@@ -7,6 +7,7 @@
 #include "LightingThread.h"
 #include "ChunkMap.h"
 #include "World.h"
+#include "BlockInfo.h"
 
 
 
@@ -99,7 +100,7 @@ public:
 // cLightingThread:
 
 cLightingThread::cLightingThread(cWorld & a_World):
-	super("cLightingThread"),
+	Super("cLightingThread"),
 	m_World(a_World),
 	m_MaxHeight(0),
 	m_NumSeeds(0)
@@ -139,7 +140,7 @@ void cLightingThread::Stop(void)
 	m_ShouldTerminate = true;
 	m_evtItemAdded.Set();
 
-	super::Stop();
+	Super::Stop();
 }
 
 
@@ -237,7 +238,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	{
 		if (a_Item.m_CallbackAfter != nullptr)
 		{
-			a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ, true);
+			a_Item.m_CallbackAfter->Call({a_Item.m_ChunkX, a_Item.m_ChunkZ}, true);
 		}
 		return;
 	}
@@ -318,7 +319,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 
 	if (a_Item.m_CallbackAfter != nullptr)
 	{
-		a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ, true);
+		a_Item.m_CallbackAfter->Call({a_Item.m_ChunkX, a_Item.m_ChunkZ}, true);
 	}
 }
 
@@ -336,7 +337,7 @@ void cLightingThread::ReadChunks(int a_ChunkX, int a_ChunkZ)
 		for (int x = 0; x < 3; x++)
 		{
 			Reader.m_ReadingChunkX = x;
-			VERIFY(m_World.GetChunkData(a_ChunkX + x - 1, a_ChunkZ + z - 1, Reader));
+			VERIFY(m_World.GetChunkData({a_ChunkX + x - 1, a_ChunkZ + z - 1}, Reader));
 		}  // for z
 	}  // for x
 
@@ -534,6 +535,33 @@ void cLightingThread::CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_Ch
 		// Skip into the next y-level in the 3x3 chunk blob; each level has cChunkDef::Width * 9 rows
 		// We've already walked cChunkDef::Width * 3 in the "for z" cycle, that makes cChunkDef::Width * 6 rows left to skip
 		InIdx += cChunkDef::Width * cChunkDef::Width * 6;
+	}
+}
+
+
+
+
+
+void cLightingThread::PropagateLight(
+	NIBBLETYPE * a_Light,
+	unsigned int a_SrcIdx, unsigned int a_DstIdx,
+	size_t & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
+)
+{
+	ASSERT(a_SrcIdx < ARRAYCOUNT(m_SkyLight));
+	ASSERT(a_DstIdx < ARRAYCOUNT(m_BlockTypes));
+
+	if (a_Light[a_SrcIdx] <= a_Light[a_DstIdx] + cBlockInfo::GetSpreadLightFalloff(m_BlockTypes[a_DstIdx]))
+	{
+		// We're not offering more light than the dest block already has
+		return;
+	}
+
+	a_Light[a_DstIdx] = a_Light[a_SrcIdx] - cBlockInfo::GetSpreadLightFalloff(m_BlockTypes[a_DstIdx]);
+	if (!a_IsSeedOut[a_DstIdx])
+	{
+		a_IsSeedOut[a_DstIdx] = true;
+		a_SeedIdxOut[a_NumSeedsOut++] = a_DstIdx;
 	}
 }
 

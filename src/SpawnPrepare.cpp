@@ -21,9 +21,9 @@ protected:
 
 	std::shared_ptr<cSpawnPrepare> m_SpawnPrepare;
 
-	virtual void Call(int a_ChunkX, int a_ChunkZ, bool a_IsSuccess) override
+	virtual void Call(cChunkCoords a_Coords, bool a_IsSuccess) override
 	{
-		m_SpawnPrepare->PreparedChunkCallback(a_ChunkX, a_ChunkZ);
+		m_SpawnPrepare->PreparedChunkCallback(a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
 	}
 };
 
@@ -59,7 +59,7 @@ void cSpawnPrepare::PrepareChunks(cWorld & a_World, int a_SpawnChunkX, int a_Spa
 	{
 		int chunkX, chunkZ;
 		prep->DecodeChunkCoords(i, chunkX, chunkZ);
-		a_World.PrepareChunk(chunkX, chunkZ, cpp14::make_unique<cSpawnPrepareCallback>(prep));
+		a_World.PrepareChunk(chunkX, chunkZ, std::make_unique<cSpawnPrepareCallback>(prep));
 	}  // for i
 
 	// Wait for the lighting thread to prepare everything. Event is set in the Call() callback:
@@ -107,7 +107,7 @@ void cSpawnPrepare::PreparedChunkCallback(int a_ChunkX, int a_ChunkZ)
 	{
 		int chunkX, chunkZ;
 		DecodeChunkCoords(m_NextIdx, chunkX, chunkZ);
-		m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, cpp14::make_unique<cSpawnPrepareCallback>(shared_from_this()));
+		m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, std::make_unique<cSpawnPrepareCallback>(shared_from_this()));
 		m_NextIdx += 1;
 	}
 

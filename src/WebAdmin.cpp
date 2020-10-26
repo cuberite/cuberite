@@ -143,7 +143,7 @@ void cWebAdmin::Stop(void)
 
 bool cWebAdmin::LoadLoginPage(void)
 {
-	cFile File(FILE_IO_PREFIX "webadmin/login_template.html", cFile::fmRead);
+	cFile File("webadmin/login_template.html", cFile::fmRead);
 	if (!File.IsOpen())
 	{
 		return false;
@@ -167,7 +167,7 @@ bool cWebAdmin::LoadLoginPage(void)
 void cWebAdmin::RemoveAllPluginWebTabs(const AString & a_PluginName)
 {
 	cCSLock lock(m_CS);
-	m_WebTabs.erase(std::remove_if(m_WebTabs.begin(), m_WebTabs.end(), [=](cWebTabPtr a_CBWebTab)
+	m_WebTabs.erase(std::remove_if(m_WebTabs.begin(), m_WebTabs.end(), [=](const cWebTabPtr & a_CBWebTab)
 		{
 			return (a_CBWebTab->m_PluginName == a_PluginName);
 		}),
@@ -198,16 +198,16 @@ void cWebAdmin::Reload(void)
 	}
 	m_TemplateScript.Create();
 	m_TemplateScript.RegisterAPILibs();
-	if (!m_TemplateScript.LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
+	if (!m_TemplateScript.LoadFile("webadmin/template.lua"))
 	{
-		LOGWARN("Could not load WebAdmin template \"%s\". WebAdmin will not work properly!", FILE_IO_PREFIX "webadmin/template.lua");
+		LOGWARN("Could not load WebAdmin template \"%s\". WebAdmin will not work properly!", "webadmin/template.lua");
 		m_TemplateScript.Close();
 	}
 
 	// Load the login template, provide a fallback default if not found:
 	if (!LoadLoginPage())
 	{
-		LOGWARN("Could not load WebAdmin login page \"%s\", using fallback template.", FILE_IO_PREFIX "webadmin/login_template.html");
+		LOGWARN("Could not load WebAdmin login page \"%s\", using fallback template.", "webadmin/login_template.html");
 
 		// Set the fallback:
 		m_LoginPage = \
@@ -375,14 +375,13 @@ void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPInc
 		}
 	}
 
-	// Remove all "../" strings:
-	ReplaceString(FileURL, "../", "");
-
 	// Read the file contents and guess its mime-type, based on the extension:
 	AString Content = "<h2>404 Not Found</h2>";
-	AString ContentType;
-	AString Path = Printf(FILE_IO_PREFIX "webadmin/files/%s", FileURL.c_str());
-	if (cFile::IsFile(Path))
+	AString ContentType = "text/html";
+	AString Path = Printf("webadmin/files/%s", FileURL.c_str());
+
+	// Return 404 if the file is not found, or the URL contains '../' (for security reasons)
+	if ((FileURL.find("../") == AString::npos) && cFile::IsFile(Path))
 	{
 		cFile File(Path, cFile::fmRead);
 		AString FileContent;
@@ -395,10 +394,10 @@ void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPInc
 				ContentType = GetContentTypeFromFileExt(Path.substr(LastPointPosition + 1));
 			}
 		}
-	}
-	if (ContentType.empty())
-	{
-		ContentType = "application/unknown";
+		if (ContentType.empty())
+		{
+			ContentType = "application/unknown";
+		}
 	}
 
 	// Send the response:
@@ -520,7 +519,7 @@ void cWebAdmin::AddWebTab(
 )
 {
 	cCSLock lock(m_CS);
-	m_WebTabs.emplace_back(std::make_shared<cWebTab>(a_Title, a_UrlPath, a_PluginName, a_Callback));
+	m_WebTabs.emplace_back(std::make_shared<cWebTab>(a_Title, a_UrlPath, a_PluginName, std::move(a_Callback)));
 }
 
 

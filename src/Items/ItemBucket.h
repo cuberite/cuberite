@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../Simulator/FluidSimulator.h"
 #include "../Blocks/BlockHandler.h"
@@ -15,25 +16,34 @@
 class cItemBucketHandler :
 	public cItemHandler
 {
+	using Super = cItemHandler;
+
 public:
-	cItemBucketHandler(int a_ItemType) :
-		cItemHandler(a_ItemType)
+
+	cItemBucketHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 
 	}
 
 
 
+
+
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
 	) override
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_BUCKET:       return ScoopUpFluid(a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			case E_ITEM_LAVA_BUCKET:  return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, E_BLOCK_LAVA);
-			case E_ITEM_WATER_BUCKET: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, E_BLOCK_WATER);
+			case E_ITEM_BUCKET:       return ScoopUpFluid(a_World, a_Player, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace);
+			case E_ITEM_LAVA_BUCKET:  return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace, E_BLOCK_LAVA);
+			case E_ITEM_WATER_BUCKET: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace, E_BLOCK_WATER);
 			default:
 			{
 				ASSERT(!"Unhandled ItemType");
@@ -44,9 +54,18 @@ public:
 
 
 
-	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
+
+
+	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, const Vector3i a_ClickedBlockPos, eBlockFace a_ClickedBlockFace)
 	{
-		if (a_BlockFace != BLOCK_FACE_NONE)
+		// Players can't pick up fluid while in adventure mode.
+		if (a_Player->IsGameModeAdventure())
+		{
+			return false;
+		}
+
+		// Needs a valid clicked block:
+		if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
 		}
@@ -64,15 +83,15 @@ public:
 		}
 
 		BLOCKTYPE Block = a_World->GetBlock(BlockPos.x, BlockPos.y, BlockPos.z);
-		ENUM_ITEM_ID NewItem;
+		ENUM_ITEM_TYPE NewItemType;
 
 		if (IsBlockWater(Block))
 		{
-			NewItem = E_ITEM_WATER_BUCKET;
+			NewItemType = E_ITEM_WATER_BUCKET;
 		}
 		else if (IsBlockLava(Block))
 		{
-			NewItem = E_ITEM_LAVA_BUCKET;
+			NewItemType = E_ITEM_LAVA_BUCKET;
 		}
 		else
 		{
@@ -95,18 +114,7 @@ public:
 		// Give new bucket, filled with fluid when the gamemode is not creative:
 		if (!a_Player->IsGameModeCreative())
 		{
-			// Remove the bucket from the inventory
-			if (!a_Player->GetInventory().RemoveOneEquippedItem())
-			{
-				LOG("Clicked with an empty bucket, but cannot remove one from the inventory? WTF?");
-				ASSERT(!"Inventory bucket mismatch");
-				return true;
-			}
-			if (a_Player->GetInventory().AddItem(cItem(NewItem)) != 1)
-			{
-				// The bucket didn't fit, toss it as a pickup:
-				a_Player->TossPickup(cItem(NewItem));
-			}
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(NewItemType));
 		}
 
 		return true;
@@ -114,11 +122,19 @@ public:
 
 
 
+
+
 	bool PlaceFluid(
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock
+		const Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock
 	)
 	{
+		// Players can't place fluid while in adventure mode.
+		if (a_Player->IsGameModeAdventure())
+		{
+			return false;
+		}
+
 		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
@@ -140,20 +156,10 @@ public:
 			return false;
 		}
 
+		// Give back an empty bucket if the gamemode is not creative:
 		if (!a_Player->IsGameModeCreative())
 		{
-			// Remove fluid bucket, add empty bucket:
-			if (!a_Player->GetInventory().RemoveOneEquippedItem())
-			{
-				LOG("Clicked with a full bucket, but cannot remove one from the inventory? WTF?");
-				ASSERT(!"Inventory bucket mismatch");
-				return false;
-			}
-			cItem Item(E_ITEM_BUCKET, 1);
-			if (!a_Player->GetInventory().AddItem(Item))
-			{
-				return false;
-			}
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_BUCKET));
 		}
 
 		// Wash away anything that was there prior to placing:
@@ -164,19 +170,15 @@ public:
 				// Plugin disagrees with the washing-away
 				return false;
 			}
-
-			cBlockHandler * Handler = BlockHandler(CurrentBlockType);
-			if (Handler->DoesDropOnUnsuitable())
-			{
-				cChunkInterface ChunkInterface(a_World->GetChunkMap());
-				Handler->DropBlock(ChunkInterface, *a_World, a_PluginInterface, a_Player, BlockPos.x, BlockPos.y, BlockPos.z);
-			}
+			a_World->DropBlockAsPickups(BlockPos, a_Player, nullptr);
 			a_PluginInterface.CallHookPlayerBrokenBlock(*a_Player, BlockPos.x, BlockPos.y, BlockPos.z, EntryFace, CurrentBlockType, CurrentBlockMeta);
 		}
 
 		// Place the actual fluid block:
 		return a_Player->PlaceBlock(BlockPos.x, BlockPos.y, BlockPos.z, a_FluidBlock, 0);
 	}
+
+
 
 
 
@@ -195,7 +197,7 @@ public:
 			{
 			}
 
-			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+			virtual bool OnNextBlock(Vector3i a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 			{
 				if (IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType))
 				{
@@ -204,7 +206,7 @@ public:
 						return false;
 					}
 					m_HasHitFluid = true;
-					m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);
+					m_Pos = a_BlockPosition;
 					return true;
 				}
 				return false;
@@ -215,7 +217,7 @@ public:
 		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
 		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
 
-		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
+		Tracer.Trace(Start, End);
 
 		if (!Callbacks.m_HasHitFluid)
 		{
@@ -226,6 +228,8 @@ public:
 		a_BlockPos = Callbacks.m_Pos;
 		return true;
 	}
+
+
 
 
 
@@ -240,18 +244,18 @@ public:
 			NIBBLETYPE m_ReplacedBlockMeta;
 			eBlockFace m_EntryFace;
 
-			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
+			virtual bool OnNextBlock(Vector3i a_CBBlockPos, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
 			{
-				if (a_CBBlockType != E_BLOCK_AIR)
+				if ((a_CBBlockType != E_BLOCK_AIR) && !IsBlockLiquid(a_CBBlockType))
 				{
 					m_ReplacedBlockType = a_CBBlockType;
 					m_ReplacedBlockMeta = a_CBBlockMeta;
 					m_EntryFace = static_cast<eBlockFace>(a_CBEntryFace);
-					if (!cFluidSimulator::CanWashAway(a_CBBlockType) && !IsBlockLiquid(a_CBBlockType))
+					if (!cFluidSimulator::CanWashAway(a_CBBlockType))
 					{
-						AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, a_CBEntryFace);  // Was an unwashawayable block, can't overwrite it!
+						a_CBBlockPos = AddFaceDirection(a_CBBlockPos, a_CBEntryFace);  // Was an unwashawayable block, can't overwrite it!
 					}
-					m_Pos.Set(a_CBBlockX, a_CBBlockY, a_CBBlockZ);  // (Block could be washed away, replace it)
+					m_Pos = a_CBBlockPos;  // (Block could be washed away, replace it)
 					return true;  // Abort tracing
 				}
 				return false;
@@ -265,7 +269,7 @@ public:
 		// cLineBlockTracer::Trace() returns true when whole line was traversed. By returning true from the callback when we hit something,
 		// we ensure that this never happens if liquid could be placed
 		// Use this to judge whether the position is valid
-		if (!Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z))
+		if (!Tracer.Trace(Start, End))
 		{
 			a_BlockPos = Callbacks.m_Pos;
 			a_BlockType = Callbacks.m_ReplacedBlockType;

@@ -10,10 +10,12 @@
 
 // Emit a warning if the first param is true
 #define CONDWARNING(ShouldLog, Fmt, ...) \
-	if (ShouldLog) \
-	{ \
-		LOGWARNING(Fmt, __VA_ARGS__); \
-	}
+	do { \
+		if (ShouldLog) \
+		{ \
+			LOGWARNING(Fmt, __VA_ARGS__); \
+		} \
+	} while (false)
 
 
 
@@ -28,36 +30,39 @@ If a_LogWarnings is true, outputs failure reasons to console.
 The range is returned in a_Min and a_Max.
 If no value is in the string, both values are left unchanged.
 If only the minimum is in the string, it is assigned to both a_Min and a_Max. */
-static bool ParseRange(const AString & a_Params, int & a_Min, int & a_Max, bool a_LogWarnings)
+namespace VerticalLimit
 {
-	auto params = StringSplitAndTrim(a_Params, "|");
-	if (params.size() == 0)
+	static bool ParseRange(const AString & a_Params, int & a_Min, int & a_Max, bool a_LogWarnings)
 	{
-		// No params, generate directly on top:
+		auto params = StringSplitAndTrim(a_Params, "|");
+		if (params.size() == 0)
+		{
+			// No params, generate directly on top:
+			return true;
+		}
+		if (!StringToInteger(params[0], a_Min))
+		{
+			// Failed to parse the min rel height:
+			CONDWARNING(a_LogWarnings, "Cannot parse minimum height from string \"%s\"!", params[0].c_str());
+			return false;
+		}
+		if (params.size() == 1)
+		{
+			// Only one param was given, there's no range
+			a_Max = a_Min;
+			return true;
+		}
+		if (!StringToInteger(params[1], a_Max))
+		{
+			CONDWARNING(a_LogWarnings, "Cannot parse maximum height from string \"%s\"!", params[1].c_str());
+			return false;
+		}
+		if (a_Max < a_Min)
+		{
+			std::swap(a_Max, a_Min);
+		}
 		return true;
 	}
-	if (!StringToInteger(params[0], a_Min))
-	{
-		// Failed to parse the min rel height:
-		CONDWARNING(a_LogWarnings, "Cannot parse minimum height from string \"%s\"!", params[0].c_str());
-		return false;
-	}
-	if (params.size() == 1)
-	{
-		// Only one param was given, there's no range
-		a_Max = a_Min;
-		return true;
-	}
-	if (!StringToInteger(params[1], a_Max))
-	{
-		CONDWARNING(a_LogWarnings, "Cannot parse maximum height from string \"%s\"!", params[1].c_str());
-		return false;
-	}
-	if (a_Max < a_Min)
-	{
-		std::swap(a_Max, a_Min);
-	}
-	return true;
 }
 
 
@@ -142,7 +147,7 @@ public:
 		// Parameters: "<MinBlocksAbove>|<MaxBlocksAbove>", both optional
 		m_MinBlocksAbove = 0;
 		m_MaxBlocksAbove = 0;
-		return ParseRange(a_Params, m_MinBlocksAbove, m_MaxBlocksAbove, a_LogWarnings);
+		return VerticalLimit::ParseRange(a_Params, m_MinBlocksAbove, m_MaxBlocksAbove, a_LogWarnings);
 	}
 
 
@@ -189,7 +194,7 @@ public:
 		// Parameters: "<MinBlocksAbove>|<MaxBlocksAbove>", both optional
 		m_MinBlocksAbove = 0;
 		m_MaxBlocksAbove = 0;
-		return ParseRange(a_Params, m_MinBlocksAbove, m_MaxBlocksAbove, a_LogWarnings);
+		return VerticalLimit::ParseRange(a_Params, m_MinBlocksAbove, m_MaxBlocksAbove, a_LogWarnings);
 	}
 
 
@@ -273,7 +278,7 @@ public:
 		// Parameters: "<MinBlocksBelow>|<MaxBlocksBelow>", both optional
 		m_MinBlocksBelow = 0;
 		m_MaxBlocksBelow = 0;
-		return ParseRange(a_Params, m_MinBlocksBelow, m_MaxBlocksBelow, a_LogWarnings);
+		return VerticalLimit::ParseRange(a_Params, m_MinBlocksBelow, m_MaxBlocksBelow, a_LogWarnings);
 	}
 
 
@@ -319,7 +324,7 @@ public:
 		// Parameters: "<MinBlocksBelow>|<MaxBlocksBelow>", both optional
 		m_MinBlocksBelow = 0;
 		m_MaxBlocksBelow = 0;
-		return ParseRange(a_Params, m_MinBlocksBelow, m_MaxBlocksBelow, a_LogWarnings);
+		return VerticalLimit::ParseRange(a_Params, m_MinBlocksBelow, m_MaxBlocksBelow, a_LogWarnings);
 	}
 
 

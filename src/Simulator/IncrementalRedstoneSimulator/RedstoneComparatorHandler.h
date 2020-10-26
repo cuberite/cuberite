@@ -1,19 +1,15 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
-#include "Blocks/BlockComparator.h"
+#include "../../Blocks/BlockComparator.h"
 
 
 
 
 
-class cRedstoneComparatorHandler : public cRedstoneHandler
+namespace RedstoneComparatorHandler
 {
-	typedef cRedstoneHandler super;
-public:
-
-	unsigned char GetFrontPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, unsigned char a_HighestSidePowerLevel, unsigned char a_HighestRearPowerLevel) const
+	inline unsigned char GetFrontPowerLevel(NIBBLETYPE a_Meta, unsigned char a_HighestSidePowerLevel, unsigned char a_HighestRearPowerLevel)
 	{
 		if (cBlockComparatorHandler::IsInSubtractionMode(a_Meta))
 		{
@@ -23,111 +19,118 @@ public:
 		else
 		{
 			// Comparison mode
-			return (std::max(a_HighestSidePowerLevel, a_HighestRearPowerLevel) == a_HighestSidePowerLevel) ? 0 : a_HighestRearPowerLevel;
+			return (a_HighestRearPowerLevel < a_HighestSidePowerLevel) ? 0 : a_HighestRearPowerLevel;
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_QueryPosition);
 		UNUSED(a_QueryBlockType);
-		auto ChunkData = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
 
+		const auto Meta = a_Chunk.GetMeta(a_Position);
 		return (
-			(cBlockComparatorHandler::GetFrontCoordinate(a_Position, a_Meta & 0x3) == a_QueryPosition) ?
-			ChunkData->GetCachedPowerData(a_Position).PowerLevel : 0
+			(cBlockComparatorHandler::GetFrontCoordinate(a_Position, Meta & 0x3) == a_QueryPosition) ?
+			DataForChunk(a_Chunk).GetCachedPowerData(a_Position) : 0
 		);
 	}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	inline unsigned char GetPowerLevel(cChunk & a_Chunk, Vector3i Position, BLOCKTYPE BlockType, NIBBLETYPE Meta)
 	{
-		UNUSED(a_Position);
-		UNUSED(a_BlockType);
-
 		UInt8 SignalStrength = 0;
-		auto RearCoordinate = cBlockComparatorHandler::GetRearCoordinate(a_Position, a_Meta & 0x3);
-		a_World.DoWithBlockEntityAt(RearCoordinate.x, RearCoordinate.y, RearCoordinate.z, [&](cBlockEntity & a_BlockEntity)
-			{
-				// Skip BlockEntities that don't have slots
-				auto BlockEntityWithItems = dynamic_cast<cBlockEntityWithItems *>(&a_BlockEntity);
-				if (BlockEntityWithItems == nullptr)
-				{
-					return false;
-				}
+		auto RearCoordinate = cBlockComparatorHandler::GetRearCoordinate(Position, Meta & 0x3);
 
-				auto & Contents = BlockEntityWithItems->GetContents();
-				float Fullness = 0;  // Is a floating-point type to allow later calculation to produce a non-truncated value
-
-				for (int Slot = 0; Slot != Contents.GetNumSlots(); ++Slot)
-				{
-					Fullness += static_cast<float>(Contents.GetSlot(Slot).m_ItemCount) / Contents.GetSlot(Slot).GetMaxStackSize();
-				}
-
-				SignalStrength = (Fullness < 0.001 /* container empty? */) ? 0 : static_cast<UInt8>(1 + (Fullness / Contents.GetNumSlots()) * 14);
-				return false;
-			}
-		);
-		auto RearPower = SignalStrength;
-		auto RearType = a_World.GetBlock(RearCoordinate);
-
-		auto PotentialSourceHandler = cIncrementalRedstoneSimulator::GetComponentHandler(RearType);
-		if (PotentialSourceHandler != nullptr)
+		auto RearChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RearCoordinate);
+		if ((RearChunk == nullptr) || !RearChunk->IsValid())
 		{
-			NIBBLETYPE RearMeta = a_World.GetBlockMeta(RearCoordinate);
-			RearPower = std::max(SignalStrength, PotentialSourceHandler->GetPowerDeliveredToPosition(a_World, RearCoordinate, RearType, RearMeta, a_Position, a_BlockType));
+			return SignalStrength;
 		}
 
-		return RearPower;
+		RearChunk->DoWithBlockEntityAt(RearCoordinate, [&](cBlockEntity & a_BlockEntity)
+		{
+			// Skip BlockEntities that don't have slots
+			auto BlockEntityWithItems = dynamic_cast<cBlockEntityWithItems *>(&a_BlockEntity);
+			if (BlockEntityWithItems == nullptr)
+			{
+				return false;
+			}
+
+			// TODO: handle double chests
+
+			auto & Contents = BlockEntityWithItems->GetContents();
+			float Fullness = 0;  // Is a floating-point type to allow later calculation to produce a non-truncated value
+
+			for (int Slot = 0; Slot != Contents.GetNumSlots(); ++Slot)
+			{
+				Fullness += static_cast<float>(Contents.GetSlot(Slot).m_ItemCount) / Contents.GetSlot(Slot).GetMaxStackSize();
+			}
+
+			SignalStrength = (Fullness < 0.001 /* container empty? */) ? 0 : static_cast<UInt8>(1 + (Fullness / Contents.GetNumSlots()) * 14);
+			return false;
+		});
+
+		const auto RearType = RearChunk->GetBlock(RearCoordinate);
+		return std::max(
+			SignalStrength,
+			RedstoneHandler::GetPowerDeliveredToPosition(
+				*RearChunk, RearCoordinate, RearType,
+				cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(a_Chunk, *RearChunk, Position), BlockType, false
+			)
+		);
 	}
 
-	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
-		// Note that a_PoweringData here contains the maximum * side * power level, as specified by GetValidSourcePositions
+		// Note that Power here contains the maximum * side * power level, as specified by GetValidSourcePositions
 		// LOGD("Evaluating ALU the comparator (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
-		auto Data = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
-		auto DelayInfo = Data->GetMechanismDelayInfo(a_Position);
+
+		auto & Data = DataForChunk(a_Chunk);
+		auto DelayInfo = Data.GetMechanismDelayInfo(a_Position);
 
 		// Delay is used here to prevent an infinite loop (#3168)
 		if (DelayInfo == nullptr)
 		{
-			auto RearPower = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);
-			auto FrontPower = GetFrontPowerLevel(a_World, a_Position, a_BlockType, a_Meta, a_PoweringData.PowerLevel, RearPower);
-			auto PreviousFrontPower = Data->ExchangeUpdateOncePowerData(a_Position, PoweringData(a_PoweringData.PoweringBlock, FrontPower));
+			const auto RearPower = GetPowerLevel(a_Chunk, a_Position, a_BlockType, a_Meta);
+			const auto FrontPower = GetFrontPowerLevel(a_Meta, Power, RearPower);
+			const auto PreviousFrontPower = Data.GetCachedPowerData(a_Position);
+			const bool ShouldUpdate = (FrontPower != PreviousFrontPower);  // "Business logic" (:P) - determined by side and rear power levels
 
-			bool ShouldBeOn = (RearPower > 0);  // Provide visual indication by examining * rear * power level
-			bool ShouldUpdate = (FrontPower != PreviousFrontPower.PowerLevel);  // "Business logic" (:P) - determine by examining *side* power levels
-
-			if (ShouldUpdate || (ShouldBeOn != cBlockComparatorHandler::IsOn(a_Meta)))
+			if (ShouldUpdate)
 			{
-				Data->m_MechanismDelays[a_Position] = std::make_pair(1, ShouldBeOn);
+				Data.m_MechanismDelays[a_Position] = std::make_pair(1, bool());
 			}
+
+			return;
 		}
-		else
+
+		int DelayTicks;
+		std::tie(DelayTicks, std::ignore) = *DelayInfo;
+
+		if (DelayTicks != 0)
 		{
-			int DelayTicks;
-			bool ShouldPowerOn;
-			std::tie(DelayTicks, ShouldPowerOn) = *DelayInfo;
-
-			if (DelayTicks == 0)
-			{
-				a_World.SetBlockMeta(a_Position, ShouldPowerOn ? (a_Meta | 0x8) : (a_Meta & 0x7));
-				Data->m_MechanismDelays.erase(a_Position);
-
-				// Assume that an update (to front power) is needed.
-				// Note: potential inconsistencies will arise as power data is updated before-delay due to limitations of the power data caching functionality (only stores one bool)
-				// This means that other mechanisms like wires may get our new power data before our delay has finished
-				// This also means that we have to manually update ourselves to be aware of any changes that happened in the previous redstone tick
-				return StaticAppend(GetAdjustedRelatives(a_Position, GetRelativeLaterals()), cVector3iArray{ a_Position });
-			}
+			return;
 		}
 
-		return {};
+		const auto RearPower = GetPowerLevel(a_Chunk, a_Position, a_BlockType, a_Meta);
+		const auto FrontPower = GetFrontPowerLevel(a_Meta, Power, RearPower);
+		const NIBBLETYPE NewMeta = (FrontPower > 0) ? (a_Meta | 0x08u) : (a_Meta & 0x07u);
+
+		// Don't care about the previous power level so return value ignored
+		Data.ExchangeUpdateOncePowerData(a_Position, FrontPower);
+
+		a_Chunk.SetMeta(a_Position, NewMeta);
+		Data.m_MechanismDelays.erase(a_Position);
+
+		// Assume that an update (to front power) is needed:
+		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, cBlockComparatorHandler::GetFrontCoordinate(a_Position, a_Meta & 0x3) - a_Position);
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
-		UNUSED(a_World);
+		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);
-		return cVector3iArray {cBlockComparatorHandler::GetSideCoordinate(a_Position, a_Meta & 0x3, false), cBlockComparatorHandler::GetSideCoordinate(a_Position, a_Meta & 0x3, true)};
+
+		Callback(cBlockComparatorHandler::GetSideCoordinate(a_Position, a_Meta & 0x3, false));
+		Callback(cBlockComparatorHandler::GetSideCoordinate(a_Position, a_Meta & 0x3, true));
 	}
 };

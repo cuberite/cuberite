@@ -15,17 +15,17 @@
 
 
 
-class cCraftingWindow :
+class cCraftingWindow:
 	public cWindow
 {
-	typedef cWindow super;
+	using Super = cWindow;
 
 public:
-	cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ);
+
+	cCraftingWindow();
 
 	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
+
+	/** Loads the given Recipe into the crafting grid */
+	void LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId);
 };
-
-
-
-

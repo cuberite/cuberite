@@ -59,11 +59,21 @@ public:
 
 	void Run(void);
 
-	void Log(const char * a_Format, fmt::ArgList);
-	FMT_VARIADIC(void, Log, const char *)
+	void vLog(const char * a_Format, fmt::printf_args a_ArgList);
 
-	void DataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::ArgList);
-	FMT_VARIADIC(void, DataLog, const void *, size_t, const char *)
+	template <typename... Args>
+	void Log(const char * a_Format, const Args & ... a_Args)
+	{
+		vLog(a_Format, fmt::make_printf_args(a_Args...));
+	}
+
+	void vDataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::printf_args a_ArgList);
+
+	template <typename... Args>
+	void DataLog(const void * a_Data, size_t a_Size, const char * a_Format, const Args & ... a_Args)
+	{
+		vDataLog(a_Data, a_Size, a_Format, fmt::make_printf_args(a_Args...));
+	}
 
 	void LogFlush(void);
 

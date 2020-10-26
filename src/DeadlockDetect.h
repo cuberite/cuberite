@@ -5,7 +5,7 @@
 
 /*
 This class simply monitors each world's m_WorldAge, which is expected to grow on each tick.
-If the world age doesn't grow for several seconds, it's either because the server is super-overloaded,
+If the world age doesn't grow for several seconds, it's either because the server is Super-overloaded,
 or because the world tick thread hangs in a deadlock. We presume the latter and therefore kill the server.
 Once we learn to write crashdumps programmatically, we should do so just before killing, to enable debugging.
 */
@@ -20,13 +20,14 @@ Once we learn to write crashdumps programmatically, we should do so just before 
 
 
 
-class cDeadlockDetect :
+class cDeadlockDetect:
 	public cIsThread
 {
-	typedef cIsThread super;
+	using Super = cIsThread;
 
 public:
-	cDeadlockDetect(void);
+
+	cDeadlockDetect();
 	virtual ~cDeadlockDetect() override;
 
 	/** Starts the detection. Hides cIsThread's Start, because we need some initialization */
@@ -79,7 +80,7 @@ protected:
 	/** Called when a deadlock is detected in a world. Aborts the server.
 	a_WorldName is the name of the world whose age has triggered the detection.
 	a_WorldAge is the age (in ticks) in which the world is stuck. */
-	NORETURN void DeadlockDetected(const AString & a_WorldName, Int64 a_WorldAge);
+	[[noreturn]] void DeadlockDetected(const AString & a_WorldName, Int64 a_WorldAge);
 
 	/** Outputs a listing of the tracked CSs, together with their name and state. */
 	void ListTrackedCSs();

@@ -7,28 +7,37 @@
 
 
 
-class cBlockFlowerHandler :
+class cBlockFlowerHandler final :
 	public cBlockHandler
 {
+	using Super = cBlockHandler;
+
 public:
-	cBlockFlowerHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	using Super::Super;
+
+private:
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
+		NIBBLETYPE meta = a_BlockMeta & 0x7;
+		return cItem(m_BlockType, 1, meta);
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		NIBBLETYPE Meta = a_BlockMeta & 0x7;
 
-		a_Pickups.push_back(cItem(m_BlockType, 1, Meta));
+
+
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	{
+		return ((a_RelPos.y > 0) && IsBlockTypeOfDirt(a_Chunk.GetBlock(a_RelPos.addedY(-1))));
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
-	{
-		return (a_RelY > 0) && IsBlockTypeOfDirt(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ));
-	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 7;

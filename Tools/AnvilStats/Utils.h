@@ -45,6 +45,7 @@ enum eEntityType
 	entWitherBoss,
 	entWolf,
 	entZombie,
+	entZombieVillager,
 	entUnknown,
 	entMax = entUnknown,
 } ;

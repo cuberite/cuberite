@@ -4,7 +4,7 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "MetaRotator.h"
+#include "Mixins.h"
 #include "ChunkInterface.h"
 
 
@@ -15,41 +15,14 @@ class cWorldInterface;
 
 
 
-class cBlockBedHandler :
-	public cMetaRotator<cBlockEntityHandler, 0x3, 0x02, 0x03, 0x00, 0x01, true>
+class cBlockBedHandler final :
+	public cYawRotator<cBlockEntityHandler, 0x03, 0x02, 0x03, 0x00, 0x01>
 {
+	using Super = cYawRotator<cBlockEntityHandler, 0x03, 0x02, 0x03, 0x00, 0x01>;
+
 public:
-	cBlockBedHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockEntityHandler, 0x3, 0x02, 0x03, 0x00, 0x01, true>(a_BlockType)
-	{
-	}
 
-	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
-
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
-
-	virtual bool IsUseable(void) override
-	{
-		return true;
-	}
-
-	virtual void ConvertToPickups(cItems & Pickups, NIBBLETYPE Meta) override {}
-
-	virtual void ConvertToPickups(cWorldInterface & a_WorldInterface, cItems & a_Pickups, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ) override;
-
-	// Bed specific helper functions
-	static NIBBLETYPE RotationToMetaData(double a_Rotation)
-	{
-		a_Rotation += 180 + (180 / 4);  // So its not aligned with axis
-		if (a_Rotation > 360)
-		{
-			a_Rotation -= 360;
-		}
-
-		a_Rotation = (a_Rotation / 360) * 4;
-
-		return (static_cast<NIBBLETYPE>(a_Rotation + 2)) % 4;
-	}
+	using Super::Super;
 
 	static Vector3i MetaDataToDirection(NIBBLETYPE a_MetaData)
 	{
@@ -63,7 +36,7 @@ public:
 		return Vector3i();
 	}
 
-	static void SetBedOccupationState(cChunkInterface & a_ChunkInterface, const Vector3i & a_BedPosition, bool a_IsOccupied)
+	static void SetBedOccupationState(cChunkInterface & a_ChunkInterface, Vector3i a_BedPosition, bool a_IsOccupied)
 	{
 		auto Meta = a_ChunkInterface.GetBlockMeta(a_BedPosition);
 		if (a_IsOccupied)
@@ -75,12 +48,44 @@ public:
 			Meta &= 0x0b;  // Clear the "occupied" bit of the bed's block
 		}
 
-		a_ChunkInterface.SetBlockMeta(a_BedPosition.x, a_BedPosition.y, a_BedPosition.z, Meta);
+		a_ChunkInterface.SetBlockMeta(a_BedPosition, Meta);
 	}
 
-	virtual void OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange) override;
+private:
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	// Overrides:
+	virtual void OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		const Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+	) const override;
+
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos
+	) const override;
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override;
+
+	virtual void OnPlacedByPlayer(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		const sSetBlock & a_BlockChange
+	) const override;
+
+
+
+
+
+	static void SetBedPos(cPlayer & a_Player, const Vector3i a_BedPosition);
+
+
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 28;

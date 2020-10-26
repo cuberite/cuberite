@@ -13,6 +13,10 @@
 	#include <signal.h>
 	#if defined(__linux__)
 		#include <fstream>
+
+		#if !defined(__GLIBC__)
+			#include <sys/select.h>
+		#endif
 	#elif defined(__APPLE__)
 		#include <mach/mach.h>
 	#endif
@@ -24,6 +28,7 @@
 #include "BrewingRecipes.h"
 #include "FurnaceRecipe.h"
 #include "CraftingRecipes.h"
+#include "Protocol/RecipeMapper.h"
 #include "Bindings/PluginManager.h"
 #include "MonsterConfig.h"
 #include "Entities/Player.h"
@@ -44,6 +49,7 @@
 
 
 
+extern bool g_RunAsService;
 cRoot * cRoot::s_Root = nullptr;
 
 
@@ -62,7 +68,7 @@ cRoot::cRoot(void) :
 	m_MojangAPI(nullptr)
 {
 	s_Root = this;
-	m_InputThreadRunFlag.clear();
+	TransitionNextState(NextState::Run);
 }
 
 
@@ -78,85 +84,28 @@ cRoot::~cRoot()
 
 
 
-void cRoot::InputThread(cRoot & a_Params)
+bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 {
-	cLogCommandOutputCallback Output;
-	AString Command;
-
-	while (a_Params.m_InputThreadRunFlag.test_and_set() && std::cin.good())
-	{
-		#ifndef _WIN32
-			timeval Timeout{ 0, 0 };
-			Timeout.tv_usec = 100 * 1000;  // 100 msec
-
-			fd_set ReadSet;
-			FD_ZERO(&ReadSet);
-			FD_SET(STDIN_FILENO, &ReadSet);
-
-			if (select(STDIN_FILENO + 1, &ReadSet, nullptr, nullptr, &Timeout) <= 0)
-			{
-				// Don't call getline because there's nothing to read
-				continue;
-			}
-		#endif
-
-		std::getline(std::cin, Command);
-
-		if (!a_Params.m_InputThreadRunFlag.test_and_set())
-		{
-			// Already shutting down, can't execute commands
-			break;
-		}
-
-		if (!Command.empty())
-		{
-			// Execute and clear command string when submitted
-			a_Params.ExecuteConsoleCommand(TrimString(Command), Output);
-		}
-	}
-
-	// We have come here because the std::cin has received an EOF / a terminate signal has been sent, and the server is still running
-	// Ignore this when running as a service, cin was never opened in that case
-	if (!std::cin.good() && !m_RunAsService)
-	{
-		// Stop the server:
-		a_Params.QueueExecuteConsoleCommand("stop");
-	}
-}
-
-
-
-
-
-void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
-{
-	#ifdef _WIN32
-		HMENU ConsoleMenu = GetSystemMenu(GetConsoleWindow(), FALSE);
-		EnableMenuItem(ConsoleMenu, SC_CLOSE, MF_GRAYED);  // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
-	#endif
-
-	auto consoleLogListener = MakeConsoleListener(m_RunAsService);
+	auto consoleLogListener = MakeConsoleListener(g_RunAsService);
 	auto consoleAttachment = cLogger::GetInstance().AttachListener(std::move(consoleLogListener));
 
 	cLogger::cAttachment fileAttachment;
-	if (!a_OverridesRepo->HasValue("Server","DisableLogFile"))
+	if (!a_OverridesRepo.HasValue("Server","DisableLogFile"))
 	{
 		auto fileLogListenerRet = MakeFileListener();
 		if (!fileLogListenerRet.first)
 		{
-			m_TerminateEventRaised = true;
-			LOGERROR("Failed to open log file, aborting");
-			return;
+			throw std::runtime_error("failed to open log file");
 		}
 		fileAttachment = cLogger::GetInstance().AttachListener(std::move(fileLogListenerRet.second));
 	}
 
 	LOG("--- Started Log ---");
 
-	#ifdef BUILD_ID
-		LOG("Cuberite " BUILD_SERIES_NAME " build id: " BUILD_ID);
-		LOG("from commit id: " BUILD_COMMIT_ID " built at: " BUILD_DATETIME);
-	#endif
+#ifdef BUILD_ID
+	LOG("Cuberite " BUILD_SERIES_NAME " (id: " BUILD_ID ")");
+	LOG("from commit " BUILD_COMMIT_ID " built at: " BUILD_DATETIME);
+#endif
 
 	cDeadlockDetect dd;
 	auto BeginTime = std::chrono::steady_clock::now();
@@ -169,12 +118,12 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	LOG("Reading server config...");
 
 	m_SettingsFilename = "settings.ini";
-	if (a_OverridesRepo->HasValue("Server","ConfigFile"))
+	if (a_OverridesRepo.HasValue("Server","ConfigFile"))
 	{
-		m_SettingsFilename = a_OverridesRepo->GetValue("Server","ConfigFile");
+		m_SettingsFilename = a_OverridesRepo.GetValue("Server","ConfigFile");
 	}
 
-	auto IniFile = cpp14::make_unique<cIniFile>();
+	auto IniFile = std::make_unique<cIniFile>();
 	bool IsNewIniFile = !IniFile->ReadFile(m_SettingsFilename);
 
 	if (IsNewIniFile)
@@ -184,7 +133,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		IniFile->AddHeaderComment(" Most of the settings here can be configured using the webadmin interface, if enabled in webadmin.ini");
 	}
 
-	auto settingsRepo = cpp14::make_unique<cOverridesSettingsRepository>(std::move(IniFile), std::move(a_OverridesRepo));
+	auto settingsRepo = std::make_unique<cOverridesSettingsRepository>(std::move(IniFile), a_OverridesRepo);
 
 	LOG("Starting server...");
 
@@ -197,8 +146,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	if (!m_Server->InitServer(*settingsRepo, ShouldAuthenticate))
 	{
 		settingsRepo->Flush();
-		LOGERROR("Failure starting server, aborting...");
-		return;
+		throw std::runtime_error("failure starting server");
 	}
 
 	m_WebAdmin = new cWebAdmin();
@@ -208,6 +156,7 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	m_RankManager.reset(new cRankManager());
 	m_RankManager->Initialize(*m_MojangAPI);
 	m_CraftingRecipes = new cCraftingRecipes();
+	m_RecipeMapper.reset(new cRecipeMapper());
 	m_FurnaceRecipe   = new cFurnaceRecipe();
 	m_BrewingRecipes.reset(new cBrewingRecipes());
 
@@ -241,32 +190,13 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	{
 		m_WebAdmin->Start();
 
-		LOGD("Starting InputThread...");
-		try
-		{
-			m_InputThreadRunFlag.test_and_set();
-			m_InputThread = std::thread(InputThread, std::ref(*this));
-		}
-		catch (std::system_error & a_Exception)
-		{
-			LOGERROR("cRoot::Start (std::thread) error %i: could not construct input thread; %s", a_Exception.code().value(), a_Exception.what());
-		}
-
 		LOG("Startup complete, took %ldms!", static_cast<long int>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - BeginTime).count()));
 
 		// Save the current time
 		m_StartTime = std::chrono::steady_clock::now();
 
-		#ifdef _WIN32
-			EnableMenuItem(ConsoleMenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
-		#endif
-
-		for (;;)
-		{
-			m_StopEvent.Wait();
-
-			break;
-		}
+		HandleInput();
+		m_StopEvent.Wait();
 
 		// Stop the server:
 		m_WebAdmin->Stop();
@@ -274,13 +204,6 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 		LOG("Shutting down server...");
 		m_Server->Shutdown();
 	}  // if (m_Server->Start()
-	else
-	{
-		cRoot::m_TerminateEventRaised = true;
-		#ifdef _WIN32
-			EnableMenuItem(ConsoleMenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
-		#endif
-	}
 
 	delete m_MojangAPI; m_MojangAPI = nullptr;
 
@@ -301,9 +224,6 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	delete m_FurnaceRecipe;   m_FurnaceRecipe = nullptr;
 	delete m_CraftingRecipes; m_CraftingRecipes = nullptr;
 
-	LOG("Unloading worlds...");
-	UnloadWorlds();
-
 	LOGD("Stopping plugin manager...");
 	delete m_PluginManager; m_PluginManager = nullptr;
 
@@ -312,75 +232,28 @@ void cRoot::Start(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo)
 	LOG("Cleaning up...");
 	delete m_Server; m_Server = nullptr;
 
-	m_InputThreadRunFlag.clear();
-	#ifdef _WIN32
-		DWORD Length;
-		INPUT_RECORD Record
-		{
-			KEY_EVENT,
-			{
-				{
-					TRUE,
-					1,
-					VK_RETURN,
-					static_cast<WORD>(MapVirtualKey(VK_RETURN, MAPVK_VK_TO_VSC)),
-					{ { VK_RETURN } },
-					0
-				}
-			}
-		};
-
-		// Can't kill the input thread since it breaks cin (getline doesn't block / receive input on restart)
-		// Apparently no way to unblock getline
-		// Only thing I can think of for now
-		if (WriteConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &Record, 1, &Length) == 0)
-		{
-			LOGWARN("Couldn't notify the input thread; the server will hang before shutdown!");
-			m_TerminateEventRaised = true;
-			m_InputThread.detach();
-		}
-		else
-		{
-			m_InputThread.join();
-		}
-	#else
-		m_InputThread.join();
-	#endif
-
-	if (m_TerminateEventRaised)
-	{
-		LOG("Shutdown successful!");
-	}
-	else
-	{
-		LOG("Shutdown successful - restarting...");
-	}
+	LOG("Shutdown successful!");
 	LOG("--- Stopped Log ---");
+
+	return m_NextState == NextState::Restart;
 }
 
 
 
 
 
-void cRoot::StopServer()
+void cRoot::Stop()
 {
-	// Kick all players from the server with custom disconnect message
+	TransitionNextState(NextState::Stop);
+}
 
-	bool SentDisconnect = false;
-	cRoot::Get()->ForEachPlayer([&](cPlayer & a_Player)
-		{
-			a_Player.GetClientHandlePtr()->Kick(m_Server->GetShutdownMessage());
-			SentDisconnect = true;
-			return false;
-		}
-	);
-	if (SentDisconnect)
-	{
-		std::this_thread::sleep_for(std::chrono::seconds(1));
-	}
-	m_TerminateEventRaised = true;
-	m_StopEvent.Set();
-	m_InputThreadRunFlag.clear();
+
+
+
+
+void cRoot::Restart()
+{
+	TransitionNextState(NextState::Restart);
 }
 
 
@@ -407,11 +280,10 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 		a_Settings.AddValue("WorldPaths", "world_nether", "world_nether");
 		a_Settings.AddValue("WorldPaths", "world_the_end", "world_the_end");
 
-		AStringVector WorldNames{ "world", "world_nether", "world_the_end" };
-		m_pDefaultWorld = new cWorld("world", "world", a_dd, WorldNames);
-		m_WorldsByName["world"] = m_pDefaultWorld;
-		m_WorldsByName["world_nether"] = new cWorld("world_nether", "world_nether", a_dd, WorldNames, dimNether, "world");
-		m_WorldsByName["world_the_end"] = new cWorld("world_the_end", "world_the_end", a_dd, WorldNames, dimEnd, "world");
+		const AStringVector WorldNames{ "world", "world_nether", "world_the_end" };
+		m_pDefaultWorld = &m_WorldsByName.try_emplace("world", "world", "world", a_dd, WorldNames).first->second;
+		m_WorldsByName.try_emplace("world_nether", "world_nether", "world_nether", a_dd, WorldNames, dimNether, "world");
+		m_WorldsByName.try_emplace("world_the_end", "world_the_end", "world_the_end", a_dd, WorldNames, dimEnd, "world");
 		return;
 	}
 
@@ -426,8 +298,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 	// Get the default world
 	AString DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
 	AString DefaultWorldPath = a_Settings.GetValueSet("WorldPaths", DefaultWorldName, DefaultWorldName);
-	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str(), DefaultWorldPath.c_str(), a_dd, WorldNames);
-	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
+	m_pDefaultWorld = &m_WorldsByName.try_emplace(DefaultWorldName, DefaultWorldName, DefaultWorldPath, a_dd, WorldNames).first->second;
 
 	// Then load the other worlds
 	if (Worlds.size() <= 0)
@@ -458,7 +329,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 	*/
 
 	bool FoundAdditionalWorlds = false;
-	for (auto WorldNameValue : Worlds)
+	for (const auto & WorldNameValue : Worlds)
 	{
 		AString ValueName = WorldNameValue.first;
 		if (ValueName.compare("World") != 0)
@@ -471,7 +342,6 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 			continue;
 		}
 		FoundAdditionalWorlds = true;
-		cWorld * NewWorld;
 		AString LowercaseName = StrToLower(WorldName);
 		AString WorldPath = a_Settings.GetValueSet("WorldPaths", WorldName, WorldName);
 		AString NetherAppend = "_nether";
@@ -480,7 +350,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 
 		// The default world is an overworld with no links
 		eDimension Dimension = dimOverworld;
-		AString LinkTo = "";
+		AString LinkTo;
 
 		// if the world is called x_nether
 		if ((LowercaseName.size() > NetherAppend.size()) && (LowercaseName.substr(LowercaseName.size() - NetherAppend.size()) == NetherAppend))
@@ -524,8 +394,7 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 			}
 			Dimension = dimEnd;
 		}
-		NewWorld = new cWorld(WorldName.c_str(), WorldPath.c_str(), a_dd, WorldNames, Dimension, LinkTo);
-		m_WorldsByName[WorldName] = NewWorld;
+		m_WorldsByName.try_emplace(WorldName, WorldName, WorldPath, a_dd, WorldNames, Dimension, LinkTo);
 	}  // for i - Worlds
 
 	if (!FoundAdditionalWorlds)
@@ -544,11 +413,12 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 
 void cRoot::StartWorlds(cDeadlockDetect & a_DeadlockDetect)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr->second->Start();
-		itr->second->InitializeSpawn();
-		m_PluginManager->CallHookWorldStarted(*itr->second);
+		auto & World = Entry.second;
+		World.Start();
+		World.InitializeSpawn();
+		m_PluginManager->CallHookWorldStarted(World);
 	}
 }
 
@@ -558,24 +428,10 @@ void cRoot::StartWorlds(cDeadlockDetect & a_DeadlockDetect)
 
 void cRoot::StopWorlds(cDeadlockDetect & a_DeadlockDetect)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr->second->Stop(a_DeadlockDetect);
+		Entry.second.Stop(a_DeadlockDetect);
 	}
-}
-
-
-
-
-
-void cRoot::UnloadWorlds(void)
-{
-	m_pDefaultWorld = nullptr;
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
-	{
-		delete itr->second;
-	}
-	m_WorldsByName.clear();
 }
 
 
@@ -584,6 +440,7 @@ void cRoot::UnloadWorlds(void)
 
 cWorld * cRoot::GetDefaultWorld()
 {
+	ASSERT(m_pDefaultWorld != nullptr);
 	return m_pDefaultWorld;
 }
 
@@ -593,10 +450,10 @@ cWorld * cRoot::GetDefaultWorld()
 
 cWorld * cRoot::GetWorld(const AString & a_WorldName)
 {
-	WorldMap::iterator itr = m_WorldsByName.find(a_WorldName);
-	if (itr != m_WorldsByName.end())
+	const auto FindResult = m_WorldsByName.find(a_WorldName);
+	if (FindResult != m_WorldsByName.cend())
 	{
-		return itr->second;
+		return &FindResult->second;
 	}
 
 	return nullptr;
@@ -610,12 +467,9 @@ bool cRoot::ForEachWorld(cWorldListCallback a_Callback)
 {
 	for (auto & World : m_WorldsByName)
 	{
-		if (World.second != nullptr)
+		if (a_Callback(World.second))
 		{
-			if (a_Callback(*World.second))
-			{
-				return false;
-			}
+			return false;
 		}
 	}
 	return true;
@@ -625,29 +479,44 @@ bool cRoot::ForEachWorld(cWorldListCallback a_Callback)
 
 
 
-void cRoot::TickCommands(void)
-{
-	// Execute any pending commands:
-	cCommandQueue PendingCommands;
-	{
-		cCSLock Lock(m_CSPendingCommands);
-		std::swap(PendingCommands, m_PendingCommands);
-	}
-	for (cCommandQueue::iterator itr = PendingCommands.begin(), end = PendingCommands.end(); itr != end; ++itr)
-	{
-		ExecuteConsoleCommand(itr->m_Command, *(itr->m_Output));
-	}
-}
-
-
-
-
-
 void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
 {
-	// Put the command into a queue (Alleviates FS #363):
-	cCSLock Lock(m_CSPendingCommands);
-	m_PendingCommands.emplace_back(a_Cmd, &a_Output);
+	const auto KickPlayers = [this]
+	{
+		// Kick all players from the server with custom disconnect message
+
+		bool SentDisconnect = false;
+		cRoot::Get()->ForEachPlayer(
+			[&](cPlayer & a_Player)
+			{
+				a_Player.GetClientHandlePtr()->Kick(m_Server->GetShutdownMessage());
+				SentDisconnect = true;
+				return false;
+			}
+		);
+
+		if (SentDisconnect)
+		{
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+		}
+	};
+
+	// Some commands are built-in:
+	if (a_Cmd == "stop")
+	{
+		KickPlayers();
+		cRoot::Stop();
+		return;
+	}
+	else if (a_Cmd == "restart")
+	{
+		KickPlayers();
+		cRoot::Restart();
+		return;
+	}
+
+	LOG("Executing console command: \"%s\"", a_Cmd.c_str());
+	m_Server->ExecuteConsoleCommand(a_Cmd, a_Output);
 }
 
 
@@ -657,31 +526,7 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCall
 void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd)
 {
 	// Put the command into a queue (Alleviates FS #363):
-	cCSLock Lock(m_CSPendingCommands);
-	m_PendingCommands.push_back(cCommand(a_Cmd, new cLogCommandDeleteSelfOutputCallback));
-}
-
-
-
-
-
-void cRoot::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
-{
-	// Some commands are built-in:
-	if (a_Cmd == "stop")
-	{
-		StopServer();
-		return;
-	}
-	else if (a_Cmd == "restart")
-	{
-		m_StopEvent.Set();
-		m_InputThreadRunFlag.clear();
-		return;
-	}
-
-	LOG("Executing console command: \"%s\"", a_Cmd.c_str());
-	m_Server->ExecuteConsoleCommand(a_Cmd, a_Output);
+	QueueExecuteConsoleCommand(a_Cmd, *new cLogCommandDeleteSelfOutputCallback);
 }
 
 
@@ -706,14 +551,14 @@ void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID
 
 
 
-int cRoot::GetTotalChunkCount(void)
+size_t cRoot::GetTotalChunkCount(void)
 {
-	int res = 0;
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	size_t Count = 0;
+	for (const auto & Entry : m_WorldsByName)
 	{
-		res += itr->second->GetNumChunks();
+		Count += Entry.second.GetNumChunks();
 	}
-	return res;
+	return Count;
 }
 
 
@@ -722,9 +567,21 @@ int cRoot::GetTotalChunkCount(void)
 
 void cRoot::SaveAllChunks(void)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr->second->QueueSaveAllChunks();
+		Entry.second.QueueSaveAllChunks();
+	}
+}
+
+
+
+
+
+void cRoot::SaveAllChunksNow(void)
+{
+	for (auto & Entry : m_WorldsByName)
+	{
+		Entry.second.SaveAllChunks();
 	}
 }
 
@@ -734,9 +591,9 @@ void cRoot::SaveAllChunks(void)
 
 void cRoot::SetSavingEnabled(bool a_SavingEnabled)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr->second->SetSavingEnabled(a_SavingEnabled);
+		Entry.second.SetSavingEnabled(a_SavingEnabled);
 	}
 }
 
@@ -746,10 +603,10 @@ void cRoot::SetSavingEnabled(bool a_SavingEnabled)
 
 void cRoot::SendPlayerLists(cPlayer * a_DestPlayer)
 {
-	for (const auto & itr : m_WorldsByName)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr.second->SendPlayerList(a_DestPlayer);
-	}  // for itr - m_WorldsByName[]
+		Entry.second.SendPlayerList(a_DestPlayer);
+	}
 }
 
 
@@ -758,10 +615,10 @@ void cRoot::SendPlayerLists(cPlayer * a_DestPlayer)
 
 void cRoot::BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
-	for (const auto & itr : m_WorldsByName)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr.second->BroadcastPlayerListAddPlayer(a_Player);
-	}  // for itr - m_WorldsByName[]
+		Entry.second.BroadcastPlayerListAddPlayer(a_Player);
+	}
 }
 
 
@@ -770,10 +627,10 @@ void cRoot::BroadcastPlayerListsAddPlayer(const cPlayer & a_Player, const cClien
 
 void cRoot::BroadcastPlayerListsRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
-	for (const auto & itr : m_WorldsByName)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr.second->BroadcastPlayerListRemovePlayer(a_Player);
-	}  // for itr - m_WorldsByName[]
+		Entry.second.BroadcastPlayerListRemovePlayer(a_Player);
+	}
 }
 
 
@@ -782,10 +639,10 @@ void cRoot::BroadcastPlayerListsRemovePlayer(const cPlayer & a_Player, const cCl
 
 void cRoot::BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr->second->BroadcastChat(a_Message, nullptr, a_ChatPrefix);
-	}  // for itr - m_WorldsByName[]
+		Entry.second.BroadcastChat(a_Message, nullptr, a_ChatPrefix);
+	}
 }
 
 
@@ -794,10 +651,10 @@ void cRoot::BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)
 
 void cRoot::BroadcastChat(const cCompositeChat & a_Message)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		itr->second->BroadcastChat(a_Message);
-	}  // for itr - m_WorldsByName[]
+		Entry.second.BroadcastChat(a_Message);
+	}
 }
 
 
@@ -806,10 +663,9 @@ void cRoot::BroadcastChat(const cCompositeChat & a_Message)
 
 bool cRoot::ForEachPlayer(cPlayerListCallback a_Callback)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
+	for (auto & Entry : m_WorldsByName)
 	{
-		++itr2;
-		if (!itr->second->ForEachPlayer(a_Callback))
+		if (!Entry.second.ForEachPlayer(a_Callback))
 		{
 			return false;
 		}
@@ -844,11 +700,7 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 				m_BestRating = Rating;
 				++m_NumMatches;
 			}
-			if (Rating == m_NameLength)  // Perfect match
-			{
-				return true;
-			}
-			return false;
+			return (Rating == m_NameLength);  // Perfect match
 		}
 
 		cCallback (const AString & a_CBPlayerName) :
@@ -877,9 +729,9 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 
 bool cRoot::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a_Callback)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr !=  m_WorldsByName.end(); ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		if (itr->second->DoWithPlayerByUUID(a_PlayerUUID, a_Callback))
+		if (Entry.second.DoWithPlayerByUUID(a_PlayerUUID, a_Callback))
 		{
 			return true;
 		}
@@ -893,9 +745,9 @@ bool cRoot::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a
 
 bool cRoot::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback a_Callback)
 {
-	for (auto World : m_WorldsByName)
+	for (auto & Entry : m_WorldsByName)
 	{
-		if (World.second->DoWithPlayer(a_PlayerName, a_Callback))
+		if (Entry.second.DoWithPlayer(a_PlayerName, a_Callback))
 		{
 			return true;
 		}
@@ -909,7 +761,7 @@ bool cRoot::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback a_Cal
 
 AString cRoot::GetProtocolVersionTextFromInt(int a_ProtocolVersion)
 {
-	return cProtocolRecognizer::GetVersionTextFromInt(a_ProtocolVersion);
+	return cMultiVersionProtocol::GetVersionTextFromInt(static_cast<cProtocol::Version>(a_ProtocolVersion));
 }
 
 
@@ -1027,23 +879,23 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 	int SumNumInLighting = 0;
 	int SumNumInGenerator = 0;
 	int SumMem = 0;
-	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
+	for (auto & Entry : m_WorldsByName)
 	{
-		cWorld * World = itr->second;
-		int NumInGenerator = World->GetGeneratorQueueLength();
-		int NumInSaveQueue = static_cast<int>(World->GetStorageSaveQueueLength());
-		int NumInLoadQueue = static_cast<int>(World->GetStorageLoadQueueLength());
+		auto & World = Entry.second;
+		const auto NumInGenerator = World.GetGeneratorQueueLength();
+		const auto NumInSaveQueue = World.GetStorageSaveQueueLength();
+		const auto NumInLoadQueue = World.GetStorageLoadQueueLength();
 		int NumValid = 0;
 		int NumDirty = 0;
 		int NumInLighting = 0;
-		World->GetChunkStats(NumValid, NumDirty, NumInLighting);
-		a_Output.Out("World %s:", World->GetName().c_str());
+		World.GetChunkStats(NumValid, NumDirty, NumInLighting);
+		a_Output.Out("World %s:", World.GetName().c_str());
 		a_Output.Out("  Num loaded chunks: %d", NumValid);
 		a_Output.Out("  Num dirty chunks: %d", NumDirty);
 		a_Output.Out("  Num chunks in lighting queue: %d", NumInLighting);
-		a_Output.Out("  Num chunks in generator queue: %d", NumInGenerator);
-		a_Output.Out("  Num chunks in storage load queue: %d", NumInLoadQueue);
-		a_Output.Out("  Num chunks in storage save queue: %d", NumInSaveQueue);
+		a_Output.Out("  Num chunks in generator queue: %zu", NumInGenerator);
+		a_Output.Out("  Num chunks in storage load queue: %zu", NumInLoadQueue);
+		a_Output.Out("  Num chunks in storage save queue: %zu", NumInSaveQueue);
 		int Mem = NumValid * static_cast<int>(sizeof(cChunk));
 		a_Output.Out("  Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
 		a_Output.Out("  Per-chunk memory size breakdown:");
@@ -1090,4 +942,107 @@ AStringVector cRoot::GetPlayerTabCompletionMultiWorld(const AString & a_Text)
 		}
 	);
 	return Results;
+}
+
+
+
+
+
+void cRoot::HandleInput()
+{
+	if (g_RunAsService)
+	{
+		// Ignore input when running as a service, cin was never opened in that case:
+		return;
+	}
+
+	cLogCommandOutputCallback Output;
+	AString Command;
+
+	while (m_NextState == NextState::Run)
+	{
+#ifndef _WIN32
+		timeval Timeout{ 0, 0 };
+		Timeout.tv_usec = 100 * 1000;  // 100 msec
+
+		fd_set ReadSet;
+		FD_ZERO(&ReadSet);
+		FD_SET(STDIN_FILENO, &ReadSet);
+
+		if (select(STDIN_FILENO + 1, &ReadSet, nullptr, nullptr, &Timeout) <= 0)
+		{
+			// Don't call getline because there's nothing to read
+			continue;
+		}
+#endif
+
+		if (!std::getline(std::cin, Command))
+		{
+			cRoot::Stop();
+			return;
+		}
+
+		if (m_NextState != NextState::Run)
+		{
+			// Already shutting down, can't execute commands
+			break;
+		}
+
+		if (!Command.empty())
+		{
+			// Execute and clear command string when submitted
+			QueueExecuteConsoleCommand(TrimString(Command), Output);
+		}
+	}
+}
+
+
+
+
+
+void cRoot::TransitionNextState(NextState a_NextState)
+{
+	{
+		auto Current = m_NextState.load();
+		do
+		{
+			// Stopping is final, so stops override restarts:
+			if (Current == NextState::Stop)
+			{
+				return;
+			}
+		}
+		while (!m_NextState.compare_exchange_strong(Current, a_NextState));
+	}
+
+	if (m_NextState == NextState::Run)
+	{
+		return;
+	}
+
+	m_StopEvent.Set();
+
+#ifdef WIN32
+
+	DWORD Length;
+	INPUT_RECORD Record
+	{
+		KEY_EVENT,
+		{
+			{
+				TRUE,
+				1,
+				VK_RETURN,
+				static_cast<WORD>(MapVirtualKey(VK_RETURN, MAPVK_VK_TO_VSC)),
+				{ { VK_RETURN } },
+				0
+			}
+		}
+	};
+
+	// Can't kill the input thread since it breaks cin (getline doesn't block / receive input on restart)
+	// Apparently no way to unblock getline apart from CancelIoEx, but xoft wants Windows XP support
+	// Only thing I can think of for now. Also, ignore the retval since sometimes there's no cin.
+	WriteConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &Record, 1, &Length);
+#endif
 }

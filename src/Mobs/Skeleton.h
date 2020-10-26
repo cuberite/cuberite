@@ -7,13 +7,14 @@
 
 
 
-class cSkeleton :
+class cSkeleton:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
-	cSkeleton(bool IsWither);
+
+	cSkeleton();
 
 	CLASS_PROTODEF(cSkeleton)
 
@@ -22,12 +23,6 @@ public:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
 	virtual bool IsUndead(void) override { return true; }
-
-	bool IsWither(void) const { return m_bIsWither; }
-
-private:
-
-	bool m_bIsWither;
 
 } ;
 

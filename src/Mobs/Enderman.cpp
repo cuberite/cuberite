@@ -73,7 +73,7 @@ protected:
 
 
 cEnderman::cEnderman(void) :
-	super("Enderman", mtEnderman, "entity.endermen.hurt", "entity.endermen.death", 0.5, 2.9),
+	Super("Enderman", mtEnderman, "entity.endermen.hurt", "entity.endermen.death", "entity.endermen.ambient", 0.5, 2.9),
 	m_bIsScreaming(false),
 	m_CarriedBlock(E_BLOCK_AIR),
 	m_CarriedMeta(0)
@@ -113,13 +113,6 @@ void cEnderman::CheckEventSeePlayer(cChunk & a_Chunk)
 
 	ASSERT(Callback.GetPlayer() != nullptr);
 
-	if (!CheckLight())
-	{
-		// Insufficient light for enderman to become aggravated
-		// TODO: Teleport to a suitable location
-		return;
-	}
-
 	if (!Callback.GetPlayer()->CanMobsTarget())
 	{
 		return;
@@ -138,11 +131,8 @@ void cEnderman::CheckEventSeePlayer(cChunk & a_Chunk)
 
 void cEnderman::CheckEventLostPlayer(void)
 {
-	super::CheckEventLostPlayer();
-	if (!CheckLight())
-	{
-		EventLosePlayer();
-	}
+	Super::CheckEventLostPlayer();
+	EventLosePlayer();
 }
 
 
@@ -151,7 +141,7 @@ void cEnderman::CheckEventLostPlayer(void)
 
 void cEnderman::EventLosePlayer()
 {
-	super::EventLosePlayer();
+	Super::EventLosePlayer();
 	m_bIsScreaming = false;
 	GetWorld()->BroadcastEntityMetadata(*this);
 }
@@ -160,48 +150,23 @@ void cEnderman::EventLosePlayer()
 
 
 
-bool cEnderman::CheckLight()
-{
-	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(POSX_TOINT, POSZ_TOINT, ChunkX, ChunkZ);
-
-	// Check if the chunk the enderman is in is lit
-	if (!m_World->IsChunkLighted(ChunkX, ChunkZ))
-	{
-		m_World->QueueLightChunk(ChunkX, ChunkZ);
-		return true;
-	}
-
-	// Enderman only attack if the skylight is lower or equal to 8
-	if (m_World->GetBlockSkyLight(POSX_TOINT, POSY_TOINT, POSZ_TOINT) - GetWorld()->GetSkyDarkness() > 8)
-	{
-		return false;
-	}
-
-	return true;
-}
-
-
-
-
-
 void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
 		return;
 	}
 
-	// Take damage when wet, drowning damage seems to be most appropriate
+	// Take damage when wet
 	if (
 		cChunkDef::IsValidHeight(POSY_TOINT) &&
 		(GetWorld()->IsWeatherWetAtXYZ(GetPosition().Floor()) || IsInWater())
 	)
 	{
 		EventLosePlayer();
-		TakeDamage(dtDrowning, nullptr, 1, 0);
+		TakeDamage(dtEnvironment, nullptr, 1, 0);
 		// TODO teleport to a safe location
 	}
 }

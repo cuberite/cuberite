@@ -6,30 +6,26 @@
 
 
 
-class cBlockPressurePlateHandler :
-	public cBlockHandler
+class cBlockPressurePlateHandler final :
+	public cClearMetaOnDrop<cBlockHandler>
 {
+	using Super = cClearMetaOnDrop<cBlockHandler>;
+
 public:
-	cBlockPressurePlateHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
-	{
-	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to zero
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
-	}
+	using Super::Super;
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+private:
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		if (a_RelY - 1 <= 0)
+		if (a_RelPos.y <= 1)
 		{
 			return false;
 		}
 
 		// TODO: check if the block is upside-down slab or upside-down stairs
-		BLOCKTYPE Block = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
+		auto Block = a_Chunk.GetBlock(a_RelPos.addedY(-1));
 		switch (Block)
 		{
 			case E_BLOCK_ACACIA_FENCE:
@@ -50,7 +46,11 @@ public:
 		}
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		switch (m_BlockType)

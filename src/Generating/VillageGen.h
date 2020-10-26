@@ -23,11 +23,13 @@ class cVillagePiecePool;
 
 
 
-class cVillageGen :
+class cVillageGen:
 	public cGridStructGen
 {
-	typedef cGridStructGen super;
+	using Super = cGridStructGen;
+
 public:
+
 	/** Creates a new instance of the generator with the specified parameters. */
 	cVillageGen(
 		int a_Seed,

@@ -3,9 +3,10 @@
 
 // Declares the cCompositeChat class used to wrap a chat message with multiple parts (text, url, cmd)
 
+#pragma once
+
 #include "Defines.h"
 #include "json/json.h"
-#include "Logger.h"
 
 
 
@@ -43,6 +44,8 @@ public:
 		ptShowAchievement,
 	} ;
 
+
+
 	class cBasePart
 	{
 	public:
@@ -57,70 +60,101 @@ public:
 		virtual ~cBasePart() {}
 	} ;
 
-	class cTextPart :
+
+
+	class cTextPart:
 		public cBasePart
 	{
-		typedef cBasePart super;
+		using Super = cBasePart;
+
 	public:
+
 		cTextPart(const AString & a_Text, const AString & a_Style = "");
 	} ;
 
-	class cClientTranslatedPart :
+
+
+	class cClientTranslatedPart:
 		public cBasePart
 	{
-		typedef cBasePart super;
+		using Super = cBasePart;
+
 	public:
+
 		AStringVector m_Parameters;
 
 		cClientTranslatedPart(const AString & a_TranslationID, const AStringVector & a_Parameters, const AString & a_Style = "");
 	} ;
 
-	class cUrlPart :
+
+
+	class cUrlPart:
 		public cBasePart
 	{
-		typedef cBasePart super;
+		using Super = cBasePart;
+
 	public:
+
 		AString m_Url;
 
 		cUrlPart(const AString & a_Text, const AString & a_Url, const AString & a_Style = "");
 	} ;
 
-	class cCommandPart :
+
+
+	class cCommandPart:
 		public cBasePart
 	{
-		typedef cBasePart super;
+		using Super = cBasePart;
+
 	public:
+
 		AString m_Command;
 
 		cCommandPart(ePartType a_PartType, const AString & a_Text, const AString & a_Command, const AString & a_Style = "");
 	} ;
 
-	class cRunCommandPart :
+
+
+	class cRunCommandPart:
 		public cCommandPart
 	{
-		typedef cCommandPart super;
+		using Super = cCommandPart;
+
 	public:
+
 		cRunCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "");
 	} ;
 
-	class cSuggestCommandPart :
+
+
+	class cSuggestCommandPart:
 		public cCommandPart
 	{
-		typedef cCommandPart super;
+		using Super = cCommandPart;
+
 	public:
+
 		cSuggestCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "");
 	} ;
 
-	class cShowAchievementPart :
+
+
+	class cShowAchievementPart:
 		public cBasePart
 	{
-		typedef cBasePart super;
+		using Super = cBasePart;
+
 	public:
+
 		AString m_PlayerName;
 		cShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style = "");
 	} ;
 
-	typedef std::vector<cBasePart *> cParts;
+
+
+	using cParts = std::vector<cBasePart *>;
+
 
 	/** Creates a new empty chat message.
 	Exported manually due to the other overload needing a manual export. */
@@ -196,7 +230,7 @@ public:
 
 	/** Converts the MessageType to a LogLevel value.
 	Used by the logging bindings when logging a cCompositeChat object. */
-	static cLogger::eLogLevel MessageTypeToLogLevel(eMessageType a_MessageType);
+	static eLogLevel MessageTypeToLogLevel(eMessageType a_MessageType);
 
 	/** Adds the chat part's style (represented by the part's stylestring) into the Json object. */
 	void AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle) const;

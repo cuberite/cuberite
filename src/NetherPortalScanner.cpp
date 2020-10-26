@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "NetherPortalScanner.h"
+#include "BlockInfo.h"
 #include "Entities/Entity.h"
 #include "World.h"
 
@@ -9,15 +10,16 @@
 
 
 
-const double cNetherPortalScanner::OutOffset = 2;
+const double cNetherPortalScanner::OutOffset = 0.5;
 const double cNetherPortalScanner::AcrossOffset = 0.5;
 
 
 
 
 
-cNetherPortalScanner::cNetherPortalScanner(cEntity * a_MovingEntity, cWorld * a_DestinationWorld, Vector3d a_DestPosition, int a_MaxY) :
-	m_Entity(a_MovingEntity),
+cNetherPortalScanner::cNetherPortalScanner(cEntity & a_MovingEntity, cWorld & a_DestinationWorld, Vector3d a_DestPosition, int a_MaxY) :
+	m_EntityID(a_MovingEntity.GetUniqueID()),
+	m_SourceWorld(*a_MovingEntity.GetWorld()),
 	m_World(a_DestinationWorld),
 	m_FoundPortal(false),
 	m_BuildPlatform(true),
@@ -37,7 +39,7 @@ cNetherPortalScanner::cNetherPortalScanner(cEntity * a_MovingEntity, cWorld * a_
 			Add(x, z);
 		}
 	}
-	Enable(*a_DestinationWorld->GetChunkMap());
+	Enable(*a_DestinationWorld.GetChunkMap());
 }
 
 
@@ -47,7 +49,7 @@ cNetherPortalScanner::cNetherPortalScanner(cEntity * a_MovingEntity, cWorld * a_
 void cNetherPortalScanner::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 {
 	cChunkDef::BlockTypes blocks;
-	m_World->GetChunkBlockTypes(a_ChunkX, a_ChunkZ, blocks);
+	m_World.GetChunkBlockTypes(a_ChunkX, a_ChunkZ, blocks);
 
 	// Iterate through all of the blocks in the chunk
 	for (unsigned int i = 0; i < cChunkDef::NumBlocks; i++)
@@ -90,7 +92,7 @@ bool cNetherPortalScanner::IsValidBuildLocation(Vector3i a_BlockPos)
 	{
 		for (int j = 0; j < PortalLength; j++)
 		{
-			BLOCKTYPE blocktype = m_World->GetBlock(a_BlockPos.x + i, a_BlockPos.y, a_BlockPos.z + j);
+			BLOCKTYPE blocktype = m_World.GetBlock(a_BlockPos.x + i, a_BlockPos.y, a_BlockPos.z + j);
 			if (!cBlockInfo::IsSolid(blocktype))
 			{
 				return false;
@@ -99,7 +101,7 @@ bool cNetherPortalScanner::IsValidBuildLocation(Vector3i a_BlockPos)
 			// Check the airspace
 			for (int k = 1; k < PortalHeight; k++)
 			{
-				blocktype = m_World->GetBlock(a_BlockPos.x + i, a_BlockPos.y + k, a_BlockPos.z + j);
+				blocktype = m_World.GetBlock(a_BlockPos.x + i, a_BlockPos.y + k, a_BlockPos.z + j);
 				if (blocktype != E_BLOCK_AIR)
 				{
 					return false;
@@ -119,15 +121,15 @@ bool cNetherPortalScanner::OnAllChunksAvailable(void)
 	if (m_FoundPortal)
 	{
 		// Find the bottom of this portal
-		while (m_World->GetBlock(m_PortalLoc.x, m_PortalLoc.y, m_PortalLoc.z) == E_BLOCK_NETHER_PORTAL)
+		while (m_World.GetBlock(m_PortalLoc.x, m_PortalLoc.y, m_PortalLoc.z) == E_BLOCK_NETHER_PORTAL)
 		{
 			m_PortalLoc.y -= 1;
 		}
 		m_PortalLoc.y += 1;
 
 		// Figure out which way the portal is facing
-		int BXP = m_World->GetBlock(m_PortalLoc.x + 1, m_PortalLoc.y, m_PortalLoc.z);
-		int BXM = m_World->GetBlock(m_PortalLoc.x - 1, m_PortalLoc.y, m_PortalLoc.z);
+		int BXP = m_World.GetBlock(m_PortalLoc.x + 1, m_PortalLoc.y, m_PortalLoc.z);
+		int BXM = m_World.GetBlock(m_PortalLoc.x - 1, m_PortalLoc.y, m_PortalLoc.z);
 		if ((BXP == E_BLOCK_NETHER_PORTAL) || (BXM == E_BLOCK_NETHER_PORTAL))
 		{
 			// The long axis is along X
@@ -206,11 +208,11 @@ void cNetherPortalScanner::BuildNetherPortal(Vector3i a_Location, Direction a_Di
 			{
 				if (a_Direction == Direction::Y)
 				{
-					m_World->SetBlock(x + i, y + k, z + j, E_BLOCK_AIR, 0);
+					m_World.SetBlock(x + i, y + k, z + j, E_BLOCK_AIR, 0);
 				}
 				else if (a_Direction == Direction::X)
 				{
-					m_World->SetBlock(x + j, y + k, z + i, E_BLOCK_AIR, 0);
+					m_World.SetBlock(x + j, y + k, z + i, E_BLOCK_AIR, 0);
 				}
 			}
 		}
@@ -224,11 +226,11 @@ void cNetherPortalScanner::BuildNetherPortal(Vector3i a_Location, Direction a_Di
 			// +2 on the short axis because that's where we deposit the entity
 			if (a_Direction == Direction::Y)
 			{
-				m_World->SetBlock(x + 2, y, z + j, E_BLOCK_OBSIDIAN, 0);
+				m_World.SetBlock(x + 2, y, z + j, E_BLOCK_OBSIDIAN, 0);
 			}
 			else if (a_Direction == Direction::X)
 			{
-				m_World->SetBlock(x + j, y, z + 2, E_BLOCK_OBSIDIAN, 0);
+				m_World.SetBlock(x + j, y, z + 2, E_BLOCK_OBSIDIAN, 0);
 			}
 		}
 	}
@@ -238,31 +240,31 @@ void cNetherPortalScanner::BuildNetherPortal(Vector3i a_Location, Direction a_Di
 	{
 		if (a_Direction == Direction::Y)
 		{
-			m_World->SetBlock(x + 1, y + i, z, E_BLOCK_OBSIDIAN, 0);
-			m_World->SetBlock(x + 1, y + i, z + 3, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock(x + 1, y + i, z, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock(x + 1, y + i, z + 3, E_BLOCK_OBSIDIAN, 0);
 		}
 		else if (a_Direction == Direction::X)
 		{
-			m_World->SetBlock(x, y + i, z + 1, E_BLOCK_OBSIDIAN, 0);
-			m_World->SetBlock(x + 3, y + i, z + 1, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock(x, y + i, z + 1, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock(x + 3, y + i, z + 1, E_BLOCK_OBSIDIAN, 0);
 		}
 	}
 	for (int i = 0; i < PortalLength; i++)
 	{
 		if (a_Direction == Direction::Y)
 		{
-			m_World->SetBlock(x + 1, y + 4, z + i, E_BLOCK_OBSIDIAN, 0);
-			m_World->SetBlock(x + 1, y, z + i, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock(x + 1, y + 4, z + i, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock(x + 1, y, z + i, E_BLOCK_OBSIDIAN, 0);
 		}
 		else if (a_Direction == Direction::X)
 		{
-			m_World->SetBlock(x + i, y + 4, z + 1, E_BLOCK_OBSIDIAN, 0);
-			m_World->SetBlock(x + i, y, z + 1, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock(x + i, y + 4, z + 1, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock(x + i, y, z + 1, E_BLOCK_OBSIDIAN, 0);
 		}
 	}
 
 	// Fill the frame (place a fire in the bottom)
-	m_World->SetBlock(x + 1, y + 1, z + 1, E_BLOCK_FIRE, 0);
+	m_World.SetBlock(x + 1, y + 1, z + 1, E_BLOCK_FIRE, 0);
 }
 
 
@@ -275,10 +277,10 @@ void cNetherPortalScanner::OnDisabled(void)
 	if (!m_FoundPortal)
 	{
 		// Build a new nether portal.
-		LOGD("Building nether portal at {%d, %d, %d}", m_PortalLoc.x, m_PortalLoc.y, m_PortalLoc.z);
+		FLOGD("Building nether portal at {0}", m_PortalLoc);
 		BuildNetherPortal(m_PortalLoc, m_Dir, m_BuildPlatform);
 		m_PortalLoc.x += 1;
-		m_PortalLoc.y += 2;
+		m_PortalLoc.y += 1;
 		m_PortalLoc.z += 1;
 	}
 
@@ -295,8 +297,28 @@ void cNetherPortalScanner::OnDisabled(void)
 		Position.z += OutOffset;
 	}
 
-	LOGD("Placing player at {%f, %f, %f}", Position.x, Position.y, Position.z);
-	m_Entity->ScheduleMoveToWorld(m_World, Position, true);
+	auto EntityID = m_EntityID;
+	auto & DestinationWorld = m_World;
+	auto DestinationPosition = Position;
+
+	// Lookup our warping entity by ID
+	// Necessary as they may have been destroyed in the meantime (#4582)
+	// And since this is called from the destination world's thread queue a task on the source world
+	m_SourceWorld.QueueTask(
+		[EntityID, &DestinationWorld, DestinationPosition](cWorld & a_World)
+		{
+			a_World.DoWithEntityByID(
+				EntityID,
+				[&DestinationWorld, &DestinationPosition](cEntity & a_Entity)
+				{
+					FLOGD("Placing player at {0}", DestinationPosition);
+					a_Entity.MoveToWorld(DestinationWorld, DestinationPosition, true, false);
+					return true;
+				}
+			);
+		}
+	);
+
 	delete this;
 }
 

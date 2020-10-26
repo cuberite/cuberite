@@ -1,0 +1,350 @@
+
+-- JungleTemple.cubeset
+
+-- Defines the prefabs in the group JungleTemple
+
+-- NOTE: This file has been generated automatically by GalExport!
+-- Any manual changes will be overwritten by the next automatic export!
+
+
+
+
+Cubeset =
+{
+	Metadata =
+	{
+		CubesetFormatVersion = 1,
+		ExportDate = "2020-08-27 10:42:17",
+		["AllowedBiomes"] = "Jungle, JungleHills, BambooJungle, BambooJungleHills",
+		["GridSizeX"] = "750",
+		["GridSizeZ"] = "750",
+		["IntendedUse"] = "SinglePieceStructures",
+		["MaxOffsetX"] = "100",
+		["MaxOffsetZ"] = "100",
+		["SeedOffset"] = "64775119",
+	},
+
+	Pieces =
+	{
+		{
+			OriginData =
+			{
+				ExportName   = "JungleTemple_1703",
+				Name         = "JungleTemple",
+				GalleryName  = "Cube",
+				GalleryIndex = "162",
+				ID           = "1703",
+				CreatorName  = "12xx12",
+			},
+			Size =
+			{
+				x = 12,
+				y = 14,
+				z = 15,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 11,
+				MaxY = 13,
+				MaxZ = 14,
+			},
+			StructureBox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 11,
+				MaxY = 13,
+				MaxZ = 14,
+			},
+			Connectors =
+			{
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "RepeatBottomTillNonAir",
+				["IsStarting"] = "1",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+				["VerticalStrategy"] = "TerrainOrOceanTop|-4",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 48: 0",  -- mossycobblestone
+				"b:  4: 0",  -- cobblestone
+				"c: 54: 3",  -- chest
+				"d: 67: 2",  -- stonestairs
+				"e:131: 3",  -- tripwirehook
+				"f:132: 0",  -- tripwire
+				"g:131: 1",  -- tripwirehook
+				"h: 55: 0",  -- redstonewire
+				"i:131: 0",  -- tripwirehook
+				"j: 54: 5",  -- chest
+				"k:131: 2",  -- tripwirehook
+				"l: 69:12",  -- lever
+				"m: 19: 0",  -- sponge
+				"n: 98: 3",  -- stonebricks
+				"o: 93: 2",  -- unpoweredrepeater
+				"p: 29: 5",  -- stickypiston
+				"q: 29: 1",  -- stickypiston
+				"r: 23: 5",  -- dispenser
+				"s: 23: 2",  -- dispenser
+				"t: 67: 7",  -- stonestairs
+				"u: 67: 3",  -- stonestairs
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aabbbbbaabaa",  --  0
+				"aaaaaaaaaaaa",  --  1
+				"babbbaaaaaab",  --  2
+				"baabaaababaa",  --  3
+				"aaabaabbbaaa",  --  4
+				"babaabbaabba",  --  5
+				"bbabaaabbaab",  --  6
+				"baabbbabaaaa",  --  7
+				"bbbaaaabaaaa",  --  8
+				"bbaabbaaaaab",  --  9
+				"abaaabababbb",  -- 10
+				"bbaaaaabbaba",  -- 11
+				"abaaababbaaa",  -- 12
+				"aaaabaabbaab",  -- 13
+				"aabaabaaaaab",  -- 14
+
+				-- Level 1
+				"abaaaabbaabb",  --  0
+				"a.........ab",  --  1
+				"a..........b",  --  2
+				"aabab..a..aa",  --  3
+				"abcaa..a...a",  --  4
+				"aa.bbddb..ab",  --  5
+				"ba.aaabeffgb",  --  6
+				"ba.babhb..bb",  --  7
+				"bbhhaahb...a",  --  8
+				"aahaiaha..ab",  --  9
+				"aaa.f.h....b",  -- 10
+				"abj.f.h...aa",  -- 11
+				"baa.f.h....b",  -- 12
+				"aa.akahha.ba",  -- 13
+				"aababaaabaab",  -- 14
+
+				-- Level 2
+				"abaaaabbabaa",  --  0
+				"b.........ab",  --  1
+				"alll.......b",  --  2
+				"bnnnb..a..bb",  --  3
+				"bo.hb..a...a",  --  4
+				"aa.hb..b..ba",  --  5
+				"apq.bdda..ab",  --  6
+				"baaaaabb..ba",  --  7
+				"aaaaba.a...a",  --  8
+				"ba..a.....ba",  --  9
+				"bbh........b",  -- 10
+				"abr.......bb",  -- 11
+				"ab.........b",  -- 12
+				"babba.basbba",  -- 13
+				"aaaaaaaaabaa",  -- 14
+
+				-- Level 3
+				"baaaaaaaaaba",  --  0
+				"b..........b",  --  1
+				"a.......baaa",  --  2
+				"aaaba..a...a",  --  3
+				"b...a..aaaab",  --  4
+				"bh..b..a...b",  --  5
+				"ap..b..abaaa",  --  6
+				"aaaaadda...a",  --  7
+				"abbaatabbaaa",  --  8
+				"aaa.a.a....a",  --  9
+				"aab.....abbb",  -- 10
+				"bba........a",  -- 11
+				"aab.....baba",  -- 12
+				"aab..b.....b",  -- 13
+				"abaababbabaa",  -- 14
+
+				-- Level 4
+				"baaabaaaaaaa",  --  0
+				"baabbbaabbaa",  --  1
+				"aaabbababaaa",  --  2
+				"aaaaababbaaa",  --  3
+				"aaabaabbabba",  --  4
+				"aabbb..bbaab",  --  5
+				"aabab..babba",  --  6
+				"aaabb..baaaa",  --  7
+				"babaaddababb",  --  8
+				"abaaabaabbbb",  --  9
+				"abaabaaaabaa",  -- 10
+				"bbaabaaaaaaa",  -- 11
+				"bbbbaabbbbaa",  -- 12
+				"aaaaaaaaabab",  -- 13
+				"bbaauuuuaaaa",  -- 14
+
+				-- Level 5
+				"............",  --  0
+				"............",  --  1
+				"..bbabbbab..",  --  2
+				"..a......b..",  --  3
+				"..a.abab.b..",  --  4
+				"..a.a..b.b..",  --  5
+				"..a.u..u.a..",  --  6
+				"..a......b..",  --  7
+				"..b......a..",  --  8
+				"..b......b..",  --  9
+				"..a......a..",  -- 10
+				"..a......b..",  -- 11
+				"..aaa..baa..",  -- 12
+				"............",  -- 13
+				"............",  -- 14
+
+				-- Level 6
+				"............",  --  0
+				"............",  --  1
+				"..bab..aaa..",  --  2
+				"..b......a..",  --  3
+				"..a......a..",  --  4
+				"..a......b..",  --  5
+				"..a......a..",  --  6
+				"..a......a..",  --  7
+				"..b......b..",  --  8
+				"..a......a..",  --  9
+				"..b......b..",  -- 10
+				"..b......b..",  -- 11
+				"..aaa..bbb..",  -- 12
+				"............",  -- 13
+				"............",  -- 14
+
+				-- Level 7
+				"............",  --  0
+				".aababaabaa.",  --  1
+				".bbbabbaabb.",  --  2
+				".babbbaabbb.",  --  3
+				".baataataaa.",  --  4
+				".aab....aaa.",  --  5
+				".baa....aaa.",  --  6
+				".aaa....aab.",  --  7
+				".aab....aab.",  --  8
+				".aaabaabbab.",  --  9
+				".abbaababaa.",  -- 10
+				".ababbaabba.",  -- 11
+				".aabaaaabba.",  -- 12
+				".babbbabaaa.",  -- 13
+				"............",  -- 14
+
+				-- Level 8
+				"..b.a..b.b..",  --  0
+				".bbaabaaabb.",  --  1
+				"bb........bb",  --  2
+				".a........b.",  --  3
+				"aa........ba",  --  4
+				".a........b.",  --  5
+				"bb........ab",  --  6
+				".b........a.",  --  7
+				"aa........ba",  --  8
+				".a..daad..a.",  --  9
+				"aa........ba",  -- 10
+				".a........a.",  -- 11
+				"ab........bb",  -- 12
+				".baaababaab.",  -- 13
+				"..a.a..b.a..",  -- 14
+
+				-- Level 9
+				"..a.a..b.a..",  --  0
+				".bbba..aaaa.",  --  1
+				"bb........bb",  --  2
+				".a........a.",  --  3
+				"bb........aa",  --  4
+				"............",  --  5
+				"ab........bb",  --  6
+				".a........b.",  --  7
+				"bb........bb",  --  8
+				"............",  --  9
+				"ab........bb",  -- 10
+				".a........a.",  -- 11
+				"bb........bb",  -- 12
+				".aaba..babb.",  -- 13
+				"..b.a..a.a..",  -- 14
+
+				-- Level 10
+				"............",  --  0
+				".bbabababab.",  --  1
+				".abaabbaaab.",  --  2
+				".aabbaaaabb.",  --  3
+				".aaaaaaabba.",  --  4
+				"abab....abaa",  --  5
+				".aab....aaa.",  --  6
+				".aba....baa.",  --  7
+				".baa....abb.",  --  8
+				"aabb....baab",  --  9
+				".baaababbaa.",  -- 10
+				".ababaaaaaa.",  -- 11
+				".ababaaaaba.",  -- 12
+				".aaaabaabaa.",  -- 13
+				".....ba.....",  -- 14
+
+				-- Level 11
+				"............",  --  0
+				"............",  --  1
+				"..a......b..",  --  2
+				"...abbbab...",  --  3
+				"...aaaaab...",  --  4
+				"...bbaabb...",  --  5
+				"...aa..ba...",  --  6
+				"...ab..bb...",  --  7
+				"...aa..aa...",  --  8
+				"...aaaaaa...",  --  9
+				"...baaaba...",  -- 10
+				"...ababaa...",  -- 11
+				"..b......a..",  -- 12
+				"............",  -- 13
+				"............",  -- 14
+
+				-- Level 12
+				"............",  --  0
+				"............",  --  1
+				"..a......a..",  --  2
+				"............",  --  3
+				"....abaa....",  --  4
+				"....baab....",  --  5
+				"....bbab....",  --  6
+				"....baab....",  --  7
+				"....bbaa....",  --  8
+				"....abaa....",  --  9
+				"....baba....",  -- 10
+				"............",  -- 11
+				"..b......a..",  -- 12
+				"............",  -- 13
+				"............",  -- 14
+
+				-- Level 13
+				"............",  --  0
+				"............",  --  1
+				"..a......a..",  --  2
+				"............",  --  3
+				"....a..b....",  --  4
+				"............",  --  5
+				".....dd.....",  --  6
+				".....ab.....",  --  7
+				".....uu.....",  --  8
+				"............",  --  9
+				"....b..b....",  -- 10
+				"............",  -- 11
+				"..b......b..",  -- 12
+				"............",  -- 13
+				"............",  -- 14
+
+			},
+		},  -- JungleTemple_1703
+	},  -- Pieces
+}
+
+
+
+

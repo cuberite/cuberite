@@ -27,9 +27,7 @@ Note that it may be called by world's BroadcastToChunk() if the client is still 
 
 #include "OSSupport/IsThread.h"
 #include "ChunkDataCallback.h"
-
-#include <unordered_set>
-#include <unordered_map>
+#include "Protocol/ChunkDataSerializer.h"
 
 
 
@@ -53,25 +51,28 @@ class cChunkSender:
 	public cIsThread,
 	public cChunkDataCopyCollector
 {
-	typedef cIsThread super;
+	using Super = cIsThread;
+
 public:
+
 	cChunkSender(cWorld & a_World);
 	virtual ~cChunkSender() override;
 
-	enum eChunkPriority
+	/** Tag indicating urgency of chunk to be sent.
+	Order MUST be from least to most urgent. */
+	enum class Priority
 	{
-		E_CHUNK_PRIORITY_HIGH = 0,
-		E_CHUNK_PRIORITY_MIDHIGH,
-		E_CHUNK_PRIORITY_MEDIUM,
-		E_CHUNK_PRIORITY_LOW,
-
+		Low,
+		Medium,
+		High,
+		Critical
 	};
 
 	void Stop(void);
 
 	/** Queues a chunk to be sent to a specific client */
-	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cClientHandle * a_Client);
-	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cChunkClientHandles a_Client);
+	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cClientHandle * a_Client);
+	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cChunkClientHandles a_Client);
 
 	/** Removes the a_Client from all waiting chunk send operations */
 	void RemoveClient(cClientHandle * a_Client);
@@ -80,18 +81,14 @@ protected:
 
 	struct sChunkQueue
 	{
-		eChunkPriority m_Priority;
+		Priority m_Priority;
 		cChunkCoords m_Chunk;
 
 		bool operator <(const sChunkQueue & a_Other) const
 		{
-			/* The Standard Priority Queue sorts from biggest to smallest
-			return true here means you are smaller than the other object, and you get pushed down.
-
-			The priorities go from HIGH (0) to LOW (2), so a smaller priority should mean further up the list
-			therefore, return true (affirm we're "smaller", and get pushed down) only if our priority is bigger than theirs (they're more urgent)
-			*/
-			return this->m_Priority > a_Other.m_Priority;
+			// The operator will return true to affirm we're less urgent than Other
+			// This comparison depends on the Priority enum ordering lower priority as smaller:
+			return m_Priority < a_Other.m_Priority;
 		}
 	};
 
@@ -100,8 +97,8 @@ protected:
 	{
 		cChunkCoords m_Chunk;
 		std::unordered_set<cClientHandle *> m_Clients;
-		eChunkPriority m_Priority;
-		sSendChunk(cChunkCoords a_Chunk, eChunkPriority a_Priority) :
+		Priority m_Priority;
+		sSendChunk(cChunkCoords a_Chunk, Priority a_Priority) :
 			m_Chunk(a_Chunk),
 			m_Priority(a_Priority)
 		{
@@ -109,6 +106,9 @@ protected:
 	};
 
 	cWorld & m_World;
+
+	/** An instance of a chunk serializer, held to maintain its internal cache. */
+	cChunkDataSerializer m_Serializer;
 
 	cCriticalSection  m_CS;
 	std::priority_queue<sChunkQueue> m_SendChunks;
@@ -120,7 +120,7 @@ protected:
 	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
 	unsigned char m_BiomeMap[cChunkDef::Width * cChunkDef::Width];
 	std::vector<Vector3i> m_BlockEntities;  // Coords of the block entities to send
-	// TODO: sEntityIDs    m_Entities;       // Entity-IDs of the entities to send
+	std::vector<UInt32> m_EntityIDs;        // Entity-IDs of the entities to send
 
 	// cIsThread override:
 	virtual void Execute(void) override;

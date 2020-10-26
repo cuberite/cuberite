@@ -16,17 +16,20 @@
 
 
 
-class cVaporizeFluidSimulator :
+class cVaporizeFluidSimulator:
 	public cFluidSimulator
 {
-	typedef cFluidSimulator super;
+	using Super = cFluidSimulator;
 
 public:
-	cVaporizeFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid);
 
-	// cSimulator overrides:
-	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override;
+	using Super::cFluidSimulator;
+
+private:
+
 	virtual void Simulate(float a_Dt) override;
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
+	virtual cFluidSimulatorData * CreateChunkData(void) override { return nullptr; }
 } ;
 
 

@@ -8,10 +8,12 @@
 class cItemMilkHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
+
 	cItemMilkHandler():
-		super(E_ITEM_MILK)
+		Super(E_ITEM_MILK)
 	{
 	}
 
@@ -28,8 +30,7 @@ public:
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			a_Player->GetInventory().RemoveOneEquippedItem();
-			a_Player->GetInventory().AddItem(E_ITEM_BUCKET);
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_BUCKET));
 		}
 		return true;
 	}

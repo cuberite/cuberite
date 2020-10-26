@@ -9,11 +9,24 @@
 #include "../ClientHandle.h"
 #include "../Blocks/BlockBed.h"
 
-cBedEntity::cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, short a_Color):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
+
+
+
+
+cBedEntity::cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, short a_Color):
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_Color(a_Color)
 {
 	ASSERT(a_BlockType == E_BLOCK_BED);
+}
+
+
+
+
+
+cItems cBedEntity::ConvertToPickups() const
+{
+	return cItem(E_ITEM_BED, 1, m_Color);
 }
 
 

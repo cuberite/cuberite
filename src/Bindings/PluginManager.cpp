@@ -57,7 +57,7 @@ void cPluginManager::RefreshPluginList(void)
 {
 	// Get a list of currently available folders:
 	AString PluginsPath = GetPluginsPath() + "/";
-	AStringVector Contents = cFile::GetFolderContents(PluginsPath.c_str());
+	AStringVector Contents = cFile::GetFolderContents(PluginsPath);
 	AStringVector Folders;
 	for (auto & item: Contents)
 	{
@@ -154,8 +154,9 @@ void cPluginManager::ReloadPluginsNow(cSettingsRepositoryInterface & a_Settings)
 void cPluginManager::InsertDefaultPlugins(cSettingsRepositoryInterface & a_Settings)
 {
 	a_Settings.AddKeyName("Plugins");
-	a_Settings.AddValue("Plugins", "Plugin", "Core");
-	a_Settings.AddValue("Plugins", "Plugin", "ChatLog");
+	a_Settings.AddValue("Plugins", "Core", "1");
+	a_Settings.AddValue("Plugins", "ChatLog", "1");
+	a_Settings.AddValue("Plugins", "ProtectionAreas", "0");
 }
 
 
@@ -164,35 +165,54 @@ void cPluginManager::InsertDefaultPlugins(cSettingsRepositoryInterface & a_Setti
 
 void cPluginManager::Tick(float a_Dt)
 {
-	// Unload plugins that have been scheduled for unloading:
-	AStringVector PluginsToUnload;
+	decltype(m_PluginsNeedAction) PluginsNeedAction;
 	{
-		cCSLock Lock(m_CSPluginsToUnload);
-		std::swap(m_PluginsToUnload, PluginsToUnload);
+		cCSLock Lock(m_CSPluginsNeedAction);
+		std::swap(m_PluginsNeedAction, PluginsNeedAction);
 	}
-	for (auto & folder: PluginsToUnload)
+
+	// Process deferred actions:
+	for (auto & CurrentPlugin : PluginsNeedAction)
 	{
-		bool HasUnloaded = false;
-		bool HasFound = false;
-		for (auto & plugin: m_Plugins)
+		auto & Action = CurrentPlugin.first;
+		auto & Folder = CurrentPlugin.second;
+
+		bool WasLoaded = false;
+		bool WasFound = false;
+		for (auto & Plugin: m_Plugins)
 		{
-			if (plugin->GetFolderName() == folder)
+			if (Plugin->GetFolderName() == Folder)
 			{
-				HasFound = true;
-				if (plugin->IsLoaded())
+				WasFound = true;
+				if (Plugin->IsLoaded())
 				{
-					plugin->Unload();
-					HasUnloaded = true;
+					switch (Action)
+					{
+						case PluginAction::Reload :
+						{
+							// Reload plugins by unloading, then loading:
+							Plugin->Unload();
+							Plugin->Load();
+							break;
+						}
+						case PluginAction::Unload :
+						{
+							// Unload plugins that have been scheduled for unloading:
+							Plugin->Unload();
+							break;
+						}
+					}
+					WasLoaded = true;
 				}
 			}
 		}
-		if (!HasFound)
+		if (!WasFound)
 		{
-			LOG("Cannot unload plugin in folder \"%s\", there's no such plugin folder", folder.c_str());
+			LOG("Cannot act on plugin in folder \"%s\", there's no such plugin folder", Folder.c_str());
 		}
-		else if (!HasUnloaded)
+		else if (!WasLoaded)
 		{
-			LOG("Cannot unload plugin in folder \"%s\", it has not been loaded.", folder.c_str());
+			LOG("Cannot act on plugin in folder \"%s\", it has not been loaded.", Folder.c_str());
 		}
 	}  // for plugin - m_Plugins[]
 
@@ -248,14 +268,18 @@ bool cPluginManager::CallHookBlockSpread(cWorld & a_World, int a_BlockX, int a_B
 
 
 bool cPluginManager::CallHookBlockToPickups(
-	cWorld & a_World, cEntity * a_Digger,
-	int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	cWorld & a_World,
+	Vector3i a_BlockPos,
+	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	const cBlockEntity * a_BlockEntity,
+	const cEntity * a_Digger,
+	const cItem * a_Tool,
 	cItems & a_Pickups
 )
 {
 	return GenericCallHook(HOOK_BLOCK_TO_PICKUPS, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnBlockToPickups(a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_Pickups);
+			return a_Plugin->OnBlockToPickups(a_World, a_BlockPos, a_BlockType, a_BlockMeta, a_BlockEntity, a_Digger, a_Tool, a_Pickups);
 		}
 	);
 }
@@ -608,6 +632,19 @@ bool cPluginManager::CallHookHopperPushingItem(cWorld & a_World, cHopperEntity &
 
 
 
+bool cPluginManager::CallHookDropSpense(cWorld & a_World, cDropSpenserEntity & a_DropSpenser, int a_SlotNum)
+{
+	return GenericCallHook(HOOK_DROPSPENSE, [&](cPlugin * a_Plugin)
+		{
+			return a_Plugin->OnDropSpense(a_World, a_DropSpenser, a_SlotNum);
+		}
+	);
+}
+
+
+
+
+
 bool cPluginManager::CallHookKilled(cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage)
 {
 	return GenericCallHook(HOOK_KILLED, [&](cPlugin * a_Plugin)
@@ -790,11 +827,11 @@ bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
+bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition, bool a_PreviousIsOnGround)
 {
 	return GenericCallHook(HOOK_PLAYER_MOVING, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerMoving(a_Player, a_OldPosition, a_NewPosition);
+			return a_Plugin->OnPlayerMoving(a_Player, a_OldPosition, a_NewPosition, a_PreviousIsOnGround);
 		}
 	);
 }
@@ -834,6 +871,19 @@ bool cPluginManager::CallHookPlayerPlacingBlock(cPlayer & a_Player, const sSetBl
 	return GenericCallHook(HOOK_PLAYER_PLACING_BLOCK, [&](cPlugin * a_Plugin)
 		{
 			return a_Plugin->OnPlayerPlacingBlock(a_Player, a_BlockChange);
+		}
+	);
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerCrouched(cPlayer & a_Player)
+{
+	return GenericCallHook(HOOK_PLAYER_CROUCHED, [&](cPlugin * a_Plugin)
+		{
+			return a_Plugin->OnPlayerCrouched(a_Player);
 		}
 	);
 }
@@ -1286,8 +1336,18 @@ void cPluginManager::UnloadPluginsNow()
 
 void cPluginManager::UnloadPlugin(const AString & a_PluginFolder)
 {
-	cCSLock Lock(m_CSPluginsToUnload);
-	m_PluginsToUnload.push_back(a_PluginFolder);
+	cCSLock Lock(m_CSPluginsNeedAction);
+	m_PluginsNeedAction.emplace_back(PluginAction::Unload, a_PluginFolder);
+}
+
+
+
+
+
+void cPluginManager::ReloadPlugin(const AString & a_PluginFolder)
+{
+	cCSLock Lock(m_CSPluginsNeedAction);
+	m_PluginsNeedAction.emplace_back(PluginAction::Reload, a_PluginFolder);
 }
 
 
@@ -1383,7 +1443,7 @@ bool cPluginManager::BindCommand(
 
 	auto & reg = m_Commands[a_Command];
 	reg.m_Plugin     = a_Plugin;
-	reg.m_Handler    = a_Handler;
+	reg.m_Handler    = std::move(a_Handler);
 	reg.m_Permission = a_Permission;
 	reg.m_HelpString = a_HelpString;
 	return true;
@@ -1490,7 +1550,7 @@ bool cPluginManager::BindConsoleCommand(
 
 	auto & reg = m_ConsoleCommands[a_Command];
 	reg.m_Plugin     = a_Plugin;
-	reg.m_Handler    = a_Handler;
+	reg.m_Handler    = std::move(a_Handler);
 	reg.m_Permission = "";
 	reg.m_HelpString = a_HelpString;
 	return true;
@@ -1716,19 +1776,37 @@ AStringVector cPluginManager::GetFoldersToLoad(cSettingsRepositoryInterface & a_
 		InsertDefaultPlugins(a_Settings);
 	}
 
-	// Get the list of plugins to load:
 	AStringVector res;
-	auto Values = a_Settings.GetValues("Plugins");
-	for (auto NameValue : Values)
+
+	// Get the old format plugin list, and migrate it.
+	// Upgrade path added on 2020-03-27
+	auto OldValues = a_Settings.GetValues("Plugins");
+	for (const auto & NameValue : OldValues)
 	{
 		AString ValueName = NameValue.first;
 		if (ValueName.compare("Plugin") == 0)
 		{
 			AString PluginFile = NameValue.second;
-			if (!PluginFile.empty())
+			if (
+				!PluginFile.empty() &&
+				(PluginFile != "0") &&
+				(PluginFile != "1")
+			)
 			{
-				res.push_back(PluginFile);
+				a_Settings.DeleteValue("Plugins", ValueName);
+				a_Settings.SetValue("Plugins", PluginFile, "1");
 			}
+		}
+	}  // for i - ini values
+
+	// Get the list of plugins to load:
+	auto Values = a_Settings.GetValues("Plugins");
+	for (const auto & NameValue : Values)
+	{
+		AString Enabled = NameValue.second;
+		if (Enabled == "1")
+		{
+			res.push_back(NameValue.first);
 		}
 	}  // for i - ini values
 

@@ -32,90 +32,19 @@
 	// 2014_01_06 xoft: Disabled this warning because MSVC is stupid and reports it in obviously wrong places
 	// #pragma warning(3 : 4244)  // Conversion from 'type1' to 'type2', possible loss of data
 
-	#define OBSOLETE __declspec(deprecated)
-
-	// No alignment needed in MSVC
-	#define ALIGN_8
-	#define ALIGN_16
 
 	#define FORMATSTRING(formatIndex, va_argsIndex)
-
-	// MSVC has its own custom version of zu format
-	#define SIZE_T_FMT "%Iu"
-	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
-	#define SIZE_T_FMT_HEX "%Ix"
-
-	#define NORETURN      __declspec(noreturn)
-
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
 	#define abstract
 
-	// override is part of c++11
-	#if __cplusplus < 201103L
-		#define override
-	#endif
-
-	#define OBSOLETE __attribute__((deprecated))
-
-	#define ALIGN_8 __attribute__((aligned(8)))
-	#define ALIGN_16 __attribute__((aligned(16)))
-
-	// Some portability macros :)
-	#define stricmp strcasecmp
 
 	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
-
-	#if defined(_WIN32)
-		// We're compiling on MinGW, which uses an old MSVCRT library that has no support for size_t printfing.
-		// We need direct size formats:
-		#if defined(_WIN64)
-			#define SIZE_T_FMT "%I64u"
-			#define SIZE_T_FMT_PRECISION(x) "%" #x "I64u"
-			#define SIZE_T_FMT_HEX "%I64x"
-		#else
-			#define SIZE_T_FMT "%u"
-			#define SIZE_T_FMT_PRECISION(x) "%" #x "u"
-			#define SIZE_T_FMT_HEX "%x"
-		#endif
-	#else
-		// We're compiling on Linux, so we can use libc's size_t printf format:
-		#define SIZE_T_FMT "%zu"
-		#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
-		#define SIZE_T_FMT_HEX "%zx"
-	#endif
-
-	#define NORETURN      __attribute((__noreturn__))
-
 #else
 
 	#error "You are using an unsupported compiler, you might need to #define some stuff here for your compiler"
 
-	/*
-	// Copy and uncomment this into another #elif section based on your compiler identification
-
-	// Explicitly mark classes as abstract (no instances can be created)
-	#define abstract
-
-	// Mark virtual methods as overriding (forcing them to have a virtual function of the same signature in the base class)
-	#define override
-
-	// Mark functions as obsolete, so that their usage results in a compile-time warning
-	#define OBSOLETE
-
-	// Mark types / variables for alignment. Do the platforms need it?
-	#define ALIGN_8
-	#define ALIGN_16
-	*/
-
-#endif
-
-
-#ifdef  _DEBUG
-	#define NORETURNDEBUG NORETURN
-#else
-	#define NORETURNDEBUG
 #endif
 
 
@@ -207,12 +136,6 @@ template class SizeChecker<UInt16, 2>;
 	#include <semaphore.h>
 	#include <errno.h>
 	#include <fcntl.h>
-#endif
-
-#if defined(ANDROID_NDK)
-	#define FILE_IO_PREFIX "/sdcard/mcserver/"
-#else
-	#define FILE_IO_PREFIX ""
 #endif
 
 
@@ -326,27 +249,8 @@ around it, "(32 KiB)") */
 // Pretty much the same as ASSERT() but stays in Release builds
 #define VERIFY( x) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), exit(1), 0))
 
-// Same as assert but in all Self test builds
-#ifdef SELF_TEST
-	#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
-#endif
-
 // C++11 has std::shared_ptr in <memory>, included earlier
 #define SharedPtr std::shared_ptr
-
-
-
-
-
-/** A generic interface used mainly in ForEach() functions */
-template <typename Type> class cItemCallback
-{
-public:
-	virtual ~cItemCallback() {}
-
-	/** Called for each item in the internal list; return true to stop the loop, or false to continue enumerating */
-	virtual bool Item(Type * a_Type) = 0;
-} ;
 
 
 
@@ -371,7 +275,5 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 
 
 // Common headers (part 2, with macros):
-#include "src/ChunkDef.h"
-#include "src/BiomeDef.h"
 #include "src/BlockID.h"
 #include "src/BlockInfo.h"

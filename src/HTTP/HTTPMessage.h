@@ -43,7 +43,9 @@ public:
 	size_t          GetContentLength(void) const { return m_ContentLength; }
 
 protected:
-	typedef std::map<AString, AString> cNameValueMap;
+
+	using cNameValueMap = std::map<AString, AString>;
+
 
 	eKind m_Kind;
 
@@ -64,12 +66,13 @@ protected:
 
 
 /** Stores outgoing response headers and serializes them to an HTTP data stream. */
-class cHTTPOutgoingResponse :
+class cHTTPOutgoingResponse:
 	public cHTTPMessage
 {
-	typedef cHTTPMessage super;
+	using Super = cHTTPMessage;
 
 public:
+
 	cHTTPOutgoingResponse(void);
 
 	/** Appends the response to the specified datastream - response line and headers.
@@ -85,8 +88,10 @@ public:
 class cHTTPIncomingRequest:
 	public cHTTPMessage
 {
-	typedef cHTTPMessage Super;
+	using Super = cHTTPMessage;
+
 public:
+
 	/** Base class for anything that can be used as the UserData for the request. */
 	class cUserData
 	{
@@ -94,7 +99,7 @@ public:
 		// Force a virtual destructor in descendants:
 		virtual ~cUserData() {}
 	};
-	typedef std::shared_ptr<cUserData> cUserDataPtr;
+	using cUserDataPtr = std::shared_ptr<cUserData>;
 
 
 	/** Creates a new instance of the class, containing the method and URL provided by the client. */
@@ -121,7 +126,7 @@ public:
 	bool DoesAllowKeepAlive(void) const { return m_AllowKeepAlive; }
 
 	/** Attaches any kind of data to this request, to be later retrieved by GetUserData(). */
-	void SetUserData(cUserDataPtr a_UserData) { m_UserData = a_UserData; }
+	void SetUserData(cUserDataPtr a_UserData) { m_UserData = std::move(a_UserData); }
 
 	/** Returns the data attached to this request by the class client. */
 	cUserDataPtr GetUserData(void) { return m_UserData; }

@@ -61,7 +61,7 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 	bool IsFromExampleRedirect = false;
 
 
-	f.open((FILE_IO_PREFIX + a_FileName).c_str(), ios::in);
+	f.open((a_FileName).c_str(), ios::in);
 	if (f.fail())
 	{
 		f.clear();
@@ -70,7 +70,7 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 			// Retry with the .example.ini file instead of .ini:
 			AString ExPath(a_FileName.substr(0, a_FileName.length() - 4));
 			ExPath.append(".example.ini");
-			f.open((FILE_IO_PREFIX + ExPath).c_str(), ios::in);
+			f.open((ExPath).c_str(), ios::in);
 			if (f.fail())
 			{
 				return false;
@@ -176,7 +176,7 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 
 	if (IsFromExampleRedirect)
 	{
-		WriteFile(FILE_IO_PREFIX + a_FileName);
+		WriteFile(a_FileName);
 	}
 
 	return true;
@@ -192,7 +192,7 @@ bool cIniFile::WriteFile(const AString & a_FileName) const
 	// a few bugs with ofstream. So ... fstream used.
 	fstream f;
 
-	f.open((FILE_IO_PREFIX + a_FileName).c_str(), ios::out);
+	f.open((a_FileName).c_str(), ios::out);
 	if (f.fail())
 	{
 		return false;
@@ -934,7 +934,7 @@ AStringVector ReadUpgradeIniPorts(
 
 	AStringVector Ports;
 
-	for (auto pair : a_Settings.GetValues(a_KeyName))
+	for (const auto & pair : a_Settings.GetValues(a_KeyName))
 	{
 		if (pair.first != a_PortsValueName)
 		{

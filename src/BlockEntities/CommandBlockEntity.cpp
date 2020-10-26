@@ -17,8 +17,8 @@
 
 
 
-cCommandBlockEntity::cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
+cCommandBlockEntity::cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_ShouldExecute(false),
 	m_Result(0)
 {
@@ -163,6 +163,11 @@ void cCommandBlockEntity::Execute()
 		return;
 	}
 
+	if (m_Command.empty())
+	{
+		return;
+	}
+
 	class CommandBlockOutCb :
 		public cCommandOutputCallback
 	{
@@ -175,21 +180,30 @@ void cCommandBlockEntity::Execute()
 		{
 			// Overwrite field
 			m_CmdBlock->SetLastOutput(cClientHandle::FormatChatPrefix(m_CmdBlock->GetWorld()->ShouldUseChatPrefixes(), "SUCCESS", cChatColor::Green, cChatColor::White) + a_Text);
+			m_CmdBlock->GetWorld()->BroadcastBlockEntity(m_CmdBlock->GetPos());
 		}
 	} CmdBlockOutCb(this);
 
+	AString RealCommand = m_Command;
+
+	// Remove leading slash if it exists, since console commands don't use them
+	if (RealCommand[0] == '/')
+	{
+		RealCommand = RealCommand.substr(1, RealCommand.length());
+	}
+
 	// Administrator commands are not executable by command blocks:
 	if (
-		(m_Command != "stop") &&
-		(m_Command != "restart") &&
-		(m_Command != "kick") &&
-		(m_Command != "ban") &&
-		(m_Command != "ipban")
+		(RealCommand != "stop") &&
+		(RealCommand != "restart") &&
+		(RealCommand != "kick") &&
+		(RealCommand != "ban") &&
+		(RealCommand != "ipban")
 	)
 	{
 		cServer * Server = cRoot::Get()->GetServer();
 		LOGD("cCommandBlockEntity: Executing command %s", m_Command.c_str());
-		Server->ExecuteConsoleCommand(m_Command, CmdBlockOutCb);
+		Server->QueueExecuteConsoleCommand(RealCommand, CmdBlockOutCb);
 	}
 	else
 	{

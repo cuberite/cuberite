@@ -15,18 +15,19 @@
 
 
 
-class cStructGenRavines :
+class cStructGenRavines:
 	public cGridStructGen
 {
-	typedef cGridStructGen super;
+	using Super = cGridStructGen;
 
 public:
+
 	cStructGenRavines(int a_Seed, int a_Size);
 
 protected:
 	class cRavine;  // fwd: Ravines.cpp
 
-	int    m_Size;  // Max size, in blocks, of the ravines generated
+	int m_Size;  // Max size, in blocks, of the ravines generated
 
 
 	// cGridStructGen overrides:

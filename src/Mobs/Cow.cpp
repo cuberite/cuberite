@@ -9,8 +9,9 @@
 
 
 cCow::cCow(void) :
-	super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", 0.9, 1.3),
+	Super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", "entity.cow.ambient", 0.9, 1.3),
 	m_Blackboard(*this)
+
 {
 	using namespace BehaviorTree;
 	using std::chrono::seconds;
@@ -70,15 +71,15 @@ void cCow::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cCow::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	short HeldItem = a_Player.GetEquippedItem().m_ItemType;
 	if (HeldItem == E_ITEM_BUCKET)
 	{
+		// Milk the cow.
 		if (!a_Player.IsGameModeCreative())
 		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
-			a_Player.GetInventory().AddItem(E_ITEM_MILK);
+			a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_MILK));
 		}
 	}
 }

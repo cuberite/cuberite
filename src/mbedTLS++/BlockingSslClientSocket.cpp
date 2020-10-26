@@ -356,7 +356,7 @@ void cBlockingSslClientSocket::OnReceivedData(const char * a_Data, size_t a_Size
 
 void cBlockingSslClientSocket::SetLink(cTCPLinkPtr a_Link)
 {
-	m_Socket = a_Link;
+	m_Socket = std::move(a_Link);
 }
 
 

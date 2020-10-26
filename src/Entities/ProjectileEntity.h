@@ -20,33 +20,60 @@
 class cProjectileEntity :
 	public cEntity
 {
-	typedef cEntity super;
+	// tolua_end
+
+	using Super = cEntity;
+
+	// tolua_begin
+
 
 public:
-	/** The kind of the projectile. The numbers correspond to the network type ID used for spawning them in the protocol. */
+
+	/** The kind of the projectile. */
 	enum eKind
 	{
-		pkArrow         = 60,
-		pkSnowball      = 61,
-		pkEgg           = 62,
-		pkGhastFireball = 63,
-		pkFireCharge    = 64,
-		pkEnderPearl    = 65,
-		pkExpBottle     = 75,
-		pkSplashPotion  = 73,
-		pkFirework      = 76,
-		pkWitherSkull   = 66,
-		pkFishingFloat  = 90,
+		pkArrow,
+		pkSnowball,
+		pkEgg,
+		pkGhastFireball,
+		pkFireCharge,
+		pkEnderPearl,
+		pkExpBottle,
+		pkSplashPotion,
+		pkFirework,
+		pkWitherSkull,
 	} ;
 
 	// tolua_end
 
 	CLASS_PROTODEF(cProjectileEntity)
 
-	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
-	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height);
+	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, double a_Width, double a_Height);
+	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, double a_Width, double a_Height);
 
-	static std::unique_ptr<cProjectileEntity> Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem * a_Item, const Vector3d * a_Speed = nullptr);
+	/** Creates a new instance of the specified projectile entity.
+	a_Item is the item from which the projectile originated (such as firework or arrow). */
+	static std::unique_ptr<cProjectileEntity> Create(
+		eKind a_Kind,
+		cEntity * a_Creator,
+		Vector3d a_Pos,
+		const cItem * a_Item,
+		const Vector3d * a_Speed = nullptr
+	);
+
+	/** OBSOLETE, use the Vector3d-based overload instead.
+	Creates a new instance of the specified projectile entity.
+	a_Item is the item from which the projectile originated (such as firework or arrow). */
+	static std::unique_ptr<cProjectileEntity> Create(
+		eKind a_Kind,
+		cEntity * a_Creator,
+		double a_PosX, double a_PosY, double a_PosZ,
+		const cItem * a_Item,
+		const Vector3d * a_Speed = nullptr
+	)
+	{
+		return Create(a_Kind, a_Creator, {a_PosX, a_PosY, a_PosZ}, a_Item, a_Speed);
+	}
 
 	/** Called by the physics blocktracer when the entity hits a solid block, the hit position and the face hit (BLOCK_FACE_) is given */
 	virtual void OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace);
@@ -65,7 +92,7 @@ public:
 	/** Returns the unique ID of the entity who created this projectile
 	May return an ID <0
 	*/
-	UInt32 GetCreatorUniqueID(void) { return m_CreatorData.m_UniqueID; }
+	UInt32 GetCreatorUniqueID(void) const { return m_CreatorData.m_UniqueID; }
 
 	/** Returns the name of the player that created the projectile
 	Will be empty for non-player creators
@@ -114,6 +141,6 @@ protected:
 	// cEntity overrides:
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-	virtual void SpawnOn(cClientHandle & a_Client) override;
+	virtual void SpawnOn(cClientHandle & a_Client) final override;
 
 } ;  // tolua_export

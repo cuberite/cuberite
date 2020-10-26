@@ -1,13 +1,8 @@
 // BlockEntityWithItems.cpp
 
-// Implements the cBlockEntityWithItems class representing a common ancestor for all block entities that have an ItemGrid
-
-
-
-
-
 #include "Globals.h"
 #include "BlockEntityWithItems.h"
+#include "../Simulator/RedstoneSimulator.h"
 
 
 
@@ -16,11 +11,11 @@
 cBlockEntityWithItems::cBlockEntityWithItems(
 	BLOCKTYPE a_BlockType,
 	NIBBLETYPE a_BlockMeta,
-	int a_BlockX, int a_BlockY, int a_BlockZ,
+	Vector3i a_Pos,
 	int a_ItemGridWidth, int a_ItemGridHeight,
 	cWorld * a_World
 ):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	cBlockEntityWindowOwner(this),
 	m_Contents(a_ItemGridWidth, a_ItemGridHeight)
 {
@@ -31,14 +26,11 @@ cBlockEntityWithItems::cBlockEntityWithItems(
 
 
 
-void cBlockEntityWithItems::Destroy(void)
+cItems cBlockEntityWithItems::ConvertToPickups() const
 {
-	// Drop the contents as pickups:
-	ASSERT(m_World != nullptr);
 	cItems Pickups;
-	m_Contents.CopyToItems(Pickups);
-	m_Contents.Clear();
-	m_World->SpawnItemPickups(Pickups, m_PosX + 0.5, m_PosY + 0.5, m_PosZ + 0.5);  // Spawn in centre of block
+	Pickups.AddItemGrid(m_Contents);
+	return Pickups;
 }
 
 
@@ -60,13 +52,19 @@ void cBlockEntityWithItems::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 {
 	UNUSED(a_SlotNum);
 	ASSERT(a_Grid == &m_Contents);
-	if (m_World != nullptr)
-	{
-		if (GetWindow() != nullptr)
-		{
-			GetWindow()->BroadcastWholeWindow();
-		}
 
-		m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
+	if (m_World == nullptr)
+	{
+		return;
 	}
+
+	if (GetWindow() != nullptr)
+	{
+		GetWindow()->BroadcastWholeWindow();
+	}
+
+	m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
+
+	// Notify comparators:
+	m_World->WakeUpSimulators(m_Pos);
 }

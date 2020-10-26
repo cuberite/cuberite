@@ -7,33 +7,37 @@
 
 
 
-class cBlockSnowHandler :
+class cBlockSnowHandler final :
 	public cBlockHandler
 {
+	using Super = cBlockHandler;
+
 public:
+
+	using Super::Super;
+
+private:
+
 	enum
 	{
 		FullBlockMeta = 7  // Meta value of a full-height snow block
 	};
 
-	cBlockSnowHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
-	{
-	}
-
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		a_BlockType = m_BlockType;
 
+		// Check if incrementing existing snow height:
 		BLOCKTYPE BlockBeforePlacement;
 		NIBBLETYPE MetaBeforePlacement;
-		a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, BlockBeforePlacement, MetaBeforePlacement);
-
+		a_ChunkInterface.GetBlockTypeMeta(a_PlacedBlockPos, BlockBeforePlacement, MetaBeforePlacement);
 		if ((BlockBeforePlacement == E_BLOCK_SNOW) && (MetaBeforePlacement < FullBlockMeta))
 		{
 			// Only increment if:
@@ -45,17 +49,20 @@ public:
 
 		// First time placement, check placement is valid
 		a_BlockMeta = 0;
-
 		BLOCKTYPE BlockBelow;
 		NIBBLETYPE MetaBelow;
 		return (
-			(a_BlockY > 0) &&
-			a_ChunkInterface.GetBlockTypeMeta({a_BlockX, a_BlockY - 1, a_BlockZ}, BlockBelow, MetaBelow) &&
+			(a_PlacedBlockPos.y > 0) &&
+			a_ChunkInterface.GetBlockTypeMeta(a_PlacedBlockPos.addedY(-1), BlockBelow, MetaBelow) &&
 			CanBeOn(BlockBelow, MetaBelow)
 		);
 	}
 
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
+
+
+
+
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
 	{
 		if ((a_Player.GetEquippedItem().m_ItemType == E_BLOCK_SNOW) && (a_Meta < FullBlockMeta))
 		{
@@ -70,39 +77,73 @@ public:
 		return false;
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		a_Pickups.push_back(cItem(E_ITEM_SNOWBALL, 1, 0));
-	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		if (a_RelY > 0)
+		// No drop unless dug up with a shovel
+		if ((a_Tool == nullptr) || !ItemCategory::IsShovel(a_Tool->m_ItemType))
 		{
-			BLOCKTYPE BlockBelow = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
-			NIBBLETYPE MetaBelow = a_Chunk.GetMeta(a_RelX, a_RelY - 1, a_RelZ);
-
-			return CanBeOn(BlockBelow, MetaBelow);
+			return {};
 		}
 
-		return false;
+		if (ToolHasSilkTouch(a_Tool))
+		{
+			return cItem(m_BlockType, 1, 0);
+		}
+		else
+		{
+			// Drop as many snowballs as there were "layers" of snow:
+			return cItem(E_ITEM_SNOWBALL, 1 + (a_BlockMeta & 0x07), 0);
+		}
 	}
 
-	virtual bool DoesDropOnUnsuitable(void) override
+
+
+
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	{
+		if (a_RelPos.y <= 0)
+		{
+			return false;
+		}
+		auto BelowPos = a_RelPos.addedY(-1);
+		auto BlockBelow = a_Chunk.GetBlock(BelowPos);
+		auto MetaBelow = a_Chunk.GetMeta(BelowPos);
+		return CanBeOn(BlockBelow, MetaBelow);
+	}
+
+
+
+
+
+	virtual bool DoesDropOnUnsuitable(void) const override
 	{
 		return false;
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 14;
 	}
 
-	virtual bool IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual bool IsInsideBlock(const Vector3d a_RelPosition, const NIBBLETYPE a_BlockMeta) const override
 	{
-		return a_Position.y < (cBlockInfo::GetBlockHeight(a_BlockType) * (a_BlockMeta & 0x07));
+		return a_RelPosition.y < (cBlockInfo::GetBlockHeight(m_BlockType) * (a_BlockMeta & 0x07));
 	}
+
 
 private:
 

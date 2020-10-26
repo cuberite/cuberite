@@ -10,7 +10,7 @@
 #pragma once
 
 #include "Entity.h"
-#include "World.h"
+#include "../World.h"
 #include "../UI/WindowOwner.h"
 
 
@@ -20,7 +20,7 @@
 class cMinecart :
 	public cEntity
 {
-	typedef cEntity super;
+	using Super = cEntity;
 
 public:
 	CLASS_PROTODEF(cMinecart)
@@ -45,7 +45,9 @@ public:
 	int LastDamage(void) const { return m_LastDamage; }
 	ePayload GetPayload(void) const { return m_Payload; }
 
+
 protected:
+
 	ePayload m_Payload;
 	int m_LastDamage;
 	Vector3i m_DetectorRailPosition;
@@ -57,7 +59,7 @@ protected:
 	// Overwrite to enforce speed limit
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
 
-	cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z);
+	cMinecart(ePayload a_Payload, Vector3d a_Pos);
 
 	/** Handles physics on normal rails
 	For each tick, slow down on flat rails, speed up or slow down on ascending / descending rails (depending on direction), and turn on curved rails. */
@@ -81,8 +83,13 @@ protected:
 	void SnapToRail(NIBBLETYPE a_RailMeta);
 	/** Tests if a solid block is in front of a cart, and stops the cart (and returns true) if so; returns false if no obstruction */
 	bool TestBlockCollision(NIBBLETYPE a_RailMeta);
+	/** Tests if there is a block at the specified position which is impassable to minecarts */
+	bool IsSolidBlockAtPosition(Vector3i a_Offset);
 	/** Tests if a solid block is at a specific offset of the minecart position */
 	bool IsSolidBlockAtOffset(int a_XOffset, int a_YOffset, int a_ZOffset);
+
+	bool IsBlockCollisionAtOffset(Vector3i a_Offset);
+
 	/** Tests if this mincecart's bounding box is intersecting another entity's bounding box (collision) and pushes mincecart away if necessary */
 	bool TestEntityCollision(NIBBLETYPE a_RailMeta);
 
@@ -95,18 +102,22 @@ protected:
 class cRideableMinecart :
 	public cMinecart
 {
-	typedef cMinecart super;
+	using Super = cMinecart;
 
 public:
+
 	CLASS_PROTODEF(cRideableMinecart)
 
-	cRideableMinecart(double a_X, double a_Y, double a_Z, const cItem & a_Content, int a_Height);
+	cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, int a_Height);
 
 	const cItem & GetContent(void) const {return m_Content;}
 	int GetBlockHeight(void) const {return m_Height;}
+
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
+
 protected:
+
 
 	cItem m_Content;
 	int m_Height;
@@ -121,12 +132,13 @@ class cMinecartWithChest :
 	public cItemGrid::cListener,
 	public cEntityWindowOwner
 {
-	typedef cMinecart super;
+	using Super = cMinecart;
 
 public:
+
 	CLASS_PROTODEF(cMinecartWithChest)
 
-	cMinecartWithChest(double a_X, double a_Y, double a_Z);
+	cMinecartWithChest(Vector3d a_Pos);
 
 	enum
 	{
@@ -137,7 +149,9 @@ public:
 	const cItem & GetSlot(int a_Idx) const { return m_Contents.GetSlot(a_Idx); }
 	void SetSlot(int a_Idx, const cItem & a_Item) { m_Contents.SetSlot(a_Idx, a_Item); }
 
+
 protected:
+
 	cItemGrid m_Contents;
 	void OpenNewWindow(void);
 	virtual void Destroyed() override;
@@ -169,12 +183,13 @@ protected:
 class cMinecartWithFurnace :
 	public cMinecart
 {
-	typedef cMinecart super;
+	using Super = cMinecart;
 
 public:
+
 	CLASS_PROTODEF(cMinecartWithFurnace)
 
-	cMinecartWithFurnace(double a_X, double a_Y, double a_Z);
+	cMinecartWithFurnace(Vector3d a_Pos);
 
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
@@ -201,12 +216,12 @@ private:
 class cMinecartWithTNT :
 	public cMinecart
 {
-	typedef cMinecart super;
+	using Super = cMinecart;
 
 public:
 	CLASS_PROTODEF(cMinecartWithTNT)
 
-	cMinecartWithTNT(double a_X, double a_Y, double a_Z);
+	cMinecartWithTNT(Vector3d a_Pos);
 } ;
 
 
@@ -216,10 +231,11 @@ public:
 class cMinecartWithHopper :
 	public cMinecart
 {
-	typedef cMinecart super;
+	using Super = cMinecart;
 
 public:
+
 	CLASS_PROTODEF(cMinecartWithHopper)
 
-	cMinecartWithHopper(double a_X, double a_Y, double a_Z);
+	cMinecartWithHopper(Vector3d a_Pos);
 } ;

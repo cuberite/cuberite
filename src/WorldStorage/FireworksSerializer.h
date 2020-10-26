@@ -10,6 +10,12 @@
 #pragma once
 
 
+#include "../BlockType.h"
+
+
+
+
+
 class cFastNBTWriter;
 class cParsedNBT;
 
@@ -62,10 +68,10 @@ public:
 	}
 
 	/** Writes firework NBT data to a Writer object */
-	static void WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFastNBTWriter & a_Writer, const ENUM_ITEM_ID a_Type);
+	static void WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFastNBTWriter & a_Writer, const ENUM_ITEM_TYPE a_Type);
 
 	/** Reads NBT data from a NBT object and populates a FireworkItem with it */
-	static void ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, int a_TagIdx, const ENUM_ITEM_ID a_Type);
+	static void ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, int a_TagIdx, const ENUM_ITEM_TYPE a_Type);
 
 	/** Converts the firework's vector of colours into a string of values separated by a semicolon */
 	static AString ColoursToString(const cFireworkItem & a_FireworkItem);

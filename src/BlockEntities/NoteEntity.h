@@ -30,22 +30,20 @@ enum ENUM_NOTE_INSTRUMENTS
 class cNoteEntity :
 	public cBlockEntity
 {
-	typedef cBlockEntity Super;
-public:
-
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cNoteEntity)
+	using Super = cBlockEntity;
+
+public:  // tolua_export
 
 	/** Creates a new note entity. a_World may be nullptr */
-	cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
-	virtual ~cNoteEntity() override {}
+	cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// tolua_begin
 
-	char GetPitch(void);
-	void SetPitch(char a_Pitch);
-	void IncrementPitch(void);
+	unsigned char GetNote(void);
+	void SetNote(unsigned char a_Note);
+	void IncrementNote(void);
 	void MakeSound(void);
 
 	// tolua_end
@@ -55,10 +53,11 @@ public:
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle &) override {}
 
+	/** Returns the relative pitch (used in the protocol)
+	from a note value between 0 and 24 (used in m_Note). */
+	static float PitchFromNote(unsigned char a_Note);
+
 private:
-	char m_Pitch;
+
+	unsigned char m_Note;
 } ;  // tolua_export
-
-
-
-

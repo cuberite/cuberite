@@ -5,9 +5,9 @@
 
 #include "Globals.h"
 #include "PrefabPiecePool.h"
-#include "../Bindings/LuaState.h"
-#include "WorldStorage/SchematicFileSerializer.h"
 #include "VerticalStrategy.h"
+#include "../Bindings/LuaState.h"
+#include "../WorldStorage/SchematicFileSerializer.h"
 #include "../StringCompression.h"
 
 
@@ -16,10 +16,12 @@
 
 // Conditionally log a warning
 #define CONDWARNING(ShouldLog, ...) \
-	if (ShouldLog) \
-	{ \
-		LOGWARNING(__VA_ARGS__); \
-	}
+	do { \
+		if (ShouldLog) \
+		{ \
+			LOGWARNING(__VA_ARGS__); \
+		} \
+	} while (false)
 
 
 
@@ -396,7 +398,7 @@ std::unique_ptr<cPrefab> cPrefabPiecePool::LoadPrefabFromCubesetVer1(
 			);
 			return nullptr;
 		}
-		return cpp14::make_unique<cPrefab>(area);
+		return std::make_unique<cPrefab>(area);
 	}  // if (SchematicFileName)
 
 	// There's no referenced schematic file, load from BlockDefinitions / BlockData.
@@ -450,7 +452,7 @@ std::unique_ptr<cPrefab> cPrefabPiecePool::LoadPrefabFromCubesetVer1(
 		return nullptr;
 	}
 
-	return cpp14::make_unique<cPrefab>(BlockDefStr, BlockDataStr, SizeX, SizeY, SizeZ);
+	return std::make_unique<cPrefab>(BlockDefStr, BlockDataStr, SizeX, SizeY, SizeZ);
 }
 
 
@@ -498,9 +500,12 @@ bool cPrefabPiecePool::ReadConnectorsCubesetVer1(
 			!cPiece::cConnector::StringToDirection(DirectionStr, Direction)
 		)
 		{
-			CONDWARNING(a_LogWarnings, "Piece %s in file %s has a malformed Connector at index %d ({%d, %d, %d}, type %d, direction %s). Skipping the connector.",
-				a_PieceName.c_str(), a_FileName.c_str(), idx, RelX, RelY, RelZ, Type, DirectionStr.c_str()
-			);
+			if (a_LogWarnings)
+			{
+				FLOGWARNING("Piece {0} in file {1} has a malformed Connector at index {2} ({3}, type {4}, direction {5}). Skipping the connector.",
+					a_PieceName, a_FileName, idx, Vector3i{RelX, RelY, RelZ}, Type, DirectionStr
+				);
+			}
 			res = false;
 			lua_pop(a_LuaState, 1);  // stk: [Connectors]
 			idx += 1;

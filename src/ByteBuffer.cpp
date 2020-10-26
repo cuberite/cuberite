@@ -26,8 +26,8 @@ Unfortunately it is very slow, so it is disabled even for regular DEBUG builds. 
 // If a string sent over the protocol is larger than this, a warning is emitted to the console
 #define MAX_STRING_SIZE (512 KiB)
 
-#define NEEDBYTES(Num) if (!CanReadBytes(Num))  return false;  // Check if at least Num bytes can be read from  the buffer, return false if not
-#define PUTBYTES(Num)  if (!CanWriteBytes(Num)) return false;  // Check if at least Num bytes can be written to the buffer, return false if not
+#define NEEDBYTES(Num) if (!CanReadBytes(Num))  return false  // Check if at least Num bytes can be read from  the buffer, return false if not
+#define PUTBYTES(Num)  if (!CanWriteBytes(Num)) return false  // Check if at least Num bytes can be written to the buffer, return false if not
 
 
 
@@ -472,7 +472,7 @@ bool cByteBuffer::ReadLEInt(int & a_Value)
 
 
 
-bool cByteBuffer::ReadPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
+bool cByteBuffer::ReadXYZPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 {
 	CHECK_THREAD
 	Int64 Value;
@@ -488,8 +488,33 @@ bool cByteBuffer::ReadPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 
 	// If the highest bit in the number's range is set, convert the number into negative:
 	a_BlockX = ((BlockXRaw & 0x02000000) == 0) ? static_cast<int>(BlockXRaw) : -(0x04000000 - static_cast<int>(BlockXRaw));
-	a_BlockY = ((BlockYRaw & 0x0800) == 0)     ? static_cast<int>(BlockYRaw) : -(0x0800     - static_cast<int>(BlockYRaw));
+	a_BlockY = ((BlockYRaw & 0x0800) == 0)     ? static_cast<int>(BlockYRaw) : -(0x01000    - static_cast<int>(BlockYRaw));
 	a_BlockZ = ((BlockZRaw & 0x02000000) == 0) ? static_cast<int>(BlockZRaw) : -(0x04000000 - static_cast<int>(BlockZRaw));
+	return true;
+}
+
+
+
+
+
+bool cByteBuffer::ReadXZYPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
+{
+	CHECK_THREAD
+	Int64 Value;
+	if (!ReadBEInt64(Value))
+	{
+		return false;
+	}
+
+	// Convert the 64 received bits into 3 coords:
+	UInt32 BlockXRaw = (Value >> 38) & 0x03ffffff;  // Top 26 bits
+	UInt32 BlockZRaw = (Value >> 12) & 0x03ffffff;  // Middle 26 bits
+	UInt32 BlockYRaw = (Value & 0x0fff);            // Bottom 12 bits
+
+	// If the highest bit in the number's range is set, convert the number into negative:
+	a_BlockX = ((BlockXRaw & 0x02000000) == 0) ? static_cast<int>(BlockXRaw) : (static_cast<int>(BlockXRaw) - 0x04000000);
+	a_BlockY = ((BlockYRaw & 0x0800)     == 0) ? static_cast<int>(BlockYRaw) : (static_cast<int>(BlockYRaw) - 0x01000);
+	a_BlockZ = ((BlockZRaw & 0x02000000) == 0) ? static_cast<int>(BlockZRaw) : (static_cast<int>(BlockZRaw) - 0x04000000);
 	return true;
 }
 
@@ -718,7 +743,7 @@ bool cByteBuffer::WriteVarUTF8String(const AString & a_Value)
 
 
 
-bool cByteBuffer::WritePosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ)
+bool cByteBuffer::WriteXYZPosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -726,6 +751,21 @@ bool cByteBuffer::WritePosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ
 		(static_cast<Int64>(a_BlockX & 0x3FFFFFF) << 38) |
 		(static_cast<Int64>(a_BlockY & 0xFFF) << 26) |
 		(static_cast<Int64>(a_BlockZ & 0x3FFFFFF))
+	);
+}
+
+
+
+
+
+bool cByteBuffer::WriteXZYPosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ)
+{
+	CHECK_THREAD
+	CheckValid();
+	return WriteBEInt64(
+		(static_cast<Int64>(a_BlockX & 0x3FFFFFF) << 38) |
+		(static_cast<Int64>(a_BlockZ & 0x3FFFFFF) << 26) |
+		(static_cast<Int64>(a_BlockY & 0xFFF))
 	);
 }
 

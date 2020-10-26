@@ -16,16 +16,16 @@
 
 
 // tolua_begin
-
 class cMobSpawnerEntity :
 	public cBlockEntity
 {
-	typedef cBlockEntity Super;
-public:
-
 	// tolua_end
 
-	cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	using Super = cBlockEntity;
+
+public:  // tolua_export
+
+	cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
@@ -35,46 +35,64 @@ public:
 
 	// tolua_begin
 
-	/** Upate the active flag from the mob spawner. This function will called every 5 seconds from the Tick() function. */
+	/** Update the active flag from the mob spawner. This function will called every 5 seconds from the Tick() function. */
 	void UpdateActiveState(void);
 
 	/** Sets the spawn delay to a new random value. */
 	void ResetTimer(void);
 
-	/** Spawns the entity. This function automaticly change the spawn delay! */
+	/** Spawns the entity. This function automatically change the spawn delay! */
 	void SpawnEntity(void);
 
-	/** Returns the entity type that will be spawn by this mob spawner. */
-	eMonsterType GetEntity(void) const { return m_Entity; }
-
-	/** Sets the entity type who will be spawn by this mob spawner. */
-	void SetEntity(eMonsterType a_EntityType) { m_Entity = a_EntityType; }
-
-	/** Returns the spawn delay. This is the tick delay that is needed to spawn new monsters. */
-	short GetSpawnDelay(void) const { return m_SpawnDelay; }
-
-	/** Sets the spawn delay. */
-	void SetSpawnDelay(short a_Delay) { m_SpawnDelay = a_Delay; }
-
-	/** Returns the amount of the nearby players in a 16-block radius. */
+	// Getters
+	int GetNearbyMonsterNum(eMonsterType a_EntityType);
 	int GetNearbyPlayersNum(void);
 
-	/** Returns the amount of this monster type in a 8-block radius (Y: 4-block radius). */
-	int GetNearbyMonsterNum(eMonsterType a_EntityType);
+	eMonsterType GetEntity(void) const       { return m_Entity; }
+	short GetSpawnCount(void) const          { return m_SpawnCount; }
+	short GetSpawnRange(void) const          { return m_SpawnRange; }
+	short GetSpawnDelay(void) const          { return m_SpawnDelay; }
+	short GetMinSpawnDelay(void) const       { return m_MinSpawnDelay; }
+	short GetMaxSpawnDelay(void) const       { return m_MaxSpawnDelay; }
+	short GetMaxNearbyEntities(void) const   { return m_MaxNearbyEntities; }
+	short GetRequiredPlayerRange(void) const { return m_RequiredPlayerRange; }
+
+	// Setters
+	void SetEntity(eMonsterType a_EntityType)                { m_Entity = a_EntityType; }
+	void SetSpawnDelay(short a_Delay)                        { m_SpawnDelay = a_Delay; }
+	void SetSpawnCount(short a_SpawnCount)                   { m_SpawnCount = a_SpawnCount; }
+	void SetSpawnRange(short a_SpawnRange)                   { m_SpawnRange = a_SpawnRange; }
+	void SetMinSpawnDelay(short a_Min)                       { m_MinSpawnDelay = a_Min; }
+	void SetMaxSpawnDelay(short a_Max)                       { m_MaxSpawnDelay = a_Max; }
+	void SetMaxNearbyEntities(short a_MaxNearbyEntities)     { m_MaxNearbyEntities = a_MaxNearbyEntities; }
+	void SetRequiredPlayerRange(short a_RequiredPlayerRange) { m_RequiredPlayerRange = a_RequiredPlayerRange; }
 
 	// tolua_end
 
-	static const char * GetClassStatic(void) { return "cMobSpawnerEntity"; }
-
 private:
+
 	/** The entity to spawn. */
 	eMonsterType m_Entity;
 
+	/** Time in ticks until the next entity spawns */
 	short m_SpawnDelay;
 
 	bool m_IsActive;
+
+	/** Number of entities the spawner tries to spawn each activation. */
+	short m_SpawnCount = 4;
+
+	/** Diameter of the square the new monsters are spawned in */
+	short m_SpawnRange = 8;
+
+	short m_MinSpawnDelay = 200;
+
+	short m_MaxSpawnDelay = 800;
+
+	/** Maximum amount of the same entity type in proximity. */
+	short m_MaxNearbyEntities = 6;
+
+	/** Maximum distance to player for activation */
+	short m_RequiredPlayerRange = 16;
+
 } ;  // tolua_end
-
-
-
-

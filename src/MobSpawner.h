@@ -27,8 +27,8 @@ public :
 	/** Try to create a monster here
 	If this is the first of a Pack, determine the type of monster
 	a_Biome, BlockType & BlockMeta are used to decide what kind of Mob can Spawn here
-	a_MaxPackSize is set to the maximal size for a pack this type of mob */
-	cMonster * TryToSpawnHere(cChunk * a_Chunk, int A_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int & a_MaxPackSize);
+	a_MaxPackSize is set to the maximum size for a pack this type of mob */
+	cMonster * TryToSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, EMCSBiome a_Biome, int & a_MaxPackSize);
 
 	/** Mark the beginning of a new Pack.
 	All mobs of the same Pack are the same type */
@@ -43,12 +43,14 @@ public :
 	}
 
 	/** Returns true if specified type of mob can spawn on specified block */
-	static bool CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, eMonsterType a_MobType, EMCSBiome a_Biome);
+	static bool CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType a_MobType, EMCSBiome a_Biome, bool a_DisableSolidBelowCheck = false);
 
 	/** Returns all mob types that can spawn that biome */
 	static std::set<eMonsterType> GetAllowedMobTypes(EMCSBiome a_Biome);
 
+
 protected :
+
 	/** Returns a random type that can spawn in the specified biome.
 	Returns mtInvalidType if none is possible. */
 	eMonsterType ChooseMobType(EMCSBiome a_Biome);

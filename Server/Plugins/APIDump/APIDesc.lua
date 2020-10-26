@@ -542,6 +542,7 @@ return
 				only used as a parameter for the {{OnChunkGenerating|OnChunkGenerating}} and
 				{{OnChunkGenerated|OnChunkGenerated}} hooks and cannot be constructed on its own. Plugins can use this
 				class in both those hooks to manipulate generated chunks.
+				Calls to any setter of this class will not trigger simulator updates (lava, water, redstone).
 			]],
 			Functions =
 			{
@@ -1119,7 +1120,7 @@ return
 							Type = "EMCSBiome",
 						},
 					},
-					Notes = "Sets the biome at the specified relative coords",
+					Notes = "Sets the biome at the specified relative coords.",
 				},
 				SetBlockMeta =
 				{
@@ -1142,7 +1143,7 @@ return
 							Type = "number",
 						},
 					},
-					Notes = "Sets the block meta at the specified relative coords",
+					Notes = "Sets the block meta at the specified relative coords.",
 				},
 				SetBlockType =
 				{
@@ -3138,12 +3139,12 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					Params =
 					{
 						{
-							Name = "ShouldBroadcast",
+							Name = "ShouldBroadcast <b>(DEPRECATED)</b>",
 							Type = "boolean",
 							IsOptional = true,
 						},
 					},
-					Notes = "Schedules the entity to be destroyed; if ShouldBroadcast is not present or set to true, broadcasts the DestroyEntity packet",
+					Notes = "Schedules the entity to be destroyed; broadcasts the DestroyEntity packet",
 				},
 				DoesPreventBlockPlacement =
 				{
@@ -3189,6 +3190,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns the number of hitpoints out of RawDamage that the currently equipped armor would cover. See {{TakeDamageInfo}} for more information on attack damage.",
+				},
+				GetBoundingBox =
+				{
+					Returns =
+					{
+						{
+							Type = "cBoundingBox",
+						},
+					},
+					Notes = "Returns the bounding box of the entity, which has width and height corresponding to the entity, and is aligned with the block grid.",
 				},
 				GetChunkX =
 				{
@@ -3654,6 +3665,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity class is a descendant of the specified class name, or the specified class itself",
 				},
+				IsArrow =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is an arrow.",
+				},
 				IsBoat =
 				{
 					Returns =
@@ -3996,7 +4017,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 								Type = "boolean",
 							},
 						},
-						Notes = "Removes the entity from this world and starts moving it to the specified world's spawn point. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). <b>OBSOLETE</b>, use ScheduleMoveToWorld() instead.",
+						Notes = "Removes the entity from this world and starts moving it to the specified world's spawn point. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions).",
 					},
 					{
 						Params =
@@ -4017,7 +4038,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 								Type = "boolean",
 							},
 						},
-						Notes = "Removes the entity from this world and starts moving it to the specified world's spawn point. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). <b>OBSOLETE</b>, use ScheduleMoveToWorld() instead.",
+						Notes = "Removes the entity from this world and starts moving it to the specified world's spawn point. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions).",
 					},
 					{
 						Params =
@@ -4041,7 +4062,37 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 								Type = "boolean",
 							},
 						},
-						Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). The Position parameter specifies the location that the entity should be placed in, in the new world. <b>OBSOLETE</b>, use ScheduleMoveToWorld() instead.",
+						Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). The Position parameter specifies the location that the entity should be placed in, in the new world.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "Position",
+								Type = "Vector3d",
+							},
+							{
+								Name = "ShouldSetPortalCooldown",
+								Type = "boolean",
+								IsOptional = true,
+							},
+							{
+								Name = "ShouldSendRespawn",
+								Type = "boolean",
+								IsOptional = true,
+							},
+						},
+						Returns =
+						{
+							{
+								Type = "boolean",
+							},
+						},
+						Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). The Position parameter specifies the location that the entity should be placed in, in the new world.",
 					},
 				},
 				ScheduleMoveToWorld =
@@ -4067,7 +4118,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							IsOptional  = true,
 						},
 					},
-					Notes = "Schedules a MoveToWorld call to occur on the next Tick of the entity. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity. If ShouldSendRespawn is false (default), no respawn packet is sent, if it is true then a respawn packet is sent to the client.",
+					Notes = "Schedules a MoveToWorld call to occur on the next Tick of the entity. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity. If ShouldSendRespawn is false, no respawn packet is sent, if it is true (default) then a respawn packet is sent to the client. <b>OBSOLETE</b>, use MoveToWorld instead.",
 				},
 				SetGravity =
 				{
@@ -6193,7 +6244,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 							Type = "number",
 						},
 					},
-					Notes = "Adds an item to the storage; if AllowNewStacks is true (default), will also create new stacks in empty slots. Returns the number of items added",
+					Notes = "Adds an item to the storage; if AllowNewStacks is true (default), will also create new stacks in empty slots. Fills existing stacks first and fills the hotbar before the main inventory. Returns the number of items added",
 				},
 				AddItems =
 				{
@@ -6294,6 +6345,23 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 						},
 					},
 					Notes = "Adds the specified damage (1 by default) to the specified item. Removes the item and returns true if the item reached its max damage and was destroyed.",
+				},
+				FindItem =
+				{
+					Params =
+					{
+						{
+							Name = "RecipeItem",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Finds an item in the shield, hotbar and inventory slots matching `ItemType` and `ItemDamage`. The actual item is returned, if none is found `nullptr`. This can be used to validate that the player has a specific type of item.",
 				},
 				GetArmorGrid =
 				{
@@ -6587,6 +6655,28 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Removes one item from the hotbar's currently selected slot. Returns true on success.",
 				},
+				ReplaceOneEquippedItem =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+						{
+							Name = "TryOtherSlots",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Removes one item from the the current equipped item stack, and attempts to add the specified item stack back to the same slot. If it is not possible to place the item in the same slot, optionally (default true) tries to place the specified item elsewhere in the inventory. Returns the number of items successfully added. If the currently equipped slot is empty, its contents are simply set to the given Item.",
+				},
 				SendEquippedSlot =
 				{
 					Notes = "Sends the equipped item slot to the client",
@@ -6632,17 +6722,6 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Sets the specified hotbar slot contents",
 				},
-				SetShieldSlot =
-				{
-					Params =
-					{
-						{
-							Name = "Item",
-							Type = "cItem",
-						},
-					},
-					Notes = "Sets the shield slot content",
-				},
 				SetInventorySlot =
 				{
 					Params =
@@ -6658,6 +6737,17 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Sets the specified main inventory slot contents",
 				},
+				SetShieldSlot =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets the shield slot content",
+				},
 				SetSlot =
 				{
 					Params =
@@ -6672,6 +6762,17 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 						},
 					},
 					Notes = "Sets the specified slot contents",
+				},
+				SetEquippedItem =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Sets current item in the equipped hotbar slot",
 				},
 			},
 			Constants =
@@ -7413,6 +7514,23 @@ This class represents a 2D array of items. It is used as the underlying storage 
 						Notes = "Destroys the item in the specified slot",
 					},
 				},
+				FindItem =
+				{
+					Params =
+					{
+						{
+							Name = "RecipeItem",
+							Type = "cItem",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Finds an item within the grid matching `ItemType` and `ItemDamage`. The actual item is returned, if none is found `nullptr`.",
+				},
 				GetFirstEmptySlot =
 				{
 					Returns =
@@ -7909,6 +8027,17 @@ end
 						Notes = "Adds a new item to the end of the collection",
 					},
 				},
+				AddItemGrid =
+				{
+					Params =
+					{
+						{
+							Name = "ItemGrid",
+							Type = "cItemGrid",
+						},
+					},
+					Notes = "Adds a copy of each item in the specified {{cItemGrid|ItemGrid}}.",
+				},
 				Clear =
 				{
 					Notes = "Removes all items from the collection",
@@ -7921,7 +8050,7 @@ end
 							Type = "cItems",
 						},
 					},
-					Notes = "Creates a new cItems object",
+					Notes = "Creates a new empty cItems object",
 				},
 				Contains =
 				{
@@ -8771,6 +8900,16 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
+                                BurnsInDaylight =
+                                {
+                                        Returns =
+                                        {
+                                                {
+                                                        Type = "boolean",
+                                                },
+                                        },
+                                        Notes = "Returns whether the mob burns in daylight.",
+                                },
 				CanBeLeashed =
 				{
 					Returns =
@@ -8990,6 +9129,17 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the age of the monster",
 				},
+				SetBurnsInDaylight =
+				{
+					Params =
+					{
+						{
+							Name = "BurnsInDaylight",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether the mob burns in daylight. Only evaluated at next burn-decision tick",
+				},
 				SetCanBeLeashed =
 				{
 					Params =
@@ -9086,126 +9236,6 @@ a_Player:OpenWindow(Window);
 				mfWater =
 				{
 					Notes = "Family: water (squid)",
-				},
-				mtBat =
-				{
-					Notes = "",
-				},
-				mtBlaze =
-				{
-					Notes = "",
-				},
-				mtCaveSpider =
-				{
-					Notes = "",
-				},
-				mtChicken =
-				{
-					Notes = "",
-				},
-				mtCow =
-				{
-					Notes = "",
-				},
-				mtCreeper =
-				{
-					Notes = "",
-				},
-				mtEnderDragon =
-				{
-					Notes = "",
-				},
-				mtEnderman =
-				{
-					Notes = "",
-				},
-				mtGhast =
-				{
-					Notes = "",
-				},
-				mtGiant =
-				{
-					Notes = "",
-				},
-				mtHorse =
-				{
-					Notes = "",
-				},
-				mtInvalidType =
-				{
-					Notes = "Invalid monster type. Returned when monster type not recognized",
-				},
-				mtIronGolem =
-				{
-					Notes = "",
-				},
-				mtMagmaCube =
-				{
-					Notes = "",
-				},
-				mtMooshroom =
-				{
-					Notes = "",
-				},
-				mtOcelot =
-				{
-					Notes = "",
-				},
-				mtPig =
-				{
-					Notes = "",
-				},
-				mtSheep =
-				{
-					Notes = "",
-				},
-				mtSilverfish =
-				{
-					Notes = "",
-				},
-				mtSkeleton =
-				{
-					Notes = "",
-				},
-				mtSlime =
-				{
-					Notes = "",
-				},
-				mtSnowGolem =
-				{
-					Notes = "",
-				},
-				mtSpider =
-				{
-					Notes = "",
-				},
-				mtSquid =
-				{
-					Notes = "",
-				},
-				mtVillager =
-				{
-					Notes = "",
-				},
-				mtWitch =
-				{
-					Notes = "",
-				},
-				mtWither =
-				{
-					Notes = "",
-				},
-				mtWolf =
-				{
-					Notes = "",
-				},
-				mtZombie =
-				{
-					Notes = "",
-				},
-				mtZombiePigman =
-				{
-					Notes = "",
 				},
 			},
 			ConstantGroups =
@@ -10650,6 +10680,17 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Places a block while impersonating the player. The {{OnPlayerPlacingBlock|HOOK_PLAYER_PLACING_BLOCK}} hook is called before the placement, and if it succeeds, the block is placed and the {{OnPlayerPlacedBlock|HOOK_PLAYER_PLACED_BLOCK}} hook is called. Returns true iff the block is successfully placed. Assumes that the block is in a currently loaded chunk.",
 				},
+				ReplaceOneEquippedItemTossRest =
+				{
+					Params =
+					{
+						{
+							Name = "Item",
+							Type = "cItem",
+						},
+					},
+					Notes = "Removes one item from the the current equipped item stack, and attempts to add the specified item stack back to the same slot. If it is not possible to place the item in the same slot, tries to place the specified item elsewhere in the inventory. If this is not possible, then any remaining items are tossed. If the currently equipped slot is empty, its contents are simply set to the given Item.",
+				},
 				Respawn =
 				{
 					Notes = "Restores the health, extinguishes fire, makes visible and sends the Respawn packet.",
@@ -11070,6 +11111,17 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the player visibility to other players",
 				},
+				SpectateEntity =
+				{
+					Params =
+					{
+						{
+							Name = "Target",
+							Type = "cEntity",
+						},
+					},
+					Notes = "Spectates the target entity. Does not change the player's gamemode to spectator mode. When called with self or nil as the target, resets the spectation.",
+				},
 				TossEquippedItem =
 				{
 					Params =
@@ -11325,6 +11377,12 @@ a_Player:OpenWindow(Window);
 							Type = "function",
 						},
 					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
 					Notes = "Calls the given callback function for each player. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|cPlayer}})</pre>",
 				},
 				ForEachWorld =
@@ -11336,7 +11394,13 @@ a_Player:OpenWindow(Window);
 							Type = "function",
 						},
 					},
-					Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>",
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>. Returns false if a callback aborts, otherwise true.",
 				},
 				Get =
 				{
@@ -12469,7 +12533,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 						},
 						{
 							Name = "Port",
-							Type = "string",
+							Type = "number",
 						},
 						{
 							Name = "Path",
@@ -12512,7 +12576,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 						},
 						{
 							Name = "Port",
-							Type = "string",
+							Type = "number",
 						},
 					},
 					Notes = "Parses the Authority part of the URL. Parts that are not explicitly specified in the AuthPart are returned empty, the port is returned zero. If parsing fails, the function returns nil and an error message.",
@@ -13217,46 +13281,74 @@ end
 			{
 				AddFaceDirection =
 				{
-					Params =
 					{
+						Params =
 						{
-							Name = "BlockX",
-							Type = "number",
+							{
+								Name = "BlockX",
+								Type = "number",
+							},
+							{
+								Name = "BlockY",
+								Type = "number",
+							},
+							{
+								Name = "BlockZ",
+								Type = "number",
+							},
+							{
+								Name = "BlockFace",
+								Type = "eBlockFace",
+							},
+							{
+								Name = "IsInverse",
+								Type = "boolean",
+								IsOptional = true,
+							},
 						},
+						Returns =
 						{
-							Name = "BlockY",
-							Type = "number",
+							{
+								Name = "BlockX",
+								Type = "number",
+							},
+							{
+								Name = "BlockY",
+								Type = "number",
+							},
+							{
+								Name = "BlockZ",
+								Type = "number",
+							},
 						},
-						{
-							Name = "BlockZ",
-							Type = "number",
-						},
-						{
-							Name = "BlockFace",
-							Type = "eBlockFace",
-						},
-						{
-							Name = "IsInverse",
-							Type = "boolean",
-							IsOptional = true,
-						},
+						Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}",
 					},
-					Returns =
 					{
+						Params =
 						{
-							Name = "BlockX",
-							Type = "number",
+							{
+								Name = "BlockPos",
+								Type = "Vector3i",
+							},
+							{
+								Name = "BlockFace",
+								Type = "eBlockFace",
+							},
+							{
+								Name = "IsInverse",
+								Type = "boolean",
+								IsOptional = true,
+							},
 						},
+						Returns =
 						{
-							Name = "BlockY",
-							Type = "number",
+							{
+								Name = "BlockPos",
+								Type = "Vector3i",
+							},
 						},
-						{
-							Name = "BlockZ",
-							Type = "number",
-						},
+						Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}",
 					},
-					Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}",
 				},
 				Base64Decode =
 				{
@@ -13550,6 +13642,40 @@ end
 						},
 					},
 					Notes = "Returns true if the biome is very cold (has snow on ground everywhere, turns top water to ice, has snowfall instead of rain everywhere). Doesn't report mildly cold biomes (where it snows above certain elevation), use IsBiomeCold() for those.",
+				},
+				IsBiomeMountain =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						}
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the biome is mountainous (mutations of the extreme hills biome)."
+				},
+				IsBiomeMesa =
+				{
+					Params =
+					{
+						{
+							Name = "Biome",
+							Type = "EMCSBiome",
+						}
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the biome is a type of Mesa (mutations of the Mesa biome)."
 				},
 				IsValidBlock =
 				{
@@ -14216,6 +14342,166 @@ end
 				caUnknown =
 				{
 					Notes = "Unknown click action"
+				},
+				dtAdmin =
+				{
+					Notes = "Damage applied by an admin command"
+				},
+				dtArrow =
+				{
+					Notes = "Damage received by being attacked by a projectile, possibly from a mob"
+				},
+				dtArrowAttack =
+				{
+					Notes = "Damage received by being attacked by a projectile, possibly from a mob"
+				},
+				dtAttack =
+				{
+					Notes = "Damage recieved by being attacked by a mob"
+				},
+				dtBurning =
+				{
+					Notes = "Damage from being on fire"
+				},
+				dtCacti =
+				{
+					Notes = "Damage from contact with a cactus block"
+				},
+				dtCactus =
+				{
+					Notes = "Damage from contact with a cactus block"
+				},
+				dtCactusContact =
+				{
+					Notes = "Damage from contact with a cactus block"
+				},
+				dtCactuses =
+				{
+					Notes = "Damage from contact with a cactus block"
+				},
+				dtDrown =
+				{
+					Notes = "Damage received by drowning in water / lava"
+				},
+				dtDrowning =
+				{
+					Notes = "Damage received by drowning in water / lava"
+				},
+				dtEnderPearl =
+				{
+					Notes = "Damage received by throwing an ender pearl and being teleported by it"
+				},
+				dtEntityAttack =
+				{
+					Notes = "Damage recieved by being attacked by a mob"
+				},
+				dtEnvironment =
+				{
+					Notes = "Damage dealt to mobs from environment: enderman in rain, snow golem in desert"
+				},
+				dtExplosion =
+				{
+					Notes = "Damage applied by an explosion"
+				},
+				dtFall =
+				{
+					Notes = "Damage from falling down. Dealt when hitting the ground"
+				},
+				dtFalling =
+				{
+					Notes = "Damage from falling down. Dealt when hitting the ground"
+				},
+				dtFireContact =
+				{
+					Notes = "Damage received by standing inside a fire block"
+				},
+				dtHunger =
+				{
+					Notes = "Damage received from hunger"
+				},
+				dtInFire =
+				{
+					Notes = "Damage received by standing inside a fire block"
+				},
+				dtInVoid =
+				{
+					Notes = "Damage received by falling into the Void (Y < 0)"
+				},
+				dtLava =
+				{
+					Notes = "Damage received by a contact with a lava block"
+				},
+				dtLavaContact =
+				{
+					Notes = "Damage received by a contact with a lava block"
+				},
+				dtLightning =
+				{
+					Notes = "Damage from being hit by a lightning strike"
+				},
+				dtMob =
+				{
+					Notes = "Damage received by being attacked by a mob"
+				},
+				dtMobAttack =
+				{
+					Notes = "Damage received by being attacked by a mob"
+				},
+				dtOnFire =
+				{
+					Notes = "Damage from being on fire"
+				},
+				dtPawnAttack =
+				{
+					Notes = "Damage received by being attacked by a mob"
+				},
+				dtPlugin =
+				{
+					Notes = "Damage applied by an admin command"
+				},
+				dtPoison =
+				{
+					Notes = "Damage applied by the poison effect"
+				},
+				dtPoisoning =
+				{
+					Notes = "Damage applied by the poison effect"
+				},
+				dtPotionOfHarming =
+				{
+					Notes = "Damage applied by the potion of harming"
+				},
+				dtProjectile =
+				{
+					Notes = "Damage received by being attacked by a projectile, possibly from a mob"
+				},
+				dtRangedAttack =
+				{
+					Notes = "Damage received by being attacked by a projectile, possibly from a mob"
+				},
+				dtStarvation =
+				{
+					Notes = "Damage received from hunger"
+				},
+				dtStarving =
+				{
+					Notes = "Damage received from hunger"
+				},
+				dtSuffocating =
+				{
+					Notes = "Damage from suffocating inside a block"
+				},
+				dtSuffocation =
+				{
+					Notes = "Damage from suffocating inside a block"
+				},
+				dtWither =
+				{
+					Notes = "Damage from the wither effect"
+				},
+				dtWithering =
+				{
+					Notes = "Damage from the wither effect"
 				},
 				E_BLOCK_ACACIA_DOOR =
 				{
@@ -15281,6 +15567,10 @@ end
 				{
 					Notes = "The blocktype for tall grass"
 				},
+				E_BLOCK_TERRACOTTA =
+				{
+					Notes = "The blocktype for terracotta (synonym for E_BLOCK_STAINED_CLAY)",
+				},
 				E_BLOCK_TNT =
 				{
 					Notes = "The blocktype for tnt"
@@ -15304,6 +15594,10 @@ end
 				E_BLOCK_TRIPWIRE_HOOK =
 				{
 					Notes = "The blocktype for tripwire hook"
+				},
+				E_BLOCK_UNFINISHED =
+				{
+					Notes = "Internal blocktype for unfinished block handlers",
 				},
 				E_BLOCK_VINES =
 				{
@@ -16497,6 +16791,46 @@ end
 				{
 					Notes = "A flag in the metadata of droppers and dispensers that indicates that the dropper or dispenser is looking in the positive Z direction.",
 				},
+				E_META_END_PORTAL_FRAME_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame has an eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_NO_EYE =
+				{
+					Notes = "The lack of the flag in the metadata of end portal frames indicating that the portal frame has an eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_XM =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative X direction.",
+				},
+				E_META_END_PORTAL_FRAME_XP =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive X direction.",
+				},
+				E_META_END_PORTAL_FRAME_ZM =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative Z direction.",
+				},
+				E_META_END_PORTAL_FRAME_ZP =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive Z direction.",
+				},
+				E_META_END_PORTAL_FRAME_XM_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative X direction and has an ender eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_XP_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive X direction and has an ender eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_ZM_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the negative Z direction and has an ender eye in it.",
+				},
+				E_META_END_PORTAL_FRAME_ZP_EYE =
+				{
+					Notes = "A flag in the metadata of end portal frames that indicates that the portal frame is facing the positive Z direction and has an ender eye in it.",
+				},
 				E_META_HEAD_CREEPER =
 				{
 					Notes = "A flag in the metadata of heads that indicates that the head is a creeper head.",
@@ -16520,6 +16854,50 @@ end
 				E_META_HEAD_ZOMBIE =
 				{
 					Notes = "A flag in the metadata of heads that indicates that the head is a zombie head.",
+				},
+				E_META_REDSTONE_REPEATER_FACING_ZM =
+				{
+					Notes = "A flag in the metadata of redstone repeaters that indicates that the repeater is looking in the negative Z direction.",
+				},
+				E_META_REDSTONE_REPEATER_FACING_XP =
+				{
+					Notes = "A flag in the metadata of redstone repeaters that indicates that the repeater is looking in the positive X direction.",
+				},
+				E_META_REDSTONE_REPEATER_FACING_ZP =
+				{
+					Notes = "A flag in the metadata of redstone repeaters that indicates that the repeater is looking in the positive Z direction.",
+				},
+				E_META_REDSTONE_REPEATER_FACING_XM =
+				{
+					Notes = "A flag in the metadata of redstone repeaters that indicates that the repeater is looking in the negative X direction.",
+				},
+				E_META_REDSTONE_REPEATER_FACING_MASK =
+				{
+					Notes = "A mask that indicates the bits of the metadata that specify the facing of redstone repeaters.",
+				},
+				E_META_SPAWN_EGG_WITHER_SKELETON =
+				{
+					Notes = ""
+				},
+				E_META_SILVERFISH_EGG_CHISELED_STONE_BRICK =
+				{
+					Notes = "A flag in the metadata of the silverfish egg that the block is made from chiseled stone bricks"
+				},
+				E_META_SILVERFISH_EGG_CRACKED_STONE_BRICK =
+				{
+					Notes = "A flag in the metadata of the silverfish egg that the block is made from cracked stone bricks"
+				},
+				E_META_SILVERFISH_EGG_MOSSY_STONE_BRICK =
+				{
+					Notes =  "A flag in the metadata of the silverfish egg that the block is made from mossy stone bricks"
+				},
+				E_META_SPONGE_DRY =
+				{
+					Notes = "A flag in the metadata of sponges that indicates that the sponge is dry.",
+				},
+				E_META_SPONGE_WET =
+				{
+					Notes = "A flag in the metadata of sponges that indicates that the sponge is wet.",
 				},
 				esBed =
 				{
@@ -16557,6 +16935,138 @@ end
 				{
 					Notes = "A wither skull explosion. The SourceData param is the {{cWitherSkullEntity|wither skull entity}} object.",
 				},
+
+				-- eMonsterType:
+				mtBat =
+				{
+					Notes = "",
+				},
+				mtBlaze =
+				{
+					Notes = "",
+				},
+				mtCaveSpider =
+				{
+					Notes = "",
+				},
+				mtChicken =
+				{
+					Notes = "",
+				},
+				mtCow =
+				{
+					Notes = "",
+				},
+				mtCreeper =
+				{
+					Notes = "",
+				},
+				mtEnderDragon =
+				{
+					Notes = "",
+				},
+				mtEnderman =
+				{
+					Notes = "",
+				},
+				mtGhast =
+				{
+					Notes = "",
+				},
+				mtGiant =
+				{
+					Notes = "",
+				},
+				mtHorse =
+				{
+					Notes = "",
+				},
+				mtInvalidType =
+				{
+					Notes = "Invalid monster type. Returned when monster type not recognized",
+				},
+				mtIronGolem =
+				{
+					Notes = "",
+				},
+				mtMagmaCube =
+				{
+					Notes = "",
+				},
+				mtMooshroom =
+				{
+					Notes = "",
+				},
+				mtOcelot =
+				{
+					Notes = "",
+				},
+				mtPig =
+				{
+					Notes = "",
+				},
+				mtSheep =
+				{
+					Notes = "",
+				},
+				mtSilverfish =
+				{
+					Notes = "",
+				},
+				mtSkeleton =
+				{
+					Notes = "",
+				},
+				mtSlime =
+				{
+					Notes = "",
+				},
+				mtSnowGolem =
+				{
+					Notes = "",
+				},
+				mtSpider =
+				{
+					Notes = "",
+				},
+				mtSquid =
+				{
+					Notes = "",
+				},
+				mtVillager =
+				{
+					Notes = "",
+				},
+				mtWitch =
+				{
+					Notes = "",
+				},
+				mtWither =
+				{
+					Notes = "",
+				},
+				mtWitherSkeleton =
+				{
+					Notes = "",
+				},
+				mtWolf =
+				{
+					Notes = "",
+				},
+				mtZombie =
+				{
+					Notes = "",
+				},
+				mtZombiePigman =
+				{
+					Notes = "",
+				},
+				mtZombieVillager =
+				{
+					Notes = "",
+				},
+
+				-- eMessageType:
 				mtCustom =
 				{
 					Notes = "Send raw data without any processing",
@@ -16616,6 +17126,10 @@ end
 				mtWarning =
 				{
 					Notes = "Something concerning (i.e. reload) is about to happen",
+				},
+				mtWitherSkeleton =
+				{
+					Notes = ""
 				},
 				hMain =
 				{
@@ -16876,9 +17390,11 @@ end
 						"mtVillager",
 						"mtWitch",
 						"mtWither",
+						"mtWitherSkeleton",
 						"mtWolf",
 						"mtZombie",
 						"mtZombiePigman",
+						"mtZombieVillager",
 						"mtMax",
 					},
 					TextBefore = [[
@@ -17630,6 +18146,7 @@ end
 		"cLuaWindow.__cItemGrid__cListener__",
 		"Globals._CuberiteInternal_.*",
 		"Globals.esMax",
+		"Globals.E_BLOCK_*",
 	},
 	IgnoreVariables =
 	{

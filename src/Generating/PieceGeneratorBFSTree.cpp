@@ -177,7 +177,7 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 	// Place the piece:
 	Vector3i NewPos = Conn.m_Piece->RotatePos(Conn.m_Connector.m_Pos, Conn.m_NumCCWRotations);
 	ConnPos -= NewPos;
-	auto PlacedPiece = cpp14::make_unique<cPlacedPiece>(&a_ParentPiece, *(Conn.m_Piece), ConnPos, Conn.m_NumCCWRotations);
+	auto PlacedPiece = std::make_unique<cPlacedPiece>(&a_ParentPiece, *(Conn.m_Piece), ConnPos, Conn.m_NumCCWRotations);
 
 	// Add the new piece's connectors to the list of free connectors:
 	cPiece::cConnectors Connectors = Conn.m_Piece->GetConnectors();
@@ -235,12 +235,11 @@ void cPieceGeneratorBFSTree::PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDe
 
 	/*
 	// DEBUG:
-	printf("Placed the starting piece at {%d, %d, %d}\n", a_BlockX, a_BlockY, a_BlockZ);
+	FLOGD("Placed the starting piece at {0}", Vector3i{a_BlockX, a_BlockY, a_BlockZ});
 	cCuboid Hitbox = a_OutPieces[0]->GetHitBox();
 	Hitbox.Sort();
-	printf("  Hitbox: {%d, %d, %d} - {%d, %d, %d} (%d * %d * %d)\n",
-		Hitbox.p1.x, Hitbox.p1.y, Hitbox.p1.z,
-		Hitbox.p2.x, Hitbox.p2.y, Hitbox.p2.z,
+	FLOGD("  Hitbox: {0} - {1} ({2} * {3} * {4})\n",
+		Hitbox.p1, Hitbox.p2,
 		Hitbox.DifX() + 1, Hitbox.DifY() + 1, Hitbox.DifZ() + 1
 	);
 	DebugConnectorPool(ConnectorPool, 0);
@@ -264,12 +263,11 @@ void cPieceGeneratorBFSTree::PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDe
 				// DEBUG:
 				const cPlacedPiece * NewPiece = a_OutPieces.back();
 				const Vector3i & Coords = NewPiece->GetCoords();
-				printf("Placed a new piece at {%d, %d, %d}, rotation %d\n", Coords.x, Coords.y, Coords.z, NewPiece->GetNumCCWRotations());
+				FLOGD("Placed a new piece at {0}, rotation {1}\n", Coords, NewPiece->GetNumCCWRotations());
 				cCuboid Hitbox = NewPiece->GetHitBox();
 				Hitbox.Sort();
-				printf("  Hitbox: {%d, %d, %d} - {%d, %d, %d} (%d * %d * %d)\n",
-					Hitbox.p1.x, Hitbox.p1.y, Hitbox.p1.z,
-					Hitbox.p2.x, Hitbox.p2.y, Hitbox.p2.z,
+				FLOGD("  Hitbox: {0} - {1} ({2} * {3} * {4})\n",
+					Hitbox.p1, Hitbox.p2,
 					Hitbox.DifX() + 1, Hitbox.DifY() + 1, Hitbox.DifZ() + 1
 				);
 				DebugConnectorPool(ConnectorPool, NumProcessed + 1);

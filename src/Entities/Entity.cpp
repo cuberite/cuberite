@@ -2,6 +2,8 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Entity.h"
+#include "Player.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../Root.h"
 #include "../Matrix4.h"
@@ -10,8 +12,7 @@
 #include "../Simulator/FluidSimulator.h"
 #include "../Bindings/PluginManager.h"
 #include "../LineBlockTracer.h"
-#include "Player.h"
-#include "Items/ItemHandler.h"
+#include "../Items/ItemHandler.h"
 #include "../FastRandom.h"
 #include "../NetherPortalScanner.h"
 #include "../BoundingBox.h"
@@ -32,22 +33,22 @@ static UInt32 GetNextUniqueID(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cEntity:
 
-cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height):
+cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, double a_Height):
 	m_UniqueID(GetNextUniqueID()),
 	m_Health(1),
 	m_MaxHealth(1),
 	m_AttachedTo(nullptr),
 	m_Attachee(nullptr),
-	m_bDirtyHead(true),
-	m_bDirtyOrientation(true),
+	m_bDirtyHead(false),
+	m_bDirtyOrientation(false),
 	m_bHasSentNoSpeed(true),
 	m_bOnGround(false),
 	m_Gravity(-9.81f),
 	m_AirDrag(0.02f),
-	m_LastPosition(a_X, a_Y, a_Z),
+	m_LastSentPosition(a_Pos),
+	m_LastPosition(a_Pos),
 	m_EntityType(a_EntityType),
 	m_World(nullptr),
-	m_IsWorldChangeScheduled(false),
 	m_IsFireproof(false),
 	m_TicksSinceLastBurnDamage(0),
 	m_TicksSinceLastLavaDamage(0),
@@ -65,14 +66,14 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_ParentChunk(nullptr),
 	m_HeadYaw(0.0),
 	m_Rot(0.0, 0.0, 0.0),
-	m_Position(a_X, a_Y, a_Z),
-	m_LastSentPosition(a_X, a_Y, a_Z),
+	m_Position(a_Pos),
 	m_WaterSpeed(0, 0, 0),
 	m_Mass (0.001),  // Default 1g
 	m_Width(a_Width),
 	m_Height(a_Height),
 	m_InvulnerableTicks(0)
 {
+	m_WorldChangeInfo.m_NewWorld = nullptr;
 }
 
 
@@ -81,19 +82,14 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 
 cEntity::~cEntity()
 {
-
-	// Before deleting, the entity needs to have been removed from the world, if ever added
-	ASSERT((m_World == nullptr) || !m_World->HasEntity(m_UniqueID));
-	ASSERT(!IsTicking());
-
 	/*
 	// DEBUG:
-	LOGD("Deleting entity %d at pos {%.2f, %.2f, %.2f} ~ [%d, %d]; ptr %p",
+	FLOGD("Deleting entity {0} at pos {1:.2f} ~ [{2}, {3}]; ptr {4}",
 		m_UniqueID,
-		m_Pos.x, m_Pos.y, m_Pos.z,
-		(int)(m_Pos.x / cChunkDef::Width), (int)(m_Pos.z / cChunkDef::Width),
-		this
-		);
+		m_Pos,
+		GetChunkX(), GetChunkZ(),
+		static_cast<void *>(this)
+	);
 	*/
 
 	if (m_AttachedTo != nullptr)
@@ -146,31 +142,39 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 
 	/*
 	// DEBUG:
-	LOGD("Initializing entity #%d (%s) at {%.02f, %.02f, %.02f}",
-		m_UniqueID, GetClass(), m_Pos.x, m_Pos.y, m_Pos.z
+	FLOGD("Initializing entity #{0} ({1}) at {2:.02f}",
+		m_UniqueID, GetClass(), m_Pos
 	);
 	*/
 
 	ASSERT(m_World == nullptr);
 	ASSERT(GetParentChunk() == nullptr);
+	SetWorld(&a_EntityWorld);
 	a_EntityWorld.AddEntity(std::move(a_Self));
-	ASSERT(m_World != nullptr);
-
-	cPluginManager::Get()->CallHookSpawnedEntity(a_EntityWorld, *this);
-
-	// Spawn the entity on the clients:
-	a_EntityWorld.BroadcastSpawnEntity(*this);
-
-	// If has any mob leashed broadcast every leashed entity to this
-	if (HasAnyMobLeashed())
-	{
-		for (auto LeashedMob : m_LeashedMobs)
-		{
-			m_World->BroadcastLeashEntity(*LeashedMob, *this);
-		}
-	}
 
 	return true;
+}
+
+
+
+
+
+void cEntity::OnAddToWorld(cWorld & a_World)
+{
+	// Spawn the entity on the clients:
+	m_LastSentPosition = GetPosition();
+	a_World.BroadcastSpawnEntity(*this);
+	BroadcastLeashedMobs();
+}
+
+
+
+
+
+void cEntity::OnRemoveFromWorld(cWorld & a_World)
+{
+	RemoveAllLeashedMobs();
+	a_World.BroadcastDestroyEntity(*this);
 }
 
 
@@ -216,7 +220,7 @@ void cEntity::SetParentChunk(cChunk * a_Chunk)
 
 
 
-void cEntity::Destroy(bool a_ShouldBroadcast)
+void cEntity::Destroy()
 {
 	SetIsTicking(false);
 
@@ -224,11 +228,6 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 	while (!m_LeashedMobs.empty())
 	{
 		m_LeashedMobs.front()->Unleash(true, true);
-	}
-
-	if (a_ShouldBroadcast)
-	{
-		m_World->BroadcastDestroyEntity(*this);
 	}
 
 	auto ParentChunkCoords = cChunkDef::BlockToChunk(GetPosition());
@@ -251,21 +250,6 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 
 
 
-void cEntity::DestroyNoScheduling(bool a_ShouldBroadcast)
-{
-	SetIsTicking(false);
-	if (a_ShouldBroadcast)
-	{
-		m_World->BroadcastDestroyEntity(*this);
-	}
-
-	Destroyed();
-}
-
-
-
-
-
 void cEntity::TakeDamage(cEntity & a_Attacker)
 {
 	int RawDamage = a_Attacker.GetRawDamageAgainst(*this);
@@ -278,15 +262,10 @@ void cEntity::TakeDamage(cEntity & a_Attacker)
 
 void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount)
 {
-	int ArmorCover = GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
-	int EnchantmentCover = GetEnchantmentCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
-	int FinalDamage = a_RawDamage - ArmorCover - EnchantmentCover;
-	if ((FinalDamage == 0) && (a_RawDamage > 0))
-	{
-		// Nobody's invincible
-		FinalDamage = 1;
-	}
-	ApplyArmorDamage(ArmorCover);
+	float FinalDamage = static_cast<float>(a_RawDamage);
+	float ArmorCover = GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
+
+	ApplyArmorDamage(static_cast<int>(ArmorCover));
 
 	cEntity::TakeDamage(a_DamageType, a_Attacker, a_RawDamage, FinalDamage, a_KnockbackAmount);
 }
@@ -319,7 +298,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_Ra
 
 
 
-void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, int a_FinalDamage, double a_KnockbackAmount)
+void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, float a_FinalDamage, double a_KnockbackAmount)
 {
 	TakeDamageInfo TDI;
 	TDI.DamageType = a_DamageType;
@@ -331,7 +310,19 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	{
 		TDI.Attacker = nullptr;
 	}
+
+	if (a_RawDamage <= 0)
+	{
+		a_RawDamage = 0;
+	}
+
 	TDI.RawDamage = a_RawDamage;
+
+	if (a_FinalDamage <= 0)
+	{
+		a_FinalDamage = 0;
+	}
+
 	TDI.FinalDamage = a_FinalDamage;
 
 	Vector3d Heading(0, 0, 0);
@@ -340,7 +331,17 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 		Heading = a_Attacker->GetLookVector();
 	}
 
-	TDI.Knockback = Heading * a_KnockbackAmount;
+	int KnockbackHeight = 3;
+
+	if (IsPlayer())
+	{
+		KnockbackHeight = 8;
+	}
+
+	// Apply slight height to knockback
+	Vector3d FinalKnockback = Vector3d(Heading.x * a_KnockbackAmount, Heading.y + KnockbackHeight, Heading.z * a_KnockbackAmount);
+
+	TDI.Knockback = FinalKnockback;
 	DoTakeDamage(TDI);
 }
 
@@ -414,7 +415,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		{
 			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
 			{
-				a_TDI.FinalDamage *= 1.5;  // 150% damage
+				a_TDI.FinalDamage *= 1.5f;  // 150% damage
 				m_World->BroadcastEntityAnimation(*this, 4);  // Critical hit
 			}
 		}
@@ -427,7 +428,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		if (SharpnessLevel > 0)
 		{
-			a_TDI.FinalDamage += static_cast<int>(ceil(1.25 * SharpnessLevel));
+			a_TDI.FinalDamage += 1.25f * SharpnessLevel;
 		}
 		else if (SmiteLevel > 0)
 		{
@@ -437,11 +438,12 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 				switch (Monster->GetMobType())
 				{
 					case mtSkeleton:
-					case mtZombie:
 					case mtWither:
+					case mtZombie:
 					case mtZombiePigman:
+					case mtZombieVillager:
 					{
-						a_TDI.FinalDamage += static_cast<int>(ceil(2.5 * SmiteLevel));
+						a_TDI.FinalDamage += 2.5f * SmiteLevel;
 						break;
 					}
 					default: break;
@@ -459,7 +461,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtCaveSpider:
 					case mtSilverfish:
 					{
-						a_TDI.FinalDamage += static_cast<int>(ceil(2.5 * BaneOfArthropodsLevel));
+						a_TDI.FinalDamage += 2.5f * BaneOfArthropodsLevel;
 						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
 						// increasing the max duration by 0.5 seconds each level
 						// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
@@ -518,20 +520,20 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 			if (Random.RandBool(Chance / 100.0))
 			{
-				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.RandInt(1, 4), 0);
+				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.RandReal(1.0f, 4.0f), 0);
 			}
 		}
 
-		Player->GetStatManager().AddValue(statDamageDealt, static_cast<StatValue>(floor(a_TDI.FinalDamage * 10 + 0.5)));
+		Player->GetStatManager().AddValue(Statistic::DamageDealt, FloorC<cStatManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5));
 	}
 
-	m_Health -= static_cast<float>(a_TDI.FinalDamage);
+	m_Health -= a_TDI.FinalDamage;
 	m_Health = std::max(m_Health, 0.0f);
 
 	// Add knockback:
 	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != nullptr))
 	{
-		AddSpeed(a_TDI.Knockback);
+		SetSpeed(a_TDI.Knockback);
 	}
 
 	m_World->BroadcastEntityStatus(*this, esGenericHurt);
@@ -595,7 +597,6 @@ int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 void cEntity::ApplyArmorDamage(int DamageBlocked)
 {
 	// cEntities don't necessarily have armor to damage.
-	return;
 }
 
 
@@ -619,6 +620,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		case dtFalling:
 		case dtLightning:
 		case dtPlugin:
+		case dtEnvironment:
 		{
 			return false;
 		}
@@ -640,7 +642,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 
 
 
-int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+float cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
 {
 	int TotalEPF = 0;
 
@@ -676,7 +678,7 @@ int cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType 
 		}
 	}
 	int CappedEPF = std::min(20, TotalEPF);
-	return static_cast<int>(a_Damage * CappedEPF / 25.0);
+	return (a_Damage * CappedEPF / 25.0f);
 }
 
 
@@ -708,7 +710,7 @@ float cEntity::GetEnchantmentBlastKnockbackReduction()
 
 
 
-int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
 {
 	// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
 
@@ -758,8 +760,8 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
 	// Ref.: https://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
 
-	double Reduction = std::max(ArmorValue / 5.0, ArmorValue - a_Damage / (2 + Toughness / 4.0));
-	return static_cast<int>(a_Damage * std::min(20.0, Reduction) / 25.0);
+	float Reduction = std::max(ArmorValue / 5.0f, ArmorValue - a_Damage / (2.0f + Toughness / 4.0f));
+	return (a_Damage * std::min(20.0f, Reduction) / 25.0f);
 }
 
 
@@ -768,18 +770,20 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 
 double cEntity::GetKnockbackAmountAgainst(const cEntity & a_Receiver)
 {
-	// Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit
-	double Knockback = 11;
+	// Default knockback for entities
+	double Knockback = 10;
 
 	// If we're sprinting, bump up the knockback
 	if (IsSprinting())
 	{
-		Knockback = 16;
+		Knockback = 15;
 	}
 
 	// Check for knockback enchantments (punch only applies to shot arrows)
 	unsigned int KnockbackLevel = GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);
-	Knockback += 10 * KnockbackLevel;
+	unsigned int KnockbackLevelMultiplier = 8;
+
+	Knockback += KnockbackLevelMultiplier * KnockbackLevel;
 
 	return Knockback;
 }
@@ -867,8 +871,8 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			return;
 		}
 
-		// Position changed -> super::Tick() called:
-		GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, POSX_TOINT, POSZ_TOINT)
+		// Position changed -> Super::Tick() called:
+		GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, POSX_TOINT, POSZ_TOINT);
 
 		// Set swim states (water, lava, and fire):
 		SetSwimState(*NextChunk);
@@ -919,8 +923,8 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	int BlockY = POSY_TOINT;
 	int BlockZ = POSZ_TOINT;
 
-	// Position changed -> super::HandlePhysics() called
-	GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, BlockX, BlockZ)
+	// Position changed -> Super::HandlePhysics() called
+	GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, BlockX, BlockZ);
 
 	// TODO Add collision detection with entities.
 	auto DtSec = std::chrono::duration_cast<std::chrono::duration<double>>(a_Dt);
@@ -949,7 +953,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 		}
 	}
-	else
+	else if (!(IsMinecart() || IsTNT() || (IsPickup() && (m_TicksAlive < 15))))
 	{
 		// Push out entity.
 		BLOCKTYPE GotBlock;
@@ -992,8 +996,8 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		/*
 		// DEBUG:
-		LOGD("Entity #%d (%s) is inside a block at {%d, %d, %d}",
-			m_UniqueID, GetClass(), BlockX, BlockY, BlockZ
+		FLOGD("Entity #{0} ({1}) is inside a block at {{2}}",
+			m_UniqueID, GetClass(), Vector3i{BlockX, BlockY, BlockZ}
 		);
 		*/
 	}
@@ -1047,51 +1051,23 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	// Get water direction
-	Direction WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
+	Vector3f WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
 
 	m_WaterSpeed *= 0.9;  // Reduce speed each tick
 
-	switch (WaterDir)
-	{
-		case X_PLUS:
+	auto AdjustSpeed = [](double & a_WaterSpeed, float a_WaterDir)
 		{
-			m_WaterSpeed.x = 0.2f;
-			m_bOnGround = false;
-			break;
-		}
-		case X_MINUS:
-		{
-			m_WaterSpeed.x = -0.2f;
-			m_bOnGround = false;
-			break;
-		}
-		case Z_PLUS:
-		{
-			m_WaterSpeed.z = 0.2f;
-			m_bOnGround = false;
-			break;
-		}
-		case Z_MINUS:
-		{
-			m_WaterSpeed.z = -0.2f;
-			m_bOnGround = false;
-			break;
-		}
-		default:
-		{
-			break;
-		}
-	}
-
-	if (fabs(m_WaterSpeed.x) < 0.05)
-	{
-		m_WaterSpeed.x = 0;
-	}
-
-	if (fabs(m_WaterSpeed.z) < 0.05)
-	{
-		m_WaterSpeed.z = 0;
-	}
+			if (std::abs(a_WaterDir) > (0.05f / 0.4f))
+			{
+				a_WaterSpeed = 0.4 * a_WaterDir;
+			}
+			else if (std::abs(a_WaterSpeed) < 0.05)
+			{
+				a_WaterSpeed = 0.0;
+			}
+		};
+	AdjustSpeed(m_WaterSpeed.x, WaterDir.x);
+	AdjustSpeed(m_WaterSpeed.z, WaterDir.z);
 
 	NextSpeed += m_WaterSpeed;
 
@@ -1104,35 +1080,49 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, wantNextPos, HitCoords, HitBlockCoords, HitBlockFace);
 		if (isHit)
 		{
-			// Set our position to where the block was hit, minus a bit:
-			// TODO: The real entity's m_Width should be taken into account here
-			NextPos = HitCoords - NextSpeed.NormalizeCopy() * 0.1;
-			if (HitBlockFace == BLOCK_FACE_YP)
-			{
-				// We hit the ground, adjust the position to the top of the block:
-				m_bOnGround = true;
-				NextPos.y = HitBlockCoords.y + 1;
-			}
+			// Set our position to where the block was hit:
+			NextPos = HitCoords;
 
-			// Avoid movement in the direction of the blockface that has been hit:
+			// Avoid movement in the direction of the blockface that has been hit and correct for collision box:
+			double HalfWidth = GetWidth() / 2.0;
 			switch (HitBlockFace)
 			{
 				case BLOCK_FACE_XM:
+				{
+					NextSpeed.x = 0;
+					NextPos.x -= HalfWidth;
+					break;
+				}
 				case BLOCK_FACE_XP:
 				{
 					NextSpeed.x = 0;
+					NextPos.x += HalfWidth;
 					break;
 				}
 				case BLOCK_FACE_YM:
+				{
+					NextSpeed.y = 0;
+					NextPos.y -= GetHeight();
+					break;
+				}
 				case BLOCK_FACE_YP:
 				{
 					NextSpeed.y = 0;
+					// We hit the ground, adjust the position to the top of the block:
+					m_bOnGround = true;
+					NextPos.y = HitBlockCoords.y + 1;
 					break;
 				}
 				case BLOCK_FACE_ZM:
+				{
+					NextSpeed.z = 0;
+					NextPos.z -= HalfWidth;
+					break;
+				}
 				case BLOCK_FACE_ZP:
 				{
 					NextSpeed.z = 0;
+					NextPos.z += HalfWidth;
 					break;
 				}
 				default:
@@ -1180,7 +1170,7 @@ void cEntity::ApplyFriction(Vector3d & a_Speed, double a_SlowdownMultiplier, flo
 void cEntity::TickBurning(cChunk & a_Chunk)
 {
 	// If we're about to change worlds, then we can't accurately determine whether we're in lava (#3939)
-	if (m_IsWorldChangeScheduled)
+	if (IsWorldChangeScheduled())
 	{
 		return;
 	}
@@ -1324,34 +1314,11 @@ void cEntity::DetectCacti(void)
 
 
 
-void cEntity::ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
-{
-	m_NewWorld = a_World;
-	m_NewWorldPosition = a_NewPosition;
-	m_IsWorldChangeScheduled = true;
-	m_WorldChangeSetPortalCooldown = a_SetPortalCooldown;
-	m_WorldChangeSendRespawn = a_ShouldSendRespawn;
-}
-
-
-
-
-
 bool cEntity::DetectPortal()
 {
-	// If somebody scheduled a world change with ScheduleMoveToWorld, change worlds now.
-	if (m_IsWorldChangeScheduled)
+	// If somebody scheduled a world change, do nothing.
+	if (IsWorldChangeScheduled())
 	{
-		m_IsWorldChangeScheduled = false;
-
-		if (m_WorldChangeSetPortalCooldown)
-		{
-			// Delay the portal check.
-			m_PortalCooldownData.m_TicksDelayed = 0;
-			m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-		}
-
-		MoveToWorld(m_NewWorld, m_WorldChangeSendRespawn, m_NewWorldPosition);
 		return true;
 	}
 
@@ -1379,6 +1346,12 @@ bool cEntity::DetectPortal()
 				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
 				{
 					// Just exited a portal, don't teleport again
+					return false;
+				}
+
+				if ((m_AttachedTo != nullptr) || (m_Attachee != nullptr))
+				{
+					// Don't let attached entities change worlds, like players riding a minecart
 					return false;
 				}
 
@@ -1415,7 +1388,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimNether).c_str(), DimensionToString(DestionationDim).c_str());
-					new cNetherPortalScanner(this, TargetWorld, TargetPos, cChunkDef::Height);
+					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, cChunkDef::Height);
 					return true;
 				}
 				// Nether portal in the overworld
@@ -1434,7 +1407,7 @@ bool cEntity::DetectPortal()
 					{
 						if (DestionationDim == dimNether)
 						{
-							static_cast<cPlayer *>(this)->AwardAchievement(achEnterPortal);
+							static_cast<cPlayer *>(this)->AwardAchievement(Statistic::AchPortal);
 						}
 
 						static_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
@@ -1447,7 +1420,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
-					new cNetherPortalScanner(this, TargetWorld, TargetPos, (cChunkDef::Height / 2));
+					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, (cChunkDef::Height / 2));
 					return true;
 				}
 			}
@@ -1455,6 +1428,12 @@ bool cEntity::DetectPortal()
 			{
 				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
 				{
+					return false;
+				}
+
+				if ((m_AttachedTo != nullptr) || (m_Attachee != nullptr))
+				{
+					// Don't let attached entities change worlds, like players riding a minecart
 					return false;
 				}
 
@@ -1489,7 +1468,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimEnd).c_str(), DimensionToString(DestionationDim).c_str());
-					return MoveToWorld(TargetWorld, false);
+					return MoveToWorld(*TargetWorld, false);
 				}
 				// End portal in the overworld
 				else
@@ -1507,7 +1486,7 @@ bool cEntity::DetectPortal()
 					{
 						if (DestionationDim == dimEnd)
 						{
-							static_cast<cPlayer *>(this)->AwardAchievement(achEnterTheEnd);
+							static_cast<cPlayer *>(this)->AwardAchievement(Statistic::AchTheEnd);
 						}
 						static_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
 					}
@@ -1515,7 +1494,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
-					return MoveToWorld(TargetWorld, false);
+					return MoveToWorld(*TargetWorld, false);
 				}
 
 			}
@@ -1533,59 +1512,106 @@ bool cEntity::DetectPortal()
 
 
 
-bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 {
-	UNUSED(a_ShouldSendRespawn);
-	ASSERT(a_World != nullptr);
+	ASSERT(a_WorldChangeInfo.m_NewWorld != nullptr);
 
-	if (GetWorld() == a_World)
+	if (a_WorldChangeInfo.m_SetPortalCooldown)
 	{
-		// Don't move to same world
-		return false;
+		m_PortalCooldownData.m_TicksDelayed = 0;
+		m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 	}
 
-	//  Ask the plugins if the entity is allowed to changing the world
-	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, *a_World))
+	if (GetWorld() == a_WorldChangeInfo.m_NewWorld)
 	{
-		// A Plugin doesn't allow the entity to changing the world
-		return false;
+		// Moving to same world, don't need to remove from world
+		SetPosition(a_WorldChangeInfo.m_NewPosition);
+		return;
 	}
+
+	LOGD("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
+		GetUniqueID(), GetClass(),
+		m_World->GetName(), a_WorldChangeInfo.m_NewWorld->GetName(),
+		GetChunkX(), GetChunkZ()
+	);
+
+	// If entity is attached to another entity, detach, to prevent client side effects
+	Detach();
 
 	// Stop ticking, in preperation for detaching from this world.
 	SetIsTicking(false);
 
-	// Tell others we are gone
-	GetWorld()->BroadcastDestroyEntity(*this);
+	// Remove from the old world
+	auto Self = m_World->RemoveEntity(*this);
 
-	// Take note of old chunk coords
-	auto OldChunkCoords = cChunkDef::BlockToChunk(GetPosition());
+	// Update entity before calling hook
+	ResetPosition(a_WorldChangeInfo.m_NewPosition);
+	SetWorld(a_WorldChangeInfo.m_NewWorld);
 
-	// Set position to the new position
-	ResetPosition(a_NewPosition);
+	cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, *m_World);
 
-	// Stop all mobs from targeting this entity
-	// Stop this entity from targeting other mobs
-	if (this->IsMob())
+	// Don't do anything after adding as the old world's CS no longer protects us
+	a_WorldChangeInfo.m_NewWorld->AddEntity(std::move(Self));
+}
+
+
+
+
+
+bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
+{
+	// Ask the plugins if the entity is allowed to change world
+	if (cRoot::Get()->GetPluginManager()->CallHookEntityChangingWorld(*this, a_World))
 	{
-		cMonster * Monster = static_cast<cMonster*>(this);
-		Monster->SetTarget(nullptr);
-		Monster->StopEveryoneFromTargetingMe();
+		// A Plugin isn't allowing the entity to change world
+		return false;
 	}
 
-	// Queue add to new world and removal from the old one
-	cWorld * OldWorld = GetWorld();
-	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
-	OldWorld->QueueTask([this, OldChunkCoords, a_World](cWorld & a_OldWorld)
+	const auto OldWorld = m_WorldChangeInfo.m_NewWorld;
+
+	// Create new world change info
+	// (The last warp command always takes precedence)
+	m_WorldChangeInfo = { &a_World,  a_NewPosition, a_SetPortalCooldown, a_ShouldSendRespawn };
+
+	if (OldWorld != nullptr)
 	{
-		LOGD("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
-			this->GetUniqueID(), this->GetClass(),
-			a_OldWorld.GetName().c_str(), a_World->GetName().c_str(),
-			OldChunkCoords.m_ChunkX, OldChunkCoords.m_ChunkZ
-		);
-		UNUSED(OldChunkCoords);  // Non Debug mode only
-		a_World->AddEntity(a_OldWorld.RemoveEntity(*this));
-		cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, a_OldWorld);
-	});
+		// Avoid scheduling multiple warp tasks
+		// Only move ahead if we came from a "not warping" state
+		return true;
+	}
+
+	// TODO: move to capture when C++14
+	const auto EntityID = GetUniqueID();
+
+	/* Requirements:
+	Only one world change in-flight at any time
+	No ticking during world changes
+	The last invocation takes effect
+
+	As of writing, cWorld ticks entities, clients, and then processes tasks
+	We may call MoveToWorld (any number of times - consider multiple /portal commands within a tick) in the first and second stages
+	Queue a task onto the third stage to invoke DoMoveToWorld ONCE with the last given destination world
+	Store entity IDs in case client tick found the player disconnected and immediately destroys the object
+
+	After the move begins, no further calls to MoveToWorld is possible since neither the client nor entity is ticked
+	This remains until the warp is complete and the destination world resumes ticking.
+	*/
+	GetWorld()->QueueTask(
+		[EntityID](cWorld & a_CurWorld)
+		{
+			a_CurWorld.DoWithEntityByID(
+				EntityID,
+				[](cEntity & a_Entity)
+				{
+					auto & WCI = a_Entity.m_WorldChangeInfo;
+					a_Entity.DoMoveToWorld(WCI);
+					WCI.m_NewWorld = nullptr;
+					return true;
+				}
+			);
+		}
+	);
+
 	return true;
 }
 
@@ -1593,18 +1619,9 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d
 
 
 
-bool cEntity::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+bool cEntity::MoveToWorld(cWorld & a_World, bool a_ShouldSendRespawn)
 {
-	return DoMoveToWorld(a_World, a_ShouldSendRespawn, a_NewPosition);
-}
-
-
-
-
-
-bool cEntity::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
-{
-	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3d(a_World->GetSpawnX(), a_World->GetSpawnY(), a_World->GetSpawnZ()));
+	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3d(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ()));
 }
 
 
@@ -1620,7 +1637,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 		return false;
 	}
 
-	return DoMoveToWorld(World, a_ShouldSendRespawn, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()));
+	return MoveToWorld(*World, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()), false, a_ShouldSendRespawn);
 }
 
 
@@ -1880,8 +1897,7 @@ void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	//  ask the plugins to allow teleport to the new position.
 	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
-		ResetPosition({a_PosX, a_PosY, a_PosZ});
-		m_World->BroadcastTeleportEntity(*this);
+		SetPosition({a_PosX, a_PosY, a_PosZ});
 	}
 }
 
@@ -1892,71 +1908,49 @@ void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 {
 	// Process packet sending every two ticks
-	if (GetWorld()->GetWorldAge() % 2 == 0)
+	if (GetWorld()->GetWorldAge() % 2 != 0)
 	{
-		double SpeedSqr = GetSpeed().SqrLength();
-		if (SpeedSqr == 0.0)
-		{
-			// Speed is zero, send this to clients once only as well as an absolute position
-			if (!m_bHasSentNoSpeed)
-			{
-				m_World->BroadcastEntityVelocity(*this, a_Exclude);
-				m_World->BroadcastTeleportEntity(*this, a_Exclude);
-				m_bHasSentNoSpeed = true;
-			}
-		}
-		else
-		{
-			// Movin'
-			m_World->BroadcastEntityVelocity(*this, a_Exclude);
-			m_bHasSentNoSpeed = false;
-		}
+		return;
+	}
 
-		// Only send movement if speed is not 0 and 'no speed' was sent to client
-		if (!m_bHasSentNoSpeed || IsPlayer())
-		{
-			// TODO: Pickups move disgracefully if relative move packets are sent as opposed to just velocity. Have a system to send relmove only when SetPosXXX() is called with a large difference in position
-			Vector3i Diff = (GetPosition() * 32.0).Floor() - (m_LastSentPosition * 32.0).Floor();
+	if (GetSpeed().SqrLength() > 0.001)
+	{
+		// Movin'
+		m_World->BroadcastEntityVelocity(*this, a_Exclude);
+		m_bHasSentNoSpeed = false;
+	}
+	else if (!m_bHasSentNoSpeed)
+	{
+		// Speed is zero, send this to clients once only as well as an absolute position
+		m_World->BroadcastEntityVelocity(*this, a_Exclude);
+		m_World->BroadcastEntityPosition(*this, a_Exclude);
+		m_LastSentPosition = GetPosition();
+		m_bDirtyOrientation = false;
+		m_bHasSentNoSpeed = true;
+	}
 
-			if (Diff.HasNonZeroLength())  // Have we moved?
-			{
-				if ((abs(Diff.x) <= 127) && (abs(Diff.y) <= 127) && (abs(Diff.z) <= 127))  // Limitations of a Byte
-				{
-					// Difference within Byte limitations, use a relative move packet
-					if (m_bDirtyOrientation)
-					{
-						m_World->BroadcastEntityRelMoveLook(*this, Vector3<Int8>(Diff), a_Exclude);
-						m_bDirtyOrientation = false;
-					}
-					else
-					{
-						m_World->BroadcastEntityRelMove(*this, Vector3<Int8>(Diff), a_Exclude);
-					}
-					// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
-					// The latter is only changed with a relmove / teleport, and m_LastSentPosition stores this position
-					m_LastSentPosition = GetPosition();
-				}
-				else
-				{
-					// Too big a movement, do a teleport
-					m_World->BroadcastTeleportEntity(*this, a_Exclude);
-					m_LastSentPosition = GetPosition();  // See above
-					m_bDirtyOrientation = false;
-				}
-			}
-		}
+	Vector3i Diff = (GetPosition() * 32.0).Floor() - (m_LastSentPosition * 32.0).Floor();
+	if (Diff.HasNonZeroLength())  // Have we moved?
+	{
+		m_World->BroadcastEntityPosition(*this, a_Exclude);
 
-		if (m_bDirtyHead)
-		{
-			m_World->BroadcastEntityHeadLook(*this, a_Exclude);
-			m_bDirtyHead = false;
-		}
-		if (m_bDirtyOrientation)
-		{
-			// Send individual update in case above (sending with rel-move packet) wasn't done
-			GetWorld()->BroadcastEntityLook(*this, a_Exclude);
-			m_bDirtyOrientation = false;
-		}
+		// Clients seem to store two positions, one for the velocity packet and one for the teleport / relmove packet
+		// The latter is only changed with a relmove / teleport, and m_LastSentPosition stores this position
+		m_LastSentPosition = GetPosition();
+		m_bDirtyOrientation = false;
+	}
+
+	if (m_bDirtyHead)
+	{
+		m_World->BroadcastEntityHeadLook(*this, a_Exclude);
+		m_bDirtyHead = false;
+	}
+
+	if (m_bDirtyOrientation)
+	{
+		// Send individual update in case above (sending with rel-move packet) wasn't done
+		GetWorld()->BroadcastEntityLook(*this, a_Exclude);
+		m_bDirtyOrientation = false;
 	}
 }
 
@@ -2027,11 +2021,19 @@ bool cEntity::IsA(const char * a_ClassName) const
 
 bool cEntity::IsAttachedTo(const cEntity * a_Entity) const
 {
-	if ((m_AttachedTo != nullptr) && (a_Entity->GetUniqueID() == m_AttachedTo->GetUniqueID()))
-	{
-		return true;
-	}
-	return false;
+	return (
+		(m_AttachedTo != nullptr) &&
+		(a_Entity->GetUniqueID() == m_AttachedTo->GetUniqueID())
+	);
+}
+
+
+
+
+
+bool cEntity::IsOrientationDirty() const
+{
+	return m_bDirtyOrientation;
 }
 
 
@@ -2236,8 +2238,16 @@ Vector3d cEntity::GetLookVector(void) const
 // Set position
 void cEntity::SetPosition(const Vector3d & a_Position)
 {
+	// Clamp the positions to exactly representable single-precision floating point values
+	// This is necessary to avoid rounding errors in the noise generator and overflows in the chunk loader
+	const double MaxFloat = std::pow(2, std::numeric_limits<float>().digits);
+
+	const double ClampedPosX = Clamp(a_Position.x, -MaxFloat, MaxFloat);
+	const double ClampedPosY = Clamp(a_Position.y, -MaxFloat, MaxFloat);
+	const double ClampedPosZ = Clamp(a_Position.z, -MaxFloat, MaxFloat);
+
 	m_LastPosition = m_Position;
-	m_Position = a_Position;
+	m_Position = {ClampedPosX, ClampedPosY, ClampedPosZ};
 }
 
 
@@ -2270,6 +2280,34 @@ void cEntity::RemoveLeashedMob(cMonster * a_Monster)
 
 
 
+void cEntity::RemoveAllLeashedMobs()
+{
+	while (!m_LeashedMobs.empty())
+	{
+		m_LeashedMobs.front()->Unleash(false, true);
+	}
+}
+
+
+
+
+
+void cEntity::BroadcastLeashedMobs()
+{
+	// If has any mob leashed broadcast every leashed entity to this
+	if (HasAnyMobLeashed())
+	{
+		for (auto LeashedMob : m_LeashedMobs)
+		{
+			m_World->BroadcastLeashEntity(*LeashedMob, *this);
+		}
+	}
+}
+
+
+
+
+
 float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower)
 {
 	double EntitySize = m_Width * m_Width * m_Height;
@@ -2279,7 +2317,7 @@ float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 		return 0;
 	}
 
-	cBoundingBox EntityBox(GetPosition(), m_Width / 2, m_Height);
+	auto EntityBox = GetBoundingBox();
 	cBoundingBox ExplosionBox(a_ExplosionPosition, a_ExlosionPower * 2.0);
 	cBoundingBox IntersectionBox(EntityBox);
 

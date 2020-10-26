@@ -6,6 +6,7 @@
 #include "Trees.h"
 #include "../BlockArea.h"
 #include "../LinearUpscale.h"
+#include "../BlockInfo.h"
 
 
 
@@ -19,7 +20,7 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
 
-	cChunkDesc WorkerDesc(ChunkX, ChunkZ);
+	cChunkDesc WorkerDesc({ChunkX, ChunkZ});
 
 	// Generate trees:
 	for (int x = 0; x <= 2; x++)
@@ -34,13 +35,13 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 			if ((x != 1) || (z != 1))
 			{
 				Dest = &WorkerDesc;
-				WorkerDesc.SetChunkCoords(BaseX, BaseZ);
+				WorkerDesc.SetChunkCoords({BaseX, BaseZ});
 
 				// TODO: This may cause a lot of wasted calculations, instead of pulling data out of a single (cChunkDesc) cache
 
 				cChunkDesc::Shape workerShape;
-				m_BiomeGen->GenBiomes           (BaseX, BaseZ, WorkerDesc.GetBiomeMap());
-				m_ShapeGen->GenShape            (BaseX, BaseZ, workerShape);
+				m_BiomeGen->GenBiomes           ({BaseX, BaseZ}, WorkerDesc.GetBiomeMap());
+				m_ShapeGen->GenShape            ({BaseX, BaseZ}, workerShape);
 				WorkerDesc.SetHeightFromShape   (workerShape);
 				m_CompositionGen->ComposeTerrain(WorkerDesc, workerShape);
 			}
@@ -49,14 +50,33 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 				Dest = &a_ChunkDesc;
 			}
 
-			int NumTrees = GetNumTrees(BaseX, BaseZ, Dest->GetBiomeMap());
+			double NumTrees = GetNumTrees(BaseX, BaseZ, Dest->GetBiomeMap());
 
 			sSetBlockVector OutsideLogs, OutsideOther;
-			for (int i = 0; i < NumTrees; i++)
+			if (NumTrees < 1)
 			{
-				GenerateSingleTree(BaseX, BaseZ, i, *Dest, OutsideLogs, OutsideOther);
-			}
+				Vector3i Pos;
+				Pos.x = (m_Noise.IntNoise3DInt(BaseX + BaseZ, BaseZ, 0) / 19) % cChunkDef::Width;
+				Pos.z = (m_Noise.IntNoise3DInt(BaseX - BaseZ, 0, BaseZ) / 19) % cChunkDef::Width;
+				Pos.y = Dest->GetHeight(Pos.x, Pos.z);
 
+				if (std::abs(m_Noise.IntNoise3D(BaseX * cChunkDef::Width + Pos.x, Pos.y, BaseZ * cChunkDef::Width + Pos.z)) <= NumTrees)
+				{
+					GenerateSingleTree(BaseX, BaseZ, 0, Pos, *Dest, OutsideLogs, OutsideOther);
+				}
+			}
+			else
+			{
+				for (int i = 0; i < NumTrees; i++)
+				{
+					Vector3i Pos;
+					Pos.x = (m_Noise.IntNoise3DInt(BaseX + BaseZ, BaseZ, i) / 19) % cChunkDef::Width;
+					Pos.z = (m_Noise.IntNoise3DInt(BaseX - BaseZ, i, BaseZ) / 19) % cChunkDef::Width;
+					Pos.y = Dest->GetHeight(Pos.x, Pos.z);
+
+					GenerateSingleTree(BaseX, BaseZ, i, Pos, *Dest, OutsideLogs, OutsideOther);
+				}
+			}
 			sSetBlockVector IgnoredOverflow;
 			IgnoredOverflow.reserve(OutsideOther.size());
 			ApplyTreeImage(ChunkX, ChunkZ, a_ChunkDesc, OutsideOther, IgnoredOverflow);
@@ -75,23 +95,19 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 
 void cStructGenTrees::GenerateSingleTree(
 	int a_ChunkX, int a_ChunkZ, int a_Seq,
+	Vector3i a_Pos,
 	cChunkDesc & a_ChunkDesc,
 	sSetBlockVector & a_OutsideLogs,
 	sSetBlockVector & a_OutsideOther
 )
 {
-	int x = (m_Noise.IntNoise3DInt(a_ChunkX + a_ChunkZ, a_ChunkZ, a_Seq) / 19) % cChunkDef::Width;
-	int z = (m_Noise.IntNoise3DInt(a_ChunkX - a_ChunkZ, a_Seq, a_ChunkZ) / 19) % cChunkDef::Width;
-
-	int Height = a_ChunkDesc.GetHeight(x, z);
-
-	if ((Height <= 0) || (Height >= 230))
+	if ((a_Pos.y <= 0) || (a_Pos.y >= 230))
 	{
 		return;
 	}
 
 	// Check the block underneath the tree:
-	BLOCKTYPE TopBlock = a_ChunkDesc.GetBlockType(x, Height, z);
+	BLOCKTYPE TopBlock = a_ChunkDesc.GetBlockType(a_Pos.x, a_Pos.y, a_Pos.z);
 	if ((TopBlock != E_BLOCK_DIRT) && (TopBlock != E_BLOCK_GRASS) && (TopBlock != E_BLOCK_FARMLAND))
 	{
 		return;
@@ -99,9 +115,9 @@ void cStructGenTrees::GenerateSingleTree(
 
 	sSetBlockVector TreeLogs, TreeOther;
 	GetTreeImageByBiome(
-		a_ChunkX * cChunkDef::Width + x, Height + 1, a_ChunkZ * cChunkDef::Width + z,
+		{ a_ChunkX * cChunkDef::Width + a_Pos.x, a_Pos.y + 1, a_ChunkZ * cChunkDef::Width + a_Pos.z },
 		m_Noise, a_Seq,
-		a_ChunkDesc.GetBiome(x, z),
+		a_ChunkDesc.GetBiome(a_Pos.x, a_Pos.z),
 		TreeLogs, TreeOther
 	);
 
@@ -157,9 +173,10 @@ void cStructGenTrees::ApplyTreeImage(
 			// Inside this chunk, integrate into a_ChunkDesc:
 			switch (a_ChunkDesc.GetBlockType(itr->m_RelX, itr->m_RelY, itr->m_RelZ))
 			{
+				case E_BLOCK_NEW_LEAVES:
 				case E_BLOCK_LEAVES:
 				{
-					if (itr->m_BlockType != E_BLOCK_LOG)
+					if ((itr->m_BlockType != E_BLOCK_LOG) && (itr->m_BlockType != E_BLOCK_NEW_LOG))
 					{
 						break;
 					}
@@ -193,7 +210,7 @@ void cStructGenTrees::ApplyTreeImage(
 
 
 
-int cStructGenTrees::GetNumTrees(
+double cStructGenTrees::GetNumTrees(
 	int a_ChunkX, int a_ChunkZ,
 	const cChunkDef::BiomeMap & a_Biomes
 )
@@ -202,68 +219,68 @@ int cStructGenTrees::GetNumTrees(
 	{
 		switch (a_Biome)
 		{
-			case biOcean:                return 2;
-			case biPlains:               return 1;
-			case biDesert:               return 0;
-			case biExtremeHills:         return 3;
-			case biForest:               return 30;
-			case biTaiga:                return 30;
-			case biSwampland:            return 8;
-			case biRiver:                return 0;
-			case biNether:               return 0;
-			case biEnd:                  return 0;
-			case biFrozenOcean:          return 0;
-			case biFrozenRiver:          return 0;
-			case biIcePlains:            return 1;
-			case biIceMountains:         return 1;
-			case biMushroomIsland:       return 3;
-			case biMushroomShore:        return 3;
-			case biBeach:                return 0;
-			case biDesertHills:          return 0;
-			case biForestHills:          return 20;
-			case biTaigaHills:           return 20;
-			case biExtremeHillsEdge:     return 5;
-			case biJungle:               return 120;
-			case biJungleHills:          return 90;
-			case biJungleEdge:           return 90;
-			case biDeepOcean:            return 0;
-			case biStoneBeach:           return 0;
-			case biColdBeach:            return 0;
-			case biBirchForest:          return 30;
-			case biBirchForestHills:     return 20;
-			case biRoofedForest:         return 50;
-			case biColdTaiga:            return 20;
-			case biColdTaigaHills:       return 15;
-			case biMegaTaiga:            return 30;
-			case biMegaTaigaHills:       return 25;
-			case biExtremeHillsPlus:     return 3;
-			case biSavanna:              return 8;
-			case biSavannaPlateau:       return 12;
-			case biMesa:                 return 2;
-			case biMesaPlateauF:         return 8;
-			case biMesaPlateau:          return 8;
+			case biOcean:                return 2.0;
+			case biPlains:               return 0.03125;
+			case biDesert:               return 0.0;
+			case biExtremeHills:         return 3.0;
+			case biForest:               return 30.0;
+			case biTaiga:                return 30.0;
+			case biSwampland:            return 8.0;
+			case biRiver:                return 0.0;
+			case biNether:               return 0.0;
+			case biEnd:                  return 0.0;
+			case biFrozenOcean:          return 0.0;
+			case biFrozenRiver:          return 0.0;
+			case biIcePlains:            return 0.03125;
+			case biIceMountains:         return 0.125;
+			case biMushroomIsland:       return 3.0;
+			case biMushroomShore:        return 3.0;
+			case biBeach:                return 0.0;
+			case biDesertHills:          return 0.0;
+			case biForestHills:          return 20.0;
+			case biTaigaHills:           return 20.0;
+			case biExtremeHillsEdge:     return 5.0;
+			case biJungle:               return 120.0;
+			case biJungleHills:          return 90.0;
+			case biJungleEdge:           return 90.0;
+			case biDeepOcean:            return 0.0;
+			case biStoneBeach:           return 0.0;
+			case biColdBeach:            return 0.0;
+			case biBirchForest:          return 30.0;
+			case biBirchForestHills:     return 20.0;
+			case biRoofedForest:         return 50.0;
+			case biColdTaiga:            return 20.0;
+			case biColdTaigaHills:       return 15.0;
+			case biMegaTaiga:            return 15.0;
+			case biMegaTaigaHills:       return 15.0;
+			case biExtremeHillsPlus:     return 3.0;
+			case biSavanna:              return 8.0;
+			case biSavannaPlateau:       return 12.0;
+			case biMesa:                 return 2.0;
+			case biMesaPlateauF:         return 8.0;
+			case biMesaPlateau:          return 8.0;
 			// Biome variants
-			case biSunflowerPlains:      return 1;
-			case biDesertM:              return 0;
-			case biExtremeHillsM:        return 4;
-			case biFlowerForest:         return 30;
-			case biTaigaM:               return 30;
-			case biSwamplandM:           return 8;
-			case biIcePlainsSpikes:      return 1;
-			case biJungleM:              return 120;
-			case biJungleEdgeM:          return 90;
-			case biBirchForestM:         return 30;
-			case biBirchForestHillsM:    return 20;
-			case biRoofedForestM:        return 40;
-			case biColdTaigaM:           return 30;
-			case biMegaSpruceTaiga:      return 30;
-			case biMegaSpruceTaigaHills: return 30;
-			case biExtremeHillsPlusM:    return 4;
-			case biSavannaM:             return 8;
-			case biSavannaPlateauM:      return 12;
-			case biMesaBryce:            return 4;
-			case biMesaPlateauFM:        return 12;
-			case biMesaPlateauM:         return 12;
+			case biSunflowerPlains:      return 0.03125;
+			case biDesertM:              return 0.0;
+			case biExtremeHillsM:        return 4.0;
+			case biFlowerForest:         return 2.0;
+			case biTaigaM:               return 30.0;
+			case biSwamplandM:           return 8.0;
+			case biIcePlainsSpikes:      return 0.0078125;
+			case biJungleM:              return 120.0;
+			case biJungleEdgeM:          return 90.0;
+			case biBirchForestM:         return 30.0;
+			case biBirchForestHillsM:    return 20.0;
+			case biRoofedForestM:        return 40.0;
+			case biColdTaigaM:           return 30.0;
+			case biMegaSpruceTaiga:      return 15.0;
+			case biMegaSpruceTaigaHills: return 15.0;
+			case biExtremeHillsPlusM:    return 4.0;
+			case biSavannaM:             return 8.0;
+			case biSavannaPlateauM:      return 12.0;
+			case biMesaBryce:            return 4.0;
+			case biMesaPlateauFM:        return 12.0;
+			case biMesaPlateauM:         return 12.0;
 			// Non-biomes
 			case biInvalidBiome:
 			case biNumBiomes:
@@ -271,18 +288,19 @@ int cStructGenTrees::GetNumTrees(
 			case biNumVariantBiomes:
 			{
 				ASSERT(!"Invalid biome in cStructGenTrees::GetNumTrees");
-				return 0;
+				return 0.0;
 			}
 		}
 		UNREACHABLE("Unsupported biome");
 	};
 
-	int NumTrees = 0;
+	double NumTrees = 0.0;
 	for (auto Biome : a_Biomes)
 	{
 		NumTrees += BiomeTrees(Biome);
 	}
-	return NumTrees / 1024;
+
+	return NumTrees / (cChunkDef::Width * cChunkDef::Width * 4);
 }
 
 

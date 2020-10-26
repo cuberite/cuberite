@@ -20,9 +20,15 @@
 class cArrowEntity :
 	public cProjectileEntity
 {
-	typedef cProjectileEntity super;
+	// tolua_end
+
+	using Super = cProjectileEntity;
+
+	// tolua_begin
+
 
 public:
+
 	/** Determines when the arrow can be picked up (depending on player gamemode). Corresponds to the MCA file "pickup" field */
 	enum ePickupState
 	{
@@ -36,7 +42,7 @@ public:
 	CLASS_PROTODEF(cArrowEntity)
 
 	/** Creates a new arrow with psNoPickup state and default damage modifier coeff */
-	cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
+	cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed);
 
 	/** Creates a new arrow as shot by a player, initializes it from the player object */
 	cArrowEntity(cPlayer & a_Player, double a_Force);
@@ -86,12 +92,6 @@ protected:
 	/** Timer for pickup collection animation or five minute timeout */
 	std::chrono::milliseconds m_Timer;
 
-	/** Timer for client arrow position confirmation via TeleportEntity */
-	std::chrono::milliseconds m_HitGroundTimer;
-
-	// Whether the arrow has already been teleported into the proper position in the ground.
-	bool m_HasTeleported;
-
 	/** If true, the arrow is in the process of being collected - don't go to anyone else */
 	bool m_bIsCollected;
 
@@ -103,5 +103,8 @@ protected:
 	virtual void OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos) override;
 	virtual void CollectedBy(cPlayer & a_Player) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+
+	// cEntity overrides:
+	virtual bool DoesPreventBlockPlacement(void) const override;
 
 };  // tolua_export

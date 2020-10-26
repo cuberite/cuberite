@@ -19,15 +19,15 @@
 
 
 
-
 // tolua_begin
-class cPluginLua :
+class cPluginLua:
 	public cPlugin
 {
-	typedef cPlugin super;
+	// tolua_end
+
+	using Super = cPlugin;
 
 public:
-	// tolua_end
 
 	/** A RAII-style mutex lock for accessing the internal LuaState.
 	This will be the only way to retrieve the plugin's LuaState;
@@ -66,7 +66,7 @@ public:
 	virtual void Tick(float a_Dt) override;
 
 	virtual bool OnBlockSpread              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source) override;
-	virtual bool OnBlockToPickups           (cWorld & a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups) override;
+	virtual bool OnBlockToPickups           (cWorld & a_World, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool, cItems & a_Pickups) override;
 	virtual bool OnBrewingCompleting        (cWorld & a_World, cBrewingstandEntity & a_BrewingstandEntity) override;
 	virtual bool OnBrewingCompleted         (cWorld & a_World, cBrewingstandEntity & a_BrewingstandEntity) override;
 	virtual bool OnChat                     (cPlayer & a_Player, AString & a_Message) override;
@@ -87,6 +87,7 @@ public:
 	virtual bool OnHandshake                (cClientHandle & a_Client, const AString & a_Username) override;
 	virtual bool OnHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum) override;
 	virtual bool OnHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum) override;
+	virtual bool OnDropSpense               (cWorld & a_World, cDropSpenserEntity & a_DropSpenser, int a_SlotNum) override;
 	virtual bool OnKilled                   (cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage) override;
 	virtual bool OnKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI) override;
 	virtual bool OnLogin                    (cClientHandle & a_Client, UInt32 a_ProtocolVersion, const AString & a_Username) override;
@@ -101,10 +102,11 @@ public:
 	virtual bool OnPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel) override;
 	virtual bool OnPlayerJoined             (cPlayer & a_Player) override;
 	virtual bool OnPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status) override;
-	virtual bool OnPlayerMoving             (cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition) override;
-	virtual bool OnPlayerOpeningWindow(cPlayer & a_Player, cWindow & a_Window) override;
+	virtual bool OnPlayerMoving             (cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition, bool a_PreviousIsOnGround) override;
+	virtual bool OnPlayerOpeningWindow      (cPlayer & a_Player, cWindow & a_Window) override;
 	virtual bool OnPlayerPlacedBlock        (cPlayer & a_Player, const sSetBlock & a_BlockChange) override;
 	virtual bool OnPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange) override;
+	virtual bool OnPlayerCrouched           (cPlayer & a_Player) override;
 	virtual bool OnPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
 	virtual bool OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity) override;
 	virtual bool OnPlayerShooting           (cPlayer & a_Player) override;
@@ -205,8 +207,4 @@ protected:
 		}
 		return false;
 	}
-} ;  // tolua_export
-
-
-
-
+};  // tolua_export

@@ -75,7 +75,7 @@
 
 
 // Common headers (part 1, without macros):
-#include "../../source/StringUtils.h"
+#include "../../src/StringUtils.h"
 
 
 

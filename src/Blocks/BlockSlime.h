@@ -6,27 +6,18 @@
 
 
 
-class cBlockSlimeHandler :
-	public cBlockHandler
+class cBlockSlimeHandler final :
+	public cClearMetaOnDrop<cBlockHandler>
 {
 public:
-	cBlockSlimeHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
-	{
-	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
-	}
+	using cClearMetaOnDrop<cBlockHandler>::cClearMetaOnDrop;
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+private:
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 1;
 	}
 };
-
-
-
-

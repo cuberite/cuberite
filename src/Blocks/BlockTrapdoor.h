@@ -2,33 +2,40 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "MetaRotator.h"
+#include "Mixins.h"
 #include "../EffectID.h"
 
 
 
 
-class cBlockTrapdoorHandler :
-	public cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>
+class cBlockTrapdoorHandler final :
+	public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>
 {
+	using Super = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>;
+
 public:
-	cBlockTrapdoorHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>(a_BlockType)
-	{
-	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to zero
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
-	}
+	using Super::Super;
 
-	virtual bool IsUseable(void) override
+private:
+
+	virtual bool IsUseable(void) const override
 	{
 		return true;
 	}
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+
+
+
+
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) const override
 	{
 		if (m_BlockType == E_BLOCK_IRON_TRAPDOOR)
 		{
@@ -37,35 +44,80 @@ public:
 		}
 
 		// Flip the ON bit on / off using the XOR bitwise operation
-		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}) ^ 0x04);
-		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, { a_BlockX, a_BlockY, a_BlockZ }, 0, a_Player.GetClientHandle());
+		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockPos) ^ 0x04);
+		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
 
 		return true;
 	}
 
-	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+
+
+
+
+	virtual void OnCancelRightClick(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace
+	) const override
 	{
 		UNUSED(a_ChunkInterface);
-		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
 	}
+
+
+
+
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = BlockFaceToMetaData(a_BlockFace);
-
-		if (a_CursorY > 7)
+		if (a_ClickedBlockFace == BLOCK_FACE_YP)
 		{
+			// Trapdoor is placed on top of a block.
+			// Engage yaw rotation to determine hinge direction:
+			return Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta);
+		}
+		else if (a_ClickedBlockFace == BLOCK_FACE_YM)
+		{
+			// Trapdoor is placed on bottom of a block.
+			// Engage yaw rotation to determine hinge direction:
+			if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta))
+			{
+				return false;
+			}
+
+			// Toggle 'Move up half-block' bit on:
+			a_BlockMeta |= 0x8;
+
+			return true;
+		}
+
+		// Placement on block sides; hinge direction is determined by which side was clicked:
+		a_BlockType = m_BlockType;
+		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
+
+		if (a_CursorPos.y > 7)
+		{
+			// Trapdoor is placed on a higher half of a vertical block.
+			// Toggle 'Move up half-block' bit on:
 			a_BlockMeta |= 0x8;
 		}
+
 		return true;
 	}
+
+
+
+
 
 	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
 	{
@@ -75,16 +127,17 @@ public:
 			case BLOCK_FACE_ZM: return 0x0;
 			case BLOCK_FACE_XP: return 0x3;
 			case BLOCK_FACE_XM: return 0x2;
-			case BLOCK_FACE_NONE:
-			case BLOCK_FACE_YM:
-			case BLOCK_FACE_YP:
+			default:
 			{
 				ASSERT(!"Unhandled block face!");
 				return 0;
 			}
 		}
-		UNREACHABLE("Unsupported block face");
 	}
+
+
+
+
 
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
@@ -102,19 +155,11 @@ public:
 		}
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
-	{
-		NIBBLETYPE Meta;
-		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
 
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
-		BLOCKTYPE BlockIsOn;
-		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
-		return ((a_RelY > 0) && cBlockInfo::IsSolid(BlockIsOn));
-	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		switch (m_BlockType)

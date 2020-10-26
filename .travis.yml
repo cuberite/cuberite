@@ -1,68 +1,77 @@
 language: cpp
-sudo: false
+cache:
+  ccache: true
+  directories:
+    # Store ctest cost data
+    - Testing
 
 # Use Linux by default
 os: linux
+dist: bionic
 
-matrix:
+# Install newer SeeMake on Linux
+addons:
+  snaps:
+    - name: cmake
+      confinement: classic
+      channel: latest
+
+jobs:
   include:
-    # AppleClang
-    # OSX workers are slower to start up.  Having these first in the build matrix makes travis faster overall.
-    - os: osx
+    # ARM workers are the slowest. Having these first in the build matrix makes travis faster overall.
+    - name: "Clang 6.0 - Debug"
+      arch: arm64
       compiler: clang
-      env: &Release
-        - TRAVIS_CUBERITE_BUILD_TYPE=RELEASE CUBERITE_PATH=./Cuberite
-    - os: osx
-      compiler: clang
-      env: &Debug
-        - TRAVIS_CUBERITE_BUILD_TYPE=DEBUG CUBERITE_PATH=./Cuberite_debug
-    # Default clang
-    - compiler: clang
-      env: *Release
-    - compiler: clang
-      env: *Debug
-    # clang 3.5
-    - compiler: clang
-      addons: &clang35
-        apt:
-          sources:
-            - llvm-toolchain-precise-3.5
-          packages:
-            - clang++-3.5
-            - clang-3.5
-      before_install:
-        - CC=clang-3.5;CXX=clang++-3.5
-      env: *Release
-    - compiler: clang
-      addons: *clang35
-      before_install:
-        - CC=clang-3.5;CXX=clang++-3.5
-      env: *Debug
-    # gcc 4.8
-    - compiler: gcc
-      addons: &gcc48
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.8
-            - gcc-4.8
-      before_install:
-        - CC=gcc-4.8;CXX=g++-4.8
-      env: *Release
-    - compiler: gcc
-      addons: *gcc48
-      before_install:
-        - CC=gcc-4.8;CXX=g++-4.8
+      before_install: &use-cmake
+        - export PATH=/snap/bin/:${PATH}
       env: *Debug
 
-script: ./CIbuild.sh
+    - name: "AppleClang - Debug"
+      os: osx
+      osx_image: xcode11.3
+      before_install:
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
+      env: &Debug
+        - TRAVIS_CUBERITE_BUILD_TYPE=Debug
+
+    - name: "Clang 7.0 - Release"
+      compiler: clang
+      before_install: *use-cmake
+      env: *Release
+
+    - name: "Clang 7.0 - Debug"
+      compiler: clang
+      before_install: *use-cmake
+      env: *Debug
+
+    - name: "GCC 7.5 - Release, CMake 3.13, No Unity"
+      compiler: gcc
+      before_install:
+        - wget --output-document=${HOME}/CMake http://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.tar.gz
+        - tar --extract --one-top-level=${HOME}/SeeMake --strip-components 1 --file ${HOME}/CMake
+        - export PATH=${HOME}/SeeMake/bin/:${PATH}
+      env:
+        - TRAVIS_CUBERITE_BUILD_TYPE=Release
+        - TRAVIS_CUBERITE_UNITY_BUILDS=No
+
+    - name: "GCC 7.5 - Debug"
+      compiler: gcc
+      before_install: *use-cmake
+      env: *Debug
+
+# Do not let CMake find ccache wrappers
+# we use CMAKE_CXX_COMPILER_LAUNCHER for ccache support
+before_script:
+  - export PATH=$(echo "$PATH" | sed -e 's/:\/usr\/lib\/ccache//')
+
+# Run the build and tests
+script: ./travisbuild.sh
 
 notifications:
   email:
     on_success: change
     on_failure: always
+
 branches:
   only:
-    - coverity_scan
     - master

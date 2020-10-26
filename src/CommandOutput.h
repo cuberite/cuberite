@@ -3,6 +3,8 @@
 
 // Declares various classes that process command output
 
+#pragma once
+
 
 
 
@@ -15,9 +17,14 @@ class cCommandOutputCallback
 public:
 	virtual ~cCommandOutputCallback() {}  // Force a virtual destructor in subclasses
 
+	void vOut(const char * a_Fmt, fmt::printf_args);
+
 	/** Syntax sugar function, calls Out() with Printf()-ed parameters; appends a newline" */
-	void Out(const char * a_Fmt, fmt::ArgList);
-	FMT_VARIADIC(void, Out, const char *)
+	template <typename... Args>
+	void Out(const char * a_Format, const Args & ... a_Args)
+	{
+		vOut(a_Format, fmt::make_printf_args(a_Args...));
+	}
 
 	/** Called when the command wants to output anything; may be called multiple times */
 	virtual void Out(const AString & a_Text) = 0;
@@ -50,9 +57,10 @@ class cNullCommandOutputCallback :
 class cStringAccumCommandOutputCallback:
 	public cCommandOutputCallback
 {
-	typedef cCommandOutputCallback super;
+	using Super = cCommandOutputCallback;
 
 public:
+
 	// cCommandOutputCallback overrides:
 	virtual void Out(const AString & a_Text) override;
 	virtual void Finished(void) override {}
@@ -83,14 +91,14 @@ public:
 
 
 /** Sends all command output to a log, line by line; deletes self when command finishes processing */
-class cLogCommandDeleteSelfOutputCallback :
+class cLogCommandDeleteSelfOutputCallback:
 	public cLogCommandOutputCallback
 {
-	typedef cLogCommandOutputCallback super;
+	using Super = cLogCommandOutputCallback;
 
 	virtual void Finished(void) override
 	{
-		super::Finished();
+		Super::Finished();
 		delete this;
 	}
 } ;

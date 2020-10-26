@@ -8,16 +8,16 @@
 
 
 #include "Globals.h"
+#include "../TestHelpers.h"
 #include "ChunkData.h"
 
 
 
 
 
-int main(int argc, char ** argv)
+/** Performs the entire CopyBlocks test. */
+static void test()
 {
-	LOGD("Test started");
-
 	// Set up a cChunkData with known contents - all blocks 0x01, all metas 0x02:
 	class cMockAllocationPool
 		: public cAllocationPool<cChunkData::sChunkSection>
@@ -32,7 +32,7 @@ int main(int argc, char ** argv)
 			delete a_Ptr;
 		}
 
-		virtual bool DoIsEqual(const cAllocationPool<cChunkData::sChunkSection> &) const NOEXCEPT override
+		virtual bool DoIsEqual(const cAllocationPool<cChunkData::sChunkSection> &) const noexcept override
 		{
 			return false;
 		}
@@ -67,17 +67,17 @@ int main(int argc, char ** argv)
 			// Verify the data copied:
 			for (size_t i = 0; i < len; i++)
 			{
-				assert_test(WritePosition[i] == 0x01);
+				TEST_EQUAL(WritePosition[i], 0x01);
 			}
 			// Verify the space before the copied data hasn't been changed:
 			for (size_t i = 0; i < WritePosIdx; i++)
 			{
-				assert_test(TestBuffer[i] == 0x03);
+				TEST_EQUAL(TestBuffer[i], 0x03);
 			}
 			// Verify the space after the copied data hasn't been changed:
 			for (size_t i = WritePosIdx + idx + len; i < ARRAYCOUNT(TestBuffer); i++)
 			{
-				assert_test(TestBuffer[i] == 0x03);
+				TEST_EQUAL(TestBuffer[i], 0x03);
 			}
 
 			// Re-initialize the buffer for the next test:
@@ -87,10 +87,12 @@ int main(int argc, char ** argv)
 			}
 		}  // for len
 	}  // for idx
-	return 0;
 }
 
 
 
 
 
+IMPLEMENT_TEST_MAIN("ChunkData CopyBlocks",
+	test()
+)

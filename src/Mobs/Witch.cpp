@@ -2,14 +2,14 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Witch.h"
-#include "FastRandom.h"
+#include "../FastRandom.h"
 
 
 
 
 
 cWitch::cWitch(void) :
-	super("Witch", mtWitch, "entity.witch.hurt", "entity.witch.death", 0.6, 1.8)
+	Super("Witch", mtWitch, "entity.witch.hurt", "entity.witch.death", "entity.witch.ambient", 0.6, 1.8)
 {
 }
 

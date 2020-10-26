@@ -2,41 +2,70 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "../Entities/Player.h"
+#include "../ClientHandle.h"
 
 
 
 
-
-class cBlockCauldronHandler :
+class cBlockCauldronHandler final :
 	public cBlockHandler
 {
+	using Super = cBlockHandler;
+
 public:
-	cBlockCauldronHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	using Super::Super;
+
+private:
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
+		return cItem(E_ITEM_CAULDRON, 1, 0);
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		a_Pickups.push_back(cItem(E_ITEM_CAULDRON, 1, 0));
-	}
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+
+
+
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) const override
 	{
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
-		switch (a_Player.GetEquippedItem().m_ItemType)
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
+		auto EquippedItem = a_Player.GetEquippedItem();
+
+		switch (EquippedItem.m_ItemType)
 		{
+			case E_ITEM_BUCKET:
+			{
+				if (Meta == 3)
+				{
+					a_ChunkInterface.SetBlockMeta(a_BlockPos, 0);
+					// Give new bucket, filled with fluid when the gamemode is not creative:
+					if (!a_Player.IsGameModeCreative())
+					{
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_WATER_BUCKET));
+					}
+				}
+				break;
+			}
 			case E_ITEM_WATER_BUCKET:
 			{
 				if (Meta < 3)
 				{
-					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, 3);
+					a_ChunkInterface.SetBlockMeta(a_BlockPos, 3);
+					// Give empty bucket back when the gamemode is not creative:
 					if (!a_Player.IsGameModeCreative())
 					{
-						a_Player.GetInventory().RemoveOneEquippedItem();
-						cItem NewItem(E_ITEM_BUCKET, 1);
-						a_Player.GetInventory().AddItem(NewItem);
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_BUCKET));
 					}
+					a_Player.GetStatManager().AddValue(Statistic::FillCauldron);
 				}
 				break;
 			}
@@ -44,41 +73,136 @@ public:
 			{
 				if (Meta > 0)
 				{
-					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, --Meta);
-					a_Player.GetInventory().RemoveOneEquippedItem();
-					cItem NewItem(E_ITEM_POTIONS, 1, 0);
-					a_Player.GetInventory().AddItem(NewItem);
+					a_ChunkInterface.SetBlockMeta(a_BlockPos, --Meta);
+					// Give new potion when the gamemode is not creative:
+					if (!a_Player.IsGameModeCreative())
+					{
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_POTION));
+					}
+					a_Player.GetStatManager().AddValue(Statistic::UseCauldron);
 				}
 				break;
 			}
+			case E_ITEM_POTION:
+			{
+				// Refill cauldron with water bottles.
+				if ((Meta < 3) && (EquippedItem.m_ItemDamage == 0))
+				{
+					a_ChunkInterface.SetBlockMeta(Vector3i(a_BlockPos), ++Meta);
+					// Give back an empty bottle when the gamemode is not creative:
+					if (!a_Player.IsGameModeCreative())
+					{
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_GLASS_BOTTLE));
+					}
+				}
+				break;
+			}
+			case E_ITEM_LEATHER_BOOTS:
+			case E_ITEM_LEATHER_CAP:
+			case E_ITEM_LEATHER_PANTS:
+			case E_ITEM_LEATHER_TUNIC:
+			{
+				// Resets any color to default:
+				if ((Meta > 0) && ((EquippedItem.m_ItemColor.GetRed() != 255) || (EquippedItem.m_ItemColor.GetBlue() != 255) || (EquippedItem.m_ItemColor.GetGreen() != 255)))
+				{
+					a_ChunkInterface.SetBlockMeta(a_BlockPos, --Meta);
+					auto NewItem = cItem(EquippedItem);
+					NewItem.m_ItemColor.Clear();
+					a_Player.ReplaceOneEquippedItemTossRest(NewItem);
+				}
+				break;
+			}
+			case E_BLOCK_BLACK_SHULKER_BOX:
+			case E_BLOCK_BLUE_SHULKER_BOX:
+			case E_BLOCK_BROWN_SHULKER_BOX:
+			case E_BLOCK_CYAN_SHULKER_BOX:
+			case E_BLOCK_GRAY_SHULKER_BOX:
+			case E_BLOCK_GREEN_SHULKER_BOX:
+			case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
+			case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
+			case E_BLOCK_LIME_SHULKER_BOX:
+			case E_BLOCK_MAGENTA_SHULKER_BOX:
+			case E_BLOCK_ORANGE_SHULKER_BOX:
+			case E_BLOCK_PINK_SHULKER_BOX:
+			case E_BLOCK_RED_SHULKER_BOX:
+			case E_BLOCK_YELLOW_SHULKER_BOX:
+			{
+				// Resets shulker box color.
+
+				// TODO: When there is an actual default shulker box add the appropriate changes here! - 19.09.2020 - 12xx12
+				if (Meta == 0)
+				{
+					// The cauldron is empty:
+					break;
+				}
+
+				// Proceed with normal cleaning:
+				a_ChunkInterface.SetBlockMeta(a_BlockPos, --Meta);
+				auto NewShulker = cItem(EquippedItem);
+				NewShulker.m_ItemType = E_BLOCK_PURPLE_SHULKER_BOX;
+				a_Player.ReplaceOneEquippedItemTossRest(NewShulker);
+
+				break;
+			}
 		}
+
+		if (!ItemHandler(EquippedItem.m_ItemType)->IsPlaceable())
+		{
+			// Item not placeable in the first place, our work is done:
+			return true;
+		}
+
+		// This is a workaround for versions < 1.13, where rclking a cauldron with a block, places a block.
+		// Using cauldrons with blocks was added in 1.13 as part of shulker cleaning.
+		const auto ResendPosition = AddFaceDirection(a_BlockPos, a_BlockFace);
+		a_Player.GetClientHandle()->SendBlockChange(
+			ResendPosition.x, ResendPosition.y, ResendPosition.z,
+			a_ChunkInterface.GetBlock(ResendPosition), a_ChunkInterface.GetBlockMeta(ResendPosition)
+		);
+
 		return true;
 	}
 
-	virtual bool IsUseable() override
+
+
+
+
+	virtual bool IsUseable() const override
 	{
 		return true;
 	}
 
-	virtual void OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+
+
+
+
+	virtual void OnUpdate(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cBlockPluginInterface & a_PluginInterface,
+		cChunk & a_Chunk,
+		const Vector3i a_RelPos
+	) const override
 	{
-		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
-		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-		if (!a_WorldInterface.IsWeatherWetAt(BlockX, BlockZ) || (a_RelY != a_WorldInterface.GetHeight(BlockX, BlockZ)))
+		auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+		if (!a_WorldInterface.IsWeatherWetAtXYZ(WorldPos.addedY(1)))
 		{
 			// It's not raining at our current location or we do not have a direct view of the sky
-			// We cannot eat the rain :(
 			return;
 		}
 
-		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
+		auto Meta = a_Chunk.GetMeta(a_RelPos);
 		if (Meta < 3)
 		{
-			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta + 1);
+			a_Chunk.SetMeta(a_RelPos, Meta + 1);
 		}
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 21;

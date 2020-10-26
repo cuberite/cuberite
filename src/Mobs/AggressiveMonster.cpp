@@ -11,8 +11,8 @@
 
 
 
-cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height) :
-	super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_Width, a_Height)
+cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height) :
+	Super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_SoundAmbient, a_Width, a_Height)
 {
 	m_EMPersonality = AGGRESSIVE;
 }
@@ -24,7 +24,7 @@ cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterTyp
 // What to do if in Chasing State
 void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::InStateChasing(a_Dt, a_Chunk);
+	Super::InStateChasing(a_Dt, a_Chunk);
 
 	if (GetTarget() != nullptr)
 	{
@@ -43,7 +43,7 @@ void cAggressiveMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 		return;
 	}
 
-	super::EventSeePlayer(a_Player, a_Chunk);
+	Super::EventSeePlayer(a_Player, a_Chunk);
 	m_EMState = CHASING;
 }
 
@@ -53,7 +53,7 @@ void cAggressiveMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 
 void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -102,7 +102,9 @@ bool cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 
 	// Setting this higher gives us more wiggle room for attackrate
 	ResetAttackCooldown();
-	GetTarget()->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);
+
+	double KnockbackAmount = 9;
+	GetTarget()->TakeDamage(dtMobAttack, this, m_AttackDamage, KnockbackAmount);
 
 	return true;
 }

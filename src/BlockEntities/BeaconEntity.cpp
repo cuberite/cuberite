@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BeaconEntity.h"
+#include "../BlockInfo.h"
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
 #include "../UI/BeaconWindow.h"
@@ -11,8 +12,8 @@
 
 
 
-cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, 1, 1, a_World),
+cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_Pos, 1, 1, a_World),
 	m_IsActive(false),
 	m_BeaconLevel(0),
 	m_PrimaryEffect(cEntityEffect::effNoEffect),
@@ -138,9 +139,9 @@ bool cBeaconEntity::SetSecondaryEffect(cEntityEffect::eType a_Effect)
 
 bool cBeaconEntity::IsBeaconBlocked(void)
 {
-	for (int Y = m_PosY; Y < cChunkDef::Height; ++Y)
+	for (int Y = m_Pos.y; Y < cChunkDef::Height; ++Y)
 	{
-		BLOCKTYPE Block = m_World->GetBlock(m_PosX, Y, m_PosZ);
+		BLOCKTYPE Block = m_World->GetBlock({m_Pos.x, Y, m_Pos.z});
 		if (!cBlockInfo::IsTransparent(Block))
 		{
 			return true;
@@ -195,7 +196,7 @@ void cBeaconEntity::UpdateBeacon(void)
 			GetWindow()->SetProperty(0, m_BeaconLevel);
 		}
 
-		Vector3d BeaconPosition(m_PosX, m_PosY, m_PosZ);
+		Vector3d BeaconPosition(m_Pos);
 		GetWorld()->ForEachPlayer([=](cPlayer & a_Player)
 			{
 				Vector3d Distance = BeaconPosition - a_Player.GetPosition();
@@ -205,7 +206,7 @@ void cBeaconEntity::UpdateBeacon(void)
 					(std::abs(Distance.z) <= 20)
 				)
 				{
-					a_Player.AwardAchievement(eStatistic::achFullBeacon);
+					a_Player.AwardAchievement(Statistic::AchFullBeacon);
 				}
 				return false;
 			}
@@ -224,7 +225,7 @@ void cBeaconEntity::GiveEffects(void)
 		return;
 	}
 
-	int Radius = m_BeaconLevel * 10 + 10;
+	double Radius = static_cast<double>(m_BeaconLevel) * 10 + 10;
 	short EffectLevel = 0;
 	if ((m_BeaconLevel >= 4) && (m_PrimaryEffect == m_SecondaryEffect))
 	{
@@ -233,28 +234,22 @@ void cBeaconEntity::GiveEffects(void)
 
 	bool HasSecondaryEffect = (m_BeaconLevel >= 4) && (m_PrimaryEffect != m_SecondaryEffect) && (m_SecondaryEffect > 0);
 
-	Vector3d BeaconPosition(m_PosX, m_PosY, m_PosZ);
-	GetWorld()->ForEachPlayer([=](cPlayer & a_Player)
+	auto Area = cBoundingBox(m_Pos, Radius, Radius + static_cast<double>(cChunkDef::Height), -Radius);
+	GetWorld()->ForEachEntityInBox(Area, [&](cEntity & a_Entity)
+	{
+		if (!a_Entity.IsPlayer())
 		{
-			auto PlayerPosition = a_Player.GetPosition();
-			if (PlayerPosition.y > BeaconPosition.y)
-			{
-				PlayerPosition.y = BeaconPosition.y;
-			}
-
-			// TODO: Vanilla minecraft uses an AABB check instead of a radius one
-			if ((PlayerPosition - BeaconPosition).Length() <= Radius)
-			{
-				a_Player.AddEntityEffect(m_PrimaryEffect, 180, EffectLevel);
-
-				if (HasSecondaryEffect)
-				{
-					a_Player.AddEntityEffect(m_SecondaryEffect, 180, 0);
-				}
-			}
 			return false;
 		}
-	);
+		auto & Player = static_cast<cPlayer &>(a_Entity);
+		Player.AddEntityEffect(m_PrimaryEffect, 180, EffectLevel);
+
+		if (HasSecondaryEffect)
+		{
+			Player.AddEntityEffect(m_SecondaryEffect, 180, 0);
+		}
+		return false;
+	});
 }
 
 
@@ -302,10 +297,12 @@ bool cBeaconEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 {
+	a_Player->GetStatManager().AddValue(Statistic::InteractWithBeacon);
+
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
 	{
-		OpenWindow(new cBeaconWindow(m_PosX, m_PosY, m_PosZ, this));
+		OpenWindow(new cBeaconWindow(this));
 		Window = GetWindow();
 	}
 
@@ -319,7 +316,6 @@ bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 	}
 	return true;
 }
-
 
 
 

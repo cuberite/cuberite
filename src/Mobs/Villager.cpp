@@ -12,7 +12,7 @@
 
 
 cVillager::cVillager(eVillagerType VillagerType) :
-	super("Villager", mtVillager, "entity.villager.hurt", "entity.villager.death", 0.6, 1.8),
+	Super("Villager", mtVillager, "entity.villager.hurt", "entity.villager.death", "entity.villager.ambient", 0.6, 1.8),
 	m_ActionCountDown(-1),
 	m_Type(VillagerType),
 	m_VillagerAction(false)
@@ -25,7 +25,7 @@ cVillager::cVillager(eVillagerType VillagerType) :
 
 bool cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	if (!super::DoTakeDamage(a_TDI))
+	if (!Super::DoTakeDamage(a_TDI))
 	{
 		return false;
 	}
@@ -53,7 +53,7 @@ bool cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -103,6 +103,26 @@ void cVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 }
+
+
+
+
+
+void cVillager::KilledBy(TakeDamageInfo & a_TDI)
+{
+	Super::KilledBy(a_TDI);
+
+	// TODO: 0% chance on Easy, 50% chance on Normal and 100% chance on Hard
+	if (GetRandomProvider().RandBool(0.5) && (a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsMob()))
+	{
+		eMonsterType MonsterType = (static_cast<cMonster *>(a_TDI.Attacker)->GetMobType());
+		if ((MonsterType == mtZombie) || (MonsterType == mtZombieVillager))
+		{
+			m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtZombieVillager, false);
+		}
+	}
+}
+
 
 
 
@@ -169,11 +189,7 @@ void cVillager::HandleFarmerTryHarvestCrops()
 		BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
 		if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z) == 0x7)
 		{
-			cBlockHandler * Handler = cBlockInfo::GetHandler(CropBlock);
-			cChunkInterface ChunkInterface(m_World->GetChunkMap());
-			cBlockInServerPluginInterface PluginInterface(*m_World);
-			Handler->DropBlock(ChunkInterface, *m_World, PluginInterface, this, m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
-			m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_AIR, 0);
+			m_World->DropBlockAsPickups(m_CropsPos, this, nullptr);
 			m_ActionCountDown = 20;
 		}
 	}
@@ -207,7 +223,17 @@ bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType)
 		{
 			return true;
 		}
+		default: return false;
 	}
-	return false;
 }
 
+
+
+
+
+cVillager::eVillagerType cVillager::GetRandomProfession()
+{
+	int Profession = GetRandomProvider().RandInt(cVillager::eVillagerType::vtMax - 1);
+
+	return static_cast<cVillager::eVillagerType>(Profession);
+}

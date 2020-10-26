@@ -26,9 +26,14 @@ class cClientHandle;
 class cDropSpenserEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems Super;
+	// tolua_end
+
+	using Super = cBlockEntityWithItems;
+
+	// tolua_begin
 
 public:
+
 	enum
 	{
 		ContentsHeight = 3,
@@ -37,9 +42,7 @@ public:
 
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cDropSpenserEntity)
-
-	cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 	virtual ~cDropSpenserEntity() override;
 
 	// cBlockEntity overrides:
@@ -51,7 +54,7 @@ public:
 	// tolua_begin
 
 	/** Modifies the block coords to match the dropspenser direction given (where the dropspensed pickups should materialize) */
-	void AddDropSpenserDir(int & a_BlockX, int & a_BlockY, int & a_BlockZ, NIBBLETYPE a_Direction);
+	void AddDropSpenserDir(Vector3i & a_RelCoord, NIBBLETYPE a_Direction);
 
 	/** Sets the dropspenser to dropspense an item in the next tick */
 	void Activate(void);
@@ -59,6 +62,7 @@ public:
 	// tolua_end
 
 protected:
+
 	bool m_ShouldDropSpense;  ///< If true, the dropspenser will dropspense an item in the next tick
 
 	/** Does the actual work on dropspensing an item. Chooses the slot, calls DropSpenseFromSlot() and handles smoke / sound effects */
@@ -70,7 +74,3 @@ protected:
 	/** Helper function, drops one item from the specified slot (like a dropper) */
 	void DropFromSlot(cChunk & a_Chunk, int a_SlotNum);
 } ;  // tolua_export
-
-
-
-

@@ -10,60 +10,47 @@
 class cItemSlabHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
 
 	/** Creates a new handler for the specified slab item type.
 	Sets the handler to use the specified doubleslab block type for combining self into doubleslabs. */
 	cItemSlabHandler(int a_ItemType, BLOCKTYPE a_DoubleSlabBlockType):
-		super(a_ItemType),
+		Super(a_ItemType),
 		m_DoubleSlabBlockType(a_DoubleSlabBlockType)
 	{
 	}
 
 
+
+
+
 	// cItemHandler overrides:
 	virtual bool OnPlayerPlace(
-		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ
+		cWorld & a_World,
+		cPlayer & a_Player,
+		const cItem & a_EquippedItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos
 	) override
 	{
-		// Special slab handling - placing a slab onto another slab produces a dblslab instead:
+		// If clicking a slab, try combining it into a double-slab:
 		BLOCKTYPE ClickedBlockType;
 		NIBBLETYPE ClickedBlockMeta;
-		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlockType, ClickedBlockMeta);
-		// If clicked on a half slab directly
+		a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
 		if (
 			(ClickedBlockType == m_ItemType) &&                         // Placing the same slab material
 			((ClickedBlockMeta & 0x07) == a_EquippedItem.m_ItemDamage)  // Placing the same slab sub-kind (and existing slab is single)
 		)
 		{
-			// If clicking the top side of a bottom-half slab, combine into a doubleslab:
 			if (
-				(a_BlockFace == BLOCK_FACE_TOP) &&
-				((ClickedBlockMeta & 0x08) == 0)
+				((a_ClickedBlockFace == BLOCK_FACE_TOP) && ((ClickedBlockMeta & 0x08) == 0)) ||  // Top side of a bottom-half-slab
+				((a_ClickedBlockFace == BLOCK_FACE_BOTTOM) && ((ClickedBlockMeta & 0x08) != 0))  // Bottom side of a top-half-slab
 			)
 			{
-				if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07))
-				{
-					return false;
-				}
-				if (a_Player.IsGameModeSurvival())
-				{
-					a_Player.GetInventory().RemoveOneEquippedItem();
-				}
-				return true;
-			}
-
-			// If clicking the bottom side of a top-half slab, combine into a doubleslab:
-			if (
-				(a_BlockFace == BLOCK_FACE_BOTTOM) &&
-				((ClickedBlockMeta & 0x08) != 0)
-			)
-			{
-				if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07))
+				if (!a_Player.PlaceBlock(a_ClickedBlockPos.x, a_ClickedBlockPos.y, a_ClickedBlockPos.z, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07))
 				{
 					return false;
 				}
@@ -75,18 +62,17 @@ public:
 			}
 		}
 
-		// Checking the type of block that should be placed
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		// If there's already a slab in the destination, combine it into a double-slab:
+		auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
 		BLOCKTYPE PlaceBlockType;
 		NIBBLETYPE PlaceBlockMeta;
-		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, PlaceBlockType, PlaceBlockMeta);
-		// If it's a slab combine into a doubleslab (means that clicked on side, top or bottom of a block adjacent to a half slab)
+		a_World.GetBlockTypeMeta(PlacePos, PlaceBlockType, PlaceBlockMeta);
 		if (
 			(PlaceBlockType == m_ItemType) &&                         // Placing the same slab material
 			((PlaceBlockMeta & 0x07) == a_EquippedItem.m_ItemDamage)  // Placing the same slab sub-kind (and existing slab is single)
 		)
 		{
-			if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, PlaceBlockMeta & 0x07))
+			if (!a_Player.PlaceBlock(PlacePos.x, PlacePos.y, PlacePos.z, m_DoubleSlabBlockType, PlaceBlockMeta & 0x07))
 			{
 				return false;
 			}
@@ -98,8 +84,7 @@ public:
 		}
 
 		// The slabs didn't combine, use the default handler to place the slab:
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
-		bool res = super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+		bool res = Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_CursorPos);
 
 		/*
 		The client has a bug when a slab replaces snow and there's a slab above it.
@@ -107,14 +92,17 @@ public:
 		We send the block above the currently placed block back to the client to fix the bug.
 		Ref.: https://forum.cuberite.org/thread-434-post-17388.html#pid17388
 		*/
-		if ((a_BlockFace == BLOCK_FACE_TOP) && (a_BlockY < cChunkDef::Height - 1))
+		if ((a_ClickedBlockFace == BLOCK_FACE_TOP) && (a_ClickedBlockPos.y < cChunkDef::Height - 1))
 		{
-			a_Player.SendBlocksAround(a_BlockX, a_BlockY + 1, a_BlockZ, 1);
+			auto AbovePos = a_ClickedBlockPos.addedY(1);
+			a_Player.SendBlocksAround(AbovePos.x, AbovePos.y, AbovePos.z, 1);
 		}
 		return res;
 	}
 
+
 protected:
+
 	/** The block type to use when the slab combines into a doubleslab block. */
 	BLOCKTYPE m_DoubleSlabBlockType;
 };

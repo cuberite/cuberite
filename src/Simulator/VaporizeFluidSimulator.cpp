@@ -13,33 +13,14 @@
 
 
 
-cVaporizeFluidSimulator::cVaporizeFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid) :
-	super(a_World, a_Fluid, a_StationaryFluid)
+void cVaporizeFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
-}
-
-
-
-
-
-void cVaporizeFluidSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
-{
-	if (a_Chunk == nullptr)
+	if ((a_Block == m_FluidBlock) || (a_Block == m_StationaryFluidBlock))
 	{
-		return;
-	}
-	int RelX = a_Block.x - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = a_Block.z - a_Chunk->GetPosZ() * cChunkDef::Width;
-	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_Block.y, RelZ);
-	if (
-		(BlockType == m_FluidBlock) ||
-		(BlockType == m_StationaryFluidBlock)
-	)
-	{
-		a_Chunk->SetBlock(RelX, a_Block.y, RelZ, E_BLOCK_AIR, 0);
+		a_Chunk.FastSetBlock(a_Position, E_BLOCK_AIR, 0);
 		World::GetBroadcastInterface(m_World).BroadcastSoundEffect(
 			"block.fire.extinguish",
-			Vector3d(a_Block),
+			Vector3d(a_Position),
 			1.0f,
 			0.6f
 		);

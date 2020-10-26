@@ -91,12 +91,13 @@ protected:
 
 
 /** Handles any part of the inventory, using parameters in constructor to distinguish between the parts */
-class cSlotAreaInventoryBase :
+class cSlotAreaInventoryBase:
 	public cSlotArea
 {
-	typedef cSlotArea super;
+	using Super = cSlotArea;
 
 public:
+
 	cSlotAreaInventoryBase(int a_NumSlots, int a_SlotOffset, cWindow & a_ParentWindow);
 
 	// Creative inventory's click handling is somewhat different from survival inventory's, handle that here:
@@ -114,14 +115,15 @@ protected:
 
 
 /** Handles the main inventory of each player, excluding the armor and hotbar */
-class cSlotAreaInventory :
+class cSlotAreaInventory:
 	public cSlotAreaInventoryBase
 {
-	typedef cSlotAreaInventoryBase super;
+	using Super = cSlotAreaInventoryBase;
 
 public:
-	cSlotAreaInventory(cWindow & a_ParentWindow) :
-		cSlotAreaInventoryBase(cInventory::invInventoryCount, cInventory::invInventoryOffset, a_ParentWindow)
+
+	cSlotAreaInventory(cWindow & a_ParentWindow):
+		Super(cInventory::invInventoryCount, cInventory::invInventoryOffset, a_ParentWindow)
 	{
 	}
 } ;
@@ -131,14 +133,14 @@ public:
 
 
 /** Handles the hotbar of each player */
-class cSlotAreaHotBar :
+class cSlotAreaHotBar:
 	public cSlotAreaInventoryBase
 {
-	typedef cSlotAreaInventoryBase super;
+	using Super = cSlotAreaInventoryBase;
 
 public:
-	cSlotAreaHotBar(cWindow & a_ParentWindow) :
-		cSlotAreaInventoryBase(cInventory::invHotbarCount, cInventory::invHotbarOffset, a_ParentWindow)
+	cSlotAreaHotBar(cWindow & a_ParentWindow):
+		Super(cInventory::invHotbarCount, cInventory::invHotbarOffset, a_ParentWindow)
 	{
 	}
 } ;
@@ -148,14 +150,15 @@ public:
 
 
 /** Handles the shield of each player */
-class cSlotAreaShield :
+class cSlotAreaShield:
 	public cSlotAreaInventoryBase
 {
-	typedef cSlotAreaInventoryBase super;
+	using Super = cSlotAreaInventoryBase;
 
 public:
-	cSlotAreaShield(cWindow & a_ParentWindow) :
-		cSlotAreaInventoryBase(cInventory::invShieldCount, cInventory::invShieldOffset, a_ParentWindow)
+
+	cSlotAreaShield(cWindow & a_ParentWindow):
+		Super(cInventory::invShieldCount, cInventory::invShieldOffset, a_ParentWindow)
 	{
 	}
 };
@@ -165,12 +168,15 @@ public:
 
 
 /** Handles the armor area of the player's inventory */
-class cSlotAreaArmor :
+class cSlotAreaArmor:
 	public cSlotAreaInventoryBase
 {
+	using Super = cSlotAreaInventoryBase;
+
 public:
-	cSlotAreaArmor(cWindow & a_ParentWindow) :
-		cSlotAreaInventoryBase(cInventory::invArmorCount, cInventory::invArmorOffset, a_ParentWindow)
+
+	cSlotAreaArmor(cWindow & a_ParentWindow):
+		Super(cInventory::invArmorCount, cInventory::invArmorOffset, a_ParentWindow)
 	{
 	}
 
@@ -188,13 +194,14 @@ public:
 
 
 /** Handles any slot area that is representing a cItemGrid; same items for all the players */
-class cSlotAreaItemGrid :
+class cSlotAreaItemGrid:
 	public cSlotArea,
 	public cItemGrid::cListener
 {
-	typedef cSlotArea super;
+	using Super = cSlotArea;
 
 public:
+
 	cSlotAreaItemGrid(cItemGrid & a_ItemGrid, cWindow & a_ParentWindow);
 
 	virtual ~cSlotAreaItemGrid() override;
@@ -216,12 +223,13 @@ protected:
 /** A cSlotArea with items layout that is private to each player and is temporary, such as
 a crafting grid or an enchantment table.
 This common ancestor stores the items in a per-player map. It also implements tossing items from the map. */
-class cSlotAreaTemporary :
+class cSlotAreaTemporary:
 	public cSlotArea
 {
-	typedef cSlotArea super;
+	using Super = cSlotArea;
 
 public:
+
 	cSlotAreaTemporary(int a_NumSlots, cWindow & a_ParentWindow);
 
 	// cSlotArea overrides:
@@ -234,7 +242,7 @@ public:
 	void TossItems(cPlayer & a_Player, int a_Begin, int a_End);
 
 protected:
-	typedef std::map<UInt32, std::vector<cItem> > cItemMap;  // Maps EntityID -> items
+	using cItemMap = std::map<UInt32, std::vector<cItem> >;  // Maps EntityID -> items
 
 	cItemMap m_Items;
 
@@ -246,12 +254,13 @@ protected:
 
 
 
-class cSlotAreaCrafting :
+class cSlotAreaCrafting:
 	public cSlotAreaTemporary
 {
-	typedef cSlotAreaTemporary super;
+	using Super = cSlotAreaTemporary;
 
 public:
+
 	/** a_GridSize is allowed to be only 2 or 3 */
 	cSlotAreaCrafting(int a_GridSize, cWindow & a_ParentWindow);
 
@@ -264,6 +273,11 @@ public:
 	// Distributing items into this area is completely disabled
 	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;
 
+	/** Clear the crafting grid */
+	void ClearCraftingGrid(cPlayer & a_Player);
+
+	/** Loads the given Recipe into the crafting grid */
+	void LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId);
 
 protected:
 	/** Maps player's EntityID -> current recipe.
@@ -298,12 +312,13 @@ protected:
 
 
 
-class cSlotAreaAnvil :
+class cSlotAreaAnvil:
 	public cSlotAreaTemporary
 {
-	typedef cSlotAreaTemporary super;
+	using Super = cSlotAreaTemporary;
 
 public:
+
 	cSlotAreaAnvil(cWindow & a_ParentWindow);
 
 	// cSlotArea overrides:
@@ -335,13 +350,14 @@ protected:
 
 
 
-class cSlotAreaBeacon :
+class cSlotAreaBeacon:
 	public cSlotArea,
 	public cItemGrid::cListener
 {
-	typedef cSlotArea super;
+	using Super = cSlotArea;
 
 public:
+
 	cSlotAreaBeacon(cBeaconEntity * a_Beacon, cWindow & a_ParentWindow);
 	virtual ~cSlotAreaBeacon() override;
 
@@ -363,13 +379,14 @@ protected:
 
 
 
-class cSlotAreaEnchanting :
+class cSlotAreaEnchanting final :
 	public cSlotAreaTemporary
 {
-	typedef cSlotAreaTemporary super;
+	using Super = cSlotAreaTemporary;
 
 public:
-	cSlotAreaEnchanting(cWindow & a_ParentWindow, int a_BlockX, int a_BlockY, int a_BlockZ);
+
+	cSlotAreaEnchanting(cWindow & a_ParentWindow, Vector3i a_BlockPos);
 
 	// cSlotArea overrides:
 	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
@@ -380,14 +397,20 @@ public:
 	virtual void OnPlayerAdded  (cPlayer & a_Player) override;
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
 
-	/* Get the count of bookshelves who stand in the near of the enchanting table */
-	int GetBookshelvesCount(cWorld & a_World);
+	/* Get the number of bookshelves which are near the enchanting table */
+	unsigned GetBookshelvesCount(cWorld & a_World);
+
+	/* Return the enchanted item matching the chosen option (0, 1, 2)
+	Ownership of the cItem is transferred to the caller. */
+	cItem SelectEnchantedOption(size_t a_EnchantOption);
 
 protected:
+
 	/** Handles a click in the item slot. */
 	void UpdateResult(cPlayer & a_Player);
 
-	int m_BlockX, m_BlockY, m_BlockZ;
+	Vector3i m_BlockPos;
+	std::array<cItem, 3> m_EnchantedItemOptions;
 };
 
 
@@ -446,13 +469,14 @@ protected:
 
 
 
-class cSlotAreaFurnace :
+class cSlotAreaFurnace:
 	public cSlotArea,
 	public cItemGrid::cListener
 {
-	typedef cSlotArea super;
+	using Super = cSlotArea;
 
 public:
+
 	cSlotAreaFurnace(cFurnaceEntity * a_Furnace, cWindow & a_ParentWindow);
 
 	virtual ~cSlotAreaFurnace() override;
@@ -476,13 +500,14 @@ protected:
 
 
 
-class cSlotAreaBrewingstand :
+class cSlotAreaBrewingstand:
 	public cSlotArea,
 	public cItemGrid::cListener
 {
-	typedef cSlotArea super;
+	using Super = cSlotArea;
 
 public:
+
 	cSlotAreaBrewingstand(cBrewingstandEntity * a_Brewingstand, cWindow & a_ParentWindow);
 
 	virtual ~cSlotAreaBrewingstand() override;
@@ -541,7 +566,3 @@ public:
 private:
 	cHorse & m_Horse;
 };
-
-
-
-

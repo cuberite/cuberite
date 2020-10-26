@@ -1,13 +1,14 @@
 
 #include "Globals.h"
 #include "FireworksSerializer.h"
-#include "WorldStorage/FastNBT.h"
+#include "../WorldStorage/FastNBT.h"
+#include "../BlockType.h"
 
 
 
 
 
-void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFastNBTWriter & a_Writer, const ENUM_ITEM_ID a_Type)
+void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFastNBTWriter & a_Writer, const ENUM_ITEM_TYPE a_Type)
 {
 	switch (a_Type)
 	{
@@ -58,7 +59,7 @@ void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFa
 
 
 
-void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, int a_TagIdx, const ENUM_ITEM_ID a_Type)
+void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, int a_TagIdx, const ENUM_ITEM_TYPE a_Type)
 {
 	if (a_TagIdx < 0)
 	{

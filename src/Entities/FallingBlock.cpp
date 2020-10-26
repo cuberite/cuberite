@@ -1,6 +1,7 @@
 #include "Globals.h"
 
 #include "FallingBlock.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../ClientHandle.h"
 #include "../Simulator/SandSimulator.h"
@@ -10,11 +11,10 @@
 
 
 
-cFallingBlock::cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
-	super(etFallingBlock, a_BlockPosition.x + 0.5f, a_BlockPosition.y, a_BlockPosition.z + 0.5f, 0.98, 0.98),
+cFallingBlock::cFallingBlock(Vector3d a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta):
+	Super(etFallingBlock, a_Position, 0.98, 0.98),
 	m_BlockType(a_BlockType),
-	m_BlockMeta(a_BlockMeta),
-	m_OriginalPosition(a_BlockPosition)
+	m_BlockMeta(a_BlockMeta)
 {
 	SetGravity(-16.0f);
 	SetAirDrag(0.02f);
@@ -26,7 +26,7 @@ cFallingBlock::cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_Block
 
 void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	a_ClientHandle.SendSpawnFallingBlock(*this);
+	a_ClientHandle.SendSpawnEntity(*this);
 }
 
 
@@ -46,7 +46,7 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Fallen out of this world, just continue falling until out of sight, then destroy:
 		if (BlockY < VOID_BOUNDARY)
 		{
-			Destroy(true);
+			Destroy();
 		}
 		return;
 	}
@@ -64,18 +64,18 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Fallen onto a block that breaks this into pickups (e. g. half-slab)
 		// Must finish the fall with coords one below the block:
 		cSandSimulator::FinishFalling(m_World, BlockX, BlockY, BlockZ, m_BlockType, m_BlockMeta);
-		Destroy(true);
+		Destroy();
 		return;
 	}
 	else if (!cSandSimulator::CanContinueFallThrough(BlockBelow))
 	{
 		// Fallen onto a solid block
 		/*
-		LOGD(
-			"Sand: Checked below at {%d, %d, %d} (rel {%d, %d, %d}), it's %s, finishing the fall.",
-			BlockX, BlockY, BlockZ,
-			BlockX - a_Chunk.GetPosX() * cChunkDef::Width, BlockY, BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width,
-			ItemTypeToString(BlockBelow).c_str()
+		FLOGD(
+			"Sand: Checked below at {0} (rel {1}), it's {2}, finishing the fall.",
+			Vector3i{BlockX, BlockY, BlockZ},
+			cChunkDef::AbsoluteToRelative({BlockX, BlockY, BlockZ}, {a_Chunk.GetPosX(), a_Chunk.GetPosZ()}),
+			ItemTypeToString(BlockBelow)
 		);
 		*/
 
@@ -83,14 +83,14 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			cSandSimulator::FinishFalling(m_World, BlockX, BlockY + 1, BlockZ, m_BlockType, m_BlockMeta);
 		}
-		Destroy(true);
+		Destroy();
 		return;
 	}
 	else if ((m_BlockType == E_BLOCK_CONCRETE_POWDER) && IsBlockWater(BlockBelow))
 	{
 		// Concrete powder falling into water solidifies on the first water it touches
 		cSandSimulator::FinishFalling(m_World, BlockX, BlockY, BlockZ, E_BLOCK_CONCRETE, m_BlockMeta);
-		Destroy(true);
+		Destroy();
 		return;
 	}
 

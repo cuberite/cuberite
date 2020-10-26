@@ -24,10 +24,8 @@ public:
 
 	~cStopwatch()
 	{
-		#ifdef _DEBUG
-			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - m_StartTime).count();
-			LOGD("Stopwatch: %s took %.03f sec", m_Name.c_str(), static_cast<double>(duration) / 1000);
-		#endif  // _DEBUG
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - m_StartTime).count();
+		LOG("Stopwatch: %s took %.03f sec", m_Name, static_cast<double>(duration) / 1000);
 	}
 
 protected:

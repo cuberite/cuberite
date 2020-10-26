@@ -7,51 +7,52 @@
 
 
 
-class cBlockSugarcaneHandler :
-	public cBlockPlant
+class cBlockSugarcaneHandler final :
+	public cBlockPlant<false>
 {
-	typedef cBlockPlant Super;
+	using Super = cBlockPlant<false>;
+
 public:
-	cBlockSugarcaneHandler(BLOCKTYPE a_BlockType)
-		: Super(a_BlockType, false)
+
+	using Super::Super;
+
+private:
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
+		return cItem(E_ITEM_SUGARCANE, 1, 0);
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		a_Pickups.push_back(cItem(E_ITEM_SUGARCANE, 1, 0));
-	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+
+
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		if (a_RelY <= 0)
+		if (a_RelPos.y <= 0)
 		{
 			return false;
 		}
 
-		switch (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ))
+		switch (a_Chunk.GetBlock(a_RelPos.addedY(-1)))
 		{
 			case E_BLOCK_DIRT:
 			case E_BLOCK_GRASS:
 			case E_BLOCK_FARMLAND:
 			case E_BLOCK_SAND:
 			{
-				static const struct
+				static const Vector3i Coords[] =
 				{
-					int x, z;
-				} Coords[] =
-				{
-					{-1,  0},
-					{ 1,  0},
-					{ 0, -1},
-					{ 0,  1},
+					{-1, -1,  0},
+					{ 1, -1,  0},
+					{ 0, -1, -1},
+					{ 0, -1,  1},
 				} ;
-				a_RelY -= 1;
 				for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 				{
 					BLOCKTYPE BlockType;
 					NIBBLETYPE BlockMeta;
-					if (!a_Chunk.UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta))
+					if (!a_Chunk.UnboundedRelGetBlock(a_RelPos + Coords[i], BlockType, BlockMeta))
 					{
 						// Too close to the edge, cannot simulate
 						return true;
@@ -72,31 +73,65 @@ public:
 		return false;
 	}
 
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
-	{
-		if (CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ) == paGrowth)
-		{
-			a_Chunk.GetWorld()->GrowSugarcane(a_RelX + a_Chunk.GetPosX() * cChunkDef::Width, a_RelY, a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width, 1);
-		}
-	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 7;
 	}
 
-protected:
 
-	virtual PlantAction CanGrow(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+
+
+
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
-		auto Action = paStay;
-		if (((a_RelY + 1) < cChunkDef::Height) && (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == E_BLOCK_AIR))
+		// Check the total height of the sugarcane blocks here:
+		int top = a_RelPos.y + 1;
+		while (
+			(top < cChunkDef::Height) &&
+			(a_Chunk.GetBlock({a_RelPos.x, top, a_RelPos.z}) == E_BLOCK_SUGARCANE)
+		)
 		{
-			Action = Super::CanGrow(a_Chunk, a_RelX, a_RelY, a_RelZ);
+			++top;
+		}
+		int bottom = a_RelPos.y - 1;
+		while (
+			(bottom > 0) &&
+			(a_Chunk.GetBlock({a_RelPos.x, bottom, a_RelPos.z}) == E_BLOCK_SUGARCANE)
+		)
+		{
+			--bottom;
 		}
 
-		return Action;
+		// Grow by at most a_NumStages, but no more than max height:
+		auto toGrow = std::min(a_NumStages, a_Chunk.GetWorld()->GetMaxSugarcaneHeight() + 1 - (top - bottom));
+		Vector3i topPos(a_RelPos.x, top, a_RelPos.z);
+		for (int i = 0; i < toGrow; i++)
+		{
+			if (a_Chunk.GetBlock(topPos.addedY(i)) == E_BLOCK_AIR)
+			{
+				a_Chunk.SetBlock(topPos.addedY(i), E_BLOCK_SUGARCANE, 0);
+			}
+			else
+			{
+				return i;
+			}
+		}  // for i
+		return toGrow;
+	}
+
+	virtual PlantAction CanGrow(cChunk & a_Chunk, Vector3i a_RelPos) const override
+	{
+		// Only allow growing if there's an air block above:
+		if (((a_RelPos.y + 1) < cChunkDef::Height) && (a_Chunk.GetBlock(a_RelPos.addedY(1)) == E_BLOCK_AIR))
+		{
+			return Super::CanGrow(a_Chunk, a_RelPos);
+		}
+		return paStay;
 	}
 } ;
 

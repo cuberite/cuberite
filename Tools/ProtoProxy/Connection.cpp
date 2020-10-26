@@ -10,8 +10,6 @@
 #include "mbedTLS++/CryptoKey.h"
 #include "../../src/Logger.h"
 
-#include "fmt/printf.h"
-
 #ifdef _WIN32
 	#include <direct.h>  // For _mkdir()
 #endif
@@ -38,21 +36,21 @@
 
 #define HANDLE_CLIENT_PACKET_READ(Proc, Type, Var) \
 	Type Var; \
-	{ \
+	do { \
 		if (!m_ClientBuffer.Proc(Var)) \
 		{ \
 			return false; \
 		} \
-	}
+	} while(false)
 
 #define HANDLE_SERVER_PACKET_READ(Proc, Type, Var) \
 	Type Var; \
-	{ \
+	do { \
 		if (!m_ServerBuffer.Proc(Var)) \
 		{ \
 			return false; \
 		} \
-	}
+	} while(false)
 
 #define CLIENTSEND(...) SendData(m_ClientSocket, __VA_ARGS__, "Client")
 #define SERVERSEND(...) SendData(m_ServerSocket, __VA_ARGS__, "Server")
@@ -60,7 +58,7 @@
 #define SERVERENCRYPTSEND(...) SendEncryptedData(m_ServerSocket, m_ServerEncryptor, __VA_ARGS__, "Server")
 
 #define COPY_TO_SERVER() \
-	{ \
+	do { \
 		AString ToServer; \
 		m_ClientBuffer.ReadAgain(ToServer); \
 		switch (m_ServerState) \
@@ -84,10 +82,10 @@
 			} \
 		} \
 		DebugSleep(50); \
-	}
+	} while (false)
 
 #define COPY_TO_CLIENT() \
-	{ \
+	do { \
 		AString ToClient; \
 		m_ServerBuffer.ReadAgain(ToClient); \
 		switch (m_ClientState) \
@@ -110,10 +108,10 @@
 			\
 		} \
 		DebugSleep(50); \
-	}
+	} while (false)
 
 #define HANDLE_CLIENT_READ(Proc) \
-	{ \
+	do { \
 		if (!Proc) \
 		{ \
 			AString Leftover; \
@@ -122,16 +120,16 @@
 			m_ClientBuffer.ResetRead(); \
 			return true; \
 		} \
-	}
+	} while (false)
 
 #define HANDLE_SERVER_READ(Proc) \
-	{ \
+	do { \
 		if (!Proc) \
 		{ \
 			m_ServerBuffer.ResetRead(); \
 			return true; \
 		} \
-	}
+	} while (false)
 
 
 
@@ -284,16 +282,13 @@ void cConnection::Run(void)
 
 
 
-void cConnection::Log(const char * a_Format, fmt::ArgList a_Args)
+void cConnection::vLog(const char * a_Format, fmt::printf_args a_ArgList)
 {
-	fmt::MemoryWriter FullMsg;
-	fmt::printf(FullMsg, "[%5.3f] ", GetRelativeTime());
-	fmt::printf(FullMsg, a_Format, a_Args);
-	fmt::printf(FullMsg, "\n");
-
 	// Log to file:
 	cCSLock Lock(m_CSLog);
-	fputs(FullMsg.c_str(), m_LogFile);
+	fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
+	fmt::vfprintf(m_LogFile, a_Format, a_ArgList);
+	fmt::fprintf(m_LogFile, "\n");
 	#ifdef _DEBUG
 		fflush(m_LogFile);
 	#endif  // _DEBUG
@@ -306,22 +301,19 @@ void cConnection::Log(const char * a_Format, fmt::ArgList a_Args)
 
 
 
-void cConnection::DataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::ArgList a_Args)
+void cConnection::vDataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::printf_args a_ArgList)
 {
-	fmt::MemoryWriter FullMsg;
-	fmt::printf(FullMsg, "[%5.3f] ", GetRelativeTime());
-	fmt::printf(FullMsg, a_Format, a_Args);
 	AString Hex;
-	fmt::printf(FullMsg, "\n%s\n", CreateHexDump(Hex, a_Data, a_Size, 16));
+	CreateHexDump(Hex, a_Data, a_Size, 16);
 
 	// Log to file:
 	cCSLock Lock(m_CSLog);
-	fputs(FullMsg.c_str(), m_LogFile);
+	fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
+	fmt::vfprintf(m_LogFile, a_Format, a_ArgList);
+	fmt::fprintf(m_LogFile, "\n%s\n", Hex);
 
-	/*
 	// Log to screen:
-	std::cout << FullMsg;
-	//*/
+	// std::cout << FullMsg;
 }
 
 
@@ -1777,7 +1769,7 @@ bool cConnection::HandleServerKeepAlive(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, PingID);
 	Log("Received a PACKET_KEEP_ALIVE from the server:");
 	Log("  ID = %u", PingID);
-	COPY_TO_CLIENT()
+	COPY_TO_CLIENT();
 	return true;
 }
 
@@ -1875,7 +1867,7 @@ bool cConnection::HandleServerMapChunk(void)
 
 	// TODO: Save the compressed data into a file for later analysis
 
-	COPY_TO_CLIENT()
+	COPY_TO_CLIENT();
 	return true;
 }
 
@@ -2238,9 +2230,9 @@ bool cConnection::HandleServerSpawnNamedEntity(void)
 	sSpawnDatas Data;
 	for (UInt32 i = 0; i < DataCount; i++)
 	{
-		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Name)
-		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Value)
-		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Signature)
+		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Name);
+		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Value);
+		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Signature);
 		Data.push_back(sSpawnData(Name, Value, Signature));
 	}
 	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosX);

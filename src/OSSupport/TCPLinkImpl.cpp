@@ -5,7 +5,7 @@
 
 #include "Globals.h"
 #include "TCPLinkImpl.h"
-#include "mbedTLS++/SslConfig.h"
+#include "../mbedTLS++/SslConfig.h"
 #include "NetworkSingleton.h"
 #include "ServerHandleImpl.h"
 #include "event2/buffer.h"
@@ -18,7 +18,7 @@
 // cTCPLinkImpl:
 
 cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
-	super(a_LinkCallbacks),
+	Super(std::move(a_LinkCallbacks)),
 	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), -1, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE | BEV_OPT_DEFER_CALLBACKS | BEV_OPT_UNLOCK_CALLBACKS)),
 	m_LocalPort(0),
 	m_RemotePort(0),
@@ -31,9 +31,9 @@ cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
 
 
 cTCPLinkImpl::cTCPLinkImpl(evutil_socket_t a_Socket, cTCPLink::cCallbacksPtr a_LinkCallbacks, cServerHandleImplPtr a_Server, const sockaddr * a_Address, socklen_t a_AddrLen):
-	super(a_LinkCallbacks),
+	Super(std::move(a_LinkCallbacks)),
 	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), a_Socket, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE | BEV_OPT_DEFER_CALLBACKS | BEV_OPT_UNLOCK_CALLBACKS)),
-	m_Server(a_Server),
+	m_Server(std::move(a_Server)),
 	m_LocalPort(0),
 	m_RemotePort(0),
 	m_ShouldShutdown(false)
@@ -65,8 +65,8 @@ cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTC
 	ASSERT(a_ConnectCallbacks != nullptr);
 
 	// Create a new link:
-	cTCPLinkImplPtr res{new cTCPLinkImpl(a_LinkCallbacks)};  // Cannot use std::make_shared here, constructor is not accessible
-	res->m_ConnectCallbacks = a_ConnectCallbacks;
+	cTCPLinkImplPtr res{new cTCPLinkImpl(std::move(a_LinkCallbacks))};  // Cannot use std::make_shared here, constructor is not accessible
+	res->m_ConnectCallbacks = std::move(a_ConnectCallbacks);
 	cNetworkSingleton::Get().AddLink(res);
 	res->m_Callbacks->OnLinkCreated(res);
 	res->Enable(res);
@@ -149,7 +149,7 @@ cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTC
 void cTCPLinkImpl::Enable(cTCPLinkImplPtr a_Self)
 {
 	// Take hold of a shared copy of self, to keep as long as the callbacks are coming:
-	m_Self = a_Self;
+	m_Self = std::move(a_Self);
 
 	// Set the LibEvent callbacks and enable processing:
 	bufferevent_setcb(m_BufferEvent, ReadCallback, WriteCallback, EventCallback, this);
@@ -550,7 +550,7 @@ cTCPLinkImpl::cLinkTlsContext::cLinkTlsContext(cTCPLinkImpl & a_Link):
 
 void cTCPLinkImpl::cLinkTlsContext::SetSelf(cLinkTlsContextWPtr a_Self)
 {
-	m_Self = a_Self;
+	m_Self = std::move(a_Self);
 }
 
 
@@ -700,7 +700,7 @@ bool cNetwork::Connect(
 )
 {
 	// Add a connection request to the queue:
-	cTCPLinkImplPtr Conn = cTCPLinkImpl::Connect(a_Host, a_Port, a_LinkCallbacks, a_ConnectCallbacks);
+	cTCPLinkImplPtr Conn = cTCPLinkImpl::Connect(a_Host, a_Port, std::move(a_LinkCallbacks), std::move(a_ConnectCallbacks));
 	return (Conn != nullptr);
 }
 

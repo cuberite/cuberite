@@ -13,15 +13,14 @@ class cWorldInterface;
 class cLeashKnot :
 	public cHangingEntity
 {
-	typedef cHangingEntity super;
-
-public:
-
 	// tolua_end
+	using Super = cHangingEntity;
+
+public:  // tolua_export
 
 	CLASS_PROTODEF(cLeashKnot)
 
-	cLeashKnot(eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z);
+	cLeashKnot(eBlockFace a_BlockFace, Vector3d a_Pos);
 
 	/** Looks for mobs leashed to a player and ties them to this knot */
 	void TiePlayersLeashedMobs(cPlayer & a_Player, bool a_ShouldBroadCast);

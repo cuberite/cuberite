@@ -9,17 +9,21 @@
 
 
 
-class cItemLilypadHandler :
+class cItemLilypadHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
+
 	cItemLilypadHandler(int a_ItemType):
-		super(a_ItemType)
+		Super(a_ItemType)
 	{
 
 	}
+
+
+
 
 
 	virtual bool IsPlaceable(void) override
@@ -29,16 +33,22 @@ public:
 
 
 
+
+
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
 	) override
 	{
-		if (a_BlockFace > BLOCK_FACE_NONE)
+		if (a_ClickedBlockFace > BLOCK_FACE_NONE)
 		{
-			// Clicked on the side of a submerged block; vanilla allows placement, so should we
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_LILY_PAD, 0);
+			// Clicked on a face of a submerged block; vanilla allows placement, so should we
+			auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+			a_World->SetBlock(PlacePos, E_BLOCK_LILY_PAD, 0);
 			if (!a_Player->IsGameModeCreative())
 			{
 				a_Player->GetInventory().RemoveOneEquippedItem();
@@ -46,17 +56,17 @@ public:
 			return true;
 		}
 
-		class cCallbacks :
+		class cCallbacks:
 			public cBlockTracer::cCallbacks
 		{
 		public:
 
-			cCallbacks(void) :
+			cCallbacks():
 				m_HasHitFluid(false)
 			{
 			}
 
-			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
+			virtual bool OnNextBlock(Vector3i a_CBBlockPos, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
 			{
 				if (IsBlockWater(a_CBBlockType))
 				{
@@ -64,7 +74,7 @@ public:
 					{
 						return false;
 					}
-					AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, BLOCK_FACE_YP);  // Always place pad at top of water block
+					a_CBBlockPos = AddFaceDirection(a_CBBlockPos, BLOCK_FACE_YP);  // Always place pad at top of water block
 					if (
 						!IsBlockWater(a_CBBlockType) &&
 						cBlockInfo::FullyOccupiesVoxel(a_CBBlockType)
@@ -74,7 +84,7 @@ public:
 						return true;
 					}
 					m_HasHitFluid = true;
-					m_Pos.Set(a_CBBlockX, a_CBBlockY, a_CBBlockZ);
+					m_Pos = a_CBBlockPos;
 					return true;
 				}
 				return false;
@@ -83,18 +93,14 @@ public:
 			Vector3i m_Pos;
 			bool m_HasHitFluid;
 
-		};
-
-		cCallbacks Callbacks;
-		cLineBlockTracer Tracer(*a_Player->GetWorld(), Callbacks);
-		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
-		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
-
-		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
+		} Callbacks;
+		auto Start = a_Player->GetEyePosition() + a_Player->GetLookVector();
+		auto End =   a_Player->GetEyePosition() + a_Player->GetLookVector() * 5;
+		cLineBlockTracer::Trace(*a_Player->GetWorld(), Callbacks, Start, End);
 
 		if (Callbacks.m_HasHitFluid)
 		{
-			a_World->SetBlock(Callbacks.m_Pos.x, Callbacks.m_Pos.y, Callbacks.m_Pos.z, E_BLOCK_LILY_PAD, 0);
+			a_World->SetBlock(Callbacks.m_Pos, E_BLOCK_LILY_PAD, 0);
 			if (!a_Player->IsGameModeCreative())
 			{
 				a_Player->GetInventory().RemoveOneEquippedItem();

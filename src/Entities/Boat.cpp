@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "Boat.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../ClientHandle.h"
 #include "Player.h"
@@ -14,7 +15,7 @@
 
 
 cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
-	super(etBoat, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.7),
+	Super(etBoat, a_Pos, 0.98, 0.7),
 	m_LastDamage(0), m_ForwardDirection(0),
 	m_DamageTaken(0.0f), m_Material(a_Material),
 	m_RightPaddleUsed(false), m_LeftPaddleUsed(false)
@@ -32,7 +33,32 @@ cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
 
 void cBoat::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	a_ClientHandle.SendSpawnVehicle(*this, 1);
+	a_ClientHandle.SendSpawnEntity(*this);
+	a_ClientHandle.SendEntityMetadata(*this);  // Boat colour
+}
+
+
+
+
+
+void cBoat::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
+{
+	// Cannot use super::BroadcastMovementUpdate here, broadcasting position when not
+	// expected by the client breaks things. See https://github.com/cuberite/cuberite/pull/4488
+
+	// Process packet sending every two ticks
+	if (GetWorld()->GetWorldAge() % 2 != 0)
+	{
+		return;
+	}
+
+	Vector3i Diff = (GetPosition() * 32.0).Floor() - (m_LastSentPosition * 32.0).Floor();
+	if (Diff.HasNonZeroLength())  // Have we moved?
+	{
+		m_World->BroadcastEntityPosition(*this, a_Exclude);
+		m_LastSentPosition = GetPosition();
+		m_bDirtyOrientation = false;
+	}
 }
 
 
@@ -42,7 +68,7 @@ void cBoat::SpawnOn(cClientHandle & a_ClientHandle)
 bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 {
 	m_LastDamage = 10;
-	if (!super::DoTakeDamage(TDI))
+	if (!Super::DoTakeDamage(TDI))
 	{
 		return false;
 	}
@@ -60,7 +86,7 @@ bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 				m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 0, 0, 0, true);
 			}
 		}
-		Destroy(true);
+		Destroy();
 	}
 	return true;
 }
@@ -71,7 +97,7 @@ bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 
 void cBoat::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	if (m_Attachee != nullptr)
 	{
@@ -102,7 +128,7 @@ void cBoat::OnRightClicked(cPlayer & a_Player)
 
 void cBoat::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -129,9 +155,6 @@ void cBoat::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		SetLastDamage(GetLastDamage() - 1);
 	}
-
-	// Broadcast any changes in position
-	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -158,6 +181,9 @@ void cBoat::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 void cBoat::SetLastDamage(int TimeSinceLastHit)
 {
 	m_LastDamage = TimeSinceLastHit;
+
+	// Tell the client to play the shaking animation
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -166,10 +192,16 @@ void cBoat::SetLastDamage(int TimeSinceLastHit)
 
 void cBoat::UpdatePaddles(bool a_RightPaddleUsed, bool a_LeftPaddleUsed)
 {
+	// Avoid telling client what it already knows since it may reset animation 1.13+
+	const bool Changed = (m_RightPaddleUsed != a_RightPaddleUsed) || (m_LeftPaddleUsed != a_LeftPaddleUsed);
+
 	m_RightPaddleUsed = a_RightPaddleUsed;
 	m_LeftPaddleUsed = a_LeftPaddleUsed;
 
-	m_World->BroadcastEntityMetadata(*this);
+	if (Changed)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
 }
 
 

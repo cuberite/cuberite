@@ -78,7 +78,7 @@ public:
 				}
 			}
 
-			~cStackBalanceCheck() CAN_THROW
+			~cStackBalanceCheck() noexcept(false)
 			{
 				auto currStackPos = lua_gettop(m_LuaState);
 				if (currStackPos != m_StackPos)
@@ -118,7 +118,7 @@ public:
 		{
 		}
 
-		~cStackBalancePopper() CAN_THROW
+		~cStackBalancePopper() noexcept(false)
 		{
 			auto curTop = lua_gettop(m_LuaState);
 			if (curTop > m_Count)
@@ -285,7 +285,7 @@ public:
 	class cCallback:
 		public cTrackedRef
 	{
-		typedef cTrackedRef Super;
+		using Super = cTrackedRef;
 
 	public:
 
@@ -334,7 +334,7 @@ public:
 	class cOptionalCallback:
 		public cCallback
 	{
-		typedef cCallback Super;
+		using Super = cCallback;
 
 	public:
 
@@ -369,7 +369,8 @@ public:
 	class cTableRef:
 		public cTrackedRef
 	{
-		typedef cTrackedRef Super;
+		using Super = cTrackedRef;
+
 	public:
 		cTableRef(void) {}
 
@@ -477,7 +478,7 @@ public:
 			std::swap(m_StackLen, a_Src.m_StackLen);
 		}
 
-		~cStackValue() CAN_THROW
+		~cStackValue() noexcept(false)
 		{
 			if (m_LuaState != nullptr)
 			{
@@ -624,6 +625,7 @@ public:
 	// Push a simple value onto the stack (keep alpha-sorted):
 	void Push(bool a_Value);
 	void Push(cEntity * a_Entity);
+	void Push(const cEntity * a_Entity);
 	void Push(cLuaServerHandle * a_ServerHandle);
 	void Push(cLuaTCPLink * a_TCPLink);
 	void Push(cLuaUDPEndpoint * a_UDPEndpoint);
@@ -694,6 +696,10 @@ public:
 		}
 		return GetStackValue(a_StackPos, a_ReturnedVal.GetDest());
 	}
+
+	/** Retrieves any Vector3 value and coerces it into a Vector3<T>. */
+	template <typename T>
+	bool GetStackValue(int a_StackPos, Vector3<T> & a_ReturnedVal);
 
 	/** Pushes the named value in the table at the top of the stack.
 	a_Name may be a path containing multiple table levels, such as "cChatColor.Blue".
@@ -793,6 +799,10 @@ public:
 	Accepts either cUUID instances or strings that contain UUIDs */
 	bool CheckParamUUID(int a_StartParam, int a_EndParam = -1);
 
+	/** Returns true if the specified parameters on the stack are Vector3s; also logs warning if not.
+	Accepts any Vector3 type instances or tables. */
+	bool CheckParamVector3(int a_StartParam, int a_EndParam = -1);
+
 	/** Returns true if the specified parameter on the stack is nil (indicating an end-of-parameters) */
 	bool CheckParamEnd(int a_Param);
 
@@ -804,9 +814,14 @@ public:
 	Returns false and logs a special warning ("wrong calling convention") if not. */
 	bool CheckParamStaticSelf(const char * a_SelfClassName);
 
-	bool IsParamUserType(int a_Param, AString a_UserType);
+	/** Returns true if the specified parameter is of the specified class. */
+	bool IsParamUserType(int a_ParamIdx, const AString & a_UserType);
 
-	bool IsParamNumber(int a_Param);
+	/** Returns true if the specified parameter is a number. */
+	bool IsParamNumber(int a_ParamIdx);
+
+	/** Returns true if the specified parameter is any of the Vector3 types. */
+	bool IsParamVector3(int a_ParamIdx);
 
 	/** If the status is nonzero, prints the text on the top of Lua stack and returns true */
 	bool ReportErrors(int status);
@@ -820,11 +835,29 @@ public:
 	/** Logs all items in the current stack trace to the server console */
 	static void LogStackTrace(lua_State * a_LuaState, int a_StartingDepth = 0);
 
-	/** Formats and prints the message, prefixed with the current function name, then logs the stack contents and raises a Lua error.
+	/** Prints the message, prefixed with the current function name, then logs the stack contents and raises a Lua error.
 	To be used for bindings when they detect bad parameters.
 	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
-	int ApiParamError(const char * a_MsgFormat, fmt::ArgList);
-	FMT_VARIADIC(int, ApiParamError, const char *)
+	int ApiParamError(std::string_view a_Msg);
+
+	/** Formats and prints the message using printf-style format specifiers, but prefixed with the current function name, then logs the stack contents and raises a Lua error.
+	To be used for bindings when they detect bad parameters.
+	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
+	template <typename... Args>
+	int ApiParamError(const char * a_MsgFormat, const Args & ... a_Args)
+	{
+		return ApiParamError(Printf(a_MsgFormat, a_Args...));
+	}
+
+	/** Formats and prints the message using python-style format specifiers, but prefixed with the current function name, then logs the stack contents and raises a Lua error.
+	To be used for bindings when they detect bad parameters.
+	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
+	template <typename... Args>
+	int FApiParamError(const char * a_MsgFormat, const Args & ... a_Args)
+	{
+		return ApiParamError(fmt::format(a_MsgFormat, a_Args...));
+	}
+
 
 	/** Returns the type of the item on the specified position in the stack */
 	AString GetTypeText(int a_StackPos);
@@ -1008,7 +1041,12 @@ protected:
 	/** Removes the specified reference from tracking.
 	The reference will no longer be invalidated when this Lua state is about to be closed. */
 	void UntrackRef(cTrackedRef & a_Ref);
-} ;
+};  // cLuaState
+
+// Instantiate the GetStackValue(Vector3<>) function for all Vector3 types:
+extern template bool cLuaState::GetStackValue(int a_StackPos, Vector3d & a_ReturnedVal);
+extern template bool cLuaState::GetStackValue(int a_StackPos, Vector3f & a_ReturnedVal);
+extern template bool cLuaState::GetStackValue(int a_StackPos, Vector3i & a_ReturnedVal);
 
 
 

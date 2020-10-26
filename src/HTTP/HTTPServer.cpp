@@ -9,7 +9,7 @@
 #include "HTTPServerConnection.h"
 #include "HTTPFormParser.h"
 #include "SslHTTPServerConnection.h"
-#include "mbedTLS++/SslConfig.h"
+#include "../mbedTLS++/SslConfig.h"
 
 
 
@@ -137,7 +137,7 @@ bool cHTTPServer::Start(cCallbacks & a_Callbacks, const AStringVector & a_Ports)
 
 	// Open up requested ports:
 	AStringVector ports;
-	for (auto port : a_Ports)
+	for (const auto & port : a_Ports)
 	{
 		UInt16 PortNum;
 		if (!StringToInteger(port, PortNum))
@@ -175,7 +175,7 @@ bool cHTTPServer::Start(cCallbacks & a_Callbacks, const AStringVector & a_Ports)
 
 void cHTTPServer::Stop(void)
 {
-	for (auto handle : m_ServerHandles)
+	for (const auto & handle : m_ServerHandles)
 	{
 		handle->Close();
 	}

@@ -30,7 +30,7 @@ static int readCuboidOverloadParams(cLuaState & a_LuaState, int a_StartParam, cC
 		// Assume the 6-number version:
 		if (!a_LuaState.GetStackValues(a_StartParam, a_Cuboid.p1.x, a_Cuboid.p2.x, a_Cuboid.p1.y, a_Cuboid.p2.y, a_Cuboid.p1.z, a_Cuboid.p2.z))
 		{
-			return a_LuaState.ApiParamError("Cannot read the bounds parameters, expected 6 numbers.");
+			return a_LuaState.ApiParamError("Cannot read the bounds parameters, expected 6 numbers");
 		}
 		return a_StartParam + 6;
 	}
@@ -40,7 +40,7 @@ static int readCuboidOverloadParams(cLuaState & a_LuaState, int a_StartParam, cC
 		cCuboid * c;
 		if (!a_LuaState.GetStackValues(a_StartParam, c))
 		{
-			return a_LuaState.ApiParamError("Cannot read the bounds parameter, expected a cCuboid instance.");
+			return a_LuaState.ApiParamError("Cannot read the bounds parameter, expected a cCuboid instance");
 		}
 		a_Cuboid = *c;
 		return a_StartParam + 1;
@@ -48,14 +48,10 @@ static int readCuboidOverloadParams(cLuaState & a_LuaState, int a_StartParam, cC
 	else
 	{
 		// Assume the 2-Vector3i version:
-		Vector3i * p1;
-		Vector3i * p2;
-		if (!a_LuaState.GetStackValues(a_StartParam, p1, p2))
+		if (!a_LuaState.GetStackValues(a_StartParam, a_Cuboid.p1, a_Cuboid.p2))
 		{
-			return a_LuaState.ApiParamError("Cannot read the bounds parameter, expected two Vector3i instances.");
+			return a_LuaState.ApiParamError("Cannot read the bounds parameter, expected two Vector3i instances");
 		}
-		a_Cuboid.p1 = *p1;
-		a_Cuboid.p2 = *p2;
 		return a_StartParam + 2;
 	}
 }
@@ -78,19 +74,17 @@ static int readVector3iOverloadParams(cLuaState & a_LuaState, int a_StartParam, 
 		// Assume the 3-number version:
 		if (!a_LuaState.GetStackValues(a_StartParam, a_Coords.x, a_Coords.y, a_Coords.z))
 		{
-			return a_LuaState.ApiParamError("Cannot read the %s, expected 3 numbers.", a_ParamName);
+			return a_LuaState.ApiParamError("Cannot read the %s, expected 3 numbers", a_ParamName);
 		}
 		return a_StartParam + 3;
 	}
 	else
 	{
 		// Assume the Vector3i version:
-		Vector3i * c;
-		if (!a_LuaState.GetStackValues(a_StartParam, c))
+		if (!a_LuaState.GetStackValues(a_StartParam, a_Coords))
 		{
-			return a_LuaState.ApiParamError("Cannot read the %s, expected a Vector3i instance.", a_ParamName);
+			return a_LuaState.ApiParamError("Cannot read the %s, expected a Vector3i instance", a_ParamName);
 		}
-		a_Coords = *c;
 		return a_StartParam + 1;
 	}
 }
@@ -110,11 +104,11 @@ static int tolua_cBlockArea_Create(lua_State * a_LuaState)
 	cBlockArea * self = nullptr;
 	if (!L.GetStackValues(1, self))
 	{
-		return L.ApiParamError("Cannot read self.");
+		return L.ApiParamError("Cannot read self");
 	}
 	if (self == nullptr)
 	{
-		return L.ApiParamError("Invalid 'self', must not be nil.");
+		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
 	int dataTypes = cBlockArea::baTypes | cBlockArea::baMetas | cBlockArea::baBlockEntities;
@@ -123,13 +117,13 @@ static int tolua_cBlockArea_Create(lua_State * a_LuaState)
 	L.GetStackValue(dataTypesIdx, dataTypes);
 	if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
 	{
-		return L.ApiParamError("Invalid combination of baDataTypes specified (%d).", dataTypes);
+		return L.ApiParamError("Invalid combination of baDataTypes specified (%d)", dataTypes);
 	}
 
 	// Create the area:
 	if ((size.x <= 0) || (size.y <= 0) || (size.z <= 0))
 	{
-		return L.ApiParamError("Invalid sizes, must be greater than zero, got {%d, %d, %d}", size.x, size.y, size.z);
+		return L.FApiParamError("Invalid sizes, must be greater than zero, got {0}", size);
 	}
 	ASSERT(self != nullptr);
 	self->Create(size, dataTypes);
@@ -154,16 +148,27 @@ static int tolua_cBlockArea_FillRelCuboid(lua_State * a_LuaState)
 	cBlockArea * self = nullptr;
 	if (!L.GetStackValues(1, self))
 	{
-		return L.ApiParamError("Cannot read self.");
+		return L.ApiParamError("Cannot read self");
 	}
 	if (self == nullptr)
 	{
-		return L.ApiParamError("Invalid 'self', must not be nil.");
+		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
 	// Check and get the overloaded params:
 	cCuboid bounds;
 	auto nextIdx = readCuboidOverloadParams(L, 2, bounds);
+	bounds.Sort();
+	if (!(self->IsValidRelCoords(bounds.p1) && self->IsValidRelCoords(bounds.p2)))
+	{
+		return L.FApiParamError(
+			"The bounds ({0} - {1}) are out of range ({2} - {3})",
+			bounds.p1,
+			bounds.p2,
+			Vector3i(0, 0, 0),
+			(self->GetSize() - Vector3i{1, 1, 1})
+		);
+	}
 	int dataTypes = cBlockArea::baTypes | cBlockArea::baMetas | cBlockArea::baBlockEntities;
 	BLOCKTYPE blockType;
 	NIBBLETYPE blockMeta = 0, blockLight = 0, blockSkyLight = 0x0f;
@@ -174,14 +179,8 @@ static int tolua_cBlockArea_FillRelCuboid(lua_State * a_LuaState)
 	L.GetStackValues(nextIdx + 2, blockMeta, blockLight, blockSkyLight);  // These values are optional
 	if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
 	{
-		return L.ApiParamError("Invalid baDataTypes combination (%d).", dataTypes);
+		return L.ApiParamError("Invalid baDataTypes combination (%d)", dataTypes);
 	}
-
-	// Check the coords, shift if needed:
-	bounds.Sort();
-	bounds.ClampX(0, self->GetSizeX());
-	bounds.ClampY(0, self->GetSizeY());
-	bounds.ClampZ(0, self->GetSizeZ());
 
 	// Do the actual Fill:
 	self->FillRelCuboid(bounds, dataTypes, blockType, blockMeta, blockLight, blockSkyLight);
@@ -209,17 +208,15 @@ static int tolua_cBlockArea_GetBlockTypeMeta(lua_State * a_LuaState)
 	}
 	if (self == nullptr)
 	{
-		return L.ApiParamError("Invalid 'self', must not be nil.");
+		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
 	Vector3i coords;
 	readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidCoords(coords))
 	{
-		return L.ApiParamError("Coords ({%d, %d, %d}) out of range ({%d, %d, %d} - {%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetOriginX(), self->GetOriginY(), self->GetOriginZ(),
-			self->GetOriginX() + self->GetSizeX() - 1, self->GetOriginY() + self->GetSizeY() - 1, self->GetOriginZ() + self->GetSizeZ() - 1
+		return L.FApiParamError("Coords ({0}) out of range ({1} - {2})",
+			coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}
 	BLOCKTYPE blockType;
@@ -249,11 +246,11 @@ static int tolua_cBlockArea_GetCoordRange(lua_State * a_LuaState)
 	cBlockArea * self;
 	if (!L.GetStackValues(1, self))
 	{
-		return L.ApiParamError("Cannot read the 'self' parameter.");
+		return L.ApiParamError("Cannot read the 'self' parameter");
 	}
 	if (self == nullptr)
 	{
-		return L.ApiParamError("Invalid 'self', must not be nil.");
+		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
 	L.Push(self->GetSizeX() - 1, self->GetSizeY() - 1, self->GetSizeZ() - 1);
@@ -319,11 +316,11 @@ static int tolua_cBlockArea_GetOrigin(lua_State * a_LuaState)
 	cBlockArea * self;
 	if (!L.GetStackValues(1, self))
 	{
-		return L.ApiParamError("Cannot read the 'self' parameter.");
+		return L.ApiParamError("Cannot read the 'self' parameter");
 	}
 	if (self == nullptr)
 	{
-		return L.ApiParamError("Invalid 'self', must not be nil.");
+		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
 	// Push the three origin coords:
@@ -349,11 +346,11 @@ static int tolua_cBlockArea_GetRelBlockTypeMeta(lua_State * a_LuaState)
 	cBlockArea * self;
 	if (!L.GetStackValues(1, self))
 	{
-		return L.ApiParamError("Cannot read the 'self' parameter.");
+		return L.ApiParamError("Cannot read the 'self' parameter");
 	}
 	if (self == nullptr)
 	{
-		return L.ApiParamError("Invalid 'self', must not be nil.");
+		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 	if (!self->HasBlockTypes())
 	{
@@ -368,9 +365,8 @@ static int tolua_cBlockArea_GetRelBlockTypeMeta(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidRelCoords(coords))
 	{
-		return L.ApiParamError("The coords ({%d, %d, %d}) are out of range (max {%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetSizeX() - 1, self->GetSizeY() - 1, self->GetSizeZ() - 1
+		return L.FApiParamError("The coords ({0}) are out of range (max {1})",
+			coords, (self->GetSize() - Vector3i{1, 1, 1})
 		);
 	}
 	BLOCKTYPE blockType;
@@ -400,11 +396,11 @@ static int tolua_cBlockArea_GetSize(lua_State * a_LuaState)
 	cBlockArea * self;
 	if (!L.GetStackValues(1, self))
 	{
-		return L.ApiParamError("Cannot read the 'self' parameter.");
+		return L.ApiParamError("Cannot read the 'self' parameter");
 	}
 	if (self == nullptr)
 	{
-		return L.ApiParamError("Invalid 'self', must not be nil.");
+		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
 	L.Push(self->GetSizeX(), self->GetSizeY(), self->GetSizeZ());
@@ -432,11 +428,11 @@ static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * a_LuaState)
 	AString fileName;
 	if (!L.GetStackValues(1, self, fileName))
 	{
-		return L.ApiParamError("Cannot read the parameters.");
+		return L.ApiParamError("Cannot read the parameters");
 	}
 	if (self == nullptr)
 	{
-		return L.ApiParamError("Invalid 'self', must not be nil.");
+		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
 	L.Push(cSchematicFileSerializer::LoadFromSchematicFile(*self, fileName));
@@ -464,11 +460,11 @@ static int tolua_cBlockArea_LoadFromSchematicString(lua_State * a_LuaState)
 	AString data;
 	if (!L.GetStackValues(1, self, data))
 	{
-		return L.ApiParamError("Cannot read the parameters.");
+		return L.ApiParamError("Cannot read the parameters");
 	}
 	if (self == nullptr)
 	{
-		return L.ApiParamError("Invalid 'self', must not be nil.");
+		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
 	L.Push(cSchematicFileSerializer::LoadFromSchematicString(*self, data));
@@ -497,11 +493,11 @@ static int tolua_cBlockArea_Read(lua_State * a_LuaState)
 	cWorld * world = nullptr;
 	if (!L.GetStackValues(1, self, world))
 	{
-		return L.ApiParamError("Cannot read self or world.");
+		return L.ApiParamError("Cannot read self or world");
 	}
 	if (world == nullptr)
 	{
-		return L.ApiParamError("Invalid world instance. The world must be not nil.");
+		return L.ApiParamError("Invalid world instance. The world must be not nil");
 	}
 
 	// Check and get the overloaded params:
@@ -511,39 +507,39 @@ static int tolua_cBlockArea_Read(lua_State * a_LuaState)
 	L.GetStackValues(dataTypesIdx, dataTypes);
 	if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
 	{
-		return L.ApiParamError("Invalid baDataTypes combination (%d).", dataTypes);
+		return L.ApiParamError("Invalid baDataTypes combination (%d)", dataTypes);
 	}
 
 	// Check the coords, shift if needed:
 	bounds.Sort();
 	if (bounds.p1.y < 0)
 	{
-		LOGWARNING("cBlockArea:Read(): MinBlockY less than zero, adjusting to zero. Coords: {%d, %d, %d} - {%d, %d, %d}",
-			bounds.p1.x, bounds.p1.y, bounds.p1.z, bounds.p2.x, bounds.p2.y, bounds.p2.z
+		FLOGWARNING("cBlockArea:Read(): MinBlockY less than zero, adjusting to zero. Coords: {0} - {1}",
+			bounds.p1, bounds.p2
 		);
 		L.LogStackTrace();
 		bounds.p1.y = 0;
 	}
 	else if (bounds.p1.y >= cChunkDef::Height)
 	{
-		LOGWARNING("cBlockArea:Read(): MinBlockY more than chunk height, adjusting to chunk height. Coords: {%d, %d, %d} - {%d, %d, %d}",
-			bounds.p1.x, bounds.p1.y, bounds.p1.z, bounds.p2.x, bounds.p2.y, bounds.p2.z
+		FLOGWARNING("cBlockArea:Read(): MinBlockY more than chunk height, adjusting to chunk height. Coords: {0} - {1}",
+			bounds.p1, bounds.p2
 		);
 		L.LogStackTrace();
 		bounds.p1.y = cChunkDef::Height - 1;
 	}
 	if (bounds.p2.y < 0)
 	{
-		LOGWARNING("cBlockArea:Read(): MaxBlockY less than zero, adjusting to zero. Coords: {%d, %d, %d} - {%d, %d, %d}",
-			bounds.p1.x, bounds.p1.y, bounds.p1.z, bounds.p2.x, bounds.p2.y, bounds.p2.z
+		FLOGWARNING("cBlockArea:Read(): MaxBlockY less than zero, adjusting to zero. Coords: {0} - {1}",
+			bounds.p1, bounds.p2
 		);
 		L.LogStackTrace();
 		bounds.p2.y = 0;
 	}
 	else if (bounds.p2.y > cChunkDef::Height)
 	{
-		LOGWARNING("cBlockArea:Read(): MaxBlockY more than chunk height, adjusting to chunk height. Coords: {%d, %d, %d} - {%d, %d, %d}",
-			bounds.p1.x, bounds.p1.y, bounds.p1.z, bounds.p2.x, bounds.p2.y, bounds.p2.z
+		FLOGWARNING("cBlockArea:Read(): MaxBlockY more than chunk height, adjusting to chunk height. Coords: {0} - {1}",
+			bounds.p1, bounds.p2
 		);
 		L.LogStackTrace();
 		bounds.p2.y = cChunkDef::Height;
@@ -573,7 +569,7 @@ static int tolua_cBlockArea_RelLine(lua_State * a_LuaState)
 	cBlockArea * self = nullptr;
 	if (!L.GetStackValues(1, self))
 	{
-		return L.ApiParamError("Cannot read self.");
+		return L.ApiParamError("Cannot read self");
 	}
 
 	// Check and get the overloaded params:
@@ -587,7 +583,7 @@ static int tolua_cBlockArea_RelLine(lua_State * a_LuaState)
 	L.GetStackValues(idx, dataTypes, blockType, blockMeta, blockLight, blockSkyLight);
 	if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
 	{
-		return L.ApiParamError("Invalid baDataTypes combination (%d).", dataTypes);
+		return L.ApiParamError("Invalid baDataTypes combination (%d)", dataTypes);
 	}
 	if ((self->GetDataTypes() & dataTypes) != dataTypes)
 	{
@@ -622,11 +618,11 @@ static int tolua_cBlockArea_SaveToSchematicFile(lua_State * a_LuaState)
 	AString fileName;
 	if (!L.GetStackValues(1, self, fileName))
 	{
-		return L.ApiParamError("Cannot read the parameters.");
+		return L.ApiParamError("Cannot read the parameters");
 	}
 	if (self == nullptr)
 	{
-		return L.ApiParamError("Invalid 'self', must not be nil.");
+		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
 	L.Push(cSchematicFileSerializer::SaveToSchematicFile(*self, fileName));
@@ -652,11 +648,11 @@ static int tolua_cBlockArea_SaveToSchematicString(lua_State * a_LuaState)
 	cBlockArea * self;
 	if (!L.GetStackValues(1, self))
 	{
-		return L.ApiParamError("Cannot read the 'self' parameter.");
+		return L.ApiParamError("Cannot read the 'self' parameter");
 	}
 	if (self == nullptr)
 	{
-		return L.ApiParamError("Invalid 'self', must not be nil.");
+		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
 	AString data;
@@ -690,11 +686,11 @@ static int tolua_cBlockArea_Write(lua_State * a_LuaState)
 	cWorld * world = nullptr;
 	if (!L.GetStackValues(1, self, world))
 	{
-		return L.ApiParamError("Cannot read self or world.");
+		return L.ApiParamError("Cannot read self or world");
 	}
 	if (world == nullptr)
 	{
-		return L.ApiParamError("Invalid world instance. The world must be not nil.");
+		return L.ApiParamError("Invalid world instance. The world must be not nil");
 	}
 
 	// Check and get the overloaded params:
@@ -708,7 +704,7 @@ static int tolua_cBlockArea_Write(lua_State * a_LuaState)
 	{
 		if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
 		{
-			return L.ApiParamError("Invalid datatype combination (%d).", dataTypes);
+			return L.ApiParamError("Invalid datatype combination (%d)", dataTypes);
 		}
 		if ((self->GetDataTypes() & dataTypes) != dataTypes)
 		{
@@ -775,13 +771,13 @@ static int GetBlock(lua_State * a_LuaState)
 	cBlockArea * self;
 	if (!L.GetStackValues(1, self))
 	{
-		return L.ApiParamError("Cannot read the 'self' param.");
+		return L.ApiParamError("Cannot read the 'self' param");
 	}
 
 	// Check the datatype's presence:
 	if ((self->GetDataTypes() & DataTypeFlag) == 0)
 	{
-		return L.ApiParamError("The area doesn't contain the datatype (%d).", DataTypeFlag);
+		return L.ApiParamError("The area doesn't contain the datatype (%d)", DataTypeFlag);
 	}
 
 	// Read the overloaded params:
@@ -789,10 +785,8 @@ static int GetBlock(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidCoords(coords))
 	{
-		return L.ApiParamError("The coords ({%d, %d, %d}) are out of range ({%d, %d, %d} - {%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetOriginX(), self->GetOriginY(), self->GetOriginZ(),
-			self->GetOriginX() + self->GetSizeX() - 1, self->GetOriginY() + self->GetSizeY() - 1, self->GetOriginZ() + self->GetSizeZ() - 1
+		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
+			coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}
 
@@ -828,13 +822,13 @@ static int GetRelBlock(lua_State * a_LuaState)
 	cBlockArea * self;
 	if (!L.GetStackValues(1, self))
 	{
-		return L.ApiParamError("Cannot read the 'self' param.");
+		return L.ApiParamError("Cannot read the 'self' param");
 	}
 
 	// Check the datatype's presence:
 	if ((self->GetDataTypes() & DataTypeFlag) == 0)
 	{
-		return L.ApiParamError("The area doesn't contain the datatype (%d).", DataTypeFlag);
+		return L.ApiParamError("The area doesn't contain the datatype (%d)", DataTypeFlag);
 	}
 
 	// Read the overloaded params:
@@ -842,9 +836,8 @@ static int GetRelBlock(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidRelCoords(coords))
 	{
-		return L.ApiParamError("The coords ({%d, %d, %d}) are out of range ({%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetSizeX(), self->GetSizeY(), self->GetSizeZ()
+		return L.FApiParamError("The coords ({0}) are out of range ({1})",
+			coords, (self->GetSize() - Vector3i(1, 1, 1))
 		);
 	}
 
@@ -880,13 +873,13 @@ static int SetBlock(lua_State * a_LuaState)
 	cBlockArea * self;
 	if (!L.GetStackValues(1, self))
 	{
-		return L.ApiParamError("Cannot read the 'self' param.");
+		return L.ApiParamError("Cannot read the 'self' param");
 	}
 
 	// Check the datatype's presence:
 	if ((self->GetDataTypes() & DataTypeFlag) == 0)
 	{
-		return L.ApiParamError("The area doesn't contain the datatype (%d).", DataTypeFlag);
+		return L.ApiParamError("The area doesn't contain the datatype (%d)", DataTypeFlag);
 	}
 
 	// Read the overloaded params:
@@ -894,10 +887,8 @@ static int SetBlock(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidCoords(coords))
 	{
-		return L.ApiParamError("The coords ({%d, %d, %d}) are out of range ({%d, %d, %d} - {%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetOriginX(), self->GetOriginY(), self->GetOriginZ(),
-			self->GetOriginX() + self->GetSizeX() - 1, self->GetOriginY() + self->GetSizeY() - 1, self->GetOriginZ() + self->GetSizeZ() - 1
+		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
+			coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}
 	DataType data;
@@ -935,13 +926,13 @@ static int SetRelBlock(lua_State * a_LuaState)
 	cBlockArea * self;
 	if (!L.GetStackValues(1, self))
 	{
-		return L.ApiParamError("Cannot read the 'self' param.");
+		return L.ApiParamError("Cannot read the 'self' param");
 	}
 
 	// Check the datatype's presence:
 	if ((self->GetDataTypes() & DataTypeFlag) == 0)
 	{
-		return L.ApiParamError("The area doesn't contain the datatype (%d).", DataTypeFlag);
+		return L.ApiParamError("The area doesn't contain the datatype (%d)", DataTypeFlag);
 	}
 
 	// Read the overloaded params:
@@ -949,9 +940,8 @@ static int SetRelBlock(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidRelCoords(coords))
 	{
-		return L.ApiParamError("The coords ({%d, %d, %d}) are out of range ({%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetSizeX(), self->GetSizeY(), self->GetSizeZ()
+		return L.FApiParamError("The coords ({0}) are out of range ({1})",
+			coords, (self->GetSize() - Vector3i(1, 1, 1))
 		);
 	}
 	DataType data;
@@ -979,13 +969,13 @@ static int tolua_cBlockArea_SetBlockTypeMeta(lua_State * a_LuaState)
 	cBlockArea * self;
 	if (!L.GetStackValues(1, self))
 	{
-		return L.ApiParamError("Cannot read the 'self' param.");
+		return L.ApiParamError("Cannot read the 'self' param");
 	}
 
 	// Check if block types and metas are present:
 	if (!self->HasBlockTypes() || !self->HasBlockMetas())
 	{
-		return L.ApiParamError("The area doesn't contain the datatypes baTypes and baMetas.");
+		return L.ApiParamError("The area doesn't contain the datatypes baTypes and baMetas");
 	}
 
 	// Read the overloaded params:
@@ -993,10 +983,8 @@ static int tolua_cBlockArea_SetBlockTypeMeta(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidCoords(coords))
 	{
-		return L.ApiParamError("The coords ({%d, %d, %d}) are out of range ({%d, %d, %d} - {%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetOriginX(), self->GetOriginY(), self->GetOriginZ(),
-			self->GetOriginX() + self->GetSizeX() - 1, self->GetOriginY() + self->GetSizeY() - 1, self->GetOriginZ() + self->GetSizeZ() - 1
+		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
+			coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}
 
@@ -1004,7 +992,7 @@ static int tolua_cBlockArea_SetBlockTypeMeta(lua_State * a_LuaState)
 	NIBBLETYPE meta;
 	if (!L.GetStackValues(idx, block, meta))
 	{
-		return L.ApiParamError("Bad number for block type or meta type.");
+		return L.ApiParamError("Bad number for block type or meta type");
 	}
 
 	// Set block type and meta:
@@ -1029,13 +1017,13 @@ static int tolua_cBlockArea_SetRelBlockTypeMeta(lua_State * a_LuaState)
 	cBlockArea * self;
 	if (!L.GetStackValues(1, self))
 	{
-		return L.ApiParamError("Cannot read the 'self' param.");
+		return L.ApiParamError("Cannot read the 'self' param");
 	}
 
 	// Check if block types and metas are present:
 	if (!self->HasBlockTypes() || !self->HasBlockMetas())
 	{
-		return L.ApiParamError("The area doesn't contain the baTypes or baMetas datatypes (0x%02x).", self->GetDataTypes());
+		return L.ApiParamError("The area doesn't contain the baTypes or baMetas datatypes (0x%02x)", self->GetDataTypes());
 	}
 
 	// Read the overloaded params:
@@ -1043,9 +1031,8 @@ static int tolua_cBlockArea_SetRelBlockTypeMeta(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidRelCoords(coords))
 	{
-		return L.ApiParamError("The coords ({%d, %d, %d}) are out of range ({%d, %d, %d}).",
-			coords.x, coords.y, coords.z,
-			self->GetSizeX(), self->GetSizeY(), self->GetSizeZ()
+		return L.FApiParamError("The coords ({0}) are out of range ({1})",
+			coords, (self->GetSize() - Vector3i(1, 1, 1))
 		);
 	}
 
@@ -1053,7 +1040,7 @@ static int tolua_cBlockArea_SetRelBlockTypeMeta(lua_State * a_LuaState)
 	NIBBLETYPE meta;
 	if (!L.GetStackValues(idx, block, meta))
 	{
-		return L.ApiParamError("Bad number for block type or meta type.");
+		return L.ApiParamError("Bad number for block type or meta type");
 	}
 
 	// Set block type and meta:

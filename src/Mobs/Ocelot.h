@@ -8,10 +8,10 @@
 
 
 
-class cOcelot :
+class cOcelot:
 	public cPassiveMonster
 {
-	typedef cPassiveMonster super;
+	using Super = cPassiveMonster;
 
 public:
 
@@ -30,7 +30,6 @@ public:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void TickFollowPlayer();
-	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void GetBreedingItems(cItems & a_Items) override
 	{
 		a_Items.Add(E_ITEM_RAW_FISH);

@@ -20,10 +20,12 @@ static const int SEED_OFFSET = 135;
 
 // Emit a warning if the first param is true
 #define CONDWARNING(ShouldLog, Fmt, ...) \
-	if (ShouldLog) \
-	{ \
-		LOGWARNING(Fmt, __VA_ARGS__); \
-	}
+	do { \
+		if (ShouldLog) \
+		{ \
+			LOGWARNING(Fmt, __VA_ARGS__); \
+		} \
+	} while (false)
 
 
 
@@ -36,37 +38,40 @@ static const int SEED_OFFSET = 135;
 Returns true if successful, false on failure.
 If a_LogWarnings is true, outputs failure reasons to console.
 The range is returned in a_Min and a_Range, they are left unchanged if the range value is not present in the string. */
-static bool ParseRange(const AString & a_Params, int & a_Min, int & a_Range, bool a_LogWarnings)
+namespace VerticalStrategy
 {
-	auto params = StringSplitAndTrim(a_Params, "|");
-	if (params.size() == 0)
+	static bool ParseRange(const AString & a_Params, int & a_Min, int & a_Range, bool a_LogWarnings)
 	{
-		// No params, generate directly on top:
+		auto params = StringSplitAndTrim(a_Params, "|");
+		if (params.size() == 0)
+		{
+			// No params, generate directly on top:
+			return true;
+		}
+		if (!StringToInteger(params[0], a_Min))
+		{
+			// Failed to parse the min rel height:
+			CONDWARNING(a_LogWarnings, "Cannot parse minimum height from string \"%s\"!", params[0].c_str());
+			return false;
+		}
+		if (params.size() == 1)
+		{
+			// Only one param was given, there's no range
+			return true;
+		}
+		int maxHeight = a_Min;
+		if (!StringToInteger(params[1], maxHeight))
+		{
+			CONDWARNING(a_LogWarnings, "Cannot parse maximum height from string \"%s\"!", params[1].c_str());
+			return false;
+		}
+		if (maxHeight < a_Min)
+		{
+			std::swap(maxHeight, a_Min);
+		}
+		a_Range = maxHeight - a_Min + 1;
 		return true;
 	}
-	if (!StringToInteger(params[0], a_Min))
-	{
-		// Failed to parse the min rel height:
-		CONDWARNING(a_LogWarnings, "Cannot parse minimum height from string \"%s\"!", params[0].c_str());
-		return false;
-	}
-	if (params.size() == 1)
-	{
-		// Only one param was given, there's no range
-		return true;
-	}
-	int maxHeight = a_Min;
-	if (!StringToInteger(params[1], maxHeight))
-	{
-		CONDWARNING(a_LogWarnings, "Cannot parse maximum height from string \"%s\"!", params[1].c_str());
-		return false;
-	}
-	if (maxHeight < a_Min)
-	{
-		std::swap(maxHeight, a_Min);
-	}
-	a_Range = maxHeight - a_Min + 1;
-	return true;
 }
 
 
@@ -188,7 +193,7 @@ public:
 		int ChunkX, ChunkZ;
 		cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
 		cChunkDef::HeightMap HeightMap;
-		m_HeightGen->GenHeightMap(ChunkX, ChunkZ, HeightMap);
+		m_HeightGen->GenHeightMap({ChunkX, ChunkZ}, HeightMap);
 		cNoise noise(m_Seed);
 		int rel = m_MinRelHeight + (noise.IntNoise2DInt(a_BlockX, a_BlockZ) / 7) % m_RelHeightRange + 1;
 		return cChunkDef::GetHeight(HeightMap, a_BlockX - ChunkX * cChunkDef::Width, a_BlockZ - ChunkZ * cChunkDef::Width) + rel;
@@ -200,7 +205,7 @@ public:
 		// Params: "<MinRelativeHeight>|<MaxRelativeHeight>", all optional
 		m_MinRelHeight = 0;
 		m_RelHeightRange = 1;
-		return ParseRange(a_Params, m_MinRelHeight, m_RelHeightRange, a_LogWarnings);
+		return VerticalStrategy::ParseRange(a_Params, m_MinRelHeight, m_RelHeightRange, a_LogWarnings);
 	}
 
 
@@ -242,7 +247,7 @@ public:
 		int ChunkX, ChunkZ;
 		cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
 		cChunkDef::HeightMap HeightMap;
-		m_HeightGen->GenHeightMap(ChunkX, ChunkZ, HeightMap);
+		m_HeightGen->GenHeightMap({ChunkX, ChunkZ}, HeightMap);
 		int terrainHeight = static_cast<int>(cChunkDef::GetHeight(HeightMap, a_BlockX - ChunkX * cChunkDef::Width, a_BlockZ - ChunkZ * cChunkDef::Width));
 		terrainHeight = std::max(1 + terrainHeight, m_SeaLevel);
 		cNoise noise(m_Seed);
@@ -256,7 +261,7 @@ public:
 		// Params: "<MinRelativeHeight>|<MaxRelativeHeight>", all optional
 		m_MinRelHeight = 0;
 		m_RelHeightRange = 1;
-		return ParseRange(a_Params, m_MinRelHeight, m_RelHeightRange, a_LogWarnings);
+		return VerticalStrategy::ParseRange(a_Params, m_MinRelHeight, m_RelHeightRange, a_LogWarnings);
 	}
 
 

@@ -12,12 +12,15 @@
 
 
 
-class cItemShovelHandler : public cItemHandler
+class cItemShovelHandler:
+	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
-	cItemShovelHandler(int a_ItemType)
-		: cItemHandler(a_ItemType)
+
+	cItemShovelHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
 
@@ -36,21 +39,7 @@ public:
 
 
 
-	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
-	{
-		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		if (Block == E_BLOCK_SNOW)
-		{
-			cChunkInterface ChunkInterface(a_World->GetChunkMap());
-			cBlockInServerPluginInterface PluginInterface(*a_World);
-			BlockHandler(Block)->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 
-			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
-			a_Player->UseEquippedItem(cItemHandler::dlaBreakBlock);
-			return true;
-		}
-		return false;
-	}
 
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
@@ -58,8 +47,12 @@ public:
 		{
 			return true;
 		}
-		return super::CanHarvestBlock(a_BlockType);
+		return Super::CanHarvestBlock(a_BlockType);
 	}
+
+
+
+
 
 	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
 	{
@@ -73,6 +66,10 @@ public:
 		}
 		return false;
 	}
+
+
+
+
 
 	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) override
 	{
@@ -101,9 +98,7 @@ public:
 				}
 				break;
 			}
-			default: return super::GetBlockBreakingStrength(a_Block);
 		}
-		ASSERT(!"Something is wrong here... Maybe they are shovels out of a new material?");
-		return 1.0f;
+		return Super::GetBlockBreakingStrength(a_Block);
 	}
 };

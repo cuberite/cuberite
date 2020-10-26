@@ -9,8 +9,8 @@
 #pragma once
 
 #include "Defines.h"
+#include "FastRandom.h"
 #include "WorldStorage/EnchantmentSerializer.h"
-
 
 
 
@@ -23,6 +23,7 @@ class cParsedNBT;
 struct cWeightedEnchantment;
 
 typedef std::vector<cWeightedEnchantment> cWeightedEnchantments;
+
 
 
 
@@ -87,7 +88,7 @@ public:
 	void AddFromString(const AString & a_StringSpec);
 
 	/** Get the count of enchantments */
-	size_t Count(void);
+	size_t Count(void) const;
 
 	/** Serializes all the enchantments into a string */
 	AString ToString(void) const;
@@ -137,10 +138,10 @@ public:
 	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_Enchantment);
 
 	/** Check enchantment conflicts from enchantments from the vector */
-	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, cEnchantments a_FirstEnchantment);
+	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_FirstEnchantment);
 
-	/** Gets random enchantment from Vector and returns it */
-	static cEnchantments GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments);
+	/** Gets random enchantment from Vector and returns it, with randomness derived from the provided PRNG. */
+	static cEnchantments GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, MTRand & a_Random);
 
 	/** Selects one enchantment from a Vector using cNoise. Mostly used for generators.
 	Uses the enchantments' weights for the random distribution.

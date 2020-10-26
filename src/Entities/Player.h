@@ -24,12 +24,18 @@ class cTeam;
 
 
 // tolua_begin
-class cPlayer :
+class cPlayer:
 	public cPawn
 {
-	typedef cPawn super;
+
+	// tolua_end
+
+	using Super = cPawn;
+
+	// tolua_begin
 
 public:
+
 	static const int MAX_HEALTH;
 
 	static const int MAX_FOOD_LEVEL;
@@ -42,7 +48,7 @@ public:
 	CLASS_PROTODEF(cPlayer)
 
 
-	cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName);
+	cPlayer(const cClientHandlePtr & a_Client, const AString & a_PlayerName);
 
 	virtual bool Initialize(OwnedEntity a_Self, cWorld & a_World) override;
 
@@ -97,10 +103,10 @@ public:
 	inline int GetCurrentXp(void) { return m_CurrentXp; }
 
 	/** Gets the current level - XpLevel */
-	int GetXpLevel(void);
+	int GetXpLevel(void) const;
 
 	/** Gets the experience bar percentage - XpP */
-	float GetXpPercentage(void);
+	float GetXpPercentage(void) const;
 
 	/** Calculates the amount of XP needed for a given level
 	Ref: https://minecraft.gamepedia.com/XP
@@ -166,6 +172,9 @@ public:
 	*/
 	void SendRotation(double a_YawDegrees, double a_PitchDegrees);
 
+	/** Spectates the target entity. If a_Target is nullptr or a pointer to self, end spectation. */
+	void SpectateEntity(cEntity * a_Target);
+
 	/** Returns the position where projectiles thrown by this player should start, player eye position + adjustment */
 	Vector3d GetThrowStartPos(void) const;
 
@@ -213,6 +222,9 @@ public:
 	/** Returns the associated team, nullptr if none */
 	cTeam * GetTeam(void) { return m_Team; }  // tolua_export
 
+	/** Returns the associated team, nullptr if none */
+	const cTeam * GetTeam(void) const { return m_Team; }
+
 	/** Sets the player team, nullptr if none */
 	void SetTeam(cTeam * a_Team);
 
@@ -226,9 +238,8 @@ public:
 
 	/** Awards the player an achievement.
 	If all prerequisites are met, this method will award the achievement and will broadcast a chat message.
-	If the achievement has been already awarded to the player, this method will just increment the stat counter.
-	Returns the _new_ stat value. (0 = Could not award achievement) */
-	unsigned int AwardAchievement(const eStatistic a_Ach);
+	If the achievement has been already awarded to the player, this method will just increment the stat counter. */
+	void AwardAchievement(Statistic a_Ach);
 
 	void SetIP(const AString & a_IP);
 
@@ -254,6 +265,13 @@ public:
 	cClientHandle * GetClientHandle(void) const { return m_ClientHandle.get(); }
 
 	// tolua_end
+
+	/** Get a copy of the PRNG for enchanting related generation, don't use this for other purposes.
+	The PRNG's state is initialised with an internal seed, such that until PermuteEnchantmentSeed is called, this function returns the same PRNG. */
+	MTRand GetEnchantmentRandomProvider();
+
+	/** Permute the seed for enchanting related PRNGs, don't use this for other purposes. */
+	void PermuteEnchantmentSeed();
 
 	/** Returns the SharedPtr to client handle associated with the player. */
 	cClientHandlePtr GetClientHandlePtr(void) const { return m_ClientHandle; }
@@ -310,6 +328,13 @@ public:
 	/** tosses the item in the selected hotbar slot */
 	void TossEquippedItem(char a_Amount = 1);
 
+	/** Removes one item from the the current equipped item stack, and attempts to add the specified item stack
+	back to the same slot. If it is not possible to place the item in the same slot, tries to place the specified
+	item elsewhere in the inventory. If this is not possible, then any remaining items are tossed. If the currently
+	equipped slot is empty, its contents are simply set to the given Item.
+	*/
+	void ReplaceOneEquippedItemTossRest(const cItem &);
+
 	/** tosses the item held in hand (when in UI windows) */
 	void TossHeldItem(char a_Amount = 1);
 
@@ -356,6 +381,9 @@ public:
 
 	// tolua_end
 
+	/** Tosses a list of items. */
+	void TossItems(const cItems & a_Items);
+
 	/** Sets a player's in-bed state
 	We can't be sure plugins will keep this value updated, so no exporting
 	If value is false (not in bed), will update players of the fact that they have been ejected from the bed
@@ -386,10 +414,6 @@ public:
 
 	void SetVisible( bool a_bVisible);  // tolua_export
 	bool IsVisible(void) const { return m_bVisible; }  // tolua_export
-
-	/** Moves the player to the specified world.
-	Returns true if successful, false on failure (world not found). */
-	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition) override;
 
 	/** Saves all player data, such as inventory, to JSON */
 	bool SaveToDisk(void);
@@ -576,11 +600,24 @@ public:
 	The player removes its m_ClientHandle ownership so that the ClientHandle gets deleted. */
 	void RemoveClientHandle(void);
 
-	/** Returns the relative block hardness for the block a_Block.
-	The bigger it is the faster the player can break the block.
-	Returns zero if the block is instant breakable.
-	Otherwise it returns the dig speed (float GetDigSpeed(BLOCKTYPE a_Block)) divided by the block hardness (cBlockInfo::GetHardness(BLOCKTYPE a_Block)) divided by 30 if the player can harvest the block and divided by 100 if he can't. */
-	float GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block);
+	/** Returns the progress mined per tick for the block a_Block as a fraction
+	(1 would be completely mined)
+	Depends on hardness values so check those are correct.
+	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
+	float GetMiningProgressPerTick(BLOCKTYPE a_Block);
+
+	/** Given tool, enchantments, status effects, and world position
+	returns whether a_Block would be instantly mined.
+	Depends on hardness values so check those are correct.
+	Source: https://minecraft.gamepedia.com/Breaking#Instant_breaking */
+	bool CanInstantlyMine(BLOCKTYPE a_Block);
+
+	/** get player explosion exposure rate */
+	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower) override;
+
+	/** Adds an Item to the list of known items.
+	If the item is already known, does nothing. */
+	void AddKnownItem(const cItem & a_Item);
 
 protected:
 
@@ -697,6 +734,7 @@ protected:
 	/** Player Xp level */
 	int m_LifetimeTotalXp;
 	int m_CurrentXp;
+	unsigned int m_EnchantmentSeed;
 
 	// flag saying we need to send a xp update to client
 	bool m_bDirtyExperience;
@@ -735,11 +773,16 @@ protected:
 	/** The main hand of the player */
 	eMainHand m_MainHand;
 
+	/** List on known recipes as Ids */
+	std::set<UInt32> m_KnownRecipes;
+
+	/** List of known items as Ids */
+	std::set<cItem, cItem::sItemCompare> m_KnownItems;
+
+	virtual void DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo) override;
+
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
-
-	void ResolvePermissions(void);
-	void ResolveGroups(void);
 
 	virtual void Destroyed(void) override;
 
@@ -752,15 +795,9 @@ protected:
 	/** Called in each tick if the player is fishing to make sure the floater dissapears when the player doesn't have a fishing rod as equipped item. */
 	void HandleFloater(void);
 
-	/** Tosses a list of items. */
-	void TossItems(const cItems & a_Items);
-
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const cUUID & a_UUID);
-
-	/** get player explosion exposure rate */
-	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower) override;
 private:
 
 	/** Pins the player to a_Location until Unfreeze() is called.
@@ -777,8 +814,13 @@ private:
 	Returns one if using hand.
 	If the player is using a tool that is good to break the block the value is higher.
 	If he has an enchanted tool with efficiency or he has a haste or mining fatique effect it gets multiplied by a specific factor depending on the strength of the effect or enchantment.
-	In he is in water it gets divided by 5 except his tool is enchanted with aqa affinity.
-	If he is not on ground it also gets divided by 5. */
+	In he is in water it gets divided by 5 except if his tool is enchanted with aqua affinity.
+	If he is not on ground it also gets divided by 5.
+	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
 	float GetDigSpeed(BLOCKTYPE a_Block);
+
+	/** Add the recipe Id to the known recipes.
+	If the recipe is already known, does nothing. */
+	void AddKnownRecipe(UInt32 RecipeId);
 
 } ;  // tolua_export

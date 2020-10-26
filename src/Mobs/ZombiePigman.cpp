@@ -2,14 +2,14 @@
 
 #include "ZombiePigman.h"
 #include "../World.h"
-#include "ClientHandle.h"
+#include "../ClientHandle.h"
 
 
 
 
 
 cZombiePigman::cZombiePigman(void) :
-	super("ZombiePigman", mtZombiePigman, "entity.zombie_pig.hurt", "entity.zombie_pig.death", 0.6, 1.8)
+	Super("ZombiePigman", mtZombiePigman, "entity.zombie_pig.hurt", "entity.zombie_pig.death", "entity.zombie_pig.ambient", 0.6, 1.8)
 {
 }
 
@@ -40,7 +40,7 @@ void cZombiePigman::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cZombiePigman::SpawnOn(cClientHandle & a_ClientHandle)
 {
-		super::SpawnOn(a_ClientHandle);
+		Super::SpawnOn(a_ClientHandle);
 		a_ClientHandle.SendEntityEquipment(*this, 0, cItem(E_ITEM_GOLD_SWORD));
 }
 
@@ -50,7 +50,7 @@ void cZombiePigman::SpawnOn(cClientHandle & a_ClientHandle)
 
 void cZombiePigman::KilledBy(TakeDamageInfo & a_TDI)
 {
-	super::KilledBy(a_TDI);
+	Super::KilledBy(a_TDI);
 
 	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPlayer()))
 	{

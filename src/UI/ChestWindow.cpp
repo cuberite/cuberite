@@ -13,7 +13,7 @@
 
 
 
-cChestWindow::cChestWindow(cChestEntity * a_Chest) :
+cChestWindow::cChestWindow(cChestEntity * a_Chest):
 	cWindow(wtChest, (a_Chest->GetBlockType() == E_BLOCK_CHEST) ? "Chest" : "Trapped Chest"),
 	m_World(a_Chest->GetWorld()),
 	m_BlockPos(a_Chest->GetPos()),
@@ -115,13 +115,13 @@ void cChestWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_
 		// Chest Area
 		AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
 		AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
-		super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
+		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
 	}
 	else
 	{
 		// Hotbar or Inventory
 		AreasInOrder.push_back(m_SlotAreas[0]);  /* Chest */
-		super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
 }
 

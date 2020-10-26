@@ -9,12 +9,9 @@
 
 
 
-cZombie::cZombie(bool a_IsVillagerZombie) :
-	super("Zombie", mtZombie, "entity.zombie.hurt", "entity.zombie.death", 0.6, 1.8),
-	m_IsVillagerZombie(a_IsVillagerZombie),
-	m_IsConverting(false)
+cZombie::cZombie() :
+	Super("Zombie", mtZombie, "entity.zombie.hurt", "entity.zombie.death", "entity.zombie.ambient", 0.6, 1.8)
 {
-	SetBurnsInDaylight(true);
 }
 
 

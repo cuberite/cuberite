@@ -4,6 +4,7 @@
 // Implements the main app entrypoint for the cByteBuffer class test
 
 #include "Globals.h"
+#include "../TestHelpers.h"
 #include "ByteBuffer.h"
 
 
@@ -15,11 +16,14 @@ static void TestRead(void)
 	cByteBuffer buf(50);
 	buf.Write("\x05\xac\x02\x00", 4);
 	UInt32 v1;
-	assert_test(buf.ReadVarInt(v1) && (v1 == 5));
+	TEST_TRUE(buf.ReadVarInt(v1));
+	TEST_EQUAL(v1, 5);
 	UInt32 v2;
-	assert_test(buf.ReadVarInt(v2) && (v2 == 300));
+	TEST_TRUE(buf.ReadVarInt(v2));
+	TEST_EQUAL(v2, 300);
 	UInt32 v3;
-	assert_test(buf.ReadVarInt(v3) && (v3 == 0));
+	TEST_TRUE(buf.ReadVarInt(v3));
+	TEST_EQUAL(v3, 0);
 }
 
 
@@ -34,8 +38,8 @@ static void TestWrite(void)
 	buf.WriteVarInt32(0);
 	AString All;
 	buf.ReadAll(All);
-	assert_test(All.size() == 4);
-	assert_test(memcmp(All.data(), "\x05\xac\x02\x00", All.size()) == 0);
+	TEST_EQUAL(All.size(), 4);
+	TEST_EQUAL(memcmp(All.data(), "\x05\xac\x02\x00", All.size()), 0);
 }
 
 
@@ -48,17 +52,17 @@ static void TestWrap(void)
 	for (int i = 0; i < 1000; i++)
 	{
 		size_t FreeSpace = buf.GetFreeSpace();
-		assert_test(buf.GetReadableSpace() == 0);
-		assert_test(FreeSpace > 0);
-		assert_test(buf.Write("a", 1));
-		assert_test(buf.CanReadBytes(1));
-		assert_test(buf.GetReadableSpace() == 1);
+		TEST_EQUAL(buf.GetReadableSpace(), 0);
+		TEST_GREATER_THAN_OR_EQUAL(FreeSpace, 1);
+		TEST_TRUE(buf.Write("a", 1));
+		TEST_TRUE(buf.CanReadBytes(1));
+		TEST_EQUAL(buf.GetReadableSpace(), 1);
 		UInt8 v = 0;
-		assert_test(buf.ReadBEUInt8(v));
-		assert_test(v == 'a');
-		assert_test(buf.GetReadableSpace() == 0);
+		TEST_TRUE(buf.ReadBEUInt8(v));
+		TEST_EQUAL(v, 'a');
+		TEST_EQUAL(buf.GetReadableSpace(), 0);
 		buf.CommitRead();
-		assert_test(buf.GetFreeSpace() == FreeSpace);  // We're back to normal
+		TEST_EQUAL(buf.GetFreeSpace(), FreeSpace);  // We're back to normal
 	}
 }
 
@@ -66,23 +70,8 @@ static void TestWrap(void)
 
 
 
-int main(int argc, char * argv[])
-{
-	LOGD("Test started");
-
-	LOGD("Testing reads");
+IMPLEMENT_TEST_MAIN("ByteBuffer",
 	TestRead();
-
-	LOGD("Testing writes");
 	TestWrite();
-
-	LOGD("Testing wraps");
 	TestWrap();
-
-	LOG("ByteBuffer test finished.");
-}
-
-
-
-
-
+)

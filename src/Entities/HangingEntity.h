@@ -11,15 +11,15 @@
 class cHangingEntity :
 	public cEntity
 {
-	typedef cEntity super;
-
-public:
-
 	// tolua_end
+
+	using Super = cEntity;
+
+public:  // tolua_export
 
 	CLASS_PROTODEF(cHangingEntity)
 
-	cHangingEntity(eEntityType a_EntityType, eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z);
+	cHangingEntity(eEntityType a_EntityType, eBlockFace a_BlockFace, Vector3d a_Pos);
 
 	// tolua_begin
 

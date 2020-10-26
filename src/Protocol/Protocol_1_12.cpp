@@ -4,11 +4,12 @@
 /*
 Implements the 1.12 protocol classes:
 - release 1.12 protocol (#335)
+- release 1.12.1 protocol (#338)
+- release 1.12.2 protocol (#340)
 */
 
 #include "Globals.h"
 #include "Protocol_1_12.h"
-#include "ProtocolRecognizer.h"
 #include "Packetizer.h"
 
 #include "../Entities/Boat.h"
@@ -25,7 +26,9 @@ Implements the 1.12 protocol classes:
 #include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
+#include "../CraftingRecipes.h"
 #include "../Bindings/PluginManager.h"
+#include "../JsonUtils.h"
 
 
 
@@ -42,9 +45,9 @@ Implements the 1.12 protocol classes:
 #pragma clang diagnostic ignored "-Wduplicate-enum"
 #endif
 
-namespace Metadata
+namespace Metadata_1_12
 {
-	enum Metadata_Index
+	enum MetadataIndex
 	{
 		// Entity
 		ENTITY_FLAGS,
@@ -305,119 +308,23 @@ namespace Metadata
 
 #define HANDLE_READ(ByteBuf, Proc, Type, Var) \
 	Type Var; \
-	if (!ByteBuf.Proc(Var))\
-	{\
-		return;\
-	}
+	do { \
+		if (!ByteBuf.Proc(Var))\
+		{\
+			return;\
+		} \
+	} while (false)
 
 
 
 
 
-cProtocol_1_12::cProtocol_1_12(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
-{
-}
-
-
-
-
-
-void cProtocol_1_12::SendSpawnMob(const cMonster & a_Mob)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, 0x03);  // Spawn Mob packet
-	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
-	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
-	Pkt.WriteBEUInt64(0);
-	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Mob.GetMobType()));
-	Pkt.WriteBEDouble(a_Mob.GetPosX());
-	Pkt.WriteBEDouble(a_Mob.GetPosY());
-	Pkt.WriteBEDouble(a_Mob.GetPosZ());
-	Pkt.WriteByteAngle(a_Mob.GetPitch());
-	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
-	Pkt.WriteByteAngle(a_Mob.GetYaw());
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedX() * 400));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
-	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
-	WriteEntityMetadata(Pkt, a_Mob);
-	Pkt.WriteBEUInt8(0xff);  // Metadata terminator
-}
-
-
-
-
-
-void cProtocol_1_12::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
-{
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadPosition64(BlockX, BlockY, BlockZ))
-	{
-		return;
-	}
-
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Face);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorX);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorY);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16), HandIntToEnum(Hand));
-}
-
-
-
-
-
-void cProtocol_1_12::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
-{
-	cServer * Server = cRoot::Get()->GetServer();
-	AString ServerDescription = Server->GetDescription();
-	auto NumPlayers = static_cast<signed>(Server->GetNumPlayers());
-	auto MaxPlayers = static_cast<signed>(Server->GetMaxPlayers());
-	AString Favicon = Server->GetFaviconData();
-	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
-
-	// Version:
-	Json::Value Version;
-	Version["name"] = "Cuberite 1.12";
-	Version["protocol"] = cProtocolRecognizer::PROTO_VERSION_1_12;
-
-	// Players:
-	Json::Value Players;
-	Players["online"] = NumPlayers;
-	Players["max"] = MaxPlayers;
-	// TODO: Add "sample"
-
-	// Description:
-	Json::Value Description;
-	Description["text"] = ServerDescription.c_str();
-
-	// Create the response:
-	Json::Value ResponseValue;
-	ResponseValue["version"] = Version;
-	ResponseValue["players"] = Players;
-	ResponseValue["description"] = Description;
-	m_Client->ForgeAugmentServerListPing(ResponseValue);
-	if (!Favicon.empty())
-	{
-		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
-	}
-
-	// Serialize the response into a packet:
-	Json::FastWriter Writer;
-	cPacketizer Pkt(*this, 0x00);  // Response packet
-	Pkt.WriteString(Writer.write(ResponseValue));
-}
-
-
-
-
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_12:
 
 void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
 {
-	using namespace Metadata;
+	using namespace Metadata_1_12;
 
 	// Common metadata:
 	Int8 Flags = 0;
@@ -624,7 +531,7 @@ void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 
 void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 {
-	using namespace Metadata;
+	using namespace Metadata_1_12;
 
 	// Living Enitiy Metadata
 	if (a_Mob.HasCustomName())
@@ -860,17 +767,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtSheep
 
-		case mtSkeleton:
-		{
-			// XXX Skeletons are separate entities; all skeletons are currently treated as regular ones
-
-			// auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
-			// a_Pkt.WriteBEUInt8(SKELETON_TYPE);
-			// a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			// a_Pkt.WriteVarInt32(Skeleton.IsWither() ? 1 : 0);
-			break;
-		}  // case mtSkeleton
-
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -964,9 +860,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			// a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			// a_Pkt.WriteVarInt32(Zombie.IsVillagerZombie() ? 1 : 0);
 
-			// a_Pkt.WriteBEUInt8(ZOMBIE_CONVERTING);
-			// a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			// a_Pkt.WriteBool(Zombie.IsConverting());
 			break;
 		}  // case mtZombie
 
@@ -978,6 +871,23 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			a_Pkt.WriteBool(ZombiePigman.IsBaby());
 			break;
 		}  // case mtZombiePigman
+
+		case mtZombieVillager:
+		{
+			auto & ZombieVillager = reinterpret_cast<const cZombieVillager &>(a_Mob);
+			a_Pkt.WriteBEUInt8(ZOMBIE_IS_BABY);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(ZombieVillager.IsBaby());
+
+			a_Pkt.WriteBEUInt8(ZOMBIE_VILLAGER_CONVERTING);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(ZombieVillager.ConversionTime()));
+
+			a_Pkt.WriteBEUInt8(ZOMBIE_VILLAGER_PROFESSION);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(ZombieVillager.GetProfession()));
+			break;
+		}  // case mtZombieVillager
 
 		case mtBlaze:
 		case mtEnderDragon:
@@ -999,7 +909,9 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtGiant:
 		case mtSilverfish:
+		case mtSkeleton:
 		case mtSquid:
+		case mtWitherSkeleton:
 		{
 			// Mobs with no extra fields
 			break;
@@ -1017,10 +929,70 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 
 
+UInt32 cProtocol_1_12::GetPacketID(cProtocol::ePacketType a_Packet)
+{
+	switch (a_Packet)
+	{
+		case pktAttachEntity:        return 0x42;
+		case pktCameraSetTo:         return 0x38;
+		case pktCollectEntity:       return 0x4a;
+		case pktDestroyEntity:       return 0x31;
+		case pktDisplayObjective:    return 0x3a;
+		case pktEntityEffect:        return 0x4e;
+		case pktEntityEquipment:     return 0x3e;
+		case pktEntityHeadLook:      return 0x35;
+		case pktEntityLook:          return 0x28;
+		case pktEntityMeta:          return 0x3b;
+		case pktEntityProperties:    return 0x4d;
+		case pktEntityRelMove:       return 0x26;
+		case pktEntityRelMoveLook:   return 0x27;
+		case pktEntityVelocity:      return 0x3d;
+		case pktExperience:          return 0x3f;
+		case pktHeldItemChange:      return 0x39;
+		case pktLeashEntity:         return 0x3c;
+		case pktPlayerMaxSpeed:      return 0x4d;
+		case pktRemoveEntityEffect:  return 0x32;
+		case pktResourcePack:        return 0x33;
+		case pktRespawn:             return 0x34;
+		case pktScoreboardObjective: return 0x41;
+		case pktSpawnPosition:       return 0x45;
+		case pktTeleportEntity:      return 0x4b;
+		case pktTimeUpdate:          return 0x46;
+		case pktTitle:               return 0x47;
+		case pktUnlockRecipe:        return 0x30;
+		case pktUpdateBlockEntity:   return 0x09;
+		case pktUpdateHealth:        return 0x40;
+		case pktUpdateScore:         return 0x44;
+
+		default: return Super::GetPacketID(a_Packet);
+	}
+}
+
+
+
+
+
+void cProtocol_1_12::HandleCraftRecipe(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8,  WindowID);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt,  UInt32, RecipeID);
+	HANDLE_READ(a_ByteBuffer, ReadBool,    bool,   MakeAll);
+	auto CuberiteRecipeId = cRoot::Get()->GetRecipeMapper()->GetCuberiteRecipeId(RecipeID, m_Client->GetProtocolVersion());
+	if (CuberiteRecipeId.has_value())
+	{
+		m_Client->HandleCraftRecipe(CuberiteRecipeId.value());
+	}
+}
+
+
+
+
+
 void cProtocol_1_12::HandlePacketCraftingBookData(cByteBuffer & a_ByteBuffer)
 {
+	// TODO not yet used, not sure if it is needed
+	// https://wiki.vg/index.php?title=Protocol&oldid=14204#Crafting_Book_Data
 	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
-	m_Client->GetPlayer()->SendMessageInfo("The green crafting book feature is not implemented yet.");
 }
 
 
@@ -1037,53 +1009,9 @@ void cProtocol_1_12::HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_12::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks)
+cProtocol::Version cProtocol_1_12::GetProtocolVersion()
 {
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
-	Pkt.WriteVarInt32(3);  // Set title display times
-	Pkt.WriteBEInt32(a_FadeInTicks);
-	Pkt.WriteBEInt32(a_DisplayTicks);
-	Pkt.WriteBEInt32(a_FadeOutTicks);
-}
-
-
-
-
-
-void cProtocol_1_12::SendHideTitle(void)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
-	Pkt.WriteVarInt32(4);  // Hide title
-}
-
-
-
-
-
-void cProtocol_1_12::SendResetTitle(void)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
-	Pkt.WriteVarInt32(5);  // Reset title
-}
-
-
-
-
-
-void cProtocol_1_12::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, GetPacketId(sendCollectEntity));  // Collect Item packet
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteVarInt32(a_Player.GetUniqueID());
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Count));
+	return Version::v1_12;
 }
 
 
@@ -1094,9 +1022,8 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 {
 	switch (m_State)
 	{
-		case 1:
+		case State::Status:
 		{
-			// Status
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
@@ -1105,9 +1032,8 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 			break;
 		}
 
-		case 2:
+		case State::Login:
 		{
-			// Login
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketLoginStart(a_ByteBuffer); return true;
@@ -1116,9 +1042,8 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 			break;
 		}
 
-		case 3:
+		case State::Game:
 		{
-			// Game
 			switch (a_PacketType)
 			{
 				case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
@@ -1145,7 +1070,7 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 				case 0x15: HandlePacketEntityAction(a_ByteBuffer); return true;
 				case 0x16: HandlePacketSteerVehicle(a_ByteBuffer); return true;
 				case 0x17: HandlePacketCraftingBookData(a_ByteBuffer); return true;
-				case 0x18: break;  // Resource pack status - not yet implemented
+				case 0x18: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
 				case 0x19: HandlePacketAdvancementTab(a_ByteBuffer); return true;
 				case 0x1a: HandlePacketSlotSelect(a_ByteBuffer); return true;
 				case 0x1b: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
@@ -1156,23 +1081,6 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 				case 0x20: HandlePacketUseItem(a_ByteBuffer); return true;
 			}
 			break;
-		}
-		default:
-		{
-			// Received a packet in an unknown state, report:
-			LOGWARNING("Received a packet in an unknown protocol state %d. Ignoring further packets.", m_State);
-
-			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
-
-			// Switch to a state when all further packets are silently ignored:
-			m_State = 255;
-			return false;
-		}
-		case 255:
-		{
-			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
-			// Do not output anything (the caller will do that for us), just return failure
-			return false;
 		}
 	}  // switch (m_State)
 
@@ -1185,53 +1093,55 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 
 
 
-cProtocol_1_12_1::cProtocol_1_12_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_12_1:
+
+UInt32 cProtocol_1_12_1::GetPacketID(ePacketType a_Packet)
 {
+	switch (a_Packet)
+	{
+		case pktAttachEntity:        return 0x43;
+		case pktCameraSetTo:         return 0x39;
+		case pktCollectEntity:       return 0x4b;
+		case pktDestroyEntity:       return 0x32;
+		case pktDisplayObjective:    return 0x3b;
+		case pktEntityEffect:        return 0x4f;
+		case pktEntityEquipment:     return 0x3f;
+		case pktEntityHeadLook:      return 0x36;
+		case pktEntityMeta:          return 0x3c;
+		case pktEntityProperties:    return 0x4e;
+		case pktEntityVelocity:      return 0x3e;
+		case pktExperience:          return 0x40;
+		case pktHeldItemChange:      return 0x3a;
+		case pktLeashEntity:         return 0x3d;
+		case pktPlayerList:          return 0x2e;
+		case pktPlayerAbilities:     return 0x2c;
+		case pktPlayerMaxSpeed:      return 0x4e;
+		case pktPlayerMoveLook:      return 0x2f;
+		case pktRemoveEntityEffect:  return 0x33;
+		case pktResourcePack:        return 0x34;
+		case pktRespawn:             return 0x35;
+		case pktScoreboardObjective: return 0x42;
+		case pktSpawnPosition:       return 0x46;
+		case pktUnlockRecipe:        return 0x31;
+		case pktUpdateHealth:        return 0x41;
+		case pktUpdateScore:         return 0x45;
+		case pktUseBed:              return 0x30;
+		case pktTeleportEntity:      return 0x4c;
+		case pktTimeUpdate:          return 0x47;
+		case pktTitle:               return 0x48;
+
+		default: return Super::GetPacketID(a_Packet);
+	}
 }
 
 
 
 
 
-void cProtocol_1_12_1::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
+cProtocol::Version cProtocol_1_12_1::GetProtocolVersion()
 {
-	cServer * Server = cRoot::Get()->GetServer();
-	AString ServerDescription = Server->GetDescription();
-	auto NumPlayers = static_cast<signed>(Server->GetNumPlayers());
-	auto MaxPlayers = static_cast<signed>(Server->GetMaxPlayers());
-	AString Favicon = Server->GetFaviconData();
-	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
-
-	// Version:
-	Json::Value Version;
-	Version["name"] = "Cuberite 1.12.1";
-	Version["protocol"] = cProtocolRecognizer::PROTO_VERSION_1_12_1;
-
-	// Players:
-	Json::Value Players;
-	Players["online"] = NumPlayers;
-	Players["max"] = MaxPlayers;
-	// TODO: Add "sample"
-
-	// Description:
-	Json::Value Description;
-	Description["text"] = ServerDescription.c_str();
-
-	// Create the response:
-	Json::Value ResponseValue;
-	ResponseValue["version"] = Version;
-	ResponseValue["players"] = Players;
-	ResponseValue["description"] = Description;
-	if (!Favicon.empty())
-	{
-		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
-	}
-
-	// Serialize the response into a packet:
-	Json::FastWriter Writer;
-	cPacketizer Pkt(*this, 0x00);  // Response packet
-	Pkt.WriteString(Writer.write(ResponseValue));
+	return Version::v1_12_1;
 }
 
 
@@ -1242,9 +1152,8 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 {
 	switch (m_State)
 	{
-		case 1:
+		case State::Status:
 		{
-			// Status
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
@@ -1253,9 +1162,8 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 			break;
 		}
 
-		case 2:
+		case State::Login:
 		{
-			// Login
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketLoginStart(a_ByteBuffer); return true;
@@ -1264,9 +1172,8 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 			break;
 		}
 
-		case 3:
+		case State::Game:
 		{
-			// Game
 			switch (a_PacketType)
 			{
 				case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
@@ -1287,13 +1194,13 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x0f: HandlePacketPlayerLook(a_ByteBuffer); return true;
 				case 0x10: HandlePacketVehicleMove(a_ByteBuffer); return true;
 				case 0x11: HandlePacketBoatSteer(a_ByteBuffer); return true;
-				case 0x12: break;  // Craft Recipe Request - not yet implemented
+				case 0x12: HandleCraftRecipe(a_ByteBuffer); return true;
 				case 0x13: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
 				case 0x14: HandlePacketBlockDig(a_ByteBuffer); return true;
 				case 0x15: HandlePacketEntityAction(a_ByteBuffer); return true;
 				case 0x16: HandlePacketSteerVehicle(a_ByteBuffer); return true;
 				case 0x17: HandlePacketCraftingBookData(a_ByteBuffer); return true;
-				case 0x18: break;  // Resource pack status - not yet implemented
+				case 0x18: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
 				case 0x19: HandlePacketAdvancementTab(a_ByteBuffer); return true;
 				case 0x1a: HandlePacketSlotSelect(a_ByteBuffer); return true;
 				case 0x1b: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
@@ -1304,23 +1211,6 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x20: HandlePacketUseItem(a_ByteBuffer); return true;
 			}
 			break;
-		}
-		default:
-		{
-			// Received a packet in an unknown state, report:
-			LOGWARNING("Received a packet in an unknown protocol state %d. Ignoring further packets.", m_State);
-
-			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
-
-			// Switch to a state when all further packets are silently ignored:
-			m_State = 255;
-			return false;
-		}
-		case 255:
-		{
-			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
-			// Do not output anything (the caller will do that for us), just return failure
-			return false;
 		}
 	}  // switch (m_State)
 
@@ -1333,7 +1223,16 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cProtocol_1_12_2:
+// cProtocol_1_12_2::
+
+cProtocol::Version cProtocol_1_12_2::GetProtocolVersion()
+{
+	return Version::v1_12_2;
+}
+
+
+
+
 
 void cProtocol_1_12_2::HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer)
 {
@@ -1352,50 +1251,6 @@ void cProtocol_1_12_2::HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_12_2::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
-{
-	cServer * Server = cRoot::Get()->GetServer();
-	AString ServerDescription = Server->GetDescription();
-	auto NumPlayers = static_cast<signed>(Server->GetNumPlayers());
-	auto MaxPlayers = static_cast<signed>(Server->GetMaxPlayers());
-	AString Favicon = Server->GetFaviconData();
-	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
-
-	// Version:
-	Json::Value Version;
-	Version["name"] = "Cuberite 1.12.2";
-	Version["protocol"] = cProtocolRecognizer::PROTO_VERSION_1_12_2;
-
-	// Players:
-	Json::Value Players;
-	Players["online"] = NumPlayers;
-	Players["max"] = MaxPlayers;
-	// TODO: Add "sample"
-
-	// Description:
-	Json::Value Description;
-	Description["text"] = ServerDescription.c_str();
-
-	// Create the response:
-	Json::Value ResponseValue;
-	ResponseValue["version"] = Version;
-	ResponseValue["players"] = Players;
-	ResponseValue["description"] = Description;
-	if (!Favicon.empty())
-	{
-		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
-	}
-
-	// Serialize the response into a packet:
-	Json::FastWriter Writer;
-	cPacketizer Pkt(*this, 0x00);  // Response packet
-	Pkt.WriteString(Writer.write(ResponseValue));
-}
-
-
-
-
-
 void cProtocol_1_12_2::SendKeepAlive(UInt32 a_PingID)
 {
 	// Drop the packet if the protocol is not in the Game state yet (caused a client crash):
@@ -1405,6 +1260,58 @@ void cProtocol_1_12_2::SendKeepAlive(UInt32 a_PingID)
 		return;
 	}
 
-	cPacketizer Pkt(*this, GetPacketId(sendKeepAlive));  // Keep Alive packet
+	cPacketizer Pkt(*this, pktKeepAlive);
 	Pkt.WriteBEInt64(a_PingID);
+}
+
+
+
+
+
+void cProtocol_1_12_2::SendUnlockRecipe(UInt32 a_RecipeID)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	auto ProtocolRecipeId = cRoot::Get()->GetRecipeMapper()->GetProtocolRecipeId(a_RecipeID, m_Client->GetProtocolVersion());
+	if (ProtocolRecipeId.has_value())
+	{
+		cPacketizer Pkt(*this, pktUnlockRecipe);
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteBool(true);
+		Pkt.WriteBool(false);
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteVarInt32(ProtocolRecipeId.value());
+	}
+}
+
+
+
+
+
+void cProtocol_1_12_2::SendInitRecipes(UInt32 a_RecipeID)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	auto ProtocolRecipeId = cRoot::Get()->GetRecipeMapper()->GetProtocolRecipeId(a_RecipeID, m_Client->GetProtocolVersion());
+	if (!ProtocolRecipeId.has_value())
+	{
+		return;
+	}
+
+	cPacketizer Pkt(*this, pktUnlockRecipe);
+	Pkt.WriteVarInt32(0);
+	Pkt.WriteBool(true);
+	Pkt.WriteBool(false);
+	if (a_RecipeID == 0)
+	{
+		Pkt.WriteVarInt32(0);
+		Pkt.WriteVarInt32(0);
+	}
+	else
+	{
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteVarInt32(ProtocolRecipeId.value());
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteVarInt32(ProtocolRecipeId.value());
+	}
 }

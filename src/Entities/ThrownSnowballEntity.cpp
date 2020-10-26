@@ -7,8 +7,8 @@
 
 
 
-cThrownSnowballEntity::cThrownSnowballEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
-	super(pkSnowball, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
+cThrownSnowballEntity::cThrownSnowballEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
+	Super(pkSnowball, a_Creator, a_Pos, 0.25, 0.25),
 	m_DestroyTimer(-1)
 {
 	SetSpeed(a_Speed);
@@ -29,7 +29,7 @@ void cThrownSnowballEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitF
 
 void cThrownSnowballEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
-	super::OnHitEntity(a_EntityHit, a_HitPos);
+	Super::OnHitEntity(a_EntityHit, a_HitPos);
 
 	int TotalDamage = 0;
 	if (a_EntityHit.IsMob())
@@ -63,7 +63,7 @@ void cThrownSnowballEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chun
 	}
 	else
 	{
-		super::Tick(a_Dt, a_Chunk);
+		Super::Tick(a_Dt, a_Chunk);
 	}
 }
 

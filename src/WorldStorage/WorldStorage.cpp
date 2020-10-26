@@ -38,7 +38,7 @@ protected:
 // cWorldStorage:
 
 cWorldStorage::cWorldStorage(void) :
-	super("cWorldStorage"),
+	Super("cWorldStorage"),
 	m_World(nullptr),
 	m_SaveSchema(nullptr)
 {
@@ -94,7 +94,7 @@ void cWorldStorage::WaitForFinish(void)
 	// Wait for the thread to finish:
 	m_ShouldTerminate = true;
 	m_Event.Set();  // Wake up the thread if waiting
-	super::Stop();
+	Super::Stop();
 	LOGD("World storage thread finished");
 }
 
@@ -138,13 +138,13 @@ size_t cWorldStorage::GetSaveQueueLength(void)
 
 
 
-void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback)
+void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT((a_ChunkX > -0x08000000) && (a_ChunkX < 0x08000000));
 	ASSERT((a_ChunkZ > -0x08000000) && (a_ChunkZ < 0x08000000));
 	ASSERT(m_World->IsChunkQueued(a_ChunkX, a_ChunkZ));
 
-	m_LoadQueue.EnqueueItem(cChunkCoordsWithCallback(a_ChunkX, a_ChunkZ, a_Callback));
+	m_LoadQueue.EnqueueItem({ a_ChunkX, a_ChunkZ });
 	m_Event.Set();
 }
 
@@ -152,11 +152,11 @@ void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallba
 
 
 
-void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback)
+void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_World->IsChunkValid(a_ChunkX, a_ChunkZ));
 
-	m_SaveQueue.EnqueueItem(cChunkCoordsWithCallback(a_ChunkX, a_ChunkZ, a_Callback));
+	m_SaveQueue.EnqueueItem({ a_ChunkX, a_ChunkZ });
 	m_Event.Set();
 }
 
@@ -227,7 +227,7 @@ void cWorldStorage::Execute(void)
 bool cWorldStorage::LoadOneChunk(void)
 {
 	// Dequeue an item, bail out if there's none left:
-	cChunkCoordsWithCallback ToLoad(0, 0, nullptr);
+	cChunkCoords ToLoad(0, 0);
 	bool ShouldLoad = m_LoadQueue.TryDequeueItem(ToLoad);
 	if (!ShouldLoad)
 	{
@@ -235,14 +235,9 @@ bool cWorldStorage::LoadOneChunk(void)
 	}
 
 	// Load the chunk:
-	bool res = LoadChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkZ);
+	LoadChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkZ);
 
-	// Call the callback, if specified:
-	if (ToLoad.m_Callback != nullptr)
-	{
-		ToLoad.m_Callback->Call(ToLoad.m_ChunkX, ToLoad.m_ChunkZ, res);
-	}
-	return res;
+	return true;
 }
 
 
@@ -252,7 +247,7 @@ bool cWorldStorage::LoadOneChunk(void)
 bool cWorldStorage::SaveOneChunk(void)
 {
 	// Dequeue one chunk to save:
-	cChunkCoordsWithCallback ToSave(0, 0, nullptr);
+	cChunkCoords ToSave(0, 0);
 	bool ShouldSave = m_SaveQueue.TryDequeueItem(ToSave);
 	if (!ShouldSave)
 	{
@@ -260,22 +255,15 @@ bool cWorldStorage::SaveOneChunk(void)
 	}
 
 	// Save the chunk, if it's valid:
-	bool Status = false;
 	if (m_World->IsChunkValid(ToSave.m_ChunkX, ToSave.m_ChunkZ))
 	{
 		m_World->MarkChunkSaving(ToSave.m_ChunkX, ToSave.m_ChunkZ);
 		if (m_SaveSchema->SaveChunk(cChunkCoords(ToSave.m_ChunkX, ToSave.m_ChunkZ)))
 		{
 			m_World->MarkChunkSaved(ToSave.m_ChunkX, ToSave.m_ChunkZ);
-			Status = true;
 		}
 	}
 
-	// Call the callback, if specified:
-	if (ToSave.m_Callback != nullptr)
-	{
-		ToSave.m_Callback->Call(ToSave.m_ChunkX, ToSave.m_ChunkZ, Status);
-	}
 	return true;
 }
 

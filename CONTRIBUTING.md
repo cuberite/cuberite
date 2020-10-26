@@ -14,7 +14,7 @@ When contributing, you must follow our code conventions. Otherwise, CI builds wi
 
 Here are the conventions:
 
- - We use the subset of C++11 supported by MSVC 2013 (ask if you think that something outside of this subset would be useful)
+ - We use C++17.
  - All new public functions in all classes need documenting comments on what they do and what behavior they follow, use doxy-comments formatted as `/** Description */`. Do not use asterisks on additional lines in multi-line comments.
  - Use spaces after the comment markers: `// Comment` instead of `//Comment`. A comment must be prefixed with two spaces if it's on the same line with code:
    - `SomeFunction()<Space><Space>//<Space>Note the two spaces prefixed to me and the space after the slashes.`
@@ -29,9 +29,10 @@ Here are the conventions:
    - `Foo(Vector3d a_Param1, const cCuboid & a_Param2)`
    - See the discussion in issue #3853
  - Put spaces after commas. `Vector3d(1, 2, 3)` instead of `Vector3d(1,2,3)`
- - Put spaces before and after every operator.
+ - Put spaces before and after every operator, except unary operators.
    - `a = b + c;`
    - `if (a == b)`
+   - `++itr`
  - Keep individual functions spaced out by 5 empty lines, this enhances readability and makes navigation in the source file easier.
  - Add those extra parentheses to conditions, especially in C++:
    - `if ((a == 1) && ((b == 2) || (c == 3)))` instead of ambiguous `if (a == 1 && b == 2 || c == 3)`

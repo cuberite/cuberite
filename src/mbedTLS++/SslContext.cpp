@@ -4,8 +4,8 @@
 // Implements the cSslContext class that holds everything a single SSL context needs to function
 
 #include "Globals.h"
-#include "mbedTLS++/SslContext.h"
-#include "mbedTLS++/SslConfig.h"
+#include "../mbedTLS++/SslContext.h"
+#include "../mbedTLS++/SslConfig.h"
 
 
 
@@ -41,7 +41,7 @@ int cSslContext::Initialize(std::shared_ptr<const cSslConfig> a_Config)
 	}
 
 	// Check the Config:
-	m_Config = a_Config;
+	m_Config = std::move(a_Config);
 	if (m_Config == nullptr)
 	{
 		ASSERT(!"Config must not be nullptr");

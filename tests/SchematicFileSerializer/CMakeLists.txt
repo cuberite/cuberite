@@ -1,62 +1,57 @@
-cmake_minimum_required(VERSION 3.0.2)
-enable_testing()
-
-include_directories(${CMAKE_SOURCE_DIR}/src/)
-include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/lib/)
+include_directories(${PROJECT_SOURCE_DIR}/src/)
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_definitions(-DTEST_GLOBALS=1)
-
 set (SHARED_SRCS
-	${CMAKE_SOURCE_DIR}/src/BiomeDef.cpp
-	${CMAKE_SOURCE_DIR}/src/BlockArea.cpp
-	${CMAKE_SOURCE_DIR}/src/Cuboid.cpp
-	${CMAKE_SOURCE_DIR}/src/ChunkData.cpp
-	${CMAKE_SOURCE_DIR}/src/StringCompression.cpp
-	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
+	${PROJECT_SOURCE_DIR}/src/BiomeDef.cpp
+	${PROJECT_SOURCE_DIR}/src/BlockArea.cpp
+	${PROJECT_SOURCE_DIR}/src/Cuboid.cpp
+	${PROJECT_SOURCE_DIR}/src/ChunkData.cpp
+	${PROJECT_SOURCE_DIR}/src/StringCompression.cpp
+	${PROJECT_SOURCE_DIR}/src/StringUtils.cpp
 
-	${CMAKE_SOURCE_DIR}/src/Noise/Noise.cpp
+	${PROJECT_SOURCE_DIR}/src/Noise/Noise.cpp
 
-	${CMAKE_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/Event.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/File.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/GZipFile.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.cpp
+	${PROJECT_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
+	${PROJECT_SOURCE_DIR}/src/OSSupport/Event.cpp
+	${PROJECT_SOURCE_DIR}/src/OSSupport/File.cpp
+	${PROJECT_SOURCE_DIR}/src/OSSupport/GZipFile.cpp
+	${PROJECT_SOURCE_DIR}/src/OSSupport/StackTrace.cpp
+	${PROJECT_SOURCE_DIR}/src/OSSupport/WinStackWalker.cpp
 
-	${CMAKE_SOURCE_DIR}/src/WorldStorage/FastNBT.cpp
-	${CMAKE_SOURCE_DIR}/src/WorldStorage/SchematicFileSerializer.cpp
+	${PROJECT_SOURCE_DIR}/src/WorldStorage/FastNBT.cpp
+	${PROJECT_SOURCE_DIR}/src/WorldStorage/SchematicFileSerializer.cpp
 )
 
 set (SHARED_HDRS
-	${CMAKE_SOURCE_DIR}/src/BiomeDef.h
-	${CMAKE_SOURCE_DIR}/src/BlockArea.h
-	${CMAKE_SOURCE_DIR}/src/Cuboid.h
-	${CMAKE_SOURCE_DIR}/src/ChunkData.h
-	${CMAKE_SOURCE_DIR}/src/Globals.h
-	${CMAKE_SOURCE_DIR}/src/StringCompression.h
-	${CMAKE_SOURCE_DIR}/src/StringUtils.h
+	${PROJECT_SOURCE_DIR}/src/BiomeDef.h
+	${PROJECT_SOURCE_DIR}/src/BlockArea.h
+	${PROJECT_SOURCE_DIR}/src/Cuboid.h
+	${PROJECT_SOURCE_DIR}/src/ChunkData.h
+	${PROJECT_SOURCE_DIR}/src/Globals.h
+	${PROJECT_SOURCE_DIR}/src/StringCompression.h
+	${PROJECT_SOURCE_DIR}/src/StringUtils.h
 
-	${CMAKE_SOURCE_DIR}/src/Bindings/LuaState.h
+	${PROJECT_SOURCE_DIR}/src/Bindings/LuaState.h
 
-	${CMAKE_SOURCE_DIR}/src/Generating/ChunkDesc.h
-	${CMAKE_SOURCE_DIR}/src/Generating/PiecePool.h
-	${CMAKE_SOURCE_DIR}/src/Generating/Prefab.h
-	${CMAKE_SOURCE_DIR}/src/Generating/PrefabPiecePool.h
-	${CMAKE_SOURCE_DIR}/src/Generating/VerticalLimit.h
-	${CMAKE_SOURCE_DIR}/src/Generating/VerticalStrategy.h
+	${PROJECT_SOURCE_DIR}/src/Generating/ChunkDesc.h
+	${PROJECT_SOURCE_DIR}/src/Generating/PiecePool.h
+	${PROJECT_SOURCE_DIR}/src/Generating/Prefab.h
+	${PROJECT_SOURCE_DIR}/src/Generating/PrefabPiecePool.h
+	${PROJECT_SOURCE_DIR}/src/Generating/VerticalLimit.h
+	${PROJECT_SOURCE_DIR}/src/Generating/VerticalStrategy.h
 
-	${CMAKE_SOURCE_DIR}/src/Noise/Noise.h
+	${PROJECT_SOURCE_DIR}/src/Noise/Noise.h
 
-	${CMAKE_SOURCE_DIR}/src/OSSupport/CriticalSection.h
-	${CMAKE_SOURCE_DIR}/src/OSSupport/Event.h
-	${CMAKE_SOURCE_DIR}/src/OSSupport/File.h
-	${CMAKE_SOURCE_DIR}/src/OSSupport/GZipFile.h
-	${CMAKE_SOURCE_DIR}/src/OSSupport/StackTrace.h
-	${CMAKE_SOURCE_DIR}/src/OSSupport/WinStackWalker.h
+	${PROJECT_SOURCE_DIR}/src/OSSupport/CriticalSection.h
+	${PROJECT_SOURCE_DIR}/src/OSSupport/Event.h
+	${PROJECT_SOURCE_DIR}/src/OSSupport/File.h
+	${PROJECT_SOURCE_DIR}/src/OSSupport/GZipFile.h
+	${PROJECT_SOURCE_DIR}/src/OSSupport/StackTrace.h
+	${PROJECT_SOURCE_DIR}/src/OSSupport/WinStackWalker.h
 
-	${CMAKE_SOURCE_DIR}/src/WorldStorage/FastNBT.h
-	${CMAKE_SOURCE_DIR}/src/WorldStorage/SchematicFileSerializer.h
+	${PROJECT_SOURCE_DIR}/src/WorldStorage/FastNBT.h
+	${PROJECT_SOURCE_DIR}/src/WorldStorage/SchematicFileSerializer.h
 )
 
 set (SRCS
@@ -66,7 +61,7 @@ set (SRCS
 
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_flags_cxx("-Wno-error=global-constructors")
+	add_compile_options("-Wno-error=global-constructors")
 endif()
 
 

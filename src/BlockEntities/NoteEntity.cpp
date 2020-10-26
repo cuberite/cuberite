@@ -4,14 +4,15 @@
 #include "NoteEntity.h"
 #include "../World.h"
 #include "json/value.h"
+#include "../Entities/Player.h"
 
 
 
 
 
-cNoteEntity::cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
-	m_Pitch(0)
+cNoteEntity::cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+	m_Note(0)
 {
 	ASSERT(a_BlockType == E_BLOCK_NOTE_BLOCK);
 }
@@ -24,7 +25,7 @@ void cNoteEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cNoteEntity &>(a_Src);
-	m_Pitch = src.m_Pitch;
+	m_Note = src.m_Note;
 }
 
 
@@ -33,8 +34,8 @@ void cNoteEntity::CopyFrom(const cBlockEntity & a_Src)
 
 bool cNoteEntity::UsedBy(cPlayer * a_Player)
 {
-	UNUSED(a_Player);
-	IncrementPitch();
+	a_Player->GetStatManager().AddValue(Statistic::TuneNoteblock);
+	IncrementNote();
 	MakeSound();
 	return true;
 }
@@ -45,10 +46,10 @@ bool cNoteEntity::UsedBy(cPlayer * a_Player)
 
 void cNoteEntity::MakeSound(void)
 {
-	char instrument;
-	AString sampleName;
+	char Instrument;
+	AString SampleName;
 
-	switch (m_World->GetBlock(m_PosX, m_PosY - 1, m_PosZ))
+	switch (m_World->GetBlock(m_Pos.addedY(-1)))
 	{
 		case E_BLOCK_ACACIA_DOOR:
 		case E_BLOCK_ACACIA_FENCE:
@@ -96,8 +97,8 @@ void cNoteEntity::MakeSound(void)
 		case E_BLOCK_WOODEN_PRESSURE_PLATE:
 		case E_BLOCK_WOODEN_SLAB:
 		{
-			instrument = E_INST_DOUBLE_BASS;
-			sampleName = "block.note.bass";
+			Instrument = E_INST_DOUBLE_BASS;
+			SampleName = "block.note.bass";
 			break;
 		}
 
@@ -105,8 +106,8 @@ void cNoteEntity::MakeSound(void)
 		case E_BLOCK_SAND:
 		case E_BLOCK_SOULSAND:
 		{
-			instrument = E_INST_SNARE_DRUM;
-			sampleName = "block.note.snare";
+			Instrument = E_INST_SNARE_DRUM;
+			SampleName = "block.note.snare";
 			break;
 		}
 
@@ -118,8 +119,8 @@ void cNoteEntity::MakeSound(void)
 		case E_BLOCK_STAINED_GLASS:
 		case E_BLOCK_STAINED_GLASS_PANE:
 		{
-			instrument = E_INST_CLICKS;
-			sampleName = "block.note.hat";
+			Instrument = E_INST_CLICKS;
+			SampleName = "block.note.hat";
 			break;
 		}
 
@@ -195,63 +196,61 @@ void cNoteEntity::MakeSound(void)
 		case E_BLOCK_WHITE_SHULKER_BOX:
 		case E_BLOCK_YELLOW_SHULKER_BOX:
 		{
-			instrument = E_INST_BASS_DRUM;
-			sampleName = "block.note.basedrum";
+			Instrument = E_INST_BASS_DRUM;
+			SampleName = "block.note.basedrum";
 			break;
 		}
 
 		case E_BLOCK_CLAY:
 		{
-			instrument = E_INST_FLUTE;
-			sampleName = "block.note.flute";
+			Instrument = E_INST_FLUTE;
+			SampleName = "block.note.flute";
 			break;
 		}
 
 		case E_BLOCK_GOLD_BLOCK:
 		{
-			instrument = E_INST_BELL;
-			sampleName = "block.note.bell";
+			Instrument = E_INST_BELL;
+			SampleName = "block.note.bell";
 			break;
 		}
 
 		case E_BLOCK_WOOL:
 		{
-			instrument = E_INST_GUITAR;
-			sampleName = "block.note.guitar";
+			Instrument = E_INST_GUITAR;
+			SampleName = "block.note.guitar";
 			break;
 		}
 
 		case E_BLOCK_PACKED_ICE:
 		{
-			instrument = E_INST_CHIME;
-			sampleName = "block.note.chime";
+			Instrument = E_INST_CHIME;
+			SampleName = "block.note.chime";
 			break;
 		}
 
 		case E_BLOCK_BONE_BLOCK:
 		{
-			instrument = E_INST_XYLOPHONE;
-			sampleName = "block.note.xylophone";
+			Instrument = E_INST_XYLOPHONE;
+			SampleName = "block.note.xylophone";
 			break;
 		}
 
 		default:
 		{
-			instrument = E_INST_HARP_PIANO;
-			sampleName = "block.note.harp";
+			Instrument = E_INST_HARP_PIANO;
+			SampleName = "block.note.harp";
 			break;
 		}
 	}
 
-	m_World->BroadcastBlockAction({m_PosX, m_PosY, m_PosZ}, static_cast<Byte>(instrument), static_cast<Byte>(m_Pitch), E_BLOCK_NOTE_BLOCK);
+	m_World->BroadcastBlockAction(m_Pos, static_cast<Byte>(Instrument), static_cast<Byte>(m_Note), E_BLOCK_NOTE_BLOCK);
 
-	// TODO: instead of calculating the power function over and over, make a precalculated table - there's only 24 pitches after all
-	float calcPitch = static_cast<float>(pow(2.0f, static_cast<float>(m_Pitch - 12.0f) / 12.0f));
 	m_World->BroadcastSoundEffect(
-		sampleName,
-		Vector3d(m_PosX, m_PosY, m_PosZ),
+		SampleName,
+		m_Pos,
 		3.0f,
-		calcPitch
+		PitchFromNote(m_Note)
 	);
 }
 
@@ -259,29 +258,66 @@ void cNoteEntity::MakeSound(void)
 
 
 
-char cNoteEntity::GetPitch(void)
+unsigned char cNoteEntity::GetNote(void)
 {
-	return m_Pitch;
+	return m_Note;
 }
 
 
 
 
 
-void cNoteEntity::SetPitch(char a_Pitch)
+void cNoteEntity::SetNote(unsigned char a_Note)
 {
-	m_Pitch = a_Pitch % 25;
+	m_Note = a_Note % 25;
 }
 
 
 
 
 
-void cNoteEntity::IncrementPitch(void)
+void cNoteEntity::IncrementNote(void)
 {
-	SetPitch(m_Pitch + 1);
+	SetNote(m_Note + 1);
 }
 
 
 
 
+
+float cNoteEntity::PitchFromNote(unsigned char a_Pitch)
+{
+	// This replaces the calculation of:
+	// float calcPitch = static_cast<float>(pow(2.0f, static_cast<float>(m_Note - 12.0f) / 12.0f));
+	// So 2 ^ ((m_Note - 12) / 12)
+	switch (a_Pitch)
+	{
+		case 0: return 0.5f;
+		case 1: return 0.5297315471796477f;
+		case 2: return 0.5612310241546865f;
+		case 3: return 0.5946035575013605f;
+		case 4: return 0.6299605249474366f;
+		case 5: return 0.6674199270850172f;
+		case 6: return 0.7071067811865476f;
+		case 7: return 0.7491535384383408f;
+		case 8: return 0.7937005259840998f;
+		case 9: return 0.8408964152537145f;
+		case 10: return 0.8908987181403393f;
+		case 11: return 0.9438743126816935f;
+		case 12: return 1.0f;
+		case 13: return 1.0594630943592953f;
+		case 14: return 1.122462048309373f;
+		case 15: return 1.189207115002721f;
+		case 16: return 1.2599210498948732f;
+		case 17: return 1.3348398541700344f;
+		case 18: return 1.4142135623730951f;
+		case 19: return 1.4983070768766815f;
+		case 20: return 1.5874010519681994f;
+		case 21: return 1.681792830507429f;
+		case 22: return 1.7817974362806785f;
+		case 23: return 1.887748625363387f;
+		case 24: return 2.0f;
+	}
+
+	UNREACHABLE("Converted unknown pitch value");
+}

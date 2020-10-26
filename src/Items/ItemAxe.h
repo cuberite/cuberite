@@ -2,18 +2,21 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "../BlockInfo.h"
 
 
 
 
 
-class cItemAxeHandler :
+class cItemAxeHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
-	cItemAxeHandler(int a_ItemType)
-	: cItemHandler(a_ItemType)
+
+	cItemAxeHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
 
@@ -36,7 +39,7 @@ public:
 	{
 		if (!IsBlockMaterialWood(a_Block) && !IsBlockMaterialPlants(a_Block) && !IsBlockMaterialVine(a_Block))
 		{
-			return super::GetBlockBreakingStrength(a_Block);
+			return Super::GetBlockBreakingStrength(a_Block);
 		}
 		else
 		{

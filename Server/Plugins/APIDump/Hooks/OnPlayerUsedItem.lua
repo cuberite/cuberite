@@ -30,8 +30,6 @@ return
 			{ Name = "CursorX", Type = "number", Notes = "X-coord of the cursor crosshair on the block being clicked" },
 			{ Name = "CursorY", Type = "number", Notes = "Y-coord of the cursor crosshair on the block being clicked" },
 			{ Name = "CursorZ", Type = "number", Notes = "Z-coord of the cursor crosshair on the block being clicked" },
-			{ Name = "BlockType", Type = "number", Notes = "Block type of the clicked block" },
-			{ Name = "BlockMeta", Type = "number", Notes = "Block meta of the clicked block" },
 		},
 		Returns = [[
 			If the function returns false or no value, other plugins' callbacks are called. If the function

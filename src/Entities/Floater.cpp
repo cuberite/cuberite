@@ -1,6 +1,7 @@
 
 #include "Globals.h"
 
+#include "../BlockInfo.h"
 #include "../BoundingBox.h"
 #include "../Chunk.h"
 #include "Floater.h"
@@ -30,7 +31,7 @@ public:
 			return false;
 		}
 
-		cBoundingBox EntBox(a_Entity.GetPosition(), a_Entity.GetWidth() / 2, a_Entity.GetHeight());
+		auto EntBox = a_Entity.GetBoundingBox();
 
 		double LineCoeff;
 		eBlockFace Face;
@@ -73,9 +74,9 @@ protected:
 
 
 
-cFloater::cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime) :
-	cEntity(etFloater, a_X, a_Y, a_Z, 0.2, 0.2),
-	m_BitePos(Vector3d(a_X, a_Y, a_Z)),
+cFloater::cFloater(Vector3d a_Pos, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime) :
+	Super(etFloater, a_Pos, 0.2, 0.2),
+	m_BitePos(a_Pos),
 	m_CanPickupItem(false),
 	m_PickupCountDown(0),
 	m_CountDownTime(a_CountDownTime),
@@ -91,7 +92,7 @@ cFloater::cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, UInt32 
 
 void cFloater::SpawnOn(cClientHandle & a_Client)
 {
-	a_Client.SendSpawnObject(*this, 90, static_cast<int>(m_PlayerID), 0, 0);
+	a_Client.SendSpawnEntity(*this);
 }
 
 
@@ -104,9 +105,9 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	HandlePhysics(a_Dt, a_Chunk);
 	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT))
-		&& (m_World->GetBlockMeta(POSX_TOINT, POSY_TOINT, POSX_TOINT) == 0))
+		&& (m_World->GetBlockMeta(POSX_TOINT, POSY_TOINT, POSZ_TOINT) == 0))
 	{
-		if ((!m_CanPickupItem) && (m_AttachedMobID == cEntity::INVALID_ID))  // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
+		if (!m_CanPickupItem && (m_AttachedMobID == cEntity::INVALID_ID))  // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
 		{
 			if (m_CountDownTime <= 0)
 			{
@@ -179,7 +180,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (!m_World->DoWithEntityByID(m_PlayerID, [](cEntity &) { return true; }))  // The owner doesn't exist anymore. Destroy the floater entity.
 	{
-		Destroy(true);
+		Destroy();
 	}
 
 	if (m_AttachedMobID != cEntity::INVALID_ID)

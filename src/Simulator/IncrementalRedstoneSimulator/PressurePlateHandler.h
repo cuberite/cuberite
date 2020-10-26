@@ -1,47 +1,37 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
-#include "BoundingBox.h"
+#include "../../BoundingBox.h"
+#include "../../Entities/Pickup.h"
 
 
 
 
 
-class cPressurePlateHandler : public cRedstoneHandler
+namespace PressurePlateHandler
 {
-	typedef cRedstoneHandler super;
-public:
-
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	inline unsigned char GetPowerLevel(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType)
 	{
-		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
-		UNUSED(a_QueryPosition);
-		UNUSED(a_QueryBlockType);
-
-		return static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->GetCachedPowerData(a_Position).PowerLevel;
-	}
-
-	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
-	{
-		UNUSED(a_Meta);
-
-		unsigned int NumberOfEntities = 0;
+		Int64 NumberOfEntities = 0;
 		bool FoundPlayer = false;
-		a_World.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + a_Position, 0.5, 0.5), [&](cEntity & a_Entity)
-			{
-				if (a_Entity.IsPlayer())
-				{
-					FoundPlayer = true;
-				}
 
-				NumberOfEntities++;
+		Chunk.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + Position, 0.5, 0.5), [&](cEntity & Entity)
+		{
+			if (Entity.IsPlayer())
+			{
+				FoundPlayer = true;
+			}
+
+			if (Entity.IsPickup())
+			{
+				NumberOfEntities += static_cast<cPickup &>(Entity).GetItem().m_ItemCount;
 				return false;
 			}
-		);
+			NumberOfEntities++;
+			return false;
+		});
 
-		switch (a_BlockType)
+		switch (BlockType)
 		{
 			case E_BLOCK_STONE_PRESSURE_PLATE:
 			{
@@ -49,7 +39,7 @@ public:
 			}
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 			{
-				return (NumberOfEntities != 0 ? 15 : 0);
+				return (NumberOfEntities > 0 ? 15 : 0);
 			}
 			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 			{
@@ -67,29 +57,159 @@ public:
 		}
 	}
 
-	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline const char * GetClickOnSound(BLOCKTYPE a_BlockType)
 	{
-		UNUSED(a_PoweringData.PowerLevel);
-		// LOGD("Evaluating clicky the pressure plate (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
-
-		auto Power = GetPowerLevel(a_World, a_Position, a_BlockType, a_Meta);
-		auto PreviousPower = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->ExchangeUpdateOncePowerData(a_Position, PoweringData(a_BlockType, Power));
-
-		if (Power != PreviousPower.PowerLevel)
+		// manage on-sound
+		switch (a_BlockType)
 		{
-			a_World.SetBlockMeta(a_Position, (Power == 0) ? E_META_PRESSURE_PLATE_RAISED : E_META_PRESSURE_PLATE_DEPRESSED);
-			return GetAdjustedRelatives(a_Position, StaticAppend(GetRelativeLaterals(), cVector3iArray{ OffsetYM() }));
+			case E_BLOCK_STONE_PRESSURE_PLATE: return "block.stone_pressureplate.click_on";
+			case E_BLOCK_WOODEN_PRESSURE_PLATE: return "block.wood_pressureplate.click_on";
+			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE: return "block.metal_pressureplate.click_on";
+			default:
+			{
+				ASSERT(!"No on sound for this one!");
+				return "";
+			}
 		}
-
-		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	inline const char * GetClickOffSound(BLOCKTYPE a_BlockType)
 	{
-		UNUSED(a_World);
+		// manage off-sound
+		switch (a_BlockType)
+		{
+			case E_BLOCK_STONE_PRESSURE_PLATE: return "block.stone_pressureplate.click_off";
+			case E_BLOCK_WOODEN_PRESSURE_PLATE: return "block.wood_pressureplate.click_off";
+			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE: return "block.metal_pressureplate.click_off";
+			default:
+			{
+				ASSERT(!"No off sound for this one!");
+				return "";
+			}
+		}
+	}
+
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	{
+		UNUSED(a_BlockType);
+		UNUSED(a_QueryPosition);
+		UNUSED(a_QueryBlockType);
+
+		// Plates only link power blocks below
+		// Retrieve and return the cached power calculated by Update for performance:
+		return (IsLinked && (a_QueryPosition != (a_Position + OffsetYM))) ? 0 : DataForChunk(a_Chunk).GetCachedPowerData(a_Position);
+	}
+
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
+	{
+		// LOGD("Evaluating clicky the pressure plate (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+
+		auto & ChunkData = DataForChunk(a_Chunk);
+
+		const auto PreviousPower = ChunkData.GetCachedPowerData(a_Position);
+		const auto Absolute = cChunkDef::RelativeToAbsolute(a_Position, a_Chunk.GetPos());
+		const auto PowerLevel = GetPowerLevel(a_Chunk, Absolute, a_BlockType);  // Get the current power of the platey
+		const auto DelayInfo = ChunkData.GetMechanismDelayInfo(a_Position);
+
+		// Resting state?
+		if (DelayInfo == nullptr)
+		{
+			if (PowerLevel == 0)
+			{
+				// Nothing happened, back to rest
+				return;
+			}
+
+			// From rest, a player stepped on us
+			// Schedule a minimum 0.5 second delay before even thinking about releasing
+			ChunkData.m_MechanismDelays[a_Position] = std::make_pair(5, true);
+
+			a_Chunk.GetWorld()->BroadcastSoundEffect(GetClickOnSound(a_BlockType), Absolute, 0.5f, 0.6f);
+
+			// Update power
+			ChunkData.SetCachedPowerData(a_Position, PowerLevel);
+
+			// Immediately depress plate
+			a_Chunk.SetMeta(a_Position, E_META_PRESSURE_PLATE_DEPRESSED);
+
+			UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
+			return;
+		}
+
+		// Not a resting state
+
+		int DelayTicks;
+		bool HasExitedMinimumOnDelayPhase;
+		std::tie(DelayTicks, HasExitedMinimumOnDelayPhase) = *DelayInfo;
+
+		// Are we waiting for the initial delay or subsequent release delay?
+		if (DelayTicks > 0)
+		{
+			// Nothing changes, if there is nothing on it anymore, because the state is locked.
+			if (PowerLevel == 0)
+			{
+				return;
+			}
+
+			// Yes. Are we waiting to release, and found that the player stepped on it again?
+			if (!HasExitedMinimumOnDelayPhase)
+			{
+				// Reset delay
+				*DelayInfo = std::make_pair(0, true);
+			}
+
+			// Did the power level change and is still above zero?
+			if (PowerLevel != PreviousPower)
+			{
+				// Yes. Update power
+				ChunkData.SetCachedPowerData(a_Position, PowerLevel);
+				UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
+			}
+
+			return;
+		}
+
+		// Not waiting for anything. Has the initial delay elapsed?
+		if (HasExitedMinimumOnDelayPhase)
+		{
+			// Yep, initial delay elapsed. Has the player gotten off?
+			if (PowerLevel == 0)
+			{
+				// Yes. Go into subsequent release delay, for a further 0.5 seconds
+				*DelayInfo = std::make_pair(5, false);
+				return;
+			}
+
+			// Did the power level change and is still above zero?
+			if (PowerLevel != PreviousPower)
+			{
+				// Yes. Update power
+				ChunkData.SetCachedPowerData(a_Position, PowerLevel);
+				UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
+			}
+
+			// Yes, but player's still on the plate, do nothing
+			return;
+		}
+
+		// Just got out of the subsequent release phase, reset everything and raise the plate
+		ChunkData.m_MechanismDelays.erase(a_Position);
+
+		a_Chunk.GetWorld()->BroadcastSoundEffect(GetClickOffSound(a_BlockType), Absolute, 0.5f, 0.5f);
+		ChunkData.SetCachedPowerData(a_Position, PowerLevel);
+
+		a_Chunk.SetMeta(a_Position, E_META_PRESSURE_PLATE_RAISED);
+		UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
+	}
+
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
+	{
+		UNUSED(a_Chunk);
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
-		return {};
+		UNUSED(Callback);
 	}
 };

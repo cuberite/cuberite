@@ -19,9 +19,10 @@
 class cPrefabStructure:
 	public cGridStructGen::cStructure
 {
-	typedef cGridStructGen::cStructure Super;
+	using Super = cGridStructGen::cStructure;
 
 public:
+
 	cPrefabStructure(
 		int a_GridX, int a_GridZ,
 		int a_OriginX, int a_OriginZ,

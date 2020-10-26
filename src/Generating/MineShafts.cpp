@@ -81,18 +81,19 @@ public:
 	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) = 0;
 } ;
 
-typedef std::vector<cMineShaft *> cMineShafts;
+using cMineShafts = std::vector<cMineShaft *>;
 
 
 
 
 
-class cMineShaftDirtRoom :
+class cMineShaftDirtRoom:
 	public cMineShaft
 {
-	typedef cMineShaft super;
+	using Super = cMineShaft;
 
 public:
+
 	cMineShaftDirtRoom(cStructGenMineShafts::cMineShaftSystem & a_Parent, cNoise & a_Noise);
 
 	// cMineShaft overrides:
@@ -104,16 +105,16 @@ public:
 
 
 
-class cMineShaftCorridor :
+class cMineShaftCorridor:
 	public cMineShaft
 {
-	typedef cMineShaft super;
+	using Super = cMineShaft;
 
 public:
+
 	/** Creates a new Corridor attached to the specified pivot point and direction.
 	Checks all ParentSystem's objects and disallows intersecting. Initializes the new object to fit.
-	May return nullptr if cannot fit.
-	*/
+	May return nullptr if cannot fit. */
 	static cMineShaft * CreateAndFit(
 		cStructGenMineShafts::cMineShaftSystem & a_ParentSystem,
 		int a_PivotX, int a_PivotY, int a_PivotZ, eDirection a_Direction,
@@ -157,16 +158,16 @@ protected:
 
 
 
-class cMineShaftCrossing :
+class cMineShaftCrossing:
 	public cMineShaft
 {
-	typedef cMineShaft super;
+	using Super = cMineShaft;
 
 public:
+
 	/** Creates a new Crossing attached to the specified pivot point and direction.
 	Checks all ParentSystem's objects and disallows intersecting. Initializes the new object to fit.
-	May return nullptr if cannot fit.
-	*/
+	May return nullptr if cannot fit. */
 	static cMineShaft * CreateAndFit(
 		cStructGenMineShafts::cMineShaftSystem & a_ParentSystem,
 		int a_PivotX, int a_PivotY, int a_PivotZ, eDirection a_Direction,
@@ -185,12 +186,13 @@ protected:
 
 
 
-class cMineShaftStaircase :
+class cMineShaftStaircase:
 	public cMineShaft
 {
-	typedef cMineShaft super;
+	using Super = cMineShaft;
 
 public:
+
 	enum eSlope
 	{
 		sUp,
@@ -228,12 +230,13 @@ protected:
 
 
 
-class cStructGenMineShafts::cMineShaftSystem :
+class cStructGenMineShafts::cMineShaftSystem:
 	public cGridStructGen::cStructure
 {
-	typedef cGridStructGen::cStructure super;
+	using Super = cGridStructGen::cStructure;
 
 public:
+
 	int         m_GridSize;            ///< Maximum offset of the dirtroom from grid center, * 2, in each direction
 	int         m_MaxRecursion;        ///< Maximum recursion level (initialized from cStructGenMineShafts::m_MaxRecursion)
 	int         m_ProbLevelCorridor;   ///< Probability level of a branch object being the corridor
@@ -283,7 +286,7 @@ cStructGenMineShafts::cMineShaftSystem::cMineShaftSystem(
 	int a_GridSize, int a_MaxSystemSize, cNoise & a_Noise,
 	int a_ProbLevelCorridor, int a_ProbLevelCrossing, int a_ProbLevelStaircase
 ) :
-	super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
+	Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 	m_GridSize(a_GridSize),
 	m_MaxRecursion(8),  // TODO: settable
 	m_ProbLevelCorridor(a_ProbLevelCorridor),
@@ -299,8 +302,8 @@ cStructGenMineShafts::cMineShaftSystem::cMineShaftSystem(
 	m_MineShafts.push_back(Start);
 
 	m_BoundingBox.Assign(
-		Start->m_BoundingBox.p1.x - a_MaxSystemSize / 2, 2,  Start->m_BoundingBox.p1.z - a_MaxSystemSize / 2,
-		Start->m_BoundingBox.p2.x + a_MaxSystemSize / 2, 50, Start->m_BoundingBox.p2.z + a_MaxSystemSize / 2
+		{Start->m_BoundingBox.p1.x - a_MaxSystemSize / 2, 2,  Start->m_BoundingBox.p1.z - a_MaxSystemSize / 2},
+		{Start->m_BoundingBox.p2.x + a_MaxSystemSize / 2, 50, Start->m_BoundingBox.p2.z + a_MaxSystemSize / 2}
 	);
 
 	Start->AppendBranches(0, a_Noise);
@@ -404,7 +407,7 @@ bool cStructGenMineShafts::cMineShaftSystem::CanAppend(const cCuboid & a_Boundin
 // cMineShaftDirtRoom:
 
 cMineShaftDirtRoom::cMineShaftDirtRoom(cStructGenMineShafts::cMineShaftSystem & a_Parent, cNoise & a_Noise) :
-	super(a_Parent, mskDirtRoom)
+	Super(a_Parent, mskDirtRoom)
 {
 	// Make the room of random size, min 10 x 4 x 10; max 18 x 12 x 18:
 	int rnd = a_Noise.IntNoise3DInt(a_Parent.m_OriginX, 0, a_Parent.m_OriginZ) / 7;
@@ -500,7 +503,7 @@ cMineShaftCorridor::cMineShaftCorridor(
 	const cCuboid & a_BoundingBox, int a_NumSegments, eDirection a_Direction,
 	cNoise & a_Noise
 ) :
-	super(a_ParentSystem, mskCorridor, a_BoundingBox),
+	Super(a_ParentSystem, mskCorridor, a_BoundingBox),
 	m_NumSegments(a_NumSegments),
 	m_Direction(a_Direction),
 	m_ChestPosition(-1),
@@ -639,7 +642,7 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 	int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 	int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 	cCuboid RelBoundingBox(m_BoundingBox);
-	RelBoundingBox.Move(-BlockX, 0, -BlockZ);
+	RelBoundingBox.Move({-BlockX, 0, -BlockZ});
 	RelBoundingBox.p1.y += 1;
 	RelBoundingBox.p2.y -= 1;
 	cCuboid Top(RelBoundingBox);
@@ -818,7 +821,7 @@ void cMineShaftCorridor::PlaceTracks(cChunkDesc & a_ChunkDesc)
 		return;
 	}
 	cCuboid Box(m_BoundingBox);
-	Box.Move(-a_ChunkDesc.GetChunkX() * cChunkDef::Width, 1, -a_ChunkDesc.GetChunkZ() * cChunkDef::Width);
+	Box.Move({-a_ChunkDesc.GetChunkX() * cChunkDef::Width, 1, -a_ChunkDesc.GetChunkZ() * cChunkDef::Width});
 	Box.p2.y = Box.p1.y;
 	Box.p1.x += 1;
 	Box.p2.x -= 1;
@@ -973,7 +976,7 @@ void cMineShaftCorridor::PlaceTorches(cChunkDesc & a_ChunkDesc)
 // cMineShaftCrossing:
 
 cMineShaftCrossing::cMineShaftCrossing(cStructGenMineShafts::cMineShaftSystem & a_ParentSystem, const cCuboid & a_BoundingBox) :
-	super(a_ParentSystem, mskCrossing, a_BoundingBox)
+	Super(a_ParentSystem, mskCrossing, a_BoundingBox)
 {
 }
 
@@ -1061,7 +1064,7 @@ void cMineShaftCrossing::ProcessChunk(cChunkDesc & a_ChunkDesc)
 	int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 	int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 	cCuboid box(m_BoundingBox);
-	box.Move(-BlockX, 0, -BlockZ);
+	box.Move({-BlockX, 0, -BlockZ});
 	if ((box.p2.x < 0) || (box.p2.z < 0) || (box.p1.x >= cChunkDef::Width) || (box.p1.z > cChunkDef::Width))
 	{
 		// Does not intersect this chunk
@@ -1113,7 +1116,7 @@ cMineShaftStaircase::cMineShaftStaircase(
 	eDirection a_Direction,
 	eSlope a_Slope
 ) :
-	super(a_ParentSystem, mskStaircase, a_BoundingBox),
+	Super(a_ParentSystem, mskStaircase, a_BoundingBox),
 	m_Direction(a_Direction),
 	m_Slope(a_Slope)
 {
@@ -1135,22 +1138,22 @@ cMineShaft * cMineShaftStaircase::CreateAndFit(
 	{
 		case dirXM:
 		{
-			Box.Assign(a_PivotX - 7, a_PivotY - 1, a_PivotZ - 1, a_PivotX, a_PivotY + 6, a_PivotZ + 1);
+			Box.Assign({a_PivotX - 7, a_PivotY - 1, a_PivotZ - 1}, {a_PivotX, a_PivotY + 6, a_PivotZ + 1});
 			break;
 		}
 		case dirXP:
 		{
-			Box.Assign(a_PivotX, a_PivotY - 1, a_PivotZ - 1, a_PivotX + 7, a_PivotY + 6, a_PivotZ + 1);
+			Box.Assign({a_PivotX, a_PivotY - 1, a_PivotZ - 1}, {a_PivotX + 7, a_PivotY + 6, a_PivotZ + 1});
 			break;
 		}
 		case dirZM:
 		{
-			Box.Assign(a_PivotX - 1, a_PivotY - 1, a_PivotZ - 7, a_PivotX + 1, a_PivotY + 6, a_PivotZ);
+			Box.Assign({a_PivotX - 1, a_PivotY - 1, a_PivotZ - 7}, {a_PivotX + 1, a_PivotY + 6, a_PivotZ});
 			break;
 		}
 		case dirZP:
 		{
-			Box.Assign(a_PivotX - 1, a_PivotY - 1, a_PivotZ, a_PivotX + 1, a_PivotY + 6, a_PivotZ + 7);
+			Box.Assign({a_PivotX - 1, a_PivotY - 1, a_PivotZ}, {a_PivotX + 1, a_PivotY + 6, a_PivotZ + 7});
 			break;
 		}
 	}
@@ -1158,7 +1161,7 @@ cMineShaft * cMineShaftStaircase::CreateAndFit(
 	if ((rnd % 4) < 2)  // 50 %
 	{
 		Slope = sDown;
-		Box.Move(0, -4, 0);
+		Box.Move({0, -4, 0});
 	}
 	if (!a_ParentSystem.CanAppend(Box))
 	{
@@ -1192,7 +1195,7 @@ void cMineShaftStaircase::ProcessChunk(cChunkDesc & a_ChunkDesc)
 	int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 	int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 	cCuboid RelB(m_BoundingBox);
-	RelB.Move(-BlockX, 0, -BlockZ);
+	RelB.Move({-BlockX, 0, -BlockZ});
 	if (
 		(RelB.p1.x >= cChunkDef::Width) ||
 		(RelB.p1.z >= cChunkDef::Width) ||
@@ -1217,12 +1220,12 @@ void cMineShaftStaircase::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			a_ChunkDesc.FillRelCuboid (RelB.p1.x,     RelB.p1.x + 1, DFloor,     DFloor + 2, RelB.p1.z, RelB.p2.z, E_BLOCK_AIR, 0);
 			a_ChunkDesc.FloorRelCuboid(RelB.p2.x - 1, RelB.p2.x,     SFloor - 1, SFloor - 1, RelB.p1.z, RelB.p2.z, E_BLOCK_PLANKS, 0);
 			a_ChunkDesc.FloorRelCuboid(RelB.p1.x,     RelB.p1.x + 1, DFloor - 1, DFloor - 1, RelB.p1.z, RelB.p2.z, E_BLOCK_PLANKS, 0);
-			Box.Assign(RelB.p2.x - 2, SFloor + InitAdd, RelB.p1.z, RelB.p2.x - 2, SFloor + 3 + InitAdd, RelB.p2.z);
+			Box.Assign({RelB.p2.x - 2, SFloor + InitAdd, RelB.p1.z}, {RelB.p2.x - 2, SFloor + 3 + InitAdd, RelB.p2.z});
 			for (int i = 0; i < 4; i++)
 			{
 				a_ChunkDesc.FillRelCuboid(Box, E_BLOCK_AIR, 0);
 				a_ChunkDesc.FloorRelCuboid(Box.p1.x, Box.p2.x, Box.p1.y - 1, Box.p1.y - 1, Box.p1.z, Box.p2.z, E_BLOCK_PLANKS, 0);
-				Box.Move(-1, Add, 0);
+				Box.Move({-1, Add, 0});
 			}
 			break;
 		}
@@ -1233,12 +1236,12 @@ void cMineShaftStaircase::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			a_ChunkDesc.FillRelCuboid (RelB.p2.x - 1, RelB.p2.x,     DFloor,     DFloor + 2, RelB.p1.z, RelB.p2.z, E_BLOCK_AIR, 0);
 			a_ChunkDesc.FloorRelCuboid(RelB.p1.x,     RelB.p1.x + 1, SFloor - 1, SFloor - 1, RelB.p1.z, RelB.p2.z, E_BLOCK_PLANKS, 0);
 			a_ChunkDesc.FloorRelCuboid(RelB.p2.x - 1, RelB.p2.x,     DFloor - 1, DFloor - 1, RelB.p1.z, RelB.p2.z, E_BLOCK_PLANKS, 0);
-			Box.Assign(RelB.p1.x + 2, SFloor + InitAdd, RelB.p1.z, RelB.p1.x + 2, SFloor + 3 + InitAdd, RelB.p2.z);
+			Box.Assign({RelB.p1.x + 2, SFloor + InitAdd, RelB.p1.z}, {RelB.p1.x + 2, SFloor + 3 + InitAdd, RelB.p2.z});
 			for (int i = 0; i < 4; i++)
 			{
 				a_ChunkDesc.FillRelCuboid(Box, E_BLOCK_AIR, 0);
 				a_ChunkDesc.FloorRelCuboid(Box.p1.x, Box.p2.x, Box.p1.y - 1, Box.p1.y - 1, Box.p1.z, Box.p2.z, E_BLOCK_PLANKS, 0);
-				Box.Move(1, Add, 0);
+				Box.Move({1, Add, 0});
 			}
 			break;
 		}
@@ -1249,12 +1252,12 @@ void cMineShaftStaircase::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			a_ChunkDesc.FillRelCuboid (RelB.p1.x, RelB.p2.x, DFloor,     DFloor + 2, RelB.p1.z,     RelB.p1.z + 1,  E_BLOCK_AIR, 0);
 			a_ChunkDesc.FloorRelCuboid(RelB.p1.x, RelB.p2.x, SFloor - 1, SFloor - 1, RelB.p2.z - 1, RelB.p2.z,      E_BLOCK_PLANKS, 0);
 			a_ChunkDesc.FloorRelCuboid(RelB.p1.x, RelB.p2.x, DFloor - 1, DFloor - 1, RelB.p1.z,     RelB.p1.z + 1,  E_BLOCK_PLANKS, 0);
-			Box.Assign(RelB.p1.x, SFloor + InitAdd, RelB.p2.z - 2, RelB.p2.x, SFloor + 3 + InitAdd, RelB.p2.z - 2);
+			Box.Assign({RelB.p1.x, SFloor + InitAdd, RelB.p2.z - 2}, {RelB.p2.x, SFloor + 3 + InitAdd, RelB.p2.z - 2});
 			for (int i = 0; i < 4; i++)
 			{
 				a_ChunkDesc.FillRelCuboid(Box, E_BLOCK_AIR, 0);
 				a_ChunkDesc.FloorRelCuboid(Box.p1.x, Box.p2.x, Box.p1.y - 1, Box.p1.y - 1, Box.p1.z, Box.p2.z, E_BLOCK_PLANKS, 0);
-				Box.Move(0, Add, -1);
+				Box.Move({0, Add, -1});
 			}
 			break;
 		}
@@ -1265,12 +1268,12 @@ void cMineShaftStaircase::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			a_ChunkDesc.FillRelCuboid (RelB.p1.x, RelB.p2.x, DFloor,     DFloor + 2, RelB.p2.z - 1, RelB.p2.z,      E_BLOCK_AIR, 0);
 			a_ChunkDesc.FloorRelCuboid(RelB.p1.x, RelB.p2.x, SFloor - 1, SFloor - 1, RelB.p1.z,     RelB.p1.z + 1,  E_BLOCK_PLANKS, 0);
 			a_ChunkDesc.FloorRelCuboid(RelB.p1.x, RelB.p2.x, DFloor - 1, DFloor - 1, RelB.p2.z - 1, RelB.p2.z,      E_BLOCK_PLANKS, 0);
-			Box.Assign(RelB.p1.x, SFloor + InitAdd, RelB.p1.z + 2, RelB.p2.x, SFloor + 3 + InitAdd, RelB.p1.z + 2);
+			Box.Assign({RelB.p1.x, SFloor + InitAdd, RelB.p1.z + 2}, {RelB.p2.x, SFloor + 3 + InitAdd, RelB.p1.z + 2});
 			for (int i = 0; i < 4; i++)
 			{
 				a_ChunkDesc.FillRelCuboid(Box, E_BLOCK_AIR, 0);
 				a_ChunkDesc.FloorRelCuboid(Box.p1.x, Box.p2.x, Box.p1.y - 1, Box.p1.y - 1, Box.p1.z, Box.p2.z, E_BLOCK_PLANKS, 0);
-				Box.Move(0, Add, 1);
+				Box.Move({0, Add, 1});
 			}
 			break;
 		}
@@ -1289,7 +1292,7 @@ cStructGenMineShafts::cStructGenMineShafts(
 	int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxSystemSize,
 	int a_ChanceCorridor, int a_ChanceCrossing, int a_ChanceStaircase
 ) :
-	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSystemSize, a_MaxSystemSize, 100),
+	Super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSystemSize, a_MaxSystemSize, 100),
 	m_GridSize(a_GridSize),
 	m_MaxSystemSize(a_MaxSystemSize),
 	m_ProbLevelCorridor(std::max(0, a_ChanceCorridor)),

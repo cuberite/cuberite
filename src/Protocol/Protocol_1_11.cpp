@@ -5,12 +5,12 @@
 Implements the 1.11 protocol classes:
 	- cProtocol_1_11_0
 		- release 1.11 protocol (#315)
-(others may be added later in the future for the 1.11 release series)
+	- cProtocol_1_11_1
+		- release 1.11.1 protocol (#316)
 */
 
 #include "Globals.h"
 #include "Protocol_1_11.h"
-#include "ProtocolRecognizer.h"
 #include "Packetizer.h"
 
 #include "../WorldStorage/FastNBT.h"
@@ -40,6 +40,7 @@ Implements the 1.11 protocol classes:
 #include "../Server.h"
 #include "../ClientHandle.h"
 #include "../CompositeChat.h"
+#include "../JsonUtils.h"
 #include "../Bindings/PluginManager.h"
 
 
@@ -57,9 +58,9 @@ Implements the 1.11 protocol classes:
 	#pragma clang diagnostic ignored "-Wduplicate-enum"
 #endif
 
-namespace Metadata
+namespace Metadata_1_11
 {
-	enum Metadata_Index
+	enum MetadataIndex
 	{
 		// Entity
 		ENTITY_FLAGS,
@@ -320,31 +321,27 @@ namespace Metadata
 
 #define HANDLE_READ(ByteBuf, Proc, Type, Var) \
 	Type Var; \
-	if (!ByteBuf.Proc(Var))\
-	{\
-		return;\
-	}
+	do { \
+		if (!ByteBuf.Proc(Var))\
+		{\
+			return;\
+		} \
+	} while (false)
 
 
 
 
 
-cProtocol_1_11_0::cProtocol_1_11_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
-{
-}
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_11_0:
 
-
-
-
-
-void cProtocol_1_11_0::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count)
+void cProtocol_1_11_0::SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, GetPacketId(sendCollectEntity));  // Collect Item packet
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteVarInt32(a_Player.GetUniqueID());
+	cPacketizer Pkt(*this, pktCollectEntity);
+	Pkt.WriteVarInt32(a_Collected.GetUniqueID());
+	Pkt.WriteVarInt32(a_Collector.GetUniqueID());
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Count));
 }
 
@@ -356,7 +353,7 @@ void cProtocol_1_11_0::SendHideTitle(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
+	cPacketizer Pkt(*this, pktTitle);
 	Pkt.WriteVarInt32(4);  // Hide title
 }
 
@@ -368,7 +365,7 @@ void cProtocol_1_11_0::SendResetTitle(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, GetPacketId(sendTitle));  // Title packet
+	cPacketizer Pkt(*this, pktTitle);
 	Pkt.WriteVarInt32(5);  // Reset title
 }
 
@@ -380,17 +377,18 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, GetPacketId(sendSpawnMob));  // Spawn Mob packet
+	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Mob.GetMobType()));
-	Pkt.WriteBEDouble(a_Mob.GetPosX());
-	Pkt.WriteBEDouble(a_Mob.GetPosY());
-	Pkt.WriteBEDouble(a_Mob.GetPosZ());
+	Pkt.WriteVarInt32(GetProtocolMobType(a_Mob.GetMobType()));
+	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
+	Pkt.WriteBEDouble(LastSentPos.x);
+	Pkt.WriteBEDouble(LastSentPos.y);
+	Pkt.WriteBEDouble(LastSentPos.z);
+	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());  // Doesn't seem to be used
 	Pkt.WriteByteAngle(a_Mob.GetPitch());
-	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
 	Pkt.WriteByteAngle(a_Mob.GetYaw());
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedX() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
@@ -441,7 +439,7 @@ void cProtocol_1_11_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity 
 			Writer.AddInt("x", CommandBlockEntity.GetPosX());
 			Writer.AddInt("y", CommandBlockEntity.GetPosY());
 			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
-			Writer.AddString("Command", CommandBlockEntity.GetCommand().c_str());
+			Writer.AddString("Command", CommandBlockEntity.GetCommand());
 			// You can set custom names for windows in Vanilla
 			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
 			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
@@ -524,7 +522,7 @@ void cProtocol_1_11_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x45);  // Title packet
+	cPacketizer Pkt(*this, pktTitle);
 	Pkt.WriteVarInt32(3);  // Set title display times
 	Pkt.WriteBEInt32(a_FadeInTicks);
 	Pkt.WriteBEInt32(a_DisplayTicks);
@@ -535,10 +533,66 @@ void cProtocol_1_11_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int
 
 
 
+cProtocol::Version cProtocol_1_11_0::GetProtocolVersion()
+{
+	return Version::v1_11_0;
+}
+
+
+
+
+
+UInt32 cProtocol_1_11_0::GetProtocolMobType(eMonsterType a_MobType)
+{
+	switch (a_MobType)
+	{
+		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
+		case mtInvalidType:           return 53;
+		case mtBat:                   return 65;
+		case mtBlaze:                 return 61;
+		case mtCaveSpider:            return 59;
+		case mtChicken:               return 93;
+		case mtCow:                   return 92;
+		case mtCreeper:               return 50;
+		case mtEnderDragon:           return 63;
+		case mtEnderman:              return 58;
+		case mtGhast:                 return 56;
+		case mtGiant:                 return 53;
+		case mtGuardian:              return 68;
+		case mtHorse:                 return 100;
+		case mtIronGolem:             return 99;
+		case mtMagmaCube:             return 62;
+		case mtMooshroom:             return 96;
+		case mtOcelot:                return 98;
+		case mtPig:                   return 90;
+		case mtRabbit:                return 101;
+		case mtSheep:                 return 91;
+		case mtSilverfish:            return 60;
+		case mtSkeleton:              return 51;
+		case mtSlime:                 return 55;
+		case mtSnowGolem:             return 97;
+		case mtSpider:                return 52;
+		case mtSquid:                 return 94;
+		case mtVillager:              return 120;
+		case mtWitch:                 return 66;
+		case mtWither:                return 64;
+		case mtWitherSkeleton:        return 5;
+		case mtWolf:                  return 95;
+		case mtZombie:                return 54;
+		case mtZombiePigman:          return 57;
+		case mtZombieVillager:        return 27;
+	}
+	UNREACHABLE("Unsupported mob type");
+}
+
+
+
+
+
 void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
 	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadPosition64(BlockX, BlockY, BlockZ))
+	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
 	{
 		return;
 	}
@@ -555,54 +609,9 @@ void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_11_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
-{
-	cServer * Server = cRoot::Get()->GetServer();
-	AString ServerDescription = Server->GetDescription();
-	auto NumPlayers = static_cast<signed>(Server->GetNumPlayers());
-	auto MaxPlayers = static_cast<signed>(Server->GetMaxPlayers());
-	AString Favicon = Server->GetFaviconData();
-	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
-
-	// Version:
-	Json::Value Version;
-	Version["name"] = "Cuberite 1.11";
-	Version["protocol"] = cProtocolRecognizer::PROTO_VERSION_1_11_0;
-
-	// Players:
-	Json::Value Players;
-	Players["online"] = NumPlayers;
-	Players["max"] = MaxPlayers;
-	// TODO: Add "sample"
-
-	// Description:
-	Json::Value Description;
-	Description["text"] = ServerDescription.c_str();
-
-	// Create the response:
-	Json::Value ResponseValue;
-	ResponseValue["version"] = Version;
-	ResponseValue["players"] = Players;
-	ResponseValue["description"] = Description;
-	m_Client->ForgeAugmentServerListPing(ResponseValue);
-	if (!Favicon.empty())
-	{
-		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
-	}
-
-	// Serialize the response into a packet:
-	Json::FastWriter Writer;
-	cPacketizer Pkt(*this, 0x00);  // Response packet
-	Pkt.WriteString(Writer.write(ResponseValue));
-}
-
-
-
-
-
 void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
 {
-	using namespace Metadata;
+	using namespace Metadata_1_11;
 
 	// Common metadata:
 	Int8 Flags = 0;
@@ -809,7 +818,7 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 {
-	using namespace Metadata;
+	using namespace Metadata_1_11;
 
 	// Living Enitiy Metadata
 	if (a_Mob.HasCustomName())
@@ -1045,17 +1054,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtSheep
 
-		case mtSkeleton:
-		{
-			// XXX Skeletons are separate entities; all skeletons are currently treated as regular ones
-
-			// auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
-			// a_Pkt.WriteBEUInt8(SKELETON_TYPE);
-			// a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			// a_Pkt.WriteVarInt32(Skeleton.IsWither() ? 1 : 0);
-			break;
-		}  // case mtSkeleton
-
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -1143,15 +1141,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			a_Pkt.WriteBEUInt8(ZOMBIE_IS_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Zombie.IsBaby());
-
-			// These don't exist
-			// a_Pkt.WriteBEUInt8(ZOMBIE_TYPE);
-			// a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			// a_Pkt.WriteVarInt32(Zombie.IsVillagerZombie() ? 1 : 0);
-
-			// a_Pkt.WriteBEUInt8(ZOMBIE_CONVERTING);
-			// a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			// a_Pkt.WriteBool(Zombie.IsConverting());
 			break;
 		}  // case mtZombie
 
@@ -1164,6 +1153,23 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtZombiePigman
 
+		case mtZombieVillager:
+		{
+			auto & ZombieVillager = reinterpret_cast<const cZombieVillager &>(a_Mob);
+			a_Pkt.WriteBEUInt8(ZOMBIE_IS_BABY);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(ZombieVillager.IsBaby());
+
+			a_Pkt.WriteBEUInt8(ZOMBIE_VILLAGER_CONVERTING);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(ZombieVillager.ConversionTime()));
+
+			a_Pkt.WriteBEUInt8(ZOMBIE_VILLAGER_PROFESSION);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(ZombieVillager.GetProfession()));
+			break;
+		}  // case mtZombieVillager
+
 		default: break;
 	}  // switch (a_Mob.GetType())
 }
@@ -1172,52 +1178,10 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 
 
 
-cProtocol_1_11_1::cProtocol_1_11_1(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_11_1:
+
+cProtocol::Version cProtocol_1_11_1::GetProtocolVersion()
 {
-}
-
-
-
-
-
-void cProtocol_1_11_1::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
-{
-	cServer * Server = cRoot::Get()->GetServer();
-	AString ServerDescription = Server->GetDescription();
-	auto NumPlayers = static_cast<signed>(Server->GetNumPlayers());
-	auto MaxPlayers = static_cast<signed>(Server->GetMaxPlayers());
-	AString Favicon = Server->GetFaviconData();
-	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
-
-	// Version:
-	Json::Value Version;
-	Version["name"] = "Cuberite 1.11.1";
-	Version["protocol"] = cProtocolRecognizer::PROTO_VERSION_1_11_1;
-
-	// Players:
-	Json::Value Players;
-	Players["online"] = NumPlayers;
-	Players["max"] = MaxPlayers;
-	// TODO: Add "sample"
-
-	// Description:
-	Json::Value Description;
-	Description["text"] = ServerDescription.c_str();
-
-	// Create the response:
-	Json::Value ResponseValue;
-	ResponseValue["version"] = Version;
-	ResponseValue["players"] = Players;
-	ResponseValue["description"] = Description;
-	m_Client->ForgeAugmentServerListPing(ResponseValue);
-	if (!Favicon.empty())
-	{
-		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
-	}
-
-	// Serialize the response into a packet:
-	Json::FastWriter Writer;
-	cPacketizer Pkt(*this, 0x00);  // Response packet
-	Pkt.WriteString(Writer.write(ResponseValue));
+	return Version::v1_11_1;
 }

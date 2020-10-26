@@ -12,8 +12,8 @@
 
 
 
-cWitherSkullEntity::cWitherSkullEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
-	super(pkWitherSkull, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
+cWitherSkullEntity::cWitherSkullEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
+	Super(pkWitherSkull, a_Creator, a_Pos, 0.25, 0.25)
 {
 	SetSpeed(a_Speed);
 	SetGravity(0);
@@ -43,7 +43,7 @@ void cWitherSkullEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 	// TODO: Explode
 	// TODO: Apply wither effect to entity and others nearby
 
-	Destroy(true);
+	Destroy();
 }
 
 

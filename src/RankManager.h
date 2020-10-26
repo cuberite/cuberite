@@ -53,7 +53,7 @@ public:
 	~cRankManager();
 
 	/** Initializes the rank manager. Performs migration and default-setting if no data is found in the DB.
-	The a_MojangAPI param is used when migrating from old ini files, to look up player UUIDs. */
+	The a_MojangAPI param is used to keep player names in sync with UUIDs, since Mojang allows username changes. */
 	void Initialize(cMojangAPI & a_MojangAPI);
 
 	/** Returns the name of the rank that the specified player has assigned to them.
@@ -273,7 +273,7 @@ protected:
 	/** Set to true once the manager is initialized. */
 	bool m_IsInitialized;
 
-	/** The MojangAPI instance that is used for translating playernames to UUIDs.
+	/** The MojangAPI instance that is used for keeping player names and UUIDs in sync.
 	Set in Initialize(), may be nullptr. */
 	cMojangAPI * m_MojangAPI;
 

@@ -24,7 +24,7 @@
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 #include "../BoundingBox.h"
-#include "../BuildInfo.h"
+#include "BuildInfo.h"
 #include "../ClientHandle.h"
 #include "../CommandOutput.h"
 #include "../CompositeChat.h"
@@ -116,7 +116,7 @@ int cManualBindings::tolua_do_error(lua_State * L, const char * a_pMsg, tolua_Er
 
 
 
-int cManualBindings::lua_do_error(lua_State * L, const char * a_pFormat, fmt::ArgList a_ArgList)
+int cManualBindings::vlua_do_error(lua_State * L, const char * a_pFormat, fmt::printf_args a_ArgList)
 {
 	// Retrieve current function name
 	lua_Debug entry;
@@ -129,7 +129,7 @@ int cManualBindings::lua_do_error(lua_State * L, const char * a_pFormat, fmt::Ar
 
 	// Copied from luaL_error and modified
 	luaL_where(L, 1);
-	AString FmtMsg = Printf(msg.c_str(), a_ArgList);
+	AString FmtMsg = vPrintf(msg.c_str(), a_ArgList);
 	lua_pushlstring(L, FmtMsg.data(), FmtMsg.size());
 	lua_concat(L, 2);
 	return lua_error(L);
@@ -367,23 +367,19 @@ static int tolua_StringSplitAndTrim(lua_State * tolua_S)
 /** Retrieves the log message from the first param on the Lua stack.
 Can take either a string or a cCompositeChat.
 */
-static AString GetLogMessage(lua_State * tolua_S)
+static void LogFromLuaStack(lua_State * tolua_S, eLogLevel a_LogLevel)
 {
 	tolua_Error err;
 	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
 	{
-		return static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->ExtractText();
+		auto Msg = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->ExtractText();
+		Logger::LogSimple(Msg, a_LogLevel);
+		return;
 	}
-	else
-	{
-		size_t len = 0;
-		const char * str = lua_tolstring(tolua_S, 1, &len);
-		if (str != nullptr)
-		{
-			return AString(str, len);
-		}
-	}
-	return "";
+
+	size_t len = 0;
+	const char * str = lua_tolstring(tolua_S, 1, &len);
+	Logger::LogSimple(std::string_view(str, len), a_LogLevel);
 }
 
 
@@ -401,15 +397,17 @@ static int tolua_LOG(lua_State * tolua_S)
 	}
 
 	// If the param is a cCompositeChat, read the log level from it:
-	cLogger::eLogLevel LogLevel = cLogger::llRegular;
+	eLogLevel LogLevel = eLogLevel::Regular;
 	tolua_Error err;
 	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
 	{
-		LogLevel = cCompositeChat::MessageTypeToLogLevel(static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->GetMessageType());
+		LogLevel = cCompositeChat::MessageTypeToLogLevel(
+			static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->GetMessageType()
+		);
 	}
 
 	// Log the message:
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), LogLevel);
+	LogFromLuaStack(tolua_S, LogLevel);
 	return 0;
 }
 
@@ -427,7 +425,7 @@ static int tolua_LOGINFO(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), cLogger::llInfo);
+	LogFromLuaStack(tolua_S, eLogLevel::Info);
 	return 0;
 }
 
@@ -445,7 +443,7 @@ static int tolua_LOGWARN(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), cLogger::llWarning);
+	LogFromLuaStack(tolua_S, eLogLevel::Warning);
 	return 0;
 }
 
@@ -463,7 +461,7 @@ static int tolua_LOGERROR(lua_State * tolua_S)
 		return 0;
 	}
 
-	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), cLogger::llError);
+	LogFromLuaStack(tolua_S, eLogLevel::Error);
 	return 0;
 }
 
@@ -2748,6 +2746,33 @@ static int tolua_get_cItem_m_LoreTable(lua_State * tolua_S)
 
 
 
+static int tolua_cItem_EnchantByXPLevels(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cItem") ||
+		!L.CheckParamNumber(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cItem * Self;
+	int NumXPLevels;
+	L.GetStackValue(1, Self);
+	L.GetStackValue(2, NumXPLevels);
+
+	// Call:
+	L.Push(Self->EnchantByXPLevels(NumXPLevels, GetRandomProvider()));
+	return 1;
+}
+
+
+
+
+
 static int tolua_set_cItem_m_LoreTable(lua_State * tolua_S)
 {
 	// Check params:
@@ -2823,64 +2848,67 @@ public:
 	{
 	}
 
-	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 	{
 		bool res = false;
-		if (!m_Callbacks->CallTableFn(
+		if (m_Callbacks->CallTableFn(
 			"OnNextBlock",
-			a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_EntryFace,
-			cLuaState::Return, res
-		))
+			a_BlockPos,
+			a_BlockType,
+			a_BlockMeta,
+			a_EntryFace,
+			cLuaState::Return, res)
+		)
 		{
-			// No such function in the table, skip the callback
-			return false;
+			return res;
 		}
-		return res;
+		// No such function in the table, skip the callback
+		return false;
 	}
 
-	virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ, char a_EntryFace) override
+	virtual bool OnNextBlockNoData(Vector3i a_BlockPos, char a_EntryFace) override
 	{
 		bool res = false;
-		if (!m_Callbacks->CallTableFn(
+		if (m_Callbacks->CallTableFn(
 			"OnNextBlockNoData",
-			a_BlockX, a_BlockY, a_BlockZ, a_EntryFace,
-			cLuaState::Return, res
-		))
+			a_BlockPos,
+			a_EntryFace,
+			cLuaState::Return, res)
+		)
 		{
-			// No such function in the table, skip the callback
-			return false;
+			return res;
 		}
-		return res;
+		// No such function in the table, skip the callback
+		return false;
 	}
 
-	virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
+	virtual bool OnOutOfWorld(Vector3d a_BlockPos) override
 	{
 		bool res = false;
-		if (!m_Callbacks->CallTableFn(
+		if (m_Callbacks->CallTableFn(
 			"OnOutOfWorld",
-			a_BlockX, a_BlockY, a_BlockZ,
-			cLuaState::Return, res
-		))
+			a_BlockPos,
+			cLuaState::Return, res)
+		)
 		{
-			// No such function in the table, skip the callback
-			return false;
+			return res;
 		}
-		return res;
+		// No such function in the table, skip the callback
+		return false;
 	}
 
-	virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
+	virtual bool OnIntoWorld(Vector3d a_BlockPos) override
 	{
 		bool res = false;
-		if (!m_Callbacks->CallTableFn(
-			"OnIntoWorld",
-			a_BlockX, a_BlockY, a_BlockZ,
-			cLuaState::Return, res
-		))
+		if (m_Callbacks->CallTableFn("OnIntoWorld",
+			a_BlockPos,
+			cLuaState::Return, res)
+		)
 		{
-			// No such function in the table, skip the callback
-			return false;
+			return res;
 		}
-		return res;
+		// No such function in the table, skip the callback
+		return false;
 	}
 
 	virtual void OnNoMoreHits(void) override
@@ -2895,7 +2923,88 @@ public:
 
 protected:
 	cLuaState::cTableRefPtr m_Callbacks;
-} ;
+};
+
+
+
+
+
+/** Provides interface between a Lua table of callbacks and the cBlockTracer::cCallbacks
+This is the deprecated version of cLuaBlockTracerCallback, used when the plugin calls
+the Trace function with number-based coords. */
+class cLuaBlockTracerCallbacksOld :
+	public cLuaBlockTracerCallbacks
+{
+public:
+	cLuaBlockTracerCallbacksOld(cLuaState::cTableRefPtr && a_Callbacks):
+		cLuaBlockTracerCallbacks(std::move(a_Callbacks))
+	{
+	}
+
+	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	{
+		bool res = false;
+		if (m_Callbacks->CallTableFn(
+			"OnNextBlock",
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+			a_BlockType,
+			a_BlockMeta,
+			a_EntryFace,
+			cLuaState::Return, res)
+		)
+		{
+			return res;
+		}
+		// No such function in the table, skip the callback
+		return false;
+	}
+
+	virtual bool OnNextBlockNoData(Vector3i a_BlockPos, char a_EntryFace) override
+	{
+		bool res = false;
+		if (m_Callbacks->CallTableFn(
+			"OnNextBlockNoData",
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+			a_EntryFace,
+			cLuaState::Return, res)
+		)
+		{
+			return res;
+		}
+		// No such function in the table, skip the callback
+		return false;
+	}
+
+	virtual bool OnOutOfWorld(Vector3d a_BlockPos) override
+	{
+		bool res = false;
+		if (m_Callbacks->CallTableFn(
+			"OnOutOfWorld",
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+			cLuaState::Return, res)
+		)
+		{
+			return res;
+		}
+		// No such function in the table, skip the callback
+		return false;
+	}
+
+	virtual bool OnIntoWorld(Vector3d a_BlockPos) override
+	{
+		bool res = false;
+		if (m_Callbacks->CallTableFn(
+			"OnIntoWorld",
+			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+			cLuaState::Return, res)
+		)
+		{
+			return res;
+		}
+		// No such function in the table, skip the callback
+		return false;
+	}
+};
 
 
 
@@ -2963,11 +3072,11 @@ static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
 		return 4;
 	}
 
-	if (L.IsParamUserType(idx + 1, "Vector3<double>"))
+	if (L.IsParamVector3(idx + 1))
 	{
-		// This is the Vector3d-based variant of the call:
+		// This is the Vector3-based variant of the call:
 		if (
-			!L.CheckParamUserType(idx + 1, "Vector3<double>", idx + 2) ||
+			!L.CheckParamVector3(idx + 1, idx + 2) ||
 			!L.CheckParamEnd(idx + 3)
 		)
 		{
@@ -2975,8 +3084,8 @@ static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
 		}
 		// Get the params:
 		cWorld * world;
-		Vector3d * start;
-		Vector3d * end;
+		Vector3d start;
+		Vector3d end;
 		if (!L.GetStackValues(idx, world, start, end))
 		{
 			LOGWARNING("cLineBlockTracer:FirstSolidHitTrace(): Cannot read parameters, aborting the trace.");
@@ -2987,7 +3096,7 @@ static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
 		Vector3d hitCoords;
 		Vector3i hitBlockCoords;
 		eBlockFace hitBlockFace;
-		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*world, *start, *end, hitCoords, hitBlockCoords, hitBlockFace);
+		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*world, start, end, hitCoords, hitBlockCoords, hitBlockFace);
 		L.Push(isHit);
 		if (!isHit)
 		{
@@ -2999,7 +3108,7 @@ static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
 		return 4;
 	}
 
-	tolua_error(L, "cLineBlockTracer:FirstSolidHitTrace(): Invalid parameters, expected either a set of coords, or two Vector3d's", nullptr);
+	tolua_error(L, "cLineBlockTracer:FirstSolidHitTrace(): Invalid parameters, expected either a set of coords, or two Vector3's", nullptr);
 	return 0;
 }
 
@@ -3061,11 +3170,11 @@ static int tolua_cLineBlockTracer_LineOfSightTrace(lua_State * tolua_S)
 		return 1;
 	}
 
-	if (L.IsParamUserType(idx + 1, "Vector3<double>"))
+	if (L.IsParamVector3(idx + 1))
 	{
-		// This is the Vector3d-based variant of the call:
+		// This is the Vector3-based variant of the call:
 		if (
-			!L.CheckParamUserType(idx + 1, "Vector3<double>", idx + 2) ||
+			!L.CheckParamVector3(idx + 1, idx + 2) ||
 			// Optional param lineOfSight is not checked
 			!L.CheckParamEnd(idx + 4)
 		)
@@ -3074,8 +3183,8 @@ static int tolua_cLineBlockTracer_LineOfSightTrace(lua_State * tolua_S)
 		}
 		// Get the params:
 		cWorld * world;
-		Vector3d * start;
-		Vector3d * end;
+		Vector3d start;
+		Vector3d end;
 		if (!L.GetStackValues(idx, world, start, end))
 		{
 			LOGWARNING("cLineBlockTracer:LineOfSightTrace(): Cannot read parameters, aborting the trace.");
@@ -3085,11 +3194,11 @@ static int tolua_cLineBlockTracer_LineOfSightTrace(lua_State * tolua_S)
 		}
 		int lineOfSight = cLineBlockTracer::losAirWater;
 		L.GetStackValue(idx + 7, lineOfSight);
-		L.Push(cLineBlockTracer::LineOfSightTrace(*world, *start, *end, lineOfSight));
+		L.Push(cLineBlockTracer::LineOfSightTrace(*world, start, end, lineOfSight));
 		return 1;
 	}
 
-	tolua_error(L, "cLineBlockTracer:LineOfSightTrace(): Invalid parameters, expected either a set of coords, or two Vector3d's", nullptr);
+	tolua_error(L, "cLineBlockTracer:LineOfSightTrace(): Invalid parameters, expected either a set of coords, or two Vector3's", nullptr);
 	return 0;
 }
 
@@ -3100,8 +3209,10 @@ static int tolua_cLineBlockTracer_LineOfSightTrace(lua_State * tolua_S)
 static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 {
 	/* Supported function signatures:
-	cLineBlockTracer:Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)  // Canonical
-	cLineBlockTracer.Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)
+	cLineBlockTracer:Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)  // Canonical  // DEPRECATED
+	cLineBlockTracer.Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)  // DEPRECATED
+	cLineBlockTracer:Trace(World, Callbacks, Start, End)  // Canonical
+	cLineBlockTracer.Trace(World, Callbacks, Start, End)
 	*/
 
 	// If the first param is the cLineBlockTracer class, shift param index by one:
@@ -3116,9 +3227,7 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 	cLuaState L(tolua_S);
 	if (
 		!L.CheckParamUserType(idx, "cWorld") ||
-		!L.CheckParamTable   (idx + 1) ||
-		!L.CheckParamNumber  (idx + 2, idx + 7) ||
-		!L.CheckParamEnd     (idx + 8)
+		!L.CheckParamTable   (idx + 1)
 	)
 	{
 		return 0;
@@ -3126,22 +3235,54 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 
 	// Get the params:
 	cWorld * world;
-	double startX, startY, startZ;
-	double endX, endY, endZ;
+	Vector3d start;
+	Vector3d end;
 	cLuaState::cTableRefPtr callbacks;
-	if (!L.GetStackValues(idx, world, callbacks, startX, startY, startZ, endX, endY, endZ))
+	if (
+		L.IsParamNumber  (idx + 2) &&
+		L.IsParamNumber  (idx + 3) &&
+		L.IsParamNumber  (idx + 4) &&
+		L.IsParamNumber  (idx + 5) &&
+		L.IsParamNumber  (idx + 6) &&
+		L.IsParamNumber  (idx + 7) &&
+		L.CheckParamEnd  (idx + 8)
+	)
 	{
-		LOGWARNING("cLineBlockTracer:Trace(): Cannot read parameters (starting at idx %d), aborting the trace.", idx);
+		if (!L.GetStackValues(idx, world, callbacks, start.x, start.y, start.z, end.x, end.y, end.z))
+		{
+			LOGWARNING("cLineBlockTracer:Trace(): Cannot read parameters (starting at idx %d), aborting the trace.", idx);
+			L.LogStackTrace();
+			L.LogStackValues("Values on the stack");
+			return 0;
+		}
+		LOGWARNING("cLineBlockTracer:Trace(): Using plain numbers is deprecated, use Vector3 coords instead.");
 		L.LogStackTrace();
-		L.LogStackValues("Values on the stack");
-		return 0;
+		// Trace:
+		cLuaBlockTracerCallbacksOld tracerCallbacks(std::move(callbacks));
+		bool res = cLineBlockTracer::Trace(*world, tracerCallbacks, start, end);
+		tolua_pushboolean(L, res ? 1 : 0);
+		return 1;
 	}
-
-	// Trace:
-	cLuaBlockTracerCallbacks tracerCallbacks(std::move(callbacks));
-	bool res = cLineBlockTracer::Trace(*world, tracerCallbacks, startX, startY, startZ, endX, endY, endZ);
-	tolua_pushboolean(L, res ? 1 : 0);
-	return 1;
+	else if (
+		L.IsParamVector3(idx + 2) &&
+		L.IsParamVector3(idx + 3) &&
+		L.CheckParamEnd (idx + 4)
+	)
+	{
+		if (!L.GetStackValues(idx, world, callbacks, start, end))
+		{
+			LOGWARNING("cLineBlockTracer:Trace(): Cannot read parameters (starting at idx %d), aborting the trace.", idx);
+			L.LogStackTrace();
+			L.LogStackValues("Values on the stack");
+			return 0;
+		}
+		// Trace:
+		cLuaBlockTracerCallbacks tracerCallbacks(std::move(callbacks));
+		bool res = cLineBlockTracer::Trace(*world, tracerCallbacks, start, end);
+		tolua_pushboolean(L, res ? 1 : 0);
+		return 1;
+	}
+	return L.ApiParamError("Invalid overload of cLineBlockTracer:Trace()");
 }
 
 
@@ -3477,14 +3618,13 @@ static int tolua_cHopperEntity_GetOutputBlockPos(lua_State * tolua_S)
 	}
 
 	NIBBLETYPE a_BlockMeta = static_cast<NIBBLETYPE>(tolua_tonumber(tolua_S, 2, 0));
-	int a_OutputX, a_OutputY, a_OutputZ;
-	bool res = self->GetOutputBlockPos(a_BlockMeta, a_OutputX, a_OutputY, a_OutputZ);
-	tolua_pushboolean(tolua_S, res);
-	if (res)
+	auto res = self->GetOutputBlockPos(a_BlockMeta);
+	tolua_pushboolean(tolua_S, res.first);
+	if (res.first)
 	{
-		tolua_pushnumber(tolua_S, static_cast<lua_Number>(a_OutputX));
-		tolua_pushnumber(tolua_S, static_cast<lua_Number>(a_OutputY));
-		tolua_pushnumber(tolua_S, static_cast<lua_Number>(a_OutputZ));
+		tolua_pushnumber(tolua_S, static_cast<lua_Number>(res.second.x));
+		tolua_pushnumber(tolua_S, static_cast<lua_Number>(res.second.y));
+		tolua_pushnumber(tolua_S, static_cast<lua_Number>(res.second.z));
 		return 4;
 	}
 	return 1;
@@ -3498,19 +3638,19 @@ static int tolua_cBoundingBox_CalcLineIntersection(lua_State * a_LuaState)
 {
 	/* Function signatures:
 	bbox:CalcLineIntersection(pt1, pt2) -> bool, [number, blockface]
-	cBoundingBox:CalcLineIntersection(min, max, pt1, pt2) -> bool, [number, blockface]
+	cBoundingBox:CalcLineIntersection(min, max, pt1, pt2) -> bool, [number, blockface] (static)
 	*/
 	cLuaState L(a_LuaState);
-	const Vector3d * min;
-	const Vector3d * max;
-	const Vector3d * pt1;
-	const Vector3d * pt2;
+	Vector3d min;
+	Vector3d max;
+	Vector3d pt1;
+	Vector3d pt2;
 	double lineCoeff;
 	eBlockFace blockFace;
 	bool res;
 	if (L.GetStackValues(2, min, max, pt1, pt2))  // Try the static signature first
 	{
-		res = cBoundingBox::CalcLineIntersection(*min, *max, *pt1, *pt2, lineCoeff, blockFace);
+		res = cBoundingBox::CalcLineIntersection(min, max, pt1, pt2, lineCoeff, blockFace);
 	}
 	else
 	{
@@ -3521,7 +3661,7 @@ static int tolua_cBoundingBox_CalcLineIntersection(lua_State * a_LuaState)
 			tolua_error(a_LuaState, "Invalid function params. Expected either bbox:CalcLineIntersection(pt1, pt2) or cBoundingBox:CalcLineIntersection(min, max, pt1, pt2).", nullptr);
 			return 0;
 		}
-		res = bbox->CalcLineIntersection(*pt1, *pt2, lineCoeff, blockFace);
+		res = bbox->CalcLineIntersection(pt1, pt2, lineCoeff, blockFace);
 	}
 	L.Push(res);
 	if (res)
@@ -3954,6 +4094,153 @@ static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
 
 
 
+static int tolua_cCuboid_Assign(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("cCuboid"))
+	{
+		return 0;
+	}
+
+	cCuboid * self = nullptr;
+	L.GetStackValue(1, self);
+
+	// Check the old coord-based signature:
+	int x1, y1, z1, x2, y2, z2;
+	if (L.GetStackValues(2, x1, y1, z1, x2, y2, z2))
+	{
+		LOGWARNING("cCuboid:Assign(x1, y1, z1, x2, y2, z2) is deprecated, use cCuboid:Assign(Vector3i, Vector3i) instead.");
+		L.LogStackTrace();
+		self->Assign({x1, y1, z1}, {x2, y2, z2});
+		return 0;
+	}
+
+	// Try the (cCuboid) param version:
+	cCuboid * other = nullptr;
+	if (L.GetStackValue(2, other) && (other != nullptr))
+	{
+		self->Assign(*other);
+		return 0;
+	}
+
+	// Try the (Vector3i, Vector3i) param version:
+	Vector3i pt1;
+	Vector3i pt2;
+	if (L.GetStackValues(2, pt1, pt2))
+	{
+		self->Assign(pt1, pt2);
+		return 0;
+	}
+	return L.ApiParamError("Invalid parameter, expected either a cCuboid or two Vector3i-s.");
+}
+
+
+
+
+
+static int tolua_cCuboid_IsInside(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("cCuboid"))
+	{
+		return 0;
+	}
+
+	cCuboid * self = nullptr;
+	L.GetStackValue(1, self);
+
+	// Check the old coord-based signature:
+	int x, y, z;
+	if (L.GetStackValues(2, x, y, z))
+	{
+		LOGWARNING("cCuboid:IsInside(x, y, z) is deprecated, use cCuboid:IsInside(Vector3) instead.");
+		L.LogStackTrace();
+		L.Push(self->IsInside(Vector3i{x, y, z}));
+		return 1;
+	}
+
+	// Try the Vector3 param version:
+	Vector3d pt;
+	if (L.GetStackValue(2, pt))
+	{
+		L.Push(self->IsInside(pt));
+		return 1;
+	}
+	return L.ApiParamError("Invalid parameter #2, expected a Vector3.");
+}
+
+
+
+
+
+static int tolua_cCuboid_Move(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("cCuboid"))
+	{
+		return 0;
+	}
+
+	cCuboid * self = nullptr;
+	L.GetStackValue(1, self);
+
+	// Check the old coord-based signature:
+	int x, y, z;
+	if (L.GetStackValues(2, x, y, z))
+	{
+		LOGWARNING("cCuboid:Move(x, y, z) is deprecated, use cCuboid:Move(Vector3i) instead.");
+		L.LogStackTrace();
+		self->Move({x, y, z});
+		return 0;
+	}
+
+	Vector3i offset;
+	if (!L.GetStackValue(2, offset))
+	{
+		return L.ApiParamError("Invalid parameter #2, expected a Vector3.");
+	}
+	self->Move(offset);
+	return 0;
+}
+
+
+
+
+
+static int tolua_cEntity_Destroy(lua_State * tolua_S)
+{
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cEntity"))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cEntity * self = nullptr;
+	L.GetStackValue(1, self);
+
+	if (lua_gettop(L) == 2)
+	{
+		LOGWARNING("cEntity:Destroy(bool) is deprecated, use cEntity:Destroy() instead.");
+	}
+
+	if (self->IsPlayer())
+	{
+		return L.ApiParamError("Cannot call cEntity:Destroy() on a cPlayer, use cClientHandle:Kick() instead.");
+	}
+
+	self->Destroy();
+	return 0;
+}
+
+
+
+
+
 static int tolua_cEntity_IsSubmerged(lua_State * tolua_S)
 {
 	// Check the params:
@@ -4121,8 +4408,15 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "sha1HexString", tolua_sha1HexString);
 		tolua_endmodule(tolua_S);
 
+		tolua_beginmodule(tolua_S, "cCuboid");
+			tolua_function(tolua_S, "Assign",   tolua_cCuboid_Assign);
+			tolua_function(tolua_S, "IsInside", tolua_cCuboid_IsInside);
+			tolua_function(tolua_S, "Move",     tolua_cCuboid_Move);
+		tolua_endmodule(tolua_S);
+
 		tolua_beginmodule(tolua_S, "cEntity");
 			tolua_constant(tolua_S, "INVALID_ID", cEntity::INVALID_ID);
+			tolua_function(tolua_S, "Destroy", tolua_cEntity_Destroy);
 			tolua_function(tolua_S, "IsSubmerged", tolua_cEntity_IsSubmerged);
 			tolua_function(tolua_S, "IsSwimming", tolua_cEntity_IsSwimming);
 			tolua_function(tolua_S, "GetPosition", tolua_cEntity_GetPosition);
@@ -4153,7 +4447,8 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cItem");
-			tolua_variable(tolua_S, "m_LoreTable", tolua_get_cItem_m_LoreTable, tolua_set_cItem_m_LoreTable);
+			tolua_function(tolua_S, "EnchantByXPLevels", tolua_cItem_EnchantByXPLevels);
+			tolua_variable(tolua_S, "m_LoreTable",       tolua_get_cItem_m_LoreTable, tolua_set_cItem_m_LoreTable);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cItemGrid");

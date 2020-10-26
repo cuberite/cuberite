@@ -2,18 +2,21 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "../BlockInfo.h"
 
 
 
 
 
-class cItemSwordHandler :
+class cItemSwordHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
-	cItemSwordHandler(int a_ItemType)
-	: cItemHandler(a_ItemType)
+
+	cItemSwordHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
 
@@ -24,7 +27,7 @@ public:
 		{
 			return true;
 		}
-		return super::CanHarvestBlock(a_BlockType);
+		return Super::CanHarvestBlock(a_BlockType);
 	}
 
 
@@ -66,7 +69,6 @@ public:
 			if (
 				IsBlockMaterialPlants(a_Block) ||
 				IsBlockMaterialVine(a_Block)   ||
-				IsBlockMaterialCoral(a_Block)  ||
 				IsBlockMaterialLeaves(a_Block) ||
 				IsBlockMaterialGourd(a_Block)
 			)

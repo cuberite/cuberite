@@ -18,8 +18,6 @@
 
 
 
-
-
 class cStructGenTrees :
 	public cFinishGen
 {
@@ -27,9 +25,9 @@ public:
 	cStructGenTrees(int a_Seed, cBiomeGenPtr a_BiomeGen, cTerrainShapeGenPtr a_ShapeGen, cTerrainCompositionGenPtr a_CompositionGen) :
 		m_Seed(a_Seed),
 		m_Noise(a_Seed),
-		m_BiomeGen(a_BiomeGen),
-		m_ShapeGen(a_ShapeGen),
-		m_CompositionGen(a_CompositionGen)
+		m_BiomeGen(std::move(a_BiomeGen)),
+		m_ShapeGen(std::move(a_ShapeGen)),
+		m_CompositionGen(std::move(a_CompositionGen))
 	{}
 
 protected:
@@ -46,6 +44,7 @@ protected:
 	*/
 	void GenerateSingleTree(
 		int a_ChunkX, int a_ChunkZ, int a_Seq,
+		Vector3i a_Pos,
 		cChunkDesc & a_ChunkDesc,
 		sSetBlockVector & a_OutsideLogs,
 		sSetBlockVector & a_OutsideOther
@@ -59,7 +58,10 @@ protected:
 		sSetBlockVector & a_Overflow
 	);
 
-	int GetNumTrees(
+	/** Get the the number of trees to generate in a_Chunk
+	If the value is between 0 and 1, it should be interpreted as the probability that a tree should be generated.
+	*/
+	double GetNumTrees(
 		int a_ChunkX, int a_ChunkZ,
 		const cChunkDef::BiomeMap & a_Biomes
 	);
@@ -80,7 +82,7 @@ public:
 		m_Noise(a_Seed),
 		m_Seed(a_Seed),
 		m_Fluid(a_Fluid),
-		m_ShapeGen(a_ShapeGen),
+		m_ShapeGen(std::move(a_ShapeGen)),
 		m_Probability(a_Probability)
 	{
 	}

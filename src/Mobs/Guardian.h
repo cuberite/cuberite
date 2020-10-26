@@ -7,12 +7,13 @@
 
 
 
-class cGuardian :
+class cGuardian:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
+
 	cGuardian();
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;

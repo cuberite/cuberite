@@ -18,9 +18,7 @@ logs can overwrite others(leaves), but others shouldn't overwrite logs. This is 
 #pragma once
 
 #include "../Noise/Noise.h"
-
-class cWorld;
-
+#include "../ChunkDef.h"  // For sSetBlockVector
 
 
 
@@ -51,62 +49,71 @@ class cWorld;
 
 
 
-/** Generates an image of a tree at the specified coords (lowest trunk block) in the specified biome */
-void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, EMCSBiome a_Biome, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a tree at the specified coords (lowest trunk block) in the specified biome */
+void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSBiome a_Biome, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-/** Generates an image of a random apple tree */
-void GetAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random apple tree */
+void GetAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-/** Generates an image of a small (nonbranching) apple tree */
-void GetSmallAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a small (nonbranching) apple tree */
+void GetSmallAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-/** Generates an image of a large (branching) apple tree */
-void GetLargeAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a large (branching) apple tree */
+void GetLargeAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-/** Generates a branch for a large apple tree */
-void GetLargeAppleTreeBranch(int a_BlockX, int a_BlockY, int a_BlockZ, int a_BranchLength, Vector3d a_StartDirection, Vector3d a_Direction, int a_TreeHeight, cNoise & a_Noise, sSetBlockVector & a_LogBlocks);
+/** Fills a_LogBlocks with the logs of a tree branch of the provided log type.
+The length of the branch can be changed with the a_BranchLength.
+The initial direction is a_StartDirection. The direction can be manipulated with a_Direction to create a curve.
+Returns the position of the last log block placed. */
+Vector3d GetTreeBranch(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_BlockPos, int a_BranchLength, Vector3d a_StartDirection, Vector3d a_Direction, sSetBlockVector & a_LogBlocks);
 
 /** Returns the meta for a log from the given direction */
 NIBBLETYPE GetLogMetaFromDirection(NIBBLETYPE a_BlockMeta, Vector3d a_Direction);
 
-/** Generates an image of a random birch tree */
-void GetBirchTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random birch tree */
+void GetBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-/** Generates an image of a random acacia tree */
-void GetAcaciaTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random acacia tree */
+void GetAcaciaTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-/** Generates an image of a random darkoak tree */
-void GetDarkoakTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random darkoak tree */
+void GetDarkoakTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-/** Generates an image of a random large birch tree */
-void GetTallBirchTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random large birch tree */
+void GetTallBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-/** Generates an image of a random conifer tree */
-void GetConiferTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random conifer tree. The probability to get a large pine is higher than a spruce tree */
+void GetConiferTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large = false);
 
-/** Generates an image of a random spruce (short conifer, two layers of leaves) */
-void GetSpruceTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random spruce */
+void GetSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large = false);
 
-/** Generates an image of a random pine (tall conifer, little leaves at top) */
-void GetPineTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random pine */
+void GetPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large = false);
 
-/** Generates an image of a random swampland tree */
-void GetSwampTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random small spruce (short conifer, two layers of leaves) */
+void GetSmallSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-/** Generates an image of a random apple bush (for jungles) */
-void GetAppleBushImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random small pine (tall conifer, little leaves at top) */
+void GetSmallPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-/** Generates an image of a random jungle tree */
-void GetJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random large spruce (short conifer, multiple layers of leaves) */
+void GetLargeSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-/** Generates an image of a large jungle tree (2x2 trunk) */
-void GetLargeJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random large pine (tall conifer, little leaves at top) */
+void GetLargePineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-/** Generates an image of a small jungle tree (1x1 trunk) */
-void GetSmallJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random swampland tree */
+void GetSwampTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-/** Moves the x and z coordinants to the north-west corner of a 2x2 of saplings. Returns true if a 2x2 was found, otherwise it returns false */
-bool GetLargeTreeAdjustment(cWorld & a_World, int & a_X, int & a_Y, int & a_Z, NIBBLETYPE a_Meta);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random apple bush (for jungles) */
+void GetAppleBushImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random jungle tree */
+void GetJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large);
 
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a large jungle tree (2x2 trunk) */
+void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a small jungle tree (1x1 trunk) */
+void GetSmallJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);

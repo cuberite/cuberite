@@ -9,24 +9,25 @@
 
 // Handlers:
 #include "ItemArmor.h"
+#include "ItemAxe.h"
 #include "ItemBed.h"
 #include "ItemBigFlower.h"
 #include "ItemBoat.h"
 #include "ItemBottle.h"
 #include "ItemBow.h"
-#include "ItemBrewingStand.h"
 #include "ItemBucket.h"
-#include "ItemCake.h"
-#include "ItemCauldron.h"
 #include "ItemChest.h"
 #include "ItemCloth.h"
 #include "ItemComparator.h"
+#include "ItemCookedFish.h"
 #include "ItemDoor.h"
 #include "ItemDye.h"
 #include "ItemEmptyMap.h"
+#include "ItemEnchantingTable.h"
+#include "ItemEyeOfEnder.h"
 #include "ItemFishingRod.h"
-#include "ItemFlowerPot.h"
 #include "ItemFood.h"
+#include "ItemFoodSeeds.h"
 #include "ItemGoldenApple.h"
 #include "ItemHoe.h"
 #include "ItemItemFrame.h"
@@ -40,24 +41,28 @@
 #include "ItemNetherWart.h"
 #include "ItemPainting.h"
 #include "ItemPickaxe.h"
+#include "ItemPoisonousPotato.h"
 #include "ItemPotion.h"
 #include "ItemPumpkin.h"
+#include "ItemRawChicken.h"
+#include "ItemRawFish.h"
 #include "ItemRedstoneDust.h"
 #include "ItemRedstoneRepeater.h"
+#include "ItemRottenFlesh.h"
 #include "ItemSapling.h"
 #include "ItemSeeds.h"
 #include "ItemShears.h"
 #include "ItemShovel.h"
 #include "ItemSign.h"
 #include "ItemSlab.h"
+#include "ItemSoup.h"
 #include "ItemSpawnEgg.h"
-#include "ItemString.h"
-#include "ItemSugarcane.h"
+#include "ItemSpiderEye.h"
 #include "ItemSword.h"
 #include "ItemThrowable.h"
-#include "ItemAxe.h"
 
 #include "../Blocks/BlockHandler.h"
+#include "SimplePlaceableItemHandler.h"
 
 
 
@@ -108,6 +113,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		// Single item per handler, alphabetically sorted:
 		case E_BLOCK_BIG_FLOWER:         return new cItemBigFlowerHandler;
 		case E_BLOCK_CHEST:              return new cItemChestHandler(a_ItemType);
+		case E_BLOCK_ENCHANTMENT_TABLE:  return new cItemEnchantingTableHandler(a_ItemType);
 		case E_BLOCK_LEAVES:             return new cItemLeavesHandler(a_ItemType);
 		case E_BLOCK_LILY_PAD:           return new cItemLilypadHandler(a_ItemType);
 		case E_BLOCK_HEAD:               return new cItemMobHeadHandler(a_ItemType);
@@ -123,21 +129,21 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BED:                 return new cItemBedHandler(a_ItemType);
 		case E_ITEM_BOTTLE_O_ENCHANTING: return new cItemBottleOEnchantingHandler();
 		case E_ITEM_BOW:                 return new cItemBowHandler();
-		case E_ITEM_BREWING_STAND:       return new cItemBrewingStandHandler(a_ItemType);
-		case E_ITEM_CAKE:                return new cItemCakeHandler(a_ItemType);
-		case E_ITEM_CAULDRON:            return new cItemCauldronHandler(a_ItemType);
+		case E_ITEM_BREWING_STAND:       return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_BREWING_STAND);
+		case E_ITEM_CAKE:                return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_CAKE);
+		case E_ITEM_CAULDRON:            return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_CAULDRON);
 		case E_ITEM_COMPARATOR:          return new cItemComparatorHandler(a_ItemType);
 		case E_ITEM_DYE:                 return new cItemDyeHandler(a_ItemType);
 		case E_ITEM_EGG:                 return new cItemEggHandler();
 		case E_ITEM_EMPTY_MAP:           return new cItemEmptyMapHandler();
 		case E_ITEM_ENDER_PEARL:         return new cItemEnderPearlHandler();
+		case E_ITEM_EYE_OF_ENDER:        return new cItemEyeOfEnderHandler();
 		case E_ITEM_FIRE_CHARGE:         return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FIREWORK_ROCKET:     return new cItemFireworkHandler();
 		case E_ITEM_FISHING_ROD:         return new cItemFishingRodHandler(a_ItemType);
 		case E_ITEM_FLINT_AND_STEEL:     return new cItemLighterHandler(a_ItemType);
-		case E_ITEM_FLOWER_POT:          return new cItemFlowerPotHandler(a_ItemType);
+		case E_ITEM_FLOWER_POT:          return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_FLOWER_POT);
 		case E_ITEM_GLASS_BOTTLE:        return new cItemBottleHandler();
-		case E_ITEM_GOLDEN_APPLE:        return new cItemGoldenAppleHandler();
 		case E_ITEM_MAP:                 return new cItemMapHandler();
 		case E_ITEM_MILK:                return new cItemMilkHandler();
 		case E_ITEM_ITEM_FRAME:          return new cItemItemFrameHandler(a_ItemType);
@@ -151,8 +157,8 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_HEAD:                return new cItemMobHeadHandler(a_ItemType);
 		case E_ITEM_SNOWBALL:            return new cItemSnowballHandler();
 		case E_ITEM_SPAWN_EGG:           return new cItemSpawnEggHandler(a_ItemType);
-		case E_ITEM_STRING:              return new cItemStringHandler(a_ItemType);
-		case E_ITEM_SUGARCANE:           return new cItemSugarcaneHandler(a_ItemType);
+		case E_ITEM_STRING:              return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_TRIPWIRE);
+		case E_ITEM_SUGARCANE:           return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_SUGARCANE);
 
 		case E_ITEM_WOODEN_HOE:
 		case E_ITEM_STONE_HOE:
@@ -207,14 +213,15 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		}
 
 		case E_ITEM_BEETROOT_SEEDS:
-		case E_ITEM_CARROT:
 		case E_ITEM_MELON_SEEDS:
-		case E_ITEM_POTATO:
 		case E_ITEM_PUMPKIN_SEEDS:
 		case E_ITEM_SEEDS:
 		{
 			return new cItemSeedsHandler(a_ItemType);
 		}
+
+		case E_ITEM_POTATO: return new cItemFoodSeedsHandler(a_ItemType, FoodInfo(1, 0.6));
+		case E_ITEM_CARROT: return new cItemFoodSeedsHandler(a_ItemType, FoodInfo(3, 6.6));
 
 		case E_ITEM_ACACIA_DOOR:
 		case E_ITEM_BIRCH_DOOR:
@@ -237,37 +244,38 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		}
 
 		// Food (please keep alpha-sorted):
-		// (carrots and potatoes handled separately in SeedHandler as they're both seed and food)
-		case E_ITEM_BAKED_POTATO:
-		case E_ITEM_BEETROOT:
-		case E_ITEM_BEETROOT_SOUP:
-		case E_ITEM_BREAD:
-		case E_ITEM_CHORUS_FRUIT:
-		case E_ITEM_COOKED_CHICKEN:
-		case E_ITEM_COOKED_FISH:
-		case E_ITEM_COOKED_MUTTON:
-		case E_ITEM_COOKED_PORKCHOP:
-		case E_ITEM_COOKED_RABBIT:
-		case E_ITEM_COOKIE:
-		case E_ITEM_GOLDEN_CARROT:
-		case E_ITEM_MELON_SLICE:
-		case E_ITEM_MUSHROOM_SOUP:
-		case E_ITEM_POISONOUS_POTATO:
-		case E_ITEM_PUMPKIN_PIE:
-		case E_ITEM_RABBIT_STEW:
-		case E_ITEM_RAW_BEEF:
-		case E_ITEM_RAW_CHICKEN:
-		case E_ITEM_RAW_FISH:
-		case E_ITEM_RAW_MUTTON:
-		case E_ITEM_RAW_PORKCHOP:
-		case E_ITEM_RAW_RABBIT:
-		case E_ITEM_RED_APPLE:
-		case E_ITEM_ROTTEN_FLESH:
-		case E_ITEM_SPIDER_EYE:
-		case E_ITEM_STEAK:
-		{
-			return new cItemFoodHandler(a_ItemType);
-		}
+		case E_ITEM_BAKED_POTATO:     return new cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
+		case E_ITEM_BEETROOT:         return new cItemFoodHandler(a_ItemType, FoodInfo(1, 1.2));
+		case E_ITEM_BREAD:            return new cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
+		case E_ITEM_CHORUS_FRUIT:     return new cItemFoodHandler(a_ItemType, FoodInfo(4, 2.4));
+		case E_ITEM_COOKED_CHICKEN:   return new cItemFoodHandler(a_ItemType, FoodInfo(6, 7.2));
+		case E_ITEM_COOKED_MUTTON:    return new cItemFoodHandler(a_ItemType, FoodInfo(6, 9.6));
+		case E_ITEM_COOKED_PORKCHOP:  return new cItemFoodHandler(a_ItemType, FoodInfo(8, 12.8));
+		case E_ITEM_COOKED_RABBIT:    return new cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
+		case E_ITEM_COOKIE:           return new cItemFoodHandler(a_ItemType, FoodInfo(2, 0.5));
+		case E_ITEM_GOLDEN_CARROT:    return new cItemFoodHandler(a_ItemType, FoodInfo(6, 14.4));
+		case E_ITEM_MELON_SLICE:      return new cItemFoodHandler(a_ItemType, FoodInfo(2, 1.2));
+		case E_ITEM_PUMPKIN_PIE:      return new cItemFoodHandler(a_ItemType, FoodInfo(8, 4.8));
+		case E_ITEM_RED_APPLE:        return new cItemFoodHandler(a_ItemType, FoodInfo(4, 2.4));
+		case E_ITEM_RAW_BEEF:         return new cItemFoodHandler(a_ItemType, FoodInfo(3, 1.8));
+		case E_ITEM_RAW_MUTTON:       return new cItemFoodHandler(a_ItemType, FoodInfo(2, 1.2));
+		case E_ITEM_RAW_PORKCHOP:     return new cItemFoodHandler(a_ItemType, FoodInfo(3, 1.8));
+		case E_ITEM_RAW_RABBIT:       return new cItemFoodHandler(a_ItemType, FoodInfo(3, 1.8));
+		case E_ITEM_STEAK:            return new cItemFoodHandler(a_ItemType, FoodInfo(8, 12.8));
+
+		// Special-case food with their own handler
+		case E_ITEM_COOKED_FISH: return new cItemCookedFishHandler();
+		case E_ITEM_GOLDEN_APPLE:        return new cItemGoldenAppleHandler();
+		case E_ITEM_POISONOUS_POTATO: return new cItemPoisonousPotatoHandler();
+		case E_ITEM_RAW_CHICKEN: return new cItemRawChickenHandler();
+		case E_ITEM_RAW_FISH: return new cItemRawFishHandler();
+		case E_ITEM_ROTTEN_FLESH: return new cItemRottenFleshHandler();
+		case E_ITEM_SPIDER_EYE: return new cItemSpiderEyeHandler();
+
+		// Soup:
+		case E_ITEM_BEETROOT_SOUP: return new cItemSoupHandler(a_ItemType, FoodInfo(6, 7.2));
+		case E_ITEM_MUSHROOM_SOUP: return new cItemSoupHandler(a_ItemType, FoodInfo(6, 7.2));
+		case E_ITEM_RABBIT_STEW: return new cItemSoupHandler(a_ItemType, FoodInfo(10, 12));
 
 		// Armor:
 		case E_ITEM_LEATHER_CAP:
@@ -335,39 +343,43 @@ cItemHandler::cItemHandler(int a_ItemType)
 
 
 bool cItemHandler::OnPlayerPlace(
-	cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-	int a_CursorX, int a_CursorY, int a_CursorZ
+	cWorld & a_World,
+	cPlayer & a_Player,
+	const cItem & a_EquippedItem,
+	const Vector3i a_ClickedBlockPos,
+	eBlockFace a_ClickedBlockFace,
+	const Vector3i a_CursorPos
 )
 {
-	if (a_BlockFace < 0)
+	if (a_ClickedBlockFace == BLOCK_FACE_NONE)
 	{
-		// Clicked in air
+		// Clicked in the air, no placement possible
 		return false;
 	}
 
-	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(a_ClickedBlockPos.y))
 	{
 		// The clicked block is outside the world, ignore this call altogether (#128)
 		return false;
 	}
 
-	BLOCKTYPE ClickedBlock;
+	BLOCKTYPE ClickedBlockType;
 	NIBBLETYPE ClickedBlockMeta;
 
-	a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
+	a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
 	cChunkInterface ChunkInterface(a_World.GetChunkMap());
 
 	// Check if the block ignores build collision (water, grass etc.):
-	if (BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY, a_BlockZ }, a_Player, ClickedBlockMeta))
+	auto PlacedBlockPos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+	if (cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
 	{
-		BlockHandler(ClickedBlock)->OnDestroyedByPlayer(ChunkInterface, a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ);
+		// Replace the clicked block:
+		a_World.DropBlockAsPickups(a_ClickedBlockPos, &a_Player, nullptr);
+		PlacedBlockPos = a_ClickedBlockPos;
 	}
 	else
 	{
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-
-		if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+		if (!cChunkDef::IsValidHeight(PlacedBlockPos.y))
 		{
 			// The block is being placed outside the world, ignore this packet altogether (#128)
 			return false;
@@ -375,11 +387,11 @@ bool cItemHandler::OnPlayerPlace(
 
 		NIBBLETYPE PlaceMeta;
 		BLOCKTYPE PlaceBlock;
-		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, PlaceBlock, PlaceMeta);
+		a_World.GetBlockTypeMeta(PlacedBlockPos, PlaceBlock, PlaceMeta);
 
 		// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
 		// No need to do combinability (dblslab) checks, client will do that here.
-		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY, a_BlockZ }, a_Player, PlaceMeta))
+		if (!cBlockHandler::For(PlaceBlock).DoesIgnoreBuildCollision(ChunkInterface, PlacedBlockPos, a_Player, PlaceMeta))
 		{
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it
@@ -389,14 +401,15 @@ bool cItemHandler::OnPlayerPlace(
 
 	// Get all the blocks to place:
 	sSetBlockVector blocks;
-	if (!GetBlocksToPlace(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, blocks))
+	if (!GetBlocksToPlace(a_World, a_Player, a_EquippedItem, PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, blocks))
 	{
 		// Handler refused the placement, send that information back to the client:
 		for (const auto & blk: blocks)
 		{
-			a_World.SendBlockTo(blk.GetX(), blk.GetY(), blk.GetZ(), a_Player);
+			const auto & AbsPos = blk.GetAbsolutePos();
+			a_World.SendBlockTo(AbsPos, a_Player);
 		}
-		a_World.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+		a_World.SendBlockTo(PlacedBlockPos, a_Player);
 		a_Player.GetInventory().SendEquippedSlot();
 		return false;
 	}
@@ -423,18 +436,19 @@ bool cItemHandler::OnPlayerPlace(
 
 bool cItemHandler::GetBlocksToPlace(
 	cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-	int a_CursorX, int a_CursorY, int a_CursorZ,
+	const Vector3i a_PlacedBlockPos,
+	eBlockFace a_ClickedBlockFace,
+	const Vector3i a_CursorPos,
 	sSetBlockVector & a_BlocksToSet
 )
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
-	if (!GetPlacementBlockTypeMeta(&a_World, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+	if (!GetPlacementBlockTypeMeta(&a_World, &a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, BlockType, BlockMeta))
 	{
 		return false;
 	}
-	a_BlocksToSet.emplace_back(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+	a_BlocksToSet.emplace_back(a_PlacedBlockPos, BlockType, BlockMeta);
 	return true;
 }
 
@@ -444,17 +458,15 @@ bool cItemHandler::GetBlocksToPlace(
 
 bool cItemHandler::OnItemUse(
 	cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+	const Vector3i a_ClickedBlockPos, eBlockFace a_ClickedBlockFace
 )
 {
 	UNUSED(a_World);
 	UNUSED(a_Player);
 	UNUSED(a_PluginInterface);
 	UNUSED(a_Item);
-	UNUSED(a_BlockX);
-	UNUSED(a_BlockY);
-	UNUSED(a_BlockZ);
-	UNUSED(a_BlockFace);
+	UNUSED(a_ClickedBlockPos);
+	UNUSED(a_ClickedBlockFace);
 
 	return false;
 }
@@ -463,39 +475,21 @@ bool cItemHandler::OnItemUse(
 
 
 
-bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir)
+bool cItemHandler::OnDiggingBlock(
+	cWorld * a_World,
+	cPlayer * a_Player,
+	const cItem & a_HeldItem,
+	const Vector3i a_ClickedBlockPos,
+	eBlockFace a_ClickedBlockFace
+)
 {
 	UNUSED(a_World);
 	UNUSED(a_Player);
-	UNUSED(a_Item);
-	UNUSED(a_BlockX);
-	UNUSED(a_BlockY);
-	UNUSED(a_BlockZ);
-	UNUSED(a_Dir);
+	UNUSED(a_HeldItem);
+	UNUSED(a_ClickedBlockPos);
+	UNUSED(a_ClickedBlockFace);
 
 	return false;
-}
-
-
-
-
-
-void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	UNUSED(a_Item);
-
-	BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-	cBlockHandler * Handler = cBlockInfo::GetHandler(Block);
-
-	if (a_Player->IsGameModeSurvival())
-	{
-		cChunkInterface ChunkInterface(a_World->GetChunkMap());
-		cBlockInServerPluginInterface PluginInterface(*a_World);
-		Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, CanHarvestBlock(Block));
-	}
-
-	auto Action = (cBlockInfo::IsOneHitDig(Block) ? dlaBreakBlockInstant : dlaBreakBlock);
-	a_Player->UseEquippedItem(Action);
 }
 
 
@@ -724,18 +718,29 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 	switch (a_BlockType)
 	{
 		case E_BLOCK_ANVIL:
+		case E_BLOCK_BLACK_GLAZED_TERRACOTTA:
+		case E_BLOCK_BLOCK_OF_COAL:
+		case E_BLOCK_BLOCK_OF_REDSTONE:
+		case E_BLOCK_BLUE_GLAZED_TERRACOTTA:
 		case E_BLOCK_BONE_BLOCK:
+		case E_BLOCK_BREWING_STAND:
 		case E_BLOCK_BRICK:
+		case E_BLOCK_BRICK_STAIRS:
+		case E_BLOCK_BROWN_GLAZED_TERRACOTTA:
 		case E_BLOCK_CAULDRON:
 		case E_BLOCK_COAL_ORE:
 		case E_BLOCK_COBBLESTONE:
 		case E_BLOCK_COBBLESTONE_STAIRS:
 		case E_BLOCK_COBBLESTONE_WALL:
 		case E_BLOCK_COBWEB:
+		case E_BLOCK_CONCRETE:
+		case E_BLOCK_CYAN_GLAZED_TERRACOTTA:
 		case E_BLOCK_DIAMOND_BLOCK:
 		case E_BLOCK_DIAMOND_ORE:
+		case E_BLOCK_DISPENSER:
 		case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB:
 		case E_BLOCK_DOUBLE_STONE_SLAB:
+		case E_BLOCK_DROPPER:
 		case E_BLOCK_EMERALD_ORE:
 		case E_BLOCK_ENCHANTMENT_TABLE:
 		case E_BLOCK_END_BRICKS:
@@ -743,35 +748,54 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 		case E_BLOCK_FURNACE:
 		case E_BLOCK_GOLD_BLOCK:
 		case E_BLOCK_GOLD_ORE:
+		case E_BLOCK_GRAY_GLAZED_TERRACOTTA:
+		case E_BLOCK_GREEN_GLAZED_TERRACOTTA:
+		case E_BLOCK_HARDENED_CLAY:
+		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+		case E_BLOCK_HOPPER:
+		case E_BLOCK_IRON_BARS:
 		case E_BLOCK_IRON_BLOCK:
+		case E_BLOCK_IRON_DOOR:
 		case E_BLOCK_IRON_ORE:
 		case E_BLOCK_IRON_TRAPDOOR:
 		case E_BLOCK_LAPIS_BLOCK:
 		case E_BLOCK_LAPIS_ORE:
+		case E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA:
+		case E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA:
+		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+		case E_BLOCK_LIME_GLAZED_TERRACOTTA:
 		case E_BLOCK_LIT_FURNACE:
+		case E_BLOCK_MAGENTA_GLAZED_TERRACOTTA:
 		case E_BLOCK_MAGMA:
 		case E_BLOCK_MOB_SPAWNER:
 		case E_BLOCK_MOSSY_COBBLESTONE:
-		case E_BLOCK_NETHER_BRICK:
-		case E_BLOCK_NETHER_BRICK_STAIRS:
-		case E_BLOCK_NETHER_BRICK_FENCE:
 		case E_BLOCK_NETHERRACK:
-		case E_BLOCK_RED_SANDSTONE_SLAB:
+		case E_BLOCK_NETHER_BRICK:
+		case E_BLOCK_NETHER_BRICK_FENCE:
+		case E_BLOCK_NETHER_BRICK_STAIRS:
+		case E_BLOCK_NETHER_QUARTZ_ORE:
 		case E_BLOCK_OBSERVER:
 		case E_BLOCK_OBSIDIAN:
+		case E_BLOCK_ORANGE_GLAZED_TERRACOTTA:
+		case E_BLOCK_PINK_GLAZED_TERRACOTTA:
 		case E_BLOCK_PRISMARINE_BLOCK:
+		case E_BLOCK_PURPLE_GLAZED_TERRACOTTA:
 		case E_BLOCK_PURPUR_BLOCK:
 		case E_BLOCK_PURPUR_DOUBLE_SLAB:
 		case E_BLOCK_PURPUR_PILLAR:
 		case E_BLOCK_PURPUR_SLAB:
 		case E_BLOCK_PURPUR_STAIRS:
-		case E_BLOCK_RED_NETHER_BRICK:
-		case E_BLOCK_RED_SANDSTONE:
-		case E_BLOCK_RED_SANDSTONE_STAIRS:
+		case E_BLOCK_QUARTZ_BLOCK:
+		case E_BLOCK_QUARTZ_STAIRS:
 		case E_BLOCK_REDSTONE_ORE:
 		case E_BLOCK_REDSTONE_ORE_GLOWING:
-		case E_BLOCK_SANDSTONE_STAIRS:
+		case E_BLOCK_RED_GLAZED_TERRACOTTA:
+		case E_BLOCK_RED_NETHER_BRICK:
+		case E_BLOCK_RED_SANDSTONE:
+		case E_BLOCK_RED_SANDSTONE_SLAB:
+		case E_BLOCK_RED_SANDSTONE_STAIRS:
 		case E_BLOCK_SANDSTONE:
+		case E_BLOCK_SANDSTONE_STAIRS:
 		case E_BLOCK_SNOW:
 		case E_BLOCK_STONE:
 		case E_BLOCK_STONE_BRICKS:
@@ -779,6 +803,8 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 		case E_BLOCK_STONE_PRESSURE_PLATE:
 		case E_BLOCK_STONE_SLAB:
 		case E_BLOCK_VINES:
+		case E_BLOCK_WHITE_GLAZED_TERRACOTTA:
+		case E_BLOCK_YELLOW_GLAZED_TERRACOTTA:
 		{
 			return false;
 		}
@@ -792,8 +818,8 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 
 bool cItemHandler::GetPlacementBlockTypeMeta(
 	cWorld * a_World, cPlayer * a_Player,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-	int a_CursorX, int a_CursorY, int a_CursorZ,
+	const Vector3i a_PlacedBlockPos, eBlockFace a_ClickedBlockFace,
+	const Vector3i a_CursorPos,
 	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 )
 {
@@ -805,12 +831,11 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 		return false;
 	}
 
-	cBlockHandler * BlockH = BlockHandler(static_cast<BLOCKTYPE>(m_ItemType));
 	cChunkInterface ChunkInterface(a_World->GetChunkMap());
-	return BlockH->GetPlacementBlockTypeMeta(
+	return cBlockHandler::For(static_cast<BLOCKTYPE>(m_ItemType)).GetPlacementBlockTypeMeta(
 		ChunkInterface, *a_Player,
-		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
-		a_CursorX, a_CursorY, a_CursorZ,
+		a_PlacedBlockPos, a_ClickedBlockFace,
+		a_CursorPos,
 		a_BlockType, a_BlockMeta
 	);
 }

@@ -9,7 +9,7 @@
 
 
 cGuardian::cGuardian(void) :
-	super("Guardian", mtGuardian, "entity.guardian.hurt", "entity.guardian.death", 0.875, 0.8)
+	Super("Guardian", mtGuardian, "entity.guardian.hurt", "entity.guardian.death", "entity.guardian.ambient", 0.875, 0.8)
 {
 }
 
@@ -48,7 +48,7 @@ void cGuardian::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 }
 
 

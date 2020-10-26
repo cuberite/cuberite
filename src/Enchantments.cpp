@@ -7,6 +7,7 @@
 #include "WorldStorage/FastNBT.h"
 #include "FastRandom.h"
 #include "Noise/Noise.h"
+#include "BlockType.h"
 
 
 
@@ -84,7 +85,7 @@ void cEnchantments::AddFromString(const AString & a_StringSpec)
 
 
 
-size_t cEnchantments::Count(void)
+size_t cEnchantments::Count(void) const
 {
 	return m_Enchantments.size();
 }
@@ -303,7 +304,7 @@ bool cEnchantments::CanAddEnchantment(int a_EnchantmentID) const
 		// {enchInfinity, enchMending}
 	};
 
-	for (auto excl: IncompatibleEnchantments)
+	for (const auto & excl: IncompatibleEnchantments)
 	{
 		if (excl.count(a_EnchantmentID) != 0)
 		{
@@ -1111,7 +1112,9 @@ void cEnchantments::RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_
 
 
 
-void cEnchantments::CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, cEnchantments a_FirstEnchantment)
+void cEnchantments::CheckEnchantmentConflictsFromVector(
+	cWeightedEnchantments & a_Enchantments, const cEnchantments & a_FirstEnchantment
+)
 {
 	if (a_FirstEnchantment.GetLevel(cEnchantments::enchProtection) > 0)
 	{
@@ -1167,20 +1170,20 @@ void cEnchantments::CheckEnchantmentConflictsFromVector(cWeightedEnchantments & 
 
 
 
-cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments)
+cEnchantments cEnchantments::GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, MTRand & a_Random)
 {
 	int AllWeights = 0;
-	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
+	for (const auto & Enchantment: a_Enchantments)
 	{
-		AllWeights += (*it).m_Weight;
+		AllWeights += Enchantment.m_Weight;
 	}
-	int RandomNumber = GetRandomProvider().RandInt(AllWeights - 1);
-	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
+	int RandomNumber = a_Random.RandInt(AllWeights - 1);
+	for (const auto & Enchantment: a_Enchantments)
 	{
-		RandomNumber -= (*it).m_Weight;
+		RandomNumber -= Enchantment.m_Weight;
 		if (RandomNumber < 0)
 		{
-			return (*it).m_Enchantments;
+			return Enchantment.m_Enchantments;
 		}
 	}
 

@@ -3,142 +3,97 @@
 # Use CMake to generate the build files for your platform
 #
 # This script supports some configuration through CMake arguments (-Dparam=val syntax):
-#   BUILD_TOOLS=1            sets up additional executables to be built along with the server (ProtoProxy, GrownBiomeGenVisualiser, MCADefrag)
-#   BUILD_UNSTABLE_TOOLS=1   sets up yet more executables to be built, these can be broken and generally are obsolete (GeneratorPerformanceTest)
-#   NO_NATIVE_OPTIMIZATION=1 disables CPU-specific optimisations for the current machine, allows use on other CPUs of the same platform
-#   DISABLE_SYSTEM_LUA=1     disables the use of system Lua interpreter; the tolua executable will be built and used instead. Incompatible with cross-compiling
-#   SELF_TEST=1              enables testing code to be built
+#   BUILD_TOOLS=1                    sets up additional executables to be built along with the server (ProtoProxy, GrownBiomeGenVisualiser, MCADefrag)
+#   BUILD_UNSTABLE_TOOLS=1           sets up yet more executables to be built, these can be broken and generally are obsolete (GeneratorPerformanceTest)
+#   NO_NATIVE_OPTIMIZATION=1         disables CPU-specific optimisations for the current machine, allows use on other CPUs of the same platform
+#   DISABLE_SYSTEM_LUA=1             disables the use of system Lua interpreter; the tolua executable will be built and used instead. Incompatible with cross-compiling
+#   SELF_TEST=1                      enables testing code to be built
+#   UNITY_BUILDS=OFF                 disables unity builds
+#   PRECOMPILE_HEADERS=OFF           disables precompiled headers
+#   WHOLE_PROGRAM_OPTIMISATION=OFF   disables link time optimisation
 
 
 
 
 
-cmake_minimum_required (VERSION 2.8.7)
+cmake_minimum_required (VERSION 3.13)
+cmake_policy(VERSION 3.13...3.17.2)
+project(
+	Cuberite
+	DESCRIPTION "A lightweight, fast and extensible game server for Minecraft"
+	HOMEPAGE_URL "https://cuberite.org"
+	LANGUAGES C CXX
+)
 
-if (POLICY CMP0054)
-	cmake_policy(SET CMP0054 NEW)
+option(BUILD_TOOLS "Sets up additional executables to be built along with the server" OFF)
+option(WHOLE_PROGRAM_OPTIMISATION "Enables link time optimisation for Release" ON)
+option(PRECOMPILE_HEADERS "Enable precompiled headers for faster builds" ON)
+option(SELF_TEST "Enables testing code to be built" OFF)
+option(UNITY_BUILDS "Enables source aggregation for faster builds" ON)
+
+include("CMake/AddDependencies.cmake")
+include("CMake/Fixups.cmake")
+include("CMake/GenerateBindings.cmake")
+include("CMake/GroupSources.cmake")
+include("SetFlags.cmake")
+
+# Add build timestamp and details:
+include("CMake/StampBuild.cmake")
+
+# We need C++17 features:
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# TODO: use standard NDEBUG in place of _DEBUG
+if("${CMAKE_BUILD_TYPE}" MATCHES "DEBUG")
+	add_definitions(-D_DEBUG)
 endif()
 
-# Without this, the MSVC variable isn't defined for MSVC builds ( https://cmake.org/pipermail/cmake/2011-November/047130.html )
-enable_language(CXX C)
-
-# Enable the support for solution folders in MSVC
-if (MSVC)
-	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+# The need for speed (in Release):
+if(WHOLE_PROGRAM_OPTIMISATION)
+	include(CheckIPOSupported)
+	check_ipo_supported(RESULT IPO_SUPPORTED)
+	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ${IPO_SUPPORTED})
 endif()
 
-# These env variables are used for configuring Travis CI builds.
-if(DEFINED ENV{TRAVIS_CUBERITE_BUILD_TYPE})
-	message("Setting build type to $ENV{TRAVIS_CUBERITE_BUILD_TYPE}")
-	set(CMAKE_BUILD_TYPE $ENV{TRAVIS_CUBERITE_BUILD_TYPE})
-endif()
+# Static CRT:
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-if(DEFINED ENV{TRAVIS_CUBERITE_FORCE32})
-	set(FORCE32 $ENV{TRAVIS_CUBERITE_FORCE32})
-endif()
+# TODO: set_build_stamp()
+set_global_flags()
+build_dependencies()
 
-if(DEFINED ENV{TRAVIS_BUILD_WITH_COVERAGE})
-	set(BUILD_WITH_COVERAGE $ENV{TRAVIS_BUILD_WITH_COVERAGE})
-endif()
+add_executable(${CMAKE_PROJECT_NAME})
+add_subdirectory(src)
 
-if(DEFINED ENV{CUBERITE_BUILD_ID})
-	# The build info is defined by the build system (Travis / Jenkins)
-	set(BUILD_ID $ENV{CUBERITE_BUILD_ID})
-	set(BUILD_SERIES_NAME $ENV{CUBERITE_BUILD_SERIES_NAME})
-	set(BUILD_DATETIME $ENV{CUBERITE_BUILD_DATETIME})
-	if(DEFINED ENV{CUBERITE_BUILD_COMMIT_ID})
-		set(BUILD_COMMIT_ID $ENV{CUBERITE_BUILD_COMMIT_ID})
-	else()
-		message("Commit id not set, attempting to determine id from git")
-		execute_process(
-			COMMAND git rev-parse HEAD
-			WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-			RESULT_VARIABLE GIT_EXECUTED
-			OUTPUT_VARIABLE BUILD_COMMIT_ID
-		)
-		string(STRIP ${BUILD_COMMIT_ID} BUILD_COMMIT_ID)
-		if (NOT (GIT_EXECUTED EQUAL 0))
-			message(FATAL_ERROR "Could not identifiy git commit id")
-		endif()
+set_exe_flags(${CMAKE_PROJECT_NAME})
+link_dependencies(${CMAKE_PROJECT_NAME})
+
+# Set the startup project to Cuberite, and the debugger dir:
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/Server")
+
+# Enable PCH and jumbo builds on supporting CMake:
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
+	if (PRECOMPILE_HEADERS)
+		target_precompile_headers(${CMAKE_PROJECT_NAME} PRIVATE src/Globals.h)
 	endif()
+
+	set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES UNITY_BUILD ${UNITY_BUILDS})
 else()
-	# This is a local build, stuff in some basic info:
-	set(BUILD_ID "Unknown")
-	set(BUILD_SERIES_NAME "local build")
-	execute_process(
-		COMMAND git rev-parse HEAD
-		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-		RESULT_VARIABLE GIT_EXECUTED
-		OUTPUT_VARIABLE BUILD_COMMIT_ID
-	)
-	if (NOT(GIT_EXECUTED EQUAL 0))
-		set(BUILD_COMMIT_ID "Unknown")
-	endif()
-	string(STRIP ${BUILD_COMMIT_ID} BUILD_COMMIT_ID)
-	execute_process(
-		COMMAND git log -1 --date=iso --pretty=format:%ai
-		WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-		RESULT_VARIABLE GIT_EXECUTED
-		OUTPUT_VARIABLE BUILD_DATETIME
-	)
-	if (NOT(GIT_EXECUTED EQUAL 0))
-		set(BUILD_DATETIME "Unknown")
-	endif()
-	string(STRIP ${BUILD_DATETIME} BUILD_DATETIME)
-
-	# The BUILD_COMMIT_ID and BUILD_DATETIME aren't updated on each repo pull
-	# They are only updated when cmake re-configures the project
-	# Therefore mark them as "approx: "
-	set(BUILD_COMMIT_ID "approx: ${BUILD_COMMIT_ID}")
-	set(BUILD_DATETIME "approx: ${BUILD_DATETIME}")
+	message(WARNING "Precompiled headers for FASTER BUILDS not enabled, upgrade to CMake 1.16 or newer!")
 endif()
 
-# We need C++11 features, Visual Studio has those from VS2012, but it needs a new platform toolset for those; VS2013 supports them natively:
-# Adapted from https://web.archive.org/web/https://binglongx.wordpress.com/2013/06/28/set-non-default-platform-toolset-in-cmake/
-if(MSVC OR MSVC_IDE)
-	if( MSVC_VERSION LESS 1700 )       # VC10- / VS2010-
-		message(FATAL_ERROR "The project requires C++11 features. "
-			"You need at least Visual Studio 11 (Microsoft Visual Studio 2012), "
-			"with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012).")
-	elseif( MSVC_VERSION EQUAL 1700 )  # VC11 / VS2012
-		message( "VC11: using Microsoft Visual Studio 2012 "
-			"with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012)" )
-		set(CMAKE_GENERATOR_TOOLSET "v120_CTP_Nov2012" CACHE STRING "Platform Toolset" FORCE)
-	else() # VC12+, assuming C++11 supported.
-	endif()
-else()  # GCC or Clang, so get compiler version directly since CMAKE_CXX_COMPILER_VERSION is only available in CMake 2.8.8 and later
-	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE DUMPED_COMPILER_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+# Selectively disable warnings in the level where the target is created:
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	# Generated file has old-style casts, missing prototypes, and deprecated declarations
+	set_source_files_properties("${PROJECT_SOURCE_DIR}/src/Bindings/Bindings.cpp" PROPERTIES COMPILE_OPTIONS -Wno-everything)
 
-	# Check for gcc version 4.8 or greater
-	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND DUMPED_COMPILER_VERSION VERSION_LESS "4.8")
-		message(FATAL_ERROR "You have ${CMAKE_CXX_COMPILER_ID} version ${DUMPED_COMPILER_VERSION}, but at least 4.8 is needed")
-	endif()
-
-	# Check for clang version 3.4 or greater
-	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND DUMPED_COMPILER_VERSION VERSION_LESS "3.4")
-		message(FATAL_ERROR "You have ${CMAKE_CXX_COMPILER_ID} version ${DUMPED_COMPILER_VERSION}, but at least 3.4 is needed")
-	endif()
+	# File failed to follow NHS guidelines on handwashing and has not maintained good hygiene
+	set_source_files_properties("${PROJECT_SOURCE_DIR}/src/IniFile.cpp" PROPERTIES COMPILE_OPTIONS -Wno-header-hygiene)
 endif()
 
-set(BUILD_TOOLS OFF CACHE BOOL "")
-set(SELF_TEST OFF CACHE BOOL "")
-
-# Check whether Lua can be used:
-if (NOT(DISABLE_SYSTEM_LUA))
-	include(CheckLua.cmake)
-	if(HAS_LUA_INTERPRETER)
-		message(STATUS "Lua has been found in your system and will be used for the build.")
-		set(USE_SYSTEM_LUA 1)
-	else()
-		message(STATUS "Lua has NOT been found in your system, the build will use its own Lua implementation.")
-		unset(USE_SYSTEM_LUA)
-	endif()
-else()
-	message(STATUS "System Lua is disabled via CMake command-line parameters. The build will use its own Lua implementation.")
-endif()
-
-
-# This has to be done before any flags have been set up.
 if(${BUILD_TOOLS})
 	message("Building tools")
 	add_subdirectory(Tools/GrownBiomeGenVisualiser/)
@@ -152,181 +107,13 @@ if(${BUILD_UNSTABLE_TOOLS})
 	add_subdirectory(Tools/GeneratorPerformanceTest/)
 endif()
 
-include(SetFlags.cmake)
-set_flags()
-set_lib_flags()
-enable_profile()
-
-# Under Windows, we need Lua as DLL; on *nix we need it linked statically:
-if (WIN32)
-	add_definitions(-DLUA_BUILD_AS_DLL)
-endif()
-
-# The Expat library is linked in statically, make the source files aware of that:
-add_definitions(-DXML_STATIC)
-
-# Let Lua use additional checks on its C API. This is only compiled into Debug builds:
-add_definitions(-DLUA_USE_APICHECK)
-
 # Self Test Mode enables extra checks at startup
-if(${SELF_TEST})
-	add_definitions(-DSELF_TEST)
-endif()
-
-# Build all dependent libraries as static:
-SET(CMAKE_BUILD_STATIC_LIBRARIES ON)
-
-####
-
-
-
-project (Cuberite)
-
-# Set options for SQLiteCpp, disable all their tests and lints:
-set(SQLITECPP_RUN_CPPLINT     OFF CACHE BOOL "Run cpplint.py tool for Google C++ StyleGuide."  FORCE)
-set(SQLITECPP_RUN_CPPCHECK    OFF CACHE BOOL "Run cppcheck C++ static analysis tool."          FORCE)
-set(SQLITECPP_RUN_DOXYGEN     OFF CACHE BOOL "Run Doxygen C++ documentation tool."             FORCE)
-set(SQLITECPP_BUILD_EXAMPLES  OFF CACHE BOOL "Build examples."                                 FORCE)
-set(SQLITECPP_BUILD_TESTS     OFF CACHE BOOL "Build and run tests."                            FORCE)
-set(SQLITECPP_INTERNAL_SQLITE OFF CACHE BOOL "Add the internal SQLite3 source to the project." FORCE)
-set(SQLITE_ENABLE_COLUMN_METADATA OFF CACHE BOOL "" FORCE)
-
-# Set options for LibEvent, disable all their tests and benchmarks:
-set(EVENT__DISABLE_OPENSSL   YES CACHE BOOL "Disable OpenSSL in LibEvent"       FORCE)
-set(EVENT__DISABLE_BENCHMARK YES CACHE BOOL "Disable LibEvent benchmarks"       FORCE)
-set(EVENT__DISABLE_TESTS     YES CACHE BOOL "Disable LibEvent tests"            FORCE)
-set(EVENT__DISABLE_REGRESS   YES CACHE BOOL "Disable LibEvent regression tests" FORCE)
-set(EVENT__DISABLE_SAMPLES   YES CACHE BOOL "Disable LibEvent samples"          FORCE)
-
-# Set options for JsonCPP, disabling all of their tests
-# Additionally, their library is output to a strange location; make sure the linker knows where to find it
-set(JSONCPP_WITH_TESTS OFF CACHE BOOL "Compile and (for jsoncpp_check) run JsonCpp test executables")
-set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "Automatically run unit-tests as a post build step")
-set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE BOOL "Generate and install .pc files")
-link_directories(lib/jsoncpp/src/lib_json)
-
-# Check that the libraries are present:
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/SQLiteCpp/CMakeLists.txt)
-	message(FATAL_ERROR "SQLiteCpp is missing in folder lib/SQLiteCpp. Have you initialized the submodules / downloaded the extra libraries?")
-endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/mbedtls/CMakeLists.txt)
-	message(FATAL_ERROR "mbedTLS is missing in folder lib/mbedtls. Have you initialized the submodules / downloaded the extra libraries?")
-endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/libevent/CMakeLists.txt)
-	message(FATAL_ERROR "LibEvent is missing in folder lib/libevent. Have you initialized and updated the submodules / downloaded the extra libraries?")
-endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/jsoncpp/CMakeLists.txt)
-	message(FATAL_ERROR "JsonCPP is missing in folder lib/jsoncpp. Have you initialized and updated the submodules / downloaded the extra libraries?")
-endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/cmake-coverage/CodeCoverage.cmake)
-	message(FATAL_ERROR "cmake-coverage is missing in folder lib/cmake-coverage. Have you initialized and updated the submodules / downloaded the extra libraries?")
-endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/expat/CMakeLists.txt)
-	message(FATAL_ERROR "expat is missing in folder lib/expat. Have you initialized and updated the submodules / downloaded the extra libraries?")
-endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/fmt/CMakeLists.txt)
-	message(FATAL_ERROR  "fmt is missing in folder lib/fmt. Have you initialized and updated the submodules / downloaded the extra libraries?")
-endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/lua/CMakeLists.txt)
-	message(FATAL_ERROR "lua is missing in folder lib/lua. Have you initialized and updated the submodules / downloaded the extra libraries?")
-endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/luaexpat/CMakeLists.txt)
-	message(FATAL_ERROR "luaexpat is missing in folder lib/luaexpat. Have you initialized and updated the submodules / downloaded the extra libraries?")
-endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/luaproxy/CMakeLists.txt)
-	message(FATAL_ERROR "luaproxy is missing in folder lib/luaproxy. Have you initialized and updated the submodules / downloaded the extra libraries?")
-endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/sqlite/CMakeLists.txt)
-	message(FATAL_ERROR "sqlite is missing in folder lib/sqlite. Have you initialized and updated the submodules / downloaded the extra libraries?")
-endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/tolua++/CMakeLists.txt)
-	message(FATAL_ERROR "tolua++ is missing in folder lib/tolua++. Have you initialized and updated the submodules / downloaded the extra libraries?")
-endif()
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/lib/zlib/CMakeLists.txt)
-	message(FATAL_ERROR "zlib is missing in folder lib/zlib. Have you initialized and updated the submodules / downloaded the extra libraries?")
-endif()
-
-
-
-
-# Include all the libraries:
-add_subdirectory(lib/jsoncpp/)
-add_subdirectory(lib/zlib/)
-add_subdirectory(lib/lua/)
-add_subdirectory(lib/tolua++/ EXCLUDE_FROM_ALL)
-add_subdirectory(lib/sqlite/)
-add_subdirectory(lib/SQLiteCpp/)
-add_subdirectory(lib/expat/)
-add_subdirectory(lib/luaexpat/)
-add_subdirectory(lib/libevent/ EXCLUDE_FROM_ALL)
-add_subdirectory(lib/fmt)
-
-
-# Add proper include directories so that SQLiteCpp can find SQLite3:
-get_property(SQLITECPP_INCLUDES DIRECTORY "lib/SQLiteCpp/" PROPERTY INCLUDE_DIRECTORIES)
-set(SQLITECPP_INCLUDES "${SQLITECPP_INCLUDES}" "${CMAKE_CURRENT_SOURCE_DIR}/lib/sqlite/")
-set_property(DIRECTORY lib/SQLiteCpp/ PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
-set_property(TARGET SQLiteCpp PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
-
-# Add proper includes for LibEvent's event-config.h header:
-include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
-
-# Prettify jsoncpp_lib_static name in VS solution explorer
-set_property(TARGET jsoncpp_lib_static PROPERTY PROJECT_LABEL "jsoncpp")
-
-if (WIN32)
-	add_subdirectory(lib/luaproxy/)
-endif()
-
-# We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used
-# (mbedTLS also has test and example programs in their CMakeLists.txt, we don't want those)
-include(lib/mbedtls.cmake EXCLUDE_FROM_ALL)
-
-if(NOT MSVC AND "${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm")
-	# mbed TLS uses the frame pointer's register in inline assembly for its bignum implementation:
-	# https://tls.mbed.org/kb/development/arm-thumb-error-r7-cannot-be-used-in-asm-here
-	target_compile_options(mbedcrypto PRIVATE -fomit-frame-pointer)
-endif()
-
-set_exe_flags()
-
-add_subdirectory(src)
-
 if(${SELF_TEST})
 	message("Tests enabled")
 	enable_testing()
 	add_subdirectory(tests)
 endif()
 
-# Put projects into solution folders in MSVC:
-if (MSVC)
-	set_target_properties(
-		event_core
-		event_extra
-		expat
-		fmt
-		jsoncpp_lib_static
-		lua
-		luaexpat
-		mbedcrypto
-		mbedtls
-		mbedx509
-		sqlite
-		SQLiteCpp
-		tolualib
-		zlib
-		PROPERTIES FOLDER Lib
-	)
-	set_target_properties(
-		luaproxy
-		PROPERTIES FOLDER Support
-	)
-
-	if(${BUILD_TOOLS})
-		set_target_properties(
-			MCADefrag
-			ProtoProxy
-			PROPERTIES FOLDER Tools
-		)
-	endif()
-endif()
+emit_fixups()
+group_sources()
+enable_bindings_generation()

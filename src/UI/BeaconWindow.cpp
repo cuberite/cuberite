@@ -13,7 +13,7 @@
 
 
 
-cBeaconWindow::cBeaconWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconEntity * a_Beacon) :
+cBeaconWindow::cBeaconWindow(cBeaconEntity * a_Beacon):
 	cWindow(wtBeacon, "Beacon"),
 	m_Beacon(a_Beacon)
 {
@@ -35,7 +35,7 @@ void cBeaconWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a
 		// Beacon Area
 		AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
 		AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
-		super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
+		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
 	}
 	else
 	{
@@ -54,7 +54,7 @@ void cBeaconWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a
 			// Hotbar Area
 			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
 		}
-		super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
 }
 
@@ -64,7 +64,7 @@ void cBeaconWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a
 
 void cBeaconWindow::OpenedByPlayer(cPlayer & a_Player)
 {
-	super::OpenedByPlayer(a_Player);
+	Super::OpenedByPlayer(a_Player);
 
 	a_Player.GetClientHandle()->SendWindowProperty(*this, 0, m_Beacon->GetBeaconLevel());
 	a_Player.GetClientHandle()->SendWindowProperty(*this, 1, m_Beacon->GetPrimaryEffect());

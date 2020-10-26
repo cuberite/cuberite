@@ -9,7 +9,8 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "LuaState.h"
-#include "../Tracer.h"
+#include "../BlockInfo.h"
+#include "../BlockEntities/NoteEntity.h"
 
 
 
@@ -291,32 +292,6 @@ tolua_lerror:
 
 
 
-static int tolua_cBlockInfo_Get(lua_State * tolua_S)
-{
-	cLuaState L(tolua_S);
-	if (
-		!L.CheckParamStaticSelf("cBlockInfo") ||
-		!L.CheckParamNumber(2)
-	)
-	{
-		return 0;
-	}
-
-	BLOCKTYPE BlockType{};
-	L.GetStackValue(2, BlockType);
-
-	LOGWARNING("cBlockInfo:Get() is deprecated, use the static querying functions instead");
-	L.LogStackTrace(0);
-
-	cBlockInfo & BlockInfo = const_cast<cBlockInfo &>(cBlockInfo::Get(BlockType));
-	L.Push(&BlockInfo);
-	return 1;
-}
-
-
-
-
-
 static int tolua_cBlockInfo_GetPlaceSound(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
@@ -332,85 +307,6 @@ static int tolua_cBlockInfo_GetPlaceSound(lua_State * tolua_S)
 	LOGWARNING("cBlockInfo:GetPlaceSound() is deprecated");
 	L.LogStackTrace(0);
 	return 1;
-}
-
-
-
-
-
-static int tolua_get_cBlockInfo_m_PlaceSound(lua_State * tolua_S)
-{
-	cLuaState L(tolua_S);
-	if (!L.CheckParamSelf("const cBlockInfo"))
-	{
-		return 0;
-	}
-
-	L.Push("");
-	LOGWARNING("cBlockInfo.m_PlaceSound is deprecated");
-	L.LogStackTrace(0);
-	return 1;
-}
-
-
-
-
-
-static int tolua_set_cBlockInfo_m_PlaceSound(lua_State * tolua_S)
-{
-	cLuaState L(tolua_S);
-	if (!L.CheckParamSelf("cBlockInfo"))
-	{
-		return 0;
-	}
-
-	LOGWARNING("cBlockInfo.m_PlaceSound is deprecated");
-	L.LogStackTrace(0);
-	return 0;
-}
-
-
-
-
-
-/** cBlockInfo variables: access the corresponding getter function instead of the variable.
-\tparam VariableType The type of the variable being accessed.
-\tparam GetterFunction The function called to get the value returned to lua. */
-template <typename VariableType, VariableType (*GetterFunction)(BLOCKTYPE)>
-static int tolua_get_cBlockInfo(lua_State * tolua_S)
-{
-	cLuaState L(tolua_S);
-	if (!L.CheckParamSelf("const cBlockInfo"))
-	{
-		return 0;
-	}
-
-	const cBlockInfo * Self = nullptr;
-	L.GetStackValue(1, Self);
-
-	L.Push(GetterFunction(Self->m_BlockType));
-	LOGWARNING("cBlockInfo variables are deprecated, use the static functions instead.");
-	L.LogStackTrace(0);
-
-	return 1;
-}
-
-
-
-
-
-/** cBlockInfo variables: Print deprecation message on assignment. */
-static int tolua_set_cBlockInfo(lua_State * tolua_S)
-{
-	cLuaState L(tolua_S);
-	if (!L.CheckParamSelf("cBlockInfo"))
-	{
-		return 0;
-	}
-
-	LOGWARNING("cBlockInfo variables are deprecated in favour of the static functions.");
-	L.LogStackTrace(0);
-	return 0;
 }
 
 
@@ -468,44 +364,102 @@ static int tolua_set_cItem_m_Lore(lua_State * tolua_S)
 
 
 
-
-/* method: Trace of class  cTracer */
-static int tolua_cTracer_Trace(lua_State * a_LuaState)
+/** function: cNoteEntity: GetNote */
+static int tolua_cNoteEntity_GetPitch(lua_State * tolua_S)
 {
-	// Log a deprecation warning with stacktrace:
-	cLuaState S(a_LuaState);
-	LOGWARNING("The function cTracer:Trace is obsolete, use the cLineBlockTracer instead");
-	S.LogStackTrace();
+	cLuaState LuaState(tolua_S);
 
-	// Check params:
 	if (
-		!S.CheckParamUserType(1, "cTracer") ||
-		!S.CheckParamUserType(2, "const Vector3<float>", 3) ||
-		!S.CheckParamNumber  (4)
+		!LuaState.CheckParamUserType(1, "cNoteEntity") ||
+		!LuaState.CheckParamEnd(2)
 	)
 	{
 		return 0;
 	}
 
-	// Read params:
-	cTracer * self;
-	Vector3d * start;
-	Vector3d * direction;
-	int distance;
-	bool lineOfSight = false;
-	if (!S.GetStackValues(1, self, start, direction, distance))
-	{
-		LOGWARNING("Cannot retrieve parameters for cTracer::Trace. Expected a cTracer (self), Vector3d, Vector3d, number and optional boolean.");
-		S.LogStackValues();
-		return 0;
-	}
-	S.GetStackValue(5, lineOfSight);
+	cNoteEntity * Self = nullptr;
 
-	// Call and push the result:
-	S.Push(self->Trace(*start, *direction, distance, lineOfSight));
+	if (!LuaState.GetStackValues(1, Self))
+	{
+		tolua_error(LuaState, "Failed to read parameters", nullptr);
+	}
+	if (Self == nullptr)
+	{
+		tolua_error(LuaState, "invalid 'self' in function 'GetPitch'", nullptr);
+	}
+	LuaState.Push(Self->GetNote());
+	LOGWARNING("Warning: 'cNoteEntity:GetPitch' function is deprecated. Please use 'cNoteEntity:GetNote' instead.");
+	LuaState.LogStackTrace(0);
 	return 1;
 }
 
+
+
+
+/** function: cNoteEntity: IncrementNote */
+static int tolua_cNoteEntity_IncrementPitch(lua_State * tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+
+	if (
+		!LuaState.CheckParamUserType(1, "cNoteEntity") ||
+		!LuaState.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	cNoteEntity * Self = nullptr;
+
+	if (!LuaState.GetStackValues(1, Self))
+	{
+		tolua_error(LuaState, "Failed to read parameters", nullptr);
+	}
+	if (Self == nullptr)
+	{
+		tolua_error(LuaState, "invalid 'self' in function 'SetPitch'", nullptr);
+	}
+
+	Self->IncrementNote();
+	LOGWARNING("Warning: 'cNoteEntity:IncrementPitch' function is deprecated. Please use 'cNoteEntity:IncrementNote' instead.");
+	LuaState.LogStackTrace(0);
+	return 1;
+}
+
+
+
+
+/** function: cNoteEntity: SetNote */
+static int tolua_cNoteEntity_SetPitch(lua_State * tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+
+	if (
+		!LuaState.CheckParamUserType(1, "cNoteEntity") ||
+		!LuaState.CheckParamNumber(2) ||
+		!LuaState.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	cNoteEntity * Self = nullptr;
+	int Note = -1;
+
+	if (!LuaState.GetStackValues(1, Self, Note))
+	{
+		tolua_error(LuaState, "Failed to read parameters", nullptr);
+	}
+	if (Self == nullptr)
+	{
+		tolua_error(LuaState, "invalid 'self' in function 'SetPitch'", nullptr);
+	}
+
+	Self->SetNote(Note % 25);
+	LOGWARNING("Warning: 'cNoteEntity:SetPitch' function is deprecated. Please use 'cNoteEntity:SetNote' instead.");
+	LuaState.LogStackTrace(0);
+	return 1;
+}
 
 
 
@@ -559,43 +513,151 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 
 
 
-template <typename T>
-int tolua_Vector3_Abs(lua_State * a_LuaState)
+/** Function: cWorld:GrowTree.
+Exported manually because of the obsolete int-based overload.
+When removing from DeprecatedBindings, make sure the function is exported automatically. */
+static int tolua_cWorld_GrowTree(lua_State * a_LuaState)
 {
-	// Retrieve the params, including self:
-	cLuaState L(a_LuaState);
-	Vector3<T> * self;
-	if (!L.GetStackValues(1, self))
+	cLuaState LuaState(a_LuaState);
+	if (lua_isnumber(LuaState, 2))
 	{
-		tolua_error(a_LuaState, "invalid 'self' in function 'Vector3<T>:Abs'", nullptr);
-		return 0;
+		// This is the obsolete signature, warn and translate:
+		LOGWARNING("Warning: cWorld:GrowTree function expects Vector3i-based coords rather than int-based coords. Emulating old-style call.");
+		LuaState.LogStackTrace(0);
+		cWorld * Self = nullptr;
+		int BlockX, BlockY, BlockZ;
+		if (!LuaState.GetStackValues(1, Self, BlockX, BlockY, BlockZ))
+		{
+			return LuaState.ApiParamError("Failed to read int-based coord parameters");
+		}
+		LuaState.Push(Self->GrowTree({BlockX, BlockY, BlockZ}));
+		return 1;
 	}
 
-	// Absolutize the vector:
-	self->Abs();
-	return 0;
+	// This is the correct signature, execute:
+	cWorld * Self = nullptr;
+	Vector3i BlockPos;
+	if (!LuaState.GetStackValues(1, Self, BlockPos))
+	{
+		return LuaState.ApiParamError("Failed to read Vector3i-based coord parameters");
+	}
+	LuaState.Push(Self->GrowTree(BlockPos));
+	return 1;
 }
 
 
 
 
 
-template <typename T>
-int tolua_Vector3_Clamp(lua_State * a_LuaState)
+/** Function: cWorld:GrowTreeByBiome.
+Exported manually because of the obsolete int-based overload.
+When removing from DeprecatedBindings, make sure the function is exported automatically. */
+static int tolua_cWorld_GrowTreeByBiome(lua_State * a_LuaState)
 {
-	// Retrieve the params, including self:
-	cLuaState L(a_LuaState);
-	Vector3<T> * self;
-	T min, max;
-	if (!L.GetStackValues(1, self, min, max))
+	cLuaState LuaState(a_LuaState);
+	if (lua_isnumber(LuaState, 2))
 	{
-		tolua_error(a_LuaState, "invalid parameters for function 'Vector3<T>:Clamp', expected a Vector3 and two numbers", nullptr);
+		// This is the obsolete signature, warn and translate:
+		LOGWARNING("Warning: cWorld:GrowTreeByBiome function expects Vector3i-based coords rather than int-based coords. Emulating old-style call.");
+		LuaState.LogStackTrace(0);
+		cWorld * Self = nullptr;
+		int BlockX, BlockY, BlockZ;
+		if (!LuaState.GetStackValues(1, Self, BlockX, BlockY, BlockZ))
+		{
+			return LuaState.ApiParamError("Failed to read int-based coord parameters");
+		}
+		LuaState.Push(Self->GrowTreeByBiome({BlockX, BlockY, BlockZ}));
+		return 1;
+	}
+
+	// This is the correct signature, execute:
+	cWorld * Self = nullptr;
+	Vector3i BlockPos;
+	if (!LuaState.GetStackValues(1, Self, BlockPos))
+	{
+		return LuaState.ApiParamError("Failed to read Vector3i-based coord parameters");
+	}
+	LuaState.Push(Self->GrowTreeByBiome(BlockPos));
+	return 1;
+}
+
+
+
+
+
+/** Function: cWorld:GrowTreeFromSapling.
+Exported manually because of the obsolete int-based overload and obsolete SaplingMeta parameter.
+When removing from DeprecatedBindings, make sure the function is exported automatically. */
+static int tolua_cWorld_GrowTreeFromSapling(lua_State * a_LuaState)
+{
+	cLuaState LuaState(a_LuaState);
+	if (lua_isnumber(LuaState, 2))
+	{
+		// This is the obsolete signature, warn and translate:
+		LOGWARNING("Warning: cWorld:GrowTreeFromSapling function expects Vector3i-based coords rather than int-based coords. Emulating old-style call.");
+		LuaState.LogStackTrace(0);
+		cWorld * Self = nullptr;
+		int BlockX, BlockY, BlockZ;
+		if (!LuaState.GetStackValues(1, Self, BlockX, BlockY, BlockZ))
+		{
+			return LuaState.ApiParamError("Failed to read int-based coord parameters");
+		}
+		LuaState.Push(Self->GrowTreeFromSapling({BlockX, BlockY, BlockZ}));
+		return 1;
+	}
+
+	// This is the correct signature, execute:
+	cWorld * Self = nullptr;
+	Vector3i BlockPos;
+	if (!LuaState.GetStackValues(1, Self, BlockPos))
+	{
+		return LuaState.ApiParamError("Failed to read Vector3i-based coord parameters");
+	}
+	if (lua_isnumber(LuaState, 3))
+	{
+		// There's an extra parameter, the obsolete SaplingMeta
+		LOGWARNING("Warning: cWorld:GrowTreeFromSapling function no longer has the SaplingMeta parameter. Ignoring it now.");
+		LuaState.LogStackTrace(0);
+	}
+	LuaState.Push(Self->GrowTreeFromSapling(BlockPos));
+	return 1;
+}
+
+
+
+
+
+/** function: cWorld:SetNextBlockTick */
+static int tolua_cWorld_SetNextBlockTick(lua_State * tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+
+	if (
+		!LuaState.CheckParamUserType(1, "cWorld") ||
+		!LuaState.CheckParamNumber(2, 4) ||
+		!LuaState.CheckParamEnd(5)
+	)
+	{
 		return 0;
 	}
 
-	// Clamp the vector:
-	self->Clamp(min, max);
-	return 0;
+	cWorld * Self = nullptr;
+	int BlockX = 0;
+	int BlockY = 0;
+	int BlockZ = 0;
+
+	if (!LuaState.GetStackValues(1, Self, BlockX, BlockY, BlockZ))
+	{
+		tolua_error(LuaState, "Failed to read parameters", nullptr);
+	}
+	if (Self == nullptr)
+	{
+		tolua_error(LuaState, "invalid 'self' in function 'SetNextBlockTick'", nullptr);
+	}
+	Self->SetNextBlockToTick({BlockX, BlockY, BlockZ});
+	LOGWARNING("Warning: 'cWorld:SetNextBlockTick' function is deprecated. Please use 'cWorld:SetNextBlockToTick' instead.");
+	LuaState.LogStackTrace(0);
+	return 1;
 }
 
 
@@ -618,50 +680,25 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 	tolua_function(tolua_S, "StringToMobType", tolua_AllToLua_StringToMobType00);
 
 	tolua_beginmodule(tolua_S, "cBlockInfo");
-		tolua_function(tolua_S, "Get",                    tolua_cBlockInfo_Get);
 		tolua_function(tolua_S, "GetPlaceSound",          tolua_cBlockInfo_GetPlaceSound);
-		tolua_variable(tolua_S, "m_PlaceSound",           tolua_get_cBlockInfo_m_PlaceSound, tolua_set_cBlockInfo_m_PlaceSound);
-		tolua_variable(tolua_S, "m_LightValue",           tolua_get_cBlockInfo<NIBBLETYPE, cBlockInfo::GetLightValue        >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_SpreadLightFalloff",   tolua_get_cBlockInfo<NIBBLETYPE, cBlockInfo::GetSpreadLightFalloff>, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_Transparent",          tolua_get_cBlockInfo<bool,       cBlockInfo::IsTransparent        >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_OneHitDig",            tolua_get_cBlockInfo<bool,       cBlockInfo::IsOneHitDig          >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_PistonBreakable",      tolua_get_cBlockInfo<bool,       cBlockInfo::IsPistonBreakable    >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_IsRainBlocker",        tolua_get_cBlockInfo<bool,       cBlockInfo::IsRainBlocker        >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_IsSkylightDispersant", tolua_get_cBlockInfo<bool,       cBlockInfo::IsSkylightDispersant >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_IsSnowable",           tolua_get_cBlockInfo<bool,       cBlockInfo::IsSnowable           >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_IsSolid",              tolua_get_cBlockInfo<bool,       cBlockInfo::IsSolid              >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_UseableBySpectator",   tolua_get_cBlockInfo<bool,       cBlockInfo::IsUseableBySpectator >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_FullyOccupiesVoxel",   tolua_get_cBlockInfo<bool,       cBlockInfo::FullyOccupiesVoxel   >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_CanBeTerraformed",     tolua_get_cBlockInfo<bool,       cBlockInfo::CanBeTerraformed     >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_BlockHeight",          tolua_get_cBlockInfo<float,      cBlockInfo::GetBlockHeight       >, tolua_set_cBlockInfo);
-		tolua_variable(tolua_S, "m_Hardness",             tolua_get_cBlockInfo<float,      cBlockInfo::GetHardness          >, tolua_set_cBlockInfo);
 	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cItem");
 		tolua_variable(tolua_S, "m_Lore", tolua_get_cItem_m_Lore, tolua_set_cItem_m_Lore);
 	tolua_endmodule(tolua_S);
 
-	tolua_beginmodule(tolua_S, "cTracer");
-		tolua_function(tolua_S, "Trace", tolua_cTracer_Trace);
+	tolua_beginmodule(tolua_S, "cNoteEntity");
+		tolua_function(tolua_S, "GetPitch", tolua_cNoteEntity_GetPitch);
+		tolua_function(tolua_S, "IncrementPitch", tolua_cNoteEntity_IncrementPitch);
+		tolua_function(tolua_S, "SetPitch", tolua_cNoteEntity_SetPitch);
 	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cWorld");
-		tolua_function(tolua_S, "UpdateSign", tolua_cWorld_SetSignLines);
-	tolua_endmodule(tolua_S);
-
-	tolua_beginmodule(tolua_S, "Vector3i");
-		tolua_function(tolua_S,"abs",   tolua_Vector3_Abs<int>);
-		tolua_function(tolua_S,"clamp", tolua_Vector3_Clamp<int>);
-	tolua_endmodule(tolua_S);
-
-	tolua_beginmodule(tolua_S, "Vector3f");
-		tolua_function(tolua_S,"abs",   tolua_Vector3_Abs<float>);
-		tolua_function(tolua_S,"clamp", tolua_Vector3_Clamp<float>);
-	tolua_endmodule(tolua_S);
-
-	tolua_beginmodule(tolua_S, "Vector3d");
-		tolua_function(tolua_S,"abs",   tolua_Vector3_Abs<double>);
-		tolua_function(tolua_S,"clamp", tolua_Vector3_Clamp<double>);
+		tolua_function(tolua_S, "GrowTree",            tolua_cWorld_GrowTree);
+		tolua_function(tolua_S, "GrowTreeByBiome",     tolua_cWorld_GrowTreeByBiome);
+		tolua_function(tolua_S, "GrowTreeFromSapling", tolua_cWorld_GrowTreeFromSapling);
+		tolua_function(tolua_S, "SetNextBlockTick",    tolua_cWorld_SetNextBlockTick);
+		tolua_function(tolua_S, "UpdateSign",          tolua_cWorld_SetSignLines);
 	tolua_endmodule(tolua_S);
 
 	tolua_endmodule(tolua_S);

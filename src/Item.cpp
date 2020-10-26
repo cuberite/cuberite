@@ -2,10 +2,89 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Item.h"
+#include "BlockType.h"
+#include "ItemGrid.h"
 #include "json/json.h"
 #include "Items/ItemHandler.h"
 
 #include "FastRandom.h"
+
+
+
+
+
+cItem::cItem():
+	m_ItemType(E_ITEM_EMPTY),
+	m_ItemCount(0),
+	m_ItemDamage(0),
+	m_CustomName(""),
+	m_RepairCost(0),
+	m_FireworkItem(),
+	m_ItemColor()
+{
+}
+
+
+
+
+
+cItem::cItem(
+	short a_ItemType,
+	char a_ItemCount,
+	short a_ItemDamage,
+	const AString & a_Enchantments,
+	const AString & a_CustomName,
+	const AStringVector & a_LoreTable
+):
+	m_ItemType    (a_ItemType),
+	m_ItemCount   (a_ItemCount),
+	m_ItemDamage  (a_ItemDamage),
+	m_Enchantments(a_Enchantments),
+	m_CustomName  (a_CustomName),
+	m_LoreTable   (a_LoreTable),
+	m_RepairCost  (0),
+	m_FireworkItem(),
+	m_ItemColor()
+{
+	if (!IsValidItem(m_ItemType))
+	{
+		if ((m_ItemType != E_BLOCK_AIR) && (m_ItemType != E_ITEM_EMPTY))
+		{
+			LOGWARNING("%s: creating an invalid item type (%d), resetting to empty.", __FUNCTION__, a_ItemType);
+		}
+		Empty();
+	}
+}
+
+
+
+
+
+void cItem::Empty()
+{
+	m_ItemType = E_ITEM_EMPTY;
+	m_ItemCount = 0;
+	m_ItemDamage = 0;
+	m_Enchantments.Clear();
+	m_CustomName = "";
+	m_LoreTable.clear();
+	m_RepairCost = 0;
+	m_FireworkItem.EmptyData();
+	m_ItemColor.Clear();
+}
+
+
+
+
+
+void cItem::Clear()
+{
+	m_ItemType = E_ITEM_EMPTY;
+	m_ItemCount = 0;
+	m_ItemDamage = 0;
+	m_RepairCost = 0;
+	m_ItemColor.Clear();
+}
 
 
 
@@ -195,7 +274,7 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 
 void cItem::FromJson(const Json::Value & a_Value)
 {
-	m_ItemType = static_cast<ENUM_ITEM_ID>(a_Value.get("ID", -1).asInt());
+	m_ItemType = static_cast<ENUM_ITEM_TYPE>(a_Value.get("ID", -1).asInt());
 	if (m_ItemType > 0)
 	{
 		m_ItemCount = static_cast<char>(a_Value.get("Count", -1).asInt());
@@ -350,7 +429,7 @@ int cItem::GetEnchantability()
 
 
 
-bool cItem::EnchantByXPLevels(int a_NumXPLevels)
+bool cItem::EnchantByXPLevels(int a_NumXPLevels, MTRand & a_Random)
 {
 	if (!cItem::IsEnchantable(m_ItemType))
 	{
@@ -363,9 +442,8 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 		return false;
 	}
 
-	auto & Random = GetRandomProvider();
-	int ModifiedEnchantmentLevel = a_NumXPLevels + Random.RandInt(Enchantability / 4) + Random.RandInt(Enchantability / 4) + 1;
-	float RandomBonus = 1.0F + (Random.RandReal() + Random.RandReal() - 1.0F) * 0.15F;
+	int ModifiedEnchantmentLevel = a_NumXPLevels + a_Random.RandInt(Enchantability / 4) + a_Random.RandInt(Enchantability / 4) + 1;
+	float RandomBonus = 1.0F + (a_Random.RandReal() + a_Random.RandReal() - 1.0F) * 0.15F;
 	int FinalEnchantmentLevel = static_cast<int>(ModifiedEnchantmentLevel * RandomBonus + 0.5F);
 
 	cWeightedEnchantments Enchantments;
@@ -376,7 +454,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 		m_ItemType = E_ITEM_ENCHANTED_BOOK;
 	}
 
-	cEnchantments Enchantment1 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments);
+	cEnchantments Enchantment1 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Random);
 	m_Enchantments.AddFromString(Enchantment1.ToString());
 	cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment1);
 
@@ -386,12 +464,12 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	// Next Enchantment (Second)
 	float NewEnchantmentLevel = a_NumXPLevels / 2.0f;
 	float SecondEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
-	if (Enchantments.empty() || !Random.RandBool(SecondEnchantmentChance))
+	if (Enchantments.empty() || !a_Random.RandBool(SecondEnchantmentChance))
 	{
 		return true;
 	}
 
-	cEnchantments Enchantment2 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments);
+	cEnchantments Enchantment2 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Random);
 	m_Enchantments.AddFromString(Enchantment2.ToString());
 	cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment2);
 
@@ -401,12 +479,12 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	// Next Enchantment (Third)
 	NewEnchantmentLevel = NewEnchantmentLevel / 2.0f;
 	float ThirdEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
-	if (Enchantments.empty() || !Random.RandBool(ThirdEnchantmentChance))
+	if (Enchantments.empty() || !a_Random.RandBool(ThirdEnchantmentChance))
 	{
 		return true;
 	}
 
-	cEnchantments Enchantment3 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments);
+	cEnchantments Enchantment3 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Random);
 	m_Enchantments.AddFromString(Enchantment3.ToString());
 	cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment3);
 
@@ -416,11 +494,11 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels)
 	// Next Enchantment (Fourth)
 	NewEnchantmentLevel = NewEnchantmentLevel / 2.0f;
 	float FourthEnchantmentChance = (NewEnchantmentLevel + 1) / 50.0f;
-	if (Enchantments.empty() || !Random.RandBool(FourthEnchantmentChance))
+	if (Enchantments.empty() || !a_Random.RandBool(FourthEnchantmentChance))
 	{
 		return true;
 	}
-	cEnchantments Enchantment4 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments);
+	cEnchantments Enchantment4 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Random);
 	m_Enchantments.AddFromString(Enchantment4.ToString());
 
 	return true;
@@ -626,6 +704,15 @@ int cItem::AddEnchantmentsFromItem(const cItem & a_Other)
 ////////////////////////////////////////////////////////////////////////////////
 // cItems:
 
+cItems::cItems(cItem && a_InitialItem)
+{
+	push_back(std::move(a_InitialItem));
+}
+
+
+
+
+
 cItem * cItems::Get(int a_Idx)
 {
 	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
@@ -684,7 +771,7 @@ void cItems::Set(int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDama
 
 bool cItems::Contains(const cItem & a_Item)
 {
-	for (auto itr : *this)
+	for (const auto & itr : *this)
 	{
 		if (a_Item.IsEqual(itr))
 		{
@@ -700,7 +787,7 @@ bool cItems::Contains(const cItem & a_Item)
 
 bool cItems::ContainsType(const cItem & a_Item)
 {
-	for (auto itr : *this)
+	for (const auto & itr : *this)
 	{
 		if (a_Item.IsSameType(itr))
 		{
@@ -711,3 +798,17 @@ bool cItems::ContainsType(const cItem & a_Item)
 }
 
 
+
+
+
+void cItems::AddItemGrid(const cItemGrid & a_ItemGrid)
+{
+	for (int i = 0; i < a_ItemGrid.GetNumSlots(); ++i)
+	{
+		const auto & Slot = a_ItemGrid.GetSlot(i);
+		if (!Slot.IsEmpty())
+		{
+			Add(Slot);
+		}
+	}
+}

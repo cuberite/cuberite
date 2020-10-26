@@ -7,13 +7,14 @@
 
 
 
-class cPig :
+class cPig:
 	public cPassiveMonster
 {
-	typedef cPassiveMonster super;
+	using Super = cPassiveMonster;
 
 public:
-	cPig(void);
+
+	cPig();
 
 	CLASS_PROTODEF(cPig)
 

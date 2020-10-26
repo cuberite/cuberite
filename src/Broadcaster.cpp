@@ -54,7 +54,7 @@ namespace
 					{
 						a_Func(*Client);
 					}
-				};
+				}
 				return true;
 			}
 		);
@@ -197,11 +197,11 @@ void cWorld::BroadcastChat(const cCompositeChat & a_Message, const cClientHandle
 
 
 
-void cWorld::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, int a_Count, const cClientHandle * a_Exclude)
+void cWorld::BroadcastCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count, const cClientHandle * a_Exclude)
 {
-	ForClientsWithEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsWithEntity(a_Collected, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendCollectEntity(a_Entity, a_Player, a_Count);
+			a_Client.SendCollectEntity(a_Collected, a_Collector, a_Count);
 		}
 	);
 }
@@ -249,7 +249,7 @@ void cWorld::BroadcastDisplayObjective(const AString & a_Objective, cScoreboard:
 
 
 
-void cWorld::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration, const cClientHandle * a_Exclude)
 {
 	ForClientsWithEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
@@ -314,24 +314,11 @@ void cWorld::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHand
 
 
 
-void cWorld::BroadcastEntityRelMove(const cEntity & a_Entity, Vector3<Int8> a_RelMove, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityPosition(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
 	ForClientsWithEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendEntityRelMove(a_Entity, a_RelMove.x, a_RelMove.y, a_RelMove.z);
-		}
-	);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityRelMoveLook(const cEntity & a_Entity, Vector3<Int8> a_RelMove, const cClientHandle * a_Exclude)
-{
-	ForClientsWithEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
-		{
-			a_Client.SendEntityRelMoveLook(a_Entity, a_RelMove.x, a_RelMove.y, a_RelMove.z);
+			a_Client.SendEntityPosition(a_Entity);
 		}
 	);
 }
@@ -553,19 +540,6 @@ void cWorld::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Ex
 	ForClientsWithEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Entity.SpawnOn(a_Client);
-		}
-	);
-}
-
-
-
-
-
-void cWorld::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
-		{
-			a_Client.SendTeleportEntity(a_Entity);
 		}
 	);
 }

@@ -5,14 +5,14 @@
 #include "../Entities/Player.h"
 #include "../World.h"
 #include "../EffectID.h"
-#include "FastRandom.h"
+#include "../FastRandom.h"
 
 
 
 
 
 cSheep::cSheep(int a_Color) :
-	super("Sheep", mtSheep, "entity.sheep.hurt", "entity.sheep.death", 0.6, 1.3),
+	Super("Sheep", mtSheep, "entity.sheep.hurt", "entity.sheep.death", "entity.sheep.ambient", 0.6, 1.3),
 	m_IsSheared(false),
 	m_WoolColor(a_Color),
 	m_TimeToStopEating(-1)
@@ -59,7 +59,7 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cSheep::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
 	if ((EquippedItem.m_ItemType == E_ITEM_SHEARS) && !IsSheared() && !IsBaby())
@@ -91,7 +91,7 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 
 void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -117,7 +117,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			{
 				// The sheep ate the grass so we change it to dirt
 				m_World->SetBlock(PosX, PosY, PosZ, E_BLOCK_DIRT, 0);
-				GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, PosX, PosY, PosX, E_BLOCK_GRASS);
+				GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, {PosX, PosY, PosZ}, E_BLOCK_GRASS);
 				m_IsSheared = false;
 				m_World->BroadcastEntityMetadata(*this);
 			}
@@ -140,7 +140,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cSheep::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a_Parent2)
+void cSheep::InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2)
 {
 	static const struct
 	{
@@ -167,12 +167,10 @@ void cSheep::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a
 		)
 		{
 			SetFurColor(ColorInheritance[i].Child);
-			m_World->BroadcastEntityMetadata(*this);
 			return;
 		}
 	}
 	SetFurColor(GetRandomProvider().RandBool() ? Parent1->GetFurColor() : Parent2->GetFurColor());
-	m_World->BroadcastEntityMetadata(*this);
 }
 
 

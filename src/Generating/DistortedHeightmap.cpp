@@ -118,11 +118,10 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 
 
 
-cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGenPtr a_BiomeGen) :
+cDistortedHeightmap::cDistortedHeightmap(int a_Seed, const cBiomeGenPtr & a_BiomeGen) :
 	m_NoiseDistortX(a_Seed + 1000),
 	m_NoiseDistortZ(a_Seed + 2000),
-	m_CurChunkX(0x7fffffff),  // Set impossible coords for the chunk so that it's always considered stale
-	m_CurChunkZ(0x7fffffff),
+	m_CurChunkCoords(0x7fffffff, 0x7fffffff),  // Set impossible coords for the chunk so that it's always considered stale
 	m_BiomeGen(a_BiomeGen),
 	m_UnderlyingHeiGen(new cHeiGenBiomal(a_Seed, a_BiomeGen)),
 	m_HeightGen(m_UnderlyingHeiGen, 64),
@@ -161,17 +160,16 @@ void cDistortedHeightmap::Initialize(cIniFile & a_IniFile)
 
 
 
-void cDistortedHeightmap::PrepareState(int a_ChunkX, int a_ChunkZ)
+void cDistortedHeightmap::PrepareState(cChunkCoords a_ChunkCoords)
 {
-	if ((m_CurChunkX == a_ChunkX) && (m_CurChunkZ == a_ChunkZ))
+	if (m_CurChunkCoords == a_ChunkCoords)
 	{
 		return;
 	}
-	m_CurChunkX = a_ChunkX;
-	m_CurChunkZ = a_ChunkZ;
+	m_CurChunkCoords = a_ChunkCoords;
 
 
-	m_HeightGen.GenHeightMap(a_ChunkX, a_ChunkZ, m_CurChunkHeights);
+	m_HeightGen.GenHeightMap(a_ChunkCoords, m_CurChunkHeights);
 	UpdateDistortAmps();
 	GenerateHeightArray();
 }
@@ -186,12 +184,12 @@ void cDistortedHeightmap::GenerateHeightArray(void)
 	NOISE_DATATYPE DistortNoiseX[DIM_X * DIM_Y * DIM_Z];
 	NOISE_DATATYPE DistortNoiseZ[DIM_X * DIM_Y * DIM_Z];
 	NOISE_DATATYPE Workspace[DIM_X * DIM_Y * DIM_Z];
-	NOISE_DATATYPE StartX = static_cast<NOISE_DATATYPE>(m_CurChunkX * cChunkDef::Width) / m_FrequencyX;
-	NOISE_DATATYPE EndX   = static_cast<NOISE_DATATYPE>((m_CurChunkX + 1) * cChunkDef::Width - 1) / m_FrequencyX;
+	NOISE_DATATYPE StartX = static_cast<NOISE_DATATYPE>(m_CurChunkCoords.m_ChunkX * cChunkDef::Width) / m_FrequencyX;
+	NOISE_DATATYPE EndX   = static_cast<NOISE_DATATYPE>((m_CurChunkCoords.m_ChunkX + 1) * cChunkDef::Width - 1) / m_FrequencyX;
 	NOISE_DATATYPE StartY = 0;
 	NOISE_DATATYPE EndY   = static_cast<NOISE_DATATYPE>(257) / m_FrequencyY;
-	NOISE_DATATYPE StartZ = static_cast<NOISE_DATATYPE>(m_CurChunkZ * cChunkDef::Width) / m_FrequencyZ;
-	NOISE_DATATYPE EndZ   = static_cast<NOISE_DATATYPE>((m_CurChunkZ + 1) * cChunkDef::Width - 1) / m_FrequencyZ;
+	NOISE_DATATYPE StartZ = static_cast<NOISE_DATATYPE>(m_CurChunkCoords.m_ChunkZ * cChunkDef::Width) / m_FrequencyZ;
+	NOISE_DATATYPE EndZ   = static_cast<NOISE_DATATYPE>((m_CurChunkCoords.m_ChunkZ + 1) * cChunkDef::Width - 1) / m_FrequencyZ;
 
 	m_NoiseDistortX.Generate3D(DistortNoiseX, DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, Workspace);
 	m_NoiseDistortZ.Generate3D(DistortNoiseZ, DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, Workspace);
@@ -210,8 +208,8 @@ void cDistortedHeightmap::GenerateHeightArray(void)
 			{
 				NOISE_DATATYPE DistX = DistortNoiseX[NoiseArrayIdx + x] * m_DistortAmpX[AmpIdx + x];
 				NOISE_DATATYPE DistZ = DistortNoiseZ[NoiseArrayIdx + x] * m_DistortAmpZ[AmpIdx + x];
-				DistX += static_cast<NOISE_DATATYPE>(m_CurChunkX * cChunkDef::Width + x * INTERPOL_X);
-				DistZ += static_cast<NOISE_DATATYPE>(m_CurChunkZ * cChunkDef::Width + z * INTERPOL_Z);
+				DistX += static_cast<NOISE_DATATYPE>(m_CurChunkCoords.m_ChunkX * cChunkDef::Width + x * INTERPOL_X);
+				DistZ += static_cast<NOISE_DATATYPE>(m_CurChunkCoords.m_ChunkZ * cChunkDef::Width + z * INTERPOL_Z);
 				// Adding 0.5 helps alleviate the interpolation artifacts
 				DistHei[NoiseArrayIdx + x] = static_cast<NOISE_DATATYPE>(GetHeightmapAt(DistX, DistZ)) + static_cast<NOISE_DATATYPE>(0.5);
 			}
@@ -231,9 +229,9 @@ void cDistortedHeightmap::GenerateHeightArray(void)
 
 
 
-void cDistortedHeightmap::GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape)
+void cDistortedHeightmap::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape)
 {
-	PrepareState(a_ChunkX, a_ChunkZ);
+	PrepareState(a_ChunkCoords);
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
@@ -268,8 +266,8 @@ int cDistortedHeightmap::GetHeightmapAt(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Z)
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(RelX, RelY, RelZ, ChunkX, ChunkZ);
 
-	// If we're withing the same chunk, return the pre-cached heightmap:
-	if ((ChunkX == m_CurChunkX) && (ChunkZ == m_CurChunkZ))
+	// If we're within the same chunk, return the pre-cached heightmap:
+	if ((ChunkX == m_CurChunkCoords.m_ChunkX) && (ChunkZ == m_CurChunkCoords.m_ChunkZ))
 	{
 		return cChunkDef::GetHeight(m_CurChunkHeights, RelX, RelZ);
 	}
@@ -284,7 +282,7 @@ int cDistortedHeightmap::GetHeightmapAt(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Z)
 
 	// The height is not in the cache, generate full heightmap and get it there:
 	cChunkDef::HeightMap Heightmap;
-	m_HeightGen.GenHeightMap(ChunkX, ChunkZ, Heightmap);
+	m_HeightGen.GenHeightMap({ChunkX, ChunkZ}, Heightmap);
 	return cChunkDef::GetHeight(Heightmap, RelX, RelZ);
 }
 
@@ -299,7 +297,7 @@ void cDistortedHeightmap::UpdateDistortAmps(void)
 	{
 		for (int x = -1; x <= 1; x++)
 		{
-			m_BiomeGen->GenBiomes(m_CurChunkX + x, m_CurChunkZ + z, Biomes[x + 1][z + 1]);
+			m_BiomeGen->GenBiomes({m_CurChunkCoords.m_ChunkX + x, m_CurChunkCoords.m_ChunkZ + z}, Biomes[x + 1][z + 1]);
 		}  // for x
 	}  // for z
 

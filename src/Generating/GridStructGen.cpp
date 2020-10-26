@@ -16,14 +16,15 @@
 /** A cStructure descendant representing an empty structure.
 Used when the generator descended from cGridStructGen doesn't return any structure, to keep at least the
 Origin coords so that the structure isn't queried over and over again. */
-class cEmptyStructure :
+class cEmptyStructure:
 	public cGridStructGen::cStructure
 {
-	typedef cGridStructGen::cStructure super;
+	using Super = cGridStructGen::cStructure;
 
 public:
+
 	cEmptyStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) :
-		super(a_GridX, a_GridZ, a_OriginX, a_OriginZ)
+		Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ)
 	{
 	}
 

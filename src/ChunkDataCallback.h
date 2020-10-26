@@ -115,7 +115,7 @@ public:
 	};
 
 	cChunkDataCopyCollector():
-		m_Pool(cpp14::make_unique<MemCallbacks>(), cChunkData::NumSections),  // Keep 1 chunk worth of reserve
+		m_Pool(std::make_unique<MemCallbacks>(), 0, cChunkData::NumSections),  // Keep 1 chunk worth of reserve
 		m_Data(m_Pool)
 	{
 	}

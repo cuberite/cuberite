@@ -11,8 +11,8 @@
 
 
 
-cBrewingstandEntity::cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+cBrewingstandEntity::cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_IsDestroyed(false),
 	m_IsBrewing(false),
 	m_TimeBrewed(0),
@@ -140,6 +140,7 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 
 		// Brewing process completed
+		m_World->BroadcastSoundEffect("block.brewing_stand.brew", m_Pos, 1.0f, 1.0f);
 		cPluginManager::Get()->CallHookBrewingCompleted(*m_World, *this);
 		return true;
 	}
@@ -155,10 +156,12 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 {
+	a_Player->GetStatManager().AddValue(Statistic::InteractWithBrewingstand);
+
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
 	{
-		OpenWindow(new cBrewingstandWindow(m_PosX, m_PosY, m_PosZ, this));
+		OpenWindow(new cBrewingstandWindow(this));
 		Window = GetWindow();
 	}
 
@@ -186,7 +189,7 @@ bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 
 
 
-void cBrewingstandEntity::BroadcastProgress(short a_ProgressbarID, short a_Value)
+void cBrewingstandEntity::BroadcastProgress(size_t a_ProgressbarID, short a_Value)
 {
 	cWindow * Window = GetWindow();
 	if (Window != nullptr)

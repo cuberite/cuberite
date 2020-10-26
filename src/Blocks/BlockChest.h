@@ -1,46 +1,82 @@
 
 #pragma once
 
-#include "BlockEntity.h"
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
-#include "MetaRotator.h"
+#include "Mixins.h"
 
 
 
 
 
-class cBlockChestHandler :
-	public cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
+class cBlockChestHandler final :
+	public cYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>
 {
+	using Super = cYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>;
+
 public:
-	cBlockChestHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
+
+	using Super::Super;
+
+	/** Translates player yaw when placing a chest into the chest block metadata. Valid for single chests only */
+	static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
 	{
+		a_Yaw += 90 + 45;  // So its not aligned with axis
+
+		if (a_Yaw > 360.f)
+		{
+			a_Yaw -= 360.f;
+		}
+		if ((a_Yaw >= 0.f) && (a_Yaw < 90.f))
+		{
+			return 0x04;
+		}
+		else if ((a_Yaw >= 180) && (a_Yaw < 270))
+		{
+			return 0x05;
+		}
+		else if ((a_Yaw >= 90) && (a_Yaw < 180))
+		{
+			return 0x02;
+		}
+		else
+		{
+			return 0x03;
+		}
 	}
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		a_BlockType = m_BlockType;
+private:
 
-		// Is there a doublechest already next to this block?
-		if (!CanBeAt(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ))
+	virtual bool GetPlacementBlockTypeMeta(
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) const override
+	{
+		// Cannot place right next to double-chest:
+		if (!CanBeAt(a_ChunkInterface, a_PlacedBlockPos))
 		{
 			// Yup, cannot form a triple-chest, refuse:
 			return false;
 		}
 
-		// Check if this forms a doublechest, if so, need to adjust the meta:
+		// Try to read double-chest information:
 		cBlockArea Area;
-		if (!Area.Read(a_ChunkInterface, a_BlockX - 1, a_BlockX + 1, a_BlockY, a_BlockY, a_BlockZ - 1, a_BlockZ + 1))
+		if (!Area.Read(a_ChunkInterface, a_PlacedBlockPos - Vector3i(1, 0, 1), a_PlacedBlockPos + Vector3i(1, 0, 1)))
 		{
 			return false;
 		}
+
+		// Get meta as if this was a single-chest:
+		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta))
+		{
+			return false;
+		}
+
+		// Check if this forms a doublechest, if so, need to adjust the meta:
 		double yaw = a_Player.GetYaw();
 		if (
 			(Area.GetRelBlockType(0, 0, 1) == m_BlockType) ||
@@ -51,31 +87,36 @@ public:
 			return true;
 		}
 		if (
-			(Area.GetRelBlockType(0, 0, 1) == m_BlockType) ||
-			(Area.GetRelBlockType(2, 0, 1) == m_BlockType)
+			(Area.GetRelBlockType(1, 0, 0) == m_BlockType) ||
+			(Area.GetRelBlockType(1, 0, 2) == m_BlockType)
 		)
 		{
-			// FIXME: This is unreachable, as the condition is the same as the above one
 			a_BlockMeta = (yaw < 0) ? 4 : 5;
 			return true;
 		}
 
-		// Single chest, get meta from rotation only
-		a_BlockMeta = PlayerYawToMetaData(yaw);
+
 		return true;
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+
+
+
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
-		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-		return CanBeAt(a_ChunkInterface, BlockX, a_RelY, BlockZ);
+		auto BlockPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+		return CanBeAt(a_ChunkInterface, BlockPos);
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+
+
+
+
+	bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_BlockPos) const
 	{
 		cBlockArea Area;
-		if (!Area.Read(a_ChunkInterface, a_BlockX - 2, a_BlockX + 2, a_BlockY, a_BlockY, a_BlockZ - 2, a_BlockZ + 2))
+		if (!Area.Read(a_ChunkInterface, a_BlockPos - Vector3i(2, 0, 2), a_BlockPos + Vector3i(2, 0, 2)))
 		{
 			// Cannot read the surroundings, probably at the edge of loaded chunks. Disallow.
 			return false;
@@ -137,35 +178,12 @@ public:
 		return (NumChestNeighbors < 2);
 	}
 
-	/** Translates player yaw when placing a chest into the chest block metadata. Valid for single chests only */
-	static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
-	{
-		a_Yaw += 90 + 45;  // So its not aligned with axis
 
-		if (a_Yaw > 360.f)
-		{
-			a_Yaw -= 360.f;
-		}
-		if ((a_Yaw >= 0.f) && (a_Yaw < 90.f))
-		{
-			return 0x04;
-		}
-		else if ((a_Yaw >= 180) && (a_Yaw < 270))
-		{
-			return 0x05;
-		}
-		else if ((a_Yaw >= 90) && (a_Yaw < 180))
-		{
-			return 0x02;
-		}
-		else
-		{
-			return 0x03;
-		}
-	}
+
+
 
 	/** If there's a chest in the a_Area in the specified coords, modifies its meta to a_NewMeta and returns true. */
-	bool CheckAndAdjustNeighbor(cChunkInterface & a_ChunkInterface, const cBlockArea & a_Area, int a_RelX, int a_RelZ, NIBBLETYPE a_NewMeta)
+	bool CheckAndAdjustNeighbor(cChunkInterface & a_ChunkInterface, const cBlockArea & a_Area, int a_RelX, int a_RelZ, NIBBLETYPE a_NewMeta) const
 	{
 		if (a_Area.GetRelBlockType(a_RelX, 0, a_RelZ) != m_BlockType)
 		{
@@ -175,12 +193,11 @@ public:
 		return true;
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
-	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 13;

@@ -17,9 +17,11 @@
 class cTwoHeights:
 	public cTerrainShapeGen
 {
-	typedef cTerrainShapeGen super;
+	using Super = cTerrainShapeGen;
+
 public:
-	cTwoHeights(int a_Seed, cBiomeGenPtr a_BiomeGen):
+
+	cTwoHeights(int a_Seed, const cBiomeGenPtr & a_BiomeGen):
 		m_Seed(a_Seed),
 		m_Choice(a_Seed),
 		m_HeightA(a_Seed + 1, a_BiomeGen),
@@ -29,23 +31,23 @@ public:
 
 
 	// cTerrainShapeGen override:
-	virtual void GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape) override
+	virtual void GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape) override
 	{
 		// Generate the two heightmaps:
 		cChunkDef::HeightMap heightsA;
 		cChunkDef::HeightMap heightsB;
-		m_HeightA.GenHeightMap(a_ChunkX, a_ChunkZ, heightsA);
-		m_HeightB.GenHeightMap(a_ChunkX, a_ChunkZ, heightsB);
+		m_HeightA.GenHeightMap(a_ChunkCoords, heightsA);
+		m_HeightB.GenHeightMap(a_ChunkCoords, heightsB);
 
 		// Generate the choice noise:
 		NOISE_DATATYPE smallChoice[33 * 5 * 5];
 		NOISE_DATATYPE workspace[33 * 5 * 5];
 		NOISE_DATATYPE startX = 0;
 		NOISE_DATATYPE endX = 256 * m_FrequencyY;
-		NOISE_DATATYPE startY =  a_ChunkX * cChunkDef::Width * m_FrequencyX;
-		NOISE_DATATYPE endY   = (a_ChunkX * cChunkDef::Width + cChunkDef::Width + 1) * m_FrequencyX;
-		NOISE_DATATYPE startZ =  a_ChunkZ * cChunkDef::Width * m_FrequencyZ;
-		NOISE_DATATYPE endZ   = (a_ChunkZ * cChunkDef::Width + cChunkDef::Width + 1) * m_FrequencyZ;
+		NOISE_DATATYPE startY =  a_ChunkCoords.m_ChunkX * cChunkDef::Width * m_FrequencyX;
+		NOISE_DATATYPE endY   = (a_ChunkCoords.m_ChunkX * cChunkDef::Width + cChunkDef::Width + 1) * m_FrequencyX;
+		NOISE_DATATYPE startZ =  a_ChunkCoords.m_ChunkZ * cChunkDef::Width * m_FrequencyZ;
+		NOISE_DATATYPE endZ   = (a_ChunkCoords.m_ChunkZ * cChunkDef::Width + cChunkDef::Width + 1) * m_FrequencyZ;
 		m_Choice.Generate3D(smallChoice, 33, 5, 5, startX, endX, startY, endY, startZ, endZ, workspace);
 		NOISE_DATATYPE choice[257 * 17 * 17];
 		LinearUpscale3DArray(smallChoice, 33, 5, 5, choice, 8, 4, 4);
@@ -111,7 +113,7 @@ protected:
 
 
 
-cTerrainShapeGenPtr CreateShapeGenTwoHeights(int a_Seed, cBiomeGenPtr a_BiomeGen)
+cTerrainShapeGenPtr CreateShapeGenTwoHeights(int a_Seed, const cBiomeGenPtr & a_BiomeGen)
 {
 	return std::make_shared<cTwoHeights>(a_Seed, a_BiomeGen);
 }

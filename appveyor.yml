@@ -1,15 +1,97 @@
 version: 1.0.{build}
-configuration: Debug
 clone_depth: 50
 
-before_build:
-- echo %TIME%
-- git submodule update --init
-- echo %TIME%
-- cmake -G "Visual Studio 12" -DSELF_TEST=1 -DBUILD_TOOLS=1 .
-- echo %TIME%
+image:
+- Visual Studio 2019
+- Visual Studio 2017
+
+branches:
+  only:
+    - master
+
+# Set up environment variables for build info
+environment:
+  CUBERITE_BUILD_SERIES_NAME: AppVeyor
+  CUBERITE_BUILD_ID: "%APPVEYOR_BUILD_NUMBER%"
+  CUBERITE_BUILD_DATETIME: "%APPVEYOR_REPO_COMMIT_TIMESTAMP%"
+
+  matrix:
+  - job_name: Windows-x64-Debug
+    configuration: Debug
+    BUILD_DIR: Debug x64
+
+  - job_name: Windows-x86
+    configuration: Release
+    BUILD_DIR: Release x86
+
+  - job_name: Windows-x64
+    configuration: Release
+    BUILD_DIR: Release x64
+
+matrix:
+  exclude:
+    - image: Visual Studio 2017
+      configuration: Release
+    - image: Visual Studio 2019
+      configuration: Debug
 
 build:
-  project: Cuberite.sln
+  project: '%BUILD_DIR%\Cuberite.sln'
   parallel: true
   verbosity: minimal
+
+pull_requests:
+  do_not_increment_build_number: true
+
+install:
+- git submodule update --init
+- if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"
+- cd "%BUILD_DIR%"
+
+for:
+##############################
+# Windows 64-bit debug build #
+##############################
+-
+  matrix:
+    only:
+      - job_name: Windows-x64-Debug
+
+  before_build:
+  # TODO: re-add -DSELF_TEST=YES -DBUILD_TOOLS=YES once PCH for tools enabled (too slow otherwise)
+  - cmake -G "Visual Studio 15 2017" -DSELF_TEST=No -DBUILD_TOOLS=No ..
+
+################################
+# Windows 32-bit release build #
+################################
+-
+  matrix:
+    only:
+      - job_name: Windows-x86
+
+  before_build:
+  - cmake -G "Visual Studio 16 2019" ..
+
+################################
+# Windows 64-bit release build #
+################################
+-
+  matrix:
+    only:
+      - job_name: Windows-x64
+
+  before_build:
+  - cmake -G "Visual Studio 16 2019" -A "x64" ..
+
+###########################################
+# Cache for speeding up subsequent builds #
+###########################################
+cache:
+  - '%BUILD_DIR%\CMakeCache.txt'
+
+#####################
+# Package artifacts #
+#####################
+after_build:
+- cd Server
+- Install\PackWindowsExecutables.cmd

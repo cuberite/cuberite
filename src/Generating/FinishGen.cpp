@@ -12,9 +12,9 @@
 #include "FinishGen.h"
 #include "../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
 #include "../Simulator/FireSimulator.h"
-#include "../World.h"
 #include "../IniFile.h"
 #include "../MobSpawner.h"
+#include "../BlockInfo.h"
 
 
 
@@ -275,7 +275,7 @@ void cFinishGenClumpTopBlock::TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int
 
 
 
-void cFinishGenClumpTopBlock::ParseConfigurationString(AString a_RawClumpInfo, std::vector<BiomeInfo> & a_Output)
+void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClumpInfo, std::vector<BiomeInfo> & a_Output)
 {
 	// Initialize the vector for all biomes.
 	for (int i = static_cast<int>(a_Output.size()); i < static_cast<int>(biMaxVariantBiome); i++)
@@ -1548,7 +1548,7 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 	auto NewMob = cMonster::NewMonsterFromType(AnimalToSpawn);
 	NewMob->SetHealth(NewMob->GetMaxHealth());
 	NewMob->SetPosition(AnimalX, AnimalY, AnimalZ);
-	LOGD("Spawning %s #%i at {%.02f, %.02f, %.02f}", NewMob->GetClass(), NewMob->GetUniqueID(), AnimalX, AnimalY, AnimalZ);
+	FLOGD("Spawning {0} #{1} at {2:.02f}", NewMob->GetClass(), NewMob->GetUniqueID(), NewMob->GetPosition());
 	a_ChunkDesc.GetEntities().emplace_back(std::move(NewMob));
 
 	return true;
@@ -1615,13 +1615,15 @@ const cFinishGenOres::OreInfos & cFinishGenOres::DefaultOverworldOres(void)
 {
 	static OreInfos res
 	{
-		// OreType,            OreMeta, MaxHeight, NumNests, NestSize
-		{E_BLOCK_COAL_ORE,     0,       127,       20,       16},
-		{E_BLOCK_IRON_ORE,     0,        64,       20,        8},
-		{E_BLOCK_GOLD_ORE,     0,        32,        2,        8},
-		{E_BLOCK_REDSTONE_ORE, 0,        16,        8,        7},
-		{E_BLOCK_DIAMOND_ORE,  0,        15,        1,        7},
-		{E_BLOCK_LAPIS_ORE,    0,        30,        1,        6},
+		// OreType,              OreMeta, MaxHeight, NumNests, NestSize
+		{E_BLOCK_COAL_ORE,       0,       127,       20,       16},
+		{E_BLOCK_IRON_ORE,       0,        64,       20,        8},
+		{E_BLOCK_GOLD_ORE,       0,        32,        2,        8},
+		{E_BLOCK_REDSTONE_ORE,   0,        16,        8,        7},
+		{E_BLOCK_DIAMOND_ORE,    0,        15,        1,        7},
+		{E_BLOCK_LAPIS_ORE,      0,        30,        1,        6},
+		{E_BLOCK_EMERALD_ORE,    0,        32,       11,        1},
+		{E_BLOCK_SILVERFISH_EGG, 0,        64,        7,        9},
 	};
 	return res;
 }
@@ -1750,6 +1752,65 @@ void cFinishGenOreNests::GenerateOre(
 	// It does so by making a random XYZ walk and adding ore along the way in cuboids of different (random) sizes
 	// Only "terraformable" blocks get replaced with ore, all other blocks stay (so the nest can actually be smaller than specified).
 
+	// If there is an attempt to generate Emerald ores in a chunk with no mountains biome abort
+	// There are just four points sampled to avoid searching all 16 * 16 blocks:
+	if (a_OreType == E_BLOCK_EMERALD_ORE)
+	{
+		const auto BiomeSampleOne =   a_ChunkDesc.GetBiome( 4,  4);
+		const auto BiomeSampleTwo =   a_ChunkDesc.GetBiome( 4, 12);
+		const auto BiomeSampleThree = a_ChunkDesc.GetBiome(12,  4);
+		const auto BiomeSampleFour =  a_ChunkDesc.GetBiome(12, 12);
+
+		if (
+			!IsBiomeMountain(BiomeSampleOne) &&
+			!IsBiomeMountain(BiomeSampleTwo) &&
+			!IsBiomeMountain(BiomeSampleThree) &&
+			!IsBiomeMountain(BiomeSampleFour)
+		)
+		{
+			return;
+		}
+	}
+
+	// Gold ores are generated more often in Mesa-Type-Biomes:
+	// https://minecraft.gamepedia.com/Gold_Ore
+	if (a_OreType == E_BLOCK_GOLD_ORE)
+	{
+		const auto BiomeSampleOne =   a_ChunkDesc.GetBiome( 4,  4);
+		const auto BiomeSampleTwo =   a_ChunkDesc.GetBiome( 4, 12);
+		const auto BiomeSampleThree = a_ChunkDesc.GetBiome(12,  4);
+		const auto BiomeSampleFour =  a_ChunkDesc.GetBiome(12, 12);
+
+		if (
+			IsBiomeMesa(BiomeSampleOne) ||
+			IsBiomeMesa(BiomeSampleTwo) ||
+			IsBiomeMesa(BiomeSampleThree) ||
+			IsBiomeMesa(BiomeSampleFour)
+		)
+		{
+			a_MaxHeight = 76;
+			a_NumNests = 22;  // 2 times default + 20 times mesa bonus
+		}
+	}
+
+	if (a_OreType == E_BLOCK_SILVERFISH_EGG)
+	{
+		const auto BiomeSampleOne =   a_ChunkDesc.GetBiome( 4,  4);
+		const auto BiomeSampleTwo =   a_ChunkDesc.GetBiome( 4, 12);
+		const auto BiomeSampleThree = a_ChunkDesc.GetBiome(12,  4);
+		const auto BiomeSampleFour =  a_ChunkDesc.GetBiome(12, 12);
+
+		if (
+			!IsBiomeMountain(BiomeSampleOne) &&
+			!IsBiomeMountain(BiomeSampleTwo) &&
+			!IsBiomeMountain(BiomeSampleThree) &&
+			!IsBiomeMountain(BiomeSampleFour)
+			)
+		{
+			return;
+		}
+	}
+
 	auto chunkX = a_ChunkDesc.GetChunkX();
 	auto chunkZ = a_ChunkDesc.GetChunkZ();
 	auto & blockTypes = a_ChunkDesc.GetBlockTypes();
@@ -1763,7 +1824,7 @@ void cFinishGenOreNests::GenerateOre(
 		nestRnd /= cChunkDef::Width;
 		int BaseY = nestRnd % a_MaxHeight;
 		nestRnd /= a_MaxHeight;
-		int NestSize = a_NestSize + (nestRnd % (a_NestSize / 4));  // The actual nest size may be up to 1 / 4 larger
+		int NestSize = a_NestSize + (nestRnd % (std::max(a_NestSize, 4) / 4));  // The actual nest size may be up to 1 / 4 larger
 		int Num = 0;
 		while (Num < NestSize)
 		{
@@ -1988,7 +2049,7 @@ void cFinishGenOrePockets::imprintSphere(
 		(blockZ >= baseZ) && (blockZ < baseZ + cChunkDef::Width)
 	)
 	{
-		// LOGD("Imprinting a sphere center at {%d, %d, %d}", blockX, blockY, blockZ);
+		// FLOGD("Imprinting a sphere center at {0}", Vector3i{blockX, blockY, blockZ});
 		a_ChunkDesc.SetBlockTypeMeta(blockX - baseX, blockY, blockZ - baseZ, a_OreType, a_OreMeta);
 	}
 	return;

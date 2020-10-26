@@ -16,12 +16,13 @@
 
 
 
-class cDungeonRoomsFinisher :
+class cDungeonRoomsFinisher:
 	public cGridStructGen
 {
-	typedef cGridStructGen super;
+	using Super = cGridStructGen;
 
 public:
+
 	/** Creates a new dungeon room finisher.
 	a_ShapeGen is the underlying terrain shape generator, so that the rooms can always be placed under the terrain.
 	a_MaxSize and a_MinSize are the maximum and minimum sizes of the room's internal (air) area, in blocks across.

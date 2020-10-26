@@ -21,7 +21,7 @@ cRabbit::cRabbit(void) :
 
 
 cRabbit::cRabbit(eRabbitType Type, int MoreCarrotTicks) :
-	super("Rabbit", mtRabbit, "entity.rabbit.hurt", "entity.rabbit.death", 0.82, 0.68),
+	Super("Rabbit", mtRabbit, "entity.rabbit.hurt", "entity.rabbit.death", "entity.rabbit.ambient", 0.82, 0.68),
 	m_Type(Type),
 	m_MoreCarrotTicks(MoreCarrotTicks)
 {

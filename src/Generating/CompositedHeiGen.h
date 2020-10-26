@@ -21,21 +21,21 @@ class cCompositedHeiGen:
 {
 public:
 	cCompositedHeiGen(cBiomeGenPtr a_BiomeGen, cTerrainShapeGenPtr a_ShapeGen, cTerrainCompositionGenPtr a_CompositionGen):
-		m_BiomeGen(a_BiomeGen),
-		m_ShapeGen(a_ShapeGen),
-		m_CompositionGen(a_CompositionGen)
+		m_BiomeGen(std::move(a_BiomeGen)),
+		m_ShapeGen(std::move(a_ShapeGen)),
+		m_CompositionGen(std::move(a_CompositionGen))
 	{
 	}
 
 
 
 	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override
+	virtual void GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap) override
 	{
 		cChunkDesc::Shape shape;
-		m_ShapeGen->GenShape(a_ChunkX, a_ChunkZ, shape);
-		cChunkDesc desc(a_ChunkX, a_ChunkZ);
-		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, desc.GetBiomeMap());	  // Need to initialize biomes for the composition gen
+		m_ShapeGen->GenShape(a_ChunkCoords, shape);
+		cChunkDesc desc(a_ChunkCoords);
+		m_BiomeGen->GenBiomes(a_ChunkCoords, desc.GetBiomeMap());  // Need to initialize biomes for the composition gen
 		desc.SetHeightFromShape(shape);
 		m_CompositionGen->ComposeTerrain(desc, shape);
 		memcpy(a_HeightMap, desc.GetHeightMap(), sizeof(a_HeightMap));

@@ -8,87 +8,83 @@
 
 
 
-class cItemBoatHandler :
+class cItemBoatHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
-	cItemBoatHandler(int a_ItemType) :
-		super(a_ItemType)
+
+	cItemBoatHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
 
 
 
+
+
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
 	) override
 	{
-		if ((a_BlockFace != BLOCK_FACE_YM) && (a_BlockFace != BLOCK_FACE_NONE))
+		// Only allow placing blocks on top of blocks, or when not in range of dest block:
+		if ((a_ClickedBlockFace != BLOCK_FACE_YM) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
 		{
 			return false;
 		}
 
-		class cCallbacks :
+		// Find the actual placement position by tracing line of sight until non-air block:
+		class cCallbacks:
 			public cBlockTracer::cCallbacks
 		{
 		public:
 			Vector3d m_Pos;
 			bool m_HasFound;
 
-			cCallbacks(void) :
+			cCallbacks():
 				m_HasFound(false)
 			{
 			}
 
-			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
+			virtual bool OnNextBlock(Vector3i a_CBBlockPos, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
 			{
 				if (a_CBBlockType != E_BLOCK_AIR)
 				{
-					m_Pos.Set(a_CBBlockX, a_CBBlockY, a_CBBlockZ);
+					m_Pos = a_CBBlockPos;
 					m_HasFound = true;
 					return true;
 				}
 				return false;
 			}
 		} Callbacks;
-
-		cLineBlockTracer Tracer(*a_World, Callbacks);
-		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
-		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
-
-		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
-
+		auto Start = a_Player->GetEyePosition() + a_Player->GetLookVector();
+		auto End = a_Player->GetEyePosition() + a_Player->GetLookVector() * 5;
+		cLineBlockTracer::Trace(*a_World, Callbacks, Start, End);
 		if (!Callbacks.m_HasFound)
 		{
 			return false;
 		}
 
-		auto x = Callbacks.m_Pos.x;
-		auto y = Callbacks.m_Pos.y;
-		auto z = Callbacks.m_Pos.z;
-		auto bx = FloorC(x);
-		auto by = FloorC(y);
-		auto bz = FloorC(z);
-
-		// Verify that block type for spawn point is water
-		BLOCKTYPE SpawnBlock = a_World->GetBlock(bx, by, bz);
-		if (!IsBlockWater(SpawnBlock))
+		// Block above must be air to spawn a boat (prevents spawning a boat underwater)
+		auto PosAbove = Callbacks.m_Pos.Floor().addedY(1);
+		if (!cChunkDef::IsValidHeight(PosAbove.y))
 		{
 			return false;
 		}
-
-		// Block above must be air to spawn a boat (prevents spawning a boat underwater)
-		BLOCKTYPE BlockAbove = a_World->GetBlock(bx, by + 1, bz);
+		BLOCKTYPE BlockAbove = a_World->GetBlock(PosAbove);
 		if (BlockAbove != E_BLOCK_AIR)
 		{
 			return false;
 		}
 
 		// Spawn block at water level
-		if (a_World->SpawnBoat(Callbacks.m_Pos + Vector3d(0.5, 0.5, 0.5), cBoat::ItemToMaterial(a_Player->GetEquippedItem())) == cEntity::INVALID_ID)
+		if (a_World->SpawnBoat(Callbacks.m_Pos + Vector3d(0.5, 1, 0.5), cBoat::ItemToMaterial(a_Player->GetEquippedItem())) == cEntity::INVALID_ID)
 		{
 			return false;
 		}

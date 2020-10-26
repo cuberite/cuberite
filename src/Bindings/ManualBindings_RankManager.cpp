@@ -5,10 +5,10 @@
 
 #include "Globals.h"
 #include "ManualBindings.h"
-#include "../Root.h"
 #include "tolua++/include/tolua++.h"
 #include "LuaState.h"
-#include "UUID.h"
+#include "../Root.h"
+#include "../UUID.h"
 
 
 

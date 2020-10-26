@@ -1,8 +1,6 @@
-project (Cuberite)
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
-SET (SRCS
 	BioGen.cpp
 	Caves.cpp
 	ChunkDesc.cpp
@@ -26,15 +24,14 @@ SET (SRCS
 	PrefabStructure.cpp
 	Ravines.cpp
 	RoughRavines.cpp
+	SinglePieceStructuresGen.cpp
 	StructGen.cpp
 	Trees.cpp
 	TwoHeights.cpp
 	VerticalLimit.cpp
 	VerticalStrategy.cpp
 	VillageGen.cpp
-)
 
-SET (HDRS
 	BioGen.h
 	Caves.h
 	ChunkDesc.h
@@ -62,6 +59,7 @@ SET (HDRS
 	Ravines.h
 	RoughRavines.h
 	ShapeGen.cpp
+	SinglePieceStructuresGen.h
 	StructGen.h
 	Trees.h
 	TwoHeights.h
@@ -69,12 +67,3 @@ SET (HDRS
 	VerticalStrategy.h
 	VillageGen.h
 )
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(CompoGenBiomal.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
-endif()
-
-if(NOT MSVC)
-	add_library(Generating ${SRCS} ${HDRS})
-	target_link_libraries(Generating fmt::fmt OSSupport Blocks Bindings)
-endif()

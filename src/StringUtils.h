@@ -8,8 +8,6 @@
 
 #pragma once
 
-
-
 typedef std::string AString;
 typedef std::vector<AString> AStringVector;
 typedef std::list<AString>   AStringList;
@@ -23,21 +21,29 @@ typedef std::map<AString, AString> AStringMap;
 
 /** Output the formatted text into the string.
 Returns a_Dst. */
-extern AString & Printf(AString & a_Dst, const char * format, fmt::ArgList args);
-FMT_VARIADIC(AString &, Printf, AString &, const char *)
+extern AString & vPrintf(AString & a_Dst, const char * a_Format, fmt::printf_args a_ArgList);
+template <typename... Args>
+AString & Printf(AString & a_Dst, const char * a_Format, const Args & ... a_Args)
+{
+	return vPrintf(a_Dst, a_Format, fmt::make_printf_args(a_Args...));
+}
 
 /** Output the formatted text into string
 Returns the formatted string by value. */
-extern AString Printf(const char * format, fmt::ArgList args);
-FMT_VARIADIC(AString, Printf, const char *)
+extern AString vPrintf(const char * a_Format, fmt::printf_args a_ArgList);
+template <typename... Args>
+AString Printf(const char * a_Format, const Args & ... a_Args)
+{
+	return vPrintf(a_Format, fmt::make_printf_args(a_Args...));
+}
 
 /** Add the formated string to the existing data in the string.
 Returns a_Dst. */
+extern AString & vAppendPrintf(AString & a_Dst, const char * a_Format, fmt::printf_args a_ArgList);
 template <typename... Args>
-extern AString & AppendPrintf(AString & a_Dst, const char * format, const Args & ... args)
+extern AString & AppendPrintf(AString & a_Dst, const char * a_Format, const Args & ... a_Args)
 {
-	a_Dst += Printf(format, args...);
-	return a_Dst;
+	return vAppendPrintf(a_Dst, a_Format, fmt::make_printf_args(a_Args...));
 }
 
 /** Split the string at any of the listed delimiters.
@@ -142,11 +148,15 @@ The order of items doesn't change, only the duplicates are removed.
 If a_Strings1 contains duplicates, the result will still contain those duplicates. */
 extern AStringVector MergeStringVectors(const AStringVector & a_Strings1, const AStringVector & a_Strings2);
 
-/** Concatenates the specified strings into a single string, separated by the specified separator. */
+/** Concatenates the specified strings into a single string, separated by the specified separator character.
+Use StringJoin() if you need multiple separator characters. */
 extern AString StringsConcat(const AStringVector & a_Strings, char a_Separator);
 
 /** Converts a string into a float. Returns false if the conversion fails. */
 extern bool StringToFloat(const AString & a_String, float & a_Num);
+
+/** Returns true if only whitespace characters are present in the string */
+bool IsOnlyWhitespace(const AString & a_String);
 
 
 

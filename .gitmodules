@@ -63,3 +63,6 @@
 	path = lib/fmt
 	url = https://github.com/fmtlib/fmt.git
 	ignore = dirty
+[submodule "Tools/BlockTypePaletteGenerator/lib/lunajson"]
+	path = Tools/BlockTypePaletteGenerator/lib/lunajson
+	url = https://github.com/grafi-tt/lunajson.git

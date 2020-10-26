@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "Defines.h"
+#include "ChunkDef.h"
 
 
 

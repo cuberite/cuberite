@@ -8,7 +8,7 @@
 
 
 cChicken::cChicken(void) :
-	super("Chicken", mtChicken, "entity.chicken.hurt", "entity.chicken.death", 0.4, 0.7),
+	Super("Chicken", mtChicken, "entity.chicken.hurt", "entity.chicken.death", "entity.chicken.ambient", 0.4, 0.7),
 	m_EggDropTimer(0)
 {
 	SetGravity(-2.0f);
@@ -21,7 +21,7 @@ cChicken::cChicken(void) :
 
 void cChicken::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -80,5 +80,5 @@ bool cChicken::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	return super::DoTakeDamage(a_TDI);
+	return Super::DoTakeDamage(a_TDI);
 }

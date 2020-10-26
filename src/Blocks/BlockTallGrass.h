@@ -8,76 +8,90 @@
 
 
 
-class cBlockTallGrassHandler :
+/** Handles the grass that is 1 block tall */
+class cBlockTallGrassHandler final :
 	public cBlockHandler
 {
-	typedef cBlockHandler super;
-public:
-	cBlockTallGrassHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
-	{
-	}
+	using Super = cBlockHandler;
 
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
+public:
+
+	using Super::Super;
+
+private:
+
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
 	{
 		return true;
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		// Drop seeds, sometimes
-		if (GetRandomProvider().RandBool(0.125))
+		// If using shears, drop self:
+		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == E_ITEM_SHEARS))
 		{
-			a_Pickups.push_back(cItem(E_ITEM_SEEDS, 1, 0));
-		}
-	}
-
-	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop) override
-	{
-		if (a_CanDrop && (a_Digger != nullptr) && (a_Digger->GetEquippedWeapon().m_ItemType == E_ITEM_SHEARS))
-		{
-			NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
-			cItems Drops;
-			Drops.Add(m_BlockType, 1, Meta);
-
-			// Allow plugins to modify the pickups:
-			a_BlockPluginInterface.CallHookBlockToPickups(a_Digger, a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta, Drops);
-
-			// Spawn the pickups:
-			if (!Drops.empty())
-			{
-				auto & r1 = GetRandomProvider();
-
-				// Mid-block position first
-				double MicroX, MicroY, MicroZ;
-				MicroX = a_BlockX + 0.5;
-				MicroY = a_BlockY + 0.5;
-				MicroZ = a_BlockZ + 0.5;
-
-				// Add random offset second
-				MicroX += r1.RandReal<double>(-0.5, 0.5);
-				MicroZ += r1.RandReal<double>(-0.5, 0.5);
-
-				a_WorldInterface.SpawnItemPickups(Drops, MicroX, MicroY, MicroZ);
-			}
-			return;
+			return cItem(m_BlockType, 1, a_BlockMeta);
 		}
 
-		super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_CanDrop);
+		// Drop seeds, depending on bernoulli trial result:
+		if (GetRandomProvider().RandBool(0.875))  // 87.5% chance of dropping nothing
+		{
+			return {};
+		}
+
+		// 12.5% chance of dropping 0 or more seeds.
+		const auto DropNum = FortuneDiscreteRandom(1, 1, 2 * ToolFortuneLevel(a_Tool));
+		return cItem(E_ITEM_SEEDS, DropNum);
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+
+
+
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		if (a_RelY <= 0)
+		if (a_RelPos.y <= 0)
 		{
 			return false;
 		}
 
-		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
+		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(a_RelPos.addedY(-1));
 		return IsBlockTypeOfDirt(BelowBlock);
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+
+
+
+	/** Growing a tall grass produces a big flower (2-block high fern or double-tall grass). */
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
+	{
+		if (a_RelPos.y > (cChunkDef::Height - 2))
+		{
+			return 0;
+		}
+		auto blockMeta = a_Chunk.GetMeta(a_RelPos);
+		NIBBLETYPE largeFlowerMeta;
+		switch (blockMeta)
+		{
+			case E_META_TALL_GRASS_GRASS: largeFlowerMeta = E_META_BIG_FLOWER_DOUBLE_TALL_GRASS; break;
+			case E_META_TALL_GRASS_FERN:  largeFlowerMeta = E_META_BIG_FLOWER_LARGE_FERN; break;
+			default:                      return 0;
+		}
+		a_Chunk.SetBlock(a_RelPos,           E_BLOCK_BIG_FLOWER, largeFlowerMeta);
+		a_Chunk.SetBlock(a_RelPos.addedY(1), E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
+		return 1;
+	}
+
+
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 7;

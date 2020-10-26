@@ -2,67 +2,119 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "Chunk.h"
-#include "MetaRotator.h"
+#include "Mixins.h"
 #include "ChunkInterface.h"
 #include "BlockSlab.h"
+#include "../Chunk.h"
 
 
 
-class cBlockRedstoneRepeaterHandler :
-	public cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>
+
+
+class cBlockRedstoneRepeaterHandler final :
+	public cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>
 {
+	using Super = cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>;
+
 public:
-	cBlockRedstoneRepeaterHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>(a_BlockType)
+
+	using Super::Super;
+
+	inline static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
 	{
+		return -GetRearCoordinateOffset(a_Meta);
 	}
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	inline static Vector3i GetLeftCoordinateOffset(NIBBLETYPE a_Meta)
 	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = RepeaterRotationToMetaData(a_Player.GetYaw());
+		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
+		{
+			case E_META_REDSTONE_REPEATER_FACING_ZM: return { -1, 0, 0 };
+			case E_META_REDSTONE_REPEATER_FACING_XP: return { 0, 0, -1 };
+			case E_META_REDSTONE_REPEATER_FACING_ZP: return { 1, 0, 0 };
+			case E_META_REDSTONE_REPEATER_FACING_XM: return { 0, 0, 1 };
+
+			default:
+			{
+				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
+				ASSERT(!"Unknown metadata while determining orientation of repeater!");
+				return { 0, 0, 0 };
+			}
+		}
+	}
+
+	inline static Vector3i GetRearCoordinateOffset(NIBBLETYPE a_Meta)
+	{
+		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
+		{
+			case E_META_REDSTONE_REPEATER_FACING_ZM: return { 0, 0, 1 };
+			case E_META_REDSTONE_REPEATER_FACING_XP: return { -1, 0, 0 };
+			case E_META_REDSTONE_REPEATER_FACING_ZP: return { 0, 0, -1 };
+			case E_META_REDSTONE_REPEATER_FACING_XM: return { 1, 0, 0 };
+			default:
+			{
+				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
+				ASSERT(!"Unknown metadata while determining orientation of repeater!");
+				return { 0, 0, 0 };
+			}
+		}
+	}
+
+private:
+
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) const override
+	{
+		// Increment the delay setting:
+		a_ChunkInterface.SetBlockMeta(a_BlockPos, ((a_ChunkInterface.GetBlockMeta(a_BlockPos) + 0x04) & 0x0f));
 		return true;
 	}
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
-	{
-		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, ((a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}) + 0x04) & 0x0f));
-		return true;
-	}
 
-	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+
+
+
+	virtual void OnCancelRightClick(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace
+	) const override
 	{
 		UNUSED(a_ChunkInterface);
-		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to zero
-		a_Pickups.push_back(cItem(E_ITEM_REDSTONE_REPEATER, 1, 0));
-	}
 
-	virtual bool IsUseable(void) override
+
+
+
+	virtual bool IsUseable(void) const override
 	{
 		return true;
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+
+
+
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		if (a_RelY <= 0)
+		if (a_RelPos.y <= 0)
 		{
 			return false;
 		}
 
 		BLOCKTYPE BelowBlock;
 		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY - 1, a_RelZ, BelowBlock, BelowBlockMeta);
+		a_Chunk.GetBlockTypeMeta(a_RelPos.addedY(-1), BelowBlock, BelowBlockMeta);
 
 		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
 		{
@@ -79,72 +131,23 @@ public:
 		return false;
 	}
 
-	inline static NIBBLETYPE RepeaterRotationToMetaData(double a_Rotation)
-	{
-		a_Rotation += 90 + 45;  // So its not aligned with axis
-		if (a_Rotation > 360)
-		{
-			a_Rotation -= 360;
-		}
 
-		if ((a_Rotation >= 0) && (a_Rotation < 90))
-		{
-			return 0x1;
-		}
-		else if ((a_Rotation >= 180) && (a_Rotation < 270))
-		{
-			return 0x3;
-		}
-		else if ((a_Rotation >= 90) && (a_Rotation < 180))
-		{
-			return 0x2;
-		}
-		else
-		{
-			return 0x0;
-		}
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	{
+		return cItem(E_ITEM_REDSTONE_REPEATER, 1, 0);
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 11;
-	}
-
-
-	inline static Vector3i GetRearCoordinateOffset(NIBBLETYPE a_Meta)
-	{
-		switch (a_Meta & 0x3)  // We only want the direction (bottom) bits
-		{
-			case 0x0: return {0, 0, 1};
-			case 0x1: return {-1, 0, 0};
-			case 0x2: return {0, 0, -1};
-			case 0x3: return {1, 0, 0};
-			default:
-			{
-				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
-				ASSERT(!"Unknown metadata while determining orientation of repeater!");
-				return {0, 0, 0};
-			}
-		}
-	}
-
-
-	inline static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
-	{
-		switch (a_Meta & 0x3)  // We only want the direction (bottom) bits
-		{
-			case 0x0: return {0, 0, -1};
-			case 0x1: return {1, 0, 0};
-			case 0x2: return {0, 0, 1};
-			case 0x3: return {-1, 0, 0};
-			default:
-			{
-				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
-				ASSERT(!"Unknown metadata while determining orientation of repeater!");
-				return {0, 0, 0};
-			}
-		}
 	}
 } ;
 

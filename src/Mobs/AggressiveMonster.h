@@ -7,14 +7,22 @@
 
 
 
-class cAggressiveMonster :
+class cAggressiveMonster:
 	public cMonster
 {
-	typedef cMonster super;
+	using Super = cMonster;
 
 public:
 
-	cAggressiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
+	cAggressiveMonster(
+		const AString & a_ConfigName,
+		eMonsterType a_MobType,
+		const AString & a_SoundHurt,
+		const AString & a_SoundDeath,
+		const AString & a_SoundAmbient,
+		double a_Width,
+		double a_Height
+	);
 
 	virtual void Tick          (std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void InStateChasing(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;

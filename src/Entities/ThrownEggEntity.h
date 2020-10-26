@@ -20,15 +20,15 @@
 class cThrownEggEntity :
 	public cProjectileEntity
 {
-	typedef cProjectileEntity super;
-
-public:
-
 	// tolua_end
+
+	using Super = cProjectileEntity;
+
+public:  // tolua_export
 
 	CLASS_PROTODEF(cThrownEggEntity)
 
-	cThrownEggEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
+	cThrownEggEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed);
 
 protected:
 

@@ -493,20 +493,15 @@ echo
 #=================== Print success message ===================
 
 
-cd ../Server
+cd Server
 echo
 echo "-----------------"
 echo "Compilation done!"
 echo
 echo "Cuberite awaits you at:"
+echo "$PWD/Cuberite"
 
-if [ "$CHOICE_BUILDTYPE" = "Debug" ]; then
-	echo "$PWD/Cuberite_debug"
-else
-	echo "$PWD/Cuberite"
-fi
-
-cd ..
+cd ../..
 echo "
 You can always update Cuberite by executing:
 $PWD/compile.sh
@@ -521,9 +516,10 @@ exit 0
 # Called via hack in line 2.
 :windows_detected
 @echo off
+cls
 echo This script is not available for Windows yet, sorry.
 echo You can still download the Windows binaries from: https://cuberite.org/
 echo You can also manually compile for Windows. See: https://github.com/cuberite/cuberite
 rem windows_exit
-exit
+goto :EOF
 }

@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "MobSpawner.h"
+#include "BlockInfo.h"
 #include "Mobs/IncludeAllMonsters.h"
 #include "World.h"
 
@@ -71,54 +72,67 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 
 
-bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, eMonsterType a_MobType, EMCSBiome a_Biome)
+bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType a_MobType, EMCSBiome a_Biome, bool a_DisableSolidBelowCheck)
 {
 	if (a_Chunk == nullptr)
 	{
 		return false;
 	}
+	if ((a_RelPos.y >= cChunkDef::Height - 1) || (a_RelPos.y <= 0))
+	{
+		return false;
+	}
 
-	if (cChunkDef::IsValidHeight(a_RelY - 1) && (a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ) == E_BLOCK_BEDROCK))
+	if (cChunkDef::IsValidHeight(a_RelPos.y - 1) && (a_Chunk->GetBlock(a_RelPos.addedY(-1)) == E_BLOCK_BEDROCK))
 	{
 		return false;   // Make sure mobs do not spawn on bedrock.
 	}
 
 	auto & Random = GetRandomProvider();
-	BLOCKTYPE TargetBlock = a_Chunk->GetBlock(a_RelX, a_RelY, a_RelZ);
+	auto TargetBlock = a_Chunk->GetBlock(a_RelPos);
 
-	cPlayer * a_Closest_Player = a_Chunk->GetWorld()->FindClosestPlayer(a_Chunk->PositionToWorldPosition(a_RelX, a_RelY, a_RelZ), 24);
-	if (a_Closest_Player != nullptr)  // Too close to a player, bail out
-	{
-		return false;
-	}
-
-	if ((a_RelY >= cChunkDef::Height - 1) || (a_RelY <= 0))
-	{
-		return false;
-	}
-
-	NIBBLETYPE BlockLight = a_Chunk->GetBlockLight(a_RelX, a_RelY, a_RelZ);
-	NIBBLETYPE SkyLight = a_Chunk->GetSkyLight(a_RelX, a_RelY, a_RelZ);
-	BLOCKTYPE BlockAbove = a_Chunk->GetBlock(a_RelX, a_RelY + 1, a_RelZ);
-	BLOCKTYPE BlockBelow = a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ);
+	auto BlockLight = a_Chunk->GetBlockLight(a_RelPos);
+	auto SkyLight = a_Chunk->GetSkyLight(a_RelPos);
+	auto BlockAbove = a_Chunk->GetBlock(a_RelPos.addedY(1));
+	auto BlockBelow = a_Chunk->GetBlock(a_RelPos.addedY(-1));
 
 	SkyLight = a_Chunk->GetTimeAlteredLight(SkyLight);
 
 	switch (a_MobType)
 	{
-		case mtGuardian:
-		{
-			return IsBlockWater(TargetBlock) && IsBlockWater(BlockBelow) && (a_RelY >= 45) && (a_RelY <= 62);
-		}
-
-		case mtSquid:
-		{
-			return IsBlockWater(TargetBlock) && (a_RelY >= 45) && (a_RelY <= 62);
-		}
-
 		case mtBat:
 		{
-			return (a_RelY <= 63) && (BlockLight <= 4) && (SkyLight <= 4) && (TargetBlock == E_BLOCK_AIR) && !cBlockInfo::IsTransparent(BlockAbove);
+			return
+			(
+				(a_RelPos.y <= 63) &&
+				(BlockLight <= 4) &&
+				(SkyLight <= 4) &&
+				(TargetBlock == E_BLOCK_AIR) &&
+				(!cBlockInfo::IsTransparent(BlockAbove))
+			);
+		}
+
+		case mtBlaze:
+		{
+			return
+			(
+				(TargetBlock == E_BLOCK_AIR) &&
+				(BlockAbove == E_BLOCK_AIR) &&
+				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
+				(Random.RandBool())
+			);
+		}
+
+		case mtCaveSpider:
+		{
+			return
+			(
+				(TargetBlock == E_BLOCK_AIR) &&
+				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
+				(SkyLight <= 7) &&
+				(BlockLight <= 7) &&
+				(Random.RandBool())
+			);
 		}
 
 		case mtChicken:
@@ -128,12 +142,96 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 		case mtRabbit:
 		case mtSheep:
 		{
-			return (
+			return
+			(
 				(TargetBlock == E_BLOCK_AIR) &&
 				(BlockAbove == E_BLOCK_AIR) &&
-				(!cBlockInfo::IsTransparent(BlockBelow)) &&
 				(BlockBelow == E_BLOCK_GRASS) &&
 				(SkyLight >= 9)
+			);
+		}
+
+		case mtCreeper:
+		case mtSkeleton:
+		case mtZombie:
+		{
+			return
+			(
+				(TargetBlock == E_BLOCK_AIR) &&
+				(BlockAbove == E_BLOCK_AIR) &&
+				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
+				(SkyLight <= 7) &&
+				(BlockLight <= 7) &&
+				(Random.RandBool())
+			);
+		}
+
+		case mtEnderman:
+		{
+			if (a_RelPos.y < 250)
+			{
+				auto blockTop = a_Chunk->GetBlock(a_RelPos.addedY(2));
+				if (blockTop == E_BLOCK_AIR)
+				{
+					blockTop = a_Chunk->GetBlock(a_RelPos.addedY(3));
+					return
+					(
+						(TargetBlock == E_BLOCK_AIR) &&
+						(BlockAbove == E_BLOCK_AIR) &&
+						(blockTop == E_BLOCK_AIR) &&
+						((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
+						(SkyLight <= 7) &&
+						(BlockLight <= 7)
+					);
+				}
+			}
+			break;
+		}
+
+		case mtGhast:
+		{
+			return
+			(
+				(TargetBlock == E_BLOCK_AIR) &&
+				(BlockAbove == E_BLOCK_AIR) &&
+				(Random.RandBool(0.01))
+			);
+		}
+
+		case mtGuardian:
+		{
+			return
+			(
+				IsBlockWater(TargetBlock) &&
+				IsBlockWater(BlockBelow) &&
+				(a_RelPos.y >= 45) &&
+				(a_RelPos.y <= 62)
+			);
+		}
+
+		case mtMagmaCube:
+		case mtSlime:
+		{
+			return
+			(
+				(TargetBlock == E_BLOCK_AIR) &&
+				(BlockAbove == E_BLOCK_AIR) &&
+				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
+				((a_RelPos.y <= 40) || (a_Biome == biSwampland))
+			);
+		}
+
+		case mtMooshroom:
+		{
+			return
+				(
+					(TargetBlock == E_BLOCK_AIR) &&
+					(BlockAbove == E_BLOCK_AIR) &&
+					(BlockBelow == E_BLOCK_MYCELIUM) &&
+				(
+					(a_Biome == biMushroomShore) ||
+					(a_Biome == biMushroomIsland)
+				)
 			);
 		}
 
@@ -145,30 +243,9 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				(
 					(BlockBelow == E_BLOCK_GRASS) || (BlockBelow == E_BLOCK_LEAVES) || (BlockBelow == E_BLOCK_NEW_LEAVES)
 				) &&
-				(a_RelY >= 62) &&
+				(a_RelPos.y >= 62) &&
 				(Random.RandBool(2.0 / 3.0))
 			);
-		}
-
-		case mtEnderman:
-		{
-			if (a_RelY < 250)
-			{
-				BLOCKTYPE BlockTop = a_Chunk->GetBlock(a_RelX, a_RelY + 2, a_RelZ);
-				if (BlockTop == E_BLOCK_AIR)
-				{
-					BlockTop = a_Chunk->GetBlock(a_RelX, a_RelY + 3, a_RelZ);
-					return (
-						(TargetBlock == E_BLOCK_AIR) &&
-						(BlockAbove == E_BLOCK_AIR) &&
-						(BlockTop == E_BLOCK_AIR) &&
-						(!cBlockInfo::IsTransparent(BlockBelow)) &&
-						(SkyLight <= 7) &&
-						(BlockLight <= 7)
-					);
-				}
-			}
-			break;
 		}
 
 		case mtSpider:
@@ -179,7 +256,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 			{
 				for (int z = 0; z < 2; ++z)
 				{
-					CanSpawn = a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY, a_RelZ + z, TargetBlock);
+					CanSpawn = a_Chunk->UnboundedRelGetBlockType(a_RelPos.addedXZ(x, z), TargetBlock);
 					CanSpawn = CanSpawn && (TargetBlock == E_BLOCK_AIR);
 					if (!CanSpawn)
 					{
@@ -188,7 +265,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					HasFloor = (
 						HasFloor ||
 						(
-							a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY - 1, a_RelZ + z, TargetBlock) &&
+							a_Chunk->UnboundedRelGetBlockType(a_RelPos + Vector3i(x, -1, z), TargetBlock) &&
 							!cBlockInfo::IsTransparent(TargetBlock)
 						)
 					);
@@ -197,52 +274,24 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 			return CanSpawn && HasFloor && (SkyLight <= 7) && (BlockLight <= 7);
 		}
 
-		case mtCaveSpider:
+		case mtSquid:
+		{
+			return (
+				IsBlockWater(TargetBlock) &&
+				(a_RelPos.y >= 45) &&
+				(a_RelPos.y <= 62)
+			);
+		}
+
+		case mtWitherSkeleton:
 		{
 			return (
 				(TargetBlock == E_BLOCK_AIR) &&
-				(!cBlockInfo::IsTransparent(BlockBelow)) &&
+				(BlockAbove == E_BLOCK_AIR) &&
+				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
 				(SkyLight <= 7) &&
 				(BlockLight <= 7) &&
-				(Random.RandBool())
-			);
-		}
-
-		case mtCreeper:
-		case mtSkeleton:
-		case mtZombie:
-		{
-			return (
-				(TargetBlock == E_BLOCK_AIR) &&
-				(BlockAbove == E_BLOCK_AIR) &&
-				(!cBlockInfo::IsTransparent(BlockBelow)) &&
-				(SkyLight <= 7) &&
-				(BlockLight <= 7) &&
-				(Random.RandBool())
-			);
-		}
-
-		case mtMagmaCube:
-		case mtSlime:
-		{
-			return (
-				(TargetBlock == E_BLOCK_AIR) &&
-				(BlockAbove == E_BLOCK_AIR) &&
-				(!cBlockInfo::IsTransparent(BlockBelow)) &&
-				(
-					(a_RelY <= 40) || (a_Biome == biSwampland)
-				)
-			);
-		}
-
-		case mtGhast:
-		case mtZombiePigman:
-		{
-			return (
-				(TargetBlock == E_BLOCK_AIR) &&
-				(BlockAbove == E_BLOCK_AIR) &&
-				(!cBlockInfo::IsTransparent(BlockBelow)) &&
-				(Random.RandBool(0.05))
+				(Random.RandBool(0.6))
 			);
 		}
 
@@ -265,16 +314,12 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 			);
 		}
 
-		case mtMooshroom:
+		case mtZombiePigman:
 		{
 			return (
 				(TargetBlock == E_BLOCK_AIR) &&
 				(BlockAbove == E_BLOCK_AIR) &&
-				(BlockBelow == E_BLOCK_MYCELIUM) &&
-				(
-					(a_Biome == biMushroomShore) ||
-					(a_Biome == biMushroomIsland)
-				)
+				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck))
 			);
 		}
 
@@ -297,23 +342,6 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 	// Check biomes first to get a list of animals
 	switch (a_Biome)
 	{
-		// Nether mobs and endermen only - no other mobs in the nether
-		case biNether:
-		{
-			ListOfSpawnables.insert(mtGhast);
-			ListOfSpawnables.insert(mtMagmaCube);
-			ListOfSpawnables.insert(mtZombiePigman);
-			ListOfSpawnables.insert(mtEnderman);
-			return ListOfSpawnables;
-		}
-
-		// Endermen only - no other mobs in the end
-		case biEnd:
-		{
-			ListOfSpawnables.insert(mtEnderman);
-			return ListOfSpawnables;
-		}
-
 		// Mooshroom only - no other mobs on mushroom islands
 		case biMushroomIsland:
 		case biMushroomShore:
@@ -395,6 +423,7 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 		}
 	}
 
+	// Overworld
 	if (
 		(a_Biome != biDesertHills) &&
 		(a_Biome != biDesert) &&
@@ -418,6 +447,13 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 	ListOfSpawnables.insert(mtCreeper);
 	ListOfSpawnables.insert(mtSquid);
 
+	// Nether
+	ListOfSpawnables.insert(mtBlaze);
+	ListOfSpawnables.insert(mtGhast);
+	ListOfSpawnables.insert(mtMagmaCube);
+	ListOfSpawnables.insert(mtWitherSkeleton);
+	ListOfSpawnables.insert(mtZombiePigman);
+
 	return ListOfSpawnables;
 }
 
@@ -425,8 +461,25 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 
 
 
-cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, EMCSBiome a_Biome, int & a_MaxPackSize)
+cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, EMCSBiome a_Biome, int & a_MaxPackSize)
 {
+	// If too close to any player, don't spawn anything
+	auto AbsPos = a_Chunk->RelativeToAbsolute(a_RelPos);
+	static const double RangeLimit = 24;
+	if (
+		a_Chunk->GetWorld()->DoWithNearestPlayer(
+			AbsPos,
+			RangeLimit,
+			[](cPlayer & a_Player)
+			{
+				return true;
+			}
+		)
+	)
+	{
+		return nullptr;
+	}
+
 	if (m_NewPack)
 	{
 		m_MobType = ChooseMobType(a_Biome);
@@ -434,7 +487,11 @@ cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY,
 		{
 			return nullptr;
 		}
-		if (m_MobType == mtWolf)
+		if (m_MobType == mtWitherSkeleton)
+		{
+			a_MaxPackSize = 5;
+		}
+		else if (m_MobType == mtWolf)
 		{
 			a_MaxPackSize = 8;
 		}
@@ -446,15 +503,15 @@ cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY,
 	}
 
 	// Make sure we are looking at the right chunk to spawn in
-	a_Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
+	a_Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(a_RelPos);
 
-	if ((m_AllowedTypes.find(m_MobType) != m_AllowedTypes.end()) && CanSpawnHere(a_Chunk, a_RelX, a_RelY, a_RelZ, m_MobType, a_Biome))
+	if ((m_AllowedTypes.find(m_MobType) != m_AllowedTypes.end()) && CanSpawnHere(a_Chunk, a_RelPos, m_MobType, a_Biome))
 	{
-		auto newMob = cMonster::NewMonsterFromType(m_MobType);
-		auto NewMobPtr = newMob.get();
-		if (newMob)
+		auto NewMob = cMonster::NewMonsterFromType(m_MobType);
+		auto NewMobPtr = NewMob.get();
+		if (NewMob)
 		{
-			m_Spawned.push_back(std::move(newMob));
+			m_Spawned.push_back(std::move(NewMob));
 		}
 		return NewMobPtr;
 	}

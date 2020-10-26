@@ -11,6 +11,35 @@
 
 
 
+static void WriteLogOpener(fmt::memory_buffer & Buffer)
+{
+	const time_t rawtime = time(nullptr);
+
+	struct tm timeinfo;
+#ifdef _MSC_VER
+	localtime_s(&timeinfo, &rawtime);
+#else
+	localtime_r(&rawtime, &timeinfo);
+#endif
+
+#ifdef _DEBUG
+	const auto ThreadID = std::hash<std::thread::id>()(std::this_thread::get_id());
+	fmt::format_to(
+		Buffer, "[{0:04x}|{1:02d}:{2:02d}:{3:02d}] ",
+		ThreadID, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec
+	);
+#else
+	fmt::format_to(
+		Buffer, "[{0:02d}:{1:02d}:{2:02d}] ",
+		timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec
+	);
+#endif
+}
+
+
+
+
+
 cLogger & cLogger::GetInstance(void)
 {
 	static cLogger Instance;
@@ -30,32 +59,24 @@ void cLogger::InitiateMultithreading()
 
 
 
-void cLogger::LogSimple(AString a_Message, eLogLevel a_LogLevel)
+void cLogger::LogSimple(std::string_view a_Message, eLogLevel a_LogLevel)
 {
-	time_t rawtime;
-	time(&rawtime);
-
-	struct tm * timeinfo;
-	#ifdef _MSC_VER
-		struct tm timeinforeal;
-		timeinfo = &timeinforeal;
-		localtime_s(timeinfo, &rawtime);
-	#else
-		timeinfo = localtime(&rawtime);
-	#endif
-
-	AString Line;
-	#ifdef _DEBUG
-		Printf(Line, "[%04llx|%02d:%02d:%02d] %s\n", static_cast<UInt64>(std::hash<std::thread::id>()(std::this_thread::get_id())), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, a_Message.c_str());
-	#else
-		Printf(Line, "[%02d:%02d:%02d] %s\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, a_Message.c_str());
-	#endif
+	fmt::memory_buffer Buffer;
+	WriteLogOpener(Buffer);
+	fmt::format_to(Buffer, "{0}\n", a_Message);
+	LogLine(std::string_view(Buffer.data(), Buffer.size()), a_LogLevel);
+}
 
 
+
+
+
+void cLogger::LogLine(std::string_view a_Line, eLogLevel a_LogLevel)
+{
 	cCSLock Lock(m_CriticalSection);
 	for (size_t i = 0; i < m_LogListeners.size(); i++)
 	{
-		m_LogListeners[i]->Log(Line, a_LogLevel);
+		m_LogListeners[i]->Log(a_Line, a_LogLevel);
 	}
 }
 
@@ -63,18 +84,28 @@ void cLogger::LogSimple(AString a_Message, eLogLevel a_LogLevel)
 
 
 
-void cLogger::LogPrintf(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList)
+void cLogger::LogPrintf(std::string_view a_Format, eLogLevel a_LogLevel, fmt::printf_args a_ArgList)
 {
-	LogSimple(Printf(a_Format, a_ArgList), a_LogLevel);
+	fmt::memory_buffer Buffer;
+	WriteLogOpener(Buffer);
+	fmt::vprintf(Buffer, fmt::to_string_view(a_Format), a_ArgList);
+	fmt::format_to(Buffer, "\n");
+
+	LogLine(std::string_view(Buffer.data(), Buffer.size()), a_LogLevel);
 }
 
 
 
 
 
-void cLogger::LogFormat(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList)
+void cLogger::LogFormat(std::string_view a_Format, eLogLevel a_LogLevel, fmt::format_args a_ArgList)
 {
-	LogSimple(fmt::format(a_Format, a_ArgList), a_LogLevel);
+	fmt::memory_buffer Buffer;
+	WriteLogOpener(Buffer);
+	fmt::vformat_to(Buffer, a_Format, a_ArgList);
+	fmt::format_to(Buffer, "\n");
+
+	LogLine(std::string_view(Buffer.data(), Buffer.size()), a_LogLevel);
 }
 
 
@@ -117,74 +148,25 @@ void cLogger::DetachListener(cListener * a_Listener)
 ////////////////////////////////////////////////////////////////////////////////
 // Global functions
 
-void FLOG(const char * a_Format, fmt::ArgList a_ArgList)
+void Logger::LogFormat(std::string_view a_Format, eLogLevel a_LogLevel, fmt::format_args a_ArgList)
 {
-	cLogger::GetInstance().LogFormat(a_Format, cLogger::llRegular, a_ArgList);
+	cLogger::GetInstance().LogFormat(a_Format, a_LogLevel, a_ArgList);
 }
 
 
 
 
 
-void FLOGINFO(const char * a_Format, fmt::ArgList a_ArgList)
+void Logger::LogPrintf(std::string_view a_Format, eLogLevel a_LogLevel, fmt::printf_args a_ArgList)
 {
-	cLogger::GetInstance().LogFormat( a_Format, cLogger::llInfo, a_ArgList);
+	cLogger::GetInstance().LogPrintf(a_Format, a_LogLevel, a_ArgList);
 }
 
 
 
 
 
-void FLOGWARNING(const char * a_Format, fmt::ArgList a_ArgList)
+void Logger::LogSimple(std::string_view a_Message, eLogLevel a_LogLevel)
 {
-	cLogger::GetInstance().LogFormat( a_Format, cLogger::llWarning, a_ArgList);
+	cLogger::GetInstance().LogSimple(a_Message, a_LogLevel);
 }
-
-
-
-
-
-void FLOGERROR(const char * a_Format, fmt::ArgList a_ArgList)
-{
-	cLogger::GetInstance().LogFormat( a_Format, cLogger::llError, a_ArgList);
-}
-
-
-
-
-
-void LOG(const char * a_Format, fmt::ArgList a_ArgList)
-{
-	cLogger::GetInstance().LogPrintf(a_Format, cLogger::llRegular, a_ArgList);
-}
-
-
-
-
-
-void LOGINFO(const char * a_Format, fmt::ArgList a_ArgList)
-{
-	cLogger::GetInstance().LogPrintf( a_Format, cLogger::llInfo, a_ArgList);
-}
-
-
-
-
-
-void LOGWARNING(const char * a_Format, fmt::ArgList a_ArgList)
-{
-	cLogger::GetInstance().LogPrintf( a_Format, cLogger::llWarning, a_ArgList);
-}
-
-
-
-
-
-void LOGERROR(const char * a_Format, fmt::ArgList a_ArgList)
-{
-	cLogger::GetInstance().LogPrintf( a_Format, cLogger::llError, a_ArgList);
-}
-
-
-
-

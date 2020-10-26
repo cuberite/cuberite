@@ -44,6 +44,7 @@ local g_IgnoredFiles =
 	"Bindings/Bindings.h",
 	"Bindings/Bindings.cpp",
 	"Bindings/LuaState_Implementation.cpp",
+	"Registries/Blocks.h"
 }
 
 --- The list of files not to be processed, as a dictionary (filename => true), built from g_IgnoredFiles
@@ -202,6 +203,9 @@ local g_ViolationPatterns =
 	-- Check if "else" is on the same line as a brace.
 	{"}%s*else", "else has to be on a separate line"},
 	{"else%s*{", "else has to be on a separate line"},
+
+	-- Don't allow characters other than ASCII 0 - 127:
+	{"[" .. string.char(128) .. "-" .. string.char(255) .. "]", "Character in the extended ASCII range (128 - 255) not allowed"},
 }
 
 

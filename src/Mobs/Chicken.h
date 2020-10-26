@@ -6,13 +6,14 @@
 
 
 
-class cChicken :
+class cChicken:
 	public cPassiveMonster
 {
-	typedef cPassiveMonster super;
+	using Super = cPassiveMonster;
 
 public:
-	cChicken(void);
+
+	cChicken();
 
 	CLASS_PROTODEF(cChicken)
 

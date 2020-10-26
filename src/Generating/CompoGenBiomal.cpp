@@ -27,30 +27,28 @@ class cPattern
 public:
 	struct BlockInfo
 	{
-		BLOCKTYPE  m_BlockType;
-		NIBBLETYPE m_BlockMeta;
+		BLOCKTYPE  m_BlockType = E_BLOCK_STONE;
+		NIBBLETYPE m_BlockMeta = 0;
 	};
 
-	cPattern(BlockInfo * a_TopBlocks, size_t a_Count)
+	constexpr cPattern(std::initializer_list<BlockInfo> a_TopBlocks)
 	{
+		ASSERT(a_TopBlocks.size() <= cChunkDef::Height);
 		// Copy the pattern into the top:
-		for (size_t i = 0; i < a_Count; i++)
+		size_t i = 0;
+		for (const auto & Block : a_TopBlocks)
 		{
-			m_Pattern[i] = a_TopBlocks[i];
+			m_Pattern[i] = Block;
+			++i;
 		}
 
-		// Fill the rest with stone:
-		static BlockInfo Stone = {E_BLOCK_STONE, 0};
-		for (int i = static_cast<int>(a_Count); i < cChunkDef::Height; i++)
-		{
-			m_Pattern[i] = Stone;
-		}
+		// The remaining blocks default to stone
 	}
 
 	const BlockInfo * Get(void) const { return m_Pattern; }
 
 protected:
-	BlockInfo m_Pattern[cChunkDef::Height];
+	BlockInfo m_Pattern[cChunkDef::Height] = {};
 } ;
 
 
@@ -58,9 +56,9 @@ protected:
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// The arrays to use for the top block pattern definitions:
+// Land top block patterns:
 
-static cPattern::BlockInfo tbGrass[] =
+static constexpr cPattern patGrass =
 {
 	{E_BLOCK_GRASS, 0},
 	{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
@@ -68,7 +66,7 @@ static cPattern::BlockInfo tbGrass[] =
 	{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
 } ;
 
-static cPattern::BlockInfo tbSand[] =
+static constexpr cPattern patSand =
 {
 	{ E_BLOCK_SAND, 0},
 	{ E_BLOCK_SAND, 0},
@@ -76,7 +74,7 @@ static cPattern::BlockInfo tbSand[] =
 	{ E_BLOCK_SANDSTONE, 0},
 } ;
 
-static cPattern::BlockInfo tbDirt[] =
+static constexpr cPattern patDirt =
 {
 	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
 	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
@@ -84,7 +82,7 @@ static cPattern::BlockInfo tbDirt[] =
 	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
 } ;
 
-static cPattern::BlockInfo tbPodzol[] =
+static constexpr cPattern patPodzol =
 {
 	{E_BLOCK_DIRT, E_META_DIRT_PODZOL},
 	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
@@ -92,7 +90,7 @@ static cPattern::BlockInfo tbPodzol[] =
 	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
 } ;
 
-static cPattern::BlockInfo tbGrassLess[] =
+static constexpr cPattern patGrassLess =
 {
 	{E_BLOCK_DIRT, E_META_DIRT_GRASSLESS},
 	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
@@ -100,7 +98,7 @@ static cPattern::BlockInfo tbGrassLess[] =
 	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
 } ;
 
-static cPattern::BlockInfo tbMycelium[] =
+static constexpr cPattern patMycelium =
 {
 	{E_BLOCK_MYCELIUM, 0},
 	{E_BLOCK_DIRT,     0},
@@ -108,7 +106,7 @@ static cPattern::BlockInfo tbMycelium[] =
 	{E_BLOCK_DIRT,     0},
 } ;
 
-static cPattern::BlockInfo tbGravel[] =
+static constexpr cPattern patGravel =
 {
 	{E_BLOCK_GRAVEL, 0},
 	{E_BLOCK_GRAVEL, 0},
@@ -116,7 +114,7 @@ static cPattern::BlockInfo tbGravel[] =
 	{E_BLOCK_STONE,  0},
 } ;
 
-static cPattern::BlockInfo tbStone[] =
+static constexpr cPattern patStone =
 {
 	{E_BLOCK_STONE,   0},
 	{E_BLOCK_STONE,   0},
@@ -127,9 +125,9 @@ static cPattern::BlockInfo tbStone[] =
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Ocean floor pattern top-block definitions:
+// Ocean floor patterns:
 
-static cPattern::BlockInfo tbOFSand[] =
+static constexpr cPattern patOFSand =
 {
 	{E_BLOCK_SAND, 0},
 	{E_BLOCK_SAND, 0},
@@ -137,7 +135,7 @@ static cPattern::BlockInfo tbOFSand[] =
 	{E_BLOCK_SANDSTONE, 0}
 } ;
 
-static cPattern::BlockInfo tbOFClay[] =
+static constexpr cPattern patOFClay =
 {
 	{ E_BLOCK_CLAY, 0},
 	{ E_BLOCK_CLAY, 0},
@@ -145,32 +143,12 @@ static cPattern::BlockInfo tbOFClay[] =
 	{ E_BLOCK_SAND, 0},
 } ;
 
-static cPattern::BlockInfo tbOFOrangeClay[] =
+static constexpr cPattern patOFOrangeClay =
 {
 	{ E_BLOCK_STAINED_CLAY, E_META_STAINED_GLASS_ORANGE},
 	{ E_BLOCK_STAINED_CLAY, E_META_STAINED_GLASS_ORANGE},
 	{ E_BLOCK_STAINED_CLAY, E_META_STAINED_GLASS_ORANGE},
 } ;
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Individual patterns to use:
-
-static cPattern patGrass    (tbGrass,     ARRAYCOUNT(tbGrass));
-static cPattern patSand     (tbSand,      ARRAYCOUNT(tbSand));
-static cPattern patDirt     (tbDirt,      ARRAYCOUNT(tbDirt));
-static cPattern patPodzol   (tbPodzol,    ARRAYCOUNT(tbPodzol));
-static cPattern patGrassLess(tbGrassLess, ARRAYCOUNT(tbGrassLess));
-static cPattern patMycelium (tbMycelium,  ARRAYCOUNT(tbMycelium));
-static cPattern patGravel   (tbGravel,    ARRAYCOUNT(tbGravel));
-static cPattern patStone    (tbStone,     ARRAYCOUNT(tbStone));
-
-static cPattern patOFSand      (tbOFSand,       ARRAYCOUNT(tbOFSand));
-static cPattern patOFClay      (tbOFClay,       ARRAYCOUNT(tbOFClay));
-static cPattern patOFOrangeClay(tbOFOrangeClay, ARRAYCOUNT(tbOFOrangeClay));
 
 
 
@@ -413,13 +391,15 @@ protected:
 				return;
 			}
 			case biInvalidBiome:
-			case biHell:
-			case biSky:
+			case biNether:
+			case biEnd:
 			case biNumBiomes:
 			case biVariant:
 			case biNumVariantBiomes:
 			{
-				ASSERT(!"Unhandled biome");
+				// This generator is not supposed to be used for these biomes, but it has to produce *something*
+				// so let's produce stone:
+				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patStone.Get(), a_ShapeColumn);
 				return;
 			}
 		}  // switch (Biome)

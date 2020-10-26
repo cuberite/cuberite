@@ -1,7 +1,9 @@
 
 #pragma once
 
+#include "../BoundingBox.h"
 #include "../Item.h"
+#include "../OSSupport/AtomicUniquePtr.h"
 
 
 
@@ -11,7 +13,7 @@
 #define CLASS_PROTODEF(classname) \
 	virtual bool IsA(const char * a_ClassName) const override\
 	{ \
-		return ((a_ClassName != nullptr) && ((strcmp(a_ClassName, #classname) == 0) || super::IsA(a_ClassName))); \
+		return ((a_ClassName != nullptr) && ((strcmp(a_ClassName, #classname) == 0) || Super::IsA(a_ClassName))); \
 	} \
 	virtual const char * GetClass(void) const override \
 	{ \
@@ -23,7 +25,7 @@
 	} \
 	virtual const char * GetParentClass(void) const override \
 	{ \
-		return super::GetClass(); \
+		return Super::GetClass(); \
 	}
 
 #define POSX_TOINT FloorC(GetPosX())
@@ -33,10 +35,12 @@
 
 #define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) \
 	cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); \
-	if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) \
-	{ \
-		return; \
-	}
+	do { \
+		if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) \
+		{ \
+			return; \
+		} \
+	} while (false)
 
 
 
@@ -57,7 +61,7 @@ struct TakeDamageInfo
 	eDamageType DamageType;   // Where does the damage come from? Being hit / on fire / contact with cactus / ...
 	cEntity *   Attacker;     // The attacking entity; valid only for dtAttack
 	int         RawDamage;    // What damage would the receiver get without any armor. Usually: attacker mob type + weapons
-	int         FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
+	float       FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
 	Vector3d    Knockback;    // The amount and direction of knockback received from the damage
 	// TODO: Effects - list of effects that the hit is causing. Unknown representation yet
 } ;
@@ -70,6 +74,16 @@ struct TakeDamageInfo
 // tolua_begin
 class cEntity
 {
+protected:
+	/** State variables for MoveToWorld. */
+	struct sWorldChangeInfo
+	{
+		cWorld * m_NewWorld;
+		Vector3d m_NewPosition;
+		bool m_SetPortalCooldown;
+		bool m_SendRespawn;
+	};
+
 public:
 
 	enum eEntityType
@@ -154,17 +168,28 @@ public:
 	static const UInt32 INVALID_ID = 0;  // Exported to Lua in ManualBindings.cpp, ToLua doesn't parse initialized constants.
 
 
-	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
+	cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, double a_Height);
 	virtual ~cEntity();
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
 	Adds the entity to the world. */
 	virtual bool Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld);
 
+	/** Called when the entity is added to a world.
+	e.g after first spawning or after successfuly moving between worlds.
+	\param a_World The world being added to. */
+	virtual void OnAddToWorld(cWorld & a_World);
+
+	/** Called when the entity is removed from a world.
+	e.g. When the entity is destroyed or moved to a different world.
+	\param a_World The world being removed from. */
+	virtual void OnRemoveFromWorld(cWorld & a_World);
+
 	// tolua_begin
 
 	eEntityType GetEntityType(void) const { return m_EntityType; }
 
+	bool IsArrow       (void) const { return IsA("cArrowEntity");              }
 	bool IsEnderCrystal(void) const { return (m_EntityType == etEnderCrystal); }
 	bool IsPlayer      (void) const { return (m_EntityType == etPlayer);       }
 	bool IsPickup      (void) const { return (m_EntityType == etPickup);       }
@@ -216,6 +241,9 @@ public:
 	int GetChunkX(void) const { return FloorC(m_Position.x / cChunkDef::Width); }
 	int GetChunkZ(void) const { return FloorC(m_Position.z / cChunkDef::Width); }
 
+	// Get the Entity's axis aligned bounding box, with absolute (world-relative) coordinates.
+	cBoundingBox GetBoundingBox() const { return cBoundingBox(GetPosition(), GetWidth() / 2, GetHeight()); }
+
 	void SetHeadYaw (double a_HeadYaw);
 	void SetMass    (double a_Mass);
 	void SetPosX    (double a_PosX) { SetPosition({a_PosX, m_Position.y, m_Position.z}); }
@@ -266,8 +294,10 @@ public:
 	If this returns false, you must stop using the cEntity pointer you have. */
 	bool IsTicking(void) const;
 
-	/** Destroys the entity and schedules it for memory freeing; if a_ShouldBroadcast is set to true, broadcasts the DestroyEntity packet */
-	virtual void Destroy(bool a_ShouldBroadcast = true);
+	// tolua_end
+	/** Destroys the entity, schedules it for memory freeing and broadcasts the DestroyEntity packet */
+	virtual void Destroy();
+	// tolua_begin
 
 	/** Makes this pawn take damage from an attack by a_Attacker. Damage values are calculated automatically and DoTakeDamage() called */
 	void TakeDamage(cEntity & a_Attacker);
@@ -279,7 +309,7 @@ public:
 	void TakeDamage(eDamageType a_DamageType, UInt32 a_Attacker, int a_RawDamage, double a_KnockbackAmount);
 
 	/** Makes this entity take the specified damage. The values are packed into a TDI, knockback calculated, then sent through DoTakeDamage() */
-	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, int a_FinalDamage, double a_KnockbackAmount);
+	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, float a_FinalDamage, double a_KnockbackAmount);
 
 	float GetGravity(void) const { return m_Gravity; }
 
@@ -309,10 +339,7 @@ public:
 
 	/** Returns the last position we sent to all the clients. Use this to
 	initialize clients with our position. */
-	Vector3d GetLastSentPos(void) const { return m_LastSentPosition; }
-
-	/** Destroy the entity without scheduling memory freeing. This should only be used by cChunk or cClientHandle for internal memory management. */
-	void DestroyNoScheduling(bool a_ShouldBroadcast);
+	Vector3d GetLastSentPosition(void) const { return m_LastSentPosition; }
 
 	/** Makes this entity take damage specified in the a_TDI.
 	The TDI is sent through plugins first, then applied.
@@ -328,10 +355,10 @@ public:
 	virtual bool ArmorCoversAgainst(eDamageType a_DamageType);
 
 	/** Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover */
-	virtual int GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_RawDamage);
+	virtual float GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_RawDamage);
 
 	/** Returns the hitpoints that the currently equipped armor's enchantments would cover */
-	virtual int GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage);
+	virtual float GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage);
 
 	/** Returns explosion knock back reduction percent from blast protection level
 	@return knock back reduce percent */
@@ -440,19 +467,32 @@ public:
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
 	/** Schedules a MoveToWorld call to occur on the next Tick of the entity */
-	void ScheduleMoveToWorld(cWorld * a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = false);
+	[[deprecated]] void ScheduleMoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = true)
+	{
+		LOGWARNING("ScheduleMoveToWorld is deprecated, use MoveToWorld instead");
+		MoveToWorld(a_World, a_NewPosition, a_ShouldSetPortalCooldown, a_ShouldSendRespawn);
+	}
 
-	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
+	bool MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = true);
+
+	bool MoveToWorld(cWorld & a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+	{
+		return MoveToWorld(a_World, a_NewPosition, false, a_ShouldSendRespawn);
+	}
 
 	/** Moves entity to specified world, taking a world pointer */
-	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true);
+	bool MoveToWorld(cWorld & a_World, bool a_ShouldSendRespawn = true);
 
 	/** Moves entity to specified world, taking a world name */
 	bool MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn = true);
 
 	// tolua_end
 
-	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition);
+	/** Returns true if a world change is scheduled to happen. */
+	bool IsWorldChangeScheduled() const
+	{
+		return (m_WorldChangeInfo.m_NewWorld != nullptr);
+	}
 
 	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);
@@ -468,6 +508,10 @@ public:
 
 	/** Returns true if this entity is attached to the specified entity */
 	bool IsAttachedTo(const cEntity * a_Entity) const;
+
+	/** Returns whether the entity's orientation has been set manually.
+	Primarily inteded for protocol use. */
+	bool IsOrientationDirty() const;
 
 	/** Makes sure head yaw is not over the specified range. */
 	void WrapHeadYaw();
@@ -541,13 +585,16 @@ public:
 	/** Set the entity's status to either ticking or not ticking. */
 	void SetIsTicking(bool a_IsTicking);
 
-	/** Adds a mob to the leashed list of mobs */
+	/** Adds a mob to the leashed list of mobs. */
 	void AddLeashedMob(cMonster * a_Monster);
 
-	/** Removes a mob from the leashed list of mobs */
+	/** Removes a mob from the leashed list of mobs. */
 	void RemoveLeashedMob(cMonster * a_Monster);
 
-	/** Returs whether the entity has any mob leashed to */
+	/** Removes all mobs from the leashed list of mobs. */
+	void RemoveAllLeashedMobs();
+
+	/** Returs whether the entity has any mob leashed to it. */
 	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }
 
 	/** a lightweight calculation approach to get explosion exposure rate
@@ -556,7 +603,9 @@ public:
 	@return exposure rate */
 	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower);
 
+
 protected:
+
 	/** Structure storing the portal delay timer and cooldown boolean */
 	struct sPortalCooldownData
 	{
@@ -567,6 +616,7 @@ protected:
 		This prevents teleportation loops, and is reset when the entity has moved out of the portal. */
 		bool m_ShouldPreventTeleportation;
 	};
+
 
 	/** Measured in meters / second (m / s) */
 	Vector3d m_Speed;
@@ -608,18 +658,18 @@ protected:
 	Data: https://minecraft.gamepedia.com/Entity#Motion_of_entities */
 	float m_AirDrag;
 
+	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)
+	Only updated if cEntity::BroadcastMovementUpdate() is called! */
+	Vector3d m_LastSentPosition;
+
 	Vector3d m_LastPosition;
 
 	eEntityType m_EntityType;
 
 	cWorld * m_World;
 
-	/** State variables for ScheduleMoveToWorld. */
-	bool m_IsWorldChangeScheduled;
-	bool m_WorldChangeSetPortalCooldown;
-	bool m_WorldChangeSendRespawn;
-	cWorld * m_NewWorld;
-	Vector3d m_NewWorldPosition;
+	/** If field m_NewWorld not nullptr, a world change is scheduled and a task is queued in the current world. */
+	sWorldChangeInfo m_WorldChangeInfo;
 
 	/** Whether the entity is capable of taking fire or lava damage. */
 	bool m_IsFireproof;
@@ -666,6 +716,10 @@ protected:
 	overrides can provide further processing, such as forcing players to move at the given speed. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 
+	/** Handles the moving of this entity between worlds.
+	Should handle degenerate cases such as moving to the same world. */
+	virtual void DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo);
+
 	virtual void Destroyed(void) {}  // Called after the entity has been destroyed
 
 	/** Applies friction to an entity
@@ -684,6 +738,9 @@ protected:
 	Only to be used when the caller will broadcast a teleport or equivalent to clients. */
 	virtual void ResetPosition(Vector3d a_NewPos);
 
+	/** If has any mobs are leashed, broadcasts every leashed entity to this. */
+	void BroadcastLeashedMobs();
+
 private:
 
 	/** Whether the entity is ticking or not. If not, it is scheduled for removal or world-teleportation. */
@@ -700,10 +757,6 @@ private:
 
 	/** Position of the entity's XZ center and Y bottom */
 	Vector3d m_Position;
-
-	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)
-	Only updated if cEntity::BroadcastMovementUpdate() is called! */
-	Vector3d m_LastSentPosition;
 
 	/** Measured in meter / second */
 	Vector3d m_WaterSpeed;

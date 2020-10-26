@@ -7,9 +7,9 @@
 #include "../Entities/Player.h"
 #include "../UI/SlotArea.h"
 #include "PluginLua.h"
-#include "Root.h"
 #include "lua/src/lauxlib.h"  // Needed for LUA_REFNIL
-#include "ClientHandle.h"
+#include "../Root.h"
+#include "../ClientHandle.h"
 
 
 
@@ -218,7 +218,8 @@ void cLuaWindow::Clicked(cPlayer & a_Player, int a_WindowID, short a_SlotNum, eC
 	if (m_OnClicked != nullptr)
 	{
 		// Plugin can stop a click
-		if (m_OnClicked->Call(this, &a_Player, a_SlotNum, a_ClickAction, a_ClickedItem))
+		bool res;
+		if (m_OnClicked->Call(this, &a_Player, a_SlotNum, a_ClickAction, a_ClickedItem, cLuaState::Return, res) && res)
 		{
 			// Tell the client the actual state of the window
 			a_Player.GetClientHandle()->SendInventorySlot(-1, -1, a_Player.GetDraggingItem());

@@ -8,12 +8,13 @@
 
 
 
-class cCow :
+class cCow:
 	public cPassiveMonster
 {
-	typedef cPassiveMonster super;
+	using Super = cPassiveMonster;
 
 public:
+
 	cCow();
 
 	CLASS_PROTODEF(cCow)

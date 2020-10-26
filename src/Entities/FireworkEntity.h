@@ -20,15 +20,15 @@
 class cFireworkEntity :
 	public cProjectileEntity
 {
-	typedef cProjectileEntity super;
-
-public:
-
 	// tolua_end
+
+	using Super = cProjectileEntity;
+
+public:  // tolua_export
 
 	CLASS_PROTODEF(cFireworkEntity)
 
-	cFireworkEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem & a_Item);
+	cFireworkEntity(cEntity * a_Creator, Vector3d a_Pos, const cItem & a_Item);
 
 	// tolua_begin
 

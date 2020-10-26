@@ -16,6 +16,7 @@ Implements the 1.10 protocol classes:
 #include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
+#include "../JsonUtils.h"
 
 #include "../WorldStorage/FastNBT.h"
 
@@ -39,7 +40,20 @@ Implements the 1.10 protocol classes:
 #include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 
-#include "Bindings/PluginManager.h"
+#include "../Bindings/PluginManager.h"
+
+
+
+
+
+#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
+	Type Var; \
+	do { \
+		if (!ByteBuf.Proc(Var))\
+		{\
+			return;\
+		} \
+	} while (false)
 
 
 
@@ -291,20 +305,15 @@ namespace Metadata
 
 
 
-cProtocol_1_10_0::cProtocol_1_10_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
-{
-}
 
-
-
-
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_10_0:
 
 void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, GetPacketId(sendSoundEffect));  // Named sound effect packet
+	cPacketizer Pkt(*this, pktSoundEffect);
 	Pkt.WriteString(a_SoundName);
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
 	Pkt.WriteBEInt32(FloorC(a_X * 8.0));
@@ -318,46 +327,18 @@ void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, double a_X, 
 
 
 
-void cProtocol_1_10_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
+cProtocol::Version cProtocol_1_10_0::GetProtocolVersion()
 {
-	cServer * Server = cRoot::Get()->GetServer();
-	AString ServerDescription = Server->GetDescription();
-	auto NumPlayers = static_cast<signed>(Server->GetNumPlayers());
-	auto MaxPlayers = static_cast<signed>(Server->GetMaxPlayers());
-	AString Favicon = Server->GetFaviconData();
-	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
+	return Version::v1_10_0;
+}
 
-	// Version:
-	Json::Value Version;
-	Version["name"] = "Cuberite 1.10";
-	Version["protocol"] = 210;
 
-	// Players:
-	Json::Value Players;
-	Players["online"] = NumPlayers;
-	Players["max"] = MaxPlayers;
-	// TODO: Add "sample"
 
-	// Description:
-	Json::Value Description;
-	Description["text"] = ServerDescription.c_str();
 
-	// Create the response:
-	Json::Value ResponseValue;
-	ResponseValue["version"] = Version;
-	ResponseValue["players"] = Players;
-	ResponseValue["description"] = Description;
-	m_Client->ForgeAugmentServerListPing(ResponseValue);
-	if (!Favicon.empty())
-	{
-		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
-	}
 
-	Json::FastWriter Writer;
-	AString Response = Writer.write(ResponseValue);
-
-	cPacketizer Pkt(*this, 0x00);  // Response packet
-	Pkt.WriteString(Response);
+void cProtocol_1_10_0::HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
 }
 
 
@@ -596,7 +577,7 @@ void cProtocol_1_10_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity 
 			Writer.AddInt("x", CommandBlockEntity.GetPosX());
 			Writer.AddInt("y", CommandBlockEntity.GetPosY());
 			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
-			Writer.AddString("Command", CommandBlockEntity.GetCommand().c_str());
+			Writer.AddString("Command", CommandBlockEntity.GetCommand());
 			// You can set custom names for windows in Vanilla
 			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
 			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
@@ -889,15 +870,6 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtSheep
 
-		case mtSkeleton:
-		{
-			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
-			a_Pkt.WriteBEUInt8(SKELETON_TYPE);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Skeleton.IsWither() ? 1 : 0);
-			break;
-		}  // case mtSkeleton
-
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -939,6 +911,14 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			// TODO: Use boss bar packet for health
 			break;
 		}  // case mtWither
+
+		case mtWitherSkeleton:
+		{
+			a_Pkt.WriteBEUInt8(SKELETON_TYPE);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(1);  // Is wither skeleton
+			break;
+		}  // case mtWitherSkeleton
 
 		case mtWolf:
 		{
@@ -987,11 +967,11 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 
 			a_Pkt.WriteBEUInt8(ZOMBIE_TYPE);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Zombie.IsVillagerZombie() ? 1 : 0);  // TODO: This actually encodes the zombie villager profession, but that isn't implemented yet.
+			a_Pkt.WriteVarInt32(0);
 
 			a_Pkt.WriteBEUInt8(ZOMBIE_CONVERTING);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Zombie.IsConverting());
+			a_Pkt.WriteBool(false);
 			break;
 		}  // case mtZombie
 
@@ -1003,6 +983,23 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			a_Pkt.WriteBool(ZombiePigman.IsBaby());
 			break;
 		}  // case mtZombiePigman
+
+		case mtZombieVillager:
+		{
+			auto & ZombieVillager = reinterpret_cast<const cZombieVillager &>(a_Mob);
+			a_Pkt.WriteBEUInt8(ZOMBIE_IS_BABY);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(ZombieVillager.IsBaby());
+
+			a_Pkt.WriteBEUInt8(ZOMBIE_TYPE);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(ZombieVillager.GetProfession());
+
+			a_Pkt.WriteBEUInt8(ZOMBIE_CONVERTING);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(ZombieVillager.ConversionTime() != -1);
+			break;
+		}  // case mtZombieVillager
 
 		default: break;
 	}  // switch (a_Mob.GetType())

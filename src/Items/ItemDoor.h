@@ -9,38 +9,45 @@
 
 
 
-class cItemDoorHandler :
+class cItemDoorHandler:
 	public cItemHandler
 {
+	using Super = cItemHandler;
+
 public:
-	cItemDoorHandler(int a_ItemType) :
-		cItemHandler(a_ItemType)
+
+	cItemDoorHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 
 	}
 
 
+
+
 	virtual bool GetBlocksToPlace(
 		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		sSetBlockVector & a_BlocksToSet
 	) override
 	{
 		// Vanilla only allows door placement while clicking on the top face of the block below the door:
-		if (a_BlockFace != BLOCK_FACE_TOP)
+		if (a_ClickedBlockFace != BLOCK_FACE_TOP)
 		{
 			return false;
 		}
 
 		// Door (bottom block) can be placed in Y range of [1, 254]:
-		if ((a_BlockY < 1) || (a_BlockY >= cChunkDef::Height - 2))
+		if ((a_PlacedBlockPos.y < 1) || (a_PlacedBlockPos.y >= cChunkDef::Height - 2))
 		{
 			return false;
 		}
 
 		// The door needs a compatible block below it:
-		if (!cBlockDoorHandler::CanBeOn(a_World.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ), a_World.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ)))
+		auto BelowPos = a_PlacedBlockPos.addedY(-1);
+		if (!cBlockDoorHandler::CanBeOn(a_World.GetBlock(BelowPos), a_World.GetBlockMeta(BelowPos)))
 		{
 			return false;
 		}
@@ -64,8 +71,9 @@ public:
 		}
 
 		// Check the two blocks that will get replaced by the door:
-		BLOCKTYPE LowerBlockType = a_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		BLOCKTYPE UpperBlockType = a_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
+		auto UpperBlockPos = a_PlacedBlockPos.addedY(1);
+		BLOCKTYPE LowerBlockType = a_World.GetBlock(a_PlacedBlockPos);
+		BLOCKTYPE UpperBlockType = a_World.GetBlock(UpperBlockPos);
 		if (
 			!cBlockDoorHandler::CanReplaceBlock(LowerBlockType) ||
 			!cBlockDoorHandler::CanReplaceBlock(UpperBlockType))
@@ -74,14 +82,14 @@ public:
 		}
 
 		// Get the coords of the neighboring blocks:
-		NIBBLETYPE LowerBlockMeta = cBlockDoorHandler::PlayerYawToMetaData(a_Player.GetYaw());
+		NIBBLETYPE LowerBlockMeta = cBlockDoorHandler::YawToMetaData(a_Player.GetYaw());
 		Vector3i RelDirToOutside = cBlockDoorHandler::GetRelativeDirectionToOutside(LowerBlockMeta);
 		Vector3i LeftNeighborPos = RelDirToOutside;
 		LeftNeighborPos.TurnCW();
-		LeftNeighborPos.Move(a_BlockX, a_BlockY, a_BlockZ);
+		LeftNeighborPos.Move(a_PlacedBlockPos);
 		Vector3i RightNeighborPos = RelDirToOutside;
 		RightNeighborPos.TurnCCW();
-		RightNeighborPos.Move(a_BlockX, a_BlockY, a_BlockZ);
+		RightNeighborPos.Move(a_PlacedBlockPos);
 
 		// Decide whether the hinge is on the left (default) or on the right:
 		NIBBLETYPE UpperBlockMeta = 0x08;
@@ -89,10 +97,10 @@ public:
 		BLOCKTYPE RightNeighborBlock = a_World.GetBlock(RightNeighborPos);
 		/*
 		// DEBUG:
-		LOGD("Door being placed at {%d, %d, %d}", a_BlockX, a_BlockY, a_BlockZ);
-		LOGD("RelDirToOutside: {%d, %d, %d}", RelDirToOutside.x, RelDirToOutside.y, RelDirToOutside.z);
-		LOGD("Left neighbor at {%d, %d, %d}: %d (%s)", LeftNeighborPos.x, LeftNeighborPos.y, LeftNeighborPos.z, LeftNeighborBlock, ItemTypeToString(LeftNeighborBlock).c_str());
-		LOGD("Right neighbor at {%d, %d, %d}: %d (%s)", RightNeighborPos.x, RightNeighborPos.y, RightNeighborPos.z, RightNeighborBlock, ItemTypeToString(RightNeighborBlock).c_str());
+		FLOGD("Door being placed at {0}", a_PlacedBlockPos);
+		FLOGD("RelDirToOutside: {0}", RelDirToOutside);
+		FLOGD("Left neighbor at {0}: {1} ({2})", LeftNeighborPos, LeftNeighborBlock, ItemTypeToString(LeftNeighborBlock));
+		FLOGD("Right neighbor at {0}: {1} ({2})", RightNeighborPos, RightNeighborBlock, ItemTypeToString(RightNeighborBlock));
 		*/
 		if (
 			cBlockDoorHandler::IsDoorBlockType(LeftNeighborBlock) ||   // The block to the left is a door block
@@ -108,10 +116,12 @@ public:
 		}
 
 		// Set the blocks:
-		a_BlocksToSet.emplace_back(a_BlockX, a_BlockY, a_BlockZ, BlockType, LowerBlockMeta);
-		a_BlocksToSet.emplace_back(a_BlockX, a_BlockY + 1, a_BlockZ, BlockType, UpperBlockMeta);
+		a_BlocksToSet.emplace_back(a_PlacedBlockPos, BlockType, LowerBlockMeta);
+		a_BlocksToSet.emplace_back(UpperBlockPos,    BlockType, UpperBlockMeta);
 		return true;
 	}
+
+
 
 
 	virtual bool IsPlaceable(void) override

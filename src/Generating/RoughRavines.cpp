@@ -6,6 +6,7 @@
 #include "Globals.h"
 
 #include "RoughRavines.h"
+#include "../BlockInfo.h"
 
 
 
@@ -14,20 +15,21 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cRoughRavine:
 
-class cRoughRavine :
+class cRoughRavine:
 	public cGridStructGen::cStructure
 {
-	typedef cGridStructGen::cStructure super;
+	using Super = cGridStructGen::cStructure;
 
 public:
+
 	cRoughRavine(
 		int a_Seed, size_t a_Size,
 		float a_CenterWidth, float a_Roughness,
 		float a_FloorHeightEdge1,   float a_FloorHeightEdge2,   float a_FloorHeightCenter,
 		float a_CeilingHeightEdge1, float a_CeilingHeightEdge2, float a_CeilingHeightCenter,
 		int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ
-	) :
-		super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
+	):
+		Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 		m_Seed(a_Seed + 100),
 		m_Noise(a_Seed + 100),
 		m_Roughness(a_Roughness)
@@ -71,7 +73,7 @@ protected:
 			m_Bottom = a_Bottom;
 		}
 	};
-	typedef std::vector<sRavineDefPoint> sRavineDefPoints;
+	using sRavineDefPoints = std::vector<sRavineDefPoint>;
 
 	int m_Seed;
 
@@ -230,7 +232,7 @@ cRoughRavines::cRoughRavines(
 	float a_MaxCeilingHeightCenter, float a_MinCeilingHeightCenter,
 	int a_GridSize, int a_MaxOffset
 ) :
-	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSize, a_MaxSize, 64),
+	Super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSize, a_MaxSize, 64),
 	m_MaxSize(a_MaxSize),
 	m_MinSize(a_MinSize),
 	m_MaxCenterWidth(a_MaxCenterWidth),

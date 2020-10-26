@@ -246,16 +246,12 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 	// Interpolate the lowest floor:
 	for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
 	{
-		//*
-		FloorLo[INTERPOL_X * x + 17 * INTERPOL_Z * z] =
+		// We need to store the intermediate result in a volatile variable, otherwise gcc -O2 optimizes
+		// through the undefined behavior in cNoise and produces different data than the other platforms / build types (#4384)
+		volatile int intermediate =
 			m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, 0, BaseZ + INTERPOL_Z * z) *
-			m_Noise2.IntNoise3DInt(BaseX + INTERPOL_X * x, 0, BaseZ + INTERPOL_Z * z) /
-			256;
-		//*/
-		/*
-		FloorLo[INTERPOL_X * x + 17 * INTERPOL_Z * z] =
-			m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, 0, BaseZ + INTERPOL_Z * z) / 256;
-		//*/
+			m_Noise2.IntNoise3DInt(BaseX + INTERPOL_X * x, 0, BaseZ + INTERPOL_Z * z);
+		FloorLo[INTERPOL_X * x + 17 * INTERPOL_Z * z] = intermediate / 256;
 	}  // for x, z - FloorLo[]
 	LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorLo);
 
@@ -265,16 +261,12 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 		// First update the high floor:
 		for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
 		{
-			//*
-			FloorHi[INTERPOL_X * x + 17 * INTERPOL_Z * z] =
+			// We need to store the intermediate result in a volatile variable, otherwise gcc -O2 optimizes
+			// through the undefined behavior in cNoise and produces different data than the other platforms / build types (#4384)
+			volatile int intermediate =
 				m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) *
-				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) /
-				256;
-			//*/
-			/*
-			FloorHi[INTERPOL_X * x + 17 * INTERPOL_Z * z] =
-				m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) / 256;
-			//*/
+				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z);
+			FloorHi[INTERPOL_X * x + 17 * INTERPOL_Z * z] = intermediate / 256;
 		}  // for x, z - FloorLo[]
 		LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorHi);
 
@@ -287,7 +279,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 			for (int y = 0; y < SEGMENT_HEIGHT; y++)
 			{
 				int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
-				if (Val < Threshold)  // Don't calculate if the block should be Netherrack when it's already decided that it's air.
+				if (Val < Threshold)
 				{
 					a_ChunkDesc.SetBlockType(x, y + Segment, z, E_BLOCK_NETHERRACK);
 				}
@@ -298,7 +290,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 		std::swap(FloorLo, FloorHi);
 	}
 
-	// Bedrock at the bottom and at the top:
+	// Bedrock at the bottom and at the top, cover ceiling with netherrack:
 	for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
 	{
 		a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
@@ -338,10 +330,10 @@ void cCompoGenNether::InitializeCompoGen(cIniFile & a_IniFile)
 // cCompoGenCache:
 
 cCompoGenCache::cCompoGenCache(cTerrainCompositionGenPtr a_Underlying, int a_CacheSize) :
-	m_Underlying(a_Underlying),
+	m_Underlying(std::move(a_Underlying)),
 	m_CacheSize(a_CacheSize),
-	m_CacheOrder(new int[a_CacheSize]),
-	m_CacheData(new sCacheData[a_CacheSize]),
+	m_CacheOrder(new int[ToUnsigned(a_CacheSize)]),
+	m_CacheData(new sCacheData[ToUnsigned(a_CacheSize)]),
 	m_NumHits(0),
 	m_NumMisses(0),
 	m_TotalChain(0)

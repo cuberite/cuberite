@@ -126,7 +126,7 @@ enum class eNBTParseError
 };
 
 // The following is required to make an error_code constructible from an eNBTParseError
-std::error_code make_error_code(eNBTParseError a_Err) NOEXCEPT;
+std::error_code make_error_code(eNBTParseError a_Err) noexcept;
 
 namespace std
 {
@@ -307,6 +307,10 @@ protected:
 	eNBTParseError ReadCompound(void);  // Reads the latest tag as a compound
 	eNBTParseError ReadList(eTagType a_ChildrenType);  // Reads the latest tag as a list of items of type a_ChildrenType
 	eNBTParseError ReadTag(void);       // Reads the latest tag, depending on its m_Type setting
+
+	/** Returns the minimum size, in bytes, of the specified tag type.
+	Used for sanity-checking. */
+	static size_t GetMinTagSize(eTagType a_TagType);
 } ;
 
 
@@ -330,9 +334,9 @@ public:
 	void AddLong     (const AString & a_Name, Int64 a_Value);
 	void AddFloat    (const AString & a_Name, float a_Value);
 	void AddDouble   (const AString & a_Name, double a_Value);
-	void AddString   (const AString & a_Name, const AString & a_Value);
+	void AddString   (const AString & a_Name, std::string_view a_Value);
 	void AddByteArray(const AString & a_Name, const char * a_Value, size_t a_NumElements);
-	void AddIntArray (const AString & a_Name, const int *  a_Value, size_t a_NumElements);
+	void AddIntArray (const AString & a_Name, const Int32 * a_Value, size_t a_NumElements);
 
 	void AddByteArray(const AString & a_Name, const AString & a_Value)
 	{

@@ -2,8 +2,9 @@
 #pragma once
 
 
-#include "Defines.h"
-#include "FunctionRef.h"
+#include "../BlockType.h"
+#include "../Defines.h"
+#include "../FunctionRef.h"
 
 
 
@@ -17,6 +18,7 @@ class cClientHandle;
 class cCommandOutputCallback;
 class cCraftingGrid;
 class cCraftingRecipe;
+class cDropSpenserEntity;
 class cEntity;
 class cHopperEntity;
 class cItems;
@@ -100,6 +102,7 @@ public:
 		HOOK_HANDSHAKE,
 		HOOK_HOPPER_PULLING_ITEM,
 		HOOK_HOPPER_PUSHING_ITEM,
+		HOOK_DROPSPENSE,
 		HOOK_KILLED,
 		HOOK_KILLING,
 		HOOK_LOGIN,
@@ -117,6 +120,7 @@ public:
 		HOOK_PLAYER_OPENING_WINDOW,
 		HOOK_PLAYER_PLACED_BLOCK,
 		HOOK_PLAYER_PLACING_BLOCK,
+		HOOK_PLAYER_CROUCHED,
 		HOOK_PLAYER_RIGHT_CLICK,
 		HOOK_PLAYER_RIGHT_CLICKING_ENTITY,
 		HOOK_PLAYER_SHOOTING,
@@ -156,6 +160,14 @@ public:
 		HOOK_NUM_HOOKS,
 		HOOK_MAX = HOOK_NUM_HOOKS - 1,
 	} ;  // tolua_export
+
+
+	/** Defines the deferred actions needed for a plugin */
+	enum class PluginAction
+	{
+		Reload,
+		Unload
+	};
 
 
 	/** Used as a callback for enumerating bound commands */
@@ -225,7 +237,7 @@ public:
 
 	// Calls for individual hooks. Each returns false if the action is to continue or true if the plugin wants to abort
 	bool CallHookBlockSpread              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source);
-	bool CallHookBlockToPickups           (cWorld & a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups);
+	bool CallHookBlockToPickups           (cWorld & a_World, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool, cItems & a_Pickups);
 	bool CallHookBrewingCompleting        (cWorld & a_World, cBrewingstandEntity & a_Brewingstand);
 	bool CallHookBrewingCompleted         (cWorld & a_World, cBrewingstandEntity & a_Brewingstand);
 	bool CallHookChat                     (cPlayer & a_Player, AString & a_Message);
@@ -247,7 +259,8 @@ public:
 	bool CallHookHandshake                (cClientHandle & a_ClientHandle, const AString & a_Username);
 	bool CallHookHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum);
 	bool CallHookHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum);
-	bool CallHookKilled		      (cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage);
+	bool CallHookDropSpense               (cWorld & a_World, cDropSpenserEntity & a_DropSpenser, int a_SlotNum);
+	bool CallHookKilled                   (cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage);
 	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI);
 	bool CallHookLogin                    (cClientHandle & a_Client, UInt32 a_ProtocolVersion, const AString & a_Username);
 	bool CallHookLoginForge               (cClientHandle & a_Client, AStringMap & a_Mods);
@@ -261,10 +274,11 @@ public:
 	bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel);
 	bool CallHookPlayerJoined             (cPlayer & a_Player);
 	bool CallHookPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
-	bool CallHookPlayerMoving             (cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition);
+	bool CallHookPlayerMoving             (cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition, bool a_PreviousIsOnGround);
 	bool CallHookPlayerOpeningWindow      (cPlayer & a_Player, cWindow & a_Window);
 	bool CallHookPlayerPlacedBlock        (cPlayer & a_Player, const sSetBlock & a_BlockChange);
 	bool CallHookPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange);
+	bool CallHookPlayerCrouched           (cPlayer & a_Player);
 	bool CallHookPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
 	bool CallHookPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity);
 	bool CallHookPlayerShooting           (cPlayer & a_Player);
@@ -296,6 +310,10 @@ public:
 	/** Queues the specified plugin to be unloaded in the next call to Tick().
 	Note that this function returns before the plugin is unloaded, to avoid deadlocks. */
 	void UnloadPlugin(const AString & a_PluginFolder);  // tolua_export
+
+	/** Queues the specified plugin to be reloaded in the next call to Tick().
+	Note that this function returns before the plugin is unloaded, to avoid deadlocks. */
+	void ReloadPlugin(const AString & a_PluginFolder);  // tolua_export
 
 	/** Loads the plugin from the specified plugin folder.
 	Returns true if the plugin was loaded successfully or was already loaded before, false otherwise. */
@@ -384,7 +402,7 @@ public:
 
 	/** Returns the path where individual plugins' folders are expected.
 	The path doesn't end in a slash. */
-	static AString GetPluginsPath(void) { return FILE_IO_PREFIX "Plugins"; }  // tolua_export
+	static AString GetPluginsPath(void) { return "Plugins"; }  // tolua_export
 
 private:
 	friend class cRoot;
@@ -402,13 +420,13 @@ private:
 	typedef std::map<AString, cCommandReg> CommandMap;
 
 
-	/** FolderNames of plugins that should be unloaded.
-	The plugins will be unloaded within the next call to Tick(), to avoid multithreading issues.
-	Protected against multithreaded access by m_CSPluginsToUnload. */
-	AStringVector m_PluginsToUnload;
+	/** FolderNames of plugins that need an action (unload, reload, ...).
+	The plugins will be acted upon within the next call to Tick(), to avoid multithreading issues.
+	Protected against multithreaded access by m_CSPluginsNeedAction. */
+	std::vector<std::pair<PluginAction, AString>> m_PluginsNeedAction;
 
 	/** Protects m_PluginsToUnload against multithreaded access. */
-	mutable cCriticalSection m_CSPluginsToUnload;
+	mutable cCriticalSection m_CSPluginsNeedAction;
 
 	/** All plugins that have been found in the Plugins folder. */
 	cPluginPtrs m_Plugins;
@@ -451,7 +469,6 @@ private:
 	template <typename HookFunction>
 	bool GenericCallHook(PluginHook a_HookName, HookFunction a_HookFunction);
 } ;  // tolua_export
-
 
 
 

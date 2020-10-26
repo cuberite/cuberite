@@ -16,46 +16,23 @@
 	// Disable some warnings that we don't care about:
 	#pragma warning(disable:4100)
 
-	#define OBSOLETE __declspec(deprecated)
-
-	// No alignment needed in MSVC
-	#define ALIGN_8
-	#define ALIGN_16
-
-	#define NORETURN      __declspec(noreturn)
-
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
 	#define abstract
 
-	#define OBSOLETE __attribute__((deprecated))
-
-	#define ALIGN_8 __attribute__((aligned(8)))
-	#define ALIGN_16 __attribute__((aligned(16)))
-
-	// Some portability macros :)
-	#define stricmp strcasecmp
-
-	#define NORETURN      __attribute((__noreturn__))
 #else
 
 	#error "You are using an unsupported compiler, you might need to #define some stuff here for your compiler"
 
-	/*
-	// Copy and uncomment this into another #elif section based on your compiler identification
+#endif
 
-	// Explicitly mark classes as abstract (no instances can be created)
-	#define abstract
 
-	// Mark functions as obsolete, so that their usage results in a compile-time warning
-	#define OBSOLETE
 
-	// Mark types / variables for alignment. Do the platforms need it?
-	#define ALIGN_8
-	#define ALIGN_16
-	*/
 
+
+#ifndef TOLUA_TEMPLATE_BIND
+	#define TOLUA_TEMPLATE_BIND(x)
 #endif
 
 
@@ -133,16 +110,6 @@ typedef unsigned char Byte;
 	#define SocketError errno
 #endif
 
-#if !defined(ANDROID_NDK)
-	#define USE_SQUIRREL
-#endif
-
-#if defined(ANDROID_NDK)
-	#define FILE_IO_PREFIX "/sdcard/mcserver/"
-#else
-	#define FILE_IO_PREFIX ""
-#endif
-
 
 
 
@@ -176,7 +143,8 @@ typedef unsigned char Byte;
 
 
 // Common headers (without macros):
-#include "fmt/format.h"
+#include "fmt.h"
+#include "LoggerSimple.h"
 #include "StringUtils.h"
 #include "OSSupport/CriticalSection.h"
 #include "OSSupport/Event.h"
@@ -213,15 +181,16 @@ typedef unsigned char Byte;
 
 
 
-/** A generic interface used mainly in ForEach() functions */
-template <typename Type> class cItemCallback
+/** Clamps the value into the specified range. */
+template <typename T>
+T Clamp(T a_Value, T a_Min, T a_Max)
 {
-public:
-	/** Called for each item in the internal list; return true to stop the loop, or false to continue enumerating */
-	virtual bool Item(Type * a_Type) = 0;
-	virtual ~cItemCallback() {}
-} ;
+	return (a_Value < a_Min) ? a_Min : ((a_Value > a_Max) ? a_Max : a_Value);
+}
 
-
-
-
+template <typename T>
+auto ToUnsigned(T a_Val)
+{
+	ASSERT(a_Val >= 0);
+	return static_cast<std::make_unsigned_t<T>>(a_Val);
+}

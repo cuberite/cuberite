@@ -1,8 +1,6 @@
-project (Cuberite)
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
-SET (SRCS
 	BeaconEntity.cpp
 	BedEntity.cpp
 	BlockEntity.cpp
@@ -13,6 +11,8 @@ SET (SRCS
 	DispenserEntity.cpp
 	DropSpenserEntity.cpp
 	DropperEntity.cpp
+	EnchantingTableEntity.cpp
+	EndPortalEntity.cpp
 	EnderChestEntity.cpp
 	FlowerPotEntity.cpp
 	FurnaceEntity.cpp
@@ -22,9 +22,7 @@ SET (SRCS
 	MobSpawnerEntity.cpp
 	NoteEntity.cpp
 	SignEntity.cpp
-)
 
-SET (HDRS
 	BeaconEntity.h
 	BedEntity.h
 	BlockEntity.h
@@ -35,6 +33,8 @@ SET (HDRS
 	DispenserEntity.h
 	DropSpenserEntity.h
 	DropperEntity.h
+	EnchantingTableEntity.h
+	EndPortalEntity.h
 	EnderChestEntity.h
 	FlowerPotEntity.h
 	FurnaceEntity.h
@@ -45,8 +45,3 @@ SET (HDRS
 	NoteEntity.h
 	SignEntity.h
 )
-
-if(NOT MSVC)
-	add_library(BlockEntities ${SRCS} ${HDRS})
-	target_link_libraries(BlockEntities fmt::fmt)
-endif()

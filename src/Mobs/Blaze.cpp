@@ -9,7 +9,9 @@
 
 
 cBlaze::cBlaze(void) :
-	super("Blaze", mtBlaze, "entity.blaze.hurt", "entity.blaze.death", 0.6, 1.8)
+	Super("Blaze", mtBlaze, "entity.blaze.hurt", "entity.blaze.death", "entity.blaze.ambient", 0.6, 1.8),
+	m_IsCharging(false),
+	m_ChargeTimer(0)
 {
 	SetGravity(-8.0f);
 	SetAirDrag(0.05f);
@@ -34,23 +36,54 @@ void cBlaze::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 bool cBlaze::Attack(std::chrono::milliseconds a_Dt)
 {
-	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0))
+	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0) && (!m_IsCharging))
 	{
-		// Setting this higher gives us more wiggle room for attackrate
-		Vector3d Speed = GetLookVector() * 20;
-		Speed.y = Speed.y + 1;
-
-		auto FireCharge = cpp14::make_unique<cFireChargeEntity>(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
-		auto FireChargePtr = FireCharge.get();
-		if (!FireChargePtr->Initialize(std::move(FireCharge), *m_World))
-		{
-			return false;
-		}
-
-		ResetAttackCooldown();
-		// ToDo: Shoot 3 fireballs instead of 1.
-
+		m_IsCharging = true;
 		return true;
 	}
 	return false;
 }
+
+
+
+
+
+void cBlaze::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	Super::Tick(a_Dt, a_Chunk);
+	if (!IsTicking())
+	{
+		// The base class tick destroyed us
+		return;
+	}
+
+	if (m_IsCharging)
+	{
+		m_ChargeTimer++;
+		if (
+			(m_ChargeTimer == 5) ||
+			(m_ChargeTimer == 10) ||
+			(m_ChargeTimer == 15)
+		)
+		{
+			Vector3d Speed = GetLookVector() * 20;
+			Speed.y = Speed.y + 1;
+
+			auto FireCharge = std::make_unique<cFireChargeEntity>(this, GetPosition().addedY(1), Speed);
+			auto FireChargePtr = FireCharge.get();
+			FireChargePtr->Initialize(std::move(FireCharge), *m_World);
+
+			m_World->BroadcastSoundEffect("entity.ghast.shoot", GetPosition(), 4.0f, 1.0f);
+		}
+	}
+
+	if ((m_IsCharging) && (m_ChargeTimer > 15))
+	{
+		m_ChargeTimer = 0;
+		m_IsCharging = false;
+		ResetAttackCooldown();
+	}
+}
+
+
+

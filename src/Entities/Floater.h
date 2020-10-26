@@ -11,14 +11,15 @@
 class cFloater :
 	public cEntity
 {
-	typedef cEntity super;
-
-public:
 	// tolua_end
+
+	using Super = cEntity;
+
+public:  // tolua_export
 
 	CLASS_PROTODEF(cFloater)
 
-	cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime);
+	cFloater(Vector3d a_Pos, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime);
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;

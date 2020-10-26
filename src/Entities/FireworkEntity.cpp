@@ -8,8 +8,8 @@
 
 
 
-cFireworkEntity::cFireworkEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem & a_Item) :
-	super(pkFirework, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
+cFireworkEntity::cFireworkEntity(cEntity * a_Creator, Vector3d a_Pos, const cItem & a_Item) :
+	Super(pkFirework, a_Creator, a_Pos, 0.25, 0.25),
 	m_TicksToExplosion(a_Item.m_FireworkItem.m_FlightTimeInTicks),
 	m_FireworkItem(a_Item)
 {
@@ -64,7 +64,7 @@ void cFireworkEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_C
 
 void cFireworkEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us

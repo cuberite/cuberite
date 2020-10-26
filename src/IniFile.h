@@ -30,10 +30,14 @@
 
 // tolua_begin
 
-class cIniFile : public cSettingsRepositoryInterface
+class cIniFile:
+	public cSettingsRepositoryInterface
 {
 private:
-	typedef cSettingsRepositoryInterface Super;
+
+	// tolua_end
+
+	using Super = cSettingsRepositoryInterface;
 
 
 	bool m_IsCaseInsensitive;
@@ -56,6 +60,8 @@ private:
 
 	/** Removes the UTF-8 BOMs (Byte order makers), if present. */
 	void RemoveBom(AString & a_line) const;
+
+	// tolua_begin
 
 public:
 

@@ -45,10 +45,10 @@ class cWorld;
 
 
 
-class cLightingThread :
+class cLightingThread:
 	public cIsThread
 {
-	typedef cIsThread super;
+	using Super = cIsThread;
 
 public:
 
@@ -159,28 +159,11 @@ protected:
 	/** Compresses from 1-block-per-byte (faster calc) into 2-blocks-per-byte (MC storage): */
 	void CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_ChunkLight);
 
-	inline void PropagateLight(
+	void PropagateLight(
 		NIBBLETYPE * a_Light,
 		unsigned int a_SrcIdx, unsigned int a_DstIdx,
 		size_t & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
-	)
-	{
-		ASSERT(a_SrcIdx < ARRAYCOUNT(m_SkyLight));
-		ASSERT(a_DstIdx < ARRAYCOUNT(m_BlockTypes));
-
-		if (a_Light[a_SrcIdx] <= a_Light[a_DstIdx] + cBlockInfo::GetSpreadLightFalloff(m_BlockTypes[a_DstIdx]))
-		{
-			// We're not offering more light than the dest block already has
-			return;
-		}
-
-		a_Light[a_DstIdx] = a_Light[a_SrcIdx] - cBlockInfo::GetSpreadLightFalloff(m_BlockTypes[a_DstIdx]);
-		if (!a_IsSeedOut[a_DstIdx])
-		{
-			a_IsSeedOut[a_DstIdx] = true;
-			a_SeedIdxOut[a_NumSeedsOut++] = a_DstIdx;
-		}
-	}
+	);
 
 	/** Queues a chunkstay that has all of its chunks loaded.
 	Called by cLightingChunkStay when all of its chunks are loaded. */

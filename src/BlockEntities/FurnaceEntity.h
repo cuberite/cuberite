@@ -18,9 +18,14 @@ class cClientHandle;
 class cFurnaceEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems Super;
+	// tolua_end
+
+	using Super = cBlockEntityWithItems;
+
+	// tolua_begin
 
 public:
+
 	enum
 	{
 		fsInput  = 0,  // Input slot number
@@ -33,10 +38,8 @@ public:
 
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cFurnaceEntity)
-
 	/** Constructor used for normal operation */
-	cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	virtual ~cFurnaceEntity() override;
 
@@ -140,7 +143,7 @@ protected:
 	bool m_IsLoading;
 
 	/** Sends the specified progressbar value to all clients of the window */
-	void BroadcastProgress(short a_ProgressbarID, short a_Value);
+	void BroadcastProgress(size_t a_ProgressbarID, short a_Value);
 
 	/** One item finished cooking */
 	void FinishOne();
@@ -170,7 +173,3 @@ protected:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 
 } ;  // tolua_export
-
-
-
-

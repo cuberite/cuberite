@@ -15,13 +15,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Globals:
 
-static bool IsValidSocket(evutil_socket_t a_Socket)
+namespace ServerHandleImplHelper
 {
-	#ifdef _WIN32
+	static bool IsValidSocket(evutil_socket_t a_Socket)
+	{
+#ifdef _WIN32
 		return (a_Socket != INVALID_SOCKET);
-	#else  // _WIN32
+#else  // _WIN32
 		return (a_Socket >= 0);
-	#endif  // else _WIN32
+#endif  // else _WIN32
+	}
 }
 
 
@@ -32,7 +35,7 @@ static bool IsValidSocket(evutil_socket_t a_Socket)
 // cServerHandleImpl:
 
 cServerHandleImpl::cServerHandleImpl(cNetwork::cListenCallbacksPtr a_ListenCallbacks):
-	m_ListenCallbacks(a_ListenCallbacks),
+	m_ListenCallbacks(std::move(a_ListenCallbacks)),
 	m_ConnListener(nullptr),
 	m_SecondaryConnListener(nullptr),
 	m_IsListening(false),
@@ -63,7 +66,10 @@ cServerHandleImpl::~cServerHandleImpl()
 void cServerHandleImpl::Close(void)
 {
 	// Stop the listener sockets:
-	evconnlistener_disable(m_ConnListener);
+	if (m_ConnListener != nullptr)
+	{
+		evconnlistener_disable(m_ConnListener);
+	}
 	if (m_SecondaryConnListener != nullptr)
 	{
 		evconnlistener_disable(m_SecondaryConnListener);
@@ -76,7 +82,7 @@ void cServerHandleImpl::Close(void)
 		cCSLock Lock(m_CS);
 		std::swap(Conns, m_Connections);
 	}
-	for (auto conn: Conns)
+	for (const auto & conn: Conns)
 	{
 		conn->Shutdown();
 	}
@@ -97,7 +103,7 @@ cServerHandleImplPtr cServerHandleImpl::Listen(
 	cNetwork::cListenCallbacksPtr a_ListenCallbacks
 )
 {
-	cServerHandleImplPtr res = cServerHandleImplPtr{new cServerHandleImpl(a_ListenCallbacks)};
+	cServerHandleImplPtr res{new cServerHandleImpl(std::move(a_ListenCallbacks))};
 	res->m_SelfPtr = res;
 	if (res->Listen(a_Port))
 	{
@@ -105,7 +111,7 @@ cServerHandleImplPtr cServerHandleImpl::Listen(
 	}
 	else
 	{
-		a_ListenCallbacks->OnError(res->m_ErrorCode, res->m_ErrorMsg);
+		res->m_ListenCallbacks->OnError(res->m_ErrorCode, res->m_ErrorMsg);
 		res->m_SelfPtr.reset();
 	}
 	return res;
@@ -126,13 +132,13 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	int err = 0;
 	evutil_socket_t MainSock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
-	if (!IsValidSocket(MainSock))
+	if (!ServerHandleImplHelper::IsValidSocket(MainSock))
 	{
 		// Failed to create IPv6 socket, create an IPv4 one instead:
 		err = EVUTIL_SOCKET_ERROR();
 		LOGD("Failed to create IPv6 MainSock: %d (%s)", err, evutil_socket_error_to_string(err));
 		MainSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if (!IsValidSocket(MainSock))
+		if (!ServerHandleImplHelper::IsValidSocket(MainSock))
 		{
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
 			Printf(m_ErrorMsg, "Cannot create socket for port %d: %s", a_Port, evutil_socket_error_to_string(m_ErrorCode));
@@ -205,7 +211,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		evutil_closesocket(MainSock);
 		return false;
 	}
-	if (listen(MainSock, 0) != 0)
+	if (listen(MainSock, SOMAXCONN) != 0)
 	{
 		m_ErrorCode = EVUTIL_SOCKET_ERROR();
 		Printf(m_ErrorMsg, "Cannot listen on port %d: %d (%s)", a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode));
@@ -224,7 +230,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	LOGD("Creating a second socket for IPv4");
 	evutil_socket_t SecondSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	if (!IsValidSocket(SecondSock))
+	if (!ServerHandleImplHelper::IsValidSocket(SecondSock))
 	{
 		err = EVUTIL_SOCKET_ERROR();
 		LOGD("socket(AF_INET, ...) failed for secondary socket: %d, %s", err, evutil_socket_error_to_string(err));
@@ -263,7 +269,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		return true;  // Report as success, the primary socket is working
 	}
 
-	if (listen(SecondSock, 0) != 0)
+	if (listen(SecondSock, SOMAXCONN) != 0)
 	{
 		err = EVUTIL_SOCKET_ERROR();
 		LOGD("Cannot listen on secondary socket on port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
@@ -360,7 +366,7 @@ cServerHandlePtr cNetwork::Listen(
 	cNetwork::cListenCallbacksPtr a_ListenCallbacks
 )
 {
-	return cServerHandleImpl::Listen(a_Port, a_ListenCallbacks);
+	return cServerHandleImpl::Listen(a_Port, std::move(a_ListenCallbacks));
 }
 
 

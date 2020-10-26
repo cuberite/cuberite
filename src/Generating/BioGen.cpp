@@ -18,8 +18,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cBioGenConstant:
 
-void cBioGenConstant::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenConstant::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
+	UNUSED(a_ChunkCoords);
 	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
 	{
 		a_BiomeMap[i] = m_Biome;
@@ -32,7 +33,15 @@ void cBioGenConstant::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 
 void cBioGenConstant::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	AString Biome = a_IniFile.GetValueSet("Generator", "ConstantBiome", "");
+	AString defaultBiome;
+	switch (StringToDimension(a_IniFile.GetValue("General", "Dimension", "Overworld")))
+	{
+		case dimOverworld: defaultBiome = "Plains";    break;
+		case dimNether:    defaultBiome = "Nether";    break;
+		case dimEnd:       defaultBiome = "End";       break;
+		case dimNotSet:    defaultBiome = "Swampland"; break;
+	}
+	AString Biome = a_IniFile.GetValueSet("Generator", "ConstantBiome", defaultBiome);
 	m_Biome = StringToBiome(Biome);
 	if (m_Biome == biInvalidBiome)
 	{
@@ -49,19 +58,17 @@ void cBioGenConstant::InitializeBiomeGen(cIniFile & a_IniFile)
 // cBioGenCache:
 
 cBioGenCache::cBioGenCache(cBiomeGenPtr a_BioGenToCache, size_t a_CacheSize) :
-	m_BioGenToCache(a_BioGenToCache),
+	m_BioGenToCache(std::move(a_BioGenToCache)),
 	m_CacheSize(a_CacheSize),
-	m_CacheOrder(new size_t[a_CacheSize]),
-	m_CacheData(new sCacheData[a_CacheSize]),
 	m_NumHits(0),
 	m_NumMisses(0),
 	m_TotalChain(0)
 {
+	m_CacheData.resize(m_CacheSize);
+	m_CacheOrder.resize(m_CacheSize);
 	for (size_t i = 0; i < m_CacheSize; i++)
 	{
 		m_CacheOrder[i] = i;
-		m_CacheData[i].m_ChunkX = 0x7fffffff;
-		m_CacheData[i].m_ChunkZ = 0x7fffffff;
 	}
 }
 
@@ -69,19 +76,7 @@ cBioGenCache::cBioGenCache(cBiomeGenPtr a_BioGenToCache, size_t a_CacheSize) :
 
 
 
-cBioGenCache::~cBioGenCache()
-{
-	delete[] m_CacheData;
-	m_CacheData = nullptr;
-	delete[] m_CacheOrder;
-	m_CacheOrder = nullptr;
-}
-
-
-
-
-
-void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenCache::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
 	if (((m_NumHits + m_NumMisses) % 1024) == 10)
 	{
@@ -91,10 +86,7 @@ void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a
 
 	for (size_t i = 0; i < m_CacheSize; i++)
 	{
-		if (
-			(m_CacheData[m_CacheOrder[i]].m_ChunkX != a_ChunkX) ||
-			(m_CacheData[m_CacheOrder[i]].m_ChunkZ != a_ChunkZ)
-		)
+		if (m_CacheData[m_CacheOrder[i]].m_Coords != a_ChunkCoords)
 		{
 			continue;
 		}
@@ -118,7 +110,7 @@ void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a
 
 	// Not in the cache:
 	m_NumMisses++;
-	m_BioGenToCache->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
+	m_BioGenToCache->GenBiomes(a_ChunkCoords, a_BiomeMap);
 
 	// Insert it as the first item in the MRU order:
 	size_t Idx = m_CacheOrder[m_CacheSize - 1];
@@ -128,8 +120,7 @@ void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a
 	}  // for i - m_CacheOrder[]
 	m_CacheOrder[0] = Idx;
 	memcpy(m_CacheData[Idx].m_BiomeMap, a_BiomeMap, sizeof(a_BiomeMap));
-	m_CacheData[Idx].m_ChunkX = a_ChunkX;
-	m_CacheData[Idx].m_ChunkZ = a_ChunkZ;
+	m_CacheData[Idx].m_Coords = a_ChunkCoords;
 }
 
 
@@ -138,7 +129,7 @@ void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a
 
 void cBioGenCache::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	super::InitializeBiomeGen(a_IniFile);
+	Super::InitializeBiomeGen(a_IniFile);
 	m_BioGenToCache->InitializeBiomeGen(a_IniFile);
 }
 
@@ -148,7 +139,7 @@ void cBioGenCache::InitializeBiomeGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cBioGenMulticache:
 
-cBioGenMulticache::cBioGenMulticache(cBiomeGenPtr a_BioGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches) :
+cBioGenMulticache::cBioGenMulticache(const cBiomeGenPtr & a_BioGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches) :
 	m_NumSubCaches(a_NumSubCaches)
 {
 	m_Caches.reserve(a_NumSubCaches);
@@ -162,12 +153,12 @@ cBioGenMulticache::cBioGenMulticache(cBiomeGenPtr a_BioGenToCache, size_t a_SubC
 
 
 
-void cBioGenMulticache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenMulticache::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
 	const size_t coefficient = 3;
-	const size_t cacheIdx = (static_cast<size_t>(a_ChunkX) + coefficient * static_cast<size_t>(a_ChunkZ)) % m_NumSubCaches;
+	const size_t cacheIdx = (static_cast<size_t>(a_ChunkCoords.m_ChunkX) + coefficient * static_cast<size_t>(a_ChunkCoords.m_ChunkZ)) % m_NumSubCaches;
 
-	m_Caches[cacheIdx]->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
+	m_Caches[cacheIdx]->GenBiomes(a_ChunkCoords, a_BiomeMap);
 }
 
 
@@ -176,7 +167,7 @@ void cBioGenMulticache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMa
 
 void cBioGenMulticache::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	for (auto itr : m_Caches)
+	for (const auto & itr : m_Caches)
 	{
 		itr->InitializeBiomeGen(a_IniFile);
 	}
@@ -269,14 +260,14 @@ void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)
 ////////////////////////////////////////////////////////////////////////////////
 // cBioGenCheckerboard:
 
-void cBioGenCheckerboard::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenCheckerboard::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
-		int Base = (cChunkDef::Width * a_ChunkZ + z) / m_BiomeSize;
+		int Base = (cChunkDef::Width * a_ChunkCoords.m_ChunkZ + z) / m_BiomeSize;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int Add = cChunkDef::Width * a_ChunkX + x;
+			int Add = cChunkDef::Width * a_ChunkCoords.m_ChunkX + x;
 			size_t BiomeIdx = static_cast<size_t>((((Base + Add / m_BiomeSize) % m_BiomesCount) + m_BiomesCount) % m_BiomesCount);  // Need to add and modulo twice because of negative numbers
 			a_BiomeMap[x + cChunkDef::Width * z] = m_Biomes[BiomeIdx];
 		}
@@ -289,7 +280,7 @@ void cBioGenCheckerboard::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 
 void cBioGenCheckerboard::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	super::InitializeBiomeGen(a_IniFile);
+	Super::InitializeBiomeGen(a_IniFile);
 	AString Biomes = a_IniFile.GetValueSet ("Generator", "CheckerBoardBiomes",    "");
 	m_BiomeSize    = a_IniFile.GetValueSetI("Generator", "CheckerboardBiomeSize", 64);
 	m_BiomeSize = (m_BiomeSize < 8) ? 8 : m_BiomeSize;
@@ -303,10 +294,10 @@ void cBioGenCheckerboard::InitializeBiomeGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cBioGenVoronoi :
 
-void cBioGenVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenVoronoi::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	int BaseZ = cChunkDef::Width * a_ChunkZ;
-	int BaseX = cChunkDef::Width * a_ChunkX;
+	int BaseZ = cChunkDef::Width * a_ChunkCoords.m_ChunkZ;
+	int BaseX = cChunkDef::Width * a_ChunkCoords.m_ChunkX;
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		int AbsoluteZ = BaseZ + z;
@@ -324,7 +315,7 @@ void cBioGenVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap &
 
 void cBioGenVoronoi::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	super::InitializeBiomeGen(a_IniFile);
+	Super::InitializeBiomeGen(a_IniFile);
 	int CellSize     = a_IniFile.GetValueSetI("Generator", "VoronoiCellSize", 128);
 	int JitterSize   = a_IniFile.GetValueSetI("Generator", "VoronoiJitterSize", CellSize);
 	int OddRowOffset = a_IniFile.GetValueSetI("Generator", "VoronoiOddRowOffset", 0);
@@ -341,10 +332,10 @@ void cBioGenVoronoi::InitializeBiomeGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cBioGenDistortedVoronoi:
 
-void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenDistortedVoronoi::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	int BaseZ = cChunkDef::Width * a_ChunkZ;
-	int BaseX = cChunkDef::Width * a_ChunkX;
+	int BaseZ = cChunkDef::Width * a_ChunkCoords.m_ChunkZ;
+	int BaseX = cChunkDef::Width * a_ChunkCoords.m_ChunkX;
 
 	// Distortions for linear interpolation:
 	int DistortX[cChunkDef::Width + 1][cChunkDef::Width + 1];
@@ -373,7 +364,7 @@ void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::B
 
 void cBioGenDistortedVoronoi::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	super::InitializeBiomeGen(a_IniFile);
+	Super::InitializeBiomeGen(a_IniFile);
 	m_CellSize = a_IniFile.GetValueSetI("Generator", "DistortedVoronoiCellSize", 96);
 	m_Voronoi.SetCellSize(m_CellSize);
 	InitializeBiomes(a_IniFile.GetValueSet("Generator", "DistortedVoronoiBiomes", ""));
@@ -436,24 +427,24 @@ void cBioGenMultiStepMap::InitializeBiomeGen(cIniFile & a_IniFile)
 
 
 
-void cBioGenMultiStepMap::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenMultiStepMap::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	DecideOceanLandMushroom(a_ChunkX, a_ChunkZ, a_BiomeMap);
-	AddRivers(a_ChunkX, a_ChunkZ, a_BiomeMap);
-	ApplyTemperatureHumidity(a_ChunkX, a_ChunkZ, a_BiomeMap);
+	DecideOceanLandMushroom(a_ChunkCoords, a_BiomeMap);
+	AddRivers(a_ChunkCoords, a_BiomeMap);
+	ApplyTemperatureHumidity(a_ChunkCoords, a_BiomeMap);
 }
 
 
 
 
 
-void cBioGenMultiStepMap::DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenMultiStepMap::DecideOceanLandMushroom(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
 	// Distorted Voronoi over 3 biomes, with mushroom having only a special occurence.
 
 	// Prepare a distortion lookup table, by distorting a 5x5 area and using that as 1:4 zoom (linear interpolate):
-	int BaseZ = cChunkDef::Width * a_ChunkZ;
-	int BaseX = cChunkDef::Width * a_ChunkX;
+	int BaseZ = cChunkDef::Width * a_ChunkCoords.m_ChunkZ;
+	int BaseX = cChunkDef::Width * a_ChunkCoords.m_ChunkX;
 	int DistortX[cChunkDef::Width + 1][cChunkDef::Width + 1];
 	int DistortZ[cChunkDef::Width + 1][cChunkDef::Width + 1];
 	int DistortSize = m_OceanCellSize / 2;
@@ -550,11 +541,11 @@ void cBioGenMultiStepMap::DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cC
 
 
 
-void cBioGenMultiStepMap::AddRivers(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenMultiStepMap::AddRivers(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
-		float NoiseCoordZ = static_cast<float>(a_ChunkZ * cChunkDef::Width + z) / m_RiverCellSize;
+		float NoiseCoordZ = static_cast<float>(a_ChunkCoords.m_ChunkZ * cChunkDef::Width + z) / m_RiverCellSize;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			if (cChunkDef::GetBiome(a_BiomeMap, x, z) != biInvalidBiome)
@@ -563,7 +554,7 @@ void cBioGenMultiStepMap::AddRivers(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 				continue;
 			}
 
-			float NoiseCoordX = static_cast<float>(a_ChunkX * cChunkDef::Width + x) / m_RiverCellSize;
+			float NoiseCoordX = static_cast<float>(a_ChunkCoords.m_ChunkX * cChunkDef::Width + x) / m_RiverCellSize;
 
 			double Noise = m_Noise1.CubicNoise2D(    NoiseCoordX,     NoiseCoordZ);
 			Noise += 0.5 * m_Noise3.CubicNoise2D(2 * NoiseCoordX, 2 * NoiseCoordZ);
@@ -581,11 +572,11 @@ void cBioGenMultiStepMap::AddRivers(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 
 
 
-void cBioGenMultiStepMap::ApplyTemperatureHumidity(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenMultiStepMap::ApplyTemperatureHumidity(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
 	IntMap TemperatureMap;
 	IntMap HumidityMap;
-	BuildTemperatureHumidityMaps(a_ChunkX, a_ChunkZ, TemperatureMap, HumidityMap);
+	BuildTemperatureHumidityMaps(a_ChunkCoords, TemperatureMap, HumidityMap);
 
 	FreezeWaterBiomes(a_BiomeMap, TemperatureMap);
 	DecideLandBiomes(a_BiomeMap, TemperatureMap, HumidityMap);
@@ -612,17 +603,17 @@ void cBioGenMultiStepMap::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX
 
 
 
-void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_ChunkZ, IntMap & a_TemperatureMap, IntMap & a_HumidityMap)
+void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(cChunkCoords a_ChunkCoords, IntMap & a_TemperatureMap, IntMap & a_HumidityMap)
 {
 	// Linear interpolation over 8x8 blocks; use double for better precision:
 	DblMap TemperatureMap;
 	DblMap HumidityMap;
 	for (int z = 0; z < 17; z += 8)
 	{
-		float NoiseCoordZ = static_cast<float>(a_ChunkZ * cChunkDef::Width + z) / m_LandBiomesSize;
+		float NoiseCoordZ = static_cast<float>(a_ChunkCoords.m_ChunkZ * cChunkDef::Width + z) / m_LandBiomesSize;
 		for (int x = 0; x < 17; x += 8)
 		{
-			float NoiseCoordX = static_cast<float>(a_ChunkX * cChunkDef::Width + x) / m_LandBiomesSize;
+			float NoiseCoordX = static_cast<float>(a_ChunkCoords.m_ChunkX * cChunkDef::Width + x) / m_LandBiomesSize;
 
 			double NoiseT = m_Noise1.CubicNoise2D(    NoiseCoordX,     NoiseCoordZ);
 			NoiseT += 0.5 * m_Noise2.CubicNoise2D(2 * NoiseCoordX, 2 * NoiseCoordZ);
@@ -752,10 +743,10 @@ cBioGenTwoLevel::cBioGenTwoLevel(int a_Seed) :
 
 
 
-void cBioGenTwoLevel::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenTwoLevel::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	int BaseZ = cChunkDef::Width * a_ChunkZ;
-	int BaseX = cChunkDef::Width * a_ChunkX;
+	int BaseZ = cChunkDef::Width * a_ChunkCoords.m_ChunkZ;
+	int BaseX = cChunkDef::Width * a_ChunkCoords.m_ChunkX;
 
 	// Distortions for linear interpolation:
 	int DistortX[cChunkDef::Width + 1][cChunkDef::Width + 1];
@@ -1014,10 +1005,10 @@ public:
 		)))));
 	}
 
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_Biomes) override
+	virtual void GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_Biomes) override
 	{
 		cIntGen<16, 16>::Values vals;
-		m_Gen->GetInts(a_ChunkX * cChunkDef::Width, a_ChunkZ * cChunkDef::Width, vals);
+		m_Gen->GetInts(a_ChunkCoords.m_ChunkX * cChunkDef::Width, a_ChunkCoords.m_ChunkZ * cChunkDef::Width, vals);
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
 			for (int x = 0; x < cChunkDef::Width; x++)
@@ -1118,10 +1109,10 @@ public:
 		)))));
 	}
 
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_Biomes) override
+	virtual void GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_Biomes) override
 	{
 		int vals[16 * 16];
-		m_Gen->GetInts(a_ChunkX * cChunkDef::Width, a_ChunkZ * cChunkDef::Width, 16, 16, vals);
+		m_Gen->GetInts(a_ChunkCoords.m_ChunkX * cChunkDef::Width, a_ChunkCoords.m_ChunkZ * cChunkDef::Width, 16, 16, vals);
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
 			for (int x = 0; x < cChunkDef::Width; x++)
@@ -1144,11 +1135,11 @@ protected:
 
 cBiomeGenPtr cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault)
 {
-	AString BiomeGenName = a_IniFile.GetValueSet("Generator", "BiomeGen", "");
+	AString BiomeGenName = a_IniFile.GetValue("Generator", "BiomeGen");
 	if (BiomeGenName.empty())
 	{
-		LOGWARN("[Generator] BiomeGen value not set in world.ini, using \"MultiStepMap\".");
-		BiomeGenName = "MultiStepMap";
+		LOGWARN("[Generator] BiomeGen value not set in world.ini, using \"Grown\".");
+		BiomeGenName = "Grown";
 	}
 
 	cBiomeGen * res = nullptr;
@@ -1175,9 +1166,9 @@ cBiomeGenPtr cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & 
 	{
 		res = new cBioGenTwoLevel(a_Seed);
 	}
-	else if (NoCaseCompare(BiomeGenName, "grown") == 0)
+	else if (NoCaseCompare(BiomeGenName, "multistepmap") == 0)
 	{
-		res = new cBioGenGrown(a_Seed);
+		res = new cBioGenMultiStepMap(a_Seed);
 	}
 	else if (NoCaseCompare(BiomeGenName, "grownprot") == 0)
 	{
@@ -1185,24 +1176,11 @@ cBiomeGenPtr cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & 
 	}
 	else
 	{
-		if (NoCaseCompare(BiomeGenName, "multistepmap") != 0)
+		if (NoCaseCompare(BiomeGenName, "grown") != 0)
 		{
-			LOGWARNING("Unknown BiomeGen \"%s\", using \"MultiStepMap\" instead.", BiomeGenName.c_str());
+			LOGWARNING("Unknown BiomeGen \"%s\", using \"Grown\" instead.", BiomeGenName.c_str());
 		}
-		res = new cBioGenMultiStepMap(a_Seed);
-
-		/*
-		// Performance-testing:
-		LOGINFO("Measuring performance of cBioGenMultiStepMap...");
-		clock_t BeginTick = clock();
-		for (int x = 0; x < 5000; x++)
-		{
-			cChunkDef::BiomeMap Biomes;
-			res->GenBiomes(x * 5, x * 5, Biomes);
-		}
-		clock_t Duration = clock() - BeginTick;
-		LOGINFO("cBioGenMultiStepMap for 5000 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
-		//*/
+		res = new cBioGenGrown(a_Seed);
 	}
 	res->InitializeBiomeGen(a_IniFile);
 

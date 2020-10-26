@@ -12,6 +12,7 @@
 
 
 #include "FunctionRef.h"
+#include "ChunkDef.h"
 
 
 class cObjective;

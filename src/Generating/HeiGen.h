@@ -29,10 +29,10 @@ class cHeiGenCache :
 {
 public:
 	cHeiGenCache(cTerrainHeightGenPtr a_HeiGenToCache, size_t a_CacheSize);
-	virtual ~cHeiGenCache() override;
+	virtual ~cHeiGenCache() override = default;
 
 	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap) override;
 	virtual HEIGHTTYPE GetHeightAt(int a_BlockX, int a_BlockZ) override;
 
 	/** Retrieves height at the specified point in the cache, returns true if found, false if not found */
@@ -41,18 +41,22 @@ public:
 protected:
 	struct sCacheData
 	{
-		int m_ChunkX;
-		int m_ChunkZ;
+		cChunkCoords m_Coords;
 		cChunkDef::HeightMap m_HeightMap;
+
+		/** Default constructor: Fill in bogus coords, so that the item is not used until properly calculated. */
+		sCacheData():
+			m_Coords(0x7fffffff, 0x7fffffff)
+		{}
 	} ;
 
 	/** The terrain height generator that is being cached. */
 	cTerrainHeightGenPtr m_HeiGenToCache;
 
 	// To avoid moving large amounts of data for the MRU behavior, we MRU-ize indices to an array of the actual data
-	size_t       m_CacheSize;
-	size_t *     m_CacheOrder;  // MRU-ized order, indices into m_CacheData array
-	sCacheData * m_CacheData;   // m_CacheData[m_CacheOrder[0]] is the most recently used
+	size_t                  m_CacheSize;
+	std::vector<size_t>     m_CacheOrder;  // MRU-ized order, indices into m_CacheData array
+	std::vector<sCacheData> m_CacheData;   // m_CacheData[m_CacheOrder[0]] is the most recently used
 
 	// Cache statistics
 	size_t m_NumHits;
@@ -69,10 +73,10 @@ class cHeiGenMultiCache:
 	public cTerrainHeightGen
 {
 public:
-	cHeiGenMultiCache(cTerrainHeightGenPtr a_HeightGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
+	cHeiGenMultiCache(const cTerrainHeightGenPtr & a_HeightGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
 
 	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap) override;
 	virtual HEIGHTTYPE GetHeightAt(int a_BlockX, int a_BlockZ) override;
 
 	/** Retrieves height at the specified point in the cache, returns true if found, false if not found */
@@ -108,7 +112,7 @@ protected:
 	HEIGHTTYPE m_Height;
 
 	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap) override;
 	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
 } ;
 
@@ -133,7 +137,7 @@ protected:
 	float GetNoise(float x, float y);
 
 	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap) override;
 	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
 } ;
 
@@ -155,7 +159,7 @@ protected:
 	cPerlinNoise m_Perlin;
 
 	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap) override;
 	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
 } ;
 
@@ -163,20 +167,21 @@ protected:
 
 
 
-class cHeiGenBiomal :
+class cHeiGenBiomal:
 	public cTerrainHeightGen
 {
-	typedef cTerrainHeightGen Super;
+	using Super = cTerrainHeightGen;
 
 public:
-	cHeiGenBiomal(int a_Seed, cBiomeGenPtr a_BiomeGen) :
+
+	cHeiGenBiomal(int a_Seed, cBiomeGenPtr a_BiomeGen):
 		m_Noise(a_Seed),
-		m_BiomeGen(a_BiomeGen)
+		m_BiomeGen(std::move(a_BiomeGen))
 	{
 	}
 
 	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap) override;
 	virtual HEIGHTTYPE GetHeightAt(int a_BlockX, int a_BlockZ) override  // Need to provide this override due to clang's overzealous detection of overloaded virtuals
 	{
 		return Super::GetHeightAt(a_BlockX, a_BlockZ);

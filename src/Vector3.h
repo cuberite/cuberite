@@ -17,8 +17,8 @@ public:
 	T x, y, z;
 
 
-	inline Vector3(void) : x(0), y(0), z(0) {}
-	inline Vector3(T a_x, T a_y, T a_z) : x(a_x), y(a_y), z(a_z) {}
+	constexpr Vector3(void) : x(0), y(0), z(0) {}
+	constexpr Vector3(T a_x, T a_y, T a_z) : x(a_x), y(a_y), z(a_z) {}
 
 
 	#ifdef TOLUA_EXPOSITION  // Hardcoded copy constructors (tolua++ does not support function templates .. yet)
@@ -31,7 +31,12 @@ public:
 	// tolua_end
 	// Conversion constructors where U is not the same as T leaving the copy-constructor implicitly generated
 	template <typename U, typename = typename std::enable_if<!std::is_same<U, T>::value>::type>
-	Vector3(const Vector3<U> & a_Rhs): x(static_cast<T>(a_Rhs.x)), y(static_cast<T>(a_Rhs.y)), z(static_cast<T>(a_Rhs.z)) {}
+	constexpr Vector3(const Vector3<U> & a_Rhs):
+			x(static_cast<T>(a_Rhs.x)),
+			y(static_cast<T>(a_Rhs.y)),
+			z(static_cast<T>(a_Rhs.z))
+	{
+	}
 	// tolua_begin
 
 	inline void Set(T a_x, T a_y, T a_z)
@@ -178,6 +183,16 @@ public:
 		);
 	}
 
+	/** Returns a new Vector3i with coords set to std::ceil() of this vector's coords. */
+	inline Vector3<int> Ceil() const
+	{
+		return Vector3<int>(
+			CeilC(x),
+			CeilC(y),
+			CeilC(z)
+		);
+	}
+
 	// tolua_end
 
 	inline bool operator != (const Vector3<T> & a_Rhs) const
@@ -289,6 +304,30 @@ public:
 		);
 	}
 
+	/** Returns a copy of this vector moved by the specified amount on the X axis. */
+	inline Vector3<T> addedX(T a_AddX) const
+	{
+		return Vector3<T>(x + a_AddX, y, z);
+	}
+
+	/** Returns a copy of this vector moved by the specified amount on the y axis. */
+	inline Vector3<T> addedY(T a_AddY) const
+	{
+		return Vector3<T>(x, y + a_AddY, z);
+	}
+
+	/** Returns a copy of this vector moved by the specified amount on the Z axis. */
+	inline Vector3<T> addedZ(T a_AddZ) const
+	{
+		return Vector3<T>(x, y, z + a_AddZ);
+	}
+
+	/** Returns a copy of this vector moved by the specified amount on the X and Z axes. */
+	inline Vector3<T> addedXZ(T a_AddX, T a_AddZ) const
+	{
+		return Vector3<T>(x + a_AddX, y, z + a_AddZ);
+	}
+
 	/** Returns the coefficient for the (a_OtherEnd - this) line to reach the specified Z coord.
 	The result satisfies the following equation:
 	(*this + Result * (a_OtherEnd - *this)).z = a_Z
@@ -362,6 +401,47 @@ public:
 
 
 
+/** Allows formatting a Vector<T> using the same format specifiers as for T
+e.g. `fmt::format("{0:0.2f}", Vector3f{0.0231f, 1.2146f, 1.0f}) == "{0.02, 1.21, 1.00}"` */
+template <typename What>
+class fmt::formatter<Vector3<What>> : public fmt::formatter<What>
+{
+	using Super = fmt::formatter<What>;
+
+	template <typename FormatContext, size_t Len>
+	void Write(FormatContext & a_Ctx, const char (& a_Str)[Len])
+	{
+		const auto Itr = std::copy_n(&a_Str[0], Len - 1, a_Ctx.out());
+		a_Ctx.advance_to(Itr);
+	}
+
+	template <typename FormatContext>
+	void Write(FormatContext & a_Ctx, const What & a_Arg)
+	{
+		const auto Itr = Super::format(a_Arg, a_Ctx);
+		a_Ctx.advance_to(Itr);
+	}
+
+public:
+
+	template <typename FormatContext>
+	auto format(const Vector3<What> & a_Vec, FormatContext & a_Ctx)
+	{
+		Write(a_Ctx, "{");
+		Write(a_Ctx, a_Vec.x);
+		Write(a_Ctx, ", ");
+		Write(a_Ctx, a_Vec.y);
+		Write(a_Ctx, ", ");
+		Write(a_Ctx, a_Vec.z);
+		Write(a_Ctx, "}");
+		return a_Ctx.out();
+	}
+};
+
+
+
+
+
 template <> inline Vector3<int> Vector3<int>::Floor(void) const
 {
 	return *this;
@@ -412,9 +492,3 @@ typedef Vector3<int>    Vector3i;
 
 
 typedef std::vector<Vector3i> cVector3iArray;
-
-
-
-
-
-

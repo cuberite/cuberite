@@ -1,11 +1,5 @@
 project (AnvilStats)
 
-include(../../SetFlags.cmake)
-
-set_flags()
-set_lib_flags()
-
-
 # Set include paths to the used libraries:
 include_directories("../../lib")
 include_directories("../../src")
@@ -22,8 +16,6 @@ function(flatten_files arg1)
 endfunction()
 
 add_subdirectory(../../lib/zlib ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/lib/zlib)
-
-set_exe_flags()
 
 # Include the shared files:
 set(SHARED_SRC
@@ -113,8 +105,10 @@ add_executable(AnvilStats
 	${SHARED_OSS_HDR}
 )
 
-
 target_link_libraries(AnvilStats zlib)
+
+include(../../SetFlags.cmake)
+set_exe_flags(AnvilStats)
 
 
 
@@ -134,6 +128,3 @@ if (MSVC)
 	SET(TEMP "${TEMP}/STACK:16777216")
 	set_target_properties(AnvilStats PROPERTIES LINK_FLAGS ${TEMP})
 endif ()
-
-
-

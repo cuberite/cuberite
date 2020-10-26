@@ -15,12 +15,13 @@
 
 
 
-class cChestWindow :
+class cChestWindow:
 	public cWindow
 {
-	typedef cWindow super;
+	using Super = cWindow;
 
 public:
+
 	cChestWindow(cChestEntity * a_Chest);
 
 	cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_SecondaryChest);

@@ -33,7 +33,7 @@ protected:
 	EMCSBiome m_Biome;
 
 	// cBiomeGen overrides:
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 } ;
 
@@ -42,14 +42,16 @@ protected:
 
 
 /** A simple cache that stores N most recently generated chunks' biomes; N being settable upon creation */
-class cBioGenCache :
+class cBioGenCache:
 	public cBiomeGen
 {
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 public:
+
 	cBioGenCache(cBiomeGenPtr a_BioGenToCache, size_t a_CacheSize);
-	virtual ~cBioGenCache() override;
+	virtual ~cBioGenCache() override = default;
+
 
 protected:
 
@@ -57,22 +59,27 @@ protected:
 
 	struct sCacheData
 	{
-		int m_ChunkX;
-		int m_ChunkZ;
+		cChunkCoords m_Coords;
 		cChunkDef::BiomeMap m_BiomeMap;
+
+		/** Default constructor: Fill in bogus coords so that the item is not used in the cache until properly calculated. */
+		sCacheData():
+			m_Coords(0x7fffffff, 0x7fffffff)
+		{
+		}
 	} ;
 
 	// To avoid moving large amounts of data for the MRU behavior, we MRU-ize indices to an array of the actual data
-	size_t          m_CacheSize;
-	size_t *        m_CacheOrder;  // MRU-ized order, indices into m_CacheData array
-	sCacheData * m_CacheData;   // m_CacheData[m_CacheOrder[0]] is the most recently used
+	size_t                  m_CacheSize;
+	std::vector<size_t>     m_CacheOrder;  // MRU-ized order, indices into m_CacheData array
+	std::vector<sCacheData> m_CacheData;   // m_CacheData[m_CacheOrder[0]] is the most recently used
 
 	// Cache statistics
 	size_t m_NumHits;
 	size_t m_NumMisses;
 	size_t m_TotalChain;  // Number of cache items walked to get to a hit (only added for hits)
 
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 } ;
 
@@ -80,18 +87,17 @@ protected:
 
 
 
-class cBioGenMulticache :
+class cBioGenMulticache:
 	public cBiomeGen
 {
-
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 public:
 	/* Creates a new multicache - a cache that divides the caching into several sub-caches based on the chunk coords.
 	This allows us to use shorter cache depths with faster lookups for more covered area. (#381)
 	a_SubCacheSize defines the size of each sub-cache
 	a_NumSubCaches defines how many sub-caches are used for the multicache. */
-	cBioGenMulticache(cBiomeGenPtr a_BioGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
+	cBioGenMulticache(const cBiomeGenPtr & a_BioGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
 
 protected:
 	typedef std::vector<cBiomeGenPtr> cBiomeGenPtrs;
@@ -104,7 +110,7 @@ protected:
 	cBiomeGenPtrs m_Caches;
 
 
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 };
 
@@ -113,12 +119,13 @@ protected:
 
 
 /** Base class for generators that use a list of available biomes. This class takes care of the list. */
-class cBiomeGenList :
+class cBiomeGenList:
 	public cBiomeGen
 {
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 protected:
+
 	// List of biomes that the generator is allowed to generate:
 	typedef std::vector<EMCSBiome> EMCSBiomes;
 	EMCSBiomes m_Biomes;
@@ -132,16 +139,17 @@ protected:
 
 
 
-class cBioGenCheckerboard :
+class cBioGenCheckerboard:
 	public cBiomeGenList
 {
-	typedef cBiomeGenList super;
+	using Super = cBiomeGenList;
 
 protected:
+
 	int m_BiomeSize;
 
 	// cBiomeGen overrides:
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 } ;
 
@@ -149,22 +157,24 @@ protected:
 
 
 
-class cBioGenVoronoi :
+class cBioGenVoronoi:
 	public cBiomeGenList
 {
-	typedef cBiomeGenList super;
+	using Super = cBiomeGenList;
 
 public:
+
 	cBioGenVoronoi(int a_Seed) :
 		m_Voronoi(a_Seed)
 	{
 	}
 
 protected:
+
 	cVoronoiMap m_Voronoi;
 
 	// cBiomeGen overrides:
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 
 	EMCSBiome VoronoiBiome(int a_BlockX, int a_BlockZ);
@@ -174,13 +184,14 @@ protected:
 
 
 
-class cBioGenDistortedVoronoi :
+class cBioGenDistortedVoronoi:
 	public cBiomeGenList
 {
-	typedef cBiomeGenList super;
+	using Super = cBiomeGenList;
 
 public:
-	cBioGenDistortedVoronoi(int a_Seed) :
+
+	cBioGenDistortedVoronoi(int a_Seed):
 		m_Noise(a_Seed),
 		m_Voronoi(a_Seed),
 		m_CellSize(0)
@@ -198,7 +209,7 @@ protected:
 	int m_CellSize;
 
 	// cBiomeGen overrides:
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 
 	/** Distorts the coords using a Perlin-like noise */
@@ -209,12 +220,13 @@ protected:
 
 
 
-class cBioGenMultiStepMap :
+class cBioGenMultiStepMap:
 	public cBiomeGen
 {
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 public:
+
 	cBioGenMultiStepMap(int a_Seed);
 
 protected:
@@ -237,26 +249,26 @@ protected:
 	typedef double DblMap[17 * 17];  // x + 17 * z, expected trimmed into [0..1] range
 
 	// cBiomeGen overrides:
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 
 	/** Step 1: Decides between ocean, land and mushroom, using a DistVoronoi with special conditions and post-processing for mushroom islands
 	Sets biomes to biOcean, -1 (i.e. land), biMushroomIsland or biMushroomShore. */
-	void DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap);
+	void DecideOceanLandMushroom(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap);
 
 	/** Step 2: Add rivers to the land
 	Flips some "-1" biomes into biRiver. */
-	void AddRivers(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap);
+	void AddRivers(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap);
 
 	/** Step 3: Decide land biomes using a temperature / humidity map; freeze ocean / river in low temperatures.
 	Flips all remaining "-1" biomes into land biomes. Also flips some biOcean and biRiver into biFrozenOcean, biFrozenRiver, based on temp map. */
-	void ApplyTemperatureHumidity(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap);
+	void ApplyTemperatureHumidity(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap);
 
 	/** Distorts the coords using a Perlin-like noise, with a specified cell-size */
 	void Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ, int a_CellSize);
 
 	/** Builds two Perlin-noise maps, one for temperature, the other for humidity. Trims both into [0..255] range */
-	void BuildTemperatureHumidityMaps(int a_ChunkX, int a_ChunkZ, IntMap & a_TemperatureMap, IntMap & a_HumidityMap);
+	void BuildTemperatureHumidityMaps(cChunkCoords a_ChunkCoords, IntMap & a_TemperatureMap, IntMap & a_HumidityMap);
 
 	/** Flips all remaining "-1" biomes into land biomes using the two maps */
 	void DecideLandBiomes(cChunkDef::BiomeMap & a_BiomeMap, const IntMap & a_TemperatureMap, const IntMap & a_HumidityMap);
@@ -269,12 +281,13 @@ protected:
 
 
 
-class cBioGenTwoLevel :
+class cBioGenTwoLevel:
 	public cBiomeGen
 {
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 public:
+
 	cBioGenTwoLevel(int a_Seed);
 
 protected:
@@ -302,7 +315,7 @@ protected:
 
 
 	// cBiomeGen overrides:
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 
 	/** Selects biome from the specified biome group, based on the specified index.

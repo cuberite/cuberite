@@ -2,8 +2,8 @@
 
 #include "ChatColor.h"
 
-const char * cChatColor::Color         = "\xc2\xa7";  // or in other words: "§" in UTF-8
-const char * cChatColor::Delimiter     = "\xc2\xa7";  // or in other words: "§" in UTF-8
+const char * cChatColor::Color         = "\xc2\xa7";  // The paragraph / section symbol in UTF-8
+const char * cChatColor::Delimiter     = "\xc2\xa7";  // The paragraph / section symbol in UTF-8
 const char * cChatColor::Black         = "\xc2\xa7""0";
 const char * cChatColor::Navy          = "\xc2\xa7""1";
 const char * cChatColor::Green         = "\xc2\xa7""2";

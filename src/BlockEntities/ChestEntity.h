@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockEntityWithItems.h"
+#include "../Simulator/RedstoneSimulator.h"
 
 
 
@@ -17,9 +18,14 @@ class cClientHandle;
 class cChestEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems Super;
+	// tolua_end
+
+	using Super = cBlockEntityWithItems;
+
+	// tolua_begin
 
 public:
+
 	enum
 	{
 		ContentsHeight = 3,
@@ -28,10 +34,8 @@ public:
 
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cChestEntity)
-
 	/** Constructor used for normal operation */
-	cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	virtual ~cChestEntity() override;
 
@@ -67,33 +71,5 @@ private:
 	cChestEntity * m_Neighbour;
 
 	/** cItemGrid::cListener overrides: */
-	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override
-	{
-		UNUSED(a_SlotNum);
-		ASSERT(a_Grid == &m_Contents);
-		if (m_World != nullptr)
-		{
-			cWindow * Window = GetWindow();
-			if (
-				(Window == nullptr) &&
-				(m_Neighbour != nullptr)
-			)
-			{
-				// Neighbour might own the window
-				Window = m_Neighbour->GetWindow();
-			}
-
-			if (Window != nullptr)
-			{
-				Window->BroadcastWholeWindow();
-			}
-
-			m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
-		}
-	}
-
+	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override;
 } ;  // tolua_export
-
-
-
-

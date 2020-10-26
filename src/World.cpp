@@ -2,15 +2,19 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "World.h"
+#include "BlockInfo.h"
 #include "ClientHandle.h"
+#include "Physics/Explodinator.h"
 #include "Server.h"
 #include "Root.h"
 #include "IniFile.h"
 #include "Generating/ChunkDesc.h"
+#include "Generating/ComposableGenerator.h"
 #include "SetChunkData.h"
 #include "DeadlockDetect.h"
 #include "LineBlockTracer.h"
 #include "UUID.h"
+#include "BlockInServerPluginInterface.h"
 
 // Serializers
 #include "WorldStorage/ScoreboardSerializer.h"
@@ -87,7 +91,7 @@ namespace World
 // cWorld::cLock:
 
 cWorld::cLock::cLock(cWorld & a_World) :
-	super(&(a_World.m_ChunkMap->GetCS()))
+	Super(&(a_World.m_ChunkMap->GetCS()))
 {
 }
 
@@ -99,7 +103,7 @@ cWorld::cLock::cLock(cWorld & a_World) :
 // cWorld::cTickThread:
 
 cWorld::cTickThread::cTickThread(cWorld & a_World) :
-	super(Printf("WorldTickThread: %s", a_World.GetName().c_str())),
+	Super(Printf("WorldTickThread: %s", a_World.GetName().c_str())),
 	m_World(a_World)
 {
 }
@@ -191,6 +195,7 @@ cWorld::cWorld(
 	m_MinThunderStormTicks(3600),   // 3 real-world minutes   -+
 	m_MaxCactusHeight(3),
 	m_MaxSugarcaneHeight(4),
+	/* TODO: Enable when functionality exists again
 	m_IsBeetrootsBonemealable(true),
 	m_IsCactusBonemealable(false),
 	m_IsCarrotsBonemealable(true),
@@ -205,6 +210,7 @@ cWorld::cWorld(
 	m_IsSugarcaneBonemealable(false),
 	m_IsBigFlowerBonemealable(true),
 	m_IsTallGrassBonemealable(true),
+	*/
 	m_bCommandBlocksEnabled(true),
 	m_bUseChatPrefixes(false),
 	m_TNTShrapnelLevel(slNone),
@@ -218,7 +224,11 @@ cWorld::cWorld(
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
-	cFile::CreateFolderRecursive(FILE_IO_PREFIX + m_DataPath);
+	cFile::CreateFolderRecursive(m_DataPath);
+
+	// TODO: unique ptr unnecessary
+	m_ChunkMap = std::make_unique<cChunkMap>(this);
+	m_ChunkMap->TrackInDeadlockDetect(a_DeadlockDetect, m_WorldName);
 
 	// Load the scoreboard
 	cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
@@ -226,7 +236,6 @@ cWorld::cWorld(
 
 	// Track the CSs used by this world in the deadlock detector:
 	a_DeadlockDetect.TrackCriticalSection(m_CSClients, Printf("World %s clients", m_WorldName.c_str()));
-	a_DeadlockDetect.TrackCriticalSection(m_CSPlayers, Printf("World %s players", m_WorldName.c_str()));
 	a_DeadlockDetect.TrackCriticalSection(m_CSTasks,   Printf("World %s tasks",   m_WorldName.c_str()));
 
 	// Load world settings from the ini file
@@ -280,6 +289,7 @@ cWorld::cWorld(
 	m_StorageCompressionFactor    = IniFile.GetValueSetI("Storage",       "CompressionFactor",           m_StorageCompressionFactor);
 	m_MaxCactusHeight             = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",             3);
 	m_MaxSugarcaneHeight          = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",          3);
+	/* TODO: Enable when functionality exists again
 	m_IsBeetrootsBonemealable     = IniFile.GetValueSetB("Plants",        "IsBeetrootsBonemealable",     true);
 	m_IsCactusBonemealable        = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",        false);
 	m_IsCarrotsBonemealable       = IniFile.GetValueSetB("Plants",        "IsCarrotsBonemealable",       true);
@@ -294,6 +304,7 @@ cWorld::cWorld(
 	m_IsSugarcaneBonemealable     = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",     false);
 	m_IsBigFlowerBonemealable     = IniFile.GetValueSetB("Plants",        "IsBigFlowerBonemealable",     true);
 	m_IsTallGrassBonemealable     = IniFile.GetValueSetB("Plants",        "IsTallGrassBonemealable",     true);
+	*/
 	m_IsDeepSnowEnabled           = IniFile.GetValueSetB("Physics",       "DeepSnow",                    true);
 	m_ShouldLavaSpawnFire         = IniFile.GetValueSetB("Physics",       "ShouldLavaSpawnFire",         true);
 	int TNTShrapnelLevel          = IniFile.GetValueSetI("Physics",       "TNTShrapnelLevel",            static_cast<int>(slAll));
@@ -400,23 +411,21 @@ cWorld::cWorld(
 	m_TNTShrapnelLevel = static_cast<eShrapnelLevel>(Clamp<int>(TNTShrapnelLevel, slNone,     slAll));
 	m_Weather          = static_cast<eWeather>      (Clamp<int>(Weather,          wSunny,     wStorm));
 
-	InitialiseGeneratorDefaults(IniFile);
-	InitialiseAndLoadMobSpawningValues(IniFile);
-	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", GetTimeOfDay()));
+	cComposableGenerator::InitializeGeneratorDefaults(IniFile, m_Dimension);
 
-	m_ChunkMap = cpp14::make_unique<cChunkMap>(this);
-	m_ChunkMap->TrackInDeadlockDetect(a_DeadlockDetect, m_WorldName);
+	InitializeAndLoadMobSpawningValues(IniFile);
+	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", GetTimeOfDay()));
 
 	// preallocate some memory for ticking blocks so we don't need to allocate that often
 	m_BlockTickQueue.reserve(1000);
 	m_BlockTickQueueCopy.reserve(1000);
 
 	// Simulators:
-	m_SimulatorManager  = cpp14::make_unique<cSimulatorManager>(*this);
+	m_SimulatorManager  = std::make_unique<cSimulatorManager>(*this);
 	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
 	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
-	m_SandSimulator     = cpp14::make_unique<cSandSimulator>(*this, IniFile);
-	m_FireSimulator     = cpp14::make_unique<cFireSimulator>(*this, IniFile);
+	m_SandSimulator     = std::make_unique<cSandSimulator>(*this, IniFile);
+	m_FireSimulator     = std::make_unique<cFireSimulator>(*this, IniFile);
 	m_RedstoneSimulator = InitializeRedstoneSimulator(IniFile);
 
 	// Water, Lava and Redstone simulators get registered in their initialize function.
@@ -450,21 +459,6 @@ cWorld::~cWorld()
 	delete m_WaterSimulator;     m_WaterSimulator    = nullptr;
 	delete m_LavaSimulator;      m_LavaSimulator     = nullptr;
 	delete m_RedstoneSimulator;  m_RedstoneSimulator = nullptr;
-
-	m_Storage.WaitForFinish();
-
-	if (IsSavingEnabled())
-	{
-		// Unload the scoreboard
-		cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
-		Serializer.Save();
-
-		m_MapManager.SaveMapData();
-	}
-
-	// Explicitly destroy the chunkmap, so that it's guaranteed to be destroyed before the other internals
-	// This fixes crashes on stopping the server, because chunk destructor deletes entities and those access the world.
-	m_ChunkMap.reset();
 }
 
 
@@ -583,9 +577,9 @@ bool cWorld::IsWeatherWetAtXYZ(Vector3i a_Pos)
 
 
 
-void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cWorld::SetNextBlockToTick(const Vector3i a_BlockPos)
 {
-	return m_ChunkMap->SetNextBlockTick(a_BlockX, a_BlockY, a_BlockZ);
+	return m_ChunkMap->SetNextBlockToTick(a_BlockPos);
 }
 
 
@@ -605,7 +599,7 @@ bool cWorld::SetSpawn(double a_X, double a_Y, double a_Z)
 			m_SpawnX = a_X;
 			m_SpawnY = a_Y;
 			m_SpawnZ = a_Z;
-			LOGD("Spawn set at {%f, %f, %f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+			FLOGD("Spawn set at {0}", Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
 			return true;
 		}
 		else
@@ -695,7 +689,7 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 	{
 		SetSpawn(BiomeOffset.x + 0.5, SpawnY, BiomeOffset.z + 0.5);
 
-		LOGINFO("World \"%s\": Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_WorldName, m_SpawnX, m_SpawnY, m_SpawnZ);
+		FLOGINFO("World \"{0}\": Generated spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
 		return;
 	}
 
@@ -729,14 +723,14 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 				cChunkDef::BlockToChunk(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ), ChunkX, ChunkZ);
 				cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, a_MaxSpawnRadius);
 
-				LOGINFO("World \"%s\":Generated spawnpoint position at {%.2f, %.2f, %.2f}", m_WorldName, m_SpawnX, m_SpawnY, m_SpawnZ);
+				FLOGINFO("World \"{0}\":Generated spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
 				return;
 			}
 		}
 	}
 
 	m_SpawnY = GetHeight(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ));
-	LOGWARNING("World \"%s\": Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {%.2f, %.2f, %.2f}", m_WorldName, m_SpawnX, m_SpawnY, m_SpawnZ);
+	FLOGWARNING("World \"{0}\": Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
 }
 
 
@@ -881,60 +875,13 @@ eWeather cWorld::ChooseNewWeather()
 
 
 
-void cWorld::InitialiseGeneratorDefaults(cIniFile & a_IniFile)
-{
-	switch (GetDimension())
-	{
-		case dimEnd:
-		{
-			a_IniFile.GetValueSet("Generator", "Generator",      "Composable");
-			a_IniFile.GetValueSet("Generator", "BiomeGen",       "Constant");
-			a_IniFile.GetValueSet("Generator", "ConstantBiome",  "End");
-			a_IniFile.GetValueSet("Generator", "ShapeGen",       "End");
-			a_IniFile.GetValueSet("Generator", "CompositionGen", "End");
-			break;
-		}
-		case dimOverworld:
-		{
-			a_IniFile.GetValueSet("Generator", "Generator",      "Composable");
-			a_IniFile.GetValueSet("Generator", "BiomeGen",       "Grown");
-			a_IniFile.GetValueSet("Generator", "ShapeGen",       "BiomalNoise3D");
-			a_IniFile.GetValueSet("Generator", "CompositionGen", "Biomal");
-			a_IniFile.GetValueSet("Generator", "Finishers",      "RoughRavines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, Villages, TallGrass, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, NaturalPatches, PreSimulator, Animals");
-			break;
-		}
-		case dimNether:
-		{
-			a_IniFile.GetValueSet("Generator", "Generator",        "Composable");
-			a_IniFile.GetValueSet("Generator", "BiomeGen",         "Constant");
-			a_IniFile.GetValueSet("Generator", "ConstantBiome",    "Nether");
-			a_IniFile.GetValueSet("Generator", "ShapeGen",         "HeightMap");
-			a_IniFile.GetValueSet("Generator", "HeightGen",        "Flat");
-			a_IniFile.GetValueSet("Generator", "FlatHeight",       "128");
-			a_IniFile.GetValueSet("Generator", "CompositionGen",   "Nether");
-			a_IniFile.GetValueSet("Generator", "Finishers",        "SoulsandRims, WormNestCaves, BottomLava, LavaSprings, NetherClumpFoliage, NetherOreNests, PieceStructures: NetherFort, GlowStone, PreSimulator");
-			a_IniFile.GetValueSet("Generator", "BottomLavaHeight", "30");
-			break;
-		}
-		case dimNotSet:
-		{
-			ASSERT(!"Dimension not set");
-			break;
-		}
-	}
-}
-
-
-
-
-
-void cWorld::InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile)
+void cWorld::InitializeAndLoadMobSpawningValues(cIniFile & a_IniFile)
 {
 	AString DefaultMonsters;
 	switch (m_Dimension)
 	{
 		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, guardian, horse, mooshroom, ocelot, pig, rabbit, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;  // TODO Re-add Enderman when bugs are fixed
-		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombie, zombiepigman"; break;
+		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, witherskeleton, zombiepigman"; break;
 		case dimEnd:       DefaultMonsters = ""; break;  // TODO Re-add Enderman when bugs are fixed
 		case dimNotSet:    ASSERT(!"Dimension not set"); break;
 	}
@@ -1004,12 +951,20 @@ void cWorld::Stop(cDeadlockDetect & a_DeadlockDetect)
 	m_Lighting.Stop();
 	m_Generator.Stop();
 	m_ChunkSender.Stop();
-	m_Storage.Stop();
+	m_Storage.Stop();  // Waits for thread to finish
 
 	a_DeadlockDetect.UntrackCriticalSection(m_CSClients);
-	a_DeadlockDetect.UntrackCriticalSection(m_CSPlayers);
 	a_DeadlockDetect.UntrackCriticalSection(m_CSTasks);
 	m_ChunkMap->UntrackInDeadlockDetect(a_DeadlockDetect);
+
+	if (IsSavingEnabled())
+	{
+		// Unload the scoreboard
+		cScoreboardSerializer Serializer(m_DataPath, &m_Scoreboard);
+		Serializer.Save();
+
+		m_MapManager.SaveMapData();
+	}
 }
 
 
@@ -1065,23 +1020,18 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	}
 	for (auto & Entity : EntitiesToAdd)
 	{
-		Entity->SetWorld(this);
-		auto EntityPtr = Entity.get();
 		m_ChunkMap->AddEntity(std::move(Entity));
-		ASSERT(!EntityPtr->IsTicking());
-		EntityPtr->SetIsTicking(true);
 	}
 	EntitiesToAdd.clear();
 
 	// Add players waiting in the queue to be added:
 	AddQueuedPlayers();
 
-	m_ChunkMap->Tick(a_Dt);
-	TickMobs(a_Dt);
-	m_MapManager.TickMaps();
-
 	TickClients(static_cast<float>(a_Dt.count()));
 	TickQueuedBlocks();
+	m_ChunkMap->Tick(a_Dt);  // Tick chunk after clients to apply at least one round of queued ticks (e.g. cBlockHandler::Check) this tick
+	TickMobs(a_Dt);
+	m_MapManager.TickMaps();
 	TickQueuedTasks();
 
 	GetSimulatorManager()->Simulate(static_cast<float>(a_Dt.count()));
@@ -1211,14 +1161,14 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 			{
 				if (Monster.GetMobType() != eMonsterType::mtWolf)
 				{
-					Monster.Destroy(true);
+					Monster.Destroy();
 				}
 				else
 				{
 					auto & Wolf = static_cast<cWolf &>(Monster);
 					if (!Wolf.IsAngry() && !Wolf.IsTame())
 					{
-						Monster.Destroy(true);
+						Monster.Destroy();
 					}
 				}
 			}
@@ -1245,11 +1195,8 @@ void cWorld::TickQueuedTasks(void)
 		// Partition everything to be executed by returning false to move to end of list if time reached
 		auto MoveBeginIterator = std::partition(m_Tasks.begin(), m_Tasks.end(), [this](const decltype(m_Tasks)::value_type & a_Task)
 			{
-				if (a_Task.first < std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count())
-				{
-					return false;
-				}
-				return true;
+				const auto WorldAgeTicks = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count();
+				return (a_Task.first >= WorldAgeTicks);
 			}
 		);
 
@@ -1370,7 +1317,7 @@ void cWorld::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinB
 
 void cWorld::WakeUpSimulatorsInArea(const cCuboid & a_Area)
 {
-	m_SimulatorManager->WakeUpArea(a_Area);
+	m_SimulatorManager->WakeUp(a_Area);
 }
 
 
@@ -1442,31 +1389,33 @@ bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback 
 
 void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData)
 {
-	if (cPluginManager::Get()->CallHookExploding(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData) || (a_ExplosionSize <= 0))
+	cLock Lock(*this);
+	if (!cPluginManager::Get()->CallHookExploding(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData) && (a_ExplosionSize > 0))
 	{
-		return;
-	}
+		// TODO: CanCauseFire gets reset to false for some reason, (plugin has ability to change it, might be related)
 
-	// TODO: Implement block hardiness
-	cVector3iArray BlocksAffected;
-	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
-	BroadcastSoundEffect("entity.generic.explode", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 1.0f, 0.6f);
-
-	{
-		cCSLock Lock(m_CSPlayers);
-		for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+		const cEntity * Entity;
+		switch (a_Source)
 		{
-			cClientHandle * ch = (*itr)->GetClientHandle();
-			if (ch == nullptr)
+			case eExplosionSource::esEnderCrystal:
+			case eExplosionSource::esGhastFireball:
+			case eExplosionSource::esMonster:
+			case eExplosionSource::esPrimedTNT:
+			case eExplosionSource::esWitherBirth:
+			case eExplosionSource::esWitherSkull:
 			{
-				continue;
+				Entity = static_cast<const cEntity *>(a_SourceData);
+				break;
 			}
-
-			ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, static_cast<float>(a_ExplosionSize), BlocksAffected, (*itr)->GetSpeed());
+			default:
+			{
+				Entity = nullptr;
+			}
 		}
-	}
 
-	cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
+		Explodinator::Kaboom(*this, Vector3d(a_BlockX, a_BlockY, a_BlockZ), FloorC<unsigned>(a_ExplosionSize), a_CanCauseFire, Entity);
+		cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
+	}
 }
 
 
@@ -1554,6 +1503,15 @@ bool cWorld::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceC
 
 
 
+bool cWorld::DoWithHopperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperCallback a_Callback)
+{
+	return m_ChunkMap->DoWithHopperAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
 bool cWorld::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback)
 {
 	return m_ChunkMap->DoWithNoteBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
@@ -1617,17 +1575,17 @@ bool cWorld::DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callback)
 
 
 
-void cWorld::GrowTree(int a_X, int a_Y, int a_Z)
+bool cWorld::GrowTree(const Vector3i a_BlockPos)
 {
-	if (GetBlock(a_X, a_Y, a_Z) == E_BLOCK_SAPLING)
+	if (GetBlock(a_BlockPos) == E_BLOCK_SAPLING)
 	{
 		// There is a sapling here, grow a tree according to its type:
-		GrowTreeFromSapling(a_X, a_Y, a_Z, GetBlockMeta(a_X, a_Y, a_Z));
+		return GrowTreeFromSapling(a_BlockPos);
 	}
 	else
 	{
 		// There is nothing here, grow a tree based on the current biome here:
-		GrowTreeByBiome(a_X, a_Y, a_Z);
+		return GrowTreeByBiome(a_BlockPos);
 	}
 }
 
@@ -1635,58 +1593,151 @@ void cWorld::GrowTree(int a_X, int a_Y, int a_Z)
 
 
 
-void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_SaplingMeta)
+bool cWorld::GrowTreeFromSapling(Vector3i a_BlockPos)
 {
 	cNoise Noise(m_Generator.GetSeed());
 	sSetBlockVector Logs, Other;
 	auto WorldAge = static_cast<int>(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count() & 0xffffffff);
-	switch (a_SaplingMeta & 0x07)
+	auto SaplingMeta = GetBlockMeta(a_BlockPos);
+	switch (SaplingMeta & 0x07)
 	{
-		case E_META_SAPLING_APPLE:    GetAppleTreeImage  (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
-		case E_META_SAPLING_BIRCH:    GetBirchTreeImage  (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
-		case E_META_SAPLING_CONIFER:  GetConiferTreeImage(a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
-		case E_META_SAPLING_ACACIA:   GetAcaciaTreeImage (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_APPLE:    GetAppleTreeImage  (a_BlockPos, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_BIRCH:    GetBirchTreeImage  (a_BlockPos, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_CONIFER:
+		{
+			bool IsLarge = GetLargeTreeAdjustment(a_BlockPos, SaplingMeta);
+			GetConiferTreeImage(a_BlockPos, Noise, WorldAge, Logs, Other, IsLarge);
+			break;
+		}
+		case E_META_SAPLING_ACACIA:   GetAcaciaTreeImage (a_BlockPos, Noise, WorldAge, Logs, Other); break;
 		case E_META_SAPLING_JUNGLE:
 		{
-			bool IsLarge = GetLargeTreeAdjustment(*this, a_X, a_Y, a_Z, a_SaplingMeta);
-			GetJungleTreeImage (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other, IsLarge);
+			bool IsLarge = GetLargeTreeAdjustment(a_BlockPos, SaplingMeta);
+			GetJungleTreeImage(a_BlockPos, Noise, WorldAge, Logs, Other, IsLarge);
 			break;
 		}
 		case E_META_SAPLING_DARK_OAK:
 		{
-			if (!GetLargeTreeAdjustment(*this, a_X, a_Y, a_Z, a_SaplingMeta))
+			if (!GetLargeTreeAdjustment(a_BlockPos, SaplingMeta))
 			{
-				return;
+				return false;
 			}
 
-			GetDarkoakTreeImage(a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other);
+			GetDarkoakTreeImage(a_BlockPos, Noise, WorldAge, Logs, Other);
 			break;
 		}
 	}
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();
-	GrowTreeImage(Other);
+	return GrowTreeImage(Other);
 }
 
 
 
 
 
-void cWorld::GrowTreeByBiome(int a_X, int a_Y, int a_Z)
+bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
+{
+	bool IsLarge = true;
+	a_Meta = a_Meta & 0x07;
+
+	// Check to see if we are the northwest corner
+	for (int x = 0; x  < 2; ++x)
+	{
+		for (int z = 0; z < 2; ++z)
+		{
+			NIBBLETYPE meta;
+			BLOCKTYPE type;
+			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+		}
+	}
+
+	if (IsLarge)
+	{
+		return true;
+	}
+
+	IsLarge = true;
+	// Check to see if we are the southwest corner
+	for (int x = 0; x  < 2; ++x)
+	{
+		for (int z = 0; z > -2; --z)
+		{
+			NIBBLETYPE meta;
+			BLOCKTYPE type;
+			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+		}
+	}
+
+	if (IsLarge)
+	{
+		--a_BlockPos.z;
+		return true;
+	}
+
+	IsLarge = true;
+	// Check to see if we are the southeast corner
+	for (int x = 0; x > -2; --x)
+	{
+		for (int z = 0; z > -2; --z)
+		{
+			NIBBLETYPE meta;
+			BLOCKTYPE type;
+			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+		}
+	}
+
+	if (IsLarge)
+	{
+		--a_BlockPos.x;
+		--a_BlockPos.z;
+		return true;
+	}
+
+	IsLarge = true;
+	// Check to see if we are the northeast corner
+	for (int x = 0; x > -2; --x)
+	{
+		for (int z = 0; z < 2; ++z)
+		{
+			NIBBLETYPE meta;
+			BLOCKTYPE type;
+			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
+			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+		}
+	}
+
+	if (IsLarge)
+	{
+		--a_BlockPos.x;
+	}
+
+	return IsLarge;
+}
+
+
+
+
+
+bool cWorld::GrowTreeByBiome(const Vector3i a_BlockPos)
 {
 	cNoise Noise(m_Generator.GetSeed());
 	sSetBlockVector Logs, Other;
-	GetTreeImageByBiome(a_X, a_Y, a_Z, Noise, static_cast<int>(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count() & 0xffffffff), GetBiomeAt(a_X, a_Z), Logs, Other);
+	auto seq = static_cast<int>(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count() & 0xffffffff);
+	GetTreeImageByBiome(a_BlockPos, Noise, seq, GetBiomeAt(a_BlockPos.x, a_BlockPos.z), Logs, Other);
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();
-	GrowTreeImage(Other);
+	return GrowTreeImage(Other);
 }
 
 
 
 
 
-void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
+bool cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 {
 	// Check that the tree has place to grow
 
@@ -1703,7 +1754,7 @@ void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 	// Query blocktypes and metas at those log blocks:
 	if (!GetBlocks(b2, false))
 	{
-		return;
+		return false;
 	}
 
 	// Check that at each log's coord there's an block allowed to be overwritten:
@@ -1717,338 +1768,32 @@ void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 			}
 			default:
 			{
-				return;
+				return false;
 			}
 		}
 	}  // for itr - b2[]
 
 	// All ok, replace blocks with the tree image:
 	m_ChunkMap->ReplaceTreeBlocks(a_Blocks);
+	return true;
 }
 
 
 
 
 
-bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal)
+int cWorld::GrowPlantAt(Vector3i a_BlockPos, int a_NumStages)
 {
-	auto & random = GetRandomProvider();
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-	switch (BlockType)
-	{
-		case E_BLOCK_BEETROOTS:
-		{
-			if ((a_IsByBonemeal && !m_IsBeetrootsBonemealable) || (BlockMeta >= 3))
-			{
-				return false;
-			}
-			if (!a_IsByBonemeal)
-			{
-				++BlockMeta;
-			}
-			else
-			{
-				BlockMeta += 1;
-				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(3));
-			}
-			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
-			return true;
-		}
+	return m_ChunkMap->GrowPlantAt(a_BlockPos, a_NumStages);
+}
 
-		case E_BLOCK_CARROTS:
-		{
-			if ((a_IsByBonemeal && !m_IsCarrotsBonemealable) || (BlockMeta >= 7))
-			{
-				return false;
-			}
-			if (!a_IsByBonemeal)
-			{
-				++BlockMeta;
-			}
-			else
-			{
-				BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
-				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
-			}
-			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
-			return true;
-		}
 
-		case E_BLOCK_COCOA_POD:
-		{
-			NIBBLETYPE TypeMeta = BlockMeta & 0x03;
-			int GrowState = BlockMeta >> 2;
 
-			if (GrowState >= 2)
-			{
-				return false;
-			}
-			++GrowState;
-			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, static_cast<NIBBLETYPE>(GrowState << 2 | TypeMeta));
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
-			return true;
-		}
 
-		case E_BLOCK_CROPS:
-		{
-			if ((a_IsByBonemeal && !m_IsCropsBonemealable) || (BlockMeta >= 7))
-			{
-				return false;
-			}
-			if (!a_IsByBonemeal)
-			{
-				++BlockMeta;
-			}
-			else
-			{
-				BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
-				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
-			}
-			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
-			return true;
-		}
 
-		case E_BLOCK_MELON_STEM:
-		{
-			if (BlockMeta < 7)
-			{
-				if (a_IsByBonemeal && !m_IsMelonStemBonemealable)
-				{
-					return false;
-				}
-
-				if (!a_IsByBonemeal)
-				{
-					++BlockMeta;
-				}
-				else
-				{
-					BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
-					BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
-				}
-				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			}
-			else
-			{
-				if (a_IsByBonemeal && !m_IsMelonBonemealable)
-				{
-					return false;
-				}
-				if (!GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, BlockType))
-				{
-					return false;
-				}
-			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
-			return true;
-		}
-
-		case E_BLOCK_POTATOES:
-		{
-			if ((a_IsByBonemeal && !m_IsPotatoesBonemealable) || (BlockMeta >= 7))
-			{
-				return false;
-			}
-			if (!a_IsByBonemeal)
-			{
-				++BlockMeta;
-			}
-			else
-			{
-				BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
-				BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
-			}
-			FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
-			return true;
-		}
-
-		case E_BLOCK_PUMPKIN_STEM:
-		{
-			if (BlockMeta < 7)
-			{
-				if (a_IsByBonemeal && !m_IsPumpkinStemBonemealable)
-				{
-					return false;
-				}
-
-				if (!a_IsByBonemeal)
-				{
-					++BlockMeta;
-				}
-				else
-				{
-					BlockMeta += random.RandInt<NIBBLETYPE>(2, 5);
-					BlockMeta = std::min(BlockMeta, static_cast<NIBBLETYPE>(7));
-				}
-				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-			}
-			else
-			{
-				if (a_IsByBonemeal && !m_IsPumpkinBonemealable)
-				{
-					return false;
-				}
-				if (!GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, BlockType))
-				{
-					return false;
-				}
-			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
-			return true;
-		}
-
-		case E_BLOCK_SAPLING:
-		{
-			if (a_IsByBonemeal && !m_IsSaplingBonemealable)
-			{
-				return false;
-			}
-			NIBBLETYPE TypeMeta = BlockMeta & 0x07;
-			int GrowState = BlockMeta >> 3;
-
-			if (GrowState < 1)
-			{
-				// Non-bonemeal forces a growth, while bonemeal only has a chance of growing it
-				if (!a_IsByBonemeal)
-				{
-					++GrowState;
-				}
-				else if (random.RandBool(0.45))
-				{
-					++GrowState;
-				}
-
-				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, static_cast<NIBBLETYPE>(GrowState << 3 | TypeMeta));
-			}
-			else if (random.RandBool(0.45))
-			{
-				GrowTreeFromSapling(a_BlockX, a_BlockY, a_BlockZ, BlockMeta);
-			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
-			return true;
-		}
-
-		case E_BLOCK_GRASS:
-		{
-			if (a_IsByBonemeal && !m_IsGrassBonemealable)
-			{
-				return false;
-			}
-			auto & r1 = GetRandomProvider();
-			for (int i = 0; i < 60; i++)
-			{
-				int OfsX = (r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3)) / 2 - 3;
-				int OfsY = r1.RandInt(3) + r1.RandInt(3) - 3;
-				int OfsZ = (r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3)) / 2 - 3;
-				BLOCKTYPE Ground = GetBlock(a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ);
-				if (Ground != E_BLOCK_GRASS)
-				{
-					continue;
-				}
-				BLOCKTYPE Above  = GetBlock(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ);
-				if (Above != E_BLOCK_AIR)
-				{
-					continue;
-				}
-				BLOCKTYPE  SpawnType;
-				NIBBLETYPE SpawnMeta = 0;
-				switch (r1.RandInt(10))
-				{
-					case 0:  SpawnType = E_BLOCK_YELLOW_FLOWER; break;
-					case 1:  SpawnType = E_BLOCK_RED_ROSE;      break;
-					default:
-					{
-						SpawnType = E_BLOCK_TALL_GRASS;
-						SpawnMeta = E_META_TALL_GRASS_GRASS;
-						break;
-					}
-				}  // switch (random spawn block type)
-				FastSetBlock(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ, SpawnType, SpawnMeta);
-				BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ, 0);
-			}  // for i - 50 times
-			return true;
-		}
-
-		case E_BLOCK_SUGARCANE:
-		{
-			if (a_IsByBonemeal && !m_IsSugarcaneBonemealable)
-			{
-				return false;
-			}
-			if (m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, 1) == 0)
-			{
-				return false;
-			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
-			return true;
-		}
-
-		case E_BLOCK_CACTUS:
-		{
-			if (a_IsByBonemeal && !m_IsCactusBonemealable)
-			{
-				return false;
-			}
-			if (m_ChunkMap->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, 1) == 0)
-			{
-				return false;
-			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
-			return true;
-		}
-
-		case E_BLOCK_TALL_GRASS:
-		{
-			if (a_IsByBonemeal && !m_IsTallGrassBonemealable)
-			{
-				return false;
-			}
-			if (!m_ChunkMap->GrowTallGrass(a_BlockX, a_BlockY, a_BlockZ))
-			{
-				return false;
-			}
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
-			return true;
-		}
-
-		case E_BLOCK_BIG_FLOWER:
-		{
-			if (a_IsByBonemeal && !m_IsBigFlowerBonemealable)
-			{
-				return false;
-			}
-			if (BlockMeta & 8)  // the upper flower block does not save the type of the flower
-			{
-				GetBlockTypeMeta(a_BlockX, a_BlockY - 1, a_BlockZ, BlockType, BlockMeta);
-				if (BlockType != E_BLOCK_BIG_FLOWER)
-				{
-					return false;
-				}
-			}
-			if (
-				(BlockMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) ||
-				(BlockMeta == E_META_BIG_FLOWER_LARGE_FERN)
-			)  // tall grass and fern do not work
-			{
-				return false;
-			}
-
-			// spawn flower item
-			BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockX, a_BlockY, a_BlockZ, 0);
-			cItems FlowerItem;
-			FlowerItem.Add(E_BLOCK_BIG_FLOWER, 1, BlockMeta);
-			SpawnItemPickups(FlowerItem, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5);
-			return true;
-		}
-
-	}  // switch (BlockType)
-	return false;
+bool cWorld::GrowRipePlant(Vector3i a_BlockPos)
+{
+	return (GrowPlantAt(a_BlockPos, 16) > 0);
 }
 
 
@@ -2057,7 +1802,8 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 
 int cWorld::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
 {
-	return m_ChunkMap->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
+	LOGWARNING("cWorld::GrowCactus is obsolete, use cWorld::GrowPlantAt instead");
+	return m_ChunkMap->GrowPlantAt({a_BlockX, a_BlockY, a_BlockZ});
 }
 
 
@@ -2066,7 +1812,8 @@ int cWorld::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocks
 
 bool cWorld::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType)
 {
-	return m_ChunkMap->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, a_BlockType);
+	LOGWARNING("cWorld::GrowMelonPumpkin is obsolete, use cWorld::GrowPlantAt instead");
+	return (m_ChunkMap->GrowPlantAt({a_BlockX, a_BlockY, a_BlockZ}, 16) > 0);  // 8 stages for the stem, 8 attempts for the produce
 }
 
 
@@ -2075,7 +1822,8 @@ bool cWorld::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYP
 
 int cWorld::GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
 {
-	return m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
+	LOGWARNING("cWorld::GrowSugarcane is obsolete, use cWorld::GrowPlantAt instead");
+	return m_ChunkMap->GrowPlantAt({a_BlockX, a_BlockY, a_BlockZ}, a_NumBlocksToGrow);
 }
 
 
@@ -2131,54 +1879,54 @@ void cWorld::SetMaxViewDistance(int a_MaxViewDistance)
 
 
 
-void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients)
+void cWorld::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	m_ChunkMap->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_SendToClients);
+	m_ChunkMap->SetBlock(a_BlockPos, a_BlockType, a_BlockMeta);
 }
 
 
 
 
 
-void cWorld::SetBlockMeta(int a_X, int a_Y, int a_Z, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty, bool a_ShouldInformClients)
+void cWorld::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData)
 {
-	m_ChunkMap->SetBlockMeta(a_X, a_Y, a_Z, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClients);
+	m_ChunkMap->SetBlockMeta(a_BlockPos, a_MetaData);
 }
 
 
 
 
 
-NIBBLETYPE cWorld::GetBlockSkyLight(int a_X, int a_Y, int a_Z)
+NIBBLETYPE cWorld::GetBlockSkyLight(Vector3i a_BlockPos)
 {
-	return m_ChunkMap->GetBlockSkyLight(a_X, a_Y, a_Z);
+	return m_ChunkMap->GetBlockSkyLight(a_BlockPos);
 }
 
 
 
 
 
-NIBBLETYPE cWorld::GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ)
+NIBBLETYPE cWorld::GetBlockBlockLight(Vector3i a_BlockPos)
 {
-	return m_ChunkMap->GetBlockBlockLight(a_BlockX, a_BlockY, a_BlockZ);
+	return m_ChunkMap->GetBlockBlockLight(a_BlockPos);
 }
 
 
 
 
 
-bool cWorld::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+bool cWorld::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
-	return m_ChunkMap->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	return m_ChunkMap->GetBlockTypeMeta(a_BlockPos, a_BlockType, a_BlockMeta);
 }
 
 
 
 
 
-bool cWorld::GetBlockInfo(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
+bool cWorld::GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
 {
-	return m_ChunkMap->GetBlockInfo(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
+	return m_ChunkMap->GetBlockInfo(a_BlockPos, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
 }
 
 
@@ -2194,7 +1942,19 @@ bool cWorld::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 
 
 
-void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed, bool IsPlayerCreated)
+void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3i a_BlockPos, double a_FlyAwaySpeed, bool a_IsPlayerCreated)
+{
+	auto & random = GetRandomProvider();
+	auto microX = random.RandReal<double>(0, 1);
+	auto microZ = random.RandReal<double>(0, 1);
+	return SpawnItemPickups(a_Pickups, Vector3d(microX, 0, microZ) + a_BlockPos, a_FlyAwaySpeed, a_IsPlayerCreated);
+}
+
+
+
+
+
+void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a_FlyAwaySpeed, bool a_IsPlayerCreated)
 {
 	auto & Random = GetRandomProvider();
 	a_FlyAwaySpeed /= 100;  // Pre-divide, so that we don't have to divide each time inside the loop
@@ -2206,14 +1966,11 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 			continue;
 		}
 
-		float SpeedX = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-5, 5));
-		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(50));
-		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-5, 5));
+		float SpeedX = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-10, 10));
+		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(40, 50));
+		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-10, 10));
 
-		auto Pickup = cpp14::make_unique<cPickup>(
-			a_BlockX, a_BlockY, a_BlockZ,
-			*itr, IsPlayerCreated, SpeedX, SpeedY, SpeedZ
-		);
+		auto Pickup = std::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, Vector3f{SpeedX, SpeedY, SpeedZ});
 		auto PickupPtr = Pickup.get();
 		PickupPtr->Initialize(std::move(Pickup), *this);
 	}
@@ -2223,7 +1980,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 
 
-void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated)
+void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d a_Speed, bool a_IsPlayerCreated)
 {
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
@@ -2232,12 +1989,9 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 			continue;
 		}
 
-		auto Pickup = cpp14::make_unique<cPickup>(
-			a_BlockX, a_BlockY, a_BlockZ,
-			*itr, IsPlayerCreated, static_cast<float>(a_SpeedX), static_cast<float>(a_SpeedY), static_cast<float>(a_SpeedZ)
-		);
-		auto PickupPtr = Pickup.get();
-		PickupPtr->Initialize(std::move(Pickup), *this);
+		auto pickup = std::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, a_Speed);
+		auto pickupPtr = pickup.get();
+		pickupPtr->Initialize(std::move(pickup), *this);
 	}
 }
 
@@ -2245,27 +1999,27 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 
 
-UInt32 cWorld::SpawnItemPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, float a_SpeedX, float a_SpeedY, float a_SpeedZ, int a_LifetimeTicks, bool a_CanCombine)
+UInt32 cWorld::SpawnItemPickup(Vector3d a_Pos, const cItem & a_Item, Vector3f a_Speed, int a_LifetimeTicks, bool a_CanCombine)
 {
-	auto Pickup = cpp14::make_unique<cPickup>(a_PosX, a_PosY, a_PosZ, a_Item, false, a_SpeedX, a_SpeedY, a_SpeedZ, a_LifetimeTicks, a_CanCombine);
-	auto PickupPtr = Pickup.get();
-	if (!PickupPtr->Initialize(std::move(Pickup), *this))
+	auto pickup = std::make_unique<cPickup>(a_Pos, a_Item, false, a_Speed, a_LifetimeTicks, a_CanCombine);
+	auto pickupPtr = pickup.get();
+	if (!pickupPtr->Initialize(std::move(pickup), *this))
 	{
 		return cEntity::INVALID_ID;
 	}
-	return PickupPtr->GetUniqueID();
+	return pickupPtr->GetUniqueID();
 }
 
 
 
 
 
-UInt32 cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta)
+UInt32 cWorld::SpawnFallingBlock(Vector3d a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	auto FallingBlock = cpp14::make_unique<cFallingBlock>(Vector3i(a_X, a_Y, a_Z), BlockType, BlockMeta);
-	auto FallingBlockPtr = FallingBlock.get();
-	auto ID = FallingBlock->GetUniqueID();
-	if (!FallingBlockPtr->Initialize(std::move(FallingBlock), *this))
+	auto fallingBlock = std::make_unique<cFallingBlock>(a_Pos, a_BlockType, a_BlockMeta);
+	auto fallingBlockPtr = fallingBlock.get();
+	auto ID = fallingBlock->GetUniqueID();
+	if (!fallingBlockPtr->Initialize(std::move(fallingBlock), *this))
 	{
 		return cEntity::INVALID_ID;
 	}
@@ -2276,7 +2030,7 @@ UInt32 cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType,
 
 
 
-UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
+UInt32 cWorld::SpawnExperienceOrb(Vector3d a_Pos, int a_Reward)
 {
 	if (a_Reward < 1)
 	{
@@ -2284,29 +2038,72 @@ UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Rewa
 		return cEntity::INVALID_ID;
 	}
 
-	auto ExpOrb = cpp14::make_unique<cExpOrb>(a_X, a_Y, a_Z, a_Reward);
-	auto ExpOrbPtr = ExpOrb.get();
-	if (!ExpOrbPtr->Initialize(std::move(ExpOrb), *this))
+	auto expOrb = std::make_unique<cExpOrb>(a_Pos, a_Reward);
+	auto expOrbPtr = expOrb.get();
+	if (!expOrbPtr->Initialize(std::move(expOrb), *this))
 	{
 		return cEntity::INVALID_ID;
 	}
-	return ExpOrbPtr->GetUniqueID();
+	return expOrbPtr->GetUniqueID();
 }
 
 
 
 
 
-UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
+std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(Vector3d a_Pos, int a_Reward)
+{
+	std::vector<UInt32> OrbsID;
+
+	if (a_Reward < 1)
+	{
+		LOGWARNING("%s: Attempting to create an experience orb with non-positive reward!", __FUNCTION__);
+		return OrbsID;
+	}
+
+	std::vector<int> Rewards = cExpOrb::Split(a_Reward);
+
+	// Check generate number to decide speed limit (distribute range)
+	float SpeedLimit = static_cast<float>((Rewards.size() / 2) + 5);
+	if (SpeedLimit > 10)
+	{
+		SpeedLimit = 10;
+	}
+
+	auto & Random = GetRandomProvider();
+	for (auto Reward : Rewards)
+	{
+		auto ExpOrb = std::make_unique<cExpOrb>(a_Pos, Reward);
+		auto ExpOrbPtr = ExpOrb.get();
+		double SpeedX = Random.RandReal(-SpeedLimit, SpeedLimit);
+		double SpeedY = Random.RandReal(0.5);
+		double SpeedZ = Random.RandReal(-SpeedLimit, SpeedLimit);
+		ExpOrbPtr->SetSpeed(SpeedX, SpeedY, SpeedZ);
+
+		UInt32 Id = ExpOrbPtr->GetUniqueID();
+		if (ExpOrbPtr->Initialize(std::move(ExpOrb), *this))
+		{
+			OrbsID.push_back(Id);
+		}
+	}
+
+	return OrbsID;
+}
+
+
+
+
+
+UInt32 cWorld::SpawnMinecart(Vector3d a_Pos, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
 {
 	std::unique_ptr<cMinecart> Minecart;
 	switch (a_MinecartType)
 	{
-		case E_ITEM_MINECART:             Minecart = cpp14::make_unique<cRideableMinecart>(a_X, a_Y, a_Z, a_Content, a_BlockHeight); break;
-		case E_ITEM_CHEST_MINECART:       Minecart = cpp14::make_unique<cMinecartWithChest>(a_X, a_Y, a_Z); break;
-		case E_ITEM_FURNACE_MINECART:     Minecart = cpp14::make_unique<cMinecartWithFurnace>(a_X, a_Y, a_Z); break;
-		case E_ITEM_MINECART_WITH_TNT:    Minecart = cpp14::make_unique<cMinecartWithTNT>(a_X, a_Y, a_Z); break;
-		case E_ITEM_MINECART_WITH_HOPPER: Minecart = cpp14::make_unique<cMinecartWithHopper>(a_X, a_Y, a_Z); break;
+		case E_ITEM_MINECART:             Minecart = std::make_unique<cRideableMinecart>   (a_Pos, a_Content, a_BlockHeight); break;
+		case E_ITEM_CHEST_MINECART:       Minecart = std::make_unique<cMinecartWithChest>  (a_Pos); break;
+		case E_ITEM_FURNACE_MINECART:     Minecart = std::make_unique<cMinecartWithFurnace>(a_Pos); break;
+		case E_ITEM_MINECART_WITH_TNT:    Minecart = std::make_unique<cMinecartWithTNT>    (a_Pos); break;
+		case E_ITEM_MINECART_WITH_HOPPER: Minecart = std::make_unique<cMinecartWithHopper> (a_Pos); break;
 		default:
 		{
 			return cEntity::INVALID_ID;
@@ -2327,7 +2124,7 @@ UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartT
 
 UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 {
-	auto Boat = cpp14::make_unique<cBoat>(a_Pos, a_Material);
+	auto Boat = std::make_unique<cBoat>(a_Pos, a_Material);
 	auto BoatPtr = Boat.get();
 	if (!BoatPtr->Initialize(std::move(Boat), *this))
 	{
@@ -2340,20 +2137,25 @@ UInt32 cWorld::SpawnBoat(Vector3d a_Pos, cBoat::eMaterial a_Material)
 
 
 
-UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialVelocityCoeff)
+UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialVelocityCoeff, bool a_ShouldPlayFuseSound)
 {
-	auto TNT = cpp14::make_unique<cTNTEntity>(a_Pos, a_FuseTicks);
+	auto TNT = std::make_unique<cTNTEntity>(a_Pos, a_FuseTicks);
 	auto TNTPtr = TNT.get();
 	if (!TNTPtr->Initialize(std::move(TNT), *this))
 	{
 		return cEntity::INVALID_ID;
 	}
 
+	if (a_ShouldPlayFuseSound)
+	{
+		BroadcastSoundEffect("entity.tnt.primed", a_Pos, 1.0f, 1.0f);
+	}
+
 	auto & Random = GetRandomProvider();
 	TNTPtr->SetSpeed(
-		a_InitialVelocityCoeff * Random.RandInt(-1, 1),
+		a_InitialVelocityCoeff * Random.RandReal(-0.5f, 0.5f),
 		a_InitialVelocityCoeff * 2,
-		a_InitialVelocityCoeff * Random.RandInt(-1, 1)
+		a_InitialVelocityCoeff * Random.RandReal(-0.5f, 0.5f)
 	);
 	return TNTPtr->GetUniqueID();
 }
@@ -2362,18 +2164,12 @@ UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialV
 
 
 
-void cWorld::SetBlocks(const sSetBlockVector & a_Blocks)
+void cWorld::PlaceBlock(const Vector3i a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
 {
-	m_ChunkMap->SetBlocks(a_Blocks);
-}
+	SetBlock(a_Position, a_BlockType, a_BlockMeta);
 
-
-
-
-
-void cWorld::ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType)
-{
-	m_ChunkMap->ReplaceBlocks(a_Blocks, a_FilterBlockType);
+	cChunkInterface ChunkInterface(GetChunkMap());
+	cBlockHandler::For(a_BlockType).OnPlaced(ChunkInterface, *this, a_Position, a_BlockType, a_BlockMeta);
 }
 
 
@@ -2389,12 +2185,45 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 
 
-bool cWorld::DigBlock(int a_X, int a_Y, int a_Z)
+bool cWorld::DigBlock(Vector3i a_BlockPos, const cEntity * a_Digger)
 {
-	cBlockHandler * Handler = cBlockInfo::GetHandler(GetBlock(a_X, a_Y, a_Z));
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta);
+
+	if (!m_ChunkMap->DigBlock(a_BlockPos))
+	{
+		return false;
+	}
+
 	cChunkInterface ChunkInterface(GetChunkMap());
-	Handler->OnDestroyed(ChunkInterface, *this, a_X, a_Y, a_Z);
-	return m_ChunkMap->DigBlock(a_X, a_Y, a_Z);
+	cBlockHandler::For(BlockType).OnBroken(ChunkInterface, *this, a_BlockPos, BlockType, BlockMeta, a_Digger);
+
+	return true;
+}
+
+
+
+
+
+bool cWorld::DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger, const cItem * a_Tool)
+{
+	auto pickups = PickupsFromBlock(a_BlockPos, a_Digger, a_Tool);
+	if (!DigBlock(a_BlockPos, a_Digger))
+	{
+		return false;
+	}
+	SpawnItemPickups(pickups, Vector3d(0.5, 0.5, 0.5) + a_BlockPos, 10);
+	return true;
+}
+
+
+
+
+
+cItems cWorld::PickupsFromBlock(Vector3i a_BlockPos, const cEntity * a_Digger, const cItem * a_Tool)
+{
+	return m_ChunkMap->PickupsFromBlock(a_BlockPos, a_Digger, a_Tool);
 }
 
 
@@ -2470,7 +2299,7 @@ void cWorld::QueueSetChunkData(cSetChunkDataPtr a_SetChunkData)
 	if (!a_SetChunkData->AreBiomesValid())
 	{
 		// The biomes are not assigned, get them from the generator:
-		m_Generator.GenerateBiomes(a_SetChunkData->GetChunkX(), a_SetChunkData->GetChunkZ(), a_SetChunkData->GetBiomes());
+		m_Generator.GenerateBiomes({a_SetChunkData->GetChunkX(), a_SetChunkData->GetChunkZ()}, a_SetChunkData->GetBiomes());
 		a_SetChunkData->MarkBiomesValid();
 	}
 
@@ -2517,7 +2346,7 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 				ChunkSender.QueueSendChunkTo(
 					a_Chunk.GetPosX(),
 					a_Chunk.GetPosZ(),
-					cChunkSender::E_CHUNK_PRIORITY_MEDIUM,
+					cChunkSender::Priority::Medium,
 					a_Chunk.GetAllClients()
 				);
 			}
@@ -2551,9 +2380,9 @@ void cWorld::ChunkLighted(
 
 
 
-bool cWorld::GetChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataCallback & a_Callback)
+bool cWorld::GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback) const
 {
-	return m_ChunkMap->GetChunkData(a_ChunkX, a_ChunkZ, a_Callback);
+	return m_ChunkMap->GetChunkData(a_Coords, a_Callback);
 }
 
 
@@ -2634,25 +2463,36 @@ void cWorld::AddPlayer(std::unique_ptr<cPlayer> a_Player, cWorld * a_OldWorld)
 
 
 
-std::unique_ptr<cPlayer> cWorld::RemovePlayer(cPlayer & a_Player, bool a_RemoveFromChunk)
+std::unique_ptr<cPlayer> cWorld::RemovePlayer(cPlayer & a_Player)
 {
-	std::unique_ptr<cPlayer> PlayerPtr;
+	// Check the chunkmap
+	std::unique_ptr<cPlayer> PlayerPtr(static_cast<cPlayer *>(m_ChunkMap->RemoveEntity(a_Player).release()));
 
-	if (a_RemoveFromChunk)
+	if (PlayerPtr != nullptr)
 	{
-		// To prevent iterator invalidations when an entity goes through a portal and calls this function whilst being ticked by cChunk
-		// we should not change cChunk's entity list if asked not to
-		PlayerPtr = std::unique_ptr<cPlayer>(static_cast<cPlayer *>(m_ChunkMap->RemoveEntity(a_Player).release()));
+		// Player found in the world, tell it it's being removed
+		PlayerPtr->OnRemoveFromWorld(*this);
 	}
+	else  // Check the awaiting players list
 	{
 		cCSLock Lock(m_CSPlayersToAdd);
-		m_PlayersToAdd.remove_if([&](const decltype(m_PlayersToAdd)::value_type & value) -> bool
+		auto itr = std::find_if(m_PlayersToAdd.begin(), m_PlayersToAdd.end(),
+			[&](const decltype(m_PlayersToAdd)::value_type & value)
+			{
+				return (value.first.get() == &a_Player);
+			}
+		);
+
+		if (itr != m_PlayersToAdd.end())
 		{
-			return (value.first.get() == &a_Player);
-		});
+			PlayerPtr = std::move(itr->first);
+			m_PlayersToAdd.erase(itr);
+		}
 	}
+
+	// Remove from the player list
 	{
-		cCSLock Lock(m_CSPlayers);
+		cLock Lock(*this);
 		LOGD("Removing player %s from world \"%s\"", a_Player.GetName().c_str(), m_WorldName.c_str());
 		m_Players.remove(&a_Player);
 	}
@@ -2677,9 +2517,13 @@ std::unique_ptr<cPlayer> cWorld::RemovePlayer(cPlayer & a_Player, bool a_RemoveF
 #ifdef _DEBUG
 bool cWorld::IsPlayerReferencedInWorldOrChunk(cPlayer & a_Player)
 {
-	if (m_ChunkMap->RemoveEntity(a_Player) != nullptr)
 	{
-		return true;
+		cLock lock(*this);
+		auto * Chunk = a_Player.GetParentChunk();
+		if (Chunk && Chunk->HasEntity(a_Player.GetUniqueID()))
+		{
+			return true;
+		}
 	}
 
 	{
@@ -2694,7 +2538,7 @@ bool cWorld::IsPlayerReferencedInWorldOrChunk(cPlayer & a_Player)
 	}
 
 	{
-		cCSLock Lock(m_CSPlayers);
+		cLock Lock(*this);
 		if (std::find(m_Players.begin(), m_Players.end(), &a_Player) != m_Players.end())
 		{
 			return true;
@@ -2729,7 +2573,7 @@ bool cWorld::IsPlayerReferencedInWorldOrChunk(cPlayer & a_Player)
 bool cWorld::ForEachPlayer(cPlayerListCallback a_Callback)
 {
 	// Calls the callback for each player in the list
-	cCSLock Lock(m_CSPlayers);
+	cLock Lock(*this);
 	for (auto & Player : m_Players)
 	{
 		if (Player->IsTicking() && a_Callback(*Player))
@@ -2747,7 +2591,7 @@ bool cWorld::ForEachPlayer(cPlayerListCallback a_Callback)
 bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback a_Callback)
 {
 	// Calls the callback for the specified player in the list
-	cCSLock Lock(m_CSPlayers);
+	cLock Lock(*this);
 	for (auto & Player : m_Players)
 	{
 		if (Player->IsTicking() && (NoCaseCompare(Player->GetName(), a_PlayerName) == 0))
@@ -2769,7 +2613,7 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 	size_t BestRating = 0;
 	size_t NameLength = a_PlayerNameHint.length();
 
-	cCSLock Lock(m_CSPlayers);
+	cLock Lock(*this);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		if (!(*itr)->IsTicking())
@@ -2801,7 +2645,7 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 
 bool cWorld::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a_Callback)
 {
-	cCSLock Lock(m_CSPlayers);
+	cLock Lock(*this);
 	for (auto & Player : m_Players)
 	{
 		if (Player->IsTicking() && (Player->GetUUID() == a_PlayerUUID))
@@ -2816,18 +2660,24 @@ bool cWorld::DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback 
 
 
 
-cPlayer * cWorld::FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_CheckLineOfSight)
+bool cWorld::DoWithNearestPlayer(Vector3d a_Pos, double a_RangeLimit, cPlayerListCallback a_Callback, bool a_CheckLineOfSight, bool a_IgnoreSpectator)
 {
-	double ClosestDistance = a_SightLimit;
+	double ClosestDistance = a_RangeLimit;
 	cPlayer * ClosestPlayer = nullptr;
 
-	cCSLock Lock(m_CSPlayers);
+	cLock Lock(*this);
 	for (cPlayerList::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		if (!(*itr)->IsTicking())
 		{
 			continue;
 		}
+
+		if (a_IgnoreSpectator && (*itr)->IsGameModeSpectator())
+		{
+			continue;
+		}
+
 		Vector3f Pos = (*itr)->GetPosition();
 		double Distance = (Pos - a_Pos).Length();
 
@@ -2849,7 +2699,15 @@ cPlayer * cWorld::FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_C
 		ClosestDistance = Distance;
 		ClosestPlayer = *itr;
 	}
-	return ClosestPlayer;
+
+	if (ClosestPlayer)
+	{
+		return a_Callback(*ClosestPlayer);
+	}
+	else
+	{
+		return false;
+	}
 }
 
 
@@ -2859,7 +2717,7 @@ cPlayer * cWorld::FindClosestPlayer(Vector3d a_Pos, float a_SightLimit, bool a_C
 void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 {
 	// Sends the playerlist to a_DestPlayer
-	cCSLock Lock(m_CSPlayers);
+	cLock Lock(*this);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
@@ -2960,7 +2818,7 @@ void cWorld::RemoveClientFromChunks(cClientHandle * a_Client)
 
 
 
-void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client)
+void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client)
 {
 	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
 }
@@ -2969,7 +2827,7 @@ void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriorit
 
 
 
-void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client)
+void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client)
 {
 	a_Client->AddWantedChunk(a_ChunkX, a_ChunkZ);
 	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
@@ -2982,15 +2840,6 @@ void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPr
 void cWorld::RemoveClientFromChunkSender(cClientHandle * a_Client)
 {
 	m_ChunkSender.RemoveClient(a_Client);
-}
-
-
-
-
-
-void cWorld::TouchChunk(int a_ChunkX, int a_ChunkZ)
-{
-	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -3085,7 +2934,7 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 	if (a_Open != IsOpen)
 	{
 		SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta ^ 0x4);
-		BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_TRAPDOOR_OPEN, a_BlockX, a_BlockY, a_BlockZ, 0);
+		BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_TRAPDOOR_OPEN, {a_BlockX, a_BlockY, a_BlockZ}, 0);
 		return true;
 	}
 	return false;
@@ -3098,8 +2947,7 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_ChunkMap->MarkChunkRegenerating(a_ChunkX, a_ChunkZ);
-
-	m_Generator.QueueGenerateChunk(a_ChunkX, a_ChunkZ, true);
+	m_Generator.QueueGenerateChunk({a_ChunkX, a_ChunkZ}, true);
 }
 
 
@@ -3176,7 +3024,7 @@ void cWorld::QueueSaveAllChunks(void)
 void cWorld::QueueTask(std::function<void(cWorld &)> a_Task)
 {
 	cCSLock Lock(m_CSTasks);
-	m_Tasks.emplace_back(0, a_Task);
+	m_Tasks.emplace_back(0, std::move(a_Task));
 }
 
 
@@ -3190,7 +3038,7 @@ void cWorld::ScheduleTask(int a_DelayTicks, std::function<void (cWorld &)> a_Tas
 	// Insert the task into the list of scheduled tasks
 	{
 		cCSLock Lock(m_CSTasks);
-		m_Tasks.emplace_back(TargetTick, a_Task);
+		m_Tasks.emplace_back(TargetTick, std::move(a_Task));
 	}
 }
 
@@ -3200,7 +3048,6 @@ void cWorld::ScheduleTask(int a_DelayTicks, std::function<void (cWorld &)> a_Tas
 
 void cWorld::AddEntity(OwnedEntity a_Entity)
 {
-	a_Entity->SetWorld(this);
 	cCSLock Lock(m_CSEntitiesToAdd);
 	m_EntitiesToAdd.emplace_back(std::move(a_Entity));
 }
@@ -3242,6 +3089,7 @@ OwnedEntity cWorld::RemoveEntity(cEntity & a_Entity)
 	auto Entity = m_ChunkMap->RemoveEntity(a_Entity);
 	if (Entity != nullptr)
 	{
+		Entity->OnRemoveFromWorld(*this);
 		return Entity;
 	}
 
@@ -3310,7 +3158,7 @@ void cWorld::TickQueuedBlocks(void)
 		if (Block->TicksToWait <= 0)
 		{
 			// TODO: Handle the case when the chunk is already unloaded
-			m_ChunkMap->TickBlock(Block->X, Block->Y, Block->Z);
+			m_ChunkMap->TickBlock({Block->X, Block->Y, Block->Z});
 			delete Block;  // We don't have to remove it from the vector, this will happen automatically on the next tick
 		}
 		else
@@ -3404,9 +3252,9 @@ UInt32 cWorld::SpawnMobFinalize(std::unique_ptr<cMonster> a_Monster)
 
 
 
-UInt32 cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
+UInt32 cWorld::CreateProjectile(Vector3d a_Pos, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
 {
-	auto Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
+	auto Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_Pos, a_Item, a_Speed);
 	if (Projectile == nullptr)
 	{
 		return cEntity::INVALID_ID;
@@ -3419,6 +3267,15 @@ UInt32 cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cPr
 	}
 
 	return ProjectilePtr->GetUniqueID();
+}
+
+
+
+
+
+UInt32 cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
+{
+	return CreateProjectile({a_PosX, a_PosY, a_PosZ}, a_Kind, a_Creator, a_Item, a_Speed);
 }
 
 
@@ -3447,7 +3304,7 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 
 	std::vector<pair_t> UsernamesByWeight;
 
-	cCSLock Lock(m_CSPlayers);
+	cLock Lock(*this);
 	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
 	{
 		AString PlayerName ((*itr)->GetName());
@@ -3619,7 +3476,7 @@ void cWorld::AddQueuedPlayers(void)
 
 	// Add all the players in the grabbed list:
 	{
-		cCSLock Lock(m_CSPlayers);
+		cLock Lock(*this);
 		for (auto & AwaitingPlayer : PlayersToAdd)
 		{
 			auto & Player = AwaitingPlayer.first;
@@ -3631,12 +3488,13 @@ void cWorld::AddQueuedPlayers(void)
 
 			// Add to chunkmap, if not already there (Spawn vs MoveToWorld):
 			auto PlayerPtr = Player.get();
-			m_ChunkMap->AddEntityIfNotPresent(std::move(Player));
+			m_ChunkMap->AddPlayer(std::move(Player));
+			PlayerPtr->OnAddToWorld(*this);
 			ASSERT(!PlayerPtr->IsTicking());
 			PlayerPtr->SetIsTicking(true);
 			AddedPlayerPtrs.emplace_back(PlayerPtr, AwaitingPlayer.second);
 		}  // for itr - PlayersToAdd[]
-	}  // Lock(m_CSPlayers)
+	}  // cLock(*this)
 
 	// Add all the players' clienthandles:
 	{
@@ -3662,6 +3520,13 @@ void cWorld::AddQueuedPlayers(void)
 			Client->SendPlayerMoveLook();
 			Client->SendHealth();
 			Client->SendWholeInventory(*Player->GetWindow());
+
+			// Send resource pack
+			auto ResourcePackUrl = cRoot::Get()->GetServer()->GetResourcePackUrl();
+			if (!ResourcePackUrl.empty())
+			{
+				Client->SendResourcePack(ResourcePackUrl);
+			}
 		}
 	}  // for itr - PlayersToAdd[]
 
@@ -3696,7 +3561,7 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 	cChunkDef::BlockNibbles BlockMetas;
 	a_ChunkDesc.CompressBlockMetas(BlockMetas);
 
-	auto SetChunkData = cpp14::make_unique<cSetChunkData>(
+	auto SetChunkData = std::make_unique<cSetChunkData>(
 		a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(),
 		a_ChunkDesc.GetBlockTypes(), BlockMetas,
 		nullptr, nullptr,  // We don't have lighting, chunk will be lighted when needed
@@ -3712,27 +3577,27 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 
 
 
-bool cWorld::cChunkGeneratorCallbacks::IsChunkValid(int a_ChunkX, int a_ChunkZ)
+bool cWorld::cChunkGeneratorCallbacks::IsChunkValid(cChunkCoords a_Coords)
 {
-	return m_World->IsChunkValid(a_ChunkX, a_ChunkZ);
+	return m_World->IsChunkValid(a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
 }
 
 
 
 
 
-bool cWorld::cChunkGeneratorCallbacks::IsChunkQueued(int a_ChunkX, int a_ChunkZ)
+bool cWorld::cChunkGeneratorCallbacks::IsChunkQueued(cChunkCoords a_Coords)
 {
-	return m_World->IsChunkQueued(a_ChunkX, a_ChunkZ);
+	return m_World->IsChunkQueued(a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
 }
 
 
 
 
 
-bool cWorld::cChunkGeneratorCallbacks::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ)
+bool cWorld::cChunkGeneratorCallbacks::HasChunkAnyClients(cChunkCoords a_Coords)
 {
-	return m_World->HasChunkAnyClients(a_ChunkX, a_ChunkZ);
+	return m_World->HasChunkAnyClients(a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
 }
 
 

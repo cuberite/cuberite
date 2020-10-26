@@ -1,8 +1,6 @@
-project (Cuberite)
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
-SET (SRCS
 	EnvelopeParser.cpp
 	HTTPFormParser.cpp
 	HTTPMessage.cpp
@@ -15,9 +13,7 @@ SET (SRCS
 	TransferEncodingParser.cpp
 	UrlClient.cpp
 	UrlParser.cpp
-)
 
-SET (HDRS
 	EnvelopeParser.h
 	HTTPFormParser.h
 	HTTPMessage.h
@@ -31,8 +27,3 @@ SET (HDRS
 	UrlClient.h
 	UrlParser.h
 )
-
-if(NOT MSVC)
-	add_library(HTTPServer ${SRCS} ${HDRS})
-	target_link_libraries(HTTPServer fmt::fmt)
-endif()

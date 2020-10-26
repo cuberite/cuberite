@@ -1,8 +1,6 @@
-project (Cuberite)
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
-SET (SRCS
 	SlotArea.cpp
 	Window.cpp
 	AnvilWindow.cpp
@@ -16,9 +14,8 @@ SET (SRCS
 	FurnaceWindow.cpp
 	HopperWindow.cpp
 	HorseWindow.cpp
-	InventoryWindow.cpp)
+	InventoryWindow.cpp
 
-SET (HDRS
 	SlotArea.h
 	Window.h
 	AnvilWindow.h
@@ -34,9 +31,5 @@ SET (HDRS
 	HorseWindow.h
 	InventoryWindow.h
 	MinecartWithChestWindow.h
-	WindowOwner.h)
-
-if(NOT MSVC)
-	add_library(UI ${SRCS} ${HDRS})
-	target_link_libraries(UI fmt::fmt)
-endif()
+	WindowOwner.h
+)

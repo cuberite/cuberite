@@ -7,22 +7,27 @@
 
 
 
-class cBlockFireHandler :
+class cBlockFireHandler final :
 	public cBlockHandler
 {
 public:
-	cBlockFireHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType),
-		XZP(0), XZM(0), Dir(0)
+
+	using cBlockHandler::cBlockHandler;
+
+private:
+
+	struct Scratch
 	{
-	}
+		/** Portal boundary and direction variables */
+		int XZP = 0, XZM = 0;
+		NIBBLETYPE Dir = 0;
+	};
 
-	/** Portal boundary and direction variables */
-	// 2014_03_30 _X: What are these used for? Why do we need extra variables?
-	int XZP, XZM;
-	NIBBLETYPE Dir;
 
-	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+
+
+
+	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) const override
 	{
 		/*
 		PORTAL FINDING ALGORITH
@@ -37,23 +42,34 @@ public:
 		- Loop through boundary variables, and fill with portal blocks based on Dir with meta from Dir
 		*/
 
+		Scratch Scratch;
+
 		// a_BlockY - 1: Because we want the block below the fire
-		FindAndSetPortalFrame(a_BlockX, a_BlockY - 1, a_BlockZ, a_ChunkInterface, a_WorldInterface);
+		FindAndSetPortalFrame(a_BlockPos.x, a_BlockPos.y - 1, a_BlockPos.z, a_ChunkInterface, a_WorldInterface, Scratch);
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// No pickups from this block
+		return {};
 	}
 
-	virtual bool IsClickedThrough(void) override
+
+
+
+
+	virtual bool IsClickedThrough(void) const override
 	{
 		return true;
 	}
 
 	/** Traces along YP until it finds an obsidian block, returns Y difference or 0 if no portal, and -1 for border
 	Takes the X, Y, and Z of the base block; with an optional MaxY for portal border finding */
-	int FindObsidianCeiling(int X, int Y, int Z, cChunkInterface & a_ChunkInterface, int MaxY = 0)
+	static int FindObsidianCeiling(int X, int Y, int Z, cChunkInterface & a_ChunkInterface, int MaxY = 0)
 	{
 		if (a_ChunkInterface.GetBlock({X, Y, Z}) != E_BLOCK_OBSIDIAN)
 		{
@@ -88,7 +104,7 @@ public:
 	}
 
 	/** Evaluates if coords have a valid border on top, based on MaxY */
-	bool EvaluatePortalBorder(int X, int FoundObsidianY, int Z, int MaxY, cChunkInterface & a_ChunkInterface)
+	static bool EvaluatePortalBorder(int X, int FoundObsidianY, int Z, int MaxY, cChunkInterface & a_ChunkInterface)
 	{
 		for (int checkBorder = FoundObsidianY + 1; checkBorder <= MaxY - 1; checkBorder++)  // FoundObsidianY + 1: FoundObsidianY has already been checked in FindObsidianCeiling; MaxY - 1: portal doesn't need corners
 		{
@@ -102,8 +118,12 @@ public:
 		return true;
 	}
 
+
+
+
+
 	/** Finds entire frame in any direction with the coordinates of a base block and fills hole with nether portal (START HERE) */
-	void FindAndSetPortalFrame(int X, int Y, int Z, cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface)
+	static void FindAndSetPortalFrame(int X, int Y, int Z, cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Scratch & a_Scratch)
 	{
 		int MaxY = FindObsidianCeiling(X, Y, Z, a_ChunkInterface);  // Get topmost obsidian block as reference for all other checks
 		int X1 = X + 1, Z1 = Z + 1, X2 = X - 1, Z2 = Z - 1;  // Duplicate XZ values, add / subtract one as we've checked the original already the line above
@@ -113,16 +133,16 @@ public:
 			return;
 		}
 
-		if (!FindPortalSliceX(X1, X2, Y, Z, MaxY, a_ChunkInterface))
+		if (!FindPortalSliceX(X1, X2, Y, Z, MaxY, a_ChunkInterface, a_Scratch))
 		{
-			if (!FindPortalSliceZ(X, Y, Z1, Z2, MaxY, a_ChunkInterface))
+			if (!FindPortalSliceZ(X, Y, Z1, Z2, MaxY, a_ChunkInterface, a_Scratch))
 			{
 				return;  // No eligible portal construct, abort abort abort!!
 			}
 		}
 
 		int PortalHeight = MaxY - Y - 1;
-		int PortalWidth = XZP - XZM + 1;
+		int PortalWidth = a_Scratch.XZP - a_Scratch.XZM + 1;
 		if ((PortalHeight < a_WorldInterface.GetMinNetherPortalHeight()) || (PortalHeight > a_WorldInterface.GetMaxNetherPortalHeight()))
 		{
 			// The portal isn't high enough, or is too high
@@ -137,27 +157,25 @@ public:
 
 		for (int Height = Y + 1; Height <= MaxY - 1; Height++)  // Loop through boundary to set portal blocks
 		{
-			for (int Width = XZM; Width <= XZP; Width++)
+			for (int Width = a_Scratch.XZM; Width <= a_Scratch.XZP; Width++)
 			{
-				if (Dir == 1)
+				if (a_Scratch.Dir == 1)
 				{
-					a_ChunkInterface.SetBlock(Width, Height, Z, E_BLOCK_NETHER_PORTAL, Dir);
+					a_ChunkInterface.SetBlock(Width, Height, Z, E_BLOCK_NETHER_PORTAL, a_Scratch.Dir);
 				}
 				else
 				{
-					a_ChunkInterface.SetBlock(X, Height, Width, E_BLOCK_NETHER_PORTAL, Dir);
+					a_ChunkInterface.SetBlock(X, Height, Width, E_BLOCK_NETHER_PORTAL, a_Scratch.Dir);
 				}
 			}
 		}
-
-		return;
 	}
 
 	/** Evaluates if coordinates are a portal going XP / XM; returns true if so, and writes boundaries to variable
 	Takes coordinates of base block and Y coord of target obsidian ceiling */
-	bool FindPortalSliceX(int X1, int X2, int Y, int Z, int MaxY, cChunkInterface & a_ChunkInterface)
+	static bool FindPortalSliceX(int X1, int X2, int Y, int Z, int MaxY, cChunkInterface & a_ChunkInterface, Scratch & a_Scratch)
 	{
-		Dir = 1;  // Set assumed direction (will change if portal turns out to be facing the other direction)
+		a_Scratch.Dir = 1;  // Set assumed direction (will change if portal turns out to be facing the other direction)
 		bool FoundFrameXP = false, FoundFrameXM = false;
 		for (; ((a_ChunkInterface.GetBlock({X1, Y, Z}) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock({X1, Y + 1, Z}) == E_BLOCK_OBSIDIAN)); X1++)  // Check XP for obsidian blocks, exempting corners
 		{
@@ -173,7 +191,7 @@ public:
 				return false;  // Not valid slice, no portal can be formed
 			}
 		}
-		XZP = X1 - 1;  // Set boundary of frame interior
+		a_Scratch.XZP = X1 - 1;  // Set boundary of frame interior
 		for (; ((a_ChunkInterface.GetBlock({X2, Y, Z}) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock({X2, Y + 1, Z}) == E_BLOCK_OBSIDIAN)); X2--)  // Go the other direction (XM)
 		{
 			int Value = FindObsidianCeiling(X2, Y, Z, a_ChunkInterface, MaxY);
@@ -188,15 +206,15 @@ public:
 				return false;
 			}
 		}
-		XZM = X2 + 1;  // Set boundary, see previous
+		a_Scratch.XZM = X2 + 1;  // Set boundary, see previous
 
 		return (FoundFrameXP && FoundFrameXM);
 	}
 
 	/** Evaluates if coords are a portal going ZP / ZM; returns true if so, and writes boundaries to variable */
-	bool FindPortalSliceZ(int X, int Y, int Z1, int Z2, int MaxY, cChunkInterface & a_ChunkInterface)
+	static bool FindPortalSliceZ(int X, int Y, int Z1, int Z2, int MaxY, cChunkInterface & a_ChunkInterface, Scratch & a_Scratch)
 	{
-		Dir = 2;
+		a_Scratch.Dir = 2;
 		bool FoundFrameZP = false, FoundFrameZM = false;
 		for (; ((a_ChunkInterface.GetBlock({X, Y, Z1}) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock({X, Y + 1, Z1}) == E_BLOCK_OBSIDIAN)); Z1++)
 		{
@@ -212,7 +230,7 @@ public:
 				return false;
 			}
 		}
-		XZP = Z1 - 1;
+		a_Scratch.XZP = Z1 - 1;
 		for (; ((a_ChunkInterface.GetBlock({X, Y, Z2}) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock({X, Y + 1, Z2}) == E_BLOCK_OBSIDIAN)); Z2--)
 		{
 			int Value = FindObsidianCeiling(X, Y, Z2, a_ChunkInterface, MaxY);
@@ -227,17 +245,17 @@ public:
 				return false;
 			}
 		}
-		XZM = Z2 + 1;
+		a_Scratch.XZM = Z2 + 1;
 
 		return (FoundFrameZP && FoundFrameZM);
 	}
 
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
 	{
 		return true;
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 15;

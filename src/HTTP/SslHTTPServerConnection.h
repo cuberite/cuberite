@@ -10,21 +10,22 @@
 #pragma once
 
 #include "HTTPServerConnection.h"
-#include "mbedTLS++/BufferedSslContext.h"
+#include "../mbedTLS++/BufferedSslContext.h"
 
 
 
 
 
-class cSslHTTPServerConnection :
+class cSslHTTPServerConnection:
 	public cHTTPServerConnection
 {
-	typedef cHTTPServerConnection super;
+	using Super = cHTTPServerConnection;
 
 public:
+
 	/** Creates a new connection on the specified server.
 	Sends the specified cert as the server certificate, uses the private key for decryption. */
-	cSslHTTPServerConnection(cHTTPServer & a_HTTPServer, std::shared_ptr<const cSslConfig> a_Config);
+	cSslHTTPServerConnection(cHTTPServer & a_HTTPServer, const std::shared_ptr<const cSslConfig> & a_Config);
 
 	virtual ~cSslHTTPServerConnection() override;
 

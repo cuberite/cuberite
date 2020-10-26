@@ -2,7 +2,7 @@
 -- Geometry.lua
 
 -- Defines the documentation for geometry-related classes:
--- cBoundingBox, cCuboid, cLineBlockTracer, cTracer, Vector3X
+-- cBoundingBox, cCuboid, cLineBlockTracer, Vector3X
 
 
 
@@ -542,6 +542,11 @@ return
 			},
 		},
 	},
+
+
+
+
+
 	cCuboid =
 	{
 		Desc = [[
@@ -570,32 +575,38 @@ return
 					Params =
 					{
 						{
-							Name = "X1",
-							Type = "number",
+							Name = "Point1",
+							Type = "Vector3i",
 						},
 						{
-							Name = "Y1",
-							Type = "number",
-						},
-						{
-							Name = "Z1",
-							Type = "number",
-						},
-						{
-							Name = "X2",
-							Type = "number",
-						},
-						{
-							Name = "Y2",
-							Type = "number",
-						},
-						{
-							Name = "Z2",
-							Type = "number",
+							Name = "Point2",
+							Type = "Vector3i",
 						},
 					},
 					Notes = "Assigns all the coords to the specified values. Sort-state is ignored.",
 				},
+			},
+			Clamp =
+			{
+				Params =
+				{
+					{
+						Name = "Limits",
+						Type = "cCuboid",
+					},
+				},
+				Notes = "Clamps this cuboid, so that it doesn't reach outside of Limits in any direction. Assumes both cuboids are sorted.",
+			},
+			ClampSize =
+			{
+				Params =
+				{
+					{
+						Name = "MaxSize",
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Clamps this cuboid's p2 so that the cuboid's size doesn't exceed the specified max size. Assumes the cuboid is sorted.",
 			},
 			ClampX =
 			{
@@ -712,42 +723,6 @@ return
 						},
 					},
 					Notes = "Creates a new Cuboid object with the specified point as both its corners (the cuboid has a size of 1 in each direction).",
-				},
-				{
-					Params =
-					{
-						{
-							Name = "X1",
-							Type = "number",
-						},
-						{
-							Name = "Y1",
-							Type = "number",
-						},
-						{
-							Name = "Z1",
-							Type = "number",
-						},
-						{
-							Name = "X2",
-							Type = "number",
-						},
-						{
-							Name = "Y2",
-							Type = "number",
-						},
-						{
-							Name = "Z2",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "cCuboid",
-						},
-					},
-					Notes = "Creates a new Cuboid object with the specified points as its corners.",
 				},
 			},
 			DifX =
@@ -872,30 +847,6 @@ return
 					Params =
 					{
 						{
-							Name = "X",
-							Type = "number",
-						},
-						{
-							Name = "Y",
-							Type = "number",
-						},
-						{
-							Name = "Z",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the specified point (integral coords) is inside this cuboid. Assumes sorted.",
-				},
-				{
-					Params =
-					{
-						{
 							Name = "Point",
 							Type = "Vector3i",
 						},
@@ -940,16 +891,8 @@ return
 				Params =
 				{
 					{
-						Name = "OffsetX",
-						Type = "number",
-					},
-					{
-						Name = "OffsetY",
-						Type = "number",
-					},
-					{
-						Name = "OffsetZ",
-						Type = "number",
+						Name = "Offset",
+						Type = "Vector3i",
 					},
 				},
 				Notes = "Adds the specified offsets to each respective coord, effectively moving the Cuboid. Sort-state is ignored and preserved.",
@@ -973,6 +916,11 @@ return
 			},
 		},
 	},
+
+
+
+
+
 	cLineBlockTracer =
 	{
 		Desc = [[
@@ -1063,25 +1011,44 @@ the most popular tracing reasons - line of sight and solid hits.
 			},  -- LineOfSightTrace
 			Trace =
 			{
-				IsStatic = true,
-				Params =
 				{
-					{ Name = "World",     Type = "cWorld" },
-					{ Name = "Callbacks", Type = "table" },
-					{ Name = "StartX",    Type = "number" },
-					{ Name = "StartY",    Type = "number" },
-					{ Name = "StartZ",    Type = "number" },
-					{ Name = "EndX",      Type = "number" },
-					{ Name = "EndY",      Type = "number" },
-					{ Name = "EndZ",      Type = "number" },
-				},
-				Returns =
-				{
+					IsStatic = true,
+					Params =
 					{
-						Type = "boolean",
+						{ Name = "World",     Type = "cWorld" },
+						{ Name = "Callbacks", Type = "table" },
+						{ Name = "StartX",    Type = "number" },
+						{ Name = "StartY",    Type = "number" },
+						{ Name = "StartZ",    Type = "number" },
+						{ Name = "EndX",      Type = "number" },
+						{ Name = "EndY",      Type = "number" },
+						{ Name = "EndZ",      Type = "number" },
 					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "(OBSOLETE, use the Vector3-based overload instead) Performs the trace on the specified line. Returns true if the entire trace was processed (no callback returned true)",
 				},
-				Notes = "Performs the trace on the specified line. Returns true if the entire trace was processed (no callback returned true)",
+				{
+					IsStatic = true,
+					Params =
+					{
+						{ Name = "World",     Type = "cWorld" },
+						{ Name = "Callbacks", Type = "table" },
+						{ Name = "Start",     Type = "Vector3d" },
+						{ Name = "End",       Type = "Vector3d" },
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Performs the trace on the specified line. Returns true if the entire trace was processed (no callback returned true)",
+				},
 			},
 		},
 		Constants =
@@ -1116,7 +1083,39 @@ The Callbacks in the Trace() function is a table that contains named functions. 
 individual functions from that table for the events that occur on the line - hitting a block, going out of
 valid world data etc. The following table lists all the available callbacks. If the callback function is
 not defined, Cuberite skips it. Each function can return a bool value, if it returns true, the tracing is
-aborted and Trace() returns false.</p>
+aborted and Trace() returns false.<br>
+Note: The folowing can only be used when using the Vector3-based Trace() function. When using
+the number-based overload, the callbacks receive number-based coordinates (see Deprecated
+Callbacks below).</p>
+<p>
+<table><tr><th>Name</th><th>Parameters</th><th>Notes</th></tr>
+<tr><td>OnNextBlock</td><td>BlockPos, BlockType, BlockMeta, EntryFace</td>
+	<td>Called when the ray hits a new valid block. The block type and meta is given. EntryFace is one of the
+	BLOCK_FACE_ constants indicating which "side" of the block got hit by the ray.</td></tr>
+<tr><td>OnNextBlockNoData</td><td>BlockPos, EntryFace</td>
+	<td>Called when the ray hits a new block, but the block is in an unloaded chunk - no valid data is
+	available. Only the coords and the entry face are given.</td></tr>
+<tr><td>OnOutOfWorld</td><td>BlockPos</td>
+	<td>Called when the ray goes outside of the world (Y-wise); the coords specify the exact exit point. Note
+	that for other paths than lines (considered for future implementations) the path may leave the world and
+	go back in again later, in such a case this callback is followed by OnIntoWorld() and further
+	OnNextBlock() calls.</td></tr>
+<tr><td>OnIntoWorld</td><td>BlockPos</td>
+	<td>Called when the ray enters the world (Y-wise); the coords specify the exact entry point.</td></tr>
+<tr><td>OnNoMoreHits</td><td>&nbsp;</td>
+	<td>Called when the path is sure not to hit any more blocks. This is the final callback, no more
+	callbacks are called after this function. Unlike the other callbacks, this function doesn't have a return
+	value.</td></tr>
+<tr><td>OnNoChunk</td><td>&nbsp;</td>
+	<td>Called when the ray enters a chunk that is not loaded. This usually means that the tracing is aborted.
+	Unlike the other callbacks, this function doesn't have a return value.</td></tr>
+</table>
+				]],
+			},
+			{
+				Header = "Deprecated Callbacks",
+				Contents = [[
+When using the deprecated number-based Trace function, Cuberite will instead assume the following signatures for the callbacks:</p>
 <p>
 <table><tr><th>Name</th><th>Parameters</th><th>Notes</th></tr>
 <tr><td>OnNextBlock</td><td>BlockX, BlockY, BlockZ, BlockType, BlockMeta, EntryFace</td>
@@ -1132,14 +1131,8 @@ aborted and Trace() returns false.</p>
 	OnNextBlock() calls.</td></tr>
 <tr><td>OnIntoWorld</td><td>X, Y, Z</td>
 	<td>Called when the ray enters the world (Y-wise); the coords specify the exact entry point.</td></tr>
-<tr><td>OnNoMoreHits</td><td>&nbsp;</td>
-	<td>Called when the path is sure not to hit any more blocks. This is the final callback, no more
-	callbacks are called after this function. Unlike the other callbacks, this function doesn't have a return
-	value.</td></tr>
-<tr><td>OnNoChunk</td><td>&nbsp;</td>
-	<td>Called when the ray enters a chunk that is not loaded. This usually means that the tracing is aborted.
-	Unlike the other callbacks, this function doesn't have a return value.</td></tr>
 </table>
+
 				]],
 			},
 			{
@@ -1153,12 +1146,12 @@ function HandleSpideyCmd(a_Split, a_Player)
 	local World = a_Player:GetWorld();
 
 	local Callbacks = {
-		OnNextBlock = function(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)
+		OnNextBlock = function(a_BlockPos, a_BlockType, a_BlockMeta)
 			if (a_BlockType ~= E_BLOCK_AIR) then
 				-- abort the trace
 				return true;
 			end
-			World:SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_COBWEB, 0);
+			World:SetBlock(a_BlockPos, E_BLOCK_COBWEB, 0);
 		end
 	};
 
@@ -1170,7 +1163,7 @@ function HandleSpideyCmd(a_Split, a_Player)
 	local Start = EyePos + LookVector + LookVector;
 	local End = EyePos + LookVector * 50;
 
-	cLineBlockTracer.Trace(World, Callbacks, Start.x, Start.y, Start.z, End.x, End.y, End.z);
+	cLineBlockTracer.Trace(World, Callbacks, Start, End);
 
 	return true;
 end
@@ -1180,20 +1173,11 @@ end
 			},
 		},
 	},
-	cTracer =
-	{
-		Desc = [[
-			This class is <b>OBSOLETE</b>, do not use it.
-			See the {{cLineBlockTracer}} class for the replacement.
-		]],
-		Functions =
-		{
-			Trace =
-			{
-				Notes = "<b>OBSOLETE</b>, use the {{cLineBlockTracer}} class instead.",
-			},
-		},
-	},
+
+
+
+
+
 	Vector3d =
 	{
 		Desc = [[
@@ -1211,6 +1195,88 @@ end
 			abs =
 			{
 				Notes = "<b>OBSOLETE</b>, use Abs() instead.",
+			},
+			addedX =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3d",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the X axis",
+			},
+			addedXZ =
+			{
+				Params =
+				{
+					{
+						Name = "ofsX",
+						Type = "number",
+					},
+					{
+						Name = "ofsZ",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3d",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offsets on the X and Z axes",
+			},
+			addedY =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3d",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the Y axis",
+			},
+			addedZ =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3d",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the Z axis",
+			},
+			Ceil =
+			{
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns a new {{Vector3i}} object with coords set to math.ceil of this vector's coords.",
 			},
 			Clamp =
 			{
@@ -1687,6 +1753,11 @@ end
 			},
 		},
 	},
+
+
+
+
+
 	Vector3f =
 	{
 		Desc = [[
@@ -1704,6 +1775,88 @@ end
 			abs =
 			{
 				Notes = "<b>OBSOLETE</b>, use Abs() instead.",
+			},
+			addedX =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3f",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the X axis",
+			},
+			addedXZ =
+			{
+				Params =
+				{
+					{
+						Name = "ofsX",
+						Type = "number",
+					},
+					{
+						Name = "ofsZ",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3f",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offsets on the X and Z axes",
+			},
+			addedY =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3f",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the Y axis",
+			},
+			addedZ =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3f",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the Z axis",
+			},
+			Ceil =
+			{
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns a new {{Vector3i}} object with coords set to math.ceil of this vector's coords.",
 			},
 			Clamp =
 			{
@@ -2212,6 +2365,11 @@ end
 			},
 		},
 	},
+
+
+
+
+
 	Vector3i =
 	{
 		Desc = [[
@@ -2229,6 +2387,88 @@ end
 			abs =
 			{
 				Notes = "<b>OBSOLETE</b>, use Abs() instead.",
+			},
+			addedX =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the X axis",
+			},
+			addedXZ =
+			{
+				Params =
+				{
+					{
+						Name = "ofsX",
+						Type = "number",
+					},
+					{
+						Name = "ofsZ",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offsets on the X and Z axes",
+			},
+			addedY =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the Y axis",
+			},
+			addedZ =
+			{
+				Params =
+				{
+					{
+						Name = "ofs",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns a copy of the vector, moved by the specified offset on the Z axis",
+			},
+			Ceil =
+			{
+				Returns =
+				{
+					{
+						Type = "Vector3i",
+					},
+				},
+				Notes = "Returns a new {{Vector3i}} object with coords set to math.ceil of this vector's coords. Normally not too useful with integer-only vectors, but still included for API completeness.",
 			},
 			Clamp =
 			{

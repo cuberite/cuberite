@@ -1,54 +1,43 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 
 
 
 
-
-class cSmallGateHandler : public cRedstoneHandler
+namespace SmallGateHandler
 {
-	typedef cRedstoneHandler super;
-public:
-
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
-		UNUSED(a_World);
+		UNUSED(a_Chunk);
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
 		UNUSED(a_QueryPosition);
 		UNUSED(a_QueryBlockType);
+		UNUSED(IsLinked);
 		return 0;
 	}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
-	{
-		UNUSED(a_World);
-		UNUSED(a_Position);
-		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
-		return 0;
-	}
-
-	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating gateydory the fence gate/trapdoor (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
-		auto Data = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData();
-		if (a_PoweringData != Data->ExchangeUpdateOncePowerData(a_Position, a_PoweringData))
-		{
-			a_World.SetBlockMeta(a_Position, (a_PoweringData.PowerLevel > 0) ? (a_Meta | 0x4) : (a_Meta & ~0x04));
-		}
 
-		return {};
+		// Use redstone data rather than block state so players can override redstone control
+		const auto Previous = DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, Power);
+		const bool IsOpen = (Previous != 0);
+		const bool ShouldBeOpen = Power != 0;
+
+		if (ShouldBeOpen != IsOpen)
+		{
+			a_Chunk.SetMeta(a_Position, ShouldBeOpen ? (a_Meta | 0x4) : (a_Meta & ~0x04));
+		}
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
-		UNUSED(a_World);
+		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
-		return GetAdjustedRelatives(a_Position, GetRelativeAdjacents());;
+		InvokeForAdjustedRelatives(Callback, a_Position, RelativeAdjacents);
 	}
 };

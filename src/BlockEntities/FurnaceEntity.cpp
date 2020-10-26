@@ -22,8 +22,8 @@ enum
 
 
 
-cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_CurrentRecipe(nullptr),
 	m_IsDestroyed(false),
 	m_IsCooking(a_BlockType == E_BLOCK_LIT_FURNACE),
@@ -106,7 +106,7 @@ bool cFurnaceEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		// Reset progressbars, block type, and bail out
 		m_BlockType = E_BLOCK_FURNACE;
-		a_Chunk.FastSetBlock(GetRelX(), m_PosY, GetRelZ(), E_BLOCK_FURNACE, m_BlockMeta);
+		a_Chunk.FastSetBlock(GetRelPos(), E_BLOCK_FURNACE, m_BlockMeta);
 		UpdateProgressBars();
 		return false;
 	}
@@ -139,10 +139,12 @@ bool cFurnaceEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cFurnaceEntity::UsedBy(cPlayer * a_Player)
 {
+	a_Player->GetStatManager().AddValue(Statistic::InteractWithFurnace);
+
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
 	{
-		OpenWindow(new cFurnaceWindow(m_PosX, m_PosY, m_PosZ, this));
+		OpenWindow(new cFurnaceWindow(this));
 		Window = GetWindow();
 	}
 
@@ -190,7 +192,7 @@ int cFurnaceEntity::GetAndResetReward(void)
 
 
 
-void cFurnaceEntity::BroadcastProgress(short a_ProgressbarID, short a_Value)
+void cFurnaceEntity::BroadcastProgress(size_t a_ProgressbarID, short a_Value)
 {
 	cWindow * Window = GetWindow();
 	if (Window != nullptr)
@@ -433,6 +435,6 @@ void cFurnaceEntity::SetIsCooking(bool a_IsCooking)
 	if (m_IsCooking)
 	{
 		m_BlockType = E_BLOCK_LIT_FURNACE;
-		m_World->FastSetBlock(m_PosX, m_PosY, m_PosZ, E_BLOCK_LIT_FURNACE, m_BlockMeta);
+		m_World->FastSetBlock(m_Pos, E_BLOCK_LIT_FURNACE, m_BlockMeta);
 	}
 }

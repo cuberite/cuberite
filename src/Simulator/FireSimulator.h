@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Simulator.h"
+#include "../IniFile.h"
 
 
 
@@ -18,18 +19,19 @@ class cFireSimulator :
 	public cSimulator
 {
 public:
+
 	cFireSimulator(cWorld & a_World, cIniFile & a_IniFile);
-	virtual ~cFireSimulator() override;
-
-	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
-	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
-
-	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override;
 
 	static bool IsFuel   (BLOCKTYPE a_BlockType);
 	static bool DoesBurnForever(BLOCKTYPE a_BlockType);
 
-protected:
+private:
+
+	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
+	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
+
+	static bool IsAllowedBlock(BLOCKTYPE a_BlockType);
+
 	/** Time (in msec) that a fire block takes to burn with a fuel block into the next step */
 	unsigned m_BurnStepTimeFuel;
 
@@ -42,23 +44,22 @@ protected:
 	/** Chance [0..100000] of a fuel burning out being replaced by a new fire block instead of an air block */
 	int m_ReplaceFuelChance;
 
-
-	virtual void AddBlock(Vector3i a_Block, cChunk * a_Chunk) override;
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
 
 	/** Returns the time [msec] after which the specified fire block is stepped again; based on surrounding fuels */
-	int GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
+	int GetBurnStepTime(cChunk * a_Chunk, Vector3i a_RelPos);
 
 	/** Tries to spread fire to a neighborhood of the specified block */
-	void TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
+	void TrySpreadFire(cChunk * a_Chunk, Vector3i a_RelPos);
 
 	/** Removes all burnable blocks neighboring the specified block */
-	void RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
+	void RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos);
 
 	/** Returns true if a fire can be started in the specified block,
 	that is, it is an air block and has fuel next to it.
 	Note that a_NearChunk may be a chunk neighbor to the block specified!
 	The coords are relative to a_NearChunk but not necessarily in it. */
-	bool CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a_RelY, int a_RelZ);
+	bool CanStartFireInBlock(cChunk * a_NearChunk, Vector3i a_RelPos);
 } ;
 
 

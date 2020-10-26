@@ -36,8 +36,8 @@ void cLuaServerHandle::SetServerHandle(cServerHandlePtr a_ServerHandle, cLuaServ
 {
 	ASSERT(m_ServerHandle == nullptr);  // The handle can be set only once
 
-	m_ServerHandle = a_ServerHandle;
-	m_Self = a_Self;
+	m_ServerHandle = std::move(a_ServerHandle);
+	m_Self = std::move(a_Self);
 }
 
 
@@ -143,7 +143,7 @@ cTCPLink::cCallbacksPtr cLuaServerHandle::OnIncomingConnection(const AString & a
 	cCSLock Lock(m_CSConnections);
 	m_Connections.push_back(res);
 
-	return res;
+	return std::move(res);
 }
 
 

@@ -7,23 +7,27 @@
 
 
 
-class cBlockMyceliumHandler :
+class cBlockMyceliumHandler final :
 	public cBlockHandler
 {
 public:
-	cBlockMyceliumHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
-	{
-	}
+
+	using cBlockHandler::cBlockHandler;
+
+private:
 
 	// TODO: Add Mycel Spread
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		a_Pickups.push_back(cItem(E_BLOCK_DIRT, 1, 0));
+		return cItem(E_BLOCK_DIRT, 1, 0);
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 24;

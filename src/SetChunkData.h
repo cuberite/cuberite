@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ChunkData.h"
+#include "BlockEntities/BlockEntity.h"
 
 
 

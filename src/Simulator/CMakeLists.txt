@@ -1,8 +1,6 @@
-project (Cuberite)
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
-SET (SRCS
 	DelayedFluidSimulator.cpp
 	FireSimulator.cpp
 	FloodyFluidSimulator.cpp
@@ -12,9 +10,7 @@ SET (SRCS
 	SimulatorManager.cpp
 	VanillaFluidSimulator.cpp
 	VaporizeFluidSimulator.cpp
-)
 
-SET (HDRS
 	DelayedFluidSimulator.h
 	FireSimulator.h
 	FloodyFluidSimulator.h
@@ -28,8 +24,3 @@ SET (HDRS
 	VanillaFluidSimulator.h
 	VaporizeFluidSimulator.h
 )
-
-if(NOT MSVC)
-	add_library(Simulator ${SRCS} ${HDRS})
-	target_link_libraries(Simulator fmt::fmt)
-endif()

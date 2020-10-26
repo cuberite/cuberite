@@ -9,13 +9,14 @@ class cEntity;
 
 
 
-class cWolf :
+class cWolf:
 	public cPassiveAggressiveMonster
 {
-	typedef cPassiveAggressiveMonster super;
+	using Super = cPassiveAggressiveMonster;
 
 public:
-	cWolf(void);
+
+	cWolf();
 
 	CLASS_PROTODEF(cWolf)
 
@@ -57,6 +58,23 @@ public:
 	void ReceiveNearbyFightInfo(const cUUID & a_PlayerUUID, cPawn * a_Opponent, bool a_IsPlayerInvolved);
 
 	virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+
+	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2) override;
+	virtual void GetBreedingItems(cItems & a_Items) override
+	{
+		a_Items.Add(E_ITEM_RAW_BEEF);
+		a_Items.Add(E_ITEM_STEAK);
+		a_Items.Add(E_ITEM_RAW_PORKCHOP);
+		a_Items.Add(E_ITEM_COOKED_PORKCHOP);
+		a_Items.Add(E_ITEM_RAW_CHICKEN);
+		a_Items.Add(E_ITEM_COOKED_CHICKEN);
+		a_Items.Add(E_ITEM_RAW_MUTTON);
+		a_Items.Add(E_ITEM_COOKED_MUTTON);
+		a_Items.Add(E_ITEM_RAW_RABBIT);
+		a_Items.Add(E_ITEM_COOKED_RABBIT);
+		a_Items.Add(E_ITEM_ROTTEN_FLESH);
+	}
+
 
 protected:
 

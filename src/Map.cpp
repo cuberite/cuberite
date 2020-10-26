@@ -3,14 +3,14 @@
 
 #include "Globals.h"
 
-#include "Map.h"
-
-#include "World.h"
+#include "BlockInfo.h"
+#include "Blocks/BlockHandler.h"
 #include "Chunk.h"
+#include "ClientHandle.h"
 #include "Entities/Player.h"
 #include "FastRandom.h"
-#include "Blocks/BlockHandler.h"
-#include "ClientHandle.h"
+#include "Map.h"
+#include "World.h"
 
 
 
@@ -125,11 +125,6 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 	ColorID PixelData;
 	m_World->DoWithChunk(ChunkX, ChunkZ, [&](cChunk & a_Chunk)
 		{
-			if (!a_Chunk.IsValid())
-			{
-				return false;
-			}
-
 			if (GetDimension() == dimNether)
 			{
 				// TODO 2014-02-22 xdot: Nether maps
@@ -144,7 +139,7 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 			auto Height = a_Chunk.GetHeight(RelX, RelZ);
 			auto ChunkHeight = cChunkDef::Height;
 			a_Chunk.GetBlockTypeMeta(RelX, Height, RelZ, TargetBlock, TargetMeta);
-			auto ColourID = BlockHandler(TargetBlock)->GetMapBaseColourID(TargetMeta);
+			auto ColourID = cBlockHandler::For(TargetBlock).GetMapBaseColourID(TargetMeta);
 
 			if (IsBlockWater(TargetBlock))
 			{
@@ -156,7 +151,7 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 			}
 			else if (ColourID == 0)
 			{
-				while (((--Height) != -1) && ((ColourID = BlockHandler(a_Chunk.GetBlock(RelX, Height, RelZ))->GetMapBaseColourID(a_Chunk.GetMeta(RelX, Height, RelZ))) == 0))
+				while (((--Height) != -1) && ((ColourID = cBlockHandler::For(a_Chunk.GetBlock(RelX, Height, RelZ)).GetMapBaseColourID(a_Chunk.GetMeta(RelX, Height, RelZ))) == 0))
 				{
 					continue;
 				}
@@ -299,11 +294,6 @@ const cMapDecorator cMap::CreateDecorator(const cEntity * a_TrackedEntity)
 	}
 	else
 	{
-		if ((PixelX > 320.0) || (PixelZ > 320.0))
-		{
-			;
-		}
-
 		Rot = 0;
 		Type = cMapDecorator::eType::E_TYPE_PLAYER_OUTSIDE;
 

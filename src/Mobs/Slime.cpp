@@ -2,24 +2,25 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Slime.h"
-#include "FastRandom.h"
-#include "World.h"
+#include "../FastRandom.h"
+#include "../World.h"
 
 
 
 
 
 cSlime::cSlime(int a_Size) :
-	super("Slime",
+	Super("Slime",
 		mtSlime,
 		Printf("entity.%sslime.hurt", GetSizeName(a_Size).c_str()),
 		Printf("entity.%sslime.death", GetSizeName(a_Size).c_str()),
+		"",
 		0.6 * a_Size,
 		0.6 * a_Size
 	),
 	m_Size(a_Size)
 {
-	SetMaxHealth(a_Size * a_Size);
+	SetMaxHealth(static_cast<float>(a_Size * a_Size));
 	SetAttackDamage(a_Size);
 }
 
@@ -51,7 +52,7 @@ bool cSlime::Attack(std::chrono::milliseconds a_Dt)
 	if (m_Size > 1)
 	{
 		// Only slimes larger than size 1 attack a player.
-		return super::Attack(a_Dt);
+		return Super::Attack(a_Dt);
 	}
 
 	return false;
@@ -78,13 +79,13 @@ void cSlime::KilledBy(TakeDamageInfo & a_TDI)
 			double AddX = (i % 2 - 0.5) * m_Size / 4.0;
 			double AddZ = (i / 2 - 0.5) * m_Size / 4.0;
 
-			auto NewSlime = cpp14::make_unique<cSlime>(m_Size / 2);
+			auto NewSlime = std::make_unique<cSlime>(m_Size / 2);
 			NewSlime->SetPosition(GetPosX() + AddX, GetPosY() + 0.5, GetPosZ() + AddZ);
 			NewSlime->SetYaw(Random.RandReal(360.0f));
 			m_World->SpawnMobFinalize(std::move(NewSlime));
 		}
 	}
-	super::KilledBy(a_TDI);
+	Super::KilledBy(a_TDI);
 }
 
 

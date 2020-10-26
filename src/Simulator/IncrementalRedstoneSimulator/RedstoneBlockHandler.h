@@ -1,48 +1,33 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 
 
 
 
-
-class cRedstoneBlockHandler : public cRedstoneHandler
+namespace RedstoneBlockHandler
 {
-	typedef cRedstoneHandler super;
-public:
-
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
-		UNUSED(a_World);
+		UNUSED(a_Chunk);
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
 		UNUSED(a_QueryPosition);
-		return cIncrementalRedstoneSimulator::IsMechanism(a_QueryBlockType) ? 15 : 0;
+		UNUSED(IsLinked);
+		return IsLinked ? 0 : 15;
 	}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
-	{
-		UNUSED(a_World);
-		UNUSED(a_Position);
-		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
-		return 15;
-	}
-
-	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating crimson the redstone block (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
-		return {};
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
-		UNUSED(a_World);
+		UNUSED(a_Chunk);
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
-		return {};
+		UNUSED(Callback);
 	}
 };

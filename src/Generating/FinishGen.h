@@ -15,6 +15,8 @@
 
 
 
+#pragma once
+
 #include "ComposableGenerator.h"
 #include "../Noise/Noise.h"
 #include "../ProbabDistrib.h"
@@ -104,7 +106,7 @@ public:
 		BiomeInfo(int a_MinNumClumpsPerChunk, int a_MaxNumClumpsPerChunk, std::vector<FoliageInfo> a_Blocks) :
 			m_MinNumClumpsPerChunk(a_MinNumClumpsPerChunk),
 			m_MaxNumClumpsPerChunk(a_MaxNumClumpsPerChunk),
-			m_Blocks(a_Blocks)
+			m_Blocks(std::move(a_Blocks))
 		{}
 	};
 
@@ -118,7 +120,7 @@ public:
 
 	/** Parses a string and puts a vector with a length of biMaxVariantBiome in a_Output.
 	The format of the string is "<Biomes separated with a comma>;<Blocks separated with a comma>". This can also be repeated with a | */
-	static void ParseConfigurationString(AString a_String, std::vector<BiomeInfo> & a_Output);
+	static void ParseConfigurationString(const AString & a_String, std::vector<BiomeInfo> & a_Output);
 
 	/** Parses an inifile in search for all clumps */
 	static std::vector<BiomeInfo> ParseIniFile(cIniFile & a_IniFile, AString a_ClumpPrefix);
@@ -487,9 +489,10 @@ Note that this class uses the "Nest" terminology for individual packs of ore, it
 class cFinishGenOres:
 	public cFinishGen
 {
-	typedef cFinishGen Super;
+	using Super = cFinishGen;
 
 public:
+
 	struct OreInfo
 	{
 		BLOCKTYPE  m_BlockType;  // The type of the nest.
@@ -574,12 +577,13 @@ protected:
 
 
 
-class cFinishGenOreNests :
+class cFinishGenOreNests:
 	public cFinishGenOres
 {
-	typedef cFinishGenOres Super;
+	using Super = cFinishGenOres;
 
 public:
+
 	cFinishGenOreNests(int a_Seed, const OreInfos & a_OreInfos):
 		Super(a_Seed, a_OreInfos)
 	{}
@@ -602,9 +606,10 @@ protected:
 class cFinishGenOrePockets:
 	public cFinishGenOres
 {
-	typedef cFinishGenOres Super;
+	using Super = cFinishGenOres;
 
 public:
+
 	cFinishGenOrePockets(int a_Seed, const OreInfos & a_OreInfos):
 		Super(a_Seed, a_OreInfos)
 	{}

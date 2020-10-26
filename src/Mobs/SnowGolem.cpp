@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "SnowGolem.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 
 
@@ -9,7 +10,7 @@
 
 
 cSnowGolem::cSnowGolem(void) :
-	super("SnowGolem", mtSnowGolem, "entity.snowman.hurt", "entity.snowman.death", 0.4, 1.8)
+	Super("SnowGolem", mtSnowGolem, "entity.snowman.hurt", "entity.snowman.death", "entity.snowman.ambient", 0.4, 1.8)
 {
 }
 
@@ -29,7 +30,7 @@ void cSnowGolem::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -37,7 +38,7 @@ void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	if (IsBiomeNoDownfall(m_World->GetBiomeAt(POSX_TOINT, POSZ_TOINT)))
 	{
-		TakeDamage(*this);
+		TakeDamage(dtEnvironment, nullptr, GetRawDamageAgainst(*this), GetKnockbackAmountAgainst(*this));
 	}
 	else
 	{

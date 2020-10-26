@@ -12,6 +12,21 @@ typedef std::vector<int> cSlotNums;
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#endif
+/** Constant to calculate ticks from seconds "ticks per second" */
+constexpr inline const int TPS = 20;
+// This is not added to the lua API because it broke the build
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
+
+
+
+
 // tolua_begin
 
 /** Experience Orb setup */
@@ -238,674 +253,202 @@ enum eSkinPart
 
 
 
-
-inline const char * ClickActionToString(int a_ClickAction)
+/** Dimension of a world */
+enum eDimension
 {
-	switch (a_ClickAction)
-	{
-		case caLeftClick:                    return "caLeftClick";
-		case caRightClick:                   return "caRightClick";
-		case caShiftLeftClick:               return "caShiftLeftClick";
-		case caShiftRightClick:              return "caShiftRightClick";
-		case caNumber1:                      return "caNumber1";
-		case caNumber2:                      return "caNumber2";
-		case caNumber3:                      return "caNumber3";
-		case caNumber4:                      return "caNumber4";
-		case caNumber5:                      return "caNumber5";
-		case caNumber6:                      return "caNumber6";
-		case caNumber7:                      return "caNumber7";
-		case caNumber8:                      return "caNumber8";
-		case caNumber9:                      return "caNumber9";
-		case caMiddleClick:                  return "caMiddleClick";
-		case caDropKey:                      return "caDropKey";
-		case caCtrlDropKey:                  return "caCtrlDropKey";
-		case caLeftClickOutside:             return "caLeftClickOutside";
-		case caRightClickOutside:            return "caRightClickOutside";
-		case caLeftClickOutsideHoldNothing:  return "caLeftClickOutsideHoldNothing";
-		case caRightClickOutsideHoldNothing: return "caRightClickOutsideHoldNothing";
-		case caLeftPaintBegin:               return "caLeftPaintBegin";
-		case caRightPaintBegin:              return "caRightPaintBegin";
-		case caMiddlePaintBegin:             return "caMiddlePaintBegin";
-		case caLeftPaintProgress:            return "caLeftPaintProgress";
-		case caRightPaintProgress:           return "caRightPaintProgress";
-		case caMiddlePaintProgress:          return "caMiddlePaintProgress";
-		case caLeftPaintEnd:                 return "caLeftPaintEnd";
-		case caRightPaintEnd:                return "caRightPaintEnd";
-		case caMiddlePaintEnd:               return "caMiddlePaintEnd";
-		case caDblClick:                     return "caDblClick";
-
-		case caUnknown:                      return "caUnknown";
-	}
-	UNREACHABLE("Unknown click action");
-}
+	dimNether    = -1,
+	dimOverworld = 0,
+	dimEnd       = 1,
+	dimNotSet    = 255,  // For things that need an "indeterminate" state, such as cProtocol's LastSentDimension
+} ;
 
 
 
 
+
+/** Damage type, used in the TakeDamageInfo structure and related functions */
+enum eDamageType
+{
+	// Canonical names for the types (as documented in the plugin wiki):
+	dtAttack,           // Being attacked by a mob
+	dtRangedAttack,     // Being attacked by a projectile, possibly from a mob
+	dtLightning,        // Hit by a lightning strike
+	dtFalling,          // Falling down; dealt when hitting the ground
+	dtDrowning,         // Drowning in water / lava
+	dtSuffocating,      // Suffocating inside a block
+	dtStarving,         // Hunger
+	dtCactusContact,    // Contact with a cactus block
+	dtLavaContact,      // Contact with a lava block
+	dtPoisoning,        // Having the poison effect
+	dtWithering,        // Having the wither effect
+	dtOnFire,           // Being on fire
+	dtFireContact,      // Standing inside a fire block
+	dtInVoid,           // Falling into the Void (Y < 0)
+	dtPotionOfHarming,
+	dtEnderPearl,       // Thrown an ender pearl, teleported by it
+	dtAdmin,            // Damage applied by an admin command
+	dtExplosion,        // Damage applied by an explosion
+	dtEnvironment,      // Damage dealt to mobs from environment: enderman in rain, snow golem in desert
+
+	// Some common synonyms:
+	dtPawnAttack   = dtAttack,
+	dtEntityAttack = dtAttack,
+	dtMob          = dtAttack,
+	dtMobAttack    = dtAttack,
+	dtArrowAttack  = dtRangedAttack,
+	dtArrow        = dtRangedAttack,
+	dtProjectile   = dtRangedAttack,
+	dtFall         = dtFalling,
+	dtDrown        = dtDrowning,
+	dtSuffocation  = dtSuffocating,
+	dtStarvation   = dtStarving,
+	dtHunger       = dtStarving,
+	dtCactus       = dtCactusContact,
+	dtCactuses     = dtCactusContact,
+	dtCacti        = dtCactusContact,
+	dtLava         = dtLavaContact,
+	dtPoison       = dtPoisoning,
+	dtWither       = dtWithering,
+	dtBurning      = dtOnFire,
+	dtInFire       = dtFireContact,
+	dtPlugin       = dtAdmin,
+} ;
+
+
+
+
+
+/** The source of an explosion.
+Also dictates the type of the additional data passed to the explosion handlers:
+| esBed           | Vector3i *             | Bed exploding in the Nether or in the End
+| esEnderCrystal  | cEnderCrystal *        |
+| esGhastFireball | cGhastFireballEntity * |
+| esMonster       | cMonster *             |
+| esOther         | nullptr                | Any other explosion unaccounted for
+| esPlugin        | nullptr                | Explosion primarily attributed to a plugin
+| esPrimedTNT     | cTNTEntity *           |
+| esWitherBirth   | cMonster *             |
+| esWitherSkull   | cProjectileEntity *    |
+*/
+enum eExplosionSource
+{
+	esBed,
+	esEnderCrystal,
+	esGhastFireball,
+	esMonster,
+	esOther,
+	esPlugin,
+	esPrimedTNT,
+	esWitherBirth,
+	esWitherSkull,
+	esMax,
+} ;
+
+
+
+
+
+enum eShrapnelLevel
+{
+	slNone,
+	slGravityAffectedOnly,
+	slAll
+} ;
+
+
+
+
+
+enum eSpreadSource
+{
+	ssFireSpread,
+	ssGrassSpread,
+	ssMushroomSpread,
+	ssMycelSpread,
+	ssVineSpread,
+} ;
+
+
+
+
+
+enum eMessageType
+{
+	// https://forum.cuberite.org/thread-1212.html
+	// MessageType...
+
+	mtCustom,          // Send raw data without any processing
+	mtFailure,         // Something could not be done (i.e. command not executed due to insufficient privilege)
+	mtInformation,     // Informational message (i.e. command usage)
+	mtSuccess,         // Something executed successfully
+	mtWarning,         // Something concerning (i.e. reload) is about to happen
+	mtFatal,           // Something catastrophic occured (i.e. plugin crash)
+	mtDeath,           // Denotes death of player
+	mtPrivateMessage,  // Player to player messaging identifier
+	mtJoin,            // A player has joined the server
+	mtLeave,           // A player has left the server
+	mtMaxPlusOne,      // The first invalid type, used for checking on LuaAPI boundaries
+
+	// Common aliases:
+	mtFail  = mtFailure,
+	mtError = mtFailure,
+	mtInfo  = mtInformation,
+	mtPM    = mtPrivateMessage,
+};
+
+
+
+
+/** Returns a textual representation of the click action. */
+const char * ClickActionToString(int a_ClickAction);
 
 /** Returns a blockface mirrored around the Y axis (doesn't change up / down). */
-inline eBlockFace MirrorBlockFaceY(eBlockFace a_BlockFace)
-{
-	switch (a_BlockFace)
-	{
-		case BLOCK_FACE_XM: return BLOCK_FACE_XP;
-		case BLOCK_FACE_XP: return BLOCK_FACE_XM;
-		case BLOCK_FACE_ZM: return BLOCK_FACE_ZP;
-		case BLOCK_FACE_ZP: return BLOCK_FACE_ZM;
-		case BLOCK_FACE_NONE:
-		case BLOCK_FACE_YM:
-		case BLOCK_FACE_YP:
-		{
-			return a_BlockFace;
-		}
-	}
-	UNREACHABLE("Unsupported block face");
-}
-
-
-
-
+eBlockFace MirrorBlockFaceY(eBlockFace a_BlockFace);
 
 /** Returns a blockface rotated around the Y axis counter-clockwise. */
-inline eBlockFace RotateBlockFaceCCW(eBlockFace a_BlockFace)
-{
-	switch (a_BlockFace)
-	{
-		case BLOCK_FACE_XM: return BLOCK_FACE_ZP;
-		case BLOCK_FACE_XP: return BLOCK_FACE_ZM;
-		case BLOCK_FACE_ZM: return BLOCK_FACE_XM;
-		case BLOCK_FACE_ZP: return BLOCK_FACE_XP;
-		case BLOCK_FACE_NONE:
-		case BLOCK_FACE_YM:
-		case BLOCK_FACE_YP:
-		{
-			return a_BlockFace;
-		}
-	}
-	UNREACHABLE("Unsupported block face");
-}
+eBlockFace RotateBlockFaceCCW(eBlockFace a_BlockFace);
 
+/** Returns a blockface rotated around the Y axis clockwise. */
+eBlockFace RotateBlockFaceCW(eBlockFace a_BlockFace);
 
-
-
-
-inline eBlockFace RotateBlockFaceCW(eBlockFace a_BlockFace)
-{
-	switch (a_BlockFace)
-	{
-		case BLOCK_FACE_XM: return BLOCK_FACE_ZM;
-		case BLOCK_FACE_XP: return BLOCK_FACE_ZP;
-		case BLOCK_FACE_ZM: return BLOCK_FACE_XP;
-		case BLOCK_FACE_ZP: return BLOCK_FACE_XM;
-		case BLOCK_FACE_NONE:
-		case BLOCK_FACE_YM:
-		case BLOCK_FACE_YP:
-		{
-			return a_BlockFace;
-		}
-	}
-	UNREACHABLE("Unsupported block face");
-}
-
-
-
-
-
-inline eBlockFace ReverseBlockFace(eBlockFace  a_BlockFace)
-{
-	switch (a_BlockFace)
-	{
-		case BLOCK_FACE_YP:   return BLOCK_FACE_YM;
-		case BLOCK_FACE_XP:   return BLOCK_FACE_XM;
-		case BLOCK_FACE_ZP:   return BLOCK_FACE_ZM;
-		case BLOCK_FACE_YM:   return BLOCK_FACE_YP;
-		case BLOCK_FACE_XM:   return BLOCK_FACE_XP;
-		case BLOCK_FACE_ZM:   return BLOCK_FACE_ZP;
-		case BLOCK_FACE_NONE: return a_BlockFace;
-	}
-	UNREACHABLE("Unsupported block face");
-}
-
-
-
-
+/** Returns a blockface opposite to the one specified. */
+eBlockFace ReverseBlockFace(eBlockFace  a_BlockFace);
 
 /** Returns the textual representation of the BlockFace constant. */
-inline AString BlockFaceToString(eBlockFace a_BlockFace)
+AString BlockFaceToString(eBlockFace a_BlockFace);
+
+/** Returns true if the specified block type is valid (known). */
+bool IsValidBlock(int a_BlockType);
+
+/** Returns true if the specified item type is valid (known). */
+bool IsValidItem(int a_ItemType);
+
+/** Translates a dimension string to dimension enum. Takes either a number or a dimension alias (built-in). Returns dimOverworld on failure */
+extern eDimension StringToDimension(const AString & a_DimensionString);
+
+/** Translates a dimension enum to dimension string.
+Takes an eDimension enum value and returns "Overworld" on failure. */
+extern AString DimensionToString(eDimension a_Dimension);
+
+/** Translates damage type constant to a string representation (built-in). */
+extern AString DamageTypeToString(eDamageType a_DamageType);
+
+/** Translates a damage type string to damage type. Takes either a number or a damage type alias (built-in). Returns -1 on failure */
+extern eDamageType StringToDamageType(const AString & a_DamageString);
+
+/** Modifies the specified coords so that they point to the block adjacent to the one specified through its specified face.
+If a_Inverse is true, the opposite direction is used instead. */
+void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBlockFace a_BlockFace, bool a_bInverse = false);
+
+/** Returns the coords of a block that is neighboring the specified position through its specified face.
+If a_IsInverse is true, the opposite direction is used instead. */
+inline Vector3i AddFaceDirection(Vector3i a_Pos, eBlockFace a_BlockFace, bool a_bInverse = false)
 {
-	switch (a_BlockFace)
-	{
-		case BLOCK_FACE_XM: return "BLOCK_FACE_XM";
-		case BLOCK_FACE_XP: return "BLOCK_FACE_XP";
-		case BLOCK_FACE_YM: return "BLOCK_FACE_YM";
-		case BLOCK_FACE_YP: return "BLOCK_FACE_YP";
-		case BLOCK_FACE_ZM: return "BLOCK_FACE_ZM";
-		case BLOCK_FACE_ZP: return "BLOCK_FACE_ZP";
-		case BLOCK_FACE_NONE: return "BLOCK_FACE_NONE";
-	}
-	UNREACHABLE("Unsupported block face");
-}
-
-
-
-
-
-inline bool IsValidBlock(int a_BlockType)
-{
-	if (
-		(
-		(a_BlockType > -1) &&
-		(a_BlockType <= E_BLOCK_MAX_TYPE_ID)
-		) ||
-		(a_BlockType == 255)  // the blocks 253-254 don't exist yet -> https://minecraft.gamepedia.com/Data_values#Block_IDs
-	)
-	{
-		return true;
-	}
-	return false;
-}
-
-
-
-
-
-inline bool IsValidItem(int a_ItemType)
-{
-	if (
-		((a_ItemType >= E_ITEM_FIRST) && (a_ItemType <= E_ITEM_MAX_CONSECUTIVE_TYPE_ID)) ||  // Basic items range
-		((a_ItemType >= E_ITEM_FIRST_DISC) && (a_ItemType <= E_ITEM_LAST_DISC))   // Music discs' special range
-	)
-	{
-		return true;
-	}
-
-	if (a_ItemType == 0)
-	{
-		return false;
-	}
-
-	return IsValidBlock(a_ItemType);
+	AddFaceDirection(a_Pos.x, a_Pos.y, a_Pos.z, a_BlockFace, a_bInverse);
+	return a_Pos;
 }
 
 // tolua_end
-
-
-
-
-
-inline bool IsBlockWater(BLOCKTYPE a_BlockType)
-{
-	return ((a_BlockType == E_BLOCK_WATER) || (a_BlockType == E_BLOCK_STATIONARY_WATER));
-}
-
-
-
-
-
-inline bool IsBlockIce(BLOCKTYPE a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case E_BLOCK_ICE:
-		case E_BLOCK_PACKED_ICE:
-		case E_BLOCK_FROSTED_ICE:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
-inline bool IsBlockWaterOrIce(BLOCKTYPE a_BlockType)
-{
-	return (IsBlockWater(a_BlockType) || IsBlockIce(a_BlockType));
-}
-
-
-
-
-
-inline bool IsBlockLava(BLOCKTYPE a_BlockType)
-{
-	return ((a_BlockType == E_BLOCK_LAVA) || (a_BlockType == E_BLOCK_STATIONARY_LAVA));
-}
-
-
-
-
-
-inline bool IsBlockLiquid(BLOCKTYPE a_BlockType)
-{
-	return IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType);
-}
-
-
-
-
-inline bool IsBlockRail(BLOCKTYPE a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case E_BLOCK_RAIL:
-		case E_BLOCK_ACTIVATOR_RAIL:
-		case E_BLOCK_DETECTOR_RAIL:
-		case E_BLOCK_POWERED_RAIL:
-		{
-			return true;
-		}
-		default: return false;
-	}
-}
-
-
-
-
-
-inline bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case E_BLOCK_DIRT:
-		case E_BLOCK_GRASS:
-		case E_BLOCK_FARMLAND:
-		case E_BLOCK_GRASS_PATH:
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-
-
-
-inline bool IsBlockFence(BLOCKTYPE a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case E_BLOCK_ACACIA_FENCE:
-		case E_BLOCK_ACACIA_FENCE_GATE:
-		case E_BLOCK_BIRCH_FENCE:
-		case E_BLOCK_BIRCH_FENCE_GATE:
-		case E_BLOCK_COBBLESTONE_WALL:
-		case E_BLOCK_DARK_OAK_FENCE:
-		case E_BLOCK_DARK_OAK_FENCE_GATE:
-		case E_BLOCK_FENCE:
-		case E_BLOCK_JUNGLE_FENCE:
-		case E_BLOCK_JUNGLE_FENCE_GATE:
-		case E_BLOCK_NETHER_BRICK_FENCE:
-		case E_BLOCK_OAK_FENCE_GATE:
-		case E_BLOCK_SPRUCE_FENCE:
-		case E_BLOCK_SPRUCE_FENCE_GATE:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
-inline bool IsBlockMaterialWood(BLOCKTYPE a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case E_BLOCK_PLANKS:
-		case E_BLOCK_LOG:
-		case E_BLOCK_NOTE_BLOCK:
-		case E_BLOCK_BOOKCASE:
-		case E_BLOCK_OAK_WOOD_STAIRS:
-		case E_BLOCK_CHEST:
-		case E_BLOCK_CRAFTING_TABLE:
-		case E_BLOCK_SIGN_POST:
-		case E_BLOCK_OAK_DOOR:
-		case E_BLOCK_WALLSIGN:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE:
-		case E_BLOCK_JUKEBOX:
-		case E_BLOCK_FENCE:
-		case E_BLOCK_TRAPDOOR:
-		case E_BLOCK_HUGE_BROWN_MUSHROOM:
-		case E_BLOCK_HUGE_RED_MUSHROOM:
-		case E_BLOCK_OAK_FENCE_GATE:
-		case E_BLOCK_DOUBLE_WOODEN_SLAB:
-		case E_BLOCK_WOODEN_SLAB:
-		case E_BLOCK_SPRUCE_WOOD_STAIRS:
-		case E_BLOCK_BIRCH_WOOD_STAIRS:
-		case E_BLOCK_JUNGLE_WOOD_STAIRS:
-		case E_BLOCK_TRAPPED_CHEST:
-		case E_BLOCK_DAYLIGHT_SENSOR:
-		case E_BLOCK_NEW_LOG:
-		case E_BLOCK_ACACIA_WOOD_STAIRS:
-		case E_BLOCK_DARK_OAK_WOOD_STAIRS:
-		case E_BLOCK_STANDING_BANNER:
-		case E_BLOCK_WALL_BANNER:
-		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
-		case E_BLOCK_SPRUCE_FENCE_GATE:
-		case E_BLOCK_BIRCH_FENCE_GATE:
-		case E_BLOCK_JUNGLE_FENCE_GATE:
-		case E_BLOCK_DARK_OAK_FENCE_GATE:
-		case E_BLOCK_ACACIA_FENCE_GATE:
-		case E_BLOCK_SPRUCE_FENCE:
-		case E_BLOCK_BIRCH_FENCE:
-		case E_BLOCK_JUNGLE_FENCE:
-		case E_BLOCK_DARK_OAK_FENCE:
-		case E_BLOCK_ACACIA_FENCE:
-		case E_BLOCK_SPRUCE_DOOR:
-		case E_BLOCK_BIRCH_DOOR:
-		case E_BLOCK_JUNGLE_DOOR:
-		case E_BLOCK_ACACIA_DOOR:
-		case E_BLOCK_DARK_OAK_DOOR:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
-inline bool IsBlockMaterialPlants(BLOCKTYPE a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case E_BLOCK_SAPLING:
-		case E_BLOCK_DANDELION:
-		case E_BLOCK_FLOWER:
-		case E_BLOCK_BROWN_MUSHROOM:
-		case E_BLOCK_RED_MUSHROOM:
-		case E_BLOCK_CROPS:
-		case E_BLOCK_REEDS:
-		case E_BLOCK_PUMPKIN_STEM:
-		case E_BLOCK_MELON_STEM:
-		case E_BLOCK_LILY_PAD:
-		case E_BLOCK_NETHER_WART:
-		case E_BLOCK_COCOA_POD:
-		case E_BLOCK_CARROTS:
-		case E_BLOCK_POTATOES:
-		case E_BLOCK_CHORUS_PLANT:
-		case E_BLOCK_CHORUS_FLOWER:
-		case E_BLOCK_BEETROOTS:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
-inline bool IsBlockMaterialVine(BLOCKTYPE a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case E_BLOCK_TALL_GRASS:
-		case E_BLOCK_DEAD_BUSH:
-		case E_BLOCK_VINES:
-		case E_BLOCK_BIG_FLOWER:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
-inline bool IsBlockMaterialIron(BLOCKTYPE a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case E_BLOCK_LAPIS_BLOCK:
-		case E_BLOCK_GOLD_BLOCK:
-		case E_BLOCK_IRON_BLOCK:
-		case E_BLOCK_DIAMOND_BLOCK:
-		case E_BLOCK_IRON_DOOR:
-		case E_BLOCK_IRON_BARS:
-		case E_BLOCK_BREWING_STAND:
-		case E_BLOCK_CAULDRON:
-		case E_BLOCK_EMERALD_BLOCK:
-		case E_BLOCK_COMMAND_BLOCK:
-		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_BLOCK_OF_REDSTONE:
-		case E_BLOCK_HOPPER:
-		case E_BLOCK_IRON_TRAPDOOR:
-		case E_BLOCK_REPEATING_COMMAND_BLOCK:
-		case E_BLOCK_CHAIN_COMMAND_BLOCK:
-		case E_BLOCK_STRUCTURE_BLOCK:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
-inline bool IsBlockMaterialAnvil(BLOCKTYPE a_BlockType)
-{
-	return (a_BlockType == E_BLOCK_ANVIL);
-}
-
-
-
-
-
-inline bool IsBlocksWeb(BLOCKTYPE a_BlockType)
-{
-	return (a_BlockType == E_BLOCK_COBWEB);
-}
-
-
-
-
-
-inline bool IsBlockMaterialLeaves(BLOCKTYPE a_BlockType)
-{
-	return (a_BlockType == E_BLOCK_LEAVES) || (a_BlockType == E_BLOCK_NEW_LEAVES);
-}
-
-
-
-
-
-inline bool IsBlocksWool(BLOCKTYPE a_BlockType)
-{
-	return (a_BlockType == E_BLOCK_WOOL);
-}
-
-
-
-
-
-inline bool IsBlockMaterialGourd(BLOCKTYPE a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case E_BLOCK_PUMPKIN:
-		case E_BLOCK_JACK_O_LANTERN:
-		case E_BLOCK_MELON:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
-inline bool IsBlockMaterialCoral(BLOCKTYPE a_BlockType)
-{
-	return false;  // yes, there is no block in minecraft which belongs to this type.
-}
-
-
-
-
-
-inline bool IsBlockMaterialRock(BLOCKTYPE a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case E_BLOCK_STONE:
-		case E_BLOCK_COBBLESTONE:
-		case E_BLOCK_BEDROCK:
-		case E_BLOCK_GOLD_ORE:
-		case E_BLOCK_IRON_ORE:
-		case E_BLOCK_COAL_ORE:
-		case E_BLOCK_LAPIS_ORE:
-		case E_BLOCK_DISPENSER:
-		case E_BLOCK_SANDSTONE:
-		case E_BLOCK_DOUBLE_STONE_SLAB:
-		case E_BLOCK_STONE_SLAB:
-		case E_BLOCK_BRICK:
-		case E_BLOCK_MOSSY_COBBLESTONE:
-		case E_BLOCK_OBSIDIAN:
-		case E_BLOCK_MOB_SPAWNER:
-		case E_BLOCK_DIAMOND_ORE:
-		case E_BLOCK_FURNACE:
-		case E_BLOCK_LIT_FURNACE:
-		case E_BLOCK_COBBLESTONE_STAIRS:
-		case E_BLOCK_STONE_PRESSURE_PLATE:
-		case E_BLOCK_REDSTONE_ORE:
-		case E_BLOCK_REDSTONE_ORE_GLOWING:
-		case E_BLOCK_NETHERRACK:
-		case E_BLOCK_STONE_BRICKS:
-		case E_BLOCK_BRICK_STAIRS:
-		case E_BLOCK_STONE_BRICK_STAIRS:
-		case E_BLOCK_NETHER_BRICK:
-		case E_BLOCK_NETHER_BRICK_FENCE:
-		case E_BLOCK_NETHER_BRICK_STAIRS:
-		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_END_PORTAL_FRAME:
-		case E_BLOCK_END_STONE:
-		case E_BLOCK_SANDSTONE_STAIRS:
-		case E_BLOCK_EMERALD_ORE:
-		case E_BLOCK_ENDER_CHEST:
-		case E_BLOCK_COBBLESTONE_WALL:
-		case E_BLOCK_NETHER_QUARTZ_ORE:
-		case E_BLOCK_QUARTZ_BLOCK:
-		case E_BLOCK_QUARTZ_STAIRS:
-		case E_BLOCK_DROPPER:
-		case E_BLOCK_STAINED_CLAY:
-		case E_BLOCK_PRISMARINE_BLOCK:
-		case E_BLOCK_HARDENED_CLAY:
-		case E_BLOCK_BLOCK_OF_COAL:
-		case E_BLOCK_RED_SANDSTONE:
-		case E_BLOCK_RED_SANDSTONE_STAIRS:
-		case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB:
-		case E_BLOCK_RED_SANDSTONE_SLAB:
-		case E_BLOCK_PURPUR_BLOCK:
-		case E_BLOCK_PURPUR_PILLAR:
-		case E_BLOCK_PURPUR_STAIRS:
-		case E_BLOCK_PURPUR_DOUBLE_SLAB:
-		case E_BLOCK_PURPUR_SLAB:
-		case E_BLOCK_END_BRICKS:
-		case E_BLOCK_MAGMA:
-		case E_BLOCK_RED_NETHER_BRICK:
-		case E_BLOCK_BONE_BLOCK:
-		case E_BLOCK_OBSERVER:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
-inline void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBlockFace a_BlockFace, bool a_bInverse = false)  // tolua_export
-{  // tolua_export
-	if (!a_bInverse)
-	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_YP: a_BlockY++; break;
-			case BLOCK_FACE_YM: a_BlockY--; break;
-			case BLOCK_FACE_ZM: a_BlockZ--; break;
-			case BLOCK_FACE_ZP: a_BlockZ++; break;
-			case BLOCK_FACE_XP: a_BlockX++; break;
-			case BLOCK_FACE_XM: a_BlockX--; break;
-			case BLOCK_FACE_NONE:
-			{
-				LOGWARNING("%s: Unknown face: %d", __FUNCTION__, a_BlockFace);
-				ASSERT(!"AddFaceDirection(): Unknown face");
-				break;
-			}
-		}
-	}
-	else
-	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_YP: a_BlockY--; break;
-			case BLOCK_FACE_YM: a_BlockY++; break;
-			case BLOCK_FACE_ZM: a_BlockZ++; break;
-			case BLOCK_FACE_ZP: a_BlockZ--; break;
-			case BLOCK_FACE_XP: a_BlockX--; break;
-			case BLOCK_FACE_XM: a_BlockX++; break;
-			case BLOCK_FACE_NONE:
-			{
-				LOGWARNING("%s: Unknown inv face: %d", __FUNCTION__, a_BlockFace);
-				ASSERT(!"AddFaceDirection(): Unknown face");
-				break;
-			}
-		}
-	}
-}  // tolua_export
-
-
-
-
-
-inline void AddFaceDirection(int & a_BlockX, unsigned char & a_BlockY, int & a_BlockZ, eBlockFace a_BlockFace, bool a_bInverse = false)
-{
-	int Y = a_BlockY;
-	AddFaceDirection(a_BlockX, Y, a_BlockZ, a_BlockFace, a_bInverse);
-	a_BlockY = Clamp<unsigned char>(static_cast<unsigned char>(Y), 0, cChunkDef::Height - 1);
-}
 
 
 
@@ -944,24 +487,6 @@ inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, do
 
 
 
-inline float GetSignf(float a_Val)
-{
-	return (a_Val < 0.f) ? -1.f : 1.f;
-}
-
-
-
-
-
-inline float GetSpecialSignf( float a_Val)
-{
-	return (a_Val <= 0.f) ? -1.f : 1.f;
-}
-
-
-
-
-
 template <class T> inline T Diff(T a_Val1, T a_Val2)
 {
 	return std::abs(a_Val1 - a_Val2);
@@ -972,34 +497,6 @@ template <class T> inline T Diff(T a_Val1, T a_Val2)
 
 
 // tolua_begin
-
-enum eMessageType
-{
-	// https://forum.cuberite.org/thread-1212.html
-	// MessageType...
-
-	mtCustom,          // Send raw data without any processing
-	mtFailure,         // Something could not be done (i.e. command not executed due to insufficient privilege)
-	mtInformation,     // Informational message (i.e. command usage)
-	mtSuccess,         // Something executed successfully
-	mtWarning,         // Something concerning (i.e. reload) is about to happen
-	mtFatal,           // Something catastrophic occured (i.e. plugin crash)
-	mtDeath,           // Denotes death of player
-	mtPrivateMessage,  // Player to player messaging identifier
-	mtJoin,            // A player has joined the server
-	mtLeave,           // A player has left the server
-	mtMaxPlusOne,      // The first invalid type, used for checking on LuaAPI boundaries
-
-	// Common aliases:
-	mtFail  = mtFailure,
-	mtError = mtFailure,
-	mtInfo  = mtInformation,
-	mtPM    = mtPrivateMessage,
-};
-
-
-
-
 
 /** Normalizes an angle in degrees to the [-180, +180) range: */
 inline double NormalizeAngleDegrees(const double a_Degrees)
@@ -1018,165 +515,31 @@ inline double NormalizeAngleDegrees(const double a_Degrees)
 
 namespace ItemCategory
 {
-	inline bool IsPickaxe(short a_ItemID)
-	{
-		return (a_ItemID == E_ITEM_WOODEN_PICKAXE)
-			|| (a_ItemID == E_ITEM_STONE_PICKAXE)
-			|| (a_ItemID == E_ITEM_IRON_PICKAXE)
-			|| (a_ItemID == E_ITEM_GOLD_PICKAXE)
-			|| (a_ItemID == E_ITEM_DIAMOND_PICKAXE);
-	}
+	bool IsPickaxe(short a_ItemType);
 
+	bool IsAxe(short a_ItemType);
 
+	bool IsSword(short a_ItemType);
 
-	inline bool IsAxe(short a_ItemID)
-	{
-		return (a_ItemID == E_ITEM_WOODEN_AXE)
-			|| (a_ItemID == E_ITEM_STONE_AXE)
-			|| (a_ItemID == E_ITEM_IRON_AXE)
-			|| (a_ItemID == E_ITEM_GOLD_AXE)
-			|| (a_ItemID == E_ITEM_DIAMOND_AXE);
-	}
+	bool IsHoe(short a_ItemType);
 
+	bool IsShovel(short a_ItemType);
 
+	bool IsTool(short a_ItemType);
 
-	inline bool IsSword(short a_ItemID)
-	{
-		return (a_ItemID == E_ITEM_WOODEN_SWORD)
-			|| (a_ItemID == E_ITEM_STONE_SWORD)
-			|| (a_ItemID == E_ITEM_IRON_SWORD)
-			|| (a_ItemID == E_ITEM_GOLD_SWORD)
-			|| (a_ItemID == E_ITEM_DIAMOND_SWORD);
-	}
+	bool IsHelmet(short a_ItemType);
 
+	bool IsChestPlate(short a_ItemType);
 
+	bool IsLeggings(short a_ItemType);
 
-	inline bool IsHoe(short a_ItemID)
-	{
-		return (a_ItemID == E_ITEM_WOODEN_HOE)
-			|| (a_ItemID == E_ITEM_STONE_HOE)
-			|| (a_ItemID == E_ITEM_IRON_HOE)
-			|| (a_ItemID == E_ITEM_GOLD_HOE)
-			|| (a_ItemID == E_ITEM_DIAMOND_HOE);
-	}
+	bool IsBoots(short a_ItemType);
 
+	bool IsMinecart(short a_ItemType);
 
+	bool IsArmor(short a_ItemType);
 
-	inline bool IsShovel(short a_ItemID)
-	{
-		return (a_ItemID == E_ITEM_WOODEN_SHOVEL)
-			|| (a_ItemID == E_ITEM_STONE_SHOVEL)
-			|| (a_ItemID == E_ITEM_IRON_SHOVEL)
-			|| (a_ItemID == E_ITEM_GOLD_SHOVEL)
-			|| (a_ItemID == E_ITEM_DIAMOND_SHOVEL);
-	}
-
-
-
-	inline bool IsTool(short a_ItemID)
-	{
-		return IsPickaxe( a_ItemID)
-			|| IsAxe    ( a_ItemID)
-			|| IsSword  ( a_ItemID)
-			|| IsHoe    ( a_ItemID)
-			|| IsShovel ( a_ItemID);
-	}
-
-
-
-	inline bool IsHelmet(short a_ItemType)
-	{
-		return (
-			(a_ItemType == E_ITEM_LEATHER_CAP) ||
-			(a_ItemType == E_ITEM_GOLD_HELMET) ||
-			(a_ItemType == E_ITEM_CHAIN_HELMET) ||
-			(a_ItemType == E_ITEM_IRON_HELMET) ||
-			(a_ItemType == E_ITEM_DIAMOND_HELMET)
-		);
-	}
-
-
-
-	inline bool IsChestPlate(short a_ItemType)
-	{
-		return (
-			(a_ItemType == E_ITEM_LEATHER_TUNIC) ||
-			(a_ItemType == E_ITEM_GOLD_CHESTPLATE) ||
-			(a_ItemType == E_ITEM_CHAIN_CHESTPLATE) ||
-			(a_ItemType == E_ITEM_IRON_CHESTPLATE) ||
-			(a_ItemType == E_ITEM_DIAMOND_CHESTPLATE)
-		);
-	}
-
-
-
-	inline bool IsLeggings(short a_ItemType)
-	{
-		return (
-			(a_ItemType == E_ITEM_LEATHER_PANTS) ||
-			(a_ItemType == E_ITEM_GOLD_LEGGINGS) ||
-			(a_ItemType == E_ITEM_CHAIN_LEGGINGS) ||
-			(a_ItemType == E_ITEM_IRON_LEGGINGS) ||
-			(a_ItemType == E_ITEM_DIAMOND_LEGGINGS)
-		);
-	}
-
-
-
-	inline bool IsBoots(short a_ItemType)
-	{
-		return (
-			(a_ItemType == E_ITEM_LEATHER_BOOTS) ||
-			(a_ItemType == E_ITEM_GOLD_BOOTS) ||
-			(a_ItemType == E_ITEM_CHAIN_BOOTS) ||
-			(a_ItemType == E_ITEM_IRON_BOOTS) ||
-			(a_ItemType == E_ITEM_DIAMOND_BOOTS)
-		);
-	}
-
-
-
-	inline bool IsMinecart(short a_ItemType)
-	{
-		return (
-			(a_ItemType == E_ITEM_MINECART) ||
-			(a_ItemType == E_ITEM_CHEST_MINECART) ||
-			(a_ItemType == E_ITEM_FURNACE_MINECART) ||
-			(a_ItemType == E_ITEM_MINECART_WITH_TNT) ||
-			(a_ItemType == E_ITEM_MINECART_WITH_HOPPER)
-		);
-	}
-
-
-
-	inline bool IsArmor(short a_ItemType)
-	{
-		return (
-			IsHelmet(a_ItemType) ||
-			IsChestPlate(a_ItemType) ||
-			IsLeggings(a_ItemType) ||
-			IsBoots(a_ItemType)
-		);
-	}
-
-
-
-	inline bool IsHorseArmor(short a_ItemType)
-	{
-		switch (a_ItemType)
-		{
-			case E_ITEM_IRON_HORSE_ARMOR:
-			case E_ITEM_GOLD_HORSE_ARMOR:
-			case E_ITEM_DIAMOND_HORSE_ARMOR:
-			{
-				return true;
-			}
-			default:
-			{
-				return false;
-			}
-		}
-	}
+	bool IsHorseArmor(short a_ItemType);
 }
 
 // tolua_end

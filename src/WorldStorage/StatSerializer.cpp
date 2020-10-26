@@ -3,149 +3,227 @@
 
 
 #include "Globals.h"
-#include "StatSerializer.h"
-
 #include "../Statistics.h"
+#include "StatSerializer.h"
+#include "NamespaceSerializer.h"
+
+#include <json/json.h>
 
 
 
 
 
-cStatSerializer::cStatSerializer(const AString & a_WorldName, const AString & a_PlayerName, const AString & a_FileName, cStatManager * a_Manager)
-	: m_Manager(a_Manager)
+namespace StatSerializer
 {
-	// Even though stats are shared between worlds, they are (usually) saved
-	// inside the folder of the default world.
-
-	AString StatsPath;
-	Printf(StatsPath, "%s%cstats", a_WorldName.c_str(), cFile::PathSeparator());
-
-	m_LegacyPath = StatsPath + "/" + a_PlayerName + ".json";
-	m_Path = StatsPath + "/" + a_FileName + ".json";
-
-	// Ensure that the directory exists.
-	cFile::CreateFolder(FILE_IO_PREFIX + StatsPath);
-}
-
-
-
-
-
-bool cStatSerializer::Load(void)
-{
-	AString Data = cFile::ReadWholeFile(FILE_IO_PREFIX + m_Path);
-	if (Data.empty())
+	static auto MakeStatisticsDirectory(const std::string & WorldPath, std::string && FileName)
 	{
-		Data = cFile::ReadWholeFile(FILE_IO_PREFIX + m_LegacyPath);
-		if (Data.empty())
+		// Even though stats are shared between worlds, they are (usually) saved
+		// inside the folder of the default world.
+
+		// Path to the world's statistics folder.
+		const auto Path = WorldPath + cFile::GetPathSeparator() + "stats";
+
+		// Ensure that the directory exists.
+		cFile::CreateFolder(Path);
+
+		return Path + cFile::GetPathSeparator() + std::move(FileName) + ".json";
+	}
+
+
+
+
+
+	static void SaveStatToJSON(const cStatManager & Manager, Json::Value & a_Out)
+	{
+		Manager.ForEachStatisticType([&a_Out](const cStatManager::CustomStore & Store)
 		{
-			return false;
+			if (Store.empty())
+			{
+				// Avoid saving "custom": null to disk:
+				return;
+			}
+
+			auto & Custom = a_Out["custom"];
+			for (const auto & Item : Store)
+			{
+				Custom[NamespaceSerializer::From(Item.first)] = Item.second;
+			}
+		});
+	}
+
+
+
+
+
+	static void LoadLegacyFromJSON(cStatManager & Manager, const Json::Value & In)
+	{
+		// Upgrade mapping from pre-1.13 names. TODO: remove on 2020-09-18
+		static const std::unordered_map<std::string_view, Statistic> LegacyMapping
+		{
+			{ "achievement.openInventory", Statistic::AchOpenInventory },
+			{ "achievement.mineWood", Statistic::AchMineWood },
+			{ "achievement.buildWorkBench", Statistic::AchBuildWorkBench },
+			{ "achievement.buildPickaxe", Statistic::AchBuildPickaxe },
+			{ "achievement.buildFurnace", Statistic::AchBuildFurnace },
+			{ "achievement.acquireIron", Statistic::AchAcquireIron },
+			{ "achievement.buildHoe", Statistic::AchBuildHoe },
+			{ "achievement.makeBread", Statistic::AchMakeBread },
+			{ "achievement.bakeCake", Statistic::AchBakeCake },
+			{ "achievement.buildBetterPickaxe", Statistic::AchBuildBetterPickaxe },
+			{ "achievement.cookFish", Statistic::AchCookFish },
+			{ "achievement.onARail", Statistic::AchOnARail },
+			{ "achievement.buildSword", Statistic::AchBuildSword },
+			{ "achievement.killEnemy", Statistic::AchKillEnemy },
+			{ "achievement.killCow", Statistic::AchKillCow },
+			{ "achievement.flyPig", Statistic::AchFlyPig },
+			{ "achievement.snipeSkeleton", Statistic::AchSnipeSkeleton },
+			{ "achievement.diamonds", Statistic::AchDiamonds },
+			{ "achievement.portal", Statistic::AchPortal },
+			{ "achievement.ghast", Statistic::AchGhast },
+			{ "achievement.blazeRod", Statistic::AchBlazeRod },
+			{ "achievement.potion", Statistic::AchPotion },
+			{ "achievement.theEnd", Statistic::AchTheEnd },
+			{ "achievement.theEnd2", Statistic::AchTheEnd2 },
+			{ "achievement.enchantments", Statistic::AchEnchantments },
+			{ "achievement.overkill", Statistic::AchOverkill },
+			{ "achievement.bookcase", Statistic::AchBookcase },
+			{ "achievement.exploreAllBiomes", Statistic::AchExploreAllBiomes },
+			{ "achievement.spawnWither", Statistic::AchSpawnWither },
+			{ "achievement.killWither", Statistic::AchKillWither },
+			{ "achievement.fullBeacon", Statistic::AchFullBeacon },
+			{ "achievement.breedCow", Statistic::AchBreedCow },
+			{ "achievement.diamondsToYou", Statistic::AchDiamondsToYou },
+			{ "stat.animalsBred", Statistic::AnimalsBred },
+			{ "stat.boatOneCm", Statistic::BoatOneCm },
+			{ "stat.climbOneCm", Statistic::ClimbOneCm },
+			{ "stat.crouchOneCm", Statistic::CrouchOneCm },
+			{ "stat.damageDealt", Statistic::DamageDealt },
+			{ "stat.damageTaken", Statistic::DamageTaken },
+			{ "stat.deaths", Statistic::Deaths },
+			{ "stat.drop", Statistic::Drop },
+			{ "stat.fallOneCm", Statistic::FallOneCm },
+			{ "stat.fishCaught", Statistic::FishCaught },
+			{ "stat.flyOneCm", Statistic::FlyOneCm },
+			{ "stat.horseOneCm", Statistic::HorseOneCm },
+			{ "stat.jump", Statistic::Jump },
+			{ "stat.leaveGame", Statistic::LeaveGame },
+			{ "stat.minecartOneCm", Statistic::MinecartOneCm },
+			{ "stat.mobKills", Statistic::MobKills },
+			{ "stat.pigOneCm", Statistic::PigOneCm },
+			{ "stat.playerKills", Statistic::PlayerKills },
+			{ "stat.playOneMinute", Statistic::PlayOneMinute },
+			{ "stat.sprintOneCm", Statistic::SprintOneCm },
+			{ "stat.swimOneCm", Statistic::SwimOneCm },
+			{ "stat.talkedToVillager", Statistic::TalkedToVillager },
+			{ "stat.timeSinceDeath", Statistic::TimeSinceDeath },
+			{ "stat.tradedWithVillager", Statistic::TradedWithVillager },
+			{ "stat.walkOneCm", Statistic::WalkOneCm },
+			{ "stat.diveOneCm", Statistic::WalkUnderWaterOneCm },
+			{ "stat.armorCleaned", Statistic::CleanArmor },
+			{ "stat.bannerCleaned", Statistic::CleanBanner },
+			{ "stat.cakeSlicesEaten", Statistic::EatCakeSlice },
+			{ "stat.itemEnchanted", Statistic::EnchantItem },
+			{ "stat.cauldronFilled", Statistic::FillCauldron },
+			{ "stat.dispenserInspected", Statistic::InspectDispenser },
+			{ "stat.dropperInspected", Statistic::InspectDropper },
+			{ "stat.hopperInspected", Statistic::InspectHopper },
+			{ "stat.beaconInteraction", Statistic::InteractWithBeacon },
+			{ "stat.brewingstandInteraction", Statistic::InteractWithBrewingstand },
+			{ "stat.craftingTableInteraction", Statistic::InteractWithCraftingTable },
+			{ "stat.furnaceInteraction", Statistic::InteractWithFurnace },
+			{ "stat.chestOpened", Statistic::OpenChest },
+			{ "stat.enderchestOpened", Statistic::OpenEnderchest },
+			{ "stat.noteblockPlayed", Statistic::PlayNoteblock },
+			{ "stat.recordPlayed", Statistic::PlayRecord },
+			{ "stat.flowerPotted", Statistic::PotFlower },
+			{ "stat.trappedChestTriggered", Statistic::TriggerTrappedChest },
+			{ "stat.noteblockTuned", Statistic::TuneNoteblock },
+			{ "stat.cauldronUsed", Statistic::UseCauldron },
+			{ "stat.aviateOneCm", Statistic::AviateOneCm },
+			{ "stat.sleepInBed", Statistic::SleepInBed },
+			{ "stat.sneakTime", Statistic::SneakTime }
+		};
+
+		for (auto Entry = In.begin(); Entry != In.end(); ++Entry)
+		{
+			const auto & Key = Entry.key().asString();
+			const auto FindResult = LegacyMapping.find(Key);
+
+			if ((FindResult != LegacyMapping.end()) && Entry->isInt())
+			{
+				auto Value = Entry->asInt();
+				if (Value < 0)
+				{
+					FLOGWARNING("Invalid stat value: {0} = {1}", Key, Value);
+					continue;
+				}
+				Manager.SetValue(FindResult->second, ToUnsigned(Value));
+			}
 		}
 	}
 
-	Json::Value Root;
-	Json::Reader Reader;
 
-	if (Reader.parse(Data, Root, false))
+
+
+
+	static void LoadCustomStatFromJSON(cStatManager & Manager, const Json::Value & a_In)
 	{
-		return LoadStatFromJSON(Root);
-	}
-
-	return false;
-}
-
-
-
-
-
-bool cStatSerializer::Save(void)
-{
-	Json::Value Root;
-	SaveStatToJSON(Root);
-
-	cFile File;
-	if (!File.Open(FILE_IO_PREFIX + m_Path, cFile::fmWrite))
-	{
-		return false;
-	}
-
-	Json::StyledWriter Writer;
-	AString JsonData = Writer.write(Root);
-
-	File.Write(JsonData.data(), JsonData.size());
-	File.Close();
-
-	return true;
-}
-
-
-
-
-
-void cStatSerializer::SaveStatToJSON(Json::Value & a_Out)
-{
-	for (unsigned int i = 0; i < static_cast<unsigned int>(statCount); ++i)
-	{
-		StatValue Value = m_Manager->GetValue(static_cast<eStatistic>(i));
-
-		if (Value != 0)
+		for (auto it = a_In.begin(); it != a_In.end(); ++it)
 		{
-			const AString & StatName = cStatInfo::GetName(static_cast<eStatistic>(i));
+			const auto & Key = it.key().asString();
+			const auto StatInfo = NamespaceSerializer::SplitNamespacedID(Key);
+			if (StatInfo.first == NamespaceSerializer::Namespace::Unknown)
+			{
+				// Ignore non-Vanilla, non-Cuberite namespaces for now:
+				continue;
+			}
 
-			a_Out[StatName] = Value;
-		}
-
-		// TODO 2014-05-11 xdot: Save "progress"
-	}
-}
-
-
-
-
-
-bool cStatSerializer::LoadStatFromJSON(const Json::Value & a_In)
-{
-	m_Manager->Reset();
-
-	for (Json::Value::const_iterator it = a_In.begin() ; it != a_In.end() ; ++it)
-	{
-		AString StatName = it.key().asString();
-
-		eStatistic StatType = cStatInfo::GetType(StatName);
-
-		if (StatType == statInvalid)
-		{
-			LOGWARNING("Invalid statistic type \"%s\"", StatName.c_str());
-			continue;
-		}
-
-		const Json::Value & Node = *it;
-
-		if (Node.isInt())
-		{
-			m_Manager->SetValue(StatType, Node.asInt());
-		}
-		else if (Node.isObject())
-		{
-			StatValue Value = Node.get("value", 0).asInt();
-
-			// TODO 2014-05-11 xdot: Load "progress"
-
-			m_Manager->SetValue(StatType, Value);
-		}
-		else
-		{
-			LOGWARNING("Invalid statistic value for type \"%s\"", StatName.c_str());
+			const auto & StatName = StatInfo.second;
+			try
+			{
+				auto Value = it->asInt();
+				if (Value < 0)
+				{
+					FLOGWARNING("Invalid statistic value: {0} = {1}", Key, Value);
+					continue;
+				}
+				Manager.SetValue(NamespaceSerializer::ToCustomStatistic(StatName), ToUnsigned(Value));
+			}
+			catch (const std::out_of_range &)
+			{
+				FLOGWARNING("Invalid statistic type \"{}\"", StatName);
+			}
+			catch (const Json::LogicError &)
+			{
+				FLOGWARNING("Invalid statistic value for type \"{}\"", StatName);
+			}
 		}
 	}
 
-	return true;
+
+
+
+
+	void Load(cStatManager & Manager, const std::string & WorldPath, std::string && FileName)
+	{
+		Json::Value Root;
+		InputFileStream(MakeStatisticsDirectory(WorldPath, std::move(FileName))) >> Root;
+
+		LoadLegacyFromJSON(Manager, Root);
+		LoadCustomStatFromJSON(Manager, Root["stats"]["custom"]);
+	}
+
+
+
+
+
+	void Save(const cStatManager & Manager, const std::string & WorldPath, std::string && FileName)
+	{
+		Json::Value Root;
+
+		SaveStatToJSON(Manager, Root["stats"]);
+		Root["DataVersion"] = NamespaceSerializer::DataVersion();
+
+		OutputFileStream(MakeStatisticsDirectory(WorldPath, std::move(FileName))) << Root;
+	}
 }
-
-
-
-
-
-
-
-

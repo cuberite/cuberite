@@ -11,7 +11,7 @@
 
 
 cCreeper::cCreeper(void) :
-	super("Creeper", mtCreeper, "entity.creeper.hurt", "entity.creeper.death", 0.6, 1.8),
+	Super("Creeper", mtCreeper, "entity.creeper.hurt", "entity.creeper.death", "entity.creeper.ambient", 0.6, 1.8),
 	m_bIsBlowing(false),
 	m_bIsCharged(false),
 	m_BurnedWithFlintAndSteel(false),
@@ -25,7 +25,7 @@ cCreeper::cCreeper(void) :
 
 void cCreeper::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -83,11 +83,10 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		auto ProjectileCreatorCallback = [](cEntity & a_Entity)
 			{
-				if (a_Entity.IsMob() && ((static_cast<cMonster &>(a_Entity)).GetMobType() == mtSkeleton))
-				{
-					return true;
-				}
-				return false;
+				return (
+					a_Entity.IsMob() &&
+					((static_cast<cMonster &>(a_Entity)).GetMobType() == mtSkeleton)
+				);
 			};
 
 		if (GetWorld()->DoWithEntityByID(static_cast<cProjectileEntity *>(a_Killer)->GetCreatorUniqueID(), ProjectileCreatorCallback))
@@ -103,7 +102,7 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 bool cCreeper::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	if (!super::DoTakeDamage(a_TDI))
+	if (!Super::DoTakeDamage(a_TDI))
 	{
 		return false;
 	}
@@ -142,7 +141,7 @@ bool cCreeper::Attack(std::chrono::milliseconds a_Dt)
 
 void cCreeper::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_FLINT_AND_STEEL))
 	{

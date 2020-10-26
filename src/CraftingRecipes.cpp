@@ -18,7 +18,7 @@
 cCraftingGrid::cCraftingGrid(int a_Width, int a_Height) :
 	m_Width(a_Width),
 	m_Height(a_Height),
-	m_Items(new cItem[a_Width * a_Height])
+	m_Items(new cItem[ToUnsigned(a_Width * a_Height)])
 {
 }
 
@@ -27,9 +27,7 @@ cCraftingGrid::cCraftingGrid(int a_Width, int a_Height) :
 
 
 cCraftingGrid::cCraftingGrid(const cItem * a_Items, int a_Width, int a_Height) :
-	m_Width(a_Width),
-	m_Height(a_Height),
-	m_Items(new cItem[a_Width * a_Height])
+	cCraftingGrid(a_Width, a_Height)
 {
 	for (int i = a_Width * a_Height - 1; i >= 0; i--)
 	{
@@ -42,9 +40,7 @@ cCraftingGrid::cCraftingGrid(const cItem * a_Items, int a_Width, int a_Height) :
 
 
 cCraftingGrid::cCraftingGrid(const cCraftingGrid & a_Original) :
-	m_Width(a_Original.m_Width),
-	m_Height(a_Original.m_Height),
-	m_Items(new cItem[a_Original.m_Width * a_Original.m_Height])
+	cCraftingGrid(a_Original.m_Width, a_Original.m_Height)
 {
 	for (int i = m_Width * m_Height - 1; i >= 0; i--)
 	{
@@ -83,7 +79,7 @@ cItem & cCraftingGrid::GetItem(int x, int y) const
 
 
 
-void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
+void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_TYPE a_ItemType, char a_ItemCount, short a_ItemHealth)
 {
 	// Accessible through scripting, must verify parameters:
 	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
@@ -170,7 +166,7 @@ void cCraftingGrid::ConsumeGrid(const cCraftingGrid & a_Grid)
 		{
 			if ((m_Items[ThisIdx].m_ItemType == E_ITEM_MILK) || (m_Items[ThisIdx].m_ItemType == E_ITEM_WATER_BUCKET) || (m_Items[ThisIdx].m_ItemType == E_ITEM_LAVA_BUCKET))
 			{
-				m_Items[ThisIdx] = cItem(E_ITEM_BUCKET, m_Items[ThisIdx].m_ItemCount);
+				m_Items[ThisIdx] = cItem(E_ITEM_BUCKET);
 			}
 			else
 			{
@@ -235,7 +231,7 @@ void cCraftingRecipe::Clear(void)
 
 
 
-void cCraftingRecipe::SetResult(ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
+void cCraftingRecipe::SetResult(ENUM_ITEM_TYPE a_ItemType, char a_ItemCount, short a_ItemHealth)
 {
 	m_Result = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
 }
@@ -272,6 +268,7 @@ void cCraftingRecipe::Dump(void)
 cCraftingRecipes::cCraftingRecipes(void)
 {
 	LoadRecipes();
+	PopulateRecipeNameMap();
 }
 
 
@@ -281,6 +278,72 @@ cCraftingRecipes::cCraftingRecipes(void)
 cCraftingRecipes::~cCraftingRecipes()
 {
 	ClearRecipes();
+}
+
+
+
+
+
+bool cCraftingRecipes::IsNewCraftableRecipe(const cRecipe * a_Recipe, const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems)
+{
+	bool ContainsNewItem = false;
+	for (const auto & Ingredient : a_Recipe->m_Ingredients)
+	{
+		if (
+			(Ingredient.m_Item.m_ItemType == a_Item.m_ItemType) &&
+			(
+				(Ingredient.m_Item.m_ItemDamage == a_Item.m_ItemDamage) ||
+				(Ingredient.m_Item.m_ItemDamage == -1)
+			)
+		)
+		{
+			ContainsNewItem = true;
+		}
+		if (a_KnownItems.find(Ingredient.m_Item) == a_KnownItems.end())
+		{
+			return false;
+		}
+	}
+	return ContainsNewItem;
+}
+
+
+
+
+
+std::vector<UInt32> cCraftingRecipes::FindNewRecipesForItem(const cItem & a_Item, const std::set<cItem, cItem::sItemCompare> & a_KnownItems)
+{
+	std::vector<UInt32> Recipes;
+	for (UInt32 i = 0; i < m_Recipes.size(); i++)
+	{
+		if (m_Recipes[i]->m_RecipeName.empty())
+		{
+			continue;
+		}
+		if (IsNewCraftableRecipe(m_Recipes[i], a_Item, a_KnownItems))
+		{
+			Recipes.push_back(i);
+		}
+	}
+	return Recipes;
+}
+
+
+
+
+
+const std::map<AString, UInt32> & cCraftingRecipes::GetRecipeNameMap()
+{
+	return m_RecipeNameMap;
+}
+
+
+
+
+
+cCraftingRecipes::cRecipe * cCraftingRecipes::GetRecipeById(UInt32 a_RecipeId)
+{
+	return m_Recipes[a_RecipeId];
 }
 
 
@@ -359,6 +422,21 @@ void cCraftingRecipes::LoadRecipes(void)
 
 
 
+void cCraftingRecipes::PopulateRecipeNameMap(void)
+{
+	for (UInt32 i = 0; i < m_Recipes.size(); i++)
+	{
+		if (!m_Recipes[i]->m_RecipeName.empty())
+		{
+			m_RecipeNameMap.emplace(m_Recipes[i]->m_RecipeName, i);
+		}
+	}
+}
+
+
+
+
+
 void cCraftingRecipes::ClearRecipes(void)
 {
 	for (cRecipes::iterator itr = m_Recipes.begin(); itr != m_Recipes.end(); ++itr)
@@ -386,10 +464,17 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 		return;
 	}
 
-	std::unique_ptr<cCraftingRecipes::cRecipe> Recipe = cpp14::make_unique<cCraftingRecipes::cRecipe>();
+	std::unique_ptr<cCraftingRecipes::cRecipe> Recipe = std::make_unique<cCraftingRecipes::cRecipe>();
 
+	AStringVector RecipeSplit = StringSplit(Sides[0], ":");
+	const auto * resultPart = &RecipeSplit[0];
+	if (RecipeSplit.size() > 1)
+	{
+		resultPart = &RecipeSplit[1];
+		Recipe->m_RecipeName = RecipeSplit[0];
+	}
 	// Parse the result:
-	AStringVector ResultSplit = StringSplit(Sides[0], ",");
+	AStringVector ResultSplit = StringSplit(*resultPart, ",");
 	if (ResultSplit.empty())
 	{
 		LOGWARNING("crafting.txt: line %d: Result is empty, ignoring the recipe.", a_LineNum);
@@ -404,7 +489,7 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 	}
 	if (ResultSplit.size() > 1)
 	{
-		if (!StringToInteger<char>(ResultSplit[1].c_str(), Recipe->m_Result.m_ItemCount))
+		if (!StringToInteger<char>(ResultSplit[1], Recipe->m_Result.m_ItemCount))
 		{
 			LOGWARNING("crafting.txt: line %d: Cannot parse result count, ignoring the recipe.", a_LineNum);
 			LOGINFO("Offending line: \"%s\"", a_RecipeLine.c_str());
@@ -456,7 +541,7 @@ bool cCraftingRecipes::ParseItem(const AString & a_String, cItem & a_Item)
 	if (Split.size() > 1)
 	{
 		AString Damage = TrimString(Split[1]);
-		if (!StringToInteger<short>(Damage.c_str(), a_Item.m_ItemDamage))
+		if (!StringToInteger<short>(Damage, a_Item.m_ItemDamage))
 		{
 			// Parsing the number failed
 			return false;
@@ -767,7 +852,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 	}  // for y, for x
 
 	// The recipe has matched. Create a copy of the recipe and set its coords to match the crafting grid:
-	std::unique_ptr<cRecipe> Recipe = cpp14::make_unique<cRecipe>();
+	std::unique_ptr<cRecipe> Recipe = std::make_unique<cRecipe>();
 	Recipe->m_Result = a_Recipe->m_Result;
 	Recipe->m_Width  = a_Recipe->m_Width;
 	Recipe->m_Height = a_Recipe->m_Height;
@@ -897,7 +982,7 @@ void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCrafting
 			for (int y = 0; y < a_GridHeight; ++y)
 			{
 				int GridIdx = x + a_GridStride * y;
-				if ((a_CraftingGrid[GridIdx].m_ItemType == result_type) && (found == false))
+				if ((a_CraftingGrid[GridIdx].m_ItemType == result_type) && !found)
 				{
 					found = true;
 					temp = a_CraftingGrid[GridIdx].CopyOne();
@@ -1063,7 +1148,3 @@ void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCrafting
 		a_Recipe->m_Result.m_ItemColor.SetColor(result_red, result_green, result_blue);
 	}
 }
-
-
-
-

@@ -2,66 +2,27 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "Mixins.h"
+#include "../Item.h"
 
-#include <unordered_set>
 
 
+
+// fwd:
 class cWorld;
 
 
-class cBlockPistonHandler :
-	public cBlockHandler
+
+
+
+class cBlockPistonHandler final :
+	public cClearMetaOnDrop<cPitchYawRotator<cBlockHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>>
 {
+	using Super = cClearMetaOnDrop<cPitchYawRotator<cBlockHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>>;
+
 public:
-	cBlockPistonHandler(BLOCKTYPE a_BlockType);
 
-	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
-
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override;
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override;
-
-	static NIBBLETYPE RotationPitchToMetaData(double a_Rotation, double a_Pitch)
-	{
-		if (a_Pitch >= 50)
-		{
-			return 0x1;
-		}
-		else if (a_Pitch <= -50)
-		{
-			return 0x0;
-		}
-		else
-		{
-			a_Rotation += 90 + 45;  // So its not aligned with axis
-
-			if (a_Rotation > 360)
-			{
-				a_Rotation -= 360;
-			}
-			if ((a_Rotation >= 0) && (a_Rotation < 90))
-			{
-				return 0x4;
-			}
-			else if ((a_Rotation >= 180) && (a_Rotation < 270))
-			{
-				return 0x5;
-			}
-			else if ((a_Rotation >= 90) && (a_Rotation < 180))
-			{
-				return 0x2;
-			}
-			else
-			{
-				return 0x3;
-			}
-		}
-	}
+	using Super::Super;
 
 	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)
 	{
@@ -86,12 +47,6 @@ public:
 
 	static void ExtendPiston(Vector3i a_BlockPos, cWorld & a_World);
 	static void RetractPiston(Vector3i a_BlockPos, cWorld & a_World);
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
-	{
-		UNUSED(a_Meta);
-		return 11;
-	}
 
 	/** Returns true if the piston (with the specified meta) is extended */
 	static inline bool IsExtended(NIBBLETYPE a_PistonMeta) { return ((a_PistonMeta & 0x8) != 0x0); }
@@ -129,7 +84,7 @@ private:
 			case E_BLOCK_END_GATEWAY:
 			case E_BLOCK_END_PORTAL:
 			case E_BLOCK_END_PORTAL_FRAME:
-			// Notice the lack of an E_BLOCK_ENDER_CHEST here; its because ender chests can totally be pushed / pulled in MCS :)
+			case E_BLOCK_ENDER_CHEST:
 			case E_BLOCK_FURNACE:
 			case E_BLOCK_LIT_FURNACE:
 			case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
@@ -164,6 +119,19 @@ private:
 		Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
 	);
 
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	{
+		UNUSED(a_Meta);
+		return 11;
+	}
+
+	virtual void OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+	) const override;
+
 	/** Moves a list of blocks in a specific direction */
 	static void PushBlocks(const Vector3iSet & a_BlocksToPush,
 		cWorld & a_World, const Vector3i & a_PushDir
@@ -174,23 +142,24 @@ private:
 
 
 
-class cBlockPistonHeadHandler :
+class cBlockPistonHeadHandler final :
 	public cBlockHandler
 {
-	typedef cBlockHandler super;
+	using Super = cBlockHandler;
 
 public:
-	cBlockPistonHeadHandler(void);
 
-	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override;
-
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	constexpr cBlockPistonHeadHandler(void) :
+		Super(E_BLOCK_PISTON_EXTENSION)
 	{
-		// No pickups
-		// Also with 1.7, the item forms of these technical blocks have been removed, so giving someone this will crash their client...
 	}
+
+	virtual void OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+	) const override;
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override;
 } ;
-
-
-
-

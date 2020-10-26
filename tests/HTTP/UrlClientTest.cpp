@@ -1,5 +1,6 @@
 
 #include "Globals.h"
+#include "../TestHelpers.h"
 #include "HTTP/UrlClient.h"
 #include "OSSupport/NetworkSingleton.h"
 
@@ -17,8 +18,8 @@ class cCallbacks:
 	public cUrlClient::cCallbacks
 {
 public:
-	cCallbacks(cEvent & a_Event):
-		m_Event(a_Event)
+	cCallbacks(std::shared_ptr<cEvent> a_Event):
+		m_Event(std::move(a_Event))
 	{
 		++g_ActiveCallbacks;
 		LOGD("Created a cCallbacks instance at %p", reinterpret_cast<void *>(this));
@@ -85,7 +86,7 @@ public:
 	virtual void OnBodyFinished() override
 	{
 		LOG("Body finished.");
-		m_Event.Set();
+		m_Event->Set();
 	}
 
 
@@ -98,11 +99,11 @@ public:
 	virtual void OnError(const AString & a_ErrorMsg) override
 	{
 		LOG("Error: %s", a_ErrorMsg.c_str());
-		m_Event.Set();
+		m_Event->Set();
 	}
 
 protected:
-	cEvent & m_Event;
+	std::shared_ptr<cEvent> m_Event;
 };
 
 
@@ -112,14 +113,14 @@ protected:
 int TestRequest1()
 {
 	LOG("Running test 1");
-	cEvent evtFinished;
-	auto callbacks = cpp14::make_unique<cCallbacks>(evtFinished);
+	auto evtFinished = std::make_shared<cEvent>();
+	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
 	options["MaxRedirects"] = "0";
 	auto res = cUrlClient::Get("http://github.com", std::move(callbacks), AStringMap(), AString(), options);
 	if (res.first)
 	{
-		evtFinished.Wait();
+		evtFinished->Wait();
 	}
 	else
 	{
@@ -136,12 +137,12 @@ int TestRequest1()
 int TestRequest2()
 {
 	LOG("Running test 2");
-	cEvent evtFinished;
-	auto callbacks = cpp14::make_unique<cCallbacks>(evtFinished);
+	auto evtFinished = std::make_shared<cEvent>();
+	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	auto res = cUrlClient::Get("http://github.com", std::move(callbacks));
 	if (res.first)
 	{
-		evtFinished.Wait();
+		evtFinished->Wait();
 	}
 	else
 	{
@@ -158,14 +159,14 @@ int TestRequest2()
 int TestRequest3()
 {
 	LOG("Running test 3");
-	cEvent evtFinished;
-	auto callbacks = cpp14::make_unique<cCallbacks>(evtFinished);
+	auto evtFinished = std::make_shared<cEvent>();
+	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
 	options["MaxRedirects"] = "0";
 	auto res = cUrlClient::Get("https://github.com", std::move(callbacks), AStringMap(), AString(), options);
 	if (res.first)
 	{
-		evtFinished.Wait();
+		evtFinished->Wait();
 	}
 	else
 	{
@@ -182,12 +183,12 @@ int TestRequest3()
 int TestRequest4()
 {
 	LOG("Running test 4");
-	cEvent evtFinished;
-	auto callbacks = cpp14::make_unique<cCallbacks>(evtFinished);
+	auto evtFinished = std::make_shared<cEvent>();
+	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	auto res = cUrlClient::Get("https://github.com", std::move(callbacks));
 	if (res.first)
 	{
-		evtFinished.Wait();
+		evtFinished->Wait();
 	}
 	else
 	{
@@ -203,14 +204,15 @@ int TestRequest4()
 
 int TestRequests()
 {
-	std::function<int(void)> tests[] =
+	using func_t = int(void);
+	func_t * tests[] =
 	{
 		&TestRequest1,
 		&TestRequest2,
 		&TestRequest3,
 		&TestRequest4,
 	};
-	for (const auto & test: tests)
+	for (auto test: tests)
 	{
 		LOG("%s", AString(60, '-').c_str());
 		auto res = test();
@@ -228,28 +230,15 @@ int TestRequests()
 
 
 
-int main()
-{
-	LOGD("Test started");
-
-	LOGD("Initializing cNetwork...");
+IMPLEMENT_TEST_MAIN("UrlClient",
+	LOG("Initializing cNetwork...");
 	cNetworkSingleton::Get().Initialise();
-
-	LOGD("Testing...");
-	auto res = TestRequests();
-
-	LOGD("Terminating cNetwork...");
+	LOG("Testing...");
+	TEST_EQUAL(TestRequests(), 0);
+	LOG("Terminating cNetwork...");
 	cNetworkSingleton::Get().Terminate();
 
 	// No leaked callback instances
-	LOGD("cCallback instances still alive: %d", g_ActiveCallbacks.load());
-	assert_test(g_ActiveCallbacks == 0);
-
-	LOGD("cUrlClient test finished");
-
-	return res;
-}
-
-
-
-
+	LOG("cCallback instances still alive: %d", g_ActiveCallbacks.load());
+	TEST_EQUAL(g_ActiveCallbacks, 0);
+)

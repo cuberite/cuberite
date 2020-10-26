@@ -2,15 +2,7 @@
 
 #include "SplashPotionEntity.h"
 #include "Pawn.h"
-#include "../ClientHandle.h"
 #include "../EffectID.h"
-
-
-
-
-
-/** Converts an angle in radians into a byte representation used by the network protocol */
-#define ANGLE_TO_PROTO(X) static_cast<Byte>(X * 255 / 360)
 
 
 
@@ -21,11 +13,11 @@
 
 cSplashPotionEntity::cSplashPotionEntity(
 	cEntity * a_Creator,
-	double a_X, double a_Y, double a_Z,
-	const Vector3d & a_Speed,
+	Vector3d a_Pos,
+	Vector3d a_Speed,
 	const cItem & a_Item
-) :
-	super(pkSplashPotion, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
+):
+	Super(pkSplashPotion, a_Creator, a_Pos, 0.25, 0.25),
 	m_Item(a_Item),
 	m_DestroyTimer(-1)
 {
@@ -92,23 +84,7 @@ void cSplashPotionEntity::Splash(Vector3d a_HitPos)
 
 	m_World->BroadcastSoundParticleEffect(
 		EffectID::PARTICLE_SPLASH_POTION,
-		FloorC(a_HitPos.x),
-		FloorC(a_HitPos.y),
-		FloorC(a_HitPos.z),
+		a_HitPos.Floor(),
 		m_PotionColor
 	);
 }
-
-
-
-
-
-void cSplashPotionEntity::SpawnOn(cClientHandle & a_Client)
-{
-	a_Client.SendSpawnObject(*this, 73, m_PotionColor, ANGLE_TO_PROTO(GetYaw()), ANGLE_TO_PROTO(GetPitch()));
-	a_Client.SendEntityMetadata(*this);
-}
-
-
-
-

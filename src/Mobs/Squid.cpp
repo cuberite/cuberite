@@ -9,7 +9,7 @@
 
 
 cSquid::cSquid(void) :
-	super("Squid", mtSquid, "entity.squid.hurt", "entity.squid.death", 0.95, 0.95)
+	Super("Squid", mtSquid, "entity.squid.hurt", "entity.squid.death", "entity.squid.ambient", 0.95, 0.95)
 {
 }
 
@@ -77,5 +77,5 @@ void cSquid::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_AirTickTimer = DROWNING_TICKS;
 	}
 
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 }

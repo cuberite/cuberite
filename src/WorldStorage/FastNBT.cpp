@@ -10,13 +10,6 @@
 
 
 
-/** If a list being loaded has more than this number of items, it's considered corrupted. */
-static const int MAX_LIST_ITEMS = 10000;
-
-
-
-
-
 // The number of NBT tags that are reserved when an NBT parsing is started.
 // You can override this by using a cmdline define
 #ifndef NBT_RESERVE_SIZE
@@ -44,7 +37,7 @@ class cNBTParseErrorCategory final :
 	cNBTParseErrorCategory() = default;
 public:
 	/** Category name */
-	virtual const char * name() const NOEXCEPT override
+	virtual const char * name() const noexcept override
 	{
 		return "NBT parse error";
 	}
@@ -53,7 +46,7 @@ public:
 	virtual AString message(int a_Condition) const override;
 
 	/** Returns the canonical error category instance. */
-	static const cNBTParseErrorCategory & Get() NOEXCEPT
+	static const cNBTParseErrorCategory & Get() noexcept
 	{
 		static cNBTParseErrorCategory Category;
 		return Category;
@@ -130,7 +123,7 @@ AString cNBTParseErrorCategory::message(int a_Condition) const
 
 
 
-std::error_code make_error_code(eNBTParseError a_Err) NOEXCEPT
+std::error_code make_error_code(eNBTParseError a_Err) noexcept
 {
 	return { static_cast<int>(a_Err), cNBTParseErrorCategory::Get() };
 }
@@ -143,10 +136,12 @@ std::error_code make_error_code(eNBTParseError a_Err) NOEXCEPT
 // cParsedNBT:
 
 #define NEEDBYTES(N, ERR) \
-	if (m_Length - m_Pos < static_cast<size_t>(N)) \
-	{ \
-		return ERR; \
-	}
+	do { \
+		if (m_Length - m_Pos < static_cast<size_t>(N)) \
+		{ \
+			return ERR; \
+		} \
+	} while (false)
 
 
 
@@ -255,7 +250,8 @@ eNBTParseError cParsedNBT::ReadList(eTagType a_ChildrenType)
 	NEEDBYTES(4, eNBTParseError::npListMissingLength);
 	int Count = GetBEInt(m_Data + m_Pos);
 	m_Pos += 4;
-	if ((Count < 0) || (Count > MAX_LIST_ITEMS))
+	auto MinChildSize = GetMinTagSize(a_ChildrenType);
+	if ((Count < 0) || (Count > static_cast<int>((m_Length - m_Pos) / MinChildSize)))
 	{
 		return eNBTParseError::npListInvalidLength;
 	}
@@ -443,6 +439,30 @@ int cParsedNBT::FindTagByPath(int a_Tag, const AString & a_Path) const
 
 
 
+size_t cParsedNBT::GetMinTagSize(eTagType a_TagType)
+{
+	switch (a_TagType)
+	{
+		case TAG_End:       return 1;
+		case TAG_Byte:      return 1;
+		case TAG_Short:     return 2;
+		case TAG_Int:       return 4;
+		case TAG_Long:      return 8;
+		case TAG_Float:     return 4;
+		case TAG_Double:    return 8;
+		case TAG_String:    return 2;  // 2 bytes for the string length
+		case TAG_ByteArray: return 4;  // 4 bytes for the count
+		case TAG_List:      return 5;  // 1 byte list type + 4 bytes count
+		case TAG_Compound:  return 1;  // Single TAG_End byte
+		case TAG_IntArray:  return 4;  // 4 bytes for the count
+	}
+	UNREACHABLE("Unsupported nbt tag type");
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cFastNBTWriter:
 
@@ -594,12 +614,12 @@ void cFastNBTWriter::AddDouble(const AString & a_Name, double a_Value)
 
 
 
-void cFastNBTWriter::AddString(const AString & a_Name, const AString & a_Value)
+void cFastNBTWriter::AddString(const AString & a_Name, const std::string_view a_Value)
 {
 	TagCommon(a_Name, TAG_String);
-	UInt16 len = htons(static_cast<UInt16>(a_Value.size()));
-	m_Result.append(reinterpret_cast<const char *>(&len), 2);
-	m_Result.append(a_Value.c_str(), a_Value.size());
+	const UInt16 Length = htons(static_cast<UInt16>(a_Value.size()));
+	m_Result.append(reinterpret_cast<const char *>(&Length), sizeof(Length));
+	m_Result.append(a_Value);
 }
 
 
@@ -618,7 +638,7 @@ void cFastNBTWriter::AddByteArray(const AString & a_Name, const char * a_Value, 
 
 
 
-void cFastNBTWriter::AddIntArray(const AString & a_Name, const int * a_Value, size_t a_NumElements)
+void cFastNBTWriter::AddIntArray(const AString & a_Name, const Int32 * a_Value, size_t a_NumElements)
 {
 	TagCommon(a_Name, TAG_IntArray);
 	UInt32 len = htonl(static_cast<UInt32>(a_NumElements));
