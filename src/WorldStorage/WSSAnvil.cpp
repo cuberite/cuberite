@@ -2210,9 +2210,9 @@ void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedN
 		}
 	}
 
-	int EffectDuration;
-	short EffectIntensity;
-	double EffectDistanceModifier;
+	int EffectDuration = 0;
+	short EffectIntensity = 0;
+	double EffectDistanceModifier = 0.0;
 	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "EffectDuration");
 	if (CurrentLine >= 0)
 	{
