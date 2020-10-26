@@ -407,6 +407,7 @@ namespace NamespaceSerializer
 		}
 		catch (...)
 		{
+			LOG(a_ID);
 			UNREACHABLE(Printf("Tried to load unknown enchantment: %s", a_ID));
 		}
 	}

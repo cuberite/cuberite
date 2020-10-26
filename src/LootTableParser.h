@@ -104,7 +104,7 @@ namespace LootTable
 
 			cItem m_Item;
 			AString m_NBT;
-			// Todo: Potion
+			// TODO: 27.10.2020 - Add Potion IDs - 12xx12
 			AString m_Tag;
 		};
 
@@ -273,7 +273,7 @@ namespace LootTable
 		public:
 			cAlternative() { m_Active = false; }
 			cAlternative(const Json::Value & a_Value);
-			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource) const;
+			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource, int a_ExplosionSize) const;
 		private:
 			cLootTableConditions m_SubConditions;
 		};
@@ -333,7 +333,7 @@ namespace LootTable
 			// because the alternative in the condition struct needs the structs of the conditions but this condition needs the condition struct and so on..
 		public:
 			cInverted(const Json::Value & a_Value);
-			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource) const;
+			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource, int a_ExplosionSize) const;
 		private:
 			cLootTableConditions m_Conditions;
 		};
@@ -389,7 +389,7 @@ namespace LootTable
 		{
 		public:
 			cSurvivesExplosion() { m_Active = true; }
-			bool operator () (cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const;
+			bool operator () (const cNoise & a_Noise, const Vector3i & a_Pos, int a_ExplosionRadius) const;
 		private:
 		};
 
@@ -870,19 +870,19 @@ namespace LootTable
 
 #define VISITCONDITION \
 	OverloadedVariantAccess { \
-		[&] (const LootTable::Condition::cAlternative & a_Cond)             { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource); }, \
+		[&] (const LootTable::Condition::cAlternative & a_Cond)             { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource, a_ExplosionSize); }, \
 		[&] (const LootTable::Condition::cBlockStateProperty & a_Cond)      { return a_Cond(a_World, a_Pos); }, \
 		[&] (const LootTable::Condition::cDamageSourceProperties & a_Cond)  { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource); }, \
 		[&] (const LootTable::Condition::cEntityProperties & a_Cond)        { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Condition::cEntityScores & a_Cond)            { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
-		[&] (const LootTable::Condition::cInverted & a_Cond)                { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource); }, \
+		[&] (const LootTable::Condition::cInverted & a_Cond)                { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID, a_DamageSource, a_ExplosionSize); }, \
 		[&] (const LootTable::Condition::cKilledByPlayer & a_Cond)          { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Condition::cLocationCheck & a_Cond)           { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Condition::cMatchTool & a_Cond)               { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Condition::cRandomChance & a_Cond)            { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Condition::cRandomChanceWithLooting & a_Cond) { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Condition::cReference & a_Cond)	            { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
-		[&] (const LootTable::Condition::cSurvivesExplosion & a_Cond)	    { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
+		[&] (const LootTable::Condition::cSurvivesExplosion & a_Cond)	    { return a_Cond(a_Noise, a_Pos, a_ExplosionSize); }, \
 		[&] (const LootTable::Condition::cTableBonus & a_Cond)              { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Condition::cTimeCheck & a_Cond)               { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \
 		[&] (const LootTable::Condition::cWeatherCheck & a_Cond)            { return a_Cond(a_World, a_Noise, a_Pos, a_KilledID, a_KillerID); }, \

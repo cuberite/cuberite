@@ -124,7 +124,7 @@ namespace LootTable
 
 	bool cAlternative::operator()(
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
-		UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource) const
+		UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource, int a_ExplosionSize) const
 	{
 		ACTIVECHECK
 		bool Success = false;
@@ -1047,7 +1047,7 @@ namespace LootTable
 
 		if (!m_NBT.empty())
 		{
-			// Add NBT check here
+			// TODO: 27.10.2020 - Add NBT check here - 12xx12
 		}
 
 		if (m_Player)
@@ -1092,7 +1092,10 @@ namespace LootTable
 			});
 		}
 
-		// Entity type
+		if (!m_EntityType.empty())
+		{
+			// Todo
+		}
 
 		if (m_TargetEntity->IsActive())
 		{
@@ -1174,7 +1177,7 @@ namespace LootTable
 
 	bool cInverted::operator()(
 		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
-		UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource) const
+		UInt32 a_KilledID, UInt32 a_KillerID, const TakeDamageInfo & a_DamageSource, int a_ExplosionSize) const
 	{
 		ACTIVECHECK
 		return !std::visit(VISITCONDITION, m_Conditions[0].m_Parameter);
@@ -1264,7 +1267,7 @@ namespace LootTable
 					if (NoCaseCompare(PredicateKey, "biome") == 0)
 					{
 						m_Biome = StringToBiome(static_cast<AString>(NamespaceSerializer::SplitNamespacedID(PredicateObject[PredicateKey].asString()).second));
-						// Todo: this might fail due to changed biome names in 1.13
+						// TODO: this might fail due to changed biome names in 1.13
 					}  // "biome"
 					else if (NoCaseCompare(PredicateKey, "block") == 0)
 					{
@@ -1714,9 +1717,9 @@ namespace LootTable
 		{
 		}
 
-		// Todo: Checks if item belongs to specified tag
 		if (!m_Tag.empty())
 		{
+			Res &= ItemTag::GetItems(ItemTag::eItemTags(m_Tag)).ContainsType(a_Item);
 		}
 
 		return Res;
@@ -1817,12 +1820,14 @@ namespace LootTable
 // cReference
 	cReference::cReference(const Json::Value & a_Value)
 	{
+		LOGWARNING("Loot table: Condition \"Reference\" is not yet supported, dropping condition!");
+		return;
+		// TODO: 06.09.2020 - Add! The wiki is not helpful at all - 12xx12
 		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"Reference\" encountered a Json problem, dropping condition!");
 			return;
 		}
-		// Todo
 		m_Active = true;
 	}
 
@@ -1832,7 +1837,6 @@ namespace LootTable
 	{
 		ACTIVECHECK
 		bool Res = true;
-		// Todo
 		return Res;
 	}
 
@@ -1841,11 +1845,10 @@ namespace LootTable
 // cSurvivesExplosion
 
 	bool cSurvivesExplosion::operator()(
-		cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos,
-		UInt32 a_KilledID, UInt32 a_KillerID) const
+		const cNoise & a_Noise, const Vector3i & a_Pos,
+		int a_ExplosionProbability) const
 	{
-		// Todo
-		return true;
+		return (abs(a_Noise.IntNoise3D(a_Pos)) > (1.0 / a_ExplosionProbability));
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2222,12 +2225,14 @@ namespace LootTable
 
 	void cCopyName::operator()(cItem & a_Item, cWorld & a_World, const cNoise & a_Noise, const Vector3i & a_Pos, UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
-		if (!m_Active)
+		ACTIVECHECK
+		// TODO: 27.10.2020 - Add when implemented
+		/*
+		a_World.DoWithBlockEntityAt(a_Pos, [&] (cBlockEntity & a_BlockEntity)
 		{
-			return;
-		}
-		// Todo
-		// a_Item.m_CustomName = a_BlockEntity.GetCustomName();
+			a_Item.m_CustomName = a_BlockEntity.GetCustomName();
+		});
+		*/
 	}
 
 
@@ -2586,7 +2591,7 @@ namespace LootTable
 
 	void cExplosionDecay::operator() (cItem & a_Item, float a_ExplosionSize) const
 	{
-		a_Item.m_ItemCount = a_Item.m_ItemCount * FloorC<char>(1 / a_ExplosionSize);
+		a_Item.m_ItemCount = a_Item.m_ItemCount * FloorC<char>(1.0 / a_ExplosionSize);
 	}
 
 ////////////////////////////////////////////////////////////////////////////////

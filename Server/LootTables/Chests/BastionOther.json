@@ -81,19 +81,6 @@
           "name": "minecraft:music_disc_pigstep"
         },
         {
-          "type": "minecraft:item",
-          "weight": 10,
-          "functions": [
-            {
-              "function": "minecraft:enchant_randomly",
-              "enchantments": [
-                "minecraft:soul_speed"
-              ]
-            }
-          ],
-          "name": "minecraft:book"
-        },
-        {
           "type": "minecraft:empty",
           "weight": 50
         }
@@ -102,22 +89,6 @@
     {
       "rolls": 2,
       "entries": [
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": 1
-            },
-            {
-              "function": "minecraft:enchant_randomly",
-              "enchantments": [
-                "minecraft:soul_speed"
-              ]
-            }
-          ],
-          "name": "minecraft:golden_boots"
-        },
         {
           "type": "minecraft:item",
           "functions": [
