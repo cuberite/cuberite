@@ -1821,14 +1821,14 @@ namespace LootTable
 	cReference::cReference(const Json::Value & a_Value)
 	{
 		LOGWARNING("Loot table: Condition \"Reference\" is not yet supported, dropping condition!");
-		return;
+		return; /*
 		// TODO: 06.09.2020 - Add! The wiki is not helpful at all - 12xx12
 		if ((a_Value.empty()) || (a_Value.isArray()))
 		{
 			LOGWARNING("Loot table: Condition \"Reference\" encountered a Json problem, dropping condition!");
 			return;
 		}
-		m_Active = true;
+		m_Active = true; */
 	}
 
 	bool cReference::operator()(
@@ -1848,7 +1848,7 @@ namespace LootTable
 		const cNoise & a_Noise, const Vector3i & a_Pos,
 		int a_ExplosionProbability) const
 	{
-		return (abs(a_Noise.IntNoise3D(a_Pos)) > (1.0 / a_ExplosionProbability));
+		return (std::abs(a_Noise.IntNoise3D(a_Pos)) > (1.0 / a_ExplosionProbability));
 	}
 
 ////////////////////////////////////////////////////////////////////////////////
