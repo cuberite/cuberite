@@ -816,7 +816,7 @@ namespace LootTable
 					LOGWARNING("Loot table: Condition \"EntityProperties - Type\" encountered a Json problem, dropping condition!");
 					continue;
 				}
-				m_EntityType = std::move(Type);
+				m_EntityType = std::move(AString(NamespaceSerializer::SplitNamespacedID(Type).second));
 			}
 			else if (
 				(NoCaseCompare(Key, "target_entity") == 0) ||
@@ -1094,7 +1094,47 @@ namespace LootTable
 
 		if (!m_EntityType.empty())
 		{
-			// Todo
+			Res &= a_World.DoWithEntityByID(DestID, [&] (cEntity & a_Entity)
+			{
+				switch (a_Entity.GetEntityType())
+				{
+					case cEntity::etEnderCrystal: return (NoCaseCompare(m_EntityType, "ender_crystal") == 0);
+					case cEntity::etPlayer:       return (NoCaseCompare(m_EntityType, "player") == 0);
+					case cEntity::etPickup:       return (NoCaseCompare(m_EntityType, "pickup") == 0);
+					case cEntity::etMonster:
+					{
+						const auto & Monster = static_cast<cMonster &>(a_Entity);
+						// Todo: wait from monster namespace serializer PR
+					}
+					case cEntity::etFallingBlock: return (NoCaseCompare(m_EntityType, "falling_block") == 0);
+					case cEntity::etMinecart:     return (NoCaseCompare(m_EntityType, "minecart") == 0);
+					case cEntity::etBoat:         return (NoCaseCompare(m_EntityType, "boat") == 0);
+					case cEntity::etTNT:          return (NoCaseCompare(m_EntityType, "tnt") == 0);
+					case cEntity::etProjectile:
+					{
+						const auto & Projectile = static_cast<cProjectileEntity &>(a_Entity);
+						switch (Projectile.GetProjectileKind())
+						{
+							case cProjectileEntity::pkArrow:         return (NoCaseCompare(m_EntityType, "arrow") == 0);
+							case cProjectileEntity::pkSnowball:      return (NoCaseCompare(m_EntityType, "snowball") == 0);
+							case cProjectileEntity::pkEgg:           return (NoCaseCompare(m_EntityType, "egg") == 0);
+							case cProjectileEntity::pkGhastFireball: return (NoCaseCompare(m_EntityType, "ghast_fireball") == 0);
+							case cProjectileEntity::pkFireCharge:    return (NoCaseCompare(m_EntityType, "fire_charge") == 0);
+							case cProjectileEntity::pkEnderPearl:    return (NoCaseCompare(m_EntityType, "ender_pearl") == 0);
+							case cProjectileEntity::pkExpBottle:     return (NoCaseCompare(m_EntityType, "experience_bottle") == 0);
+							case cProjectileEntity::pkSplashPotion:  return (NoCaseCompare(m_EntityType, "splash_potion") == 0);
+							case cProjectileEntity::pkFirework:      return (NoCaseCompare(m_EntityType, "firework") == 0);
+							case cProjectileEntity::pkWitherSkull:   return (NoCaseCompare(m_EntityType, "wither_skull") == 0);
+						}
+					}
+					case cEntity::etExpOrb:      return (NoCaseCompare(m_EntityType, "experience_orb") == 0);
+					case cEntity::etFloater:     return (NoCaseCompare(m_EntityType, "floater") == 0);
+					case cEntity::etItemFrame:   return (NoCaseCompare(m_EntityType, "item_frame") == 0);
+					case cEntity::etPainting:    return (NoCaseCompare(m_EntityType, "painting") == 0);
+					case cEntity::etLeashKnot:   return (NoCaseCompare(m_EntityType, "leash_knot") == 0);
+					default: return false;
+				}
+			});
 		}
 
 		if (m_TargetEntity->IsActive())
