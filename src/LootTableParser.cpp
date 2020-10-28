@@ -816,7 +816,7 @@ namespace LootTable
 					LOGWARNING("Loot table: Condition \"EntityProperties - Type\" encountered a Json problem, dropping condition!");
 					continue;
 				}
-				m_EntityType = std::move(AString(NamespaceSerializer::SplitNamespacedID(Type).second));
+				m_EntityType = AString(NamespaceSerializer::SplitNamespacedID(Type).second);
 			}
 			else if (
 				(NoCaseCompare(Key, "target_entity") == 0) ||
