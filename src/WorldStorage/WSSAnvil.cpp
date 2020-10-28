@@ -1751,7 +1751,7 @@ void cWSSAnvil::LoadEnderCrystalFromNBT(cEntityList & a_Entities, const cParsedN
 	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "ShowBottom");
 	if (CurrentLine > 0)
 	{
-		EnderCrystal->SetShowBottom(a_NBT.GetByte(CurrentLine) == 0);
+		EnderCrystal->SetShowBottom(a_NBT.GetByte(CurrentLine) == 1);
 	}
 
 	a_Entities.emplace_back(std::move(EnderCrystal));
