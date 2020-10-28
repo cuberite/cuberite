@@ -500,8 +500,6 @@ static void ParseReference()
 
 	auto Reference = std::get<LootTable::Condition::cReference>(Condition.m_Parameter);
 
-	TEST_TRUE(Reference.IsActive());
-
 	// TODO
 }
 
