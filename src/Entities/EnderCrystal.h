@@ -24,8 +24,8 @@ public:
 	bool ShowsBottom() const { return m_ShowBottom; }
 	void SetShowBottom(bool a_ShowBottom) { m_ShowBottom = a_ShowBottom; }
 
-	const Vector3i & GetBeamTarget() const { return m_BeamTarget; }
-	void SetBeamTarget(const Vector3i & a_BeamTarget) { m_BeamTarget = a_BeamTarget; }
+	const Vector3i GetBeamTarget() const { return m_BeamTarget; }
+	void SetBeamTarget(const Vector3i a_BeamTarget) { m_BeamTarget = a_BeamTarget; }
 
 	/** If the EnderCrystal should send it's beam to the client and store to disk. */
 	bool DisplaysBeam() const { return m_DisplayBeam; }
