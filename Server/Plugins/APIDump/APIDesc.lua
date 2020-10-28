@@ -4500,7 +4500,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				},
 				etEnderCrystal =
 				{
-					Notes = "",
+					Notes = "The entity is a {{cEnderCrystal}}",
 				},
 				etEntity =
 				{
