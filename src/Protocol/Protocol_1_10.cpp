@@ -21,6 +21,7 @@ Implements the 1.10 protocol classes:
 #include "../WorldStorage/FastNBT.h"
 
 #include "../Entities/Boat.h"
+#include "../Entities/EnderCrystal.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"

@@ -13,7 +13,6 @@ Implements the 1.9 protocol classes:
 		- release 1.9.4 protocol (#110)
 */
 
-#include <Entities/TNTEntity.h>
 #include "Globals.h"
 #include "Protocol_1_9.h"
 #include "../mbedTLS++/Sha1Checksum.h"

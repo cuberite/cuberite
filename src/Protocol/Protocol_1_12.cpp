@@ -13,6 +13,7 @@ Implements the 1.12 protocol classes:
 #include "Packetizer.h"
 
 #include "../Entities/Boat.h"
+#include "../Entities/EnderCrystal.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/Player.h"
