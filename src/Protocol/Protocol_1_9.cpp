@@ -13,6 +13,7 @@ Implements the 1.9 protocol classes:
 		- release 1.9.4 protocol (#110)
 */
 
+#include <Entities/TNTEntity.h>
 #include "Globals.h"
 #include "Protocol_1_9.h"
 #include "../mbedTLS++/Sha1Checksum.h"
@@ -28,6 +29,7 @@ Implements the 1.9 protocol classes:
 
 #include "../WorldStorage/FastNBT.h"
 
+#include "../Entities/EnderCrystal.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
@@ -1727,6 +1729,21 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 			break;
 		}  // case etItemFrame
 
+		case cEntity::etEnderCrystal:
+		{
+			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
+			a_Pkt.WriteBEUInt8(7);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_OPTIONAL_POSITION);
+			a_Pkt.WriteBool(EnderCrystal.DisplaysBeam());
+			if (EnderCrystal.DisplaysBeam())
+			{
+				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
+			}
+			a_Pkt.WriteBEUInt8(8);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
+			break;
+		}  // case etEnderCrystal
 		default:
 		{
 			break;
