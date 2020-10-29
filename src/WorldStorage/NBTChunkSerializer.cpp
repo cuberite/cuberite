@@ -683,6 +683,16 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicEntity(a_EnderCrystal, "EnderCrystal");
+			mWriter.AddByte("ShowBottom", a_EnderCrystal->ShowsBottom() ? 1 : 0);
+			if (a_EnderCrystal->DisplaysBeam())
+			{
+				mWriter.BeginCompound("BeamTarget");
+				const auto & BeamTarget = a_EnderCrystal->GetBeamTarget();
+				mWriter.AddInt("X", BeamTarget.x);
+				mWriter.AddInt("Y", BeamTarget.y);
+				mWriter.AddInt("Z", BeamTarget.z);
+				mWriter.EndCompound();
+			}
 		mWriter.EndCompound();
 	}
 

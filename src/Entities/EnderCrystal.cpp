@@ -10,8 +10,9 @@
 
 
 
-cEnderCrystal::cEnderCrystal(Vector3d a_Pos):
-	Super(etEnderCrystal, a_Pos, 1.0, 1.0)
+cEnderCrystal::cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom):
+	Super(etEnderCrystal, a_Pos, 1.0, 1.0),
+	m_ShowBottom(a_ShowBottom)
 {
 	SetMaxHealth(5);
 }
@@ -33,6 +34,10 @@ void cEnderCrystal::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	// No further processing (physics e.t.c.) is needed
+	if (m_World->GetDimension() == dimEnd)
+	{
+		m_World->SetBlock(POS_TOINT.addedY(1), E_BLOCK_FIRE, 0);
+	}
 }
 
 
@@ -47,8 +52,7 @@ void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 
 	Destroy();
 
-	m_World->SetBlock(POSX_TOINT, POSY_TOINT,     POSZ_TOINT, E_BLOCK_BEDROCK, 0);
-	m_World->SetBlock(POSX_TOINT, POSY_TOINT + 1, POSZ_TOINT, E_BLOCK_FIRE,    0);
+	m_World->SetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT, E_BLOCK_FIRE, 0);
 }
 
 
