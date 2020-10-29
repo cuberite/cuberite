@@ -198,7 +198,7 @@ public:
 
 			case E_BLOCK_GRASS:
 			{
-				growPlantsAround(a_World, a_BlockPos);
+				GrowPlantsAround(a_World, a_BlockPos);
 				return true;
 			}
 
@@ -216,51 +216,139 @@ public:
 
 	/** Grows new plants around the specified block.
 	Places up to 40 new plants, with the following probability:
-		- 20 % big grass (2-block tall grass)
-		- 60 % tall grass (1-block tall grass)
-		- 20 % flowers (biome dependent variants)
+		- 0 up to 8  big grass  (2-block tall grass)
+		- 8 up tp 24 tall grass (1-block tall grass)
+		- 0 up to 8  flowers    (biome dependent variants)
 	The new plants are spawned within 7 taxicab distance of a_BlockPos, on a grass block.
 	Broadcasts a particle for each new spawned plant. */
-	void growPlantsAround(cWorld & a_World, Vector3i a_BlockPos)
+	static void GrowPlantsAround(cWorld & a_World, Vector3i a_BlockPos)
 	{
-		auto & r1 = GetRandomProvider();
-		for (int i = 0; i < 40; ++i)
+		auto & Random = GetRandomProvider();
+		int OffsetX, OffsetY, OffsetZ;
+		Vector3i Offset, Pos;
+		//
+		const auto RandomPosition = [&] (bool a_TallGrass)
 		{
-			int ofsY = r1.RandInt(3) + r1.RandInt(3) - 3;
-			if (!cChunkDef::IsValidHeight(a_BlockPos.y + ofsY))
+			OffsetY = Random.RandInt(3) + Random.RandInt(3) - 3;
+			if (!cChunkDef::IsValidHeight(a_BlockPos.y + OffsetY))
 			{
-				continue;
+				return false;
 			}
-			int ofsX = (r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3)) / 2 - 3;
-			int ofsZ = (r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3)) / 2 - 3;
-			Vector3i ofs(ofsX, ofsY, ofsZ);
-			auto typeGround = a_World.GetBlock(a_BlockPos + ofs);
-			if (typeGround != E_BLOCK_GRASS)
+			OffsetX = (Random.RandInt(3) + Random.RandInt(3) + Random.RandInt(3) + Random.RandInt(3)) / 2 - 3;
+			OffsetZ = (Random.RandInt(3) + Random.RandInt(3) + Random.RandInt(3) + Random.RandInt(3)) / 2 - 3;
+			Offset = {OffsetX, OffsetY, OffsetZ};
+
+			auto TypeGround = a_World.GetBlock(a_BlockPos + Offset);
+			if (TypeGround != E_BLOCK_GRASS)
 			{
-				continue;
+				return false;
 			}
-			auto pos = a_BlockPos + ofs.addedY(1);
-			auto typeAbove = a_World.GetBlock(pos);
-			if (typeAbove != E_BLOCK_AIR)
+			Pos = a_BlockPos + Offset.addedY(2);
+			auto TypeTwoAbove = a_World.GetBlock(Pos);
+			if (TypeTwoAbove != E_BLOCK_AIR)
 			{
-				continue;
+				return false;
 			}
-			BLOCKTYPE  spawnType;
-			NIBBLETYPE spawnMeta = 0;
-			switch (r1.RandInt(10))
+			Pos = a_BlockPos + Offset.addedY(1);
+			auto TypeAbove = a_World.GetBlock(Pos);
+			return TypeAbove == E_BLOCK_AIR;
+		};
+
+		// place the big grass
+		for (int i = 0; i < Random.RandInt(8); i++)
+		{
+			if (RandomPosition(true))
 			{
-				case 0:  spawnType = E_BLOCK_YELLOW_FLOWER; break;
-				case 1:  spawnType = E_BLOCK_RED_ROSE;      break;
-				default:
+				a_World.SetBlock(Pos, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_DOUBLE_TALL_GRASS);
+				a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, Pos, 0);
+			}
+		}
+
+		// place the tall grass
+		for (int i = 0; i < Random.RandInt(8, 24); ++i)
+		{
+			if (RandomPosition(false))
+			{
+				a_World.SetBlock(Pos, E_BLOCK_TALL_GRASS, E_META_TALL_GRASS_GRASS);
+				a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, Pos, 0);
+			}
+		}
+
+		// place the flowers
+		// https://minecraft.gamepedia.com/Flower#Flower_biomes
+		for (int i = 0; i < Random.RandInt(8); ++i)
+		{
+			if (RandomPosition(false))
+			{
+				auto Biome = a_World.GetBiomeAt(Pos.x, Pos.z);
+				switch (Biome)
 				{
-					spawnType = E_BLOCK_TALL_GRASS;
-					spawnMeta = E_META_TALL_GRASS_GRASS;
-					break;
+					case biPlains:
+					case biSunflowerPlains:
+					{
+						switch (Random.RandInt(8))
+						{
+							case 0: a_World.SetBlock(Pos, E_BLOCK_DANDELION, 0); break;
+							case 1: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_POPPY); break;
+							case 2: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_ALLIUM); break;
+							case 3: a_World.SetBlock(Pos, E_BLOCK_RED_ROSE, 0); break;  // was renamed to Azure Bluet later
+							case 4: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_RED_TULIP); break;
+							case 5: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_PINK_TULIP); break;
+							case 6: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_WHITE_TULIP); break;
+							case 7: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_ORANGE_TULIP); break;
+							case 8: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_OXEYE_DAISY); break;
+							// TODO: Add cornflower
+						}
+						break;
+					}
+					case biSwampland:
+					case biSwamplandM:
+					{
+						a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_BLUE_ORCHID);
+						break;
+					}
+					case biFlowerForest:
+					{
+						switch (Random.RandInt(8))
+						{
+							case 0: a_World.SetBlock(Pos, E_BLOCK_DANDELION, 0); break;
+							case 1: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_POPPY); break;
+							case 2: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_ALLIUM); break;
+							case 3: a_World.SetBlock(Pos, E_BLOCK_RED_ROSE, 0); break;  // was renamed to Azure Bluet later
+							case 4: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_RED_TULIP); break;
+							case 5: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_PINK_TULIP); break;
+							case 6: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_WHITE_TULIP); break;
+							case 7: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_ORANGE_TULIP); break;
+							case 8: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_OXEYE_DAISY); break;
+							// TODO: Add cornflower, lily of the valley
+						}
+						break;
+					}
+					case biMesa:
+					case biMesaBryce:
+					case biMesaPlateau:
+					case biMesaPlateauF:
+					case biMesaPlateauM:
+					case biMesaPlateauFM:
+					case biMushroomIsland:
+					case biMushroomShore:
+					case biNether:
+					case biEnd:
+					{
+						continue;
+					}
+					default:
+					{
+						switch (Random.RandInt(1))
+						{
+							case 0: a_World.SetBlock(Pos, E_BLOCK_DANDELION, 0); break;
+							case 1: a_World.SetBlock(Pos, E_BLOCK_RED_ROSE, 0); break;
+						}
+						break;
+					}
 				}
-			}  // switch (random spawn block type)
-			a_World.SetBlock(pos, spawnType, spawnMeta);
-			a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, pos, 0);
-		}  // for i - attempts
+			}
+		}
 	}
 } ;
 
