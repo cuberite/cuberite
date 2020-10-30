@@ -5,6 +5,7 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "../Blocks/BlockCocoaPod.h"
+#include <optional>
 
 
 
@@ -224,53 +225,27 @@ public:
 	static void GrowPlantsAround(cWorld & a_World, Vector3i a_BlockPos)
 	{
 		auto & Random = GetRandomProvider();
-		int OffsetX, OffsetY, OffsetZ;
-		Vector3i Offset, Pos;
-		//
-		const auto RandomPosition = [&] (bool a_TallGrass)
-		{
-			OffsetY = Random.RandInt(3) + Random.RandInt(3) - 3;
-			if (!cChunkDef::IsValidHeight(a_BlockPos.y + OffsetY))
-			{
-				return false;
-			}
-			OffsetX = (Random.RandInt(3) + Random.RandInt(3) + Random.RandInt(3) + Random.RandInt(3)) / 2 - 3;
-			OffsetZ = (Random.RandInt(3) + Random.RandInt(3) + Random.RandInt(3) + Random.RandInt(3)) / 2 - 3;
-			Offset = {OffsetX, OffsetY, OffsetZ};
-
-			auto TypeGround = a_World.GetBlock(a_BlockPos + Offset);
-			if (TypeGround != E_BLOCK_GRASS)
-			{
-				return false;
-			}
-			Pos = a_BlockPos + Offset.addedY(2);
-			auto TypeTwoAbove = a_World.GetBlock(Pos);
-			if (TypeTwoAbove != E_BLOCK_AIR)
-			{
-				return false;
-			}
-			Pos = a_BlockPos + Offset.addedY(1);
-			auto TypeAbove = a_World.GetBlock(Pos);
-			return TypeAbove == E_BLOCK_AIR;
-		};
+		Vector3i Offset;
 
 		// place the big grass
 		for (int i = 0; i < Random.RandInt(8); i++)
 		{
-			if (RandomPosition(true))
+			auto Pos = GetRandomPlantPosition(a_BlockPos, a_World, true);
+			if (Pos)
 			{
-				a_World.SetBlock(Pos, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_DOUBLE_TALL_GRASS);
-				a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, Pos, 0);
+				a_World.SetBlock(*Pos, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_DOUBLE_TALL_GRASS);
+				a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, *Pos, 0);
 			}
 		}
 
 		// place the tall grass
 		for (int i = 0; i < Random.RandInt(8, 24); ++i)
 		{
-			if (RandomPosition(false))
+			auto Pos = GetRandomPlantPosition(a_BlockPos, a_World, true);
+			if (Pos)
 			{
-				a_World.SetBlock(Pos, E_BLOCK_TALL_GRASS, E_META_TALL_GRASS_GRASS);
-				a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, Pos, 0);
+				a_World.SetBlock(*Pos, E_BLOCK_TALL_GRASS, E_META_TALL_GRASS_GRASS);
+				a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, *Pos, 0);
 			}
 		}
 
@@ -278,9 +253,10 @@ public:
 		// https://minecraft.gamepedia.com/Flower#Flower_biomes
 		for (int i = 0; i < Random.RandInt(8); ++i)
 		{
-			if (RandomPosition(false))
+			auto Pos = GetRandomPlantPosition(a_BlockPos, a_World, true);
+			if (Pos)
 			{
-				auto Biome = a_World.GetBiomeAt(Pos.x, Pos.z);
+				auto Biome = a_World.GetBiomeAt(Pos->x, Pos->z);
 				switch (Biome)
 				{
 					case biPlains:
@@ -288,15 +264,15 @@ public:
 					{
 						switch (Random.RandInt(8))
 						{
-							case 0: a_World.SetBlock(Pos, E_BLOCK_DANDELION, 0); break;
-							case 1: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_POPPY); break;
-							case 2: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_ALLIUM); break;
-							case 3: a_World.SetBlock(Pos, E_BLOCK_RED_ROSE, 0); break;  // was renamed to Azure Bluet later
-							case 4: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_RED_TULIP); break;
-							case 5: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_PINK_TULIP); break;
-							case 6: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_WHITE_TULIP); break;
-							case 7: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_ORANGE_TULIP); break;
-							case 8: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_OXEYE_DAISY); break;
+							case 0: a_World.SetBlock(*Pos, E_BLOCK_DANDELION, 0); break;
+							case 1: a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_POPPY); break;
+							case 2: a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_ALLIUM); break;
+							case 3: a_World.SetBlock(*Pos, E_BLOCK_RED_ROSE, 0); break;  // was renamed to Azure Bluet later
+							case 4: a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_RED_TULIP); break;
+							case 5: a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_PINK_TULIP); break;
+							case 6: a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_WHITE_TULIP); break;
+							case 7: a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_ORANGE_TULIP); break;
+							case 8: a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_OXEYE_DAISY); break;
 							// TODO: Add cornflower
 						}
 						break;
@@ -304,22 +280,22 @@ public:
 					case biSwampland:
 					case biSwamplandM:
 					{
-						a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_BLUE_ORCHID);
+						a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_BLUE_ORCHID);
 						break;
 					}
 					case biFlowerForest:
 					{
 						switch (Random.RandInt(8))
 						{
-							case 0: a_World.SetBlock(Pos, E_BLOCK_DANDELION, 0); break;
-							case 1: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_POPPY); break;
-							case 2: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_ALLIUM); break;
-							case 3: a_World.SetBlock(Pos, E_BLOCK_RED_ROSE, 0); break;  // was renamed to Azure Bluet later
-							case 4: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_RED_TULIP); break;
-							case 5: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_PINK_TULIP); break;
-							case 6: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_WHITE_TULIP); break;
-							case 7: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_ORANGE_TULIP); break;
-							case 8: a_World.SetBlock(Pos, E_BLOCK_FLOWER, E_META_FLOWER_OXEYE_DAISY); break;
+							case 0: a_World.SetBlock(*Pos, E_BLOCK_DANDELION, 0); break;
+							case 1: a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_POPPY); break;
+							case 2: a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_ALLIUM); break;
+							case 3: a_World.SetBlock(*Pos, E_BLOCK_RED_ROSE, 0); break;  // was renamed to Azure Bluet later
+							case 4: a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_RED_TULIP); break;
+							case 5: a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_PINK_TULIP); break;
+							case 6: a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_WHITE_TULIP); break;
+							case 7: a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_ORANGE_TULIP); break;
+							case 8: a_World.SetBlock(*Pos, E_BLOCK_FLOWER, E_META_FLOWER_OXEYE_DAISY); break;
 							// TODO: Add cornflower, lily of the valley
 						}
 						break;
@@ -341,14 +317,52 @@ public:
 					{
 						switch (Random.RandInt(1))
 						{
-							case 0: a_World.SetBlock(Pos, E_BLOCK_DANDELION, 0); break;
-							case 1: a_World.SetBlock(Pos, E_BLOCK_RED_ROSE, 0); break;
+							case 0: a_World.SetBlock(*Pos, E_BLOCK_DANDELION, 0); break;
+							case 1: a_World.SetBlock(*Pos, E_BLOCK_RED_ROSE, 0); break;
 						}
 						break;
 					}
 				}
 			}
 		}
+	}
+
+	static std::optional<Vector3i> GetRandomPlantPosition(Vector3i a_BlockPos, cWorld & a_World, bool a_TallGrass)
+	{
+		auto & Random = GetRandomProvider();
+		Vector3i Offset, Pos;
+		int OffsetX, OffsetY, OffsetZ;
+
+		OffsetY = Random.RandInt(3) + Random.RandInt(3) - 3;
+		if (!cChunkDef::IsValidHeight(a_BlockPos.y + OffsetY))
+		{
+			return std::nullopt;
+		}
+		OffsetX = (Random.RandInt(3) + Random.RandInt(3) + Random.RandInt(3) + Random.RandInt(3)) / 2 - 3;
+		OffsetZ = (Random.RandInt(3) + Random.RandInt(3) + Random.RandInt(3) + Random.RandInt(3)) / 2 - 3;
+		Offset = {OffsetX, OffsetY, OffsetZ};
+
+		auto TypeGround = a_World.GetBlock(a_BlockPos + Offset);
+		if (TypeGround != E_BLOCK_GRASS)
+		{
+			return std::nullopt;
+		}
+		if (a_TallGrass)
+		{
+			Pos = a_BlockPos + Offset.addedY(2);
+			auto TypeTwoAbove = a_World.GetBlock(Pos);
+			if (TypeTwoAbove != E_BLOCK_AIR)
+			{
+				return std::nullopt;
+			}
+		}
+		Pos = a_BlockPos + Offset.addedY(1);
+		auto TypeAbove = a_World.GetBlock(Pos);
+		if (TypeAbove != E_BLOCK_AIR)
+		{
+			return std::nullopt;
+		}
+		return Pos;
 	}
 } ;
 
