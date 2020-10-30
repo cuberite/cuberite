@@ -9585,7 +9585,7 @@ a_Player:OpenWindow(Window);
 							Name = "DisplaysBeam",
 							Type = "boolean",
 						},
-						Notes = "Sets if the EnderCrystal should display its beam.",
+						Notes = "Sets if the EnderCrystal should display its beam and save it.",
 					},
 				},
 				SetShowBottom =

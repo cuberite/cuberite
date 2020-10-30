@@ -27,7 +27,7 @@ public:
 	Vector3i GetBeamTarget() const { return m_BeamTarget; }
 	void SetBeamTarget(Vector3i a_BeamTarget);
 
-	/** If the EnderCrystal should send it's beam to the client. */
+	/** If the EnderCrystal should send it's beam to the client and save it. */
 	bool DisplaysBeam() const { return m_DisplayBeam; }
 	void SetDisplayBeam(bool a_DisplayBeam);
 
