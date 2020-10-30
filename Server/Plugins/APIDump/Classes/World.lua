@@ -3312,7 +3312,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				{
 					{
 						Name = "Pos",
-						Type = "Vector3i",
+						Type = "Vector3d",
 					},
 					{
 						Name = "ShowBottom",
