@@ -5061,8 +5061,8 @@ cFile:DeleteFile("/usr/bin/virus.exe");
 				{
 					Returns =
 					{
-							Name = "BitePosition",
-							Type = "Vector3d",
+						Name = "BitePosition",
+						Type = "Vector3d",
 					},
 					Notes = "Returns the position of the floater just before a fish bites. If a fish hasn't bitten the floater, this function returns the position the floater was cast from.",
 				},
@@ -8900,16 +8900,16 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-                                BurnsInDaylight =
-                                {
-                                        Returns =
-                                        {
-                                                {
-                                                        Type = "boolean",
-                                                },
-                                        },
-                                        Notes = "Returns whether the mob burns in daylight.",
-                                },
+				BurnsInDaylight =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the mob burns in daylight.",
+				},
 				CanBeLeashed =
 				{
 					Returns =
@@ -9538,6 +9538,77 @@ a_Player:OpenWindow(Window);
 				},
 			},
 			Inherits = "cEntity",
+		},
+		cEnderCrystal =
+		{
+			Desc = [[
+				This class represents an ender crystal. This entity can be spawned by using {{cWorld#SpawnEnderCrystal_1|cWorld:SpawnEnderCrystal}}.
+			]],
+			Functions =
+			{
+				DisplaysBeam =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+						Notes = "Returns if the EnderCrystal shout display it's bream.",
+					},
+				},
+				GetBeamTarget =
+				{
+					Returns =
+					{
+						{
+							Type = "Vector3i",
+						},
+					},
+					Notes = "Returns the Block position where the beam is pointing",
+				},
+				SetBeamTarget =
+				{
+					Params =
+					{
+						{
+							Name = "BeamTarget",
+							Type = "Vector3i",
+						},
+					},
+				},
+				SetDisplayBeam =
+				{
+					Params =
+					{
+						{
+							Name = "ShowsBottom",
+							Type = "boolean",
+						},
+						Notes = "Sets if the EnderCrystal should broadcast it's bedrock base",
+					},
+				},
+				SetShowBottom =
+				{
+					Params =
+					{
+						{
+							Name = "ShowsBottom",
+							Type = "boolean",
+						},
+						Notes = "Sets if the EnderCrystal should broadcast it's bedrock base",
+					},
+				},
+				ShowsBottom =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+						Notes = "Returns if the bottom bedrock crystal like block.",
+					},
+				},
+			},
 		},
 		cExpOrb =
 		{

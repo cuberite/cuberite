@@ -20,6 +20,7 @@ public:
 
 	cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom);
 
+	// tolua_begin
 	// Getters and Setters
 	bool ShowsBottom() const { return m_ShowBottom; }
 	void SetShowBottom(bool a_ShowBottom);
@@ -27,10 +28,11 @@ public:
 	Vector3i GetBeamTarget() const { return m_BeamTarget; }
 	void SetBeamTarget(Vector3i a_BeamTarget);
 
-	/** If the EnderCrystal should send it's beam to the client and store to disk. */
+	/** If the EnderCrystal should send it's beam to the client. */
 	bool DisplaysBeam() const { return m_DisplayBeam; }
 	void SetDisplayBeam(bool a_DisplayBeam);
 
+	// tolua_end
 private:
 
 	// If the bedrock base should be displayed

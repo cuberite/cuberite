@@ -13,6 +13,7 @@
 cEnderCrystal::cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom):
 	Super(etEnderCrystal, a_Pos, 1.0, 1.0),
 	m_ShowBottom(a_ShowBottom),
+	m_BeamTarget({0, 0, 0}),
 	m_DisplayBeam(false)
 {
 	SetMaxHealth(5);
