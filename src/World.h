@@ -654,7 +654,7 @@ public:
 
 	/** Spawns a new ender crystal at the specified block coords.
 	Returns the UniqueID of the created entity, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnEnderCrystal(Vector3d a_Pos, bool a_ShowBottom = false);
+	UInt32 SpawnEnderCrystal(Vector3d a_Pos, bool a_ShowBottom, Vector3i a_BeamTarget, bool a_DisplayBeam);
 
 	// tolua_end
 

@@ -2165,9 +2165,9 @@ UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialV
 
 
 
-UInt32 cWorld::SpawnEnderCrystal(Vector3d a_Pos, bool a_ShowBottom)
+UInt32 cWorld::SpawnEnderCrystal(Vector3d a_Pos, bool a_ShowBottom, Vector3i a_BeamTarget, bool a_DisplayBeam)
 {
-	auto EnderCrystal = std::make_unique<cEnderCrystal>(a_Pos, a_ShowBottom);
+	auto EnderCrystal = std::make_unique<cEnderCrystal>(a_Pos, a_ShowBottom, a_BeamTarget, a_DisplayBeam);
 	auto EnderCrystalPtr = EnderCrystal.get();
 	if (!EnderCrystalPtr->Initialize(std::move(EnderCrystal), *this))
 	{

@@ -891,10 +891,10 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 		case cEntity::etEnderCrystal:
 		{
 			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
-			WriteEntityMetadata(a_Pkt, EntityMetadata::EnderCrystalBeamTarget, EntityMetadataType::OptPosition);
-			a_Pkt.WriteBool(EnderCrystal.DisplaysBeam());
 			if (EnderCrystal.DisplaysBeam())
 			{
+				WriteEntityMetadata(a_Pkt, EntityMetadata::EnderCrystalBeamTarget, EntityMetadataType::OptPosition);
+				a_Pkt.WriteBool(true);  // Dont do a second check if it should display the beam
 				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
 			}
 			WriteEntityMetadata(a_Pkt, EntityMetadata::EnderCrystalShowBottom, EntityMetadataType::Boolean);
