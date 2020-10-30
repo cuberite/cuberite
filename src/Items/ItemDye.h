@@ -225,7 +225,6 @@ public:
 	static void GrowPlantsAround(cWorld & a_World, Vector3i a_BlockPos)
 	{
 		auto & Random = GetRandomProvider();
-		Vector3i Offset;
 
 		// place the big grass
 		for (int i = 0; i < Random.RandInt(8); i++)
