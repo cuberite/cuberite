@@ -61,7 +61,7 @@ public:
 	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer & a_Player) = 0;
 
 	/** Sends the block on those coords to the player */
-	inline void SendBlockTo(const Vector3i a_BlockPos, cPlayer & a_Player)
+	virtual inline void SendBlockTo(const Vector3i a_BlockPos, cPlayer & a_Player)
 	{
 		SendBlockTo(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Player);
 	}

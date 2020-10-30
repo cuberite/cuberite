@@ -140,7 +140,7 @@ public:
 
 	/** Returns the default weather interval for the specific weather type.
 	Returns -1 for any unknown weather. */
-	int GetDefaultWeatherInterval(eWeather a_Weather);
+	int GetDefaultWeatherInterval(eWeather a_Weather) const;
 
 	/** Returns the current game mode. Partly OBSOLETE, you should use IsGameModeXXX() functions wherever applicable */
 	eGameMode GetGameMode(void) const { return m_GameMode; }
@@ -701,7 +701,7 @@ public:
 
 	/** Sends the block at the specified coords to the player.
 	Used mainly when plugins disable block-placing or block-breaking, to restore the previous block. */
-	void SendBlockTo(const Vector3i a_BlockPos, cPlayer & a_Player)
+	inline void SendBlockTo(const Vector3i a_BlockPos, cPlayer & a_Player) override
 	{
 		SendBlockTo(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Player);
 	}
