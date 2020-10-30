@@ -21,7 +21,6 @@ public:
 	cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom);
 
 	// tolua_begin
-	// Getters and Setters
 	bool ShowsBottom() const { return m_ShowBottom; }
 	void SetShowBottom(bool a_ShowBottom);
 

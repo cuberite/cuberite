@@ -9553,7 +9553,7 @@ a_Player:OpenWindow(Window);
 						{
 							Type = "boolean",
 						},
-						Notes = "Returns if the EnderCrystal shout display it's bream.",
+						Notes = "Returns if the EnderCrystal should display it's beam.",
 					},
 				},
 				GetBeamTarget =
@@ -9575,16 +9575,17 @@ a_Player:OpenWindow(Window);
 							Type = "Vector3i",
 						},
 					},
+					Notes = "Sets the target of the beam of this Ender Crystal.",
 				},
 				SetDisplayBeam =
 				{
 					Params =
 					{
 						{
-							Name = "ShowsBottom",
+							Name = "DisplaysBeam",
 							Type = "boolean",
 						},
-						Notes = "Sets if the EnderCrystal should broadcast it's bedrock base",
+						Notes = "Sets if the EnderCrystal should display its bedrock base.",
 					},
 				},
 				SetShowBottom =

@@ -813,7 +813,7 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 			{
 				a_Pkt.WriteBEUInt8(ENDER_CRYSTAL_BEAM_TARGET);
 				a_Pkt.WriteBEUInt8(METADATA_TYPE_OPTIONAL_POSITION);
-				a_Pkt.WriteBool(EnderCrystal.DisplaysBeam());
+				a_Pkt.WriteBool(true);  // Dont do a second check if it should display the beam
 				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
 			}
 			a_Pkt.WriteBEUInt8(ENDER_CRYSTAL_SHOW_BOTTOM);
