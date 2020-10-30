@@ -12,7 +12,8 @@
 
 cEnderCrystal::cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom):
 	Super(etEnderCrystal, a_Pos, 1.0, 1.0),
-	m_ShowBottom(a_ShowBottom)
+	m_ShowBottom(a_ShowBottom),
+	m_DisplayBeam(false)
 {
 	SetMaxHealth(5);
 }
@@ -24,6 +25,7 @@ cEnderCrystal::cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom):
 void cEnderCrystal::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnEntity(*this);
+	a_ClientHandle.SendEntityMetadata(*this);
 }
 
 
@@ -34,9 +36,14 @@ void cEnderCrystal::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	// No further processing (physics e.t.c.) is needed
-	if (m_World->GetDimension() == dimEnd)
+
+	BLOCKTYPE Block;
+	NIBBLETYPE Meta;
+	m_World->GetBlockTypeMeta(POS_TOINT, Block, Meta);
+	UNUSED(Meta);
+	if ((m_World->GetDimension() == dimEnd) && (Block != E_BLOCK_FIRE))
 	{
-		m_World->SetBlock(POS_TOINT.addedY(1), E_BLOCK_FIRE, 0);
+		m_World->SetBlock(POS_TOINT, E_BLOCK_FIRE, 0);
 	}
 }
 
@@ -47,11 +54,9 @@ void cEnderCrystal::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 {
 	Super::KilledBy(a_TDI);
-
-	m_World->DoExplosionAt(6.0, GetPosX(), GetPosY(), GetPosZ(), true, esEnderCrystal, this);
-
 	Destroy();
 
+	m_World->DoExplosionAt(6.0, GetPosX(), GetPosY(), GetPosZ(), true, esEnderCrystal, this);
 	m_World->SetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT, E_BLOCK_FIRE, 0);
 }
 
