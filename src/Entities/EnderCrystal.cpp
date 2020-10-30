@@ -22,6 +22,36 @@ cEnderCrystal::cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom):
 
 
 
+void cEnderCrystal::SetShowBottom(bool a_ShowBottom)
+{
+	m_ShowBottom = a_ShowBottom;
+	m_World->BroadcastEntityMetadata(*this);
+}
+
+
+
+
+
+void cEnderCrystal::SetBeamTarget(Vector3i a_BeamTarget)
+{
+	m_BeamTarget = a_BeamTarget;
+	m_World->BroadcastEntityMetadata(*this);
+}
+
+
+
+
+
+void cEnderCrystal::SetDisplayBeam(bool a_DisplayBeam)
+{
+	m_DisplayBeam = a_DisplayBeam;
+	m_World->BroadcastEntityMetadata(*this);
+}
+
+
+
+
+
 void cEnderCrystal::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnEntity(*this);
