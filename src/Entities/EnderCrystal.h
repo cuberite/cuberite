@@ -18,7 +18,8 @@ public:
 
 	CLASS_PROTODEF(cEnderCrystal)
 
-	cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom);
+	// cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom = false, Vector3i a_BeamTarget = {0, 0, 0}, bool a_DisplayBeam = false);
+	cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom, Vector3i a_BeamTarget, bool a_DisplayBeam);
 
 	// tolua_begin
 	bool ShowsBottom() const { return m_ShowBottom; }
