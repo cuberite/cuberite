@@ -54,7 +54,8 @@ public:
 	cNBT();
 
 	/** Creates a new tag from the supplied element.
- 	Trying to create a Tag from populated cList will result in a failed assert. */
+	Trying to create a Tag from a cList with more then one element will result in a failed assert.
+	Please use Push for any operation. */
 	cNBT(NBT::cNBTContent a_Content);
 
 	~cNBT();
@@ -67,9 +68,11 @@ public:
 	/** Returns a reference to the stored value. */
 	const NBT::cNBTContent & Expose() const;
 
-	/** If there is a list stored you may use this to push back a element.
+	/** If there is a list stored you may use this to push back a element or pop it.
 	Pushing the wrong type or pushing when cNBT is not a list will result in a failed assert. */
 	void Push(NBT::cNBTContent a_NewContent);
+	NBT::cNBTContent Pop(size_t a_Index);
+	NBT::cNBTContent Pop(NBT::cList::iterator a_Index);
 
 	/** Writes the cCompound into the cFastNBTWriter. */
 	static void Serialize(const NBT::cCompound * a_Compound, cFastNBTWriter & a_Writer);

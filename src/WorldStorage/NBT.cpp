@@ -19,7 +19,7 @@ cNBT::cNBT(NBT::cNBTContent a_Content)
 {
 	if (std::holds_alternative<NBT::cList>(a_Content))
 	{
-		assert(std::get<NBT::cList>(a_Content).size() == 0);
+		assert(std::get<NBT::cList>(a_Content).size() < 2);
 	}
 	m_Content = std::move(a_Content);
 }
@@ -60,6 +60,28 @@ void cNBT::Push(NBT::cNBTContent a_NewContent)
 	);
 
 	List.emplace_back(std::move(a_NewContent));
+}
+
+
+
+
+
+NBT::cNBTContent cNBT::Pop(size_t a_Index)
+{
+	assert(std::holds_alternative<NBT::cList>(m_Content));
+	auto & List = std::get<NBT::cList>(m_Content);
+	return List.erase(List.begin() + a_Index)->Expose();
+}
+
+
+
+
+
+NBT::cNBTContent cNBT::Pop(NBT::cList::iterator a_Index)
+{
+	assert(std::holds_alternative<NBT::cList>(m_Content));
+	auto & List = std::get<NBT::cList>(m_Content);
+	return List.erase(a_Index)->Expose();
 }
 
 
