@@ -116,27 +116,27 @@ void cNBT::SerializeEntry(const AString & a_Name, const cNBT & a_Entry, eTagType
 		}
 		case TAG_Short:
 		{
-			a_Writer.AddByte(a_Name, std::get<Int16>(a_Entry.Expose()));
+			a_Writer.AddShort(a_Name, std::get<Int16>(a_Entry.Expose()));
 			break;
 		}
 		case TAG_Int:
 		{
-			a_Writer.AddByte(a_Name, std::get<Int32>(a_Entry.Expose()));
+			a_Writer.AddInt(a_Name, std::get<Int32>(a_Entry.Expose()));
 			break;
 		}
 		case TAG_Long:
 		{
-			a_Writer.AddByte(a_Name, std::get<Int64>(a_Entry.Expose()));
+			a_Writer.AddLong(a_Name, std::get<Int64>(a_Entry.Expose()));
 			break;
 		}
 		case TAG_Float:
 		{
-			a_Writer.AddByte(a_Name, std::get<float>(a_Entry.Expose()));
+			a_Writer.AddFloat(a_Name, std::get<float>(a_Entry.Expose()));
 			break;
 		}
 		case TAG_Double:
 		{
-			a_Writer.AddByte(a_Name, std::get<double>(a_Entry.Expose()));
+			a_Writer.AddDouble(a_Name, std::get<double>(a_Entry.Expose()));
 			break;
 		}
 		case TAG_String:
