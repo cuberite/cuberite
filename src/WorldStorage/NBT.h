@@ -13,7 +13,6 @@ class cParsedNBT;
 class cFastNBTWriter;
 
 // fwd:
-class cNBTContent;
 class cNBT;
 namespace NBT
 {
