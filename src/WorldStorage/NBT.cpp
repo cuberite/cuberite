@@ -8,7 +8,7 @@
 
 cNBT::cNBT()
 {
-	m_Content = NBT::cEmptyTag();
+	m_Content = new NBT::cCompound();
 }
 
 
@@ -24,9 +24,12 @@ cNBT::cNBT(NBT::cNBTContent a_Content)
 
 
 
-cNBT::cNBT(NBT::cNBTVariant a_Content)
+cNBT::~cNBT()
 {
-	m_Content = NBT::cNBTContent(std::move(a_Content));
+	if (static_cast<eTagType>(m_Content.index()) == TAG_Compound)
+	{
+		delete [] std::get<NBT::cCompound *>(m_Content);
+	}
 }
 
 
@@ -59,10 +62,10 @@ void cNBT::Push(NBT::cNBTContent a_NewContent)
 
 
 
-void cNBT::Serialize(const NBT::cCompound & a_Compound, cFastNBTWriter & a_Writer)
+void cNBT::Serialize(const NBT::cCompound * a_Compound, cFastNBTWriter & a_Writer)
 {
 	a_Writer.BeginCompound("");
-	for (const auto & Entry : a_Compound)
+	for (const auto & Entry : *a_Compound)
 	{
 		SerializeEntry(Entry.first, Entry.second.second, Entry.second.first, a_Writer);
 	}
@@ -73,13 +76,13 @@ void cNBT::Serialize(const NBT::cCompound & a_Compound, cFastNBTWriter & a_Write
 
 
 
-NBT::cCompound cNBT::Deserialize(const cParsedNBT & a_NBT, int a_TagIdx)
+cNBT cNBT::Deserialize(const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	if (!a_NBT.IsValid())
 	{
-		return NBT::cCompound();
+		return cNBT(NBT::cEmptyTag());
 	}
-	NBT::cCompound Compound;
+	auto Compound = cNBT();
 	int CurrentLine = a_NBT.GetFirstChild(a_TagIdx);
 	while (CurrentLine > -1)
 	{
@@ -88,7 +91,7 @@ NBT::cCompound cNBT::Deserialize(const cParsedNBT & a_NBT, int a_TagIdx)
 		{
 			break;
 		}
-		Compound[a_NBT.GetName(CurrentLine)] = {Type, DeserializeEntry(a_NBT, CurrentLine, Type)};
+		std::get<NBT::cCompound *>(Compound.Expose())->operator[](a_NBT.GetName(CurrentLine)) = {Type, DeserializeEntry(a_NBT, CurrentLine, Type)};
 		CurrentLine = a_NBT.GetNextSibling(CurrentLine);
 	}
 	return Compound;
@@ -155,7 +158,7 @@ void cNBT::SerializeEntry(const AString & a_Name, const cNBT & a_Entry, eTagType
 		}
 		case TAG_Compound:
 		{
-			Serialize(std::get<NBT::cCompound>(a_Entry.Expose()), a_Writer);
+			Serialize(std::get<NBT::cCompound *>(a_Entry.Expose()), a_Writer);
 			break;
 		}
 		case TAG_ByteArray:
@@ -177,7 +180,7 @@ void cNBT::SerializeEntry(const AString & a_Name, const cNBT & a_Entry, eTagType
 
 
 
-NBT::cNBTVariant cNBT::DeserializeEntry(const cParsedNBT & a_NBT, int a_TagIdx, eTagType a_TagType)
+NBT::cNBTContent cNBT::DeserializeEntry(const cParsedNBT & a_NBT, int a_TagIdx, eTagType a_TagType)
 {
 	switch (a_TagType)
 	{
@@ -211,7 +214,7 @@ NBT::cNBTVariant cNBT::DeserializeEntry(const cParsedNBT & a_NBT, int a_TagIdx, 
 			}
 			return List.Expose();
 		}
-		case TAG_Compound: return Deserialize(a_NBT, a_TagIdx);
+		case TAG_Compound: return Deserialize(a_NBT, a_TagIdx).Expose();
 		case TAG_IntArray:
 		{
 			assert(a_NBT.GetChildrenType(a_TagIdx) == TAG_Int);
