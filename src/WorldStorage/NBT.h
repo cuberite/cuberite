@@ -52,6 +52,9 @@ class cNBT
 public:
 	/** Creates a compound tag. TAG_Compound. */
 	cNBT();
+
+	/** Creates a new tag from the supplied element.
+ 	Trying to create a Tag from populated cList will result in a failed assert. */
 	cNBT(NBT::cNBTContent a_Content);
 
 	~cNBT();
@@ -64,12 +67,14 @@ public:
 	/** Returns a reference to the stored value. */
 	const NBT::cNBTContent & Expose() const;
 
-	/** If there is a list stored you may use this to push back a element */
+	/** If there is a list stored you may use this to push back a element.
+	Pushing the wrong type or pushing when cNBT is not a list will result in a failed assert. */
 	void Push(NBT::cNBTContent a_NewContent);
 
-	/** Returns a String containing the tag in the notchian way. */
+	/** Writes the cCompound into the cFastNBTWriter. */
 	static void Serialize(const NBT::cCompound * a_Compound, cFastNBTWriter & a_Writer);
 
+	/** Writes cParsedNBT into a cCompound, stores it into a cNBT and returns it. */
 	static cNBT Deserialize(const cParsedNBT & a_NBT, int a_TagIdx);
 
 private:

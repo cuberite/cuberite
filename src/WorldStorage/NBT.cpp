@@ -17,6 +17,10 @@ cNBT::cNBT()
 
 cNBT::cNBT(NBT::cNBTContent a_Content)
 {
+	if (std::holds_alternative<NBT::cList>(a_Content))
+	{
+		assert(std::get<NBT::cList>(a_Content).size() == 0);
+	}
 	m_Content = std::move(a_Content);
 }
 
