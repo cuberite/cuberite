@@ -71,7 +71,7 @@ public:
 	/** If there is a list stored you may use this to push back a element or pop it.
 	Pushing the wrong type or pushing when cNBT is not a list will result in a failed assert. */
 	void Push(NBT::cNBTContent a_NewContent);
-	NBT::cNBTContent Pop(size_t a_Index);
+	NBT::cNBTContent Pop(long a_Index);
 	NBT::cNBTContent Pop(NBT::cList::iterator a_Index);
 
 	/** Writes the cCompound into the cFastNBTWriter. */

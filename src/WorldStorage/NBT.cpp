@@ -66,7 +66,7 @@ void cNBT::Push(NBT::cNBTContent a_NewContent)
 
 
 
-NBT::cNBTContent cNBT::Pop(size_t a_Index)
+NBT::cNBTContent cNBT::Pop(long a_Index)
 {
 	assert(std::holds_alternative<NBT::cList>(m_Content));
 	auto & List = std::get<NBT::cList>(m_Content);
