@@ -25,7 +25,7 @@ namespace NBT
 	// The oder must match the eTagType enum
 	using cNBTVariant = std::variant<
 		cEmptyTag,    // TAG_End
-		Int8,         // TAG_Byte
+		char,         // TAG_Byte  // Todo: Make this a Int8
 		Int16,        // TAG_Short
 		Int32,        // TAG_Int
 		Int64,        // TAG_Long

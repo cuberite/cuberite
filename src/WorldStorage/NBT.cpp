@@ -137,7 +137,7 @@ void cNBT::SerializeEntry(const AString & a_Name, const cNBT & a_Entry, eTagType
 		}
 		case TAG_Byte:
 		{
-			a_Writer.AddByte(a_Name, std::get<Int8>(a_Entry.Expose()));
+			a_Writer.AddByte(a_Name, std::get<char>(a_Entry.Expose()));
 			break;
 		}
 		case TAG_Short:
