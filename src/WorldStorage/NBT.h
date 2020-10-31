@@ -22,7 +22,7 @@ public:
 	using cByteArray = std::vector<char>;  // Todo: Make this a Int8
 	using cIntArray = std::vector<Int32>;
 	using cList = std::vector<cNBT>;
-	using cCompound = std::unordered_map<AString, std::pair<eTagType, cNBT>>;
+	using cCompound = std::unordered_map<AString, std::pair<eTagType, cNBT>, std::hash<AString>>;
 	class cEmptyTag{};
 
 	// The oder must match the eTagType enum
@@ -43,11 +43,11 @@ public:
 private:
 	// We need this wrapper to be able to have the circular behaviour in the variant
 	class cNBTContent :
-			public cNBTVariant
+		public cNBT::cNBTVariant
 	{
 	public:
-		cNBTContent() : cNBTVariant() {}
-		cNBTContent(cNBTVariant a_Content) : cNBTVariant(std::move(a_Content)) {}
+		cNBTContent() : cNBT::cNBTVariant() {}
+		cNBTContent(cNBT::cNBTVariant a_Content) : cNBT::cNBTVariant(std::move(a_Content)) {}
 		using cNBTVariant::operator=;
 	};
 public:
