@@ -41,7 +41,7 @@ namespace NBT
 
 	// We need this wrapper to be able to have the circular behaviour in the variant
 	class cNBTContent :
-			public cNBTVariant
+			public virtual cNBTVariant
 	{
 	public:
 		cNBTContent() : cNBTVariant() {}
