@@ -24,18 +24,18 @@ namespace NBT
 
 	// The oder must match the eTagType enum
 	using cNBTVariant = std::variant<
-		cEmptyTag,    // TAG_End
-		char,         // TAG_Byte  // Todo: Make this a Int8
-		Int16,        // TAG_Short
-		Int32,        // TAG_Int
-		Int64,        // TAG_Long
-		float,        // TAG_Float
-		double,       // TAG_Double
-		AString,      // TAG_String
-		cCompound *,  // TAG_Compound
-		cList,        // TAG_List
-		cByteArray,   // TAG_ByteArray
-		cIntArray     // TAG_IntArray
+		cEmptyTag,      // TAG_End
+		unsigned char,  // TAG_Byte  // Todo: Make this a Int8
+		Int16,          // TAG_Short
+		Int32,          // TAG_Int
+		Int64,          // TAG_Long
+		float,          // TAG_Float
+		double,         // TAG_Double
+		AString,        // TAG_String
+		cCompound *,    // TAG_Compound
+		cList,          // TAG_List
+		cByteArray,     // TAG_ByteArray
+		cIntArray       // TAG_IntArray
 	>;
 
 	// We need this wrapper to be able to have the circular behaviour in the variant
