@@ -88,9 +88,11 @@ void cEnderCrystal::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 {
 	Super::KilledBy(a_TDI);
-	Destroy();
 
 	m_World->DoExplosionAt(6.0, GetPosX(), GetPosY() + (GetHeight() / 2.0), GetPosZ(), true, esEnderCrystal, this);
+
+	Destroy();
+
 	m_World->SetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT, E_BLOCK_FIRE, 0);
 }
 
