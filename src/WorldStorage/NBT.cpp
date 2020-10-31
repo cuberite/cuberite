@@ -2,6 +2,8 @@
 #include "Globals.h"
 
 #include "NBT.h"
+
+#include <utility>
 #include "FastNBT.h"
 
 cNBT::cNBT()
@@ -24,7 +26,7 @@ cNBT::cNBT(cNBTContent a_Content)
 
 cNBT::cNBT(cNBTVariant a_Content)
 {
-	m_Content = std::move(a_Content);
+	m_Content = cNBTContent(std::move(a_Content));
 }
 
 
