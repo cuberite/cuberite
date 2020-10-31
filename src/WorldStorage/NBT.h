@@ -12,13 +12,11 @@ This class represents a mutable NBT tree. Everything is stored in a variant.
 class cParsedNBT;
 class cFastNBTWriter;
 
-class cNBT
+// fwd:
+class cNBTContent;
+class cNBT;
+namespace NBT
 {
-private:
-	// fwd:
-	class cNBTContent;
-public:
-
 	using cByteArray = std::vector<char>;  // Todo: Make this a Int8
 	using cIntArray = std::vector<Int32>;
 	using cList = std::vector<cNBT>;
@@ -40,36 +38,40 @@ public:
 		cByteArray,  // TAG_ByteArray
 		cIntArray    // TAG_IntArray
 	>;
-private:
+
 	// We need this wrapper to be able to have the circular behaviour in the variant
 	class cNBTContent :
-		public cNBT::cNBTVariant
+			public cNBTVariant
 	{
 	public:
-		cNBTContent() : cNBT::cNBTVariant() {}
-		cNBTContent(cNBT::cNBTVariant a_Content) : cNBT::cNBTVariant(std::move(a_Content)) {}
+		cNBTContent() : cNBTVariant() {}
+		cNBTContent(cNBTVariant a_Content) : cNBTVariant(std::move(a_Content)) {}
 		using cNBTVariant::operator=;
 	};
+}
+
+class cNBT
+{
 public:
 	/** Creates an empty NBT tag. TAG_End. */
 	cNBT();
-	cNBT(cNBTContent a_Content);
-	cNBT(cNBTVariant a_Content);
+	cNBT(NBT::cNBTContent a_Content);
+	cNBT(NBT::cNBTVariant a_Content);
 
 	/** Returns a reference to the stored value. */
-	const cNBTContent & Expose() const;
+	const NBT::cNBTContent & Expose() const;
 
 	/** If there is a list stored you may use this to push back a element */
-	void Push(cNBTContent a_NewContent);
+	void Push(NBT::cNBTContent a_NewContent);
 
 	/** Returns a String containing the tag in the notchian way. */
-	static void Serialize(const cCompound & a_Compound, cFastNBTWriter & a_Writer);
+	static void Serialize(const NBT::cCompound & a_Compound, cFastNBTWriter & a_Writer);
 
-	static cNBT::cCompound Deserialize(const cParsedNBT & a_NBT, int a_TagIdx);
+	static NBT::cCompound Deserialize(const cParsedNBT & a_NBT, int a_TagIdx);
 
 private:
-	cNBTContent m_Content;
+	NBT::cNBTContent m_Content;
 
 	static void SerializeEntry(const AString & a_Name, const cNBT & a_Entry, eTagType a_TagType, cFastNBTWriter & a_Writer);
-	static cNBTVariant DeserializeEntry(const cParsedNBT & a_NBT, int a_TagIdx, eTagType a_TagType);
+	static NBT::cNBTVariant DeserializeEntry(const cParsedNBT & a_NBT, int a_TagIdx, eTagType a_TagType);
 };
