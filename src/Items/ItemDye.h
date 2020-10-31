@@ -116,11 +116,6 @@ public:
 			case E_BLOCK_MELON_STEM:
 			case E_BLOCK_PUMPKIN_STEM:
 			{
-				// Don't fertilize when already fully grown
-				if (a_World.IsFullGrownPlantAt(a_BlockPos))
-				{
-					return false;
-				}
 				// Grow by 2 - 5 stages:
 				auto NumStages = GetRandomProvider().RandInt(2, 5);
 				if (a_World.GrowPlantAt(a_BlockPos, NumStages) <= 0)
@@ -133,21 +128,21 @@ public:
 
 			case E_BLOCK_BEETROOTS:
 			{
-				// Don't fertilize when already fully grown
-				if (a_World.IsFullGrownPlantAt(a_BlockPos))
+				if (a_World.GrowPlantAt(a_BlockPos, 1) <= 0)
 				{
+					// Fix GH #4805 (bonemeal should only advance growth, not spawn produce):
 					return false;
 				}
+
+				a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockPos, 0);
+
 				// 75% chance of 1-stage growth:
-				if (GetRandomProvider().RandBool(0.75))
+				if (!GetRandomProvider().RandBool(0.75))
 				{
-					if (a_World.GrowPlantAt(a_BlockPos, 1) <= 0)
-					{
-						// Fix #4805
-						return false;
-					}
-					a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockPos, 0);
+					// Hit the 25%, rollback:
+					a_World.GrowPlantAt(a_BlockPos, -1);
 				}
+
 				return true;
 			}  // case beetroots
 

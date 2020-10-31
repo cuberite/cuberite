@@ -2177,46 +2177,20 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			},
 			GrowRipePlant =
 			{
+				Params =
 				{
-					Params =
 					{
-						{
-							Name = "BlockX",
-							Type = "number",
-						},
-						{
-							Name = "BlockY",
-							Type = "number",
-						},
-						{
-							Name = "BlockZ",
-							Type = "number",
-						},
+						Name = "BlockPos",
+						Type = "Vector3i",
 					},
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "OBSOLETE, use the Vector3-based overload instead. Grows the plant at the specified coords to its full. Returns true if the plant was grown, false if not.",
 				},
+				Returns =
 				{
-					Params =
 					{
-						{
-							Name = "BlockPos",
-							Type = "Vector3i",
-						},
+						Type = "boolean",
 					},
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Grows the plant at the specified coords to its full. Returns true if the plant was grown, false if not.",
 				},
+				Notes = "Grows the plant at the specified coords to its full. Returns true if the plant was grown, false if not.",
 			},
 			GrowSugarcane =
 			{
@@ -2342,23 +2316,6 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					},
 				},
 				Notes = "Returns whether the configuration has DeepSnow enabled.",
-			},
-			IsFullGrownPlantAt =
-			{
-				Params =
-				{
-					{
-						Name = "BlockPos",
-						Type = "Vector3i",
-					},
-				},
-				Returns =
-				{
-					{
-						Type = "boolean",
-					},
-				},
-				Notes = "Returns whether the plant at specific position is full grown. If block at specific position is not a plant, return true.",
 			},
 			IsGameModeAdventure =
 			{

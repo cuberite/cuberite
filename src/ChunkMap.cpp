@@ -1624,23 +1624,6 @@ int cChunkMap::GrowPlantAt(Vector3i a_BlockPos, int a_NumStages)
 
 
 
-bool cChunkMap::IsFullGrownPlantAt(Vector3i a_BlockPos)
-{
-	auto ChunkPos = cChunkDef::BlockToChunk(a_BlockPos);
-	auto RelPos = cChunkDef::AbsoluteToRelative(a_BlockPos, ChunkPos);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkPos.m_ChunkX, ChunkPos.m_ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return true;
-	}
-	return Chunk->IsFullGrownPlantAt(RelPos);
-}
-
-
-
-
-
 void cChunkMap::SetNextBlockToTick(const Vector3i a_BlockPos)
 {
 	auto ChunkPos = cChunkDef::BlockToChunk(a_BlockPos);

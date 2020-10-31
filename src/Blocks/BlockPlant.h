@@ -165,9 +165,9 @@ private:
 		}
 	}
 
-
-
-	/** Grows the final produce next to the stem at the specified pos.
-	Returns true if successful, false if not. */
-	virtual bool BearFruit(cChunk & a_Chunk, const Vector3i a_StemRelPos) const { return true; }
+	/** Grows the final produce next to the stem at the specified position. */
+	virtual void BearFruit(cChunk & a_Chunk, const Vector3i a_StemRelPos) const
+	{
+		// Nothing to do by default
+	}
 };

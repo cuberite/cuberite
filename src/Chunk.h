@@ -652,9 +652,6 @@ private:
 	Returns the number of stages the plant has grown, 0 if not a plant. */
 	int GrowPlantAt(Vector3i a_RelPos, int a_NumStages = 1);
 
-	/** Check if the plant at the specified position is full grown */
-	bool IsFullGrownPlantAt(Vector3i a_RelPos);
-
 	/** Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients */
 	void MoveEntityToNewChunk(OwnedEntity a_Entity);
 

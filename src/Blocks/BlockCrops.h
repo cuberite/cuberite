@@ -106,15 +106,9 @@ private:
 
 	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
-		auto OldMeta = a_Chunk.GetMeta(a_RelPos);
-		if (OldMeta >= RipeMeta)
-		{
-			// Already ripe
-			return 0;
-		}
-		auto NewMeta = std::min<int>(OldMeta + a_NumStages, RipeMeta);
-		ASSERT(NewMeta > OldMeta);
-		a_Chunk.GetWorld()->SetBlock(a_Chunk.RelativeToAbsolute(a_RelPos), m_BlockType, static_cast<NIBBLETYPE>(NewMeta));
+		const auto OldMeta = a_Chunk.GetMeta(a_RelPos);
+		const auto NewMeta = std::clamp<NIBBLETYPE>(static_cast<NIBBLETYPE>(OldMeta + a_NumStages), 0, RipeMeta);
+		a_Chunk.SetMeta(a_RelPos, NewMeta);
 		return NewMeta - OldMeta;
 	}
 

@@ -210,10 +210,6 @@ public:
 	Returns the number of stages actually grown, zero if not supported (default). */
 	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const { return 0; }
 
-	/** Check if the plant at the specified position is full grown.
-	Returns true if plant is full grown or if not supported (default). */
-	virtual bool IsFullGrown(cChunk & a_Chunk, Vector3i a_RelPos) const { return true; }
-
 	/** Returns true if the specified tool is valid and has a non-zero silk-touch enchantment.
 	Helper used in many ConvertToPickups() implementations. */
 	static bool ToolHasSilkTouch(const cItem * a_Tool);

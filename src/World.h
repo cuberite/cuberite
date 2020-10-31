@@ -851,22 +851,9 @@ public:
 	Returns the number of stages the plant has grown, 0 if not a plant. */
 	int GrowPlantAt(Vector3i a_BlockPos, int a_NumStages = 1);
 
-	/** Check if the plant at the specified position is full grown */
-	bool IsFullGrownPlantAt(Vector3i a_BlockPos);
-
 	/** Grows the plant at the specified block to its ripe stage.
 	Returns true if grown, false if not (invalid chunk, non-growable block, already ripe). */
 	bool GrowRipePlant(Vector3i a_BlockPos);
-
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Grows the plant at the specified block to its ripe stage.
-	a_IsByBonemeal is obsolete, do not use.
-	Returns true if grown, false if not (invalid chunk, non-growable block, already ripe). */
-	bool GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal = false)
-	{
-		UNUSED(a_IsByBonemeal);
-		return GrowRipePlant({a_BlockX, a_BlockY, a_BlockZ});
-	}
 
 	/** Grows a cactus present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the cactus grew inside this call */
 	int GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
