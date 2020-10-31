@@ -550,7 +550,7 @@ void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 			{
 				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
 			}
-			a_Pkt.WriteBEUInt8(ENDER_CRYSTAL_BEAM_TARGET);
+			a_Pkt.WriteBEUInt8(ENDER_CRYSTAL_SHOW_BOTTOM);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
 			break;
