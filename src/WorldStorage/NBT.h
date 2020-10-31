@@ -58,6 +58,11 @@ public:
 	cNBT(NBT::cNBTContent a_Content);
 	cNBT(NBT::cNBTVariant a_Content);
 
+	cNBT(const cNBT & a_Other) = default;
+	cNBT(cNBT && a_Other) = default;
+	cNBT & operator = (const cNBT & a_Other) = default;
+	cNBT & operator = (cNBT && a_Other) = default;
+
 	/** Returns a reference to the stored value. */
 	const NBT::cNBTContent & Expose() const;
 
