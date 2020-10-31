@@ -10,6 +10,7 @@ target_sources(
 	SchematicFileSerializer.cpp
 	ScoreboardSerializer.cpp
 	StatSerializer.cpp
+	NBT.cpp
 	WSSAnvil.cpp
 	WorldStorage.cpp
 
@@ -19,9 +20,11 @@ target_sources(
 	MapSerializer.h
 	NamespaceSerializer.h
 	NBTChunkSerializer.h
+	NBTDef.h
 	SchematicFileSerializer.h
 	ScoreboardSerializer.h
 	StatSerializer.h
+	NBT.h
 	WSSAnvil.h
 	WorldStorage.h
 )
