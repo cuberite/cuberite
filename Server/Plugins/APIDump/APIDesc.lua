@@ -9610,6 +9610,7 @@ a_Player:OpenWindow(Window);
 					},
 				},
 			},
+			Inherits = "cEntity",
 		},
 		cExpOrb =
 		{
