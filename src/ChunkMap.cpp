@@ -93,7 +93,7 @@ cChunk * cChunkMap::FindChunk(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_CSChunks.IsLockedByCurrentThread());
 
-	auto Chunk = m_Chunks.find({ a_ChunkX, a_ChunkZ });
+	const auto Chunk = m_Chunks.find({ a_ChunkX, a_ChunkZ });
 	return (Chunk == m_Chunks.end()) ? nullptr : &Chunk->second;
 }
 
