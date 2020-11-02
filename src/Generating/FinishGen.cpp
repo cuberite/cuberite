@@ -640,6 +640,40 @@ bool cFinishGenTallGrass::CanLargeFernGrow(EMCSBiome a_Biome)
 
 
 
+int cFinishGenTallGrass::GetBiomeDensity(EMCSBiome a_Biome)
+{
+	switch (a_Biome)
+	{
+		case biSavanna:
+		case biSavannaM:
+		case biSavannaPlateau:
+		case biSavannaPlateauM:
+		case biPlains:
+		{
+			return 70;
+		}
+
+		case biExtremeHillsEdge:
+		case biExtremeHillsPlus:
+		case biExtremeHills:
+		case biExtremeHillsPlusM:
+		case biExtremeHillsM:
+		case biIceMountains:
+		{
+			return 3;
+		}
+
+		default:
+		{
+			return 20;
+		}
+	}
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cFinishGenVines
 
