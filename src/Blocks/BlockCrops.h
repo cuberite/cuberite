@@ -87,7 +87,7 @@ private:
 				{
 					// https://minecraft.gamepedia.com/Poisonous_Potato#Obtaining
 					// With a 2% chance, drop a poisonous potato as well:
-					res.Add(E_ITEM_POISONOUS_POTATO);
+					Res.Add(E_ITEM_POISONOUS_POTATO);
 				}
 				break;
 			}
@@ -129,28 +129,5 @@ private:
 	{
 		UNUSED(a_Meta);
 		return 7;
-	}
-
-
-
-
-
-private:
-
-	/**
-		Generate a random number using a binomial distribution
-		See https://minecraft.gamepedia.com/Fortune#Seeds
-	*/
-	int GenerateAmountSeedDrop(int a_Min, int a_Count, double a_Probability, MTRand &a_Rand)
-	{
-		int SeedCount = a_Min;
-		for (int i = 0; i < a_Count; i++)
-		{
-			if (a_Rand.RandBool(a_Probability))
-			{
-				SeedCount++;
-			}
-		}
-		return SeedCount;
 	}
 };
