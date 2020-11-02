@@ -22,7 +22,6 @@ It directly outputs a string containing the serialized NBT data.
 #include <system_error>
 #include "../Endianness.h"
 #include "NBTDef.h"
-#include "NBT.h"
 
 
 /** This structure is used for all NBT tags.

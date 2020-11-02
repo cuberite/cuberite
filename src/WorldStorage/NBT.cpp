@@ -2,8 +2,6 @@
 #include "Globals.h"
 
 #include "NBT.h"
-
-#include <utility>
 #include "FastNBT.h"
 
 cNBT::cNBT()
@@ -49,6 +47,16 @@ const NBT::cNBTContent & cNBT::Expose() const
 
 
 
+NBT::cCompound & cNBT::ExposeCompound() const
+{
+	assert(std::holds_alternative<NBT::cCompound *>(m_Content));
+	return *std::get<NBT::cCompound *>(m_Content);
+}
+
+
+
+
+
 void cNBT::Push(NBT::cNBTContent a_NewContent)
 {
 	assert(std::holds_alternative<NBT::cList>(m_Content));
@@ -88,10 +96,12 @@ NBT::cNBTContent cNBT::Pop(NBT::cList::iterator a_Index)
 
 
 
-void cNBT::Serialize(const NBT::cCompound * a_Compound, cFastNBTWriter & a_Writer)
+void cNBT::Serialize(const cNBT & a_Compound, cFastNBTWriter & a_Writer)
 {
 	a_Writer.BeginCompound("");
-	for (const auto & Entry : *a_Compound)
+	assert(std::holds_alternative<NBT::cCompound *>(a_Compound.Expose()));
+	const auto Compound = a_Compound.ExposeCompound();
+	for (const auto & Entry : Compound)
 	{
 		SerializeEntry(Entry.first, Entry.second.second, Entry.second.first, a_Writer);
 	}
@@ -117,7 +127,7 @@ cNBT cNBT::Deserialize(const cParsedNBT & a_NBT, int a_TagIdx)
 		{
 			break;
 		}
-		std::get<NBT::cCompound *>(Compound.Expose())->operator[](a_NBT.GetName(CurrentLine)) = {Type, DeserializeEntry(a_NBT, CurrentLine, Type)};
+		Compound.ExposeCompound()[a_NBT.GetName(CurrentLine)] = {Type, DeserializeEntry(a_NBT, CurrentLine, Type)};
 		CurrentLine = a_NBT.GetNextSibling(CurrentLine);
 	}
 	return Compound;
@@ -173,18 +183,20 @@ void cNBT::SerializeEntry(const AString & a_Name, const cNBT & a_Entry, eTagType
 		case TAG_List:
 		{
 			const auto & Array = std::get<NBT::cList>(a_Entry.Expose());
+			const auto GlobalType =  Array.begin()->Expose().index();
+			a_Writer.BeginList(a_Name, static_cast<eTagType>(GlobalType));
 			for (const auto & ArrayEntry : Array)
 			{
+				assert(ArrayEntry.Expose().index() == GlobalType);
 				auto Type = static_cast<eTagType>(ArrayEntry.Expose().index());
-				a_Writer.BeginList(a_Name, Type);
 				SerializeEntry("", ArrayEntry.Expose(), Type, a_Writer);
-				a_Writer.EndList();
 			}
+			a_Writer.EndList();
 			break;
 		}
 		case TAG_Compound:
 		{
-			Serialize(std::get<NBT::cCompound *>(a_Entry.Expose()), a_Writer);
+			Serialize(a_Entry, a_Writer);
 			break;
 		}
 		case TAG_ByteArray:

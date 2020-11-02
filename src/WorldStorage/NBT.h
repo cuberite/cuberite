@@ -23,7 +23,7 @@ namespace NBT
 	class cEmptyTag{};
 
 	// The oder must match the eTagType enum
-	using cNBTVariant = std::variant<
+	using cNBTContent = std::variant<
 		cEmptyTag,      // TAG_End
 		unsigned char,  // TAG_Byte  // Todo: Make this a Int8
 		Int16,          // TAG_Short
@@ -37,14 +37,6 @@ namespace NBT
 		cByteArray,     // TAG_ByteArray
 		cIntArray       // TAG_IntArray
 	>;
-
-	// We need this wrapper to be able to have the circular behaviour in the variant
-	class cNBTContent :
-			public cNBTVariant
-	{
-	public:
-		using cNBTVariant::cNBTVariant;
-	};
 }
 
 class cNBT
@@ -68,14 +60,19 @@ public:
 	/** Returns a reference to the stored value. */
 	const NBT::cNBTContent & Expose() const;
 
+	/** Returns a reference to the stored compound.
+	An assert will fail if there is no compound stored! */
+	NBT::cCompound & ExposeCompound() const;
+
 	/** If there is a list stored you may use this to push back a element or pop it.
 	Pushing the wrong type or pushing when cNBT is not a list will result in a failed assert. */
 	void Push(NBT::cNBTContent a_NewContent);
 	NBT::cNBTContent Pop(long a_Index);
 	NBT::cNBTContent Pop(NBT::cList::iterator a_Index);
 
-	/** Writes the cCompound into the cFastNBTWriter. */
-	static void Serialize(const NBT::cCompound * a_Compound, cFastNBTWriter & a_Writer);
+	/** Writes the cNBT holding a TAG_Compound into the cFastNBTWriter.
+	If the cNBT doesn't hold a compound an assert will fail. */
+	static void Serialize(const cNBT & a_Compound, cFastNBTWriter & a_Writer);
 
 	/** Writes cParsedNBT into a cCompound, stores it into a cNBT and returns it. */
 	static cNBT Deserialize(const cParsedNBT & a_NBT, int a_TagIdx);
