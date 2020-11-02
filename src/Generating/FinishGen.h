@@ -181,38 +181,9 @@ protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-	bool CanFernGrow(EMCSBiome a_Biome);
-	bool CanLargeFernGrow(EMCSBiome a_Biome);
-
-	int GetBiomeDensity(EMCSBiome a_Biome)
-	{
-		switch (a_Biome)
-		{
-			case biSavanna:
-			case biSavannaM:
-			case biSavannaPlateau:
-			case biSavannaPlateauM:
-			case biPlains:
-			{
-				return 70;
-			}
-
-			case biExtremeHillsEdge:
-			case biExtremeHillsPlus:
-			case biExtremeHills:
-			case biExtremeHillsPlusM:
-			case biExtremeHillsM:
-			case biIceMountains:
-			{
-				return 3;
-			}
-
-			default:
-			{
-				return 20;
-			}
-		}
-	}
+	static bool CanFernGrow(EMCSBiome a_Biome);
+	static bool CanLargeFernGrow(EMCSBiome a_Biome);
+	static int GetBiomeDensity(EMCSBiome a_Biome);
 };
 
 
