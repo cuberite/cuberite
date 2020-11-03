@@ -253,7 +253,7 @@ void cFinishGenClumpTopBlock::TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int
 		int Top = a_ChunkDesc.GetHeight(x, z);
 
 		// Doesn't place if the blocks can't be placed. Checked value also depends on a_IsDoubleTall
-		if (!cChunkDef::IsValidHeight(Top + 1 + static_cast<int>(a_IsDoubleTall)))
+		if (Top + 1 + (a_IsDoubleTall ? 1 : 0) >= cChunkDef::Height)
 		{
 			continue;
 		}
