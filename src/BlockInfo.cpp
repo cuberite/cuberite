@@ -684,8 +684,32 @@ NIBBLETYPE cBlockInfo::GetSpreadLightFalloff(const BLOCKTYPE Block)
 		case E_BLOCK_STATIONARY_WATER:
 		case E_BLOCK_WATER: return 3;
 
-		// Light does not pass through anything else (note: including tilled farmland, stairs, and slabs):
-		default: return 15;
+		// Light does not pass through these blocks at all:
+		case E_BLOCK_ACACIA_WOOD_STAIRS:
+		case E_BLOCK_BIRCH_WOOD_STAIRS:
+		case E_BLOCK_BRICK_STAIRS:
+		case E_BLOCK_COBBLESTONE_STAIRS:
+		case E_BLOCK_DARK_OAK_WOOD_STAIRS:
+		case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB:
+		case E_BLOCK_DOUBLE_STONE_SLAB:
+		case E_BLOCK_DOUBLE_WOODEN_SLAB:
+		case E_BLOCK_FARMLAND:
+		case E_BLOCK_JUNGLE_WOOD_STAIRS:
+		case E_BLOCK_NETHER_BRICK_STAIRS:
+		case E_BLOCK_OAK_WOOD_STAIRS:
+		case E_BLOCK_PURPUR_DOUBLE_SLAB:
+		case E_BLOCK_PURPUR_SLAB:
+		case E_BLOCK_PURPUR_STAIRS:
+		case E_BLOCK_QUARTZ_STAIRS:
+		case E_BLOCK_RED_SANDSTONE_SLAB:
+		case E_BLOCK_RED_SANDSTONE_STAIRS:
+		case E_BLOCK_SANDSTONE_STAIRS:
+		case E_BLOCK_SPRUCE_WOOD_STAIRS:
+		case E_BLOCK_STONE_BRICK_STAIRS:
+		case E_BLOCK_STONE_SLAB:
+		case E_BLOCK_WOODEN_SLAB: return 15;
+
+		default: return 0;
 	}
 }
 
