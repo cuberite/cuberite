@@ -652,10 +652,6 @@ public:
 	Returns the UniqueID of the created entity, or cEntity::INVALID_ID on failure. */
 	UInt32 SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1, bool a_ShouldPlayFuseSound = true);
 
-	/** Spawns a new ender crystal at the specified block coords.
-	Returns the UniqueID of the created entity, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnEnderCrystal(Vector3d a_Pos, bool a_ShowBottom = false);
-
 	// tolua_end
 
 	/** Replaces the specified block with another, and calls the OnPlaced block handler.

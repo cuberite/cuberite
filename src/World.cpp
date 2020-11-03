@@ -20,7 +20,6 @@
 #include "WorldStorage/ScoreboardSerializer.h"
 
 // Entities (except mobs):
-#include "Entities/EnderCrystal.h"
 #include "Entities/ExpOrb.h"
 #include "Entities/FallingBlock.h"
 #include "Entities/Minecart.h"
@@ -2159,21 +2158,6 @@ UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialV
 		a_InitialVelocityCoeff * Random.RandReal(-0.5f, 0.5f)
 	);
 	return TNTPtr->GetUniqueID();
-}
-
-
-
-
-
-UInt32 cWorld::SpawnEnderCrystal(Vector3d a_Pos, bool a_ShowBottom)
-{
-	auto EnderCrystal = std::make_unique<cEnderCrystal>(a_Pos, a_ShowBottom);
-	auto EnderCrystalPtr = EnderCrystal.get();
-	if (!EnderCrystalPtr->Initialize(std::move(EnderCrystal), *this))
-	{
-		return cEntity::INVALID_ID;
-	}
-	return EnderCrystalPtr->GetUniqueID();
 }
 
 

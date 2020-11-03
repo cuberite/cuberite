@@ -3306,28 +3306,6 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					Notes = "Spawns a {{cBoat|boat}} at the specific coordinates. Returns the EntityID of the new boat, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no boat was created. (DEPRECATED, use vector-parametered version)",
 				},
 			},
-			SpawnEnderCrystal =
-			{
-				Params =
-				{
-					{
-						Name = "Pos",
-						Type = "Vector3d",
-					},
-					{
-						Name = "ShowBottom",
-						Type = "boolean",
-					}
-				},
-				Returns =
-				{
-					{
-						Name = "EntityID",
-						Type = "number",
-					},
-				},
-				Notes = "Spawns an {{cEnderCrystal|ender crystal}} at the specified coords. Returns the EntityID of the new ender crystal, or {{cEntity#INVALID_ID|cEntity#INVALID_ID}} if no ender crystal was created.",
-			},
 			SpawnExperienceOrb =
 			{
 				Params =
