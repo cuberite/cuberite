@@ -69,6 +69,7 @@ cEnderDragonFightStructuresGen::cEnderDragonFightStructuresGen(int a_Seed) :
 
 void cEnderDragonFightStructuresGen::Init(const AString & a_TowerProperties, int a_Radius)
 {
+	const auto ChunkWidth = cChunkDef::Width;
 	// Loads the fountain schematic
 	if (!cSchematicFileSerializer::LoadFromSchematicFile(
 		m_Fountain, AString("Prefabs") + cFile::GetPathSeparator() + "SinglePieceStructures" + cFile::GetPathSeparator() + "EndFountain.schematic"))
@@ -115,9 +116,9 @@ void cEnderDragonFightStructuresGen::Init(const AString & a_TowerProperties, int
 		TowerProperties[I].m_Pos = TowerPos;
 
 		// Check all crossed chunks
-		for (int X = -TowerProperties[I].m_Radius - cChunkDef::Width; X <= TowerProperties[I].m_Radius + cChunkDef::Width; X+=std::min(TowerProperties[I].m_Radius, cChunkDef::Width))
+		for (int X = -TowerProperties[I].m_Radius - ChunkWidth; X <= TowerProperties[I].m_Radius + ChunkWidth; X+=std::min(TowerProperties[I].m_Radius, ChunkWidth))
 		{
-			for (int Z = -TowerProperties[I].m_Radius - cChunkDef::Width; Z <= TowerProperties[I].m_Radius + cChunkDef::Width; Z+=std::min(TowerProperties[I].m_Radius, cChunkDef::Width))
+			for (int Z = -TowerProperties[I].m_Radius - ChunkWidth; Z <= TowerProperties[I].m_Radius + ChunkWidth; Z+=std::min(TowerProperties[I].m_Radius, ChunkWidth))
 			{
 				auto Chunk = cChunkDef::BlockToChunk({TowerPos.x + X, 0, TowerPos.z + Z});
 				// Update limits
