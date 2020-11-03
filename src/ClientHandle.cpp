@@ -1202,19 +1202,13 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 		case DIG_STATUS_STARTED:
 		{
-			BLOCKTYPE  OldBlock;
-			NIBBLETYPE OldMeta;
-			m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, OldBlock, OldMeta);
-			HandleBlockDigStarted(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, OldBlock, OldMeta);
+			HandleBlockDigStarted(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			return;
 		}
 
 		case DIG_STATUS_FINISHED:
 		{
-			BLOCKTYPE  OldBlock;
-			NIBBLETYPE OldMeta;
-			m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, OldBlock, OldMeta);
-			HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, OldBlock, OldMeta);
+			HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			return;
 		}
 
@@ -1261,7 +1255,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 
 
-void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
+void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 {
 	if (
 		m_HasStartedDigging &&
@@ -1274,10 +1268,14 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		return;
 	}
 
+	BLOCKTYPE DiggingBlock;
+	NIBBLETYPE DiggingMeta;
+	m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, DiggingBlock, DiggingMeta);
+
 	if (
 		m_Player->IsGameModeCreative() &&
 		ItemCategory::IsSword(m_Player->GetInventory().GetEquippedItem().m_ItemType) &&
-		(m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_FIRE)
+		(DiggingBlock != E_BLOCK_FIRE)
 	)
 	{
 		// Players can't destroy blocks with a sword in the hand.
@@ -1301,11 +1299,14 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_LastDigBlockZ = a_BlockZ;
 
 	if (
-		(m_Player->IsGameModeCreative()) ||     // In creative mode, digging is done immediately
-		m_Player->CanInstantlyMine(a_OldBlock)  // Sometimes the player is fast enough to instantly mine
+		m_Player->IsGameModeCreative() ||         // In creative mode, digging is done immediately
+		m_Player->CanInstantlyMine(DiggingBlock)  // Sometimes the player is fast enough to instantly mine
 	)
 	{
-		HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
+		// Immediately done:
+		m_BreakProgress = 1;
+
+		HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		return;
 	}
 
@@ -1323,7 +1324,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	cWorld * World = m_Player->GetWorld();
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	cBlockHandler::For(a_OldBlock).OnDigging(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ});
+	cBlockHandler::For(DiggingBlock).OnDigging(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ});
 
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 	ItemHandler->OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
@@ -1333,7 +1334,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 
 
-void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
+void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 {
 	if (
 		!m_HasStartedDigging ||           // Hasn't received the DIG_STARTED packet
@@ -1352,23 +1353,14 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	FinishDigAnimation();
 
+	BLOCKTYPE DugBlock;
+	NIBBLETYPE DugMeta;
+	m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, DugBlock, DugMeta);
+
 	if (!m_Player->IsGameModeCreative())
 	{
-		if (a_OldBlock == E_BLOCK_BEDROCK)
-		{
-			Kick("You can't break a bedrock!");
-			return;
-		}
-		if (a_OldBlock == E_BLOCK_BARRIER)
-		{
-			Kick("You can't break a barrier!");
-			return;
-		}
-	}
+		m_BreakProgress += m_Player->GetMiningProgressPerTick(DugBlock);
 
-	if (!m_Player->IsGameModeCreative() && !m_Player->CanInstantlyMine(a_OldBlock))
-	{
-		m_BreakProgress += m_Player->GetMiningProgressPerTick(a_OldBlock);
 		// Check for very fast tools. Maybe instead of FASTBREAK_PERCENTAGE we should check we are within x multiplied by the progress per tick
 		if (m_BreakProgress < FASTBREAK_PERCENTAGE)
 		{
@@ -1384,7 +1376,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	cWorld * World = m_Player->GetWorld();
 
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, DugBlock, DugMeta))
 	{
 		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, *m_Player);
@@ -1393,7 +1385,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		return;
 	}
 
-	if (a_OldBlock == E_BLOCK_AIR)
+	if (DugBlock == E_BLOCK_AIR)
 	{
 		return;
 	}
@@ -1402,7 +1394,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	m_Player->AddFoodExhaustion(0.025);
 
 	// Damage the tool, but not for 0 hardness blocks:
-	m_Player->UseEquippedItem(cBlockInfo::IsOneHitDig(a_OldBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock);
+	m_Player->UseEquippedItem(cBlockInfo::IsOneHitDig(DugBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock);
 
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	Vector3i absPos(a_BlockX, a_BlockY, a_BlockZ);
@@ -1415,8 +1407,8 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		World->DigBlock(absPos, m_Player);
 	}
 
-	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, absPos, a_OldBlock, this);
-	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
+	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, absPos, DugBlock, this);
+	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, DugBlock, DugMeta);
 }
 
 
