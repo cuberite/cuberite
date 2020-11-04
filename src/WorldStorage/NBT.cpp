@@ -17,7 +17,7 @@ cNBT::cNBT(NBT::cNBTContent a_Content)
 {
 	if (std::holds_alternative<NBT::cList>(a_Content))
 	{
-		assert(std::get<NBT::cList>(a_Content).size() < 2);
+		VERIFY(std::get<NBT::cList>(a_Content).size() < 2);
 	}
 	m_Content = std::move(a_Content);
 }
@@ -49,7 +49,7 @@ const NBT::cNBTContent & cNBT::Expose() const
 
 NBT::cCompound & cNBT::ExposeCompound() const
 {
-	assert(std::holds_alternative<NBT::cCompound *>(m_Content));
+	VERIFY(std::holds_alternative<NBT::cCompound *>(m_Content));
 	return *std::get<NBT::cCompound *>(m_Content);
 }
 
@@ -59,10 +59,10 @@ NBT::cCompound & cNBT::ExposeCompound() const
 
 void cNBT::Push(NBT::cNBTContent a_NewContent)
 {
-	assert(std::holds_alternative<NBT::cList>(m_Content));
+	VERIFY(std::holds_alternative<NBT::cList>(m_Content));
 
 	auto & List = std::get<NBT::cList>(m_Content);
-	assert(
+	VERIFY(
 		List.empty() ||
 		List.back().m_Content.index() == a_NewContent.index()
 	);
@@ -76,7 +76,7 @@ void cNBT::Push(NBT::cNBTContent a_NewContent)
 
 NBT::cNBTContent cNBT::Pop(long a_Index)
 {
-	assert(std::holds_alternative<NBT::cList>(m_Content));
+	VERIFY(std::holds_alternative<NBT::cList>(m_Content));
 	auto & List = std::get<NBT::cList>(m_Content);
 	return List.erase(List.begin() + a_Index)->Expose();
 }
@@ -87,7 +87,7 @@ NBT::cNBTContent cNBT::Pop(long a_Index)
 
 NBT::cNBTContent cNBT::Pop(NBT::cList::iterator a_Index)
 {
-	assert(std::holds_alternative<NBT::cList>(m_Content));
+	VERIFY(std::holds_alternative<NBT::cList>(m_Content));
 	auto & List = std::get<NBT::cList>(m_Content);
 	return List.erase(a_Index)->Expose();
 }
@@ -99,7 +99,7 @@ NBT::cNBTContent cNBT::Pop(NBT::cList::iterator a_Index)
 void cNBT::Serialize(const cNBT & a_Compound, cFastNBTWriter & a_Writer)
 {
 	a_Writer.BeginCompound("");
-	assert(std::holds_alternative<NBT::cCompound *>(a_Compound.Expose()));
+	VERIFY(std::holds_alternative<NBT::cCompound *>(a_Compound.Expose()));
 	const auto Compound = a_Compound.ExposeCompound();
 	for (const auto & Entry : Compound)
 	{
@@ -187,7 +187,7 @@ void cNBT::SerializeEntry(const AString & a_Name, const cNBT & a_Entry, eTagType
 			a_Writer.BeginList(a_Name, static_cast<eTagType>(GlobalType));
 			for (const auto & ArrayEntry : Array)
 			{
-				assert(ArrayEntry.Expose().index() == GlobalType);
+				VERIFY(ArrayEntry.Expose().index() == GlobalType);
 				auto Type = static_cast<eTagType>(ArrayEntry.Expose().index());
 				SerializeEntry("", ArrayEntry.Expose(), Type, a_Writer);
 			}
@@ -230,7 +230,7 @@ NBT::cNBTContent cNBT::DeserializeEntry(const cParsedNBT & a_NBT, int a_TagIdx, 
 		case TAG_Double: return a_NBT.GetDouble(a_TagIdx);
 		case TAG_ByteArray:
 		{
-			assert(a_NBT.GetChildrenType(a_TagIdx) == TAG_Byte);
+			VERIFY(a_NBT.GetChildrenType(a_TagIdx) == TAG_Byte);
 			NBT::cByteArray ByteArray;
 			int ChildLine = a_NBT.GetFirstChild(a_TagIdx);
 			while (ChildLine > -1)
@@ -255,7 +255,7 @@ NBT::cNBTContent cNBT::DeserializeEntry(const cParsedNBT & a_NBT, int a_TagIdx, 
 		case TAG_Compound: return Deserialize(a_NBT, a_TagIdx).Expose();
 		case TAG_IntArray:
 		{
-			assert(a_NBT.GetChildrenType(a_TagIdx) == TAG_Int);
+			VERIFY(a_NBT.GetChildrenType(a_TagIdx) == TAG_Int);
 			NBT::cIntArray IntArray;
 			int ChildLine = a_NBT.GetFirstChild(a_TagIdx);
 			while (ChildLine > -1)
