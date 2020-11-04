@@ -277,7 +277,7 @@ void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const s
 		// Spawn the fire
 		a_ChunkDesc.SetBlockType(Pos.x, a_Properties.m_Height, Pos.z, E_BLOCK_FIRE);
 		// Spawn the ender crystal of the origin position is in this chunk
-		auto EnderCrystal = std::make_unique<cEnderCrystal>(Vector3d(0.5, a_Properties.m_Height, 0.5) + a_Properties.m_Pos);
+		auto EnderCrystal = std::make_unique<cEnderCrystal>(Vector3d(0.5, a_Properties.m_Height, 0.5) + a_Properties.m_Pos, true);
 		a_ChunkDesc.GetEntities().emplace_back(std::move(EnderCrystal));
 	}
 }
