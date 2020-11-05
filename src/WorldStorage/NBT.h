@@ -87,9 +87,9 @@ private:
 namespace NBT
 {
 	class cCompound :
-		public std::unordered_map<AString, std::pair<eTagType, cNBT>, std::hash<AString>>
+		public std::unordered_map<AString, std::pair<eTagType, cNBT>>
 	{
-		using Super = std::unordered_map<AString, std::pair<eTagType, cNBT>, std::hash<AString>>;
+		using Super = std::unordered_map<AString, std::pair<eTagType, cNBT>>;
 		using Super::Super;
 	};
 }
