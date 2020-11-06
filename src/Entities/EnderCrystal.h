@@ -18,12 +18,10 @@ public:
 
 	CLASS_PROTODEF(cEnderCrystal)
 
-	// cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom = false, Vector3i a_BeamTarget = {0, 0, 0}, bool a_DisplayBeam = false);
-	cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom, Vector3i a_BeamTarget, bool a_DisplayBeam);
+	cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom);
+	cEnderCrystal(Vector3d a_Pos, Vector3i a_BeamTarget, bool a_DisplayBeam, bool a_ShowBottom);
 
 	// tolua_begin
-	bool ShowsBottom() const { return m_ShowBottom; }
-	void SetShowBottom(bool a_ShowBottom);
 
 	Vector3i GetBeamTarget() const { return m_BeamTarget; }
 	void SetBeamTarget(Vector3i a_BeamTarget);
@@ -32,14 +30,18 @@ public:
 	bool DisplaysBeam() const { return m_DisplayBeam; }
 	void SetDisplayBeam(bool a_DisplayBeam);
 
-	// tolua_end
-private:
+	bool ShowsBottom() const { return m_ShowBottom; }
+	void SetShowBottom(bool a_ShowBottom);
 
-	// If the bedrock base should be displayed
-	bool m_ShowBottom;
+	// tolua_end
+
+private:
 
 	Vector3i m_BeamTarget;
 	bool m_DisplayBeam;
+
+	// If the bedrock base should be displayed.
+	bool m_ShowBottom;
 
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;

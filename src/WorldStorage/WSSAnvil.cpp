@@ -1749,7 +1749,7 @@ void cWSSAnvil::LoadEnderCrystalFromNBT(cEntityList & a_Entities, const cParsedN
 		ShowBottom = a_NBT.GetByte(CurrentLine) == 1;
 	}
 
-	auto EnderCrystal = std::make_unique<cEnderCrystal>(Vector3d(), DisplayBeam, BeamTarget, ShowBottom);
+	auto EnderCrystal = std::make_unique<cEnderCrystal>(Vector3d(), BeamTarget, DisplayBeam, ShowBottom);
 	if (!LoadEntityBaseFromNBT(*EnderCrystal.get(), a_NBT, a_TagIdx))
 	{
 		return;

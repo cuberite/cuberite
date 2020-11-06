@@ -10,7 +10,16 @@
 
 
 
-cEnderCrystal::cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom, Vector3i a_BeamTarget, bool a_DisplayBeam) :
+cEnderCrystal::cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom) :
+	cEnderCrystal(a_Pos, {}, false, a_ShowBottom)
+{
+}
+
+
+
+
+
+cEnderCrystal::cEnderCrystal(Vector3d a_Pos, Vector3i a_BeamTarget, bool a_DisplayBeam, bool a_ShowBottom) :
 	Super(etEnderCrystal, a_Pos, 1.0, 1.0),
 	m_ShowBottom(a_ShowBottom),
 	m_BeamTarget(a_BeamTarget),
@@ -26,10 +35,7 @@ cEnderCrystal::cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom, Vector3i a_BeamT
 void cEnderCrystal::SetShowBottom(bool a_ShowBottom)
 {
 	m_ShowBottom = a_ShowBottom;
-	if (m_World != nullptr)
-	{
-		m_World->BroadcastEntityMetadata(*this);
-	}
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -39,10 +45,7 @@ void cEnderCrystal::SetShowBottom(bool a_ShowBottom)
 void cEnderCrystal::SetBeamTarget(Vector3i a_BeamTarget)
 {
 	m_BeamTarget = a_BeamTarget;
-	if (m_World != nullptr)
-	{
-		m_World->BroadcastEntityMetadata(*this);
-	}
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -52,10 +55,7 @@ void cEnderCrystal::SetBeamTarget(Vector3i a_BeamTarget)
 void cEnderCrystal::SetDisplayBeam(bool a_DisplayBeam)
 {
 	m_DisplayBeam = a_DisplayBeam;
-	if (m_World != nullptr)
-	{
-		m_World->BroadcastEntityMetadata(*this);
-	}
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -93,7 +93,7 @@ void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 
 	Destroy();
 
-	m_World->SetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT, E_BLOCK_FIRE, 0);
+	m_World->SetBlock(POS_TOINT, E_BLOCK_FIRE, 0);
 }
 
 

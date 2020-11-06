@@ -3318,14 +3318,6 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Name = "ShowBottom",
 						Type = "boolean",
 					},
-					{
-						Name = "BeamTarget",
-						Type = "Vector3i",
-					},
-					{
-						Name = "DisplayBeam",
-						Type = "boolean",
-					},
 				},
 				Returns =
 				{
