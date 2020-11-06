@@ -855,14 +855,16 @@ public:
 	Returns true if grown, false if not (invalid chunk, non-growable block, already ripe). */
 	bool GrowRipePlant(Vector3i a_BlockPos);
 
-	/** Grows a cactus present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the cactus grew inside this call */
-	int GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
-
-	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem); returns true if the pumpkin or melon sucessfully grew. */
-	bool GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType);
-
-	/** Grows a sugarcane present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the sugarcane grew inside this call */
-	int GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
+	/** OBSOLETE, use the Vector3-based overload instead.
+	Grows the plant at the specified block to its ripe stage.
+	a_IsByBonemeal is obsolete, do not use.
+	Returns true if grown, false if not (invalid chunk, non-growable block, already ripe). */
+	bool GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal = false)
+	{
+		UNUSED(a_IsByBonemeal);
+		LOGWARNING("Warning: cWorld:GrowRipePlant function expects Vector3i-based coords rather than int-based coords. Emulating old-style call.");
+		return GrowRipePlant({ a_BlockX, a_BlockY, a_BlockZ });
+	}
 
 	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, otherwise uses the world generator to provide the biome value */
 	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ);
