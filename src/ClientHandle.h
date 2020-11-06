@@ -562,8 +562,8 @@ private:
 	/** Shared pointer to self, so that this instance can keep itself alive when needed. */
 	cClientHandlePtr m_Self;
 
-	/** The fraction between 0 and 1, of how far through mining the currently mined block is.
-	0 for just started, 1 for broken. Used for anti-cheat. */
+	/** The fraction between 0 and 1 (or above), of how far through mining the currently mined block is.
+	0 for just started, 1 and above for broken. Used for anti-cheat. */
 	float m_BreakProgress;
 
 	/** Finish logging the user in after authenticating. */
@@ -576,10 +576,10 @@ private:
 	void StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority);
 
 	/** Handles the DIG_STARTED dig packet: */
-	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
+	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace);
 
 	/** Handles the DIG_FINISHED dig packet: */
-	void HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
+	void HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace);
 
 	/** The clients will receive a finished dig animation */
 	void FinishDigAnimation();

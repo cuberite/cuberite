@@ -3228,21 +3228,15 @@ float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 	{
 		return 1;
 	}
-	float BlockHardness = cBlockInfo::GetHardness(a_Block);
+
+	const bool CanHarvest = GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block);
+	const float BlockHardness = cBlockInfo::GetHardness(a_Block) * (CanHarvest ? 1.5f : 5.0f);
 	ASSERT(BlockHardness > 0);  // Can't divide by 0 or less, IsOneHitDig should have returned true
-	if (GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block))
-	{
-		BlockHardness *= 1.5f;
-	}
-	else
-	{
-		BlockHardness *= 5.0f;
-	}
-	float DigSpeed = GetDigSpeed(a_Block);
+
 	// LOGD("Time to mine block = %f", BlockHardness/DigSpeed);
 	// Number of ticks to mine = (20 * BlockHardness)/DigSpeed;
 	// Therefore take inverse to get fraction mined per tick:
-	return DigSpeed / (20.0f * BlockHardness);
+	return GetDigSpeed(a_Block) / (20.0f * BlockHardness);
 }
 
 
@@ -3252,13 +3246,9 @@ float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 bool cPlayer::CanInstantlyMine(BLOCKTYPE a_Block)
 {
 	// Based on: https://minecraft.gamepedia.com/Breaking#Calculation
-	// Check it has non-zero hardness
-	if (cBlockInfo::IsOneHitDig(a_Block))
-	{
-		return true;
-	}
-	// If the dig speed is greater than 30 times the hardness, then the wiki says we can instantly mine
-	return GetDigSpeed(a_Block) > 30 * cBlockInfo::GetHardness(a_Block);
+
+	// If the dig speed is greater than 30 times the hardness, then the wiki says we can instantly mine:
+	return GetDigSpeed(a_Block) > (30 * cBlockInfo::GetHardness(a_Block));
 }
 
 
