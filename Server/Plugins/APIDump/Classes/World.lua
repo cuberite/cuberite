@@ -3317,7 +3317,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					{
 						Name = "ShowBottom",
 						Type = "boolean",
-					}
+					},
 				},
 				Returns =
 				{

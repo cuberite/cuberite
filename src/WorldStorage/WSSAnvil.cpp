@@ -1718,19 +1718,14 @@ void cWSSAnvil::LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 
 void cWSSAnvil::LoadEnderCrystalFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	auto EnderCrystal = std::make_unique<cEnderCrystal>(Vector3d(), false);
-	if (!LoadEntityBaseFromNBT(*EnderCrystal.get(), a_NBT, a_TagIdx))
-	{
-		return;
-	}
-
+	bool DisplayBeam = false, ShowBottom = false;
+	Vector3i BeamTarget;
 	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "BeamTarget");
 	if (CurrentLine > 0)
 	{
-		EnderCrystal->SetDisplayBeam(true);
+		DisplayBeam = true;
 		if (a_NBT.GetType(CurrentLine) == TAG_Compound)
 		{
-			Vector3d BeamTarget = {0, 0, 0};
 			int CoordinateLine = a_NBT.FindChildByName(CurrentLine, "X");
 			if (CoordinateLine > 0)
 			{
@@ -1751,7 +1746,13 @@ void cWSSAnvil::LoadEnderCrystalFromNBT(cEntityList & a_Entities, const cParsedN
 	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "ShowBottom");
 	if (CurrentLine > 0)
 	{
-		EnderCrystal->SetShowBottom(a_NBT.GetByte(CurrentLine) == 1);
+		ShowBottom = a_NBT.GetByte(CurrentLine) == 1;
+	}
+
+	auto EnderCrystal = std::make_unique<cEnderCrystal>(Vector3d(), BeamTarget, DisplayBeam, ShowBottom);
+	if (!LoadEntityBaseFromNBT(*EnderCrystal.get(), a_NBT, a_TagIdx))
+	{
+		return;
 	}
 
 	a_Entities.emplace_back(std::move(EnderCrystal));

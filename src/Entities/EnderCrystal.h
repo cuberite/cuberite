@@ -19,25 +19,29 @@ public:
 	CLASS_PROTODEF(cEnderCrystal)
 
 	cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom);
+	cEnderCrystal(Vector3d a_Pos, Vector3i a_BeamTarget, bool a_DisplayBeam, bool a_ShowBottom);
 
-	// Getters and Setters
-	bool ShowsBottom() const { return m_ShowBottom; }
-	void SetShowBottom(bool a_ShowBottom) { m_ShowBottom = a_ShowBottom; }
+	// tolua_begin
 
 	Vector3i GetBeamTarget() const { return m_BeamTarget; }
-	void SetBeamTarget(Vector3i a_BeamTarget) { m_BeamTarget = a_BeamTarget; }
+	void SetBeamTarget(Vector3i a_BeamTarget);
 
-	/** If the EnderCrystal should send it's beam to the client and store to disk. */
+	/** If the EnderCrystal should send it's beam to the client and save it. */
 	bool DisplaysBeam() const { return m_DisplayBeam; }
-	void SetDisplayBeam(bool a_DisplayBeam) { m_DisplayBeam = a_DisplayBeam; }
+	void SetDisplayBeam(bool a_DisplayBeam);
+
+	bool ShowsBottom() const { return m_ShowBottom; }
+	void SetShowBottom(bool a_ShowBottom);
+
+	// tolua_end
 
 private:
 
-	// If the bedrock base should be displayed
-	bool m_ShowBottom;
-
 	Vector3i m_BeamTarget;
 	bool m_DisplayBeam;
+
+	// If the bedrock base should be displayed.
+	bool m_ShowBottom;
 
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
