@@ -1743,7 +1743,6 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
 			break;
 		}  // case etEnderCrystal
-
 		default:
 		{
 			break;

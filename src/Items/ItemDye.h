@@ -100,7 +100,7 @@ public:
 	Returns true if the plant was fertilized successfully, false if not / not a plant.
 	Note that successful fertilization doesn't mean successful growth - for blocks that have only a chance to grow,
 	fertilization success is reported even in the case when the chance fails (bonemeal still needs to be consumed). */
-	bool FertilizePlant(cWorld & a_World, Vector3i a_BlockPos)
+	static bool FertilizePlant(cWorld & a_World, Vector3i a_BlockPos)
 	{
 		BLOCKTYPE blockType;
 		NIBBLETYPE blockMeta;
@@ -198,7 +198,7 @@ public:
 
 			case E_BLOCK_GRASS:
 			{
-				growPlantsAround(a_World, a_BlockPos);
+				GrowPlantsAround(a_World, a_BlockPos);
 				return true;
 			}
 
@@ -216,51 +216,185 @@ public:
 
 	/** Grows new plants around the specified block.
 	Places up to 40 new plants, with the following probability:
-		- 20 % big grass (2-block tall grass)
-		- 60 % tall grass (1-block tall grass)
-		- 20 % flowers (biome dependent variants)
-	The new plants are spawned within 7 taxicab distance of a_BlockPos, on a grass block.
+		- 0 up to 8  big grass  (2-block tall grass)
+		- 8 up tp 24 tall grass (1-block tall grass)
+		- 0 up to 8  flowers    (biome dependent variants)
+	The new plants are spawned within 7 taxicab distance of a_Position, on a grass block.
 	Broadcasts a particle for each new spawned plant. */
-	void growPlantsAround(cWorld & a_World, Vector3i a_BlockPos)
+	static void GrowPlantsAround(cWorld & a_World, const Vector3i a_Position)
 	{
-		auto & r1 = GetRandomProvider();
-		for (int i = 0; i < 40; ++i)
+		auto & Random = GetRandomProvider();
+
+		auto DoubleGrassCount = Random.RandInt(8U);
+		auto GrassCount = Random.RandInt(8U, 24U);
+		auto FlowerCount = Random.RandInt(8U);
+
+		// Do a round-robin placement:
+		while ((DoubleGrassCount > 0) || (GrassCount > 0) || (FlowerCount > 0))
 		{
-			int ofsY = r1.RandInt(3) + r1.RandInt(3) - 3;
-			if (!cChunkDef::IsValidHeight(a_BlockPos.y + ofsY))
+			// place the big grass:
+			if (DoubleGrassCount != 0)
 			{
-				continue;
+				FindAdjacentGrassAnd<&GrowDoubleTallGrass>(a_World, a_Position);
+				DoubleGrassCount--;
 			}
-			int ofsX = (r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3)) / 2 - 3;
-			int ofsZ = (r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3) + r1.RandInt(3)) / 2 - 3;
-			Vector3i ofs(ofsX, ofsY, ofsZ);
-			auto typeGround = a_World.GetBlock(a_BlockPos + ofs);
-			if (typeGround != E_BLOCK_GRASS)
+
+			// place the tall grass:
+			if (GrassCount != 0)
 			{
-				continue;
+				FindAdjacentGrassAnd<&GrowTallGrass>(a_World, a_Position);
+				GrassCount--;
 			}
-			auto pos = a_BlockPos + ofs.addedY(1);
-			auto typeAbove = a_World.GetBlock(pos);
-			if (typeAbove != E_BLOCK_AIR)
+
+			// place the flowers
+			if (FlowerCount != 0)
 			{
-				continue;
+				FindAdjacentGrassAnd<&GrowFlower>(a_World, a_Position);
+				FlowerCount--;
 			}
-			BLOCKTYPE  spawnType;
-			NIBBLETYPE spawnMeta = 0;
-			switch (r1.RandInt(10))
+		}
+	}
+
+	static void GrowDoubleTallGrass(cWorld & a_World, const Vector3i a_Position)
+	{
+		a_World.SetBlock(a_Position, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_DOUBLE_TALL_GRASS);
+		a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_Position, 0);
+
+		const auto Above = a_Position.addedY(1);
+		a_World.SetBlock(Above, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_DOUBLE_TALL_GRASS | E_META_BIG_FLOWER_TOP);
+		a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, Above, 0);
+	}
+
+	static void GrowTallGrass(cWorld & a_World, const Vector3i a_Position)
+	{
+		a_World.SetBlock(a_Position, E_BLOCK_TALL_GRASS, E_META_TALL_GRASS_GRASS);
+		a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_Position, 0);
+	}
+
+	/** Grows a biome-dependent flower according to https://minecraft.gamepedia.com/Flower#Flower_biomes */
+	static void GrowFlower(cWorld & a_World, const Vector3i a_Position)
+	{
+		auto & Random = GetRandomProvider();
+		switch (a_World.GetBiomeAt(a_Position.x, a_Position.z))
+		{
+			case biPlains:
+			case biSunflowerPlains:
 			{
-				case 0:  spawnType = E_BLOCK_YELLOW_FLOWER; break;
-				case 1:  spawnType = E_BLOCK_RED_ROSE;      break;
-				default:
+				switch (Random.RandInt(8))
 				{
-					spawnType = E_BLOCK_TALL_GRASS;
-					spawnMeta = E_META_TALL_GRASS_GRASS;
-					break;
+					case 0: a_World.SetBlock(a_Position, E_BLOCK_DANDELION, 0); break;
+					case 1: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_POPPY); break;
+					case 2: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_ALLIUM); break;
+					case 3: a_World.SetBlock(a_Position, E_BLOCK_RED_ROSE, 0); break;  // was renamed to Azure Bluet later
+					case 4: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_RED_TULIP); break;
+					case 5: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_PINK_TULIP); break;
+					case 6: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_WHITE_TULIP); break;
+					case 7: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_ORANGE_TULIP); break;
+					case 8: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_OXEYE_DAISY); break;
+					// TODO: Add cornflower
 				}
-			}  // switch (random spawn block type)
-			a_World.SetBlock(pos, spawnType, spawnMeta);
-			a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, pos, 0);
-		}  // for i - attempts
+				break;
+			}
+			case biSwampland:
+			case biSwamplandM:
+			{
+				a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_BLUE_ORCHID);
+				break;
+			}
+			case biFlowerForest:
+			{
+				switch (Random.RandInt(8))
+				{
+					case 0: a_World.SetBlock(a_Position, E_BLOCK_DANDELION, 0); break;
+					case 1: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_POPPY); break;
+					case 2: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_ALLIUM); break;
+					case 3: a_World.SetBlock(a_Position, E_BLOCK_RED_ROSE, 0); break;  // was renamed to Azure Bluet later
+					case 4: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_RED_TULIP); break;
+					case 5: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_PINK_TULIP); break;
+					case 6: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_WHITE_TULIP); break;
+					case 7: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_ORANGE_TULIP); break;
+					case 8: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_OXEYE_DAISY); break;
+					// TODO: Add cornflower, lily of the valley
+				}
+				break;
+			}
+			case biMesa:
+			case biMesaBryce:
+			case biMesaPlateau:
+			case biMesaPlateauF:
+			case biMesaPlateauM:
+			case biMesaPlateauFM:
+			case biMushroomIsland:
+			case biMushroomShore:
+			case biNether:
+			case biEnd:
+			{
+				break;
+			}
+			default:
+			{
+				switch (Random.RandInt(1))
+				{
+					case 0: a_World.SetBlock(a_Position, E_BLOCK_DANDELION, 0); break;
+					case 1: a_World.SetBlock(a_Position, E_BLOCK_RED_ROSE, 0); break;
+				}
+				break;
+			}
+		}
+	}
+
+	/** Walks adjacent grass blocks up to 7 taxicab distance away from a_Position and calls the Planter function on the first suitable one found.
+	Does nothing if no position suitable for growing was found. */
+	template <auto Planter>
+	static void FindAdjacentGrassAnd(cWorld & a_World, const Vector3i a_Position)
+	{
+		auto & Random = GetRandomProvider();
+		auto Position = a_Position;
+
+		// Maximum 7 taxicab distance away from centre:
+		for (
+			int Tries = 0;
+			Tries != 8;
+			Tries++,
+
+			// Get the adjacent block to visit this iteration:
+			Position += Vector3i(
+				Random.RandInt(-1, 1),
+				Random.RandInt(-1, 1) * (Random.RandInt(2) / 2),  // Y offset, with discouragement to values that aren't zero
+				Random.RandInt(-1, 1)
+			)
+		)
+		{
+			if (
+				!cChunkDef::IsValidHeight(Position.y) ||
+				(a_World.GetBlock(Position) != E_BLOCK_GRASS)  // Are we looking at grass?
+			)
+			{
+				// Not grass or invalid height, restart random walk and bail:
+				Position = a_Position;
+				continue;
+			}
+
+			if (Planter == GrowDoubleTallGrass)
+			{
+				const auto TwoAbove = Position.addedY(2);
+				if ((TwoAbove.y >= cChunkDef::Height) || (a_World.GetBlock(TwoAbove) != E_BLOCK_AIR))
+				{
+					// Insufficient space for tall grass:
+					continue;
+				}
+			}
+
+			const auto PlantBase = Position.addedY(1);
+			if ((PlantBase.y >= cChunkDef::Height) || (a_World.GetBlock(PlantBase) != E_BLOCK_AIR))
+			{
+				// Insufficient space:
+				continue;
+			}
+
+			Planter(a_World, PlantBase);
+			return;
+		}
 	}
 } ;
 

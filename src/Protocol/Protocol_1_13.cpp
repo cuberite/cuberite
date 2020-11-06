@@ -12,6 +12,7 @@ Implements the 1.13 protocol classes:
 #include "Protocol_1_13.h"
 
 #include "../Entities/Boat.h"
+#include "../Entities/EnderCrystal.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/Player.h"

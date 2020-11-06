@@ -1750,7 +1750,6 @@ void cWSSAnvil::LoadEnderCrystalFromNBT(cEntityList & a_Entities, const cParsedN
 	}
 
 	auto EnderCrystal = std::make_unique<cEnderCrystal>(Vector3d(), BeamTarget, DisplayBeam, ShowBottom);
-
 	if (!LoadEntityBaseFromNBT(*EnderCrystal.get(), a_NBT, a_TagIdx))
 	{
 		return;

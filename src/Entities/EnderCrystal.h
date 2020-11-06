@@ -29,6 +29,7 @@ public:
 	/** If the EnderCrystal should send it's beam to the client and save it. */
 	bool DisplaysBeam() const { return m_DisplayBeam; }
 	void SetDisplayBeam(bool a_DisplayBeam);
+
 	bool ShowsBottom() const { return m_ShowBottom; }
 	void SetShowBottom(bool a_ShowBottom);
 
