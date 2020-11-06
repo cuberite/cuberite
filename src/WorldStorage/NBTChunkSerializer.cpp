@@ -680,7 +680,6 @@ public:
 
 
 	void AddEnderCrystalEntity(cEnderCrystal * a_EnderCrystal)
-
 	{
 		mWriter.BeginCompound("");
 			AddBasicEntity(a_EnderCrystal, "EnderCrystal");
