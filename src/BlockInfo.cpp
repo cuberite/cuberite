@@ -841,7 +841,7 @@ bool cBlockInfo::IsOneHitDig(const BLOCKTYPE Block)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wfloat-equal"
 
-	// One hit break blocks:
+	// GetHardness returns exactly 0 for one hit break blocks:
 	return GetHardness(Block) == 0;
 
 #pragma clang diagnostic pop
