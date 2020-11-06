@@ -21,9 +21,9 @@ cEnderCrystal::cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom) :
 
 cEnderCrystal::cEnderCrystal(Vector3d a_Pos, Vector3i a_BeamTarget, bool a_DisplayBeam, bool a_ShowBottom) :
 	Super(etEnderCrystal, a_Pos, 1.0, 1.0),
-	m_ShowBottom(a_ShowBottom),
 	m_BeamTarget(a_BeamTarget),
-	m_DisplayBeam(a_DisplayBeam)
+	m_DisplayBeam(a_DisplayBeam),
+	m_ShowBottom(a_ShowBottom)
 {
 	SetMaxHealth(5);
 }
