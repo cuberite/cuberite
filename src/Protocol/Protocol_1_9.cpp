@@ -1727,6 +1727,22 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 			break;
 		}  // case etItemFrame
 
+		case cEntity::etEnderCrystal:
+		{
+			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
+			a_Pkt.WriteBEUInt8(5);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_OPTIONAL_POSITION);
+			a_Pkt.WriteBool(EnderCrystal.DisplaysBeam());
+			if (EnderCrystal.DisplaysBeam())
+			{
+				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
+			}
+			a_Pkt.WriteBEUInt8(6);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
+			break;
+		}  // case etEnderCrystal
+
 		default:
 		{
 			break;

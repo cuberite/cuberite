@@ -862,43 +862,13 @@ bool cBlockInfo::FullyOccupiesVoxel(const BLOCKTYPE Block)
 
 bool cBlockInfo::IsOneHitDig(const BLOCKTYPE Block)
 {
-	// One hit break blocks:
-	switch (Block)
-	{
-		case E_BLOCK_ACTIVE_COMPARATOR:
-		case E_BLOCK_BEETROOTS:
-		case E_BLOCK_BIG_FLOWER:
-		case E_BLOCK_BROWN_MUSHROOM:
-		case E_BLOCK_CARROTS:
-		case E_BLOCK_CROPS:
-		case E_BLOCK_DANDELION:
-		case E_BLOCK_DEAD_BUSH:
-		case E_BLOCK_END_ROD:
-		case E_BLOCK_FIRE:
-		case E_BLOCK_FLOWER:
-		case E_BLOCK_FLOWER_POT:
-		case E_BLOCK_INACTIVE_COMPARATOR:
-		case E_BLOCK_LILY_PAD:
-		case E_BLOCK_MELON_STEM:
-		case E_BLOCK_NETHER_WART:
-		case E_BLOCK_POTATOES:
-		case E_BLOCK_PUMPKIN_STEM:
-		case E_BLOCK_REDSTONE_REPEATER_OFF:
-		case E_BLOCK_REDSTONE_REPEATER_ON:
-		case E_BLOCK_REDSTONE_TORCH_OFF:
-		case E_BLOCK_REDSTONE_TORCH_ON:
-		case E_BLOCK_REDSTONE_WIRE:
-		case E_BLOCK_RED_MUSHROOM:
-		case E_BLOCK_REEDS:
-		case E_BLOCK_SAPLING:
-		case E_BLOCK_SLIME_BLOCK:
-		case E_BLOCK_TNT:
-		case E_BLOCK_TALL_GRASS:
-		case E_BLOCK_TORCH:
-		case E_BLOCK_TRIPWIRE_HOOK:
-		case E_BLOCK_TRIPWIRE: return true;
-		default: return false;
-	}
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
+
+	// GetHardness returns exactly 0 for one hit break blocks:
+	return GetHardness(Block) == 0;
+
+#pragma clang diagnostic pop
 }
 
 
@@ -1349,10 +1319,10 @@ float cBlockInfo::GetHardness(const BLOCKTYPE Block)
 		case E_BLOCK_ACTIVE_COMPARATOR:             return 0.0f;
 		case E_BLOCK_AIR:                           return 0.0f;
 		case E_BLOCK_ANVIL:                         return 5.0f;
-		case E_BLOCK_BARRIER:                       return -1.0f;
+		case E_BLOCK_BARRIER:                       return INFINITY;
 		case E_BLOCK_BEACON:                        return 3.0f;
 		case E_BLOCK_BED:                           return 0.2f;
-		case E_BLOCK_BEDROCK:                       return -1.0f;
+		case E_BLOCK_BEDROCK:                       return INFINITY;
 		case E_BLOCK_BEETROOTS:                     return 0.0f;
 		case E_BLOCK_BIG_FLOWER:                    return 0.0f;
 		case E_BLOCK_BIRCH_DOOR:                    return 3.0f;
@@ -1378,7 +1348,7 @@ float cBlockInfo::GetHardness(const BLOCKTYPE Block)
 		case E_BLOCK_CARPET:                        return 0.1f;
 		case E_BLOCK_CARROTS:                       return 0.0f;
 		case E_BLOCK_CAULDRON:                      return 2.0f;
-		case E_BLOCK_CHAIN_COMMAND_BLOCK:           return -1.0f;
+		case E_BLOCK_CHAIN_COMMAND_BLOCK:           return INFINITY;
 		case E_BLOCK_CHEST:                         return 2.5f;
 		case E_BLOCK_CHORUS_FLOWER:                 return 0.4f;
 		case E_BLOCK_CHORUS_PLANT:                  return 0.4f;
@@ -1389,7 +1359,7 @@ float cBlockInfo::GetHardness(const BLOCKTYPE Block)
 		case E_BLOCK_COBBLESTONE_WALL:              return 2.0f;
 		case E_BLOCK_COBWEB:                        return 4.0f;
 		case E_BLOCK_COCOA_POD:                     return 0.2f;
-		case E_BLOCK_COMMAND_BLOCK:                 return -1.0f;
+		case E_BLOCK_COMMAND_BLOCK:                 return INFINITY;
 		case E_BLOCK_CONCRETE:                      return 1.8f;
 		case E_BLOCK_CONCRETE_POWDER:               return 0.5f;
 		case E_BLOCK_CRAFTING_TABLE:                return 2.5f;
@@ -1418,9 +1388,9 @@ float cBlockInfo::GetHardness(const BLOCKTYPE Block)
 		case E_BLOCK_ENCHANTMENT_TABLE:             return 5.0f;
 		case E_BLOCK_ENDER_CHEST:                   return 22.5f;
 		case E_BLOCK_END_BRICKS:                    return 0.8f;
-		case E_BLOCK_END_GATEWAY:                   return -1.0f;
-		case E_BLOCK_END_PORTAL:                    return -1.0f;
-		case E_BLOCK_END_PORTAL_FRAME:              return -1.0f;
+		case E_BLOCK_END_GATEWAY:                   return INFINITY;
+		case E_BLOCK_END_PORTAL:                    return INFINITY;
+		case E_BLOCK_END_PORTAL_FRAME:              return INFINITY;
 		case E_BLOCK_END_ROD:                       return 0.0f;
 		case E_BLOCK_END_STONE:                     return 3.0f;
 		case E_BLOCK_FARMLAND:                      return 0.6f;
@@ -1491,7 +1461,7 @@ float cBlockInfo::GetHardness(const BLOCKTYPE Block)
 		case E_BLOCK_NETHER_BRICK:                  return 2.0f;
 		case E_BLOCK_NETHER_BRICK_FENCE:            return 2.0f;
 		case E_BLOCK_NETHER_BRICK_STAIRS:           return 2.0f;
-		case E_BLOCK_NETHER_PORTAL:                 return -1.0f;
+		case E_BLOCK_NETHER_PORTAL:                 return INFINITY;
 		case E_BLOCK_NETHER_QUARTZ_ORE:             return 3.0f;
 		case E_BLOCK_NETHER_WART:                   return 0.0f;
 		case E_BLOCK_NETHER_WART_BLOCK:             return 1.0f;
@@ -1510,7 +1480,7 @@ float cBlockInfo::GetHardness(const BLOCKTYPE Block)
 		case E_BLOCK_PINK_SHULKER_BOX:              return 2.0f;
 		case E_BLOCK_PISTON:                        return 0.5f;
 		case E_BLOCK_PISTON_EXTENSION:              return 0.5f;
-		case E_BLOCK_PISTON_MOVED_BLOCK:            return -1.0f;
+		case E_BLOCK_PISTON_MOVED_BLOCK:            return INFINITY;
 		case E_BLOCK_PLANKS:                        return 2.0f;
 		case E_BLOCK_POTATOES:                      return 0.0f;
 		case E_BLOCK_POWERED_RAIL:                  return 0.7f;
@@ -1543,7 +1513,7 @@ float cBlockInfo::GetHardness(const BLOCKTYPE Block)
 		case E_BLOCK_RED_SANDSTONE_SLAB:            return 2.0f;
 		case E_BLOCK_RED_SANDSTONE_STAIRS:          return 0.8f;
 		case E_BLOCK_RED_SHULKER_BOX:               return 2.0f;
-		case E_BLOCK_REPEATING_COMMAND_BLOCK:       return -1.0f;
+		case E_BLOCK_REPEATING_COMMAND_BLOCK:       return INFINITY;
 		case E_BLOCK_SAND:                          return 0.5f;
 		case E_BLOCK_SANDSTONE:                     return 0.8f;
 		case E_BLOCK_SANDSTONE_STAIRS:              return 0.8f;
@@ -1573,7 +1543,7 @@ float cBlockInfo::GetHardness(const BLOCKTYPE Block)
 		case E_BLOCK_STONE_BUTTON:                  return 0.5f;
 		case E_BLOCK_STONE_PRESSURE_PLATE:          return 0.5f;
 		case E_BLOCK_STONE_SLAB:                    return 2.0f;
-		case E_BLOCK_STRUCTURE_BLOCK:               return -1.0f;
+		case E_BLOCK_STRUCTURE_BLOCK:               return INFINITY;
 		case E_BLOCK_STRUCTURE_VOID:                return 0.0f;
 		case E_BLOCK_SUGARCANE:                     return 0.0f;
 		case E_BLOCK_TALL_GRASS:                    return 0.0f;

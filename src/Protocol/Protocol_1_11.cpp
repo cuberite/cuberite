@@ -805,6 +805,22 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 			break;
 		}  // case etItemFrame
 
+		case cEntity::etEnderCrystal:
+		{
+			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
+			if (EnderCrystal.DisplaysBeam())
+			{
+				a_Pkt.WriteBEUInt8(ENDER_CRYSTAL_BEAM_TARGET);
+				a_Pkt.WriteBEUInt8(METADATA_TYPE_OPTIONAL_POSITION);
+				a_Pkt.WriteBool(true);  // Dont do a second check if it should display the beam
+				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
+			}
+			a_Pkt.WriteBEUInt8(ENDER_CRYSTAL_SHOW_BOTTOM);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
+			break;
+		}  // case etEnderCrystal
+
 		default:
 		{
 			break;

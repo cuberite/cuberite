@@ -798,6 +798,7 @@ protected:
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const cUUID & a_UUID);
+
 private:
 
 	/** Pins the player to a_Location until Unfreeze() is called.
