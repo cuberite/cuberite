@@ -150,7 +150,10 @@ private:
 		{
 			case paGrowth:
 			{
-				Grow(a_Chunk, a_RelPos);
+				if (Grow(a_Chunk, a_RelPos) == 0)
+				{
+					BearFruit(a_Chunk, a_RelPos);
+				}
 				break;
 			}
 			case paDeath:
@@ -160,5 +163,11 @@ private:
 			}
 			case paStay: break;  // do nothing
 		}
+	}
+
+	/** Grows the final produce next to the stem at the specified position. */
+	virtual void BearFruit(cChunk & a_Chunk, const Vector3i a_StemRelPos) const
+	{
+		// Nothing to do by default
 	}
 };

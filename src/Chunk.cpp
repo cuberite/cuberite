@@ -820,10 +820,12 @@ void cChunk::TickBlocks(void)
 
 	// Tick random blocks, but the first one should be m_BlockToTick (so that SetNextBlockToTick() works)
 	auto Idx = cChunkDef::MakeIndexNoCheck(m_BlockToTick);
+	auto & Random = GetRandomProvider();
+
 	for (int i = 0; i < 50; ++i)
 	{
 		auto Pos = cChunkDef::IndexToCoordinate(static_cast<size_t>(Idx));
-		Idx = m_World->GetTickRandomNumber(cChunkDef::NumBlocks - 1);
+		Idx = Random.RandInt(cChunkDef::NumBlocks - 1);
 		if (Pos.y > cChunkDef::GetHeight(m_HeightMap, Pos.x, Pos.z))
 		{
 			continue;  // It's all air up here

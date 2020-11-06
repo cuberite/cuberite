@@ -1801,36 +1801,6 @@ bool cWorld::GrowRipePlant(Vector3i a_BlockPos)
 
 
 
-int cWorld::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
-{
-	LOGWARNING("cWorld::GrowCactus is obsolete, use cWorld::GrowPlantAt instead");
-	return m_ChunkMap->GrowPlantAt({a_BlockX, a_BlockY, a_BlockZ});
-}
-
-
-
-
-
-bool cWorld::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType)
-{
-	LOGWARNING("cWorld::GrowMelonPumpkin is obsolete, use cWorld::GrowPlantAt instead");
-	return (m_ChunkMap->GrowPlantAt({a_BlockX, a_BlockY, a_BlockZ}, 16) > 0);  // 8 stages for the stem, 8 attempts for the produce
-}
-
-
-
-
-
-int cWorld::GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
-{
-	LOGWARNING("cWorld::GrowSugarcane is obsolete, use cWorld::GrowPlantAt instead");
-	return m_ChunkMap->GrowPlantAt({a_BlockX, a_BlockY, a_BlockZ}, a_NumBlocksToGrow);
-}
-
-
-
-
-
 EMCSBiome cWorld::GetBiomeAt (int a_BlockX, int a_BlockZ)
 {
 	return m_ChunkMap->GetBiomeAt(a_BlockX, a_BlockZ);
