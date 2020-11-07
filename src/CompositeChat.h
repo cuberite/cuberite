@@ -153,7 +153,7 @@ public:
 
 
 	/** the parts have to be allocated with new else the part specific parts are not saved (only the cBasePart members). */
-	using cParts = std::vector<cBasePart *>;
+	using cParts = std::vector<std::unique_ptr<cBasePart>>;
 
 	/** Creates a new empty chat message.
 	Exported manually due to the other overload needing a manual export. */
