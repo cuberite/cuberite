@@ -45,6 +45,10 @@ cCompositeChat::~cCompositeChat()
 
 void cCompositeChat::Clear(void)
 {
+	for (const auto Part : m_Parts)
+	{
+		delete Part;
+	}
 	m_Parts.clear();
 }
 
