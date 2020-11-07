@@ -45,10 +45,6 @@ cCompositeChat::~cCompositeChat()
 
 void cCompositeChat::Clear(void)
 {
-	for (cParts::iterator itr = m_Parts.begin(), end = m_Parts.end(); itr != end; ++itr)
-	{
-		delete *itr;
-	}  // for itr - m_Parts[]
 	m_Parts.clear();
 }
 
@@ -58,7 +54,7 @@ void cCompositeChat::Clear(void)
 
 void cCompositeChat::AddTextPart(const AString & a_Message, const AString & a_Style)
 {
-	m_Parts.push_back(new cTextPart(a_Message, a_Style));
+	m_Parts.emplace_back(new cTextPart(a_Message, a_Style));
 }
 
 
@@ -67,7 +63,7 @@ void cCompositeChat::AddTextPart(const AString & a_Message, const AString & a_St
 
 void cCompositeChat::AddClientTranslatedPart(const AString & a_TranslationID, const AStringVector & a_Parameters, const AString & a_Style)
 {
-	m_Parts.push_back(new cClientTranslatedPart(a_TranslationID, a_Parameters, a_Style));
+	m_Parts.emplace_back(new cClientTranslatedPart(a_TranslationID, a_Parameters, a_Style));
 }
 
 
@@ -76,7 +72,7 @@ void cCompositeChat::AddClientTranslatedPart(const AString & a_TranslationID, co
 
 void cCompositeChat::AddUrlPart(const AString & a_Text, const AString & a_Url, const AString & a_Style)
 {
-	m_Parts.push_back(new cUrlPart(a_Text, a_Url, a_Style));
+	m_Parts.emplace_back(new cUrlPart(a_Text, a_Url, a_Style));
 }
 
 
@@ -85,7 +81,7 @@ void cCompositeChat::AddUrlPart(const AString & a_Text, const AString & a_Url, c
 
 void cCompositeChat::AddRunCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style)
 {
-	m_Parts.push_back(new cRunCommandPart(a_Text, a_Command, a_Style));
+	m_Parts.emplace_back(new cRunCommandPart(a_Text, a_Command, a_Style));
 }
 
 
@@ -94,7 +90,7 @@ void cCompositeChat::AddRunCommandPart(const AString & a_Text, const AString & a
 
 void cCompositeChat::AddSuggestCommandPart(const AString & a_Text, const AString & a_SuggestedCommand, const AString & a_Style)
 {
-	m_Parts.push_back(new cSuggestCommandPart(a_Text, a_SuggestedCommand, a_Style));
+	m_Parts.emplace_back(new cSuggestCommandPart(a_Text, a_SuggestedCommand, a_Style));
 }
 
 
@@ -103,7 +99,7 @@ void cCompositeChat::AddSuggestCommandPart(const AString & a_Text, const AString
 
 void cCompositeChat::AddShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style)
 {
-	m_Parts.push_back(new cShowAchievementPart(a_PlayerName, a_Achievement, a_Style));
+	m_Parts.emplace_back(new cShowAchievementPart(a_PlayerName, a_Achievement, a_Style));
 }
 
 
@@ -149,7 +145,7 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 					}
 					if (!CurrentText.empty())
 					{
-						m_Parts.push_back(new cTextPart(CurrentText, CurrentStyle));
+						m_Parts.emplace_back(new cTextPart(CurrentText, CurrentStyle));
 						CurrentText.clear();
 					}
 					AddStyle(CurrentStyle, a_ParseText.substr(i - 1, 2));
@@ -159,17 +155,19 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 
 			case ':':
 			{
-				const char * LinkPrefixes[] =
+				static const std::array<AString, 2> LinkPrefixes =
 				{
-					"http",
-					"https"
+					{
+						AString("http"),
+						AString("https")
+					}
 				};
-				for (size_t Prefix = 0; Prefix < ARRAYCOUNT(LinkPrefixes); Prefix++)
+				for (const auto & Prefix : LinkPrefixes)
 				{
-					size_t PrefixLen = strlen(LinkPrefixes[Prefix]);
+					size_t PrefixLen = Prefix.size();
 					if (
 						(i >= first + PrefixLen) &&  // There is enough space in front of the colon for the prefix
-						(strncmp(a_ParseText.c_str() + i - PrefixLen, LinkPrefixes[Prefix], PrefixLen) == 0)  // the prefix matches
+						(strncmp(a_ParseText.c_str() + i - PrefixLen, Prefix.c_str(), PrefixLen) == 0)  // the prefix matches
 					)
 					{
 						// Add everything before this as a text part:
@@ -223,13 +221,13 @@ void cCompositeChat::SetMessageType(eMessageType a_MessageType, const AString & 
 
 void cCompositeChat::UnderlineUrls(void)
 {
-	for (cParts::iterator itr = m_Parts.begin(), end = m_Parts.end(); itr != end; ++itr)
+	for (auto & Part : m_Parts)
 	{
-		if ((*itr)->m_PartType == ptUrl)
+		if (Part->m_PartType == ptUrl)
 		{
-			(*itr)->m_Style.append("u");
+			Part->m_Style.append("u");
 		}
-	}  // for itr - m_Parts[]
+	}
 }
 
 
@@ -239,21 +237,21 @@ void cCompositeChat::UnderlineUrls(void)
 AString cCompositeChat::ExtractText(void) const
 {
 	AString Msg;
-	for (cParts::const_iterator itr = m_Parts.begin(), end = m_Parts.end(); itr != end; ++itr)
+	for (const auto & Part : m_Parts)
 	{
-		switch ((*itr)->m_PartType)
+		switch (Part->m_PartType)
 		{
 			case ptText:
 			case ptClientTranslated:
 			case ptRunCommand:
 			case ptSuggestCommand:
 			{
-				Msg.append((*itr)->m_Text);
+				Msg.append(Part->m_Text);
 				break;
 			}
 			case ptUrl:
 			{
-				Msg.append((static_cast<cUrlPart *>(*itr))->m_Url);
+				Msg.append(static_cast<const cUrlPart *>(Part)->m_Url);
 				break;
 			}
 			case ptShowAchievement:
@@ -318,98 +316,98 @@ void cCompositeChat::AddStyle(AString & a_Style, const AString & a_AddStyle)
 
 AString cCompositeChat::CreateJsonString(bool a_ShouldUseChatPrefixes) const
 {
-	Json::Value msg;
-	msg["text"] = cClientHandle::FormatMessageType(a_ShouldUseChatPrefixes, GetMessageType(), GetAdditionalMessageTypeData());  // The client crashes without this field being present
-	const cCompositeChat::cParts & Parts = GetParts();
-	for (cCompositeChat::cParts::const_iterator itr = Parts.begin(), end = Parts.end(); itr != end; ++itr)
+	Json::Value Message;
+	Message["text"] = cClientHandle::FormatMessageType(a_ShouldUseChatPrefixes, GetMessageType(), GetAdditionalMessageTypeData());  // The client crashes without this field being present
+	for (const auto & Part : m_Parts)
 	{
-		Json::Value Part;
-		switch ((*itr)->m_PartType)
+		Json::Value JsonPart;
+		switch (Part->m_PartType)
 		{
 			case cCompositeChat::ptText:
 			{
-				Part["text"] = (*itr)->m_Text;
-				AddChatPartStyle(Part, (*itr)->m_Style);
+				JsonPart["text"] = Part->m_Text;
+				AddChatPartStyle(JsonPart, Part->m_Style);
 				break;
 			}
 
 			case cCompositeChat::ptClientTranslated:
 			{
-				const cCompositeChat::cClientTranslatedPart & p = static_cast<const cCompositeChat::cClientTranslatedPart &>(**itr);
-				Part["translate"] = p.m_Text;
+				const auto TranslatedPart = static_cast<const cCompositeChat::cClientTranslatedPart *>(Part);
+				JsonPart["translate"] = TranslatedPart->m_Text;
 				Json::Value With;
-				for (AStringVector::const_iterator itrW = p.m_Parameters.begin(), endW = p.m_Parameters.end(); itrW != endW; ++itr)
+				for (const auto & Parameter : TranslatedPart->m_Parameters)
 				{
-					With.append(*itrW);
+					With.append(Parameter);
 				}
-				if (!p.m_Parameters.empty())
+				if (!TranslatedPart->m_Parameters.empty())
 				{
-					Part["with"] = With;
+					JsonPart["with"] = With;
 				}
-				AddChatPartStyle(Part, p.m_Style);
+				AddChatPartStyle(JsonPart, TranslatedPart->m_Style);
 				break;
 			}
 
 			case cCompositeChat::ptUrl:
 			{
-				const cCompositeChat::cUrlPart & p = static_cast<const cCompositeChat::cUrlPart &>(**itr);
-				Part["text"] = p.m_Text;
+				const auto UrlPart = static_cast<const cCompositeChat::cUrlPart *>(Part);
+				JsonPart["text"] = UrlPart->m_Text;
 				Json::Value Url;
 				Url["action"] = "open_url";
-				Url["value"] = p.m_Url;
-				Part["clickEvent"] = Url;
-				AddChatPartStyle(Part, p.m_Style);
+				LOG(UrlPart->m_Url);
+				Url["value"] = UrlPart->m_Url;
+				JsonPart["clickEvent"] = Url;
+				AddChatPartStyle(JsonPart, UrlPart->m_Style);
 				break;
 			}
 
 			case cCompositeChat::ptSuggestCommand:
 			case cCompositeChat::ptRunCommand:
 			{
-				const cCompositeChat::cCommandPart & p = static_cast<const cCompositeChat::cCommandPart &>(**itr);
-				Part["text"] = p.m_Text;
+				const auto CommandPart = static_cast<const cCompositeChat::cCommandPart *>(Part);
+				JsonPart["text"] = CommandPart->m_Text;
 				Json::Value Cmd;
-				Cmd["action"] = (p.m_PartType == cCompositeChat::ptRunCommand) ? "run_command" : "suggest_command";
-				Cmd["value"] = p.m_Command;
-				Part["clickEvent"] = Cmd;
-				AddChatPartStyle(Part, p.m_Style);
+				Cmd["action"] = (CommandPart->m_PartType == cCompositeChat::ptRunCommand) ? "run_command" : "suggest_command";
+				Cmd["value"] = CommandPart->m_Command;
+				JsonPart["clickEvent"] = Cmd;
+				AddChatPartStyle(JsonPart, CommandPart->m_Style);
 				break;
 			}
 
 			case cCompositeChat::ptShowAchievement:
 			{
-				const cCompositeChat::cShowAchievementPart & p = static_cast<const cCompositeChat::cShowAchievementPart &>(**itr);
-				Part["translate"] = "chat.type.achievement";
+				const auto AchievementPart = static_cast<const cCompositeChat::cShowAchievementPart *>(Part);
+				JsonPart["translate"] = "chat.type.achievement";
 
 				Json::Value Ach;
 				Ach["action"] = "show_achievement";
-				Ach["value"] = p.m_Text;
+				Ach["value"] = AchievementPart->m_Text;
 
 				Json::Value AchColourAndName;
 				AchColourAndName["color"] = "green";
-				AchColourAndName["translate"] = p.m_Text;
+				AchColourAndName["translate"] = AchievementPart->m_Text;
 				AchColourAndName["hoverEvent"] = Ach;
 
 				Json::Value Extra;
 				Extra.append(AchColourAndName);
 
 				Json::Value Name;
-				Name["text"] = p.m_PlayerName;
+				Name["text"] = AchievementPart->m_PlayerName;
 
 				Json::Value With;
 				With.append(Name);
 				With.append(Extra);
 
-				Part["with"] = With;
-				AddChatPartStyle(Part, p.m_Style);
+				JsonPart["with"] = With;
+				AddChatPartStyle(JsonPart, AchievementPart->m_Style);
 				break;
 			}
 		}
-		msg["extra"].append(Part);
+		Message["extra"].append(JsonPart);
 	}  // for itr - Parts[]
 
 	#if 1
 		// Serialize as machine-readable string (no whitespace):
-		return JsonUtils::WriteFastString(msg);
+		return JsonUtils::WriteFastString(Message);
 	#else
 		// Serialize as human-readable string (pretty-printed):
 		return JsonUtils::WriteStyledString(msg);
