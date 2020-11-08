@@ -165,6 +165,12 @@ public:
 	Exported manually due to ToLua++ generating extra output parameter. */
 	cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType = mtCustom);
 
+	cCompositeChat(cCompositeChat && a_Other) = default;
+
+	/** Copy constructor is explicitly deleted because m_Parts is not copyable. */
+	cCompositeChat(cCompositeChat & a_Other) = delete;
+	cCompositeChat(const cCompositeChat & a_Other) = delete;
+
 	~cCompositeChat();  // tolua_export
 
 	// The following are exported in ManualBindings in order to support chaining - they return "self" in Lua (#755)
