@@ -45,10 +45,6 @@ cCompositeChat::~cCompositeChat()
 
 void cCompositeChat::Clear(void)
 {
-	for (auto & Part : m_Parts)
-	{
-		Part.reset();
-	}
 	m_Parts.clear();
 }
 
@@ -159,11 +155,11 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 
 			case ':':
 			{
-				static const std::array<AString, 2> LinkPrefixes =
+				static const constexpr std::array<std::string_view , 2> LinkPrefixes =
 				{
 					{
-						AString("http"),
-						AString("https")
+						"http",
+						"https"
 					}
 				};
 				for (const auto & Prefix : LinkPrefixes)
@@ -171,7 +167,7 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 					size_t PrefixLen = Prefix.size();
 					if (
 						(i >= first + PrefixLen) &&  // There is enough space in front of the colon for the prefix
-						(strncmp(a_ParseText.c_str() + i - PrefixLen, Prefix.c_str(), PrefixLen) == 0)  // the prefix matches
+						(std::string_view(a_ParseText).substr(i - PrefixLen, PrefixLen) == Prefix)  // the prefix matches
 					)
 					{
 						// Add everything before this as a text part:
