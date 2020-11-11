@@ -96,6 +96,19 @@ static void TestParser5(void)
 
 
 
+static void TestParser6(void)
+{
+	cCompositeChat Msg;
+	Msg.ParseText("Hello World");
+	const cCompositeChat::cParts & Parts = Msg.GetParts();
+	TEST_EQUAL(Parts.size(), 1);
+	TEST_EQUAL(Parts[0]->m_PartType, cCompositeChat::ptText);
+	TEST_EQUAL(Parts[0]->m_Style, "");
+}
+
+
+
+
 
 IMPLEMENT_TEST_MAIN("CompositeChat",
 	TestParser1();
@@ -103,4 +116,5 @@ IMPLEMENT_TEST_MAIN("CompositeChat",
 	TestParser3();
 	TestParser4();
 	TestParser5();
+	TestParser6();
 )
