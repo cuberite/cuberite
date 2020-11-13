@@ -140,7 +140,7 @@ public:
 
 	/** Returns the default weather interval for the specific weather type.
 	Returns -1 for any unknown weather. */
-	int GetDefaultWeatherInterval(eWeather a_Weather);
+	int GetDefaultWeatherInterval(eWeather a_Weather) const;
 
 	/** Returns the current game mode. Partly OBSOLETE, you should use IsGameModeXXX() functions wherever applicable */
 	eGameMode GetGameMode(void) const { return m_GameMode; }
@@ -666,6 +666,8 @@ public:
 	/** Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read. */
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
 
+	using cWorldInterface::SendBlockTo;
+
 	// tolua_begin
 
 	/** Replaces the specified block with air, and calls the OnBroken block handler.
@@ -697,14 +699,9 @@ public:
 	Returns an empty cItems object if the chunk is not present. */
 	cItems PickupsFromBlock(Vector3i a_BlockPos, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr);
 
-	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player) override;
-
 	/** Sends the block at the specified coords to the player.
 	Used mainly when plugins disable block-placing or block-breaking, to restore the previous block. */
-	void SendBlockTo(const Vector3i a_BlockPos, cPlayer & a_Player)
-	{
-		SendBlockTo(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Player);
-	}
+	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player) override;
 
 	/** Set default spawn at the given coordinates.
 	Returns false if the new spawn couldn't be stored in the INI file. */

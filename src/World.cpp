@@ -486,7 +486,7 @@ void cWorld::CastThunderbolt(Vector3i a_Block)
 
 
 
-int cWorld::GetDefaultWeatherInterval(eWeather a_Weather)
+int cWorld::GetDefaultWeatherInterval(eWeather a_Weather) const
 {
 	auto & Random = GetRandomProvider();
 	switch (a_Weather)
