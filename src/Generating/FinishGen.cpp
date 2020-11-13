@@ -289,7 +289,8 @@ void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClum
 	// Initialize the vector for all biomes.
 	for (int i = static_cast<int>(a_Output.size()); i <= static_cast<int>(biMaxVariantBiome); i++)
 	{
-		a_Output.push_back(BiomeInfo());
+		// Push empty BiomeInfo structure to be later directly accessed by index:
+		a_Output.emplace_back();
 	}
 
 	AStringVector ClumpInfo = StringSplitAndTrim(a_RawClumpInfo, "=");
@@ -306,14 +307,17 @@ void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClum
 
 	for (const auto & RawBiomeInfo : Biomes)
 	{
-		AStringVector BiomeInfo = StringSplitAndTrim(RawBiomeInfo, ",");
-		AString BiomeName = BiomeInfo[0];
-		EMCSBiome Biome = StringToBiome(BiomeName);
+		const AStringVector BiomeInfo = StringSplitAndTrim(RawBiomeInfo, ",");
+		const AString & BiomeName = BiomeInfo[0];
+		const EMCSBiome Biome = StringToBiome(BiomeName);
 		if (Biome == biInvalidBiome)
 		{
 			LOGWARNING("Biome \"%s\" is invalid.", BiomeName.c_str());
 			continue;
 		}
+
+		// The index of Biome in the output vector.
+		const size_t BiomeIndex = static_cast<size_t>(Biome);
 
 		if (BiomeInfo.size() == 2)
 		{
@@ -324,10 +328,10 @@ void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClum
 				LOGWARNING("OverworldClumpFoliage: Invalid data in \"%s\". Second parameter is either not existing or a number", RawBiomeInfo.c_str());
 				continue;
 			}
-			a_Output[static_cast<size_t>(Biome)].m_MinNumClumpsPerChunk = MinNumClump;
+			a_Output[BiomeIndex].m_MinNumClumpsPerChunk = MinNumClump;
 
 			// In case the minimum number is higher than the current maximum value we change the max to the minimum value.
-			a_Output[static_cast<size_t>(Biome)].m_MaxNumClumpsPerChunk = std::max(MinNumClump, a_Output[static_cast<size_t>(Biome)].m_MaxNumClumpsPerChunk);
+			a_Output[BiomeIndex].m_MaxNumClumpsPerChunk = std::max(MinNumClump, a_Output[BiomeIndex].m_MaxNumClumpsPerChunk);
 		}
 		else if (BiomeInfo.size() == 3)
 		{
@@ -339,22 +343,24 @@ void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClum
 				continue;
 			}
 
-			a_Output[static_cast<size_t>(Biome)].m_MaxNumClumpsPerChunk = MaxNumClumps + 1;
-			a_Output[static_cast<size_t>(Biome)].m_MinNumClumpsPerChunk = MinNumClumps;
+			a_Output[BiomeIndex].m_MaxNumClumpsPerChunk = MaxNumClumps + 1;
+			a_Output[BiomeIndex].m_MinNumClumpsPerChunk = MinNumClumps;
 		}
 
 		// TODO: Make the weight configurable.
 		for (const auto & BlockName : Blocks)
 		{
-			cItem Block = cItem();
+			cItem Block;
 			if (!StringToItem(BlockName, Block) || !IsValidBlock(Block.m_ItemType))
 			{
 				LOGWARNING("Block \"%s\" is invalid", BlockName.c_str());
 				continue;
 			}
 
-			FoliageInfo info = FoliageInfo(static_cast<BLOCKTYPE>(Block.m_ItemType), static_cast<NIBBLETYPE>(Block.m_ItemDamage), 100);
-			a_Output[static_cast<size_t>(Biome)].m_Blocks.push_back(info);
+			// Construct the FoliageInfo:
+			a_Output[BiomeIndex].m_Blocks.emplace_back(
+				static_cast<BLOCKTYPE>(Block.m_ItemType), static_cast<NIBBLETYPE>(Block.m_ItemDamage), 100
+			);
 		}
 	}
 }
@@ -365,7 +371,7 @@ void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClum
 
 std::vector<cFinishGenClumpTopBlock::BiomeInfo> cFinishGenClumpTopBlock::ParseIniFile(cIniFile & a_IniFile, const AString & a_ClumpPrefix)
 {
-	std::vector<cFinishGenClumpTopBlock::BiomeInfo> foliage;
+	std::vector<cFinishGenClumpTopBlock::BiomeInfo> Foliage;
 	int NumGeneratorValues = a_IniFile.GetNumValues("Generator");
 	int GeneratorKeyId = a_IniFile.FindKey("Generator");
 	for (int i = 0; i < NumGeneratorValues; i++)
@@ -374,22 +380,22 @@ std::vector<cFinishGenClumpTopBlock::BiomeInfo> cFinishGenClumpTopBlock::ParseIn
 		if (ValueName.substr(0, a_ClumpPrefix.size()) == a_ClumpPrefix)
 		{
 			AString RawClump = a_IniFile.GetValue(GeneratorKeyId, i);
-			cFinishGenClumpTopBlock::ParseConfigurationString(RawClump, foliage);
+			cFinishGenClumpTopBlock::ParseConfigurationString(RawClump, Foliage);
 		}
 	}
 
-	if (foliage.size() == 0)
+	if (Foliage.empty())
 	{
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-1", "Forest, -2, 2; ForestHills, -3, 2; FlowerForest = yellowflower; redflower; lilac; rosebush"), foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-2", "Plains, -2, 1; SunflowerPlains = yellowflower; redflower; azurebluet; redtulip; orangetulip; whitetulip; pinktulip; oxeyedaisy"), foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-3", "SunflowerPlains, 1, 2 = sunflower"), foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-4", "FlowerForest, 2, 5 = allium; redtulip; orangetulip; whitetulip; pinktulip; oxeyedaisy"), foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-5", "Swampland; SwamplandM = brownmushroom; redmushroom; blueorchid"), foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-6", "MushroomIsland; MushroomShore; MegaTaiga; MegaTaigaHills; MegaSpruceTaiga; MegaSpruceTaigaHills = brownmushroom; redmushroom"), foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-7", "RoofedForest, 1, 5; RoofedForestM, 1, 5 = rosebush; peony; lilac; grass"), foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-1", "Forest, -2, 2; ForestHills, -3, 2; FlowerForest = yellowflower; redflower; lilac; rosebush"), Foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-2", "Plains, -2, 1; SunflowerPlains = yellowflower; redflower; azurebluet; redtulip; orangetulip; whitetulip; pinktulip; oxeyedaisy"), Foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-3", "SunflowerPlains, 1, 2 = sunflower"), Foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-4", "FlowerForest, 2, 5 = allium; redtulip; orangetulip; whitetulip; pinktulip; oxeyedaisy"), Foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-5", "Swampland; SwamplandM = brownmushroom; redmushroom; blueorchid"), Foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-6", "MushroomIsland; MushroomShore; MegaTaiga; MegaTaigaHills; MegaSpruceTaiga; MegaSpruceTaigaHills = brownmushroom; redmushroom"), Foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-7", "RoofedForest, 1, 5; RoofedForestM, 1, 5 = rosebush; peony; lilac; grass"), Foliage);
 	}
 
-	return foliage;
+	return Foliage;
 }
 
 
