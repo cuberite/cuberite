@@ -123,7 +123,7 @@ public:
 	static void ParseConfigurationString(const AString & a_String, std::vector<BiomeInfo> & a_Output);
 
 	/** Parses an inifile in search for all clumps */
-	static std::vector<BiomeInfo> ParseIniFile(cIniFile & a_IniFile, AString a_ClumpPrefix);
+	static std::vector<BiomeInfo> ParseIniFile(cIniFile & a_IniFile, const AString & a_ClumpPrefix);
 protected:
 
 	cNoise m_Noise;
@@ -132,7 +132,7 @@ protected:
 	/** The maximum number of foliage per clump */
 	const int MAX_NUM_FOLIAGE = 8;
 
-	/** The mininum number of foliage per clump */
+	/** The minimum number of foliage per clump */
 	const int MIN_NUM_FOLIAGE = 4;
 
 	/** The maximum range a foliage can be placed from the center of the clump */
@@ -181,35 +181,9 @@ protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-	int GetBiomeDensity(EMCSBiome a_Biome)
-	{
-		switch (a_Biome)
-		{
-			case biSavanna:
-			case biSavannaM:
-			case biSavannaPlateau:
-			case biSavannaPlateauM:
-			case biPlains:
-			{
-				return 70;
-			}
-
-			case biExtremeHillsEdge:
-			case biExtremeHillsPlus:
-			case biExtremeHills:
-			case biExtremeHillsPlusM:
-			case biExtremeHillsM:
-			case biIceMountains:
-			{
-				return 3;
-			}
-
-			default:
-			{
-				return 20;
-			}
-		}
-	}
+	static bool CanFernGrow(EMCSBiome a_Biome);
+	static bool CanLargeFernGrow(EMCSBiome a_Biome);
+	static int GetBiomeDensity(EMCSBiome a_Biome);
 };
 
 
