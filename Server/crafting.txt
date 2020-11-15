@@ -824,6 +824,23 @@ purple_stained_glass_pane: VioletStainedGlassPane, 16    = VioletStainedGlass, 1
 white_stained_glass_pane: WhiteStainedGlassPane, 16     = WhiteStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
 yellow_stained_glass_pane: YellowStainedGlassPane, 16    = YellowStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
 
+black_stained_glass_pane: BlackStainedGlassPane , 8    = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | BlackDye, 2:2
+blue_stained_glass_pane: BlueStainedGlassPane, 8      = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | BlueDye, 2:2
+brown_stained_glass_pane: BrownStainedGlassPane, 8     = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | BrownDye, 2:2
+cyan_stained_glass_pane: CyanStainedGlassPane, 8      = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | CyanDye, 2:2
+gray_stained_glass_pane: GrayStainedGlassPane, 8      = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | GrayDye, 2:2
+green_stained_glass_pane: GreenStainedGlassPane, 8     = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | GreenDye, 2:2
+light_blue_stained_glass_pane: LightBlueStainedGlassPane, 8 = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | LightBlueDye, 2:2
+light_gray_stained_glass_pane: LightGrayStainedGlassPane, 8 = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | LightGrayDye, 2:2
+lime_stained_glass_pane: LimeStainedGlassPane, 8      = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | LimeDye, 2:2
+magenta_stained_glass_pane: MagentaStainedGlassPane, 8   = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | MagentaDye, 2:2
+orange_stained_glass_pane: OrangeStainedGlassPane, 8    = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | OrangeDye, 2:2
+pink_stained_glass_pane: PinkStainedGlassPane, 8      = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | PinkDye, 2:2
+red_stained_glass_pane: RedStainedGlassPane, 8       = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | RedDye, 2:2
+purple_stained_glass_pane: VioletStainedGlassPane, 8    = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | VioletDye, 2:2
+white_stained_glass_pane: WhiteStainedGlassPane, 8     = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | BoneMeal, 2:2
+yellow_stained_glass_pane: YellowStainedGlassPane, 8    = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | YellowDye, 2:2
+
 #******************************************************#
 # Stained Clay:
 #
