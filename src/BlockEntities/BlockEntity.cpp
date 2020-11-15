@@ -92,8 +92,8 @@ OwnedBlockEntity cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETY
 		case E_BLOCK_DISPENSER:         return std::make_unique<cDispenserEntity      >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_DROPPER:           return std::make_unique<cDropperEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_ENCHANTMENT_TABLE: return std::make_unique<cEnchantingTableEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_END_PORTAL:        return std::make_unique<cEndPortalEntity      >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_ENDER_CHEST:       return std::make_unique<cEnderChestEntity     >(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_END_PORTAL:        return std::make_unique<cEndPortalEntity      >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_FLOWER_POT:        return std::make_unique<cFlowerPotEntity      >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_FURNACE:           return std::make_unique<cFurnaceEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_HEAD:              return std::make_unique<cMobHeadEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);

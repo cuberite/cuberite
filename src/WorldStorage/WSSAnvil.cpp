@@ -665,6 +665,7 @@ OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int
 		case E_BLOCK_SIGN_POST:          return LoadSignFromNBT            (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_TRAPPED_CHEST:      return LoadChestFromNBT           (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_WALLSIGN:           return LoadSignFromNBT            (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+
 		default:
 		{
 			// All the other blocktypes should have no entities assigned to them. Report an error:

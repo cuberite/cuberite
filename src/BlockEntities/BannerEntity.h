@@ -61,20 +61,6 @@ enum class eBannerPattern
 	None
 };
 
-
-
-
-/** struct representing a Pattern */
-struct BannerPattern
-{
-	eBannerPattern m_Pattern;
-	short m_Color;
-};
-
-
-
-
-
 class cBannerEntity :
 	public cBlockEntity
 {
