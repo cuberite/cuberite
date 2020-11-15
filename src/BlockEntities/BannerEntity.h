@@ -80,7 +80,7 @@ public:  // tolua_export
 	virtual cItems ConvertToPickups() const override;
 
 	// Functions for sending with network and storing to disk
-	void SetBaseColor(short a_Color);
+	void SetBaseColor(unsigned char a_Color);
 	unsigned char GetBaseColor() const;
 
 	static const char * GetPatternTag(eBannerPattern a_Pattern);
@@ -88,7 +88,7 @@ public:  // tolua_export
 
 protected:
 
-	short m_BaseColor = 1;
+	unsigned char m_BaseColor = 1;
 
 
 } ;  // tolua_export

@@ -58,7 +58,7 @@ cItems cBannerEntity::ConvertToPickups() const
 
 
 
-void cBannerEntity::SetBaseColor(short a_Color)
+void cBannerEntity::SetBaseColor(unsigned char a_Color)
 {
 	m_BaseColor = a_Color;
 }

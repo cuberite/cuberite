@@ -3362,7 +3362,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 			Writer.AddInt("y", BannerEntity.GetPosY());
 			Writer.AddInt("z", BannerEntity.GetPosZ());
 			Writer.AddString("id", "Banner");
-			Writer.AddInt("Base", BannerEntity.GetBaseColor());
+			Writer.AddInt("Base", static_cast<Int32>(BannerEntity.GetBaseColor()));
 			break;
 		}
 
