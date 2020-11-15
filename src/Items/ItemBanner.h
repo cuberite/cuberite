@@ -47,17 +47,6 @@ public:
 		sSetBlockVector & a_BlocksToPlace
 	) override
 	{
-		/*
-			can be placed in item frame - just shows the item model
-			If renamed retains its name on adding and removing pattern
-			keeps its name on building and breaking
-
-			Banners can be copied using blank banner
-			may be crafted together with shield to display the banners
-
-			can be used for 1.5 items as fuel
-		*/
-
 		NIBBLETYPE BlockMeta = 0x00;
 		double Rotation = a_Player.GetYaw();
 		// Placing on the floor

@@ -48,6 +48,7 @@ void cBannerEntity::SendTo(cClientHandle & a_Client)
 
 
 
+
 cItems cBannerEntity::ConvertToPickups() const
 {
 	return cItem(E_ITEM_BANNER, 1, static_cast<NIBBLETYPE>(GetBaseColor()));
