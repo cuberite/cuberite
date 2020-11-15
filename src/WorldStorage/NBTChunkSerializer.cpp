@@ -384,20 +384,6 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_Entity,"Banner");
-
-			if (a_Entity->HasPatterns())
-			{
-				mWriter.BeginList("Patterns", TAG_Compound);
-					for (short i = 0; i < a_Entity->GetPatternCount(); i++)
-					{
-						mWriter.BeginCompound(std::to_string(i));
-						auto Pattern = a_Entity->GetPattern(i);
-						mWriter.AddString("Pattern", cBannerEntity::GetPatternTag(Pattern->m_Pattern));
-						mWriter.AddByte("Color", static_cast<UInt8>(Pattern->m_Color));
-						mWriter.EndCompound();
-					}
-				mWriter.EndList();
-			}
 			mWriter.AddInt("Base", static_cast<int>(a_Entity->GetBaseColor()));
 		mWriter.EndCompound();
 	}

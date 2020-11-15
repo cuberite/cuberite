@@ -3361,19 +3361,6 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 			Writer.AddInt("y", BannerEntity.GetPosY());
 			Writer.AddInt("z", BannerEntity.GetPosZ());
 			Writer.AddString("id", "Banner");
-			if (BannerEntity.HasPatterns())
-			{
-				Writer.BeginList("Patterns", TAG_Compound);
-				for (int i = 0; i < BannerEntity.GetPatternCount(); ++i)
-				{
-					auto Pattern = BannerEntity.GetPattern(i);
-					Writer.BeginCompound(std::to_string(i));
-					Writer.AddString("Pattern", cBannerEntity::GetPatternTag(Pattern->m_Pattern));
-					Writer.AddInt("Color", static_cast<int>(Pattern->m_Color));
-					Writer.EndCompound();
-				}
-				Writer.EndList();
-			}
 			Writer.AddInt("Base", BannerEntity.GetBaseColor());
 			break;
 		}

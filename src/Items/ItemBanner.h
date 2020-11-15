@@ -53,7 +53,7 @@ public:
 			keeps its name on building and breaking
 
 			Banners can be copied using blank banner
-			may be crated together with shield to display the banner
+			may be crafted together with shield to display the banners
 
 			can be used for 1.5 items as fuel
 		*/
@@ -203,7 +203,7 @@ public:
 		NIBBLETYPE ClickedBlockMeta;
 		a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
 		cChunkInterface ChunkInterface(a_World.GetChunkMap());
-		bool IsReplacingClickedBlock = BlockHandler(ClickedBlockType)->DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta);
+		bool IsReplacingClickedBlock = cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta);
 		auto BannerPos = IsReplacingClickedBlock ? a_ClickedBlockPos : AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
 		return PlaceBannerEntity(a_World, a_Player, Color, BannerPos);
 	}

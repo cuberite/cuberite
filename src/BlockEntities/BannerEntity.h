@@ -84,8 +84,6 @@ class cBannerEntity :
 
 public:  // tolua_export
 
-	BLOCKENTITY_PROTODEF(cBannerEntity)
-
 	/** Creates a new empty Banner entity */
 	cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
@@ -93,25 +91,16 @@ public:  // tolua_export
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override { return true; }
 	virtual void SendTo(cClientHandle & a_Client) override;
+	virtual cItems ConvertToPickups() const override;
 
 	// Functions for sending with network and storing to disk
-	bool HasPatterns() const;
 	void SetBaseColor(short a_Color);
 	unsigned char GetBaseColor() const;
-
-	// Pattern handling
-	bool AddPattern(BannerPattern a_Pattern, bool a_ByCommand = false);
-	const short GetPatternCount() const;
-	const BannerPattern * GetPattern(short a_Pattern) const;
-	void ClearAll();
 
 	static const char * GetPatternTag(eBannerPattern a_Pattern);
 
 
 protected:
-
-	BannerPattern m_Patterns[16];
-	short m_PatternCount = 0;
 
 	short m_BaseColor = 1;
 

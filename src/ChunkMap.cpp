@@ -1167,7 +1167,7 @@ bool cChunkMap::DoWithBannerAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBanner
 	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	cCSLock Lock(m_CSChunks);
-	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
+	const auto Chunk = FindChunk(ChunkX, ChunkZ);
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		return false;

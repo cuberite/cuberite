@@ -896,7 +896,7 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT &a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	static const AStringVector expectedTypes({"Banner", "minecraft:standingbanner","minecraft:wallbanner"});
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
@@ -904,20 +904,6 @@ OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT &a_NBT, int a_Tag
 		return nullptr;
 	}
 	auto Banner = std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
-
-	// Reads patterns from NBT
-	int Patterns = a_NBT.FindChildByName(a_TagIdx, "Patterns");
-	if ((Patterns >= 0) && (a_NBT.GetType(Patterns) == TAG_List))
-	{
-		int i = 0;
-		for (int Child = a_NBT.GetFirstChild(Patterns); Child != -1; Child = a_NBT.GetNextSibling(Child))
-		{
-			int Pattern = a_NBT.FindChildByName(Child, "Pattern");
-			int Color = a_NBT.FindChildByName(Child, "Color");
-			Banner->AddPattern({eBannerPattern::Border, static_cast<short>(a_NBT.GetInt(Color))}, true);
-			i++;
-		}
-	}
 
 	// Reads base color from NBT
 	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Base");

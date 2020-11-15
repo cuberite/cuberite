@@ -3,17 +3,7 @@
 
 #pragma once
 
-#include "BlockEntity.h"
-#include "Mixins.h"
-#include "ChunkInterface.h"
 #include "../BlockInfo.h"
-
-#include "../BlockEntities/BannerEntity.h"
-
-
-class cEntity;
-class cPlayer;
-class cWorldInterface;
 
 /*
 	may either be placed on top of a block or on the side (may overlap)
@@ -31,55 +21,31 @@ class cWorldInterface;
 		Mining the block                        block.wood.hit      0.25    0.5     16
 		Placing the block                       block.wood.place    1.0     0.8     16
 		Walking on the block                    block.wood.step	    0.15    1.0     16
-
-	Block data:
-		Standing:
-			direction
-		Wall:
-			direction
 */
 
 
-class cBlockBannerHandler :
+class cBlockBannerHandler final :
 	public cBlockEntityHandler
 {
 	using Super = cBlockEntityHandler;
 
 public:
 
-	cBlockBannerHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
+	using Super::Super;
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
+		// Drops handled by the block entity:
+		return {};
 	}
 
 
 
 
 
-	virtual cItems ConvertToPickups(
-		NIBBLETYPE a_BlockMeta,
-		cBlockEntity * a_BlockEntity,
-		const cEntity * a_Digger,
-		const cItem * a_Tool
-	) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		if ((a_BlockEntity == nullptr) || ((a_BlockEntity->GetBlockType() != E_BLOCK_STANDING_BANNER) && (a_BlockEntity->GetBlockType() != E_BLOCK_WALL_BANNER)))
-		{
-			return {};
-		}
-		// Todo: transfer cBannerPatternContainer back to the item
-		auto BannerEntity = static_cast<cBannerEntity *>(a_BlockEntity);
-		NIBBLETYPE BlockMeta = static_cast<NIBBLETYPE>(BannerEntity->GetBaseColor());
-		return cItem(E_ITEM_BANNER, 1, BlockMeta);
-	}
-
-
-
-
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
-	{
-		if (a_RelPos.y <= 0)
+		if (!cChunkDef::IsValidRelPos(a_RelPos))
 		{
 			return false;
 		}
@@ -91,10 +57,9 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
-		// Todo: find out which color is which
 		return 0;
 	}
 } ;
