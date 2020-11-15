@@ -1,34 +1,14 @@
 
 #pragma once
 
-
-
-
-
-/** Place this macro in the declaration of each cBlockEntity descendant. */
-#define BLOCKENTITY_PROTODEF(classname) \
-	virtual bool IsA(const char * a_ClassName) const override \
-	{ \
-		return ((a_ClassName != nullptr) && ((strcmp(a_ClassName, #classname) == 0) || Super::IsA(a_ClassName))); \
-	} \
-	virtual const char * GetClass() const override \
-	{ \
-		return #classname; \
-	} \
-	static const char * GetClassStatic() \
-	{ \
-		return #classname; \
-	} \
-	virtual const char * GetParentClass() const override \
-	{ \
-		return Super::GetClass(); \
-	}
+#include "ChunkDef.h"
 
 
 
 
 
 class cChunk;
+class cItems;
 class cPlayer;
 class cWorld;
 class cBlockEntity;
@@ -55,6 +35,7 @@ protected:
 	}
 
 public:
+
 	// tolua_end
 
 	virtual ~cBlockEntity() {}  // force a virtual destructor in all descendants
@@ -83,24 +64,14 @@ public:
 	Uses CopyFrom() to copy the properties. */
 	OwnedBlockEntity Clone(Vector3i a_Pos);
 
+	/** Returns the contents of this block entity that it would drop if broken.
+	Note that the block handler will usually handle pickups for the block itself, in addition to any items returned here. */
+	virtual cItems ConvertToPickups() const;
+
 	/** Copies all properties of a_Src into this entity, except for its m_World and location.
 	Each non-abstract descendant should override to copy its specific properties, and call
 	Super::CopyFrom(a_Src) to copy the common ones. */
 	virtual void CopyFrom(const cBlockEntity & a_Src);
-
-	static const char * GetClassStatic()  // Needed for ManualBindings's ForEach templates
-	{
-		return "cBlockEntity";
-	}
-
-	/** Returns true if the object is the specified class, or its descendant. */
-	virtual bool IsA(const char * a_ClassName) const { return (strcmp(a_ClassName, "cBlockEntity") == 0); }
-
-	/** Returns the name of the topmost class (the most descendant). Used for Lua bindings to push the correct object type. */
-	virtual const char * GetClass() const { return GetClassStatic(); }
-
-	/** Returns the name of the parent class, or empty string if no parent class. */
-	virtual const char * GetParentClass() const { return ""; }
 
 	// tolua_begin
 
@@ -117,7 +88,7 @@ public:
 	cWorld * GetWorld() const { return m_World; }
 
 	int GetChunkX() const { return FAST_FLOOR_DIV(m_Pos.x, cChunkDef::Width); }
-	int GetChunkZ() const { return FAST_FLOOR_DIV(m_Pos.y, cChunkDef::Width); }
+	int GetChunkZ() const { return FAST_FLOOR_DIV(m_Pos.z, cChunkDef::Width); }
 
 	int GetRelX() const { return m_RelX; }
 	int GetRelZ() const { return m_RelZ; }
@@ -158,7 +129,3 @@ protected:
 
 	cWorld * m_World;
 } ;  // tolua_export
-
-
-
-

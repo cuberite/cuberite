@@ -175,21 +175,21 @@ public:
 				case 0:
 				{
 					cItem Bow(E_ITEM_BOW, 1, Random.RandInt<short>(50));
-					Bow.EnchantByXPLevels(Random.RandInt(22, 30));
+					Bow.EnchantByXPLevels(Random.RandInt(22, 30), GetRandomProvider());
 					Drops.Add(Bow);
 					break;
 				}
 				case 1:
 				{
 					cItem Book(E_ITEM_BOOK);
-					Book.EnchantByXPLevels(30);
+					Book.EnchantByXPLevels(30, GetRandomProvider());
 					Drops.Add(Book);
 					break;
 				}
 				case 2:
 				{
 					cItem Rod(E_ITEM_FISHING_ROD, 1, Random.RandInt<short>(50));
-					Rod.EnchantByXPLevels(Random.RandInt(22, 30));
+					Rod.EnchantByXPLevels(Random.RandInt(22, 30), GetRandomProvider());
 					Drops.Add(Rod);
 					break;
 				}
@@ -210,7 +210,7 @@ public:
 				}
 			}
 
-			a_Player.GetStatManager().AddValue(statTreasureFished, 1);
+			a_Player.GetStatManager().AddValue(Statistic::TreasureFished, 1);
 		}
 		else if (ItemCategory < JunkChances[LotSLevel])
 		{
@@ -262,7 +262,7 @@ public:
 				Drops.Add(cItem(E_BLOCK_TRIPWIRE_HOOK));
 			}
 
-			a_Player.GetStatManager().AddValue(statJunkFished, 1);
+			a_Player.GetStatManager().AddValue(Statistic::JunkFished, 1);
 		}
 		else
 		{
@@ -284,7 +284,7 @@ public:
 				Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_FISH));
 			}
 
-			a_Player.GetStatManager().AddValue(statFishCaught, 1);
+			a_Player.GetStatManager().AddValue(Statistic::FishCaught, 1);
 		}
 
 		// Check with plugins if this loot is acceptable:

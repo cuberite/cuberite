@@ -370,7 +370,7 @@ void cPawn::HandleFalling(void)
 			}
 
 			/* If the block is solid, and the blockhandler confirms the block to be inside, we're officially on the ground. */
-			if ((cBlockInfo::IsSolid(BlockType)) && (cBlockInfo::GetHandler(BlockType)->IsInsideBlock(CrossTestPosition - BlockTestPosition, BlockMeta)))
+			if ((cBlockInfo::IsSolid(BlockType)) && (cBlockHandler::For(BlockType).IsInsideBlock(CrossTestPosition - BlockTestPosition, BlockMeta)))
 			{
 				OnGround = true;
 			}
@@ -470,7 +470,7 @@ void cPawn::StopEveryoneFromTargetingMe()
 
 
 
-std::map<cEntityEffect::eType, cEntityEffect *> cPawn::GetEntityEffects()
+std::map<cEntityEffect::eType, cEntityEffect *> cPawn::GetEntityEffects() const
 {
 	std::map<cEntityEffect::eType, cEntityEffect *> Effects;
 	for (auto & Effect : m_EntityEffects)
@@ -484,7 +484,7 @@ std::map<cEntityEffect::eType, cEntityEffect *> cPawn::GetEntityEffects()
 
 
 
-cEntityEffect * cPawn::GetEntityEffect(cEntityEffect::eType a_EffectType)
+cEntityEffect * cPawn::GetEntityEffect(cEntityEffect::eType a_EffectType) const
 {
 	auto itr = m_EntityEffects.find(a_EffectType);
 	return (itr != m_EntityEffects.end()) ? itr->second.get() : nullptr;

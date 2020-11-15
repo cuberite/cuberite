@@ -19,6 +19,8 @@ target_sources(
 	ItemDoor.h
 	ItemDye.h
 	ItemEmptyMap.h
+	ItemEnchantingTable.h
+	ItemEyeOfEnder.h
 	ItemFishingRod.h
 	ItemFood.h
 	ItemFoodSeeds.h

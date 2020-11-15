@@ -5,6 +5,7 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "../Items/ItemHandler.h"
+#include "../Items/ItemSpawnEgg.h"
 
 
 
@@ -16,7 +17,6 @@ cWolf::cWolf(void) :
 	m_IsTame(false),
 	m_IsBegging(false),
 	m_IsAngry(false),
-	m_OwnerName(""),
 	m_CollarColor(E_META_DYE_ORANGE),
 	m_NotificationCooldown(0)
 {
@@ -198,6 +198,10 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 	}
 	else if (IsTame())
 	{
+		if (a_Player.GetUUID() == m_OwnerUUID)
+		{
+			cMonster::RightClickFeed(a_Player);
+		}
 		// Feed the wolf, restoring its health, or dye its collar:
 		switch (EquippedItemType)
 		{
@@ -208,6 +212,10 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			case E_ITEM_RAW_CHICKEN:
 			case E_ITEM_COOKED_CHICKEN:
 			case E_ITEM_ROTTEN_FLESH:
+			case E_ITEM_RAW_MUTTON:
+			case E_ITEM_RAW_RABBIT:
+			case E_ITEM_COOKED_RABBIT:
+			case E_ITEM_COOKED_MUTTON:
 			{
 				if (m_Health < m_MaxHealth)
 				{
@@ -215,6 +223,13 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 					if (!a_Player.IsGameModeCreative())
 					{
 						a_Player.GetInventory().RemoveOneEquippedItem();
+					}
+				}
+				else if (a_Player.GetUUID() == m_OwnerUUID)  // Is the player the owner of the dog?
+				{
+					if (IsBaby())
+					{
+						m_AgingTimer = FloorC(m_AgingTimer * 0.9);
 					}
 				}
 				break;
@@ -231,12 +246,32 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				}
 				break;
 			}
+			// Multiplication is handled in cMonster. Just prevents from sitting down.
+			case E_ITEM_SPAWN_EGG:
+			{
+				break;
+			}
 			default:
 			{
 				if (a_Player.GetUUID() == m_OwnerUUID)  // Is the player the owner of the dog?
 				{
 					SetIsSitting(!IsSitting());
 				}
+			}
+		}
+	}
+
+	if ((EquippedItemType == E_ITEM_SPAWN_EGG) && (!IsTame()))
+	{
+		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(EquippedItem.m_ItemDamage);
+		if (
+			(MonsterType == m_MobType) &&
+			(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID))  // Spawning succeeded
+		{
+			if (!a_Player.IsGameModeCreative())
+			{
+				// The mob was spawned, "use" the item:
+				a_Player.GetInventory().RemoveOneEquippedItem();
 			}
 		}
 	}
@@ -337,6 +372,8 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		StopMovingToPosition();
 	}
+
+	cMonster::LoveTick();
 }
 
 
@@ -400,3 +437,29 @@ void cWolf::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 }
 
 
+
+
+
+void cWolf::InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2)
+{
+	const auto Parent1 = static_cast<cWolf *>(a_Parent1);
+	const auto Parent2 = static_cast<cWolf *>(a_Parent2);
+	if (Parent1->GetOwnerUUID() == Parent2->GetOwnerUUID())
+	{
+		SetOwner(Parent1->GetOwnerName(), Parent2->GetOwnerUUID());
+	}
+	else
+	{
+		auto Parent1Age = Parent1->GetAge();
+		auto Parent2Age = Parent2->GetAge();
+
+		if (Parent1Age > Parent2Age)
+		{
+			SetOwner(Parent2->GetOwnerName(), Parent2->GetOwnerUUID());
+		}
+		else
+		{
+			SetOwner(Parent1->GetOwnerName(), Parent1->GetOwnerUUID());
+		}
+	}
+}

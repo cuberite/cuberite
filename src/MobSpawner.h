@@ -43,7 +43,7 @@ public :
 	}
 
 	/** Returns true if specified type of mob can spawn on specified block */
-	static bool CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType a_MobType, EMCSBiome a_Biome);
+	static bool CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType a_MobType, EMCSBiome a_Biome, bool a_DisableSolidBelowCheck = false);
 
 	/** Returns all mob types that can spawn that biome */
 	static std::set<eMonsterType> GetAllowedMobTypes(EMCSBiome a_Biome);

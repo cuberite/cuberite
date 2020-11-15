@@ -5,7 +5,7 @@
 
 namespace Palette_1_16
 {
-	UInt32 FromBlock(short ID)
+	UInt32 FromBlock(const short ID)
 	{
 		using namespace Block;
 
@@ -11779,7 +11779,7 @@ namespace Palette_1_16
 		}
 	}
 
-	UInt32 FromItem(Item ID)
+	UInt32 FromItem(const Item ID)
 	{
 		switch (ID)
 		{
@@ -12758,11 +12758,93 @@ namespace Palette_1_16
 			case Item::ZombieSpawnEgg: return 818;
 			case Item::ZombieVillagerSpawnEgg: return 820;
 			case Item::ZombiePigmanSpawnEgg: return 821;
-			default: return 0;
+		}
+		UNREACHABLE("Invalid item");
+	}
+
+	UInt32 From(const Statistic ID)
+	{
+		switch (ID)
+		{
+			case Statistic::AnimalsBred: return 31;
+			case Statistic::AviateOneCm: return 17;
+			case Statistic::BellRing: return 67;
+			case Statistic::BoatOneCm: return 14;
+			case Statistic::CleanArmor: return 39;
+			case Statistic::CleanBanner: return 40;
+			case Statistic::CleanShulkerBox: return 41;
+			case Statistic::ClimbOneCm: return 10;
+			case Statistic::CrouchOneCm: return 6;
+			case Statistic::DamageAbsorbed: return 27;
+			case Statistic::DamageBlockedByShield: return 26;
+			case Statistic::DamageDealt: return 22;
+			case Statistic::DamageDealtAbsorbed: return 23;
+			case Statistic::DamageDealtResisted: return 24;
+			case Statistic::DamageResisted: return 28;
+			case Statistic::DamageTaken: return 25;
+			case Statistic::Deaths: return 29;
+			case Statistic::Drop: return 21;
+			case Statistic::EatCakeSlice: return 36;
+			case Statistic::EnchantItem: return 52;
+			case Statistic::FallOneCm: return 9;
+			case Statistic::FillCauldron: return 37;
+			case Statistic::FishCaught: return 33;
+			case Statistic::FlyOneCm: return 11;
+			case Statistic::HorseOneCm: return 16;
+			case Statistic::InspectDispenser: return 46;
+			case Statistic::InspectDropper: return 44;
+			case Statistic::InspectHopper: return 45;
+			case Statistic::InteractWithAnvil: return 70;
+			case Statistic::InteractWithBeacon: return 43;
+			case Statistic::InteractWithBlastFurnace: return 60;
+			case Statistic::InteractWithBrewingstand: return 42;
+			case Statistic::InteractWithCampfire: return 63;
+			case Statistic::InteractWithCartographyTable: return 64;
+			case Statistic::InteractWithCraftingTable: return 55;
+			case Statistic::InteractWithFurnace: return 54;
+			case Statistic::InteractWithGrindstone: return 71;
+			case Statistic::InteractWithLectern: return 62;
+			case Statistic::InteractWithLoom: return 65;
+			case Statistic::InteractWithSmithingTable: return 73;
+			case Statistic::InteractWithSmoker: return 61;
+			case Statistic::InteractWithStonecutter: return 66;
+			case Statistic::Jump: return 20;
+			case Statistic::LeaveGame: return -0;
+			case Statistic::MinecartOneCm: return 13;
+			case Statistic::MobKills: return 30;
+			case Statistic::OpenBarrel: return 59;
+			case Statistic::OpenChest: return 56;
+			case Statistic::OpenEnderchest: return 51;
+			case Statistic::OpenShulkerBox: return 58;
+			case Statistic::PigOneCm: return 15;
+			case Statistic::PlayNoteblock: return 47;
+			case Statistic::PlayOneMinute: return 1;
+			case Statistic::PlayRecord: return 53;
+			case Statistic::PlayerKills: return 32;
+			case Statistic::PotFlower: return 49;
+			case Statistic::RaidTrigger: return 68;
+			case Statistic::RaidWin: return 69;
+			case Statistic::SleepInBed: return 57;
+			case Statistic::SneakTime: return 4;
+			case Statistic::SprintOneCm: return 7;
+			case Statistic::StriderOneCm: return 19;
+			case Statistic::SwimOneCm: return 18;
+			case Statistic::TalkedToVillager: return 34;
+			case Statistic::TargetHit: return 72;
+			case Statistic::TimeSinceDeath: return 2;
+			case Statistic::TimeSinceRest: return 3;
+			case Statistic::TradedWithVillager: return 35;
+			case Statistic::TriggerTrappedChest: return 50;
+			case Statistic::TuneNoteblock: return 48;
+			case Statistic::UseCauldron: return 38;
+			case Statistic::WalkOnWaterOneCm: return 8;
+			case Statistic::WalkOneCm: return 5;
+			case Statistic::WalkUnderWaterOneCm: return 12;
+			default: return UInt32(-1);
 		}
 	}
 
-	Item ToItem(UInt32 ID)
+	Item ToItem(const UInt32 ID)
 	{
 		switch (ID)
 		{

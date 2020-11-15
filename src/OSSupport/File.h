@@ -28,7 +28,7 @@ For reading entire files into memory, just use the static cFile::ReadWholeFile()
 
 #pragma once
 
-
+#include "StringUtils.h"
 
 
 
@@ -185,3 +185,29 @@ private:
 
 
 
+
+/** A wrapper for file streams that enables exceptions. */
+template <class StreamType>
+class FileStream final : public StreamType
+{
+public:
+
+	FileStream(const std::string & Path)
+	{
+		// Except on failbit, which is what open sets on failure:
+		FileStream::exceptions(FileStream::failbit | FileStream::badbit);
+
+		// Open the file:
+		FileStream::open(Path);
+
+		// Only subsequently except on serious errors, and not on conditions like EOF or malformed input:
+		FileStream::exceptions(FileStream::badbit);
+	}
+};
+
+
+
+
+
+using InputFileStream = FileStream<std::ifstream>;
+using OutputFileStream = FileStream<std::ofstream>;

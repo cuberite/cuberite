@@ -1,14 +1,14 @@
-include_directories(${CMAKE_SOURCE_DIR}/src/)
+include_directories(${PROJECT_SOURCE_DIR}/src/)
 
 set (SHARED_SRCS
-	${CMAKE_SOURCE_DIR}/src/FastRandom.cpp
-	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
+	${PROJECT_SOURCE_DIR}/src/FastRandom.cpp
+	${PROJECT_SOURCE_DIR}/src/StringUtils.cpp
 )
 
 set (SHARED_HDRS
 	../TestHelpers.h
-	${CMAKE_SOURCE_DIR}/src/FastRandom.h
-	${CMAKE_SOURCE_DIR}/src/StringUtils.h
+	${PROJECT_SOURCE_DIR}/src/FastRandom.h
+	${PROJECT_SOURCE_DIR}/src/StringUtils.h
 )
 
 set (SRCS

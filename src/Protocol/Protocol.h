@@ -139,7 +139,7 @@ public:
 		pktWindowProperty
 	};
 
-	enum class eEntityMetadata
+	enum class EntityMetadata
 	{
 		EntityFlags,
 		EntityAir,
@@ -303,7 +303,7 @@ public:
 		TNTPrimedFuseTime
 	};
 
-	enum class eEntityMetadataType
+	enum class EntityMetadataType
 	{
 		Byte,
 		VarInt,
@@ -328,21 +328,28 @@ public:
 
 	enum class Version
 	{
-		Version_1_8_0  = 47,
-		Version_1_9_0  = 107,
-		Version_1_9_1  = 108,
-		Version_1_9_2  = 109,
-		Version_1_9_4  = 110,
-		Version_1_10_0 = 210,
-		Version_1_11_0 = 315,
-		Version_1_11_1 = 316,
-		Version_1_12   = 335,
-		Version_1_12_1 = 338,
-		Version_1_12_2 = 340,
-		Version_1_13   = 393,
-		Version_1_13_1 = 401,
-		Version_1_13_2 = 404,  // TODO: this constant should be in WebServer
-		Version_1_14   = 477
+		v1_8_0  = 47,
+		v1_9_0  = 107,
+		v1_9_1  = 108,
+		v1_9_2  = 109,
+		v1_9_4  = 110,
+		v1_10_0 = 210,
+		v1_11_0 = 315,
+		v1_11_1 = 316,
+		v1_12   = 335,
+		v1_12_1 = 338,
+		v1_12_2 = 340,
+		v1_13   = 393,
+		v1_13_1 = 401,
+		v1_13_2 = 404,  // TODO: this constant should be in WebServer
+		v1_14   = 477
+	};
+
+	enum State
+	{
+		Status = 1,
+		Login = 2,
+		Game = 3,
 	};
 
 	/** Called when client sends some data */
@@ -374,7 +381,7 @@ public:
 	virtual void SendEntityProperties           (const cEntity & a_Entity) = 0;
 	virtual void SendEntityStatus               (const cEntity & a_Entity, char a_Status) = 0;
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) = 0;
-	virtual void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) = 0;
+	virtual void SendExplosion                  (Vector3f a_Position, float a_Power) = 0;
 	virtual void SendGameMode                   (eGameMode a_GameMode) = 0;
 	virtual void SendHealth                     (void) = 0;
 	virtual void SendHeldItemChange             (int a_ItemIndex) = 0;
@@ -432,7 +439,7 @@ public:
 	virtual void SendWholeInventory             (const cWindow    & a_Window) = 0;
 	virtual void SendWindowClose                (const cWindow    & a_Window) = 0;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) = 0;
-	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) = 0;
+	virtual void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value) = 0;
 
 	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;

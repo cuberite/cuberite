@@ -18,9 +18,11 @@
 void cBlockBedHandler::OnBroken(
 	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 	const Vector3i a_BlockPos,
-	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-)
+	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+	const cEntity * a_Digger
+) const
 {
+	UNUSED(a_Digger);
 	auto Direction = MetaDataToDirection(a_OldBlockMeta & 0x03);
 	if ((a_OldBlockMeta & 0x08) != 0)
 	{
@@ -61,7 +63,7 @@ bool cBlockBedHandler::OnUse(
 	const Vector3i a_BlockPos,
 	eBlockFace a_BlockFace,
 	const Vector3i a_CursorPos
-)
+) const
 {
 	// Sleeping in bed only allowed in Overworld, beds explode elsewhere:
 	if (a_WorldInterface.GetDimension() != dimOverworld)
@@ -128,6 +130,7 @@ bool cBlockBedHandler::OnUse(
 	SetBedPos(a_Player, a_BlockPos);
 	SetBedOccupationState(a_ChunkInterface, a_Player.GetLastBedPos(), true);
 	a_Player.SetIsInBed(true);
+	a_Player.GetStatManager().AddValue(Statistic::SleepInBed);
 
 	// Fast-forward the time if all players in the world are in their beds:
 	auto TimeFastForwardTester = [](cPlayer & a_OtherPlayer)
@@ -153,7 +156,7 @@ bool cBlockBedHandler::OnUse(
 
 
 
-void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange)
+void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange) const
 {
 	a_Player.GetWorld()->DoWithBedAt(a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(), [&](cBedEntity & a_Bed)
 		{
@@ -167,14 +170,10 @@ void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWor
 
 
 
-cItems cBlockBedHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool)
+cItems cBlockBedHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const
 {
-	short color = E_META_WOOL_RED;
-	if (a_BlockEntity != nullptr)
-	{
-		color = reinterpret_cast<cBedEntity *>(a_BlockEntity)->GetColor();
-	}
-	return cItem(E_ITEM_BED, 1, color);
+	// Drops handled by the block entity:
+	return {};
 }
 
 

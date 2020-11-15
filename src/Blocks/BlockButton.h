@@ -9,21 +9,52 @@
 
 
 
-class cBlockButtonHandler :
+class cBlockButtonHandler final :
 	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>>
 {
 	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>>;
 
 public:
 
-	cBlockButtonHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
+	using Super::Super;
+
+	/** Extracts the ON bit from metadata and returns if true if it is set */
+	static bool IsButtonOn(NIBBLETYPE a_Meta)
 	{
+		return (a_Meta & 0x08) == 0x08;
 	}
 
+	/** Event handler for an arrow striking a block.
+	Performs appropriate handling if the arrow intersected a wooden button. */
+	static void OnArrowHit(cWorld & a_World, const Vector3i a_Position, const eBlockFace a_HitFace)
+	{
+		BLOCKTYPE Type;
+		NIBBLETYPE Meta;
+		const auto Pos = AddFaceDirection(a_Position, a_HitFace);
 
+		if (
+			!a_World.GetBlockTypeMeta(Pos, Type, Meta) ||
+			IsButtonOn(Meta) ||
+			!IsButtonPressedByArrow(a_World, Pos, Type, Meta)
+		)
+		{
+			// Bail if we're not specifically a wooden button, or it's already on
+			// or if the arrow didn't intersect. It is very important that nothing is
+			// done if the button is depressed, since the release task will already be queued
+			return;
+		}
 
+		a_World.SetBlockMeta(Pos, Meta | 0x08);
+		a_World.WakeUpSimulators(Pos);
 
+		// sound name is ok to be wood, because only wood gets triggered by arrow
+		a_World.GetBroadcastManager().BroadcastSoundEffect("block.wood_button.click_on", Pos, 0.5f, 0.6f);
+
+		// Queue a button reset
+		QueueButtonRelease(a_World, Pos, Type);
+	}
+
+private:
 
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
@@ -32,7 +63,7 @@ public:
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
-	) override
+	) const override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
 
@@ -47,7 +78,7 @@ public:
 
 		const auto SoundToPlay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? "block.stone_button.click_on" : "block.wood_button.click_on";
 
-		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta, false);
+		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
 		a_WorldInterface.WakeUpSimulators(a_BlockPos);
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect(SoundToPlay, a_BlockPos, 0.5f, 0.6f, a_Player.GetClientHandle());
 
@@ -61,7 +92,7 @@ public:
 
 
 
-	virtual bool IsUseable(void) override
+	virtual bool IsUseable(void) const override
 	{
 		return true;
 	}
@@ -77,7 +108,7 @@ public:
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
@@ -135,7 +166,7 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		auto Meta = a_Chunk.GetMeta(a_RelPos);
 		auto SupportRelPos = AddFaceDirection(a_RelPos, BlockMetaDataToBlockFace(Meta), true);
@@ -153,49 +184,11 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 0;
 	}
-
-	/** Extracts the ON bit from metadata and returns if true if it is set */
-	static bool IsButtonOn(NIBBLETYPE a_Meta)
-	{
-		return (a_Meta & 0x08) == 0x08;
-	}
-
-	/** Event handler for an arrow striking a block.
-	Performs appropriate handling if the arrow intersected a wooden button. */
-	static void OnArrowHit(cWorld & a_World, const Vector3i a_Position, const eBlockFace a_HitFace)
-	{
-		BLOCKTYPE Type;
-		NIBBLETYPE Meta;
-		const auto Pos = AddFaceDirection(a_Position, a_HitFace);
-
-		if (
-			!a_World.GetBlockTypeMeta(Pos, Type, Meta) ||
-			IsButtonOn(Meta) ||
-			!IsButtonPressedByArrow(a_World, Pos, Type, Meta)
-		)
-		{
-			// Bail if we're not specifically a wooden button, or it's already on
-			// or if the arrow didn't intersect. It is very important that nothing is
-			// done if the button is depressed, since the release task will already be queued
-			return;
-		}
-
-		a_World.SetBlockMeta(Pos, Meta | 0x08, false);
-		a_World.WakeUpSimulators(Pos);
-
-		// sound name is ok to be wood, because only wood gets triggered by arrow
-		a_World.GetBroadcastManager().BroadcastSoundEffect("block.wood_button.click_on", Pos, 0.5f, 0.6f);
-
-		// Queue a button reset
-		QueueButtonRelease(a_World, Pos, Type);
-	}
-
-private:
 
 	/** Schedules a recurring event at appropriate intervals to release a button at a given position.
 	The given block type is checked when the task is executed to ensure the position still contains a button. */
@@ -228,7 +221,7 @@ private:
 				// Block hasn't change in the meantime; release it
 				const auto SoundToPlayOnRelease = (Type == E_BLOCK_STONE_BUTTON) ? "block.stone_button.click_off" : "block.wood_button.click_off";
 
-				a_World.SetBlockMeta(a_Position, Meta & 0x07, false);
+				a_World.SetBlockMeta(a_Position, Meta & 0x07);
 				a_World.WakeUpSimulators(a_Position);
 				a_World.BroadcastSoundEffect(SoundToPlayOnRelease, a_Position, 0.5f, 0.5f);
 			}

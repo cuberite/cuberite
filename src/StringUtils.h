@@ -8,8 +8,6 @@
 
 #pragma once
 
-
-
 typedef std::string AString;
 typedef std::vector<AString> AStringVector;
 typedef std::list<AString>   AStringList;

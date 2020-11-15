@@ -7,34 +7,33 @@
 
 
 
-class cBlockConcretePowderHandler :
+class cBlockConcretePowderHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
 
 public:
 
-	cBlockConcretePowderHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
+
+private:
 
 	virtual void OnPlaced(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) override
+	) const override
 	{
 		OnNeighborChanged(a_ChunkInterface, a_BlockPos, BLOCK_FACE_NONE);
 	}
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
 	{
 		a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { CheckSoaked(a_Chunk.AbsoluteToRelative(a_BlockPos), a_Chunk); return true; });
 	}
 
 	/** Check blocks above and around to see if they are water. If one is, converts this into concrete block. */
-	void CheckSoaked(Vector3i a_Rel, cChunk & a_Chunk)
+	static void CheckSoaked(Vector3i a_Rel, cChunk & a_Chunk)
 	{
 		const auto & WaterCheck = cSimulator::AdjacentOffsets;
 		const bool ShouldSoak = std::any_of(WaterCheck.cbegin(), WaterCheck.cend(), [a_Rel, & a_Chunk](Vector3i a_Offset)
@@ -54,7 +53,7 @@ public:
 		}
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		switch (a_Meta)
 		{

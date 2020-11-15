@@ -24,11 +24,11 @@ Implements the 1.9 protocol classes:
 #include "../World.h"
 #include "../StringCompression.h"
 #include "../CompositeChat.h"
-#include "../Statistics.h"
 #include "../JsonUtils.h"
 
 #include "../WorldStorage/FastNBT.h"
 
+#include "../Entities/EnderCrystal.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
@@ -81,8 +81,8 @@ static const UInt32 OFF_HAND = 1;
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_0:
 
-cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	Super(a_Client, a_ServerAddress, a_ServerPort, a_State),
+cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State) :
+	Super(a_Client, a_ServerAddress, a_State),
 	m_IsTeleportIdConfirmed(true),
 	m_OutstandingTeleportId(0)
 {
@@ -566,7 +566,7 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 
 cProtocol::Version cProtocol_1_9_0::GetProtocolVersion()
 {
-	return Version::Version_1_9_0;
+	return Version::v1_9_0;
 }
 
 
@@ -577,9 +577,8 @@ bool cProtocol_1_9_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 {
 	switch (m_State)
 	{
-		case 1:
+		case State::Status:
 		{
-			// Status
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
@@ -588,9 +587,8 @@ bool cProtocol_1_9_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			break;
 		}
 
-		case 2:
+		case State::Login:
 		{
-			// Login
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketLoginStart             (a_ByteBuffer); return true;
@@ -599,9 +597,8 @@ bool cProtocol_1_9_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			break;
 		}
 
-		case 3:
+		case State::Game:
 		{
-			// Game
 			switch (a_PacketType)
 			{
 				case 0x00: HandleConfirmTeleport              (a_ByteBuffer); return true;
@@ -636,23 +633,6 @@ bool cProtocol_1_9_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 				case 0x1d: HandlePacketUseItem                (a_ByteBuffer); return true;
 			}
 			break;
-		}
-		default:
-		{
-			// Received a packet in an unknown state, report:
-			LOGWARNING("Received a packet in an unknown protocol state %d. Ignoring further packets.", m_State);
-
-			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
-
-			// Switch to a state when all further packets are silently ignored:
-			m_State = 255;
-			return false;
-		}
-		case 255:
-		{
-			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
-			// Do not output anything (the caller will do that for us), just return failure
-			return false;
 		}
 	}  // switch (m_State)
 
@@ -1235,26 +1215,6 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 
 
 
-eBlockFace cProtocol_1_9_0::FaceIntToBlockFace(Int32 a_BlockFace)
-{
-	// Normalize the blockface values returned from the protocol
-	// Anything known gets mapped 1:1, everything else returns BLOCK_FACE_NONE
-	switch (a_BlockFace)
-	{
-		case BLOCK_FACE_XM: return BLOCK_FACE_XM;
-		case BLOCK_FACE_XP: return BLOCK_FACE_XP;
-		case BLOCK_FACE_YM: return BLOCK_FACE_YM;
-		case BLOCK_FACE_YP: return BLOCK_FACE_YP;
-		case BLOCK_FACE_ZM: return BLOCK_FACE_ZM;
-		case BLOCK_FACE_ZP: return BLOCK_FACE_ZP;
-		default: return BLOCK_FACE_NONE;
-	}
-}
-
-
-
-
-
 eHand cProtocol_1_9_0::HandIntToEnum(Int32 a_Hand)
 {
 	// Convert hand parameter into eHand enum
@@ -1794,6 +1754,21 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 			break;
 		}  // case etItemFrame
 
+		case cEntity::etEnderCrystal:
+		{
+			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
+			a_Pkt.WriteBEUInt8(5);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_OPTIONAL_POSITION);
+			a_Pkt.WriteBool(EnderCrystal.DisplaysBeam());
+			if (EnderCrystal.DisplaysBeam())
+			{
+				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
+			}
+			a_Pkt.WriteBEUInt8(6);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
+			break;
+		}  // case etEnderCrystal
 		default:
 		{
 			break;
@@ -2216,7 +2191,7 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 
 cProtocol::Version cProtocol_1_9_1::GetProtocolVersion()
 {
-	return Version::Version_1_9_1;
+	return Version::v1_9_1;
 }
 
 
@@ -2228,7 +2203,7 @@ cProtocol::Version cProtocol_1_9_1::GetProtocolVersion()
 
 cProtocol::Version cProtocol_1_9_2::GetProtocolVersion()
 {
-	return Version::Version_1_9_2;
+	return Version::v1_9_2;
 }
 
 
@@ -2276,7 +2251,7 @@ void cProtocol_1_9_4::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 cProtocol::Version cProtocol_1_9_4::GetProtocolVersion()
 {
-	return Version::Version_1_9_4;
+	return Version::v1_9_4;
 }
 
 

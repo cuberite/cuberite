@@ -151,6 +151,8 @@ cPlayer::cPlayer(const cClientHandlePtr & a_Client, const AString & a_PlayerName
 
 		SetWorld(World);  // Use default world
 
+		m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();  // Use a random number to seed the enchantment generator
+
 		FLOGD("Player \"{0}\" is connecting for the first time, spawning at default world spawn {1:.2f}",
 			a_PlayerName, GetPosition()
 		);
@@ -334,7 +336,12 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 
-	m_Stats.AddValue(statMinutesPlayed, 1);
+	m_Stats.AddValue(Statistic::PlayOneMinute);
+	m_Stats.AddValue(Statistic::TimeSinceDeath);
+	if (IsCrouched())
+	{
+		m_Stats.AddValue(Statistic::SneakTime);
+	}
 
 	// Handle the player detach, when the player is in spectator mode
 	if (
@@ -520,7 +527,7 @@ int cPlayer::XpForLevel(int a_Level)
 
 
 
-int cPlayer::GetXpLevel()
+int cPlayer::GetXpLevel() const
 {
 	return CalcLevelFromXp(m_CurrentXp);
 }
@@ -529,7 +536,7 @@ int cPlayer::GetXpLevel()
 
 
 
-float cPlayer::GetXpPercentage()
+float cPlayer::GetXpPercentage() const
 {
 	int currentLevel = CalcLevelFromXp(m_CurrentXp);
 	int currentLevel_XpBase = XpForLevel(currentLevel);
@@ -742,7 +749,7 @@ void cPlayer::TossItems(const cItems & a_Items)
 		return;
 	}
 
-	m_Stats.AddValue(statItemsDropped, static_cast<StatValue>(a_Items.Size()));
+	m_Stats.AddValue(Statistic::Drop, static_cast<cStatManager::StatValue>(a_Items.Size()));
 
 	const auto Speed = (GetLookVector() + Vector3d(0, 0.2, 0)) * 6;  // A dash of height and a dollop of speed
 	const auto Position = GetEyePosition() - Vector3d(0, 0.2, 0);  // Correct for eye-height weirdness
@@ -1110,7 +1117,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 				NotifyNearbyWolves(static_cast<cPawn*>(a_TDI.Attacker), true);
 			}
 		}
-		m_Stats.AddValue(statDamageTaken, FloorC<StatValue>(a_TDI.FinalDamage * 10 + 0.5));
+		m_Stats.AddValue(Statistic::DamageTaken, FloorC<cStatManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5));
 		return true;
 	}
 	return false;
@@ -1168,7 +1175,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	{
 		Pickups.Add(cItem(E_ITEM_RED_APPLE));
 	}
-	m_Stats.AddValue(statItemsDropped, static_cast<StatValue>(Pickups.Size()));
+	m_Stats.AddValue(Statistic::Drop, static_cast<cStatManager::StatValue>(Pickups.Size()));
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
@@ -1198,6 +1205,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 					case dtAdmin:           return "was administrator'd";
 					case dtExplosion:       return "blew up";
 					case dtAttack:          return "was attacked by thin air";
+					case dtEnvironment:     return "played too much dress up";  // This is not vanilla - added a own pun
 				}
 				UNREACHABLE("Unsupported damage type");
 			}();
@@ -1234,7 +1242,8 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		}
 	}
 
-	m_Stats.AddValue(statDeaths);
+	m_Stats.AddValue(Statistic::Deaths);
+	m_Stats.SetValue(Statistic::TimeSinceDeath, 0);
 
 	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::otDeathCount, 1);
 }
@@ -1249,7 +1258,7 @@ void cPlayer::Killed(cEntity * a_Victim)
 
 	if (a_Victim->IsPlayer())
 	{
-		m_Stats.AddValue(statPlayerKills);
+		m_Stats.AddValue(Statistic::PlayerKills);
 
 		ScoreBoard.AddPlayerScore(GetName(), cObjective::otPlayerKillCount, 1);
 	}
@@ -1257,10 +1266,10 @@ void cPlayer::Killed(cEntity * a_Victim)
 	{
 		if (static_cast<cMonster *>(a_Victim)->GetMobFamily() == cMonster::mfHostile)
 		{
-			AwardAchievement(achKillMonster);
+			AwardAchievement(Statistic::AchKillEnemy);
 		}
 
-		m_Stats.AddValue(statMobKills);
+		m_Stats.AddValue(Statistic::MobKills);
 	}
 
 	ScoreBoard.AddPlayerScore(GetName(), cObjective::otTotalKillCount, 1);
@@ -1671,43 +1680,32 @@ void cPlayer::SetIP(const AString & a_IP)
 
 
 
-unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
+void cPlayer::AwardAchievement(const Statistic a_Ach)
 {
-	eStatistic Prerequisite = cStatInfo::GetPrerequisite(a_Ach);
-
-	// Check if the prerequisites are met
-	if (Prerequisite != statInvalid)
+	// Check if the prerequisites are met:
+	if (!m_Stats.SatisfiesPrerequisite(a_Ach))
 	{
-		if (m_Stats.GetValue(Prerequisite) == 0)
-		{
-			return 0;
-		}
+		return;
 	}
 
-	StatValue Old = m_Stats.GetValue(a_Ach);
-
-	if (Old > 0)
+	// Increment the statistic and check if we already have it:
+	if (m_Stats.AddValue(a_Ach) != 1)
 	{
-		return static_cast<unsigned int>(m_Stats.AddValue(a_Ach));
+		return;
 	}
-	else
+
+	if (m_World->ShouldBroadcastAchievementMessages())
 	{
-		if (m_World->ShouldBroadcastAchievementMessages())
-		{
-			cCompositeChat Msg;
-			Msg.SetMessageType(mtSuccess);
-			Msg.AddShowAchievementPart(GetName(), cStatInfo::GetName(a_Ach));
-			m_World->BroadcastChat(Msg);
-		}
-
-		// Increment the statistic
-		StatValue New = m_Stats.AddValue(a_Ach);
-
-		// Achievement Get!
-		m_ClientHandle->SendStatistics(m_Stats);
-
-		return static_cast<unsigned int>(New);
+		cCompositeChat Msg;
+		Msg.SetMessageType(mtSuccess);
+		// TODO: cCompositeChat should not use protocol-specific strings
+		// Msg.AddShowAchievementPart(GetName(), nameNew);
+		Msg.AddTextPart("Achivement get!");
+		m_World->BroadcastChat(Msg);
 	}
+
+	// Achievement Get!
+	m_ClientHandle->SendStatistics(m_Stats);
 }
 
 
@@ -1859,6 +1857,25 @@ void cPlayer::SetVisible(bool a_bVisible)
 		m_bVisible = false;
 		m_World->BroadcastDestroyEntity(*this, m_ClientHandle.get());  // Destroy on all clients
 	}
+}
+
+
+
+
+
+MTRand cPlayer::GetEnchantmentRandomProvider()
+{
+	return m_EnchantmentSeed;
+}
+
+
+
+
+
+void cPlayer::PermuteEnchantmentSeed()
+{
+	// Get a new random integer and save that as the seed:
+	m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();
 }
 
 
@@ -2281,6 +2298,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	m_LifetimeTotalXp     = root.get("xpTotal",        0).asInt();
 	m_CurrentXp           = root.get("xpCurrent",      0).asInt();
 	m_IsFlying            = root.get("isflying",       0).asBool();
+	m_EnchantmentSeed     = root.get("enchantmentSeed", GetRandomProvider().RandInt<unsigned int>()).asUInt();
 
 	Json::Value & JSON_KnownItems = root["knownItems"];
 	for (UInt32 i = 0; i < JSON_KnownItems.size(); i++)
@@ -2334,10 +2352,16 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 		m_SpawnWorld = cRoot::Get()->GetDefaultWorld();
 	}
 
-	// Load the player stats.
-	// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetName(), GetUUID().ToLongString(), &m_Stats);
-	StatSerializer.Load();
+	try
+	{
+		// Load the player stats.
+		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
+		StatSerializer::Load(m_Stats, cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetUUID().ToLongString());
+	}
+	catch (...)
+	{
+		LOGWARNING("Failed loading player statistics");
+	}
 
 	FLOGD("Player {0} was read from file \"{1}\", spawning at {2:.2f} in world \"{3}\"",
 		GetName(), a_FileName, GetPosition(), a_World->GetName()
@@ -2437,6 +2461,7 @@ bool cPlayer::SaveToDisk()
 	root["SpawnY"]              = GetLastBedPos().y;
 	root["SpawnZ"]              = GetLastBedPos().z;
 	root["SpawnWorld"]          = m_SpawnWorld->GetName();
+	root["enchantmentSeed"]     = m_EnchantmentSeed;
 
 	if (m_World != nullptr)
 	{
@@ -2476,10 +2501,13 @@ bool cPlayer::SaveToDisk()
 		return false;
 	}
 
-	// Save the player stats.
-	// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetName(), GetUUID().ToLongString(), &m_Stats);
-	if (!StatSerializer.Save())
+	try
+	{
+		// Save the player stats.
+		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
+		StatSerializer::Save(m_Stats, cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetUUID().ToLongString());
+	}
+	catch (...)
 	{
 		LOGWARNING("Could not save stats for player %s", GetName().c_str());
 		return false;
@@ -2659,12 +2687,12 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		return;
 	}
 
-	StatValue Value = FloorC<StatValue>(a_DeltaPos.Length() * 100 + 0.5);
+	const auto Value = FloorC<cStatManager::StatValue>(a_DeltaPos.Length() * 100 + 0.5);
 	if (m_AttachedTo == nullptr)
 	{
 		if (IsFlying())
 		{
-			m_Stats.AddValue(statDistFlown, Value);
+			m_Stats.AddValue(Statistic::FlyOneCm, Value);
 			// May be flying and doing any of the following:
 		}
 
@@ -2672,31 +2700,51 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		{
 			if (a_DeltaPos.y > 0.0)  // Going up
 			{
-				m_Stats.AddValue(statDistClimbed, FloorC<StatValue>(a_DeltaPos.y * 100 + 0.5));
+				m_Stats.AddValue(Statistic::ClimbOneCm, FloorC<cStatManager::StatValue>(a_DeltaPos.y * 100 + 0.5));
 			}
 		}
 		else if (IsInWater())
 		{
-			m_Stats.AddValue(statDistSwum, Value);
+			if (m_IsHeadInWater)
+			{
+				m_Stats.AddValue(Statistic::WalkUnderWaterOneCm, Value);
+			}
+			else
+			{
+				m_Stats.AddValue(Statistic::WalkOnWaterOneCm, Value);
+			}
 			AddFoodExhaustion(0.00015 * static_cast<double>(Value));
 		}
 		else if (IsOnGround())
 		{
-			m_Stats.AddValue(statDistWalked, Value);
-			AddFoodExhaustion((IsSprinting() ? 0.001 : 0.0001) * static_cast<double>(Value));
+			if (IsCrouched())
+			{
+				m_Stats.AddValue(Statistic::CrouchOneCm, Value);
+				AddFoodExhaustion(0.0001 * static_cast<double>(Value));
+			}
+			if (IsSprinting())
+			{
+				m_Stats.AddValue(Statistic::SprintOneCm, Value);
+				AddFoodExhaustion(0.001 * static_cast<double>(Value));
+			}
+			else
+			{
+				m_Stats.AddValue(Statistic::WalkOneCm, Value);
+				AddFoodExhaustion(0.0001 * static_cast<double>(Value));
+			}
 		}
 		else
 		{
 			// If a jump just started, process food exhaustion:
 			if ((a_DeltaPos.y > 0.0) && a_PreviousIsOnGround)
 			{
-				m_Stats.AddValue(statJumps, 1);
+				m_Stats.AddValue(Statistic::Jump, 1);
 				AddFoodExhaustion((IsSprinting() ? 0.008 : 0.002) * static_cast<double>(Value));
 			}
 			else if (a_DeltaPos.y < 0.0)
 			{
 				// Increment statistic
-				m_Stats.AddValue(statDistFallen, static_cast<StatValue>(std::abs(a_DeltaPos.y) * 100 + 0.5));
+				m_Stats.AddValue(Statistic::FallOneCm, static_cast<cStatManager::StatValue>(std::abs(a_DeltaPos.y) * 100 + 0.5));
 			}
 			// TODO: good opportunity to detect illegal flight (check for falling tho)
 		}
@@ -2705,15 +2753,15 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 	{
 		switch (m_AttachedTo->GetEntityType())
 		{
-			case cEntity::etMinecart: m_Stats.AddValue(statDistMinecart, Value); break;
-			case cEntity::etBoat:     m_Stats.AddValue(statDistBoat,     Value); break;
+			case cEntity::etMinecart: m_Stats.AddValue(Statistic::MinecartOneCm, Value); break;
+			case cEntity::etBoat:     m_Stats.AddValue(Statistic::BoatOneCm,     Value); break;
 			case cEntity::etMonster:
 			{
 				cMonster * Monster = static_cast<cMonster *>(m_AttachedTo);
 				switch (Monster->GetMobType())
 				{
-					case mtPig:   m_Stats.AddValue(statDistPig,   Value); break;
-					case mtHorse: m_Stats.AddValue(statDistHorse, Value); break;
+					case mtPig:   m_Stats.AddValue(Statistic::PigOneCm,   Value); break;
+					case mtHorse: m_Stats.AddValue(Statistic::HorseOneCm, Value); break;
 					default: break;
 				}
 				break;
@@ -2825,11 +2873,10 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 	bool HasInitializedBounds = false;
 	for (auto blk: a_Blocks)
 	{
-		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(blk.m_BlockType);
 		int x = blk.GetX();
 		int y = blk.GetY();
 		int z = blk.GetZ();
-		cBoundingBox BlockBox = BlockHandler->GetPlacementCollisionBox(
+		cBoundingBox BlockBox = cBlockHandler::For(blk.m_BlockType).GetPlacementCollisionBox(
 			m_World->GetBlock(x - 1, y, z),
 			m_World->GetBlock(x + 1, y, z),
 			(y == 0) ? E_BLOCK_AIR : m_World->GetBlock(x, y - 1, z),
@@ -2917,8 +2964,7 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 		m_World->PlaceBlock(blk.GetAbsolutePos(), blk.m_BlockType, blk.m_BlockMeta);
 
 		// Notify the blockhandlers:
-		cBlockHandler * newBlock = BlockHandler(blk.m_BlockType);
-		newBlock->OnPlacedByPlayer(ChunkInterface, *m_World, *this, blk);
+		cBlockHandler::For(blk.m_BlockType).OnPlacedByPlayer(ChunkInterface, *m_World, *this, blk);
 
 		// Call the "placed" hooks:
 		pm->CallHookPlayerPlacedBlock(*this, blk);
@@ -3110,61 +3156,99 @@ bool cPlayer::IsInsideWater()
 
 float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 {
-	float f = GetEquippedItem().GetHandler()->GetBlockBreakingStrength(a_Block);
-	if (f > 1.0f)
+	// Based on: https://minecraft.gamepedia.com/Breaking#Speed
+
+	// Get the base speed multiplier of the equipped tool for the mined block
+	float MiningSpeed = GetEquippedItem().GetHandler()->GetBlockBreakingStrength(a_Block);
+
+	// If we can harvest the block then we can apply material and enchantment bonuses
+	if (GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block))
 	{
-		unsigned int efficiencyModifier = GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchEfficiency);
-		if (efficiencyModifier > 0)
+		if (MiningSpeed > 1.0f)  // If the base multiplier for this block is greater than 1, now we can check enchantments
 		{
-			f += (efficiencyModifier * efficiencyModifier) + 1;
+			unsigned int EfficiencyModifier = GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchEfficiency);
+			if (EfficiencyModifier > 0)  // If an efficiency enchantment is present, apply formula as on wiki
+			{
+				MiningSpeed += (EfficiencyModifier * EfficiencyModifier) + 1;
+			}
 		}
 	}
+	else  // If we can't harvest the block then no bonuses:
+	{
+		MiningSpeed = 1;
+	}
 
+	// Haste increases speed by 20% per level
 	auto Haste = GetEntityEffect(cEntityEffect::effHaste);
 	if (Haste != nullptr)
 	{
 		int intensity = Haste->GetIntensity() + 1;
-		f *= 1.0f + (intensity * 0.2f);
+		MiningSpeed *= 1.0f + (intensity * 0.2f);
 	}
 
+	// Mining fatigue decreases speed a lot
 	auto MiningFatigue = GetEntityEffect(cEntityEffect::effMiningFatigue);
 	if (MiningFatigue != nullptr)
 	{
 		int intensity = MiningFatigue->GetIntensity();
 		switch (intensity)
 		{
-			case 0:  f *= 0.3f;     break;
-			case 1:  f *= 0.09f;    break;
-			case 2:  f *= 0.0027f;  break;
-			default: f *= 0.00081f; break;
+			case 0:  MiningSpeed *= 0.3f;     break;
+			case 1:  MiningSpeed *= 0.09f;    break;
+			case 2:  MiningSpeed *= 0.0027f;  break;
+			default: MiningSpeed *= 0.00081f; break;
 
 		}
 	}
 
+	// 5x speed loss for being in water
 	if (IsInsideWater() && !(GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) > 0))
 	{
-		f /= 5.0f;
+		MiningSpeed /= 5.0f;
 	}
 
+	// 5x speed loss for not touching ground
 	if (!IsOnGround())
 	{
-		f /= 5.0f;
+		MiningSpeed /= 5.0f;
 	}
 
-	return f;
+	return MiningSpeed;
 }
 
 
 
 
 
-float cPlayer::GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block)
+float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 {
-	float blockHardness = cBlockInfo::GetHardness(a_Block);
-	float digSpeed = GetDigSpeed(a_Block);
-	float canHarvestBlockDivisor = GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block) ? 30.0f : 100.0f;
-	// LOGD("blockHardness: %f, digSpeed: %f, canHarvestBlockDivisor: %f\n", blockHardness, digSpeed, canHarvestBlockDivisor);
-	return (blockHardness < 0) ? 0 : ((digSpeed / blockHardness) / canHarvestBlockDivisor);
+	// Based on https://minecraft.gamepedia.com/Breaking#Calculation
+	// If we know it's instantly breakable then quit here:
+	if (cBlockInfo::IsOneHitDig(a_Block))
+	{
+		return 1;
+	}
+
+	const bool CanHarvest = GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block);
+	const float BlockHardness = cBlockInfo::GetHardness(a_Block) * (CanHarvest ? 1.5f : 5.0f);
+	ASSERT(BlockHardness > 0);  // Can't divide by 0 or less, IsOneHitDig should have returned true
+
+	// LOGD("Time to mine block = %f", BlockHardness/DigSpeed);
+	// Number of ticks to mine = (20 * BlockHardness)/DigSpeed;
+	// Therefore take inverse to get fraction mined per tick:
+	return GetDigSpeed(a_Block) / (20.0f * BlockHardness);
+}
+
+
+
+
+
+bool cPlayer::CanInstantlyMine(BLOCKTYPE a_Block)
+{
+	// Based on: https://minecraft.gamepedia.com/Breaking#Calculation
+
+	// If the dig speed is greater than 30 times the hardness, then the wiki says we can instantly mine:
+	return GetDigSpeed(a_Block) > (30 * cBlockInfo::GetHardness(a_Block));
 }
 
 

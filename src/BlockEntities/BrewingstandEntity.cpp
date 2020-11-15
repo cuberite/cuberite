@@ -156,6 +156,8 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 {
+	a_Player->GetStatManager().AddValue(Statistic::InteractWithBrewingstand);
+
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
 	{
@@ -187,7 +189,7 @@ bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 
 
 
-void cBrewingstandEntity::BroadcastProgress(short a_ProgressbarID, short a_Value)
+void cBrewingstandEntity::BroadcastProgress(size_t a_ProgressbarID, short a_Value)
 {
 	cWindow * Window = GetWindow();
 	if (Window != nullptr)

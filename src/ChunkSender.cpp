@@ -11,7 +11,6 @@
 #include "ChunkSender.h"
 #include "World.h"
 #include "BlockEntities/BlockEntity.h"
-#include "Protocol/ChunkDataSerializer.h"
 #include "ClientHandle.h"
 #include "Chunk.h"
 
@@ -34,7 +33,7 @@ class cNotifyChunkSender :
 			a_Coords.m_ChunkX, a_Coords.m_ChunkZ,
 			[&ChunkSender] (cChunk & a_Chunk) -> bool
 			{
-				ChunkSender.QueueSendChunkTo(a_Chunk.GetPosX(), a_Chunk.GetPosZ(), cChunkSender::E_CHUNK_PRIORITY_MIDHIGH, a_Chunk.GetAllClients());
+				ChunkSender.QueueSendChunkTo(a_Chunk.GetPosX(), a_Chunk.GetPosZ(), cChunkSender::Priority::High, a_Chunk.GetAllClients());
 				return true;
 			}
 		);
@@ -61,7 +60,8 @@ public:
 
 cChunkSender::cChunkSender(cWorld & a_World) :
 	Super("ChunkSender"),
-	m_World(a_World)
+	m_World(a_World),
+	m_Serializer(m_World.GetDimension())
 {
 }
 
@@ -89,7 +89,7 @@ void cChunkSender::Stop(void)
 
 
 
-void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cClientHandle * a_Client)
+void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cClientHandle * a_Client)
 {
 	ASSERT(a_Client != nullptr);
 	{
@@ -99,7 +99,7 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 		if (iter != m_ChunkInfo.end())
 		{
 			auto & info = iter->second;
-			if (info.m_Priority > a_Priority)
+			if (info.m_Priority < a_Priority)  // Was the chunk's priority boosted?
 			{
 				m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
 				info.m_Priority = a_Priority;
@@ -121,7 +121,7 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 
 
 
-void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cChunkClientHandles a_Clients)
+void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cChunkClientHandles a_Clients)
 {
 	{
 		cChunkCoords Chunk{a_ChunkX, a_ChunkZ};
@@ -130,7 +130,7 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 		if (iter != m_ChunkInfo.end())
 		{
 			auto & info = iter->second;
-			if (info.m_Priority > a_Priority)
+			if (info.m_Priority < a_Priority)  // Was the chunk's priority boosted?
 			{
 				m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
 				info.m_Priority = a_Priority;
@@ -246,11 +246,8 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 		return;
 	}
 
-	{
-		// Send:
-		cChunkDataSerializer Data(a_ChunkX, a_ChunkZ, m_Data, m_BiomeMap, m_World.GetDimension());
-		Data.SendToClients(a_Clients);
-	}
+	// Send:
+	m_Serializer.SendToClients(a_ChunkX, a_ChunkZ, m_Data, m_BiomeMap, a_Clients);
 
 	for (const auto Client : a_Clients)
 	{

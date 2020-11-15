@@ -5,16 +5,14 @@
 #include "Mixins.h"
 
 
-class cBlockObserverHandler:
+class cBlockObserverHandler final :
 	public cClearMetaOnDrop<cPitchYawRotator<cBlockHandler>>
 {
 	using Super = cClearMetaOnDrop<cPitchYawRotator<cBlockHandler>>;
 
 public:
 
-	cBlockObserverHandler(BLOCKTYPE a_BlockType) : Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
 	inline static Vector3i GetObservingFaceOffset(NIBBLETYPE a_Meta)
 	{

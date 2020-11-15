@@ -152,9 +152,8 @@ public:
 	} ;
 
 
-
-	using cParts = std::vector<cBasePart *>;
-
+	/** the parts have to be allocated with new else the part specific parts are not saved (only the cBasePart members). */
+	using cParts = std::vector<std::unique_ptr<cBasePart>>;
 
 	/** Creates a new empty chat message.
 	Exported manually due to the other overload needing a manual export. */
@@ -165,6 +164,12 @@ public:
 	Uses ParseText() for the actual parsing.
 	Exported manually due to ToLua++ generating extra output parameter. */
 	cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType = mtCustom);
+
+	cCompositeChat(cCompositeChat && a_Other) = default;
+
+	/** Copy constructor is explicitly deleted because m_Parts is not copyable. */
+	cCompositeChat(cCompositeChat & a_Other) = delete;
+	cCompositeChat(const cCompositeChat & a_Other) = delete;
 
 	~cCompositeChat();  // tolua_export
 

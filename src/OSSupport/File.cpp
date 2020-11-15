@@ -6,7 +6,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "File.h"
-#include <fstream>
 #include <sys/stat.h>
 #ifdef _WIN32
 	#include <share.h>  // for _SH_DENYWRITE

@@ -155,12 +155,13 @@ target_sources(
 	WebAdmin.h
 	World.h
 	XMLParser.h
+	main.h
 )
 
 set(FOLDERS
 	Bindings BlockEntities Blocks Entities
 	Generating HTTP Items mbedTLS++ Mobs Noise
-	OSSupport Protocol Registries Simulator
+	OSSupport Physics Protocol Registries Simulator
 	Simulator/IncrementalRedstoneSimulator UI WorldStorage
 )
 
@@ -173,7 +174,7 @@ file(WRITE "${CMAKE_BINARY_DIR}/include/Globals.h"
 	"/* This file allows Globals.h to be included with an absolute path */\n#include \"${PROJECT_SOURCE_DIR}/src/Globals.h\"\n")
 
 configure_file("BuildInfo.h.cmake" "${CMAKE_BINARY_DIR}/include/BuildInfo.h")
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_BINARY_DIR}/include/")
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_BINARY_DIR}/include/" ".")
 
 # Generate AllFiles.lst for CheckBasicStyle.lua
 get_target_property(ALL_FILES ${CMAKE_PROJECT_NAME} SOURCES)

@@ -10,7 +10,9 @@ public:
 		noID = -1,
 	};
 
+	cSettingsRepositoryInterface() = default;
 	virtual ~cSettingsRepositoryInterface() = default;
+	DISALLOW_COPY_AND_ASSIGN(cSettingsRepositoryInterface);
 
 	/** Returns true iff the specified key exists */
 	virtual bool KeyExists(const AString keyname) const = 0;

@@ -15,6 +15,7 @@ Declares the 1.8 protocol classes:
 
 #include "Protocol.h"
 #include "../ByteBuffer.h"
+#include "../Registries/Statistics.h"
 
 #include "../mbedTLS++/AesCfb128Decryptor.h"
 #include "../mbedTLS++/AesCfb128Encryptor.h"
@@ -30,7 +31,7 @@ class cProtocol_1_8_0:
 
 public:
 
-	cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State);
 
 	/** Called when client sends some data: */
 	virtual void DataReceived(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size) override;
@@ -63,7 +64,7 @@ public:
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) override;
 	virtual void SendExperience                 (void) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
-	virtual void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) override;
+	virtual void SendExplosion                  (Vector3f a_Position, float a_Power) override;
 	virtual void SendGameMode                   (eGameMode a_GameMode) override;
 	virtual void SendHealth                     (void) override;
 	virtual void SendHeldItemChange             (int a_ItemIndex) override;
@@ -119,7 +120,7 @@ public:
 	virtual void SendWholeInventory             (const cWindow & a_Window) override;
 	virtual void SendWindowClose                (const cWindow & a_Window) override;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) override;
-	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) override;
+	virtual void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value) override;
 
 	virtual AString GetAuthServerID(void) override { return m_AuthServerID; }
 
@@ -133,22 +134,8 @@ public:
 
 protected:
 
-	AString m_ServerAddress;
-
-	UInt16 m_ServerPort;
-
-	AString m_AuthServerID;
-
-	/** State of the protocol. 1 = status, 2 = login, 3 = game */
-	UInt32 m_State;
-
-	bool m_IsEncrypted;
-
-	cAesCfb128Decryptor m_Decryptor;
-	cAesCfb128Encryptor m_Encryptor;
-
-	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
-	cFile m_CommLogFile;
+	/** State of the protocol. */
+	State m_State;
 
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
 	virtual void AddReceivedData(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size);
@@ -206,7 +193,6 @@ protected:
 	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel */
 	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel);
 
-
 	/** Sends the data to the client, encrypting them if needed. */
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
@@ -225,7 +211,7 @@ protected:
 
 	/** Converts the BlockFace received by the protocol into eBlockFace constants.
 	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
-	eBlockFace FaceIntToBlockFace(Int8 a_FaceInt);
+	static eBlockFace FaceIntToBlockFace(Int32 a_FaceInt);
 
 	/** Sends the entity type and entity-dependent data required for the entity to initially spawn. */
 	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData);
@@ -247,6 +233,18 @@ protected:
 
 private:
 
+	AString m_ServerAddress;
+
+	AString m_AuthServerID;
+
+	bool m_IsEncrypted;
+
+	cAesCfb128Decryptor m_Decryptor;
+	cAesCfb128Encryptor m_Encryptor;
+
+	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
+	cFile m_CommLogFile;
+
 	/** Sends an entity teleport packet.
 	Mitigates a 1.8 bug where the position in the entity spawn packet is ignored,
 	and so entities don't show up until a teleport is sent. */
@@ -254,5 +252,10 @@ private:
 
 	/** Converts an entity to a protocol-specific entity type.
 	Only entities that the Send Spawn Entity packet supports are valid inputs to this method */
-	UInt8 GetProtocolEntityType(const cEntity & a_Entity);
+	static UInt8 GetProtocolEntityType(const cEntity & a_Entity);
+
+	/** Converts a statistic to a protocol-specific string.
+	Protocols <= 1.12 use strings, hence this is a static as the string-mapping was append-only for the versions that used it.
+	Returns an empty string, handled correctly by the client, for newer, unsupported statistics. */
+	static const char * GetProtocolStatisticName(Statistic a_Statistic);
 } ;

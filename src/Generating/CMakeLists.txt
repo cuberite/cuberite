@@ -24,6 +24,7 @@ target_sources(
 	PrefabStructure.cpp
 	Ravines.cpp
 	RoughRavines.cpp
+	SinglePieceStructuresGen.cpp
 	StructGen.cpp
 	Trees.cpp
 	TwoHeights.cpp
@@ -58,6 +59,7 @@ target_sources(
 	Ravines.h
 	RoughRavines.h
 	ShapeGen.cpp
+	SinglePieceStructuresGen.h
 	StructGen.h
 	Trees.h
 	TwoHeights.h

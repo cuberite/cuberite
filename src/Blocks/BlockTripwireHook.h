@@ -7,21 +7,28 @@
 
 
 
-class cBlockTripwireHookHandler :
+class cBlockTripwireHookHandler final :
 	public cMetaRotator<cClearMetaOnDrop<cBlockHandler>, 0x03, 0x02, 0x03, 0x00, 0x01>
 {
 	using Super = cMetaRotator<cClearMetaOnDrop<cBlockHandler>, 0x03, 0x02, 0x03, 0x00, 0x01>;
 
 public:
 
-	cBlockTripwireHookHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
+	using Super::Super;
+
+	inline static eBlockFace MetadataToDirection(NIBBLETYPE a_Meta)
 	{
+		switch (a_Meta & 0x03)
+		{
+			case 0x1: return BLOCK_FACE_XM;
+			case 0x3: return BLOCK_FACE_XP;
+			case 0x2: return BLOCK_FACE_ZM;
+			case 0x0: return BLOCK_FACE_ZP;
+			default: ASSERT(!"Unhandled tripwire hook metadata!"); return BLOCK_FACE_NONE;
+		}
 	}
 
-
-
-
+private:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface,
@@ -30,7 +37,7 @@ public:
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		a_BlockType = m_BlockType;
 
@@ -71,23 +78,7 @@ public:
 
 
 
-	inline static eBlockFace MetadataToDirection(NIBBLETYPE a_Meta)
-	{
-		switch (a_Meta & 0x03)
-		{
-			case 0x1: return BLOCK_FACE_XM;
-			case 0x3: return BLOCK_FACE_XP;
-			case 0x2: return BLOCK_FACE_ZM;
-			case 0x0: return BLOCK_FACE_ZP;
-			default: ASSERT(!"Unhandled tripwire hook metadata!"); return BLOCK_FACE_NONE;
-		}
-	}
-
-
-
-
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		const auto Meta = a_Chunk.GetMeta(a_RelPos);
 		const auto RearPosition = AddFaceDirection(a_RelPos, MetadataToDirection(Meta), true);
@@ -105,7 +96,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 0;

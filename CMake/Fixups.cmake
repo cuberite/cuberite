@@ -4,4 +4,12 @@ function(emit_fixups)
 		# https://tls.mbed.org/kb/development/arm-thumb-error-r7-cannot-be-used-in-asm-here
 		target_compile_options(mbedcrypto PRIVATE -fomit-frame-pointer)
 	endif()
+
+	if(UNIX)
+		execute_process(COMMAND ldd OUTPUT_VARIABLE LDD_OUTPUT ERROR_VARIABLE LDD_OUTPUT)
+		if (LDD_OUTPUT MATCHES musl)
+			# Bring musl stack size in line with other platforms:
+			target_link_options(${CMAKE_PROJECT_NAME} PRIVATE "-Wl,-z,stack-size=1048576")
+		endif()
+	endif()
 endfunction()

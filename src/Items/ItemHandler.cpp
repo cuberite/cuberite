@@ -24,6 +24,7 @@
 #include "ItemDoor.h"
 #include "ItemDye.h"
 #include "ItemEmptyMap.h"
+#include "ItemEnchantingTable.h"
 #include "ItemEyeOfEnder.h"
 #include "ItemFishingRod.h"
 #include "ItemFood.h"
@@ -114,6 +115,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BANNER:              return new cItemBannerHandler(a_ItemType);
 		case E_BLOCK_BIG_FLOWER:         return new cItemBigFlowerHandler;
 		case E_BLOCK_CHEST:              return new cItemChestHandler(a_ItemType);
+		case E_BLOCK_ENCHANTMENT_TABLE:  return new cItemEnchantingTableHandler(a_ItemType);
 		case E_BLOCK_LEAVES:             return new cItemLeavesHandler(a_ItemType);
 		case E_BLOCK_LILY_PAD:           return new cItemLilypadHandler(a_ItemType);
 		case E_BLOCK_HEAD:               return new cItemMobHeadHandler(a_ItemType);
@@ -370,9 +372,8 @@ bool cItemHandler::OnPlayerPlace(
 	cChunkInterface ChunkInterface(a_World.GetChunkMap());
 
 	// Check if the block ignores build collision (water, grass etc.):
-	auto HandlerB = BlockHandler(ClickedBlockType);
 	auto PlacedBlockPos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-	if (HandlerB->DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
+	if (cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
 	{
 		// Replace the clicked block:
 		a_World.DropBlockAsPickups(a_ClickedBlockPos, &a_Player, nullptr);
@@ -392,7 +393,7 @@ bool cItemHandler::OnPlayerPlace(
 
 		// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
 		// No need to do combinability (dblslab) checks, client will do that here.
-		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(ChunkInterface, PlacedBlockPos, a_Player, PlaceMeta))
+		if (!cBlockHandler::For(PlaceBlock).DoesIgnoreBuildCollision(ChunkInterface, PlacedBlockPos, a_Player, PlaceMeta))
 		{
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it
@@ -832,9 +833,8 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 		return false;
 	}
 
-	cBlockHandler * BlockH = BlockHandler(static_cast<BLOCKTYPE>(m_ItemType));
 	cChunkInterface ChunkInterface(a_World->GetChunkMap());
-	return BlockH->GetPlacementBlockTypeMeta(
+	return cBlockHandler::For(static_cast<BLOCKTYPE>(m_ItemType)).GetPlacementBlockTypeMeta(
 		ChunkInterface, *a_Player,
 		a_PlacedBlockPos, a_ClickedBlockFace,
 		a_CursorPos,

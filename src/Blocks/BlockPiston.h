@@ -15,20 +15,14 @@ class cWorld;
 
 
 
-class cBlockPistonHandler:
+class cBlockPistonHandler final :
 	public cClearMetaOnDrop<cPitchYawRotator<cBlockHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>>
 {
 	using Super = cClearMetaOnDrop<cPitchYawRotator<cBlockHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>>;
 
 public:
 
-	cBlockPistonHandler(BLOCKTYPE a_BlockType);
-
-	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-	) override;
+	using Super::Super;
 
 	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)
 	{
@@ -53,12 +47,6 @@ public:
 
 	static void ExtendPiston(Vector3i a_BlockPos, cWorld & a_World);
 	static void RetractPiston(Vector3i a_BlockPos, cWorld & a_World);
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
-	{
-		UNUSED(a_Meta);
-		return 11;
-	}
 
 	/** Returns true if the piston (with the specified meta) is extended */
 	static inline bool IsExtended(NIBBLETYPE a_PistonMeta) { return ((a_PistonMeta & 0x8) != 0x0); }
@@ -131,6 +119,19 @@ private:
 		Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
 	);
 
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	{
+		UNUSED(a_Meta);
+		return 11;
+	}
+
+	virtual void OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+	) const override;
+
 	/** Moves a list of blocks in a specific direction */
 	static void PushBlocks(const Vector3iSet & a_BlocksToPush,
 		cWorld & a_World, const Vector3i & a_PushDir
@@ -141,19 +142,24 @@ private:
 
 
 
-class cBlockPistonHeadHandler:
+class cBlockPistonHeadHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
 
 public:
-	cBlockPistonHeadHandler(void);
+
+	constexpr cBlockPistonHeadHandler(void) :
+		Super(E_BLOCK_PISTON_EXTENSION)
+	{
+	}
 
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-	) override;
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+	) const override;
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override;
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override;
 } ;

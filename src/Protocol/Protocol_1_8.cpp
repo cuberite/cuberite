@@ -9,6 +9,7 @@ Implements the 1.8 protocol classes:
 
 #include "Globals.h"
 #include "Protocol_1_8.h"
+#include "main.h"
 #include "../mbedTLS++/Sha1Checksum.h"
 #include "Packetizer.h"
 
@@ -19,7 +20,6 @@ Implements the 1.8 protocol classes:
 #include "../EffectID.h"
 #include "../StringCompression.h"
 #include "../CompositeChat.h"
-#include "../Statistics.h"
 #include "../UUID.h"
 #include "../World.h"
 #include "../JsonUtils.h"
@@ -45,6 +45,7 @@ Implements the 1.8 protocol classes:
 #include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
+#include "../BlockEntities/EnchantingTableEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
@@ -92,21 +93,13 @@ static const UInt32 CompressionThreshold = 256;  // After how large a packet sho
 
 
 
-// fwd: main.cpp:
-extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_8_0:
 
-cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State) :
 	Super(a_Client),
-	m_ServerAddress(a_ServerAddress),
-	m_ServerPort(a_ServerPort),
 	m_State(a_State),
+	m_ServerAddress(a_ServerAddress),
 	m_IsEncrypted(false)
 {
 	AStringVector Params;
@@ -385,19 +378,24 @@ void cProtocol_1_8_0::SendDisconnect(const AString & a_Reason)
 {
 	switch (m_State)
 	{
-		case 2:
+		case State::Login:
 		{
-			// During login:
 			cPacketizer Pkt(*this, pktDisconnectDuringLogin);
 			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
 			break;
 		}
-		case 3:
+		case State::Game:
 		{
-			// In-game:
 			cPacketizer Pkt(*this, pktDisconnectDuringGame);
 			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
 			break;
+		}
+		default:
+		{
+			FLOGERROR(
+				"Tried to send disconnect in invalid game state {0}",
+				static_cast<int>(m_State)
+			);
 		}
 	}
 }
@@ -622,25 +620,19 @@ void cProtocol_1_8_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cProtocol_1_8_0::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
+void cProtocol_1_8_0::SendExplosion(const Vector3f a_Position, const float a_Power)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktExplosion);
-	Pkt.WriteBEFloat(static_cast<float>(a_BlockX));
-	Pkt.WriteBEFloat(static_cast<float>(a_BlockY));
-	Pkt.WriteBEFloat(static_cast<float>(a_BlockZ));
-	Pkt.WriteBEFloat(static_cast<float>(a_Radius));
-	Pkt.WriteBEUInt32(static_cast<UInt32>(a_BlocksAffected.size()));
-	for (cVector3iArray::const_iterator itr = a_BlocksAffected.begin(), end = a_BlocksAffected.end(); itr != end; ++itr)
-	{
-		Pkt.WriteBEInt8(static_cast<Int8>(itr->x));
-		Pkt.WriteBEInt8(static_cast<Int8>(itr->y));
-		Pkt.WriteBEInt8(static_cast<Int8>(itr->z));
-	}  // for itr - a_BlockAffected[]
-	Pkt.WriteBEFloat(static_cast<float>(a_PlayerMotion.x));
-	Pkt.WriteBEFloat(static_cast<float>(a_PlayerMotion.y));
-	Pkt.WriteBEFloat(static_cast<float>(a_PlayerMotion.z));
+	Pkt.WriteBEFloat(a_Position.x);
+	Pkt.WriteBEFloat(a_Position.y);
+	Pkt.WriteBEFloat(a_Position.z);
+	Pkt.WriteBEFloat(a_Power);
+	Pkt.WriteBEUInt32(0);
+	Pkt.WriteBEFloat(0);
+	Pkt.WriteBEFloat(0);
+	Pkt.WriteBEFloat(0);
 }
 
 
@@ -804,7 +796,7 @@ void cProtocol_1_8_0::SendLoginSuccess(void)
 		Pkt.WriteVarInt32(CompressionThreshold);
 	}
 
-	m_State = 3;  // State = Game
+	m_State = State::Game;
 
 	{
 		cPacketizer Pkt(*this, pktLoginSuccess);
@@ -1422,18 +1414,26 @@ void cProtocol_1_8_0::SendStatistics(const cStatManager & a_Manager)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktStatistics);
-	Pkt.WriteVarInt32(statCount);  // TODO 2014-05-11 xdot: Optimization: Send "dirty" statistics only
-
-	size_t Count = static_cast<size_t>(statCount);
-	for (size_t i = 0; i < Count; ++i)
+	UInt32 Size = 0;
+	a_Manager.ForEachStatisticType([&Size](const auto & Store)
 	{
-		StatValue Value = a_Manager.GetValue(static_cast<eStatistic>(i));
-		const AString & StatName = cStatInfo::GetName(static_cast<eStatistic>(i));
+		Size += static_cast<UInt32>(Store.size());
+	});
 
-		Pkt.WriteString(StatName);
-		Pkt.WriteVarInt32(static_cast<UInt32>(Value));
-	}
+	// No need to check Size != 0
+	// Assume that the vast majority of the time there's at least one statistic to send
+
+	cPacketizer Pkt(*this, pktStatistics);
+	Pkt.WriteVarInt32(Size);
+
+	a_Manager.ForEachStatisticType([&Pkt](const cStatManager::CustomStore & Store)
+	{
+		for (const auto & Item : Store)
+		{
+			Pkt.WriteString(GetProtocolStatisticName(Item.first));
+			Pkt.WriteVarInt32(static_cast<UInt32>(Item.second));
+		}
+	});
 }
 
 
@@ -1540,6 +1540,8 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 		case E_BLOCK_WALL_BANNER:
 		case E_BLOCK_STANDING_BANNER: Action = 6; break;  // Update Banner
 		case E_BLOCK_BED:             Action = 11; break;  // Update bed color
+		case E_BLOCK_ENCHANTMENT_TABLE: Action = 0; break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
+		case E_BLOCK_END_PORTAL:        Action = 0; break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
 		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
 	}
 	Pkt.WriteBEUInt8(Action);
@@ -1694,13 +1696,13 @@ void cProtocol_1_8_0::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, size_t a_Property, short a_Value)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktWindowProperty);
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
-	Pkt.WriteBEInt16(a_Property);
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Property));
 	Pkt.WriteBEInt16(a_Value);
 }
 
@@ -1725,7 +1727,8 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 		----------------------------------------------
 		*/
 		const UInt32 DataSize = 0;
-		const auto PacketSize = cByteBuffer::GetVarIntSize(DataSize) + UncompressedSize;
+		const auto PacketSize = static_cast<UInt32>(
+			cByteBuffer::GetVarIntSize(DataSize) + UncompressedSize);
 
 		cByteBuffer LengthHeaderBuffer(
 			cByteBuffer::GetVarIntSize(PacketSize) +
@@ -1739,7 +1742,7 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 		LengthHeaderBuffer.ReadAll(LengthData);
 
 		a_CompressedData.reserve(LengthData.size() + UncompressedSize);
-		a_CompressedData.append(LengthData.data(), LengthData.size());
+		a_CompressedData.assign(LengthData.data(), LengthData.size());
 		a_CompressedData.append(a_Packet);
 
 		return true;
@@ -1776,8 +1779,9 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 		return false;
 	}
 
-	const UInt32 DataSize = UncompressedSize;
-	const auto PacketSize = cByteBuffer::GetVarIntSize(DataSize) + CompressedSize;
+	const UInt32 DataSize = static_cast<UInt32>(UncompressedSize);
+	const auto PacketSize = static_cast<UInt32>(
+		cByteBuffer::GetVarIntSize(DataSize) + CompressedSize);
 
 	cByteBuffer LengthHeaderBuffer(
 		cByteBuffer::GetVarIntSize(PacketSize) +
@@ -1790,8 +1794,8 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 	AString LengthData;
 	LengthHeaderBuffer.ReadAll(LengthData);
 
-	a_CompressedData.reserve(LengthData.size() + DataSize);
-	a_CompressedData.append(LengthData.data(), LengthData.size());
+	a_CompressedData.reserve(LengthData.size() + CompressedSize);
+	a_CompressedData.assign(LengthData.data(), LengthData.size());
 	a_CompressedData.append(CompressedData, CompressedSize);
 
 	return true;
@@ -2208,7 +2212,7 @@ UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType)
 
 cProtocol::Version cProtocol_1_8_0::GetProtocolVersion()
 {
-	return Version::Version_1_8_0;
+	return Version::v1_8_0;
 }
 
 
@@ -2219,9 +2223,8 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 {
 	switch (m_State)
 	{
-		case 1:
+		case State::Status:
 		{
-			// Status
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
@@ -2230,9 +2233,8 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			break;
 		}
 
-		case 2:
+		case State::Login:
 		{
-			// Login
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketLoginStart             (a_ByteBuffer); return true;
@@ -2241,9 +2243,8 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			break;
 		}
 
-		case 3:
+		case State::Game:
 		{
-			// Game
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketKeepAlive              (a_ByteBuffer); return true;
@@ -2274,23 +2275,6 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 				case 0x19: HandlePacketResourcePackStatus     (a_ByteBuffer); return true;
 			}
 			break;
-		}
-		default:
-		{
-			// Received a packet in an unknown state, report:
-			LOGWARNING("Received a packet in an unknown protocol state %d. Ignoring further packets.", m_State);
-
-			// Cannot kick the client - we don't know this state and thus the packet number for the kick packet
-
-			// Switch to a state when all further packets are silently ignored:
-			m_State = 255;
-			return false;
-		}
-		case 255:
-		{
-			// This is the state used for "not processing packets anymore" when we receive a bad packet from a client.
-			// Do not output anything (the caller will do that for us), just return failure
-			return false;
 		}
 	}  // switch (m_State)
 
@@ -2568,7 +2552,7 @@ void cProtocol_1_8_0::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 		case 2:
 		{
 			// Open Inventory achievement
-			m_Client->GetPlayer()->AwardAchievement(achOpenInv);
+			m_Client->GetPlayer()->AwardAchievement(Statistic::AchOpenInventory);
 			break;
 		}
 	}
@@ -3168,7 +3152,7 @@ void cProtocol_1_8_0::StartEncryption(const Byte * a_Key)
 
 
 
-eBlockFace cProtocol_1_8_0::FaceIntToBlockFace(Int8 a_BlockFace)
+eBlockFace cProtocol_1_8_0::FaceIntToBlockFace(const Int32 a_BlockFace)
 {
 	// Normalize the blockface values returned from the protocol
 	// Anything known gets mapped 1:1, everything else returns BLOCK_FACE_NONE
@@ -3425,6 +3409,29 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 			{
 				Writer.AddString("LastOutput", Printf("{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str()));
 			}
+			break;
+		}
+
+		case E_BLOCK_ENCHANTMENT_TABLE:
+		{
+			auto & EnchantingTableEntity = static_cast<const cEnchantingTableEntity &>(a_BlockEntity);
+			Writer.AddInt("x", EnchantingTableEntity.GetPosX());
+			Writer.AddInt("y", EnchantingTableEntity.GetPosY());
+			Writer.AddInt("z", EnchantingTableEntity.GetPosZ());
+			if (!EnchantingTableEntity.GetCustomName().empty())
+			{
+				Writer.AddString("CustomName", EnchantingTableEntity.GetCustomName());
+			}
+			Writer.AddString("id", "EnchantingTable");
+			break;
+		}
+
+		case E_BLOCK_END_PORTAL:
+		{
+			Writer.AddInt("x", a_BlockEntity.GetPosX());
+			Writer.AddInt("y", a_BlockEntity.GetPosY());
+			Writer.AddInt("z", a_BlockEntity.GetPosZ());
+			Writer.AddString("id", "EndPortal");
 			break;
 		}
 
@@ -3995,4 +4002,105 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity)
 		case Type::etPainting: UNREACHABLE("Tried to spawn an unhandled entity");
 	}
 	UNREACHABLE("Unhandled entity kind");
+}
+
+
+
+
+
+const char * cProtocol_1_8_0::GetProtocolStatisticName(Statistic a_Statistic)
+{
+	switch (a_Statistic)
+	{
+		// V1.8 Achievements
+		case Statistic::AchOpenInventory:        return "achievement.openInventory";
+		case Statistic::AchMineWood:             return "achievement.mineWood";
+		case Statistic::AchBuildWorkBench:       return "achievement.buildWorkBench";
+		case Statistic::AchBuildPickaxe:         return "achievement.buildPickaxe";
+		case Statistic::AchBuildFurnace:         return "achievement.buildFurnace";
+		case Statistic::AchAcquireIron:          return "achievement.acquireIron";
+		case Statistic::AchBuildHoe:             return "achievement.buildHoe";
+		case Statistic::AchMakeBread:            return "achievement.makeBread";
+		case Statistic::AchBakeCake:             return "achievement.bakeCake";
+		case Statistic::AchBuildBetterPickaxe:   return "achievement.buildBetterPickaxe";
+		case Statistic::AchCookFish:             return "achievement.cookFish";
+		case Statistic::AchOnARail:              return "achievement.onARail";
+		case Statistic::AchBuildSword:           return "achievement.buildSword";
+		case Statistic::AchKillEnemy:            return "achievement.killEnemy";
+		case Statistic::AchKillCow:              return "achievement.killCow";
+		case Statistic::AchFlyPig:               return "achievement.flyPig";
+		case Statistic::AchSnipeSkeleton:        return "achievement.snipeSkeleton";
+		case Statistic::AchDiamonds:             return "achievement.diamonds";
+		case Statistic::AchPortal:               return "achievement.portal";
+		case Statistic::AchGhast:                return "achievement.ghast";
+		case Statistic::AchBlazeRod:             return "achievement.blazeRod";
+		case Statistic::AchPotion:               return "achievement.potion";
+		case Statistic::AchTheEnd:               return "achievement.theEnd";
+		case Statistic::AchTheEnd2:              return "achievement.theEnd2";
+		case Statistic::AchEnchantments:         return "achievement.enchantments";
+		case Statistic::AchOverkill:             return "achievement.overkill";
+		case Statistic::AchBookcase:             return "achievement.bookcase";
+		case Statistic::AchExploreAllBiomes:     return "achievement.exploreAllBiomes";
+		case Statistic::AchSpawnWither:          return "achievement.spawnWither";
+		case Statistic::AchKillWither:           return "achievement.killWither";
+		case Statistic::AchFullBeacon:           return "achievement.fullBeacon";
+		case Statistic::AchBreedCow:             return "achievement.breedCow";
+		case Statistic::AchDiamondsToYou:        return "achievement.diamondsToYou";
+
+		// V1.8 stats
+		case Statistic::AnimalsBred:               return "stat.animalsBred";
+		case Statistic::BoatOneCm:                 return "stat.boatOneCm";
+		case Statistic::ClimbOneCm:                return "stat.climbOneCm";
+		case Statistic::CrouchOneCm:               return "stat.crouchOneCm";
+		case Statistic::DamageDealt:               return "stat.damageDealt";
+		case Statistic::DamageTaken:               return "stat.damageTaken";
+		case Statistic::Deaths:                    return "stat.deaths";
+		case Statistic::Drop:                      return "stat.drop";
+		case Statistic::FallOneCm:                 return "stat.fallOneCm";
+		case Statistic::FishCaught:                return "stat.fishCaught";
+		case Statistic::FlyOneCm:                  return "stat.flyOneCm";
+		case Statistic::HorseOneCm:                return "stat.horseOneCm";
+		case Statistic::Jump:                      return "stat.jump";
+		case Statistic::LeaveGame:                 return "stat.leaveGame";
+		case Statistic::MinecartOneCm:             return "stat.minecartOneCm";
+		case Statistic::MobKills:                  return "stat.mobKills";
+		case Statistic::PigOneCm:                  return "stat.pigOneCm";
+		case Statistic::PlayerKills:               return "stat.playerKills";
+		case Statistic::PlayOneMinute:             return "stat.playOneMinute";
+		case Statistic::SprintOneCm:               return "stat.sprintOneCm";
+		case Statistic::SwimOneCm:                 return "stat.swimOneCm";
+		case Statistic::TalkedToVillager:          return "stat.talkedToVillager";
+		case Statistic::TimeSinceDeath:            return "stat.timeSinceDeath";
+		case Statistic::TradedWithVillager:        return "stat.tradedWithVillager";
+		case Statistic::WalkOneCm:                 return "stat.walkOneCm";
+		case Statistic::WalkUnderWaterOneCm:       return "stat.diveOneCm";
+
+		// V1.8.2 stats
+		case Statistic::CleanArmor:                return "stat.armorCleaned";
+		case Statistic::CleanBanner:               return "stat.bannerCleaned";
+		case Statistic::EatCakeSlice:              return "stat.cakeSlicesEaten";
+		case Statistic::EnchantItem:               return "stat.itemEnchanted";
+		case Statistic::FillCauldron:              return "stat.cauldronFilled";
+		case Statistic::InspectDispenser:          return "stat.dispenserInspected";
+		case Statistic::InspectDropper:            return "stat.dropperInspected";
+		case Statistic::InspectHopper:             return "stat.hopperInspected";
+		case Statistic::InteractWithBeacon:        return "stat.beaconInteraction";
+		case Statistic::InteractWithBrewingstand:  return "stat.brewingstandInteraction";
+		case Statistic::InteractWithCraftingTable: return "stat.craftingTableInteraction";
+		case Statistic::InteractWithFurnace:       return "stat.furnaceInteraction";
+		case Statistic::OpenChest:                 return "stat.chestOpened";
+		case Statistic::OpenEnderchest:            return "stat.enderchestOpened";
+		case Statistic::PlayNoteblock:             return "stat.noteblockPlayed";
+		case Statistic::PlayRecord:                return "stat.recordPlayed";
+		case Statistic::PotFlower:                 return "stat.flowerPotted";
+		case Statistic::TriggerTrappedChest:       return "stat.trappedChestTriggered";
+		case Statistic::TuneNoteblock:             return "stat.noteblockTuned";
+		case Statistic::UseCauldron:               return "stat.cauldronUsed";
+
+		// V1.9 stats
+		case Statistic::AviateOneCm:               return "stat.aviateOneCm";
+		case Statistic::SleepInBed:                return "stat.sleepInBed";
+		case Statistic::SneakTime:                 return "stat.sneakTime";
+		default:                                   return "";
+	}
 }

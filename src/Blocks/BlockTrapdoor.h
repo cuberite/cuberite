@@ -8,22 +8,18 @@
 
 
 
-class cBlockTrapdoorHandler :
-	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>
+class cBlockTrapdoorHandler final :
+	public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>
 {
-	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>;
+	using Super = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>;
 
 public:
 
-	cBlockTrapdoorHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-	virtual bool IsUseable(void) override
+	virtual bool IsUseable(void) const override
 	{
 		return true;
 	}
@@ -39,7 +35,7 @@ public:
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
-	) override
+	) const override
 	{
 		if (m_BlockType == E_BLOCK_IRON_TRAPDOOR)
 		{
@@ -65,7 +61,7 @@ public:
 		cPlayer & a_Player,
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace
-	) override
+	) const override
 	{
 		UNUSED(a_ChunkInterface);
 		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
@@ -82,15 +78,40 @@ public:
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
+		if (a_ClickedBlockFace == BLOCK_FACE_YP)
+		{
+			// Trapdoor is placed on top of a block.
+			// Engage yaw rotation to determine hinge direction:
+			return Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta);
+		}
+		else if (a_ClickedBlockFace == BLOCK_FACE_YM)
+		{
+			// Trapdoor is placed on bottom of a block.
+			// Engage yaw rotation to determine hinge direction:
+			if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta))
+			{
+				return false;
+			}
+
+			// Toggle 'Move up half-block' bit on:
+			a_BlockMeta |= 0x8;
+
+			return true;
+		}
+
+		// Placement on block sides; hinge direction is determined by which side was clicked:
 		a_BlockType = m_BlockType;
 		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
 
 		if (a_CursorPos.y > 7)
 		{
+			// Trapdoor is placed on a higher half of a vertical block.
+			// Toggle 'Move up half-block' bit on:
 			a_BlockMeta |= 0x8;
 		}
+
 		return true;
 	}
 
@@ -106,15 +127,12 @@ public:
 			case BLOCK_FACE_ZM: return 0x0;
 			case BLOCK_FACE_XP: return 0x3;
 			case BLOCK_FACE_XM: return 0x2;
-			case BLOCK_FACE_NONE:
-			case BLOCK_FACE_YM:
-			case BLOCK_FACE_YP:
+			default:
 			{
 				ASSERT(!"Unhandled block face!");
 				return 0;
 			}
 		}
-		UNREACHABLE("Unsupported block face");
 	}
 
 
@@ -141,7 +159,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		switch (m_BlockType)

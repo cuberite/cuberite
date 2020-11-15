@@ -12,15 +12,13 @@
 
 // tolua_begin
 
-class cBedEntity:
+class cBedEntity :
 	public cBlockEntity
 {
 	// tolua_end
 	using Super = cBlockEntity;
 
 public:  // tolua_export
-
-	BLOCKENTITY_PROTODEF(cBedEntity)
 
 	cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, short a_Color = E_META_WOOL_RED);
 
@@ -38,10 +36,12 @@ public:  // tolua_export
 	// tolua_end
 
 	// cBlockEntity overrides:
+	virtual cItems ConvertToPickups() const override;
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override { return false; }
 	virtual void SendTo(cClientHandle & a_Client) override;
 
 private:
+
 	short m_Color;
 };  // tolua_export

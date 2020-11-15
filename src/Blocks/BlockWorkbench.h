@@ -9,21 +9,16 @@
 
 
 
-class cBlockWorkbenchHandler:
+class cBlockWorkbenchHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
 
 public:
 
-	cBlockWorkbenchHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
-
-
-
+private:
 
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
@@ -32,8 +27,10 @@ public:
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
-	) override
+	) const override
 	{
+		a_Player.GetStatManager().AddValue(Statistic::InteractWithCraftingTable);
+
 		cWindow * Window = new cCraftingWindow();
 		a_Player.OpenWindow(*Window);
 		return true;
@@ -43,7 +40,7 @@ public:
 
 
 
-	virtual bool IsUseable(void) override
+	virtual bool IsUseable(void) const override
 	{
 		return true;
 	}
@@ -52,7 +49,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 13;

@@ -5,7 +5,7 @@
 
 namespace Palette_1_13_1
 {
-	UInt32 FromBlock(short ID)
+	UInt32 FromBlock(const short ID)
 	{
 		using namespace Block;
 
@@ -7072,7 +7072,7 @@ namespace Palette_1_13_1
 		}
 	}
 
-	UInt32 FromItem(Item ID)
+	UInt32 FromItem(const Item ID)
 	{
 		switch (ID)
 		{
@@ -7870,7 +7870,73 @@ namespace Palette_1_13_1
 		}
 	}
 
-	Item ToItem(UInt32 ID)
+	UInt32 From(const Statistic ID)
+	{
+		switch (ID)
+		{
+			case Statistic::AnimalsBred: return 30;
+			case Statistic::AviateOneCm: return 17;
+			case Statistic::BoatOneCm: return 14;
+			case Statistic::CleanArmor: return 38;
+			case Statistic::CleanBanner: return 39;
+			case Statistic::CleanShulkerBox: return 40;
+			case Statistic::ClimbOneCm: return 10;
+			case Statistic::CrouchOneCm: return 6;
+			case Statistic::DamageAbsorbed: return 26;
+			case Statistic::DamageBlockedByShield: return 25;
+			case Statistic::DamageDealt: return 21;
+			case Statistic::DamageDealtAbsorbed: return 22;
+			case Statistic::DamageDealtResisted: return 23;
+			case Statistic::DamageResisted: return 27;
+			case Statistic::DamageTaken: return 24;
+			case Statistic::Deaths: return 28;
+			case Statistic::Drop: return 20;
+			case Statistic::EatCakeSlice: return 35;
+			case Statistic::EnchantItem: return 51;
+			case Statistic::FallOneCm: return 9;
+			case Statistic::FillCauldron: return 36;
+			case Statistic::FishCaught: return 32;
+			case Statistic::FlyOneCm: return 11;
+			case Statistic::HorseOneCm: return 16;
+			case Statistic::InspectDispenser: return 45;
+			case Statistic::InspectDropper: return 43;
+			case Statistic::InspectHopper: return 44;
+			case Statistic::InteractWithBeacon: return 42;
+			case Statistic::InteractWithBrewingstand: return 41;
+			case Statistic::InteractWithCraftingTable: return 54;
+			case Statistic::InteractWithFurnace: return 53;
+			case Statistic::Jump: return 19;
+			case Statistic::LeaveGame: return 0;
+			case Statistic::MinecartOneCm: return 13;
+			case Statistic::MobKills: return 29;
+			case Statistic::OpenChest: return 55;
+			case Statistic::OpenEnderchest: return 50;
+			case Statistic::OpenShulkerBox: return 57;
+			case Statistic::PigOneCm: return 15;
+			case Statistic::PlayerKills: return 31;
+			case Statistic::PlayNoteblock: return 46;
+			case Statistic::PlayOneMinute: return 1;
+			case Statistic::PlayRecord: return 52;
+			case Statistic::PotFlower: return 48;
+			case Statistic::SleepInBed: return 56;
+			case Statistic::SneakTime: return 4;
+			case Statistic::SprintOneCm: return 7;
+			case Statistic::SwimOneCm: return 8;
+			case Statistic::TalkedToVillager: return 33;
+			case Statistic::TimeSinceDeath: return 2;
+			case Statistic::TimeSinceRest: return 3;
+			case Statistic::TradedWithVillager: return 34;
+			case Statistic::TriggerTrappedChest: return 49;
+			case Statistic::TuneNoteblock: return 47;
+			case Statistic::UseCauldron: return 37;
+			case Statistic::WalkOneCm: return 5;
+			case Statistic::WalkOnWaterOneCm: return 18;
+			case Statistic::WalkUnderWaterOneCm: return 12;
+			default: return UInt32(-1);
+		}
+	}
+
+	Item ToItem(const UInt32 ID)
 	{
 		switch (ID)
 		{

@@ -542,6 +542,7 @@ return
 				only used as a parameter for the {{OnChunkGenerating|OnChunkGenerating}} and
 				{{OnChunkGenerated|OnChunkGenerated}} hooks and cannot be constructed on its own. Plugins can use this
 				class in both those hooks to manipulate generated chunks.
+				Calls to any setter of this class will not trigger simulator updates (lava, water, redstone).
 			]],
 			Functions =
 			{
@@ -1119,7 +1120,7 @@ return
 							Type = "EMCSBiome",
 						},
 					},
-					Notes = "Sets the biome at the specified relative coords",
+					Notes = "Sets the biome at the specified relative coords.",
 				},
 				SetBlockMeta =
 				{
@@ -1142,7 +1143,7 @@ return
 							Type = "number",
 						},
 					},
-					Notes = "Sets the block meta at the specified relative coords",
+					Notes = "Sets the block meta at the specified relative coords.",
 				},
 				SetBlockType =
 				{
@@ -4499,7 +4500,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				},
 				etEnderCrystal =
 				{
-					Notes = "",
+					Notes = "The entity is a {{cEnderCrystal}}",
 				},
 				etEntity =
 				{
@@ -5060,8 +5061,8 @@ cFile:DeleteFile("/usr/bin/virus.exe");
 				{
 					Returns =
 					{
-							Name = "BitePosition",
-							Type = "Vector3d",
+						Name = "BitePosition",
+						Type = "Vector3d",
 					},
 					Notes = "Returns the position of the floater just before a fish bites. If a fish hasn't bitten the floater, this function returns the position the floater was cast from.",
 				},
@@ -8899,16 +8900,16 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-                                BurnsInDaylight =
-                                {
-                                        Returns =
-                                        {
-                                                {
-                                                        Type = "boolean",
-                                                },
-                                        },
-                                        Notes = "Returns whether the mob burns in daylight.",
-                                },
+				BurnsInDaylight =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the mob burns in daylight.",
+				},
 				CanBeLeashed =
 				{
 					Returns =
@@ -9534,6 +9535,79 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Removes a currently applied entity effect",
+				},
+			},
+			Inherits = "cEntity",
+		},
+		cEnderCrystal =
+		{
+			Desc = [[
+				This class represents an ender crystal. This entity can be spawned by using {{cWorld#SpawnEnderCrystal_1|cWorld:SpawnEnderCrystal}}.
+			]],
+			Functions =
+			{
+				DisplaysBeam =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+						Notes = "Returns true if the ender crystal displays its beam.",
+					},
+				},
+				GetBeamTarget =
+				{
+					Returns =
+					{
+						{
+							Type = "Vector3i",
+						},
+					},
+					Notes = "Returns the Block position the beam is pointing to.",
+				},
+				SetBeamTarget =
+				{
+					Params =
+					{
+						{
+							Name = "BeamTarget",
+							Type = "Vector3i",
+						},
+					},
+					Notes = "Sets the target of the beam of this ender crystal.",
+				},
+				SetDisplayBeam =
+				{
+					Params =
+					{
+						{
+							Name = "DisplaysBeam",
+							Type = "boolean",
+						},
+						Notes = "Sets if the ender crystal should display its beam.",
+					},
+				},
+				SetShowBottom =
+				{
+					Params =
+					{
+						{
+							Name = "ShowsBottom",
+							Type = "boolean",
+						},
+						Notes = "Sets if the ender crystal should broadcast its bedrock base.",
+					},
+				},
+				ShowsBottom =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+						Notes = "Returns true if the bedrock base is displayed.",
+					},
 				},
 			},
 			Inherits = "cEntity",
@@ -11376,6 +11450,12 @@ a_Player:OpenWindow(Window);
 							Type = "function",
 						},
 					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
 					Notes = "Calls the given callback function for each player. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|cPlayer}})</pre>",
 				},
 				ForEachWorld =
@@ -11387,7 +11467,13 @@ a_Player:OpenWindow(Window);
 							Type = "function",
 						},
 					},
-					Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>",
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>. Returns false if a callback aborts, otherwise true.",
 				},
 				Get =
 				{
@@ -12520,7 +12606,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 						},
 						{
 							Name = "Port",
-							Type = "string",
+							Type = "number",
 						},
 						{
 							Name = "Path",
@@ -12563,7 +12649,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 						},
 						{
 							Name = "Port",
-							Type = "string",
+							Type = "number",
 						},
 					},
 					Notes = "Parses the Authority part of the URL. Parts that are not explicitly specified in the AuthPart are returned empty, the port is returned zero. If parsing fails, the function returns nil and an error message.",
@@ -13662,7 +13748,7 @@ end
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the biome is type of Mesa (mutations of the Mesa biome)."
+					Notes = "Returns true if the biome is a type of Mesa (mutations of the Mesa biome)."
 				},
 				IsValidBlock =
 				{
@@ -14329,6 +14415,166 @@ end
 				caUnknown =
 				{
 					Notes = "Unknown click action"
+				},
+				dtAdmin =
+				{
+					Notes = "Damage applied by an admin command"
+				},
+				dtArrow =
+				{
+					Notes = "Damage received by being attacked by a projectile, possibly from a mob"
+				},
+				dtArrowAttack =
+				{
+					Notes = "Damage received by being attacked by a projectile, possibly from a mob"
+				},
+				dtAttack =
+				{
+					Notes = "Damage recieved by being attacked by a mob"
+				},
+				dtBurning =
+				{
+					Notes = "Damage from being on fire"
+				},
+				dtCacti =
+				{
+					Notes = "Damage from contact with a cactus block"
+				},
+				dtCactus =
+				{
+					Notes = "Damage from contact with a cactus block"
+				},
+				dtCactusContact =
+				{
+					Notes = "Damage from contact with a cactus block"
+				},
+				dtCactuses =
+				{
+					Notes = "Damage from contact with a cactus block"
+				},
+				dtDrown =
+				{
+					Notes = "Damage received by drowning in water / lava"
+				},
+				dtDrowning =
+				{
+					Notes = "Damage received by drowning in water / lava"
+				},
+				dtEnderPearl =
+				{
+					Notes = "Damage received by throwing an ender pearl and being teleported by it"
+				},
+				dtEntityAttack =
+				{
+					Notes = "Damage recieved by being attacked by a mob"
+				},
+				dtEnvironment =
+				{
+					Notes = "Damage dealt to mobs from environment: enderman in rain, snow golem in desert"
+				},
+				dtExplosion =
+				{
+					Notes = "Damage applied by an explosion"
+				},
+				dtFall =
+				{
+					Notes = "Damage from falling down. Dealt when hitting the ground"
+				},
+				dtFalling =
+				{
+					Notes = "Damage from falling down. Dealt when hitting the ground"
+				},
+				dtFireContact =
+				{
+					Notes = "Damage received by standing inside a fire block"
+				},
+				dtHunger =
+				{
+					Notes = "Damage received from hunger"
+				},
+				dtInFire =
+				{
+					Notes = "Damage received by standing inside a fire block"
+				},
+				dtInVoid =
+				{
+					Notes = "Damage received by falling into the Void (Y < 0)"
+				},
+				dtLava =
+				{
+					Notes = "Damage received by a contact with a lava block"
+				},
+				dtLavaContact =
+				{
+					Notes = "Damage received by a contact with a lava block"
+				},
+				dtLightning =
+				{
+					Notes = "Damage from being hit by a lightning strike"
+				},
+				dtMob =
+				{
+					Notes = "Damage received by being attacked by a mob"
+				},
+				dtMobAttack =
+				{
+					Notes = "Damage received by being attacked by a mob"
+				},
+				dtOnFire =
+				{
+					Notes = "Damage from being on fire"
+				},
+				dtPawnAttack =
+				{
+					Notes = "Damage received by being attacked by a mob"
+				},
+				dtPlugin =
+				{
+					Notes = "Damage applied by an admin command"
+				},
+				dtPoison =
+				{
+					Notes = "Damage applied by the poison effect"
+				},
+				dtPoisoning =
+				{
+					Notes = "Damage applied by the poison effect"
+				},
+				dtPotionOfHarming =
+				{
+					Notes = "Damage applied by the potion of harming"
+				},
+				dtProjectile =
+				{
+					Notes = "Damage received by being attacked by a projectile, possibly from a mob"
+				},
+				dtRangedAttack =
+				{
+					Notes = "Damage received by being attacked by a projectile, possibly from a mob"
+				},
+				dtStarvation =
+				{
+					Notes = "Damage received from hunger"
+				},
+				dtStarving =
+				{
+					Notes = "Damage received from hunger"
+				},
+				dtSuffocating =
+				{
+					Notes = "Damage from suffocating inside a block"
+				},
+				dtSuffocation =
+				{
+					Notes = "Damage from suffocating inside a block"
+				},
+				dtWither =
+				{
+					Notes = "Damage from the wither effect"
+				},
+				dtWithering =
+				{
+					Notes = "Damage from the wither effect"
 				},
 				E_BLOCK_ACACIA_DOOR =
 				{
@@ -16705,6 +16951,18 @@ end
 				E_META_SPAWN_EGG_WITHER_SKELETON =
 				{
 					Notes = ""
+				},
+				E_META_SILVERFISH_EGG_CHISELED_STONE_BRICK =
+				{
+					Notes = "A flag in the metadata of the silverfish egg that the block is made from chiseled stone bricks"
+				},
+				E_META_SILVERFISH_EGG_CRACKED_STONE_BRICK =
+				{
+					Notes = "A flag in the metadata of the silverfish egg that the block is made from cracked stone bricks"
+				},
+				E_META_SILVERFISH_EGG_MOSSY_STONE_BRICK =
+				{
+					Notes =  "A flag in the metadata of the silverfish egg that the block is made from mossy stone bricks"
 				},
 				E_META_SPONGE_DRY =
 				{

@@ -26,6 +26,9 @@
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/DropperEntity.h"
+#include "../BlockEntities/EnchantingTableEntity.h"
+#include "../BlockEntities/EnderChestEntity.h"
+#include "../BlockEntities/EndPortalEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
 #include "../BlockEntities/HopperEntity.h"
 #include "../BlockEntities/JukeboxEntity.h"
@@ -640,29 +643,28 @@ OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int
 	{
 		// Specific entity loaders:
 		case E_BLOCK_STANDING_BANNER:
-		case E_BLOCK_WALL_BANNER:   return LoadBannerFromNBT      (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_BEACON:        return LoadBeaconFromNBT      (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_BED:           return LoadBedFromNBT         (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_BREWING_STAND: return LoadBrewingstandFromNBT(a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_CHEST:         return LoadChestFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_COMMAND_BLOCK: return LoadCommandBlockFromNBT(a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_DISPENSER:     return LoadDispenserFromNBT   (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_DROPPER:       return LoadDropperFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_FLOWER_POT:    return LoadFlowerPotFromNBT   (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_FURNACE:       return LoadFurnaceFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_HEAD:          return LoadMobHeadFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_HOPPER:        return LoadHopperFromNBT      (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_JUKEBOX:       return LoadJukeboxFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_LIT_FURNACE:   return LoadFurnaceFromNBT     (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_MOB_SPAWNER:   return LoadMobSpawnerFromNBT  (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_NOTE_BLOCK:    return LoadNoteBlockFromNBT   (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_SIGN_POST:     return LoadSignFromNBT        (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_TRAPPED_CHEST: return LoadChestFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_WALLSIGN:      return LoadSignFromNBT        (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-
-		// Blocktypes that have block entities but don't load their contents from disk:
-		case E_BLOCK_ENDER_CHEST:   return nullptr;
-
+		case E_BLOCK_WALL_BANNER:        return LoadBannerFromNBT          (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_BEACON:             return LoadBeaconFromNBT          (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_BED:                return LoadBedFromNBT             (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_BREWING_STAND:      return LoadBrewingstandFromNBT    (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_CHEST:              return LoadChestFromNBT           (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_COMMAND_BLOCK:      return LoadCommandBlockFromNBT    (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_DISPENSER:          return LoadDispenserFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_DROPPER:            return LoadDropperFromNBT         (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_ENCHANTMENT_TABLE:  return LoadEnchantingTableFromNBT (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_ENDER_CHEST:        return LoadEnderChestFromNBT      (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_END_PORTAL:         return LoadEndPortalFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_FLOWER_POT:         return LoadFlowerPotFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_FURNACE:            return LoadFurnaceFromNBT         (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_HEAD:               return LoadMobHeadFromNBT         (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_HOPPER:             return LoadHopperFromNBT          (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_JUKEBOX:            return LoadJukeboxFromNBT         (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_LIT_FURNACE:        return LoadFurnaceFromNBT         (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_MOB_SPAWNER:        return LoadMobSpawnerFromNBT      (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_NOTE_BLOCK:         return LoadNoteBlockFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_SIGN_POST:          return LoadSignFromNBT            (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_TRAPPED_CHEST:      return LoadChestFromNBT           (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case E_BLOCK_WALLSIGN:           return LoadSignFromNBT            (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		default:
 		{
 			// All the other blocktypes should have no entities assigned to them. Report an error:
@@ -1166,6 +1168,61 @@ OwnedBlockEntity cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_T
 
 
 
+OwnedBlockEntity cWSSAnvil::LoadEnchantingTableFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+{
+	// Check if the data has a proper type:
+	static const AStringVector expectedTypes({ "EnchantingTable", "minecraft:enchanting_table" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
+	{
+		return nullptr;
+	}
+
+	AString CustomName;
+	int currentLine = a_NBT.FindChildByName(a_TagIdx, "CustomName");
+	if (currentLine >= 0)
+	{
+		if (a_NBT.GetType(currentLine) == TAG_String)
+		{
+			CustomName = a_NBT.GetString(currentLine);
+		}
+	}
+	return std::make_unique<cEnchantingTableEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, CustomName);
+}
+
+
+
+
+
+OwnedBlockEntity cWSSAnvil::LoadEnderChestFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+{
+	// Check if the data has a proper type:
+	static const AStringVector expectedTypes({ "EnderChest", "minecraft:ender_chest" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
+	{
+		return nullptr;
+	}
+	return std::make_unique<cEnderChestEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+}
+
+
+
+
+
+OwnedBlockEntity cWSSAnvil::LoadEndPortalFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+{
+	// Check if the data has a proper type:
+	static const AStringVector expectedTypes({ "EndPortal", "minecraft:end_portal" });
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
+	{
+		return nullptr;
+	}
+	return std::make_unique<cEndPortalEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+}
+
+
+
+
+
 OwnedBlockEntity cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
@@ -1321,36 +1378,65 @@ OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int 
 
 	auto MobSpawner = std::make_unique<cMobSpawnerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 
-	// Load entity (Cuberite worlds):
-	int Type = a_NBT.FindChildByName(a_TagIdx, "Entity");
-	if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_Short))
+	// Load entity type
+	int Type = a_NBT.FindChildByName(a_TagIdx, "EntityId");
+	if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_String))
 	{
-		short MonsterType = a_NBT.GetShort(Type);
-		if ((MonsterType >= 50) && (MonsterType <= 120))
+		eMonsterType MonsterType = cMonster::StringToMobType(a_NBT.GetString(Type));
+		if (MonsterType != eMonsterType::mtInvalidType)
 		{
-			MobSpawner->SetEntity(static_cast<eMonsterType>(MonsterType));
-		}
-	}
-	else
-	{
-		// Load entity (vanilla worlds):
-		Type = a_NBT.FindChildByName(a_TagIdx, "EntityId");
-		if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_String))
-		{
-			eMonsterType MonsterType = cMonster::StringToMobType(a_NBT.GetString(Type));
-			if (MonsterType != eMonsterType::mtInvalidType)
-			{
-				MobSpawner->SetEntity(MonsterType);
-			}
+			MobSpawner->SetEntity(MonsterType);
 		}
 	}
 
-	// Load delay:
-	int Delay = a_NBT.FindChildByName(a_TagIdx, "Delay");
-	if ((Delay >= 0) && (a_NBT.GetType(Delay) == TAG_Short))
+	// Load spawn count:
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "SpawnCount");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
 	{
-		MobSpawner->SetSpawnDelay(a_NBT.GetShort(Delay));
+		MobSpawner->SetSpawnCount(a_NBT.GetShort(CurrentLine));
 	}
+
+	// Load spawn range:
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "SpawnRange");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
+	{
+		MobSpawner->SetSpawnRange(a_NBT.GetShort(CurrentLine));
+	}
+
+	// Load delay:
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Delay");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
+	{
+		MobSpawner->SetSpawnDelay(a_NBT.GetShort(CurrentLine));
+	}
+
+	// Load delay range:
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "MinSpawnDelay");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
+	{
+		MobSpawner->SetMinSpawnDelay(a_NBT.GetShort(CurrentLine));
+	}
+
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "MaxSpawnDelay");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
+	{
+		MobSpawner->SetMaxSpawnDelay(a_NBT.GetShort(CurrentLine));
+	}
+
+	// Load MaxNearbyEntities:
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "MaxNearbyEntities");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
+	{
+		MobSpawner->SetMaxNearbyEntities(a_NBT.GetShort(CurrentLine));
+	}
+
+	// Load RequiredPlayerRange:
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "RequiredPlayerRange");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_Short))
+	{
+		MobSpawner->SetRequiredPlayerRange(a_NBT.GetShort(CurrentLine));
+	}
+
 
 	return MobSpawner;
 }
@@ -1446,7 +1532,7 @@ OwnedBlockEntity cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a
 	int note = a_NBT.FindChildByName(a_TagIdx, "note");
 	if (note >= 0)
 	{
-		NoteBlock->SetPitch(static_cast<char>(a_NBT.GetByte(note)));
+		NoteBlock->SetNote(a_NBT.GetByte(note));
 	}
 	return NoteBlock;
 }
@@ -1672,11 +1758,43 @@ void cWSSAnvil::LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 
 void cWSSAnvil::LoadEnderCrystalFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	auto EnderCrystal = std::make_unique<cEnderCrystal>(Vector3d());
+	bool DisplayBeam = false, ShowBottom = false;
+	Vector3i BeamTarget;
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "BeamTarget");
+	if (CurrentLine > 0)
+	{
+		DisplayBeam = true;
+		if (a_NBT.GetType(CurrentLine) == TAG_Compound)
+		{
+			int CoordinateLine = a_NBT.FindChildByName(CurrentLine, "X");
+			if (CoordinateLine > 0)
+			{
+				BeamTarget.x = a_NBT.GetInt(CoordinateLine);
+			}
+			CoordinateLine = a_NBT.FindChildByName(CurrentLine, "Y");
+			if (CoordinateLine > 0)
+			{
+				BeamTarget.y = a_NBT.GetInt(CoordinateLine);
+			}
+			CoordinateLine = a_NBT.FindChildByName(CurrentLine, "Z");
+			if (CoordinateLine > 0)
+			{
+				BeamTarget.z = a_NBT.GetInt(CoordinateLine);
+			}
+		}
+	}
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "ShowBottom");
+	if (CurrentLine > 0)
+	{
+		ShowBottom = a_NBT.GetByte(CurrentLine) == 1;
+	}
+
+	auto EnderCrystal = std::make_unique<cEnderCrystal>(Vector3d(), BeamTarget, DisplayBeam, ShowBottom);
 	if (!LoadEntityBaseFromNBT(*EnderCrystal.get(), a_NBT, a_TagIdx))
 	{
 		return;
 	}
+
 	a_Entities.emplace_back(std::move(EnderCrystal));
 }
 
@@ -1852,7 +1970,7 @@ void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 	int FuseTicks = a_NBT.FindChildByName(a_TagIdx, "Fuse");
 	if (FuseTicks > 0)
 	{
-		TNT->SetFuseTicks(static_cast<int>(a_NBT.GetByte(FuseTicks)));
+		TNT->SetFuseTicks(a_NBT.GetByte(FuseTicks));
 	}
 
 	a_Entities.emplace_back(std::move(TNT));

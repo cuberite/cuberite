@@ -6,7 +6,6 @@
 #include "WorldInterface.h"
 #include "../ChunkMap.h"
 #include "../World.h"
-#include "../BlockInfo.h"
 
 
 
@@ -57,9 +56,9 @@ void cChunkInterface::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBL
 
 
 
-void cChunkInterface::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty, bool a_ShouldInformClient)
+void cChunkInterface::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData)
 {
-	m_ChunkMap->SetBlockMeta(a_BlockPos, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClient);
+	m_ChunkMap->SetBlockMeta(a_BlockPos, a_MetaData);
 }
 
 
@@ -102,7 +101,7 @@ bool cChunkInterface::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a
 
 
 
-bool cChunkInterface::DigBlock(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos)
+bool cChunkInterface::DigBlock(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, cEntity * a_Digger)
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
@@ -113,7 +112,7 @@ bool cChunkInterface::DigBlock(cWorldInterface & a_WorldInterface, Vector3i a_Bl
 		return false;
 	}
 
-	cBlockInfo::GetHandler(BlockType)->OnBroken(*this, a_WorldInterface, a_BlockPos, BlockType, BlockMeta);
+	cBlockHandler::For(BlockType).OnBroken(*this, a_WorldInterface, a_BlockPos, BlockType, BlockMeta, a_Digger);
 	return true;
 }
 

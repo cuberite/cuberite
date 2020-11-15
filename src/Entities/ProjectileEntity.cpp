@@ -167,7 +167,8 @@ public:
 				!a_Entity.IsPlayer() ||
 				static_cast<cPlayer &>(a_Entity).IsGameModeSpectator()
 			) &&
-			!a_Entity.IsBoat()
+			!a_Entity.IsBoat() &&
+			!a_Entity.IsEnderCrystal()
 		)
 		{
 			// Not an entity that interacts with a projectile

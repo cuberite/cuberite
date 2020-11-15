@@ -129,7 +129,6 @@ cClientHandle::~cClientHandle()
 		{
 			RemoveFromAllChunks();
 			m_Player->GetWorld()->RemoveClientFromChunkSender(this);
-			m_Player->DestroyNoScheduling(true);
 		}
 		// Send the Offline PlayerList packet:
 		cRoot::Get()->BroadcastPlayerListsRemovePlayer(*m_Player);
@@ -507,7 +506,7 @@ bool cClientHandle::StreamNextChunk(void)
 
 				// Unloaded chunk found -> Send it to the client.
 				Lock.Unlock();
-				StreamChunk(ChunkX, ChunkZ, ((Range <= 2) ? cChunkSender::E_CHUNK_PRIORITY_HIGH : cChunkSender::E_CHUNK_PRIORITY_MEDIUM));
+				StreamChunk(ChunkX, ChunkZ, ((Range <= 2) ? cChunkSender::Priority::Critical : cChunkSender::Priority::Medium));
 				return false;
 			}
 		}
@@ -545,7 +544,7 @@ bool cClientHandle::StreamNextChunk(void)
 
 			// Unloaded chunk found -> Send it to the client.
 			Lock.Unlock();
-			StreamChunk(Coords.m_ChunkX, Coords.m_ChunkZ, cChunkSender::E_CHUNK_PRIORITY_LOW);
+			StreamChunk(Coords.m_ChunkX, Coords.m_ChunkZ, cChunkSender::Priority::Low);
 			return false;
 		}
 	}
@@ -609,7 +608,7 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 
 
 
-void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority)
+void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority)
 {
 	if (m_State >= csDestroying)
 	{
@@ -769,36 +768,67 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 	if (a_Enchantment > 2)
 	{
 		LOGWARNING("%s attempt to crash the server with invalid enchanting selection (%u)!", GetUsername().c_str(), a_Enchantment);
-		Kick("Invalid enchanting!");
+		Kick("Selected invalid enchantment - hacked client?");
 		return;
 	}
 
+	// Bail out if something's wrong with the window:
 	if (
 		(m_Player->GetWindow() == nullptr) ||
 		(m_Player->GetWindow()->GetWindowID() != a_WindowID) ||
 		(m_Player->GetWindow()->GetWindowType() != cWindow::wtEnchantment)
 	)
 	{
+		Kick("Enchantment with invalid window - hacked client?");
 		return;
 	}
 
 	cEnchantingWindow * Window = static_cast<cEnchantingWindow *>(m_Player->GetWindow());
-	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);  // Make a copy of the item
-	short BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
+	const auto BaseEnchantmentLevel = Window->GetProperty(a_Enchantment);
 
-	if (Item.EnchantByXPLevels(BaseEnchantmentLevel))
+	// Survival players must be checked they can afford enchantment and have lapis removed:
+	if (!m_Player->IsGameModeCreative())
 	{
-		if (m_Player->IsGameModeCreative() || m_Player->DeltaExperience(-m_Player->XpForLevel(BaseEnchantmentLevel)) >= 0)
-		{
-			Window->m_SlotArea->SetSlot(0, *m_Player, Item);
-			Window->SendSlot(*m_Player, Window->m_SlotArea, 0);
-			Window->BroadcastWholeWindow();
+		const auto XpRequired = m_Player->XpForLevel(BaseEnchantmentLevel);
+		auto LapisStack = *Window->m_SlotArea->GetSlot(1, *m_Player);  // A copy of the lapis stack.
+		const auto LapisRequired = a_Enchantment + 1;
 
-			Window->SetProperty(0, 0, *m_Player);
-			Window->SetProperty(1, 0, *m_Player);
-			Window->SetProperty(2, 0, *m_Player);
+		// Only allow enchantment if the player has sufficient levels and lapis to enchant:
+		if ((m_Player->GetCurrentXp() >= XpRequired) && (LapisStack.m_ItemCount >= LapisRequired))
+		{
+			/** We need to reduce the player's level by the number of lapis required.
+			However we need to keep the resulting percentage filled the same. */
+
+			const auto TargetLevel = m_Player->GetXpLevel() - LapisRequired;
+			const auto CurrentFillPercent = m_Player->GetXpPercentage();
+
+			// The experience to remove in order to reach the start (0% fill) of the target level.
+			const auto DeltaForLevel = -m_Player->GetCurrentXp() + m_Player->XpForLevel(TargetLevel);
+
+			// The experience to add to get the same fill percent.
+			const auto DeltaForPercent = CurrentFillPercent * (m_Player->XpForLevel(TargetLevel + 1) - m_Player->XpForLevel(TargetLevel));
+
+			// Apply the experience delta:
+			m_Player->DeltaExperience(FloorC(DeltaForLevel + DeltaForPercent));
+
+			// Now reduce the lapis in our stack and send it back:
+			LapisStack.AddCount(static_cast<char>(-LapisRequired));
+			Window->m_SlotArea->SetSlot(1, *m_Player, LapisStack);
+		}
+		else
+		{
+			// Not creative and can't afford enchantment, so exit:
+			Kick("Selected unavailable enchantment - hacked client?");
+			return;
 		}
 	}
+
+	// Retrieve the enchanted item corresponding to our chosen option (top, middle, bottom)
+	cItem EnchantedItem = Window->m_SlotArea->SelectEnchantedOption(a_Enchantment);
+
+	// Set the item slot to our new enchanted item:
+	Window->m_SlotArea->SetSlot(0, *m_Player, EnchantedItem);
+	m_Player->PermuteEnchantmentSeed();
 }
 
 
@@ -1103,7 +1133,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 		if (
 			cChunkDef::IsValidHeight(BlockY) &&
-			cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(BlockX, BlockY, BlockZ))->IsClickedThrough()
+			cBlockHandler::For(m_Player->GetWorld()->GetBlock(BlockX, BlockY, BlockZ)).IsClickedThrough()
 		)
 		{
 			a_BlockX = BlockX;
@@ -1172,19 +1202,13 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 		case DIG_STATUS_STARTED:
 		{
-			BLOCKTYPE  OldBlock;
-			NIBBLETYPE OldMeta;
-			m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, OldBlock, OldMeta);
-			HandleBlockDigStarted(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, OldBlock, OldMeta);
+			HandleBlockDigStarted(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			return;
 		}
 
 		case DIG_STATUS_FINISHED:
 		{
-			BLOCKTYPE  OldBlock;
-			NIBBLETYPE OldMeta;
-			m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, OldBlock, OldMeta);
-			HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, OldBlock, OldMeta);
+			HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			return;
 		}
 
@@ -1231,7 +1255,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 
 
-void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
+void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 {
 	if (
 		m_HasStartedDigging &&
@@ -1244,10 +1268,14 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		return;
 	}
 
+	BLOCKTYPE DiggingBlock;
+	NIBBLETYPE DiggingMeta;
+	m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, DiggingBlock, DiggingMeta);
+
 	if (
 		m_Player->IsGameModeCreative() &&
 		ItemCategory::IsSword(m_Player->GetInventory().GetEquippedItem().m_ItemType) &&
-		(m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_FIRE)
+		(DiggingBlock != E_BLOCK_FIRE)
 	)
 	{
 		// Players can't destroy blocks with a sword in the hand.
@@ -1271,11 +1299,14 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_LastDigBlockZ = a_BlockZ;
 
 	if (
-		(m_Player->IsGameModeCreative()) ||  // In creative mode, digging is done immediately
-		cBlockInfo::IsOneHitDig(a_OldBlock)  // One-hit blocks get destroyed immediately, too
+		m_Player->IsGameModeCreative() ||         // In creative mode, digging is done immediately
+		m_Player->CanInstantlyMine(DiggingBlock)  // Sometimes the player is fast enough to instantly mine
 	)
 	{
-		HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
+		// Immediately done:
+		m_BreakProgress = 1;
+
+		HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		return;
 	}
 
@@ -1293,8 +1324,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	cWorld * World = m_Player->GetWorld();
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	cBlockHandler * Handler = cBlockInfo::GetHandler(a_OldBlock);
-	Handler->OnDigging(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ});
+	cBlockHandler::For(DiggingBlock).OnDigging(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ});
 
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 	ItemHandler->OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
@@ -1304,7 +1334,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 
 
-void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
+void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 {
 	if (
 		!m_HasStartedDigging ||           // Hasn't received the DIG_STARTED packet
@@ -1323,24 +1353,15 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	FinishDigAnimation();
 
+	BLOCKTYPE DugBlock;
+	NIBBLETYPE DugMeta;
+	m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, DugBlock, DugMeta);
+
 	if (!m_Player->IsGameModeCreative())
 	{
-		if (a_OldBlock == E_BLOCK_BEDROCK)
-		{
-			Kick("You can't break a bedrock!");
-			return;
-		}
-		if (a_OldBlock == E_BLOCK_BARRIER)
-		{
-			Kick("You can't break a barrier!");
-			return;
-		}
-	}
+		m_BreakProgress += m_Player->GetMiningProgressPerTick(DugBlock);
 
-	if (!m_Player->IsGameModeCreative() && !cBlockInfo::IsOneHitDig(a_OldBlock))
-	{
-		// Fix for very fast tools.
-		m_BreakProgress += m_Player->GetPlayerRelativeBlockHardness(a_OldBlock);
+		// Check for very fast tools. Maybe instead of FASTBREAK_PERCENTAGE we should check we are within x multiplied by the progress per tick
 		if (m_BreakProgress < FASTBREAK_PERCENTAGE)
 		{
 			LOGD("Break progress of player %s was less than expected: %f < %f\n", m_Player->GetName().c_str(), m_BreakProgress * 100, FASTBREAK_PERCENTAGE * 100);
@@ -1355,7 +1376,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	cWorld * World = m_Player->GetWorld();
 
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, DugBlock, DugMeta))
 	{
 		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, *m_Player);
@@ -1364,14 +1385,18 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		return;
 	}
 
-	if (a_OldBlock == E_BLOCK_AIR)
+	if (DugBlock == E_BLOCK_AIR)
 	{
 		return;
 	}
 
+	// Apply hunger:
 	m_Player->AddFoodExhaustion(0.025);
+
+	// Damage the tool, but not for 0 hardness blocks:
+	m_Player->UseEquippedItem(cBlockInfo::IsOneHitDig(DugBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock);
+
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	auto blockHandler = BlockHandler(a_OldBlock);
 	Vector3i absPos(a_BlockX, a_BlockY, a_BlockZ);
 	if (m_Player->IsGameModeSurvival())
 	{
@@ -1379,16 +1404,11 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 	else
 	{
-		World->DigBlock(absPos);
+		World->DigBlock(absPos, m_Player);
 	}
 
-	// Damage the tool:
-	auto dlAction = (cBlockInfo::IsOneHitDig(a_OldBlock) ? cItemHandler::dlaBreakBlockInstant : cItemHandler::dlaBreakBlock);
-	m_Player->UseEquippedItem(dlAction);
-
-	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, absPos, a_OldBlock, this);
-	blockHandler->OnPlayerBrokeBlock(ChunkInterface, *World, *m_Player, absPos, a_OldBlock, a_OldMeta);
-	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
+	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, absPos, DugBlock, this);
+	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, DugBlock, DugMeta);
 }
 
 
@@ -1466,10 +1486,10 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
 		World->GetBlockTypeMeta(ClickedBlockPos, BlockType, BlockMeta);
-		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
+		const auto & BlockHandler = cBlockHandler::For(BlockType);
 
 		bool Placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeAdventure() && !m_Player->IsGameModeSpectator();
-		bool BlockUsable = BlockHandler->IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
+		bool BlockUsable = BlockHandler.IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
 
 		if (BlockUsable && !(m_Player->IsCrouched() && !HeldItem.IsEmpty()))
 		{
@@ -1477,7 +1497,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			cChunkInterface ChunkInterface(World->GetChunkMap());
 			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 			{
-				if (BlockHandler->OnUse(ChunkInterface, *World, *m_Player, ClickedBlockPos, a_BlockFace, CursorPos))
+				if (BlockHandler.OnUse(ChunkInterface, *World, *m_Player, ClickedBlockPos, a_BlockFace, CursorPos))
 				{
 					// block use was successful, we're done
 					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
@@ -1495,7 +1515,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			{
 				// TODO: OnCancelRightClick seems to do the same thing with updating blocks at the end of this function. Need to double check
 				// A plugin doesn't agree with the action, replace the block on the client and quit:
-				BlockHandler->OnCancelRightClick(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
+				BlockHandler.OnCancelRightClick(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
 			}
 		}
 		else if (Placeable)
@@ -2092,7 +2112,7 @@ void cClientHandle::Tick(float a_Dt)
 	if (m_HasStartedDigging)
 	{
 		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock(m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ);
-		m_BreakProgress += m_Player->GetPlayerRelativeBlockHardness(Block);
+		m_BreakProgress += m_Player->GetMiningProgressPerTick(Block);
 	}
 
 	ProcessProtocolInOut();
@@ -2109,6 +2129,7 @@ void cClientHandle::Tick(float a_Dt)
 		LOGD("Client %s @ %s (%p) has been queued for destruction, destroying now.",
 			m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this)
 		);
+		GetPlayer()->GetStatManager().AddValue(Statistic::LeaveGame);
 		Destroy();
 		return;
 	}
@@ -2479,7 +2500,8 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, const std::string_
 	{
 		// This just sometimes happens. If you have a reliably replicatable situation for this, go ahead and fix it
 		// It's not a big issue anyway, just means that some chunks may be compressed several times
-		// LOGD("Refusing to send    chunk [%d, %d] to client \"%s\" at [%d, %d].", ChunkX, ChunkZ, m_Username.c_str(), m_Player->GetChunkX(), m_Player->GetChunkZ());
+		// LOG("Refusing to send    chunk [%d, %d] to client \"%s\" at [%d, %d].", a_ChunkX, a_ChunkZ, m_Username.c_str(), m_Player->GetChunkX(), m_Player->GetChunkZ());
+		// 2020 08 21: seems to happen going through nether portals on 1.8.9
 		return;
 	}
 
@@ -2635,7 +2657,7 @@ void cClientHandle::SendEntityVelocity(const cEntity & a_Entity)
 
 
 
-void cClientHandle::SendExplosion(const Vector3d a_Pos, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d a_PlayerMotion)
+void cClientHandle::SendExplosion(const Vector3f a_Position, const float a_Power)
 {
 	if (m_NumExplosionsThisTick > MAX_EXPLOSIONS_PER_TICK)
 	{
@@ -2646,7 +2668,27 @@ void cClientHandle::SendExplosion(const Vector3d a_Pos, float a_Radius, const cV
 	// Update the statistics:
 	m_NumExplosionsThisTick++;
 
-	m_Protocol->SendExplosion(a_Pos.x, a_Pos.y, a_Pos.z, a_Radius, a_BlocksAffected, a_PlayerMotion);
+	auto & Random = GetRandomProvider();
+	const auto SoundPitchMultiplier = 1.0f + (Random.RandReal() - Random.RandReal()) * 0.2f;
+
+	// Sound:
+	SendSoundEffect("entity.generic.explode", a_Position, 4.0f, SoundPitchMultiplier * 0.7f);
+
+	const auto ParticleFormula = a_Power * 0.33f;
+	auto Spread = ParticleFormula * 0.5f;
+	auto ParticleCount = std::min(static_cast<int>(ParticleFormula * 125), 600);
+
+	// Dark smoke particles:
+	SendParticleEffect("largesmoke", a_Position.x, a_Position.y, a_Position.z, 0, 0, 0, Spread, static_cast<int>(ParticleCount));
+
+	Spread = ParticleFormula * 0.35f;
+	ParticleCount = std::min(static_cast<int>(ParticleFormula * 550), 1800);
+
+	// Light smoke particles:
+	SendParticleEffect("explode", a_Position.x, a_Position.y, a_Position.z, 0, 0, 0, Spread, static_cast<int>(ParticleCount));
+
+	// Shockwave effect:
+	m_Protocol->SendExplosion(a_Position, a_Power);
 }
 
 
@@ -3201,7 +3243,7 @@ void cClientHandle::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cClientHandle::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
+void cClientHandle::SendWindowProperty(const cWindow & a_Window, size_t a_Property, short a_Value)
 {
 	m_Protocol->SendWindowProperty(a_Window, a_Property, a_Value);
 }

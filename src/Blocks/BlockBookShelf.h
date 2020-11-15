@@ -6,21 +6,21 @@
 
 
 
-class cBlockBookShelfHandler :
+class cBlockBookShelfHandler final :
 	public cBlockHandler
 {
-	public:
-		cBlockBookShelfHandler(BLOCKTYPE a_BlockType) :
-			cBlockHandler(a_BlockType)
-		{
-		}
+public:
 
-		virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	using cBlockHandler::cBlockHandler;
+
+private:
+
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	{
+		if (ToolHasSilkTouch(a_Tool))
 		{
-			if (ToolHasSilkTouch(a_Tool))
-			{
-				return cItem(m_BlockType, 1);
-			}
-			return cItem(E_ITEM_BOOK, 3);
+			return cItem(m_BlockType, 1);
 		}
+		return cItem(E_ITEM_BOOK, 3);
+	}
 };

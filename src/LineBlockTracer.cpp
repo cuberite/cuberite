@@ -287,12 +287,8 @@ bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 	// This is the actual line tracing loop.
 	for (;;)
 	{
-		// Report the current block through the callbacks:
-		if (a_Chunk == nullptr)
-		{
-			m_Callbacks->OnNoChunk();
-			return false;
-		}
+		// Our caller (DoWithChunk callback) should never give nothing:
+		ASSERT(a_Chunk != nullptr);
 
 		// Move to next block
 		if (!MoveToNextBlock())
@@ -324,6 +320,7 @@ bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 			return false;
 		}
 
+		// Report the current block through the callbacks:
 		if (a_Chunk->IsValid())
 		{
 			BLOCKTYPE BlockType;

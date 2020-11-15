@@ -21,36 +21,6 @@ Implements the 1.14 protocol classes:
 
 
 
-#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!ByteBuf.Proc(Var))\
-		{\
-			return;\
-		} \
-	} while (false)
-
-
-
-
-
-#define HANDLE_PACKET_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		{ \
-			if (!ByteBuf.Proc(Var)) \
-			{ \
-				ByteBuf.CheckValid(); \
-				return false; \
-			} \
-			ByteBuf.CheckValid(); \
-		} \
-	} while (false)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_14:
 
@@ -64,38 +34,6 @@ void cProtocol_1_14::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 void cProtocol_1_14::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
 {
-}
-
-
-
-
-
-void cProtocol_1_14::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-	SendBlockChange<&Palette_1_14::FromBlock>(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
-}
-
-
-
-
-
-template <auto Palette>
-void cProtocol_1_14::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktBlockChange);
-	Pkt.WriteXZYPosition64(a_BlockX, a_BlockY, a_BlockZ);
-	Pkt.WriteVarInt32(Palette(PaletteUpgrade::FromBlock(a_BlockType, a_BlockMeta)));
-}
-
-
-
-
-
-void cProtocol_1_14::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
-{
-	cProtocol_1_13::SendBlockChanges<&Palette_1_14::FromBlock>(a_ChunkX, a_ChunkZ, a_Changes);
 }
 
 
@@ -121,7 +59,7 @@ void cProtocol_1_14::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteBEInt32(static_cast<Int32>(a_World.GetDimension()));
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<size_t>(Server->GetMaxPlayers(), 0, 255)));
 		Pkt.WriteString("default");
-		Pkt.WriteVarInt32(a_World.GetMaxViewDistance());
+		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));
 		Pkt.WriteBool(false);
 	}
 
@@ -240,7 +178,43 @@ UInt32 cProtocol_1_14::GetPacketID(ePacketType a_PacketType)
 
 cProtocol::Version cProtocol_1_14::GetProtocolVersion()
 {
-	return Version::Version_1_14;
+	return Version::v1_14;
+}
+
+
+
+
+
+std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolID)
+{
+	return PaletteUpgrade::ToItem(Palette_1_14::ToItem(a_ProtocolID));
+}
+
+
+
+
+
+UInt32 cProtocol_1_14::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+{
+	return Palette_1_14::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+}
+
+
+
+
+
+UInt32 cProtocol_1_14::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
+{
+	return Palette_1_14::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+}
+
+
+
+
+
+UInt32 cProtocol_1_14::GetProtocolStatisticType(Statistic a_Statistic)
+{
+	return Palette_1_14::From(a_Statistic);
 }
 
 
@@ -249,7 +223,7 @@ cProtocol::Version cProtocol_1_14::GetProtocolVersion()
 
 bool cProtocol_1_14::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
-	if (m_State != 3)
+	if (m_State != State::Game)
 	{
 		return Super::HandlePacket(a_ByteBuffer, a_PacketType);
 	}
@@ -284,22 +258,4 @@ void cProtocol_1_14::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_14::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 {
-}
-
-
-
-
-
-std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolID)
-{
-	return PaletteUpgrade::ToItem(Palette_1_14::ToItem(a_ProtocolID));
-}
-
-
-
-
-
-UInt32 cProtocol_1_14::GetProtocolIDFromItem(short a_ItemID, short a_ItemDamage)
-{
-	return Palette_1_14::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
 }

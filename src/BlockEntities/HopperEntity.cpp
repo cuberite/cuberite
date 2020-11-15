@@ -95,7 +95,7 @@ bool cHopperEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cHopperEntity::SendTo(cClientHandle & a_Client)
 {
 	// The hopper entity doesn't need anything sent to the client when it's created / gets in the viewdistance
-	// All the actual handling is in the cWindow UI code that gets called when the hopper is rclked
+	// All the actual handling is in the cWindow UI code that gets called when the hopper is right-clicked
 
 	UNUSED(a_Client);
 }
@@ -106,6 +106,8 @@ void cHopperEntity::SendTo(cClientHandle & a_Client)
 
 bool cHopperEntity::UsedBy(cPlayer * a_Player)
 {
+	a_Player->GetStatManager().AddValue(Statistic::InspectHopper);
+
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)

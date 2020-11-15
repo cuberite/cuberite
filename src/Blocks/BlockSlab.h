@@ -17,23 +17,29 @@
 
 
 
-class cBlockSlabHandler :
+class cBlockSlabHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
 
 public:
 
-	cBlockSlabHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
+	using Super::Super;
+
+	/** Returns true if the specified blocktype is one of the slabs handled by this handler */
+	static bool IsAnySlabType(BLOCKTYPE a_BlockType)
 	{
+		return (
+			(a_BlockType == E_BLOCK_WOODEN_SLAB) ||
+			(a_BlockType == E_BLOCK_STONE_SLAB) ||
+			(a_BlockType == E_BLOCK_RED_SANDSTONE_SLAB) ||
+			(a_BlockType == E_BLOCK_PURPUR_SLAB)
+		);
 	}
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Reset the "top half" flag:
 		return cItem(m_BlockType, 1, a_BlockMeta & 0x07);
@@ -50,7 +56,7 @@ public:
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		a_BlockType = m_BlockType;
 		NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage);
@@ -104,28 +110,13 @@ public:
 
 
 
-	/** Returns true if the specified blocktype is one of the slabs handled by this handler */
-	static bool IsAnySlabType(BLOCKTYPE a_BlockType)
-	{
-		return (
-			(a_BlockType == E_BLOCK_WOODEN_SLAB) ||
-			(a_BlockType == E_BLOCK_STONE_SLAB) ||
-			(a_BlockType == E_BLOCK_RED_SANDSTONE_SLAB) ||
-			(a_BlockType == E_BLOCK_PURPUR_SLAB)
-		);
-	}
-
-
-
-
-
 	virtual void OnCancelRightClick(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
 		cPlayer & a_Player,
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace
-	) override
+	) const override
 	{
 		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_Player.GetEquippedItem().m_ItemType != static_cast<short>(m_BlockType)))
 		{
@@ -158,7 +149,7 @@ public:
 
 
 
-	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) const override
 	{
 		// Toggle the 4th bit - up / down:
 		return (a_Meta ^ 0x08);
@@ -168,7 +159,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		a_Meta &= 0x7;
 
@@ -230,7 +221,7 @@ public:
 
 
 
-	virtual bool IsInsideBlock(Vector3d a_Position, const NIBBLETYPE a_BlockMeta) override
+	virtual bool IsInsideBlock(Vector3d a_Position, const NIBBLETYPE a_BlockMeta) const override
 	{
 		if (a_BlockMeta & 0x08)  // top half
 		{
@@ -244,23 +235,18 @@ public:
 
 
 
-class cBlockDoubleSlabHandler:
+class cBlockDoubleSlabHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
 
 public:
 
-	cBlockDoubleSlabHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		BLOCKTYPE Block = GetSingleSlabType(m_BlockType);
 		return cItem(Block, 2, a_BlockMeta & 0x7);
@@ -287,10 +273,10 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		// For doule slabs, the meta values are the same. Only the meaning of the 4th bit changes, but that's ignored in the below handler
-		return BlockHandler(GetSingleSlabType(m_BlockType))->GetMapBaseColourID(a_Meta);
+		return cBlockHandler::For(GetSingleSlabType(m_BlockType)).GetMapBaseColourID(a_Meta);
 	}
 } ;
 

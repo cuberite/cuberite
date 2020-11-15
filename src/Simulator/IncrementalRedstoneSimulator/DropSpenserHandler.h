@@ -1,21 +1,20 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 #include "../../BlockEntities/DropSpenserEntity.h"
 
 
 
 
 
-class cDropSpenserHandler final : public cRedstoneHandler
+namespace DropSpenserHandler
 {
-	inline static bool IsActivated(NIBBLETYPE a_Meta)
+	inline bool IsActivated(NIBBLETYPE a_Meta)
 	{
 		return (a_Meta & E_META_DROPSPENSER_ACTIVATED) != 0;
 	}
 
-	inline static NIBBLETYPE SetActivationState(NIBBLETYPE a_Meta, bool IsOn)
+	inline NIBBLETYPE SetActivationState(NIBBLETYPE a_Meta, bool IsOn)
 	{
 		if (IsOn)
 		{
@@ -27,7 +26,7 @@ class cDropSpenserHandler final : public cRedstoneHandler
 		}
 	}
 
-	virtual unsigned char GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked) const override
+	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
@@ -38,11 +37,11 @@ class cDropSpenserHandler final : public cRedstoneHandler
 		return 0;
 	}
 
-	virtual void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
+	inline void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating spencer the dropspenser (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		const bool IsPoweredNow = (a_PoweringData.PowerLevel > 0);
+		const bool IsPoweredNow = (Power > 0);
 		const bool WasPoweredPreviously = IsActivated(a_Meta);
 
 		if (IsPoweredNow && !WasPoweredPreviously)
@@ -61,11 +60,16 @@ class cDropSpenserHandler final : public cRedstoneHandler
 		}
 	}
 
-	virtual void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, SourceCallback Callback) const override
+	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
+
+		// Consider indirect power:
+		Callback.CheckIndirectPower();
+
+		// Consider normal adjacents:
 		InvokeForAdjustedRelatives(Callback, a_Position, RelativeAdjacents);
 	}
 };
