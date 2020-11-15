@@ -176,7 +176,7 @@ public:
 	) override
 	{
 		// saving the color of the banner in case it's the players last one
-		NIBBLETYPE Color = a_EquippedItem.m_ItemDamage;
+		NIBBLETYPE Color = static_cast<NIBBLETYPE>(a_EquippedItem.m_ItemDamage);
 
 		// Cannot place a banner at "no face" and from the bottom:
 		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_BOTTOM))
