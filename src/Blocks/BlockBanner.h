@@ -4,6 +4,7 @@
 #pragma once
 
 #include "../BlockInfo.h"
+#include "BlockEntity.h"
 
 class cBlockBannerHandler final :
 	public cBlockEntityHandler
