@@ -64,6 +64,7 @@ target_sources(
 	BlockMycelium.h
 	BlockNetherrack.h
 	BlockNetherWart.h
+	BlockNoteBlock.h
 	BlockObserver.h
 	BlockOre.h
 	BlockPackedIce.h
