@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockEntity.h"
+#include "../BlockEntities/NoteEntity.h"
 
 
 
@@ -25,14 +26,14 @@ private:
 		const Vector3i a_BlockPos
 	) const override
 	{
-		a_WorldInterface.DoWithBlockEntityAt(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, [](cBlockEntity & a_Entity)
+		a_WorldInterface.DoWithBlockEntityAt(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, [](cBlockEntity & a_BlockEntity)
 		{
-			if (a_Entity.GetBlockType() != E_BLOCK_NOTE_BLOCK)
+			if (a_BlockEntity.GetBlockType() != E_BLOCK_NOTE_BLOCK)
 			{
 				return false;
 			}
 
-			auto & NoteEntity = static_cast<cNoteEntity &>(a_Entity);
+			auto & NoteEntity = static_cast<cNoteEntity &>(a_BlockEntity);
 
 			NoteEntity.MakeSound();
 
