@@ -39,4 +39,4 @@ private:
 			return true;
 		});
 	}
-} ;
+};
