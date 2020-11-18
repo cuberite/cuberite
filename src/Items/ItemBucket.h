@@ -175,6 +175,7 @@ public:
 		}
 
 		// Place the actual fluid block:
+
 		return a_Player->PlaceBlock(BlockPos.x, BlockPos.y, BlockPos.z, a_FluidBlock, 0);
 	}
 
@@ -263,20 +264,16 @@ public:
 		} Callbacks;
 
 		cLineBlockTracer Tracer(*a_World, Callbacks);
-		Vector3d Start;
-		Vector3d End;
+		Vector3d Start(a_Player->GetEyePosition());
+		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
 
 		// If the Player is standing half-inside non-air block
-		if (cBlockInfo::IsTransparent(a_World->GetBlock(a_Player->GetEyePosition())))
+		auto blockPlayerIsIn = a_World->GetBlock(a_Player->GetEyePosition());
+		if (cBlockInfo::IsTransparent(blockPlayerIsIn))
 		{
 			// Correct their eye position to not include this block they're standing in
-			Start = (a_Player->GetEyePosition()) + a_Player->GetLookVector();
-			End   = (a_Player->GetEyePosition() + a_Player->GetLookVector() * 4);
-		}
-		else
-		{
-			Start = (a_Player->GetEyePosition());
-			End   = (a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
+			Start +=  a_Player->GetLookVector();
+			End   += -a_Player->GetLookVector();
 		}
 
 		// cLineBlockTracer::Trace() returns true when whole line was traversed. By returning true from the callback when we hit something,
