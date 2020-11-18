@@ -264,19 +264,20 @@ public:
 
 		cLineBlockTracer Tracer(*a_World, Callbacks);
 		Vector3d Start;
+		Vector3d End;
 
 		// If the Player is standing half-inside non-air block
 		if (cBlockInfo::IsTransparent(a_World->GetBlock(a_Player->GetEyePosition())))
 		{
 			// Correct their eye position to not include this block they're standing in
 			Start = (a_Player->GetEyePosition()) + a_Player->GetLookVector();
+			End   = (a_Player->GetEyePosition() + a_Player->GetLookVector() * 4);
 		}
 		else
 		{
 			Start = (a_Player->GetEyePosition());
+			End   = (a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
 		}
-
-		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
 
 		// cLineBlockTracer::Trace() returns true when whole line was traversed. By returning true from the callback when we hit something,
 		// we ensure that this never happens if liquid could be placed
