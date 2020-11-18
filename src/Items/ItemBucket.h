@@ -263,7 +263,19 @@ public:
 		} Callbacks;
 
 		cLineBlockTracer Tracer(*a_World, Callbacks);
-		Vector3d Start(a_Player->GetEyePosition());
+		Vector3d Start;
+
+		// If the Player is standing half-inside non-air block
+		if (cBlockInfo::IsTransparent(a_World->GetBlock(a_Player->GetEyePosition())))
+		{
+			// Correct their eye position to not include this block they're standing in
+			Start = (a_Player->GetEyePosition()) + a_Player->GetLookVector();
+		}
+		else
+		{
+			Start = (a_Player->GetEyePosition());
+		}
+
 		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
 
 		// cLineBlockTracer::Trace() returns true when whole line was traversed. By returning true from the callback when we hit something,
