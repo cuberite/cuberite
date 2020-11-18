@@ -175,7 +175,6 @@ public:
 		}
 
 		// Place the actual fluid block:
-
 		return a_Player->PlaceBlock(BlockPos.x, BlockPos.y, BlockPos.z, a_FluidBlock, 0);
 	}
 
