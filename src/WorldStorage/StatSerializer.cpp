@@ -46,7 +46,7 @@ namespace StatSerializer
 			auto & Custom = a_Out["custom"];
 			for (const auto & Item : Store)
 			{
-				Custom[NamespaceSerializer::From(Item.first)] = Item.second;
+				Custom[NamespaceSerializer::From(Item.first).data()] = Item.second;
 			}
 		});
 	}

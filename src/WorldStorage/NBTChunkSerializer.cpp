@@ -644,7 +644,7 @@ public:
 
 
 
-	void AddBasicEntity(cEntity * a_Entity, const AString & a_ClassName)
+	void AddBasicEntity(cEntity * a_Entity, const std::string_view a_ClassName)
 	{
 		mWriter.AddString("id", a_ClassName);
 		mWriter.BeginList("Pos", TAG_Double);
@@ -753,9 +753,8 @@ public:
 
 	void AddMonsterEntity(cMonster * a_Monster)
 	{
-		const char * EntityClass = NamespaceSerializer::From(a_Monster->GetMobType());
 		mWriter.BeginCompound("");
-			AddBasicEntity(a_Monster, EntityClass);
+			AddBasicEntity(a_Monster, NamespaceSerializer::From(a_Monster->GetMobType()));
 			mWriter.BeginList("DropChances", TAG_Float);
 				mWriter.AddFloat("", a_Monster->GetDropChanceWeapon());
 				mWriter.AddFloat("", a_Monster->GetDropChanceHelmet());

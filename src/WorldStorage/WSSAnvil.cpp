@@ -584,7 +584,15 @@ void cWSSAnvil::LoadEntitiesFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		{
 			continue;
 		}
-		LoadEntityFromNBT(a_Entities, a_NBT, Child, a_NBT.GetData(sID), a_NBT.GetDataLength(sID));
+
+		try
+		{
+			LoadEntityFromNBT(a_Entities, a_NBT, Child, a_NBT.GetData(sID), a_NBT.GetDataLength(sID));
+		}
+		catch (...)
+		{
+			continue;
+		}
 	}  // for Child - a_NBT[]
 }
 
@@ -618,15 +626,28 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 		// Load the proper BlockEntity type based on the block type:
 		BLOCKTYPE BlockType = cChunkDef::GetBlock(a_BlockTypes, relPos);
 		NIBBLETYPE BlockMeta = cChunkDef::GetNibble(a_BlockMetas, relPos);
-		auto be = LoadBlockEntityFromNBT(a_NBT, Child, absPos, BlockType, BlockMeta);
-		if (be == nullptr)
+		OwnedBlockEntity Entity;
+
+		try
+		{
+			Entity = LoadBlockEntityFromNBT(a_NBT, Child, absPos, BlockType, BlockMeta);
+		}
+		catch (...)
 		{
 			continue;
 		}
 
+		// TODO: exception-ify the failure case
+		if (Entity == nullptr)
+		{
+			continue;
+		}
+
+		// Index computed before Entity moved.
+		const auto Idx = cChunkDef::MakeIndexNoCheck(Entity->GetRelPos());
+
 		// Add the BlockEntity to the loaded data:
-		auto Idx = cChunkDef::MakeIndex(be->GetRelX(), be->GetPosY(), be->GetRelZ());
-		a_BlockEntities.emplace(Idx, std::move(be));
+		a_BlockEntities.emplace(Idx, std::move(Entity));
 	}  // for Child - tag children
 }
 
@@ -1343,7 +1364,13 @@ OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int 
 	int Type = a_NBT.FindChildByName(a_TagIdx, "EntityId");
 	if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_String))
 	{
-		eMonsterType MonsterType = NamespaceSerializer::ToMonsterType(a_NBT.GetString(Type));
+		const auto StatInfo = NamespaceSerializer::SplitNamespacedID(a_NBT.GetString(Type));
+		if (StatInfo.first == NamespaceSerializer::Namespace::Unknown)
+		{
+			return nullptr;
+		}
+
+		eMonsterType MonsterType = NamespaceSerializer::ToMonsterType(StatInfo.second);
 		if (MonsterType != eMonsterType::mtInvalidType)
 		{
 			MobSpawner->SetEntity(MonsterType);
@@ -1592,126 +1619,97 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		{ "SmallFireball",                 &cWSSAnvil::LoadFireChargeFromNBT },
 		{ "minecraft:small_fireball",      &cWSSAnvil::LoadFireChargeFromNBT },
 		{ "ThrownEnderpearl",              &cWSSAnvil::LoadThrownEnderpearlFromNBT },
-		{ "minecraft:ender_pearl",         &cWSSAnvil::LoadThrownEnderpearlFromNBT },
-
-		// Old mob type ids:
-		{ "Bat",                           &cWSSAnvil::LoadBatFromNBT },
-		{ "Blaze",                         &cWSSAnvil::LoadBlazeFromNBT },
-		{ "CaveSpider",                    &cWSSAnvil::LoadCaveSpiderFromNBT },
-		{ "Chicken",                       &cWSSAnvil::LoadChickenFromNBT },
-		{ "Cow",                           &cWSSAnvil::LoadCowFromNBT },
-		{ "Creeper",                       &cWSSAnvil::LoadCreeperFromNBT },
-		{ "EnderDragon",                   &cWSSAnvil::LoadEnderDragonFromNBT },
-		{ "Enderman",                      &cWSSAnvil::LoadEndermanFromNBT },
-		{ "Ghast",                         &cWSSAnvil::LoadGhastFromNBT },
-		{ "Giant",                         &cWSSAnvil::LoadGiantFromNBT },
-		{ "Guardian",                      &cWSSAnvil::LoadGuardianFromNBT },
-		{ "Horse",                         &cWSSAnvil::LoadHorseFromNBT },
-		{ "Villager",                      &cWSSAnvil::LoadVillagerFromNBT },
-		{ "VillagerGolem",                 &cWSSAnvil::LoadIronGolemFromNBT },
-		{ "LavaSlime",                     &cWSSAnvil::LoadMagmaCubeFromNBT },
-		{ "MushroomCow",                   &cWSSAnvil::LoadMooshroomFromNBT },
-		{ "Ozelot",                        &cWSSAnvil::LoadOcelotFromNBT },
-		{ "Pig",                           &cWSSAnvil::LoadPigFromNBT },
-		{ "Rabbit",                        &cWSSAnvil::LoadRabbitFromNBT },
-		{ "Sheep",                         &cWSSAnvil::LoadSheepFromNBT },
-		{ "Silverfish",                    &cWSSAnvil::LoadSilverfishFromNBT },
-		{ "Skeleton",                      &cWSSAnvil::LoadSkeletonFromNBT },
-		{ "Slime",                         &cWSSAnvil::LoadSlimeFromNBT },
-		{ "SnowMan",                       &cWSSAnvil::LoadSnowGolemFromNBT },
-		{ "Spider",                        &cWSSAnvil::LoadSpiderFromNBT },
-		{ "Squid",                         &cWSSAnvil::LoadSquidFromNBT },
-		{ "Witch",                         &cWSSAnvil::LoadWitchFromNBT },
-		{ "WitherBoss",                    &cWSSAnvil::LoadWitherFromNBT },
-		{ "WitherSkeleton",                &cWSSAnvil::LoadWitherSkeletonFromNBT },
-		{ "Wolf",                          &cWSSAnvil::LoadWolfFromNBT },
-		{ "Zombie",                        &cWSSAnvil::LoadZombieFromNBT },
-		{ "PigZombie", &cWSSAnvil::LoadZombiefiedPiglinFromNBT },
-		{ "ZombieVillager",                &cWSSAnvil::LoadZombieVillagerFromNBT },
-
-		// Old names in the new format
-		{ "minecraft:villager_golem",      &cWSSAnvil::LoadIronGolemFromNBT },
-		{ "minecraft:snowman",             &cWSSAnvil::LoadSnowGolemFromNBT },
-		{ "minecraft:zombie_pigman",       &cWSSAnvil::LoadZombiefiedPiglinFromNBT },
-
-		// New namespaced mob type ids:
-		{ "minecraft:bat",                 &cWSSAnvil::LoadBatFromNBT },
-		{ "minecraft:blaze",               &cWSSAnvil::LoadBlazeFromNBT },
-		{ "minecraft:cat",                 &cWSSAnvil::LoadCatFromNBT },
-		{ "minecraft:cave_spider",         &cWSSAnvil::LoadCaveSpiderFromNBT },
-		{ "minecraft:chicken",             &cWSSAnvil::LoadChickenFromNBT },
-		{ "minecraft:cod",                 &cWSSAnvil::LoadCodFromNBT},
-		{ "minecraft:cow",                 &cWSSAnvil::LoadCowFromNBT },
-		{ "minecraft:creeper",             &cWSSAnvil::LoadCreeperFromNBT },
-		{ "minecraft:dolphin",             &cWSSAnvil::LoadDolphinFromNBT },
-		{ "minecraft:donkey",              &cWSSAnvil::LoadDonkeyFromNBT },
-		{ "minecraft:drowned",             &cWSSAnvil::LoadDrownedFromNBT },
-		{ "minecraft:elder_guardian",      &cWSSAnvil::LoadElderGuardianFromNBT },
-		{ "minecraft:ender_dragon",        &cWSSAnvil::LoadEnderDragonFromNBT },
-		{ "minecraft:enderman",            &cWSSAnvil::LoadEndermanFromNBT },
-		{ "minecraft:endermite",           &cWSSAnvil::LoadEndermiteFromNBT },
-		{ "minecraft:evoker",              &cWSSAnvil::LoadEvokerFromNBT },
-		{ "minecraft:fox",                 &cWSSAnvil::LoadFoxFromNBT },
-		{ "minecraft:ghast",               &cWSSAnvil::LoadGhastFromNBT },
-		{ "minecraft:giant",               &cWSSAnvil::LoadGiantFromNBT },
-		{ "minecraft:guardian",            &cWSSAnvil::LoadGuardianFromNBT },
-		{ "minecraft:horse",               &cWSSAnvil::LoadHorseFromNBT },
-		{ "minecraft:hoglin",              &cWSSAnvil::LoadHoglinFromNBT },
-		{ "minecraft:husk",                &cWSSAnvil::LoadHuskFromNBT },
-		{ "minecraft:illusioner",          &cWSSAnvil::LoadIllusionerFromNBT },
-		{ "minecraft:villager",            &cWSSAnvil::LoadVillagerFromNBT },
-		{ "minecraft:iron_golem",          &cWSSAnvil::LoadIronGolemFromNBT },
-		{ "minecraft:llama",               &cWSSAnvil::LoadLlamaFromNBT },
-		{ "minecraft:magma_cube",          &cWSSAnvil::LoadMagmaCubeFromNBT },
-		{ "minecraft:mooshroom",           &cWSSAnvil::LoadMooshroomFromNBT },
-		{ "minecraft:mule",                &cWSSAnvil::LoadMuleFromNBT },
-		{ "minecraft:ocelot",              &cWSSAnvil::LoadOcelotFromNBT },
-		{ "minecraft:panda",               &cWSSAnvil::LoadPandaFromNBT },
-		{ "minecraft:parrot",              &cWSSAnvil::LoadParrotFromNBT },
-		{ "minecraft:phantom",             &cWSSAnvil::LoadPhantomFromNBT },
-		{ "minecraft:pig",                 &cWSSAnvil::LoadPigFromNBT },
-		{ "minecraft:piglin",              &cWSSAnvil::LoadPiglinFromNBT },
-		{ "minecraft:piglin_brute",        &cWSSAnvil::LoadPiglinBruteFromNBT },
-		{ "minecraft:pillager",            &cWSSAnvil::LoadPillagerFromNBT },
-		{ "minecraft:polar_bear",          &cWSSAnvil::LoadPolarBearFromNBT },
-		{ "minecraft:pufferfish",          &cWSSAnvil::LoadPufferfishFromNBT },
-		{ "minecraft:rabbit",              &cWSSAnvil::LoadRabbitFromNBT },
-		{ "minecraft:ravager",             &cWSSAnvil::LoadRavagerFromNBT },
-		{ "minecraft:salmon",              &cWSSAnvil::LoadSalmonFromNBT },
-		{ "minecraft:sheep",               &cWSSAnvil::LoadSheepFromNBT },
-		{ "minecraft:shulker",             &cWSSAnvil::LoadShulkerFromNBT },
-		{ "minecraft:silverfish",          &cWSSAnvil::LoadSilverfishFromNBT },
-		{ "minecraft:skeleton",            &cWSSAnvil::LoadSkeletonFromNBT },
-		{ "minecraft:slime",               &cWSSAnvil::LoadSlimeFromNBT },
-		{ "minecraft:snow_golem",          &cWSSAnvil::LoadSnowGolemFromNBT },
-		{ "minecraft:spider",              &cWSSAnvil::LoadSpiderFromNBT },
-		{ "minecraft:squid",               &cWSSAnvil::LoadSquidFromNBT },
-		{ "minecraft:stray",               &cWSSAnvil::LoadStrayFromNBT },
-		{ "minecraft:strider",             &cWSSAnvil::LoadStriderFromNBT },
-		{ "minecraft:trader_llama",        &cWSSAnvil::LoadTraderLlamaFromNBT },
-		{ "minecraft:tropical_fish",       &cWSSAnvil::LoadTropicalFishFromNBT },
-		{ "minecraft:turtle",              &cWSSAnvil::LoadTurtleFromNBT },
-		{ "minecraft:vex",                 &cWSSAnvil::LoadVexFromNBT },
-		{ "minecraft:villager",            &cWSSAnvil::LoadVillagerFromNBT },
-		{ "minecraft:vindicator",          &cWSSAnvil::LoadVindicatorFromNBT },
-		{ "minecraft:wandering_trader",    &cWSSAnvil::LoadWanderingTraderFromNBT },
-		{ "minecraft:witch",               &cWSSAnvil::LoadWitchFromNBT },
-		{ "minecraft:wither",              &cWSSAnvil::LoadWitherFromNBT },
-		{ "minecraft:wither_skeleton",     &cWSSAnvil::LoadWitherSkeletonFromNBT },
-		{ "minecraft:wolf",                &cWSSAnvil::LoadWolfFromNBT },
-		{ "minecraft:zoglin",              &cWSSAnvil::LoadZoglinFromNBT },
-		{ "minecraft:zombie",              &cWSSAnvil::LoadZombieFromNBT },
-		{ "minecraft:zombie_horse",        &cWSSAnvil::LoadZombieHorseFromNBT },
-		{ "minecraft:zombified_piglin",    &cWSSAnvil::LoadZombiefiedPiglinFromNBT },
-		{ "minecraft:zombie_villager",     &cWSSAnvil::LoadZombieVillagerFromNBT },
+		{ "minecraft:ender_pearl",         &cWSSAnvil::LoadThrownEnderpearlFromNBT }
 	};
+
+	// TODO: flatten monster\projectile into one entity type enum
 
 	auto it = EntityTypeToFunction.find(AString(a_IDTag, a_IDTagLength));
 	if (it != EntityTypeToFunction.end())
 	{
 		(this->*it->second)(a_Entities, a_NBT, a_EntityTagIdx);
+		return;
 	}
-	// TODO: other entities
+
+	const auto StatInfo = NamespaceSerializer::SplitNamespacedID({ a_IDTag, a_IDTagLength });
+	if (StatInfo.first == NamespaceSerializer::Namespace::Unknown)
+	{
+		return;
+	}
+
+	switch (NamespaceSerializer::ToMonsterType(StatInfo.second))
+	{
+		case mtBat:             return LoadBatFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtBlaze:           return LoadBlazeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtCat:             return LoadCatFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtCaveSpider:      return LoadCaveSpiderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtChicken:         return LoadChickenFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtCod:             return LoadCodFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtCow:             return LoadCowFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtCreeper:         return LoadCreeperFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtDolphin:         return LoadDolphinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtDonkey:          return LoadDonkeyFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtDrowned:         return LoadDrownedFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtElderGuardian:   return LoadElderGuardianFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtEnderDragon:     return LoadEnderDragonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtEnderman:        return LoadEndermanFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtEndermite:       return LoadEndermiteFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtEvoker:          return LoadEvokerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtFox:             return LoadFoxFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtGhast:           return LoadGhastFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtGiant:           return LoadGiantFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtGuardian:        return LoadGuardianFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtHorse:           return LoadHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtHoglin:          return LoadHoglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtHusk:            return LoadHuskFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtIllusioner:      return LoadIllusionerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtIronGolem:       return LoadVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtLlama:           return LoadIronGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtMagmaCube:       return LoadLlamaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtMooshroom:       return LoadMagmaCubeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtMule:            return LoadMooshroomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtOcelot:          return LoadMuleFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPanda:           return LoadOcelotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtParrot:          return LoadPandaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPhantom:         return LoadParrotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPig:             return LoadPhantomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPiglin:          return LoadPigFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPiglinBrute:     return LoadPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPillager:        return LoadPiglinBruteFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPolarBear:       return LoadPillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPufferfish:      return LoadPolarBearFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtRabbit:          return LoadPufferfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtRavager:         return LoadRabbitFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSalmon:          return LoadRavagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSheep:           return LoadSalmonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtShulker:         return LoadSheepFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSilverfish:      return LoadShulkerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSkeleton:        return LoadSilverfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSkeletonHorse:   return LoadSkeletonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSlime:           return LoadSlimeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSnowGolem:       return LoadSnowGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSpider:          return LoadSpiderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSquid:           return LoadSquidFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtStray:           return LoadStrayFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtStrider:         return LoadStriderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtTraderLlama:     return LoadTraderLlamaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtTropicalFish:    return LoadTropicalFishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtTurtle:          return LoadTurtleFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtVex:             return LoadVexFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtVillager:        return LoadVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtVindicator:      return LoadVindicatorFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtWanderingTrader: return LoadWanderingTraderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtWitch:           return LoadWitchFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtWither:          return LoadWitherFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtWitherSkeleton:  return LoadWitherSkeletonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtWolf:            return LoadWolfFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtZoglin:          return LoadZoglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtZombie:          return LoadZombieFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtZombieHorse:     return LoadZombieHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtZombifiedPiglin: return LoadZombifiedPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtZombieVillager:  return LoadZombieVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtInvalidType:     break;
+	}
 }
 
 
@@ -3459,7 +3457,7 @@ void cWSSAnvil::LoadZombieHorseFromNBT(cEntityList &a_Entities, const cParsedNBT
 
 
 
-void cWSSAnvil::LoadZombiefiedPiglinFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+void cWSSAnvil::LoadZombifiedPiglinFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	std::unique_ptr<cZombiePigman> Monster = std::make_unique<cZombiePigman>();
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))

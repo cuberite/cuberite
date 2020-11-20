@@ -14,8 +14,8 @@ namespace NamespaceSerializer
 
 	unsigned DataVersion();
 
-	const char * From(Statistic a_ID);
-	const char * From(eMonsterType a_ID);
+	std::string_view From(Statistic a_ID);
+	std::string_view From(eMonsterType a_ID);
 
 	Statistic ToCustomStatistic(std::string_view a_ID);
 	eMonsterType ToMonsterType(std::string_view a_ID);

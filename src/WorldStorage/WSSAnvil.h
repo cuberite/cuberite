@@ -270,7 +270,7 @@ protected:
 	void LoadZoglinFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadZombieFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadZombieHorseFromNBT     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadZombiefiedPiglinFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadZombifiedPiglinFromNBT (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadZombieVillagerFromNBT  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 
 	/** Loads the owner name and UUID from the entity at the specified NBT tag.

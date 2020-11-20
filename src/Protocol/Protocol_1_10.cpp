@@ -336,12 +336,12 @@ cProtocol::Version cProtocol_1_10_0::GetProtocolVersion()
 
 
 
-UInt32 cProtocol_1_10_0::GetProtocolMobType(eMonsterType a_MobType)
+UInt32 cProtocol_1_10_0::GetProtocolMobType(const eMonsterType a_MobType)
 {
 	switch (a_MobType)
 	{
-		case mtPolarBear:   return 102;
-		default:            return Super::GetProtocolMobType(a_MobType);
+		case mtPolarBear: return 102;
+		default:          return Super::GetProtocolMobType(a_MobType);
 	}
 }
 

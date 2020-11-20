@@ -417,7 +417,7 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	auto MobType = GetProtocolMobType(a_Mob.GetMobType());
+	const auto MobType = GetProtocolMobType(a_Mob.GetMobType());
 
 	// If the type is not valid in this protocol bail out:
 	if (MobType == 0)
@@ -579,12 +579,12 @@ cProtocol::Version cProtocol_1_9_0::GetProtocolVersion()
 
 
 
-UInt32 cProtocol_1_9_0::GetProtocolMobType(eMonsterType a_MobType)
+UInt32 cProtocol_1_9_0::GetProtocolMobType(const eMonsterType a_MobType)
 {
 	switch (a_MobType)
 	{
-		case mtShulker:   return 69;
-		default: return Super::GetProtocolMobType(a_MobType);
+		case mtShulker: return 69;
+		default:        return Super::GetProtocolMobType(a_MobType);
 	}
 }
 

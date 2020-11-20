@@ -1054,13 +1054,13 @@ cProtocol::Version cProtocol_1_12::GetProtocolVersion()
 
 
 
-UInt32 cProtocol_1_12::GetProtocolMobType(eMonsterType a_MobType)
+UInt32 cProtocol_1_12::GetProtocolMobType(const eMonsterType a_MobType)
 {
 	switch (a_MobType)
 	{
-		case mtIllusioner:  return 37;
-		case mtParrot:      return 105;
-		default:            return Super::GetProtocolMobType(a_MobType);
+		case mtIllusioner: return 37;
+		case mtParrot:     return 105;
+		default:           return Super::GetProtocolMobType(a_MobType);
 	}
 }
 

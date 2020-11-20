@@ -1388,7 +1388,7 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	auto MobType = GetProtocolMobType(a_Mob.GetMobType());
+	const auto MobType = GetProtocolMobType(a_Mob.GetMobType());
 
 	// If the type is not valid in this protocol bail out:
 	if (MobType == 0)
@@ -1884,7 +1884,7 @@ int cProtocol_1_8_0::GetParticleID(const AString & a_ParticleName)
 
 
 
-UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
+UInt32 cProtocol_1_8_0::GetProtocolMobType(const eMonsterType a_MobType)
 {
 	switch (a_MobType)
 	{
@@ -1924,6 +1924,7 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtZombie:                return 54;
 		case mtZombiePigman:          return 57;
 		case mtZombieVillager:        return 27;
+
 		// Mobs that get replaced with another because they were added later
 		case mtCat:                   return GetProtocolMobType(mtOcelot);
 		case mtDonkey:                return GetProtocolMobType(mtHorse);
