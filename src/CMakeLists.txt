@@ -98,6 +98,7 @@ target_sources(
 	Color.h
 	CommandOutput.h
 	CompositeChat.h
+	ConstexprMap.h
 	CraftingRecipes.h
 	Cuboid.h
 	DeadlockDetect.h

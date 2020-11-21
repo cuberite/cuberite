@@ -9,6 +9,9 @@
 #include "../Bindings/LuaState.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 #include "../StringCompression.h"
+#include "../ConstexprMap.h"
+
+#include <optional>
 
 
 
@@ -28,22 +31,26 @@
 
 
 /** Returns the map of string => eMergeStrategy used when translating cubeset file merge strategies. */
-static std::map<AString, cBlockArea::eMergeStrategy> & GetMergeStrategyMap(void)
+static std::optional<cBlockArea::eMergeStrategy> GetMergeStrategy(std::string_view a_MS)
 {
-	static std::map<AString, cBlockArea::eMergeStrategy> msmap;
-	if (msmap.empty())
+	static constexpr cConstexprMap<std::string_view, cBlockArea::eMergeStrategy, 8> MSMap
 	{
 		// This is the first use, initialize the map:
-		msmap["msOverwrite"]     = cBlockArea::msOverwrite;
-		msmap["msFillAir"]       = cBlockArea::msFillAir;
-		msmap["msImprint"]       = cBlockArea::msImprint;
-		msmap["msLake"]          = cBlockArea::msLake;
-		msmap["msSpongePrint"]   = cBlockArea::msSpongePrint;
-		msmap["msDifference"]    = cBlockArea::msDifference;
-		msmap["msSimpleCompare"] = cBlockArea::msSimpleCompare;
-		msmap["msMask"]          = cBlockArea::msMask;
+		{"msOverwrite",     cBlockArea::msOverwrite},
+		{"msFillAir",       cBlockArea::msFillAir},
+		{"msImprint",       cBlockArea::msImprint},
+		{"msLake",          cBlockArea::msLake},
+		{"msSpongePrint",   cBlockArea::msSpongePrint},
+		{"msDifference",    cBlockArea::msDifference},
+		{"msSimpleCompare", cBlockArea::msSimpleCompare},
+		{"msMask",          cBlockArea::msMask}
+	};
+	auto It = MSMap.find(a_MS);
+	if (It == MSMap.end())
+	{
+		return std::nullopt;
 	}
-	return msmap;
+	return It->second;
 }
 
 
@@ -552,9 +559,8 @@ bool cPrefabPiecePool::ReadPieceMetadataCubesetVer1(
 	a_Prefab->SetAddWeightIfSame(AddWeightIfSame);
 	a_Prefab->SetDefaultWeight(DefaultWeight);
 	a_Prefab->ParseDepthWeight(DepthWeight.c_str());
-	auto msmap = GetMergeStrategyMap();
-	auto strategy = msmap.find(MergeStrategy);
-	if (strategy == msmap.end())
+	auto StrategyOpt = GetMergeStrategy(MergeStrategy);
+	if (!StrategyOpt)
 	{
 		CONDWARNING(a_LogWarnings, "Unknown merge strategy (\"%s\") specified for piece %s in file %s. Using msSpongePrint instead.",
 			MergeStrategy.c_str(), a_PieceName.c_str(), a_FileName.c_str()
@@ -563,7 +569,7 @@ bool cPrefabPiecePool::ReadPieceMetadataCubesetVer1(
 	}
 	else
 	{
-		a_Prefab->SetMergeStrategy(strategy->second);
+		a_Prefab->SetMergeStrategy(*StrategyOpt);
 	}
 	a_Prefab->SetMoveToGround(MoveToGround != 0);
 
