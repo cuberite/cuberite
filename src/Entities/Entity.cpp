@@ -903,7 +903,7 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		// Handle magma block damage
 		if (
-			IsMob() ||
+			(IsMob() && !(this->m_IsFireproof)) ||
 			(IsPlayer() && !((static_cast<cPlayer *>(this))->IsGameModeCreative() || (static_cast<cPlayer *>(this))->IsGameModeSpectator()))
 		)
 		{
