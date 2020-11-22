@@ -147,6 +147,7 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 	);
 	*/
 
+
 	ASSERT(m_World == nullptr);
 	ASSERT(GetParentChunk() == nullptr);
 	SetWorld(&a_EntityWorld);
@@ -1344,11 +1345,10 @@ void cEntity::DetectMagma(void)
 					TakeDamage(dtMagmaContact, nullptr, 1, 0);
 					return;
 				}
-			} // for y
-		} // for z
-	} // for x
+			}  // for y
+		}  // for z
+	}  // for x
 }
-
 
 
 
