@@ -48,6 +48,24 @@ public:
 		{
 			// Clicked on a face of a submerged block; vanilla allows placement, so should we
 			auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+
+			// Lilypad should not replace non air and non water blocks
+			auto BlockToReplace = a_World->GetBlock(PlacePos);
+			if ((BlockToReplace != E_BLOCK_AIR) &&
+				(BlockToReplace != E_BLOCK_WATER) &&
+				(BlockToReplace != E_BLOCK_STATIONARY_WATER))
+			{
+				return false;
+			}
+
+			// Lilypad should be placed only if there is a water block below
+			auto BlockBelow = a_World->GetBlock(PlacePos - Vector3i(0, 1, 0));
+			if ((BlockBelow != E_BLOCK_WATER) &&
+				(BlockBelow != E_BLOCK_STATIONARY_WATER))
+			{
+				return false;
+			}
+
 			a_World->SetBlock(PlacePos, E_BLOCK_LILY_PAD, 0);
 			if (!a_Player->IsGameModeCreative())
 			{
@@ -100,6 +118,13 @@ public:
 
 		if (Callbacks.m_HasHitFluid)
 		{
+			// Lilypad should not replace non air blocks
+			auto BlockToReplace = a_World->GetBlock(Callbacks.m_Pos);
+			if (BlockToReplace != E_BLOCK_AIR)
+			{
+				return false;
+			}
+
 			a_World->SetBlock(Callbacks.m_Pos, E_BLOCK_LILY_PAD, 0);
 			if (!a_Player->IsGameModeCreative())
 			{
