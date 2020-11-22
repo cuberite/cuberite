@@ -418,12 +418,20 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
+	const auto MobType = GetProtocolMobType(a_Mob.GetMobType());
+
+	// If the type is not valid in this protocol bail out:
+	if (MobType == 0)
+	{
+		return;
+	}
+
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
-	Pkt.WriteBEUInt8(static_cast<Byte>(GetProtocolMobType(a_Mob.GetMobType())));
+	Pkt.WriteBEUInt8(static_cast<Byte>(MobType));
 	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
@@ -566,6 +574,19 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 cProtocol::Version cProtocol_1_9_0::GetProtocolVersion()
 {
 	return Version::v1_9_0;
+}
+
+
+
+
+
+UInt32 cProtocol_1_9_0::GetProtocolMobType(const eMonsterType a_MobType)
+{
+	switch (a_MobType)
+	{
+		case mtShulker: return 69;
+		default:        return Super::GetProtocolMobType(a_MobType);
+	}
 }
 
 
@@ -1756,7 +1777,7 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 
 void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 {
-	// Living Enitiy Metadata
+	// Living entity metadata
 	if (a_Mob.HasCustomName())
 	{
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
@@ -1966,6 +1987,13 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtSheep
 
+		case mtSkeleton:
+		{
+			a_Pkt.WriteBEUInt8(11);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(0);
+		}
+
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -2097,7 +2125,52 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtZombieVillager
 
-		default: break;
+		case mtBlaze:
+		case mtElderGuardian:
+		case mtGuardian:
+		{
+			// TODO: Mobs with extra fields that aren't implemented
+			break;
+		}
+
+		case mtCat:
+
+		case mtDonkey:
+
+		case mtEndermite:
+
+		case mtMule:
+
+		case mtStray:
+
+		case mtSkeletonHorse:
+		case mtZombieHorse:
+
+		case mtShulker:
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			UNREACHABLE("cProtocol_1_9::WriteMobMetadata: received unimplemented type");
+			break;
+		}
+
+		case mtCaveSpider:
+		case mtEnderDragon:
+		case mtGiant:
+		case mtIronGolem:
+		case mtMooshroom:
+		case mtSilverfish:
+		case mtSnowGolem:
+		case mtSpider:
+		case mtSquid:
+		{
+			// Entities without additional metadata
+			break;
+		}
+		case mtInvalidType:
+		{
+
+		}
+		default: UNREACHABLE("cProtocol_1_9::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
 

@@ -550,7 +550,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 {
 	using namespace Metadata_1_12;
 
-	// Living Enitiy Metadata
+	// Living entity metadata
 	if (a_Mob.HasCustomName())
 	{
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
@@ -642,7 +642,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtHorse:
 		{
-			// XXX This behaves incorrectly with different varients; horses have different entity IDs now
+			// XXX This behaves incorrectly with different variants; horses have different entity IDs now
 
 			// Abstract horse
 			auto & Horse = static_cast<const cHorse &>(a_Mob);
@@ -866,7 +866,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtZombie:
 		{
-			// XXX Zombies were also split into new sublcasses; this doesn't handle that.
+			// XXX Zombies were also split into new subclasses; this doesn't handle that.
 			auto & Zombie = static_cast<const cZombie &>(a_Mob);
 			a_Pkt.WriteBEUInt8(ZOMBIE_IS_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
@@ -907,20 +907,57 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		}  // case mtZombieVillager
 
 		case mtBlaze:
+		case mtCaveSpider:
+		case mtElderGuardian:
 		case mtEnderDragon:
 		case mtGuardian:
 		case mtIronGolem:
 		case mtSnowGolem:
 		case mtSpider:
+		case mtWitherSkeleton:
 		{
 			// TODO: Mobs with extra fields that aren't implemented
 			break;
 		}
 
 		case mtMooshroom:
-		case mtCaveSpider:
 		{
 			// Not mentioned on http://wiki.vg/Entities
+			break;
+		}
+
+		case mtCat:
+
+		case mtDonkey:
+		case mtMule:
+
+		case mtEndermite:
+
+		case mtEvoker:
+
+		case mtHusk:
+
+		case mtIllusioner:
+
+		case mtLlama:
+
+		case mtParrot:
+
+		case mtPolarBear:
+
+		case mtShulker:
+
+		case mtSkeletonHorse:
+		case mtZombieHorse:
+
+		case mtStray:
+
+		case mtVex:
+
+		case mtVindicator:
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			UNREACHABLE("cProtocol_1_12::WriteMobMetadata: received unimplemented type");
 			break;
 		}
 
@@ -928,7 +965,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtSilverfish:
 		case mtSkeleton:
 		case mtSquid:
-		case mtWitherSkeleton:
 		{
 			// Mobs with no extra fields
 			break;
@@ -936,9 +972,9 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtInvalidType:
 		{
-			ASSERT(!"cProtocol_1_12::WriteMobMetadata: Recieved mob of invalid type");
 			break;
 		}
+		default: UNREACHABLE("cProtocol_1_12::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
 
@@ -1029,6 +1065,20 @@ void cProtocol_1_12::HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer)
 cProtocol::Version cProtocol_1_12::GetProtocolVersion()
 {
 	return Version::v1_12;
+}
+
+
+
+
+
+UInt32 cProtocol_1_12::GetProtocolMobType(const eMonsterType a_MobType)
+{
+	switch (a_MobType)
+	{
+		case mtIllusioner: return 37;
+		case mtParrot:     return 105;
+		default:           return Super::GetProtocolMobType(a_MobType);
+	}
 }
 
 

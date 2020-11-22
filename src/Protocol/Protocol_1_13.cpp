@@ -406,38 +406,65 @@ UInt32 cProtocol_1_13::GetProtocolMobType(eMonsterType a_MobType)
 		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
 		case mtInvalidType:           return 27;
 		case mtBat:                   return 3;
+		case mtCat:                   return 48;
 		case mtBlaze:                 return 4;
 		case mtCaveSpider:            return 6;
 		case mtChicken:               return 7;
+		case mtCod:                   return 8;
 		case mtCow:                   return 9;
 		case mtCreeper:               return 10;
+		case mtDonkey:                return 11;
+		case mtDolphin:               return 12;
+		case mtDrowned:               return 14;
+		case mtElderGuardian:         return 15;
 		case mtEnderDragon:           return 17;
 		case mtEnderman:              return 18;
+		case mtEndermite:             return 19;
+		case mtEvoker:                return 21;
 		case mtGhast:                 return 26;
 		case mtGiant:                 return 27;
 		case mtGuardian:              return 28;
 		case mtHorse:                 return 29;
+		case mtHusk:                  return 30;
+		case mtIllusioner:            return 31;
 		case mtIronGolem:             return 80;
+		case mtLlama:                 return 36;
 		case mtMagmaCube:             return 38;
+		case mtMule:                  return 46;
 		case mtMooshroom:             return 47;
 		case mtOcelot:                return 48;
+		case mtParrot:                return 50;
+		case mtPhantom:               return 90;
 		case mtPig:                   return 51;
+		case mtPufferfish:            return 52;
+		case mtPolarBear:             return 54;
 		case mtRabbit:                return 56;
+		case mtSalmon:                return 57;
 		case mtSheep:                 return 58;
+		case mtShulker:               return 59;
 		case mtSilverfish:            return 61;
 		case mtSkeleton:              return 62;
+		case mtSkeletonHorse:         return 63;
 		case mtSlime:                 return 64;
 		case mtSnowGolem:             return 66;
 		case mtSpider:                return 69;
 		case mtSquid:                 return 70;
+		case mtStray:                 return 71;
+		case mtTropicalFish:          return 72;
+		case mtTurtle:                return 73;
+		case mtVex:                   return 78;
 		case mtVillager:              return 79;
+		case mtVindicator:            return 81;
 		case mtWitch:                 return 82;
 		case mtWither:                return 83;
 		case mtWitherSkeleton:        return 84;
 		case mtWolf:                  return 86;
 		case mtZombie:                return 87;
 		case mtZombiePigman:          return 53;
+		case mtZombieHorse:           return 88;
 		case mtZombieVillager:        return 89;
+
+		default:                      return 0;
 	}
 	UNREACHABLE("Unsupported mob type");
 }
@@ -1222,13 +1249,68 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtBlaze:
 		case mtEnderDragon:
-		case mtGuardian:
 		case mtIronGolem:
 		case mtSnowGolem:
 		case mtSpider:
 		case mtZombieVillager:
 		{
 			// TODO: Mobs with extra fields that aren't implemented
+			break;
+		}
+
+		case mtCat:
+
+		case mtCod:
+
+		case mtDolphin:
+
+		case mtDonkey:
+
+		case mtDrowned:
+
+		case mtElderGuardian:
+		case mtGuardian:
+
+		case mtEndermite:
+
+		case mtEvoker:
+
+		case mtIllusioner:
+
+		case mtLlama:
+
+		case mtMule:
+
+		case mtParrot:
+
+		case mtPhantom:
+
+		case mtPolarBear:
+
+		case mtPufferfish:
+
+		case mtSalmon:
+
+		case mtShulker:
+
+		case mtStray:
+
+		case mtSkeletonHorse:
+		case mtZombieHorse:
+
+		case mtTropicalFish:
+
+		case mtTurtle:
+
+		case mtVex:
+
+		case mtVindicator:
+
+		case mtHusk:
+
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			UNREACHABLE("cProtocol_1_13::WriteMobMetadata: received unimplemented type");
 			break;
 		}
 
@@ -1251,9 +1333,9 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtInvalidType:
 		{
-			ASSERT(!"cProtocol_1_13::WriteMobMetadata: Recieved mob of invalid type");
 			break;
 		}
+		default: UNREACHABLE("cProtocol_1_13::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
 
