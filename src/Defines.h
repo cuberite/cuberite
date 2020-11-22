@@ -278,6 +278,7 @@ enum eDamageType
 	dtSuffocating,      // Suffocating inside a block
 	dtStarving,         // Hunger
 	dtCactusContact,    // Contact with a cactus block
+	dtMagmaContact,     // Contact with a magma block
 	dtLavaContact,      // Contact with a lava block
 	dtPoisoning,        // Having the poison effect
 	dtWithering,        // Having the wither effect
@@ -306,6 +307,7 @@ enum eDamageType
 	dtCactus       = dtCactusContact,
 	dtCactuses     = dtCactusContact,
 	dtCacti        = dtCactusContact,
+	dtMagma        = dtMagmaContact,
 	dtLava         = dtLavaContact,
 	dtPoison       = dtPoisoning,
 	dtWither       = dtWithering,

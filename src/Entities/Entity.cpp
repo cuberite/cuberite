@@ -628,6 +628,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		case dtAttack:
 		case dtArrowAttack:
 		case dtCactusContact:
+		case dtMagmaContact:
 		case dtLavaContact:
 		case dtFireContact:
 		case dtExplosion:
@@ -897,6 +898,15 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		)
 		{
 			DetectCacti();
+		}
+
+		// Handle magma block damage
+		if (
+			IsMob() ||
+			(IsPlayer() && !((static_cast<cPlayer *>(this))->IsGameModeCreative() || (static_cast<cPlayer *>(this))->IsGameModeSpectator()))
+		)
+		{
+			DetectMagma();
 		}
 
 		// Handle drowning:
@@ -1309,6 +1319,36 @@ void cEntity::DetectCacti(void)
 		}  // for z
 	}  // for x
 }
+
+
+
+
+
+void cEntity::DetectMagma(void)
+{
+	int MinX = FloorC(GetPosX() - m_Width / 2);
+	int MaxX = FloorC(GetPosX() + m_Width / 2);
+	int MinZ = FloorC(GetPosZ() - m_Width / 2);
+	int MaxZ = FloorC(GetPosZ() + m_Width / 2);
+	int MinY = Clamp(POSY_TOINT - 1, 0, cChunkDef::Height - 1);
+	int MaxY = Clamp(FloorC(GetPosY() + m_Height), 0, cChunkDef::Height - 1);
+
+	for (int x = MinX; x <= MaxX; x++)
+	{
+		for (int z = MinZ; z <= MaxZ; z++)
+		{
+			for (int y = MinY; y <= MaxY; y++)
+			{
+				if (GetWorld()->GetBlock(x, y, z) == E_BLOCK_MAGMA)
+				{
+					TakeDamage(dtMagmaContact, nullptr, 1, 0);
+					return;
+				}
+			} // for y
+		} // for z
+	} // for x
+}
+
 
 
 
@@ -2334,6 +2374,3 @@ float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 		return 0;
 	}
 }
-
-
-

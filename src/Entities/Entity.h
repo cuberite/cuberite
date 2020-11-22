@@ -420,6 +420,9 @@ public:
 	/** Detects the time for application of cacti damage */
 	virtual void DetectCacti(void);
 
+	/** Detects the time for application of magma block damage */
+	virtual void DetectMagma(void);
+
 	/** Detects whether we are in a portal block and begins teleportation procedures if so
 	Returns true if MoveToWorld() was called, false if not
 	*/

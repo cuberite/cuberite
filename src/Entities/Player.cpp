@@ -1194,6 +1194,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 					case dtSuffocating:     return GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block";
 					case dtStarving:        return "forgot the importance of food";
 					case dtCactusContact:   return "was impaled on a cactus";
+					case dtMagmaContact:    return "discovered the floor was lava";
 					case dtLavaContact:     return "was melted by lava";
 					case dtPoisoning:       return "died from septicaemia";
 					case dtWithering:       return "is a husk of their former selves";
