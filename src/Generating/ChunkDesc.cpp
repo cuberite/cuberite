@@ -647,6 +647,19 @@ void cChunkDesc::CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas)
 
 
 
+void cChunkDesc::UncompressBlockMetas(const cChunkDef::BlockNibbles & a_DestMetas)
+{
+	for (size_t i = 0; i < ARRAYCOUNT(a_DestMetas); i++)
+	{
+		m_BlockArea.GetBlockMetas()[2 * i]     = (a_DestMetas[i] >> 0) & 0x0F;
+		m_BlockArea.GetBlockMetas()[2 * i + 1] = (a_DestMetas[i] >> 4) & 0x0F;
+	}
+}
+
+
+
+
+
 #ifdef _DEBUG
 
 void cChunkDesc::VerifyHeightmap(void)

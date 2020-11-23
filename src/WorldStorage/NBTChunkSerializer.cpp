@@ -48,6 +48,9 @@
 
 #include "../Mobs/IncludeAllMonsters.h"
 
+#include "../Generating/ChunkDesc.h"
+#include "../AllocationPool.h"
+
 
 
 
@@ -1240,5 +1243,115 @@ bool NBTChunkSerializer::serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 	aWriter.AddByte("TerrainPopulated", 1);
 
 	aWriter.EndCompound();  // "Level"
+	return true;
+}
+
+
+
+
+
+bool NBTChunkSerializer::serializeChunkDesc(cChunkDesc & aChunkDesc, cFastNBTWriter & aWriter)
+{
+	SerializerCollector serializer(aWriter);
+	aWriter.BeginCompound("Level");
+	aWriter.AddInt("xPos", aChunkDesc.GetChunkX());
+	aWriter.AddInt("zPos", aChunkDesc.GetChunkZ());
+
+	serializer.HeightMap(&aChunkDesc.GetHeightMap());
+	serializer.BiomeData(&aChunkDesc.GetBiomeMap());
+
+	serializer.LightIsValid(false);
+
+	{
+		serializer.m_Data.SetBlockTypes(aChunkDesc.GetBlockTypes());
+
+		{
+			cChunkDef::BlockNibbles Metas;
+			aChunkDesc.CompressBlockMetas(Metas);
+			serializer.m_Data.SetMetas(Metas);
+		}
+	}
+
+	for (const auto & Entity : aChunkDesc.GetEntities())
+	{
+		serializer.Entity(Entity.get());
+	}
+
+	for (auto & KeyPair : aChunkDesc.GetBlockEntities())
+	{
+		serializer.BlockEntity(KeyPair.second.get());
+	}
+
+	serializer.Finish();  // Close NBT tags
+
+	// Save biomes, both MCS (IntArray) and MC-vanilla (ByteArray):
+	if (serializer.mBiomesAreValid)
+	{
+		aWriter.AddByteArray("Biomes",    reinterpret_cast<const char *>(serializer.mVanillaBiomes), ARRAYCOUNT(serializer.mVanillaBiomes));
+		aWriter.AddIntArray ("MCSBiomes", reinterpret_cast<const int *>(serializer.mBiomes),         ARRAYCOUNT(serializer.mBiomes));
+	}
+
+	// Save heightmap (Vanilla require this):
+	aWriter.AddIntArray("HeightMap", reinterpret_cast<const int *>(serializer.mVanillaHeightMap), ARRAYCOUNT(serializer.mVanillaHeightMap));
+
+	// Save blockdata:
+	aWriter.BeginList("Sections", TAG_Compound);
+	for (size_t Y = 0; Y != cChunkData::NumSections; ++Y)
+	{
+		auto section = serializer.m_Data.GetSection(Y);
+		if (section == nullptr)
+		{
+			continue;
+		}
+
+		aWriter.BeginCompound("");
+		aWriter.AddByteArray("Blocks", reinterpret_cast<const char *>(section->m_BlockTypes), ARRAYCOUNT(section->m_BlockTypes));
+		aWriter.AddByteArray("Data",   reinterpret_cast<const char *>(section->m_BlockMetas), ARRAYCOUNT(section->m_BlockMetas));
+
+		aWriter.AddByte("Y", static_cast<unsigned char>(Y));
+		aWriter.EndCompound();
+	}
+	aWriter.EndList();  // "Sections"
+
+	aWriter.EndCompound();  // "Level"
+	return true;
+}
+
+
+
+
+
+bool NBTChunkSerializer::serializeBiomeMap(const cChunkDef::BiomeMap & aBiomeMap, cFastNBTWriter & aWriter)
+{
+	aWriter.AddByteArray("Biomes",    reinterpret_cast<const char *>(aBiomeMap), ARRAYCOUNT(aBiomeMap));
+	return true;
+}
+
+
+
+
+
+bool NBTChunkSerializer::deserializeBiomeMap(cChunkDef::BiomeMap & aBiomeMap, cParsedNBT & a_NBT)
+{
+	int Biomes = a_NBT.FindChildByName(a_NBT.GetRoot(), "Biomes");
+	if ((Biomes < 0) || (a_NBT.GetType(Biomes) != TAG_ByteArray))
+	{
+		return false;
+	}
+	if (a_NBT.GetDataLength(Biomes) != 16 * 16)
+	{
+		// The biomes stored don't match in size
+		return false;
+	}
+	const unsigned char * BiomeData = reinterpret_cast<const unsigned char *>(a_NBT.GetData(Biomes));
+	for (size_t i = 0; i < ARRAYCOUNT(aBiomeMap); i++)
+	{
+		if ((BiomeData)[i] == 0xff)
+		{
+			// Unassigned biomes
+			return false;
+		}
+		aBiomeMap[i] = static_cast<EMCSBiome>(BiomeData[i]);
+	}
 	return true;
 }

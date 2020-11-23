@@ -5,6 +5,7 @@ target_sources(
 	Caves.cpp
 	ChunkDesc.cpp
 	ChunkGenerator.cpp
+	ChunkGeneratorHTTPClient.cpp
 	CompoGen.cpp
 	CompoGenBiomal.cpp
 	ComposableGenerator.cpp
@@ -36,6 +37,7 @@ target_sources(
 	Caves.h
 	ChunkDesc.h
 	ChunkGenerator.h
+	ChunkGeneratorHTTPClient.h
 	CompoGen.h
 	CompoGenBiomal.h
 	ComposableGenerator.h

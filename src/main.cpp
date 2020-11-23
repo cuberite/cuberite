@@ -145,6 +145,7 @@ static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & r
 	TCLAP::SwitchArg noBufArg        ("",  "no-output-buffering", "Disable output buffering", cmd);
 	TCLAP::SwitchArg noFileLogArg    ("",  "no-log-file",         "Disable logging to file", cmd);
 	TCLAP::SwitchArg runAsServiceArg ("d", "service",             "Run as a service on Windows, or daemon on UNIX like systems", cmd);
+	TCLAP::SwitchArg chunkServer     ("",  "chunk-server",        "Run a ChunkHTTPServer", cmd);
 	cmd.parse(argc, argv);
 
 	// Copy the parsed args' values into a settings repository:
@@ -183,6 +184,7 @@ static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & r
 	{
 		setvbuf(stdout, nullptr, _IONBF, 0);
 	}
+	repo.AddValue("ChunkServer", "Enable", chunkServer.getValue());
 	repo.SetReadOnly();
 
 	if (runAsServiceArg.getValue())

@@ -7,7 +7,8 @@
 #include "Protocol/Authenticator.h"
 #include "Protocol/MojangAPI.h"
 #include "RankManager.h"
-#include "ChunkDef.h"
+#include "ChunkHTTPServer.h"
+
 
 
 
@@ -20,6 +21,7 @@ class cCraftingRecipes;
 class cRecipeMapper;
 class cFurnaceRecipe;
 class cWebAdmin;
+class ChunkHTTPServer;
 class cPluginManager;
 class cServer;
 class cWorld;
@@ -226,6 +228,7 @@ private:
 	cPluginManager *   m_PluginManager;
 	cAuthenticator     m_Authenticator;
 	cMojangAPI *       m_MojangAPI;
+	ChunkHTTPServer *  m_ChunkServer;
 
 	std::unique_ptr<cRankManager> m_RankManager;
 

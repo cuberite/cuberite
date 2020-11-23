@@ -9,7 +9,6 @@
 #include "WorldStorage.h"
 #include "WSSAnvil.h"
 #include "../World.h"
-#include "../Generating/ChunkGenerator.h"
 #include "../Entities/Entity.h"
 #include "../BlockEntities/BlockEntity.h"
 

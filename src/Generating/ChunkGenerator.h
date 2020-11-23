@@ -46,6 +46,10 @@ public:
 	Initializes the generator, so that it can be used immediately after this call returns. */
 	static std::unique_ptr<cChunkGenerator> CreateFromIniFile(cIniFile & a_IniFile);
 
+	/** Creates and initializes generator, possibly a ChunkGeneratorHTTPClient.
+	Definition is in the ChunkGeneratorHTTPClient.cpp file. */
+	static std::unique_ptr<cChunkGenerator> CreateFromIniFile(cIniFile & a_IniFile, bool a_EnableHTTP);
+
 
 protected:
 

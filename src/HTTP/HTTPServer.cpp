@@ -163,7 +163,7 @@ bool cHTTPServer::Start(cCallbacks & a_Callbacks, const AStringVector & a_Ports)
 		}
 		reportPorts.append(port);
 	}
-	LOGINFO("WebAdmin is running on port(s) %s", reportPorts.c_str());
+	LOGINFO("HTTPServer is running on port(s) %s", reportPorts.c_str());
 
 	// Report success if at least one port opened successfully:
 	return !m_ServerHandles.empty();

@@ -23,6 +23,7 @@ class cMonster;
 class cProjectileEntity;
 class cHangingEntity;
 class cUUID;
+class cChunkDesc;
 
 
 
@@ -53,6 +54,8 @@ public:
 
 	cWSSAnvil(cWorld * a_World, int a_CompressionFactor);
 	virtual ~cWSSAnvil() override;
+
+	bool LoadChunkDescFromNBT(cChunkDesc & a_ChunkDesc, const cParsedNBT & a_NBT);
 
 protected:
 

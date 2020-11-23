@@ -483,6 +483,79 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 
 
+bool cWSSAnvil::LoadChunkDescFromNBT(cChunkDesc & a_ChunkDesc, const cParsedNBT & a_NBT)
+{
+	// The data arrays, in MCA-native y / z / x ordering (will be reordered for the final chunk data)
+	cChunkDef::BlockNibbles MetaData;
+
+	memset(MetaData,   0,    sizeof(MetaData));
+
+	// Load the blockdata, blocklight and skylight:
+	int Level = a_NBT.FindChildByName(0, "Level");
+	if (Level < 0)
+	{
+		LOG("Missing NBT tag: Level");
+		return false;
+	}
+
+	// Coords
+	int xPos = a_NBT.FindChildByName(Level, "xPos");
+	int zPos = a_NBT.FindChildByName(Level, "zPos");
+	a_ChunkDesc.SetChunkCoords(cChunkCoords(a_NBT.GetInt(xPos), a_NBT.GetInt(zPos)));
+
+	// Sections
+	int Sections = a_NBT.FindChildByName(Level, "Sections");
+	if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
+	{
+		LOG("Missing NBT tag: Sections");
+		return false;
+	}
+	eTagType SectionsType = a_NBT.GetChildrenType(Sections);
+	if ((SectionsType != TAG_Compound) && (SectionsType != TAG_End))
+	{
+		LOG("NBT tag has wrong type: Sections");
+		return false;
+	}
+	for (int Child = a_NBT.GetFirstChild(Sections); Child >= 0; Child = a_NBT.GetNextSibling(Child))
+	{
+		int y = 0;
+		int SectionY = a_NBT.FindChildByName(Child, "Y");
+		if ((SectionY < 0) || (a_NBT.GetType(SectionY) != TAG_Byte))
+		{
+			continue;
+		}
+		y = a_NBT.GetByte(SectionY);
+		if ((y < 0) || (y > 15))
+		{
+			continue;
+		}
+		CopyNBTData(a_NBT, Child, "Blocks",     reinterpret_cast<char *>(&(a_ChunkDesc.GetBlockTypes()[y * 4096])), 4096);
+		CopyNBTData(a_NBT, Child, "Data",       reinterpret_cast<char *>(&(MetaData[y   * 2048])), 2048);
+	}  // for itr - LevelSections[]
+
+	// Load the biomes from NBT, if present and valid. First try MCS-style, then Vanilla-style:
+	cChunkDef::BiomeMap * Biomes = LoadBiomeMapFromNBT(&a_ChunkDesc.GetBiomeMap(), a_NBT, a_NBT.FindChildByName(Level, "MCSBiomes"));
+	if (Biomes == nullptr)
+	{
+		// MCS-style biomes not available, load vanilla-style:
+		Biomes = LoadVanillaBiomeMapFromNBT(&a_ChunkDesc.GetBiomeMap(), a_NBT, a_NBT.FindChildByName(Level, "Biomes"));
+	}
+
+	// Load the entities from NBT:
+	cEntityList      Entities;
+	cBlockEntities   BlockEntities;
+	LoadEntitiesFromNBT     (a_ChunkDesc.GetEntities(),      a_NBT, a_NBT.FindChildByName(Level, "Entities"));
+	LoadBlockEntitiesFromNBT(a_ChunkDesc.GetBlockEntities(), a_NBT, a_NBT.FindChildByName(Level, "TileEntities"), a_ChunkDesc.GetBlockTypes(), MetaData);
+
+	a_ChunkDesc.UncompressBlockMetas(MetaData);
+
+	return true;
+}
+
+
+
+
+
 void cWSSAnvil::CopyNBTData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, char * a_Destination, size_t a_Length)
 {
 	int Child = a_NBT.FindChildByName(a_Tag, a_ChildName);
