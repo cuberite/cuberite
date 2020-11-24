@@ -658,7 +658,7 @@ float cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageTyp
 			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchProtection)) * 1;
 		}
 
-		if ((a_DamageType == dtBurning) || (a_DamageType == dtFireContact) || (a_DamageType == dtLavaContact))
+		if ((a_DamageType == dtBurning) || (a_DamageType == dtFireContact) || (a_DamageType == dtLavaContact) || (a_DamageType == dtMagmaContact))
 		{
 			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection)) * 2;
 		}
@@ -902,9 +902,12 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 
 		// Handle magma block damage
-		if (
-			(IsMob() && !(this->m_IsFireproof)) ||
-			(IsPlayer() && !((static_cast<cPlayer *>(this))->IsGameModeCreative() || (static_cast<cPlayer *>(this))->IsGameModeSpectator()))
+		if
+		(
+			(IsMob() && !static_cast<cPawn *>(this)->IsFireproof()) ||
+			(IsPlayer() && !((static_cast<cPlayer *>(this))->IsGameModeCreative() || (static_cast<cPlayer *>(this))->IsGameModeSpectator())
+			&& !static_cast<cPlayer *>(this)->IsFireproof()
+			&& !static_cast<cPlayer *>(this)->HasEntityEffect(cEntityEffect::effFireResistance))
 		)
 		{
 			DetectMagma();
