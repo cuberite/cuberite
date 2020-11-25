@@ -72,6 +72,9 @@ protected:
 	/** Returns 1.9. */
 	virtual Version GetProtocolVersion() override;
 
+	/** Converts eMonsterType to protocol-specific mob types */
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
+
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet. */
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;

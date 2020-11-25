@@ -17030,7 +17030,15 @@ end
 				{
 					Notes = "",
 				},
+				mtCat =
+				{
+					Notes = "",
+				},
 				mtChicken =
+				{
+					Notes = "",
+				},
+				mtCod =
 				{
 					Notes = "",
 				},
@@ -17042,11 +17050,39 @@ end
 				{
 					Notes = "",
 				},
+				mtDolphin =
+				{
+					Notes = "",
+				},
+				mtDonkey =
+				{
+					Notes = "",
+				},
+				mtDrowned =
+				{
+					Notes = "",
+				},
+				mtElderGuardian =
+				{
+					Notes = "",
+				},
 				mtEnderDragon =
 				{
 					Notes = "",
 				},
 				mtEnderman =
+				{
+					Notes = "",
+				},
+				mtEndermite =
+				{
+					Notes = "",
+				},
+				mtEvoker =
+				{
+					Notes = "",
+				},
+				mtFox =
 				{
 					Notes = "",
 				},
@@ -17058,7 +17094,19 @@ end
 				{
 					Notes = "",
 				},
+				mtHoglin =
+				{
+					Notes = "",
+				},
 				mtHorse =
+				{
+					Notes = "",
+				},
+				mtHusk =
+				{
+					Notes = "",
+				},
+				mtIllusioner =
 				{
 					Notes = "",
 				},
@@ -17070,6 +17118,10 @@ end
 				{
 					Notes = "",
 				},
+				mtLlama =
+				{
+					Notes = "",
+				},
 				mtMagmaCube =
 				{
 					Notes = "",
@@ -17078,7 +17130,23 @@ end
 				{
 					Notes = "",
 				},
+				mtMule =
+				{
+					Notes = "",
+				},
 				mtOcelot =
+				{
+					Notes = "",
+				},
+				mtPanda =
+				{
+					Notes = "",
+				},
+				mtParrot =
+				{
+					Notes = "",
+				},
+				mtPhantom =
 				{
 					Notes = "",
 				},
@@ -17086,7 +17154,39 @@ end
 				{
 					Notes = "",
 				},
+				mtPiglin =
+				{
+					Notes = "",
+				},
+				mtPiglinBrute =
+				{
+					Notes = "",
+				},
+				mtPillager =
+				{
+					Notes = "",
+				},
+				mtPolarBear =
+				{
+					Notes = "",
+				},
+				mtPufferfish =
+				{
+					Notes = "",
+				},
+				mtRavager =
+				{
+					Notes = "",
+				},
+				mtSalmon =
+				{
+					Notes = "",
+				},
 				mtSheep =
+				{
+					Notes = "",
+				},
+				mtShulker =
 				{
 					Notes = "",
 				},
@@ -17098,7 +17198,19 @@ end
 				{
 					Notes = "",
 				},
+				mtSkeletonHorse =
+				{
+					Notes = "",
+				},
 				mtSlime =
+				{
+					Notes = "",
+				},
+				mtStray =
+				{
+					Notes = "",
+				},
+				mtStrider =
 				{
 					Notes = "",
 				},
@@ -17114,7 +17226,31 @@ end
 				{
 					Notes = "",
 				},
+				mtTraderLlama =
+				{
+					Notes = "",
+				},
+				mtTropicalFish =
+				{
+					Notes = "",
+				},
+				mtTurtle =
+				{
+					Notes = "",
+				},
+				mtVex =
+				{
+					Notes = "",
+				},
 				mtVillager =
+				{
+					Notes = "",
+				},
+				mtVindicator =
+				{
+					Notes = "",
+				},
+				mtWanderingTrader =
 				{
 					Notes = "",
 				},
@@ -17134,11 +17270,23 @@ end
 				{
 					Notes = "",
 				},
+				mtZoglin =
+				{
+					Notes = "",
+				},
 				mtZombie =
 				{
 					Notes = "",
 				},
+				mtZombieHorse =
+				{
+					Notes = "",
+				},
 				mtZombiePigman =
+				{
+					Notes = "",
+				},
+				mtZombifiedPiglin =
 				{
 					Notes = "",
 				},

@@ -337,6 +337,19 @@ cProtocol::Version cProtocol_1_10_0::GetProtocolVersion()
 
 
 
+UInt32 cProtocol_1_10_0::GetProtocolMobType(const eMonsterType a_MobType)
+{
+	switch (a_MobType)
+	{
+		case mtPolarBear: return 102;
+		default:          return Super::GetProtocolMobType(a_MobType);
+	}
+}
+
+
+
+
+
 void cProtocol_1_10_0::HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
@@ -677,7 +690,7 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 {
 	using namespace Metadata;
 
-	// Living Enitiy Metadata
+	// Living entity metadata
 	if (a_Mob.HasCustomName())
 	{
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
@@ -975,6 +988,7 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtWolf
 
+		case mtHusk:
 		case mtZombie:
 		{
 			auto & Zombie = static_cast<const cZombie &>(a_Mob);
@@ -1018,6 +1032,50 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtZombieVillager
 
-		default: break;
+		case mtBlaze:
+		case mtElderGuardian:
+		case mtGuardian:
+		{
+			// TODO: Mobs with extra fields that aren't implemented
+			break;
+		}
+		case mtCat:
+
+		case mtEndermite:
+
+		case mtPolarBear:
+
+		case mtShulker:
+
+		case mtDonkey:
+		case mtMule:
+		case mtSkeletonHorse:
+		case mtZombieHorse:
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			UNREACHABLE("cProtocol_1_10::WriteMobMetadata: received unimplemented type");
+			break;
+		}
+
+		case mtCaveSpider:
+		case mtEnderDragon:
+		case mtGiant:
+		case mtIronGolem:
+		case mtMooshroom:
+		case mtSilverfish:
+		case mtSkeleton:
+		case mtSnowGolem:
+		case mtStray:
+		case mtSpider:
+		case mtSquid:
+		{
+			// Entities without additional metadata
+			break;
+		}
+		case mtInvalidType:
+		{
+			break;
+		}
+		default: UNREACHABLE("cProtocol_1_10::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
