@@ -22,6 +22,7 @@
 		{
 			SetLogColour(a_LogLevel);
 			fwrite(a_Message.data(), sizeof(char), a_Message.size(), stdout);
+			fflush(stdout);
 			SetDefaultLogColour();
 		}
 	};
