@@ -93,14 +93,6 @@ public:
 						return false;
 					}
 					a_CBBlockPos = AddFaceDirection(a_CBBlockPos, BLOCK_FACE_YP);  // Always place pad at top of water block
-					if (
-						!IsBlockWater(a_CBBlockType) &&
-						cBlockInfo::FullyOccupiesVoxel(a_CBBlockType)
-						)
-					{
-						// Can't place lilypad on air / in another block!
-						return true;
-					}
 					m_HasHitFluid = true;
 					m_Pos = a_CBBlockPos;
 					return true;
