@@ -14452,6 +14452,14 @@ end
 				{
 					Notes = "Damage from contact with a cactus block"
 				},
+				dtMagmaContact =
+				{
+					Notes = "Damage from contact with a magma block"
+				},
+				dtMagma =
+				{
+					Notes = "Damage from contact with a magma block"
+				}, 
 				dtDrown =
 				{
 					Notes = "Damage received by drowning in water / lava"
