@@ -61,6 +61,7 @@
 #include "BlockMycelium.h"
 #include "BlockNetherWart.h"
 #include "BlockNetherrack.h"
+#include "BlockNoteBlock.h"
 #include "BlockObserver.h"
 #include "BlockOre.h"
 #include "BlockPackedIce.h"
@@ -344,7 +345,7 @@ namespace
 	constexpr cBlockNetherrack                BlockNetherrackHandler            (E_BLOCK_NETHERRACK);
 	constexpr cBlockLeavesHandler             BlockNewLeavesHandler             (E_BLOCK_NEW_LEAVES);
 	constexpr cBlockSidewaysHandler           BlockNewLogHandler                (E_BLOCK_NEW_LOG);
-	constexpr cDefaultBlockEntityHandler      BlockNoteBlockHandler             (E_BLOCK_NOTE_BLOCK);
+	constexpr cBlockNoteBlockHandler      	  BlockNoteBlockHandler             (E_BLOCK_NOTE_BLOCK);
 	constexpr cBlockDoorHandler               BlockOakDoorHandler               (E_BLOCK_OAK_DOOR);
 	constexpr cBlockFenceGateHandler          BlockOakFenceGateHandler          (E_BLOCK_OAK_FENCE_GATE);
 	constexpr cBlockStairsHandler             BlockOakWoodStairsHandler         (E_BLOCK_OAK_WOOD_STAIRS);
