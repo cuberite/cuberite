@@ -24,6 +24,7 @@
 #include "BlockComparator.h"
 #include "BlockConcretePowder.h"
 #include "BlockCrops.h"
+#include "BlockDaylightSensor.h"
 #include "BlockDeadBush.h"
 #include "BlockDefaultBlock.h"
 #include "BlockDirt.h"
@@ -249,7 +250,8 @@ namespace
 	constexpr cBlockFenceGateHandler          BlockDarkOakFenceGateHandler      (E_BLOCK_DARK_OAK_FENCE_GATE);
 	constexpr cBlockFenceHandler              BlockDarkOakFenceHandler          (E_BLOCK_DARK_OAK_FENCE);
 	constexpr cBlockStairsHandler             BlockDarkOakWoodStairsHandler     (E_BLOCK_DARK_OAK_WOOD_STAIRS);
-	constexpr cDefaultBlockHandler            BlockDaylightSensorHandler        (E_BLOCK_DAYLIGHT_SENSOR);
+	constexpr cBlockDaylightSensorHandler     BlockDaylightSensorHandler        (E_BLOCK_DAYLIGHT_SENSOR);
+	constexpr cBlockDaylightSensorHandler     BlockInvertedDaylightSensorHandler(E_BLOCK_INVERTED_DAYLIGHT_SENSOR);
 	constexpr cBlockDeadBushHandler           BlockDeadBushHandler              (E_BLOCK_DEAD_BUSH);
 	constexpr cBlockRailHandler               BlockDetectorRailHandler          (E_BLOCK_DETECTOR_RAIL);
 	constexpr cDefaultBlockHandler            BlockDiamondBlockHandler          (E_BLOCK_DIAMOND_BLOCK);
@@ -782,7 +784,7 @@ const cBlockHandler & cBlockHandler::For(BLOCKTYPE a_BlockType)
 		case E_BLOCK_HUGE_RED_MUSHROOM:             return BlockHugeRedMushroomHandler;
 		case E_BLOCK_ICE:                           return BlockIceHandler;
 		case E_BLOCK_INACTIVE_COMPARATOR:           return BlockInactiveComparatorHandler;
-		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:      return BlockDaylightSensorHandler;
+		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:      return BlockInvertedDaylightSensorHandler;
 		case E_BLOCK_IRON_BARS:                     return BlockIronBarsHandler;
 		case E_BLOCK_IRON_BLOCK:                    return BlockIronBlockHandler;
 		case E_BLOCK_IRON_DOOR:                     return BlockIronDoorHandler;

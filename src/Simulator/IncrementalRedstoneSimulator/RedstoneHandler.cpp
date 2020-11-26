@@ -7,6 +7,7 @@
 
 #include "CommandBlockHandler.h"
 #include "DoorHandler.h"
+#include "DaylightSensorHandler.h"
 #include "RedstoneTorchHandler.h"
 #include "RedstoneWireHandler.h"
 #include "RedstoneRepeaterHandler.h"
@@ -35,46 +36,48 @@
 	{                                                                                       \
 		switch (BlockType)                                                                  \
 		{                                                                                   \
-			case E_BLOCK_ACTIVATOR_RAIL:                                                    \
-			case E_BLOCK_DETECTOR_RAIL:                                                     \
-			case E_BLOCK_POWERED_RAIL:          return PoweredRailHandler::Callback;        \
-			case E_BLOCK_ACTIVE_COMPARATOR:                                                 \
-			case E_BLOCK_INACTIVE_COMPARATOR:   return RedstoneComparatorHandler::Callback; \
-			case E_BLOCK_DISPENSER:                                                         \
-			case E_BLOCK_DROPPER:               return DropSpenserHandler::Callback;        \
-			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:                                     \
-			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:                                     \
-			case E_BLOCK_STONE_PRESSURE_PLATE:                                              \
-			case E_BLOCK_WOODEN_PRESSURE_PLATE: return PressurePlateHandler::Callback;      \
-			case E_BLOCK_ACACIA_FENCE_GATE:                                                 \
-			case E_BLOCK_BIRCH_FENCE_GATE:                                                  \
-			case E_BLOCK_DARK_OAK_FENCE_GATE:                                               \
-			case E_BLOCK_FENCE_GATE:                                                        \
-			case E_BLOCK_IRON_TRAPDOOR:                                                     \
-			case E_BLOCK_JUNGLE_FENCE_GATE:                                                 \
-			case E_BLOCK_SPRUCE_FENCE_GATE:                                                 \
-			case E_BLOCK_TRAPDOOR:              return SmallGateHandler::Callback;          \
-			case E_BLOCK_REDSTONE_LAMP_OFF:                                                 \
-			case E_BLOCK_REDSTONE_LAMP_ON:      return RedstoneLampHandler::Callback;       \
-			case E_BLOCK_REDSTONE_REPEATER_OFF:                                             \
-			case E_BLOCK_REDSTONE_REPEATER_ON:  return RedstoneRepeaterHandler::Callback;   \
-			case E_BLOCK_REDSTONE_TORCH_OFF:                                                \
-			case E_BLOCK_REDSTONE_TORCH_ON:     return RedstoneTorchHandler::Callback;      \
-			case E_BLOCK_OBSERVER:              return ObserverHandler::Callback;           \
-			case E_BLOCK_PISTON:                                                            \
-			case E_BLOCK_STICKY_PISTON:         return PistonHandler::Callback;             \
-			case E_BLOCK_LEVER:                                                             \
-			case E_BLOCK_STONE_BUTTON:                                                      \
-			case E_BLOCK_WOODEN_BUTTON:         return RedstoneToggleHandler::Callback;     \
-			case E_BLOCK_BLOCK_OF_REDSTONE:     return RedstoneBlockHandler::Callback;      \
-			case E_BLOCK_COMMAND_BLOCK:         return CommandBlockHandler::Callback;       \
-			case E_BLOCK_HOPPER:                return HopperHandler::Callback;             \
-			case E_BLOCK_NOTE_BLOCK:            return NoteBlockHandler::Callback;          \
-			case E_BLOCK_REDSTONE_WIRE:         return RedstoneWireHandler::Callback;       \
-			case E_BLOCK_TNT:                   return TNTHandler::Callback;                \
-			case E_BLOCK_TRAPPED_CHEST:         return TrappedChestHandler::Callback;       \
-			case E_BLOCK_TRIPWIRE_HOOK:         return TripwireHookHandler::Callback;       \
-			default:                                                                        \
+			case E_BLOCK_ACTIVATOR_RAIL:                                                                \
+			case E_BLOCK_DETECTOR_RAIL:                                                                 \
+			case E_BLOCK_DAYLIGHT_SENSOR:                   return DaylightSensorHandler::Callback;     \
+			case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:          return DaylightSensorHandler::Callback;     \
+			case E_BLOCK_POWERED_RAIL:                      return PoweredRailHandler::Callback;        \
+			case E_BLOCK_ACTIVE_COMPARATOR:                                                             \
+			case E_BLOCK_INACTIVE_COMPARATOR:               return RedstoneComparatorHandler::Callback; \
+			case E_BLOCK_DISPENSER:                                                                     \
+			case E_BLOCK_DROPPER:                           return DropSpenserHandler::Callback;        \
+			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:                                                 \
+			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:                                                 \
+			case E_BLOCK_STONE_PRESSURE_PLATE:                                                          \
+			case E_BLOCK_WOODEN_PRESSURE_PLATE:             return PressurePlateHandler::Callback;      \
+			case E_BLOCK_ACACIA_FENCE_GATE:                                                             \
+			case E_BLOCK_BIRCH_FENCE_GATE:                                                              \
+			case E_BLOCK_DARK_OAK_FENCE_GATE:                                                           \
+			case E_BLOCK_FENCE_GATE:                                                                    \
+			case E_BLOCK_IRON_TRAPDOOR:                                                                 \
+			case E_BLOCK_JUNGLE_FENCE_GATE:                                                             \
+			case E_BLOCK_SPRUCE_FENCE_GATE:                                                             \
+			case E_BLOCK_TRAPDOOR:                          return SmallGateHandler::Callback;          \
+			case E_BLOCK_REDSTONE_LAMP_OFF:                                                             \
+			case E_BLOCK_REDSTONE_LAMP_ON:                  return RedstoneLampHandler::Callback;       \
+			case E_BLOCK_REDSTONE_REPEATER_OFF:                                                         \
+			case E_BLOCK_REDSTONE_REPEATER_ON:              return RedstoneRepeaterHandler::Callback;   \
+			case E_BLOCK_REDSTONE_TORCH_OFF:                                                            \
+			case E_BLOCK_REDSTONE_TORCH_ON:                 return RedstoneTorchHandler::Callback;      \
+			case E_BLOCK_OBSERVER:                          return ObserverHandler::Callback;           \
+			case E_BLOCK_PISTON:                                                                        \
+			case E_BLOCK_STICKY_PISTON:                     return PistonHandler::Callback;             \
+			case E_BLOCK_LEVER:                                                                         \
+			case E_BLOCK_STONE_BUTTON:                                                                  \
+			case E_BLOCK_WOODEN_BUTTON:                     return RedstoneToggleHandler::Callback;     \
+			case E_BLOCK_BLOCK_OF_REDSTONE:                 return RedstoneBlockHandler::Callback;      \
+			case E_BLOCK_COMMAND_BLOCK:                     return CommandBlockHandler::Callback;       \
+			case E_BLOCK_HOPPER:                            return HopperHandler::Callback;             \
+			case E_BLOCK_NOTE_BLOCK:                        return NoteBlockHandler::Callback;          \
+			case E_BLOCK_REDSTONE_WIRE:                     return RedstoneWireHandler::Callback;       \
+			case E_BLOCK_TNT:                               return TNTHandler::Callback;                \
+			case E_BLOCK_TRAPPED_CHEST:                     return TrappedChestHandler::Callback;       \
+			case E_BLOCK_TRIPWIRE_HOOK:                     return TripwireHookHandler::Callback;       \
+			default:                                                                                    \
 			{                                                                               \
 				if (cBlockDoorHandler::IsDoorBlockType(BlockType))                          \
 				{                                                                           \
