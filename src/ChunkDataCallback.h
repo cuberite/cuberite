@@ -18,7 +18,7 @@
 /** Interface class used for getting data out of a chunk using the GetAllData() function.
 Implementation must use the pointers immediately and NOT store any of them for later use
 The virtual methods are called in the same order as they're declared here. */
-class cChunkDataCallback abstract
+class cChunkDataCallback
 {
 public:
 
@@ -44,7 +44,7 @@ public:
 	/** Called for each entity in the chunk */
 	virtual void Entity(cEntity * a_Entity) { UNUSED(a_Entity); }
 
-	/** Called for each blockentity in the chunk */
+	/** Called for each block entity in the chunk */
 	virtual void BlockEntity(cBlockEntity * a_Entity) { UNUSED(a_Entity); }
 } ;
 

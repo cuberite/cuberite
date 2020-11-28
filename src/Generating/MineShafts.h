@@ -35,7 +35,7 @@ protected:
 	class cMineShaftSystem;  // fwd: MineShafts.cpp
 
 	int    m_GridSize;            ///< Average spacing of the systems
-	int    m_MaxSystemSize;       ///< Maximum blcok size of a mineshaft system
+	int    m_MaxSystemSize;       ///< Maximum block size of a mineshaft system
 	int    m_ProbLevelCorridor;   ///< Probability level of a branch object being the corridor
 	int    m_ProbLevelCrossing;   ///< Probability level of a branch object being the crossing, minus Corridor
 	int    m_ProbLevelStaircase;  ///< Probability level of a branch object being the staircase, minus Crossing

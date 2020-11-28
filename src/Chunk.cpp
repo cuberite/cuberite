@@ -310,20 +310,26 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
 	m_BlockEntities = std::move(a_SetChunkData.GetBlockEntities());
 
-	// Check that all block entities have a valid blocktype at their respective coords (DEBUG-mode only):
-	#ifdef _DEBUG
-		for (auto & KeyPair : m_BlockEntities)
-		{
+	// Set all block entities' World variable:
+	for (auto & KeyPair : m_BlockEntities)
+	{
+		// Check that all block entities have a valid blocktype at their respective coords (DEBUG-mode only):
+		#ifdef _DEBUG
 			cBlockEntity * Block = KeyPair.second.get();
 			BLOCKTYPE EntityBlockType = Block->GetBlockType();
 			BLOCKTYPE WorldBlockType = GetBlock(Block->GetRelX(), Block->GetPosY(), Block->GetRelZ());
 			ASSERT(WorldBlockType == EntityBlockType);
-		}  // for KeyPair - m_BlockEntities
-	#endif  // _DEBUG
+			ASSERT(cChunkDef::IndexToCoordinate(KeyPair.first) == KeyPair.second->GetRelPos());
+		#endif  // _DEBUG
 
-	// Set all block entities' World variable:
-	for (auto & KeyPair : m_BlockEntities)
-	{
+		// Reset Pointer
+		KeyPair.second->SetWorld(nullptr);
+
+		auto Pos = cChunkDef::RelativeToAbsolute({KeyPair.second->GetRelX(), 0, KeyPair.second->GetRelZ()}, {m_PosX, m_PosZ});
+		if (Pos.x != KeyPair.second->GetPosX() || Pos.z != KeyPair.second->GetPosZ())
+		{
+			KeyPair.second->SetPos(Pos.addedY(KeyPair.second->GetPosY()));
+		}
 		KeyPair.second->SetWorld(m_World);
 	}
 

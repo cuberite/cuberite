@@ -32,6 +32,8 @@ void cBlockEntity::SetPos(Vector3i a_NewPos)
 {
 	ASSERT(m_World == nullptr);  // Cannot move block entities that represent world blocks (only use this for cBlockArea's BEs)
 	m_Pos = a_NewPos;
+	m_RelX = a_NewPos.x - cChunkDef::Width * FAST_FLOOR_DIV(a_NewPos.x, cChunkDef::Width);
+	m_RelZ = a_NewPos.z - cChunkDef::Width * FAST_FLOOR_DIV(a_NewPos.z, cChunkDef::Width);
 }
 
 
