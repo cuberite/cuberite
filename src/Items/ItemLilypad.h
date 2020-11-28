@@ -63,9 +63,15 @@ public:
 				return false;
 			}
 
-			// Lilypad should be placed only if there is a water block below
+			const auto Below = PlacePos.addedY(-1);
+			if (Below.y < 0)
+			{
+				return false;
+			}
+
+			// Lilypad should be placed only if there is a water block below:
 			if (
-				const auto BlockBelow = a_World->GetBlock(PlacePos.addedY(-1));
+				const auto BlockBelow = a_World->GetBlock(Below);
 				(BlockBelow != E_BLOCK_WATER) &&
 				(BlockBelow != E_BLOCK_STATIONARY_WATER)
 			)
@@ -78,6 +84,7 @@ public:
 			{
 				a_Player->GetInventory().RemoveOneEquippedItem();
 			}
+
 			return true;
 		}
 
