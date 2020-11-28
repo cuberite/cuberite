@@ -326,7 +326,7 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 		KeyPair.second->SetWorld(nullptr);
 
 		auto Pos = cChunkDef::RelativeToAbsolute({KeyPair.second->GetRelX(), 0, KeyPair.second->GetRelZ()}, {m_PosX, m_PosZ});
-		if (Pos.x != KeyPair.second->GetPosX() || Pos.z != KeyPair.second->GetPosZ())
+		if ((Pos.x != KeyPair.second->GetPosX()) || (Pos.z != KeyPair.second->GetPosZ()))
 		{
 			KeyPair.second->SetPos(Pos.addedY(KeyPair.second->GetPosY()));
 		}
