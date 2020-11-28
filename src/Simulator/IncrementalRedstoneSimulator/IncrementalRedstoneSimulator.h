@@ -24,8 +24,6 @@ private:
 	{
 		switch (a_Block)  // Call the appropriate simulator for the entry's block type
 		{
-			case E_BLOCK_DAYLIGHT_SENSOR:
-			case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
 			case E_BLOCK_TRIPWIRE_HOOK:
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 			case E_BLOCK_STONE_PRESSURE_PLATE:
