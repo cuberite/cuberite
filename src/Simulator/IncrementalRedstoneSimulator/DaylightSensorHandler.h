@@ -34,8 +34,6 @@ namespace DaylightSensorHandler
 
 	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
-		// LOGD("Evaluating Darryl the daylight sensor (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
-
 		auto & ChunkData = DataForChunk(a_Chunk);
 
 		const auto PreviousPower = ChunkData.GetCachedPowerData(a_Position);
