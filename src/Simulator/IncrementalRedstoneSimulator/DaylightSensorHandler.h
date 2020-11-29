@@ -35,7 +35,7 @@ namespace DaylightSensorHandler
 
 	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
-		LOGD("Evaluating Darryl the daylight sensor (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+		// LOGD("Evaluating Darryl the daylight sensor (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
 		auto & ChunkData = DataForChunk(a_Chunk);
 
@@ -43,7 +43,7 @@ namespace DaylightSensorHandler
 		const auto PowerLevel = GetPowerLevel(a_Chunk, a_Position);
 
 		// We don't need to update the daylight sensor often
-		ChunkData.m_MechanismDelays[a_Position] = std::make_pair(30, true);
+		ChunkData.m_MechanismDelays[a_Position] = std::make_pair(10, true);
 
 		// Only update the power level if the power level has changed - it has gone
 		// up a 'step' on the time-power function
