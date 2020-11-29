@@ -30,7 +30,7 @@ namespace DaylightSensorHandler
 
 		// Daylight sensors output to all surrounding blocks
 		// Retrieve and return the cached power calculated by Update for performance
-		return DataForChunk(a_Chunk).GetCachedPowerData(a_Position);
+		return IsLinked ? 0 : DataForChunk(a_Chunk).GetCachedPowerData(a_Position);
 	}
 
 	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
