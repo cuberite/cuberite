@@ -838,13 +838,17 @@ bool cBlockInfo::FullyOccupiesVoxel(const BLOCKTYPE Block)
 
 bool cBlockInfo::IsOneHitDig(const BLOCKTYPE Block)
 {
+#ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
 
 	// GetHardness returns exactly 0 for one hit break blocks:
 	return GetHardness(Block) == 0;
 
+#ifdef __clang__
 #pragma clang diagnostic pop
+#endif
 }
 
 
