@@ -264,7 +264,7 @@ void cNetherPortalScanner::BuildNetherPortal(Vector3i a_Location, Direction a_Di
 	}
 
 	// Fill the frame (place a fire in the bottom)
-	m_World.SetBlock(x + 1, y + 1, z + 1, E_BLOCK_FIRE, 0);
+	m_World.PlaceBlock(x + 1, y + 1, z + 1, E_BLOCK_FIRE, 0);
 }
 
 
