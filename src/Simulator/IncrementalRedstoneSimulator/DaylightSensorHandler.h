@@ -9,10 +9,9 @@ namespace DaylightSensorHandler
 {
 	inline unsigned char GetPowerLevel(const cChunk & Chunk, const Vector3i Position)
 	{
-		double PI = 3.14159;
 		int TimeOfDay = Chunk.GetWorld()->GetTimeOfDay();
 		bool IsInverted = (Chunk.GetBlock(Position) == E_BLOCK_DAYLIGHT_SENSOR) ? 0 : 1;
-		int Output = Clamp(FloorC(14 * std::sin((TimeOfDay * PI) / 12000) + 8), 0, 15);
+		int Output = Clamp(FloorC(14 * std::sin((TimeOfDay * M_PI) / 12000) + 8), 0, 15);
 
 		if (IsInverted)
 		{
