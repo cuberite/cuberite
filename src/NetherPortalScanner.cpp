@@ -87,6 +87,12 @@ void cNetherPortalScanner::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 
 bool cNetherPortalScanner::IsValidBuildLocation(Vector3i a_BlockPos)
 {
+	//Check the dimension
+	if (GetDimension() == dimNether)
+	{
+		return false;
+	}
+	
 	// Check the base
 	for (int i = 0; i < SearchSolidBaseWidth; i++)
 	{
