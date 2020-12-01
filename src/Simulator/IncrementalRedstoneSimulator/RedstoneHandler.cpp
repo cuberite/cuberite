@@ -38,9 +38,9 @@
 		{                                                                                   \
 			case E_BLOCK_ACTIVATOR_RAIL:                                                                \
 			case E_BLOCK_DETECTOR_RAIL:                                                                 \
-			case E_BLOCK_DAYLIGHT_SENSOR:                   return DaylightSensorHandler::Callback;     \
-			case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:          return DaylightSensorHandler::Callback;     \
 			case E_BLOCK_POWERED_RAIL:                      return PoweredRailHandler::Callback;        \
+			case E_BLOCK_DAYLIGHT_SENSOR:                                                               \
+			case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:          return DaylightSensorHandler::Callback;     \
 			case E_BLOCK_ACTIVE_COMPARATOR:                                                             \
 			case E_BLOCK_INACTIVE_COMPARATOR:               return RedstoneComparatorHandler::Callback; \
 			case E_BLOCK_DISPENSER:                                                                     \
