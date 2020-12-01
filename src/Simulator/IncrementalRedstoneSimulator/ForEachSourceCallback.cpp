@@ -91,9 +91,11 @@ bool ForEachSourceCallback::ShouldQueryLinkedPosition(const BLOCKTYPE Block)
 {
 	switch (Block)
 	{
-		// Normally we don't ask solid blocks for power because they don't have any (store, dirt, etc.)
+		// Normally we don't ask solid blocks for power because they don't have any (stone, dirt, etc.)
 		// However, these are mechanisms that are IsSolid, but still give power. Don't ignore them:
 		case E_BLOCK_BLOCK_OF_REDSTONE:
+		case E_BLOCK_DAYLIGHT_SENSOR:
+		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
 		case E_BLOCK_OBSERVER:
 		case E_BLOCK_TRAPPED_CHEST: return false;
 

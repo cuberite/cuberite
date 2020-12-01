@@ -26,6 +26,7 @@ target_sources(
 	BlockComparator.h
 	BlockConcretePowder.h
 	BlockCrops.h
+	BlockDaylightSensor.h
 	BlockDeadBush.h
 	BlockDefaultBlock.h
 	BlockDirt.h
