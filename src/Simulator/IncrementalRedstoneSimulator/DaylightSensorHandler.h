@@ -7,18 +7,18 @@
 
 namespace DaylightSensorHandler
 {
-	inline unsigned char GetPowerLevel(const cChunk & Chunk, const Vector3i Position)
+	inline unsigned char GetPowerLevel(const cChunk & a_Chunk, const Vector3i a_Position)
 	{
-		int TimeOfDay = Chunk.GetWorld()->GetTimeOfDay();
-		int IsSunny = Chunk.GetWorld()->IsWeatherSunnyAt(Position.x, Position.z);
-		bool IsInverted = (Chunk.GetBlock(Position) == E_BLOCK_DAYLIGHT_SENSOR) ? 0 : 1;
+		int TimeOfDay = a_Chunk.GetWorld()->GetTimeOfDay();
+		int IsSunny = a_Chunk.GetWorld()->IsWeatherSunnyAt(a_Position.x, a_Position.z);
+		bool IsInverted = (a_Chunk.GetBlock(a_Position) == E_BLOCK_DAYLIGHT_SENSOR) ? 0 : 1;
 
 		// Find which is lower - the predicted daylight or the actual daylight
 		// Actual daylight is too high for power level at night, but predicted
 		// daylight is too high when sensor is covered
-		int Output = std::min(
-			static_cast<int>(Chunk.GetSkyLightAltered(Position)),
-			Clamp(FloorC(14 * std::sin((TimeOfDay * M_PI) / 12000) + 8), 0, 15)
+		NIBBLETYPE Output = std::min(
+			a_Chunk.GetSkyLightAltered(a_Position),
+			static_cast<NIBBLETYPE>(Clamp(FloorC(14 * std::sin((TimeOfDay * M_PI) / 12000) + 8), 0, 15))
 		);
 
 		if (IsInverted)
@@ -28,9 +28,9 @@ namespace DaylightSensorHandler
 
 		if (!IsSunny)
 		{
-			Output *= 0.75;
+			std::max(Output - 3, 0);
 		}
-
+		
 		return static_cast<unsigned char>(Output);
 	}
 
