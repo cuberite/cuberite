@@ -29,23 +29,27 @@ private:
 
 	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) const override
 	{
-		/*
-		PORTAL FINDING ALGORITH
-		=======================
-		- Get clicked base block
-		- Trace upwards to find first obsidian block; aborts if anything other than obsidian or air is encountered.
-			Uses this value as a reference (the 'ceiling')
-		- For both directions (if one fails, try the other), BASE (clicked) block:
-			- Go in one direction, only stop if a non obsidian block is encountered (abort) OR a portal border is encountered (FindObsidianCeiling returns -1)
-			- If a border was encountered, go the other direction and repeat above
-			- Write borders to XZP and XZM, write direction portal faces to Dir
-		- Loop through boundary variables, and fill with portal blocks based on Dir with meta from Dir
-		*/
+		// Checking if dimension is valid
+		if (IsValidDimension(a_WorldInterface))
+		{
+			/*
+			PORTAL FINDING ALGORITH
+			=======================
+			- Get clicked base block
+			- Trace upwards to find first obsidian block; aborts if anything other than obsidian or air is encountered.
+				Uses this value as a reference (the 'ceiling')
+			- For both directions (if one fails, try the other), BASE (clicked) block:
+				- Go in one direction, only stop if a non obsidian block is encountered (abort) OR a portal border is encountered (FindObsidianCeiling returns -1)
+				- If a border was encountered, go the other direction and repeat above
+				- Write borders to XZP and XZM, write direction portal faces to Dir
+			- Loop through boundary variables, and fill with portal blocks based on Dir with meta from Dir
+			*/
 
-		Scratch Scratch;
+			Scratch Scratch;
 
-		// a_BlockY - 1: Because we want the block below the fire
-		FindAndSetPortalFrame(a_BlockPos.x, a_BlockPos.y - 1, a_BlockPos.z, a_ChunkInterface, a_WorldInterface, Scratch);
+			// a_BlockY - 1: Because we want the block below the fire
+			FindAndSetPortalFrame(a_BlockPos.x, a_BlockPos.y - 1, a_BlockPos.z, a_ChunkInterface, a_WorldInterface, Scratch);
+		}
 	}
 
 
@@ -259,6 +263,11 @@ private:
 	{
 		UNUSED(a_Meta);
 		return 15;
+	}
+
+	static bool IsValidDimension(cWorldInterface & a_WorldInterface)
+	{
+		return (a_WorldInterface.GetDimension()!=dimEnd);
 	}
 };
 
