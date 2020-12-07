@@ -34,7 +34,7 @@ private:
 		{
 			return;
 		}
-		
+
 		/*
 		PORTAL FINDING ALGORITH
 		=======================
@@ -52,7 +52,7 @@ private:
 
 		// a_BlockY - 1: Because we want the block below the fire
 		FindAndSetPortalFrame(a_BlockPos.x, a_BlockPos.y - 1, a_BlockPos.z, a_ChunkInterface, a_WorldInterface, Scratch);
-		
+
 	}
 
 
