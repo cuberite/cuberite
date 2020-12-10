@@ -1343,11 +1343,12 @@ void cProtocol_1_12_2::SendUnlockRecipe(UInt32 a_RecipeID)
 	if (ProtocolRecipeId.has_value())
 	{
 		cPacketizer Pkt(*this, pktUnlockRecipe);
-		Pkt.WriteVarInt32(1);
-		Pkt.WriteBool(true);
-		Pkt.WriteBool(false);
-		Pkt.WriteVarInt32(1);
-		Pkt.WriteVarInt32(ProtocolRecipeId.value());
+		Pkt.WriteVarInt32(1);                         // Tells the client to unlock the recipe
+		Pkt.WriteBool(true);                          // Tells the client that the crafting book will now open when the client opens its inventory
+		Pkt.WriteBool(false);                         // Disables the filtering option
+		Pkt.WriteVarInt32(1);                         // Length of the list of recipes. In this case just one
+		Pkt.WriteVarInt32(ProtocolRecipeId.value());  // sends the new recipe
+		Pkt.WriteVarInt32(0);                         // There is no second array
 	}
 }
 
