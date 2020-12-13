@@ -42,9 +42,19 @@ void cAggressiveMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 	{
 		return;
 	}
+	// Check to see if Mob can see the player.
+	Vector3d MyHeadPosition1 = GetPosition() + Vector3d(0, GetHeight(), 0);
+	Vector3d TargetPosition1 = a_Player->GetPosition() + Vector3d(0, a_Player->GetHeight(), 0);
+	if (cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition1, TargetPosition1, cLineBlockTracer::losAirWaterLava))
+	{
+		Super::EventSeePlayer(a_Player, a_Chunk);
+		m_EMState = CHASING;
+	}
+	else
+	{
+		return;
+	}
 
-	Super::EventSeePlayer(a_Player, a_Chunk);
-	m_EMState = CHASING;
 }
 
 
