@@ -2641,17 +2641,13 @@ void cProtocol_1_8_0::HandlePacketPlayerAbilities(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, WalkingSpeed);
 
 	// COnvert the bitfield into individual boolean flags:
-	bool IsFlying = false, CanFly = false;
+	bool IsFlying = false;
 	if ((Flags & 2) != 0)
 	{
 		IsFlying = true;
 	}
-	if ((Flags & 4) != 0)
-	{
-		CanFly = true;
-	}
 
-	m_Client->HandlePlayerAbilities(CanFly, IsFlying, FlyingSpeed, WalkingSpeed);
+	m_Client->HandlePlayerAbilities(IsFlying, FlyingSpeed, WalkingSpeed);
 }
 
 

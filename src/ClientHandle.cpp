@@ -837,12 +837,11 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 
 
 
-void cClientHandle::HandlePlayerAbilities(bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed)
+void cClientHandle::HandlePlayerAbilities(bool a_IsFlying, float FlyingSpeed, float WalkingSpeed)
 {
 	UNUSED(FlyingSpeed);  // Ignore the client values for these
 	UNUSED(WalkingSpeed);
 
-	m_Player->SetCanFly(a_CanFly);
 	m_Player->SetFlying(a_IsFlying);
 }
 
