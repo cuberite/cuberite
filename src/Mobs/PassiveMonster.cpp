@@ -57,7 +57,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_EMState == ESCAPING)
 	{
-		CheckEventLostPlayer();
+		CheckEventLostPlayer(a_Dt);
 	}
 
 	cMonster::LoveTick();

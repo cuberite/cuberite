@@ -20,7 +20,6 @@ public:
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual void CheckEventSeePlayer(cChunk & a_Chunk) override;
-	virtual void CheckEventLostPlayer(void) override;
 	virtual void EventLosePlayer(void) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
