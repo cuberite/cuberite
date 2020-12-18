@@ -43,7 +43,6 @@ typedef std::list<cClientHandle *>                cClientHandleList;
 
 // A convenience macro for calling GetChunkAndRelByAbsolute.
 #define PREPARE_REL_AND_CHUNK(Position, OriginalChunk) cChunk * Chunk; Vector3i Rel; bool RelSuccess = (OriginalChunk).GetChunkAndRelByAbsolute(Position, &Chunk, Rel)
-#define PREPARE_BLOCKDATA BLOCKTYPE BlockType; NIBBLETYPE BlockMeta;
 
 
 // This class is not to be used directly

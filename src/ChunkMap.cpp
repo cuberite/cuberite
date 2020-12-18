@@ -153,9 +153,8 @@ bool cChunkMap::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback a_Callbac
 
 bool cChunkMap::DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callback)
 {
-	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_BlockPos.x, a_BlockPos.z, ChunkX, ChunkZ);
-	return DoWithChunk(ChunkX, ChunkZ, a_Callback);
+	const auto Position = cChunkDef::BlockToChunk(a_BlockPos);
+	return DoWithChunk(Position.m_ChunkX, Position.m_ChunkZ, a_Callback);
 }
 
 

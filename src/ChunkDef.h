@@ -187,7 +187,7 @@ public:
 	/** Converts the absolute coords into coords relative to the specified chunk. */
 	inline static Vector3i AbsoluteToRelative(Vector3i a_BlockPosition, cChunkCoords a_ChunkPos)
 	{
-		return {a_BlockPosition.x - a_ChunkPos.m_ChunkX * Width, a_BlockPosition.y, a_BlockPosition.z - a_ChunkPos.m_ChunkZ * Width};
+		return { a_BlockPosition.x - a_ChunkPos.m_ChunkX * Width, a_BlockPosition.y, a_BlockPosition.z - a_ChunkPos.m_ChunkZ * Width };
 	}
 
 
@@ -234,24 +234,15 @@ public:
 	{
 		// This version is deprecated in favor of the vector version
 		// If you're developing new code, use the other version.
-		auto ChunkCoords = BlockToChunk({a_X, 0, a_Z});
+		const auto ChunkCoords = BlockToChunk({ a_X, 0, a_Z });
 		a_ChunkX = ChunkCoords.m_ChunkX;
 		a_ChunkZ = ChunkCoords.m_ChunkZ;
 	}
 
 	/** The Y coordinate of a_Pos is ignored */
-	inline static cChunkCoords BlockToChunk(Vector3i a_Pos)
+	inline static cChunkCoords BlockToChunk(const Vector3i a_Position)
 	{
-		cChunkCoords Chunk(a_Pos.x / Width, a_Pos.z / Width);
-		if ((a_Pos.x < 0) && (a_Pos.x % Width != 0))
-		{
-			Chunk.m_ChunkX--;
-		}
-		if ((a_Pos.z < 0) && (a_Pos.z % Width != 0))
-		{
-			Chunk.m_ChunkZ--;
-		}
-		return Chunk;
+		return { FAST_FLOOR_DIV(a_Position.x, Width), FAST_FLOOR_DIV(a_Position.z, Width) };
 	}
 
 
