@@ -29,12 +29,6 @@ private:
 
 	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) const override
 	{
-		// Checking if dimension is valid
-		if (!IsValidDimension(a_WorldInterface))
-		{
-			return;
-		}
-
 		/*
 		PORTAL FINDING ALGORITH
 		=======================
@@ -48,11 +42,16 @@ private:
 		- Loop through boundary variables, and fill with portal blocks based on Dir with meta from Dir
 		*/
 
+		if (a_WorldInterface.GetDimension() == dimEnd)
+		{
+			// Can only create portals in the Nether and Overworld (GH #5009):
+			return;
+		}
+
 		Scratch Scratch;
 
 		// a_BlockY - 1: Because we want the block below the fire
 		FindAndSetPortalFrame(a_BlockPos.x, a_BlockPos.y - 1, a_BlockPos.z, a_ChunkInterface, a_WorldInterface, Scratch);
-
 	}
 
 
@@ -266,11 +265,6 @@ private:
 	{
 		UNUSED(a_Meta);
 		return 15;
-	}
-
-	static bool IsValidDimension(cWorldInterface & a_WorldInterface)
-	{
-		return (a_WorldInterface.GetDimension()!=dimEnd);
 	}
 };
 
