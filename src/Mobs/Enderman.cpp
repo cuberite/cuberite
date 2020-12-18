@@ -113,26 +113,10 @@ void cEnderman::CheckEventSeePlayer(cChunk & a_Chunk)
 
 	ASSERT(Callback.GetPlayer() != nullptr);
 
-	if (!Callback.GetPlayer()->CanMobsTarget())
-	{
-		return;
-	}
-
-	// Target the player
-	cMonster::EventSeePlayer(Callback.GetPlayer(), a_Chunk);
-	m_EMState = CHASING;
+	// Target the player:
+	cAggressiveMonster::EventSeePlayer(Callback.GetPlayer(), a_Chunk);
 	m_bIsScreaming = true;
 	GetWorld()->BroadcastEntityMetadata(*this);
-}
-
-
-
-
-
-void cEnderman::CheckEventLostPlayer(void)
-{
-	Super::CheckEventLostPlayer();
-	EventLosePlayer();
 }
 
 

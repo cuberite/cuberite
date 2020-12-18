@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "IncludeAllMonsters.h"
+#include "LineBlockTracer.h"
 #include "../BlockInfo.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -305,19 +306,6 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (m_TicksSinceLastDamaged < 100)
 	{
 		++m_TicksSinceLastDamaged;
-	}
-	if ((GetTarget() != nullptr))
-	{
-		ASSERT(GetTarget()->IsTicking());
-
-		if (GetTarget()->IsPlayer())
-		{
-			if (!static_cast<cPlayer *>(GetTarget())->CanMobsTarget())
-			{
-				SetTarget(nullptr);
-				m_EMState = IDLE;
-			}
-		}
 	}
 
 	// Process the undead burning in daylight.
@@ -764,29 +752,94 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 // monster sez: Do I see the player
 void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 {
-	m_World->DoWithNearestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
+	if (GetTarget() != nullptr)
 	{
-		EventSeePlayer(&a_Player, a_Chunk);
-		return true;
-	}, true);
+		return;
+	}
+
+	cPlayer * TargetPlayer = nullptr;
+	double ClosestDistance = m_SightDistance * m_SightDistance;
+	const auto MyHeadPosition = GetPosition().addedY(GetHeight());
+
+	// Enumerate all players within sight:
+	m_World->ForEachEntityInBox({ GetPosition(), m_SightDistance * 2.0 }, [this, &TargetPlayer, &ClosestDistance, MyHeadPosition](cEntity & a_Entity)
+	{
+		if (!a_Entity.IsPlayer())
+		{
+			// Continue iteration:
+			return false;
+		}
+
+		const auto Player = static_cast<cPlayer *>(&a_Entity);
+
+		if (!Player->CanMobsTarget())
+		{
+			return false;
+		}
+
+		const auto TargetHeadPosition = a_Entity.GetPosition().addedY(a_Entity.GetHeight());
+		const auto TargetDistance = (TargetHeadPosition - MyHeadPosition).SqrLength();
+
+		// TODO: Currently all mobs see through lava, but only Nether-native mobs should be able to.
+		if (
+			(TargetDistance < ClosestDistance) &&
+			cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, cLineBlockTracer::losAirWaterLava)
+		)
+		{
+			TargetPlayer = Player;
+			ClosestDistance = TargetDistance;
+		}
+
+		return false;
+	});
+
+	// Target him if suitable player found:
+	if (TargetPlayer != nullptr)
+	{
+		EventSeePlayer(TargetPlayer, a_Chunk);
+	}
 }
 
 
 
 
 
-void cMonster::CheckEventLostPlayer(void)
+void cMonster::CheckEventLostPlayer(const std::chrono::milliseconds a_Dt)
 {
-	if (GetTarget() != nullptr)
+	const auto Target = GetTarget();
+
+	if (Target == nullptr)
 	{
-		if ((GetTarget()->GetPosition() - GetPosition()).Length() > m_SightDistance)
+		return;
+	}
+
+	// Check if the player died, is in creative mode, etc:
+	if (Target->IsPlayer() && !static_cast<cPlayer *>(Target)->CanMobsTarget())
+	{
+		EventLosePlayer();
+		return;
+	}
+
+	// Check if the target is too far away:
+	if (!Target->GetBoundingBox().DoesIntersect({ GetPosition(), m_SightDistance * 2.0 }))
+	{
+		EventLosePlayer();
+		return;
+	}
+
+	const auto MyHeadPosition = GetPosition().addedY(GetHeight());
+	const auto TargetHeadPosition = Target->GetPosition().addedY(Target->GetHeight());
+	if (!cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, cLineBlockTracer::losAirWaterLava))
+	{
+		if ((m_LoseSightAbandonTargetTimer += a_Dt) > std::chrono::seconds(4))
 		{
 			EventLosePlayer();
 		}
 	}
 	else
 	{
-		EventLosePlayer();
+		// Subtract the amount of time we "handled" instead of setting to zero, so we don't ignore a large a_Dt of say, 8s:
+		m_LoseSightAbandonTargetTimer -= std::min(std::chrono::milliseconds(4000), m_LoseSightAbandonTargetTimer);
 	}
 }
 
@@ -809,7 +862,9 @@ void cMonster::EventSeePlayer(cPlayer * a_SeenPlayer, cChunk & a_Chunk)
 void cMonster::EventLosePlayer(void)
 {
 	SetTarget(nullptr);
+
 	m_EMState = IDLE;
+	m_LoseSightAbandonTargetTimer = std::chrono::seconds::zero();
 }
 
 

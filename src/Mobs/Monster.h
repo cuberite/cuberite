@@ -117,7 +117,7 @@ public:
 	virtual bool IsUndead(void);
 
 	virtual void EventLosePlayer(void);
-	virtual void CheckEventLostPlayer(void);
+	virtual void CheckEventLostPlayer(std::chrono::milliseconds a_Dt);
 
 	virtual void InStateIdle    (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual void InStateChasing (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
@@ -313,6 +313,7 @@ protected:
 	double m_AttackRange;
 	int m_AttackCoolDownTicksLeft;
 	int m_SightDistance;
+	std::chrono::milliseconds m_LoseSightAbandonTargetTimer;
 
 	float m_DropChanceWeapon;
 	float m_DropChanceHelmet;
