@@ -13,9 +13,10 @@
 class cPlayerLookCheck
 {
 public:
-	cPlayerLookCheck(Vector3d a_EndermanPos, int a_SightDistance) :
+
+	cPlayerLookCheck(Vector3d a_EndermanHeadPosition, int a_SightDistance) :
 		m_Player(nullptr),
-		m_EndermanPos(a_EndermanPos),
+		m_EndermanHeadPosition(a_EndermanHeadPosition),
 		m_SightDistance(a_SightDistance)
 	{
 	}
@@ -28,29 +29,32 @@ public:
 			return false;
 		}
 
-		// Don't check players who are more than SightDistance (64) blocks away
-		auto Direction = m_EndermanPos - a_Player.GetPosition();
+		const auto PlayerHeadPosition = a_Player.GetPosition().addedY(a_Player.GetHeight());
+		const auto Direction = m_EndermanHeadPosition - PlayerHeadPosition;
+
+		// Don't check players who are more than SightDistance (64) blocks away:
 		if (Direction.Length() > m_SightDistance)
 		{
 			return false;
 		}
 
-		// Don't check if the player has a pumpkin on his head
+		// Don't check if the player has a pumpkin on his head:
 		if (a_Player.GetEquippedHelmet().m_ItemType == E_BLOCK_PUMPKIN)
 		{
 			return false;
 		}
 
-		// If the player's crosshair is within 5 degrees of the enderman, it counts as looking
-		auto LookVector = a_Player.GetLookVector();
-		auto dot = Direction.Dot(LookVector);
-		if (dot <= cos(0.09))  // 0.09 rad ~ 5 degrees
+		const auto LookVector = a_Player.GetLookVector();  // Note: ||LookVector|| is always 1.
+		const auto Cosine = Direction.Dot(LookVector) / Direction.Length();  // a.b / (||a|| * ||b||)
+
+		// If the player's crosshair is within 5 degrees of the enderman, it counts as looking:
+		if ((Cosine < std::cos(0.09)) || (Cosine > std::cos(0)))  // 0.09 rad ~ 5 degrees
 		{
 			return false;
 		}
 
 		// TODO: Check if endermen are angered through water in Vanilla
-		if (!cLineBlockTracer::LineOfSightTrace(*a_Player.GetWorld(), m_EndermanPos, a_Player.GetPosition(), cLineBlockTracer::losAirWater))
+		if (!cLineBlockTracer::LineOfSightTrace(*a_Player.GetWorld(), m_EndermanHeadPosition, PlayerHeadPosition, cLineBlockTracer::losAirWater))
 		{
 			// No direct line of sight
 			return false;
@@ -63,8 +67,9 @@ public:
 	cPlayer * GetPlayer(void) const { return m_Player; }
 
 protected:
+
 	cPlayer * m_Player;
-	Vector3d m_EndermanPos;
+	Vector3d m_EndermanHeadPosition;
 	int m_SightDistance;
 } ;
 
@@ -105,7 +110,7 @@ void cEnderman::CheckEventSeePlayer(cChunk & a_Chunk)
 		return;
 	}
 
-	cPlayerLookCheck Callback(GetPosition(), m_SightDistance);
+	cPlayerLookCheck Callback(GetPosition().addedY(GetHeight()), m_SightDistance);
 	if (m_World->ForEachPlayer(Callback))
 	{
 		return;
