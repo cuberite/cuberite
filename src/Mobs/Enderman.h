@@ -27,9 +27,6 @@ public:
 	BLOCKTYPE GetCarriedBlock(void) const {return m_CarriedBlock; }
 	NIBBLETYPE GetCarriedMeta(void) const {return m_CarriedMeta; }
 
-	/** Returns if the current sky light level is sufficient for the enderman to become aggravated */
-	bool CheckLight(void);
-
 private:
 
 	bool m_bIsScreaming;
