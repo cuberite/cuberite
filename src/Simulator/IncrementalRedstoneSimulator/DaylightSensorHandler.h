@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "World.h"
+
 
 
 
@@ -9,29 +11,20 @@ namespace DaylightSensorHandler
 {
 	inline unsigned char GetPowerLevel(const cChunk & a_Chunk, const Vector3i a_Position)
 	{
-		int TimeOfDay = a_Chunk.GetWorld()->GetTimeOfDay();
-		int IsSunny = a_Chunk.GetWorld()->IsWeatherSunnyAt(a_Position.x, a_Position.z);
-		bool IsInverted = (a_Chunk.GetBlock(a_Position) == E_BLOCK_DAYLIGHT_SENSOR) ? 0 : 1;
-
-		// Find which is lower - the predicted daylight or the actual daylight
-		// Actual daylight is too high for power level at night, but predicted
-		// daylight is too high when sensor is covered
-		NIBBLETYPE Output = std::min(
-			a_Chunk.GetSkyLightAltered(a_Position),
-			static_cast<NIBBLETYPE>(Clamp(FloorC(14 * std::sin((TimeOfDay * M_PI) / 12000) + 8), 0, 15))
-		);
-
-		if (IsInverted)
+		if (a_Chunk.GetBlock(a_Position) == E_BLOCK_INVERTED_DAYLIGHT_SENSOR)
 		{
-			Output = 15 - Output;
+			// Inverted sensor directly returns darkened skylight, no fancy tricks:
+			return 15 - a_Chunk.GetSkyLightAltered(a_Position);
 		}
 
-		if (!IsSunny)
-		{
-			std::max(Output - 3, 0);
-		}
-		
-		return static_cast<unsigned char>(Output);
+		// The [0, 1) proportion of the current day that has elapsed.
+		const auto ProportionOfDay = a_Chunk.GetWorld()->GetTimeOfDay() * (static_cast<float>(M_PI) / 12000.f);
+
+		// The curved value of darkened skylight, with outputs somewhat similar to Vanilla.
+		const auto RawOutput = a_Chunk.GetSkyLightAltered(a_Position) * (0.6f * std::sin(ProportionOfDay) + 0.5f);
+
+		// Saturate the amplified sine curve at 0 and 15:
+		return static_cast<unsigned char>(std::clamp(RawOutput, 0.f, 15.f));
 	}
 
 	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
@@ -49,15 +42,13 @@ namespace DaylightSensorHandler
 	{
 		// LOGD("Evaluating Darryl the daylight sensor (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		auto & ChunkData = DataForChunk(a_Chunk);
+		// We don't need to update the daylight sensor often:
+		DataForChunk(a_Chunk).m_MechanismDelays[a_Position] = std::make_pair(10, bool());
+
+		// What the sensor should output according to the time-power function.
 		const auto PowerLevel = GetPowerLevel(a_Chunk, a_Position);
 
-		// We don't need to update the daylight sensor often
-		ChunkData.m_MechanismDelays[a_Position] = std::make_pair(5, true);
-
-		// Only update the power level if the power level has changed - it has gone
-		// up a 'step' on the time-power function
-		// a_Meta stores current power level
+		// Only update the output if the power level has changed:
 		if (PowerLevel != a_Meta)
 		{
 			a_Chunk.SetMeta(a_Position, PowerLevel);

@@ -31,11 +31,11 @@
 
 
 
-#define INVOKE_FOR_HANDLERS(Callback)                                                       \
-	do                                                                                      \
-	{                                                                                       \
-		switch (BlockType)                                                                  \
-		{                                                                                   \
+#define INVOKE_FOR_HANDLERS(Callback)                                                          \
+	do                                                                                         \
+	{                                                                                          \
+		switch (BlockType)                                                                     \
+		{                                                                                      \
 			case E_BLOCK_ACTIVATOR_RAIL:                                                       \
 			case E_BLOCK_DETECTOR_RAIL:                                                        \
 			case E_BLOCK_POWERED_RAIL:             return PoweredRailHandler::Callback;        \
@@ -64,6 +64,8 @@
 			case E_BLOCK_OBSERVER:                 return ObserverHandler::Callback;           \
 			case E_BLOCK_PISTON:                                                               \
 			case E_BLOCK_STICKY_PISTON:            return PistonHandler::Callback;             \
+			case E_BLOCK_DAYLIGHT_SENSOR:                                                      \
+			case E_BLOCK_INVERTED_DAYLIGHT_SENSOR: return DaylightSensorHandler::Callback;     \
 			case E_BLOCK_LEVER:                                                                \
 			case E_BLOCK_STONE_BUTTON:                                                         \
 			case E_BLOCK_WOODEN_BUTTON:            return RedstoneToggleHandler::Callback;     \
@@ -75,16 +77,14 @@
 			case E_BLOCK_TNT:                      return TNTHandler::Callback;                \
 			case E_BLOCK_TRAPPED_CHEST:            return TrappedChestHandler::Callback;       \
 			case E_BLOCK_TRIPWIRE_HOOK:            return TripwireHookHandler::Callback;       \
-			case E_BLOCK_DAYLIGHT_SENSOR:                                                      \
-			case E_BLOCK_INVERTED_DAYLIGHT_SENSOR: return DaylightSensorHandler::Callback;     \
-			default:                                                                        \
-			{                                                                               \
-				if (cBlockDoorHandler::IsDoorBlockType(BlockType))                          \
-				{                                                                           \
-					return DoorHandler::Callback;                                           \
-				}                                                                           \
-			}                                                                               \
-		}                                                                                   \
+			default:                                                                           \
+			{                                                                                  \
+				if (cBlockDoorHandler::IsDoorBlockType(BlockType))                             \
+				{                                                                              \
+					return DoorHandler::Callback;                                              \
+				}                                                                              \
+			}                                                                                  \
+		}                                                                                      \
 	} while (false)
 
 
