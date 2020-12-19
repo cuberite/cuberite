@@ -266,8 +266,8 @@ namespace Explodinator
 		{
 			for (int OffsetZ = -HalfSide; OffsetZ < HalfSide; OffsetZ++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, +1, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, -1, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, +HalfSide, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, -HalfSide, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
 			}
 		}
 
@@ -276,8 +276,8 @@ namespace Explodinator
 		{
 			for (int OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, +1), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, -1), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, +HalfSide), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, -HalfSide), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
 			}
 		}
 
@@ -286,8 +286,8 @@ namespace Explodinator
 		{
 			for (int OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(+1, OffsetY, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(-1, OffsetY, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(+HalfSide, OffsetY, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(-HalfSide, OffsetY, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
 			}
 		}
 	}
