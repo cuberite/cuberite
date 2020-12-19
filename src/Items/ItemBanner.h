@@ -37,123 +37,121 @@ public:
 
 
 
-	virtual bool GetBlocksToPlace(
-		cWorld & a_World,
-		cPlayer & a_Player,
-		const cItem & a_EquippedItem,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		sSetBlockVector & a_BlocksToPlace
+	virtual bool GetPlacementBlockTypeMeta(
+			cWorld * a_World, cPlayer * a_Player,
+			const Vector3i a_PlacedBlockPos,
+			eBlockFace a_ClickedBlockFace,
+			const Vector3i a_CursorPos,
+			BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		NIBBLETYPE BlockMeta = 0x00;
-		double Rotation = a_Player.GetYaw();
+		a_BlockMeta = 0x00;
+		double Rotation = a_Player->GetYaw();
 		// Placing on the floor
 		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
 		{
 			if ((Rotation >= - 11.25f) && (Rotation < 11.25f))
 			{
 				// South
-				BlockMeta |= 0x08;
+				a_BlockMeta |= 0x08;
 			}
 			else if ((Rotation >= 11.25f) && (Rotation < 33.75f))
 			{
 				// SouthSouthWest
-				BlockMeta |= 0x09;
+				a_BlockMeta |= 0x09;
 			}
 			else if ((Rotation >= 23.75f) && (Rotation < 56.25f))
 			{
 				// SouthWest
-				BlockMeta |= 0x0a;
+				a_BlockMeta |= 0x0a;
 			}
 			else if ((Rotation >= 56.25f) && (Rotation < 78.75f))
 			{
 				// WestSouthWest
-				BlockMeta |= 0x0b;
+				a_BlockMeta |= 0x0b;
 			}
 			else if ((Rotation >= 78.75f) && (Rotation < 101.25f))
 			{
 				// West
-				BlockMeta |= 0x0c;
+				a_BlockMeta |= 0x0c;
 			}
 			else if ((Rotation >= 101.25f) && (Rotation < 123.75f))
 			{
 				// WestNorthWest
-				BlockMeta |= 0x0d;
+				a_BlockMeta |= 0x0d;
 			}
 			else if ((Rotation >= 123.75f) && (Rotation < 146.25f))
 			{
 				// NorthWest
-				BlockMeta |= 0x0e;
+				a_BlockMeta |= 0x0e;
 			}
 			else if ((Rotation >= 146.25f) && (Rotation < 168.75f))
 			{
 				// NorthNorthWest
-				BlockMeta |= 0x0f;
+				a_BlockMeta |= 0x0f;
 			}
 			else if ((Rotation >= -168.75f) && (Rotation < -146.25f))
 			{
 				// NorthNorthEast
-				BlockMeta |= 0x01;
+				a_BlockMeta |= 0x01;
 			}
 			else if ((Rotation >= -146.25f) && (Rotation < -123.75f))
 			{
 				// NorthEast
-				BlockMeta |= 0x02;
+				a_BlockMeta |= 0x02;
 			}
 			else if ((Rotation >= -123.75f) && (Rotation < -101.25f))
 			{
 				// EastNorthEast
-				BlockMeta |= 0x03;
+				a_BlockMeta |= 0x03;
 			}
 			else if ((Rotation >= -101.25) && (Rotation < -78.75f))
 			{
 				// East
-				BlockMeta |= 0x04;
+				a_BlockMeta |= 0x04;
 			}
 			else if ((Rotation >= -78.75) && (Rotation < -56.25f))
 			{
 				// EastSouthEast
-				BlockMeta |= 0x05;
+				a_BlockMeta |= 0x05;
 			}
 			else if ((Rotation >= -56.25f) && (Rotation < -33.75f))
 			{
 				// SouthEast
-				BlockMeta |= 0x06;
+				a_BlockMeta |= 0x06;
 			}
 			else if ((Rotation >= -33.75f) && (Rotation < -11.25f))
 			{
 				// SouthSouthEast
-				BlockMeta |= 0x07;
+				a_BlockMeta |= 0x07;
 			}
 			else  // degrees jumping from 180 to -180
 			{
 				// North
-				BlockMeta |= 0x00;
+				a_BlockMeta |= 0x00;
 			}
-			a_BlocksToPlace.emplace_back(a_PlacedBlockPos, E_BLOCK_STANDING_BANNER, BlockMeta);
+			a_BlockType = E_BLOCK_STANDING_BANNER;
 		}
 		// placing on the sides
 		else if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
 			if (a_ClickedBlockFace == BLOCK_FACE_EAST)
 			{
-				BlockMeta |= 0x05;
+				a_BlockMeta |= 0x05;
 			}
 			else if (a_ClickedBlockFace == BLOCK_FACE_WEST)
 			{
-				BlockMeta |= 0x04;
+				a_BlockMeta |= 0x04;
 			}
 			else if (a_ClickedBlockFace == BLOCK_FACE_NORTH)
 			{
-				BlockMeta |= 0x02;
+				a_BlockMeta |= 0x02;
 			}
 			else  // degrees jumping from 180 to -180
 			{
-				BlockMeta |= 0x03;
+				a_BlockMeta |= 0x03;
 			}
-			a_BlocksToPlace.emplace_back(a_PlacedBlockPos, E_BLOCK_WALL_BANNER, BlockMeta);
+			a_BlockType = E_BLOCK_WALL_BANNER;
 		}
 		else
 		{
