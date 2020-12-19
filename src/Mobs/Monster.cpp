@@ -768,7 +768,7 @@ void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 	{
 		EventSeePlayer(&a_Player, a_Chunk);
 		return true;
-	}, false);
+	}, true);
 }
 
 
