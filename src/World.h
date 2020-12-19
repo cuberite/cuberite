@@ -904,8 +904,8 @@ public:
 	eShrapnelLevel GetTNTShrapnelLevel(void) const { return m_TNTShrapnelLevel; }
 	void SetTNTShrapnelLevel(eShrapnelLevel a_Flag) { m_TNTShrapnelLevel = a_Flag; }
 
-	int GetMaxViewDistance(void) const { return m_MaxViewDistance; }
-	void SetMaxViewDistance(int a_MaxViewDistance);
+	unsigned GetMaxViewDistance(void) const { return m_MaxViewDistance; }
+	void SetMaxViewDistance(unsigned a_MaxViewDistance);
 
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
@@ -1257,7 +1257,7 @@ private:
 	eShrapnelLevel m_TNTShrapnelLevel;
 
 	/** The maximum view distance that a player can have in this world. */
-	int m_MaxViewDistance;
+	unsigned m_MaxViewDistance;
 
 	/** Name of the nether world - where Nether portals should teleport.
 	Only used when this world is an Overworld. */

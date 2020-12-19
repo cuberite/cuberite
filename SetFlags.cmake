@@ -111,14 +111,6 @@ function(set_global_flags)
 	endif()
 endfunction()
 
-function (try_add_flag TARGET FLAG)
-	include(CheckCXXCompilerFlag)
-	check_cxx_compiler_flag("${FLAG}" "HAS_FLAG_${FLAG}")
-	if ("${HAS_FLAG_${FLAG}}")
-		target_compile_options(${TARGET} PRIVATE "${FLAG}")
-	endif()
-endfunction()
-
 function(set_exe_flags TARGET)
 	if (MSVC)
 		# TODO: MSVC level 4, warnings as errors
@@ -158,15 +150,27 @@ function(set_exe_flags TARGET)
 			-Wno-switch-enum
 
 			# Weverything with Clang exceptions:
-			-Weverything -Wno-error=disabled-macro-expansion -Wno-weak-vtables
-			-Wno-exit-time-destructors -Wno-string-conversion -Wno-c++98-compat-pedantic
-			-Wno-documentation -Wno-documentation-unknown-command -Wno-reserved-id-macro
-			-Wno-error=unused-command-line-argument
+			-Weverything -Wno-exit-time-destructors -Wno-error=disabled-macro-expansion
+			-Wno-weak-vtables -Wno-string-conversion -Wno-c++98-compat-pedantic -Wno-documentation
+			-Wno-documentation-unknown-command -Wno-reserved-id-macro -Wno-error=unused-command-line-argument
 		)
 
-		# We aren't using C++11
-		try_add_flag(${TARGET} -Wno-return-std-move-in-c++11)
-		# int to float conversions happen a lot, not worth fixing all warnings
-		try_add_flag(${TARGET} -Wno-implicit-int-float-conversion)
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7)
+			target_compile_options(
+				${TARGET} PRIVATE
+
+				# We aren't using C++11:
+				-Wno-return-std-move-in-c++11
+			)
+		endif()
+
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 10)
+			target_compile_options(
+				${TARGET} PRIVATE
+
+				# int to float conversions happen a lot, not worth fixing all warnings:
+				-Wno-implicit-int-float-conversion
+			)
+		endif()
 	endif()
 endfunction()

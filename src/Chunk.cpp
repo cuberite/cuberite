@@ -480,8 +480,15 @@ bool cChunk::HasBlockEntityAt(Vector3i a_BlockPos)
 
 void cChunk::Stay(bool a_Stay)
 {
-	m_StayCount += (a_Stay ? 1 : -1);
-	ASSERT(m_StayCount >= 0);
+	if (a_Stay)
+	{
+		m_StayCount++;
+	}
+	else
+	{
+		ASSERT(m_StayCount != 0);
+		m_StayCount--;
+	}
 }
 
 

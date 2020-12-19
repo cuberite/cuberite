@@ -1389,9 +1389,17 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
+	const auto MobType = GetProtocolMobType(a_Mob.GetMobType());
+
+	// If the type is not valid in this protocol bail out:
+	if (MobType == 0)
+	{
+		return;
+	}
+
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
-	Pkt.WriteBEUInt8(static_cast<Byte>(GetProtocolMobType(a_Mob.GetMobType())));
+	Pkt.WriteBEUInt8(static_cast<Byte>(MobType));
 	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
 	Pkt.WriteFPInt(LastSentPos.x);
 	Pkt.WriteFPInt(LastSentPos.y);
@@ -1713,7 +1721,7 @@ void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, size_t a_Prop
 
 bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_CompressedData)
 {
-	const auto UncompressedSize = static_cast<size_t>(a_Packet.size());
+	const auto UncompressedSize = a_Packet.size();
 
 	if (UncompressedSize < CompressionThreshold)
 	{
@@ -1728,8 +1736,7 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 		----------------------------------------------
 		*/
 		const UInt32 DataSize = 0;
-		const auto PacketSize = static_cast<UInt32>(
-			cByteBuffer::GetVarIntSize(DataSize) + UncompressedSize);
+		const auto PacketSize = static_cast<UInt32>(cByteBuffer::GetVarIntSize(DataSize) + UncompressedSize);
 
 		cByteBuffer LengthHeaderBuffer(
 			cByteBuffer::GetVarIntSize(PacketSize) +
@@ -1781,8 +1788,7 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 	}
 
 	const UInt32 DataSize = static_cast<UInt32>(UncompressedSize);
-	const auto PacketSize = static_cast<UInt32>(
-		cByteBuffer::GetVarIntSize(DataSize) + CompressedSize);
+	const auto PacketSize = static_cast<UInt32>(cByteBuffer::GetVarIntSize(DataSize) + CompressedSize);
 
 	cByteBuffer LengthHeaderBuffer(
 		cByteBuffer::GetVarIntSize(PacketSize) +
@@ -1878,7 +1884,7 @@ int cProtocol_1_8_0::GetParticleID(const AString & a_ParticleName)
 
 
 
-UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
+UInt32 cProtocol_1_8_0::GetProtocolMobType(const eMonsterType a_MobType)
 {
 	switch (a_MobType)
 	{
@@ -1892,6 +1898,7 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtCreeper:               return 50;
 		case mtEnderDragon:           return 63;
 		case mtEnderman:              return 58;
+		case mtEndermite:             return 67;
 		case mtGhast:                 return 56;
 		case mtGiant:                 return 53;
 		case mtGuardian:              return 68;
@@ -1917,8 +1924,18 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtZombie:                return 54;
 		case mtZombiePigman:          return 57;
 		case mtZombieVillager:        return 27;
+
+		// Mobs that get replaced with another because they were added later
+		case mtCat:                   return GetProtocolMobType(mtOcelot);
+		case mtDonkey:                return GetProtocolMobType(mtHorse);
+		case mtMule:                  return GetProtocolMobType(mtHorse);
+		case mtSkeletonHorse:         return GetProtocolMobType(mtHorse);
+		case mtZombieHorse:           return GetProtocolMobType(mtHorse);
+		case mtStray:                 return GetProtocolMobType(mtSkeleton);
+		case mtHusk:                  return GetProtocolMobType(mtZombie);
+
+		default:                      return 0;
 	}
-	UNREACHABLE("Unsupported mob type");
 }
 
 
@@ -2626,17 +2643,13 @@ void cProtocol_1_8_0::HandlePacketPlayerAbilities(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, WalkingSpeed);
 
 	// COnvert the bitfield into individual boolean flags:
-	bool IsFlying = false, CanFly = false;
+	bool IsFlying = false;
 	if ((Flags & 2) != 0)
 	{
 		IsFlying = true;
 	}
-	if ((Flags & 4) != 0)
-	{
-		CanFly = true;
-	}
 
-	m_Client->HandlePlayerAbilities(CanFly, IsFlying, FlyingSpeed, WalkingSpeed);
+	m_Client->HandlePlayerAbilities(IsFlying, FlyingSpeed, WalkingSpeed);
 }
 
 
@@ -2970,8 +2983,8 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 	}
 	else if (a_Channel == "MC|Beacon")
 	{
-		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, Effect1);
-		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, Effect2);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, Effect1);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, Effect2);
 		m_Client->HandleBeaconSelection(Effect1, Effect2);
 		return;
 	}
@@ -3806,6 +3819,14 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtSlime
 
+		case mtSkeleton:
+		case mtStray:
+		{
+			a_Pkt.WriteBEUInt8(0x0d);
+			a_Pkt.WriteBEUInt8(0);  // Is normal skeleton
+			break;
+		}
+
 		case mtVillager:
 		{
 			auto & Villager = static_cast<const cVillager &>(a_Mob);
@@ -3871,6 +3892,7 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtWolf
 
+		case mtHusk:
 		case mtZombie:
 		{
 			auto & Zombie = static_cast<const cZombie &>(a_Mob);
@@ -3903,7 +3925,46 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtZombieVillager
 
-		default: break;
+		case mtBlaze:
+		case mtElderGuardian:
+		case mtGuardian:
+		{
+			// TODO: Mobs with extra fields that aren't implemented
+			break;
+		}
+
+		case mtCat:
+
+		case mtEndermite:
+
+		case mtDonkey:
+		case mtMule:
+		case mtSkeletonHorse:
+		case mtZombieHorse:
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			UNREACHABLE("cProtocol_1_8::WriteMobMetadata: received unimplemented type");
+			break;
+		}
+
+		case mtCaveSpider:
+		case mtEnderDragon:
+		case mtGiant:
+		case mtIronGolem:
+		case mtMooshroom:
+		case mtSilverfish:
+		case mtSnowGolem:
+		case mtSpider:
+		case mtSquid:
+		{
+			// Allowed mobs without additional metadata
+			break;
+		}
+		case mtInvalidType:
+		{
+			break;
+		}
+		default: UNREACHABLE("cProtocol_1_8::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
 

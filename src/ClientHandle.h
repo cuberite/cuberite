@@ -50,12 +50,12 @@ class cClientHandle  // tolua_export
 public:  // tolua_export
 
 	#if defined(ANDROID)
-		static const int DEFAULT_VIEW_DISTANCE = 4;  // The default ViewDistance (used when no value is set in Settings.ini)
+		static const unsigned DEFAULT_VIEW_DISTANCE = 4;  // The default ViewDistance (used when no value is set in Settings.ini)
 	#else
-		static const int DEFAULT_VIEW_DISTANCE = 10;
+		static const unsigned DEFAULT_VIEW_DISTANCE = 10;
 	#endif
-	static const int MAX_VIEW_DISTANCE = 32;
-	static const int MIN_VIEW_DISTANCE = 1;
+	static const unsigned MAX_VIEW_DISTANCE = 32;
+	static const unsigned MIN_VIEW_DISTANCE = 1;
 
 	/** The percentage how much a block has to be broken.
 	Should be a value between 0.7 (70% broken) and 1 (100% broken) depending on lag.
@@ -63,7 +63,7 @@ public:  // tolua_export
 	static float FASTBREAK_PERCENTAGE;
 
 	/** Creates a new client with the specified IP address in its description and the specified initial view distance. */
-	cClientHandle(const AString & a_IPString, int a_ViewDistance);
+	cClientHandle(const AString & a_IPString, unsigned a_ViewDistance);
 
 	virtual ~cClientHandle() override;
 
@@ -242,13 +242,13 @@ public:  // tolua_export
 	inline short GetPing(void) const { return static_cast<short>(std::chrono::duration_cast<std::chrono::milliseconds>(m_Ping).count()); }
 
 	/** Sets the maximal view distance. */
-	void SetViewDistance(int a_ViewDistance);
+	void SetViewDistance(unsigned a_ViewDistance);
 
 	/** Returns the view distance that the player currently have. */
-	int GetViewDistance(void) const { return m_CurrentViewDistance; }
+	unsigned GetViewDistance(void) const { return m_CurrentViewDistance; }
 
 	/** Returns the view distance that the player request, not the used view distance. */
-	int GetRequestedViewDistance(void) const { return m_RequestedViewDistance; }
+	unsigned GetRequestedViewDistance(void) const { return m_RequestedViewDistance; }
 
 	void SetLocale(const AString & a_Locale) { m_Locale = a_Locale; }
 	AString GetLocale(void) const { return m_Locale; }
@@ -304,7 +304,7 @@ public:  // tolua_export
 
 	/** Called when the protocol receives a MC|Beacon plugin message, indicating that the player set an effect
 	in the beacon UI. */
-	void HandleBeaconSelection(int a_PrimaryEffect, int a_SecondaryEffect);
+	void HandleBeaconSelection(unsigned a_PrimaryEffect, unsigned a_SecondaryEffect);
 
 	/** Called when the protocol detects a chat packet. */
 	void HandleChat(const AString & a_Message);
@@ -350,7 +350,7 @@ public:  // tolua_export
 	void HandleOpenHorseInventory(UInt32 a_EntityID);
 
 	void HandlePing             (void);
-	void HandlePlayerAbilities  (bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
+	void HandlePlayerAbilities  (bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
 	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
 
@@ -422,10 +422,10 @@ private:
 	AStringMap m_ForgeMods;
 
 	/** The actual view distance used, the minimum of client's requested view distance and world's max view distance. */
-	int m_CurrentViewDistance;
+	unsigned m_CurrentViewDistance;
 
 	/** The requested view distance from the player. It isn't clamped with 1 and the max view distance of the world. */
-	int m_RequestedViewDistance;
+	unsigned m_RequestedViewDistance;
 
 	AString m_IPString;
 

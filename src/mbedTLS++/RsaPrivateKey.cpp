@@ -118,7 +118,7 @@ int cRsaPrivateKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLeng
 	if (a_DecryptedMaxLength < m_Rsa.len)
 	{
 		LOGD("%s: Invalid a_DecryptedMaxLength: got %u, exp at least %u",
-			__FUNCTION__, static_cast<unsigned>(a_EncryptedLength), static_cast<unsigned>(m_Rsa.len)
+			__FUNCTION__, static_cast<unsigned>(a_DecryptedMaxLength), static_cast<unsigned>(m_Rsa.len)
 		);
 		ASSERT(!"Invalid a_DecryptedMaxLength!");
 		return -1;

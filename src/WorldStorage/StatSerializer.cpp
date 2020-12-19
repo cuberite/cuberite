@@ -46,7 +46,7 @@ namespace StatSerializer
 			auto & Custom = a_Out["custom"];
 			for (const auto & Item : Store)
 			{
-				Custom[NamespaceSerializer::From(Item.first)] = Item.second;
+				Custom[NamespaceSerializer::From(Item.first).data()] = Item.second;
 			}
 		});
 	}
@@ -151,13 +151,7 @@ namespace StatSerializer
 
 			if ((FindResult != LegacyMapping.end()) && Entry->isInt())
 			{
-				auto Value = Entry->asInt();
-				if (Value < 0)
-				{
-					FLOGWARNING("Invalid stat value: {0} = {1}", Key, Value);
-					continue;
-				}
-				Manager.SetValue(FindResult->second, ToUnsigned(Value));
+				Manager.SetValue(FindResult->second, Entry->asUInt());
 			}
 		}
 	}
@@ -181,13 +175,7 @@ namespace StatSerializer
 			const auto & StatName = StatInfo.second;
 			try
 			{
-				auto Value = it->asInt();
-				if (Value < 0)
-				{
-					FLOGWARNING("Invalid statistic value: {0} = {1}", Key, Value);
-					continue;
-				}
-				Manager.SetValue(NamespaceSerializer::ToCustomStatistic(StatName), ToUnsigned(Value));
+				Manager.SetValue(NamespaceSerializer::ToCustomStatistic(StatName), it->asUInt());
 			}
 			catch (const std::out_of_range &)
 			{

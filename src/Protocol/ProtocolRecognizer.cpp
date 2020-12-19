@@ -253,9 +253,7 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 			a_Client.GetIPString().c_str(), PacketType
 		);
 
-		throw TriedToJoinWithUnsupportedProtocolException(
-			Printf("Your client isn't supported.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS, ProtocolVersion)
-		);
+		throw TriedToJoinWithUnsupportedProtocolException("Your client isn't supported.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS);
 	}
 
 	if (
@@ -270,21 +268,16 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		throw TriedToJoinWithUnsupportedProtocolException("Incorrect amount of data received - hacked client?");
 	}
 
-	cProtocol::State NextState = [&]
+	const auto NextState = [NextStateValue]
+	{
+		switch (NextStateValue)
 		{
-			switch (NextStateValue)
-			{
-				case cProtocol::State::Status: return cProtocol::State::Status;
-				case cProtocol::State::Login: return cProtocol::State::Login;
-				case cProtocol::State::Game: return cProtocol::State::Game;
-				default:
-				{
-					throw TriedToJoinWithUnsupportedProtocolException(
-						fmt::format("Invalid next game state: {}", NextStateValue)
-					);
-				}
-			}
-		}();
+			case 1:  return cProtocol::State::Status;
+			case 2:  return cProtocol::State::Login;
+			case 3:  return cProtocol::State::Game;
+			default: throw TriedToJoinWithUnsupportedProtocolException("Your client isn't supported.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS);
+		}
+	}();
 
 	// TODO: this should be a protocol property, not ClientHandle:
 	a_Client.SetProtocolVersion(ProtocolVersion);

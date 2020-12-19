@@ -206,7 +206,7 @@ private:
 	cCriticalSection m_CSPendingCommands;
 	std::vector<std::pair<AString, cCommandOutputCallback *>> m_PendingCommands;
 
-	int m_ClientViewDistance;  // The default view distance for clients; settable in Settings.ini
+	unsigned m_ClientViewDistance;  // The default view distance for clients; settable in Settings.ini
 
 	bool m_bIsConnected;  // true - connected false - not connected
 

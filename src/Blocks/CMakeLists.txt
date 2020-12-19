@@ -27,6 +27,7 @@ target_sources(
 	BlockComparator.h
 	BlockConcretePowder.h
 	BlockCrops.h
+	BlockDaylightSensor.h
 	BlockDeadBush.h
 	BlockDefaultBlock.h
 	BlockDirt.h
@@ -65,6 +66,7 @@ target_sources(
 	BlockMycelium.h
 	BlockNetherrack.h
 	BlockNetherWart.h
+	BlockNoteBlock.h
 	BlockObserver.h
 	BlockOre.h
 	BlockPackedIce.h

@@ -592,7 +592,7 @@ private:
 	cBlockEntities m_BlockEntities;
 
 	/** Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded */
-	int m_StayCount;
+	unsigned m_StayCount;
 
 	int m_PosX, m_PosZ;
 	cWorld *    m_World;
@@ -622,7 +622,7 @@ private:
 	/** If greater than zero, the chunk is ticked even if it has no clients.
 	Manipulated by the SetAlwaysTicked() function, allows for nested calls of the function.
 	This is the support for plugin-accessible chunk tick forcing. */
-	int m_AlwaysTicked;
+	unsigned m_AlwaysTicked;
 
 	// Pick up a random block of this chunk
 	void GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z);
