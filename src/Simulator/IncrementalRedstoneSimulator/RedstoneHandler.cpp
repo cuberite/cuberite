@@ -31,11 +31,11 @@
 
 
 
-#define INVOKE_FOR_HANDLERS(Callback)                                                          \
-	do                                                                                         \
-	{                                                                                          \
-		switch (BlockType)                                                                     \
-		{                                                                                      \
+#define INVOKE_FOR_HANDLERS(Callback) \
+	do \
+	{ \
+		switch (BlockType) \
+		{ \
 			case E_BLOCK_ACTIVATOR_RAIL:                                                       \
 			case E_BLOCK_DETECTOR_RAIL:                                                        \
 			case E_BLOCK_POWERED_RAIL:             return PoweredRailHandler::Callback;        \
@@ -78,13 +78,13 @@
 			case E_BLOCK_TRAPPED_CHEST:            return TrappedChestHandler::Callback;       \
 			case E_BLOCK_TRIPWIRE_HOOK:            return TripwireHookHandler::Callback;       \
 			default:                                                                           \
-			{                                                                                  \
-				if (cBlockDoorHandler::IsDoorBlockType(BlockType))                             \
-				{                                                                              \
-					return DoorHandler::Callback;                                              \
-				}                                                                              \
-			}                                                                                  \
-		}                                                                                      \
+			{ \
+				if (cBlockDoorHandler::IsDoorBlockType(BlockType)) \
+				{ \
+					return DoorHandler::Callback; \
+				} \
+			} \
+		} \
 	} while (false)
 
 

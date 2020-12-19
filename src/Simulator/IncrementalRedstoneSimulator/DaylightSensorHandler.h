@@ -9,7 +9,7 @@
 
 namespace DaylightSensorHandler
 {
-	inline unsigned char GetPowerLevel(const cChunk & a_Chunk, const Vector3i a_Position)
+	inline PowerLevel GetPowerLevel(const cChunk & a_Chunk, const Vector3i a_Position)
 	{
 		if (a_Chunk.GetBlock(a_Position) == E_BLOCK_INVERTED_DAYLIGHT_SENSOR)
 		{
@@ -24,7 +24,7 @@ namespace DaylightSensorHandler
 		const auto RawOutput = a_Chunk.GetSkyLightAltered(a_Position) * (0.6f * std::sin(ProportionOfDay) + 0.5f);
 
 		// Saturate the amplified sine curve at 0 and 15:
-		return static_cast<unsigned char>(std::clamp(RawOutput, 0.f, 15.f));
+		return static_cast<PowerLevel>(std::clamp(RawOutput, 0.f, 15.f));
 	}
 
 	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
@@ -33,8 +33,7 @@ namespace DaylightSensorHandler
 		UNUSED(a_BlockType);
 		UNUSED(a_QueryPosition);
 
-		// Daylight sensors output to all surrounding blocks
-		// Retrieve and return the cached power calculated by Update for performance
+		// Daylight sensors only output to immediately surrounding blocks:
 		return IsLinked ? 0 : a_Chunk.GetMeta(a_Position);
 	}
 

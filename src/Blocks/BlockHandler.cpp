@@ -300,7 +300,6 @@ namespace
 	constexpr cDefaultBlockHandler            BlockHugeRedMushroomHandler       (E_BLOCK_HUGE_RED_MUSHROOM);
 	constexpr cBlockIceHandler                BlockIceHandler                   (E_BLOCK_ICE);
 	constexpr cBlockComparatorHandler         BlockInactiveComparatorHandler    (E_BLOCK_INACTIVE_COMPARATOR);
-	constexpr cBlockDaylightSensorHandler     BlockInvertedDaylightSensorHandler(E_BLOCK_INVERTED_DAYLIGHT_SENSOR);
 	constexpr cBlockInfestedHandler           BlockInfestedBlockHandler         (E_BLOCK_SILVERFISH_EGG);
 	constexpr cDefaultBlockHandler            BlockIronBarsHandler              (E_BLOCK_IRON_BARS);
 	constexpr cDefaultBlockHandler            BlockIronBlockHandler             (E_BLOCK_IRON_BLOCK);
