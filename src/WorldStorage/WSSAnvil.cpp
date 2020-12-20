@@ -8,8 +8,8 @@
 #include "NBTChunkSerializer.h"
 #include "EnchantmentSerializer.h"
 #include "NamespaceSerializer.h"
-#include "zlib/zlib.h"
 #include "json/json.h"
+#include "OSSupport/GZipFile.h"
 #include "../World.h"
 #include "../Item.h"
 #include "../ItemGrid.h"
@@ -86,7 +86,7 @@ Since only the header is actually in the memory, this number can be high, but st
 
 cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 	Super(a_World),
-	m_CompressionFactor(a_CompressionFactor)
+	m_Compressor(a_CompressionFactor)
 {
 	// Create a level.dat file for mapping tools, if it doesn't already exist:
 	AString fnam;
@@ -117,12 +117,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 		Writer.EndCompound();
 		Writer.Finish();
 
-		gzFile gz = gzopen((fnam).c_str(), "wb");
-		if (gz != nullptr)
-		{
-			gzwrite(gz, Writer.GetResult().data(), static_cast<unsigned>(Writer.GetResult().size()));
-		}
-		gzclose(gz);
+		GZipFile::Write(fnam, Writer.GetResult());
 	}
 }
 
@@ -145,7 +140,7 @@ cWSSAnvil::~cWSSAnvil()
 
 bool cWSSAnvil::LoadChunk(const cChunkCoords & a_Chunk)
 {
-	AString ChunkData;
+	ContiguousByteBuffer ChunkData;
 	if (!GetChunkData(a_Chunk, ChunkData))
 	{
 		// The reason for failure is already printed in GetChunkData()
@@ -161,15 +156,17 @@ bool cWSSAnvil::LoadChunk(const cChunkCoords & a_Chunk)
 
 bool cWSSAnvil::SaveChunk(const cChunkCoords & a_Chunk)
 {
-	AString ChunkData;
-	if (!SaveChunkToData(a_Chunk, ChunkData))
+	try
 	{
-		LOGWARNING("Cannot serialize chunk [%d, %d] into data", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
-		return false;
+		if (!SetChunkData(a_Chunk, SaveChunkToData(a_Chunk).GetView()))
+		{
+			LOGWARNING("Cannot store chunk [%d, %d] data", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+			return false;
+		}
 	}
-	if (!SetChunkData(a_Chunk, ChunkData))
+	catch (const std::exception & Oops)
 	{
-		LOGWARNING("Cannot store chunk [%d, %d] data", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		LOGWARNING("Cannot serialize chunk [%d, %d] into data: %s", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Oops.what());
 		return false;
 	}
 
@@ -181,7 +178,7 @@ bool cWSSAnvil::SaveChunk(const cChunkCoords & a_Chunk)
 
 
 
-void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Reason, const AString & a_ChunkDataToSave)
+void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Reason, const ContiguousByteBufferView a_ChunkDataToSave)
 {
 	// Construct the filename for offloading:
 	AString OffloadFileName;
@@ -202,7 +199,7 @@ void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Re
 	// Log the warning to console:
 	const int RegionX = FAST_FLOOR_DIV(a_ChunkX, 32);
 	const int RegionZ = FAST_FLOOR_DIV(a_ChunkZ, 32);
-	AString Info = Printf("Loading chunk [%d, %d] for world %s from file r.%d.%d.mca failed: %s. Offloading old chunk data to file %s and regenerating chunk.",
+	AString Info = Printf("Loading chunk [%d, %d] for world %s from file r.%d.%d.mca failed: %s Offloading old chunk data to file %s and regenerating chunk.",
 		a_ChunkX, a_ChunkZ, m_World->GetName().c_str(), RegionX, RegionZ, a_Reason.c_str(), OffloadFileName.c_str()
 	);
 	LOGWARNING("%s", Info.c_str());
@@ -231,7 +228,7 @@ void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Re
 
 
 
-bool cWSSAnvil::GetChunkData(const cChunkCoords & a_Chunk, AString & a_Data)
+bool cWSSAnvil::GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data)
 {
 	cCSLock Lock(m_CS);
 	cMCAFile * File = LoadMCAFile(a_Chunk);
@@ -246,7 +243,7 @@ bool cWSSAnvil::GetChunkData(const cChunkCoords & a_Chunk, AString & a_Data)
 
 
 
-bool cWSSAnvil::SetChunkData(const cChunkCoords & a_Chunk, const AString & a_Data)
+bool cWSSAnvil::SetChunkData(const cChunkCoords & a_Chunk, const ContiguousByteBufferView a_Data)
 {
 	cCSLock Lock(m_CS);
 	cMCAFile * File = LoadMCAFile(a_Chunk);
@@ -314,55 +311,47 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 
 
 
-bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & a_Data)
+bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const ContiguousByteBufferView a_Data)
 {
-	// Uncompress the data:
-	AString Uncompressed;
-	int res = InflateString(a_Data.data(), a_Data.size(), Uncompressed);
-	if (res != Z_OK)
+	try
 	{
-		LOGWARNING("Uncompressing chunk [%d, %d] failed: %d", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, res);
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "InflateString() failed", a_Data);
+		const auto Compressed = m_Extractor.ExtractZLib(a_Data);
+		cParsedNBT NBT(Compressed.GetView());
+
+		if (!NBT.IsValid())
+		{
+			// NBT Parsing failed:
+			throw std::runtime_error(fmt::format("NBT parsing failed. {} at position {}.", NBT.GetErrorCode().message(), NBT.GetErrorPos()));
+		}
+
+		// Load the data from NBT:
+		return LoadChunkFromNBT(a_Chunk, NBT, a_Data);
+	}
+	catch (const std::exception & Oops)
+	{
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Oops.what(), a_Data);
 		return false;
 	}
-
-	// Parse the NBT data:
-	cParsedNBT NBT(Uncompressed.data(), Uncompressed.size());
-	if (!NBT.IsValid())
-	{
-		// NBT Parsing failed
-		auto msg = fmt::format("NBT parsing failed: {}, pos {}", NBT.GetErrorCode().message(), NBT.GetErrorPos());
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, msg, a_Data);
-		return false;
-	}
-
-	// Load the data from NBT:
-	return LoadChunkFromNBT(a_Chunk, NBT, a_Data);
 }
 
 
 
 
 
-bool cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data)
+Compression::Result cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk)
 {
 	cFastNBTWriter Writer;
-	if (!SaveChunkToNBT(a_Chunk, Writer))
-	{
-		LOGWARNING("Cannot save chunk [%d, %d] to NBT", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
-		return false;
-	}
+	NBTChunkSerializer::Serialize(*m_World, a_Chunk, Writer);
 	Writer.Finish();
 
-	CompressString(Writer.GetResult().data(), Writer.GetResult().size(), a_Data, m_CompressionFactor);
-	return true;
+	return m_Compressor.CompressZLib(Writer.GetResult());
 }
 
 
 
 
 
-bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, const AString & a_RawChunkData)
+bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, const ContiguousByteBufferView a_RawChunkData)
 {
 	// The data arrays, in MCA-native y / z / x ordering (will be reordered for the final chunk data)
 	cChunkDef::BlockTypes   BlockTypes;
@@ -496,20 +485,6 @@ void cWSSAnvil::CopyNBTData(const cParsedNBT & a_NBT, int a_Tag, const AString &
 
 
 
-bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_Writer)
-{
-	if (!NBTChunkSerializer::serialize(*m_World, a_Chunk, a_Writer))
-	{
-		LOGWARNING("Failed to save chunk %s.", a_Chunk.ToString());
-		return false;
-	}
-	return true;
-}
-
-
-
-
-
 cChunkDef::BiomeMap * cWSSAnvil::LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_ByteArray))
@@ -549,7 +524,7 @@ cChunkDef::BiomeMap * cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_Bio
 		// The biomes stored don't match in size
 		return nullptr;
 	}
-	const char * BiomeData = (a_NBT.GetData(a_TagIdx));
+	const auto * BiomeData = a_NBT.GetData(a_TagIdx);
 	for (size_t i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
 	{
 		(*a_BiomeMap)[i] = static_cast<EMCSBiome>(GetBEInt(&BiomeData[i * 4]));
@@ -587,7 +562,7 @@ void cWSSAnvil::LoadEntitiesFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 		try
 		{
-			LoadEntityFromNBT(a_Entities, a_NBT, Child, a_NBT.GetData(sID), a_NBT.GetDataLength(sID));
+			LoadEntityFromNBT(a_Entities, a_NBT, Child, a_NBT.GetStringView(sID));
 		}
 		catch (...)
 		{
@@ -690,14 +665,9 @@ OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int
 			// All the other blocktypes should have no entities assigned to them. Report an error:
 			// Get the "id" tag:
 			int TagID = a_NBT.FindChildByName(a_Tag, "id");
-			AString TypeName("<unknown>");
-			if (TagID >= 0)
-			{
-				TypeName.assign(a_NBT.GetData(TagID), static_cast<size_t>(a_NBT.GetDataLength(TagID)));
-			}
 			FLOGINFO("WorldLoader({0}): Block entity mismatch: block type {1} ({2}), type \"{3}\", at {4}; the entity will be lost.",
 				m_World->GetName(),
-				ItemTypeToString(a_BlockType), a_BlockType, TypeName,
+				ItemTypeToString(a_BlockType), a_BlockType, (TagID >= 0) ? a_NBT.GetStringView(TagID) : "unknown",
 				a_Pos
 			);
 			return nullptr;
@@ -887,10 +857,16 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 		return false;
 	}
 
+	// Check if the "id" tag is a string:
+	if (a_NBT.GetType(TagID) != eTagType::TAG_String)
+	{
+		return false;
+	}
+
 	// Compare the value:
 	for (const auto & et: a_ExpectedTypes)
 	{
-		if (strncmp(a_NBT.GetData(TagID), et.c_str(), static_cast<size_t>(a_NBT.GetDataLength(TagID))) == 0)
+		if (a_NBT.GetStringView(TagID) == et)
 		{
 			return true;
 		}
@@ -906,8 +882,7 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 	}
 	FLOGWARNING("Block entity type mismatch: exp {0}, got \"{1}\". The block entity at {2} will lose all its properties.",
 		expectedTypes.c_str() + 2,  // Skip the first ", " that is extra in the string
-		AString(a_NBT.GetData(TagID), static_cast<size_t>(a_NBT.GetDataLength(TagID))),
-		a_Pos
+		a_NBT.GetStringView(TagID), a_Pos
 	);
 	return false;
 }
@@ -1571,10 +1546,10 @@ OwnedBlockEntity cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagI
 
 
 
-void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, size_t a_IDTagLength)
+void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const std::string_view a_EntityName)
 {
 	typedef void (cWSSAnvil::*EntityLoaderFunc)(cEntityList &, const cParsedNBT &, int a_EntityTagIdx);
-	typedef std::map<AString, EntityLoaderFunc> EntityLoaderMap;
+	typedef std::map<std::string_view, EntityLoaderFunc> EntityLoaderMap;
 	static const EntityLoaderMap EntityTypeToFunction
 	{
 		{ "Boat",                          &cWSSAnvil::LoadBoatFromNBT },
@@ -1624,14 +1599,14 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 	// TODO: flatten monster\projectile into one entity type enum
 
-	auto it = EntityTypeToFunction.find(AString(a_IDTag, a_IDTagLength));
+	const auto it = EntityTypeToFunction.find(a_EntityName);
 	if (it != EntityTypeToFunction.end())
 	{
 		(this->*it->second)(a_Entities, a_NBT, a_EntityTagIdx);
 		return;
 	}
 
-	const auto StatInfo = NamespaceSerializer::SplitNamespacedID({ a_IDTag, a_IDTagLength });
+	const auto StatInfo = NamespaceSerializer::SplitNamespacedID(a_EntityName);
 	if (StatInfo.first == NamespaceSerializer::Namespace::Unknown)
 	{
 		return;
@@ -3947,7 +3922,7 @@ bool cWSSAnvil::cMCAFile::OpenFile(bool a_IsForReading)
 
 
 
-bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a_Data)
+bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data)
 {
 	if (!OpenFile(true))
 	{
@@ -3976,21 +3951,21 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 	UInt32 ChunkSize = 0;
 	if (m_File.Read(&ChunkSize, 4) != 4)
 	{
-		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk size", "");
+		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk size", {});
 		return false;
 	}
 	ChunkSize = ntohl(ChunkSize);
 	if (ChunkSize < 1)
 	{
 		// Chunk size too small
-		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Chunk size too small", "");
+		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Chunk size too small", {});
 		return false;
 	}
 
 	char CompressionType = 0;
 	if (m_File.Read(&CompressionType, 1) != 1)
 	{
-		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk compression", "");
+		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk compression", {});
 		return false;
 	}
 	ChunkSize--;
@@ -4015,7 +3990,7 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 
 
 
-bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AString & a_Data)
+bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const ContiguousByteBufferView a_Data)
 {
 	if (!OpenFile(false))
 	{
@@ -4034,7 +4009,7 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 		LocalZ = 32 + LocalZ;
 	}
 
-	unsigned ChunkSector = FindFreeLocation(LocalX, LocalZ, a_Data);
+	unsigned ChunkSector = FindFreeLocation(LocalX, LocalZ, a_Data.size());
 
 	// Store the chunk data:
 	m_File.Seek(static_cast<int>(ChunkSector * 4096));
@@ -4103,12 +4078,12 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 
 
 
-unsigned cWSSAnvil::cMCAFile::FindFreeLocation(int a_LocalX, int a_LocalZ, const AString & a_Data)
+unsigned cWSSAnvil::cMCAFile::FindFreeLocation(int a_LocalX, int a_LocalZ, const size_t a_DataSize)
 {
 	// See if it fits the current location:
 	unsigned ChunkLocation = ntohl(m_Header[a_LocalX + 32 * a_LocalZ]);
 	unsigned ChunkLen = ChunkLocation & 0xff;
-	if (a_Data.size() + MCA_CHUNK_HEADER_LENGTH <= (ChunkLen * 4096))
+	if (a_DataSize + MCA_CHUNK_HEADER_LENGTH <= (ChunkLen * 4096))
 	{
 		return ChunkLocation >> 8;
 	}

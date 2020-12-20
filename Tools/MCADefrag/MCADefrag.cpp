@@ -8,7 +8,6 @@
 #include "Logger.h"
 #include "LoggerSimple.h"
 #include "LoggerListeners.h"
-#include "zlib/zlib.h"
 
 
 
@@ -385,7 +384,7 @@ bool cMCADefrag::cThread::UncompressChunkGzip(void)
 bool cMCADefrag::cThread::UncompressChunkZlib(void)
 {
 	// Uncompress the data:
-	z_stream strm;
+	/*z_stream strm;
 	strm.zalloc = nullptr;
 	strm.zfree = nullptr;
 	strm.opaque = nullptr;
@@ -402,7 +401,7 @@ bool cMCADefrag::cThread::UncompressChunkZlib(void)
 		return false;
 	}
 	ASSERT(strm.total_out < static_cast<uLong>(std::numeric_limits<int>::max()));
-	m_RawChunkDataSize = static_cast<int>(strm.total_out);
+	m_RawChunkDataSize = static_cast<int>(strm.total_out);*/
 
 	return true;
 }
@@ -414,7 +413,7 @@ bool cMCADefrag::cThread::UncompressChunkZlib(void)
 bool cMCADefrag::cThread::CompressChunk(void)
 {
 	// Check that the compressed data can fit:
-	uLongf CompressedSize = compressBound(static_cast<uLong>(m_RawChunkDataSize));
+	/*uLongf CompressedSize = compressBound(static_cast<uLong>(m_RawChunkDataSize));
 	if (CompressedSize > sizeof(m_CompressedChunkData))
 	{
 		LOGINFO("Too much data for the internal compression buffer!");
@@ -430,6 +429,6 @@ bool cMCADefrag::cThread::CompressChunk(void)
 	}
 	m_CompressedChunkData[0] = COMPRESSION_ZLIB;
 	ASSERT(CompressedSize < static_cast<uLong>(std::numeric_limits<int>::max()));
-	m_CompressedChunkDataSize = static_cast<int>(CompressedSize + 1);
+	m_CompressedChunkDataSize = static_cast<int>(CompressedSize + 1);*/
 	return true;
 }

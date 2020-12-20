@@ -1009,7 +1009,7 @@ bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message)
+bool cPluginManager::CallHookPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const ContiguousByteBufferView a_Message)
 {
 	return GenericCallHook(HOOK_PLUGIN_MESSAGE, [&](cPlugin * a_Plugin)
 		{

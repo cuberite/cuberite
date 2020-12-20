@@ -863,7 +863,7 @@ void cLuaState::Push(const AStringVector & a_Vector)
 	int index = 1;
 	for (AStringVector::const_iterator itr = a_Vector.begin(), end = a_Vector.end(); itr != end; ++itr, ++index)
 	{
-		tolua_pushstring(m_LuaState, itr->c_str());
+		Push(*itr);
 		lua_rawseti(m_LuaState, newTable, index);
 	}
 }
@@ -910,6 +910,17 @@ void cLuaState::Push(const cLuaState::cRef & a_Ref)
 	ASSERT(IsValid());
 
 	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, static_cast<int>(a_Ref));
+}
+
+
+
+
+
+void cLuaState::Push(const ContiguousByteBufferView a_Data)
+{
+	ASSERT(IsValid());
+
+	lua_pushlstring(m_LuaState, reinterpret_cast<const char *>(a_Data.data()), a_Data.size());
 }
 
 
@@ -1349,6 +1360,22 @@ bool cLuaState::GetStackValue(int a_StackPos, cTrackedRefSharedPtr & a_Ref)
 		a_Ref = std::make_shared<cTrackedRef>();
 	}
 	return a_Ref->RefStack(*this, a_StackPos);
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, ContiguousByteBuffer & a_Data)
+{
+	size_t Length = 0;
+	const char * const Data = lua_tolstring(m_LuaState, a_StackPos, &Length);
+	if (Data != nullptr)
+	{
+		a_Data.assign(reinterpret_cast<const std::byte *>(Data), Length);
+		return true;
+	}
+	return false;
 }
 
 

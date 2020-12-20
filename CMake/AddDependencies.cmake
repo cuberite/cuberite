@@ -28,7 +28,7 @@ function(build_dependencies)
 
 	# Enumerate all submodule libraries
 	# SQLiteCpp needs to be included before sqlite so the lsqlite target is available:
-	set(DEPENDENCIES expat fmt jsoncpp libevent lua luaexpat mbedtls SQLiteCpp sqlite tolua++ zlib)
+	set(DEPENDENCIES expat fmt jsoncpp libdeflate libevent lua luaexpat mbedtls SQLiteCpp sqlite tolua++)
 	foreach(DEPENDENCY ${DEPENDENCIES})
 		# Check that the libraries are present:
 		if (NOT EXISTS "${PROJECT_SOURCE_DIR}/lib/${DEPENDENCY}/CMakeLists.txt")
@@ -62,13 +62,13 @@ function(link_dependencies TARGET)
 		event_extra
 		fmt::fmt
 		jsoncpp_lib
+		libdeflate
 		lsqlite
 		lualib
 		luaexpat
 		mbedtls
 		SQLiteCpp
 		tolualib
-		zlib
 	)
 
 	# Link process information library:

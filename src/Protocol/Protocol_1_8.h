@@ -20,6 +20,9 @@ Declares the 1.8 protocol classes:
 #include "../mbedTLS++/AesCfb128Decryptor.h"
 #include "../mbedTLS++/AesCfb128Encryptor.h"
 
+#include "CircularBufferCompressor.h"
+#include "StringCompression.h"
+
 
 
 
@@ -46,7 +49,7 @@ public:
 	virtual void SendChat                       (const AString & a_Message, eChatType a_Type) override;
 	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) override;
 	virtual void SendChatRaw                    (const AString & a_MessageRaw, eChatType a_Type) override;
-	virtual void SendChunkData                  (const std::string_view a_ChunkData) override;
+	virtual void SendChunkData                  (ContiguousByteBufferView a_ChunkData) override;
 	virtual void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) override;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) override;
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
@@ -88,7 +91,7 @@ public:
 	virtual void SendPlayerMoveLook             (void) override;
 	virtual void SendPlayerPosition             (void) override;
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) override;
-	virtual void SendPluginMessage              (const AString & a_Channel, const AString & a_Message) override;
+	virtual void SendPluginMessage              (const AString & a_Channel, ContiguousByteBufferView a_Message) override;
 	virtual void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID) override;
 	virtual void SendResetTitle                 (void) override;
 	virtual void SendResourcePack               (const AString & a_ResourcePackUrl) override;
@@ -127,7 +130,7 @@ public:
 	/** Compress the packet. a_Packet must be without packet length.
 	a_Compressed will be set to the compressed packet includes packet length and data length.
 	If compression fails, the function returns false. */
-	static bool CompressPacket(const AString & a_Packet, AString & a_Compressed);
+	static void CompressPacket(CircularBufferCompressor & a_Packet, ContiguousByteBuffer & a_Compressed);
 
 	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
 	static int GetParticleID(const AString & a_ParticleName);
@@ -194,7 +197,7 @@ protected:
 	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel);
 
 	/** Sends the data to the client, encrypting them if needed. */
-	virtual void SendData(const char * a_Data, size_t a_Size) override;
+	virtual void SendData(ContiguousByteBufferView a_Size) override;
 
 	/** Sends the packet to the client. Called by the cPacketizer's destructor. */
 	virtual void SendPacket(cPacketizer & a_Packet) override;
@@ -205,7 +208,7 @@ protected:
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes = 0);
 
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
-	virtual void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
+	virtual void ParseItemMetadata(cItem & a_Item, ContiguousByteBufferView a_Metadata);
 
 	virtual void StartEncryption(const Byte * a_Key);
 
@@ -242,8 +245,14 @@ private:
 	cAesCfb128Decryptor m_Decryptor;
 	cAesCfb128Encryptor m_Encryptor;
 
+	CircularBufferCompressor m_Compressor;
+	CircularBufferExtractor m_Extractor;
+
 	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
 	cFile m_CommLogFile;
+
+	/** Handle a complete packet stored in the given buffer. */
+	void HandlePacket(cByteBuffer & a_Buffer);
 
 	/** Sends an entity teleport packet.
 	Mitigates a 1.8 bug where the position in the entity spawn packet is ignored,

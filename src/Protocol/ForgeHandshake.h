@@ -34,7 +34,7 @@ public:
 	void SendServerHello();
 
 	/** Process received data from the client advancing the Forge handshake. */
-	void DataReceived(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
+	void DataReceived(cClientHandle * a_Client, ContiguousByteBufferView a_Data);
 
 private:
 	/** True if the Forge handshake is in an errored state. */
@@ -48,13 +48,13 @@ private:
 	cUUID m_UUID;
 	Json::Value m_Properties;
 
-	void HandleClientHello(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
-	void HandleModList(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
-	void HandleHandshakeAck(cClientHandle * a_Client, const char * a_Data, size_t a_Size);
+	void HandleClientHello(cClientHandle * a_Client, ContiguousByteBufferView a_Data);
+	void HandleModList(cClientHandle * a_Client, ContiguousByteBufferView a_Data);
+	void HandleHandshakeAck(cClientHandle * a_Client, ContiguousByteBufferView a_Data);
 
 	/** Set errored state to prevent further handshake message processing. */
 	void SetError(const AString & message);
 
 	/** Parse the client ModList packet of installed Forge mods and versions. */
-	AStringMap ParseModList(const char * a_Data, size_t a_Size);
+	AStringMap ParseModList(ContiguousByteBufferView a_Data);
 };

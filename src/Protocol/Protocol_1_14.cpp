@@ -231,8 +231,7 @@ bool cProtocol_1_14::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 	// Game
 	switch (a_PacketType)
 	{
-		default: AString dum; a_ByteBuffer.ReadAll(dum); a_ByteBuffer.CommitRead(); a_ByteBuffer.Write(" ", 1);
-			return true;
+		default: a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace()); a_ByteBuffer.CommitRead(); return true;
 	}
 }
 

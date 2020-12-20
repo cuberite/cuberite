@@ -157,19 +157,18 @@ int cFile::Read (void * a_Buffer, size_t a_NumBytes)
 
 
 
-AString cFile::Read(size_t a_NumBytes)
+ContiguousByteBuffer cFile::Read(size_t a_NumBytes)
 {
 	ASSERT(IsOpen());
 
 	if (!IsOpen())
 	{
-		return AString();
+		return {};
 	}
 
-	// HACK: This depends on the knowledge that AString::data() returns the internal buffer, rather than a copy of it.
-	AString res;
-	res.resize(a_NumBytes);
-	auto newSize = fread(const_cast<char *>(res.data()), 1, a_NumBytes, m_File);
+	ContiguousByteBuffer res;
+	res.resize(a_NumBytes);  // TODO: investigate if worth hacking around std::string internals to avoid initialisation
+	auto newSize = fread(res.data(), sizeof(std::byte), a_NumBytes, m_File);
 	res.resize(newSize);
 	return res;
 }
@@ -284,9 +283,8 @@ int cFile::ReadRestOfFile(AString & a_Contents)
 
 	auto DataSize = static_cast<size_t>(TotalSize - Position);
 
-	// HACK: This depends on the internal knowledge that AString's data() function returns the internal buffer directly
-	a_Contents.assign(DataSize, '\0');
-	return Read(static_cast<void *>(const_cast<char *>(a_Contents.data())), DataSize);
+	a_Contents.assign(DataSize, '\0');  // TODO: investigate if worth hacking around std::string internals to avoid initialisation
+	return Read(a_Contents.data(), DataSize);
 }
 
 
@@ -709,3 +707,54 @@ void cFile::Flush(void)
 {
 	fflush(m_File);
 }
+
+
+
+
+
+template <class StreamType>
+FileStream<StreamType>::FileStream(const std::string & Path)
+{
+	// Except on failbit, which is what open sets on failure:
+	FileStream::exceptions(FileStream::failbit | FileStream::badbit);
+
+	// Open the file:
+	FileStream::open(Path);
+
+	// Only subsequently except on serious errors, and not on conditions like EOF or malformed input:
+	FileStream::exceptions(FileStream::badbit);
+}
+
+
+
+
+
+template <class StreamType>
+FileStream<StreamType>::FileStream(const std::string & Path, const typename FileStream::openmode Mode)
+{
+	// Except on failbit, which is what open sets on failure:
+	FileStream::exceptions(FileStream::failbit | FileStream::badbit);
+
+	// Open the file:
+	FileStream::open(Path, Mode);
+
+	// Only subsequently except on serious errors, and not on conditions like EOF or malformed input:
+	FileStream::exceptions(FileStream::badbit);
+}
+
+
+
+
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-template-vtables"  // http://bugs.llvm.org/show_bug.cgi?id=18733
+#endif
+
+// Instantiate the templated wrapper for input and output:
+template class FileStream<std::ifstream>;
+template class FileStream<std::ofstream>;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

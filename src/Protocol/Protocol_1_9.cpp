@@ -1031,10 +1031,10 @@ void cProtocol_1_9_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
+void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBufferView a_Metadata)
 {
 	// Parse into NBT:
-	cParsedNBT NBT(a_Metadata.data(), a_Metadata.size());
+	cParsedNBT NBT(a_Metadata);
 	if (!NBT.IsValid())
 	{
 		AString HexDump;
@@ -1438,13 +1438,13 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 
 	Writer.Finish();
 
-	AString Result = Writer.GetResult();
-	if (Result.size() == 0)
+	const auto Result = Writer.GetResult();
+	if (Result.empty())
 	{
 		a_Pkt.WriteBEInt8(0);
 		return;
 	}
-	a_Pkt.WriteBuf(Result.data(), Result.size());
+	a_Pkt.WriteBuf(Result);
 }
 
 
@@ -1550,7 +1550,7 @@ void cProtocol_1_9_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 	}
 
 	Writer.Finish();
-	a_Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
+	a_Pkt.WriteBuf(Writer.GetResult());
 }
 
 
@@ -2289,7 +2289,7 @@ void cProtocol_1_9_4::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	Writer.AddString("Text4", JsonUtils::WriteFastString(Line4));
 
 	Writer.Finish();
-	Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
+	Pkt.WriteBuf(Writer.GetResult());
 }
 
 

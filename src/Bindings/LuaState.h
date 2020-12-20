@@ -619,6 +619,7 @@ public:
 	void Push(const cItem & a_Item);
 	void Push(const cNil & a_Nil);
 	void Push(const cRef & a_Ref);
+	void Push(ContiguousByteBufferView a_Data);
 	void Push(const Vector3d & a_Vector);
 	void Push(const Vector3i & a_Vector);
 
@@ -658,6 +659,7 @@ public:
 	bool GetStackValue(int a_StackPos, cTrackedRef & a_Ref);
 	bool GetStackValue(int a_StackPos, cTrackedRefPtr & a_Ref);
 	bool GetStackValue(int a_StackPos, cTrackedRefSharedPtr & a_Ref);
+	bool GetStackValue(int a_StackPos, ContiguousByteBuffer & a_Data);
 	bool GetStackValue(int a_StackPos, double & a_Value);
 	bool GetStackValue(int a_StackPos, eBlockFace & a_Value);
 	bool GetStackValue(int a_StackPos, eWeather & a_Value);

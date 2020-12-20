@@ -188,6 +188,7 @@ template class SizeChecker<UInt8,  1>;
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <variant>
 
 
 
@@ -334,6 +335,9 @@ typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
 using cTickTime = std::chrono::duration<int,  std::ratio_multiply<std::chrono::milliseconds::period, std::ratio<50>>>;
 using cTickTimeLong = std::chrono::duration<Int64,  cTickTime::period>;
 
+using ContiguousByteBuffer = std::basic_string<std::byte>;
+using ContiguousByteBufferView = std::basic_string_view<std::byte>;
+
 #ifndef TOLUA_TEMPLATE_BIND
 	#define TOLUA_TEMPLATE_BIND(x)
 #endif
@@ -355,4 +359,3 @@ auto ToUnsigned(T a_Val)
 
 // Common headers (part 2, with macros):
 #include "Vector3.h"
-

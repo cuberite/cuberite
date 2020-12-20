@@ -4,8 +4,7 @@
 
 #include "Globals.h"
 #include "MapSerializer.h"
-#include "../StringCompression.h"
-#include "zlib/zlib.h"
+#include "OSSupport/GZipFile.h"
 #include "FastNBT.h"
 
 #include "../Map.h"
@@ -32,22 +31,8 @@ cMapSerializer::cMapSerializer(const AString & a_WorldName, cMap * a_Map):
 
 bool cMapSerializer::Load(void)
 {
-	AString Data = cFile::ReadWholeFile(m_Path);
-	if (Data.empty())
-	{
-		return false;
-	}
+	cParsedNBT NBT(GZipFile::ReadRestOfFile(m_Path).GetView());
 
-	AString Uncompressed;
-	int res = UncompressStringGZIP(Data.data(), Data.size(), Uncompressed);
-
-	if (res != Z_OK)
-	{
-		return false;
-	}
-
-	// Parse the NBT data:
-	cParsedNBT NBT(Uncompressed.data(), Uncompressed.size());
 	if (!NBT.IsValid())
 	{
 		// NBT Parsing failed
@@ -64,32 +49,15 @@ bool cMapSerializer::Load(void)
 bool cMapSerializer::Save(void)
 {
 	cFastNBTWriter Writer;
-
 	SaveMapToNBT(Writer);
-
 	Writer.Finish();
 
 	#ifdef _DEBUG
-	cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
+	cParsedNBT TestParse(Writer.GetResult());
 	ASSERT(TestParse.IsValid());
 	#endif  // _DEBUG
 
-	cFile File;
-	if (!File.Open(m_Path, cFile::fmWrite))
-	{
-		return false;
-	}
-
-	AString Compressed;
-	int res = CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
-
-	if (res != Z_OK)
-	{
-		return false;
-	}
-
-	File.Write(Compressed.data(), Compressed.size());
-	File.Close();
+	GZipFile::Write(m_Path, Writer.GetResult());
 
 	return true;
 }
@@ -225,7 +193,7 @@ bool cIDCountSerializer::Load(void)
 	// NOTE: idcounts.dat is not compressed (raw format)
 
 	// Parse the NBT data:
-	cParsedNBT NBT(Data.data(), Data.size());
+	cParsedNBT NBT({ reinterpret_cast<const std::byte *>(Data.data()), Data.size() });
 	if (!NBT.IsValid())
 	{
 		// NBT Parsing failed
@@ -261,7 +229,7 @@ bool cIDCountSerializer::Save(void)
 	Writer.Finish();
 
 	#ifdef _DEBUG
-	cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
+	cParsedNBT TestParse(Writer.GetResult());
 	ASSERT(TestParse.IsValid());
 	#endif  // _DEBUG
 
@@ -278,11 +246,3 @@ bool cIDCountSerializer::Save(void)
 
 	return true;
 }
-
-
-
-
-
-
-
-
