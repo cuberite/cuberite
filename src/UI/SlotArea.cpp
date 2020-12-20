@@ -1130,7 +1130,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	const cItem Target(*GetSlot(0, a_Player));
 	const cItem Sacrifice(*GetSlot(1, a_Player));
 
-	// Output initialised as copy of target
+	// Output initialised as copy of target.
 	cItem Output(Target);
 
 	if (Target.IsEmpty())
@@ -1148,9 +1148,8 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	int NeedExp = 0;
 	if (!Sacrifice.IsEmpty())
 	{
-		bool IsEnchantBook = (Sacrifice.m_ItemType == E_ITEM_ENCHANTED_BOOK);
-
 		RepairCost += Sacrifice.m_RepairCost;
+
 		// Can we repair with sacrifce material?
 		if (Target.IsDamageable() && cItemHandler::GetItemHandler(Target)->CanRepairWithRawMaterial(Sacrifice.m_ItemType))
 		{
@@ -1166,8 +1165,9 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				return;
 			}
 
-			int NumItemsConsumed = 0;
-			// Repair until out of materials, or fully repaired
+			char NumItemsConsumed = 0;
+
+			// Repair until out of materials, or fully repaired:
 			while ((DamageDiff > 0) && (NumItemsConsumed < Sacrifice.m_ItemCount))
 			{
 				Output.m_ItemDamage -= DamageDiff;
@@ -1176,10 +1176,12 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 				++NumItemsConsumed;
 			}
-			m_StackSizeToBeUsedInRepair = static_cast<char>(NumItemsConsumed);
+			m_StackSizeToBeUsedInRepair = NumItemsConsumed;
 		}
 		else  // Combining tools / armour
 		{
+			const bool IsEnchantBook = (Sacrifice.m_ItemType == E_ITEM_ENCHANTED_BOOK);
+
 			// No result if we can't combine the items
 			if (!IsEnchantBook && (!Target.IsSameType(Sacrifice) || !Target.IsDamageable()))
 			{
@@ -1197,7 +1199,8 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				// Durability = MaxDamage - m_ItemDamage = how far from broken
 				const short TargetDurability = Target.GetMaxDamage() - Target.m_ItemDamage;
 				const short SacrificeDurability = Sacrifice.GetMaxDamage() - Sacrifice.m_ItemDamage;
-				// How much durability to repair by:
+
+				// How much durability to repair by.
 				const short RepairDurability = SacrificeDurability + Target.GetMaxDamage() * 12 / 100;
 
 				// Don't give item a negative damage:
@@ -1270,7 +1273,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		Output.m_RepairCost = RepairCost;
 	}
 
-	// If after everything, output will be the same then no point enchanting
+	// If after everything, output will be the same then no point enchanting:
 	if (Target.IsEqual(Output))
 	{
 		Output.Empty();

@@ -16,11 +16,11 @@
 
 namespace Explodinator
 {
-	const auto StepUnit = 0.3f;
-	const auto KnockbackFactor = 25U;
-	const auto StepAttenuation = 0.225f;
-	const auto TraceCubeSideLength = 16U;
-	const auto BoundingBoxStepUnit = 0.5;
+	static const auto StepUnit = 0.3f;
+	static const auto KnockbackFactor = 25U;
+	static const auto StepAttenuation = 0.225f;
+	static const auto TraceCubeSideLength = 16U;
+	static const auto BoundingBoxStepUnit = 0.5;
 
 	/** Converts an absolute floating-point Position into a Chunk-relative one. */
 	static Vector3f AbsoluteToRelative(const Vector3f a_Position, const cChunkCoords a_ChunkPosition)

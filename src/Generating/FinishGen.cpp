@@ -1892,7 +1892,7 @@ void cFinishGenOreNests::GenerateOre(
 			!IsBiomeMountain(BiomeSampleTwo) &&
 			!IsBiomeMountain(BiomeSampleThree) &&
 			!IsBiomeMountain(BiomeSampleFour)
-			)
+		)
 		{
 			return;
 		}

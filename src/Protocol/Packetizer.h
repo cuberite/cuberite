@@ -134,9 +134,9 @@ public:
 
 	/** Writes the specified block position as a single encoded 64-bit BigEndian integer.
 	The three coordinates are written in XYZ order. */
-	inline void WriteXYZPosition64(const Vector3i & a_Pos)
+	inline void WriteXYZPosition64(const Vector3i a_Position)
 	{
-		VERIFY(m_Out.WriteXYZPosition64(a_Pos.x, a_Pos.y, a_Pos.z));
+		VERIFY(m_Out.WriteXYZPosition64(a_Position.x, a_Position.y, a_Position.z));
 	}
 
 	/** Writes the specified block position as a single encoded 64-bit BigEndian integer.
