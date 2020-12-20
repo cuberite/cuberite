@@ -1,9 +1,13 @@
 
 // BlockInfested.h
 
+// Declares the cBlockInfestedHandler class representing the handler for Silverfish blocks (Mojang calls them Monster Eggs)
+
 #include "../Entities/Player.h"
 
-/* This Block Handler describes the blocks spawning silver fishes. Mojang calls them monster egg */
+
+
+
 
 class cBlockInfestedHandler final:
 	public cBlockHandler
@@ -14,17 +18,17 @@ public:
 
 	using Super::Super;
 
+private:
+
 	static void SpawnSilverfish(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos)
 	{
-		auto Pos = Vector3f(a_BlockPos.x - 0.5f, a_BlockPos.y - 0.5f, a_BlockPos.z - 0.5f);
 		// TODO: only display animation if the difficulty allows mob spawns - Add when difficulty is implemented
-		// Spawn Silverfish
-		a_WorldInterface.SpawnMob(Pos.x, Pos.y, Pos.z, mtSilverfish, false);
-		// Play particle
-		a_WorldInterface.GetBroadcastManager().BroadcastParticleEffect("explode", Pos, Vector3f(), 0.1f, 50);
+
+		const auto Position = Vector3f(a_BlockPos.x + 0.5f, a_BlockPos.y, a_BlockPos.z + 0.5f);
+		a_WorldInterface.SpawnMob(Position.x, Position.y, Position.z, mtSilverfish, false);
+		a_WorldInterface.GetBroadcastManager().BroadcastParticleEffect("explode", Position, Vector3f(), 0.1f, 50);
 	}
 
-private:
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
@@ -34,31 +38,29 @@ private:
 			{
 				if (ToolHasSilkTouch(a_Tool))
 				{
-					return cItem(E_BLOCK_STONE);
+					return { E_BLOCK_STONE };
 				}
 				else
 				{
-					return cItem(E_BLOCK_COBBLESTONE);
+					return { E_BLOCK_COBBLESTONE };
 				}
 			}
-			case E_META_SILVERFISH_EGG_COBBLESTONE:          return cItem(E_BLOCK_COBBLESTONE);
-			case E_META_SILVERFISH_EGG_STONE_BRICK:          return cItem(E_BLOCK_STONE_BRICKS);
+			case E_META_SILVERFISH_EGG_COBBLESTONE:          return { E_BLOCK_COBBLESTONE };
+			case E_META_SILVERFISH_EGG_STONE_BRICK:          return { E_BLOCK_STONE_BRICKS };
 			case E_META_SILVERFISH_EGG_MOSSY_STONE_BRICK:    return cItem(E_BLOCK_STONE_BRICKS, 1, E_META_STONE_BRICK_MOSSY);
 			case E_META_SILVERFISH_EGG_CRACKED_STONE_BRICK:  return cItem(E_BLOCK_STONE_BRICKS, 1, E_META_STONE_BRICK_CRACKED);
 			case E_META_SILVERFISH_EGG_CHISELED_STONE_BRICK: return cItem(E_BLOCK_STONE_BRICKS, 1, E_META_STONE_BRICK_ORNAMENT);
 		}
+
 		return {};
 	}
 
 
-
-
-
 	virtual void OnBroken(
-			cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-			Vector3i a_BlockPos,
-			BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
-			const cEntity * a_Digger
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
 	) const override
 	{
 		if (a_Digger != nullptr)
@@ -85,4 +87,3 @@ private:
 		return 11;
 	}
 } ;
-
