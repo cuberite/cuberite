@@ -4,15 +4,14 @@
 
 struct BlockState
 {
-	constexpr BlockState(unsigned short ID) :
+	constexpr BlockState(uint_least16_t ID) :
 		ID(ID)
 	{
 	}
 
-	Block::Type Type() const;
-	bool operator == (Block::Type Type) const;
+	BlockType Type() const;
 	bool operator == (BlockState Block) const;
 	bool operator != (BlockState Block) const;
 
-	unsigned short ID;
+	uint_least16_t ID;
 };

@@ -6,6 +6,7 @@ target_sources(
 	BiomeDef.cpp
 	BlockArea.cpp
 	BlockInfo.cpp
+	BlockState.cpp
 	BlockType.cpp
 	BrewingRecipes.cpp
 	Broadcaster.cpp
@@ -72,6 +73,7 @@ target_sources(
 	BlockArea.h
 	BlockInServerPluginInterface.h
 	BlockInfo.h
+	BlockState.h
 	BlockTracer.h
 	BlockType.h
 	BrewingRecipes.h

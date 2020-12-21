@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ChunkDef.h"
 #include "BlockState.h"
 #include "Registries/Items.h"
 

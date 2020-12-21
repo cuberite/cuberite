@@ -8,7 +8,7 @@ namespace Block
 		{
 			return 6451;
 		}
-		enum Face Face(BlockState Block)
+		enum Face Face(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -17,7 +17,7 @@ namespace Block
 				default: return Face::Wall;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -27,7 +27,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -42,7 +42,7 @@ namespace Block
 		{
 			return 8941;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -52,7 +52,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -60,7 +60,7 @@ namespace Block
 				default: return Half::Upper;
 			}
 		}
-		enum Hinge Hinge(BlockState Block)
+		enum Hinge Hinge(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -68,7 +68,7 @@ namespace Block
 				default: return Hinge::Right;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -76,7 +76,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -91,7 +91,7 @@ namespace Block
 		{
 			return 8705;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -99,7 +99,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -107,7 +107,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -115,7 +115,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -130,7 +130,7 @@ namespace Block
 		{
 			return 8521;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -140,7 +140,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool InWall(BlockState Block)
+		bool InWall(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -148,7 +148,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -156,7 +156,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -171,7 +171,7 @@ namespace Block
 		{
 			return 214;
 		}
-		unsigned char Distance(BlockState Block)
+		unsigned char Distance(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -184,7 +184,7 @@ namespace Block
 				default: return 7;
 			}
 		}
-		bool Persistent(BlockState Block)
+		bool Persistent(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -199,7 +199,7 @@ namespace Block
 		{
 			return 86;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -218,7 +218,7 @@ namespace Block
 		{
 			return 3882;
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -233,7 +233,7 @@ namespace Block
 		{
 			return 29;
 		}
-		unsigned char Stage(BlockState Block)
+		unsigned char Stage(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -248,7 +248,7 @@ namespace Block
 		{
 			return 3478;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -277,7 +277,7 @@ namespace Block
 		{
 			return 8327;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -293,7 +293,7 @@ namespace Block
 		{
 			return 7386;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -303,7 +303,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -311,7 +311,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -329,7 +329,7 @@ namespace Block
 		{
 			return 4382;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -339,7 +339,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -347,7 +347,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -355,7 +355,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -370,7 +370,7 @@ namespace Block
 		{
 			return 3760;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -387,7 +387,7 @@ namespace Block
 		{
 			return 122;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -403,7 +403,7 @@ namespace Block
 		{
 			return 6829;
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -411,7 +411,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -442,7 +442,7 @@ namespace Block
 		{
 			return 10846;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -458,7 +458,7 @@ namespace Block
 		{
 			return 10480;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -468,7 +468,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -476,7 +476,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -494,7 +494,7 @@ namespace Block
 		{
 			return 13138;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -503,7 +503,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -512,7 +512,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -521,7 +521,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -529,7 +529,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -545,7 +545,7 @@ namespace Block
 		{
 			return 6610;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -562,7 +562,7 @@ namespace Block
 		{
 			return 4768;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -579,7 +579,7 @@ namespace Block
 		{
 			return 4764;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -599,7 +599,7 @@ namespace Block
 		{
 			return 9652;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -607,7 +607,7 @@ namespace Block
 				default: return 1;
 			}
 		}
-		enum Leaves Leaves(BlockState Block)
+		enum Leaves Leaves(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -616,7 +616,7 @@ namespace Block
 				default: return Leaves::Small;
 			}
 		}
-		unsigned char Stage(BlockState Block)
+		unsigned char Stage(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -634,7 +634,7 @@ namespace Block
 		{
 			return 14792;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -646,7 +646,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -664,7 +664,7 @@ namespace Block
 		{
 			return 4003;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -686,7 +686,7 @@ namespace Block
 		{
 			return 15776;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -696,7 +696,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		unsigned char HoneyLevel(BlockState Block)
+		unsigned char HoneyLevel(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -715,7 +715,7 @@ namespace Block
 		{
 			return 15800;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -725,7 +725,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		unsigned char HoneyLevel(BlockState Block)
+		unsigned char HoneyLevel(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -744,7 +744,7 @@ namespace Block
 		{
 			return 9219;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -761,7 +761,7 @@ namespace Block
 		{
 			return 14855;
 		}
-		enum Attachment Attachment(BlockState Block)
+		enum Attachment Attachment(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -771,7 +771,7 @@ namespace Block
 				default: return Attachment::SingleWall;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -781,7 +781,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -796,7 +796,7 @@ namespace Block
 		{
 			return 6403;
 		}
-		enum Face Face(BlockState Block)
+		enum Face Face(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -805,7 +805,7 @@ namespace Block
 				default: return Face::Wall;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -815,7 +815,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -830,7 +830,7 @@ namespace Block
 		{
 			return 8813;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -840,7 +840,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -848,7 +848,7 @@ namespace Block
 				default: return Half::Upper;
 			}
 		}
-		enum Hinge Hinge(BlockState Block)
+		enum Hinge Hinge(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -856,7 +856,7 @@ namespace Block
 				default: return Hinge::Right;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -864,7 +864,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -879,7 +879,7 @@ namespace Block
 		{
 			return 8641;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -887,7 +887,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -895,7 +895,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -903,7 +903,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -918,7 +918,7 @@ namespace Block
 		{
 			return 8457;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -928,7 +928,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool InWall(BlockState Block)
+		bool InWall(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -936,7 +936,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -944,7 +944,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -959,7 +959,7 @@ namespace Block
 		{
 			return 186;
 		}
-		unsigned char Distance(BlockState Block)
+		unsigned char Distance(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -972,7 +972,7 @@ namespace Block
 				default: return 7;
 			}
 		}
-		bool Persistent(BlockState Block)
+		bool Persistent(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -987,7 +987,7 @@ namespace Block
 		{
 			return 80;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1006,7 +1006,7 @@ namespace Block
 		{
 			return 3878;
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1021,7 +1021,7 @@ namespace Block
 		{
 			return 25;
 		}
-		unsigned char Stage(BlockState Block)
+		unsigned char Stage(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1036,7 +1036,7 @@ namespace Block
 		{
 			return 3446;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1065,7 +1065,7 @@ namespace Block
 		{
 			return 8315;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1081,7 +1081,7 @@ namespace Block
 		{
 			return 5495;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1091,7 +1091,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1099,7 +1099,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1117,7 +1117,7 @@ namespace Block
 		{
 			return 4254;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1127,7 +1127,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1135,7 +1135,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1143,7 +1143,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1158,7 +1158,7 @@ namespace Block
 		{
 			return 3752;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1175,7 +1175,7 @@ namespace Block
 		{
 			return 116;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1191,7 +1191,7 @@ namespace Block
 		{
 			return 8137;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1220,7 +1220,7 @@ namespace Block
 		{
 			return 1292;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1230,7 +1230,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1238,7 +1238,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1262,7 +1262,7 @@ namespace Block
 		{
 			return 9434;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1279,7 +1279,7 @@ namespace Block
 		{
 			return 9372;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1301,7 +1301,7 @@ namespace Block
 		{
 			return 7374;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1309,7 +1309,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1317,7 +1317,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1325,7 +1325,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1343,7 +1343,7 @@ namespace Block
 		{
 			return 8213;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1366,7 +1366,7 @@ namespace Block
 		{
 			return 16247;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1382,7 +1382,7 @@ namespace Block
 		{
 			return 15851;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1392,7 +1392,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1400,7 +1400,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1418,7 +1418,7 @@ namespace Block
 		{
 			return 15923;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1427,7 +1427,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1436,7 +1436,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1445,7 +1445,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1453,7 +1453,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1469,7 +1469,7 @@ namespace Block
 		{
 			return 14812;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1479,7 +1479,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Lit(BlockState Block)
+		bool Lit(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1494,7 +1494,7 @@ namespace Block
 		{
 			return 8073;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1523,7 +1523,7 @@ namespace Block
 		{
 			return 1228;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1533,7 +1533,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1541,7 +1541,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1565,7 +1565,7 @@ namespace Block
 		{
 			return 9418;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1588,7 +1588,7 @@ namespace Block
 		{
 			return 9348;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1610,7 +1610,7 @@ namespace Block
 		{
 			return 7246;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1618,7 +1618,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1626,7 +1626,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1634,7 +1634,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1652,7 +1652,7 @@ namespace Block
 		{
 			return 8197;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1672,7 +1672,7 @@ namespace Block
 		{
 			return 9257;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1700,7 +1700,7 @@ namespace Block
 		{
 			return 9608;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1717,7 +1717,7 @@ namespace Block
 		{
 			return 5140;
 		}
-		bool HasBottle_0(BlockState Block)
+		bool HasBottle_0(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1725,7 +1725,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool HasBottle_1(BlockState Block)
+		bool HasBottle_1(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1733,7 +1733,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool HasBottle_2(BlockState Block)
+		bool HasBottle_2(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1748,7 +1748,7 @@ namespace Block
 		{
 			return 8375;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1764,7 +1764,7 @@ namespace Block
 		{
 			return 4863;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1774,7 +1774,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1782,7 +1782,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1800,7 +1800,7 @@ namespace Block
 		{
 			return 10870;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1809,7 +1809,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1818,7 +1818,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1827,7 +1827,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1835,7 +1835,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1854,7 +1854,7 @@ namespace Block
 		{
 			return 8089;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1883,7 +1883,7 @@ namespace Block
 		{
 			return 1244;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1893,7 +1893,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1901,7 +1901,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1925,7 +1925,7 @@ namespace Block
 		{
 			return 9422;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1945,7 +1945,7 @@ namespace Block
 		{
 			return 4505;
 		}
-		bool Down(BlockState Block)
+		bool Down(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1953,7 +1953,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1961,7 +1961,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1969,7 +1969,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1977,7 +1977,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -1985,7 +1985,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2000,7 +2000,7 @@ namespace Block
 		{
 			return 9354;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2022,7 +2022,7 @@ namespace Block
 		{
 			return 7278;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2030,7 +2030,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2038,7 +2038,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2046,7 +2046,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2064,7 +2064,7 @@ namespace Block
 		{
 			return 8201;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2084,7 +2084,7 @@ namespace Block
 		{
 			return 9667;
 		}
-		bool Drag(BlockState Block)
+		bool Drag(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2108,7 +2108,7 @@ namespace Block
 		{
 			return 9616;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2125,7 +2125,7 @@ namespace Block
 		{
 			return 3931;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2154,7 +2154,7 @@ namespace Block
 		{
 			return 4024;
 		}
-		unsigned char Bites(BlockState Block)
+		unsigned char Bites(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2174,7 +2174,7 @@ namespace Block
 		{
 			return 14893;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2184,7 +2184,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Lit(BlockState Block)
+		bool Lit(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2192,7 +2192,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool SignalFire(BlockState Block)
+		bool SignalFire(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2207,7 +2207,7 @@ namespace Block
 		{
 			return 6330;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2231,7 +2231,7 @@ namespace Block
 		{
 			return 4016;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2248,7 +2248,7 @@ namespace Block
 		{
 			return 5141;
 		}
-		unsigned char Level(BlockState Block)
+		unsigned char Level(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2271,7 +2271,7 @@ namespace Block
 		{
 			return 9243;
 		}
-		bool Conditional(BlockState Block)
+		bool Conditional(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2279,7 +2279,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2298,7 +2298,7 @@ namespace Block
 		{
 			return 2035;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2308,7 +2308,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2324,7 +2324,7 @@ namespace Block
 		{
 			return 6614;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2359,7 +2359,7 @@ namespace Block
 		{
 			return 9128;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2378,7 +2378,7 @@ namespace Block
 		{
 			return 9127;
 		}
-		bool Down(BlockState Block)
+		bool Down(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2386,7 +2386,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2394,7 +2394,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2402,7 +2402,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2410,7 +2410,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2418,7 +2418,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2448,7 +2448,7 @@ namespace Block
 		{
 			return 8369;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2464,7 +2464,7 @@ namespace Block
 		{
 			return 3666;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2474,7 +2474,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2482,7 +2482,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2500,7 +2500,7 @@ namespace Block
 		{
 			return 5660;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2509,7 +2509,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2518,7 +2518,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2527,7 +2527,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2535,7 +2535,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2554,7 +2554,7 @@ namespace Block
 		{
 			return 5158;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2563,7 +2563,7 @@ namespace Block
 				default: return 2;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2580,7 +2580,7 @@ namespace Block
 		{
 			return 5650;
 		}
-		bool Conditional(BlockState Block)
+		bool Conditional(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2588,7 +2588,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2607,7 +2607,7 @@ namespace Block
 		{
 			return 6679;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2617,7 +2617,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Mode Mode(BlockState Block)
+		enum Mode Mode(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2625,7 +2625,7 @@ namespace Block
 				default: return Mode::Subtract;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2640,7 +2640,7 @@ namespace Block
 		{
 			return 15751;
 		}
-		unsigned char Level(BlockState Block)
+		unsigned char Level(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2680,7 +2680,7 @@ namespace Block
 		{
 			return 6570;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2709,7 +2709,7 @@ namespace Block
 		{
 			return 6586;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2726,7 +2726,7 @@ namespace Block
 		{
 			return 15488;
 		}
-		enum Face Face(BlockState Block)
+		enum Face Face(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2735,7 +2735,7 @@ namespace Block
 				default: return Face::Wall;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2745,7 +2745,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2760,7 +2760,7 @@ namespace Block
 		{
 			return 15538;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2770,7 +2770,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2778,7 +2778,7 @@ namespace Block
 				default: return Half::Upper;
 			}
 		}
-		enum Hinge Hinge(BlockState Block)
+		enum Hinge Hinge(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2786,7 +2786,7 @@ namespace Block
 				default: return Hinge::Right;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2794,7 +2794,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2809,7 +2809,7 @@ namespace Block
 		{
 			return 15094;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2817,7 +2817,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2825,7 +2825,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2833,7 +2833,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2848,7 +2848,7 @@ namespace Block
 		{
 			return 15262;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2858,7 +2858,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool InWall(BlockState Block)
+		bool InWall(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2866,7 +2866,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2874,7 +2874,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2892,7 +2892,7 @@ namespace Block
 		{
 			return 14982;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2914,7 +2914,7 @@ namespace Block
 		{
 			return 15060;
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2932,7 +2932,7 @@ namespace Block
 		{
 			return 15656;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2961,7 +2961,7 @@ namespace Block
 		{
 			return 15050;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2977,7 +2977,7 @@ namespace Block
 		{
 			return 15330;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2987,7 +2987,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -2995,7 +2995,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3013,7 +3013,7 @@ namespace Block
 		{
 			return 14976;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3029,7 +3029,7 @@ namespace Block
 		{
 			return 15142;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3039,7 +3039,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3047,7 +3047,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3055,7 +3055,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3070,7 +3070,7 @@ namespace Block
 		{
 			return 15720;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3093,7 +3093,7 @@ namespace Block
 		{
 			return 8405;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3112,7 +3112,7 @@ namespace Block
 		{
 			return 8357;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3128,7 +3128,7 @@ namespace Block
 		{
 			return 8041;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3157,7 +3157,7 @@ namespace Block
 		{
 			return 1196;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3167,7 +3167,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3175,7 +3175,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3199,7 +3199,7 @@ namespace Block
 		{
 			return 9410;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3216,7 +3216,7 @@ namespace Block
 		{
 			return 9336;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3238,7 +3238,7 @@ namespace Block
 		{
 			return 7182;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3246,7 +3246,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3254,7 +3254,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3262,7 +3262,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3280,7 +3280,7 @@ namespace Block
 		{
 			return 8189;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3300,7 +3300,7 @@ namespace Block
 		{
 			return 6618;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3320,7 +3320,7 @@ namespace Block
 		{
 			return 6475;
 		}
-		enum Face Face(BlockState Block)
+		enum Face Face(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3329,7 +3329,7 @@ namespace Block
 				default: return Face::Wall;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3339,7 +3339,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3354,7 +3354,7 @@ namespace Block
 		{
 			return 9005;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3364,7 +3364,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3372,7 +3372,7 @@ namespace Block
 				default: return Half::Upper;
 			}
 		}
-		enum Hinge Hinge(BlockState Block)
+		enum Hinge Hinge(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3380,7 +3380,7 @@ namespace Block
 				default: return Hinge::Right;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3388,7 +3388,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3403,7 +3403,7 @@ namespace Block
 		{
 			return 8737;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3411,7 +3411,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3419,7 +3419,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3427,7 +3427,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3442,7 +3442,7 @@ namespace Block
 		{
 			return 8553;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3452,7 +3452,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool InWall(BlockState Block)
+		bool InWall(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3460,7 +3460,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3468,7 +3468,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3483,7 +3483,7 @@ namespace Block
 		{
 			return 228;
 		}
-		unsigned char Distance(BlockState Block)
+		unsigned char Distance(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3496,7 +3496,7 @@ namespace Block
 				default: return 7;
 			}
 		}
-		bool Persistent(BlockState Block)
+		bool Persistent(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3511,7 +3511,7 @@ namespace Block
 		{
 			return 89;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3530,7 +3530,7 @@ namespace Block
 		{
 			return 3884;
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3545,7 +3545,7 @@ namespace Block
 		{
 			return 31;
 		}
-		unsigned char Stage(BlockState Block)
+		unsigned char Stage(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3560,7 +3560,7 @@ namespace Block
 		{
 			return 3542;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3589,7 +3589,7 @@ namespace Block
 		{
 			return 8333;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3605,7 +3605,7 @@ namespace Block
 		{
 			return 7466;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3615,7 +3615,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3623,7 +3623,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3641,7 +3641,7 @@ namespace Block
 		{
 			return 4446;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3651,7 +3651,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3659,7 +3659,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3667,7 +3667,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3682,7 +3682,7 @@ namespace Block
 		{
 			return 3776;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3699,7 +3699,7 @@ namespace Block
 		{
 			return 125;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3718,7 +3718,7 @@ namespace Block
 		{
 			return 7859;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3734,7 +3734,7 @@ namespace Block
 		{
 			return 7775;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3744,7 +3744,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3752,7 +3752,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3770,7 +3770,7 @@ namespace Block
 		{
 			return 6710;
 		}
-		bool Inverted(BlockState Block)
+		bool Inverted(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3778,7 +3778,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		unsigned char Power(BlockState Block)
+		unsigned char Power(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3816,7 +3816,7 @@ namespace Block
 		{
 			return 9568;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3842,7 +3842,7 @@ namespace Block
 		{
 			return 9576;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3871,7 +3871,7 @@ namespace Block
 		{
 			return 9584;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3897,7 +3897,7 @@ namespace Block
 		{
 			return 9592;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3923,7 +3923,7 @@ namespace Block
 		{
 			return 9560;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3940,7 +3940,7 @@ namespace Block
 		{
 			return 1323;
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3948,7 +3948,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3976,7 +3976,7 @@ namespace Block
 		{
 			return 10864;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -3992,7 +3992,7 @@ namespace Block
 		{
 			return 10720;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4002,7 +4002,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4010,7 +4010,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4028,7 +4028,7 @@ namespace Block
 		{
 			return 14434;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4037,7 +4037,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4046,7 +4046,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4055,7 +4055,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4063,7 +4063,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4082,7 +4082,7 @@ namespace Block
 		{
 			return 235;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4094,7 +4094,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Triggered(BlockState Block)
+		bool Triggered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4112,7 +4112,7 @@ namespace Block
 		{
 			return 6590;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4141,7 +4141,7 @@ namespace Block
 		{
 			return 6606;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4161,7 +4161,7 @@ namespace Block
 		{
 			return 6836;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4173,7 +4173,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Triggered(BlockState Block)
+		bool Triggered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4203,7 +4203,7 @@ namespace Block
 		{
 			return 5150;
 		}
-		bool Eye(BlockState Block)
+		bool Eye(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4211,7 +4211,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4228,7 +4228,7 @@ namespace Block
 		{
 			return 9062;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4250,7 +4250,7 @@ namespace Block
 		{
 			return 10822;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4266,7 +4266,7 @@ namespace Block
 		{
 			return 10080;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4276,7 +4276,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4284,7 +4284,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4302,7 +4302,7 @@ namespace Block
 		{
 			return 14110;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4311,7 +4311,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4320,7 +4320,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4329,7 +4329,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4337,7 +4337,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4356,7 +4356,7 @@ namespace Block
 		{
 			return 5252;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4373,7 +4373,7 @@ namespace Block
 		{
 			return 3365;
 		}
-		unsigned char Moisture(BlockState Block)
+		unsigned char Moisture(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4397,7 +4397,7 @@ namespace Block
 		{
 			return 1471;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4419,7 +4419,7 @@ namespace Block
 				default: return 9;
 			}
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4427,7 +4427,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4435,7 +4435,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4443,7 +4443,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4451,7 +4451,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4475,7 +4475,7 @@ namespace Block
 		{
 			return 9624;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4498,7 +4498,7 @@ namespace Block
 		{
 			return 9249;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4515,7 +4515,7 @@ namespace Block
 		{
 			return 3374;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4525,7 +4525,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Lit(BlockState Block)
+		bool Lit(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4546,7 +4546,7 @@ namespace Block
 		{
 			return 4762;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4554,7 +4554,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4562,7 +4562,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4570,7 +4570,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4597,7 +4597,7 @@ namespace Block
 		{
 			return 10840;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4613,7 +4613,7 @@ namespace Block
 		{
 			return 10400;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4623,7 +4623,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4631,7 +4631,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4649,7 +4649,7 @@ namespace Block
 		{
 			return 12166;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4658,7 +4658,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4667,7 +4667,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4676,7 +4676,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4684,7 +4684,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4703,7 +4703,7 @@ namespace Block
 		{
 			return 9;
 		}
-		bool Snowy(BlockState Block)
+		bool Snowy(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4724,7 +4724,7 @@ namespace Block
 		{
 			return 8009;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4753,7 +4753,7 @@ namespace Block
 		{
 			return 1164;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4763,7 +4763,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4771,7 +4771,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4795,7 +4795,7 @@ namespace Block
 		{
 			return 9402;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4812,7 +4812,7 @@ namespace Block
 		{
 			return 9324;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4834,7 +4834,7 @@ namespace Block
 		{
 			return 7118;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4842,7 +4842,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4850,7 +4850,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4858,7 +4858,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4876,7 +4876,7 @@ namespace Block
 		{
 			return 8181;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4896,7 +4896,7 @@ namespace Block
 		{
 			return 8105;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4925,7 +4925,7 @@ namespace Block
 		{
 			return 1260;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4935,7 +4935,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4943,7 +4943,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4967,7 +4967,7 @@ namespace Block
 		{
 			return 9426;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -4984,7 +4984,7 @@ namespace Block
 		{
 			return 9360;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5006,7 +5006,7 @@ namespace Block
 		{
 			return 7310;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5014,7 +5014,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5022,7 +5022,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5030,7 +5030,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5048,7 +5048,7 @@ namespace Block
 		{
 			return 8205;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5068,7 +5068,7 @@ namespace Block
 		{
 			return 14825;
 		}
-		enum Face Face(BlockState Block)
+		enum Face Face(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5077,7 +5077,7 @@ namespace Block
 				default: return Face::Wall;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5094,7 +5094,7 @@ namespace Block
 		{
 			return 7864;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5110,7 +5110,7 @@ namespace Block
 		{
 			return 6662;
 		}
-		unsigned char Power(BlockState Block)
+		unsigned char Power(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5145,7 +5145,7 @@ namespace Block
 		{
 			return 6728;
 		}
-		bool Enabled(BlockState Block)
+		bool Enabled(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5153,7 +5153,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5180,7 +5180,7 @@ namespace Block
 		{
 			return 9632;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5218,7 +5218,7 @@ namespace Block
 		{
 			return 4728;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5226,7 +5226,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5234,7 +5234,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5242,7 +5242,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5260,7 +5260,7 @@ namespace Block
 		{
 			return 3820;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5270,7 +5270,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5278,7 +5278,7 @@ namespace Block
 				default: return Half::Upper;
 			}
 		}
-		enum Hinge Hinge(BlockState Block)
+		enum Hinge Hinge(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5286,7 +5286,7 @@ namespace Block
 				default: return Hinge::Right;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5294,7 +5294,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5312,7 +5312,7 @@ namespace Block
 		{
 			return 7552;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5322,7 +5322,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5330,7 +5330,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5338,7 +5338,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5353,7 +5353,7 @@ namespace Block
 		{
 			return 4020;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5370,7 +5370,7 @@ namespace Block
 		{
 			return 15749;
 		}
-		enum Orientation Orientation(BlockState Block)
+		enum Orientation Orientation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5395,7 +5395,7 @@ namespace Block
 		{
 			return 3965;
 		}
-		bool HasRecord(BlockState Block)
+		bool HasRecord(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5410,7 +5410,7 @@ namespace Block
 		{
 			return 6427;
 		}
-		enum Face Face(BlockState Block)
+		enum Face Face(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5419,7 +5419,7 @@ namespace Block
 				default: return Face::Wall;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5429,7 +5429,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5444,7 +5444,7 @@ namespace Block
 		{
 			return 8877;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5454,7 +5454,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5462,7 +5462,7 @@ namespace Block
 				default: return Half::Upper;
 			}
 		}
-		enum Hinge Hinge(BlockState Block)
+		enum Hinge Hinge(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5470,7 +5470,7 @@ namespace Block
 				default: return Hinge::Right;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5478,7 +5478,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5493,7 +5493,7 @@ namespace Block
 		{
 			return 8673;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5501,7 +5501,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5509,7 +5509,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5517,7 +5517,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5532,7 +5532,7 @@ namespace Block
 		{
 			return 8489;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5542,7 +5542,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool InWall(BlockState Block)
+		bool InWall(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5550,7 +5550,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5558,7 +5558,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5573,7 +5573,7 @@ namespace Block
 		{
 			return 200;
 		}
-		unsigned char Distance(BlockState Block)
+		unsigned char Distance(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5586,7 +5586,7 @@ namespace Block
 				default: return 7;
 			}
 		}
-		bool Persistent(BlockState Block)
+		bool Persistent(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5601,7 +5601,7 @@ namespace Block
 		{
 			return 83;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5620,7 +5620,7 @@ namespace Block
 		{
 			return 3880;
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5635,7 +5635,7 @@ namespace Block
 		{
 			return 27;
 		}
-		unsigned char Stage(BlockState Block)
+		unsigned char Stage(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5650,7 +5650,7 @@ namespace Block
 		{
 			return 3510;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5679,7 +5679,7 @@ namespace Block
 		{
 			return 8321;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5695,7 +5695,7 @@ namespace Block
 		{
 			return 5575;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5705,7 +5705,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5713,7 +5713,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5731,7 +5731,7 @@ namespace Block
 		{
 			return 4318;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5741,7 +5741,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5749,7 +5749,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5757,7 +5757,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5772,7 +5772,7 @@ namespace Block
 		{
 			return 3768;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5789,7 +5789,7 @@ namespace Block
 		{
 			return 119;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5805,7 +5805,7 @@ namespace Block
 		{
 			return 9470;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5847,7 +5847,7 @@ namespace Block
 		{
 			return 3638;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5864,7 +5864,7 @@ namespace Block
 		{
 			return 14887;
 		}
-		bool Hanging(BlockState Block)
+		bool Hanging(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5885,7 +5885,7 @@ namespace Block
 		{
 			return 7896;
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5900,7 +5900,7 @@ namespace Block
 		{
 			return 50;
 		}
-		unsigned char Level(BlockState Block)
+		unsigned char Level(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5929,7 +5929,7 @@ namespace Block
 		{
 			return 14836;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5939,7 +5939,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool HasBook(BlockState Block)
+		bool HasBook(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5947,7 +5947,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5962,7 +5962,7 @@ namespace Block
 		{
 			return 3792;
 		}
-		enum Face Face(BlockState Block)
+		enum Face Face(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5971,7 +5971,7 @@ namespace Block
 				default: return Face::Wall;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5981,7 +5981,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -5996,7 +5996,7 @@ namespace Block
 		{
 			return 7945;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6025,7 +6025,7 @@ namespace Block
 		{
 			return 1100;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6035,7 +6035,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6043,7 +6043,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6067,7 +6067,7 @@ namespace Block
 		{
 			return 9386;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6084,7 +6084,7 @@ namespace Block
 		{
 			return 9300;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6106,7 +6106,7 @@ namespace Block
 		{
 			return 6990;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6114,7 +6114,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6122,7 +6122,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6130,7 +6130,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6148,7 +6148,7 @@ namespace Block
 		{
 			return 8165;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6168,7 +6168,7 @@ namespace Block
 		{
 			return 8025;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6197,7 +6197,7 @@ namespace Block
 		{
 			return 1180;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6207,7 +6207,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6215,7 +6215,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6239,7 +6239,7 @@ namespace Block
 		{
 			return 9406;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6256,7 +6256,7 @@ namespace Block
 		{
 			return 9330;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6278,7 +6278,7 @@ namespace Block
 		{
 			return 7150;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6286,7 +6286,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6294,7 +6294,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6302,7 +6302,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6320,7 +6320,7 @@ namespace Block
 		{
 			return 8185;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6340,7 +6340,7 @@ namespace Block
 		{
 			return 6646;
 		}
-		unsigned char Power(BlockState Block)
+		unsigned char Power(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6369,7 +6369,7 @@ namespace Block
 		{
 			return 7888;
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6390,7 +6390,7 @@ namespace Block
 		{
 			return 7977;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6419,7 +6419,7 @@ namespace Block
 		{
 			return 1132;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6429,7 +6429,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6437,7 +6437,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6461,7 +6461,7 @@ namespace Block
 		{
 			return 9394;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6478,7 +6478,7 @@ namespace Block
 		{
 			return 9312;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6500,7 +6500,7 @@ namespace Block
 		{
 			return 7054;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6508,7 +6508,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6516,7 +6516,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6524,7 +6524,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6542,7 +6542,7 @@ namespace Block
 		{
 			return 8173;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6565,7 +6565,7 @@ namespace Block
 		{
 			return 14787;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6582,7 +6582,7 @@ namespace Block
 		{
 			return 7929;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6611,7 +6611,7 @@ namespace Block
 		{
 			return 1084;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6621,7 +6621,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6629,7 +6629,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6653,7 +6653,7 @@ namespace Block
 		{
 			return 9382;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6670,7 +6670,7 @@ namespace Block
 		{
 			return 9294;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6692,7 +6692,7 @@ namespace Block
 		{
 			return 6958;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6700,7 +6700,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6708,7 +6708,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6716,7 +6716,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6734,7 +6734,7 @@ namespace Block
 		{
 			return 8161;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6760,7 +6760,7 @@ namespace Block
 		{
 			return 4780;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6784,7 +6784,7 @@ namespace Block
 		{
 			return 10816;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6800,7 +6800,7 @@ namespace Block
 		{
 			return 10000;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6810,7 +6810,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6818,7 +6818,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6836,7 +6836,7 @@ namespace Block
 		{
 			return 5984;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6845,7 +6845,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6854,7 +6854,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6863,7 +6863,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6871,7 +6871,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6887,7 +6887,7 @@ namespace Block
 		{
 			return 10804;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6903,7 +6903,7 @@ namespace Block
 		{
 			return 9840;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6913,7 +6913,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6921,7 +6921,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6939,7 +6939,7 @@ namespace Block
 		{
 			return 11842;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6948,7 +6948,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6957,7 +6957,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6966,7 +6966,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6974,7 +6974,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -6993,7 +6993,7 @@ namespace Block
 		{
 			return 1400;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7005,7 +7005,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7020,7 +7020,7 @@ namespace Block
 		{
 			return 4633;
 		}
-		bool Down(BlockState Block)
+		bool Down(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7028,7 +7028,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7036,7 +7036,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7044,7 +7044,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7052,7 +7052,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7060,7 +7060,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7075,7 +7075,7 @@ namespace Block
 		{
 			return 5013;
 		}
-		bool Snowy(BlockState Block)
+		bool Snowy(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7090,7 +7090,7 @@ namespace Block
 		{
 			return 5047;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7098,7 +7098,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7106,7 +7106,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7114,7 +7114,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7129,7 +7129,7 @@ namespace Block
 		{
 			return 8387;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7145,7 +7145,7 @@ namespace Block
 		{
 			return 5059;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7155,7 +7155,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7163,7 +7163,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7181,7 +7181,7 @@ namespace Block
 		{
 			return 12814;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7190,7 +7190,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7199,7 +7199,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7208,7 +7208,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7216,7 +7216,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7238,7 +7238,7 @@ namespace Block
 		{
 			return 4014;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7259,7 +7259,7 @@ namespace Block
 		{
 			return 5128;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7285,7 +7285,7 @@ namespace Block
 		{
 			return 250;
 		}
-		enum Instrument Instrument(BlockState Block)
+		enum Instrument Instrument(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7307,7 +7307,7 @@ namespace Block
 				default: return Instrument::Xylophone;
 			}
 		}
-		unsigned char Note(BlockState Block)
+		unsigned char Note(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7338,7 +7338,7 @@ namespace Block
 				default: return 9;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7353,7 +7353,7 @@ namespace Block
 		{
 			return 6355;
 		}
-		enum Face Face(BlockState Block)
+		enum Face Face(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7362,7 +7362,7 @@ namespace Block
 				default: return Face::Wall;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7372,7 +7372,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7387,7 +7387,7 @@ namespace Block
 		{
 			return 3584;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7397,7 +7397,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7405,7 +7405,7 @@ namespace Block
 				default: return Half::Upper;
 			}
 		}
-		enum Hinge Hinge(BlockState Block)
+		enum Hinge Hinge(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7413,7 +7413,7 @@ namespace Block
 				default: return Hinge::Right;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7421,7 +7421,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7436,7 +7436,7 @@ namespace Block
 		{
 			return 3997;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7444,7 +7444,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7452,7 +7452,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7460,7 +7460,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7475,7 +7475,7 @@ namespace Block
 		{
 			return 4827;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7485,7 +7485,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool InWall(BlockState Block)
+		bool InWall(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7493,7 +7493,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7501,7 +7501,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7516,7 +7516,7 @@ namespace Block
 		{
 			return 158;
 		}
-		unsigned char Distance(BlockState Block)
+		unsigned char Distance(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7529,7 +7529,7 @@ namespace Block
 				default: return 7;
 			}
 		}
-		bool Persistent(BlockState Block)
+		bool Persistent(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7544,7 +7544,7 @@ namespace Block
 		{
 			return 74;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7563,7 +7563,7 @@ namespace Block
 		{
 			return 3874;
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7578,7 +7578,7 @@ namespace Block
 		{
 			return 21;
 		}
-		unsigned char Stage(BlockState Block)
+		unsigned char Stage(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7593,7 +7593,7 @@ namespace Block
 		{
 			return 3382;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7622,7 +7622,7 @@ namespace Block
 		{
 			return 8303;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7638,7 +7638,7 @@ namespace Block
 		{
 			return 1965;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7648,7 +7648,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7656,7 +7656,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7674,7 +7674,7 @@ namespace Block
 		{
 			return 4126;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7684,7 +7684,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7692,7 +7692,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7700,7 +7700,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7715,7 +7715,7 @@ namespace Block
 		{
 			return 3736;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7732,7 +7732,7 @@ namespace Block
 		{
 			return 110;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7748,7 +7748,7 @@ namespace Block
 		{
 			return 9265;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7760,7 +7760,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7778,7 +7778,7 @@ namespace Block
 		{
 			return 7913;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7807,7 +7807,7 @@ namespace Block
 		{
 			return 1068;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7817,7 +7817,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7825,7 +7825,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7849,7 +7849,7 @@ namespace Block
 		{
 			return 9378;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7866,7 +7866,7 @@ namespace Block
 		{
 			return 9288;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7888,7 +7888,7 @@ namespace Block
 		{
 			return 6926;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7896,7 +7896,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7904,7 +7904,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7912,7 +7912,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7933,7 +7933,7 @@ namespace Block
 		{
 			return 8157;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7959,7 +7959,7 @@ namespace Block
 		{
 			return 7892;
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7974,7 +7974,7 @@ namespace Block
 		{
 			return 8363;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -7990,7 +7990,7 @@ namespace Block
 		{
 			return 7993;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8019,7 +8019,7 @@ namespace Block
 		{
 			return 1148;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8029,7 +8029,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8037,7 +8037,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8061,7 +8061,7 @@ namespace Block
 		{
 			return 9398;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8078,7 +8078,7 @@ namespace Block
 		{
 			return 9318;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8100,7 +8100,7 @@ namespace Block
 		{
 			return 7086;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8108,7 +8108,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8116,7 +8116,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8124,7 +8124,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8145,7 +8145,7 @@ namespace Block
 		{
 			return 8177;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8165,7 +8165,7 @@ namespace Block
 		{
 			return 1354;
 		}
-		bool Extended(BlockState Block)
+		bool Extended(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8173,7 +8173,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8192,7 +8192,7 @@ namespace Block
 		{
 			return 1362;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8204,7 +8204,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Short(BlockState Block)
+		bool Short(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8212,7 +8212,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8227,7 +8227,7 @@ namespace Block
 		{
 			return 6550;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8256,7 +8256,7 @@ namespace Block
 		{
 			return 6566;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8273,7 +8273,7 @@ namespace Block
 		{
 			return 13;
 		}
-		bool Snowy(BlockState Block)
+		bool Snowy(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8291,7 +8291,7 @@ namespace Block
 		{
 			return 10858;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8307,7 +8307,7 @@ namespace Block
 		{
 			return 10640;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8317,7 +8317,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8325,7 +8325,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8343,7 +8343,7 @@ namespace Block
 		{
 			return 4006;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8362,7 +8362,7 @@ namespace Block
 		{
 			return 16257;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8378,7 +8378,7 @@ namespace Block
 		{
 			return 16271;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8388,7 +8388,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8396,7 +8396,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8414,7 +8414,7 @@ namespace Block
 		{
 			return 16343;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8423,7 +8423,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8432,7 +8432,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8441,7 +8441,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8449,7 +8449,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8468,7 +8468,7 @@ namespace Block
 		{
 			return 16762;
 		}
-		enum Face Face(BlockState Block)
+		enum Face Face(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8477,7 +8477,7 @@ namespace Block
 				default: return Face::Wall;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8487,7 +8487,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8502,7 +8502,7 @@ namespace Block
 		{
 			return 16752;
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8517,7 +8517,7 @@ namespace Block
 		{
 			return 16748;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8533,7 +8533,7 @@ namespace Block
 		{
 			return 16676;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8543,7 +8543,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8551,7 +8551,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8569,7 +8569,7 @@ namespace Block
 		{
 			return 16780;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8578,7 +8578,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8587,7 +8587,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8596,7 +8596,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8604,7 +8604,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8623,7 +8623,7 @@ namespace Block
 		{
 			return 10810;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8639,7 +8639,7 @@ namespace Block
 		{
 			return 9920;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8649,7 +8649,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8657,7 +8657,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8678,7 +8678,7 @@ namespace Block
 		{
 			return 10792;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8694,7 +8694,7 @@ namespace Block
 		{
 			return 9680;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8704,7 +8704,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8712,7 +8712,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8733,7 +8733,7 @@ namespace Block
 		{
 			return 6338;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8841,7 +8841,7 @@ namespace Block
 		{
 			return 1311;
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8849,7 +8849,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8871,7 +8871,7 @@ namespace Block
 		{
 			return 7853;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8887,7 +8887,7 @@ namespace Block
 		{
 			return 7695;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8897,7 +8897,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8905,7 +8905,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8926,7 +8926,7 @@ namespace Block
 		{
 			return 7847;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8942,7 +8942,7 @@ namespace Block
 		{
 			return 7615;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8952,7 +8952,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8960,7 +8960,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8978,7 +8978,7 @@ namespace Block
 		{
 			return 11194;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8987,7 +8987,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -8996,7 +8996,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9005,7 +9005,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9013,7 +9013,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9032,7 +9032,7 @@ namespace Block
 		{
 			return 4772;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9053,7 +9053,7 @@ namespace Block
 		{
 			return 8057;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9082,7 +9082,7 @@ namespace Block
 		{
 			return 1212;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9092,7 +9092,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9100,7 +9100,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9124,7 +9124,7 @@ namespace Block
 		{
 			return 9414;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9141,7 +9141,7 @@ namespace Block
 		{
 			return 9342;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9163,7 +9163,7 @@ namespace Block
 		{
 			return 7214;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9171,7 +9171,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9179,7 +9179,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9187,7 +9187,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9205,7 +9205,7 @@ namespace Block
 		{
 			return 8193;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9228,7 +9228,7 @@ namespace Block
 		{
 			return 9136;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9244,7 +9244,7 @@ namespace Block
 		{
 			return 8411;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9260,7 +9260,7 @@ namespace Block
 		{
 			return 9149;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9270,7 +9270,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9278,7 +9278,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9302,7 +9302,7 @@ namespace Block
 		{
 			return 6741;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9318,7 +9318,7 @@ namespace Block
 		{
 			return 8393;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9334,7 +9334,7 @@ namespace Block
 		{
 			return 6754;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9344,7 +9344,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9352,7 +9352,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9370,7 +9370,7 @@ namespace Block
 		{
 			return 3645;
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9393,7 +9393,7 @@ namespace Block
 		{
 			return 8121;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9422,7 +9422,7 @@ namespace Block
 		{
 			return 1276;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9432,7 +9432,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9440,7 +9440,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9464,7 +9464,7 @@ namespace Block
 		{
 			return 9430;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9484,7 +9484,7 @@ namespace Block
 		{
 			return 4569;
 		}
-		bool Down(BlockState Block)
+		bool Down(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9492,7 +9492,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9500,7 +9500,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9508,7 +9508,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9516,7 +9516,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9524,7 +9524,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9539,7 +9539,7 @@ namespace Block
 		{
 			return 10852;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9555,7 +9555,7 @@ namespace Block
 		{
 			return 10560;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9565,7 +9565,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9573,7 +9573,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9591,7 +9591,7 @@ namespace Block
 		{
 			return 13462;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9600,7 +9600,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9609,7 +9609,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9618,7 +9618,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9626,7 +9626,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9651,7 +9651,7 @@ namespace Block
 		{
 			return 8399;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9667,7 +9667,7 @@ namespace Block
 		{
 			return 8231;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9677,7 +9677,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9685,7 +9685,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9703,7 +9703,7 @@ namespace Block
 		{
 			return 11518;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9712,7 +9712,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9721,7 +9721,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9730,7 +9730,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9738,7 +9738,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9754,7 +9754,7 @@ namespace Block
 		{
 			return 9366;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9776,7 +9776,7 @@ namespace Block
 		{
 			return 7342;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9784,7 +9784,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9792,7 +9792,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9800,7 +9800,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9821,7 +9821,7 @@ namespace Block
 		{
 			return 8209;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9844,7 +9844,7 @@ namespace Block
 		{
 			return 5157;
 		}
-		bool Lit(BlockState Block)
+		bool Lit(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9859,7 +9859,7 @@ namespace Block
 		{
 			return 3886;
 		}
-		bool Lit(BlockState Block)
+		bool Lit(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9874,7 +9874,7 @@ namespace Block
 		{
 			return 3887;
 		}
-		bool Lit(BlockState Block)
+		bool Lit(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9889,7 +9889,7 @@ namespace Block
 		{
 			return 3889;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9899,7 +9899,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Lit(BlockState Block)
+		bool Lit(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9914,7 +9914,7 @@ namespace Block
 		{
 			return 3218;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9923,7 +9923,7 @@ namespace Block
 				default: return East::Up;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9932,7 +9932,7 @@ namespace Block
 				default: return North::Up;
 			}
 		}
-		unsigned char Power(BlockState Block)
+		unsigned char Power(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9954,7 +9954,7 @@ namespace Block
 				default: return 9;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9963,7 +9963,7 @@ namespace Block
 				default: return South::Up;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9979,7 +9979,7 @@ namespace Block
 		{
 			return 4034;
 		}
-		unsigned char Delay(BlockState Block)
+		unsigned char Delay(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9989,7 +9989,7 @@ namespace Block
 				default: return 4;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -9999,7 +9999,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Locked(BlockState Block)
+		bool Locked(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10007,7 +10007,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10022,7 +10022,7 @@ namespace Block
 		{
 			return 9231;
 		}
-		bool Conditional(BlockState Block)
+		bool Conditional(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10030,7 +10030,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10049,7 +10049,7 @@ namespace Block
 		{
 			return 15829;
 		}
-		unsigned char Charges(BlockState Block)
+		unsigned char Charges(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10067,7 +10067,7 @@ namespace Block
 		{
 			return 7890;
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10088,7 +10088,7 @@ namespace Block
 		{
 			return 8351;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10104,7 +10104,7 @@ namespace Block
 		{
 			return 5181;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10114,7 +10114,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10122,7 +10122,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10140,7 +10140,7 @@ namespace Block
 		{
 			return 13786;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10149,7 +10149,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10158,7 +10158,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10167,7 +10167,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10175,7 +10175,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10191,7 +10191,7 @@ namespace Block
 		{
 			return 14786;
 		}
-		bool Bottom(BlockState Block)
+		bool Bottom(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10199,7 +10199,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		unsigned char Distance(BlockState Block)
+		unsigned char Distance(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10223,7 +10223,7 @@ namespace Block
 		{
 			return 9640;
 		}
-		unsigned char Pickles(BlockState Block)
+		unsigned char Pickles(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10246,7 +10246,7 @@ namespace Block
 		{
 			return 9276;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10265,7 +10265,7 @@ namespace Block
 		{
 			return 6490;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10294,7 +10294,7 @@ namespace Block
 		{
 			return 6506;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10317,7 +10317,7 @@ namespace Block
 		{
 			return 14804;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10327,7 +10327,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Lit(BlockState Block)
+		bool Lit(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10345,7 +10345,7 @@ namespace Block
 		{
 			return 10834;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10361,7 +10361,7 @@ namespace Block
 		{
 			return 10320;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10371,7 +10371,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10379,7 +10379,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10400,7 +10400,7 @@ namespace Block
 		{
 			return 10798;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10416,7 +10416,7 @@ namespace Block
 		{
 			return 9760;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10426,7 +10426,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10434,7 +10434,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10455,7 +10455,7 @@ namespace Block
 		{
 			return 10828;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10471,7 +10471,7 @@ namespace Block
 		{
 			return 10240;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10481,7 +10481,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10489,7 +10489,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10510,7 +10510,7 @@ namespace Block
 		{
 			return 8345;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10526,7 +10526,7 @@ namespace Block
 		{
 			return 3921;
 		}
-		unsigned char Layers(BlockState Block)
+		unsigned char Layers(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10550,7 +10550,7 @@ namespace Block
 		{
 			return 14925;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10560,7 +10560,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Lit(BlockState Block)
+		bool Lit(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10568,7 +10568,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool SignalFire(BlockState Block)
+		bool SignalFire(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10586,7 +10586,7 @@ namespace Block
 		{
 			return 14889;
 		}
-		bool Hanging(BlockState Block)
+		bool Hanging(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10610,7 +10610,7 @@ namespace Block
 		{
 			return 4009;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10633,7 +10633,7 @@ namespace Block
 		{
 			return 6379;
 		}
-		enum Face Face(BlockState Block)
+		enum Face Face(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10642,7 +10642,7 @@ namespace Block
 				default: return Face::Wall;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10652,7 +10652,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10667,7 +10667,7 @@ namespace Block
 		{
 			return 8749;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10677,7 +10677,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10685,7 +10685,7 @@ namespace Block
 				default: return Half::Upper;
 			}
 		}
-		enum Hinge Hinge(BlockState Block)
+		enum Hinge Hinge(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10693,7 +10693,7 @@ namespace Block
 				default: return Hinge::Right;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10701,7 +10701,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10716,7 +10716,7 @@ namespace Block
 		{
 			return 8609;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10724,7 +10724,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10732,7 +10732,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10740,7 +10740,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10755,7 +10755,7 @@ namespace Block
 		{
 			return 8425;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10765,7 +10765,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool InWall(BlockState Block)
+		bool InWall(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10773,7 +10773,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10781,7 +10781,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10796,7 +10796,7 @@ namespace Block
 		{
 			return 172;
 		}
-		unsigned char Distance(BlockState Block)
+		unsigned char Distance(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10809,7 +10809,7 @@ namespace Block
 				default: return 7;
 			}
 		}
-		bool Persistent(BlockState Block)
+		bool Persistent(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10824,7 +10824,7 @@ namespace Block
 		{
 			return 77;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10843,7 +10843,7 @@ namespace Block
 		{
 			return 3876;
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10858,7 +10858,7 @@ namespace Block
 		{
 			return 23;
 		}
-		unsigned char Stage(BlockState Block)
+		unsigned char Stage(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10873,7 +10873,7 @@ namespace Block
 		{
 			return 3414;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10902,7 +10902,7 @@ namespace Block
 		{
 			return 8309;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10918,7 +10918,7 @@ namespace Block
 		{
 			return 5415;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10928,7 +10928,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10936,7 +10936,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10954,7 +10954,7 @@ namespace Block
 		{
 			return 4190;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10964,7 +10964,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10972,7 +10972,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10980,7 +10980,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -10995,7 +10995,7 @@ namespace Block
 		{
 			return 3744;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11012,7 +11012,7 @@ namespace Block
 		{
 			return 113;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11028,7 +11028,7 @@ namespace Block
 		{
 			return 1335;
 		}
-		bool Extended(BlockState Block)
+		bool Extended(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11036,7 +11036,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11058,7 +11058,7 @@ namespace Block
 		{
 			return 8381;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11074,7 +11074,7 @@ namespace Block
 		{
 			return 4943;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11084,7 +11084,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11092,7 +11092,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11110,7 +11110,7 @@ namespace Block
 		{
 			return 12490;
 		}
-		enum East East(BlockState Block)
+		enum East East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11119,7 +11119,7 @@ namespace Block
 				default: return East::Tall;
 			}
 		}
-		enum North North(BlockState Block)
+		enum North North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11128,7 +11128,7 @@ namespace Block
 				default: return North::Tall;
 			}
 		}
-		enum South South(BlockState Block)
+		enum South South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11137,7 +11137,7 @@ namespace Block
 				default: return South::Tall;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11145,7 +11145,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum West West(BlockState Block)
+		enum West West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11164,7 +11164,7 @@ namespace Block
 		{
 			return 3906;
 		}
-		enum Face Face(BlockState Block)
+		enum Face Face(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11173,7 +11173,7 @@ namespace Block
 				default: return Face::Wall;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11183,7 +11183,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11198,7 +11198,7 @@ namespace Block
 		{
 			return 3808;
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11213,7 +11213,7 @@ namespace Block
 		{
 			return 8339;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11229,7 +11229,7 @@ namespace Block
 		{
 			return 10160;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11239,7 +11239,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11247,7 +11247,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11265,7 +11265,7 @@ namespace Block
 		{
 			return 14850;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11282,7 +11282,7 @@ namespace Block
 		{
 			return 101;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11298,7 +11298,7 @@ namespace Block
 		{
 			return 140;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11314,7 +11314,7 @@ namespace Block
 		{
 			return 95;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11330,7 +11330,7 @@ namespace Block
 		{
 			return 134;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11346,7 +11346,7 @@ namespace Block
 		{
 			return 14985;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11362,7 +11362,7 @@ namespace Block
 		{
 			return 14979;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11378,7 +11378,7 @@ namespace Block
 		{
 			return 104;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11394,7 +11394,7 @@ namespace Block
 		{
 			return 143;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11410,7 +11410,7 @@ namespace Block
 		{
 			return 98;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11426,7 +11426,7 @@ namespace Block
 		{
 			return 137;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11442,7 +11442,7 @@ namespace Block
 		{
 			return 107;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11458,7 +11458,7 @@ namespace Block
 		{
 			return 128;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11474,7 +11474,7 @@ namespace Block
 		{
 			return 92;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11490,7 +11490,7 @@ namespace Block
 		{
 			return 131;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11506,7 +11506,7 @@ namespace Block
 		{
 			return 14968;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11522,7 +11522,7 @@ namespace Block
 		{
 			return 14962;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11538,7 +11538,7 @@ namespace Block
 		{
 			return 15735;
 		}
-		enum Mode Mode(BlockState Block)
+		enum Mode Mode(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11558,7 +11558,7 @@ namespace Block
 		{
 			return 3948;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11587,7 +11587,7 @@ namespace Block
 		{
 			return 7886;
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11602,7 +11602,7 @@ namespace Block
 		{
 			return 14954;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11619,7 +11619,7 @@ namespace Block
 		{
 			return 1431;
 		}
-		bool Unstable(BlockState Block)
+		bool Unstable(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11634,7 +11634,7 @@ namespace Block
 		{
 			return 7894;
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11649,7 +11649,7 @@ namespace Block
 		{
 			return 1347;
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11664,7 +11664,7 @@ namespace Block
 		{
 			return 15760;
 		}
-		unsigned char Power(BlockState Block)
+		unsigned char Power(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11699,7 +11699,7 @@ namespace Block
 		{
 			return 6623;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11709,7 +11709,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11725,7 +11725,7 @@ namespace Block
 		{
 			return 5402;
 		}
-		bool Attached(BlockState Block)
+		bool Attached(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11733,7 +11733,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Disarmed(BlockState Block)
+		bool Disarmed(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11741,7 +11741,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11749,7 +11749,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11757,7 +11757,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11765,7 +11765,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11773,7 +11773,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11788,7 +11788,7 @@ namespace Block
 		{
 			return 5268;
 		}
-		bool Attached(BlockState Block)
+		bool Attached(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11796,7 +11796,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11806,7 +11806,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11830,7 +11830,7 @@ namespace Block
 		{
 			return 9600;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11847,7 +11847,7 @@ namespace Block
 		{
 			return 9498;
 		}
-		unsigned char Eggs(BlockState Block)
+		unsigned char Eggs(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11857,7 +11857,7 @@ namespace Block
 				default: return 4;
 			}
 		}
-		unsigned char Hatch(BlockState Block)
+		unsigned char Hatch(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11873,7 +11873,7 @@ namespace Block
 		{
 			return 15017;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11915,7 +11915,7 @@ namespace Block
 		{
 			return 4819;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11923,7 +11923,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11931,7 +11931,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11939,7 +11939,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Up(BlockState Block)
+		bool Up(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11947,7 +11947,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11965,7 +11965,7 @@ namespace Block
 		{
 			return 1436;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11982,7 +11982,7 @@ namespace Block
 		{
 			return 15512;
 		}
-		enum Face Face(BlockState Block)
+		enum Face Face(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -11991,7 +11991,7 @@ namespace Block
 				default: return Face::Wall;
 			}
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12001,7 +12001,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12016,7 +12016,7 @@ namespace Block
 		{
 			return 15602;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12026,7 +12026,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12034,7 +12034,7 @@ namespace Block
 				default: return Half::Upper;
 			}
 		}
-		enum Hinge Hinge(BlockState Block)
+		enum Hinge Hinge(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12042,7 +12042,7 @@ namespace Block
 				default: return Hinge::Right;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12050,7 +12050,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12065,7 +12065,7 @@ namespace Block
 		{
 			return 15126;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12073,7 +12073,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12081,7 +12081,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12089,7 +12089,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12104,7 +12104,7 @@ namespace Block
 		{
 			return 15294;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12114,7 +12114,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool InWall(BlockState Block)
+		bool InWall(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12122,7 +12122,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12130,7 +12130,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12148,7 +12148,7 @@ namespace Block
 		{
 			return 14965;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12170,7 +12170,7 @@ namespace Block
 		{
 			return 15062;
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12188,7 +12188,7 @@ namespace Block
 		{
 			return 15688;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12217,7 +12217,7 @@ namespace Block
 		{
 			return 15056;
 		}
-		enum Type Type(BlockState Block)
+		enum Type Type(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12233,7 +12233,7 @@ namespace Block
 		{
 			return 15410;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12243,7 +12243,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12251,7 +12251,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		enum Shape Shape(BlockState Block)
+		enum Shape Shape(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12269,7 +12269,7 @@ namespace Block
 		{
 			return 14959;
 		}
-		enum Axis Axis(BlockState Block)
+		enum Axis Axis(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12285,7 +12285,7 @@ namespace Block
 		{
 			return 15206;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12295,7 +12295,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		enum Half Half(BlockState Block)
+		enum Half Half(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12303,7 +12303,7 @@ namespace Block
 				default: return Half::Top;
 			}
 		}
-		bool Open(BlockState Block)
+		bool Open(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12311,7 +12311,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool Powered(BlockState Block)
+		bool Powered(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12326,7 +12326,7 @@ namespace Block
 		{
 			return 15728;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12346,7 +12346,7 @@ namespace Block
 		{
 			return 34;
 		}
-		unsigned char Level(BlockState Block)
+		unsigned char Level(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12375,7 +12375,7 @@ namespace Block
 		{
 			return 14990;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12420,7 +12420,7 @@ namespace Block
 		{
 			return 3357;
 		}
-		unsigned char Age(BlockState Block)
+		unsigned char Age(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12441,7 +12441,7 @@ namespace Block
 		{
 			return 7897;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12470,7 +12470,7 @@ namespace Block
 		{
 			return 1052;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12480,7 +12480,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12488,7 +12488,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12512,7 +12512,7 @@ namespace Block
 		{
 			return 9374;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12529,7 +12529,7 @@ namespace Block
 		{
 			return 9282;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12551,7 +12551,7 @@ namespace Block
 		{
 			return 6894;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12559,7 +12559,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12567,7 +12567,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12575,7 +12575,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12596,7 +12596,7 @@ namespace Block
 		{
 			return 8153;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12619,7 +12619,7 @@ namespace Block
 		{
 			return 6510;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12648,7 +12648,7 @@ namespace Block
 		{
 			return 6526;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12665,7 +12665,7 @@ namespace Block
 		{
 			return 7961;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12694,7 +12694,7 @@ namespace Block
 		{
 			return 1116;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12704,7 +12704,7 @@ namespace Block
 				default: return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		bool Occupied(BlockState Block)
+		bool Occupied(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12712,7 +12712,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		enum Part Part(BlockState Block)
+		enum Part Part(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12736,7 +12736,7 @@ namespace Block
 		{
 			return 9390;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12753,7 +12753,7 @@ namespace Block
 		{
 			return 9306;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12775,7 +12775,7 @@ namespace Block
 		{
 			return 7022;
 		}
-		bool East(BlockState Block)
+		bool East(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12783,7 +12783,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool North(BlockState Block)
+		bool North(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12791,7 +12791,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool South(BlockState Block)
+		bool South(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12799,7 +12799,7 @@ namespace Block
 				default: return true;
 			}
 		}
-		bool West(BlockState Block)
+		bool West(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12817,7 +12817,7 @@ namespace Block
 		{
 			return 8169;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12837,7 +12837,7 @@ namespace Block
 		{
 			return 6530;
 		}
-		unsigned char Rotation(BlockState Block)
+		unsigned char Rotation(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
@@ -12866,7 +12866,7 @@ namespace Block
 		{
 			return 6546;
 		}
-		eBlockFace Facing(BlockState Block)
+		eBlockFace Facing(const BlockState Block)
 		{
 			switch (Block.ID)
 			{
