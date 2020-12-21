@@ -72,6 +72,7 @@ target_sources(
 	BlockArea.h
 	BlockInServerPluginInterface.h
 	BlockInfo.h
+	BlockState.h
 	BlockTracer.h
 	BlockType.h
 	BrewingRecipes.h

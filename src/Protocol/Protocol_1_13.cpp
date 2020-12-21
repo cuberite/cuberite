@@ -648,7 +648,7 @@ std::pair<short, short> cProtocol_1_13::GetItemFromProtocolID(UInt32 a_ProtocolI
 
 UInt32 cProtocol_1_13::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 {
-	return Palette_1_13::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+	return Palette_1_13::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
 }
 
 
@@ -657,7 +657,7 @@ UInt32 cProtocol_1_13::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_
 
 UInt32 cProtocol_1_13::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
 {
-	return Palette_1_13::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+	return Palette_1_13::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
 }
 
 
@@ -1364,7 +1364,7 @@ std::pair<short, short> cProtocol_1_13_1::GetItemFromProtocolID(UInt32 a_Protoco
 
 UInt32 cProtocol_1_13_1::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 {
-	return Palette_1_13_1::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+	return Palette_1_13_1::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
 }
 
 
@@ -1373,7 +1373,7 @@ UInt32 cProtocol_1_13_1::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE 
 
 UInt32 cProtocol_1_13_1::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
 {
-	return Palette_1_13_1::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+	return Palette_1_13_1::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
 }
 
 

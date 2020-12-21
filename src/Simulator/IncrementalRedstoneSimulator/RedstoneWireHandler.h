@@ -2,7 +2,7 @@
 #pragma once
 
 #include "RedstoneHandler.h"
-#include "../../Registries/Blocks.h"
+#include "Registries/BlockStates.h"
 
 
 
@@ -20,7 +20,7 @@ namespace RedstoneWireHandler
 	/** Invokes Callback with the wire's left, front, and right direction state corresponding to Offset.
 	Returns a new block constructed from the directions that the callback may have modified. */
 	template <class OffsetCallback>
-	inline short DoWithDirectionState(const Vector3i Offset, short Block, OffsetCallback Callback)
+	inline BlockState DoWithDirectionState(const Vector3i Offset, BlockState Block, OffsetCallback Callback)
 	{
 		auto North = Block::RedstoneWire::North(Block);
 		auto South = Block::RedstoneWire::South(Block);
@@ -49,7 +49,7 @@ namespace RedstoneWireHandler
 	}
 
 	/** Adjusts a given wire block so that the direction represented by Offset has state Direction. */
-	inline void SetDirectionState(const Vector3i Offset, short & Block, TemporaryDirection Direction)
+	inline void SetDirectionState(const Vector3i Offset, BlockState & Block, TemporaryDirection Direction)
 	{
 		Block = DoWithDirectionState(Offset, Block, [Direction](auto, auto & Front, auto)
 		{
@@ -189,7 +189,7 @@ namespace RedstoneWireHandler
 			return;
 		}
 
-		DataForChunk(Chunk).WireStates[Position] = Block;
+		DataForChunk(Chunk).WireStates.emplace(Position, Block);
 	}
 
 	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
