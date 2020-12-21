@@ -112,16 +112,16 @@ public:
 
 	/** Calls the callback with the chunk's data, if available (with ChunkCS locked).
 	Returns true if the chunk was reported successfully, false if not (chunk not present or callback failed). */
-	bool GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback);
+	bool GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback) const;
 
 	/** Copies the chunk's blocktypes into a_Blocks; returns true if successful */
 	bool GetChunkBlockTypes (int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_Blocks);
 
 	/** Returns true iff the chunk is in the loader / generator queue. */
-	bool IsChunkQueued(int a_ChunkX, int a_ChunkZ);
+	bool IsChunkQueued(int a_ChunkX, int a_ChunkZ) const;
 
-	bool      IsChunkValid       (int a_ChunkX, int a_ChunkZ);
-	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkZ);
+	bool      IsChunkValid       (int a_ChunkX, int a_ChunkZ) const;
+	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkZ) const;
 	int       GetHeight          (int a_BlockX, int a_BlockZ);  // Waits for the chunk to get loaded / generated
 	bool      TryGetHeight       (int a_BlockX, int a_BlockZ, int & a_Height);  // Returns false if chunk not loaded / generated
 
@@ -134,24 +134,24 @@ public:
 	/** Makes the specified player collect all the pickups around them. */
 	void CollectPickupsByPlayer(cPlayer & a_Player);
 
-	BLOCKTYPE  GetBlock          (Vector3i a_BlockPos);
-	NIBBLETYPE GetBlockMeta      (Vector3i a_BlockPos);
-	NIBBLETYPE GetBlockSkyLight  (Vector3i a_BlockPos);
-	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos);
+	BLOCKTYPE  GetBlock          (Vector3i a_BlockPos) const;
+	NIBBLETYPE GetBlockMeta      (Vector3i a_BlockPos) const;
+	NIBBLETYPE GetBlockSkyLight  (Vector3i a_BlockPos) const;
+	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos) const;
 
 	/** Sets the meta for the specified block, while keeping the blocktype.
 	Ignored if the chunk is invalid. */
 	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta);
 
 	void       SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool       GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
-	bool       GetBlockInfo      (Vector3i, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
+	bool       GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
+	bool       GetBlockInfo      (Vector3i, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
 
 	/** Special function used for growing trees, replaces only blocks that tree may overwrite */
 	void      ReplaceTreeBlocks(const sSetBlockVector & a_Blocks);
 
 	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, otherwise uses the world generator to provide the biome value */
-	EMCSBiome GetBiomeAt (int a_BlockX, int a_BlockZ);
+	EMCSBiome GetBiomeAt (int a_BlockX, int a_BlockZ) const;
 
 	/** Sets the biome at the specified coords. Returns true if successful, false if not (chunk not loaded).
 	Doesn't resend the chunk to clients. */
@@ -461,6 +461,9 @@ private:
 
 	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be called only from cChunkMap. */
 	cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
+
+	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be called only from cChunkMap. */
+	const cChunk * FindChunk(int a_ChunkX, int a_ChunkZ) const;
 
 	/** Adds a new cChunkStay descendant to the internal list of ChunkStays; loads its chunks.
 	To be used only by cChunkStay; others should use cChunkStay::Enable() instead */
