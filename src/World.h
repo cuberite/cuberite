@@ -307,10 +307,6 @@ public:
 	The entity is added lazily - this function only puts it in a queue that is then processed by the Tick thread. */
 	void AddEntity(OwnedEntity a_Entity);
 
-	/** Returns true if an entity with the specified UniqueID exists in the world.
-	Note: Only loaded chunks are considered. */
-	bool HasEntity(UInt32 a_UniqueID);
-
 	/** Removes the entity from the world.
 	Returns an owning reference to the found entity. */
 	OwnedEntity RemoveEntity(cEntity & a_Entity);
@@ -410,7 +406,7 @@ public:
 	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block) */
 	void FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
-		m_ChunkMap->FastSetBlock(a_BlockPos, a_BlockType, a_BlockMeta);
+		m_ChunkMap.FastSetBlock(a_BlockPos, a_BlockType, a_BlockMeta);
 	}
 
 	/** OBSOLETE, use the Vector3-based overload instead.
@@ -424,32 +420,32 @@ public:
 
 	/** Returns the block type at the specified position.
 	Returns 0 if the chunk is not valid. */
-	BLOCKTYPE GetBlock(Vector3i a_BlockPos)
+	BLOCKTYPE GetBlock(Vector3i a_BlockPos) const
 	{
-		return m_ChunkMap->GetBlock(a_BlockPos);
+		return m_ChunkMap.GetBlock(a_BlockPos);
 	}
 
 	/** OBSOLETE, use the Vector3-based overload instead.
 	Returns the block type at the specified position.
 	Returns 0 if the chunk is not valid. */
-	BLOCKTYPE GetBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
+	BLOCKTYPE GetBlock(int a_BlockX, int a_BlockY, int a_BlockZ) const
 	{
-		return m_ChunkMap->GetBlock({a_BlockX, a_BlockY, a_BlockZ});
+		return m_ChunkMap.GetBlock({a_BlockX, a_BlockY, a_BlockZ});
 	}
 
 	/** Returns the block meta at the specified position.
 	Returns 0 if the chunk is not valid. */
-	NIBBLETYPE GetBlockMeta(Vector3i a_BlockPos)
+	NIBBLETYPE GetBlockMeta(Vector3i a_BlockPos) const
 	{
-		return m_ChunkMap->GetBlockMeta(a_BlockPos);
+		return m_ChunkMap.GetBlockMeta(a_BlockPos);
 	}
 
 	/** OBSOLETE, use the Vector3-based overload instead.
 	Returns the block meta at the specified position.
 	Returns 0 if the chunk is not valid. */
-	NIBBLETYPE GetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ)
+	NIBBLETYPE GetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ) const
 	{
-		return m_ChunkMap->GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
+		return m_ChunkMap.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
 	}
 
 	/** Sets the meta for the specified block, while keeping the blocktype.
@@ -808,7 +804,7 @@ public:
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Exported in ManualBindings.cpp
 
 	/** a_Player is using block entity at [x, y, z], handle that: */
-	void UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) {m_ChunkMap->UseBlockEntity(a_Player, a_BlockX, a_BlockY, a_BlockZ); }  // tolua_export
+	void UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) { m_ChunkMap.UseBlockEntity(a_Player, a_BlockX, a_BlockY, a_BlockZ); }  // tolua_export
 
 	/** Calls the callback for the chunk specified, with ChunkMapCS locked.
 	Returns false if the chunk doesn't exist, otherwise returns the same value as the callback */
@@ -1048,7 +1044,7 @@ public:
 
 	cChunkGeneratorThread & GetGenerator(void) { return m_Generator; }
 	cWorldStorage &   GetStorage  (void) { return m_Storage; }
-	cChunkMap *       GetChunkMap (void) { return m_ChunkMap.get(); }
+	cChunkMap *       GetChunkMap (void) { return &m_ChunkMap; }
 
 	/** Causes the specified block to be ticked on the next Tick() call.
 	Only one block coord per chunk may be set, a second call overwrites the first call */
@@ -1211,7 +1207,7 @@ private:
 
 	unsigned int m_MaxPlayers;
 
-	std::unique_ptr<cChunkMap> m_ChunkMap;
+	cChunkMap m_ChunkMap;
 
 	bool m_bAnimals;
 	std::set<eMonsterType> m_AllowedMobs;

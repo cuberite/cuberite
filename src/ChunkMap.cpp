@@ -101,6 +101,18 @@ cChunk * cChunkMap::FindChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+const cChunk * cChunkMap::FindChunk(int a_ChunkX, int a_ChunkZ) const
+{
+	ASSERT(m_CSChunks.IsLockedByCurrentThread());
+
+	const auto Chunk = m_Chunks.find({ a_ChunkX, a_ChunkZ });
+	return (Chunk == m_Chunks.end()) ? nullptr : &Chunk->second;
+}
+
+
+
+
+
 void cChunkMap::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client)
 {
 	cCSLock Lock(m_CSChunks);
@@ -285,7 +297,7 @@ void cChunkMap::ChunkLighted(
 
 
 
-bool cChunkMap::GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback)
+bool cChunkMap::GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback) const
 {
 	if (!a_Callback.Coords(a_Coords.m_ChunkX, a_Coords.m_ChunkZ))
 	{
@@ -323,7 +335,7 @@ bool cChunkMap::GetChunkBlockTypes(int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_Blo
 
 
 
-bool cChunkMap::IsChunkQueued(int a_ChunkX, int a_ChunkZ)
+bool cChunkMap::IsChunkQueued(int a_ChunkX, int a_ChunkZ) const
 {
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
@@ -334,7 +346,7 @@ bool cChunkMap::IsChunkQueued(int a_ChunkX, int a_ChunkZ)
 
 
 
-bool cChunkMap::IsChunkValid(int a_ChunkX, int a_ChunkZ)
+bool cChunkMap::IsChunkValid(int a_ChunkX, int a_ChunkZ) const
 {
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
@@ -345,7 +357,7 @@ bool cChunkMap::IsChunkValid(int a_ChunkX, int a_ChunkZ)
 
 
 
-bool cChunkMap::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ)
+bool cChunkMap::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const
 {
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
@@ -448,7 +460,7 @@ void cChunkMap::CollectPickupsByPlayer(cPlayer & a_Player)
 
 
 
-BLOCKTYPE cChunkMap::GetBlock(Vector3i a_BlockPos)
+BLOCKTYPE cChunkMap::GetBlock(Vector3i a_BlockPos) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
@@ -467,7 +479,7 @@ BLOCKTYPE cChunkMap::GetBlock(Vector3i a_BlockPos)
 
 
 
-NIBBLETYPE cChunkMap::GetBlockMeta(Vector3i a_BlockPos)
+NIBBLETYPE cChunkMap::GetBlockMeta(Vector3i a_BlockPos) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
@@ -486,7 +498,7 @@ NIBBLETYPE cChunkMap::GetBlockMeta(Vector3i a_BlockPos)
 
 
 
-NIBBLETYPE cChunkMap::GetBlockSkyLight(Vector3i a_BlockPos)
+NIBBLETYPE cChunkMap::GetBlockSkyLight(Vector3i a_BlockPos) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
@@ -505,7 +517,7 @@ NIBBLETYPE cChunkMap::GetBlockSkyLight(Vector3i a_BlockPos)
 
 
 
-NIBBLETYPE cChunkMap::GetBlockBlockLight(Vector3i a_BlockPos)
+NIBBLETYPE cChunkMap::GetBlockBlockLight(Vector3i a_BlockPos) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
@@ -559,7 +571,7 @@ void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE 
 
 
 
-bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
 	auto chunkCoord = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkCoord);
@@ -578,7 +590,7 @@ bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, N
 
 
 
-bool cChunkMap::GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
+bool cChunkMap::GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
@@ -633,7 +645,7 @@ void cChunkMap::ReplaceTreeBlocks(const sSetBlockVector & a_Blocks)
 
 
 
-EMCSBiome cChunkMap::GetBiomeAt (int a_BlockX, int a_BlockZ)
+EMCSBiome cChunkMap::GetBiomeAt(int a_BlockX, int a_BlockZ) const
 {
 	int ChunkX, ChunkZ, X = a_BlockX, Y = 0, Z = a_BlockZ;
 	cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);
