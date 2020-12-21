@@ -13,6 +13,12 @@
 
 
 
+#include "OSSupport/IsThread.h"
+
+
+
+
+
 
 class cMCADefrag
 {

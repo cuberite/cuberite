@@ -75,39 +75,8 @@
 #endif
 
 
-#include <stddef.h>
 
 
-// Integral types with predefined sizes:
-typedef signed long long Int64;
-typedef signed int       Int32;
-typedef signed short     Int16;
-typedef signed char      Int8;
-
-typedef unsigned long long UInt64;
-typedef unsigned int       UInt32;
-typedef unsigned short     UInt16;
-typedef unsigned char      UInt8;
-
-typedef unsigned char Byte;
-typedef Byte ColourID;
-
-
-template <typename T, size_t Size>
-class SizeChecker
-{
-	static_assert(sizeof(T) == Size, "Check the size of integral types");
-};
-
-template class SizeChecker<Int64, 8>;
-template class SizeChecker<Int32, 4>;
-template class SizeChecker<Int16, 2>;
-template class SizeChecker<Int8,  1>;
-
-template class SizeChecker<UInt64, 8>;
-template class SizeChecker<UInt32, 4>;
-template class SizeChecker<UInt16, 2>;
-template class SizeChecker<UInt8,  1>;
 
 // A macro to disallow the copy constructor and operator = functions
 // This should be used in the declarations for any class that shouldn't allow copying itself
@@ -126,6 +95,7 @@ template class SizeChecker<UInt8,  1>;
 #else
 	#define UNUSED UNUSED_VAR
 #endif
+
 
 
 
@@ -161,6 +131,7 @@ template class SizeChecker<UInt8,  1>;
 #include <cstdio>
 #include <cmath>
 #include <cstdarg>
+#include <cstddef>
 
 
 
@@ -192,6 +163,38 @@ template class SizeChecker<UInt8,  1>;
 
 
 
+
+
+// Integral types with predefined sizes:
+typedef signed long long Int64;
+typedef signed int       Int32;
+typedef signed short     Int16;
+typedef signed char      Int8;
+
+typedef unsigned long long UInt64;
+typedef unsigned int       UInt32;
+typedef unsigned short     UInt16;
+typedef unsigned char      UInt8;
+
+typedef unsigned char Byte;
+typedef Byte ColourID;
+
+
+template <typename T, size_t Size>
+class SizeChecker
+{
+	static_assert(sizeof(T) == Size, "Check the size of integral types");
+};
+
+template class SizeChecker<Int64, 8>;
+template class SizeChecker<Int32, 4>;
+template class SizeChecker<Int16, 2>;
+template class SizeChecker<Int8, 1>;
+
+template class SizeChecker<UInt64, 8>;
+template class SizeChecker<UInt32, 4>;
+template class SizeChecker<UInt16, 2>;
+template class SizeChecker<UInt8, 1>;
 
 // Common headers (part 1, without macros):
 #include "fmt.h"

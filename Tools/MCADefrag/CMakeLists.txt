@@ -62,11 +62,9 @@ source_group("Shared\\OSSupport" FILES ${SHARED_OSS_SRC} ${SHARED_OSS_HDR})
 # Include the main source files:
 set(SOURCES
 	MCADefrag.cpp
-	Globals.cpp
 )
 set(HEADERS
 	MCADefrag.h
-	Globals.h
 )
 
 source_group("" FILES ${SOURCES} ${HEADERS})

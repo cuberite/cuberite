@@ -36,11 +36,9 @@ source_group("Shared" FILES ${SHARED_SRC} ${SHARED_HDR})
 # Include the main source files:
 set(SOURCES
 	NoiseSpeedTest.cpp
-	Globals.cpp
 )
 set(HEADERS
 	NoiseSpeedTest.h
-	Globals.h
 	SimplexNoise.h
 )
 
