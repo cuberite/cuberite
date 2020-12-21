@@ -421,27 +421,13 @@ private:
 		}
 	};
 
-	struct ChunkCoordinate
-	{
-		struct Comparer
-		{
-			bool operator() (const ChunkCoordinate & a_Lhs, const ChunkCoordinate & a_Rhs) const
-			{
-				return ((a_Lhs.ChunkX == a_Rhs.ChunkX) ? (a_Lhs.ChunkZ < a_Rhs.ChunkZ) : (a_Lhs.ChunkX < a_Rhs.ChunkX));
-			}
-		};
-
-		int ChunkX;
-		int ChunkZ;
-	};
-
 	typedef std::list<cChunkStay *> cChunkStays;
 
 	mutable cCriticalSection m_CSChunks;
 
 	/** A map of chunk coordinates to chunks.
 	Uses a map (as opposed to unordered_map) because sorted maps are apparently faster. */
-	std::map<ChunkCoordinate, cChunk, ChunkCoordinate::Comparer> m_Chunks;
+	std::map<cChunkCoords, cChunk> m_Chunks;
 
 	cEvent m_evtChunkValid;  // Set whenever any chunk becomes valid, via ChunkValidated()
 

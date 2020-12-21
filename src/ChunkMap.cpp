@@ -63,7 +63,7 @@ cChunk & cChunkMap::ConstructChunk(int a_ChunkX, int a_ChunkZ)
 {
 	// If not exists insert. Then, return the chunk at these coordinates:
 	return m_Chunks.try_emplace(
-		ChunkCoordinate{ a_ChunkX, a_ChunkZ },
+		{ a_ChunkX, a_ChunkZ },
 		a_ChunkX, a_ChunkZ, this, m_World, *m_Pool
 	).first->second;
 }
@@ -1548,7 +1548,7 @@ bool cChunkMap::ForEachLoadedChunk(cFunctionRef<bool(int, int)> a_Callback) cons
 	{
 		if (Chunk.second.IsValid())
 		{
-			if (a_Callback(Chunk.first.ChunkX, Chunk.first.ChunkZ))
+			if (a_Callback(Chunk.first.m_ChunkX, Chunk.first.m_ChunkZ))
 			{
 				return false;
 			}
@@ -1729,11 +1729,11 @@ void cChunkMap::UnloadUnusedChunks(void)
 	{
 		if (
 			itr->second.CanUnload() &&  // Can unload
-			!cPluginManager::Get()->CallHookChunkUnloading(*GetWorld(), itr->first.ChunkX, itr->first.ChunkZ)  // Plugins agree
+			!cPluginManager::Get()->CallHookChunkUnloading(*GetWorld(), itr->first.m_ChunkX, itr->first.m_ChunkZ)  // Plugins agree
 		)
 		{
 			// First notify plugins:
-			cPluginManager::Get()->CallHookChunkUnloaded(*m_World, itr->first.ChunkX, itr->first.ChunkZ);
+			cPluginManager::Get()->CallHookChunkUnloaded(*m_World, itr->first.m_ChunkX, itr->first.m_ChunkZ);
 
 			// Notify entities within the chunk, while everything's still valid:
 			itr->second.OnUnload();
@@ -1759,7 +1759,7 @@ void cChunkMap::SaveAllChunks(void) const
 	{
 		if (Chunk.second.IsValid() && Chunk.second.IsDirty())
 		{
-			GetWorld()->GetStorage().QueueSaveChunk(Chunk.first.ChunkX, Chunk.first.ChunkZ);
+			GetWorld()->GetStorage().QueueSaveChunk(Chunk.first.m_ChunkX, Chunk.first.m_ChunkZ);
 		}
 	}
 }
