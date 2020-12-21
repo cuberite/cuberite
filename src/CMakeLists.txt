@@ -6,7 +6,6 @@ target_sources(
 	BiomeDef.cpp
 	BlockArea.cpp
 	BlockInfo.cpp
-	BlockState.cpp
 	BlockType.cpp
 	BrewingRecipes.cpp
 	Broadcaster.cpp

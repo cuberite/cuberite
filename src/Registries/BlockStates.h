@@ -57,9 +57,9 @@ namespace Block
 					else return 6465;
 		}
 		BlockState AcaciaButton();
-		enum Face Face(BlockState ID);
-		eBlockFace Facing(BlockState ID);
-		bool Powered(BlockState ID);
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace AcaciaDoor
 	{
@@ -201,11 +201,11 @@ namespace Block
 							else return 8993;
 		}
 		BlockState AcaciaDoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Hinge Hinge(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace AcaciaFence
 	{
@@ -243,10 +243,10 @@ namespace Block
 						else return 8705;
 		}
 		BlockState AcaciaFence();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace AcaciaFenceGate
 	{
@@ -314,10 +314,10 @@ namespace Block
 						else return 8545;
 		}
 		BlockState AcaciaFenceGate();
-		eBlockFace Facing(BlockState ID);
-		bool InWall(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace AcaciaLeaves
 	{
@@ -346,8 +346,8 @@ namespace Block
 				else return 214;
 		}
 		BlockState AcaciaLeaves();
-		unsigned char Distance(BlockState ID);
-		bool Persistent(BlockState ID);
+		unsigned char Distance(BlockState Block);
+		bool Persistent(BlockState Block);
 	}
 	namespace AcaciaLog
 	{
@@ -364,7 +364,7 @@ namespace Block
 			else return 87;
 		}
 		BlockState AcaciaLog();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace AcaciaPlanks
 	{
@@ -381,7 +381,7 @@ namespace Block
 			else return 3882;
 		}
 		BlockState AcaciaPressurePlate();
-		bool Powered(BlockState ID);
+		bool Powered(BlockState Block);
 	}
 	namespace AcaciaSapling
 	{
@@ -391,7 +391,7 @@ namespace Block
 			else return 30;
 		}
 		BlockState AcaciaSapling();
-		unsigned char Stage(BlockState ID);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace AcaciaSign
 	{
@@ -415,7 +415,7 @@ namespace Block
 			else return 3508;
 		}
 		BlockState AcaciaSign();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace AcaciaSlab
 	{
@@ -432,7 +432,7 @@ namespace Block
 			else return 8329;
 		}
 		BlockState AcaciaSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace AcaciaStairs
 	{
@@ -505,9 +505,9 @@ namespace Block
 					else return 7454;
 		}
 		BlockState AcaciaStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace AcaciaTrapdoor
 	{
@@ -580,10 +580,10 @@ namespace Block
 						else return 4430;
 		}
 		BlockState AcaciaTrapdoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace AcaciaWallSign
 	{
@@ -595,7 +595,7 @@ namespace Block
 			else return 3766;
 		}
 		BlockState AcaciaWallSign();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace AcaciaWood
 	{
@@ -612,7 +612,7 @@ namespace Block
 			else return 123;
 		}
 		BlockState AcaciaWood();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace ActivatorRail
 	{
@@ -643,8 +643,8 @@ namespace Block
 				else return 6834;
 		}
 		BlockState ActivatorRail();
-		bool Powered(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		bool Powered(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace Air
 	{
@@ -689,7 +689,7 @@ namespace Block
 			else return 10848;
 		}
 		BlockState AndesiteSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace AndesiteStairs
 	{
@@ -762,9 +762,9 @@ namespace Block
 					else return 10548;
 		}
 		BlockState AndesiteStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace AndesiteWall
 	{
@@ -1051,11 +1051,11 @@ namespace Block
 							else return 13458;
 		}
 		BlockState AndesiteWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Anvil
 	{
@@ -1067,7 +1067,7 @@ namespace Block
 			else return 6613;
 		}
 		BlockState Anvil();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace AttachedMelonStem
 	{
@@ -1079,7 +1079,7 @@ namespace Block
 			else return 4771;
 		}
 		BlockState AttachedMelonStem();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace AttachedPumpkinStem
 	{
@@ -1091,7 +1091,7 @@ namespace Block
 			else return 4767;
 		}
 		BlockState AttachedPumpkinStem();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace AzureBluet
 	{
@@ -1132,9 +1132,9 @@ namespace Block
 					else return 9663;
 		}
 		BlockState Bamboo();
-		unsigned char Age(BlockState ID);
-		enum Leaves Leaves(BlockState ID);
-		unsigned char Stage(BlockState ID);
+		unsigned char Age(BlockState Block);
+		enum Leaves Leaves(BlockState Block);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace BambooSapling
 	{
@@ -1167,8 +1167,8 @@ namespace Block
 				else return 14802;
 		}
 		BlockState Barrel();
-		eBlockFace Facing(BlockState ID);
-		bool Open(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Open(BlockState Block);
 	}
 	namespace Barrier
 	{
@@ -1192,7 +1192,7 @@ namespace Block
 			else return 4004;
 		}
 		BlockState Basalt();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace Beacon
 	{
@@ -1242,8 +1242,8 @@ namespace Block
 				else return 15799;
 		}
 		BlockState BeeNest();
-		eBlockFace Facing(BlockState ID);
-		unsigned char HoneyLevel(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		unsigned char HoneyLevel(BlockState Block);
 	}
 	namespace Beehive
 	{
@@ -1279,8 +1279,8 @@ namespace Block
 				else return 15823;
 		}
 		BlockState Beehive();
-		eBlockFace Facing(BlockState ID);
-		unsigned char HoneyLevel(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		unsigned char HoneyLevel(BlockState Block);
 	}
 	namespace Beetroots
 	{
@@ -1292,7 +1292,7 @@ namespace Block
 			else return 9222;
 		}
 		BlockState Beetroots();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace Bell
 	{
@@ -1359,9 +1359,9 @@ namespace Block
 					else return 14885;
 		}
 		BlockState Bell();
-		enum Attachment Attachment(BlockState ID);
-		eBlockFace Facing(BlockState ID);
-		bool Powered(BlockState ID);
+		enum Attachment Attachment(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace BirchButton
 	{
@@ -1414,9 +1414,9 @@ namespace Block
 					else return 6417;
 		}
 		BlockState BirchButton();
-		enum Face Face(BlockState ID);
-		eBlockFace Facing(BlockState ID);
-		bool Powered(BlockState ID);
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace BirchDoor
 	{
@@ -1558,11 +1558,11 @@ namespace Block
 							else return 8865;
 		}
 		BlockState BirchDoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Hinge Hinge(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace BirchFence
 	{
@@ -1600,10 +1600,10 @@ namespace Block
 						else return 8641;
 		}
 		BlockState BirchFence();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace BirchFenceGate
 	{
@@ -1671,10 +1671,10 @@ namespace Block
 						else return 8481;
 		}
 		BlockState BirchFenceGate();
-		eBlockFace Facing(BlockState ID);
-		bool InWall(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace BirchLeaves
 	{
@@ -1703,8 +1703,8 @@ namespace Block
 				else return 186;
 		}
 		BlockState BirchLeaves();
-		unsigned char Distance(BlockState ID);
-		bool Persistent(BlockState ID);
+		unsigned char Distance(BlockState Block);
+		bool Persistent(BlockState Block);
 	}
 	namespace BirchLog
 	{
@@ -1721,7 +1721,7 @@ namespace Block
 			else return 81;
 		}
 		BlockState BirchLog();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace BirchPlanks
 	{
@@ -1738,7 +1738,7 @@ namespace Block
 			else return 3878;
 		}
 		BlockState BirchPressurePlate();
-		bool Powered(BlockState ID);
+		bool Powered(BlockState Block);
 	}
 	namespace BirchSapling
 	{
@@ -1748,7 +1748,7 @@ namespace Block
 			else return 26;
 		}
 		BlockState BirchSapling();
-		unsigned char Stage(BlockState ID);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace BirchSign
 	{
@@ -1772,7 +1772,7 @@ namespace Block
 			else return 3476;
 		}
 		BlockState BirchSign();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace BirchSlab
 	{
@@ -1789,7 +1789,7 @@ namespace Block
 			else return 8317;
 		}
 		BlockState BirchSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace BirchStairs
 	{
@@ -1862,9 +1862,9 @@ namespace Block
 					else return 5563;
 		}
 		BlockState BirchStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace BirchTrapdoor
 	{
@@ -1937,10 +1937,10 @@ namespace Block
 						else return 4302;
 		}
 		BlockState BirchTrapdoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace BirchWallSign
 	{
@@ -1952,7 +1952,7 @@ namespace Block
 			else return 3758;
 		}
 		BlockState BirchWallSign();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BirchWood
 	{
@@ -1969,7 +1969,7 @@ namespace Block
 			else return 117;
 		}
 		BlockState BirchWood();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace BlackBanner
 	{
@@ -1993,7 +1993,7 @@ namespace Block
 			else return 8152;
 		}
 		BlockState BlackBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace BlackBed
 	{
@@ -2034,9 +2034,9 @@ namespace Block
 					else return 1304;
 		}
 		BlockState BlackBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace BlackCarpet
 	{
@@ -2069,7 +2069,7 @@ namespace Block
 			else return 9437;
 		}
 		BlockState BlackGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BlackShulkerBox
 	{
@@ -2083,7 +2083,7 @@ namespace Block
 			else return 9373;
 		}
 		BlockState BlackShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BlackStainedGlass
 	{
@@ -2128,10 +2128,10 @@ namespace Block
 						else return 7374;
 		}
 		BlockState BlackStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace BlackTerracotta
 	{
@@ -2150,7 +2150,7 @@ namespace Block
 			else return 8216;
 		}
 		BlockState BlackWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BlackWool
 	{
@@ -2181,7 +2181,7 @@ namespace Block
 			else return 16249;
 		}
 		BlockState BlackstoneSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace BlackstoneStairs
 	{
@@ -2254,9 +2254,9 @@ namespace Block
 					else return 15919;
 		}
 		BlockState BlackstoneStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace BlackstoneWall
 	{
@@ -2543,11 +2543,11 @@ namespace Block
 							else return 16243;
 		}
 		BlockState BlackstoneWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace BlastFurnace
 	{
@@ -2567,8 +2567,8 @@ namespace Block
 				else return 14818;
 		}
 		BlockState BlastFurnace();
-		eBlockFace Facing(BlockState ID);
-		bool Lit(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Lit(BlockState Block);
 	}
 	namespace BlueBanner
 	{
@@ -2592,7 +2592,7 @@ namespace Block
 			else return 8088;
 		}
 		BlockState BlueBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace BlueBed
 	{
@@ -2633,9 +2633,9 @@ namespace Block
 					else return 1240;
 		}
 		BlockState BlueBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace BlueCarpet
 	{
@@ -2668,7 +2668,7 @@ namespace Block
 			else return 9421;
 		}
 		BlockState BlueGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BlueIce
 	{
@@ -2696,7 +2696,7 @@ namespace Block
 			else return 9349;
 		}
 		BlockState BlueShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BlueStainedGlass
 	{
@@ -2741,10 +2741,10 @@ namespace Block
 						else return 7246;
 		}
 		BlockState BlueStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace BlueTerracotta
 	{
@@ -2763,7 +2763,7 @@ namespace Block
 			else return 8200;
 		}
 		BlockState BlueWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BlueWool
 	{
@@ -2787,7 +2787,7 @@ namespace Block
 			else return 9258;
 		}
 		BlockState BoneBlock();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace Bookshelf
 	{
@@ -2827,7 +2827,7 @@ namespace Block
 			else return 9615;
 		}
 		BlockState BrainCoralWallFan();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BrewingStand
 	{
@@ -2849,9 +2849,9 @@ namespace Block
 					else return 5140;
 		}
 		BlockState BrewingStand();
-		bool HasBottle_0(BlockState ID);
-		bool HasBottle_1(BlockState ID);
-		bool HasBottle_2(BlockState ID);
+		bool HasBottle_0(BlockState Block);
+		bool HasBottle_1(BlockState Block);
+		bool HasBottle_2(BlockState Block);
 	}
 	namespace BrickSlab
 	{
@@ -2868,7 +2868,7 @@ namespace Block
 			else return 8377;
 		}
 		BlockState BrickSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace BrickStairs
 	{
@@ -2941,9 +2941,9 @@ namespace Block
 					else return 4931;
 		}
 		BlockState BrickStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace BrickWall
 	{
@@ -3230,11 +3230,11 @@ namespace Block
 							else return 11190;
 		}
 		BlockState BrickWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Bricks
 	{
@@ -3265,7 +3265,7 @@ namespace Block
 			else return 8104;
 		}
 		BlockState BrownBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace BrownBed
 	{
@@ -3306,9 +3306,9 @@ namespace Block
 					else return 1256;
 		}
 		BlockState BrownBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace BrownCarpet
 	{
@@ -3341,7 +3341,7 @@ namespace Block
 			else return 9425;
 		}
 		BlockState BrownGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BrownMushroom
 	{
@@ -3482,12 +3482,12 @@ namespace Block
 								else return 4568;
 		}
 		BlockState BrownMushroomBlock();
-		bool Down(BlockState ID);
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool Up(BlockState ID);
-		bool West(BlockState ID);
+		bool Down(BlockState Block);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool Up(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace BrownShulkerBox
 	{
@@ -3501,7 +3501,7 @@ namespace Block
 			else return 9355;
 		}
 		BlockState BrownShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BrownStainedGlass
 	{
@@ -3546,10 +3546,10 @@ namespace Block
 						else return 7278;
 		}
 		BlockState BrownStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace BrownTerracotta
 	{
@@ -3568,7 +3568,7 @@ namespace Block
 			else return 8204;
 		}
 		BlockState BrownWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace BrownWool
 	{
@@ -3585,7 +3585,7 @@ namespace Block
 			else return 9668;
 		}
 		BlockState BubbleColumn();
-		bool Drag(BlockState ID);
+		bool Drag(BlockState Block);
 	}
 	namespace BubbleCoral
 	{
@@ -3618,7 +3618,7 @@ namespace Block
 			else return 9623;
 		}
 		BlockState BubbleCoralWallFan();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Cactus
 	{
@@ -3642,7 +3642,7 @@ namespace Block
 			else return 3946;
 		}
 		BlockState Cactus();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace Cake
 	{
@@ -3657,7 +3657,7 @@ namespace Block
 			else return 4030;
 		}
 		BlockState Cake();
-		unsigned char Bites(BlockState ID);
+		unsigned char Bites(BlockState Block);
 	}
 	namespace Campfire
 	{
@@ -3693,9 +3693,9 @@ namespace Block
 					else return 14921;
 		}
 		BlockState Campfire();
-		eBlockFace Facing(BlockState ID);
-		bool Lit(BlockState ID);
-		bool SignalFire(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Lit(BlockState Block);
+		bool SignalFire(BlockState Block);
 	}
 	namespace Carrots
 	{
@@ -3711,7 +3711,7 @@ namespace Block
 			else return 6337;
 		}
 		BlockState Carrots();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace CartographyTable
 	{
@@ -3730,7 +3730,7 @@ namespace Block
 			else return 4019;
 		}
 		BlockState CarvedPumpkin();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Cauldron
 	{
@@ -3742,7 +3742,7 @@ namespace Block
 			else return 5144;
 		}
 		BlockState Cauldron();
-		unsigned char Level(BlockState ID);
+		unsigned char Level(BlockState Block);
 	}
 	namespace CaveAir
 	{
@@ -3778,8 +3778,8 @@ namespace Block
 				else return 9248;
 		}
 		BlockState ChainCommandBlock();
-		bool Conditional(BlockState ID);
-		eBlockFace Facing(BlockState ID);
+		bool Conditional(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Chest
 	{
@@ -3809,8 +3809,8 @@ namespace Block
 				else return 2057;
 		}
 		BlockState Chest();
-		eBlockFace Facing(BlockState ID);
-		enum Type Type(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Type Type(BlockState Block);
 	}
 	namespace ChippedAnvil
 	{
@@ -3822,7 +3822,7 @@ namespace Block
 			else return 6617;
 		}
 		BlockState ChippedAnvil();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace ChiseledNetherBricks
 	{
@@ -3878,7 +3878,7 @@ namespace Block
 			else return 9133;
 		}
 		BlockState ChorusFlower();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace ChorusPlant
 	{
@@ -4012,12 +4012,12 @@ namespace Block
 								else return 9127;
 		}
 		BlockState ChorusPlant();
-		bool Down(BlockState ID);
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool Up(BlockState ID);
-		bool West(BlockState ID);
+		bool Down(BlockState Block);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool Up(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace Clay
 	{
@@ -4069,7 +4069,7 @@ namespace Block
 			else return 8371;
 		}
 		BlockState CobblestoneSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace CobblestoneStairs
 	{
@@ -4142,9 +4142,9 @@ namespace Block
 					else return 3734;
 		}
 		BlockState CobblestoneStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace CobblestoneWall
 	{
@@ -4431,11 +4431,11 @@ namespace Block
 							else return 5980;
 		}
 		BlockState CobblestoneWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Cobweb
 	{
@@ -4465,8 +4465,8 @@ namespace Block
 				else return 5169;
 		}
 		BlockState Cocoa();
-		unsigned char Age(BlockState ID);
-		eBlockFace Facing(BlockState ID);
+		unsigned char Age(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace CommandBlock
 	{
@@ -4488,8 +4488,8 @@ namespace Block
 				else return 5655;
 		}
 		BlockState CommandBlock();
-		bool Conditional(BlockState ID);
-		eBlockFace Facing(BlockState ID);
+		bool Conditional(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Comparator
 	{
@@ -4530,9 +4530,9 @@ namespace Block
 					else return 6693;
 		}
 		BlockState Comparator();
-		eBlockFace Facing(BlockState ID);
-		enum Mode Mode(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Mode Mode(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace Composter
 	{
@@ -4549,7 +4549,7 @@ namespace Block
 			else return 15759;
 		}
 		BlockState Composter();
-		unsigned char Level(BlockState ID);
+		unsigned char Level(BlockState Block);
 	}
 	namespace Conduit
 	{
@@ -4615,7 +4615,7 @@ namespace Block
 			else return 6585;
 		}
 		BlockState CreeperHead();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace CreeperWallHead
 	{
@@ -4627,7 +4627,7 @@ namespace Block
 			else return 6589;
 		}
 		BlockState CreeperWallHead();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace CrimsonButton
 	{
@@ -4680,9 +4680,9 @@ namespace Block
 					else return 15502;
 		}
 		BlockState CrimsonButton();
-		enum Face Face(BlockState ID);
-		eBlockFace Facing(BlockState ID);
-		bool Powered(BlockState ID);
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace CrimsonDoor
 	{
@@ -4824,11 +4824,11 @@ namespace Block
 							else return 15590;
 		}
 		BlockState CrimsonDoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Hinge Hinge(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace CrimsonFence
 	{
@@ -4866,10 +4866,10 @@ namespace Block
 						else return 15094;
 		}
 		BlockState CrimsonFence();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace CrimsonFenceGate
 	{
@@ -4937,10 +4937,10 @@ namespace Block
 						else return 15286;
 		}
 		BlockState CrimsonFenceGate();
-		eBlockFace Facing(BlockState ID);
-		bool InWall(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace CrimsonFungus
 	{
@@ -4964,7 +4964,7 @@ namespace Block
 			else return 14983;
 		}
 		BlockState CrimsonHyphae();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace CrimsonNylium
 	{
@@ -4988,7 +4988,7 @@ namespace Block
 			else return 15060;
 		}
 		BlockState CrimsonPressurePlate();
-		bool Powered(BlockState ID);
+		bool Powered(BlockState Block);
 	}
 	namespace CrimsonRoots
 	{
@@ -5019,7 +5019,7 @@ namespace Block
 			else return 15686;
 		}
 		BlockState CrimsonSign();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace CrimsonSlab
 	{
@@ -5036,7 +5036,7 @@ namespace Block
 			else return 15052;
 		}
 		BlockState CrimsonSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace CrimsonStairs
 	{
@@ -5109,9 +5109,9 @@ namespace Block
 					else return 15398;
 		}
 		BlockState CrimsonStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace CrimsonStem
 	{
@@ -5128,7 +5128,7 @@ namespace Block
 			else return 14977;
 		}
 		BlockState CrimsonStem();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace CrimsonTrapdoor
 	{
@@ -5201,10 +5201,10 @@ namespace Block
 						else return 15190;
 		}
 		BlockState CrimsonTrapdoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace CrimsonWallSign
 	{
@@ -5216,7 +5216,7 @@ namespace Block
 			else return 15726;
 		}
 		BlockState CrimsonWallSign();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace CryingObsidian
 	{
@@ -5247,7 +5247,7 @@ namespace Block
 			else return 8407;
 		}
 		BlockState CutRedSandstoneSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace CutSandstone
 	{
@@ -5271,7 +5271,7 @@ namespace Block
 			else return 8359;
 		}
 		BlockState CutSandstoneSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace CyanBanner
 	{
@@ -5295,7 +5295,7 @@ namespace Block
 			else return 8056;
 		}
 		BlockState CyanBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace CyanBed
 	{
@@ -5336,9 +5336,9 @@ namespace Block
 					else return 1208;
 		}
 		BlockState CyanBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace CyanCarpet
 	{
@@ -5371,7 +5371,7 @@ namespace Block
 			else return 9413;
 		}
 		BlockState CyanGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace CyanShulkerBox
 	{
@@ -5385,7 +5385,7 @@ namespace Block
 			else return 9337;
 		}
 		BlockState CyanShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace CyanStainedGlass
 	{
@@ -5430,10 +5430,10 @@ namespace Block
 						else return 7182;
 		}
 		BlockState CyanStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace CyanTerracotta
 	{
@@ -5452,7 +5452,7 @@ namespace Block
 			else return 8192;
 		}
 		BlockState CyanWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace CyanWool
 	{
@@ -5471,7 +5471,7 @@ namespace Block
 			else return 6621;
 		}
 		BlockState DamagedAnvil();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Dandelion
 	{
@@ -5531,9 +5531,9 @@ namespace Block
 					else return 6489;
 		}
 		BlockState DarkOakButton();
-		enum Face Face(BlockState ID);
-		eBlockFace Facing(BlockState ID);
-		bool Powered(BlockState ID);
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace DarkOakDoor
 	{
@@ -5675,11 +5675,11 @@ namespace Block
 							else return 9057;
 		}
 		BlockState DarkOakDoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Hinge Hinge(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace DarkOakFence
 	{
@@ -5717,10 +5717,10 @@ namespace Block
 						else return 8737;
 		}
 		BlockState DarkOakFence();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace DarkOakFenceGate
 	{
@@ -5788,10 +5788,10 @@ namespace Block
 						else return 8577;
 		}
 		BlockState DarkOakFenceGate();
-		eBlockFace Facing(BlockState ID);
-		bool InWall(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace DarkOakLeaves
 	{
@@ -5820,8 +5820,8 @@ namespace Block
 				else return 228;
 		}
 		BlockState DarkOakLeaves();
-		unsigned char Distance(BlockState ID);
-		bool Persistent(BlockState ID);
+		unsigned char Distance(BlockState Block);
+		bool Persistent(BlockState Block);
 	}
 	namespace DarkOakLog
 	{
@@ -5838,7 +5838,7 @@ namespace Block
 			else return 90;
 		}
 		BlockState DarkOakLog();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace DarkOakPlanks
 	{
@@ -5855,7 +5855,7 @@ namespace Block
 			else return 3884;
 		}
 		BlockState DarkOakPressurePlate();
-		bool Powered(BlockState ID);
+		bool Powered(BlockState Block);
 	}
 	namespace DarkOakSapling
 	{
@@ -5865,7 +5865,7 @@ namespace Block
 			else return 32;
 		}
 		BlockState DarkOakSapling();
-		unsigned char Stage(BlockState ID);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace DarkOakSign
 	{
@@ -5889,7 +5889,7 @@ namespace Block
 			else return 3572;
 		}
 		BlockState DarkOakSign();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace DarkOakSlab
 	{
@@ -5906,7 +5906,7 @@ namespace Block
 			else return 8335;
 		}
 		BlockState DarkOakSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace DarkOakStairs
 	{
@@ -5979,9 +5979,9 @@ namespace Block
 					else return 7534;
 		}
 		BlockState DarkOakStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace DarkOakTrapdoor
 	{
@@ -6054,10 +6054,10 @@ namespace Block
 						else return 4494;
 		}
 		BlockState DarkOakTrapdoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace DarkOakWallSign
 	{
@@ -6069,7 +6069,7 @@ namespace Block
 			else return 3782;
 		}
 		BlockState DarkOakWallSign();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace DarkOakWood
 	{
@@ -6086,7 +6086,7 @@ namespace Block
 			else return 126;
 		}
 		BlockState DarkOakWood();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace DarkPrismarine
 	{
@@ -6110,7 +6110,7 @@ namespace Block
 			else return 7861;
 		}
 		BlockState DarkPrismarineSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace DarkPrismarineStairs
 	{
@@ -6183,9 +6183,9 @@ namespace Block
 					else return 7843;
 		}
 		BlockState DarkPrismarineStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace DaylightDetector
 	{
@@ -6227,8 +6227,8 @@ namespace Block
 				else return 6725;
 		}
 		BlockState DaylightDetector();
-		bool Inverted(BlockState ID);
-		unsigned char Power(BlockState ID);
+		bool Inverted(BlockState Block);
+		unsigned char Power(BlockState Block);
 	}
 	namespace DeadBrainCoral
 	{
@@ -6261,7 +6261,7 @@ namespace Block
 			else return 9575;
 		}
 		BlockState DeadBrainCoralWallFan();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace DeadBubbleCoral
 	{
@@ -6294,7 +6294,7 @@ namespace Block
 			else return 9583;
 		}
 		BlockState DeadBubbleCoralWallFan();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace DeadBush
 	{
@@ -6334,7 +6334,7 @@ namespace Block
 			else return 9591;
 		}
 		BlockState DeadFireCoralWallFan();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace DeadHornCoral
 	{
@@ -6367,7 +6367,7 @@ namespace Block
 			else return 9599;
 		}
 		BlockState DeadHornCoralWallFan();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace DeadTubeCoral
 	{
@@ -6400,7 +6400,7 @@ namespace Block
 			else return 9567;
 		}
 		BlockState DeadTubeCoralWallFan();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace DetectorRail
 	{
@@ -6431,8 +6431,8 @@ namespace Block
 				else return 1328;
 		}
 		BlockState DetectorRail();
-		bool Powered(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		bool Powered(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace DiamondBlock
 	{
@@ -6470,7 +6470,7 @@ namespace Block
 			else return 10866;
 		}
 		BlockState DioriteSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace DioriteStairs
 	{
@@ -6543,9 +6543,9 @@ namespace Block
 					else return 10788;
 		}
 		BlockState DioriteStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace DioriteWall
 	{
@@ -6832,11 +6832,11 @@ namespace Block
 							else return 14754;
 		}
 		BlockState DioriteWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Dirt
 	{
@@ -6869,8 +6869,8 @@ namespace Block
 				else return 245;
 		}
 		BlockState Dispenser();
-		eBlockFace Facing(BlockState ID);
-		bool Triggered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Triggered(BlockState Block);
 	}
 	namespace DragonEgg
 	{
@@ -6901,7 +6901,7 @@ namespace Block
 			else return 6605;
 		}
 		BlockState DragonHead();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace DragonWallHead
 	{
@@ -6913,7 +6913,7 @@ namespace Block
 			else return 6609;
 		}
 		BlockState DragonWallHead();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace DriedKelpBlock
 	{
@@ -6946,8 +6946,8 @@ namespace Block
 				else return 6846;
 		}
 		BlockState Dropper();
-		eBlockFace Facing(BlockState ID);
-		bool Triggered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Triggered(BlockState Block);
 	}
 	namespace EmeraldBlock
 	{
@@ -7000,8 +7000,8 @@ namespace Block
 				else return 5153;
 		}
 		BlockState EndPortalFrame();
-		bool Eye(BlockState ID);
-		eBlockFace Facing(BlockState ID);
+		bool Eye(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace EndRod
 	{
@@ -7015,7 +7015,7 @@ namespace Block
 			else return 9063;
 		}
 		BlockState EndRod();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace EndStone
 	{
@@ -7039,7 +7039,7 @@ namespace Block
 			else return 10824;
 		}
 		BlockState EndStoneBrickSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace EndStoneBrickStairs
 	{
@@ -7112,9 +7112,9 @@ namespace Block
 					else return 10148;
 		}
 		BlockState EndStoneBrickStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace EndStoneBrickWall
 	{
@@ -7401,11 +7401,11 @@ namespace Block
 							else return 14430;
 		}
 		BlockState EndStoneBrickWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace EndStoneBricks
 	{
@@ -7424,7 +7424,7 @@ namespace Block
 			else return 5258;
 		}
 		BlockState EnderChest();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Farmland
 	{
@@ -7440,7 +7440,7 @@ namespace Block
 			else return 3372;
 		}
 		BlockState Farmland();
-		unsigned char Moisture(BlockState ID);
+		unsigned char Moisture(BlockState Block);
 	}
 	namespace Fern
 	{
@@ -8463,12 +8463,12 @@ namespace Block
 								else return 1951;
 		}
 		BlockState Fire();
-		unsigned char Age(BlockState ID);
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool Up(BlockState ID);
-		bool West(BlockState ID);
+		unsigned char Age(BlockState Block);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool Up(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace FireCoral
 	{
@@ -8501,7 +8501,7 @@ namespace Block
 			else return 9631;
 		}
 		BlockState FireCoralWallFan();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace FletchingTable
 	{
@@ -8527,7 +8527,7 @@ namespace Block
 			else return 9252;
 		}
 		BlockState FrostedIce();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace Furnace
 	{
@@ -8547,8 +8547,8 @@ namespace Block
 				else return 3380;
 		}
 		BlockState Furnace();
-		eBlockFace Facing(BlockState ID);
-		bool Lit(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Lit(BlockState Block);
 	}
 	namespace GildedBlackstone
 	{
@@ -8600,10 +8600,10 @@ namespace Block
 						else return 4762;
 		}
 		BlockState GlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace Glowstone
 	{
@@ -8648,7 +8648,7 @@ namespace Block
 			else return 10842;
 		}
 		BlockState GraniteSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace GraniteStairs
 	{
@@ -8721,9 +8721,9 @@ namespace Block
 					else return 10468;
 		}
 		BlockState GraniteStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace GraniteWall
 	{
@@ -9010,11 +9010,11 @@ namespace Block
 							else return 12486;
 		}
 		BlockState GraniteWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Grass
 	{
@@ -9031,7 +9031,7 @@ namespace Block
 			else return 9;
 		}
 		BlockState GrassBlock();
-		bool Snowy(BlockState ID);
+		bool Snowy(BlockState Block);
 	}
 	namespace GrassPath
 	{
@@ -9069,7 +9069,7 @@ namespace Block
 			else return 8024;
 		}
 		BlockState GrayBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace GrayBed
 	{
@@ -9110,9 +9110,9 @@ namespace Block
 					else return 1176;
 		}
 		BlockState GrayBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace GrayCarpet
 	{
@@ -9145,7 +9145,7 @@ namespace Block
 			else return 9405;
 		}
 		BlockState GrayGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace GrayShulkerBox
 	{
@@ -9159,7 +9159,7 @@ namespace Block
 			else return 9325;
 		}
 		BlockState GrayShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace GrayStainedGlass
 	{
@@ -9204,10 +9204,10 @@ namespace Block
 						else return 7118;
 		}
 		BlockState GrayStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace GrayTerracotta
 	{
@@ -9226,7 +9226,7 @@ namespace Block
 			else return 8184;
 		}
 		BlockState GrayWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace GrayWool
 	{
@@ -9257,7 +9257,7 @@ namespace Block
 			else return 8120;
 		}
 		BlockState GreenBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace GreenBed
 	{
@@ -9298,9 +9298,9 @@ namespace Block
 					else return 1272;
 		}
 		BlockState GreenBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace GreenCarpet
 	{
@@ -9333,7 +9333,7 @@ namespace Block
 			else return 9429;
 		}
 		BlockState GreenGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace GreenShulkerBox
 	{
@@ -9347,7 +9347,7 @@ namespace Block
 			else return 9361;
 		}
 		BlockState GreenShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace GreenStainedGlass
 	{
@@ -9392,10 +9392,10 @@ namespace Block
 						else return 7310;
 		}
 		BlockState GreenStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace GreenTerracotta
 	{
@@ -9414,7 +9414,7 @@ namespace Block
 			else return 8208;
 		}
 		BlockState GreenWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace GreenWool
 	{
@@ -9450,8 +9450,8 @@ namespace Block
 				else return 14832;
 		}
 		BlockState Grindstone();
-		enum Face Face(BlockState ID);
-		eBlockFace Facing(BlockState ID);
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace HayBale
 	{
@@ -9468,7 +9468,7 @@ namespace Block
 			else return 7865;
 		}
 		BlockState HayBale();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace HeavyWeightedPressurePlate
 	{
@@ -9492,7 +9492,7 @@ namespace Block
 			else return 6677;
 		}
 		BlockState HeavyWeightedPressurePlate();
-		unsigned char Power(BlockState ID);
+		unsigned char Power(BlockState Block);
 	}
 	namespace HoneyBlock
 	{
@@ -9526,8 +9526,8 @@ namespace Block
 				else return 6737;
 		}
 		BlockState Hopper();
-		bool Enabled(BlockState ID);
-		eBlockFace Facing(BlockState ID);
+		bool Enabled(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace HornCoral
 	{
@@ -9560,7 +9560,7 @@ namespace Block
 			else return 9639;
 		}
 		BlockState HornCoralWallFan();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Ice
 	{
@@ -9647,10 +9647,10 @@ namespace Block
 						else return 4728;
 		}
 		BlockState IronBars();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace IronBlock
 	{
@@ -9799,11 +9799,11 @@ namespace Block
 							else return 3872;
 		}
 		BlockState IronDoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Hinge Hinge(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace IronOre
 	{
@@ -9883,10 +9883,10 @@ namespace Block
 						else return 7600;
 		}
 		BlockState IronTrapdoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace JackOLantern
 	{
@@ -9898,7 +9898,7 @@ namespace Block
 			else return 4023;
 		}
 		BlockState JackOLantern();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Jigsaw
 	{
@@ -9933,7 +9933,7 @@ namespace Block
 			else return 15750;
 		}
 		BlockState Jigsaw();
-		enum Orientation Orientation(BlockState ID);
+		enum Orientation Orientation(BlockState Block);
 	}
 	namespace Jukebox
 	{
@@ -9943,7 +9943,7 @@ namespace Block
 			else return 3965;
 		}
 		BlockState Jukebox();
-		bool HasRecord(BlockState ID);
+		bool HasRecord(BlockState Block);
 	}
 	namespace JungleButton
 	{
@@ -9996,9 +9996,9 @@ namespace Block
 					else return 6441;
 		}
 		BlockState JungleButton();
-		enum Face Face(BlockState ID);
-		eBlockFace Facing(BlockState ID);
-		bool Powered(BlockState ID);
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace JungleDoor
 	{
@@ -10140,11 +10140,11 @@ namespace Block
 							else return 8929;
 		}
 		BlockState JungleDoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Hinge Hinge(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace JungleFence
 	{
@@ -10182,10 +10182,10 @@ namespace Block
 						else return 8673;
 		}
 		BlockState JungleFence();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace JungleFenceGate
 	{
@@ -10253,10 +10253,10 @@ namespace Block
 						else return 8513;
 		}
 		BlockState JungleFenceGate();
-		eBlockFace Facing(BlockState ID);
-		bool InWall(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace JungleLeaves
 	{
@@ -10285,8 +10285,8 @@ namespace Block
 				else return 200;
 		}
 		BlockState JungleLeaves();
-		unsigned char Distance(BlockState ID);
-		bool Persistent(BlockState ID);
+		unsigned char Distance(BlockState Block);
+		bool Persistent(BlockState Block);
 	}
 	namespace JungleLog
 	{
@@ -10303,7 +10303,7 @@ namespace Block
 			else return 84;
 		}
 		BlockState JungleLog();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace JunglePlanks
 	{
@@ -10320,7 +10320,7 @@ namespace Block
 			else return 3880;
 		}
 		BlockState JunglePressurePlate();
-		bool Powered(BlockState ID);
+		bool Powered(BlockState Block);
 	}
 	namespace JungleSapling
 	{
@@ -10330,7 +10330,7 @@ namespace Block
 			else return 28;
 		}
 		BlockState JungleSapling();
-		unsigned char Stage(BlockState ID);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace JungleSign
 	{
@@ -10354,7 +10354,7 @@ namespace Block
 			else return 3540;
 		}
 		BlockState JungleSign();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace JungleSlab
 	{
@@ -10371,7 +10371,7 @@ namespace Block
 			else return 8323;
 		}
 		BlockState JungleSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace JungleStairs
 	{
@@ -10444,9 +10444,9 @@ namespace Block
 					else return 5643;
 		}
 		BlockState JungleStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace JungleTrapdoor
 	{
@@ -10519,10 +10519,10 @@ namespace Block
 						else return 4366;
 		}
 		BlockState JungleTrapdoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace JungleWallSign
 	{
@@ -10534,7 +10534,7 @@ namespace Block
 			else return 3774;
 		}
 		BlockState JungleWallSign();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace JungleWood
 	{
@@ -10551,7 +10551,7 @@ namespace Block
 			else return 120;
 		}
 		BlockState JungleWood();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace Kelp
 	{
@@ -10585,7 +10585,7 @@ namespace Block
 			else return 9495;
 		}
 		BlockState Kelp();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace KelpPlant
 	{
@@ -10604,7 +10604,7 @@ namespace Block
 			else return 3644;
 		}
 		BlockState Ladder();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Lantern
 	{
@@ -10614,7 +10614,7 @@ namespace Block
 			else return 14887;
 		}
 		BlockState Lantern();
-		bool Hanging(BlockState ID);
+		bool Hanging(BlockState Block);
 	}
 	namespace LapisBlock
 	{
@@ -10643,7 +10643,7 @@ namespace Block
 			else return 7896;
 		}
 		BlockState LargeFern();
-		enum Half Half(BlockState ID);
+		enum Half Half(BlockState Block);
 	}
 	namespace Lava
 	{
@@ -10667,7 +10667,7 @@ namespace Block
 			else return 65;
 		}
 		BlockState Lava();
-		unsigned char Level(BlockState ID);
+		unsigned char Level(BlockState Block);
 	}
 	namespace Lectern
 	{
@@ -10703,9 +10703,9 @@ namespace Block
 					else return 14848;
 		}
 		BlockState Lectern();
-		eBlockFace Facing(BlockState ID);
-		bool HasBook(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool HasBook(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace Lever
 	{
@@ -10758,9 +10758,9 @@ namespace Block
 					else return 3806;
 		}
 		BlockState Lever();
-		enum Face Face(BlockState ID);
-		eBlockFace Facing(BlockState ID);
-		bool Powered(BlockState ID);
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace LightBlueBanner
 	{
@@ -10784,7 +10784,7 @@ namespace Block
 			else return 7960;
 		}
 		BlockState LightBlueBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace LightBlueBed
 	{
@@ -10825,9 +10825,9 @@ namespace Block
 					else return 1112;
 		}
 		BlockState LightBlueBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace LightBlueCarpet
 	{
@@ -10860,7 +10860,7 @@ namespace Block
 			else return 9389;
 		}
 		BlockState LightBlueGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LightBlueShulkerBox
 	{
@@ -10874,7 +10874,7 @@ namespace Block
 			else return 9301;
 		}
 		BlockState LightBlueShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LightBlueStainedGlass
 	{
@@ -10919,10 +10919,10 @@ namespace Block
 						else return 6990;
 		}
 		BlockState LightBlueStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace LightBlueTerracotta
 	{
@@ -10941,7 +10941,7 @@ namespace Block
 			else return 8168;
 		}
 		BlockState LightBlueWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LightBlueWool
 	{
@@ -10972,7 +10972,7 @@ namespace Block
 			else return 8040;
 		}
 		BlockState LightGrayBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace LightGrayBed
 	{
@@ -11013,9 +11013,9 @@ namespace Block
 					else return 1192;
 		}
 		BlockState LightGrayBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace LightGrayCarpet
 	{
@@ -11048,7 +11048,7 @@ namespace Block
 			else return 9409;
 		}
 		BlockState LightGrayGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LightGrayShulkerBox
 	{
@@ -11062,7 +11062,7 @@ namespace Block
 			else return 9331;
 		}
 		BlockState LightGrayShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LightGrayStainedGlass
 	{
@@ -11107,10 +11107,10 @@ namespace Block
 						else return 7150;
 		}
 		BlockState LightGrayStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace LightGrayTerracotta
 	{
@@ -11129,7 +11129,7 @@ namespace Block
 			else return 8188;
 		}
 		BlockState LightGrayWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LightGrayWool
 	{
@@ -11160,7 +11160,7 @@ namespace Block
 			else return 6661;
 		}
 		BlockState LightWeightedPressurePlate();
-		unsigned char Power(BlockState ID);
+		unsigned char Power(BlockState Block);
 	}
 	namespace Lilac
 	{
@@ -11175,7 +11175,7 @@ namespace Block
 			else return 7888;
 		}
 		BlockState Lilac();
-		enum Half Half(BlockState ID);
+		enum Half Half(BlockState Block);
 	}
 	namespace LilyOfTheValley
 	{
@@ -11213,7 +11213,7 @@ namespace Block
 			else return 7992;
 		}
 		BlockState LimeBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace LimeBed
 	{
@@ -11254,9 +11254,9 @@ namespace Block
 					else return 1144;
 		}
 		BlockState LimeBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace LimeCarpet
 	{
@@ -11289,7 +11289,7 @@ namespace Block
 			else return 9397;
 		}
 		BlockState LimeGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LimeShulkerBox
 	{
@@ -11303,7 +11303,7 @@ namespace Block
 			else return 9313;
 		}
 		BlockState LimeShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LimeStainedGlass
 	{
@@ -11348,10 +11348,10 @@ namespace Block
 						else return 7054;
 		}
 		BlockState LimeStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace LimeTerracotta
 	{
@@ -11370,7 +11370,7 @@ namespace Block
 			else return 8176;
 		}
 		BlockState LimeWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace LimeWool
 	{
@@ -11396,7 +11396,7 @@ namespace Block
 			else return 14790;
 		}
 		BlockState Loom();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace MagentaBanner
 	{
@@ -11420,7 +11420,7 @@ namespace Block
 			else return 7944;
 		}
 		BlockState MagentaBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace MagentaBed
 	{
@@ -11461,9 +11461,9 @@ namespace Block
 					else return 1096;
 		}
 		BlockState MagentaBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace MagentaCarpet
 	{
@@ -11496,7 +11496,7 @@ namespace Block
 			else return 9385;
 		}
 		BlockState MagentaGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace MagentaShulkerBox
 	{
@@ -11510,7 +11510,7 @@ namespace Block
 			else return 9295;
 		}
 		BlockState MagentaShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace MagentaStainedGlass
 	{
@@ -11555,10 +11555,10 @@ namespace Block
 						else return 6958;
 		}
 		BlockState MagentaStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace MagentaTerracotta
 	{
@@ -11577,7 +11577,7 @@ namespace Block
 			else return 8164;
 		}
 		BlockState MagentaWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace MagentaWool
 	{
@@ -11614,7 +11614,7 @@ namespace Block
 			else return 4787;
 		}
 		BlockState MelonStem();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace MossyCobblestone
 	{
@@ -11638,7 +11638,7 @@ namespace Block
 			else return 10818;
 		}
 		BlockState MossyCobblestoneSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace MossyCobblestoneStairs
 	{
@@ -11711,9 +11711,9 @@ namespace Block
 					else return 10068;
 		}
 		BlockState MossyCobblestoneStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace MossyCobblestoneWall
 	{
@@ -12000,11 +12000,11 @@ namespace Block
 							else return 6304;
 		}
 		BlockState MossyCobblestoneWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace MossyStoneBrickSlab
 	{
@@ -12021,7 +12021,7 @@ namespace Block
 			else return 10806;
 		}
 		BlockState MossyStoneBrickSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace MossyStoneBrickStairs
 	{
@@ -12094,9 +12094,9 @@ namespace Block
 					else return 9908;
 		}
 		BlockState MossyStoneBrickStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace MossyStoneBrickWall
 	{
@@ -12383,11 +12383,11 @@ namespace Block
 							else return 12162;
 		}
 		BlockState MossyStoneBrickWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace MossyStoneBricks
 	{
@@ -12425,8 +12425,8 @@ namespace Block
 				else return 1411;
 		}
 		BlockState MovingPiston();
-		eBlockFace Facing(BlockState ID);
-		enum Type Type(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Type Type(BlockState Block);
 	}
 	namespace MushroomStem
 	{
@@ -12560,12 +12560,12 @@ namespace Block
 								else return 4696;
 		}
 		BlockState MushroomStem();
-		bool Down(BlockState ID);
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool Up(BlockState ID);
-		bool West(BlockState ID);
+		bool Down(BlockState Block);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool Up(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace Mycelium
 	{
@@ -12575,7 +12575,7 @@ namespace Block
 			else return 5013;
 		}
 		BlockState Mycelium();
-		bool Snowy(BlockState ID);
+		bool Snowy(BlockState Block);
 	}
 	namespace NetherBrickFence
 	{
@@ -12613,10 +12613,10 @@ namespace Block
 						else return 5047;
 		}
 		BlockState NetherBrickFence();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace NetherBrickSlab
 	{
@@ -12633,7 +12633,7 @@ namespace Block
 			else return 8389;
 		}
 		BlockState NetherBrickSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace NetherBrickStairs
 	{
@@ -12706,9 +12706,9 @@ namespace Block
 					else return 5127;
 		}
 		BlockState NetherBrickStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace NetherBrickWall
 	{
@@ -12995,11 +12995,11 @@ namespace Block
 							else return 13134;
 		}
 		BlockState NetherBrickWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace NetherBricks
 	{
@@ -13028,7 +13028,7 @@ namespace Block
 			else return 4015;
 		}
 		BlockState NetherPortal();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace NetherQuartzOre
 	{
@@ -13054,7 +13054,7 @@ namespace Block
 			else return 5131;
 		}
 		BlockState NetherWart();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace NetherWartBlock
 	{
@@ -14318,9 +14318,9 @@ namespace Block
 					else return 1048;
 		}
 		BlockState NoteBlock();
-		enum Instrument Instrument(BlockState ID);
-		unsigned char Note(BlockState ID);
-		bool Powered(BlockState ID);
+		enum Instrument Instrument(BlockState Block);
+		unsigned char Note(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace OakButton
 	{
@@ -14373,9 +14373,9 @@ namespace Block
 					else return 6369;
 		}
 		BlockState OakButton();
-		enum Face Face(BlockState ID);
-		eBlockFace Facing(BlockState ID);
-		bool Powered(BlockState ID);
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace OakDoor
 	{
@@ -14517,11 +14517,11 @@ namespace Block
 							else return 3636;
 		}
 		BlockState OakDoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Hinge Hinge(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace OakFence
 	{
@@ -14559,10 +14559,10 @@ namespace Block
 						else return 3997;
 		}
 		BlockState OakFence();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace OakFenceGate
 	{
@@ -14630,10 +14630,10 @@ namespace Block
 						else return 4851;
 		}
 		BlockState OakFenceGate();
-		eBlockFace Facing(BlockState ID);
-		bool InWall(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace OakLeaves
 	{
@@ -14662,8 +14662,8 @@ namespace Block
 				else return 158;
 		}
 		BlockState OakLeaves();
-		unsigned char Distance(BlockState ID);
-		bool Persistent(BlockState ID);
+		unsigned char Distance(BlockState Block);
+		bool Persistent(BlockState Block);
 	}
 	namespace OakLog
 	{
@@ -14680,7 +14680,7 @@ namespace Block
 			else return 75;
 		}
 		BlockState OakLog();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace OakPlanks
 	{
@@ -14697,7 +14697,7 @@ namespace Block
 			else return 3874;
 		}
 		BlockState OakPressurePlate();
-		bool Powered(BlockState ID);
+		bool Powered(BlockState Block);
 	}
 	namespace OakSapling
 	{
@@ -14707,7 +14707,7 @@ namespace Block
 			else return 22;
 		}
 		BlockState OakSapling();
-		unsigned char Stage(BlockState ID);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace OakSign
 	{
@@ -14731,7 +14731,7 @@ namespace Block
 			else return 3412;
 		}
 		BlockState OakSign();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace OakSlab
 	{
@@ -14748,7 +14748,7 @@ namespace Block
 			else return 8305;
 		}
 		BlockState OakSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace OakStairs
 	{
@@ -14821,9 +14821,9 @@ namespace Block
 					else return 2033;
 		}
 		BlockState OakStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace OakTrapdoor
 	{
@@ -14896,10 +14896,10 @@ namespace Block
 						else return 4174;
 		}
 		BlockState OakTrapdoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace OakWallSign
 	{
@@ -14911,7 +14911,7 @@ namespace Block
 			else return 3742;
 		}
 		BlockState OakWallSign();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace OakWood
 	{
@@ -14928,7 +14928,7 @@ namespace Block
 			else return 111;
 		}
 		BlockState OakWood();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace Observer
 	{
@@ -14954,8 +14954,8 @@ namespace Block
 				else return 9271;
 		}
 		BlockState Observer();
-		eBlockFace Facing(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace Obsidian
 	{
@@ -14986,7 +14986,7 @@ namespace Block
 			else return 7928;
 		}
 		BlockState OrangeBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace OrangeBed
 	{
@@ -15027,9 +15027,9 @@ namespace Block
 					else return 1080;
 		}
 		BlockState OrangeBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace OrangeCarpet
 	{
@@ -15062,7 +15062,7 @@ namespace Block
 			else return 9381;
 		}
 		BlockState OrangeGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace OrangeShulkerBox
 	{
@@ -15076,7 +15076,7 @@ namespace Block
 			else return 9289;
 		}
 		BlockState OrangeShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace OrangeStainedGlass
 	{
@@ -15121,10 +15121,10 @@ namespace Block
 						else return 6926;
 		}
 		BlockState OrangeStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace OrangeTerracotta
 	{
@@ -15150,7 +15150,7 @@ namespace Block
 			else return 8160;
 		}
 		BlockState OrangeWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace OrangeWool
 	{
@@ -15186,7 +15186,7 @@ namespace Block
 			else return 7892;
 		}
 		BlockState Peony();
-		enum Half Half(BlockState ID);
+		enum Half Half(BlockState Block);
 	}
 	namespace PetrifiedOakSlab
 	{
@@ -15203,7 +15203,7 @@ namespace Block
 			else return 8365;
 		}
 		BlockState PetrifiedOakSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace PinkBanner
 	{
@@ -15227,7 +15227,7 @@ namespace Block
 			else return 8008;
 		}
 		BlockState PinkBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace PinkBed
 	{
@@ -15268,9 +15268,9 @@ namespace Block
 					else return 1160;
 		}
 		BlockState PinkBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace PinkCarpet
 	{
@@ -15303,7 +15303,7 @@ namespace Block
 			else return 9401;
 		}
 		BlockState PinkGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace PinkShulkerBox
 	{
@@ -15317,7 +15317,7 @@ namespace Block
 			else return 9319;
 		}
 		BlockState PinkShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace PinkStainedGlass
 	{
@@ -15362,10 +15362,10 @@ namespace Block
 						else return 7086;
 		}
 		BlockState PinkStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace PinkTerracotta
 	{
@@ -15391,7 +15391,7 @@ namespace Block
 			else return 8180;
 		}
 		BlockState PinkWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace PinkWool
 	{
@@ -15420,8 +15420,8 @@ namespace Block
 				else return 1359;
 		}
 		BlockState Piston();
-		bool Extended(BlockState ID);
-		eBlockFace Facing(BlockState ID);
+		bool Extended(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace PistonHead
 	{
@@ -15476,9 +15476,9 @@ namespace Block
 					else return 1383;
 		}
 		BlockState PistonHead();
-		eBlockFace Facing(BlockState ID);
-		bool Short(BlockState ID);
-		enum Type Type(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Short(BlockState Block);
+		enum Type Type(BlockState Block);
 	}
 	namespace PlayerHead
 	{
@@ -15502,7 +15502,7 @@ namespace Block
 			else return 6565;
 		}
 		BlockState PlayerHead();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace PlayerWallHead
 	{
@@ -15514,7 +15514,7 @@ namespace Block
 			else return 6569;
 		}
 		BlockState PlayerWallHead();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Podzol
 	{
@@ -15524,7 +15524,7 @@ namespace Block
 			else return 13;
 		}
 		BlockState Podzol();
-		bool Snowy(BlockState ID);
+		bool Snowy(BlockState Block);
 	}
 	namespace PolishedAndesite
 	{
@@ -15548,7 +15548,7 @@ namespace Block
 			else return 10860;
 		}
 		BlockState PolishedAndesiteSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace PolishedAndesiteStairs
 	{
@@ -15621,9 +15621,9 @@ namespace Block
 					else return 10708;
 		}
 		BlockState PolishedAndesiteStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace PolishedBasalt
 	{
@@ -15640,7 +15640,7 @@ namespace Block
 			else return 4007;
 		}
 		BlockState PolishedBasalt();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace PolishedBlackstone
 	{
@@ -15664,7 +15664,7 @@ namespace Block
 			else return 16259;
 		}
 		BlockState PolishedBlackstoneBrickSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace PolishedBlackstoneBrickStairs
 	{
@@ -15737,9 +15737,9 @@ namespace Block
 					else return 16339;
 		}
 		BlockState PolishedBlackstoneBrickStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace PolishedBlackstoneBrickWall
 	{
@@ -16026,11 +16026,11 @@ namespace Block
 							else return 16663;
 		}
 		BlockState PolishedBlackstoneBrickWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace PolishedBlackstoneBricks
 	{
@@ -16090,9 +16090,9 @@ namespace Block
 					else return 16776;
 		}
 		BlockState PolishedBlackstoneButton();
-		enum Face Face(BlockState ID);
-		eBlockFace Facing(BlockState ID);
-		bool Powered(BlockState ID);
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace PolishedBlackstonePressurePlate
 	{
@@ -16102,7 +16102,7 @@ namespace Block
 			else return 16752;
 		}
 		BlockState PolishedBlackstonePressurePlate();
-		bool Powered(BlockState ID);
+		bool Powered(BlockState Block);
 	}
 	namespace PolishedBlackstoneSlab
 	{
@@ -16119,7 +16119,7 @@ namespace Block
 			else return 16750;
 		}
 		BlockState PolishedBlackstoneSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace PolishedBlackstoneStairs
 	{
@@ -16192,9 +16192,9 @@ namespace Block
 					else return 16744;
 		}
 		BlockState PolishedBlackstoneStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace PolishedBlackstoneWall
 	{
@@ -16481,11 +16481,11 @@ namespace Block
 							else return 17100;
 		}
 		BlockState PolishedBlackstoneWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace PolishedDiorite
 	{
@@ -16509,7 +16509,7 @@ namespace Block
 			else return 10812;
 		}
 		BlockState PolishedDioriteSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace PolishedDioriteStairs
 	{
@@ -16582,9 +16582,9 @@ namespace Block
 					else return 9988;
 		}
 		BlockState PolishedDioriteStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace PolishedGranite
 	{
@@ -16608,7 +16608,7 @@ namespace Block
 			else return 10794;
 		}
 		BlockState PolishedGraniteSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace PolishedGraniteStairs
 	{
@@ -16681,9 +16681,9 @@ namespace Block
 					else return 9748;
 		}
 		BlockState PolishedGraniteStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace Poppy
 	{
@@ -16706,7 +16706,7 @@ namespace Block
 			else return 6345;
 		}
 		BlockState Potatoes();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace PottedAcaciaSapling
 	{
@@ -16940,8 +16940,8 @@ namespace Block
 				else return 1316;
 		}
 		BlockState PoweredRail();
-		bool Powered(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		bool Powered(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace Prismarine
 	{
@@ -16965,7 +16965,7 @@ namespace Block
 			else return 7855;
 		}
 		BlockState PrismarineBrickSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace PrismarineBrickStairs
 	{
@@ -17038,9 +17038,9 @@ namespace Block
 					else return 7763;
 		}
 		BlockState PrismarineBrickStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace PrismarineBricks
 	{
@@ -17064,7 +17064,7 @@ namespace Block
 			else return 7849;
 		}
 		BlockState PrismarineSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace PrismarineStairs
 	{
@@ -17137,9 +17137,9 @@ namespace Block
 					else return 7683;
 		}
 		BlockState PrismarineStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace PrismarineWall
 	{
@@ -17426,11 +17426,11 @@ namespace Block
 							else return 11514;
 		}
 		BlockState PrismarineWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Pumpkin
 	{
@@ -17453,7 +17453,7 @@ namespace Block
 			else return 4779;
 		}
 		BlockState PumpkinStem();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace PurpleBanner
 	{
@@ -17477,7 +17477,7 @@ namespace Block
 			else return 8072;
 		}
 		BlockState PurpleBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace PurpleBed
 	{
@@ -17518,9 +17518,9 @@ namespace Block
 					else return 1224;
 		}
 		BlockState PurpleBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace PurpleCarpet
 	{
@@ -17553,7 +17553,7 @@ namespace Block
 			else return 9417;
 		}
 		BlockState PurpleGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace PurpleShulkerBox
 	{
@@ -17567,7 +17567,7 @@ namespace Block
 			else return 9343;
 		}
 		BlockState PurpleShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace PurpleStainedGlass
 	{
@@ -17612,10 +17612,10 @@ namespace Block
 						else return 7214;
 		}
 		BlockState PurpleStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace PurpleTerracotta
 	{
@@ -17634,7 +17634,7 @@ namespace Block
 			else return 8196;
 		}
 		BlockState PurpleWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace PurpleWool
 	{
@@ -17665,7 +17665,7 @@ namespace Block
 			else return 9137;
 		}
 		BlockState PurpurPillar();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace PurpurSlab
 	{
@@ -17682,7 +17682,7 @@ namespace Block
 			else return 8413;
 		}
 		BlockState PurpurSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace PurpurStairs
 	{
@@ -17755,9 +17755,9 @@ namespace Block
 					else return 9217;
 		}
 		BlockState PurpurStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace QuartzBlock
 	{
@@ -17788,7 +17788,7 @@ namespace Block
 			else return 6742;
 		}
 		BlockState QuartzPillar();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace QuartzSlab
 	{
@@ -17805,7 +17805,7 @@ namespace Block
 			else return 8395;
 		}
 		BlockState QuartzSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace QuartzStairs
 	{
@@ -17878,9 +17878,9 @@ namespace Block
 					else return 6822;
 		}
 		BlockState QuartzStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace Rail
 	{
@@ -17911,7 +17911,7 @@ namespace Block
 			else return 3654;
 		}
 		BlockState Rail();
-		enum Shape Shape(BlockState ID);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace RedBanner
 	{
@@ -17935,7 +17935,7 @@ namespace Block
 			else return 8136;
 		}
 		BlockState RedBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace RedBed
 	{
@@ -17976,9 +17976,9 @@ namespace Block
 					else return 1288;
 		}
 		BlockState RedBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace RedCarpet
 	{
@@ -18011,7 +18011,7 @@ namespace Block
 			else return 9433;
 		}
 		BlockState RedGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace RedMushroom
 	{
@@ -18152,12 +18152,12 @@ namespace Block
 								else return 4632;
 		}
 		BlockState RedMushroomBlock();
-		bool Down(BlockState ID);
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool Up(BlockState ID);
-		bool West(BlockState ID);
+		bool Down(BlockState Block);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool Up(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace RedNetherBrickSlab
 	{
@@ -18174,7 +18174,7 @@ namespace Block
 			else return 10854;
 		}
 		BlockState RedNetherBrickSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace RedNetherBrickStairs
 	{
@@ -18247,9 +18247,9 @@ namespace Block
 					else return 10628;
 		}
 		BlockState RedNetherBrickStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace RedNetherBrickWall
 	{
@@ -18536,11 +18536,11 @@ namespace Block
 							else return 13782;
 		}
 		BlockState RedNetherBrickWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace RedNetherBricks
 	{
@@ -18578,7 +18578,7 @@ namespace Block
 			else return 8401;
 		}
 		BlockState RedSandstoneSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace RedSandstoneStairs
 	{
@@ -18651,9 +18651,9 @@ namespace Block
 					else return 8299;
 		}
 		BlockState RedSandstoneStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace RedSandstoneWall
 	{
@@ -18940,11 +18940,11 @@ namespace Block
 							else return 11838;
 		}
 		BlockState RedSandstoneWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace RedShulkerBox
 	{
@@ -18958,7 +18958,7 @@ namespace Block
 			else return 9367;
 		}
 		BlockState RedShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace RedStainedGlass
 	{
@@ -19003,10 +19003,10 @@ namespace Block
 						else return 7342;
 		}
 		BlockState RedStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace RedTerracotta
 	{
@@ -19032,7 +19032,7 @@ namespace Block
 			else return 8212;
 		}
 		BlockState RedWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace RedWool
 	{
@@ -19056,7 +19056,7 @@ namespace Block
 			else return 5157;
 		}
 		BlockState RedstoneLamp();
-		bool Lit(BlockState ID);
+		bool Lit(BlockState Block);
 	}
 	namespace RedstoneOre
 	{
@@ -19066,7 +19066,7 @@ namespace Block
 			else return 3886;
 		}
 		BlockState RedstoneOre();
-		bool Lit(BlockState ID);
+		bool Lit(BlockState Block);
 	}
 	namespace RedstoneTorch
 	{
@@ -19076,7 +19076,7 @@ namespace Block
 			else return 3888;
 		}
 		BlockState RedstoneTorch();
-		bool Lit(BlockState ID);
+		bool Lit(BlockState Block);
 	}
 	namespace RedstoneWallTorch
 	{
@@ -19096,8 +19096,8 @@ namespace Block
 				else return 3896;
 		}
 		BlockState RedstoneWallTorch();
-		eBlockFace Facing(BlockState ID);
-		bool Lit(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Lit(BlockState Block);
 	}
 	namespace RedstoneWire
 	{
@@ -21013,11 +21013,11 @@ namespace Block
 							else return 3353;
 		}
 		BlockState RedstoneWire();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		unsigned char Power(BlockState ID);
-		enum South South(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		unsigned char Power(BlockState Block);
+		enum South South(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Repeater
 	{
@@ -21141,10 +21141,10 @@ namespace Block
 						else return 4094;
 		}
 		BlockState Repeater();
-		unsigned char Delay(BlockState ID);
-		eBlockFace Facing(BlockState ID);
-		bool Locked(BlockState ID);
-		bool Powered(BlockState ID);
+		unsigned char Delay(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Locked(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace RepeatingCommandBlock
 	{
@@ -21166,8 +21166,8 @@ namespace Block
 				else return 9236;
 		}
 		BlockState RepeatingCommandBlock();
-		bool Conditional(BlockState ID);
-		eBlockFace Facing(BlockState ID);
+		bool Conditional(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace RespawnAnchor
 	{
@@ -21180,7 +21180,7 @@ namespace Block
 			else return 15833;
 		}
 		BlockState RespawnAnchor();
-		unsigned char Charges(BlockState ID);
+		unsigned char Charges(BlockState Block);
 	}
 	namespace RoseBush
 	{
@@ -21195,7 +21195,7 @@ namespace Block
 			else return 7890;
 		}
 		BlockState RoseBush();
-		enum Half Half(BlockState ID);
+		enum Half Half(BlockState Block);
 	}
 	namespace Sand
 	{
@@ -21226,7 +21226,7 @@ namespace Block
 			else return 8353;
 		}
 		BlockState SandstoneSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace SandstoneStairs
 	{
@@ -21299,9 +21299,9 @@ namespace Block
 					else return 5249;
 		}
 		BlockState SandstoneStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace SandstoneWall
 	{
@@ -21588,11 +21588,11 @@ namespace Block
 							else return 14106;
 		}
 		BlockState SandstoneWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace Scaffolding
 	{
@@ -21618,8 +21618,8 @@ namespace Block
 				else return 14786;
 		}
 		BlockState Scaffolding();
-		bool Bottom(BlockState ID);
-		unsigned char Distance(BlockState ID);
+		bool Bottom(BlockState Block);
+		unsigned char Distance(BlockState Block);
 	}
 	namespace SeaLantern
 	{
@@ -21638,7 +21638,7 @@ namespace Block
 			else return 9647;
 		}
 		BlockState SeaPickle();
-		unsigned char Pickles(BlockState ID);
+		unsigned char Pickles(BlockState Block);
 	}
 	namespace Seagrass
 	{
@@ -21666,7 +21666,7 @@ namespace Block
 			else return 9277;
 		}
 		BlockState ShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace SkeletonSkull
 	{
@@ -21690,7 +21690,7 @@ namespace Block
 			else return 6505;
 		}
 		BlockState SkeletonSkull();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace SkeletonWallSkull
 	{
@@ -21702,7 +21702,7 @@ namespace Block
 			else return 6509;
 		}
 		BlockState SkeletonWallSkull();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace SlimeBlock
 	{
@@ -21736,8 +21736,8 @@ namespace Block
 				else return 14810;
 		}
 		BlockState Smoker();
-		eBlockFace Facing(BlockState ID);
-		bool Lit(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Lit(BlockState Block);
 	}
 	namespace SmoothQuartz
 	{
@@ -21761,7 +21761,7 @@ namespace Block
 			else return 10836;
 		}
 		BlockState SmoothQuartzSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace SmoothQuartzStairs
 	{
@@ -21834,9 +21834,9 @@ namespace Block
 					else return 10388;
 		}
 		BlockState SmoothQuartzStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace SmoothRedSandstone
 	{
@@ -21860,7 +21860,7 @@ namespace Block
 			else return 10800;
 		}
 		BlockState SmoothRedSandstoneSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace SmoothRedSandstoneStairs
 	{
@@ -21933,9 +21933,9 @@ namespace Block
 					else return 9828;
 		}
 		BlockState SmoothRedSandstoneStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace SmoothSandstone
 	{
@@ -21959,7 +21959,7 @@ namespace Block
 			else return 10830;
 		}
 		BlockState SmoothSandstoneSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace SmoothSandstoneStairs
 	{
@@ -22032,9 +22032,9 @@ namespace Block
 					else return 10308;
 		}
 		BlockState SmoothSandstoneStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace SmoothStone
 	{
@@ -22058,7 +22058,7 @@ namespace Block
 			else return 8347;
 		}
 		BlockState SmoothStoneSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace Snow
 	{
@@ -22074,7 +22074,7 @@ namespace Block
 			else return 3928;
 		}
 		BlockState Snow();
-		unsigned char Layers(BlockState ID);
+		unsigned char Layers(BlockState Block);
 	}
 	namespace SnowBlock
 	{
@@ -22117,9 +22117,9 @@ namespace Block
 					else return 14953;
 		}
 		BlockState SoulCampfire();
-		eBlockFace Facing(BlockState ID);
-		bool Lit(BlockState ID);
-		bool SignalFire(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Lit(BlockState Block);
+		bool SignalFire(BlockState Block);
 	}
 	namespace SoulFire
 	{
@@ -22136,7 +22136,7 @@ namespace Block
 			else return 14889;
 		}
 		BlockState SoulLantern();
-		bool Hanging(BlockState ID);
+		bool Hanging(BlockState Block);
 	}
 	namespace SoulSand
 	{
@@ -22169,7 +22169,7 @@ namespace Block
 			else return 4012;
 		}
 		BlockState SoulWallTorch();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Spawner
 	{
@@ -22236,9 +22236,9 @@ namespace Block
 					else return 6393;
 		}
 		BlockState SpruceButton();
-		enum Face Face(BlockState ID);
-		eBlockFace Facing(BlockState ID);
-		bool Powered(BlockState ID);
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace SpruceDoor
 	{
@@ -22380,11 +22380,11 @@ namespace Block
 							else return 8801;
 		}
 		BlockState SpruceDoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Hinge Hinge(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace SpruceFence
 	{
@@ -22422,10 +22422,10 @@ namespace Block
 						else return 8609;
 		}
 		BlockState SpruceFence();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace SpruceFenceGate
 	{
@@ -22493,10 +22493,10 @@ namespace Block
 						else return 8449;
 		}
 		BlockState SpruceFenceGate();
-		eBlockFace Facing(BlockState ID);
-		bool InWall(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace SpruceLeaves
 	{
@@ -22525,8 +22525,8 @@ namespace Block
 				else return 172;
 		}
 		BlockState SpruceLeaves();
-		unsigned char Distance(BlockState ID);
-		bool Persistent(BlockState ID);
+		unsigned char Distance(BlockState Block);
+		bool Persistent(BlockState Block);
 	}
 	namespace SpruceLog
 	{
@@ -22543,7 +22543,7 @@ namespace Block
 			else return 78;
 		}
 		BlockState SpruceLog();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace SprucePlanks
 	{
@@ -22560,7 +22560,7 @@ namespace Block
 			else return 3876;
 		}
 		BlockState SprucePressurePlate();
-		bool Powered(BlockState ID);
+		bool Powered(BlockState Block);
 	}
 	namespace SpruceSapling
 	{
@@ -22570,7 +22570,7 @@ namespace Block
 			else return 24;
 		}
 		BlockState SpruceSapling();
-		unsigned char Stage(BlockState ID);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace SpruceSign
 	{
@@ -22594,7 +22594,7 @@ namespace Block
 			else return 3444;
 		}
 		BlockState SpruceSign();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace SpruceSlab
 	{
@@ -22611,7 +22611,7 @@ namespace Block
 			else return 8311;
 		}
 		BlockState SpruceSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace SpruceStairs
 	{
@@ -22684,9 +22684,9 @@ namespace Block
 					else return 5483;
 		}
 		BlockState SpruceStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace SpruceTrapdoor
 	{
@@ -22759,10 +22759,10 @@ namespace Block
 						else return 4238;
 		}
 		BlockState SpruceTrapdoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace SpruceWallSign
 	{
@@ -22774,7 +22774,7 @@ namespace Block
 			else return 3750;
 		}
 		BlockState SpruceWallSign();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace SpruceWood
 	{
@@ -22791,7 +22791,7 @@ namespace Block
 			else return 114;
 		}
 		BlockState SpruceWood();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StickyPiston
 	{
@@ -22813,8 +22813,8 @@ namespace Block
 				else return 1340;
 		}
 		BlockState StickyPiston();
-		bool Extended(BlockState ID);
-		eBlockFace Facing(BlockState ID);
+		bool Extended(BlockState Block);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace Stone
 	{
@@ -22838,7 +22838,7 @@ namespace Block
 			else return 8383;
 		}
 		BlockState StoneBrickSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace StoneBrickStairs
 	{
@@ -22911,9 +22911,9 @@ namespace Block
 					else return 5011;
 		}
 		BlockState StoneBrickStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace StoneBrickWall
 	{
@@ -23200,11 +23200,11 @@ namespace Block
 							else return 12810;
 		}
 		BlockState StoneBrickWall();
-		enum East East(BlockState ID);
-		enum North North(BlockState ID);
-		enum South South(BlockState ID);
-		bool Up(BlockState ID);
-		enum West West(BlockState ID);
+		enum East East(BlockState Block);
+		enum North North(BlockState Block);
+		enum South South(BlockState Block);
+		bool Up(BlockState Block);
+		enum West West(BlockState Block);
 	}
 	namespace StoneBricks
 	{
@@ -23264,9 +23264,9 @@ namespace Block
 					else return 3920;
 		}
 		BlockState StoneButton();
-		enum Face Face(BlockState ID);
-		eBlockFace Facing(BlockState ID);
-		bool Powered(BlockState ID);
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace StonePressurePlate
 	{
@@ -23276,7 +23276,7 @@ namespace Block
 			else return 3808;
 		}
 		BlockState StonePressurePlate();
-		bool Powered(BlockState ID);
+		bool Powered(BlockState Block);
 	}
 	namespace StoneSlab
 	{
@@ -23293,7 +23293,7 @@ namespace Block
 			else return 8341;
 		}
 		BlockState StoneSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace StoneStairs
 	{
@@ -23366,9 +23366,9 @@ namespace Block
 					else return 10228;
 		}
 		BlockState StoneStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace Stonecutter
 	{
@@ -23380,7 +23380,7 @@ namespace Block
 			else return 14853;
 		}
 		BlockState Stonecutter();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace StrippedAcaciaLog
 	{
@@ -23397,7 +23397,7 @@ namespace Block
 			else return 102;
 		}
 		BlockState StrippedAcaciaLog();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedAcaciaWood
 	{
@@ -23414,7 +23414,7 @@ namespace Block
 			else return 141;
 		}
 		BlockState StrippedAcaciaWood();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedBirchLog
 	{
@@ -23431,7 +23431,7 @@ namespace Block
 			else return 96;
 		}
 		BlockState StrippedBirchLog();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedBirchWood
 	{
@@ -23448,7 +23448,7 @@ namespace Block
 			else return 135;
 		}
 		BlockState StrippedBirchWood();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedCrimsonHyphae
 	{
@@ -23465,7 +23465,7 @@ namespace Block
 			else return 14986;
 		}
 		BlockState StrippedCrimsonHyphae();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedCrimsonStem
 	{
@@ -23482,7 +23482,7 @@ namespace Block
 			else return 14980;
 		}
 		BlockState StrippedCrimsonStem();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedDarkOakLog
 	{
@@ -23499,7 +23499,7 @@ namespace Block
 			else return 105;
 		}
 		BlockState StrippedDarkOakLog();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedDarkOakWood
 	{
@@ -23516,7 +23516,7 @@ namespace Block
 			else return 144;
 		}
 		BlockState StrippedDarkOakWood();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedJungleLog
 	{
@@ -23533,7 +23533,7 @@ namespace Block
 			else return 99;
 		}
 		BlockState StrippedJungleLog();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedJungleWood
 	{
@@ -23550,7 +23550,7 @@ namespace Block
 			else return 138;
 		}
 		BlockState StrippedJungleWood();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedOakLog
 	{
@@ -23567,7 +23567,7 @@ namespace Block
 			else return 108;
 		}
 		BlockState StrippedOakLog();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedOakWood
 	{
@@ -23584,7 +23584,7 @@ namespace Block
 			else return 129;
 		}
 		BlockState StrippedOakWood();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedSpruceLog
 	{
@@ -23601,7 +23601,7 @@ namespace Block
 			else return 93;
 		}
 		BlockState StrippedSpruceLog();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedSpruceWood
 	{
@@ -23618,7 +23618,7 @@ namespace Block
 			else return 132;
 		}
 		BlockState StrippedSpruceWood();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedWarpedHyphae
 	{
@@ -23635,7 +23635,7 @@ namespace Block
 			else return 14969;
 		}
 		BlockState StrippedWarpedHyphae();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StrippedWarpedStem
 	{
@@ -23652,7 +23652,7 @@ namespace Block
 			else return 14963;
 		}
 		BlockState StrippedWarpedStem();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace StructureBlock
 	{
@@ -23671,7 +23671,7 @@ namespace Block
 			else return 15738;
 		}
 		BlockState StructureBlock();
-		enum Mode Mode(BlockState ID);
+		enum Mode Mode(BlockState Block);
 	}
 	namespace StructureVoid
 	{
@@ -23702,7 +23702,7 @@ namespace Block
 			else return 3963;
 		}
 		BlockState SugarCane();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace Sunflower
 	{
@@ -23717,7 +23717,7 @@ namespace Block
 			else return 7886;
 		}
 		BlockState Sunflower();
-		enum Half Half(BlockState ID);
+		enum Half Half(BlockState Block);
 	}
 	namespace SweetBerryBush
 	{
@@ -23729,7 +23729,7 @@ namespace Block
 			else return 14957;
 		}
 		BlockState SweetBerryBush();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace TNT
 	{
@@ -23739,7 +23739,7 @@ namespace Block
 			else return 1431;
 		}
 		BlockState TNT();
-		bool Unstable(BlockState ID);
+		bool Unstable(BlockState Block);
 	}
 	namespace TallGrass
 	{
@@ -23754,7 +23754,7 @@ namespace Block
 			else return 7894;
 		}
 		BlockState TallGrass();
-		enum Half Half(BlockState ID);
+		enum Half Half(BlockState Block);
 	}
 	namespace TallSeagrass
 	{
@@ -23769,7 +23769,7 @@ namespace Block
 			else return 1347;
 		}
 		BlockState TallSeagrass();
-		enum Half Half(BlockState ID);
+		enum Half Half(BlockState Block);
 	}
 	namespace Target
 	{
@@ -23793,7 +23793,7 @@ namespace Block
 			else return 15775;
 		}
 		BlockState Target();
-		unsigned char Power(BlockState ID);
+		unsigned char Power(BlockState Block);
 	}
 	namespace Terracotta
 	{
@@ -23837,8 +23837,8 @@ namespace Block
 				else return 6645;
 		}
 		BlockState TrappedChest();
-		eBlockFace Facing(BlockState ID);
-		enum Type Type(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Type Type(BlockState Block);
 	}
 	namespace Tripwire
 	{
@@ -24100,13 +24100,13 @@ namespace Block
 									else return 5402;
 		}
 		BlockState Tripwire();
-		bool Attached(BlockState ID);
-		bool Disarmed(BlockState ID);
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool Powered(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool Attached(BlockState Block);
+		bool Disarmed(BlockState Block);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool Powered(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace TripwireHook
 	{
@@ -24140,9 +24140,9 @@ namespace Block
 					else return 5274;
 		}
 		BlockState TripwireHook();
-		bool Attached(BlockState ID);
-		eBlockFace Facing(BlockState ID);
-		bool Powered(BlockState ID);
+		bool Attached(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace TubeCoral
 	{
@@ -24175,7 +24175,7 @@ namespace Block
 			else return 9607;
 		}
 		BlockState TubeCoralWallFan();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace TurtleEgg
 	{
@@ -24199,8 +24199,8 @@ namespace Block
 				else return 9509;
 		}
 		BlockState TurtleEgg();
-		unsigned char Eggs(BlockState ID);
-		unsigned char Hatch(BlockState ID);
+		unsigned char Eggs(BlockState Block);
+		unsigned char Hatch(BlockState Block);
 	}
 	namespace TwistingVines
 	{
@@ -24234,7 +24234,7 @@ namespace Block
 			else return 15042;
 		}
 		BlockState TwistingVines();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace TwistingVinesPlant
 	{
@@ -24311,11 +24311,11 @@ namespace Block
 							else return 4819;
 		}
 		BlockState Vine();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool Up(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool Up(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace VoidAir
 	{
@@ -24334,7 +24334,7 @@ namespace Block
 			else return 1439;
 		}
 		BlockState WallTorch();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace WarpedButton
 	{
@@ -24387,9 +24387,9 @@ namespace Block
 					else return 15526;
 		}
 		BlockState WarpedButton();
-		enum Face Face(BlockState ID);
-		eBlockFace Facing(BlockState ID);
-		bool Powered(BlockState ID);
+		enum Face Face(BlockState Block);
+		eBlockFace Facing(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace WarpedDoor
 	{
@@ -24531,11 +24531,11 @@ namespace Block
 							else return 15654;
 		}
 		BlockState WarpedDoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Hinge Hinge(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Hinge Hinge(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace WarpedFence
 	{
@@ -24573,10 +24573,10 @@ namespace Block
 						else return 15126;
 		}
 		BlockState WarpedFence();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace WarpedFenceGate
 	{
@@ -24644,10 +24644,10 @@ namespace Block
 						else return 15318;
 		}
 		BlockState WarpedFenceGate();
-		eBlockFace Facing(BlockState ID);
-		bool InWall(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool InWall(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace WarpedFungus
 	{
@@ -24671,7 +24671,7 @@ namespace Block
 			else return 14966;
 		}
 		BlockState WarpedHyphae();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace WarpedNylium
 	{
@@ -24695,7 +24695,7 @@ namespace Block
 			else return 15062;
 		}
 		BlockState WarpedPressurePlate();
-		bool Powered(BlockState ID);
+		bool Powered(BlockState Block);
 	}
 	namespace WarpedRoots
 	{
@@ -24726,7 +24726,7 @@ namespace Block
 			else return 15718;
 		}
 		BlockState WarpedSign();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace WarpedSlab
 	{
@@ -24743,7 +24743,7 @@ namespace Block
 			else return 15058;
 		}
 		BlockState WarpedSlab();
-		enum Type Type(BlockState ID);
+		enum Type Type(BlockState Block);
 	}
 	namespace WarpedStairs
 	{
@@ -24816,9 +24816,9 @@ namespace Block
 					else return 15478;
 		}
 		BlockState WarpedStairs();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		enum Shape Shape(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		enum Shape Shape(BlockState Block);
 	}
 	namespace WarpedStem
 	{
@@ -24835,7 +24835,7 @@ namespace Block
 			else return 14960;
 		}
 		BlockState WarpedStem();
-		enum Axis Axis(BlockState ID);
+		enum Axis Axis(BlockState Block);
 	}
 	namespace WarpedTrapdoor
 	{
@@ -24908,10 +24908,10 @@ namespace Block
 						else return 15254;
 		}
 		BlockState WarpedTrapdoor();
-		eBlockFace Facing(BlockState ID);
-		enum Half Half(BlockState ID);
-		bool Open(BlockState ID);
-		bool Powered(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		enum Half Half(BlockState Block);
+		bool Open(BlockState Block);
+		bool Powered(BlockState Block);
 	}
 	namespace WarpedWallSign
 	{
@@ -24923,7 +24923,7 @@ namespace Block
 			else return 15734;
 		}
 		BlockState WarpedWallSign();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace WarpedWartBlock
 	{
@@ -24954,7 +24954,7 @@ namespace Block
 			else return 49;
 		}
 		BlockState Water();
-		unsigned char Level(BlockState ID);
+		unsigned char Level(BlockState Block);
 	}
 	namespace WeepingVines
 	{
@@ -24988,7 +24988,7 @@ namespace Block
 			else return 15015;
 		}
 		BlockState WeepingVines();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace WeepingVinesPlant
 	{
@@ -25018,7 +25018,7 @@ namespace Block
 			else return 3364;
 		}
 		BlockState Wheat();
-		unsigned char Age(BlockState ID);
+		unsigned char Age(BlockState Block);
 	}
 	namespace WhiteBanner
 	{
@@ -25042,7 +25042,7 @@ namespace Block
 			else return 7912;
 		}
 		BlockState WhiteBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace WhiteBed
 	{
@@ -25083,9 +25083,9 @@ namespace Block
 					else return 1064;
 		}
 		BlockState WhiteBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace WhiteCarpet
 	{
@@ -25118,7 +25118,7 @@ namespace Block
 			else return 9377;
 		}
 		BlockState WhiteGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace WhiteShulkerBox
 	{
@@ -25132,7 +25132,7 @@ namespace Block
 			else return 9283;
 		}
 		BlockState WhiteShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace WhiteStainedGlass
 	{
@@ -25177,10 +25177,10 @@ namespace Block
 						else return 6894;
 		}
 		BlockState WhiteStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace WhiteTerracotta
 	{
@@ -25206,7 +25206,7 @@ namespace Block
 			else return 8156;
 		}
 		BlockState WhiteWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace WhiteWool
 	{
@@ -25244,7 +25244,7 @@ namespace Block
 			else return 6525;
 		}
 		BlockState WitherSkeletonSkull();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace WitherSkeletonWallSkull
 	{
@@ -25256,7 +25256,7 @@ namespace Block
 			else return 6529;
 		}
 		BlockState WitherSkeletonWallSkull();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace YellowBanner
 	{
@@ -25280,7 +25280,7 @@ namespace Block
 			else return 7976;
 		}
 		BlockState YellowBanner();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace YellowBed
 	{
@@ -25321,9 +25321,9 @@ namespace Block
 					else return 1128;
 		}
 		BlockState YellowBed();
-		eBlockFace Facing(BlockState ID);
-		bool Occupied(BlockState ID);
-		enum Part Part(BlockState ID);
+		eBlockFace Facing(BlockState Block);
+		bool Occupied(BlockState Block);
+		enum Part Part(BlockState Block);
 	}
 	namespace YellowCarpet
 	{
@@ -25356,7 +25356,7 @@ namespace Block
 			else return 9393;
 		}
 		BlockState YellowGlazedTerracotta();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace YellowShulkerBox
 	{
@@ -25370,7 +25370,7 @@ namespace Block
 			else return 9307;
 		}
 		BlockState YellowShulkerBox();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace YellowStainedGlass
 	{
@@ -25415,10 +25415,10 @@ namespace Block
 						else return 7022;
 		}
 		BlockState YellowStainedGlassPane();
-		bool East(BlockState ID);
-		bool North(BlockState ID);
-		bool South(BlockState ID);
-		bool West(BlockState ID);
+		bool East(BlockState Block);
+		bool North(BlockState Block);
+		bool South(BlockState Block);
+		bool West(BlockState Block);
 	}
 	namespace YellowTerracotta
 	{
@@ -25437,7 +25437,7 @@ namespace Block
 			else return 8172;
 		}
 		BlockState YellowWallBanner();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 	namespace YellowWool
 	{
@@ -25468,7 +25468,7 @@ namespace Block
 			else return 6545;
 		}
 		BlockState ZombieHead();
-		unsigned char Rotation(BlockState ID);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace ZombieWallHead
 	{
@@ -25480,6 +25480,6 @@ namespace Block
 			else return 6549;
 		}
 		BlockState ZombieWallHead();
-		eBlockFace Facing(BlockState ID);
+		eBlockFace Facing(BlockState Block);
 	}
 }
