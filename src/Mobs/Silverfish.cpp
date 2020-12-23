@@ -59,7 +59,7 @@ bool cSilverfish::DoTakeDamage(TakeDamageInfo &a_TDI)
 
 	// Search the faces of an increasingly large cube (so the positions closest get looked at first)
 	// of min 3, max 10, for infested blocks and spawn additional reinforcements:
-	for (int CubeSideLength = 3; CubeSideLength <= 10; CubeSideLength++)
+	for (int CubeSideLength = 3; CubeSideLength <= 10; CubeSideLength += 2)
 	{
 		const int HalfSide = CubeSideLength / 2;
 
