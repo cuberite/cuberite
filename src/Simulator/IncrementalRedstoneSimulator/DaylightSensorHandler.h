@@ -41,9 +41,6 @@ namespace DaylightSensorHandler
 	{
 		// LOGD("Evaluating Darryl the daylight sensor (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		// We don't need to update the daylight sensor often:
-		DataForChunk(a_Chunk).m_MechanismDelays[a_Position] = std::make_pair(10, bool());
-
 		// What the sensor should output according to the time-power function.
 		const auto PowerLevel = GetPowerLevel(a_Chunk, a_Position);
 
