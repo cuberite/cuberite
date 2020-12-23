@@ -262,8 +262,7 @@ cWorld::cWorld(
 	m_BroadcastDeathMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastDeathMessages", true);
 	m_BroadcastAchievementMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastAchievementMessages", true);
 
-	const auto ClientViewDistance = IniFile.GetValueSetI("SpawnPosition", "MaxViewDistance", static_cast<int>(cClientHandle::DEFAULT_VIEW_DISTANCE));
-	m_MaxViewDistance = static_cast<unsigned>(std::clamp(ClientViewDistance, static_cast<int>(cClientHandle::MIN_VIEW_DISTANCE), static_cast<int>(cClientHandle::MAX_VIEW_DISTANCE)));
+	SetMaxViewDistance(IniFile.GetValueSetI("SpawnPosition", "MaxViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE));
 
 	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
 	int KeyNum = IniFile.FindKey("SpawnPosition");
@@ -1840,7 +1839,7 @@ bool cWorld::SetAreaBiome(const cCuboid & a_Area, EMCSBiome a_Biome)
 
 
 
-void cWorld::SetMaxViewDistance(unsigned a_MaxViewDistance)
+void cWorld::SetMaxViewDistance(int a_MaxViewDistance)
 {
 	m_MaxViewDistance = Clamp(a_MaxViewDistance, cClientHandle::MIN_VIEW_DISTANCE, cClientHandle::MAX_VIEW_DISTANCE);
 }
