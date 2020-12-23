@@ -67,7 +67,7 @@ float cClientHandle::FASTBREAK_PERCENTAGE;
 ////////////////////////////////////////////////////////////////////////////////
 // cClientHandle:
 
-cClientHandle::cClientHandle(const AString & a_IPString, unsigned a_ViewDistance) :
+cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_LastSentDimension(dimNotSet),
 	m_ForgeHandshake(this),
 	m_CurrentViewDistance(a_ViewDistance),
@@ -473,7 +473,7 @@ bool cClientHandle::StreamNextChunk(void)
 	cCSLock Lock(m_CSChunkLists);
 
 	// High priority: Load the chunks that are in the view-direction of the player (with a radius of 3)
-	for (unsigned Range = 0; Range < m_CurrentViewDistance; Range++)
+	for (int Range = 0; Range < m_CurrentViewDistance; Range++)
 	{
 		Vector3d Vector = Position + LookVector * cChunkDef::Width * Range;
 
@@ -513,10 +513,8 @@ bool cClientHandle::StreamNextChunk(void)
 	}
 
 	// Low priority: Add all chunks that are in range. (From the center out to the edge)
-	for (unsigned Range = 0; Range <= m_CurrentViewDistance; ++Range)  // cycle through (square) distance, from nearest to furthest
+	for (int d = 0; d <= m_CurrentViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
 	{
-		const int d = static_cast<int>(Range);
-
 		// For each distance add chunks in a hollow square centered around current position:
 		cChunkCoordsList CurcleChunks;
 		for (int i = -d; i <= d; ++i)
@@ -3271,7 +3269,7 @@ void cClientHandle::SetUsername(const AString & a_Username)
 
 
 
-void cClientHandle::SetViewDistance(unsigned a_ViewDistance)
+void cClientHandle::SetViewDistance(int a_ViewDistance)
 {
 	m_RequestedViewDistance = a_ViewDistance;
 	LOGD("%s is requesting ViewDistance of %d!", GetUsername().c_str(), m_RequestedViewDistance);

@@ -214,20 +214,20 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	m_ShouldLoadOfflinePlayerData = a_Settings.GetValueSetB("PlayerData", "LoadOfflinePlayerData", false);
 	m_ShouldLoadNamedPlayerData   = a_Settings.GetValueSetB("PlayerData", "LoadNamedPlayerData", true);
 
-	const auto ClientViewDistance = a_Settings.GetValueSetI("Server", "DefaultViewDistance", static_cast<int>(cClientHandle::DEFAULT_VIEW_DISTANCE));
-	if (ClientViewDistance < static_cast<int>(cClientHandle::MIN_VIEW_DISTANCE))
+	const auto ClientViewDistance = a_Settings.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
+	if (ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
 	{
 		m_ClientViewDistance = cClientHandle::MIN_VIEW_DISTANCE;
 		LOGINFO("Setting default view distance to the minimum of %d", m_ClientViewDistance);
 	}
-	else if (ClientViewDistance > static_cast<int>(cClientHandle::MAX_VIEW_DISTANCE))
+	else if (ClientViewDistance > cClientHandle::MAX_VIEW_DISTANCE)
 	{
 		m_ClientViewDistance = cClientHandle::MAX_VIEW_DISTANCE;
 		LOGINFO("Setting default view distance to the maximum of %d", m_ClientViewDistance);
 	}
 	else
 	{
-		m_ClientViewDistance = static_cast<unsigned>(ClientViewDistance);
+		m_ClientViewDistance = ClientViewDistance;
 	}
 
 	PrepareKeys();
