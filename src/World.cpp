@@ -3459,7 +3459,6 @@ void cWorld::AddQueuedPlayers(void)
 		cClientHandle * Client = Player->GetClientHandle();
 		if (Client != nullptr)
 		{
-			Client->SendPlayerMoveLook();
 			Client->SendHealth();
 			Client->SendWholeInventory(*Player->GetWindow());
 
