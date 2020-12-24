@@ -2310,13 +2310,6 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 
 	m_ChunkMap.SetChunkData(a_SetChunkData);
 
-	// Initialize the entities (outside the m_ChunkMap's CS, to fix FS #347):
-	for (auto & Entity : a_SetChunkData.GetEntities())
-	{
-		auto EntityPtr = Entity.get();
-		EntityPtr->Initialize(std::move(Entity), *this);
-	}
-
 	// If a client is requesting this chunk, send it to them:
 	int ChunkX = a_SetChunkData.GetChunkX();
 	int ChunkZ = a_SetChunkData.GetChunkZ();
@@ -2337,14 +2330,6 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 			return true;
 		}
 	);
-
-	// Save the chunk right after generating, so that we don't have to generate it again on next run
-	// If saving is disabled, then the chunk was marked dirty so it will get
-	// saved if saving is later enabled.
-	if (a_SetChunkData.ShouldMarkDirty() && IsSavingEnabled())
-	{
-		m_Storage.QueueSaveChunk(ChunkX, ChunkZ);
-	}
 }
 
 

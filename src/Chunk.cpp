@@ -262,6 +262,9 @@ void cChunk::MarkLoadFailed(void)
 {
 	ASSERT(m_Presence == cpQueued);
 
+	// Mark dirty before generating, so that we get saved and don't have to later generate again:
+	MarkDirty();
+
 	// The chunk is always needed, generate it:
 	m_World->GetGenerator().QueueGenerateChunk({m_PosX, m_PosZ}, false);
 }
@@ -306,6 +309,25 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 
 	m_ChunkData.Assign(std::move(a_SetChunkData.GetChunkData()));
 	m_IsLightValid = a_SetChunkData.IsLightValid();
+
+	// Entities need some extra steps to destroy, so here we're keeping the old ones.
+	// Move the entities already in the chunk, including player entities, so that we don't lose any:
+	a_SetChunkData.GetEntities().insert(
+		a_SetChunkData.GetEntities().end(),
+		std::make_move_iterator(m_Entities.begin()),
+		std::make_move_iterator(m_Entities.end())
+	);
+
+	// Store the augmented result:
+	m_Entities = std::move(a_SetChunkData.GetEntities());
+
+	// Set all the entity variables again:
+	for (const auto & Entity : m_Entities)
+	{
+		Entity->SetWorld(m_World);
+		Entity->SetParentChunk(this);
+		Entity->SetIsTicking(true);
+	}
 
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
 	m_BlockEntities = std::move(a_SetChunkData.GetBlockEntities());
