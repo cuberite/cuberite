@@ -127,7 +127,6 @@ cClientHandle::~cClientHandle()
 		cWorld * World = m_Player->GetWorld();
 		if (World != nullptr)
 		{
-			RemoveFromAllChunks();
 			m_Player->GetWorld()->RemoveClientFromChunkSender(this);
 		}
 		// Send the Offline PlayerList packet:
@@ -627,32 +626,6 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::Priori
 			m_ChunksToSend.emplace(a_ChunkX, a_ChunkZ);
 		}
 		World->SendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, this);
-	}
-}
-
-
-
-
-
-void cClientHandle::RemoveFromAllChunks()
-{
-	cWorld * World = m_Player->GetWorld();
-	if (World != nullptr)
-	{
-		World->RemoveClientFromChunks(this);
-	}
-
-	{
-		// Reset all chunk lists:
-		cCSLock Lock(m_CSChunkLists);
-		m_LoadedChunks.clear();
-		m_ChunksToSend.clear();
-		m_SentChunks.clear();
-
-		// Also reset the LastStreamedChunk coords to bogus coords,
-		// so that all chunks are streamed in subsequent StreamChunks() call (FS #407)
-		m_LastStreamedChunkX = 0x7fffffff;
-		m_LastStreamedChunkZ = 0x7fffffff;
 	}
 }
 
@@ -2047,16 +2020,14 @@ void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 void cClientHandle::RemoveFromWorld(void)
 {
 	// Remove all associated chunks:
-	decltype(m_LoadedChunks) Chunks;
 	{
 		cCSLock Lock(m_CSChunkLists);
-		std::swap(Chunks, m_LoadedChunks);
+		m_LoadedChunks.clear();
 		m_ChunksToSend.clear();
+		m_SentChunks.clear();
 	}
-	for (auto && Chunk : Chunks)
-	{
-		SendUnloadChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ);
-	}  // for itr - Chunks[]
+
+	// No need to send Unload Chunk packets, the client unloads automatically.
 
 	// Here, we set last streamed values to bogus ones so everything is resent
 	m_LastStreamedChunkX = 0x7fffffff;

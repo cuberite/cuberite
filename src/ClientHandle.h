@@ -124,10 +124,6 @@ public:  // tolua_export
 	/** Remove all loaded chunks that are no longer in range */
 	void UnloadOutOfRangeChunks(void);
 
-	/** Removes the client from all chunks. Used when destroying the player.
-	When switching worlds, RemoveFromWorld does this function's job so it isn't called. */
-	void RemoveFromAllChunks(void);
-
 	inline bool IsLoggedIn(void) const { return (m_State >= csAuthenticating); }
 
 	/** Called while the client is being ticked from the world via its cPlayer object */
@@ -505,7 +501,6 @@ private:
 		csAuthenticating,        ///< The client has logged in, waiting for external authentication
 		csAuthenticated,         ///< The client has been authenticated, will start streaming chunks in the next tick
 		csDownloadingWorld,      ///< The client is waiting for chunks, we're waiting for the loader to provide and send them
-		csConfirmingPos,         ///< The client has been sent the position packet, waiting for them to repeat the position back
 		csPlaying,               ///< Normal gameplay
 		csKicked,                ///< Disconnect packet sent, awaiting connection closure
 		csQueuedForDestruction,  ///< The client will be destroyed in the next tick (flag set when socket closed)
