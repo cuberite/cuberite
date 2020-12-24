@@ -352,6 +352,11 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 	// Set the chunk data as valid. This may be needed for some simulators that perform actions upon block adding (Vaporize)
 	SetPresence(cpPresent);
 
+	if (a_SetChunkData.ShouldMarkDirty())
+	{
+		MarkDirty();
+	}
+
 	// Wake up all simulators for their respective blocks:
 	WakeUpSimulators();
 
@@ -371,9 +376,9 @@ void cChunk::SetLight(
 	// Postponing until we see how bad it is :)
 
 	m_ChunkData.SetBlockLight(a_BlockLight);
-
 	m_ChunkData.SetSkyLight(a_SkyLight);
 
+	MarkDirty();
 	m_IsLightValid = true;
 }
 

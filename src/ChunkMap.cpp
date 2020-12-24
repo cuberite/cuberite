@@ -245,11 +245,6 @@ void cChunkMap::SetChunkData(cSetChunkData & a_SetChunkData)
 		ASSERT(Chunk != nullptr);  // Chunk cannot have unloaded since it is marked as queued
 		Chunk->SetAllData(a_SetChunkData);
 
-		if (a_SetChunkData.ShouldMarkDirty())
-		{
-			Chunk->MarkDirty();
-		}
-
 		// Notify relevant ChunkStays:
 		cChunkStays ToBeDisabled;
 		for (cChunkStays::iterator itr = m_ChunkStays.begin(), end = m_ChunkStays.end(); itr != end; ++itr)
@@ -290,7 +285,6 @@ void cChunkMap::ChunkLighted(
 		return;
 	}
 	Chunk->SetLight(a_BlockLight, a_SkyLight);
-	Chunk->MarkDirty();
 }
 
 
