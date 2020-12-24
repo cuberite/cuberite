@@ -514,37 +514,37 @@ bool cClientHandle::StreamNextChunk(void)
 	// Low priority: Add all chunks that are in range. (From the center out to the edge)
 	for (int d = 0; d <= m_CurrentViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
 	{
-		// For each distance add chunks in a hollow square centered around current position:
-		cChunkCoordsList CurcleChunks;
-		for (int i = -d; i <= d; ++i)
+		const auto StreamIfUnloaded = [this, &Lock](const cChunkCoords Chunk)
 		{
-			CurcleChunks.push_back(cChunkCoords(ChunkPosX + d, ChunkPosZ + i));
-			CurcleChunks.push_back(cChunkCoords(ChunkPosX - d, ChunkPosZ + i));
-		}
-		for (int i = -d + 1; i < d; ++i)
-		{
-			CurcleChunks.push_back(cChunkCoords(ChunkPosX + i, ChunkPosZ + d));
-			CurcleChunks.push_back(cChunkCoords(ChunkPosX + i, ChunkPosZ - d));
-		}
-
-		// For each the CurcleChunks list and send the first unloaded chunk:
-		for (cChunkCoordsList::iterator itr = CurcleChunks.begin(), end = CurcleChunks.end(); itr != end; ++itr)
-		{
-			cChunkCoords Coords = *itr;
-
 			// If the chunk already loading / loaded -> skip
 			if (
-				(m_ChunksToSend.find(Coords) != m_ChunksToSend.end()) ||
-				(m_LoadedChunks.find(Coords) != m_LoadedChunks.end())
+				(m_ChunksToSend.find(Chunk) != m_ChunksToSend.end()) ||
+				(m_LoadedChunks.find(Chunk) != m_LoadedChunks.end())
 			)
 			{
-				continue;
+				return false;
 			}
 
 			// Unloaded chunk found -> Send it to the client.
 			Lock.Unlock();
-			StreamChunk(Coords.m_ChunkX, Coords.m_ChunkZ, cChunkSender::Priority::Low);
-			return false;
+			StreamChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, cChunkSender::Priority::Low);
+			return true;
+		};
+
+		// For each distance, send the first unloaded chunk in a hollow square centered around current position:
+		for (int i = -d; i <= d; ++i)
+		{
+			if (StreamIfUnloaded({ ChunkPosX + d, ChunkPosZ + i }) || StreamIfUnloaded({ ChunkPosX - d, ChunkPosZ + i }))
+			{
+				return false;
+			}
+		}
+		for (int i = -d + 1; i < d; ++i)
+		{
+			if (StreamIfUnloaded({ ChunkPosX + i, ChunkPosZ + d }) || StreamIfUnloaded({ ChunkPosX + i, ChunkPosZ - d }))
+			{
+				return false;
+			}
 		}
 	}
 
