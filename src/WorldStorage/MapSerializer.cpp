@@ -31,7 +31,8 @@ cMapSerializer::cMapSerializer(const AString & a_WorldName, cMap * a_Map):
 
 bool cMapSerializer::Load(void)
 {
-	cParsedNBT NBT(GZipFile::ReadRestOfFile(m_Path).GetView());
+	const auto Data = GZipFile::ReadRestOfFile(m_Path);
+	const cParsedNBT NBT(Data.GetView());
 
 	if (!NBT.IsValid())
 	{

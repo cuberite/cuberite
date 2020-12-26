@@ -128,8 +128,7 @@ public:
 	virtual AString GetAuthServerID(void) override { return m_AuthServerID; }
 
 	/** Compress the packet. a_Packet must be without packet length.
-	a_Compressed will be set to the compressed packet includes packet length and data length.
-	If compression fails, the function returns false. */
+	a_Compressed will be set to the compressed packet includes packet length and data length. */
 	static void CompressPacket(CircularBufferCompressor & a_Packet, ContiguousByteBuffer & a_Compressed);
 
 	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */

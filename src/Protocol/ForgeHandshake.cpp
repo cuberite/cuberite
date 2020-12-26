@@ -187,9 +187,9 @@ void cForgeHandshake::HandleClientHello(cClientHandle * a_Client, const Contiguo
 {
 	if (a_Data.size() == 2)
 	{
-		const auto FmlProtocolVersion = a_Data[1];
-
-		if (FmlProtocolVersion != std::byte(2))
+		const auto FmlProtocolVersion = static_cast<Int8>(a_Data[1]);
+		LOGD("Received ClientHello with FML protocol version %d", FmlProtocolVersion);
+		if (FmlProtocolVersion != 2)
 		{
 			SetError(Printf("Unsupported FML client protocol version received in ClientHello: %d", FmlProtocolVersion));
 		}
@@ -262,6 +262,8 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const Contigu
 	}
 
 	const auto Phase = static_cast<Int8>(a_Data[1]);
+	LOGD("Received client HandshakeAck with phase = %d", Phase);
+
 	switch (Phase)
 	{
 		case ClientPhase::WAITINGSERVERDATA:

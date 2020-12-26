@@ -308,8 +308,8 @@ template class SizeChecker<UInt8, 1>;
 
 namespace cpp20
 {
-	template<class T>
-	std::enable_if_t<std::is_array_v<T> && std::extent_v<T> == 0, std::unique_ptr<T>> make_unique_for_overwrite(std::size_t a_Size)
+	template <class T>
+	std::enable_if_t<std::is_array_v<T> && (std::extent_v<T> == 0), std::unique_ptr<T>> make_unique_for_overwrite(std::size_t a_Size)
 	{
 		return std::unique_ptr<T>(new std::remove_extent_t<T>[a_Size]);
 	}

@@ -18,7 +18,8 @@
 
 void cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, const std::string & a_FileName)
 {
-	const cParsedNBT NBT(GZipFile::ReadRestOfFile(a_FileName).GetView());
+	const auto Data = GZipFile::ReadRestOfFile(a_FileName);
+	const cParsedNBT NBT(Data.GetView());
 
 	if (!NBT.IsValid())
 	{

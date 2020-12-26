@@ -280,9 +280,7 @@ public:
 	inline AString GetString(int a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_String);
-		AString res;
-		res.assign(reinterpret_cast<const char *>(GetData(a_Tag)), GetDataLength(a_Tag));
-		return res;
+		return { reinterpret_cast<const char *>(GetData(a_Tag)), GetDataLength(a_Tag) };
 	}
 
 	/** Returns the value stored in a String tag. Not valid for any other tag type. */
@@ -301,7 +299,8 @@ public:
 	}
 
 protected:
-	const ContiguousByteBufferView m_Data;
+
+	ContiguousByteBufferView m_Data;
 	std::vector<cFastNBTTag> m_Tags;
 	eNBTParseError           m_Error;  // npSuccess if parsing succeeded
 

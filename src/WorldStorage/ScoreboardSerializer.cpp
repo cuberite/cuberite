@@ -32,7 +32,8 @@ bool cScoreboardSerializer::Load(void)
 {
 	try
 	{
-		cParsedNBT NBT(GZipFile::ReadRestOfFile(m_Path).GetView());
+		const auto Data = GZipFile::ReadRestOfFile(m_Path);
+		const cParsedNBT NBT(Data.GetView());
 
 		if (!NBT.IsValid())
 		{

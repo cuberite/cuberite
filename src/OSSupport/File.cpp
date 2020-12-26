@@ -283,7 +283,7 @@ int cFile::ReadRestOfFile(AString & a_Contents)
 
 	auto DataSize = static_cast<size_t>(TotalSize - Position);
 
-	a_Contents.assign(DataSize, '\0');  // TODO: investigate if worth hacking around std::string internals to avoid initialisation
+	a_Contents.resize(DataSize);  // TODO: investigate if worth hacking around std::string internals to avoid initialisation
 	return Read(a_Contents.data(), DataSize);
 }
 
