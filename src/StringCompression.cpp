@@ -86,7 +86,7 @@ Compression::Result Compression::Compressor::Compress(const void * const Input, 
 	auto DynamicCapacity = Result::StaticCapacity * 2;
 	while (true)
 	{
-		auto Dynamic = std::make_unique<Result::Dynamic::element_type[]>(DynamicCapacity);
+		auto Dynamic = cpp20::make_unique_for_overwrite<Result::Dynamic::element_type[]>(DynamicCapacity);
 		const auto BytesWrittenOut = Algorithm(m_Handle, Input, Size, Dynamic.get(), DynamicCapacity);
 
 		if (BytesWrittenOut != 0)
@@ -194,12 +194,11 @@ Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferVi
 		}
 	}
 
-	size_t DynamicCapacity = Result::StaticCapacity * 2;
-
+	auto DynamicCapacity = Result::StaticCapacity * 2;
 	while (true)
 	{
 		size_t BytesWrittenOut;
-		auto Dynamic = std::make_unique<Result::Dynamic::element_type[]>(DynamicCapacity);
+		auto Dynamic = cpp20::make_unique_for_overwrite<Result::Dynamic::element_type[]>(DynamicCapacity);
 
 		switch (Algorithm(m_Handle, Input.data(), Input.size(), Dynamic.get(), DynamicCapacity, &BytesWrittenOut))
 		{
@@ -232,7 +231,7 @@ Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferVi
 		}
 	}
 	else if (
-		auto Dynamic = std::make_unique<Result::Dynamic::element_type[]>(UncompressedSize);
+		auto Dynamic = cpp20::make_unique_for_overwrite<Result::Dynamic::element_type[]>(UncompressedSize);
 		Algorithm(m_Handle, Input.data(), Input.size(), Dynamic.get(), UncompressedSize, nullptr) == libdeflate_result::LIBDEFLATE_SUCCESS
 	)
 	{
