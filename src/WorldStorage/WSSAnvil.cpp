@@ -1339,7 +1339,7 @@ OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int 
 	int Type = a_NBT.FindChildByName(a_TagIdx, "EntityId");
 	if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_String))
 	{
-		const auto StatInfo = NamespaceSerializer::SplitNamespacedID(a_NBT.GetString(Type));
+		const auto StatInfo = NamespaceSerializer::SplitNamespacedID(a_NBT.GetStringView(Type));
 		if (StatInfo.first == NamespaceSerializer::Namespace::Unknown)
 		{
 			return nullptr;
