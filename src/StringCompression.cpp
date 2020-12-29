@@ -25,6 +25,7 @@ std::string_view Compression::Result::GetStringView() const
 
 ContiguousByteBufferView Compression::Result::GetView() const
 {
+	// Get a generic std::byte * to what the variant is currently storing:
 	return
 	{
 		std::visit([](const auto & Buffer) -> const std::byte *
@@ -73,6 +74,7 @@ Compression::Compressor::~Compressor()
 template <auto Algorithm>
 Compression::Result Compression::Compressor::Compress(const void * const Input, const size_t Size)
 {
+	// First see if the stack buffer has enough space:
 	{
 		Result::Static Buffer;
 		const auto BytesWrittenOut = Algorithm(m_Handle, Input, Size, Buffer.data(), Buffer.size());
@@ -82,6 +84,9 @@ Compression::Result Compression::Compressor::Compress(const void * const Input, 
 			return { Buffer, BytesWrittenOut };
 		}
 	}
+
+	// No it doesn't. Allocate space on the heap to write the compression result, increasing in powers of 2.
+	// This will either succeed, or except with bad_alloc.
 
 	auto DynamicCapacity = Result::StaticCapacity * 2;
 	while (true)
@@ -182,6 +187,7 @@ Compression::Result Compression::Extractor::ExtractZLib(ContiguousByteBufferView
 template <auto Algorithm>
 Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferView Input)
 {
+	// First see if the stack buffer has enough space:
 	{
 		Result::Static Buffer;
 		size_t BytesWrittenOut;
@@ -193,6 +199,8 @@ Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferVi
 			default: throw std::runtime_error("Data extraction failed.");
 		}
 	}
+
+	// No it doesn't. Allocate space on the heap to write the compression result, increasing in powers of 2.
 
 	auto DynamicCapacity = Result::StaticCapacity * 2;
 	while (true)
@@ -220,6 +228,7 @@ Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferVi
 template <auto Algorithm>
 Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferView Input, size_t UncompressedSize)
 {
+	// Here we have the expected size after extraction, so directly use a suitable buffer size:
 	if (UncompressedSize <= Result::StaticCapacity)
 	{
 		if (

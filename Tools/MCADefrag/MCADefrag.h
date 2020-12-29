@@ -14,6 +14,7 @@
 
 
 #include "OSSupport/IsThread.h"
+#include "StringCompression.h"
 
 
 
@@ -23,6 +24,7 @@
 class cMCADefrag
 {
 public:
+
 	enum
 	{
 		MAX_COMPRESSED_CHUNK_DATA_SIZE = (1 MiB),
@@ -39,6 +41,7 @@ public:
 	void Run(void);
 
 protected:
+
 	/** A single thread processing MCA files from the queue */
 	class cThread :
 		public cIsThread
@@ -46,9 +49,11 @@ protected:
 		typedef cIsThread super;
 
 	public:
+
 		cThread(cMCADefrag & a_Parent);
 
 	protected:
+
 		/** The compression methods, as specified by the MCA compression method byte. */
 		enum
 		{
@@ -80,6 +85,12 @@ protected:
 		/** Set to true when the chunk has been successfully uncompressed. Only used if recompression is active.
 		WriteChunk() tests this flag to decide whether to call Compress(). */
 		bool m_IsChunkUncompressed;
+
+		/** An instance of the compressor. */
+		Compression::Compressor m_Compressor;
+
+		/** An instance of the extractor. */
+		Compression::Extractor m_Extractor;
 
 
 		/** Processes the specified file. */

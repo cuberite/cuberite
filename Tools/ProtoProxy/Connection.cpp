@@ -801,6 +801,7 @@ bool cConnection::HandleClientHandshake(void)
 	ContiguousByteBuffer Pkt;
 	Packet.ReadAll(Pkt);
 	cByteBuffer ToServer(512);
+	ToServer.WriteVarInt32(static_cast<UInt32>(Pkt.size()));
 	ToServer.Write(Pkt.data(), Pkt.size());
 	SERVERSEND(ToServer);
 
@@ -2452,6 +2453,7 @@ bool cConnection::HandleServerStatusResponse(void)
 	ContiguousByteBuffer Pkt;
 	Packet.ReadAll(Pkt);
 	cByteBuffer ToClient(Response.size() + 50);
+	ToClient.WriteVarInt32(static_cast<UInt32>(Pkt.size()));
 	ToClient.Write(Pkt.data(), Pkt.size());
 	CLIENTSEND(ToClient);
 	return true;

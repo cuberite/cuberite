@@ -2121,7 +2121,7 @@ void cClientHandle::Tick(float a_Dt)
 	catch (const std::exception & Oops)
 	{
 		Kick(Oops.what());
-		return;
+		return;  // Return early to give a chance to send the kick packet before link shutdown
 	}
 
 	// If player has been kicked, terminate the connection:

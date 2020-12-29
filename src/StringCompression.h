@@ -20,6 +20,7 @@ struct libdeflate_decompressor;
 
 namespace Compression
 {
+	/** Contains the result of a compression or extraction operation. */
 	struct Result
 	{
 		using Static = std::array<std::byte, 128 KiB>;
@@ -27,17 +28,25 @@ namespace Compression
 
 		static constexpr size_t StaticCapacity = sizeof(Compression::Result::Static) / sizeof(Compression::Result::Static::value_type);
 
+		/** Returns a view (of type char) of the internal store. */
 		std::string_view GetStringView() const;
+
+		/** Returns a view (of type std::byte) of the internal store. */
 		ContiguousByteBufferView GetView() const;
 
+		/** A store allocated on either the stack or heap. */
 		std::variant<Static, Dynamic> Storage;
+
+		/** The length of valid data in the store. */
 		size_t Size;
 	};
 
+	/** Contains routines for data compression. */
 	class Compressor
 	{
 	public:
 
+		/** Creates a new compressor instance with a compression factor [0-12]. */
 		Compressor(int CompressionFactor = 6);
 		~Compressor();
 
@@ -53,10 +62,12 @@ namespace Compression
 		libdeflate_compressor * m_Handle;
 	};
 
+	/** Contains routines for data extraction. */
 	class Extractor
 	{
 	public:
 
+		/** Creates a new extractor instance. */
 		Extractor();
 		~Extractor();
 

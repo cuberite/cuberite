@@ -1765,17 +1765,6 @@ end
 					},
 					Notes = "Sets the locale that Cuberite keeps on record. Initially the locale is initialized in protocol handshake, this function allows plugins to override the stored value (but only server-side and only until the user disconnects).",
 				},
-				SetUsername =
-				{
-					Params =
-					{
-						{
-							Name = "Name",
-							Type = "string",
-						},
-					},
-					Notes = "Sets the username",
-				},
 				SetViewDistance =
 				{
 					Params =
@@ -14459,7 +14448,7 @@ end
 				dtMagma =
 				{
 					Notes = "Damage from contact with a magma block"
-				}, 
+				},
 				dtDrown =
 				{
 					Notes = "Damage received by drowning in water / lava"

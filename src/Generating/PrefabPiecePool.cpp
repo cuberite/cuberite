@@ -162,6 +162,29 @@ bool cPrefabPiecePool::LoadFromFile(const AString & a_FileName, bool a_LogWarnin
 
 bool cPrefabPiecePool::LoadFromString(const AString & a_Contents, const AString & a_FileName, bool a_LogWarnings)
 {
+	// If the contents start with GZip signature, ungzip and retry:
+	if (a_Contents.substr(0, 3) == "\x1f\x8b\x08")
+	{
+		try
+		{
+			const auto Extracted = Compression::Extractor().ExtractGZip(
+			{
+				reinterpret_cast<const std::byte *>(a_Contents.data()), a_Contents.size()
+			});
+
+			// Here we do an extra std::string conversion, hardly efficient, but...
+			// Better would be refactor into LoadFromByteView for the GZip decompression path, and getting cFile to support std::byte.
+			// ...so it'll do for now.
+
+			return LoadFromString(std::string(Extracted.GetStringView()), a_FileName, a_LogWarnings);
+		}
+		catch (const std::exception & Oops)
+		{
+			CONDWARNING(a_LogWarnings, "Failed to decompress Gzip data in file %s. %s", a_FileName.c_str(), Oops.what());
+			return false;
+		}
+	}
+
 	// Search the first 8 KiB of the file for the format auto-detection string:
 	const auto Header = a_Contents.substr(0, 8 KiB);
 	if (Header.find("CubesetFormatVersion =") != AString::npos)
