@@ -279,8 +279,7 @@ public:
 	/** Returns the value stored in a String tag. Not valid for any other tag type. */
 	inline AString GetString(int a_Tag) const
 	{
-		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_String);
-		return { reinterpret_cast<const char *>(GetData(a_Tag)), GetDataLength(a_Tag) };
+		return AString(GetStringView(a_Tag));
 	}
 
 	/** Returns the value stored in a String tag. Not valid for any other tag type. */
@@ -392,7 +391,3 @@ protected:
 		}
 	}
 } ;
-
-
-
-

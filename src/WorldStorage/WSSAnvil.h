@@ -65,7 +65,6 @@ protected:
 
 		bool GetChunkData  (const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data);
 		bool SetChunkData  (const cChunkCoords & a_Chunk, ContiguousByteBufferView a_Data);
-		// bool EraseChunkData(const cChunkCoords & a_Chunk);
 
 		int             GetRegionX (void) const {return m_RegionX; }
 		int             GetRegionZ (void) const {return m_RegionZ; }
@@ -87,7 +86,7 @@ protected:
 		// Chunk timestamps, following the chunk headers
 		unsigned m_TimeStamps[MCA_MAX_CHUNKS];
 
-		/** Finds a free location large enough to hold a_Data. Gets a hint of the chunk coords, places the data there if it fits. Returns the sector number. */
+		/** Finds a free location large enough to hold a_Data. Returns the sector number. */
 		unsigned FindFreeLocation(int a_LocalX, int a_LocalZ, size_t a_DataSize);
 
 		/** Opens a MCA file either for a Read operation (fails if doesn't exist) or for a Write operation (creates new if not found) */

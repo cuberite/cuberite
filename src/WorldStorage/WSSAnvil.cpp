@@ -315,8 +315,8 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const Contiguous
 {
 	try
 	{
-		const auto Compressed = m_Extractor.ExtractZLib(a_Data);
-		cParsedNBT NBT(Compressed.GetView());
+		const auto Extracted = m_Extractor.ExtractZLib(a_Data);
+		cParsedNBT NBT(Extracted.GetView());
 
 		if (!NBT.IsValid())
 		{
@@ -4101,7 +4101,3 @@ unsigned cWSSAnvil::cMCAFile::FindFreeLocation(int a_LocalX, int a_LocalZ, const
 	}  // for i - m_Header[]
 	return MaxLocation >> 8;
 }
-
-
-
-
