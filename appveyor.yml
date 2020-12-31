@@ -70,7 +70,6 @@ for:
       - job_name: Windows-x86
 
   before_build:
-  - del CMakeCache.txt
   - cmake -G "Visual Studio 16 2019" -A "Win32" ..
 
 ################################
