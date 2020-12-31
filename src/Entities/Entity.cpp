@@ -80,32 +80,6 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 
 
 
-cEntity::~cEntity()
-{
-	/*
-	// DEBUG:
-	FLOGD("Deleting entity {0} at pos {1:.2f} ~ [{2}, {3}]; ptr {4}",
-		m_UniqueID,
-		m_Pos,
-		GetChunkX(), GetChunkZ(),
-		static_cast<void *>(this)
-	);
-	*/
-
-	if (m_AttachedTo != nullptr)
-	{
-		Detach();
-	}
-	if (m_Attachee != nullptr)
-	{
-		m_Attachee->Detach();
-	}
-}
-
-
-
-
-
 const char * cEntity::GetClass(void) const
 {
 	return "cEntity";
@@ -174,7 +148,22 @@ void cEntity::OnAddToWorld(cWorld & a_World)
 
 void cEntity::OnRemoveFromWorld(cWorld & a_World)
 {
-	RemoveAllLeashedMobs();
+	// Remove all mobs from the leashed list of mobs:
+	while (!m_LeashedMobs.empty())
+	{
+		m_LeashedMobs.front()->Unleash(false, true);
+	}
+
+	if (m_AttachedTo != nullptr)
+	{
+		Detach();
+	}
+
+	if (m_Attachee != nullptr)
+	{
+		m_Attachee->Detach();
+	}
+
 	a_World.BroadcastDestroyEntity(*this);
 }
 
@@ -244,7 +233,6 @@ void cEntity::Destroy()
 		// Also, not storing the returned pointer means automatic destruction
 		VERIFY(a_World.RemoveEntity(*this));
 	});
-	Destroyed();
 }
 
 
@@ -813,10 +801,17 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 		cRoot::Get()->GetPluginManager()->CallHookKilled(*this, a_TDI, emptystring);
 	}
 
-	// Drop loot:
-	cItems Drops;
-	GetDrops(Drops, a_TDI.Attacker);
-	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
+	// Drop loot, unless the attacker was a creative mode player:
+	if (
+		(a_TDI.Attacker == nullptr) ||
+		!a_TDI.Attacker->IsPlayer() ||
+		!static_cast<cPlayer *>(a_TDI.Attacker)->IsGameModeCreative()
+	)
+	{
+		cItems Drops;
+		GetDrops(Drops, a_TDI.Attacker);
+		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
+	}
 
 	m_World->BroadcastEntityStatus(*this, esGenericDead);
 }
@@ -2322,18 +2317,6 @@ void cEntity::RemoveLeashedMob(cMonster * a_Monster)
 	ASSERT(std::find(m_LeashedMobs.begin(), m_LeashedMobs.end(), a_Monster) != m_LeashedMobs.end());
 
 	m_LeashedMobs.remove(a_Monster);
-}
-
-
-
-
-
-void cEntity::RemoveAllLeashedMobs()
-{
-	while (!m_LeashedMobs.empty())
-	{
-		m_LeashedMobs.front()->Unleash(false, true);
-	}
 }
 
 

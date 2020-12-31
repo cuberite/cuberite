@@ -54,6 +54,8 @@ public:
 
 	virtual ~cPlayer() override;
 
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
+
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
@@ -783,8 +785,6 @@ protected:
 
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
-
-	virtual void Destroyed(void) override;
 
 	/** Filters out damage for creative mode / friendly fire */
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;

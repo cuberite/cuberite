@@ -28,25 +28,6 @@ cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
 
 
 
-cPawn::~cPawn()
-{
-	ASSERT(m_TargetingMe.size() == 0);
-}
-
-
-
-
-
-void cPawn::Destroyed()
-{
-	StopEveryoneFromTargetingMe();
-	Super::Destroyed();
-}
-
-
-
-
-
 void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	std::vector<cEntityEffect *> EffectsToTick;
@@ -447,6 +428,16 @@ void cPawn::HandleFalling(void)
 	/* Note: it is currently possible to fall through lava and still die from fall damage
 	because of the client skipping an update about the lava block. This can only be resolved by
 	somehow integrating these above checks into the tracer in HandlePhysics. */
+}
+
+
+
+
+
+void cPawn::OnRemoveFromWorld(cWorld & a_World)
+{
+	StopEveryoneFromTargetingMe();
+	Super::OnRemoveFromWorld(a_World);
 }
 
 

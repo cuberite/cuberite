@@ -30,10 +30,4 @@ public:
 
 	/** When hit by someone, run away */
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
-
-	virtual void Destroyed(void) override;
 };
-
-
-
-

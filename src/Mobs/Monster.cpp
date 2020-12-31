@@ -135,17 +135,15 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 
 
 
-cMonster::~cMonster()
-{
-	ASSERT(GetTarget() == nullptr);
-}
-
-
-
-
-
 void cMonster::OnRemoveFromWorld(cWorld & a_World)
 {
+	SetTarget(nullptr);  // Tell them we're no longer targeting them.
+
+	if (m_LovePartner != nullptr)
+	{
+		m_LovePartner->ResetLoveMode();
+	}
+
 	if (IsLeashed())
 	{
 		cEntity * LeashedTo = GetLeashedTo();
@@ -159,20 +157,6 @@ void cMonster::OnRemoveFromWorld(cWorld & a_World)
 	}
 
 	Super::OnRemoveFromWorld(a_World);
-}
-
-
-
-
-
-void cMonster::Destroyed()
-{
-	SetTarget(nullptr);  // Tell them we're no longer targeting them.
-	if (m_LovePartner != nullptr)
-	{
-		m_LovePartner->ResetLoveMode();
-	}
-	Super::Destroyed();
 }
 
 
@@ -762,22 +746,14 @@ void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 	const auto MyHeadPosition = GetPosition().addedY(GetHeight());
 
 	// Enumerate all players within sight:
-	m_World->ForEachEntityInBox({ GetPosition(), m_SightDistance * 2.0 }, [this, &TargetPlayer, &ClosestDistance, MyHeadPosition](cEntity & a_Entity)
+	m_World->ForEachPlayer([this, &TargetPlayer, &ClosestDistance, MyHeadPosition](cPlayer & a_Player)
 	{
-		if (!a_Entity.IsPlayer())
-		{
-			// Continue iteration:
-			return false;
-		}
-
-		const auto Player = static_cast<cPlayer *>(&a_Entity);
-
-		if (!Player->CanMobsTarget())
+		if (!a_Player.CanMobsTarget())
 		{
 			return false;
 		}
 
-		const auto TargetHeadPosition = a_Entity.GetPosition().addedY(a_Entity.GetHeight());
+		const auto TargetHeadPosition = a_Player.GetPosition().addedY(a_Player.GetHeight());
 		const auto TargetDistance = (TargetHeadPosition - MyHeadPosition).SqrLength();
 
 		// TODO: Currently all mobs see through lava, but only Nether-native mobs should be able to.
@@ -786,7 +762,7 @@ void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 			cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, cLineBlockTracer::losAirWaterLava)
 		)
 		{
-			TargetPlayer = Player;
+			TargetPlayer = &a_Player;
 			ClosestDistance = TargetDistance;
 		}
 

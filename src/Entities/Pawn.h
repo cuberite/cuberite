@@ -23,8 +23,6 @@ public:
 	CLASS_PROTODEF(cPawn)
 
 	cPawn(eEntityType a_EntityType, double a_Width, double a_Height);
-	virtual ~cPawn() override;
-	virtual void Destroyed() override;
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
@@ -33,6 +31,7 @@ public:
 	virtual bool IsInvisible() const override;
 	virtual void HandleAir(void) override;
 	virtual void HandleFalling(void);
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 
 	/** Tells all pawns which are targeting us to stop targeting us. */
 	void StopEveryoneFromTargetingMe();
@@ -85,7 +84,3 @@ private:
 	/** A list of all monsters that are targeting this pawn. */
 	std::vector<cMonster*> m_TargetingMe;
 } ;  // tolua_export
-
-
-
-

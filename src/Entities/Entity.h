@@ -169,7 +169,7 @@ public:
 
 
 	cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, double a_Height);
-	virtual ~cEntity();
+	virtual ~cEntity() = default;
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
 	Adds the entity to the world. */
@@ -296,7 +296,7 @@ public:
 
 	// tolua_end
 	/** Destroys the entity, schedules it for memory freeing and broadcasts the DestroyEntity packet */
-	virtual void Destroy();
+	void Destroy();
 	// tolua_begin
 
 	/** Makes this pawn take damage from an attack by a_Attacker. Damage values are calculated automatically and DoTakeDamage() called */
@@ -594,9 +594,6 @@ public:
 	/** Removes a mob from the leashed list of mobs. */
 	void RemoveLeashedMob(cMonster * a_Monster);
 
-	/** Removes all mobs from the leashed list of mobs. */
-	void RemoveAllLeashedMobs();
-
 	/** Returs whether the entity has any mob leashed to it. */
 	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }
 
@@ -722,8 +719,6 @@ protected:
 	/** Handles the moving of this entity between worlds.
 	Should handle degenerate cases such as moving to the same world. */
 	virtual void DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo);
-
-	virtual void Destroyed(void) {}  // Called after the entity has been destroyed
 
 	/** Applies friction to an entity
 	@param a_Speed The speed vector to apply changes to
