@@ -82,7 +82,7 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
 
 	set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES UNITY_BUILD ${UNITY_BUILDS})
 else()
-	message(WARNING "Precompiled headers for FASTER BUILDS not enabled, upgrade to CMake 1.16 or newer!")
+	message(WARNING "Precompiled headers for FASTER BUILDS not enabled, upgrade to CMake 3.16 or newer!")
 endif()
 
 # Selectively disable warnings in the level where the target is created:
