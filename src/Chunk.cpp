@@ -767,6 +767,7 @@ void cChunk::MoveEntityToNewChunk(OwnedEntity a_Entity)
 	if (Neighbor == nullptr)
 	{
 		LOGWARNING("%s: Failed to move entity, destination chunk unreachable. Entity lost", __FUNCTION__);
+		a_Entity->OnRemoveFromWorld(*m_World);
 		return;
 	}
 
