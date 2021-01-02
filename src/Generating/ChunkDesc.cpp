@@ -573,12 +573,12 @@ void cChunkDesc::RandomFillRelCuboid(
 cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 {
 	auto Idx = static_cast<size_t>(cChunkDef::MakeIndex(a_RelX, a_RelY, a_RelZ));
-	auto itr = m_BlockEntities.find(Idx);
+	auto Iterator = m_BlockArea.GetBlockEntities().find(Idx);
 
-	if (itr != m_BlockEntities.end())
+	if (Iterator != m_BlockArea.GetBlockEntities().end())
 	{
 		// Already in the list:
-		cBlockEntity * BlockEntity = itr->second.get();
+		cBlockEntity * BlockEntity = Iterator->second.get();
 		if (BlockEntity->GetBlockType() == GetBlockType(a_RelX, a_RelY, a_RelZ))
 		{
 			// Correct type, already present. Return it:
@@ -587,7 +587,7 @@ cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 		else
 		{
 			// Wrong type, the block type has been overwritten. Erase and create new:
-			m_BlockEntities.erase(itr);
+			m_BlockArea.GetBlockEntities().erase(Iterator);
 		}
 	}
 
@@ -595,13 +595,13 @@ cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 	int AbsZ = a_RelZ + m_Coords.m_ChunkZ * cChunkDef::Width;
 
 	// The block entity is not created yet, try to create it and add to list:
-	auto be = cBlockEntity::CreateByBlockType(GetBlockType(a_RelX, a_RelY, a_RelZ), GetBlockMeta(a_RelX, a_RelY, a_RelZ), {AbsX, a_RelY, AbsZ});
-	if (be == nullptr)
+	auto BlockEntity = cBlockEntity::CreateByBlockType(GetBlockType(a_RelX, a_RelY, a_RelZ), GetBlockMeta(a_RelX, a_RelY, a_RelZ), {AbsX, a_RelY, AbsZ});
+	if (BlockEntity == nullptr)
 	{
 		// No block entity for this block type
 		return nullptr;
 	}
-	auto res = m_BlockEntities.emplace(Idx, std::move(be));
+	auto res = m_BlockArea.GetBlockEntities().emplace(Idx, std::move(BlockEntity));
 	return res.first->second.get();
 }
 

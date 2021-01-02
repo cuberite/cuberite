@@ -83,7 +83,7 @@ cSetChunkData::cSetChunkData(
 		m_AreBiomesValid = true;
 	}
 
-	// Move entities and blockentities:
+	// Move entities and block entities:
 	m_Entities = std::move(a_Entities);
 	m_BlockEntities = std::move(a_BlockEntities);
 }
@@ -94,7 +94,7 @@ cSetChunkData::cSetChunkData(
 
 void cSetChunkData::CalculateHeightMap(void)
 {
-	// Find the heighest present section in the chunk
+	// Find the highest present section in the chunk
 	size_t MaxSection = 0;
 	for (size_t i = cChunkData::NumSections - 1; i != 0; --i)
 	{
