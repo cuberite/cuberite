@@ -43,7 +43,7 @@ public:  // tolua_export
 	// tolua_end
 
 	// cBlockEntity overrides:
-	virtual void Destroy(void) override;
+	virtual cItems ConvertToPickups() const override;
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;

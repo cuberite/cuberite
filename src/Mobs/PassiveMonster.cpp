@@ -37,15 +37,6 @@ bool cPassiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cPassiveMonster::Destroyed()
-{
-	Super::Destroyed();
-}
-
-
-
-
-
 void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);

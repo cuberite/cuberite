@@ -280,10 +280,9 @@ cPlayer::~cPlayer(void)
 
 
 
-void cPlayer::Destroyed()
+void cPlayer::OnRemoveFromWorld(cWorld & a_World)
 {
 	CloseWindow(false);
-	Super::Destroyed();
 }
 
 

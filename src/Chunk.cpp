@@ -220,6 +220,12 @@ void cChunk::OnUnload()
 		// Notify the entity:
 		Entity->OnRemoveFromWorld(*Entity->GetWorld());
 	}
+
+	// Notify all block entities of imminent unload:
+	for (auto & BlockEntity : m_BlockEntities)
+	{
+		BlockEntity.second->OnRemoveFromWorld();
+	}
 }
 
 
@@ -452,6 +458,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 		if (affectedArea.IsInside(itr->second->GetPos()))
 		{
 			itr->second->Destroy();
+			itr->second->OnRemoveFromWorld();
 			itr = m_BlockEntities.erase(itr);
 		}
 		else
@@ -760,6 +767,7 @@ void cChunk::MoveEntityToNewChunk(OwnedEntity a_Entity)
 	if (Neighbor == nullptr)
 	{
 		LOGWARNING("%s: Failed to move entity, destination chunk unreachable. Entity lost", __FUNCTION__);
+		a_Entity->OnRemoveFromWorld(*m_World);
 		return;
 	}
 
@@ -1267,6 +1275,7 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 	if (BlockEntity != nullptr)
 	{
 		BlockEntity->Destroy();
+		BlockEntity->OnRemoveFromWorld();
 		RemoveBlockEntity(BlockEntity);
 	}
 

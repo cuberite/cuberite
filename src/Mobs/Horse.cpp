@@ -32,19 +32,6 @@ cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
 
 
 
-cHorse::~cHorse()
-{
-	auto Window = GetWindow();
-	if (Window != nullptr)
-	{
-		Window->OwnerDestroyed();
-	}
-}
-
-
-
-
-
 void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
@@ -117,6 +104,21 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		m_World->BroadcastEntityMetadata(*this);
 	}
+}
+
+
+
+
+
+void cHorse::OnRemoveFromWorld(cWorld & a_World)
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		Window->OwnerDestroyed();
+	}
+
+	Super::OnRemoveFromWorld(a_World);
 }
 
 
