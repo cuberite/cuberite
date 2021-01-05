@@ -340,6 +340,63 @@ bool cChunkMap::IsChunkQueued(int a_ChunkX, int a_ChunkZ) const
 
 
 
+bool cChunkMap::IsWeatherSunnyAt(int a_BlockX, int a_BlockZ) const
+{
+	int ChunkX, ChunkZ, BlockY = 0;
+	cChunkDef::AbsoluteToRelative(a_BlockX, BlockY, a_BlockZ, ChunkX, ChunkZ);
+
+	cCSLock Lock(m_CSChunks);
+	const auto Chunk = FindChunk(ChunkX, ChunkZ);
+	if ((Chunk == nullptr) || !Chunk->IsValid())
+	{
+		return m_World->IsWeatherSunny();
+	}
+
+	return Chunk->IsWeatherSunnyAt(a_BlockX, a_BlockZ);
+}
+
+
+
+
+
+bool cChunkMap::IsWeatherWetAt(int a_BlockX, int a_BlockZ) const
+{
+	int ChunkX, ChunkZ, BlockY = 0;
+	cChunkDef::AbsoluteToRelative(a_BlockX, BlockY, a_BlockZ, ChunkX, ChunkZ);
+
+	cCSLock Lock(m_CSChunks);
+	const auto Chunk = FindChunk(ChunkX, ChunkZ);
+	if ((Chunk == nullptr) || !Chunk->IsValid())
+	{
+		return m_World->IsWeatherWet();
+	}
+
+	return Chunk->IsWeatherWetAt(a_BlockX, a_BlockZ);
+}
+
+
+
+
+
+bool cChunkMap::IsWeatherWetAt(const Vector3i a_Position) const
+{
+	const auto ChunkPosition = cChunkDef::BlockToChunk(a_Position);
+	const auto Position = cChunkDef::AbsoluteToRelative(a_Position, ChunkPosition);
+
+	cCSLock Lock(m_CSChunks);
+	const auto Chunk = FindChunk(ChunkPosition.m_ChunkX, ChunkPosition.m_ChunkZ);
+	if ((Chunk == nullptr) || !Chunk->IsValid())
+	{
+		return m_World->IsWeatherWet();
+	}
+
+	return Chunk->IsWeatherWetAt(Position);
+}
+
+
+
+
+
 bool cChunkMap::IsChunkValid(int a_ChunkX, int a_ChunkZ) const
 {
 	cCSLock Lock(m_CSChunks);
@@ -650,10 +707,7 @@ EMCSBiome cChunkMap::GetBiomeAt(int a_BlockX, int a_BlockZ) const
 	{
 		return Chunk->GetBiomeAt(X, Z);
 	}
-	else
-	{
-		return m_World->GetGenerator().GetBiomeAt(a_BlockX, a_BlockZ);
-	}
+	return EMCSBiome::biInvalidBiome;
 }
 
 

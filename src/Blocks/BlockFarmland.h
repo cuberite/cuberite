@@ -115,12 +115,13 @@ private:
 	/** Returns true if there's either a water source block close enough to hydrate the specified position, or it's raining there. */
 	static bool IsWaterInNear(const cChunk & a_Chunk, const Vector3i a_RelPos)
 	{
-		const auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-		if (a_Chunk.GetWorld()->IsWeatherWetAtXYZ(WorldPos))
+		if (a_Chunk.IsWeatherWetAt(a_RelPos.addedY(1)))
 		{
 			// Rain hydrates farmland, too
 			return true;
 		}
+
+		const auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
 
 		// Search for water in a close proximity:
 		// Ref.: https://minecraft.gamepedia.com/Farmland#Hydration

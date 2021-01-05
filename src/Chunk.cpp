@@ -627,7 +627,6 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 		int WorldX, WorldY, WorldZ;
 		PositionToWorldPosition(TryX, TryY, TryZ, WorldX, WorldY, WorldZ);
 
-		EMCSBiome Biome = m_ChunkMap->GetBiomeAt(WorldX, WorldZ);
 		// MG TODO :
 		// Moon cycle (for slime)
 		// check player and playerspawn presence < 24 blocks
@@ -642,12 +641,16 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 		*/
 
 		NumberOfTries++;
-		if (!IsLightValid())
+
+		Vector3i Try(TryX, TryY, TryZ);
+		const auto Chunk = GetRelNeighborChunkAdjustCoords(Try);
+
+		if ((Chunk == nullptr) || !Chunk->IsValid() || !Chunk->IsLightValid())
 		{
 			continue;
 		}
 
-		auto newMob = a_MobSpawner.TryToSpawnHere(this, {TryX, TryY, TryZ}, Biome, MaxNbOfSuccess);
+		auto newMob = a_MobSpawner.TryToSpawnHere(this, Try, GetBiomeAt(Try.x, Try.z), MaxNbOfSuccess);
 		if (newMob == nullptr)
 		{
 			continue;
@@ -1191,15 +1194,56 @@ bool cChunk::UnboundedRelFastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, 
 
 
 
-int cChunk::GetHeight(int a_X, int a_Z)
+int cChunk::GetHeight(int a_X, int a_Z) const
 {
 	ASSERT((a_X >= 0) && (a_X < Width) && (a_Z >= 0) && (a_Z < Width));
+	return m_HeightMap[a_X + a_Z * Width];
+}
 
-	if ((a_X >= 0) && (a_X < Width) && (a_Z >= 0) && (a_Z < Width))
+
+
+
+
+bool cChunk::IsWeatherSunnyAt(int a_RelX, int a_RelZ) const
+{
+	return m_World->IsWeatherSunny() || IsBiomeNoDownfall(GetBiomeAt(a_RelX, a_RelZ));
+}
+
+
+
+
+
+bool cChunk::IsWeatherWetAt(const int a_RelX, const int a_RelZ) const
+{
+	const auto Biome = GetBiomeAt(a_RelX, a_RelZ);
+	return m_World->IsWeatherWet() && !IsBiomeNoDownfall(Biome) && !IsBiomeCold(Biome);
+}
+
+
+
+
+
+bool cChunk::IsWeatherWetAt(const Vector3i a_Position) const
+{
+	if ((a_Position.y < 0) || !IsWeatherWetAt(a_Position.x, a_Position.z))
 	{
-		return m_HeightMap[a_X + a_Z * Width];
+		return false;
 	}
-	return 0;
+
+	if (a_Position.y >= cChunkDef::Height)
+	{
+		return true;
+	}
+
+	for (int y = GetHeight(a_Position.x, a_Position.z); y >= a_Position.y; y--)
+	{
+		if (cBlockInfo::IsRainBlocker(GetBlock({ a_Position.x, y, a_Position.z })))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 

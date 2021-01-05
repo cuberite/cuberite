@@ -548,28 +548,27 @@ void cWorld::ChangeWeather(void)
 
 
 
-bool cWorld::IsWeatherWetAtXYZ(Vector3i a_Pos)
+bool cWorld::IsWeatherSunnyAt(int a_BlockX, int a_BlockZ) const
 {
-	if ((a_Pos.y < 0) || !IsWeatherWetAt(a_Pos.x, a_Pos.z))
-	{
-		return false;
-	}
+	return m_ChunkMap.IsWeatherSunnyAt(a_BlockX, a_BlockZ);
+}
 
-	if (a_Pos.y >= cChunkDef::Height)
-	{
-		return true;
-	}
 
-	for (int y = GetHeight(a_Pos.x, a_Pos.z); y >= a_Pos.y; y--)
-	{
-		auto BlockType = GetBlock({a_Pos.x, y, a_Pos.z});
-		if (cBlockInfo::IsRainBlocker(BlockType))
-		{
-			return false;
-		}
-	}
 
-	return true;
+
+
+bool cWorld::IsWeatherWetAt(int a_BlockX, int a_BlockZ)
+{
+	return m_ChunkMap.IsWeatherWetAt(a_BlockX, a_BlockZ);
+}
+
+
+
+
+
+bool cWorld::IsWeatherWetAtXYZ(const Vector3i a_Position)
+{
+	return m_ChunkMap.IsWeatherWetAt(a_Position);
 }
 
 

@@ -999,10 +999,7 @@ public:
 	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
 
 	/** Returns true if it is sunny at the specified location. This takes into account biomes. */
-	bool IsWeatherSunnyAt(int a_BlockX, int a_BlockZ)
-	{
-		return (IsWeatherSunny() || IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
-	}
+	bool IsWeatherSunnyAt(int a_BlockX, int a_BlockZ) const;
 
 	/** Returns true if the current weather is rainy. */
 	bool IsWeatherRain(void) const { return (m_Weather == wRain); }
@@ -1027,15 +1024,11 @@ public:
 
 	/** Returns true if it is raining or storming at the specified location.
 	This takes into account biomes. */
-	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) override
-	{
-		auto Biome = GetBiomeAt(a_BlockX, a_BlockZ);
-		return (IsWeatherWet() && !IsBiomeNoDownfall(Biome) && !IsBiomeCold(Biome));
-	}
+	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) override;
 
 	/** Returns true if it is raining or storming at the specified location,
 	and the rain reaches (the bottom of) the specified block position. */
-	virtual bool IsWeatherWetAtXYZ(Vector3i a_Pos) override;
+	virtual bool IsWeatherWetAtXYZ(Vector3i a_Position) override;
 
 	/** Returns the seed of the world. */
 	int GetSeed(void) { return m_Generator.GetSeed(); }

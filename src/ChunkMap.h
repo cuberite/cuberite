@@ -5,9 +5,6 @@
 
 #pragma once
 
-
-#include <functional>
-
 #include "ChunkDataCallback.h"
 #include "EffectID.h"
 #include "FunctionRef.h"
@@ -120,6 +117,10 @@ public:
 	/** Returns true iff the chunk is in the loader / generator queue. */
 	bool IsChunkQueued(int a_ChunkX, int a_ChunkZ) const;
 
+	bool IsWeatherSunnyAt(int a_BlockX, int a_BlockZ) const;
+	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) const;
+	bool IsWeatherWetAt(Vector3i a_Position) const;
+
 	bool      IsChunkValid       (int a_ChunkX, int a_ChunkZ) const;
 	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkZ) const;
 	int       GetHeight          (int a_BlockX, int a_BlockZ);  // Waits for the chunk to get loaded / generated
@@ -143,15 +144,15 @@ public:
 	Ignored if the chunk is invalid. */
 	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta);
 
-	void       SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool       GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
-	bool       GetBlockInfo      (Vector3i, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
+	void SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
+	bool GetBlockInfo      (Vector3i, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
 
 	/** Special function used for growing trees, replaces only blocks that tree may overwrite */
-	void      ReplaceTreeBlocks(const sSetBlockVector & a_Blocks);
+	void ReplaceTreeBlocks(const sSetBlockVector & a_Blocks);
 
-	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, otherwise uses the world generator to provide the biome value */
-	EMCSBiome GetBiomeAt (int a_BlockX, int a_BlockZ) const;
+	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, invalid otherwise. */
+	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ) const;
 
 	/** Sets the biome at the specified coords. Returns true if successful, false if not (chunk not loaded).
 	Doesn't resend the chunk to clients. */

@@ -221,7 +221,17 @@ public:
 	/** Sets the sign text. Returns true if successful. Also sends update packets to all clients in the chunk */
 	bool SetSignLines(int a_RelX, int a_RelY, int a_RelZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 
-	int  GetHeight( int a_X, int a_Z);
+	int GetHeight( int a_X, int a_Z) const;
+
+	/** Returns true if it is sunny at the specified location. This takes into account biomes. */
+	bool IsWeatherSunnyAt(int a_RelX, int a_RelZ) const;
+
+	/** Returns true if it is raining or storming at the specified location, taking into account biomes. */
+	bool IsWeatherWetAt(int a_RelX, int a_RelZ) const;
+
+	/** Returns true if it is raining or storming at the specified location,
+	and the rain reaches (the bottom of) the specified block position. */
+	bool IsWeatherWetAt(Vector3i a_Position) const;
 
 	void SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client);
 
