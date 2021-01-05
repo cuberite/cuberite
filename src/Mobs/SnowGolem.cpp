@@ -1,6 +1,7 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
+#include "Chunk.h"
 #include "SnowGolem.h"
 #include "../BlockInfo.h"
 #include "../World.h"
@@ -36,17 +37,22 @@ void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// The base class tick destroyed us
 		return;
 	}
-	if (IsBiomeNoDownfall(m_World->GetBiomeAt(POSX_TOINT, POSZ_TOINT)))
+
+	PREPARE_REL_AND_CHUNK(GetPosition().Floor(), a_Chunk);
+	if (!RelSuccess)
+	{
+		return;
+	}
+
+	if (IsBiomeNoDownfall(Chunk->GetBiomeAt(Rel.x, Rel.z)))
 	{
 		TakeDamage(dtEnvironment, nullptr, GetRawDamageAgainst(*this), GetKnockbackAmountAgainst(*this));
 	}
-	else
+	else if (const auto Below = Rel.addedY(-1); Below.y >= 0)
 	{
-		BLOCKTYPE BlockBelow = m_World->GetBlock(POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT);
-		BLOCKTYPE Block = m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
-		if ((Block == E_BLOCK_AIR) && cBlockInfo::IsSolid(BlockBelow))
+		if ((Chunk->GetBlock(Rel) == E_BLOCK_AIR) && cBlockInfo::IsSolid(Chunk->GetBlock(Below)))
 		{
-			m_World->SetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT, E_BLOCK_SNOW, 0);
+			Chunk->SetBlock(Rel, E_BLOCK_SNOW, 0);
 		}
 	}
 }

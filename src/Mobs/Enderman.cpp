@@ -1,6 +1,7 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
+#include "Chunk.h"
 #include "Enderman.h"
 #include "../Entities/Player.h"
 #include "../LineBlockTracer.h"
@@ -148,11 +149,14 @@ void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	// Take damage when wet
-	if (
-		cChunkDef::IsValidHeight(POSY_TOINT) &&
-		(GetWorld()->IsWeatherWetAtXYZ(GetPosition().Floor()) || IsInWater())
-	)
+	PREPARE_REL_AND_CHUNK(GetPosition().Floor(), a_Chunk);
+	if (!RelSuccess)
+	{
+		return;
+	}
+
+	// Take damage when wet:
+	if (IsInWater() || Chunk->IsWeatherWetAt(Rel))
 	{
 		EventLosePlayer();
 		TakeDamage(dtEnvironment, nullptr, 1, 0);

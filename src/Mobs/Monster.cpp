@@ -1667,10 +1667,10 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 	}
 
 	if (
-		(Chunk->GetBlock(Rel.x, Rel.y, Rel.z) != E_BLOCK_SOULSAND) &&  // Not on soulsand
-		(GetWorld()->GetTimeOfDay() < 12000 + 1000) &&              // Daytime
-		GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT) &&     // Not raining
-		!IsInWater()                                                // Isn't swimming
+		(Chunk->GetBlock(Rel) != E_BLOCK_SOULSAND) &&   // Not on soulsand
+		(GetWorld()->GetTimeOfDay() < 12000 + 1000) &&  // Daytime
+		Chunk->IsWeatherSunnyAt(Rel.x, Rel.z) &&        // Not raining
+		!IsInWater()                                    // Isn't swimming
 	)
 	{
 		int MobHeight = CeilC(a_Location.y + GetHeight()) - 1;  // The block Y coord of the mob's head
