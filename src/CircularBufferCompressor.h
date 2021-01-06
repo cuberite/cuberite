@@ -7,6 +7,12 @@
 
 
 
+class cByteBuffer;
+
+
+
+
+
 class CircularBufferCompressor
 {
 public:

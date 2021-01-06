@@ -81,7 +81,6 @@ protected:
 		cWorld * m_NewWorld;
 		Vector3d m_NewPosition;
 		bool m_SetPortalCooldown;
-		bool m_SendRespawn;
 	};
 
 public:
@@ -173,7 +172,7 @@ public:
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
 	Adds the entity to the world. */
-	virtual bool Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld);
+	bool Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld);
 
 	/** Called when the entity is added to a world.
 	e.g after first spawning or after successfuly moving between worlds.
@@ -469,13 +468,6 @@ public:
 	/** Teleports to the coordinates specified */
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
-	/** Schedules a MoveToWorld call to occur on the next Tick of the entity */
-	[[deprecated]] void ScheduleMoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = true)
-	{
-		LOGWARNING("ScheduleMoveToWorld is deprecated, use MoveToWorld instead");
-		MoveToWorld(a_World, a_NewPosition, a_ShouldSetPortalCooldown, a_ShouldSendRespawn);
-	}
-
 	bool MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = true);
 
 	bool MoveToWorld(cWorld & a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
@@ -718,7 +710,7 @@ protected:
 
 	/** Handles the moving of this entity between worlds.
 	Should handle degenerate cases such as moving to the same world. */
-	virtual void DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo);
+	void DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo);
 
 	/** Applies friction to an entity
 	@param a_Speed The speed vector to apply changes to

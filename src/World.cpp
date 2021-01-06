@@ -234,8 +234,7 @@ cWorld::cWorld(
 	Serializer.Load();
 
 	// Track the CSs used by this world in the deadlock detector:
-	a_DeadlockDetect.TrackCriticalSection(m_CSClients, Printf("World %s clients", m_WorldName.c_str()));
-	a_DeadlockDetect.TrackCriticalSection(m_CSTasks,   Printf("World %s tasks",   m_WorldName.c_str()));
+	a_DeadlockDetect.TrackCriticalSection(m_CSTasks, Printf("World %s tasks",   m_WorldName.c_str()));
 
 	// Load world settings from the ini file
 	cIniFile IniFile;
@@ -914,16 +913,6 @@ void cWorld::InitializeAndLoadMobSpawningValues(cIniFile & a_IniFile)
 
 void cWorld::Stop(cDeadlockDetect & a_DeadlockDetect)
 {
-	// Delete the clients that have been in this world:
-	{
-		cCSLock Lock(m_CSClients);
-		for (auto itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
-		{
-			(*itr)->Destroy();
-		}  // for itr - m_Clients[]
-		m_Clients.clear();
-	}
-
 	// Write settings to file; these are all plugin changeable values - keep updated!
 	cIniFile IniFile;
 	IniFile.ReadFile(m_IniFileName);
@@ -951,7 +940,6 @@ void cWorld::Stop(cDeadlockDetect & a_DeadlockDetect)
 	m_ChunkSender.Stop();
 	m_Storage.Stop();  // Waits for thread to finish
 
-	a_DeadlockDetect.UntrackCriticalSection(m_CSClients);
 	a_DeadlockDetect.UntrackCriticalSection(m_CSTasks);
 	m_ChunkMap.UntrackInDeadlockDetect(a_DeadlockDetect);
 
@@ -1009,26 +997,10 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		}
 	}
 
-	// Add entities waiting in the queue to be added:
-	cEntityList EntitiesToAdd;
-	{
-		// Don't access chunkmap while holding lock
-		cCSLock Lock(m_CSEntitiesToAdd);
-		std::swap(EntitiesToAdd, m_EntitiesToAdd);
-	}
-	for (auto & Entity : EntitiesToAdd)
-	{
-		m_ChunkMap.AddEntity(std::move(Entity));
-	}
-	EntitiesToAdd.clear();
-
-	// Add players waiting in the queue to be added:
-	AddQueuedPlayers();
-
-	TickClients(static_cast<float>(a_Dt.count()));
 	TickQueuedBlocks();
-	m_ChunkMap.Tick(a_Dt);  // Tick chunk after clients to apply at least one round of queued ticks (e.g. cBlockHandler::Check) this tick
+	m_ChunkMap.Tick(a_Dt);
 	TickMobs(a_Dt);
+	TickQueuedEntityAdditions();
 	m_MapManager.TickMaps();
 	TickQueuedTasks();
 
@@ -1179,6 +1151,45 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 
 
 
+void cWorld::TickQueuedEntityAdditions(void)
+{
+	decltype(m_EntitiesToAdd) EntitiesToAdd;
+	{
+		cCSLock Lock(m_CSEntitiesToAdd);
+		EntitiesToAdd = std::move(m_EntitiesToAdd);
+	}
+
+	// Ensures m_Players manipulation happens under the chunkmap lock.
+	cLock Lock(*this);
+
+	// Add entities waiting in the queue to be added:
+	for (auto & Item: EntitiesToAdd)
+	{
+		const auto Entity = Item.first.get();
+
+		if (Entity->IsPlayer())
+		{
+			const auto Player = static_cast<cPlayer *>(Entity);
+
+			LOGD("Adding player %s to world \"%s\".", Player->GetName().c_str(), m_WorldName.c_str());
+			ASSERT(std::find(m_Players.begin(), m_Players.end(), Player) == m_Players.end());  // Is it already in the list? HOW?
+
+			m_Players.push_back(Player);
+		}
+
+		m_ChunkMap.AddEntity(std::move(Item.first));
+
+		if (const auto OldWorld = Item.second; OldWorld != nullptr)
+		{
+			cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*Entity, *OldWorld);
+		}
+	}
+}
+
+
+
+
+
 void cWorld::TickQueuedTasks(void)
 {
 	// Move the tasks to be executed to a seperate vector to avoid deadlocks on accessing m_Tasks
@@ -1212,57 +1223,6 @@ void cWorld::TickQueuedTasks(void)
 	{
 		Task.second(*this);
 	}  // for itr - m_Tasks[]
-}
-
-
-
-
-
-void cWorld::TickClients(float a_Dt)
-{
-	cClientHandlePtrs RemoveClients;
-	{
-		cCSLock Lock(m_CSClients);
-
-		// Remove clients scheduled for removal:
-		for (auto itr = m_ClientsToRemove.begin(), end = m_ClientsToRemove.end(); itr != end; ++itr)
-		{
-			for (auto itrC = m_Clients.begin(), endC = m_Clients.end(); itrC != endC; ++itrC)
-			{
-				if (itrC->get() == *itr)
-				{
-					m_Clients.erase(itrC);
-					break;
-				}
-			}
-		}  // for itr - m_ClientsToRemove[]
-		m_ClientsToRemove.clear();
-
-		// Add clients scheduled for adding:
-		for (auto itr = m_ClientsToAdd.begin(), end = m_ClientsToAdd.end(); itr != end; ++itr)
-		{
-			ASSERT(std::find(m_Clients.begin(), m_Clients.end(), *itr) == m_Clients.end());
-			m_Clients.push_back(*itr);
-		}  // for itr - m_ClientsToRemove[]
-		m_ClientsToAdd.clear();
-
-		// Tick the clients, take out those that have been destroyed into RemoveClients
-		for (auto itr = m_Clients.begin(); itr != m_Clients.end();)
-		{
-			if ((*itr)->IsDestroyed())
-			{
-				// Remove the client later, when CS is not held, to avoid deadlock
-				RemoveClients.push_back(*itr);
-				itr = m_Clients.erase(itr);
-				continue;
-			}
-			(*itr)->Tick(a_Dt);
-			++itr;
-		}  // for itr - m_Clients[]
-	}
-
-	// Delete the clients queued for removal:
-	RemoveClients.clear();
 }
 
 
@@ -2421,123 +2381,6 @@ void cWorld::CollectPickupsByPlayer(cPlayer & a_Player)
 
 
 
-void cWorld::AddPlayer(std::unique_ptr<cPlayer> a_Player, cWorld * a_OldWorld)
-{
-	cCSLock Lock(m_CSPlayersToAdd);
-	m_PlayersToAdd.emplace_back(std::move(a_Player), a_OldWorld);
-}
-
-
-
-
-
-std::unique_ptr<cPlayer> cWorld::RemovePlayer(cPlayer & a_Player)
-{
-	// Check the chunkmap
-	std::unique_ptr<cPlayer> PlayerPtr(static_cast<cPlayer *>(m_ChunkMap.RemoveEntity(a_Player).release()));
-
-	if (PlayerPtr != nullptr)
-	{
-		// Player found in the world, tell it it's being removed
-		PlayerPtr->OnRemoveFromWorld(*this);
-	}
-	else  // Check the awaiting players list
-	{
-		cCSLock Lock(m_CSPlayersToAdd);
-		auto itr = std::find_if(m_PlayersToAdd.begin(), m_PlayersToAdd.end(),
-			[&](const decltype(m_PlayersToAdd)::value_type & value)
-			{
-				return (value.first.get() == &a_Player);
-			}
-		);
-
-		if (itr != m_PlayersToAdd.end())
-		{
-			PlayerPtr = std::move(itr->first);
-			m_PlayersToAdd.erase(itr);
-		}
-	}
-
-	// Remove from the player list
-	{
-		cLock Lock(*this);
-		LOGD("Removing player %s from world \"%s\"", a_Player.GetName().c_str(), m_WorldName.c_str());
-		m_Players.remove(&a_Player);
-	}
-
-	// Remove the player's client from the list of clients to be ticked:
-	cClientHandle * Client = a_Player.GetClientHandle();
-	if (Client != nullptr)
-	{
-		Client->RemoveFromWorld();
-		m_ChunkMap.RemoveClientFromChunks(Client);
-		cCSLock Lock(m_CSClients);
-		m_ClientsToRemove.push_back(Client);
-	}
-
-	return PlayerPtr;
-}
-
-
-
-
-
-#ifdef _DEBUG
-bool cWorld::IsPlayerReferencedInWorldOrChunk(cPlayer & a_Player)
-{
-	{
-		cLock lock(*this);
-		auto * Chunk = a_Player.GetParentChunk();
-		if (Chunk && Chunk->HasEntity(a_Player.GetUniqueID()))
-		{
-			return true;
-		}
-	}
-
-	{
-		cCSLock Lock(m_CSPlayersToAdd);
-		if (std::find_if(
-			m_PlayersToAdd.begin(), m_PlayersToAdd.end(),
-			[&a_Player](const cAwaitingPlayerList::value_type & Item) { return Item.first.get() == &a_Player; }) != m_PlayersToAdd.end()
-		)
-		{
-			return true;
-		}
-	}
-
-	{
-		cLock Lock(*this);
-		if (std::find(m_Players.begin(), m_Players.end(), &a_Player) != m_Players.end())
-		{
-			return true;
-		}
-	}
-
-	{
-		cCSLock Lock(m_CSEntitiesToAdd);
-		if (std::find(m_ClientsToAdd.begin(), m_ClientsToAdd.end(), a_Player.GetClientHandlePtr()) != m_ClientsToAdd.end())
-		{
-			return true;
-		}
-	}
-
-	{
-		cCSLock Lock(m_CSClients);
-		if (std::find(m_Clients.begin(), m_Clients.end(), a_Player.GetClientHandlePtr()) != m_Clients.end())
-		{
-			return true;
-		}
-	}
-
-	// Assume OK if in ClientsToRemove or PlayersToRemove
-	return false;
-}
-#endif
-
-
-
-
-
 bool cWorld::ForEachPlayer(cPlayerListCallback a_Callback)
 {
 	// Calls the callback for each player in the list
@@ -2686,12 +2529,11 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 {
 	// Sends the playerlist to a_DestPlayer
 	cLock Lock(*this);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	for (const auto & Player : m_Players)
 	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch != nullptr) && !ch->IsDestroyed())
+		if (!Player->GetClientHandle()->IsDestroyed())
 		{
-			a_DestPlayer->GetClientHandle()->SendPlayerListAddPlayer(*(*itr));
+			a_DestPlayer->GetClientHandle()->SendPlayerListAddPlayer(*Player);
 		}
 	}
 }
@@ -2732,11 +2574,11 @@ bool cWorld::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback a_Callback)
 	// First check the entities-to-add:
 	{
 		cCSLock Lock(m_CSEntitiesToAdd);
-		for (const auto & ent: m_EntitiesToAdd)
+		for (const auto & Item : m_EntitiesToAdd)
 		{
-			if (ent->GetUniqueID() == a_UniqueID)
+			if (Item.first->GetUniqueID() == a_UniqueID)
 			{
-				a_Callback(*ent);
+				a_Callback(*Item.first);
 				return true;
 			}
 		}  // for ent - m_EntitiesToAdd[]
@@ -2799,15 +2641,6 @@ void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority
 {
 	a_Client->AddWantedChunk(a_ChunkX, a_ChunkZ);
 	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
-}
-
-
-
-
-
-void cWorld::RemoveClientFromChunkSender(cClientHandle * a_Client)
-{
-	m_ChunkSender.RemoveClient(a_Client);
 }
 
 
@@ -3014,10 +2847,10 @@ void cWorld::ScheduleTask(int a_DelayTicks, std::function<void (cWorld &)> a_Tas
 
 
 
-void cWorld::AddEntity(OwnedEntity a_Entity)
+void cWorld::AddEntity(OwnedEntity a_Entity, cWorld * a_OldWorld)
 {
 	cCSLock Lock(m_CSEntitiesToAdd);
-	m_EntitiesToAdd.emplace_back(std::move(a_Entity));
+	m_EntitiesToAdd.emplace_back(std::move(a_Entity), a_OldWorld);
 }
 
 
@@ -3026,6 +2859,15 @@ void cWorld::AddEntity(OwnedEntity a_Entity)
 
 OwnedEntity cWorld::RemoveEntity(cEntity & a_Entity)
 {
+	// Remove players from the player list:
+	if (a_Entity.IsPlayer())
+	{
+		cLock Lock(*this);
+		const auto Player = static_cast<cPlayer *>(&a_Entity);
+		LOGD("Removing player %s from world \"%s\"", Player->GetName().c_str(), m_WorldName.c_str());
+		m_Players.remove(Player);
+	}
+
 	// Check if the entity is in the chunkmap:
 	auto Entity = m_ChunkMap.RemoveEntity(a_Entity);
 	if (Entity != nullptr)
@@ -3037,17 +2879,18 @@ OwnedEntity cWorld::RemoveEntity(cEntity & a_Entity)
 	// Check if the entity is in the queue to be added to the world:
 	cCSLock Lock(m_CSEntitiesToAdd);
 	auto itr = std::find_if(m_EntitiesToAdd.begin(), m_EntitiesToAdd.end(),
-		[&a_Entity](const OwnedEntity & a_OwnedEntity)
+		[&a_Entity](const auto & Item)
 		{
-			return (a_OwnedEntity.get() == &a_Entity);
+			return (Item.first.get() == &a_Entity);
 		}
 	);
 
 	if (itr != m_EntitiesToAdd.end())
 	{
-		Entity = std::move(*itr);
+		Entity = std::move(itr->first);
 		m_EntitiesToAdd.erase(itr);
 	}
+
 	return Entity;
 }
 
@@ -3394,90 +3237,6 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	m_SimulatorManager->RegisterSimulator(res, Rate);
 
 	return res;
-}
-
-
-
-
-
-void cWorld::AddQueuedPlayers(void)
-{
-	ASSERT(m_TickThread.IsCurrentThread());
-
-	// Grab the list of players to add, it has to be locked to access it:
-	cAwaitingPlayerList PlayersToAdd;
-	{
-		cCSLock Lock(m_CSPlayersToAdd);
-		std::swap(PlayersToAdd, m_PlayersToAdd);
-	}
-
-	// Temporary (#3115-will-fix): store pointers to player objects after ownership transferral
-	std::vector<std::pair<cPlayer *, cWorld *>> AddedPlayerPtrs;
-	AddedPlayerPtrs.reserve(PlayersToAdd.size());
-
-	// Add all the players in the grabbed list:
-	{
-		cLock Lock(*this);
-		for (auto & AwaitingPlayer : PlayersToAdd)
-		{
-			auto & Player = AwaitingPlayer.first;
-			ASSERT(std::find(m_Players.begin(), m_Players.end(), Player.get()) == m_Players.end());  // Is it already in the list? HOW?
-			LOGD("Adding player %s to world \"%s\".", Player->GetName().c_str(), m_WorldName.c_str());
-
-			m_Players.push_back(Player.get());
-			Player->SetWorld(this);
-
-			// Add to chunkmap, if not already there (Spawn vs MoveToWorld):
-			auto PlayerPtr = Player.get();
-			m_ChunkMap.AddPlayer(std::move(Player));
-			PlayerPtr->OnAddToWorld(*this);
-			ASSERT(!PlayerPtr->IsTicking());
-			PlayerPtr->SetIsTicking(true);
-			AddedPlayerPtrs.emplace_back(PlayerPtr, AwaitingPlayer.second);
-		}  // for itr - PlayersToAdd[]
-	}  // cLock(*this)
-
-	// Add all the players' clienthandles:
-	{
-		cCSLock Lock(m_CSClients);
-		for (auto & AwaitingPlayer : AddedPlayerPtrs)
-		{
-			auto & Player = AwaitingPlayer.first;
-			cClientHandlePtr Client = Player->GetClientHandlePtr();
-			if (Client != nullptr)
-			{
-				m_Clients.push_back(Client);
-			}
-		}  // for itr - PlayersToAdd[]
-	}  // Lock(m_CSClients)
-
-	// Stream chunks to all eligible clients:
-	for (auto & AwaitingPlayer : AddedPlayerPtrs)
-	{
-		auto & Player = AwaitingPlayer.first;
-		cClientHandle * Client = Player->GetClientHandle();
-		if (Client != nullptr)
-		{
-			Client->SendHealth();
-			Client->SendWholeInventory(*Player->GetWindow());
-
-			// Send resource pack
-			auto ResourcePackUrl = cRoot::Get()->GetServer()->GetResourcePackUrl();
-			if (!ResourcePackUrl.empty())
-			{
-				Client->SendResourcePack(ResourcePackUrl);
-			}
-		}
-	}  // for itr - PlayersToAdd[]
-
-	// Call EntityChangedWorld callback on all eligible clients
-	for (auto & AwaitingPlayer : AddedPlayerPtrs)
-	{
-		if (AwaitingPlayer.second != nullptr)
-		{
-			cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*(static_cast <cEntity *>(AwaitingPlayer.first)), *AwaitingPlayer.second);
-		}
-	}
 }
 
 

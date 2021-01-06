@@ -670,8 +670,7 @@ void cProtocol_1_8_0::SendHeldItemChange(int a_ItemIndex)
 	ASSERT((a_ItemIndex >= 0) && (a_ItemIndex <= 8));  // Valid check
 
 	cPacketizer Pkt(*this, pktHeldItemChange);
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteBEInt8(static_cast<Int8>(Player->GetInventory().GetEquippedSlotNum()));
+	Pkt.WriteBEInt8(static_cast<Int8>(a_ItemIndex));
 }
 
 
@@ -1021,15 +1020,11 @@ void cProtocol_1_8_0::SendPlayerListUpdatePing(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	auto ClientHandle = a_Player.GetClientHandlePtr();
-	if (ClientHandle != nullptr)
-	{
-		cPacketizer Pkt(*this, pktPlayerList);
-		Pkt.WriteVarInt32(2);
-		Pkt.WriteVarInt32(1);
-		Pkt.WriteUUID(a_Player.GetUUID());
-		Pkt.WriteVarInt32(static_cast<UInt32>(ClientHandle->GetPing()));
-	}
+	cPacketizer Pkt(*this, pktPlayerList);
+	Pkt.WriteVarInt32(2);
+	Pkt.WriteVarInt32(1);
+	Pkt.WriteUUID(a_Player.GetUUID());
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
 }
 
 

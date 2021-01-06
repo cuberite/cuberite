@@ -54,7 +54,6 @@ class cDeadlockDetect;
 class cUUID;
 
 typedef std::list< cPlayer * > cPlayerList;
-typedef std::list< std::pair< std::unique_ptr<cPlayer>, cWorld * > > cAwaitingPlayerList;
 
 typedef std::unique_ptr<cSetChunkData> cSetChunkDataPtr;
 typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
@@ -269,22 +268,6 @@ public:
 
 	void CollectPickupsByPlayer(cPlayer & a_Player);
 
-	/** Adds the player to the world.
-	Uses a queue to store the player object until the Tick thread processes the addition event.
-	Also adds the player as an entity in the chunkmap, and the player's ClientHandle, if any, for ticking.
-	If a_OldWorld is provided, a corresponding ENTITY_CHANGED_WORLD event is triggerred after the addition. */
-	void AddPlayer(std::unique_ptr<cPlayer> a_Player, cWorld * a_OldWorld = nullptr);
-
-	/** Removes the player from the world.
-	Removes the player from the addition queue, too, if appropriate.
-	If the player has a ClientHandle, the ClientHandle is removed from all chunks in the world and will not be ticked by this world anymore.
-	@return An owning reference to the given player. */
-	std::unique_ptr<cPlayer> RemovePlayer(cPlayer & a_Player);
-
-#ifdef _DEBUG
-	bool IsPlayerReferencedInWorldOrChunk(cPlayer & a_Player);
-#endif
-
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cPlayerListCallback a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<
 
@@ -304,8 +287,9 @@ public:
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
 	/** Adds the entity into its appropriate chunk; takes ownership of the entity ptr.
-	The entity is added lazily - this function only puts it in a queue that is then processed by the Tick thread. */
-	void AddEntity(OwnedEntity a_Entity);
+	The entity is added lazily - this function only puts it in a queue that is then processed by the Tick thread.
+	If a_OldWorld is provided, a corresponding ENTITY_CHANGED_WORLD event is triggerred after the addition. */
+	void AddEntity(OwnedEntity a_Entity, cWorld * a_OldWorld = nullptr);
 
 	/** Removes the entity from the world.
 	Returns an owning reference to the found entity. */
@@ -345,9 +329,6 @@ public:
 	/** Sends the chunk to the client specified, even if the client already has the chunk.
 	If the chunk's not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
 	void ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client);
-
-	/** Removes client from ChunkSender's queue of chunks to be sent */
-	void RemoveClientFromChunkSender(cClientHandle * a_Client);
 
 	/** Queues the chunk for preparing - making sure that it's generated and lit.
 	The specified chunk is queued to be loaded or generated, and lit if needed.
@@ -1271,29 +1252,11 @@ private:
 	/** Tasks that have been queued onto the tick thread, possibly to be executed at target tick in the future; guarded by m_CSTasks */
 	std::vector<std::pair<Int64, std::function<void(cWorld &)>>> m_Tasks;
 
-	/** Guards m_Clients */
-	cCriticalSection  m_CSClients;
-
-	/** List of clients in this world, these will be ticked by this world */
-	cClientHandlePtrs m_Clients;
-
-	/** Clients that are scheduled for removal (ticked in another world), waiting for TickClients() to remove them */
-	cClientHandles m_ClientsToRemove;
-
-	/** Clients that are scheduled for adding, waiting for TickClients to add them */
-	cClientHandlePtrs m_ClientsToAdd;
-
 	/** Guards m_EntitiesToAdd */
 	cCriticalSection m_CSEntitiesToAdd;
 
 	/** List of entities that are scheduled for adding, waiting for the Tick thread to add them. */
-	cEntityList m_EntitiesToAdd;
-
-	/** Guards m_PlayersToAdd */
-	cCriticalSection m_CSPlayersToAdd;
-
-	/** List of players that are scheduled for adding, waiting for the Tick thread to add them. */
-	cAwaitingPlayerList m_PlayersToAdd;
+	std::vector<std::pair<OwnedEntity, cWorld *>> m_EntitiesToAdd;
 
 	/** CS protecting m_SetChunkDataQueue. */
 	cCriticalSection m_CSSetChunkDataQueue;
@@ -1309,11 +1272,12 @@ private:
 	/** Handles the mob spawning / moving / destroying each tick */
 	void TickMobs(std::chrono::milliseconds a_Dt);
 
+	/** Adds the entities queued in the m_EntitiesToAdd queue into their chunk.
+	If the entity was a player, he is also added to the m_Players list. */
+	void TickQueuedEntityAdditions(void);
+
 	/** Executes all tasks queued onto the tick thread */
 	void TickQueuedTasks(void);
-
-	/** Ticks all clients that are in this world */
-	void TickClients(float a_Dt);
 
 	/** Unloads all chunks immediately. */
 	void UnloadUnusedChunks(void);
@@ -1338,10 +1302,6 @@ private:
 
 	/** Creates a new redstone simulator. */
 	cRedstoneSimulator * InitializeRedstoneSimulator(cIniFile & a_IniFile);
-
-	/** Adds the players queued in the m_PlayersToAdd queue into the m_Players list.
-	Assumes it is called from the Tick thread. */
-	void AddQueuedPlayers(void);
 
 	/** Sets mob spawning values if nonexistant to their dimension specific defaults */
 	void InitializeAndLoadMobSpawningValues(cIniFile & a_IniFile);

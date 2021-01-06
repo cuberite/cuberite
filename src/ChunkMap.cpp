@@ -940,19 +940,18 @@ void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client)
 void cChunkMap::AddEntity(OwnedEntity a_Entity)
 {
 	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
-	if (Chunk == nullptr)
+	if (FindChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ()) == nullptr)
 	{
-		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
-			static_cast<void *>(a_Entity.get()), a_Entity->GetClass(), a_Entity->GetUniqueID()
+		LOGWARNING("%s: Entity at %p (%s, ID %d) spawning in a non-existent chunk.",
+			__FUNCTION__, static_cast<void *>(a_Entity.get()), a_Entity->GetClass(), a_Entity->GetUniqueID()
 		);
-		return;
 	}
 
 	const auto EntityPtr = a_Entity.get();
 	ASSERT(EntityPtr->GetWorld() == m_World);
 
-	Chunk->AddEntity(std::move(a_Entity));
+	auto & Chunk = ConstructChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
+	Chunk.AddEntity(std::move(a_Entity));
 
 	EntityPtr->OnAddToWorld(*m_World);
 	ASSERT(!EntityPtr->IsTicking());
@@ -1738,11 +1737,7 @@ void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
 	cCSLock Lock(m_CSChunks);
 	for (auto & Chunk : m_Chunks)
 	{
-		// Only tick chunks that are valid and should be ticked:
-		if (Chunk.second.IsValid() && Chunk.second.ShouldBeTicked())
-		{
-			Chunk.second.Tick(a_Dt);
-		}
+		Chunk.second.Tick(a_Dt);
 	}
 }
 

@@ -668,8 +668,10 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 
 void cChunk::Tick(std::chrono::milliseconds a_Dt)
 {
+	const auto ShouldTick = ShouldBeTicked();
+
 	// If we are not valid, tick players and bailout
-	if (!IsValid())
+	if (!ShouldTick)
 	{
 		for (const auto & Entity : m_Entities)
 		{
@@ -680,11 +682,6 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 		}
 		return;
 	}
-
-	CheckBlocks();
-
-	// Tick simulators:
-	m_World->GetSimulatorManager()->SimulateChunk(a_Dt, m_PosX, m_PosZ, this);
 
 	TickBlocks();
 
@@ -745,6 +742,13 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 
 	ApplyWeatherToTop();
 
+	// Tick simulators:
+	m_World->GetSimulatorManager()->SimulateChunk(a_Dt, m_PosX, m_PosZ, this);
+
+	// Check blocks after everything else to apply at least one round of queued ticks (i.e. cBlockHandler::Check) this tick:
+	CheckBlocks();
+
+	// Finally, tell the client about all block changes:
 	BroadcastPendingBlockChanges();
 }
 
@@ -768,9 +772,11 @@ void cChunk::MoveEntityToNewChunk(OwnedEntity a_Entity)
 	cChunk * Neighbor = GetNeighborChunk(a_Entity->GetChunkX() * cChunkDef::Width, a_Entity->GetChunkZ() * cChunkDef::Width);
 	if (Neighbor == nullptr)
 	{
-		LOGWARNING("%s: Failed to move entity, destination chunk unreachable. Entity lost", __FUNCTION__);
-		a_Entity->OnRemoveFromWorld(*m_World);
-		return;
+		LOGWARNING("%s: Entity at %p (%s, ID %d) moving to a non-existent chunk.",
+			__FUNCTION__, static_cast<void *>(a_Entity.get()), a_Entity->GetClass(), a_Entity->GetUniqueID()
+		);
+
+		Neighbor = &m_ChunkMap->ConstructChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
 	}
 
 	ASSERT(Neighbor != this);  // Moving into the same chunk? wtf?
@@ -1480,7 +1486,7 @@ cBlockEntity * cChunk::GetBlockEntityRel(Vector3i a_RelPos)
 
 bool cChunk::ShouldBeTicked(void) const
 {
-	return (HasAnyClients() || (m_AlwaysTicked > 0));
+	return IsValid() && (HasAnyClients() || (m_AlwaysTicked > 0));
 }
 
 
