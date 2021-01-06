@@ -1183,12 +1183,6 @@ void cEntity::ApplyFriction(Vector3d & a_Speed, double a_SlowdownMultiplier, flo
 
 void cEntity::TickBurning(cChunk & a_Chunk)
 {
-	// If we're about to change worlds, then we can't accurately determine whether we're in lava (#3939)
-	if (IsWorldChangeScheduled())
-	{
-		return;
-	}
-
 	// Remember the current burning state:
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 
@@ -1359,12 +1353,6 @@ void cEntity::DetectMagma(void)
 
 bool cEntity::DetectPortal()
 {
-	// If somebody scheduled a world change, do nothing.
-	if (IsWorldChangeScheduled())
-	{
-		return true;
-	}
-
 	if (GetWorld()->GetDimension() == dimOverworld)
 	{
 		if (GetWorld()->GetLinkedNetherWorldName().empty() && GetWorld()->GetLinkedEndWorldName().empty())
@@ -1380,7 +1368,7 @@ bool cEntity::DetectPortal()
 	}
 
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
-	if ((Y > 0) && (Y < cChunkDef::Height))
+	if (cChunkDef::IsValidHeight(Y))
 	{
 		switch (GetWorld()->GetBlock(X, Y, Z))
 		{
@@ -1413,16 +1401,8 @@ bool cEntity::DetectPortal()
 					{
 						return false;
 					}
-					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
-					eDimension DestionationDim = DestinationWorld->GetDimension();
 
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;  // Stop portals from working on respawn
-
-					if (IsPlayer())
-					{
-						// Send a respawn packet before world is loaded / generated so the client isn't left in limbo
-						(static_cast<cPlayer *>(this))->GetClientHandle()->SendRespawn(DestionationDim);
-					}
 
 					Vector3d TargetPos = GetPosition();
 					TargetPos.x *= 8.0;
@@ -1430,7 +1410,7 @@ bool cEntity::DetectPortal()
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimNether).c_str(), DimensionToString(DestionationDim).c_str());
+					LOGD("Jumping %s -> %s", DimensionToString(dimNether).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
 					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, cChunkDef::Height);
 					return true;
 				}
@@ -1441,20 +1421,8 @@ bool cEntity::DetectPortal()
 					{
 						return false;
 					}
-					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
-					eDimension DestionationDim = DestinationWorld->GetDimension();
 
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-
-					if (IsPlayer())
-					{
-						if (DestionationDim == dimNether)
-						{
-							static_cast<cPlayer *>(this)->AwardAchievement(Statistic::AchPortal);
-						}
-
-						static_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
-					}
 
 					Vector3d TargetPos = GetPosition();
 					TargetPos.x /= 8.0;
@@ -1462,7 +1430,7 @@ bool cEntity::DetectPortal()
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
+					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
 					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, (cChunkDef::Height / 2));
 					return true;
 				}
@@ -1483,34 +1451,26 @@ bool cEntity::DetectPortal()
 				// End portal in the end
 				if (GetWorld()->GetDimension() == dimEnd)
 				{
-
 					if (GetWorld()->GetLinkedOverworldName().empty())
 					{
 						return false;
 					}
-					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
-					eDimension DestionationDim = DestinationWorld->GetDimension();
-
 
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
+					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
+					LOGD("Jumping %s -> %s", DimensionToString(dimEnd).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
 
 					if (IsPlayer())
 					{
 						cPlayer * Player = static_cast<cPlayer *>(this);
-						if (Player->GetBedWorld() == DestinationWorld)
+						if (Player->GetBedWorld() == TargetWorld)
 						{
-							Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
+							return MoveToWorld(*TargetWorld, Player->GetLastBedPos());
 						}
-						else
-						{
-							Player->TeleportToCoords(DestinationWorld->GetSpawnX(), DestinationWorld->GetSpawnY(), DestinationWorld->GetSpawnZ());
-						}
-						Player->GetClientHandle()->SendRespawn(DestionationDim);
 					}
 
-					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
-					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimEnd).c_str(), DimensionToString(DestionationDim).c_str());
 					return MoveToWorld(*TargetWorld, false);
 				}
 				// End portal in the overworld
@@ -1520,23 +1480,12 @@ bool cEntity::DetectPortal()
 					{
 						return false;
 					}
-					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
-					eDimension DestionationDim = DestinationWorld->GetDimension();
 
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 
-					if (IsPlayer())
-					{
-						if (DestionationDim == dimEnd)
-						{
-							static_cast<cPlayer *>(this)->AwardAchievement(Statistic::AchTheEnd);
-						}
-						static_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
-					}
-
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
+					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
 					return MoveToWorld(*TargetWorld, false);
 				}
 
@@ -1559,13 +1508,14 @@ void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 {
 	ASSERT(a_WorldChangeInfo.m_NewWorld != nullptr);
 
+	// Reset portal cooldown:
 	if (a_WorldChangeInfo.m_SetPortalCooldown)
 	{
 		m_PortalCooldownData.m_TicksDelayed = 0;
 		m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 	}
 
-	if (GetWorld() == a_WorldChangeInfo.m_NewWorld)
+	if (m_World == a_WorldChangeInfo.m_NewWorld)
 	{
 		// Moving to same world, don't need to remove from world
 		SetPosition(a_WorldChangeInfo.m_NewPosition);
@@ -1578,23 +1528,19 @@ void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 		GetChunkX(), GetChunkZ()
 	);
 
-	// If entity is attached to another entity, detach, to prevent client side effects
-	Detach();
-
 	// Stop ticking, in preperation for detaching from this world.
 	SetIsTicking(false);
 
 	// Remove from the old world
+	const auto OldWorld = m_World;
 	auto Self = m_World->RemoveEntity(*this);
 
-	// Update entity before calling hook
+	// Update entity:
 	ResetPosition(a_WorldChangeInfo.m_NewPosition);
 	SetWorld(a_WorldChangeInfo.m_NewWorld);
 
-	cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, *m_World);
-
 	// Don't do anything after adding as the old world's CS no longer protects us
-	a_WorldChangeInfo.m_NewWorld->AddEntity(std::move(Self));
+	a_WorldChangeInfo.m_NewWorld->AddEntity(std::move(Self), OldWorld);
 }
 
 
@@ -1614,7 +1560,7 @@ bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPo
 
 	// Create new world change info
 	// (The last warp command always takes precedence)
-	m_WorldChangeInfo = { &a_World,  a_NewPosition, a_SetPortalCooldown, a_ShouldSendRespawn };
+	m_WorldChangeInfo = { &a_World,  a_NewPosition, a_SetPortalCooldown };
 
 	if (OldWorld != nullptr)
 	{

@@ -9,8 +9,6 @@
 
 
 
-class cByteBuffer;
-
 struct libdeflate_compressor;
 struct libdeflate_decompressor;
 

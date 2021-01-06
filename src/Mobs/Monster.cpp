@@ -598,20 +598,6 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cMonster::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo)
-{
-	// Stop all mobs from targeting this entity
-	// Stop this entity from targeting other mobs
-	SetTarget(nullptr);
-	StopEveryoneFromTargetingMe();
-
-	Super::DoMoveToWorld(a_WorldChangeInfo);
-}
-
-
-
-
-
 void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 {
 	Super::KilledBy(a_TDI);

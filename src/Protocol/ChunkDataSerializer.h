@@ -21,7 +21,7 @@ Caches the serialized data for as long as this object lives, so that the same da
 other clients using the same protocol. */
 class cChunkDataSerializer
 {
-	using ClientHandles = std::unordered_set<cClientHandle *>;
+	using ClientHandles = std::vector<std::shared_ptr<cClientHandle>>;
 
 	/** Enum to collapse protocol versions into a contiguous index. */
 	enum class CacheVersion
@@ -55,7 +55,7 @@ private:
 
 	/** Serialises the given chunk, storing the result into the given cache entry, and sends the data.
 	If the cache entry is already present, simply re-uses it. */
-	inline void Serialize(cClientHandle * a_Client, int a_ChunkX, int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData, CacheVersion a_CacheVersion);
+	inline void Serialize(const ClientHandles::value_type & a_Client, int a_ChunkX, int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData, CacheVersion a_CacheVersion);
 
 	inline void Serialize47 (int a_ChunkX, int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData);  // Release 1.8
 	inline void Serialize107(int a_ChunkX, int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData);  // Release 1.9

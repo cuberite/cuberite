@@ -74,7 +74,7 @@ cChunkDataSerializer::cChunkDataSerializer(const eDimension a_Dimension) :
 
 void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData, const ClientHandles & a_SendTo)
 {
-	for (const auto Client : a_SendTo)
+	for (const auto & Client : a_SendTo)
 	{
 		switch (static_cast<cProtocol::Version>(Client->GetProtocolVersion()))
 		{
@@ -133,7 +133,7 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 
 
 
-inline void cChunkDataSerializer::Serialize(cClientHandle * a_Client, const int a_ChunkX, const int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData, const CacheVersion a_CacheVersion)
+inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_Client, const int a_ChunkX, const int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData, const CacheVersion a_CacheVersion)
 {
 	auto & Cache = m_Cache[static_cast<size_t>(a_CacheVersion)];
 	if (Cache.Engaged)

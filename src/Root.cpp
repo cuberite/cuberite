@@ -500,7 +500,7 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCall
 		cRoot::Get()->ForEachPlayer(
 			[&](cPlayer & a_Player)
 			{
-				a_Player.GetClientHandlePtr()->Kick(m_Server->GetShutdownMessage());
+				a_Player.GetClientHandle()->Kick(m_Server->GetShutdownMessage());
 				SentDisconnect = true;
 				return false;
 			}
