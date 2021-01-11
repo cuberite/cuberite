@@ -133,7 +133,7 @@ public:
 	const AString & GetFaviconData(void) const { return m_FaviconData; }
 
 	cRsaPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
-	const AString & GetPublicKeyDER(void) const { return m_PublicKeyDER; }
+	ContiguousByteBufferView GetPublicKeyDER(void) const { return m_PublicKeyDER; }
 
 	/** Returns true if authentication has been turned on in server settings. */
 	bool ShouldAuthenticate(void) const { return m_ShouldAuthenticate; }  // tolua_export
@@ -214,7 +214,7 @@ private:
 	cRsaPrivateKey m_PrivateKey;
 
 	/** Public key for m_PrivateKey, ASN1-DER-encoded */
-	AString m_PublicKeyDER;
+	ContiguousByteBuffer m_PublicKeyDER;
 
 	cRCONServer m_RCONServer;
 

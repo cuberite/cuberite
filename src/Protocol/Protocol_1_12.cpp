@@ -1045,7 +1045,7 @@ void cProtocol_1_12::HandlePacketCraftingBookData(cByteBuffer & a_ByteBuffer)
 {
 	// TODO not yet used, not sure if it is needed
 	// https://wiki.vg/index.php?title=Protocol&oldid=14204#Crafting_Book_Data
-	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
+	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace());
 }
 
 
@@ -1054,7 +1054,7 @@ void cProtocol_1_12::HandlePacketCraftingBookData(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_12::HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer)
 {
-	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
+	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace());
 	m_Client->GetPlayer()->SendMessageInfo("The new advancements are not implemented.");
 }
 

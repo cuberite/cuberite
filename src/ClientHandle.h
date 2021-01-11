@@ -153,7 +153,7 @@ public:  // tolua_export
 	void SendChatAboveActionBar         (const cCompositeChat & a_Message);
 	void SendChatSystem                 (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChatSystem                 (const cCompositeChat & a_Message);
-	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, const std::string_view a_ChunkData);
+	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, ContiguousByteBufferView a_ChunkData);
 	void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count);
 	void SendDestroyEntity              (const cEntity & a_Entity);
 	void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
@@ -192,7 +192,8 @@ public:  // tolua_export
 	void SendPlayerMoveLook             (void);
 	void SendPlayerPosition             (void);
 	void SendPlayerSpawn                (const cPlayer & a_Player);
-	void SendPluginMessage              (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
+	void SendPluginMessage              (const AString & a_Channel, std::string_view a_Message);  // Exported in ManualBindings.cpp
+	void SendPluginMessage              (const AString & a_Channel, ContiguousByteBufferView a_Message);
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
 	void SendResourcePack               (const AString & a_ResourcePackUrl);
 	void SendResetTitle                 (void);  // tolua_export
@@ -231,9 +232,10 @@ public:  // tolua_export
 	void SendWindowOpen                 (const cWindow & a_Window);
 	void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value);
 
+	const AString & GetUsername(void) const;  // tolua_export
+	void SetUsername(AString && a_Username);
+
 	// tolua_begin
-	const AString & GetUsername(void) const;
-	void SetUsername( const AString & a_Username);
 
 	inline short GetPing(void) const { return static_cast<short>(std::chrono::duration_cast<std::chrono::milliseconds>(m_Ping).count()); }
 
@@ -357,7 +359,7 @@ public:  // tolua_export
 	void HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
 
 
-	void HandlePluginMessage    (const AString & a_Channel, const AString & a_Message);
+	void HandlePluginMessage    (const AString & a_Channel, ContiguousByteBufferView a_Message);
 	void HandleRespawn          (void);
 	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, eHand a_Hand);
 	void HandleSlotSelected     (Int16 a_SlotNum);
@@ -379,11 +381,10 @@ public:  // tolua_export
 	void HandleCraftRecipe      (UInt32 a_RecipeId);
 
 	/** Called when the protocol has finished logging the user in.
-	Return true to allow the user in; false to kick them.
-	*/
-	bool HandleLogin(const AString & a_Username);
+	Return true to allow the user in; false to kick them. */
+	bool HandleLogin();
 
-	void SendData(const char * a_Data, size_t a_Size);
+	void SendData(ContiguousByteBufferView a_Data);
 
 	/** Called when the player moves into a different world.
 	Sends an UnloadChunk packet for each loaded chunk and resets the streamed chunks. */
@@ -448,7 +449,7 @@ private:
 
 	/** Buffer for storing outgoing data from any thread; will get sent in Tick() (to prevent deadlocks).
 	Protected by m_CSOutgoingData. */
-	AString m_OutgoingData;
+	ContiguousByteBuffer m_OutgoingData;
 
 	Vector3d m_ConfirmPosition;
 
@@ -580,7 +581,7 @@ private:
 	void FinishDigAnimation();
 
 	/** Converts the protocol-formatted channel list (NUL-separated) into a proper string vector. */
-	AStringVector BreakApartPluginChannels(const AString & a_PluginChannels);
+	AStringVector BreakApartPluginChannels(ContiguousByteBufferView a_PluginChannels);
 
 	/** Adds all of the channels to the list of current plugin channels. Handles duplicates gracefully. */
 	void RegisterPluginChannels(const AStringVector & a_ChannelList);

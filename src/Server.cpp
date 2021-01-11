@@ -24,11 +24,6 @@
 #include <sstream>
 #include <iostream>
 
-extern "C"
-{
-	#include "zlib/zlib.h"
-}
-
 
 
 

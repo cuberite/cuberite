@@ -11,7 +11,6 @@
 #include "World.h"
 #include "ClientHandle.h"
 #include "Server.h"
-#include "zlib/zlib.h"
 #include "Defines.h"
 #include "BlockEntities/BeaconEntity.h"
 #include "BlockEntities/BedEntity.h"

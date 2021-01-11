@@ -1,6 +1,5 @@
 #include "Globals.h"
 #include "ChunkDataSerializer.h"
-#include "zlib/zlib.h"
 #include "Protocol_1_8.h"
 #include "Protocol_1_9.h"
 #include "../ClientHandle.h"
@@ -543,14 +542,10 @@ inline void cChunkDataSerializer::WriteSectionDataSeamless(const cChunkData::sCh
 
 inline void cChunkDataSerializer::CompressPacketInto(ChunkDataCache & a_Cache)
 {
-	m_Packet.ReadAll(a_Cache.PacketData);
+	m_Compressor.ReadFrom(m_Packet);
 	m_Packet.CommitRead();
 
-	if (!cProtocol_1_8_0::CompressPacket(a_Cache.PacketData, a_Cache.ToSend))
-	{
-		ASSERT(!"Packet compression failed.");
-		return;
-	}
+	cProtocol_1_8_0::CompressPacket(m_Compressor, a_Cache.ToSend);
 
 	a_Cache.Engaged = true;
 }

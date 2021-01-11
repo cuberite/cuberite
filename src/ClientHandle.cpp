@@ -678,7 +678,7 @@ void cClientHandle::HandlePing(void)
 
 
 
-bool cClientHandle::HandleLogin(const AString & a_Username)
+bool cClientHandle::HandleLogin()
 {
 	{
 		cCSLock lock(m_CSState);
@@ -694,10 +694,8 @@ bool cClientHandle::HandleLogin(const AString & a_Username)
 
 		// LOGD("Handling login for client %s @ %s (%p), state = %d", a_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this), m_State.load());
 
-		m_Username = a_Username;
-
 		// Let the plugins know about this event, they may refuse the player:
-		if (cRoot::Get()->GetPluginManager()->CallHookLogin(*this, m_ProtocolVersion, a_Username))
+		if (cRoot::Get()->GetPluginManager()->CallHookLogin(*this, m_ProtocolVersion, GetUsername()))
 		{
 			SendDisconnect("Login Rejected!");
 			return false;
@@ -885,7 +883,7 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 
 
-void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
+void cClientHandle::HandlePluginMessage(const AString & a_Channel, const ContiguousByteBufferView a_Message)
 {
 	if (a_Channel == "REGISTER")
 	{
@@ -903,7 +901,7 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 	}
 	else if (a_Channel == "FML|HS")
 	{
-		m_ForgeHandshake.DataReceived(this, a_Message.c_str(), a_Message.size());
+		m_ForgeHandshake.DataReceived(this, a_Message);
 	}
 	else if (!HasPluginChannel(a_Channel))
 	{
@@ -920,7 +918,7 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 
 
 
-AStringVector cClientHandle::BreakApartPluginChannels(const AString & a_PluginChannels)
+AStringVector cClientHandle::BreakApartPluginChannels(const ContiguousByteBufferView a_PluginChannels)
 {
 	// Break the string on each NUL character.
 	// Note that StringSplit() doesn't work on this because NUL is a special char - string terminator
@@ -929,19 +927,21 @@ AStringVector cClientHandle::BreakApartPluginChannels(const AString & a_PluginCh
 	AStringVector res;
 	for (size_t i = 0; i < len; i++)
 	{
-		if (a_PluginChannels[i] != 0)
+		if (a_PluginChannels[i] != std::byte(0))
 		{
 			continue;
 		}
 		if (i > first)
 		{
-			res.push_back(a_PluginChannels.substr(first, i - first));
+			const auto Part = a_PluginChannels.substr(first, i - first);
+			res.emplace_back(reinterpret_cast<const char *>(Part.data()), Part.size());
 		}
 		first = i + 1;
 	}  // for i - a_PluginChannels[]
 	if (first < len)
 	{
-		res.push_back(a_PluginChannels.substr(first, len - first));
+		const auto Part = a_PluginChannels.substr(first, len - first);
+		res.emplace_back(reinterpret_cast<const char *>(Part.data()), Part.size());
 	}
 	return res;
 }
@@ -2001,7 +2001,7 @@ void cClientHandle::HandleTabCompletion(const AString & a_Text)
 
 
 
-void cClientHandle::SendData(const char * a_Data, size_t a_Size)
+void cClientHandle::SendData(const ContiguousByteBufferView a_Data)
 {
 	if (m_HasSentDC)
 	{
@@ -2010,7 +2010,7 @@ void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 	}
 
 	cCSLock Lock(m_CSOutgoingData);
-	m_OutgoingData.append(a_Data, a_Size);
+	m_OutgoingData += a_Data;
 }
 
 
@@ -2085,7 +2085,15 @@ void cClientHandle::Tick(float a_Dt)
 		m_BreakProgress += m_Player->GetMiningProgressPerTick(Block);
 	}
 
-	ProcessProtocolInOut();
+	try
+	{
+		ProcessProtocolInOut();
+	}
+	catch (const std::exception & Oops)
+	{
+		Kick(Oops.what());
+		return;  // Return early to give a chance to send the kick packet before link shutdown
+	}
 
 	// If player has been kicked, terminate the connection:
 	if (m_State == csKicked)
@@ -2451,7 +2459,7 @@ void cClientHandle::SendChatSystem(const cCompositeChat & a_Message)
 
 
 
-void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, const std::string_view a_ChunkData)
+void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, const ContiguousByteBufferView a_ChunkData)
 {
 	ASSERT(m_Player != nullptr);
 
@@ -2486,7 +2494,7 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, const std::string_
 	// Add the chunk to the list of chunks sent to the player:
 	{
 		cCSLock Lock(m_CSChunkLists);
-		m_SentChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+		m_SentChunks.emplace_back(a_ChunkX, a_ChunkZ);
 	}
 }
 
@@ -2860,7 +2868,16 @@ void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
-void cClientHandle::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
+void cClientHandle::SendPluginMessage(const AString & a_Channel, const std::string_view a_Message)
+{
+	m_Protocol->SendPluginMessage(a_Channel, { reinterpret_cast<const std::byte *>(a_Message.data()), a_Message.size() });
+}
+
+
+
+
+
+void cClientHandle::SendPluginMessage(const AString & a_Channel, const ContiguousByteBufferView a_Message)
 {
 	m_Protocol->SendPluginMessage(a_Channel, a_Message);
 }
@@ -3231,9 +3248,9 @@ const AString & cClientHandle::GetUsername(void) const
 
 
 
-void cClientHandle::SetUsername(const AString & a_Username)
+void cClientHandle::SetUsername(AString && a_Username)
 {
-	m_Username = a_Username;
+	m_Username = std::move(a_Username);
 }
 
 
@@ -3398,7 +3415,7 @@ void cClientHandle::ProcessProtocolInOut(void)
 	}
 
 	// Send any queued outgoing data:
-	AString OutgoingData;
+	ContiguousByteBuffer OutgoingData;
 	{
 		cCSLock Lock(m_CSOutgoingData);
 		std::swap(OutgoingData, m_OutgoingData);

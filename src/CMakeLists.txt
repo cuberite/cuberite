@@ -18,6 +18,7 @@ target_sources(
 	ChunkMap.cpp
 	ChunkSender.cpp
 	ChunkStay.cpp
+	CircularBufferCompressor.cpp
 	ClientHandle.cpp
 	Color.cpp
 	CommandOutput.cpp
@@ -88,6 +89,7 @@ target_sources(
 	ChunkMap.h
 	ChunkSender.h
 	ChunkStay.h
+	CircularBufferCompressor.h
 	ClientHandle.h
 	Color.h
 	CommandOutput.h

@@ -11,6 +11,7 @@
 #include "../BlockEntities/BlockEntity.h"
 #include "WorldStorage.h"
 #include "FastNBT.h"
+#include "StringCompression.h"
 
 
 
@@ -62,9 +63,8 @@ protected:
 
 		cMCAFile(cWSSAnvil & a_ParentSchema, const AString & a_FileName, int a_RegionX, int a_RegionZ);
 
-		bool GetChunkData  (const cChunkCoords & a_Chunk, AString & a_Data);
-		bool SetChunkData  (const cChunkCoords & a_Chunk, const AString & a_Data);
-		bool EraseChunkData(const cChunkCoords & a_Chunk);
+		bool GetChunkData  (const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data);
+		bool SetChunkData  (const cChunkCoords & a_Chunk, ContiguousByteBufferView a_Data);
 
 		int             GetRegionX (void) const {return m_RegionX; }
 		int             GetRegionZ (void) const {return m_RegionZ; }
@@ -86,8 +86,8 @@ protected:
 		// Chunk timestamps, following the chunk headers
 		unsigned m_TimeStamps[MCA_MAX_CHUNKS];
 
-		/** Finds a free location large enough to hold a_Data. Gets a hint of the chunk coords, places the data there if it fits. Returns the sector number. */
-		unsigned FindFreeLocation(int a_LocalX, int a_LocalZ, const AString & a_Data);
+		/** Finds a free location large enough to hold a_Data. Returns the sector number. */
+		unsigned FindFreeLocation(int a_LocalX, int a_LocalZ, size_t a_DataSize);
 
 		/** Opens a MCA file either for a Read operation (fails if doesn't exist) or for a Write operation (creates new if not found) */
 		bool OpenFile(bool a_IsForReading);
@@ -97,30 +97,27 @@ protected:
 	cCriticalSection m_CS;
 	cMCAFiles        m_Files;  // a MRU cache of MCA files
 
-	int m_CompressionFactor;
-
+	Compression::Extractor m_Extractor;
+	Compression::Compressor m_Compressor;
 
 	/** Reports that the specified chunk failed to load and saves the chunk data to an external file. */
-	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Reason, const AString & a_ChunkDataToSave);
+	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Reason, ContiguousByteBufferView a_ChunkDataToSave);
 
 	/** Gets chunk data from the correct file; locks file CS as needed */
-	bool GetChunkData(const cChunkCoords & a_Chunk, AString & a_Data);
+	bool GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data);
 
 	/** Sets chunk data into the correct file; locks file CS as needed */
-	bool SetChunkData(const cChunkCoords & a_Chunk, const AString & a_Data);
+	bool SetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBufferView a_Data);
 
 	/** Loads the chunk from the data (no locking needed) */
-	bool LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & a_Data);
+	bool LoadChunkFromData(const cChunkCoords & a_Chunk, ContiguousByteBufferView a_Data);
 
 	/** Saves the chunk into datastream (no locking needed) */
-	bool SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data);
+	Compression::Result SaveChunkToData(const cChunkCoords & a_Chunk);
 
 	/** Loads the chunk from NBT data (no locking needed).
 	a_RawChunkData is the raw (compressed) chunk data, used for offloading when chunk loading fails. */
-	bool LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, const AString & a_RawChunkData);
-
-	/** Saves the chunk into NBT data using a_Writer; returns true on success */
-	bool SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_Writer);
+	bool LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, ContiguousByteBufferView a_RawChunkData);
 
 	/** Loads the chunk's biome map from vanilla-format; returns a_BiomeMap if biomes present and valid, nullptr otherwise */
 	cChunkDef::BiomeMap * LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx);
@@ -175,7 +172,7 @@ protected:
 	OwnedBlockEntity LoadNoteBlockFromNBT        (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
 	OwnedBlockEntity LoadSignFromNBT             (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
 
-	void LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, size_t a_IDTagLength);
+	void LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, std::string_view a_EntityName);
 
 	void LoadBoatFromNBT            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadEnderCrystalFromNBT    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
@@ -309,7 +306,3 @@ protected:
 	virtual bool SaveChunk(const cChunkCoords & a_Chunk) override;
 	virtual const AString GetName(void) const override {return "anvil"; }
 } ;
-
-
-
-

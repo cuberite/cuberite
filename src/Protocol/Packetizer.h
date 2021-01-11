@@ -119,9 +119,9 @@ public:
 	}
 
 
-	inline void WriteBuf(const char * a_Data, size_t a_Size)
+	inline void WriteBuf(const ContiguousByteBufferView a_Data)
 	{
-		VERIFY(m_Out.Write(a_Data, a_Size));
+		VERIFY(m_Out.Write(a_Data.data(), a_Data.size()));
 	}
 
 

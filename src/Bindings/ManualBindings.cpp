@@ -188,9 +188,7 @@ static int tolua_CompressStringZLIB(lua_State * tolua_S)
 	S.GetStackValues(1, ToCompress, CompressionLevel);
 
 	// Compress the string:
-	AString res;
-	CompressString(ToCompress.data(), ToCompress.size(), res, CompressionLevel);
-	S.Push(res);
+	S.Push(Compression::Compressor(CompressionLevel).CompressZLib(ToCompress.data(), ToCompress.size()).GetView());
 	return 1;
 }
 
@@ -211,14 +209,21 @@ static int tolua_UncompressStringZLIB(lua_State * tolua_S)
 	}
 
 	// Get the params:
-	AString ToUncompress;
+	ContiguousByteBuffer ToUncompress;
 	size_t UncompressedSize = 0;
 	S.GetStackValues(1, ToUncompress, UncompressedSize);
 
-	// Compress the string:
-	AString res;
-	UncompressString(ToUncompress.data(), ToUncompress.size(), res, UncompressedSize);
-	S.Push(res);
+	try
+	{
+		// Decompress the string:
+		S.Push(Compression::Extractor().ExtractZLib(ToUncompress, UncompressedSize).GetView());
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING(Oops.what());
+		cLuaState::LogStackTrace(tolua_S);
+		return 0;
+	}
 	return 1;
 }
 
@@ -239,40 +244,11 @@ static int tolua_CompressStringGZIP(lua_State * tolua_S)
 	}
 
 	// Get the params:
-	AString ToCompress;
+	ContiguousByteBuffer ToCompress;
 	S.GetStackValues(1, ToCompress);
 
 	// Compress the string:
-	AString res;
-	CompressStringGZIP(ToCompress.data(), ToCompress.size(), res);
-	S.Push(res);
-	return 1;
-}
-
-
-
-
-
-static int tolua_UncompressStringGZIP(lua_State * tolua_S)
-{
-	cLuaState S(tolua_S);
-	if (
-		!S.CheckParamString(1) ||
-		!S.CheckParamEnd(2)
-	)
-	{
-		cLuaState::LogStackTrace(tolua_S);
-		return 0;
-	}
-
-	// Get the params:
-	AString ToUncompress;
-	S.GetStackValues(1, ToUncompress);
-
-	// Compress the string:
-	AString res;
-	UncompressStringGZIP(ToUncompress.data(), ToUncompress.size(), res);
-	S.Push(res);
+	S.Push(Compression::Compressor().CompressGZip(ToCompress).GetView());
 	return 1;
 }
 
@@ -293,13 +269,20 @@ static int tolua_InflateString(lua_State * tolua_S)
 	}
 
 	// Get the params:
-	AString ToUncompress;
+	ContiguousByteBuffer ToUncompress;
 	S.GetStackValues(1, ToUncompress);
 
-	// Compress the string:
-	AString res;
-	InflateString(ToUncompress.data(), ToUncompress.size(), res);
-	S.Push(res);
+	try
+	{
+		// Decompress the string:
+		S.Push(Compression::Extractor().ExtractZLib(ToUncompress).GetView());
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING(Oops.what());
+		cLuaState::LogStackTrace(tolua_S);
+		return 0;
+	}
 	return 1;
 }
 
@@ -4552,7 +4535,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "CompressStringZLIB",     tolua_CompressStringZLIB);
 			tolua_function(tolua_S, "UncompressStringZLIB",   tolua_UncompressStringZLIB);
 			tolua_function(tolua_S, "CompressStringGZIP",     tolua_CompressStringGZIP);
-			tolua_function(tolua_S, "UncompressStringGZIP",   tolua_UncompressStringGZIP);
+			tolua_function(tolua_S, "UncompressStringGZIP",   tolua_InflateString);
 			tolua_function(tolua_S, "InflateString",          tolua_InflateString);
 		tolua_endmodule(tolua_S);
 

@@ -123,11 +123,6 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 			HandleIncomingDataInOldPingResponseStage(a_Clyent, a_In);
 		};
 	}
-	catch (const std::exception & Oops)
-	{
-		a_Client.Kick(Oops.what());
-		return;
-	}
 
 	// Explicitly process any remaining data with the new handler:
 	HandleIncomingData(a_Client, a_Data);
@@ -341,15 +336,15 @@ void cMultiVersionProtocol::SendPacket(cClientHandle & a_Client, cByteBuffer & a
 
 	// Compression doesn't apply to this state, send raw data:
 	VERIFY(OutPacketLenBuffer.WriteVarInt32(PacketLen));
-	AString LengthData;
+	ContiguousByteBuffer LengthData;
 	OutPacketLenBuffer.ReadAll(LengthData);
-	a_Client.SendData(LengthData.data(), LengthData.size());
+	a_Client.SendData(LengthData);
 
 	// Send the packet's payload:
-	AString PacketData;
+	ContiguousByteBuffer PacketData;
 	a_OutPacketBuffer.ReadAll(PacketData);
 	a_OutPacketBuffer.CommitRead();
-	a_Client.SendData(PacketData.data(), PacketData.size());
+	a_Client.SendData(PacketData);
 }
 
 
