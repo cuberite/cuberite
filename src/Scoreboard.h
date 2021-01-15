@@ -9,12 +9,13 @@
 
 #pragma once
 
-
-
 #include "FunctionRef.h"
-#include "ChunkDef.h"
 
 
+
+
+
+class cClientHandle;
 class cObjective;
 class cTeam;
 class cWorld;
