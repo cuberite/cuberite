@@ -4,7 +4,7 @@ add_library(ChunkBuffer ${PROJECT_SOURCE_DIR}/src/ChunkData.cpp ${PROJECT_SOURCE
 
 target_link_libraries(ChunkBuffer PUBLIC fmt::fmt)
 
-add_executable(creatable-exe creatable.cpp)
+add_executable(creatable-exe Creatable.cpp)
 target_link_libraries(creatable-exe ChunkBuffer)
 add_test(NAME creatable-test COMMAND creatable-exe)
 
