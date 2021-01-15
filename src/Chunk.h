@@ -37,7 +37,8 @@ class cBlockArea;
 class cFluidSimulatorData;
 class cMobCensus;
 class cMobSpawner;
-class cSetChunkData;
+
+struct SetChunkData;
 
 typedef std::list<cClientHandle *>                cClientHandleList;
 
@@ -62,8 +63,7 @@ public:
 
 	cChunk(
 		int a_ChunkX, int a_ChunkZ,   // Chunk coords
-		cChunkMap * a_ChunkMap, cWorld * a_World,   // Parent objects
-		cAllocationPool<cChunkData::sChunkSection> & a_Pool
+		cChunkMap * a_ChunkMap, cWorld * a_World   // Parent objects
 	);
 	cChunk(const cChunk & Other) = delete;
 	~cChunk();
@@ -116,15 +116,12 @@ public:
 	/** Sets all chunk data as either loaded from the storage or generated.
 	BlockLight and BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
 	Modifies the BlockEntity list in a_SetChunkData - moves the block entities into the chunk. */
-	void SetAllData(cSetChunkData & a_SetChunkData);
+	void SetAllData(SetChunkData && a_SetChunkData);
 
 	void SetLight(
 		const cChunkDef::BlockNibbles & a_BlockLight,
 		const cChunkDef::BlockNibbles & a_SkyLight
 	);
-
-	/** Copies m_BlockData into a_BlockTypes, only the block types */
-	void GetBlockTypes(BLOCKTYPE  * a_BlockTypes);
 
 	/** Writes the specified cBlockArea at the coords specified. Note that the coords may extend beyond the chunk! */
 	void WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
@@ -163,8 +160,8 @@ public:
 		FastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_BlockType, a_BlockMeta);
 	}
 
-	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetBlock({ a_RelX, a_RelY, a_RelZ }); }
-	BLOCKTYPE GetBlock(Vector3i a_RelCoords) const { return m_ChunkData.GetBlock(a_RelCoords); }
+	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const { return m_BlockData.GetBlock({ a_RelX, a_RelY, a_RelZ }); }
+	BLOCKTYPE GetBlock(Vector3i a_RelCoords) const { return m_BlockData.GetBlock(a_RelCoords); }
 
 	void GetBlockTypeMeta(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	void GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
@@ -347,8 +344,6 @@ public:
 	returns true if the use was successful, return false to use the block as a "normal" block */
 	bool UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
 
-	void CalculateHeightmap(const BLOCKTYPE * a_BlockTypes);
-
 	void SendBlockEntity             (int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 
 	Vector3i PositionToWorldPosition(Vector3i a_RelPos)
@@ -375,42 +370,36 @@ public:
 
 	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 	{
-		return m_ChunkData.GetMeta({ a_RelX, a_RelY, a_RelZ });
+		return m_BlockData.GetMeta({ a_RelX, a_RelY, a_RelZ });
 	}
 
-	NIBBLETYPE GetMeta(Vector3i a_RelPos) const { return m_ChunkData.GetMeta(a_RelPos); }
+	NIBBLETYPE GetMeta(Vector3i a_RelPos) const { return m_BlockData.GetMeta(a_RelPos); }
 
 	void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
 		SetMeta({ a_RelX, a_RelY, a_RelZ }, a_Meta);
 	}
 
-	/** Set a meta value, with the option of not informing the client and / or not marking dirty.
-	Used for setting metas that are of little value for saving to disk and / or for sending to the client,
-	such as leaf decay flags. */
 	inline void SetMeta(Vector3i a_RelPos, NIBBLETYPE a_Meta)
 	{
-		bool hasChanged = m_ChunkData.SetMeta(a_RelPos, a_Meta);
-		if (hasChanged)
-		{
-			MarkDirty();
-			m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock(a_RelPos), a_Meta));
-		}
+		m_BlockData.SetMeta(a_RelPos, a_Meta);
+		MarkDirty();
+		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock(a_RelPos), a_Meta));
 	}
 
 	/** Light alterations based on time */
 	NIBBLETYPE GetTimeAlteredLight(NIBBLETYPE a_Skylight) const;
 
 	/** Get the level of artificial light illuminating the block (0 - 15) */
-	inline NIBBLETYPE GetBlockLight(Vector3i a_RelPos) const { return m_ChunkData.GetBlockLight(a_RelPos); }
-	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetBlockLight({ a_RelX, a_RelY, a_RelZ }); }
+	inline NIBBLETYPE GetBlockLight(Vector3i a_RelPos) const { return m_LightData.GetBlockLight(a_RelPos); }
+	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetBlockLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15) independent of daytime. */
-	inline NIBBLETYPE GetSkyLight(Vector3i a_RelPos) const { return m_ChunkData.GetSkyLight(a_RelPos); }
-	inline NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetSkyLight({ a_RelX, a_RelY, a_RelZ }); }
+	inline NIBBLETYPE GetSkyLight(Vector3i a_RelPos) const { return m_LightData.GetSkyLight(a_RelPos); }
+	inline NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetSkyLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15), taking daytime into a account. */
-	inline NIBBLETYPE GetSkyLightAltered(Vector3i a_RelPos) const { return GetTimeAlteredLight(m_ChunkData.GetSkyLight(a_RelPos)); }
+	inline NIBBLETYPE GetSkyLightAltered(Vector3i a_RelPos) const { return GetTimeAlteredLight(m_LightData.GetSkyLight(a_RelPos)); }
 	inline NIBBLETYPE GetSkyLightAltered(int a_RelX, int a_RelY, int a_RelZ) const { return GetSkyLightAltered({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
@@ -583,7 +572,6 @@ private:
 	bool m_IsLightValid;   // True if the blocklight and skylight are calculated
 	bool m_IsDirty;        // True if the chunk has changed since it was last saved
 	bool m_IsSaving;       // True if the chunk is being saved
-	bool m_HasLoadFailed;  // True if chunk failed to load and hasn't been generated yet since then
 
 	std::queue<Vector3i>  m_ToTickBlocks;
 	sSetBlockVector       m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
@@ -600,7 +588,8 @@ private:
 	cWorld *    m_World;
 	cChunkMap * m_ChunkMap;
 
-	cChunkData m_ChunkData;
+	ChunkBlockData m_BlockData;
+	ChunkLightData m_LightData;
 
 	cChunkDef::HeightMap m_HeightMap;
 	cChunkDef::BiomeMap  m_BiomeMap;

@@ -113,6 +113,9 @@ public:
 	/** Writes a_Count bytes into a_Buffer; returns true if successful */
 	bool WriteBuf(const void * a_Buffer, size_t a_Count);
 
+	/** Writes a_Count bytes into a_Buffer; returns true if successful */
+	bool WriteBuf(size_t a_Count, unsigned char a_Value);
+
 	/** Reads a_Count bytes into a_String; returns true if successful */
 	bool ReadSome(ContiguousByteBuffer & a_String, size_t a_Count);
 

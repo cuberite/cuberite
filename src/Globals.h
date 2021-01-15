@@ -313,6 +313,12 @@ namespace cpp20
 	{
 		return std::unique_ptr<T>(new std::remove_extent_t<T>[a_Size]);
 	}
+
+	template <class T>
+	std::enable_if_t<!std::is_array_v<T>, std::unique_ptr<T>> make_unique_for_overwrite()
+	{
+		return std::unique_ptr<T>(new T);
+	}
 }
 
 

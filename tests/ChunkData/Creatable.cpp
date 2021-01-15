@@ -1,29 +1,34 @@
 
 #include "Globals.h"
+#include "../TestHelpers.h"
 #include "ChunkData.h"
 
-int main(int argc, char** argv)
+
+
+
+
+static void Test()
 {
 	LOGD("Test started");
 
-	class cMockAllocationPool
-		: public cAllocationPool<cChunkData::sChunkSection>
-	{
-		virtual cChunkData::sChunkSection * Allocate() override
-		{
-			return new cChunkData::sChunkSection();
-		}
+	ChunkBlockData train;
+	ChunkLightData buffer;
 
-		virtual void Free(cChunkData::sChunkSection * a_Ptr) override
-		{
-			delete a_Ptr;
-		}
+	/*
 
-		virtual bool DoIsEqual(const cAllocationPool<cChunkData::sChunkSection> &) const noexcept override
-		{
-			return false;
-		}
-	} Pool;
-	cChunkData buffer(Pool);
-	return 0;
+	         /-|===D
+	        /  |===D
+	       /---|
+	      /    |
+	 ====/=====|===============
+
+	*/
 }
+
+
+
+
+
+IMPLEMENT_TEST_MAIN("ChunkData Creatable",
+	Test()
+);

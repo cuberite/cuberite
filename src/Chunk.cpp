@@ -54,20 +54,17 @@
 
 cChunk::cChunk(
 	int a_ChunkX, int a_ChunkZ,
-	cChunkMap * a_ChunkMap, cWorld * a_World,
-	cAllocationPool<cChunkData::sChunkSection> & a_Pool
+	cChunkMap * a_ChunkMap, cWorld * a_World
 ):
 	m_Presence(cpInvalid),
 	m_IsLightValid(false),
 	m_IsDirty(false),
 	m_IsSaving(false),
-	m_HasLoadFailed(false),
 	m_StayCount(0),
 	m_PosX(a_ChunkX),
 	m_PosZ(a_ChunkZ),
 	m_World(a_World),
 	m_ChunkMap(a_ChunkMap),
-	m_ChunkData(a_Pool),
 	m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData()),
 	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData()),
 	m_RedstoneSimulatorData(a_World->GetRedstoneSimulator()->CreateChunkData()),
@@ -271,7 +268,7 @@ void cChunk::MarkLoadFailed(void)
 	MarkDirty();
 
 	// The chunk is always needed, generate it:
-	m_World->GetGenerator().QueueGenerateChunk({m_PosX, m_PosZ}, false);
+	m_World->GetGenerator().QueueGenerateChunk({ m_PosX, m_PosZ }, false);
 }
 
 
@@ -282,12 +279,10 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback) const
 {
 	ASSERT(m_Presence == cpPresent);
 
-	a_Callback.HeightMap(&m_HeightMap);
-	a_Callback.BiomeData(&m_BiomeMap);
-
 	a_Callback.LightIsValid(m_IsLightValid);
-
-	a_Callback.ChunkData(m_ChunkData);
+	a_Callback.ChunkData(m_BlockData, m_LightData);
+	a_Callback.HeightMap(m_HeightMap);
+	a_Callback.BiomeMap(m_BiomeMap);
 
 	for (const auto & Entity : m_Entities)
 	{
@@ -304,27 +299,25 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback) const
 
 
 
-void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
+void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 {
-	ASSERT(a_SetChunkData.IsHeightMapValid());
-	ASSERT(a_SetChunkData.AreBiomesValid());
+	std::copy(a_SetChunkData.HeightMap, a_SetChunkData.HeightMap + std::size(a_SetChunkData.HeightMap), m_HeightMap);
+	std::copy(a_SetChunkData.BiomeMap, a_SetChunkData.BiomeMap + std::size(a_SetChunkData.BiomeMap), m_BiomeMap);
 
-	memcpy(m_BiomeMap, a_SetChunkData.GetBiomes(), sizeof(m_BiomeMap));
-	memcpy(m_HeightMap, a_SetChunkData.GetHeightMap(), sizeof(m_HeightMap));
-
-	m_ChunkData.Assign(std::move(a_SetChunkData.GetChunkData()));
-	m_IsLightValid = a_SetChunkData.IsLightValid();
+	m_BlockData = std::move(a_SetChunkData.BlockData);
+	m_LightData = std::move(a_SetChunkData.LightData);
+	m_IsLightValid = a_SetChunkData.IsLightValid;
 
 	// Entities need some extra steps to destroy, so here we're keeping the old ones.
 	// Move the entities already in the chunk, including player entities, so that we don't lose any:
-	a_SetChunkData.GetEntities().insert(
-		a_SetChunkData.GetEntities().end(),
+	a_SetChunkData.Entities.insert(
+		a_SetChunkData.Entities.end(),
 		std::make_move_iterator(m_Entities.begin()),
 		std::make_move_iterator(m_Entities.end())
 	);
 
 	// Store the augmented result:
-	m_Entities = std::move(a_SetChunkData.GetEntities());
+	m_Entities = std::move(a_SetChunkData.Entities);
 
 	// Set all the entity variables again:
 	for (const auto & Entity : m_Entities)
@@ -335,7 +328,7 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 	}
 
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
-	m_BlockEntities = std::move(a_SetChunkData.GetBlockEntities());
+	m_BlockEntities = std::move(a_SetChunkData.BlockEntities);
 
 	// Check that all block entities have a valid blocktype at their respective coords (DEBUG-mode only):
 	#ifdef _DEBUG
@@ -357,15 +350,8 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 	// Set the chunk data as valid. This may be needed for some simulators that perform actions upon block adding (Vaporize)
 	SetPresence(cpPresent);
 
-	if (a_SetChunkData.ShouldMarkDirty())
-	{
-		MarkDirty();
-	}
-
 	// Wake up all simulators for their respective blocks:
 	WakeUpSimulators();
-
-	m_HasLoadFailed = false;
 }
 
 
@@ -380,20 +366,10 @@ void cChunk::SetLight(
 	// TODO: We might get cases of wrong lighting when a chunk changes in the middle of a lighting calculation.
 	// Postponing until we see how bad it is :)
 
-	m_ChunkData.SetBlockLight(a_BlockLight);
-	m_ChunkData.SetSkyLight(a_SkyLight);
+	m_LightData.SetAll(a_BlockLight, a_SkyLight);
 
 	MarkDirty();
 	m_IsLightValid = true;
-}
-
-
-
-
-
-void cChunk::GetBlockTypes(BLOCKTYPE * a_BlockTypes)
-{
-	m_ChunkData.CopyBlockTypes(a_BlockTypes);
 }
 
 
@@ -1261,48 +1237,24 @@ void cChunk::WakeUpSimulators(void)
 	auto * LavaSimulator  = m_World->GetLavaSimulator();
 	auto * RedstoneSimulator = m_World->GetRedstoneSimulator();
 
-	for (size_t SectionIdx = 0; SectionIdx != cChunkData::NumSections; ++SectionIdx)
+	for (size_t SectionIdx = 0; SectionIdx != cChunkDef::NumSections; ++SectionIdx)
 	{
-		const auto * Section = m_ChunkData.GetSection(SectionIdx);
+		const auto * Section = m_BlockData.GetSection(SectionIdx);
 		if (Section == nullptr)
 		{
 			continue;
 		}
 
-		for (size_t BlockIdx = 0; BlockIdx != cChunkData::SectionBlockCount; ++BlockIdx)
+		for (size_t BlockIdx = 0; BlockIdx != ChunkBlockData::SectionBlockCount; ++BlockIdx)
 		{
-			const auto BlockType = Section->m_BlockTypes[BlockIdx];
-			auto Position = IndexToCoordinate(BlockIdx);
-			Position.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
+			const auto BlockType = (*Section)[BlockIdx];
+			const auto Position = IndexToCoordinate(BlockIdx + SectionIdx * ChunkBlockData::SectionBlockCount);
 
 			RedstoneSimulator->AddBlock(*this, Position, BlockType);
 			WaterSimulator->AddBlock(*this, Position, BlockType);
 			LavaSimulator->AddBlock(*this, Position, BlockType);
 		}
 	}
-}
-
-
-
-
-
-void cChunk::CalculateHeightmap(const BLOCKTYPE * a_BlockTypes)
-{
-	for (int x = 0; x < Width; x++)
-	{
-		for (int z = 0; z < Width; z++)
-		{
-			for (int y = Height - 1; y > -1; y--)
-			{
-				int index = MakeIndex( x, y, z);
-				if (a_BlockTypes[index] != E_BLOCK_AIR)
-				{
-					m_HeightMap[x + z * Width] = static_cast<HEIGHTTYPE>(y);
-					break;
-				}
-			}  // for y
-		}  // for z
-	}  // for x
 }
 
 
@@ -1346,7 +1298,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	ASSERT(IsValid());
 
 	const BLOCKTYPE OldBlockType = GetBlock(a_RelX, a_RelY, a_RelZ);
-	const BLOCKTYPE OldBlockMeta = m_ChunkData.GetMeta({ a_RelX, a_RelY, a_RelZ });
+	const BLOCKTYPE OldBlockMeta = m_BlockData.GetMeta({ a_RelX, a_RelY, a_RelZ });
 	if ((OldBlockType == a_BlockType) && (OldBlockMeta == a_BlockMeta))
 	{
 		return;
@@ -1364,7 +1316,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		MarkDirty();
 	}
 
-	m_ChunkData.SetBlock({ a_RelX, a_RelY, a_RelZ }, a_BlockType);
+	m_BlockData.SetBlock({ a_RelX, a_RelY, a_RelZ }, a_BlockType);
 
 	// Queue block to be sent only if ...
 	if (
@@ -1380,7 +1332,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta));
 	}
 
-	m_ChunkData.SetMeta({ a_RelX, a_RelY, a_RelZ }, a_BlockMeta);
+	m_BlockData.SetMeta({ a_RelX, a_RelY, a_RelZ }, a_BlockMeta);
 
 	// ONLY recalculate lighting if it's necessary!
 	if (
@@ -2115,9 +2067,9 @@ void cChunk::GetBlockTypeMeta(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLE
 void cChunk::GetBlockInfo(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const
 {
 	a_BlockType  = GetBlock(a_RelPos);
-	a_Meta       = m_ChunkData.GetMeta(a_RelPos);
-	a_SkyLight   = m_ChunkData.GetSkyLight(a_RelPos);
-	a_BlockLight = m_ChunkData.GetBlockLight(a_RelPos);
+	a_Meta       = m_BlockData.GetMeta(a_RelPos);
+	a_SkyLight   = m_LightData.GetSkyLight(a_RelPos);
+	a_BlockLight = m_LightData.GetBlockLight(a_RelPos);
 }
 
 

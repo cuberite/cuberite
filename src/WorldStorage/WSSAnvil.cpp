@@ -353,16 +353,7 @@ Compression::Result cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk)
 
 bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, const ContiguousByteBufferView a_RawChunkData)
 {
-	// The data arrays, in MCA-native y / z / x ordering (will be reordered for the final chunk data)
-	cChunkDef::BlockTypes   BlockTypes;
-	cChunkDef::BlockNibbles MetaData;
-	cChunkDef::BlockNibbles BlockLight;
-	cChunkDef::BlockNibbles SkyLight;
-
-	memset(BlockTypes, 0,    sizeof(BlockTypes));
-	memset(MetaData,   0,    sizeof(MetaData));
-	memset(SkyLight,   0xff, sizeof(SkyLight));  // By default, data not present in the NBT means air, which means full skylight
-	memset(BlockLight, 0x00, sizeof(BlockLight));
+	struct SetChunkData Data(a_Chunk);
 
 	// Load the blockdata, blocklight and skylight:
 	int Level = a_NBT.FindChildByName(0, "Level");
@@ -371,12 +362,14 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing NBT tag: Level", a_RawChunkData);
 		return false;
 	}
+
 	int Sections = a_NBT.FindChildByName(Level, "Sections");
 	if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
 	{
 		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing NBT tag: Sections", a_RawChunkData);
 		return false;
 	}
+
 	eTagType SectionsType = a_NBT.GetChildrenType(Sections);
 	if ((SectionsType != TAG_Compound) && (SectionsType != TAG_End))
 	{
@@ -385,39 +378,56 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	}
 	for (int Child = a_NBT.GetFirstChild(Sections); Child >= 0; Child = a_NBT.GetNextSibling(Child))
 	{
-		int y = 0;
-		int SectionY = a_NBT.FindChildByName(Child, "Y");
-		if ((SectionY < 0) || (a_NBT.GetType(SectionY) != TAG_Byte))
+		const int SectionYTag = a_NBT.FindChildByName(Child, "Y");
+		if ((SectionYTag < 0) || (a_NBT.GetType(SectionYTag) != TAG_Byte))
 		{
-			continue;
+			ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT tag missing or has wrong: Y", a_RawChunkData);
+			return false;
 		}
-		y = a_NBT.GetByte(SectionY);
-		if ((y < 0) || (y > 15))
+
+		const int Y = a_NBT.GetByte(SectionYTag);
+		if ((Y < 0) || (Y > static_cast<int>(cChunkDef::NumSections - 1)))
 		{
-			continue;
+			ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT tag exceeds chunk bounds: Y", a_RawChunkData);
+			return false;
 		}
-		CopyNBTData(a_NBT, Child, "Blocks",     reinterpret_cast<char *>(&(BlockTypes[y * 4096])), 4096);
-		CopyNBTData(a_NBT, Child, "Data",       reinterpret_cast<char *>(&(MetaData[y   * 2048])), 2048);
-		CopyNBTData(a_NBT, Child, "SkyLight",   reinterpret_cast<char *>(&(SkyLight[y   * 2048])), 2048);
-		CopyNBTData(a_NBT, Child, "BlockLight", reinterpret_cast<char *>(&(BlockLight[y * 2048])), 2048);
+
+		const auto
+			BlockData = GetSectionData(a_NBT, Child, "Blocks", ChunkBlockData::SectionBlockCount),
+			MetaData = GetSectionData(a_NBT, Child, "Data", ChunkBlockData::SectionMetaCount),
+			BlockLightData = GetSectionData(a_NBT, Child, "BlockLight", ChunkLightData::SectionLightCount),
+			SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount);
+		if ((BlockData != nullptr) && (MetaData != nullptr) && (SkyLightData != nullptr) && (BlockLightData != nullptr))
+		{
+			Data.BlockData.SetSection(*reinterpret_cast<const ChunkBlockData::SectionType *>(BlockData), *reinterpret_cast<const ChunkBlockData::SectionMetaType *>(MetaData), static_cast<size_t>(Y));
+			Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
+		}
+		else
+		{
+			ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing chunk block/light data", a_RawChunkData);
+			return false;
+		}
 	}  // for itr - LevelSections[]
 
-	// Load the biomes from NBT, if present and valid. First try MCS-style, then Vanilla-style:
-	cChunkDef::BiomeMap BiomeMap;
-	cChunkDef::BiomeMap * Biomes = LoadBiomeMapFromNBT(&BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "MCSBiomes"));
-	if (Biomes == nullptr)
+	// Load the biomes from NBT, if present and valid:
+	if (!LoadBiomeMapFromNBT(Data.BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "Biomes")))
 	{
-		// MCS-style biomes not available, load vanilla-style:
-		Biomes = LoadVanillaBiomeMapFromNBT(&BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "Biomes"));
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing chunk biome data", a_RawChunkData);
+		return false;
+	}
+
+	// Height map too:
+	if (!LoadHeightMapFromNBT(Data.HeightMap, a_NBT, a_NBT.FindChildByName(Level, "HeightMap")))
+	{
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing chunk height data", a_RawChunkData);
+		return false;
 	}
 
 	// Load the entities from NBT:
-	cEntityList      Entities;
-	cBlockEntities   BlockEntities;
-	LoadEntitiesFromNBT     (Entities,      a_NBT, a_NBT.FindChildByName(Level, "Entities"));
-	LoadBlockEntitiesFromNBT(BlockEntities, a_NBT, a_NBT.FindChildByName(Level, "TileEntities"), BlockTypes, MetaData);
+	LoadEntitiesFromNBT     (Data.Entities,      a_NBT, a_NBT.FindChildByName(Level, "Entities"));
+	LoadBlockEntitiesFromNBT(Data.BlockEntities, a_NBT, a_NBT.FindChildByName(Level, "TileEntities"), Data.BlockData);
 
-	bool IsLightValid = (a_NBT.FindChildByName(Level, "MCSIsLightValid") > 0);
+	Data.IsLightValid = (a_NBT.FindChildByName(Level, "MCSIsLightValid") > 0);
 
 	/*
 	// Uncomment this block for really cool stuff :)
@@ -455,16 +465,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	}  // for y
 	//*/
 
-	auto SetChunkData = std::make_unique<cSetChunkData>(
-		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
-		BlockTypes, MetaData,
-		IsLightValid ? BlockLight : nullptr,
-		IsLightValid ? SkyLight : nullptr,
-		nullptr, Biomes,
-		std::move(Entities), std::move(BlockEntities),
-		false
-	);
-	m_World->QueueSetChunkData(std::move(SetChunkData));
+	m_World->QueueSetChunkData(std::move(Data));
 	return true;
 }
 
@@ -472,69 +473,66 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 
 
-void cWSSAnvil::CopyNBTData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, char * a_Destination, size_t a_Length)
+bool cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, const int a_TagIdx)
 {
-	int Child = a_NBT.FindChildByName(a_Tag, a_ChildName);
-	if ((Child >= 0) && (a_NBT.GetType(Child) == TAG_ByteArray) && (a_NBT.GetDataLength(Child) == a_Length))
+	if (
+		(a_TagIdx < 0) ||
+		(a_NBT.GetType(a_TagIdx) != TAG_ByteArray) ||
+		(a_NBT.GetDataLength(a_TagIdx) != std::size(a_BiomeMap))
+	)
 	{
-		memcpy(a_Destination, a_NBT.GetData(Child), a_Length);
+		return false;
 	}
+
+	const auto * const BiomeData = a_NBT.GetData(a_TagIdx);
+	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
+	{
+		if (BiomeData[i] > std::byte(EMCSBiome::biMaxVariantBiome))
+		{
+			// Unassigned biomes:
+			return false;
+		}
+
+		a_BiomeMap[i] = static_cast<EMCSBiome>(BiomeData[i]);
+	}
+
+	return true;
 }
 
 
 
 
 
-cChunkDef::BiomeMap * cWSSAnvil::LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
+bool cWSSAnvil::LoadHeightMapFromNBT(cChunkDef::HeightMap & a_HeightMap, const cParsedNBT & a_NBT, const int a_TagIdx)
 {
-	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_ByteArray))
+	if (
+		(a_TagIdx < 0) ||
+		(a_NBT.GetType(a_TagIdx) != TAG_IntArray) ||
+		(a_NBT.GetDataLength(a_TagIdx) != (4 * std::size(a_HeightMap)))
+	)
 	{
-		return nullptr;
+		return false;
 	}
-	if (a_NBT.GetDataLength(a_TagIdx) != 16 * 16)
+
+	const auto * const HeightData = a_NBT.GetData(a_TagIdx);
+	for (int RelZ = 0; RelZ < cChunkDef::Width; RelZ++)
 	{
-		// The biomes stored don't match in size
-		return nullptr;
-	}
-	const unsigned char * VanillaBiomeData = reinterpret_cast<const unsigned char *>(a_NBT.GetData(a_TagIdx));
-	for (size_t i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
-	{
-		if ((VanillaBiomeData)[i] == 0xff)
+		for (int RelX = 0; RelX < cChunkDef::Width; RelX++)
 		{
-			// Unassigned biomes
-			return nullptr;
-		}
-		(*a_BiomeMap)[i] = static_cast<EMCSBiome>(VanillaBiomeData[i]);
-	}
-	return a_BiomeMap;
-}
+			const int Index = 4 * (RelX + RelZ * cChunkDef::Width);
+			const int Height = GetBEInt(HeightData + Index);
 
+			if (Height > std::numeric_limits<HEIGHTTYPE>::max())
+			{
+				// Invalid data:
+				return false;
+			}
 
-
-
-
-cChunkDef::BiomeMap * cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
-{
-	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_IntArray))
-	{
-		return nullptr;
-	}
-	if (a_NBT.GetDataLength(a_TagIdx) != sizeof(*a_BiomeMap))
-	{
-		// The biomes stored don't match in size
-		return nullptr;
-	}
-	const auto * BiomeData = a_NBT.GetData(a_TagIdx);
-	for (size_t i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
-	{
-		(*a_BiomeMap)[i] = static_cast<EMCSBiome>(GetBEInt(&BiomeData[i * 4]));
-		if ((*a_BiomeMap)[i] == 0xff)
-		{
-			// Unassigned biomes
-			return nullptr;
+			cChunkDef::SetHeight(a_HeightMap, RelX, RelZ, static_cast<HEIGHTTYPE>(Height));
 		}
 	}
-	return a_BiomeMap;
+
+	return true;
 }
 
 
@@ -575,7 +573,7 @@ void cWSSAnvil::LoadEntitiesFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 
 
-void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE * a_BlockTypes, NIBBLETYPE * a_BlockMetas)
+void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx, const ChunkBlockData & a_BlockData)
 {
 	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_List))
 	{
@@ -596,11 +594,11 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 			LOGWARNING("Bad block entity, missing the coords. Will be ignored.");
 			continue;
 		}
-		auto relPos = cChunkDef::AbsoluteToRelative(absPos);
+		const auto relPos = cChunkDef::AbsoluteToRelative(absPos);
 
 		// Load the proper BlockEntity type based on the block type:
-		BLOCKTYPE BlockType = cChunkDef::GetBlock(a_BlockTypes, relPos);
-		NIBBLETYPE BlockMeta = cChunkDef::GetNibble(a_BlockMetas, relPos);
+		const auto BlockType = a_BlockData.GetBlock(relPos);
+		const auto BlockMeta = a_BlockData.GetMeta(relPos);
 		OwnedBlockEntity Entity;
 
 		try
@@ -3984,6 +3982,20 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, ContiguousB
 		return false;
 	}
 	return true;
+}
+
+
+
+
+
+const std::byte * cWSSAnvil::GetSectionData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, size_t a_Length)
+{
+	int Child = a_NBT.FindChildByName(a_Tag, a_ChildName);
+	if ((Child >= 0) && (a_NBT.GetType(Child) == TAG_ByteArray) && (a_NBT.GetDataLength(Child) == a_Length))
+	{
+		return a_NBT.GetData(Child);
+	}
+	return nullptr;
 }
 
 

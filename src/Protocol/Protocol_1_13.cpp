@@ -1309,7 +1309,7 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
-			UNREACHABLE("cProtocol_1_13::WriteMobMetadata: received unimplemented type");
+			LOGD("cProtocol_1_13::WriteMobMetadata: received unimplemented type");
 			break;
 		}
 

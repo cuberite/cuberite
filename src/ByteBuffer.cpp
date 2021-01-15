@@ -856,6 +856,34 @@ bool cByteBuffer::WriteBuf(const void * a_Buffer, size_t a_Count)
 
 
 
+bool cByteBuffer::WriteBuf(size_t a_Count, unsigned char a_Value)
+{
+	CHECK_THREAD
+	CheckValid();
+	PUTBYTES(a_Count);
+	ASSERT(m_BufferSize >= m_ReadPos);
+	size_t BytesToEndOfBuffer = m_BufferSize - m_WritePos;
+	if (BytesToEndOfBuffer <= a_Count)
+	{
+		// Reading across the ringbuffer end, read the first part and adjust parameters:
+		memset(m_Buffer + m_WritePos, a_Value, BytesToEndOfBuffer);
+		a_Count -= BytesToEndOfBuffer;
+		m_WritePos = 0;
+	}
+
+	// Read the rest of the bytes in a single read (guaranteed to fit):
+	if (a_Count > 0)
+	{
+		memset(m_Buffer + m_WritePos, a_Value, a_Count);
+		m_WritePos += a_Count;
+	}
+	return true;
+}
+
+
+
+
+
 bool cByteBuffer::ReadSome(ContiguousByteBuffer & a_String, size_t a_Count)
 {
 	CHECK_THREAD
