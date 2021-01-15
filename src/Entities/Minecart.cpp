@@ -137,7 +137,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	auto relPos = a_Chunk.AbsoluteToRelative(GetPosition());
+	auto relPos = cChunkDef::AbsoluteToRelative(GetPosition());
 	auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relPos);
 	if (chunk == nullptr)
 	{

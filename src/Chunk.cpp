@@ -483,7 +483,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 				continue;
 			}
 			// This block entity is inside the chunk, clone it (and remove any that is there currently):
-			auto idx = static_cast<size_t>(MakeIndex(posX - m_PosX * cChunkDef::Width, posY, posZ - m_PosZ * cChunkDef::Width));
+			auto idx = static_cast<size_t>(cChunkDef::MakeIndex(posX - m_PosX * cChunkDef::Width, posY, posZ - m_PosZ * cChunkDef::Width));
 			auto itr = m_BlockEntities.find(idx);
 			if (itr != m_BlockEntities.end())
 			{
@@ -584,7 +584,7 @@ void cChunk::GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z)
 	// MG TODO : check if this kind of optimization (only one random call) is still needed
 	// MG TODO : if so propagate it
 
-	GetThreeRandomNumbers(a_X, a_Y, a_Z, Width, Height - 2, Width);
+	GetThreeRandomNumbers(a_X, a_Y, a_Z, cChunkDef::Width, cChunkDef::Height - 2, cChunkDef::Width);
 	a_Y++;
 }
 
@@ -1201,8 +1201,8 @@ bool cChunk::UnboundedRelFastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, 
 
 int cChunk::GetHeight(int a_X, int a_Z) const
 {
-	ASSERT((a_X >= 0) && (a_X < Width) && (a_Z >= 0) && (a_Z < Width));
-	return m_HeightMap[a_X + a_Z * Width];
+	ASSERT((a_X >= 0) && (a_X < cChunkDef::Width) && (a_Z >= 0) && (a_Z < cChunkDef::Width));
+	return m_HeightMap[a_X + a_Z * cChunkDef::Width];
 }
 
 
@@ -1272,7 +1272,7 @@ void cChunk::WakeUpSimulators(void)
 		for (size_t BlockIdx = 0; BlockIdx != cChunkData::SectionBlockCount; ++BlockIdx)
 		{
 			const auto BlockType = Section->m_BlockTypes[BlockIdx];
-			auto Position = IndexToCoordinate(BlockIdx);
+			auto Position = cChunkDef::IndexToCoordinate(BlockIdx);
 			Position.y += static_cast<int>(SectionIdx * cChunkData::SectionHeight);
 
 			RedstoneSimulator->AddBlock(*this, Position, BlockType);
@@ -1280,29 +1280,6 @@ void cChunk::WakeUpSimulators(void)
 			LavaSimulator->AddBlock(*this, Position, BlockType);
 		}
 	}
-}
-
-
-
-
-
-void cChunk::CalculateHeightmap(const BLOCKTYPE * a_BlockTypes)
-{
-	for (int x = 0; x < Width; x++)
-	{
-		for (int z = 0; z < Width; z++)
-		{
-			for (int y = Height - 1; y > -1; y--)
-			{
-				int index = MakeIndex( x, y, z);
-				if (a_BlockTypes[index] != E_BLOCK_AIR)
-				{
-					m_HeightMap[x + z * Width] = static_cast<HEIGHTTYPE>(y);
-					break;
-				}
-			}  // for y
-		}  // for z
-	}  // for x
 }
 
 
@@ -1341,7 +1318,7 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 
 void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
 {
-	ASSERT(!((a_RelX < 0) || (a_RelX >= Width) || (a_RelY < 0) || (a_RelY >= Height) || (a_RelZ < 0) || (a_RelZ >= Width)));
+	ASSERT(!((a_RelX < 0) || (a_RelX >= cChunkDef::Width) || (a_RelY < 0) || (a_RelY >= cChunkDef::Height) || (a_RelZ < 0) || (a_RelZ >= cChunkDef::Width)));
 
 	ASSERT(IsValid());
 
@@ -1393,11 +1370,11 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	}
 
 	// Update heightmap, if needed:
-	if (a_RelY >= m_HeightMap[a_RelX + a_RelZ * Width])
+	if (a_RelY >= m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width])
 	{
 		if (a_BlockType != E_BLOCK_AIR)
 		{
-			m_HeightMap[a_RelX + a_RelZ * Width] = static_cast<HEIGHTTYPE>(a_RelY);
+			m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width] = static_cast<HEIGHTTYPE>(a_RelY);
 		}
 		else
 		{
@@ -1405,7 +1382,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 			{
 				if (GetBlock(a_RelX, y, a_RelZ) != E_BLOCK_AIR)
 				{
-					m_HeightMap[a_RelX + a_RelZ * Width] = static_cast<HEIGHTTYPE>(y);
+					m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width] = static_cast<HEIGHTTYPE>(y);
 					break;
 				}
 			}  // for y - column in m_BlockData
@@ -1445,7 +1422,7 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 void cChunk::AddBlockEntity(OwnedBlockEntity a_BlockEntity)
 {
 	[[maybe_unused]] const auto Result = m_BlockEntities.emplace(
-		MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ()),
+		cChunkDef::MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ()),
 		std::move(a_BlockEntity)
 	);
 	ASSERT(Result.second);  // No block entity already at this position
@@ -1457,15 +1434,15 @@ void cChunk::AddBlockEntity(OwnedBlockEntity a_BlockEntity)
 
 cBlockEntity * cChunk::GetBlockEntity(Vector3i a_AbsPos)
 {
-	auto relPos = AbsoluteToRelative(a_AbsPos);
+	const auto relPos = cChunkDef::AbsoluteToRelative(a_AbsPos);
 
-	if (!IsValidRelPos(relPos))
+	if (!cChunkDef::IsValidRelPos(relPos))
 	{
 		// Coordinates are outside outside this chunk, no block entities here
 		return nullptr;
 	}
 
-	auto itr = m_BlockEntities.find(static_cast<size_t>(MakeIndexNoCheck(relPos)));
+	auto itr = m_BlockEntities.find(static_cast<size_t>(cChunkDef::MakeIndexNoCheck(relPos)));
 	return (itr == m_BlockEntities.end()) ? nullptr : itr->second.get();
 }
 
@@ -1475,8 +1452,8 @@ cBlockEntity * cChunk::GetBlockEntity(Vector3i a_AbsPos)
 
 cBlockEntity * cChunk::GetBlockEntityRel(Vector3i a_RelPos)
 {
-	ASSERT(IsValidRelPos(a_RelPos));
-	auto itr = m_BlockEntities.find(static_cast<size_t>(MakeIndexNoCheck(a_RelPos)));
+	ASSERT(cChunkDef::IsValidRelPos(a_RelPos));
+	auto itr = m_BlockEntities.find(static_cast<size_t>(cChunkDef::MakeIndexNoCheck(a_RelPos)));
 	return (itr == m_BlockEntities.end()) ? nullptr : itr->second.get();
 }
 
@@ -1588,7 +1565,7 @@ void cChunk::RemoveBlockEntity(cBlockEntity * a_BlockEntity)
 {
 	MarkDirty();
 	ASSERT(a_BlockEntity != nullptr);
-	auto idx = static_cast<size_t>(MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ()));
+	auto idx = static_cast<size_t>(cChunkDef::MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ()));
 	m_BlockEntities.erase(idx);
 }
 
@@ -2171,7 +2148,7 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 		int BlockX = m_PosX * cChunkDef::Width + a_RelX;
 		int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
 		int ChunkX, ChunkZ;
-		BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
+		cChunkDef::BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
 		return m_ChunkMap->FindChunk(ChunkX, ChunkZ);
 	}
 
@@ -2236,8 +2213,8 @@ cChunk * cChunk::GetRelNeighborChunkAdjustCoords(Vector3i & a_RelPos) const
 
 	// The most common case: inside this chunk:
 	if (
-		(a_RelPos.x >= 0) && (a_RelPos.x < Width) &&
-		(a_RelPos.z >= 0) && (a_RelPos.z < Width)
+		(a_RelPos.x >= 0) && (a_RelPos.x < cChunkDef::Width) &&
+		(a_RelPos.z >= 0) && (a_RelPos.z < cChunkDef::Width)
 	)
 	{
 		return ToReturn;
@@ -2246,24 +2223,24 @@ cChunk * cChunk::GetRelNeighborChunkAdjustCoords(Vector3i & a_RelPos) const
 	// Request for a different chunk, calculate chunk offset:
 	int RelX = a_RelPos.x;  // Make a local copy of the coords (faster access)
 	int RelZ = a_RelPos.z;
-	while ((RelX >= Width) && (ToReturn != nullptr))
+	while ((RelX >= cChunkDef::Width) && (ToReturn != nullptr))
 	{
-		RelX -= Width;
+		RelX -= cChunkDef::Width;
 		ToReturn = ToReturn->m_NeighborXP;
 	}
 	while ((RelX < 0) && (ToReturn != nullptr))
 	{
-		RelX += Width;
+		RelX += cChunkDef::Width;
 		ToReturn = ToReturn->m_NeighborXM;
 	}
-	while ((RelZ >= Width) && (ToReturn != nullptr))
+	while ((RelZ >= cChunkDef::Width) && (ToReturn != nullptr))
 	{
-		RelZ -= Width;
+		RelZ -= cChunkDef::Width;
 		ToReturn = ToReturn->m_NeighborZP;
 	}
 	while ((RelZ < 0) && (ToReturn != nullptr))
 	{
-		RelZ += Width;
+		RelZ += cChunkDef::Width;
 		ToReturn = ToReturn->m_NeighborZM;
 	}
 	if (ToReturn != nullptr)
@@ -2274,13 +2251,13 @@ cChunk * cChunk::GetRelNeighborChunkAdjustCoords(Vector3i & a_RelPos) const
 	}
 
 	// The chunk cannot be walked through neighbors, find it through the chunkmap:
-	int AbsX = a_RelPos.x + m_PosX * Width;
-	int AbsZ = a_RelPos.z + m_PosZ * Width;
+	int AbsX = a_RelPos.x + m_PosX * cChunkDef::Width;
+	int AbsZ = a_RelPos.z + m_PosZ * cChunkDef::Width;
 	int DstChunkX, DstChunkZ;
-	BlockToChunk(AbsX, AbsZ, DstChunkX, DstChunkZ);
+	cChunkDef::BlockToChunk(AbsX, AbsZ, DstChunkX, DstChunkZ);
 	ToReturn = m_ChunkMap->FindChunk(DstChunkX, DstChunkZ);
-	a_RelPos.x = AbsX - DstChunkX * Width;
-	a_RelPos.z = AbsZ - DstChunkZ * Width;
+	a_RelPos.x = AbsX - DstChunkX * cChunkDef::Width;
+	a_RelPos.z = AbsZ - DstChunkZ * cChunkDef::Width;
 	return ToReturn;
 }
 
@@ -2305,8 +2282,8 @@ void cChunk::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHa
 void cChunk::PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ, int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 {
 	a_BlockY = a_RelY;
-	a_BlockX = m_PosX * Width + a_RelX;
-	a_BlockZ = m_PosZ * Width + a_RelZ;
+	a_BlockX = m_PosX * cChunkDef::Width + a_RelX;
+	a_BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
 }
 
 
@@ -2315,7 +2292,7 @@ void cChunk::PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ, int & a
 
 Vector3i cChunk::PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ)
 {
-	return Vector3i(m_PosX * Width + a_RelX, a_RelY, m_PosZ * Width + a_RelZ);
+	return Vector3i(m_PosX * cChunkDef::Width + a_RelX, a_RelY, m_PosZ * cChunkDef::Width + a_RelZ);
 }
 
 

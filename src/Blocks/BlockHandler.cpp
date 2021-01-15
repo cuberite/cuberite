@@ -488,7 +488,7 @@ void cBlockHandler::OnUpdate(
 
 void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const
 {
-	if (a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { return CanBeAt(a_ChunkInterface, a_Chunk.AbsoluteToRelative(a_BlockPos), a_Chunk); }))
+	if (a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { return CanBeAt(a_ChunkInterface, cChunkDef::AbsoluteToRelative(a_BlockPos), a_Chunk); }))
 	{
 		return;
 	}

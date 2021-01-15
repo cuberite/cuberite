@@ -45,10 +45,7 @@ typedef std::list<cClientHandle *>                cClientHandleList;
 #define PREPARE_REL_AND_CHUNK(Position, OriginalChunk) cChunk * Chunk; Vector3i Rel; bool RelSuccess = (OriginalChunk).GetChunkAndRelByAbsolute(Position, &Chunk, Rel)
 
 
-// This class is not to be used directly
-// Instead, call actions on cChunkMap (such as cChunkMap::SetBlock() etc.)
-class cChunk :
-	public cChunkDef  // The inheritance is "misused" here only to inherit the functions and constants defined in cChunkDef
+class cChunk
 {
 public:
 
@@ -346,8 +343,6 @@ public:
 	/** Use block entity on coordinate.
 	returns true if the use was successful, return false to use the block as a "normal" block */
 	bool UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
-
-	void CalculateHeightmap(const BLOCKTYPE * a_BlockTypes);
 
 	void SendBlockEntity             (int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 
