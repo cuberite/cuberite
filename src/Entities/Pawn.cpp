@@ -115,15 +115,16 @@ void cPawn::KilledBy(TakeDamageInfo & a_TDI)
 	if (IsPlayer())
 	{
 		auto Player = static_cast<cPlayer *>(this);
+		cInventory & inv = Player->GetInventory();
 
 		//  If the player is holding a totem of undying in their off-hand or
 		//  main-hand slot and receives otherwise fatal damage, the totem saves the player from death.
-		if ((Player->GetInventory().GetShieldSlot().m_ItemType == E_ITEM_TOTEM_OF_UNDYING ||
-			Player->GetInventory().GetEquippedItem().m_ItemType == E_ITEM_TOTEM_OF_UNDYING) &&
+		if ((inv.GetShieldSlot().m_ItemType == E_ITEM_TOTEM_OF_UNDYING ||
+			 inv.GetEquippedItem().m_ItemType == E_ITEM_TOTEM_OF_UNDYING) &&
 				a_TDI.DamageType != dtAdmin && a_TDI.DamageType != dtInVoid
 			)
 		{
-			Player->GetInventory().SetShieldSlot(cItem());
+			inv.SetShieldSlot(cItem());
 			m_World->BroadcastEntityStatus(*this, esTotemOfUndying);
 
 			AddEntityEffect(cEntityEffect::effAbsorption, 100, 1);
