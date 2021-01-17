@@ -177,6 +177,13 @@ void cProtocol_1_8_0::DataReceived(cByteBuffer & a_Buffer, const char * a_Data, 
 {
 	if (m_IsEncrypted)
 	{
+		// An artefact of the protocol recogniser, will be removed when decryption done in-place:
+		if (a_Size == 0)
+		{
+			AddReceivedData(a_Buffer, nullptr, 0);
+			return;
+		}
+
 		std::byte Decrypted[512];
 		while (a_Size > 0)
 		{

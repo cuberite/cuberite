@@ -1981,14 +1981,7 @@ void cClientHandle::Tick(float a_Dt)
 		m_BreakProgress += m_Player->GetMiningProgressPerTick(Block);
 	}
 
-	try
-	{
-		ProcessProtocolIn();
-	}
-	catch (const std::exception & Oops)
-	{
-		Kick(Oops.what());
-	}
+	ProcessProtocolIn();
 
 	if (IsDestroyed())
 	{
@@ -3171,7 +3164,7 @@ void cClientHandle::PacketBufferFull(void)
 {
 	// Too much data in the incoming queue, the server is probably too busy, kick the client:
 	LOGERROR("Too much data in queue for client \"%s\" @ %s, kicking them.", m_Username.c_str(), m_IPString.c_str());
-	SendDisconnect("Server busy");
+	SendDisconnect("The server is busy; please try again later.");
 }
 
 
@@ -3249,9 +3242,18 @@ void cClientHandle::ProcessProtocolIn(void)
 		std::swap(IncomingData, m_IncomingData);
 	}
 
-	if (!IncomingData.empty())
+	if (IncomingData.empty())
+	{
+		return;
+	}
+
+	try
 	{
 		m_Protocol.HandleIncomingData(*this, IncomingData);
+	}
+	catch (const std::exception & Oops)
+	{
+		Kick(Oops.what());
 	}
 }
 

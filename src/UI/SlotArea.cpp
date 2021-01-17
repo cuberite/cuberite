@@ -2815,7 +2815,6 @@ void cSlotAreaHorse::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 				}
 				default: break;
 			}
-
 		}
 		default: break;
 	}
