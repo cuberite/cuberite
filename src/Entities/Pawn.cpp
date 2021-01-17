@@ -111,6 +111,36 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cPawn::KilledBy(TakeDamageInfo & a_TDI)
 {
 	ClearEntityEffects();
+
+	if (IsPlayer())
+	{
+		auto Player = static_cast<cPlayer *>(this);
+
+		//  If the player is holding a totem of undying in their off-hand or
+		//  main-hand slot and receives otherwise fatal damage, the totem saves the player from death.
+		if ((Player->GetInventory().GetShieldSlot().m_ItemType == E_ITEM_TOTEM_OF_UNDYING ||
+			Player->GetInventory().GetEquippedItem().m_ItemType == E_ITEM_TOTEM_OF_UNDYING) &&
+				a_TDI.DamageType != dtAdmin && a_TDI.DamageType != dtInVoid
+			)
+		{
+			Player->GetInventory().SetShieldSlot(cItem());
+			m_World->BroadcastEntityStatus(*this, esTotemOfUndying);
+
+			AddEntityEffect(cEntityEffect::effAbsorption, 100, 1);
+			AddEntityEffect(cEntityEffect::effRegeneration, 900, 1);
+			AddEntityEffect(cEntityEffect::effFireResistance, 800, 0);
+
+			m_Health = 1;
+
+			return;
+		}
+	}
+	else
+	{
+		// todo implement when mobs will be able to pick up items based on
+		// CanPickUpLoot attribute
+	}
+
 	Super::KilledBy(a_TDI);
 }
 
