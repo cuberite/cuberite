@@ -124,7 +124,14 @@ void cPawn::KilledBy(TakeDamageInfo & a_TDI)
 				a_TDI.DamageType != dtAdmin && a_TDI.DamageType != dtInVoid
 			)
 		{
-			inv.SetShieldSlot(cItem());
+			if (inv.GetShieldSlot().m_ItemType == E_ITEM_TOTEM_OF_UNDYING) {
+				inv.SetShieldSlot(cItem());
+			}
+			else
+			{
+				inv.SetEquippedItem(cItem());
+			}
+
 			m_World->BroadcastEntityStatus(*this, esTotemOfUndying);
 
 			AddEntityEffect(cEntityEffect::effAbsorption, 100, 1);
