@@ -119,18 +119,9 @@ void cPawn::KilledBy(TakeDamageInfo & a_TDI)
 
 		//  If the player is holding a totem of undying in their off-hand or
 		//  main-hand slot and receives otherwise fatal damage, the totem saves the player from death.
-		if ((inv.GetShieldSlot().m_ItemType == E_ITEM_TOTEM_OF_UNDYING ||
-			 inv.GetEquippedItem().m_ItemType == E_ITEM_TOTEM_OF_UNDYING) &&
-				a_TDI.DamageType != dtAdmin && a_TDI.DamageType != dtInVoid
-			)
+		// Is death eligible for totem reanimation?
+		if (a_TDI.DamageType != dtAdmin && a_TDI.DamageType != dtInVoid && DeductTotem(Player))
 		{
-			if (inv.GetShieldSlot().m_ItemType == E_ITEM_TOTEM_OF_UNDYING) {
-				inv.SetShieldSlot(cItem());
-			}
-			else
-			{
-				inv.SetEquippedItem(cItem());
-			}
 
 			m_World->BroadcastEntityStatus(*this, esTotemOfUndying);
 
