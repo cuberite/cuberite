@@ -106,6 +106,21 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
+bool DeductTotem(cPlayer * a_Player)
+{
+	auto & inv = a_Player->GetInventory();
+	if (inv.GetEquippedItem().m_ItemType == E_ITEM_TOTEM_OF_UNDYING)
+	{
+		inv.SetEquippedItem(cItem());
+		return true;
+	}
+	if (inv.GetShieldSlot().m_ItemType == E_ITEM_TOTEM_OF_UNDYING)
+	{
+		inv.SetShieldSlot(cItem());
+		return true;
+	}
+	return false;
+}
 
 
 void cPawn::KilledBy(TakeDamageInfo & a_TDI)
