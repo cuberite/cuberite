@@ -45,32 +45,34 @@ class cItemEndCrystalHandler : public cItemHandler
 
 		auto a_BlockType = ChunkInterface.GetBlock(a_BlockPos);
 
-		// When placed on obsidian or bedrock
-		if (a_BlockType == E_BLOCK_OBSIDIAN || a_BlockType == E_BLOCK_BEDROCK)
+		// Dont't place if placement block is not obsidian or bedrock
+		if (a_BlockType != E_BLOCK_OBSIDIAN && a_BlockType != E_BLOCK_BEDROCK)
 		{
-			// Check there are no end crystals in bounding box as in vanilla server
-			bool CanBePlaced = !a_ChunkMap->ForEachEntityInBox(cBoundingBox(a_BlockPos,Vector3d(a_BlockPos.x + 1.0, a_BlockPos.y + 2.0, a_BlockPos.z + 1.0)),
-				[](cEntity & a_Entity) -> bool
-				{
-					return a_Entity.IsEnderCrystal();
-				}
-			);
-
-			if (CanBePlaced)
-			{
-				// Spawns ender crystal entity
-				a_World->SpawnEnderCrystal(Vector3d(a_BlockPos.x + 0.5, a_BlockPos.y + 1.0, a_BlockPos.z + 0.5), false);
-
-				if (!a_Player->IsGameModeCreative())
-				{
-					// Remove one ender crystal from player's inventory
-					a_Player->GetInventory().RemoveOneEquippedItem();
-				}
-
-				return true;
-			}
+			return false;
 		}
 
+		// Checks if there are end crystals in bounding box
+		bool CanBePlaced = !a_ChunkMap->ForEachEntityInBox(cBoundingBox(a_BlockPos,Vector3d(a_BlockPos.x + 1.0, a_BlockPos.y + 2.0, a_BlockPos.z + 1.0)),
+			[](cEntity & a_Entity) -> bool
+			{
+				return a_Entity.IsEnderCrystal();
+			}
+		);
+
+		if (CanBePlaced)
+		{
+			// Spawns ender crystal entity
+			a_World->SpawnEnderCrystal(Vector3d(a_BlockPos.x + 0.5, a_BlockPos.y + 1.0, a_BlockPos.z + 0.5), false);
+
+			if (!a_Player->IsGameModeCreative())
+			{
+				// Removes one ender crystal from player's inventory
+				a_Player->GetInventory().RemoveOneEquippedItem();
+			}
+
+			return true;
+		}
+		
 		return false;
 	}
 };
