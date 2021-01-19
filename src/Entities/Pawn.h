@@ -79,7 +79,9 @@ protected:
 
 	virtual void ResetPosition(Vector3d a_NewPosition) override;
 
-private:
+	static bool DeductTotem(cPlayer * a_Player);
+
+  private:
 
 	/** A list of all monsters that are targeting this pawn. */
 	std::vector<cMonster*> m_TargetingMe;

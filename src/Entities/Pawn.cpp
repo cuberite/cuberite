@@ -106,7 +106,7 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-bool DeductTotem(cPlayer * a_Player)
+bool cPawn::DeductTotem(cPlayer * a_Player)
 {
 	auto & inv = a_Player->GetInventory();
 	if (inv.GetEquippedItem().m_ItemType == E_ITEM_TOTEM_OF_UNDYING)
@@ -130,7 +130,6 @@ void cPawn::KilledBy(TakeDamageInfo & a_TDI)
 	if (IsPlayer())
 	{
 		auto Player = static_cast<cPlayer *>(this);
-		cInventory & inv = Player->GetInventory();
 
 		//  If the player is holding a totem of undying in their off-hand or
 		//  main-hand slot and receives otherwise fatal damage, the totem saves the player from death.
