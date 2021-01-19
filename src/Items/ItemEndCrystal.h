@@ -48,18 +48,11 @@ class cItemEndCrystalHandler : public cItemHandler
 		// When placed on obsidian or bedrock
 		if (a_BlockType == E_BLOCK_OBSIDIAN || a_BlockType == E_BLOCK_BEDROCK)
 		{
-			bool CanBePlaced = true;
-
-			// Gets ender crystals in bounding box as in vanilla server
-			a_ChunkMap->ForEachEntityInBox(cBoundingBox(a_BlockPos,Vector3d(a_BlockPos.x + 1.0, a_BlockPos.y + 2.0, a_BlockPos.z + 1.0)),
-				[&CanBePlaced](cEntity & a_Entity) -> bool
+			// Check there are no end crystals in bounding box as in vanilla server
+			bool CanBePlaced = !a_ChunkMap->ForEachEntityInBox(cBoundingBox(a_BlockPos,Vector3d(a_BlockPos.x + 1.0, a_BlockPos.y + 2.0, a_BlockPos.z + 1.0)),
+				[](cEntity & a_Entity) -> bool
 				{
-					if (a_Entity.IsEnderCrystal())
-					{
-						CanBePlaced = false;
-					}
-
-					return false;
+					return a_Entity.IsEnderCrystal();
 				}
 			);
 
