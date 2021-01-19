@@ -404,15 +404,19 @@ void cPawn::HandleFalling(void)
 		auto Damage = static_cast<int>(m_LastGroundHeight - GetPosY() - 3.0);
 		if ((Damage > 0) && !FallDamageAbsorbed)
 		{
+			// Take fall damage
 			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
+
+			// Call informative hook
+			cPluginManager::Get()->CallHookPawnFell(*this, Damage);
 
 			// Fall particles
 			GetWorld()->BroadcastParticleEffect(
 				"blockdust",
 				GetPosition(),
 				{ 0, 0, 0 },
-				(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
-				static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
+				(Damage - 1.f) * 0.01428571429 + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3) Full formula: ((Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f)
+				static_cast<int>((Damage - 1.f) * 2.142857143 + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50) Full formula: static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f)
 				{ { GetWorld()->GetBlock(POS_TOINT - Vector3i(0, 1, 0)), 0 } }
 			);
 		}

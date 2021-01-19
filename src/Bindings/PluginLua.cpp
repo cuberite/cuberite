@@ -583,6 +583,16 @@ bool cPluginLua::OnLoginForge(cClientHandle & a_Client, const AStringMap & a_Mod
 
 
 
+bool cPluginLua::OnPawnFell(cPawn & a_Pawn, int & a_Damage)
+{
+	return CallSimpleHooks(
+		cPluginManager::HOOK_PAWN_FELL, &a_Pawn, a_Damage);
+}
+
+
+
+
+
 bool cPluginLua::OnPlayerAnimation(cPlayer & a_Player, int a_Animation)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_ANIMATION, &a_Player, a_Animation);

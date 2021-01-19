@@ -697,6 +697,19 @@ bool cPluginManager::CallHookLoginForge(cClientHandle & a_Client, AStringMap & a
 
 
 
+bool cPluginManager::CallHookPawnFell(cPawn & a_Pawn, int & a_Damage)
+{
+	return GenericCallHook(HOOK_PAWN_FELL, [&](cPlugin * a_Plugin)
+		{
+			return a_Plugin->OnPawnFell(a_Pawn, a_Damage);
+		}
+	);
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation)
 {
 	return GenericCallHook(HOOK_PLAYER_ANIMATION, [&](cPlugin * a_Plugin)
