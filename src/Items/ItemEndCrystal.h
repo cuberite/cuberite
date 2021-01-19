@@ -39,6 +39,7 @@ class cItemEndCrystalHandler : public cItemHandler
 
 		cChunkInterface ChunkInterface(a_ChunkMap);
 
+		// Don't place if two blocks above placement block aren't air
 		if (ChunkInterface.GetBlock(a_BlockPos + Vector3i(0, 1, 0)) != 0 ||
 			ChunkInterface.GetBlock(a_BlockPos + Vector3i(0, 2, 0)) != 0)
 		{
@@ -47,15 +48,16 @@ class cItemEndCrystalHandler : public cItemHandler
 
 		auto a_BlockType = ChunkInterface.GetBlock(a_BlockPos);
 
+		// When placed on obsidian or bedrock
 		if (a_BlockType == E_BLOCK_OBSIDIAN || a_BlockType == E_BLOCK_BEDROCK)
 		{
-
 			bool CanBePlaced = true;
 
+			// Gets ender crystals in bounding box as in vanilla server
 			a_ChunkMap->ForEachEntityInBox(cBoundingBox(a_BlockPos,Vector3d(a_BlockPos.x + 1.0, a_BlockPos.y + 2.0, a_BlockPos.z + 1.0)),
 				[&CanBePlaced](cEntity & a_Entity) -> bool
 				{
-					if (a_Entity.GetEntityType() == esEnderCrystal)
+					if (a_Entity.IsEnderCrystal())
 					{
 						CanBePlaced = false;
 					}
@@ -66,10 +68,12 @@ class cItemEndCrystalHandler : public cItemHandler
 
 			if (CanBePlaced)
 			{
+				// Spawns ender crystal entity
 				a_World->SpawnEnderCrystal(Vector3d(a_BlockPos.x + 0.5, a_BlockPos.y + 1.0, a_BlockPos.z + 0.5), false);
 
 				if (!a_Player->IsGameModeCreative())
 				{
+					// Remove one ender crystal from player's inventory
 					a_Player->GetInventory().RemoveOneEquippedItem();
 				}
 
