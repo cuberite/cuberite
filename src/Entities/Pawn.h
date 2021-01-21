@@ -71,6 +71,7 @@ public:
 	cEntityEffect * GetEntityEffect(cEntityEffect::eType a_EffectType) const;
 
 protected:
+
 	typedef std::map<cEntityEffect::eType, std::unique_ptr<cEntityEffect>> tEffectMap;
 	tEffectMap m_EntityEffects;
 
@@ -79,10 +80,12 @@ protected:
 
 	virtual void ResetPosition(Vector3d a_NewPosition) override;
 
-	static bool DeductTotem(cPlayer * a_Player);
-
-  private:
+private:
 
 	/** A list of all monsters that are targeting this pawn. */
 	std::vector<cMonster*> m_TargetingMe;
+
+	/** Attempt to activate a Totem of Undying.
+	If activation for the given type of damage was successful, consumes the totem and returns true. */
+	bool DeductTotem(eDamageType a_DamageType);
 } ;  // tolua_export
