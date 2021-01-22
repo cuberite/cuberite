@@ -9,15 +9,17 @@
 
 
 
-class cItemEndCrystalHandler : public cItemHandler
+class cItemEndCrystalHandler :
+	public cItemHandler
 {
 	using Super = cItemHandler;
 
   public:
-	cItemEndCrystalHandler(int a_ItemType) : Super(a_ItemType) {}
 
-
-
+	cItemEndCrystalHandler(int a_ItemType) :
+		Super(a_ItemType)
+	{
+	}
 
 
 	virtual bool OnItemUse(
@@ -32,40 +34,42 @@ class cItemEndCrystalHandler : public cItemHandler
 			return false;
 		}
 
-		auto * a_ChunkMap = a_World->GetChunkMap();
+		if (
+			const auto BlockType = a_World->GetBlock(a_BlockPos);
 
-		cChunkInterface ChunkInterface(a_ChunkMap);
-
-		// Don't place if two blocks above placement block aren't air
-		if (ChunkInterface.GetBlock(a_BlockPos + Vector3i(0, 1, 0)) != E_BLOCK_AIR  ||
-			ChunkInterface.GetBlock(a_BlockPos + Vector3i(0, 2, 0)) != E_BLOCK_AIR )
+			// Don't place if placement block is not obsidian or bedrock:
+			(BlockType != E_BLOCK_OBSIDIAN) && (BlockType != E_BLOCK_BEDROCK)
+		)
 		{
 			return false;
 		}
 
-		auto a_BlockType = ChunkInterface.GetBlock(a_BlockPos);
+		// The position of the block above the placement block.
+		const auto Above = a_BlockPos.addedY(1);
 
-		// Dont't place if placement block is not obsidian or bedrock
-		if (a_BlockType != E_BLOCK_OBSIDIAN && a_BlockType != E_BLOCK_BEDROCK)
+		if (
+			// Don't place if two blocks above placement block aren't air:
+			((Above.y != cChunkDef::Height) && (a_World->GetBlock(Above) != E_BLOCK_AIR)) ||
+			((Above.y < (cChunkDef::Height - 1)) && (a_World->GetBlock(Above.addedY(1)) != E_BLOCK_AIR)) ||
+
+			// Refuse placement if there are any entities in a (1 by 2 by 1) bounding box with base at the block above:
+			!a_World->ForEachEntityInBox(
+				{ Above, Above + Vector3i(1, 2, 1) },
+				[](cEntity & a_Entity)
+				{
+					return true;
+				}
+			)
+		)
 		{
 			return false;
 		}
 
-		// Checks if there are end crystals in bounding box
-		bool CanBePlaced = a_ChunkMap->ForEachEntityInBox(cBoundingBox(a_BlockPos,Vector3d(a_BlockPos.x + 1.0, a_BlockPos.y + 2.0, a_BlockPos.z + 1.0)),
-			[](cEntity & a_Entity) -> bool
-			{
-				return a_Entity.IsEnderCrystal();
-			}
-		);
-
-		if (!CanBePlaced)
+		// Spawns ender crystal entity, aborts if plugin cancelled:
+		if (a_World->SpawnEnderCrystal(Vector3d(0.5, 0, 0.5) + Above, false) == cEntity::INVALID_ID)
 		{
 			return false;
 		}
-
-		// Spawns ender crystal entity
-		a_World->SpawnEnderCrystal(Vector3d(a_BlockPos.x + 0.5, a_BlockPos.y + 1.0, a_BlockPos.z + 0.5), false);
 
 		if (!a_Player->IsGameModeCreative())
 		{
