@@ -58,7 +58,7 @@ class cLuaState
 {
 public:
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		/** Asserts that the Lua stack has the same amount of entries when this object is destructed, as when it was constructed.
 		Used for checking functions that should preserve Lua stack balance. */
 		class cStackBalanceCheck

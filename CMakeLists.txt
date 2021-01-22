@@ -45,11 +45,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# TODO: use standard NDEBUG in place of _DEBUG
-if("${CMAKE_BUILD_TYPE}" MATCHES "DEBUG")
-	add_definitions(-D_DEBUG)
-endif()
-
 # The need for speed (in Release):
 if(WHOLE_PROGRAM_OPTIMISATION)
 	include(CheckIPOSupported)

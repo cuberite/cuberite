@@ -105,9 +105,9 @@ public:
 		cChunkDef::HeightMap & a_HeightMap
 	);
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 	AString ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) const;
-	#endif  // _DEBUG
+	#endif  // !NDEBUG
 } ;
 
 typedef std::vector<cCaveTunnel *> cCaveTunnels;
@@ -530,7 +530,7 @@ void cCaveTunnel::ProcessChunk(
 	}  // for itr - m_Points[]
 
 	/*
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 	// For debugging purposes, outline the shape of the cave using glowstone, after carving the entire cave:
 	for (cCaveDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
 	{
@@ -545,7 +545,7 @@ void cCaveTunnel::ProcessChunk(
 			cChunkDef::SetBlock(a_BlockTypes, DifX, itr->m_BlockY, DifZ, E_BLOCK_GLOWSTONE);
 		}
 	}  // for itr - m_Points[]
-	#endif  // _DEBUG
+	#endif  // !NDEBUG
 	//*/
 }
 
@@ -553,7 +553,7 @@ void cCaveTunnel::ProcessChunk(
 
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 AString cCaveTunnel::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) const
 {
 	AString SVG;
@@ -568,7 +568,7 @@ AString cCaveTunnel::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) cons
 	SVG.append("\"/>\n");
 	return SVG;
 }
-#endif  // _DEBUG
+#endif  // !NDEBUG
 
 
 
