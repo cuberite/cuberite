@@ -89,13 +89,14 @@ void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 {
 	Super::KilledBy(a_TDI);
 
-	m_World->DoExplosionAt(6.0, GetPosX(), GetPosY() + (GetHeight() / 2.0), GetPosZ(), true, esEnderCrystal, this);
-
+	// Destroy first so the Explodinator doesn't find us (when iterating through entities):
 	Destroy();
 
-	m_World->SetBlock(POS_TOINT, E_BLOCK_FIRE, 0);
+	m_World->DoExplosionAt(6.0, GetPosX(), GetPosY() + (GetHeight() / 2.0), GetPosZ(), true, esEnderCrystal, this);
+
+	const auto Position = GetPosition().Floor();
+	if (cChunkDef::IsValidHeight(Position.y))
+	{
+		m_World->SetBlock(Position, E_BLOCK_FIRE, 0);
+	}
 }
-
-
-
-
