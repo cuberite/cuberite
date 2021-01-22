@@ -111,6 +111,20 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cPawn::KilledBy(TakeDamageInfo & a_TDI)
 {
 	ClearEntityEffects();
+
+	// Is death eligible for totem reanimation?
+	if (DeductTotem(a_TDI.DamageType))
+	{
+		m_World->BroadcastEntityStatus(*this, esTotemOfUndying);
+
+		AddEntityEffect(cEntityEffect::effAbsorption, 100, 1);
+		AddEntityEffect(cEntityEffect::effRegeneration, 900, 1);
+		AddEntityEffect(cEntityEffect::effFireResistance, 800, 0);
+
+		m_Health = 1;
+		return;
+	}
+
 	Super::KilledBy(a_TDI);
 }
 
@@ -489,4 +503,39 @@ void cPawn::ResetPosition(Vector3d a_NewPosition)
 {
 	Super::ResetPosition(a_NewPosition);
 	m_LastGroundHeight = GetPosY();
+}
+
+
+
+
+
+bool cPawn::DeductTotem(const eDamageType a_DamageType)
+{
+	if ((a_DamageType == dtAdmin) || (a_DamageType == dtInVoid))
+	{
+		// Beyond saving:
+		return false;
+	}
+
+	if (!IsPlayer())
+	{
+		// TODO: implement when mobs will be able to pick up items based on CanPickUpLoot attribute:
+		return false;
+	}
+
+	// If the player is holding a totem of undying in their off-hand or
+	// main-hand slot and receives otherwise fatal damage, the totem saves the player from death.
+
+	auto & inv = static_cast<cPlayer *>(this)->GetInventory();
+	if (inv.GetEquippedItem().m_ItemType == E_ITEM_TOTEM_OF_UNDYING)
+	{
+		inv.SetEquippedItem({});
+		return true;
+	}
+	if (inv.GetShieldSlot().m_ItemType == E_ITEM_TOTEM_OF_UNDYING)
+	{
+		inv.SetShieldSlot({});
+		return true;
+	}
+	return false;
 }
