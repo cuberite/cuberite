@@ -354,9 +354,10 @@ public:
 					const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
 					EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, mWriter, TagName);
 				}
-				
-				if (!a_Item.m_BlockEntityTag.empty()){
-					auto a_ItemGrid = cItemGrid(3,9);
+
+				if (!a_Item.m_BlockEntityTag.empty())
+				{
+					auto a_ItemGrid = cItemGrid(3, 9);
 					BlockEntityTagSerializer::ParseFromJson(a_Item.m_BlockEntityTag, a_ItemGrid);
 
 					mWriter.BeginCompound("BlockEntityTag");

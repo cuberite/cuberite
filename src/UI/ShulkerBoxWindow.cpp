@@ -12,6 +12,10 @@
 
 class cItemGrid;
 
+
+
+
+
 cShulkerBoxWindow::cShulkerBoxWindow(cShulkerBoxEntity * a_ShulkerBox, AString CustomName):
 	cWindow(wtShulkerBox, CustomName.length() > 0 ? CustomName : "Shulker Box"),
 	m_World(a_ShulkerBox->GetWorld()),
@@ -28,6 +32,9 @@ cShulkerBoxWindow::cShulkerBoxWindow(cShulkerBoxEntity * a_ShulkerBox, AString C
 	// Send out the shulker box open packet:
 	m_World->BroadcastBlockAction(m_BlockPos, 1, 1, a_ShulkerBox->GetBlockType());
 }
+
+
+
 
 
 cShulkerBoxWindow::~cShulkerBoxWindow()
@@ -81,3 +88,7 @@ void cShulkerBoxWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer
 		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
 }
+
+
+
+

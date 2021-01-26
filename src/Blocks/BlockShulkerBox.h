@@ -9,12 +9,13 @@
 
 
 
-class cBlockShulkerBoxHandler final : public cBlockEntityHandler
+class cBlockShulkerBoxHandler final :
+	public cBlockEntityHandler
 {
-  public:
+public:
 	using cBlockEntityHandler::cBlockEntityHandler;
 
-  private:
+private:
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{

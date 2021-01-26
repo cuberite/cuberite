@@ -61,7 +61,7 @@ public:
 
 	AString m_CustomName;
 
-  private:
+private:
 
 	/** Number of players who currently have this shulker box open */
 	int m_NumActivePlayers;
@@ -73,3 +73,7 @@ public:
 	/** cItemGrid::cListener overrides: */
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override;
 } ;  // tolua_export
+
+
+
+

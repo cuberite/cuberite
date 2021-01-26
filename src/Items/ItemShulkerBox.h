@@ -23,8 +23,7 @@ public:
 	}
 
 
-	/** We need an OnPlayerPlace override because we're processing neighbor chests and changing their metas,
-	the parent class cannot do that. */
+
 	virtual bool OnPlayerPlace(
 		cWorld & a_World,
 		cPlayer & a_Player,
@@ -55,7 +54,7 @@ public:
 		Vector3i PlacePos;
 
 
-		if(cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
+		if (cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
 		{
 			PlacePos = a_ClickedBlockPos;
 		}
@@ -79,10 +78,10 @@ public:
 		}
 
 
-		// Get the meta of the placed chest; take existing neighbors into account:
+		// Get the meta of the placed shulker box
 		BLOCKTYPE ShulkerBoxType = static_cast<BLOCKTYPE>(m_ItemType);
 
-		// Place the new chest:
+		// Place the new shulker box:
 		if (!a_Player.PlaceBlock(PlacePos.x, PlacePos.y, PlacePos.z, ShulkerBoxType, a_ClickedBlockFace))
 		{
 			return false;
@@ -90,9 +89,10 @@ public:
 
 
 		a_World.DoWithShulkerBoxAt(PlacePos.x, PlacePos.y, PlacePos.z,
-			[a_EquippedItem](cShulkerBoxEntity & a_ShulkerBox) -> bool {
+			[a_EquippedItem](cShulkerBoxEntity & a_ShulkerBox) -> bool 
+			{
 				a_ShulkerBox.Load(a_EquippedItem);
-			  	return true;
+				return true;
 			}
 		);
 
@@ -112,3 +112,7 @@ public:
 private:
 	cItemShulkerBoxHandler(const cItemShulkerBoxHandler &) = delete;
 };
+
+
+
+

@@ -13,6 +13,7 @@ class cItemGrid;
 
 
 
+
 cShulkerBoxEntity::cShulkerBoxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_NumActivePlayers(0),
@@ -20,6 +21,8 @@ cShulkerBoxEntity::cShulkerBoxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMe
 	m_Type(a_BlockType)
 {
 }
+
+
 
 
 
@@ -176,7 +179,8 @@ void cShulkerBoxEntity::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 			IsAllowed = false;
 	}
 
-	if (!IsAllowed){
+	if (!IsAllowed)
+	{
 		return;
 	}
 
@@ -212,11 +216,17 @@ cItems cShulkerBoxEntity::ConvertToPickups() const
 
 
 
-void cShulkerBoxEntity::Load(const cItem & a_Item){
-	auto a_ItemGrid = cItemGrid(3,9);
+void cShulkerBoxEntity::Load(const cItem & a_Item)
+{
+	auto a_ItemGrid = cItemGrid(3, 9);
 	BlockEntityTagSerializer::ParseFromJson(a_Item.m_BlockEntityTag, a_ItemGrid);
-	if(!a_Item.IsCustomNameEmpty()){
+	if (!a_Item.IsCustomNameEmpty())
+	{
 		m_CustomName = a_Item.m_CustomName;
 	}
 	m_Contents.CopyFrom(a_ItemGrid);
 }
+
+
+
+

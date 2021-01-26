@@ -1452,16 +1452,16 @@ bool cChunkMap::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlo
 
 bool cChunkMap::DoWithShulkerBoxAt(int a_BlockX, int a_BlockY, int a_BlockZ, cShulkerBoxCallback a_Callback)
 {
-    int ChunkX, ChunkZ;
-    int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-    cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-    cCSLock Lock(m_CSChunks);
-    const auto Chunk = FindChunk(ChunkX, ChunkZ);
-    if ((Chunk == nullptr) || !Chunk->IsValid())
-    {
-        return false;
-    }
-    return Chunk->DoWithShulkerBoxAt({ BlockX, BlockY, BlockZ }, a_Callback);
+	int ChunkX, ChunkZ;
+	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
+	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
+	cCSLock Lock(m_CSChunks);
+	const auto Chunk = FindChunk(ChunkX, ChunkZ);
+	if ((Chunk == nullptr) || !Chunk->IsValid())
+	{
+		return false;
+	}
+	return Chunk->DoWithShulkerBoxAt({ BlockX, BlockY, BlockZ }, a_Callback);
 }
 
 
