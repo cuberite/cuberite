@@ -31,6 +31,7 @@ class cNoteEntity;
 class cCommandBlockEntity;
 class cMobHeadEntity;
 class cFlowerPotEntity;
+class cShulkerBoxEntity;
 class cBlockArea;
 class cMobCensus;
 class cMobSpawner;
@@ -55,6 +56,7 @@ using cNoteBlockCallback    = cFunctionRef<bool(cNoteEntity         &)>;
 using cCommandBlockCallback = cFunctionRef<bool(cCommandBlockEntity &)>;
 using cMobHeadCallback      = cFunctionRef<bool(cMobHeadEntity      &)>;
 using cFlowerPotCallback    = cFunctionRef<bool(cFlowerPotEntity    &)>;
+using cShulkerBoxCallback   = cFunctionRef<bool(cShulkerBoxEntity   &)>;
 
 
 
@@ -310,6 +312,9 @@ public:
 	Returns false if there's no flower pot at those coords or callback returns true, returns true if found. */
 	bool DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback);  // Lua-accessible
 
+	/** Calls the callback for the shulker box at the specified coords; returns false if there's no shulker box at those coords, true if found */
+	bool DoWithShulkerBoxAt(int a_BlockX, int a_BlockY, int a_BlockZ, cShulkerBoxCallback a_Callback);  // Lua-accessible
+	
 	/** Retrieves the test on the sign at the specified coords.
 	Returns false if there's no sign at those coords, true if found. */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible

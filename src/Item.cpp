@@ -20,7 +20,8 @@ cItem::cItem():
 	m_CustomName(""),
 	m_RepairCost(0),
 	m_FireworkItem(),
-	m_ItemColor()
+	m_ItemColor(),
+	m_BlockEntityTag()
 {
 }
 
@@ -44,7 +45,8 @@ cItem::cItem(
 	m_LoreTable   (a_LoreTable),
 	m_RepairCost  (0),
 	m_FireworkItem(),
-	m_ItemColor()
+	m_ItemColor(),
+	m_BlockEntityTag()
 {
 	if (!IsValidItem(m_ItemType))
 	{
@@ -265,6 +267,11 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 		}
 
 		a_OutValue["RepairCost"] = m_RepairCost;
+		
+		if(!m_BlockEntityTag.empty())
+		{
+			a_OutValue["BlockEntityTag"] = m_BlockEntityTag;
+		}
 	}
 }
 
@@ -311,6 +318,10 @@ void cItem::FromJson(const Json::Value & a_Value)
 		}
 
 		m_RepairCost = a_Value.get("RepairCost", 0).asInt();
+		
+		if(a_Value.isMember("BlockEntityTag")){
+			m_BlockEntityTag = a_Value.get("BlockEntityTag", Json::nullValue);
+		}
 	}
 }
 

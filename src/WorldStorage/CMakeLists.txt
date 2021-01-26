@@ -1,6 +1,7 @@
 target_sources(
 	${CMAKE_PROJECT_NAME} PRIVATE
 
+	BlockEntityTagSerializer.cpp
 	EnchantmentSerializer.cpp
 	FastNBT.cpp
 	FireworksSerializer.cpp
@@ -13,6 +14,7 @@ target_sources(
 	WSSAnvil.cpp
 	WorldStorage.cpp
 
+	BlockEntityTagSerializer.h
 	EnchantmentSerializer.h
 	FastNBT.h
 	FireworksSerializer.h

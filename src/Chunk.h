@@ -32,6 +32,7 @@ class cHopperEntity;
 class cNoteEntity;
 class cMobHeadEntity;
 class cFlowerPotEntity;
+class cShulkerBoxEntity;
 class cBlockArea;
 class cBlockArea;
 class cFluidSimulatorData;
@@ -337,6 +338,9 @@ public:
 	/** Calls the callback for the flower pot at the specified coords; returns false if there's no flower pot at those coords or callback returns true, returns true if found */
 	bool DoWithFlowerPotAt(Vector3i a_Position, cFlowerPotCallback a_Callback);
 
+	/** Calls the callback for the shulker box at the specified coords; returns false if there's no shulker box at those coords, true if found */
+	bool DoWithShulkerBoxAt(Vector3i a_Position, cShulkerBoxCallback a_Callback);  // Lua-acessible
+	
 	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
 	bool GetSignLines (Vector3i a_Position, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
