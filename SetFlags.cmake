@@ -88,15 +88,6 @@ function(set_global_flags)
 
 		# Make build use Unicode:
 		add_compile_definitions(UNICODE _UNICODE)
-	else()
-		# TODO: is this needed? NDEBUG is standard. Also, why are we using _DEBUG?
-		# Add the preprocessor macros used for distinguishing between debug and release builds (CMake does this automatically for MSVC):
-		set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -D_DEBUG")
-		set(CMAKE_C_FLAGS_DEBUG      "${CMAKE_C_FLAGS_DEBUG}      -D_DEBUG")
-		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -D_DEBUG")
-		set(CMAKE_C_FLAGS_COVERAGE   "${CMAKE_C_FLAGS_COVERAGE}   -D_DEBUG")
-		set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -DNDEBUG")
-		set(CMAKE_C_FLAGS_RELEASE    "${CMAKE_C_FLAGS_RELEASE}    -DNDEBUG")
 	endif()
 
 	# Allow for a forced 32-bit build under 64-bit OS:

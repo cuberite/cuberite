@@ -149,7 +149,7 @@ protected:
 	size_t m_WritePos;   // Where the data ends in the ringbuffer
 	size_t m_ReadPos;    // Where the next read will start in the ringbuffer
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		/** The ID of the thread currently accessing the object.
 		Used for checking that only one thread accesses the object at a time, via cSingleThreadAccessChecker. */
 		mutable std::thread::id m_ThreadID;

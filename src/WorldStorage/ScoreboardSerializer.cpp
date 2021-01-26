@@ -60,10 +60,10 @@ bool cScoreboardSerializer::Save(void)
 	SaveScoreboardToNBT(Writer);
 	Writer.Finish();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	cParsedNBT TestParse(Writer.GetResult());
 	ASSERT(TestParse.IsValid());
-#endif  // _DEBUG
+#endif  // !NDEBUG
 
 	GZipFile::Write(m_Path, Writer.GetResult());
 

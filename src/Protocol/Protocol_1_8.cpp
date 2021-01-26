@@ -3913,7 +3913,7 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 		// Unknown packet, already been reported, but without the length. Log the length here:
 		LOGWARNING("Unhandled packet: type 0x%x, state %d, length %u", PacketType, m_State, a_Buffer.GetUsedSpace());
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		// Dump the packet contents into the log:
 		a_Buffer.ResetRead();
 		ContiguousByteBuffer Packet;
@@ -3922,7 +3922,7 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 		AString Out;
 		CreateHexDump(Out, Packet.data(), Packet.size(), 24);
 		LOGD("Packet contents:\n%s", Out.c_str());
-#endif  // _DEBUG
+#endif  // !NDEBUG
 
 		// Put a message in the comm log:
 		if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())

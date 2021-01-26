@@ -613,11 +613,11 @@ bool cWorld::SetSpawn(double a_X, double a_Y, double a_Z)
 void cWorld::InitializeSpawn(void)
 {
 	// For the debugging builds, don't make the server build too much world upon start:
-	#if defined(_DEBUG) || defined(ANDROID)
+	#if !defined(NDEBUG) || defined(ANDROID)
 		const int DefaultViewDist = 9;
 	#else
 		const int DefaultViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
-	#endif  // _DEBUG
+	#endif  // !NDEBUG
 
 	if (!m_IsSpawnExplicitlySet)
 	{
