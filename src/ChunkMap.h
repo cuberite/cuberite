@@ -314,7 +314,7 @@ public:
 
 	/** Calls the callback for the shulker box at the specified coords; returns false if there's no shulker box at those coords, true if found */
 	bool DoWithShulkerBoxAt(int a_BlockX, int a_BlockY, int a_BlockZ, cShulkerBoxCallback a_Callback);  // Lua-accessible
-	
+
 	/** Retrieves the test on the sign at the specified coords.
 	Returns false if there's no sign at those coords, true if found. */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible

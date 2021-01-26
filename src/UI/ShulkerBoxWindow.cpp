@@ -81,3 +81,7 @@ void cShulkerBoxWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer
 		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
 }
+
+
+
+

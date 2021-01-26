@@ -220,3 +220,7 @@ void cShulkerBoxEntity::Load(const cItem & a_Item){
 	}
 	m_Contents.CopyFrom(a_ItemGrid);
 }
+
+
+
+

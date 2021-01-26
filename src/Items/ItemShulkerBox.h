@@ -23,8 +23,7 @@ public:
 	}
 
 
-	/** We need an OnPlayerPlace override because we're processing neighbor chests and changing their metas,
-	the parent class cannot do that. */
+	
 	virtual bool OnPlayerPlace(
 		cWorld & a_World,
 		cPlayer & a_Player,
@@ -79,10 +78,10 @@ public:
 		}
 
 
-		// Get the meta of the placed chest; take existing neighbors into account:
+		// Get the meta of the placed shulker box
 		BLOCKTYPE ShulkerBoxType = static_cast<BLOCKTYPE>(m_ItemType);
 
-		// Place the new chest:
+		// Place the new shulker box:
 		if (!a_Player.PlaceBlock(PlacePos.x, PlacePos.y, PlacePos.z, ShulkerBoxType, a_ClickedBlockFace))
 		{
 			return false;
@@ -112,3 +111,7 @@ public:
 private:
 	cItemShulkerBoxHandler(const cItemShulkerBoxHandler &) = delete;
 };
+
+
+
+

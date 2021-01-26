@@ -314,7 +314,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		{
 			return new cItemBoatHandler(a_ItemType);
 		}
-		
+
 		case E_BLOCK_WHITE_SHULKER_BOX:
 		case E_BLOCK_ORANGE_SHULKER_BOX:
 		case E_BLOCK_MAGENTA_SHULKER_BOX:

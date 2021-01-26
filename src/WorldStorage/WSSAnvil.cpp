@@ -794,13 +794,13 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	{
 		cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, a_NBT, FireworksTag, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
 	}
-	
+
 	// Load BlockEntityTag
 	int BlockEntityTag = a_NBT.FindChildByName(TagTag, "BlockEntityTag");
 	if (BlockEntityTag > 0)
 	{
 		int ItemsTag = a_NBT.FindChildByName(BlockEntityTag, "Items");
-		auto Items = cItemGrid(3,9);
+		auto Items = cItemGrid(3, 9);
 		LoadItemGridFromNBT(Items, a_NBT, ItemsTag);
 
 		Json::Value a_TagJson(Json::objectValue);
@@ -1085,7 +1085,7 @@ OwnedBlockEntity cWSSAnvil::LoadShulkerBoxFromNBT(const cParsedNBT & a_NBT, int 
 	{
 		return nullptr;
 	}
-	
+
 	auto ShulkerBox = std::make_unique<cShulkerBoxEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(ShulkerBox->GetContents(), a_NBT, Items);
 
