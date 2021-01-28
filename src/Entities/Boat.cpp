@@ -75,6 +75,16 @@ bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 
 	m_World->BroadcastEntityMetadata(*this);
 
+	if ((TDI.Attacker != nullptr) && (TDI.Attacker->IsPlayer()))
+	{
+		cPlayer * Destroyer = static_cast<cPlayer *>(TDI.Attacker);
+		if (Destroyer->IsGameModeCreative())
+		{
+			Destroy();
+			return true;
+		}
+	}
+
 	if (GetHealth() <= 0)
 	{
 		if (TDI.Attacker != nullptr)
