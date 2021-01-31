@@ -57,8 +57,12 @@ public:
 	/** Sets the number of players who currently have this shulker box open */
 	void SetNumberOfPlayers(int a_NumActivePlayers) { m_NumActivePlayers = a_NumActivePlayers; }
 
+	/** Loads shulker box from item */
 	void Load(const cItem & a_Item);
 
+	static bool IsShulkerBox(short m_ItemType);
+
+	/** Custom name of a shulker box */
 	AString m_CustomName;
 
 private:
@@ -66,12 +70,12 @@ private:
 	/** Number of players who currently have this shulker box open */
 	int m_NumActivePlayers;
 
-	NIBBLETYPE m_BlockMeta;
-
-	BLOCKTYPE m_Type;
-
 	/** cItemGrid::cListener overrides: */
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override;
+
+	/** Returns direction for obstruction check */
+	static Vector3i BlockMetaToObstructionCheckDirection(NIBBLETYPE a_BlockMeta);
+
 } ;  // tolua_export
 
 

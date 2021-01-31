@@ -24,7 +24,7 @@ class cShulkerBoxWindow :
 
 public:
 
-	cShulkerBoxWindow(cShulkerBoxEntity * a_ShulkerBox, AString CustomName);
+	cShulkerBoxWindow(cShulkerBoxEntity * a_ShulkerBox, const AString CustomName);
 
 	virtual ~cShulkerBoxWindow() override;
 
@@ -33,6 +33,8 @@ public:
 	virtual void OpenedByPlayer(cPlayer & a_Player) override;
 
 	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
+
+	virtual void Clicked(cPlayer & a_Player, int a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 
 protected:
 	cWorld * m_World;

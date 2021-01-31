@@ -67,7 +67,7 @@ public:
 				return false;
 			}
 
-			// Check if the chest can overwrite the block at PlacePos:
+			// Check if the shulker box can overwrite the block at PlacePos:
 			BLOCKTYPE PlaceBlock;
 			NIBBLETYPE PlaceMeta;
 			a_World.GetBlockTypeMeta(PlacePos, PlaceBlock, PlaceMeta);
@@ -82,14 +82,14 @@ public:
 		BLOCKTYPE ShulkerBoxType = static_cast<BLOCKTYPE>(m_ItemType);
 
 		// Place the new shulker box:
-		if (!a_Player.PlaceBlock(PlacePos.x, PlacePos.y, PlacePos.z, ShulkerBoxType, a_ClickedBlockFace))
+		if (!a_Player.PlaceBlock(PlacePos.x, PlacePos.y, PlacePos.z, ShulkerBoxType, (int)a_ClickedBlockFace))
 		{
 			return false;
 		}
 
 
 		a_World.DoWithShulkerBoxAt(PlacePos.x, PlacePos.y, PlacePos.z,
-			[a_EquippedItem](cShulkerBoxEntity & a_ShulkerBox) -> bool 
+			[a_EquippedItem] (cShulkerBoxEntity & a_ShulkerBox) -> bool
 			{
 				a_ShulkerBox.Load(a_EquippedItem);
 				return true;

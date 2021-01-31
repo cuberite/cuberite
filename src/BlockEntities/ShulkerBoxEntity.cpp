@@ -16,9 +16,7 @@ class cItemGrid;
 
 cShulkerBoxEntity::cShulkerBoxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
-	m_NumActivePlayers(0),
-	m_BlockMeta(a_BlockMeta),
-	m_Type(a_BlockType)
+	m_NumActivePlayers(0)
 {
 }
 
@@ -113,9 +111,39 @@ void cShulkerBoxEntity::OpenNewWindow(void)
 
 
 
-Vector3i MetaDataToObstructionDirection(NIBBLETYPE a_MetaData)
+bool cShulkerBoxEntity::IsShulkerBox(short a_ItemType)
 {
-	switch (a_MetaData)
+	switch (a_ItemType)
+	{
+		case E_BLOCK_WHITE_SHULKER_BOX:
+		case E_BLOCK_ORANGE_SHULKER_BOX:
+		case E_BLOCK_MAGENTA_SHULKER_BOX:
+		case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
+		case E_BLOCK_YELLOW_SHULKER_BOX:
+		case E_BLOCK_LIME_SHULKER_BOX:
+		case E_BLOCK_PINK_SHULKER_BOX:
+		case E_BLOCK_GRAY_SHULKER_BOX:
+		case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
+		case E_BLOCK_CYAN_SHULKER_BOX:
+		case E_BLOCK_PURPLE_SHULKER_BOX:
+		case E_BLOCK_BLUE_SHULKER_BOX:
+		case E_BLOCK_BROWN_SHULKER_BOX:
+		case E_BLOCK_GREEN_SHULKER_BOX:
+		case E_BLOCK_RED_SHULKER_BOX:
+		case E_BLOCK_BLACK_SHULKER_BOX:
+			return true;
+	}
+
+	return false;
+}
+
+
+
+
+
+Vector3i cShulkerBoxEntity::BlockMetaToObstructionCheckDirection(NIBBLETYPE a_BlockMeta)
+{
+	switch (a_BlockMeta)
 	{
 		case BLOCK_FACE_XP: return Vector3i(1, 0, 0);
 		case BLOCK_FACE_XM: return Vector3i(-1, 0, 0);
@@ -133,7 +161,7 @@ Vector3i MetaDataToObstructionDirection(NIBBLETYPE a_MetaData)
 
 bool cShulkerBoxEntity::IsBlocked()
 {
-	Vector3i CheckPos = GetPos() + MetaDataToObstructionDirection(m_BlockMeta);
+	Vector3i CheckPos = GetPos() + cShulkerBoxEntity::BlockMetaToObstructionCheckDirection(m_BlockMeta);
 
 	return (
 		(GetPosY() < cChunkDef::Height - 1) &&
@@ -153,33 +181,6 @@ void cShulkerBoxEntity::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 	ASSERT(a_Grid == &m_Contents);
 
 	if (m_World == nullptr)
-	{
-		return;
-	}
-
-	bool IsAllowed = true;
-	switch (a_Grid->GetSlot(a_SlotNum).m_ItemType)
-	{
-		case E_BLOCK_WHITE_SHULKER_BOX:
-		case E_BLOCK_ORANGE_SHULKER_BOX:
-		case E_BLOCK_MAGENTA_SHULKER_BOX:
-		case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
-		case E_BLOCK_YELLOW_SHULKER_BOX:
-		case E_BLOCK_LIME_SHULKER_BOX:
-		case E_BLOCK_PINK_SHULKER_BOX:
-		case E_BLOCK_GRAY_SHULKER_BOX:
-		case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
-		case E_BLOCK_CYAN_SHULKER_BOX:
-		case E_BLOCK_PURPLE_SHULKER_BOX:
-		case E_BLOCK_BLUE_SHULKER_BOX:
-		case E_BLOCK_BROWN_SHULKER_BOX:
-		case E_BLOCK_GREEN_SHULKER_BOX:
-		case E_BLOCK_RED_SHULKER_BOX:
-		case E_BLOCK_BLACK_SHULKER_BOX:
-			IsAllowed = false;
-	}
-
-	if (!IsAllowed)
 	{
 		return;
 	}

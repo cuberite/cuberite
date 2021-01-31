@@ -1,6 +1,7 @@
 
 #include "Globals.h"
 #include "BlockEntityTagSerializer.h"
+#include "../Item.h"
 #include "../ItemGrid.h"
 
 

@@ -83,10 +83,34 @@ void cShulkerBoxWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer
 	}
 	else
 	{
+		if (cShulkerBoxEntity::IsShulkerBox(a_ItemStack.m_ItemType))
+		{
+			return;
+		}
+
 		// Hotbar or Inventory
 		AreasInOrder.push_back(m_SlotAreas[0]);  /* Shulker box */
 		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
+}
+
+
+
+
+
+void cShulkerBoxWindow::Clicked(cPlayer & a_Player, int a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+{
+	if ((a_WindowID == GetWindowID()) && (a_SlotNum >= 0) && (a_SlotNum < m_SlotAreas[0]->GetNumSlots()))
+	{
+		cItem & DraggingItem = a_Player.GetDraggingItem();
+
+		if (cShulkerBoxEntity::IsShulkerBox(DraggingItem.m_ItemType))
+		{
+			return;
+		}
+	}
+
+	Super::Clicked(a_Player, a_WindowID, a_SlotNum, a_ClickAction, a_ClickedItem);
 }
 
 

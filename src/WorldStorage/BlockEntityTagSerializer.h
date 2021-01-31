@@ -3,6 +3,7 @@
 
 #include "json/json.h"
 
+class cItem;
 class cItemGrid;
 
 
