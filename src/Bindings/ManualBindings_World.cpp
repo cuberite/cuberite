@@ -974,6 +974,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithFurnaceAt",              DoWithXYZ<cWorld, cFurnaceEntity,      &cWorld::DoWithFurnaceAt>);
 			tolua_function(tolua_S, "DoWithHopperAt",               DoWithXYZ<cWorld, cHopperEntity,       &cWorld::DoWithHopperAt>);
 			tolua_function(tolua_S, "DoWithMobHeadAt",              DoWithXYZ<cWorld, cMobHeadEntity,      &cWorld::DoWithMobHeadAt>);
+			tolua_function(tolua_S, "DoWithShulkerBoxAt",           DoWithXYZ<cWorld, cShulkerBoxEntity,   &cWorld::DoWithShulkerBoxAt>);
 			tolua_function(tolua_S, "DoWithNearestPlayer",          tolua_cWorld_DoWithNearestPlayer);
 			tolua_function(tolua_S, "DoWithNoteBlockAt",            DoWithXYZ<cWorld, cNoteEntity,         &cWorld::DoWithNoteBlockAt>);
 			tolua_function(tolua_S, "DoWithPlayer",                 DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayer>);
@@ -986,6 +987,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachEntityInBox",           ForEachInBox<  cWorld, cEntity,        &cWorld::ForEachEntityInBox>);
 			tolua_function(tolua_S, "ForEachEntityInChunk",         ForEachInChunk<cWorld, cEntity,        &cWorld::ForEachEntityInChunk>);
 			tolua_function(tolua_S, "ForEachFurnaceInChunk",        ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
+			tolua_function(tolua_S, "ForEachShulkerBoxInChunk",     ForEachInChunk<cWorld, cShulkerBoxEntity, &cWorld::ForEachShulkerBoxInChunk>);
 			tolua_function(tolua_S, "ForEachLoadedChunk",           tolua_cWorld_ForEachLoadedChunk);
 			tolua_function(tolua_S, "ForEachPlayer",                ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
 			tolua_function(tolua_S, "GetBlockInfo",                 tolua_cWorld_GetBlockInfo);
