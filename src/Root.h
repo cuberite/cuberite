@@ -166,6 +166,9 @@ public:
 	/** Broadcast playerlist removal through all worlds */
 	void BroadcastPlayerListsRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 
+	/** Broadcast playerlist header and footer through all worlds */
+	void BroadcastPlayerListsHeaderFooter(const cCompositeChat & a_Header, const cCompositeChat & a_Footer);  // tolua_export
+
 	// tolua_begin
 
 	/** Sends a chat message to all connected clients (in all worlds) */

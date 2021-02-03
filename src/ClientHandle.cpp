@@ -2625,6 +2625,15 @@ void cClientHandle::SendPlayerListAddPlayer(const cPlayer & a_Player)
 
 
 
+void cClientHandle::SendPlayerListHeaderFooter(const cCompositeChat & a_Header, const cCompositeChat & a_Footer)
+{
+	m_Protocol->SendPlayerListHeaderFooter(a_Header, a_Footer);
+}
+
+
+
+
+
 void cClientHandle::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 {
 	m_Protocol->SendPlayerListRemovePlayer(a_Player);

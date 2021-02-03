@@ -327,6 +327,21 @@ return
 				},
 				Notes = "Spawns the specified particles to all players in the world exept the optional ExeptClient. A list of available particles by thinkofdeath can be found {{https://gist.github.com/thinkofdeath/5110835|Here}}",
 			},
+			BroadcastPlayerListHeaderFooter =
+			{
+				Params =
+				{
+					{
+						Type = "cCompositeChat",
+						Name = "Header",
+					},
+					{
+						Type = "cCompositeChat",
+						Name = "Footer",
+					},
+				},
+				Desc = "Broadcasts the header and footer of the player list to all players in the world.",
+			},
 			BroadcastSoundEffect =
 			{
 				Params =

@@ -418,6 +418,19 @@ void cWorld::BroadcastPlayerListAddPlayer(const cPlayer & a_Player, const cClien
 
 
 
+void cWorld::BroadcastPlayerListHeaderFooter(const cCompositeChat & a_Header, const cCompositeChat & a_Footer)
+{
+	ForClientsInWorld(*this, nullptr, [&](cClientHandle & a_Client)
+		{
+			a_Client.SendPlayerListHeaderFooter(a_Header, a_Footer);
+		}
+	);
+}
+
+
+
+
+
 void cWorld::BroadcastPlayerListRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
