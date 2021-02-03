@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "InventoryWindow.h"
 #include "SlotArea.h"
+#include "../Entities/Player.h"
 
 
 
@@ -30,6 +31,11 @@ void cInventoryWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer 
 {
 	cSlotAreas AreasInOrder;
 
+	if ((a_ItemStack.m_ItemType == E_ITEM_ELYTRA) && ((a_ClickedArea == m_SlotAreas[2]) || (a_ClickedArea == m_SlotAreas[3])) && m_SlotAreas[1]->GetSlot(1, a_Player)->IsEmpty())
+	{
+		a_Player.GetWorld()->BroadcastSoundEffect("item.armor.equip_elytra", a_Player.GetPosition(), 1.0, 1.0);
+	}
+
 	if (a_ClickedArea == m_SlotAreas[0])
 	{
 		// Crafting Area
@@ -48,6 +54,11 @@ void cInventoryWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer 
 	}
 	else if (a_ClickedArea == m_SlotAreas[1])
 	{
+		if ((a_ItemStack.m_ItemType == E_ITEM_ELYTRA) && a_Player.IsElytraFlying())
+		{
+			a_Player.SetElytraFlight(false);
+		}
+
 		// Armor Area
 		AreasInOrder.push_back(m_SlotAreas[2]);  /* Inventory */
 		AreasInOrder.push_back(m_SlotAreas[3]);  /* Hotbar    */
@@ -67,6 +78,27 @@ void cInventoryWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer 
 		AreasInOrder.push_back(m_SlotAreas[2]);  /* Inventory */
 		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
+
+}
+
+
+
+
+
+void cInventoryWindow::Clicked(cPlayer & a_Player, int a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+{
+	if ((a_SlotNum == 6) && (a_Player.GetDraggingItem().m_ItemType == E_ITEM_ELYTRA) && ((a_ClickAction == caLeftClick) || (a_ClickAction == caRightClick)))
+	{
+		a_Player.GetWorld()->BroadcastSoundEffect("item.armor.equip_elytra", a_Player.GetPosition(), 1.0, 1.0);
+	}
+
+	Super::Clicked(a_Player, a_WindowID, a_SlotNum, a_ClickAction, a_ClickedItem);
+
+	if ((a_SlotNum == 6) && (a_Player.GetDraggingItem().m_ItemType == E_ITEM_ELYTRA) && ((a_ClickAction == caLeftClick) || (a_ClickAction == caRightClick)))
+	{
+		a_Player.SetElytraFlight(false);
+	}
+
 }
 
 

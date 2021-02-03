@@ -114,6 +114,7 @@ public:
 			case E_ITEM_LEATHER_CAP:
 			case E_ITEM_LEATHER_PANTS:
 			case E_ITEM_LEATHER_TUNIC:
+			case E_ITEM_ELYTRA:  // TODO require Phantom Membrane instead of leather starting from protocol version 369 or 1.13 release
 			{
 				return (a_ItemType == E_ITEM_LEATHER);
 			}

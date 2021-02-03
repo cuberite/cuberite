@@ -140,6 +140,7 @@ public:
 	void SetTouchGround(bool a_bTouchGround);
 	inline void SetStance(const double a_Stance) { m_Stance = a_Stance; }
 	double GetEyeHeight(void) const;  // tolua_export
+	float GetRelativeEyeHeight(void) { return m_RelativeEyeHeight; }  // tolua_export
 	Vector3d GetEyePosition(void) const;  // tolua_export
 	virtual bool IsOnGround(void) const override { return m_bTouchGround; }
 	inline double GetStance(void) const { return m_Stance; }  // tolua_export
@@ -492,6 +493,9 @@ public:
 	/** Starts or stops sprinting, sends the max speed update to the client, if needed */
 	void SetSprint(bool a_IsSprinting);
 
+	/** Sets the flying with elytra status, broadcasts to all visible players */
+	void SetElytraFlight(bool a_IsElytraFlying);
+
 	/** Flags the player as flying */
 	void SetFlying(bool a_IsFlying);
 
@@ -533,6 +537,8 @@ public:
 
 	/** Returns the UUID that has been read from the client, or nil if not available. */
 	const cUUID & GetUUID(void) const { return m_UUID; }  // Exported in ManualBindings.cpp
+
+	void StartFallFlying(void);
 
 	// tolua_begin
 
@@ -579,9 +585,10 @@ public:
 	void NotifyNearbyWolves(cPawn * a_Opponent, bool a_IsPlayerInvolved);
 
 	// cEntity overrides:
-	virtual bool IsCrouched (void) const override { return m_IsCrouched; }
-	virtual bool IsSprinting(void) const override { return m_IsSprinting; }
-	virtual bool IsRclking  (void) const override { return IsEating() || IsChargingBow(); }
+	virtual bool IsCrouched    (void) const override { return m_IsCrouched; }
+	virtual bool IsSprinting   (void) const override { return m_IsSprinting; }
+	virtual bool IsRclking     (void) const override { return IsEating() || IsChargingBow(); }
+	virtual bool IsElytraFlying(void) const override { return m_IsElytraFlying; }
 
 	virtual void AttachTo(cEntity * a_AttachTo) override;
 	virtual void Detach(void) override;
@@ -656,6 +663,8 @@ protected:
 
 	double m_Stance;
 
+	float  m_RelativeEyeHeight;
+
 	/** Stores the player's inventory, consisting of crafting grid, hotbar, and main slots */
 	cInventory m_Inventory;
 
@@ -715,6 +724,7 @@ protected:
 	bool m_IsSprinting;
 	bool m_IsFlying;
 	bool m_IsFishing;
+	bool m_IsElytraFlying;
 
 	bool m_CanFly;  // If this is true the player can fly. Even if he is not in creative.
 
@@ -765,6 +775,8 @@ protected:
 
 	/** List of known items as Ids */
 	std::set<cItem, cItem::sItemCompare> m_KnownItems;
+
+	int m_TicksElytraFlying;
 
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;

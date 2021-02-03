@@ -347,16 +347,19 @@ public:  // tolua_export
 	@param a_EntityID ID of the player that is to open the inventory. Should be the same as GetPlayer()->GetUniqueID().  */
 	void HandleOpenHorseInventory(UInt32 a_EntityID);
 
+	/** Handles a player starting elytra flight while falling. */
+	void HandleStartFallFlying(UInt32 a_EntityID);
+
 	void HandlePing             (void);
 	void HandlePlayerAbilities  (bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
-	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
+	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
 
 	/** Verifies and sets player position, performing relevant checks
 	Calls relevant methods to process movement related statistics
 	Requires state of previous position and on-ground status, so must be called when these are still intact
 	*/
-	void HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
+	void HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround);
 
 
 	void HandlePluginMessage    (const AString & a_Channel, ContiguousByteBufferView a_Message);

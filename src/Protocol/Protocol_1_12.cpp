@@ -349,6 +349,10 @@ void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 	{
 		Flags |= 0x20;
 	}
+	if (a_Entity.IsElytraFlying())
+	{
+		Flags |= 0x80;
+	}
 	a_Pkt.WriteBEUInt8(ENTITY_FLAGS);  // Index
 	a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
 	a_Pkt.WriteBEInt8(Flags);

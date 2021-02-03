@@ -300,6 +300,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_CHAIN_BOOTS:
 		case E_ITEM_IRON_BOOTS:
 		case E_ITEM_DIAMOND_BOOTS:
+		case E_ITEM_ELYTRA:
 		{
 			return new cItemArmorHandler(a_ItemType);
 		}

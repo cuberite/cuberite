@@ -559,6 +559,18 @@ void cClientHandle::HandleOpenHorseInventory(UInt32 a_EntityID)
 
 
 
+void cClientHandle::HandleStartFallFlying(UInt32 a_EntityID)
+{
+	if (m_Player->GetUniqueID() == a_EntityID)
+	{
+		m_Player->StartFallFlying();
+	}
+}
+
+
+
+
+
 void cClientHandle::HandlePing(void)
 {
 	/* TODO: unused function, handles Legacy Server List Ping
@@ -722,7 +734,7 @@ void cClientHandle::HandlePlayerAbilities(bool a_IsFlying, float FlyingSpeed, fl
 
 
 
-void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround)
+void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround)
 {
 	if (m_Player->IsFrozen())
 	{
@@ -732,7 +744,6 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 	Vector3d NewPosition(a_PosX, a_PosY, a_PosZ);
 	Vector3d OldPosition = GetPlayer()->GetPosition();
-	double OldStance = GetPlayer()->GetStance();
 	auto PreviousIsOnGround = GetPlayer()->IsOnGround();
 
 	#ifdef __clang__
@@ -742,7 +753,6 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 	if (
 		(OldPosition == NewPosition) &&
-		(OldStance == a_Stance) &&
 		(PreviousIsOnGround == a_IsOnGround)
 	)
 	{
@@ -772,7 +782,7 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 	// TODO: Official server refuses position packets too far away from each other, kicking "hacked" clients; we should, too
 
 	m_Player->SetPosition(NewPosition);
-	m_Player->SetStance(a_Stance);
+	m_Player->SetStance(NewPosition.y + m_Player->GetRelativeEyeHeight());
 	m_Player->SetTouchGround(a_IsOnGround);
 	m_Player->UpdateMovementStats(NewPosition - OldPosition, PreviousIsOnGround);
 }
@@ -1488,9 +1498,9 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 
 
 
-void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround)
+void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
-	HandlePlayerPos(a_PosX, a_PosY, a_PosZ, a_Stance, a_IsOnGround);
+	HandlePlayerPos(a_PosX, a_PosY, a_PosZ, a_IsOnGround);
 	HandlePlayerLook(a_Rotation, a_Pitch, a_IsOnGround);
 }
 

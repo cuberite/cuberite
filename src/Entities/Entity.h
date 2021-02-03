@@ -522,12 +522,13 @@ public:
 	// tolua_begin
 
 	// COMMON metadata flags; descendants may override the defaults:
-	virtual bool IsOnFire   (void) const {return (m_TicksLeftBurning > 0); }
-	virtual bool IsCrouched (void) const {return false; }
-	virtual bool IsRiding   (void) const {return false; }
-	virtual bool IsSprinting(void) const {return false; }
-	virtual bool IsRclking  (void) const {return false; }
-	virtual bool IsInvisible(void) const { return false; }
+	virtual bool IsOnFire      (void) const {return (m_TicksLeftBurning > 0); }
+	virtual bool IsCrouched    (void) const {return false; }
+	virtual bool IsRiding      (void) const {return false; }
+	virtual bool IsSprinting   (void) const {return false; }
+	virtual bool IsRclking     (void) const {return false; }
+	virtual bool IsInvisible   (void) const {return false; }
+	virtual bool IsElytraFlying(void) const {return false; }
 
 	/** Returns true if any part of the entity is in a fire block */
 	virtual bool IsInFire(void) const { return m_IsInFire; }
@@ -732,6 +733,8 @@ protected:
 
 	/** If has any mobs are leashed, broadcasts every leashed entity to this. */
 	void BroadcastLeashedMobs();
+
+	void SetSize(float a_Width, float a_Height) { m_Width = a_Width; m_Height = a_Height;  }
 
 private:
 

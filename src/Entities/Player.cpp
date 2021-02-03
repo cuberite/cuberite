@@ -107,6 +107,7 @@ cPlayer::cPlayer(const cClientHandlePtr & a_Client) :
 	m_IsSprinting(false),
 	m_IsFlying(false),
 	m_IsFishing(false),
+	m_IsElytraFlying(false),
 	m_CanFly(false),
 	m_EatingFinishTick(-1),
 	m_LifetimeTotalXp(0),
@@ -120,7 +121,8 @@ cPlayer::cPlayer(const cClientHandlePtr & a_Client) :
 	m_bIsTeleporting(false),
 	m_UUID((a_Client != nullptr) ? a_Client->GetUUID() : cUUID{}),
 	m_SkinParts(0),
-	m_MainHand(mhRight)
+	m_MainHand(mhRight),
+	m_TicksElytraFlying(0)
 {
 	ASSERT(GetName().length() <= 16);  // Otherwise this player could crash many clients...
 
@@ -426,10 +428,57 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	Super::Tick(a_Dt, a_Chunk);
 
+	float Width = 0.6F, Height = 1.8F, EyeHeight = 1.62F;
+	if (m_IsElytraFlying)
+	{
+		Width = 0.6F;
+		Height = 0.6F;
+		EyeHeight = 0.4F;
+	}
+	else if (m_bIsInBed)
+	{
+		Width = 0.2F;
+		Height = 0.2F;
+		EyeHeight = 0.2F;
+	}
+	else if (m_IsCrouched)
+	{
+		Width = 0.6F;
+		Height = 1.65F;
+		EyeHeight = 1.54F;
+	}
+
+	// I don't think that comparisons of such a small floats will cause errors
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wfloat-equal"
+	if ((Width != GetWidth()) || (Height != GetHeight()))
+	{
+		SetSize(Width, Height);
+		m_RelativeEyeHeight = EyeHeight;
+		SetStance(GetPosY()+EyeHeight);
+	}
+	#pragma clang diagnostic pop
+
 	// Handle charging the bow:
 	if (m_IsChargingBow)
 	{
 		m_BowCharge += 1;
+	}
+
+
+	/** Elytra flying */
+	if (IsElytraFlying() && !IsOnGround() && !IsRiding())
+	{
+		if ((m_TicksElytraFlying + 1) % 20 == 0)
+		{
+			UseItem(cInventory::invArmorOffset + 1);
+		}
+
+		m_TicksElytraFlying++;
+	}
+	else if (IsElytraFlying())
+	{
+		SetElytraFlight(false);
 	}
 
 	BroadcastMovementUpdate(m_ClientHandle.get());
@@ -994,6 +1043,28 @@ void cPlayer::SetSprint(bool a_IsSprinting)
 
 	m_IsSprinting = a_IsSprinting;
 	m_ClientHandle->SendPlayerMaxSpeed();
+}
+
+
+
+
+
+void cPlayer::SetElytraFlight(bool a_IsElytraFlying)
+{
+	// Set the flying with Elytra status, broadcast to all visible players
+	if (a_IsElytraFlying == m_IsElytraFlying)
+	{
+		// No change
+		return;
+	}
+
+	if (a_IsElytraFlying)
+	{
+		// cRoot::Get()->GetPluginManager()->CallHookPlayerElytraFlying(*this);
+	}
+
+	m_IsElytraFlying = a_IsElytraFlying;
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -1786,6 +1857,11 @@ bool cPlayer::IsFrozen()
 
 void cPlayer::Unfreeze()
 {
+	if (m_IsElytraFlying)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
+
 	GetClientHandle()->SendPlayerAbilities();
 	GetClientHandle()->SendPlayerMaxSpeed();
 
@@ -2536,6 +2612,11 @@ void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
 	if (m_Inventory.DamageItem(a_SlotNumber, ReducedDamage))
 	{
 		m_World->BroadcastSoundEffect("entity.item.break", GetPosition(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+
+		if (m_IsElytraFlying && (Item.m_ItemType == E_ITEM_ELYTRA))
+		{
+			SetElytraFlight(false);
+		}
 	}
 }
 
@@ -3223,3 +3304,23 @@ float cPlayer::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_Ex
 
 	return Super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower) / 30.0f;
 }
+
+
+
+
+
+void cPlayer::StartFallFlying()
+{
+	if (!IsOnGround() && !IsElytraFlying() && !IsInWater() && !IsRiding() && GetEquippedChestplate().m_ItemType == E_ITEM_ELYTRA)
+	{
+		SetElytraFlight(true);
+	}
+	else
+	{
+		SetElytraFlight(false);
+	}
+}
+
+
+
+

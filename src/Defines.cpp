@@ -540,7 +540,8 @@ bool ItemCategory::IsChestPlate(short a_ItemType)
 		(a_ItemType == E_ITEM_GOLD_CHESTPLATE) ||
 		(a_ItemType == E_ITEM_CHAIN_CHESTPLATE) ||
 		(a_ItemType == E_ITEM_IRON_CHESTPLATE) ||
-		(a_ItemType == E_ITEM_DIAMOND_CHESTPLATE)
+		(a_ItemType == E_ITEM_DIAMOND_CHESTPLATE) ||
+		(a_ItemType == E_ITEM_ELYTRA)
 	);
 }
 

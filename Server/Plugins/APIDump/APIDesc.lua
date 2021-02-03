@@ -3949,6 +3949,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity is sprinting. Entities that cannot sprint return always false",
 				},
+				IsElytraFlying =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is elytra flying. Entities that cannot fly with elytra return always false",
+				},
 				IsSubmerged =
 				{
 					Returns =
@@ -10212,6 +10222,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the height of the player's eyes, in absolute coords",
 				},
+				GetRelativeEyeHeight =
+				{
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns the height of the player's eyes, in relative coords",
+				},
 				GetEyePosition =
 				{
 					Returns =
@@ -11154,6 +11174,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the skin part flags of the player.  The value should be a bitwise OR of several {{Globals#eSkinPart|eSkinPart}} constants.",
+				},
+				SetElytraFlight =
+				{
+					Params =
+					{
+						{
+							Name = "IsElytraFlying",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether the player is elytra flying or not.",
 				},
 				SetSprintingMaxSpeed =
 				{
