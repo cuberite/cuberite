@@ -1584,6 +1584,21 @@ end
 					},
 					Notes = "Sends the specified animation of the specified entity to the client. The AnimationNumber is protocol-specific.",
 				},
+				SendPlayerListHeaderFooter =
+				{
+					Params =
+					{
+						{
+							Type = "cCompositeChat",
+							Name = "Header",
+						},
+						{
+							Type = "cCompositeChat",
+							Name = "Footer",
+						},
+					},
+					Desc = "Sends the header and footer of the player list to the client.",
+				},
 				SendHideTitle =
 				{
 					Notes = "Hides the title. This makes the title and subtitle disappear, but if you call SendTitleTimes() the same title and subtitle will appear again."
@@ -11387,6 +11402,21 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Broadcasts the specified message to all players, with its message type set to mtWarning. Use for concerning events, such as plugin reload etc.",
+				},
+				BroadcastPlayerListsHeaderFooter =
+				{
+					Params =
+					{
+						{
+							Type = "cCompositeChat",
+							Name = "Header",
+						},
+						{
+							Type = "cCompositeChat",
+							Name = "Footer",
+						},
+					},
+					Desc = "Broadcasts the header and footer of the player list to all players.",
 				},
 				DoWithPlayerByUUID =
 				{

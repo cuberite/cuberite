@@ -648,6 +648,18 @@ void cRoot::BroadcastPlayerListsRemovePlayer(const cPlayer & a_Player, const cCl
 
 
 
+void cRoot::BroadcastPlayerListsHeaderFooter(const cCompositeChat & a_Header, const cCompositeChat & a_Footer)
+{
+	for (auto & Entry : m_WorldsByName)
+	{
+		Entry.second.BroadcastPlayerListHeaderFooter(a_Header, a_Footer);
+	}
+}
+
+
+
+
+
 void cRoot::BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)
 {
 	for (auto & Entry : m_WorldsByName)
