@@ -17,6 +17,7 @@ target_sources(
 	MineShafts.cpp
 	Noise3DGenerator.cpp
 	PieceGeneratorBFSTree.cpp
+	PieceModifier.cpp
 	PiecePool.cpp
 	PieceStructuresGen.cpp
 	Prefab.cpp
@@ -50,6 +51,7 @@ target_sources(
 	MineShafts.h
 	Noise3DGenerator.h
 	PieceGeneratorBFSTree.h
+	PieceModifier.h
 	PiecePool.h
 	PieceStructuresGen.h
 	Prefab.h
