@@ -317,6 +317,26 @@ namespace cpp20
 
 
 
+/**
+You can use this struct to use in std::visit
+example:
+std::visit(
+	OverloadedVariantAccess
+	{
+		[&] (cFirstType  & a_FirstTypeObject)  {  // Your code to handle cFirstType },
+		[&] (cSecondType & a_SecondTypeObject) {  // YourCode to handle cSecondType },
+		...
+	}
+, YourVariant);
+You can use constant references if you want to.
+*/
+template<class... Ts> struct OverloadedVariantAccess : Ts... { using Ts::operator()...; };
+template<class... Ts> OverloadedVariantAccess(Ts...)->OverloadedVariantAccess<Ts...>;
+
+
+
+
+
 /** Clamp X to the specified range. */
 template <typename T>
 T Clamp(T a_Value, T a_Min, T a_Max)
