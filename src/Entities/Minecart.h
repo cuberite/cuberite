@@ -56,9 +56,6 @@ protected:
 	/** Applies an acceleration to the minecart parallel to a_ForwardDirection but without allowing backward speed. */
 	void ApplyAcceleration(Vector3d a_ForwardDirection, double a_Acceleration);
 
-	// Overwrite to enforce speed limit
-	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
-
 	cMinecart(ePayload a_Payload, Vector3d a_Pos);
 
 	/** Handles physics on normal rails
