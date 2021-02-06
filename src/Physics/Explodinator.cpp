@@ -96,11 +96,11 @@ namespace Explodinator
 			if (Entity.IsPawn())
 			{
 				const auto ReducedImpact = Impact - Impact * Entity.GetEnchantmentBlastKnockbackReduction();
-				Entity.SetSpeed(Direction.NormalizeCopy() * KnockbackFactor * ReducedImpact);
+				Entity.AddSpeed(Direction.NormalizeCopy() * KnockbackFactor * ReducedImpact);
 			}
 			else
 			{
-				Entity.SetSpeed(Direction.NormalizeCopy() * KnockbackFactor * Impact);
+				Entity.AddSpeed(Direction.NormalizeCopy() * KnockbackFactor * Impact);
 			}
 
 			// Continue iteration:
