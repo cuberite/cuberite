@@ -40,7 +40,7 @@ namespace Explodinator
 	}
 
 	/** Calculates the approximate percentage of an Entity's bounding box that is exposed to an explosion centred at Position. */
-	static float CalculateEntityExposure(cChunk & a_Chunk, const cEntity & a_Entity, const Vector3f a_Position, const float a_SquareRadius)
+	static float CalculateEntityExposure(cChunk & a_Chunk, const cEntity & a_Entity, const Vector3f a_Position, const int a_SquareRadius)
 	{
 		const Vector3d Position = a_Position;
 		unsigned Unobstructed = 0, Total = 0;
@@ -69,16 +69,16 @@ namespace Explodinator
 			}
 		}
 
-		return static_cast<float>(Unobstructed) / Total;
+		return (Total == 0) ? 0 : (static_cast<float>(Unobstructed) / Total);
 	}
 
 	/** Applies distance-based damage and knockback to all entities within the explosion's effect range. */
-	static void DamageEntities(cChunk & a_Chunk, const Vector3f a_Position, const unsigned a_Power)
+	static void DamageEntities(cChunk & a_Chunk, const Vector3f a_Position, const int a_Power)
 	{
-		const auto Radius = a_Power * 2.f;
+		const auto Radius = a_Power * 2;
 		const auto SquareRadius = Radius * Radius;
 
-		a_Chunk.GetWorld()->ForEachEntityInBox({ a_Position, Radius * 2 }, [&a_Chunk, a_Position, a_Power, Radius, SquareRadius](cEntity & Entity)
+		a_Chunk.GetWorld()->ForEachEntityInBox({ a_Position, Radius * 2.f }, [&a_Chunk, a_Position, a_Power, Radius, SquareRadius](cEntity & Entity)
 		{
 			// Percentage of rays unobstructed.
 			const auto Exposure = CalculateEntityExposure(a_Chunk, Entity, a_Position, SquareRadius);
@@ -146,7 +146,7 @@ namespace Explodinator
 	/** Work out what should happen when an explosion destroys the given block.
 	Tasks include lighting TNT, dropping pickups, setting fire and flinging shrapnel according to Minecraft rules.
 	OK, _mostly_ Minecraft rules. */
-	static void DestroyBlock(cChunk & a_Chunk, const Vector3i a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
+	static void DestroyBlock(cChunk & a_Chunk, const Vector3i a_Position, const int a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
 		const auto DestroyedBlock = a_Chunk.GetBlock(a_Position);
 		if (DestroyedBlock == E_BLOCK_AIR)
@@ -173,7 +173,7 @@ namespace Explodinator
 			const auto DestroyedMeta = a_Chunk.GetMeta(a_Position);
 			a_Chunk.GetWorld()->SpawnItemPickups(cBlockHandler::For(DestroyedBlock).ConvertToPickups(DestroyedMeta), Absolute);
 		}
-		else if (a_Fiery && Random.RandBool(1.f / 3.f))  // 33% chance of starting fires if it can start fires
+		else if (a_Fiery && Random.RandBool(1 / 3.0))  // 33% chance of starting fires if it can start fires
 		{
 			const auto Below = a_Position.addedY(-1);
 			if ((Below.y >= 0) && cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(Below)))
@@ -202,7 +202,7 @@ namespace Explodinator
 	}
 
 	/** Traces the path taken by one Explosion Lazor (tm) with given direction and intensity, that will destroy blocks until it is exhausted. */
-	static void DestructionTrace(cChunk * a_Chunk, Vector3f a_Origin, const Vector3f a_Direction, const unsigned a_Power, const bool a_Fiery, float a_Intensity, const cEntity * const a_ExplodingEntity)
+	static void DestructionTrace(cChunk * a_Chunk, Vector3f a_Origin, const Vector3f a_Direction, const int a_Power, const bool a_Fiery, float a_Intensity, const cEntity * const a_ExplodingEntity)
 	{
 		// The current position the ray is at.
 		auto Checkpoint = a_Origin;
@@ -246,13 +246,13 @@ namespace Explodinator
 	}
 
 	/** Returns a random intensity for an Explosion Lazor (tm) as a function of the explosion's power. */
-	static float RandomIntensity(MTRand & a_Random, const unsigned a_Power)
+	static float RandomIntensity(MTRand & a_Random, const int a_Power)
 	{
 		return a_Power * (0.7f + a_Random.RandReal(0.6f));
 	}
 
 	/** Sends out Explosion Lazors (tm) originating from the given position that destroy blocks. */
-	static void DamageBlocks(cChunk & a_Chunk, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
+	static void DamageBlocks(cChunk & a_Chunk, const Vector3f a_Position, const int a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
 		// Oh boy... Better hope you have a hot cache, 'cos this little manoeuvre's gonna cost us 1352 raytraces in one tick...
 		const int HalfSide = TraceCubeSideLength / 2;
@@ -293,7 +293,7 @@ namespace Explodinator
 	}
 
 	/** Sends an explosion packet to all clients in the given chunk. */
-	static void LagTheClient(cChunk & a_Chunk, const Vector3f a_Position, const unsigned a_Power)
+	static void LagTheClient(cChunk & a_Chunk, const Vector3f a_Position, const int a_Power)
 	{
 		for (const auto Client : a_Chunk.GetAllClients())
 		{
@@ -301,7 +301,7 @@ namespace Explodinator
 		}
 	}
 
-	void Kaboom(cWorld & a_World, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
+	void Kaboom(cWorld & a_World, const Vector3f a_Position, const int a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
 		a_World.DoWithChunkAt(a_Position.Floor(), [a_Position, a_Power, a_Fiery, a_ExplodingEntity](cChunk & a_Chunk)
 		{
