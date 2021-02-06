@@ -12,14 +12,6 @@ class cBlockInfo
 {
 public:
 
-	// tolua_end
-
-	/** Returns how much of an explosion Destruction Lazor's (tm) intensity the given block attenuates.
-	See Physics\Explodinator.cpp for details of explosion block destruction. */
-	static float GetExplosionAbsorption(BLOCKTYPE Block);
-
-	// tolua_begin
-
 	/** How much light do the blocks emit on their own? */
 	static NIBBLETYPE GetLightValue(BLOCKTYPE Block);
 
