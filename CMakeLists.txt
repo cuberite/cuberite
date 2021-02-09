@@ -87,6 +87,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 
 	# File failed to follow NHS guidelines on handwashing and has not maintained good hygiene
 	set_source_files_properties("${PROJECT_SOURCE_DIR}/src/IniFile.cpp" PROPERTIES COMPILE_OPTIONS -Wno-header-hygiene)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	set_source_files_properties("${PROJECT_SOURCE_DIR}/src/Bindings/Bindings.cpp" PROPERTIES COMPILE_OPTIONS -w)
 endif()
 
 if(${BUILD_TOOLS})

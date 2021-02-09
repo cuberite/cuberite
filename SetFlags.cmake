@@ -104,7 +104,16 @@ endfunction()
 
 function(set_exe_flags TARGET)
 	if (MSVC)
-		# TODO: MSVC level 4, warnings as errors
+		# TODO: Warnings as errors
+		target_compile_options(
+			${TARGET} PRIVATE
+
+			# Warnings level 4:
+			/W4
+
+			# Excessive amount of logspam (Unreferenced formal parameter), disable for now:
+			/wd4100
+		)
 		return ()
 	endif()
 
