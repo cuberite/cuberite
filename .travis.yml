@@ -19,9 +19,10 @@ addons:
 jobs:
   include:
     # ARM workers are the slowest. Having these first in the build matrix makes travis faster overall.
-    - name: "Clang 6.0 - Debug"
+    - name: "Clang 10.0 - Debug"
       arch: arm64
       compiler: clang
+      dist: focal # For Clang 10, bionic is Clang 6 for some reason.
       before_install: &use-cmake
         - export PATH=/snap/bin/:${PATH}
       env: *Debug
