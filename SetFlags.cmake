@@ -88,15 +88,6 @@ function(set_global_flags)
 
 		# Make build use Unicode:
 		add_compile_definitions(UNICODE _UNICODE)
-	else()
-		# TODO: is this needed? NDEBUG is standard. Also, why are we using _DEBUG?
-		# Add the preprocessor macros used for distinguishing between debug and release builds (CMake does this automatically for MSVC):
-		set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -D_DEBUG")
-		set(CMAKE_C_FLAGS_DEBUG      "${CMAKE_C_FLAGS_DEBUG}      -D_DEBUG")
-		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -D_DEBUG")
-		set(CMAKE_C_FLAGS_COVERAGE   "${CMAKE_C_FLAGS_COVERAGE}   -D_DEBUG")
-		set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -DNDEBUG")
-		set(CMAKE_C_FLAGS_RELEASE    "${CMAKE_C_FLAGS_RELEASE}    -DNDEBUG")
 	endif()
 
 	# Allow for a forced 32-bit build under 64-bit OS:
@@ -105,15 +96,33 @@ function(set_global_flags)
 		add_link_options(-m32)
 	endif()
 
+	# https://en.wikipedia.org/wiki/Uname
+	# https://gcc.gnu.org/onlinedocs/gcc/index.html
 	# Have the compiler generate code specifically targeted at the current machine on Linux:
-	if(LINUX AND NOT NO_NATIVE_OPTIMIZATION)
-		add_compile_options(-march=native)
+	if(UNIX AND NOT NO_NATIVE_OPTIMIZATION AND NOT CMAKE_CROSSCOMPILING)
+		string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} SYSTEM_PROCESSOR)
+		if (SYSTEM_PROCESSOR MATCHES "^(i386|i686|x86|amd64|mips)")
+			message(STATUS "Optimising for this machine (march=native)")
+			add_compile_options(-march=native)
+		elseif (SYSTEM_PROCESSOR MATCHES "^(arm|aarch|powerpc|ppc|sparc|alpha)")
+			message(STATUS "Optimising for this machine (mcpu=native)")
+			add_compile_options(-mcpu=native)
+		endif()
 	endif()
 endfunction()
 
 function(set_exe_flags TARGET)
 	if (MSVC)
-		# TODO: MSVC level 4, warnings as errors
+		# TODO: Warnings as errors
+		target_compile_options(
+			${TARGET} PRIVATE
+
+			# Warnings level 4:
+			/W4
+
+			# Excessive amount of logspam (Unreferenced formal parameter), disable for now:
+			/wd4100
+		)
 		return ()
 	endif()
 

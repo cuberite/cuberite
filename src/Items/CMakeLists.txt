@@ -20,6 +20,7 @@ target_sources(
 	ItemDye.h
 	ItemEmptyMap.h
 	ItemEnchantingTable.h
+	ItemEndCrystal.h
 	ItemEyeOfEnder.h
 	ItemFishingRod.h
 	ItemFood.h

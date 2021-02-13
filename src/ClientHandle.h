@@ -45,17 +45,17 @@ typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 
 
 class cClientHandle  // tolua_export
-	: public cTCPLink::cCallbacks
+	: public cTCPLink::cCallbacks, public std::enable_shared_from_this<cClientHandle>
 {  // tolua_export
 public:  // tolua_export
 
 	#if defined(ANDROID)
-		static const unsigned DEFAULT_VIEW_DISTANCE = 4;  // The default ViewDistance (used when no value is set in Settings.ini)
+		static const int DEFAULT_VIEW_DISTANCE = 4;  // The default ViewDistance (used when no value is set in Settings.ini)
 	#else
-		static const unsigned DEFAULT_VIEW_DISTANCE = 10;
+		static const int DEFAULT_VIEW_DISTANCE = 10;
 	#endif
-	static const unsigned MAX_VIEW_DISTANCE = 32;
-	static const unsigned MIN_VIEW_DISTANCE = 1;
+	static const int MAX_VIEW_DISTANCE = 32;
+	static const int MIN_VIEW_DISTANCE = 1;
 
 	/** The percentage how much a block has to be broken.
 	Should be a value between 0.7 (70% broken) and 1 (100% broken) depending on lag.
@@ -63,7 +63,7 @@ public:  // tolua_export
 	static float FASTBREAK_PERCENTAGE;
 
 	/** Creates a new client with the specified IP address in its description and the specified initial view distance. */
-	cClientHandle(const AString & a_IPString, unsigned a_ViewDistance);
+	cClientHandle(const AString & a_IPString, int a_ViewDistance);
 
 	virtual ~cClientHandle() override;
 
@@ -124,10 +124,6 @@ public:  // tolua_export
 	/** Remove all loaded chunks that are no longer in range */
 	void UnloadOutOfRangeChunks(void);
 
-	/** Removes the client from all chunks. Used when destroying the player.
-	When switching worlds, RemoveFromWorld does this function's job so it isn't called. */
-	void RemoveFromAllChunks(void);
-
 	inline bool IsLoggedIn(void) const { return (m_State >= csAuthenticating); }
 
 	/** Called while the client is being ticked from the world via its cPlayer object */
@@ -140,7 +136,6 @@ public:  // tolua_export
 
 	bool IsPlaying   (void) const { return (m_State == csPlaying); }
 	bool IsDestroyed (void) const { return (m_State == csDestroyed); }
-	bool IsDestroying(void) const { return (m_State == csDestroying); }
 
 	// The following functions send the various packets:
 	// (Please keep these alpha-sorted)
@@ -157,7 +152,7 @@ public:  // tolua_export
 	void SendChatAboveActionBar         (const cCompositeChat & a_Message);
 	void SendChatSystem                 (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChatSystem                 (const cCompositeChat & a_Message);
-	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, const std::string_view a_ChunkData);
+	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, ContiguousByteBufferView a_ChunkData);
 	void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count);
 	void SendDestroyEntity              (const cEntity & a_Entity);
 	void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
@@ -188,6 +183,7 @@ public:  // tolua_export
 	void SendParticleEffect             (const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data);
 	void SendPlayerAbilities            (void);
 	void SendPlayerListAddPlayer        (const cPlayer & a_Player);
+	void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer);   // tolua_export
 	void SendPlayerListRemovePlayer     (const cPlayer & a_Player);
 	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
 	void SendPlayerListUpdateGameMode   (const cPlayer & a_Player);
@@ -196,11 +192,12 @@ public:  // tolua_export
 	void SendPlayerMoveLook             (void);
 	void SendPlayerPosition             (void);
 	void SendPlayerSpawn                (const cPlayer & a_Player);
-	void SendPluginMessage              (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
+	void SendPluginMessage              (const AString & a_Channel, std::string_view a_Message);  // Exported in ManualBindings.cpp
+	void SendPluginMessage              (const AString & a_Channel, ContiguousByteBufferView a_Message);
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
 	void SendResourcePack               (const AString & a_ResourcePackUrl);
 	void SendResetTitle                 (void);  // tolua_export
-	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks = false);
+	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks);
 	void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
 	void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void SendSetSubTitle                (const cCompositeChat & a_SubTitle);  // tolua_export
@@ -235,20 +232,21 @@ public:  // tolua_export
 	void SendWindowOpen                 (const cWindow & a_Window);
 	void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value);
 
+	const AString & GetUsername(void) const;  // tolua_export
+	void SetUsername(AString && a_Username);
+
 	// tolua_begin
-	const AString & GetUsername(void) const;
-	void SetUsername( const AString & a_Username);
 
 	inline short GetPing(void) const { return static_cast<short>(std::chrono::duration_cast<std::chrono::milliseconds>(m_Ping).count()); }
 
 	/** Sets the maximal view distance. */
-	void SetViewDistance(unsigned a_ViewDistance);
+	void SetViewDistance(int a_ViewDistance);
 
 	/** Returns the view distance that the player currently have. */
-	unsigned GetViewDistance(void) const { return m_CurrentViewDistance; }
+	int GetViewDistance(void) const { return m_CurrentViewDistance; }
 
 	/** Returns the view distance that the player request, not the used view distance. */
-	unsigned GetRequestedViewDistance(void) const { return m_RequestedViewDistance; }
+	int GetRequestedViewDistance(void) const { return m_RequestedViewDistance; }
 
 	void SetLocale(const AString & a_Locale) { m_Locale = a_Locale; }
 	AString GetLocale(void) const { return m_Locale; }
@@ -361,7 +359,7 @@ public:  // tolua_export
 	void HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
 
 
-	void HandlePluginMessage    (const AString & a_Channel, const AString & a_Message);
+	void HandlePluginMessage    (const AString & a_Channel, ContiguousByteBufferView a_Message);
 	void HandleRespawn          (void);
 	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, eHand a_Hand);
 	void HandleSlotSelected     (Int16 a_SlotNum);
@@ -383,11 +381,10 @@ public:  // tolua_export
 	void HandleCraftRecipe      (UInt32 a_RecipeId);
 
 	/** Called when the protocol has finished logging the user in.
-	Return true to allow the user in; false to kick them.
-	*/
-	bool HandleLogin(const AString & a_Username);
+	Return true to allow the user in; false to kick them. */
+	bool HandleLogin();
 
-	void SendData(const char * a_Data, size_t a_Size);
+	void SendData(ContiguousByteBufferView a_Data);
 
 	/** Called when the player moves into a different world.
 	Sends an UnloadChunk packet for each loaded chunk and resets the streamed chunks. */
@@ -404,9 +401,6 @@ public:  // tolua_export
 	bool IsPlayerChunkSent();
 
 private:
-	/** The dimension that was last sent to a player in a Respawn or Login packet.
-	Used to avoid Respawning into the same dimension, which confuses the client. */
-	eDimension m_LastSentDimension;
 
 	friend class cServer;  // Needs access to SetSelf()
 
@@ -422,10 +416,10 @@ private:
 	AStringMap m_ForgeMods;
 
 	/** The actual view distance used, the minimum of client's requested view distance and world's max view distance. */
-	unsigned m_CurrentViewDistance;
+	int m_CurrentViewDistance;
 
 	/** The requested view distance from the player. It isn't clamped with 1 and the max view distance of the world. */
-	unsigned m_RequestedViewDistance;
+	int m_RequestedViewDistance;
 
 	AString m_IPString;
 
@@ -450,16 +444,11 @@ private:
 	/** Protects m_OutgoingData against multithreaded access. */
 	cCriticalSection m_CSOutgoingData;
 
-	/** Buffer for storing outgoing data from any thread; will get sent in Tick() (to prevent deadlocks).
-	Protected by m_CSOutgoingData. */
-	AString m_OutgoingData;
-
-	Vector3d m_ConfirmPosition;
-
+	/** A pointer to a World-owned player object, created in FinishAuthenticate when authentication succeeds.
+	The player should only be accessed from the tick thread of the World that owns him.
+	After the player object is handed off to the World, lifetime is managed automatically, guaranteed to outlast this client handle.
+	The player self-destructs some time after the client handle enters the Destroyed state. */
 	cPlayer * m_Player;
-
-	// Temporary (#3115-will-fix): maintain temporary ownership of created cPlayer objects while they are in limbo
-	std::unique_ptr<cPlayer> m_PlayerPtr;
 
 	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know
 	whether or not the player is standing at a sent chunk.
@@ -503,13 +492,8 @@ private:
 	{
 		csConnected,             ///< The client has just connected, waiting for their handshake / login
 		csAuthenticating,        ///< The client has logged in, waiting for external authentication
-		csAuthenticated,         ///< The client has been authenticated, will start streaming chunks in the next tick
 		csDownloadingWorld,      ///< The client is waiting for chunks, we're waiting for the loader to provide and send them
-		csConfirmingPos,         ///< The client has been sent the position packet, waiting for them to repeat the position back
 		csPlaying,               ///< Normal gameplay
-		csKicked,                ///< Disconnect packet sent, awaiting connection closure
-		csQueuedForDestruction,  ///< The client will be destroyed in the next tick (flag set when socket closed)
-		csDestroying,            ///< The client is being destroyed, don't queue any more packets / don't add to chunks
 		csDestroyed,             ///< The client has been destroyed, the destructor is to be called from the owner thread
 	} ;
 
@@ -559,9 +543,6 @@ private:
 	m_CSOutgoingData is used to synchronize access for sending data. */
 	cTCPLinkPtr m_Link;
 
-	/** Shared pointer to self, so that this instance can keep itself alive when needed. */
-	cClientHandlePtr m_Self;
-
 	/** The fraction between 0 and 1 (or above), of how far through mining the currently mined block is.
 	0 for just started, 1 and above for broken. Used for anti-cheat. */
 	float m_BreakProgress;
@@ -585,7 +566,7 @@ private:
 	void FinishDigAnimation();
 
 	/** Converts the protocol-formatted channel list (NUL-separated) into a proper string vector. */
-	AStringVector BreakApartPluginChannels(const AString & a_PluginChannels);
+	AStringVector BreakApartPluginChannels(ContiguousByteBufferView a_PluginChannels);
 
 	/** Adds all of the channels to the list of current plugin channels. Handles duplicates gracefully. */
 	void RegisterPluginChannels(const AStringVector & a_ChannelList);
@@ -596,16 +577,13 @@ private:
 	/** Called when the network socket has been closed. */
 	void SocketClosed(void);
 
-	/** Called right after the instance is created to store its SharedPtr inside. */
-	void SetSelf(cClientHandlePtr a_Self);
-
 	/** Called to update m_State.
 	Only succeeds if a_NewState > m_State, otherwise returns false. */
 	bool SetState(eState a_NewState);
 
-	/** Processes the data in the network input and output buffers.
+	/** Processes the data in the network input buffer.
 	Called by both Tick() and ServerTick(). */
-	void ProcessProtocolInOut(void);
+	void ProcessProtocolIn(void);
 
 	// cTCPLink::cCallbacks overrides:
 	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override;

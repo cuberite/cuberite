@@ -1191,17 +1191,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // NBTChunkSerializer:
 
-bool NBTChunkSerializer::serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter)
+void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter)
 {
 	SerializerCollector serializer(aWriter);
 	aWriter.BeginCompound("Level");
 	aWriter.AddInt("xPos", aCoords.m_ChunkX);
 	aWriter.AddInt("zPos", aCoords.m_ChunkZ);
-	if (!aWorld.GetChunkData(aCoords, serializer))
-	{
-		aWriter.EndCompound();  // "Level"
-		return false;
-	}
+	[[maybe_unused]] const bool Result = aWorld.GetChunkData(aCoords, serializer);  // Chunk must be present in order to save
+	ASSERT(Result);
 	serializer.Finish();  // Close NBT tags
 
 	// Save biomes, both MCS (IntArray) and MC-vanilla (ByteArray):
@@ -1254,5 +1251,4 @@ bool NBTChunkSerializer::serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 	aWriter.AddByte("TerrainPopulated", 1);
 
 	aWriter.EndCompound();  // "Level"
-	return true;
 }

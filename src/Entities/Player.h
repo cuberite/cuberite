@@ -47,40 +47,8 @@ public:
 
 	CLASS_PROTODEF(cPlayer)
 
-
-	cPlayer(const cClientHandlePtr & a_Client, const AString & a_PlayerName);
-
-	virtual bool Initialize(OwnedEntity a_Self, cWorld & a_World) override;
-
+	cPlayer(const cClientHandlePtr & a_Client);
 	virtual ~cPlayer() override;
-
-	virtual void SpawnOn(cClientHandle & a_Client) override;
-
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-
-	void TickFreezeCode();
-
-	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
-
-	/** Returns the currently equipped weapon; empty item if none */
-	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
-
-	/** Returns the currently equipped helmet; empty item if none */
-	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
-
-	/** Returns the currently equipped chestplate; empty item if none */
-	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
-
-	/** Returns the currently equipped leggings; empty item if none */
-	virtual cItem GetEquippedLeggings(void) const override { return m_Inventory.GetEquippedLeggings(); }
-
-	/** Returns the currently equipped boots; empty item if none */
-	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
-
-	/** Returns the currently offhand equipped item; empty item if none */
-	virtual cItem GetOffHandEquipedItem(void) const override { return m_Inventory.GetShieldSlot(); }
-
-	virtual void ApplyArmorDamage(int DamageBlocked) override;
 
 	// tolua_begin
 
@@ -120,6 +88,9 @@ public:
 	static int CalcLevelFromXp(int a_CurrentXp);
 
 	// tolua_end
+
+	/** Gets the set of IDs for recipes this player has discovered. */
+	const std::set<UInt32> & GetKnownRecipes() const;
 
 	/** Starts charging the equipped bow */
 	void StartChargingBow(void);
@@ -185,7 +156,7 @@ public:
 	eGameMode GetGameMode(void) const { return m_GameMode; }
 
 	/** Returns the current effective gamemode (inherited gamemode is resolved before returning) */
-	eGameMode GetEffectiveGameMode(void) const { return (m_GameMode == gmNotSet) ? m_World->GetGameMode() : m_GameMode; }
+	eGameMode GetEffectiveGameMode(void) const;
 
 	/** Sets the gamemode for the player.
 	The gamemode may be gmNotSet, in that case the player inherits the world's gamemode.
@@ -217,7 +188,7 @@ public:
 	/** Returns true if the player can be targeted by Mobs */
 	bool CanMobsTarget(void) const;
 
-	AString GetIP(void) const { return m_IP; }  // tolua_export
+	AString GetIP(void) const;  // tolua_export
 
 	/** Returns the associated team, nullptr if none */
 	cTeam * GetTeam(void) { return m_Team; }  // tolua_export
@@ -241,8 +212,6 @@ public:
 	If the achievement has been already awarded to the player, this method will just increment the stat counter. */
 	void AwardAchievement(Statistic a_Ach);
 
-	void SetIP(const AString & a_IP);
-
 	/** Forces the player to move in the given direction.
 	@deprecated Use SetSpeed instead. */
 	void ForceSetSpeed(const Vector3d & a_Speed);  // tolua_export
@@ -261,7 +230,6 @@ public:
 	/** Closes the current window if it matches the specified ID, resets current window to m_InventoryWindow */
 	void CloseWindowIfID(char a_WindowID, bool a_CanRefuse = true);
 
-	/** Returns the raw client handle associated with the player. */
 	cClientHandle * GetClientHandle(void) const { return m_ClientHandle.get(); }
 
 	// tolua_end
@@ -272,9 +240,6 @@ public:
 
 	/** Permute the seed for enchanting related PRNGs, don't use this for other purposes. */
 	void PermuteEnchantmentSeed();
-
-	/** Returns the SharedPtr to client handle associated with the player. */
-	cClientHandlePtr GetClientHandlePtr(void) const { return m_ClientHandle; }
 
 	// tolua_begin
 
@@ -292,8 +257,7 @@ public:
 	void SendSystemMessage        (const cCompositeChat & a_Message);
 	void SendAboveActionBarMessage(const cCompositeChat & a_Message);
 
-	const AString & GetName(void) const { return m_PlayerName; }
-	void SetName(const AString & a_Name) { m_PlayerName = a_Name; }
+	const AString & GetName(void) const;
 
 	// tolua_end
 
@@ -432,7 +396,7 @@ public:
 	*/
 	bool LoadFromFile(const AString & a_FileName, cWorldPtr & a_World);
 
-	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
+	const AString & GetLoadedWorldName() const { return m_CurrentWorldName; }
 
 	/** Opens the inventory of any tame horse the player is riding.
 	If the player is not riding a horse or if the horse is untamed, does nothing. */
@@ -449,13 +413,6 @@ public:
 	/** Damage the item in a_SlotNumber by a_Damage, possibly less if the
 	equipped item is enchanted. */
 	void UseItem(int a_SlotNumber, short a_Damage = 1);
-
-	void SendHealth(void);
-
-	// Send current active hotbar slot
-	void SendHotbarActiveSlot(void);
-
-	void SendExperience(void);
 
 	/** In UI windows, get the item that the player is dragging */
 	cItem & GetDraggingItem(void) {return m_DraggingItem; }  // tolua_export
@@ -596,10 +553,6 @@ public:
 	virtual void AttachTo(cEntity * a_AttachTo) override;
 	virtual void Detach(void) override;
 
-	/** Called by cClientHandle when the client is being destroyed.
-	The player removes its m_ClientHandle ownership so that the ClientHandle gets deleted. */
-	void RemoveClientHandle(void);
-
 	/** Returns the progress mined per tick for the block a_Block as a fraction
 	(1 would be completely mined)
 	Depends on hardness values so check those are correct.
@@ -612,14 +565,19 @@ public:
 	Source: https://minecraft.gamepedia.com/Breaking#Instant_breaking */
 	bool CanInstantlyMine(BLOCKTYPE a_Block);
 
-	/** get player explosion exposure rate */
-	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower) override;
-
 	/** Adds an Item to the list of known items.
 	If the item is already known, does nothing. */
 	void AddKnownItem(const cItem & a_Item);
 
-protected:
+	// cEntity overrides:
+	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
+	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
+	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
+	virtual cItem GetEquippedLeggings(void) const override { return m_Inventory.GetEquippedLeggings(); }
+	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
+	virtual cItem GetOffHandEquipedItem(void) const override { return m_Inventory.GetShieldSlot(); }
+
+private:
 
 	typedef std::vector<std::vector<AString> > AStringVectorVector;
 
@@ -644,9 +602,6 @@ protected:
 	// Message visuals:
 	AString m_MsgPrefix, m_MsgSuffix;
 	AString m_MsgNameColorCode;
-
-	AString m_PlayerName;
-	AString m_LoadedWorldName;
 
 	/** Xp Level stuff */
 	enum
@@ -685,11 +640,18 @@ protected:
 	/** The player's last saved bed position */
 	Vector3i m_LastBedPos;
 
-	/** The world which the player respawns in upon death */
-	cWorld * m_SpawnWorld;
+	/** The name of the world which the player respawns in upon death.
+	This is stored as a string to enable SaveToDisk to not touch cRoot, and thus can be safely called in the player's destructor. */
+	std::string m_SpawnWorldName;
+
+	/** The name of the world which the player currently resides in.
+	Stored in addition to m_World to allow SaveToDisk to be safely called in the player's destructor. */
+	std::string m_CurrentWorldName;
+
+	/** The save path of the default world. */
+	std::string m_DefaultWorldPath;
 
 	eGameMode m_GameMode;
-	AString m_IP;
 
 	/** The item being dragged by the cursor while in a UI window */
 	cItem m_DraggingItem;
@@ -736,9 +698,6 @@ protected:
 	int m_CurrentXp;
 	unsigned int m_EnchantmentSeed;
 
-	// flag saying we need to send a xp update to client
-	bool m_bDirtyExperience;
-
 	bool m_IsChargingBow;
 	int  m_BowCharge;
 
@@ -779,16 +738,6 @@ protected:
 	/** List of known items as Ids */
 	std::set<cItem, cItem::sItemCompare> m_KnownItems;
 
-	virtual void DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo) override;
-
-	/** Sets the speed and sends it to the client, so that they are forced to move so. */
-	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
-
-	virtual void Destroyed(void) override;
-
-	/** Filters out damage for creative mode / friendly fire */
-	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
-
 	/** Called in each tick to handle food-related processing */
 	void HandleFood(void);
 
@@ -798,8 +747,6 @@ protected:
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const cUUID & a_UUID);
-
-private:
 
 	/** Pins the player to a_Location until Unfreeze() is called.
 	If ManuallyFrozen is false, the player will unfreeze when the chunk is loaded. */
@@ -823,5 +770,18 @@ private:
 	/** Add the recipe Id to the known recipes.
 	If the recipe is already known, does nothing. */
 	void AddKnownRecipe(UInt32 RecipeId);
+
+	void TickFreezeCode();
+
+	// cEntity overrides:
+	virtual void ApplyArmorDamage(int DamageBlocked) override;
+	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
+	virtual float GetEnchantmentBlastKnockbackReduction() override;
+	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
+	virtual void OnAddToWorld(cWorld & a_World) override;
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
+	virtual void SpawnOn(cClientHandle & a_Client) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 } ;  // tolua_export

@@ -1045,7 +1045,7 @@ void cProtocol_1_12::HandlePacketCraftingBookData(cByteBuffer & a_ByteBuffer)
 {
 	// TODO not yet used, not sure if it is needed
 	// https://wiki.vg/index.php?title=Protocol&oldid=14204#Crafting_Book_Data
-	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
+	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace());
 }
 
 
@@ -1054,7 +1054,7 @@ void cProtocol_1_12::HandlePacketCraftingBookData(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_12::HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer)
 {
-	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
+	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace());
 	m_Client->GetPlayer()->SendMessageInfo("The new advancements are not implemented.");
 }
 
@@ -1167,36 +1167,37 @@ UInt32 cProtocol_1_12_1::GetPacketID(ePacketType a_Packet)
 {
 	switch (a_Packet)
 	{
-		case pktAttachEntity:        return 0x43;
-		case pktCameraSetTo:         return 0x39;
-		case pktCollectEntity:       return 0x4b;
-		case pktDestroyEntity:       return 0x32;
-		case pktDisplayObjective:    return 0x3b;
-		case pktEntityEffect:        return 0x4f;
-		case pktEntityEquipment:     return 0x3f;
-		case pktEntityHeadLook:      return 0x36;
-		case pktEntityMeta:          return 0x3c;
-		case pktEntityProperties:    return 0x4e;
-		case pktEntityVelocity:      return 0x3e;
-		case pktExperience:          return 0x40;
-		case pktHeldItemChange:      return 0x3a;
-		case pktLeashEntity:         return 0x3d;
-		case pktPlayerList:          return 0x2e;
-		case pktPlayerAbilities:     return 0x2c;
-		case pktPlayerMaxSpeed:      return 0x4e;
-		case pktPlayerMoveLook:      return 0x2f;
-		case pktRemoveEntityEffect:  return 0x33;
-		case pktResourcePack:        return 0x34;
-		case pktRespawn:             return 0x35;
-		case pktScoreboardObjective: return 0x42;
-		case pktSpawnPosition:       return 0x46;
-		case pktUnlockRecipe:        return 0x31;
-		case pktUpdateHealth:        return 0x41;
-		case pktUpdateScore:         return 0x45;
-		case pktUseBed:              return 0x30;
-		case pktTeleportEntity:      return 0x4c;
-		case pktTimeUpdate:          return 0x47;
-		case pktTitle:               return 0x48;
+		case pktAttachEntity:           return 0x43;
+		case pktCameraSetTo:            return 0x39;
+		case pktCollectEntity:          return 0x4b;
+		case pktDestroyEntity:          return 0x32;
+		case pktDisplayObjective:       return 0x3b;
+		case pktEntityEffect:           return 0x4f;
+		case pktEntityEquipment:        return 0x3f;
+		case pktEntityHeadLook:         return 0x36;
+		case pktEntityMeta:             return 0x3c;
+		case pktEntityProperties:       return 0x4e;
+		case pktEntityVelocity:         return 0x3e;
+		case pktExperience:             return 0x40;
+		case pktHeldItemChange:         return 0x3a;
+		case pktLeashEntity:            return 0x3d;
+		case pktPlayerList:             return 0x2e;
+		case pktPlayerListHeaderFooter: return 0x4a;
+		case pktPlayerAbilities:        return 0x2c;
+		case pktPlayerMaxSpeed:         return 0x4e;
+		case pktPlayerMoveLook:         return 0x2f;
+		case pktRemoveEntityEffect:     return 0x33;
+		case pktResourcePack:           return 0x34;
+		case pktRespawn:                return 0x35;
+		case pktScoreboardObjective:    return 0x42;
+		case pktSpawnPosition:          return 0x46;
+		case pktUnlockRecipe:           return 0x31;
+		case pktUpdateHealth:           return 0x41;
+		case pktUpdateScore:            return 0x45;
+		case pktUseBed:                 return 0x30;
+		case pktTeleportEntity:         return 0x4c;
+		case pktTimeUpdate:             return 0x47;
+		case pktTitle:                  return 0x48;
 
 		default: return Super::GetPacketID(a_Packet);
 	}

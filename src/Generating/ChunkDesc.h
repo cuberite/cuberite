@@ -229,10 +229,10 @@ public:
 	/** Compresses the metas from the BlockArea format (1 meta per byte) into regular format (2 metas per byte) */
 	void CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas);
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 	/** Verifies that the heightmap corresponds to blocktype contents; if not, asserts on that column */
 	void VerifyHeightmap(void);
-	#endif  // _DEBUG
+	#endif  // !NDEBUG
 
 private:
 	cChunkCoords m_Coords;

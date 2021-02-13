@@ -1,5 +1,5 @@
 #include "Globals.h"
-#include "BlockState.h"
+#include "Bindings/BlockState.h"
 #include "../TestHelpers.h"
 
 

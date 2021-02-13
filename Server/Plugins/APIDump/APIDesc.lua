@@ -1584,6 +1584,21 @@ end
 					},
 					Notes = "Sends the specified animation of the specified entity to the client. The AnimationNumber is protocol-specific.",
 				},
+				SendPlayerListHeaderFooter =
+				{
+					Params =
+					{
+						{
+							Type = "cCompositeChat",
+							Name = "Header",
+						},
+						{
+							Type = "cCompositeChat",
+							Name = "Footer",
+						},
+					},
+					Desc = "Sends the header and footer of the player list to the client.",
+				},
 				SendHideTitle =
 				{
 					Notes = "Hides the title. This makes the title and subtitle disappear, but if you call SendTitleTimes() the same title and subtitle will appear again."
@@ -1764,17 +1779,6 @@ end
 						},
 					},
 					Notes = "Sets the locale that Cuberite keeps on record. Initially the locale is initialized in protocol handshake, this function allows plugins to override the stored value (but only server-side and only until the user disconnects).",
-				},
-				SetUsername =
-				{
-					Params =
-					{
-						{
-							Name = "Name",
-							Type = "string",
-						},
-					},
-					Notes = "Sets the username",
 				},
 				SetViewDistance =
 				{
@@ -11399,6 +11403,21 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Broadcasts the specified message to all players, with its message type set to mtWarning. Use for concerning events, such as plugin reload etc.",
 				},
+				BroadcastPlayerListsHeaderFooter =
+				{
+					Params =
+					{
+						{
+							Type = "cCompositeChat",
+							Name = "Header",
+						},
+						{
+							Type = "cCompositeChat",
+							Name = "Footer",
+						},
+					},
+					Desc = "Broadcasts the header and footer of the player list to all players.",
+				},
 				DoWithPlayerByUUID =
 				{
 					Params =
@@ -14459,7 +14478,7 @@ end
 				dtMagma =
 				{
 					Notes = "Damage from contact with a magma block"
-				}, 
+				},
 				dtDrown =
 				{
 					Notes = "Damage received by drowning in water / lava"

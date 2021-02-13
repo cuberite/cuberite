@@ -74,10 +74,6 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType a_MobType, EMCSBiome a_Biome, bool a_DisableSolidBelowCheck)
 {
-	if (a_Chunk == nullptr)
-	{
-		return false;
-	}
 	if ((a_RelPos.y >= cChunkDef::Height - 1) || (a_RelPos.y <= 0))
 	{
 		return false;
@@ -501,9 +497,6 @@ cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, EMCS
 		}
 		m_NewPack = false;
 	}
-
-	// Make sure we are looking at the right chunk to spawn in
-	a_Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(a_RelPos);
 
 	if ((m_AllowedTypes.find(m_MobType) != m_AllowedTypes.end()) && CanSpawnHere(a_Chunk, a_RelPos, m_MobType, a_Biome))
 	{

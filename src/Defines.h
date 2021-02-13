@@ -12,16 +12,9 @@ typedef std::vector<int> cSlotNums;
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-#endif
 /** Constant to calculate ticks from seconds "ticks per second" */
 constexpr inline const int TPS = 20;
 // This is not added to the lua API because it broke the build
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 
@@ -489,20 +482,10 @@ inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, do
 
 
 
-template <class T, typename = std::enable_if_t<!std::is_integral_v<T>>>
+template <class T>
 inline T Diff(T a_Val1, T a_Val2)
 {
 	return std::abs(a_Val1 - a_Val2);
-}
-
-
-
-
-
-template <class T, typename = std::enable_if_t<std::is_integral_v<T>>>
-inline auto Diff(T a_Val1, T a_Val2)
-{
-	return static_cast<std::make_unsigned_t<T>>(std::abs(a_Val1 - a_Val2));
 }
 
 

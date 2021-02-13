@@ -100,7 +100,7 @@ public:
 			void * space = malloc(sizeof(T));
 			if (space != nullptr)
 			{
-				#if defined(_MSC_VER) && defined(_DEBUG)
+				#if defined(_MSC_VER) && !defined(NDEBUG)
 					// The debugging-new that is set up using macros in Globals.h doesn't support the placement-new syntax used here.
 					// Temporarily disable the macro
 					#pragma push_macro("new")
@@ -109,7 +109,7 @@ public:
 
 				return new(space) T;
 
-				#if defined(_MSC_VER) && defined(_DEBUG)
+				#if defined(_MSC_VER) && !defined(NDEBUG)
 					// Re-enable the debugging-new macro
 					#pragma pop_macro("new")
 				#endif
@@ -127,7 +127,7 @@ public:
 		}
 		// placement new, used to initalize the object
 
-		#if defined(_MSC_VER) && defined(_DEBUG)
+		#if defined(_MSC_VER) && !defined(NDEBUG)
 			// The debugging-new that is set up using macros in Globals.h doesn't support the placement-new syntax used here.
 			// Temporarily disable the macro
 			#pragma push_macro("new")
@@ -136,7 +136,7 @@ public:
 
 		T * ret = new (m_FreeList.front()) T;
 
-		#if defined(_MSC_VER) && defined(_DEBUG)
+		#if defined(_MSC_VER) && !defined(NDEBUG)
 			// Re-enable the debugging-new macro
 			#pragma pop_macro("new")
 		#endif

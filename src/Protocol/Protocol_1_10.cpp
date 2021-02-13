@@ -692,7 +692,7 @@ void cProtocol_1_10_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity 
 	}
 
 	Writer.Finish();
-	a_Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
+	a_Pkt.WriteBuf(Writer.GetResult());
 }
 
 

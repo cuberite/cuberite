@@ -98,7 +98,7 @@ protected:
 	virtual void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer) override;
 
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
-	virtual void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata) override;
+	virtual void ParseItemMetadata(cItem & a_Item, ContiguousByteBufferView a_Metadata) override;
 
 	/** Converts the hand parameter received by the protocol into eHand constants.
 	If the received value doesn't match any of the know value, raise an assertion fail or return hMain. */

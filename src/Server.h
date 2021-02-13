@@ -133,7 +133,7 @@ public:
 	const AString & GetFaviconData(void) const { return m_FaviconData; }
 
 	cRsaPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
-	const AString & GetPublicKeyDER(void) const { return m_PublicKeyDER; }
+	ContiguousByteBufferView GetPublicKeyDER(void) const { return m_PublicKeyDER; }
 
 	/** Returns true if authentication has been turned on in server settings. */
 	bool ShouldAuthenticate(void) const { return m_ShouldAuthenticate; }  // tolua_export
@@ -206,7 +206,7 @@ private:
 	cCriticalSection m_CSPendingCommands;
 	std::vector<std::pair<AString, cCommandOutputCallback *>> m_PendingCommands;
 
-	unsigned m_ClientViewDistance;  // The default view distance for clients; settable in Settings.ini
+	int m_ClientViewDistance;  // The default view distance for clients; settable in Settings.ini
 
 	bool m_bIsConnected;  // true - connected false - not connected
 
@@ -214,7 +214,7 @@ private:
 	cRsaPrivateKey m_PrivateKey;
 
 	/** Public key for m_PrivateKey, ASN1-DER-encoded */
-	AString m_PublicKeyDER;
+	ContiguousByteBuffer m_PublicKeyDER;
 
 	cRCONServer m_RCONServer;
 

@@ -102,6 +102,7 @@ public:
 		pktPingResponse,
 		pktPlayerAbilities,
 		pktPlayerList,
+		pktPlayerListHeaderFooter,
 		pktPlayerMaxSpeed,
 		pktPlayerMoveLook,
 		pktPluginMessage,
@@ -365,7 +366,7 @@ public:
 	virtual void SendChat                       (const AString & a_Message, eChatType a_Type) = 0;
 	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) = 0;
 	virtual void SendChatRaw                    (const AString & a_MessageRaw, eChatType a_Type) = 0;
-	virtual void SendChunkData                  (const std::string_view a_ChunkData) = 0;
+	virtual void SendChunkData                  (ContiguousByteBufferView a_ChunkData) = 0;
 	virtual void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) = 0;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) = 0;
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) = 0;
@@ -397,6 +398,7 @@ public:
 	virtual void SendParticleEffect             (const AString & a_SoundName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) = 0;
 	virtual void SendParticleEffect             (const AString & a_SoundName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) = 0;
 	virtual void SendPlayerListAddPlayer        (const cPlayer & a_Player) = 0;
+	virtual void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer) = 0;
 	virtual void SendPlayerListRemovePlayer     (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerListUpdatePing       (const cPlayer & a_Player) = 0;
@@ -405,7 +407,7 @@ public:
 	virtual void SendPlayerMoveLook             (void) = 0;
 	virtual void SendPlayerPosition             (void) = 0;
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) = 0;
-	virtual void SendPluginMessage              (const AString & a_Channel, const AString & a_Message) = 0;
+	virtual void SendPluginMessage              (const AString & a_Channel, ContiguousByteBufferView a_Message) = 0;
 	virtual void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID) = 0;
 	virtual void SendResetTitle                 (void) = 0;
 	virtual void SendResourcePack               (const AString & a_ResourcePackUrl) = 0;
@@ -468,7 +470,7 @@ protected:
 	virtual Version GetProtocolVersion() = 0;
 
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
-	virtual void SendData(const char * a_Data, size_t a_Size) = 0;
+	virtual void SendData(ContiguousByteBufferView a_Data) = 0;
 
 	/** Sends a single packet contained within the cPacketizer class.
 	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */

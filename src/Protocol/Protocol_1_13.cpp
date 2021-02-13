@@ -298,13 +298,14 @@ void cProtocol_1_13::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 		m_Client->SetClientBrand(Brand);
 
 		// Send back our brand, including the length:
-		SendPluginMessage("minecraft:brand", "\x08""Cuberite");
+		m_Client->SendPluginMessage("minecraft:brand", "\x08""Cuberite");
 		return;
 	}
 
+	ContiguousByteBuffer Data;
+
 	// Read the plugin message and relay to clienthandle:
-	AString Data;
-	VERIFY(a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1));  // Always succeeds
+	VERIFY(a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace()));  // Always succeeds
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 
@@ -336,59 +337,60 @@ UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType)
 {
 	switch (a_PacketType)
 	{
-		case pktAttachEntity:         return 0x46;
-		case pktBlockChanges:         return 0x0f;
-		case pktCameraSetTo:          return 0x3c;
-		case pktChatRaw:              return 0x0e;
-		case pktCollectEntity:        return 0x4f;
-		case pktDestroyEntity:        return 0x35;
-		case pktDisconnectDuringGame: return 0x1b;
-		case pktEditSign:             return 0x2c;
-		case pktEntityEffect:         return 0x53;
-		case pktEntityEquipment:      return 0x42;
-		case pktEntityHeadLook:       return 0x39;
-		case pktEntityLook:           return 0x2a;
-		case pktEntityMeta:           return 0x3f;
-		case pktEntityProperties:     return 0x52;
-		case pktEntityRelMove:        return 0x28;
-		case pktEntityRelMoveLook:    return 0x29;
-		case pktEntityStatus:         return 0x1c;
-		case pktEntityVelocity:       return 0x41;
-		case pktExperience:           return 0x43;
-		case pktExplosion:            return 0x1e;
-		case pktGameMode:             return 0x20;
-		case pktHeldItemChange:       return 0x3d;
-		case pktInventorySlot:        return 0x17;
-		case pktJoinGame:             return 0x25;
-		case pktKeepAlive:            return 0x21;
-		case pktLeashEntity:          return 0x40;
-		case pktMapData:              return 0x26;
-		case pktParticleEffect:       return 0x24;
-		case pktPlayerAbilities:      return 0x2e;
-		case pktPlayerList:           return 0x30;
-		case pktPlayerMaxSpeed:       return 0x52;
-		case pktPlayerMoveLook:       return 0x32;
-		case pktPluginMessage:        return 0x19;
-		case pktRemoveEntityEffect:   return 0x36;
-		case pktRespawn:              return 0x38;
-		case pktScoreboardObjective:  return 0x45;
-		case pktSoundEffect:          return 0x1a;
-		case pktSoundParticleEffect:  return 0x23;
-		case pktSpawnPosition:        return 0x49;
-		case pktTabCompletionResults: return 0x10;
-		case pktTeleportEntity:       return 0x50;
-		case pktTimeUpdate:           return 0x4a;
-		case pktTitle:                return 0x4b;
-		case pktUnloadChunk:          return 0x1f;
-		case pktUnlockRecipe:         return 0x32;
-		case pktUpdateHealth:         return 0x44;
-		case pktUpdateScore:          return 0x48;
-		case pktUpdateSign:           return GetPacketID(pktUpdateBlockEntity);
-		case pktUseBed:               return 0x33;
-		case pktWindowClose:          return 0x13;
-		case pktWindowItems:          return 0x15;
-		case pktWindowOpen:           return 0x14;
-		case pktWindowProperty:       return 0x16;
+		case pktAttachEntity:           return 0x46;
+		case pktBlockChanges:           return 0x0f;
+		case pktCameraSetTo:            return 0x3c;
+		case pktChatRaw:                return 0x0e;
+		case pktCollectEntity:          return 0x4f;
+		case pktDestroyEntity:          return 0x35;
+		case pktDisconnectDuringGame:   return 0x1b;
+		case pktEditSign:               return 0x2c;
+		case pktEntityEffect:           return 0x53;
+		case pktEntityEquipment:        return 0x42;
+		case pktEntityHeadLook:         return 0x39;
+		case pktEntityLook:             return 0x2a;
+		case pktEntityMeta:             return 0x3f;
+		case pktEntityProperties:       return 0x52;
+		case pktEntityRelMove:          return 0x28;
+		case pktEntityRelMoveLook:      return 0x29;
+		case pktEntityStatus:           return 0x1c;
+		case pktEntityVelocity:         return 0x41;
+		case pktExperience:             return 0x43;
+		case pktExplosion:              return 0x1e;
+		case pktGameMode:               return 0x20;
+		case pktHeldItemChange:         return 0x3d;
+		case pktInventorySlot:          return 0x17;
+		case pktJoinGame:               return 0x25;
+		case pktKeepAlive:              return 0x21;
+		case pktLeashEntity:            return 0x40;
+		case pktMapData:                return 0x26;
+		case pktParticleEffect:         return 0x24;
+		case pktPlayerAbilities:        return 0x2e;
+		case pktPlayerList:             return 0x30;
+		case pktPlayerListHeaderFooter: return 0x4E;
+		case pktPlayerMaxSpeed:         return 0x52;
+		case pktPlayerMoveLook:         return 0x32;
+		case pktPluginMessage:          return 0x19;
+		case pktRemoveEntityEffect:     return 0x36;
+		case pktRespawn:                return 0x38;
+		case pktScoreboardObjective:    return 0x45;
+		case pktSoundEffect:            return 0x1a;
+		case pktSoundParticleEffect:    return 0x23;
+		case pktSpawnPosition:          return 0x49;
+		case pktTabCompletionResults:   return 0x10;
+		case pktTeleportEntity:         return 0x50;
+		case pktTimeUpdate:             return 0x4a;
+		case pktTitle:                  return 0x4b;
+		case pktUnloadChunk:            return 0x1f;
+		case pktUnlockRecipe:           return 0x32;
+		case pktUpdateHealth:           return 0x44;
+		case pktUpdateScore:            return 0x48;
+		case pktUpdateSign:             return GetPacketID(pktUpdateBlockEntity);
+		case pktUseBed:                 return 0x33;
+		case pktWindowClose:            return 0x13;
+		case pktWindowItems:            return 0x15;
+		case pktWindowOpen:             return 0x14;
+		case pktWindowProperty:         return 0x16;
 		default: return Super::GetPacketID(a_PacketType);
 	}
 }
@@ -648,7 +650,7 @@ std::pair<short, short> cProtocol_1_13::GetItemFromProtocolID(UInt32 a_ProtocolI
 
 UInt32 cProtocol_1_13::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 {
-	return Palette_1_13::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+	return Palette_1_13::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
 }
 
 
@@ -657,7 +659,7 @@ UInt32 cProtocol_1_13::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_
 
 UInt32 cProtocol_1_13::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
 {
-	return Palette_1_13::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+	return Palette_1_13::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
 }
 
 
@@ -694,8 +696,8 @@ bool cProtocol_1_13::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t
 		a_Item.Empty();
 	}
 
-	AString Metadata;
-	if (!a_ByteBuffer.ReadString(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes - 1) || (Metadata.size() == 0) || (Metadata[0] == 0))
+	ContiguousByteBuffer Metadata;
+	if (!a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes) || Metadata.empty() || (Metadata[0] == std::byte(0)))
 	{
 		// No metadata
 		return true;
@@ -1364,7 +1366,7 @@ std::pair<short, short> cProtocol_1_13_1::GetItemFromProtocolID(UInt32 a_Protoco
 
 UInt32 cProtocol_1_13_1::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 {
-	return Palette_1_13_1::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+	return Palette_1_13_1::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
 }
 
 
@@ -1373,7 +1375,7 @@ UInt32 cProtocol_1_13_1::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE 
 
 UInt32 cProtocol_1_13_1::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
 {
-	return Palette_1_13_1::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+	return Palette_1_13_1::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
 }
 
 
@@ -1423,8 +1425,8 @@ bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size
 		a_Item.Empty();
 	}
 
-	AString Metadata;
-	if (!a_ByteBuffer.ReadString(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes - 1) || (Metadata.size() == 0) || (Metadata[0] == 0))
+	ContiguousByteBuffer Metadata;
+	if (!a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes) || Metadata.empty() || (Metadata[0] == std::byte(0)))
 	{
 		// No metadata
 		return true;

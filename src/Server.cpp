@@ -24,11 +24,6 @@
 #include <sstream>
 #include <iostream>
 
-extern "C"
-{
-	#include "zlib/zlib.h"
-}
-
 
 
 
@@ -214,20 +209,20 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	m_ShouldLoadOfflinePlayerData = a_Settings.GetValueSetB("PlayerData", "LoadOfflinePlayerData", false);
 	m_ShouldLoadNamedPlayerData   = a_Settings.GetValueSetB("PlayerData", "LoadNamedPlayerData", true);
 
-	const auto ClientViewDistance = a_Settings.GetValueSetI("Server", "DefaultViewDistance", static_cast<int>(cClientHandle::DEFAULT_VIEW_DISTANCE));
-	if (ClientViewDistance < static_cast<int>(cClientHandle::MIN_VIEW_DISTANCE))
+	const auto ClientViewDistance = a_Settings.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
+	if (ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
 	{
 		m_ClientViewDistance = cClientHandle::MIN_VIEW_DISTANCE;
 		LOGINFO("Setting default view distance to the minimum of %d", m_ClientViewDistance);
 	}
-	else if (ClientViewDistance > static_cast<int>(cClientHandle::MAX_VIEW_DISTANCE))
+	else if (ClientViewDistance > cClientHandle::MAX_VIEW_DISTANCE)
 	{
 		m_ClientViewDistance = cClientHandle::MAX_VIEW_DISTANCE;
 		LOGINFO("Setting default view distance to the maximum of %d", m_ClientViewDistance);
 	}
 	else
 	{
-		m_ClientViewDistance = static_cast<unsigned>(ClientViewDistance);
+		m_ClientViewDistance = ClientViewDistance;
 	}
 
 	PrepareKeys();
@@ -324,7 +319,6 @@ cTCPLink::cCallbacksPtr cServer::OnConnectionAccepted(const AString & a_RemoteIP
 {
 	LOGD("Client \"%s\" connected!", a_RemoteIPAddress.c_str());
 	cClientHandlePtr NewHandle = std::make_shared<cClientHandle>(a_RemoteIPAddress, m_ClientViewDistance);
-	NewHandle->SetSelf(NewHandle);
 	cCSLock Lock(m_CSClients);
 	m_Clients.push_back(NewHandle);
 	return std::move(NewHandle);
@@ -373,14 +367,17 @@ void cServer::TickClients(float a_Dt)
 		// Tick the remaining clients, take out those that have been destroyed into RemoveClients
 		for (auto itr = m_Clients.begin(); itr != m_Clients.end();)
 		{
-			if ((*itr)->IsDestroyed())
+			auto & Client = *itr;
+
+			Client->ServerTick(a_Dt);
+			if (Client->IsDestroyed())
 			{
 				// Delete the client later, when CS is not held, to avoid deadlock: https://forum.cuberite.org/thread-374.html
-				RemoveClients.push_back(*itr);
+				RemoveClients.push_back(std::move(Client));
 				itr = m_Clients.erase(itr);
 				continue;
 			}
-			(*itr)->ServerTick(a_Dt);
+
 			++itr;
 		}  // for itr - m_Clients[]
 	}

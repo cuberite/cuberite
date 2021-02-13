@@ -29,58 +29,52 @@
 
 
 
-void cBlockEntity::SetPos(Vector3i a_NewPos)
+cBlockEntity::cBlockEntity(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta, const Vector3i a_Pos, cWorld * const a_World) :
+	m_Pos(a_Pos),
+	m_RelX(a_Pos.x - cChunkDef::Width * FAST_FLOOR_DIV(a_Pos.x, cChunkDef::Width)),
+	m_RelZ(a_Pos.z - cChunkDef::Width * FAST_FLOOR_DIV(a_Pos.z, cChunkDef::Width)),
+	m_BlockType(a_BlockType),
+	m_BlockMeta(a_BlockMeta),
+	m_World(a_World)
 {
-	ASSERT(m_World == nullptr);  // Cannot move block entities that represent world blocks (only use this for cBlockArea's BEs)
-	m_Pos = a_NewPos;
 }
 
 
 
 
 
-bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
+OwnedBlockEntity cBlockEntity::Clone(const Vector3i a_Pos)
 {
-	switch (a_BlockType)
-	{
-		case E_BLOCK_BEACON:
-		case E_BLOCK_BED:
-		case E_BLOCK_BREWING_STAND:
-		case E_BLOCK_CHEST:
-		case E_BLOCK_COMMAND_BLOCK:
-		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER:
-		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_ENDER_CHEST:
-		case E_BLOCK_END_PORTAL:
-		case E_BLOCK_FLOWER_POT:
-		case E_BLOCK_FURNACE:
-		case E_BLOCK_HEAD:
-		case E_BLOCK_HOPPER:
-		case E_BLOCK_JUKEBOX:
-		case E_BLOCK_LIT_FURNACE:
-		case E_BLOCK_MOB_SPAWNER:
-		case E_BLOCK_NOTE_BLOCK:
-		case E_BLOCK_SIGN_POST:
-		case E_BLOCK_STANDING_BANNER:
-		case E_BLOCK_TRAPPED_CHEST:
-		case E_BLOCK_WALL_BANNER:
-		case E_BLOCK_WALLSIGN:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
+	auto res = CreateByBlockType(m_BlockType, m_BlockMeta, a_Pos, nullptr);
+	res->CopyFrom(*this);
+	return res;
 }
 
 
 
 
 
-OwnedBlockEntity cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World)
+cItems cBlockEntity::ConvertToPickups() const
+{
+	return {};
+}
+
+
+
+
+
+void cBlockEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	// Nothing to copy, but check that we're copying the right entity:
+	ASSERT(m_BlockType == a_Src.m_BlockType);
+	ASSERT(m_BlockMeta == a_Src.m_BlockMeta);
+}
+
+
+
+
+
+OwnedBlockEntity cBlockEntity::CreateByBlockType(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta, const Vector3i a_Pos, cWorld * const a_World)
 {
 	switch (a_BlockType)
 	{
@@ -122,29 +116,84 @@ OwnedBlockEntity cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETY
 
 
 
-OwnedBlockEntity cBlockEntity::Clone(Vector3i a_Pos)
+void cBlockEntity::Destroy()
 {
-	auto res = CreateByBlockType(m_BlockType, m_BlockMeta, a_Pos, nullptr);
-	res->CopyFrom(*this);
-	return res;
 }
 
 
 
 
 
-cItems cBlockEntity::ConvertToPickups() const
+bool cBlockEntity::IsBlockEntityBlockType(const BLOCKTYPE a_BlockType)
 {
-	return {};
+	switch (a_BlockType)
+	{
+		case E_BLOCK_BEACON:
+		case E_BLOCK_BED:
+		case E_BLOCK_BREWING_STAND:
+		case E_BLOCK_CHEST:
+		case E_BLOCK_COMMAND_BLOCK:
+		case E_BLOCK_DISPENSER:
+		case E_BLOCK_DROPPER:
+		case E_BLOCK_ENCHANTMENT_TABLE:
+		case E_BLOCK_ENDER_CHEST:
+		case E_BLOCK_END_PORTAL:
+		case E_BLOCK_FLOWER_POT:
+		case E_BLOCK_FURNACE:
+		case E_BLOCK_HEAD:
+		case E_BLOCK_HOPPER:
+		case E_BLOCK_JUKEBOX:
+		case E_BLOCK_LIT_FURNACE:
+		case E_BLOCK_MOB_SPAWNER:
+		case E_BLOCK_NOTE_BLOCK:
+		case E_BLOCK_SIGN_POST:
+		case E_BLOCK_STANDING_BANNER:
+		case E_BLOCK_TRAPPED_CHEST:
+		case E_BLOCK_WALL_BANNER:
+		case E_BLOCK_WALLSIGN:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
 }
 
 
 
 
 
-void cBlockEntity::CopyFrom(const cBlockEntity & a_Src)
+void cBlockEntity::OnRemoveFromWorld()
 {
-	// Nothing to copy, but check that we're copying the right entity:
-	ASSERT(m_BlockType == a_Src.m_BlockType);
-	ASSERT(m_BlockMeta == a_Src.m_BlockMeta);
+}
+
+
+
+
+
+void cBlockEntity::SetPos(const Vector3i a_NewPos)
+{
+	ASSERT(m_World == nullptr);  // Cannot move block entities that represent world blocks (only use this for cBlockArea's BEs)
+	m_Pos = a_NewPos;
+}
+
+
+
+
+
+void cBlockEntity::SetWorld(cWorld * const a_World)
+{
+	m_World = a_World;
+}
+
+
+
+
+
+bool cBlockEntity::Tick(const std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	UNUSED(a_Dt);
+	return false;
 }

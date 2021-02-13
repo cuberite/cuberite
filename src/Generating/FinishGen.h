@@ -589,9 +589,8 @@ public:
 	{}
 
 	/** Reads the configuration from the specified INI file.
-	a_GenName is the name of the generator (this class may be used for OrePockets and DirtPockets, each has a different default).
-	Returns true on success, false and logs errors to console on failure. */
-	bool Initialize(cIniFile & a_IniFile, const AString & a_GenName);
+	a_GenName is the name of the generator (this class may be used for OrePockets and DirtPockets, each has a different default). */
+	void Initialize(cIniFile & a_IniFile, const AString & a_GenName);
 
 protected:
 

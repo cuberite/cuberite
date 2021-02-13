@@ -86,7 +86,6 @@ Implements the 1.8 protocol classes:
 
 
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
-const uLongf MAX_COMPRESSED_PACKET_LEN = 200 KiB;  // Maximum size of compressed packets.
 static const UInt32 CompressionThreshold = 256;  // After how large a packet should we compress it.
 
 
@@ -179,7 +178,14 @@ void cProtocol_1_8_0::DataReceived(cByteBuffer & a_Buffer, const char * a_Data, 
 {
 	if (m_IsEncrypted)
 	{
-		Byte Decrypted[512];
+		// An artefact of the protocol recogniser, will be removed when decryption done in-place:
+		if (a_Size == 0)
+		{
+			AddReceivedData(a_Buffer, nullptr, 0);
+			return;
+		}
+
+		std::byte Decrypted[512];
 		while (a_Size > 0)
 		{
 			size_t NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
@@ -321,12 +327,12 @@ void cProtocol_1_8_0::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type
 
 
 
-void cProtocol_1_8_0::SendChunkData(const std::string_view a_ChunkData)
+void cProtocol_1_8_0::SendChunkData(const ContiguousByteBufferView a_ChunkData)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cCSLock Lock(m_CSPacket);
-	SendData(a_ChunkData.data(), a_ChunkData.size());
+	SendData(a_ChunkData);
 }
 
 
@@ -672,8 +678,7 @@ void cProtocol_1_8_0::SendHeldItemChange(int a_ItemIndex)
 	ASSERT((a_ItemIndex >= 0) && (a_ItemIndex <= 8));  // Valid check
 
 	cPacketizer Pkt(*this, pktHeldItemChange);
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteBEInt8(static_cast<Int8>(Player->GetInventory().GetEquippedSlotNum()));
+	Pkt.WriteBEInt8(static_cast<Int8>(a_ItemIndex));
 }
 
 
@@ -990,6 +995,19 @@ void cProtocol_1_8_0::SendPlayerListAddPlayer(const cPlayer & a_Player)
 
 
 
+void cProtocol_1_8_0::SendPlayerListHeaderFooter(const cCompositeChat & a_Header, const cCompositeChat & a_Footer)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktPlayerListHeaderFooter);
+	Pkt.WriteString(a_Header.CreateJsonString(false));
+	Pkt.WriteString(a_Footer.CreateJsonString(false));
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1023,15 +1041,11 @@ void cProtocol_1_8_0::SendPlayerListUpdatePing(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	auto ClientHandle = a_Player.GetClientHandlePtr();
-	if (ClientHandle != nullptr)
-	{
-		cPacketizer Pkt(*this, pktPlayerList);
-		Pkt.WriteVarInt32(2);
-		Pkt.WriteVarInt32(1);
-		Pkt.WriteUUID(a_Player.GetUUID());
-		Pkt.WriteVarInt32(static_cast<UInt32>(ClientHandle->GetPing()));
-	}
+	cPacketizer Pkt(*this, pktPlayerList);
+	Pkt.WriteVarInt32(2);
+	Pkt.WriteVarInt32(1);
+	Pkt.WriteUUID(a_Player.GetUUID());
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
 }
 
 
@@ -1144,13 +1158,13 @@ void cProtocol_1_8_0::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
-void cProtocol_1_8_0::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
+void cProtocol_1_8_0::SendPluginMessage(const AString & a_Channel, const ContiguousByteBufferView a_Message)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktPluginMessage);
 	Pkt.WriteString(a_Channel);
-	Pkt.WriteBuf(a_Message.data(), a_Message.size());
+	Pkt.WriteBuf(a_Message);
 }
 
 
@@ -1719,11 +1733,11 @@ void cProtocol_1_8_0::SendWindowProperty(const cWindow & a_Window, size_t a_Prop
 
 
 
-bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_CompressedData)
+void cProtocol_1_8_0::CompressPacket(CircularBufferCompressor & a_Packet, ContiguousByteBuffer & a_CompressedData)
 {
-	const auto UncompressedSize = a_Packet.size();
+	const auto Uncompressed = a_Packet.GetView();
 
-	if (UncompressedSize < CompressionThreshold)
+	if (Uncompressed.size() < CompressionThreshold)
 	{
 		/* Size doesn't reach threshold, not worth compressing.
 
@@ -1736,7 +1750,7 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 		----------------------------------------------
 		*/
 		const UInt32 DataSize = 0;
-		const auto PacketSize = static_cast<UInt32>(cByteBuffer::GetVarIntSize(DataSize) + UncompressedSize);
+		const auto PacketSize = static_cast<UInt32>(cByteBuffer::GetVarIntSize(DataSize) + Uncompressed.size());
 
 		cByteBuffer LengthHeaderBuffer(
 			cByteBuffer::GetVarIntSize(PacketSize) +
@@ -1746,14 +1760,14 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 		LengthHeaderBuffer.WriteVarInt32(PacketSize);
 		LengthHeaderBuffer.WriteVarInt32(DataSize);
 
-		AString LengthData;
+		ContiguousByteBuffer LengthData;
 		LengthHeaderBuffer.ReadAll(LengthData);
 
-		a_CompressedData.reserve(LengthData.size() + UncompressedSize);
-		a_CompressedData.assign(LengthData.data(), LengthData.size());
-		a_CompressedData.append(a_Packet);
+		a_CompressedData.reserve(LengthData.size() + Uncompressed.size());
+		a_CompressedData = LengthData;
+		a_CompressedData += Uncompressed;
 
-		return true;
+		return;
 	}
 
 	/* Definitely worth compressing.
@@ -1767,28 +1781,11 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 	----------------------------------------------
 	*/
 
-	// Compress the data:
-	char CompressedData[MAX_COMPRESSED_PACKET_LEN];
+	const auto CompressedData = a_Packet.Compress();
+	const auto Compressed = CompressedData.GetView();
 
-	uLongf CompressedSize = compressBound(static_cast<uLongf>(a_Packet.size()));
-	if (CompressedSize >= MAX_COMPRESSED_PACKET_LEN)
-	{
-		ASSERT(!"Too high packet size.");
-		return false;
-	}
-
-	if (
-		compress2(
-			reinterpret_cast<Bytef *>(CompressedData), &CompressedSize,
-			reinterpret_cast<const Bytef *>(a_Packet.data()), static_cast<uLongf>(a_Packet.size()), Z_DEFAULT_COMPRESSION
-		) != Z_OK
-	)
-	{
-		return false;
-	}
-
-	const UInt32 DataSize = static_cast<UInt32>(UncompressedSize);
-	const auto PacketSize = static_cast<UInt32>(cByteBuffer::GetVarIntSize(DataSize) + CompressedSize);
+	const UInt32 DataSize = static_cast<UInt32>(Uncompressed.size());
+	const auto PacketSize = static_cast<UInt32>(cByteBuffer::GetVarIntSize(DataSize) + Compressed.size());
 
 	cByteBuffer LengthHeaderBuffer(
 		cByteBuffer::GetVarIntSize(PacketSize) +
@@ -1798,14 +1795,12 @@ bool cProtocol_1_8_0::CompressPacket(const AString & a_Packet, AString & a_Compr
 	LengthHeaderBuffer.WriteVarInt32(PacketSize);
 	LengthHeaderBuffer.WriteVarInt32(DataSize);
 
-	AString LengthData;
+	ContiguousByteBuffer LengthData;
 	LengthHeaderBuffer.ReadAll(LengthData);
 
-	a_CompressedData.reserve(LengthData.size() + CompressedSize);
-	a_CompressedData.assign(LengthData.data(), LengthData.size());
-	a_CompressedData.append(CompressedData, CompressedSize);
-
-	return true;
+	a_CompressedData.reserve(LengthData.size() + Compressed.size());
+	a_CompressedData = LengthData;
+	a_CompressedData += Compressed;
 }
 
 
@@ -1949,7 +1944,7 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const char * a_Dat
 	{
 		if (a_Buffer.GetReadableSpace() > 0)
 		{
-			AString AllData;
+			ContiguousByteBuffer AllData;
 			size_t OldReadableSpace = a_Buffer.GetReadableSpace();
 			a_Buffer.ReadAll(AllData);
 			a_Buffer.ResetRead();
@@ -1994,12 +1989,11 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const char * a_Dat
 		}
 
 		// Check packet for compression:
-		UInt32 UncompressedSize = 0;
-		AString UncompressedData;
 		if (m_State == 3)
 		{
 			UInt32 NumBytesRead = static_cast<UInt32>(a_Buffer.GetReadableSpace());
 
+			UInt32 UncompressedSize;
 			if (!a_Buffer.ReadVarInt(UncompressedSize))
 			{
 				m_Client->Kick("Compression packet incomplete");
@@ -2013,113 +2007,35 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const char * a_Dat
 			if (UncompressedSize > 0)
 			{
 				// Decompress the data:
-				AString CompressedData;
-				VERIFY(a_Buffer.ReadString(CompressedData, PacketLen));
-				if (InflateString(CompressedData.data(), PacketLen, UncompressedData) != Z_OK)
-				{
-					m_Client->Kick("Compression failure");
-					return;
-				}
-				PacketLen = static_cast<UInt32>(UncompressedData.size());
-				if (PacketLen != UncompressedSize)
-				{
-					m_Client->Kick("Wrong uncompressed packet size given");
-					return;
-				}
+				m_Extractor.ReadFrom(a_Buffer, PacketLen);
+				a_Buffer.CommitRead();
+
+				const auto UncompressedData = m_Extractor.Extract(UncompressedSize);
+				const auto Uncompressed = UncompressedData.GetView();
+				cByteBuffer bb(Uncompressed.size());
+
+				// Compression was used, move the uncompressed data:
+				VERIFY(bb.Write(Uncompressed.data(), Uncompressed.size()));
+
+				HandlePacket(bb);
+				continue;
 			}
 		}
 
 		// Move the packet payload to a separate cByteBuffer, bb:
-		cByteBuffer bb(PacketLen + 1);
-		if (UncompressedSize == 0)
-		{
-			// No compression was used, move directly
-			VERIFY(a_Buffer.ReadToByteBuffer(bb, static_cast<size_t>(PacketLen)));
-		}
-		else
-		{
-			// Compression was used, move the uncompressed data:
-			VERIFY(bb.Write(UncompressedData.data(), UncompressedData.size()));
-		}
+		cByteBuffer bb(PacketLen);
+
+		// No compression was used, move directly:
+		VERIFY(a_Buffer.ReadToByteBuffer(bb, static_cast<size_t>(PacketLen)));
 		a_Buffer.CommitRead();
 
-		UInt32 PacketType;
-		if (!bb.ReadVarInt(PacketType))
-		{
-			// Not enough data
-			break;
-		}
-
-		// Write one NUL extra, so that we can detect over-reads
-		bb.Write("\0", 1);
-
-		// Log the packet info into the comm log file:
-		if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
-		{
-			AString PacketData;
-			bb.ReadAll(PacketData);
-			bb.ResetRead();
-			bb.ReadVarInt(PacketType);  // We have already read the packet type once, it will be there again
-			ASSERT(PacketData.size() > 0);  // We have written an extra NUL, so there had to be at least one byte read
-			PacketData.resize(PacketData.size() - 1);
-			AString PacketDataHex;
-			CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);
-			m_CommLogFile.Printf("Next incoming packet is type %u (0x%x), length %u (0x%x) at state %d. Payload:\n%s\n",
-				PacketType, PacketType, PacketLen, PacketLen, m_State, PacketDataHex.c_str()
-			);
-		}
-
-		if (!HandlePacket(bb, PacketType))
-		{
-			// Unknown packet, already been reported, but without the length. Log the length here:
-			LOGWARNING("Unhandled packet: type 0x%x, state %d, length %u", PacketType, m_State, PacketLen);
-
-			#ifdef _DEBUG
-				// Dump the packet contents into the log:
-				bb.ResetRead();
-				AString Packet;
-				bb.ReadAll(Packet);
-				Packet.resize(Packet.size() - 1);  // Drop the final NUL pushed there for over-read detection
-				AString Out;
-				CreateHexDump(Out, Packet.data(), Packet.size(), 24);
-				LOGD("Packet contents:\n%s", Out.c_str());
-			#endif  // _DEBUG
-
-			// Put a message in the comm log:
-			if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
-			{
-				m_CommLogFile.Printf("^^^^^^ Unhandled packet ^^^^^^\n\n\n");
-			}
-
-			return;
-		}
-
-		// The packet should have 1 byte left in the buffer - the NUL we had added
-		if (bb.GetReadableSpace() != 1)
-		{
-			// Read more or less than packet length, report as error
-			LOGWARNING("Protocol 1.8: Wrong number of bytes read for packet 0x%x, state %d. Read %zu bytes, packet contained %u bytes",
-				PacketType, m_State, bb.GetUsedSpace() - bb.GetReadableSpace(), PacketLen
-			);
-
-			// Put a message in the comm log:
-			if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
-			{
-				m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got %zu left) ^^^^^^\n\n\n",
-					1, bb.GetReadableSpace()
-				);
-				m_CommLogFile.Flush();
-			}
-
-			ASSERT(!"Read wrong number of bytes!");
-			m_Client->PacketError(PacketType);
-		}
+		HandlePacket(bb);
 	}  // for (ever)
 
 	// Log any leftover bytes into the logfile:
 	if (g_ShouldLogCommIn && (a_Buffer.GetReadableSpace() > 0) && m_CommLogFile.IsOpen())
 	{
-		AString AllData;
+		ContiguousByteBuffer AllData;
 		size_t OldReadableSpace = a_Buffer.GetReadableSpace();
 		a_Buffer.ReadAll(AllData);
 		a_Buffer.ResetRead();
@@ -2142,79 +2058,80 @@ UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType)
 {
 	switch (a_PacketType)
 	{
-		case pktAttachEntity:          return 0x1b;
-		case pktBlockAction:           return 0x24;
-		case pktBlockBreakAnim:        return 0x25;
-		case pktBlockChange:           return 0x23;
-		case pktBlockChanges:          return 0x22;
-		case pktCameraSetTo:           return 0x43;
-		case pktChatRaw:               return 0x02;
-		case pktCollectEntity:         return 0x0d;
-		case pktDestroyEntity:         return 0x13;
-		case pktDifficulty:            return 0x41;
-		case pktDisconnectDuringGame:  return 0x40;
-		case pktDisconnectDuringLogin: return 0x00;
-		case pktDisplayObjective:      return 0x3d;
-		case pktEditSign:              return 0x36;
-		case pktEncryptionRequest:     return 0x01;
-		case pktEntityAnimation:       return 0x0b;
-		case pktEntityEffect:          return 0x1d;
-		case pktEntityEquipment:       return 0x04;
-		case pktEntityHeadLook:        return 0x19;
-		case pktEntityLook:            return 0x16;
-		case pktEntityMeta:            return 0x1c;
-		case pktEntityProperties:      return 0x20;
-		case pktEntityRelMove:         return 0x15;
-		case pktEntityRelMoveLook:     return 0x17;
-		case pktEntityStatus:          return 0x1a;
-		case pktEntityVelocity:        return 0x12;
-		case pktExperience:            return 0x1f;
-		case pktExplosion:             return 0x27;
-		case pktGameMode:              return 0x2b;
-		case pktHeldItemChange:        return 0x09;
-		case pktInventorySlot:         return 0x2f;
-		case pktJoinGame:              return 0x01;
-		case pktKeepAlive:             return 0x00;
-		case pktLeashEntity:           return 0x1b;
-		case pktLoginSuccess:          return 0x02;
-		case pktMapData:               return 0x34;
-		case pktParticleEffect:        return 0x2a;
-		case pktPingResponse:          return 0x01;
-		case pktPlayerAbilities:       return 0x39;
-		case pktPlayerList:            return 0x38;
-		case pktPlayerMoveLook:        return 0x08;
-		case pktPluginMessage:         return 0x3f;
-		case pktRemoveEntityEffect:    return 0x1e;
-		case pktResourcePack:          return 0x48;
-		case pktRespawn:               return 0x07;
-		case pktScoreboardObjective:   return 0x3b;
-		case pktSoundEffect:           return 0x29;
-		case pktSoundParticleEffect:   return 0x28;
-		case pktSpawnExperienceOrb:    return 0x11;
-		case pktSpawnGlobalEntity:     return 0x2c;
-		case pktSpawnMob:              return 0x0f;
-		case pktSpawnObject:           return 0x0e;
-		case pktSpawnOtherPlayer:      return 0x0c;
-		case pktSpawnPainting:         return 0x10;
-		case pktSpawnPosition:         return 0x05;
-		case pktStartCompression:      return 0x03;
-		case pktStatistics:            return 0x37;
-		case pktStatusResponse:        return 0x00;
-		case pktTabCompletionResults:  return 0x3a;
-		case pktTeleportEntity:        return 0x18;
-		case pktTimeUpdate:            return 0x03;
-		case pktTitle:                 return 0x45;
-		case pktUnloadChunk:           return 0x21;
-		case pktUpdateBlockEntity:     return 0x35;
-		case pktUpdateHealth:          return 0x06;
-		case pktUpdateScore:           return 0x3c;
-		case pktUpdateSign:            return 0x33;
-		case pktUseBed:                return 0x0a;
-		case pktWeather:               return 0x2b;
-		case pktWindowClose:           return 0x2e;
-		case pktWindowItems:           return 0x30;
-		case pktWindowOpen:            return 0x2d;
-		case pktWindowProperty:        return 0x31;
+		case pktAttachEntity:           return 0x1b;
+		case pktBlockAction:            return 0x24;
+		case pktBlockBreakAnim:         return 0x25;
+		case pktBlockChange:            return 0x23;
+		case pktBlockChanges:           return 0x22;
+		case pktCameraSetTo:            return 0x43;
+		case pktChatRaw:                return 0x02;
+		case pktCollectEntity:          return 0x0d;
+		case pktDestroyEntity:          return 0x13;
+		case pktDifficulty:             return 0x41;
+		case pktDisconnectDuringGame:   return 0x40;
+		case pktDisconnectDuringLogin:  return 0x00;
+		case pktDisplayObjective:       return 0x3d;
+		case pktEditSign:               return 0x36;
+		case pktEncryptionRequest:      return 0x01;
+		case pktEntityAnimation:        return 0x0b;
+		case pktEntityEffect:           return 0x1d;
+		case pktEntityEquipment:        return 0x04;
+		case pktEntityHeadLook:         return 0x19;
+		case pktEntityLook:             return 0x16;
+		case pktEntityMeta:             return 0x1c;
+		case pktEntityProperties:       return 0x20;
+		case pktEntityRelMove:          return 0x15;
+		case pktEntityRelMoveLook:      return 0x17;
+		case pktEntityStatus:           return 0x1a;
+		case pktEntityVelocity:         return 0x12;
+		case pktExperience:             return 0x1f;
+		case pktExplosion:              return 0x27;
+		case pktGameMode:               return 0x2b;
+		case pktHeldItemChange:         return 0x09;
+		case pktInventorySlot:          return 0x2f;
+		case pktJoinGame:               return 0x01;
+		case pktKeepAlive:              return 0x00;
+		case pktLeashEntity:            return 0x1b;
+		case pktLoginSuccess:           return 0x02;
+		case pktMapData:                return 0x34;
+		case pktParticleEffect:         return 0x2a;
+		case pktPingResponse:           return 0x01;
+		case pktPlayerAbilities:        return 0x39;
+		case pktPlayerList:             return 0x38;
+		case pktPlayerListHeaderFooter: return 0x47;
+		case pktPlayerMoveLook:         return 0x08;
+		case pktPluginMessage:          return 0x3f;
+		case pktRemoveEntityEffect:     return 0x1e;
+		case pktResourcePack:           return 0x48;
+		case pktRespawn:                return 0x07;
+		case pktScoreboardObjective:    return 0x3b;
+		case pktSoundEffect:            return 0x29;
+		case pktSoundParticleEffect:    return 0x28;
+		case pktSpawnExperienceOrb:     return 0x11;
+		case pktSpawnGlobalEntity:      return 0x2c;
+		case pktSpawnMob:               return 0x0f;
+		case pktSpawnObject:            return 0x0e;
+		case pktSpawnOtherPlayer:       return 0x0c;
+		case pktSpawnPainting:          return 0x10;
+		case pktSpawnPosition:          return 0x05;
+		case pktStartCompression:       return 0x03;
+		case pktStatistics:             return 0x37;
+		case pktStatusResponse:         return 0x00;
+		case pktTabCompletionResults:   return 0x3a;
+		case pktTeleportEntity:         return 0x18;
+		case pktTimeUpdate:             return 0x03;
+		case pktTitle:                  return 0x45;
+		case pktUnloadChunk:            return 0x21;
+		case pktUpdateBlockEntity:      return 0x35;
+		case pktUpdateHealth:           return 0x06;
+		case pktUpdateScore:            return 0x3c;
+		case pktUpdateSign:             return 0x33;
+		case pktUseBed:                 return 0x0a;
+		case pktWeather:                return 0x2b;
+		case pktWindowClose:            return 0x2e;
+		case pktWindowItems:            return 0x30;
+		case pktWindowOpen:             return 0x2d;
+		case pktWindowProperty:         return 0x31;
 		default:
 		{
 			LOG("Unhandled outgoing packet type: %s (0x%02x)", cPacketizer::PacketTypeToStr(a_PacketType), a_PacketType);
@@ -2369,8 +2286,8 @@ void cProtocol_1_8_0::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBu
 	{
 		return;
 	}
-	AString EncKey;
-	if (!a_ByteBuffer.ReadString(EncKey, EncKeyLength))
+	ContiguousByteBuffer EncKey;
+	if (!a_ByteBuffer.ReadSome(EncKey, EncKeyLength))
 	{
 		return;
 	}
@@ -2378,8 +2295,8 @@ void cProtocol_1_8_0::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBu
 	{
 		return;
 	}
-	AString EncNonce;
-	if (!a_ByteBuffer.ReadString(EncNonce, EncNonceLength))
+	ContiguousByteBuffer EncNonce;
+	if (!a_ByteBuffer.ReadSome(EncNonce, EncNonceLength))
 	{
 		return;
 	}
@@ -2393,7 +2310,7 @@ void cProtocol_1_8_0::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBu
 	// Decrypt EncNonce using privkey
 	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
 	UInt32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
-	int res = rsaDecryptor.Decrypt(reinterpret_cast<const Byte *>(EncNonce.data()), EncNonce.size(), reinterpret_cast<Byte *>(DecryptedNonce), sizeof(DecryptedNonce));
+	int res = rsaDecryptor.Decrypt(EncNonce, reinterpret_cast<Byte *>(DecryptedNonce), sizeof(DecryptedNonce));
 	if (res != 4)
 	{
 		LOGD("Bad nonce length: got %d, exp %d", res, 4);
@@ -2409,7 +2326,7 @@ void cProtocol_1_8_0::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBu
 
 	// Decrypt the symmetric encryption key using privkey:
 	Byte DecryptedKey[MAX_ENC_LEN];
-	res = rsaDecryptor.Decrypt(reinterpret_cast<const Byte *>(EncKey.data()), EncKey.size(), DecryptedKey, sizeof(DecryptedKey));
+	res = rsaDecryptor.Decrypt(EncKey, DecryptedKey, sizeof(DecryptedKey));
 	if (res != 16)
 	{
 		LOGD("Bad key length");
@@ -2418,7 +2335,7 @@ void cProtocol_1_8_0::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBu
 	}
 
 	StartEncryption(DecryptedKey);
-	m_Client->HandleLogin(m_Client->GetUsername());
+	m_Client->HandleLogin();
 }
 
 
@@ -2440,22 +2357,22 @@ void cProtocol_1_8_0::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	cServer * Server = cRoot::Get()->GetServer();
+	m_Client->SetUsername(std::move(Username));
+
 	// If auth is required, then send the encryption request:
-	if (Server->ShouldAuthenticate())
+	if (const auto Server = cRoot::Get()->GetServer(); Server->ShouldAuthenticate())
 	{
 		cPacketizer Pkt(*this, pktEncryptionRequest);
 		Pkt.WriteString(Server->GetServerID());
-		const AString & PubKeyDer = Server->GetPublicKeyDER();
+		const auto PubKeyDer = Server->GetPublicKeyDER();
 		Pkt.WriteVarInt32(static_cast<UInt32>(PubKeyDer.size()));
-		Pkt.WriteBuf(PubKeyDer.data(), PubKeyDer.size());
+		Pkt.WriteBuf(PubKeyDer);
 		Pkt.WriteVarInt32(4);
 		Pkt.WriteBEInt32(static_cast<int>(reinterpret_cast<intptr_t>(this)));  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
-		m_Client->SetUsername(Username);
 		return;
 	}
 
-	m_Client->HandleLogin(Username);
+	m_Client->HandleLogin();
 }
 
 
@@ -2706,20 +2623,20 @@ void cProtocol_1_8_0::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 		HandleVanillaPluginMessage(a_ByteBuffer, Channel);
 
 		// Skip any unread data (vanilla sometimes sends garbage at the end of a packet; #1692):
-		if (a_ByteBuffer.GetReadableSpace() > 1)
+		if (a_ByteBuffer.GetReadableSpace() > 0)
 		{
 			LOGD("Protocol 1.8: Skipping garbage data at the end of a vanilla PluginMessage packet, %u bytes",
-				static_cast<unsigned>(a_ByteBuffer.GetReadableSpace() - 1)
+				static_cast<unsigned>(a_ByteBuffer.GetReadableSpace())
 			);
-			a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
+			a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace());
 		}
 
 		return;
 	}
 
 	// Read the plugin message and relay to clienthandle:
-	AString Data;
-	VERIFY(a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1));  // Always succeeds
+	ContiguousByteBuffer Data;
+	VERIFY(a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace()));  // Always succeeds
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 
@@ -2978,7 +2895,7 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
 		m_Client->SetClientBrand(Brand);
 		// Send back our brand, including the length:
-		SendPluginMessage("MC|Brand", "\x08""Cuberite");
+		m_Client->SendPluginMessage("MC|Brand", "\x08""Cuberite");
 		return;
 	}
 	else if (a_Channel == "MC|Beacon")
@@ -3003,8 +2920,8 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 	LOG("Unhandled vanilla plugin channel: \"%s\".", a_Channel.c_str());
 
 	// Read the payload and send it through to the clienthandle:
-	AString Message;
-	VERIFY(a_ByteBuffer.ReadString(Message, a_ByteBuffer.GetReadableSpace() - 1));
+	ContiguousByteBuffer Message;
+	VERIFY(a_ByteBuffer.ReadSome(Message, a_ByteBuffer.GetReadableSpace() - 1));
 	m_Client->HandlePluginMessage(a_Channel, Message);
 }
 
@@ -3012,23 +2929,24 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 
 
 
-void cProtocol_1_8_0::SendData(const char * a_Data, size_t a_Size)
+void cProtocol_1_8_0::SendData(ContiguousByteBufferView a_Data)
 {
 	if (m_IsEncrypted)
 	{
-		Byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
-		while (a_Size > 0)
+		std::byte Encrypted[8 KiB];  // Larger buffer, we may be sending lots of data (chunks)
+
+		while (a_Data.size() > 0)
 		{
-			size_t NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
-			m_Encryptor.ProcessData(Encrypted, reinterpret_cast<const Byte *>(a_Data), NumBytes);
-			m_Client->SendData(reinterpret_cast<const char *>(Encrypted), NumBytes);
-			a_Size -= NumBytes;
-			a_Data += NumBytes;
+			const auto NumBytes = (a_Data.size() > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Data.size();
+			m_Encryptor.ProcessData(Encrypted, a_Data.data(), NumBytes);
+			m_Client->SendData({ Encrypted, NumBytes });
+
+			a_Data = a_Data.substr(NumBytes);
 		}
 	}
 	else
 	{
-		m_Client->SendData(a_Data, a_Size);
+		m_Client->SendData(a_Data);
 	}
 }
 
@@ -3056,8 +2974,8 @@ bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_
 		a_Item.Empty();
 	}
 
-	AString Metadata;
-	if (!a_ByteBuffer.ReadString(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes - 1) || (Metadata.size() == 0) || (Metadata[0] == 0))
+	ContiguousByteBuffer Metadata;
+	if (!a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes) || Metadata.empty() || (Metadata[0] == std::byte(0)))
 	{
 		// No metadata
 		return true;
@@ -3071,10 +2989,10 @@ bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_
 
 
 
-void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
+void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBufferView a_Metadata)
 {
 	// Parse into NBT:
-	cParsedNBT NBT(a_Metadata.data(), a_Metadata.size());
+	cParsedNBT NBT(a_Metadata);
 	if (!NBT.IsValid())
 	{
 		AString HexDump;
@@ -3191,33 +3109,34 @@ eBlockFace cProtocol_1_8_0::FaceIntToBlockFace(const Int32 a_BlockFace)
 
 void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 {
-	UInt32 PacketLen = static_cast<UInt32>(m_OutPacketBuffer.GetUsedSpace());
-	AString PacketData, CompressedPacket;
-	m_OutPacketBuffer.ReadAll(PacketData);
+	ASSERT(m_OutPacketBuffer.GetReadableSpace() == m_OutPacketBuffer.GetUsedSpace());
+
+	m_Compressor.ReadFrom(m_OutPacketBuffer);
 	m_OutPacketBuffer.CommitRead();
+
+	const auto PacketData = m_Compressor.GetView();
 
 	if (m_State == 3)
 	{
+		ContiguousByteBuffer CompressedPacket;
+
 		// Compress the packet payload:
-		if (!cProtocol_1_8_0::CompressPacket(PacketData, CompressedPacket))
-		{
-			return;
-		}
+		cProtocol_1_8_0::CompressPacket(m_Compressor, CompressedPacket);
 
 		// Send the packet's payload compressed:
-		SendData(CompressedPacket.data(), CompressedPacket.size());
+		SendData(CompressedPacket);
 	}
 	else
 	{
 		// Compression doesn't apply to this state, send raw data:
-		m_OutPacketLenBuffer.WriteVarInt32(PacketLen);
-		AString LengthData;
+		m_OutPacketLenBuffer.WriteVarInt32(static_cast<UInt32>(PacketData.size()));
+		ContiguousByteBuffer LengthData;
 		m_OutPacketLenBuffer.ReadAll(LengthData);
-		SendData(LengthData.data(), LengthData.size());
+		m_OutPacketLenBuffer.CommitRead();
+		SendData(LengthData);
 
 		// Send the packet's payload directly:
-		m_OutPacketLenBuffer.CommitRead();
-		SendData(PacketData.data(), PacketData.size());
+		SendData(PacketData);
 	}
 
 	// Log the comm into logfile:
@@ -3228,7 +3147,7 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 		CreateHexDump(Hex, PacketData.data(), PacketData.size(), 16);
 		m_CommLogFile.Printf("Outgoing packet: type %s (translated to 0x%02x), length %u (0x%04x), state %d. Payload (incl. type):\n%s\n",
 			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
-			PacketLen, PacketLen, m_State, Hex
+			PacketData.size(), PacketData.size(), m_State, Hex
 		);
 		/*
 		// Useful for debugging a new protocol:
@@ -3348,13 +3267,13 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 	}
 	Writer.Finish();
 
-	AString Result = Writer.GetResult();
-	if (Result.size() == 0)
+	const auto Result = Writer.GetResult();
+	if (Result.empty())
 	{
 		a_Pkt.WriteBEInt8(0);
 		return;
 	}
-	a_Pkt.WriteBuf(Result.data(), Result.size());
+	a_Pkt.WriteBuf(Result);
 }
 
 
@@ -3493,7 +3412,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 	}
 
 	Writer.Finish();
-	a_Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
+	a_Pkt.WriteBuf(Writer.GetResult());
 }
 
 
@@ -3986,6 +3905,82 @@ void cProtocol_1_8_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity &
 	// TODO: Send properties and modifiers based on the mob type
 
 	a_Pkt.WriteBEInt32(0);  // NumProperties
+}
+
+
+
+
+
+void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
+{
+	UInt32 PacketType;
+	if (!a_Buffer.ReadVarInt(PacketType))
+	{
+		// Not enough data
+		return;
+	}
+
+	// Log the packet info into the comm log file:
+	if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
+	{
+		ContiguousByteBuffer PacketData;
+		a_Buffer.ReadAll(PacketData);
+		a_Buffer.ResetRead();
+		a_Buffer.ReadVarInt(PacketType);  // We have already read the packet type once, it will be there again
+		ASSERT(PacketData.size() > 0);  // We have written an extra NUL, so there had to be at least one byte read
+		PacketData.resize(PacketData.size() - 1);
+		AString PacketDataHex;
+		CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);
+		m_CommLogFile.Printf("Next incoming packet is type %u (0x%x), length %u (0x%x) at state %d. Payload:\n%s\n",
+			PacketType, PacketType, a_Buffer.GetUsedSpace(), a_Buffer.GetUsedSpace(), m_State, PacketDataHex.c_str()
+		);
+	}
+
+	if (!HandlePacket(a_Buffer, PacketType))
+	{
+		// Unknown packet, already been reported, but without the length. Log the length here:
+		LOGWARNING("Unhandled packet: type 0x%x, state %d, length %u", PacketType, m_State, a_Buffer.GetUsedSpace());
+
+#ifndef NDEBUG
+		// Dump the packet contents into the log:
+		a_Buffer.ResetRead();
+		ContiguousByteBuffer Packet;
+		a_Buffer.ReadAll(Packet);
+		Packet.resize(Packet.size() - 1);  // Drop the final NUL pushed there for over-read detection
+		AString Out;
+		CreateHexDump(Out, Packet.data(), Packet.size(), 24);
+		LOGD("Packet contents:\n%s", Out.c_str());
+#endif  // !NDEBUG
+
+		// Put a message in the comm log:
+		if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
+		{
+			m_CommLogFile.Printf("^^^^^^ Unhandled packet ^^^^^^\n\n\n");
+		}
+
+		return;
+	}
+
+	// The packet should have nothing left in the buffer:
+	if (a_Buffer.GetReadableSpace() != 0)
+	{
+		// Read more or less than packet length, report as error
+		LOGWARNING("Protocol 1.8: Wrong number of bytes read for packet 0x%x, state %d. Read %zu bytes, packet contained %u bytes",
+			PacketType, m_State, a_Buffer.GetUsedSpace() - a_Buffer.GetReadableSpace(), a_Buffer.GetUsedSpace()
+		);
+
+		// Put a message in the comm log:
+		if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
+		{
+			m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got %zu left) ^^^^^^\n\n\n",
+				1, a_Buffer.GetReadableSpace()
+			);
+			m_CommLogFile.Flush();
+		}
+
+		ASSERT(!"Read wrong number of bytes!");
+		m_Client->PacketError(PacketType);
+	}
 }
 
 

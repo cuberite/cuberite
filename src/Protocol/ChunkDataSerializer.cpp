@@ -1,6 +1,5 @@
 #include "Globals.h"
 #include "ChunkDataSerializer.h"
-#include "zlib/zlib.h"
 #include "Protocol_1_8.h"
 #include "Protocol_1_9.h"
 #include "../ClientHandle.h"
@@ -42,17 +41,17 @@ namespace
 
 	auto Palette393(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
 	{
-		return Palette_1_13::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+		return Palette_1_13::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
 	}
 
 	auto Palette401(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
 	{
-		return Palette_1_13_1::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+		return Palette_1_13_1::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
 	}
 
 	auto Palette477(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
 	{
-		return Palette_1_14::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+		return Palette_1_14::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
 	}
 }
 
@@ -75,7 +74,7 @@ cChunkDataSerializer::cChunkDataSerializer(const eDimension a_Dimension) :
 
 void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData, const ClientHandles & a_SendTo)
 {
-	for (const auto Client : a_SendTo)
+	for (const auto & Client : a_SendTo)
 	{
 		switch (static_cast<cProtocol::Version>(Client->GetProtocolVersion()))
 		{
@@ -134,7 +133,7 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 
 
 
-inline void cChunkDataSerializer::Serialize(cClientHandle * a_Client, const int a_ChunkX, const int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData, const CacheVersion a_CacheVersion)
+inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_Client, const int a_ChunkX, const int a_ChunkZ, const cChunkData & a_Data, const unsigned char * a_BiomeData, const CacheVersion a_CacheVersion)
 {
 	auto & Cache = m_Cache[static_cast<size_t>(a_CacheVersion)];
 	if (Cache.Engaged)
@@ -543,14 +542,10 @@ inline void cChunkDataSerializer::WriteSectionDataSeamless(const cChunkData::sCh
 
 inline void cChunkDataSerializer::CompressPacketInto(ChunkDataCache & a_Cache)
 {
-	m_Packet.ReadAll(a_Cache.PacketData);
+	m_Compressor.ReadFrom(m_Packet);
 	m_Packet.CommitRead();
 
-	if (!cProtocol_1_8_0::CompressPacket(a_Cache.PacketData, a_Cache.ToSend))
-	{
-		ASSERT(!"Packet compression failed.");
-		return;
-	}
+	cProtocol_1_8_0::CompressPacket(m_Compressor, a_Cache.ToSend);
 
 	a_Cache.Engaged = true;
 }

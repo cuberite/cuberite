@@ -9,7 +9,7 @@
 
 namespace DaylightSensorHandler
 {
-	inline PowerLevel GetPowerLevel(const cChunk & a_Chunk, const Vector3i a_Position)
+	static PowerLevel GetPowerLevel(const cChunk & a_Chunk, const Vector3i a_Position)
 	{
 		if (a_Chunk.GetBlock(a_Position) == E_BLOCK_INVERTED_DAYLIGHT_SENSOR)
 		{
@@ -27,7 +27,7 @@ namespace DaylightSensorHandler
 		return static_cast<PowerLevel>(std::clamp(RawOutput, 0.f, 15.f));
 	}
 
-	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);
@@ -37,12 +37,9 @@ namespace DaylightSensorHandler
 		return IsLinked ? 0 : a_Chunk.GetMeta(a_Position);
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
+	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating Darryl the daylight sensor (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
-
-		// We don't need to update the daylight sensor often:
-		DataForChunk(a_Chunk).m_MechanismDelays[a_Position] = std::make_pair(10, bool());
 
 		// What the sensor should output according to the time-power function.
 		const auto PowerLevel = GetPowerLevel(a_Chunk, a_Position);
@@ -55,7 +52,7 @@ namespace DaylightSensorHandler
 		}
 	}
 
-	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
+	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);

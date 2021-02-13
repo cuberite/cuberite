@@ -10,7 +10,7 @@
 
 namespace PressurePlateHandler
 {
-	inline unsigned char GetPowerLevel(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType)
+	static unsigned char GetPowerLevel(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType)
 	{
 		size_t NumberOfEntities = 0;
 		bool FoundPlayer = false;
@@ -58,7 +58,7 @@ namespace PressurePlateHandler
 		}
 	}
 
-	inline const char * GetClickOnSound(BLOCKTYPE a_BlockType)
+	static const char * GetClickOnSound(BLOCKTYPE a_BlockType)
 	{
 		// manage on-sound
 		switch (a_BlockType)
@@ -75,7 +75,7 @@ namespace PressurePlateHandler
 		}
 	}
 
-	inline const char * GetClickOffSound(BLOCKTYPE a_BlockType)
+	static const char * GetClickOffSound(BLOCKTYPE a_BlockType)
 	{
 		// manage off-sound
 		switch (a_BlockType)
@@ -92,7 +92,7 @@ namespace PressurePlateHandler
 		}
 	}
 
-	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_BlockType);
 		UNUSED(a_QueryPosition);
@@ -103,7 +103,7 @@ namespace PressurePlateHandler
 		return (IsLinked && (a_QueryPosition != (a_Position + OffsetYM))) ? 0 : DataForChunk(a_Chunk).GetCachedPowerData(a_Position);
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
+	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating clicky the pressure plate (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -205,7 +205,7 @@ namespace PressurePlateHandler
 		UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
 	}
 
-	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
+	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);

@@ -430,10 +430,8 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(finisher, "DirtPockets") == 0)
 		{
 			auto gen = std::make_shared<cFinishGenOrePockets>(m_Seed + 1, cFinishGenOrePockets::DefaultNaturalPatches());
-			if (gen->Initialize(a_IniFile, "DirtPockets"))
-			{
-				m_FinishGens.push_back(gen);
-			}
+			gen->Initialize(a_IniFile, "DirtPockets");
+			m_FinishGens.push_back(gen);
 		}
 		else if (NoCaseCompare(finisher, "DistortedMembraneOverhangs") == 0)
 		{
@@ -508,15 +506,6 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenNetherClumpFoliage(m_Seed)));
 		}
-		else if (NoCaseCompare(*itr, "NetherForts") == 0)
-		{
-			LOGINFO("The NetherForts finisher is obsolete, you should use \"PieceStructures: NetherFort\" instead.");
-			auto gen = std::make_shared<cPieceStructuresGen>(m_Seed);
-			if (gen->Initialize("NetherFort", seaLevel, m_BiomeGen, m_CompositedHeightCache))
-			{
-				m_FinishGens.push_back(gen);
-			}
-		}
 		else if (NoCaseCompare(finisher, "NetherOreNests") == 0)
 		{
 			m_FinishGens.push_back(std::make_shared<cFinishGenOreNests>(m_Seed + 2, cFinishGenOreNests::DefaultNetherOres()));
@@ -528,10 +517,8 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(finisher, "OrePockets") == 0)
 		{
 			auto gen = std::make_shared<cFinishGenOrePockets>(m_Seed + 2, cFinishGenOrePockets::DefaultOverworldOres());
-			if (gen->Initialize(a_IniFile, "OrePockets"))
-			{
-				m_FinishGens.push_back(gen);
-			}
+			gen->Initialize(a_IniFile, "OrePockets");
+			m_FinishGens.push_back(gen);
 		}
 		else if (NoCaseCompare(finisher, "OverworldClumpFlowers") == 0)
 		{
@@ -560,15 +547,6 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			bool PreSimulateLava          = a_IniFile.GetValueSetB("Generator", "PreSimulatorLava", true);
 
 			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenPreSimulator(PreSimulateFallingBlocks, PreSimulateWater, PreSimulateLava)));
-		}
-		else if (NoCaseCompare(finisher, "RainbowRoads") == 0)
-		{
-			LOGINFO("The RainbowRoads finisher is obsolete, you should use \"PieceStructures: RainbowRoads\" instead.");
-			auto gen = std::make_shared<cPieceStructuresGen>(m_Seed);
-			if (gen->Initialize("RainbowRoads", seaLevel, m_BiomeGen, m_CompositedHeightCache))
-			{
-				m_FinishGens.push_back(gen);
-			}
 		}
 		else if (NoCaseCompare(finisher, "Ravines") == 0)
 		{
@@ -644,15 +622,6 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(finisher, "Trees") == 0)
 		{
 			m_FinishGens.push_back(cFinishGenPtr(new cStructGenTrees(m_Seed, m_BiomeGen, m_ShapeGen, m_CompositionGen)));
-		}
-		else if (NoCaseCompare(finisher, "UnderwaterBases") == 0)
-		{
-			LOGINFO("The UnderwaterBases finisher is obsolete, you should use \"PieceStructures: UnderwaterBases\" instead.");
-			auto gen = std::make_shared<cPieceStructuresGen>(m_Seed);
-			if (gen->Initialize("UnderwaterBases", seaLevel, m_BiomeGen, m_CompositedHeightCache))
-			{
-				m_FinishGens.push_back(gen);
-			}
 		}
 		else if (NoCaseCompare(finisher, "Villages") == 0)
 		{
