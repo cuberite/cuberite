@@ -2281,7 +2281,7 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 		{
 			for (int z = -Radius; z <= Radius; z++)
 			{
-				if(!cChunkDef::IsValidRelPos({ Pos.x + x, Pos.y + y, Pos.z + z }))
+				if (!cChunkDef::IsValidRelPos({ Pos.x + x, Pos.y + y, Pos.z + z }))
 				{
 					continue;
 				}
