@@ -2273,8 +2273,6 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 		StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y + YSize, Pos.z);
 	}
 
-	auto UpChance = m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % 100;
-
 	for (int x = -Radius; x <= Radius; x++)
 	{
 		for (int y = -YSize; y <= YSize; y++)
