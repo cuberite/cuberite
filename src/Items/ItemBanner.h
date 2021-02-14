@@ -173,9 +173,21 @@ public:
 		const Vector3i a_CursorPos
 	) override
 	{
+		// Checks if the banner replaced the block
+		BLOCKTYPE ClickedBlockType;
+		NIBBLETYPE ClickedBlockMeta;
+		a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
+		cChunkInterface ChunkInterface(a_World.GetChunkMap());
+		bool IsReplacingClickedBlock = cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta);
+		if (IsReplacingClickedBlock)
+		{
+			// TODO: There is a bug in the network which prevents the client from receiving the new block entity on placement
+			// For now the replaced blocks are disabled
+			return false;
+		}
+
 		// saving the color of the banner in case it's the players last one
 		NIBBLETYPE Color = static_cast<NIBBLETYPE>(a_EquippedItem.m_ItemDamage);
-
 		// Cannot place a banner at "no face" and from the bottom:
 		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_BOTTOM))
 		{
@@ -185,13 +197,8 @@ public:
 		{
 			return false;
 		}
-		// Checks if the banner replaced the block
-		BLOCKTYPE ClickedBlockType;
-		NIBBLETYPE ClickedBlockMeta;
-		a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
-		cChunkInterface ChunkInterface(a_World.GetChunkMap());
-		bool IsReplacingClickedBlock = cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta);
-		auto BannerPos = IsReplacingClickedBlock ? a_ClickedBlockPos : AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+		// auto BannerPos = IsReplacingClickedBlock ? a_ClickedBlockPos : AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+		auto BannerPos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
 		return PlaceBannerEntity(a_World, a_Player, Color, BannerPos);
 	}
 

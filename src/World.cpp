@@ -1391,7 +1391,7 @@ bool cWorld::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBloc
 
 bool cWorld::DoWithBannerAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBannerCallback a_Callback)
 {
-	return m_ChunkMap->DoWithBannerAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return m_ChunkMap.DoWithBannerAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 
