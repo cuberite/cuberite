@@ -229,7 +229,8 @@ void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDi
 				"NaturalPatches, "
 				"PreSimulator, "
 				"Animals, "
-				"OverworldClumpFlowers"
+				"OverworldClumpFlowers, "
+				"ForestRocks"
 			);
 			break;
 		}  // dimOverworld
@@ -449,6 +450,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int     MinSize       = a_IniFile.GetValueSetI("Generator", "DungeonRoomsMinSize", 5);
 			AString HeightDistrib = a_IniFile.GetValueSet ("Generator", "DungeonRoomsHeightDistrib", "0, 0; 10, 10; 11, 500; 40, 500; 60, 40; 90, 1");
 			m_FinishGens.push_back(cFinishGenPtr(new cDungeonRoomsFinisher(m_ShapeGen, m_Seed, GridSize, MaxSize, MinSize, HeightDistrib)));
+		}
+		else if (NoCaseCompare(finisher, "ForestRocks") == 0)
+		{
+			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenForestRocks(m_Seed, a_IniFile)));
 		}
 		else if (NoCaseCompare(finisher, "GlowStone") == 0)
 		{

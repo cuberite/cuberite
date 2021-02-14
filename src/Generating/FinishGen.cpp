@@ -2213,3 +2213,86 @@ void cFinishGenOrePockets::imprintSphere(
 
 
 
+cFinishGenForestRocks::cFinishGenForestRocks(int a_Seed, cIniFile & a_IniFile) : m_Noise(a_Seed)
+{
+}
+
+
+
+
+
+void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
+{
+	auto Biome = a_ChunkDesc.GetBiome(cChunkDef::Width / 2, cChunkDef::Width / 2);
+	if ((Biome != biMegaTaiga) && (Biome != biMegaTaigaHills))
+	{
+		return;
+	}
+
+	// Choose random position in chunk and place boulder around it
+	auto Pos = Vector3i(
+		m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % cChunkDef::Width,
+		0,
+		m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % cChunkDef::Width
+		);
+	Pos.y = a_ChunkDesc.GetHeight(Pos.x, Pos.z);
+
+	if (!cChunkDef::IsValidRelPos(Pos))
+	{
+		return;
+	}
+
+	// Determines the size of the boulder
+	const int TwoLimit = 70;
+	const int ThreeLimit = 90;
+
+	auto RadiusChance = m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % 100;
+	int Radius = 1;
+	if (RadiusChance > TwoLimit && RadiusChance <= ThreeLimit)
+	{
+		Radius = 2;
+	}
+	else if (RadiusChance > ThreeLimit)
+	{
+		Radius = 3;
+	}
+
+	auto YSize = (m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % 2) + 1;
+
+	Pos.x = Clamp(Pos.x, 0 + Radius, cChunkDef::Width - Radius - 1);
+	Pos.z = Clamp(Pos.z, 0 + Radius, cChunkDef::Width - Radius - 1);
+
+	auto StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y + YSize, Pos.z);
+	while (!((StartBlock == E_BLOCK_DIRT) || (StartBlock == E_BLOCK_GRASS)))
+	{
+		Pos.y -= 1;
+		if (!cChunkDef::IsValidRelPos(Pos.addedY(-YSize)))
+		{
+			return;
+		}
+		StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y + YSize, Pos.z);
+	}
+
+	auto UpChance = m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % 100;
+
+	for (int x = -Radius; x <= Radius; x++)
+	{
+		for (int y = -YSize; y <= YSize; y++)
+		{
+			for (int z = -Radius; z <= Radius; z++)
+			{
+				if(!cChunkDef::IsValidRelPos({ Pos.x + x, Pos.y + y, Pos.z + z }))
+				{
+					continue;
+				}
+
+				if (Vector3d(x, y, z).Length() - 0.25 > Radius)
+				{
+					continue;
+				}
+
+				a_ChunkDesc.SetBlockTypeMeta(Pos.x + x, Pos.y + y, Pos.z + z, E_BLOCK_MOSSY_COBBLESTONE, 0);
+			}
+		}
+	}
+}
