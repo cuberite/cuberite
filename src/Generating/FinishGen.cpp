@@ -554,7 +554,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 
 			// Choose what long grass meta we should use:
 			int GrassType = m_Noise.IntNoise2DInt(xx * 50, zz * 50) / 7 % 100;
-			if (GrassType < 60 && CanGrassGrow(a_ChunkDesc.GetBiome(x, z)))
+			if ((GrassType < 60) && CanGrassGrow(a_ChunkDesc.GetBiome(x, z)))
 			{
 				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, E_META_TALL_GRASS_GRASS);
 			}
@@ -570,8 +570,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 					NIBBLETYPE Meta;
 					if (CanGrassGrow(a_ChunkDesc.GetBiome(x, z)))
 					{
-						Meta = (m_Noise.IntNoise2DInt(xx * 100, zz * 100) / 7 % 100) > 25 ?
-							   E_META_BIG_FLOWER_DOUBLE_TALL_GRASS : E_META_BIG_FLOWER_LARGE_FERN;
+						Meta = (m_Noise.IntNoise2DInt(xx * 100, zz * 100) / 7 % 100) > 25 ? E_META_BIG_FLOWER_DOUBLE_TALL_GRASS : E_META_BIG_FLOWER_LARGE_FERN;
 					}
 					else
 					{
