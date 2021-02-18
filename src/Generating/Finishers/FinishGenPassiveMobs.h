@@ -4,7 +4,9 @@
 #pragma once
 
 #include "../ComposableGenerator.h"
+
 #include "../../Mobs/MonsterTypes.h"
+#include "../../Noise/Noise.h"
 
 /** This class populates generated chunks with packs of biome-dependant animals
 Animals: cows, sheep, pigs, mooshrooms, squid, horses, wolves, ocelots */

@@ -7,6 +7,7 @@
 
 #include "../../Mobs/Monster.h"
 #include "../../MobSpawner.h"
+#include "../../BlockInfo.h"
 
 #define DEF_ANIMAL_SPAWN_PERCENT    10
 #define DEF_NO_ANIMALS              0

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "../ComposableGenerator.h"
+#include "../../Noise/Noise.h"
 
 class cFinishGenSprinkleFoliage :
 	public cFinishGen

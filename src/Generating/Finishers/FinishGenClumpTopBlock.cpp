@@ -4,7 +4,8 @@
 
 #include "FinishGenClumpTopBlock.h"
 
-
+#include "../../Item.h"
+#include "../../IniFile.h"
 
 void cFinishGenClumpTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 {
