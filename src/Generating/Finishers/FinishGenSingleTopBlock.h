@@ -5,6 +5,7 @@
 
 #include "../ComposableGenerator.h"
 #include "../../BlockInfo.h"
+#include "../../Noise/Noise.h"
 
 /** This class adds a single top block in random positions in the specified biome on top of specified allowed blocks.
 Used for:

@@ -4,6 +4,7 @@
 #include "Globals.h"
 
 #include "FinishGenSprinkleFoliage.h"
+#include "../../BlockInfo.h"
 
 static inline bool IsWater(BLOCKTYPE a_BlockType)
 {
