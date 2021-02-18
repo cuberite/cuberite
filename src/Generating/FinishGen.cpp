@@ -2235,7 +2235,7 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 		0,
 		m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % cChunkDef::Width
 		);
-	Pos.y = a_ChunkDesc.GetHeight(Pos.x, Pos.z);
+	Pos.y = a_ChunkDesc.GetHeight(Pos.x, Pos.z) % cChunkDef::Height;
 
 	if (!cChunkDef::IsValidRelPos(Pos))
 	{
@@ -2257,25 +2257,25 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 		Radius = 3;
 	}
 
-	auto YSize = (m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % 2) + 1;
-
 	Pos.x = Clamp(Pos.x, 0 + Radius, cChunkDef::Width - Radius - 1);
 	Pos.z = Clamp(Pos.z, 0 + Radius, cChunkDef::Width - Radius - 1);
 
-	auto StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y + YSize, Pos.z);
+	auto StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y + Radius, Pos.z);
 	while (!((StartBlock == E_BLOCK_DIRT) || (StartBlock == E_BLOCK_GRASS)))
 	{
 		Pos.y -= 1;
-		if (!cChunkDef::IsValidRelPos(Pos.addedY(-YSize)))
+		if (!cChunkDef::IsValidRelPos(Pos.addedY(-Radius)))
 		{
+			LOGWARNING("Test");
 			return;
 		}
-		StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y + YSize, Pos.z);
+		LOGERROR("Height: %d", Pos.y);
+		StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y + Radius, Pos.z);
 	}
 
 	for (int x = -Radius; x <= Radius; x++)
 	{
-		for (int y = -YSize; y <= YSize; y++)
+		for (int y = -Radius; y <= Radius; y++)
 		{
 			for (int z = -Radius; z <= Radius; z++)
 			{
