@@ -44,7 +44,20 @@ set (GENERATING_SRCS
 	${PROJECT_SOURCE_DIR}/src/Generating/DistortedHeightmap.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/DungeonRoomsFinisher.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/EndGen.cpp
-	${PROJECT_SOURCE_DIR}/src/Generating/FinishGen.cpp
+
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGen.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenClumpTopBlock.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenFluidSprings.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenGlowStone.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenNetherClumpFoliage.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenOres.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenPassiveMobs.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenPreSimulator.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenSingleTopBlock.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenSprinkleFoliage.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenTallGrass.cpp
+
+
 	${PROJECT_SOURCE_DIR}/src/Generating/GridStructGen.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/HeiGen.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/MineShafts.cpp
@@ -111,7 +124,19 @@ set (GENERATING_HDRS
 	${PROJECT_SOURCE_DIR}/src/Generating/DistortedHeightmap.h
 	${PROJECT_SOURCE_DIR}/src/Generating/DungeonRoomsFinisher.h
 	${PROJECT_SOURCE_DIR}/src/Generating/EndGen.h
-	${PROJECT_SOURCE_DIR}/src/Generating/FinishGen.h
+
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGen.h
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenClumpTopBlock.h
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenFluidSprings.h
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenGlowStone.h
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenNetherClumpFoliage.h
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenOres.h
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenPassiveMobs.h
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenPreSimulator.h
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenSingleTopBlock.h
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenSprinkleFoliage.h
+	${PROJECT_SOURCE_DIR}/src/Generating/Finishers/FinishGenTallGrass.h
+
 	${PROJECT_SOURCE_DIR}/src/Generating/GridStructGen.h
 	${PROJECT_SOURCE_DIR}/src/Generating/HeiGen.h
 	${PROJECT_SOURCE_DIR}/src/Generating/IntGen.h

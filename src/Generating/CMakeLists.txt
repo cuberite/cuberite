@@ -11,7 +11,6 @@ target_sources(
 	DistortedHeightmap.cpp
 	DungeonRoomsFinisher.cpp
 	EndGen.cpp
-	FinishGen.cpp
 	GridStructGen.cpp
 	HeiGen.cpp
 	MineShafts.cpp
@@ -43,7 +42,6 @@ target_sources(
 	DistortedHeightmap.h
 	DungeonRoomsFinisher.h
 	EndGen.h
-	FinishGen.h
 	GridStructGen.h
 	HeiGen.h
 	IntGen.h
@@ -67,3 +65,5 @@ target_sources(
 	VerticalStrategy.h
 	VillageGen.h
 )
+
+add_subdirectory(Finishers)

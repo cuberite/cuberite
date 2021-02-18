@@ -13,7 +13,7 @@
 #include "HeiGen.h"
 #include "CompoGen.h"
 #include "StructGen.h"
-#include "FinishGen.h"
+#include "Generating/Finishers/FinishGen.h"
 
 #include "CompoGenBiomal.h"
 
@@ -30,6 +30,18 @@
 #include "SinglePieceStructuresGen.h"
 #include "VillageGen.h"
 #include "PieceStructuresGen.h"
+
+#include "Finishers/FinishGen.h"
+#include "Finishers/FinishGenClumpTopBlock.h"
+#include "Finishers/FinishGenFluidSprings.h"
+#include "Finishers/FinishGenGlowStone.h"
+#include "Finishers/FinishGenNetherClumpFoliage.h"
+#include "Finishers/FinishGenOres.h"
+#include "Finishers/FinishGenPassiveMobs.h"
+#include "Finishers/FinishGenPreSimulator.h"
+#include "Finishers/FinishGenSingleTopBlock.h"
+#include "Finishers/FinishGenSprinkleFoliage.h"
+#include "Finishers/FinishGenTallGrass.h"
 
 
 
