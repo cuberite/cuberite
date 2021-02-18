@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "../ComposableGenerator.h"
+
 class cFinishGenPreSimulator :
 	public cFinishGen
 {

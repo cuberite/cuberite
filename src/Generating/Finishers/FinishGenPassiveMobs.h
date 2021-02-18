@@ -1,6 +1,9 @@
 
 // FinishGenPassiveMobs.h
 
+#pragma once
+
+#include "../ComposableGenerator.h"
 #include "../../Mobs/MonsterTypes.h"
 
 /** This class populates generated chunks with packs of biome-dependant animals

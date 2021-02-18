@@ -3,8 +3,9 @@
 
 #pragma once
 
+#include "../ComposableGenerator.h"
 #include "../../ProbabDistrib.h"
-
+#include "../../Noise/Noise.h"
 
 class cFinishGenFluidSprings :
 	public cFinishGen

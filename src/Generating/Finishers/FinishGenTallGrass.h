@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include "../ComposableGenerator.h"
+#include "../../Noise/Noise.h"
+
 class cFinishGenTallGrass :
 	public cFinishGen
 {

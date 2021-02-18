@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "../ComposableGenerator.h"
+
 /** This class adds a single top block in random positions in the specified biome on top of specified allowed blocks.
 Used for:
 - Lilypads finisher

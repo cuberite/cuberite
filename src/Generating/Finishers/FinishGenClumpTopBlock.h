@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "../ComposableGenerator.h"
+
 class cFinishGenClumpTopBlock :
 	public cFinishGen
 {
