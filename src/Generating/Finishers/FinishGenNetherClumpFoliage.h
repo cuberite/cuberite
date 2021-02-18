@@ -8,14 +8,14 @@
 class cFinishGenNetherClumpFoliage :
 	public cFinishGen
 {
-  public:
+public:
 	cFinishGenNetherClumpFoliage(int a_Seed) :
 		m_Noise(a_Seed),
 		m_Seed(a_Seed)
 	{
 	}
 
-  protected:
+protected:
 	cNoise m_Noise;
 	int    m_Seed;
 

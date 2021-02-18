@@ -1,6 +1,8 @@
 
 // FinishGenOres.cpp
 
+#include "Globals.h"
+
 #include "FinishGenOres.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,9 +94,7 @@ cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_Or
 		auto parts = StringSplitAndTrim(ore, ":");
 		if (parts.size() != 5)
 		{
-			LOGWARNING("Cannot parse ore information from string, not enough OreInfo members (exp 5, got %d). Offending item: \"%s\".",
-					   static_cast<unsigned>(parts.size()), ore.c_str()
-			);
+			LOGWARNING("Cannot parse ore information from string, not enough OreInfo members (exp 5, got %d). Offending item: \"%s\".", static_cast<unsigned>(parts.size()), ore.c_str());
 			continue;
 		}
 		auto oreType = BlockStringToType(parts[0]);
@@ -134,8 +134,8 @@ AString cFinishGenOres::OreInfosToString(const cFinishGenOres::OreInfos & a_OreI
 			res.append(" | ");
 		}
 		AppendPrintf(res, "%s:%d:%d:%d:%d",
-					 ItemTypeToString(ore.m_BlockType).c_str(), ore.m_BlockMeta,
-					 ore.m_MaxHeight, ore.m_NumNests, ore.m_NestSize
+			ItemTypeToString(ore.m_BlockType).c_str(), ore.m_BlockMeta,
+			ore.m_MaxHeight, ore.m_NumNests, ore.m_NestSize
 		);
 	}  // for ore - a_OreInfos[]
 	return res;

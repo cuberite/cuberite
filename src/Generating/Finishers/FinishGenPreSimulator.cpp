@@ -1,6 +1,8 @@
 
 // FinishGenPreSimulator.cpp
 
+#include "Globals.h"
+
 #include "FinishGenPreSimulator.h"
 #include "../../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
 

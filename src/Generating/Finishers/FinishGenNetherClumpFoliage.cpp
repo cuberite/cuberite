@@ -1,7 +1,8 @@
 // FinishGenNetherClumpFoliage.cpp
 
-#include "FinishGenNetherClumpFoliage.h"
+#include "Globals.h"
 
+#include "FinishGenNetherClumpFoliage.h"
 #include "../../Simulator/FireSimulator.h"
 #include "../../BlockInfo.h"
 

@@ -1,6 +1,8 @@
 
 // FinishGenFluidSprings.cpp
 
+#include "Globals.h"
+
 #include "FinishGenFluidSprings.h"
 #include "../../IniFile.h"
 
@@ -50,9 +52,7 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cI
 	AString HeightDistribution = a_IniFile.GetValueSet(SectionName, "HeightDistribution", DefaultHeightDistribution);
 	if (!m_HeightDistribution.SetDefString(HeightDistribution) || (m_HeightDistribution.GetSum() <= 0))
 	{
-		LOGWARNING("[%sSprings]: HeightDistribution is invalid, using the default of \"%s\".",
-				   (a_Fluid == E_BLOCK_WATER) ? "Water" : "Lava",
-				   DefaultHeightDistribution.c_str()
+		LOGWARNING("[%sSprings]: HeightDistribution is invalid, using the default of \"%s\".", (a_Fluid == E_BLOCK_WATER) ? "Water" : "Lava", DefaultHeightDistribution.c_str()
 		);
 		m_HeightDistribution.SetDefString(DefaultHeightDistribution);
 	}

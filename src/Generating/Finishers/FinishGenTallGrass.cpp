@@ -1,6 +1,8 @@
 
 // FinishGenTallGrass.cpp
 
+#include "Globals.h"
+
 #include "FinishGenTallGrass.h"
 
 void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
@@ -53,7 +55,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 				if (a_ChunkDesc.GetBlockType(x, y + 1, z) == E_BLOCK_AIR)
 				{
 					NIBBLETYPE Meta = (m_Noise.IntNoise2DInt(xx * 100, zz * 100) / 7 % 100) > 25 ?
-									  E_META_BIG_FLOWER_DOUBLE_TALL_GRASS : E_META_BIG_FLOWER_LARGE_FERN;
+						E_META_BIG_FLOWER_DOUBLE_TALL_GRASS : E_META_BIG_FLOWER_LARGE_FERN;
 
 					if ((Meta != E_META_BIG_FLOWER_LARGE_FERN) || CanLargeFernGrow(a_ChunkDesc.GetBiome(x, z)))
 					{

@@ -9,10 +9,10 @@
 class cFinishGenFluidSprings :
 	public cFinishGen
 {
-  public:
+public:
 	cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, eDimension a_Dimension);
 
-  protected:
+protected:
 
 	cNoise         m_Noise;
 	cProbabDistrib m_HeightDistribution;

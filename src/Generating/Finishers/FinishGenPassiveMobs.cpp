@@ -1,6 +1,8 @@
 
 // FinishGenPassiveMobs.cpp
 
+#include "Globals.h"
+
 #include "FinishGenPassiveMobs.h"
 
 #include "../../Mobs/Monster.h"

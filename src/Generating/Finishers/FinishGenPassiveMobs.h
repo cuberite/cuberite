@@ -8,11 +8,11 @@ Animals: cows, sheep, pigs, mooshrooms, squid, horses, wolves, ocelots */
 class cFinishGenPassiveMobs :
 	public cFinishGen
 {
-  public:
+public:
 
 	cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, eDimension a_Dimension);
 
-  protected:
+protected:
 
 	/** The noise used as the source of randomness */
 	cNoise m_Noise;

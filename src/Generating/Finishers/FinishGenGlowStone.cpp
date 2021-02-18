@@ -1,8 +1,9 @@
 
 // FinishGenGlowStone.cpp
 
-#include "./FinishGenGlowStone.h"
+#include "Globals.h"
 
+#include "./FinishGenGlowStone.h"
 #include "../../BlockInfo.h"
 
 void cFinishGenGlowStone::GenFinish(cChunkDesc & a_ChunkDesc)

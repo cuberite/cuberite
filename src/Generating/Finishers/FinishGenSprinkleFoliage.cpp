@@ -1,6 +1,8 @@
 
 // FinishGenSprinkleFoliage.cpp
 
+#include "Globals.h"
+
 #include "FinishGenSprinkleFoliage.h"
 
 static inline bool IsWater(BLOCKTYPE a_BlockType)

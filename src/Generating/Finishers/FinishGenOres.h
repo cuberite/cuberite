@@ -78,7 +78,7 @@ public:
 	/** (Re-)sets the seed used by the internal generating mechanisms. */
 	void SetSeed(int a_Seed);
 
-  protected:
+protected:
 	/** The noise used for generating. */
 	cNoise m_Noise;
 
@@ -107,13 +107,13 @@ class cFinishGenOreNests:
 {
 	using Super = cFinishGenOres;
 
-  public:
+public:
 
 	cFinishGenOreNests(int a_Seed, const OreInfos & a_OreInfos):
 		Super(a_Seed, a_OreInfos)
 	{}
 
-  protected:
+protected:
 
 	// cFinishGenOreClumps overrides:
 	virtual void GenerateOre(
@@ -133,7 +133,7 @@ class cFinishGenOrePockets:
 {
 	using Super = cFinishGenOres;
 
-  public:
+public:
 
 	cFinishGenOrePockets(int a_Seed, const OreInfos & a_OreInfos):
 		Super(a_Seed, a_OreInfos)
@@ -143,7 +143,7 @@ class cFinishGenOrePockets:
 	a_GenName is the name of the generator (this class may be used for OrePockets and DirtPockets, each has a different default). */
 	void Initialize(cIniFile & a_IniFile, const AString & a_GenName);
 
-  protected:
+protected:
 
 	// cFinishGenOreClumps overrides:
 	virtual void GenerateOre(
