@@ -936,6 +936,5 @@ const cBlockHandler & cBlockHandler::For(BLOCKTYPE a_BlockType)
 		case E_BLOCK_NUMBER_OF_TYPES:
 		case E_BLOCK_UNFINISHED: return BlockAirHandler;
 	}
-
 	UNREACHABLE("Getting handler for unexpected block type");
 }

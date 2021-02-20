@@ -957,7 +957,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtVindicator:
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
-			UNREACHABLE("cProtocol_1_12::WriteMobMetadata: received unimplemented type");
+			ASSERT(!"cProtocol_1_12::WriteMobMetadata: received unimplemented type");
 			break;
 		}
 
@@ -970,10 +970,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}
 
-		case mtInvalidType:
-		{
-			break;
-		}
 		default: UNREACHABLE("cProtocol_1_12::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
