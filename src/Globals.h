@@ -35,10 +35,14 @@
 		// The CRT has a definition for this operator new that stores the debugging info for leak-finding later.
 	#endif
 
+	#define UNREACHABLE_INTRINSIC __assume(false)
+
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
 	#define abstract
+
+	#define UNREACHABLE_INTRINSIC __builtin_unreachable()
 
 #else
 
@@ -271,8 +275,12 @@ template class SizeChecker<UInt8, 1>;
 
 #endif  // else TEST_GLOBALS
 
-/** Use to mark code that should be impossible to reach. */
-#define UNREACHABLE(x) do { FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__); std::abort(); } while (false)
+// Use to mark code that should be impossible to reach.
+#ifdef NDEBUG
+	#define UNREACHABLE(x) UNREACHABLE_INTRINSIC
+#else
+	#define UNREACHABLE(x) ( FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__), std::abort(), 0)
+#endif
 
 
 

@@ -463,7 +463,6 @@ UInt32 cProtocol_1_13::GetProtocolMobType(eMonsterType a_MobType)
 		case mtZombiePigman:          return 53;
 		case mtZombieHorse:           return 88;
 		case mtZombieVillager:        return 89;
-
 		default:                      return 0;
 	}
 	UNREACHABLE("Unsupported mob type");
@@ -599,7 +598,6 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadata a_Metadata)
 		case EntityMetadata::AbstractSkeletonArmsSwinging:
 		case EntityMetadata::ZombieUnusedWasType: break;
 	}
-
 	UNREACHABLE("Retrieved invalid metadata for protocol");
 }
 
@@ -631,7 +629,6 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadataType a_FieldType)
 		case EntityMetadataType::OptVarInt:    return 17;
 		case EntityMetadataType::Pose:         return 18;
 	}
-
 	UNREACHABLE("Translated invalid metadata type for protocol");
 }
 
@@ -1307,10 +1304,9 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtVindicator:
 
 		case mtHusk:
-
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
-			UNREACHABLE("cProtocol_1_13::WriteMobMetadata: received unimplemented type");
+			ASSERT(!"cProtocol_1_13::WriteMobMetadata: received unimplemented type");
 			break;
 		}
 
@@ -1331,10 +1327,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}
 
-		case mtInvalidType:
-		{
-			break;
-		}
 		default: UNREACHABLE("cProtocol_1_13::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }

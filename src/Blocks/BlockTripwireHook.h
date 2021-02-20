@@ -70,7 +70,6 @@ private:
 				return false;
 			}
 		}
-
 		UNREACHABLE("Unsupported block face");
 	}
 

@@ -41,7 +41,6 @@ const char * ClickActionToString(int a_ClickAction)
 		case caRightPaintEnd:                return "caRightPaintEnd";
 		case caMiddlePaintEnd:               return "caMiddlePaintEnd";
 		case caDblClick:                     return "caDblClick";
-
 		case caUnknown:                      return "caUnknown";
 	}
 	UNREACHABLE("Unknown click action");
