@@ -1443,7 +1443,6 @@ void GetSmallJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 void GetRedMushroomTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	static constexpr int Height = 4;
-	static constexpr int Border = 3;
 
 	for (int i = 0; i < Height; i++)
 	{
