@@ -2266,10 +2266,8 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 		Pos.y -= 1;
 		if (!cChunkDef::IsValidRelPos(Pos.addedY(-Radius)))
 		{
-			LOGWARNING("Test");
 			return;
 		}
-		LOGERROR("Height: %d", Pos.y);
 		StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y + Radius, Pos.z);
 	}
 
