@@ -378,7 +378,7 @@ std::pair<NamespaceSerializer::Namespace, std::string_view> NamespaceSerializer:
 
 
 
-const char * From(cEntityEffect::eType a_ID)
+const char * NamespaceSerializer::From(cEntityEffect::eType a_ID)
 {
 	switch (a_ID)
 	{
@@ -415,7 +415,7 @@ const char * From(cEntityEffect::eType a_ID)
 
 
 
-cEntityEffect::eType ToEntityEffect(std::string_view a_ID)
+cEntityEffect::eType NamespaceSerializer::ToEntityEffect(std::string_view a_ID)
 {
 	static const std::unordered_map<std::string_view, cEntityEffect::eType> Effects =
 	{
@@ -450,7 +450,7 @@ cEntityEffect::eType ToEntityEffect(std::string_view a_ID)
 
 
 
-const char * From(cEnchantments::eEnchantment a_Enchantment)
+const char * NamespaceSerializer::From(cEnchantments::eEnchantment a_Enchantment)
 {
 	switch (a_Enchantment)
 	{
@@ -488,7 +488,7 @@ const char * From(cEnchantments::eEnchantment a_Enchantment)
 
 
 
-cEnchantments::eEnchantment ToEnchantmentID(std::string_view a_ID)
+cEnchantments::eEnchantment NamespaceSerializer::ToEnchantmentID(std::string_view a_ID)
 {
 	static const std::unordered_map<std::string_view, cEnchantments::eEnchantment> Enchantments =
 	{
