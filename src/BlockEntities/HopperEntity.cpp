@@ -316,7 +316,7 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 	}
 
 	// Convert coords to relative:
-	auto relCoord = a_Chunk.AbsoluteToRelative(out.second);
+	auto relCoord = cChunkDef::AbsoluteToRelative(out.second);
 	auto destChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relCoord);
 	if (destChunk == nullptr)
 	{
@@ -557,7 +557,7 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 		{ 0, 0,  1},
 		{ 0, 0, -1},
 	} ;
-	auto relCoord = a_Chunk.AbsoluteToRelative(a_Coords);
+	auto relCoord = cChunkDef::AbsoluteToRelative(a_Coords);
 	for (const auto & ofs: neighborOfs)
 	{
 		auto otherHalfRelCoord = relCoord + ofs;

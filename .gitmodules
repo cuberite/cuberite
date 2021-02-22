@@ -55,10 +55,6 @@
 	path = lib/tolua++
 	url = https://github.com/cuberite/toluapp.git
 	ignore = dirty
-[submodule "lib/zlib"]
-	path = lib/zlib
-	url = https://github.com/cuberite/zlib.git
-	ignore = dirty
 [submodule "lib/fmt"]
 	path = lib/fmt
 	url = https://github.com/fmtlib/fmt.git
@@ -66,3 +62,6 @@
 [submodule "Tools/BlockTypePaletteGenerator/lib/lunajson"]
 	path = Tools/BlockTypePaletteGenerator/lib/lunajson
 	url = https://github.com/grafi-tt/lunajson.git
+[submodule "lib/libdeflate"]
+	path = lib/libdeflate
+	url = https://github.com/cuberite/libdeflate

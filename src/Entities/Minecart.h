@@ -40,11 +40,11 @@ public:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
-	virtual void Destroyed() override;
+	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 
 	int LastDamage(void) const { return m_LastDamage; }
 	ePayload GetPayload(void) const { return m_Payload; }
-
 
 protected:
 
@@ -55,9 +55,6 @@ protected:
 
 	/** Applies an acceleration to the minecart parallel to a_ForwardDirection but without allowing backward speed. */
 	void ApplyAcceleration(Vector3d a_ForwardDirection, double a_Acceleration);
-
-	// Overwrite to enforce speed limit
-	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
 
 	cMinecart(ePayload a_Payload, Vector3d a_Pos);
 
@@ -98,7 +95,7 @@ protected:
 
 
 
-class cRideableMinecart :
+class cRideableMinecart final :
 	public cMinecart
 {
 	using Super = cMinecart;
@@ -113,6 +110,7 @@ public:
 	int GetBlockHeight(void) const {return m_Height;}
 
 	// cEntity overrides:
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
 protected:
@@ -126,7 +124,7 @@ protected:
 
 
 
-class cMinecartWithChest :
+class cMinecartWithChest final :
 	public cMinecart,
 	public cItemGrid::cListener,
 	public cEntityWindowOwner
@@ -158,7 +156,6 @@ protected:
 
 	cItemGrid m_Contents;
 	void OpenNewWindow(void);
-	virtual void Destroyed() override;
 
 	/** This string is the filename of the loottable without the ".json" end.
 	Check root / LootTables / * for available names. If you put a file into the worldfolder / LootTables / * you can set them per world.
@@ -183,6 +180,8 @@ protected:
 	}
 
 	// cEntity overrides:
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 } ;
 
@@ -190,7 +189,7 @@ protected:
 
 
 
-class cMinecartWithFurnace :
+class cMinecartWithFurnace final :
 	public cMinecart
 {
 	using Super = cMinecart;
@@ -202,6 +201,7 @@ public:
 	cMinecartWithFurnace(Vector3d a_Pos);
 
 	// cEntity overrides:
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
@@ -223,22 +223,27 @@ private:
 
 
 
-class cMinecartWithTNT :
+class cMinecartWithTNT final :
 	public cMinecart
 {
 	using Super = cMinecart;
 
 public:
+
 	CLASS_PROTODEF(cMinecartWithTNT)
 
 	cMinecartWithTNT(Vector3d a_Pos);
+
+private:
+
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 } ;
 
 
 
 
 
-class cMinecartWithHopper :
+class cMinecartWithHopper final :
 	public cMinecart
 {
 	using Super = cMinecart;
@@ -255,4 +260,7 @@ protected:
 	AString m_LootTable;
 
 	// Todo - 14.10.2020 add loot table handling when window is added
+private:
+
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 } ;

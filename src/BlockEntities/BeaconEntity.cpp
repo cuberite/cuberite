@@ -271,6 +271,20 @@ void cBeaconEntity::CopyFrom(const cBlockEntity & a_Src)
 
 
 
+void cBeaconEntity::OnRemoveFromWorld()
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		// Tell window its owner is destroyed:
+		Window->OwnerDestroyed();
+	}
+}
+
+
+
+
+
 void cBeaconEntity::SendTo(cClientHandle & a_Client)
 {
 	a_Client.SendUpdateBlockEntity(*this);
@@ -319,6 +333,3 @@ bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 	}
 	return true;
 }
-
-
-

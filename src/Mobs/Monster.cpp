@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "IncludeAllMonsters.h"
+#include "LineBlockTracer.h"
 #include "../BlockInfo.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -134,17 +135,15 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 
 
 
-cMonster::~cMonster()
-{
-	ASSERT(GetTarget() == nullptr);
-}
-
-
-
-
-
 void cMonster::OnRemoveFromWorld(cWorld & a_World)
 {
+	SetTarget(nullptr);  // Tell them we're no longer targeting them.
+
+	if (m_LovePartner != nullptr)
+	{
+		m_LovePartner->ResetLoveMode();
+	}
+
 	if (IsLeashed())
 	{
 		cEntity * LeashedTo = GetLeashedTo();
@@ -158,20 +157,6 @@ void cMonster::OnRemoveFromWorld(cWorld & a_World)
 	}
 
 	Super::OnRemoveFromWorld(a_World);
-}
-
-
-
-
-
-void cMonster::Destroyed()
-{
-	SetTarget(nullptr);  // Tell them we're no longer targeting them.
-	if (m_LovePartner != nullptr)
-	{
-		m_LovePartner->ResetLoveMode();
-	}
-	Super::Destroyed();
 }
 
 
@@ -305,19 +290,6 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (m_TicksSinceLastDamaged < 100)
 	{
 		++m_TicksSinceLastDamaged;
-	}
-	if ((GetTarget() != nullptr))
-	{
-		ASSERT(GetTarget()->IsTicking());
-
-		if (GetTarget()->IsPlayer())
-		{
-			if (!static_cast<cPlayer *>(GetTarget())->CanMobsTarget())
-			{
-				SetTarget(nullptr);
-				m_EMState = IDLE;
-			}
-		}
 	}
 
 	// Process the undead burning in daylight.
@@ -626,20 +598,6 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cMonster::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo)
-{
-	// Stop all mobs from targeting this entity
-	// Stop this entity from targeting other mobs
-	SetTarget(nullptr);
-	StopEveryoneFromTargetingMe();
-
-	Super::DoMoveToWorld(a_WorldChangeInfo);
-}
-
-
-
-
-
 void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 {
 	Super::KilledBy(a_TDI);
@@ -764,29 +722,86 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 // monster sez: Do I see the player
 void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 {
-	m_World->DoWithNearestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
+	if (GetTarget() != nullptr)
 	{
-		EventSeePlayer(&a_Player, a_Chunk);
-		return true;
-	}, false);
+		return;
+	}
+
+	cPlayer * TargetPlayer = nullptr;
+	double ClosestDistance = m_SightDistance * m_SightDistance;
+	const auto MyHeadPosition = GetPosition().addedY(GetHeight());
+
+	// Enumerate all players within sight:
+	m_World->ForEachPlayer([this, &TargetPlayer, &ClosestDistance, MyHeadPosition](cPlayer & a_Player)
+	{
+		if (!a_Player.CanMobsTarget())
+		{
+			return false;
+		}
+
+		const auto TargetHeadPosition = a_Player.GetPosition().addedY(a_Player.GetHeight());
+		const auto TargetDistance = (TargetHeadPosition - MyHeadPosition).SqrLength();
+
+		// TODO: Currently all mobs see through lava, but only Nether-native mobs should be able to.
+		if (
+			(TargetDistance < ClosestDistance) &&
+			cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, cLineBlockTracer::losAirWaterLava)
+		)
+		{
+			TargetPlayer = &a_Player;
+			ClosestDistance = TargetDistance;
+		}
+
+		return false;
+	});
+
+	// Target him if suitable player found:
+	if (TargetPlayer != nullptr)
+	{
+		EventSeePlayer(TargetPlayer, a_Chunk);
+	}
 }
 
 
 
 
 
-void cMonster::CheckEventLostPlayer(void)
+void cMonster::CheckEventLostPlayer(const std::chrono::milliseconds a_Dt)
 {
-	if (GetTarget() != nullptr)
+	const auto Target = GetTarget();
+
+	if (Target == nullptr)
 	{
-		if ((GetTarget()->GetPosition() - GetPosition()).Length() > m_SightDistance)
+		return;
+	}
+
+	// Check if the player died, is in creative mode, etc:
+	if (Target->IsPlayer() && !static_cast<cPlayer *>(Target)->CanMobsTarget())
+	{
+		EventLosePlayer();
+		return;
+	}
+
+	// Check if the target is too far away:
+	if (!Target->GetBoundingBox().DoesIntersect({ GetPosition(), m_SightDistance * 2.0 }))
+	{
+		EventLosePlayer();
+		return;
+	}
+
+	const auto MyHeadPosition = GetPosition().addedY(GetHeight());
+	const auto TargetHeadPosition = Target->GetPosition().addedY(Target->GetHeight());
+	if (!cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, cLineBlockTracer::losAirWaterLava))
+	{
+		if ((m_LoseSightAbandonTargetTimer += a_Dt) > std::chrono::seconds(4))
 		{
 			EventLosePlayer();
 		}
 	}
 	else
 	{
-		EventLosePlayer();
+		// Subtract the amount of time we "handled" instead of setting to zero, so we don't ignore a large a_Dt of say, 8s:
+		m_LoseSightAbandonTargetTimer -= std::min(std::chrono::milliseconds(4000), m_LoseSightAbandonTargetTimer);
 	}
 }
 
@@ -809,7 +824,9 @@ void cMonster::EventSeePlayer(cPlayer * a_SeenPlayer, cChunk & a_Chunk)
 void cMonster::EventLosePlayer(void)
 {
 	SetTarget(nullptr);
+
 	m_EMState = IDLE;
+	m_LoseSightAbandonTargetTimer = std::chrono::seconds::zero();
 }
 
 
@@ -1064,39 +1081,75 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 
 	switch (a_Type)
 	{
-		case mtBat:            return mfAmbient;
-		case mtBlaze:          return mfHostile;
-		case mtCaveSpider:     return mfHostile;
-		case mtChicken:        return mfPassive;
-		case mtCow:            return mfPassive;
-		case mtCreeper:        return mfHostile;
-		case mtEnderDragon:    return mfNoSpawn;
-		case mtEnderman:       return mfHostile;
-		case mtGhast:          return mfHostile;
-		case mtGiant:          return mfNoSpawn;
-		case mtGuardian:       return mfWater;  // Just because they have special spawning conditions. If Watertemples have been added, this needs to be edited!
-		case mtHorse:          return mfPassive;
-		case mtIronGolem:      return mfPassive;
-		case mtMagmaCube:      return mfHostile;
-		case mtMooshroom:      return mfPassive;
-		case mtOcelot:         return mfPassive;
-		case mtPig:            return mfPassive;
-		case mtRabbit:         return mfPassive;
-		case mtSheep:          return mfPassive;
-		case mtSilverfish:     return mfHostile;
-		case mtSkeleton:       return mfHostile;
-		case mtSlime:          return mfHostile;
-		case mtSnowGolem:      return mfNoSpawn;
-		case mtSpider:         return mfHostile;
-		case mtSquid:          return mfWater;
-		case mtVillager:       return mfPassive;
-		case mtWitch:          return mfHostile;
-		case mtWither:         return mfNoSpawn;
-		case mtWitherSkeleton: return mfHostile;
-		case mtWolf:           return mfPassive;
-		case mtZombie:         return mfHostile;
-		case mtZombiePigman:   return mfHostile;
-		case mtZombieVillager: return mfHostile;
+		case mtBat:             return mfAmbient;
+		case mtBlaze:           return mfHostile;
+		case mtCat:             return mfPassive;
+		case mtCaveSpider:      return mfHostile;
+		case mtChicken:         return mfPassive;
+		case mtCod:             return mfWater;
+		case mtCow:             return mfPassive;
+		case mtCreeper:         return mfHostile;
+		case mtDolphin:         return mfWater;
+		case mtDonkey:          return mfPassive;
+		case mtDrowned:         return mfHostile;
+		case mtElderGuardian:   return mfHostile;
+		case mtEnderDragon:     return mfNoSpawn;
+		case mtEnderman:        return mfHostile;
+		case mtEndermite:       return mfHostile;
+		case mtEvoker:          return mfHostile;
+		case mtFox:             return mfPassive;
+		case mtGhast:           return mfHostile;
+		case mtGiant:           return mfNoSpawn;
+		case mtGuardian:        return mfWater;  // Just because they have special spawning conditions. TODO: If Watertemples have been added, this needs to be edited!
+		case mtHoglin:          return mfHostile;
+		case mtHorse:           return mfPassive;
+		case mtHusk:            return mfHostile;
+		case mtIllusioner:      return mfHostile;
+		case mtIronGolem:       return mfPassive;
+		case mtLlama:           return mfPassive;
+		case mtMagmaCube:       return mfHostile;
+		case mtMooshroom:       return mfPassive;
+		case mtMule:            return mfPassive;
+		case mtOcelot:          return mfPassive;
+		case mtPanda:           return mfPassive;
+		case mtParrot:          return mfPassive;
+		case mtPhantom:         return mfHostile;
+		case mtPig:             return mfPassive;
+		case mtPiglin:          return mfHostile;
+		case mtPiglinBrute:     return mfHostile;
+		case mtPillager:        return mfHostile;
+		case mtPolarBear:       return mfPassive;
+		case mtPufferfish:      return mfWater;
+		case mtRabbit:          return mfPassive;
+		case mtRavager:         return mfHostile;
+		case mtSalmon:          return mfWater;
+		case mtSheep:           return mfPassive;
+		case mtShulker:         return mfHostile;
+		case mtSilverfish:      return mfHostile;
+		case mtSkeleton:        return mfHostile;
+		case mtSkeletonHorse:   return mfPassive;
+		case mtSlime:           return mfHostile;
+		case mtSnowGolem:       return mfNoSpawn;
+		case mtSpider:          return mfHostile;
+		case mtSquid:           return mfWater;
+		case mtStray:           return mfHostile;
+		case mtStrider:         return mfHostile;
+		case mtTraderLlama:     return mfPassive;
+		case mtTropicalFish:    return mfWater;
+		case mtTurtle:          return mfWater;  // I'm not quite sure
+		case mtVex:             return mfHostile;
+		case mtVindicator:      return mfHostile;
+		case mtVillager:        return mfPassive;
+		case mtWanderingTrader: return mfPassive;
+		case mtWitch:           return mfHostile;
+		case mtWither:          return mfNoSpawn;
+		case mtWitherSkeleton:  return mfHostile;
+		case mtWolf:            return mfPassive;
+		case mtZoglin:          return mfHostile;
+		case mtZombie:          return mfHostile;
+		case mtZombieHorse:     return mfPassive;
+		case mtZombiePigman:    return mfHostile;
+		case mtZombieVillager:  return mfHostile;
 
 		default:
 		{
@@ -1600,10 +1653,10 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 	}
 
 	if (
-		(Chunk->GetBlock(Rel.x, Rel.y, Rel.z) != E_BLOCK_SOULSAND) &&  // Not on soulsand
-		(GetWorld()->GetTimeOfDay() < 12000 + 1000) &&              // Daytime
-		GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT) &&     // Not raining
-		!IsInWater()                                                // Isn't swimming
+		(Chunk->GetBlock(Rel) != E_BLOCK_SOULSAND) &&   // Not on soulsand
+		(GetWorld()->GetTimeOfDay() < 12000 + 1000) &&  // Daytime
+		Chunk->IsWeatherSunnyAt(Rel.x, Rel.z) &&        // Not raining
+		!IsInWater()                                    // Isn't swimming
 	)
 	{
 		int MobHeight = CeilC(a_Location.y + GetHeight()) - 1;  // The block Y coord of the mob's head

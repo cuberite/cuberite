@@ -3,8 +3,10 @@ target_sources(
 
 	Blocks.cpp
 	ItemTags.cpp
+	BlockStates.cpp
 
-	Blocks.h
+	BlockStates.h
+	BlockTypes.h
 	Items.h
 	ItemTags.h
 	Statistics.h

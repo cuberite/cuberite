@@ -50,8 +50,8 @@
 58 stone_axe
 59 sticky_piston
 60 stick
-61 spruce_stairs
-62 spruce_slab
+61 spruce_slab
+62 spruce_stairs
 63 spruce_planks
 64 spruce_fence_gate
 65 spruce_fence
@@ -150,8 +150,8 @@
 158 orange_bed
 159 orange_banner
 160 observer
-161 oak_stairs
-162 oak_slab
+161 oak_slab
+162 oak_stairs
 163 oak_planks
 164 note_block
 165 nether_wart_block

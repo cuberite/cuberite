@@ -137,14 +137,15 @@ void cMobSpawnerEntity::SpawnEntity(void)
 		return;
 	}
 
-	bool EntitiesSpawned = m_World->DoWithChunk(GetChunkX(), GetChunkZ(), [&](cChunk & a_Chunk)
+	bool EntitiesSpawned = m_World->DoWithChunk(GetChunkX(), GetChunkZ(), [this, NearbyEntities](cChunk & a_Chunk)
 		{
 			auto & Random = GetRandomProvider();
+			auto EntitySpawnTally = NearbyEntities;
 
 			bool HaveSpawnedEntity = false;
 			for (short I = 0; I < m_SpawnCount; I++)
 			{
-				if (NearbyEntities >= m_MaxNearbyEntities)
+				if (EntitySpawnTally >= m_MaxNearbyEntities)
 				{
 					break;
 				}
@@ -177,7 +178,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					{
 						HaveSpawnedEntity = true;
 						m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_MOBSPAWN, AbsPos, 0);
-						NearbyEntities++;
+						EntitySpawnTally++;
 					}
 				}
 			}
@@ -199,7 +200,7 @@ int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 {
 	int NumPlayers = 0;
 
-	auto Callback = [&] (cEntity & a_Entity)
+	auto Callback = [this, &NumPlayers](cEntity & a_Entity)
 	{
 		if (!a_Entity.IsPlayer())
 		{
@@ -212,8 +213,7 @@ int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 		return false;
 	};
 
-	auto PlayerBoundingBox = cBoundingBox(Vector3d(m_Pos.x, m_Pos.y - m_RequiredPlayerRange, m_Pos.z), m_RequiredPlayerRange, m_RequiredPlayerRange * 2);
-
+	const cBoundingBox PlayerBoundingBox(Vector3d(m_Pos.x, m_Pos.y - m_RequiredPlayerRange, m_Pos.z), m_RequiredPlayerRange, m_RequiredPlayerRange * 2);
 	m_World->ForEachEntityInBox(PlayerBoundingBox, Callback);
 
 	return NumPlayers;
@@ -227,7 +227,7 @@ int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 {
 	int NumEntities = 0;
 
-	auto Callback = [&] (cEntity & a_Entity)
+	auto Callback = [this, &NumEntities](cEntity & a_Entity)
 	{
 		if (!a_Entity.IsMob())
 		{
@@ -242,13 +242,8 @@ int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 		return false;
 	};
 
-	auto EntityBoundingBox = cBoundingBox(Vector3d(m_Pos.x, m_Pos.y - 4, m_Pos.z), m_SpawnRange, 8);
-
+	const cBoundingBox EntityBoundingBox(Vector3d(m_Pos.x, m_Pos.y - 4, m_Pos.z), m_SpawnRange, 8);
 	m_World->ForEachEntityInBox(EntityBoundingBox, Callback);
 
 	return NumEntities;
 }
-
-
-
-

@@ -554,7 +554,7 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_MobSpawner, "MobSpawner");
-			mWriter.AddString("EntityId", cMonster::MobTypeToVanillaName(a_MobSpawner->GetEntity()));
+			mWriter.AddString("EntityId", NamespaceSerializer::From(a_MobSpawner->GetEntity()));
 			mWriter.AddShort("SpawnCount", a_MobSpawner->GetSpawnCount());
 			mWriter.AddShort("SpawnRange", a_MobSpawner->GetSpawnRange());
 			mWriter.AddShort("Delay", a_MobSpawner->GetSpawnDelay());
@@ -651,7 +651,7 @@ public:
 
 
 
-	void AddBasicEntity(cEntity * a_Entity, const AString & a_ClassName)
+	void AddBasicEntity(cEntity * a_Entity, const std::string_view a_ClassName)
 	{
 		mWriter.AddString("id", a_ClassName);
 		mWriter.BeginList("Pos", TAG_Double);
@@ -691,6 +691,16 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicEntity(a_EnderCrystal, "EnderCrystal");
+			mWriter.AddByte("ShowBottom", a_EnderCrystal->ShowsBottom() ? 1 : 0);
+			if (a_EnderCrystal->DisplaysBeam())
+			{
+				mWriter.BeginCompound("BeamTarget");
+				const auto & BeamTarget = a_EnderCrystal->GetBeamTarget();
+				mWriter.AddInt("X", BeamTarget.x);
+				mWriter.AddInt("Y", BeamTarget.y);
+				mWriter.AddInt("Z", BeamTarget.z);
+				mWriter.EndCompound();
+			}
 		mWriter.EndCompound();
 	}
 
@@ -760,51 +770,8 @@ public:
 
 	void AddMonsterEntity(cMonster * a_Monster)
 	{
-		const char * EntityClass = nullptr;
-		switch (a_Monster->GetMobType())
-		{
-			case mtBat:            EntityClass = "Bat";            break;
-			case mtBlaze:          EntityClass = "Blaze";          break;
-			case mtCaveSpider:     EntityClass = "CaveSpider";     break;
-			case mtChicken:        EntityClass = "Chicken";        break;
-			case mtCow:            EntityClass = "Cow";            break;
-			case mtCreeper:        EntityClass = "Creeper";        break;
-			case mtEnderDragon:    EntityClass = "EnderDragon";    break;
-			case mtEnderman:       EntityClass = "Enderman";       break;
-			case mtGhast:          EntityClass = "Ghast";          break;
-			case mtGiant:          EntityClass = "Giant";          break;
-			case mtGuardian:       EntityClass = "Guardian";       break;
-			case mtHorse:          EntityClass = "Horse";          break;
-			case mtIronGolem:      EntityClass = "VillagerGolem";  break;
-			case mtMagmaCube:      EntityClass = "LavaSlime";      break;
-			case mtMooshroom:      EntityClass = "MushroomCow";    break;
-			case mtOcelot:         EntityClass = "Ozelot";         break;
-			case mtPig:            EntityClass = "Pig";            break;
-			case mtRabbit:         EntityClass = "Rabbit";         break;
-			case mtSheep:          EntityClass = "Sheep";          break;
-			case mtSilverfish:     EntityClass = "Silverfish";     break;
-			case mtSkeleton:       EntityClass = "Skeleton";       break;
-			case mtSlime:          EntityClass = "Slime";          break;
-			case mtSnowGolem:      EntityClass = "SnowMan";        break;
-			case mtSpider:         EntityClass = "Spider";         break;
-			case mtSquid:          EntityClass = "Squid";          break;
-			case mtVillager:       EntityClass = "Villager";       break;
-			case mtWitch:          EntityClass = "Witch";          break;
-			case mtWither:         EntityClass = "WitherBoss";     break;
-			case mtWitherSkeleton: EntityClass = "WitherSkeleton"; break;
-			case mtWolf:           EntityClass = "Wolf";           break;
-			case mtZombie:         EntityClass = "Zombie";         break;
-			case mtZombiePigman:   EntityClass = "PigZombie";      break;
-			case mtZombieVillager: EntityClass = "ZombieVillager"; break;
-			default:
-			{
-				ASSERT(!"Unhandled monster type");
-				return;
-			}
-		}  // switch (payload)
-
 		mWriter.BeginCompound("");
-			AddBasicEntity(a_Monster, EntityClass);
+			AddBasicEntity(a_Monster, NamespaceSerializer::From(a_Monster->GetMobType()));
 			mWriter.BeginList("DropChances", TAG_Float);
 				mWriter.AddFloat("", a_Monster->GetDropChanceWeapon());
 				mWriter.AddFloat("", a_Monster->GetDropChanceHelmet());
@@ -969,6 +936,7 @@ public:
 					mWriter.AddInt("Profession",     ZombieVillager->GetProfession());
 					mWriter.AddInt("ConversionTime", ZombieVillager->ConversionTime());
 					mWriter.AddInt("Age",            ZombieVillager->GetAge());
+					break;
 				}
 				case mtBlaze:
 				case mtCaveSpider:
@@ -989,6 +957,47 @@ public:
 				case mtWitherSkeleton:
 				{
 					// Other mobs have no special tags.
+					break;
+				}
+				case mtCat:
+				case mtCod:
+				case mtDolphin:
+				case mtDonkey:
+				case mtDrowned:
+				case mtElderGuardian:
+				case mtEndermite:
+				case mtEvoker:
+				case mtFox:
+				case mtHoglin:
+				case mtHusk:
+				case mtIllusioner:
+				case mtLlama:
+				case mtMule:
+				case mtPanda:
+				case mtParrot:
+				case mtPhantom:
+				case mtPiglin:
+				case mtPiglinBrute:
+				case mtPillager:
+				case mtPolarBear:
+				case mtPufferfish:
+				case mtRavager:
+				case mtSalmon:
+				case mtShulker:
+				case mtSkeletonHorse:
+				case mtStray:
+				case mtStrider:
+				case mtTraderLlama:
+				case mtTropicalFish:
+				case mtTurtle:
+				case mtVex:
+				case mtVindicator:
+				case mtWanderingTrader:
+				case mtZoglin:
+				case mtZombieHorse:
+				{
+					// All the entities not added
+					LOGD("Saving unimplemented entity type: %d", NamespaceSerializer::From(a_Monster->GetMobType()));
 					break;
 				}
 				case mtInvalidType:
@@ -1175,17 +1184,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // NBTChunkSerializer:
 
-bool NBTChunkSerializer::serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter)
+void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter)
 {
 	SerializerCollector serializer(aWriter);
 	aWriter.BeginCompound("Level");
 	aWriter.AddInt("xPos", aCoords.m_ChunkX);
 	aWriter.AddInt("zPos", aCoords.m_ChunkZ);
-	if (!aWorld.GetChunkData(aCoords, serializer))
-	{
-		aWriter.EndCompound();  // "Level"
-		return false;
-	}
+	[[maybe_unused]] const bool Result = aWorld.GetChunkData(aCoords, serializer);  // Chunk must be present in order to save
+	ASSERT(Result);
 	serializer.Finish();  // Close NBT tags
 
 	// Save biomes, both MCS (IntArray) and MC-vanilla (ByteArray):
@@ -1238,5 +1244,4 @@ bool NBTChunkSerializer::serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 	aWriter.AddByte("TerrainPopulated", 1);
 
 	aWriter.EndCompound();  // "Level"
-	return true;
 }

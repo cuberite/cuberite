@@ -6,10 +6,7 @@ target_sources(
 	BiomeDef.cpp
 	BlockArea.cpp
 	BlockInfo.cpp
-	BlockState.cpp
 	BlockType.cpp
-	BlockTypePalette.cpp
-	BlockTypeRegistry.cpp
 	BrewingRecipes.cpp
 	Broadcaster.cpp
 	BoundingBox.cpp
@@ -21,6 +18,7 @@ target_sources(
 	ChunkMap.cpp
 	ChunkSender.cpp
 	ChunkStay.cpp
+	CircularBufferCompressor.cpp
 	ClientHandle.cpp
 	Color.cpp
 	CommandOutput.cpp
@@ -56,7 +54,6 @@ target_sources(
 	MonsterConfig.cpp
 	NetherPortalScanner.cpp
 	OverridesSettingsRepository.cpp
-	PalettedBlockArea.cpp
 	ProbabDistrib.cpp
 	RankManager.cpp
 	RCONServer.cpp
@@ -82,8 +79,6 @@ target_sources(
 	BlockState.h
 	BlockTracer.h
 	BlockType.h
-	BlockTypePalette.h
-	BlockTypeRegistry.h
 	BrewingRecipes.h
 	BoundingBox.h
 	BuildInfo.h.cmake
@@ -97,6 +92,7 @@ target_sources(
 	ChunkMap.h
 	ChunkSender.h
 	ChunkStay.h
+	CircularBufferCompressor.h
 	ClientHandle.h
 	Color.h
 	CommandOutput.h
@@ -141,7 +137,6 @@ target_sources(
 	NetherPortalScanner.h
 	OpaqueWorld.h
 	OverridesSettingsRepository.h
-	PalettedBlockArea.h
 	ProbabDistrib.h
 	RankManager.h
 	RCONServer.h
@@ -221,7 +216,7 @@ function(make_symlink orig link)
 	endif()
 
 	# Create the symlink (platform-dependent):
-	message("Creating symlink, orig = ${orig}; link = ${link}")
+	message(STATUS "Creating symlink, orig = ${orig}; link = ${link}")
 	if (CMAKE_HOST_UNIX)
 		set(command ln -s ${orig} ${link})
 	else()
@@ -266,7 +261,7 @@ set(symlinks
 	monsters.ini
 	README.txt
 )
-message("Creating output folder and symlinks...")
+message(STATUS "Creating output folder and symlinks...")
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Server")
 foreach (symlink ${symlinks})
 	make_symlink("${CMAKE_CURRENT_SOURCE_DIR}/../Server/${symlink}" "${CMAKE_BINARY_DIR}/Server/${symlink}")

@@ -14,8 +14,6 @@ class cEnchantingTableEntity :
 
 public:
 
-	BLOCKENTITY_PROTODEF(cEnchantingTableEntity)
-
 	cEnchantingTableEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, AString a_CustomName = "");
 
 	const AString & GetCustomName() const { return m_CustomName; }

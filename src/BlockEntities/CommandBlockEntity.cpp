@@ -169,7 +169,7 @@ void cCommandBlockEntity::Execute()
 	}
 
 	class CommandBlockOutCb :
-		public cCommandOutputCallback
+		public cLogCommandDeleteSelfOutputCallback
 	{
 		cCommandBlockEntity * m_CmdBlock;
 
@@ -182,7 +182,7 @@ void cCommandBlockEntity::Execute()
 			m_CmdBlock->SetLastOutput(cClientHandle::FormatChatPrefix(m_CmdBlock->GetWorld()->ShouldUseChatPrefixes(), "SUCCESS", cChatColor::Green, cChatColor::White) + a_Text);
 			m_CmdBlock->GetWorld()->BroadcastBlockEntity(m_CmdBlock->GetPos());
 		}
-	} CmdBlockOutCb(this);
+	};
 
 	AString RealCommand = m_Command;
 
@@ -203,7 +203,7 @@ void cCommandBlockEntity::Execute()
 	{
 		cServer * Server = cRoot::Get()->GetServer();
 		LOGD("cCommandBlockEntity: Executing command %s", m_Command.c_str());
-		Server->QueueExecuteConsoleCommand(RealCommand, CmdBlockOutCb);
+		Server->QueueExecuteConsoleCommand(RealCommand, *new CommandBlockOutCb(this));
 	}
 	else
 	{

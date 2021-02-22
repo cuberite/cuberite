@@ -32,22 +32,6 @@ cChestEntity::cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector
 
 
 
-cChestEntity::~cChestEntity()
-{
-	if (m_Neighbour != nullptr)
-	{
-		// Neighbour may share a window with us, force the window shut
-		m_Neighbour->DestroyWindow();
-		m_Neighbour->m_Neighbour = nullptr;
-	}
-
-	DestroyWindow();
-}
-
-
-
-
-
 void cChestEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
@@ -57,6 +41,22 @@ void cChestEntity::CopyFrom(const cBlockEntity & a_Src)
 	// Reset the neighbor and player count, there's no sense in copying these:
 	m_Neighbour = nullptr;
 	m_NumActivePlayers = 0;
+}
+
+
+
+
+
+void cChestEntity::OnRemoveFromWorld()
+{
+	if (m_Neighbour != nullptr)
+	{
+		// Neighbour may share a window with us, force the window shut:
+		m_Neighbour->DestroyWindow();
+		m_Neighbour->m_Neighbour = nullptr;
+	}
+
+	DestroyWindow();
 }
 
 
@@ -202,11 +202,10 @@ void cChestEntity::OpenNewWindow(void)
 
 void cChestEntity::DestroyWindow()
 {
-	cWindow * Window = GetWindow();
+	const auto Window = GetWindow();
 	if (Window != nullptr)
 	{
 		Window->OwnerDestroyed();
-		CloseWindow();
 	}
 }
 

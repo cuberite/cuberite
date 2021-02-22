@@ -33,7 +33,6 @@ public:  // tolua_export
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
-	static const char * GetClassStatic(void) { return "cMobSpawnerEntity"; }
 	// tolua_begin
 
 	/** Update the active flag from the mob spawner. This function will called every 5 seconds from the Tick() function. */
@@ -71,6 +70,7 @@ public:  // tolua_export
 	// tolua_end
 
 private:
+
 	/** The entity to spawn. */
 	eMonsterType m_Entity;
 
@@ -96,7 +96,3 @@ private:
 	short m_RequiredPlayerRange = 16;
 
 } ;  // tolua_end
-
-
-
-

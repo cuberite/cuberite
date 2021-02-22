@@ -3,6 +3,7 @@
 #include "../Registries/Statistics.h"
 #include "../Entities/EntityEffect.h"
 #include "../Enchantments.h"
+#include "../Mobs/MonsterTypes.h"
 
 namespace NamespaceSerializer
 {
@@ -15,9 +16,11 @@ namespace NamespaceSerializer
 
 	unsigned DataVersion();
 
-	const char * From(Statistic ID);
+	std::string_view From(Statistic a_ID);
+	std::string_view From(eMonsterType a_ID);
 
-	Statistic ToCustomStatistic(std::string_view ID);
+	Statistic ToCustomStatistic(std::string_view a_ID);
+	eMonsterType ToMonsterType(std::string_view a_ID);
 
 	const char * From(cEntityEffect::eType a_ID);
 	cEntityEffect::eType ToEntityEffect(std::string_view a_ID);

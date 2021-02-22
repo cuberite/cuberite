@@ -34,15 +34,12 @@ public:
 
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cChestEntity)
-
 	/** Constructor used for normal operation */
 	cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
-	virtual ~cChestEntity() override;
-
 	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
+	virtual void OnRemoveFromWorld() override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 
@@ -64,7 +61,6 @@ public:
 	/** Sets the number of players who currently have this chest open */
 	void SetNumberOfPlayers(int a_NumActivePlayers) { m_NumActivePlayers = a_NumActivePlayers; }
 
-
 private:
 
 	/** Number of players who currently have this chest open */
@@ -75,9 +71,4 @@ private:
 
 	/** cItemGrid::cListener overrides: */
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override;
-
 } ;  // tolua_export
-
-
-
-

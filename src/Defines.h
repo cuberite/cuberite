@@ -12,16 +12,9 @@ typedef std::vector<int> cSlotNums;
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-#endif
 /** Constant to calculate ticks from seconds "ticks per second" */
 constexpr inline const int TPS = 20;
 // This is not added to the lua API because it broke the build
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 
@@ -296,6 +289,7 @@ enum eDamageType
 	dtSuffocating,      // Suffocating inside a block
 	dtStarving,         // Hunger
 	dtCactusContact,    // Contact with a cactus block
+	dtMagmaContact,     // Contact with a magma block
 	dtLavaContact,      // Contact with a lava block
 	dtPoisoning,        // Having the poison effect
 	dtWithering,        // Having the wither effect
@@ -324,6 +318,7 @@ enum eDamageType
 	dtCactus       = dtCactusContact,
 	dtCactuses     = dtCactusContact,
 	dtCacti        = dtCactusContact,
+	dtMagma        = dtMagmaContact,
 	dtLava         = dtLavaContact,
 	dtPoison       = dtPoisoning,
 	dtWither       = dtWithering,
@@ -505,7 +500,8 @@ inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, do
 
 
 
-template <class T> inline T Diff(T a_Val1, T a_Val2)
+template <class T>
+inline T Diff(T a_Val1, T a_Val2)
 {
 	return std::abs(a_Val1 - a_Val2);
 }

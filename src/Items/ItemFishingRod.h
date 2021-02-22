@@ -175,7 +175,7 @@ public:
 				case 0:
 				{
 					cItem Bow(E_ITEM_BOW, 1, Random.RandInt<short>(50));
-					Bow.EnchantByXPLevels(Random.RandInt(22, 30), GetRandomProvider());
+					Bow.EnchantByXPLevels(Random.RandInt(22U, 30U), GetRandomProvider());
 					Drops.Add(Bow);
 					break;
 				}
@@ -189,7 +189,7 @@ public:
 				case 2:
 				{
 					cItem Rod(E_ITEM_FISHING_ROD, 1, Random.RandInt<short>(50));
-					Rod.EnchantByXPLevels(Random.RandInt(22, 30), GetRandomProvider());
+					Rod.EnchantByXPLevels(Random.RandInt(22U, 30U), GetRandomProvider());
 					Drops.Add(Rod);
 					break;
 				}

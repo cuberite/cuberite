@@ -86,7 +86,7 @@ static void NonCtrlHandler(int a_Signal)
 		case SIGTERM:
 		{
 			// Server is shutting down, wait for it...
-			cRoot::Get()->Stop();
+			cRoot::Stop();
 			return;
 		}
 #ifdef SIGPIPE
@@ -111,7 +111,7 @@ static void NonCtrlHandler(int a_Signal)
 // Handle CTRL events in windows, including console window close
 static BOOL CtrlHandler(DWORD fdwCtrlType)
 {
-	cRoot::Get()->Stop();
+	cRoot::Stop();
 	LOGD("Terminate event raised from the Windows CtrlHandler");
 
 	// Delay as much as possible to try to get the server to shut down cleanly - 10 seconds given by Windows
@@ -130,7 +130,7 @@ static BOOL CtrlHandler(DWORD fdwCtrlType)
 ////////////////////////////////////////////////////////////////////////////////
 // ParseArguments - Read the startup arguments and store into a settings object
 
-static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & repo)
+static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & Settings)
 {
 	// Parse the comand line args:
 	TCLAP::CmdLine cmd("Cuberite");
@@ -151,23 +151,23 @@ static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & r
 	if (confArg.isSet())
 	{
 		AString conf_file = confArg.getValue();
-		repo.AddValue("Server", "ConfigFile", conf_file);
+		Settings.AddValue("Server", "ConfigFile", conf_file);
 	}
 	if (slotsArg.isSet())
 	{
 		int slots = slotsArg.getValue();
-		repo.AddValue("Server", "MaxPlayers", static_cast<Int64>(slots));
+		Settings.AddValue("Server", "MaxPlayers", static_cast<Int64>(slots));
 	}
 	if (portsArg.isSet())
 	{
 		for (auto port: portsArg.getValue())
 		{
-			repo.AddValue("Server", "Ports", std::to_string(port));
+			Settings.AddValue("Server", "Ports", std::to_string(port));
 		}
 	}
 	if (noFileLogArg.getValue())
 	{
-		repo.AddValue("Server", "DisableLogFile", true);
+		Settings.AddValue("Server", "DisableLogFile", true);
 	}
 	if (commLogArg.getValue())
 	{
@@ -183,7 +183,7 @@ static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & r
 	{
 		setvbuf(stdout, nullptr, _IONBF, 0);
 	}
-	repo.SetReadOnly();
+	Settings.SetReadOnly();
 
 	if (runAsServiceArg.getValue())
 	{
@@ -230,11 +230,10 @@ static int UniversalMain(int argc, char * argv[], bool RunningAsService)
 
 	try
 	{
-		// Make sure g_RunAsService is set correctly before checking it's value
 		cMemorySettingsRepository Settings;
-		ParseArguments(argc, argv, Settings);
+		ParseArguments(argc, argv, Settings);  // Make sure g_RunAsService is set correctly before checking it's value
 
-		// Attempt to run as a service
+		// Attempt to run as a service:
 		if (!RunningAsService && g_RunAsService)
 		{
 			// This will either fork or call UniversalMain again:
@@ -290,7 +289,7 @@ int main(int argc, char ** argv)
 	// Only useful when the leak is in the same sequence all the time
 	// _CrtSetBreakAlloc(85950);
 
-#endif  // _DEBUG && _MSC_VER
+#endif  // !NDEBUG && _MSC_VER
 
 	std::signal(SIGSEGV, NonCtrlHandler);
 	std::signal(SIGTERM, NonCtrlHandler);

@@ -36,7 +36,7 @@ static void TestWrite(void)
 	buf.WriteVarInt32(5);
 	buf.WriteVarInt32(300);
 	buf.WriteVarInt32(0);
-	AString All;
+	ContiguousByteBuffer All;
 	buf.ReadAll(All);
 	TEST_EQUAL(All.size(), 4);
 	TEST_EQUAL(memcmp(All.data(), "\x05\xac\x02\x00", All.size()), 0);

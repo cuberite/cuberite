@@ -23,18 +23,9 @@ cFlowerPotEntity::cFlowerPotEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
 
 
 
-void cFlowerPotEntity::Destroy(void)
+cItems cFlowerPotEntity::ConvertToPickups() const
 {
-	// Drop the contents as pickups:
-	if (!m_Item.IsEmpty())
-	{
-		ASSERT(m_World != nullptr);
-		cItems Pickups;
-		Pickups.Add(m_Item);
-		m_World->SpawnItemPickups(Pickups, Vector3d(0.5, 0.5, 0.5) + m_Pos);
-
-		m_Item.Empty();
-	}
+	return cItem(m_Item);
 }
 
 

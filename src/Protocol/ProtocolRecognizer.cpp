@@ -25,18 +25,6 @@
 
 
 
-struct UnsupportedButPingableProtocolException : public std::runtime_error
-{
-	explicit UnsupportedButPingableProtocolException() :
-		std::runtime_error("")
-	{
-	}
-};
-
-
-
-
-
 struct TriedToJoinWithUnsupportedProtocolException : public std::runtime_error
 {
 	explicit TriedToJoinWithUnsupportedProtocolException(const std::string & a_Message) :
@@ -90,31 +78,44 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 
 void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, std::string_view a_Data)
 {
-	// We read more than the handshake packet here, oh well.
+	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and MCS_PROTOCOL_VERSIONS macros in the header file
+
+	/* Write all incoming data unmodified into m_Buffer.
+	Writing everything is always okay to do:
+	1. We can be sure protocol encryption hasn't started yet since m_Protocol hasn't been called, hence no decryption needs to take place
+	2. The extra data are processed at the end of this function */
 	if (!m_Buffer.Write(a_Data.data(), a_Data.size()))
 	{
-		a_Client.Kick("Your client sent too much data; please try again later.");
+		a_Client.PacketBufferFull();
 		return;
 	}
 
-	try
+	// TODO: recover from git history
+	// Unlengthed protocol, ...
+
+	// Lengthed protocol, try if it has the entire initial handshake packet:
+	if (
+		UInt32 PacketLen;
+
+		// If not enough bytes for the packet length, keep waiting
+		!m_Buffer.ReadVarInt(PacketLen) ||
+
+		// If not enough bytes for the packet, keep waiting
+		// (More of a sanity check to make sure no one tries anything funny, since ReadXXX can wait for data themselves)
+		!m_Buffer.CanReadBytes(PacketLen)
+	)
 	{
-		// Note that a_Data is assigned to a subview containing the data to pass to m_Protocol or UnsupportedPing
-
-		TryRecognizeProtocol(a_Client, a_Data);
-		if (m_Protocol == nullptr)
-		{
-			m_Buffer.ResetRead();
-			return;
-		}
-
-		// The protocol recogniser succesfully identified, switch mode:
-		HandleIncomingData = [this](cClientHandle &, const std::string_view a_In)
-		{
-			m_Protocol->DataReceived(m_Buffer, a_In.data(), a_In.size());
-		};
+		m_Buffer.ResetRead();
+		return;
 	}
-	catch (const UnsupportedButPingableProtocolException &)
+
+	/* Figure out the client's version.
+	1. m_Protocol != nullptr: the protocol is supported and we have a handler
+	2. m_Protocol == nullptr: the protocol is unsupported, handling is a special case done by ourselves
+	3. Exception: the data sent were garbage, the client handle deals with it by disconnecting */
+	m_Protocol = TryRecognizeLengthedProtocol(a_Client, a_Data);
+
+	if (m_Protocol == nullptr)
 	{
 		// Got a server list ping for an unrecognised version,
 		// switch into responding to unknown protocols mode:
@@ -123,14 +124,17 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 			HandleIncomingDataInOldPingResponseStage(a_Clyent, a_In);
 		};
 	}
-	catch (const std::exception & Oops)
+	else
 	{
-		a_Client.Kick(Oops.what());
-		return;
+		// The protocol recogniser succesfully identified, switch mode:
+		HandleIncomingData = [this](cClientHandle &, const std::string_view a_In)
+		{
+			m_Protocol->DataReceived(m_Buffer, a_In.data(), a_In.size());
+		};
 	}
 
-	// Explicitly process any remaining data with the new handler:
-	HandleIncomingData(a_Client, a_Data);
+	// Explicitly process any remaining data (already written to m_Buffer) with the new handler:
+	HandleIncomingData(a_Client, {});
 }
 
 
@@ -141,7 +145,7 @@ void cMultiVersionProtocol::HandleIncomingDataInOldPingResponseStage(cClientHand
 {
 	if (!m_Buffer.Write(a_Data.data(), a_Data.size()))
 	{
-		a_Client.Kick("Server list ping failed, too much data.");
+		a_Client.PacketBufferFull();
 		return;
 	}
 
@@ -175,7 +179,7 @@ void cMultiVersionProtocol::HandleIncomingDataInOldPingResponseStage(cClientHand
 		}
 		else
 		{
-			a_Client.Kick("Server list ping failed, unrecognized packet.");
+			a_Client.PacketUnknown(PacketID);
 			return;
 		}
 
@@ -211,34 +215,7 @@ void cMultiVersionProtocol::SendDisconnect(cClientHandle & a_Client, const AStri
 
 
 
-void cMultiVersionProtocol::TryRecognizeProtocol(cClientHandle & a_Client, std::string_view & a_Data)
-{
-	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and MCS_PROTOCOL_VERSIONS macros in the header file
-
-	// Lengthed protocol, try if it has the entire initial handshake packet:
-	UInt32 PacketLen;
-	if (!m_Buffer.ReadVarInt(PacketLen))
-	{
-		// Not enough bytes for the packet length, keep waiting
-		return;
-	}
-
-	if (!m_Buffer.CanReadBytes(PacketLen))
-	{
-		// Not enough bytes for the packet, keep waiting
-		// More of a sanity check to make sure no one tries anything funny (since ReadXXX can wait for data themselves):
-		return;
-	}
-
-	m_Protocol = TryRecognizeLengthedProtocol(a_Client, a_Data);
-	ASSERT(m_Protocol != nullptr);
-}
-
-
-
-
-
-std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(cClientHandle & a_Client, std::string_view & a_Data)
+std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(cClientHandle & a_Client, const std::string_view a_Data)
 {
 	UInt32 PacketType;
 	UInt32 ProtocolVersion;
@@ -248,14 +225,12 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 
 	if (!m_Buffer.ReadVarInt(PacketType) || (PacketType != 0x00))
 	{
-		// Not an initial handshake packet, we don't know how to talk to them
-		LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, initial packet %u)",
+		// Not an initial handshake packet, we don't know how to talk to them:
+		LOGD("Client \"%s\" uses an unsupported protocol (lengthed, initial packet %u)",
 			a_Client.GetIPString().c_str(), PacketType
 		);
 
-		throw TriedToJoinWithUnsupportedProtocolException(
-			Printf("Your client isn't supported.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS, ProtocolVersion)
-		);
+		throw TriedToJoinWithUnsupportedProtocolException("Your client isn't supported.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS);
 	}
 
 	if (
@@ -270,33 +245,19 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		throw TriedToJoinWithUnsupportedProtocolException("Incorrect amount of data received - hacked client?");
 	}
 
-	cProtocol::State NextState = [&]
+	const auto NextState = [NextStateValue]
+	{
+		switch (NextStateValue)
 		{
-			switch (NextStateValue)
-			{
-				case cProtocol::State::Status: return cProtocol::State::Status;
-				case cProtocol::State::Login: return cProtocol::State::Login;
-				case cProtocol::State::Game: return cProtocol::State::Game;
-				default:
-				{
-					throw TriedToJoinWithUnsupportedProtocolException(
-						fmt::format("Invalid next game state: {}", NextStateValue)
-					);
-				}
-			}
-		}();
+			case 1:  return cProtocol::State::Status;
+			case 2:  return cProtocol::State::Login;
+			case 3:  return cProtocol::State::Game;
+			default: throw TriedToJoinWithUnsupportedProtocolException("Your client isn't supported.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS);
+		}
+	}();
 
 	// TODO: this should be a protocol property, not ClientHandle:
 	a_Client.SetProtocolVersion(ProtocolVersion);
-
-	// The protocol has just been recognized, advance data start
-	// to after the handshake and leave the rest to the protocol:
-	a_Data = a_Data.substr(m_Buffer.GetUsedSpace() - m_Buffer.GetReadableSpace());
-
-	// We read more than we can handle, purge the rest:
-	[[maybe_unused]] const bool Success =
-		m_Buffer.SkipRead(m_Buffer.GetReadableSpace());
-	ASSERT(Success);
 
 	// All good, eat up the data:
 	m_Buffer.CommitRead();
@@ -331,7 +292,8 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 				);
 			}
 
-			throw UnsupportedButPingableProtocolException();
+			// No cProtocol can handle the client:
+			return nullptr;
 		}
 	}
 }
@@ -348,15 +310,15 @@ void cMultiVersionProtocol::SendPacket(cClientHandle & a_Client, cByteBuffer & a
 
 	// Compression doesn't apply to this state, send raw data:
 	VERIFY(OutPacketLenBuffer.WriteVarInt32(PacketLen));
-	AString LengthData;
+	ContiguousByteBuffer LengthData;
 	OutPacketLenBuffer.ReadAll(LengthData);
-	a_Client.SendData(LengthData.data(), LengthData.size());
+	a_Client.SendData(LengthData);
 
 	// Send the packet's payload:
-	AString PacketData;
+	ContiguousByteBuffer PacketData;
 	a_OutPacketBuffer.ReadAll(PacketData);
 	a_OutPacketBuffer.CommitRead();
-	a_Client.SendData(PacketData.data(), PacketData.size());
+	a_Client.SendData(PacketData);
 }
 
 

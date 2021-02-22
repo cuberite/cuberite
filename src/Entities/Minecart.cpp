@@ -137,7 +137,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	auto relPos = a_Chunk.AbsoluteToRelative(GetPosition());
+	auto relPos = cChunkDef::AbsoluteToRelative(GetPosition());
 	auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relPos);
 	if (chunk == nullptr)
 	{
@@ -215,6 +215,9 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_bIsOnDetectorRail = true;
 		m_DetectorRailPosition = Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
 	}
+
+	// Enforce speed limit:
+	m_Speed.Clamp(MAX_SPEED_NEGATIVE, MAX_SPEED);
 
 	// Broadcast positioning changes to client
 	BroadcastMovementUpdate();
@@ -1203,7 +1206,6 @@ bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 {
 	if ((TDI.Attacker != nullptr) && TDI.Attacker->IsPlayer() && static_cast<cPlayer *>(TDI.Attacker)->IsGameModeCreative())
 	{
-		Destroy();
 		TDI.FinalDamage = GetMaxHealth();  // Instant hit for creative
 		SetInvulnerableTicks(0);
 		return Super::DoTakeDamage(TDI);  // No drops for creative
@@ -1217,43 +1219,32 @@ bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 
 	m_World->BroadcastEntityMetadata(*this);
 
-	if (GetHealth() <= 0)
-	{
-		Destroy();
-
-		cItems Drops;
-		switch (m_Payload)
-		{
-			case mpNone:
-			{
-				Drops.push_back(cItem(E_ITEM_MINECART, 1, 0));
-				break;
-			}
-			case mpChest:
-			{
-				Drops.push_back(cItem(E_ITEM_CHEST_MINECART, 1, 0));
-				break;
-			}
-			case mpFurnace:
-			{
-				Drops.push_back(cItem(E_ITEM_FURNACE_MINECART, 1, 0));
-				break;
-			}
-			case mpTNT:
-			{
-				Drops.push_back(cItem(E_ITEM_MINECART_WITH_TNT, 1, 0));
-				break;
-			}
-			case mpHopper:
-			{
-				Drops.push_back(cItem(E_ITEM_MINECART_WITH_HOPPER, 1, 0));
-				break;
-			}
-		}
-
-		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
-	}
 	return true;
+}
+
+
+
+
+
+void cMinecart::KilledBy(TakeDamageInfo & a_TDI)
+{
+	Super::KilledBy(a_TDI);
+
+	Destroy();
+}
+
+
+
+
+
+void cMinecart::OnRemoveFromWorld(cWorld & a_World)
+{
+	if (m_bIsOnDetectorRail)
+	{
+		m_World->SetBlock(m_DetectorRailPosition.x, m_DetectorRailPosition.y, m_DetectorRailPosition.z, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
+	}
+
+	Super::OnRemoveFromWorld(a_World);
 }
 
 
@@ -1280,52 +1271,6 @@ void cMinecart::ApplyAcceleration(Vector3d a_ForwardDirection, double a_Accelera
 
 
 
-void cMinecart::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
-{
-	if (a_SpeedX > MAX_SPEED)
-	{
-		a_SpeedX = MAX_SPEED;
-	}
-	else if (a_SpeedX < MAX_SPEED_NEGATIVE)
-	{
-		a_SpeedX = MAX_SPEED_NEGATIVE;
-	}
-	if (a_SpeedY > MAX_SPEED)
-	{
-		a_SpeedY = MAX_SPEED;
-	}
-	else if (a_SpeedY < MAX_SPEED_NEGATIVE)
-	{
-		a_SpeedY = MAX_SPEED_NEGATIVE;
-	}
-	if (a_SpeedZ > MAX_SPEED)
-	{
-		a_SpeedZ = MAX_SPEED;
-	}
-	else if (a_SpeedZ < MAX_SPEED_NEGATIVE)
-	{
-		a_SpeedZ = MAX_SPEED_NEGATIVE;
-	}
-
-	Super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
-}
-
-
-
-
-
-void cMinecart::Destroyed()
-{
-	if (m_bIsOnDetectorRail)
-	{
-		m_World->SetBlock(m_DetectorRailPosition.x, m_DetectorRailPosition.y, m_DetectorRailPosition.z, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
-	}
-}
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cRideableMinecart:
 
@@ -1334,6 +1279,15 @@ cRideableMinecart::cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, in
 	m_Content(a_Content),
 	m_Height(a_Height)
 {
+}
+
+
+
+
+
+void cRideableMinecart::GetDrops(cItems & a_Drops, cEntity * a_Killer)
+{
+	a_Drops.emplace_back(E_ITEM_MINECART);
 }
 
 
@@ -1386,6 +1340,31 @@ cMinecartWithChest::cMinecartWithChest(Vector3d a_Pos):
 
 
 
+void cMinecartWithChest::GetDrops(cItems & a_Drops, cEntity * a_Killer)
+{
+	m_Contents.CopyToItems(a_Drops);
+	a_Drops.emplace_back(E_ITEM_CHEST_MINECART);
+}
+
+
+
+
+
+void cMinecartWithChest::OnRemoveFromWorld(cWorld & a_World)
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		Window->OwnerDestroyed();
+	}
+
+	Super::OnRemoveFromWorld(a_World);
+}
+
+
+
+
+
 void cMinecartWithChest::OnRightClicked(cPlayer & a_Player)
 {
 	if (!m_LootTable.empty())
@@ -1425,32 +1404,6 @@ void cMinecartWithChest::OpenNewWindow()
 
 
 
-void cMinecartWithChest::Destroyed()
-{
-	if (GetWindow() != nullptr)
-	{
-		GetWindow()->OwnerDestroyed();
-	}
-	cItems Pickups;
-	m_Contents.CopyToItems(Pickups);
-
-
-	// Schedule the pickups creation for the next world tick
-	// This avoids a deadlock when terminating the world
-	// Note that the scheduled task may be run when this object is no longer valid, we need to store everything in the task's captured variables
-	auto posX = GetPosX();
-	auto posY = GetPosY() + 1;
-	auto posZ = GetPosZ();
-	GetWorld()->ScheduleTask(1, [Pickups, posX, posY, posZ](cWorld & World)
-	{
-		World.SpawnItemPickups(Pickups, posX, posY, posZ, 4);
-	});
-}
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithFurnace:
 
@@ -1459,6 +1412,15 @@ cMinecartWithFurnace::cMinecartWithFurnace(Vector3d a_Pos):
 	m_FueledTimeLeft(-1),
 	m_IsFueled(false)
 {
+}
+
+
+
+
+
+void cMinecartWithFurnace::GetDrops(cItems & a_Drops, cEntity * a_Killer)
+{
+	a_Drops.emplace_back(E_ITEM_FURNACE_MINECART);
 }
 
 
@@ -1532,6 +1494,15 @@ cMinecartWithTNT::cMinecartWithTNT(Vector3d a_Pos):
 
 
 
+void cMinecartWithTNT::GetDrops(cItems & a_Drops, cEntity * a_Killer)
+{
+	a_Drops.emplace_back(E_ITEM_MINECART_WITH_TNT);
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithHopper:
 
@@ -1542,3 +1513,12 @@ cMinecartWithHopper::cMinecartWithHopper(Vector3d a_Pos):
 
 // TODO: Make it suck up blocks and travel further than any other cart and physics and put and take blocks
 // AND AVARYTHING!!
+
+
+
+
+
+void cMinecartWithHopper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
+{
+	a_Drops.emplace_back(E_ITEM_MINECART_WITH_HOPPER);
+}

@@ -63,10 +63,10 @@ public:
 
 	cRavine(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_Size, cNoise & a_Noise);
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 	/** Exports itself as a SVG line definition */
 	AString ExportAsSVG(int a_Color, int a_OffsetX = 0, int a_OffsetZ = 0) const;
-	#endif  // _DEBUG
+	#endif  // !NDEBUG
 
 protected:
 	// cGridStructGen::cStructure overrides:
@@ -277,7 +277,7 @@ void cStructGenRavines::cRavine::FinishLinear(void)
 
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 AString cStructGenRavines::cRavine::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) const
 {
 	AString SVG;
@@ -318,7 +318,7 @@ AString cStructGenRavines::cRavine::ExportAsSVG(int a_Color, int a_OffsetX, int 
 	}
 	return SVG;
 }
-#endif  // _DEBUG
+#endif  // !NDEBUG
 
 
 
@@ -349,13 +349,13 @@ void cStructGenRavines::cRavine::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
 		int DifZ = BlockStartZ - itr->m_BlockZ;  // substitution for faster calc
 		for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
 		{
-			#ifdef _DEBUG
+			#ifndef NDEBUG
 			// DEBUG: Make the ravine shapepoints visible on a single layer (so that we can see with Minutor what's going on)
 			if ((DifX + x == 0) && (DifZ + z == 0))
 			{
 				a_ChunkDesc.SetBlockType(x, 4, z, E_BLOCK_LAPIS_ORE);
 			}
-			#endif  // _DEBUG
+			#endif  // !NDEBUG
 
 			int DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
 			if (DistSq <= RadiusSq)

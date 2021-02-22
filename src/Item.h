@@ -138,12 +138,12 @@ public:
 	static bool IsEnchantable(short a_ItemType, bool a_FromBook = false);  // tolua_export
 
 	/** Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0 */
-	int GetEnchantability();  // tolua_export
+	unsigned GetEnchantability();  // tolua_export
 
 	/** Randomly enchants the item using the specified number of XP levels.
 	Returns true if the item was enchanted, false if not (not enchantable / too many enchantments already).
 	Randomness is derived from the provided PRNG. */
-	bool EnchantByXPLevels(int a_NumXPLevels, MTRand & a_Random);  // Exported in ManualBindings.cpp
+	bool EnchantByXPLevels(unsigned a_NumXPLevels, MTRand & a_Random);  // Exported in ManualBindings.cpp
 
 	/** Adds this specific enchantment to this item, returning the cost.
 	FromBook specifies whether the enchantment should be treated as coming

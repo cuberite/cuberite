@@ -43,13 +43,8 @@ void cAesCfb128Decryptor::Init(const Byte a_Key[16], const Byte a_IV[16])
 
 
 
-void cAesCfb128Decryptor::ProcessData(Byte * a_DecryptedOut, const Byte * a_EncryptedIn, size_t a_Length)
+void cAesCfb128Decryptor::ProcessData(std::byte * a_DecryptedOut, const Byte * a_EncryptedIn, size_t a_Length)
 {
 	ASSERT(IsValid());  // Must Init() first
-	mbedtls_aes_crypt_cfb8(&m_Aes, MBEDTLS_AES_DECRYPT, a_Length, m_IV, a_EncryptedIn, a_DecryptedOut);
+	mbedtls_aes_crypt_cfb8(&m_Aes, MBEDTLS_AES_DECRYPT, a_Length, m_IV, a_EncryptedIn, reinterpret_cast<unsigned char *>(a_DecryptedOut));
 }
-
-
-
-
-

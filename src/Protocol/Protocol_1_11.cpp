@@ -16,6 +16,7 @@ Implements the 1.11 protocol classes:
 #include "../WorldStorage/FastNBT.h"
 
 #include "../Entities/Boat.h"
+#include "../Entities/EnderCrystal.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
@@ -377,12 +378,20 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
+	const auto MobType = GetProtocolMobType(a_Mob.GetMobType());
+
+	// If the type is not valid in this protocol bail out:
+	if (MobType == 0)
+	{
+		return;
+	}
+
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
-	Pkt.WriteVarInt32(GetProtocolMobType(a_Mob.GetMobType()));
+	Pkt.WriteVarInt32(MobType);
 	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
@@ -511,7 +520,7 @@ void cProtocol_1_11_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity 
 	}
 
 	Writer.Finish();
-	a_Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
+	a_Pkt.WriteBuf(Writer.GetResult());
 }
 
 
@@ -542,7 +551,7 @@ cProtocol::Version cProtocol_1_11_0::GetProtocolVersion()
 
 
 
-UInt32 cProtocol_1_11_0::GetProtocolMobType(eMonsterType a_MobType)
+UInt32 cProtocol_1_11_0::GetProtocolMobType(const eMonsterType a_MobType)
 {
 	switch (a_MobType)
 	{
@@ -554,26 +563,38 @@ UInt32 cProtocol_1_11_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtChicken:               return 93;
 		case mtCow:                   return 92;
 		case mtCreeper:               return 50;
+		case mtDonkey:                return 31;
 		case mtEnderDragon:           return 63;
 		case mtEnderman:              return 58;
+		case mtEndermite:             return 67;
+		case mtEvoker:                return 34;
 		case mtGhast:                 return 56;
 		case mtGiant:                 return 53;
 		case mtGuardian:              return 68;
 		case mtHorse:                 return 100;
+		case mtHusk:                  return 23;
 		case mtIronGolem:             return 99;
+		case mtLlama:                 return 103;
 		case mtMagmaCube:             return 62;
 		case mtMooshroom:             return 96;
+		case mtMule:                  return 32;
 		case mtOcelot:                return 98;
 		case mtPig:                   return 90;
+		case mtPolarBear:             return 102;
 		case mtRabbit:                return 101;
 		case mtSheep:                 return 91;
+		case mtShulker:               return 69;
 		case mtSilverfish:            return 60;
 		case mtSkeleton:              return 51;
 		case mtSlime:                 return 55;
 		case mtSnowGolem:             return 97;
 		case mtSpider:                return 52;
+		case mtStray:                 return 6;
+		case mtTraderLlama:           return 103;
 		case mtSquid:                 return 94;
+		case mtVex:                   return 35;
 		case mtVillager:              return 120;
+		case mtVindicator:            return 36;
 		case mtWitch:                 return 66;
 		case mtWither:                return 64;
 		case mtWitherSkeleton:        return 5;
@@ -581,8 +602,9 @@ UInt32 cProtocol_1_11_0::GetProtocolMobType(eMonsterType a_MobType)
 		case mtZombie:                return 54;
 		case mtZombiePigman:          return 57;
 		case mtZombieVillager:        return 27;
+
+		default:                      return 0;
 	}
-	UNREACHABLE("Unsupported mob type");
 }
 
 
@@ -805,6 +827,22 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 			break;
 		}  // case etItemFrame
 
+		case cEntity::etEnderCrystal:
+		{
+			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
+			if (EnderCrystal.DisplaysBeam())
+			{
+				a_Pkt.WriteBEUInt8(ENDER_CRYSTAL_BEAM_TARGET);
+				a_Pkt.WriteBEUInt8(METADATA_TYPE_OPTIONAL_POSITION);
+				a_Pkt.WriteBool(true);  // Dont do a second check if it should display the beam
+				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
+			}
+			a_Pkt.WriteBEUInt8(ENDER_CRYSTAL_SHOW_BOTTOM);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
+			break;
+		}  // case etEnderCrystal
+
 		default:
 		{
 			break;
@@ -820,7 +858,7 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 {
 	using namespace Metadata_1_11;
 
-	// Living Enitiy Metadata
+	// Living entity Metadata
 	if (a_Mob.HasCustomName())
 	{
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
@@ -912,7 +950,7 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 
 		case mtHorse:
 		{
-			// XXX This behaves incorrectly with different varients; horses have different entity IDs now
+			// XXX This behaves incorrectly with different variants; horses have different entity IDs now
 
 			// Abstract horse
 			auto & Horse = static_cast<const cHorse &>(a_Mob);
@@ -979,6 +1017,7 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 
 		case mtOcelot:
 		{
+			// Todo: move unnecessary to cat
 			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
 
 			a_Pkt.WriteBEUInt8(AGEABLE_BABY);
@@ -1136,7 +1175,7 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 
 		case mtZombie:
 		{
-			// XXX Zombies were also split into new sublcasses; this doesn't handle that.
+			// XXX Zombies were also split into new subclasses; this doesn't handle that.
 			auto & Zombie = static_cast<const cZombie &>(a_Mob);
 			a_Pkt.WriteBEUInt8(ZOMBIE_IS_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
@@ -1170,7 +1209,59 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtZombieVillager
 
-		default: break;
+		case mtBlaze:
+		case mtElderGuardian:
+		case mtGuardian:
+		case mtSnowGolem:
+		{
+			// TODO: Mobs with extra fields that aren't implemented
+			break;
+		}
+
+		case mtCat:
+
+		case mtDonkey:
+		case mtMule:
+
+		case mtEndermite:
+
+		case mtEvoker:
+
+		case mtLlama:
+
+		case mtPolarBear:
+
+		case mtShulker:
+
+		case mtSkeletonHorse:
+		case mtZombieHorse:
+
+		case mtVex:
+
+		case mtVindicator:
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			ASSERT(!"cProtocol_1_11::WriteMobMetadata: received unimplemented type");
+			break;
+		}
+
+		case mtCaveSpider:
+		case mtEnderDragon:
+		case mtGiant:
+		case mtIronGolem:
+		case mtMooshroom:
+		case mtSilverfish:
+		case mtSkeleton:
+		case mtStray:
+		case mtSpider:
+		case mtSquid:
+		case mtWitherSkeleton:
+		{
+			// Mobs without additional metadata
+			break;
+		}
+
+		default: UNREACHABLE("cProtocol_1_11::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
 
