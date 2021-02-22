@@ -1104,7 +1104,7 @@ namespace LootTable
 					case cEntity::etMonster:
 					{
 						const auto & Monster = static_cast<cMonster &>(a_Entity);
-						// Todo: wait from monster namespace serializer PR
+						return NamespaceSerializer::ToMonsterType(m_EntityType) == Monster.GetMobType();
 					}
 					case cEntity::etFallingBlock: return (NoCaseCompare(m_EntityType, "falling_block") == 0);
 					case cEntity::etMinecart:     return (NoCaseCompare(m_EntityType, "minecart") == 0);
