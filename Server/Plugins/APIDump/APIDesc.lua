@@ -16999,6 +16999,58 @@ end
 				{
 					Notes = "A flag in the metadata of sponges that indicates that the sponge is wet.",
 				},
+				E_META_MUSHROOM_ALL_SIDES  =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on all sides.",
+				},
+				E_META_MUSHROOM_NORTH_WEST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the pore texture on north and west side.",
+				},
+				E_META_MUSHROOM_NORTH =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on north side.",
+				},
+				E_META_MUSHROOM_NORTH_EAST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on north and east side.",
+				},
+				E_META_MUSHROOM_WEST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on west side.",
+				},
+				E_META_MUSHROOM_CENTER =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on top.",
+				},
+				E_META_MUSHROOM_EAST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on east side.",
+				},
+				E_META_MUSHROOM_SOUTH_WEST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on south and west side.",
+				},
+				E_META_MUSHROOM_SOUTH =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on south side.",
+				},
+				E_META_MUSHROOM_SOUTH_EAST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on south and east side.",
+				},
+				E_META_MUSHROOM_STEM =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the stem texture on all sides but not on top and bottom.",
+				},
+				E_META_MUSHROOM_CAP =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on all sides.",
+				},
+				E_META_MUSHROOM_FULL_STEM =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the stem texture on all sides.",
+				},
 				esBed =
 				{
 					Notes = "A bed explosion. The SourceData param is the {{Vector3i|position}} of the bed.",
