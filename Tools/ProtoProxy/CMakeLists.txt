@@ -15,8 +15,6 @@ function(flatten_files arg1)
 	set(${arg1} "${res}" PARENT_SCOPE)
 endfunction()
 
-add_subdirectory(../../lib/zlib ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/lib/zlib)
-
 # Include the shared files:
 set(SHARED_SRC
 	../../src/ByteBuffer.cpp
@@ -33,6 +31,7 @@ set(SHARED_SRC
 )
 set(SHARED_HDR
 	../../src/ByteBuffer.h
+	../../src/Globals.h
 	../../src/StringUtils.h
 	../../src/UUID.h
 	../../src/mbedTLS++/AesCfb128Decryptor.h
@@ -72,13 +71,11 @@ source_group("Shared\\OSSupport" FILES ${SHARED_OSS_SRC} ${SHARED_OSS_HDR})
 # Include the main source files:
 set(SOURCES
 	Connection.cpp
-	Globals.cpp
 	ProtoProxy.cpp
 	Server.cpp
 )
 set(HEADERS
 	Connection.h
-	Globals.h
 	Server.h
 )
 source_group("" FILES ${SOURCES} ${HEADERS})
@@ -92,7 +89,7 @@ add_executable(ProtoProxy
 	${SHARED_OSS_HDR}
 )
 
-target_link_libraries(ProtoProxy zlib mbedtls fmt::fmt Threads::Threads)
+target_link_libraries(ProtoProxy fmt::fmt libdeflate mbedtls Threads::Threads)
 
 include(../../SetFlags.cmake)
 set_exe_flags(ProtoProxy)

@@ -10,6 +10,7 @@
 #pragma once
 
 #include "../BlockArea.h"
+#include "../StringCompression.h"
 
 
 
@@ -26,29 +27,23 @@ class cSchematicFileSerializer
 {
 public:
 
-	/** Loads an area from a .schematic file. Returns true if successful. */
-	static bool LoadFromSchematicFile(cBlockArea & a_BlockArea, const AString & a_FileName);
+	/** Loads an area from a .schematic file. */
+	static void LoadFromSchematicFile(cBlockArea & a_BlockArea, const std::string & a_FileName);
 
-	/** Loads an area from a string containing the .schematic file data. Returns true if successful. */
-	static bool LoadFromSchematicString(cBlockArea & a_BlockArea, const AString & a_SchematicData);
+	/** Loads an area from a string containing the .schematic file data. */
+	static void LoadFromSchematicString(cBlockArea & a_BlockArea, ContiguousByteBufferView a_SchematicData);
 
-	/** Saves the area into a .schematic file. Returns true if successful. */
-	static bool SaveToSchematicFile(const cBlockArea & a_BlockArea, const AString & a_FileName);
+	/** Saves the area into a .schematic file. */
+	static void SaveToSchematicFile(const cBlockArea & a_BlockArea, const std::string & a_FileName);
 
-	/** Saves the area into a string containing the .schematic file data.
-	Returns true if successful, false on failure. The data is stored into a_Out. */
-	static bool SaveToSchematicString(const cBlockArea & a_BlockArea, AString & a_Out);
+	/** Saves the area into a string containing the .schematic file data. */
+	static Compression::Result SaveToSchematicString(const cBlockArea & a_BlockArea);
 
 private:
-	/** Loads the area from a schematic file uncompressed and parsed into a NBT tree.
-	Returns true if successful. */
-	static bool LoadFromSchematicNBT(cBlockArea & a_BlockArea, cParsedNBT & a_NBT);
 
-	/** Saves the area into a NBT representation and returns the NBT data as a string.
-	Returns an empty string if failed. */
-	static AString SaveToSchematicNBT(const cBlockArea & a_BlockArea);
+	/** Loads the area from a schematic file uncompressed and parsed into a NBT tree. */
+	static void LoadFromSchematicNBT(cBlockArea & a_BlockArea, const cParsedNBT & a_NBT);
+
+	/** Saves the area into a NBT representation and returns the NBT data as a string. */
+	static ContiguousByteBuffer SaveToSchematicNBT(const cBlockArea & a_BlockArea);
 };
-
-
-
-

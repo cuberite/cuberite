@@ -74,8 +74,7 @@ private:
 
 			case BLOCK_FACE_NONE:
 			{
-				ASSERT(!"Unhandled block face!");
-				return a_Meta | 0xC;  // No idea, give a special meta
+				break;
 			}
 		}
 		UNREACHABLE("Unsupported block face");

@@ -29,7 +29,7 @@ private:
 
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
 	{
-		a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { CheckSoaked(a_Chunk.AbsoluteToRelative(a_BlockPos), a_Chunk); return true; });
+		a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { CheckSoaked(cChunkDef::AbsoluteToRelative(a_BlockPos), a_Chunk); return true; });
 	}
 
 	/** Check blocks around the sponge to see if they are water.

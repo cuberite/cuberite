@@ -11,7 +11,7 @@
 
 
 
-#if defined(_MSC_VER) && defined(_DEBUG)
+#if defined(_MSC_VER) && !defined(NDEBUG)
 	// Code adapted from MSDN: https://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
 
 	const DWORD MS_VC_EXCEPTION = 0x406D1388;
@@ -39,7 +39,7 @@
 		{
 		}
 	}
-#endif  // _MSC_VER && _DEBUG
+#endif  // _MSC_VER && !NDEBUG
 
 
 
@@ -84,7 +84,7 @@ bool cIsThread::Start(void)
 		// Initialize the thread:
 		m_Thread = std::thread(&cIsThread::DoExecute, this);
 
-		#if defined (_MSC_VER) && defined(_DEBUG)
+		#if defined(_MSC_VER) && !defined(NDEBUG)
 		if (!m_ThreadName.empty())
 		{
 			SetThreadName(&m_Thread, m_ThreadName.c_str());

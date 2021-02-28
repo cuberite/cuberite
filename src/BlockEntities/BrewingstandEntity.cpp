@@ -13,36 +13,11 @@
 
 cBrewingstandEntity::cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
-	m_IsDestroyed(false),
 	m_IsBrewing(false),
 	m_TimeBrewed(0),
 	m_RemainingFuel(0)
 {
 	m_Contents.AddListener(*this);
-}
-
-
-
-
-
-cBrewingstandEntity::~cBrewingstandEntity()
-{
-	// Tell window its owner is destroyed
-	cWindow * Window = GetWindow();
-	if (Window != nullptr)
-	{
-		Window->OwnerDestroyed();
-	}
-}
-
-
-
-
-
-void cBrewingstandEntity::Destroy()
-{
-	m_IsDestroyed = true;
-	Super::Destroy();
 }
 
 
@@ -64,6 +39,20 @@ void cBrewingstandEntity::CopyFrom(const cBlockEntity & a_Src)
 	}
 	m_TimeBrewed = src.m_TimeBrewed;
 	m_RemainingFuel = src.m_RemainingFuel;
+}
+
+
+
+
+
+void cBrewingstandEntity::OnRemoveFromWorld()
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		// Tell window its owner is destroyed:
+		Window->OwnerDestroyed();
+	}
 }
 
 
@@ -205,11 +194,6 @@ void cBrewingstandEntity::BroadcastProgress(size_t a_ProgressbarID, short a_Valu
 void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
 	Super::OnSlotChanged(a_ItemGrid, a_SlotNum);
-
-	if (m_IsDestroyed)
-	{
-		return;
-	}
 
 	ASSERT(a_ItemGrid == &m_Contents);
 

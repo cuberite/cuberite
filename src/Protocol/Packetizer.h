@@ -119,9 +119,9 @@ public:
 	}
 
 
-	inline void WriteBuf(const char * a_Data, size_t a_Size)
+	inline void WriteBuf(const ContiguousByteBufferView a_Data)
 	{
-		VERIFY(m_Out.Write(a_Data, a_Size));
+		VERIFY(m_Out.Write(a_Data.data(), a_Data.size()));
 	}
 
 
@@ -134,9 +134,9 @@ public:
 
 	/** Writes the specified block position as a single encoded 64-bit BigEndian integer.
 	The three coordinates are written in XYZ order. */
-	inline void WriteXYZPosition64(const Vector3i & a_Pos)
+	inline void WriteXYZPosition64(const Vector3i a_Position)
 	{
-		VERIFY(m_Out.WriteXYZPosition64(a_Pos.x, a_Pos.y, a_Pos.z));
+		VERIFY(m_Out.WriteXYZPosition64(a_Position.x, a_Position.y, a_Position.z));
 	}
 
 	/** Writes the specified block position as a single encoded 64-bit BigEndian integer.

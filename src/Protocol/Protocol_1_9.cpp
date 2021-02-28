@@ -418,12 +418,20 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
+	const auto MobType = GetProtocolMobType(a_Mob.GetMobType());
+
+	// If the type is not valid in this protocol bail out:
+	if (MobType == 0)
+	{
+		return;
+	}
+
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
-	Pkt.WriteBEUInt8(static_cast<Byte>(GetProtocolMobType(a_Mob.GetMobType())));
+	Pkt.WriteBEUInt8(static_cast<Byte>(MobType));
 	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
@@ -475,80 +483,81 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 {
 	switch (a_Packet)
 	{
-		case pktAttachEntity:          return 0x40;
-		case pktBlockAction:           return 0x0a;
-		case pktBlockBreakAnim:        return 0x08;
-		case pktBlockChange:           return 0x0b;
-		case pktBlockChanges:          return 0x10;
-		case pktCameraSetTo:           return 0x36;
-		case pktChatRaw:               return 0x0f;
-		case pktCollectEntity:         return 0x49;
-		case pktDestroyEntity:         return 0x30;
-		case pktDifficulty:            return 0x0d;
-		case pktDisconnectDuringGame:  return 0x1a;
-		case pktDisconnectDuringLogin: return 0x0;
-		case pktDisplayObjective:      return 0x38;
-		case pktEditSign:              return 0x2a;
-		case pktEncryptionRequest:     return 0x01;
-		case pktEntityAnimation:       return 0x06;
-		case pktEntityEffect:          return 0x4c;
-		case pktEntityEquipment:       return 0x3c;
-		case pktEntityHeadLook:        return 0x34;
-		case pktEntityLook:            return 0x27;
-		case pktEntityMeta:            return 0x39;
-		case pktEntityProperties:      return 0x4b;
-		case pktEntityRelMove:         return 0x25;
-		case pktEntityRelMoveLook:     return 0x26;
-		case pktEntityStatus:          return 0x1b;
-		case pktEntityVelocity:        return 0x3b;
-		case pktExperience:            return 0x3d;
-		case pktExplosion:             return 0x1c;
-		case pktGameMode:              return 0x1e;
-		case pktHeldItemChange:        return 0x37;
-		case pktInventorySlot:         return 0x16;
-		case pktJoinGame:              return 0x23;
-		case pktKeepAlive:             return 0x1f;
-		case pktLeashEntity:           return 0x3a;
-		case pktLoginSuccess:          return 0x02;
-		case pktMapData:               return 0x24;
-		case pktParticleEffect:        return 0x22;
-		case pktPingResponse:          return 0x01;
-		case pktPlayerAbilities:       return 0x2b;
-		case pktPlayerList:            return 0x2d;
-		case pktPlayerMaxSpeed:        return 0x4b;
-		case pktPlayerMoveLook:        return 0x2e;
-		case pktPluginMessage:         return 0x18;
-		case pktRemoveEntityEffect:    return 0x31;
-		case pktResourcePack:          return 0x32;
-		case pktRespawn:               return 0x33;
-		case pktScoreboardObjective:   return 0x3f;
-		case pktSpawnExperienceOrb:    return 0x01;
-		case pktSpawnGlobalEntity:     return 0x02;
-		case pktSpawnObject:           return 0x00;
-		case pktSpawnOtherPlayer:      return 0x05;
-		case pktSpawnPainting:         return 0x04;
-		case pktSpawnPosition:         return 0x43;
-		case pktSoundEffect:           return 0x19;
-		case pktSoundParticleEffect:   return 0x21;
-		case pktSpawnMob:              return 0x03;
-		case pktStartCompression:      return 0x03;
-		case pktStatistics:            return 0x07;
-		case pktStatusResponse:        return 0x00;
-		case pktTabCompletionResults:  return 0x0e;
-		case pktTeleportEntity:        return 0x4a;
-		case pktTimeUpdate:            return 0x44;
-		case pktTitle:                 return 0x45;
-		case pktUnloadChunk:           return 0x1d;
-		case pktUpdateBlockEntity:     return 0x09;
-		case pktUpdateHealth:          return 0x3e;
-		case pktUpdateScore:           return 0x42;
-		case pktUpdateSign:            return 0x46;
-		case pktUseBed:                return 0x2f;
-		case pktWeather:               return 0x1e;
-		case pktWindowClose:           return 0x12;
-		case pktWindowItems:           return 0x14;
-		case pktWindowOpen:            return 0x13;
-		case pktWindowProperty:        return 0x15;
+		case pktAttachEntity:           return 0x40;
+		case pktBlockAction:            return 0x0a;
+		case pktBlockBreakAnim:         return 0x08;
+		case pktBlockChange:            return 0x0b;
+		case pktBlockChanges:           return 0x10;
+		case pktCameraSetTo:            return 0x36;
+		case pktChatRaw:                return 0x0f;
+		case pktCollectEntity:          return 0x49;
+		case pktDestroyEntity:          return 0x30;
+		case pktDifficulty:             return 0x0d;
+		case pktDisconnectDuringGame:   return 0x1a;
+		case pktDisconnectDuringLogin:  return 0x0;
+		case pktDisplayObjective:       return 0x38;
+		case pktEditSign:               return 0x2a;
+		case pktEncryptionRequest:      return 0x01;
+		case pktEntityAnimation:        return 0x06;
+		case pktEntityEffect:           return 0x4c;
+		case pktEntityEquipment:        return 0x3c;
+		case pktEntityHeadLook:         return 0x34;
+		case pktEntityLook:             return 0x27;
+		case pktEntityMeta:             return 0x39;
+		case pktEntityProperties:       return 0x4b;
+		case pktEntityRelMove:          return 0x25;
+		case pktEntityRelMoveLook:      return 0x26;
+		case pktEntityStatus:           return 0x1b;
+		case pktEntityVelocity:         return 0x3b;
+		case pktExperience:             return 0x3d;
+		case pktExplosion:              return 0x1c;
+		case pktGameMode:               return 0x1e;
+		case pktHeldItemChange:         return 0x37;
+		case pktInventorySlot:          return 0x16;
+		case pktJoinGame:               return 0x23;
+		case pktKeepAlive:              return 0x1f;
+		case pktLeashEntity:            return 0x3a;
+		case pktLoginSuccess:           return 0x02;
+		case pktMapData:                return 0x24;
+		case pktParticleEffect:         return 0x22;
+		case pktPingResponse:           return 0x01;
+		case pktPlayerAbilities:        return 0x2b;
+		case pktPlayerList:             return 0x2d;
+		case pktPlayerListHeaderFooter: return 0x48;
+		case pktPlayerMaxSpeed:         return 0x4b;
+		case pktPlayerMoveLook:         return 0x2e;
+		case pktPluginMessage:          return 0x18;
+		case pktRemoveEntityEffect:     return 0x31;
+		case pktResourcePack:           return 0x32;
+		case pktRespawn:                return 0x33;
+		case pktScoreboardObjective:    return 0x3f;
+		case pktSpawnExperienceOrb:     return 0x01;
+		case pktSpawnGlobalEntity:      return 0x02;
+		case pktSpawnObject:            return 0x00;
+		case pktSpawnOtherPlayer:       return 0x05;
+		case pktSpawnPainting:          return 0x04;
+		case pktSpawnPosition:          return 0x43;
+		case pktSoundEffect:            return 0x19;
+		case pktSoundParticleEffect:    return 0x21;
+		case pktSpawnMob:               return 0x03;
+		case pktStartCompression:       return 0x03;
+		case pktStatistics:             return 0x07;
+		case pktStatusResponse:         return 0x00;
+		case pktTabCompletionResults:   return 0x0e;
+		case pktTeleportEntity:         return 0x4a;
+		case pktTimeUpdate:             return 0x44;
+		case pktTitle:                  return 0x45;
+		case pktUnloadChunk:            return 0x1d;
+		case pktUpdateBlockEntity:      return 0x09;
+		case pktUpdateHealth:           return 0x3e;
+		case pktUpdateScore:            return 0x42;
+		case pktUpdateSign:             return 0x46;
+		case pktUseBed:                 return 0x2f;
+		case pktWeather:                return 0x1e;
+		case pktWindowClose:            return 0x12;
+		case pktWindowItems:            return 0x14;
+		case pktWindowOpen:             return 0x13;
+		case pktWindowProperty:         return 0x15;
 
 		// Unsupported packets
 		case pktUnlockRecipe:
@@ -566,6 +575,19 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 cProtocol::Version cProtocol_1_9_0::GetProtocolVersion()
 {
 	return Version::v1_9_0;
+}
+
+
+
+
+
+UInt32 cProtocol_1_9_0::GetProtocolMobType(const eMonsterType a_MobType)
+{
+	switch (a_MobType)
+	{
+		case mtShulker: return 69;
+		default:        return Super::GetProtocolMobType(a_MobType);
+	}
 }
 
 
@@ -1010,10 +1032,10 @@ void cProtocol_1_9_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
+void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBufferView a_Metadata)
 {
 	// Parse into NBT:
-	cParsedNBT NBT(a_Metadata.data(), a_Metadata.size());
+	cParsedNBT NBT(a_Metadata);
 	if (!NBT.IsValid())
 	{
 		AString HexDump;
@@ -1417,13 +1439,13 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 
 	Writer.Finish();
 
-	AString Result = Writer.GetResult();
-	if (Result.size() == 0)
+	const auto Result = Writer.GetResult();
+	if (Result.empty())
 	{
 		a_Pkt.WriteBEInt8(0);
 		return;
 	}
-	a_Pkt.WriteBuf(Result.data(), Result.size());
+	a_Pkt.WriteBuf(Result);
 }
 
 
@@ -1529,7 +1551,7 @@ void cProtocol_1_9_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 	}
 
 	Writer.Finish();
-	a_Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
+	a_Pkt.WriteBuf(Writer.GetResult());
 }
 
 
@@ -1731,14 +1753,14 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 		case cEntity::etEnderCrystal:
 		{
 			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
-			a_Pkt.WriteBEUInt8(7);
+			a_Pkt.WriteBEUInt8(5);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_OPTIONAL_POSITION);
 			a_Pkt.WriteBool(EnderCrystal.DisplaysBeam());
 			if (EnderCrystal.DisplaysBeam())
 			{
 				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
 			}
-			a_Pkt.WriteBEUInt8(8);
+			a_Pkt.WriteBEUInt8(6);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
 			break;
@@ -1756,7 +1778,7 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 
 void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 {
-	// Living Enitiy Metadata
+	// Living entity metadata
 	if (a_Mob.HasCustomName())
 	{
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
@@ -1966,6 +1988,13 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtSheep
 
+		case mtSkeleton:
+		{
+			a_Pkt.WriteBEUInt8(11);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(0);
+		}
+
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -2097,7 +2126,49 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtZombieVillager
 
-		default: break;
+		case mtBlaze:
+		case mtElderGuardian:
+		case mtGuardian:
+		{
+			// TODO: Mobs with extra fields that aren't implemented
+			break;
+		}
+
+		case mtCat:
+
+		case mtDonkey:
+
+		case mtEndermite:
+
+		case mtMule:
+
+		case mtStray:
+
+		case mtSkeletonHorse:
+		case mtZombieHorse:
+
+		case mtShulker:
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			ASSERT(!"cProtocol_1_9::WriteMobMetadata: received unimplemented type");
+			break;
+		}
+
+		case mtCaveSpider:
+		case mtEnderDragon:
+		case mtGiant:
+		case mtIronGolem:
+		case mtMooshroom:
+		case mtSilverfish:
+		case mtSnowGolem:
+		case mtSpider:
+		case mtSquid:
+		{
+			// Entities without additional metadata
+			break;
+		}
+
+		default: UNREACHABLE("cProtocol_1_9::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
 
@@ -2216,7 +2287,7 @@ void cProtocol_1_9_4::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	Writer.AddString("Text4", JsonUtils::WriteFastString(Line4));
 
 	Writer.Finish();
-	Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
+	Pkt.WriteBuf(Writer.GetResult());
 }
 
 
@@ -2236,11 +2307,12 @@ UInt32 cProtocol_1_9_4::GetPacketID(cProtocol::ePacketType a_Packet)
 {
 	switch (a_Packet)
 	{
-		case pktCollectEntity:    return 0x48;
-		case pktEntityEffect:     return 0x4b;
-		case pktEntityProperties: return 0x4a;
-		case pktPlayerMaxSpeed:   return 0x4a;
-		case pktTeleportEntity:   return 0x49;
+		case pktCollectEntity:          return 0x48;
+		case pktEntityEffect:           return 0x4b;
+		case pktEntityProperties:       return 0x4a;
+		case pktPlayerMaxSpeed:         return 0x4a;
+		case pktPlayerListHeaderFooter: return 0x47;
+		case pktTeleportEntity:         return 0x49;
 
 		default: return Super::GetPacketID(a_Packet);
 	}

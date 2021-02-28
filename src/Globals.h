@@ -16,57 +16,33 @@
 
 // Compiler-dependent stuff:
 #if defined(_MSC_VER)
-	// Disable some warnings that we don't care about:
-	#pragma warning(disable:4100)  // Unreferenced formal parameter
-
-	// Useful warnings from warning level 4:
-	#pragma warning(3 : 4189)  // Local variable is initialized but not referenced
-	#pragma warning(3 : 4245)  // Conversion from 'type1' to 'type2', signed / unsigned mismatch
-	#pragma warning(3 : 4310)  // Cast truncates constant value
-	#pragma warning(3 : 4389)  // Signed / unsigned mismatch
-	#pragma warning(3 : 4505)  // Unreferenced local function has been removed
-	#pragma warning(3 : 4701)  // Potentially unitialized local variable used
-	#pragma warning(3 : 4702)  // Unreachable code
-	#pragma warning(3 : 4706)  // Assignment within conditional expression
-
-	// 2014-10-23 xoft: Disabled this because the new C++11 headers in MSVC produce tons of these warnings uselessly
-	// #pragma warning(3 : 4127)  // Conditional expression is constant
-
-	// Disabling this warning, because we know what we're doing when we're doing this:
-	#pragma warning(disable: 4355)  // 'this' used in initializer list
-
-	// Disabled because it's useless:
-	#pragma warning(disable: 4512)  // 'class': assignment operator could not be generated - reported for each class that has a reference-type member
-	#pragma warning(disable: 4351)  // new behavior: elements of array 'member' will be default initialized
-
-	// 2014_01_06 xoft: Disabled this warning because MSVC is stupid and reports it in obviously wrong places
-	// #pragma warning(3 : 4244)  // Conversion from 'type1' to 'type2', possible loss of data
-
 	// Use non-standard defines in <cmath>
 	#define _USE_MATH_DEFINES
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		// Override the "new" operator to include file and line specification for debugging memory leaks
 		// Ref.: https://social.msdn.microsoft.com/Forums/en-US/ebc7dd7a-f3c6-49f1-8a60-e381052f21b6/debugging-memory-leaks?forum=vcgeneral#53f0cc89-62fe-45e8-bbf0-56b89f2a1901
 		// This causes MSVC Debug runs to produce a report upon program exit, that contains memory-leaks
 		// together with the file:line information about where the memory was allocated.
 		// Note that this doesn't work with placement-new, which needs to temporarily #undef the macro
 		// (See AllocationPool.h for an example).
-		#ifdef _DEBUG
-			#define _CRTDBG_MAP_ALLOC
-			#include <stdlib.h>
-			#include <crtdbg.h>
-			#define DEBUG_CLIENTBLOCK   new(_CLIENT_BLOCK, __FILE__, __LINE__)
-			#define new DEBUG_CLIENTBLOCK
-			// For some reason this works magically - each "new X" gets replaced as "new(_CLIENT_BLOCK, "file", line) X"
-			// The CRT has a definition for this operator new that stores the debugging info for leak-finding later.
-		#endif
+		#define _CRTDBG_MAP_ALLOC
+		#include <stdlib.h>
+		#include <crtdbg.h>
+		#define DEBUG_CLIENTBLOCK   new(_CLIENT_BLOCK, __FILE__, __LINE__)
+		#define new DEBUG_CLIENTBLOCK
+		// For some reason this works magically - each "new X" gets replaced as "new(_CLIENT_BLOCK, "file", line) X"
+		// The CRT has a definition for this operator new that stores the debugging info for leak-finding later.
 	#endif
+
+	#define UNREACHABLE_INTRINSIC __assume(false)
 
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
 	#define abstract
+
+	#define UNREACHABLE_INTRINSIC __builtin_unreachable()
 
 #else
 
@@ -75,39 +51,8 @@
 #endif
 
 
-#include <stddef.h>
 
 
-// Integral types with predefined sizes:
-typedef signed long long Int64;
-typedef signed int       Int32;
-typedef signed short     Int16;
-typedef signed char      Int8;
-
-typedef unsigned long long UInt64;
-typedef unsigned int       UInt32;
-typedef unsigned short     UInt16;
-typedef unsigned char      UInt8;
-
-typedef unsigned char Byte;
-typedef Byte ColourID;
-
-
-template <typename T, size_t Size>
-class SizeChecker
-{
-	static_assert(sizeof(T) == Size, "Check the size of integral types");
-};
-
-template class SizeChecker<Int64, 8>;
-template class SizeChecker<Int32, 4>;
-template class SizeChecker<Int16, 2>;
-template class SizeChecker<Int8,  1>;
-
-template class SizeChecker<UInt64, 8>;
-template class SizeChecker<UInt32, 4>;
-template class SizeChecker<UInt16, 2>;
-template class SizeChecker<UInt8,  1>;
 
 // A macro to disallow the copy constructor and operator = functions
 // This should be used in the declarations for any class that shouldn't allow copying itself
@@ -126,6 +71,7 @@ template class SizeChecker<UInt8,  1>;
 #else
 	#define UNUSED UNUSED_VAR
 #endif
+
 
 
 
@@ -161,6 +107,7 @@ template class SizeChecker<UInt8,  1>;
 #include <cstdio>
 #include <cmath>
 #include <cstdarg>
+#include <cstddef>
 
 
 
@@ -188,9 +135,42 @@ template class SizeChecker<UInt8,  1>;
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <variant>
 
 
 
+
+
+// Integral types with predefined sizes:
+typedef signed long long Int64;
+typedef signed int       Int32;
+typedef signed short     Int16;
+typedef signed char      Int8;
+
+typedef unsigned long long UInt64;
+typedef unsigned int       UInt32;
+typedef unsigned short     UInt16;
+typedef unsigned char      UInt8;
+
+typedef unsigned char Byte;
+typedef Byte ColourID;
+
+
+template <typename T, size_t Size>
+class SizeChecker
+{
+	static_assert(sizeof(T) == Size, "Check the size of integral types");
+};
+
+template class SizeChecker<Int64, 8>;
+template class SizeChecker<Int32, 4>;
+template class SizeChecker<Int16, 2>;
+template class SizeChecker<Int8, 1>;
+
+template class SizeChecker<UInt64, 8>;
+template class SizeChecker<UInt32, 4>;
+template class SizeChecker<UInt16, 2>;
+template class SizeChecker<UInt8, 1>;
 
 // Common headers (part 1, without macros):
 #include "fmt.h"
@@ -273,10 +253,10 @@ template class SizeChecker<UInt8,  1>;
 		int lineNumber() const { return mLineNumber; }
 	};
 
-	#ifdef _DEBUG
-		#define ASSERT(x) do { if (!(x)) { throw cAssertFailure(#x, __FILE__, __LINE__);} } while (0)
+	#ifdef NDEBUG
+		#define ASSERT(x)
 	#else
-		#define ASSERT(...)
+		#define ASSERT(x) do { if (!(x)) { throw cAssertFailure(#x, __FILE__, __LINE__);} } while (0)
 	#endif
 
 	// Pretty much the same as ASSERT() but stays in Release builds
@@ -284,10 +264,10 @@ template class SizeChecker<UInt8,  1>;
 
 #else  // TEST_GLOBALS
 
-	#ifdef _DEBUG
-		#define ASSERT(x) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__), std::abort(), 0))
-	#else
+	#ifdef NDEBUG
 		#define ASSERT(x)
+	#else
+		#define ASSERT(x) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__), std::abort(), 0))
 	#endif
 
 	// Pretty much the same as ASSERT() but stays in Release builds
@@ -295,8 +275,46 @@ template class SizeChecker<UInt8,  1>;
 
 #endif  // else TEST_GLOBALS
 
-/** Use to mark code that should be impossible to reach. */
-#define UNREACHABLE(x) do { FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__); std::abort(); } while (false)
+// Use to mark code that should be impossible to reach.
+#ifdef NDEBUG
+	#define UNREACHABLE(x) UNREACHABLE_INTRINSIC
+#else
+	#define UNREACHABLE(x) ( FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__), std::abort(), 0)
+#endif
+
+
+
+
+
+namespace cpp20
+{
+	template <class T>
+	std::enable_if_t<std::is_array_v<T> && (std::extent_v<T> == 0), std::unique_ptr<T>> make_unique_for_overwrite(std::size_t a_Size)
+	{
+		return std::unique_ptr<T>(new std::remove_extent_t<T>[a_Size]);
+	}
+}
+
+
+
+
+
+/**
+You can use this struct to use in std::visit
+example:
+std::visit(
+	OverloadedVariantAccess
+	{
+		[&] (cFirstType  & a_FirstTypeObject)  {  // Your code to handle cFirstType },
+		[&] (cSecondType & a_SecondTypeObject) {  // YourCode to handle cSecondType },
+		...
+	}
+, YourVariant);
+You can use constant references if you want to.
+*/
+template<class... Ts> struct OverloadedVariantAccess : Ts... { using Ts::operator()...; };
+template<class... Ts> OverloadedVariantAccess(Ts...)->OverloadedVariantAccess<Ts...>;
+
 
 
 
@@ -334,6 +352,9 @@ typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
 using cTickTime = std::chrono::duration<int,  std::ratio_multiply<std::chrono::milliseconds::period, std::ratio<50>>>;
 using cTickTimeLong = std::chrono::duration<Int64,  cTickTime::period>;
 
+using ContiguousByteBuffer = std::basic_string<std::byte>;
+using ContiguousByteBufferView = std::basic_string_view<std::byte>;
+
 #ifndef TOLUA_TEMPLATE_BIND
 	#define TOLUA_TEMPLATE_BIND(x)
 #endif
@@ -355,4 +376,3 @@ auto ToUnsigned(T a_Val)
 
 // Common headers (part 2, with macros):
 #include "Vector3.h"
-

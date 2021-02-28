@@ -80,32 +80,6 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 
 
 
-cEntity::~cEntity()
-{
-	/*
-	// DEBUG:
-	FLOGD("Deleting entity {0} at pos {1:.2f} ~ [{2}, {3}]; ptr {4}",
-		m_UniqueID,
-		m_Pos,
-		GetChunkX(), GetChunkZ(),
-		static_cast<void *>(this)
-	);
-	*/
-
-	if (m_AttachedTo != nullptr)
-	{
-		Detach();
-	}
-	if (m_Attachee != nullptr)
-	{
-		m_Attachee->Detach();
-	}
-}
-
-
-
-
-
 const char * cEntity::GetClass(void) const
 {
 	return "cEntity";
@@ -147,6 +121,7 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 	);
 	*/
 
+
 	ASSERT(m_World == nullptr);
 	ASSERT(GetParentChunk() == nullptr);
 	SetWorld(&a_EntityWorld);
@@ -173,7 +148,22 @@ void cEntity::OnAddToWorld(cWorld & a_World)
 
 void cEntity::OnRemoveFromWorld(cWorld & a_World)
 {
-	RemoveAllLeashedMobs();
+	// Remove all mobs from the leashed list of mobs:
+	while (!m_LeashedMobs.empty())
+	{
+		m_LeashedMobs.front()->Unleash(false, true);
+	}
+
+	if (m_AttachedTo != nullptr)
+	{
+		Detach();
+	}
+
+	if (m_Attachee != nullptr)
+	{
+		m_Attachee->Detach();
+	}
+
 	a_World.BroadcastDestroyEntity(*this);
 }
 
@@ -243,7 +233,6 @@ void cEntity::Destroy()
 		// Also, not storing the returned pointer means automatic destruction
 		VERIFY(a_World.RemoveEntity(*this));
 	});
-	Destroyed();
 }
 
 
@@ -628,6 +617,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		case dtAttack:
 		case dtArrowAttack:
 		case dtCactusContact:
+		case dtMagmaContact:
 		case dtLavaContact:
 		case dtFireContact:
 		case dtExplosion:
@@ -656,7 +646,7 @@ float cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageTyp
 			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchProtection)) * 1;
 		}
 
-		if ((a_DamageType == dtBurning) || (a_DamageType == dtFireContact) || (a_DamageType == dtLavaContact))
+		if ((a_DamageType == dtBurning) || (a_DamageType == dtFireContact) || (a_DamageType == dtLavaContact) || (a_DamageType == dtMagmaContact))
 		{
 			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection)) * 2;
 		}
@@ -811,10 +801,17 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 		cRoot::Get()->GetPluginManager()->CallHookKilled(*this, a_TDI, emptystring);
 	}
 
-	// Drop loot:
-	cItems Drops;
-	GetDrops(Drops, a_TDI.Attacker);
-	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
+	// Drop loot, unless the attacker was a creative mode player:
+	if (
+		(a_TDI.Attacker == nullptr) ||
+		!a_TDI.Attacker->IsPlayer() ||
+		!static_cast<cPlayer *>(a_TDI.Attacker)->IsGameModeCreative()
+	)
+	{
+		cItems Drops;
+		GetDrops(Drops, a_TDI.Attacker);
+		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
+	}
 
 	m_World->BroadcastEntityStatus(*this, esGenericDead);
 }
@@ -897,6 +894,23 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		)
 		{
 			DetectCacti();
+		}
+
+		// Handle magma block damage
+		if
+		(
+			IsOnGround() &&
+			(
+				(IsMob() && !static_cast<cPawn *>(this)->IsFireproof()) ||
+				(
+					IsPlayer() && !((static_cast<cPlayer *>(this))->IsGameModeCreative() || (static_cast<cPlayer *>(this))->IsGameModeSpectator())
+					&& !static_cast<cPlayer *>(this)->IsFireproof()
+					&& !static_cast<cPlayer *>(this)->HasEntityEffect(cEntityEffect::effFireResistance)
+				)
+			)
+		)
+		{
+			DetectMagma();
 		}
 
 		// Handle drowning:
@@ -1169,12 +1183,6 @@ void cEntity::ApplyFriction(Vector3d & a_Speed, double a_SlowdownMultiplier, flo
 
 void cEntity::TickBurning(cChunk & a_Chunk)
 {
-	// If we're about to change worlds, then we can't accurately determine whether we're in lava (#3939)
-	if (IsWorldChangeScheduled())
-	{
-		return;
-	}
-
 	// Remember the current burning state:
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 
@@ -1184,8 +1192,8 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		m_TicksLeftBurning = 0;
 	}
 
-	// Fire is extinguished by rain
-	if (GetWorld()->IsWeatherWetAtXYZ(GetPosition().Floor()))
+	// Fire is extinguished by rain:
+	if (a_Chunk.IsWeatherWetAt(cChunkDef::AbsoluteToRelative(GetPosition().Floor(), a_Chunk.GetPos())))
 	{
 		m_TicksLeftBurning = 0;
 	}
@@ -1314,14 +1322,37 @@ void cEntity::DetectCacti(void)
 
 
 
+void cEntity::DetectMagma(void)
+{
+	int MinX = FloorC(GetPosX() - m_Width / 2);
+	int MaxX = FloorC(GetPosX() + m_Width / 2);
+	int MinZ = FloorC(GetPosZ() - m_Width / 2);
+	int MaxZ = FloorC(GetPosZ() + m_Width / 2);
+	int MinY = Clamp(POSY_TOINT - 1, 0, cChunkDef::Height - 1);
+	int MaxY = Clamp(FloorC(GetPosY() + m_Height), 0, cChunkDef::Height - 1);
+
+	for (int x = MinX; x <= MaxX; x++)
+	{
+		for (int z = MinZ; z <= MaxZ; z++)
+		{
+			for (int y = MinY; y <= MaxY; y++)
+			{
+				if (GetWorld()->GetBlock(x, y, z) == E_BLOCK_MAGMA)
+				{
+					TakeDamage(dtMagmaContact, nullptr, 1, 0);
+					return;
+				}
+			}  // for y
+		}  // for z
+	}  // for x
+}
+
+
+
+
+
 bool cEntity::DetectPortal()
 {
-	// If somebody scheduled a world change, do nothing.
-	if (IsWorldChangeScheduled())
-	{
-		return true;
-	}
-
 	if (GetWorld()->GetDimension() == dimOverworld)
 	{
 		if (GetWorld()->GetLinkedNetherWorldName().empty() && GetWorld()->GetLinkedEndWorldName().empty())
@@ -1337,7 +1368,7 @@ bool cEntity::DetectPortal()
 	}
 
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
-	if ((Y > 0) && (Y < cChunkDef::Height))
+	if (cChunkDef::IsValidHeight(Y))
 	{
 		switch (GetWorld()->GetBlock(X, Y, Z))
 		{
@@ -1370,16 +1401,8 @@ bool cEntity::DetectPortal()
 					{
 						return false;
 					}
-					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
-					eDimension DestionationDim = DestinationWorld->GetDimension();
 
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;  // Stop portals from working on respawn
-
-					if (IsPlayer())
-					{
-						// Send a respawn packet before world is loaded / generated so the client isn't left in limbo
-						(static_cast<cPlayer *>(this))->GetClientHandle()->SendRespawn(DestionationDim);
-					}
 
 					Vector3d TargetPos = GetPosition();
 					TargetPos.x *= 8.0;
@@ -1387,7 +1410,7 @@ bool cEntity::DetectPortal()
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimNether).c_str(), DimensionToString(DestionationDim).c_str());
+					LOGD("Jumping %s -> %s", DimensionToString(dimNether).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
 					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, cChunkDef::Height);
 					return true;
 				}
@@ -1398,20 +1421,8 @@ bool cEntity::DetectPortal()
 					{
 						return false;
 					}
-					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
-					eDimension DestionationDim = DestinationWorld->GetDimension();
 
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-
-					if (IsPlayer())
-					{
-						if (DestionationDim == dimNether)
-						{
-							static_cast<cPlayer *>(this)->AwardAchievement(Statistic::AchPortal);
-						}
-
-						static_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
-					}
 
 					Vector3d TargetPos = GetPosition();
 					TargetPos.x /= 8.0;
@@ -1419,7 +1430,7 @@ bool cEntity::DetectPortal()
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
+					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
 					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, (cChunkDef::Height / 2));
 					return true;
 				}
@@ -1440,34 +1451,26 @@ bool cEntity::DetectPortal()
 				// End portal in the end
 				if (GetWorld()->GetDimension() == dimEnd)
 				{
-
 					if (GetWorld()->GetLinkedOverworldName().empty())
 					{
 						return false;
 					}
-					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
-					eDimension DestionationDim = DestinationWorld->GetDimension();
-
 
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
+					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
+					LOGD("Jumping %s -> %s", DimensionToString(dimEnd).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
 
 					if (IsPlayer())
 					{
 						cPlayer * Player = static_cast<cPlayer *>(this);
-						if (Player->GetBedWorld() == DestinationWorld)
+						if (Player->GetBedWorld() == TargetWorld)
 						{
-							Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
+							return MoveToWorld(*TargetWorld, Player->GetLastBedPos());
 						}
-						else
-						{
-							Player->TeleportToCoords(DestinationWorld->GetSpawnX(), DestinationWorld->GetSpawnY(), DestinationWorld->GetSpawnZ());
-						}
-						Player->GetClientHandle()->SendRespawn(DestionationDim);
 					}
 
-					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
-					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimEnd).c_str(), DimensionToString(DestionationDim).c_str());
 					return MoveToWorld(*TargetWorld, false);
 				}
 				// End portal in the overworld
@@ -1477,23 +1480,12 @@ bool cEntity::DetectPortal()
 					{
 						return false;
 					}
-					cWorld * DestinationWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
-					eDimension DestionationDim = DestinationWorld->GetDimension();
 
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 
-					if (IsPlayer())
-					{
-						if (DestionationDim == dimEnd)
-						{
-							static_cast<cPlayer *>(this)->AwardAchievement(Statistic::AchTheEnd);
-						}
-						static_cast<cPlayer *>(this)->GetClientHandle()->SendRespawn(DestionationDim);
-					}
-
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(DestionationDim).c_str());
+					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
 					return MoveToWorld(*TargetWorld, false);
 				}
 
@@ -1516,13 +1508,14 @@ void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 {
 	ASSERT(a_WorldChangeInfo.m_NewWorld != nullptr);
 
+	// Reset portal cooldown:
 	if (a_WorldChangeInfo.m_SetPortalCooldown)
 	{
 		m_PortalCooldownData.m_TicksDelayed = 0;
 		m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 	}
 
-	if (GetWorld() == a_WorldChangeInfo.m_NewWorld)
+	if (m_World == a_WorldChangeInfo.m_NewWorld)
 	{
 		// Moving to same world, don't need to remove from world
 		SetPosition(a_WorldChangeInfo.m_NewPosition);
@@ -1535,23 +1528,19 @@ void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 		GetChunkX(), GetChunkZ()
 	);
 
-	// If entity is attached to another entity, detach, to prevent client side effects
-	Detach();
-
 	// Stop ticking, in preperation for detaching from this world.
 	SetIsTicking(false);
 
 	// Remove from the old world
+	const auto OldWorld = m_World;
 	auto Self = m_World->RemoveEntity(*this);
 
-	// Update entity before calling hook
+	// Update entity:
 	ResetPosition(a_WorldChangeInfo.m_NewPosition);
 	SetWorld(a_WorldChangeInfo.m_NewWorld);
 
-	cRoot::Get()->GetPluginManager()->CallHookEntityChangedWorld(*this, *m_World);
-
 	// Don't do anything after adding as the old world's CS no longer protects us
-	a_WorldChangeInfo.m_NewWorld->AddEntity(std::move(Self));
+	a_WorldChangeInfo.m_NewWorld->AddEntity(std::move(Self), OldWorld);
 }
 
 
@@ -1571,7 +1560,7 @@ bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPo
 
 	// Create new world change info
 	// (The last warp command always takes precedence)
-	m_WorldChangeInfo = { &a_World,  a_NewPosition, a_SetPortalCooldown, a_ShouldSendRespawn };
+	m_WorldChangeInfo = { &a_World,  a_NewPosition, a_SetPortalCooldown };
 
 	if (OldWorld != nullptr)
 	{
@@ -1720,17 +1709,6 @@ void cEntity::SetIsTicking(bool a_IsTicking)
 {
 	m_IsTicking = a_IsTicking;
 	ASSERT(!(m_IsTicking && (m_ParentChunk == nullptr)));  // We shouldn't be ticking if we have no parent chunk
-}
-
-
-
-
-
-void cEntity::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
-{
-	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
-
-	WrapSpeed();
 }
 
 
@@ -2106,7 +2084,8 @@ void cEntity::SetRoll(double a_Roll)
 
 void cEntity::SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 {
-	DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
+	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
+	WrapSpeed();
 }
 
 
@@ -2151,7 +2130,7 @@ void cEntity::SetWidth(double a_Width)
 
 void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeedZ)
 {
-	DoSetSpeed(m_Speed.x + a_AddSpeedX, m_Speed.y + a_AddSpeedY, m_Speed.z + a_AddSpeedZ);
+	SetSpeed(m_Speed.x + a_AddSpeedX, m_Speed.y + a_AddSpeedY, m_Speed.z + a_AddSpeedZ);
 }
 
 
@@ -2280,18 +2259,6 @@ void cEntity::RemoveLeashedMob(cMonster * a_Monster)
 
 
 
-void cEntity::RemoveAllLeashedMobs()
-{
-	while (!m_LeashedMobs.empty())
-	{
-		m_LeashedMobs.front()->Unleash(false, true);
-	}
-}
-
-
-
-
-
 void cEntity::BroadcastLeashedMobs()
 {
 	// If has any mob leashed broadcast every leashed entity to this
@@ -2303,37 +2270,3 @@ void cEntity::BroadcastLeashedMobs()
 		}
 	}
 }
-
-
-
-
-
-float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower)
-{
-	double EntitySize = m_Width * m_Width * m_Height;
-	if (EntitySize <= 0)
-	{
-		// Handle entity with invalid size
-		return 0;
-	}
-
-	auto EntityBox = GetBoundingBox();
-	cBoundingBox ExplosionBox(a_ExplosionPosition, a_ExlosionPower * 2.0);
-	cBoundingBox IntersectionBox(EntityBox);
-
-	bool Overlap = EntityBox.Intersect(ExplosionBox, IntersectionBox);
-	if (Overlap)
-	{
-		Vector3d Diff = IntersectionBox.GetMax() - IntersectionBox.GetMin();
-		double OverlapSize = Diff.x * Diff.y * Diff.z;
-
-		return static_cast<float>(OverlapSize / EntitySize);
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-
-

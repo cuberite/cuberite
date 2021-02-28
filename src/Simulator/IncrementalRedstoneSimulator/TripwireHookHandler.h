@@ -9,7 +9,7 @@
 
 namespace TripwireHookHandler
 {
-	inline unsigned char GetPowerLevel(const cChunk & a_Chunk, Vector3i a_Position, NIBBLETYPE a_Meta)
+	static unsigned char GetPowerLevel(const cChunk & a_Chunk, Vector3i a_Position, NIBBLETYPE a_Meta)
 	{
 		bool FoundActivated = false;
 		const auto FaceToGoTowards = cBlockTripwireHookHandler::MetadataToDirection(a_Meta);
@@ -60,7 +60,7 @@ namespace TripwireHookHandler
 		return 0;
 	}
 
-	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_BlockType);
 		UNUSED(a_QueryBlockType);
@@ -69,7 +69,7 @@ namespace TripwireHookHandler
 		return (GetPowerLevel(a_Chunk, a_Position, a_Chunk.GetMeta(a_Position)) == 15) ? 15 : 0;
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
+	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating hooky the tripwire hook (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -101,7 +101,7 @@ namespace TripwireHookHandler
 		}
 	}
 
-	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
+	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);

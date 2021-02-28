@@ -81,7 +81,6 @@ protected:
 		cWorld * m_NewWorld;
 		Vector3d m_NewPosition;
 		bool m_SetPortalCooldown;
-		bool m_SendRespawn;
 	};
 
 public:
@@ -147,6 +146,8 @@ public:
 		esFireworkExploding      = 17,
 		// Passive mob is in "love mode"
 		esMobInLove              = 18,
+		// Plays totem of undying animation and sound
+		esTotemOfUndying         = 35,
 	} ;
 
 	static const int FIRE_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in fire
@@ -169,11 +170,11 @@ public:
 
 
 	cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, double a_Height);
-	virtual ~cEntity();
+	virtual ~cEntity() = default;
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
 	Adds the entity to the world. */
-	virtual bool Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld);
+	bool Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld);
 
 	/** Called when the entity is added to a world.
 	e.g after first spawning or after successfuly moving between worlds.
@@ -296,7 +297,7 @@ public:
 
 	// tolua_end
 	/** Destroys the entity, schedules it for memory freeing and broadcasts the DestroyEntity packet */
-	virtual void Destroy();
+	void Destroy();
 	// tolua_begin
 
 	/** Makes this pawn take damage from an attack by a_Attacker. Damage values are calculated automatically and DoTakeDamage() called */
@@ -420,6 +421,9 @@ public:
 	/** Detects the time for application of cacti damage */
 	virtual void DetectCacti(void);
 
+	/** Detects the time for application of magma block damage */
+	virtual void DetectMagma(void);
+
 	/** Detects whether we are in a portal block and begins teleportation procedures if so
 	Returns true if MoveToWorld() was called, false if not
 	*/
@@ -465,13 +469,6 @@ public:
 
 	/** Teleports to the coordinates specified */
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
-
-	/** Schedules a MoveToWorld call to occur on the next Tick of the entity */
-	[[deprecated]] void ScheduleMoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = true)
-	{
-		LOGWARNING("ScheduleMoveToWorld is deprecated, use MoveToWorld instead");
-		MoveToWorld(a_World, a_NewPosition, a_ShouldSetPortalCooldown, a_ShouldSendRespawn);
-	}
 
 	bool MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = true);
 
@@ -591,17 +588,8 @@ public:
 	/** Removes a mob from the leashed list of mobs. */
 	void RemoveLeashedMob(cMonster * a_Monster);
 
-	/** Removes all mobs from the leashed list of mobs. */
-	void RemoveAllLeashedMobs();
-
 	/** Returs whether the entity has any mob leashed to it. */
 	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }
-
-	/** a lightweight calculation approach to get explosion exposure rate
-	@param a_ExplosionPosition explosion position
-	@param a_ExlosionPower explosion power
-	@return exposure rate */
-	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower);
 
 
 protected:
@@ -711,16 +699,9 @@ protected:
 	/** The number of ticks this entity has been alive for */
 	long int m_TicksAlive;
 
-
-	/** Does the actual speed-setting. The default implementation just sets the member variable value;
-	overrides can provide further processing, such as forcing players to move at the given speed. */
-	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
-
 	/** Handles the moving of this entity between worlds.
 	Should handle degenerate cases such as moving to the same world. */
-	virtual void DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo);
-
-	virtual void Destroyed(void) {}  // Called after the entity has been destroyed
+	void DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo);
 
 	/** Applies friction to an entity
 	@param a_Speed The speed vector to apply changes to

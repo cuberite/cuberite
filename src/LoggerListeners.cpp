@@ -45,7 +45,7 @@
 		{
 		}
 
-		#ifdef _DEBUG
+		#ifndef NDEBUG
 			virtual void Log(std::string_view a_Message, eLogLevel a_LogLevel) override
 			{
 				Super::Log(a_Message, a_LogLevel);

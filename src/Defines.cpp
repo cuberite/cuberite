@@ -41,7 +41,6 @@ const char * ClickActionToString(int a_ClickAction)
 		case caRightPaintEnd:                return "caRightPaintEnd";
 		case caMiddlePaintEnd:               return "caMiddlePaintEnd";
 		case caDblClick:                     return "caDblClick";
-
 		case caUnknown:                      return "caUnknown";
 	}
 	UNREACHABLE("Unknown click action");
@@ -273,6 +272,7 @@ AString DamageTypeToString(eDamageType a_DamageType)
 		case dtAdmin:           return "dtAdmin";
 		case dtAttack:          return "dtAttack";
 		case dtCactusContact:   return "dtCactusContact";
+		case dtMagmaContact:    return "dtMagmaContact";
 		case dtDrowning:        return "dtDrowning";
 		case dtEnderPearl:      return "dtEnderPearl";
 		case dtEnvironment:     return "dtEnvironment";
@@ -323,6 +323,7 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 		{ dtSuffocating,     "dtSuffocation"},
 		{ dtStarving,        "dtStarving"},
 		{ dtCactusContact,   "dtCactusContact"},
+		{ dtMagmaContact,    "dtMagmaContact"},
 		{ dtLavaContact,     "dtLavaContact"},
 		{ dtPoisoning,       "dtPoisoning"},
 		{ dtWithering,       "dtWithering"},
@@ -350,6 +351,7 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 		{ dtCactusContact, "dtCactus"},
 		{ dtCactusContact, "dtCactuses"},
 		{ dtCactusContact, "dtCacti"},
+		{ dtMagmaContact,  "dtMagma"},
 		{ dtLavaContact,   "dtLava"},
 		{ dtPoisoning,     "dtPoison"},
 		{ dtWithering,     "dtWither"},

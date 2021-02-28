@@ -86,7 +86,7 @@ const int cPlayer::EATING_TICKS = 30;
 
 
 
-cPlayer::cPlayer(const cClientHandlePtr & a_Client, const AString & a_PlayerName) :
+cPlayer::cPlayer(const cClientHandlePtr & a_Client) :
 	Super(etPlayer, 0.6, 1.8),
 	m_bVisible(true),
 	m_FoodLevel(MAX_FOOD_LEVEL),
@@ -96,10 +96,8 @@ cPlayer::cPlayer(const cClientHandlePtr & a_Client, const AString & a_PlayerName
 	m_Stance(0.0),
 	m_Inventory(*this),
 	m_EnderChestContents(9, 3),
-	m_CurrentWindow(nullptr),
-	m_InventoryWindow(nullptr),
+	m_DefaultWorldPath(cRoot::Get()->GetDefaultWorld()->GetDataPath()),
 	m_GameMode(eGameMode_NotSet),
-	m_IP(""),
 	m_ClientHandle(a_Client),
 	m_IsFrozen(false),
 	m_NormalMaxSpeed(1.0),
@@ -113,7 +111,6 @@ cPlayer::cPlayer(const cClientHandlePtr & a_Client, const AString & a_PlayerName
 	m_EatingFinishTick(-1),
 	m_LifetimeTotalXp(0),
 	m_CurrentXp(0),
-	m_bDirtyExperience(false),
 	m_IsChargingBow(false),
 	m_BowCharge(0),
 	m_FloaterID(cEntity::INVALID_ID),
@@ -122,11 +119,10 @@ cPlayer::cPlayer(const cClientHandlePtr & a_Client, const AString & a_PlayerName
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
 	m_bIsTeleporting(false),
 	m_UUID((a_Client != nullptr) ? a_Client->GetUUID() : cUUID{}),
-	m_CustomName(""),
 	m_SkinParts(0),
 	m_MainHand(mhRight)
 {
-	ASSERT(a_PlayerName.length() <= 16);  // Otherwise this player could crash many clients...
+	ASSERT(GetName().length() <= 16);  // Otherwise this player could crash many clients...
 
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
@@ -136,7 +132,6 @@ cPlayer::cPlayer(const cClientHandlePtr & a_Client, const AString & a_PlayerName
 	m_Health = MAX_HEALTH;
 
 	m_LastPlayerListTime = std::chrono::steady_clock::now();
-	m_PlayerName = a_PlayerName;
 
 	cWorld * World = nullptr;
 	if (!LoadFromDisk(World))
@@ -149,18 +144,15 @@ cPlayer::cPlayer(const cClientHandlePtr & a_Client, const AString & a_PlayerName
 		// This is a new player. Set the player spawn point to the spawn point of the default world
 		SetBedPos(Vector3i(static_cast<int>(World->GetSpawnX()), static_cast<int>(World->GetSpawnY()), static_cast<int>(World->GetSpawnZ())), World);
 
-		SetWorld(World);  // Use default world
-
 		m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();  // Use a random number to seed the enchantment generator
 
 		FLOGD("Player \"{0}\" is connecting for the first time, spawning at default world spawn {1:.2f}",
-			a_PlayerName, GetPosition()
+			GetName(), GetPosition()
 		);
 	}
 
 	m_LastGroundHeight = static_cast<float>(GetPosY());
 	m_Stance = GetPosY() + 1.62;
-
 
 	if (m_GameMode == gmNotSet)
 	{
@@ -187,296 +179,18 @@ cPlayer::cPlayer(const cClientHandlePtr & a_Client, const AString & a_PlayerName
 
 
 
-bool cPlayer::Initialize(OwnedEntity a_Self, cWorld & a_World)
-{
-	UNUSED(a_World);
-	ASSERT(GetWorld() != nullptr);
-	ASSERT(GetParentChunk() == nullptr);
-	GetWorld()->AddPlayer(std::unique_ptr<cPlayer>(static_cast<cPlayer *>(a_Self.release())));
-
-	cPluginManager::Get()->CallHookSpawnedEntity(*GetWorld(), *this);
-
-	if (m_KnownRecipes.empty())
-	{
-		m_ClientHandle->SendInitRecipes(0);
-	}
-	else
-	{
-		for (const auto KnownRecipe : m_KnownRecipes)
-		{
-			m_ClientHandle->SendInitRecipes(KnownRecipe);
-		}
-	}
-
-	return true;
-}
-
-
-
-
-
-void cPlayer::AddKnownItem(const cItem & a_Item)
-{
-	if (a_Item.m_ItemType < 0)
-	{
-		return;
-	}
-
-	auto Response = m_KnownItems.insert(a_Item.CopyOne());
-	if (!Response.second)
-	{
-		// The item was already known, bail out:
-		return;
-	}
-
-	// Process the recipes that got unlocked by this newly-known item:
-	auto Recipes = cRoot::Get()->GetCraftingRecipes()->FindNewRecipesForItem(a_Item, m_KnownItems);
-	for (const auto & RecipeId : Recipes)
-	{
-		AddKnownRecipe(RecipeId);
-	}
-}
-
-
-
-
-
-void cPlayer::AddKnownRecipe(UInt32 a_RecipeId)
-{
-	auto Response = m_KnownRecipes.insert(a_RecipeId);
-	if (!Response.second)
-	{
-		// The recipe was already known, bail out:
-		return;
-	}
-	m_ClientHandle->SendUnlockRecipe(a_RecipeId);
-}
-
-
-
-
-
 cPlayer::~cPlayer(void)
 {
-	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
-	{
-		cRoot::Get()->BroadcastChatLeave(Printf("%s has left the game", GetName().c_str()));
-		LOGINFO("Player %s has left the game", GetName().c_str());
-	}
-
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), static_cast<void *>(this), GetUniqueID());
+
+	// "Times ragequit":
+	m_Stats.AddValue(Statistic::LeaveGame);
 
 	SaveToDisk();
 
-	m_ClientHandle = nullptr;
-
 	delete m_InventoryWindow;
-	m_InventoryWindow = nullptr;
 
 	LOGD("Player %p deleted", static_cast<void *>(this));
-}
-
-
-
-
-
-void cPlayer::Destroyed()
-{
-	CloseWindow(false);
-	Super::Destroyed();
-}
-
-
-
-
-
-void cPlayer::SpawnOn(cClientHandle & a_Client)
-{
-	if (!m_bVisible || (m_ClientHandle.get() == (&a_Client)))
-	{
-		return;
-	}
-
-	LOGD("Spawing %s on %s", GetName().c_str(), a_Client.GetUsername().c_str());
-
-	a_Client.SendPlayerSpawn(*this);
-	a_Client.SendEntityHeadLook(*this);
-	a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem());
-	a_Client.SendEntityEquipment(*this, 1, m_Inventory.GetEquippedBoots());
-	a_Client.SendEntityEquipment(*this, 2, m_Inventory.GetEquippedLeggings());
-	a_Client.SendEntityEquipment(*this, 3, m_Inventory.GetEquippedChestplate());
-	a_Client.SendEntityEquipment(*this, 4, m_Inventory.GetEquippedHelmet());
-}
-
-
-
-
-
-void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
-{
-	if (m_ClientHandle != nullptr)
-	{
-		if (m_ClientHandle->IsDestroyed())
-		{
-			// This should not happen, because destroying a client will remove it from the world, but just in case
-			ASSERT(!"Player ticked whilst in the process of destruction!");
-			m_ClientHandle = nullptr;
-			return;
-		}
-
-		if (!m_ClientHandle->IsPlaying())
-		{
-			// We're not yet in the game, ignore everything
-			return;
-		}
-	}
-	else
-	{
-		ASSERT(!"Player ticked whilst in the process of destruction!");
-	}
-
-
-	m_Stats.AddValue(Statistic::PlayOneMinute);
-	m_Stats.AddValue(Statistic::TimeSinceDeath);
-	if (IsCrouched())
-	{
-		m_Stats.AddValue(Statistic::SneakTime);
-	}
-
-	// Handle the player detach, when the player is in spectator mode
-	if (
-		(IsGameModeSpectator()) &&
-		(m_AttachedTo != nullptr) &&
-		(
-			(m_AttachedTo->IsDestroyed()) ||  // Watching entity destruction
-			(m_AttachedTo->GetHealth() <= 0) ||  // Watching entity dead
-			(IsCrouched())  // Or the player wants to be detached
-		)
-	)
-	{
-		Detach();
-	}
-
-	// Handle a frozen player
-	TickFreezeCode();
-	if (m_IsFrozen)
-	{
-		return;
-	}
-	ASSERT((GetParentChunk() != nullptr) && (GetParentChunk()->IsValid()));
-
-	ASSERT(a_Chunk.IsValid());
-
-	Super::Tick(a_Dt, a_Chunk);
-
-	// Handle charging the bow:
-	if (m_IsChargingBow)
-	{
-		m_BowCharge += 1;
-	}
-
-	// Handle updating experience
-	if (m_bDirtyExperience)
-	{
-		SendExperience();
-	}
-
-	BroadcastMovementUpdate(m_ClientHandle.get());
-
-	if (m_Health > 0)  // make sure player is alive
-	{
-		m_World->CollectPickupsByPlayer(*this);
-
-		if ((m_EatingFinishTick >= 0) && (m_EatingFinishTick <= m_World->GetWorldAge()))
-		{
-			FinishEating();
-		}
-
-		HandleFood();
-	}
-
-	if (m_IsFishing)
-	{
-		HandleFloater();
-	}
-
-	// Update items (e.g. Maps)
-	m_Inventory.UpdateItems();
-
-	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
-	if (m_LastPlayerListTime + PLAYER_LIST_TIME_MS <= std::chrono::steady_clock::now())
-	{
-		m_World->BroadcastPlayerListUpdatePing(*this);
-		m_LastPlayerListTime = std::chrono::steady_clock::now();
-	}
-
-	if (m_TicksUntilNextSave == 0)
-	{
-		SaveToDisk();
-		m_TicksUntilNextSave = PLAYER_INVENTORY_SAVE_INTERVAL;
-	}
-	else
-	{
-		m_TicksUntilNextSave--;
-	}
-}
-
-
-
-
-
-void cPlayer::TickFreezeCode()
-{
-	if (m_IsFrozen)
-	{
-		if ((!m_IsManuallyFrozen) && (GetClientHandle()->IsPlayerChunkSent()))
-		{
-			// If the player was automatically frozen, unfreeze if the chunk the player is inside is loaded and sent
-			Unfreeze();
-
-			// Pull the player out of any solids that might have loaded on them.
-			PREPARE_REL_AND_CHUNK(GetPosition(), *(GetParentChunk()));
-			if (RelSuccess)
-			{
-				int NewY = Rel.y;
-				if (NewY < 0)
-				{
-					NewY = 0;
-				}
-				while (NewY < cChunkDef::Height - 2)
-				{
-					// If we find a position with enough space for the player
-					if (
-						!cBlockInfo::IsSolid(Chunk->GetBlock(Rel.x, NewY, Rel.z)) &&
-						!cBlockInfo::IsSolid(Chunk->GetBlock(Rel.x, NewY + 1, Rel.z))
-					)
-					{
-						// If the found position is not the same as the original
-						if (NewY != Rel.y)
-						{
-							SetPosition(GetPosition().x, NewY, GetPosition().z);
-							GetClientHandle()->SendPlayerPosition();
-						}
-						break;
-					}
-					++NewY;
-				}
-			}
-		}
-		else if (GetWorld()->GetWorldAge() % 100 == 0)
-		{
-			// Despite the client side freeze, the player may be able to move a little by
-			// Jumping or canceling flight. Re-freeze every now and then
-			FreezeInternal(GetPosition(), m_IsManuallyFrozen);
-		}
-	}
-	else
-	{
-		if (!GetClientHandle()->IsPlayerChunkSent() || (!GetParentChunk()->IsValid()))
-		{
-			FreezeInternal(GetPosition(), false);
-		}
-	}
 }
 
 
@@ -499,6 +213,15 @@ int cPlayer::CalcLevelFromXp(int a_XpTotal)
 
 	// level 16 to 30
 	return static_cast<int>((29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal)))) / 3);
+}
+
+
+
+
+
+const std::set<UInt32> & cPlayer::GetKnownRecipes() const
+{
+	return m_KnownRecipes;
 }
 
 
@@ -559,8 +282,8 @@ bool cPlayer::SetCurrentExperience(int a_CurrentXp)
 
 	m_CurrentXp = a_CurrentXp;
 
-	// Set experience to be updated
-	m_bDirtyExperience = true;
+	// Update experience:
+	m_ClientHandle->SendExperience();
 
 	return true;
 }
@@ -592,8 +315,8 @@ int cPlayer::DeltaExperience(int a_Xp_delta)
 
 	LOGD("Player \"%s\" gained / lost %d experience, total is now: %d", GetName().c_str(), a_Xp_delta, m_CurrentXp);
 
-	// Set experience to be updated
-	m_bDirtyExperience = true;
+	// Set experience to be updated:
+	m_ClientHandle->SendExperience();
 
 	return m_CurrentXp;
 }
@@ -662,7 +385,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 void cPlayer::Heal(int a_Health)
 {
 	Super::Heal(a_Health);
-	SendHealth();
+	m_ClientHandle->SendHealth();
 }
 
 
@@ -680,7 +403,7 @@ void cPlayer::SetFoodLevel(int a_FoodLevel)
 	}
 
 	m_FoodLevel = FoodLevel;
-	SendHealth();
+	m_ClientHandle->SendHealth();
 }
 
 
@@ -802,43 +525,6 @@ void cPlayer::AbortEating(void)
 {
 	m_EatingFinishTick = -1;
 	m_World->BroadcastEntityMetadata(*this);
-}
-
-
-
-
-
-void cPlayer::SendHealth(void)
-{
-	if (m_ClientHandle != nullptr)
-	{
-		m_ClientHandle->SendHealth();
-	}
-}
-
-
-
-
-
-void cPlayer::SendHotbarActiveSlot(void)
-{
-	if (m_ClientHandle != nullptr)
-	{
-		m_ClientHandle->SendHeldItemChange(m_Inventory.GetEquippedSlotNum());
-	}
-}
-
-
-
-
-
-void cPlayer::SendExperience(void)
-{
-	if (m_ClientHandle != nullptr)
-	{
-		m_ClientHandle->SendExperience();
-		m_bDirtyExperience = false;
-	}
 }
 
 
@@ -1008,7 +694,7 @@ void cPlayer::SetCustomName(const AString & a_CustomName)
 	}
 
 	m_World->BroadcastPlayerListAddPlayer(*this);
-	m_World->BroadcastSpawnEntity(*this, GetClientHandle());
+	m_World->BroadcastSpawnEntity(*this, m_ClientHandle.get());
 }
 
 
@@ -1018,7 +704,7 @@ void cPlayer::SetCustomName(const AString & a_CustomName)
 void cPlayer::SetBedPos(const Vector3i & a_Pos)
 {
 	m_LastBedPos = a_Pos;
-	m_SpawnWorld = m_World;
+	m_SpawnWorldName = m_World->GetName();
 }
 
 
@@ -1029,7 +715,7 @@ void cPlayer::SetBedPos(const Vector3i & a_Pos, cWorld * a_World)
 {
 	m_LastBedPos = a_Pos;
 	ASSERT(a_World != nullptr);
-	m_SpawnWorld = a_World;
+	m_SpawnWorldName = a_World->GetName();
 }
 
 
@@ -1038,7 +724,12 @@ void cPlayer::SetBedPos(const Vector3i & a_Pos, cWorld * a_World)
 
 cWorld * cPlayer::GetBedWorld()
 {
-	return m_SpawnWorld;
+	if (const auto World = cRoot::Get()->GetWorld(m_SpawnWorldName); World != nullptr)
+	{
+		return World;
+	}
+
+	return cRoot::Get()->GetDefaultWorld();
 }
 
 
@@ -1058,69 +749,6 @@ void cPlayer::SetFlying(bool a_IsFlying)
 		// If we are frozen, we do not send this yet. We send when unfreeze() is called
 		m_ClientHandle->SendPlayerAbilities();
 	}
-}
-
-
-
-
-
-void cPlayer::ApplyArmorDamage(int a_DamageBlocked)
-{
-	short ArmorDamage = static_cast<short>(std::max(a_DamageBlocked / 4, 1));
-
-	for (int i = 0; i < 4; i++)
-	{
-		UseItem(cInventory::invArmorOffset + i, ArmorDamage);
-	}
-}
-
-
-
-
-
-bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
-{
-	if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtPlugin))
-	{
-		if (IsGameModeCreative() || IsGameModeSpectator())
-		{
-			// No damage / health in creative or spectator mode if not void or plugin damage
-			return false;
-		}
-	}
-
-	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPlayer()))
-	{
-		cPlayer * Attacker = static_cast<cPlayer *>(a_TDI.Attacker);
-
-		if ((m_Team != nullptr) && (m_Team == Attacker->m_Team))
-		{
-			if (!m_Team->AllowsFriendlyFire())
-			{
-				// Friendly fire is disabled
-				return false;
-			}
-		}
-	}
-
-	if (Super::DoTakeDamage(a_TDI))
-	{
-		// Any kind of damage adds food exhaustion
-		AddFoodExhaustion(0.3f);
-		SendHealth();
-
-		// Tell the wolves
-		if (a_TDI.Attacker != nullptr)
-		{
-			if (a_TDI.Attacker->IsPawn())
-			{
-				NotifyNearbyWolves(static_cast<cPawn*>(a_TDI.Attacker), true);
-			}
-		}
-		m_Stats.AddValue(Statistic::DamageTaken, FloorC<cStatManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5));
-		return true;
-	}
-	return false;
 }
 
 
@@ -1194,6 +822,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 					case dtSuffocating:     return GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block";
 					case dtStarving:        return "forgot the importance of food";
 					case dtCactusContact:   return "was impaled on a cactus";
+					case dtMagmaContact:    return "discovered the floor was lava";
 					case dtLavaContact:     return "was melted by lava";
 					case dtPoisoning:       return "died from septicaemia";
 					case dtWithering:       return "is a husk of their former selves";
@@ -1296,17 +925,16 @@ void cPlayer::Respawn(void)
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn(m_SpawnWorld->GetDimension(), true);
-
 	// Extinguish the fire:
 	StopBurning();
 
-	if (GetWorld() != m_SpawnWorld)
+	if (const auto BedWorld = GetBedWorld(); m_World != BedWorld)
 	{
-		MoveToWorld(*m_SpawnWorld, GetLastBedPos(), false, false);
+		MoveToWorld(*BedWorld, GetLastBedPos(), false, false);
 	}
 	else
 	{
+		m_ClientHandle->SendRespawn(m_World->GetDimension(), true);
 		TeleportToCoords(GetLastBedPos().x, GetLastBedPos().y, GetLastBedPos().z);
 	}
 
@@ -1374,6 +1002,15 @@ bool cPlayer::IsGameModeSpectator(void) const
 bool cPlayer::CanMobsTarget(void) const
 {
 	return (IsGameModeSurvival() || IsGameModeAdventure()) && (m_Health > 0);
+}
+
+
+
+
+
+AString cPlayer::GetIP(void) const
+{
+	return m_ClientHandle->GetIPString();
 }
 
 
@@ -1600,6 +1237,15 @@ void cPlayer::SendAboveActionBarMessage(const cCompositeChat & a_Message)
 
 
 
+const AString & cPlayer::GetName(void) const
+{
+	return m_ClientHandle->GetUsername();
+}
+
+
+
+
+
 void cPlayer::SetGameMode(eGameMode a_GameMode)
 {
 	if ((a_GameMode < gmMin) || (a_GameMode >= gmMax))
@@ -1665,15 +1311,6 @@ void cPlayer::SetCapabilities()
 			GetClientHandle()->SendInventorySlot(-1, -1, m_DraggingItem);
 		}
 	}
-}
-
-
-
-
-
-void cPlayer::SetIP(const AString & a_IP)
-{
-	m_IP = a_IP;
 }
 
 
@@ -1753,7 +1390,7 @@ void cPlayer::Unfreeze()
 	GetClientHandle()->SendPlayerMaxSpeed();
 
 	m_IsFrozen = false;
-	BroadcastMovementUpdate(GetClientHandle());
+	BroadcastMovementUpdate(m_ClientHandle.get());
 	GetClientHandle()->SendPlayerPosition();
 }
 
@@ -1819,25 +1456,32 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 
 
 
-void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
+eGameMode cPlayer::GetEffectiveGameMode(void) const
 {
-	SetSpeed(a_Speed);
+	// Since entities' m_World aren't set until Initialize, but cClientHandle sends the player's gamemode early
+	// the below block deals with m_World being nullptr when called.
+
+	auto World = m_World;
+
+	if (World == nullptr)
+	{
+		World = cRoot::Get()->GetDefaultWorld();
+	}
+	else if (IsWorldChangeScheduled())
+	{
+		World = m_WorldChangeInfo.m_NewWorld;
+	}
+
+	return (m_GameMode == gmNotSet) ? World->GetGameMode() : m_GameMode;
 }
 
 
 
 
 
-void cPlayer::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
+void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
 {
-	if (m_IsFrozen)
-	{
-		// Do not set speed to a frozen client
-		return;
-	}
-	Super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
-	// Send the speed to the client so he actualy moves
-	m_ClientHandle->SendEntityVelocity(*this);
+	SetSpeed(a_Speed);
 }
 
 
@@ -2099,79 +1743,6 @@ void cPlayer::TossPickup(const cItem & a_Item)
 
 
 
-void cPlayer::DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo)
-{
-	ASSERT(a_WorldChangeInfo.m_NewWorld != nullptr);
-
-	// Reset portal cooldown
-	if (a_WorldChangeInfo.m_SetPortalCooldown)
-	{
-		m_PortalCooldownData.m_TicksDelayed = 0;
-		m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-	}
-
-	if (m_World == a_WorldChangeInfo.m_NewWorld)
-	{
-		// Moving to same world, don't need to remove from world
-		SetPosition(a_WorldChangeInfo.m_NewPosition);
-		return;
-	}
-
-	LOGD("Warping player \"%s\" from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
-		GetName(), GetWorld()->GetName(), a_WorldChangeInfo.m_NewWorld->GetName(),
-		GetChunkX(), GetChunkZ()
-	);
-
-	// Stop all mobs from targeting this player
-	StopEveryoneFromTargetingMe();
-
-	// If player is attached to entity, detach, to prevent client side effects
-	Detach();
-
-	// Prevent further ticking in this world
-	SetIsTicking(false);
-
-	// Remove from the old world
-	auto & OldWorld = *GetWorld();
-	auto Self = OldWorld.RemovePlayer(*this);
-
-	ResetPosition(a_WorldChangeInfo.m_NewPosition);
-	FreezeInternal(a_WorldChangeInfo.m_NewPosition, false);
-	SetWorld(a_WorldChangeInfo.m_NewWorld);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
-
-	// Set capabilities based on new world
-	SetCapabilities();
-
-	cClientHandle * ch = GetClientHandle();
-	if (ch != nullptr)
-	{
-		// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
-		ch->InvalidateCachedSentChunk();
-
-		// Send the respawn packet:
-		if (a_WorldChangeInfo.m_SendRespawn)
-		{
-			ch->SendRespawn(a_WorldChangeInfo.m_NewWorld->GetDimension());
-		}
-
-		// Update the view distance.
-		ch->SetViewDistance(ch->GetRequestedViewDistance());
-
-		// Send current weather of target world to player
-		if (a_WorldChangeInfo.m_NewWorld->GetDimension() == dimOverworld)
-		{
-			ch->SendWeather(a_WorldChangeInfo.m_NewWorld->GetWeather());
-		}
-	}
-
-	// New world will take over and announce client at its next tick
-	a_WorldChangeInfo.m_NewWorld->AddPlayer(std::move(Self), &OldWorld);
-}
-
-
-
-
-
 bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 {
 	LoadRank();
@@ -2334,7 +1905,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 
 	cEnderChestEntity::LoadFromJson(root["enderchestinventory"], m_EnderChestContents);
 
-	m_LoadedWorldName = root.get("world", "world").asString();
+	m_CurrentWorldName = root.get("world", "world").asString();
 	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName());
 	if (a_World == nullptr)
 	{
@@ -2345,18 +1916,13 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	m_LastBedPos.x = root.get("SpawnX", a_World->GetSpawnX()).asInt();
 	m_LastBedPos.y = root.get("SpawnY", a_World->GetSpawnY()).asInt();
 	m_LastBedPos.z = root.get("SpawnZ", a_World->GetSpawnZ()).asInt();
-	AString SpawnWorldName =  root.get("SpawnWorld", cRoot::Get()->GetDefaultWorld()->GetName()).asString();
-	m_SpawnWorld = cRoot::Get()->GetWorld(SpawnWorldName);
-	if (m_SpawnWorld == nullptr)
-	{
-		m_SpawnWorld = cRoot::Get()->GetDefaultWorld();
-	}
+	m_SpawnWorldName = root.get("SpawnWorld", cRoot::Get()->GetDefaultWorld()->GetName()).asString();
 
 	try
 	{
 		// Load the player stats.
 		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-		StatSerializer::Load(m_Stats, cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetUUID().ToLongString());
+		StatSerializer::Load(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
 	}
 	catch (...)
 	{
@@ -2460,27 +2026,10 @@ bool cPlayer::SaveToDisk()
 	root["SpawnX"]              = GetLastBedPos().x;
 	root["SpawnY"]              = GetLastBedPos().y;
 	root["SpawnZ"]              = GetLastBedPos().z;
-	root["SpawnWorld"]          = m_SpawnWorld->GetName();
+	root["SpawnWorld"]          = m_SpawnWorldName;
 	root["enchantmentSeed"]     = m_EnchantmentSeed;
-
-	if (m_World != nullptr)
-	{
-		root["world"] = m_World->GetName();
-		if (m_GameMode == m_World->GetGameMode())
-		{
-			root["gamemode"] = static_cast<int>(eGameMode_NotSet);
-		}
-		else
-		{
-			root["gamemode"] = static_cast<int>(m_GameMode);
-		}
-	}
-	else
-	{
-		// This happens if the player is saved to new format after loading from the old format
-		root["world"]    = m_LoadedWorldName;
-		root["gamemode"] = static_cast<int>(eGameMode_NotSet);
-	}
+	root["world"]               = m_CurrentWorldName;
+	root["gamemode"]            = static_cast<int>(m_GameMode);
 
 	auto JsonData = JsonUtils::WriteStyledString(root);
 	AString SourceFile = GetUUIDFileName(m_UUID);
@@ -2505,7 +2054,8 @@ bool cPlayer::SaveToDisk()
 	{
 		// Save the player stats.
 		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-		StatSerializer::Save(m_Stats, cRoot::Get()->GetDefaultWorld()->GetDataPath(), GetUUID().ToLongString());
+		// TODO: save together with player.dat, not in some other place.
+		StatSerializer::Save(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
 	}
 	catch (...)
 	{
@@ -2787,7 +2337,7 @@ void cPlayer::LoadRank(void)
 	else
 	{
 		// Update the name:
-		RankMgr->UpdatePlayerName(m_UUID, m_PlayerName);
+		RankMgr->UpdatePlayerName(m_UUID, GetName());
 	}
 	m_Permissions = RankMgr->GetPlayerPermissions(m_UUID);
 	m_Restrictions = RankMgr->GetPlayerRestrictions(m_UUID);
@@ -3062,16 +2612,6 @@ void cPlayer::Detach()
 
 
 
-void cPlayer::RemoveClientHandle(void)
-{
-	ASSERT(m_ClientHandle != nullptr);
-	m_ClientHandle.reset();
-}
-
-
-
-
-
 AString cPlayer::GetUUIDFileName(const cUUID & a_UUID)
 {
 	AString UUID = a_UUID.ToLongString();
@@ -3228,21 +2768,15 @@ float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 	{
 		return 1;
 	}
-	float BlockHardness = cBlockInfo::GetHardness(a_Block);
+
+	const bool CanHarvest = GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block);
+	const float BlockHardness = cBlockInfo::GetHardness(a_Block) * (CanHarvest ? 1.5f : 5.0f);
 	ASSERT(BlockHardness > 0);  // Can't divide by 0 or less, IsOneHitDig should have returned true
-	if (GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block))
-	{
-		BlockHardness *= 1.5f;
-	}
-	else
-	{
-		BlockHardness *= 5.0f;
-	}
-	float DigSpeed = GetDigSpeed(a_Block);
+
 	// LOGD("Time to mine block = %f", BlockHardness/DigSpeed);
 	// Number of ticks to mine = (20 * BlockHardness)/DigSpeed;
 	// Therefore take inverse to get fraction mined per tick:
-	return DigSpeed / (20.0f * BlockHardness);
+	return GetDigSpeed(a_Block) / (20.0f * BlockHardness);
 }
 
 
@@ -3252,28 +2786,445 @@ float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 bool cPlayer::CanInstantlyMine(BLOCKTYPE a_Block)
 {
 	// Based on: https://minecraft.gamepedia.com/Breaking#Calculation
-	// Check it has non-zero hardness
-	if (cBlockInfo::IsOneHitDig(a_Block))
-	{
-		return true;
-	}
-	// If the dig speed is greater than 30 times the hardness, then the wiki says we can instantly mine
-	return GetDigSpeed(a_Block) > 30 * cBlockInfo::GetHardness(a_Block);
+
+	// If the dig speed is greater than 30 times the hardness, then the wiki says we can instantly mine:
+	return GetDigSpeed(a_Block) > (30 * cBlockInfo::GetHardness(a_Block));
 }
 
 
 
 
 
-float cPlayer::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower)
+void cPlayer::AddKnownItem(const cItem & a_Item)
+{
+	if (a_Item.m_ItemType < 0)
+	{
+		return;
+	}
+
+	auto Response = m_KnownItems.insert(a_Item.CopyOne());
+	if (!Response.second)
+	{
+		// The item was already known, bail out:
+		return;
+	}
+
+	// Process the recipes that got unlocked by this newly-known item:
+	auto Recipes = cRoot::Get()->GetCraftingRecipes()->FindNewRecipesForItem(a_Item, m_KnownItems);
+	for (const auto & RecipeId : Recipes)
+	{
+		AddKnownRecipe(RecipeId);
+	}
+}
+
+
+
+
+
+void cPlayer::AddKnownRecipe(UInt32 a_RecipeId)
+{
+	auto Response = m_KnownRecipes.insert(a_RecipeId);
+	if (!Response.second)
+	{
+		// The recipe was already known, bail out:
+		return;
+	}
+	m_ClientHandle->SendUnlockRecipe(a_RecipeId);
+}
+
+
+
+
+
+void cPlayer::TickFreezeCode()
+{
+	if (m_IsFrozen)
+	{
+		if ((!m_IsManuallyFrozen) && (GetClientHandle()->IsPlayerChunkSent()))
+		{
+			// If the player was automatically frozen, unfreeze if the chunk the player is inside is loaded and sent
+			Unfreeze();
+
+			// Pull the player out of any solids that might have loaded on them.
+			PREPARE_REL_AND_CHUNK(GetPosition(), *(GetParentChunk()));
+			if (RelSuccess)
+			{
+				int NewY = Rel.y;
+				if (NewY < 0)
+				{
+					NewY = 0;
+				}
+				while (NewY < cChunkDef::Height - 2)
+				{
+					// If we find a position with enough space for the player
+					if (
+						!cBlockInfo::IsSolid(Chunk->GetBlock(Rel.x, NewY, Rel.z)) &&
+						!cBlockInfo::IsSolid(Chunk->GetBlock(Rel.x, NewY + 1, Rel.z))
+					)
+					{
+						// If the found position is not the same as the original
+						if (NewY != Rel.y)
+						{
+							SetPosition(GetPosition().x, NewY, GetPosition().z);
+							GetClientHandle()->SendPlayerPosition();
+						}
+						break;
+					}
+					++NewY;
+				}
+			}
+		}
+		else if (GetWorld()->GetWorldAge() % 100 == 0)
+		{
+			// Despite the client side freeze, the player may be able to move a little by
+			// Jumping or canceling flight. Re-freeze every now and then
+			FreezeInternal(GetPosition(), m_IsManuallyFrozen);
+		}
+	}
+	else
+	{
+		if (!GetClientHandle()->IsPlayerChunkSent() || (!GetParentChunk()->IsValid()))
+		{
+			FreezeInternal(GetPosition(), false);
+		}
+	}
+}
+
+
+
+
+
+void cPlayer::ApplyArmorDamage(int a_DamageBlocked)
+{
+	short ArmorDamage = static_cast<short>(std::max(a_DamageBlocked / 4, 1));
+
+	for (int i = 0; i < 4; i++)
+	{
+		UseItem(cInventory::invArmorOffset + i, ArmorDamage);
+	}
+}
+
+
+
+
+
+void cPlayer::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
+{
+	if (!m_IsFrozen && m_Speed.SqrLength() > 0.001)
+	{
+		// If the player is not frozen, has a non-zero speed,
+		// send the speed to the client so he is forced to move so:
+		m_ClientHandle->SendEntityVelocity(*this);
+	}
+
+	// Since we do no physics processing for players, speed will otherwise never decrease:
+	m_Speed.Set(0, 0, 0);
+
+	Super::BroadcastMovementUpdate(a_Exclude);
+}
+
+
+
+
+
+bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	// Filters out damage for creative mode / friendly fire.
+
+	if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtPlugin))
+	{
+		if (IsGameModeCreative() || IsGameModeSpectator())
+		{
+			// No damage / health in creative or spectator mode if not void or plugin damage
+			return false;
+		}
+	}
+
+	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPlayer()))
+	{
+		cPlayer * Attacker = static_cast<cPlayer *>(a_TDI.Attacker);
+
+		if ((m_Team != nullptr) && (m_Team == Attacker->m_Team))
+		{
+			if (!m_Team->AllowsFriendlyFire())
+			{
+				// Friendly fire is disabled
+				return false;
+			}
+		}
+	}
+
+	if (Super::DoTakeDamage(a_TDI))
+	{
+		// Any kind of damage adds food exhaustion
+		AddFoodExhaustion(0.3f);
+		m_ClientHandle->SendHealth();
+
+		// Tell the wolves
+		if (a_TDI.Attacker != nullptr)
+		{
+			if (a_TDI.Attacker->IsPawn())
+			{
+				NotifyNearbyWolves(static_cast<cPawn*>(a_TDI.Attacker), true);
+			}
+		}
+		m_Stats.AddValue(Statistic::DamageTaken, FloorC<cStatManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5));
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+float cPlayer::GetEnchantmentBlastKnockbackReduction()
 {
 	if (
 		IsGameModeSpectator() ||
 		(IsGameModeCreative() && !IsOnGround())
 	)
 	{
-		return 0;  // No impact from explosion
+		return 1;  // No impact from explosion
 	}
 
-	return Super::GetExplosionExposureRate(a_ExplosionPosition, a_ExlosionPower) / 30.0f;
+	return Super::GetEnchantmentBlastKnockbackReduction();
+}
+
+
+
+
+
+void cPlayer::OnAddToWorld(cWorld & a_World)
+{
+	Super::OnAddToWorld(a_World);
+
+	// Update world name tracking:
+	m_CurrentWorldName = m_World->GetName();
+
+	// Fix to stop the player falling through the world, until we get serversided collision detection:
+	FreezeInternal(GetPosition(), false);
+
+	// Set capabilities based on new world:
+	SetCapabilities();
+
+	// Send contents of the inventory window:
+	m_ClientHandle->SendWholeInventory(*m_CurrentWindow);
+
+	// Send health (the respawn packet, which understandably resets health, is also used for world travel...):
+	m_ClientHandle->SendHealth();
+
+	// Send experience, similar story with the respawn packet:
+	m_ClientHandle->SendExperience();
+
+	// Send hotbar active slot (also reset by respawn):
+	m_ClientHandle->SendHeldItemChange(m_Inventory.GetEquippedSlotNum());
+
+	// Update player team:
+	UpdateTeam();
+
+	// Send scoreboard data:
+	m_World->GetScoreBoard().SendTo(*m_ClientHandle);
+
+	// Update the view distance:
+	m_ClientHandle->SetViewDistance(m_ClientHandle->GetRequestedViewDistance());
+
+	// Send current weather of target world:
+	m_ClientHandle->SendWeather(a_World.GetWeather());
+
+	// Send time:
+	m_ClientHandle->SendTimeUpdate(a_World.GetWorldAge(), a_World.GetTimeOfDay(), a_World.IsDaylightCycleEnabled());
+
+	// Finally, deliver the notification hook:
+	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*this);
+}
+
+
+
+
+
+void cPlayer::OnRemoveFromWorld(cWorld & a_World)
+{
+	Super::OnRemoveFromWorld(a_World);
+
+	// Remove any references to this player pointer by windows in the old world:
+	CloseWindow(false);
+
+	// Remove the client handle from the world:
+	m_World->RemoveClientFromChunks(m_ClientHandle.get());
+
+	if (m_ClientHandle->IsDestroyed())  // Note: checking IsWorldChangeScheduled not appropriate here since we can disconnecting while having a scheduled warp
+	{
+		// Disconnecting, do the necessary cleanup.
+		// This isn't in the destructor to avoid crashing accessing destroyed objects during shutdown.
+
+		if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
+		{
+			cRoot::Get()->BroadcastChatLeave(Printf("%s has left the game", GetName().c_str()));
+			LOGINFO("Player %s has left the game", GetName().c_str());
+		}
+
+		// Remove ourself from everyone's lists:
+		cRoot::Get()->BroadcastPlayerListsRemovePlayer(*this);
+
+		// Atomically decrement player count (in world thread):
+		cRoot::Get()->GetServer()->PlayerDestroyed();
+
+		// We're just disconnecting. The remaining code deals with going through portals, so bail:
+		return;
+	}
+
+	const auto DestinationDimension = m_WorldChangeInfo.m_NewWorld->GetDimension();
+
+	// Award relevant achievements:
+	if (DestinationDimension == dimEnd)
+	{
+		AwardAchievement(Statistic::AchTheEnd);
+	}
+	else if (DestinationDimension == dimNether)
+	{
+		AwardAchievement(Statistic::AchPortal);
+	}
+
+	// Clear sent chunk lists from the clienthandle:
+	m_ClientHandle->RemoveFromWorld();
+
+	// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
+	m_ClientHandle->InvalidateCachedSentChunk();
+
+	// Clientside warp start:
+	m_ClientHandle->SendRespawn(DestinationDimension, false);
+}
+
+
+
+
+
+void cPlayer::SpawnOn(cClientHandle & a_Client)
+{
+	if (!m_bVisible || (m_ClientHandle.get() == (&a_Client)))
+	{
+		return;
+	}
+
+	LOGD("Spawing %s on %s", GetName().c_str(), a_Client.GetUsername().c_str());
+
+	a_Client.SendPlayerSpawn(*this);
+	a_Client.SendEntityHeadLook(*this);
+	a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem());
+	a_Client.SendEntityEquipment(*this, 1, m_Inventory.GetEquippedBoots());
+	a_Client.SendEntityEquipment(*this, 2, m_Inventory.GetEquippedLeggings());
+	a_Client.SendEntityEquipment(*this, 3, m_Inventory.GetEquippedChestplate());
+	a_Client.SendEntityEquipment(*this, 4, m_Inventory.GetEquippedHelmet());
+}
+
+
+
+
+
+void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	m_ClientHandle->Tick(a_Dt.count());
+
+	if (m_ClientHandle->IsDestroyed())
+	{
+		Destroy();
+		return;
+	}
+
+	if (!m_ClientHandle->IsPlaying())
+	{
+		// We're not yet in the game, ignore everything:
+		return;
+	}
+
+	m_Stats.AddValue(Statistic::PlayOneMinute);
+	m_Stats.AddValue(Statistic::TimeSinceDeath);
+
+	if (IsCrouched())
+	{
+		m_Stats.AddValue(Statistic::SneakTime);
+	}
+
+	// Handle the player detach, when the player is in spectator mode
+	if (
+		(IsGameModeSpectator()) &&
+		(m_AttachedTo != nullptr) &&
+		(
+			(m_AttachedTo->IsDestroyed()) ||  // Watching entity destruction
+			(m_AttachedTo->GetHealth() <= 0) ||  // Watching entity dead
+			(IsCrouched())  // Or the player wants to be detached
+		)
+	)
+	{
+		Detach();
+	}
+
+	if (!a_Chunk.IsValid())
+	{
+		// Players are ticked even if the parent chunk is invalid.
+		// We've processed as much as we can, bail:
+		return;
+	}
+
+	ASSERT((GetParentChunk() != nullptr) && (GetParentChunk()->IsValid()));
+	ASSERT(a_Chunk.IsValid());
+
+	// Handle a frozen player:
+	TickFreezeCode();
+
+	if (
+		m_IsFrozen ||  // Don't do Tick updates if frozen
+		IsWorldChangeScheduled()  // If we're about to change worlds (e.g. respawn), abort processing all world interactions (GH #3939)
+	)
+	{
+		return;
+	}
+
+	Super::Tick(a_Dt, a_Chunk);
+
+	// Handle charging the bow:
+	if (m_IsChargingBow)
+	{
+		m_BowCharge += 1;
+	}
+
+	BroadcastMovementUpdate(m_ClientHandle.get());
+
+	if (m_Health > 0)  // make sure player is alive
+	{
+		m_World->CollectPickupsByPlayer(*this);
+
+		if ((m_EatingFinishTick >= 0) && (m_EatingFinishTick <= m_World->GetWorldAge()))
+		{
+			FinishEating();
+		}
+
+		HandleFood();
+	}
+
+	if (m_IsFishing)
+	{
+		HandleFloater();
+	}
+
+	// Update items (e.g. Maps)
+	m_Inventory.UpdateItems();
+
+	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
+	if (m_LastPlayerListTime + PLAYER_LIST_TIME_MS <= std::chrono::steady_clock::now())
+	{
+		m_World->BroadcastPlayerListUpdatePing(*this);
+		m_LastPlayerListTime = std::chrono::steady_clock::now();
+	}
+
+	if (m_TicksUntilNextSave == 0)
+	{
+		SaveToDisk();
+		m_TicksUntilNextSave = PLAYER_INVENTORY_SAVE_INTERVAL;
+	}
+	else
+	{
+		m_TicksUntilNextSave--;
+	}
 }

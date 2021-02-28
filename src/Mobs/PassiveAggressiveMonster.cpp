@@ -26,7 +26,7 @@ bool cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	if ((GetTarget() != nullptr) && (GetTarget()->IsPlayer()))
+	if ((GetTarget() != nullptr) && GetTarget()->IsPlayer())
 	{
 		if (static_cast<cPlayer *>(GetTarget())->CanMobsTarget())
 		{

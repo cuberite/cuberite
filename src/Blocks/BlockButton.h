@@ -132,8 +132,7 @@ private:
 			case BLOCK_FACE_YM: return 0x0;
 			case BLOCK_FACE_NONE:
 			{
-				ASSERT(!"Unhandled block face!");
-				return 0x0;
+				break;
 			}
 		}
 		UNREACHABLE("Unsupported block face");
@@ -265,10 +264,9 @@ private:
 			case BLOCK_FACE_YP: return { 0.5, 0, 0.5 };
 			case BLOCK_FACE_NONE:
 			{
-				ASSERT(!"Unhandled block face!");
-				return { 0, 0, 0 };
+				break;
 			}
 		}
-		UNREACHABLE(!"Unhandled block face!");
+		UNREACHABLE("Unhandled block face!");
 	}
 } ;

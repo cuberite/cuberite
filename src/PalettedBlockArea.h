@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include "BlockTypePalette.h"
+#include "Bindings/BlockTypePalette.h"
 #include "Cuboid.h"
 
 

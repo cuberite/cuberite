@@ -14,6 +14,7 @@ Tools/ProtoProxy/ProtoProxy
 Testing/
 ChunkWorxSave.ini
 doxy/
+.vscode/
 Profiling
 Symbols
 cloc-ignored.txt
