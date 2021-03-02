@@ -44,10 +44,6 @@ public:
 		int a_DefaultStartingPieceHeight = -1
 	);
 
-	/** Creates a pool and loads the contents of the specified file into it.
-	If a_LogWarnings is true, logs a warning to console when loading fails. */
-	cPrefabPiecePool(const AString & a_FileName, bool a_LogWarnings);
-
 	/** Destroys the pool, freeing all pieces. */
 	virtual ~cPrefabPiecePool() override;
 

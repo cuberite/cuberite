@@ -13,6 +13,7 @@ Implements the 1.12 protocol classes:
 #include "Packetizer.h"
 
 #include "../Entities/Boat.h"
+#include "../Entities/EnderCrystal.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/Player.h"
@@ -518,6 +519,22 @@ void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			break;
 		}  // case etItemFrame
 
+		case cEntity::etEnderCrystal:
+		{
+			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
+			if (EnderCrystal.DisplaysBeam())
+			{
+				a_Pkt.WriteBEUInt8(ENDER_CRYSTAL_BEAM_TARGET);
+				a_Pkt.WriteBEUInt8(METADATA_TYPE_OPTIONAL_POSITION);
+				a_Pkt.WriteBool(true);  // Dont do a second check if it should display the beam
+				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
+			}
+			a_Pkt.WriteBEUInt8(ENDER_CRYSTAL_SHOW_BOTTOM);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
+			break;
+		}  // case etEnderCrystal
+
 		default:
 		{
 			break;
@@ -533,7 +550,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 {
 	using namespace Metadata_1_12;
 
-	// Living Enitiy Metadata
+	// Living entity metadata
 	if (a_Mob.HasCustomName())
 	{
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
@@ -625,7 +642,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtHorse:
 		{
-			// XXX This behaves incorrectly with different varients; horses have different entity IDs now
+			// XXX This behaves incorrectly with different variants; horses have different entity IDs now
 
 			// Abstract horse
 			auto & Horse = static_cast<const cHorse &>(a_Mob);
@@ -849,7 +866,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtZombie:
 		{
-			// XXX Zombies were also split into new sublcasses; this doesn't handle that.
+			// XXX Zombies were also split into new subclasses; this doesn't handle that.
 			auto & Zombie = static_cast<const cZombie &>(a_Mob);
 			a_Pkt.WriteBEUInt8(ZOMBIE_IS_BABY);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
@@ -890,20 +907,57 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		}  // case mtZombieVillager
 
 		case mtBlaze:
+		case mtCaveSpider:
+		case mtElderGuardian:
 		case mtEnderDragon:
 		case mtGuardian:
 		case mtIronGolem:
 		case mtSnowGolem:
 		case mtSpider:
+		case mtWitherSkeleton:
 		{
 			// TODO: Mobs with extra fields that aren't implemented
 			break;
 		}
 
 		case mtMooshroom:
-		case mtCaveSpider:
 		{
 			// Not mentioned on http://wiki.vg/Entities
+			break;
+		}
+
+		case mtCat:
+
+		case mtDonkey:
+		case mtMule:
+
+		case mtEndermite:
+
+		case mtEvoker:
+
+		case mtHusk:
+
+		case mtIllusioner:
+
+		case mtLlama:
+
+		case mtParrot:
+
+		case mtPolarBear:
+
+		case mtShulker:
+
+		case mtSkeletonHorse:
+		case mtZombieHorse:
+
+		case mtStray:
+
+		case mtVex:
+
+		case mtVindicator:
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			ASSERT(!"cProtocol_1_12::WriteMobMetadata: received unimplemented type");
 			break;
 		}
 
@@ -911,17 +965,12 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtSilverfish:
 		case mtSkeleton:
 		case mtSquid:
-		case mtWitherSkeleton:
 		{
 			// Mobs with no extra fields
 			break;
 		}
 
-		case mtInvalidType:
-		{
-			ASSERT(!"cProtocol_1_12::WriteMobMetadata: Recieved mob of invalid type");
-			break;
-		}
+		default: UNREACHABLE("cProtocol_1_12::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
 
@@ -992,7 +1041,7 @@ void cProtocol_1_12::HandlePacketCraftingBookData(cByteBuffer & a_ByteBuffer)
 {
 	// TODO not yet used, not sure if it is needed
 	// https://wiki.vg/index.php?title=Protocol&oldid=14204#Crafting_Book_Data
-	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
+	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace());
 }
 
 
@@ -1001,7 +1050,7 @@ void cProtocol_1_12::HandlePacketCraftingBookData(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_12::HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer)
 {
-	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
+	a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace());
 	m_Client->GetPlayer()->SendMessageInfo("The new advancements are not implemented.");
 }
 
@@ -1012,6 +1061,20 @@ void cProtocol_1_12::HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer)
 cProtocol::Version cProtocol_1_12::GetProtocolVersion()
 {
 	return Version::v1_12;
+}
+
+
+
+
+
+UInt32 cProtocol_1_12::GetProtocolMobType(const eMonsterType a_MobType)
+{
+	switch (a_MobType)
+	{
+		case mtIllusioner: return 37;
+		case mtParrot:     return 105;
+		default:           return Super::GetProtocolMobType(a_MobType);
+	}
 }
 
 
@@ -1100,36 +1163,37 @@ UInt32 cProtocol_1_12_1::GetPacketID(ePacketType a_Packet)
 {
 	switch (a_Packet)
 	{
-		case pktAttachEntity:        return 0x43;
-		case pktCameraSetTo:         return 0x39;
-		case pktCollectEntity:       return 0x4b;
-		case pktDestroyEntity:       return 0x32;
-		case pktDisplayObjective:    return 0x3b;
-		case pktEntityEffect:        return 0x4f;
-		case pktEntityEquipment:     return 0x3f;
-		case pktEntityHeadLook:      return 0x36;
-		case pktEntityMeta:          return 0x3c;
-		case pktEntityProperties:    return 0x4e;
-		case pktEntityVelocity:      return 0x3e;
-		case pktExperience:          return 0x40;
-		case pktHeldItemChange:      return 0x3a;
-		case pktLeashEntity:         return 0x3d;
-		case pktPlayerList:          return 0x2e;
-		case pktPlayerAbilities:     return 0x2c;
-		case pktPlayerMaxSpeed:      return 0x4e;
-		case pktPlayerMoveLook:      return 0x2f;
-		case pktRemoveEntityEffect:  return 0x33;
-		case pktResourcePack:        return 0x34;
-		case pktRespawn:             return 0x35;
-		case pktScoreboardObjective: return 0x42;
-		case pktSpawnPosition:       return 0x46;
-		case pktUnlockRecipe:        return 0x31;
-		case pktUpdateHealth:        return 0x41;
-		case pktUpdateScore:         return 0x45;
-		case pktUseBed:              return 0x30;
-		case pktTeleportEntity:      return 0x4c;
-		case pktTimeUpdate:          return 0x47;
-		case pktTitle:               return 0x48;
+		case pktAttachEntity:           return 0x43;
+		case pktCameraSetTo:            return 0x39;
+		case pktCollectEntity:          return 0x4b;
+		case pktDestroyEntity:          return 0x32;
+		case pktDisplayObjective:       return 0x3b;
+		case pktEntityEffect:           return 0x4f;
+		case pktEntityEquipment:        return 0x3f;
+		case pktEntityHeadLook:         return 0x36;
+		case pktEntityMeta:             return 0x3c;
+		case pktEntityProperties:       return 0x4e;
+		case pktEntityVelocity:         return 0x3e;
+		case pktExperience:             return 0x40;
+		case pktHeldItemChange:         return 0x3a;
+		case pktLeashEntity:            return 0x3d;
+		case pktPlayerList:             return 0x2e;
+		case pktPlayerListHeaderFooter: return 0x4a;
+		case pktPlayerAbilities:        return 0x2c;
+		case pktPlayerMaxSpeed:         return 0x4e;
+		case pktPlayerMoveLook:         return 0x2f;
+		case pktRemoveEntityEffect:     return 0x33;
+		case pktResourcePack:           return 0x34;
+		case pktRespawn:                return 0x35;
+		case pktScoreboardObjective:    return 0x42;
+		case pktSpawnPosition:          return 0x46;
+		case pktUnlockRecipe:           return 0x31;
+		case pktUpdateHealth:           return 0x41;
+		case pktUpdateScore:            return 0x45;
+		case pktUseBed:                 return 0x30;
+		case pktTeleportEntity:         return 0x4c;
+		case pktTimeUpdate:             return 0x47;
+		case pktTitle:                  return 0x48;
 
 		default: return Super::GetPacketID(a_Packet);
 	}

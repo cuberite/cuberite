@@ -287,8 +287,7 @@ double cStructGenTrees::GetNumTrees(
 			case biVariant:
 			case biNumVariantBiomes:
 			{
-				ASSERT(!"Invalid biome in cStructGenTrees::GetNumTrees");
-				return 0.0;
+				break;
 			}
 		}
 		UNREACHABLE("Unsupported biome");

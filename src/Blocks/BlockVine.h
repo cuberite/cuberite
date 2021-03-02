@@ -162,7 +162,7 @@ private:
 		a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk)
 		{
 
-		const auto a_RelPos = a_Chunk.AbsoluteToRelative(a_BlockPos);
+		const auto a_RelPos = cChunkDef::AbsoluteToRelative(a_BlockPos);
 		NIBBLETYPE CurMeta = a_Chunk.GetMeta(a_RelPos);
 		NIBBLETYPE MaxMeta = GetMaxMeta(a_Chunk, a_RelPos);
 

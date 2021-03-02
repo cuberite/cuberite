@@ -43,13 +43,9 @@ typedef std::list<cClientHandle *>                cClientHandleList;
 
 // A convenience macro for calling GetChunkAndRelByAbsolute.
 #define PREPARE_REL_AND_CHUNK(Position, OriginalChunk) cChunk * Chunk; Vector3i Rel; bool RelSuccess = (OriginalChunk).GetChunkAndRelByAbsolute(Position, &Chunk, Rel)
-#define PREPARE_BLOCKDATA BLOCKTYPE BlockType; NIBBLETYPE BlockMeta;
 
 
-// This class is not to be used directly
-// Instead, call actions on cChunkMap (such as cChunkMap::SetBlock() etc.)
-class cChunk :
-	public cChunkDef  // The inheritance is "misused" here only to inherit the functions and constants defined in cChunkDef
+class cChunk
 {
 public:
 
@@ -112,7 +108,7 @@ public:
 	void MarkLoadFailed(void);
 
 	/** Gets all chunk data, calls the a_Callback's methods for each data type */
-	void GetAllData(cChunkDataCallback & a_Callback);
+	void GetAllData(cChunkDataCallback & a_Callback) const;
 
 	/** Sets all chunk data as either loaded from the storage or generated.
 	BlockLight and BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
@@ -173,11 +169,7 @@ public:
 		GetBlockTypeMeta({ a_RelX, a_RelY, a_RelZ }, a_BlockType, a_BlockMeta);
 	}
 
-	void GetBlockInfo(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
-	void GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
-	{
-		GetBlockInfo({ a_RelX, a_RelY, a_RelZ }, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
-	}
+	void GetBlockInfo(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
 
 	/** Convert absolute coordinates into relative coordinates.
 	Returns false on failure to obtain a valid chunk. Returns true otherwise.
@@ -226,7 +218,17 @@ public:
 	/** Sets the sign text. Returns true if successful. Also sends update packets to all clients in the chunk */
 	bool SetSignLines(int a_RelX, int a_RelY, int a_RelZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 
-	int  GetHeight( int a_X, int a_Z);
+	int GetHeight( int a_X, int a_Z) const;
+
+	/** Returns true if it is sunny at the specified location. This takes into account biomes. */
+	bool IsWeatherSunnyAt(int a_RelX, int a_RelZ) const;
+
+	/** Returns true if it is raining or storming at the specified location, taking into account biomes. */
+	bool IsWeatherWetAt(int a_RelX, int a_RelZ) const;
+
+	/** Returns true if it is raining or storming at the specified location,
+	and the rain reaches (the bottom of) the specified block position. */
+	bool IsWeatherWetAt(Vector3i a_Position) const;
 
 	void SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client);
 
@@ -341,8 +343,6 @@ public:
 	/** Use block entity on coordinate.
 	returns true if the use was successful, return false to use the block as a "normal" block */
 	bool UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
-
-	void CalculateHeightmap(const BLOCKTYPE * a_BlockTypes);
 
 	void SendBlockEntity             (int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 
@@ -589,7 +589,7 @@ private:
 	cBlockEntities m_BlockEntities;
 
 	/** Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded */
-	int m_StayCount;
+	unsigned m_StayCount;
 
 	int m_PosX, m_PosZ;
 	cWorld *    m_World;
@@ -619,7 +619,7 @@ private:
 	/** If greater than zero, the chunk is ticked even if it has no clients.
 	Manipulated by the SetAlwaysTicked() function, allows for nested calls of the function.
 	This is the support for plugin-accessible chunk tick forcing. */
-	int m_AlwaysTicked;
+	unsigned m_AlwaysTicked;
 
 	// Pick up a random block of this chunk
 	void GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z);

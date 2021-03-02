@@ -435,7 +435,17 @@ static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * a_LuaState)
 		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
-	L.Push(cSchematicFileSerializer::LoadFromSchematicFile(*self, fileName));
+	try
+	{
+		cSchematicFileSerializer::LoadFromSchematicFile(*self, fileName);
+		L.Push(true);
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING(Oops.what());
+		L.LogStackTrace();
+		L.Push(false);
+	}
 	return 1;
 }
 
@@ -457,7 +467,7 @@ static int tolua_cBlockArea_LoadFromSchematicString(lua_State * a_LuaState)
 		return 0;
 	}
 	cBlockArea * self;
-	AString data;
+	ContiguousByteBuffer data;
 	if (!L.GetStackValues(1, self, data))
 	{
 		return L.ApiParamError("Cannot read the parameters");
@@ -467,7 +477,17 @@ static int tolua_cBlockArea_LoadFromSchematicString(lua_State * a_LuaState)
 		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
-	L.Push(cSchematicFileSerializer::LoadFromSchematicString(*self, data));
+	try
+	{
+		cSchematicFileSerializer::LoadFromSchematicString(*self, data);
+		L.Push(true);
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING(Oops.what());
+		L.LogStackTrace();
+		L.Push(false);
+	}
 	return 1;
 }
 
@@ -625,7 +645,17 @@ static int tolua_cBlockArea_SaveToSchematicFile(lua_State * a_LuaState)
 		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
-	L.Push(cSchematicFileSerializer::SaveToSchematicFile(*self, fileName));
+	try
+	{
+		cSchematicFileSerializer::SaveToSchematicFile(*self, fileName);
+		L.Push(true);
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING(Oops.what());
+		L.LogStackTrace();
+		L.Push(false);
+	}
 	return 1;
 }
 
@@ -655,13 +685,17 @@ static int tolua_cBlockArea_SaveToSchematicString(lua_State * a_LuaState)
 		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
-	AString data;
-	if (cSchematicFileSerializer::SaveToSchematicString(*self, data))
+	try
 	{
-		L.Push(data);
+		L.Push(cSchematicFileSerializer::SaveToSchematicString(*self).GetView());
 		return 1;
 	}
-	return 0;
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING(Oops.what());
+		L.LogStackTrace();
+		return 0;
+	}
 }
 
 

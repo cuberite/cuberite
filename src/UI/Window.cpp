@@ -418,7 +418,6 @@ void cWindow::SetProperty(size_t a_Property, short a_Value)
 
 void cWindow::OwnerDestroyed()
 {
-	m_Owner = nullptr;
 	// Close window for each player. Note that the last one needs special handling
 	while (m_OpenedBy.size() > 1)
 	{

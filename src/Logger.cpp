@@ -22,7 +22,7 @@ static void WriteLogOpener(fmt::memory_buffer & Buffer)
 	localtime_r(&rawtime, &timeinfo);
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	const auto ThreadID = std::hash<std::thread::id>()(std::this_thread::get_id());
 	fmt::format_to(
 		Buffer, "[{0:04x}|{1:02d}:{2:02d}:{3:02d}] ",

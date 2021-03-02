@@ -25,7 +25,6 @@ enum
 cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_CurrentRecipe(nullptr),
-	m_IsDestroyed(false),
 	m_IsCooking(a_BlockType == E_BLOCK_LIT_FURNACE),
 	m_NeedCookTime(0),
 	m_TimeCooked(0),
@@ -41,30 +40,6 @@ cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Ve
 
 
 
-cFurnaceEntity::~cFurnaceEntity()
-{
-	// Tell window its owner is destroyed
-	cWindow * Window = GetWindow();
-	if (Window != nullptr)
-	{
-		Window->OwnerDestroyed();
-	}
-}
-
-
-
-
-
-void cFurnaceEntity::Destroy()
-{
-	m_IsDestroyed = true;
-	Super::Destroy();
-}
-
-
-
-
-
 void cFurnaceEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
@@ -73,12 +48,25 @@ void cFurnaceEntity::CopyFrom(const cBlockEntity & a_Src)
 	m_CurrentRecipe = src.m_CurrentRecipe;
 	m_FuelBurnTime = src.m_FuelBurnTime;
 	m_IsCooking = src.m_IsCooking;
-	m_IsDestroyed = src.m_IsDestroyed;
 	m_IsLoading = src.m_IsLoading;
 	m_LastInput = src.m_LastInput;
 	m_NeedCookTime = src.m_NeedCookTime;
 	m_TimeBurned = src.m_TimeBurned;
 	m_TimeCooked = src.m_TimeCooked;
+}
+
+
+
+
+
+void cFurnaceEntity::OnRemoveFromWorld()
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		// Tell window its owner is destroyed:
+		Window->OwnerDestroyed();
+	}
 }
 
 
@@ -258,11 +246,6 @@ void cFurnaceEntity::BurnNewFuel(void)
 void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
 	Super::OnSlotChanged(a_ItemGrid, a_SlotNum);
-
-	if (m_IsDestroyed)
-	{
-		return;
-	}
 
 	if (m_IsLoading)
 	{

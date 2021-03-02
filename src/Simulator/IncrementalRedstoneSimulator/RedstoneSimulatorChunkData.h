@@ -3,8 +3,9 @@
 
 #include <stack>
 
-#include "../RedstoneSimulator.h"
-#include "../../Chunk.h"
+#include "Chunk.h"
+#include "BlockState.h"
+#include "Simulator/RedstoneSimulator.h"
 
 
 
@@ -82,7 +83,7 @@ public:
 	}
 
 	/** Temporary, should be chunk data: wire block store, to avoid recomputing states every time. */
-	std::unordered_map<Vector3i, short, VectorHasher<int>> WireStates;
+	std::unordered_map<Vector3i, BlockState, VectorHasher<int>> WireStates;
 
 	std::unordered_set<Vector3i, VectorHasher<int>> AlwaysTickedPositions;
 

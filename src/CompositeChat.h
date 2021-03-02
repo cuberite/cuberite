@@ -34,126 +34,67 @@ class cCompositeChat
 public:
 	// tolua_end
 
-	enum ePartType
+
+	struct BasePart
 	{
-		ptText,
-		ptClientTranslated,
-		ptUrl,
-		ptRunCommand,
-		ptSuggestCommand,
-		ptShowAchievement,
+		AString Text;
+		AString Style;
+		AString AdditionalStyleData;
 	} ;
 
 
 
-	class cBasePart
+	struct TextPart:
+		public BasePart
 	{
-	public:
-		ePartType m_PartType;
-		AString m_Text;
-		AString m_Style;
-		AString m_AdditionalStyleData;
-
-		cBasePart(ePartType a_PartType, const AString & a_Text, const AString & a_Style = "");
-
-		// Force a virtual destructor in descendants
-		virtual ~cBasePart() {}
 	} ;
 
 
 
-	class cTextPart:
-		public cBasePart
+	struct ClientTranslatedPart:
+		public BasePart
 	{
-		using Super = cBasePart;
-
-	public:
-
-		cTextPart(const AString & a_Text, const AString & a_Style = "");
+		AStringVector Parameters;
 	} ;
 
 
 
-	class cClientTranslatedPart:
-		public cBasePart
+	struct UrlPart:
+		public BasePart
 	{
-		using Super = cBasePart;
-
-	public:
-
-		AStringVector m_Parameters;
-
-		cClientTranslatedPart(const AString & a_TranslationID, const AStringVector & a_Parameters, const AString & a_Style = "");
+		AString Url;
 	} ;
 
 
 
-	class cUrlPart:
-		public cBasePart
+	struct CommandPart:
+		public BasePart
 	{
-		using Super = cBasePart;
-
-	public:
-
-		AString m_Url;
-
-		cUrlPart(const AString & a_Text, const AString & a_Url, const AString & a_Style = "");
+		AString Command;
 	} ;
 
 
 
-	class cCommandPart:
-		public cBasePart
+	struct RunCommandPart:
+		public CommandPart
 	{
-		using Super = cBasePart;
-
-	public:
-
-		AString m_Command;
-
-		cCommandPart(ePartType a_PartType, const AString & a_Text, const AString & a_Command, const AString & a_Style = "");
 	} ;
 
 
 
-	class cRunCommandPart:
-		public cCommandPart
+	struct SuggestCommandPart:
+		public CommandPart
 	{
-		using Super = cCommandPart;
-
-	public:
-
-		cRunCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "");
 	} ;
 
 
 
-	class cSuggestCommandPart:
-		public cCommandPart
+	struct ShowAchievementPart:
+		public BasePart
 	{
-		using Super = cCommandPart;
-
-	public:
-
-		cSuggestCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "");
+		AString PlayerName;
 	} ;
 
-
-
-	class cShowAchievementPart:
-		public cBasePart
-	{
-		using Super = cBasePart;
-
-	public:
-
-		AString m_PlayerName;
-		cShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style = "");
-	} ;
-
-
-
-	using cParts = std::vector<cBasePart *>;
 
 
 	/** Creates a new empty chat message.
@@ -165,8 +106,6 @@ public:
 	Uses ParseText() for the actual parsing.
 	Exported manually due to ToLua++ generating extra output parameter. */
 	cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType = mtCustom);
-
-	~cCompositeChat();  // tolua_export
 
 	// The following are exported in ManualBindings in order to support chaining - they return "self" in Lua (#755)
 
@@ -226,7 +165,7 @@ public:
 
 	// tolua_end
 
-	const cParts & GetParts(void) const { return m_Parts; }
+	const auto & GetParts(void) const { return m_Parts; }
 
 	/** Converts the MessageType to a LogLevel value.
 	Used by the logging bindings when logging a cCompositeChat object. */
@@ -236,8 +175,9 @@ public:
 	void AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle) const;
 
 protected:
+
 	/** All the parts that */
-	cParts m_Parts;
+	std::vector<std::variant<TextPart, ClientTranslatedPart, UrlPart, RunCommandPart, SuggestCommandPart, ShowAchievementPart>> m_Parts;
 
 	/** The message type, as indicated by prefixes. */
 	eMessageType m_MessageType;
@@ -250,7 +190,3 @@ protected:
 	If the style already contains something that a_AddStyle overrides, it is erased first. */
 	void AddStyle(AString & a_Style, const AString & a_AddStyle);
 } ;  // tolua_export
-
-
-
-

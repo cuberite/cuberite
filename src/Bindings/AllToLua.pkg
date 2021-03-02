@@ -74,6 +74,8 @@ $cfile "../UUID.h"
 
 // Entities:
 $cfile "../Entities/Entity.h"
+
+$cfile "../Entities/EnderCrystal.h"
 $cfile "../Entities/Boat.h"
 $cfile "../Entities/Pawn.h"
 $cfile "../Entities/ProjectileEntity.h"

@@ -13,7 +13,7 @@
 // #define ENABLE_SSL_DEBUG_MSG
 
 
-#if defined(_DEBUG) && defined(ENABLE_SSL_DEBUG_MSG)
+#if !defined(NDEBUG) && defined(ENABLE_SSL_DEBUG_MSG)
 	#include "mbedtls/debug.h"
 
 
@@ -95,7 +95,7 @@
 			return 0;
 		}
 	}
-#endif  // defined(_DEBUG) && defined(ENABLE_SSL_DEBUG_MSG)
+#endif  // !defined(NDEBUG) && defined(ENABLE_SSL_DEBUG_MSG)
 
 
 
@@ -238,7 +238,7 @@ std::shared_ptr<cSslConfig> cSslConfig::MakeDefaultConfig(bool a_IsClient)
 
 	Ret->SetAuthMode(eSslAuthMode::None);  // We cannot verify because we don't have a CA chain
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		#ifdef ENABLE_SSL_DEBUG_MSG
 			Ret->SetDebugCallback(&SSLDebugMessage, nullptr);
 			Ret->SetVerifyCallback(SSLVerifyCert, nullptr);

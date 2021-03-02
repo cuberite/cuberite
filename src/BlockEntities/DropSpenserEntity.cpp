@@ -26,20 +26,6 @@ cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_Block
 
 
 
-cDropSpenserEntity::~cDropSpenserEntity()
-{
-	// Tell window its owner is destroyed
-	cWindow * Window = GetWindow();
-	if (Window != nullptr)
-	{
-		Window->OwnerDestroyed();
-	}
-}
-
-
-
-
-
 void cDropSpenserEntity::AddDropSpenserDir(Vector3i & a_RelCoord, NIBBLETYPE a_Direction)
 {
 	switch (a_Direction & E_META_DROPSPENSER_FACING_MASK)
@@ -126,6 +112,20 @@ void cDropSpenserEntity::CopyFrom(const cBlockEntity & a_Src)
 	auto & src = static_cast<const cDropSpenserEntity &>(a_Src);
 	m_Contents.CopyFrom(src.m_Contents);
 	m_ShouldDropSpense = src.m_ShouldDropSpense;
+}
+
+
+
+
+
+void cDropSpenserEntity::OnRemoveFromWorld()
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		// Tell window its owner is destroyed:
+		Window->OwnerDestroyed();
+	}
 }
 
 

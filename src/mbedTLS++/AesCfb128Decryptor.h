@@ -27,7 +27,7 @@ public:
 	void Init(const Byte a_Key[16], const Byte a_IV[16]);
 
 	/** Decrypts a_Length bytes of the encrypted data; produces a_Length output bytes */
-	void ProcessData(Byte * a_DecryptedOut, const Byte * a_EncryptedIn, size_t a_Length);
+	void ProcessData(std::byte * a_DecryptedOut, const Byte * a_EncryptedIn, size_t a_Length);
 
 	/** Returns true if the object has been initialized with the Key / IV */
 	bool IsValid(void) const { return m_IsValid; }

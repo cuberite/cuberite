@@ -42,6 +42,12 @@ private:
 		- Loop through boundary variables, and fill with portal blocks based on Dir with meta from Dir
 		*/
 
+		if (a_WorldInterface.GetDimension() == dimEnd)
+		{
+			// Can only create portals in the Nether and Overworld (GH #5009):
+			return;
+		}
+
 		Scratch Scratch;
 
 		// a_BlockY - 1: Because we want the block below the fire
