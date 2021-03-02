@@ -1248,7 +1248,7 @@ void cChunk::WakeUpSimulators(void)
 		for (size_t BlockIdx = 0; BlockIdx != ChunkBlockData::SectionBlockCount; ++BlockIdx)
 		{
 			const auto BlockType = (*Section)[BlockIdx];
-			const auto Position = IndexToCoordinate(BlockIdx + SectionIdx * ChunkBlockData::SectionBlockCount);
+			const auto Position = cChunkDef::IndexToCoordinate(BlockIdx + SectionIdx * ChunkBlockData::SectionBlockCount);
 
 			RedstoneSimulator->AddBlock(*this, Position, BlockType);
 			WaterSimulator->AddBlock(*this, Position, BlockType);
