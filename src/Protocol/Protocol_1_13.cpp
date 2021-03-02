@@ -337,59 +337,60 @@ UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType)
 {
 	switch (a_PacketType)
 	{
-		case pktAttachEntity:         return 0x46;
-		case pktBlockChanges:         return 0x0f;
-		case pktCameraSetTo:          return 0x3c;
-		case pktChatRaw:              return 0x0e;
-		case pktCollectEntity:        return 0x4f;
-		case pktDestroyEntity:        return 0x35;
-		case pktDisconnectDuringGame: return 0x1b;
-		case pktEditSign:             return 0x2c;
-		case pktEntityEffect:         return 0x53;
-		case pktEntityEquipment:      return 0x42;
-		case pktEntityHeadLook:       return 0x39;
-		case pktEntityLook:           return 0x2a;
-		case pktEntityMeta:           return 0x3f;
-		case pktEntityProperties:     return 0x52;
-		case pktEntityRelMove:        return 0x28;
-		case pktEntityRelMoveLook:    return 0x29;
-		case pktEntityStatus:         return 0x1c;
-		case pktEntityVelocity:       return 0x41;
-		case pktExperience:           return 0x43;
-		case pktExplosion:            return 0x1e;
-		case pktGameMode:             return 0x20;
-		case pktHeldItemChange:       return 0x3d;
-		case pktInventorySlot:        return 0x17;
-		case pktJoinGame:             return 0x25;
-		case pktKeepAlive:            return 0x21;
-		case pktLeashEntity:          return 0x40;
-		case pktMapData:              return 0x26;
-		case pktParticleEffect:       return 0x24;
-		case pktPlayerAbilities:      return 0x2e;
-		case pktPlayerList:           return 0x30;
-		case pktPlayerMaxSpeed:       return 0x52;
-		case pktPlayerMoveLook:       return 0x32;
-		case pktPluginMessage:        return 0x19;
-		case pktRemoveEntityEffect:   return 0x36;
-		case pktRespawn:              return 0x38;
-		case pktScoreboardObjective:  return 0x45;
-		case pktSoundEffect:          return 0x1a;
-		case pktSoundParticleEffect:  return 0x23;
-		case pktSpawnPosition:        return 0x49;
-		case pktTabCompletionResults: return 0x10;
-		case pktTeleportEntity:       return 0x50;
-		case pktTimeUpdate:           return 0x4a;
-		case pktTitle:                return 0x4b;
-		case pktUnloadChunk:          return 0x1f;
-		case pktUnlockRecipe:         return 0x32;
-		case pktUpdateHealth:         return 0x44;
-		case pktUpdateScore:          return 0x48;
-		case pktUpdateSign:           return GetPacketID(pktUpdateBlockEntity);
-		case pktUseBed:               return 0x33;
-		case pktWindowClose:          return 0x13;
-		case pktWindowItems:          return 0x15;
-		case pktWindowOpen:           return 0x14;
-		case pktWindowProperty:       return 0x16;
+		case pktAttachEntity:           return 0x46;
+		case pktBlockChanges:           return 0x0f;
+		case pktCameraSetTo:            return 0x3c;
+		case pktChatRaw:                return 0x0e;
+		case pktCollectEntity:          return 0x4f;
+		case pktDestroyEntity:          return 0x35;
+		case pktDisconnectDuringGame:   return 0x1b;
+		case pktEditSign:               return 0x2c;
+		case pktEntityEffect:           return 0x53;
+		case pktEntityEquipment:        return 0x42;
+		case pktEntityHeadLook:         return 0x39;
+		case pktEntityLook:             return 0x2a;
+		case pktEntityMeta:             return 0x3f;
+		case pktEntityProperties:       return 0x52;
+		case pktEntityRelMove:          return 0x28;
+		case pktEntityRelMoveLook:      return 0x29;
+		case pktEntityStatus:           return 0x1c;
+		case pktEntityVelocity:         return 0x41;
+		case pktExperience:             return 0x43;
+		case pktExplosion:              return 0x1e;
+		case pktGameMode:               return 0x20;
+		case pktHeldItemChange:         return 0x3d;
+		case pktInventorySlot:          return 0x17;
+		case pktJoinGame:               return 0x25;
+		case pktKeepAlive:              return 0x21;
+		case pktLeashEntity:            return 0x40;
+		case pktMapData:                return 0x26;
+		case pktParticleEffect:         return 0x24;
+		case pktPlayerAbilities:        return 0x2e;
+		case pktPlayerList:             return 0x30;
+		case pktPlayerListHeaderFooter: return 0x4E;
+		case pktPlayerMaxSpeed:         return 0x52;
+		case pktPlayerMoveLook:         return 0x32;
+		case pktPluginMessage:          return 0x19;
+		case pktRemoveEntityEffect:     return 0x36;
+		case pktRespawn:                return 0x38;
+		case pktScoreboardObjective:    return 0x45;
+		case pktSoundEffect:            return 0x1a;
+		case pktSoundParticleEffect:    return 0x23;
+		case pktSpawnPosition:          return 0x49;
+		case pktTabCompletionResults:   return 0x10;
+		case pktTeleportEntity:         return 0x50;
+		case pktTimeUpdate:             return 0x4a;
+		case pktTitle:                  return 0x4b;
+		case pktUnloadChunk:            return 0x1f;
+		case pktUnlockRecipe:           return 0x32;
+		case pktUpdateHealth:           return 0x44;
+		case pktUpdateScore:            return 0x48;
+		case pktUpdateSign:             return GetPacketID(pktUpdateBlockEntity);
+		case pktUseBed:                 return 0x33;
+		case pktWindowClose:            return 0x13;
+		case pktWindowItems:            return 0x15;
+		case pktWindowOpen:             return 0x14;
+		case pktWindowProperty:         return 0x16;
 		default: return Super::GetPacketID(a_PacketType);
 	}
 }
@@ -462,7 +463,6 @@ UInt32 cProtocol_1_13::GetProtocolMobType(eMonsterType a_MobType)
 		case mtZombiePigman:          return 53;
 		case mtZombieHorse:           return 88;
 		case mtZombieVillager:        return 89;
-
 		default:                      return 0;
 	}
 	UNREACHABLE("Unsupported mob type");
@@ -598,7 +598,6 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadata a_Metadata)
 		case EntityMetadata::AbstractSkeletonArmsSwinging:
 		case EntityMetadata::ZombieUnusedWasType: break;
 	}
-
 	UNREACHABLE("Retrieved invalid metadata for protocol");
 }
 
@@ -630,7 +629,6 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadataType a_FieldType)
 		case EntityMetadataType::OptVarInt:    return 17;
 		case EntityMetadataType::Pose:         return 18;
 	}
-
 	UNREACHABLE("Translated invalid metadata type for protocol");
 }
 
@@ -1306,10 +1304,9 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtVindicator:
 
 		case mtHusk:
-
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
-			LOGD("cProtocol_1_13::WriteMobMetadata: received unimplemented type");
+			ASSERT(!"cProtocol_1_13::WriteMobMetadata: received unimplemented type");
 			break;
 		}
 
@@ -1330,10 +1327,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}
 
-		case mtInvalidType:
-		{
-			break;
-		}
 		default: UNREACHABLE("cProtocol_1_13::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }

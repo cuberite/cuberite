@@ -46,10 +46,7 @@ typedef std::list<cClientHandle *>                cClientHandleList;
 #define PREPARE_REL_AND_CHUNK(Position, OriginalChunk) cChunk * Chunk; Vector3i Rel; bool RelSuccess = (OriginalChunk).GetChunkAndRelByAbsolute(Position, &Chunk, Rel)
 
 
-// This class is not to be used directly
-// Instead, call actions on cChunkMap (such as cChunkMap::SetBlock() etc.)
-class cChunk :
-	public cChunkDef  // The inheritance is "misused" here only to inherit the functions and constants defined in cChunkDef
+class cChunk
 {
 public:
 

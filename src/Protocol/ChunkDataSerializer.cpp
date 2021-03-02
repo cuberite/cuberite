@@ -114,7 +114,6 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 				continue;
 			}
 		}
-
 		UNREACHABLE("Unknown chunk data serialization version");
 	}
 

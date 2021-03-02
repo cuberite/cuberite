@@ -53,10 +53,10 @@ bool cMapSerializer::Save(void)
 	SaveMapToNBT(Writer);
 	Writer.Finish();
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 	cParsedNBT TestParse(Writer.GetResult());
 	ASSERT(TestParse.IsValid());
-	#endif  // _DEBUG
+	#endif  // !NDEBUG
 
 	GZipFile::Write(m_Path, Writer.GetResult());
 
@@ -229,10 +229,10 @@ bool cIDCountSerializer::Save(void)
 
 	Writer.Finish();
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 	cParsedNBT TestParse(Writer.GetResult());
 	ASSERT(TestParse.IsValid());
-	#endif  // _DEBUG
+	#endif  // !NDEBUG
 
 	cFile File;
 	if (!File.Open(m_Path, cFile::fmWrite))

@@ -41,8 +41,7 @@ int cMobCensus::GetCapMultiplier(cMonster::eFamily a_MobFamily)
 		case cMonster::mfNoSpawn:
 		case cMonster::mfUnhandled:
 		{
-			ASSERT(!"Unhandled mob family");
-			return -1;
+			break;
 		}
 	}
 	UNREACHABLE("Unsupported mob family");

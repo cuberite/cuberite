@@ -97,12 +97,6 @@ public:
 	/** Send this objective to the specified client */
 	void SendTo(cClientHandle & a_Client);
 
-	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
-	{
-		return "cObjective";
-	}
-
-
 private:
 
 	typedef std::pair<AString, Score> cTrackedPlayer;
@@ -176,11 +170,6 @@ public:
 	void SetSuffix(const AString & a_Suffix) { m_Suffix = a_Suffix; }
 
 	// tolua_end
-
-	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
-	{
-		return "cTeam";
-	}
 
 private:
 

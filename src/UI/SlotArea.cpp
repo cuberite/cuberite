@@ -2803,6 +2803,7 @@ void cSlotAreaHorse::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 					{
 						return;
 					}
+					break;
 				}
 				case ArmorSlot:
 				{
@@ -2810,6 +2811,7 @@ void cSlotAreaHorse::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 					{
 						return;
 					}
+					break;
 				}
 				default: break;
 			}

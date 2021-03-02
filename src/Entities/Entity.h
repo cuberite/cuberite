@@ -146,6 +146,8 @@ public:
 		esFireworkExploding      = 17,
 		// Passive mob is in "love mode"
 		esMobInLove              = 18,
+		// Plays totem of undying animation and sound
+		esTotemOfUndying         = 35,
 	} ;
 
 	static const int FIRE_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in fire
@@ -589,12 +591,6 @@ public:
 	/** Returs whether the entity has any mob leashed to it. */
 	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }
 
-	/** a lightweight calculation approach to get explosion exposure rate
-	@param a_ExplosionPosition explosion position
-	@param a_ExlosionPower explosion power
-	@return exposure rate */
-	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower);
-
 
 protected:
 
@@ -702,11 +698,6 @@ protected:
 
 	/** The number of ticks this entity has been alive for */
 	long int m_TicksAlive;
-
-
-	/** Does the actual speed-setting. The default implementation just sets the member variable value;
-	overrides can provide further processing, such as forcing players to move at the given speed. */
-	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 
 	/** Handles the moving of this entity between worlds.
 	Should handle degenerate cases such as moving to the same world. */

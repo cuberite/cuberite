@@ -1715,17 +1715,6 @@ void cEntity::SetIsTicking(bool a_IsTicking)
 
 
 
-void cEntity::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
-{
-	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
-
-	WrapSpeed();
-}
-
-
-
-
-
 void cEntity::HandleAir(void)
 {
 	// Ref.: https://minecraft.gamepedia.com/Chunk_format
@@ -2095,7 +2084,8 @@ void cEntity::SetRoll(double a_Roll)
 
 void cEntity::SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 {
-	DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
+	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
+	WrapSpeed();
 }
 
 
@@ -2140,7 +2130,7 @@ void cEntity::SetWidth(double a_Width)
 
 void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeedZ)
 {
-	DoSetSpeed(m_Speed.x + a_AddSpeedX, m_Speed.y + a_AddSpeedY, m_Speed.z + a_AddSpeedZ);
+	SetSpeed(m_Speed.x + a_AddSpeedX, m_Speed.y + a_AddSpeedY, m_Speed.z + a_AddSpeedZ);
 }
 
 
@@ -2278,36 +2268,5 @@ void cEntity::BroadcastLeashedMobs()
 		{
 			m_World->BroadcastLeashEntity(*LeashedMob, *this);
 		}
-	}
-}
-
-
-
-
-
-float cEntity::GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower)
-{
-	double EntitySize = m_Width * m_Width * m_Height;
-	if (EntitySize <= 0)
-	{
-		// Handle entity with invalid size
-		return 0;
-	}
-
-	auto EntityBox = GetBoundingBox();
-	cBoundingBox ExplosionBox(a_ExplosionPosition, a_ExlosionPower * 2.0);
-	cBoundingBox IntersectionBox(EntityBox);
-
-	bool Overlap = EntityBox.Intersect(ExplosionBox, IntersectionBox);
-	if (Overlap)
-	{
-		Vector3d Diff = IntersectionBox.GetMax() - IntersectionBox.GetMin();
-		double OverlapSize = Diff.x * Diff.y * Diff.z;
-
-		return static_cast<float>(OverlapSize / EntitySize);
-	}
-	else
-	{
-		return 0;
 	}
 }

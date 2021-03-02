@@ -289,7 +289,7 @@ int main(int argc, char ** argv)
 	// Only useful when the leak is in the same sequence all the time
 	// _CrtSetBreakAlloc(85950);
 
-#endif  // _DEBUG && _MSC_VER
+#endif  // !NDEBUG && _MSC_VER
 
 	std::signal(SIGSEGV, NonCtrlHandler);
 	std::signal(SIGTERM, NonCtrlHandler);

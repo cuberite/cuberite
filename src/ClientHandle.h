@@ -183,6 +183,7 @@ public:  // tolua_export
 	void SendParticleEffect             (const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data);
 	void SendPlayerAbilities            (void);
 	void SendPlayerListAddPlayer        (const cPlayer & a_Player);
+	void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer);   // tolua_export
 	void SendPlayerListRemovePlayer     (const cPlayer & a_Player);
 	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
 	void SendPlayerListUpdateGameMode   (const cPlayer & a_Player);

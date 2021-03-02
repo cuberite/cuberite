@@ -9,7 +9,7 @@
 
 namespace RedstoneComparatorHandler
 {
-	inline unsigned char GetFrontPowerLevel(NIBBLETYPE a_Meta, unsigned char a_HighestSidePowerLevel, unsigned char a_HighestRearPowerLevel)
+	static unsigned char GetFrontPowerLevel(NIBBLETYPE a_Meta, unsigned char a_HighestSidePowerLevel, unsigned char a_HighestRearPowerLevel)
 	{
 		if (cBlockComparatorHandler::IsInSubtractionMode(a_Meta))
 		{
@@ -23,7 +23,7 @@ namespace RedstoneComparatorHandler
 		}
 	}
 
-	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_QueryPosition);
 		UNUSED(a_QueryBlockType);
@@ -35,7 +35,7 @@ namespace RedstoneComparatorHandler
 		);
 	}
 
-	inline unsigned char GetPowerLevel(cChunk & a_Chunk, Vector3i Position, BLOCKTYPE BlockType, NIBBLETYPE Meta)
+	static unsigned char GetPowerLevel(cChunk & a_Chunk, Vector3i Position, BLOCKTYPE BlockType, NIBBLETYPE Meta)
 	{
 		UInt8 SignalStrength = 0;
 		auto RearCoordinate = cBlockComparatorHandler::GetRearCoordinate(Position, Meta & 0x3);
@@ -79,7 +79,7 @@ namespace RedstoneComparatorHandler
 		);
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
+	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// Note that Power here contains the maximum * side * power level, as specified by GetValidSourcePositions
 		// LOGD("Evaluating ALU the comparator (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
@@ -125,7 +125,7 @@ namespace RedstoneComparatorHandler
 		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, cBlockComparatorHandler::GetFrontCoordinate(a_Position, a_Meta & 0x3) - a_Position);
 	}
 
-	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
+	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);

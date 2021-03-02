@@ -10,7 +10,7 @@
 
 namespace RedstoneToggleHandler
 {
-	inline Vector3i GetOffsetAttachedTo(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+	static Vector3i GetOffsetAttachedTo(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 	{
 		switch (a_BlockType)
 		{
@@ -59,7 +59,7 @@ namespace RedstoneToggleHandler
 		}
 	}
 
-	inline unsigned char GetPowerLevel(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+	static unsigned char GetPowerLevel(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 	{
 		switch (a_BlockType)
 		{
@@ -74,7 +74,7 @@ namespace RedstoneToggleHandler
 		}
 	}
 
-	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_QueryBlockType);
 
@@ -89,12 +89,12 @@ namespace RedstoneToggleHandler
 		return GetPowerLevel(a_BlockType, Meta);
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
+	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating templatio<> the lever/button (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 	}
 
-	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
+	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
