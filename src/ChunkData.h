@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "FunctionRef.h"
 #include "ChunkDef.h"
 
 
@@ -131,10 +132,16 @@ public:
 
 namespace ChunkDef
 {
+	using cForEachSectionCallback = cFunctionRef<void(
+		size_t,
+		ChunkBlockData::BlockArray *,
+		ChunkBlockData::MetaArray *,
+		ChunkLightData::LightArray *,
+		ChunkLightData::LightArray *)>;
+
 	/** Invokes the callback functor for every chunk section containing at least one present block or light section data.
 	This is used to collect all data for all sections. */
-	template <class Functor>
-	void ForEachSection(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, Functor a_Callback)
+	inline void ForEachSection(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, cForEachSectionCallback a_Callback)
 	{
 		for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 		{
