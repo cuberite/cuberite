@@ -32,7 +32,7 @@ class cProtocol_1_13:
 
 public:
 
-	using Super::cProtocol_1_12_2;
+	using Super::Super;
 
 protected:
 
@@ -84,9 +84,11 @@ class cProtocol_1_13_1 :
 
 public:
 
-	using Super::cProtocol_1_13;
+	using Super::Super;
 
 protected:
+
+	virtual void SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
 
 	virtual Version GetProtocolVersion() override;
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) override;

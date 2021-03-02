@@ -5,6 +5,8 @@
 
 #include "../World.h"
 #include "../Entities/Player.h"
+#include "ClientHandle.h"
+#include "CompositeChat.h"
 
 
 
@@ -48,40 +50,13 @@ bool cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	return Super::DoTakeDamage(a_TDI);
-}
-
-
-
-
-
-void cWither::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
-{
-	Super::Tick(a_Dt, a_Chunk);
-	if (!IsTicking())
+	if (!Super::DoTakeDamage(a_TDI))
 	{
-		// The base class tick destroyed us
-		return;
+		return false;
 	}
 
-	if (m_WitherInvulnerableTicks > 0)
-	{
-		unsigned int NewTicks = m_WitherInvulnerableTicks - 1;
-
-		if (NewTicks == 0)
-		{
-			m_World->DoExplosionAt(7.0, GetPosX(), GetPosY(), GetPosZ(), false, esWitherBirth, this);
-		}
-
-		m_WitherInvulnerableTicks = NewTicks;
-
-		if ((NewTicks % 10) == 0)
-		{
-			Heal(10);
-		}
-	}
-
-	m_World->BroadcastEntityMetadata(*this);
+	m_World->BroadcastBossBarUpdateHealth(GetUniqueID(), GetHealth() / GetMaxHealth());
+	return true;
 }
 
 
@@ -119,3 +94,44 @@ void cWither::KilledBy(TakeDamageInfo & a_TDI)
 
 
 
+
+void cWither::SpawnOn(cClientHandle & a_Client)
+{
+	Super::SpawnOn(a_Client);
+
+	// Purple boss bar with no divisions that darkens the sky:
+	a_Client.SendBossBarAdd(GetUniqueID(), cCompositeChat("Wither"), GetHealth() / GetMaxHealth(), BossBarColor::Purple, BossBarDivisionType::None, true, false, false);
+}
+
+
+
+
+
+void cWither::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	Super::Tick(a_Dt, a_Chunk);
+	if (!IsTicking())
+	{
+		// The base class tick destroyed us
+		return;
+	}
+
+	if (m_WitherInvulnerableTicks > 0)
+	{
+		unsigned int NewTicks = m_WitherInvulnerableTicks - 1;
+
+		if (NewTicks == 0)
+		{
+			m_World->DoExplosionAt(7.0, GetPosX(), GetPosY(), GetPosZ(), false, esWitherBirth, this);
+		}
+
+		m_WitherInvulnerableTicks = NewTicks;
+
+		if ((NewTicks % 10) == 0)
+		{
+			Heal(10);
+		}
+	}
+
+	m_World->BroadcastEntityMetadata(*this);
+}

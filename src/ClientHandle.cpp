@@ -2188,6 +2188,33 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 
 
+void cClientHandle::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	m_Protocol->SendBossBarAdd(a_UniqueID, a_Title, a_FractionFilled, a_Color, a_DivisionType, a_DarkenSky, a_PlayEndMusic, a_CreateFog);
+}
+
+
+
+
+
+void cClientHandle::SendBossBarRemove(UInt32 a_UniqueID)
+{
+	m_Protocol->SendBossBarRemove(a_UniqueID);
+}
+
+
+
+
+
+void cClientHandle::SendBossBarUpdateHealth(UInt32 a_UniqueID, float a_FractionFilled)
+{
+	m_Protocol->SendBossBarUpdateHealth(a_UniqueID, a_FractionFilled);
+}
+
+
+
+
+
 void cClientHandle::SendCameraSetTo(const cEntity & a_Entity)
 {
 	m_Protocol->SendCameraSetTo(a_Entity);
@@ -2643,6 +2670,15 @@ void cClientHandle::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 
 
 
+void cClientHandle::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
+{
+	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
+}
+
+
+
+
+
 void cClientHandle::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 {
 	m_Protocol->SendPlayerListUpdateGameMode(a_Player);
@@ -2655,15 +2691,6 @@ void cClientHandle::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 void cClientHandle::SendPlayerListUpdatePing(const cPlayer & a_Player)
 {
 	m_Protocol->SendPlayerListUpdatePing(a_Player);
-}
-
-
-
-
-
-void cClientHandle::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
-{
-	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
 }
 
 
