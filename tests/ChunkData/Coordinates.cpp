@@ -28,22 +28,22 @@ static void test()
 
 		// Out of range GetBlock
 		TEST_ASSERTS(
-			buffer.GetBlock(-1, 0, 0);
+			buffer.GetBlock({ -1, 0, 0 });
 		);
 		TEST_ASSERTS(
-			buffer.GetBlock(0, -1, 0);
+			buffer.GetBlock({ 0, -1, 0 });
 		);
 		TEST_ASSERTS(
-			buffer.GetBlock(0, 0, -1);
+			buffer.GetBlock({ 0, 0, -1 });
 		);
 		TEST_ASSERTS(
-			buffer.GetBlock(256, 0, 0);
+			buffer.GetBlock({ 256, 0, 0 });
 		);
 		TEST_ASSERTS(
-			buffer.GetBlock(0, 256, 0);
+			buffer.GetBlock({ 0, 256, 0 });
 		);
 		TEST_ASSERTS(
-			buffer.GetBlock(0, 0, 256);
+			buffer.GetBlock({ 0, 0, 256 });
 		);
 
 		// Out of range SetBlock
@@ -68,22 +68,22 @@ static void test()
 
 		// Out of range GetMeta
 		TEST_ASSERTS(
-			buffer.GetMeta(-1, 0, 0);
+			buffer.GetMeta({ -1, 0, 0 });
 		);
 		TEST_ASSERTS(
-			buffer.GetMeta(0, -1, 0);
+			buffer.GetMeta({ 0, -1, 0 });
 		);
 		TEST_ASSERTS(
-			buffer.GetMeta(0, 0, -1);
+			buffer.GetMeta({ 0, 0, -1 });
 		);
 		TEST_ASSERTS(
-			buffer.GetMeta(256, 0, 0);
+			buffer.GetMeta({ 256, 0, 0 });
 		);
 		TEST_ASSERTS(
-			buffer.GetMeta(0, 256, 0);
+			buffer.GetMeta({ 0, 256, 0 });
 		);
 		TEST_ASSERTS(
-			buffer.GetMeta(0, 0, 256);
+			buffer.GetMeta({ 0, 0, 256 });
 		);
 
 		// Out of range SetMeta
