@@ -366,6 +366,9 @@ public:
 	virtual void SendBossBarAdd                 (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) = 0;
 	virtual void SendBossBarRemove              (UInt32 a_UniqueID) = 0;
 	virtual void SendBossBarUpdateHealth        (UInt32 a_UniqueID, float a_FractionFilled) = 0;
+	virtual void SendBossBarUpdateFlags         (UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) = 0;
+	virtual void SendBossBarUpdateStyle         (UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType) = 0;
+	virtual void SendBossBarUpdateTitle         (UInt32 a_UniqueID, const cCompositeChat & a_Title) = 0;
 	virtual void SendCameraSetTo                (const cEntity & a_Entity) = 0;
 	virtual void SendChat                       (const AString & a_Message, eChatType a_Type) = 0;
 	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) = 0;

@@ -145,6 +145,9 @@ public:  // tolua_export
 	void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // tolua_export
 	void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
 	void SendBossBarAdd                 (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog);  // tolua_export
+	void SendBossBarUpdateFlags         (UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog);  // tolua_export
+	void SendBossBarUpdateStyle         (UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType);  // tolua_export
+	void SendBossBarUpdateTitle         (UInt32 a_UniqueID, const cCompositeChat & a_Title);  // tolua_export
 	void SendBossBarRemove              (UInt32 a_UniqueID);  // tolua_export
 	void SendBossBarUpdateHealth        (UInt32 a_UniqueID, float a_FractionFilled);  // tolua_export
 	void SendCameraSetTo                (const cEntity & a_Entity);

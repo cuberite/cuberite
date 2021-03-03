@@ -1395,6 +1395,37 @@ void cProtocol_1_13_1::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & 
 
 
 
+void cProtocol_1_13_1::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(5);  // Update Flags
+	{
+		UInt8 Flags = 0x00;
+		if (a_DarkenSky)
+		{
+			Flags |= 0x01;
+		}
+		if (a_PlayEndMusic)
+		{
+			Flags |= 0x02;
+		}
+		if (a_CreateFog)
+		{
+			Flags |= 0x04;  // Only difference to 1.9 is fog now a separate flag
+		}
+		Pkt.WriteBEUInt8(Flags);
+	}
+}
+
+
+
+
+
 cProtocol::Version cProtocol_1_13_1::GetProtocolVersion()
 {
 	return Version::v1_13_1;

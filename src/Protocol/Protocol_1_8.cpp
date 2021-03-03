@@ -298,7 +298,34 @@ void cProtocol_1_8_0::SendBossBarRemove(UInt32 a_UniqueID)
 
 
 
+void cProtocol_1_8_0::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	// No such packet here
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendBossBarUpdateHealth(UInt32 a_UniqueID, float a_FractionFilled)
+{
+	// No such packet here
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType)
+{
+	// No such packet here
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendBossBarUpdateTitle(UInt32 a_UniqueID, const cCompositeChat & a_Title)
 {
 	// No such packet here
 }

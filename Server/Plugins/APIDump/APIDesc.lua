@@ -1606,7 +1606,64 @@ end
 							Type = "boolean",
 						},
 					},
-					Notes = "Creates a boss bar on the client's UI. The boss bar is independent of any entity and has a lifetime and properties fully controlled by the plugin. Plugins are responsible for assigning a unique ID.",
+					Notes = "Creates a boss bar on the client's UI. The boss bar is independent of any entity and has a lifetime and properties fully controlled by the plugin. Plugins are responsible for assigning a unique ID and removal.",
+				},
+				SendBossBarUpdateFlags =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+						{
+							Name = "DarkenSky",
+							Type = "boolean",
+						},
+						{
+							Name = "PlayEndMusic",
+							Type = "boolean",
+						},
+						{
+							Name = "CreateFog",
+							Type = "boolean",
+						},
+					},
+					Notes = "Updates a boss bar on the client's UI. Only updates some meta flags for additional effects.",
+				},
+				SendBossBarUpdateStyle =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+						{
+							Name = "Color",
+							Type = "BossBarColor",
+						},
+						{
+							Name = "DivisionType",
+							Type = "BossBarDivisionType",
+						},
+					},
+					Notes = "Updates a boss bar on the client's UI. Only updates the visuals of the Boss Bar.",
+				},
+				SendBossBarUpdateTitle =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+						{
+							Name = "Title",
+							Type = "cCompositeChat",
+						},
+					},
+					Notes = "Updates a boss bar on the client's UI. Only Updates the text at the top.",
 				},
 				SendBossBarRemove =
 				{

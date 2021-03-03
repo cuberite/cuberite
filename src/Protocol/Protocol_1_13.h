@@ -89,6 +89,7 @@ public:
 protected:
 
 	virtual void SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
+	virtual void SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
 
 	virtual Version GetProtocolVersion() override;
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) override;

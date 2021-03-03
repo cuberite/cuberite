@@ -2197,6 +2197,33 @@ void cClientHandle::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_T
 
 
 
+void cClientHandle::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	m_Protocol->SendBossBarUpdateFlags(a_UniqueID, a_DarkenSky, a_PlayEndMusic, a_CreateFog);
+}
+
+
+
+
+
+void cClientHandle::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType)
+{
+	m_Protocol->SendBossBarUpdateStyle(a_UniqueID, a_Color, a_DivisionType);
+}
+
+
+
+
+
+void cClientHandle::SendBossBarUpdateTitle(UInt32 a_UniqueID, const cCompositeChat & a_Title)
+{
+	m_Protocol->SendBossBarUpdateTitle(a_UniqueID, a_Title);
+}
+
+
+
+
+
 void cClientHandle::SendBossBarRemove(UInt32 a_UniqueID)
 {
 	m_Protocol->SendBossBarRemove(a_UniqueID);
