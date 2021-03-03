@@ -5,8 +5,8 @@
 
 #include "../World.h"
 #include "../Entities/Player.h"
-#include "ClientHandle.h"
-#include "CompositeChat.h"
+#include "../ClientHandle.h"
+#include "../CompositeChat.h"
 
 
 

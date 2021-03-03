@@ -23,7 +23,7 @@ Implements the 1.13 protocol classes:
 
 #include "../Mobs/IncludeAllMonsters.h"
 
-#include "CompositeChat.h"
+#include "../CompositeChat.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
