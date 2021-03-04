@@ -91,5 +91,8 @@ void cCow::OnRightClicked(cPlayer & a_Player)
 
 void cCow::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	m_BehaviorTree->Tick(m_Blackboard);
+	if (m_BehaviorTree)
+	{
+		m_BehaviorTree->Tick(m_Blackboard);
+	}
 }

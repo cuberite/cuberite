@@ -62,6 +62,12 @@ std::unique_ptr<cTask> CreateBehaviourTree(eMonsterType a_MobType, const AString
 		FilePath = Printf(FilePath.c_str(), cFile::PathSeparator(), NamespaceSerializer::From(a_MobType), ".lua");
 	}
 
+	// If file does not exist no behaviour
+	if (!cFile::IsFile(FilePath))
+	{
+		return nullptr;
+	}
+
 	auto Lua = cLuaState(LuaSubsystemName);
 	Lua.Create();
 	cLuaState::cLock lock(Lua);
@@ -77,6 +83,12 @@ std::unique_ptr<cTask> CreateBehaviourTree(eMonsterType a_MobType, const AString
 
 	lua_pushnil(Lua);
 	lua_next(Lua, -2);
+
+	// There is no behaviour
+	if (lua_gettop(Lua) == 1)
+	{
+		return nullptr;
+	}
 
 	lua_pushvalue(Lua, -2);
 	auto Name = lua_tostring(Lua, -1);

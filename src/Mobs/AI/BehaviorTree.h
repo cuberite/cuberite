@@ -1,10 +1,11 @@
 
 #pragma once
 
+#include "../../Bindings/LuaState.h"
+
 #include "Blackboard.h"
 
 #include "../MonsterTypes.h"
-#include "../../Bindings/LuaState.h"
 
 namespace BehaviorTree
 {
@@ -103,7 +104,7 @@ public:
 
 	cBasicComposite(cLuaState & a_LuaState)
 	{
-		m_Children = std::move(CreateChildBehaviours(a_LuaState));
+		m_Children = CreateChildBehaviours(a_LuaState);
 		m_CurrentTask = m_Children.begin();
 	}
 
