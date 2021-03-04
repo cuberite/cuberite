@@ -2223,12 +2223,6 @@ cFinishGenForestRocks::cFinishGenForestRocks(int a_Seed, cIniFile & a_IniFile) :
 
 void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	auto Biome = a_ChunkDesc.GetBiome(cChunkDef::Width / 2, cChunkDef::Width / 2);
-	if ((Biome != biMegaTaiga) && (Biome != biMegaTaigaHills))
-	{
-		return;
-	}
-
 	// Choose random position in chunk and place boulder around it
 	auto Pos = Vector3i(
 		m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % cChunkDef::Width,
@@ -2237,7 +2231,8 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 		);
 	Pos.y = a_ChunkDesc.GetHeight(Pos.x, Pos.z) % cChunkDef::Height;
 
-	if (!cChunkDef::IsValidRelPos(Pos))
+	auto Biome = a_ChunkDesc.GetBiome(Pos.x, Pos.z);
+	if ((Biome != biMegaTaiga) && (Biome != biMegaTaigaHills))
 	{
 		return;
 	}
@@ -2257,10 +2252,10 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 		Radius = 3;
 	}
 
-	Pos.x = Clamp(Pos.x, 0 + Radius, cChunkDef::Width - Radius - 1);
-	Pos.z = Clamp(Pos.z, 0 + Radius, cChunkDef::Width - Radius - 1);
+	Pos.x = Clamp(Pos.x, Radius, cChunkDef::Width - Radius - 1);
+	Pos.z = Clamp(Pos.z, Radius, cChunkDef::Width - Radius - 1);
 
-	auto StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y + Radius, Pos.z);
+	auto StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y, Pos.z);
 	while (!((StartBlock == E_BLOCK_DIRT) || (StartBlock == E_BLOCK_GRASS)))
 	{
 		Pos.y -= 1;
@@ -2268,8 +2263,12 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 		{
 			return;
 		}
-		StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y + Radius, Pos.z);
+		StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y, Pos.z);
 	}
+
+
+	Pos.y -= Radius - 1;
+	// Pos.y = Clamp(Pos.y - m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % Radius + 1, 0, cChunkDef::Height);
 
 	for (int x = -Radius; x <= Radius; x++)
 	{
@@ -2282,7 +2281,7 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 					continue;
 				}
 
-				if (Vector3d(x, y, z).Length() - 0.25 > Radius)
+				if (Vector3d(x, y, z).SqrLength() > Radius * Radius + 1)
 				{
 					continue;
 				}
