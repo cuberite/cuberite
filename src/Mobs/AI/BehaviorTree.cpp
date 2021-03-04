@@ -208,7 +208,7 @@ cGuardedTask::cGuardedTask(cLuaState & a_LuaState)
 			lua_next(a_LuaState, -2);
 
 			auto Name = lua_tostring(a_LuaState, -2);
-			m_Guard = std::move(CreateBehaviour(Name, a_LuaState));
+			m_Guard = CreateBehaviour(Name, a_LuaState);
 
 			a_LuaState.Pop(2);
 		}
@@ -226,7 +226,7 @@ cGuardedTask::cGuardedTask(cLuaState & a_LuaState)
 			lua_next(a_LuaState, -2);
 
 			auto Name = lua_tostring(a_LuaState, -2);
-			m_Child = std::move(CreateBehaviour(Name, a_LuaState));
+			m_Child = CreateBehaviour(Name, a_LuaState);
 			a_LuaState.Pop(2);
 		}
 	}
