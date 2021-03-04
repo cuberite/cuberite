@@ -3,6 +3,9 @@
 
 #include "Blackboard.h"
 
+#include "../MonsterTypes.h"
+#include "../../Bindings/LuaState.h"
+
 namespace BehaviorTree
 {
 
@@ -65,6 +68,15 @@ private:
 
 using cTasks = std::vector<std::unique_ptr<cTask>>;
 
+
+
+
+
+std::unique_ptr<cTask> CreateBehaviourTree(eMonsterType a_MobType, const AString & a_CustomFileName = "");
+cTasks CreateChildBehaviours(cLuaState & a_LuaState);
+std::unique_ptr<cTask> CreateBehaviour(const AString & a_BehaviourName, cLuaState & a_LuaState);
+
+
 /** Creates a vector from a variadic set of arguments
 This helps avoid the issue that you can't move from `std::initializer_list`
 so vector's list constructor won't work with e.g. `std::unique_ptr<cBehavior>`. */
@@ -88,6 +100,12 @@ class cBasicComposite:
 	public cTask
 {
 public:
+
+	cBasicComposite(cLuaState & a_LuaState)
+	{
+		m_Children = std::move(CreateChildBehaviours(a_LuaState));
+		m_CurrentTask = m_Children.begin();
+	}
 
 	cBasicComposite(cTasks a_Children) :
 		m_Children(std::move(a_Children)),
@@ -143,6 +161,8 @@ class cGuardedTask :
 	public cTask
 {
 public:
+	cGuardedTask(cLuaState & a_LuaState);
+
 	cGuardedTask(std::unique_ptr<cTask> a_Guard, std::unique_ptr<cTask> a_Child) :
 		m_Guard(std::move(a_Guard)),
 		m_Child(std::move(a_Child))
@@ -175,6 +195,8 @@ public:
 	{
 	}
 
+	cDynamicGuardSelector(cLuaState & a_LuaState);
+
 private:
 	cGuardedTasks m_Children;
 	cGuardedTasks::iterator m_CurrentTask;
@@ -197,6 +219,8 @@ public:
 	{
 		ASSERT(m_Child != nullptr);
 	}
+
+	cSucceeder(cLuaState & a_LuaState);
 
 private:
 	std::unique_ptr<cTask> m_Child;
@@ -225,6 +249,8 @@ public:
 	{
 	}
 
+	cRandomPosition(cLuaState & a_LuaState);
+
 private:
 	cBlackboardKey m_Key;
 	double m_MaxRange;
@@ -246,6 +272,8 @@ public:
 	{
 	}
 
+	cMoveToPosition(cLuaState & a_LuaState);
+
 private:
 	cBlackboardKey m_Key;
 
@@ -264,6 +292,8 @@ class cRandomWait:
 	public cTask
 {
 public:
+	cRandomWait(cLuaState & a_LuaState);
+
 	cRandomWait(cTickTime a_WaitMin, cTickTime a_WaitMax):
 		m_WaitMin(a_WaitMin),
 		m_WaitMax(a_WaitMax)
@@ -292,6 +322,8 @@ public:
 		m_MaxHealth(a_MaxHealth)
 	{
 	}
+
+	cHealthRange(cLuaState & a_LuaState);
 
 private:
 	float m_MinHealth, m_MaxHealth;

@@ -42,6 +42,8 @@ cCow::cCow(void) :
 			)
 		)
 	);
+
+	m_BehaviorTree = BehaviorTree::CreateBehaviourTree(eMonsterType::mtCow);
 }
 
 
