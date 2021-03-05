@@ -1,20 +1,6 @@
 # This is the top-level CMakeLists.txt file for the Cuberite project
 #
 # Use CMake to generate the build files for your platform
-#
-# This script supports some configuration through CMake arguments (-Dparam=val syntax):
-#   BUILD_TOOLS=1                    sets up additional executables to be built along with the server (ProtoProxy, GrownBiomeGenVisualiser, MCADefrag)
-#   BUILD_UNSTABLE_TOOLS=1           sets up yet more executables to be built, these can be broken and generally are obsolete (GeneratorPerformanceTest)
-#   NO_NATIVE_OPTIMIZATION=1         disables CPU-specific optimisations for the current machine, allows use on other CPUs of the same platform
-#   DISABLE_SYSTEM_LUA=1             disables the use of system Lua interpreter; the tolua executable will be built and used instead. Incompatible with cross-compiling
-#   SELF_TEST=1                      enables testing code to be built
-#   UNITY_BUILDS=OFF                 disables unity builds
-#   PRECOMPILE_HEADERS=OFF           disables precompiled headers
-#   WHOLE_PROGRAM_OPTIMISATION=OFF   disables link time optimisation
-
-
-
-
 
 cmake_minimum_required (VERSION 3.13)
 cmake_policy(VERSION 3.13...3.17.2)
@@ -26,10 +12,12 @@ project(
 )
 
 option(BUILD_TOOLS "Sets up additional executables to be built along with the server" OFF)
-option(WHOLE_PROGRAM_OPTIMISATION "Enables link time optimisation for Release" ON)
+option(BUILD_UNSTABLE_TOOLS "Sets up yet more executables to be built, these can be broken and generally are obsolete" OFF)
+option(NO_NATIVE_OPTIMIZATION "Disables CPU-specific optimisations for the current machine, allows use on other CPUs of the same platform" OFF)
 option(PRECOMPILE_HEADERS "Enable precompiled headers for faster builds" ON)
 option(SELF_TEST "Enables testing code to be built" OFF)
 option(UNITY_BUILDS "Enables source aggregation for faster builds" ON)
+option(WHOLE_PROGRAM_OPTIMISATION "Enables link time optimisation for Release" ON)
 
 include("CMake/AddDependencies.cmake")
 include("CMake/Fixups.cmake")
@@ -87,24 +75,26 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 
 	# File failed to follow NHS guidelines on handwashing and has not maintained good hygiene
 	set_source_files_properties("${PROJECT_SOURCE_DIR}/src/IniFile.cpp" PROPERTIES COMPILE_OPTIONS -Wno-header-hygiene)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	set_source_files_properties("${PROJECT_SOURCE_DIR}/src/Bindings/Bindings.cpp" PROPERTIES COMPILE_OPTIONS -w)
 endif()
 
-if(${BUILD_TOOLS})
-	message("Building tools")
+if(BUILD_TOOLS)
+	message(STATUS "Building tools")
 	add_subdirectory(Tools/GrownBiomeGenVisualiser/)
 	add_subdirectory(Tools/MCADefrag/)
 	add_subdirectory(Tools/NoiseSpeedTest/)
 	add_subdirectory(Tools/ProtoProxy/)
 endif()
 
-if(${BUILD_UNSTABLE_TOOLS})
-	message("Building unstable tools")
+if(BUILD_UNSTABLE_TOOLS)
+	message(STATUS "Building unstable tools")
 	add_subdirectory(Tools/GeneratorPerformanceTest/)
 endif()
 
 # Self Test Mode enables extra checks at startup
-if(${SELF_TEST})
-	message("Tests enabled")
+if(SELF_TEST)
+	message(STATUS "Tests enabled")
 	enable_testing()
 	add_subdirectory(tests)
 endif()

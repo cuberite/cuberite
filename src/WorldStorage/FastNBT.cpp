@@ -637,6 +637,18 @@ void cFastNBTWriter::AddByteArray(const AString & a_Name, const char * a_Value, 
 
 
 
+void cFastNBTWriter::AddByteArray(const AString & a_Name, size_t a_NumElements, unsigned char a_Value)
+{
+	TagCommon(a_Name, TAG_ByteArray);
+	UInt32 len = htonl(static_cast<UInt32>(a_NumElements));
+	m_Result.append(reinterpret_cast<const std::byte *>(&len), 4);
+	m_Result.append(a_NumElements, std::byte(a_Value));
+}
+
+
+
+
+
 void cFastNBTWriter::AddIntArray(const AString & a_Name, const Int32 * a_Value, size_t a_NumElements)
 {
 	TagCommon(a_Name, TAG_IntArray);

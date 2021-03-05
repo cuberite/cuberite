@@ -57,7 +57,6 @@ target_sources(
 	Root.cpp
 	Scoreboard.cpp
 	Server.cpp
-	SetChunkData.cpp
 	SpawnPrepare.cpp
 	Statistics.cpp
 	StringCompression.cpp
@@ -68,7 +67,6 @@ target_sources(
 	World.cpp
 	main.cpp
 
-	AllocationPool.h
 	BiomeDef.h
 	BlockArea.h
 	BlockInServerPluginInterface.h
@@ -210,7 +208,7 @@ function(make_symlink orig link)
 	endif()
 
 	# Create the symlink (platform-dependent):
-	message("Creating symlink, orig = ${orig}; link = ${link}")
+	message(STATUS "Creating symlink, orig = ${orig}; link = ${link}")
 	if (CMAKE_HOST_UNIX)
 		set(command ln -s ${orig} ${link})
 	else()
@@ -254,7 +252,7 @@ set(symlinks
 	monsters.ini
 	README.txt
 )
-message("Creating output folder and symlinks...")
+message(STATUS "Creating output folder and symlinks...")
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Server")
 foreach (symlink ${symlinks})
 	make_symlink("${CMAKE_CURRENT_SOURCE_DIR}/../Server/${symlink}" "${CMAKE_BINARY_DIR}/Server/${symlink}")

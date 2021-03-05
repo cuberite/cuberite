@@ -216,6 +216,9 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_DetectorRailPosition = Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
 	}
 
+	// Enforce speed limit:
+	m_Speed.Clamp(MAX_SPEED_NEGATIVE, MAX_SPEED);
+
 	// Broadcast positioning changes to client
 	BroadcastMovementUpdate();
 }
@@ -1262,40 +1265,6 @@ void cMinecart::ApplyAcceleration(Vector3d a_ForwardDirection, double a_Accelera
 	auto Acceleration = a_ForwardDirection * (NewSpeed - CurSpeed);
 
 	AddSpeed(Acceleration);
-}
-
-
-
-
-
-void cMinecart::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
-{
-	if (a_SpeedX > MAX_SPEED)
-	{
-		a_SpeedX = MAX_SPEED;
-	}
-	else if (a_SpeedX < MAX_SPEED_NEGATIVE)
-	{
-		a_SpeedX = MAX_SPEED_NEGATIVE;
-	}
-	if (a_SpeedY > MAX_SPEED)
-	{
-		a_SpeedY = MAX_SPEED;
-	}
-	else if (a_SpeedY < MAX_SPEED_NEGATIVE)
-	{
-		a_SpeedY = MAX_SPEED_NEGATIVE;
-	}
-	if (a_SpeedZ > MAX_SPEED)
-	{
-		a_SpeedZ = MAX_SPEED;
-	}
-	else if (a_SpeedZ < MAX_SPEED_NEGATIVE)
-	{
-		a_SpeedZ = MAX_SPEED_NEGATIVE;
-	}
-
-	Super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
 

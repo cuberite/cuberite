@@ -1,13 +1,12 @@
 function(build_dependencies)
-	# Set options for SQLiteCpp, disable all their tests and lints:
-	set(SQLITECPP_BUILD_EXAMPLES       OFF CACHE BOOL "Build examples.")
-	set(SQLITECPP_BUILD_TESTS          OFF CACHE BOOL "Build and run tests.")
-	set(SQLITECPP_INTERNAL_SQLITE      ON  CACHE BOOL "Add the internal SQLite3 source to the project.")
+	# Set options for SQLiteCpp, disable all their lints and other features we don't need:
+	set(SQLITE_ENABLE_COLUMN_METADATA  OFF CACHE BOOL "Enable Column::getColumnOriginName(). Require support from sqlite3 library.")
+	set(SQLITE_ENABLE_JSON1            OFF CACHE BOOL "Enable JSON1 extension when building internal sqlite3 library.")
+	set(SQLITECPP_INCLUDE_SCRIPT       OFF CACHE BOOL "Include config & script files.")
 	set(SQLITECPP_RUN_CPPCHECK         OFF CACHE BOOL "Run cppcheck C++ static analysis tool.")
 	set(SQLITECPP_RUN_CPPLINT          OFF CACHE BOOL "Run cpplint.py tool for Google C++ StyleGuide.")
-	set(SQLITECPP_RUN_DOXYGEN          OFF CACHE BOOL "Run Doxygen C++ documentation tool.")
 	set(SQLITECPP_USE_STACK_PROTECTION OFF CACHE BOOL "USE Stack Protection hardening.")
-	set(SQLITE_ENABLE_COLUMN_METADATA  OFF CACHE BOOL "Enable Column::getColumnOriginName(). Require support from sqlite3 library.")
+	set(SQLITECPP_USE_STATIC_RUNTIME   OFF CACHE BOOL "Use MSVC static runtime (default for internal googletest).")
 
 	# Set options for LibEvent, disable all their tests and benchmarks:
 	set(EVENT__DISABLE_OPENSSL   YES CACHE BOOL   "Disable OpenSSL in LibEvent")

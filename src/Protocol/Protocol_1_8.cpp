@@ -3852,7 +3852,7 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 		case mtZombieHorse:
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
-			UNREACHABLE("cProtocol_1_8::WriteMobMetadata: received unimplemented type");
+			ASSERT(!"cProtocol_1_8::WriteMobMetadata: received unimplemented type");
 			break;
 		}
 
@@ -3869,10 +3869,7 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			// Allowed mobs without additional metadata
 			break;
 		}
-		case mtInvalidType:
-		{
-			break;
-		}
+
 		default: UNREACHABLE("cProtocol_1_8::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
@@ -4033,7 +4030,7 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity)
 		case Type::etPlayer:
 		case Type::etMonster:
 		case Type::etExpOrb:
-		case Type::etPainting: UNREACHABLE("Tried to spawn an unhandled entity");
+		case Type::etPainting: break;
 	}
 	UNREACHABLE("Unhandled entity kind");
 }

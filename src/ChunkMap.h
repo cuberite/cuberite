@@ -34,9 +34,10 @@ class cFlowerPotEntity;
 class cBlockArea;
 class cMobCensus;
 class cMobSpawner;
-class cSetChunkData;
 class cBoundingBox;
 class cDeadlockDetect;
+
+struct SetChunkData;
 
 typedef std::list<cClientHandle *> cClientHandleList;
 using cEntityCallback       = cFunctionRef<bool(cEntity             &)>;
@@ -65,7 +66,6 @@ class cChunkMap
 public:
 
 	cChunkMap(cWorld * a_World);
-	~cChunkMap();
 
 	/** Sends the block entity, if it is at the coords specified, to a_Client */
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
@@ -99,7 +99,7 @@ public:
 	If MarkDirty is set, the chunk is set as dirty (used after generating)
 	Modifies the BlockEntity list in a_SetChunkData - moves the block entities into the chunk.
 	*/
-	void SetChunkData(cSetChunkData & a_SetChunkData);
+	void SetChunkData(SetChunkData && a_SetChunkData);
 
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
@@ -110,9 +110,6 @@ public:
 	/** Calls the callback with the chunk's data, if available (with ChunkCS locked).
 	Returns true if the chunk was reported successfully, false if not (chunk not present or callback failed). */
 	bool GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback) const;
-
-	/** Copies the chunk's blocktypes into a_Blocks; returns true if successful */
-	bool GetChunkBlockTypes (int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_Blocks);
 
 	/** Returns true iff the chunk is in the loader / generator queue. */
 	bool IsChunkQueued(int a_ChunkX, int a_ChunkZ) const;
@@ -404,24 +401,6 @@ private:
 	// The chunkstay can (de-)register itself using AddChunkStay() and DelChunkStay()
 	friend class cChunkStay;
 
-
-	class cStarvationCallbacks
-		: public cAllocationPool<cChunkData::sChunkSection>::cStarvationCallbacks
-	{
-		virtual void OnStartUsingReserve() override
-		{
-			LOG("Using backup memory buffer");
-		}
-		virtual void OnEndUsingReserve() override
-		{
-			LOG("Stoped using backup memory buffer");
-		}
-		virtual void OnOutOfReserve() override
-		{
-			LOG("Out of Memory");
-		}
-	};
-
 	typedef std::list<cChunkStay *> cChunkStays;
 
 	mutable cCriticalSection m_CSChunks;
@@ -436,8 +415,6 @@ private:
 
 	/** The cChunkStay descendants that are currently enabled in this chunkmap */
 	cChunkStays m_ChunkStays;
-
-	std::unique_ptr<cAllocationPool<cChunkData::sChunkSection> > m_Pool;
 
 	/** Returns or creates and returns a chunk pointer corresponding to the given chunk coordinates.
 	Emplaces this chunk in the chunk map. */

@@ -96,15 +96,33 @@ function(set_global_flags)
 		add_link_options(-m32)
 	endif()
 
+	# https://en.wikipedia.org/wiki/Uname
+	# https://gcc.gnu.org/onlinedocs/gcc/index.html
 	# Have the compiler generate code specifically targeted at the current machine on Linux:
-	if(LINUX AND NOT NO_NATIVE_OPTIMIZATION)
-		add_compile_options(-march=native)
+	if(UNIX AND NOT NO_NATIVE_OPTIMIZATION AND NOT CMAKE_CROSSCOMPILING)
+		string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} SYSTEM_PROCESSOR)
+		if (SYSTEM_PROCESSOR MATCHES "^(i386|i686|x86|amd64|mips)")
+			message(STATUS "Optimising for this machine (march=native)")
+			add_compile_options(-march=native)
+		elseif (SYSTEM_PROCESSOR MATCHES "^(arm|aarch|powerpc|ppc|sparc|alpha)")
+			message(STATUS "Optimising for this machine (mcpu=native)")
+			add_compile_options(-mcpu=native)
+		endif()
 	endif()
 endfunction()
 
 function(set_exe_flags TARGET)
 	if (MSVC)
-		# TODO: MSVC level 4, warnings as errors
+		# TODO: Warnings as errors
+		target_compile_options(
+			${TARGET} PRIVATE
+
+			# Warnings level 4:
+			/W4
+
+			# Excessive amount of logspam (Unreferenced formal parameter), disable for now:
+			/wd4100
+		)
 		return ()
 	endif()
 

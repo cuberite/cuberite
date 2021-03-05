@@ -108,7 +108,7 @@ void cStructGenTrees::GenerateSingleTree(
 
 	// Check the block underneath the tree:
 	BLOCKTYPE TopBlock = a_ChunkDesc.GetBlockType(a_Pos.x, a_Pos.y, a_Pos.z);
-	if ((TopBlock != E_BLOCK_DIRT) && (TopBlock != E_BLOCK_GRASS) && (TopBlock != E_BLOCK_FARMLAND))
+	if ((TopBlock != E_BLOCK_DIRT) && (TopBlock != E_BLOCK_GRASS) && (TopBlock != E_BLOCK_FARMLAND) && (TopBlock != E_BLOCK_MYCELIUM))
 	{
 		return;
 	}
@@ -175,6 +175,8 @@ void cStructGenTrees::ApplyTreeImage(
 			{
 				case E_BLOCK_NEW_LEAVES:
 				case E_BLOCK_LEAVES:
+				case E_BLOCK_HUGE_BROWN_MUSHROOM:
+				case E_BLOCK_HUGE_RED_MUSHROOM:
 				{
 					if ((itr->m_BlockType != E_BLOCK_LOG) && (itr->m_BlockType != E_BLOCK_NEW_LOG))
 					{
@@ -287,8 +289,7 @@ double cStructGenTrees::GetNumTrees(
 			case biVariant:
 			case biNumVariantBiomes:
 			{
-				ASSERT(!"Invalid biome in cStructGenTrees::GetNumTrees");
-				return 0.0;
+				break;
 			}
 		}
 		UNREACHABLE("Unsupported biome");

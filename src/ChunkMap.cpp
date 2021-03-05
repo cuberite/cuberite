@@ -30,26 +30,8 @@
 // cChunkMap:
 
 cChunkMap::cChunkMap(cWorld * a_World) :
-	m_World(a_World),
-	m_Pool(
-		std::make_unique<cListAllocationPool<cChunkData::sChunkSection>>(
-			std::make_unique<cStarvationCallbacks>(), 1600u, 5000u
-		)
-	)
+	m_World(a_World)
 {
-}
-
-
-
-
-
-cChunkMap::~cChunkMap()
-{
-	// Explicitly destroy all chunks, so that they're guaranteed to be
-	// destroyed before other internals. This fixes crashes on stopping the server.
-	// because the chunk destructor deletes entities and those may access the chunkmap.
-	// Also, the cChunkData destructor accesses the chunkMap's allocator.
-	m_Chunks.clear();
 }
 
 
@@ -61,7 +43,7 @@ cChunk & cChunkMap::ConstructChunk(int a_ChunkX, int a_ChunkZ)
 	// If not exists insert. Then, return the chunk at these coordinates:
 	return m_Chunks.try_emplace(
 		{ a_ChunkX, a_ChunkZ },
-		a_ChunkX, a_ChunkZ, this, m_World, *m_Pool
+		a_ChunkX, a_ChunkZ, this, m_World
 	).first->second;
 }
 
@@ -232,15 +214,15 @@ void cChunkMap::MarkChunkSaved (int a_ChunkX, int a_ChunkZ)
 
 
 
-void cChunkMap::SetChunkData(cSetChunkData & a_SetChunkData)
+void cChunkMap::SetChunkData(struct SetChunkData && a_SetChunkData)
 {
-	int ChunkX = a_SetChunkData.GetChunkX();
-	int ChunkZ = a_SetChunkData.GetChunkZ();
+	const int ChunkX = a_SetChunkData.Chunk.m_ChunkX;
+	const int ChunkZ = a_SetChunkData.Chunk.m_ChunkZ;
 	{
 		cCSLock Lock(m_CSChunks);
 		const auto Chunk = FindChunk(ChunkX, ChunkZ);
 		ASSERT(Chunk != nullptr);  // Chunk cannot have unloaded since it is marked as queued
-		Chunk->SetAllData(a_SetChunkData);
+		Chunk->SetAllData(std::move(a_SetChunkData));
 
 		// Notify relevant ChunkStays:
 		cChunkStays ToBeDisabled;
@@ -303,22 +285,6 @@ bool cChunkMap::GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callb
 		return false;
 	}
 	Chunk->GetAllData(a_Callback);
-	return true;
-}
-
-
-
-
-
-bool cChunkMap::GetChunkBlockTypes(int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_BlockTypes)
-{
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	Chunk->GetBlockTypes(a_BlockTypes);
 	return true;
 }
 

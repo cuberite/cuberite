@@ -16,32 +16,6 @@
 
 // Compiler-dependent stuff:
 #if defined(_MSC_VER)
-	// Disable some warnings that we don't care about:
-	#pragma warning(disable:4100)  // Unreferenced formal parameter
-
-	// Useful warnings from warning level 4:
-	#pragma warning(3 : 4189)  // Local variable is initialized but not referenced
-	#pragma warning(3 : 4245)  // Conversion from 'type1' to 'type2', signed / unsigned mismatch
-	#pragma warning(3 : 4310)  // Cast truncates constant value
-	#pragma warning(3 : 4389)  // Signed / unsigned mismatch
-	#pragma warning(3 : 4505)  // Unreferenced local function has been removed
-	#pragma warning(3 : 4701)  // Potentially unitialized local variable used
-	#pragma warning(3 : 4702)  // Unreachable code
-	#pragma warning(3 : 4706)  // Assignment within conditional expression
-
-	// 2014-10-23 xoft: Disabled this because the new C++11 headers in MSVC produce tons of these warnings uselessly
-	// #pragma warning(3 : 4127)  // Conditional expression is constant
-
-	// Disabling this warning, because we know what we're doing when we're doing this:
-	#pragma warning(disable: 4355)  // 'this' used in initializer list
-
-	// Disabled because it's useless:
-	#pragma warning(disable: 4512)  // 'class': assignment operator could not be generated - reported for each class that has a reference-type member
-	#pragma warning(disable: 4351)  // new behavior: elements of array 'member' will be default initialized
-
-	// 2014_01_06 xoft: Disabled this warning because MSVC is stupid and reports it in obviously wrong places
-	// #pragma warning(3 : 4244)  // Conversion from 'type1' to 'type2', possible loss of data
-
 	// Use non-standard defines in <cmath>
 	#define _USE_MATH_DEFINES
 
@@ -61,10 +35,14 @@
 		// The CRT has a definition for this operator new that stores the debugging info for leak-finding later.
 	#endif
 
+	#define UNREACHABLE_INTRINSIC __assume(false)
+
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
 	#define abstract
+
+	#define UNREACHABLE_INTRINSIC __builtin_unreachable()
 
 #else
 
@@ -297,8 +275,12 @@ template class SizeChecker<UInt8, 1>;
 
 #endif  // else TEST_GLOBALS
 
-/** Use to mark code that should be impossible to reach. */
-#define UNREACHABLE(x) do { FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__); std::abort(); } while (false)
+// Use to mark code that should be impossible to reach.
+#ifdef NDEBUG
+	#define UNREACHABLE(x) UNREACHABLE_INTRINSIC
+#else
+	#define UNREACHABLE(x) ( FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__), std::abort(), 0)
+#endif
 
 
 
@@ -311,7 +293,33 @@ namespace cpp20
 	{
 		return std::unique_ptr<T>(new std::remove_extent_t<T>[a_Size]);
 	}
+
+	template <class T>
+	std::enable_if_t<!std::is_array_v<T>, std::unique_ptr<T>> make_unique_for_overwrite()
+	{
+		return std::unique_ptr<T>(new T);
+	}
 }
+
+
+
+
+
+/**
+You can use this struct to use in std::visit
+example:
+std::visit(
+	OverloadedVariantAccess
+	{
+		[&] (cFirstType  & a_FirstTypeObject)  {  // Your code to handle cFirstType },
+		[&] (cSecondType & a_SecondTypeObject) {  // YourCode to handle cSecondType },
+		...
+	}
+, YourVariant);
+You can use constant references if you want to.
+*/
+template<class... Ts> struct OverloadedVariantAccess : Ts... { using Ts::operator()...; };
+template<class... Ts> OverloadedVariantAccess(Ts...)->OverloadedVariantAccess<Ts...>;
 
 
 

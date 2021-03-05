@@ -47,41 +47,8 @@ public:
 
 	CLASS_PROTODEF(cPlayer)
 
-
 	cPlayer(const cClientHandlePtr & a_Client);
-
 	virtual ~cPlayer() override;
-
-	virtual void OnAddToWorld(cWorld & a_World) override;
-	virtual void OnRemoveFromWorld(cWorld & a_World) override;
-
-	virtual void SpawnOn(cClientHandle & a_Client) override;
-
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-
-	void TickFreezeCode();
-
-	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
-
-	/** Returns the currently equipped weapon; empty item if none */
-	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
-
-	/** Returns the currently equipped helmet; empty item if none */
-	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
-
-	/** Returns the currently equipped chestplate; empty item if none */
-	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
-
-	/** Returns the currently equipped leggings; empty item if none */
-	virtual cItem GetEquippedLeggings(void) const override { return m_Inventory.GetEquippedLeggings(); }
-
-	/** Returns the currently equipped boots; empty item if none */
-	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
-
-	/** Returns the currently offhand equipped item; empty item if none */
-	virtual cItem GetOffHandEquipedItem(void) const override { return m_Inventory.GetShieldSlot(); }
-
-	virtual void ApplyArmorDamage(int DamageBlocked) override;
 
 	// tolua_begin
 
@@ -605,14 +572,19 @@ public:
 	Source: https://minecraft.gamepedia.com/Breaking#Instant_breaking */
 	bool CanInstantlyMine(BLOCKTYPE a_Block);
 
-	/** get player explosion exposure rate */
-	virtual float GetExplosionExposureRate(Vector3d a_ExplosionPosition, float a_ExlosionPower) override;
-
 	/** Adds an Item to the list of known items.
 	If the item is already known, does nothing. */
 	void AddKnownItem(const cItem & a_Item);
 
-protected:
+	// cEntity overrides:
+	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
+	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
+	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
+	virtual cItem GetEquippedLeggings(void) const override { return m_Inventory.GetEquippedLeggings(); }
+	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
+	virtual cItem GetOffHandEquipedItem(void) const override { return m_Inventory.GetShieldSlot(); }
+
+private:
 
 	typedef std::vector<std::vector<AString> > AStringVectorVector;
 
@@ -778,12 +750,6 @@ protected:
 
 	int m_TicksElytraFlying;
 
-	/** Sets the speed and sends it to the client, so that they are forced to move so. */
-	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
-
-	/** Filters out damage for creative mode / friendly fire */
-	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
-
 	/** Called in each tick to handle food-related processing */
 	void HandleFood(void);
 
@@ -793,8 +759,6 @@ protected:
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const cUUID & a_UUID);
-
-private:
 
 	/** Pins the player to a_Location until Unfreeze() is called.
 	If ManuallyFrozen is false, the player will unfreeze when the chunk is loaded. */
@@ -818,5 +782,18 @@ private:
 	/** Add the recipe Id to the known recipes.
 	If the recipe is already known, does nothing. */
 	void AddKnownRecipe(UInt32 RecipeId);
+
+	void TickFreezeCode();
+
+	// cEntity overrides:
+	virtual void ApplyArmorDamage(int DamageBlocked) override;
+	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
+	virtual float GetEnchantmentBlastKnockbackReduction() override;
+	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
+	virtual void OnAddToWorld(cWorld & a_World) override;
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
+	virtual void SpawnOn(cClientHandle & a_Client) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 } ;  // tolua_export
