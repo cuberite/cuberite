@@ -345,6 +345,15 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_Type)
 
 
 
+void cMonster::CheckEventLostPlayer(std::chrono::milliseconds a_Dt);
+{
+
+}
+
+
+
+
+
 bool cFluidSimulator::CanWashAway(BLOCKTYPE a_BlockType)
 {
 	return false;
@@ -746,6 +755,13 @@ void cEntity::SetSpeed(double a_XSpeed, double a_YSpeed, double a_ZSpeed)
 
 
 
+void cEntity::DetectMagma(void);
+{
+}
+
+
+
+
 
 bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
 {
@@ -825,8 +841,21 @@ void cPawn::HandleAir(void)
 
 
 
+void cPawn::HandleFalling()
+{
+}
+
+
+
+
 
 void cPawn::KilledBy(struct TakeDamageInfo & a_TakeDamageInfo)
+{
+}
+
+
+
+void cPawn::OnRemoveFromWorld(cWorld & a_World)
 {
 }
 
