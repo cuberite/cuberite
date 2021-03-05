@@ -454,14 +454,6 @@ cEntity::cEntity(enum cEntity::eEntityType a_EntityType, class Vector3<double> a
 
 
 
-cEntity::~cEntity(void)
-{
-}
-
-
-
-
-
 bool cEntity::Initialize(class std::unique_ptr<class cEntity,struct std::default_delete<class cEntity> > a_Entity,class cWorld & a_World)
 {
 	return true;
@@ -746,17 +738,7 @@ void cEntity::Detach(void)
 
 
 
-float cEntity::GetExplosionExposureRate(class Vector3<double> a_Pos, float a_Value)
-{
-	return 0.0f;
-}
-
-
-
-
-
-
-void cEntity::DoSetSpeed(double a_XSpeed, double a_YSpeed, double a_ZSpeed)
+void cEntity::SetSpeed(double a_XSpeed, double a_YSpeed, double a_ZSpeed)
 {
 }
 
@@ -765,7 +747,7 @@ void cEntity::DoSetSpeed(double a_XSpeed, double a_YSpeed, double a_ZSpeed)
 
 
 
-void cEntity::DoMoveToWorld(struct cEntity::sWorldChangeInfo const & a_WorldChangeInfo)
+void cEntity::MoveToWorld(struct cEntity::sWorldChangeInfo const & a_WorldChangeInfo)
 {
 }
 
@@ -818,22 +800,6 @@ cPawn::cPawn(enum cEntity::eEntityType,double a_Width, double a_Height) :
 
 
 
-cPawn::~cPawn(void)
-{
-}
-
-
-
-
-
-void cPawn::Destroyed(void)
-{
-}
-
-
-
-
-
 bool cPawn::IsFireproof(void) const
 {
 	return true;
@@ -853,14 +819,6 @@ bool cPawn::IsInvisible(void) const
 
 
 void cPawn::HandleAir(void)
-{
-}
-
-
-
-
-
-void cPawn::HandleFalling(void)
 {
 }
 
@@ -906,23 +864,10 @@ cPathFinder::cPathFinder(double a_Width, double a_Height)
 }
 
 
-cMonster::~cMonster(void)
-{
-}
-
-
 
 
 
 void cMonster::OnRemoveFromWorld(class cWorld & a_World)
-{
-}
-
-
-
-
-
-void cMonster::Destroyed(void)
 {
 }
 
@@ -1029,14 +974,6 @@ void cMonster::EventLosePlayer(void)
 
 
 
-void cMonster::CheckEventLostPlayer(void)
-{
-}
-
-
-
-
-
 void cMonster::InStateIdle(std::chrono::milliseconds a_Dt ,class cChunk & a_Chunk)
 {
 }
@@ -1053,7 +990,7 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt ,class cChunk & a_
 
 
 
-void cMonster::DoMoveToWorld(cEntity::sWorldChangeInfo const & a_WorldChangeInfo)
+void cMonster::MoveToWorld(cEntity::sWorldChangeInfo const & a_WorldChangeInfo)
 {
 }
 
