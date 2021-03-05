@@ -171,9 +171,9 @@ void cWorld::BroadcastBlockEntity(Vector3i a_BlockPos, const cClientHandle * a_E
 
 
 
-void cWorld::BroadcastBossBarUpdateHealth(UInt32 a_UniqueID, float a_FractionFilled)
+void cWorld::BroadcastBossBarUpdateHealth(const cEntity & a_Entity, UInt32 a_UniqueID, float a_FractionFilled)
 {
-	ForClientsInWorld(*this, nullptr, [&](cClientHandle & a_Client)
+	ForClientsWithEntity(a_Entity, *this, nullptr, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendBossBarUpdateHealth(a_UniqueID, a_FractionFilled);
 		}

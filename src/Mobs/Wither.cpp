@@ -55,7 +55,7 @@ bool cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	m_World->BroadcastBossBarUpdateHealth(GetUniqueID(), GetHealth() / GetMaxHealth());
+	m_World->BroadcastBossBarUpdateHealth(*this, GetUniqueID(), GetHealth() / GetMaxHealth());
 	return true;
 }
 

@@ -181,7 +181,7 @@ public:
 	virtual void BroadcastBlockAction        (Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
 	virtual void BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, Int8 a_Stage, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastBlockEntity        (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr) override;  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
-	virtual void BroadcastBossBarUpdateHealth(UInt32 a_UniqueID, float a_FractionFilled) override;
+	virtual void BroadcastBossBarUpdateHealth(const cEntity & a_Entity, UInt32 a_UniqueID, float a_FractionFilled) override;
 
 	// tolua_begin
 	virtual void BroadcastChat       (const AString & a_Message, const cClientHandle * a_Exclude = nullptr, eMessageType a_ChatPrefix = mtCustom) override;
