@@ -51,6 +51,7 @@ target_sources(
 	BlockGravel.h
 	BlockHandler.h
 	BlockHopper.h
+	BlockHugeMushroom.h
 	BlockIce.h
 	BlockJukebox.h
 	BlockLadder.h
