@@ -376,13 +376,13 @@ bool cConnection::RelayFromServer(void)
 		}
 		case csEncryptedUnderstood:
 		{
-			m_ServerDecryptor.ProcessData(reinterpret_cast<std::byte *>(Buffer), reinterpret_cast<const Byte *>(Buffer), static_cast<size_t>(res));
+			m_ServerDecryptor.ProcessData(reinterpret_cast<std::byte *>(Buffer), static_cast<size_t>(res));
 			DataLog(Buffer, static_cast<size_t>(res), "Decrypted %d bytes from the SERVER", res);
 			return DecodeServersPackets(Buffer, res);
 		}
 		case csEncryptedUnknown:
 		{
-			m_ServerDecryptor.ProcessData(reinterpret_cast<std::byte *>(Buffer), reinterpret_cast<const Byte *>(Buffer), static_cast<size_t>(res));
+			m_ServerDecryptor.ProcessData(reinterpret_cast<std::byte *>(Buffer), static_cast<size_t>(res));
 			DataLog(Buffer, static_cast<size_t>(res), "Decrypted %d bytes from the SERVER", res);
 			return CLIENTSEND({ reinterpret_cast<const std::byte *>(Buffer), static_cast<size_t>(res) });
 		}

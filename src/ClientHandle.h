@@ -445,7 +445,7 @@ private:
 
 	/** Queue for the incoming data received on the link until it is processed in Tick().
 	Protected by m_CSIncomingData. */
-	AString m_IncomingData;
+	ContiguousByteBuffer m_IncomingData;
 
 	/** Protects m_OutgoingData against multithreaded access. */
 	cCriticalSection m_CSOutgoingData;
