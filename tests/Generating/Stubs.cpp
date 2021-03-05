@@ -765,6 +765,7 @@ void cEntity::DetectMagma(void)
 
 bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
 {
+    return false;
 }
 
 
@@ -808,14 +809,6 @@ cEnderDragon::cEnderDragon(void) :
 
 
 void cEnderDragon::GetDrops(cItems & a_Drops, cEntity * a_Killer)
-{
-}
-
-
-
-
-
-cEnderDragon::~cEnderDragon()
 {
 }
 
