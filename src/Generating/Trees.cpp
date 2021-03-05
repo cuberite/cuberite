@@ -313,8 +313,6 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 	{
 		case biPlains:
 		case biForest:
-		case biMushroomIsland:
-		case biMushroomShore:
 		case biForestHills:
 		case biSunflowerPlains:
 		case biFlowerForest:
@@ -434,7 +432,39 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 		case biRoofedForest:
 		case biRoofedForestM:
 		{
-			GetDarkoakTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			// 53 % DarkOak
+			// 23 % SmallAppleTree
+			// 16 % RedMushroom
+			// 4 % BrownMushroom
+			// 4 % Birch
+			const int DarkOakProb = 53;
+			const int SmallAppleTreeProb = DarkOakProb + 23;
+			const int RedMushroomProb = SmallAppleTreeProb + 16;
+			const int BrownMushroomProb = RedMushroomProb + 4;
+
+			static_assert(BrownMushroomProb + 4 == 100);
+
+			auto RandomValue = a_Noise.IntNoise3DInt(a_BlockPos.addedY(16 * a_Seq).addedZ(16 * a_Seq)) % 100;
+			if (RandomValue < DarkOakProb)
+			{
+				GetDarkoakTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			}
+			else if ((RandomValue >= DarkOakProb) && (RandomValue < SmallAppleTreeProb))
+			{
+				GetSmallAppleTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			}
+			else if ((RandomValue >= SmallAppleTreeProb) && (RandomValue < RedMushroomProb))
+			{
+				GetRedMushroomTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			}
+			else if ((RandomValue >= RedMushroomProb) && (RandomValue < BrownMushroomProb))
+			{
+				GetBrownMushroomTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			}
+			else
+			{
+				GetBirchTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			}
 			return;
 		}
 
@@ -447,7 +477,18 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 		{
 			GetSmallAppleTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
 		}
-
+		case biMushroomIsland:
+		case biMushroomShore:
+		{
+			if (a_Noise.IntNoise3DInt(a_BlockPos.addedY(16 * a_Seq).addedZ(16 * a_Seq)) < 0x6fffffff)
+			{
+				GetBrownMushroomTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			}
+			else
+			{
+				GetRedMushroomTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			}
+		}
 		case biDesert:
 		case biDesertHills:
 		case biDesertM:
@@ -1393,4 +1434,100 @@ void GetSmallJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 	// Top plus, all leaves:
 	PushCoordBlocks(a_BlockPos.x, hei, a_BlockPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
 	a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, hei, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE));
+}
+
+
+
+
+
+void GetRedMushroomTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+{
+	static constexpr int Height = 4;
+
+	for (int i = 0; i < Height; i++)
+	{
+		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_STEM));
+
+		if (i != 0)
+		{
+			// NORTH SIDE
+			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(-1, -2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_WEST));
+			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(0, -2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH));
+			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(1, -2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_EAST));
+			// WEST SIDE
+			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(-2, -1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_WEST));
+			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(-2, 0), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_WEST));
+			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(-2, 1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST));
+			// SOUTH SIDE
+			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(-1, 2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST));
+			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(0, 2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH));
+			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(1, 2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST));
+			// EAST SIDE
+			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(2, -1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_EAST));
+			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(2, 0), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_EAST));
+			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(2, 1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST));
+		}
+	}
+
+	// Top Layer
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-1, -1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_WEST));
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedX(-1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_WEST));
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-1, 1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST));
+
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedZ(-1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH));
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_CENTER));
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedZ(1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH));
+
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(1, -1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_EAST));
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedX(1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_EAST));
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(1, 1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST));
+}
+
+
+
+
+
+void GetBrownMushroomTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+{
+	static constexpr int Height = 4;
+	static constexpr int Radius = 2;
+	static constexpr int Border = 3;
+
+	for (int i = 0; i < Height; i++)
+	{
+		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_STEM));
+	}
+
+	for (int x = -Radius; x <= Radius; x++)
+	{
+		for (int z = -Radius; z <= Radius; z++)
+		{
+			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(x, z), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_CENTER));
+		}
+	}
+
+	for (int i = 0; i < Border; i++)
+	{
+		// NORTH SIDE
+		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-1, -3).addedX(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH));
+		// WEST SIDE
+		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-3, -1).addedZ(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_WEST));
+		// SOUTH SIDE
+		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-1, 3).addedX(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH));
+		// EAST SIDE
+		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(3, -1).addedZ(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_EAST));
+	}
+
+	// Corners
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(3, 2), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST));
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(2, 3), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST));
+
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-2, 3), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST));
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-3, 2), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST));
+
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-2, -3), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH_WEST));
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-3, -2), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH_WEST));
+
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(2, -3), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH_EAST));
+	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(3, -2), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH_EAST));
 }
