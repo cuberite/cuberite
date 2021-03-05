@@ -345,7 +345,7 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_Type)
 
 
 
-void cMonster::CheckEventLostPlayer(std::chrono::milliseconds a_Dt);
+void cMonster::CheckEventLostPlayer(std::chrono::milliseconds a_Dt)
 {
 
 }
@@ -755,7 +755,7 @@ void cEntity::SetSpeed(double a_XSpeed, double a_YSpeed, double a_ZSpeed)
 
 
 
-void cEntity::DetectMagma(void);
+void cEntity::DetectMagma(void)
 {
 }
 
