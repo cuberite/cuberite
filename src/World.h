@@ -49,14 +49,12 @@ class cHopperEntity;
 class cNoteEntity;
 class cMobHeadEntity;
 class cCompositeChat;
-class cSetChunkData;
 class cDeadlockDetect;
 class cUUID;
 
-typedef std::list< cPlayer * > cPlayerList;
+struct SetChunkData;
 
-typedef std::unique_ptr<cSetChunkData> cSetChunkDataPtr;
-typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
+typedef std::list< cPlayer * > cPlayerList;
 
 
 
@@ -240,8 +238,8 @@ public:
 	void MarkChunkSaved (int a_ChunkX, int a_ChunkZ);
 
 	/** Puts the chunk data into a queue to be set into the chunkmap in the tick thread.
-	If the chunk data doesn't contain valid biomes, the biomes are calculated before adding the data into the queue. */
-	void QueueSetChunkData(cSetChunkDataPtr a_SetChunkData);
+	Modifies the a_SetChunkData - moves the entities contained in it into the queue. */
+	void QueueSetChunkData(SetChunkData && a_SetChunkData);
 
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
@@ -252,9 +250,6 @@ public:
 	/** Calls the callback with the chunk's data, if available (with ChunkCS locked).
 	Returns true if the chunk was reported successfully, false if not (chunk not present or callback failed). */
 	bool GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback) const;
-
-	/** Gets the chunk's blocks, only the block types */
-	bool GetChunkBlockTypes(int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_BlockTypes);
 
 	/** Returns true iff the chunk is in the loader / generator queue. */
 	bool IsChunkQueued(int a_ChunkX, int a_ChunkZ) const;
@@ -1263,7 +1258,7 @@ private:
 	cCriticalSection m_CSSetChunkDataQueue;
 
 	/** Queue for the chunk data to be set into m_ChunkMap by the tick thread. Protected by m_CSSetChunkDataQueue */
-	cSetChunkDataPtrs m_SetChunkDataQueue;
+	std::vector<SetChunkData> m_SetChunkDataQueue;
 
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
 
@@ -1272,6 +1267,9 @@ private:
 
 	/** Handles the mob spawning / moving / destroying each tick */
 	void TickMobs(std::chrono::milliseconds a_Dt);
+
+	/** Sets the chunk data queued in the m_SetChunkDataQueue queue into their chunk. */
+	void TickQueuedChunkDataSets();
 
 	/** Adds the entities queued in the m_EntitiesToAdd queue into their chunk.
 	If the entity was a player, he is also added to the m_Players list. */
@@ -1306,10 +1304,6 @@ private:
 
 	/** Sets mob spawning values if nonexistant to their dimension specific defaults */
 	void InitializeAndLoadMobSpawningValues(cIniFile & a_IniFile);
-
-	/** Sets the specified chunk data into the chunkmap. Called in the tick thread.
-	Modifies the a_SetChunkData - moves the entities contained in it into the chunk. */
-	void SetChunkData(cSetChunkData & a_SetChunkData);
 
 	/** Checks if the sapling at the specified block coord is a part of a large-tree sapling (2x2).
 	If so, adjusts the coords so that they point to the northwest (XM ZM) corner of the sapling area and returns true.

@@ -962,17 +962,6 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	// Call the plugins
 	cPluginManager::Get()->CallHookWorldTick(*this, a_Dt, a_LastTickDurationMSec);
 
-	// Set any chunk data that has been queued for setting:
-	cSetChunkDataPtrs SetChunkDataQueue;
-	{
-		cCSLock Lock(m_CSSetChunkDataQueue);
-		std::swap(SetChunkDataQueue, m_SetChunkDataQueue);
-	}
-	for (cSetChunkDataPtrs::iterator itr = SetChunkDataQueue.begin(), end = SetChunkDataQueue.end(); itr != end; ++itr)
-	{
-		SetChunkData(**itr);
-	}  // for itr - SetChunkDataQueue[]
-
 	m_WorldAge += a_Dt;
 
 	if (m_IsDaylightCycleEnabled)
@@ -997,6 +986,7 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		}
 	}
 
+	TickQueuedChunkDataSets();
 	TickQueuedBlocks();
 	m_ChunkMap.Tick(a_Dt);
 	TickMobs(a_Dt);
@@ -1145,6 +1135,48 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 			return false;
 		}
 	);
+}
+
+
+
+
+
+void cWorld::TickQueuedChunkDataSets()
+{
+	decltype(m_SetChunkDataQueue) SetChunkDataQueue;
+	{
+		cCSLock Lock(m_CSSetChunkDataQueue);
+		SetChunkDataQueue = std::move(m_SetChunkDataQueue);
+	}
+
+	// Set any chunk data that has been queued for setting:
+	for (auto & Item : SetChunkDataQueue)
+	{
+		// A copy of the chunk coordinates since we're moving Item.
+		const auto Chunk = Item.Chunk;
+
+		// Set the data:
+		m_ChunkMap.SetChunkData(std::move(Item));
+
+		// If a client is requesting this chunk, send it to them:
+		cChunkSender & ChunkSender = m_ChunkSender;
+		DoWithChunk(
+			Chunk.m_ChunkX, Chunk.m_ChunkZ,
+			[&ChunkSender](cChunk & a_Chunk)
+			{
+				if (a_Chunk.HasAnyClients())
+				{
+					ChunkSender.QueueSendChunkTo(
+						a_Chunk.GetPosX(),
+						a_Chunk.GetPosZ(),
+						cChunkSender::Priority::Medium,
+						a_Chunk.GetAllClients()
+					);
+				}
+				return true;
+			}
+		);
+	}  // for itr - SetChunkDataQueue[]
 }
 
 
@@ -2236,59 +2268,12 @@ void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkZ)
 
 
 
-void cWorld::QueueSetChunkData(cSetChunkDataPtr a_SetChunkData)
+void cWorld::QueueSetChunkData(struct SetChunkData && a_SetChunkData)
 {
-	// Validate biomes, if needed:
-	if (!a_SetChunkData->AreBiomesValid())
-	{
-		// The biomes are not assigned, get them from the generator:
-		m_Generator.GenerateBiomes({a_SetChunkData->GetChunkX(), a_SetChunkData->GetChunkZ()}, a_SetChunkData->GetBiomes());
-		a_SetChunkData->MarkBiomesValid();
-	}
-
-	// Validate heightmap, if needed:
-	if (!a_SetChunkData->IsHeightMapValid())
-	{
-		a_SetChunkData->CalculateHeightMap();
-	}
-
 	// Store a copy of the data in the queue:
 	// TODO: If the queue is too large, wait for it to get processed. Not likely, though.
 	cCSLock Lock(m_CSSetChunkDataQueue);
 	m_SetChunkDataQueue.emplace_back(std::move(a_SetChunkData));
-}
-
-
-
-
-
-void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
-{
-	ASSERT(a_SetChunkData.AreBiomesValid());
-	ASSERT(a_SetChunkData.IsHeightMapValid());
-
-	m_ChunkMap.SetChunkData(a_SetChunkData);
-
-	// If a client is requesting this chunk, send it to them:
-	int ChunkX = a_SetChunkData.GetChunkX();
-	int ChunkZ = a_SetChunkData.GetChunkZ();
-	cChunkSender & ChunkSender = m_ChunkSender;
-	DoWithChunk(
-		ChunkX, ChunkZ,
-		[&ChunkSender] (cChunk & a_Chunk) -> bool
-		{
-			if (a_Chunk.HasAnyClients())
-			{
-				ChunkSender.QueueSendChunkTo(
-					a_Chunk.GetPosX(),
-					a_Chunk.GetPosZ(),
-					cChunkSender::Priority::Medium,
-					a_Chunk.GetAllClients()
-				);
-			}
-			return true;
-		}
-	);
 }
 
 
@@ -2311,15 +2296,6 @@ void cWorld::ChunkLighted(
 bool cWorld::GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback) const
 {
 	return m_ChunkMap.GetChunkData(a_Coords, a_Callback);
-}
-
-
-
-
-
-bool cWorld::GetChunkBlockTypes(int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_BlockTypes)
-{
-	return m_ChunkMap.GetChunkBlockTypes(a_ChunkX, a_ChunkZ, a_BlockTypes);
 }
 
 
@@ -3260,16 +3236,20 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 	cChunkDef::BlockNibbles BlockMetas;
 	a_ChunkDesc.CompressBlockMetas(BlockMetas);
 
-	auto SetChunkData = std::make_unique<cSetChunkData>(
-		a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(),
-		a_ChunkDesc.GetBlockTypes(), BlockMetas,
-		nullptr, nullptr,  // We don't have lighting, chunk will be lighted when needed
-		&a_ChunkDesc.GetHeightMap(), &a_ChunkDesc.GetBiomeMap(),
-		std::move(a_ChunkDesc.GetEntities()), std::move(a_ChunkDesc.GetBlockEntities()),
-		true
-	);
-	SetChunkData->RemoveInvalidBlockEntities();
-	m_World->QueueSetChunkData(std::move(SetChunkData));
+	struct SetChunkData Data({ a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ() });
+	{
+		Data.BlockData.SetAll(a_ChunkDesc.GetBlockTypes(), BlockMetas);
+
+		std::copy(a_ChunkDesc.GetBiomeMap(), a_ChunkDesc.GetBiomeMap() + std::size(a_ChunkDesc.GetBiomeMap()), Data.BiomeMap);
+		std::copy(a_ChunkDesc.GetHeightMap(), a_ChunkDesc.GetHeightMap() + std::size(a_ChunkDesc.GetHeightMap()), Data.HeightMap);
+
+		Data.Entities = std::move(a_ChunkDesc.GetEntities());
+		Data.BlockEntities = std::move(a_ChunkDesc.GetBlockEntities());
+
+		Data.IsLightValid = false;
+	}
+
+	m_World->QueueSetChunkData(std::move(Data));
 }
 
 
