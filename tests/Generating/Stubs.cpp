@@ -747,7 +747,7 @@ void cEntity::SetSpeed(double a_XSpeed, double a_YSpeed, double a_ZSpeed)
 
 
 
-void cEntity::MoveToWorld(struct cEntity::sWorldChangeInfo const & a_WorldChangeInfo)
+bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
 {
 }
 
@@ -983,14 +983,6 @@ void cMonster::InStateIdle(std::chrono::milliseconds a_Dt ,class cChunk & a_Chun
 
 
 void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt ,class cChunk & a_Chunk)
-{
-}
-
-
-
-
-
-void cMonster::MoveToWorld(cEntity::sWorldChangeInfo const & a_WorldChangeInfo)
 {
 }
 
