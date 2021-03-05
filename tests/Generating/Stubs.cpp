@@ -807,6 +807,22 @@ cEnderDragon::cEnderDragon(void) :
 
 
 
+void cEnderDragon::GetDrops(cItems & a_Drops, cEntity * a_Killer)
+{
+}
+
+
+
+
+
+cEnderDragon::~cEnderDragon()
+{
+}
+
+
+
+
+
 cPawn::cPawn(enum cEntity::eEntityType,double a_Width, double a_Height) :
 	cEntity(etMonster, Vector3d(), a_Height, a_Width)
 {
@@ -1057,12 +1073,3 @@ bool cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 {
 	return true;
 }
-
-
-
-
-
-void cEnderDragon::GetDrops(cItems & a_Items, cEntity * a_Entity)
-{
-}
-
