@@ -104,13 +104,13 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Prior
 				m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
 				info.m_Priority = a_Priority;
 			}
-			info.m_Clients.insert(a_Client);
+			info.m_Clients.insert(a_Client->shared_from_this());
 		}
 		else
 		{
 			m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
 			auto info = sSendChunk{Chunk, a_Priority};
-			info.m_Clients.insert(a_Client);
+			info.m_Clients.insert(a_Client->shared_from_this());
 			m_ChunkInfo.emplace(Chunk, info);
 		}
 	}
@@ -135,35 +135,23 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Prior
 				m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
 				info.m_Priority = a_Priority;
 			}
-			info.m_Clients.insert(a_Clients.begin(), a_Clients.end());
+			for (const auto & Client : a_Clients)
+			{
+				info.m_Clients.insert(Client->shared_from_this());
+			}
 		}
 		else
 		{
 			m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
 			auto info = sSendChunk{Chunk, a_Priority};
-			info.m_Clients.insert(a_Clients.begin(), a_Clients.end());
+			for (const auto & Client : a_Clients)
+			{
+				info.m_Clients.insert(Client->shared_from_this());
+			}
 			m_ChunkInfo.emplace(Chunk, info);
 		}
 	}
 	m_evtQueue.Set();
-}
-
-
-
-
-
-void cChunkSender::RemoveClient(cClientHandle * a_Client)
-{
-	{
-		cCSLock Lock(m_CS);
-		for (auto && pair : m_ChunkInfo)
-		{
-			auto && clients = pair.second.m_Clients;
-			clients.erase(a_Client);  // nop for sets that do not contain a_Client
-		}
-	}
-	m_evtQueue.Set();
-	m_evtRemoved.Wait();  // Wait for all remaining instances of a_Client to be processed (Execute() makes a copy of m_ChunkInfo)
 }
 
 
@@ -189,16 +177,13 @@ void cChunkSender::Execute(void)
 					continue;
 				}
 
-				std::unordered_set<cClientHandle *> clients;
-				std::swap(itr->second.m_Clients, clients);
+				auto clients = std::move(itr->second.m_Clients);
 				m_ChunkInfo.erase(itr);
 
 				cCSUnlock Unlock(Lock);
 				SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, clients);
 			}
 		}
-
-		m_evtRemoved.SetAll();  // Notify all waiting threads that all clients are processed and thus safe to destroy
 	}  // while (!m_ShouldTerminate)
 }
 
@@ -206,19 +191,25 @@ void cChunkSender::Execute(void)
 
 
 
-void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cClientHandle *> a_Clients)
+void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, const WeakClients & a_Clients)
 {
+	// Contains strong pointers to clienthandles.
+	std::vector<std::shared_ptr<cClientHandle>> Clients;
+
 	// Ask the client if it still wants the chunk:
-	for (auto itr = a_Clients.begin(); itr != a_Clients.end();)
+	for (const auto & WeakClient : a_Clients)
 	{
-		if (!(*itr)->WantsSendChunk(a_ChunkX, a_ChunkZ))
+		auto Client = WeakClient.lock();
+		if ((Client != nullptr) && Client->WantsSendChunk(a_ChunkX, a_ChunkZ))
 		{
-			itr = a_Clients.erase(itr);
+			Clients.push_back(std::move(Client));
 		}
-		else
-		{
-			itr++;
-		}
+	}
+
+	// Bail early if every requester disconnected:
+	if (Clients.empty())
+	{
+		return;
 	}
 
 	// If the chunk has no clients, no need to packetize it:
@@ -247,9 +238,9 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 	}
 
 	// Send:
-	m_Serializer.SendToClients(a_ChunkX, a_ChunkZ, m_Data, m_BiomeMap, a_Clients);
+	m_Serializer.SendToClients(a_ChunkX, a_ChunkZ, m_BlockData, m_LightData, m_BiomeMap, Clients);
 
-	for (const auto Client : a_Clients)
+	for (const auto & Client : Clients)
 	{
 		// Send block-entity packets:
 		for (const auto & Pos : m_BlockEntities)
@@ -270,12 +261,22 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 					Client->GetUsername().c_str()
 				);
 				*/
-				a_Entity.SpawnOn(*Client);
+
+				/* This check looks highly suspect.
+				Its purpose is to check the client still has a valid player object associated,
+				since the player destroys itself when the client is destroyed.
+				It's done within the world lock to ensure correctness.
+				A better way involves fixing chunk sending (GH #3696) to obviate calling SpawnOn from this thread in the first place. */
+				if (!Client->IsDestroyed())
+				{
+					a_Entity.SpawnOn(*Client);
+				}
+
 				return true;
 			});
 		}
 	}
-	m_Data.Clear();
+
 	m_BlockEntities.clear();
 	m_EntityIDs.clear();
 }
@@ -302,14 +303,14 @@ void cChunkSender::Entity(cEntity * a_Entity)
 
 
 
-void cChunkSender::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
+void cChunkSender::BiomeMap(const cChunkDef::BiomeMap & a_BiomeMap)
 {
 	for (size_t i = 0; i < ARRAYCOUNT(m_BiomeMap); i++)
 	{
-		if ((*a_BiomeMap)[i] < 255)
+		if (a_BiomeMap[i] < 255)
 		{
 			// Normal MC biome, copy as-is:
-			m_BiomeMap[i] = static_cast<unsigned char>((*a_BiomeMap)[i]);
+			m_BiomeMap[i] = static_cast<unsigned char>(a_BiomeMap[i]);
 		}
 		else
 		{
@@ -318,7 +319,3 @@ void cChunkSender::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
 		}
 	}  // for i - m_BiomeMap[]
 }
-
-
-
-

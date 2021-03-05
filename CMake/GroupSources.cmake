@@ -9,6 +9,7 @@ function(group_sources)
 		expat
 		fmt
 		jsoncpp_lib
+		libdeflate
 		lualib
 		luaexpat
 		mbedcrypto
@@ -18,7 +19,6 @@ function(group_sources)
 		sqlite3
 		SQLiteCpp
 		tolualib
-		zlib
 		PROPERTIES FOLDER Libraries
 	)
 

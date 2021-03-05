@@ -37,19 +37,16 @@ class cBlockArea;
 class cFluidSimulatorData;
 class cMobCensus;
 class cMobSpawner;
-class cSetChunkData;
+
+struct SetChunkData;
 
 typedef std::list<cClientHandle *>                cClientHandleList;
 
 // A convenience macro for calling GetChunkAndRelByAbsolute.
 #define PREPARE_REL_AND_CHUNK(Position, OriginalChunk) cChunk * Chunk; Vector3i Rel; bool RelSuccess = (OriginalChunk).GetChunkAndRelByAbsolute(Position, &Chunk, Rel)
-#define PREPARE_BLOCKDATA BLOCKTYPE BlockType; NIBBLETYPE BlockMeta;
 
 
-// This class is not to be used directly
-// Instead, call actions on cChunkMap (such as cChunkMap::SetBlock() etc.)
-class cChunk :
-	public cChunkDef  // The inheritance is "misused" here only to inherit the functions and constants defined in cChunkDef
+class cChunk
 {
 public:
 
@@ -63,8 +60,7 @@ public:
 
 	cChunk(
 		int a_ChunkX, int a_ChunkZ,   // Chunk coords
-		cChunkMap * a_ChunkMap, cWorld * a_World,   // Parent objects
-		cAllocationPool<cChunkData::sChunkSection> & a_Pool
+		cChunkMap * a_ChunkMap, cWorld * a_World   // Parent objects
 	);
 	cChunk(const cChunk & Other) = delete;
 	~cChunk();
@@ -112,20 +108,17 @@ public:
 	void MarkLoadFailed(void);
 
 	/** Gets all chunk data, calls the a_Callback's methods for each data type */
-	void GetAllData(cChunkDataCallback & a_Callback);
+	void GetAllData(cChunkDataCallback & a_Callback) const;
 
 	/** Sets all chunk data as either loaded from the storage or generated.
 	BlockLight and BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
 	Modifies the BlockEntity list in a_SetChunkData - moves the block entities into the chunk. */
-	void SetAllData(cSetChunkData & a_SetChunkData);
+	void SetAllData(SetChunkData && a_SetChunkData);
 
 	void SetLight(
 		const cChunkDef::BlockNibbles & a_BlockLight,
 		const cChunkDef::BlockNibbles & a_SkyLight
 	);
-
-	/** Copies m_BlockData into a_BlockTypes, only the block types */
-	void GetBlockTypes(BLOCKTYPE  * a_BlockTypes);
 
 	/** Writes the specified cBlockArea at the coords specified. Note that the coords may extend beyond the chunk! */
 	void WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
@@ -164,8 +157,8 @@ public:
 		FastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_BlockType, a_BlockMeta);
 	}
 
-	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetBlock({ a_RelX, a_RelY, a_RelZ }); }
-	BLOCKTYPE GetBlock(Vector3i a_RelCoords) const { return m_ChunkData.GetBlock(a_RelCoords); }
+	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const { return m_BlockData.GetBlock({ a_RelX, a_RelY, a_RelZ }); }
+	BLOCKTYPE GetBlock(Vector3i a_RelCoords) const { return m_BlockData.GetBlock(a_RelCoords); }
 
 	void GetBlockTypeMeta(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	void GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
@@ -173,11 +166,7 @@ public:
 		GetBlockTypeMeta({ a_RelX, a_RelY, a_RelZ }, a_BlockType, a_BlockMeta);
 	}
 
-	void GetBlockInfo(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
-	void GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
-	{
-		GetBlockInfo({ a_RelX, a_RelY, a_RelZ }, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
-	}
+	void GetBlockInfo(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
 
 	/** Convert absolute coordinates into relative coordinates.
 	Returns false on failure to obtain a valid chunk. Returns true otherwise.
@@ -226,7 +215,17 @@ public:
 	/** Sets the sign text. Returns true if successful. Also sends update packets to all clients in the chunk */
 	bool SetSignLines(int a_RelX, int a_RelY, int a_RelZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 
-	int  GetHeight( int a_X, int a_Z);
+	int GetHeight( int a_X, int a_Z) const;
+
+	/** Returns true if it is sunny at the specified location. This takes into account biomes. */
+	bool IsWeatherSunnyAt(int a_RelX, int a_RelZ) const;
+
+	/** Returns true if it is raining or storming at the specified location, taking into account biomes. */
+	bool IsWeatherWetAt(int a_RelX, int a_RelZ) const;
+
+	/** Returns true if it is raining or storming at the specified location,
+	and the rain reaches (the bottom of) the specified block position. */
+	bool IsWeatherWetAt(Vector3i a_Position) const;
 
 	void SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client);
 
@@ -342,8 +341,6 @@ public:
 	returns true if the use was successful, return false to use the block as a "normal" block */
 	bool UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
 
-	void CalculateHeightmap(const BLOCKTYPE * a_BlockTypes);
-
 	void SendBlockEntity             (int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 
 	Vector3i PositionToWorldPosition(Vector3i a_RelPos)
@@ -370,42 +367,36 @@ public:
 
 	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 	{
-		return m_ChunkData.GetMeta({ a_RelX, a_RelY, a_RelZ });
+		return m_BlockData.GetMeta({ a_RelX, a_RelY, a_RelZ });
 	}
 
-	NIBBLETYPE GetMeta(Vector3i a_RelPos) const { return m_ChunkData.GetMeta(a_RelPos); }
+	NIBBLETYPE GetMeta(Vector3i a_RelPos) const { return m_BlockData.GetMeta(a_RelPos); }
 
 	void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
 		SetMeta({ a_RelX, a_RelY, a_RelZ }, a_Meta);
 	}
 
-	/** Set a meta value, with the option of not informing the client and / or not marking dirty.
-	Used for setting metas that are of little value for saving to disk and / or for sending to the client,
-	such as leaf decay flags. */
 	inline void SetMeta(Vector3i a_RelPos, NIBBLETYPE a_Meta)
 	{
-		bool hasChanged = m_ChunkData.SetMeta(a_RelPos, a_Meta);
-		if (hasChanged)
-		{
-			MarkDirty();
-			m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock(a_RelPos), a_Meta));
-		}
+		m_BlockData.SetMeta(a_RelPos, a_Meta);
+		MarkDirty();
+		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock(a_RelPos), a_Meta));
 	}
 
 	/** Light alterations based on time */
 	NIBBLETYPE GetTimeAlteredLight(NIBBLETYPE a_Skylight) const;
 
 	/** Get the level of artificial light illuminating the block (0 - 15) */
-	inline NIBBLETYPE GetBlockLight(Vector3i a_RelPos) const { return m_ChunkData.GetBlockLight(a_RelPos); }
-	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetBlockLight({ a_RelX, a_RelY, a_RelZ }); }
+	inline NIBBLETYPE GetBlockLight(Vector3i a_RelPos) const { return m_LightData.GetBlockLight(a_RelPos); }
+	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetBlockLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15) independent of daytime. */
-	inline NIBBLETYPE GetSkyLight(Vector3i a_RelPos) const { return m_ChunkData.GetSkyLight(a_RelPos); }
-	inline NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetSkyLight({ a_RelX, a_RelY, a_RelZ }); }
+	inline NIBBLETYPE GetSkyLight(Vector3i a_RelPos) const { return m_LightData.GetSkyLight(a_RelPos); }
+	inline NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetSkyLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15), taking daytime into a account. */
-	inline NIBBLETYPE GetSkyLightAltered(Vector3i a_RelPos) const { return GetTimeAlteredLight(m_ChunkData.GetSkyLight(a_RelPos)); }
+	inline NIBBLETYPE GetSkyLightAltered(Vector3i a_RelPos) const { return GetTimeAlteredLight(m_LightData.GetSkyLight(a_RelPos)); }
 	inline NIBBLETYPE GetSkyLightAltered(int a_RelX, int a_RelY, int a_RelZ) const { return GetSkyLightAltered({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
@@ -578,7 +569,6 @@ private:
 	bool m_IsLightValid;   // True if the blocklight and skylight are calculated
 	bool m_IsDirty;        // True if the chunk has changed since it was last saved
 	bool m_IsSaving;       // True if the chunk is being saved
-	bool m_HasLoadFailed;  // True if chunk failed to load and hasn't been generated yet since then
 
 	std::queue<Vector3i>  m_ToTickBlocks;
 	sSetBlockVector       m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
@@ -589,13 +579,14 @@ private:
 	cBlockEntities m_BlockEntities;
 
 	/** Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded */
-	int m_StayCount;
+	unsigned m_StayCount;
 
 	int m_PosX, m_PosZ;
 	cWorld *    m_World;
 	cChunkMap * m_ChunkMap;
 
-	cChunkData m_ChunkData;
+	ChunkBlockData m_BlockData;
+	ChunkLightData m_LightData;
 
 	cChunkDef::HeightMap m_HeightMap;
 	cChunkDef::BiomeMap  m_BiomeMap;
@@ -619,7 +610,7 @@ private:
 	/** If greater than zero, the chunk is ticked even if it has no clients.
 	Manipulated by the SetAlwaysTicked() function, allows for nested calls of the function.
 	This is the support for plugin-accessible chunk tick forcing. */
-	int m_AlwaysTicked;
+	unsigned m_AlwaysTicked;
 
 	// Pick up a random block of this chunk
 	void GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z);

@@ -1130,7 +1130,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	const cItem Target(*GetSlot(0, a_Player));
 	const cItem Sacrifice(*GetSlot(1, a_Player));
 
-	// Output initialised as copy of target
+	// Output initialised as copy of target.
 	cItem Output(Target);
 
 	if (Target.IsEmpty())
@@ -1148,9 +1148,8 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	int NeedExp = 0;
 	if (!Sacrifice.IsEmpty())
 	{
-		bool IsEnchantBook = (Sacrifice.m_ItemType == E_ITEM_ENCHANTED_BOOK);
-
 		RepairCost += Sacrifice.m_RepairCost;
+
 		// Can we repair with sacrifce material?
 		if (Target.IsDamageable() && cItemHandler::GetItemHandler(Target)->CanRepairWithRawMaterial(Sacrifice.m_ItemType))
 		{
@@ -1166,8 +1165,9 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				return;
 			}
 
-			int NumItemsConsumed = 0;
-			// Repair until out of materials, or fully repaired
+			char NumItemsConsumed = 0;
+
+			// Repair until out of materials, or fully repaired:
 			while ((DamageDiff > 0) && (NumItemsConsumed < Sacrifice.m_ItemCount))
 			{
 				Output.m_ItemDamage -= DamageDiff;
@@ -1176,10 +1176,12 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 				++NumItemsConsumed;
 			}
-			m_StackSizeToBeUsedInRepair = static_cast<char>(NumItemsConsumed);
+			m_StackSizeToBeUsedInRepair = NumItemsConsumed;
 		}
 		else  // Combining tools / armour
 		{
+			const bool IsEnchantBook = (Sacrifice.m_ItemType == E_ITEM_ENCHANTED_BOOK);
+
 			// No result if we can't combine the items
 			if (!IsEnchantBook && (!Target.IsSameType(Sacrifice) || !Target.IsDamageable()))
 			{
@@ -1197,7 +1199,8 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				// Durability = MaxDamage - m_ItemDamage = how far from broken
 				const short TargetDurability = Target.GetMaxDamage() - Target.m_ItemDamage;
 				const short SacrificeDurability = Sacrifice.GetMaxDamage() - Sacrifice.m_ItemDamage;
-				// How much durability to repair by:
+
+				// How much durability to repair by.
 				const short RepairDurability = SacrificeDurability + Target.GetMaxDamage() * 12 / 100;
 
 				// Don't give item a negative damage:
@@ -1270,7 +1273,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		Output.m_RepairCost = RepairCost;
 	}
 
-	// If after everything, output will be the same then no point enchanting
+	// If after everything, output will be the same then no point enchanting:
 	if (Target.IsEqual(Output))
 	{
 		Output.Empty();
@@ -1698,18 +1701,18 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 	}
 
 	// Pseudocode found at: https://minecraft.gamepedia.com/Enchanting_mechanics
-	const auto Bookshelves = std::min(static_cast<int>(GetBookshelvesCount(*a_Player.GetWorld())), 15);
+	const auto Bookshelves = std::min(GetBookshelvesCount(*a_Player.GetWorld()), 15U);
 
 	// A PRNG initialised using the player's enchantment seed.
 	auto Random = a_Player.GetEnchantmentRandomProvider();
 
 	// Calculate the levels for the offered enchantment options:
-	const auto Base = (Random.RandInt(1, 8) + (Bookshelves / 2) + Random.RandInt(0, Bookshelves));
-	const std::array<short, 3> OptionLevels
+	const auto Base = (Random.RandInt(1U, 8U) + (Bookshelves / 2) + Random.RandInt(0U, Bookshelves));
+	const std::array<unsigned, 3> OptionLevels
 	{
-		static_cast<short>(std::max(Base / 3, 1)),
-		static_cast<short>((Base * 2) / 3 + 1),
-		static_cast<short>(std::max(Base, Bookshelves * 2))
+		std::max(Base / 3, 1U),
+		(Base * 2) / 3 + 1,
+		std::max(Base, Bookshelves * 2)
 	};
 
 	// Properties set according to: https://wiki.vg/Protocol#Window_Property
@@ -1728,7 +1731,7 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 		LOGD("Generated enchanted item %d with enchantments: %s", i, EnchantedItem.m_Enchantments.ToString());
 
 		// Send the level requirement for the enchantment option:
-		m_ParentWindow.SetProperty(i, OptionLevels[i]);
+		m_ParentWindow.SetProperty(i, static_cast<short>(OptionLevels[i]));
 
 		// Get the first enchantment ID, which must exist:
 		ASSERT(EnchantedItem.m_Enchantments.begin() != EnchantedItem.m_Enchantments.end());
@@ -2800,6 +2803,7 @@ void cSlotAreaHorse::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 					{
 						return;
 					}
+					break;
 				}
 				case ArmorSlot:
 				{
@@ -2807,6 +2811,7 @@ void cSlotAreaHorse::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 					{
 						return;
 					}
+					break;
 				}
 				default: break;
 			}

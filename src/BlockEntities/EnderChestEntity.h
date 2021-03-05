@@ -20,9 +20,9 @@ class cEnderChestEntity :
 public:  // tolua_export
 
 	cEnderChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
-	virtual ~cEnderChestEntity() override;
 
 	// cBlockEntity overrides:
+	virtual void OnRemoveFromWorld() override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 

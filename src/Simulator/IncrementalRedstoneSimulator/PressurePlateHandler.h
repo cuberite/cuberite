@@ -10,9 +10,9 @@
 
 namespace PressurePlateHandler
 {
-	inline unsigned char GetPowerLevel(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType)
+	static unsigned char GetPowerLevel(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType)
 	{
-		Int64 NumberOfEntities = 0;
+		size_t NumberOfEntities = 0;
 		bool FoundPlayer = false;
 
 		Chunk.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + Position, 0.5, 0.5), [&](cEntity & Entity)
@@ -24,7 +24,8 @@ namespace PressurePlateHandler
 
 			if (Entity.IsPickup())
 			{
-				NumberOfEntities += static_cast<cPickup &>(Entity).GetItem().m_ItemCount;
+				const auto & Pickup = static_cast<cPickup &>(Entity);
+				NumberOfEntities += static_cast<size_t>(Pickup.GetItem().m_ItemCount);
 				return false;
 			}
 			NumberOfEntities++;
@@ -35,11 +36,11 @@ namespace PressurePlateHandler
 		{
 			case E_BLOCK_STONE_PRESSURE_PLATE:
 			{
-				return (FoundPlayer ? 15 : 0);
+				return FoundPlayer ? 15 : 0;
 			}
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 			{
-				return (NumberOfEntities > 0 ? 15 : 0);
+				return (NumberOfEntities != 0) ? 15 : 0;
 			}
 			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 			{
@@ -57,7 +58,7 @@ namespace PressurePlateHandler
 		}
 	}
 
-	inline const char * GetClickOnSound(BLOCKTYPE a_BlockType)
+	static const char * GetClickOnSound(BLOCKTYPE a_BlockType)
 	{
 		// manage on-sound
 		switch (a_BlockType)
@@ -74,7 +75,7 @@ namespace PressurePlateHandler
 		}
 	}
 
-	inline const char * GetClickOffSound(BLOCKTYPE a_BlockType)
+	static const char * GetClickOffSound(BLOCKTYPE a_BlockType)
 	{
 		// manage off-sound
 		switch (a_BlockType)
@@ -91,7 +92,7 @@ namespace PressurePlateHandler
 		}
 	}
 
-	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_BlockType);
 		UNUSED(a_QueryPosition);
@@ -102,7 +103,7 @@ namespace PressurePlateHandler
 		return (IsLinked && (a_QueryPosition != (a_Position + OffsetYM))) ? 0 : DataForChunk(a_Chunk).GetCachedPowerData(a_Position);
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
+	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating clicky the pressure plate (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
@@ -204,7 +205,7 @@ namespace PressurePlateHandler
 		UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
 	}
 
-	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
+	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);

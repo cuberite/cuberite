@@ -83,7 +83,7 @@ Unfortunately it is very slow, so it is disabled even for regular DEBUG builds. 
 // cByteBuffer:
 
 cByteBuffer::cByteBuffer(size_t a_BufferSize) :
-	m_Buffer(new char[a_BufferSize + 1]),
+	m_Buffer(new std::byte[a_BufferSize + 1]),
 	m_BufferSize(a_BufferSize + 1),
 	m_DataStart(0),
 	m_WritePos(0),
@@ -115,7 +115,7 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 
 	// Store the current free space for a check after writing:
 	size_t CurFreeSpace = GetFreeSpace();
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		size_t CurReadableSpace = GetReadableSpace();
 	#endif
 	size_t WrittenBytes = 0;
@@ -446,7 +446,15 @@ bool cByteBuffer::ReadVarUTF8String(AString & a_Value)
 	{
 		LOGWARNING("%s: String too large: %u (%u KiB)", __FUNCTION__, Size, Size / 1024);
 	}
-	return ReadString(a_Value, static_cast<size_t>(Size));
+	ContiguousByteBuffer Buffer;
+	if (!ReadSome(Buffer, static_cast<size_t>(Size)))
+	{
+		return false;
+	}
+	// "Convert" a UTF-8 encoded string into system-native char.
+	// This isn't great, better would be to use codecvt:
+	a_Value = { reinterpret_cast<const char *>(Buffer.data()), Buffer.size() };
+	return true;
 }
 
 
@@ -541,6 +549,18 @@ bool cByteBuffer::ReadUUID(cUUID & a_Value)
 
 
 bool cByteBuffer::WriteBEInt8(Int8 a_Value)
+{
+	CHECK_THREAD
+	CheckValid();
+	PUTBYTES(1);
+	return WriteBuf(&a_Value, 1);
+}
+
+
+
+
+
+bool cByteBuffer::WriteBEInt8(const std::byte a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -836,7 +856,35 @@ bool cByteBuffer::WriteBuf(const void * a_Buffer, size_t a_Count)
 
 
 
-bool cByteBuffer::ReadString(AString & a_String, size_t a_Count)
+bool cByteBuffer::WriteBuf(size_t a_Count, unsigned char a_Value)
+{
+	CHECK_THREAD
+	CheckValid();
+	PUTBYTES(a_Count);
+	ASSERT(m_BufferSize >= m_ReadPos);
+	size_t BytesToEndOfBuffer = m_BufferSize - m_WritePos;
+	if (BytesToEndOfBuffer <= a_Count)
+	{
+		// Reading across the ringbuffer end, read the first part and adjust parameters:
+		memset(m_Buffer + m_WritePos, a_Value, BytesToEndOfBuffer);
+		a_Count -= BytesToEndOfBuffer;
+		m_WritePos = 0;
+	}
+
+	// Read the rest of the bytes in a single read (guaranteed to fit):
+	if (a_Count > 0)
+	{
+		memset(m_Buffer + m_WritePos, a_Value, a_Count);
+		m_WritePos += a_Count;
+	}
+	return true;
+}
+
+
+
+
+
+bool cByteBuffer::ReadSome(ContiguousByteBuffer & a_String, size_t a_Count)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -886,11 +934,11 @@ bool cByteBuffer::SkipRead(size_t a_Count)
 
 
 
-void cByteBuffer::ReadAll(AString & a_Data)
+void cByteBuffer::ReadAll(ContiguousByteBuffer & a_Data)
 {
 	CHECK_THREAD
 	CheckValid();
-	ReadString(a_Data, GetReadableSpace());
+	ReadSome(a_Data, GetReadableSpace());
 }
 
 
@@ -944,7 +992,7 @@ void cByteBuffer::ResetRead(void)
 
 
 
-void cByteBuffer::ReadAgain(AString & a_Out)
+void cByteBuffer::ReadAgain(ContiguousByteBuffer & a_Out)
 {
 	// Return the data between m_DataStart and m_ReadPos (the data that has been read but not committed)
 	// Used by ProtoProxy to repeat communication twice, once for parsing and the other time for the remote party
@@ -1004,8 +1052,3 @@ size_t cByteBuffer::GetVarIntSize(UInt32 a_Value)
 
 	return Count;
 }
-
-
-
-
-

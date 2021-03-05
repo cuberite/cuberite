@@ -46,6 +46,7 @@ function(enable_bindings_generation)
 		Entities/ArrowEntity.h
 		Entities/Entity.h
 		Entities/ExpOrb.h
+		Entities/EnderCrystal.h
 		Entities/EntityEffect.h
 		Entities/ExpBottleEntity.h
 		Entities/FallingBlock.h

@@ -47,7 +47,7 @@ class cChunkSender;
 
 
 
-class cChunkSender:
+class cChunkSender final :
 	public cIsThread,
 	public cChunkDataCopyCollector
 {
@@ -74,10 +74,9 @@ public:
 	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cClientHandle * a_Client);
 	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cChunkClientHandles a_Client);
 
-	/** Removes the a_Client from all waiting chunk send operations */
-	void RemoveClient(cClientHandle * a_Client);
-
 protected:
+
+	using WeakClients = std::set<std::weak_ptr<cClientHandle>, std::owner_less<std::weak_ptr<cClientHandle>>>;
 
 	struct sChunkQueue
 	{
@@ -96,7 +95,7 @@ protected:
 	struct sSendChunk
 	{
 		cChunkCoords m_Chunk;
-		std::unordered_set<cClientHandle *> m_Clients;
+		WeakClients m_Clients;
 		Priority m_Priority;
 		sSendChunk(cChunkCoords a_Chunk, Priority a_Priority) :
 			m_Chunk(a_Chunk),
@@ -114,7 +113,6 @@ protected:
 	std::priority_queue<sChunkQueue> m_SendChunks;
 	std::unordered_map<cChunkCoords, sSendChunk, cChunkCoordsHash> m_ChunkInfo;
 	cEvent m_evtQueue;  // Set when anything is added to m_ChunksReady
-	cEvent m_evtRemoved;  // Set when removed clients are safe to be deleted
 
 	// Data about the chunk that is being sent:
 	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
@@ -127,12 +125,12 @@ protected:
 
 	// cChunkDataCollector overrides:
 	// (Note that they are called while the ChunkMap's CS is locked - don't do heavy calculations here!)
-	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) override;
+	virtual void BiomeMap     (const cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void Entity       (cEntity *      a_Entity) override;
 	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
 
 	/** Sends the specified chunk to all the specified clients */
-	void SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cClientHandle *> a_Clients);
+	void SendChunk(int a_ChunkX, int a_ChunkZ, const WeakClients & a_Clients);
 } ;
 
 

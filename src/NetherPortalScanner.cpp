@@ -48,37 +48,73 @@ cNetherPortalScanner::cNetherPortalScanner(cEntity & a_MovingEntity, cWorld & a_
 
 void cNetherPortalScanner::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 {
-	cChunkDef::BlockTypes blocks;
-	m_World.GetChunkBlockTypes(a_ChunkX, a_ChunkZ, blocks);
-
-	// Iterate through all of the blocks in the chunk
-	for (unsigned int i = 0; i < cChunkDef::NumBlocks; i++)
+	class PortalSearchCallback : public cChunkDataCallback
 	{
-		if (blocks[i] == E_BLOCK_NETHER_PORTAL)
-		{
-			Vector3i Coordinate = cChunkDef::IndexToCoordinate(i);
-			if (Coordinate.y >= m_MaxY)
-			{
-				// This is above the map, don't consider it.
-				continue;
-			}
+	public:
 
-			Vector3d PortalLoc = Vector3d(Coordinate.x + a_ChunkX * cChunkDef::Width, Coordinate.y, Coordinate.z + a_ChunkZ * cChunkDef::Width);
-			if (!m_FoundPortal)
+		PortalSearchCallback(const int a_ChunkX, const int a_ChunkZ, bool & a_FoundPortal, Vector3i & a_PortalLoc, const Vector3d a_Position, const int a_MaxY) :
+			m_ChunkX(a_ChunkX),
+			m_ChunkZ(a_ChunkZ),
+			m_FoundPortal(a_FoundPortal),
+			m_PortalLoc(a_PortalLoc),
+			m_Position(a_Position),
+			m_MaxY(a_MaxY)
+		{
+		}
+
+	private:
+
+		virtual void ChunkData(const ChunkBlockData & a_BlockData, const ChunkLightData &) override
+		{
+			for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 			{
-				m_FoundPortal = true;
-				m_PortalLoc = PortalLoc;
-			}
-			else
-			{
-				if ((PortalLoc - m_Position).SqrLength() < (m_PortalLoc - m_Position).SqrLength())
+				const auto Blocks = a_BlockData.GetSection(Y);
+				if (Blocks == nullptr)
 				{
-					m_FoundPortal = true;
-					m_PortalLoc = PortalLoc;
+					continue;
+				}
+
+				// Iterate through all of the blocks in the chunk:
+				for (size_t i = 0; i < ChunkBlockData::SectionBlockCount; i++)
+				{
+					if ((*Blocks)[i] != E_BLOCK_NETHER_PORTAL)
+					{
+						continue;
+					}
+
+					Vector3i Coordinate = cChunkDef::IndexToCoordinate(i + Y * ChunkBlockData::SectionBlockCount);
+					if (Coordinate.y >= m_MaxY)
+					{
+						// This is above the map, don't consider it:
+						continue;
+					}
+
+					Vector3d PortalLoc = Vector3d(Coordinate.x + m_ChunkX * cChunkDef::Width, Coordinate.y, Coordinate.z + m_ChunkZ * cChunkDef::Width);
+					if (!m_FoundPortal)
+					{
+						m_FoundPortal = true;
+						m_PortalLoc = PortalLoc;
+					}
+					else if ((PortalLoc - m_Position).SqrLength() < (m_PortalLoc - m_Position).SqrLength())
+					{
+						// Found a closer portal, use that instead:
+						m_PortalLoc = PortalLoc;
+					}
 				}
 			}
 		}
-	}
+
+		int m_ChunkX, m_ChunkZ;
+
+		bool & m_FoundPortal;
+		Vector3i & m_PortalLoc;
+		const Vector3d m_Position;
+
+		const int m_MaxY;
+	} Callback(a_ChunkX, a_ChunkZ, m_FoundPortal, m_PortalLoc, m_Position, m_MaxY);
+
+	[[maybe_unused]] const bool Result = m_World.GetChunkData({ a_ChunkX, a_ChunkZ }, Callback);
+	ASSERT(Result);
 }
 
 
@@ -264,7 +300,7 @@ void cNetherPortalScanner::BuildNetherPortal(Vector3i a_Location, Direction a_Di
 	}
 
 	// Fill the frame (place a fire in the bottom)
-	m_World.SetBlock(x + 1, y + 1, z + 1, E_BLOCK_FIRE, 0);
+	m_World.PlaceBlock(Vector3<int>(x + 1, y + 1, z + 1), E_BLOCK_FIRE, 0);
 }
 
 

@@ -24,6 +24,7 @@
 #include "BlockComparator.h"
 #include "BlockConcretePowder.h"
 #include "BlockCrops.h"
+#include "BlockDaylightSensor.h"
 #include "BlockDeadBush.h"
 #include "BlockDefaultBlock.h"
 #include "BlockDirt.h"
@@ -61,6 +62,7 @@
 #include "BlockMycelium.h"
 #include "BlockNetherWart.h"
 #include "BlockNetherrack.h"
+#include "BlockNoteBlock.h"
 #include "BlockObserver.h"
 #include "BlockOre.h"
 #include "BlockPackedIce.h"
@@ -249,7 +251,7 @@ namespace
 	constexpr cBlockFenceGateHandler          BlockDarkOakFenceGateHandler      (E_BLOCK_DARK_OAK_FENCE_GATE);
 	constexpr cBlockFenceHandler              BlockDarkOakFenceHandler          (E_BLOCK_DARK_OAK_FENCE);
 	constexpr cBlockStairsHandler             BlockDarkOakWoodStairsHandler     (E_BLOCK_DARK_OAK_WOOD_STAIRS);
-	constexpr cDefaultBlockHandler            BlockDaylightSensorHandler        (E_BLOCK_DAYLIGHT_SENSOR);
+	constexpr cBlockDaylightSensorHandler     BlockDaylightSensorHandler        (E_BLOCK_DAYLIGHT_SENSOR);
 	constexpr cBlockDeadBushHandler           BlockDeadBushHandler              (E_BLOCK_DEAD_BUSH);
 	constexpr cBlockRailHandler               BlockDetectorRailHandler          (E_BLOCK_DETECTOR_RAIL);
 	constexpr cDefaultBlockHandler            BlockDiamondBlockHandler          (E_BLOCK_DIAMOND_BLOCK);
@@ -344,7 +346,7 @@ namespace
 	constexpr cBlockNetherrack                BlockNetherrackHandler            (E_BLOCK_NETHERRACK);
 	constexpr cBlockLeavesHandler             BlockNewLeavesHandler             (E_BLOCK_NEW_LEAVES);
 	constexpr cBlockSidewaysHandler           BlockNewLogHandler                (E_BLOCK_NEW_LOG);
-	constexpr cDefaultBlockEntityHandler      BlockNoteBlockHandler             (E_BLOCK_NOTE_BLOCK);
+	constexpr cBlockNoteBlockHandler      	  BlockNoteBlockHandler             (E_BLOCK_NOTE_BLOCK);
 	constexpr cBlockDoorHandler               BlockOakDoorHandler               (E_BLOCK_OAK_DOOR);
 	constexpr cBlockFenceGateHandler          BlockOakFenceGateHandler          (E_BLOCK_OAK_FENCE_GATE);
 	constexpr cBlockStairsHandler             BlockOakWoodStairsHandler         (E_BLOCK_OAK_WOOD_STAIRS);
@@ -486,7 +488,7 @@ void cBlockHandler::OnUpdate(
 
 void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const
 {
-	if (a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { return CanBeAt(a_ChunkInterface, a_Chunk.AbsoluteToRelative(a_BlockPos), a_Chunk); }))
+	if (a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { return CanBeAt(a_ChunkInterface, cChunkDef::AbsoluteToRelative(a_BlockPos), a_Chunk); }))
 	{
 		return;
 	}
@@ -934,6 +936,5 @@ const cBlockHandler & cBlockHandler::For(BLOCKTYPE a_BlockType)
 		case E_BLOCK_NUMBER_OF_TYPES:
 		case E_BLOCK_UNFINISHED: return BlockAirHandler;
 	}
-
 	UNREACHABLE("Getting handler for unexpected block type");
 }

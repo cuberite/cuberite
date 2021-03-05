@@ -972,10 +972,12 @@ AString Base64Encode(const AString & a_Input)
 
 
 
-short GetBEShort(const char * a_Mem)
+short GetBEShort(const std::byte * const a_Mem)
 {
-	const Byte * Bytes = reinterpret_cast<const Byte *>(a_Mem);
-	return static_cast<short>((Bytes[0] << 8) | Bytes[1]);
+	return static_cast<short>(
+		(static_cast<short>(a_Mem[0]) << 8) |
+		static_cast<short>(a_Mem[1])
+	);
 }
 
 
@@ -992,22 +994,26 @@ unsigned short GetBEUShort(const char * a_Mem)
 
 
 
-int GetBEInt(const char * a_Mem)
+int GetBEInt(const std::byte * const a_Mem)
 {
-	const Byte * Bytes = reinterpret_cast<const Byte *>(a_Mem);
-	return (Bytes[0] << 24) | (Bytes[1] << 16) | (Bytes[2] << 8) | Bytes[3];
+	return
+		(static_cast<int>(a_Mem[0]) << 24) |
+		(static_cast<int>(a_Mem[1]) << 16) |
+		(static_cast<int>(a_Mem[2]) << 8) |
+		static_cast<int>(a_Mem[3])
+	;
 }
 
 
 
 
 
-void SetBEInt(char * a_Mem, Int32 a_Value)
+void SetBEInt(std::byte * a_Mem, Int32 a_Value)
 {
-	a_Mem[0] = a_Value >> 24;
-	a_Mem[1] = static_cast<char>((a_Value >> 16) & 0xff);
-	a_Mem[2] = static_cast<char>((a_Value >> 8) & 0xff);
-	a_Mem[3] = static_cast<char>(a_Value & 0xff);
+	a_Mem[0] = std::byte(a_Value >> 24);
+	a_Mem[1] = std::byte((a_Value >> 16) & 0xff);
+	a_Mem[2] = std::byte((a_Value >> 8) & 0xff);
+	a_Mem[3] = std::byte(a_Value & 0xff);
 }
 
 

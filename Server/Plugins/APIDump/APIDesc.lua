@@ -1584,6 +1584,21 @@ end
 					},
 					Notes = "Sends the specified animation of the specified entity to the client. The AnimationNumber is protocol-specific.",
 				},
+				SendPlayerListHeaderFooter =
+				{
+					Params =
+					{
+						{
+							Type = "cCompositeChat",
+							Name = "Header",
+						},
+						{
+							Type = "cCompositeChat",
+							Name = "Footer",
+						},
+					},
+					Desc = "Sends the header and footer of the player list to the client.",
+				},
 				SendHideTitle =
 				{
 					Notes = "Hides the title. This makes the title and subtitle disappear, but if you call SendTitleTimes() the same title and subtitle will appear again."
@@ -1764,17 +1779,6 @@ end
 						},
 					},
 					Notes = "Sets the locale that Cuberite keeps on record. Initially the locale is initialized in protocol handshake, this function allows plugins to override the stored value (but only server-side and only until the user disconnects).",
-				},
-				SetUsername =
-				{
-					Params =
-					{
-						{
-							Name = "Name",
-							Type = "string",
-						},
-					},
-					Notes = "Sets the username",
 				},
 				SetViewDistance =
 				{
@@ -5061,8 +5065,8 @@ cFile:DeleteFile("/usr/bin/virus.exe");
 				{
 					Returns =
 					{
-							Name = "BitePosition",
-							Type = "Vector3d",
+						Name = "BitePosition",
+						Type = "Vector3d",
 					},
 					Notes = "Returns the position of the floater just before a fish bites. If a fish hasn't bitten the floater, this function returns the position the floater was cast from.",
 				},
@@ -8900,16 +8904,16 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-                                BurnsInDaylight =
-                                {
-                                        Returns =
-                                        {
-                                                {
-                                                        Type = "boolean",
-                                                },
-                                        },
-                                        Notes = "Returns whether the mob burns in daylight.",
-                                },
+				BurnsInDaylight =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whether the mob burns in daylight.",
+				},
 				CanBeLeashed =
 				{
 					Returns =
@@ -9535,6 +9539,79 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Removes a currently applied entity effect",
+				},
+			},
+			Inherits = "cEntity",
+		},
+		cEnderCrystal =
+		{
+			Desc = [[
+				This class represents an ender crystal. This entity can be spawned by using {{cWorld#SpawnEnderCrystal_1|cWorld:SpawnEnderCrystal}}.
+			]],
+			Functions =
+			{
+				DisplaysBeam =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+						Notes = "Returns true if the ender crystal displays its beam.",
+					},
+				},
+				GetBeamTarget =
+				{
+					Returns =
+					{
+						{
+							Type = "Vector3i",
+						},
+					},
+					Notes = "Returns the Block position the beam is pointing to.",
+				},
+				SetBeamTarget =
+				{
+					Params =
+					{
+						{
+							Name = "BeamTarget",
+							Type = "Vector3i",
+						},
+					},
+					Notes = "Sets the target of the beam of this ender crystal.",
+				},
+				SetDisplayBeam =
+				{
+					Params =
+					{
+						{
+							Name = "DisplaysBeam",
+							Type = "boolean",
+						},
+						Notes = "Sets if the ender crystal should display its beam.",
+					},
+				},
+				SetShowBottom =
+				{
+					Params =
+					{
+						{
+							Name = "ShowsBottom",
+							Type = "boolean",
+						},
+						Notes = "Sets if the ender crystal should broadcast its bedrock base.",
+					},
+				},
+				ShowsBottom =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+						Notes = "Returns true if the bedrock base is displayed.",
+					},
 				},
 			},
 			Inherits = "cEntity",
@@ -11325,6 +11402,21 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Broadcasts the specified message to all players, with its message type set to mtWarning. Use for concerning events, such as plugin reload etc.",
+				},
+				BroadcastPlayerListsHeaderFooter =
+				{
+					Params =
+					{
+						{
+							Type = "cCompositeChat",
+							Name = "Header",
+						},
+						{
+							Type = "cCompositeChat",
+							Name = "Footer",
+						},
+					},
+					Desc = "Broadcasts the header and footer of the player list to all players.",
 				},
 				DoWithPlayerByUUID =
 				{
@@ -14379,6 +14471,14 @@ end
 				{
 					Notes = "Damage from contact with a cactus block"
 				},
+				dtMagmaContact =
+				{
+					Notes = "Damage from contact with a magma block"
+				},
+				dtMagma =
+				{
+					Notes = "Damage from contact with a magma block"
+				},
 				dtDrown =
 				{
 					Notes = "Damage received by drowning in water / lava"
@@ -16899,6 +16999,58 @@ end
 				{
 					Notes = "A flag in the metadata of sponges that indicates that the sponge is wet.",
 				},
+				E_META_MUSHROOM_ALL_SIDES  =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on all sides.",
+				},
+				E_META_MUSHROOM_NORTH_WEST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the pore texture on north and west side.",
+				},
+				E_META_MUSHROOM_NORTH =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on north side.",
+				},
+				E_META_MUSHROOM_NORTH_EAST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on north and east side.",
+				},
+				E_META_MUSHROOM_WEST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on west side.",
+				},
+				E_META_MUSHROOM_CENTER =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on top.",
+				},
+				E_META_MUSHROOM_EAST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on east side.",
+				},
+				E_META_MUSHROOM_SOUTH_WEST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on south and west side.",
+				},
+				E_META_MUSHROOM_SOUTH =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on south side.",
+				},
+				E_META_MUSHROOM_SOUTH_EAST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on south and east side.",
+				},
+				E_META_MUSHROOM_STEM =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the stem texture on all sides but not on top and bottom.",
+				},
+				E_META_MUSHROOM_CAP =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on all sides.",
+				},
+				E_META_MUSHROOM_FULL_STEM =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the stem texture on all sides.",
+				},
 				esBed =
 				{
 					Notes = "A bed explosion. The SourceData param is the {{Vector3i|position}} of the bed.",
@@ -16949,7 +17101,15 @@ end
 				{
 					Notes = "",
 				},
+				mtCat =
+				{
+					Notes = "",
+				},
 				mtChicken =
+				{
+					Notes = "",
+				},
+				mtCod =
 				{
 					Notes = "",
 				},
@@ -16961,11 +17121,39 @@ end
 				{
 					Notes = "",
 				},
+				mtDolphin =
+				{
+					Notes = "",
+				},
+				mtDonkey =
+				{
+					Notes = "",
+				},
+				mtDrowned =
+				{
+					Notes = "",
+				},
+				mtElderGuardian =
+				{
+					Notes = "",
+				},
 				mtEnderDragon =
 				{
 					Notes = "",
 				},
 				mtEnderman =
+				{
+					Notes = "",
+				},
+				mtEndermite =
+				{
+					Notes = "",
+				},
+				mtEvoker =
+				{
+					Notes = "",
+				},
+				mtFox =
 				{
 					Notes = "",
 				},
@@ -16977,7 +17165,19 @@ end
 				{
 					Notes = "",
 				},
+				mtHoglin =
+				{
+					Notes = "",
+				},
 				mtHorse =
+				{
+					Notes = "",
+				},
+				mtHusk =
+				{
+					Notes = "",
+				},
+				mtIllusioner =
 				{
 					Notes = "",
 				},
@@ -16989,6 +17189,10 @@ end
 				{
 					Notes = "",
 				},
+				mtLlama =
+				{
+					Notes = "",
+				},
 				mtMagmaCube =
 				{
 					Notes = "",
@@ -16997,7 +17201,23 @@ end
 				{
 					Notes = "",
 				},
+				mtMule =
+				{
+					Notes = "",
+				},
 				mtOcelot =
+				{
+					Notes = "",
+				},
+				mtPanda =
+				{
+					Notes = "",
+				},
+				mtParrot =
+				{
+					Notes = "",
+				},
+				mtPhantom =
 				{
 					Notes = "",
 				},
@@ -17005,7 +17225,39 @@ end
 				{
 					Notes = "",
 				},
+				mtPiglin =
+				{
+					Notes = "",
+				},
+				mtPiglinBrute =
+				{
+					Notes = "",
+				},
+				mtPillager =
+				{
+					Notes = "",
+				},
+				mtPolarBear =
+				{
+					Notes = "",
+				},
+				mtPufferfish =
+				{
+					Notes = "",
+				},
+				mtRavager =
+				{
+					Notes = "",
+				},
+				mtSalmon =
+				{
+					Notes = "",
+				},
 				mtSheep =
+				{
+					Notes = "",
+				},
+				mtShulker =
 				{
 					Notes = "",
 				},
@@ -17017,7 +17269,19 @@ end
 				{
 					Notes = "",
 				},
+				mtSkeletonHorse =
+				{
+					Notes = "",
+				},
 				mtSlime =
+				{
+					Notes = "",
+				},
+				mtStray =
+				{
+					Notes = "",
+				},
+				mtStrider =
 				{
 					Notes = "",
 				},
@@ -17033,7 +17297,31 @@ end
 				{
 					Notes = "",
 				},
+				mtTraderLlama =
+				{
+					Notes = "",
+				},
+				mtTropicalFish =
+				{
+					Notes = "",
+				},
+				mtTurtle =
+				{
+					Notes = "",
+				},
+				mtVex =
+				{
+					Notes = "",
+				},
 				mtVillager =
+				{
+					Notes = "",
+				},
+				mtVindicator =
+				{
+					Notes = "",
+				},
+				mtWanderingTrader =
 				{
 					Notes = "",
 				},
@@ -17053,11 +17341,23 @@ end
 				{
 					Notes = "",
 				},
+				mtZoglin =
+				{
+					Notes = "",
+				},
 				mtZombie =
 				{
 					Notes = "",
 				},
+				mtZombieHorse =
+				{
+					Notes = "",
+				},
 				mtZombiePigman =
+				{
+					Notes = "",
+				},
+				mtZombifiedPiglin =
 				{
 					Notes = "",
 				},

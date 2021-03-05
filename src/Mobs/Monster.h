@@ -48,13 +48,9 @@ public:
 	*/
 	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height);
 
-	virtual ~cMonster() override;
+	CLASS_PROTODEF(cMonster)
 
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
-
-	virtual void Destroyed() override;
-
-	CLASS_PROTODEF(cMonster)
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
@@ -117,7 +113,7 @@ public:
 	virtual bool IsUndead(void);
 
 	virtual void EventLosePlayer(void);
-	virtual void CheckEventLostPlayer(void);
+	virtual void CheckEventLostPlayer(std::chrono::milliseconds a_Dt);
 
 	virtual void InStateIdle    (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual void InStateChasing (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
@@ -313,6 +309,7 @@ protected:
 	double m_AttackRange;
 	int m_AttackCoolDownTicksLeft;
 	int m_SightDistance;
+	std::chrono::milliseconds m_LoseSightAbandonTargetTimer;
 
 	float m_DropChanceWeapon;
 	float m_DropChanceHelmet;
@@ -360,8 +357,6 @@ protected:
 
 	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
-
-	virtual void DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo) override;
 
 	/* The breeding processing */
 

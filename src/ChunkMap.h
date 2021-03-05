@@ -5,9 +5,6 @@
 
 #pragma once
 
-
-#include <functional>
-
 #include "ChunkDataCallback.h"
 #include "EffectID.h"
 #include "FunctionRef.h"
@@ -37,9 +34,10 @@ class cFlowerPotEntity;
 class cBlockArea;
 class cMobCensus;
 class cMobSpawner;
-class cSetChunkData;
 class cBoundingBox;
 class cDeadlockDetect;
+
+struct SetChunkData;
 
 typedef std::list<cClientHandle *> cClientHandleList;
 using cEntityCallback       = cFunctionRef<bool(cEntity             &)>;
@@ -68,7 +66,6 @@ class cChunkMap
 public:
 
 	cChunkMap(cWorld * a_World);
-	~cChunkMap();
 
 	/** Sends the block entity, if it is at the coords specified, to a_Client */
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
@@ -102,7 +99,7 @@ public:
 	If MarkDirty is set, the chunk is set as dirty (used after generating)
 	Modifies the BlockEntity list in a_SetChunkData - moves the block entities into the chunk.
 	*/
-	void SetChunkData(cSetChunkData & a_SetChunkData);
+	void SetChunkData(SetChunkData && a_SetChunkData);
 
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
@@ -112,16 +109,17 @@ public:
 
 	/** Calls the callback with the chunk's data, if available (with ChunkCS locked).
 	Returns true if the chunk was reported successfully, false if not (chunk not present or callback failed). */
-	bool GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback);
-
-	/** Copies the chunk's blocktypes into a_Blocks; returns true if successful */
-	bool GetChunkBlockTypes (int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_Blocks);
+	bool GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback) const;
 
 	/** Returns true iff the chunk is in the loader / generator queue. */
-	bool IsChunkQueued(int a_ChunkX, int a_ChunkZ);
+	bool IsChunkQueued(int a_ChunkX, int a_ChunkZ) const;
 
-	bool      IsChunkValid       (int a_ChunkX, int a_ChunkZ);
-	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkZ);
+	bool IsWeatherSunnyAt(int a_BlockX, int a_BlockZ) const;
+	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) const;
+	bool IsWeatherWetAt(Vector3i a_Position) const;
+
+	bool      IsChunkValid       (int a_ChunkX, int a_ChunkZ) const;
+	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkZ) const;
 	int       GetHeight          (int a_BlockX, int a_BlockZ);  // Waits for the chunk to get loaded / generated
 	bool      TryGetHeight       (int a_BlockX, int a_BlockZ, int & a_Height);  // Returns false if chunk not loaded / generated
 
@@ -134,24 +132,24 @@ public:
 	/** Makes the specified player collect all the pickups around them. */
 	void CollectPickupsByPlayer(cPlayer & a_Player);
 
-	BLOCKTYPE  GetBlock          (Vector3i a_BlockPos);
-	NIBBLETYPE GetBlockMeta      (Vector3i a_BlockPos);
-	NIBBLETYPE GetBlockSkyLight  (Vector3i a_BlockPos);
-	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos);
+	BLOCKTYPE  GetBlock          (Vector3i a_BlockPos) const;
+	NIBBLETYPE GetBlockMeta      (Vector3i a_BlockPos) const;
+	NIBBLETYPE GetBlockSkyLight  (Vector3i a_BlockPos) const;
+	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos) const;
 
 	/** Sets the meta for the specified block, while keeping the blocktype.
 	Ignored if the chunk is invalid. */
 	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta);
 
-	void       SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool       GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
-	bool       GetBlockInfo      (Vector3i, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
+	void SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
+	bool GetBlockInfo      (Vector3i, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
 
 	/** Special function used for growing trees, replaces only blocks that tree may overwrite */
-	void      ReplaceTreeBlocks(const sSetBlockVector & a_Blocks);
+	void ReplaceTreeBlocks(const sSetBlockVector & a_Blocks);
 
-	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, otherwise uses the world generator to provide the biome value */
-	EMCSBiome GetBiomeAt (int a_BlockX, int a_BlockZ);
+	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, invalid otherwise. */
+	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ) const;
 
 	/** Sets the biome at the specified coords. Returns true if successful, false if not (chunk not loaded).
 	Doesn't resend the chunk to clients. */
@@ -403,45 +401,13 @@ private:
 	// The chunkstay can (de-)register itself using AddChunkStay() and DelChunkStay()
 	friend class cChunkStay;
 
-
-	class cStarvationCallbacks
-		: public cAllocationPool<cChunkData::sChunkSection>::cStarvationCallbacks
-	{
-		virtual void OnStartUsingReserve() override
-		{
-			LOG("Using backup memory buffer");
-		}
-		virtual void OnEndUsingReserve() override
-		{
-			LOG("Stoped using backup memory buffer");
-		}
-		virtual void OnOutOfReserve() override
-		{
-			LOG("Out of Memory");
-		}
-	};
-
-	struct ChunkCoordinate
-	{
-		struct Comparer
-		{
-			bool operator() (const ChunkCoordinate & a_Lhs, const ChunkCoordinate & a_Rhs) const
-			{
-				return ((a_Lhs.ChunkX == a_Rhs.ChunkX) ? (a_Lhs.ChunkZ < a_Rhs.ChunkZ) : (a_Lhs.ChunkX < a_Rhs.ChunkX));
-			}
-		};
-
-		int ChunkX;
-		int ChunkZ;
-	};
-
 	typedef std::list<cChunkStay *> cChunkStays;
 
 	mutable cCriticalSection m_CSChunks;
 
 	/** A map of chunk coordinates to chunks.
 	Uses a map (as opposed to unordered_map) because sorted maps are apparently faster. */
-	std::map<ChunkCoordinate, cChunk, ChunkCoordinate::Comparer> m_Chunks;
+	std::map<cChunkCoords, cChunk> m_Chunks;
 
 	cEvent m_evtChunkValid;  // Set whenever any chunk becomes valid, via ChunkValidated()
 
@@ -449,8 +415,6 @@ private:
 
 	/** The cChunkStay descendants that are currently enabled in this chunkmap */
 	cChunkStays m_ChunkStays;
-
-	std::unique_ptr<cAllocationPool<cChunkData::sChunkSection> > m_Pool;
 
 	/** Returns or creates and returns a chunk pointer corresponding to the given chunk coordinates.
 	Emplaces this chunk in the chunk map. */
@@ -461,6 +425,9 @@ private:
 
 	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be called only from cChunkMap. */
 	cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
+
+	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be called only from cChunkMap. */
+	const cChunk * FindChunk(int a_ChunkX, int a_ChunkZ) const;
 
 	/** Adds a new cChunkStay descendant to the internal list of ChunkStays; loads its chunks.
 	To be used only by cChunkStay; others should use cChunkStay::Enable() instead */

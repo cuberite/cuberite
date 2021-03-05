@@ -196,7 +196,7 @@ std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolI
 
 UInt32 cProtocol_1_14::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 {
-	return Palette_1_14::FromBlock(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+	return Palette_1_14::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
 }
 
 
@@ -205,7 +205,7 @@ UInt32 cProtocol_1_14::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_
 
 UInt32 cProtocol_1_14::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
 {
-	return Palette_1_14::FromItem(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+	return Palette_1_14::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
 }
 
 
@@ -231,8 +231,7 @@ bool cProtocol_1_14::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 	// Game
 	switch (a_PacketType)
 	{
-		default: AString dum; a_ByteBuffer.ReadAll(dum); a_ByteBuffer.CommitRead(); a_ByteBuffer.Write(" ", 1);
-			return true;
+		default: a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace()); a_ByteBuffer.CommitRead(); return true;
 	}
 }
 

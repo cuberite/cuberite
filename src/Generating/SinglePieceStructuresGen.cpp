@@ -64,7 +64,8 @@ public:
 		m_BiomeGen->GenBiomes({ChunkX, ChunkZ}, Biomes);
 
 		// Checks if the biome at the origin position is allowed
-		if (!m_PiecePool.IsBiomeAllowed(Biomes[ChunkX + cChunkDef::Width * ChunkZ]))
+		auto Relative = cChunkDef::AbsoluteToRelative(Vector3i(a_OriginX, 1, a_OriginZ), {ChunkX, ChunkZ});
+		if (!m_PiecePool.IsBiomeAllowed(Biomes[Relative.x + cChunkDef::Width * Relative.z]))
 		{
 			return cStructurePtr();
 		}

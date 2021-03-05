@@ -62,10 +62,10 @@ public:
 	bool Run(cSettingsRepositoryInterface & a_OverridesRepo);
 
 	/** Interrupts the server and stops it, as if "/stop" typed in the console. */
-	void Stop();
+	static void Stop();
 
 	/** Interrupts the server and restarts it, as if "/restart" was typed in the console. */
-	void Restart();
+	static void Restart();
 
 	// tolua_begin
 	cServer * GetServer(void) { return m_Server; }
@@ -166,6 +166,9 @@ public:
 	/** Broadcast playerlist removal through all worlds */
 	void BroadcastPlayerListsRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 
+	/** Broadcast playerlist header and footer through all worlds */
+	void BroadcastPlayerListsHeaderFooter(const cCompositeChat & a_Header, const cCompositeChat & a_Footer);  // tolua_export
+
 	// tolua_begin
 
 	/** Sends a chat message to all connected clients (in all worlds) */
@@ -208,12 +211,12 @@ private:
 	void HandleInput();
 
 	/** Performs run state transition, enforcing guarantees about state transitions. */
-	void TransitionNextState(NextState a_NextState);
+	static void TransitionNextState(NextState a_NextState);
 
 	cWorld * m_pDefaultWorld;
 	WorldMap m_WorldsByName;
 
-	cEvent m_StopEvent;
+	static cEvent s_StopEvent;
 
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;
@@ -249,5 +252,5 @@ private:
 	static cRoot * s_Root;
 
 	/** Indicates the next action of cRoot, whether to run, stop or restart. */
-	std::atomic<NextState> m_NextState;
+	static std::atomic<NextState> s_NextState;
 };  // tolua_export

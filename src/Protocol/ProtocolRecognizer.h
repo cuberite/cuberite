@@ -47,22 +47,17 @@ public:
 
 private:
 
-	/** Handles data reception in a newly-created client handle that doesn't yet have known protocol.
+	/** Handles data reception in a newly-created client handle that doesn't yet have a known protocol.
 	a_Data contains a view of data that were just received.
-	Calls TryRecognizeProtocol to populate m_Protocol, and transitions to another mode depending on success. */
+	Tries to recognize a protocol, populate m_Protocol, and transitions to another mode depending on success. */
 	void HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, std::string_view a_Data);
 
 	/** Handles and responds to unsupported clients sending pings. */
-	void HandleIncomingDataInOldPingResponseStage(cClientHandle & a_Client, const std::string_view a_Data);
-
-	/* Tries to recognize a protocol based on a_Data and m_Buffer contents.
-	a_Data is replaced with a sub-view, with handshake packet removed. */
-	void TryRecognizeProtocol(cClientHandle & a_Client, std::string_view & a_Data);
+	void HandleIncomingDataInOldPingResponseStage(cClientHandle & a_Client, std::string_view a_Data);
 
 	/** Tries to recognize a protocol in the lengthed family (1.7+), based on m_Buffer.
-	The packet length and type have already been read, type is 0.
 	Returns a cProtocol_XXX instance if recognized. */
-	std::unique_ptr<cProtocol> TryRecognizeLengthedProtocol(cClientHandle & a_Client, std::string_view & a_Data);
+	std::unique_ptr<cProtocol> TryRecognizeLengthedProtocol(cClientHandle & a_Client, std::string_view a_Data);
 
 	/** Sends one packet inside a cByteBuffer.
 	This is used only when handling an outdated server ping. */

@@ -199,11 +199,11 @@ public:
 
 
 /** Checks that the statement causes an ASSERT trigger. */
-#ifdef _DEBUG
-	#define TEST_ASSERTS(Stmt) TEST_THROWS(Stmt, cAssertFailure)
-#else
+#ifdef NDEBUG
 	#define TEST_ASSERTS(Stmt) LOG("Skipped, cannot test in Release mode: TEST_ASSERT(%s); (%s:%d)", #Stmt, __FILE__, __LINE__)
-#endif  // else _DEBUG
+#else
+	#define TEST_ASSERTS(Stmt) TEST_THROWS(Stmt, cAssertFailure)
+#endif  // else NDEBUG
 
 
 

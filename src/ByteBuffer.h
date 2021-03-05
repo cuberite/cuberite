@@ -11,6 +11,8 @@
 
 
 
+
+
 // fwd:
 class cUUID;
 
@@ -87,6 +89,7 @@ public:
 
 	// Write the specified datatype; return true if successfully written
 	bool WriteBEInt8         (Int8   a_Value);
+	bool WriteBEInt8         (std::byte a_Value);
 	bool WriteBEInt16        (Int16  a_Value);
 	bool WriteBEInt32        (Int32  a_Value);
 	bool WriteBEInt64        (Int64  a_Value);
@@ -110,14 +113,17 @@ public:
 	/** Writes a_Count bytes into a_Buffer; returns true if successful */
 	bool WriteBuf(const void * a_Buffer, size_t a_Count);
 
+	/** Writes a_Count bytes into a_Buffer; returns true if successful */
+	bool WriteBuf(size_t a_Count, unsigned char a_Value);
+
 	/** Reads a_Count bytes into a_String; returns true if successful */
-	bool ReadString(AString & a_String, size_t a_Count);
+	bool ReadSome(ContiguousByteBuffer & a_String, size_t a_Count);
 
 	/** Skips reading by a_Count bytes; returns false if not enough bytes in the ringbuffer */
 	bool SkipRead(size_t a_Count);
 
 	/** Reads all available data into a_Data */
-	void ReadAll(AString & a_Data);
+	void ReadAll(ContiguousByteBuffer & a_Data);
 
 	/** Reads the specified number of bytes and writes it into the destinatio bytebuffer. Returns true on success. */
 	bool ReadToByteBuffer(cByteBuffer & a_Dst, size_t a_NumBytes);
@@ -129,7 +135,7 @@ public:
 	void ResetRead(void);
 
 	/** Re-reads the data that has been read since the last commit to the current readpos. Used by ProtoProxy to duplicate communication */
-	void ReadAgain(AString & a_Out);
+	void ReadAgain(ContiguousByteBuffer & a_Out);
 
 	/** Checks if the internal state is valid (read and write positions in the correct bounds) using ASSERTs */
 	void CheckValid(void) const;
@@ -138,14 +144,15 @@ public:
 	static size_t GetVarIntSize(UInt32 a_Value);
 
 protected:
-	char * m_Buffer;
+
+	std::byte * m_Buffer;
 	size_t m_BufferSize;  // Total size of the ringbuffer
 
 	size_t m_DataStart;  // Where the data starts in the ringbuffer
 	size_t m_WritePos;   // Where the data ends in the ringbuffer
 	size_t m_ReadPos;    // Where the next read will start in the ringbuffer
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		/** The ID of the thread currently accessing the object.
 		Used for checking that only one thread accesses the object at a time, via cSingleThreadAccessChecker. */
 		mutable std::thread::id m_ThreadID;
@@ -154,7 +161,3 @@ protected:
 	/** Advances the m_ReadPos by a_Count bytes */
 	void AdvanceReadPos(size_t a_Count);
 } ;
-
-
-
-
