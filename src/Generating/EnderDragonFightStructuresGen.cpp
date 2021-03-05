@@ -74,7 +74,7 @@ void cEnderDragonFightStructuresGen::Init(const AString & a_TowerProperties, int
 	if (!cSchematicFileSerializer::LoadFromSchematicFile(
 		m_Fountain, AString("Prefabs") + cFile::GetPathSeparator() + "SinglePieceStructures" + cFile::GetPathSeparator() + "EndFountain.schematic"))
 	{
-		LOGWARNING("EnderDragonFightStructuresGen is missing it's end fountain prefab, please update your cuberite server files! There will be no end fountain!");
+		LOGWARNING("EnderDragonFightStructuresGen is missing its end fountain prefab, please update your Cuberite server files! There will be no end fountain!");
 	}
 	// Reads the given tower properties
 	const auto TowerPropertiesVector = StringSplitAndTrim(a_TowerProperties, ";");
@@ -100,7 +100,7 @@ void cEnderDragonFightStructuresGen::Init(const AString & a_TowerProperties, int
 		}
 		else
 		{
-			LOGWARNING("Got unknown value for boolean if the tower: %s should have a cage! %s. Tower wont be generated!", TowerProperty, TowerPropertyVector[2]);
+			LOGWARNING("Got unknown value for boolean of the tower: %s should have a cage! %s. Tower will not be generated!", TowerProperty, TowerPropertyVector[2]);
 			continue;
 		}
 		TowerProperties.push_back({Vector3d(), Height, Radius, HasCage});
