@@ -71,11 +71,15 @@ void cEnderDragonFightStructuresGen::Init(const AString & a_TowerProperties, int
 {
 	const auto ChunkWidth = cChunkDef::Width;
 	// Loads the fountain schematic
-	if (!cSchematicFileSerializer::LoadFromSchematicFile(
-		m_Fountain, AString("Prefabs") + cFile::GetPathSeparator() + "SinglePieceStructures" + cFile::GetPathSeparator() + "EndFountain.schematic"))
+	if (!cFile::IsFile(AString("Prefabs") + cFile::GetPathSeparator() + "SinglePieceStructures" + cFile::GetPathSeparator() + "EndFountain.schematic"))
 	{
 		LOGWARNING("EnderDragonFightStructuresGen is missing its end fountain prefab, please update your Cuberite server files! There will be no end fountain!");
 	}
+	else
+	{
+		cSchematicFileSerializer::LoadFromSchematicFile(m_Fountain, AString("Prefabs") + cFile::GetPathSeparator() + "SinglePieceStructures" + cFile::GetPathSeparator() + "EndFountain.schematic");
+	}
+
 	// Reads the given tower properties
 	const auto TowerPropertiesVector = StringSplitAndTrim(a_TowerProperties, ";");
 	std::vector<sTowerProperties> TowerProperties;
@@ -216,8 +220,7 @@ void cEnderDragonFightStructuresGen::GenFinish(cChunkDesc &a_ChunkDesc)
 
 void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const sTowerProperties & a_Properties)
 {
-	auto Pos = cChunk::AbsoluteToRelative(a_Properties.m_Pos, a_ChunkDesc.GetChunkCoords());
-
+	auto Pos = cChunkDef::AbsoluteToRelative(a_Properties.m_Pos, a_ChunkDesc.GetChunkCoords());
 	// Place obsidian pillar
 	for (int X = -a_Properties.m_Radius; X < a_Properties.m_Radius; X++)
 	{
