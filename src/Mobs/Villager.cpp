@@ -186,8 +186,8 @@ void cVillager::HandleFarmerTryHarvestCrops()
 	if (!m_PathfinderActivated && (GetPosition() - m_CropsPos).Length() < 2)
 	{
 		// Check if the blocks didn't change while the villager was walking to the coordinates.
-		BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
-		if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z) == 0x7)
+		BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos);
+		if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos) == 0x7)
 		{
 			m_World->DropBlockAsPickups(m_CropsPos, this, nullptr);
 			m_ActionCountDown = 20;
@@ -202,9 +202,9 @@ void cVillager::HandleFarmerTryHarvestCrops()
 void cVillager::HandleFarmerPlaceCrops()
 {
 	// Check if there is still farmland at the spot where the crops were.
-	if (m_World->GetBlock(m_CropsPos.x, m_CropsPos.y - 1, m_CropsPos.z) == E_BLOCK_FARMLAND)
+	if (m_World->GetBlock(m_CropsPos.addedY(-1)) == E_BLOCK_FARMLAND)
 	{
-		m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_CROPS, 0);
+		m_World->SetBlock(m_CropsPos, E_BLOCK_CROPS, 0);
 	}
 }
 

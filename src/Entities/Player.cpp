@@ -2204,16 +2204,14 @@ void cPlayer::HandleFloater()
 
 bool cPlayer::IsClimbing(void) const
 {
-	int PosX = POSX_TOINT;
-	int PosY = POSY_TOINT;
-	int PosZ = POSZ_TOINT;
+	const auto Position = GetPosition().Floor();
 
-	if ((PosY < 0) || (PosY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(Position.y))
 	{
 		return false;
 	}
 
-	BLOCKTYPE Block = m_World->GetBlock(PosX, PosY, PosZ);
+	BLOCKTYPE Block = m_World->GetBlock(Position);
 	switch (Block)
 	{
 		case E_BLOCK_LADDER:
@@ -2427,12 +2425,12 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 		int y = blk.GetY();
 		int z = blk.GetZ();
 		cBoundingBox BlockBox = cBlockHandler::For(blk.m_BlockType).GetPlacementCollisionBox(
-			m_World->GetBlock(x - 1, y, z),
-			m_World->GetBlock(x + 1, y, z),
-			(y == 0) ? E_BLOCK_AIR : m_World->GetBlock(x, y - 1, z),
-			(y == cChunkDef::Height - 1) ? E_BLOCK_AIR : m_World->GetBlock(x, y + 1, z),
-			m_World->GetBlock(x, y, z - 1),
-			m_World->GetBlock(x, y, z + 1)
+			m_World->GetBlock({ x - 1, y, z }),
+			m_World->GetBlock({ x + 1, y, z }),
+			(y == 0) ? E_BLOCK_AIR : m_World->GetBlock({ x, y - 1, z }),
+			(y == cChunkDef::Height - 1) ? E_BLOCK_AIR : m_World->GetBlock({ x, y + 1, z }),
+			m_World->GetBlock({ x, y, z - 1 }),
+			m_World->GetBlock({ x, y, z + 1 })
 		);
 		BlockBox.Move(x, y, z);
 
@@ -2595,9 +2593,9 @@ void cPlayer::Detach()
 			for (int z = PosZ - 1; z <= (PosZ + 1); ++z)
 			{
 				if (
-					(m_World->GetBlock(x, y, z) == E_BLOCK_AIR) &&
-					(m_World->GetBlock(x, y + 1, z) == E_BLOCK_AIR) &&
-					cBlockInfo::IsSolid(m_World->GetBlock(x, y - 1, z))
+					(m_World->GetBlock({ x, y, z }) == E_BLOCK_AIR) &&
+					(m_World->GetBlock({ x, y + 1, z }) == E_BLOCK_AIR) &&
+					cBlockInfo::IsSolid(m_World->GetBlock({ x, y - 1, z }))
 				)
 				{
 					TeleportToCoords(x + 0.5, y, z + 0.5);
@@ -2678,12 +2676,12 @@ float cPlayer::GetLiquidHeightPercent(NIBBLETYPE a_Meta)
 
 bool cPlayer::IsInsideWater()
 {
-	BLOCKTYPE Block = m_World->GetBlock(FloorC(GetPosX()), FloorC(m_Stance), FloorC(GetPosZ()));
+	BLOCKTYPE Block = m_World->GetBlock(Vector3d(GetPosX(), m_Stance, GetPosZ()).Floor());
 	if ((Block != E_BLOCK_WATER) && (Block != E_BLOCK_STATIONARY_WATER))
 	{
 		return false;
 	}
-	NIBBLETYPE Meta = GetWorld()->GetBlockMeta(FloorC(GetPosX()), FloorC(m_Stance), FloorC(GetPosZ()));
+	NIBBLETYPE Meta = GetWorld()->GetBlockMeta(Vector3d(GetPosX(), m_Stance, GetPosZ()).Floor());
 	float f = GetLiquidHeightPercent(Meta) - 0.11111111f;
 	float f1 = static_cast<float>(m_Stance + 1) - f;
 	bool flag = (m_Stance < f1);

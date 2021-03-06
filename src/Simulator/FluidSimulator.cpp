@@ -137,7 +137,7 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 		return {};
 	}
 
-	if (!IsAllowedBlock(m_World.GetBlock(a_X, a_Y, a_Z)))  // No Fluid -> No Flowing direction :D
+	if (!IsAllowedBlock(m_World.GetBlock({ a_X, a_Y, a_Z })))  // No Fluid -> No Flowing direction :D
 	{
 		return {};
 	}
@@ -148,7 +148,7 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 			return ((a_BlockMeta & 0x08) != 0) ? 0 : a_BlockMeta;
 		};
 
-	auto BlockMeta = m_World.GetBlockMeta(a_X, a_Y, a_Z);
+	auto BlockMeta = m_World.GetBlockMeta({ a_X, a_Y, a_Z });
 	NIBBLETYPE CentralPoint = HeightFromMeta(BlockMeta);
 	NIBBLETYPE LevelPoint[4];
 

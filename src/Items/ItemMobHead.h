@@ -231,7 +231,7 @@ public:
 			// Query the world block:
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
-			if (!a_World.GetBlockTypeMeta(BlockX, BlockY, BlockZ, BlockType, BlockMeta))
+			if (!a_World.GetBlockTypeMeta({ BlockX, BlockY, BlockZ }, BlockType, BlockMeta))
 			{
 				// Cannot query block, assume unloaded chunk, fail to spawn the wither
 				return false;

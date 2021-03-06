@@ -1198,7 +1198,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "number",
 						},
 					},
-					Notes = "Sets the block at the specified coords, without waking up the simulators or replacing the block entities for the previous block type. Do not use if the block being replaced has a block entity tied to it!",
+					Notes = "Sets the block at the specified coords, without waking up the simulators or replacing the block entities for the previous block type. Do not use if the block being replaced has a block entity tied to it! <b>OBSOLETE</b>, use the vector-based overload instead.",
 				},
 				{
 					Params =
@@ -1499,7 +1499,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "number",
 						},
 					},
-					Notes = "Returns the block type of the block at the specified coords, or 0 if the appropriate chunk is not loaded.",
+					Notes = "Returns the block type of the block at the specified coords, or 0 if the appropriate chunk is not loaded. <b>OBSOLETE</b>, use the vector-based overload instead.",
 				},
 				{
 					Params =
@@ -1543,7 +1543,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "number",
 						},
 					},
-					Notes = "Returns the amount of block light at the specified coords, or 0 if the appropriate chunk is not loaded.",
+					Notes = "Returns the amount of block light at the specified coords, or 0 if the appropriate chunk is not loaded. <b>OBSOLETE</b>, use the vector-based overload instead.",
 				},
 				{
 					Params =
@@ -1628,7 +1628,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "number",
 						},
 					},
-					Notes = "Returns the block metadata of the block at the specified coords, or 0 if the appropriate chunk is not loaded.",
+					Notes = "Returns the block metadata of the block at the specified coords, or 0 if the appropriate chunk is not loaded. <b>OBSOLETE</b>, use the vector-based overload instead.",
 				},
 				{
 					Params =
@@ -3743,77 +3743,25 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			},
 			WakeUpSimulators =
 			{
+				Params =
 				{
-					Params =
 					{
-						{
-							Name = "Block",
-							Type = "Vector3i",
-						},
+						Name = "Block",
+						Type = "Vector3i",
 					},
-					Notes = "Wakes up the simulators for the specified block.",
 				},
-				{
-					Params =
-					{
-						{
-							Name = "BlockX",
-							Type = "number",
-						},
-						{
-							Name = "BlockY",
-							Type = "number",
-						},
-						{
-							Name = "BlockZ",
-							Type = "number",
-						},
-					},
-					Notes = "Wakes up the simulators for the specified block. (DEPRECATED, use vector-parametered version)",
-				},
+				Notes = "Wakes up the simulators for the specified block.",
 			},
 			WakeUpSimulatorsInArea =
 			{
+				Params =
 				{
-					Params =
 					{
-						{
-							Name = "Area",
-							Type = "cCuboid",
-						},
+						Name = "Area",
+						Type = "cCuboid",
 					},
-					Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive).",
 				},
-				{
-					Params =
-					{
-						{
-							Name = "MinBlockX",
-							Type = "number",
-						},
-						{
-							Name = "MaxBlockX",
-							Type = "number",
-						},
-						{
-							Name = "MinBlockY",
-							Type = "number",
-						},
-						{
-							Name = "MaxBlockY",
-							Type = "number",
-						},
-						{
-							Name = "MinBlockZ",
-							Type = "number",
-						},
-						{
-							Name = "MaxBlockZ",
-							Type = "number",
-						},
-					},
-					Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive). (DEPRECATED, use vector-parametered version)",
-				},
+				Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive).",
 			},
 		},
 		AdditionalInfo =
