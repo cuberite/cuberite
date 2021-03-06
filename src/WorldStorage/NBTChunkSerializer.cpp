@@ -1182,7 +1182,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 	// Save blockdata:
 	aWriter.BeginList("Sections", TAG_Compound);
-	ChunkDef::ForEachSection(serializer.m_BlockData, serializer.m_LightData, [&aWriter](const auto Y, const auto Blocks, const auto Metas, const auto BlockLights, const auto SkyLights)
+	ChunkDef_ForEachSection(serializer.m_BlockData, serializer.m_LightData,
 	{
 		aWriter.BeginCompound("");
 
