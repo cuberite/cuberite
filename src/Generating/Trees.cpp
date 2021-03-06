@@ -262,7 +262,7 @@ inline void PushCoordBlocks(int a_BlockX, int a_Height, int a_BlockZ, sSetBlockV
 {
 	for (size_t i = 0; i < a_NumCoords; i++)
 	{
-		a_Blocks.push_back(sSetBlock(a_BlockX + a_Coords[i].x, a_Height, a_BlockZ + a_Coords[i].z, a_BlockType, a_Meta));
+		a_Blocks.emplace_back(a_BlockX + a_Coords[i].x, a_Height, a_BlockZ + a_Coords[i].z, a_BlockType, a_Meta);
 	}
 }
 
@@ -278,7 +278,7 @@ inline void PushCornerBlocks(int a_BlockX, int a_Height, int a_BlockZ, int a_Seq
 		int z = a_BlockZ + Corners[i].z;
 		if (a_Noise.IntNoise3DInt(x + 64 * a_Seq, a_Height, z + 64 * a_Seq) <= a_Chance)
 		{
-			a_Blocks.push_back(sSetBlock(x, a_Height, z, a_BlockType, a_Meta));
+			a_Blocks.emplace_back(x, a_Height, z, a_BlockType, a_Meta);
 		}
 	}  // for i - Corners[]
 }
@@ -297,7 +297,7 @@ inline void PushSomeColumns(int a_BlockX, int a_Height, int a_BlockZ, int a_Colu
 		{
 			for (int j = 0; j < a_ColumnHeight; j++)
 			{
-				a_Blocks.push_back(sSetBlock(x, a_Height - j, z, a_BlockType, a_Coords[i].Meta));
+				a_Blocks.emplace_back(x, a_Height - j, z, a_BlockType, a_Coords[i].Meta);
 			}
 		}
 	}  // for i - a_Coords[]
@@ -554,7 +554,7 @@ void GetSmallAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sS
 	// Trunk:
 	for (int i = 0; i < Height; i++)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_APPLE));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_APPLE);
 	}
 	int Hei = a_BlockPos.y + Height;
 
@@ -563,7 +563,7 @@ void GetSmallAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sS
 	{
 		PushCoordBlocks (a_BlockPos.x, Hei, a_BlockPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 		PushCornerBlocks(a_BlockPos.x, Hei, a_BlockPos.z, a_Seq, a_Noise, 0x5000000 - i * 0x10000000, a_OtherBlocks, 2, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.x, Hei, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_APPLE));
+		a_LogBlocks.emplace_back(a_BlockPos.x, Hei, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_APPLE);
 		Hei++;
 	}  // for i - 2*
 
@@ -572,13 +572,13 @@ void GetSmallAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sS
 	{
 		PushCoordBlocks (a_BlockPos.x, Hei, a_BlockPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 		PushCornerBlocks(a_BlockPos.x, Hei, a_BlockPos.z, a_Seq, a_Noise, 0x6000000, a_OtherBlocks, 1, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.x, Hei, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_APPLE));
+		a_LogBlocks.emplace_back(a_BlockPos.x, Hei, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_APPLE);
 		Hei++;
 	}
 
 	// Top plus:
 	PushCoordBlocks(a_BlockPos.x, Hei, a_BlockPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
-	a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, Hei, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE));
+	a_OtherBlocks.emplace_back(a_BlockPos.x, Hei, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 }
 
 
@@ -607,20 +607,20 @@ void GetLargeAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sS
 		int X = itr.GetX();
 		int Z = itr.GetZ();
 
-		a_OtherBlocks.push_back(sSetBlock(X, itr.m_RelY - 2, Z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE));
+		a_OtherBlocks.emplace_back(X, itr.m_RelY - 2, Z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 		PushCoordBlocks(X, itr.m_RelY - 2, Z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 		for (int y = -1; y <= 1; y++)
 		{
 			PushCoordBlocks (X, itr.m_RelY + y, Z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 		}
 		PushCoordBlocks(X, itr.m_RelY + 2, Z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
-		a_OtherBlocks.push_back(sSetBlock(X, itr.m_RelY + 2, Z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE));
+		a_OtherBlocks.emplace_back(X, itr.m_RelY + 2, Z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 	}
 
 	// Trunk:
 	for (int i = 0; i < Height; i++)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_APPLE));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_APPLE);
 	}
 }
 
@@ -637,7 +637,7 @@ Vector3d GetTreeBranch(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a
 		CurrentPos += Direction;
 		Direction += a_Direction;
 		Direction.Clamp(-1.0, 1.0);
-		a_LogBlocks.push_back(sSetBlock(CurrentPos.Floor(), a_BlockType, GetLogMetaFromDirection(a_BlockMeta, Direction)));
+		a_LogBlocks.emplace_back(CurrentPos.Floor(), a_BlockType, GetLogMetaFromDirection(a_BlockMeta, Direction));
 	}
 	return CurrentPos;
 }
@@ -679,13 +679,13 @@ void GetBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlo
 	// The entire trunk, out of logs:
 	for (int i = Height - 1; i >= 0; --i)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_BIRCH));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_BIRCH);
 	}
 	int h = a_BlockPos.y + Height;
 
 	// Top layer - just the Plus:
 	PushCoordBlocks(a_BlockPos.x, h, a_BlockPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_BIRCH);
-	a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, h, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_BIRCH));  // There's no log at this layer
+	a_OtherBlocks.emplace_back(a_BlockPos.x, h, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_BIRCH);  // There's no log at this layer
 	h--;
 
 	// Second layer - log, Plus and maybe Corners:
@@ -714,7 +714,7 @@ void GetAcaciaTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBl
 	// Create the trunk
 	for (int i = 0; i < Height; i++)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i), E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i), E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD);
 	}
 
 	// Array with possible directions for a branch to go to.
@@ -737,7 +737,7 @@ void GetAcaciaTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBl
 	// Add the leaves to the top of the branch
 	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
 	PushCoordBlocks(BranchPos.x, BranchPos.y + 1, BranchPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
-	a_OtherBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA));
+	a_OtherBlocks.emplace_back(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
 
 	// Choose if we have to add another branch
 	bool TwoTop = (a_Noise.IntNoise3D(a_BlockPos) < 0);
@@ -757,7 +757,7 @@ void GetAcaciaTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBl
 	// And add the leaves ontop of the second branch
 	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
 	PushCoordBlocks(BranchPos.x, BranchPos.y + 1, BranchPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
-	a_OtherBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA));
+	a_OtherBlocks.emplace_back(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);
 }
 
 
@@ -772,19 +772,19 @@ void GetDarkoakTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetB
 	// Create the trunk
 	for (int i = 0; i < Height; i++)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i), E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD));
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedX(1).addedY(i), E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD));
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedZ(1), E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD));
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedX(1).addedY(i).addedZ(1), E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i), E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD);
+		a_LogBlocks.emplace_back(a_BlockPos.addedX(1).addedY(i), E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD);
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedZ(1), E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD);
+		a_LogBlocks.emplace_back(a_BlockPos.addedX(1).addedY(i).addedZ(1), E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD);
 	}
 
 	// Prevent floating trees by placing dirt under them
 	for (int i = 1; i < 5; i++)
 	{
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i), E_BLOCK_DIRT, E_META_DIRT_NORMAL));
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedX(1).addedY(-i), E_BLOCK_DIRT, E_META_DIRT_NORMAL));
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedZ(1), E_BLOCK_DIRT, E_META_DIRT_NORMAL));
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedX(1).addedY(-i).addedZ(1), E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+		a_OtherBlocks.emplace_back(a_BlockPos.addedY(-i), E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+		a_OtherBlocks.emplace_back(a_BlockPos.addedX(1).addedY(-i), E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+		a_OtherBlocks.emplace_back(a_BlockPos.addedY(-i).addedZ(1), E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+		a_OtherBlocks.emplace_back(a_BlockPos.addedX(1).addedY(-i).addedZ(1), E_BLOCK_DIRT, E_META_DIRT_NORMAL);
 	}
 
 	// Create branches
@@ -811,7 +811,7 @@ void GetDarkoakTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetB
 
 		for (int Y = y; Y < Height; Y++)
 		{
-			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedX(x).addedY(Y).addedZ(z), E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD));
+			a_LogBlocks.emplace_back(a_BlockPos.addedX(x).addedY(Y).addedZ(z), E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD);
 		}
 	}
 
@@ -828,7 +828,7 @@ void GetDarkoakTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetB
 	// The top leaves layer is a BigO3 with leaves in the middle and possibly corners:
 	PushCoordBlocks(a_BlockPos.x, hei, a_BlockPos.z, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_DARK_OAK);
 	PushCornerBlocks(a_BlockPos.x, hei, a_BlockPos.z, a_Seq, a_Noise, 0x5fffffff, a_OtherBlocks, 3, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_DARK_OAK);
-	a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, hei, a_BlockPos.z, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_DARK_OAK));
+	a_OtherBlocks.emplace_back(a_BlockPos.x, hei, a_BlockPos.z, E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_DARK_OAK);
 }
 
 
@@ -846,13 +846,13 @@ void GetTallBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSe
 	// The entire trunk, out of logs:
 	for (int i = Height - 1; i >= 0; --i)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_BIRCH));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_BIRCH);
 	}
 	int h = a_BlockPos.y + Height;
 
 	// Top layer - just the Plus:
 	PushCoordBlocks(a_BlockPos.x, h, a_BlockPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_BIRCH);
-	a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, h, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_BIRCH));  // There's no log at this layer
+	a_OtherBlocks.emplace_back(a_BlockPos.x, h, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_BIRCH);  // There's no log at this layer
 	h--;
 
 	// Second layer - log, Plus and maybe Corners:
@@ -945,7 +945,7 @@ void GetSmallSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 	// Clear trunk blocks:
 	for (int i = 0; i < Height; i++)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_CONIFER));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_CONIFER);
 	}
 	Height += a_BlockPos.y;
 
@@ -953,7 +953,7 @@ void GetSmallSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 	if ((MyRandom & 1) == 0)
 	{
 		PushCoordBlocks(a_BlockPos.x, Height, a_BlockPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, Height, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER));
+		a_OtherBlocks.emplace_back(a_BlockPos.x, Height, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER);
 		Height++;
 	}
 	MyRandom >>= 1;
@@ -971,8 +971,8 @@ void GetSmallSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 			{
 				PushCoordBlocks(a_BlockPos.x, Height,     a_BlockPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 				PushCoordBlocks(a_BlockPos.x, Height + 1, a_BlockPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
-				a_LogBlocks.push_back(sSetBlock(a_BlockPos.x, Height,     a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER));
-				a_LogBlocks.push_back(sSetBlock(a_BlockPos.x, Height + 1, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER));
+				a_LogBlocks.emplace_back(a_BlockPos.x, Height,     a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER);
+				a_LogBlocks.emplace_back(a_BlockPos.x, Height + 1, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER);
 				Height += 2;
 				break;
 			}
@@ -980,8 +980,8 @@ void GetSmallSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 			{
 				PushCoordBlocks(a_BlockPos.x, Height,     a_BlockPos.z, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 				PushCoordBlocks(a_BlockPos.x, Height + 1, a_BlockPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
-				a_LogBlocks.push_back(sSetBlock(a_BlockPos.x, Height,     a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER));
-				a_LogBlocks.push_back(sSetBlock(a_BlockPos.x, Height + 1, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER));
+				a_LogBlocks.emplace_back(a_BlockPos.x, Height,     a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER);
+				a_LogBlocks.emplace_back(a_BlockPos.x, Height + 1, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER);
 				Height += 2;
 				break;
 			}
@@ -990,9 +990,9 @@ void GetSmallSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 				PushCoordBlocks(a_BlockPos.x, Height,     a_BlockPos.z, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 				PushCoordBlocks(a_BlockPos.x, Height + 1, a_BlockPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 				PushCoordBlocks(a_BlockPos.x, Height + 2, a_BlockPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
-				a_LogBlocks.push_back(sSetBlock(a_BlockPos.x, Height,     a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER));
-				a_LogBlocks.push_back(sSetBlock(a_BlockPos.x, Height + 1, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER));
-				a_LogBlocks.push_back(sSetBlock(a_BlockPos.x, Height + 2, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER));
+				a_LogBlocks.emplace_back(a_BlockPos.x, Height,     a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER);
+				a_LogBlocks.emplace_back(a_BlockPos.x, Height + 1, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER);
+				a_LogBlocks.emplace_back(a_BlockPos.x, Height + 2, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER);
 				Height += 3;
 				break;
 			}
@@ -1003,17 +1003,17 @@ void GetSmallSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 	if ((MyRandom & 1) == 0)
 	{
 		// (0, 1, 0) top:
-		a_LogBlocks.push_back  (sSetBlock(a_BlockPos.x, Height,     a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER));
+		a_LogBlocks.emplace_back  (a_BlockPos.x, Height,     a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_CONIFER);
 		PushCoordBlocks                  (a_BlockPos.x, Height + 1, a_BlockPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, Height + 1, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER));
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, Height + 2, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER));
+		a_OtherBlocks.emplace_back(a_BlockPos.x, Height + 1, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
+		a_OtherBlocks.emplace_back(a_BlockPos.x, Height + 2, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 	}
 	else
 	{
 		// (1, 0) top:
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, Height,     a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER));
+		a_OtherBlocks.emplace_back(a_BlockPos.x, Height,     a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 		PushCoordBlocks                  (a_BlockPos.x, Height + 1, a_BlockPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, Height + 1, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER));
+		a_OtherBlocks.emplace_back(a_BlockPos.x, Height + 1, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 	}
 }
 
@@ -1050,20 +1050,20 @@ void GetLargeSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 
 	for (int i = 0; i < Height; i++)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i),               E_BLOCK_LOG, E_META_LOG_CONIFER));
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedX(1),     E_BLOCK_LOG, E_META_LOG_CONIFER));
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedZ(1),     E_BLOCK_LOG, E_META_LOG_CONIFER));
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(1, 1), E_BLOCK_LOG, E_META_LOG_CONIFER));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i),               E_BLOCK_LOG, E_META_LOG_CONIFER);
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedX(1),     E_BLOCK_LOG, E_META_LOG_CONIFER);
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedZ(1),     E_BLOCK_LOG, E_META_LOG_CONIFER);
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(1, 1), E_BLOCK_LOG, E_META_LOG_CONIFER);
 	}
 	int hei = a_BlockPos.y + Height - 1;
 
 	// Prevent floating trees by placing dirt under them
 	for (int i = 1; i < 5; i++)
 	{
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i),               E_BLOCK_DIRT, E_META_DIRT_NORMAL));
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedX(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL));
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedZ(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL));
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedXZ(1, 1), E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+		a_OtherBlocks.emplace_back(a_BlockPos.addedY(-i),               E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+		a_OtherBlocks.emplace_back(a_BlockPos.addedY(-i).addedX(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+		a_OtherBlocks.emplace_back(a_BlockPos.addedY(-i).addedZ(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+		a_OtherBlocks.emplace_back(a_BlockPos.addedY(-i).addedXZ(1, 1), E_BLOCK_DIRT, E_META_DIRT_NORMAL);
 	}
 
 	// Place the top.
@@ -1148,16 +1148,16 @@ void GetSmallPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSe
 	// The entire trunk, out of logs:
 	for (int i = TrunkHeight; i >= 0; --i)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_CONIFER));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_CONIFER);
 	}
 	int h = a_BlockPos.y + TrunkHeight + 2;
 
 	// Top layer - just a single leaves block:
-	a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, h, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER));
+	a_OtherBlocks.emplace_back(a_BlockPos.x, h, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 	h--;
 
 	// One more layer is above the trunk, push the central leaves:
-	a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, h, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER));
+	a_OtherBlocks.emplace_back(a_BlockPos.x, h, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER);
 
 	// Layers expanding in size, then collapsing again:
 	// LOGD("Generating %d layers of pine leaves, SameSizeMax = %d", NumLeavesLayers, SameSizeMax);
@@ -1188,20 +1188,20 @@ void GetLargePineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSe
 
 	for (int i = 0; i < Height; i++)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i),               E_BLOCK_LOG, E_META_LOG_CONIFER));
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedX(1),     E_BLOCK_LOG, E_META_LOG_CONIFER));
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedZ(1),     E_BLOCK_LOG, E_META_LOG_CONIFER));
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(1, 1), E_BLOCK_LOG, E_META_LOG_CONIFER));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i),               E_BLOCK_LOG, E_META_LOG_CONIFER);
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedX(1),     E_BLOCK_LOG, E_META_LOG_CONIFER);
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedZ(1),     E_BLOCK_LOG, E_META_LOG_CONIFER);
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(1, 1), E_BLOCK_LOG, E_META_LOG_CONIFER);
 	}
 	int hei = a_BlockPos.y + Height - 2;
 
 	// Prevent floating trees by placing dirt under them
 	for (int i = 1; i < 5; i++)
 	{
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i),               E_BLOCK_DIRT, E_META_DIRT_NORMAL));
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedX(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL));
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedZ(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL));
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedXZ(1, 1), E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+		a_OtherBlocks.emplace_back(a_BlockPos.addedY(-i),               E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+		a_OtherBlocks.emplace_back(a_BlockPos.addedY(-i).addedX(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+		a_OtherBlocks.emplace_back(a_BlockPos.addedY(-i).addedZ(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+		a_OtherBlocks.emplace_back(a_BlockPos.addedY(-i).addedXZ(1, 1), E_BLOCK_DIRT, E_META_DIRT_NORMAL);
 	}
 
 	// Place the canopy.
@@ -1233,7 +1233,7 @@ void GetSwampTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlo
 
 	for (int i = 0; i < Height; i++)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_APPLE));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_APPLE);
 	}
 	int hei = a_BlockPos.y + Height - 2;
 
@@ -1253,7 +1253,7 @@ void GetSwampTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlo
 	{
 		PushCoordBlocks(a_BlockPos.x, hei, a_BlockPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 		PushCornerBlocks(a_BlockPos.x, hei, a_BlockPos.z, a_Seq, a_Noise, 0x5fffffff, a_OtherBlocks, 3, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, hei, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE));
+		a_OtherBlocks.emplace_back(a_BlockPos.x, hei, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 		hei++;
 	}  // for i - 2*
 }
@@ -1267,15 +1267,15 @@ void GetAppleBushImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlo
 	a_OtherBlocks.reserve(3 + ARRAYCOUNT(BigO2) + ARRAYCOUNT(BigO1));
 
 	int hei = a_BlockPos.y;
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.x, hei, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_JUNGLE));
+	a_LogBlocks.emplace_back(a_BlockPos.x, hei, a_BlockPos.z, E_BLOCK_LOG, E_META_LOG_JUNGLE);
 	PushCoordBlocks(a_BlockPos.x, hei, a_BlockPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 	hei++;
 
-	a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, hei, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE));
+	a_OtherBlocks.emplace_back(a_BlockPos.x, hei, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 	PushCoordBlocks(a_BlockPos.x, hei, a_BlockPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 	hei++;
 
-	a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, hei, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE));
+	a_OtherBlocks.emplace_back(a_BlockPos.x, hei, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 }
 
 
@@ -1316,10 +1316,10 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 	// Generates the main trunk
 	for (int i = 0; i < Height; i++)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i),               E_BLOCK_LOG, E_META_LOG_JUNGLE));
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedX(1),     E_BLOCK_LOG, E_META_LOG_JUNGLE));
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedZ(1),     E_BLOCK_LOG, E_META_LOG_JUNGLE));
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(1, 1), E_BLOCK_LOG, E_META_LOG_JUNGLE));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i),               E_BLOCK_LOG, E_META_LOG_JUNGLE);
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedX(1),     E_BLOCK_LOG, E_META_LOG_JUNGLE);
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedZ(1),     E_BLOCK_LOG, E_META_LOG_JUNGLE);
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(1, 1), E_BLOCK_LOG, E_META_LOG_JUNGLE);
 
 		// Randomly place vines around the trunk
 		for (size_t j = 0; j < ARRAYCOUNT(VinesTrunk); j++)
@@ -1328,17 +1328,17 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 			{
 				continue;
 			}
-			a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedXZ(VinesTrunk[j].x, VinesTrunk[j].z).addedY(i), E_BLOCK_VINES, VinesTrunk[j].Meta));
+			a_OtherBlocks.emplace_back(a_BlockPos.addedXZ(VinesTrunk[j].x, VinesTrunk[j].z).addedY(i), E_BLOCK_VINES, VinesTrunk[j].Meta);
 		}
 	}
 
 	// Prevent floating trees by placing dirt under them
 	for (int i = 1; i < 5; i++)
 	{
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i),               E_BLOCK_DIRT, E_META_DIRT_NORMAL));
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedX(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL));
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedZ(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL));
-		a_OtherBlocks.push_back(sSetBlock(a_BlockPos.addedY(-i).addedXZ(1, 1), E_BLOCK_DIRT, E_META_DIRT_NORMAL));
+		a_OtherBlocks.emplace_back(a_BlockPos.addedY(-i),               E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+		a_OtherBlocks.emplace_back(a_BlockPos.addedY(-i).addedX(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+		a_OtherBlocks.emplace_back(a_BlockPos.addedY(-i).addedZ(1),     E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+		a_OtherBlocks.emplace_back(a_BlockPos.addedY(-i).addedXZ(1, 1), E_BLOCK_DIRT, E_META_DIRT_NORMAL);
 	}
 
 	int NumBranches = std::max(
@@ -1361,13 +1361,13 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 			PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y, BranchEndPosition.z, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
 			PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
 			PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y + 2, BranchEndPosition.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
-			a_OtherBlocks.push_back(sSetBlock(BranchEndPosition.x, BranchEndPosition.y + 2, BranchEndPosition.z, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE));
+			a_OtherBlocks.emplace_back(BranchEndPosition.x, BranchEndPosition.y + 2, BranchEndPosition.z, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
 		}
 		else
 		{
 			PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y, BranchEndPosition.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
 			PushCoordBlocks(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
-			a_OtherBlocks.push_back(sSetBlock(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE));
+			a_OtherBlocks.emplace_back(BranchEndPosition.x, BranchEndPosition.y + 1, BranchEndPosition.z, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
 		}
 	}
 
@@ -1408,7 +1408,7 @@ void GetSmallJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 
 	for (int i = 0; i < Height; i++)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_JUNGLE));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_JUNGLE);
 	}
 	int hei = a_BlockPos.y + Height - 3;
 
@@ -1433,7 +1433,7 @@ void GetSmallJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 
 	// Top plus, all leaves:
 	PushCoordBlocks(a_BlockPos.x, hei, a_BlockPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
-	a_OtherBlocks.push_back(sSetBlock(a_BlockPos.x, hei, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE));
+	a_OtherBlocks.emplace_back(a_BlockPos.x, hei, a_BlockPos.z, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
 }
 
 
@@ -1446,41 +1446,41 @@ void GetRedMushroomTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 
 	for (int i = 0; i < Height; i++)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_STEM));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_STEM);
 
 		if (i != 0)
 		{
 			// NORTH SIDE
-			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(-1, -2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_WEST));
-			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(0, -2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH));
-			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(1, -2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_EAST));
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(-1, -2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_WEST);
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(0, -2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH);
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(1, -2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_EAST);
 			// WEST SIDE
-			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(-2, -1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_WEST));
-			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(-2, 0), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_WEST));
-			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(-2, 1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST));
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(-2, -1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_WEST);
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(-2, 0), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_WEST);
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(-2, 1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST);
 			// SOUTH SIDE
-			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(-1, 2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST));
-			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(0, 2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH));
-			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(1, 2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST));
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(-1, 2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST);
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(0, 2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH);
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(1, 2), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST);
 			// EAST SIDE
-			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(2, -1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_EAST));
-			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(2, 0), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_EAST));
-			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i).addedXZ(2, 1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST));
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(2, -1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_EAST);
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(2, 0), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_EAST);
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(2, 1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST);
 		}
 	}
 
 	// Top Layer
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-1, -1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_WEST));
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedX(-1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_WEST));
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-1, 1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST));
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(-1, -1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_WEST);
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedX(-1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_WEST);
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(-1, 1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST);
 
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedZ(-1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH));
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_CENTER));
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedZ(1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH));
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedZ(-1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH);
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_CENTER);
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedZ(1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH);
 
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(1, -1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_EAST));
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedX(1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_EAST));
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(1, 1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST));
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(1, -1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_NORTH_EAST);
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedX(1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_EAST);
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(1, 1), E_BLOCK_HUGE_RED_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST);
 }
 
 
@@ -1495,39 +1495,39 @@ void GetBrownMushroomTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq,
 
 	for (int i = 0; i < Height; i++)
 	{
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_STEM));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_STEM);
 	}
 
 	for (int x = -Radius; x <= Radius; x++)
 	{
 		for (int z = -Radius; z <= Radius; z++)
 		{
-			a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(x, z), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_CENTER));
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(x, z), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_CENTER);
 		}
 	}
 
 	for (int i = 0; i < Border; i++)
 	{
 		// NORTH SIDE
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-1, -3).addedX(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(-1, -3).addedX(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH);
 		// WEST SIDE
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-3, -1).addedZ(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_WEST));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(-3, -1).addedZ(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_WEST);
 		// SOUTH SIDE
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-1, 3).addedX(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(-1, 3).addedX(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH);
 		// EAST SIDE
-		a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(3, -1).addedZ(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_EAST));
+		a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(3, -1).addedZ(i), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_EAST);
 	}
 
 	// Corners
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(3, 2), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST));
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(2, 3), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST));
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(3, 2), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST);
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(2, 3), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH_EAST);
 
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-2, 3), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST));
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-3, 2), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST));
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(-2, 3), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST);
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(-3, 2), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_SOUTH_WEST);
 
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-2, -3), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH_WEST));
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(-3, -2), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH_WEST));
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(-2, -3), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH_WEST);
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(-3, -2), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH_WEST);
 
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(2, -3), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH_EAST));
-	a_LogBlocks.push_back(sSetBlock(a_BlockPos.addedY(Height).addedXZ(3, -2), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH_EAST));
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(2, -3), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH_EAST);
+	a_LogBlocks.emplace_back(a_BlockPos.addedY(Height).addedXZ(3, -2), E_BLOCK_HUGE_BROWN_MUSHROOM, E_META_MUSHROOM_NORTH_EAST);
 }

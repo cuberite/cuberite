@@ -27,9 +27,9 @@ public:
 		cWindow(wtChest, "Minecart with Chest"),
 		m_ChestCart(a_ChestCart)
 	{
-		m_SlotAreas.push_back(new cSlotAreaMinecartWithChest(a_ChestCart, *this));
-		m_SlotAreas.push_back(new cSlotAreaInventory(*this));
-		m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+		m_SlotAreas.emplace_back(new cSlotAreaMinecartWithChest(a_ChestCart, *this));
+		m_SlotAreas.emplace_back(new cSlotAreaInventory(*this));
+		m_SlotAreas.emplace_back(new cSlotAreaHotBar(*this));
 
 		a_ChestCart->GetWorld()->BroadcastSoundEffect("block.chest.open", a_ChestCart->GetPosition(), 1, 1);
 	}

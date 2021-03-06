@@ -20,9 +20,9 @@ cChestWindow::cChestWindow(cChestEntity * a_Chest):
 	m_PrimaryChest(a_Chest),
 	m_SecondaryChest(nullptr)
 {
-	m_SlotAreas.push_back(new cSlotAreaChest(a_Chest, *this));
-	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
-	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+	m_SlotAreas.emplace_back(new cSlotAreaChest(a_Chest, *this));
+	m_SlotAreas.emplace_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.emplace_back(new cSlotAreaHotBar(*this));
 
 	// Play the opening sound:
 	m_World->BroadcastSoundEffect("block.chest.open", m_BlockPos, 1, 1);
@@ -42,9 +42,9 @@ cChestWindow::cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_Secon
 	m_PrimaryChest(a_PrimaryChest),
 	m_SecondaryChest(a_SecondaryChest)
 {
-	m_SlotAreas.push_back(new cSlotAreaDoubleChest(a_PrimaryChest, a_SecondaryChest, *this));
-	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
-	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+	m_SlotAreas.emplace_back(new cSlotAreaDoubleChest(a_PrimaryChest, a_SecondaryChest, *this));
+	m_SlotAreas.emplace_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.emplace_back(new cSlotAreaHotBar(*this));
 
 	// Play the opening sound:
 	m_World->BroadcastSoundEffect("block.chest.open", m_BlockPos, 1, 1);

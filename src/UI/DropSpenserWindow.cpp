@@ -14,9 +14,9 @@
 cDropSpenserWindow::cDropSpenserWindow(cDropSpenserEntity * a_DropSpenser):
 	Super(wtDropSpenser, (a_DropSpenser->GetBlockType() == E_BLOCK_DISPENSER) ? "Dispenser" : "Dropper")
 {
-	m_SlotAreas.push_back(new cSlotAreaItemGrid(a_DropSpenser->GetContents(), *this));
-	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
-	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+	m_SlotAreas.emplace_back(new cSlotAreaItemGrid(a_DropSpenser->GetContents(), *this));
+	m_SlotAreas.emplace_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.emplace_back(new cSlotAreaHotBar(*this));
 }
 
 

@@ -381,7 +381,7 @@ public:
 	{
 		m_BlockData.SetMeta(a_RelPos, a_Meta);
 		MarkDirty();
-		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock(a_RelPos), a_Meta));
+		m_PendingSendBlocks.emplace_back(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock(a_RelPos), a_Meta);
 	}
 
 	/** Light alterations based on time */

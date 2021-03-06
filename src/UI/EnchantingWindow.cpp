@@ -17,9 +17,9 @@ cEnchantingWindow::cEnchantingWindow(Vector3i a_BlockPos, const AString & a_Titl
 	m_BlockPos(a_BlockPos)
 {
 	m_SlotArea = new cSlotAreaEnchanting(*this, m_BlockPos);
-	m_SlotAreas.push_back(m_SlotArea);
-	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
-	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+	m_SlotAreas.emplace_back(m_SlotArea);
+	m_SlotAreas.emplace_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.emplace_back(new cSlotAreaHotBar(*this));
 }
 
 

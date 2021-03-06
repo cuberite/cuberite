@@ -1521,7 +1521,7 @@ void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short
 {
 	if (GetRandomProvider().RandBool(a_Chance / 100.0))
 	{
-		a_Drops.push_back(cItem(a_Item, 1, a_ItemHealth));
+		a_Drops.emplace_back(a_Item, 1, a_ItemHealth);
 	}
 }
 

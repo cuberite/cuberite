@@ -45,7 +45,7 @@ void cCompositeChat::Clear(void)
 
 void cCompositeChat::AddTextPart(const AString & a_Message, const AString & a_Style)
 {
-	m_Parts.push_back(TextPart{{ a_Message, a_Style, {} } });
+	m_Parts.emplace_back(TextPart{{ a_Message, a_Style, {} } });
 }
 
 
@@ -54,7 +54,7 @@ void cCompositeChat::AddTextPart(const AString & a_Message, const AString & a_St
 
 void cCompositeChat::AddClientTranslatedPart(const AString & a_TranslationID, const AStringVector & a_Parameters, const AString & a_Style)
 {
-	m_Parts.push_back(ClientTranslatedPart{{ a_TranslationID, a_Style, {} }, a_Parameters });
+	m_Parts.emplace_back(ClientTranslatedPart{{ a_TranslationID, a_Style, {} }, a_Parameters });
 }
 
 
@@ -63,7 +63,7 @@ void cCompositeChat::AddClientTranslatedPart(const AString & a_TranslationID, co
 
 void cCompositeChat::AddUrlPart(const AString & a_Text, const AString & a_Url, const AString & a_Style)
 {
-	m_Parts.push_back(UrlPart{{ a_Text, a_Style, {} }, a_Url });
+	m_Parts.emplace_back(UrlPart{{ a_Text, a_Style, {} }, a_Url });
 }
 
 
@@ -72,7 +72,7 @@ void cCompositeChat::AddUrlPart(const AString & a_Text, const AString & a_Url, c
 
 void cCompositeChat::AddRunCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style)
 {
-	m_Parts.push_back(RunCommandPart{{{ a_Text, a_Style, {} }, a_Command } });
+	m_Parts.emplace_back(RunCommandPart{{{ a_Text, a_Style, {} }, a_Command } });
 }
 
 
@@ -81,7 +81,7 @@ void cCompositeChat::AddRunCommandPart(const AString & a_Text, const AString & a
 
 void cCompositeChat::AddSuggestCommandPart(const AString & a_Text, const AString & a_SuggestedCommand, const AString & a_Style)
 {
-	m_Parts.push_back(SuggestCommandPart{{{ a_Text, a_Style, {} }, a_SuggestedCommand } });
+	m_Parts.emplace_back(SuggestCommandPart{{{ a_Text, a_Style, {} }, a_SuggestedCommand } });
 }
 
 
@@ -90,7 +90,7 @@ void cCompositeChat::AddSuggestCommandPart(const AString & a_Text, const AString
 
 void cCompositeChat::AddShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style)
 {
-	m_Parts.push_back(ShowAchievementPart{{ a_Achievement, a_Style, {} }, a_PlayerName });
+	m_Parts.emplace_back(ShowAchievementPart{{ a_Achievement, a_Style, {} }, a_PlayerName });
 }
 
 

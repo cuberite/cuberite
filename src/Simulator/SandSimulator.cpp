@@ -92,7 +92,7 @@ void cSandSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a
 	}
 
 	m_TotalBlocks += 1;
-	ChunkData.push_back(cCoordWithInt(a_Position.x, a_Position.y, a_Position.z));
+	ChunkData.emplace_back(a_Position.x, a_Position.y, a_Position.z);
 }
 
 

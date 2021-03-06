@@ -16,9 +16,9 @@
 cFurnaceWindow::cFurnaceWindow(cFurnaceEntity * a_Furnace):
 	cWindow(wtFurnace, "Furnace")
 {
-	m_SlotAreas.push_back(new cSlotAreaFurnace(a_Furnace, *this));
-	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
-	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+	m_SlotAreas.emplace_back(new cSlotAreaFurnace(a_Furnace, *this));
+	m_SlotAreas.emplace_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.emplace_back(new cSlotAreaHotBar(*this));
 }
 
 

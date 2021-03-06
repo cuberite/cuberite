@@ -17,9 +17,9 @@ cBeaconWindow::cBeaconWindow(cBeaconEntity * a_Beacon):
 	cWindow(wtBeacon, "Beacon"),
 	m_Beacon(a_Beacon)
 {
-	m_SlotAreas.push_back(new cSlotAreaBeacon(m_Beacon, *this));
-	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
-	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+	m_SlotAreas.emplace_back(new cSlotAreaBeacon(m_Beacon, *this));
+	m_SlotAreas.emplace_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.emplace_back(new cSlotAreaHotBar(*this));
 }
 
 

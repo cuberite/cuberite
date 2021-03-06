@@ -16,9 +16,9 @@
 cHopperWindow::cHopperWindow(cHopperEntity * a_Hopper):
 	Super(wtHopper, "Hopper")
 {
-	m_SlotAreas.push_back(new cSlotAreaItemGrid(a_Hopper->GetContents(), *this));
-	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
-	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+	m_SlotAreas.emplace_back(new cSlotAreaItemGrid(a_Hopper->GetContents(), *this));
+	m_SlotAreas.emplace_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.emplace_back(new cSlotAreaHotBar(*this));
 }
 
 

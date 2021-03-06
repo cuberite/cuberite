@@ -196,7 +196,7 @@ bool cNetherPortalScanner::OnAllChunksAvailable(void)
 					Vector3i Location = Vector3i(x, y, z);
 					if (IsValidBuildLocation(Location))
 					{
-						Possibilities.push_back(Vector3i(x, y, z));
+						Possibilities.emplace_back(x, y, z);
 					}
 				}
 			}
