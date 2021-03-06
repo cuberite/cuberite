@@ -1375,7 +1375,7 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 	if (a_Client == nullptr)
 	{
 		// Queue the block for all clients in the chunk (will be sent in Tick())
-		m_PendingSendBlocks.emplace_back(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY,a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
+		m_PendingSendBlocks.emplace_back(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
 		return;
 	}
 
