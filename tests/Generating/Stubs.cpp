@@ -799,23 +799,6 @@ void cEntity::ResetPosition(class Vector3<double> a_Pos)
 
 
 
-cEnderDragon::cEnderDragon(void) :
-	cAggressiveMonster("EnderDragon", mtEnderDragon, "entity.enderdragon.hurt", "entity.enderdragon.death", "entity.enderdragon.ambient", 16.0, 8.0)
-{
-}
-
-
-
-
-
-void cEnderDragon::GetDrops(cItems & a_Drops, cEntity * a_Killer)
-{
-}
-
-
-
-
-
 cPawn::cPawn(enum cEntity::eEntityType,double a_Width, double a_Height) :
 	cEntity(etMonster, Vector3d(), a_Height, a_Width)
 {

@@ -4,7 +4,6 @@
 #include "EnderDragonFightStructuresGen.h"
 #include "../Chunk.h"
 #include "../Entities/EnderCrystal.h"
-#include "../Mobs/EnderDragon.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 
 const std::array<Vector3i, 48> cEnderDragonFightStructuresGen::m_CagePos =
