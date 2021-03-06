@@ -171,6 +171,19 @@ void cWorld::BroadcastBlockEntity(Vector3i a_BlockPos, const cClientHandle * a_E
 
 
 
+void cWorld::BroadcastBossBarUpdateHealth(const cEntity & a_Entity, UInt32 a_UniqueID, float a_FractionFilled)
+{
+	ForClientsWithEntity(a_Entity, *this, nullptr, [&](cClientHandle & a_Client)
+		{
+			a_Client.SendBossBarUpdateHealth(a_UniqueID, a_FractionFilled);
+		}
+	);
+}
+
+
+
+
+
 void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude, eMessageType a_ChatPrefix)
 {
 	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
@@ -444,6 +457,19 @@ void cWorld::BroadcastPlayerListRemovePlayer(const cPlayer & a_Player, const cCl
 
 
 
+void cWorld::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude)
+{
+	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
+		{
+			a_Client.SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
+		}
+	);
+}
+
+
+
+
+
 void cWorld::BroadcastPlayerListUpdateGameMode(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
@@ -462,19 +488,6 @@ void cWorld::BroadcastPlayerListUpdatePing(const cPlayer & a_Player, const cClie
 	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendPlayerListUpdatePing(a_Player);
-		}
-	);
-}
-
-
-
-
-
-void cWorld::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude)
-{
-	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
-		{
-			a_Client.SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
 		}
 	);
 }

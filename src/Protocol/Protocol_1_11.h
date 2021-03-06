@@ -28,7 +28,7 @@ class cProtocol_1_11_0:
 
 public:
 
-	using Super::cProtocol_1_10_0;
+	using Super::Super;
 
 protected:
 
@@ -62,7 +62,7 @@ class cProtocol_1_11_1:
 
 public:
 
-	using Super::cProtocol_1_11_0;
+	using Super::Super;
 
 protected:
 

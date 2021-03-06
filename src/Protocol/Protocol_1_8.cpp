@@ -280,6 +280,60 @@ void cProtocol_1_8_0::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlo
 
 
 
+void cProtocol_1_8_0::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	// No such packet here
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendBossBarRemove(UInt32 a_UniqueID)
+{
+	// No such packet here
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	// No such packet here
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendBossBarUpdateHealth(UInt32 a_UniqueID, float a_FractionFilled)
+{
+	// No such packet here
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType)
+{
+	// No such packet here
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendBossBarUpdateTitle(UInt32 a_UniqueID, const cCompositeChat & a_Title)
+{
+	// No such packet here
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendCameraSetTo(const cEntity & a_Entity)
 {
 	cPacketizer Pkt(*this, pktCameraSetTo);
@@ -356,9 +410,22 @@ void cProtocol_1_8_0::SendDestroyEntity(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktDestroyEntity);
-	Pkt.WriteVarInt32(1);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	{
+		cPacketizer Pkt(*this, pktDestroyEntity);
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	}
+
+	if (!a_Entity.IsMob())
+	{
+		return;
+	}
+
+	const auto & Mob = static_cast<const cMonster &>(a_Entity);
+	if ((Mob.GetMobType() == mtEnderDragon) || (Mob.GetMobType() == mtWither))
+	{
+		SendBossBarRemove(Mob.GetUniqueID());
+	}
 }
 
 
@@ -1021,6 +1088,30 @@ void cProtocol_1_8_0::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 
 
 
+void cProtocol_1_8_0::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktPlayerList);
+	Pkt.WriteVarInt32(3);
+	Pkt.WriteVarInt32(1);
+	Pkt.WriteUUID(a_Player.GetUUID());
+
+	if (a_CustomName.empty())
+	{
+		Pkt.WriteBool(false);
+	}
+	else
+	{
+		Pkt.WriteBool(true);
+		Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_CustomName.c_str()));
+	}
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1045,30 +1136,6 @@ void cProtocol_1_8_0::SendPlayerListUpdatePing(const cPlayer & a_Player)
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
-}
-
-
-
-
-
-void cProtocol_1_8_0::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktPlayerList);
-	Pkt.WriteVarInt32(3);
-	Pkt.WriteVarInt32(1);
-	Pkt.WriteUUID(a_Player.GetUUID());
-
-	if (a_CustomName.empty())
-	{
-		Pkt.WriteBool(false);
-	}
-	else
-	{
-		Pkt.WriteBool(true);
-		Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_CustomName.c_str()));
-	}
 }
 
 
