@@ -16,9 +16,9 @@ cHorseWindow::cHorseWindow(cHorse & a_Horse):
 	Super(wtAnimalChest, "Horse"),
 	m_Horse(a_Horse)
 {
-	m_SlotAreas.emplace_back(new cSlotAreaHorse(a_Horse, *this));
-	m_SlotAreas.emplace_back(new cSlotAreaInventory(*this));
-	m_SlotAreas.emplace_back(new cSlotAreaHotBar(*this));
+	m_SlotAreas.push_back(new cSlotAreaHorse(a_Horse, *this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 }
 
 

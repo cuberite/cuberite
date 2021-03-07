@@ -13,9 +13,9 @@
 cCraftingWindow::cCraftingWindow() :
 	cWindow(wtWorkbench, "Crafting Table")
 {
-	m_SlotAreas.emplace_back(new cSlotAreaCrafting(3, *this));
-	m_SlotAreas.emplace_back(new cSlotAreaInventory(*this));
-	m_SlotAreas.emplace_back(new cSlotAreaHotBar(*this));
+	m_SlotAreas.push_back(new cSlotAreaCrafting(3, *this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 }
 
 

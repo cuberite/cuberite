@@ -16,9 +16,9 @@
 cBrewingstandWindow::cBrewingstandWindow(cBrewingstandEntity * a_Brewingstand):
 	Super(wtBrewery, "Brewingstand")
 {
-	m_SlotAreas.emplace_back(new cSlotAreaBrewingstand(a_Brewingstand, *this));
-	m_SlotAreas.emplace_back(new cSlotAreaInventory(*this));
-	m_SlotAreas.emplace_back(new cSlotAreaHotBar(*this));
+	m_SlotAreas.push_back(new cSlotAreaBrewingstand(a_Brewingstand, *this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 }
 
 

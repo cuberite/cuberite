@@ -17,9 +17,9 @@ cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest):
 	m_World(a_EnderChest->GetWorld()),
 	m_BlockPos(a_EnderChest->GetPos())
 {
-	m_SlotAreas.emplace_back(new cSlotAreaEnderChest(a_EnderChest, *this));
-	m_SlotAreas.emplace_back(new cSlotAreaInventory(*this));
-	m_SlotAreas.emplace_back(new cSlotAreaHotBar(*this));
+	m_SlotAreas.push_back(new cSlotAreaEnderChest(a_EnderChest, *this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 
 	// Play the opening sound:
 	m_World->BroadcastSoundEffect(

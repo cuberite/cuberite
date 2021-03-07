@@ -15,11 +15,11 @@ cInventoryWindow::cInventoryWindow(cPlayer & a_Player) :
 	cWindow(wtInventory, "Inventory"),
 	m_Player(a_Player)
 {
-	m_SlotAreas.emplace_back(new cSlotAreaCrafting(2, *this));  // The creative inventory doesn't display it, but it's still counted into slot numbers
-	m_SlotAreas.emplace_back(new cSlotAreaArmor(*this));
-	m_SlotAreas.emplace_back(new cSlotAreaInventory(*this));
-	m_SlotAreas.emplace_back(new cSlotAreaHotBar(*this));
-	m_SlotAreas.emplace_back(new cSlotAreaShield(*this));
+	m_SlotAreas.push_back(new cSlotAreaCrafting(2, *this));  // The creative inventory doesn't display it, but it's still counted into slot numbers
+	m_SlotAreas.push_back(new cSlotAreaArmor(*this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+	m_SlotAreas.push_back(new cSlotAreaShield(*this));
 }
 
 

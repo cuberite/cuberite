@@ -17,8 +17,8 @@ cAnvilWindow::cAnvilWindow(Vector3i a_BlockPos) :
 {
 	m_AnvilSlotArea = new cSlotAreaAnvil(*this);
 	m_SlotAreas.push_back(m_AnvilSlotArea);
-	m_SlotAreas.emplace_back(new cSlotAreaInventory(*this));
-	m_SlotAreas.emplace_back(new cSlotAreaHotBar(*this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 }
 
 

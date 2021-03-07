@@ -167,8 +167,8 @@ void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkZ)
 void cWorldStorage::InitSchemas(int a_StorageCompressionFactor)
 {
 	// The first schema added is considered the default
-	m_Schemas.emplace_back(new cWSSAnvil    (m_World, a_StorageCompressionFactor));
-	m_Schemas.emplace_back(new cWSSForgetful(m_World));
+	m_Schemas.push_back(new cWSSAnvil    (m_World, a_StorageCompressionFactor));
+	m_Schemas.push_back(new cWSSForgetful(m_World));
 	// Add new schemas here
 
 	if (NoCaseCompare(m_StorageSchemaName, "default") == 0)
