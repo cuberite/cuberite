@@ -754,7 +754,7 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 	cCraftingGrid   Grid(GetPlayerSlots(a_Player) + 1, m_GridSize, m_GridSize);
 	cCraftingRecipe Recipe(Grid);
 	cRoot::Get()->GetCraftingRecipes()->GetRecipe(a_Player, Grid, Recipe);
-	m_Recipes.push_back(std::make_pair(a_Player.GetUniqueID(), Recipe));
+	m_Recipes.emplace_back(a_Player.GetUniqueID(), Recipe);
 	return m_Recipes.back().second;
 }
 

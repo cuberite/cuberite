@@ -145,7 +145,7 @@ cBioGenMulticache::cBioGenMulticache(const cBiomeGenPtr & a_BioGenToCache, size_
 	m_Caches.reserve(a_NumSubCaches);
 	for (size_t i = 0; i < a_NumSubCaches; i++)
 	{
-		m_Caches.push_back(cBiomeGenPtr(new cBioGenCache(a_BioGenToCache, a_SubCacheSize)));
+		m_Caches.emplace_back(new cBioGenCache(a_BioGenToCache, a_SubCacheSize));
 	}
 }
 

@@ -143,7 +143,7 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 	int Mid = (Top + Bottom) / 2;
 	int DefinitionPointX = CenterX - static_cast<int>(xc * a_Size / 2);
 	int DefinitionPointZ = CenterZ - static_cast<int>(zc * a_Size / 2);
-	m_Points.push_back(cRavDefPoint(DefinitionPointX, DefinitionPointZ, 0, (Mid + Top) / 2, (Mid + Bottom) / 2));
+	m_Points.emplace_back(DefinitionPointX, DefinitionPointZ, 0, (Mid + Top) / 2, (Mid + Bottom) / 2);
 	for (int i = 1; i < NUM_RAVINE_POINTS - 1; i++)
 	{
 		int LineX = CenterX + static_cast<int>(xc * a_Size * (i - NUM_RAVINE_POINTS / 2) / NUM_RAVINE_POINTS);
@@ -156,11 +156,11 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 		int Radius = MaxRadius - abs(i - NUM_RAVINE_POINTS / 2);  // TODO: better radius function
 		int ThisTop    = Top    + ((a_Noise.IntNoise3DInt(7 *  a_BlockX, 19 * a_BlockZ, i * 31) / 13) % 8) - 4;
 		int ThisBottom = Bottom + ((a_Noise.IntNoise3DInt(19 * a_BlockX, 7 *  a_BlockZ, i * 31) / 13) % 8) - 4;
-		m_Points.push_back(cRavDefPoint(PointX, PointZ, Radius, ThisTop, ThisBottom));
+		m_Points.emplace_back(PointX, PointZ, Radius, ThisTop, ThisBottom);
 	}  // for i - m_Points[]
 	DefinitionPointX = CenterX + static_cast<int>(xc * a_Size / 2);
 	DefinitionPointZ = CenterZ + static_cast<int>(zc * a_Size / 2);
-	m_Points.push_back(cRavDefPoint(DefinitionPointX, DefinitionPointZ, 0, Mid, Mid));
+	m_Points.emplace_back(DefinitionPointX, DefinitionPointZ, 0, Mid, Mid);
 }
 
 
@@ -201,8 +201,8 @@ void cStructGenRavines::cRavine::RefineDefPoints(const cRavDefPoints & a_Src, cR
 		int db = itr->m_Bottom - PrevB;
 		int Rad1 = std::max(PrevR + 1 * dr / 4, 1);
 		int Rad2 = std::max(PrevR + 3 * dr / 4, 1);
-		a_Dst.push_back(cRavDefPoint(PrevX + 1 * dx / 4, PrevZ + 1 * dz / 4, Rad1, PrevT + 1 * dt / 4, PrevB + 1 * db / 4));
-		a_Dst.push_back(cRavDefPoint(PrevX + 3 * dx / 4, PrevZ + 3 * dz / 4, Rad2, PrevT + 3 * dt / 4, PrevB + 3 * db / 4));
+		a_Dst.emplace_back(PrevX + 1 * dx / 4, PrevZ + 1 * dz / 4, Rad1, PrevT + 1 * dt / 4, PrevB + 1 * db / 4);
+		a_Dst.emplace_back(PrevX + 3 * dx / 4, PrevZ + 3 * dz / 4, Rad2, PrevT + 3 * dt / 4, PrevB + 3 * db / 4);
 		PrevX = itr->m_BlockX;
 		PrevZ = itr->m_BlockZ;
 		PrevR = itr->m_Radius;
@@ -253,7 +253,7 @@ void cStructGenRavines::cRavine::FinishLinear(void)
 		int B = itr->m_Bottom;
 		for (;;)
 		{
-			m_Points.push_back(cRavDefPoint(PrevX, PrevZ, R, T, B));
+			m_Points.emplace_back(PrevX, PrevZ, R, T, B);
 			if ((PrevX == x1) && (PrevZ == z1))
 			{
 				break;

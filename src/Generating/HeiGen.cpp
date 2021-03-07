@@ -226,7 +226,7 @@ cHeiGenMultiCache::cHeiGenMultiCache(const cTerrainHeightGenPtr & a_HeiGenToCach
 	m_SubCaches.reserve(a_NumSubCaches);
 	for (size_t i = 0; i < a_NumSubCaches; i++)
 	{
-		m_SubCaches.push_back(std::make_shared<cHeiGenCache>(a_HeiGenToCache, a_SubCacheSize));
+		m_SubCaches.emplace_back(std::make_shared<cHeiGenCache>(a_HeiGenToCache, a_SubCacheSize));
 	}
 }
 

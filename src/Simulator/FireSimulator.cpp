@@ -262,7 +262,7 @@ void cFireSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a
 	}  // for itr - ChunkData[]
 
 	FIRE_FLOG("FS: Adding block {0}", a_Block);
-	ChunkData.push_back(cCoordWithInt(a_Position.x, a_Position.y, a_Position.z, 100));
+	ChunkData.emplace_back(a_Position.x, a_Position.y, a_Position.z, 100);
 }
 
 
