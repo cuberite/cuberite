@@ -20,10 +20,10 @@ class cPieceStructuresGen::cGen:
 
 public:
 
-	cGen(int a_Seed, cBiomeGenPtr a_BiomeGen, cTerrainHeightGenPtr a_HeightGen, int a_SeaLevel, const AString & a_Name):
+	cGen(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel, const AString & a_Name):
 		Super(a_Seed),
-		m_BiomeGen(std::move(a_BiomeGen)),
-		m_HeightGen(std::move(a_HeightGen)),
+		m_BiomeGen(a_BiomeGen),
+		m_HeightGen(a_HeightGen),
 		m_SeaLevel(a_SeaLevel),
 		m_Name(a_Name),
 		m_MaxDepth(5)
@@ -95,10 +95,10 @@ protected:
 	typedef std::vector<cFreeConnector> cFreeConnectors;
 
 	/** The underlying biome generator that defines whether the structure is created or not */
-	cBiomeGenPtr m_BiomeGen;
+	cBiomeGen & m_BiomeGen;
 
 	/** The underlying height generator, used to position the prefabs crossing chunk borders if they are set to FitGround. */
-	cTerrainHeightGenPtr m_HeightGen;
+	cTerrainHeightGen & m_HeightGen;
 
 	/** The world's sea level, if available. Used for some cVerticalStrategy descendants. */
 	int m_SeaLevel;
@@ -129,7 +129,7 @@ cPieceStructuresGen::cPieceStructuresGen(int a_Seed):
 
 
 
-bool cPieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaLevel, const cBiomeGenPtr & a_BiomeGen, const cTerrainHeightGenPtr & a_HeightGen)
+bool cPieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaLevel, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen)
 {
 	// Load each piecepool:
 	auto Structures = StringSplitAndTrim(a_Prefabs, "|");
@@ -172,8 +172,3 @@ void cPieceStructuresGen::GenFinish(cChunkDesc & a_Chunk)
 		Gen->GenFinish(a_Chunk);
 	}
 }
-
-
-
-
-
