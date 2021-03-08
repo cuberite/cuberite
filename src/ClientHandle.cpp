@@ -3299,7 +3299,7 @@ bool cClientHandle::SetState(eState a_NewState)
 void cClientHandle::ProcessProtocolIn(void)
 {
 	// Process received network data:
-	AString IncomingData;
+	decltype(m_IncomingData) IncomingData;
 	{
 		cCSLock Lock(m_CSIncomingData);
 		std::swap(IncomingData, m_IncomingData);
@@ -3312,7 +3312,7 @@ void cClientHandle::ProcessProtocolIn(void)
 
 	try
 	{
-		m_Protocol.HandleIncomingData(*this, IncomingData);
+		m_Protocol.HandleIncomingData(*this, std::move(IncomingData));
 	}
 	catch (const std::exception & Oops)
 	{
@@ -3340,7 +3340,7 @@ void cClientHandle::OnReceivedData(const char * a_Data, size_t a_Length)
 
 	// Queue the incoming data to be processed in the tick thread:
 	cCSLock Lock(m_CSIncomingData);
-	m_IncomingData.append(a_Data, a_Length);
+	m_IncomingData.append(reinterpret_cast<const std::byte *>(a_Data), a_Length);
 }
 
 
