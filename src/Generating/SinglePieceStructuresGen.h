@@ -30,7 +30,7 @@ public:
 	a_Prefabs contains the list of prefab sets that should be activated, "|"-separated.
 	All problems are logged to the console and the generator skips over them.
 	Returns true if at least one prefab set is valid (the generator should be kept). */
-	bool Initialize(const AString & a_Prefabs, int a_SeaLevel, const cBiomeGenPtr & a_BiomeGen, const cTerrainHeightGenPtr & a_HeightGen);
+	bool Initialize(const AString & a_Prefabs, int a_SeaLevel, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen);
 
 
 	// cFinishGen override:

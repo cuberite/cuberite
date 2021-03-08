@@ -108,7 +108,7 @@ public:
 
 	/** Called when the piece pool is assigned to a generator,
 	so that the individual starting pieces' vertical strategies may bind to the underlying subgenerators. */
-	void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_HeightGen, int a_SeaLevel);
+	void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel);
 
 	// cPiecePool overrides:
 	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override;
