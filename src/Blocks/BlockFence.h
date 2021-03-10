@@ -19,6 +19,24 @@ public:
 
 	using Super::Super;
 
+
+	static inline bool IsBlockFence(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaFence:
+			case BlockType::BirchFence:
+			case BlockType::DarkOakFence:
+			case BlockType::JungleFence:
+			case BlockType::NetherBrickFence:
+			case BlockType::OakFence:
+			case BlockType::SpruceFence:
+			case BlockType::WarpedFence:
+				return true;
+			default: return false;
+		}
+	}
+
 private:
 
 	// These are the min and max coordinates (X and Z) for a straight fence.
@@ -27,14 +45,16 @@ private:
 	static constexpr double MIN_COORD = 0.4;
 	static constexpr double MAX_COORD = 0.6;
 
-	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const override
+	virtual cBoundingBox GetPlacementCollisionBox(BlockState a_XM, BlockState a_XP, BlockState a_YM, BlockState a_YP, BlockState a_ZM, BlockState a_ZP) const override
 	{
 		bool XMSolid = cBlockInfo::IsSolid(a_XM);
 		bool XPSolid = cBlockInfo::IsSolid(a_XP);
 		bool ZMSolid = cBlockInfo::IsSolid(a_ZM);
 		bool ZPSolid = cBlockInfo::IsSolid(a_ZP);
 
-		double FENCE_HEIGHT = cBlockInfo::GetBlockHeight(m_BlockType);
+		// This is a bit of a hack - some blocks change their height depending on their state so we can't only switch on the type.
+		// We use an example fence: all fences have the same height.
+		double FENCE_HEIGHT = cBlockInfo::GetBlockHeight(Block::OakFence::OakFence());
 
 		// Entities can never be in the center
 		cBoundingBox PlacementBox(MIN_COORD, MAX_COORD, 0, FENCE_HEIGHT, MIN_COORD, MAX_COORD);
@@ -156,7 +176,7 @@ private:
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BlockState a_OldBlock,
 		const cEntity * a_Digger
 	) const override
 	{

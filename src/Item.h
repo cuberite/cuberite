@@ -13,6 +13,8 @@
 #include "Enchantments.h"
 #include "WorldStorage/FireworksSerializer.h"
 #include "Color.h"
+#include "Registries/Items.h"
+#include "Protocol/Palettes/Upgrade.h"
 
 
 
@@ -41,7 +43,7 @@ public:
 
 	/** Creates an item of the specified type, by default 1 piece with no damage and no enchantments */
 	cItem(
-		short a_ItemType,
+		enum Item a_ItemType,
 		char a_ItemCount = 1,
 		short a_ItemDamage = 0,
 		const AString & a_Enchantments = "",
@@ -230,20 +232,15 @@ public:
 
 	cItem * Get   (int a_Idx);
 	void    Set   (int a_Idx, const cItem & a_Item);
-	void    Add   (const cItem & a_Item) {push_back(a_Item); }
-	void    Add   (short a_ItemType) { emplace_back(a_ItemType); }
-	void    Add   (short a_ItemType, char a_ItemCount) { emplace_back(a_ItemType, a_ItemCount); }
+	void    Add   (const cItem & a_Item) { push_back(a_Item); }
+	void    Add   (enum Item a_ItemType) { emplace_back(a_ItemType); }
+	void    Add   (enum Item a_ItemType, char a_ItemCount) { emplace_back(a_ItemType, a_ItemCount); }
 	void    Delete(int a_Idx);
 	void    Clear (void) {clear(); }
 	size_t  Size  (void) const { return size(); }
-	void    Set   (int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDamage);
+	void    Set   (int a_Idx, Item a_Item, char a_ItemCount, short a_ItemDamage);
 	bool    Contains(const cItem & a_Item);
 	bool    ContainsType(const cItem & a_Item);
-
-	void    Add   (short a_ItemType, char a_ItemCount, short a_ItemDamage)
-	{
-		emplace_back(a_ItemType, a_ItemCount, a_ItemDamage);
-	}
 
 	/** Adds a copy of all items in a_ItemGrid. */
 	void AddItemGrid(const cItemGrid & a_ItemGrid);

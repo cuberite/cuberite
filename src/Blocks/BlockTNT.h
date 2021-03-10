@@ -33,9 +33,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 4;
 	}
 };

@@ -29,16 +29,14 @@ cItem::cItem():
 
 
 cItem::cItem(
-	short a_ItemType,
+	enum Item a_ItemType,
 	char a_ItemCount,
 	short a_ItemDamage,
 	const AString & a_Enchantments,
 	const AString & a_CustomName,
 	const AStringVector & a_LoreTable
 ):
-	m_ItemType    (a_ItemType),
 	m_ItemCount   (a_ItemCount),
-	m_ItemDamage  (a_ItemDamage),
 	m_Enchantments(a_Enchantments),
 	m_CustomName  (a_CustomName),
 	m_LoreTable   (a_LoreTable),
@@ -46,6 +44,10 @@ cItem::cItem(
 	m_FireworkItem(),
 	m_ItemColor()
 {
+	auto NumericItem = PaletteUpgrade::ToItem(a_ItemType);
+	m_ItemType = NumericItem.first;
+	m_ItemDamage = NumericItem.second | a_ItemDamage;
+
 	if (!IsValidItem(m_ItemType))
 	{
 		if ((m_ItemType != E_BLOCK_AIR) && (m_ItemType != E_ITEM_EMPTY))
@@ -305,7 +307,7 @@ void cItem::FromJson(const Json::Value & a_Value)
 		{
 			m_FireworkItem.m_HasFlicker = a_Value.get("Flicker", false).asBool();
 			m_FireworkItem.m_HasTrail = a_Value.get("Trail", false).asBool();
-			m_FireworkItem.m_Type = static_cast<NIBBLETYPE>(a_Value.get("Type", 0).asInt());
+			m_FireworkItem.m_Type = static_cast<unsigned char>(a_Value.get("Type", 0).asInt());
 			m_FireworkItem.m_FlightTimeInTicks = static_cast<short>(a_Value.get("FlightTimeInTicks", 0).asInt());
 			m_FireworkItem.ColoursFromString(a_Value.get("Colours", "").asString(), m_FireworkItem);
 			m_FireworkItem.FadeColoursFromString(a_Value.get("FadeColours", "").asString(), m_FireworkItem);
@@ -754,14 +756,14 @@ void cItems::Delete(int a_Idx)
 
 
 
-void cItems::Set(int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDamage)
+void cItems::Set(int a_Idx, Item a_Item, char a_ItemCount, short a_ItemDamage)
 {
 	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
 		LOGWARNING("cItems: Attempt to set an item at an out-of-bounds index %d; there are currently %zu items. Not setting.", a_Idx, size());
 		return;
 	}
-	at(static_cast<size_t>(a_Idx)) = cItem(a_ItemType, a_ItemCount, a_ItemDamage);
+	at(static_cast<size_t>(a_Idx)) = cItem(a_Item, a_ItemCount, a_ItemDamage);
 }
 
 

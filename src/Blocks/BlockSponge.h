@@ -21,7 +21,7 @@ private:
 	virtual void OnPlaced(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+		BlockState a_Block
 	) const override
 	{
 		OnNeighborChanged(a_ChunkInterface, a_BlockPos, BLOCK_FACE_NONE);
@@ -49,8 +49,8 @@ private:
 		};
 
 		// Check if this is a dry sponge next to a water block.
-		NIBBLETYPE TargetMeta = a_Chunk.GetMeta(a_Rel.x, a_Rel.y, a_Rel.z);
-		if (TargetMeta != E_META_SPONGE_DRY)
+		BlockState Target = a_Chunk.GetBlock(a_Rel.x, a_Rel.y, a_Rel.z);
+		if (Target.Type() != BlockType::Sponge)
 		{
 			return;
 		}
@@ -100,25 +100,24 @@ private:
 			Seeds.pop();
 		}
 
-		a_Chunk.SetBlock(a_Rel, E_BLOCK_SPONGE, E_META_SPONGE_WET);
+		a_Chunk.SetBlock(a_Rel, Block::WetSponge::WetSponge());
 	}
 
 	static void DryUp(Vector3i a_Rel, cChunk & a_Chunk)
 	{
 		// TODO: support evaporating waterlogged blocks.
-		a_Chunk.UnboundedRelSetBlock(a_Rel.x, a_Rel.y, a_Rel.z, E_BLOCK_AIR, 0);
+		a_Chunk.UnboundedRelSetBlock(a_Rel.x, a_Rel.y, a_Rel.z, Block::Air::Air());
 	}
 
 	static bool IsWet(Vector3i a_Rel, cChunk & a_Chunk)
 	{
 		// TODO: support detecting waterlogged blocks.
-		BLOCKTYPE Type;
-		return(a_Chunk.UnboundedRelGetBlockType(a_Rel.x, a_Rel.y, a_Rel.z, Type) && IsBlockWater(Type));
+		BlockState Block;
+		return(a_Chunk.UnboundedRelGetBlock({a_Rel.x, a_Rel.y, a_Rel.z}, Block) && Block.Type() == BlockType::Water);
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 18;
 	}
 };

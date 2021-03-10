@@ -185,7 +185,7 @@ protected:
 				// DEBUG: Make the roughravine shapepoints visible on a single layer (so that we can see with Minutor what's going on)
 				if ((FloorC(DifX + x) == 0) && (FloorC(DifZ + z) == 0))
 				{
-					a_ChunkDesc.SetBlockType(x, 4, z, E_BLOCK_LAPIS_ORE);
+					a_ChunkDesc.SetBlock({x, 4, z}, Block::LapisOre::LapisOre());
 				}
 				#endif  // !NDEBUG
 
@@ -204,9 +204,9 @@ protected:
 						continue;
 					}
 
-					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlockType(x, y, z)))
+					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlock({x, y, z})))
 					{
-						a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
+						a_ChunkDesc.SetBlock({x, y, z}, Block::Air::Air());
 					}
 				}  // for y
 			}  // for x, z - a_BlockTypes

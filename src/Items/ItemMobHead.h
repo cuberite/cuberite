@@ -9,43 +9,54 @@
 
 
 
-class cItemMobHeadHandler final :
+class cItemMobHeadHandler:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	using Super::Super;
+	cItemMobHeadHandler(int a_ItemType):
+		Super(a_ItemType)
+	{
+	}
 
 
 
 
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
+	virtual bool OnPlayerPlace(
+		cWorld & a_World,
+		cPlayer & a_Player,
+		const cItem & a_EquippedItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos
+	) override
 	{
 		// Cannot place a head at "no face" and from the bottom:
 		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_BOTTOM))
 		{
-			return false;
+			return true;
 		}
+		const auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
 
 		// If the placed head is a wither, try to spawn the wither first:
-		if (a_HeldItem.m_ItemDamage == E_META_HEAD_WITHER)
+		if (a_EquippedItem.m_ItemDamage == E_META_HEAD_WITHER)
 		{
-			if (TrySpawnWitherAround(a_Player, a_PlacePosition))
+			if (TrySpawnWitherAround(a_World, a_Player, PlacePos))
 			{
 				return true;
 			}
 			// Wither not created, proceed with regular head placement
 		}
 
-		if (!a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_HEAD, BlockFaceToBlockMeta(a_ClickedBlockFace)))
+		cItem ItemCopy(a_EquippedItem);  // Make a copy in case this is the player's last head item and OnPlayerPlace removes it
+		if (!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_CursorPos))
 		{
 			return false;
 		}
-
-		RegularHeadPlaced(a_Player, a_HeldItem, a_PlacePosition, a_ClickedBlockFace);
+		RegularHeadPlaced(a_World, a_Player, ItemCopy, PlacePos, a_ClickedBlockFace);
 		return true;
 	}
 
@@ -55,26 +66,45 @@ public:
 
 	/** Called after placing a regular head block with no mob spawning.
 	Adjusts the mob head entity based on the equipped item's data. */
-	void RegularHeadPlaced(const cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace) const
+	void RegularHeadPlaced(
+		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		const Vector3i a_PlacePos, eBlockFace a_ClickedBlockFace
+	)
 	{
-		const auto HeadType = static_cast<eMobHeadType>(a_HeldItem.m_ItemDamage);
-		const auto BlockMeta = static_cast<NIBBLETYPE>(a_ClickedBlockFace);
+		auto HeadType = static_cast<eMobHeadType>(a_EquippedItem.m_ItemDamage);
 
 		// Use a callback to set the properties of the mob head block entity:
-		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_Player, HeadType, BlockMeta](cBlockEntity & a_BlockEntity)
+		a_World.DoWithBlockEntityAt(a_PlacePos, [&](cBlockEntity & a_BlockEntity)
 		{
-			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_HEAD);
+			switch (a_BlockEntity.GetBlockType())
+			{
+				case BlockType::CreeperHead:
+				case BlockType::CreeperWallHead:
+				case BlockType::DragonHead:
+				case BlockType::DragonWallHead:
+				case BlockType::PlayerHead:
+				case BlockType::PlayerWallHead:
+				case BlockType::SkeletonSkull:
+				case BlockType::SkeletonWallSkull:
+				case BlockType::WitherSkeletonSkull:
+				case BlockType::WitherSkeletonWallSkull:
+				case BlockType::ZombieHead:
+				case BlockType::ZombieWallHead:
+					break;
+				default: return false;
+			}
 
 			auto & MobHeadEntity = static_cast<cMobHeadEntity &>(a_BlockEntity);
 
 			int Rotation = 0;
-			if (BlockMeta == 1)
+			if (a_ClickedBlockFace == BLOCK_FACE_TOP)
 			{
 				Rotation = FloorC(a_Player.GetYaw() * 16.0f / 360.0f + 0.5f) & 0x0f;
 			}
 
 			MobHeadEntity.SetType(HeadType);
 			MobHeadEntity.SetRotation(static_cast<eMobHeadRotation>(Rotation));
+			MobHeadEntity.GetWorld()->BroadcastBlockEntity(MobHeadEntity.GetPos());
 			return false;
 		});
 	}
@@ -85,7 +115,10 @@ public:
 
 	/** Spawns a wither if the wither skull placed at the specified coords completes wither's spawning formula.
 	Returns true if the wither was created. */
-	bool TrySpawnWitherAround(cPlayer & a_Player, const Vector3i a_BlockPos) const
+	bool TrySpawnWitherAround(
+		cWorld & a_World, cPlayer & a_Player,
+		const Vector3i a_BlockPos
+	)
 	{
 		// No wither can be created at Y < 2 - not enough space for the formula:
 		if (a_BlockPos.y < 2)
@@ -93,183 +126,141 @@ public:
 			return false;
 		}
 
-		// Check for all relevant wither locations:
-		static const Vector3i RelCoords[] =
+		static constexpr std::array<Vector3i, 4> SoulSandOffsetX =
 		{
-			{ 0, 0,  0},
-			{ 1, 0,  0},
-			{-1, 0,  0},
-			{ 0, 0,  1},
-			{ 0, 0, -1},
+			Vector3i( 0, -1, 0),
+			Vector3i(-1, -1, 0),
+			Vector3i( 1, -1, 0),
+			Vector3i( 0, -2, 0)
 		};
 
-		for (auto & RelCoord : RelCoords)
+		static constexpr std::array<Vector3i, 4> SoulSandOffsetZ =
 		{
-			if (TrySpawnWitherAt(
-				*a_Player.GetWorld(), a_Player,
-				a_BlockPos,
-				RelCoord.x, RelCoord.z
-			))
-			{
-				return true;
-			}
-		}  // for i - RelCoords[]
-
-		return false;
-	}
-
-
-	/** Tries to spawn a wither at the specified offset from the placed head block.
-	PlacedHead coords are used to override the block query - at those coords the block is not queried from the world,
-	but assumed to be a head instead.
-	Offset is used to shift the image around the X and Z axis.
-	Returns true iff the wither was created successfully. */
-	bool TrySpawnWitherAt(
-		cWorld & a_World, cPlayer & a_Player,
-		Vector3i a_PlacedHeadPos,
-		int a_OffsetX, int a_OffsetZ
-	) const
-	{
-		// Image for the wither at the X axis:
-		static const sSetBlock ImageWitherX[] =
-		{
-			{-1,  0, 0, E_BLOCK_HEAD,     0},
-			{ 0,  0, 0, E_BLOCK_HEAD,     0},
-			{ 1,  0, 0, E_BLOCK_HEAD,     0},
-			{-1, -1, 0, E_BLOCK_SOULSAND, 0},
-			{ 0, -1, 0, E_BLOCK_SOULSAND, 0},
-			{ 1, -1, 0, E_BLOCK_SOULSAND, 0},
-			{-1, -2, 0, E_BLOCK_AIR,      0},
-			{ 0, -2, 0, E_BLOCK_SOULSAND, 0},
-			{ 1, -2, 0, E_BLOCK_AIR,      0},
+			Vector3i( 0, -1, 0),
+			Vector3i(-1, -1, 0),
+			Vector3i( 1, -1, 0),
+			Vector3i( 0, -2, 0)
 		};
 
-		// Image for the wither at the Z axis:
-		static const sSetBlock ImageWitherZ[] =
+		static constexpr std::array<Vector3i, 5> XHeadCoords =
 		{
-			{ 0,  0, -1, E_BLOCK_HEAD,     0},
-			{ 0,  0,  0, E_BLOCK_HEAD,     0},
-			{ 0,  0,  1, E_BLOCK_HEAD,     0},
-			{ 0, -1, -1, E_BLOCK_SOULSAND, 0},
-			{ 0, -1,  0, E_BLOCK_SOULSAND, 0},
-			{ 0, -1,  1, E_BLOCK_SOULSAND, 0},
-			{ 0, -2, -1, E_BLOCK_AIR,      0},
-			{ 0, -2,  0, E_BLOCK_SOULSAND, 0},
-			{ 0, -2,  1, E_BLOCK_AIR,      0},
+			Vector3i(-2, 0,  0),
+			Vector3i(-1, 0,  0),
+			Vector3i( 0, 0,  0),
+			Vector3i( 1, 0,  0),
+			Vector3i( 2, 0,  0),
 		};
 
-		// Try to spawn the wither from each image:
-		return (
-			TrySpawnWitherFromImage(
-				a_World, a_Player, ImageWitherX,
-				a_PlacedHeadPos,
-				a_OffsetX, a_OffsetZ
-			) ||
-			TrySpawnWitherFromImage(
-				a_World, a_Player, ImageWitherZ,
-				a_PlacedHeadPos,
-				a_OffsetX, a_OffsetZ
-			)
-		);
-	}
-
-
-
-
-
-	/** Tries to spawn a wither from the specified image at the specified offset from the placed head block.
-	PlacedHead coords are used to override the block query - at those coords the block is not queried from the world,
-	but assumed to be a head instead.
-	Offset is used to shift the image around the X and Z axis.
-	Returns true iff the wither was created successfully. */
-	bool TrySpawnWitherFromImage(
-		cWorld & a_World, cPlayer & a_Player, const sSetBlock (& a_Image)[9],
-		Vector3i a_PlacedHeadPos,
-		int a_OffsetX, int a_OffsetZ
-	) const
-	{
-		std::array<Vector3i, 9> PositionsToClear;
-
-		// Check each block individually:
-		for (size_t i = 0; i != std::size(a_Image); i++)
+		static constexpr std::array<Vector3i, 5> ZHeadCoords =
 		{
-			// The absolute coords of the block in the image to check.
-			const Vector3i Block(
-				a_PlacedHeadPos.x + a_OffsetX + a_Image[i].GetX(),
-				a_PlacedHeadPos.y + a_Image[i].GetY(),
-				a_PlacedHeadPos.z + a_OffsetZ + a_Image[i].GetZ()
-			);
+			Vector3i(0,  0, -2),
+			Vector3i(0,  0, -1),
+			Vector3i(0,  0,  0),
+			Vector3i(0,  0,  1),
+			Vector3i(0,  0,  2),
+		};
 
-			// If the query is for the head the player is about to place (remember, it hasn't been set into the world yet), short-circuit-evaluate it:
-			if (Block == a_PlacedHeadPos)
-			{
-				if (a_Image[i].m_BlockType != E_BLOCK_HEAD)
-				{
-					return false;  // Didn't match.
-				}
+		static constexpr std::array<Vector3i, 7> XAirPos =
+		{
+			Vector3i(-1,  0, 0),
+			Vector3i( 0,  0, 0),
+			Vector3i( 1,  0, 0),
+			Vector3i(-1, -1, 0),
+			Vector3i( 0, -1, 0),
+			Vector3i( 1, -1, 0),
+			Vector3i( 0, -2, 0)
+		};
 
-				PositionsToClear[i] = Block;
-				continue;  // Matched, continue checking the rest of the image.
-			}
+		static constexpr std::array<Vector3i, 7> ZAirPos =
+		{
+			Vector3i(0,  0, -1),
+			Vector3i(0,  0,  0),
+			Vector3i(0,  0,  1),
+			Vector3i(0, -1, -1),
+			Vector3i(0, -1,  0),
+			Vector3i(0, -1,  1),
+			Vector3i(0, -2,  0)
+		};
 
-			// Query the world block:
-			BLOCKTYPE BlockType;
-			NIBBLETYPE BlockMeta;
-			if (!a_World.GetBlockTypeMeta(Block, BlockType, BlockMeta))
-			{
-				// Cannot query block, assume unloaded chunk, fail to spawn the wither
-				return false;
-			}
+		cBlockArea Area;
+		Area.Read(a_World, a_BlockPos - Vector3i(2, 2, 2), a_BlockPos + Vector3i(2, 0, 2), cBlockArea::baBlocks);
 
-			// Compare the world block:
-			if (BlockType != a_Image[i].m_BlockType)
+		auto RelHeadPos = Vector3i(3, 2, 3);
+		Vector3i CenterHeadPos;
+
+		if (FindCenterHead(Area, XHeadCoords, CenterHeadPos, RelHeadPos))
+		{
+			if (!ValidateSoulSand(Area, SoulSandOffsetX, RelHeadPos))
 			{
 				return false;
 			}
-
-			// If it is a mob head, check it's a wither skull using the block entity:
-			if (
-				(BlockType == E_BLOCK_HEAD) &&
-				!a_World.DoWithBlockEntityAt(Block, [&](cBlockEntity & a_BlockEntity)
-				{
-					ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_HEAD);
-
-					return static_cast<cMobHeadEntity &>(a_BlockEntity).GetType() == SKULL_TYPE_WITHER;
-				})
-			)
+			if (!ReplaceAir(a_Player, XAirPos, CenterHeadPos - RelHeadPos + a_BlockPos))
 			{
 				return false;
 			}
-
-			// Matched, continue checking:
-			PositionsToClear[i] = Block;
-		}  // for i - a_Image
-
-		// All image blocks matched, try replace the image with air blocks:
-		if (
-			!a_Player.PlaceBlocks(
-			{
-				{ PositionsToClear[0], E_BLOCK_AIR, 0 },
-				{ PositionsToClear[1], E_BLOCK_AIR, 0 },
-				{ PositionsToClear[2], E_BLOCK_AIR, 0 },
-				{ PositionsToClear[3], E_BLOCK_AIR, 0 },
-				{ PositionsToClear[4], E_BLOCK_AIR, 0 },
-				{ PositionsToClear[5], E_BLOCK_AIR, 0 },
-				{ PositionsToClear[6], E_BLOCK_AIR, 0 },
-				{ PositionsToClear[7], E_BLOCK_AIR, 0 },
-				{ PositionsToClear[8], E_BLOCK_AIR, 0 },
-			})
-		)
+		}
+		else
 		{
-			return false;
+			if (!FindCenterHead(Area, ZHeadCoords, CenterHeadPos, RelHeadPos))
+			{
+				return false;
+			}
+			if (!ValidateSoulSand(Area, SoulSandOffsetZ, RelHeadPos))
+			{
+				return false;
+			}
+			if (!ReplaceAir(a_Player, ZAirPos, CenterHeadPos - RelHeadPos + a_BlockPos))
+			{
+				return false;
+			}
 		}
 
+
 		// Spawn the wither:
-		int BlockX = a_PlacedHeadPos.x + a_OffsetX;
-		int BlockZ = a_PlacedHeadPos.z + a_OffsetZ;
-		a_World.SpawnMob(static_cast<double>(BlockX) + 0.5, a_PlacedHeadPos.y - 2, static_cast<double>(BlockZ) + 0.5, mtWither, false);
-		AwardSpawnWitherAchievement(a_World, {BlockX, a_PlacedHeadPos.y - 2, BlockZ});
+		Vector3d WitherPos = CenterHeadPos - RelHeadPos + a_BlockPos + Vector3d(0.5, -2, 0.5);
+		a_World.SpawnMob(WitherPos.x, WitherPos.y, WitherPos.z, mtWither, false);
+		AwardSpawnWitherAchievement(a_World, CenterHeadPos - RelHeadPos + a_BlockPos);
 		return true;
+	}
+
+	static bool FindCenterHead(cBlockArea & a_Area, const std::array<Vector3i, 5> & a_Offsets, Vector3i & a_CenterHeadPos, Vector3i a_StartPos)
+	{
+		int HeadCount = 0;
+		for (const auto & Offset : a_Offsets)
+		{
+			switch (a_Area.GetRelBlock(a_StartPos + Offset).Type())
+			{
+				case BlockType::WitherSkeletonSkull: HeadCount += 1; break;
+				default: HeadCount = 0;
+			}
+			if (HeadCount == 2)
+			{
+				a_CenterHeadPos = a_StartPos + Offset;
+			}
+		}
+		return (HeadCount >= 3);
+	}
+
+	static bool ValidateSoulSand(cBlockArea & a_Area, const std::array<Vector3i, 4> a_Offsets, Vector3i a_StartPos)
+	{
+		for (const auto & Offset : a_Offsets)
+		{
+			if (a_Area.GetRelBlock(a_StartPos + Offset).Type() != BlockType::SoulSand)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	static bool ReplaceAir(cPlayer & a_Player, const std::array<Vector3i, 7> a_Offsets, Vector3i a_StartPos)
+	{
+		sSetBlockVector AirBlocks;
+		for (const auto & Offset : a_Offsets)
+		{
+			AirBlocks.emplace_back(a_StartPos + Offset, Block::Air::Air());
+		}
+		return a_Player.PlaceBlocks(AirBlocks);
 	}
 
 
@@ -277,7 +268,7 @@ public:
 
 
 	/** Awards the achievement to all players close to the specified point. */
-	void AwardSpawnWitherAchievement(cWorld & a_World, Vector3i a_BlockPos) const
+	void AwardSpawnWitherAchievement(cWorld & a_World, Vector3i a_BlockPos)
 	{
 		Vector3f Pos(a_BlockPos);
 		a_World.ForEachPlayer([=](cPlayer & a_Player)
@@ -286,7 +277,7 @@ public:
 				double Dist = (a_Player.GetPosition() - Pos).Length();
 				if (Dist < 50.0)
 				{
-					a_Player.AwardAchievement(CustomStatistic::AchSpawnWither);
+					a_Player.AwardAchievement(Statistic::AchSpawnWither);
 				}
 				return false;
 			}
@@ -297,31 +288,162 @@ public:
 
 
 
-	/** Converts the block face of the placement (which face of the block was clicked to place the head)
-	into the block's metadata value. */
-	static NIBBLETYPE BlockFaceToBlockMeta(int a_BlockFace)
+	virtual bool IsPlaceable(void) override
 	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_TOP: return 0x01;  // On ground (rotation provided in block entity)
-			case BLOCK_FACE_XM:  return 0x04;  // west wall, facing east
-			case BLOCK_FACE_XP:  return 0x05;  // east wall, facing west
-			case BLOCK_FACE_ZM:  return 0x02;  // north wall, facing south
-			case BLOCK_FACE_ZP:  return 0x03;  // south wall, facing north
-			default:
-			{
-				ASSERT(!"Unhandled block face");
-				return 0;
-			}
-		}
+		return true;
 	}
 
 
 
 
 
-	virtual bool IsPlaceable(void) const override
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
+		BlockState & a_Block
+	) override
 	{
+		if (a_Player == nullptr)
+		{
+			return false;
+		}
+		using namespace Block;
+
+		switch (a_Player->GetEquippedItem().m_ItemDamage)
+		{
+			case E_META_HEAD_SKELETON:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Block = SkeletonSkull::SkeletonSkull(RotationToFineFace(a_Player->GetYaw()));
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Block = SkeletonWallSkull::SkeletonWallSkull(RotationToBlockFace(a_Player->GetYaw()));
+						break;
+					}
+					default: return false;
+				}
+				break;
+			}
+			case E_META_HEAD_WITHER:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Block = WitherSkeletonSkull::WitherSkeletonSkull(RotationToFineFace(a_Player->GetYaw()));
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Block = WitherSkeletonWallSkull::WitherSkeletonWallSkull(RotationToBlockFace(a_Player->GetYaw()));
+						break;
+					}
+					default: return false;
+				}
+				break;
+			}
+			case E_META_HEAD_ZOMBIE:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Block = ZombieHead::ZombieHead(RotationToFineFace(a_Player->GetYaw()));
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Block = ZombieWallHead::ZombieWallHead(RotationToBlockFace(a_Player->GetYaw()));
+						break;
+					}
+					default: return false;
+				}
+				break;
+			}
+			case E_META_HEAD_PLAYER:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Block = PlayerHead::PlayerHead(RotationToFineFace(a_Player->GetYaw()));
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Block = PlayerWallHead::PlayerWallHead(RotationToBlockFace(a_Player->GetYaw()));
+						break;
+					}
+					default: return false;
+				}
+				break;
+			}
+			case E_META_HEAD_CREEPER:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Block = CreeperHead::CreeperHead(RotationToFineFace(a_Player->GetYaw()));
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Block = CreeperWallHead::CreeperWallHead(RotationToBlockFace(a_Player->GetYaw()));
+						break;
+					}
+					default: return false;
+				}
+				break;
+			}
+			case E_META_HEAD_DRAGON:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Block = CreeperHead::CreeperHead(RotationToFineFace(a_Player->GetYaw()));
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Block = CreeperWallHead::CreeperWallHead(RotationToBlockFace(a_Player->GetYaw()));
+						break;
+					}
+					default: return false;
+				}
+				break;
+			}
+			default:
+			{
+				ASSERT(!"UNHANDLED MOB HEAD TYPE IN ITEMMOBHEAD");
+			}
+		}
 		return true;
 	}
 } ;

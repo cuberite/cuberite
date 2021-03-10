@@ -9,12 +9,25 @@
 
 
 cBlaze::cBlaze(void) :
-	Super("Blaze", mtBlaze, "entity.blaze.hurt", "entity.blaze.death", "entity.blaze.ambient", 0.6f, 1.8f),
+	Super("Blaze", mtBlaze, "entity.blaze.hurt", "entity.blaze.death", "entity.blaze.ambient", 0.6, 1.8),
 	m_IsCharging(false),
 	m_ChargeTimer(0)
 {
 	SetGravity(-8.0f);
 	SetAirDrag(0.05f);
+}
+
+
+
+
+
+void cBlaze::GetDrops(cItems & a_Drops, cEntity * a_Killer)
+{
+	if ((a_Killer != nullptr) && (a_Killer->IsPlayer() || a_Killer->IsA("cWolf")))
+	{
+		unsigned int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+		AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, Item::BlazeRod);
+	}
 }
 
 
@@ -29,19 +42,6 @@ bool cBlaze::Attack(std::chrono::milliseconds a_Dt)
 		return true;
 	}
 	return false;
-}
-
-
-
-
-
-void cBlaze::GetDrops(cItems & a_Drops, cEntity * a_Killer)
-{
-	if ((a_Killer != nullptr) && (a_Killer->IsPlayer() || a_Killer->IsA("cWolf")))
-	{
-		unsigned int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
-		AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_BLAZE_ROD);
-	}
 }
 
 
@@ -73,7 +73,7 @@ void cBlaze::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			auto FireChargePtr = FireCharge.get();
 			FireChargePtr->Initialize(std::move(FireCharge), *m_World);
 
-			m_World->BroadcastSoundEffect("entity.blaze.shoot", GetPosition(), 4.0f, 1.0f);
+			m_World->BroadcastSoundEffect("entity.ghast.shoot", GetPosition(), 4.0f, 1.0f);
 		}
 	}
 
@@ -84,3 +84,6 @@ void cBlaze::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		ResetAttackCooldown();
 	}
 }
+
+
+

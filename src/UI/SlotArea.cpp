@@ -22,6 +22,7 @@
 #include "../EffectID.h"
 #include "../ClientHandle.h"
 #include "../Mobs/Horse.h"
+#include "../Blocks/BlockAnvil.h"
 
 
 
@@ -138,7 +139,8 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 			else if ((Slot.m_ItemType <= 0) || DraggingItem.IsEqual(Slot))
 			{
 				// Drop one item in slot
-				if ((DraggingItem.m_ItemCount > 0) && (Slot.m_ItemCount < Slot.GetMaxStackSize()))
+				cItemHandler * Handler = ItemHandler(Slot.m_ItemType);
+				if ((DraggingItem.m_ItemCount > 0) && (Slot.m_ItemCount < Handler->GetMaxStackSize()))
 				{
 					char OldSlotCount = Slot.m_ItemCount;
 
@@ -176,7 +178,8 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 			else
 			{
 				// Same type, add items:
-				int FreeSlots = DraggingItem.GetMaxStackSize() - Slot.m_ItemCount;
+				cItemHandler * Handler = ItemHandler(DraggingItem.m_ItemType);
+				int FreeSlots = Handler->GetMaxStackSize() - Slot.m_ItemCount;
 				if (FreeSlots < 0)
 				{
 					ASSERT(!"Bad item stack size - where did we get more items in a slot than allowed?");
@@ -363,7 +366,7 @@ void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_
 			// Different items
 			continue;
 		}
-		char NumFit = Slot->GetMaxStackSize() - Slot->m_ItemCount;
+		char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
 		if (NumFit <= 0)
 		{
 			// Full stack already
@@ -634,7 +637,8 @@ void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 	}
 	else if (DraggingItem.IsEqual(Result))
 	{
-		if (DraggingItem.m_ItemCount + Result.m_ItemCount <= Result.GetMaxStackSize())
+		cItemHandler * Handler = ItemHandler(Result.m_ItemType);
+		if (DraggingItem.m_ItemCount + Result.m_ItemCount <= Handler->GetMaxStackSize())
 		{
 			DraggingItem.m_ItemCount += Result.m_ItemCount;
 			Recipe.ConsumeIngredients(Grid);
@@ -761,20 +765,23 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 
 void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Player)
 {
+	ASSERT("UNCOMMENT THIS");
+	/*
 	switch (a_Result.m_ItemType)
 	{
-		case E_BLOCK_WORKBENCH:         a_Player.AwardAchievement(CustomStatistic::AchBuildWorkBench);      break;
-		case E_BLOCK_FURNACE:           a_Player.AwardAchievement(CustomStatistic::AchBuildFurnace);        break;
-		case E_BLOCK_CAKE:              a_Player.AwardAchievement(CustomStatistic::AchBakeCake);            break;
-		case E_BLOCK_ENCHANTMENT_TABLE: a_Player.AwardAchievement(CustomStatistic::AchEnchantments);        break;
-		case E_BLOCK_BOOKCASE:          a_Player.AwardAchievement(CustomStatistic::AchBookcase);            break;
-		case E_ITEM_WOODEN_PICKAXE:     a_Player.AwardAchievement(CustomStatistic::AchBuildPickaxe);        break;
-		case E_ITEM_WOODEN_SWORD:       a_Player.AwardAchievement(CustomStatistic::AchBuildSword);          break;
-		case E_ITEM_STONE_PICKAXE:      a_Player.AwardAchievement(CustomStatistic::AchBuildBetterPickaxe);  break;
-		case E_ITEM_WOODEN_HOE:         a_Player.AwardAchievement(CustomStatistic::AchBuildHoe);            break;
-		case E_ITEM_BREAD:              a_Player.AwardAchievement(CustomStatistic::AchMakeBread);           break;
+		case Item::CraftingTable:         a_Player.AwardAchievement(Statistic::AchBuildWorkBench);      break;
+		case E_BLOCK_FURNACE:           a_Player.AwardAchievement(Statistic::AchBuildFurnace);        break;
+		case E_BLOCK_CAKE:              a_Player.AwardAchievement(Statistic::AchBakeCake);            break;
+		case E_BLOCK_ENCHANTMENT_TABLE: a_Player.AwardAchievement(Statistic::AchEnchantments);        break;
+		case E_BLOCK_BOOKCASE:          a_Player.AwardAchievement(Statistic::AchBookcase);            break;
+		case E_ITEM_WOODEN_PICKAXE:     a_Player.AwardAchievement(Statistic::AchBuildPickaxe);        break;
+		case E_ITEM_WOODEN_SWORD:       a_Player.AwardAchievement(Statistic::AchBuildSword);          break;
+		case E_ITEM_STONE_PICKAXE:      a_Player.AwardAchievement(Statistic::AchBuildBetterPickaxe);  break;
+		case E_ITEM_WOODEN_HOE:         a_Player.AwardAchievement(Statistic::AchBuildHoe);            break;
+		case E_ITEM_BREAD:              a_Player.AwardAchievement(Statistic::AchMakeBread);           break;
 		default: break;
 	}
+	*/
 }
 
 
@@ -925,7 +932,7 @@ void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 	}
 	if (!DraggingItem.IsEmpty())
 	{
-		if (!(DraggingItem.IsEqual(Slot) && ((DraggingItem.m_ItemCount + Slot.m_ItemCount) <= Slot.GetMaxStackSize())))
+		if (!(DraggingItem.IsEqual(Slot) && ((DraggingItem.m_ItemCount + Slot.m_ItemCount) <= cItemHandler::GetItemHandler(Slot)->GetMaxStackSize())))
 		{
 			return;
 		}
@@ -1001,7 +1008,7 @@ void cSlotAreaAnvil::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bo
 			// Different items
 			continue;
 		}
-		char NumFit = Slot->GetMaxStackSize() - Slot->m_ItemCount;
+		char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
 		if (NumFit <= 0)
 		{
 			// Full stack already
@@ -1063,30 +1070,36 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 
 	const Vector3i BlockPos = static_cast<cAnvilWindow &>(m_ParentWindow).GetBlockPos();
 
-	BLOCKTYPE Block;
-	NIBBLETYPE BlockMeta;
+	auto Self = a_Player.GetWorld()->GetBlock(BlockPos);
 
-	if (
-		a_Player.GetWorld()->GetBlockTypeMeta(BlockPos, Block, BlockMeta) &&
-		!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) &&
-		GetRandomProvider().RandBool(0.12)
-	)
+	if (!a_Player.IsGameModeCreative() && (cBlockAnvilHandler::IsBlockAnvil(Self)) && GetRandomProvider().RandBool(0.12))
 	{
-		NIBBLETYPE Orientation = BlockMeta & 0x3;
-		NIBBLETYPE AnvilDamage = BlockMeta >> 2;
-		++AnvilDamage;
+		using namespace Block;
 
-		if (AnvilDamage > 2)
+		auto Orientation = cBlockAnvilHandler::GetFacing(Self);
+
+		switch (Self.Type())
 		{
-			// Anvil will break
-			a_Player.GetWorld()->SetBlock(BlockPos, E_BLOCK_AIR, 0);
-			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_BREAK, BlockPos, 0);
-			a_Player.CloseWindow(false);
-		}
-		else
-		{
-			a_Player.GetWorld()->SetBlockMeta(BlockPos, static_cast<NIBBLETYPE>(Orientation | (AnvilDamage << 2)));
-			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, BlockPos, 0);
+			case BlockType::Anvil:
+			{
+				a_Player.GetWorld()->SetBlock(BlockPos, ChippedAnvil::ChippedAnvil(Orientation));
+				a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, BlockPos, 0);
+				break;
+			}
+			case BlockType::ChippedAnvil:
+			{
+				a_Player.GetWorld()->SetBlock(BlockPos, DamagedAnvil::DamagedAnvil(Orientation));
+				break;
+			}
+			case BlockType::DamagedAnvil:
+			{
+				// Anvil will break
+				a_Player.GetWorld()->SetBlock(BlockPos, Air::Air());
+				a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_BREAK, BlockPos, 0);
+				a_Player.CloseWindow(false);
+				break;
+			}
+			default: break;
 		}
 	}
 	else
@@ -1151,10 +1164,10 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		RepairCost += Sacrifice.m_RepairCost;
 
 		// Can we repair with sacrifce material?
-		if (Target.IsDamageable() && Target.GetHandler().CanRepairWithRawMaterial(Sacrifice.m_ItemType))
+		if (Target.IsDamageable() && cItemHandler::GetItemHandler(Target)->CanRepairWithRawMaterial(Sacrifice.m_ItemType))
 		{
 			// Tool and armor repair with special item (iron / gold / diamond / ...)
-			int DamageDiff = std::min(static_cast<int>(Target.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
+			char DamageDiff = static_cast<char>(std::min(static_cast<int>(Target.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4));
 			if (DamageDiff <= 0)
 			{
 				// No enchantment
@@ -1170,9 +1183,9 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			// Repair until out of materials, or fully repaired:
 			while ((DamageDiff > 0) && (NumItemsConsumed < Sacrifice.m_ItemCount))
 			{
-				Output.m_ItemDamage -= static_cast<char>(DamageDiff);
+				Output.m_ItemDamage -= DamageDiff;
 				NeedExp += std::max(1, DamageDiff / 100) + static_cast<int>(Target.m_Enchantments.Count());
-				DamageDiff = std::min(static_cast<int>(Output.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
+				DamageDiff = static_cast<char>(std::min(static_cast<int>(Output.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4));
 
 				++NumItemsConsumed;
 			}
@@ -1620,7 +1633,7 @@ void cSlotAreaEnchanting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Playe
 	{
 		// It's lapis, put it in the lapis spot.
 		const cItem * Slot = GetSlot(1, a_Player);
-		char NumFit = Slot->GetMaxStackSize() - Slot->m_ItemCount;
+		char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
 		if (NumFit <= 0)
 		{
 			// Full stack already
@@ -1700,7 +1713,7 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 		return;
 	}
 
-	// Pseudocode found at: https://minecraft.wiki/w/Enchanting_mechanics
+	// Pseudocode found at: https://minecraft.gamepedia.com/Enchanting_mechanics
 	const auto Bookshelves = std::min(GetBookshelvesCount(*a_Player.GetWorld()), 15U);
 
 	// A PRNG initialised using the player's enchantment seed.
@@ -1806,8 +1819,8 @@ unsigned cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 	for (size_t i = 0; i < ARRAYCOUNT(CheckCoords); i++)
 	{
 		if (
-			(Area.GetRelBlockType(CheckCoords[i].m_AirX, CheckCoords[i].m_AirY, CheckCoords[i].m_AirZ) == E_BLOCK_AIR) &&  // There's air in the checkspot
-			(Area.GetRelBlockType(CheckCoords[i].m_BookX, CheckCoords[i].m_BookY, CheckCoords[i].m_BookZ) == E_BLOCK_BOOKCASE)  // There's bookcase in the wanted place
+			(Area.GetRelBlock({CheckCoords[i].m_AirX, CheckCoords[i].m_AirY, CheckCoords[i].m_AirZ}).Type() == BlockType::Air) &&  // There's air in the checkspot
+			(Area.GetRelBlock({CheckCoords[i].m_BookX, CheckCoords[i].m_BookY, CheckCoords[i].m_BookZ}).Type() == BlockType::Bookshelf)  // There's Bookshelf in the wanted place
 		)
 		{
 			Bookshelves++;
@@ -1894,18 +1907,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 		return;
 	}
 
-	if (a_SlotNum == 1)
-	{
-		cItem & DraggingItem = a_Player.GetDraggingItem();
-		cFurnaceRecipe * FurnaceRecipes = cRoot::Get()->GetFurnaceRecipe();
-
-		// Do not allow non-fuels to be placed in the fuel slot:
-		if (!DraggingItem.IsEmpty() && !FurnaceRecipes->IsFuel(DraggingItem) && (a_ClickAction != caShiftLeftClick) && (a_ClickAction != caShiftRightClick))
-		{
-			return;
-		}
-	}
-	else if (a_SlotNum == 2)
+	if (a_SlotNum == 2)
 	{
 		bool bAsync = false;
 		if (GetSlot(a_SlotNum, a_Player) == nullptr)
@@ -2047,7 +2049,7 @@ void cSlotAreaFurnace::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, 
 		return;
 	}
 
-	char NumFit = Slot->GetMaxStackSize() - Slot->m_ItemCount;
+	char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
 	if (NumFit <= 0)
 	{
 		// Full stack already
@@ -2116,8 +2118,8 @@ void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Playe
 	/** TODO 2014-05-12 xdot: Figure out when to call this method. */
 	switch (a_Result.m_ItemType)
 	{
-		case E_ITEM_IRON:        a_Player.AwardAchievement(CustomStatistic::AchAcquireIron); break;
-		case E_ITEM_COOKED_FISH: a_Player.AwardAchievement(CustomStatistic::AchCookFish);    break;
+		case E_ITEM_IRON:        a_Player.AwardAchievement(Statistic::AchAcquireIron); break;
+		case E_ITEM_COOKED_FISH: a_Player.AwardAchievement(Statistic::AchCookFish);    break;
 		default: break;
 	}
 }
@@ -2266,7 +2268,7 @@ void cSlotAreaBrewingstand::HandleBrewedItem(cPlayer & a_Player, const cItem & a
 	// Award an achievement if the item is not a water bottle (is a real brewed potion)
 	if (a_ClickedItem.m_ItemDamage > 0)
 	{
-		a_Player.AwardAchievement(CustomStatistic::AchPotion);
+		a_Player.AwardAchievement(Statistic::AchPotion);
 	}
 }
 
@@ -2311,7 +2313,7 @@ void cSlotAreaBrewingstand::DistributeStack(cItem & a_ItemStack, cPlayer & a_Pla
 		return;
 	}
 
-	char NumFit = Slot->GetMaxStackSize() - Slot->m_ItemCount;
+	char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
 	if (NumFit <= 0)
 	{
 		// Full stack already

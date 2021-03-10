@@ -73,6 +73,50 @@ eBlockFace MirrorBlockFaceY(eBlockFace a_BlockFace)
 
 
 
+eBlockFace MirrorBlockFaceXY(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_XM;
+		case BLOCK_FACE_XP: return BLOCK_FACE_XP;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_ZM;
+		case BLOCK_FACE_NONE:
+		case BLOCK_FACE_YM:
+		case BLOCK_FACE_YP:
+		{
+			return a_BlockFace;
+		}
+	}
+	UNREACHABLE("Unsupported block face");
+}
+
+
+
+
+
+eBlockFace MirrorBlockFaceYZ(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_XP;
+		case BLOCK_FACE_XP: return BLOCK_FACE_XM;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_ZM;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_NONE:
+		case BLOCK_FACE_YM:
+		case BLOCK_FACE_YP:
+		{
+			return a_BlockFace;
+		}
+	}
+	UNREACHABLE("Unsupported block face");
+}
+
+
+
+
+
 /** Returns a blockface rotated around the Y axis counter-clockwise. */
 eBlockFace RotateBlockFaceCCW(eBlockFace a_BlockFace)
 {
@@ -151,6 +195,141 @@ AString BlockFaceToString(eBlockFace a_BlockFace)
 		case BLOCK_FACE_NONE: return "BLOCK_FACE_NONE";
 	}
 	UNREACHABLE("Unsupported block face");
+}
+
+
+
+
+
+eBlockFace RotationToBlockFace(double a_Rotation, bool a_Inverse)
+{
+	if (a_Inverse)
+	{
+		if ((a_Rotation > 135) || (a_Rotation < -135))  // -180/180
+		{
+			return eBlockFace::BLOCK_FACE_NORTH;
+		}
+		if ((-45 > a_Rotation) || (a_Rotation >= -135))  // -90
+		{
+			return eBlockFace::BLOCK_FACE_EAST;
+		}
+		if ((45 > a_Rotation)  || (a_Rotation >= -45))  // 0
+		{
+			return eBlockFace::BLOCK_FACE_SOUTH;
+		}
+		if ((135 > a_Rotation) || (a_Rotation >= 45))  // 90
+		{
+			return eBlockFace::BLOCK_FACE_WEST;
+		}
+	}
+	else
+	{
+		if ((a_Rotation > 135) || (a_Rotation < -135))    // -180/180
+		{
+			return eBlockFace::BLOCK_FACE_SOUTH;
+		}
+		if ((-45 > a_Rotation) || (a_Rotation >= -135))   // -90
+		{
+			return eBlockFace::BLOCK_FACE_WEST;
+		}
+		if ((45 > a_Rotation)  || (a_Rotation >= -45))    // 0
+		{
+			return eBlockFace::BLOCK_FACE_NORTH;
+		}
+		if ((135 > a_Rotation) || (a_Rotation >= 45))      // 90
+		{
+			return eBlockFace::BLOCK_FACE_EAST;
+		}
+	}
+	return BLOCK_FACE_NONE;
+}
+
+
+
+
+
+unsigned char RotationToFineFace(double a_Rotation)
+{
+	if ((a_Rotation >= - 11.25f) && (a_Rotation < 11.25f))
+	{
+		// South
+		return 8;
+	}
+	else if ((a_Rotation >= 11.25f) && (a_Rotation < 33.75f))
+	{
+		// SouthSouthWest
+		return 9;
+	}
+	else if ((a_Rotation >= 23.75f) && (a_Rotation < 56.25f))
+	{
+		// SouthWest
+		return 10;
+	}
+	else if ((a_Rotation >= 56.25f) && (a_Rotation < 78.75f))
+	{
+		// WestSouthWest
+		return 11;
+	}
+	else if ((a_Rotation >= 78.75f) && (a_Rotation < 101.25f))
+	{
+		// West
+		return 12;
+	}
+	else if ((a_Rotation >= 101.25f) && (a_Rotation < 123.75f))
+	{
+		// WestNorthWest
+		return 13;
+	}
+	else if ((a_Rotation >= 123.75f) && (a_Rotation < 146.25f))
+	{
+		// NorthWest
+		return 14;
+	}
+	else if ((a_Rotation >= 146.25f) && (a_Rotation < 168.75f))
+	{
+		// NorthNorthWest
+		return 15;
+	}
+	else if ((a_Rotation >= -168.75f) && (a_Rotation < -146.25f))
+	{
+		// NorthNorthEast
+		return 1;
+	}
+	else if ((a_Rotation >= -146.25f) && (a_Rotation < -123.75f))
+	{
+		// NorthEast
+		return 2;
+	}
+	else if ((a_Rotation >= -123.75f) && (a_Rotation < -101.25f))
+	{
+		// EastNorthEast
+		return 3;
+	}
+	else if ((a_Rotation >= -101.25) && (a_Rotation < -78.75f))
+	{
+		// East
+		return 4;
+	}
+	else if ((a_Rotation >= -78.75) && (a_Rotation < -56.25f))
+	{
+		// EastSouthEast
+		return 5;
+	}
+	else if ((a_Rotation >= -56.25f) && (a_Rotation < -33.75f))
+	{
+		// SouthEast
+		return 6;
+	}
+	else if ((a_Rotation >= -33.75f) && (a_Rotation < -11.25f))
+	{
+		// SouthSouthEast
+		return 7;
+	}
+	else  // degrees jumping from 180 to -180
+	{
+		// North
+		return 0;
+	}
 }
 
 

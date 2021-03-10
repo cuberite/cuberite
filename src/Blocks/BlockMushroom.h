@@ -9,9 +9,9 @@
 
 /** Handler for the small (singleblock) mushrooms. */
 class cBlockMushroomHandler final :
-	public cClearMetaOnDrop<cBlockHandler>
+	public cBlockHandler
 {
-	using Super = cClearMetaOnDrop<cBlockHandler>;
+	using Super = cBlockHandler;
 
 public:
 
@@ -21,38 +21,54 @@ private:
 
 	// TODO: Add Mushroom Spread
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		const auto BasePos = a_Position.addedY(-1);
-		if (!cChunkDef::IsValidHeight(BasePos))
+		if (a_RelPos.y <= 0)
 		{
 			return false;
 		}
 
 		// TODO: Cannot be at too much daylight
 
-		switch (a_Chunk.GetBlock(BasePos))
+		switch (a_Chunk.GetBlock(a_RelPos.addedY(-1)).Type())
 		{
-			case E_BLOCK_GLASS:
-			case E_BLOCK_CACTUS:
-			case E_BLOCK_ICE:
-			case E_BLOCK_LEAVES:
-			case E_BLOCK_NEW_LEAVES:
-			case E_BLOCK_AIR:
-			{
+			case BlockType::AcaciaLeaves:
+			case BlockType::Air:
+			case BlockType::BirchLeaves:
+			case BlockType::BlackStainedGlass:
+			case BlockType::BlueStainedGlass:
+			case BlockType::BrownStainedGlass:
+			case BlockType::Cactus:
+			case BlockType::CyanStainedGlass:
+			case BlockType::DarkOakLeaves:
+			case BlockType::Glass:
+			case BlockType::GrayStainedGlass:
+			case BlockType::GreenStainedGlass:
+			case BlockType::Ice:
+			case BlockType::JungleLeaves:
+			case BlockType::LightBlueStainedGlass:
+			case BlockType::LightGrayStainedGlass:
+			case BlockType::LimeStainedGlass:
+			case BlockType::MagentaStainedGlass:
+			case BlockType::OakLeaves:
+			case BlockType::OrangeStainedGlass:
+			case BlockType::PinkStainedGlass:
+			case BlockType::PurpleStainedGlass:
+			case BlockType::RedStainedGlass:
+			case BlockType::SpruceLeaves:
+			case BlockType::WhiteStainedGlass:
+			case BlockType::YellowStainedGlass:
 				return false;
-			}
+			default: return true;
 		}
-		return true;
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 0;
 	}
 } ;

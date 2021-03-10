@@ -1,15 +1,15 @@
 
 #pragma once
 
-#include "Mixins/Mixins.h"
+#include "Mixins.h"
 
 
 
 
 class cBlockFurnaceHandler final :
-	public cYawRotator<cBlockEntityHandler, 0x07, 0x03, 0x04, 0x02, 0x05>
+	public cBlockEntityHandler
 {
-	using Super = cYawRotator<cBlockEntityHandler, 0x07, 0x03, 0x04, 0x02, 0x05>;
+	using Super = cBlockEntityHandler;
 
 public:
 
@@ -17,18 +17,25 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual bool GetPlacementBlockTypeMeta(
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
+		BlockState & a_Block
+	) const override
 	{
-		return cItem(E_BLOCK_FURNACE);  // We can't drop a lit furnace
+
+		a_Block = Block::Furnace::Furnace(RotationToBlockFace(a_Player.GetYaw()), false);
+		return true;
 	}
 
 
 
 
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 11;
 	}
 } ;

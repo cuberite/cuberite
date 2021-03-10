@@ -1,6 +1,5 @@
 #include "Globals.h"
 #include "PathFinder.h"
-#include "BlockType.h"
 #include "../BlockInfo.h"
 #include "../Chunk.h"
 
@@ -8,12 +7,13 @@
 
 
 
-cPathFinder::cPathFinder(float a_MobWidth, float a_MobHeight) :
-	m_Width(a_MobWidth),
-	m_Height(a_MobHeight),
+cPathFinder::cPathFinder(double a_MobWidth, double a_MobHeight) :
+	m_Path(),
 	m_GiveUpCounter(0),
 	m_NotFoundCooldown(0)
 {
+	m_Width = a_MobWidth;
+	m_Height = a_MobHeight;
 }
 
 
@@ -177,86 +177,80 @@ void cPathFinder::ResetPathFinding(cChunk &a_Chunk)
 bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 {
 	cChunk * Chunk = a_Chunk.GetNeighborChunk(FloorC(a_Vector.x), FloorC(a_Vector.z));
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
 
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		return false;
 	}
 
+	int RelX = FloorC(a_Vector.x) - Chunk->GetPosX() * cChunkDef::Width;
+	int RelZ = FloorC(a_Vector.z) - Chunk->GetPosZ() * cChunkDef::Width;
+
 	// If destination in the air, first try to go 1 block north, or east, or west.
 	// This fixes the player leaning issue.
 	// If that failed, we instead go down to the lowest air block.
-	auto Below = a_Vector.Floor().addedY(-1);
-	if (!cChunkDef::IsValidHeight(Below))
+	int YBelowUs = FloorC(a_Vector.y) - 1;
+	if (YBelowUs < 0)
 	{
 		return false;
 
 	}
-	auto BelowRel = cChunkDef::AbsoluteToRelative(Below);
-
-	Chunk->GetBlockTypeMeta(BelowRel, BlockType, BlockMeta);
-	if (!(IsWaterOrSolid(BlockType)))
+	auto BlockToCheck = Chunk->GetBlock(RelX, YBelowUs, RelZ);
+	if (!(IsWaterOrSolid(BlockToCheck)))
 	{
-		constexpr std::array<Vector3i, 8> Offsets =
-		{
-			{
-				{-1, 0, 0},
-				{1, 0, 0},
-				{0, 0, -1},
-				{0, 0, 1},
-				{-1, 0, -1},
-				{-1, 0, 1},
-				{1, 0, -1},
-				{1, 0, 1},
-			}
-		};
-
-		// Looks for a neighbouring block one block in x or z direction that is water or solid.
 		bool InTheAir = true;
-		for (const auto & Offset : Offsets)
+		int x, z;
+		for (z = -1; z <= 1; ++z)
 		{
-			auto InspectPos = Below + Offset;
-			Chunk = a_Chunk.GetNeighborChunk(InspectPos.x, InspectPos.z);
-			if ((Chunk == nullptr) || !Chunk->IsValid())
+			for (x = -1; x <= 1; ++x)
 			{
-				return false;
-			}
-			auto InspectRel = cChunkDef::AbsoluteToRelative(InspectPos);
-			Chunk->GetBlockTypeMeta(InspectRel, BlockType, BlockMeta);
-			if (IsWaterOrSolid((BlockType)))
-			{
-				BelowRel = InspectRel;
-				InTheAir = false;
-				break;
+				if ((x == 0) && (z == 0))
+				{
+					continue;
+				}
+				Chunk = a_Chunk.GetNeighborChunk(FloorC(a_Vector.x+x), FloorC(a_Vector.z+z));
+				if ((Chunk == nullptr) || !Chunk->IsValid())
+				{
+					return false;
+				}
+				RelX = FloorC(a_Vector.x+x) - Chunk->GetPosX() * cChunkDef::Width;
+				RelZ = FloorC(a_Vector.z+z) - Chunk->GetPosZ() * cChunkDef::Width;
+				BlockToCheck = Chunk->GetBlock(RelX, YBelowUs, RelZ);
+				if (IsWaterOrSolid((BlockToCheck)))
+				{
+					a_Vector.x += x;
+					a_Vector.z += z;
+					InTheAir = false;
+					goto breakBothLoops;
+				}
 			}
 		}
+		breakBothLoops:
 
 		// Go down to the lowest air block.
 		if (InTheAir)
 		{
-			while (cChunkDef::IsValidHeight(BelowRel.addedY(-1)))
+			while (a_Vector.y > 0)
 			{
-				Chunk->GetBlockTypeMeta(BelowRel.addedY(-1), BlockType, BlockMeta);
-				if (IsWaterOrSolid(BlockType))
+				BlockToCheck = Chunk->GetBlock(RelX, FloorC(a_Vector.y) - 1, RelZ);
+				if (IsWaterOrSolid(BlockToCheck))
 				{
 					break;
 				}
-				BelowRel.y -= 1;
+				a_Vector.y -= 1;
 			}
 		}
 	}
 
 	// If destination in water or solid, go up to the first air block.
-	while (BelowRel.y < cChunkDef::Height)
+	while (a_Vector.y < cChunkDef::Height)
 	{
-		Chunk->GetBlockTypeMeta(BelowRel, BlockType, BlockMeta);
-		if (!IsWaterOrSolid(BlockType))
+		BlockToCheck = Chunk->GetBlock(RelX, FloorC(a_Vector.y), RelZ);
+		if (!IsWaterOrSolid(BlockToCheck))
 		{
 			break;
 		}
-		BelowRel.y += 1;
+		a_Vector.y += 1;
 	}
 
 	return true;
@@ -266,9 +260,9 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 
 
 
-bool cPathFinder::IsWaterOrSolid(BLOCKTYPE a_BlockType)
+bool cPathFinder::IsWaterOrSolid(BlockState a_Block)
 {
-	return ((a_BlockType == E_BLOCK_STATIONARY_WATER) || cBlockInfo::IsSolid(a_BlockType));
+	return ((a_Block.Type() == BlockType::Water) || cBlockInfo::IsSolid(a_Block));
 }
 
 

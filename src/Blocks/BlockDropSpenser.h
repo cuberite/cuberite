@@ -5,16 +5,16 @@
 
 #pragma once
 
-#include "Mixins/Mixins.h"
+#include "Mixins.h"
 
 
 
 
 
 class cBlockDropSpenserHandler final :
-	public cDisplacementYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>
+	public cBlockEntityHandler
 {
-	using Super = cDisplacementYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>;
+	using Super = cBlockEntityHandler;
 
 public:
 
@@ -22,9 +22,27 @@ public:
 
 private:
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+
+	virtual bool GetPlacementBlockTypeMeta(
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
+		BlockState & a_Block
+	) const
 	{
-		UNUSED(a_Meta);
+		switch (m_BlockType)
+		{
+			case BlockType::Dispenser: a_Block = Block::Dispenser::Dispenser(RotationToBlockFace(a_Player.GetYaw()), false); break;
+			case BlockType::Dropper:   a_Block = Block::Dropper::Dropper(RotationToBlockFace(a_Player.GetYaw()), false); break;
+			default: return false;
+		}
+		return true;
+	}
+
+	virtual ColourID GetMapBaseColourID() const override
+	{
 		return 11;
 	}
 } ;

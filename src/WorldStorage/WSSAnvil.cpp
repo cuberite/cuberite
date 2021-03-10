@@ -1,3 +1,8 @@
+
+// WSSAnvil.cpp
+
+// Implements the cWSSAnvil class representing the Anvil world storage scheme
+
 #include "Globals.h"
 #include "WSSAnvil.h"
 #include "NBTChunkSerializer.h"
@@ -13,6 +18,9 @@
 #include "../Root.h"
 #include "../BlockType.h"
 #include "../JsonUtils.h"
+
+#include "../Registries/BlockStates.h"
+#include "../Protocol/Palettes/Upgrade.h"
 
 #include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
@@ -59,7 +67,7 @@
 #include "../Server.h"
 #include "../BoundingBox.h"
 
-#include "../Protocol/Palettes/BlockMap.h"
+
 
 
 
@@ -80,12 +88,13 @@ Since only the header is actually in the memory, this number can be high, but st
 ////////////////////////////////////////////////////////////////////////////////
 // cWSSAnvil:
 
-cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor):
+cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 	Super(a_World),
 	m_Compressor(a_CompressionFactor)
 {
 	// Create a level.dat file for mapping tools, if it doesn't already exist:
-	auto fnam = fmt::format(FMT_STRING("{}{}level.dat"), a_World->GetDataPath(), cFile::PathSeparator());
+	AString fnam;
+	Printf(fnam, "%s%clevel.dat", a_World->GetDataPath().c_str(), cFile::PathSeparator());
 	if (!cFile::Exists(fnam))
 	{
 		cFastNBTWriter Writer;
@@ -99,12 +108,12 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor):
 		Writer.AddByte("thundering", a_World->IsWeatherStorm() ? 1 : 0);
 		Writer.AddInt("GameType", static_cast<int>(a_World->GetGameMode()));
 		Writer.AddInt("generatorVersion", 1);
-		Writer.AddInt("SpawnX", a_World->GetSpawnX());
-		Writer.AddInt("SpawnY", a_World->GetSpawnY());
-		Writer.AddInt("SpawnZ", a_World->GetSpawnZ());
+		Writer.AddInt("SpawnX", FloorC(a_World->GetSpawnX()));
+		Writer.AddInt("SpawnY", FloorC(a_World->GetSpawnY()));
+		Writer.AddInt("SpawnZ", FloorC(a_World->GetSpawnZ()));
 		Writer.AddInt("version", 19133);
-		Writer.AddLong("DayTime", a_World->GetWorldDate().count());
-		Writer.AddLong("Time", a_World->GetWorldAge().count());
+		Writer.AddLong("DayTime", a_World->GetTimeOfDay());
+		Writer.AddLong("Time", a_World->GetWorldAge());
 		Writer.AddLong("SizeOnDisk", 0);
 		Writer.AddString("generatorName", "default");
 		Writer.AddString("generatorOptions", "");
@@ -123,7 +132,10 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor):
 cWSSAnvil::~cWSSAnvil()
 {
 	cCSLock Lock(m_CS);
-	m_Files.clear();
+	for (cMCAFiles::iterator itr = m_Files.begin(); itr != m_Files.end(); ++itr)
+	{
+		delete *itr;
+	}  // for itr - m_Files[]
 }
 
 
@@ -170,10 +182,11 @@ bool cWSSAnvil::SaveChunk(const cChunkCoords & a_Chunk)
 
 
 
-void cWSSAnvil::ChunkLoadFailed(const cChunkCoords a_ChunkCoords, const AString & a_Reason, const ContiguousByteBufferView a_ChunkDataToSave)
+void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Reason, const ContiguousByteBufferView a_ChunkDataToSave)
 {
 	// Construct the filename for offloading:
-	auto OffloadFileName = fmt::format(FMT_STRING("{0}{1}region{1}badchunks"), m_World->GetDataPath(), cFile::PathSeparator());
+	AString OffloadFileName;
+	Printf(OffloadFileName, "%s%cregion%cbadchunks", m_World->GetDataPath().c_str(), cFile::PathSeparator(), cFile::PathSeparator());
 	cFile::CreateFolder(OffloadFileName);
 	auto t = time(nullptr);
 	struct tm stm;
@@ -182,26 +195,24 @@ void cWSSAnvil::ChunkLoadFailed(const cChunkCoords a_ChunkCoords, const AString 
 	#else
 		localtime_r(&t, &stm);
 	#endif
-	OffloadFileName.append(fmt::format(
-		FMT_STRING("{}ch.{}.{}.{}-{:02d}-{:02d}-{:02d}-{:02d}-{:02d}.dat"),
-		cFile::PathSeparator(), a_ChunkCoords.m_ChunkX, a_ChunkCoords.m_ChunkZ,
+	AppendPrintf(OffloadFileName, "%cch.%d.%d.%d-%02d-%02d-%02d-%02d-%02d.dat",
+		cFile::PathSeparator(), a_ChunkX, a_ChunkZ,
 		stm.tm_year + 1900, stm.tm_mon + 1, stm.tm_mday, stm.tm_hour, stm.tm_min, stm.tm_sec
-	));
+	);
 
 	// Log the warning to console:
-	const int RegionX = FAST_FLOOR_DIV(a_ChunkCoords.m_ChunkX, 32);
-	const int RegionZ = FAST_FLOOR_DIV(a_ChunkCoords.m_ChunkZ, 32);
-	auto Info = fmt::format(
-		FMT_STRING("Loading chunk {} for world {} from file r.{}.{}.mca failed: {} Offloading old chunk data to file {} and regenerating chunk."),
-		a_ChunkCoords, m_World->GetName(), RegionX, RegionZ, a_Reason, OffloadFileName
+	const int RegionX = FAST_FLOOR_DIV(a_ChunkX, 32);
+	const int RegionZ = FAST_FLOOR_DIV(a_ChunkZ, 32);
+	AString Info = Printf("Loading chunk [%d, %d] for world %s from file r.%d.%d.mca failed: %s Offloading old chunk data to file %s and regenerating chunk.",
+		a_ChunkX, a_ChunkZ, m_World->GetName().c_str(), RegionX, RegionZ, a_Reason.c_str(), OffloadFileName.c_str()
 	);
-	LOGWARNING("%s", Info);
+	LOGWARNING("%s", Info.c_str());
 
 	// Write the data:
 	cFile f;
 	if (!f.Open(OffloadFileName, cFile::fmWrite))
 	{
-		LOGWARNING("Cannot open file %s for writing! Old chunk data is lost.", OffloadFileName);
+		LOGWARNING("Cannot open file %s for writing! Old chunk data is lost.", OffloadFileName.c_str());
 		return;
 	}
 	f.Write(a_ChunkDataToSave.data(), a_ChunkDataToSave.size());
@@ -210,7 +221,7 @@ void cWSSAnvil::ChunkLoadFailed(const cChunkCoords a_ChunkCoords, const AString 
 	// Write a description file:
 	if (!f.Open(OffloadFileName + ".info", cFile::fmWrite))
 	{
-		LOGWARNING("Cannot open file %s.info for writing! The information about the failed chunk will not be written.", OffloadFileName);
+		LOGWARNING("Cannot open file %s.info for writing! The information about the failed chunk will not be written.", OffloadFileName.c_str());
 		return;
 	}
 	f.Write(Info.c_str(), Info.size());
@@ -224,7 +235,7 @@ void cWSSAnvil::ChunkLoadFailed(const cChunkCoords a_ChunkCoords, const AString 
 bool cWSSAnvil::GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data)
 {
 	cCSLock Lock(m_CS);
-	auto File = LoadMCAFile(a_Chunk);
+	cMCAFile * File = LoadMCAFile(a_Chunk);
 	if (File == nullptr)
 	{
 		return false;
@@ -239,7 +250,7 @@ bool cWSSAnvil::GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer 
 bool cWSSAnvil::SetChunkData(const cChunkCoords & a_Chunk, const ContiguousByteBufferView a_Data)
 {
 	cCSLock Lock(m_CS);
-	auto File = LoadMCAFile(a_Chunk);
+	cMCAFile * File = LoadMCAFile(a_Chunk);
 	if (File == nullptr)
 	{
 		return false;
@@ -251,7 +262,7 @@ bool cWSSAnvil::SetChunkData(const cChunkCoords & a_Chunk, const ContiguousByteB
 
 
 
-std::shared_ptr<cWSSAnvil::cMCAFile> cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
+cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 {
 	// ASSUME m_CS is locked
 	ASSERT(m_CS.IsLocked());
@@ -264,12 +275,12 @@ std::shared_ptr<cWSSAnvil::cMCAFile> cWSSAnvil::LoadMCAFile(const cChunkCoords &
 	ASSERT(a_Chunk.m_ChunkZ - RegionZ * 32 < 32);
 
 	// Is it already cached?
-	for (auto itr = m_Files.begin(); itr != m_Files.end(); ++itr)
+	for (cMCAFiles::iterator itr = m_Files.begin(); itr != m_Files.end(); ++itr)
 	{
 		if (((*itr) != nullptr) && ((*itr)->GetRegionX() == RegionX) && ((*itr)->GetRegionZ() == RegionZ))
 		{
 			// Move the file to front and return it:
-			auto f = *itr;
+			cMCAFile * f = *itr;
 			if (itr != m_Files.begin())
 			{
 				m_Files.erase(itr);
@@ -280,10 +291,11 @@ std::shared_ptr<cWSSAnvil::cMCAFile> cWSSAnvil::LoadMCAFile(const cChunkCoords &
 	}
 
 	// Load it anew:
-	auto FileName = fmt::format(FMT_STRING("{}{}region"), m_World->GetDataPath(), cFile::PathSeparator());
+	AString FileName;
+	Printf(FileName, "%s%cregion", m_World->GetDataPath().c_str(), cFile::PathSeparator());
 	cFile::CreateFolder(FileName);
-	FileName.append(fmt::format(FMT_STRING("/r.{}.{}.mca"), RegionX, RegionZ));
-	auto f = std::make_shared<cMCAFile>(*this, FileName, RegionX, RegionZ);
+	AppendPrintf(FileName, "/r.%d.%d.mca", RegionX, RegionZ);
+	cMCAFile * f = new cMCAFile(*this, FileName, RegionX, RegionZ);
 	if (f == nullptr)
 	{
 		return nullptr;
@@ -293,6 +305,7 @@ std::shared_ptr<cWSSAnvil::cMCAFile> cWSSAnvil::LoadMCAFile(const cChunkCoords &
 	// If there are too many MCA files cached, delete the last one used:
 	if (m_Files.size() > MAX_MCA_FILES)
 	{
+		delete m_Files.back();
 		m_Files.pop_back();
 	}
 	return f;
@@ -320,7 +333,7 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const Contiguous
 	}
 	catch (const std::exception & Oops)
 	{
-		ChunkLoadFailed(a_Chunk, Oops.what(), a_Data);
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Oops.what(), a_Data);
 		return false;
 	}
 }
@@ -345,330 +358,26 @@ Compression::Result cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk)
 bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, const ContiguousByteBufferView a_RawChunkData)
 {
 	struct SetChunkData Data(a_Chunk);
-	
-	if (newFormat)
-	{
-		// LOGD("LOADING chunk X %d Z %d", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
-		int Level = a_NBT.FindChildByName(0, "Level");
-		if (Level < 0)
-		{
-			ChunkLoadFailed(a_Chunk, "Missing NBT tag: Level", a_RawChunkData);
-			return false;
-		}
-		int DataVersionTag = a_NBT.FindChildByName(0, "DataVersion");
-		if (DataVersionTag < 0)
-		{
-			ChunkLoadFailed(a_Chunk, "Missing NBT tag: DataVersion", a_RawChunkData);
-			return false;
-		}
-		int DataVersion = a_NBT.GetInt(DataVersionTag);
-		int Sections = a_NBT.FindChildByName(Level, "Sections");
-		if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
-		{
-			ChunkLoadFailed(a_Chunk, "Missing NBT tag: Sections", a_RawChunkData);
-			return false;
-		}
-		eTagType SectionsType = a_NBT.GetChildrenType(Sections);
-		if ((SectionsType != TAG_Compound) && (SectionsType != TAG_End))
-		{
-			ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Sections", a_RawChunkData);
-			return false;
-		}
-
-		for (int Child = a_NBT.GetFirstChild(Sections); Child >= 0; Child = a_NBT.GetNextSibling(Child))
-		{
-			const int SectionYTag = a_NBT.FindChildByName(Child, "Y");
-			if ((SectionYTag < 0) || (a_NBT.GetType(SectionYTag) != TAG_Byte))
-			{
-				ChunkLoadFailed(a_Chunk, "NBT tag missing or has wrong: Y", a_RawChunkData);
-				return false;
-			}
-			// Y level can go negative in 1.13+ worlds
-			// in 1.18 it goes to -4
-			// Section num can go higher in newer versions
-			const int Y = (signed char)a_NBT.GetByte(SectionYTag);
-			if ((Y < -1) || (Y > static_cast<int>(cChunkDef::NumSections - 1)))
-			{
-				ChunkLoadFailed(a_Chunk, "NBT tag exceeds chunk bounds: Y", a_RawChunkData);
-				return false;
-			}
-
-			// BlockStateData = reinterpret_cast<byte*>(reinterpret_cast<const Int64*>(BlockStateData))
-
-			int PaletteList = a_NBT.FindChildByName(Child, "Palette");
-			if (PaletteList < 0)
-			{
-				// The pallete does not have to exists but that also means that the section is empty and should be ignored
-				continue;
-			}
-			if (a_NBT.GetType(PaletteList) != TAG_List)
-			{
-				ChunkLoadFailed(a_Chunk, "Missing NBT tag: Palette", a_RawChunkData);
-				return false;
-			}
-
-			eTagType PaletteListType = a_NBT.GetChildrenType(PaletteList);
-			if ((PaletteListType != TAG_Compound) && (PaletteListType != TAG_End))
-			{
-				ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Palette", a_RawChunkData);
-				return false;
-			}
-
-			AStringList Palette;
-
-			std::vector<NEWBLOCKTYPE> Paletteids;
-
-			for (int Child1 = a_NBT.GetFirstChild(PaletteList); Child1 >= 0; Child1 = a_NBT.GetNextSibling(Child1))
-			{
-				const int NameTagId = a_NBT.FindChildByName(Child1, "Name");
-				if ((NameTagId < 0) || (a_NBT.GetType(NameTagId) != TAG_String))
-				{
-					ChunkLoadFailed(a_Chunk, "NBT tag missing or has wrong type: Name", a_RawChunkData);
-					return false;
-				}
-				AString blockid = a_NBT.GetString(NameTagId);
-				if (!blockid._Starts_with("minecraft:"))
-				{
-					ChunkLoadFailed(a_Chunk, "Invalid namespace: " + blockid + " Mods arent supported", a_RawChunkData);
-					return false;
-				}
-				const int BlockStatesId = a_NBT.FindChildByName(Child1, "Properties");
-
-				AString bls = "";
-				std::vector<AString> strs;
-				if (BlockStatesId > 0)
-				{
-					if (a_NBT.GetType(BlockStatesId) != TAG_Compound)
-					{
-						ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Properties", a_RawChunkData);
-						return false;
-					}
-					for (int ProChild = a_NBT.GetFirstChild(BlockStatesId); ProChild >= 0; ProChild = a_NBT.GetNextSibling(ProChild))
-					{
-						AString name = a_NBT.GetName(ProChild);
-						AString value = a_NBT.GetString(ProChild);
-						bls = name + ": " + value + ", ";
-						strs.push_back(bls);
-					}
-				}
-				std::sort(strs.begin(),strs.end());
-
-				AString tosearch = blockid.substr(10,std::string::npos);  // substr to remove the "minecraft:"
-				if (strs.size() != 0)
-				{
-					tosearch += " ";
-				}
-				//tosearch += bls;
-				for each (auto itm in strs)
-				{
-					tosearch += itm;
-				}
-				if (strs.size() != 0)
-				{
-					tosearch = tosearch.substr(0, tosearch.size() - 2);
-				}
-				// LOGD("%d hash tbl size", (*BlockMap::BlMap::GetMap()).size());
-				//Check if 
-				int cnt = (*BlockMap::BlMap::GetMap()).count(tosearch);
-				if (cnt == 0)
-				{
-					UNREACHABLE("could find given block while lodaing chunk X: " + a_Chunk.m_ChunkX + " Z: " a_Chunk.m_ChunkZ + " Y Section: " + Y);
-				}
-				NEWBLOCKTYPE protocolblockid = (*BlockMap::BlMap::GetMap()).at(tosearch);
-				Paletteids.push_back(protocolblockid);
-
-				Palette.emplace_back(blockid.substr(strlen("minecraft:"), std::string::npos));
-			}
-			int IndexBitSize = std::max(4, static_cast<int>(std::ceil(std::log2(Paletteids.size()))));  // How many bits is one index in length. Min is 4 bits, maximum 12 bits
-			ASSERT((12 >= IndexBitSize) && (IndexBitSize >= 4));
-
-			int SectionBlockLongCount = IndexBitSize*4096/8/8;
-
-			const auto BlockStateData = GetSectionDataLong(a_NBT, Child, "BlockStates", SectionBlockLongCount /*ChunkBlockData::SectionBlockCount*/);
-				// MetaData = GetSectionData(a_NBT, Child, "Data", ChunkBlockData::SectionMetaCount), no longer exists
-			const auto BlockLightData = GetSectionData(a_NBT, Child, "BlockLight",ChunkLightData::SectionLightCount);	 // Still exists but does not have to be present for a valid section
-			const auto SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount); // Still exists but does not have to be present for a valid section
-
-			UInt64 * LEstates = new UInt64[SectionBlockLongCount];
-
-			for (size_t i = 0; i < SectionBlockLongCount; i++)
-			{
-				LEstates[i] = ntohll(reinterpret_cast<const UInt64*>(BlockStateData)[i]);
-			}
-
-			// Byte bitsleftover = 0;
-			// int valuesread = 0;
-			// int currentbyte = 0;
-			// needs better bounds checking
-			// u_short numblockdata[4096] = { 0 };
-			NEWBLOCKTYPE resolveddata[4096] = { AIR };
-			int numblockdataindex = 0;
-			int pl = Paletteids.size();
-
-			bool usepadding = DataVersion >= 2566;  // Enable padding for worlds generated in 1.16+
-
-			int BitIndex = 0;
-			int arrindex = 0;
-			while (numblockdataindex < 4096)
-			{
-				Int64 finalv = 0;
-				if (BitIndex + IndexBitSize <= 64)
-				{
-					finalv = (LEstates[arrindex] >> BitIndex) & ((1 << IndexBitSize)-1);
-					BitIndex += IndexBitSize;
-					if (BitIndex == 64)
-					{
-						BitIndex = 0;
-						arrindex++;
-					}
-				}
-				else  // BitIndex + IndexBitSize > 64
-				{
-					if (usepadding)
-					{
-						BitIndex = 0;
-						arrindex++;
-						continue;
-					}
-					UInt64 lowerpart = LEstates[arrindex] >> BitIndex;
-					arrindex++;
-					int BitsRead = (64 - BitIndex);
-					BitIndex = IndexBitSize - BitsRead;
-					UInt64 upperpart = (LEstates[arrindex] & ((static_cast<UInt64>(1) << BitIndex) - 1)) << BitsRead;
-					finalv = lowerpart | upperpart;
-				}
-				resolveddata[numblockdataindex] = Paletteids[finalv];
-				numblockdataindex++;
-			}
-
-			/* while (numblockdataindex < 4095)
-			{
-				numblockdataindex++;
-				int finalvalue = 0;
-				int reversebitmask = (0xFF ^ ((1 << (8 - bitsleftover))-1));
-				int bitsread = 0;
-				if (bitsleftover == 0)
-				{
-					finalvalue = static_cast<Byte>(LEstates[currentbyte]) & ((1 << IndexBitSize)-1);
-					bitsread = Clamp(IndexBitSize,0,8);
-					bitsleftover = 8 - IndexBitSize;
-				}
-				else
-				{
-					finalvalue = (static_cast<Byte>(LEstates[currentbyte]) & reversebitmask) >> (8 - bitsleftover);
-					bitsread = bitsleftover;
-					bitsleftover = std::clamp(8 - (bitsleftover + IndexBitSize),0,12);
-				}
-				int bitslefttoread = IndexBitSize - bitsread;
-				if (bitslefttoread <= 0)
-				{
-					numblockdata[numblockdataindex] = finalvalue;
-					if (bitsleftover == 0)
-					{
-						currentbyte++;
-					}
-					ASSERT(finalvalue < pl);
-					continue;
-				}
-				int Mask = (1 << bitslefttoread)-1;
-				if (currentbyte + 1 < 4096)
-				{
-					UNREACHABLE("Out of bounds reading block ids + 1");
-				}
-				finalvalue |= (static_cast<Byte>(LEstates[currentbyte+1]) & Mask) >> bitsread;
-				bitslefttoread -= 8;
-				if (bitslefttoread <= 0)
-				{
-					bitsleftover = (-bitslefttoread);
-					numblockdata[numblockdataindex] = finalvalue;
-					if (bitsleftover != 0)
-					{
-						currentbyte += 1;
-					}
-					else
-					{
-						currentbyte += 2;
-					}
-					ASSERT(finalvalue < pl);
-					continue;
-				}
-				Mask = (1 << bitslefttoread)-1;
-				if (currentbyte + 2 < 4096)
-				{
-					UNREACHABLE("Out of bounds reading block ids + 2");
-				}
-				finalvalue |= (static_cast<Byte>(LEstates[currentbyte+2]) & Mask) >> (8+bitsread);
-				if (finalvalue >= 1 << (IndexBitSize))
-				{
-					UNREACHABLE("block palette index too large");
-				}
-				numblockdata[numblockdataindex] = finalvalue;
-				if (bitsleftover != 0)
-				{
-					currentbyte += 2;
-				}
-				else
-				{
-					currentbyte += 3;
-				}
-				bitsleftover = (-bitslefttoread);
-				ASSERT(finalvalue < pl);
-			} */
-
-			Data.BlockData2.SetSection(resolveddata,Y);
-
-			if (BlockLightData != NULL && SkyLightData != NULL)
-			{
-				Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
-			}
-			char hm[256] = {0};
-			memset(&Data.HeightMap,0,256); // temp
-			memset(&Data.BiomeMap,0,1024); // temp
-			Data.IsLightValid = true;
-			delete[] LEstates;
-			// Data.BlockData.SetSection(*reinterpret_cast<const ChunkBlockData::SectionType *>(BlockData), *reinterpret_cast<const ChunkBlockData::SectionMetaType *>(MetaData), static_cast<size_t>(Y));
-			// Set the data
-			/*
-			if ((BlockData != nullptr) && (MetaData != nullptr) &&
-				(SkyLightData != nullptr) && (BlockLightData != nullptr))
-				{
-					Data.BlockData.SetSection(*reinterpret_cast<const ChunkBlockData::SectionType *>(BlockData), *reinterpret_cast<const ChunkBlockData::SectionMetaType *>(MetaData), static_cast<size_t>(Y));
-					Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
-				}
-				else
-				{
-					ChunkLoadFailed(a_Chunk, "Missing chunk block/light data", a_RawChunkData);
-					return false;
-				}*/
-
-		}  // for itr - LevelSections[]
-
-		// Load the entities from NBT:
-		LoadEntitiesFromNBT(Data.Entities,      a_NBT, a_NBT.FindChildByName(Level, "Entities"));
-	}
-
-	m_World->QueueSetChunkData(std::move(Data));
-	return true;
 
 	// Load the blockdata, blocklight and skylight:
 	int Level = a_NBT.FindChildByName(0, "Level");
 	if (Level < 0)
 	{
-		ChunkLoadFailed(a_Chunk, "Missing NBT tag: Level", a_RawChunkData);
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing NBT tag: Level", a_RawChunkData);
 		return false;
 	}
 
 	int Sections = a_NBT.FindChildByName(Level, "Sections");
 	if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
 	{
-		ChunkLoadFailed(a_Chunk, "Missing NBT tag: Sections", a_RawChunkData);
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing NBT tag: Sections", a_RawChunkData);
 		return false;
 	}
 
 	eTagType SectionsType = a_NBT.GetChildrenType(Sections);
 	if ((SectionsType != TAG_Compound) && (SectionsType != TAG_End))
 	{
-		ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Sections", a_RawChunkData);
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT tag has wrong type: Sections", a_RawChunkData);
 		return false;
 	}
 	for (int Child = a_NBT.GetFirstChild(Sections); Child >= 0; Child = a_NBT.GetNextSibling(Child))
@@ -676,14 +385,14 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		const int SectionYTag = a_NBT.FindChildByName(Child, "Y");
 		if ((SectionYTag < 0) || (a_NBT.GetType(SectionYTag) != TAG_Byte))
 		{
-			ChunkLoadFailed(a_Chunk, "NBT tag missing or has wrong: Y", a_RawChunkData);
+			ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT tag missing or has wrong: Y", a_RawChunkData);
 			return false;
 		}
 
 		const int Y = a_NBT.GetByte(SectionYTag);
 		if ((Y < 0) || (Y > static_cast<int>(cChunkDef::NumSections - 1)))
 		{
-			ChunkLoadFailed(a_Chunk, "NBT tag exceeds chunk bounds: Y", a_RawChunkData);
+			ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT tag exceeds chunk bounds: Y", a_RawChunkData);
 			return false;
 		}
 
@@ -694,12 +403,12 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount);
 		if ((BlockData != nullptr) && (MetaData != nullptr) && (SkyLightData != nullptr) && (BlockLightData != nullptr))
 		{
-			Data.BlockData.SetSection(*reinterpret_cast<const ChunkBlockData::SectionType *>(BlockData), *reinterpret_cast<const ChunkBlockData::SectionMetaType *>(MetaData), static_cast<size_t>(Y));
+			Data.BlockData.SetSection(*reinterpret_cast<const ChunkBlockData::SectionType *>(BlockData), static_cast<size_t>(Y));
 			Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
 		}
 		else
 		{
-			ChunkLoadFailed(a_Chunk, "Missing chunk block/light data", a_RawChunkData);
+			ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing chunk block/light data", a_RawChunkData);
 			return false;
 		}
 	}  // for itr - LevelSections[]
@@ -707,14 +416,15 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	// Load the biomes from NBT, if present and valid:
 	if (!LoadBiomeMapFromNBT(Data.BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "Biomes")))
 	{
-		ChunkLoadFailed(a_Chunk, "Missing chunk biome data", a_RawChunkData);
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing chunk biome data", a_RawChunkData);
 		return false;
 	}
 
-	// Load the Height map, if it fails, recalculate it:
+	// Height map too:
 	if (!LoadHeightMapFromNBT(Data.HeightMap, a_NBT, a_NBT.FindChildByName(Level, "HeightMap")))
 	{
-		Data.UpdateHeightMap();
+		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing chunk height data", a_RawChunkData);
+		return false;
 	}
 
 	// Load the entities from NBT:
@@ -732,7 +442,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	{
 		for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
 		{
-			const auto Index = cChunkDef::MakeIndex(x, y, z);
+			int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
 			if (ShouldInvert[x + cChunkDef::Width * z])
 			{
 				BlockTypes[Index] = (BlockTypes[Index] == E_BLOCK_AIR) ? E_BLOCK_STONE : E_BLOCK_AIR;
@@ -779,7 +489,7 @@ bool cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cPar
 	}
 
 	const auto * const BiomeData = a_NBT.GetData(a_TagIdx);
-	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
+	for (size_t i = 0; i < a_BiomeMap.size(); i++)
 	{
 		if (BiomeData[i] > std::byte(EMCSBiome::biMaxVariantBiome))
 		{
@@ -814,7 +524,7 @@ bool cWSSAnvil::LoadHeightMapFromNBT(cChunkDef::HeightMap & a_HeightMap, const c
 		for (int RelX = 0; RelX < cChunkDef::Width; RelX++)
 		{
 			const int Index = 4 * (RelX + RelZ * cChunkDef::Width);
-			const int Height = NetworkBufToHost<Int32>(HeightData + Index);
+			const int Height = GetBEInt(HeightData + Index);
 
 			if (Height > std::numeric_limits<HEIGHTTYPE>::max())
 			{
@@ -891,13 +601,12 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 		const auto relPos = cChunkDef::AbsoluteToRelative(absPos);
 
 		// Load the proper BlockEntity type based on the block type:
-		const auto BlockType = a_BlockData.GetBlock(relPos);
-		const auto BlockMeta = a_BlockData.GetMeta(relPos);
+		const auto Block = a_BlockData.GetBlock(relPos);
 		OwnedBlockEntity Entity;
 
 		try
 		{
-			Entity = LoadBlockEntityFromNBT(a_NBT, Child, absPos, BlockType, BlockMeta);
+			Entity = LoadBlockEntityFromNBT(a_NBT, Child, absPos, Block);
 		}
 		catch (...)
 		{
@@ -911,10 +620,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 		}
 
 		// Index computed before Entity moved.
-		const auto Index = cChunkDef::MakeIndex(Entity->GetRelPos());
+		const auto Idx = cChunkDef::MakeIndexNoCheck(Entity->GetRelPos());
 
 		// Add the BlockEntity to the loaded data:
-		a_BlockEntities.emplace(Index, std::move(Entity));
+		a_BlockEntities.emplace(Idx, std::move(Entity));
 	}  // for Child - tag children
 }
 
@@ -922,47 +631,127 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a_Tag, Vector3i a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a_Tag, Vector3i a_Pos, BlockState a_Block)
 {
 	ASSERT((a_Pos.y >= 0) && (a_Pos.y < cChunkDef::Height));
 
 	// Load the specific BlockEntity type:
-	switch (a_BlockType)
+	switch (a_Block.Type())
 	{
-		// Banners:
-		case E_BLOCK_STANDING_BANNER:
-		case E_BLOCK_WALL_BANNER:        return LoadBannerFromNBT          (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		// Specific entity loaders:
+		case BlockType::BlackBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BrownBanner:
+		case BlockType::CyanBanner:
+		case BlockType::GrayBanner:
+		case BlockType::GreenBanner:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LimeBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::OrangeBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::RedBanner:
+		case BlockType::WhiteBanner:
+		case BlockType::YellowBanner:
 
-		// Others:
-		case E_BLOCK_BEACON:             return LoadBeaconFromNBT          (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_BED:                return LoadBedFromNBT             (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_BREWING_STAND:      return LoadBrewingstandFromNBT    (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_CHEST:              return LoadChestFromNBT           (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_COMMAND_BLOCK:      return LoadCommandBlockFromNBT    (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_DISPENSER:          return LoadDispenserFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_DROPPER:            return LoadDropperFromNBT         (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_ENCHANTMENT_TABLE:  return LoadEnchantingTableFromNBT (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_ENDER_CHEST:        return LoadEnderChestFromNBT      (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_END_PORTAL:         return LoadEndPortalFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_FLOWER_POT:         return LoadFlowerPotFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_FURNACE:            return LoadFurnaceFromNBT         (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_HEAD:               return LoadMobHeadFromNBT         (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_HOPPER:             return LoadHopperFromNBT          (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_JUKEBOX:            return LoadJukeboxFromNBT         (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_LIT_FURNACE:        return LoadFurnaceFromNBT         (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_MOB_SPAWNER:        return LoadMobSpawnerFromNBT      (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_NOTE_BLOCK:         return LoadNoteBlockFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_SIGN_POST:          return LoadSignFromNBT            (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_TRAPPED_CHEST:      return LoadChestFromNBT           (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-		case E_BLOCK_WALLSIGN:           return LoadSignFromNBT            (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownWallBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedWallBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowWallBanner: return LoadBannerFromNBT         (a_NBT, a_Tag, a_Block, a_Pos);
+
+		case BlockType::Beacon:          return LoadBeaconFromNBT          (a_NBT, a_Tag, a_Block, a_Pos);
+		case BlockType::BlackBed:
+		case BlockType::BlueBed:
+		case BlockType::BrownBed:
+		case BlockType::CyanBed:
+		case BlockType::GrayBed:
+		case BlockType::GreenBed:
+		case BlockType::LightBlueBed:
+		case BlockType::LightGrayBed:
+		case BlockType::LimeBed:
+		case BlockType::MagentaBed:
+		case BlockType::OrangeBed:
+		case BlockType::PinkBed:
+		case BlockType::PurpleBed:
+		case BlockType::RedBed:
+		case BlockType::WhiteBed:
+		case BlockType::YellowBed:
+			return LoadBedFromNBT(a_NBT, a_Tag, a_Block, a_Pos);
+
+		case BlockType::BrewingStand:    return LoadBrewingstandFromNBT    (a_NBT, a_Tag, a_Block, a_Pos);
+		case BlockType::Chest:           return LoadChestFromNBT           (a_NBT, a_Tag, a_Block, a_Pos);
+		case BlockType::CommandBlock:    return LoadCommandBlockFromNBT    (a_NBT, a_Tag, a_Block, a_Pos);
+		case BlockType::Dispenser:       return LoadDispenserFromNBT       (a_NBT, a_Tag, a_Block, a_Pos);
+		case BlockType::Dropper:         return LoadDropperFromNBT         (a_NBT, a_Tag, a_Block, a_Pos);
+		case BlockType::EnchantingTable: return LoadEnchantingTableFromNBT (a_NBT, a_Tag, a_Block, a_Pos);
+		case BlockType::EnderChest:      return LoadEnderChestFromNBT      (a_NBT, a_Tag, a_Block, a_Pos);
+		case BlockType::EndPortal:       return LoadEndPortalFromNBT       (a_NBT, a_Tag, a_Block, a_Pos);
+		case BlockType::FlowerPot:       return LoadFlowerPotFromNBT       (a_NBT, a_Tag, a_Block, a_Pos);
+		case BlockType::Furnace:         return LoadFurnaceFromNBT         (a_NBT, a_Tag, a_Block, a_Pos);
+
+		case BlockType::CreeperHead:
+		case BlockType::CreeperWallHead:
+		case BlockType::DragonHead:
+		case BlockType::DragonWallHead:
+		case BlockType::PlayerHead:
+		case BlockType::PlayerWallHead:
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:
+		case BlockType::SkeletonSkull:
+		case BlockType::SkeletonWallSkull:
+		case BlockType::WitherSkeletonSkull:
+		case BlockType::WitherSkeletonWallSkull:
+			return LoadMobHeadFromNBT(a_NBT, a_Tag, a_Block, a_Pos);
+
+		case BlockType::Hopper:          return LoadHopperFromNBT          (a_NBT, a_Tag, a_Block, a_Pos);
+		case BlockType::Jukebox:         return LoadJukeboxFromNBT         (a_NBT, a_Tag, a_Block, a_Pos);
+		case BlockType::Spawner:         return LoadMobSpawnerFromNBT      (a_NBT, a_Tag, a_Block, a_Pos);
+		case BlockType::NoteBlock:       return LoadNoteBlockFromNBT       (a_NBT, a_Tag, a_Block, a_Pos);
+
+		case BlockType::AcaciaSign:
+		case BlockType::AcaciaWallSign:
+		case BlockType::BirchSign:
+		case BlockType::BirchWallSign:
+		case BlockType::CrimsonSign:
+		case BlockType::CrimsonWallSign:
+		case BlockType::DarkOakSign:
+		case BlockType::DarkOakWallSign:
+		case BlockType::JungleSign:
+		case BlockType::JungleWallSign:
+		case BlockType::OakSign:
+		case BlockType::OakWallSign:
+		case BlockType::SpruceSign:
+		case BlockType::SpruceWallSign:
+		case BlockType::WarpedSign:
+		case BlockType::WarpedWallSign:
+			return LoadSignFromNBT(a_NBT, a_Tag, a_Block, a_Pos);
+
+		case BlockType::TrappedChest:    return LoadChestFromNBT           (a_NBT, a_Tag, a_Block, a_Pos);
+
 		default:
 		{
 			// All the other blocktypes should have no entities assigned to them. Report an error:
 			// Get the "id" tag:
 			int TagID = a_NBT.FindChildByName(a_Tag, "id");
+			auto NumericBlock = PaletteUpgrade::ToBlock(a_Block);
 			FLOGINFO("WorldLoader({0}): Block entity mismatch: block type {1} ({2}), type \"{3}\", at {4}; the entity will be lost.",
 				m_World->GetName(),
-				ItemTypeToString(a_BlockType), a_BlockType, (TagID >= 0) ? a_NBT.GetStringView(TagID) : "unknown",
+				NumericBlock.first,
+				ItemTypeToString(NumericBlock.first), NumericBlock.first, (TagID >= 0) ? a_NBT.GetStringView(TagID) : "unknown",
 				a_Pos
 			);
 			return nullptr;
@@ -1186,38 +975,30 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
-	static const AStringVector expectedTypes({"Banner", "minecraft:standingbanner","minecraft:wallbanner"});
+	static const AStringVector expectedTypes({"Banner", "minecraft:standingbanner","minecraft:wallbanner"});  // TODO(12xx12): update list
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
 	}
 
-	unsigned char Color = 15;
-	AString CustomName;
-
 	// Reads base color from NBT
 	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Base");
 	if (CurrentLine >= 0)
 	{
-		Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
+		const auto Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
+		return std::make_unique<cBannerEntity>(a_Block, a_Pos, m_World, Color);
 	}
 
-	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "CustomName");
-	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_String))
-	{
-		CustomName = a_NBT.GetString(CurrentLine);
-	}
-
-	return std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color, CustomName);
+	return nullptr;
 }
 
 
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({"Beacon", "minecraft:beacon"});
@@ -1226,7 +1007,7 @@ OwnedBlockEntity cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_Ta
 		return nullptr;
 	}
 
-	auto Beacon = std::make_unique<cBeaconEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	auto Beacon = std::make_unique<cBeaconEntity>(a_Block, a_Pos, m_World);
 
 	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Levels");
 	if (CurrentLine >= 0)
@@ -1260,7 +1041,7 @@ OwnedBlockEntity cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_Ta
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadBedFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadBedFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Bed", "minecraft:bed" });
@@ -1278,14 +1059,14 @@ OwnedBlockEntity cWSSAnvil::LoadBedFromNBT(const cParsedNBT & a_NBT, int a_TagId
 		Color = static_cast<short>(a_NBT.GetInt(ColorIDx));
 	}
 
-	return std::make_unique<cBedEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color);
+	return std::make_unique<cBedEntity>(a_Block, a_Pos, m_World, Color);
 }
 
 
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Brewingstand", "minecraft:brewing_stand" });
@@ -1300,7 +1081,7 @@ OwnedBlockEntity cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, in
 		return nullptr;  // Make it an empty brewingstand - the chunk loader will provide an empty cBrewingstandEntity for this
 	}
 
-	auto Brewingstand = std::make_unique<cBrewingstandEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	auto Brewingstand = std::make_unique<cBrewingstandEntity>(a_Block, a_Pos, m_World);
 
 	// Fuel has to be loaded at first, because of slot events:
 	int Fuel = a_NBT.FindChildByName(a_TagIdx, "Fuel");
@@ -1343,7 +1124,7 @@ OwnedBlockEntity cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, in
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	// Note that older Cuberite code used "TrappedChest" for trapped chests; new code mimics vanilla and uses "Chest" throughout, but we allow migration here:
@@ -1358,7 +1139,7 @@ OwnedBlockEntity cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	{
 		return nullptr;  // Make it an empty chest - the chunk loader will provide an empty cChestEntity for this
 	}
-	auto Chest = std::make_unique<cChestEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	auto Chest = std::make_unique<cChestEntity>(a_Block, a_Pos, m_World);
 	LoadItemGridFromNBT(Chest->GetContents(), a_NBT, Items);
 	return Chest;
 }
@@ -1367,7 +1148,7 @@ OwnedBlockEntity cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_Tag
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Control", "minecraft:command_block" });
@@ -1376,7 +1157,7 @@ OwnedBlockEntity cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, in
 		return nullptr;
 	}
 
-	auto CmdBlock = std::make_unique<cCommandBlockEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	auto CmdBlock = std::make_unique<cCommandBlockEntity>(a_Block, a_Pos, m_World);
 
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Command");
 	if (currentLine >= 0)
@@ -1387,7 +1168,7 @@ OwnedBlockEntity cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, in
 	currentLine = a_NBT.FindChildByName(a_TagIdx, "SuccessCount");
 	if (currentLine >= 0)
 	{
-		CmdBlock->SetResult(static_cast<NIBBLETYPE>(a_NBT.GetInt(currentLine)));
+		CmdBlock->SetResult(static_cast<unsigned char>(a_NBT.GetInt(currentLine)));
 	}
 
 	currentLine = a_NBT.FindChildByName(a_TagIdx, "LastOutput");
@@ -1405,7 +1186,7 @@ OwnedBlockEntity cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, in
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Trap", "minecraft:dispenser" });
@@ -1419,7 +1200,7 @@ OwnedBlockEntity cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a
 	{
 		return nullptr;  // Make it an empty dispenser - the chunk loader will provide an empty cDispenserEntity for this
 	}
-	auto Dispenser = std::make_unique<cDispenserEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	auto Dispenser = std::make_unique<cDispenserEntity>(a_Block, a_Pos, m_World);
 	LoadItemGridFromNBT(Dispenser->GetContents(), a_NBT, Items);
 	return Dispenser;
 }
@@ -1428,7 +1209,7 @@ OwnedBlockEntity cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Dropper", "minecraft:dropper" });
@@ -1442,7 +1223,7 @@ OwnedBlockEntity cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_T
 	{
 		return nullptr;  // Make it an empty dropper - the chunk loader will provide an empty cDropperEntity for this
 	}
-	auto Dropper = std::make_unique<cDropperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	auto Dropper = std::make_unique<cDropperEntity>(a_Block, a_Pos, m_World);
 	LoadItemGridFromNBT(Dropper->GetContents(), a_NBT, Items);
 	return Dropper;
 }
@@ -1451,7 +1232,7 @@ OwnedBlockEntity cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_T
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadEnchantingTableFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadEnchantingTableFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "EnchantingTable", "minecraft:enchanting_table" });
@@ -1469,14 +1250,14 @@ OwnedBlockEntity cWSSAnvil::LoadEnchantingTableFromNBT(const cParsedNBT & a_NBT,
 			CustomName = a_NBT.GetString(currentLine);
 		}
 	}
-	return std::make_unique<cEnchantingTableEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, CustomName);
+	return std::make_unique<cEnchantingTableEntity>(a_Block, a_Pos, m_World, CustomName);
 }
 
 
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadEnderChestFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadEnderChestFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "EnderChest", "minecraft:ender_chest" });
@@ -1484,14 +1265,14 @@ OwnedBlockEntity cWSSAnvil::LoadEnderChestFromNBT(const cParsedNBT & a_NBT, int 
 	{
 		return nullptr;
 	}
-	return std::make_unique<cEnderChestEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	return std::make_unique<cEnderChestEntity>(a_Block, a_Pos, m_World);
 }
 
 
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadEndPortalFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadEndPortalFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "EndPortal", "minecraft:end_portal" });
@@ -1499,14 +1280,14 @@ OwnedBlockEntity cWSSAnvil::LoadEndPortalFromNBT(const cParsedNBT & a_NBT, int a
 	{
 		return nullptr;
 	}
-	return std::make_unique<cEndPortalEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	return std::make_unique<cEndPortalEntity>(a_Block, a_Pos, m_World);
 }
 
 
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "FlowerPot", "minecraft:flower_pot" });
@@ -1515,7 +1296,7 @@ OwnedBlockEntity cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a
 		return nullptr;
 	}
 
-	auto FlowerPot = std::make_unique<cFlowerPotEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	auto FlowerPot = std::make_unique<cFlowerPotEntity>(a_Block, a_Pos, m_World);
 	cItem Item;
 
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Item");
@@ -1545,7 +1326,7 @@ OwnedBlockEntity cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Furnace", "minecraft:furnace" });
@@ -1560,7 +1341,7 @@ OwnedBlockEntity cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_T
 		return nullptr;  // Make it an empty furnace - the chunk loader will provide an empty cFurnaceEntity for this
 	}
 
-	auto Furnace = std::make_unique<cFurnaceEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	auto Furnace = std::make_unique<cFurnaceEntity>(a_Block, a_Pos, m_World);
 	Furnace->SetLoading(true);
 
 	// Load slots:
@@ -1605,7 +1386,7 @@ OwnedBlockEntity cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_T
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Hopper", "minecraft:hopper" });
@@ -1619,7 +1400,7 @@ OwnedBlockEntity cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_Ta
 	{
 		return nullptr;  // Make it an empty hopper - the chunk loader will provide an empty cHopperEntity for this
 	}
-	auto Hopper = std::make_unique<cHopperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	auto Hopper = std::make_unique<cHopperEntity>(a_Block, a_Pos, m_World);
 	LoadItemGridFromNBT(Hopper->GetContents(), a_NBT, Items);
 	return Hopper;
 }
@@ -1628,7 +1409,7 @@ OwnedBlockEntity cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_Ta
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "RecordPlayer", "minecraft:jukebox" });
@@ -1637,7 +1418,7 @@ OwnedBlockEntity cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_T
 		return nullptr;
 	}
 
-	auto Jukebox = std::make_unique<cJukeboxEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	auto Jukebox = std::make_unique<cJukeboxEntity>(a_Block, a_Pos, m_World);
 	int Record = a_NBT.FindChildByName(a_TagIdx, "Record");
 	if (Record >= 0)
 	{
@@ -1650,7 +1431,7 @@ OwnedBlockEntity cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_T
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "MobSpawner", "minecraft:mob_spawner" });
@@ -1659,7 +1440,7 @@ OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int 
 		return nullptr;
 	}
 
-	auto MobSpawner = std::make_unique<cMobSpawnerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	auto MobSpawner = std::make_unique<cMobSpawnerEntity>(a_Block, a_Pos, m_World);
 
 	// Load entity type
 	int Type = a_NBT.FindChildByName(a_TagIdx, "EntityId");
@@ -1734,7 +1515,7 @@ OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int 
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Skull", "minecraft:skull" });
@@ -1743,7 +1524,7 @@ OwnedBlockEntity cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_T
 		return nullptr;
 	}
 
-	auto MobHead = std::make_unique<cMobHeadEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	auto MobHead = std::make_unique<cMobHeadEntity>(a_Block, a_Pos, m_World);
 
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "SkullType");
 	if (currentLine >= 0)
@@ -1808,7 +1589,7 @@ OwnedBlockEntity cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_T
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Music", "minecraft:noteblock" });
@@ -1817,7 +1598,7 @@ OwnedBlockEntity cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a
 		return nullptr;
 	}
 
-	auto NoteBlock = std::make_unique<cNoteEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	auto NoteBlock = std::make_unique<cNoteEntity>(a_Block, a_Pos, m_World);
 	int note = a_NBT.FindChildByName(a_TagIdx, "note");
 	if (note >= 0)
 	{
@@ -1830,7 +1611,7 @@ OwnedBlockEntity cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Sign", "minecraft:sign" });
@@ -1839,7 +1620,7 @@ OwnedBlockEntity cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagI
 		return nullptr;
 	}
 
-	auto Sign = std::make_unique<cSignEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	auto Sign = std::make_unique<cSignEntity>(a_Block, a_Pos, m_World);
 
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Text1");
 	if (currentLine >= 0)
@@ -1964,29 +1745,29 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		case mtHoglin:          return LoadHoglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtHusk:            return LoadHuskFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtIllusioner:      return LoadIllusionerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtIronGolem:       return LoadIronGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtLlama:           return LoadLlamaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtMagmaCube:       return LoadMagmaCubeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtMooshroom:       return LoadMooshroomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtMule:            return LoadMuleFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtOcelot:          return LoadOcelotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPanda:           return LoadPandaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtParrot:          return LoadParrotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPhantom:         return LoadPhantomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPig:             return LoadPigFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPiglin:          return LoadPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPiglinBrute:     return LoadPiglinBruteFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPillager:        return LoadPillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPolarBear:       return LoadPolarBearFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPufferfish:      return LoadPufferfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtRabbit:          return LoadRabbitFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtRavager:         return LoadRavagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSalmon:          return LoadSalmonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSheep:           return LoadSheepFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtShulker:         return LoadShulkerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSilverfish:      return LoadSilverfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSkeleton:        return LoadSkeletonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSkeletonHorse:   return LoadSkeletonHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtIronGolem:       return LoadVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtLlama:           return LoadIronGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtMagmaCube:       return LoadLlamaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtMooshroom:       return LoadMagmaCubeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtMule:            return LoadMooshroomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtOcelot:          return LoadMuleFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPanda:           return LoadOcelotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtParrot:          return LoadPandaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPhantom:         return LoadParrotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPig:             return LoadPhantomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPiglin:          return LoadPigFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPiglinBrute:     return LoadPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPillager:        return LoadPiglinBruteFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPolarBear:       return LoadPillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPufferfish:      return LoadPolarBearFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtRabbit:          return LoadPufferfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtRavager:         return LoadRabbitFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSalmon:          return LoadRavagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSheep:           return LoadSalmonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtShulker:         return LoadSheepFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSilverfish:      return LoadShulkerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSkeleton:        return LoadSilverfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSkeletonHorse:   return LoadSkeletonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtSlime:           return LoadSlimeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtSnowGolem:       return LoadSnowGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtSpider:          return LoadSpiderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
@@ -2009,7 +1790,6 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		case mtZombieHorse:     return LoadZombieHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtZombifiedPiglin: return LoadZombifiedPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtZombieVillager:  return LoadZombieVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtBee:             break;  // TODO: implement bee nbt
 		case mtInvalidType:     break;
 	}
 }
@@ -2118,10 +1898,10 @@ void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedN
 		return;
 	}
 
-	BLOCKTYPE Type = static_cast<BLOCKTYPE>(a_NBT.GetInt(TypeIdx));
-	NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_NBT.GetByte(MetaIdx));
+	auto Type = static_cast<unsigned char>(a_NBT.GetInt(TypeIdx));
+	auto Meta = static_cast<unsigned char>(a_NBT.GetByte(MetaIdx));
 
-	auto FallingBlock = std::make_unique<cFallingBlock>(Vector3i(0, 0, 0), Type, Meta);
+	auto FallingBlock = std::make_unique<cFallingBlock>(Vector3i(0, 0, 0), PaletteUpgrade::FromBlock(Type, Meta));
 	if (!LoadEntityBaseFromNBT(*FallingBlock.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2407,7 +2187,7 @@ void cWSSAnvil::LoadPaintingFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		return;
 	}
 
-	auto Painting = std::make_unique<cPainting>(a_NBT.GetString(MotiveTag), BLOCK_FACE_NONE, Vector3d(), 0);
+	auto Painting = std::make_unique<cPainting>(a_NBT.GetString(MotiveTag), BLOCK_FACE_NONE, Vector3d());
 	if (!LoadEntityBaseFromNBT(*Painting.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -3572,12 +3352,6 @@ void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		Monster->SetAge(Age);
 	}
 
-	int InventoryIdx = a_NBT.FindChildByName(a_TagIdx, "Inventory");
-	if (InventoryIdx > 0)
-	{
-		LoadItemGridFromNBT(Monster->GetInventory(), a_NBT, InventoryIdx);
-	}
-
 
 	a_Entities.emplace_back(std::move(Monster));
 }
@@ -3953,7 +3727,7 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 		Rotation[1] = 0;
 	}
 	a_Entity.SetYaw(Rotation[0]);
-	a_Entity.SetPitch(Rotation[1]);
+	a_Entity.SetRoll(Rotation[1]);
 
 	// Depending on the Minecraft version, the entity's health is
 	// stored either as a float Health tag (HealF prior to 1.9) or
@@ -4284,21 +4058,21 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, ContiguousB
 	UInt32 ChunkSize = 0;
 	if (m_File.Read(&ChunkSize, 4) != 4)
 	{
-		m_ParentSchema.ChunkLoadFailed(a_Chunk, "Cannot read chunk size", {});
+		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk size", {});
 		return false;
 	}
 	ChunkSize = ntohl(ChunkSize);
 	if (ChunkSize < 1)
 	{
 		// Chunk size too small
-		m_ParentSchema.ChunkLoadFailed(a_Chunk, "Chunk size too small", {});
+		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Chunk size too small", {});
 		return false;
 	}
 
 	char CompressionType = 0;
 	if (m_File.Read(&CompressionType, 1) != 1)
 	{
-		m_ParentSchema.ChunkLoadFailed(a_Chunk, "Cannot read chunk compression", {});
+		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk compression", {});
 		return false;
 	}
 	ChunkSize--;
@@ -4306,14 +4080,14 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, ContiguousB
 	a_Data = m_File.Read(ChunkSize);
 	if (a_Data.size() != ChunkSize)
 	{
-		m_ParentSchema.ChunkLoadFailed(a_Chunk, "Cannot read entire chunk data", a_Data);
+		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read entire chunk data", a_Data);
 		return false;
 	}
 
 	if (CompressionType != 2)
 	{
 		// Chunk is in an unknown compression
-		m_ParentSchema.ChunkLoadFailed(a_Chunk, fmt::format(FMT_STRING("Unknown chunk compression: {}"), CompressionType), a_Data);
+		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Printf("Unknown chunk compression: %d", CompressionType), a_Data);
 		return false;
 	}
 	return true;
@@ -4332,22 +4106,6 @@ const std::byte * cWSSAnvil::GetSectionData(const cParsedNBT & a_NBT, int a_Tag,
 	}
 	return nullptr;
 }
-
-
-
-
-
-
-const std::byte * cWSSAnvil::GetSectionDataLong(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, size_t a_Length)
-{
-	int Child = a_NBT.FindChildByName(a_Tag, a_ChildName);
-	if ((Child >= 0) && (a_NBT.GetType(Child) == TAG_LongArray) && (a_NBT.GetDataLength(Child) == a_Length * 8))
-	{
-		return a_NBT.GetData(Child);
-	}
-	return nullptr;
-}
-
 
 
 

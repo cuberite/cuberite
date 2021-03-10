@@ -10,7 +10,7 @@
 
 
 cPig::cPig(void) :
-	Super("Pig", mtPig, "entity.pig.hurt", "entity.pig.death", "entity.pig.ambient", 0.9f, 0.9f),
+	Super("Pig", mtPig, "entity.pig.hurt", "entity.pig.death", "entity.pig.ambient", 0.9, 0.9),
 	m_bIsSaddled(false)
 {
 }
@@ -31,10 +31,10 @@ void cPig::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? E_ITEM_COOKED_PORKCHOP : E_ITEM_RAW_PORKCHOP);
+	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? Item::CookedPorkchop : Item::Porkchop);
 	if (m_bIsSaddled)
 	{
-		a_Drops.emplace_back(E_ITEM_SADDLE, static_cast<char>(1));
+		a_Drops.emplace_back(Item::Saddle, 1);
 	}
 }
 
@@ -67,8 +67,8 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 			m_Attachee->Detach();
 		}
 
-		// Attach the player to this pig:
-		a_Player.AttachTo(*this);
+		// Attach the player to this pig
+		a_Player.AttachTo(this);
 	}
 	else if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE)
 	{

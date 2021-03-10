@@ -2,10 +2,12 @@
 #pragma once
 
 #include "BlockEntities/BlockEntity.h"
+#include "Entities/Entity.h"
 #include "ChunkData.h"
 
 #include "Simulator/FireSimulator.h"
 #include "Simulator/SandSimulator.h"
+#include "Simulator/RedstoneSimulator.h"
 
 #include "ChunkMap.h"
 
@@ -17,16 +19,28 @@ class cWorld;
 class cClientHandle;
 class cPlayer;
 class cChunkMap;
+class cBeaconEntity;
+class cBedEntity;
+class cBrewingstandEntity;
 class cBoundingBox;
+class cChestEntity;
 class cChunkDataCallback;
+class cCommandBlockEntity;
+class cDispenserEntity;
+class cFurnaceEntity;
+class cHopperEntity;
+class cNoteEntity;
+class cMobHeadEntity;
+class cFlowerPotEntity;
 class cBlockArea;
 class cBlockArea;
 class cFluidSimulatorData;
 class cMobCensus;
 class cMobSpawner;
-class cRedstoneSimulatorChunkData;
 
 struct SetChunkData;
+
+typedef std::list<cClientHandle *>                cClientHandleList;
 
 // A convenience macro for calling GetChunkAndRelByAbsolute.
 #define PREPARE_REL_AND_CHUNK(Position, OriginalChunk) cChunk * Chunk; Vector3i Rel; bool RelSuccess = (OriginalChunk).GetChunkAndRelByAbsolute(Position, &Chunk, Rel)
@@ -50,9 +64,6 @@ public:
 	);
 	cChunk(const cChunk & Other) = delete;
 	~cChunk();
-
-	/** Flushes the pending block (entity) queue, and clients' outgoing data buffers. */
-	void BroadcastPendingChanges(void);
 
 	/** Returns true iff the chunk block data is valid (loaded / generated) */
 	bool IsValid(void) const {return (m_Presence == cpPresent); }
@@ -105,12 +116,15 @@ public:
 	void SetAllData(SetChunkData && a_SetChunkData);
 
 	void SetLight(
-		const cChunkDef::BlockNibbles & a_BlockLight,
-		const cChunkDef::BlockNibbles & a_SkyLight
+		const cChunkDef::LightNibbles & a_BlockLight,
+		const cChunkDef::LightNibbles & a_SkyLight
 	);
 
 	/** Writes the specified cBlockArea at the coords specified. Note that the coords may extend beyond the chunk! */
 	void WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
+
+	/** Returns true if there is a block entity at the coords specified */
+	bool HasBlockEntityAt(Vector3i a_BlockPos);
 
 	/** Sets or resets the internal flag that prevents chunk from being unloaded.
 	The flag is cumulative - it can be set multiple times and then needs to be un-set that many times
@@ -134,33 +148,26 @@ public:
 
 	cWorld * GetWorld(void) const { return m_World; }
 
-	void SetBlock(Vector3i a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	void NewSetBlock(Vector3i a_RelPos, NEWBLOCKTYPE a_block);
+	void SetBlock(Vector3i a_RelBlockPos, BlockState a_Block);
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
 
-	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
-	void NewFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, NEWBLOCKTYPE a_block);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
-	void FastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
+	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
+	void FastSetBlock(Vector3i a_RelPos, BlockState a_Block)
 	{
-		FastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_BlockType, a_BlockMeta);
+		FastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_Block);
 	}
-	void NewFastSetBlock(Vector3i a_RelPos, NEWBLOCKTYPE a_block)
-	{
-		NewFastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_block);
-	}
-	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const { return m_BlockData.GetBlock({ a_RelX, a_RelY, a_RelZ }); }
-	BLOCKTYPE GetBlock(Vector3i a_RelCoords) const { return m_BlockData.GetBlock(a_RelCoords); }
 
-	UInt32 GetBlock2(int a_RelX, int a_RelY, int a_RelZ) const { return m_BlockData2.GetBlock({ a_RelX, a_RelY, a_RelZ }); } 
-	UInt32 GetBlock2(Vector3i a_RelCoords) const { return m_BlockData2.GetBlock(a_RelCoords); }
+	BlockState GetBlock(int a_RelX, int a_RelY, int a_RelZ) const { return m_BlockData.GetBlock({ a_RelX, a_RelY, a_RelZ }); }
+	BlockState GetBlock(Vector3i a_RelCoords) const { return m_BlockData.GetBlock(a_RelCoords); }
 
+	/*
 	void GetBlockTypeMeta(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	void GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 	{
 		GetBlockTypeMeta({ a_RelX, a_RelY, a_RelZ }, a_BlockType, a_BlockMeta);
 	}
-
-	void GetBlockInfo(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
+	*/
+	void GetBlockInfo(Vector3i a_RelPos, BlockState & a_Block, LIGHTTYPE & a_SkyLight, LIGHTTYPE & a_BlockLight) const;
 
 	/** Convert absolute coordinates into relative coordinates.
 	Returns false on failure to obtain a valid chunk. Returns true otherwise.
@@ -206,6 +213,9 @@ public:
 	Sends the chunk to all relevant clients. */
 	void SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_MaxRelZ, EMCSBiome a_Biome);
 
+	/** Sets the sign text. Returns true if successful. Also sends update packets to all clients in the chunk */
+	bool SetSignLines(int a_RelX, int a_RelY, int a_RelZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
+
 	int GetHeight( int a_X, int a_Z) const;
 
 	/** Returns true if it is sunny at the specified location. This takes into account biomes. */
@@ -250,11 +260,83 @@ public:
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found. */
 	bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback a_Callback, bool & a_CallbackResult) const;  // Lua-accessible
 
+	/** Calls the callback for each tyEntity; returns true if all block entities processed, false if the callback aborted by returning true
+	tBlocktypes are all blocktypes convertible to tyEntity which are to be called. If no block type is given the callback is called for every block entity
+	Accessible only from within Chunk.cpp */
+	template <class tyEntity, BlockType... tBlocktype>
+	bool GenericForEachBlockEntity(cFunctionRef<bool(tyEntity &)> a_Callback);
+
 	/** Calls the callback for each block entity; returns true if all block entities processed, false if the callback aborted by returning true */
 	bool ForEachBlockEntity(cBlockEntityCallback a_Callback);  // Lua-accessible
 
-	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, and whatever the callback returns if found. */
+	/** Calls the callback for each brewingstand; returns true if all brewingstands processed, false if the callback aborted by returning true */
+	bool ForEachBrewingstand(cBrewingstandCallback a_Callback);  // Lua-accessible
+
+	/** Calls the callback for each chest; returns true if all chests processed, false if the callback aborted by returning true */
+	bool ForEachChest(cChestCallback a_Callback);  // Lua-accessible
+
+	/** Calls the callback for each dispenser; returns true if all dispensers processed, false if the callback aborted by returning true */
+	bool ForEachDispenser(cDispenserCallback a_Callback);
+
+	/** Calls the callback for each dropper; returns true if all droppers processed, false if the callback aborted by returning true */
+	bool ForEachDropper(cDropperCallback a_Callback);
+
+	/** Calls the callback for each dropspenser; returns true if all dropspensers processed, false if the callback aborted by returning true */
+	bool ForEachDropSpenser(cDropSpenserCallback a_Callback);
+
+	/** Calls the callback for each furnace; returns true if all furnaces processed, false if the callback aborted by returning true */
+	bool ForEachFurnace(cFurnaceCallback a_Callback);  // Lua-accessible
+
+	/** Calls the callback for the tyEntity at the specified coords; returns false if there's no such block entity at those coords, true if found
+	tBlocktype is a list of the blocktypes to be called. If no BLOCKTYPE template arguments are given the callback is called for any block entity
+	Accessible only from within Chunk.cpp */
+	template <class tyEntity, BlockType... tBlocktype>
+	bool GenericDoWithBlockEntityAt(Vector3i a_Position, cFunctionRef<bool(tyEntity &)> a_Callback);
+
+	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	bool DoWithBlockEntityAt(Vector3i a_Position, cBlockEntityCallback a_Callback);  // Lua-acessible
+
+	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
+	bool DoWithBeaconAt(Vector3i a_Position, cBeaconCallback a_Callback);  // Lua-acessible
+
+	/** Calls the callback for the brewingstand at the specified coords; returns false if there's no brewingstand at those coords, true if found */
+	bool DoWithBrewingstandAt(Vector3i a_Position, cBrewingstandCallback a_Callback);  // Lua-acessible
+
+	/** Calls the callback for the bed at the specified coords; returns false if there's no bed at those coords, true if found */
+	bool DoWithBedAt(Vector3i a_Position, cBedCallback a_Callback);  // Lua-acessible
+
+	/** Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found */
+	bool DoWithChestAt(Vector3i a_Position, cChestCallback a_Callback);  // Lua-acessible
+
+	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords or callback returns true, returns true if found */
+	bool DoWithDispenserAt(Vector3i a_Position, cDispenserCallback a_Callback);
+
+	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dropper at those coords or callback returns true, returns true if found */
+	bool DoWithDropperAt(Vector3i a_Position, cDropperCallback a_Callback);
+
+	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dropspenser at those coords or callback returns true, returns true if found */
+	bool DoWithDropSpenserAt(Vector3i a_Position, cDropSpenserCallback a_Callback);
+
+	/** Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found */
+	bool DoWithFurnaceAt(Vector3i a_Position, cFurnaceCallback a_Callback);  // Lua-accessible
+
+	/** Calls the callback for the hopper at the specified coords; returns false if there's no hopper at those coords or callback returns true, returns true if found */
+	bool DoWithHopperAt(Vector3i a_Position, cHopperCallback a_Callback);  // Lua-accessible
+
+	/** Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found */
+	bool DoWithNoteBlockAt(Vector3i a_Position, cNoteBlockCallback a_Callback);
+
+	/** Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found */
+	bool DoWithCommandBlockAt(Vector3i a_Position, cCommandBlockCallback a_Callback);
+
+	/** Calls the callback for the mob head block at the specified coords; returns false if there's no mob head block at those coords or callback returns true, returns true if found */
+	bool DoWithMobHeadAt(Vector3i a_Position, cMobHeadCallback a_Callback);
+
+	/** Calls the callback for the flower pot at the specified coords; returns false if there's no flower pot at those coords or callback returns true, returns true if found */
+	bool DoWithFlowerPotAt(Vector3i a_Position, cFlowerPotCallback a_Callback);
+
+	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
+	bool GetSignLines (Vector3i a_Position, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
 	/** Use block entity on coordinate.
 	returns true if the use was successful, return false to use the block as a "normal" block */
@@ -284,134 +366,91 @@ public:
 		m_BlockToTick = a_RelPos;
 	}
 
-	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
-	{
-		return m_BlockData.GetMeta({ a_RelX, a_RelY, a_RelZ });
-	}
-
-	NIBBLETYPE GetMeta(Vector3i a_RelPos) const { return m_BlockData.GetMeta(a_RelPos); }
-
-	void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
-	{
-		SetMeta({ a_RelX, a_RelY, a_RelZ }, a_Meta);
-	}
-
-	inline void SetMeta(Vector3i a_RelPos, NIBBLETYPE a_Meta)
-	{
-		m_BlockData.SetMeta(a_RelPos, a_Meta);
-		MarkDirty();
-		m_PendingSendBlocks.emplace_back(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock2(a_RelPos));
-	}
-
 	/** Light alterations based on time */
-	NIBBLETYPE GetTimeAlteredLight(NIBBLETYPE a_Skylight) const;
+	LIGHTTYPE GetTimeAlteredLight(LIGHTTYPE a_Skylight) const;
 
 	/** Get the level of artificial light illuminating the block (0 - 15) */
-	inline NIBBLETYPE GetBlockLight(Vector3i a_RelPos) const { return m_LightData.GetBlockLight(a_RelPos); }
-	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetBlockLight({ a_RelX, a_RelY, a_RelZ }); }
+	inline LIGHTTYPE GetBlockLight(Vector3i a_RelPos) const { return m_LightData.GetBlockLight(a_RelPos); }
+	inline LIGHTTYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetBlockLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15) independent of daytime. */
-	inline NIBBLETYPE GetSkyLight(Vector3i a_RelPos) const { return m_LightData.GetSkyLight(a_RelPos); }
-	inline NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetSkyLight({ a_RelX, a_RelY, a_RelZ }); }
+	inline LIGHTTYPE GetSkyLight(Vector3i a_RelPos) const { return m_LightData.GetSkyLight(a_RelPos); }
+	inline LIGHTTYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetSkyLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15), taking daytime into a account. */
-	inline NIBBLETYPE GetSkyLightAltered(Vector3i a_RelPos) const { return GetTimeAlteredLight(m_LightData.GetSkyLight(a_RelPos)); }
-	inline NIBBLETYPE GetSkyLightAltered(int a_RelX, int a_RelY, int a_RelZ) const { return GetSkyLightAltered({ a_RelX, a_RelY, a_RelZ }); }
+	inline LIGHTTYPE GetSkyLightAltered(Vector3i a_RelPos) const { return GetTimeAlteredLight(m_LightData.GetSkyLight(a_RelPos)); }
+	inline LIGHTTYPE GetSkyLightAltered(int a_RelX, int a_RelY, int a_RelZ) const { return GetSkyLightAltered({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlock(Vector3i a_RelCoords, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
-
-	/** OBSOLETE, use the Vector3i-based overload.
-	Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
-	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
-	{
-		return UnboundedRelGetBlock({a_RelX, a_RelY, a_RelZ}, a_BlockType, a_BlockMeta);
-	}
-
-	/** Same as GetBlockType(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
-	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockType(Vector3i a_RelCoords, BLOCKTYPE & a_BlockType) const;
+	bool UnboundedRelGetBlock(Vector3i a_RelCoords, BlockState & a_Block) const;
 
 	/** OBSOLETE, use the Vector3i-based overload.
 	Same as GetBlockType(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType) const
+	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState & a_Block) const
 	{
-		return UnboundedRelGetBlockType({a_RelX, a_RelY, a_RelZ}, a_BlockType);
-	}
-
-	/** Same as GetBlockMeta(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
-	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockMeta(Vector3i a_RelPos, NIBBLETYPE & a_BlockMeta) const;
-
-	/** OBSOLETE, use the Vector3i-based overload.
-	Same as GetBlockMeta(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
-	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockMeta) const
-	{
-		return UnboundedRelGetBlockMeta({a_RelX, a_RelY, a_RelZ}, a_BlockMeta);
+		return UnboundedRelGetBlock({a_RelX, a_RelY, a_RelZ}, a_Block);
 	}
 
 	/** Same as GetBlockBlockLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockBlockLight(Vector3i a_RelPos, NIBBLETYPE & a_BlockLight) const;
+	bool UnboundedRelGetBlockBlockLight(Vector3i a_RelPos, LIGHTTYPE & a_BlockLight) const;
 
 	/** OBSOLETE, use the Vector3i-based overload.
 	Same as GetBlockBlockLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockBlockLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockLight) const
+	bool UnboundedRelGetBlockBlockLight(int a_RelX, int a_RelY, int a_RelZ, LIGHTTYPE & a_BlockLight) const
 	{
 		return UnboundedRelGetBlockBlockLight({a_RelX, a_RelY, a_RelZ}, a_BlockLight);
 	}
 
 	/** Same as GetBlockSkyLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockSkyLight(Vector3i a_RelPos, NIBBLETYPE & a_SkyLight) const;
+	bool UnboundedRelGetBlockSkyLight(Vector3i a_RelPos, LIGHTTYPE & a_SkyLight) const;
 
 	/** OBSOLETE, use the Vector3i-based overload.
 	Same as GetBlockSkyLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_SkyLight) const
+	bool UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, LIGHTTYPE & a_SkyLight) const
 	{
 		return UnboundedRelGetBlockSkyLight({a_RelX, a_RelY, a_RelZ}, a_SkyLight);
 	}
 
 	/** Queries both BlockLight and SkyLight, relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockLights(Vector3i a_RelPos, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_SkyLight) const;
+	bool UnboundedRelGetBlockLights(Vector3i a_RelPos, LIGHTTYPE & a_BlockLight, LIGHTTYPE & a_SkyLight) const;
 
 	/** OBSOLETE, use the Vector3i-based overload.
 	Queries both BlockLight and SkyLight, relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockLights(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_SkyLight) const
+	bool UnboundedRelGetBlockLights(int a_RelX, int a_RelY, int a_RelZ, LIGHTTYPE & a_BlockLight, LIGHTTYPE & a_SkyLight) const
 	{
 		return UnboundedRelGetBlockLights({a_RelX, a_RelY, a_RelZ}, a_BlockLight, a_SkyLight);
 	}
 
 	/** Same as SetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool UnboundedRelSetBlock(Vector3i a_RelPos, BlockState a_Block);
 
 	/** OBSOLETE, use the Vector3i-based overload.
 	Same as SetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	bool UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block)
 	{
-		return UnboundedRelSetBlock({a_RelX, a_RelY, a_RelZ}, a_BlockType, a_BlockMeta);
+		return UnboundedRelSetBlock({a_RelX, a_RelY, a_RelZ}, a_Block);
 	}
 
 	/** Same as FastSetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelFastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool UnboundedRelFastSetBlock(Vector3i a_RelPos, BlockState a_Block);
 
 	/** OBSOLETE, use the Vector3i-based overload.
 	Same as FastSetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	bool UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block)
 	{
-		return UnboundedRelFastSetBlock({a_RelX, a_RelY, a_RelZ}, a_BlockType, a_BlockMeta);
+		return UnboundedRelFastSetBlock({a_RelX, a_RelY, a_RelZ}, a_Block);
 	}
 
 
@@ -448,9 +487,9 @@ public:
 	as at least one requests is active the chunk will be ticked). */
 	void SetAlwaysTicked(bool a_AlwaysTicked);
 
-	const auto & GetAllClients(void) const
+	cChunkClientHandles GetAllClients(void) const
 	{
-		return m_LoadedByClient;
+		return cChunkClientHandles(m_LoadedByClient);
 	}
 
 	/** Converts the coord relative to this chunk into an absolute coord.
@@ -460,8 +499,6 @@ public:
 		return cChunkDef::RelativeToAbsolute(a_RelBlockPosition, {m_PosX, m_PosZ});
 	}
 
-	/** Returns true if slimes should spawn in the chunk. */
-	bool IsSlimeChunk() const;
 
 private:
 
@@ -471,12 +508,11 @@ private:
 	{
 		Int64 m_Tick;
 		int m_RelX, m_RelY, m_RelZ;
-		BLOCKTYPE m_BlockType;
-		NIBBLETYPE m_BlockMeta;
-		BLOCKTYPE m_PreviousType;
+		BlockState m_Block;
+		BlockType m_PreviousType;
 
-		sSetBlockQueueItem(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType) :
-			m_Tick(a_Tick), m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ), m_BlockType(a_BlockType), m_BlockMeta(a_BlockMeta), m_PreviousType(a_PreviousBlockType)
+		sSetBlockQueueItem(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block, Int64 a_Tick, BlockType a_PreviousBlockType) :
+			m_Tick(a_Tick), m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ), m_Block(a_Block), m_PreviousType(a_PreviousBlockType)
 		{
 		}
 	} ;
@@ -491,19 +527,8 @@ private:
 	bool m_IsDirty;        // True if the chunk has changed since it was last saved
 	bool m_IsSaving;       // True if the chunk is being saved
 
-	/** Blocks that have changed and need to be sent to all clients.
-	The protocol has a provision for coalescing block changes, and this is the buffer.
-	It will collect the block changes that occur in a tick, before being flushed in BroadcastPendingSendBlocks. */
-	sSetBlockVector m_PendingSendBlocks;
-
-	/** Block entities that have been touched and need to be sent to all clients.
-	Because block changes are buffered and we need to happen after them, this buffer exists too.
-	Pointers to block entities that were destroyed are guaranteed to be removed from this array by SetAllData, SetBlock, WriteBlockArea. */
-	std::vector<cBlockEntity *> m_PendingSendBlockEntities;
-
-	/** A queue of relative positions to call cBlockHandler::Check on.
-	Processed at the end of each tick by CheckBlocks. */
-	std::queue<Vector3i> m_BlocksToCheck;
+	std::queue<Vector3i>  m_ToTickBlocks;
+	sSetBlockVector       m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
 
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	std::vector<cClientHandle *> m_LoadedByClient;
@@ -518,7 +543,6 @@ private:
 	cChunkMap * m_ChunkMap;
 
 	ChunkBlockData m_BlockData;
-	ChunkBlockDataNew m_BlockData2;
 	ChunkLightData m_LightData;
 
 	cChunkDef::HeightMap m_HeightMap;
@@ -549,16 +573,19 @@ private:
 	void GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z);
 	void GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z, int a_MaxX, int a_MaxY, int a_MaxZ);
 
-	/** Takes ownership of a block entity, which MUST actually reside in this chunk. */
-	void AddBlockEntity(OwnedBlockEntity a_BlockEntity);
+	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
+	void AddBlockEntity   (OwnedBlockEntity a_BlockEntity);
 
 	/** Wakes up each simulator for its specific blocks; through all the blocks in the chunk */
 	void WakeUpSimulators(void);
 
+	/** Sends m_PendingSendBlocks to all clients */
+	void BroadcastPendingBlockChanges(void);
+
 	/** Checks the block scheduled for checking in m_ToTickBlocks[] */
 	void CheckBlocks();
 
-	/** Ticks several random blocks in the chunk. */
+	/** Ticks several random blocks in the chunk */
 	void TickBlocks(void);
 
 	/** Adds snow to the top of snowy biomes and hydrates farmland / fills cauldrons in rainy biomes */
@@ -571,7 +598,7 @@ private:
 	/** Grows the plant at the specified position by at most a_NumStages.
 	The block's Grow handler is invoked.
 	Returns the number of stages the plant has grown, 0 if not a plant. */
-	int GrowPlantAt(Vector3i a_RelPos, int a_NumStages = 1);
+	int GrowPlantAt(Vector3i a_RelPos, unsigned char a_NumStages = 1);
 
 	/** Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients */
 	void MoveEntityToNewChunk(OwnedEntity a_Entity);

@@ -25,7 +25,7 @@ class cMobSpawnerEntity :
 
 public:  // tolua_export
 
-	cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cMobSpawnerEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World);
 
 	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;

@@ -18,7 +18,7 @@ public:
 
 private:
 
-	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, BlockState a_Block) const override
 	{
 		return true;
 	}
@@ -27,21 +27,35 @@ private:
 
 
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		const auto PosBelow = a_Position.addedY(-1);
-		if (!cChunkDef::IsValidHeight(PosBelow))
+		if (a_RelPos.y <= 0)
 		{
 			return false;
 		}
 
-		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(PosBelow);
-		switch (BelowBlock)
+		auto BelowBlock = a_Chunk.GetBlock(a_RelPos.addedY(-1));
+		switch (BelowBlock.Type())
 		{
-			case E_BLOCK_CLAY:
-			case E_BLOCK_HARDENED_CLAY:
-			case E_BLOCK_STAINED_CLAY:
-			case E_BLOCK_SAND:
+			case BlockType::Clay:
+			case BlockType::Terracotta:
+			case BlockType::BlackTerracotta:
+			case BlockType::BlueTerracotta:
+			case BlockType::BrownTerracotta:
+			case BlockType::CyanTerracotta:
+			case BlockType::GrayTerracotta:
+			case BlockType::GreenTerracotta:
+			case BlockType::LightBlueTerracotta:
+			case BlockType::LightGrayTerracotta:
+			case BlockType::LimeTerracotta:
+			case BlockType::MagentaTerracotta:
+			case BlockType::OrangeTerracotta:
+			case BlockType::PinkTerracotta:
+			case BlockType::PurpleTerracotta:
+			case BlockType::RedTerracotta:
+			case BlockType::WhiteTerracotta:
+			case BlockType::YellowTerracotta:
+			case BlockType::Sand:
 			{
 				return true;
 			}
@@ -53,19 +67,19 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// If cutting down with shears, drop self:
 		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == E_ITEM_SHEARS))
 		{
-			return cItem(m_BlockType, 1, a_BlockMeta);
+			return cItem(Item::DeadBush);
 		}
 
 		// Drop 0-3 sticks:
 		auto chance = GetRandomProvider().RandInt<char>(3);
 		if (chance > 0)
 		{
-			return cItem(E_ITEM_STICK, chance, 0);
+			return cItem(Item::Stick, chance, 0);
 		}
 		return {};
 	}
@@ -74,9 +88,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 0;
 	}
 } ;

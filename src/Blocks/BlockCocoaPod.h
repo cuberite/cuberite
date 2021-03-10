@@ -16,40 +16,16 @@ public:
 
 	using Super::Super;
 
-	static NIBBLETYPE BlockFaceToMeta(eBlockFace a_BlockFace)
-	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_ZM: return 0;
-			case BLOCK_FACE_XM: return 3;
-			case BLOCK_FACE_XP: return 1;
-			case BLOCK_FACE_ZP: return 2;
-			case BLOCK_FACE_NONE:
-			case BLOCK_FACE_YM:
-			case BLOCK_FACE_YP:
-			{
-				break;
-			}
-		}
-		UNREACHABLE("Unsupported block face");
-	}
-
 private:
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
 		// Check that we're attached to a jungle log block:
-		eBlockFace BlockFace = MetaToBlockFace(a_Meta);
-		auto LogPos = AddFaceDirection(a_Position, BlockFace, true);
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-		if (!a_Chunk.UnboundedRelGetBlock(LogPos, BlockType, BlockMeta))
-		{
-			// Don't pop if chunk not loaded.
-			return true;
-		}
-
-		return ((BlockType == E_BLOCK_LOG) && ((BlockMeta & 0x03) == E_META_LOG_JUNGLE));
+		eBlockFace BlockFace = Block::Cocoa::Facing(a_Chunk.GetBlock(a_RelPos));
+		auto LogPos = AddFaceDirection(a_RelPos, BlockFace, true);
+		BlockState LogBlock;
+		a_Chunk.UnboundedRelGetBlock(LogPos, LogBlock);
+		return (LogBlock.Type() == BlockType::JungleLog);
 	}
 
 
@@ -74,59 +50,36 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// If fully grown, give 3 items, otherwise just one:
-		auto growState = a_BlockMeta >> 2;
-		return cItem(E_ITEM_DYE, ((growState >= 2) ? 3 : 1), E_META_DYE_BROWN);
+		auto GrowState = Block::Cocoa::Age(a_Block);
+		return cItem(Item::CocoaBeans, ((GrowState >= 2) ? 3 : 1));
 	}
 
 
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, unsigned char a_NumStages = 1) const override
 	{
-		auto meta = a_Chunk.GetMeta(a_RelPos);
-		auto typeMeta = meta & 0x03;
-		auto growState = meta >> 2;
+		auto OldAge = Block::Cocoa::Age(a_Chunk.GetBlock(a_RelPos));
 
-		if (growState >= 2)
+		if (OldAge >= 2)
 		{
 			return 0;
 		}
-		auto newState = std::min(growState + a_NumStages, 2);
-		a_Chunk.SetMeta(a_RelPos, static_cast<NIBBLETYPE>(newState << 2 | typeMeta));
-		return newState - growState;
+		auto NewAge = std::min<unsigned char>(OldAge + a_NumStages, 2);
+		a_Chunk.FastSetBlock(a_RelPos, Block::Cocoa::Cocoa(NewAge, Block::Cocoa::Facing(a_Chunk.GetBlock(a_RelPos))));
+		return NewAge - OldAge;
 	}
 
 
 
 
 
-	static eBlockFace MetaToBlockFace(NIBBLETYPE a_Meta)
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		switch (a_Meta & 0x03)
-		{
-			case 0: return BLOCK_FACE_ZM;
-			case 1: return BLOCK_FACE_XP;
-			case 2: return BLOCK_FACE_ZP;
-			case 3: return BLOCK_FACE_XM;
-			default:
-			{
-				ASSERT(!"Bad meta");
-				return BLOCK_FACE_NONE;
-			}
-		}
-	}
-
-
-
-
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
-	{
-		UNUSED(a_Meta);
 		return 34;
 	}
 } ;

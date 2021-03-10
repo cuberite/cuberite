@@ -9,13 +9,12 @@
 
 
 cBlockEntityWithItems::cBlockEntityWithItems(
-	BLOCKTYPE a_BlockType,
-	NIBBLETYPE a_BlockMeta,
+	BlockState a_Block,
 	Vector3i a_Pos,
 	int a_ItemGridWidth, int a_ItemGridHeight,
 	cWorld * a_World
 ):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+	Super(a_Block, a_Pos, a_World),
 	cBlockEntityWindowOwner(this),
 	m_Contents(a_ItemGridWidth, a_ItemGridHeight)
 {

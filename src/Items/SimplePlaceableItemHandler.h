@@ -6,32 +6,37 @@
 
 
 
-class cSimplePlaceableItemHandler final:
+class cSimplePlaceableItemHandler :
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	constexpr cSimplePlaceableItemHandler(int a_ItemType, BLOCKTYPE a_BlockType) :
+	cSimplePlaceableItemHandler(int a_ItemType, BlockType a_BlockType) :
 		Super(a_ItemType),
 		m_BlockType(a_BlockType)
 	{
 	}
 
 
-	virtual bool IsPlaceable(void) const override
+	virtual bool IsPlaceable(void) override
 	{
 		return true;
 	}
 
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player, const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPos,
+		BlockState & a_Block) override
 	{
-		return a_Player.PlaceBlock(a_PlacePosition, m_BlockType, 0);
+		cChunkInterface ChunkInterface(a_World->GetChunkMap());
+		cBlockHandler::For(m_BlockType).GetPlacementBlockTypeMeta(ChunkInterface, *a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_Block);
+		return true;
 	}
 
 private:
 
-	BLOCKTYPE m_BlockType;
+	BlockType m_BlockType;
 };

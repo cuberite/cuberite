@@ -5,6 +5,7 @@
 #include "BlockInfo.h"
 #include "Mobs/IncludeAllMonsters.h"
 #include "World.h"
+#include "Blocks/BlockAir.h"
 
 
 
@@ -28,17 +29,17 @@ cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily, const std::set<eMons
 
 
 
-bool cMobSpawner::CheckPackCenter(BLOCKTYPE a_BlockType)
+bool cMobSpawner::CheckPackCenter(BlockState a_Block)
 {
 	// Packs of non-water mobs can only be centered on an air block
 	// Packs of water mobs can only be centered on a water block
 	if (m_MonsterFamily == cMonster::mfWater)
 	{
-		return IsBlockWater(a_BlockType);
+		return (a_Block.Type() == BlockType::Water);
 	}
 	else
 	{
-		return a_BlockType == E_BLOCK_AIR;
+		return cBlockAirHandler::IsBlockAir(a_Block);
 	}
 }
 
@@ -198,8 +199,8 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		{
 			return
 			(
-				IsBlockWater(TargetBlock) &&
-				IsBlockWater(BlockBelow) &&
+				(TargetBlock.Type() == BlockType::Water) &&
+				(BlockBelow.Type() == BlockType::Water) &&
 				(a_RelPos.y >= 45) &&
 				(a_RelPos.y <= 62)
 			);
@@ -272,7 +273,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			{
 				for (int z = 0; z < 2; ++z)
 				{
-					CanSpawn = a_Chunk->UnboundedRelGetBlockType(a_RelPos.addedXZ(x, z), TargetBlock);
+					CanSpawn = a_Chunk->UnboundedRelGetBlock(a_RelPos.addedXZ(x, z), TargetBlock);
 					CanSpawn = CanSpawn && (TargetBlock == E_BLOCK_AIR);
 					if (!CanSpawn)
 					{
@@ -281,7 +282,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 					HasFloor = (
 						HasFloor ||
 						(
-							a_Chunk->UnboundedRelGetBlockType(a_RelPos + Vector3i(x, -1, z), TargetBlock) &&
+							a_Chunk->UnboundedRelGetBlock(a_RelPos + Vector3i(x, -1, z), TargetBlock) &&
 							!cBlockInfo::IsTransparent(TargetBlock)
 						)
 					);
@@ -293,7 +294,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		case mtSquid:
 		{
 			return (
-				IsBlockWater(TargetBlock) &&
+				(TargetBlock.Type() == BlockType::Water) &&
 				(a_RelPos.y >= 45) &&
 				(a_RelPos.y <= 62)
 			);

@@ -7,7 +7,7 @@
 #include "../World.h"
 #include "../Items/ItemHandler.h"
 
-#include "../StatisticsManager.h"
+#include "../Statistics.h"
 
 #include "../UUID.h"
 
@@ -27,56 +27,10 @@ class cTeam;
 class cPlayer:
 	public cPawn
 {
+
 	// tolua_end
 
 	using Super = cPawn;
-
-	/** Tag representing a sneaking pose. */
-	struct BodyStanceCrouching
-	{
-		BodyStanceCrouching(cPlayer & a_Player);
-	};
-
-	/** Tag representing a sleeping pose.
-	Set by a right click on unoccupied bed, unset by a time fast forward or teleport. */
-	struct BodyStanceSleeping
-	{
-		BodyStanceSleeping(cPlayer & a_Player);
-	};
-
-	/** Tag representing a sprinting pose. */
-	struct BodyStanceSprinting
-	{
-	};
-
-	/** Tag representing the neutral stance. */
-	struct BodyStanceStanding
-	{
-		BodyStanceStanding(cPlayer & a_Player);
-	};
-
-	/** Tag representing a swimming or elytra flying pose. */
-	struct BodyStanceGliding
-	{
-		BodyStanceGliding(cPlayer & a_Player);
-
-		cTickTime TicksElytraFlying;
-	};
-
-	/*
-	struct HandStanceNeutral
-	{
-	};
-
-	struct HandStandChargingBow
-	{
-		int m_BowCharge;
-	};
-
-	struct HandStanceEating
-	{
-	};
-	*/
 
 	// tolua_begin
 
@@ -86,15 +40,15 @@ public:
 
 	static const int MAX_FOOD_LEVEL;
 
+	/** Number of ticks it takes to eat an item */
+	static const int EATING_TICKS;
+
 	// tolua_end
 
 	CLASS_PROTODEF(cPlayer)
 
-	cPlayer(const std::shared_ptr<cClientHandle> & a_Client);
+	cPlayer(const cClientHandlePtr & a_Client);
 	virtual ~cPlayer() override;
-
-	/** Called when spectation stops, because the player crouched or when the entity we're spectating gets removed from the world. */
-	void OnLoseSpectated();
 
 	// tolua_begin
 
@@ -103,11 +57,6 @@ public:
 	"should" really only be called at init or player death, plugins excepted
 	*/
 	bool SetCurrentExperience(int a_XpTotal);
-
-	/** Resend the RenderDistanceCenter packet to the player **/
-	void ResendRenderDistanceCenter();
-
-		void SendPlayerInventoryJoin();
 
 	/* changes Xp by Xp_delta, you "shouldn't" inc more than MAX_EXPERIENCE_ORB_SIZE
 	Wont't allow xp to go negative
@@ -128,12 +77,12 @@ public:
 	float GetXpPercentage(void) const;
 
 	/** Calculates the amount of XP needed for a given level
-	Ref: https://minecraft.wiki/w/XP
+	Ref: https://minecraft.gamepedia.com/XP
 	*/
 	static int XpForLevel(int a_Level);
 
 	/** Inverse of XpForLevel
-	Ref: https://minecraft.wiki/w/XP
+	Ref: https://minecraft.gamepedia.com/XP
 	values are as per this with pre-calculations
 	*/
 	static int CalcLevelFromXp(int a_CurrentXp);
@@ -152,15 +101,15 @@ public:
 	/** Cancels the current bow charging */
 	void CancelChargingBow(void);
 
-	/** Gets If The Player Is Teleporting To Fix https://github.com/cuberite/cuberite/issues/5542 */
-	bool GetIsTeleporting() { return m_IsTeleporting; }
-
 	/** Returns true if the player is currently charging the bow */
 	bool IsChargingBow(void) const { return m_IsChargingBow; }
 
 	void SetTouchGround(bool a_bTouchGround);
+	inline void SetStance(const double a_Stance) { m_Stance = a_Stance; }
 	double GetEyeHeight(void) const;  // tolua_export
 	Vector3d GetEyePosition(void) const;  // tolua_export
+	virtual bool IsOnGround(void) const override { return m_bTouchGround; }
+	inline double GetStance(void) const { return m_Stance; }  // tolua_export
 	inline cInventory &       GetInventory(void)       { return m_Inventory; }  // tolua_export
 	inline const cInventory & GetInventory(void) const { return m_Inventory; }
 
@@ -174,8 +123,8 @@ public:
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
-	/** Updates player's capabilities - flying, visibility, etc. from their gamemode. */
-	void UpdateCapabilities();
+	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
+	void SetCapabilities();
 
 	// tolua_begin
 
@@ -241,9 +190,6 @@ public:
 
 	AString GetIP(void) const;  // tolua_export
 
-	/** Return the associated statistic and achievement manager. */
-	StatisticsManager & GetStatistics() { return m_Stats; }
-
 	/** Returns the associated team, nullptr if none */
 	cTeam * GetTeam(void) { return m_Team; }  // tolua_export
 
@@ -258,10 +204,13 @@ public:
 	/** Forces the player to query the scoreboard for his team */
 	cTeam * UpdateTeam(void);
 
+	/** Return the associated statistic and achievement manager. */
+	cStatManager & GetStatManager() { return m_Stats; }
+
 	/** Awards the player an achievement.
 	If all prerequisites are met, this method will award the achievement and will broadcast a chat message.
 	If the achievement has been already awarded to the player, this method will just increment the stat counter. */
-	void AwardAchievement(CustomStatistic a_Ach);
+	void AwardAchievement(Statistic a_Ach);
 
 	/** Forces the player to move in the given direction.
 	@deprecated Use SetSpeed instead. */
@@ -312,7 +261,7 @@ public:
 
 	// tolua_end
 
-	bool HasPermission(const AString & a_Permission) const;  // tolua_export
+	bool HasPermission(const AString & a_Permission);  // tolua_export
 
 	/** Returns true iff a_Permission matches the a_Template.
 	A match is defined by either being exactly the same, or each sub-item matches until there's a wildcard in a_Template.
@@ -379,16 +328,13 @@ public:
 	void AddFoodExhaustion(double a_Exhaustion);
 
 	/** Returns true if the player is currently in the process of eating the currently equipped item */
-	bool IsEating(void) const { return m_EatingFinishTick >= 0_tick; }
+	bool IsEating(void) const { return (m_EatingFinishTick >= 0); }
 
 	/** Returns true if the player is currently flying */
 	bool IsFlying(void) const { return m_IsFlying; }
 
-	/** Returns true if a player is sleeping in a bed. */
-	bool IsInBed(void) const;
-
-	/** Returns true if the player's left hand is dominant. */
-	bool IsLeftHanded() const;
+	/** Returns true if a player is sleeping in a bed */
+	bool IsInBed(void) const { return m_bIsInBed; }
 
 	/** Returns true if the player has thrown out a floater */
 	bool IsFishing(void) const { return m_IsFishing; }
@@ -399,16 +345,21 @@ public:
 
 	// tolua_end
 
-	/** Returns true if a player is standing normally, that is, in a neutral pose. */
-	bool IsStanding() const;
-
 	/** Tosses a list of items. */
 	void TossItems(const cItems & a_Items);
 
-	/** Sets a player's in-bed state.
-	We can't be sure plugins will keep this value updated, so no exporting.
-	If value is false (not in bed), will update players of the fact that they have been ejected from the bed. */
-	void SetIsInBed(bool a_IsInBed);
+	/** Sets a player's in-bed state
+	We can't be sure plugins will keep this value updated, so no exporting
+	If value is false (not in bed), will update players of the fact that they have been ejected from the bed
+	*/
+	void SetIsInBed(bool a_Flag)
+	{
+		m_bIsInBed = a_Flag;
+		if (!a_Flag)
+		{
+			GetWorld()->BroadcastEntityAnimation(*this, 2);
+		}
+	}
 
 	/** Starts eating the currently equipped item. Resets the eating timer and sends the proper animation packet */
 	void StartEating(void);
@@ -421,18 +372,29 @@ public:
 
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
-	virtual void Killed(const cEntity & a_Victim, eDamageType a_DamageType) override;
+	virtual void Killed(cEntity * a_Victim) override;
 
 	void Respawn(void);  // tolua_export
 
 	void SetVisible( bool a_bVisible);  // tolua_export
+	bool IsVisible(void) const { return m_bVisible; }  // tolua_export
 
-	/** Saves all player data, such as inventory, to JSON. */
-	void SaveToDisk(void);
+	/** Saves all player data, such as inventory, to JSON */
+	bool SaveToDisk(void);
 
-	/** Loads the player data from the save file.
-	Sets m_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile(). */
-	void LoadFromDisk();
+	typedef cWorld * cWorldPtr;
+
+	/** Loads the player data from the disk file
+	Sets a_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile()
+	Returns true on success, false on failure
+	*/
+	bool LoadFromDisk(cWorldPtr & a_World);
+
+	/** Loads the player data from the specified file
+	Sets a_World to the world where the player will spawn, based on the stored world name or the default world
+	Returns true on success, false on failure
+	*/
+	bool LoadFromFile(const AString & a_FileName, cWorldPtr & a_World);
 
 	const AString & GetLoadedWorldName() const { return m_CurrentWorldName; }
 
@@ -491,20 +453,14 @@ public:
 	/** Sets the flying relative maximum speed. Sends the update to player, if needed. */
 	void SetFlyingMaxSpeed(double a_Speed);
 
-	/** Starts or stops crouching, if our current body stance permits, broadcasting the state change. */
-	void SetCrouch(bool a_ShouldCrouch);
+	/** Sets the crouch status, broadcasts to all visible players */
+	void SetCrouch(bool a_IsCrouched);
 
-	/** Starts or stops elytra flight, if our current body stance permits, broadcasting the state change. */
-	void SetElytraFlight(bool a_ShouldElytraFly);
+	/** Starts or stops sprinting, sends the max speed update to the client, if needed */
+	void SetSprint(bool a_IsSprinting);
 
-	/** Starts or stops flying, broadcasting the state change. */
-	void SetFlying(bool a_ShouldFly);
-
-	/** Sets the dominant hand of the player. */
-	void SetLeftHanded(bool a_IsLeftHanded);
-
-	/** Starts or stops sprinting, if our current body stance permits, broadcasting the state change. */
-	void SetSprint(bool a_ShouldSprint);
+	/** Flags the player as flying */
+	void SetFlying(bool a_IsFlying);
 
 	/** If true the player can fly even when he's not in creative. */
 	void SetCanFly(bool a_CanFly);
@@ -519,67 +475,74 @@ public:
 	The custom name will be used in the tab-list, in the player nametag and in the tab-completion. */
 	void SetCustomName(const AString & a_CustomName);
 
-	/** Gets the player's potential respawn position (named LastBedPos for compatibility reasons). */
-	Vector3i GetLastBedPos(void) const { return m_RespawnPosition; }
+	/** Gets the last position that the player slept in
+	This is initialised to the world spawn point if the player has not slept in a bed as of yet
+	*/
+	Vector3i GetLastBedPos(void) const { return m_LastBedPos; }
 
-	/** Returns if the respawn point is unconditionally used. */
-	bool IsRespawnPointForced(void) const { return m_IsRespawnPointForced; }
+	/** Sets the player's bed (home / respawn) position to the specified position.
+	Sets the respawn world to the player's world. */
+	void SetBedPos(const Vector3i & a_Pos);
 
-	/** Sets the player's bed position to the specified position.
-	Sets the respawn world to the player's world and unforces the respawn point.
-	The given position will be used subject to bed checks when respawning. */
-	void SetBedPos(Vector3i a_Position);
-
-	/** Sets the player's bed position to the specified position.
-	The spawn point is unforced. The given position will be used subject to bed checks when respawning. */
-	void SetBedPos(Vector3i a_Position, const cWorld & a_World);
-
-	/** Sets the player's forced respawn position and world. */
-	void SetRespawnPosition(Vector3i a_Position, const cWorld & a_World);
+	/** Sets the player's bed (home / respawn) position and respawn world to the specified parameters. */
+	void SetBedPos(const Vector3i & a_Pos, cWorld * a_World);
 
 	// tolua_end
 
-	// TODO lua export GetRespawnWorld
-	cWorld * GetRespawnWorld();
+	// TODO lua export GetBedPos and GetBedWorld
+	cWorld * GetBedWorld();
 
 	/** Update movement-related statistics. */
 	void UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIsOnGround);
 
 	/** Whether placing the given blocks would intersect any entitiy */
-	bool DoesPlacingBlocksIntersectEntity(std::initializer_list<sSetBlock> a_Blocks) const;
+	bool DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks);
 
 	/** Returns the UUID that has been read from the client, or nil if not available. */
-	const cUUID & GetUUID(void) const;  // Exported in ManualBindings.cpp
+	const cUUID & GetUUID(void) const { return m_UUID; }  // Exported in ManualBindings.cpp
 
 	// tolua_begin
 
 	/** Returns wheter the player can fly or not. */
-	virtual bool CanFly(void) const { return m_IsFlightCapable; }
+	virtual bool CanFly(void) const { return m_CanFly; }
 
-	/** (Re)loads the rank and permissions from the cRankManager and sends a permission level update to the client. */
+	/** (Re)loads the rank and permissions from the cRankManager.
+	Expects the m_UUID member to be valid.
+	Loads the m_Rank, m_Permissions, m_MsgPrefix, m_MsgSuffix and m_MsgNameColorCode members. */
 	void LoadRank(void);
+
+	/** Calls the block-placement hook and places the block in the world, unless refused by the hook.
+	If the hook prevents the placement, sends the current block at the specified coords back to the client.
+	Assumes that the block is in a currently loaded chunk.
+	Returns true if the block is successfully placed. */
+	bool PlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BlockState a_Block)
+	{
+		return PlaceBlock({a_BlockX, a_BlockY, a_BlockZ}, a_Block);
+	}
+
+	bool PlaceBlock(Vector3i a_Pos, BlockState a_Block);
 
 	/** Sends the block in the specified range around the specified coord to the client
 	as a block change packet.
 	The blocks in range (a_BlockX - a_Range, a_BlockX + a_Range) are sent (NY-metric). */
-	void SendBlocksAround(Vector3i a_BlockPos, int a_Range = 1);
+	void SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Range = 1);
 
 	bool HasSkinPart(eSkinPart a_Part) const { return (m_SkinParts & a_Part) != 0; }
 	int GetSkinParts(void) const { return m_SkinParts; }
 	void SetSkinParts(int a_Parts);
 
+	eMainHand GetMainHand(void) const { return m_MainHand; }
+	void SetMainHand(eMainHand a_Hand);
+
 	// tolua_end
 
-	/** Attempts to place the block in the world with a call to PlaceBlocks. */
-	bool PlaceBlock(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-
-	bool NewPlaceBlock(const Vector3i a_Position, NEWBLOCKTYPE a_block);
-
 	/** Calls the block placement hooks and places the blocks in the world.
-	First the "placing" hooks for all the blocks are called, then the blocks are placed, and finally the "placed" hooks are called.
+	First the "placing" hooks for all the blocks are called, then the blocks are placed, and finally
+	the "placed" hooks are called.
 	If the any of the "placing" hooks aborts, none of the blocks are placed and the function returns false.
-	Returns true if all the blocks are placed. */
-	bool PlaceBlocks(std::initializer_list<sSetBlock> a_Blocks);
+	Returns true if all the blocks are placed.
+	Assumes that all the blocks are in currently loaded chunks. */
+	bool PlaceBlocks(const sSetBlockVector & a_Blocks);
 
 	/** Notify nearby wolves that the player or one of the player's wolves took damage or did damage to an entity
 	@param a_Opponent the opponent we're fighting.
@@ -587,17 +550,25 @@ public:
 	*/
 	void NotifyNearbyWolves(cPawn * a_Opponent, bool a_IsPlayerInvolved);
 
+	// cEntity overrides:
+	virtual bool IsCrouched (void) const override { return m_IsCrouched; }
+	virtual bool IsSprinting(void) const override { return m_IsSprinting; }
+	virtual bool IsRclking  (void) const override { return IsEating() || IsChargingBow(); }
+
+	virtual void AttachTo(cEntity * a_AttachTo) override;
+	virtual void Detach(void) override;
+
 	/** Returns the progress mined per tick for the block a_Block as a fraction
 	(1 would be completely mined)
 	Depends on hardness values so check those are correct.
-	Source: https://minecraft.wiki/w/Breaking#Calculation */
-	float GetMiningProgressPerTick(BLOCKTYPE a_Block);
+	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
+	float GetMiningProgressPerTick(BlockState a_Block);
 
 	/** Given tool, enchantments, status effects, and world position
 	returns whether a_Block would be instantly mined.
 	Depends on hardness values so check those are correct.
-	Source: https://minecraft.wiki/w/Breaking#Instant_breaking */
-	bool CanInstantlyMine(BLOCKTYPE a_Block);
+	Source: https://minecraft.gamepedia.com/Breaking#Instant_breaking */
+	bool CanInstantlyMine(BlockState a_Block);
 
 	/** Adds an Item to the list of known items.
 	If the item is already known, does nothing. */
@@ -610,16 +581,10 @@ public:
 	virtual cItem GetEquippedLeggings(void) const override { return m_Inventory.GetEquippedLeggings(); }
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
 	virtual cItem GetOffHandEquipedItem(void) const override { return m_Inventory.GetShieldSlot(); }
-	virtual bool IsCrouched(void) const override;
-	virtual bool IsOnGround(void) const override { return m_bTouchGround; }
-	virtual bool IsSprinting(void) const override;
 
 private:
 
 	typedef std::vector<std::vector<AString> > AStringVectorVector;
-
-	/** The current body stance the player has adopted. */
-	std::variant<BodyStanceCrouching, BodyStanceSleeping, BodyStanceSprinting, BodyStanceStanding, BodyStanceGliding> m_BodyStance;
 
 	/** The name of the rank assigned to this player. */
 	AString m_Rank;
@@ -638,9 +603,20 @@ private:
 	This is used mainly by the HasPermission() function to optimize the lookup. */
 	AStringVectorVector m_SplitRestrictions;
 
+
 	// Message visuals:
 	AString m_MsgPrefix, m_MsgSuffix;
 	AString m_MsgNameColorCode;
+
+	/** Xp Level stuff */
+	enum
+	{
+		XP_TO_LEVEL15 = 255,
+		XP_PER_LEVEL_TO15 = 17,
+		XP_TO_LEVEL30 = 825
+	} ;
+
+	bool m_bVisible;
 
 	// Food-related variables:
 	/** Represents the food bar, one point equals half a "drumstick" */
@@ -655,6 +631,8 @@ private:
 	/** A "buffer" which adds up hunger before it is substracted from m_FoodSaturationLevel or m_FoodLevel. Each action adds a little */
 	double m_FoodExhaustionLevel;
 
+	double m_Stance;
+
 	/** Stores the player's inventory, consisting of crafting grid, hotbar, and main slots */
 	cInventory m_Inventory;
 
@@ -664,9 +642,8 @@ private:
 	cWindow * m_CurrentWindow;
 	cWindow * m_InventoryWindow;
 
-	/** The player's potential respawn position, initialised to world spawn by default.
-	During player respawn from death, if m_IsRespawnPointForced is false and no bed exists here, it will be reset to world spawn. */
-	Vector3i m_RespawnPosition;
+	/** The player's last saved bed position */
+	Vector3i m_LastBedPos;
 
 	/** The name of the world which the player respawns in upon death.
 	This is stored as a string to enable SaveToDisk to not touch cRoot, and thus can be safely called in the player's destructor. */
@@ -684,9 +661,17 @@ private:
 	/** The item being dragged by the cursor while in a UI window */
 	cItem m_DraggingItem;
 
-	std::shared_ptr<cClientHandle> m_ClientHandle;
+	std::chrono::steady_clock::time_point m_LastPlayerListTime;
+
+	cClientHandlePtr m_ClientHandle;
 
 	cSlotNums m_InventoryPaintSlots;
+
+	/** If true, we are locking m_Position to m_FrozenPosition. */
+	bool m_IsFrozen;
+
+	/** Was the player frozen manually by a plugin or automatically by the server? */
+	bool m_IsManuallyFrozen;
 
 	/** Max speed, relative to the game default.
 	1 means regular speed, 2 means twice as fast, 0.5 means half-speed.
@@ -703,59 +688,54 @@ private:
 	Default value is 1. */
 	double m_FlyingMaxSpeed;
 
-	bool m_IsChargingBow;
+	bool m_IsCrouched;
+	bool m_IsSprinting;
+	bool m_IsFlying;
 	bool m_IsFishing;
 
-	/** If this is true the player can fly. Even if he is not in creative. */
-	bool m_IsFlightCapable;
-
-	bool m_IsFlying;
-
-	/** If true, we are locking m_Position to m_FrozenPosition. */
-	bool m_IsFrozen;
-
-	/** Whether the player is left-handed, or right-handed. */
-	bool m_IsLeftHanded;
-
-	/** Was the player frozen manually by a plugin or automatically by the server? */
-	bool m_IsManuallyFrozen;
-
-	/** Whether we unconditionally respawn to m_RespawnPosition, or check if a bed is unobstructed and available first. */
-	bool m_IsRespawnPointForced;
-
-	/** Flag used by food handling system to determine whether a teleport has just happened.
-	Will not apply food penalties if found to be true; will set to false after processing. */
-	bool m_IsTeleporting;
-
-	bool m_IsVisible;
+	bool m_CanFly;  // If this is true the player can fly. Even if he is not in creative.
 
 	/** The world tick in which eating will be finished. -1 if not eating */
-	cTickTimeLong m_EatingFinishTick;
+	Int64 m_EatingFinishTick;
 
 	/** Player Xp level */
 	int m_LifetimeTotalXp;
 	int m_CurrentXp;
 	unsigned int m_EnchantmentSeed;
 
-	int m_BowCharge;
+	bool m_IsChargingBow;
+	int  m_BowCharge;
 
 	UInt32 m_FloaterID;
 
 	cTeam * m_Team;
 
-	/** The entity that this player is spectating, nullptr if none. */
-	cEntity * m_Spectating;
+	cStatManager m_Stats;
 
-	StatisticsManager m_Stats;
+	/** Flag representing whether the player is currently in a bed
+	Set by a right click on unoccupied bed, unset by a time fast forward or teleport */
+	bool m_bIsInBed;
 
 	/** How long till the player's inventory will be saved
 	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
 	unsigned int m_TicksUntilNextSave;
 
+	/** Flag used by food handling system to determine whether a teleport has just happened
+	Will not apply food penalties if found to be true; will set to false after processing
+	*/
+	bool m_bIsTeleporting;
+
+	/** The UUID of the player, as read from the ClientHandle.
+	If no ClientHandle is given, the UUID is nil. */
+	cUUID m_UUID;
+
 	AString m_CustomName;
 
 	/** Displayed skin part bit mask */
 	int m_SkinParts;
+
+	/** The main hand of the player */
+	eMainHand m_MainHand;
 
 	/** List on known recipes as Ids */
 	std::set<UInt32> m_KnownRecipes;
@@ -778,7 +758,7 @@ private:
 	void FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen);
 
 	/** Returns how high the liquid is in percent. Used by IsInsideWater */
-	float GetLiquidHeightPercent(NIBBLETYPE a_Meta);
+	float GetLiquidHeightPercent(BlockState a_Block);
 
 	/** Checks if the player is inside of water */
 	bool IsInsideWater();
@@ -789,8 +769,8 @@ private:
 	If he has an enchanted tool with efficiency or he has a haste or mining fatique effect it gets multiplied by a specific factor depending on the strength of the effect or enchantment.
 	In he is in water it gets divided by 5 except if his tool is enchanted with aqua affinity.
 	If he is not on ground it also gets divided by 5.
-	Source: https://minecraft.wiki/w/Breaking#Calculation */
-	float GetDigSpeed(BLOCKTYPE a_Block);
+	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
+	float GetDigSpeed(BlockState a_Block);
 
 	/** Add the recipe Id to the known recipes.
 	If the recipe is already known, does nothing. */
@@ -798,21 +778,13 @@ private:
 
 	void TickFreezeCode();
 
-	/** (Re)loads the rank and permissions from the cRankManager.
-	Loads the m_Rank, m_Permissions, m_MsgPrefix, m_MsgSuffix and m_MsgNameColorCode members. */
-	void RefreshRank();
-
 	// cEntity overrides:
 	virtual void ApplyArmorDamage(int DamageBlocked) override;
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual float GetEnchantmentBlastKnockbackReduction() override;
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
-	virtual bool IsElytraFlying(void) const override;
-	virtual bool IsInvisible() const override;
-	virtual bool IsRclking(void) const override { return IsEating() || IsChargingBow(); }
 	virtual void OnAddToWorld(cWorld & a_World) override;
-	virtual void OnDetach() override;
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;

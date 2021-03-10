@@ -8,18 +8,21 @@
 
 
 
-class cItemAxeHandler final :
+class cItemAxeHandler:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	using Super::Super;
+	cItemAxeHandler(int a_ItemType):
+		Super(a_ItemType)
+	{
+	}
 
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) const override
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
 	{
 		switch (a_Action)
 		{
@@ -32,7 +35,7 @@ public:
 
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) const override
+	virtual float GetBlockBreakingStrength(BlockState a_Block) override
 	{
 		if (!IsBlockMaterialWood(a_Block) && !IsBlockMaterialPlants(a_Block) && !IsBlockMaterialVine(a_Block))
 		{

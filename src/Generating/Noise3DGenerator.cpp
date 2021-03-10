@@ -198,9 +198,9 @@ void cNoise3DGenerator::Initialize(cIniFile & a_IniFile)
 void cNoise3DGenerator::GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
 	UNUSED(a_ChunkCoords);
-	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
+	for (auto & Biome : a_BiomeMap)
 	{
-		a_BiomeMap[i] = biExtremeHills;
+		Biome = biExtremeHills;
 	}
 }
 
@@ -222,16 +222,16 @@ void cNoise3DGenerator::Generate(cChunkDesc & a_ChunkDesc)
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
 				NOISE_DATATYPE n = Noise[idx++];
-				BLOCKTYPE BlockType;
+				BlockState BaseBlock;
 				if (n > m_AirThreshold)
 				{
-					BlockType = (y > m_SeaLevel) ? E_BLOCK_AIR : E_BLOCK_STATIONARY_WATER;
+					BaseBlock = (y > m_SeaLevel) ? Block::Air::Air() : Block::Water::Water();
 				}
 				else
 				{
-					BlockType = E_BLOCK_STONE;
+					BaseBlock = Block::Stone::Stone();
 				}
-				a_ChunkDesc.SetBlockType(x, y, z, BlockType);
+				a_ChunkDesc.SetBlock({x, y, z}, BaseBlock);
 			}
 		}
 	}
@@ -304,14 +304,16 @@ void cNoise3DGenerator::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 			bool HasHadWater = false;
 			for (int y = LastAir - 1; y > 0; y--)
 			{
-				switch (a_ChunkDesc.GetBlockType(x, y, z))
+				switch (a_ChunkDesc.GetBlock({x, y, z}).Type())
 				{
-					case E_BLOCK_AIR:
+					case BlockType::Air:
+					case BlockType::CaveAir:
+					case BlockType::VoidAir:
 					{
 						LastAir = y;
 						break;
 					}
-					case E_BLOCK_STONE:
+					case BlockType::Stone:
 					{
 						if (LastAir - y > 3)
 						{
@@ -319,23 +321,24 @@ void cNoise3DGenerator::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 						}
 						if (HasHadWater)
 						{
-							a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_SAND);
+							a_ChunkDesc.SetBlock({x, y, z}, Block::Sand::Sand());
 						}
 						else
 						{
-							a_ChunkDesc.SetBlockType(x, y, z, (LastAir == y + 1) ? E_BLOCK_GRASS : E_BLOCK_DIRT);
+							a_ChunkDesc.SetBlock({x, y, z}, (LastAir == y + 1) ? Block::GrassBlock::GrassBlock() : Block::Dirt::Dirt());
 						}
 						break;
 					}
-					case E_BLOCK_STATIONARY_WATER:
+					case BlockType::Water:
 					{
 						LastAir = y;
 						HasHadWater = true;
 						break;
 					}
+					default: break;
 				}  // switch (GetBlockType())
 			}  // for y
-			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
+			a_ChunkDesc.SetBlock({x, 0, z}, Block::Bedrock::Bedrock());
 		}  // for x
 	}  // for z
 }

@@ -352,10 +352,10 @@ protected:
 	bool m_CanBeLeashed;
 
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops */
-	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
+	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, Item a_Item);
 
 	/** Adds a item a_Item with the chance of a_Chance (in percent) to itemdrops a_Drops */
-	void AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth = 0);
+	void AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, enum Item a_Item);
 
 	/** Adds one rare item out of the list of rare items a_Items modified by the looting level a_LootingLevel(I-III or custom) to the itemdrop a_Drops */
 	void AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, unsigned int a_LootingLevel);

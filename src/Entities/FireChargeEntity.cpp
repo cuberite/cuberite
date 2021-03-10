@@ -23,7 +23,7 @@ void cFireChargeEntity::Explode(Vector3i a_Block)
 {
 	if (m_World->GetBlock(a_Block) == E_BLOCK_AIR)
 	{
-		m_World->SetBlock(a_Block, E_BLOCK_FIRE, 1);
+		m_World->SetBlock(a_Block, Block::Fire::Fire());
 	}
 }
 

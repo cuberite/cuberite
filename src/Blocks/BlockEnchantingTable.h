@@ -32,9 +32,12 @@ private:
 	) const override
 	{
 		AString WindowName = "Enchant";
-		a_WorldInterface.DoWithBlockEntityAt(a_BlockPos, [&WindowName](cBlockEntity & a_Entity)
+		a_WorldInterface.DoWithBlockEntityAt(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, [&WindowName](cBlockEntity & a_Entity)
 		{
-			ASSERT(a_Entity.GetBlockType() == E_BLOCK_ENCHANTMENT_TABLE);
+			if (a_Entity.GetBlockType() != BlockType::EnchantingTable)
+			{
+				return false;
+			}
 
 			const auto & EnchantingTable = static_cast<cEnchantingTableEntity &>(a_Entity);
 			const auto & CustomName = EnchantingTable.GetCustomName();
@@ -43,7 +46,7 @@ private:
 				WindowName = CustomName;
 			}
 
-			return false;
+			return true;
 		});
 
 		cWindow * Window = new cEnchantingWindow(a_BlockPos, std::move(WindowName));
@@ -59,14 +62,14 @@ private:
 	}
 
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Drops handled by the block entity:
 		return {};
 	}
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
 		UNUSED(a_Meta);
 		return 29;

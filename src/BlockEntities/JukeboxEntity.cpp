@@ -13,11 +13,11 @@
 
 
 
-cJukeboxEntity::cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+cJukeboxEntity::cJukeboxEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, a_World),
 	m_Record(0)
 {
-	ASSERT(a_BlockType == E_BLOCK_JUKEBOX);
+	ASSERT(a_Block.Type() == BlockType::Jukebox);
 }
 
 
@@ -36,7 +36,7 @@ void cJukeboxEntity::Destroy(void)
 
 cItems cJukeboxEntity::ConvertToPickups() const
 {
-	return IsPlayingRecord() ? cItem(static_cast<short>(m_Record)) : cItems();
+	return IsPlayingRecord() ? cItem(PaletteUpgrade::FromItem(static_cast<short>(m_Record), 0)) : cItems();
 }
 
 
@@ -99,7 +99,7 @@ bool cJukeboxEntity::PlayRecord(int a_Record)
 
 	m_Record = a_Record;
 	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), m_Record);
-	m_World->SetBlockMeta(m_Pos, E_META_JUKEBOX_ON);
+	m_World->FastSetBlock(m_Pos, Block::Jukebox::Jukebox(true));
 	return true;
 }
 
@@ -115,8 +115,8 @@ bool cJukeboxEntity::EjectRecord(void)
 		return false;
 	}
 
-	m_World->SpawnItemPickups(cItem(static_cast<short>(m_Record)), Vector3d(0.5, 0.5, 0.5) + m_Pos, 10);
-	m_World->SetBlockMeta(m_Pos, E_META_JUKEBOX_OFF);
+	m_World->SpawnItemPickups(cItem(PaletteUpgrade::FromItem(static_cast<short>(m_Record), 0)), Vector3d(0.5, 0.5, 0.5) + m_Pos, 10);
+	m_World->SetBlock(m_Pos, Block::Jukebox::Jukebox(false));
 	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), 0);
 
 	m_Record = 0;

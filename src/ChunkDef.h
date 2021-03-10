@@ -11,7 +11,7 @@
 
 #include "BiomeDef.h"
 
-//#include "BlockType.h";
+
 
 // Used to smoothly convert to new axis ordering. One will be removed when deemed stable.
 #define AXIS_ORDER_YZX 1  // Original (1.1-)
@@ -38,22 +38,22 @@ using cEntityList = std::vector<OwnedEntity>;
 // tolua_begin
 
 /** The datatype used by blockdata */
-typedef unsigned short BLOCKTYPE;
+// typedef unsigned char BLOCKTYPE;
 
 /** The datatype used by nibbledata (meta, light, skylight) */
-typedef unsigned short NIBBLETYPE;
+// typedef unsigned char NIBBLETYPE;
+
+typedef unsigned char LIGHTTYPE;
 
 /** The type used by the heightmap */
 typedef unsigned char HEIGHTTYPE;
 
-typedef unsigned int  NEWBLOCKTYPE;
 // tolua_end
 
 
 
 
 
-/** Wraps the chunk coords into a single structure. */
 class cChunkCoords
 {
 public:
@@ -92,7 +92,7 @@ public:
 	/** Returns a string that describes the chunk coords, suitable for logging. */
 	AString ToString() const
 	{
-		return fmt::format(FMT_STRING("[{}, {}]"), m_ChunkX, m_ChunkZ);
+		return Printf("[%d, %d]", m_ChunkX, m_ChunkZ);
 	}
 } ;
 
@@ -100,17 +100,28 @@ public:
 
 
 
-/** Implements custom fmtlib formatting for cChunkCoords. */
-namespace fmt
+/** Non-owning view of a chunk's client handles. */
+class cChunkClientHandles
 {
-	template <> struct formatter<cChunkCoords>: formatter<int>
+public:
+	using const_iterator = std::vector<cClientHandle *>::const_iterator;
+	using iterator = const_iterator;
+
+	explicit cChunkClientHandles(const std::vector<cClientHandle *> & a_Container):
+		m_Begin(a_Container.cbegin()),
+		m_End(a_Container.cend())
 	{
-		auto format(cChunkCoords a_Coords, format_context & a_Ctx)
-		{
-			return format_to(a_Ctx.out(), "[{}, {}]", a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
-		}
-	};
-}
+	}
+
+	const_iterator begin()  const { return m_Begin; }
+	const_iterator cbegin() const { return m_Begin; }
+
+	const_iterator end()  const { return m_End; }
+	const_iterator cend() const { return m_End; }
+
+private:
+	const_iterator m_Begin, m_End;
+};
 
 
 
@@ -130,21 +141,21 @@ public:
 	static const size_t NumSections = (cChunkDef::Height / SectionHeight);
 
 	/** The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column */
-	typedef HEIGHTTYPE HeightMap[Width * Width];
+	using HeightMap = std::array<HEIGHTTYPE, Width * Width>;
 
 	/** The type used for any biomemap operations and storage inside Cuberite,
 	using Cuberite biomes (need not correspond to client representation!)
 	idx = x + Width * z */
-	typedef EMCSBiome BiomeMap[Width * Width];
+	using BiomeMap = std::array<EMCSBiome, Width * Width>;
 
+	// typedef unsigned char BlockTypes[NumBlocks];
 	/** The type used for block type operations and storage, AXIS_ORDER ordering */
-	typedef BLOCKTYPE BlockTypes[NumBlocks];
-
-	/** The type used for block type operations and storage, AXIS_ORDER ordering */
-	typedef NEWBLOCKTYPE BlockTypes2[NumBlocks];
+	using BlockStates = BlockState[NumBlocks];
 
 	/** The type used for block data in nibble format, AXIS_ORDER ordering */
-	typedef NIBBLETYPE BlockNibbles[NumBlocks / 2];
+	// typedef NIBBLETYPE BlockNibbles[NumBlocks / 2];
+
+	typedef LIGHTTYPE LightNibbles[NumBlocks / 2];
 
 
 	/** Converts absolute block coords into relative (chunk + block) coords: */
@@ -185,10 +196,10 @@ public:
 	}
 
 
-	/** Validates a height-coordinate. Returns false if height-coordinate is out of height bounds */
-	inline static bool IsValidHeight(Vector3i a_BlockPosition)
+	/** Validates a height-coordinate. Returns false if height-coordiante is out of height bounds */
+	inline static bool IsValidHeight(int a_Height)
 	{
-		return ((a_BlockPosition.y >= 0) && (a_BlockPosition.y < Height));
+		return ((a_Height >= 0) && (a_Height < Height));
 	}
 
 
@@ -204,7 +215,7 @@ public:
 	{
 		return (
 			IsValidWidth(a_RelPos.x) &&
-			IsValidHeight(a_RelPos) &&
+			IsValidHeight(a_RelPos.y) &&
 			IsValidWidth(a_RelPos.z)
 		);
 	}
@@ -228,22 +239,42 @@ public:
 	}
 
 
-	inline static size_t MakeIndex(int x, int y, int z)
+	inline static int MakeIndex(Vector3i a_Pos)
 	{
-		ASSERT(IsValidRelPos({ x, y, z }));
+		return MakeIndex(a_Pos.x, a_Pos.y, a_Pos.z);
+	}
 
+
+	inline static int MakeIndex(int x, int y, int z)
+	{
+		if (
+			(x < Width)  && (x > -1) &&
+			(y < Height) && (y > -1) &&
+			(z < Width)  && (z > -1)
+		)
+		{
+			return MakeIndexNoCheck(x, y, z);
+		}
+		FLOGERROR("cChunkDef::MakeIndex(): coords out of range: {0}; returning fake index 0", Vector3i{x, y, z});
+		ASSERT(!"cChunkDef::MakeIndex(): coords out of chunk range!");
+		return 0;
+	}
+
+
+	inline static int MakeIndexNoCheck(int x, int y, int z)
+	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			// For some reason, NOT using the Horner schema is faster. Weird.
-			return static_cast<size_t>(x + (z * Width) + (y * Width * Width));   // 1.2 uses XZY
+			return x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width);   // 1.2 uses XZY
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return static_cast<size_t>(y + (z * Width) + (x * Height * Width));  // 1.1 uses YZX
+			return y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width);  // 1.1 uses YZX
 		#endif
 	}
 
 
-	inline static size_t MakeIndex(Vector3i a_RelPos)
+	inline static int MakeIndexNoCheck(Vector3i a_RelPos)
 	{
-		return MakeIndex(a_RelPos.x, a_RelPos.y, a_RelPos.z);
+		return MakeIndexNoCheck(a_RelPos.x, a_RelPos.y, a_RelPos.z);
 	}
 
 
@@ -265,39 +296,39 @@ public:
 	}
 
 
-	inline static void SetBlock(BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z, BLOCKTYPE a_Type)
+	inline static void SetBlock(BlockState * a_BlockTypes, int a_X, int a_Y, int a_Z, BlockState a_Type)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Y >= 0) && (a_Y < Height));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		a_BlockTypes[MakeIndex(a_X, a_Y, a_Z)] = a_Type;
+		a_BlockTypes[MakeIndexNoCheck(a_X, a_Y, a_Z)] = a_Type;
 	}
 
 
-	inline static void SetBlock(BLOCKTYPE * a_BlockTypes, int a_Index, BLOCKTYPE a_Type)
+	inline static void SetBlock(BlockState * a_BlockTypes, int a_Index, BlockState a_Type)
 	{
 		ASSERT((a_Index >= 0) && (a_Index <= NumBlocks));
 		a_BlockTypes[a_Index] = a_Type;
 	}
 
 
-	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, Vector3i a_RelPos)
+	inline static BlockState GetBlock(const BlockState * a_BlockTypes, Vector3i a_RelPos)
 	{
 		ASSERT(IsValidRelPos(a_RelPos));
-		return a_BlockTypes[MakeIndex(a_RelPos)];
+		return a_BlockTypes[MakeIndexNoCheck(a_RelPos)];
 	}
 
 
-	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z)
+	inline static BlockState GetBlock(const BlockState * a_BlockTypes, int a_X, int a_Y, int a_Z)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Y >= 0) && (a_Y < Height));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		return a_BlockTypes[MakeIndex(a_X, a_Y, a_Z)];
+		return a_BlockTypes[MakeIndexNoCheck(a_X, a_Y, a_Z)];
 	}
 
 
-	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, int a_Idx)
+	inline static BlockState GetBlock(const BlockState * a_BlockTypes, int a_Idx)
 	{
 		ASSERT((a_Idx >= 0) && (a_Idx < NumBlocks));
 		return a_BlockTypes[a_Idx];
@@ -335,12 +366,13 @@ public:
 		a_BiomeMap[a_X + Width * a_Z] = a_Biome;
 	}
 
-
+/*
 	static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, int x, int y, int z)
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
-			return ExpandNibble(a_Buffer, MakeIndex(x, y, z));
+			int Index = MakeIndexNoCheck(x, y, z);
+			return ExpandNibble(a_Buffer, static_cast<size_t>(Index));
 		}
 		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
 		return 0;
@@ -362,6 +394,7 @@ public:
 	{
 		return (a_Buffer[a_Index / 2] >> ((a_Index & 1) * 4)) & 0x0f;
 	}
+*/
 } ;
 
 
@@ -391,60 +424,26 @@ struct sSetBlock
 {
 	int m_RelX, m_RelY, m_RelZ;
 	int m_ChunkX, m_ChunkZ;
-	BLOCKTYPE m_BlockType;
-	NIBBLETYPE m_BlockMeta;
-	UInt32 m_BlockIdNew;
+	BlockState m_Block;
 
-	sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta):
+	sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BlockState a_Block):
 		m_RelX(a_BlockX),
 		m_RelY(a_BlockY),
 		m_RelZ(a_BlockZ),
-		m_BlockType(a_BlockType),
-		m_BlockMeta(a_BlockMeta),
-		m_BlockIdNew(2)
+		m_Block(a_Block)
 	{
 		cChunkDef::AbsoluteToRelative(m_RelX, m_RelY, m_RelZ, m_ChunkX, m_ChunkZ);
 	}
 
-	sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, UInt32 a_BlockIdNew):
-		m_RelX(a_BlockX),
-		m_RelY(a_BlockY),
-		m_RelZ(a_BlockZ),
-		m_BlockType(0),
-		m_BlockMeta(0),
-		m_BlockIdNew(a_BlockIdNew)
-	{
-		cChunkDef::AbsoluteToRelative(m_RelX, m_RelY, m_RelZ, m_ChunkX, m_ChunkZ);
-	}
-
-
-	sSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
-		sSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockType, a_BlockMeta)
+	sSetBlock(Vector3i a_BlockPos, BlockState a_Block) :
+		sSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Block)
 	{
 	}
 
-	sSetBlock(Vector3i a_BlockPos, UInt32 a_BlockIdNew) :
-		sSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockIdNew)
-	{
-	}
-
-	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
+	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block) :
 		m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ),
 		m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ),
-		m_BlockType(a_BlockType),
-		m_BlockMeta(a_BlockMeta),
-		m_BlockIdNew(2)
-	{
-		ASSERT((a_RelX >= 0) && (a_RelX < cChunkDef::Width));
-		ASSERT((a_RelZ >= 0) && (a_RelZ < cChunkDef::Width));
-	}
-
-	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelY, int a_RelZ, UInt32 a_BlockIdNew) :
-		m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ),
-		m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ),
-		m_BlockType(0),
-		m_BlockMeta(0),
-		m_BlockIdNew(a_BlockIdNew)
+		m_Block(a_Block)
 	{
 		ASSERT((a_RelX >= 0) && (a_RelX < cChunkDef::Width));
 		ASSERT((a_RelZ >= 0) && (a_RelZ < cChunkDef::Width));
@@ -473,6 +472,7 @@ struct sSetBlock
 	}
 };
 
+typedef std::list<sSetBlock> sSetBlockList;
 typedef std::vector<sSetBlock> sSetBlockVector;
 
 typedef std::list<cChunkCoords> cChunkCoordsList;
@@ -492,6 +492,27 @@ public:
 		return (static_cast<size_t>(a_Coords.m_ChunkX) << 16) ^ static_cast<size_t>(a_Coords.m_ChunkZ);
 	}
 };
+
+
+
+
+
+class cChunkCoordsWithBool
+{
+public:
+	int m_ChunkX;
+	int m_ChunkZ;
+	bool m_ForceGenerate;
+
+	cChunkCoordsWithBool(int a_ChunkX, int a_ChunkZ, bool a_ForceGenerate) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ), m_ForceGenerate(a_ForceGenerate){}
+
+	bool operator == (const cChunkCoordsWithBool & a_Other) const
+	{
+		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ) && (m_ForceGenerate == a_Other.m_ForceGenerate));
+	}
+};
+
+typedef std::list<cChunkCoordsWithBool> cChunkCoordsWithBoolList;
 
 
 
@@ -533,319 +554,7 @@ public:
 } ;
 
 typedef cCoordWithData<int>        cCoordWithInt;
+typedef cCoordWithData<BlockState>  cCoordWithBlock;
 
 typedef std::list<cCoordWithInt>   cCoordWithIntList;
 typedef std::vector<cCoordWithInt> cCoordWithIntVector;
-
-	enum class VAxis : char
-	{
-		X,
-		Z,
-	};
-	enum class Axis : char
-	{
-		X,
-		Y,
-		Z,
-	};
-	enum class Direction : char
-	{
-		NORTH,
-		EAST,
-		SOUTH,
-		WEST,
-		UP,
-		DOWN,
-	};
-	enum class Orientation : char
-	{
-		DOWN_EAST,
-		DOWN_NORTH,
-		DOWN_SOUTH,
-		DOWN_WEST,
-		UP_EAST,
-		UP_NORTH,
-		UP_SOUTH,
-		UP_WEST,
-		WEST_UP,
-		EAST_UP,
-		NORTH_UP,
-		SOUTH_UP,
-	};
-	enum class BlockFace : char
-	{
-		FLOOR,
-		WALL,
-		CEILING,
-	};
-	enum class Attachment : char
-	{
-		FLOOR,
-		CEILING,
-		SINGLE_WALL,
-		DOUBLE_WALL,
-	};
-	enum class WallShape : char
-	{
-		NONE,
-		LOW,
-		TALL,
-	};
-	enum class WireConnection : char
-	{
-		UP,
-		SIDE,
-		NONE,
-	};
-	enum class DoubleBlockHalf : char
-	{
-		UPPER,
-		LOWER,
-	};
-	enum class BlockHalf : char
-	{
-		TOP,
-		BOTTOM,
-	};
-	enum class RailShape : char
-	{
-		NORTH_SOUTH,
-		EAST_WEST,
-		ASCENDING_EAST,
-		ASCENDING_WEST,
-		ASCENDING_NORTH,
-		ASCENDING_SOUTH,
-		SOUTH_EAST,
-		SOUTH_WEST,
-		NORTH_WEST,
-		NORTH_EAST,
-	};
-	enum class BedPart : char
-	{
-		HEAD,
-		FOOT,
-	};
-	enum class ChestType : char
-	{
-		SINGLE,
-		LEFT,
-		RIGHT,
-	};
-	enum class ComparatorMode : char
-	{
-		COMPARE,
-		SUBTRACT,
-	};
-	enum class DoorHinge : char
-	{
-		LEFT,
-		RIGHT,
-	};
-	enum class Instrument : char
-	{
-		HARP,
-		BASEDRUM,
-		SNARE,
-		HAT,
-		BASS,
-		FLUTE,
-		BELL,
-		GUITAR,
-		CHIME,
-		XYLOPHONE,
-		IRON_XYLOPHONE,
-		COW_BELL,
-		DIDGERIDOO,
-		BIT,
-		BANJO,
-		PLING,
-		ZOMBIE,
-		SKELETON,
-		CREEPER,
-		DRAGON,
-		WITHER_SKELETON,
-		PIGLIN,
-		CUSTOM_HEAD,
-	};
-	enum class PistonType : char
-	{
-		NORMAL,  // manually changed from DEFAULT to NORMAL
-		STICKY,
-	};
-	enum class SlabType : char
-	{
-		TOP,
-		BOTTOM,
-		DOUBLE,
-	};
-	enum class StairShape : char
-	{
-		STRAIGHT,
-		INNER_LEFT,
-		INNER_RIGHT,
-		OUTER_LEFT,
-		OUTER_RIGHT,
-	};
-	enum class StructureBlockMode : char
-	{
-		SAVE,
-		LOAD,
-		CORNER,
-		DATA,
-	};
-	enum class BambooLeaves : char
-	{
-		NONE,
-		SMALL,
-		LARGE,
-	};
-	enum class Tilt : char
-	{
-		NONE,
-		UNSTABLE,
-		PARTIAL,
-		FULL,
-	};
-	enum class Thickness : char
-	{
-		TIP_MERGE,
-		TIP,
-		FRUSTUM,
-		MIDDLE,
-		BASE,
-	};
-	enum class SculkSensorPhase : char
-	{
-		INACTIVE,
-		ACTIVE,
-		COOLDOWN,
-	};
-	enum class TrialSpawnerState : char
-	{
-		INACTIVE,
-		WAITING_FOR_PLAYERS,
-		ACTIVE,
-		WAITING_FOR_REWARD_EJECTION,
-		EJECTING_REWARD,
-		COOLDOWN,
-	};
-	enum class VaultState : char
-	{
-		INACTIVE,
-		ACTIVE,
-		UNLOCKING,
-		EJECTING,
-	};
-	struct AllBlockStates
-	{
-		bool attached;
-		bool bottom;
-		bool conditional;
-		bool disarmed;
-		bool drag;
-		bool enabled;
-		bool extended;
-		bool eye;
-		bool falling;
-		bool hanging;
-		bool has_bottle_0;
-		bool has_bottle_1;
-		bool has_bottle_2;
-		bool has_record;
-		bool has_book;
-		bool inverted;
-		bool in_wall;
-		bool lit;
-		bool locked;
-		bool occupied;
-		bool open;
-		bool persistent;
-		bool powered;
-		bool shorts; // called short but that are resver keyword so s is appended
-		bool signal_fire;
-		bool snowy;
-		bool triggered;
-		bool unstable;
-		bool waterlogged;
-		bool berries;
-		bool bloom;
-		bool shrieking;
-		bool can_summon;
-		Axis axis;
-		VAxis v_axis;
-		bool up;
-		bool down;
-		bool north;
-		bool east;
-		bool south;
-		bool west;
-		Direction facing;
-		char flower_amount;
-		Orientation orientation;
-		BlockFace face;
-		Attachment attachment;
-		WallShape wall_east;
-		WallShape wall_north;
-		WallShape wall_south;
-		WallShape wall_west;
-		WireConnection wire_east;
-		WireConnection wire_north;
-		WireConnection wire_south;
-		WireConnection wire_west;
-		DoubleBlockHalf half;
-		BlockHalf block_half;  // for stairs and trapdoors
-		RailShape rail_shape;
-		char age;
-		//char age;
-		//char age;
-		//char age;
-		//char age;
-		//char age;
-		//char age;
-		//char age;
-		char bites;
-		char candles;
-		char delay;
-		char distance;
-		char eggs;
-		char hatch;
-		char layers;
-		//char level;
-		//char level;
-		//char level;
-		char honey_level;
-		char level;
-		char moisture;
-		char note;
-		char pickles;
-		char power;
-		char stage;
-		char charges;
-		char rotation;
-		BedPart part;
-		ChestType type;
-		ComparatorMode comp_mode;
-		DoorHinge hinge;
-		Instrument instrument;
-		PistonType piston_type;
-		SlabType slab_type;
-		StairShape stairs_shape;
-		StructureBlockMode str_mode;
-		BambooLeaves leaves;
-		Tilt tilt;
-		Direction vertical_direction;
-		Thickness thickness;
-		SculkSensorPhase sculk_sensor_phase;
-		bool slot_0_occupied;
-		bool slot_1_occupied;
-		bool slot_2_occupied;
-		bool slot_3_occupied;
-		bool slot_4_occupied;
-		bool slot_5_occupied;
-		char dusted;
-		bool cracked;
-		bool crafting;
-		TrialSpawnerState trial_spawner_state;
-		VaultState vault_state;
-		bool ominous;
-	};

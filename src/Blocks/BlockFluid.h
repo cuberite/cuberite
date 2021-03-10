@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "../Simulator/FireSimulator.h"
 
 
 
@@ -16,13 +17,41 @@ public:
 
 	using Super::Super;
 
-protected:
+	static inline bool IsBlockLiquid(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Lava:
+			case BlockType::Water:
+				return true;
+			default: return false;
+		}
+	}
 
-	~cBlockFluidHandler() = default;
+	static inline unsigned char GetFalloff (BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Lava:  return Block::Lava::Level(a_Block);
+			case BlockType::Water: return Block::Water::Level(a_Block);
+			default: return 0;
+		}
+	}
+
+	static inline BlockState SetFalloff (BlockState a_Block, unsigned char a_Falloff)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Lava:  return Block::Lava::Lava(a_Falloff);
+			case BlockType::Water: return Block::Water::Water(a_Falloff);
+			default: return a_Block;
+		}
+	}
+
 
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// No pickups
 		return {};
@@ -32,7 +61,7 @@ private:
 
 
 
-	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, BlockState a_Block) const override
 	{
 		return true;
 	}
@@ -86,37 +115,38 @@ private:
 		auto Pos = a_RelPos + Vector3i(x, y, z);
 
 		// Check if it's fuel:
-		BLOCKTYPE BlockType;
+		BlockState Self = 0;
 		if (
-			!cChunkDef::IsValidHeight(Pos) ||
-			!a_Chunk.UnboundedRelGetBlockType(Pos, BlockType) ||
-			!cFireSimulator::IsFuel(BlockType)
+			!cChunkDef::IsValidHeight(Pos.y) ||
+			!a_Chunk.UnboundedRelGetBlock(Pos, Self) ||
+			!cFireSimulator::IsFuel(Self)
 		)
 		{
 			return false;
 		}
 
 		// Try to set it on fire:
-		static Vector3i CrossCoords[] =
+		static std::array<Vector3i, 6> CrossCoords =
 		{
-			{-1,  0,  0},
-			{ 1,  0,  0},
-			{ 0, -1,  0},
-			{ 0,  1,  0},
-			{ 0,  0, -1},
-			{ 0,  0,  1},
-		} ;
-		for (size_t i = 0; i < ARRAYCOUNT(CrossCoords); i++)
+			Vector3i(-1,  0,  0),
+			Vector3i( 1,  0,  0),
+			Vector3i( 0, -1,  0),
+			Vector3i( 0,  1,  0),
+			Vector3i( 0,  0, -1),
+			Vector3i( 0,  0,  1),
+		};
+
+		for (auto CrossCord : CrossCoords)
 		{
-			auto NeighborPos = Pos + CrossCoords[i];
+			auto NeighborPos = Pos + CrossCord;
 			if (
-				cChunkDef::IsValidHeight(NeighborPos) &&
-				a_Chunk.UnboundedRelGetBlockType(NeighborPos, BlockType) &&
-				(BlockType == E_BLOCK_AIR)
+				cChunkDef::IsValidHeight(NeighborPos.y) &&
+				a_Chunk.UnboundedRelGetBlock(NeighborPos, Self) &&
+				(Self.Type() == BlockType::Air)
 			)
 			{
 				// This is an air block next to a fuel next to lava, light the fuel block up:
-				a_Chunk.UnboundedRelSetBlock(NeighborPos, E_BLOCK_FIRE, 0);
+				a_Chunk.UnboundedRelSetBlock(NeighborPos, Block::Fire::Fire());
 				return true;
 			}
 		}  // for i - CrossCoords[]
@@ -127,19 +157,9 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 4;
-	}
-
-
-
-
-
-	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override
-	{
-		return false;
 	}
 } ;
 
@@ -156,26 +176,26 @@ public:
 
 private:
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
-		if (IsBlockWater(m_BlockType))
-		{
-			return 12;
-		}
-		ASSERT(!"Unhandled blocktype in fluid/water handler!");
-		return 0;
+		return 12;
+
 	}
 
-	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override
+	virtual bool CanSustainPlant(BlockState a_Plant) const override
 	{
-		return (
-			(a_Plant == E_BLOCK_BEETROOTS) ||
-			(a_Plant == E_BLOCK_CROPS) ||
-			(a_Plant == E_BLOCK_CARROTS) ||
-			(a_Plant == E_BLOCK_POTATOES) ||
-			(a_Plant == E_BLOCK_MELON_STEM) ||
-			(a_Plant == E_BLOCK_PUMPKIN_STEM)
-		);
+		switch (a_Plant.Type())
+		{
+			case BlockType::Beetroots:
+			case BlockType::Wheat:
+			case BlockType::Carrots:
+			case BlockType::Potatoes:
+			case BlockType::MelonStem:
+			case BlockType::AttachedMelonStem:
+			case BlockType::PumpkinStem:
+			case BlockType::AttachedPumpkinStem:
+				return true;
+			default: return false;
+		}
 	}
 };

@@ -9,14 +9,17 @@
 
 
 
-class cItemHoeHandler final:
+class cItemHoeHandler:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	using Super::Super;
+	cItemHoeHandler(int a_ItemType):
+		Super(a_ItemType)
+	{
+	}
 
 
 
@@ -29,7 +32,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) const override
+	) override
 	{
 		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockPos.y >= cChunkDef::Height))
 		{
@@ -37,31 +40,39 @@ public:
 		}
 
 		// Need air above the hoe-d block to transform it:
-		BLOCKTYPE UpperBlockType = a_World->GetBlock(a_ClickedBlockPos.addedY(1));
-		if (UpperBlockType != E_BLOCK_AIR)
+		auto UpperBlockType = a_World->GetBlock(a_ClickedBlockPos.addedY(1));
+		if (UpperBlockType != Block::Air::Air())
 		{
 			return false;
 		}
 
 		// Can only transform dirt or grass blocks:
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-		if (!a_World->GetBlockTypeMeta(a_ClickedBlockPos, BlockType, BlockMeta))
+		auto BlockBelow = a_World->GetBlock(a_ClickedBlockPos);
+		switch (BlockBelow.Type())
 		{
-			return false;
-		}
-		if ((BlockType != E_BLOCK_DIRT) && (BlockType != E_BLOCK_GRASS))
-		{
-			return false;
-		}
-		if ((BlockType == E_BLOCK_DIRT) && (BlockMeta == E_META_DIRT_PODZOL))
-		{
-			return false;
+			case BlockType::GrassBlock:
+			case BlockType::Dirt:
+			case BlockType::CoarseDirt:
+				break;
+			default: return false;
 		}
 
 		// Transform:
-		auto NewBlockType = ((BlockType == E_BLOCK_DIRT) && (BlockMeta == E_META_DIRT_COARSE)) ? E_BLOCK_DIRT : E_BLOCK_FARMLAND;
-		a_World->SetBlock(a_ClickedBlockPos, NewBlockType, 0);
+		switch (BlockBelow.Type())
+		{
+			case BlockType::GrassBlock:
+			case BlockType::Dirt:
+			{
+				a_World->SetBlock(a_ClickedBlockPos, Block::Farmland::Farmland());
+				break;
+			}
+			case BlockType::CoarseDirt:
+			{
+				a_World->SetBlock(a_ClickedBlockPos, Block::Dirt::Dirt());
+				break;
+			}
+			default: return false;
+		}
 		a_World->BroadcastSoundEffect("item.hoe.till", a_ClickedBlockPos + Vector3d(0.5, 0.5, 0.5), 1.0f, 0.8f);
 		a_Player->UseEquippedItem();
 		return true;
@@ -71,7 +82,7 @@ public:
 
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) const override
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
 	{
 		switch (a_Action)
 		{
