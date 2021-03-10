@@ -12,7 +12,7 @@
 
 
 cDropSpenserWindow::cDropSpenserWindow(cDropSpenserEntity * a_DropSpenser):
-	Super(wtDropSpenser, (a_DropSpenser->GetBlockType() == E_BLOCK_DISPENSER) ? "Dispenser" : "Dropper")
+	Super(wtDropSpenser, (a_DropSpenser->GetBlock().Type() == BlockType::Dispenser) ? "Dispenser" : "Dropper")
 {
 	m_SlotAreas.push_back(new cSlotAreaItemGrid(a_DropSpenser->GetContents(), *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));

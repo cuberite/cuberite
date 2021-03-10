@@ -73,35 +73,79 @@ void cBlockEntity::CopyFrom(const cBlockEntity & a_Src)
 
 
 
-OwnedBlockEntity cBlockEntity::CreateByBlockType(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta, const Vector3i a_Pos, cWorld * const a_World)
+OwnedBlockEntity cBlockEntity::CreateByBlockType(BlockState a_Block, const Vector3i a_Pos, cWorld * const a_World)
 {
-	switch (a_BlockType)
+	switch (a_Block.Type())
 	{
-		case E_BLOCK_BEACON:            return std::make_unique<cBeaconEntity         >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_BED:               return std::make_unique<cBedEntity            >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_BREWING_STAND:     return std::make_unique<cBrewingstandEntity   >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_CHEST:             return std::make_unique<cChestEntity          >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_COMMAND_BLOCK:     return std::make_unique<cCommandBlockEntity   >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_DISPENSER:         return std::make_unique<cDispenserEntity      >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_DROPPER:           return std::make_unique<cDropperEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_ENCHANTMENT_TABLE: return std::make_unique<cEnchantingTableEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_ENDER_CHEST:       return std::make_unique<cEnderChestEntity     >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_END_PORTAL:        return std::make_unique<cEndPortalEntity      >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_FLOWER_POT:        return std::make_unique<cFlowerPotEntity      >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_FURNACE:           return std::make_unique<cFurnaceEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_HEAD:              return std::make_unique<cMobHeadEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_HOPPER:            return std::make_unique<cHopperEntity         >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_JUKEBOX:           return std::make_unique<cJukeboxEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_LIT_FURNACE:       return std::make_unique<cFurnaceEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_MOB_SPAWNER:       return std::make_unique<cMobSpawnerEntity     >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_NOTE_BLOCK:        return std::make_unique<cNoteEntity           >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_SIGN_POST:         return std::make_unique<cSignEntity           >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_TRAPPED_CHEST:     return std::make_unique<cChestEntity          >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_WALLSIGN:          return std::make_unique<cSignEntity           >(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case BlockType::Beacon:          return std::make_unique<cBeaconEntity>        (a_Block, a_Pos, a_World);
+		case BlockType::BlackBed:
+		case BlockType::BlueBed:
+		case BlockType::BrownBed:
+		case BlockType::CyanBed:
+		case BlockType::GrayBed:
+		case BlockType::GreenBed:
+		case BlockType::LightBlueBed:
+		case BlockType::LightGrayBed:
+		case BlockType::LimeBed:
+		case BlockType::MagentaBed:
+		case BlockType::OrangeBed:
+		case BlockType::PinkBed:
+		case BlockType::PurpleBed:
+		case BlockType::RedBed:
+		case BlockType::WhiteBed:
+		case BlockType::YellowBed:       return std::make_unique<cBedEntity>            (a_Block, a_Pos, a_World);
+
+		case BlockType::BrewingStand:    return std::make_unique<cBrewingstandEntity>   (a_Block, a_Pos, a_World);
+		case BlockType::Chest:           return std::make_unique<cChestEntity>          (a_Block, a_Pos, a_World);
+		case BlockType::CommandBlock:    return std::make_unique<cCommandBlockEntity>   (a_Block, a_Pos, a_World);
+		case BlockType::Dispenser:       return std::make_unique<cDispenserEntity>      (a_Block, a_Pos, a_World);
+		case BlockType::Dropper:         return std::make_unique<cDropperEntity>        (a_Block, a_Pos, a_World);
+		case BlockType::EnchantingTable: return std::make_unique<cEnchantingTableEntity>(a_Block, a_Pos, a_World);
+		case BlockType::EnderChest:      return std::make_unique<cEnderChestEntity>     (a_Block, a_Pos, a_World);
+		case BlockType::EndPortal:       return std::make_unique<cEndPortalEntity>      (a_Block, a_Pos, a_World);
+		case BlockType::FlowerPot:       return std::make_unique<cFlowerPotEntity>      (a_Block, a_Pos, a_World);
+		case BlockType::Furnace:         return std::make_unique<cFurnaceEntity>        (a_Block, a_Pos, a_World);
+
+		case BlockType::CreeperHead:
+		case BlockType::CreeperWallHead:
+		case BlockType::DragonHead:
+		case BlockType::DragonWallHead:
+		case BlockType::PlayerHead:
+		case BlockType::PlayerWallHead:
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:
+		case BlockType::SkeletonSkull:
+		case BlockType::SkeletonWallSkull:
+		case BlockType::WitherSkeletonSkull:
+		case BlockType::WitherSkeletonWallSkull: return std::make_unique<cMobHeadEntity>(a_Block, a_Pos, a_World);
+
+		case BlockType::Hopper:          return std::make_unique<cHopperEntity>    (a_Block, a_Pos, a_World);
+		case BlockType::Jukebox:         return std::make_unique<cJukeboxEntity>   (a_Block, a_Pos, a_World);
+		case BlockType::Spawner:         return std::make_unique<cMobSpawnerEntity>(a_Block, a_Pos, a_World);
+		case BlockType::NoteBlock:       return std::make_unique<cNoteEntity>      (a_Block, a_Pos, a_World);
+
+		case BlockType::AcaciaSign:
+		case BlockType::AcaciaWallSign:
+		case BlockType::BirchSign:
+		case BlockType::BirchWallSign:
+		case BlockType::CrimsonSign:
+		case BlockType::CrimsonWallSign:
+		case BlockType::DarkOakSign:
+		case BlockType::DarkOakWallSign:
+		case BlockType::JungleSign:
+		case BlockType::JungleWallSign:
+		case BlockType::OakSign:
+		case BlockType::OakWallSign:
+		case BlockType::SpruceSign:
+		case BlockType::SpruceWallSign:
+		case BlockType::WarpedSign:
+		case BlockType::WarpedWallSign: return std::make_unique<cSignEntity> (a_Block, a_Pos, a_World);
+
+		case BlockType::TrappedChest:   return std::make_unique<cChestEntity>(a_Block, a_Pos, a_World);
 		default:
 		{
 			LOGD("%s: Requesting creation of an unknown block entity - block type %d (%s)",
-				__FUNCTION__, a_BlockType, ItemTypeToString(a_BlockType).c_str()
+				__FUNCTION__, a_Block.Type(), "" //ItemTypeToString(a_BlockType).c_str()
 			);
 			ASSERT(!"Requesting creation of an unknown block entity");
 			return nullptr;
@@ -121,31 +165,76 @@ void cBlockEntity::Destroy()
 
 
 
-bool cBlockEntity::IsBlockEntityBlockType(const BLOCKTYPE a_BlockType)
+bool cBlockEntity::IsBlockEntityBlockType(const BlockType a_Block)
 {
-	switch (a_BlockType)
+	switch (a_Block)
 	{
-		case E_BLOCK_BEACON:
-		case E_BLOCK_BED:
-		case E_BLOCK_BREWING_STAND:
-		case E_BLOCK_CHEST:
-		case E_BLOCK_COMMAND_BLOCK:
-		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER:
-		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_ENDER_CHEST:
-		case E_BLOCK_END_PORTAL:
-		case E_BLOCK_FLOWER_POT:
-		case E_BLOCK_FURNACE:
-		case E_BLOCK_HEAD:
-		case E_BLOCK_HOPPER:
-		case E_BLOCK_JUKEBOX:
-		case E_BLOCK_LIT_FURNACE:
-		case E_BLOCK_MOB_SPAWNER:
-		case E_BLOCK_NOTE_BLOCK:
-		case E_BLOCK_SIGN_POST:
-		case E_BLOCK_TRAPPED_CHEST:
-		case E_BLOCK_WALLSIGN:
+		case BlockType::Beacon:
+
+		case BlockType::BlackBed:
+		case BlockType::BlueBed:
+		case BlockType::BrownBed:
+		case BlockType::CyanBed:
+		case BlockType::GrayBed:
+		case BlockType::GreenBed:
+		case BlockType::LightBlueBed:
+		case BlockType::LightGrayBed:
+		case BlockType::LimeBed:
+		case BlockType::MagentaBed:
+		case BlockType::OrangeBed:
+		case BlockType::PinkBed:
+		case BlockType::PurpleBed:
+		case BlockType::RedBed:
+		case BlockType::WhiteBed:
+		case BlockType::YellowBed:
+
+		case BlockType::BrewingStand:
+		case BlockType::Chest:
+		case BlockType::CommandBlock:
+		case BlockType::Dispenser:
+		case BlockType::Dropper:
+		case BlockType::EnchantingTable:
+		case BlockType::EnderChest:
+		case BlockType::EndPortal:
+		case BlockType::FlowerPot:
+		case BlockType::Furnace:
+
+		case BlockType::CreeperHead:
+		case BlockType::CreeperWallHead:
+		case BlockType::DragonHead:
+		case BlockType::DragonWallHead:
+		case BlockType::PlayerHead:
+		case BlockType::PlayerWallHead:
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:
+		case BlockType::SkeletonSkull:
+		case BlockType::SkeletonWallSkull:
+		case BlockType::WitherSkeletonSkull:
+		case BlockType::WitherSkeletonWallSkull:
+
+		case BlockType::Hopper:
+		case BlockType::Jukebox:
+		case BlockType::Spawner:
+		case BlockType::NoteBlock:
+
+		case BlockType::AcaciaSign:
+		case BlockType::AcaciaWallSign:
+		case BlockType::BirchSign:
+		case BlockType::BirchWallSign:
+		case BlockType::CrimsonSign:
+		case BlockType::CrimsonWallSign:
+		case BlockType::DarkOakSign:
+		case BlockType::DarkOakWallSign:
+		case BlockType::JungleSign:
+		case BlockType::JungleWallSign:
+		case BlockType::OakSign:
+		case BlockType::OakWallSign:
+		case BlockType::SpruceSign:
+		case BlockType::SpruceWallSign:
+		case BlockType::WarpedSign:
+		case BlockType::WarpedWallSign:
+
+		case BlockType::TrappedChest:
 		{
 			return true;
 		}

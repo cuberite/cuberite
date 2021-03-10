@@ -38,10 +38,12 @@ using cEntityList = std::vector<OwnedEntity>;
 // tolua_begin
 
 /** The datatype used by blockdata */
-typedef unsigned char BLOCKTYPE;
+// typedef unsigned char BLOCKTYPE;
 
 /** The datatype used by nibbledata (meta, light, skylight) */
-typedef unsigned char NIBBLETYPE;
+// typedef unsigned char NIBBLETYPE;
+
+typedef unsigned char LIGHTTYPE;
 
 /** The type used by the heightmap */
 typedef unsigned char HEIGHTTYPE;
@@ -144,13 +146,16 @@ public:
 	/** The type used for any biomemap operations and storage inside Cuberite,
 	using Cuberite biomes (need not correspond to client representation!)
 	idx = x + Width * z */
-	typedef EMCSBiome BiomeMap[Width * Width];
+	using BiomeMap = std::array<EMCSBiome, Width * Width>;
 
+	// typedef unsigned char BlockTypes[NumBlocks];
 	/** The type used for block type operations and storage, AXIS_ORDER ordering */
-	typedef BLOCKTYPE BlockTypes[NumBlocks];
+	using BlockStates = BlockState[NumBlocks];
 
 	/** The type used for block data in nibble format, AXIS_ORDER ordering */
-	typedef NIBBLETYPE BlockNibbles[NumBlocks / 2];
+	// typedef NIBBLETYPE BlockNibbles[NumBlocks / 2];
+
+	typedef LIGHTTYPE LightNibbles[NumBlocks / 2];
 
 
 	/** Converts absolute block coords into relative (chunk + block) coords: */
@@ -285,7 +290,7 @@ public:
 	}
 
 
-	inline static void SetBlock(BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z, BLOCKTYPE a_Type)
+	inline static void SetBlock(BlockState * a_BlockTypes, int a_X, int a_Y, int a_Z, BlockState a_Type)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Y >= 0) && (a_Y < Height));
@@ -294,21 +299,21 @@ public:
 	}
 
 
-	inline static void SetBlock(BLOCKTYPE * a_BlockTypes, int a_Index, BLOCKTYPE a_Type)
+	inline static void SetBlock(BlockState * a_BlockTypes, int a_Index, BlockState a_Type)
 	{
 		ASSERT((a_Index >= 0) && (a_Index <= NumBlocks));
 		a_BlockTypes[a_Index] = a_Type;
 	}
 
 
-	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, Vector3i a_RelPos)
+	inline static BlockState GetBlock(const BlockState * a_BlockTypes, Vector3i a_RelPos)
 	{
 		ASSERT(IsValidRelPos(a_RelPos));
 		return a_BlockTypes[MakeIndexNoCheck(a_RelPos)];
 	}
 
 
-	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z)
+	inline static BlockState GetBlock(const BlockState * a_BlockTypes, int a_X, int a_Y, int a_Z)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Y >= 0) && (a_Y < Height));
@@ -317,7 +322,7 @@ public:
 	}
 
 
-	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, int a_Idx)
+	inline static BlockState GetBlock(const BlockState * a_BlockTypes, int a_Idx)
 	{
 		ASSERT((a_Idx >= 0) && (a_Idx < NumBlocks));
 		return a_BlockTypes[a_Idx];
@@ -355,7 +360,7 @@ public:
 		a_BiomeMap[a_X + Width * a_Z] = a_Biome;
 	}
 
-
+/*
 	static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, int x, int y, int z)
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
@@ -383,6 +388,7 @@ public:
 	{
 		return (a_Buffer[a_Index / 2] >> ((a_Index & 1) * 4)) & 0x0f;
 	}
+ */
 } ;
 
 
@@ -412,29 +418,26 @@ struct sSetBlock
 {
 	int m_RelX, m_RelY, m_RelZ;
 	int m_ChunkX, m_ChunkZ;
-	BLOCKTYPE m_BlockType;
-	NIBBLETYPE m_BlockMeta;
+	BlockState m_Block;
 
-	sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta):
+	sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BlockState a_Block):
 		m_RelX(a_BlockX),
 		m_RelY(a_BlockY),
 		m_RelZ(a_BlockZ),
-		m_BlockType(a_BlockType),
-		m_BlockMeta(a_BlockMeta)
+		m_Block(a_Block)
 	{
 		cChunkDef::AbsoluteToRelative(m_RelX, m_RelY, m_RelZ, m_ChunkX, m_ChunkZ);
 	}
 
-	sSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
-		sSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockType, a_BlockMeta)
+	sSetBlock(Vector3i a_BlockPos, BlockState a_Block) :
+		sSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Block)
 	{
 	}
 
-	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
+	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block) :
 		m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ),
 		m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ),
-		m_BlockType(a_BlockType),
-		m_BlockMeta(a_BlockMeta)
+		m_Block(a_Block)
 	{
 		ASSERT((a_RelX >= 0) && (a_RelX < cChunkDef::Width));
 		ASSERT((a_RelZ >= 0) && (a_RelZ < cChunkDef::Width));
@@ -545,7 +548,7 @@ public:
 } ;
 
 typedef cCoordWithData<int>        cCoordWithInt;
-typedef cCoordWithData<BLOCKTYPE>  cCoordWithBlock;
+typedef cCoordWithData<BlockState>  cCoordWithBlock;
 
 typedef std::list<cCoordWithInt>   cCoordWithIntList;
 typedef std::vector<cCoordWithInt> cCoordWithIntVector;

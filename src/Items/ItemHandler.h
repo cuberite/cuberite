@@ -82,7 +82,7 @@ public:
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState a_Block
 	);
 
 
@@ -169,11 +169,11 @@ public:
 
 	/** Returns whether this tool / item can harvest a specific block (e.g. iron pickaxe can harvest diamond ore, but wooden one can't).
 	Defaults to false unless overridden. */
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType);
+	virtual bool CanHarvestBlock(BlockType a_BlockType);
 
 	/** Returns the strength to break a specific block.
 	Defaults to 1 unless overriden. */
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block);
+	virtual float GetBlockBreakingStrength(BlockType a_Block);
 
 	static cItemHandler * GetItemHandler(int a_ItemType);
 	static cItemHandler * GetItemHandler(const cItem & a_Item) { return GetItemHandler(a_Item.m_ItemType); }

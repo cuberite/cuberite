@@ -4,6 +4,7 @@
 
 // tolua_begin
 
+/*
 
 enum ENUM_BLOCK_TYPE : BLOCKTYPE
 {
@@ -289,7 +290,7 @@ enum ENUM_BLOCK_TYPE : BLOCKTYPE
 
 
 
-
+*/
 
 enum ENUM_ITEM_TYPE : short
 {
@@ -528,7 +529,7 @@ enum ENUM_ITEM_TYPE : short
 
 
 
-enum ENUM_BLOCK_META : NIBBLETYPE
+enum ENUM_BLOCK_META
 {
 	// Please keep this list alpha-sorted by the blocktype part
 	// then number-sorted for the same block
@@ -1188,7 +1189,7 @@ extern cItem GetIniItemSet(cIniFile & a_IniFile, const char * a_Section, const c
 
 /** Base case for IsOneOf to handle empty template aguments. */
 template <class = void>
-bool IsOneOf(BLOCKTYPE a_BlockType)
+bool IsOneOf(BlockType a_BlockType)
 {
 	return false;
 }
@@ -1197,17 +1198,17 @@ bool IsOneOf(BLOCKTYPE a_BlockType)
 /** Returns true if a_BlockType is equal to any of the variadic template arguments.
 Some example usage:
 \code
-	IsOneOf<>(E_BLOCK_AIR)                           == false
-	IsOneOf<E_BLOCK_AIR>(E_BLOCK_DIRT)               == false
-	IsOneOf<E_BLOCK_AIR, E_BLOCK_DIRT>(E_BLOCK_DIRT) == true
+	IsOneOf<>(BlockType::Air)                                 == false
+	IsOneOf<BlockType::Air>(BlockType::Dirt)                  == false
+	IsOneOf<BlockType::Air, BlockType::Dirt>(BlockType::Dirt) == true
 \endcode
 The implementation is ugly but it is equivalent to this C++17 fold expression:
 \code
 	((a_BlockType == Types) || ...)
 \endcode
 Just written to be valid without fold expressions or SFINAE. */
-template <BLOCKTYPE Head, BLOCKTYPE ... Tail>
-bool IsOneOf(BLOCKTYPE a_BlockType)
+template <BlockType Head, BlockType ... Tail>
+bool IsOneOf(BlockType a_BlockType)
 {
 	return ((a_BlockType == Head) || (IsOneOf<Tail...>(a_BlockType)));
 }

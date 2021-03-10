@@ -26,7 +26,7 @@ class cDropperEntity :
 public:  // tolua_export
 
 	/** Constructor used for normal operation */
-	cDropperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cDropperEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World);
 
 protected:
 

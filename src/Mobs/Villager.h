@@ -38,8 +38,8 @@ public:
 	virtual void KilledBy    (TakeDamageInfo & a_TDI) override;
 
 	// cVillager functions
-	/** return true if the given blocktype are: crops, potatoes or carrots. */
-	bool IsBlockFarmable(BLOCKTYPE a_BlockType);
+	/** return true if the given BlockType are: crops, potatoes or carrots. */
+	bool IsBlockFarmable(BlockType a_BlockType);
 
 	// Farmer functions
 	/** Searches in a 11x7x11 area for crops. If it found some it will navigate to them. */

@@ -9,8 +9,8 @@
 
 void cBlockDoorHandler::OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType,
-		NIBBLETYPE a_OldBlockMeta,
+		Vector3i a_BlockPos,
+		BlockState a_Block,
 		const cEntity * a_Digger
 ) const
 {

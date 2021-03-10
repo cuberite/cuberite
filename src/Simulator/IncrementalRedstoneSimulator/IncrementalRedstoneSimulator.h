@@ -20,75 +20,106 @@ public:
 private:
 
 	/** Returns if a redstone device is always ticked due to influence by its environment */
-	inline static bool IsAlwaysTicked(BLOCKTYPE a_Block)
+	inline static bool IsAlwaysTicked(BlockType a_Block)
 	{
 		switch (a_Block)  // Call the appropriate simulator for the entry's block type
 		{
-			case E_BLOCK_DAYLIGHT_SENSOR:
-			case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
-			case E_BLOCK_TRIPWIRE_HOOK:
-			case E_BLOCK_WOODEN_PRESSURE_PLATE:
-			case E_BLOCK_STONE_PRESSURE_PLATE:
-			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE: return true;
+			case BlockType::DaylightDetector:
+			case BlockType::TripwireHook:
+			case BlockType::AcaciaPressurePlate:
+			case BlockType::BirchPressurePlate:
+			case BlockType::CrimsonPressurePlate:
+			case BlockType::DarkOakPressurePlate:
+			case BlockType::HeavyWeightedPressurePlate:
+			case BlockType::LightWeightedPressurePlate:
+			case BlockType::JunglePressurePlate:
+			case BlockType::OakPressurePlate:
+			case BlockType::PolishedBlackstonePressurePlate:
+			case BlockType::SprucePressurePlate:
+			case BlockType::StonePressurePlate:
+			case BlockType::WarpedPressurePlate:
+				return true;
 			default: return false;
 		}
 	}
 
 	/** Returns if a block is any sort of redstone device */
-	inline static bool IsRedstone(BLOCKTYPE a_Block)
+	inline static bool IsRedstone(BlockType a_Block)
 	{
 		switch (a_Block)
 		{
 			// All redstone devices, please alpha sort
-			case E_BLOCK_ACACIA_DOOR:
-			case E_BLOCK_ACACIA_FENCE_GATE:
-			case E_BLOCK_ACTIVATOR_RAIL:
-			case E_BLOCK_ACTIVE_COMPARATOR:
-			case E_BLOCK_BIRCH_DOOR:
-			case E_BLOCK_BIRCH_FENCE_GATE:
-			case E_BLOCK_BLOCK_OF_REDSTONE:
-			case E_BLOCK_COMMAND_BLOCK:
-			case E_BLOCK_DARK_OAK_DOOR:
-			case E_BLOCK_DARK_OAK_FENCE_GATE:
-			case E_BLOCK_DAYLIGHT_SENSOR:
-			case E_BLOCK_DETECTOR_RAIL:
-			case E_BLOCK_DISPENSER:
-			case E_BLOCK_DROPPER:
-			case E_BLOCK_FENCE_GATE:
-			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-			case E_BLOCK_HOPPER:
-			case E_BLOCK_INACTIVE_COMPARATOR:
-			case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
-			case E_BLOCK_IRON_DOOR:
-			case E_BLOCK_IRON_TRAPDOOR:
-			case E_BLOCK_JUNGLE_DOOR:
-			case E_BLOCK_JUNGLE_FENCE_GATE:
-			case E_BLOCK_LEVER:
-			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-			case E_BLOCK_NOTE_BLOCK:
-			case E_BLOCK_OBSERVER:
-			case E_BLOCK_POWERED_RAIL:
-			case E_BLOCK_REDSTONE_LAMP_OFF:
-			case E_BLOCK_REDSTONE_LAMP_ON:
-			case E_BLOCK_REDSTONE_REPEATER_OFF:
-			case E_BLOCK_REDSTONE_REPEATER_ON:
-			case E_BLOCK_REDSTONE_TORCH_OFF:
-			case E_BLOCK_REDSTONE_TORCH_ON:
-			case E_BLOCK_REDSTONE_WIRE:
-			case E_BLOCK_SPRUCE_DOOR:
-			case E_BLOCK_SPRUCE_FENCE_GATE:
-			case E_BLOCK_STICKY_PISTON:
-			case E_BLOCK_STONE_BUTTON:
-			case E_BLOCK_STONE_PRESSURE_PLATE:
-			case E_BLOCK_TNT:
-			case E_BLOCK_TRAPDOOR:
-			case E_BLOCK_TRAPPED_CHEST:
-			case E_BLOCK_TRIPWIRE_HOOK:
-			case E_BLOCK_WOODEN_BUTTON:
-			case E_BLOCK_WOODEN_DOOR:
-			case E_BLOCK_WOODEN_PRESSURE_PLATE:
-			case E_BLOCK_PISTON:
+			case BlockType::AcaciaButton:
+			case BlockType::AcaciaDoor:
+			case BlockType::AcaciaFenceGate:
+			case BlockType::AcaciaPressurePlate:
+			case BlockType::AcaciaTrapdoor:
+
+			case BlockType::ActivatorRail:
+
+			case BlockType::BirchButton:
+			case BlockType::BirchDoor:
+			case BlockType::BirchFenceGate:
+			case BlockType::BirchPressurePlate:
+			case BlockType::BirchTrapdoor:
+
+			case BlockType::Comparator:
+			case BlockType::RedstoneBlock:
+			case BlockType::CommandBlock:
+			case BlockType::ChainCommandBlock:
+			case BlockType::RepeatingCommandBlock:
+
+			case BlockType::DarkOakButton:
+			case BlockType::DarkOakDoor:
+			case BlockType::DarkOakFenceGate:
+			case BlockType::DarkOakPressurePlate:
+			case BlockType::DarkOakTrapdoor:
+
+			case BlockType::DaylightDetector:
+			case BlockType::DetectorRail:
+			case BlockType::Dispenser:
+			case BlockType::Dropper:
+
+			case BlockType::OakButton:
+			case BlockType::OakDoor:
+			case BlockType::OakFenceGate:
+			case BlockType::OakPressurePlate:
+			case BlockType::OakTrapdoor:
+
+			case BlockType::HeavyWeightedPressurePlate:
+			case BlockType::Hopper:
+			case BlockType::IronDoor:
+			case BlockType::IronTrapdoor:
+
+			case BlockType::JungleButton:
+			case BlockType::JungleDoor:
+			case BlockType::JungleFenceGate:
+			case BlockType::JunglePressurePlate:
+			case BlockType::JungleTrapdoor:
+				
+			case BlockType::Lever:
+			case BlockType::LightWeightedPressurePlate:
+			case BlockType::NoteBlock:
+			case BlockType::Observer:
+			case BlockType::PoweredRail:
+			case BlockType::RedstoneLamp:
+			case BlockType::Repeater:
+			case BlockType::RedstoneTorch:
+			case BlockType::RedstoneWire:
+
+			case BlockType::SpruceButton:
+			case BlockType::SpruceDoor:
+			case BlockType::SpruceFenceGate:
+			case BlockType::SprucePressurePlate:
+			case BlockType::SpruceTrapdoor:
+
+			case BlockType::StickyPiston:
+			case BlockType::StoneButton:
+			case BlockType::StonePressurePlate:
+			case BlockType::TNT:
+			case BlockType::TrappedChest:
+			case BlockType::TripwireHook:
+			case BlockType::Piston:
 			{
 				return true;
 			}
@@ -106,7 +137,7 @@ private:
 		return new cIncrementalRedstoneSimulatorChunkData;
 	}
 
-	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
-	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
-	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BLOCKTYPE a_Block) override;
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block) override;
+	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block) override;
+	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BlockState a_Block) override;
 } ;

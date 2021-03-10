@@ -12,52 +12,68 @@
 
 
 class cBlockRedstoneRepeaterHandler final :
-	public cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>
+	public cBlockHandler
 {
-	using Super = cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>;
+	using Super = cBlockHandler;
 
 public:
 
 	using Super::Super;
 
-	inline static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
+	const unsigned char MaxDelay = 4;
+
+	inline static Vector3i GetFrontCoordinateOffset(BlockState a_Block)
 	{
-		return -GetRearCoordinateOffset(a_Meta);
+		return -GetRearCoordinateOffset(a_Block);
 	}
 
-	inline static Vector3i GetLeftCoordinateOffset(NIBBLETYPE a_Meta)
+	inline static Vector3i GetLeftCoordinateOffset(BlockState a_Block)
 	{
-		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
+		auto Facing = Block::Repeater::Facing(a_Block);
+		switch (Facing)
 		{
-			case E_META_REDSTONE_REPEATER_FACING_ZM: return { -1, 0, 0 };
-			case E_META_REDSTONE_REPEATER_FACING_XP: return { 0, 0, -1 };
-			case E_META_REDSTONE_REPEATER_FACING_ZP: return { 1, 0, 0 };
-			case E_META_REDSTONE_REPEATER_FACING_XM: return { 0, 0, 1 };
+			case eBlockFace::BLOCK_FACE_ZM: return { -1, 0, 0 };
+			case eBlockFace::BLOCK_FACE_XP: return { 0, 0, -1 };
+			case eBlockFace::BLOCK_FACE_ZP: return { 1, 0, 0 };
+			case eBlockFace::BLOCK_FACE_XM: return { 0, 0, 1 };
 
 			default:
 			{
-				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
+				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Block);
 				ASSERT(!"Unknown metadata while determining orientation of repeater!");
 				return { 0, 0, 0 };
 			}
 		}
 	}
 
-	inline static Vector3i GetRearCoordinateOffset(NIBBLETYPE a_Meta)
+	inline static Vector3i GetRearCoordinateOffset(BlockState a_Block)
 	{
-		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
+		auto Facing = Block::Repeater::Facing(a_Block);
+		switch (Facing)
 		{
-			case E_META_REDSTONE_REPEATER_FACING_ZM: return { 0, 0, 1 };
-			case E_META_REDSTONE_REPEATER_FACING_XP: return { -1, 0, 0 };
-			case E_META_REDSTONE_REPEATER_FACING_ZP: return { 0, 0, -1 };
-			case E_META_REDSTONE_REPEATER_FACING_XM: return { 1, 0, 0 };
+			case eBlockFace::BLOCK_FACE_ZM: return { 0, 0, 1 };
+			case eBlockFace::BLOCK_FACE_XP: return { -1, 0, 0 };
+			case eBlockFace::BLOCK_FACE_ZP: return { 0, 0, -1 };
+			case eBlockFace::BLOCK_FACE_XM: return { 1, 0, 0 };
 			default:
 			{
-				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
+				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Block);
 				ASSERT(!"Unknown metadata while determining orientation of repeater!");
 				return { 0, 0, 0 };
 			}
 		}
+	}
+
+	inline static BlockState IncreaseDelay(BlockState a_Block)
+	{
+		using namespace Block;
+		return Repeater::Repeater
+		(
+			(Repeater::Delay(a_Block) + 1) % 5,
+			Repeater::Facing(a_Block),
+			Repeater::Locked(a_Block),
+			Repeater::Powered(a_Block)
+		);
 	}
 
 private:
@@ -72,7 +88,7 @@ private:
 	) const override
 	{
 		// Increment the delay setting:
-		a_ChunkInterface.SetBlockMeta(a_BlockPos, ((a_ChunkInterface.GetBlockMeta(a_BlockPos) + 0x04) & 0x0f));
+		a_ChunkInterface.SetBlock(a_BlockPos, IncreaseDelay(a_ChunkInterface.GetBlock(a_BlockPos)));
 		return true;
 	}
 
@@ -112,9 +128,7 @@ private:
 			return false;
 		}
 
-		BLOCKTYPE BelowBlock;
-		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_RelPos.addedY(-1), BelowBlock, BelowBlockMeta);
+		auto BelowBlock = a_Chunk.GetBlock(a_RelPos.addedY(-1));
 
 		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
 		{
@@ -123,7 +137,7 @@ private:
 		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
 		{
 			// Check if the slab is turned up side down
-			if ((BelowBlockMeta & 0x08) == 0x08)
+			if (cBlockSlabHandler::IsSlabTop(BelowBlock))
 			{
 				return true;
 			}
@@ -135,7 +149,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		return cItem(E_ITEM_REDSTONE_REPEATER, 1, 0);
 	}
@@ -144,7 +158,7 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID(BlockState a_Block) const override
 	{
 		UNUSED(a_Meta);
 		return 11;

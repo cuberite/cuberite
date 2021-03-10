@@ -86,11 +86,11 @@ public:
 	static void FadeColoursFromString(const AString & a_String, cFireworkItem & a_FireworkItem);
 
 	/** Returns a colour code for fireworks used by the network code */
-	static int GetVanillaColourCodeFromDye(NIBBLETYPE a_DyeMeta);
+	static int GetVanillaColourCodeFromDye(unsigned char a_DyeMeta);
 
 	bool m_HasFlicker;
 	bool m_HasTrail;
-	NIBBLETYPE m_Type;
+	unsigned char m_Type;
 	short m_FlightTimeInTicks;
 	std::vector<int> m_Colours;
 	std::vector<int> m_FadeColours;

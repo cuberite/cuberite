@@ -11,7 +11,7 @@
 
 
 
-ForEachSourceCallback::ForEachSourceCallback(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE CurrentBlock) :
+ForEachSourceCallback::ForEachSourceCallback(const cChunk & Chunk, const Vector3i Position, const BlockType CurrentBlock) :
 	Power(0),
 	m_Chunk(Chunk),
 	m_Position(Position),
@@ -87,7 +87,7 @@ void ForEachSourceCallback::CheckIndirectPower()
 
 
 
-bool ForEachSourceCallback::ShouldQueryLinkedPosition(const BLOCKTYPE Block)
+bool ForEachSourceCallback::ShouldQueryLinkedPosition(const BlockType Block)
 {
 	switch (Block)
 	{
@@ -113,7 +113,7 @@ bool ForEachSourceCallback::ShouldQueryLinkedPosition(const BLOCKTYPE Block)
 
 
 
-PowerLevel ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const Vector3i QueryPosition, const BLOCKTYPE QueryBlock, const Vector3i SolidBlockPosition)
+PowerLevel ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const Vector3i QueryPosition, const BlockState QueryBlock, const Vector3i SolidBlockPosition)
 {
 	PowerLevel Power = 0;
 

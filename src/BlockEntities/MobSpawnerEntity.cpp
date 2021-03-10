@@ -13,13 +13,13 @@
 
 
 
-cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+cMobSpawnerEntity::cMobSpawnerEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, a_World),
 	m_Entity(mtPig),
 	m_SpawnDelay(100),
 	m_IsActive(false)
 {
-	ASSERT(a_BlockType == E_BLOCK_MOB_SPAWNER);
+	ASSERT(a_Block.Type() == BlockType::Spawner);
 }
 
 

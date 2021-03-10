@@ -3,6 +3,8 @@
 #include "BlockInfo.h"
 #include "BlockType.h"
 
+#include "Blocks/BlockHandler.h"
+
 
 
 
@@ -58,25 +60,6 @@ bool IsBlockLava(BLOCKTYPE a_BlockType)
 bool IsBlockLiquid(BLOCKTYPE a_BlockType)
 {
 	return IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType);
-}
-
-
-
-
-
-bool IsBlockRail(BLOCKTYPE a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case E_BLOCK_RAIL:
-		case E_BLOCK_ACTIVATOR_RAIL:
-		case E_BLOCK_DETECTOR_RAIL:
-		case E_BLOCK_POWERED_RAIL:
-		{
-			return true;
-		}
-		default: return false;
-	}
 }
 
 
@@ -404,6 +387,121 @@ bool IsBlockMaterialRock(BLOCKTYPE a_BlockType)
 
 
 
+bool IsBed(BlockType a_BlockType)
+{
+	switch(a_BlockType)
+	{
+		case BlockType::BlackBed:
+		case BlockType::BlueBed:
+		case BlockType::BrownBed:
+		case BlockType::CyanBed:
+		case BlockType::GrayBed:
+		case BlockType::GreenBed:
+		case BlockType::LightBlueBed:
+		case BlockType::LightGrayBed:
+		case BlockType::LimeBed:
+		case BlockType::MagentaBed:
+		case BlockType::OrangeBed:
+		case BlockType::PinkBed:
+		case BlockType::PurpleBed:
+		case BlockType::RedBed:
+		case BlockType::WhiteBed:
+		case BlockType::YellowBed:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+bool IsHead(BlockType a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case BlockType::CreeperHead:
+		case BlockType::CreeperWallHead:
+		case BlockType::DragonHead:
+		case BlockType::DragonWallHead:
+		case BlockType::PlayerHead:
+		case BlockType::PlayerWallHead:
+		case BlockType::SkeletonSkull:
+		case BlockType::SkeletonWallSkull:
+		case BlockType::WitherSkeletonSkull:
+		case BlockType::WitherSkeletonWallSkull:
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+bool IsSign(BlockType a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case BlockType::AcaciaSign:
+		case BlockType::AcaciaWallSign:
+		case BlockType::BirchSign:
+		case BlockType::BirchWallSign:
+		case BlockType::CrimsonSign:
+		case BlockType::CrimsonWallSign:
+		case BlockType::DarkOakSign:
+		case BlockType::DarkOakWallSign:
+		case BlockType::JungleSign:
+		case BlockType::JungleWallSign:
+		case BlockType::OakSign:
+		case BlockType::OakWallSign:
+		case BlockType::SpruceSign:
+		case BlockType::SpruceWallSign:
+		case BlockType::WarpedSign:
+		case BlockType::WarpedWallSign:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+bool IsAnvil(BlockType a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case BlockType::Anvil:
+		case BlockType::ChippedAnvil:
+		case BlockType::DamagedAnvil:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // cBlockInfo:
@@ -603,110 +701,148 @@ bool cBlockInfo::CanBeTerraformed(const BLOCKTYPE Block)
 
 
 
-bool cBlockInfo::FullyOccupiesVoxel(const BLOCKTYPE Block)
+bool cBlockInfo::FullyOccupiesVoxel(const BlockState Block)
 {
+	return cBlockHandler::For(Block.Type()).FullyOccupiesVoxel(Block);
+
 	// Blocks that fully occupy their voxel - used as a guide for torch placeable blocks, amongst other things:
-	switch (Block)
+	switch (Block.Type())
 	{
-		case E_BLOCK_BARRIER:
-		case E_BLOCK_BEDROCK:
-		case E_BLOCK_BLOCK_OF_COAL:
-		case E_BLOCK_BLOCK_OF_REDSTONE:
-		case E_BLOCK_BONE_BLOCK:
-		case E_BLOCK_BOOKCASE:
-		case E_BLOCK_BRICK:
-		case E_BLOCK_CHAIN_COMMAND_BLOCK:
-		case E_BLOCK_CLAY:
-		case E_BLOCK_COAL_ORE:
-		case E_BLOCK_COBBLESTONE:
-		case E_BLOCK_COMMAND_BLOCK:
-		case E_BLOCK_CONCRETE:
-		case E_BLOCK_CONCRETE_POWDER:
-		case E_BLOCK_CRAFTING_TABLE:
-		case E_BLOCK_DIAMOND_BLOCK:
-		case E_BLOCK_DIAMOND_ORE:
-		case E_BLOCK_DIRT:
-		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB:
-		case E_BLOCK_DOUBLE_STONE_SLAB:
-		case E_BLOCK_DOUBLE_WOODEN_SLAB:
-		case E_BLOCK_DROPPER:
-		case E_BLOCK_EMERALD_BLOCK:
-		case E_BLOCK_EMERALD_ORE:
-		case E_BLOCK_END_BRICKS:
-		case E_BLOCK_END_STONE:
-		case E_BLOCK_FROSTED_ICE:
-		case E_BLOCK_FURNACE:
-		case E_BLOCK_GLOWSTONE:
-		case E_BLOCK_GOLD_BLOCK:
-		case E_BLOCK_GOLD_ORE:
-		case E_BLOCK_WHITE_GLAZED_TERRACOTTA:
-		case E_BLOCK_ORANGE_GLAZED_TERRACOTTA:
-		case E_BLOCK_MAGENTA_GLAZED_TERRACOTTA:
-		case E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA:
-		case E_BLOCK_YELLOW_GLAZED_TERRACOTTA:
-		case E_BLOCK_LIME_GLAZED_TERRACOTTA:
-		case E_BLOCK_PINK_GLAZED_TERRACOTTA:
-		case E_BLOCK_GRAY_GLAZED_TERRACOTTA:
-		case E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA:
-		case E_BLOCK_CYAN_GLAZED_TERRACOTTA:
-		case E_BLOCK_PURPLE_GLAZED_TERRACOTTA:
-		case E_BLOCK_BLUE_GLAZED_TERRACOTTA:
-		case E_BLOCK_BROWN_GLAZED_TERRACOTTA:
-		case E_BLOCK_GREEN_GLAZED_TERRACOTTA:
-		case E_BLOCK_BLACK_GLAZED_TERRACOTTA:
-		case E_BLOCK_RED_GLAZED_TERRACOTTA:
-		case E_BLOCK_GRASS:
-		case E_BLOCK_GRAVEL:
-		case E_BLOCK_HARDENED_CLAY:
-		case E_BLOCK_HAY_BALE:
-		case E_BLOCK_HUGE_BROWN_MUSHROOM:
-		case E_BLOCK_HUGE_RED_MUSHROOM:
-		case E_BLOCK_ICE:
-		case E_BLOCK_IRON_BLOCK:
-		case E_BLOCK_IRON_ORE:
-		case E_BLOCK_JACK_O_LANTERN:
-		case E_BLOCK_JUKEBOX:
-		case E_BLOCK_LAPIS_BLOCK:
-		case E_BLOCK_LAPIS_ORE:
-		case E_BLOCK_LOG:
-		case E_BLOCK_MAGMA:
-		case E_BLOCK_MELON:
-		case E_BLOCK_MOB_SPAWNER:
-		case E_BLOCK_MOSSY_COBBLESTONE:
-		case E_BLOCK_MYCELIUM:
-		case E_BLOCK_NETHERRACK:
-		case E_BLOCK_NETHER_BRICK:
-		case E_BLOCK_NETHER_QUARTZ_ORE:
-		case E_BLOCK_NETHER_WART_BLOCK:
-		case E_BLOCK_NEW_LOG:
-		case E_BLOCK_NOTE_BLOCK:
-		case E_BLOCK_OBSERVER:
-		case E_BLOCK_OBSIDIAN:
-		case E_BLOCK_PACKED_ICE:
-		case E_BLOCK_PLANKS:
-		case E_BLOCK_PRISMARINE_BLOCK:
-		case E_BLOCK_PUMPKIN:
-		case E_BLOCK_PURPUR_BLOCK:
-		case E_BLOCK_PURPUR_PILLAR:
-		case E_BLOCK_PURPUR_DOUBLE_SLAB:
-		case E_BLOCK_QUARTZ_BLOCK:
-		case E_BLOCK_RED_NETHER_BRICK:
-		case E_BLOCK_RED_SANDSTONE:
-		case E_BLOCK_REDSTONE_LAMP_OFF:
-		case E_BLOCK_REDSTONE_LAMP_ON:
-		case E_BLOCK_REDSTONE_ORE:
-		case E_BLOCK_REDSTONE_ORE_GLOWING:
-		case E_BLOCK_REPEATING_COMMAND_BLOCK:
-		case E_BLOCK_SANDSTONE:
-		case E_BLOCK_SAND:
-		case E_BLOCK_SILVERFISH_EGG:
-		case E_BLOCK_SPONGE:
-		case E_BLOCK_STAINED_CLAY:
-		case E_BLOCK_STONE:
-		case E_BLOCK_STONE_BRICKS:
-		case E_BLOCK_STRUCTURE_BLOCK:
-		case E_BLOCK_WOOL: return true;
+		case BlockType::Barrier:
+		case BlockType::Bedrock:
+		case BlockType::CoalBlock:
+		case BlockType::RedstoneBlock:
+		case BlockType::BoneBlock:
+		case BlockType::Bookshelf:
+		case BlockType::Bricks:
+		case BlockType::ChainCommandBlock:
+		case BlockType::Clay:
+		case BlockType::CoalOre:
+		case BlockType::Cobblestone:
+		case BlockType::CommandBlock:
+		case BlockType::BlackConcrete:
+		case BlockType::BlueConcrete:
+		case BlockType::BrownConcrete:
+		case BlockType::CyanConcrete:
+		case BlockType::GrayConcrete:
+		case BlockType::GreenConcrete:
+		case BlockType::LightBlueConcrete:
+		case BlockType::LightGrayConcrete:
+		case BlockType::LimeConcrete:
+		case BlockType::MagentaConcrete:
+		case BlockType::OrangeConcrete:
+		case BlockType::PinkConcrete:
+		case BlockType::PurpleConcrete:
+		case BlockType::RedConcrete:
+		case BlockType::WhiteConcrete:
+		case BlockType::YellowConcrete:
+		case BlockType::BlackConcretePowder:
+		case BlockType::BlueConcretePowder:
+		case BlockType::BrownConcretePowder:
+		case BlockType::CyanConcretePowder:
+		case BlockType::GrayConcretePowder:
+		case BlockType::GreenConcretePowder:
+		case BlockType::LightBlueConcretePowder:
+		case BlockType::LightGrayConcretePowder:
+		case BlockType::LimeConcretePowder:
+		case BlockType::MagentaConcretePowder:
+		case BlockType::OrangeConcretePowder:
+		case BlockType::PinkConcretePowder:
+		case BlockType::PurpleConcretePowder:
+		case BlockType::RedConcretePowder:
+		case BlockType::WhiteConcretePowder:
+		case BlockType::YellowConcretePowder:
+		case BlockType::CraftingTable:
+		case BlockType::DiamondBlock:
+		case BlockType::DiamondOre:
+
+		case BlockType::Dirt:
+		case BlockType::GrassBlock:
+		case BlockType::CoarseDirt:
+
+		case BlockType::Dispenser:
+
+		case BlockType::DOUBLEREDSANDSTONESLAB:
+		case BlockType::DOUBLESTONESLAB:
+		case BlockType::DOUBLEWOODENSLAB:
+
+		case BlockType::Dropper:
+		case BlockType::EmeraldBlock:
+		case BlockType::EmeraldOre:
+		case BlockType::EndStoneBricks:
+		case BlockType::EndStone:
+		case BlockType::FrostedIce:
+		case BlockType::Furnace:
+		case BlockType::Glowstone:
+		case BlockType::GoldBlock:
+		case BlockType::GoldOre:
+		case BlockType::WhiteGlazedTerracotta:
+		case BlockType::OrangeGlazedTerracotta:
+		case BlockType::MagentaGlazedTerracotta:
+		case BlockType::LightBlueGlazedTerracotta:
+		case BlockType::YellowGlazedTerracotta:
+		case BlockType::LimeGlazedTerracotta:
+		case BlockType::PinkGlazedTerracotta:
+		case BlockType::GrayGlazedTerracotta:
+		case BlockType::LightGrayGlazedTerracotta:
+		case BlockType::CyanGlazedTerracotta:
+		case BlockType::PurpleGlazedTerracotta:
+		case BlockType::BlueGlazedTerracotta:
+		case BlockType::BrownGlazedTerracotta:
+		case BlockType::GreenGlazedTerracotta:
+		case BlockType::BlackGlazedTerracotta:
+		case BlockType::RedGlazedTerracotta:
+
+		case BlockType::Gravel:
+		case BlockType::HARDENEDCLAY:
+		case BlockType::HayBale:
+		case BlockType::HUGEBROWNMUSHROOM:
+		case BlockType::HUGEREDMUSHROOM:
+		case BlockType::Ice:
+		case BlockType::IRONBLOCK:
+		case BlockType::IRONORE:
+		case BlockType::JACKOLANTERN:
+		case BlockType::JUKEBOX:
+		case BlockType::LAPISBLOCK:
+		case BlockType::LAPISORE:
+		case BlockType::LOG:
+		case BlockType::MAGMA:
+		case BlockType::MELON:
+		case BlockType::MOBSPAWNER:
+		case BlockType::MOSSYCOBBLESTONE:
+		case BlockType::MYCELIUM:
+		case BlockType::NETHERRACK:
+		case BlockType::NETHERBRICK:
+		case BlockType::NETHERQUARTZORE:
+		case BlockType::NETHERWARTBLOCK:
+		case BlockType::NEWLOG:
+		case BlockType::NOTEBLOCK:
+		case BlockType::OBSERVER:
+		case BlockType::OBSIDIAN:
+		case BlockType::PACKEDICE:
+		case BlockType::PLANKS:
+		case BlockType::PRISMARINEBLOCK:
+		case BlockType::PUMPKIN:
+		case BlockType::PURPURBLOCK:
+		case BlockType::PURPURPILLAR:
+		case BlockType::PURPURDOUBLESLAB:
+		case BlockType::QUARTZBLOCK:
+		case BlockType::REDNETHERBRICK:
+		case BlockType::REDSANDSTONE:
+		case BlockType::REDSTONELAMPOFF:
+		case BlockType::REDSTONELAMPON:
+		case BlockType::REDSTONEORE:
+		case BlockType::REDSTONEOREGLOWING:
+		case BlockType::REPEATINGCOMMANDBLOCK:
+		case BlockType::SANDSTONE:
+		case BlockType::SAND:
+		case BlockType::SILVERFISHEGG:
+		case BlockType::SPONGE:
+		case BlockType::STAINEDCLAY:
+		case BlockType::STONE:
+		case BlockType::STONEBRICKS:
+		case BlockType::STRUCTUREBLOCK:
+		case BlockType::WOOL: return true;
 		default: return false;
 	}
 }

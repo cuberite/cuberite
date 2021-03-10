@@ -22,15 +22,15 @@ public:
 
 	cFireSimulator(cWorld & a_World, cIniFile & a_IniFile);
 
-	static bool IsFuel   (BLOCKTYPE a_BlockType);
-	static bool DoesBurnForever(BLOCKTYPE a_BlockType);
+	static bool IsFuel         (BlockType a_BlockType);
+	static bool DoesBurnForever(BlockType a_BlockType);
 
 private:
 
 	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
 
-	static bool IsAllowedBlock(BLOCKTYPE a_BlockType);
+	static bool IsAllowedBlock(BlockType a_BlockType);
 
 	/** Time (in msec) that a fire block takes to burn with a fuel block into the next step */
 	unsigned m_BurnStepTimeFuel;
@@ -44,7 +44,7 @@ private:
 	/** Chance [0..100000] of a fuel burning out being replaced by a new fire block instead of an air block */
 	int m_ReplaceFuelChance;
 
-	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block) override;
 
 	/** Returns the time [msec] after which the specified fire block is stepped again; based on surrounding fuels */
 	int GetBurnStepTime(cChunk * a_Chunk, Vector3i a_RelPos);

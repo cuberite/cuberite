@@ -37,12 +37,12 @@ public:
 	// tolua_end
 
 	/** Constructor used for normal operation */
-	cHopperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cHopperEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World);
 
 	/** Returns the block coords of the block receiving the output items, based on the meta
 	Returns <false, undefined> if unattached.
 	Exported in ManualBindings.cpp. */
-	std::pair<bool, Vector3i> GetOutputBlockPos(NIBBLETYPE a_BlockMeta);
+	std::pair<bool, Vector3i> GetOutputBlockPos(unsigned char a_BlockMeta);
 
 	void SetLocked(bool a_Value);
 
@@ -85,7 +85,7 @@ protected:
 	bool MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords);
 
 	/** Moves items to the furnace at the specified absolute coords. Returns true if contents have changed */
-	bool MoveItemsToFurnace(cChunk & a_Chunk, Vector3i a_Coords, NIBBLETYPE a_HopperMeta);
+	bool MoveItemsToFurnace(cChunk & a_Chunk, Vector3i a_Coords, BlockState a_Block);
 
 	/** Moves items to the specified ItemGrid. Returns true if contents have changed */
 	bool MoveItemsToGrid(cBlockEntityWithItems & a_Entity);

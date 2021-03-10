@@ -8,6 +8,7 @@
 #include "FastNBT.h"
 #include "SchematicFileSerializer.h"
 #include "../OSSupport/GZipFile.h"
+#include "../Protocol/Palettes/Upgrade.h"
 
 
 
@@ -137,28 +138,26 @@ void cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, co
 	}
 
 	// Copy the block types and metas:
-	size_t NumTypeBytes = a_BlockArea.GetBlockCount();
-	if (a_NBT.GetDataLength(TBlockTypes) < NumTypeBytes)
+	size_t NumBytes = a_BlockArea.GetBlockCount();
+	if (a_NBT.GetDataLength(TBlockTypes) < NumBytes)
 	{
 		LOG("BlockTypes truncated in the schematic file (exp %u, got %u bytes). Loading partial.",
-			static_cast<unsigned>(NumTypeBytes), static_cast<unsigned>(a_NBT.GetDataLength(TBlockTypes))
+			static_cast<unsigned>(NumBytes), static_cast<unsigned>(a_NBT.GetDataLength(TBlockTypes))
 		);
-		NumTypeBytes = a_NBT.GetDataLength(TBlockTypes);
+		NumBytes = a_NBT.GetDataLength(TBlockTypes);
 	}
-	memcpy(a_BlockArea.GetBlockTypes(), a_NBT.GetData(TBlockTypes), NumTypeBytes);
 
-	if (AreMetasPresent)
+	auto BlockTypes = a_NBT.GetData(TBlockTypes);
+	auto BlockMetas = a_NBT.GetData(TBlockMetas);
+
+	std::unique_ptr<BlockState[]> Blocks;
+
+	for (size_t I = 0; I < NumBytes; I ++)
 	{
-		size_t NumMetaBytes = a_BlockArea.GetBlockCount();
-		if (a_NBT.GetDataLength(TBlockMetas) < NumMetaBytes)
-		{
-			LOG("BlockMetas truncated in the schematic file (exp %u, got %u bytes). Loading partial.",
-				static_cast<unsigned>(NumMetaBytes), static_cast<unsigned>(a_NBT.GetDataLength(TBlockMetas))
-			);
-			NumMetaBytes = a_NBT.GetDataLength(TBlockMetas);
-		}
-		memcpy(a_BlockArea.GetBlockMetas(), a_NBT.GetData(TBlockMetas), NumMetaBytes);
+		Blocks[I] = PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockTypes[I]), static_cast<unsigned char>(BlockMetas[I]));
 	}
+
+	memcpy((void *) a_BlockArea.GetBlocks(), Blocks.get(), NumBytes);
 }
 
 
@@ -172,23 +171,28 @@ ContiguousByteBuffer cSchematicFileSerializer::SaveToSchematicNBT(const cBlockAr
 	Writer.AddShort("Height", static_cast<Int16>(a_BlockArea.m_Size.y));
 	Writer.AddShort("Length", static_cast<Int16>(a_BlockArea.m_Size.z));
 	Writer.AddString("Materials", "Alpha");
-	if (a_BlockArea.HasBlockTypes())
+	if (a_BlockArea.HasBlocks())
 	{
-		Writer.AddByteArray("Blocks", reinterpret_cast<const char *>(a_BlockArea.GetBlockTypes()), a_BlockArea.GetBlockCount());
+		auto Blocks = a_BlockArea.GetBlocks();
+
+		std::string BlockData;
+		std::string MetaData;
+
+		for (size_t I = 0; I < ARRAYCOUNT(Blocks); I++)
+		{
+			auto NumericBlock = PaletteUpgrade::ToBlock(Blocks[I]);
+			BlockData += NumericBlock.first;
+			MetaData += NumericBlock.second;
+		}
+
+		Writer.AddByteArray("Blocks", BlockData);
+		Writer.AddByteArray("Data", MetaData);
 	}
 	else
 	{
 		AString Dummy(a_BlockArea.GetBlockCount(), 0);
-		Writer.AddByteArray("Blocks", Dummy.data(), Dummy.size());
-	}
-	if (a_BlockArea.HasBlockMetas())
-	{
-		Writer.AddByteArray("Data", reinterpret_cast<const char *>(a_BlockArea.GetBlockMetas()), a_BlockArea.GetBlockCount());
-	}
-	else
-	{
-		AString Dummy(a_BlockArea.GetBlockCount(), 0);
-		Writer.AddByteArray("Data", Dummy.data(), Dummy.size());
+		Writer.AddByteArray("Blocks", Dummy);
+		Writer.AddByteArray("Data", Dummy);
 	}
 
 	Writer.AddInt("WEOffsetX", a_BlockArea.m_WEOffset.x);

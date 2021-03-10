@@ -11,10 +11,9 @@
 
 
 
-cFallingBlock::cFallingBlock(Vector3d a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta):
+cFallingBlock::cFallingBlock(Vector3d a_Position, BlockState a_Block):
 	Super(etFallingBlock, a_Position, 0.98, 0.98),
-	m_BlockType(a_BlockType),
-	m_BlockMeta(a_BlockMeta)
+	m_Block(a_Block)
 {
 	SetGravity(-16.0f);
 	SetAirDrag(0.02f);

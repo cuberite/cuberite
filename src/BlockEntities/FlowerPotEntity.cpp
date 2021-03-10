@@ -13,10 +13,10 @@
 
 
 
-cFlowerPotEntity::cFlowerPotEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World)
+cFlowerPotEntity::cFlowerPotEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, a_World)
 {
-	ASSERT(a_BlockType == E_BLOCK_FLOWER_POT);
+	ASSERT(a_Block.Type() == BlockType::FlowerPot);
 }
 
 

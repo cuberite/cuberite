@@ -25,8 +25,8 @@ class cBlockHandler
 {
 public:
 
-	constexpr cBlockHandler(BLOCKTYPE a_BlockType) :
-		m_BlockType(a_BlockType)
+	constexpr cBlockHandler(BlockType a_Block) :
+		m_BlockType(a_Block)
 	{
 	}
 
@@ -43,14 +43,14 @@ public:
 	/** Returns the relative bounding box that must be entity-free in
 	order for the block to be placed. a_XM, a_XP, etc. stand for the
 	blocktype of the minus-X neighbor, the positive-X neighbor, etc. */
-	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const;
+	virtual cBoundingBox GetPlacementCollisionBox(BlockState a_XM, BlockState a_XP, BlockState a_YM, BlockState a_YP, BlockState a_ZM, BlockState a_ZP) const;
 
 	/** Called before a block is placed into a world by player, by cItemHandler::GetPlacementBlockTypeMeta().
 	The handler should return true to allow placement, false to refuse.
 	a_PlacedBlockPos is the coords of the block being placed
 	a_ClickedBlockFace is the face of the neighbor block clicked by the client to place this block.
 	a_CursorPos is the position of the cursor within the neighbor's face
-	The descendant handler should set a_BlockType and a_BlockMeta to correct values for the newly placed block.
+	The descendant handler should set a_Block and a_BlockMeta to correct values for the newly placed block.
 	The default handler uses the stored block type and meta copied from the lowest 4 bits of the player's equipped item's damage value. */
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface,
@@ -58,14 +58,14 @@ public:
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState & a_Block
 	) const;
 
 	/** Called by cWorld::SetBlock() after the block has been set */
 	virtual void OnPlaced(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+		BlockState a_Block
 	) const {}
 
 	/** Called by cPlayer::PlaceBlocks() for each block after it has been set to the world. Called after OnPlaced(). */
@@ -80,7 +80,7 @@ public:
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BlockState a_OldBlock,
 		const cEntity * a_Digger
 	) const {}
 
@@ -139,7 +139,7 @@ public:
 	a_Digger is the entity that caused the conversion, usually the player digging.
 	a_Tool is the tool used for the digging.
 	The default implementation drops a single item created from m_BlockType and the current meta. */
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr) const;
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr) const;
 
 	/** Checks if the block can stay at the specified relative coords in the chunk */
 	virtual bool CanBeAt(
@@ -149,7 +149,7 @@ public:
 	) const;
 
 	/** Checks whether the block has an effect on growing the plant */
-	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const { return false; }
+	virtual bool CanSustainPlant(BlockState a_Block) const { return false; }
 
 	/** Called to check whether this block supports a rclk action.
 	If it returns true, OnUse() is called */
@@ -164,7 +164,7 @@ public:
 	@param a_Pos Position of the block
 	@param a_Player Player trying to build on the block
 	@param a_Meta Meta value of the block currently at a_Pos */
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & ChunkInterface, const Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const;
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & ChunkInterface, const Vector3i a_Pos, cPlayer & a_Player, BlockState a_Block) const;
 
 	/** Returns if this block drops if it gets destroyed by an unsuitable situation.
 	Default: true */
@@ -172,7 +172,7 @@ public:
 
 	/** Tests if a_RelPosition is inside the block, where a_RelPosition is relative to the origin of the block.
 	Coords in a_RelPosition are guaranteed to be in the [0..1] range. */
-	virtual bool IsInsideBlock(const Vector3d a_RelPosition, const NIBBLETYPE a_BlockMeta) const;
+	virtual bool IsInsideBlock(const Vector3d a_RelPosition, const BlockState a_Block) const;
 
 	/** Called when one of the neighbors gets set; equivalent to MC block update.
 	By default drops (DropBlockAsPickup() / SetBlock()) if the position is no longer suitable (CanBeAt(), DoesDropOnUnsuitable()),
@@ -184,31 +184,33 @@ public:
 	) const;
 
 	/** Returns the base colour ID of the block, as will be represented on a map, as per documentation: https://minecraft.gamepedia.com/Map_item_format */
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const;
+	virtual ColourID GetMapBaseColourID(BlockState a_Block) const;
 
 	/** Rotates a given block meta counter-clockwise. Default: no change
 	Returns block meta following rotation */
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const { return a_Meta; }
+	virtual BlockState RotateCCW(BlockState a_Block) const { return a_Block; }
 
 	/** Rotates a given block meta clockwise. Default: no change
 	Returns block meta following rotation */
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const { return a_Meta; }
+	virtual BlockState RotateCW(BlockState a_Block) const { return a_Block; }
 
 	/** Mirrors a given block meta around the XY plane. Default: no change
 	Returns block meta following rotation */
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) const { return a_Meta; }
+	virtual BlockState MirrorXY(BlockState a_Block) const { return a_Block; }
 
 	/** Mirros a given block meta around the XZ plane. Default: no change
 	Returns block meta following rotation */
-	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) const { return a_Meta; }
+	virtual BlockState MirrorXZ(BlockState a_Block) const { return a_Block; }
 
 	/** Mirros a given block meta around the YZ plane. Default: no change
 	Returns block meta following rotation */
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) const { return a_Meta; }
+	virtual BlockState MirrorYZ(BlockState a_Block) const { return a_Block; }
 
 	/** Grows this block, if it supports growing, by the specified amount of stages (at most).
 	Returns the number of stages actually grown, zero if not supported (default). */
 	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const { return 0; }
+
+	virtual bool FullyOccupiesVoxel(const BlockState a_Block) const { return true; }
 
 	/** Returns true if the specified tool is valid and has a non-zero silk-touch enchantment.
 	Helper used in many ConvertToPickups() implementations. */
@@ -228,11 +230,11 @@ public:
 	static char FortuneDiscreteRandom(char a_MinDrop, char a_DefaultMax, unsigned char a_BonusMax, char a_DropCap = 25);
 
 	// Gets the blockhandler for the given block type.
-	static const cBlockHandler & For(BLOCKTYPE a_BlockType);
+	static const cBlockHandler & For(BlockType a_Block);
 
 protected:
 
 	~cBlockHandler() = default;
 
-	const BLOCKTYPE m_BlockType;
+	const BlockType m_BlockType;
 };

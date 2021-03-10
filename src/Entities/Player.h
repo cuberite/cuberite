@@ -515,7 +515,7 @@ public:
 	If the hook prevents the placement, sends the current block at the specified coords back to the client.
 	Assumes that the block is in a currently loaded chunk.
 	Returns true if the block is successfully placed. */
-	bool PlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool PlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BlockState a_Block);
 
 	/** Sends the block in the specified range around the specified coord to the client
 	as a block change packet.
@@ -557,13 +557,13 @@ public:
 	(1 would be completely mined)
 	Depends on hardness values so check those are correct.
 	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
-	float GetMiningProgressPerTick(BLOCKTYPE a_Block);
+	float GetMiningProgressPerTick(BlockType a_Block);
 
 	/** Given tool, enchantments, status effects, and world position
 	returns whether a_Block would be instantly mined.
 	Depends on hardness values so check those are correct.
 	Source: https://minecraft.gamepedia.com/Breaking#Instant_breaking */
-	bool CanInstantlyMine(BLOCKTYPE a_Block);
+	bool CanInstantlyMine(BlockType a_Block);
 
 	/** Adds an Item to the list of known items.
 	If the item is already known, does nothing. */
@@ -753,7 +753,7 @@ private:
 	void FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen);
 
 	/** Returns how high the liquid is in percent. Used by IsInsideWater */
-	float GetLiquidHeightPercent(NIBBLETYPE a_Meta);
+	float GetLiquidHeightPercent(BlockState a_Block);
 
 	/** Checks if the player is inside of water */
 	bool IsInsideWater();
@@ -765,7 +765,7 @@ private:
 	In he is in water it gets divided by 5 except if his tool is enchanted with aqua affinity.
 	If he is not on ground it also gets divided by 5.
 	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
-	float GetDigSpeed(BLOCKTYPE a_Block);
+	float GetDigSpeed(BlockType a_Block);
 
 	/** Add the recipe Id to the known recipes.
 	If the recipe is already known, does nothing. */

@@ -103,8 +103,8 @@ public:
 
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
-		const cChunkDef::BlockNibbles & a_BlockLight,
-		const cChunkDef::BlockNibbles & a_SkyLight
+		const cChunkDef::LightNibbles & a_BlockLight,
+		const cChunkDef::LightNibbles & a_SkyLight
 	);
 
 	/** Calls the callback with the chunk's data, if available (with ChunkCS locked).
@@ -127,23 +127,21 @@ public:
 	The replacement doesn't trigger block updates, nor wake up simulators.
 	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block).
 	If the chunk is invalid, the operation is ignored silently. */
-	void FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void FastSetBlock(Vector3i a_BlockPos, BlockState a_Block);
 
 	/** Makes the specified player collect all the pickups around them. */
 	void CollectPickupsByPlayer(cPlayer & a_Player);
 
-	BLOCKTYPE  GetBlock          (Vector3i a_BlockPos) const;
-	NIBBLETYPE GetBlockMeta      (Vector3i a_BlockPos) const;
-	NIBBLETYPE GetBlockSkyLight  (Vector3i a_BlockPos) const;
-	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos) const;
+	BlockState GetBlock          (Vector3i a_BlockPos) const;
+	LIGHTTYPE  GetBlockSkyLight  (Vector3i a_BlockPos) const;
+	LIGHTTYPE  GetBlockBlockLight(Vector3i a_BlockPos) const;
 
 	/** Sets the meta for the specified block, while keeping the blocktype.
 	Ignored if the chunk is invalid. */
-	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta);
+	// void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta);
 
-	void SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
-	bool GetBlockInfo      (Vector3i, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
+	void SetBlock     (Vector3i a_BlockPos, BlockState a_Block);
+	bool GetBlockInfo (Vector3i, BlockState & a_Block, LIGHTTYPE & a_SkyLight, LIGHTTYPE & a_BlockLight) const;
 
 	/** Special function used for growing trees, replaces only blocks that tree may overwrite */
 	void ReplaceTreeBlocks(const sSetBlockVector & a_Blocks);

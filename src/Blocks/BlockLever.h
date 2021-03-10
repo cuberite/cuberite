@@ -7,18 +7,25 @@
 
 
 class cBlockLeverHandler final :
-	public cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>
+	public cBlockHandler
 {
-	using Super = cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>;
+	using Super = cBlockHandler;
 
 public:
 
 	using Super::Super;
 
 	/** Extracts the ON bit from metadata and returns if true if it is set */
-	static bool IsLeverOn(NIBBLETYPE a_BlockMeta)
+	static bool IsLeverOn(BlockState a_Block)
 	{
-		return ((a_BlockMeta & 0x8) == 0x8);
+		return Block::Lever::Powered(a_Block);
+	}
+
+	static inline void Flip(cChunkInterface & a_ChunkInterface, Vector3i a_Position)
+	{
+		auto Self = a_ChunkInterface.GetBlock(a_Position);
+		Self = Block::Lever::Lever(Block::Lever::Face(Self), Block::Lever::Facing(Self), !Block::Lever::Powered(Self));
+		a_ChunkInterface.FastSetBlock(a_Position, Self);
 	}
 
 private:
@@ -32,12 +39,9 @@ private:
 		const Vector3i a_CursorPos
 	) const override
 	{
-		// Flip the ON bit on / off using the XOR bitwise operation
-		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockPos) ^ 0x08);
-
-		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
+		Flip(a_ChunkInterface, a_BlockPos);
 		a_WorldInterface.WakeUpSimulators(a_BlockPos);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.lever.click", a_BlockPos, 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.lever.click", a_BlockPos, 0.5f, IsLeverOn(a_ChunkInterface.GetBlock(a_BlockPos)) ? 0.6f : 0.5f);
 		return true;
 	}
 
@@ -45,10 +49,10 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Reset meta to zero:
-		return cItem(E_BLOCK_LEVER, 1, 0);
+		return cItem(Item::Lever, 1, 0);
 	}
 
 
@@ -70,58 +74,35 @@ private:
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState & a_Block
 	) const override
 	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = LeverDirectionToMetaData(a_ClickedBlockFace);
+		using namespace Block;
+		enum Lever::Face Face;
+		switch (a_ClickedBlockFace)
+		{
+			case BLOCK_FACE_TOP:    Face = Lever::Face::Floor; break;
+			case BLOCK_FACE_BOTTOM: Face = Lever::Face::Ceiling; break;
+			case BLOCK_FACE_SOUTH:
+			case BLOCK_FACE_WEST:
+			case BLOCK_FACE_EAST:
+			case BLOCK_FACE_NORTH:	Face = Lever::Face::Wall; break;
+			case BLOCK_FACE_NONE:   return false;
+		}
+
+		a_Block = Block::Lever::Lever(Face, FacingFromYaw(a_Player.GetYaw()), false);
 		return true;
 	}
 
 
 
 
-
-	/** Converts the block face of the neighbor to which the lever is attached to the lever block's meta. */
-	inline static NIBBLETYPE LeverDirectionToMetaData(eBlockFace a_Dir)
+	static inline eBlockFace FacingFromYaw(double a_Yaw)
 	{
-		// Determine lever direction:
-		switch (a_Dir)
-		{
-			case BLOCK_FACE_YP:   return 0x6;
-			case BLOCK_FACE_XP:   return 0x1;
-			case BLOCK_FACE_XM:   return 0x2;
-			case BLOCK_FACE_ZP:   return 0x3;
-			case BLOCK_FACE_ZM:   return 0x4;
-			case BLOCK_FACE_YM:   return 0x0;
-			case BLOCK_FACE_NONE: return 0x6;
-		}
-		UNREACHABLE("Unsupported block face");
-	}
-
-
-
-
-
-	/** Converts the leve block's meta to the block face of the neighbor to which the lever is attached. */
-	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
-	{
-		switch (a_Meta & 0x7)
-		{
-			case 0x1: return BLOCK_FACE_XP;
-			case 0x2: return BLOCK_FACE_XM;
-			case 0x3: return BLOCK_FACE_ZP;
-			case 0x4: return BLOCK_FACE_ZM;
-			case 0x5:
-			case 0x6: return BLOCK_FACE_YP;
-			case 0x7:
-			case 0x0: return BLOCK_FACE_YM;
-			default:
-			{
-				ASSERT(!"Unhandled block meta!");
-				return BLOCK_FACE_NONE;
-			}
-		}
+		if ((a_Yaw > 135) || (a_Yaw < -135)) { return eBlockFace::BLOCK_FACE_NORTH; }  // -180/180
+		if ((-45 > a_Yaw) || (a_Yaw >= -135)) { return eBlockFace::BLOCK_FACE_EAST; }  // -90
+		if ((45 > a_Yaw) || (a_Yaw >= -45)) { return eBlockFace::BLOCK_FACE_SOUTH; }   // 0
+		if ((135 > a_Yaw) || (a_Yaw >= 45)) { return eBlockFace::BLOCK_FACE_WEST; }    // 90
 	}
 
 
@@ -130,31 +111,36 @@ private:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
+		auto Self = a_Chunk.GetBlock(a_RelPos);
+
 		// Find the type of block the lever is attached to:
-		auto Meta = a_Chunk.GetMeta(a_RelPos);
-		auto NeighborFace = BlockMetaDataToBlockFace(Meta);
+		auto NeighborFace = Block::Lever::Facing(Self);
 		auto NeighborPos = AddFaceDirection(a_RelPos, NeighborFace, true);
 		if (!cChunkDef::IsValidHeight(NeighborPos.y))
 		{
 			return false;
 		}
-		BLOCKTYPE NeighborBlockType;
-		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, NeighborBlockType, Meta))
+
+		BlockState Neighbour = 0;
+		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, Neighbour))
 		{
 			return false;
 		}
 
 		// Allow any full block or the "good" side of a half-slab:
-		if (cBlockInfo::FullyOccupiesVoxel(NeighborBlockType))
+		if (cBlockInfo::FullyOccupiesVoxel(Neighbour))
 		{
 			return true;
 		}
-		else if (cBlockSlabHandler::IsAnySlabType(NeighborBlockType))
+
+		else if (cBlockSlabHandler::IsAnySlabType(Neighbour))
 		{
-			return (
-				(((Meta & 0x08) == 0x08) && (NeighborFace == BLOCK_FACE_TOP)) ||
-				(((Meta & 0x08) == 0)    && (NeighborFace == BLOCK_FACE_BOTTOM))
-			);
+			switch (Block::Lever::Face(Self))
+			{
+				case Block::Lever::Face::Floor:   return cBlockSlabHandler::IsSlabTop(Neighbour);
+				case Block::Lever::Face::Wall:    return false;
+				case Block::Lever::Face::Ceiling: return !cBlockSlabHandler::IsSlabTop(Neighbour);
+			}
 		}
 
 		return false;
@@ -164,43 +150,27 @@ private:
 
 
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override
+	virtual BlockState RotateCCW(BlockState a_Block) const override
 	{
-		switch (a_Meta)
-		{
-			case 0x00: return 0x07;  // Ceiling rotation
-			case 0x07: return 0x00;
-
-			case 0x05: return 0x06;  // Ground rotation
-			case 0x06: return 0x05;
-
-			default:  return Super::MetaRotateCCW(a_Meta);  // Wall Rotation
-		}
+		using namespace Block;
+		return Lever::Lever(Lever::Face(a_Block), RotateBlockFaceCCW(Lever::Facing(a_Block)), Lever::Powered(a_Block));
 	}
 
 
 
 
 
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const override
+	virtual BlockState RotateCW(BlockState a_Block) const override
 	{
-		switch (a_Meta)
-		{
-			case 0x00: return 0x07;  // Ceiling rotation
-			case 0x07: return 0x00;
-
-			case 0x05: return 0x06;  // Ground rotation
-			case 0x06: return 0x05;
-
-			default:  return Super::MetaRotateCW(a_Meta);  // Wall Rotation
-		}
+		using namespace Block;
+		return Lever::Lever(Lever::Face(a_Block), RotateBlockFaceCW(Lever::Facing(a_Block)), Lever::Powered(a_Block));
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID(BlockState a_Block) const override
 	{
 		UNUSED(a_Meta);
 		return 0;

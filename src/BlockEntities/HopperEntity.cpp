@@ -17,13 +17,13 @@
 
 
 
-cHopperEntity::cHopperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
+cHopperEntity::cHopperEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_LastMoveItemsInTick(0),
 	m_LastMoveItemsOutTick(0),
 	m_Locked(false)
 {
-	ASSERT(a_BlockType == E_BLOCK_HOPPER);
+	ASSERT(a_Block.Type() == BlockType::Hopper);
 }
 
 

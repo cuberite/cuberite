@@ -13,48 +13,48 @@ class cBlockInfo
 public:
 
 	/** How much light do the blocks emit on their own? */
-	static NIBBLETYPE GetLightValue(BLOCKTYPE Block);
+	static LIGHTTYPE GetLightValue(BlockType Block);
 
 	/** How much light do the blocks consume? */
-	static NIBBLETYPE GetSpreadLightFalloff(BLOCKTYPE Block);
+	static LIGHTTYPE GetSpreadLightFalloff(BlockType Block);
 
 	/** Can a finisher change it? */
-	static bool CanBeTerraformed(BLOCKTYPE Block);
+	static bool CanBeTerraformed(BlockType Block);
 
 	/** Does this block fully occupy its voxel - is it a 'full' block? */
-	static bool FullyOccupiesVoxel(BLOCKTYPE Block);
+	static bool FullyOccupiesVoxel(BlockState Block);
 
 	/** Is a block destroyed after a single hit?
 	Warning: IsOneHitDig does not take into account enchantments / status effects / swim state / floating state
 	and therefore may be incorrect. Only use to check if hardness is 0.
 	If you want to check if a player would instantly mine a_Block use cPlayer::CanInstantlyMine(a_Block) */
-	static bool IsOneHitDig(BLOCKTYPE Block);
+	static bool IsOneHitDig(BlockType Block);
 
 	/** Can a piston break this block? */
-	static bool IsPistonBreakable(BLOCKTYPE Block);
+	static bool IsPistonBreakable(BlockType Block);
 
 	/** Does this block block the passage of rain? */
-	static bool IsRainBlocker(BLOCKTYPE Block);
+	static bool IsRainBlocker(BlockType Block);
 
 	/** Does this block disperse sky light? (only relevant for transparent blocks) */
-	static bool IsSkylightDispersant(BLOCKTYPE Block);
+	static bool IsSkylightDispersant(BlockType Block);
 
-	static bool IsSnowable(BLOCKTYPE Block);
+	static bool IsSnowable(BlockType Block);
 
 	/** Is this block solid (player cannot walk through)? */
-	static bool IsSolid(BLOCKTYPE Block);
+	static bool IsSolid(BlockType Block);
 
 	/** Is a block transparent? (https://minecraft.gamepedia.com/Opacity) */
-	static bool IsTransparent(BLOCKTYPE Block);
+	static bool IsTransparent(BlockType Block);
 
 	/** Can a spectator interact with this block? */
-	static bool IsUseableBySpectator(BLOCKTYPE Block);
+	static bool IsUseableBySpectator(BlockType Block);
 
 	/** Block's height. */
-	static float GetBlockHeight(BLOCKTYPE Block);
+	static float GetBlockHeight(BlockType Block);
 
 	/** Block's hardness. The greater the value the longer the player needs to break the block. */
-	static float GetHardness(BLOCKTYPE Block);
+	static float GetHardness(BlockType Block);
 };
 // tolua_end
 
@@ -62,34 +62,42 @@ public:
 
 
 
-bool IsBlockWater(BLOCKTYPE a_BlockType);
+bool IsBlockWater(BlockType a_BlockType);
 
-bool IsBlockIce(BLOCKTYPE a_BlockType);
+bool IsBlockIce(BlockType a_BlockType);
 
-bool IsBlockWaterOrIce(BLOCKTYPE a_BlockType);
+bool IsBlockWaterOrIce(BlockType a_BlockType);
 
-bool IsBlockLava(BLOCKTYPE a_BlockType);
+bool IsBlockLava(BlockType a_BlockType);
 
-bool IsBlockLiquid(BLOCKTYPE a_BlockType);
+bool IsBlockLiquid(BlockType a_BlockType);
 
-bool IsBlockRail(BLOCKTYPE a_BlockType);
+bool IsBlockRail(BlockType a_BlockType);
 
-bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType);
+bool IsBlockTypeOfDirt(BlockType a_BlockType);
 
-bool IsBlockFence(BLOCKTYPE a_BlockType);
+bool IsBlockFence(BlockType a_BlockType);
 
-bool IsBlockShulkerBox(BLOCKTYPE a_BlockType);
+bool IsBlockShulkerBox(BlockType a_BlockType);
 
-bool IsBlockMaterialWood(BLOCKTYPE a_BlockType);
+bool IsBlockMaterialWood(BlockType a_BlockType);
 
-bool IsBlockMaterialPlants(BLOCKTYPE a_BlockType);
+bool IsBlockMaterialPlants(BlockType a_BlockType);
 
-bool IsBlockMaterialVine(BLOCKTYPE a_BlockType);
+bool IsBlockMaterialVine(BlockType a_BlockType);
 
-bool IsBlockMaterialIron(BLOCKTYPE a_BlockType);
+bool IsBlockMaterialIron(BlockType a_BlockType);
 
-bool IsBlockMaterialLeaves(BLOCKTYPE a_BlockType);
+bool IsBlockMaterialLeaves(BlockType a_BlockType);
 
-bool IsBlockMaterialGourd(BLOCKTYPE a_BlockType);
+bool IsBlockMaterialGourd(BlockType a_BlockType);
 
-bool IsBlockMaterialRock(BLOCKTYPE a_BlockType);
+bool IsBlockMaterialRock(BlockType a_BlockType);
+
+bool IsBed(BlockType a_BlockType);
+
+bool IsHead(BlockType a_BlockType);
+
+bool IsSign(BlockType a_BlockType);
+
+bool IsAnvil(BlockType a_BlockType);
