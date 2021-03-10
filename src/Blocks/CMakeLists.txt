@@ -19,12 +19,12 @@ target_sources(
 	BlockCarpet.h
 	BlockCauldron.h
 	BlockChest.h
-	BlockCloth.h
 	BlockCobWeb.h
 	BlockCocoaPod.h
 	BlockCommandBlock.h
 	BlockComparator.h
 	BlockConcretePowder.h
+	BlockCraftingTable.h
 	BlockCrops.h
 	BlockDaylightSensor.h
 	BlockDeadBush.h
@@ -106,7 +106,7 @@ target_sources(
 	BlockVines.h
 	BlockWallBanner.h
 	BlockWallSign.h
-	BlockWorkbench.h
+	BlockWool.h
 	BroadcastInterface.h
 	ChunkInterface.h
 	GetHandlerCompileTimeTemplate.h

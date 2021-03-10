@@ -250,8 +250,8 @@ void cChunkMap::SetChunkData(struct SetChunkData && a_SetChunkData)
 
 void cChunkMap::ChunkLighted(
 	int a_ChunkX, int a_ChunkZ,
-	const cChunkDef::BlockNibbles & a_BlockLight,
-	const cChunkDef::BlockNibbles & a_SkyLight
+	const cChunkDef::LightNibbles & a_BlockLight,
+	const cChunkDef::LightNibbles & a_SkyLight
 )
 {
 	cCSLock Lock(m_CSChunks);
@@ -399,7 +399,7 @@ std::optional<int> cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
 
 
 
-void cChunkMap::FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cChunkMap::FastSetBlock(Vector3i a_BlockPos, BlockState a_Block)
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
@@ -408,7 +408,7 @@ void cChunkMap::FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLET
 	const auto Chunk = FindChunk(chunkPos.m_ChunkX, chunkPos.m_ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
-		Chunk->FastSetBlock(relPos, a_BlockType, a_BlockMeta);
+		Chunk->FastSetBlock(relPos, a_Block);
 	}
 }
 

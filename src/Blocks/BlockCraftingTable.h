@@ -9,7 +9,7 @@
 
 
 
-class cBlockWorkbenchHandler final :
+class cBlockCraftingTableHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

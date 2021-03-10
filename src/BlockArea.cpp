@@ -1976,7 +1976,7 @@ size_t cBlockArea::CountSpecificBlocks(BLOCKTYPE a_BlockType, NIBBLETYPE a_Block
 
 
 
-void cBlockArea::GetNonAirCropRelCoords(int & a_MinRelX, int & a_MinRelY, int & a_MinRelZ, int & a_MaxRelX, int & a_MaxRelY, int & a_MaxRelZ, BLOCKTYPE a_IgnoreBlockType)
+void cBlockArea::GetNonAirCropRelCoords(int & a_MinRelX, int & a_MinRelY, int & a_MinRelZ, int & a_MaxRelX, int & a_MaxRelY, int & a_MaxRelZ, BlockType a_IgnoreBlockType)
 {
 	// Check if blocktypes are valid:
 	if (m_BlockTypes == nullptr)
@@ -2198,52 +2198,6 @@ bool cBlockArea::ForEachBlockEntity(cBlockEntityCallback a_Callback)
 		}
 	}
 	return true;
-}
-
-
-
-
-
-void cBlockArea::SetRelNibble(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Value, NIBBLETYPE * a_Array)
-{
-	if (a_Array == nullptr)
-	{
-		LOGWARNING("cBlockArea: datatype has not been read!");
-		return;
-	}
-	a_Array[MakeIndex(a_RelX, a_RelY, a_RelZ)] = a_Value;
-}
-
-
-
-
-
-void cBlockArea::SetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Value, NIBBLETYPE * a_Array)
-{
-	SetRelNibble(a_BlockX - m_Origin.x, a_BlockY - m_Origin.y, a_BlockZ - m_Origin.z, a_Value, a_Array);
-}
-
-
-
-
-
-NIBBLETYPE cBlockArea::GetRelNibble(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE * a_Array) const
-{
-	if (a_Array == nullptr)
-	{
-		LOGWARNING("cBlockArea: datatype has not been read!");
-		return 16;
-	}
-	return a_Array[MakeIndex(a_RelX, a_RelY, a_RelZ)];
-}
-
-
-
-
-
-NIBBLETYPE cBlockArea::GetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE * a_Array) const
-{
-	return GetRelNibble(a_BlockX - m_Origin.x, a_BlockY - m_Origin.y, a_BlockZ - m_Origin.z, a_Array);
 }
 
 
@@ -2706,72 +2660,6 @@ cBlockArea::cChunkReader::cChunkReader(cBlockArea & a_Area) :
 	m_CurrentChunkX(0),
 	m_CurrentChunkZ(0)
 {
-}
-
-
-
-
-
-void cBlockArea::cChunkReader::CopyNibbles(NIBBLETYPE * a_AreaDst, const NIBBLETYPE * a_ChunkSrc)
-{
-	int SizeY = m_Area.m_Size.y;
-	int MinY = m_Origin.y;
-
-	// SizeX, SizeZ are the dmensions of the block data to copy from the current chunk (size of the geometric union)
-	// OffX, OffZ are the offsets of the current chunk data from the area origin
-	// BaseX, BaseZ are the offsets of the area data within the current chunk from the chunk borders
-	int SizeX = cChunkDef::Width;
-	int SizeZ = cChunkDef::Width;
-	int OffX, OffZ;
-	int BaseX, BaseZ;
-	OffX = m_CurrentChunkX * cChunkDef::Width - m_Origin.x;
-	if (OffX < 0)
-	{
-		BaseX = -OffX;
-		SizeX += OffX;  // SizeX is decreased, OffX is negative
-		OffX = 0;
-	}
-	else
-	{
-		BaseX = 0;
-	}
-	OffZ = m_CurrentChunkZ * cChunkDef::Width - m_Origin.z;
-	if (OffZ < 0)
-	{
-		BaseZ = -OffZ;
-		SizeZ += OffZ;  // SizeZ is decreased, OffZ is negative
-		OffZ = 0;
-	}
-	else
-	{
-		BaseZ = 0;
-	}
-	// If the chunk extends beyond the area in the X or Z axis, cut off the Size:
-	if ((m_CurrentChunkX + 1) * cChunkDef::Width > m_Origin.x + m_Area.m_Size.x)
-	{
-		SizeX -= (m_CurrentChunkX + 1) * cChunkDef::Width - (m_Origin.x + m_Area.m_Size.x);
-	}
-	if ((m_CurrentChunkZ + 1) * cChunkDef::Width > m_Origin.z + m_Area.m_Size.z)
-	{
-		SizeZ -= (m_CurrentChunkZ + 1) * cChunkDef::Width - (m_Origin.z + m_Area.m_Size.z);
-	}
-
-	for (int y = 0; y < SizeY; y++)
-	{
-		int ChunkY = MinY + y;
-		int AreaY = y;
-		for (int z = 0; z < SizeZ; z++)
-		{
-			int ChunkZ = BaseZ + z;
-			int AreaZ = OffZ + z;
-			for (int x = 0; x < SizeX; x++)
-			{
-				int ChunkX = BaseX + x;
-				int AreaX = OffX + x;
-				a_AreaDst[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = cChunkDef::GetNibble(a_ChunkSrc, ChunkX, ChunkY, ChunkZ);
-			}  // for x
-		}  // for z
-	}  // for y
 }
 
 

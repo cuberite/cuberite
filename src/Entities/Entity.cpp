@@ -16,7 +16,6 @@
 #include "../FastRandom.h"
 #include "../NetherPortalScanner.h"
 #include "../BoundingBox.h"
-#include "../WorldStorage/NamespaceSerializer.h"
 
 
 
@@ -34,7 +33,7 @@ static UInt32 GetNextUniqueID(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cEntity:
 
-cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, float a_Width, float a_Height):
+cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, double a_Height):
 	m_UniqueID(GetNextUniqueID()),
 	m_Health(1),
 	m_MaxHealth(1),
@@ -123,21 +122,12 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 	*/
 
 
-	ASSERT(a_Self->IsPlayer() || (m_World == nullptr));  // Players' worlds are loaded from disk.
+	ASSERT(m_World == nullptr);
 	ASSERT(GetParentChunk() == nullptr);
 	SetWorld(&a_EntityWorld);
 	a_EntityWorld.AddEntity(std::move(a_Self));
 
 	return true;
-}
-
-
-
-
-
-void cEntity::OnAcquireSpectator(cPlayer & a_Player)
-{
-	m_Spectators.push_back(&a_Player);
 }
 
 
@@ -156,19 +146,6 @@ void cEntity::OnAddToWorld(cWorld & a_World)
 
 
 
-void cEntity::OnLoseSpectator(cPlayer & a_Player)
-{
-	const auto Spectator = std::find(m_Spectators.begin(), m_Spectators.end(), &a_Player);
-
-	ASSERT(Spectator != m_Spectators.end());
-	std::swap(*Spectator, m_Spectators.back());
-	m_Spectators.pop_back();
-}
-
-
-
-
-
 void cEntity::OnRemoveFromWorld(cWorld & a_World)
 {
 	// Remove all mobs from the leashed list of mobs:
@@ -176,13 +153,6 @@ void cEntity::OnRemoveFromWorld(cWorld & a_World)
 	{
 		m_LeashedMobs.front()->Unleash(false, true);
 	}
-
-	for (const auto Player : m_Spectators)
-	{
-		Player->OnLoseSpectated();
-	}
-
-	m_Spectators.clear();
 
 	if (m_AttachedTo != nullptr)
 	{
@@ -420,35 +390,22 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	if (IsPainting())
-	{
-		KilledBy(a_TDI);
-
-		if (a_TDI.Attacker != nullptr)
-		{
-			a_TDI.Attacker->Killed(*this, a_TDI.DamageType);
-		}
-
-		return true;
-	}
-
 	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPlayer()))
 	{
 		cPlayer * Player = static_cast<cPlayer *>(a_TDI.Attacker);
 
-		Player->GetEquippedItem().GetHandler().OnEntityAttack(Player, this);
+		Player->GetEquippedItem().GetHandler()->OnEntityAttack(Player, this);
 
-		// Whether an enchantment boosted this attack's damage.
-		bool MagicalCriticalHit = false;
+		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
 
 		// IsOnGround() only is false if the player is moving downwards
-		// Ref: https://minecraft.wiki/w/Damage#Critical_Hits
+		// Ref: https://minecraft.gamepedia.com/Damage#Critical_Hits
 		if (!Player->IsOnGround())
 		{
 			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
 			{
 				a_TDI.FinalDamage *= 1.5f;  // 150% damage
-				m_World->BroadcastEntityAnimation(*this, EntityAnimation::EntityGetsCriticalHit);
+				m_World->BroadcastEntityAnimation(*this, 4);  // Critical hit
 			}
 		}
 
@@ -460,7 +417,6 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		if (SharpnessLevel > 0)
 		{
-			MagicalCriticalHit = true;
 			a_TDI.FinalDamage += 1.25f * SharpnessLevel;
 		}
 		else if (SmiteLevel > 0)
@@ -476,7 +432,6 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtZombiePigman:
 					case mtZombieVillager:
 					{
-						MagicalCriticalHit = true;
 						a_TDI.FinalDamage += 2.5f * SmiteLevel;
 						break;
 					}
@@ -494,15 +449,12 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtSpider:
 					case mtCaveSpider:
 					case mtSilverfish:
-					case mtEndermite:
 					{
-						MagicalCriticalHit = true;
 						a_TDI.FinalDamage += 2.5f * BaneOfArthropodsLevel;
-
 						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
-						// increasing the max duration by 0.5 seconds each level.
-						// Ref: https://minecraft.wiki/w/Enchanting#Bane_of_Arthropods
-						int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks.
+						// increasing the max duration by 0.5 seconds each level
+						// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
+						int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks
 						Monster->AddEntityEffect(cEntityEffect::effSlowness, Duration, 4);
 
 						break;
@@ -521,7 +473,6 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			{
 				BurnTicks += 4 * (FireAspectLevel - 1);
 			}
-
 			if (!IsMob() && !IsInWater())
 			{
 				StartBurning(BurnTicks * 20);
@@ -537,18 +488,9 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					{
 						break;
 					}
-					default:
-					{
-						MagicalCriticalHit = true;
-						StartBurning(BurnTicks * 20);
-					}
+					default: StartBurning(BurnTicks * 20);
 				}
 			}
-		}
-
-		if (MagicalCriticalHit)
-		{
-			m_World->BroadcastEntityAnimation(*this, EntityAnimation::EntityGetsMagicalCriticalHit);
 		}
 
 		unsigned int ThornsLevel = 0;
@@ -571,7 +513,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			}
 		}
 
-		Player->GetStatistics().Custom[CustomStatistic::DamageDealt] += FloorC<StatisticsManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5);
+		Player->GetStatManager().AddValue(Statistic::DamageDealt, FloorC<cStatManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5));
 	}
 
 	m_Health -= a_TDI.FinalDamage;
@@ -583,15 +525,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		SetSpeed(a_TDI.Knockback);
 	}
 
-	m_World->BroadcastEntityAnimation(*this, [&a_TDI]
-	{
-		switch (a_TDI.DamageType)
-		{
-			case eDamageType::dtBurning: return EntityAnimation::PawnBurns;
-			case eDamageType::dtDrowning: return EntityAnimation::PawnDrowns;
-			default: return EntityAnimation::PawnHurts;
-		}
-	}());
+	m_World->BroadcastEntityStatus(*this, esGenericHurt);
 
 	m_InvulnerableTicks = 10;
 
@@ -601,7 +535,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		if (a_TDI.Attacker != nullptr)
 		{
-			a_TDI.Attacker->Killed(*this, a_TDI.DamageType);
+			a_TDI.Attacker->Killed(this);
 		}
 	}
 	return true;
@@ -614,7 +548,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 {
 	// Returns the hitpoints that this pawn can deal to a_Receiver using its equipped items
-	// Ref: https://minecraft.wiki/w/Damage#Dealing_damage as of 2012_12_20
+	// Ref: https://minecraft.gamepedia.com/Damage#Dealing_damage as of 2012_12_20
 	switch (this->GetEquippedWeapon().m_ItemType)
 	{
 		case E_ITEM_WOODEN_SWORD:    return 4;
@@ -660,7 +594,7 @@ void cEntity::ApplyArmorDamage(int DamageBlocked)
 
 bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 {
-	// Ref.: https://minecraft.wiki/w/Armor#Effects as of 2012_12_20
+	// Ref.: https://minecraft.gamepedia.com/Armor#Effects as of 2012_12_20
 	switch (a_DamageType)
 	{
 		case dtOnFire:
@@ -777,7 +711,7 @@ float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Da
 	}
 
 	// Add up all armor points:
-	// Ref.: https://minecraft.wiki/w/Armor#Defense_points
+	// Ref.: https://minecraft.gamepedia.com/Armor#Defense_points
 	int ArmorValue = 0;
 	int Toughness = 0;
 	switch (GetEquippedHelmet().m_ItemType)
@@ -814,7 +748,7 @@ float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Da
 	}
 
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
-	// Ref.: https://minecraft.wiki/w/Armor#Mob_armor as of 2012_12_20
+	// Ref.: https://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
 
 	float Reduction = std::max(ArmorValue / 5.0f, ArmorValue - a_Damage / (2.0f + Toughness / 4.0f));
 	return (a_Damage * std::min(20.0f, Reduction) / 25.0f);
@@ -863,7 +797,7 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 	// If the victim is a player the hook is handled by the cPlayer class
 	if (!IsPlayer())
 	{
-		AString emptystring;
+		AString emptystring = AString("");
 		cRoot::Get()->GetPluginManager()->CallHookKilled(*this, a_TDI, emptystring);
 	}
 
@@ -879,8 +813,7 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 	}
 
-	m_TicksAlive = 0;
-	m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnDies);
+	m_World->BroadcastEntityStatus(*this, esGenericDead);
 }
 
 
@@ -1132,7 +1065,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	// Get water direction
-	Vector3f WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection({BlockX, BlockY, BlockZ});
+	Vector3f WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
 
 	m_WaterSpeed *= 0.9;  // Reduce speed each tick
 
@@ -1165,7 +1098,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			NextPos = HitCoords;
 
 			// Avoid movement in the direction of the blockface that has been hit and correct for collision box:
-			const auto HalfWidth = GetWidth() / 2;
+			double HalfWidth = GetWidth() / 2.0;
 			switch (HitBlockFace)
 			{
 				case BLOCK_FACE_XM:
@@ -1375,7 +1308,7 @@ void cEntity::DetectCacti(void)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				if (GetWorld()->GetBlock({ x, y, z }) == E_BLOCK_CACTUS)
+				if (GetWorld()->GetBlock(x, y, z) == E_BLOCK_CACTUS)
 				{
 					TakeDamage(dtCactusContact, nullptr, 1, 0);
 					return;
@@ -1404,7 +1337,7 @@ void cEntity::DetectMagma(void)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				if (GetWorld()->GetBlock({ x, y, z }) == E_BLOCK_MAGMA)
+				if (GetWorld()->GetBlock(x, y, z) == E_BLOCK_MAGMA)
 				{
 					TakeDamage(dtMagmaContact, nullptr, 1, 0);
 					return;
@@ -1434,9 +1367,10 @@ bool cEntity::DetectPortal()
 		return false;
 	}
 
-	if (const auto Position = m_Position.Floor(); cChunkDef::IsValidHeight(Position))
+	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
+	if (cChunkDef::IsValidHeight(Y))
 	{
-		switch (GetWorld()->GetBlock(Position))
+		switch (GetWorld()->GetBlock(X, Y, Z))
 		{
 			case E_BLOCK_NETHER_PORTAL:
 			{
@@ -1531,7 +1465,7 @@ bool cEntity::DetectPortal()
 					if (IsPlayer())
 					{
 						cPlayer * Player = static_cast<cPlayer *>(this);
-						if (Player->GetRespawnWorld() == TargetWorld)
+						if (Player->GetBedWorld() == TargetWorld)
 						{
 							return MoveToWorld(*TargetWorld, Player->GetLastBedPos());
 						}
@@ -1676,7 +1610,7 @@ bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPo
 
 bool cEntity::MoveToWorld(cWorld & a_World, bool a_ShouldSendRespawn)
 {
-	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3i(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ()));
+	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3d(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ()));
 }
 
 
@@ -1692,7 +1626,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 		return false;
 	}
 
-	return MoveToWorld(*World, Vector3i(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()), false, a_ShouldSendRespawn);
+	return MoveToWorld(*World, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()), false, a_ShouldSendRespawn);
 }
 
 
@@ -1729,12 +1663,10 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 			{
 				BLOCKTYPE Block;
 				if (!a_Chunk.UnboundedRelGetBlockType(x, y, z, Block))
-				{
-					/*
+				{ /*
 					LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
 						x, y, z, GetPosX(), GetPosZ()
-					);
-					*/
+					); */
 					continue;
 				}
 
@@ -1761,11 +1693,9 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	BLOCKTYPE BlockIn;
 	if (!a_Chunk.UnboundedRelGetBlockType(RelX, HeadHeight, RelZ, BlockIn))
 	{
-		/*
 		LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
 			RelX, HeadHeight, RelZ, GetPosX(), GetPosZ()
 		);
-		*/
 		return;
 	}
 	m_IsHeadInWater = IsBlockWater(BlockIn);
@@ -1785,19 +1715,9 @@ void cEntity::SetIsTicking(bool a_IsTicking)
 
 
 
-void cEntity::SetSize(const float a_Width, const float a_Height)
-{
-	m_Width = a_Width;
-	m_Height = a_Height;
-}
-
-
-
-
-
 void cEntity::HandleAir(void)
 {
-	// Ref.: https://minecraft.wiki/w/Chunk_format
+	// Ref.: https://minecraft.gamepedia.com/Chunk_format
 	// See if the entity is /submerged/ water (head is in water)
 	// Get the type of block the entity is standing in:
 
@@ -1965,13 +1885,13 @@ void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 
 void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 {
-	// Process packet sending every two ticks:
-	if ((GetWorld()->GetWorldTickAge() % 2_tick) != 0_tick)
+	// Process packet sending every two ticks
+	if (GetWorld()->GetWorldAge() % 2 != 0)
 	{
 		return;
 	}
 
-	if (m_Speed.HasNonZeroLength())
+	if (GetSpeed().SqrLength() > 0.001)
 	{
 		// Movin'
 		m_World->BroadcastEntityVelocity(*this, a_Exclude);
@@ -1987,7 +1907,8 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		m_bHasSentNoSpeed = true;
 	}
 
-	if ((m_Position - m_LastSentPosition).HasNonZeroLength())  // Have we moved?
+	Vector3i Diff = (GetPosition() * 32.0).Floor() - (m_LastSentPosition * 32.0).Floor();
+	if (Diff.HasNonZeroLength())  // Have we moved?
 	{
 		m_World->BroadcastEntityPosition(*this, a_Exclude);
 
@@ -2024,25 +1945,26 @@ cEntity * cEntity::GetAttached()
 
 
 
-void cEntity::AttachTo(cEntity & a_AttachTo)
+void cEntity::AttachTo(cEntity * a_AttachTo)
 {
-	if (m_AttachedTo == &a_AttachTo)
+	if (m_AttachedTo == a_AttachTo)
 	{
-		// Already attached to that entity, nothing to do here:
+		// Already attached to that entity, nothing to do here
 		return;
 	}
-
 	if (m_AttachedTo != nullptr)
 	{
 		// Detach from any previous entity:
 		Detach();
 	}
 
-	// Update state information:
-	m_AttachedTo = &a_AttachTo;
-	a_AttachTo.m_Attachee = this;
-
-	m_World->BroadcastAttachEntity(*this, a_AttachTo);
+	// Update state information
+	m_AttachedTo = a_AttachTo;
+	a_AttachTo->m_Attachee = this;
+	if (a_AttachTo != nullptr)
+	{
+		m_World->BroadcastAttachEntity(*this, *a_AttachTo);
+	}
 }
 
 
@@ -2053,16 +1975,13 @@ void cEntity::Detach(void)
 {
 	if (m_AttachedTo == nullptr)
 	{
-		// Already not attached to any entity, our work is done:
+		// Already not attached to any entity, our work is done
 		return;
 	}
-
 	m_World->BroadcastDetachEntity(*this, *m_AttachedTo);
 
 	m_AttachedTo->m_Attachee = nullptr;
 	m_AttachedTo = nullptr;
-
-	OnDetach();
 }
 
 
@@ -2104,6 +2023,15 @@ void cEntity::SetHeadYaw(double a_HeadYaw)
 	m_HeadYaw = a_HeadYaw;
 	m_bDirtyHead = true;
 	WrapHeadYaw();
+}
+
+
+
+
+
+void cEntity::SetHeight(double a_Height)
+{
+	m_Height = a_Height;
 }
 
 
@@ -2185,6 +2113,15 @@ void cEntity::SetSpeedY(double a_SpeedY)
 void cEntity::SetSpeedZ(double a_SpeedZ)
 {
 	SetSpeed(m_Speed.x, m_Speed.y, a_SpeedZ);
+}
+
+
+
+
+
+void cEntity::SetWidth(double a_Width)
+{
+	m_Width = a_Width;
 }
 
 
@@ -2330,115 +2267,6 @@ void cEntity::BroadcastLeashedMobs()
 		for (auto LeashedMob : m_LeashedMobs)
 		{
 			m_World->BroadcastLeashEntity(*LeashedMob, *this);
-		}
-	}
-}
-
-
-
-
-
-void cEntity::OnDetach()
-{
-}
-
-
-
-
-
-void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
-{
-	cPluginManager * PluginManager = cRoot::Get()->GetPluginManager();
-
-	AString Name;
-	if (IsPlayer())
-	{
-		cPlayer * Player = static_cast<cPlayer *>(this);
-		Name = Player->GetName();
-	}
-	else if (IsMob())
-	{
-		cMonster * Monster = static_cast<cMonster *>(this);
-		if (Monster->HasCustomName())
-		{
-			Name = Monster->GetCustomName();
-		}
-		else
-		{
-			Name = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
-		}
-	}
-	else
-	{
-		// If the entity is neither a player nor a mob, we should quit.
-		return;
-	}
-
-	if (a_TDI.Attacker == nullptr)
-	{
-		const AString DamageText = [&]
-			{
-				switch (a_TDI.DamageType)
-				{
-					case dtRangedAttack:    return "was shot";
-					case dtLightning:       return "was plasmified by lightining";
-					case dtFalling:         return GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard";
-					case dtDrowning:        return "drowned";
-					case dtSuffocating:     return GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block";
-					case dtStarving:        return "forgot the importance of food";
-					case dtCactusContact:   return "was impaled on a cactus";
-					case dtMagmaContact:    return "discovered the floor was lava";
-					case dtLavaContact:     return "was melted by lava";
-					case dtPoisoning:       return "died from septicaemia";
-					case dtWithering:       return "is a husk of their former selves";
-					case dtOnFire:          return "forgot to stop, drop, and roll";
-					case dtFireContact:     return "burnt themselves to death";
-					case dtInVoid:          return "somehow fell out of the world";
-					case dtPotionOfHarming: return "was magicked to death";
-					case dtEnderPearl:      return "misused an ender pearl";
-					case dtAdmin:           return "was administrator'd";
-					case dtExplosion:       return "blew up";
-					case dtAttack:          return "was attacked by thin air";
-					case dtEnvironment:     return "played too much dress up";  // This is not vanilla - added a own pun
-				}
-				UNREACHABLE("Unsupported damage type");
-			}();
-		auto DeathMessage = fmt::format(FMT_STRING("{} {}"), Name, DamageText);
-		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (!DeathMessage.empty())
-		{
-			GetWorld()->BroadcastChatDeath(DeathMessage);
-		}
-	}
-	else if (a_TDI.Attacker->IsPlayer())
-	{
-		cPlayer * Killer = static_cast<cPlayer *>(a_TDI.Attacker);
-		auto DeathMessage = fmt::format(FMT_STRING("{0} was killed by {1}"), Name, Killer->GetName());
-		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (!DeathMessage.empty())
-		{
-			GetWorld()->BroadcastChatDeath(DeathMessage);
-		}
-	}  // This will trigger if a player / tamed pet has been killed by another mob / tamed pet.
-	else if (a_TDI.Attacker->IsMob())
-	{
-		cMonster * Monster = static_cast<cMonster *>(a_TDI.Attacker);
-
-		AString DeathMessage;
-		if (Monster->HasCustomName())
-		{
-			DeathMessage = fmt::format(FMT_STRING("{0} was killed by {1}"), Name, Monster->GetCustomName());
-		}
-		else
-		{
-			AString KillerName = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
-			DeathMessage = fmt::format(FMT_STRING("{0} was killed by a {1}"), Name, KillerName);
-		}
-
-		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (!DeathMessage.empty())
-		{
-			GetWorld()->BroadcastChatDeath(DeathMessage);
 		}
 	}
 }

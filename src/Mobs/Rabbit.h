@@ -39,7 +39,7 @@ public:
 	{
 		a_Items.Add(E_ITEM_CARROT);
 		a_Items.Add(E_ITEM_GOLDEN_CARROT);
-		a_Items.Add(E_BLOCK_DANDELION);
+		// a_Items.Add(E_BLOCK_DANDELION);
 	}
 
 	eRabbitType GetRabbitType()         const { return m_Type; }

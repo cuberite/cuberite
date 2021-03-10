@@ -33,8 +33,8 @@ public:
 	}
 
 	/** Generates a random color for the sheep like the vanilla server.
-	The percent's where used are from the wiki: https://minecraft.wiki/w/Sheep#Breeding */
-	static NIBBLETYPE GenerateNaturalRandomColor(void);
+	The percent's where used are from the wiki: https://minecraft.gamepedia.com/Sheep#Breeding */
+	static unsigned char GenerateNaturalRandomColor(void);
 
 	bool IsSheared(void) const { return m_IsSheared; }
 	void SetSheared(bool a_IsSheared) { m_IsSheared = a_IsSheared; }

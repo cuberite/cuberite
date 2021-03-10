@@ -12,14 +12,14 @@
 
 
 
-cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, 1, 1, a_World),
+cBeaconEntity::cBeaconEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, 1, 1, a_World),
 	m_IsActive(false),
 	m_BeaconLevel(0),
 	m_PrimaryEffect(cEntityEffect::effNoEffect),
 	m_SecondaryEffect(cEntityEffect::effNoEffect)
 {
-	ASSERT(a_BlockType == E_BLOCK_BEACON);
+	ASSERT(a_Block.Type() == BlockType::Beacon);
 	if (m_World != nullptr)
 	{
 		UpdateBeacon();
@@ -154,7 +154,7 @@ bool cBeaconEntity::IsBeaconBlocked(void)
 
 
 
-bool cBeaconEntity::IsMineralBlock(BLOCKTYPE a_BlockType)
+bool cBeaconEntity::IsMineralBlock(BlockType a_BlockType)
 {
 	switch (a_BlockType)
 	{

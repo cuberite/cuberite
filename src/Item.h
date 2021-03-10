@@ -13,6 +13,7 @@
 #include "Enchantments.h"
 #include "WorldStorage/FireworksSerializer.h"
 #include "Color.h"
+#include "Registries/Items.h"
 
 
 
@@ -48,6 +49,15 @@ public:
 		const AString & a_CustomName = "",
 		const AStringVector & a_LoreTable = {}
 	);
+
+	cItem(
+		Item a_ItemType,
+		char a_ItemCount = 1,
+		short a_ItemDamage = 0,
+		const AString & a_Enchantments = "",
+		const AString & a_CustomName = "",
+		const AStringVector & a_LoreTable = {}
+			) {}
 
 	// The constructor is disabled in code, because the compiler generates it anyway,
 	// but it needs to stay because ToLua needs to generate the binding for it

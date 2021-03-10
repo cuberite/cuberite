@@ -127,7 +127,7 @@ const cBlockHandler & cBlockHandler::For(BLOCKTYPE a_BlockType)
 
 
 
-bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
+bool cBlockEntity::IsBlockEntityBlockType(BlockType a_Block)
 {
 	return false;
 }
