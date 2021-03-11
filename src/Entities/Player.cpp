@@ -809,7 +809,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	SaveToDisk();  // Save it, yeah the world is a tough place !
 	cPluginManager * PluginManager = cRoot::Get()->GetPluginManager();
 
-	if ((a_TDI.Attacker == nullptr) && m_World->ShouldBroadcastDeathMessages())
+	if (a_TDI.Attacker == nullptr)
 	{
 		const AString DamageText = [&]
 			{
@@ -844,10 +844,6 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		{
 			GetWorld()->BroadcastChatDeath(DeathMessage);
 		}
-	}
-	else if (a_TDI.Attacker == nullptr)  // && !m_World->ShouldBroadcastDeathMessages() by fallthrough
-	{
-		// no-op
 	}
 	else if (a_TDI.Attacker->IsPlayer())
 	{
