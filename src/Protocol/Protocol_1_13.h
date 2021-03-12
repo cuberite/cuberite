@@ -36,7 +36,7 @@ public:
 
 protected:
 
-	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BlockState a_Block) override;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
@@ -58,7 +58,7 @@ protected:
 	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata);
 	virtual UInt8 GetEntityMetadataID(EntityMetadataType a_FieldType);
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID);
-	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta);
+	virtual UInt32 GetProtocolBlockType(BlockState a_Block);
 	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage);
 	virtual UInt32 GetProtocolStatisticType(Statistic a_Statistic);
 
@@ -93,7 +93,7 @@ protected:
 
 	virtual Version GetProtocolVersion() override;
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) override;
-	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) override;
+	virtual UInt32 GetProtocolBlockType(BlockState a_Block) override;
 	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) override;
 	virtual UInt32 GetProtocolStatisticType(Statistic a_Statistic) override;
 };

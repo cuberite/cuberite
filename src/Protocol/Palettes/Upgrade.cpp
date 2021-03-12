@@ -2516,10 +2516,10 @@ namespace PaletteUpgrade
 		}
 	}
 
-	std::pair<short, short> ToBlock(const BlockState Block)
+	std::pair<unsigned char, unsigned char> ToBlock(const BlockState Block)
 	{
 		using namespace Block;
-		switch(Block.ID)
+		switch (Block.ID)
 		{
 			case Air::Air().ID: return { 0, 0 };
 			case Stone::Stone().ID: return { 1, 0 };
@@ -2603,10 +2603,18 @@ namespace PaletteUpgrade
 			case SpruceLog::SpruceLog(SpruceLog::Axis::Z).ID: return { 17, 9 };
 			case BirchLog::BirchLog(BirchLog::Axis::Z).ID: return { 17, 10 };
 			case JungleLog::JungleLog(JungleLog::Axis::Z).ID: return { 17, 11 };
-			case OakWood::OakWood().ID: return { 17, 12 };
-			case SpruceWood::SpruceWood().ID: return { 17, 13 };
-			case BirchWood::BirchWood().ID: return { 17, 14 };
-			case JungleWood::JungleWood().ID: return { 17, 15 };
+			case OakWood::OakWood(OakWood::Axis::X).ID: return { 17, 12 };
+			case OakWood::OakWood(OakWood::Axis::Y).ID: return { 17, 12 };
+			case OakWood::OakWood(OakWood::Axis::Z).ID: return { 17, 12 };
+			case SpruceWood::SpruceWood(SpruceWood::Axis::X).ID: return { 17, 13 };
+			case SpruceWood::SpruceWood(SpruceWood::Axis::Y).ID: return { 17, 13 };
+			case SpruceWood::SpruceWood(SpruceWood::Axis::Z).ID: return { 17, 13 };
+			case BirchWood::BirchWood(BirchWood::Axis::X).ID: return { 17, 14 };
+			case BirchWood::BirchWood(BirchWood::Axis::Y).ID: return { 17, 14 };
+			case BirchWood::BirchWood(BirchWood::Axis::Z).ID: return { 17, 14 };
+			case JungleWood::JungleWood(JungleWood::Axis::X).ID: return { 17, 15 };
+			case JungleWood::JungleWood(JungleWood::Axis::Y).ID: return { 17, 15 };
+			case JungleWood::JungleWood(JungleWood::Axis::Z).ID: return { 17, 15 };
 			case OakLeaves::OakLeaves(false, true).ID: return { 18, 0 };
 			case SpruceLeaves::SpruceLeaves(false, true).ID: return { 18, 1 };
 			case BirchLeaves::BirchLeaves(false, true).ID: return { 18, 2 };
@@ -2643,7 +2651,7 @@ namespace PaletteUpgrade
 			case Sandstone::Sandstone().ID: return { 24, 0 };
 			case ChiseledSandstone::ChiseledSandstone().ID: return { 24, 1 };
 			case CutSandstone::CutSandstone().ID: return { 24, 2 };
-			case NoteBlock::NoteBlock().ID: return { 25, 0 };
+			// case NoteBlock::NoteBlock(NoteBlock::Instrument).ID: return { 25, 0 };  // TODO(12xx12) There are 800 values
 			case RedBed::RedBed(eBlockFace::BLOCK_FACE_ZP, false, RedBed::Part::Foot).ID: return { 26, 0 };
 			case RedBed::RedBed(eBlockFace::BLOCK_FACE_XM, false, RedBed::Part::Foot).ID: return { 26, 1 };
 			case RedBed::RedBed(eBlockFace::BLOCK_FACE_ZM, false, RedBed::Part::Foot).ID: return { 26, 2 };
@@ -2696,7 +2704,6 @@ namespace PaletteUpgrade
 			case DeadBush::DeadBush().ID: return { 31, 0 };
 			case Grass::Grass().ID: return { 31, 1 };
 			case Fern::Fern().ID: return { 31, 2 };
-			case DeadBush::DeadBush().ID: return { 32, 0 };
 			case Piston::Piston(false, eBlockFace::BLOCK_FACE_YM).ID: return { 33, 0 };
 			case Piston::Piston(false, eBlockFace::BLOCK_FACE_YP).ID: return { 33, 1 };
 			case Piston::Piston(false, eBlockFace::BLOCK_FACE_ZM).ID: return { 33, 2 };
@@ -2773,11 +2780,6 @@ namespace PaletteUpgrade
 			case QuartzSlab::QuartzSlab(QuartzSlab::Type::Double).ID: return { 43, 7 };
 			case SmoothStone::SmoothStone().ID: return { 43, 8 };
 			case SmoothSandstone::SmoothSandstone().ID: return { 43, 9 };
-			case PetrifiedOakSlab::PetrifiedOakSlab(PetrifiedOakSlab::Type::Double).ID: return { 43, 10 };
-			case CobblestoneSlab::CobblestoneSlab(CobblestoneSlab::Type::Double).ID: return { 43, 11 };
-			case BrickSlab::BrickSlab(BrickSlab::Type::Double).ID: return { 43, 12 };
-			case StoneBrickSlab::StoneBrickSlab(StoneBrickSlab::Type::Double).ID: return { 43, 13 };
-			case NetherBrickSlab::NetherBrickSlab(NetherBrickSlab::Type::Double).ID: return { 43, 14 };
 			case SmoothQuartz::SmoothQuartz().ID: return { 43, 15 };
 			case StoneSlab::StoneSlab(StoneSlab::Type::Bottom).ID: return { 44, 0 };
 			case SandstoneSlab::SandstoneSlab(SandstoneSlab::Type::Bottom).ID: return { 44, 1 };
@@ -3147,9 +3149,6 @@ namespace PaletteUpgrade
 			case BrownMushroomBlock::BrownMushroomBlock(false, false, false, true, true, false).ID: return { 99, 8 };
 			case BrownMushroomBlock::BrownMushroomBlock(false, true, false, true, true, false).ID: return { 99, 9 };
 			case MushroomStem::MushroomStem(false, true, true, true, false, true).ID: return { 99, 10 };
-			case BrownMushroomBlock::BrownMushroomBlock(false, false, false, false, false, false).ID: return { 99, 11 };
-			case BrownMushroomBlock::BrownMushroomBlock(false, false, false, false, false, false).ID: return { 99, 12 };
-			case BrownMushroomBlock::BrownMushroomBlock(false, false, false, false, false, false).ID: return { 99, 13 };
 			case BrownMushroomBlock::BrownMushroomBlock(true, true, true, true, true, true).ID: return { 99, 14 };
 			case MushroomStem::MushroomStem(true, true, true, true, true, true).ID: return { 99, 15 };
 			case RedMushroomBlock::RedMushroomBlock(false, false, false, false, false, false).ID: return { 100, 0 };
@@ -3162,12 +3161,7 @@ namespace PaletteUpgrade
 			case RedMushroomBlock::RedMushroomBlock(false, false, false, true, true, true).ID: return { 100, 7 };
 			case RedMushroomBlock::RedMushroomBlock(false, false, false, true, true, false).ID: return { 100, 8 };
 			case RedMushroomBlock::RedMushroomBlock(false, true, false, true, true, false).ID: return { 100, 9 };
-			case MushroomStem::MushroomStem(false, true, true, true, false, true).ID: return { 100, 10 };
-			case RedMushroomBlock::RedMushroomBlock(false, false, false, false, false, false).ID: return { 100, 11 };
-			case RedMushroomBlock::RedMushroomBlock(false, false, false, false, false, false).ID: return { 100, 12 };
-			case RedMushroomBlock::RedMushroomBlock(false, false, false, false, false, false).ID: return { 100, 13 };
 			case RedMushroomBlock::RedMushroomBlock(true, true, true, true, true, true).ID: return { 100, 14 };
-			case MushroomStem::MushroomStem(true, true, true, true, true, true).ID: return { 100, 15 };
 			case IronBars::IronBars(false, false, false, false).ID: return { 101, 0 };
 			case GlassPane::GlassPane(false, false, false, false).ID: return { 102, 0 };
 			case Melon::Melon().ID: return { 103, 0 };
@@ -3338,19 +3332,12 @@ namespace PaletteUpgrade
 			case TripwireHook::TripwireHook(true, eBlockFace::BLOCK_FACE_XP, true).ID: return { 131, 15 };
 			case Tripwire::Tripwire(false, false, false, false, false, false, false).ID: return { 132, 0 };
 			case Tripwire::Tripwire(false, false, false, false, true, false, false).ID: return { 132, 1 };
-			case Tripwire::Tripwire(false, false, false, false, false, false, false).ID: return { 132, 2 };
-			case Tripwire::Tripwire(false, false, false, false, true, false, false).ID: return { 132, 3 };
 			case Tripwire::Tripwire(true, false, false, false, false, false, false).ID: return { 132, 4 };
 			case Tripwire::Tripwire(true, false, false, false, true, false, false).ID: return { 132, 5 };
-			case Tripwire::Tripwire(true, false, false, false, false, false, false).ID: return { 132, 6 };
-			case Tripwire::Tripwire(true, false, false, false, true, false, false).ID: return { 132, 7 };
 			case Tripwire::Tripwire(false, true, false, false, false, false, false).ID: return { 132, 8 };
 			case Tripwire::Tripwire(false, true, false, false, true, false, false).ID: return { 132, 9 };
-			case Tripwire::Tripwire(false, true, false, false, false, false, false).ID: return { 132, 10 };
-			case Tripwire::Tripwire(false, true, false, false, true, false, false).ID: return { 132, 11 };
 			case Tripwire::Tripwire(true, true, false, false, false, false, false).ID: return { 132, 12 };
 			case Tripwire::Tripwire(true, true, false, false, true, false, false).ID: return { 132, 13 };
-			case Tripwire::Tripwire(true, true, false, false, false, false, false).ID: return { 132, 14 };
 			case EmeraldBlock::EmeraldBlock().ID: return { 133, 0 };
 			case SpruceStairs::SpruceStairs(eBlockFace::BLOCK_FACE_XP, SpruceStairs::Half::Bottom, SpruceStairs::Shape::Straight).ID: return { 134, 0 };
 			case SpruceStairs::SpruceStairs(eBlockFace::BLOCK_FACE_XM, SpruceStairs::Half::Bottom, SpruceStairs::Shape::Straight).ID: return { 134, 1 };
@@ -3392,21 +3379,6 @@ namespace PaletteUpgrade
 			case CobblestoneWall::CobblestoneWall(CobblestoneWall::East::None, CobblestoneWall::North::None, CobblestoneWall::South::None, true, CobblestoneWall::West::None).ID: return { 139, 0 };
 			case MossyCobblestoneWall::MossyCobblestoneWall(MossyCobblestoneWall::East::None, MossyCobblestoneWall::North::None, MossyCobblestoneWall::South::None, true, MossyCobblestoneWall::West::None).ID: return { 139, 1 };
 			case PottedCactus::PottedCactus().ID: return { 140, 0 };
-			case PottedCactus::PottedCactus().ID: return { 140, 1 };
-			case PottedCactus::PottedCactus().ID: return { 140, 2 };
-			case PottedCactus::PottedCactus().ID: return { 140, 3 };
-			case PottedCactus::PottedCactus().ID: return { 140, 4 };
-			case PottedCactus::PottedCactus().ID: return { 140, 5 };
-			case PottedCactus::PottedCactus().ID: return { 140, 6 };
-			case PottedCactus::PottedCactus().ID: return { 140, 7 };
-			case PottedCactus::PottedCactus().ID: return { 140, 8 };
-			case PottedCactus::PottedCactus().ID: return { 140, 9 };
-			case PottedCactus::PottedCactus().ID: return { 140, 10 };
-			case PottedCactus::PottedCactus().ID: return { 140, 11 };
-			case PottedCactus::PottedCactus().ID: return { 140, 12 };
-			case PottedCactus::PottedCactus().ID: return { 140, 13 };
-			case PottedCactus::PottedCactus().ID: return { 140, 14 };
-			case PottedCactus::PottedCactus().ID: return { 140, 15 };
 			case Carrots::Carrots(0).ID: return { 141, 0 };
 			case Carrots::Carrots(1).ID: return { 141, 1 };
 			case Carrots::Carrots(2).ID: return { 141, 2 };
@@ -3504,22 +3476,6 @@ namespace PaletteUpgrade
 			case Comparator::Comparator(eBlockFace::BLOCK_FACE_XM, Comparator::Mode::Subtract, true).ID: return { 149, 13 };
 			case Comparator::Comparator(eBlockFace::BLOCK_FACE_ZM, Comparator::Mode::Subtract, true).ID: return { 149, 14 };
 			case Comparator::Comparator(eBlockFace::BLOCK_FACE_XP, Comparator::Mode::Subtract, true).ID: return { 149, 15 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_ZP, Comparator::Mode::Compare, false).ID: return { 150, 0 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_XM, Comparator::Mode::Compare, false).ID: return { 150, 1 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_ZM, Comparator::Mode::Compare, false).ID: return { 150, 2 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_XP, Comparator::Mode::Compare, false).ID: return { 150, 3 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_ZP, Comparator::Mode::Subtract, false).ID: return { 150, 4 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_XM, Comparator::Mode::Subtract, false).ID: return { 150, 5 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_ZM, Comparator::Mode::Subtract, false).ID: return { 150, 6 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_XP, Comparator::Mode::Subtract, false).ID: return { 150, 7 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_ZP, Comparator::Mode::Compare, true).ID: return { 150, 8 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_XM, Comparator::Mode::Compare, true).ID: return { 150, 9 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_ZM, Comparator::Mode::Compare, true).ID: return { 150, 10 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_XP, Comparator::Mode::Compare, true).ID: return { 150, 11 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_ZP, Comparator::Mode::Subtract, true).ID: return { 150, 12 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_XM, Comparator::Mode::Subtract, true).ID: return { 150, 13 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_ZM, Comparator::Mode::Subtract, true).ID: return { 150, 14 };
-			case Comparator::Comparator(eBlockFace::BLOCK_FACE_XP, Comparator::Mode::Subtract, true).ID: return { 150, 15 };
 			case DaylightDetector::DaylightDetector(false, 0).ID: return { 151, 0 };
 			case DaylightDetector::DaylightDetector(false, 1).ID: return { 151, 1 };
 			case DaylightDetector::DaylightDetector(false, 2).ID: return { 151, 2 };
@@ -3631,8 +3587,12 @@ namespace PaletteUpgrade
 			case DarkOakLog::DarkOakLog(DarkOakLog::Axis::X).ID: return { 162, 5 };
 			case AcaciaLog::AcaciaLog(AcaciaLog::Axis::Z).ID: return { 162, 8 };
 			case DarkOakLog::DarkOakLog(DarkOakLog::Axis::Z).ID: return { 162, 9 };
-			case AcaciaWood::AcaciaWood().ID: return { 162, 12 };
-			case DarkOakWood::DarkOakWood().ID: return { 162, 13 };
+			case AcaciaWood::AcaciaWood(AcaciaWood::Axis::X).ID: return { 162, 12 };
+			case AcaciaWood::AcaciaWood(AcaciaWood::Axis::Y).ID: return { 162, 12 };
+			case AcaciaWood::AcaciaWood(AcaciaWood::Axis::Z).ID: return { 162, 12 };
+			case DarkOakWood::DarkOakWood(DarkOakWood::Axis::X).ID: return { 162, 13 };
+			case DarkOakWood::DarkOakWood(DarkOakWood::Axis::Y).ID: return { 162, 13 };
+			case DarkOakWood::DarkOakWood(DarkOakWood::Axis::Z).ID: return { 162, 13 };
 			case AcaciaStairs::AcaciaStairs(eBlockFace::BLOCK_FACE_XP, AcaciaStairs::Half::Bottom, AcaciaStairs::Shape::Straight).ID: return { 163, 0 };
 			case AcaciaStairs::AcaciaStairs(eBlockFace::BLOCK_FACE_XM, AcaciaStairs::Half::Bottom, AcaciaStairs::Shape::Straight).ID: return { 163, 1 };
 			case AcaciaStairs::AcaciaStairs(eBlockFace::BLOCK_FACE_ZP, AcaciaStairs::Half::Bottom, AcaciaStairs::Shape::Straight).ID: return { 163, 2 };
@@ -4179,6 +4139,7 @@ namespace PaletteUpgrade
 			case StructureBlock::StructureBlock(StructureBlock::Mode::Load).ID: return { 255, 1 };
 			case StructureBlock::StructureBlock(StructureBlock::Mode::Corner).ID: return { 255, 2 };
 			case StructureBlock::StructureBlock(StructureBlock::Mode::Data).ID: return { 255, 3 };
+			default: return { 0, 0 };
 		}
 	}
 

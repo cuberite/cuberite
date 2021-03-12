@@ -20,7 +20,7 @@ namespace TNTHandler
 
 	static void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BlockState a_Block, const PowerLevel Power)
 	{
-		// LOGD("Evaluating explodinator the trinitrotoluene (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+		LOGREDSTONE("Evaluating explodinator the trinitrotoluene (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 		if (Power != 0)
 		{
 			a_Chunk.SetBlock(a_Position, Block::Air::Air());
@@ -31,8 +31,7 @@ namespace TNTHandler
 	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
-		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
+		UNUSED(a_Block);
 		InvokeForAdjustedRelatives(Callback, a_Position, RelativeAdjacents);
 	}
 };

@@ -21,7 +21,7 @@ namespace RedstoneRepeaterHandler
 		BlockState State = 0;
 		if (!Chunk.UnboundedRelGetBlock(a_Position, State))
 		{
-			return std::make_pair(false, 0);
+			return std::make_pair(false, BlockState(0));
 		}
 
 		return std::make_pair(IsOn(State), State);
@@ -95,7 +95,7 @@ namespace RedstoneRepeaterHandler
 
 	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BlockState a_Block, const PowerLevel Power)
 	{
-		// LOGD("Evaluating loopy the repeater (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+		LOGREDSTONE("Evaluating loopy the repeater (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
 		auto & Data = DataForChunk(a_Chunk);
 		const auto DelayInfo = Data.GetMechanismDelayInfo(a_Position);

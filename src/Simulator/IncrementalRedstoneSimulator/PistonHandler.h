@@ -13,16 +13,16 @@ namespace PistonHandler
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
-		UNUSED(a_BlockType);
+		UNUSED(a_Block);
 		UNUSED(a_QueryPosition);
-		UNUSED(a_QueryBlockType);
+		UNUSED(a_QueryBlock);
 		UNUSED(IsLinked);
 		return 0;
 	}
 
 	static void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BlockState a_Block, const PowerLevel Power)
 	{
-		// LOGD("Evaluating pisty the piston (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+		LOGREDSTONE("Evaluating pisty the piston (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
 		const bool ShouldBeExtended = Power != 0;
 		if (ShouldBeExtended == cBlockPistonHandler::IsExtended(a_Block))
@@ -48,7 +48,7 @@ namespace PistonHandler
 	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
-		UNUSED(a_BlockType);
+		UNUSED(a_Block);
 
 		eBlockFace Face;
 		switch (a_Block.Type())

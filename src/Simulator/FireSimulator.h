@@ -22,15 +22,15 @@ public:
 
 	cFireSimulator(cWorld & a_World, cIniFile & a_IniFile);
 
-	static bool IsFuel         (BlockType a_BlockType);
-	static bool DoesBurnForever(BlockType a_BlockType);
+	static bool IsFuel         (BlockState a_BlockType);
+	static bool DoesBurnForever(BlockState a_BlockType);
 
 private:
 
 	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
 
-	static bool IsAllowedBlock(BlockType a_BlockType);
+	static bool IsAllowedBlock(BlockState a_Block);
 
 	/** Time (in msec) that a fire block takes to burn with a fuel block into the next step */
 	unsigned m_BurnStepTimeFuel;

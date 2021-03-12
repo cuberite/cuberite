@@ -131,21 +131,20 @@ private:
 
 	/** Tries to push a block and increases the pushed blocks variable. Returns true if the block is pushable */
 	static bool CanPushBlock(
-		const Vector3i & aBlockPos, cWorld & aWorld, bool aRequirePushable,
-		Vector3iSet & aBlocksPushed, const Vector3i & aPushDir
+		const Vector3i & a_BlockPos, cWorld & a_World, bool a_RequirePushable,
+		Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
 	);
 
-	virtual ColourID GetMapBaseColourID(BlockState aBlock) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(aBlock);
 		return 11;
 	}
 
 	virtual void OnBroken(
-		cChunkInterface & aChunkInterface, cWorldInterface & aWorldInterface,
-		Vector3i aBlockPos,
-		BlockState aBlock,
-		const cEntity * aDigger
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos,
+		BlockState a_OldBlock,
+		const cEntity * a_Digger
 	) const override;
 
 	/** Moves a list of blocks in a specific direction */

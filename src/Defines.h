@@ -34,7 +34,7 @@ enum
 
 
 /** Block face constants, used in PlayerDigging and PlayerBlockPlacement packets and bbox collision calc */
-enum eBlockFace
+enum eBlockFace : char
 {
 	BLOCK_FACE_NONE = -1,  // Interacting with no block face - swinging the item in the air
 	BLOCK_FACE_XM   =  4,  // Interacting with the X- face of the block
@@ -440,6 +440,8 @@ eBlockFace ReverseBlockFace(eBlockFace  a_BlockFace);
 
 /** Returns the textual representation of the BlockFace constant. */
 AString BlockFaceToString(eBlockFace a_BlockFace);
+
+eBlockFace RotationToBlockFace(double a_Rotation);
 
 /** Returns true if the specified block type is valid (known). */
 bool IsValidBlock(int a_BlockType);

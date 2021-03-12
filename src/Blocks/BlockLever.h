@@ -86,23 +86,12 @@ private:
 			case BLOCK_FACE_SOUTH:
 			case BLOCK_FACE_WEST:
 			case BLOCK_FACE_EAST:
-			case BLOCK_FACE_NORTH:	Face = Lever::Face::Wall; break;
+			case BLOCK_FACE_NORTH:  Face = Lever::Face::Wall; break;
 			case BLOCK_FACE_NONE:   return false;
 		}
 
-		a_Block = Block::Lever::Lever(Face, FacingFromYaw(a_Player.GetYaw()), false);
+		a_Block = Block::Lever::Lever(Face, RotationToBlockFace(a_Player.GetYaw()), false);
 		return true;
-	}
-
-
-
-
-	static inline eBlockFace FacingFromYaw(double a_Yaw)
-	{
-		if ((a_Yaw > 135) || (a_Yaw < -135)) { return eBlockFace::BLOCK_FACE_NORTH; }  // -180/180
-		if ((-45 > a_Yaw) || (a_Yaw >= -135)) { return eBlockFace::BLOCK_FACE_EAST; }  // -90
-		if ((45 > a_Yaw) || (a_Yaw >= -45)) { return eBlockFace::BLOCK_FACE_SOUTH; }   // 0
-		if ((135 > a_Yaw) || (a_Yaw >= 45)) { return eBlockFace::BLOCK_FACE_WEST; }    // 90
 	}
 
 
@@ -170,9 +159,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(BlockState a_Block) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 0;
 	}
 } ;

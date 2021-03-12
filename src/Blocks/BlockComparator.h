@@ -3,6 +3,7 @@
 
 #include "BlockHandler.h"
 #include "BlockRedstoneRepeater.h"
+#include "BlockStairs.h"
 #include "Mixins.h"
 
 
@@ -10,31 +11,32 @@
 
 
 class cBlockComparatorHandler final :
-	public cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>
+	public cBlockHandler
 {
-	using Super = cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>;
+	using Super = cBlockHandler;
 
 public:
 
 	using Super::Super;
 
-	inline static bool IsInSubtractionMode(NIBBLETYPE a_Meta)
+	inline static bool IsInSubtractionMode(BlockState a_Block)
 	{
-		return ((a_Meta & 0x4) == 0x4);
+		return (Block::Comparator::Mode(a_Block) == Block::Comparator::Mode::Subtract);
 	}
 
-	inline static Vector3i GetFrontCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta)
+	inline static Vector3i GetFrontCoordinate(Vector3i a_Position, BlockState a_Block)
 	{
-		switch (a_Meta)
+		using namespace Block;
+		switch (Comparator::Facing(a_Block))
 		{
-			case 0x0: a_Position.z--; break;
-			case 0x1: a_Position.x++; break;
-			case 0x2: a_Position.z++; break;
-			case 0x3: a_Position.x--; break;
+			case BLOCK_FACE_NORTH: a_Position.z++; break;
+			case BLOCK_FACE_WEST:  a_Position.x++; break;
+			case BLOCK_FACE_EAST:  a_Position.x--; break;
+			case BLOCK_FACE_SOUTH: a_Position.z--; break;
 			default:
 			{
-				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
-				ASSERT(!"Unknown metadata while determining orientation of comparator!");
+				LOGWARNING("%s: Unknown facing: %s", __FUNCTION__, BlockFaceToString(Comparator::Facing(a_Block)));
+				ASSERT(!"Unknown facing while determining orientation of comparator!");
 				break;
 			}
 		}
@@ -42,36 +44,37 @@ public:
 		return a_Position;
 	}
 
-	inline static Vector3i GetSideCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta, bool a_bInverse)
+	inline static Vector3i GetSideCoordinate(Vector3i a_Position, BlockState a_Block, bool a_bInverse)
 	{
+		using namespace Block;
 		if (!a_bInverse)
 		{
-			switch (a_Meta)
+			switch (Comparator::Facing(a_Block))
 			{
-				case 0x0: a_Position.x++; break;
-				case 0x1: a_Position.z--; break;
-				case 0x2: a_Position.x--; break;
-				case 0x3: a_Position.z++; break;
+				case BLOCK_FACE_NORTH: a_Position.x++; break;
+				case BLOCK_FACE_WEST:  a_Position.z--; break;
+				case BLOCK_FACE_EAST:  a_Position.z++; break;
+				case BLOCK_FACE_SOUTH: a_Position.x--; break;
 				default:
 				{
-					LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
-					ASSERT(!"Unknown metadata while determining orientation of comparator!");
+					LOGWARNING("%s: Unknown facing: %s", __FUNCTION__, BlockFaceToString(Comparator::Facing(a_Block)));
+					ASSERT(!"Unknown facing while determining orientation of comparator!");
 					break;
 				}
 			}
 		}
 		else
 		{
-			switch (a_Meta)
+			switch (Comparator::Facing(a_Block))
 			{
-				case 0x0: a_Position.x--; break;
-				case 0x1: a_Position.z++; break;
-				case 0x2: a_Position.x++; break;
-				case 0x3: a_Position.z--; break;
+				case BLOCK_FACE_NORTH: a_Position.x--; break;
+				case BLOCK_FACE_WEST:  a_Position.z++; break;
+				case BLOCK_FACE_EAST:  a_Position.z--; break;
+				case BLOCK_FACE_SOUTH: a_Position.x++; break;
 				default:
 				{
-					LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
-					ASSERT(!"Unknown metadata while determining orientation of comparator!");
+					LOGWARNING("%s: Unknown facing: %s", __FUNCTION__, BlockFaceToString(Comparator::Facing(a_Block)));
+					ASSERT(!"Unknown facing while determining orientation of comparator!");
 					break;
 				}
 			}
@@ -80,17 +83,18 @@ public:
 		return a_Position;
 	}
 
-	inline static Vector3i GetRearCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta)
+	inline static Vector3i GetRearCoordinate(Vector3i a_Position, BlockState a_Block)
 	{
-		switch (a_Meta)
+		using namespace Block;
+		switch (Comparator::Facing(a_Block))
 		{
-			case 0x0: a_Position.z++; break;
-			case 0x1: a_Position.x--; break;
-			case 0x2: a_Position.z--; break;
-			case 0x3: a_Position.x++; break;
+			case BLOCK_FACE_NORTH: a_Position.z--; break;
+			case BLOCK_FACE_WEST:  a_Position.x--; break;
+			case BLOCK_FACE_EAST:  a_Position.x++; break;
+			case BLOCK_FACE_SOUTH: a_Position.z++; break;
 			default:
 			{
-				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
+				LOGWARNING("%s: Unknown metadata: %s", __FUNCTION__, BlockFaceToString(Comparator::Facing(a_Block)));
 				ASSERT(!"Unknown metadata while determining orientation of comparator!");
 				break;
 			}
@@ -110,13 +114,14 @@ private:
 		const Vector3i a_CursorPos
 	) const override
 	{
-		const auto Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
+		auto Self = a_ChunkInterface.GetBlock(a_BlockPos);
 
-		// Toggle the 3rd bit (addition / subtraction):
-		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta ^ 0x04);
-
-		// Update simulators:
-		a_WorldInterface.WakeUpSimulators(a_BlockPos);
+		using namespace Block;
+		switch (Comparator::Mode(Self))
+		{
+			case Comparator::Mode::Compare:  a_ChunkInterface.SetBlock(a_BlockPos, Comparator::Comparator(Comparator::Facing(Self), Comparator::Mode::Subtract, Comparator::Powered(Self))); break;
+			case Comparator::Mode::Subtract: a_ChunkInterface.SetBlock(a_BlockPos, Comparator::Comparator(Comparator::Facing(Self), Comparator::Mode::Compare, Comparator::Powered(Self))); break;
+		}
 		return true;
 	}
 
@@ -159,21 +164,24 @@ private:
 			return false;
 		}
 
-		BLOCKTYPE BelowBlock;
-		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_RelPos.addedY(-1), BelowBlock, BelowBlockMeta);
 
-		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
+		auto Below = a_Chunk.GetBlock(a_RelPos.addedY(-1));
+
+		if (cBlockInfo::FullyOccupiesVoxel(Below))
 		{
 			return true;
 		}
-		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
+		else if (cBlockSlabHandler::IsAnySlabType(Below))
 		{
-			// Check if the slab is turned up side down
-			if ((BelowBlockMeta & 0x08) == 0x08)
+			// Check if the slab is turned up side down or double slab
+			if (cBlockSlabHandler::IsSlabFull(Below) || cBlockSlabHandler::IsSlabTop(Below))
 			{
-				return true;
+				return true;;
 			}
+		}
+		else if (cBlockStairsHandler::IsBlockStairs(Below) && cBlockStairsHandler::IsStairsTopHalf(Below))
+		{
+			return true;
 		}
 		return false;
 	}
@@ -182,7 +190,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		return cItem(E_ITEM_COMPARATOR, 1, 0);
 	}
@@ -191,9 +199,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 11;
 	}
 } ;

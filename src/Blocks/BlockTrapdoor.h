@@ -9,13 +9,31 @@
 
 
 class cBlockTrapdoorHandler final :
-	public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>
+	public cBlockHandler
 {
-	using Super = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>;
+	using Super = cBlockHandler;
 
 public:
 
 	using Super::Super;
+
+	static inline bool IsBlockTrapdoor(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaTrapdoor:
+			case BlockType::BirchTrapdoor:
+			case BlockType::CrimsonTrapdoor:
+			case BlockType::DarkOakTrapdoor:
+			case BlockType::IronTrapdoor:
+			case BlockType::JungleTrapdoor:
+			case BlockType::OakTrapdoor:
+			case BlockType::SpruceTrapdoor:
+			case BlockType::WarpedTrapdoor:
+				return true;
+			default: return false;
+		}
+	}
 
 private:
 

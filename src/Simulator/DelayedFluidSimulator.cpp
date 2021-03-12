@@ -65,8 +65,8 @@ cDelayedFluidSimulatorChunkData::~cDelayedFluidSimulatorChunkData()
 ////////////////////////////////////////////////////////////////////////////////
 // cDelayedFluidSimulator:
 
-cDelayedFluidSimulator::cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, int a_TickDelay) :
-	Super(a_World, a_Fluid, a_StationaryFluid),
+cDelayedFluidSimulator::cDelayedFluidSimulator(cWorld & a_World, BlockType a_Fluid, unsigned char a_StationaryFlowValue, int a_TickDelay) :
+	Super(a_World, a_Fluid, a_StationaryFlowValue),
 	m_TickDelay(a_TickDelay),
 	m_AddSlotNum(a_TickDelay - 1),
 	m_SimSlotNum(0),
@@ -94,7 +94,7 @@ void cDelayedFluidSimulator::Simulate(float a_Dt)
 
 void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 {
-	auto ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
+	auto ChunkDataRaw = (m_FluidBlock == BlockType::Water) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
 	cDelayedFluidSimulatorChunkData * ChunkData = static_cast<cDelayedFluidSimulatorChunkData *>(ChunkDataRaw);
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_SimSlotNum];
 
@@ -108,7 +108,7 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 		}
 		for (cCoordWithIntVector::iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
 		{
-			SimulateBlock(a_Chunk, itr->x, itr->y, itr->z);
+			SimulateBlock(a_Chunk, {itr->x, itr->y, itr->z});
 		}
 		m_TotalBlocks -= static_cast<int>(Blocks.size());
 		Blocks.clear();
@@ -119,14 +119,14 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 
 
 
-void cDelayedFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
+void cDelayedFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block)
 {
-	if ((a_Block != m_FluidBlock) && (a_Block != m_StationaryFluidBlock))
+	if ((a_Block.Type() != m_FluidBlock) && IsFluidStationary(a_Block))
 	{
 		return;
 	}
 
-	auto ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk.GetWaterSimulatorData() : a_Chunk.GetLavaSimulatorData();
+	auto ChunkDataRaw = (m_FluidBlock == BlockType::Water) ? a_Chunk.GetWaterSimulatorData() : a_Chunk.GetLavaSimulatorData();
 	cDelayedFluidSimulatorChunkData * ChunkData = static_cast<cDelayedFluidSimulatorChunkData *>(ChunkDataRaw);
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_AddSlotNum];
 
@@ -143,7 +143,7 @@ void cDelayedFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLO
 
 
 
-void cDelayedFluidSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
+void cDelayedFluidSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block)
 {
 	if (!cChunkDef::IsValidHeight(a_Position.y))
 	{

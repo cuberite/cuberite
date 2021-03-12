@@ -52,14 +52,14 @@ class cDelayedFluidSimulator:
 
 public:
 
-	cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, int a_TickDelay);
+	cDelayedFluidSimulator(cWorld & a_World, BlockType a_Fluid, unsigned char a_StationaryFlowValue, int a_TickDelay);
 
 protected:
 
 	virtual void Simulate(float a_Dt) override;
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
-	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
-	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block) override;
+	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block) override;
 	virtual cFluidSimulatorData * CreateChunkData(void) override { return new cDelayedFluidSimulatorChunkData(m_TickDelay); }
 
 	int m_TickDelay;   // Count of the m_Slots array in each ChunkData
@@ -73,7 +73,7 @@ protected:
 	|       adding blocks here ^ | ^ simulating here */
 
 	/** Called from SimulateChunk() to simulate each block in one slot of blocks. Descendants override this method to provide custom simulation. */
-	virtual void SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ) = 0;
+	virtual void SimulateBlock(cChunk * a_Chunk, Vector3i a_RelPos) = 0;
 } ;
 
 

@@ -13,16 +13,16 @@ namespace NoteBlockHandler
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
-		UNUSED(a_BlockType);
+		UNUSED(a_Block);
 		UNUSED(a_QueryPosition);
-		UNUSED(a_QueryBlockType);
+		UNUSED(a_QueryBlock);
 		UNUSED(IsLinked);
 		return 0;
 	}
 
 	static void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BlockState a_Block, const PowerLevel Power)
 	{
-		// LOGD("Evaluating sparky the magical note block (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, Power);
+		LOGREDSTONE("Evaluating sparky the magical note block (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, Power);
 
 		const auto Previous = DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, Power);
 		if ((Previous != 0) || (Power == 0))

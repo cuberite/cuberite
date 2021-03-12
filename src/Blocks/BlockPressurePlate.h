@@ -70,16 +70,22 @@ private:
 
 		// TODO: check if the block is upside-down slab or upside-down stairs
 		auto Block = a_Chunk.GetBlock(a_RelPos.addedY(-1));
-		switch (Block)
+		if (cBlockSlabHandler::IsAnySlabType(Block))
 		{
-			case E_BLOCK_ACACIA_FENCE:
-			case E_BLOCK_BIRCH_FENCE:
-			case E_BLOCK_DARK_OAK_FENCE:
-			case E_BLOCK_FENCE:
-			case E_BLOCK_HOPPER:
-			case E_BLOCK_JUNGLE_FENCE:
-			case E_BLOCK_NETHER_BRICK_FENCE:
-			case E_BLOCK_SPRUCE_FENCE:
+			return cBlockSlabHandler::IsSlabTop(Block) || cBlockSlabHandler::IsSlabFull(Block);
+		}
+		switch (Block.Type())
+		{
+			case BlockType::AcaciaFence:
+			case BlockType::BirchFence:
+			case BlockType::CrimsonFence:
+			case BlockType::DarkOakFence:
+			case BlockType::OakFence:
+			case BlockType::Hopper:
+			case BlockType::JungleFence:
+			case BlockType::NetherBrickFence:
+			case BlockType::SpruceFence:
+			case BlockType::WarpedFence:
 			{
 				return true;
 			}
@@ -94,23 +100,22 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(BlockState a_Block) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		switch (m_BlockType)
 		{
-			case BlockType::AcaciaPressurePlate:             return 0;  //TODO(12xx12)
-			case BlockType::BirchPressurePlate:              return 0;  //TODO(12xx12)
-			case BlockType::CrimsonPressurePlate:            return 0;  //TODO(12xx12)
-			case BlockType::DarkOakPressurePlate:            return 0;  //TODO(12xx12)
+			case BlockType::AcaciaPressurePlate:             return 0;  // TODO(12xx12)
+			case BlockType::BirchPressurePlate:              return 0;  // TODO(12xx12)
+			case BlockType::CrimsonPressurePlate:            return 0;  // TODO(12xx12)
+			case BlockType::DarkOakPressurePlate:            return 0;  // TODO(12xx12)
 			case BlockType::HeavyWeightedPressurePlate:      return 6;
-			case BlockType::JunglePressurePlate:             return 0;  //TODO(12xx12)
+			case BlockType::JunglePressurePlate:             return 0;  // TODO(12xx12)
 			case BlockType::LightWeightedPressurePlate:      return 30;
 			case BlockType::OakPressurePlate:                return 13;
-			case BlockType::PolishedBlackstonePressurePlate: return 0;  //TODO(12xx12)
-			case BlockType::SprucePressurePlate:             return 0;  //TODO(12xx12)
+			case BlockType::PolishedBlackstonePressurePlate: return 0;  // TODO(12xx12)
+			case BlockType::SprucePressurePlate:             return 0;  // TODO(12xx12)
 			case BlockType::StonePressurePlate:              return 11;
-			case BlockType::WarpedPressurePlate:             return 0;  //TODO(12xx12)
+			case BlockType::WarpedPressurePlate:             return 0;  // TODO(12xx12)
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in pressure plate handler!");

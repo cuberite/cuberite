@@ -12,16 +12,16 @@ namespace SmallGateHandler
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
-		UNUSED(a_BlockType);
+		UNUSED(a_Block);
 		UNUSED(a_QueryPosition);
-		UNUSED(a_QueryBlockType);
+		UNUSED(a_QueryBlock);
 		UNUSED(IsLinked);
 		return 0;
 	}
 
 	static void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BlockState a_Block, const PowerLevel Power)
 	{
-		// LOGD("Evaluating gateydory the fence gate/trapdoor (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+		LOGREDSTONE("Evaluating gateydory the fence gate/trapdoor (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
 		// Use redstone data rather than block state so players can override redstone control
 		const auto Previous = DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, Power);

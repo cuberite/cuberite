@@ -24,7 +24,7 @@ Implements the 1.14 protocol classes:
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_14:
 
-void cProtocol_1_14::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
+void cProtocol_1_14::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BlockState a_Block)
 {
 }
 
@@ -194,9 +194,9 @@ std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolI
 
 
 
-UInt32 cProtocol_1_14::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+UInt32 cProtocol_1_14::GetProtocolBlockType(BlockState a_Block)
 {
-	return Palette_1_14::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+	return Palette_1_14::From(a_Block);
 }
 
 

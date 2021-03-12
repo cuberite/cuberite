@@ -8,25 +8,13 @@
 
 
 class cBlockTripwireHookHandler final :
-	public cMetaRotator<cClearMetaOnDrop<cBlockHandler>, 0x03, 0x02, 0x03, 0x00, 0x01>
+	public cBlockHandler
 {
-	using Super = cMetaRotator<cClearMetaOnDrop<cBlockHandler>, 0x03, 0x02, 0x03, 0x00, 0x01>;
+	using Super = cBlockHandler;
 
 public:
 
 	using Super::Super;
-
-	inline static eBlockFace MetadataToDirection(NIBBLETYPE a_Meta)
-	{
-		switch (a_Meta & 0x03)
-		{
-			case 0x1: return BLOCK_FACE_XM;
-			case 0x3: return BLOCK_FACE_XP;
-			case 0x2: return BLOCK_FACE_ZM;
-			case 0x0: return BLOCK_FACE_ZP;
-			default: ASSERT(!"Unhandled tripwire hook metadata!"); return BLOCK_FACE_NONE;
-		}
-	}
 
 private:
 
@@ -36,31 +24,18 @@ private:
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState & a_Block
 	) const override
 	{
-		a_BlockType = m_BlockType;
-
+		using namespace Block;
 		switch (a_ClickedBlockFace)
 		{
 			case BLOCK_FACE_XM:
-			{
-				a_BlockMeta = 0x1;
-				return true;
-			}
 			case BLOCK_FACE_XP:
-			{
-				a_BlockMeta = 0x3;
-				return true;
-			}
 			case BLOCK_FACE_ZM:
-			{
-				a_BlockMeta = 0x2;
-				return true;
-			}
 			case BLOCK_FACE_ZP:
 			{
-				a_BlockMeta = 0x0;
+				a_Block = Block::TripwireHook::TripwireHook(false, a_ClickedBlockFace, false);
 				return true;
 			}
 			case BLOCK_FACE_NONE:
@@ -79,25 +54,25 @@ private:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		const auto Meta = a_Chunk.GetMeta(a_RelPos);
-		const auto RearPosition = AddFaceDirection(a_RelPos, MetadataToDirection(Meta), true);
+		using namespace Block;
+		const auto Self = a_Chunk.GetBlock(a_RelPos);
+		const auto RearPosition = AddFaceDirection(a_RelPos, TripwireHook::Facing(Self), true);
 
-		BLOCKTYPE NeighborBlockType;
-		if (!a_Chunk.UnboundedRelGetBlockType(RearPosition, NeighborBlockType))
+		BlockState Other = 0;
+		if (!a_Chunk.UnboundedRelGetBlockType(RearPosition, Other))
 		{
 			return false;
 		}
 
-		return cBlockInfo::FullyOccupiesVoxel(NeighborBlockType);
+		return cBlockInfo::FullyOccupiesVoxel(Other);
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 0;
 	}
 };

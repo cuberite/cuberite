@@ -23,6 +23,28 @@ public:
 
 	using Super::Super;
 
+	static inline bool IsBlockCarpet(BlockState a_Block)
+	{
+		case BlockType::BlackCarpet:
+		case BlockType::BlueCarpet:
+		case BlockType::BrownCarpet:
+		case BlockType::CyanCarpet:
+		case BlockType::GrayCarpet:
+		case BlockType::GreenCarpet:
+		case BlockType::LightBlueCarpet:
+		case BlockType::LightGrayCarpet:
+		case BlockType::LimeCarpet:
+		case BlockType::MagentaCarpet:
+		case BlockType::OrangeCarpet:
+		case BlockType::PinkCarpet:
+		case BlockType::PurpleCarpet:
+		case BlockType::RedCarpet:
+		case BlockType::WhiteCarpet:
+		case BlockType::YellowCarpet:
+			return true;
+		default: return false;
+	}
+
 private:
 
 	virtual bool GetPlacementBlockTypeMeta(

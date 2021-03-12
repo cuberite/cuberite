@@ -184,7 +184,7 @@ public:
 	) const;
 
 	/** Returns the base colour ID of the block, as will be represented on a map, as per documentation: https://minecraft.gamepedia.com/Map_item_format */
-	virtual ColourID GetMapBaseColourID(BlockState a_Block) const;
+	virtual ColourID GetMapBaseColourID() const;
 
 	/** Rotates a given block meta counter-clockwise. Default: no change
 	Returns block meta following rotation */

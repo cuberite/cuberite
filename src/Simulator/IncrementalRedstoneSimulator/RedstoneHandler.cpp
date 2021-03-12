@@ -1,6 +1,14 @@
 
 #include "Globals.h"
 
+// Some wrapper for the LOGD function to enable - disable the redstone logging
+#ifdef RedstoneLogger
+	#define LOGREDSTONE LOGD
+#else
+	#define LOGREDSTONE(...)
+#endif
+
+
 #include "RedstoneHandler.h"
 #include "RedstoneDataHelper.h"
 #include "ForEachSourceCallback.h"
@@ -74,7 +82,7 @@
 			case BlockType::JungleTrapdoor: \
 			case BlockType::OakTrapdoor: \
 			case BlockType::SpruceTrapdoor: \
-			case BlockType::WarpedTrapdoor \
+			case BlockType::WarpedTrapdoor: \
 				return SmallGateHandler::Callback; \
 			case BlockType::RedstoneLamp: \
 				return RedstoneLampHandler::Callback; \
@@ -124,7 +132,7 @@
 				return TripwireHookHandler::Callback; \
 			default: \
 			{ \
-				if (cBlockDoorHandler::IsDoorBlockType(BlockType)) \
+				if (cBlockDoorHandler::IsDoorBlockType(a_Block)) \
 				{ \
 					return DoorHandler::Callback; \
 				} \
@@ -138,14 +146,13 @@
 
 namespace RedstoneHandler
 {
-	PowerLevel GetPowerDeliveredToPosition(const cChunk & Chunk, const Vector3i Position, const BlockState a_Block, const Vector3i QueryPosition, const BLOCKTYPE QueryBlockType, const bool IsLinked)
+	PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Block, const Vector3i a_QueryPosition, const BlockState a_QueryBlock, const bool a_IsLinked)
 	{
-		INVOKE_FOR_HANDLERS(GetPowerDeliveredToPosition(Chunk, Position, a_Block.Type(), QueryPosition, QueryBlockType, IsLinked));
+		INVOKE_FOR_HANDLERS(GetPowerDeliveredToPosition(a_Chunk, a_Position, a_Block, a_QueryPosition, a_QueryBlock, a_IsLinked));
 
 		// Fell through the switch statement
 		// Block at Position doesn't have a corresponding redstone handler
 		// ErasePowerData will have been called in AddBlock
-
 		// Default:
 		return 0;
 	}

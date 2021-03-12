@@ -159,7 +159,7 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 			int Z = m_World->GetTickRandomNumber(11);
 
 			// A villager can't farm this.
-			if (!IsBlockFarmable(Surrounding.GetRelBlockType(X, Y, Z)))
+			if (!IsBlockFarmable(Surrounding.GetRelBlock(X, Y, Z)))
 			{
 				continue;
 			}
@@ -202,9 +202,9 @@ void cVillager::HandleFarmerTryHarvestCrops()
 void cVillager::HandleFarmerPlaceCrops()
 {
 	// Check if there is still farmland at the spot where the crops were.
-	if (m_World->GetBlock(m_CropsPos.x, m_CropsPos.y - 1, m_CropsPos.z) == E_BLOCK_FARMLAND)
+	if (m_World->GetBlock(m_CropsPos.x, m_CropsPos.y - 1, m_CropsPos.z) == BlockType::FARMLAND)
 	{
-		m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, E_BLOCK_CROPS, 0);
+		m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, BlockType::CROPS, 0);
 	}
 }
 
@@ -212,17 +212,15 @@ void cVillager::HandleFarmerPlaceCrops()
 
 
 
-bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType)
+bool cVillager::IsBlockFarmable(BlockState a_Block)
 {
-	switch (a_BlockType)
+	switch (a_Block.Type())
 	{
-		case E_BLOCK_BEETROOTS:
-		case E_BLOCK_CROPS:
-		case E_BLOCK_POTATOES:
-		case E_BLOCK_CARROTS:
-		{
+		case BlockType::Beetroots:
+		case BlockType::Wheat:
+		case BlockType::Potatoes:
+		case BlockType::Carrots:
 			return true;
-		}
 		default: return false;
 	}
 }

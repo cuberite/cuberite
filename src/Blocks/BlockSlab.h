@@ -18,7 +18,8 @@
 
 
 class cBlockSlabHandler final :
-	public cBlockHandler {
+	public cBlockHandler
+{
 	using Super = cBlockHandler;
 
 public:
@@ -71,359 +72,401 @@ public:
 			case BlockType::StoneSlab:
 			case BlockType::WarpedSlab:
 				return true;
-			default:
-				return false;
+			default: return false;
 		}
 	}
 
 #define ISSLABTOP(SlabType) \
-    return (SlabType::Type(a_Block) == SlabType::Type::Top);
+	return (SlabType::Type(a_Block) == SlabType::Type::Top);
 
-	static bool IsSlabTop(BlockState a_Block) {
+	static bool IsSlabTop(BlockState a_Block)
+	{
 		using namespace Block;
-		switch (a_Block.Type()) {
-			case BlockType::AcaciaSlab: {
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaSlab:
+			{
 				ISSLABTOP(AcaciaSlab)
 			}
-			case BlockType::AndesiteSlab: {
+			case BlockType::AndesiteSlab:
+			{
 				ISSLABTOP(AndesiteSlab)
 			}
-			case BlockType::BirchSlab: {
+			case BlockType::BirchSlab:
+			{
 				ISSLABTOP(BirchSlab)
 			}
-			case BlockType::BlackstoneSlab: {
+			case BlockType::BlackstoneSlab:
+			{
 				ISSLABTOP(BlackstoneSlab)
 			}
-			case BlockType::BrickSlab: {
+			case BlockType::BrickSlab:
+			{
 				ISSLABTOP(BrickSlab)
 			}
-			case BlockType::CobblestoneSlab: {
+			case BlockType::CobblestoneSlab:
+			{
 				ISSLABTOP(CobblestoneSlab)
 			}
-			case BlockType::CrimsonSlab: {
+			case BlockType::CrimsonSlab:
+			{
 				ISSLABTOP(CrimsonSlab)
 			}
-			case BlockType::CutRedSandstoneSlab: {
+			case BlockType::CutRedSandstoneSlab:
+			{
 				ISSLABTOP(CutRedSandstoneSlab)
 			}
-			case BlockType::CutSandstoneSlab: {
+			case BlockType::CutSandstoneSlab:
+			{
 				ISSLABTOP(CutSandstoneSlab)
 			}
-			case BlockType::DarkOakSlab: {
+			case BlockType::DarkOakSlab:
+			{
 				ISSLABTOP(DarkOakSlab)
 			}
-			case BlockType::DarkPrismarineSlab: {
+			case BlockType::DarkPrismarineSlab:
+			{
 				ISSLABTOP(DarkPrismarineSlab)
 			}
-			case BlockType::DioriteSlab: {
+			case BlockType::DioriteSlab:
+			{
 				ISSLABTOP(DioriteSlab)
 			}
-			case BlockType::EndStoneBrickSlab: {
+			case BlockType::EndStoneBrickSlab:
+			{
 				ISSLABTOP(EndStoneBrickSlab)
 			}
-			case BlockType::GraniteSlab: {
+			case BlockType::GraniteSlab:
+			{
 				ISSLABTOP(GraniteSlab)
 			}
-			case BlockType::JungleSlab: {
+			case BlockType::JungleSlab:
+			{
 				ISSLABTOP(JungleSlab)
 			}
-			case BlockType::MossyCobblestoneSlab: {
+			case BlockType::MossyCobblestoneSlab:
+			{
 				ISSLABTOP(MossyCobblestoneSlab)
 			}
-			case BlockType::MossyStoneBrickSlab: {
+			case BlockType::MossyStoneBrickSlab:
+			{
 				ISSLABTOP(MossyStoneBrickSlab)
 			}
-			case BlockType::NetherBrickSlab: {
+			case BlockType::NetherBrickSlab:
+			{
 				ISSLABTOP(NetherBrickSlab)
 			}
-			case BlockType::OakSlab: {
+			case BlockType::OakSlab:
+			{
 				ISSLABTOP(OakSlab)
 			}
-			case BlockType::PetrifiedOakSlab: {
+			case BlockType::PetrifiedOakSlab:
+			{
 				ISSLABTOP(PetrifiedOakSlab)
 			}
-			case BlockType::PolishedAndesiteSlab: {
+			case BlockType::PolishedAndesiteSlab:
+			{
 				ISSLABTOP(PolishedAndesiteSlab)
 			}
-			case BlockType::PolishedBlackstoneBrickSlab: {
+			case BlockType::PolishedBlackstoneBrickSlab:
+			{
 				ISSLABTOP(PolishedBlackstoneBrickSlab)
 			}
-			case BlockType::PolishedBlackstoneSlab: {
+			case BlockType::PolishedBlackstoneSlab:
+			{
 				ISSLABTOP(PolishedBlackstoneSlab)
 			}
-			case BlockType::PolishedDioriteSlab: {
+			case BlockType::PolishedDioriteSlab:
+			{
 				ISSLABTOP(PolishedDioriteSlab)
 			}
-			case BlockType::PolishedGraniteSlab: {
+			case BlockType::PolishedGraniteSlab:
+			{
 				ISSLABTOP(PolishedGraniteSlab)
 			}
-			case BlockType::PrismarineBrickSlab: {
+			case BlockType::PrismarineBrickSlab:
+			{
 				ISSLABTOP(PrismarineBrickSlab)
 			}
-			case BlockType::PrismarineSlab: {
+			case BlockType::PrismarineSlab:
+			{
 				ISSLABTOP(PrismarineSlab)
 			}
-			case BlockType::PurpurSlab: {
+			case BlockType::PurpurSlab:
+			{
 				ISSLABTOP(PurpurSlab)
 			}
-			case BlockType::QuartzSlab: {
+			case BlockType::QuartzSlab:
+			{
 				ISSLABTOP(QuartzSlab)
 			}
-			case BlockType::RedNetherBrickSlab: {
+			case BlockType::RedNetherBrickSlab:
+			{
 				ISSLABTOP(RedNetherBrickSlab)
 			}
-			case BlockType::RedSandstoneSlab: {
+			case BlockType::RedSandstoneSlab:
+			{
 				ISSLABTOP(RedSandstoneSlab)
 			}
-			case BlockType::SandstoneSlab: {
+			case BlockType::SandstoneSlab:
+			{
 				ISSLABTOP(SandstoneSlab)
 			}
-			case BlockType::SmoothQuartzSlab: {
+			case BlockType::SmoothQuartzSlab:
+			{
 				ISSLABTOP(SmoothQuartzSlab)
 			}
-			case BlockType::SmoothRedSandstoneSlab: {
+			case BlockType::SmoothRedSandstoneSlab:
+			{
 				ISSLABTOP(SmoothRedSandstoneSlab)
 			}
-			case BlockType::SmoothSandstoneSlab: {
+			case BlockType::SmoothSandstoneSlab:
+			{
 				ISSLABTOP(SmoothSandstoneSlab)
 			}
-			case BlockType::SmoothStoneSlab: {
+			case BlockType::SmoothStoneSlab:
+			{
 				ISSLABTOP(SmoothStoneSlab)
 			}
-			case BlockType::SpruceSlab: {
+			case BlockType::SpruceSlab:
+			{
 				ISSLABTOP(SpruceSlab)
 			}
-			case BlockType::StoneBrickSlab: {
+			case BlockType::StoneBrickSlab:
+			{
 				ISSLABTOP(StoneBrickSlab)
 			}
-			case BlockType::StoneSlab: {
+			case BlockType::StoneSlab:
+			{
 				ISSLABTOP(StoneSlab)
 			}
-			case BlockType::WarpedSlab: {
+			case BlockType::WarpedSlab:
+			{
 				ISSLABTOP(WarpedSlab)
 			}
-			default:
-				return false;
+			default: return false;
 		}
 	}
 
 #define ISSLABFULL(SlabType) \
-    return (SlabType::Type(a_Block) == SlabType::Type::Top);
+	return (SlabType::Type(a_Block) == SlabType::Type::Double);
 
-	static bool IsSlabFull(BlockState a_Block) {
+	static bool IsSlabFull(BlockState a_Block)
+	{
 		using namespace Block;
-		switch (a_Block.Type()) {
-			case BlockType::AcaciaSlab: {
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaSlab:
+			{
 				ISSLABFULL(AcaciaSlab)
 			}
-			case BlockType::AndesiteSlab: {
+			case BlockType::AndesiteSlab:
+			{
 				ISSLABFULL(AndesiteSlab)
 			}
-			case BlockType::BirchSlab: {
+			case BlockType::BirchSlab:
+			{
 				ISSLABFULL(BirchSlab)
 			}
-			case BlockType::BlackstoneSlab: {
+			case BlockType::BlackstoneSlab:
+			{
 				ISSLABFULL(BlackstoneSlab)
 			}
-			case BlockType::BrickSlab: {
+			case BlockType::BrickSlab:
+			{
 				ISSLABFULL(BrickSlab)
 			}
-			case BlockType::CobblestoneSlab: {
+			case BlockType::CobblestoneSlab:
+			{
 				ISSLABFULL(CobblestoneSlab)
 			}
-			case BlockType::CrimsonSlab: {
+			case BlockType::CrimsonSlab:
+			{
 				ISSLABFULL(CrimsonSlab)
 			}
-			case BlockType::CutRedSandstoneSlab: {
+			case BlockType::CutRedSandstoneSlab:
+			{
 				ISSLABFULL(CutRedSandstoneSlab)
 			}
-			case BlockType::CutSandstoneSlab: {
+			case BlockType::CutSandstoneSlab:
+			{
 				ISSLABFULL(CutSandstoneSlab)
 			}
-			case BlockType::DarkOakSlab: {
+			case BlockType::DarkOakSlab:
+			{
 				ISSLABFULL(DarkOakSlab)
 			}
-			case BlockType::DarkPrismarineSlab: {
+			case BlockType::DarkPrismarineSlab:
+			{
 				ISSLABFULL(DarkPrismarineSlab)
 			}
-			case BlockType::DioriteSlab: {
+			case BlockType::DioriteSlab:
+			{
 				ISSLABFULL(DioriteSlab)
 			}
-			case BlockType::EndStoneBrickSlab: {
+			case BlockType::EndStoneBrickSlab:
+			{
 				ISSLABFULL(EndStoneBrickSlab)
 			}
-			case BlockType::GraniteSlab: {
+			case BlockType::GraniteSlab:
+			{
 				ISSLABFULL(GraniteSlab)
 			}
-			case BlockType::JungleSlab: {
+			case BlockType::JungleSlab:
+			{
 				ISSLABFULL(JungleSlab)
 			}
-			case BlockType::MossyCobblestoneSlab: {
+			case BlockType::MossyCobblestoneSlab:
+			{
 				ISSLABFULL(MossyCobblestoneSlab)
 			}
-			case BlockType::MossyStoneBrickSlab: {
+			case BlockType::MossyStoneBrickSlab:
+			{
 				ISSLABFULL(MossyStoneBrickSlab)
 			}
-			case BlockType::NetherBrickSlab: {
+			case BlockType::NetherBrickSlab:
+			{
 				ISSLABFULL(NetherBrickSlab)
 			}
-			case BlockType::OakSlab: {
+			case BlockType::OakSlab:
+			{
 				ISSLABFULL(OakSlab)
 			}
-			case BlockType::PetrifiedOakSlab: {
+			case BlockType::PetrifiedOakSlab:
+			{
 				ISSLABFULL(PetrifiedOakSlab)
 			}
-			case BlockType::PolishedAndesiteSlab: {
+			case BlockType::PolishedAndesiteSlab:
+			{
 				ISSLABFULL(PolishedAndesiteSlab)
 			}
-			case BlockType::PolishedBlackstoneBrickSlab: {
+			case BlockType::PolishedBlackstoneBrickSlab:
+			{
 				ISSLABFULL(PolishedBlackstoneBrickSlab)
 			}
-			case BlockType::PolishedBlackstoneSlab: {
+			case BlockType::PolishedBlackstoneSlab:
+			{
 				ISSLABFULL(PolishedBlackstoneSlab)
 			}
-			case BlockType::PolishedDioriteSlab: {
+			case BlockType::PolishedDioriteSlab:
+			{
 				ISSLABFULL(PolishedDioriteSlab)
 			}
-			case BlockType::PolishedGraniteSlab: {
+			case BlockType::PolishedGraniteSlab:
+			{
 				ISSLABFULL(PolishedGraniteSlab)
 			}
-			case BlockType::PrismarineBrickSlab: {
+			case BlockType::PrismarineBrickSlab:
+			{
 				ISSLABFULL(PrismarineBrickSlab)
 			}
-			case BlockType::PrismarineSlab: {
+			case BlockType::PrismarineSlab:
+			{
 				ISSLABFULL(PrismarineSlab)
 			}
-			case BlockType::PurpurSlab: {
+			case BlockType::PurpurSlab:
+			{
 				ISSLABFULL(PurpurSlab)
 			}
-			case BlockType::QuartzSlab: {
+			case BlockType::QuartzSlab:
+			{
 				ISSLABFULL(QuartzSlab)
 			}
-			case BlockType::RedNetherBrickSlab: {
+			case BlockType::RedNetherBrickSlab:
+			{
 				ISSLABFULL(RedNetherBrickSlab)
 			}
-			case BlockType::RedSandstoneSlab: {
+			case BlockType::RedSandstoneSlab:
+			{
 				ISSLABFULL(RedSandstoneSlab)
 			}
-			case BlockType::SandstoneSlab: {
+			case BlockType::SandstoneSlab:
+			{
 				ISSLABFULL(SandstoneSlab)
 			}
-			case BlockType::SmoothQuartzSlab: {
+			case BlockType::SmoothQuartzSlab:
+			{
 				ISSLABFULL(SmoothQuartzSlab)
 			}
-			case BlockType::SmoothRedSandstoneSlab: {
+			case BlockType::SmoothRedSandstoneSlab:
+			{
 				ISSLABFULL(SmoothRedSandstoneSlab)
 			}
-			case BlockType::SmoothSandstoneSlab: {
+			case BlockType::SmoothSandstoneSlab:
+			{
 				ISSLABFULL(SmoothSandstoneSlab)
 			}
-			case BlockType::SmoothStoneSlab: {
+			case BlockType::SmoothStoneSlab:
+			{
 				ISSLABFULL(SmoothStoneSlab)
 			}
-			case BlockType::SpruceSlab: {
+			case BlockType::SpruceSlab:
+			{
 				ISSLABFULL(SpruceSlab)
 			}
-			case BlockType::StoneBrickSlab: {
+			case BlockType::StoneBrickSlab:
+			{
 				ISSLABFULL(StoneBrickSlab)
 			}
-			case BlockType::StoneSlab: {
+			case BlockType::StoneSlab:
+			{
 				ISSLABFULL(StoneSlab)
 			}
-			case BlockType::WarpedSlab: {
+			case BlockType::WarpedSlab:
+			{
 				ISSLABFULL(WarpedSlab)
 			}
-			default:
-				return false;
+			default: return false;
 		}
 	}
 
 private:
 
-	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity *a_Digger, const cItem *a_Tool) const override {
-		switch (m_BlockType) {
-			case BlockType::AcaciaSlab:
-				return cItem(Item::AcaciaSlab);
-			case BlockType::AndesiteSlab:
-				return cItem(Item::AndesiteSlab);
-			case BlockType::BirchSlab:
-				return cItem(Item::BirchSlab);
-			case BlockType::BlackstoneSlab:
-				return cItem(Item::BlackstoneSlab);
-			case BlockType::BrickSlab:
-				return cItem(Item::BrickSlab);
-			case BlockType::CobblestoneSlab:
-				return cItem(Item::CobblestoneSlab);
-			case BlockType::CrimsonSlab:
-				return cItem(Item::CrimsonSlab);
-			case BlockType::CutRedSandstoneSlab:
-				return cItem(Item::CutRedSandstoneSlab);
-			case BlockType::CutSandstoneSlab:
-				return cItem(Item::CutSandstoneSlab);
-			case BlockType::DarkOakSlab:
-				return cItem(Item::DarkOakSlab);
-			case BlockType::DarkPrismarineSlab:
-				return cItem(Item::DarkPrismarineSlab);
-			case BlockType::DioriteSlab:
-				return cItem(Item::DioriteSlab);
-			case BlockType::EndStoneBrickSlab:
-				return cItem(Item::EndStoneBrickSlab);
-			case BlockType::GraniteSlab:
-				return cItem(Item::GraniteSlab);
-			case BlockType::JungleSlab:
-				return cItem(Item::JungleSlab);
-			case BlockType::MossyCobblestoneSlab:
-				return cItem(Item::MossyCobblestoneSlab);
-			case BlockType::MossyStoneBrickSlab:
-				return cItem(Item::MossyStoneBrickSlab);
-			case BlockType::NetherBrickSlab:
-				return cItem(Item::NetherBrickSlab);
-			case BlockType::OakSlab:
-				return cItem(Item::OakSlab);
-			case BlockType::PetrifiedOakSlab:
-				return cItem(Item::PetrifiedOakSlab);
-			case BlockType::PolishedAndesiteSlab:
-				return cItem(Item::PolishedAndesiteSlab);
-			case BlockType::PolishedBlackstoneBrickSlab:
-				return cItem(Item::PolishedBlackstoneBrickSlab);
-			case BlockType::PolishedBlackstoneSlab:
-				return cItem(Item::PolishedBlackstoneSlab);
-			case BlockType::PolishedDioriteSlab:
-				return cItem(Item::PolishedDioriteSlab);
-			case BlockType::PolishedGraniteSlab:
-				return cItem(Item::PolishedGraniteSlab);
-			case BlockType::PrismarineBrickSlab:
-				return cItem(Item::PrismarineBrickSlab);
-			case BlockType::PrismarineSlab:
-				return cItem(Item::PrismarineSlab);
-			case BlockType::PurpurSlab:
-				return cItem(Item::PurpurSlab);
-			case BlockType::QuartzSlab:
-				return cItem(Item::QuartzSlab);
-			case BlockType::RedNetherBrickSlab:
-				return cItem(Item::RedNetherBrickSlab);
-			case BlockType::RedSandstoneSlab:
-				return cItem(Item::RedSandstoneSlab);
-			case BlockType::SandstoneSlab:
-				return cItem(Item::SandstoneSlab);
-			case BlockType::SmoothQuartzSlab:
-				return cItem(Item::SmoothQuartzSlab);
-			case BlockType::SmoothRedSandstoneSlab:
-				return cItem(Item::SmoothRedSandstoneSlab);
-			case BlockType::SmoothSandstoneSlab:
-				return cItem(Item::SmoothSandstoneSlab);
-			case BlockType::SmoothStoneSlab:
-				return cItem(Item::SmoothStoneSlab);
-			case BlockType::SpruceSlab:
-				return cItem(Item::SpruceSlab);
-			case BlockType::StoneBrickSlab:
-				return cItem(Item::StoneBrickSlab);
-			case BlockType::StoneSlab:
-				return cItem(Item::StoneSlab);
-			case BlockType::WarpedSlab:
-				return cItem(Item::WarpedSlab);
-			default:
-				return cItem();
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity *a_Digger, const cItem *a_Tool) const override
+	{
+		switch (m_BlockType)
+		{
+			case BlockType::AcaciaSlab: return cItem(Item::AcaciaSlab);
+			case BlockType::AndesiteSlab: return cItem(Item::AndesiteSlab);
+			case BlockType::BirchSlab: return cItem(Item::BirchSlab);
+			case BlockType::BlackstoneSlab: return cItem(Item::BlackstoneSlab);
+			case BlockType::BrickSlab: return cItem(Item::BrickSlab);
+			case BlockType::CobblestoneSlab: return cItem(Item::CobblestoneSlab);
+			case BlockType::CrimsonSlab: return cItem(Item::CrimsonSlab);
+			case BlockType::CutRedSandstoneSlab: return cItem(Item::CutRedSandstoneSlab);
+			case BlockType::CutSandstoneSlab: return cItem(Item::CutSandstoneSlab);
+			case BlockType::DarkOakSlab: return cItem(Item::DarkOakSlab);
+			case BlockType::DarkPrismarineSlab: return cItem(Item::DarkPrismarineSlab);
+			case BlockType::DioriteSlab: return cItem(Item::DioriteSlab);
+			case BlockType::EndStoneBrickSlab: return cItem(Item::EndStoneBrickSlab);
+			case BlockType::GraniteSlab: return cItem(Item::GraniteSlab);
+			case BlockType::JungleSlab: return cItem(Item::JungleSlab);
+			case BlockType::MossyCobblestoneSlab: return cItem(Item::MossyCobblestoneSlab);
+			case BlockType::MossyStoneBrickSlab: return cItem(Item::MossyStoneBrickSlab);
+			case BlockType::NetherBrickSlab: return cItem(Item::NetherBrickSlab);
+			case BlockType::OakSlab: return cItem(Item::OakSlab);
+			case BlockType::PetrifiedOakSlab: return cItem(Item::PetrifiedOakSlab);
+			case BlockType::PolishedAndesiteSlab: return cItem(Item::PolishedAndesiteSlab);
+			case BlockType::PolishedBlackstoneBrickSlab: return cItem(Item::PolishedBlackstoneBrickSlab);
+			case BlockType::PolishedBlackstoneSlab: return cItem(Item::PolishedBlackstoneSlab);
+			case BlockType::PolishedDioriteSlab: return cItem(Item::PolishedDioriteSlab);
+			case BlockType::PolishedGraniteSlab: return cItem(Item::PolishedGraniteSlab);
+			case BlockType::PrismarineBrickSlab: return cItem(Item::PrismarineBrickSlab);
+			case BlockType::PrismarineSlab: return cItem(Item::PrismarineSlab);
+			case BlockType::PurpurSlab: return cItem(Item::PurpurSlab);
+			case BlockType::QuartzSlab: return cItem(Item::QuartzSlab);
+			case BlockType::RedNetherBrickSlab: return cItem(Item::RedNetherBrickSlab);
+			case BlockType::RedSandstoneSlab: return cItem(Item::RedSandstoneSlab);
+			case BlockType::SandstoneSlab: return cItem(Item::SandstoneSlab);
+			case BlockType::SmoothQuartzSlab: return cItem(Item::SmoothQuartzSlab);
+			case BlockType::SmoothRedSandstoneSlab: return cItem(Item::SmoothRedSandstoneSlab);
+			case BlockType::SmoothSandstoneSlab: return cItem(Item::SmoothSandstoneSlab);
+			case BlockType::SmoothStoneSlab: return cItem(Item::SmoothStoneSlab);
+			case BlockType::SpruceSlab: return cItem(Item::SpruceSlab);
+			case BlockType::StoneBrickSlab: return cItem(Item::StoneBrickSlab);
+			case BlockType::StoneSlab: return cItem(Item::StoneSlab);
+			case BlockType::WarpedSlab: return cItem(Item::WarpedSlab);
+			default: return cItem();
 		}
 	}
 
@@ -435,17 +478,21 @@ private:
 			eBlockFace a_ClickedBlockFace,
 			const Vector3i a_CursorPos,
 			BlockState &a_Block
-	) const override {
+	) const override
+	{
 		bool IsTop;
 
 		// Set the correct metadata based on player equipped item (i.e. a_BlockMeta not initialised yet)
-		switch (a_ClickedBlockFace) {
-			case BLOCK_FACE_TOP: {
+		switch (a_ClickedBlockFace)
+		{
+			case BLOCK_FACE_TOP:
+			{
 				// Bottom half slab block
 				IsTop = false;
 				break;
 			}
-			case BLOCK_FACE_BOTTOM: {
+			case BLOCK_FACE_BOTTOM:
+			{
 				// Top half slab block
 				IsTop = true;
 				break;
@@ -453,512 +500,796 @@ private:
 			case BLOCK_FACE_EAST:
 			case BLOCK_FACE_NORTH:
 			case BLOCK_FACE_SOUTH:
-			case BLOCK_FACE_WEST: {
-				if (a_CursorPos.y > 7) {
+			case BLOCK_FACE_WEST:
+			{
+				if (a_CursorPos.y > 7)
+				{
 					// Cursor at top half of block, place top slab
 					IsTop = true;
 					break;
-				} else {
+				}
+				else
+				{
 					// Cursor at bottom half of block, place bottom slab
 					IsTop = false;
 					break;
 				}
 			}
-			case BLOCK_FACE_NONE:
-				return false;
+			case BLOCK_FACE_NONE: return false;
 		}  // switch (a_BlockFace)
 
 		bool DoubleSlab = false;
 
 		// Check if the block at the coordinates is a single slab. Eligibility for combining has already been processed in ClientHandle
 		// Changed to-be-placed to a double slab if we are clicking on a single slab, as opposed to placing one for the first time
-		if (IsAnySlabType(a_ChunkInterface.GetBlock(a_PlacedBlockPos))) {
+		if (IsAnySlabType(a_ChunkInterface.GetBlock(a_PlacedBlockPos)))
+		{
 			DoubleSlab = true;
 		}
 
-		switch (m_BlockType) {
-			case BlockType::AcaciaSlab: {
-				if (DoubleSlab) {
+		switch (m_BlockType)
+		{
+			case BlockType::AcaciaSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::AcaciaSlab::AcaciaSlab(Block::AcaciaSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::AcaciaSlab::AcaciaSlab(Block::AcaciaSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::AcaciaSlab::AcaciaSlab(Block::AcaciaSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::AndesiteSlab: {
-				if (DoubleSlab) {
+			case BlockType::AndesiteSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::AndesiteSlab::AndesiteSlab(Block::AndesiteSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::AndesiteSlab::AndesiteSlab(Block::AndesiteSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::AndesiteSlab::AndesiteSlab(Block::AndesiteSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::BirchSlab: {
-				if (DoubleSlab) {
+			case BlockType::BirchSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::BirchSlab::BirchSlab(Block::BirchSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::BirchSlab::BirchSlab(Block::BirchSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::BirchSlab::BirchSlab(Block::BirchSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::BlackstoneSlab: {
-				if (DoubleSlab) {
+			case BlockType::BlackstoneSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::BlackstoneSlab::BlackstoneSlab(Block::BlackstoneSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::BlackstoneSlab::BlackstoneSlab(Block::BlackstoneSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::BlackstoneSlab::BlackstoneSlab(Block::BlackstoneSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::BrickSlab: {
-				if (DoubleSlab) {
+			case BlockType::BrickSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::BrickSlab::BrickSlab(Block::BrickSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::BrickSlab::BrickSlab(Block::BrickSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::BrickSlab::BrickSlab(Block::BrickSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::CobblestoneSlab: {
-				if (DoubleSlab) {
+			case BlockType::CobblestoneSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::CobblestoneSlab::CobblestoneSlab(Block::CobblestoneSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::CobblestoneSlab::CobblestoneSlab(Block::CobblestoneSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::CobblestoneSlab::CobblestoneSlab(Block::CobblestoneSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::CrimsonSlab: {
-				if (DoubleSlab) {
+			case BlockType::CrimsonSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::CrimsonSlab::CrimsonSlab(Block::CrimsonSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::CrimsonSlab::CrimsonSlab(Block::CrimsonSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::CrimsonSlab::CrimsonSlab(Block::CrimsonSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::CutRedSandstoneSlab: {
-				if (DoubleSlab) {
+			case BlockType::CutRedSandstoneSlab:
+				{
+				if (DoubleSlab)
+				{
 					a_Block = Block::CutRedSandstoneSlab::CutRedSandstoneSlab(Block::CutRedSandstoneSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::CutRedSandstoneSlab::CutRedSandstoneSlab(Block::CutRedSandstoneSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::CutRedSandstoneSlab::CutRedSandstoneSlab(Block::CutRedSandstoneSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::CutSandstoneSlab: {
-				if (DoubleSlab) {
+			case BlockType::CutSandstoneSlab:
+				{
+				if (DoubleSlab)
+				{
 					a_Block = Block::CutSandstoneSlab::CutSandstoneSlab(Block::CutSandstoneSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::CutSandstoneSlab::CutSandstoneSlab(Block::CutSandstoneSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::CutSandstoneSlab::CutSandstoneSlab(Block::CutSandstoneSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::DarkOakSlab: {
-				if (DoubleSlab) {
+			case BlockType::DarkOakSlab:
+				{
+				if (DoubleSlab)
+				{
 					a_Block = Block::DarkOakSlab::DarkOakSlab(Block::DarkOakSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::DarkOakSlab::DarkOakSlab(Block::DarkOakSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::DarkOakSlab::DarkOakSlab(Block::DarkOakSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::DarkPrismarineSlab: {
-				if (DoubleSlab) {
+			case BlockType::DarkPrismarineSlab:
+				{
+				if (DoubleSlab)
+				{
 					a_Block = Block::DarkPrismarineSlab::DarkPrismarineSlab(Block::DarkPrismarineSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::DarkPrismarineSlab::DarkPrismarineSlab(Block::DarkPrismarineSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::DarkPrismarineSlab::DarkPrismarineSlab(Block::DarkPrismarineSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::DioriteSlab: {
-				if (DoubleSlab) {
+			case BlockType::DioriteSlab:
+				{
+				if (DoubleSlab)
+				{
 					a_Block = Block::DioriteSlab::DioriteSlab(Block::DioriteSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::DioriteSlab::DioriteSlab(Block::DioriteSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::DioriteSlab::DioriteSlab(Block::DioriteSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::EndStoneBrickSlab: {
-				if (DoubleSlab) {
+			case BlockType::EndStoneBrickSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::EndStoneBrickSlab::EndStoneBrickSlab(Block::EndStoneBrickSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::EndStoneBrickSlab::EndStoneBrickSlab(Block::EndStoneBrickSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::EndStoneBrickSlab::EndStoneBrickSlab(Block::EndStoneBrickSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::GraniteSlab: {
-				if (DoubleSlab) {
+			case BlockType::GraniteSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::GraniteSlab::GraniteSlab(Block::GraniteSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::GraniteSlab::GraniteSlab(Block::GraniteSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::GraniteSlab::GraniteSlab(Block::GraniteSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::JungleSlab: {
-				if (DoubleSlab) {
+			case BlockType::JungleSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::JungleSlab::JungleSlab(Block::JungleSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::JungleSlab::JungleSlab(Block::JungleSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::JungleSlab::JungleSlab(Block::JungleSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::MossyCobblestoneSlab: {
-				if (DoubleSlab) {
+			case BlockType::MossyCobblestoneSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::MossyCobblestoneSlab::MossyCobblestoneSlab(Block::MossyCobblestoneSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::MossyCobblestoneSlab::MossyCobblestoneSlab(Block::MossyCobblestoneSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::MossyCobblestoneSlab::MossyCobblestoneSlab(Block::MossyCobblestoneSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::MossyStoneBrickSlab: {
-				if (DoubleSlab) {
+			case BlockType::MossyStoneBrickSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::MossyStoneBrickSlab::MossyStoneBrickSlab(Block::MossyStoneBrickSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::MossyStoneBrickSlab::MossyStoneBrickSlab(Block::MossyStoneBrickSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::MossyStoneBrickSlab::MossyStoneBrickSlab(Block::MossyStoneBrickSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::NetherBrickSlab: {
-				if (DoubleSlab) {
+			case BlockType::NetherBrickSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::NetherBrickSlab::NetherBrickSlab(Block::NetherBrickSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::NetherBrickSlab::NetherBrickSlab(Block::NetherBrickSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::NetherBrickSlab::NetherBrickSlab(Block::NetherBrickSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::OakSlab: {
-				if (DoubleSlab) {
+			case BlockType::OakSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::OakSlab::OakSlab(Block::OakSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::OakSlab::OakSlab(Block::OakSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::OakSlab::OakSlab(Block::OakSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::PetrifiedOakSlab: {
-				if (DoubleSlab) {
+			case BlockType::PetrifiedOakSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::PetrifiedOakSlab::PetrifiedOakSlab(Block::PetrifiedOakSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::PetrifiedOakSlab::PetrifiedOakSlab(Block::PetrifiedOakSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::PetrifiedOakSlab::PetrifiedOakSlab(Block::PetrifiedOakSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::PolishedAndesiteSlab: {
-				if (DoubleSlab) {
+			case BlockType::PolishedAndesiteSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::PolishedAndesiteSlab::PolishedAndesiteSlab(Block::PolishedAndesiteSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::PolishedAndesiteSlab::PolishedAndesiteSlab(Block::PolishedAndesiteSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::PolishedAndesiteSlab::PolishedAndesiteSlab(Block::PolishedAndesiteSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::PolishedBlackstoneBrickSlab: {
-				if (DoubleSlab) {
+			case BlockType::PolishedBlackstoneBrickSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::PolishedBlackstoneBrickSlab::PolishedBlackstoneBrickSlab(Block::PolishedBlackstoneBrickSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::PolishedBlackstoneBrickSlab::PolishedBlackstoneBrickSlab(Block::PolishedBlackstoneBrickSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::PolishedBlackstoneBrickSlab::PolishedBlackstoneBrickSlab(Block::PolishedBlackstoneBrickSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::PolishedBlackstoneSlab: {
-				if (DoubleSlab) {
+			case BlockType::PolishedBlackstoneSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::PolishedBlackstoneSlab::PolishedBlackstoneSlab(Block::PolishedBlackstoneSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::PolishedBlackstoneSlab::PolishedBlackstoneSlab(Block::PolishedBlackstoneSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::PolishedBlackstoneSlab::PolishedBlackstoneSlab(Block::PolishedBlackstoneSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::PolishedDioriteSlab: {
-				if (DoubleSlab) {
+			case BlockType::PolishedDioriteSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::PolishedDioriteSlab::PolishedDioriteSlab(Block::PolishedDioriteSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::PolishedDioriteSlab::PolishedDioriteSlab(Block::PolishedDioriteSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::PolishedDioriteSlab::PolishedDioriteSlab(Block::PolishedDioriteSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::PolishedGraniteSlab: {
-				if (DoubleSlab) {
+			case BlockType::PolishedGraniteSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::PolishedGraniteSlab::PolishedGraniteSlab(Block::PolishedGraniteSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::PolishedGraniteSlab::PolishedGraniteSlab(Block::PolishedGraniteSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::PolishedGraniteSlab::PolishedGraniteSlab(Block::PolishedGraniteSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::PrismarineBrickSlab: {
-				if (DoubleSlab) {
+			case BlockType::PrismarineBrickSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::PrismarineBrickSlab::PrismarineBrickSlab(Block::PrismarineBrickSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::PrismarineBrickSlab::PrismarineBrickSlab(Block::PrismarineBrickSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::PrismarineBrickSlab::PrismarineBrickSlab(Block::PrismarineBrickSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::PrismarineSlab: {
-				if (DoubleSlab) {
+			case BlockType::PrismarineSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::PrismarineSlab::PrismarineSlab(Block::PrismarineSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::PrismarineSlab::PrismarineSlab(Block::PrismarineSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::PrismarineSlab::PrismarineSlab(Block::PrismarineSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::PurpurSlab: {
-				if (DoubleSlab) {
+			case BlockType::PurpurSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::PurpurSlab::PurpurSlab(Block::PurpurSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::PurpurSlab::PurpurSlab(Block::PurpurSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::PurpurSlab::PurpurSlab(Block::PurpurSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::QuartzSlab: {
-				if (DoubleSlab) {
+			case BlockType::QuartzSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::QuartzSlab::QuartzSlab(Block::QuartzSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::QuartzSlab::QuartzSlab(Block::QuartzSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::QuartzSlab::QuartzSlab(Block::QuartzSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::RedNetherBrickSlab: {
-				if (DoubleSlab) {
+			case BlockType::RedNetherBrickSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::RedNetherBrickSlab::RedNetherBrickSlab(Block::RedNetherBrickSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::RedNetherBrickSlab::RedNetherBrickSlab(Block::RedNetherBrickSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::RedNetherBrickSlab::RedNetherBrickSlab(Block::RedNetherBrickSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::RedSandstoneSlab: {
-				if (DoubleSlab) {
+			case BlockType::RedSandstoneSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::RedSandstoneSlab::RedSandstoneSlab(Block::RedSandstoneSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::RedSandstoneSlab::RedSandstoneSlab(Block::RedSandstoneSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::RedSandstoneSlab::RedSandstoneSlab(Block::RedSandstoneSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::SandstoneSlab: {
-				if (DoubleSlab) {
+			case BlockType::SandstoneSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::SandstoneSlab::SandstoneSlab(Block::SandstoneSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::SandstoneSlab::SandstoneSlab(Block::SandstoneSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::SandstoneSlab::SandstoneSlab(Block::SandstoneSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::SmoothQuartzSlab: {
-				if (DoubleSlab) {
+			case BlockType::SmoothQuartzSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::SmoothQuartzSlab::SmoothQuartzSlab(Block::SmoothQuartzSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::SmoothQuartzSlab::SmoothQuartzSlab(Block::SmoothQuartzSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::SmoothQuartzSlab::SmoothQuartzSlab(Block::SmoothQuartzSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::SmoothRedSandstoneSlab: {
-				if (DoubleSlab) {
+			case BlockType::SmoothRedSandstoneSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::SmoothRedSandstoneSlab::SmoothRedSandstoneSlab(Block::SmoothRedSandstoneSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::SmoothRedSandstoneSlab::SmoothRedSandstoneSlab(Block::SmoothRedSandstoneSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::SmoothRedSandstoneSlab::SmoothRedSandstoneSlab(Block::SmoothRedSandstoneSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::SmoothSandstoneSlab: {
-				if (DoubleSlab) {
+			case BlockType::SmoothSandstoneSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::SmoothSandstoneSlab::SmoothSandstoneSlab(Block::SmoothSandstoneSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::SmoothSandstoneSlab::SmoothSandstoneSlab(Block::SmoothSandstoneSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::SmoothSandstoneSlab::SmoothSandstoneSlab(Block::SmoothSandstoneSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::SmoothStoneSlab: {
-				if (DoubleSlab) {
+			case BlockType::SmoothStoneSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::SmoothStoneSlab::SmoothStoneSlab(Block::SmoothStoneSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::SmoothStoneSlab::SmoothStoneSlab(Block::SmoothStoneSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::SmoothStoneSlab::SmoothStoneSlab(Block::SmoothStoneSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::SpruceSlab: {
-				if (DoubleSlab) {
+			case BlockType::SpruceSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::SpruceSlab::SpruceSlab(Block::SpruceSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::SpruceSlab::SpruceSlab(Block::SpruceSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::SpruceSlab::SpruceSlab(Block::SpruceSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::StoneBrickSlab: {
-				if (DoubleSlab) {
+			case BlockType::StoneBrickSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::StoneBrickSlab::StoneBrickSlab(Block::StoneBrickSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::StoneBrickSlab::StoneBrickSlab(Block::StoneBrickSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::StoneBrickSlab::StoneBrickSlab(Block::StoneBrickSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::StoneSlab: {
-				if (DoubleSlab) {
+			case BlockType::StoneSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::StoneSlab::StoneSlab(Block::StoneSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::StoneSlab::StoneSlab(Block::StoneSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::StoneSlab::StoneSlab(Block::StoneSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			case BlockType::WarpedSlab: {
-				if (DoubleSlab) {
+			case BlockType::WarpedSlab:
+			{
+				if (DoubleSlab)
+				{
 					a_Block = Block::WarpedSlab::WarpedSlab(Block::WarpedSlab::Type::Double);
-				} else {
-					if (IsTop) {
+				}
+				else
+				{
+					if (IsTop)
+					{
 						a_Block = Block::WarpedSlab::WarpedSlab(Block::WarpedSlab::Type::Top);
-					} else {
+					}
+					else
+					{
 						a_Block = Block::WarpedSlab::WarpedSlab(Block::WarpedSlab::Type::Bottom);
 					}
 				}
 				break;
 			}
-			default:
-				return false;
+			default: return false;
 		}
 
 		return true;
@@ -966,13 +1297,15 @@ private:
 
 
 	virtual void OnCancelRightClick(
-			cChunkInterface &a_ChunkInterface,
-			cWorldInterface &a_WorldInterface,
-			cPlayer &a_Player,
+			cChunkInterface & a_ChunkInterface,
+			cWorldInterface & a_WorldInterface,
+			cPlayer & a_Player,
 			const Vector3i a_BlockPos,
 			eBlockFace a_BlockFace
-	) const override {
-		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_Player.GetEquippedItem().m_ItemType != static_cast<short>(m_BlockType))) {
+	) const override
+	{
+		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_Player.GetEquippedItem().m_ItemType != static_cast<short>(m_BlockType)))
+		{
 			return;
 		}
 
@@ -983,16 +1316,16 @@ private:
 
 #define METAMIRRORXZ(SlabType) \
 { \
-    if (IsSlabTop(a_Block)) \
-    { \
-        return SlabType::SlabType(SlabType::Type::Bottom); \
-    } \
-    else \
-    { \
-        return SlabType::SlabType(SlabType::Type::Top); \
-    }\
+	if (IsSlabTop(a_Block)) \
+	{ \
+		return SlabType::SlabType(SlabType::Type::Bottom); \
+	} \
+	else \
+	{ \
+		return SlabType::SlabType(SlabType::Type::Top); \
+	}\
 }
-	// Flips top/bottom
+	// Flips top and bottom
 	virtual BlockState MirrorXZ(BlockState a_Block) const override
 	{
 		using namespace Block;
@@ -1002,7 +1335,7 @@ private:
 			return a_Block;
 		}
 
-		switch(a_Block.Type())
+		switch (a_Block.Type())
 		{
 			case BlockType::AcaciaSlab:                  METAMIRRORXZ(AcaciaSlab)
 			case BlockType::AndesiteSlab:                METAMIRRORXZ(AndesiteSlab)
@@ -1052,12 +1385,12 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(BlockState a_Block) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
 		switch (m_BlockType)
 		{
 			case BlockType::AcaciaSlab:                  return 15;
-			case BlockType::AndesiteSlab:                return 0;  // TODO             
+			case BlockType::AndesiteSlab:                return 0;  // TODO
 			case BlockType::BirchSlab:                   return 2;
 			case BlockType::BlackstoneSlab:              return 0;  // TODO
 			case BlockType::BrickSlab:                   return 28;
@@ -1119,7 +1452,7 @@ private:
 	virtual bool IsInsideBlock(Vector3d a_Position, const BlockState a_Block) const override
 	{
 		using namespace Block;
-		switch(m_BlockType)
+		switch (m_BlockType)
 		{
 			case BlockType::AcaciaSlab:
 			{

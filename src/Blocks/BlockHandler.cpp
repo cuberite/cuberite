@@ -1133,7 +1133,7 @@ void cBlockHandler::Check(
 
 
 
-ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta) const
+ColourID cBlockHandler::GetMapBaseColourID() const
 {
 	// Zero for transparent
 	return 0;

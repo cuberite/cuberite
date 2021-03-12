@@ -96,7 +96,7 @@ private:
 			case BlockType::JungleFenceGate:
 			case BlockType::JunglePressurePlate:
 			case BlockType::JungleTrapdoor:
-				
+
 			case BlockType::Lever:
 			case BlockType::LightWeightedPressurePlate:
 			case BlockType::NoteBlock:

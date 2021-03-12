@@ -39,7 +39,7 @@ public:
 
 	// cVillager functions
 	/** return true if the given BlockType are: crops, potatoes or carrots. */
-	bool IsBlockFarmable(BlockType a_BlockType);
+	bool IsBlockFarmable(BlockState a_Block);
 
 	// Farmer functions
 	/** Searches in a 11x7x11 area for crops. If it found some it will navigate to them. */

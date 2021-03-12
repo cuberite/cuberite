@@ -22,6 +22,7 @@
 #include "../EffectID.h"
 #include "../ClientHandle.h"
 #include "../Mobs/Horse.h"
+#include "../Blocks/BlockAnvil.h"
 
 
 
@@ -401,7 +402,7 @@ bool cSlotArea::CollectItemsToHand(cItem & a_Dragging, cPlayer & a_Player, bool 
 		{
 			continue;
 		}
-		int ToMove = a_Dragging.GetMaxStackSize() - a_Dragging.m_ItemCount;
+		char ToMove = a_Dragging.GetMaxStackSize() - a_Dragging.m_ItemCount;
 		if (ToMove > SlotItem.m_ItemCount)
 		{
 			ToMove = SlotItem.m_ItemCount;
@@ -764,9 +765,11 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 
 void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Player)
 {
+	ASSERT("UNCOMMENT THIS");
+	/*
 	switch (a_Result.m_ItemType)
 	{
-		case E_BLOCK_WORKBENCH:         a_Player.AwardAchievement(Statistic::AchBuildWorkBench);      break;
+		case Item::CraftingTable:         a_Player.AwardAchievement(Statistic::AchBuildWorkBench);      break;
 		case E_BLOCK_FURNACE:           a_Player.AwardAchievement(Statistic::AchBuildFurnace);        break;
 		case E_BLOCK_CAKE:              a_Player.AwardAchievement(Statistic::AchBakeCake);            break;
 		case E_BLOCK_ENCHANTMENT_TABLE: a_Player.AwardAchievement(Statistic::AchEnchantments);        break;
@@ -778,6 +781,7 @@ void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Play
 		case E_ITEM_BREAD:              a_Player.AwardAchievement(Statistic::AchMakeBread);           break;
 		default: break;
 	}
+	*/
 }
 
 
@@ -1066,27 +1070,36 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 
 	const Vector3i BlockPos = static_cast<cAnvilWindow &>(m_ParentWindow).GetBlockPos();
 
-	BLOCKTYPE Block;
-	NIBBLETYPE BlockMeta;
-	a_Player.GetWorld()->GetBlockTypeMeta(BlockPos, Block, BlockMeta);
+	auto Self = a_Player.GetWorld()->GetBlock(BlockPos);
 
-	if (!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) && GetRandomProvider().RandBool(0.12))
+	if (!a_Player.IsGameModeCreative() && (cBlockAnvilHandler::IsBlockAnvil(Self)) && GetRandomProvider().RandBool(0.12))
 	{
-		NIBBLETYPE Orientation = BlockMeta & 0x3;
-		NIBBLETYPE AnvilDamage = BlockMeta >> 2;
-		++AnvilDamage;
+		using namespace Block;
 
-		if (AnvilDamage > 2)
+		auto Orientation = cBlockAnvilHandler::GetFacing(Self);
+
+		switch (Self.Type())
 		{
-			// Anvil will break
-			a_Player.GetWorld()->SetBlock(BlockPos, E_BLOCK_AIR, 0);
-			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_BREAK, BlockPos, 0);
-			a_Player.CloseWindow(false);
-		}
-		else
-		{
-			a_Player.GetWorld()->SetBlockMeta(BlockPos, static_cast<NIBBLETYPE>(Orientation | (AnvilDamage << 2)));
-			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, BlockPos, 0);
+			case BlockType::Anvil:
+			{
+				a_Player.GetWorld()->SetBlock(BlockPos, ChippedAnvil::ChippedAnvil(Orientation));
+				a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, BlockPos, 0);
+				break;
+			}
+			case BlockType::ChippedAnvil:
+			{
+				a_Player.GetWorld()->SetBlock(BlockPos, DamagedAnvil::DamagedAnvil(Orientation));
+				break;
+			}
+			case BlockType::DamagedAnvil:
+			{
+				// Anvil will break
+				a_Player.GetWorld()->SetBlock(BlockPos, Air::Air());
+				a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_BREAK, BlockPos, 0);
+				a_Player.CloseWindow(false);
+				break;
+			}
+			default: break;
 		}
 	}
 	else
@@ -1154,7 +1167,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		if (Target.IsDamageable() && cItemHandler::GetItemHandler(Target)->CanRepairWithRawMaterial(Sacrifice.m_ItemType))
 		{
 			// Tool and armor repair with special item (iron / gold / diamond / ...)
-			int DamageDiff = std::min(static_cast<int>(Target.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
+			char DamageDiff = static_cast<char>(std::min(static_cast<int>(Target.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4));
 			if (DamageDiff <= 0)
 			{
 				// No enchantment
@@ -1172,7 +1185,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			{
 				Output.m_ItemDamage -= DamageDiff;
 				NeedExp += std::max(1, DamageDiff / 100) + static_cast<int>(Target.m_Enchantments.Count());
-				DamageDiff = std::min(static_cast<int>(Output.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
+				DamageDiff = static_cast<char>(std::min(static_cast<int>(Output.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4));
 
 				++NumItemsConsumed;
 			}
@@ -1806,8 +1819,8 @@ unsigned cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 	for (size_t i = 0; i < ARRAYCOUNT(CheckCoords); i++)
 	{
 		if (
-			(Area.GetRelBlockType(CheckCoords[i].m_AirX, CheckCoords[i].m_AirY, CheckCoords[i].m_AirZ) == E_BLOCK_AIR) &&  // There's air in the checkspot
-			(Area.GetRelBlockType(CheckCoords[i].m_BookX, CheckCoords[i].m_BookY, CheckCoords[i].m_BookZ) == E_BLOCK_BOOKCASE)  // There's bookcase in the wanted place
+			(Area.GetRelBlock(CheckCoords[i].m_AirX, CheckCoords[i].m_AirY, CheckCoords[i].m_AirZ).Type() == BlockType::Air) &&  // There's air in the checkspot
+			(Area.GetRelBlock(CheckCoords[i].m_BookX, CheckCoords[i].m_BookY, CheckCoords[i].m_BookZ).Type() == BlockType::Bookshelf)  // There's Bookshelf in the wanted place
 		)
 		{
 			Bookshelves++;

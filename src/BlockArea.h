@@ -442,8 +442,6 @@ protected:
 		virtual void BlockEntity(cBlockEntity * a_BlockEntity) override;
 	} ;
 
-	using BLOCKARRAY = std::unique_ptr<BlockState[]>;
-
 	Vector3i m_Origin;
 	Vector3i m_Size;
 

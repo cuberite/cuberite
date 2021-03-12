@@ -16,13 +16,23 @@ public:
 
 	using Super::Super;
 
+	static inline unsigned char GetFalloff (BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Lava:  return Block::Lava::Level(a_Block);
+			case BlockType::Water: return Block::Water::Level(a_Block);
+			default: return 0;
+		}
+	}
+
 protected:
 
 	~cBlockFluidHandler() = default;
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// No pickups
 		return {};
@@ -32,7 +42,7 @@ private:
 
 
 
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, BlockState a_Block) const override
 	{
 		return true;
 	}
@@ -86,11 +96,11 @@ private:
 		auto Pos = a_RelPos + Vector3i(x, y, z);
 
 		// Check if it's fuel:
-		BLOCKTYPE BlockType;
+		BlockState Self = 0;
 		if (
 			!cChunkDef::IsValidHeight(Pos.y) ||
-			!a_Chunk.UnboundedRelGetBlockType(Pos, BlockType) ||
-			!cFireSimulator::IsFuel(BlockType)
+			!a_Chunk.UnboundedRelGetBlock(Pos, Self) ||
+			!cFireSimulator::IsFuel(Self)
 		)
 		{
 			return false;
@@ -111,12 +121,12 @@ private:
 			auto NeighborPos = Pos + CrossCoords[i];
 			if (
 				cChunkDef::IsValidHeight(NeighborPos.y) &&
-				a_Chunk.UnboundedRelGetBlockType(NeighborPos, BlockType) &&
-				(BlockType == E_BLOCK_AIR)
+				a_Chunk.UnboundedRelGetBlock(NeighborPos, Self) &&
+				(Self.Type() == BlockType::Air)
 			)
 			{
 				// This is an air block next to a fuel next to lava, light the fuel block up:
-				a_Chunk.UnboundedRelSetBlock(NeighborPos, E_BLOCK_FIRE, 0);
+				a_Chunk.UnboundedRelSetBlock(NeighborPos, Block::Fire::Fire());
 				return true;
 			}
 		}  // for i - CrossCoords[]
@@ -127,9 +137,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 4;
 	}
 
@@ -137,7 +146,7 @@ private:
 
 
 
-	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override
+	virtual bool CanSustainPlant(BlockState a_Plant) const override
 	{
 		return false;
 	}
@@ -156,9 +165,8 @@ public:
 
 private:
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		if (IsBlockWater(m_BlockType))
 		{
 			return 12;
@@ -167,15 +175,20 @@ private:
 		return 0;
 	}
 
-	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override
+	virtual bool CanSustainPlant(BlockState a_Plant) const override
 	{
-		return (
-			(a_Plant == E_BLOCK_BEETROOTS) ||
-			(a_Plant == E_BLOCK_CROPS) ||
-			(a_Plant == E_BLOCK_CARROTS) ||
-			(a_Plant == E_BLOCK_POTATOES) ||
-			(a_Plant == E_BLOCK_MELON_STEM) ||
-			(a_Plant == E_BLOCK_PUMPKIN_STEM)
-		);
+		switch (a_Plant.Type())
+		{
+			case BlockType::Beetroots:
+			case BlockType::Wheat:
+			case BlockType::Carrots:
+			case BlockType::Potatoes:
+			case BlockType::MelonStem:
+			case BlockType::AttachedMelonStem:
+			case BlockType::PumpkinStem:
+			case BlockType::AttachedPumpkinStem:
+				return true;
+			default: return false;
+		}
 	}
 };

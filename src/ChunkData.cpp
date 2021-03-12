@@ -194,9 +194,8 @@ void ChunkBlockData::SetSection(const SectionType & a_BlockSource, const size_t 
 	m_Blocks.SetSection(a_BlockSource, a_Y);
 }
 
-ChunkBlockData::ChunkBlockData() {
 
-}
+
 
 
 void ChunkLightData::Assign(const ChunkLightData & a_Other)

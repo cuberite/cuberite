@@ -4,7 +4,9 @@
 // Implements the cVaporizeFluidSimulator class representing a fluid simulator that replaces all fluid blocks with air
 
 #include "Globals.h"
+
 #include "VaporizeFluidSimulator.h"
+
 #include "../OpaqueWorld.h"
 #include "../Chunk.h"
 #include "../Blocks/BroadcastInterface.h"
@@ -13,11 +15,11 @@
 
 
 
-void cVaporizeFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
+void cVaporizeFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block)
 {
-	if ((a_Block == m_FluidBlock) || (a_Block == m_StationaryFluidBlock))
+	if ((a_Block.Type() == m_FluidBlock) || cBlockFluidHandler::GetFalloff(a_Block) == m_StationaryFalloffValue)
 	{
-		a_Chunk.FastSetBlock(a_Position, E_BLOCK_AIR, 0);
+		a_Chunk.FastSetBlock(a_Position, Block::Air::Air());
 		World::GetBroadcastInterface(m_World).BroadcastSoundEffect(
 			"block.fire.extinguish",
 			Vector3d(a_Position),
