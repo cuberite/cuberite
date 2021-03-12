@@ -1968,7 +1968,7 @@ namespace Block
 			else if (Axis == Axis::Y) return 116;
 			else return 117;
 		}
-		constexpr BlockState BirchWood();
+		BlockState BirchWood();
 		enum Axis Axis(BlockState Block);
 	}
 	namespace BlackBanner
@@ -10583,7 +10583,7 @@ namespace Block
 			else if (Axis == Axis::Y) return 119;
 			else return 120;
 		}
-		constexpr BlockState JungleWood();
+		BlockState JungleWood();
 		enum Axis Axis(BlockState Block);
 	}
 	namespace Kelp
@@ -14350,7 +14350,7 @@ namespace Block
 					if (Powered) return 1047;
 					else return 1048;
 		}
-		constexpr BlockState NoteBlock();
+		BlockState NoteBlock();
 		enum Instrument Instrument(BlockState Block);
 		unsigned char Note(BlockState Block);
 		bool Powered(BlockState Block);
@@ -22823,7 +22823,7 @@ namespace Block
 			else if (Axis == Axis::Y) return 113;
 			else return 114;
 		}
-		constexpr BlockState SpruceWood();
+		BlockState SpruceWood();
 		enum Axis Axis(BlockState Block);
 	}
 	namespace StickyPiston

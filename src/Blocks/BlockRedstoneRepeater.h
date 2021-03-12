@@ -39,8 +39,8 @@ public:
 
 			default:
 			{
-				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Block);
-				ASSERT(!"Unknown metadata while determining orientation of repeater!");
+				LOGWARNING("%s: Unknown BlockFace: %d", __FUNCTION__, BlockFaceToString(Facing));
+				ASSERT(!"Unknown BlockFace while determining orientation of repeater!");
 				return { 0, 0, 0 };
 			}
 		}
@@ -57,8 +57,8 @@ public:
 			case eBlockFace::BLOCK_FACE_XM: return { 1, 0, 0 };
 			default:
 			{
-				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Block);
-				ASSERT(!"Unknown metadata while determining orientation of repeater!");
+				LOGWARNING("%s: Unknown BlockFace: %d", __FUNCTION__, BlockFaceToString(Facing));
+				ASSERT(!"Unknown BlockFace while determining orientation of repeater!");
 				return { 0, 0, 0 };
 			}
 		}
@@ -158,9 +158,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(BlockState a_Block) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 11;
 	}
 } ;

@@ -19,6 +19,24 @@ public:
 
 	using Super::Super;
 
+
+	static inline bool IsBlockFence(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaFence:
+			case BlockType::BirchFence:
+			case BlockType::DarkOakFence:
+			case BlockType::JungleFence:
+			case BlockType::NetherBrickFence:
+			case BlockType::OakFence:
+			case BlockType::SpruceFence:
+			case BlockType::WarpedFence:
+				return true;
+			default: return false;
+		}
+	}
+
 private:
 
 	// These are the min and max coordinates (X and Z) for a straight fence.

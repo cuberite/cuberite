@@ -16,6 +16,23 @@ public:
 
 	using Super::Super;
 
+	static inline bool IsBlockPlanks(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaPlanks:
+			case BlockType::BirchPlanks:
+			case BlockType::CrimsonPlanks:
+			case BlockType::DarkOakPlanks:
+			case BlockType::JunglePlanks:
+			case BlockType::OakPlanks:
+			case BlockType::SprucePlanks:
+			case BlockType::WarpedPlanks:
+				return true;
+			default: return false;
+		}
+	}
+
 private:
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override

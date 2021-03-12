@@ -9,11 +9,11 @@
 
 namespace TrappedChestHandler
 {
-	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, Vector3i a_QueryPosition, BlockState a_QueryBlock, bool IsLinked)
 	{
-		UNUSED(a_BlockType);
+		UNUSED(a_Block);
 		UNUSED(a_QueryPosition);
-		UNUSED(a_QueryBlockType);
+		UNUSED(a_QueryBlock);
 		UNUSED(IsLinked);
 
 		return DataForChunk(a_Chunk).GetCachedPowerData(a_Position);
@@ -22,20 +22,21 @@ namespace TrappedChestHandler
 	static unsigned char GetPowerLevel(cChunk & a_Chunk, Vector3i a_Position)
 	{
 		int NumberOfPlayers = 0;
-		a_Chunk.DoWithBlockEntityAt(a_Position, [&NumberOfPlayers](cBlockEntity & a_BlockEntity)
-		{
-			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_TRAPPED_CHEST);
-
-			NumberOfPlayers = static_cast<cChestEntity &>(a_BlockEntity).GetNumberOfPlayers();
-			return false;
-		});
+		VERIFY(
+			!a_Chunk.DoWithChestAt(a_Position, [&](cChestEntity & a_Chest)
+			{
+				ASSERT(a_Chest.GetBlockType() == BlockType::TrappedChest);
+				NumberOfPlayers = a_Chest.GetNumberOfPlayers();
+				return true;
+			})
+		);
 
 		return static_cast<unsigned char>(std::min(NumberOfPlayers, 15));
 	}
 
-	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
+	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BlockState a_Block, const PowerLevel Power)
 	{
-		// LOGD("Evaluating tricky the trapped chest (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+		LOGREDSTONE("Evaluating tricky the trapped chest (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
 		const auto PowerLevel = GetPowerLevel(a_Chunk, a_Position);
 		const auto PreviousPower = DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, PowerLevel);
@@ -46,12 +47,11 @@ namespace TrappedChestHandler
 		}
 	}
 
-	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
+	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
-		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
+		UNUSED(a_Block);
 		UNUSED(Callback);
 	}
 };

@@ -27,20 +27,57 @@ namespace PoweredRailHandler
 		using namespace Block;
 		switch (a_Block.Type())
 		{
-			case BlockType::DetectorRail:  GETXZOFFSET(DetectorRail)
-			case BlockType::ActivatorRail: GETXZOFFSET(ActivatorRail)
-			case BlockType::PoweredRail:   GETXZOFFSET(PoweredRail)
+			case BlockType::ActivatorRail:
+			{
+				switch (ActivatorRail::Shape(a_Block))
+				{
+					case ActivatorRail::Shape::NorthSouth:     return { 0, 0, 1 };
+					case ActivatorRail::Shape::EastWest:       return { 1, 0, 0 };
+					case ActivatorRail::Shape::AscendingEast:  return { 1, 1, 0 };
+					case ActivatorRail::Shape::AscendingWest:  return { 1, 1, 0 };
+					case ActivatorRail::Shape::AscendingNorth: return { 0, 1, 1 };
+					case ActivatorRail::Shape::AscendingSouth: return { 0, 1, 1 };
+				}
+				break;
+			}
+			case BlockType::DetectorRail:
+			{
+				switch (DetectorRail::Shape(a_Block))
+				{
+					case DetectorRail::Shape::NorthSouth:     return { 0, 0, 1 };
+					case DetectorRail::Shape::EastWest:       return { 1, 0, 0 };
+					case DetectorRail::Shape::AscendingEast:  return { 1, 1, 0 };
+					case DetectorRail::Shape::AscendingWest:  return { 1, 1, 0 };
+					case DetectorRail::Shape::AscendingNorth: return { 0, 1, 1 };
+					case DetectorRail::Shape::AscendingSouth: return { 0, 1, 1 };
+				}
+				break;
+			}
+			case BlockType::PoweredRail:
+			{
+				switch (PoweredRail::Shape(a_Block))
+				{
+					case PoweredRail::Shape::NorthSouth:     return { 0, 0, 1 };
+					case PoweredRail::Shape::EastWest:       return { 1, 0, 0 };
+					case PoweredRail::Shape::AscendingEast:  return { 1, 1, 0 };
+					case PoweredRail::Shape::AscendingWest:  return { 1, 1, 0 };
+					case PoweredRail::Shape::AscendingNorth: return { 0, 1, 1 };
+					case PoweredRail::Shape::AscendingSouth: return { 0, 1, 1 };
+				}
+				break;
+			}
 			default:
 			{
 				ASSERT(!"Impossible rail meta! wat wat wat");
-				return { 0, 0, 0 };
+				return {0, 0, 0};
 			}
 		}
+		return {0, 0, 0};
 	}
 
 	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, Vector3i a_QueryPosition, BlockState a_QueryBlock, bool IsLinked)
 	{
-		UNUSED(a_QueryBlockType);
+		UNUSED(a_QueryBlock);
 
 		const auto Offset = GetPoweredRailAdjacentXZCoordinateOffset(a_Block);
 		if (((Offset + a_Position) == a_QueryPosition) || ((-Offset + a_Position) == a_QueryPosition))
@@ -53,7 +90,7 @@ namespace PoweredRailHandler
 
 	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTickingChunk, Vector3i a_Position, BlockState a_Block, const PowerLevel Power)
 	{
-		// LOGD("Evaluating tracky the rail (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+		LOGREDSTONE("Evaluating tracky the rail (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
 		switch (a_Block.Type())
 		{
@@ -92,7 +129,6 @@ namespace PoweredRailHandler
 	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
-		UNUSED(a_Meta);
 
 		if ((a_Block.Type() == BlockType::PoweredRail) || (a_Block.Type() == BlockType::ActivatorRail))
 		{

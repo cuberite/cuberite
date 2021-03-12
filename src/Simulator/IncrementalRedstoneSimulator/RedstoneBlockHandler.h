@@ -11,7 +11,7 @@ namespace RedstoneBlockHandler
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
-		UNUSED(a_BlockType);
+		UNUSED(a_Block);
 		UNUSED(a_QueryPosition);
 		UNUSED(IsLinked);
 		return IsLinked ? 0 : 15;
@@ -19,15 +19,14 @@ namespace RedstoneBlockHandler
 
 	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BlockState a_Block, const PowerLevel Power)
 	{
-		// LOGD("Evaluating crimson the redstone block (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+		LOGREDSTONE("Evaluating crimson the redstone block (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 	}
 
 	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
-		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
+		UNUSED(a_Block);
 		UNUSED(Callback);
 	}
 };

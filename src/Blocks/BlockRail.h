@@ -42,7 +42,7 @@ public:
 	{
 		using namespace Block;
 		auto Self = a_ChunkInterface.GetBlock(a_Position);
-		switch(Self.Type())
+		switch (Self.Type())
 		{
 			case BlockType::Rail: break;   // Nothing to do
 			case BlockType::ActivatorRail: a_ChunkInterface.FastSetBlock(a_Position, ActivatorRail::ActivatorRail(a_Powered, ActivatorRail::Shape(Self))); break;
@@ -514,7 +514,9 @@ private:
 							case Rail::Shape::AscendingWest:
 							case Rail::Shape::NorthWest:
 							case Rail::Shape::NorthEast:
+							{
 								return true;
+							}
 						}
 					}
 					case BlockType::ActivatorRail:
@@ -528,7 +530,9 @@ private:
 							case ActivatorRail::Shape::EastWest:
 							case ActivatorRail::Shape::AscendingEast:
 							case ActivatorRail::Shape::AscendingWest:
+							{
 								return true;
+							}
 						}
 					}
 					case BlockType::DetectorRail:
@@ -542,7 +546,9 @@ private:
 							case DetectorRail::Shape::EastWest:
 							case DetectorRail::Shape::AscendingEast:
 							case DetectorRail::Shape::AscendingWest:
+							{
 								return true;
+							}
 						}
 					}
 					case BlockType::PoweredRail:
@@ -556,7 +562,9 @@ private:
 							case PoweredRail::Shape::EastWest:
 							case PoweredRail::Shape::AscendingEast:
 							case PoweredRail::Shape::AscendingWest:
+							{
 								return true;
+							}
 						}
 					}
 					default: return false;
@@ -583,7 +591,9 @@ private:
 							case Rail::Shape::AscendingWest:
 							case Rail::Shape::SouthEast:
 							case Rail::Shape::SouthWest:
+							{
 								return true;
+							}
 						}
 					}
 					case BlockType::ActivatorRail:
@@ -597,7 +607,9 @@ private:
 							case ActivatorRail::Shape::EastWest:
 							case ActivatorRail::Shape::AscendingEast:
 							case ActivatorRail::Shape::AscendingWest:
+							{
 								return true;
+							}
 						}
 					}
 					case BlockType::DetectorRail:
@@ -611,7 +623,9 @@ private:
 							case DetectorRail::Shape::EastWest:
 							case DetectorRail::Shape::AscendingEast:
 							case DetectorRail::Shape::AscendingWest:
+							{
 								return true;
+							}
 						}
 					}
 					case BlockType::PoweredRail:
@@ -625,7 +639,9 @@ private:
 							case PoweredRail::Shape::EastWest:
 							case PoweredRail::Shape::AscendingEast:
 							case PoweredRail::Shape::AscendingWest:
+							{
 								return true;
+							}
 						}
 					}
 					default: return false;
@@ -651,7 +667,9 @@ private:
 							case Rail::Shape::AscendingSouth:
 							case Rail::Shape::SouthEast:
 							case Rail::Shape::NorthEast:
+							{
 								return true;
+							}
 						}
 					}
 					case BlockType::ActivatorRail:
@@ -665,7 +683,9 @@ private:
 							case ActivatorRail::Shape::NorthSouth:
 							case ActivatorRail::Shape::AscendingNorth:
 							case ActivatorRail::Shape::AscendingSouth:
+							{
 								return true;
+							}
 						}
 					}
 					case BlockType::DetectorRail:
@@ -679,7 +699,9 @@ private:
 							case DetectorRail::Shape::NorthSouth:
 							case DetectorRail::Shape::AscendingNorth:
 							case DetectorRail::Shape::AscendingSouth:
+							{
 								return true;
+							}
 						}
 					}
 					case BlockType::PoweredRail:
@@ -693,7 +715,9 @@ private:
 							case PoweredRail::Shape::NorthSouth:
 							case PoweredRail::Shape::AscendingNorth:
 							case PoweredRail::Shape::AscendingSouth:
+							{
 								return true;
+							}
 						}
 					}
 					default: return false;
@@ -718,7 +742,9 @@ private:
 							case Rail::Shape::AscendingSouth:
 							case Rail::Shape::SouthWest:
 							case Rail::Shape::NorthWest:
+							{
 								return true;
+							}
 						}
 					}
 					case BlockType::ActivatorRail:
@@ -732,7 +758,9 @@ private:
 							case ActivatorRail::Shape::NorthSouth:
 							case ActivatorRail::Shape::AscendingNorth:
 							case ActivatorRail::Shape::AscendingSouth:
+							{
 								return true;
+							}
 						}
 					}
 					case BlockType::DetectorRail:
@@ -746,7 +774,9 @@ private:
 							case DetectorRail::Shape::NorthSouth:
 							case DetectorRail::Shape::AscendingNorth:
 							case DetectorRail::Shape::AscendingSouth:
+							{
 								return true;
+							}
 						}
 					}
 					case BlockType::PoweredRail:
@@ -760,7 +790,9 @@ private:
 							case PoweredRail::Shape::NorthSouth:
 							case PoweredRail::Shape::AscendingNorth:
 							case PoweredRail::Shape::AscendingSouth:
+							{
 								return true;
+							}
 						}
 					}
 					default: return false;
@@ -812,7 +844,7 @@ private:
 		}
 		// To avoid a compiler warning;
 		return a_Meta;
-		 */
+		*/
 	}
 
 
@@ -936,9 +968,8 @@ private:
 	}
 
 
-	virtual ColourID GetMapBaseColourID(BlockState a_Block) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Block);
 		return 0;
 	}
 } ;

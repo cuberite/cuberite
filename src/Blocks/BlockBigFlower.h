@@ -18,6 +18,21 @@ public:
 
 	using Super::Super;
 
+	static inline bool IsBlockBigFlower(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::TallGrass:
+			case BlockType::LargeFern:
+			case BlockType::Lilac:
+			case BlockType::Peony:
+			case BlockType::RoseBush:
+			case BlockType::Sunflower:
+				return true;
+			default: return false;
+		}
+	}
+
 private:
 
 	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override

@@ -102,9 +102,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(BlockState a_Block) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		switch (m_BlockType)
 		{
 			case BlockType::AcaciaFenceGate: return 15;

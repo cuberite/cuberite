@@ -157,6 +157,52 @@ AString BlockFaceToString(eBlockFace a_BlockFace)
 
 
 
+eBlockFace RotationToBlockFace(double a_Rotation, bool a_Inverse = false)
+{
+	if (a_Inverse)
+	{
+		if ((a_Rotation > 135) || (a_Rotation < -135))  // -180/180
+		{
+			return eBlockFace::BLOCK_FACE_NORTH;
+		}
+		if ((-45 > a_Rotation) || (a_Rotation >= -135))  // -90
+		{
+			return eBlockFace::BLOCK_FACE_EAST;
+		}
+		if ((45 > a_Rotation)  || (a_Rotation >= -45))  // 0
+		{
+			return eBlockFace::BLOCK_FACE_SOUTH;
+		}
+		if ((135 > a_Rotation) || (a_Rotation >= 45))  // 90
+		{
+			return eBlockFace::BLOCK_FACE_WEST;
+		}
+	}
+	else
+	{
+		if ((a_Rotation > 135) || (a_Rotation < -135))    // -180/180
+		{
+			return eBlockFace::BLOCK_FACE_SOUTH;
+		}
+		if ((-45 > a_Rotation) || (a_Rotation >= -135))   // -90
+		{
+			return eBlockFace::BLOCK_FACE_WEST;
+		}
+		if ((45 > a_Rotation)  || (a_Rotation >= -45))    // 0
+		{
+			return eBlockFace::BLOCK_FACE_NORTH;
+		}
+		if ((135 > a_Rotation) || (a_Rotation >= 45))      // 90
+		{
+			return eBlockFace::BLOCK_FACE_EAST;
+		}
+	}
+}
+
+
+
+
+
 bool IsValidBlock(int a_BlockType)
 {
 	return (

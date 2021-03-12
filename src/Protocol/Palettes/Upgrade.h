@@ -13,7 +13,7 @@ namespace PaletteUpgrade
 	Item FromItem(short Item, short Damage);
 
 	// Any unimplemented Block before 1.13 is returned as air.
-	std::pair<char, char> ToBlock(BlockState a_Block);
+	std::pair<unsigned char, unsigned char> ToBlock(BlockState a_Block);
 	std::pair<short, short> ToItem(Item ID);
 	BlockType ToBlockType(NEWBLOCKTYPE block);
 	NEWBLOCKTYPE ToInternalId(BlockType block, AllBlockStates blockstate);

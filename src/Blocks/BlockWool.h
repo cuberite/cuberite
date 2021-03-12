@@ -14,6 +14,31 @@ public:
 
 	using cBlockHandler::cBlockHandler;
 
+	static inline bool IsBlockWool(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::BlackWool:
+			case BlockType::BlueWool:
+			case BlockType::BrownWool:
+			case BlockType::CyanWool:
+			case BlockType::GrayWool:
+			case BlockType::GreenWool:
+			case BlockType::LightBlueWool:
+			case BlockType::LightGrayWool:
+			case BlockType::LimeWool:
+			case BlockType::MagentaWool:
+			case BlockType::OrangeWool:
+			case BlockType::PinkWool:
+			case BlockType::PurpleWool:
+			case BlockType::RedWool:
+			case BlockType::WhiteWool:
+			case BlockType::YellowWool:
+				return true;
+			default: return false;
+		}
+	}
+
 private:
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override

@@ -32,14 +32,14 @@ public:
 			return true;
 		}
 		// Doors can also be placed on other doors
-		else if (IsDoorBlockType(a_Block.Type()))
+		else if (IsDoorBlockType(a_Block))
 		{
 			return true;
 		}
 		// Doors can not be placed on transparent blocks, but on any other block
 		else
 		{
-			return !cBlockInfo::IsTransparent(a_Block.Type());
+			return !cBlockInfo::IsTransparent(a_Block);
 		}
 	}
 
@@ -126,9 +126,9 @@ public:
 	}
 
 	/** Returns true if the specified BlockType is any kind of door */
-	inline static bool IsDoorBlockType(BlockType a_Block)
+	inline static bool IsDoorBlockType(BlockState a_Block)
 	{
-		switch (a_Block)
+		switch (a_Block.Type())
 		{
 			case BlockType::AcaciaDoor:
 			case BlockType::BirchDoor:
@@ -155,7 +155,7 @@ public:
 	{
 		using namespace Block;
 		auto State = a_ChunkInterface.GetBlock(a_BlockPos);
-		switch(State.Type())
+		switch (State.Type())
 		{
 			case BlockType::AcaciaDoor:  return AcaciaDoor::Open(State);
 			case BlockType::BirchDoor:   return BirchDoor::Open(State);
@@ -193,12 +193,12 @@ public:
 	}
 
 #define SETOPEN(DoorType) \
-	Block = DoorType::DoorType\
-	(\
-		DoorType::Facing(Block),\
-		DoorType::Half(Block),\
-		DoorType::Hinge(Block),\
-		a_Open,\
+	Block = DoorType::DoorType \
+	( \
+		DoorType::Facing(Block), \
+		DoorType::Half(Block), \
+		DoorType::Hinge(Block), \
+		a_Open, \
 		DoorType::Powered(Block)\
 	); \
 	break;\
@@ -207,7 +207,7 @@ public:
 	static void SetOpen(cChunkInterface & a_ChunkInterface, const Vector3i a_BlockPos, bool a_Open)
 	{
 		auto Block = a_ChunkInterface.GetBlock(a_BlockPos);
-		if (!IsDoorBlockType(Block.Type()))
+		if (!IsDoorBlockType(Block))
 		{
 			return;
 		}
@@ -391,9 +391,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(BlockState a_Block) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		switch (m_BlockType)
 		{
 			case BlockType::AcaciaDoor:  return 15;

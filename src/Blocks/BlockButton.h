@@ -157,7 +157,7 @@ private:
 #define GETPLACEMENTBLOCKTYPEMETA(ButtonType) \
 {\
 	enum ButtonType::Face Facing;\
-	switch(a_ClickedBlockFace)\
+	switch (a_ClickedBlockFace)\
 	{\
 		case BLOCK_FACE_BOTTOM: Facing = ButtonType::Face::Ceiling; break;\
 		case BLOCK_FACE_TOP:    Facing = ButtonType::Face::Floor; break;\
@@ -165,7 +165,7 @@ private:
 		case BLOCK_FACE_SOUTH:\
 		case BLOCK_FACE_WEST:\
 		case BLOCK_FACE_EAST:   Facing = ButtonType::Face::Wall; break;   \
-    	default: return false;\
+		default: return false;\
 	}\
 	a_Block = ButtonType::ButtonType(Facing, a_ClickedBlockFace, false);\
 	break;\
@@ -182,7 +182,7 @@ private:
 	{
 		using namespace Block;
 
-		switch(m_BlockType)
+		switch (m_BlockType)
 		{
 			case BlockType::AcaciaButton:             GETPLACEMENTBLOCKTYPEMETA(AcaciaButton)
 			case BlockType::BirchButton:              GETPLACEMENTBLOCKTYPEMETA(BirchButton)
@@ -221,9 +221,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(BlockState a_Block) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 0;
 	}
 

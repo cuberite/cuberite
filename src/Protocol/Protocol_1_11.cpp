@@ -30,8 +30,12 @@ Implements the 1.11 protocol classes:
 
 #include "../Mobs/IncludeAllMonsters.h"
 
+#include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BedEntity.h"
+#include "../BlockEntities/CommandBlockEntity.h"
+#include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"
+#include "../BlockEntities/FlowerPotEntity.h"
 
 #include "../Root.h"
 #include "../Server.h"
@@ -316,6 +320,19 @@ namespace Metadata_1_11
 
 
 
+#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
+	Type Var; \
+	do { \
+		if (!ByteBuf.Proc(Var))\
+		{\
+			return;\
+		} \
+	} while (false)
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_11_0:
 
@@ -327,41 +344,6 @@ void cProtocol_1_11_0::SendCollectEntity(const cEntity & a_Collected, const cEnt
 	Pkt.WriteVarInt32(a_Collected.GetUniqueID());
 	Pkt.WriteVarInt32(a_Collector.GetUniqueID());
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Count));
-}
-
-
-
-
-
-void cProtocol_1_11_0::SendEntityAnimation(const cEntity & a_Entity, const EntityAnimation a_Animation)
-{
-	switch (a_Animation)
-	{
-		case EntityAnimation::EggCracks:
-		case EntityAnimation::SnowballPoofs:
-		{
-			// Vanilla stopped doing clientside prediction for thrown projectile particle effects (for some reason).
-			// But they're still doing motion prediction, and latency exists, hence re-send the server position to avoid particle effects happening inside a block:
-			SendEntityPosition(a_Entity);
-			break;
-		}
-		case EntityAnimation::PawnChestEquipmentBreaks:
-		case EntityAnimation::PawnFeetEquipmentBreaks:
-		case EntityAnimation::PawnHeadEquipmentBreaks:
-		case EntityAnimation::PawnLegsEquipmentBreaks:
-		case EntityAnimation::PawnMainHandEquipmentBreaks:
-		case EntityAnimation::PawnOffHandEquipmentBreaks:
-		{
-			const auto Position = a_Entity.GetPosition();
-
-			// 1.11 dropped the automatic particle effect + sound on item break. Emulate at least some of it:
-			SendSoundEffect("entity.item.break", Position, 1, 0.75f + ((a_Entity.GetUniqueID() * 23) % 32) / 64.f);
-			break;
-		}
-		default: break;
-	}
-
-	Super::SendEntityAnimation(a_Entity, a_Animation);
 }
 
 
@@ -428,6 +410,179 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 
 
 
+void cProtocol_1_11_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity)
+{
+	cFastNBTWriter Writer;
+
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case BlockType::Beacon:
+		{
+			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);
+			Writer.AddInt("x", BeaconEntity.GetPosX());
+			Writer.AddInt("y", BeaconEntity.GetPosY());
+			Writer.AddInt("z", BeaconEntity.GetPosZ());
+			Writer.AddInt("Primary", BeaconEntity.GetPrimaryEffect());
+			Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
+			Writer.AddInt("Levels", BeaconEntity.GetBeaconLevel());
+			Writer.AddString("id", "Beacon");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			break;
+		}
+
+		case BlockType::BlackBed:
+		case BlockType::BlueBed:
+		case BlockType::BrownBed:
+		case BlockType::CyanBed:
+		case BlockType::GrayBed:
+		case BlockType::GreenBed:
+		case BlockType::LightBlueBed:
+		case BlockType::LightGrayBed:
+		case BlockType::LimeBed:
+		case BlockType::MagentaBed:
+		case BlockType::OrangeBed:
+		case BlockType::PinkBed:
+		case BlockType::PurpleBed:
+		case BlockType::RedBed:
+		case BlockType::WhiteBed:
+		case BlockType::YellowBed:
+		{
+			auto & BedEntity = static_cast<const cBedEntity &>(a_BlockEntity);
+			Writer.AddInt("x", BedEntity.GetPosX());
+			Writer.AddInt("y", BedEntity.GetPosY());
+			Writer.AddInt("z", BedEntity.GetPosZ());
+			Writer.AddInt("color", BedEntity.GetColor());
+			Writer.AddString("id", "Bed");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			break;
+		}
+
+		case BlockType::CommandBlock:
+		case BlockType::ChainCommandBlock:
+		case BlockType::RepeatingCommandBlock:
+		{
+			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
+			Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
+			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
+			Writer.AddInt("x", CommandBlockEntity.GetPosX());
+			Writer.AddInt("y", CommandBlockEntity.GetPosY());
+			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
+			Writer.AddString("Command", CommandBlockEntity.GetCommand());
+			// You can set custom names for windows in Vanilla
+			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
+			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
+			Writer.AddString("CustomName", "@");
+			Writer.AddString("id", "Control");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			if (!CommandBlockEntity.GetLastOutput().empty())
+			{
+				Writer.AddString("LastOutput", Printf("{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str()));
+			}
+			break;
+		}
+
+		case BlockType::CreeperHead:
+		case BlockType::CreeperWallHead:
+		case BlockType::DragonHead:
+		case BlockType::DragonWallHead:
+		case BlockType::PlayerHead:
+		case BlockType::PlayerWallHead:
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:
+		case BlockType::SkeletonSkull:
+		case BlockType::SkeletonWallSkull:
+		case BlockType::WitherSkeletonSkull:
+		case BlockType::WitherSkeletonWallSkull:
+		{
+			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
+			Writer.AddInt("x", MobHeadEntity.GetPosX());
+			Writer.AddInt("y", MobHeadEntity.GetPosY());
+			Writer.AddInt("z", MobHeadEntity.GetPosZ());
+			Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
+			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
+			Writer.AddString("id", "Skull");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+
+			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
+			Writer.BeginCompound("Owner");
+			Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
+			Writer.AddString("Name", MobHeadEntity.GetOwnerName());
+			Writer.BeginCompound("Properties");
+			Writer.BeginList("textures", TAG_Compound);
+			Writer.BeginCompound("");
+			Writer.AddString("Signature", MobHeadEntity.GetOwnerTextureSignature());
+			Writer.AddString("Value", MobHeadEntity.GetOwnerTexture());
+			Writer.EndCompound();
+			Writer.EndList();
+			Writer.EndCompound();
+			Writer.EndCompound();
+			break;
+		}
+
+		case BlockType::PottedAcaciaSapling:
+		case BlockType::PottedAzureBluet:
+		case BlockType::PottedBamboo:
+		case BlockType::PottedBirchSapling:
+		case BlockType::PottedBlueOrchid:
+		case BlockType::PottedBrownMushroom:
+		case BlockType::PottedCactus:
+		case BlockType::PottedCornflower:
+		case BlockType::PottedCrimsonRoots:
+		case BlockType::PottedCrimsonFungus:
+		case BlockType::PottedDandelion:
+		case BlockType::PottedDarkOakSapling:
+		case BlockType::PottedDeadBush:
+		case BlockType::PottedFern:
+		case BlockType::PottedJungleSapling:
+		case BlockType::PottedLilyOfTheValley:
+		case BlockType::PottedOakSapling:
+		case BlockType::PottedOrangeTulip:
+		case BlockType::PottedOxeyeDaisy:
+		case BlockType::PottedPinkTulip:
+		case BlockType::PottedPoppy:
+		case BlockType::PottedRedMushroom:
+		case BlockType::PottedRedTulip:
+		case BlockType::PottedSpruceSapling:
+		case BlockType::PottedWarpedFungus:
+		case BlockType::PottedWarpedRoots:
+		case BlockType::PottedWhiteTulip:
+		case BlockType::PottedWitherRose:
+		case BlockType::PottedAllium:
+		{
+			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
+			Writer.AddInt("x", FlowerPotEntity.GetPosX());
+			Writer.AddInt("y", FlowerPotEntity.GetPosY());
+			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
+			Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
+			Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
+			Writer.AddString("id", "FlowerPot");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			break;
+		}
+
+		case BlockType::Spawner:
+		{
+			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
+			Writer.AddInt("x", MobSpawnerEntity.GetPosX());
+			Writer.AddInt("y", MobSpawnerEntity.GetPosY());
+			Writer.AddInt("z", MobSpawnerEntity.GetPosZ());
+			Writer.BeginCompound("SpawnData");
+				Writer.AddString("id", "minecraft:" + cMonster::MobTypeToVanillaNBT(MobSpawnerEntity.GetEntity()));
+			Writer.EndCompound();
+			Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
+			Writer.AddString("id", "MobSpawner");
+			break;
+		}
+
+		default:
+		{
+			break;
+		}
+	}
+
+	Writer.Finish();
+	a_Pkt.WriteBuf(Writer.GetResult());
+}
+
+
+
+
+
 void cProtocol_1_11_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -443,68 +598,16 @@ void cProtocol_1_11_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int
 
 
 
-void cProtocol_1_11_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+cProtocol::Version cProtocol_1_11_0::GetProtocolVersion()
 {
-	ASSERT(m_State == 3);  // In game mode?
-
-	Byte Action;
-	switch (a_BlockEntity.GetBlockType())
-	{
-		case E_BLOCK_CHEST:
-		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_END_PORTAL:
-		case E_BLOCK_TRAPPED_CHEST:
-		{
-			// The ones with a action of 0 is just a workaround to send the block entities to a client.
-			// Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
-			Action = 0;
-			break;
-		}
-
-		case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
-		case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
-		case E_BLOCK_BEACON:            Action = 3;  break;  // Update beacon entity
-		case E_BLOCK_HEAD:              Action = 4;  break;  // Update mobhead entity
-		case E_BLOCK_FLOWER_POT:        Action = 5;  break;  // Update flower pot
-		case E_BLOCK_WALL_BANNER:
-		case E_BLOCK_STANDING_BANNER:   Action = 6;  break;  // Update banner
-		case E_BLOCK_BED:               Action = 11; break;  // Update bed color (new!)
-
-		default: return;  // Block entities change between versions
-	}
-
-	cPacketizer Pkt(*this, pktUpdateBlockEntity);
-	Pkt.WriteXYZPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
-	Pkt.WriteBEUInt8(Action);
-
-	cFastNBTWriter Writer;
-	WriteBlockEntity(Writer, a_BlockEntity);
-	Writer.Finish();
-	Pkt.WriteBuf(Writer.GetResult());
+	return Version::v1_11_0;
 }
 
 
 
 
 
-signed char cProtocol_1_11_0::GetProtocolEntityStatus(const EntityAnimation a_Animation) const
-{
-	switch (a_Animation)
-	{
-		case EntityAnimation::EggCracks: return 3;
-		case EntityAnimation::EvokerFangsAttacks: return 4;
-		case EntityAnimation::IronGolemStashesGift: return 34;
-		case EntityAnimation::PawnTotemActivates: return 35;
-		case EntityAnimation::SnowballPoofs: return 3;
-		default: return Super::GetProtocolEntityStatus(a_Animation);
-	}
-}
-
-
-
-
-
-UInt32 cProtocol_1_11_0::GetProtocolMobType(const eMonsterType a_MobType) const
+UInt32 cProtocol_1_11_0::GetProtocolMobType(const eMonsterType a_MobType)
 {
 	switch (a_MobType)
 	{
@@ -564,19 +667,10 @@ UInt32 cProtocol_1_11_0::GetProtocolMobType(const eMonsterType a_MobType) const
 
 
 
-cProtocol::Version cProtocol_1_11_0::GetProtocolVersion() const
-{
-	return Version::v1_11_0;
-}
-
-
-
-
-
 void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
-	Vector3i Position;
-	if (!a_ByteBuffer.ReadXYZPosition64(Position))
+	int BlockX, BlockY, BlockZ;
+	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
 	{
 		return;
 	}
@@ -586,46 +680,14 @@ void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorZ);
-
-	m_Client->HandleRightClick(Position, FaceIntToBlockFace(Face), {FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16)}, Hand == 0);
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16), HandIntToEnum(Hand));
 }
 
 
 
 
 
-void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
-{
-	switch (a_BlockEntity.GetBlockType())
-	{
-		case E_BLOCK_BED:
-		{
-			auto & BedEntity = static_cast<const cBedEntity &>(a_BlockEntity);
-			a_Writer.AddInt("color", BedEntity.GetColor());  // New: multicoloured beds
-			break;
-		}
-		case E_BLOCK_MOB_SPAWNER:
-		{
-			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
-			a_Writer.BeginCompound("SpawnData");
-				a_Writer.AddString("id", cMonster::MobTypeToVanillaNBT(MobSpawnerEntity.GetEntity()));  // New: uses namespaced ID
-			a_Writer.EndCompound();
-			a_Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
-			break;
-		}
-		default: return Super::WriteBlockEntity(a_Writer, a_BlockEntity);
-	}
-
-	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
-	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
-	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
-}
-
-
-
-
-
-void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
 {
 	using namespace Metadata_1_11;
 
@@ -678,7 +740,7 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 			a_Pkt.WriteBEUInt8(PLAYER_MAIN_HAND);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetMainHand()));
 			break;
 		}
 		case cEntity::etPickup:
@@ -848,7 +910,7 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 
 
-void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
+void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
 {
 	using namespace Metadata_1_11;
 
@@ -922,9 +984,10 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
 			a_Pkt.WriteBEUInt8(ENDERMAN_CARRIED_BLOCK);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BLOCKID);
+			auto NumericBlock = PaletteUpgrade::ToBlock(Enderman.GetCarriedBlock());
 			UInt32 Carried = 0;
-			Carried |= static_cast<UInt32>(Enderman.GetCarriedBlock() << 4);
-			Carried |= Enderman.GetCarriedMeta();
+			Carried |= static_cast<UInt32>(NumericBlock.first << 4);
+			Carried |= static_cast<UInt32>(NumericBlock.second);
 			a_Pkt.WriteVarInt32(Carried);
 
 			a_Pkt.WriteBEUInt8(ENDERMAN_SCREAMING);
@@ -1087,19 +1150,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtSheep
 
-		case mtSkeleton:
-		{
-			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
-			a_Pkt.WriteBEUInt8(LIVING_ACTIVE_HAND);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEUInt8(Skeleton.IsChargingBow() ? 0x01 : 0x00);
-
-			a_Pkt.WriteBEUInt8(ABSTRACT_SKELETON_ARMS_SWINGING);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Skeleton.IsChargingBow());
-			break;
-		}  // case mtSkeleton
-
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -1230,6 +1280,8 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 		case mtDonkey:
 		case mtMule:
 
+		case mtEndermite:
+
 		case mtEvoker:
 
 		case mtLlama:
@@ -1252,11 +1304,11 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 
 		case mtCaveSpider:
 		case mtEnderDragon:
-		case mtEndermite:
 		case mtGiant:
 		case mtIronGolem:
 		case mtMooshroom:
 		case mtSilverfish:
+		case mtSkeleton:
 		case mtStray:
 		case mtSpider:
 		case mtSquid:
@@ -1277,7 +1329,7 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_11_1:
 
-cProtocol::Version cProtocol_1_11_1::GetProtocolVersion() const
+cProtocol::Version cProtocol_1_11_1::GetProtocolVersion()
 {
 	return Version::v1_11_1;
 }

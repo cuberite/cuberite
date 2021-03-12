@@ -4,6 +4,11 @@
 
 // tolua_begin
 
+enum ENUM_BLOCK_TYPE
+{
+	E_BLOCK_PUMPKIN
+};
+
 /*
 
 enum ENUM_BLOCK_TYPE : BLOCKTYPE

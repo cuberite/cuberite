@@ -13,6 +13,33 @@ class cBlockSignPostHandler final :
 {
 	using Super = cBlockHandler;
 
+	static inline bool IsBlockSign(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+
+			case BlockType::AcaciaSign:
+			case BlockType::BirchSign:
+			case BlockType::CrimsonSign:
+			case BlockType::DarkOakSign:
+			case BlockType::JungleSign:
+			case BlockType::OakSign:
+			case BlockType::SpruceSign:
+			case BlockType::WarpedSign:
+
+			case BlockType::AcaciaWallSign:
+			case BlockType::BirchWallSign:
+			case BlockType::CrimsonWallSign:
+			case BlockType::DarkOakWallSign:
+			case BlockType::OakWallSign:
+			case BlockType::JungleWallSign:
+			case BlockType::WarpedWallSign:
+			case BlockType::SpruceWallSign:
+				return true;
+			default: return false;
+		}
+	}
+
 public:
 
 	using Super::Super;

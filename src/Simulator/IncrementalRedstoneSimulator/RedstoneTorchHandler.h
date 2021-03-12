@@ -59,7 +59,7 @@ namespace RedstoneTorchHandler
 
 	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BlockState a_Block, const PowerLevel Power)
 	{
-		// LOGD("Evaluating torchy the redstone torch (%i %i %i)", a_Position.x, a_Position.y, a_Position.z);
+		LOGREDSTONE("Evaluating torchy the redstone torch (%i %i %i)", a_Position.x, a_Position.y, a_Position.z);
 
 		auto & Data = DataForChunk(a_Chunk);
 		auto DelayInfo = Data.GetMechanismDelayInfo(a_Position);
@@ -111,7 +111,7 @@ namespace RedstoneTorchHandler
 	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
-		UNUSED(a_BlockType);
+		UNUSED(a_Block);
 		Callback(a_Position + GetOffsetAttachedTo(a_Block));
 	}
 };

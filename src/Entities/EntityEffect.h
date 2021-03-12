@@ -9,7 +9,7 @@ public:
 
 	//Missing luck, unluck, levitaion anmd glowing
 	/** All types of entity effects (numbers correspond to protocol / storage types) */
-	enum eType
+	enum eType : short
 	{
 		effNoEffect       = 0,
 		effSpeed          = 1,

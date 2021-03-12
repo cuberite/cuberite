@@ -28,12 +28,11 @@
 
 
 
-cBlockEntity::cBlockEntity(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta, const Vector3i a_Pos, cWorld * const a_World) :
+cBlockEntity::cBlockEntity(BlockState a_Block, const Vector3i a_Pos, cWorld * const a_World) :
 	m_Pos(a_Pos),
 	m_RelX(a_Pos.x - cChunkDef::Width * FAST_FLOOR_DIV(a_Pos.x, cChunkDef::Width)),
 	m_RelZ(a_Pos.z - cChunkDef::Width * FAST_FLOOR_DIV(a_Pos.z, cChunkDef::Width)),
-	m_BlockType(a_BlockType),
-	m_BlockMeta(a_BlockMeta),
+	m_Block(a_Block),
 	m_World(a_World)
 {
 }
@@ -97,7 +96,9 @@ OwnedBlockEntity cBlockEntity::CreateByBlockType(BlockState a_Block, const Vecto
 
 		case BlockType::BrewingStand:    return std::make_unique<cBrewingstandEntity>   (a_Block, a_Pos, a_World);
 		case BlockType::Chest:           return std::make_unique<cChestEntity>          (a_Block, a_Pos, a_World);
-		case BlockType::CommandBlock:    return std::make_unique<cCommandBlockEntity>   (a_Block, a_Pos, a_World);
+		case BlockType::CommandBlock:
+		case BlockType::ChainCommandBlock:
+		case BlockType::RepeatingCommandBlock: return std::make_unique<cCommandBlockEntity>   (a_Block, a_Pos, a_World);
 		case BlockType::Dispenser:       return std::make_unique<cDispenserEntity>      (a_Block, a_Pos, a_World);
 		case BlockType::Dropper:         return std::make_unique<cDropperEntity>        (a_Block, a_Pos, a_World);
 		case BlockType::EnchantingTable: return std::make_unique<cEnchantingTableEntity>(a_Block, a_Pos, a_World);
@@ -145,7 +146,7 @@ OwnedBlockEntity cBlockEntity::CreateByBlockType(BlockState a_Block, const Vecto
 		default:
 		{
 			LOGD("%s: Requesting creation of an unknown block entity - block type %d (%s)",
-				__FUNCTION__, a_Block.Type(), "" //ItemTypeToString(a_BlockType).c_str()
+				__FUNCTION__, a_Block.Type(), ""  // ItemTypeToString(a_BlockType).c_str()
 			);
 			ASSERT(!"Requesting creation of an unknown block entity");
 			return nullptr;
@@ -169,6 +170,40 @@ bool cBlockEntity::IsBlockEntityBlockType(const BlockType a_Block)
 {
 	switch (a_Block)
 	{
+		case BlockType::BlackBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BrownBanner:
+		case BlockType::CyanBanner:
+		case BlockType::GrayBanner:
+		case BlockType::GreenBanner:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LimeBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::OrangeBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::RedBanner:
+		case BlockType::WhiteBanner:
+		case BlockType::YellowBanner:
+
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownWallBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedWallBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowWallBanner:
+
 		case BlockType::Beacon:
 
 		case BlockType::BlackBed:
@@ -190,7 +225,11 @@ bool cBlockEntity::IsBlockEntityBlockType(const BlockType a_Block)
 
 		case BlockType::BrewingStand:
 		case BlockType::Chest:
+
 		case BlockType::CommandBlock:
+		case BlockType::ChainCommandBlock:
+		case BlockType::RepeatingCommandBlock:
+
 		case BlockType::Dispenser:
 		case BlockType::Dropper:
 		case BlockType::EnchantingTable:
@@ -214,8 +253,37 @@ bool cBlockEntity::IsBlockEntityBlockType(const BlockType a_Block)
 
 		case BlockType::Hopper:
 		case BlockType::Jukebox:
-		case BlockType::Spawner:
 		case BlockType::NoteBlock:
+
+		case BlockType::PottedAcaciaSapling:
+		case BlockType::PottedAzureBluet:
+		case BlockType::PottedBamboo:
+		case BlockType::PottedBirchSapling:
+		case BlockType::PottedBlueOrchid:
+		case BlockType::PottedBrownMushroom:
+		case BlockType::PottedCactus:
+		case BlockType::PottedCornflower:
+		case BlockType::PottedCrimsonRoots:
+		case BlockType::PottedCrimsonFungus:
+		case BlockType::PottedDandelion:
+		case BlockType::PottedDarkOakSapling:
+		case BlockType::PottedDeadBush:
+		case BlockType::PottedFern:
+		case BlockType::PottedJungleSapling:
+		case BlockType::PottedLilyOfTheValley:
+		case BlockType::PottedOakSapling:
+		case BlockType::PottedOrangeTulip:
+		case BlockType::PottedOxeyeDaisy:
+		case BlockType::PottedPinkTulip:
+		case BlockType::PottedPoppy:
+		case BlockType::PottedRedMushroom:
+		case BlockType::PottedRedTulip:
+		case BlockType::PottedSpruceSapling:
+		case BlockType::PottedWarpedFungus:
+		case BlockType::PottedWarpedRoots:
+		case BlockType::PottedWhiteTulip:
+		case BlockType::PottedWitherRose:
+		case BlockType::PottedAllium:
 
 		case BlockType::AcaciaSign:
 		case BlockType::AcaciaWallSign:
@@ -234,6 +302,7 @@ bool cBlockEntity::IsBlockEntityBlockType(const BlockType a_Block)
 		case BlockType::WarpedSign:
 		case BlockType::WarpedWallSign:
 
+		case BlockType::Spawner:
 		case BlockType::TrappedChest:
 		{
 			return true;

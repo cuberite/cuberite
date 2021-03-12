@@ -24,13 +24,13 @@ public:
 		using namespace Block;
 		switch (Observer::Facing(a_Block))
 		{
-			case BLOCK_FACE_NONE: return Vector3i();
 			case BLOCK_FACE_XM:   return { -1, 0, 0 };
 			case BLOCK_FACE_XP:   return { 1, 0, 0 };
 			case BLOCK_FACE_YM:   return { 0, -1, 0 };
 			case BLOCK_FACE_YP:   return { 0, 1, 0 };
 			case BLOCK_FACE_ZM:   return { 0, 0, -1 };
 			case BLOCK_FACE_ZP:   return { 0, 0, 1 };
+			default: return Vector3i();
 		}
 	}
 

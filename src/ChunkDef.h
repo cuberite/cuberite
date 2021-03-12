@@ -388,7 +388,7 @@ public:
 	{
 		return (a_Buffer[a_Index / 2] >> ((a_Index & 1) * 4)) & 0x0f;
 	}
- */
+*/
 } ;
 
 

@@ -19,6 +19,21 @@ class cBlockLeavesHandler final :
 {
 	using Super = cBlockHandler;
 
+	static inline bool IsBlockLeaves(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaLeaves:
+			case BlockType::BirchLeaves:
+			case BlockType::DarkOakLeaves:
+			case BlockType::JungleLeaves:
+			case BlockType::OakLeaves:
+			case BlockType::SpruceLeaves:
+				return true;
+			default: return false;
+		}
+	}
+
 public:
 
 	using Super::Super;

@@ -9,6 +9,7 @@ target_sources(
 
 	BlockAir.h
 	BlockAnvil.h
+	BlockBanner.h
 	BlockBed.h
 	BlockBigFlower.h
 	BlockBookShelf.h

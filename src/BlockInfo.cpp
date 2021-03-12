@@ -9,9 +9,9 @@
 
 
 
-bool IsBlockWater(BLOCKTYPE a_BlockType)
+bool IsBlockWater(BlockType a_BlockType)
 {
-	return ((a_BlockType == E_BLOCK_WATER) || (a_BlockType == E_BLOCK_STATIONARY_WATER));
+	return a_BlockType == BlockType::Water;
 }
 
 
@@ -387,9 +387,10 @@ bool IsBlockMaterialRock(BLOCKTYPE a_BlockType)
 
 
 
+
 bool IsBed(BlockType a_BlockType)
 {
-	switch(a_BlockType)
+	switch (a_BlockType)
 	{
 		case BlockType::BlackBed:
 		case BlockType::BlueBed:
@@ -416,6 +417,7 @@ bool IsBed(BlockType a_BlockType)
 		}
 	}
 }
+
 
 
 
@@ -449,6 +451,7 @@ bool IsHead(BlockType a_BlockType)
 
 
 
+
 bool IsSign(BlockType a_BlockType)
 {
 	switch (a_BlockType)
@@ -478,6 +481,7 @@ bool IsSign(BlockType a_BlockType)
 		}
 	}
 }
+
 
 
 
@@ -1080,10 +1084,10 @@ bool cBlockInfo::IsSolid(const BLOCKTYPE Block)
 
 
 
-bool cBlockInfo::IsTransparent(const BLOCKTYPE Block)
+bool cBlockInfo::IsTransparent(const BlockState a_Block)
 {
 	// Transparent blocks:
-	switch (Block)
+	switch (a_Block.Type())
 	{
 		case E_BLOCK_ACACIA_DOOR:
 		case E_BLOCK_ACACIA_FENCE:

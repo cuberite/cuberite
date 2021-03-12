@@ -11,11 +11,11 @@
 
 
 
-ForEachSourceCallback::ForEachSourceCallback(const cChunk & Chunk, const Vector3i Position, const BlockType CurrentBlock) :
+ForEachSourceCallback::ForEachSourceCallback(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_CurrentBlock) :
 	Power(0),
-	m_Chunk(Chunk),
-	m_Position(Position),
-	m_CurrentBlock(CurrentBlock)
+	m_Chunk(a_Chunk),
+	m_Position(a_Position),
+	m_CurrentBlock(a_CurrentBlock)
 {
 }
 
@@ -23,32 +23,32 @@ ForEachSourceCallback::ForEachSourceCallback(const cChunk & Chunk, const Vector3
 
 
 
-void ForEachSourceCallback::operator()(Vector3i Location)
+void ForEachSourceCallback::operator()(Vector3i a_Location)
 {
-	if (!cChunkDef::IsValidHeight(Location.y))
+	if (!cChunkDef::IsValidHeight(a_Location.y))
 	{
 		return;
 	}
 
-	const auto NeighbourChunk = m_Chunk.GetRelNeighborChunkAdjustCoords(Location);
+	const auto NeighbourChunk = m_Chunk.GetRelNeighborChunkAdjustCoords(a_Location);
 	if ((NeighbourChunk == nullptr) || !NeighbourChunk->IsValid())
 	{
 		return;
 	}
 
-	const auto PotentialSourceBlock = NeighbourChunk->GetBlock(Location);
+	const auto PotentialSourceBlock = NeighbourChunk->GetBlock(a_Location);
 	const auto NeighbourRelativeQueryPosition = cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(m_Chunk, *NeighbourChunk, m_Position);
 
 	if (ShouldQueryLinkedPosition(PotentialSourceBlock))
 	{
-		Power = std::max(Power, QueryLinkedPower(*NeighbourChunk, NeighbourRelativeQueryPosition, m_CurrentBlock, Location));
+		Power = std::max(Power, QueryLinkedPower(*NeighbourChunk, NeighbourRelativeQueryPosition, m_CurrentBlock, a_Location));
 	}
 	else
 	{
 		Power = std::max(
 			Power,
 			RedstoneHandler::GetPowerDeliveredToPosition(
-				*NeighbourChunk, Location, PotentialSourceBlock,
+				*NeighbourChunk, a_Location, PotentialSourceBlock,
 				NeighbourRelativeQueryPosition, m_CurrentBlock, false
 			)
 		);
@@ -87,25 +87,24 @@ void ForEachSourceCallback::CheckIndirectPower()
 
 
 
-bool ForEachSourceCallback::ShouldQueryLinkedPosition(const BlockType Block)
+bool ForEachSourceCallback::ShouldQueryLinkedPosition(const BlockState a_Block)
 {
-	switch (Block)
+	switch (a_Block.Type())
 	{
 		// Normally we don't ask solid blocks for power because they don't have any (stone, dirt, etc.)
 		// However, these are mechanisms that are IsSolid, but still give power. Don't ignore them:
-		case E_BLOCK_BLOCK_OF_REDSTONE:
-		case E_BLOCK_DAYLIGHT_SENSOR:
-		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
-		case E_BLOCK_OBSERVER:
-		case E_BLOCK_TRAPPED_CHEST: return false;
+		case BlockType::RedstoneBlock:
+		case BlockType::DaylightDetector:
+		case BlockType::Observer:
+		case BlockType::TrappedChest: return false;
 
 		// Pistons are solid but don't participate in link powering:
-		case E_BLOCK_PISTON:
-		case E_BLOCK_PISTON_EXTENSION:
-		case E_BLOCK_STICKY_PISTON: return false;
+		case BlockType::Piston:
+		case BlockType::MovingPiston:
+		case BlockType::StickyPiston: return false;
 
 		// If a mechanism asks for power from a block, redirect the query to linked positions if:
-		default: return cBlockInfo::IsSolid(Block);
+		default: return cBlockInfo::IsSolid(a_Block);
 	}
 }
 

@@ -114,7 +114,7 @@ namespace RedstoneWireHandler
 	{
 		auto Block = Block::RedstoneWire::RedstoneWire();
 		const auto YPTerraceBlock = Chunk.GetBlock(Position + OffsetYP);
-		const bool IsYPTerracingBlocked = cBlockInfo::IsSolid(YPTerraceBlock.Type()) && !cBlockInfo::IsTransparent(YPTerraceBlock.Type());
+		const bool IsYPTerracingBlocked = cBlockInfo::IsSolid(YPTerraceBlock) && !cBlockInfo::IsTransparent(YPTerraceBlock);
 
 		// Loop through laterals, discovering terracing connections:
 		for (const auto & Offset : RelativeLaterals)
@@ -166,7 +166,7 @@ namespace RedstoneWireHandler
 
 			if (
 				// IsYMTerracingBlocked (i.e. check block above lower terracing position, a.k.a. just the plain adjacent)
-				(!cBlockInfo::IsSolid(LateralBlock.Type()) || cBlockInfo::IsTransparent(LateralBlock.Type())) &&
+				(!cBlockInfo::IsSolid(LateralBlock) || cBlockInfo::IsTransparent(LateralBlock)) &&
 				(Adjacent.y > 0) &&
 				(NeighbourChunk->GetBlock(Adjacent + OffsetYM).Type() == BlockType::RedstoneWire)  // Only terrace YM with another wire
 			)
@@ -266,7 +266,7 @@ namespace RedstoneWireHandler
 
 	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BlockState a_Block, const PowerLevel a_Power)
 	{
-		// LOGD("Evaluating dusty the wire (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, Power);
+		LOGREDSTONE("Evaluating dusty the wire (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, Power);
 
 		if (Block::RedstoneWire::Power(a_Block) == a_Power)
 		{
@@ -297,8 +297,7 @@ namespace RedstoneWireHandler
 
 	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, ForEachSourceCallback & Callback)
 	{
-		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
+		UNUSED(a_Block);
 
 		Callback(a_Position + OffsetYP);
 		Callback(a_Position + OffsetYM);
@@ -327,7 +326,7 @@ namespace RedstoneWireHandler
 
 					const auto YMDiagonalPosition = Relative + OffsetYM;
 					if (
-						BLOCKTYPE QueryBlock;
+						BlockState QueryBlock = 0;
 						cChunkDef::IsValidHeight(YMDiagonalPosition.y) &&
 						a_Chunk.UnboundedRelGetBlockType(YMDiagonalPosition, QueryBlock) &&
 						(QueryBlock == BlockType::RedstoneWire)

@@ -25,14 +25,13 @@ namespace DoorHandler
 	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
-		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
+		UNUSED(a_Block);
 		InvokeForAdjustedRelatives(Callback, a_Position, RelativeAdjacents);
 	}
 
 	static void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BlockState a_Block, PowerLevel Power)
 	{
-		// LOGD("Evaluating dori the door (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+		LOGREDSTONE("Evaluating dori the door (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
 		const bool IsTop = cBlockDoorHandler::IsTop(a_Block);
 		const auto TopPosition = IsTop ? a_Position : a_Position.addedY(1);
@@ -52,10 +51,11 @@ namespace DoorHandler
 			}
 
 			auto AboveBlock = a_Chunk.GetBlock(TopPosition);
-			if (!cBlockDoorHandler::IsDoorBlockType(AboveBlock.Type()))
+			if (!cBlockDoorHandler::IsDoorBlockType(AboveBlock))
 			{
 				return;
 			}
+			IsOpen = cBlockDoorHandler::IsOpen(ChunkInterface, TopPosition);
 		}
 
 		const auto OppositeHalfPosition = a_Position + (IsTop ? OffsetYM : OffsetYP);
