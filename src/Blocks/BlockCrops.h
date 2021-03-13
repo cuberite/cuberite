@@ -9,7 +9,7 @@
 
 
 /** Common class that takes care of beetroots, carrots, potatoes and wheat */
-template <NIBBLETYPE RipeMeta>
+template <unsigned char RipeAge>
 class cBlockCropsHandler final :
 	public cBlockPlant<true>
 {
@@ -18,6 +18,19 @@ class cBlockCropsHandler final :
 public:
 
 	using Super::Super;
+
+	static inline bool IsFullyGown(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::Beetroots: return (Beetroots::Age(a_Block) == 3)  // Maximum Age = 3
+			case BlockType::Carrots: return (Carrots::Age(a_Block) = 7)  // Maximum Age = 7
+			case BlockType::Potatoes: return (Potatoes::Age(a_Block) == 7)  // Maximum Age = 7
+			case BlockType::Wheat: return (Wheat::Age(a_Block) == 7)  // Maximum Age = 7
+			default: return false;
+		}
+	}
 
 private:
 
@@ -32,12 +45,12 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		auto & rand = GetRandomProvider();
 
 		// If not fully grown, drop the "seed" of whatever is growing:
-		if (a_BlockMeta < RipeMeta)
+		if (a_BlockMeta < RipeAge)
 		{
 			switch (m_BlockType)
 			{
