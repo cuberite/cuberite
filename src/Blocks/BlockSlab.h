@@ -477,7 +477,7 @@ private:
 			const Vector3i a_PlacedBlockPos,
 			eBlockFace a_ClickedBlockFace,
 			const Vector3i a_CursorPos,
-			BlockState &a_Block
+			BlockState & a_Block
 	) const override
 	{
 		bool IsTop;

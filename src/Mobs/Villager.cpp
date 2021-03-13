@@ -191,7 +191,7 @@ void cVillager::HandleFarmerTryHarvestCrops()
 	{
 		// Check if the blocks didn't change while the villager was walking to the coordinates.
 		auto CropBlock = m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
-		if (IsBlockFarmable(CropBlock) && cBlockCropsHandler::IsFullyGrown(m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z)))
+		if (IsBlockFarmable(CropBlock) && cBlockCropsHandler<0>::IsFullyGrown(m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z)))
 		{
 			m_World->DropBlockAsPickups(m_CropsPos, this, nullptr);
 			m_ActionCountDown = 20;
@@ -206,9 +206,9 @@ void cVillager::HandleFarmerTryHarvestCrops()
 void cVillager::HandleFarmerPlaceCrops()
 {
 	// Check if there is still farmland at the spot where the crops were.
-	if (m_World->GetBlock(m_CropsPos.x, m_CropsPos.y - 1, m_CropsPos.z) == BlockType::FARMLAND)
+	if (m_World->GetBlock(m_CropsPos).Type() == BlockType::Farmland)
 	{
-		m_World->SetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z, BlockType::CROPS, 0);
+		m_World->SetBlock(m_CropsPos, Block::Wheat::Wheat(0));
 	}
 }
 

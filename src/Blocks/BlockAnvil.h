@@ -87,8 +87,7 @@ private:
 			return false;
 		}
 
-		// TODO(12xx12)
-		// a_BlockMeta = a_BlockMeta | static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage << 2);
+		Block::Anvil::Anvil(RotationToBlockFace(a_Player.GetYaw()));
 		return true;
 	}
 

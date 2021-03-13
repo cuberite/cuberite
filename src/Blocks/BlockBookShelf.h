@@ -11,7 +11,9 @@ class cBlockBookShelfHandler final :
 {
 public:
 
-	using cBlockHandler::cBlockHandler;
+	using Super = cBlockHandler
+
+	using Super::Super;
 
 private:
 
