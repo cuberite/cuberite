@@ -9,7 +9,7 @@
 
 
 /** Common class that takes care of beetroots, carrots, potatoes and wheat */
-template <NIBBLETYPE RipeMeta>
+template <unsigned char RipeAge>
 class cBlockCropsHandler final :
 	public cBlockPlant<true>
 {
@@ -18,6 +18,19 @@ class cBlockCropsHandler final :
 public:
 
 	using Super::Super;
+
+	static inline bool IsFullyGown(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::Beetroots: return (Beetroots::Age(a_Block) == 3)  // Maximum Age = 3
+			case BlockType::Carrots: return (Carrots::Age(a_Block) = 7)  // Maximum Age = 7
+			case BlockType::Potatoes: return (Potatoes::Age(a_Block) == 7)  // Maximum Age = 7
+			case BlockType::Wheat: return (Wheat::Age(a_Block) == 7)  // Maximum Age = 7
+			default: return false;
+		}
+	}
 
 private:
 
@@ -32,12 +45,12 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		auto & rand = GetRandomProvider();
 
 		// If not fully grown, drop the "seed" of whatever is growing:
-		if (a_BlockMeta < RipeMeta)
+		if (a_BlockMeta < RipeAge)
 		{
 			switch (m_BlockType)
 			{
@@ -65,7 +78,7 @@ private:
 			}
 			case E_BLOCK_CROPS:
 			{
-				// https://minecraft.wiki/w/Seeds_(Wheat)
+				// https://minecraft.fandom.com/wiki/Seeds_(Wheat)
 				Res.Add(E_ITEM_WHEAT);
 				const auto SeedCount = CalculateSeedCount(1, 3, ToolFortuneLevel(a_Tool));
 				Res.Add(E_ITEM_SEEDS, SeedCount);
@@ -73,19 +86,19 @@ private:
 			}
 			case E_BLOCK_CARROTS:
 			{
-				// https://minecraft.wiki/w/Carrot#Breaking
+				// https://minecraft.gamepedia.com/Carrot#Breaking
 				const auto CarrotCount = CalculateSeedCount(1, 4, ToolFortuneLevel(a_Tool));
 				Res.Add(E_ITEM_CARROT, CarrotCount);
 				break;
 			}
 			case E_BLOCK_POTATOES:
 			{
-				// https://minecraft.wiki/w/Potato#Breaking
+				// https://minecraft.gamepedia.com/Potato#Breaking
 				const auto PotatoCount = CalculateSeedCount(2, 3, ToolFortuneLevel(a_Tool));
 				Res.Add(E_ITEM_POTATO, PotatoCount);
 				if (rand.RandBool(0.02))
 				{
-					// https://minecraft.wiki/w/Poisonous_Potato#Obtaining
+					// https://minecraft.gamepedia.com/Poisonous_Potato#Obtaining
 					// With a 2% chance, drop a poisonous potato as well:
 					Res.Add(E_ITEM_POISONOUS_POTATO);
 				}
@@ -116,16 +129,9 @@ private:
 
 
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		const auto BlockBelow = a_Position.addedY(-1);
-
-		if (!cChunkDef::IsValidHeight(BlockBelow))
-		{
-			return false;
-		}
-
-		return a_Chunk.GetBlock(BlockBelow) == E_BLOCK_FARMLAND;
+		return ((a_RelPos.y > 0) && (a_Chunk.GetBlock(a_RelPos.addedY(-1)) == E_BLOCK_FARMLAND));
 	}
 
 
