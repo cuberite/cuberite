@@ -975,7 +975,7 @@ bool cBlockHandler::GetPlacementBlockTypeMeta(
 ) const
 {
 	// By default, all blocks can be placed and the meta is copied over from the item's damage value:
-	a_BlockType = BlockState(m_BlockType);
+	a_BlockType = BlockState(m_BlockType);  // TODO: NONONONONO
 	return true;
 }
 
