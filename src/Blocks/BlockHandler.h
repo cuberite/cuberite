@@ -166,10 +166,6 @@ public:
 	@param a_Meta Meta value of the block currently at a_Pos */
 	virtual bool DoesIgnoreBuildCollision(cChunkInterface & ChunkInterface, const Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const;
 
-	/** Returns if this block drops if it gets destroyed by an unsuitable situation.
-	Default: true */
-	virtual bool DoesDropOnUnsuitable(void) const;
-
 	/** Tests if a_RelPosition is inside the block, where a_RelPosition is relative to the origin of the block.
 	Coords in a_RelPosition are guaranteed to be in the [0..1] range. */
 	virtual bool IsInsideBlock(const Vector3d a_RelPosition, const NIBBLETYPE a_BlockMeta) const;
