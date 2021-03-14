@@ -9,9 +9,9 @@
 
 /** Handler for huge mushroom blocks. */
 class cBlockHugeMushroomHandler final :
-	public cClearMetaOnDrop<cBlockHandler>
+	public cBlockHandler
 {
-	using Super = cClearMetaOnDrop<cBlockHandler>;
+	using Super = cBlockHandler;
 
 public:
 
