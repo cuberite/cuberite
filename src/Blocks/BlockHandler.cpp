@@ -237,7 +237,7 @@ namespace
 	constexpr cDefaultBlockHandler            BlockChorusPlantHandler           (E_BLOCK_CHORUS_PLANT);
 	constexpr cDefaultOreHandler              BlockClayHandler                  (E_BLOCK_CLAY);
 	constexpr cDefaultOreHandler              BlockCoalOreHandler               (E_BLOCK_COAL_ORE);
-	constexpr cBlockStoneHandler              BlockCobblestoneHandler           (E_BLOCK_COBBLESTONE);
+	constexpr cDefaultBlockHandler            BlockCobblestoneHandler           (E_BLOCK_COBBLESTONE);
 	constexpr cBlockStairsHandler             BlockCobblestoneStairsHandler     (E_BLOCK_COBBLESTONE_STAIRS);
 	constexpr cDefaultBlockHandler            BlockCobblestoneWallHandler       (E_BLOCK_COBBLESTONE_WALL);
 	constexpr cBlockCobWebHandler             BlockCobwebHandler                (E_BLOCK_COBWEB);
