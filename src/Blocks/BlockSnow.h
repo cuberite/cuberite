@@ -120,15 +120,6 @@ private:
 
 
 
-	virtual bool DoesDropOnUnsuitable(void) const override
-	{
-		return false;
-	}
-
-
-
-
-
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);

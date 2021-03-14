@@ -494,14 +494,7 @@ void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector
 		return;
 	}
 
-	if (DoesDropOnUnsuitable())
-	{
-		a_ChunkInterface.DropBlockAsPickups(a_BlockPos);
-	}
-	else
-	{
-		a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_AIR, 0);
-	}
+	a_ChunkInterface.DropBlockAsPickups(a_BlockPos);
 }
 
 
@@ -565,15 +558,6 @@ bool cBlockHandler::IsClickedThrough(void) const
 bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const
 {
 	return (m_BlockType == E_BLOCK_AIR);
-}
-
-
-
-
-
-bool cBlockHandler::DoesDropOnUnsuitable(void) const
-{
-	return true;
 }
 
 
