@@ -3,6 +3,7 @@
 #include "../FastRandom.h"
 #include "../BlockArea.h"
 
+#include "../Registries/BlockTypeItemTypeConverter.h"
 
 
 
@@ -19,6 +20,10 @@ class cBlockLeavesHandler final :
 {
 	using Super = cBlockHandler;
 
+public:
+
+	using Super::Super;
+
 	static inline bool IsBlockLeaves(BlockState a_Block)
 	{
 		switch (a_Block.Type())
@@ -33,10 +38,6 @@ class cBlockLeavesHandler final :
 			default: return false;
 		}
 	}
-
-public:
-
-	using Super::Super;
 
 private:
 
@@ -61,21 +62,30 @@ private:
 	static bool HasNearLog(cBlockArea & a_Area, const Vector3i a_BlockPos)
 	{
 		// Filter the blocks into a {leaves, log, other (air)} set:
-		auto * Types = a_Area.GetBlockTypes();
+		auto * Types = a_Area.GetBlocks();
 		for (size_t i = a_Area.GetBlockCount() - 1; i > 0; i--)
 		{
-			switch (Types[i])
+			switch (Types[i].Type())
 			{
-				case E_BLOCK_LEAVES:
-				case E_BLOCK_LOG:
-				case E_BLOCK_NEW_LEAVES:
-				case E_BLOCK_NEW_LOG:
+				case BlockType::AcaciaLeaves:
+				case BlockType::BirchLeaves:
+				case BlockType::DarkOakLeaves:
+				case BlockType::JungleLeaves:
+				case BlockType::OakLeaves:
+				case BlockType::SpruceLeaves:
+
+				case BlockType::AcaciaLog:
+				case BlockType::BirchLog:
+				case BlockType::DarkOakLog:
+				case BlockType::JungleLog:
+				case BlockType::OakLog:
+				case BlockType::SpruceLog:
 				{
 					break;
 				}
 				default:
 				{
-					Types[i] = E_BLOCK_AIR;
+					Types[i] = Block::Air::Air();
 					break;
 				}
 			}
@@ -125,12 +135,12 @@ private:
 		return false;
 	}
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// If breaking with shears, drop self:
 		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == E_ITEM_SHEARS))
 		{
-			return cItem(m_BlockType, 1, a_BlockMeta & 0x03);
+			return cItem(BlockItemConverter::(m_BlockType), 1);
 		}
 
 
@@ -251,9 +261,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 7;
 	}
 } ;

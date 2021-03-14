@@ -81,8 +81,7 @@ protected:
 cEnderman::cEnderman(void) :
 	Super("Enderman", mtEnderman, "entity.endermen.hurt", "entity.endermen.death", "entity.endermen.ambient", 0.5, 2.9),
 	m_bIsScreaming(false),
-	m_CarriedBlock(E_BLOCK_AIR),
-	m_CarriedMeta(0)
+	m_CarriedBlock(Block::Air::Air())
 {
 }
 

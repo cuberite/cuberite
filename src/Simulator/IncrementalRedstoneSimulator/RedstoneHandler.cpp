@@ -132,7 +132,7 @@
 				return TripwireHookHandler::Callback; \
 			default: \
 			{ \
-				if (cBlockDoorHandler::IsDoorBlockType(a_Block)) \
+				if (cBlockDoorHandler::IsBlockDoor(a_Block)) \
 				{ \
 					return DoorHandler::Callback; \
 				} \

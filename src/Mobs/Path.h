@@ -195,7 +195,7 @@ private:
 	/* High level world queries */
 	bool IsWalkable(const Vector3i & a_Location, const Vector3i & a_Source);
 	bool BodyFitsIn(const Vector3i & a_Location, const Vector3i & a_Source);
-	bool BlockTypeIsSpecial(BlockType a_Type);
+	bool BlockTypeIsSpecial(BlockState a_Block);
 	bool SpecialIsSolidFromThisDirection(BlockState a_Block, const Vector3i & a_Direction);
 	bool HasSolidBelow(const Vector3i & a_Location);
 	#ifdef COMPILING_PATHFIND_DEBUGGER

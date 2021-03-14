@@ -51,7 +51,7 @@ namespace DoorHandler
 			}
 
 			auto AboveBlock = a_Chunk.GetBlock(TopPosition);
-			if (!cBlockDoorHandler::IsDoorBlockType(AboveBlock))
+			if (!cBlockDoorHandler::IsBlockDoor(AboveBlock))
 			{
 				return;
 			}

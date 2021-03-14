@@ -35,6 +35,48 @@ public:
 		}
 	}
 
+
+
+
+	static inline BlockState ToggleTrapdoor(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaTrapdoor:  return AcaciaTrapdoor::AcaciaTrapdoor  (AcaciaTrapdoor::Facing(a_Block),  AcaciaTrapdoor::Half(a_Block),  !AcaciaTrapdoor::Open(a_Block),  AcaciaTrapdoor::Powered(a_Block));
+			case BlockType::BirchTrapdoor:   return BirchTrapdoor::BirchTrapdoor    (BirchTrapdoor::Facing(a_Block),   BirchTrapdoor::Half(a_Block),   !BirchTrapdoor::Open(a_Block),   BirchTrapdoor::Powered(a_Block));
+			case BlockType::CrimsonTrapdoor: return CrimsonTrapdoor::CrimsonTrapdoor(CrimsonTrapdoor::Facing(a_Block), CrimsonTrapdoor::Half(a_Block), !CrimsonTrapdoor::Open(a_Block), CrimsonTrapdoor::Powered(a_Block));
+			case BlockType::DarkOakTrapdoor: return DarkOakTrapdoor::DarkOakTrapdoor(DarkOakTrapdoor::Facing(a_Block), DarkOakTrapdoor::Half(a_Block), !DarkOakTrapdoor::Open(a_Block), DarkOakTrapdoor::Powered(a_Block));
+			case BlockType::IronTrapdoor:    return IronTrapdoor::IronTrapdoor      (IronTrapdoor::Facing(a_Block),    IronTrapdoor::Half(a_Block),    !IronTrapdoor::Open(a_Block),    IronTrapdoor::Powered(a_Block));
+			case BlockType::JungleTrapdoor:  return JungleTrapdoor::JungleTrapdoor  (JungleTrapdoor::Facing(a_Block),  JungleTrapdoor::Half(a_Block),  !JungleTrapdoor::Open(a_Block),  JungleTrapdoor::Powered(a_Block));
+			case BlockType::OakTrapdoor:     return OakTrapdoor::OakTrapdoor        (OakTrapdoor::Facing(a_Block),     OakTrapdoor::Half(a_Block),     !OakTrapdoor::Open(a_Block),     OakTrapdoor::Powered(a_Block));
+			case BlockType::SpruceTrapdoor:  return SpruceTrapdoor::SpruceTrapdoor  (SpruceTrapdoor::Facing(a_Block),  SpruceTrapdoor::Half(a_Block),  !SpruceTrapdoor::Open(a_Block),  SpruceTrapdoor::Powered(a_Block));
+			case BlockType::WarpedTrapdoor:  return WarpedTrapdoor::WarpedTrapdoor  (WarpedTrapdoor::Facing(a_Block),  WarpedTrapdoor::Half(a_Block),  !WarpedTrapdoor::Open(a_Block),  WarpedTrapdoor::Powered(a_Block));
+			default: return a_Block;
+		}
+	}
+
+
+
+
+	static inline BlockState ToggleTrapdoorPower(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaTrapdoor:  return AcaciaTrapdoor::AcaciaTrapdoor  (AcaciaTrapdoor::Facing(a_Block),  AcaciaTrapdoor::Half(a_Block),  AcaciaTrapdoor::Open(a_Block),  !AcaciaTrapdoor::Powered(a_Block));
+			case BlockType::BirchTrapdoor:   return BirchTrapdoor::BirchTrapdoor    (BirchTrapdoor::Facing(a_Block),   BirchTrapdoor::Half(a_Block),   BirchTrapdoor::Open(a_Block),   !BirchTrapdoor::Powered(a_Block));
+			case BlockType::CrimsonTrapdoor: return CrimsonTrapdoor::CrimsonTrapdoor(CrimsonTrapdoor::Facing(a_Block), CrimsonTrapdoor::Half(a_Block), CrimsonTrapdoor::Open(a_Block), !CrimsonTrapdoor::Powered(a_Block));
+			case BlockType::DarkOakTrapdoor: return DarkOakTrapdoor::DarkOakTrapdoor(DarkOakTrapdoor::Facing(a_Block), DarkOakTrapdoor::Half(a_Block), DarkOakTrapdoor::Open(a_Block), !DarkOakTrapdoor::Powered(a_Block));
+			case BlockType::IronTrapdoor:    return IronTrapdoor::IronTrapdoor      (IronTrapdoor::Facing(a_Block),    IronTrapdoor::Half(a_Block),    IronTrapdoor::Open(a_Block),    !IronTrapdoor::Powered(a_Block));
+			case BlockType::JungleTrapdoor:  return JungleTrapdoor::JungleTrapdoor  (JungleTrapdoor::Facing(a_Block),  JungleTrapdoor::Half(a_Block),  JungleTrapdoor::Open(a_Block),  !JungleTrapdoor::Powered(a_Block));
+			case BlockType::OakTrapdoor:     return OakTrapdoor::OakTrapdoor        (OakTrapdoor::Facing(a_Block),     OakTrapdoor::Half(a_Block),     OakTrapdoor::Open(a_Block),     !OakTrapdoor::Powered(a_Block));
+			case BlockType::SpruceTrapdoor:  return SpruceTrapdoor::SpruceTrapdoor  (SpruceTrapdoor::Facing(a_Block),  SpruceTrapdoor::Half(a_Block),  SpruceTrapdoor::Open(a_Block),  !SpruceTrapdoor::Powered(a_Block));
+			case BlockType::WarpedTrapdoor:  return WarpedTrapdoor::WarpedTrapdoor  (WarpedTrapdoor::Facing(a_Block),  WarpedTrapdoor::Half(a_Block),  WarpedTrapdoor::Open(a_Block),  !WarpedTrapdoor::Powered(a_Block));
+			default: return a_Block;
+		}
+	}
+
 private:
 
 	virtual bool IsUseable(void) const override
@@ -55,15 +97,15 @@ private:
 		const Vector3i a_CursorPos
 	) const override
 	{
-		if (m_BlockType == E_BLOCK_IRON_TRAPDOOR)
+		if (m_BlockType == BlockType::IronTrapdoor)
 		{
 			// Iron doors can only be toggled by redstone, not by right-clicking
 			return false;
 		}
 
 		// Flip the ON bit on / off using the XOR bitwise operation
-		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockPos) ^ 0x04);
-		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
+		auto Self = a_ChunkInterface.GetBlock(a_BlockPos);
+		a_ChunkInterface.SetBlock(a_BlockPos, ToggleTrapdoor(Self));
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
 
 		return true;
@@ -95,95 +137,136 @@ private:
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState & a_Block
 	) const override
 	{
-		if (a_ClickedBlockFace == BLOCK_FACE_YP)
+		bool IsBottom = false;
+		eBlockFace DestFacing;
+		switch (a_ClickedBlockFace)
 		{
-			// Trapdoor is placed on top of a block.
-			// Engage yaw rotation to determine hinge direction:
-			return Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta);
-		}
-		else if (a_ClickedBlockFace == BLOCK_FACE_YM)
-		{
-			// Trapdoor is placed on bottom of a block.
-			// Engage yaw rotation to determine hinge direction:
-			if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta))
+			case BLOCK_FACE_NONE: return false;
+
+			// Clicked one of the sides
+			case BLOCK_FACE_XM:
+			case BLOCK_FACE_XP:
+			case BLOCK_FACE_ZM:
+			case BLOCK_FACE_ZP:
 			{
-				return false;
+				if (a_CursorPos.y < 8)
+				{
+					// Trapdoor is placed on a higher half of a vertical block.
+					IsBottom = true;
+				}
+				DestFacing = MirrorBlockFaceY(a_ClickedBlockFace);
+				break;
 			}
-
-			// Toggle 'Move up half-block' bit on:
-			a_BlockMeta |= 0x8;
-
-			return true;
+			case BLOCK_FACE_YM:
+			{
+				IsBottom = true;
+				DestFacing = RotationToBlockFace(a_Player.GetYaw());
+				break;
+			}
+			case BLOCK_FACE_YP:
+				break;
 		}
 
-		// Placement on block sides; hinge direction is determined by which side was clicked:
-		a_BlockType = m_BlockType;
-		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
+		using namespace Block;
 
-		if (a_CursorPos.y > 7)
+		switch (m_BlockType)
 		{
-			// Trapdoor is placed on a higher half of a vertical block.
-			// Toggle 'Move up half-block' bit on:
-			a_BlockMeta |= 0x8;
+			case BlockType::AcaciaTrapdoor:
+			{
+				a_Block = AcaciaTrapdoor::AcaciaTrapdoor(
+					DestFacing,
+					IsBottom ? AcaciaTrapdoor::Half::Bottom : AcaciaTrapdoor::Half::Top,
+					false, false);
+				return true;
+			}
+			case BlockType::BirchTrapdoor:
+			{
+				a_Block = BirchTrapdoor::BirchTrapdoor(
+						DestFacing,
+						IsBottom ? BirchTrapdoor::Half::Bottom : BirchTrapdoor::Half::Top,
+						false, false);
+				return true;
+			}
+			case BlockType::CrimsonTrapdoor:
+			{
+				a_Block = CrimsonTrapdoor::CrimsonTrapdoor(
+						DestFacing,
+						IsBottom ? CrimsonTrapdoor::Half::Bottom : CrimsonTrapdoor::Half::Top,
+						false, false);
+				return true;
+			}
+			case BlockType::DarkOakTrapdoor:
+			{
+				a_Block = DarkOakTrapdoor::DarkOakTrapdoor(
+						DestFacing,
+						IsBottom ? DarkOakTrapdoor::Half::Bottom : DarkOakTrapdoor::Half::Top,
+						false, false);
+				return true;
+			}
+			case BlockType::IronTrapdoor:
+			{
+				a_Block = IronTrapdoor::IronTrapdoor(
+						DestFacing,
+						IsBottom ? IronTrapdoor::Half::Bottom : IronTrapdoor::Half::Top,
+						false, false);
+				return true;
+			}
+			case BlockType::JungleTrapdoor:
+			{
+				a_Block = JungleTrapdoor::JungleTrapdoor(
+						DestFacing,
+						IsBottom ? JungleTrapdoor::Half::Bottom : JungleTrapdoor::Half::Top,
+						false, false);
+				return true;
+			}
+			case BlockType::OakTrapdoor:
+			{
+				a_Block = OakTrapdoor::OakTrapdoor(
+						DestFacing,
+						IsBottom ? OakTrapdoor::Half::Bottom : OakTrapdoor::Half::Top,
+						false, false);
+				return true;
+			}
+			case BlockType::SpruceTrapdoor:
+			{
+				a_Block = SpruceTrapdoor::SpruceTrapdoor(
+						DestFacing,
+						IsBottom ? SpruceTrapdoor::Half::Bottom : SpruceTrapdoor::Half::Top,
+						false, false);
+				return true;
+			}
+			case BlockType::WarpedTrapdoor:
+			{
+				a_Block = WarpedTrapdoor::WarpedTrapdoor(
+						DestFacing,
+						IsBottom ? WarpedTrapdoor::Half::Bottom : WarpedTrapdoor::Half::Top,
+						false, false);
+				return true;
+			}
+			default: return false;
 		}
-
-		return true;
 	}
 
 
 
 
-
-	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
-	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_ZP: return 0x1;
-			case BLOCK_FACE_ZM: return 0x0;
-			case BLOCK_FACE_XP: return 0x3;
-			case BLOCK_FACE_XM: return 0x2;
-			default:
-			{
-				ASSERT(!"Unhandled block face!");
-				return 0;
-			}
-		}
-	}
-
-
-
-
-
-	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
-	{
-		switch (a_Meta & 0x3)
-		{
-			case 0x0: return BLOCK_FACE_ZM;
-			case 0x1: return BLOCK_FACE_ZP;
-			case 0x2: return BLOCK_FACE_XM;
-			case 0x3: return BLOCK_FACE_XP;
-			default:
-			{
-				ASSERT(!"Unhandled block meta!");
-				return BLOCK_FACE_NONE;
-			}
-		}
-	}
-
-
-
-
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
 		UNUSED(a_Meta);
 		switch (m_BlockType)
 		{
-			case E_BLOCK_TRAPDOOR: return 13;
-			case E_BLOCK_IRON_TRAPDOOR: return 6;
+			case BlockType::AcaciaTrapdoor:  return 15;
+			case BlockType::BirchTrapdoor:   return 2;
+			case BlockType::CrimsonTrapdoor: return 35;
+			case BlockType::DarkOakTrapdoor: return 26;
+			case BlockType::IronTrapdoor:    return 6;
+			case BlockType::JungleTrapdoor:  return 10;
+			case BlockType::OakTrapdoor:     return 13;
+			case BlockType::SpruceTrapdoor:  return 26;
+			case BlockType::WarpedTrapdoor:  return 56;
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in trapdoor handler!");

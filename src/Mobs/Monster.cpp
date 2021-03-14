@@ -22,7 +22,8 @@
 
 #include "PathFinder.h"
 #include "../Entities/LeashKnot.h"
-
+#include "../Protocol/Palettes/Upgrade.h"
+#include "../Blocks/BlockLeaves.h"
 
 
 /** Map for eType <-> string
@@ -865,15 +866,13 @@ void cMonster::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				return;
 			}
 
-			BLOCKTYPE BlockType;
-			NIBBLETYPE BlockMeta;
 			int RelX = static_cast<int>(Destination.x) - Chunk->GetPosX() * cChunkDef::Width;
 			int RelZ = static_cast<int>(Destination.z) - Chunk->GetPosZ() * cChunkDef::Width;
 			int YBelowUs = static_cast<int>(Destination.y) - 1;
 			if (YBelowUs >= 0)
 			{
-				Chunk->GetBlockTypeMeta(RelX, YBelowUs, RelZ, BlockType, BlockMeta);
-				if (BlockType != E_BLOCK_STATIONARY_WATER)  // Idle mobs shouldn't enter water on purpose
+				auto BlockToCheck = Chunk->GetBlock(RelX, YBelowUs, RelZ);
+				if ((BlockToCheck.Type() != BlockType::Water) && (Block::Water::Level(BlockToCheck) == 0))  // Idle mobs shouldn't enter water on purpose
 				{
 					MoveToPosition(Destination);
 				}
@@ -1516,6 +1515,25 @@ void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned 
 
 
 
+void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, Item a_Item)
+{
+	auto NumericItem = PaletteUpgrade::ToItem(a_Item);
+	auto Count = GetRandomProvider().RandInt<unsigned int>(a_Min, a_Max);
+	auto MaxStackSize = static_cast<unsigned char>(ItemHandler(NumericItem.first)->GetMaxStackSize());
+	while (Count > MaxStackSize)
+	{
+		a_Drops.emplace_back(a_Item, MaxStackSize);
+		Count -= MaxStackSize;
+	}
+	if (Count > 0)
+	{
+		a_Drops.emplace_back(a_Item, Count);
+	}
+}
+
+
+
+
 
 void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth)
 {
@@ -1653,7 +1671,7 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 	}
 
 	if (
-		(Chunk->GetBlock(Rel) != E_BLOCK_SOULSAND) &&   // Not on soulsand
+		(Chunk->GetBlock(Rel) != BlockType::SoulSand) &&   // Not on soulsand
 		(GetWorld()->GetTimeOfDay() < 12000 + 1000) &&  // Daytime
 		Chunk->IsWeatherSunnyAt(Rel.x, Rel.z) &&        // Not raining
 		!IsInWater()                                    // Isn't swimming
@@ -1671,13 +1689,12 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 		int CurrentBlock = Chunk->GetHeight(Rel.x, Rel.z);
 		while (CurrentBlock > MobHeight)
 		{
-			BLOCKTYPE Block = Chunk->GetBlock(Rel.x, CurrentBlock, Rel.z);
+			auto BlockToCheck = Chunk->GetBlock(Rel.x, CurrentBlock, Rel.z);
 			if (
 				// Do not burn if a block above us meets one of the following conditions:
-				(!cBlockInfo::IsTransparent(Block)) ||
-				(Block == E_BLOCK_LEAVES) ||
-				(Block == E_BLOCK_NEW_LEAVES) ||
-				(IsBlockWater(Block))
+				(!cBlockInfo::IsTransparent(BlockToCheck)) ||
+				(cBlockLeavesHandler::IsBlockLeaves(BlockToCheck)) ||
+				(BlockToCheck.Type() == BlockType::Water)
 			)
 			{
 				return false;

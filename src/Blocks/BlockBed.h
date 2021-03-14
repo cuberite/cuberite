@@ -24,6 +24,31 @@ public:
 
 	using Super::Super;
 
+	static constexpr bool IsBlockBed(BlockState a_Block)
+	{
+		switch(a_Block.Type())
+		{
+			case BlockType::BlackBed:
+			case BlockType::BlueBed:
+			case BlockType::BrownBed:
+			case BlockType::CyanBed:
+			case BlockType::GrayBed:
+			case BlockType::GreenBed:
+			case BlockType::LightBlueBed:
+			case BlockType::LightGrayBed:
+			case BlockType::LimeBed:
+			case BlockType::MagentaBed:
+			case BlockType::OrangeBed:
+			case BlockType::PinkBed:
+			case BlockType::PurpleBed:
+			case BlockType::RedBed:
+			case BlockType::WhiteBed:
+			case BlockType::YellowBed:
+				return true;
+			default: return false;
+		}
+	}
+
 	static Vector3i MetaDataToDirection(NIBBLETYPE a_MetaData)
 	{
 		switch (a_MetaData)
