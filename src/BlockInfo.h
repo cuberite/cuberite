@@ -76,8 +76,6 @@ bool IsBlockRail(BlockState a_Block);
 
 bool IsBlockStateOfDirt(BlockState a_Block);
 
-bool IsBlockFence(BlockState a_Block);
-
 bool IsBlockShulkerBox(BlockState a_Block);
 
 bool IsBlockMaterialWood(BlockState a_Block);

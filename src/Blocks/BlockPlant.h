@@ -43,14 +43,14 @@ protected:
 		{
 			return paGrowth;
 		}
-		NIBBLETYPE Blocklight = a_Chunk.GetBlockLight(a_RelPos);
-		NIBBLETYPE SkyLight   = a_Chunk.GetSkyLight  (a_RelPos);
-		NIBBLETYPE Light = a_Chunk.GetTimeAlteredLight(SkyLight);
+		LIGHTTYPE BlockLight = a_Chunk.GetBlockLight(a_RelPos);
+		LIGHTTYPE SkyLight   = a_Chunk.GetSkyLight  (a_RelPos);
+		LIGHTTYPE Light      = a_Chunk.GetTimeAlteredLight(SkyLight);
 
 		// If the amount of light provided by blocks is greater than the sky light, use it instead
-		if (Blocklight > Light)
+		if (BlockLight > Light)
 		{
-			Light = Blocklight;
+			Light = BlockLight;
 		}
 
 		// Based on light levels, decide between growth, stay and death:
@@ -58,7 +58,7 @@ protected:
 		{
 			return paGrowth;
 		}
-		else if ((Blocklight < 9) && (SkyLight < 9))
+		else if ((BlockLight < 9) && (SkyLight < 9))
 		{
 			return paDeath;
 		}

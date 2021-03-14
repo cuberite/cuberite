@@ -32,7 +32,7 @@ public:
 			return true;
 		}
 		// Doors can also be placed on other doors
-		else if (IsDoorBlockType(a_Block))
+		else if (IsBlockDoor(a_Block))
 		{
 			return true;
 		}
@@ -126,7 +126,7 @@ public:
 	}
 
 	/** Returns true if the specified BlockType is any kind of door */
-	inline static bool IsDoorBlockType(BlockState a_Block)
+	inline static bool IsBlockDoor(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -207,7 +207,7 @@ public:
 	static void SetOpen(cChunkInterface & a_ChunkInterface, const Vector3i a_BlockPos, bool a_Open)
 	{
 		auto Block = a_ChunkInterface.GetBlock(a_BlockPos);
-		if (!IsDoorBlockType(Block))
+		if (!IsBlockDoor(Block))
 		{
 			return;
 		}
