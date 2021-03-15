@@ -32,11 +32,12 @@ public:
 
 protected:
 
-	virtual void SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) override;
-	virtual void SendHideTitle    (void) override;
-	virtual void SendResetTitle   (void) override;
-	virtual void SendSpawnMob     (const cMonster & a_Mob) override;
-	virtual void SendTitleTimes   (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
+	virtual void SendCollectEntity    (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) override;
+	virtual void SendHideTitle        (void) override;
+	virtual void SendResetTitle       (void) override;
+	virtual void SendSpawnMob         (const cMonster & a_Mob) override;
+	virtual void SendTitleTimes       (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
+	virtual void SendUpdateBlockEntity(cBlockEntity & a_BlockEntity) override;
 
 	/** Returns 1.11. */
 	virtual Version GetProtocolVersion() override;
@@ -46,9 +47,9 @@ protected:
 
 	virtual void HandlePacketBlockPlace   (cByteBuffer & a_ByteBuffer) override;
 
+	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) override;
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override;
-	virtual void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity) override;
 };
 
 

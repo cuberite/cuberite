@@ -223,6 +223,9 @@ protected:
 	/** Sends the entity type and entity-dependent data required for the entity to initially spawn. */
 	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData);
 
+	/** Writes the block entity data for the specified block entity into the packet. */
+	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity);
+
 	/** Writes the item data into a packet. */
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
 
@@ -234,9 +237,6 @@ protected:
 
 	/** Writes the entity properties for the specified entity, including the Count field. */
 	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity);
-
-	/** Writes the block entity data for the specified block entity into the packet. */
-	virtual void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
 
 private:
 
