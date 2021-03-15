@@ -12,6 +12,7 @@
 #include "../UUID.h"
 #include "FastNBT.h"
 
+#include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BedEntity.h"
 #include "../BlockEntities/BrewingstandEntity.h"
@@ -205,6 +206,11 @@ public:
 		// Add tile-entity into NBT:
 		switch (a_Entity->GetBlockType())
 		{
+			// Banners:
+			case E_BLOCK_STANDING_BANNER:
+			case E_BLOCK_WALL_BANNER:       AddBannerEntity         (static_cast<cBannerEntity *>         (a_Entity)); break;
+
+			// Others:
 			case E_BLOCK_BEACON:            AddBeaconEntity         (static_cast<cBeaconEntity *>         (a_Entity)); break;
 			case E_BLOCK_BED:               AddBedEntity            (static_cast<cBedEntity *>            (a_Entity)); break;
 			case E_BLOCK_BREWING_STAND:     AddBrewingstandEntity   (static_cast<cBrewingstandEntity *>   (a_Entity)); break;
@@ -226,7 +232,6 @@ public:
 			case E_BLOCK_SIGN_POST:         AddSignEntity           (static_cast<cSignEntity *>           (a_Entity)); break;
 			case E_BLOCK_TRAPPED_CHEST:     AddChestEntity          (static_cast<cChestEntity *>          (a_Entity), a_Entity->GetBlockType()); break;
 			case E_BLOCK_WALLSIGN:          AddSignEntity           (static_cast<cSignEntity *>           (a_Entity)); break;
-
 			default:
 			{
 				ASSERT(!"Unhandled block entity saved into Anvil");
@@ -360,6 +365,18 @@ public:
 		mWriter.AddInt   ("y",  a_Entity->GetPosY());
 		mWriter.AddInt   ("z",  a_Entity->GetPosZ());
 		mWriter.AddString("id", a_EntityTypeID);
+	}
+
+
+
+
+
+	void AddBannerEntity(cBannerEntity * a_Entity)
+	{
+		mWriter.BeginCompound("");
+			AddBasicTileEntity(a_Entity,"Banner");
+			mWriter.AddInt("Base", static_cast<int>(a_Entity->GetBaseColor()));
+		mWriter.EndCompound();
 	}
 
 

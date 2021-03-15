@@ -45,6 +45,7 @@ Implements the 1.9 protocol classes:
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/HorseWindow.h"
 
+#include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
@@ -1625,6 +1626,18 @@ void cProtocol_1_9_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 
 	switch (a_BlockEntity.GetBlockType())
 	{
+		case E_BLOCK_WALL_BANNER:
+		case E_BLOCK_STANDING_BANNER:
+		{
+			auto & BannerEntity = static_cast<const cBannerEntity &>(a_BlockEntity);
+			Writer.AddInt("x", BannerEntity.GetPosX());
+			Writer.AddInt("y", BannerEntity.GetPosY());
+			Writer.AddInt("z", BannerEntity.GetPosZ());
+			Writer.AddString("id", "Banner");
+			Writer.AddInt("Base", static_cast<Int32>(BannerEntity.GetBaseColor()));
+			break;
+		}
+
 		case E_BLOCK_BEACON:
 		{
 			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);

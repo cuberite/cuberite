@@ -42,6 +42,7 @@ Implements the 1.8 protocol classes:
 #include "../UI/Window.h"
 #include "../UI/HorseWindow.h"
 
+#include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/EnchantingTableEntity.h"
@@ -1603,13 +1604,14 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	Byte Action = 0;
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_MOB_SPAWNER:       Action = 1; break;  // Update mob spawner spinny mob thing
-		case E_BLOCK_COMMAND_BLOCK:     Action = 2; break;  // Update command block text
-		case E_BLOCK_BEACON:            Action = 3; break;  // Update beacon entity
-		case E_BLOCK_HEAD:              Action = 4; break;  // Update Mobhead entity
-		case E_BLOCK_FLOWER_POT:        Action = 5; break;  // Update flower pot
-		case E_BLOCK_BED:               Action = 11; break;  // Update bed color
-
+		case E_BLOCK_MOB_SPAWNER:     Action = 1; break;  // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK:   Action = 2; break;  // Update command block text
+		case E_BLOCK_BEACON:          Action = 3; break;  // Update beacon entity
+		case E_BLOCK_HEAD:            Action = 4; break;  // Update Mobhead entity
+		case E_BLOCK_FLOWER_POT:      Action = 5; break;  // Update flower pot
+		case E_BLOCK_WALL_BANNER:
+		case E_BLOCK_STANDING_BANNER: Action = 6; break;  // Update Banner
+		case E_BLOCK_BED:             Action = 11; break;  // Update bed color
 		case E_BLOCK_ENCHANTMENT_TABLE: Action = 0; break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
 		case E_BLOCK_END_PORTAL:        Action = 0; break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
 
@@ -3217,6 +3219,18 @@ void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity &
 
 	switch (a_BlockEntity.GetBlockType())
 	{
+		case E_BLOCK_WALL_BANNER:
+		case E_BLOCK_STANDING_BANNER:
+		{
+			auto & BannerEntity = static_cast<const cBannerEntity &>(a_BlockEntity);
+			Writer.AddInt("x", BannerEntity.GetPosX());
+			Writer.AddInt("y", BannerEntity.GetPosY());
+			Writer.AddInt("z", BannerEntity.GetPosZ());
+			Writer.AddString("id", "Banner");
+			Writer.AddInt("Base", static_cast<Int32>(BannerEntity.GetBaseColor()));
+			break;
+		}
+
 		case E_BLOCK_BEACON:
 		{
 			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../Registries/Statistics.h"
-#include "../Mobs/MonsterTypes.h"
+#include "Defines.h"
+#include "Mobs/MonsterTypes.h"
+#include "Registries/Statistics.h"
 
 namespace NamespaceSerializer
 {
@@ -16,6 +17,7 @@ namespace NamespaceSerializer
 
 	std::string_view From(Statistic a_ID);
 	std::string_view From(eMonsterType a_ID);
+	std::string_view From(BannerPattern a_ID);
 
 	Statistic ToCustomStatistic(std::string_view a_ID);
 	eMonsterType ToMonsterType(std::string_view a_ID);
