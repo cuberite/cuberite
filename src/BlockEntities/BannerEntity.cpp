@@ -33,6 +33,33 @@ cBannerEntity::cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vect
 
 
 
+unsigned char cBannerEntity::GetBaseColor() const
+{
+	return m_BaseColor;
+}
+
+
+
+
+
+void cBannerEntity::SetBaseColor(const unsigned char a_Color)
+{
+	m_BaseColor = a_Color;
+}
+
+
+
+
+
+cItems cBannerEntity::ConvertToPickups() const
+{
+	return cItem(E_ITEM_BANNER, 1, static_cast<NIBBLETYPE>(GetBaseColor()));
+}
+
+
+
+
+
 void cBannerEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
@@ -54,25 +81,8 @@ void cBannerEntity::SendTo(cClientHandle & a_Client)
 
 
 
-cItems cBannerEntity::ConvertToPickups() const
+bool cBannerEntity::UsedBy(cPlayer * a_Player)
 {
-	return cItem(E_ITEM_BANNER, 1, static_cast<NIBBLETYPE>(GetBaseColor()));
-}
-
-
-
-
-
-unsigned char cBannerEntity::GetBaseColor() const
-{
-	return m_BaseColor;
-}
-
-
-
-
-
-void cBannerEntity::SetBaseColor(const unsigned char a_Color)
-{
-	m_BaseColor = a_Color;
+	UNUSED(a_Player);
+	return false;
 }
