@@ -7,6 +7,7 @@
 #include "BlockPluginInterface.h"
 #include "BlockAir.h"
 #include "BlockAnvil.h"
+#include "BlockBanner.h"
 #include "BlockBed.h"
 #include "BlockBigFlower.h"
 #include "BlockBookShelf.h"
@@ -1004,14 +1005,7 @@ void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector
 		return;
 	}
 
-	if (DoesDropOnUnsuitable())
-	{
-		a_ChunkInterface.DropBlockAsPickups(a_BlockPos);
-	}
-	else
-	{
-		a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_AIR, 0);
-	}
+	a_ChunkInterface.DropBlockAsPickups(a_BlockPos);
 }
 
 
@@ -1081,16 +1075,7 @@ bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface,
 
 
 
-bool cBlockHandler::DoesDropOnUnsuitable(void) const
-{
-	return true;
-}
-
-
-
-
-
-bool cBlockHandler::IsInsideBlock(const Vector3d a_RelPosition, const BlockState a_BlockMeta) const
+bool cBlockHandler::IsInsideBlock(const Vector3d a_RelPosition, const NIBBLETYPE a_BlockMeta) const
 {
 	// Default functionality: Test the height, since we assume full voxels with varying height
 	return (a_RelPosition.y < cBlockInfo::GetBlockHeight(m_BlockType));

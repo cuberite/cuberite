@@ -1308,7 +1308,7 @@ void cEntity::DetectCacti(void)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				if (GetWorld()->GetBlock(x, y, z) == E_BLOCK_CACTUS)
+				if (GetWorld()->GetBlock({ x, y, z }) == E_BLOCK_CACTUS)
 				{
 					TakeDamage(dtCactusContact, nullptr, 1, 0);
 					return;
@@ -1337,7 +1337,7 @@ void cEntity::DetectMagma(void)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				if (GetWorld()->GetBlock(x, y, z) == E_BLOCK_MAGMA)
+				if (GetWorld()->GetBlock({ x, y, z }) == E_BLOCK_MAGMA)
 				{
 					TakeDamage(dtMagmaContact, nullptr, 1, 0);
 					return;
@@ -1367,10 +1367,9 @@ bool cEntity::DetectPortal()
 		return false;
 	}
 
-	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
-	if (cChunkDef::IsValidHeight(Y))
+	if (const auto Position = m_Position.Floor(); cChunkDef::IsValidHeight(Position.y))
 	{
-		switch (GetWorld()->GetBlock(X, Y, Z))
+		switch (GetWorld()->GetBlock(Position))
 		{
 			case E_BLOCK_NETHER_PORTAL:
 			{

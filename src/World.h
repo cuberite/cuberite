@@ -365,19 +365,9 @@ public:
 	/** Calls the callback for each loaded chunk. Returns true if all chunks have been processed successfully */
 	bool ForEachLoadedChunk(cFunctionRef<bool(int, int)> a_Callback);
 
-	// tolua_begin
-
 	/** Sets the block at the specified coords to the specified value.
 	Full processing, incl. updating neighbors, is performed. */
 	void SetBlock(Vector3i a_BlockPos, BlockState a_Block);
-
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Sets the block at the specified coords to the specified value.
-	Full processing, incl. updating neighbors, is performed. */
-	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BlockState a_Block)
-	{
-		return SetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_Block);
-	}
 
 	/** Sets the block at the specified coords to the specified value.
 	The replacement doesn't trigger block updates, nor wake up simulators.
@@ -387,15 +377,6 @@ public:
 		m_ChunkMap.FastSetBlock(a_BlockPos, a_Block);
 	}
 
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Sets the block at the specified coords to the specified value.
-	The replacement doesn't trigger block updates, nor wake up simulators.
-	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block) */
-	void FastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BlockState a_Block)
-	{
-		return FastSetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_Block);
-	}
-
 	/** Returns the block type at the specified position.
 	Returns 0 if the chunk is not valid. */
 	BlockState GetBlock(Vector3i a_BlockPos) const
@@ -403,70 +384,19 @@ public:
 		return m_ChunkMap.GetBlock(a_BlockPos);
 	}
 
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Returns the block type at the specified position.
-	Returns 0 if the chunk is not valid. */
-	BlockState GetBlock(int a_BlockX, int a_BlockY, int a_BlockZ) const
-	{
-		return m_ChunkMap.GetBlock({a_BlockX, a_BlockY, a_BlockZ});
-	}
-
 	/** Returns the sky light value at the specified block position.
 	The sky light is "raw" - not affected by time-of-day.
 	Returns 0 if chunk not valid. */
 	LIGHTTYPE GetBlockSkyLight(Vector3i a_BlockPos);
 
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Returns the sky light value at the specified block position.
-	The sky light is "raw" - not affected by time-of-day.
-	Returns 0 if chunk not valid. */
-	LIGHTTYPE GetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ)
-	{
-		return GetBlockSkyLight({a_BlockX, a_BlockY, a_BlockZ});
-	}
-
 	/** Returns the block-light value at the specified block position.
 	Returns 0 if chunk not valid. */
 	LIGHTTYPE GetBlockBlockLight(Vector3i a_BlockPos);
-
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Returns the block-light value at the specified block position.
-	Returns 0 if chunk not valid. */
-	LIGHTTYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ)
-	{
-		return GetBlockBlockLight({a_BlockX, a_BlockY, a_BlockZ});
-	}
-
-	// tolua_end
-
-	/** Retrieves the block type and meta at the specified coords.
-	Stores the result into a_BlockType and a_BlockMeta.
-	Returns true if successful, false if chunk not present.
-	TODO: Export in ManualBindings_World.cpp. */
-	bool GetBlockTypeMeta(Vector3i a_BlockPos, BlockState & a_Block);
-
-	/** OBSOLETE, use the Vector3i-based overload instead.
-	Retrieves the block type and meta at the specified coords.
-	Stores the result into a_BlockType and a_BlockMeta.
-	Returns true if successful, false if chunk not present.
-	Exported in ManualBindings_World.cpp. */
-	bool GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BlockState & a_Block)
-	{
-		return GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, a_Block);
-	}
 
 	/** Queries the whole block specification from the world.
 	Returns true if all block info was retrieved successfully, false if not (invalid chunk / bad position).
 	Exported in ManualBindings_World.cpp. */
 	bool GetBlockInfo(Vector3i a_BlockPos, BlockState & a_Block, LIGHTTYPE & a_SkyLight, LIGHTTYPE & a_BlockLight);
-
-	/** Queries the whole block specification from the world.
-	Returns true if all block info was retrieved successfully, false if not (invalid chunk / bad position).
-	Exported in ManualBindings_World.cpp. */
-	bool GetBlockInfo(int a_BlockX, int a_BlockY, int a_BlockZ, BlockState & a_Block, LIGHTTYPE & a_SkyLight, LIGHTTYPE & a_BlockLight)
-	{
-		return GetBlockInfo({a_BlockX, a_BlockY, a_BlockZ}, a_Block, a_SkyLight, a_BlockLight);
-	}
 
 	// TODO: NIBBLETYPE GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);
 
@@ -663,16 +593,6 @@ public:
 
 	/** Wakes up the simulators for the specified area of blocks */
 	void WakeUpSimulatorsInArea(const cCuboid & a_Area);
-
-	// DEPRECATED, use vector-parametered version instead
-	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
-	{
-		LOGWARNING("cWorld::WakeUpSimulators(int, int, int) is deprecated, use cWorld::WakeUpSimulators(Vector3i) instead.");
-		WakeUpSimulators({a_BlockX, a_BlockY, a_BlockZ});
-	}
-
-	// DEPRECATED, use vector-parametered version instead
-	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
 
 	// tolua_end
 

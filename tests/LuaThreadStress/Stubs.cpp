@@ -196,15 +196,6 @@ bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface,
 
 
 
-bool cBlockHandler::DoesDropOnUnsuitable(void) const
-{
-	return true;
-}
-
-
-
-
-
 void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, Vector3i a_RelPos, cChunk & a_Chunk) const
 {
 }

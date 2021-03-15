@@ -211,6 +211,7 @@ unsigned char cSheep::GenerateNaturalRandomColor(void)
 
 Item cSheep::GetItemFromColor(int a_Color)
 {
+	// TODO(12xx12): replace number with enum constant
 	switch (a_Color)
 	{
 		case 0: return Item::WhiteWool;

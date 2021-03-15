@@ -186,6 +186,11 @@ void cWorld::BroadcastBossBarUpdateHealth(const cEntity & a_Entity, UInt32 a_Uni
 
 void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude, eMessageType a_ChatPrefix)
 {
+	if ((a_ChatPrefix == mtDeath) && !ShouldBroadcastDeathMessages())
+	{
+		return;
+	}
+
 	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendChat(a_Message, a_ChatPrefix);

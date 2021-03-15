@@ -76,7 +76,7 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 
 
 
-void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, std::string_view a_Data)
+void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, ContiguousByteBuffer && a_Data)
 {
 	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and MCS_PROTOCOL_VERSIONS macros in the header file
 
@@ -113,13 +113,13 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 	1. m_Protocol != nullptr: the protocol is supported and we have a handler
 	2. m_Protocol == nullptr: the protocol is unsupported, handling is a special case done by ourselves
 	3. Exception: the data sent were garbage, the client handle deals with it by disconnecting */
-	m_Protocol = TryRecognizeLengthedProtocol(a_Client, a_Data);
+	m_Protocol = TryRecognizeLengthedProtocol(a_Client);
 
 	if (m_Protocol == nullptr)
 	{
 		// Got a server list ping for an unrecognised version,
 		// switch into responding to unknown protocols mode:
-		HandleIncomingData = [this](cClientHandle & a_Clyent, const std::string_view a_In)
+		HandleIncomingData = [this](cClientHandle & a_Clyent, ContiguousByteBuffer && a_In)
 		{
 			HandleIncomingDataInOldPingResponseStage(a_Clyent, a_In);
 		};
@@ -127,9 +127,9 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 	else
 	{
 		// The protocol recogniser succesfully identified, switch mode:
-		HandleIncomingData = [this](cClientHandle &, const std::string_view a_In)
+		HandleIncomingData = [this](cClientHandle &, ContiguousByteBuffer && a_In)
 		{
-			m_Protocol->DataReceived(m_Buffer, a_In.data(), a_In.size());
+			m_Protocol->DataReceived(m_Buffer, std::move(a_In));
 		};
 	}
 
@@ -141,7 +141,7 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 
 
 
-void cMultiVersionProtocol::HandleIncomingDataInOldPingResponseStage(cClientHandle & a_Client, const std::string_view a_Data)
+void cMultiVersionProtocol::HandleIncomingDataInOldPingResponseStage(cClientHandle & a_Client, const ContiguousByteBufferView a_Data)
 {
 	if (!m_Buffer.Write(a_Data.data(), a_Data.size()))
 	{
@@ -215,7 +215,7 @@ void cMultiVersionProtocol::SendDisconnect(cClientHandle & a_Client, const AStri
 
 
 
-std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(cClientHandle & a_Client, const std::string_view a_Data)
+std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(cClientHandle & a_Client)
 {
 	UInt32 PacketType;
 	UInt32 ProtocolVersion;

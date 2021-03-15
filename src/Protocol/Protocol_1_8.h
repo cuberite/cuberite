@@ -36,8 +36,9 @@ public:
 
 	cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State);
 
-	/** Called when client sends some data: */
-	virtual void DataReceived(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size) override;
+	/** Called to process them, when client sends some data.
+	The protocol uses the provided buffers for storage and processing, and must have exclusive access to them. */
+	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer && a_Data) override;
 
 	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
@@ -146,9 +147,6 @@ protected:
 	/** State of the protocol. */
 	State m_State;
 
-	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
-	virtual void AddReceivedData(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size);
-
 	/** Nobody inherits 1.8, so it doesn't use this method */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 
@@ -256,6 +254,9 @@ private:
 
 	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
 	cFile m_CommLogFile;
+
+	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
+	void AddReceivedData(cByteBuffer & a_Buffer, ContiguousByteBufferView a_Data);
 
 	/** Handle a complete packet stored in the given buffer. */
 	void HandlePacket(cByteBuffer & a_Buffer);

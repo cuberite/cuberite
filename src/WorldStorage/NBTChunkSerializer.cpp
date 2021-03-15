@@ -13,6 +13,7 @@
 #include "../BlockInfo.h"
 #include "FastNBT.h"
 
+#include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BedEntity.h"
 #include "../BlockEntities/BrewingstandEntity.h"
@@ -207,6 +208,40 @@ public:
 		// Add tile-entity into NBT:
 		switch (a_Entity->GetBlockType())
 		{
+			case BlockType::BlackBanner:
+			case BlockType::BlueBanner:
+			case BlockType::BrownBanner:
+			case BlockType::CyanBanner:
+			case BlockType::GrayBanner:
+			case BlockType::GreenBanner:
+			case BlockType::LightBlueBanner:
+			case BlockType::LightGrayBanner:
+			case BlockType::LimeBanner:
+			case BlockType::MagentaBanner:
+			case BlockType::OrangeBanner:
+			case BlockType::PinkBanner:
+			case BlockType::PurpleBanner:
+			case BlockType::RedBanner:
+			case BlockType::WhiteBanner:
+			case BlockType::YellowBanner:
+
+			case BlockType::BlackWallBanner:
+			case BlockType::BlueWallBanner:
+			case BlockType::BrownWallBanner:
+			case BlockType::CyanWallBanner:
+			case BlockType::GrayWallBanner:
+			case BlockType::GreenWallBanner:
+			case BlockType::LightBlueWallBanner:
+			case BlockType::LightGrayWallBanner:
+			case BlockType::LimeWallBanner:
+			case BlockType::MagentaWallBanner:
+			case BlockType::OrangeWallBanner:
+			case BlockType::PinkWallBanner:
+			case BlockType::PurpleWallBanner:
+			case BlockType::RedWallBanner:
+			case BlockType::WhiteWallBanner:
+			case BlockType::YellowWallBanner: AddBannerEntity         (static_cast<cBannerEntity *>         (a_Entity)); break;
+
 			case BlockType::Beacon:         AddBeaconEntity         (static_cast<cBeaconEntity *>         (a_Entity)); break;
 			case BlockType::BlackBed:
 			case BlockType::BlueBed:
@@ -223,7 +258,7 @@ public:
 			case BlockType::PurpleBed:
 			case BlockType::RedBed:
 			case BlockType::WhiteBed:
-			case BlockType::YellowBed:      AddBedEntity            (static_cast<cBedEntity *>            (a_Entity)); break;
+			case BlockType::YellowBed:       AddBedEntity            (static_cast<cBedEntity *>            (a_Entity)); break;
 
 
 			case BlockType::BrewingStand:    AddBrewingstandEntity   (static_cast<cBrewingstandEntity *>   (a_Entity)); break;
@@ -407,6 +442,18 @@ public:
 		mWriter.AddInt   ("y",  a_Entity->GetPosY());
 		mWriter.AddInt   ("z",  a_Entity->GetPosZ());
 		mWriter.AddString("id", a_EntityTypeID);
+	}
+
+
+
+
+
+	void AddBannerEntity(cBannerEntity * a_Entity)
+	{
+		mWriter.BeginCompound("");
+			AddBasicTileEntity(a_Entity,"Banner");
+			mWriter.AddInt("Base", static_cast<int>(a_Entity->GetBaseColor()));
+		mWriter.EndCompound();
 	}
 
 

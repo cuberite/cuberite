@@ -48,6 +48,7 @@ typedef unsigned char Byte;
 class cProtocol
 {
 public:
+
 	cProtocol(cClientHandle * a_Client) :
 		m_Client(a_Client),
 		m_OutPacketBuffer(64 KiB),
@@ -354,8 +355,9 @@ public:
 		Game = 3,
 	};
 
-	/** Called when client sends some data */
-	virtual void DataReceived(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size) = 0;
+	/** Called to process them, when client sends some data.
+	The protocol uses the provided buffers for storage and processing, and must have exclusive access to them. */
+	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer && a_Data) = 0;
 
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;

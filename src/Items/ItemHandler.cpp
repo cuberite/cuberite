@@ -10,6 +10,7 @@
 // Handlers:
 #include "ItemArmor.h"
 #include "ItemAxe.h"
+#include "ItemBanner.h"
 #include "ItemBed.h"
 #include "ItemBigFlower.h"
 #include "ItemBoat.h"
@@ -112,6 +113,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		default:                       return new cItemHandler(a_ItemType);
 
 		// Single item per handler, alphabetically sorted:
+		case E_ITEM_BANNER:              return new cItemBannerHandler(a_ItemType);
 		case E_BLOCK_BIG_FLOWER:         return new cItemBigFlowerHandler;
 		case E_BLOCK_CHEST:              return new cItemChestHandler(a_ItemType);
 		case E_BLOCK_ENCHANTMENT_TABLE:  return new cItemEnchantingTableHandler(a_ItemType);

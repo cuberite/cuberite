@@ -76,13 +76,13 @@ public:
 			return false;  // Nothing in range.
 		}
 
-		if (a_World->GetBlockMeta(BlockPos.x, BlockPos.y, BlockPos.z) != 0)
+		if (a_World->GetBlockMeta(BlockPos) != 0)
 		{
 			// Not a source block
 			return false;
 		}
 
-		BLOCKTYPE Block = a_World->GetBlock(BlockPos.x, BlockPos.y, BlockPos.z);
+		BLOCKTYPE Block = a_World->GetBlock(BlockPos);
 		ENUM_ITEM_TYPE NewItemType;
 
 		if (IsBlockWater(Block))

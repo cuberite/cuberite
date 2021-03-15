@@ -159,6 +159,7 @@ protected:
 	The coordinates are used only for the log message. */
 	bool CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, const AStringVector & a_ExpectedTypes, Vector3i a_Pos);
 
+	OwnedBlockEntity LoadBannerFromNBT           (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
 	OwnedBlockEntity LoadBeaconFromNBT           (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
 	OwnedBlockEntity LoadBedFromNBT              (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
 	OwnedBlockEntity LoadBrewingstandFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);

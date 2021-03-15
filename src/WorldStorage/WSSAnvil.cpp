@@ -17,12 +17,12 @@
 #include "../SetChunkData.h"
 #include "../Root.h"
 #include "../BlockType.h"
-#include "../BlockState.h"
 #include "../JsonUtils.h"
 
 #include "../Registries/BlockStates.h"
 #include "../Protocol/Palettes/Upgrade.h"
 
+#include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BedEntity.h"
 #include "../BlockEntities/BrewingstandEntity.h"
@@ -639,6 +639,40 @@ OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int
 	switch (a_Block.Type())
 	{
 		// Specific entity loaders:
+		case BlockType::BlackBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BrownBanner:
+		case BlockType::CyanBanner:
+		case BlockType::GrayBanner:
+		case BlockType::GreenBanner:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LimeBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::OrangeBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::RedBanner:
+		case BlockType::WhiteBanner:
+		case BlockType::YellowBanner:
+
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownWallBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedWallBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowWallBanner: return LoadBannerFromNBT         (a_NBT, a_Tag, a_Block, a_Pos);
+
 		case BlockType::Beacon:          return LoadBeaconFromNBT          (a_NBT, a_Tag, a_Block, a_Pos);
 		case BlockType::BlackBed:
 		case BlockType::BlueBed:
@@ -935,6 +969,29 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 		a_NBT.GetStringView(TagID), a_Pos
 	);
 	return false;
+}
+
+
+
+
+
+OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+{
+	static const AStringVector expectedTypes({"Banner", "minecraft:standingbanner","minecraft:wallbanner"});
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
+	{
+		return nullptr;
+	}
+
+	// Reads base color from NBT
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Base");
+	if (CurrentLine >= 0)
+	{
+		const auto Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
+		return std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color);
+	}
+
+	return nullptr;
 }
 
 

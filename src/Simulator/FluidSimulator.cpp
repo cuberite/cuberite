@@ -164,7 +164,7 @@ Vector3f cFluidSimulator::GetFlowingDirection(Vector3i a_Pos)
 
 	auto Self = m_World.GetBlock(a_Pos);
 
-	if (!IsAllowedBlock(Self))  // No Fluid -> No Flowing direction :D
+	if (!IsAllowedBlock(m_World.GetBlock(a_Pos)))  // No Fluid -> No Flowing direction :D
 	{
 		return {};
 	}
