@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "../Simulator/FireSimulator.h"
 
 
 
@@ -16,6 +17,17 @@ public:
 
 	using Super::Super;
 
+	static inline bool IsBlockLiquid(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Lava:
+			case BlockType::Water:
+				return true;
+			default: return false;
+		}
+	}
+
 	static inline unsigned char GetFalloff (BlockState a_Block)
 	{
 		switch (a_Block.Type())
@@ -26,9 +38,6 @@ public:
 		}
 	}
 
-protected:
-
-	~cBlockFluidHandler() = default;
 
 private:
 
@@ -107,18 +116,19 @@ private:
 		}
 
 		// Try to set it on fire:
-		static Vector3i CrossCoords[] =
+		static std::array<Vector3i, 6> CrossCoords =
 		{
-			{-1,  0,  0},
-			{ 1,  0,  0},
-			{ 0, -1,  0},
-			{ 0,  1,  0},
-			{ 0,  0, -1},
-			{ 0,  0,  1},
-		} ;
-		for (size_t i = 0; i < ARRAYCOUNT(CrossCoords); i++)
+			Vector3i(-1,  0,  0),
+			Vector3i( 1,  0,  0),
+			Vector3i( 0, -1,  0),
+			Vector3i( 0,  1,  0),
+			Vector3i( 0,  0, -1),
+			Vector3i( 0,  0,  1),
+		};
+
+		for (auto CrossCord : CrossCoords)
 		{
-			auto NeighborPos = Pos + CrossCoords[i];
+			auto NeighborPos = Pos + CrossCord;
 			if (
 				cChunkDef::IsValidHeight(NeighborPos.y) &&
 				a_Chunk.UnboundedRelGetBlock(NeighborPos, Self) &&
@@ -158,12 +168,8 @@ private:
 
 	virtual ColourID GetMapBaseColourID() const override
 	{
-		if (IsBlockWater(m_BlockType))
-		{
-			return 12;
-		}
-		ASSERT(!"Unhandled blocktype in fluid/water handler!");
-		return 0;
+		return 12;
+
 	}
 
 	virtual bool CanSustainPlant(BlockType a_Plant) const override

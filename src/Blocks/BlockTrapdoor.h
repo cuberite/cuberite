@@ -166,8 +166,7 @@ private:
 				DestFacing = RotationToBlockFace(a_Player.GetYaw());
 				break;
 			}
-			case BLOCK_FACE_YP:
-				break;
+			case BLOCK_FACE_YP: break;
 		}
 
 		using namespace Block;
@@ -185,65 +184,65 @@ private:
 			case BlockType::BirchTrapdoor:
 			{
 				a_Block = BirchTrapdoor::BirchTrapdoor(
-						DestFacing,
-						IsBottom ? BirchTrapdoor::Half::Bottom : BirchTrapdoor::Half::Top,
-						false, false);
+					DestFacing,
+					IsBottom ? BirchTrapdoor::Half::Bottom : BirchTrapdoor::Half::Top,
+					false, false);
 				return true;
 			}
 			case BlockType::CrimsonTrapdoor:
 			{
 				a_Block = CrimsonTrapdoor::CrimsonTrapdoor(
-						DestFacing,
-						IsBottom ? CrimsonTrapdoor::Half::Bottom : CrimsonTrapdoor::Half::Top,
-						false, false);
+					DestFacing,
+					IsBottom ? CrimsonTrapdoor::Half::Bottom : CrimsonTrapdoor::Half::Top,
+					false, false);
 				return true;
 			}
 			case BlockType::DarkOakTrapdoor:
 			{
 				a_Block = DarkOakTrapdoor::DarkOakTrapdoor(
-						DestFacing,
-						IsBottom ? DarkOakTrapdoor::Half::Bottom : DarkOakTrapdoor::Half::Top,
-						false, false);
+					DestFacing,
+					IsBottom ? DarkOakTrapdoor::Half::Bottom : DarkOakTrapdoor::Half::Top,
+					false, false);
 				return true;
 			}
 			case BlockType::IronTrapdoor:
 			{
 				a_Block = IronTrapdoor::IronTrapdoor(
-						DestFacing,
-						IsBottom ? IronTrapdoor::Half::Bottom : IronTrapdoor::Half::Top,
-						false, false);
+					DestFacing,
+					IsBottom ? IronTrapdoor::Half::Bottom : IronTrapdoor::Half::Top,
+					false, false);
 				return true;
 			}
 			case BlockType::JungleTrapdoor:
 			{
 				a_Block = JungleTrapdoor::JungleTrapdoor(
-						DestFacing,
-						IsBottom ? JungleTrapdoor::Half::Bottom : JungleTrapdoor::Half::Top,
-						false, false);
+					DestFacing,
+					IsBottom ? JungleTrapdoor::Half::Bottom : JungleTrapdoor::Half::Top,
+					false, false);
 				return true;
 			}
 			case BlockType::OakTrapdoor:
 			{
 				a_Block = OakTrapdoor::OakTrapdoor(
-						DestFacing,
-						IsBottom ? OakTrapdoor::Half::Bottom : OakTrapdoor::Half::Top,
-						false, false);
+					DestFacing,
+					IsBottom ? OakTrapdoor::Half::Bottom : OakTrapdoor::Half::Top,
+					false, false);
 				return true;
 			}
 			case BlockType::SpruceTrapdoor:
 			{
 				a_Block = SpruceTrapdoor::SpruceTrapdoor(
-						DestFacing,
-						IsBottom ? SpruceTrapdoor::Half::Bottom : SpruceTrapdoor::Half::Top,
-						false, false);
+					DestFacing,
+					IsBottom ? SpruceTrapdoor::Half::Bottom : SpruceTrapdoor::Half::Top,
+					false, false);
 				return true;
 			}
 			case BlockType::WarpedTrapdoor:
 			{
 				a_Block = WarpedTrapdoor::WarpedTrapdoor(
-						DestFacing,
-						IsBottom ? WarpedTrapdoor::Half::Bottom : WarpedTrapdoor::Half::Top,
-						false, false);
+					DestFacing,
+					IsBottom ? WarpedTrapdoor::Half::Bottom : WarpedTrapdoor::Half::Top,
+					false, false);
 				return true;
 			}
 			default: return false;

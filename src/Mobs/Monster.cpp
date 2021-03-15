@@ -1515,6 +1515,7 @@ void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned 
 
 
 
+
 void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, Item a_Item)
 {
 	auto NumericItem = PaletteUpgrade::ToItem(a_Item);

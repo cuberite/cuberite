@@ -17,6 +17,7 @@ Implements the 1.9 protocol classes:
 #include "Protocol_1_9.h"
 #include "../mbedTLS++/Sha1Checksum.h"
 #include "Packetizer.h"
+#include "Palettes/Upgrade.h"
 
 #include "../ClientHandle.h"
 #include "../Root.h"

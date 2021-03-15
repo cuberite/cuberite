@@ -95,11 +95,9 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// The base class tick destroyed us
 		return;
 	}
-	int PosX = POSX_TOINT;
-	int PosY = POSY_TOINT - 1;
-	int PosZ = POSZ_TOINT;
+	auto Pos = POS_TOINT.addedY(-1);
 
-	if ((PosY <= 0) || (PosY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(Pos.y))
 	{
 		return;
 	}
@@ -111,11 +109,11 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		if (m_TimeToStopEating == 0)
 		{
-			if (m_World->GetBlock(PosX, PosY, PosZ).Type() == BlockType::GrassBlock)  // Make sure grass hasn't been destroyed in the meantime
+			if (m_World->GetBlock(Pos).Type() == BlockType::GrassBlock)  // Make sure grass hasn't been destroyed in the meantime
 			{
 				// The sheep ate the grass so we change it to dirt
-				m_World->SetBlock(PosX, PosY, PosZ, Block::Dirt::Dirt());
-				GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, {PosX, PosY, PosZ}, 2);  // This is a magic number corresponding to the old value of the grass block
+				m_World->SetBlock(Pos, Block::Dirt::Dirt());
+				GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, Pos, 2);  // This is a magic number corresponding to the old value of the grass block
 				m_IsSheared = false;
 				m_World->BroadcastEntityMetadata(*this);
 			}
@@ -125,7 +123,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (GetRandomProvider().RandBool(1.0 / 600.0))
 		{
-			if (m_World->GetBlock(PosX, PosY, PosZ).Type() == BlockType::GrassBlock)
+			if (m_World->GetBlock(Pos).Type() == BlockType::GrassBlock)
 			{
 				m_World->BroadcastEntityStatus(*this, esSheepEating);
 				m_TimeToStopEating = 40;

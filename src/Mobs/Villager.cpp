@@ -3,6 +3,7 @@
 
 #include "Villager.h"
 #include "../World.h"
+#include "../Chunk.h"
 #include "../BlockArea.h"
 #include "../Blocks/BlockHandler.h"
 #include "../Blocks/BlockCrops.h"
@@ -190,8 +191,8 @@ void cVillager::HandleFarmerTryHarvestCrops()
 	if (!m_PathfinderActivated && (GetPosition() - m_CropsPos).Length() < 2)
 	{
 		// Check if the blocks didn't change while the villager was walking to the coordinates.
-		auto CropBlock = m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z);
-		if (IsBlockFarmable(CropBlock) && cBlockCropsHandler<0>::IsFullyGrown(m_World->GetBlock(m_CropsPos.x, m_CropsPos.y, m_CropsPos.z)))
+		auto CropBlock = m_World->GetBlock(m_CropsPos);
+		if (IsBlockFarmable(CropBlock) && cBlockCropsHandler<0>::IsFullyGrown(m_World->GetBlock(m_CropsPos)))
 		{
 			m_World->DropBlockAsPickups(m_CropsPos, this, nullptr);
 			m_ActionCountDown = 20;

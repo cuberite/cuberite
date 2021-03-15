@@ -88,7 +88,7 @@ public:
 		const auto Pos = AddFaceDirection(a_Position, a_HitFace);
 
 		if (
-			!a_World.GetBlockTypeMeta(Pos, Self) ||
+			!a_World.GetBlock(Pos, Self) ||
 			IsButtonOn(Self) ||
 			!IsButtonPressedByArrow(a_World, Pos, Self)
 		)
@@ -238,7 +238,7 @@ private:
 				BlockState Self = 0;
 
 				if (
-					!a_World.GetBlockTypeMeta(a_Position, Self) ||
+					!a_World.GetBlock(a_Position, Self) ||
 					(Self != a_Block) || !IsButtonOn(Self)
 				)
 				{

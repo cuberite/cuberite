@@ -312,8 +312,8 @@ public:
 	// tolua_end
 
 	// Setters:
-	void SetRelBlock        (int a_RelX,   int a_RelY,   int a_RelZ,   BlockState a_Block);
-	void SetBlock           (int a_BlockX, int a_BlockY, int a_BlockZ, BlockState a_Block);
+	void SetRelBlock        (Vector3i a_RelPos, BlockState a_Block);
+	void SetBlock           (Vector3i a_Pos, BlockState a_Block);
 	void SetRelBlockLight   (int a_RelX,   int a_RelY,   int a_RelZ,   LIGHTTYPE a_BlockLight);
 	void SetBlockLight      (int a_BlockX, int a_BlockY, int a_BlockZ, LIGHTTYPE a_BlockLight);
 	void SetRelBlockSkyLight(int a_RelX,   int a_RelY,   int a_RelZ,   LIGHTTYPE a_BlockSkyLight);
@@ -328,6 +328,8 @@ public:
 	// tolua_end
 
 	// Getters:
+	BlockState GetRelBlock        (Vector3i a_RelPos) const;
+	BlockState GetBlock           (Vector3i a_Pos) const;
 	BlockState GetRelBlock        (int a_RelX,   int a_RelY,   int a_RelZ)   const;
 	BlockState GetBlock           (int a_BlockX, int a_BlockY, int a_BlockZ) const;
 	LIGHTTYPE  GetRelBlockLight   (int a_RelX,   int a_RelY,   int a_RelZ)   const;
