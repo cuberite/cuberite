@@ -13242,6 +13242,175 @@ end
 			},  -- ConstantGroups
 		},  -- cWindow
 
+		BannerPattern =
+		{
+			Desc = [[
+				An enumeration of banner patterns.
+			]],
+			Constants =
+			{
+				BottomStripe =
+				{
+					Notes = "A base pattern."
+				},
+				TopStripe =
+				{
+					Notes = "A chief pattern."
+				},
+				LeftStripe =
+				{
+					Notes = "A pale dexter pattern."
+				},
+				RightStripe =
+				{
+					Notes = "A pale sinister pattern."
+				},
+				CenterStripeVertical =
+				{
+					Notes = "A pale pattern."
+				},
+				MiddleStripeHorizontal =
+				{
+					Notes = "A fess pattern."
+				},
+				DownRightStripe =
+				{
+					Notes = "A bend pattern."
+				},
+				DownLeftStripe =
+				{
+					Notes = "A bend sinister pattern."
+				},
+				SmallVerticalStripes =
+				{
+					Notes = "A paly pattern."
+				},
+				DiagonalCross =
+				{
+					Notes = "A saltire pattern."
+				},
+				SquareCross =
+				{
+					Notes = "A cross pattern."
+				},
+				LeftOfDiagonal =
+				{
+					Notes = "A per bend sinister pattern."
+				},
+				RightOfUpsideDownDiagonal =
+				{
+					Notes = "A per bend pattern."
+				},
+				LeftOfUpsideDownDiagonal =
+				{
+					Notes = "A per bend inverted pattern."
+				},
+				RightOfDiagonal =
+				{
+					Notes = "A per bend sinister inverted pattern."
+				},
+				VerticalHalfLeft =
+				{
+					Notes = "A per pale pattern."
+				},
+				VerticalHalfRight =
+				{
+					Notes = "A per pale inverted pattern."
+				},
+				HorizontalHalfTop =
+				{
+					Notes = "A per fess pattern."
+				},
+				HorizontalHalfBottom =
+				{
+					Notes = "A per fess inverted pattern."
+				},
+				BottomLeftCorner =
+				{
+					Notes = "A base dexter canton pattern."
+				},
+				BottomRightCorner =
+				{
+					Notes = "A base sinister canton pattern."
+				},
+				TopLeftCorner =
+				{
+					Notes = "A chief dexter canton pattern."
+				},
+				TopRightCorner =
+				{
+					Notes = "A chief sinister canton pattern."
+				},
+				BottomTriangle =
+				{
+					Notes = "A chevron pattern."
+				},
+				TopTriangle =
+				{
+					Notes = "An inverted chevron pattern."
+				},
+				BottomTriangleSawtooth =
+				{
+					Notes = "A base indented pattern."
+				},
+				TopTriangleSawtooth =
+				{
+					Notes = "A chief indented pattern."
+				},
+				MiddleCircle =
+				{
+					Notes = "A roundel pattern."
+				},
+				MiddleRhombus =
+				{
+					Notes = "A lozenge pattern."
+				},
+				Border =
+				{
+					Notes = "A bordure pattern."
+				},
+				CurlyBorder =
+				{
+					Notes = "A bordure indented pattern."
+				},
+				Brick =
+				{
+					Notes = "A field masoned pattern."
+				},
+				Gradient =
+				{
+					Notes = "A gradient pattern."
+				},
+				GradientUpsideDown =
+				{
+					Notes = "A base gradient pattern."
+				},
+				Creeper =
+				{
+					Notes = "A creeper charge pattern."
+				},
+				Skull =
+				{
+					Notes = "A skull charge pattern."
+				},
+				Flower =
+				{
+					Notes = "A flower charge pattern."
+				},
+				Mojang =
+				{
+					Notes = "A... thing."
+				},
+				Globe =
+				{
+					Notes = "A globe."
+				},
+				Piglin =
+				{
+					Notes = "A snoot."
+				},
+			},
+		},
 		BossBarColor =
 		{
 			Desc = [[
