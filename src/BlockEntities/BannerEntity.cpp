@@ -7,7 +7,6 @@
 #include "BannerEntity.h"
 
 #include "../World.h"
-//#include "../BlockType.h"
 #include "../ClientHandle.h"
 
 
