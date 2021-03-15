@@ -39,5 +39,5 @@ private:
 	virtual cItems ConvertToPickups() const override;
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
-	virtual bool UsedBy(cPlayer * a_Player) override { return true; }
+	virtual bool UsedBy(cPlayer * a_Player) override;
 } ;  // tolua_export
