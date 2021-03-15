@@ -174,31 +174,14 @@ cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_Ser
 
 
 
-void cProtocol_1_8_0::DataReceived(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size)
+void cProtocol_1_8_0::DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer && a_Data)
 {
 	if (m_IsEncrypted)
 	{
-		// An artefact of the protocol recogniser, will be removed when decryption done in-place:
-		if (a_Size == 0)
-		{
-			AddReceivedData(a_Buffer, nullptr, 0);
-			return;
-		}
+		m_Decryptor.ProcessData(a_Data.data(), a_Data.size());
+	}
 
-		std::byte Decrypted[512];
-		while (a_Size > 0)
-		{
-			size_t NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
-			m_Decryptor.ProcessData(Decrypted, reinterpret_cast<const Byte *>(a_Data), NumBytes);
-			AddReceivedData(a_Buffer, reinterpret_cast<const char *>(Decrypted), NumBytes);
-			a_Size -= NumBytes;
-			a_Data += NumBytes;
-		}
-	}
-	else
-	{
-		AddReceivedData(a_Buffer, a_Data, a_Size);
-	}
+	AddReceivedData(a_Buffer, a_Data);
 }
 
 
@@ -281,6 +264,60 @@ void cProtocol_1_8_0::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlo
 
 
 
+void cProtocol_1_8_0::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	// No such packet here
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendBossBarRemove(UInt32 a_UniqueID)
+{
+	// No such packet here
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	// No such packet here
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendBossBarUpdateHealth(UInt32 a_UniqueID, float a_FractionFilled)
+{
+	// No such packet here
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType)
+{
+	// No such packet here
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendBossBarUpdateTitle(UInt32 a_UniqueID, const cCompositeChat & a_Title)
+{
+	// No such packet here
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendCameraSetTo(const cEntity & a_Entity)
 {
 	cPacketizer Pkt(*this, pktCameraSetTo);
@@ -357,9 +394,22 @@ void cProtocol_1_8_0::SendDestroyEntity(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktDestroyEntity);
-	Pkt.WriteVarInt32(1);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	{
+		cPacketizer Pkt(*this, pktDestroyEntity);
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	}
+
+	if (!a_Entity.IsMob())
+	{
+		return;
+	}
+
+	const auto & Mob = static_cast<const cMonster &>(a_Entity);
+	if ((Mob.GetMobType() == mtEnderDragon) || (Mob.GetMobType() == mtWither))
+	{
+		SendBossBarRemove(Mob.GetUniqueID());
+	}
 }
 
 
@@ -1022,6 +1072,30 @@ void cProtocol_1_8_0::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 
 
 
+void cProtocol_1_8_0::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktPlayerList);
+	Pkt.WriteVarInt32(3);
+	Pkt.WriteVarInt32(1);
+	Pkt.WriteUUID(a_Player.GetUUID());
+
+	if (a_CustomName.empty())
+	{
+		Pkt.WriteBool(false);
+	}
+	else
+	{
+		Pkt.WriteBool(true);
+		Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_CustomName.c_str()));
+	}
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1046,30 +1120,6 @@ void cProtocol_1_8_0::SendPlayerListUpdatePing(const cPlayer & a_Player)
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
-}
-
-
-
-
-
-void cProtocol_1_8_0::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktPlayerList);
-	Pkt.WriteVarInt32(3);
-	Pkt.WriteVarInt32(1);
-	Pkt.WriteUUID(a_Player.GetUUID());
-
-	if (a_CustomName.empty())
-	{
-		Pkt.WriteBool(false);
-	}
-	else
-	{
-		Pkt.WriteBool(true);
-		Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_CustomName.c_str()));
-	}
 }
 
 
@@ -1930,123 +1980,6 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(const eMonsterType a_MobType)
 		case mtHusk:                  return GetProtocolMobType(mtZombie);
 
 		default:                      return 0;
-	}
-}
-
-
-
-
-
-void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size)
-{
-	// Write the incoming data into the comm log file:
-	if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
-	{
-		if (a_Buffer.GetReadableSpace() > 0)
-		{
-			ContiguousByteBuffer AllData;
-			size_t OldReadableSpace = a_Buffer.GetReadableSpace();
-			a_Buffer.ReadAll(AllData);
-			a_Buffer.ResetRead();
-			a_Buffer.SkipRead(a_Buffer.GetReadableSpace() - OldReadableSpace);
-			ASSERT(a_Buffer.GetReadableSpace() == OldReadableSpace);
-			AString Hex;
-			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-			m_CommLogFile.Printf("Incoming data, %zu (0x%zx) unparsed bytes already present in buffer:\n%s\n",
-				AllData.size(), AllData.size(), Hex.c_str()
-			);
-		}
-		AString Hex;
-		CreateHexDump(Hex, a_Data, a_Size, 16);
-		m_CommLogFile.Printf("Incoming data: %u (0x%x) bytes: \n%s\n",
-			static_cast<unsigned>(a_Size), static_cast<unsigned>(a_Size), Hex.c_str()
-		);
-		m_CommLogFile.Flush();
-	}
-
-	if (!a_Buffer.Write(a_Data, a_Size))
-	{
-		// Too much data in the incoming queue, report to caller:
-		m_Client->PacketBufferFull();
-		return;
-	}
-
-	// Handle all complete packets:
-	for (;;)
-	{
-		UInt32 PacketLen;
-		if (!a_Buffer.ReadVarInt(PacketLen))
-		{
-			// Not enough data
-			a_Buffer.ResetRead();
-			break;
-		}
-		if (!a_Buffer.CanReadBytes(PacketLen))
-		{
-			// The full packet hasn't been received yet
-			a_Buffer.ResetRead();
-			break;
-		}
-
-		// Check packet for compression:
-		if (m_State == 3)
-		{
-			UInt32 NumBytesRead = static_cast<UInt32>(a_Buffer.GetReadableSpace());
-
-			UInt32 UncompressedSize;
-			if (!a_Buffer.ReadVarInt(UncompressedSize))
-			{
-				m_Client->Kick("Compression packet incomplete");
-				return;
-			}
-
-			NumBytesRead -= static_cast<UInt32>(a_Buffer.GetReadableSpace());  // How many bytes has the UncompressedSize taken up?
-			ASSERT(PacketLen > NumBytesRead);
-			PacketLen -= NumBytesRead;
-
-			if (UncompressedSize > 0)
-			{
-				// Decompress the data:
-				m_Extractor.ReadFrom(a_Buffer, PacketLen);
-				a_Buffer.CommitRead();
-
-				const auto UncompressedData = m_Extractor.Extract(UncompressedSize);
-				const auto Uncompressed = UncompressedData.GetView();
-				cByteBuffer bb(Uncompressed.size());
-
-				// Compression was used, move the uncompressed data:
-				VERIFY(bb.Write(Uncompressed.data(), Uncompressed.size()));
-
-				HandlePacket(bb);
-				continue;
-			}
-		}
-
-		// Move the packet payload to a separate cByteBuffer, bb:
-		cByteBuffer bb(PacketLen);
-
-		// No compression was used, move directly:
-		VERIFY(a_Buffer.ReadToByteBuffer(bb, static_cast<size_t>(PacketLen)));
-		a_Buffer.CommitRead();
-
-		HandlePacket(bb);
-	}  // for (ever)
-
-	// Log any leftover bytes into the logfile:
-	if (g_ShouldLogCommIn && (a_Buffer.GetReadableSpace() > 0) && m_CommLogFile.IsOpen())
-	{
-		ContiguousByteBuffer AllData;
-		size_t OldReadableSpace = a_Buffer.GetReadableSpace();
-		a_Buffer.ReadAll(AllData);
-		a_Buffer.ResetRead();
-		a_Buffer.SkipRead(a_Buffer.GetReadableSpace() - OldReadableSpace);
-		ASSERT(a_Buffer.GetReadableSpace() == OldReadableSpace);
-		AString Hex;
-		CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-		m_CommLogFile.Printf("There are %zu (0x%zx) bytes of non-parse-able data left in the buffer:\n%s",
-			a_Buffer.GetReadableSpace(), a_Buffer.GetReadableSpace(), Hex.c_str()
-		);
-		m_CommLogFile.Flush();
 	}
 }
 
@@ -3862,7 +3795,7 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 		case mtZombieHorse:
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
-			UNREACHABLE("cProtocol_1_8::WriteMobMetadata: received unimplemented type");
+			ASSERT(!"cProtocol_1_8::WriteMobMetadata: received unimplemented type");
 			break;
 		}
 
@@ -3879,10 +3812,7 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			// Allowed mobs without additional metadata
 			break;
 		}
-		case mtInvalidType:
-		{
-			break;
-		}
+
 		default: UNREACHABLE("cProtocol_1_8::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
@@ -3905,6 +3835,123 @@ void cProtocol_1_8_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity &
 	// TODO: Send properties and modifiers based on the mob type
 
 	a_Pkt.WriteBEInt32(0);  // NumProperties
+}
+
+
+
+
+
+void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousByteBufferView a_Data)
+{
+	// Write the incoming data into the comm log file:
+	if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
+	{
+		if (a_Buffer.GetReadableSpace() > 0)
+		{
+			ContiguousByteBuffer AllData;
+			size_t OldReadableSpace = a_Buffer.GetReadableSpace();
+			a_Buffer.ReadAll(AllData);
+			a_Buffer.ResetRead();
+			a_Buffer.SkipRead(a_Buffer.GetReadableSpace() - OldReadableSpace);
+			ASSERT(a_Buffer.GetReadableSpace() == OldReadableSpace);
+			AString Hex;
+			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
+			m_CommLogFile.Printf("Incoming data, %zu (0x%zx) unparsed bytes already present in buffer:\n%s\n",
+				AllData.size(), AllData.size(), Hex.c_str()
+			);
+		}
+		AString Hex;
+		CreateHexDump(Hex, a_Data.data(), a_Data.size(), 16);
+		m_CommLogFile.Printf("Incoming data: %zu (0x%zx) bytes: \n%s\n",
+			a_Data.size(), a_Data.size(), Hex.c_str()
+		);
+		m_CommLogFile.Flush();
+	}
+
+	if (!a_Buffer.Write(a_Data.data(), a_Data.size()))
+	{
+		// Too much data in the incoming queue, report to caller:
+		m_Client->PacketBufferFull();
+		return;
+	}
+
+	// Handle all complete packets:
+	for (;;)
+	{
+		UInt32 PacketLen;
+		if (!a_Buffer.ReadVarInt(PacketLen))
+		{
+			// Not enough data
+			a_Buffer.ResetRead();
+			break;
+		}
+		if (!a_Buffer.CanReadBytes(PacketLen))
+		{
+			// The full packet hasn't been received yet
+			a_Buffer.ResetRead();
+			break;
+		}
+
+		// Check packet for compression:
+		if (m_State == 3)
+		{
+			UInt32 NumBytesRead = static_cast<UInt32>(a_Buffer.GetReadableSpace());
+
+			UInt32 UncompressedSize;
+			if (!a_Buffer.ReadVarInt(UncompressedSize))
+			{
+				m_Client->Kick("Compression packet incomplete");
+				return;
+			}
+
+			NumBytesRead -= static_cast<UInt32>(a_Buffer.GetReadableSpace());  // How many bytes has the UncompressedSize taken up?
+			ASSERT(PacketLen > NumBytesRead);
+			PacketLen -= NumBytesRead;
+
+			if (UncompressedSize > 0)
+			{
+				// Decompress the data:
+				m_Extractor.ReadFrom(a_Buffer, PacketLen);
+				a_Buffer.CommitRead();
+
+				const auto UncompressedData = m_Extractor.Extract(UncompressedSize);
+				const auto Uncompressed = UncompressedData.GetView();
+				cByteBuffer bb(Uncompressed.size());
+
+				// Compression was used, move the uncompressed data:
+				VERIFY(bb.Write(Uncompressed.data(), Uncompressed.size()));
+
+				HandlePacket(bb);
+				continue;
+			}
+		}
+
+		// Move the packet payload to a separate cByteBuffer, bb:
+		cByteBuffer bb(PacketLen);
+
+		// No compression was used, move directly:
+		VERIFY(a_Buffer.ReadToByteBuffer(bb, static_cast<size_t>(PacketLen)));
+		a_Buffer.CommitRead();
+
+		HandlePacket(bb);
+	}  // for (ever)
+
+	// Log any leftover bytes into the logfile:
+	if (g_ShouldLogCommIn && (a_Buffer.GetReadableSpace() > 0) && m_CommLogFile.IsOpen())
+	{
+		ContiguousByteBuffer AllData;
+		size_t OldReadableSpace = a_Buffer.GetReadableSpace();
+		a_Buffer.ReadAll(AllData);
+		a_Buffer.ResetRead();
+		a_Buffer.SkipRead(a_Buffer.GetReadableSpace() - OldReadableSpace);
+		ASSERT(a_Buffer.GetReadableSpace() == OldReadableSpace);
+		AString Hex;
+		CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
+		m_CommLogFile.Printf("There are %zu (0x%zx) bytes of non-parse-able data left in the buffer:\n%s",
+			a_Buffer.GetReadableSpace(), a_Buffer.GetReadableSpace(), Hex.c_str()
+		);
+		m_CommLogFile.Flush();
+	}
 }
 
 
@@ -4043,7 +4090,7 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity)
 		case Type::etPlayer:
 		case Type::etMonster:
 		case Type::etExpOrb:
-		case Type::etPainting: UNREACHABLE("Tried to spawn an unhandled entity");
+		case Type::etPainting: break;
 	}
 	UNREACHABLE("Unhandled entity kind");
 }

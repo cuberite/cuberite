@@ -72,7 +72,7 @@ bool cDeadlockDetect::Start(int a_IntervalSec)
 void cDeadlockDetect::TrackCriticalSection(cCriticalSection & a_CS, const AString & a_Name)
 {
 	cCSLock lock(m_CS);
-	m_TrackedCriticalSections.emplace_back(std::make_pair(&a_CS, a_Name));
+	m_TrackedCriticalSections.emplace_back(&a_CS, a_Name);
 }
 
 

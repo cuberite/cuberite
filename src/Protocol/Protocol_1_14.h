@@ -26,7 +26,7 @@ class cProtocol_1_14:
 
 public:
 
-	using Super::cProtocol_1_13_2;
+	using Super::Super;
 
 protected:
 

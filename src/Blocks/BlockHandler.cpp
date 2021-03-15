@@ -49,6 +49,7 @@
 #include "BlockGrass.h"
 #include "BlockGravel.h"
 #include "BlockHopper.h"
+#include "BlockHugeMushroom.h"
 #include "BlockIce.h"
 #include "BlockJukebox.h"
 #include "BlockLadder.h"
@@ -297,8 +298,8 @@ namespace
 	constexpr cBlockMobHeadHandler            BlockHeadHandler                  (E_BLOCK_HEAD);
 	constexpr cBlockPressurePlateHandler      BlockHeavyWeightedPressurePHandler(E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE);
 	constexpr cBlockHopperHandler             BlockHopperHandler                (E_BLOCK_HOPPER);
-	constexpr cDefaultBlockHandler            BlockHugeBrownMushroomHandler     (E_BLOCK_HUGE_BROWN_MUSHROOM);
-	constexpr cDefaultBlockHandler            BlockHugeRedMushroomHandler       (E_BLOCK_HUGE_RED_MUSHROOM);
+	constexpr cBlockHugeMushroomHandler       BlockHugeBrownMushroomHandler     (E_BLOCK_HUGE_BROWN_MUSHROOM);
+	constexpr cBlockHugeMushroomHandler       BlockHugeRedMushroomHandler       (E_BLOCK_HUGE_RED_MUSHROOM);
 	constexpr cBlockIceHandler                BlockIceHandler                   (E_BLOCK_ICE);
 	constexpr cBlockComparatorHandler         BlockInactiveComparatorHandler    (E_BLOCK_INACTIVE_COMPARATOR);
 	constexpr cBlockInfestedHandler           BlockInfestedBlockHandler         (E_BLOCK_SILVERFISH_EGG);
@@ -937,6 +938,5 @@ const cBlockHandler & cBlockHandler::For(BLOCKTYPE a_BlockType)
 		case E_BLOCK_NUMBER_OF_TYPES:
 		case E_BLOCK_UNFINISHED: return BlockAirHandler;
 	}
-
 	UNREACHABLE("Getting handler for unexpected block type");
 }

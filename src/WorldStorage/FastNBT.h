@@ -340,6 +340,7 @@ public:
 	void AddDouble   (const AString & a_Name, double a_Value);
 	void AddString   (const AString & a_Name, std::string_view a_Value);
 	void AddByteArray(const AString & a_Name, const char * a_Value, size_t a_NumElements);
+	void AddByteArray(const AString & a_Name, size_t a_NumElements, unsigned char a_Value);
 	void AddIntArray (const AString & a_Name, const Int32 * a_Value, size_t a_NumElements);
 
 	void AddByteArray(const AString & a_Name, const AString & a_Value)

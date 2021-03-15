@@ -105,6 +105,172 @@ void cProtocol_1_9_0::SendAttachEntity(const cEntity & a_Entity, const cEntity &
 
 
 
+void cProtocol_1_9_0::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(0);  // Add
+	Pkt.WriteString(a_Title.CreateJsonString());
+	Pkt.WriteBEFloat(a_FractionFilled);
+	Pkt.WriteVarInt32([a_Color]
+	{
+		switch (a_Color)
+		{
+			case BossBarColor::Pink: return 0U;
+			case BossBarColor::Blue: return 1U;
+			case BossBarColor::Red: return 2U;
+			case BossBarColor::Green: return 3U;
+			case BossBarColor::Yellow: return 4U;
+			case BossBarColor::Purple: return 5U;
+			case BossBarColor::White: return 6U;
+		}
+	}());
+	Pkt.WriteVarInt32([a_DivisionType]
+	{
+		switch (a_DivisionType)
+		{
+			case BossBarDivisionType::None: return 0U;
+			case BossBarDivisionType::SixNotches: return 1U;
+			case BossBarDivisionType::TenNotches: return 2U;
+			case BossBarDivisionType::TwelveNotches: return 3U;
+			case BossBarDivisionType::TwentyNotches: return 4U;
+		}
+	}());
+	{
+		UInt8 Flags = 0x00;
+		if (a_DarkenSky)
+		{
+			Flags |= 0x01;
+		}
+		if (a_PlayEndMusic || a_CreateFog)
+		{
+			Flags |= 0x02;
+		}
+		Pkt.WriteBEUInt8(Flags);
+	}
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarRemove(UInt32 a_UniqueID)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(1);  // Remove
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(5);  // Update Flags
+	{
+		UInt8 Flags = 0x00;
+		if (a_DarkenSky)
+		{
+			Flags |= 0x01;
+		}
+		if (a_PlayEndMusic || a_CreateFog)
+		{
+			Flags |= 0x02;
+		}
+		Pkt.WriteBEUInt8(Flags);
+	}
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarUpdateHealth(UInt32 a_UniqueID, float a_FractionFilled)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(2);  // Update health
+	Pkt.WriteBEFloat(a_FractionFilled);
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(4);  // Update health
+	Pkt.WriteVarInt32([a_Color]
+	{
+		switch (a_Color)
+		{
+			case BossBarColor::Pink: return 0U;
+			case BossBarColor::Blue: return 1U;
+			case BossBarColor::Red: return 2U;
+			case BossBarColor::Green: return 3U;
+			case BossBarColor::Yellow: return 4U;
+			case BossBarColor::Purple: return 5U;
+			case BossBarColor::White: return 6U;
+		}
+	}());
+	Pkt.WriteVarInt32([a_DivisionType]
+	{
+		switch (a_DivisionType)
+		{
+			case BossBarDivisionType::None: return 0U;
+			case BossBarDivisionType::SixNotches: return 1U;
+			case BossBarDivisionType::TenNotches: return 2U;
+			case BossBarDivisionType::TwelveNotches: return 3U;
+			case BossBarDivisionType::TwentyNotches: return 4U;
+		}
+	}());
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarUpdateTitle(UInt32 a_UniqueID, const cCompositeChat & a_Title)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(3);  // Update title
+	Pkt.WriteString(a_Title.CreateJsonString());
+}
+
+
+
+
+
 void cProtocol_1_9_0::SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -489,6 +655,7 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 		case pktBlockBreakAnim:         return 0x08;
 		case pktBlockChange:            return 0x0b;
 		case pktBlockChanges:           return 0x10;
+		case pktBossBar:                return 0x0c;
 		case pktCameraSetTo:            return 0x36;
 		case pktChatRaw:                return 0x0f;
 		case pktCollectEntity:          return 0x49;
@@ -2163,7 +2330,7 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 		case mtShulker:
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
-			UNREACHABLE("cProtocol_1_9::WriteMobMetadata: received unimplemented type");
+			ASSERT(!"cProtocol_1_9::WriteMobMetadata: received unimplemented type");
 			break;
 		}
 
@@ -2180,10 +2347,7 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			// Entities without additional metadata
 			break;
 		}
-		case mtInvalidType:
-		{
 
-		}
 		default: UNREACHABLE("cProtocol_1_9::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }

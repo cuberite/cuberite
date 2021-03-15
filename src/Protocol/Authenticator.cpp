@@ -67,7 +67,7 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 	}
 
 	cCSLock LOCK(m_CS);
-	m_Queue.push_back(cUser(a_ClientID, a_UserName, a_ServerHash));
+	m_Queue.emplace_back(a_ClientID, a_UserName, a_ServerHash);
 	m_QueueNonempty.Set();
 }
 

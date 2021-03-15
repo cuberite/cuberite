@@ -1241,7 +1241,7 @@ void cMinecart::OnRemoveFromWorld(cWorld & a_World)
 {
 	if (m_bIsOnDetectorRail)
 	{
-		m_World->SetBlock(m_DetectorRailPosition.x, m_DetectorRailPosition.y, m_DetectorRailPosition.z, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
+		m_World->SetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
 	}
 
 	Super::OnRemoveFromWorld(a_World);

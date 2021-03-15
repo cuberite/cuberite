@@ -1003,7 +1003,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 		if (
 			cChunkDef::IsValidHeight(BlockY) &&
-			cBlockHandler::For(m_Player->GetWorld()->GetBlock(BlockX, BlockY, BlockZ)).IsClickedThrough()
+			cBlockHandler::For(m_Player->GetWorld()->GetBlock({ BlockX, BlockY, BlockZ })).IsClickedThrough()
 		)
 		{
 			a_BlockX = BlockX;
@@ -1140,7 +1140,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	BLOCKTYPE DiggingBlock;
 	NIBBLETYPE DiggingMeta;
-	m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, DiggingBlock, DiggingMeta);
+	m_Player->GetWorld()->GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, DiggingBlock, DiggingMeta);
 
 	if (
 		m_Player->IsGameModeCreative() &&
@@ -1225,7 +1225,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	BLOCKTYPE DugBlock;
 	NIBBLETYPE DugMeta;
-	m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, DugBlock, DugMeta);
+	m_Player->GetWorld()->GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, DugBlock, DugMeta);
 
 	if (!m_Player->IsGameModeCreative())
 	{
@@ -1977,7 +1977,7 @@ void cClientHandle::Tick(float a_Dt)
 	// anticheat fastbreak
 	if (m_HasStartedDigging)
 	{
-		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock(m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ);
+		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock({ m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ });
 		m_BreakProgress += m_Player->GetMiningProgressPerTick(Block);
 	}
 
@@ -2182,6 +2182,60 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 		Lock.Unlock();
 		m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
 	}
+}
+
+
+
+
+
+void cClientHandle::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	m_Protocol->SendBossBarAdd(a_UniqueID, a_Title, a_FractionFilled, a_Color, a_DivisionType, a_DarkenSky, a_PlayEndMusic, a_CreateFog);
+}
+
+
+
+
+
+void cClientHandle::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	m_Protocol->SendBossBarUpdateFlags(a_UniqueID, a_DarkenSky, a_PlayEndMusic, a_CreateFog);
+}
+
+
+
+
+
+void cClientHandle::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType)
+{
+	m_Protocol->SendBossBarUpdateStyle(a_UniqueID, a_Color, a_DivisionType);
+}
+
+
+
+
+
+void cClientHandle::SendBossBarUpdateTitle(UInt32 a_UniqueID, const cCompositeChat & a_Title)
+{
+	m_Protocol->SendBossBarUpdateTitle(a_UniqueID, a_Title);
+}
+
+
+
+
+
+void cClientHandle::SendBossBarRemove(UInt32 a_UniqueID)
+{
+	m_Protocol->SendBossBarRemove(a_UniqueID);
+}
+
+
+
+
+
+void cClientHandle::SendBossBarUpdateHealth(UInt32 a_UniqueID, float a_FractionFilled)
+{
+	m_Protocol->SendBossBarUpdateHealth(a_UniqueID, a_FractionFilled);
 }
 
 
@@ -2643,6 +2697,15 @@ void cClientHandle::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 
 
 
+void cClientHandle::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
+{
+	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
+}
+
+
+
+
+
 void cClientHandle::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 {
 	m_Protocol->SendPlayerListUpdateGameMode(a_Player);
@@ -2655,15 +2718,6 @@ void cClientHandle::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 void cClientHandle::SendPlayerListUpdatePing(const cPlayer & a_Player)
 {
 	m_Protocol->SendPlayerListUpdatePing(a_Player);
-}
-
-
-
-
-
-void cClientHandle::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
-{
-	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
 }
 
 
@@ -3245,7 +3299,7 @@ bool cClientHandle::SetState(eState a_NewState)
 void cClientHandle::ProcessProtocolIn(void)
 {
 	// Process received network data:
-	AString IncomingData;
+	decltype(m_IncomingData) IncomingData;
 	{
 		cCSLock Lock(m_CSIncomingData);
 		std::swap(IncomingData, m_IncomingData);
@@ -3258,7 +3312,7 @@ void cClientHandle::ProcessProtocolIn(void)
 
 	try
 	{
-		m_Protocol.HandleIncomingData(*this, IncomingData);
+		m_Protocol.HandleIncomingData(*this, std::move(IncomingData));
 	}
 	catch (const std::exception & Oops)
 	{
@@ -3286,7 +3340,7 @@ void cClientHandle::OnReceivedData(const char * a_Data, size_t a_Length)
 
 	// Queue the incoming data to be processed in the tick thread:
 	cCSLock Lock(m_CSIncomingData);
-	m_IncomingData.append(a_Data, a_Length);
+	m_IncomingData.append(reinterpret_cast<const std::byte *>(a_Data), a_Length);
 }
 
 

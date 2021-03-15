@@ -85,7 +85,7 @@ void cChunkGeneratorThread::QueueGenerateChunk(
 		{
 			LOGWARN("WARNING: Adding chunk %s to generation queue; Queue is too big! (%zu)", a_Coords.ToString().c_str(), m_Queue.size());
 		}
-		m_Queue.push_back(QueueItem{a_Coords, a_ForceRegeneration, a_Callback});
+		m_Queue.emplace_back(a_Coords, a_ForceRegeneration, a_Callback);
 	}
 
 	m_Event.Set();

@@ -133,7 +133,6 @@ std::string_view NamespaceSerializer::From(const Statistic a_ID)
 		case Statistic::AchBreedCow:                  return "cuberite:achievement.breedCow";
 		case Statistic::AchDiamondsToYou:             return "cuberite:achievement.diamondsToYou";
 	}
-
 	UNREACHABLE("Tried to save unhandled statistic");
 }
 
@@ -216,7 +215,6 @@ std::string_view NamespaceSerializer::From(const eMonsterType a_ID)
 		case mtZombieVillager: return "zombie_villager";
 		case mtInvalidType:    break;
 	}
-
 	UNREACHABLE("Tried to save unknown monster type");
 }
 

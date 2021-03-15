@@ -35,10 +35,14 @@
 		// The CRT has a definition for this operator new that stores the debugging info for leak-finding later.
 	#endif
 
+	#define UNREACHABLE_INTRINSIC __assume(false)
+
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
 	#define abstract
+
+	#define UNREACHABLE_INTRINSIC __builtin_unreachable()
 
 #else
 
@@ -271,8 +275,12 @@ template class SizeChecker<UInt8, 1>;
 
 #endif  // else TEST_GLOBALS
 
-/** Use to mark code that should be impossible to reach. */
-#define UNREACHABLE(x) do { FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__); std::abort(); } while (false)
+// Use to mark code that should be impossible to reach.
+#ifdef NDEBUG
+	#define UNREACHABLE(x) UNREACHABLE_INTRINSIC
+#else
+	#define UNREACHABLE(x) ( FLOGERROR("Hit unreachable code: {0}, file {1}, line {2}", #x, __FILE__, __LINE__), std::abort(), 0)
+#endif
 
 
 
@@ -284,6 +292,12 @@ namespace cpp20
 	std::enable_if_t<std::is_array_v<T> && (std::extent_v<T> == 0), std::unique_ptr<T>> make_unique_for_overwrite(std::size_t a_Size)
 	{
 		return std::unique_ptr<T>(new std::remove_extent_t<T>[a_Size]);
+	}
+
+	template <class T>
+	std::enable_if_t<!std::is_array_v<T>, std::unique_ptr<T>> make_unique_for_overwrite()
+	{
+		return std::unique_ptr<T>(new T);
 	}
 }
 

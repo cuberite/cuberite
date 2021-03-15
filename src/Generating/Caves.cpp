@@ -163,8 +163,8 @@ cCaveTunnel::cCaveTunnel(
 	cNoise & a_Noise
 )
 {
-	m_Points.push_back(cCaveDefPoint(a_BlockStartX, a_BlockStartY, a_BlockStartZ, a_StartRadius));
-	m_Points.push_back(cCaveDefPoint(a_BlockEndX,   a_BlockEndY,   a_BlockEndZ,   a_EndRadius));
+	m_Points.emplace_back(a_BlockStartX, a_BlockStartY, a_BlockStartZ, a_StartRadius);
+	m_Points.emplace_back(a_BlockEndX,   a_BlockEndY,   a_BlockEndZ,   a_EndRadius);
 
 	if ((a_BlockStartY <= 0) && (a_BlockEndY <= 0))
 	{
@@ -216,7 +216,7 @@ void cCaveTunnel::Randomize(cNoise & a_Noise)
 			int y = (itr->m_BlockY + PrevY) / 2 + (Random % (len / 2 + 1) - len / 4);
 			Random /= 256;
 			int z = (itr->m_BlockZ + PrevZ) / 2 + (Random % (len + 1) - len / 2);
-			Pts.push_back(cCaveDefPoint(x, y, z, Rad));
+			Pts.emplace_back(x, y, z, Rad);
 			Pts.push_back(*itr);
 			PrevX = itr->m_BlockX;
 			PrevY = itr->m_BlockY;
@@ -268,8 +268,8 @@ bool cCaveTunnel::RefineDefPoints(const cCaveDefPoints & a_Src, cCaveDefPoints &
 		int dr = itr->m_Radius - PrevR;
 		int Rad1 = std::max(PrevR + 1 * dr / 4, 1);
 		int Rad2 = std::max(PrevR + 3 * dr / 4, 1);
-		a_Dst.push_back(cCaveDefPoint(PrevX + 1 * dx / 4, PrevY + 1 * dy / 4, PrevZ + 1 * dz / 4, Rad1));
-		a_Dst.push_back(cCaveDefPoint(PrevX + 3 * dx / 4, PrevY + 3 * dy / 4, PrevZ + 3 * dz / 4, Rad2));
+		a_Dst.emplace_back(PrevX + 1 * dx / 4, PrevY + 1 * dy / 4, PrevZ + 1 * dz / 4, Rad1);
+		a_Dst.emplace_back(PrevX + 3 * dx / 4, PrevY + 3 * dy / 4, PrevZ + 3 * dz / 4, Rad2);
 		PrevX = itr->m_BlockX;
 		PrevY = itr->m_BlockY;
 		PrevZ = itr->m_BlockZ;
@@ -336,7 +336,7 @@ void cCaveTunnel::FinishLinear(void)
 
 			for (;;)
 			{
-				m_Points.push_back(cCaveDefPoint(PrevX, PrevY, PrevZ, R));
+				m_Points.emplace_back(PrevX, PrevY, PrevZ, R);
 
 				if (PrevX == x1)
 				{
@@ -368,7 +368,7 @@ void cCaveTunnel::FinishLinear(void)
 
 			for (;;)
 			{
-				m_Points.push_back(cCaveDefPoint(PrevX, PrevY, PrevZ, R));
+				m_Points.emplace_back(PrevX, PrevY, PrevZ, R);
 
 				if (PrevY == y1)
 				{
@@ -402,7 +402,7 @@ void cCaveTunnel::FinishLinear(void)
 
 			for (;;)
 			{
-				m_Points.push_back(cCaveDefPoint(PrevX, PrevY, PrevZ, R));
+				m_Points.emplace_back(PrevX, PrevY, PrevZ, R);
 
 				if (PrevZ == z1)
 				{

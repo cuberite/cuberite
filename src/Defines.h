@@ -443,6 +443,34 @@ enum class BannerPattern
 
 
 
+enum class BossBarColor
+{
+	Pink,
+	Blue,
+	Red,
+	Green,
+	Yellow,
+	Purple,
+	White
+};
+
+
+
+
+
+enum class BossBarDivisionType
+{
+	None,
+	SixNotches,
+	TenNotches,
+	TwelveNotches,
+	TwentyNotches
+};
+
+
+
+
+
 /** Returns a textual representation of the click action. */
 const char * ClickActionToString(int a_ClickAction);
 

@@ -28,8 +28,7 @@ public:
 			case BLOCK_FACE_YM:
 			case BLOCK_FACE_YP:
 			{
-				ASSERT(!"Unknown face");
-				return 0;
+				break;
 			}
 		}
 		UNREACHABLE("Unsupported block face");

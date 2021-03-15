@@ -48,6 +48,7 @@ typedef unsigned char Byte;
 class cProtocol
 {
 public:
+
 	cProtocol(cClientHandle * a_Client) :
 		m_Client(a_Client),
 		m_OutPacketBuffer(64 KiB),
@@ -67,6 +68,7 @@ public:
 		pktBlockBreakAnim,
 		pktBlockChange,
 		pktBlockChanges,
+		pktBossBar,
 		pktCameraSetTo,
 		pktChatRaw,
 		pktCollectEntity,
@@ -353,8 +355,9 @@ public:
 		Game = 3,
 	};
 
-	/** Called when client sends some data */
-	virtual void DataReceived(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size) = 0;
+	/** Called to process them, when client sends some data.
+	The protocol uses the provided buffers for storage and processing, and must have exclusive access to them. */
+	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer && a_Data) = 0;
 
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;
@@ -362,6 +365,12 @@ public:
 	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) = 0;
 	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) = 0;
+	virtual void SendBossBarAdd                 (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) = 0;
+	virtual void SendBossBarRemove              (UInt32 a_UniqueID) = 0;
+	virtual void SendBossBarUpdateHealth        (UInt32 a_UniqueID, float a_FractionFilled) = 0;
+	virtual void SendBossBarUpdateFlags         (UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) = 0;
+	virtual void SendBossBarUpdateStyle         (UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType) = 0;
+	virtual void SendBossBarUpdateTitle         (UInt32 a_UniqueID, const cCompositeChat & a_Title) = 0;
 	virtual void SendCameraSetTo                (const cEntity & a_Entity) = 0;
 	virtual void SendChat                       (const AString & a_Message, eChatType a_Type) = 0;
 	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) = 0;

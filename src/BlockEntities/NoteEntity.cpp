@@ -318,6 +318,5 @@ float cNoteEntity::PitchFromNote(unsigned char a_Pitch)
 		case 23: return 1.887748625363387f;
 		case 24: return 2.0f;
 	}
-
 	UNREACHABLE("Converted unknown pitch value");
 }
