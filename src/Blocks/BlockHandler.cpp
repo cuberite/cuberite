@@ -412,7 +412,7 @@ namespace
 	constexpr cDefaultBlockHandler            BlockStainedClayHandler           (E_BLOCK_STAINED_CLAY);
 	constexpr cBlockGlassHandler              BlockStainedGlassHandler          (E_BLOCK_STAINED_GLASS);
 	constexpr cBlockGlassHandler              BlockStainedGlassPaneHandler      (E_BLOCK_STAINED_GLASS_PANE);
-	constexpr cBlockBannerHandler             BlockStandingBannerHandler        (E_BLOCK_STANDING_BANNER);  // TODO: drops correct?
+	constexpr cBlockBannerHandler             BlockStandingBannerHandler        (E_BLOCK_STANDING_BANNER);
 	constexpr cBlockLavaHandler               BlockStationaryLavaHandler        (E_BLOCK_STATIONARY_LAVA);
 	constexpr cBlockWaterHandler              BlockStationaryWaterHandler       (E_BLOCK_STATIONARY_WATER);
 	constexpr cBlockPistonHandler             BlockStickyPistonHandler          (E_BLOCK_STICKY_PISTON);
@@ -433,7 +433,7 @@ namespace
 	constexpr cBlockTripwireHandler           BlockTripwireHandler              (E_BLOCK_TRIPWIRE);
 	constexpr cBlockTripwireHookHandler       BlockTripwireHookHandler          (E_BLOCK_TRIPWIRE_HOOK);
 	constexpr cBlockVineHandler               BlockVinesHandler                 (E_BLOCK_VINES);
-	constexpr cBlockBannerHandler             BlockWallBannerHandler            (E_BLOCK_WALL_BANNER);  // TODO: drops correct?
+	constexpr cBlockBannerHandler             BlockWallBannerHandler            (E_BLOCK_WALL_BANNER);
 	constexpr cBlockWallSignHandler           BlockWallsignHandler              (E_BLOCK_WALLSIGN);
 	constexpr cBlockWaterHandler              BlockWaterHandler                 (E_BLOCK_WATER);
 	constexpr cBlockGlazedTerracottaHandler   BlockWhiteGlazedTerracottaHandler (E_BLOCK_WHITE_GLAZED_TERRACOTTA);

@@ -18,7 +18,6 @@ class cItems;
 class cChunkStay;
 class cChunk;
 class cPlayer;
-class cBannerEntity;
 class cBeaconEntity;
 class cBedEntity;
 class cBrewingstandEntity;
@@ -41,7 +40,6 @@ class cDeadlockDetect;
 
 typedef std::list<cClientHandle *> cClientHandleList;
 using cEntityCallback       = cFunctionRef<bool(cEntity             &)>;
-using cBannerCallback       = cFunctionRef<bool(cBannerEntity       &)>;
 using cBeaconCallback       = cFunctionRef<bool(cBeaconEntity       &)>;
 using cBedCallback          = cFunctionRef<bool(cBedEntity          &)>;
 using cBlockEntityCallback  = cFunctionRef<bool(cBlockEntity        &)>;
@@ -260,11 +258,6 @@ public:
 	/** Calls the callback for the block entity at the specified coords.
 	Returns false if there's no block entity at those coords, true if found. */
 	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback);  // Lua-acessible
-
-
-	/** Calls the callback for the Banner at the specified coords.
-	Returns false if there's no Banner at those coords, true if found. */
-	bool DoWithBannerAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBannerCallback a_Callback);  // Todo: make lua accessible
 
 	/** Calls the callback for the beacon at the specified coords.
 	Returns false if there's no beacon at those coords, true if found. */

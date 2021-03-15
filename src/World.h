@@ -38,7 +38,6 @@ typedef std::list<cClientHandlePtr> cClientHandlePtrs;
 typedef std::list<cClientHandle *> cClientHandles;
 class cEntity;
 class cChunkGenerator;  // The thread responsible for generating chunks
-class cBannerEntity;
 class cBeaconEntity;
 class cBrewingstandEntity;
 class cChestEntity;
@@ -743,9 +742,6 @@ public:
 
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback) override;  // Exported in ManualBindings.cpp
-
-	/** Calls the callback for the Banner at the specified coords; returns false if there's no beacon at those coords, true if found */
-	bool DoWithBannerAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBannerCallback a_Callback);  // Todo: export to ManualBindings
 
 	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
 	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback a_Callback);  // Exported in ManualBindings.cpp

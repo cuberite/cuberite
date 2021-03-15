@@ -638,9 +638,11 @@ OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int
 	// Load the specific BlockEntity type:
 	switch (a_BlockType)
 	{
-		// Specific entity loaders:
+		// Banners:
 		case E_BLOCK_STANDING_BANNER:
 		case E_BLOCK_WALL_BANNER:        return LoadBannerFromNBT          (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+
+		// Others:
 		case E_BLOCK_BEACON:             return LoadBeaconFromNBT          (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_BED:                return LoadBedFromNBT             (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_BREWING_STAND:      return LoadBrewingstandFromNBT    (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
@@ -662,7 +664,6 @@ OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int
 		case E_BLOCK_SIGN_POST:          return LoadSignFromNBT            (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_TRAPPED_CHEST:      return LoadChestFromNBT           (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_WALLSIGN:           return LoadSignFromNBT            (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
-
 		default:
 		{
 			// All the other blocktypes should have no entities assigned to them. Report an error:
@@ -901,17 +902,16 @@ OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_Ta
 	{
 		return nullptr;
 	}
-	auto Banner = std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 
 	// Reads base color from NBT
 	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Base");
 	if (CurrentLine >= 0)
 	{
-		auto Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
-		Banner->SetBaseColor(Color);
+		const auto Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
+		return std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color);
 	}
 
-	return std::move(Banner);
+	return nullptr;
 }
 
 

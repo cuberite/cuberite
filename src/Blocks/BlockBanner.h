@@ -6,6 +6,10 @@
 #include "../BlockInfo.h"
 #include "BlockEntity.h"
 
+
+
+
+
 class cBlockBannerHandler final :
 	public cBlockEntityHandler
 {
@@ -27,12 +31,12 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		if (!cChunkDef::IsValidRelPos(a_RelPos))
+		if (a_RelPos.y < 1)
 		{
 			return false;
 		}
-		BLOCKTYPE Type = a_Chunk.GetBlock(a_RelPos.addedY(-1));
-		return (cBlockInfo::IsSolid(Type));
+
+		return cBlockInfo::IsSolid(a_Chunk.GetBlock(a_RelPos.addedY(-1)));
 	}
 
 

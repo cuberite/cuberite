@@ -394,6 +394,55 @@ enum eMessageType
 
 
 
+
+enum class BannerPattern
+{
+	BottomStripe,
+	TopStripe,
+	LeftStripe,
+	RightStripe,
+	CenterStripeVertical,
+	MiddleStripeHorizontal,
+	DownRightStripe,
+	DownLeftStripe,
+	SmallVerticalStripes,
+	DiagonalCross,
+	SquareCross,
+	LeftOfDiagonal,
+	RightOfUpsideDownDiagonal,
+	LeftOfUpsideDownDiagonal,
+	RightOfDiagonal,
+	VerticalHalfLeft,
+	VerticalHalfRight,
+	HorizontalHalfTop,
+	HorizontalHalfBottom,
+	BottomLeftCorner,
+	BottomRightCorner,
+	TopLeftCorner,
+	TopRightCorner,
+	BottomTriangle,
+	TopTriangle,
+	BottomTriangleSawtooth,
+	TopTriangleSawtooth,
+	MiddleCircle,
+	MiddleRhombus,
+	Border,
+	CurlyBorder,
+	Brick,
+	Gradient,
+	GradientUpsideDown,
+	Creeper,
+	Skull,
+	Flower,
+	Mojang,
+	Globe,
+	Piglin
+};
+
+
+
+
+
 /** Returns a textual representation of the click action. */
 const char * ClickActionToString(int a_ClickAction);
 

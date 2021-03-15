@@ -12,7 +12,6 @@
 #include "ClientHandle.h"
 #include "Server.h"
 #include "Defines.h"
-#include "BlockEntities/BannerEntity.h"
 #include "BlockEntities/BeaconEntity.h"
 #include "BlockEntities/BedEntity.h"
 #include "BlockEntities/BrewingstandEntity.h"
@@ -1900,17 +1899,6 @@ bool cChunk::GenericDoWithBlockEntityAt(Vector3i a_Position, cFunctionRef<bool(t
 bool cChunk::DoWithBlockEntityAt(Vector3i a_Position, cBlockEntityCallback a_Callback)
 {
 	return GenericDoWithBlockEntityAt<cBlockEntity>(a_Position, a_Callback);
-}
-
-
-
-
-
-bool cChunk::DoWithBannerAt(Vector3i a_Position, cBannerCallback a_Callback)
-{
-	return GenericDoWithBlockEntityAt<cBannerEntity,
-		E_BLOCK_WALL_BANNER, E_BLOCK_STANDING_BANNER
-	>(a_Position, a_Callback);
 }
 
 

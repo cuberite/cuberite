@@ -141,7 +141,7 @@ std::string_view NamespaceSerializer::From(const Statistic a_ID)
 
 
 
-std::string_view NamespaceSerializer::From(eMonsterType a_ID)
+std::string_view NamespaceSerializer::From(const eMonsterType a_ID)
 {
 	switch (a_ID)
 	{
@@ -218,6 +218,58 @@ std::string_view NamespaceSerializer::From(eMonsterType a_ID)
 	}
 
 	UNREACHABLE("Tried to save unknown monster type");
+}
+
+
+
+
+
+std::string_view NamespaceSerializer::From(const BannerPattern a_Pattern)
+{
+	switch (a_Pattern)
+	{
+		case BannerPattern::BottomStripe: return "bs";
+		case BannerPattern::TopStripe: return "ts";
+		case BannerPattern::LeftStripe: return "ls";
+		case BannerPattern::RightStripe: return "rs";
+		case BannerPattern::CenterStripeVertical: return "cs";
+		case BannerPattern::MiddleStripeHorizontal: return "ms";
+		case BannerPattern::DownRightStripe: return "drs";
+		case BannerPattern::DownLeftStripe: return "dls";
+		case BannerPattern::SmallVerticalStripes: return "ss";
+		case BannerPattern::DiagonalCross: return "cr";
+		case BannerPattern::SquareCross: return "sc";
+		case BannerPattern::LeftOfDiagonal: return "ld";
+		case BannerPattern::RightOfUpsideDownDiagonal: return "rud";
+		case BannerPattern::LeftOfUpsideDownDiagonal: return "lud";
+		case BannerPattern::RightOfDiagonal: return "rd";
+		case BannerPattern::VerticalHalfLeft: return "vh";
+		case BannerPattern::VerticalHalfRight: return "vhr";
+		case BannerPattern::HorizontalHalfTop: return "hh";
+		case BannerPattern::HorizontalHalfBottom: return "hhb";
+		case BannerPattern::BottomLeftCorner: return "bl";
+		case BannerPattern::BottomRightCorner: return "br";
+		case BannerPattern::TopLeftCorner: return "tl";
+		case BannerPattern::TopRightCorner: return "tr";
+		case BannerPattern::BottomTriangle: return "bt";
+		case BannerPattern::TopTriangle: return "tt";
+		case BannerPattern::BottomTriangleSawtooth: return "bts";
+		case BannerPattern::TopTriangleSawtooth: return "tts";
+		case BannerPattern::MiddleCircle: return "mc";
+		case BannerPattern::MiddleRhombus: return "mr";
+		case BannerPattern::Border: return "bo";
+		case BannerPattern::CurlyBorder: return "cbo";
+		case BannerPattern::Brick: return "bri";
+		case BannerPattern::Gradient: return "gra";
+		case BannerPattern::GradientUpsideDown: return "gru";
+		case BannerPattern::Creeper: return "cre";
+		case BannerPattern::Skull: return "sku";
+		case BannerPattern::Flower: return "flo";
+		case BannerPattern::Mojang: return "moj";
+		case BannerPattern::Globe: return "glb";
+		case BannerPattern::Piglin: return "pig";
+	}
+	UNREACHABLE("Unsupported banner pattern");
 }
 
 

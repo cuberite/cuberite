@@ -38,15 +38,16 @@ public:
 
 
 	virtual bool GetPlacementBlockTypeMeta(
-			cWorld * a_World, cPlayer * a_Player,
-			const Vector3i a_PlacedBlockPos,
-			eBlockFace a_ClickedBlockFace,
-			const Vector3i a_CursorPos,
-			BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		cWorld * a_World, cPlayer * a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
 		a_BlockMeta = 0x00;
-		double Rotation = a_Player->GetYaw();
+		const double Rotation = a_Player->GetYaw();
+
 		// Placing on the floor
 		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
 		{
@@ -157,6 +158,7 @@ public:
 		{
 			return false;
 		}
+
 		return true;
 	}
 
@@ -173,6 +175,12 @@ public:
 		const Vector3i a_CursorPos
 	) override
 	{
+		// Cannot place a banner at "no face" and from the bottom:
+		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_BOTTOM))
+		{
+			return true;
+		}
+
 		// Checks if the banner replaced the block
 		BLOCKTYPE ClickedBlockType;
 		NIBBLETYPE ClickedBlockMeta;
@@ -188,39 +196,20 @@ public:
 
 		// saving the color of the banner in case it's the players last one
 		NIBBLETYPE Color = static_cast<NIBBLETYPE>(a_EquippedItem.m_ItemDamage);
-		// Cannot place a banner at "no face" and from the bottom:
-		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_BOTTOM))
-		{
-			return true;
-		}
+
 		if (!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_ClickedBlockPos))
 		{
 			return false;
 		}
-		// auto BannerPos = IsReplacingClickedBlock ? a_ClickedBlockPos : AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-		auto BannerPos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-		return PlaceBannerEntity(a_World, a_Player, Color, BannerPos);
-	}
 
+		const auto BannerPos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+		return a_World.DoWithBlockEntityAt(BannerPos.x, BannerPos.y, BannerPos.z, [Color](cBlockEntity & a_BlockEntity)
+		{
+			ASSERT((a_BlockEntity.GetBlockType() == E_BLOCK_STANDING_BANNER) || (a_BlockEntity.GetBlockType() == E_BLOCK_WALL_BANNER));
 
-
-
-	/** Tries to place a Banner BlockEntity to the given position */
-	bool PlaceBannerEntity(
-		cWorld & a_World, cPlayer & a_Player, NIBBLETYPE Color,
-		Vector3i a_PlacePos
-		)
-	{
-		return a_World.DoWithBannerAt(a_PlacePos.x, a_PlacePos.y, a_PlacePos.z, [&](cBannerEntity & a_BlockEntity)
-			{
-				if (!((a_BlockEntity.GetBlockType() == E_BLOCK_STANDING_BANNER) || (a_BlockEntity.GetBlockType() == E_BLOCK_WALL_BANNER)))
-				{
-					return false;
-				}
-				a_BlockEntity.SetBaseColor(Color);
-				a_BlockEntity.GetWorld()->BroadcastBlockEntity(a_BlockEntity.GetPos());
-				return true;
-			}
-		);
+			auto & Banner = static_cast<cBannerEntity &>(a_BlockEntity);
+			Banner.SetBaseColor(Color);
+			return true;
+		});
 	}
 };
