@@ -113,11 +113,11 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		if (m_TimeToStopEating == 0)
 		{
-			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS)  // Make sure grass hasn't been destroyed in the meantime
+			if (m_World->GetBlock({ PosX, PosY, PosZ }) == E_BLOCK_GRASS)  // Make sure grass hasn't been destroyed in the meantime
 			{
 				// The sheep ate the grass so we change it to dirt
-				m_World->SetBlock(PosX, PosY, PosZ, E_BLOCK_DIRT, 0);
-				GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, {PosX, PosY, PosZ}, E_BLOCK_GRASS);
+				m_World->SetBlock({ PosX, PosY, PosZ }, E_BLOCK_DIRT, 0);
+				GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, { PosX, PosY, PosZ }, E_BLOCK_GRASS);
 				m_IsSheared = false;
 				m_World->BroadcastEntityMetadata(*this);
 			}
@@ -127,7 +127,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (GetRandomProvider().RandBool(1.0 / 600.0))
 		{
-			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS)
+			if (m_World->GetBlock({ PosX, PosY, PosZ }) == E_BLOCK_GRASS)
 			{
 				m_World->BroadcastEntityStatus(*this, esSheepEating);
 				m_TimeToStopEating = 40;

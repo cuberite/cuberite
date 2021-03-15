@@ -755,7 +755,7 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 
 	for (int PotentialY = HighestSpawnPoint; PotentialY > LowestSpawnPoint; --PotentialY)
 	{
-		BLOCKTYPE HeadBlock = GetBlock(static_cast<int>(a_X), PotentialY, static_cast<int>(a_Z));
+		BLOCKTYPE HeadBlock = GetBlock({ static_cast<int>(a_X), PotentialY, static_cast<int>(a_Z) });
 
 		// Is this block safe for spawning
 		if (HeadBlock != E_BLOCK_AIR)
@@ -763,7 +763,7 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 			continue;
 		}
 
-		BLOCKTYPE BodyBlock = GetBlock(static_cast<int>(a_X), PotentialY - 1, static_cast<int>(a_Z));
+		BLOCKTYPE BodyBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 1, static_cast<int>(a_Z) });
 
 		// Is this block safe for spawning
 		if (BodyBlock != E_BLOCK_AIR)
@@ -771,7 +771,7 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 			continue;
 		}
 
-		BLOCKTYPE FloorBlock = GetBlock(static_cast<int>(a_X), PotentialY - 2, static_cast<int>(a_Z));
+		BLOCKTYPE FloorBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 2, static_cast<int>(a_Z) });
 
 		// Early out - Is the floor block air
 		if (FloorBlock == E_BLOCK_AIR)
@@ -835,7 +835,7 @@ bool cWorld::CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
 		const int XPos = a_PosX + SurroundingCoords[CoordIndex].x;
 		const int ZPos = a_PosZ + SurroundingCoords[CoordIndex].z;
 
-		const BLOCKTYPE BlockType = GetBlock(XPos, a_PosY, ZPos);
+		const BLOCKTYPE BlockType = GetBlock({ XPos, a_PosY, ZPos });
 		if (cBlockInfo::IsSolid(BlockType) || IsBlockLiquid(BlockType))
 		{
 			return false;
@@ -1289,16 +1289,6 @@ void cWorld::UpdateSkyDarkness(void)
 void cWorld::WakeUpSimulators(Vector3i a_Block)
 {
 	return m_ChunkMap.WakeUpSimulators(a_Block);
-}
-
-
-
-
-
-void cWorld::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ)
-{
-	LOGWARNING("cWorld::WakeUpSimulatorsInArea(int, int, int) is deprecated, use cWorld::WakeUpSimulatorsInArea(Vector3i) instead.");
-	WakeUpSimulatorsInArea(cCuboid({a_MinBlockX, a_MinBlockY, a_MinBlockZ}, {a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ}));
 }
 
 
@@ -2684,7 +2674,7 @@ bool cWorld::IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
-	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, Meta);
+	GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, Block, Meta);
 	if ((Block != E_BLOCK_TRAPDOOR) && (Block != E_BLOCK_IRON_TRAPDOOR))
 	{
 		return false;
@@ -2701,7 +2691,7 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 {
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
-	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, Meta);
+	GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, Block, Meta);
 	if ((Block != E_BLOCK_TRAPDOOR) && (Block != E_BLOCK_IRON_TRAPDOOR))
 	{
 		return false;
@@ -2710,8 +2700,8 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 	bool IsOpen = (Meta & 0x4) != 0;
 	if (a_Open != IsOpen)
 	{
-		SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta ^ 0x4);
-		BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_TRAPDOOR_OPEN, {a_BlockX, a_BlockY, a_BlockZ}, 0);
+		SetBlockMeta({ a_BlockX, a_BlockY, a_BlockZ }, Meta ^ 0x4);
+		BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_TRAPDOOR_OPEN, { a_BlockX, a_BlockY, a_BlockZ }, 0);
 		return true;
 	}
 	return false;
@@ -2950,10 +2940,10 @@ void cWorld::QueueBlockForTick(int a_BlockX, int a_BlockY, int a_BlockZ, int a_T
 bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	return (
-		IsBlockWater(GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ)) ||
-		IsBlockWater(GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ)) ||
-		IsBlockWater(GetBlock(a_BlockX,     a_BlockY, a_BlockZ - 1)) ||
-		IsBlockWater(GetBlock(a_BlockX,     a_BlockY, a_BlockZ + 1))
+		IsBlockWater(GetBlock({ a_BlockX - 1, a_BlockY, a_BlockZ })) ||
+		IsBlockWater(GetBlock({ a_BlockX + 1, a_BlockY, a_BlockZ })) ||
+		IsBlockWater(GetBlock({ a_BlockX,     a_BlockY, a_BlockZ - 1 })) ||
+		IsBlockWater(GetBlock({ a_BlockX,     a_BlockY, a_BlockZ + 1 }))
 	);
 }
 
