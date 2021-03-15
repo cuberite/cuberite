@@ -10,40 +10,13 @@
 
 
 class cBlockChestHandler final :
-	public cYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>
+	public cBlockHandler
 {
-	using Super = cYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>;
+	using Super = cBlockHandler;
 
 public:
 
 	using Super::Super;
-
-	/** Translates player yaw when placing a chest into the chest block metadata. Valid for single chests only */
-	static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
-	{
-		a_Yaw += 90 + 45;  // So its not aligned with axis
-
-		if (a_Yaw > 360.f)
-		{
-			a_Yaw -= 360.f;
-		}
-		if ((a_Yaw >= 0.f) && (a_Yaw < 90.f))
-		{
-			return 0x04;
-		}
-		else if ((a_Yaw >= 180) && (a_Yaw < 270))
-		{
-			return 0x05;
-		}
-		else if ((a_Yaw >= 90) && (a_Yaw < 180))
-		{
-			return 0x02;
-		}
-		else
-		{
-			return 0x03;
-		}
-	}
 
 private:
 
@@ -53,7 +26,7 @@ private:
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState & a_Block
 	) const override
 	{
 		// Cannot place right next to double-chest:
@@ -71,7 +44,7 @@ private:
 		}
 
 		// Get meta as if this was a single-chest:
-		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta))
+		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_Block))
 		{
 			return false;
 		}
@@ -79,16 +52,16 @@ private:
 		// Check if this forms a doublechest, if so, need to adjust the meta:
 		double yaw = a_Player.GetYaw();
 		if (
-			(Area.GetRelBlockType(0, 0, 1) == m_BlockType) ||
-			(Area.GetRelBlockType(2, 0, 1) == m_BlockType)
+			(Area.GetRelBlock(0, 0, 1).Type() == m_BlockType) ||
+			(Area.GetRelBlock(2, 0, 1).Type() == m_BlockType)
 		)
 		{
 			a_BlockMeta = ((yaw >= -90) && (yaw < 90)) ? 2 : 3;
 			return true;
 		}
 		if (
-			(Area.GetRelBlockType(1, 0, 0) == m_BlockType) ||
-			(Area.GetRelBlockType(1, 0, 2) == m_BlockType)
+			(Area.GetRelBlock(1, 0, 0).Type() == m_BlockType) ||
+			(Area.GetRelBlock(1, 0, 2).Type() == m_BlockType)
 		)
 		{
 			a_BlockMeta = (yaw < 0) ? 4 : 5;
@@ -197,7 +170,7 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
 		UNUSED(a_Meta);
 		return 13;

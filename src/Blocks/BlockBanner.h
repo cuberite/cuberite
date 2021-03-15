@@ -8,6 +8,8 @@
 class cBlockBannerHandler final :
 		public cBlockHandler
 {
+
+public:
 	static inline bool IsBlockBanner(BlockState a_Block)
 	{
 		switch (a_Block.Type())
@@ -49,22 +51,12 @@ class cBlockBannerHandler final :
 			default: return false;
 		}
 	}
-};
 
 
 
 
 
-class cBlockBannerHandler final :
-	public cBlockEntityHandler
-{
-	using Super = cBlockEntityHandler;
-
-public:
-
-	using Super::Super;
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Drops handled by the block entity:
 		return {};
@@ -88,7 +80,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
 		UNUSED(a_Meta);
 		return 0;

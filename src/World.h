@@ -384,6 +384,8 @@ public:
 		return m_ChunkMap.GetBlock(a_BlockPos);
 	}
 
+	bool GetBlock(Vector3i a_BlockPos, BlockState & a_Block) const;
+
 	/** Returns the sky light value at the specified block position.
 	The sky light is "raw" - not affected by time-of-day.
 	Returns 0 if chunk not valid. */

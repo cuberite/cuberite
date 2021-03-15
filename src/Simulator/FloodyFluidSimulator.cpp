@@ -167,17 +167,10 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, Vector3i a_RelPos
 	// Not fed from above, check if there's a feed from the side (but not if it's a downward-OldFalloffing block):
 	if (a_Falloff != 8)
 	{
-		static const std::array<Vector3i, 4> Coords =
-		{
-			Vector3i( 1, 0,  0),
-			Vector3i(-1, 0,  0),
-			Vector3i( 0, 0,  1),
-			Vector3i( 0, 0, -1),
-		} ;
-		for (size_t i = 0; i < Coords.size(); i++)
+		for (const auto & NeighborCoord : FlatCrossCoords)
 		{
 			BlockState Self = 0;
-			if (!a_Chunk->UnboundedRelGetBlock(a_RelPos + Coords[i], Self))
+			if (!a_Chunk->UnboundedRelGetBlock(a_RelPos + NeighborCoord, Self))
 			{
 				continue;
 			}
@@ -188,13 +181,12 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, Vector3i a_RelPos
 			{
 				// This block is fed, no more processing needed
 				FLUID_FLOG("  Fed from {0}, type {1}",
-					a_Chunk->PositionToWorldPosition(a_RelPos +
-					Coords[i]),
+					a_Chunk->PositionToWorldPosition(a_RelPos + NeighborCoord),
 					"PLEASE ADD FUNCTION TO TRANSFORM BLOCK TO STRING"
 				);
 				return false;
 			}
-		}  // for i - Coords[]
+		}
 	}  // if not fed from above
 
 	// Block is not fed, decrease by m_Falloff levels:
@@ -346,18 +338,10 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, Vector3i a
 {
 	FLUID_FLOG("  Checking neighbors for source creation");
 
-	static const std::array<Vector3i, 4> NeighborCoords=
-	{
-		Vector3i(-1, 0,  0),
-		Vector3i( 1, 0,  0),
-		Vector3i( 0, 0, -1),
-		Vector3i( 0, 0,  1),
-	} ;
-
 	int NumNeeded = m_NumNeighborsForSource;
-	for (size_t i = 0; i < NeighborCoords.size(); i++)
+	for (const auto & NeighborCoords : FlatCrossCoords)
 	{
-		auto NeighborCoord = a_RelPos + NeighborCoords[i];
+		auto NeighborCoord = a_RelPos + NeighborCoords;
 		BlockState Neighbor = 0;
 		if (!a_Chunk->UnboundedRelGetBlock(NeighborCoord, Neighbor))
 		{
@@ -426,7 +410,7 @@ bool cFloodyFluidSimulator::HardenBlock(cChunk * a_Chunk, Vector3i a_RelPos, Blo
 		{
 			ShouldHarden = true;
 		}
-	}  // for i - Coords[]
+	}
 
 	if (ShouldHarden)
 	{

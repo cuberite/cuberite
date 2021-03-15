@@ -8,13 +8,14 @@
 
 #include "../World.h"
 #include "../ClientHandle.h"
+#include "../Blocks/BlockBanner.h"
 
 
 
 
 
-cBannerEntity::cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) :
-	cBannerEntity(a_BlockType, a_BlockMeta, a_Pos, a_World, 1)
+cBannerEntity::cBannerEntity(BlocState a_Block, Vector3i a_Pos, cWorld * a_World) :
+	cBannerEntity(a_Block, a_Pos, a_World, 1)
 {
 }
 
@@ -22,11 +23,11 @@ cBannerEntity::cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vect
 
 
 
-cBannerEntity::cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, unsigned char a_BaseColor):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+cBannerEntity::cBannerEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World, unsigned char a_BaseColor):
+	Super(a_Block, a_Pos, a_World),
 	m_BaseColor(a_BaseColor)
 {
-	ASSERT((a_BlockType == E_BLOCK_WALL_BANNER) || (a_BlockType == E_BLOCK_STANDING_BANNER));
+	ASSERT(cBlockBannerHandler::IsBlockBanner(a_Block));
 }
 
 
@@ -46,7 +47,7 @@ void cBannerEntity::CopyFrom(const cBlockEntity & a_Src)
 
 void cBannerEntity::SendTo(cClientHandle & a_Client)
 {
-	a_Client.SendBlockChange(m_Pos.x, m_Pos.y, m_Pos.z, m_BlockType, m_BlockMeta);
+	a_Client.SendBlockChange(m_Pos.x, m_Pos.y, m_Pos.z, m_Block);
 	a_Client.SendUpdateBlockEntity(*this);
 }
 

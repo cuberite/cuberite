@@ -36,7 +36,7 @@
 
 
 
-static constexpr std::array<Vector3i, 4> CrossCoords =
+static constexpr std::array<Vector3i, 4> FlatCrossCoords =
 {
 	Vector3i( 1, 0,  0),
 	Vector3i(-1, 0,  0),
@@ -48,7 +48,7 @@ static constexpr std::array<Vector3i, 4> CrossCoords =
 
 
 
-static constexpr std::array<Vector3i, 6> NeighborCoords =
+static constexpr std::array<Vector3i, 6> ThreeDimensionalNeighborCoords =
 {
 	Vector3i( 1,  0,  0),
 	Vector3i(-1,  0,  0),
@@ -99,7 +99,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 
 		auto BurnsForever = ((RelPos.y > 0) && DoesBurnForever(a_Chunk->GetBlock(RelPos.addedY(-1))));
 
-		auto Raining = std::any_of(CrossCoords.begin(), CrossCoords.end(), [a_Chunk, RelPos](Vector3i Offset)
+		auto Raining = std::any_of(FlatCrossCoords.begin(), FlatCrossCoords.end(), [a_Chunk, RelPos](Vector3i Offset)
 		{
 			auto Adjusted = RelPos + Offset;
 			const auto Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(Adjusted);
@@ -390,7 +390,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, Vector3i a_RelPos)
 		IsBlockBelowSolid = cBlockInfo::IsSolid(BlockBelow);
 	}
 
-	for (const auto & Cross: CrossCoords)
+	for (const auto & Cross: FlatCrossCoords)
 	{
 		BlockState Other = 0;
 		if (a_Chunk->UnboundedRelGetBlock(a_RelPos + Cross, Other))
@@ -463,10 +463,10 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, Vector3i a_RelPos)
 
 void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 {
-	for (auto & coord : NeighborCoords)
+	for (auto & Coord : ThreeDimensionalNeighborCoords)
 	{
 		BlockState Self = 0;
-		auto RelPos = a_RelPos + coord;
+		auto RelPos = a_RelPos + Coord;
 		auto NeighborChunk = a_Chunk->GetRelNeighborChunkAdjustCoords(RelPos);
 		if (NeighborChunk == nullptr)
 		{
@@ -518,7 +518,7 @@ bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, Vector3i a_RelPos
 		return false;
 	}
 
-	for (const auto & NeighborCoord: NeighborCoords)
+	for (const auto & NeighborCoord : ThreeDimensionalNeighborCoords)
 	{
 		if (!a_NearChunk->UnboundedRelGetBlock(a_RelPos + NeighborCoord, Self))
 		{

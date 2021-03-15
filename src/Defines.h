@@ -491,6 +491,8 @@ AString BlockFaceToString(eBlockFace a_BlockFace);
 
 eBlockFace RotationToBlockFace(double a_Rotation);
 
+unsigned char RotationToFineFace(double a_Rotation);
+
 /** Returns true if the specified block type is valid (known). */
 bool IsValidBlock(int a_BlockType);
 

@@ -59,6 +59,7 @@ target_sources(
 	BlockLeaves.h
 	BlockLever.h
 	BlockLilypad.h
+	BlockLog.h
 	BlockMelon.h
 	BlockMobHead.h
 	BlockMobSpawner.h

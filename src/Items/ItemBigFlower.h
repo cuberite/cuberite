@@ -15,13 +15,7 @@ class cItemBigFlowerHandler:
 
 public:
 
-	cItemBigFlowerHandler():
-		Super(E_BLOCK_BIG_FLOWER)
-	{
-	}
-
-
-
+	using Super::Super;
 
 
 	virtual bool GetBlocksToPlace(
@@ -35,7 +29,7 @@ public:
 	) override
 	{
 		// Can only be placed on dirt:
-		if ((a_PlacedBlockPos.y <= 0) || !IsBlockTypeOfDirt(a_World.GetBlock(a_PlacedBlockPos.addedY(-1))))
+		if ((a_PlacedBlockPos.y <= 0) || !IsBlockStateOfDirt(a_World.GetBlock(a_PlacedBlockPos.addedY(-1))))
 		{
 			return false;
 		}
@@ -47,18 +41,57 @@ public:
 		}
 
 		auto TopPos = a_PlacedBlockPos.addedY(1);
-		BLOCKTYPE TopType;
-		NIBBLETYPE TopMeta;
-		a_World.GetBlockTypeMeta(TopPos, TopType, TopMeta);
+		auto TopBlock = a_World.GetBlock(TopPos);
 		cChunkInterface ChunkInterface(a_World.GetChunkMap());
 
-		if (!cBlockHandler::For(TopType).DoesIgnoreBuildCollision(ChunkInterface, TopPos, a_Player, TopMeta))
+		if (!cBlockHandler::For(TopBlock.Type()).DoesIgnoreBuildCollision(ChunkInterface, TopPos, a_Player, TopBlock))
 		{
 			return false;
 		}
 
-		a_BlocksToPlace.emplace_back(a_PlacedBlockPos, E_BLOCK_BIG_FLOWER, a_EquippedItem.m_ItemDamage & 0x07);
-		a_BlocksToPlace.emplace_back(TopPos,           E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
+		using namespace Block;
+
+		switch (a_EquippedItem.m_ItemDamage)
+		{
+			case E_META_BIG_FLOWER_SUNFLOWER:
+			{
+				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, Sunflower::Sunflower(Sunflower::Half::Lower));
+				a_BlocksToPlace.emplace_back(TopBlock,         Sunflower::Sunflower(Sunflower::Half::Upper));
+				break;
+			}
+			case E_META_BIG_FLOWER_LILAC:
+			{
+				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, Lilac::Lilac(Lilac::Half::Lower));
+				a_BlocksToPlace.emplace_back(TopBlock,         Lilac::Lilac(Lilac::Half::Upper));
+				break;
+			}
+			case E_META_BIG_FLOWER_DOUBLE_TALL_GRASS:
+			{
+				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, TallGrass::TallGrass(TallGrass::Half::Lower));
+				a_BlocksToPlace.emplace_back(TopBlock,         TallGrass::TallGrass(TallGrass::Half::Upper));
+				break;
+			}
+			case E_META_BIG_FLOWER_LARGE_FERN:
+			{
+				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, LargeFern::LargeFern(LargeFern::Half::Lower));
+				a_BlocksToPlace.emplace_back(TopBlock,         LargeFern::LargeFern(LargeFern::Half::Upper));
+				break;
+			}
+			case E_META_BIG_FLOWER_ROSE_BUSH:
+			{
+				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, RoseBush::RoseBush(RoseBush::Half::Lower));
+				a_BlocksToPlace.emplace_back(TopBlock,         RoseBush::RoseBush(RoseBush::Half::Upper));
+				break;
+			}
+			case E_META_BIG_FLOWER_PEONY:
+			{
+				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, Peony::Peony(Peony::Half::Lower));
+				a_BlocksToPlace.emplace_back(TopBlock,         Peony::Peony(Peony::Half::Upper));
+				break;
+			}
+			default: return false;
+		}
+
 		return true;
 	}
 };

@@ -975,9 +975,9 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 
 
 
-OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
-	static const AStringVector expectedTypes({"Banner", "minecraft:standingbanner","minecraft:wallbanner"});
+	static const AStringVector expectedTypes({"Banner", "minecraft:standingbanner","minecraft:wallbanner"});  // TODO(12xx12): update list
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
@@ -988,7 +988,7 @@ OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_Ta
 	if (CurrentLine >= 0)
 	{
 		const auto Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
-		return std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color);
+		return std::make_unique<cBannerEntity>(a_Block, a_Pos, m_World, Color);
 	}
 
 	return nullptr;
