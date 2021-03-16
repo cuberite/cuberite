@@ -65,7 +65,8 @@
 
 #include "../Blocks/BlockHandler.h"
 #include "SimplePlaceableItemHandler.h"
-
+#include "../Registries/BlockTypeItemTypeConverter.h"
+#include "../Protocol/Palettes/Upgrade.h"
 
 
 
@@ -367,15 +368,12 @@ bool cItemHandler::OnPlayerPlace(
 		return false;
 	}
 
-	BLOCKTYPE ClickedBlockType;
-	NIBBLETYPE ClickedBlockMeta;
-
-	a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
+	auto ClickedBlock = a_World.GetBlock(a_ClickedBlockPos);
 	cChunkInterface ChunkInterface(a_World.GetChunkMap());
 
 	// Check if the block ignores build collision (water, grass etc.):
 	auto PlacedBlockPos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-	if (cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
+	if (cBlockHandler::For(ClickedBlock.Type()).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlock))
 	{
 		// Replace the clicked block:
 		a_World.DropBlockAsPickups(a_ClickedBlockPos, &a_Player, nullptr);
@@ -389,13 +387,11 @@ bool cItemHandler::OnPlayerPlace(
 			return false;
 		}
 
-		NIBBLETYPE PlaceMeta;
-		BLOCKTYPE PlaceBlock;
-		a_World.GetBlockTypeMeta(PlacedBlockPos, PlaceBlock, PlaceMeta);
+		auto OldBlock = a_World.GetBlock(PlacedBlockPos);
 
 		// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
 		// No need to do combinability (dblslab) checks, client will do that here.
-		if (!cBlockHandler::For(PlaceBlock).DoesIgnoreBuildCollision(ChunkInterface, PlacedBlockPos, a_Player, PlaceMeta))
+		if (!cBlockHandler::For(OldBlock.Type()).DoesIgnoreBuildCollision(ChunkInterface, PlacedBlockPos, a_Player, OldBlock))
 		{
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it
@@ -417,7 +413,6 @@ bool cItemHandler::OnPlayerPlace(
 		a_Player.GetInventory().SendEquippedSlot();
 		return false;
 	}
-
 	// Try to place the blocks:
 	if (!a_Player.PlaceBlocks(blocks))
 	{
@@ -446,13 +441,12 @@ bool cItemHandler::GetBlocksToPlace(
 	sSetBlockVector & a_BlocksToSet
 )
 {
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	if (!GetPlacementBlockTypeMeta(&a_World, &a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, BlockType, BlockMeta))
+	BlockState NewBlock;
+	if (!GetPlacementBlockTypeMeta(&a_World, &a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, NewBlock))
 	{
 		return false;
 	}
-	a_BlocksToSet.emplace_back(a_PlacedBlockPos, BlockType, BlockMeta);
+	a_BlocksToSet.emplace_back(a_PlacedBlockPos, NewBlock);
 	return true;
 }
 
@@ -836,6 +830,7 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 	}
 
 	cChunkInterface ChunkInterface(a_World->GetChunkMap());
+
 	return cBlockHandler::For(static_cast<BLOCKTYPE>(m_ItemType)).GetPlacementBlockTypeMeta(
 		ChunkInterface, *a_Player,
 		a_PlacedBlockPos, a_ClickedBlockFace,

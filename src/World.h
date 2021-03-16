@@ -634,6 +634,11 @@ public:
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback) override;  // Exported in ManualBindings.cpp
 
+	bool DoWithBlockEntityAt(Vector3i a_BlockPos, cBlockEntityCallback a_Callback)
+	{
+		return DoWithBlockEntityAt(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Callback);
+	}
+
 	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
 	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback a_Callback);  // Exported in ManualBindings.cpp
 
