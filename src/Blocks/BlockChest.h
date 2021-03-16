@@ -18,6 +18,48 @@ public:
 
 	using Super::Super;
 
+	/** This enum is used to unify the type of both chests for better readability. */
+	enum class ChestType : char
+	{
+		Left,
+		Single,
+		Right
+	};
+
+	/** Sets the orientation of the chest. -1 = left, 0 = single, 1 = right. */
+	static inline BlockState SetChestOrientation(BlockState a_Block, ChestType a_Orientation)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::Chest:        return Chest::Chest              (Chest::Facing(a_Block),        a_Orientation == ChestType::Left ? Chest::Type::Left :        a_Orientation == ChestType::Right ? Chest::Type::Right        : Chest::Type::Single);
+			case BlockType::TrappedChest: return TrappedChest::TrappedChest(TrappedChest::Facing(a_Block), a_Orientation == ChestType::Left ? TrappedChest::Type::Left : a_Orientation == ChestType::Right ? TrappedChest::Type::Right : TrappedChest::Type::Single);
+			default: return a_Block;
+		}
+	}
+
+	static inline ChestType GetChestOrientation(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::Chest:
+			{
+				switch (Chest::Type(a_Block))
+				{
+					case Chest::Type::Single: return ChestType::Single;
+					case Chest::Type::Left:   return ChestType::Left;
+					case Chest::Type::Right:  return ChestType::Right;
+				}
+			}
+			case BlockType::TrappedChest:
+			{
+
+			}
+			default: return ChestType::Single;
+		}
+	}
+
 private:
 
 	virtual bool GetPlacementBlockTypeMeta(
@@ -43,32 +85,68 @@ private:
 			return false;
 		}
 
-		// Get meta as if this was a single-chest:
-		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_Block))
-		{
-			return false;
-		}
+		auto Facing = RotationToBlockFace(a_Player.GetYaw());
+		/*
+		x is the placed chest
+			| 0 | 1 | 2 |
+		---------------
+		0   |   |   |   |
+		---------------
+		1   |   | x |   |
+		---------------
+		2   |   |   |   |
+		*/
 
-		// Check if this forms a doublechest, if so, need to adjust the meta:
-		double yaw = a_Player.GetYaw();
-		if (
-			(Area.GetRelBlock(0, 0, 1).Type() == m_BlockType) ||
-			(Area.GetRelBlock(2, 0, 1).Type() == m_BlockType)
-		)
+		using namespace Block;
+		if (Area.GetRelBlock(0, 0, 1).Type() == m_BlockType)
 		{
-			a_BlockMeta = ((yaw >= -90) && (yaw < 90)) ? 2 : 3;
-			return true;
+			switch (m_BlockType)
+			{
+				case BlockType::Chest:        a_Block = Chest::Chest              (Facing, Chest::Type::Right); break;
+				case BlockType::TrappedChest: a_Block = TrappedChest::TrappedChest(Facing, TrappedChest::Type::Right); break;
+				default: return false;
+			}
+			a_ChunkInterface.FastSetBlock(a_PlacedBlockPos.addedZ(1), SetChestOrientation(a_ChunkInterface.GetBlock(a_PlacedBlockPos.addedZ(1)), ChestType::Left));
 		}
-		if (
-			(Area.GetRelBlock(1, 0, 0).Type() == m_BlockType) ||
-			(Area.GetRelBlock(1, 0, 2).Type() == m_BlockType)
-		)
+		else if (Area.GetRelBlock(2, 0, 1).Type() == m_BlockType)
 		{
-			a_BlockMeta = (yaw < 0) ? 4 : 5;
-			return true;
+			switch (m_BlockType)
+			{
+				case BlockType::Chest:        a_Block = Chest::Chest              (Facing, Chest::Type::Left); break;
+				case BlockType::TrappedChest: a_Block = TrappedChest::TrappedChest(Facing, TrappedChest::Type::Left); break;
+				default: return false;
+			}
+			a_ChunkInterface.FastSetBlock(a_PlacedBlockPos.addedXZ(2, 1), SetChestOrientation(a_ChunkInterface.GetBlock(a_PlacedBlockPos.addedXZ(2, 1)), ChestType::Right));
 		}
-
-
+		else if (Area.GetRelBlock(1, 0, 0).Type() == m_BlockType)
+		{
+			switch (m_BlockType)
+			{
+				case BlockType::Chest:        a_Block = Chest::Chest              (Facing, Chest::Type::Right); break;
+				case BlockType::TrappedChest: a_Block = TrappedChest::TrappedChest(Facing, TrappedChest::Type::Right); break;
+				default: return false;
+			}
+			a_ChunkInterface.FastSetBlock(a_PlacedBlockPos.addedX(1), SetChestOrientation(a_ChunkInterface.GetBlock(a_PlacedBlockPos.addedX(1)), ChestType::Left));
+		}
+		else if (Area.GetRelBlock(1, 0, 2).Type() == m_BlockType)
+		{
+			switch (m_BlockType)
+			{
+				case BlockType::Chest:        a_Block = Chest::Chest              (Facing, Chest::Type::Left); break;
+				case BlockType::TrappedChest: a_Block = TrappedChest::TrappedChest(Facing, TrappedChest::Type::Left); break;
+				default: return false;
+			}
+			a_ChunkInterface.FastSetBlock(a_PlacedBlockPos.addedXZ(1, 2), SetChestOrientation(a_ChunkInterface.GetBlock(a_PlacedBlockPos.addedXZ(1, 2)), ChestType::Right));
+		}
+		else
+		{
+			switch (m_BlockType)
+			{
+				case BlockType::Chest:        a_Block = Chest::Chest              (Facing, Chest::Type::Single); break;
+				case BlockType::TrappedChest: a_Block = TrappedChest::TrappedChest(Facing, TrappedChest::Type::Single); break;
+				default: return false;
+			}
+		}
 		return true;
 	}
 
@@ -96,12 +174,12 @@ private:
 		}
 
 		int NumChestNeighbors = 0;
-		if (Area.GetRelBlockType(1, 0, 2) == m_BlockType)
+		if (Area.GetRelBlock(1, 0, 2).Type() == m_BlockType)
 		{
 			if (
-				(Area.GetRelBlockType(0, 0, 2) == m_BlockType) ||
-				(Area.GetRelBlockType(1, 0, 1) == m_BlockType) ||
-				(Area.GetRelBlockType(1, 0, 3) == m_BlockType)
+				(Area.GetRelBlock(0, 0, 2).Type() == m_BlockType) ||
+				(Area.GetRelBlock(1, 0, 1).Type() == m_BlockType) ||
+				(Area.GetRelBlock(1, 0, 3).Type() == m_BlockType)
 			)
 			{
 				// Already a doublechest neighbor, disallow:
@@ -109,12 +187,12 @@ private:
 			}
 			NumChestNeighbors += 1;
 		}
-		if (Area.GetRelBlockType(3, 0, 2) == m_BlockType)
+		if (Area.GetRelBlock(3, 0, 2).Type() == m_BlockType)
 		{
 			if (
-				(Area.GetRelBlockType(4, 0, 2) == m_BlockType) ||
-				(Area.GetRelBlockType(3, 0, 1) == m_BlockType) ||
-				(Area.GetRelBlockType(3, 0, 3) == m_BlockType)
+				(Area.GetRelBlock(4, 0, 2).Type() == m_BlockType) ||
+				(Area.GetRelBlock(3, 0, 1).Type() == m_BlockType) ||
+				(Area.GetRelBlock(3, 0, 3).Type() == m_BlockType)
 			)
 			{
 				// Already a doublechest neighbor, disallow:
@@ -122,12 +200,12 @@ private:
 			}
 			NumChestNeighbors += 1;
 		}
-		if (Area.GetRelBlockType(2, 0, 1) == m_BlockType)
+		if (Area.GetRelBlock(2, 0, 1).Type() == m_BlockType)
 		{
 			if (
-				(Area.GetRelBlockType(2, 0, 0) == m_BlockType) ||
-				(Area.GetRelBlockType(1, 0, 1) == m_BlockType) ||
-				(Area.GetRelBlockType(3, 0, 1) == m_BlockType)
+				(Area.GetRelBlock(2, 0, 0).Type() == m_BlockType) ||
+				(Area.GetRelBlock(1, 0, 1).Type() == m_BlockType) ||
+				(Area.GetRelBlock(3, 0, 1).Type() == m_BlockType)
 			)
 			{
 				// Already a doublechest neighbor, disallow:
@@ -135,12 +213,12 @@ private:
 			}
 			NumChestNeighbors += 1;
 		}
-		if (Area.GetRelBlockType(2, 0, 3) == m_BlockType)
+		if (Area.GetRelBlock(2, 0, 3).Type() == m_BlockType)
 		{
 			if (
-				(Area.GetRelBlockType(2, 0, 4) == m_BlockType) ||
-				(Area.GetRelBlockType(1, 0, 3) == m_BlockType) ||
-				(Area.GetRelBlockType(3, 0, 3) == m_BlockType)
+				(Area.GetRelBlock(2, 0, 4).Type() == m_BlockType) ||
+				(Area.GetRelBlock(1, 0, 3).Type() == m_BlockType) ||
+				(Area.GetRelBlock(3, 0, 3).Type() == m_BlockType)
 			)
 			{
 				// Already a doublechest neighbor, disallow:
@@ -153,9 +231,9 @@ private:
 
 
 
+/*
 
-
-	/** If there's a chest in the a_Area in the specified coords, modifies its meta to a_NewMeta and returns true. */
+	// If there's a chest in the a_Area in the specified coords, modifies its meta to a_NewMeta and returns true.
 	bool CheckAndAdjustNeighbor(cChunkInterface & a_ChunkInterface, const cBlockArea & a_Area, int a_RelX, int a_RelZ, NIBBLETYPE a_NewMeta) const
 	{
 		if (a_Area.GetRelBlockType(a_RelX, 0, a_RelZ) != m_BlockType)
@@ -166,13 +244,12 @@ private:
 		return true;
 	}
 
-
+*/
 
 
 
 	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 13;
 	}
 } ;

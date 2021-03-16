@@ -192,7 +192,7 @@ void cVillager::HandleFarmerTryHarvestCrops()
 	{
 		// Check if the blocks didn't change while the villager was walking to the coordinates.
 		auto CropBlock = m_World->GetBlock(m_CropsPos);
-		if (IsBlockFarmable(CropBlock) && cBlockCropsHandler<0>::IsFullyGrown(m_World->GetBlock(m_CropsPos)))
+		if (IsBlockFarmable(CropBlock) && cBlockCropsHandler::IsFullyGrown(m_World->GetBlock(m_CropsPos)))
 		{
 			m_World->DropBlockAsPickups(m_CropsPos, this, nullptr);
 			m_ActionCountDown = 20;

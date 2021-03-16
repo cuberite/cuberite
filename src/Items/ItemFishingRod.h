@@ -130,7 +130,7 @@ public:
 
 		// Empty fishing rod, just damage it:
 		auto BlockType = a_World.GetBlock(FloaterInfo.GetPos() - Vector3d(0, 0.1, 0));
-		if ((BlockType != E_BLOCK_AIR) && !IsBlockWater(BlockType))
+		if (cBlockAirHandler::IsBlockAir(BlockType) && (BlockType.Type() != BlockType::Water))
 		{
 			a_Player.UseEquippedItem(2);
 		}
@@ -205,7 +205,7 @@ public:
 				}
 				case 5:
 				{
-					Drops.Add(cItem(E_BLOCK_LILY_PAD));
+					Drops.Add(cItem(Item::LilyPad));
 					break;
 				}
 			}
@@ -259,7 +259,7 @@ public:
 			}
 			else  // 10 / 83 chance of spawning a tripwire hook
 			{
-				Drops.Add(cItem(E_BLOCK_TRIPWIRE_HOOK));
+				Drops.Add(cItem(Item::TripwireHook));
 			}
 
 			a_Player.GetStatManager().AddValue(Statistic::JunkFished, 1);

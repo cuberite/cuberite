@@ -235,7 +235,6 @@ public:
 
 		a_ChunkInterface.SetBlock(a_BlockPos, Block);
 
-		// TODO: 12xx12 - Check for infinite interation
 		if (IsTop(Block))
 		{
 			SetOpen(a_ChunkInterface, a_BlockPos.addedY(-1), a_Open);

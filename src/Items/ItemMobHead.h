@@ -77,7 +77,7 @@ public:
 		// Use a callback to set the properties of the mob head block entity:
 		a_World.DoWithBlockEntityAt(a_PlacePos.x, a_PlacePos.y, a_PlacePos.z, [&](cBlockEntity & a_BlockEntity)
 			{
-				if (a_BlockEntity.GetBlockType() != E_BLOCK_HEAD)
+				if (a_BlockEntity.GetBlockType() != BlockType::HEAD)
 				{
 					return false;
 				}
@@ -153,29 +153,29 @@ public:
 		// Image for the wither at the X axis:
 		static const sSetBlock ImageWitherX[] =
 		{
-			{-1,  0, 0, E_BLOCK_HEAD,     0},
-			{ 0,  0, 0, E_BLOCK_HEAD,     0},
-			{ 1,  0, 0, E_BLOCK_HEAD,     0},
-			{-1, -1, 0, E_BLOCK_SOULSAND, 0},
-			{ 0, -1, 0, E_BLOCK_SOULSAND, 0},
-			{ 1, -1, 0, E_BLOCK_SOULSAND, 0},
-			{-1, -2, 0, E_BLOCK_AIR,      0},
-			{ 0, -2, 0, E_BLOCK_SOULSAND, 0},
-			{ 1, -2, 0, E_BLOCK_AIR,      0},
+			{-1,  0, 0, BlockType::WitherSkeletonSkull},
+			{ 0,  0, 0, BlockType::WitherSkeletonSkull},
+			{ 1,  0, 0, BlockType::WitherSkeletonSkull},
+			{-1, -1, 0, BlockType::SoulSand },
+			{ 0, -1, 0, BlockType::SoulSand },
+			{ 1, -1, 0, BlockType::SoulSand },
+			{-1, -2, 0, BlockType::Air      },  // TODO: support other air
+			{ 0, -2, 0, BlockType::SoulSand },
+			{ 1, -2, 0, BlockType::Air      },  // TODO: support other air
 		};
 
 		// Image for the wither at the Z axis:
 		static const sSetBlock ImageWitherZ[] =
 		{
-			{ 0,  0, -1, E_BLOCK_HEAD,     0},
-			{ 0,  0,  0, E_BLOCK_HEAD,     0},
-			{ 0,  0,  1, E_BLOCK_HEAD,     0},
-			{ 0, -1, -1, E_BLOCK_SOULSAND, 0},
-			{ 0, -1,  0, E_BLOCK_SOULSAND, 0},
-			{ 0, -1,  1, E_BLOCK_SOULSAND, 0},
-			{ 0, -2, -1, E_BLOCK_AIR,      0},
-			{ 0, -2,  0, E_BLOCK_SOULSAND, 0},
-			{ 0, -2,  1, E_BLOCK_AIR,      0},
+			{ 0,  0, -1, BlockType::HEAD,     0},
+			{ 0,  0,  0, BlockType::HEAD,     0},
+			{ 0,  0,  1, BlockType::HEAD,     0},
+			{ 0, -1, -1, BlockType::SOULSAND, 0},
+			{ 0, -1,  0, BlockType::SOULSAND, 0},
+			{ 0, -1,  1, BlockType::SOULSAND, 0},
+			{ 0, -2, -1, BlockType::AIR,      0},
+			{ 0, -2,  0, BlockType::SOULSAND, 0},
+			{ 0, -2,  1, BlockType::AIR,      0},
 		};
 
 		// Try to spawn the wither from each image:
@@ -221,7 +221,7 @@ public:
 			// If the query is for the placed head, short-circuit-evaluate it:
 			if ((BlockX == a_PlacedHeadPos.x) && (BlockY == a_PlacedHeadPos.y) && (BlockZ == a_PlacedHeadPos.z))
 			{
-				if (a_Image[i].m_BlockType != E_BLOCK_HEAD)
+				if (a_Image[i].m_BlockType != BlockType::HEAD)
 				{
 					return false;  // Didn't match
 				}
@@ -244,12 +244,12 @@ public:
 			}
 
 			// If it is a mob head, check the correct head type using the block entity:
-			if (BlockType == E_BLOCK_HEAD)
+			if (BlockType == BlockType::HEAD)
 			{
 				bool IsWitherHead = false;
 				a_World.DoWithBlockEntityAt(BlockX, BlockY, BlockZ, [&](cBlockEntity & a_Entity)
 					{
-						ASSERT(a_Entity.GetBlockType() == E_BLOCK_HEAD);
+						ASSERT(a_Entity.GetBlockType() == BlockType::HEAD);
 						auto & MobHead = static_cast<cMobHeadEntity &>(a_Entity);
 						IsWitherHead = (MobHead.GetType() == SKULL_TYPE_WITHER);
 						return true;
@@ -261,7 +261,7 @@ public:
 				}
 			}
 			// Matched, continue checking
-			AirBlocks.emplace_back(BlockX, BlockY, BlockZ, E_BLOCK_AIR, 0);
+			AirBlocks.emplace_back(BlockX, BlockY, BlockZ, BlockType::AIR, 0);
 		}  // for i - a_Image
 
 		// All image blocks matched, try replace the image with air blocks:
@@ -303,29 +303,6 @@ public:
 
 
 
-	/** Converts the block face of the placement (which face of the block was clicked to place the head)
-	into the block's metadata value. */
-	static NIBBLETYPE BlockFaceToBlockMeta(int a_BlockFace)
-	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_TOP: return 0x01;  // On ground (rotation provided in block entity)
-			case BLOCK_FACE_XM:  return 0x04;  // west wall, facing east
-			case BLOCK_FACE_XP:  return 0x05;  // east wall, facing west
-			case BLOCK_FACE_ZM:  return 0x02;  // north wall, facing south
-			case BLOCK_FACE_ZP:  return 0x03;  // south wall, facing north
-			default:
-			{
-				ASSERT(!"Unhandled block face");
-				return 0;
-			}
-		}
-	}
-
-
-
-
-
 	virtual bool IsPlaceable(void) override
 	{
 		return true;
@@ -340,10 +317,19 @@ public:
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState & a_Block
 	) override
 	{
-		a_BlockType = E_BLOCK_HEAD;
+		if (a_Player == nullptr)
+		{
+			return false;
+		}
+
+		switch (a_Player->GetEquippedItem().m_ItemDamage)
+		{
+
+		}
+		a_BlockType = BlockType::HEAD;
 		a_BlockMeta = BlockFaceToBlockMeta(a_ClickedBlockFace);
 		return true;
 	}

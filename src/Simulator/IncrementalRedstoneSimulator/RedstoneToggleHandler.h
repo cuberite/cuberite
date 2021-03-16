@@ -28,6 +28,7 @@ namespace RedstoneToggleHandler
 			}\
 		}\
 	}\
+	break;\
 }
 
 	static Vector3i GetOffsetAttachedTo(BlockState a_Block)

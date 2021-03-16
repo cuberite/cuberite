@@ -48,59 +48,63 @@ public:
 	{
 		using namespace Block;
 
-		// Placing on the floor
-		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
+		switch (a_ClickedBlockFace)
 		{
-			auto Rotation = RotationToBlockFace(a_Player->GetYaw());
-			switch (a_Player->GetEquippedItem().m_ItemDamage)
+			// Placing on the floor
+			case BLOCK_FACE_YP:
 			{
-				case E_META_BANNER_BLACK:      a_Block = BlackBanner::BlackBanner(Rotation);
-				case E_META_BANNER_RED:        a_Block = RedBanner::RedBanner(Rotation);
-				case E_META_BANNER_GREEN:      a_Block = GreenBanner::GreenBanner(Rotation);
-				case E_META_BANNER_BROWN:      a_Block = BrownBanner::BrownBanner(Rotation);
-				case E_META_BANNER_BLUE:       a_Block = BlueBanner::BlueBanner(Rotation);
-				case E_META_BANNER_PURPLE:     a_Block = PurpleBanner::PurpleBanner(Rotation);
-				case E_META_BANNER_CYAN:       a_Block = CyanBanner::CyanBanner(Rotation);
-				case E_META_BANNER_LIGHTGRAY:  a_Block = LightGrayBanner::LightGrayBanner(Rotation);
-				case E_META_BANNER_GRAY:       a_Block = GrayBanner::GrayBanner(Rotation);
-				case E_META_BANNER_PINK:       a_Block = PinkBanner::PinkBanner(Rotation);
-				case E_META_BANNER_LIGHTGREEN: a_Block = LimeBanner::LimeBanner(Rotation);
-				case E_META_BANNER_YELLOW:     a_Block = YellowBanner::YellowBanner(Rotation);
-				case E_META_BANNER_LIGHTBLUE:  a_Block = LightBlueBanner::LightBlueBanner(Rotation);
-				case E_META_BANNER_MAGENTA:    a_Block = MagentaBanner::MagentaBanner(Rotation);
-				case E_META_BANNER_ORANGE:     a_Block = OrangeBanner::OrangeBanner(Rotation);
-				case E_META_BANNER_WHITE:      a_Block = WhiteBanner::WhiteBanner(Rotation);
+				auto Rotation = RotationToBlockFace(a_Player->GetYaw());
+				switch (a_Player->GetEquippedItem().m_ItemDamage)
+				{
+					case E_META_BANNER_BLACK:      a_Block = BlackBanner::BlackBanner(Rotation);         break;
+					case E_META_BANNER_RED:        a_Block = RedBanner::RedBanner(Rotation);             break;
+					case E_META_BANNER_GREEN:      a_Block = GreenBanner::GreenBanner(Rotation);         break;
+					case E_META_BANNER_BROWN:      a_Block = BrownBanner::BrownBanner(Rotation);         break;
+					case E_META_BANNER_BLUE:       a_Block = BlueBanner::BlueBanner(Rotation);           break;
+					case E_META_BANNER_PURPLE:     a_Block = PurpleBanner::PurpleBanner(Rotation);       break;
+					case E_META_BANNER_CYAN:       a_Block = CyanBanner::CyanBanner(Rotation);           break;
+					case E_META_BANNER_LIGHTGRAY:  a_Block = LightGrayBanner::LightGrayBanner(Rotation); break;
+					case E_META_BANNER_GRAY:       a_Block = GrayBanner::GrayBanner(Rotation);           break;
+					case E_META_BANNER_PINK:       a_Block = PinkBanner::PinkBanner(Rotation);           break;
+					case E_META_BANNER_LIGHTGREEN: a_Block = LimeBanner::LimeBanner(Rotation);           break;
+					case E_META_BANNER_YELLOW:     a_Block = YellowBanner::YellowBanner(Rotation);       break;
+					case E_META_BANNER_LIGHTBLUE:  a_Block = LightBlueBanner::LightBlueBanner(Rotation); break;
+					case E_META_BANNER_MAGENTA:    a_Block = MagentaBanner::MagentaBanner(Rotation);     break;
+					case E_META_BANNER_ORANGE:     a_Block = OrangeBanner::OrangeBanner(Rotation);       break;
+					case E_META_BANNER_WHITE:      a_Block = WhiteBanner::WhiteBanner(Rotation);         break;
+				}
+				break;
 			}
-		}
-		// placing on the sides
-		else if (a_ClickedBlockFace != BLOCK_FACE_NONE)
-		{
-			auto Facing = RotationToBlockFace(a_Player->GetYaw());
-			switch (a_Player->GetEquippedItem().m_ItemDamage)
+			case BLOCK_FACE_XM:
+			case BLOCK_FACE_XP:
+			case BLOCK_FACE_ZM:
+			case BLOCK_FACE_ZP:
 			{
-				case E_META_BANNER_BLACK:      a_Block = BlackWallBanner::BlackWallBanner(Facing);
-				case E_META_BANNER_RED:        a_Block = RedWallBanner::RedWallBanner(Facing);
-				case E_META_BANNER_GREEN:      a_Block = GreenWallBanner::GreenWallBanner(Facing);
-				case E_META_BANNER_BROWN:      a_Block = BrownWallBanner::BrownWallBanner(Facing);
-				case E_META_BANNER_BLUE:       a_Block = BlueWallBanner::BlueWallBanner(Facing);
-				case E_META_BANNER_PURPLE:     a_Block = PurpleWallBanner::PurpleWallBanner(Facing);
-				case E_META_BANNER_CYAN:       a_Block = CyanWallBanner::CyanWallBanner(Facing);
-				case E_META_BANNER_LIGHTGRAY:  a_Block = LightGrayWallBanner::LightGrayWallBanner(Facing);
-				case E_META_BANNER_GRAY:       a_Block = GrayWallBanner::GrayWallBanner(Facing);
-				case E_META_BANNER_PINK:       a_Block = PinkWallBanner::PinkWallBanner(Facing);
-				case E_META_BANNER_LIGHTGREEN: a_Block = LimeWallBanner::LimeWallBanner(Facing);
-				case E_META_BANNER_YELLOW:     a_Block = YellowWallBanner::YellowWallBanner(Facing);
-				case E_META_BANNER_LIGHTBLUE:  a_Block = LightBlueWallBanner::LightBlueWallBanner(Facing);
-				case E_META_BANNER_MAGENTA:    a_Block = MagentaWallBanner::MagentaWallBanner(Facing);
-				case E_META_BANNER_ORANGE:     a_Block = OrangeWallBanner::OrangeWallBanner(Facing);
-				case E_META_BANNER_WHITE:      a_Block = WhiteWallBanner::WhiteWallBanner(Facing);
+				// placing on the sides
+				auto Facing = RotationToBlockFace(a_Player->GetYaw());
+				switch (a_Player->GetEquippedItem().m_ItemDamage)
+				{
+					case E_META_BANNER_BLACK:      a_Block = BlackWallBanner::BlackWallBanner(Facing);         break;
+					case E_META_BANNER_RED:        a_Block = RedWallBanner::RedWallBanner(Facing);             break;
+					case E_META_BANNER_GREEN:      a_Block = GreenWallBanner::GreenWallBanner(Facing);         break;
+					case E_META_BANNER_BROWN:      a_Block = BrownWallBanner::BrownWallBanner(Facing);         break;
+					case E_META_BANNER_BLUE:       a_Block = BlueWallBanner::BlueWallBanner(Facing);           break;
+					case E_META_BANNER_PURPLE:     a_Block = PurpleWallBanner::PurpleWallBanner(Facing);       break;
+					case E_META_BANNER_CYAN:       a_Block = CyanWallBanner::CyanWallBanner(Facing);           break;
+					case E_META_BANNER_LIGHTGRAY:  a_Block = LightGrayWallBanner::LightGrayWallBanner(Facing); break;
+					case E_META_BANNER_GRAY:       a_Block = GrayWallBanner::GrayWallBanner(Facing);           break;
+					case E_META_BANNER_PINK:       a_Block = PinkWallBanner::PinkWallBanner(Facing);           break;
+					case E_META_BANNER_LIGHTGREEN: a_Block = LimeWallBanner::LimeWallBanner(Facing);           break;
+					case E_META_BANNER_YELLOW:     a_Block = YellowWallBanner::YellowWallBanner(Facing);       break;
+					case E_META_BANNER_LIGHTBLUE:  a_Block = LightBlueWallBanner::LightBlueWallBanner(Facing); break;
+					case E_META_BANNER_MAGENTA:    a_Block = MagentaWallBanner::MagentaWallBanner(Facing);     break;
+					case E_META_BANNER_ORANGE:     a_Block = OrangeWallBanner::OrangeWallBanner(Facing);       break;
+					case E_META_BANNER_WHITE:      a_Block = WhiteWallBanner::WhiteWallBanner(Facing);         break;
+				}
+				break;
 			}
+			default: return false;
 		}
-		else
-		{
-			return false;
-		}
-
 		return true;
 	}
 

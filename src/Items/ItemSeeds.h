@@ -39,7 +39,7 @@ public:
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState & a_Block
 	) override
 	{
 		// Only allow planting seeds from the top side of the block:
@@ -49,22 +49,23 @@ public:
 		}
 
 		// Only allow placement on farmland
-		if (a_World->GetBlock(a_PlacedBlockPos.addedY(-1)) != E_BLOCK_FARMLAND)
+		if (a_World->GetBlock(a_PlacedBlockPos.addedY(-1)).Type() != BlockType::Farmland)
 		{
 			return false;
 		}
 
+		using namespace Block;
+
 		// Get the produce block based on the seed item:
-		a_BlockMeta = 0;
 		switch (m_ItemType)
 		{
-			case E_ITEM_BEETROOT_SEEDS: a_BlockType = E_BLOCK_BEETROOTS;    return true;
-			case E_ITEM_CARROT:         a_BlockType = E_BLOCK_CARROTS;      return true;
-			case E_ITEM_MELON_SEEDS:    a_BlockType = E_BLOCK_MELON_STEM;   return true;
-			case E_ITEM_POTATO:         a_BlockType = E_BLOCK_POTATOES;     return true;
-			case E_ITEM_PUMPKIN_SEEDS:  a_BlockType = E_BLOCK_PUMPKIN_STEM; return true;
-			case E_ITEM_SEEDS:          a_BlockType = E_BLOCK_CROPS;        return true;
-			default:                    a_BlockType = E_BLOCK_AIR;          return true;
+			case E_ITEM_BEETROOT_SEEDS: a_Block = Beetroots::Beetroots();     return true;
+			case E_ITEM_CARROT:         a_Block = Carrots::Carrots();         return true;
+			case E_ITEM_MELON_SEEDS:    a_Block = MelonStem::MelonStem();     return true;
+			case E_ITEM_POTATO:         a_Block = Potatoes::Potatoes();       return true;
+			case E_ITEM_PUMPKIN_SEEDS:  a_Block = PumpkinStem::PumpkinStem(); return true;
+			case E_ITEM_SEEDS:          a_Block = Wheat::Wheat();             return true;
+			default: return false;
 		}
 	}
 } ;

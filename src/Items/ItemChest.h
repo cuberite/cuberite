@@ -21,9 +21,9 @@ public:
 	{
 	}
 
-
-	/** We need an OnPlayerPlace override because we're processing neighbor chests and changing their metas,
-	the parent class cannot do that. */
+/*
+	// We need an OnPlayerPlace override because we're processing neighbor chests and changing their metas,
+	// the parent class cannot do that.
 	virtual bool OnPlayerPlace(
 		cWorld & a_World,
 		cPlayer & a_Player,
@@ -155,7 +155,7 @@ public:
 		}
 		return true;
 	}
-
+*/
 private:
 	cItemChestHandler(const cItemChestHandler &) = delete;
 };

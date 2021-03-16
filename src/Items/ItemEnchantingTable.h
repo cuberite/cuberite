@@ -48,7 +48,7 @@ private:
 		const auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
 		a_World.DoWithBlockEntityAt(PlacePos.x, PlacePos.y, PlacePos.z, [&a_EquippedItem](cBlockEntity & a_Entity)
 		{
-			if (a_Entity.GetBlockType() != E_BLOCK_ENCHANTMENT_TABLE)
+			if (a_Entity.GetBlockType() != BlockType::EnchantingTable)
 			{
 				return true;
 			}

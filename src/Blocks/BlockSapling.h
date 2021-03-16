@@ -17,6 +17,21 @@ public:
 
 	using Super::Super;
 
+	static inline bool IsBlockSapling(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaSapling:
+			case BlockType::BirchSapling:
+			case BlockType::JungleSapling:
+			case BlockType::DarkOakSapling:
+			case BlockType::OakSapling:
+			case BlockType::SpruceSapling:
+				return true;
+			default: return false;
+		}
+	}
+
 private:
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override

@@ -34,13 +34,12 @@ private:
 			return false;
 		}
 
-		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(a_RelPos.addedY(-1));
-		switch (BelowBlock)
+		auto BelowBlock = a_Chunk.GetBlock(a_RelPos.addedY(-1));
+		switch (BelowBlock.Type())
 		{
-			case E_BLOCK_CLAY:
-			case E_BLOCK_HARDENED_CLAY:
-			case E_BLOCK_STAINED_CLAY:
-			case E_BLOCK_SAND:
+			case BlockType::Clay:
+				// TODO(12xx12) add hardened clay and stained clay
+			case BlockType::Sand:
 			{
 				return true;
 			}
@@ -52,7 +51,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// If cutting down with shears, drop self:
 		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == E_ITEM_SHEARS))
@@ -73,9 +72,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 0;
 	}
 } ;

@@ -47,22 +47,22 @@ public:
 
 		// The door needs a compatible block below it:
 		auto BelowPos = a_PlacedBlockPos.addedY(-1);
-		if (!cBlockDoorHandler::CanBeOn(a_World.GetBlock(BelowPos), a_World.GetBlockMeta(BelowPos)))
+		if (!cBlockDoorHandler::CanBeOn(a_World.GetBlock(BelowPos)))
 		{
 			return false;
 		}
 
 		// Get the block type of the door to place:
-		BLOCKTYPE BlockType;
+		BlockType BlockType;
 		switch (m_ItemType)
 		{
-			case E_ITEM_WOODEN_DOOR:   BlockType = E_BLOCK_OAK_DOOR;      break;
-			case E_ITEM_IRON_DOOR:     BlockType = E_BLOCK_IRON_DOOR;     break;
-			case E_ITEM_SPRUCE_DOOR:   BlockType = E_BLOCK_SPRUCE_DOOR;   break;
-			case E_ITEM_BIRCH_DOOR:    BlockType = E_BLOCK_BIRCH_DOOR;    break;
-			case E_ITEM_JUNGLE_DOOR:   BlockType = E_BLOCK_JUNGLE_DOOR;   break;
-			case E_ITEM_DARK_OAK_DOOR: BlockType = E_BLOCK_DARK_OAK_DOOR; break;
-			case E_ITEM_ACACIA_DOOR:   BlockType = E_BLOCK_ACACIA_DOOR;   break;
+			case E_ITEM_WOODEN_DOOR:   BlockType = BlockType::OakDoor;     break;
+			case E_ITEM_IRON_DOOR:     BlockType = BlockType::IronDoor;    break;
+			case E_ITEM_SPRUCE_DOOR:   BlockType = BlockType::SpruceDoor;  break;
+			case E_ITEM_BIRCH_DOOR:    BlockType = BlockType::BirchDoor;   break;
+			case E_ITEM_JUNGLE_DOOR:   BlockType = BlockType::JungleDoor;  break;
+			case E_ITEM_DARK_OAK_DOOR: BlockType = BlockType::DarkOakDoor; break;
+			case E_ITEM_ACACIA_DOOR:   BlockType = BlockType::AcaciaDoor;  break;
 			default:
 			{
 				ASSERT(!"Unhandled door type");
@@ -72,18 +72,20 @@ public:
 
 		// Check the two blocks that will get replaced by the door:
 		auto UpperBlockPos = a_PlacedBlockPos.addedY(1);
-		BLOCKTYPE LowerBlockType = a_World.GetBlock(a_PlacedBlockPos);
-		BLOCKTYPE UpperBlockType = a_World.GetBlock(UpperBlockPos);
+		auto LowerBlock = a_World.GetBlock(a_PlacedBlockPos);
+		auto UpperBlock = a_World.GetBlock(UpperBlockPos);
 		if (
-			!cBlockDoorHandler::CanReplaceBlock(LowerBlockType) ||
-			!cBlockDoorHandler::CanReplaceBlock(UpperBlockType))
+			!cBlockDoorHandler::CanReplaceBlock(LowerBlock) ||
+			!cBlockDoorHandler::CanReplaceBlock(UpperBlock))
 		{
 			return false;
 		}
 
+		bool HingeRight = false;
+
 		// Get the coords of the neighboring blocks:
-		NIBBLETYPE LowerBlockMeta = cBlockDoorHandler::YawToMetaData(a_Player.GetYaw());
-		Vector3i RelDirToOutside = cBlockDoorHandler::GetRelativeDirectionToOutside(LowerBlockMeta);
+		auto Facing = RotationToBlockFace(a_Player.GetYaw());
+		Vector3i RelDirToOutside = cBlockDoorHandler::GetRelativeDirectionToOutside(LowerBlock);
 		Vector3i LeftNeighborPos = RelDirToOutside;
 		LeftNeighborPos.TurnCW();
 		LeftNeighborPos.Move(a_PlacedBlockPos);
@@ -92,9 +94,8 @@ public:
 		RightNeighborPos.Move(a_PlacedBlockPos);
 
 		// Decide whether the hinge is on the left (default) or on the right:
-		NIBBLETYPE UpperBlockMeta = 0x08;
-		BLOCKTYPE LeftNeighborBlock = a_World.GetBlock(LeftNeighborPos);
-		BLOCKTYPE RightNeighborBlock = a_World.GetBlock(RightNeighborPos);
+		auto LeftNeighborBlock = a_World.GetBlock(LeftNeighborPos);
+		auto RightNeighborBlock = a_World.GetBlock(RightNeighborPos);
 		/*
 		// DEBUG:
 		FLOGD("Door being placed at {0}", a_PlacedBlockPos);
@@ -103,21 +104,78 @@ public:
 		FLOGD("Right neighbor at {0}: {1} ({2})", RightNeighborPos, RightNeighborBlock, ItemTypeToString(RightNeighborBlock));
 		*/
 		if (
-			cBlockDoorHandler::IsDoorBlockType(LeftNeighborBlock) ||   // The block to the left is a door block
+			cBlockDoorHandler::IsBlockDoor(LeftNeighborBlock) ||     // The block to the left is a door block
 			(
-				!cBlockInfo::IsSolid(LeftNeighborBlock) &&               // Prioritize hinge on the left side
-				cBlockInfo::IsSolid(RightNeighborBlock) &&               // The block to the right is solid...
-				!cBlockDoorHandler::IsDoorBlockType(RightNeighborBlock)  // ... but not a door
+				!cBlockInfo::IsSolid(LeftNeighborBlock) &&           // Prioritize hinge on the left side
+				cBlockInfo::IsSolid(RightNeighborBlock) &&           // The block to the right is solid...
+				!cBlockDoorHandler::IsBlockDoor(RightNeighborBlock)  // ... but not a door
 			)
 		)
 		{
 			// DEBUG: LOGD("Setting hinge to right side");
-			UpperBlockMeta = 0x09;  // Upper block | hinge on right
+			HingeRight = true;
 		}
 
-		// Set the blocks:
-		a_BlocksToSet.emplace_back(a_PlacedBlockPos, BlockType, LowerBlockMeta);
-		a_BlocksToSet.emplace_back(UpperBlockPos,    BlockType, UpperBlockMeta);
+		using namespace Block;
+
+		switch (BlockType)
+		{
+			case BlockType::AcaciaDoor:
+			{
+				a_BlocksToSet.emplace_back(a_PlacedBlockPos, AcaciaDoor::AcaciaDoor(Facing, AcaciaDoor::Half::Lower, HingeRight ? AcaciaDoor::Hinge::Right : AcaciaDoor::Hinge::Left, false, false));
+				a_BlocksToSet.emplace_back(UpperBlockPos,    AcaciaDoor::AcaciaDoor(Facing, AcaciaDoor::Half::Upper, HingeRight ? AcaciaDoor::Hinge::Right : AcaciaDoor::Hinge::Left, false, false));
+				break;
+			}
+			case BlockType::BirchDoor:
+			{
+				a_BlocksToSet.emplace_back(a_PlacedBlockPos, BirchDoor::BirchDoor(Facing, BirchDoor::Half::Lower, HingeRight ? BirchDoor::Hinge::Right : BirchDoor::Hinge::Left, false, false));
+				a_BlocksToSet.emplace_back(UpperBlockPos,    BirchDoor::BirchDoor(Facing, BirchDoor::Half::Upper, HingeRight ? BirchDoor::Hinge::Right : BirchDoor::Hinge::Left, false, false));
+				break;
+			}
+			case BlockType::CrimsonDoor:
+			{
+				a_BlocksToSet.emplace_back(a_PlacedBlockPos, CrimsonDoor::CrimsonDoor(Facing, CrimsonDoor::Half::Lower, HingeRight ? CrimsonDoor::Hinge::Right : CrimsonDoor::Hinge::Left, false, false));
+				a_BlocksToSet.emplace_back(UpperBlockPos,    CrimsonDoor::CrimsonDoor(Facing, CrimsonDoor::Half::Upper, HingeRight ? CrimsonDoor::Hinge::Right : CrimsonDoor::Hinge::Left, false, false));
+				break;
+			}
+			case BlockType::DarkOakDoor:
+			{
+				a_BlocksToSet.emplace_back(a_PlacedBlockPos, CrimsonDoor::CrimsonDoor(Facing, CrimsonDoor::Half::Lower, HingeRight ? CrimsonDoor::Hinge::Right : CrimsonDoor::Hinge::Left, false, false));
+				a_BlocksToSet.emplace_back(UpperBlockPos,    CrimsonDoor::CrimsonDoor(Facing, CrimsonDoor::Half::Upper, HingeRight ? CrimsonDoor::Hinge::Right : CrimsonDoor::Hinge::Left, false, false));
+				break;
+			}
+			case BlockType::JungleDoor:
+			{
+				a_BlocksToSet.emplace_back(a_PlacedBlockPos, JungleDoor::JungleDoor(Facing, JungleDoor::Half::Lower, HingeRight ? JungleDoor::Hinge::Right : JungleDoor::Hinge::Left, false, false));
+				a_BlocksToSet.emplace_back(UpperBlockPos,    JungleDoor::JungleDoor(Facing, JungleDoor::Half::Upper, HingeRight ? JungleDoor::Hinge::Right : JungleDoor::Hinge::Left, false, false));
+				break;
+			}
+			case BlockType::OakDoor:
+			{
+				a_BlocksToSet.emplace_back(a_PlacedBlockPos, OakDoor::OakDoor(Facing, OakDoor::Half::Lower, HingeRight ? OakDoor::Hinge::Right : OakDoor::Hinge::Left, false, false));
+				a_BlocksToSet.emplace_back(UpperBlockPos,    OakDoor::OakDoor(Facing, OakDoor::Half::Upper, HingeRight ? OakDoor::Hinge::Right : OakDoor::Hinge::Left, false, false));
+				break;
+			}
+			case BlockType::SpruceDoor:
+			{
+				a_BlocksToSet.emplace_back(a_PlacedBlockPos, SpruceDoor::SpruceDoor(Facing, SpruceDoor::Half::Lower, HingeRight ? SpruceDoor::Hinge::Right : SpruceDoor::Hinge::Left, false, false));
+				a_BlocksToSet.emplace_back(UpperBlockPos,    SpruceDoor::SpruceDoor(Facing, SpruceDoor::Half::Upper, HingeRight ? SpruceDoor::Hinge::Right : SpruceDoor::Hinge::Left, false, false));
+				break;
+			}
+			case BlockType::WarpedDoor:
+			{
+				a_BlocksToSet.emplace_back(a_PlacedBlockPos, WarpedDoor::WarpedDoor(Facing, WarpedDoor::Half::Lower, HingeRight ? WarpedDoor::Hinge::Right : WarpedDoor::Hinge::Left, false, false));
+				a_BlocksToSet.emplace_back(UpperBlockPos,    WarpedDoor::WarpedDoor(Facing, WarpedDoor::Half::Upper, HingeRight ? WarpedDoor::Hinge::Right : WarpedDoor::Hinge::Left, false, false));
+				break;
+			}
+			case BlockType::IronDoor:
+			{
+				a_BlocksToSet.emplace_back(a_PlacedBlockPos, IronDoor::IronDoor(Facing, IronDoor::Half::Lower, HingeRight ? IronDoor::Hinge::Right : IronDoor::Hinge::Left, false, false));
+				a_BlocksToSet.emplace_back(UpperBlockPos,    IronDoor::IronDoor(Facing, IronDoor::Half::Upper, HingeRight ? IronDoor::Hinge::Right : IronDoor::Hinge::Left, false, false));
+				break;
+			}
+			default: return false;
+		}
 		return true;
 	}
 

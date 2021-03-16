@@ -60,9 +60,9 @@ public:
 			}
 		}
 
-		switch (a_World->GetBlock(a_ClickedBlockPos))
+		switch (a_World->GetBlock(a_ClickedBlockPos).Type())
 		{
-			case E_BLOCK_TNT:
+			case BlockType::TNT:
 			{
 				// Activate the TNT:
 				a_World->DigBlock(a_ClickedBlockPos, a_Player);
@@ -77,9 +77,9 @@ public:
 				{
 					break;
 				}
-				if (a_World->GetBlock(FirePos) == E_BLOCK_AIR)
+				if (a_World->GetBlock(FirePos) == Block::Air::Air())
 				{
-					a_World->PlaceBlock(FirePos, E_BLOCK_FIRE, 0);
+					a_World->PlaceBlock(FirePos, Block::Fire::Fire());
 					a_World->BroadcastSoundEffect("item.flintandsteel.use", FirePos, 1.0f, 1.04f);
 					break;
 				}
