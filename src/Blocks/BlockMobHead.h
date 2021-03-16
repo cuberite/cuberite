@@ -14,6 +14,27 @@ class cBlockMobHeadHandler final :
 
 public:
 
+	static inline bool IsBlockMobHead(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::CreeperHead:
+			case BlockType::CreeperWallHead:
+			case BlockType::DragonHead:
+			case BlockType::DragonWallHead:
+			case BlockType::PlayerHead:
+			case BlockType::PlayerWallHead:
+			case BlockType::SkeletonSkull:
+			case BlockType::SkeletonWallSkull:
+			case BlockType::WitherSkeletonSkull:
+			case BlockType::WitherSkeletonWallSkull:
+			case BlockType::ZombieHead:
+			case BlockType::ZombieWallHead:
+				return true;
+			default: return false;
+		}
+	}
+
 	using Super::Super;
 
 private:
