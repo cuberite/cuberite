@@ -9,14 +9,17 @@
 
 
 
-class cItemLighterHandler final:
+class cItemLighterHandler:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	using Super::Super;
+	cItemLighterHandler(int a_ItemType):
+		Super(a_ItemType)
+	{
+	}
 
 
 
@@ -29,7 +32,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) const override
+	) override
 	{
 		if (a_ClickedBlockFace < 0)
 		{
@@ -38,39 +41,48 @@ public:
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			if (m_ItemType == E_ITEM_FLINT_AND_STEEL)
+			switch (m_ItemType)
 			{
-				a_Player->UseEquippedItem();
+				case E_ITEM_FLINT_AND_STEEL:
+				{
+					a_Player->UseEquippedItem();
+					break;
+				}
+				case E_ITEM_FIRE_CHARGE:
+				{
+					a_Player->GetInventory().RemoveOneEquippedItem();
+					break;
+				}
+				default:
+				{
+					ASSERT(!"Unknown Lighter Item!");
+				}
 			}
-			else  // Fire charge.
+		}
+
+		switch (a_World->GetBlock(a_ClickedBlockPos).Type())
+		{
+			case BlockType::TNT:
 			{
-				a_Player->GetInventory().RemoveOneEquippedItem();
+				// Activate the TNT:
+				a_World->DigBlock(a_ClickedBlockPos, a_Player);
+				a_World->SpawnPrimedTNT(Vector3d(a_ClickedBlockPos) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
+				break;
 			}
-		}
-
-		// Activate TNT if we clicked on it while not crouched:
-		if ((a_World->GetBlock(a_ClickedBlockPos) == E_BLOCK_TNT) && !a_Player->IsCrouched())
-		{
-			a_World->DigBlock(a_ClickedBlockPos, a_Player);
-			a_World->SpawnPrimedTNT(Vector3d(a_ClickedBlockPos) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
-			return false;
-		}
-
-		const auto FirePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-		if (!cChunkDef::IsValidHeight(FirePos))
-		{
-			return false;
-		}
-
-		// Light a fire next to / on top of the block if air:
-		if (a_World->GetBlock(FirePos) == E_BLOCK_AIR)
-		{
-			a_World->PlaceBlock(FirePos, E_BLOCK_FIRE, 0);
-
-			// The client plays flint and steel sounds, only need to handle fire charges:
-			if (m_ItemType == E_ITEM_FIRE_CHARGE)
+			default:
 			{
-				a_World->BroadcastSoundEffect("item.firecharge.use", FirePos, 1.0f, 1.04f);
+				// Light a fire next to / on top of the block if air:
+				auto FirePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+				if (!cChunkDef::IsValidHeight(FirePos.y))
+				{
+					break;
+				}
+				if (a_World->GetBlock(FirePos) == Block::Air::Air())
+				{
+					a_World->PlaceBlock(FirePos, Block::Fire::Fire());
+					a_World->BroadcastSoundEffect("item.flintandsteel.use", FirePos, 1.0f, 1.04f);
+					break;
+				}
 			}
 		}
 

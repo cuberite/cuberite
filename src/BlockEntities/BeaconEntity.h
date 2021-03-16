@@ -67,7 +67,7 @@ public:  // tolua_export
 	void GiveEffects(void);
 
 	/** Returns true if the block is a diamond block, a golden block, an iron block or an emerald block. */
-	static bool IsMineralBlock(BlockType a_BlockType);
+	static bool IsMineralBlock(BlockState a_Block);
 
 	/** Returns true if the effect can be used. */
 	static bool IsValidEffect(cEntityEffect::eType a_Effect, char a_BeaconLevel);

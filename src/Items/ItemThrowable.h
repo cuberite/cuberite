@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include "ItemHandler.h"
-#include "Entities/ProjectileEntity.h"
+#include "../Blocks/BlockAir.h"
 
 
 
@@ -17,7 +16,7 @@ class cItemThrowableHandler:
 
 public:
 
-	constexpr cItemThrowableHandler(int a_ItemType, cProjectileEntity::eKind a_ProjectileKind, double a_SpeedCoeff):
+	cItemThrowableHandler(int a_ItemType, cProjectileEntity::eKind a_ProjectileKind, double a_SpeedCoeff):
 		Super(a_ItemType),
 		m_ProjectileKind(a_ProjectileKind),
 		m_SpeedCoeff(a_SpeedCoeff)
@@ -35,7 +34,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) const override
+	) override
 	{
 		auto Pos = a_Player->GetThrowStartPos();
 		auto Speed = a_Player->GetLookVector() * m_SpeedCoeff;
@@ -65,23 +64,21 @@ protected:
 
 	/** The speed multiplier (to the player's normalized look vector) to set for the new projectile. */
 	double m_SpeedCoeff;
-
-	~cItemThrowableHandler() = default;
 } ;
 
 
 
 
 
-class cItemEggHandler final:
+class cItemEggHandler:
 	public cItemThrowableHandler
 {
 	using Super = cItemThrowableHandler;
 
 public:
 
-	constexpr cItemEggHandler(int a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkEgg, 30)
+	cItemEggHandler():
+		Super(E_ITEM_EGG, cProjectileEntity::pkEgg, 30)
 	{
 	}
 } ;
@@ -89,32 +86,15 @@ public:
 
 
 
-class cItemSnowballHandler final:
+class cItemSnowballHandler:
 	public cItemThrowableHandler
 {
 	using Super = cItemThrowableHandler;
 
 public:
 
-	constexpr cItemSnowballHandler(int a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkSnowball, 30)
-	{
-	}
-} ;
-
-
-
-
-
-class cItemEnderPearlHandler final:
-	public cItemThrowableHandler
-{
-	using Super = cItemThrowableHandler;
-
-public:
-
-	constexpr cItemEnderPearlHandler(int a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkEnderPearl, 30)
+	cItemSnowballHandler():
+		Super(E_ITEM_SNOWBALL, cProjectileEntity::pkSnowball, 30)
 	{
 	}
 } ;
@@ -123,15 +103,32 @@ public:
 
 
 
-class cItemBottleOEnchantingHandler final :
+class cItemEnderPearlHandler:
 	public cItemThrowableHandler
 {
 	using Super = cItemThrowableHandler;
 
 public:
 
-	constexpr cItemBottleOEnchantingHandler(int a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkExpBottle, 14)
+	cItemEnderPearlHandler():
+		Super(E_ITEM_ENDER_PEARL, cProjectileEntity::pkEnderPearl, 30)
+	{
+	}
+} ;
+
+
+
+
+
+class cItemBottleOEnchantingHandler:
+	public cItemThrowableHandler
+{
+	using Super = cItemThrowableHandler;
+
+public:
+
+	cItemBottleOEnchantingHandler():
+		Super(E_ITEM_BOTTLE_O_ENCHANTING, cProjectileEntity::pkExpBottle, 14)
 	{
 	}
 };
@@ -140,15 +137,15 @@ public:
 
 
 
-class cItemFireworkHandler final:
+class cItemFireworkHandler:
 	public cItemThrowableHandler
 {
 	using Super = cItemThrowableHandler;
 
 public:
 
-	constexpr cItemFireworkHandler(int a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkFirework, 0)
+	cItemFireworkHandler():
+		Super(E_ITEM_FIREWORK_ROCKET, cProjectileEntity::pkFirework, 0)
 	{
 	}
 
@@ -163,9 +160,9 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) const override
+	) override
 	{
-		if (a_World->GetBlock(a_ClickedBlockPos) == E_BLOCK_AIR)
+		if (cBlockAirHandler::IsBlockAir(a_World->GetBlock(a_ClickedBlockPos)))
 		{
 			return false;
 		}
@@ -182,4 +179,5 @@ public:
 
 		return true;
 	}
+
 };

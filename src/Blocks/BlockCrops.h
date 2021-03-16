@@ -9,7 +9,6 @@
 
 
 /** Common class that takes care of beetroots, carrots, potatoes and wheat */
-template <unsigned char RipeAge>
 class cBlockCropsHandler final :
 	public cBlockPlant<true>
 {
@@ -95,7 +94,7 @@ private:
 			}
 			case BlockType::Potatoes:
 			{
-				if (Potatoes::Age(a_Block))
+				if (Potatoes::Age(a_Block) < PotatoesMaxAge)
 				{
 					return cItem(E_ITEM_POTATO);
 				}
@@ -109,10 +108,11 @@ private:
 					// With a 2% chance, drop a poisonous potato as well:
 					Res.Add(E_ITEM_POISONOUS_POTATO);
 				}
+				return Res;
 			}
 			case BlockType::Wheat:
 			{
-				if (Wheat::Age(a_Block))
+				if (Wheat::Age(a_Block) < WheatMaxAge)
 				{
 					return cItem(E_ITEM_SEEDS);
 				}

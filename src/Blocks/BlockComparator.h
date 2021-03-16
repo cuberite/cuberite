@@ -148,6 +148,23 @@ private:
 
 
 
+	virtual bool GetPlacementBlockTypeMeta(
+			cChunkInterface & a_ChunkInterface,
+			cPlayer & a_Player,
+			const Vector3i a_PlacedBlockPos,
+			eBlockFace a_ClickedBlockFace,
+			const Vector3i a_CursorPos,
+			BlockState & a_Block
+	) const override
+	{
+		a_Block = Block::Comparator::Comparator(RotationToBlockFace(a_Player.GetYaw()), Block::Comparator::Mode::Compare, false);
+		return true;
+	}
+
+
+
+
+
 	virtual bool IsUseable(void) const override
 	{
 		return true;

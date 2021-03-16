@@ -82,7 +82,22 @@ public:
 			case BlockType::JungleLeaves:  return JungleLeaves::Persistent(a_Block);
 			case BlockType::OakLeaves:     return OakLeaves::Persistent(a_Block);
 			case BlockType::SpruceLeaves:  return SpruceLeaves::Persistent(a_Block);
-			default:return false;
+			default: return false;
+		}
+	}
+
+	static inline BlockState SetLeafPermission(BlockState a_Block, bool a_IsPersistant)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaLeaves:  return AcaciaLeaves::AcaciaLeaves   (AcaciaLeaves::Distance(a_Block),  a_IsPersistant);
+			case BlockType::BirchLeaves:   return BirchLeaves::BirchLeaves     (BirchLeaves::Distance(a_Block),   a_IsPersistant);
+			case BlockType::DarkOakLeaves: return DarkOakLeaves::DarkOakLeaves (DarkOakLeaves::Distance(a_Block), a_IsPersistant);
+			case BlockType::JungleLeaves:  return JungleLeaves::JungleLeaves   (JungleLeaves::Distance(a_Block),  a_IsPersistant);
+			case BlockType::OakLeaves:     return OakLeaves::OakLeaves         (OakLeaves::Distance(a_Block),     a_IsPersistant);
+			case BlockType::SpruceLeaves:  return SpruceLeaves::SpruceLeaves   (SpruceLeaves::Distance(a_Block),  a_IsPersistant);
+			default: return a_Block;
 		}
 	}
 

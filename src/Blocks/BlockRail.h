@@ -446,6 +446,7 @@ private:
 				{
 					ISUNSTABLE(DetectorRail)
 				}
+				break;
 			}
 			case BlockType::PoweredRail:
 			{
@@ -453,6 +454,7 @@ private:
 				{
 					ISUNSTABLE(PoweredRail)
 				}
+				break;
 			}
 			default: return false;
 		}
@@ -518,6 +520,7 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					case BlockType::ActivatorRail:
 					{
@@ -534,6 +537,7 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					case BlockType::DetectorRail:
 					{
@@ -550,6 +554,7 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					case BlockType::PoweredRail:
 					{
@@ -566,6 +571,7 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					default: return false;
 				}
@@ -595,6 +601,7 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					case BlockType::ActivatorRail:
 					{
@@ -611,6 +618,7 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					case BlockType::DetectorRail:
 					{
@@ -627,6 +635,7 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					case BlockType::PoweredRail:
 					{
@@ -643,9 +652,11 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					default: return false;
 				}
+				break;
 			}
 
 			case BLOCK_FACE_EAST:
@@ -671,6 +682,7 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					case BlockType::ActivatorRail:
 					{
@@ -687,6 +699,7 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					case BlockType::DetectorRail:
 					{
@@ -703,6 +716,7 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					case BlockType::PoweredRail:
 					{
@@ -719,9 +733,11 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					default: return false;
 				}
+				break;
 			}
 			case BLOCK_FACE_WEST:
 			{
@@ -746,6 +762,7 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					case BlockType::ActivatorRail:
 					{
@@ -762,6 +779,7 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					case BlockType::DetectorRail:
 					{
@@ -778,6 +796,7 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					case BlockType::PoweredRail:
 					{
@@ -794,9 +813,11 @@ private:
 								return true;
 							}
 						}
+						break;
 					}
 					default: return false;
 				}
+				break;
 			}
 			case BLOCK_FACE_NONE:
 			case BLOCK_FACE_YM:

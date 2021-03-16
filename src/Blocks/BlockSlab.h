@@ -1439,182 +1439,21 @@ private:
 
 
 
-#define ISINSIDEBLOCK(SlabType) \
-	if (SlabType::Type(a_Block) == SlabType::Type::Top)\
-	{\
-		return !cBlockHandler::IsInsideBlock(a_Position, a_Block);\
-	}\
-	else if (SlabType::Type(a_Block) == SlabType::Type::Double)\
-	{\
-		return true;\
-	}
+
 
 	virtual bool IsInsideBlock(Vector3d a_Position, const BlockState a_Block) const override
 	{
-		using namespace Block;
-		switch (m_BlockType)
+		if (IsSlabTop(a_Block))
 		{
-			case BlockType::AcaciaSlab:
-			{
-				ISINSIDEBLOCK(AcaciaSlab)
-			}
-			case BlockType::AndesiteSlab:
-			{
-				ISINSIDEBLOCK(AndesiteSlab)
-			}
-			case BlockType::BirchSlab:
-			{
-				ISINSIDEBLOCK(BirchSlab)
-			}
-			case BlockType::BlackstoneSlab:
-			{
-				ISINSIDEBLOCK(BlackstoneSlab)
-			}
-			case BlockType::BrickSlab:
-			{
-				ISINSIDEBLOCK(BrickSlab)
-			}
-			case BlockType::CobblestoneSlab:
-			{
-				ISINSIDEBLOCK(CobblestoneSlab)
-			}
-			case BlockType::CrimsonSlab:
-			{
-				ISINSIDEBLOCK(CrimsonSlab)
-			}
-			case BlockType::CutRedSandstoneSlab:
-			{
-				ISINSIDEBLOCK(CutRedSandstoneSlab)
-			}
-			case BlockType::CutSandstoneSlab:
-			{
-				ISINSIDEBLOCK(CutSandstoneSlab)
-			}
-			case BlockType::DarkOakSlab:
-			{
-				ISINSIDEBLOCK(DarkOakSlab)
-			}
-			case BlockType::DarkPrismarineSlab:
-			{
-				ISINSIDEBLOCK(DarkPrismarineSlab)
-			}
-			case BlockType::DioriteSlab:
-			{
-				ISINSIDEBLOCK(DioriteSlab)
-			}
-			case BlockType::EndStoneBrickSlab:
-			{
-				ISINSIDEBLOCK(EndStoneBrickSlab)
-			}
-			case BlockType::GraniteSlab:
-			{
-				ISINSIDEBLOCK(GraniteSlab)
-			}
-			case BlockType::JungleSlab:
-			{
-				ISINSIDEBLOCK(JungleSlab)
-			}
-			case BlockType::MossyCobblestoneSlab:
-			{
-				ISINSIDEBLOCK(MossyCobblestoneSlab)
-			}
-			case BlockType::MossyStoneBrickSlab:
-			{
-				ISINSIDEBLOCK(MossyStoneBrickSlab)
-			}
-			case BlockType::NetherBrickSlab:
-			{
-				ISINSIDEBLOCK(NetherBrickSlab)
-			}
-			case BlockType::OakSlab:
-			{
-				ISINSIDEBLOCK(OakSlab)
-			}
-			case BlockType::PetrifiedOakSlab:
-			{
-				ISINSIDEBLOCK(PetrifiedOakSlab)
-			}
-			case BlockType::PolishedAndesiteSlab:
-			{
-				ISINSIDEBLOCK(PolishedAndesiteSlab)
-			}
-			case BlockType::PolishedBlackstoneBrickSlab:
-			{
-				ISINSIDEBLOCK(PolishedBlackstoneBrickSlab)
-			}
-			case BlockType::PolishedBlackstoneSlab:
-			{
-				ISINSIDEBLOCK(PolishedBlackstoneSlab)
-			}
-			case BlockType::PolishedDioriteSlab:
-			{
-				ISINSIDEBLOCK(PolishedDioriteSlab)
-			}
-			case BlockType::PolishedGraniteSlab:
-			{
-				ISINSIDEBLOCK(PolishedGraniteSlab)
-			}
-			case BlockType::PrismarineBrickSlab:
-			{
-				ISINSIDEBLOCK(PrismarineBrickSlab)
-			}
-			case BlockType::PrismarineSlab:
-			{
-				ISINSIDEBLOCK(PrismarineSlab)
-			}
-			case BlockType::PurpurSlab:
-			{
-				ISINSIDEBLOCK(PurpurSlab)
-			}
-			case BlockType::QuartzSlab:
-			{
-				ISINSIDEBLOCK(QuartzSlab)
-			}
-			case BlockType::RedNetherBrickSlab:
-			{
-				ISINSIDEBLOCK(RedNetherBrickSlab)
-			}
-			case BlockType::RedSandstoneSlab:
-			{
-				ISINSIDEBLOCK(RedSandstoneSlab)
-			}
-			case BlockType::SandstoneSlab:
-			{
-				ISINSIDEBLOCK(SandstoneSlab)
-			}
-			case BlockType::SmoothQuartzSlab:
-			{
-				ISINSIDEBLOCK(SmoothQuartzSlab)
-			}
-			case BlockType::SmoothRedSandstoneSlab:
-			{
-				ISINSIDEBLOCK(SmoothRedSandstoneSlab)
-			}
-			case BlockType::SmoothSandstoneSlab:
-			{
-				ISINSIDEBLOCK(SmoothSandstoneSlab)
-			}
-			case BlockType::SmoothStoneSlab:
-			{
-				ISINSIDEBLOCK(SmoothStoneSlab)
-			}
-			case BlockType::SpruceSlab:
-			{
-				ISINSIDEBLOCK(SpruceSlab)
-			}
-			case BlockType::StoneBrickSlab:
-			{
-				ISINSIDEBLOCK(StoneBrickSlab)
-			}
-			case BlockType::StoneSlab:
-			{
-				ISINSIDEBLOCK(StoneSlab)
-			}
-			case BlockType::WarpedSlab:
-			{
-				ISINSIDEBLOCK(WarpedSlab)
-			}
-			default: return cBlockHandler::IsInsideBlock(a_Position, a_Block);
+			return (a_Position.y >= 0.5);
+		}
+		else if (IsSlabFull(a_Block))
+		{
+			return true;
+		}
+		else
+		{
+			return (a_Position.y <= 0.5);
 		}
 	}
 

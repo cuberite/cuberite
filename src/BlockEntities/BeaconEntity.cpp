@@ -154,19 +154,17 @@ bool cBeaconEntity::IsBeaconBlocked(void)
 
 
 
-bool cBeaconEntity::IsMineralBlock(BlockType a_BlockType)
+bool cBeaconEntity::IsMineralBlock(BlockState a_Block)
 {
-	switch (a_BlockType)
+	switch (a_Block.Type())
 	{
-		case E_BLOCK_DIAMOND_BLOCK:
-		case E_BLOCK_GOLD_BLOCK:
-		case E_BLOCK_IRON_BLOCK:
-		case E_BLOCK_EMERALD_BLOCK:
-		{
+		case BlockType::DiamondBlock:
+		case BlockType::GoldBlock:
+		case BlockType::IronBlock:
+		case BlockType::EmeraldBlock:
 			return true;
-		}
+		default: return false;
 	}
-	return false;
 }
 
 

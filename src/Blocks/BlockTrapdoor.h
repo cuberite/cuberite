@@ -254,7 +254,6 @@ private:
 
 	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		switch (m_BlockType)
 		{
 			case BlockType::AcaciaTrapdoor:  return 15;
