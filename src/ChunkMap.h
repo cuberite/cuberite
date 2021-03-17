@@ -378,7 +378,7 @@ public:
 	void ChunkValidated(void);  // Called by chunks that have become valid
 
 	/** Returns the CS for locking the chunkmap; only cWorld::cLock may use this function! */
-	cCriticalSection & GetCS(void) { return m_CSChunks; }
+	cCriticalSection & GetCS(void) const { return m_CSChunks; }
 
 	/** Increments (a_AlwaysTicked == true) or decrements (false) the m_AlwaysTicked counter for the specified chunk.
 	If the m_AlwaysTicked counter is greater than zero, the chunk is ticked in the tick-thread regardless of

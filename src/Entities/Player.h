@@ -656,8 +656,6 @@ private:
 	/** The item being dragged by the cursor while in a UI window */
 	cItem m_DraggingItem;
 
-	std::chrono::steady_clock::time_point m_LastPlayerListTime;
-
 	cClientHandlePtr m_ClientHandle;
 
 	cSlotNums m_InventoryPaintSlots;

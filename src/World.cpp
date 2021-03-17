@@ -91,7 +91,7 @@ namespace World
 ////////////////////////////////////////////////////////////////////////////////
 // cWorld::cLock:
 
-cWorld::cLock::cLock(cWorld & a_World) :
+cWorld::cLock::cLock(const cWorld & a_World) :
 	Super(&(a_World.m_ChunkMap.GetCS()))
 {
 }
@@ -168,7 +168,7 @@ cWorld::cWorld(
 	m_IsDaylightCycleEnabled(true),
 	m_WorldAge(0),
 	m_TimeOfDay(0),
-	m_LastTimeUpdate(0),
+	m_WorldTickAge(0),
 	m_LastChunkCheck(0),
 	m_LastSave(0),
 	m_SkyDarkness(0),
@@ -959,31 +959,36 @@ void cWorld::Stop(cDeadlockDetect & a_DeadlockDetect)
 
 void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec)
 {
-	// Call the plugins
+	// Notify the plugins:
 	cPluginManager::Get()->CallHookWorldTick(*this, a_Dt, a_LastTickDurationMSec);
 
 	m_WorldAge += a_Dt;
+	m_WorldTickAge += 1;
 
 	if (m_IsDaylightCycleEnabled)
 	{
-		// We need sub-tick precision here, that's why we store the time in milliseconds and calculate ticks off of it
 		m_TimeOfDay += a_Dt;
 
-		// Wrap time of day each 20 minutes (1200 seconds)
+		// Wrap time of day every 20 minutes (1200 seconds):
 		if (m_TimeOfDay > std::chrono::minutes(20))
 		{
 			m_TimeOfDay -= std::chrono::minutes(20);
 		}
 
-		// Updates the sky darkness based on current time of day
+		// Updates the sky darkness based on current time of day:
 		UpdateSkyDarkness();
 
-		// Broadcast time update every 40 ticks (2 seconds)
-		if (m_LastTimeUpdate < m_WorldAge - cTickTime(40))
+		// Broadcast time update every 64 ticks (3.2 seconds):
+		if ((m_WorldTickAge % 64) == 0)
 		{
 			BroadcastTimeUpdate();
-			m_LastTimeUpdate = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
 		}
+	}
+
+	// Broadcast player list pings every 256 ticks (12.8 seconds):
+	if ((m_WorldTickAge % 256) == 0)
+	{
+		BroadcastPlayerListUpdatePing();
 	}
 
 	TickQueuedChunkDataSets();
@@ -993,10 +998,9 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	TickQueuedEntityAdditions();
 	m_MapManager.TickMaps();
 	TickQueuedTasks();
+	TickWeather(static_cast<float>(a_Dt.count()));
 
 	GetSimulatorManager()->Simulate(static_cast<float>(a_Dt.count()));
-
-	TickWeather(static_cast<float>(a_Dt.count()));
 
 	if (m_WorldAge - m_LastChunkCheck > std::chrono::seconds(10))
 	{
@@ -2529,6 +2533,16 @@ bool cWorld::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback a_
 bool cWorld::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback)
 {
 	return m_ChunkMap.ForEachEntityInBox(a_Box, a_Callback);
+}
+
+
+
+
+
+size_t cWorld::GetPlayerCount() const
+{
+	cLock Lock(*this);
+	return m_Players.size();
 }
 
 
