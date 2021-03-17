@@ -128,7 +128,7 @@ protected:
 
 	/** Fills the specified area of blocks in the chunk with the specified blocktype if they are one of the overwritten block types.
 	The coords are absolute, start coords are inclusive, end coords are exclusive. */
-	void ReplaceCuboid(cChunkDesc & a_ChunkDesc, int a_StartX, int a_StartY, int a_StartZ, int a_EndX, int a_EndY, int a_EndZ, BLOCKTYPE a_DstBlockType)
+	void ReplaceCuboid(cChunkDesc & a_ChunkDesc, int a_StartX, int a_StartY, int a_StartZ, int a_EndX, int a_EndY, int a_EndZ, BlockState a_DstBlock)
 	{
 		int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 		int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
@@ -142,9 +142,9 @@ protected:
 			{
 				for (int x = RelStartX; x < RelEndX; x++)
 				{
-					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlockType(x, y, z)))
+					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlock({x, y, z})))
 					{
-						a_ChunkDesc.SetBlockType(x, y, z, a_DstBlockType);
+						a_ChunkDesc.SetBlock({x, y, z}, a_DstBlock);
 					}
 				}  // for x
 			}  // for z
@@ -155,7 +155,7 @@ protected:
 
 	/** Fills the specified area of blocks in the chunk with a random pattern of the specified blocktypes, if they are one of the overwritten block types.
 	The coords are absolute, start coords are inclusive, end coords are exclusive. The first blocktype uses 75% chance, the second 25% chance. */
-	void ReplaceCuboidRandom(cChunkDesc & a_ChunkDesc, int a_StartX, int a_StartY, int a_StartZ, int a_EndX, int a_EndY, int a_EndZ, BLOCKTYPE a_DstBlockType1, BLOCKTYPE a_DstBlockType2)
+	void ReplaceCuboidRandom(cChunkDesc & a_ChunkDesc, int a_StartX, int a_StartY, int a_StartZ, int a_EndX, int a_EndY, int a_EndZ, BlockState a_DstBlock1, BlockState a_DstBlock2)
 	{
 		int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 		int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
@@ -163,17 +163,16 @@ protected:
 		int RelStartZ = Clamp(a_StartZ - BlockZ, 0, cChunkDef::Width - 1);
 		int RelEndX   = Clamp(a_EndX - BlockX,   0, cChunkDef::Width);
 		int RelEndZ   = Clamp(a_EndZ - BlockZ,   0, cChunkDef::Width);
-		auto & rnd = GetRandomProvider();
+		auto & Rnd = GetRandomProvider();
 		for (int y = a_StartY; y < a_EndY; y++)
 		{
 			for (int z = RelStartZ; z < RelEndZ; z++)
 			{
 				for (int x = RelStartX; x < RelEndX; x++)
 				{
-					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlockType(x, y, z)))
+					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlock({x, y, z})))
 					{
-						BLOCKTYPE BlockType = rnd.RandBool(0.75) ? a_DstBlockType1 : a_DstBlockType2;
-						a_ChunkDesc.SetBlockType(x, y, z, BlockType);
+						a_ChunkDesc.SetBlock({x, y, z}, Rnd.RandBool(0.75) ? a_DstBlock1 : a_DstBlock2);
 					}
 				}  // for x
 			}  // for z
@@ -195,7 +194,7 @@ protected:
 		{
 			return;
 		}
-		a_ChunkDesc.SetBlockTypeMeta(RelX, m_FloorHeight + 1, RelZ, E_BLOCK_CHEST, static_cast<NIBBLETYPE>(a_Chest.y));
+		a_ChunkDesc.SetBlock({RelX, m_FloorHeight + 1, RelZ}, Block::Chest::Chest());
 
 		// Fill the chest with random loot
 		static const cLootProbab LootProbab[] =
@@ -226,7 +225,7 @@ protected:
 		} ;
 
 		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity(RelX, m_FloorHeight + 1, RelZ));
-		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
+		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == BlockType::Chest));
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
 		int NumSlots = 3 + ((Noise.IntNoise3DInt(a_Chest.x, a_Chest.y, a_Chest.z) / 11) % 4);
 		int Seed = Noise.IntNoise2DInt(RelX, RelZ);
@@ -272,9 +271,9 @@ protected:
 			(CenterZ >= 0) && (CenterZ < cChunkDef::Width)
 		)
 		{
-			a_ChunkDesc.SetBlockTypeMeta(CenterX, b, CenterZ, E_BLOCK_MOB_SPAWNER, 0);
+			a_ChunkDesc.SetBlock({CenterX, b, CenterZ}, Block::Spawner::Spawner());
 			cMobSpawnerEntity * MobSpawner = static_cast<cMobSpawnerEntity *>(a_ChunkDesc.GetBlockEntity(CenterX, b, CenterZ));
-			ASSERT((MobSpawner != nullptr) && (MobSpawner->GetBlockType() == E_BLOCK_MOB_SPAWNER));
+			ASSERT((MobSpawner != nullptr) && (MobSpawner->GetBlockType() == BlockType::Spawner));
 			MobSpawner->SetEntity(m_MonsterType);
 		}
 	}

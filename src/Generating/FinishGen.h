@@ -64,7 +64,7 @@ protected:
 	cNoise m_Noise;
 	int    m_Seed;
 
-	void TryPlaceClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block);
+	void TryPlaceClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block);
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
@@ -79,13 +79,11 @@ public:
 	// Contains the meta, type and weight for a clump block
 	struct FoliageInfo
 	{
-		BLOCKTYPE m_BlockType;
-		NIBBLETYPE m_BlockMeta;
+		BlockState m_Block;
 		int m_Weight;
 
-		FoliageInfo(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_Weight) :
-			m_BlockType(a_BlockType),
-			m_BlockMeta(a_BlockMeta),
+		FoliageInfo(BlockState a_Block, int a_Weight) :
+			m_Block(a_Block),
 			m_Weight(a_Weight)
 		{}
 	};
@@ -138,7 +136,7 @@ protected:
 	/** The maximum range a foliage can be placed from the center of the clump */
 	const int RANGE_FROM_CENTER = 5;
 
-	void TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_IsDoubleTall);
+	void TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, BlockState a_Block, bool a_IsDoubleTall);
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 };
 
@@ -274,7 +272,7 @@ class cFinishGenSingleTopBlock :
 	public cFinishGen
 {
 public:
-	typedef std::vector<BLOCKTYPE> BlockList;
+	typedef std::vector<BlockState> BlockList;
 	bool m_IsAllowedBelow[256];
 
 	typedef std::vector<EMCSBiome> BiomeList;
@@ -282,11 +280,11 @@ public:
 
 
 	cFinishGenSingleTopBlock(
-		int a_Seed, BLOCKTYPE a_BlockType, BiomeList a_Biomes, int a_Amount,
+		int a_Seed, BlockState a_Block, BiomeList a_Biomes, int a_Amount,
 		BlockList a_AllowedBelow
 	) :
 		m_Noise(a_Seed),
-		m_BlockType(a_BlockType),
+		m_Block(a_Block),
 		m_Amount(a_Amount)
 	{
 		// Initialize all the block types.
@@ -316,7 +314,7 @@ public:
 
 protected:
 	cNoise m_Noise;
-	BLOCKTYPE m_BlockType;
+	BlockState m_Block;
 
 	/** Relative amount of blocks to try adding. 1 = one block per 256 biome columns. */
 	int m_Amount;
@@ -331,7 +329,7 @@ protected:
 	}
 
 	/** Returns true if the given blocktype may be below m_BlockType */
-	inline bool IsAllowedBlockBelow(BLOCKTYPE a_BlockBelow)
+	inline bool IsAllowedBlockBelow(BlockState a_BlockBelow)
 	{
 		return m_IsAllowedBelow[a_BlockBelow];
 	}

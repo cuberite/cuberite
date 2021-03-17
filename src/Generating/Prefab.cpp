@@ -12,6 +12,8 @@ uses a prefabricate in a cBlockArea for drawing itself.
 #include "ChunkDesc.h"
 #include "../BlockInfo.h"
 
+#include "../Protocol/Palettes/Upgrade.h"
+
 
 
 
@@ -184,23 +186,21 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumR
 						// X coord outside the chunk
 						continue;
 					}
-					BLOCKTYPE BlockType;
-					NIBBLETYPE BlockMeta;
-					Image.GetRelBlockTypeMeta(x, 0, z, BlockType, BlockMeta);
-					if ((BlockType == E_BLOCK_AIR) || (BlockType == E_BLOCK_SPONGE))
+					auto Block = Image.GetRelBlock(x, 0, z);
+					if ((Block.Type() == BlockType::Air) || (Block.Type() == BlockType::Sponge))
 					{
 						// Do not expand air nor sponge blocks
 						continue;
 					}
 					for (int y = Placement.y - 1; y >= 0; y--)
 					{
-						BLOCKTYPE ExistingBlock = a_Dest.GetBlockType(RelX, y, RelZ);
-						if (ExistingBlock != E_BLOCK_AIR)
+						auto ExistingBlock = a_Dest.GetBlock({RelX, y, RelZ});
+						if (ExistingBlock != BlockType::Air)
 						{
 							// End the expansion for this column, reached the end
 							break;
 						}
-						a_Dest.SetBlockTypeMeta(RelX, y, RelZ, BlockType, BlockMeta);
+						a_Dest.SetBlock(RelX, y, RelZ, Block);
 					}  // for y
 				}  // for x
 			}  // for z
@@ -227,23 +227,21 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumR
 						// X coord outside the chunk
 						continue;
 					}
-					BLOCKTYPE BlockType;
-					NIBBLETYPE BlockMeta;
-					Image.GetRelBlockTypeMeta(x, 0, z, BlockType, BlockMeta);
-					if ((BlockType == E_BLOCK_AIR) || (BlockType == E_BLOCK_SPONGE))
+					auto Block = Image.GetRelBlock({x, 0, z});
+					if ((Block.Type() == BlockType::Air) || (Block.Type() == BlockType::Sponge))
 					{
 						// Do not expand air nor sponge blocks
 						continue;
 					}
 					for (int y = Placement.y - 1; y >= 0; y--)
 					{
-						BLOCKTYPE ExistingBlock = a_Dest.GetBlockType(RelX, y, RelZ);
+						auto ExistingBlock = a_Dest.GetBlock({RelX, y, RelZ});
 						if (cBlockInfo::IsSolid(ExistingBlock))
 						{
 							// End the expansion for this column, reached the end
 							break;
 						}
-						a_Dest.SetBlockTypeMeta(RelX, y, RelZ, BlockType, BlockMeta);
+						a_Dest.SetBlock(RelX, y, RelZ, Block);
 					}  // for y
 				}  // for x
 			}  // for z
@@ -327,8 +325,7 @@ void cPrefab::ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef)
 	// Initialize the charmap to all-invalid values:
 	for (size_t i = 0; i < ARRAYCOUNT(a_CharMapOut); i++)
 	{
-		a_CharMapOut[i].m_BlockType = 0;
-		a_CharMapOut[i].m_BlockMeta = 16;  // Mark unassigned entries with a meta that is impossible otherwise
+		a_CharMapOut[i] = UINT_LEAST16_MAX;  // Mark unassigned entries with a value that is impossible (hopefully)
 	}
 
 	// Process the lines in the definition:
@@ -343,15 +340,16 @@ void cPrefab::ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef)
 			continue;
 		}
 		unsigned char Src = static_cast<unsigned char>(CharDef[0][0]);
-		ASSERT(a_CharMapOut[Src].m_BlockMeta == 16);  // This letter has not been assigned yet?
-		a_CharMapOut[Src].m_BlockType = static_cast<BLOCKTYPE>(atoi(CharDef[1].c_str()));
-		NIBBLETYPE BlockMeta = 0;
+		ASSERT(a_CharMapOut[Src] == UINT_LEAST16_MAX);  // This letter has not been assigned yet?
+		auto BlockType = static_cast<unsigned char>(atoi(CharDef[1].c_str()));
+		unsigned char BlockMeta = 0;
 		if ((NumElements >= 3) && !CharDef[2].empty())
 		{
-			BlockMeta = static_cast<NIBBLETYPE>(atoi(CharDef[2].c_str()));
+			BlockMeta = static_cast<unsigned char>(atoi(CharDef[2].c_str()));
 			ASSERT((BlockMeta <= 15));
 		}
-		a_CharMapOut[Src].m_BlockMeta = BlockMeta;
+
+		a_CharMapOut[Src] = PaletteUpgrade::FromBlock(BlockType, BlockMeta);
 	}  // for itr - Lines[]
 }
 
@@ -369,9 +367,9 @@ void cPrefab::ParseBlockImage(const CharMap & a_CharMap, const char * a_BlockIma
 			const unsigned char * BlockImage = reinterpret_cast<const unsigned char *>(a_BlockImage + y * m_Size.x * m_Size.z + z * m_Size.x);
 			for (int x = 0; x < m_Size.x; x++)
 			{
-				const sBlockTypeDef & MappedValue = a_CharMap[BlockImage[x]];
-				ASSERT(MappedValue.m_BlockMeta != 16);  // Using a letter not defined in the CharMap?
-				m_BlockArea[0].SetRelBlockTypeMeta(x, y, z, MappedValue.m_BlockType, MappedValue.m_BlockMeta);
+				const BlockState & MappedValue = a_CharMap[BlockImage[x]];
+				ASSERT(MappedValue != UINT_LEAST16_MAX);  // Using a letter not defined in the CharMap?
+				m_BlockArea[0].SetRelBlock({x, y, z}, MappedValue);
 			}
 		}
 	}
