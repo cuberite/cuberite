@@ -133,9 +133,9 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BED:                 return new cItemBedHandler(a_ItemType);
 		case E_ITEM_BOTTLE_O_ENCHANTING: return new cItemBottleOEnchantingHandler();
 		case E_ITEM_BOW:                 return new cItemBowHandler();
-		case E_ITEM_BREWING_STAND:       return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_BREWING_STAND);
-		case E_ITEM_CAKE:                return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_CAKE);
-		case E_ITEM_CAULDRON:            return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_CAULDRON);
+		case E_ITEM_BREWING_STAND:       return new cSimplePlaceableItemHandler(a_ItemType, BlockType::BrewingStand);
+		case E_ITEM_CAKE:                return new cSimplePlaceableItemHandler(a_ItemType, BlockType::Cake);
+		case E_ITEM_CAULDRON:            return new cSimplePlaceableItemHandler(a_ItemType, BlockType::Cauldron);
 		case E_ITEM_COMPARATOR:          return new cItemComparatorHandler(a_ItemType);
 		case E_ITEM_DYE:                 return new cItemDyeHandler(a_ItemType);
 		case E_ITEM_EGG:                 return new cItemEggHandler();
@@ -147,7 +147,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_FIREWORK_ROCKET:     return new cItemFireworkHandler();
 		case E_ITEM_FISHING_ROD:         return new cItemFishingRodHandler(a_ItemType);
 		case E_ITEM_FLINT_AND_STEEL:     return new cItemLighterHandler(a_ItemType);
-		case E_ITEM_FLOWER_POT:          return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_FLOWER_POT);
+		case E_ITEM_FLOWER_POT:          return new cSimplePlaceableItemHandler(a_ItemType, BlockType::FlowerPot);
 		case E_ITEM_GLASS_BOTTLE:        return new cItemBottleHandler();
 		case E_ITEM_MAP:                 return new cItemMapHandler();
 		case E_ITEM_MILK:                return new cItemMilkHandler();
@@ -162,8 +162,8 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_HEAD:                return new cItemMobHeadHandler(a_ItemType);
 		case E_ITEM_SNOWBALL:            return new cItemSnowballHandler();
 		case E_ITEM_SPAWN_EGG:           return new cItemSpawnEggHandler(a_ItemType);
-		case E_ITEM_STRING:              return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_TRIPWIRE);
-		case E_ITEM_SUGARCANE:           return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_SUGARCANE);
+		case E_ITEM_STRING:              return new cSimplePlaceableItemHandler(a_ItemType, BlockType::Tripwire);
+		case E_ITEM_SUGARCANE:           return new cSimplePlaceableItemHandler(a_ItemType, BlockType::SugarCane);
 
 		case E_ITEM_WOODEN_HOE:
 		case E_ITEM_STONE_HOE:
@@ -711,98 +711,110 @@ bool cItemHandler::CanRepairWithRawMaterial(short a_ItemType)
 
 
 
-bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
+bool cItemHandler::CanHarvestBlock(BlockState a_Block)
 {
-	switch (a_BlockType)
+	switch (a_Block.Type())
 	{
-		case E_BLOCK_ANVIL:
-		case E_BLOCK_BLACK_GLAZED_TERRACOTTA:
-		case E_BLOCK_BLOCK_OF_COAL:
-		case E_BLOCK_BLOCK_OF_REDSTONE:
-		case E_BLOCK_BLUE_GLAZED_TERRACOTTA:
-		case E_BLOCK_BONE_BLOCK:
-		case E_BLOCK_BREWING_STAND:
-		case E_BLOCK_BRICK:
-		case E_BLOCK_BRICK_STAIRS:
-		case E_BLOCK_BROWN_GLAZED_TERRACOTTA:
-		case E_BLOCK_CAULDRON:
-		case E_BLOCK_COAL_ORE:
-		case E_BLOCK_COBBLESTONE:
-		case E_BLOCK_COBBLESTONE_STAIRS:
-		case E_BLOCK_COBBLESTONE_WALL:
-		case E_BLOCK_COBWEB:
-		case E_BLOCK_CONCRETE:
-		case E_BLOCK_CYAN_GLAZED_TERRACOTTA:
-		case E_BLOCK_DIAMOND_BLOCK:
-		case E_BLOCK_DIAMOND_ORE:
-		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB:
-		case E_BLOCK_DOUBLE_STONE_SLAB:
-		case E_BLOCK_DROPPER:
-		case E_BLOCK_EMERALD_ORE:
-		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_END_BRICKS:
-		case E_BLOCK_END_STONE:
-		case E_BLOCK_FURNACE:
-		case E_BLOCK_GOLD_BLOCK:
-		case E_BLOCK_GOLD_ORE:
-		case E_BLOCK_GRAY_GLAZED_TERRACOTTA:
-		case E_BLOCK_GREEN_GLAZED_TERRACOTTA:
-		case E_BLOCK_HARDENED_CLAY:
-		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_HOPPER:
-		case E_BLOCK_IRON_BARS:
-		case E_BLOCK_IRON_BLOCK:
-		case E_BLOCK_IRON_DOOR:
-		case E_BLOCK_IRON_ORE:
-		case E_BLOCK_IRON_TRAPDOOR:
-		case E_BLOCK_LAPIS_BLOCK:
-		case E_BLOCK_LAPIS_ORE:
-		case E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA:
-		case E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA:
-		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_LIME_GLAZED_TERRACOTTA:
-		case E_BLOCK_LIT_FURNACE:
-		case E_BLOCK_MAGENTA_GLAZED_TERRACOTTA:
-		case E_BLOCK_MAGMA:
-		case E_BLOCK_MOB_SPAWNER:
-		case E_BLOCK_MOSSY_COBBLESTONE:
-		case E_BLOCK_NETHERRACK:
-		case E_BLOCK_NETHER_BRICK:
-		case E_BLOCK_NETHER_BRICK_FENCE:
-		case E_BLOCK_NETHER_BRICK_STAIRS:
-		case E_BLOCK_NETHER_QUARTZ_ORE:
-		case E_BLOCK_OBSERVER:
-		case E_BLOCK_OBSIDIAN:
-		case E_BLOCK_ORANGE_GLAZED_TERRACOTTA:
-		case E_BLOCK_PINK_GLAZED_TERRACOTTA:
-		case E_BLOCK_PRISMARINE_BLOCK:
-		case E_BLOCK_PURPLE_GLAZED_TERRACOTTA:
-		case E_BLOCK_PURPUR_BLOCK:
-		case E_BLOCK_PURPUR_DOUBLE_SLAB:
-		case E_BLOCK_PURPUR_PILLAR:
-		case E_BLOCK_PURPUR_SLAB:
-		case E_BLOCK_PURPUR_STAIRS:
-		case E_BLOCK_QUARTZ_BLOCK:
-		case E_BLOCK_QUARTZ_STAIRS:
-		case E_BLOCK_REDSTONE_ORE:
-		case E_BLOCK_REDSTONE_ORE_GLOWING:
-		case E_BLOCK_RED_GLAZED_TERRACOTTA:
-		case E_BLOCK_RED_NETHER_BRICK:
-		case E_BLOCK_RED_SANDSTONE:
-		case E_BLOCK_RED_SANDSTONE_SLAB:
-		case E_BLOCK_RED_SANDSTONE_STAIRS:
-		case E_BLOCK_SANDSTONE:
-		case E_BLOCK_SANDSTONE_STAIRS:
-		case E_BLOCK_SNOW:
-		case E_BLOCK_STONE:
-		case E_BLOCK_STONE_BRICKS:
-		case E_BLOCK_STONE_BRICK_STAIRS:
-		case E_BLOCK_STONE_PRESSURE_PLATE:
-		case E_BLOCK_STONE_SLAB:
-		case E_BLOCK_VINES:
-		case E_BLOCK_WHITE_GLAZED_TERRACOTTA:
-		case E_BLOCK_YELLOW_GLAZED_TERRACOTTA:
+		case BlockType::Anvil:
+		case BlockType::ChippedAnvil:
+		case BlockType::DamagedAnvil:
+		case BlockType::BlackGlazedTerracotta:
+		case BlockType::CoalBlock:
+		case BlockType::RedstoneBlock:
+		case BlockType::BlueGlazedTerracotta:
+		case BlockType::BoneBlock:
+		case BlockType::BrewingStand:
+		case BlockType::Bricks:
+		case BlockType::BrickStairs:
+		case BlockType::BrownGlazedTerracotta:
+		case BlockType::Cauldron:
+		case BlockType::CoalOre:
+		case BlockType::Cobblestone:
+		case BlockType::CobblestoneStairs:
+		case BlockType::CobblestoneWall:
+		case BlockType::Cobweb:
+		case BlockType::CyanGlazedTerracotta:
+		case BlockType::DiamondBlock:
+		case BlockType::DiamondOre:
+		case BlockType::Dispenser:
+		case BlockType::Dropper:
+		case BlockType::EmeraldOre:
+		case BlockType::EnchantingTable:
+		case BlockType::EndStoneBricks:
+		case BlockType::EndStone:
+		case BlockType::Furnace:
+		case BlockType::GoldBlock:
+		case BlockType::GoldOre:
+		case BlockType::GrayGlazedTerracotta:
+		case BlockType::GreenGlazedTerracotta:
+		case BlockType::HeavyWeightedPressurePlate:
+		case BlockType::Hopper:
+		case BlockType::IronBars:
+		case BlockType::IronBlock:
+		case BlockType::IronDoor:
+		case BlockType::IronOre:
+		case BlockType::IronTrapdoor:
+		case BlockType::LapisBlock:
+		case BlockType::LapisOre:
+		case BlockType::LightBlueGlazedTerracotta:
+		case BlockType::LightGrayGlazedTerracotta:
+		case BlockType::LightWeightedPressurePlate:
+		case BlockType::LimeGlazedTerracotta:
+		case BlockType::MagentaGlazedTerracotta:
+		case BlockType::MagmaBlock:
+		case BlockType::Spawner:
+		case BlockType::MossyCobblestone:
+		case BlockType::Netherrack:
+		case BlockType::NetherBricks:
+		case BlockType::NetherBrickFence:
+		case BlockType::NetherBrickStairs:
+		case BlockType::NetherQuartzOre:
+		case BlockType::Observer:
+		case BlockType::Obsidian:
+		case BlockType::OrangeGlazedTerracotta:
+		case BlockType::PinkGlazedTerracotta:
+		case BlockType::Prismarine:
+		case BlockType::PurpleGlazedTerracotta:
+		case BlockType::PurpurBlock:
+		case BlockType::PurpurPillar:
+		case BlockType::PurpurSlab:
+		case BlockType::PurpurStairs:
+		case BlockType::QuartzBlock:
+		case BlockType::QuartzStairs:
+		case BlockType::RedstoneOre:
+		case BlockType::RedGlazedTerracotta:
+		case BlockType::RedNetherBricks:
+		case BlockType::RedSandstone:
+		case BlockType::RedSandstoneSlab:
+		case BlockType::RedSandstoneStairs:
+		case BlockType::Sandstone:
+		case BlockType::SandstoneStairs:
+		case BlockType::SnowBlock:
+		case BlockType::Stone:
+		case BlockType::StoneBricks:
+		case BlockType::StoneBrickStairs:
+		case BlockType::StonePressurePlate:
+		case BlockType::StoneSlab:
+		case BlockType::Vine:
+		case BlockType::WhiteGlazedTerracotta:
+		case BlockType::YellowGlazedTerracotta:
+			// Concrete
+		case BlockType::BlackConcretePowder:
+		case BlockType::BlueConcretePowder:
+		case BlockType::BrownConcretePowder:
+		case BlockType::CyanConcretePowder:
+		case BlockType::GrayConcretePowder:
+		case BlockType::GreenConcretePowder:
+		case BlockType::LightBlueConcretePowder:
+		case BlockType::LightGrayConcretePowder:
+		case BlockType::LimeConcretePowder:
+		case BlockType::MagentaConcretePowder:
+		case BlockType::OrangeConcretePowder:
+		case BlockType::PinkConcretePowder:
+		case BlockType::PurpleConcretePowder:
+		case BlockType::RedConcretePowder:
+		case BlockType::WhiteConcretePowder:
+		case BlockType::YellowConcretePowder:
 		{
 			return false;
 		}
@@ -818,7 +830,7 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 	cWorld * a_World, cPlayer * a_Player,
 	const Vector3i a_PlacedBlockPos, eBlockFace a_ClickedBlockFace,
 	const Vector3i a_CursorPos,
-	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	BlockState & a_Block
 )
 {
 	ASSERT(m_ItemType < 256);  // Items with IDs above 255 should all be handled by specific handlers
@@ -831,11 +843,13 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 
 	cChunkInterface ChunkInterface(a_World->GetChunkMap());
 
-	return cBlockHandler::For(static_cast<BLOCKTYPE>(m_ItemType)).GetPlacementBlockTypeMeta(
+	auto NewBlockType = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(m_ItemType, 0));
+
+	return cBlockHandler::For(NewBlockType).GetPlacementBlockTypeMeta(
 		ChunkInterface, *a_Player,
 		a_PlacedBlockPos, a_ClickedBlockFace,
 		a_CursorPos,
-		a_BlockType, a_BlockMeta
+		a_Block
 	);
 }
 
@@ -863,7 +877,7 @@ cItemHandler::FoodInfo cItemHandler::GetFoodInfo(const cItem * a_Item)
 
 
 
-float cItemHandler::GetBlockBreakingStrength(BLOCKTYPE a_Block)
+float cItemHandler::GetBlockBreakingStrength(BlockState a_Block)
 {
 	return 1.0f;
 }

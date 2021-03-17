@@ -2,6 +2,8 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "../Protocol/Palettes/Upgrade.h"
+#include "../Registries/BlockTypeItemTypeConverter.h"
 
 
 
@@ -16,7 +18,7 @@ public:
 
 	/** Creates a new handler for the specified slab item type.
 	Sets the handler to use the specified doubleslab block type for combining self into doubleslabs. */
-	cItemSlabHandler(int a_ItemType, BLOCKTYPE a_DoubleSlabBlockType):
+	cItemSlabHandler(int a_ItemType, unsigned char a_DoubleSlabBlockType):
 		Super(a_ItemType),
 		m_DoubleSlabBlockType(a_DoubleSlabBlockType)
 	{
@@ -24,7 +26,7 @@ public:
 
 
 
-
+/*
 
 	// cItemHandler overrides:
 	virtual bool OnPlayerPlace(
@@ -37,12 +39,13 @@ public:
 	) override
 	{
 		// If clicking a slab, try combining it into a double-slab:
-		BLOCKTYPE ClickedBlockType;
-		NIBBLETYPE ClickedBlockMeta;
-		a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
+		auto ClickedBlock = a_World.GetBlock(a_ClickedBlockPos);
+
+		auto NumericBlock = PaletteUpgrade::ToItem(BlockItemConverter::FromBlock(ClickedBlock.Type()));
+
 		if (
-			(ClickedBlockType == m_ItemType) &&                         // Placing the same slab material
-			((ClickedBlockMeta & 0x07) == a_EquippedItem.m_ItemDamage)  // Placing the same slab sub-kind (and existing slab is single)
+			(NumericBlock.first == m_ItemType) &&                          // Placing the same slab material
+			((NumericBlock.second & 0x07) == a_EquippedItem.m_ItemDamage)  // Placing the same slab sub-kind (and existing slab is single)
 		)
 		{
 			if (
@@ -72,7 +75,7 @@ public:
 			((PlaceBlockMeta & 0x07) == a_EquippedItem.m_ItemDamage)  // Placing the same slab sub-kind (and existing slab is single)
 		)
 		{
-			if (!a_Player.PlaceBlock(PlacePos.x, PlacePos.y, PlacePos.z, m_DoubleSlabBlockType, PlaceBlockMeta & 0x07))
+			if (!a_Player.PlaceBlock(PlacePos.x, PlacePos.y, PlacePos.z, PaletteUpgrade:: m_DoubleSlabBlockType, PlaceBlockMeta & 0x07))
 			{
 				return false;
 			}
@@ -86,12 +89,11 @@ public:
 		// The slabs didn't combine, use the default handler to place the slab:
 		bool res = Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_CursorPos);
 
-		/*
-		The client has a bug when a slab replaces snow and there's a slab above it.
-		The client then combines the slab above, rather than replacing the snow.
-		We send the block above the currently placed block back to the client to fix the bug.
-		Ref.: https://forum.cuberite.org/thread-434-post-17388.html#pid17388
-		*/
+
+		// The client has a bug when a slab replaces snow and there's a slab above it.
+		// The client then combines the slab above, rather than replacing the snow.
+		// We send the block above the currently placed block back to the client to fix the bug.
+		// Ref.: https://forum.cuberite.org/thread-434-post-17388.html#pid17388
 		if ((a_ClickedBlockFace == BLOCK_FACE_TOP) && (a_ClickedBlockPos.y < cChunkDef::Height - 1))
 		{
 			auto AbovePos = a_ClickedBlockPos.addedY(1);
@@ -104,5 +106,6 @@ public:
 protected:
 
 	/** The block type to use when the slab combines into a doubleslab block. */
-	BLOCKTYPE m_DoubleSlabBlockType;
+	unsigned char m_DoubleSlabBlockType;
+
 };

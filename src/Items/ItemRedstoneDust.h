@@ -37,7 +37,7 @@ public:
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState & a_Block
 	) override
 	{
 		// Check the block below, if it supports dust on top of it:
@@ -46,19 +46,17 @@ public:
 		{
 			return false;
 		}
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-		if (!a_World->GetBlockTypeMeta(UnderPos, BlockType, BlockMeta))
+		BlockState BlockBelow;
+		if (!a_World->GetBlock(UnderPos, BlockBelow))
 		{
 			return false;
 		}
-		if (!IsBlockTypeUnderSuitable(BlockType, BlockMeta))
+		if (!IsBlockTypeUnderSuitable(BlockBelow))
 		{
 			return false;
 		}
 
-		a_BlockType = E_BLOCK_REDSTONE_WIRE;
-		a_BlockMeta = 0;
+		a_Block = Block::RedstoneWire::RedstoneWire();
 		return true;
 	}
 
@@ -67,22 +65,16 @@ public:
 
 
 	/** Returns true if the specified block type / meta is suitable to have redstone dust on top of it. */
-	static bool IsBlockTypeUnderSuitable(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	static bool IsBlockTypeUnderSuitable(BlockState a_Block)
 	{
-		if (cBlockInfo::FullyOccupiesVoxel(a_BlockType))
+		if (cBlockInfo::FullyOccupiesVoxel(a_Block))
 		{
 			return true;
 		}
 
-		switch (a_BlockType)
+		if (cBlockSlabHandler::IsAnySlabType(a_Block) && cBlockSlabHandler::IsSlabTop(a_Block))
 		{
-			case E_BLOCK_RED_SANDSTONE_SLAB:
-			case E_BLOCK_WOODEN_SLAB:
-			case E_BLOCK_STONE_SLAB:
-			{
-				// Slabs can support redstone if they're upside down:
-				return ((a_BlockMeta & 0x08) != 0);
-			}
+			return true;
 		}
 		return false;
 	}

@@ -13,7 +13,7 @@ class cSimplePlaceableItemHandler :
 
 public:
 
-	cSimplePlaceableItemHandler(int a_ItemType, BLOCKTYPE a_BlockType) :
+	cSimplePlaceableItemHandler(int a_ItemType, BlockType a_BlockType) :
 		Super(a_ItemType),
 		m_BlockType(a_BlockType)
 	{
@@ -29,14 +29,14 @@ public:
 	virtual bool GetPlacementBlockTypeMeta(
 		cWorld * a_World, cPlayer * a_Player, const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) override
+		BlockState & a_Block) override
 	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = 0;
+		cChunkInterface ChunkInterface(a_World->GetChunkMap());
+		cBlockHandler::For(m_BlockType).GetPlacementBlockTypeMeta(ChunkInterface, *a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_Block);
 		return true;
 	}
 
 private:
 
-	BLOCKTYPE m_BlockType;
+	BlockType m_BlockType;
 };

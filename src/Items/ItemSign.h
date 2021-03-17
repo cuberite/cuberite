@@ -37,11 +37,9 @@ public:
 	) override
 	{
 		// Check if placing on something ignoring build collision to edit the correct sign later on:
-		BLOCKTYPE ClickedBlockType;
-		NIBBLETYPE ClickedBlockMeta;
-		a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
+		auto ClickedBlock = a_World.GetBlock(a_ClickedBlockPos);
 		cChunkInterface ChunkInterface(a_World.GetChunkMap());
-		bool IsReplacingClickedBlock = cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta);
+		bool IsReplacingClickedBlock = cBlockHandler::For(ClickedBlock.Type()).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlock);
 
 		// If the regular placement doesn't work, do no further processing:
 		if (!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_CursorPos))
@@ -75,18 +73,25 @@ public:
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState & a_Block
 	) override
 	{
-		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
+		switch (a_ClickedBlockFace)
 		{
-			a_BlockMeta = cBlockSignPostHandler::RotationToMetaData(a_Player->GetYaw());
-			a_BlockType = E_BLOCK_SIGN_POST;
-		}
-		else
-		{
-			a_BlockMeta = cBlockWallSignHandler::BlockFaceToMetaData(a_ClickedBlockFace);
-			a_BlockType = E_BLOCK_WALLSIGN;
+			case BLOCK_FACE_YP:
+			{
+				a_Block = Block::OakSign::OakSign(RotationToFineFace(a_Player->GetYaw()));
+				break;
+			}
+			case BLOCK_FACE_XM:
+			case BLOCK_FACE_XP:
+			case BLOCK_FACE_ZM:
+			case BLOCK_FACE_ZP:
+			{
+				a_Block = Block::OakWallSign::OakWallSign(RotationToBlockFace(a_Player->GetYaw()));
+				break;
+			}
+			default: return false;
 		}
 		return true;
 	}

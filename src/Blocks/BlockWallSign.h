@@ -5,9 +5,6 @@
 #include "../Chunk.h"
 
 
-
-
-
 class cBlockWallSignHandler final :
 	public cBlockHandler
 {
@@ -17,29 +14,62 @@ public:
 
 	using Super::Super;
 
-	/** Converts the block face of the neighbor to which the wallsign is attached to the wallsign block's meta. */
-	static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_NeighborBlockFace)
+	static inline bool IsBlockWallSign(BlockState a_Block)
 	{
-		switch (a_NeighborBlockFace)
+		switch (a_Block.Type())
 		{
-			case BLOCK_FACE_ZM: return 0x02;
-			case BLOCK_FACE_ZP: return 0x03;
-			case BLOCK_FACE_XM: return 0x04;
-			case BLOCK_FACE_XP: return 0x05;
-			case BLOCK_FACE_NONE:
-			case BLOCK_FACE_YP:
-			case BLOCK_FACE_YM:
-			{
-				break;
-			}
+			case BlockType::AcaciaWallSign:
+			case BlockType::BirchWallSign:
+			case BlockType::CrimsonWallSign:
+			case BlockType::DarkOakWallSign:
+			case BlockType::OakWallSign:
+			case BlockType::JungleWallSign:
+			case BlockType::WarpedWallSign:
+			case BlockType::SpruceWallSign:
+				return true;
+			default: return false;
 		}
-		return 0x02;
+	}
+
+	static inline bool IsBlockSignPost(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaSign:
+			case BlockType::BirchSign:
+			case BlockType::CrimsonSign:
+			case BlockType::DarkOakSign:
+			case BlockType::JungleSign:
+			case BlockType::OakSign:
+			case BlockType::SpruceSign:
+			case BlockType::WarpedSign:
+				return true;
+			default: return false;
+		}
+	}
+
+	static inline eBlockFace GetSignFacing(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaWallSign:  return AcaciaWallSign::Facing(a_Block);
+			case BlockType::BirchWallSign:   return BirchWallSign::Facing(a_Block);
+			case BlockType::CrimsonWallSign: return CrimsonWallSign::Facing(a_Block);
+			case BlockType::DarkOakWallSign: return DarkOakWallSign::Facing(a_Block);
+			case BlockType::OakWallSign:     return OakWallSign::Facing(a_Block);
+			case BlockType::JungleWallSign:  return JungleWallSign::Facing(a_Block);
+			case BlockType::WarpedWallSign:  return WarpedWallSign::Facing(a_Block);
+			case BlockType::SpruceWallSign:  return SpruceWallSign::Facing(a_Block);
+			default: return eBlockFace::BLOCK_FACE_NONE;
+		}
 	}
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
+		// TODO: add all signs when possible
 		return cItem(E_ITEM_SIGN, 1, 0);
 	}
 
@@ -49,14 +79,14 @@ private:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		auto NeighborPos = a_RelPos + GetOffsetBehindTheSign(a_Chunk.GetMeta(a_RelPos));
-		BLOCKTYPE NeighborType;
-		if (!a_Chunk.UnboundedRelGetBlockType(NeighborPos, NeighborType))
+		auto NeighborPos = a_RelPos + GetOffsetBehindTheSign(a_Chunk.GetBlock(a_RelPos));
+		BlockState Neighbor;
+		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, Neighbor))
 		{
 			// The neighbor is not accessible (unloaded chunk), bail out without changing this
 			return true;
 		}
-		return ((NeighborType == E_BLOCK_WALLSIGN) || (NeighborType == E_BLOCK_SIGN_POST) || cBlockInfo::IsSolid(NeighborType));
+		return (IsBlockWallSign(Neighbor) || IsBlockSignPost(Neighbor) || cBlockInfo::IsSolid(Neighbor));
 	}
 
 
@@ -65,26 +95,28 @@ private:
 
 	/** Returns the offset from the sign coords to the block to which the wallsign is attached, based on the wallsign's block meta.
 	Asserts / returns a zero vector on wrong meta. */
-	static Vector3i GetOffsetBehindTheSign(NIBBLETYPE a_BlockMeta)
+	static Vector3i GetOffsetBehindTheSign(BlockState a_Block)
 	{
-		switch (a_BlockMeta)
+		switch (GetSignFacing(a_Block))
 		{
-			case 2: return Vector3i( 0, 0,  1);
-			case 3: return Vector3i( 0, 0, -1);
-			case 4: return Vector3i( 1, 0,  0);
-			case 5: return Vector3i(-1, 0,  0);
+			case BLOCK_FACE_XM: return Vector3i( 1, 0,  0);
+			case BLOCK_FACE_XP: return Vector3i(-1, 0,  0);
+			case BLOCK_FACE_ZM: return Vector3i( 0, 0,  1);
+			case BLOCK_FACE_ZP: return Vector3i( 0, 0, -1);
+			default:
+			{
+				ASSERT(!"Invalid wallsign block facing");
+				return Vector3i();
+			}
 		}
-		ASSERT(!"Invalid wallsign block meta");
-		return Vector3i();
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 13;
 	}
 } ;

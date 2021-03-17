@@ -41,29 +41,29 @@ public:
 
 private:
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		switch (a_Meta)
+		switch (m_BlockType)
 		{
-			case E_META_WOOL_WHITE: return 14;
-			case E_META_WOOL_ORANGE: return 15;
-			case E_META_WOOL_MAGENTA: return 16;
-			case E_META_WOOL_LIGHTBLUE: return 17;
-			case E_META_WOOL_YELLOW: return 18;
-			case E_META_WOOL_LIGHTGREEN: return 19;
-			case E_META_WOOL_PINK: return 20;
-			case E_META_WOOL_GRAY: return 21;
-			case E_META_WOOL_LIGHTGRAY: return 22;
-			case E_META_WOOL_CYAN: return 23;
-			case E_META_WOOL_PURPLE: return 24;
-			case E_META_WOOL_BLUE: return 25;
-			case E_META_WOOL_BROWN: return 26;
-			case E_META_WOOL_GREEN: return 27;
-			case E_META_WOOL_RED: return 28;
-			case E_META_WOOL_BLACK: return 29;
+			case BlockType::BlackWool:     return 29;
+			case BlockType::BlueWool:      return 25;
+			case BlockType::BrownWool:     return 26;
+			case BlockType::CyanWool:      return 23;
+			case BlockType::GrayWool:      return 21;
+			case BlockType::GreenWool:     return 27;
+			case BlockType::LightBlueWool: return 17;
+			case BlockType::LightGrayWool: return 22;
+			case BlockType::LimeWool:      return 19;
+			case BlockType::MagentaWool:   return 16;
+			case BlockType::OrangeWool:    return 15;
+			case BlockType::PinkWool:      return 20;
+			case BlockType::PurpleWool:    return 24;
+			case BlockType::RedWool:       return 28;
+			case BlockType::WhiteWool:     return 14;
+			case BlockType::YellowWool:    return 18;
 			default:
 			{
-				ASSERT(!"Unhandled meta in wool handler!");
+				ASSERT(!"Unhandled block in wool handler!");
 				return 0;
 			}
 		}

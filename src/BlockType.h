@@ -4,14 +4,9 @@
 
 // tolua_begin
 
-enum ENUM_BLOCK_TYPE
-{
-	E_BLOCK_PUMPKIN
-};
 
-/*
 
-enum ENUM_BLOCK_TYPE : BLOCKTYPE
+enum ENUM_BLOCK_TYPE  // : unsigned char
 {
 	E_BLOCK_AIR = 0,
 	E_BLOCK_STONE = 1,
@@ -295,7 +290,7 @@ enum ENUM_BLOCK_TYPE : BLOCKTYPE
 
 
 
-*/
+
 
 enum ENUM_ITEM_TYPE : short
 {

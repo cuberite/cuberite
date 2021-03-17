@@ -21,13 +21,13 @@ public:
 	}
 
 
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
+	virtual bool CanHarvestBlock(BlockState a_Block) override
 	{
-		if (a_BlockType == E_BLOCK_COBWEB)
+		if (a_Block.Type() == BlockType::Cobweb)
 		{
 			return true;
 		}
-		return Super::CanHarvestBlock(a_BlockType);
+		return Super::CanHarvestBlock(a_Block);
 	}
 
 
@@ -35,8 +35,33 @@ public:
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_WOODEN_SWORD:  return (a_ItemType == E_BLOCK_PLANKS);
-			case E_ITEM_STONE_SWORD:   return (a_ItemType == E_BLOCK_COBBLESTONE);
+			case E_ITEM_WOODEN_SWORD:
+			{
+				auto NewItem = PaletteUpgrade::FromItem(a_ItemType, 0);
+				switch (NewItem)
+				{
+					case Item::AcaciaPlanks:
+					case Item::BirchPlanks:
+					case Item::CrimsonPlanks:
+					case Item::DarkOakPlanks:
+					case Item::JunglePlanks:
+					case Item::OakPlanks:
+					case Item::SprucePlanks:
+					case Item::WarpedPlanks:
+						return true;
+					default: return false;
+				}
+			}
+			case E_ITEM_STONE_SWORD:
+			{
+				auto NewItem = PaletteUpgrade::FromItem(a_ItemType, 0);
+				switch (NewItem)
+				{
+					case Item::Cobblestone:
+						return true;
+					default: return false;
+				}
+			}
 			case E_ITEM_IRON_SWORD:    return (a_ItemType == E_ITEM_IRON);
 			case E_ITEM_GOLD_SWORD:    return (a_ItemType == E_ITEM_GOLD);
 			case E_ITEM_DIAMOND_SWORD: return (a_ItemType == E_ITEM_DIAMOND);
@@ -58,9 +83,9 @@ public:
 
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) override
+	virtual float GetBlockBreakingStrength(BlockState a_Block) override
 	{
-		if (a_Block == E_BLOCK_COBWEB)
+		if (a_Block.Type() == BlockType::Cobweb)
 		{
 			return 15.0f;
 		}

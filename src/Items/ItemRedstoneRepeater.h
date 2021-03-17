@@ -38,11 +38,10 @@ public:
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState & a_Block
 	) override
 	{
-		a_BlockType = E_BLOCK_REDSTONE_REPEATER_OFF;
-		a_BlockMeta = cBlockRedstoneRepeaterHandler::YawToMetaData(a_Player->GetYaw());
+		a_Block = Block::Repeater::Repeater(0, RotationToBlockFace(a_Player->GetYaw()), false, false);
 		return true;
 	}
 } ;

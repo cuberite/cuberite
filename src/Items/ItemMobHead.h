@@ -173,13 +173,13 @@ public:
 
 		static constexpr std::array<Vector3i, 7> ZAirPos =
 		{
-				Vector3i(0,  0, -1),
-				Vector3i(0,  0,  0),
-				Vector3i(0,  0,  1),
-				Vector3i(0, -1, -1),
-				Vector3i(0, -1,  0),
-				Vector3i(0, -1,  1),
-				Vector3i(0, -2,  0)
+			Vector3i(0,  0, -1),
+			Vector3i(0,  0,  0),
+			Vector3i(0,  0,  1),
+			Vector3i(0, -1, -1),
+			Vector3i(0, -1,  0),
+			Vector3i(0, -1,  1),
+			Vector3i(0, -2,  0)
 		};
 
 		cBlockArea Area;
@@ -187,9 +187,8 @@ public:
 
 		auto RelHeadPos = Vector3i(3, 2, 3);
 		Vector3i CenterHeadPos;
-		int HeadCount = 0;
 
-		if(FindCenterHead(Area, XHeadCoords, CenterHeadPos, RelHeadPos))
+		if (FindCenterHead(Area, XHeadCoords, CenterHeadPos, RelHeadPos))
 		{
 			if (!ValidateSoulSand(Area, SoulSandOffsetX, RelHeadPos))
 			{
@@ -229,7 +228,7 @@ public:
 		int HeadCount = 0;
 		for (const auto & Offset : a_Offsets)
 		{
-			switch(a_Area.GetRelBlock(a_StartPos + Offset).Type())
+			switch (a_Area.GetRelBlock(a_StartPos + Offset).Type())
 			{
 				case BlockType::WitherSkeletonSkull: HeadCount += 1; break;
 				default: HeadCount = 0;
@@ -251,14 +250,15 @@ public:
 				return false;
 			}
 		}
+		return true;
 	}
 
 	static bool ReplaceAir(cPlayer & a_Player, const std::array<Vector3i, 7> a_Offsets, Vector3i a_StartPos)
 	{
 		sSetBlockVector AirBlocks;
-		for(const auto & Offset : a_Offsets)
+		for (const auto & Offset : a_Offsets)
 		{
-			AirBlocks.emplace_back(a_StartPos + Offset);
+			AirBlocks.emplace_back(a_StartPos + Offset, Block::Air::Air());
 		}
 		return a_Player.PlaceBlocks(AirBlocks);
 	}
