@@ -3,81 +3,97 @@
 
 #include "ItemHandler.h"
 #include "../World.h"
+#include "../Blocks/BlockSignPost.h"
+#include "../Blocks/BlockWallSign.h"
 #include "../ClientHandle.h"
 
 
 
 
 
-class cItemSignHandler final:
+class cItemSignHandler:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	using Super::Super;
-
-private:
-
-	/** Converts the block face of the neighbor to which the wallsign is attached to the wallsign block's meta. */
-	static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_NeighborBlockFace)
+	cItemSignHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
-		switch (a_NeighborBlockFace)
-		{
-			case BLOCK_FACE_ZM: return 0x02;
-			case BLOCK_FACE_ZP: return 0x03;
-			case BLOCK_FACE_XM: return 0x04;
-			case BLOCK_FACE_XP: return 0x05;
-			case BLOCK_FACE_NONE:
-			case BLOCK_FACE_YP:
-			case BLOCK_FACE_YM:
-			{
-				break;
-			}
-		}
-		return 0x02;
 	}
 
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
+
+
+
+	virtual bool OnPlayerPlace(
+		cWorld & a_World,
+		cPlayer & a_Player,
+		const cItem & a_EquippedItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos
+	) override
 	{
-		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
-		{
-			if (!a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_SIGN_POST, RotationToMetaData(a_Player.GetYaw())))
-			{
-				return false;
-			}
-		}
-		else if (!a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_WALLSIGN, BlockFaceToMetaData(a_ClickedBlockFace)))
+		// Check if placing on something ignoring build collision to edit the correct sign later on:
+		auto ClickedBlock = a_World.GetBlock(a_ClickedBlockPos);
+		cChunkInterface ChunkInterface(a_World.GetChunkMap());
+		bool IsReplacingClickedBlock = cBlockHandler::For(ClickedBlock.Type()).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlock);
+
+		// If the regular placement doesn't work, do no further processing:
+		if (!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_CursorPos))
 		{
 			return false;
 		}
 
+		// Use IsReplacingClickedBlock to make sure we will edit the right sign:
+		auto SignPos = IsReplacingClickedBlock ? a_ClickedBlockPos : AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+
 		// After successfully placing the sign, open the sign editor for the player:
-		a_Player.GetClientHandle()->SendEditSign(a_PlacePosition);
+		a_Player.GetClientHandle()->SendEditSign(SignPos.x, SignPos.y, SignPos.z);
 		return true;
 	}
 
 
-	virtual bool IsPlaceable(void) const override
+
+
+
+	virtual bool IsPlaceable(void) override
 	{
 		return true;
 	}
 
 
-	/** Converts the (player) rotation to placed-signpost block meta. */
-	static NIBBLETYPE RotationToMetaData(double a_Rotation)
+
+
+
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
+		BlockState & a_Block
+	) override
 	{
-		a_Rotation += 180 + (180.f / 16);  // So it's not aligned with axis.
-		if (a_Rotation > 360)
+		switch (a_ClickedBlockFace)
 		{
-			a_Rotation -= 360;
+			case BLOCK_FACE_YP:
+			{
+				a_Block = Block::OakSign::OakSign(RotationToFineFace(a_Player->GetYaw()));
+				break;
+			}
+			case BLOCK_FACE_XM:
+			case BLOCK_FACE_XP:
+			case BLOCK_FACE_ZM:
+			case BLOCK_FACE_ZP:
+			{
+				a_Block = Block::OakWallSign::OakWallSign(RotationToBlockFace(a_Player->GetYaw()));
+				break;
+			}
+			default: return false;
 		}
-
-		a_Rotation = (a_Rotation / 360) * 16;
-
-		return static_cast<NIBBLETYPE>(a_Rotation) % 16;
+		return true;
 	}
 } ;
 

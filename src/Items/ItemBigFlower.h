@@ -17,6 +17,11 @@ public:
 
 	using Super::Super;
 
+	cItemBigFlowerHandler():
+		Super(E_BLOCK_BIG_FLOWER)
+	{
+	}
+
 
 	virtual bool GetBlocksToPlace(
 		cWorld & a_World,
@@ -56,37 +61,37 @@ public:
 			case E_META_BIG_FLOWER_SUNFLOWER:
 			{
 				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, Sunflower::Sunflower(Sunflower::Half::Lower));
-				a_BlocksToPlace.emplace_back(TopBlock,         Sunflower::Sunflower(Sunflower::Half::Upper));
+				a_BlocksToPlace.emplace_back(TopPos,           Sunflower::Sunflower(Sunflower::Half::Upper));
 				break;
 			}
 			case E_META_BIG_FLOWER_LILAC:
 			{
 				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, Lilac::Lilac(Lilac::Half::Lower));
-				a_BlocksToPlace.emplace_back(TopBlock,         Lilac::Lilac(Lilac::Half::Upper));
+				a_BlocksToPlace.emplace_back(TopPos,           Lilac::Lilac(Lilac::Half::Upper));
 				break;
 			}
 			case E_META_BIG_FLOWER_DOUBLE_TALL_GRASS:
 			{
 				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, TallGrass::TallGrass(TallGrass::Half::Lower));
-				a_BlocksToPlace.emplace_back(TopBlock,         TallGrass::TallGrass(TallGrass::Half::Upper));
+				a_BlocksToPlace.emplace_back(TopPos,           TallGrass::TallGrass(TallGrass::Half::Upper));
 				break;
 			}
 			case E_META_BIG_FLOWER_LARGE_FERN:
 			{
 				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, LargeFern::LargeFern(LargeFern::Half::Lower));
-				a_BlocksToPlace.emplace_back(TopBlock,         LargeFern::LargeFern(LargeFern::Half::Upper));
+				a_BlocksToPlace.emplace_back(TopPos,           LargeFern::LargeFern(LargeFern::Half::Upper));
 				break;
 			}
 			case E_META_BIG_FLOWER_ROSE_BUSH:
 			{
 				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, RoseBush::RoseBush(RoseBush::Half::Lower));
-				a_BlocksToPlace.emplace_back(TopBlock,         RoseBush::RoseBush(RoseBush::Half::Upper));
+				a_BlocksToPlace.emplace_back(TopPos,           RoseBush::RoseBush(RoseBush::Half::Upper));
 				break;
 			}
 			case E_META_BIG_FLOWER_PEONY:
 			{
 				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, Peony::Peony(Peony::Half::Lower));
-				a_BlocksToPlace.emplace_back(TopBlock,         Peony::Peony(Peony::Half::Upper));
+				a_BlocksToPlace.emplace_back(TopPos,           Peony::Peony(Peony::Half::Upper));
 				break;
 			}
 			default: return false;

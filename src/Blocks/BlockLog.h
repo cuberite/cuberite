@@ -3,14 +3,15 @@
 
 #include "BlockHandler.h"
 
-class BlockLogHandler final:
-	public BlockHandler
+class cBlockLogHandler final:
+	public cBlockHandler
 {
-	using Super = BlockHandler;
+	using Super = cBlockHandler;
 
+public:
 	using Super::Super;
 
-	static constexpr IsBlockLog(BlockState a_Block)
+	static inline bool IsBlockLog(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -20,6 +21,8 @@ class BlockLogHandler final:
 			case BlockType::JungleLog:
 			case BlockType::OakLog:
 			case BlockType::SpruceLog:
+				return true;
+			default: return false;
 		}
 	}
 };
