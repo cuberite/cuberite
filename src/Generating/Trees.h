@@ -86,7 +86,7 @@ Returns the position of the last log block placed. */
 Vector3d GetTreeBranch(BlockState a_Block, Vector3i a_BlockPos, int a_BranchLength, Vector3d a_StartDirection, Vector3d a_Direction, sSetBlockVector & a_LogBlocks);
 
 /** Returns the meta for a log from the given direction */
-eBlockFace GetLogFacingFromDirection(BlockState a_Block, Vector3d a_Direction);
+BlockState RotateLogForDirection(BlockState a_Block, Vector3d a_Direction);
 
 /** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random birch tree */
 void GetBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
