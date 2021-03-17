@@ -34,9 +34,6 @@
 // 6000 ticks or 5 minutes
 #define PLAYER_INVENTORY_SAVE_INTERVAL 6000
 
-// 1000 = once per second
-#define PLAYER_LIST_TIME_MS std::chrono::milliseconds(1000)
-
 namespace
 {
 
@@ -130,8 +127,6 @@ cPlayer::cPlayer(const cClientHandlePtr & a_Client) :
 
 	SetMaxHealth(MAX_HEALTH);
 	m_Health = MAX_HEALTH;
-
-	m_LastPlayerListTime = std::chrono::steady_clock::now();
 
 	cWorld * World = nullptr;
 	if (!LoadFromDisk(World))
@@ -3204,13 +3199,6 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	// Update items (e.g. Maps)
 	m_Inventory.UpdateItems();
-
-	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
-	if (m_LastPlayerListTime + PLAYER_LIST_TIME_MS <= std::chrono::steady_clock::now())
-	{
-		m_World->BroadcastPlayerListUpdatePing(*this);
-		m_LastPlayerListTime = std::chrono::steady_clock::now();
-	}
 
 	if (m_TicksUntilNextSave == 0)
 	{

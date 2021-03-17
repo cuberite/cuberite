@@ -193,7 +193,7 @@ public:  // tolua_export
 	void SendPlayerListRemovePlayer     (const cPlayer & a_Player);
 	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
 	void SendPlayerListUpdateGameMode   (const cPlayer & a_Player);
-	void SendPlayerListUpdatePing       (const cPlayer & a_Player);
+	void SendPlayerListUpdatePing       ();
 	void SendPlayerMaxSpeed             (void);  ///< Informs the client of the maximum player speed (1.6.1+)
 	void SendPlayerMoveLook             (void);
 	void SendPlayerPosition             (void);

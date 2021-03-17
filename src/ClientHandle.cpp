@@ -2715,9 +2715,9 @@ void cClientHandle::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 
 
 
-void cClientHandle::SendPlayerListUpdatePing(const cPlayer & a_Player)
+void cClientHandle::SendPlayerListUpdatePing()
 {
-	m_Protocol->SendPlayerListUpdatePing(a_Player);
+	m_Protocol->SendPlayerListUpdatePing();
 }
 
 

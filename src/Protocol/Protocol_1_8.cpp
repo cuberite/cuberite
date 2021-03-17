@@ -1111,15 +1111,21 @@ void cProtocol_1_8_0::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 
 
 
-void cProtocol_1_8_0::SendPlayerListUpdatePing(const cPlayer & a_Player)
+void cProtocol_1_8_0::SendPlayerListUpdatePing()
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktPlayerList);
 	Pkt.WriteVarInt32(2);
-	Pkt.WriteVarInt32(1);
-	Pkt.WriteUUID(a_Player.GetUUID());
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
+
+	const auto World = m_Client->GetPlayer()->GetWorld();
+	Pkt.WriteVarInt32(static_cast<UInt32>(World->GetPlayerCount()));
+	World->ForEachPlayer([&Pkt](cPlayer & a_Player)
+	{
+		Pkt.WriteUUID(a_Player.GetUUID());
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
+		return false;
+	});
 }
 
 

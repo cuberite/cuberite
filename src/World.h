@@ -78,7 +78,7 @@ public:
 	{
 		using Super = cCSLock;
 	public:
-		cLock(cWorld & a_World);
+		cLock(const cWorld & a_World);
 	};
 
 
@@ -212,7 +212,7 @@ public:
 	virtual void BroadcastPlayerListRemovePlayer     (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastPlayerListUpdateGameMode   (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) override;
-	virtual void BroadcastPlayerListUpdatePing       (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastPlayerListUpdatePing       () override;
 	virtual void BroadcastRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	virtual void BroadcastScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
@@ -302,6 +302,9 @@ public:
 	Returns true if all entities processed, false if the callback aborted by returning true.
 	If any chunk in the box is missing, ignores the entities in that chunk silently. */
 	virtual bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback) override;  // Exported in ManualBindings.cpp
+
+	/** Returns the number of players currently in this world. */
+	size_t GetPlayerCount() const;
 
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param.
 	Returns true if entity found and callback returned false. */
@@ -1054,11 +1057,20 @@ private:
 	bool   m_IsDaylightCycleEnabled;
 
 	/** The age of the world.
-	Monotonic, always increasing each game tick, persistent across server restart. */
+	Monotonic, always increasing each game tick, persistent across server restart.
+	We need sub-tick precision here, that's why we store the time in milliseconds and calculate ticks off of it. */
 	std::chrono::milliseconds m_WorldAge;
 
+	/** The duration of one Minecraft day that has elapsed.
+	Wraps every 20 minutes.
+	We need sub-tick precision here, that's why we store the time in milliseconds and calculate ticks off of it. */
 	std::chrono::milliseconds  m_TimeOfDay;
-	cTickTimeLong  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
+
+	/** The age of the world, in ticks.
+	Monotonic, but does not persist across restarts.
+	Used for less important but heavy tasks that run periodically. These tasks don't need to follow wallclock time, and slowing their rate down if TPS drops is desirable. */
+	unsigned long long m_WorldTickAge;
+
 	cTickTimeLong  m_LastChunkCheck;        // The last WorldAge (in ticks) in which unloading and possibly saving was triggered
 	cTickTimeLong  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
 	std::map<cMonster::eFamily, cTickTimeLong> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)

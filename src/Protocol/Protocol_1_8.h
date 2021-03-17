@@ -94,7 +94,7 @@ public:
 	virtual void SendPlayerListRemovePlayer     (const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) override;
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) override;
-	virtual void SendPlayerListUpdatePing       (const cPlayer & a_Player) override;
+	virtual void SendPlayerListUpdatePing       () override;
 	virtual void SendPlayerMaxSpeed             (void) override;
 	virtual void SendPlayerMoveLook             (void) override;
 	virtual void SendPlayerPosition             (void) override;
