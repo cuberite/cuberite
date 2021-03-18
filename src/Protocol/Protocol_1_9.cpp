@@ -129,6 +129,7 @@ void cProtocol_1_9_0::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a
 			case BossBarColor::Purple: return 5U;
 			case BossBarColor::White: return 6U;
 		}
+		UNREACHABLE("Unsupported boss bar property");
 	}());
 	Pkt.WriteVarInt32([a_DivisionType]
 	{
@@ -140,6 +141,7 @@ void cProtocol_1_9_0::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a
 			case BossBarDivisionType::TwelveNotches: return 3U;
 			case BossBarDivisionType::TwentyNotches: return 4U;
 		}
+		UNREACHABLE("Unsupported boss bar property");
 	}());
 	{
 		UInt8 Flags = 0x00;
@@ -238,6 +240,7 @@ void cProtocol_1_9_0::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_C
 			case BossBarColor::Purple: return 5U;
 			case BossBarColor::White: return 6U;
 		}
+		UNREACHABLE("Unsupported boss bar property");
 	}());
 	Pkt.WriteVarInt32([a_DivisionType]
 	{
@@ -249,6 +252,7 @@ void cProtocol_1_9_0::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_C
 			case BossBarDivisionType::TwelveNotches: return 3U;
 			case BossBarDivisionType::TwentyNotches: return 4U;
 		}
+		UNREACHABLE("Unsupported boss bar property");
 	}());
 }
 
@@ -1451,6 +1455,30 @@ void cProtocol_1_9_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Ob
 
 
 
+void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity)
+{
+	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
+
+	if (a_BlockEntity.GetBlockType() == E_BLOCK_MOB_SPAWNER)
+	{
+		auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
+		a_Writer.BeginCompound("SpawnData");  // New: SpawnData compound
+			a_Writer.AddString("id", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
+		a_Writer.EndCompound();
+		a_Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
+	}
+	else
+	{
+		Super::WriteBlockEntity(a_Writer, a_BlockEntity);
+	}
+}
+
+
+
+
+
 void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 {
 	short ItemType = a_Item.m_ItemType;
@@ -1615,196 +1643,6 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 		return;
 	}
 	a_Pkt.WriteBuf(Result);
-}
-
-
-
-
-
-void cProtocol_1_9_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity)
-{
-	cFastNBTWriter Writer;
-
-	switch (a_BlockEntity.GetBlockType())
-	{
-		case BlockType::BlackBanner:
-		case BlockType::BlueBanner:
-		case BlockType::BrownBanner:
-		case BlockType::CyanBanner:
-		case BlockType::GrayBanner:
-		case BlockType::GreenBanner:
-		case BlockType::LightBlueBanner:
-		case BlockType::LightGrayBanner:
-		case BlockType::LimeBanner:
-		case BlockType::MagentaBanner:
-		case BlockType::OrangeBanner:
-		case BlockType::PinkBanner:
-		case BlockType::PurpleBanner:
-		case BlockType::RedBanner:
-		case BlockType::WhiteBanner:
-		case BlockType::YellowBanner:
-
-		case BlockType::BlackWallBanner:
-		case BlockType::BlueWallBanner:
-		case BlockType::BrownWallBanner:
-		case BlockType::CyanWallBanner:
-		case BlockType::GrayWallBanner:
-		case BlockType::GreenWallBanner:
-		case BlockType::LightBlueWallBanner:
-		case BlockType::LightGrayWallBanner:
-		case BlockType::LimeWallBanner:
-		case BlockType::MagentaWallBanner:
-		case BlockType::OrangeWallBanner:
-		case BlockType::PinkWallBanner:
-		case BlockType::PurpleWallBanner:
-		case BlockType::RedWallBanner:
-		case BlockType::WhiteWallBanner:
-		case BlockType::YellowWallBanner:
-		{
-			auto & BannerEntity = static_cast<const cBannerEntity &>(a_BlockEntity);
-			Writer.AddInt("x", BannerEntity.GetPosX());
-			Writer.AddInt("y", BannerEntity.GetPosY());
-			Writer.AddInt("z", BannerEntity.GetPosZ());
-			Writer.AddString("id", "Banner");
-			Writer.AddInt("Base", static_cast<Int32>(BannerEntity.GetBaseColor()));
-			break;
-		}
-
-		case BlockType::Beacon:
-		{
-			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);
-			Writer.AddInt("x",         BeaconEntity.GetPosX());
-			Writer.AddInt("y",         BeaconEntity.GetPosY());
-			Writer.AddInt("z",         BeaconEntity.GetPosZ());
-			Writer.AddInt("Primary",   BeaconEntity.GetPrimaryEffect());
-			Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
-			Writer.AddInt("Levels",    BeaconEntity.GetBeaconLevel());
-			Writer.AddString("id", "Beacon");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
-
-		case BlockType::CommandBlock:
-		case BlockType::ChainCommandBlock:
-		case BlockType::RepeatingCommandBlock:
-		{
-			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
-			Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
-			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
-			Writer.AddInt("x", CommandBlockEntity.GetPosX());
-			Writer.AddInt("y", CommandBlockEntity.GetPosY());
-			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
-			Writer.AddString("Command", CommandBlockEntity.GetCommand());
-			// You can set custom names for windows in Vanilla
-			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
-			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
-			Writer.AddString("CustomName", "@");
-			Writer.AddString("id", "Control");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			if (!CommandBlockEntity.GetLastOutput().empty())
-			{
-				Writer.AddString("LastOutput", Printf("{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str()));
-			}
-			break;
-		}
-
-		case BlockType::CreeperHead:
-		case BlockType::CreeperWallHead:
-		case BlockType::DragonHead:
-		case BlockType::DragonWallHead:
-		case BlockType::PlayerHead:
-		case BlockType::PlayerWallHead:
-		case BlockType::ZombieHead:
-		case BlockType::ZombieWallHead:
-		case BlockType::SkeletonSkull:
-		case BlockType::SkeletonWallSkull:
-		case BlockType::WitherSkeletonSkull:
-		case BlockType::WitherSkeletonWallSkull:
-		{
-			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
-			Writer.AddInt("x", MobHeadEntity.GetPosX());
-			Writer.AddInt("y", MobHeadEntity.GetPosY());
-			Writer.AddInt("z", MobHeadEntity.GetPosZ());
-			Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
-			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
-			Writer.AddString("id", "Skull");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-
-			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
-			Writer.BeginCompound("Owner");
-				Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
-				Writer.AddString("Name", MobHeadEntity.GetOwnerName());
-				Writer.BeginCompound("Properties");
-					Writer.BeginList("textures", TAG_Compound);
-						Writer.BeginCompound("");
-							Writer.AddString("Signature", MobHeadEntity.GetOwnerTextureSignature());
-							Writer.AddString("Value", MobHeadEntity.GetOwnerTexture());
-						Writer.EndCompound();
-					Writer.EndList();
-				Writer.EndCompound();
-			Writer.EndCompound();
-			break;
-		}
-
-		case BlockType::PottedAcaciaSapling:
-		case BlockType::PottedAzureBluet:
-		case BlockType::PottedBamboo:
-		case BlockType::PottedBirchSapling:
-		case BlockType::PottedBlueOrchid:
-		case BlockType::PottedBrownMushroom:
-		case BlockType::PottedCactus:
-		case BlockType::PottedCornflower:
-		case BlockType::PottedCrimsonRoots:
-		case BlockType::PottedCrimsonFungus:
-		case BlockType::PottedDandelion:
-		case BlockType::PottedDarkOakSapling:
-		case BlockType::PottedDeadBush:
-		case BlockType::PottedFern:
-		case BlockType::PottedJungleSapling:
-		case BlockType::PottedLilyOfTheValley:
-		case BlockType::PottedOakSapling:
-		case BlockType::PottedOrangeTulip:
-		case BlockType::PottedOxeyeDaisy:
-		case BlockType::PottedPinkTulip:
-		case BlockType::PottedPoppy:
-		case BlockType::PottedRedMushroom:
-		case BlockType::PottedRedTulip:
-		case BlockType::PottedSpruceSapling:
-		case BlockType::PottedWarpedFungus:
-		case BlockType::PottedWarpedRoots:
-		case BlockType::PottedWhiteTulip:
-		case BlockType::PottedWitherRose:
-		case BlockType::PottedAllium:
-		{
-			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
-			Writer.AddInt("x", FlowerPotEntity.GetPosX());
-			Writer.AddInt("y", FlowerPotEntity.GetPosY());
-			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
-			Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
-			Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
-			Writer.AddString("id", "FlowerPot");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
-
-		case BlockType::Spawner:
-		{
-			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
-			Writer.AddInt("x", MobSpawnerEntity.GetPosX());
-			Writer.AddInt("y", MobSpawnerEntity.GetPosY());
-			Writer.AddInt("z", MobSpawnerEntity.GetPosZ());
-			Writer.BeginCompound("SpawnData");
-				Writer.AddString("id", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
-			Writer.EndCompound();
-			Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
-			Writer.AddString("id", "MobSpawner");
-			break;
-		}
-
-		default:
-		{
-			break;
-		}
-	}
-
-	Writer.Finish();
-	a_Pkt.WriteBuf(Writer.GetResult());
 }
 
 

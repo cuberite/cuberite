@@ -739,7 +739,7 @@ AString cPrefabPiecePool::GetMetadata(const AString & a_ParamName) const
 
 
 
-void cPrefabPiecePool::AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_HeightGen, int a_SeaLevel)
+void cPrefabPiecePool::AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel)
 {
 	// Assign the generator linkage to all starting pieces' VerticalStrategies:
 	for (auto & piece: m_StartingPieces)
@@ -823,7 +823,3 @@ void cPrefabPiecePool::Reset(void)
 {
 	// Do nothing
 }
-
-
-
-

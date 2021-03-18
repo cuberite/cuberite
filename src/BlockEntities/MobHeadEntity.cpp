@@ -25,41 +25,6 @@ cMobHeadEntity::cMobHeadEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_Wo
 
 
 
-cItems cMobHeadEntity::ConvertToPickups() const
-{
-	return cItem(E_ITEM_HEAD, 1, static_cast<short>(m_Type));
-}
-
-
-
-
-
-void cMobHeadEntity::CopyFrom(const cBlockEntity & a_Src)
-{
-	Super::CopyFrom(a_Src);
-	auto & src = static_cast<const cMobHeadEntity &>(a_Src);
-	m_OwnerName = src.m_OwnerName;
-	m_OwnerTexture = src.m_OwnerTexture;
-	m_OwnerTextureSignature = src.m_OwnerTextureSignature;
-	m_OwnerUUID = src.m_OwnerUUID;
-	m_Rotation = src.m_Rotation;
-	m_Type = src.m_Type;
-}
-
-
-
-
-
-bool cMobHeadEntity::UsedBy(cPlayer * a_Player)
-{
-	UNUSED(a_Player);
-	return true;
-}
-
-
-
-
-
 void cMobHeadEntity::SetType(const eMobHeadType & a_Type)
 {
 	if ((!m_OwnerName.empty()) && (a_Type != SKULL_TYPE_PLAYER))
@@ -131,6 +96,31 @@ void cMobHeadEntity::SetOwner(const cUUID & a_OwnerUUID, const AString & a_Owner
 
 
 
+cItems cMobHeadEntity::ConvertToPickups() const
+{
+	return cItem(E_ITEM_HEAD, 1, static_cast<short>(m_Type));
+}
+
+
+
+
+
+void cMobHeadEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = static_cast<const cMobHeadEntity &>(a_Src);
+	m_OwnerName = src.m_OwnerName;
+	m_OwnerTexture = src.m_OwnerTexture;
+	m_OwnerTextureSignature = src.m_OwnerTextureSignature;
+	m_OwnerUUID = src.m_OwnerUUID;
+	m_Rotation = src.m_Rotation;
+	m_Type = src.m_Type;
+}
+
+
+
+
+
 void cMobHeadEntity::SendTo(cClientHandle & a_Client)
 {
 	cWorld * World = a_Client.GetPlayer()->GetWorld();
@@ -141,3 +131,9 @@ void cMobHeadEntity::SendTo(cClientHandle & a_Client)
 
 
 
+
+bool cMobHeadEntity::UsedBy(cPlayer * a_Player)
+{
+	UNUSED(a_Player);
+	return false;
+}

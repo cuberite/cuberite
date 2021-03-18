@@ -574,10 +574,7 @@ protected:
 
 
 
-cTerrainCompositionGenPtr CreateCompoGenBiomal(int a_Seed)
+std::unique_ptr<cTerrainCompositionGen> CreateCompoGenBiomal(int a_Seed)
 {
-	return std::make_shared<cCompoGenBiomal>(a_Seed);
+	return std::make_unique<cCompoGenBiomal>(a_Seed);
 }
-
-
-

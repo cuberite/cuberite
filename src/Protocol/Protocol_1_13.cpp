@@ -29,6 +29,7 @@ Implements the 1.13 protocol classes:
 #include "../Server.h"
 #include "../World.h"
 #include "../JsonUtils.h"
+#include "../WorldStorage/FastNBT.h"
 
 #include "../Bindings/PluginManager.h"
 
@@ -200,119 +201,37 @@ void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results)
 void cProtocol_1_13::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	cPacketizer Pkt(*this, pktUpdateBlockEntity);
 
-	Pkt.WriteXYZPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
-
-	Byte Action = 0;
+	Byte Action;
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case BlockType::Spawner:
-			Action = 1;  break;  // Update mob spawner spinny mob thing
-		case BlockType::CommandBlock:
-		case BlockType::ChainCommandBlock:
-		case BlockType::RepeatingCommandBlock:
-			Action = 2;  break;  // Update command block text
-		case BlockType::Beacon:
-			Action = 3;  break;  // Update beacon entity
-		case BlockType::CreeperHead:
-		case BlockType::CreeperWallHead:
-		case BlockType::DragonHead:
-		case BlockType::DragonWallHead:
-		case BlockType::PlayerHead:
-		case BlockType::PlayerWallHead:
-		case BlockType::ZombieHead:
-		case BlockType::ZombieWallHead:
-		case BlockType::SkeletonSkull:
-		case BlockType::SkeletonWallSkull:
-		case BlockType::WitherSkeletonSkull:
-		case BlockType::WitherSkeletonWallSkull:
-			Action = 4;  break;  // Update Mobhead entity
-		case BlockType::Conduit:
-			Action = 5;  break;  // Update Conduit entity
-		case BlockType::BlackBanner:
-		case BlockType::BlueBanner:
-		case BlockType::BrownBanner:
-		case BlockType::CyanBanner:
-		case BlockType::GrayBanner:
-		case BlockType::GreenBanner:
-		case BlockType::LightBlueBanner:
-		case BlockType::LightGrayBanner:
-		case BlockType::LimeBanner:
-		case BlockType::MagentaBanner:
-		case BlockType::OrangeBanner:
-		case BlockType::PinkBanner:
-		case BlockType::PurpleBanner:
-		case BlockType::RedBanner:
-		case BlockType::WhiteBanner:
-		case BlockType::YellowBanner:
+		case E_BLOCK_ENCHANTMENT_TABLE: Action = 0; break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
+		case E_BLOCK_END_PORTAL:        Action = 0; break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
 
-		case BlockType::BlackWallBanner:
-		case BlockType::BlueWallBanner:
-		case BlockType::BrownWallBanner:
-		case BlockType::CyanWallBanner:
-		case BlockType::GrayWallBanner:
-		case BlockType::GreenWallBanner:
-		case BlockType::LightBlueWallBanner:
-		case BlockType::LightGrayWallBanner:
-		case BlockType::LimeWallBanner:
-		case BlockType::MagentaWallBanner:
-		case BlockType::OrangeWallBanner:
-		case BlockType::PinkWallBanner:
-		case BlockType::PurpleWallBanner:
-		case BlockType::RedWallBanner:
-		case BlockType::WhiteWallBanner:
-		case BlockType::YellowWallBanner:
-			Action = 6;  break;  // Update banner entity
-		case BlockType::StructureBlock:
-			Action = 7;  break;  // Update Structure tile entity
-		case BlockType::EndGateway:
-			Action = 8;  break;  // Update destination for a end gateway entity
-		case BlockType::AcaciaSign:
-		case BlockType::AcaciaWallSign:
-		case BlockType::BirchSign:
-		case BlockType::BirchWallSign:
-		case BlockType::CrimsonSign:
-		case BlockType::CrimsonWallSign:
-		case BlockType::DarkOakSign:
-		case BlockType::DarkOakWallSign:
-		case BlockType::JungleSign:
-		case BlockType::JungleWallSign:
-		case BlockType::OakSign:
-		case BlockType::OakWallSign:
-		case BlockType::SpruceSign:
-		case BlockType::SpruceWallSign:
-		case BlockType::WarpedSign:
-		case BlockType::WarpedWallSign:
-			Action = 9;  break;  // Update sign entity
+		case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
+		case E_BLOCK_BEACON:            Action = 3;  break;  // Update beacon entity
+		case E_BLOCK_HEAD:              Action = 4;  break;  // Update Mobhead entity
+		// case E_BLOCK_CONDUIT:        Action = 5;  break;  // Update Conduit entity
+		case E_BLOCK_STANDING_BANNER:
+		case E_BLOCK_WALL_BANNER:       Action = 6;  break;  // Update banner entity
+		// case Structure Block:        Action = 7;  break;  // Update Structure tile entity
+		case E_BLOCK_END_GATEWAY:       Action = 8;  break;  // Update destination for a end gateway entity
+		case E_BLOCK_SIGN_POST:         Action = 9;  break;  // Update sign entity
 		// case E_BLOCK_SHULKER_BOX:    Action = 10; break;  // sets shulker box - not used just here if anyone is confused from reading the protocol wiki
-		case BlockType::BlackBed:
-		case BlockType::BlueBed:
-		case BlockType::BrownBed:
-		case BlockType::CyanBed:
-		case BlockType::GrayBed:
-		case BlockType::GreenBed:
-		case BlockType::LightBlueBed:
-		case BlockType::LightGrayBed:
-		case BlockType::LimeBed:
-		case BlockType::MagentaBed:
-		case BlockType::OrangeBed:
-		case BlockType::PinkBed:
-		case BlockType::PurpleBed:
-		case BlockType::RedBed:
-		case BlockType::WhiteBed:
-		case BlockType::YellowBed:
-			Action = 11; break;  // Update bed color
-		case BlockType::EnchantingTable:
-			Action = 0; break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
-		case BlockType::EndPortal:
-			Action = 0; break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
+		case E_BLOCK_BED:               Action = 11; break;  // Update bed color
 
-		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
+		default: return;  // Block entities change between versions
 	}
+
+	cPacketizer Pkt(*this, pktUpdateBlockEntity);
+	Pkt.WriteXYZPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
 	Pkt.WriteBEUInt8(Action);
 
-	WriteBlockEntity(Pkt, a_BlockEntity);
+	cFastNBTWriter Writer;
+	WriteBlockEntity(Writer, a_BlockEntity);
+	Writer.Finish();
+	Pkt.WriteBuf(Writer.GetResult());
 }
 
 
@@ -1446,6 +1365,7 @@ void cProtocol_1_13_1::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & 
 			case BossBarColor::Purple: return 5U;
 			case BossBarColor::White: return 6U;
 		}
+		UNREACHABLE("Unsupported boss bar property");
 	}());
 	Pkt.WriteVarInt32([a_DivisionType]
 	{
@@ -1457,6 +1377,7 @@ void cProtocol_1_13_1::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & 
 			case BossBarDivisionType::TwelveNotches: return 3U;
 			case BossBarDivisionType::TwentyNotches: return 4U;
 		}
+		UNREACHABLE("Unsupported boss bar property");
 	}());
 	{
 		UInt8 Flags = 0x00;
