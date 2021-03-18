@@ -43,6 +43,7 @@ Implements the 1.8 protocol classes:
 #include "../UI/Window.h"
 #include "../UI/HorseWindow.h"
 
+#include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/EnchantingTableEntity.h"
@@ -174,31 +175,14 @@ cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_Ser
 
 
 
-void cProtocol_1_8_0::DataReceived(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size)
+void cProtocol_1_8_0::DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer && a_Data)
 {
 	if (m_IsEncrypted)
 	{
-		// An artefact of the protocol recogniser, will be removed when decryption done in-place:
-		if (a_Size == 0)
-		{
-			AddReceivedData(a_Buffer, nullptr, 0);
-			return;
-		}
+		m_Decryptor.ProcessData(a_Data.data(), a_Data.size());
+	}
 
-		std::byte Decrypted[512];
-		while (a_Size > 0)
-		{
-			size_t NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
-			m_Decryptor.ProcessData(Decrypted, reinterpret_cast<const Byte *>(a_Data), NumBytes);
-			AddReceivedData(a_Buffer, reinterpret_cast<const char *>(Decrypted), NumBytes);
-			a_Size -= NumBytes;
-			a_Data += NumBytes;
-		}
-	}
-	else
-	{
-		AddReceivedData(a_Buffer, a_Data, a_Size);
-	}
+	AddReceivedData(a_Buffer, a_Data);
 }
 
 
@@ -1619,12 +1603,12 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktUpdateBlockEntity);
-	Pkt.WriteXYZPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
-
-	Byte Action = 0;
+	Byte Action;
 	switch (a_BlockEntity.GetBlockType())
 	{
+		case BlockType::EnchantingTable: Action = 0; break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
+		case BlockType::EndPortal:       Action = 0; break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
+
 		case BlockType::Spawner:       Action = 1; break;  // Update mob spawner spinny mob thing
 		case BlockType::CommandBlock:
 		case BlockType::ChainCommandBlock:
@@ -1674,6 +1658,40 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 		case BlockType::PottedWitherRose:
 		case BlockType::PottedAllium:
 			Action = 5; break;  // Update flower pot
+		case BlockType::BlackBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BrownBanner:
+		case BlockType::CyanBanner:
+		case BlockType::GrayBanner:
+		case BlockType::GreenBanner:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LimeBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::OrangeBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::RedBanner:
+		case BlockType::WhiteBanner:
+		case BlockType::YellowBanner:
+
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownWallBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedWallBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowWallBanner:
+			Action = 6; break;  // Update Banner
 		case BlockType::BlackBed:
 		case BlockType::BlueBed:
 		case BlockType::BrownBed:
@@ -1691,14 +1709,18 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 		case BlockType::WhiteBed:
 		case BlockType::YellowBed:
 			Action = 11; break;  // Update bed color
-		case BlockType::EnchantingTable: Action = 0; break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
-		case BlockType::EndPortal:       Action = 0; break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
 
-		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
+		default: return;  // Block entities change between versions
 	}
+
+	cPacketizer Pkt(*this, pktUpdateBlockEntity);
+	Pkt.WriteXYZPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
 	Pkt.WriteBEUInt8(Action);
 
-	WriteBlockEntity(Pkt, a_BlockEntity);
+	cFastNBTWriter Writer;
+	WriteBlockEntity(Writer, a_BlockEntity);
+	Writer.Finish();
+	Pkt.WriteBuf(Writer.GetResult());
 }
 
 
@@ -2059,123 +2081,6 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(const eMonsterType a_MobType)
 		case mtHusk:                  return GetProtocolMobType(mtZombie);
 
 		default:                      return 0;
-	}
-}
-
-
-
-
-
-void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size)
-{
-	// Write the incoming data into the comm log file:
-	if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
-	{
-		if (a_Buffer.GetReadableSpace() > 0)
-		{
-			ContiguousByteBuffer AllData;
-			size_t OldReadableSpace = a_Buffer.GetReadableSpace();
-			a_Buffer.ReadAll(AllData);
-			a_Buffer.ResetRead();
-			a_Buffer.SkipRead(a_Buffer.GetReadableSpace() - OldReadableSpace);
-			ASSERT(a_Buffer.GetReadableSpace() == OldReadableSpace);
-			AString Hex;
-			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-			m_CommLogFile.Printf("Incoming data, %zu (0x%zx) unparsed bytes already present in buffer:\n%s\n",
-				AllData.size(), AllData.size(), Hex.c_str()
-			);
-		}
-		AString Hex;
-		CreateHexDump(Hex, a_Data, a_Size, 16);
-		m_CommLogFile.Printf("Incoming data: %u (0x%x) bytes: \n%s\n",
-			static_cast<unsigned>(a_Size), static_cast<unsigned>(a_Size), Hex.c_str()
-		);
-		m_CommLogFile.Flush();
-	}
-
-	if (!a_Buffer.Write(a_Data, a_Size))
-	{
-		// Too much data in the incoming queue, report to caller:
-		m_Client->PacketBufferFull();
-		return;
-	}
-
-	// Handle all complete packets:
-	for (;;)
-	{
-		UInt32 PacketLen;
-		if (!a_Buffer.ReadVarInt(PacketLen))
-		{
-			// Not enough data
-			a_Buffer.ResetRead();
-			break;
-		}
-		if (!a_Buffer.CanReadBytes(PacketLen))
-		{
-			// The full packet hasn't been received yet
-			a_Buffer.ResetRead();
-			break;
-		}
-
-		// Check packet for compression:
-		if (m_State == 3)
-		{
-			UInt32 NumBytesRead = static_cast<UInt32>(a_Buffer.GetReadableSpace());
-
-			UInt32 UncompressedSize;
-			if (!a_Buffer.ReadVarInt(UncompressedSize))
-			{
-				m_Client->Kick("Compression packet incomplete");
-				return;
-			}
-
-			NumBytesRead -= static_cast<UInt32>(a_Buffer.GetReadableSpace());  // How many bytes has the UncompressedSize taken up?
-			ASSERT(PacketLen > NumBytesRead);
-			PacketLen -= NumBytesRead;
-
-			if (UncompressedSize > 0)
-			{
-				// Decompress the data:
-				m_Extractor.ReadFrom(a_Buffer, PacketLen);
-				a_Buffer.CommitRead();
-
-				const auto UncompressedData = m_Extractor.Extract(UncompressedSize);
-				const auto Uncompressed = UncompressedData.GetView();
-				cByteBuffer bb(Uncompressed.size());
-
-				// Compression was used, move the uncompressed data:
-				VERIFY(bb.Write(Uncompressed.data(), Uncompressed.size()));
-
-				HandlePacket(bb);
-				continue;
-			}
-		}
-
-		// Move the packet payload to a separate cByteBuffer, bb:
-		cByteBuffer bb(PacketLen);
-
-		// No compression was used, move directly:
-		VERIFY(a_Buffer.ReadToByteBuffer(bb, static_cast<size_t>(PacketLen)));
-		a_Buffer.CommitRead();
-
-		HandlePacket(bb);
-	}  // for (ever)
-
-	// Log any leftover bytes into the logfile:
-	if (g_ShouldLogCommIn && (a_Buffer.GetReadableSpace() > 0) && m_CommLogFile.IsOpen())
-	{
-		ContiguousByteBuffer AllData;
-		size_t OldReadableSpace = a_Buffer.GetReadableSpace();
-		a_Buffer.ReadAll(AllData);
-		a_Buffer.ResetRead();
-		a_Buffer.SkipRead(a_Buffer.GetReadableSpace() - OldReadableSpace);
-		ASSERT(a_Buffer.GetReadableSpace() == OldReadableSpace);
-		AString Hex;
-		CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-		m_CommLogFile.Printf("There are %zu (0x%zx) bytes of non-parse-able data left in the buffer:\n%s",
-			a_Buffer.GetReadableSpace(), a_Buffer.GetReadableSpace(), Hex.c_str()
-		);
-		m_CommLogFile.Flush();
 	}
 }
 
@@ -3327,6 +3232,185 @@ void cProtocol_1_8_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Ob
 
 
 
+void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity)
+{
+	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
+
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case BlockType::BlackBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BrownBanner:
+		case BlockType::CyanBanner:
+		case BlockType::GrayBanner:
+		case BlockType::GreenBanner:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LimeBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::OrangeBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::RedBanner:
+		case BlockType::WhiteBanner:
+		case BlockType::YellowBanner:
+
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownWallBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedWallBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowWallBanner:
+		{
+			auto & BannerEntity = static_cast<const cBannerEntity &>(a_BlockEntity);
+			a_Writer.AddInt("Base", static_cast<Int32>(BannerEntity.GetBaseColor()));
+			break;
+		}
+
+		case BlockType::Beacon:
+		{
+			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);
+			a_Writer.AddInt("Primary",   BeaconEntity.GetPrimaryEffect());
+			a_Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
+			a_Writer.AddInt("Levels",    BeaconEntity.GetBeaconLevel());
+			break;
+		}
+
+		case BlockType::CommandBlock:
+		case BlockType::ChainCommandBlock:
+		case BlockType::RepeatingCommandBlock:
+		{
+			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
+			a_Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
+			a_Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
+			a_Writer.AddString("Command", CommandBlockEntity.GetCommand());
+			// You can set custom names for windows in Vanilla
+			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
+			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
+			a_Writer.AddString("CustomName", "@");
+			if (!CommandBlockEntity.GetLastOutput().empty())
+			{
+				a_Writer.AddString("LastOutput", Printf("{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str()));
+			}
+			break;
+		}
+
+		case BlockType::EnchantingTable:
+		{
+			auto & EnchantingTableEntity = static_cast<const cEnchantingTableEntity &>(a_BlockEntity);
+			if (!EnchantingTableEntity.GetCustomName().empty())
+			{
+				a_Writer.AddString("CustomName", EnchantingTableEntity.GetCustomName());
+			}
+			break;
+		}
+
+		case BlockType::EndPortal:
+		{
+			// Nothing!
+			break;
+		}
+
+		case BlockType::CreeperHead:
+		case BlockType::CreeperWallHead:
+		case BlockType::DragonHead:
+		case BlockType::DragonWallHead:
+		case BlockType::PlayerHead:
+		case BlockType::PlayerWallHead:
+		case BlockType::SkeletonSkull:
+		case BlockType::SkeletonWallSkull:
+		case BlockType::WitherSkeletonSkull:
+		case BlockType::WitherSkeletonWallSkull:
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:
+		{
+			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
+			a_Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
+			a_Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
+
+			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
+			a_Writer.BeginCompound("Owner");
+				a_Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
+				a_Writer.AddString("Name", MobHeadEntity.GetOwnerName());
+				a_Writer.BeginCompound("Properties");
+					a_Writer.BeginList("textures", TAG_Compound);
+						a_Writer.BeginCompound("");
+							a_Writer.AddString("Signature", MobHeadEntity.GetOwnerTextureSignature());
+							a_Writer.AddString("Value", MobHeadEntity.GetOwnerTexture());
+						a_Writer.EndCompound();
+					a_Writer.EndList();
+				a_Writer.EndCompound();
+			a_Writer.EndCompound();
+			break;
+		}
+
+		case BlockType::PottedAcaciaSapling:
+		case BlockType::PottedAzureBluet:
+		case BlockType::PottedBamboo:
+		case BlockType::PottedBirchSapling:
+		case BlockType::PottedBlueOrchid:
+		case BlockType::PottedBrownMushroom:
+		case BlockType::PottedCactus:
+		case BlockType::PottedCornflower:
+		case BlockType::PottedCrimsonRoots:
+		case BlockType::PottedCrimsonFungus:
+		case BlockType::PottedDandelion:
+		case BlockType::PottedDarkOakSapling:
+		case BlockType::PottedDeadBush:
+		case BlockType::PottedFern:
+		case BlockType::PottedJungleSapling:
+		case BlockType::PottedLilyOfTheValley:
+		case BlockType::PottedOakSapling:
+		case BlockType::PottedOrangeTulip:
+		case BlockType::PottedOxeyeDaisy:
+		case BlockType::PottedPinkTulip:
+		case BlockType::PottedPoppy:
+		case BlockType::PottedRedMushroom:
+		case BlockType::PottedRedTulip:
+		case BlockType::PottedSpruceSapling:
+		case BlockType::PottedWarpedFungus:
+		case BlockType::PottedWarpedRoots:
+		case BlockType::PottedWhiteTulip:
+		case BlockType::PottedWitherRose:
+		case BlockType::PottedAllium:
+		{
+			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
+			a_Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
+			a_Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
+			break;
+		}
+
+		case BlockType::Spawner:
+		{
+			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
+			a_Writer.AddString("EntityId", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
+			a_Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
+			break;
+		}
+
+		default:
+		{
+			break;
+		}
+	}
+}
+
+
+
+
+
 void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 {
 	short ItemType = a_Item.m_ItemType;
@@ -3403,174 +3487,6 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 		return;
 	}
 	a_Pkt.WriteBuf(Result);
-}
-
-
-
-
-
-void cProtocol_1_8_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity)
-{
-	cFastNBTWriter Writer;
-
-	switch (a_BlockEntity.GetBlockType())
-	{
-		case BlockType::Beacon:
-		{
-			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);
-			Writer.AddInt("x",         BeaconEntity.GetPosX());
-			Writer.AddInt("y",         BeaconEntity.GetPosY());
-			Writer.AddInt("z",         BeaconEntity.GetPosZ());
-			Writer.AddInt("Primary",   BeaconEntity.GetPrimaryEffect());
-			Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
-			Writer.AddInt("Levels",    BeaconEntity.GetBeaconLevel());
-			Writer.AddString("id", "Beacon");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
-
-		case BlockType::CommandBlock:
-		case BlockType::ChainCommandBlock:
-		case BlockType::RepeatingCommandBlock:
-		{
-			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
-			Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
-			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
-			Writer.AddInt("x", CommandBlockEntity.GetPosX());
-			Writer.AddInt("y", CommandBlockEntity.GetPosY());
-			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
-			Writer.AddString("Command", CommandBlockEntity.GetCommand());
-			// You can set custom names for windows in Vanilla
-			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
-			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
-			Writer.AddString("CustomName", "@");
-			Writer.AddString("id", "Control");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			if (!CommandBlockEntity.GetLastOutput().empty())
-			{
-				Writer.AddString("LastOutput", Printf("{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str()));
-			}
-			break;
-		}
-
-		case BlockType::EnchantingTable:
-		{
-			auto & EnchantingTableEntity = static_cast<const cEnchantingTableEntity &>(a_BlockEntity);
-			Writer.AddInt("x", EnchantingTableEntity.GetPosX());
-			Writer.AddInt("y", EnchantingTableEntity.GetPosY());
-			Writer.AddInt("z", EnchantingTableEntity.GetPosZ());
-			if (!EnchantingTableEntity.GetCustomName().empty())
-			{
-				Writer.AddString("CustomName", EnchantingTableEntity.GetCustomName());
-			}
-			Writer.AddString("id", "EnchantingTable");
-			break;
-		}
-
-		case BlockType::EndPortal:
-		{
-			Writer.AddInt("x", a_BlockEntity.GetPosX());
-			Writer.AddInt("y", a_BlockEntity.GetPosY());
-			Writer.AddInt("z", a_BlockEntity.GetPosZ());
-			Writer.AddString("id", "EndPortal");
-			break;
-		}
-
-		case BlockType::CreeperHead:
-		case BlockType::CreeperWallHead:
-		case BlockType::DragonHead:
-		case BlockType::DragonWallHead:
-		case BlockType::PlayerHead:
-		case BlockType::PlayerWallHead:
-		case BlockType::ZombieHead:
-		case BlockType::ZombieWallHead:
-		case BlockType::SkeletonSkull:
-		case BlockType::SkeletonWallSkull:
-		case BlockType::WitherSkeletonSkull:
-		case BlockType::WitherSkeletonWallSkull:
-		{
-			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
-			Writer.AddInt("x", MobHeadEntity.GetPosX());
-			Writer.AddInt("y", MobHeadEntity.GetPosY());
-			Writer.AddInt("z", MobHeadEntity.GetPosZ());
-			Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
-			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
-			Writer.AddString("id", "Skull");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-
-			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
-			Writer.BeginCompound("Owner");
-				Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
-				Writer.AddString("Name", MobHeadEntity.GetOwnerName());
-				Writer.BeginCompound("Properties");
-					Writer.BeginList("textures", TAG_Compound);
-						Writer.BeginCompound("");
-							Writer.AddString("Signature", MobHeadEntity.GetOwnerTextureSignature());
-							Writer.AddString("Value", MobHeadEntity.GetOwnerTexture());
-						Writer.EndCompound();
-					Writer.EndList();
-				Writer.EndCompound();
-			Writer.EndCompound();
-			break;
-		}
-
-		case BlockType::PottedAcaciaSapling:
-		case BlockType::PottedAzureBluet:
-		case BlockType::PottedBamboo:
-		case BlockType::PottedBirchSapling:
-		case BlockType::PottedBlueOrchid:
-		case BlockType::PottedBrownMushroom:
-		case BlockType::PottedCactus:
-		case BlockType::PottedCornflower:
-		case BlockType::PottedCrimsonRoots:
-		case BlockType::PottedCrimsonFungus:
-		case BlockType::PottedDandelion:
-		case BlockType::PottedDarkOakSapling:
-		case BlockType::PottedDeadBush:
-		case BlockType::PottedFern:
-		case BlockType::PottedJungleSapling:
-		case BlockType::PottedLilyOfTheValley:
-		case BlockType::PottedOakSapling:
-		case BlockType::PottedOrangeTulip:
-		case BlockType::PottedOxeyeDaisy:
-		case BlockType::PottedPinkTulip:
-		case BlockType::PottedPoppy:
-		case BlockType::PottedRedMushroom:
-		case BlockType::PottedRedTulip:
-		case BlockType::PottedSpruceSapling:
-		case BlockType::PottedWarpedFungus:
-		case BlockType::PottedWarpedRoots:
-		case BlockType::PottedWhiteTulip:
-		case BlockType::PottedWitherRose:
-		case BlockType::PottedAllium:
-		{
-			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
-			Writer.AddInt("x", FlowerPotEntity.GetPosX());
-			Writer.AddInt("y", FlowerPotEntity.GetPosY());
-			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
-			Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
-			Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
-			Writer.AddString("id", "FlowerPot");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
-
-		case BlockType::Spawner:
-		{
-			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
-			Writer.AddInt("x", MobSpawnerEntity.GetPosX());
-			Writer.AddInt("y", MobSpawnerEntity.GetPosY());
-			Writer.AddInt("z", MobSpawnerEntity.GetPosZ());
-			Writer.AddString("EntityId", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
-			Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
-			Writer.AddString("id", "MobSpawner");
-			break;
-		}
-
-		default:
-		{
-			break;
-		}
-	}
-
-	Writer.Finish();
-	a_Pkt.WriteBuf(Writer.GetResult());
 }
 
 
@@ -4061,6 +3977,123 @@ void cProtocol_1_8_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity &
 	// TODO: Send properties and modifiers based on the mob type
 
 	a_Pkt.WriteBEInt32(0);  // NumProperties
+}
+
+
+
+
+
+void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousByteBufferView a_Data)
+{
+	// Write the incoming data into the comm log file:
+	if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
+	{
+		if (a_Buffer.GetReadableSpace() > 0)
+		{
+			ContiguousByteBuffer AllData;
+			size_t OldReadableSpace = a_Buffer.GetReadableSpace();
+			a_Buffer.ReadAll(AllData);
+			a_Buffer.ResetRead();
+			a_Buffer.SkipRead(a_Buffer.GetReadableSpace() - OldReadableSpace);
+			ASSERT(a_Buffer.GetReadableSpace() == OldReadableSpace);
+			AString Hex;
+			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
+			m_CommLogFile.Printf("Incoming data, %zu (0x%zx) unparsed bytes already present in buffer:\n%s\n",
+				AllData.size(), AllData.size(), Hex.c_str()
+			);
+		}
+		AString Hex;
+		CreateHexDump(Hex, a_Data.data(), a_Data.size(), 16);
+		m_CommLogFile.Printf("Incoming data: %zu (0x%zx) bytes: \n%s\n",
+			a_Data.size(), a_Data.size(), Hex.c_str()
+		);
+		m_CommLogFile.Flush();
+	}
+
+	if (!a_Buffer.Write(a_Data.data(), a_Data.size()))
+	{
+		// Too much data in the incoming queue, report to caller:
+		m_Client->PacketBufferFull();
+		return;
+	}
+
+	// Handle all complete packets:
+	for (;;)
+	{
+		UInt32 PacketLen;
+		if (!a_Buffer.ReadVarInt(PacketLen))
+		{
+			// Not enough data
+			a_Buffer.ResetRead();
+			break;
+		}
+		if (!a_Buffer.CanReadBytes(PacketLen))
+		{
+			// The full packet hasn't been received yet
+			a_Buffer.ResetRead();
+			break;
+		}
+
+		// Check packet for compression:
+		if (m_State == 3)
+		{
+			UInt32 NumBytesRead = static_cast<UInt32>(a_Buffer.GetReadableSpace());
+
+			UInt32 UncompressedSize;
+			if (!a_Buffer.ReadVarInt(UncompressedSize))
+			{
+				m_Client->Kick("Compression packet incomplete");
+				return;
+			}
+
+			NumBytesRead -= static_cast<UInt32>(a_Buffer.GetReadableSpace());  // How many bytes has the UncompressedSize taken up?
+			ASSERT(PacketLen > NumBytesRead);
+			PacketLen -= NumBytesRead;
+
+			if (UncompressedSize > 0)
+			{
+				// Decompress the data:
+				m_Extractor.ReadFrom(a_Buffer, PacketLen);
+				a_Buffer.CommitRead();
+
+				const auto UncompressedData = m_Extractor.Extract(UncompressedSize);
+				const auto Uncompressed = UncompressedData.GetView();
+				cByteBuffer bb(Uncompressed.size());
+
+				// Compression was used, move the uncompressed data:
+				VERIFY(bb.Write(Uncompressed.data(), Uncompressed.size()));
+
+				HandlePacket(bb);
+				continue;
+			}
+		}
+
+		// Move the packet payload to a separate cByteBuffer, bb:
+		cByteBuffer bb(PacketLen);
+
+		// No compression was used, move directly:
+		VERIFY(a_Buffer.ReadToByteBuffer(bb, static_cast<size_t>(PacketLen)));
+		a_Buffer.CommitRead();
+
+		HandlePacket(bb);
+	}  // for (ever)
+
+	// Log any leftover bytes into the logfile:
+	if (g_ShouldLogCommIn && (a_Buffer.GetReadableSpace() > 0) && m_CommLogFile.IsOpen())
+	{
+		ContiguousByteBuffer AllData;
+		size_t OldReadableSpace = a_Buffer.GetReadableSpace();
+		a_Buffer.ReadAll(AllData);
+		a_Buffer.ResetRead();
+		a_Buffer.SkipRead(a_Buffer.GetReadableSpace() - OldReadableSpace);
+		ASSERT(a_Buffer.GetReadableSpace() == OldReadableSpace);
+		AString Hex;
+		CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
+		m_CommLogFile.Printf("There are %zu (0x%zx) bytes of non-parse-able data left in the buffer:\n%s",
+			a_Buffer.GetReadableSpace(), a_Buffer.GetReadableSpace(), Hex.c_str()
+		);
+		m_CommLogFile.Flush();
+	}
 }
 
 
