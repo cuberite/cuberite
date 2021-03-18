@@ -185,10 +185,10 @@ public:
 	/** Return true if this block is a portal frame, has an eye, and is facing the correct direction. */
 	static bool IsValidFrameAtPos(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_ShouldFace)
 	{
-		auto EnderPortalFrame = a_ChunkInterface.GetBlock(a_BlockPos);
+		auto EndPortalFrame = a_ChunkInterface.GetBlock(a_BlockPos);
 
 		return (
-			(EnderPortalFrame.Type() == BlockType::EndPortalFrame) &&
+			(EndPortalFrame.Type() == BlockType::EndPortalFrame) &&
 			(Block::EndPortalFrame::Facing(EndPortalFrame) == a_ShouldFace)
 		);
 	}

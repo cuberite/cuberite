@@ -364,8 +364,7 @@ void cSandSimulator::FinishFalling(
 
 	// Create a pickup instead:
 	cItems Pickups;
-	auto NumericBlock = PaletteUpgrade::ToBlock(a_FallingBlock);
-	Pickups.Add(NumericBlock.first, 1, NumericBlock.second);
+	Pickups.Add(BlockItemConverter::FromBlock(a_FallingBlock.Type()));
 	a_World->SpawnItemPickups(
 		Pickups,
 		Vector3d(a_Pos) + Vector3d(0.5, 0.5, 0.5)
@@ -437,7 +436,7 @@ void cSandSimulator::DoInstantFall(cChunk * a_Chunk, Vector3i a_RelPos)
 		}
 		else if ((cBlockConcretePowderHandler::IsBlockConcretePowder(FallingBlock)) && NewBlock.Type() == BlockType::Water)
 		{
-			FallingBlock = cBlockConcretePowderHandler::GetConcreteFromConretePowder(FallingBlock);
+			FallingBlock = cBlockConcretePowderHandler::GetConcreteFromConcretePowder(FallingBlock);
 			BlockY = y;
 		}
 		else

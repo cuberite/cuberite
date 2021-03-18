@@ -1,4 +1,6 @@
 
+#include "BlockHandler.h"
+
 #pragma once
 
 
@@ -25,6 +27,21 @@ public:
 
 	using Super::Super;
 
+	enum class Shape
+	{
+		NorthSouth,
+		EastWest,
+		AscendingEast,
+		AscendingWest,
+		AscendingNorth,
+		AscendingSouth,
+		SouthEast,
+		SouthWest,
+		NorthWest,
+		NorthEast,
+		None
+	};
+
 	static inline bool IsBlockRail(BlockState a_Block)
 	{
 		switch (a_Block.Type())
@@ -49,6 +66,67 @@ public:
 			case BlockType::DetectorRail:  a_ChunkInterface.FastSetBlock(a_Position, DetectorRail::DetectorRail(a_Powered, DetectorRail::Shape(Self))); break;
 			case BlockType::PoweredRail:   a_ChunkInterface.FastSetBlock(a_Position, PoweredRail::PoweredRail(a_Powered, PoweredRail::Shape(Self))); break;
 			default: break;
+		}
+	}
+
+	static inline enum Shape GetShapeFromRail(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::Rail:
+			{
+				switch (Rail::Shape(a_Block))
+				{
+					case Rail::Shape::NorthSouth:     return Shape::NorthSouth;
+					case Rail::Shape::EastWest:       return Shape::EastWest;
+					case Rail::Shape::AscendingEast:  return Shape::AscendingEast;
+					case Rail::Shape::AscendingWest:  return Shape::AscendingWest;
+					case Rail::Shape::AscendingNorth: return Shape::AscendingNorth;
+					case Rail::Shape::AscendingSouth: return Shape::AscendingSouth;
+					case Rail::Shape::SouthEast:      return Shape::SouthEast;
+					case Rail::Shape::SouthWest:      return Shape::SouthWest;
+					case Rail::Shape::NorthWest:      return Shape::NorthWest;
+					case Rail::Shape::NorthEast:      return Shape::NorthEast;
+				}
+			}
+			case BlockType::ActivatorRail:
+			{
+				switch (ActivatorRail::Shape(a_Block))
+				{
+					case ActivatorRail::Shape::NorthSouth:     return Shape::NorthSouth;
+					case ActivatorRail::Shape::EastWest:       return Shape::EastWest;
+					case ActivatorRail::Shape::AscendingEast:  return Shape::AscendingEast;
+					case ActivatorRail::Shape::AscendingWest:  return Shape::AscendingWest;
+					case ActivatorRail::Shape::AscendingNorth: return Shape::AscendingNorth;
+					case ActivatorRail::Shape::AscendingSouth: return Shape::AscendingSouth;
+				}
+			}
+			case BlockType::DetectorRail:
+			{
+				switch (DetectorRail::Shape(a_Block))
+				{
+					case DetectorRail::Shape::NorthSouth:     return Shape::NorthSouth;
+					case DetectorRail::Shape::EastWest:       return Shape::EastWest;
+					case DetectorRail::Shape::AscendingEast:  return Shape::AscendingEast;
+					case DetectorRail::Shape::AscendingWest:  return Shape::AscendingWest;
+					case DetectorRail::Shape::AscendingNorth: return Shape::AscendingNorth;
+					case DetectorRail::Shape::AscendingSouth: return Shape::AscendingSouth;
+				}
+			}
+			case BlockType::PoweredRail:
+			{
+				switch (PoweredRail::Shape(a_Block))
+				{
+					case PoweredRail::Shape::NorthSouth:     return Shape::NorthSouth;
+					case PoweredRail::Shape::EastWest:       return Shape::EastWest;
+					case PoweredRail::Shape::AscendingEast:  return Shape::AscendingEast;
+					case PoweredRail::Shape::AscendingWest:  return Shape::AscendingWest;
+					case PoweredRail::Shape::AscendingNorth: return Shape::AscendingNorth;
+					case PoweredRail::Shape::AscendingSouth: return Shape::AscendingSouth;
+				}
+			}
+			default: return Shape::None;
 		}
 	}
 

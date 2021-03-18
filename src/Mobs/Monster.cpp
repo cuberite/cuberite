@@ -1463,7 +1463,7 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 	{
 		cItems Items;
 		GetBreedingItems(Items);
-		if (Items.ContainsType(EquippedItem.m_ItemType))
+		if (Items.ContainsType(EquippedItem))
 		{
 			if (!a_Player.IsGameModeCreative())
 			{
@@ -1497,25 +1497,6 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 
 
 
-void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth)
-{
-	auto Count = GetRandomProvider().RandInt<unsigned int>(a_Min, a_Max);
-	auto MaxStackSize = static_cast<unsigned char>(ItemHandler(a_Item)->GetMaxStackSize());
-	while (Count > MaxStackSize)
-	{
-		a_Drops.emplace_back(a_Item, MaxStackSize, a_ItemHealth);
-		Count -= MaxStackSize;
-	}
-	if (Count > 0)
-	{
-		a_Drops.emplace_back(a_Item, Count, a_ItemHealth);
-	}
-}
-
-
-
-
-
 void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, Item a_Item)
 {
 	auto NumericItem = PaletteUpgrade::ToItem(a_Item);
@@ -1536,11 +1517,11 @@ void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned 
 
 
 
-void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth)
+void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, enum Item a_Item)
 {
 	if (GetRandomProvider().RandBool(a_Chance / 100.0))
 	{
-		a_Drops.emplace_back(a_Item, 1, a_ItemHealth);
+		a_Drops.emplace_back(a_Item);
 	}
 }
 
@@ -1760,7 +1741,7 @@ void cMonster::Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast)
 	if (a_ShouldDropLeashPickup)
 	{
 		cItems Pickups;
-		Pickups.Add(cItem(E_ITEM_LEASH, 1, 0));
+		Pickups.Add(cItem(Item::Lead));
 		GetWorld()->SpawnItemPickups(Pickups, GetPosX() + 0.5, GetPosY() + 0.5, GetPosZ() + 0.5);
 	}
 

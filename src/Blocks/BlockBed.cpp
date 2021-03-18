@@ -9,6 +9,7 @@
 #include "../World.h"
 #include "../BoundingBox.h"
 #include "../Mobs/Monster.h"
+#include "../BlockEntities/BedEntity.h"
 
 
 
@@ -17,36 +18,36 @@
 void cBlockBedHandler::OnBroken(
 	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 	const Vector3i a_BlockPos,
-	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+	BlockState a_OldBlock,
 	const cEntity * a_Digger
 ) const
 {
 	UNUSED(a_Digger);
-	auto Direction = MetaDataToDirection(a_OldBlockMeta & 0x03);
-	if ((a_OldBlockMeta & 0x08) != 0)
+	auto Direction = GetBlockFace(a_OldBlock);
+	if (IsHeadPart(a_OldBlock))
 	{
 		// Was pillow
-		Vector3i FootPos(a_BlockPos - Direction);
-		if (a_ChunkInterface.GetBlock(FootPos) == E_BLOCK_BED)
+		Vector3i FootPos(a_BlockPos - BlockFaceToDirection(Direction));
+		if (a_ChunkInterface.GetBlock(FootPos).Type() == a_OldBlock.Type())
 		{
 			// First replace the bed with air
-			a_ChunkInterface.FastSetBlock(FootPos, E_BLOCK_AIR, 0);
+			a_ChunkInterface.FastSetBlock(FootPos, Block::Air::Air());
 
 			// Then destroy the bed entity
-			a_ChunkInterface.SetBlock(FootPos, E_BLOCK_AIR, 0);
+			a_ChunkInterface.SetBlock(FootPos, Block::Air::Air());
 		}
 	}
 	else
 	{
 		// Was foot end
-		Vector3i PillowPos(a_BlockPos + Direction);
+		Vector3i PillowPos(a_BlockPos + BlockFaceToDirection(Direction));
 		if (a_ChunkInterface.GetBlock(PillowPos) == E_BLOCK_BED)
 		{
 			// First replace the bed with air
-			a_ChunkInterface.FastSetBlock(PillowPos, E_BLOCK_AIR, 0);
+			a_ChunkInterface.FastSetBlock(PillowPos, Block::Air::Air());
 
 			// Then destroy the bed entity
-			a_ChunkInterface.SetBlock(PillowPos, E_BLOCK_AIR, 0);
+			a_ChunkInterface.SetBlock(PillowPos, Block::Air::Air());
 		}
 	}
 }
@@ -59,13 +60,11 @@ bool cBlockBedHandler::OnUse(
 	cChunkInterface & a_ChunkInterface,
 	cWorldInterface & a_WorldInterface,
 	cPlayer & a_Player,
-	Vector3i a_BlockPos,
+	const Vector3i a_BlockPos,
 	eBlockFace a_BlockFace,
 	const Vector3i a_CursorPos
 ) const
 {
-	// Source: https://minecraft.wiki/w/Bed#Sleeping
-
 	// Sleeping in bed only allowed in Overworld, beds explode elsewhere:
 	if (a_WorldInterface.GetDimension() != dimOverworld)
 	{
@@ -74,82 +73,83 @@ bool cBlockBedHandler::OnUse(
 		return true;
 	}
 
-	auto Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
-
-	if ((Meta & 0x8) == 0)
-	{
-		// Clicked on the foot of the bed, adjust to the head:
-		a_BlockPos += MetaDataToDirection(Meta & 0x03);
-
-		BLOCKTYPE Type;
-		a_ChunkInterface.GetBlockTypeMeta(a_BlockPos, Type, Meta);
-		if (Type != E_BLOCK_BED)
-		{
-			// Bed was incomplete, bail:
-			return true;
-		}
-	}
-
-	// Set the bed position to the pillow block:
-	a_Player.SetBedPos(a_BlockPos);
-
 	// Sleeping is allowed only during night and thunderstorms:
 	if (
-		!(((a_WorldInterface.GetTimeOfDay() > 12541_tick) && (a_WorldInterface.GetTimeOfDay() < 23458_tick)) ||
+		!(((a_WorldInterface.GetTimeOfDay() > 12541) && (a_WorldInterface.GetTimeOfDay() < 23458)) ||
 		(a_Player.GetWorld()->GetWeather() == wThunderstorm))
-	)
+	)  // Source: https://minecraft.gamepedia.com/Bed#Sleeping
 	{
 		a_Player.SendAboveActionBarMessage("You can only sleep at night and during thunderstorms");
+
+		// Try to set home position anyway:
+		SetBedPos(a_Player, a_BlockPos);
 		return true;
 	}
 
+	auto Self = a_ChunkInterface.GetBlock(a_BlockPos);
+
 	// Check if the bed is occupied:
-	if ((Meta & 0x04) == 0x04)
+	if (IsBedOccupied(Self))
 	{
-		a_Player.SendAboveActionBarMessage("This bed is occupied");
+		a_Player.SendMessageFailure("This bed is occupied");
 		return true;
 	}
 
 	// Cannot sleep if there are hostile mobs nearby:
-	if (
-		!a_Player.GetWorld()->ForEachEntityInBox({ a_Player.GetPosition().addedY(-5), 8, 10 }, [](cEntity & a_Entity)
-		{
-			return a_Entity.IsMob() && (static_cast<cMonster&>(a_Entity).GetMobFamily() == cMonster::mfHostile);
-		})
-	)
+	auto FindMobs = [](cEntity & a_Entity)
+	{
+		return (
+			(a_Entity.GetEntityType() == cEntity::etMonster) &&
+			(static_cast<cMonster&>(a_Entity).GetMobFamily() == cMonster::mfHostile)
+		);
+	};
+	if (!a_Player.GetWorld()->ForEachEntityInBox(cBoundingBox(a_Player.GetPosition() - Vector3i(0, 5, 0), 8, 10), FindMobs))
 	{
 		a_Player.SendAboveActionBarMessage("You may not rest now, there are monsters nearby");
 		return true;
 	}
 
-	// This will broadcast "use bed" for the pillow block, if the player can sleep:
-	a_Player.SetIsInBed(true);
-
-	// Check sleeping was successful, if not, bail:
-	if (!a_Player.IsInBed())
+	// Broadcast the "Use bed" for the pillow block:
+	if (IsHeadPart(Self))
 	{
-		return true;
+		// Is pillow
+		a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, a_BlockPos);
+	}
+	else
+	{
+		// Is foot end
+		VERIFY(!IsBedOccupied(Self));  // Occupied flag should never be set, else our compilator (intended) is broken
+
+		auto PillowPos = a_BlockPos + BlockFaceToDirection(GetBlockFace(Self));
+		if (a_ChunkInterface.GetBlock(PillowPos).Type() == Self.Type())  // Must always use pillow location for sleeping
+		{
+			a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, PillowPos);
+		}
 	}
 
-	// Occupy the bed, where 0x4 = occupied bit:
-	a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta | 0x04);
-	a_Player.GetStatistics().Custom[CustomStatistic::SleepInBed]++;
-
-	// When sleeping, the player's bounding box moves to approximately where his head is.
-	// Set the player's position to somewhere close to the edge of the pillow block:
-	a_Player.SetPosition(Vector3f(0.4f, 1, 0.4f) * MetaDataToDirection(Meta & 0x03) + Vector3f(0.5f, 0.6875, 0.5f) + a_BlockPos);
+	// Occupy the bed:
+	SetBedPos(a_Player, a_BlockPos);
+	SetBedOccupationState(a_ChunkInterface, a_Player.GetLastBedPos(), true);
+	a_Player.SetIsInBed(true);
+	a_Player.GetStatManager().AddValue(Statistic::SleepInBed);
 
 	// Fast-forward the time if all players in the world are in their beds:
-	if (a_WorldInterface.ForEachPlayer([](cPlayer & a_OtherPlayer) { return !a_OtherPlayer.IsInBed(); }))
+	auto TimeFastForwardTester = [](cPlayer & a_OtherPlayer)
 	{
-		a_WorldInterface.ForEachPlayer([&a_ChunkInterface](cPlayer & a_OtherPlayer)
-		{
-			VacateBed(a_ChunkInterface, a_OtherPlayer);
-			return false;
-		});
-		a_WorldInterface.SetTimeOfDay(0_tick);
+		return !a_OtherPlayer.IsInBed();
+	};
+	if (a_WorldInterface.ForEachPlayer(TimeFastForwardTester))
+	{
+		a_WorldInterface.ForEachPlayer([&](cPlayer & a_OtherPlayer)
+			{
+				cBlockBedHandler::SetBedOccupationState(a_ChunkInterface, a_OtherPlayer.GetLastBedPos(), false);
+				a_OtherPlayer.SetIsInBed(false);
+				return false;
+			}
+		);
+		a_WorldInterface.SetTimeOfDay(0);
+		SetBedOccupationState(a_ChunkInterface, a_Player.GetLastBedPos(), false);
 	}
-
 	return true;
 }
 
@@ -157,8 +157,25 @@ bool cBlockBedHandler::OnUse(
 
 
 
-cItems cBlockBedHandler::ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const
+void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange) const
 {
-	// Drops handled by the block entity:
-	return {};
+	a_Player.GetWorld()->DoWithBedAt(a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(), [&](cBedEntity & a_Bed)
+		{
+			a_Bed.SetColor(a_Player.GetEquippedItem().m_ItemDamage);
+			return true;
+		}
+	);
+}
+
+
+
+
+
+void cBlockBedHandler::SetBedPos(cPlayer & a_Player, const Vector3i a_BedPosition)
+{
+	if (a_Player.GetLastBedPos() != a_BedPosition)
+	{
+		a_Player.SetBedPos(a_BedPosition);
+		a_Player.SendMessageSuccess("Home position set successfully");
+	}
 }

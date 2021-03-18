@@ -39,14 +39,14 @@ void cWitherSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomUncommonDropItem(a_Drops, 33.0f, E_ITEM_COAL);
-	AddRandomUncommonDropItem(a_Drops, 8.5f, E_ITEM_STONE_SWORD, GetRandomProvider().RandInt<short>(50));
+	AddRandomUncommonDropItem(a_Drops, 33.0f, Item::Coal);
+	AddRandomUncommonDropItem(a_Drops, 8.5f, Item::StoneSword);  // TODO(12xx12) readd this when move to new item enum is done;, GetRandomProvider().RandInt<short>(50));
 
 	cItems RareDrops;
-	RareDrops.Add(cItem(E_ITEM_HEAD, 1, 1));
+	RareDrops.Add(cItem(Item::WitherSkeletonSkull));
 	AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
 
-	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_BONE);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, Item::Bone);
 	AddRandomArmorDropItem(a_Drops, LootingLevel);
 	AddRandomWeaponDropItem(a_Drops, LootingLevel);
 }
@@ -58,5 +58,5 @@ void cWitherSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 void cWitherSkeleton::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	Super::SpawnOn(a_ClientHandle);
-	a_ClientHandle.SendEntityEquipment(*this, 0, cItem(E_ITEM_STONE_SWORD));
+	a_ClientHandle.SendEntityEquipment(*this, 0, cItem(Item::StoneSword));
 }

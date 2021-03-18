@@ -151,7 +151,7 @@ private:
 
 	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		return cItem(E_ITEM_REDSTONE_REPEATER, 1, 0);
+		return cItem(Item::Repeater);
 	}
 
 

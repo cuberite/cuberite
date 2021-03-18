@@ -747,18 +747,18 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 {
 	static const cLootProbab LootProbab[] =
 	{
-		// Item,                          MinAmount, MaxAmount, Weight
-		{ cItem(E_ITEM_IRON),             1,         5,         10 },
-		{ cItem(E_ITEM_GOLD),             1,         3,          5 },
-		{ cItem(E_ITEM_REDSTONE_DUST),    4,         9,          5 },
-		{ cItem(E_ITEM_DIAMOND),          1,         2,          3 },
-		{ cItem(E_ITEM_DYE, 1, 4),        4,         9,          5 },  // lapis lazuli dye
-		{ cItem(E_ITEM_COAL),             3,         8,         10 },
-		{ cItem(E_ITEM_BREAD),            1,         3,         15 },
-		{ cItem(E_ITEM_IRON_PICKAXE),     1,         1,          1 },
-		{ cItem(Item::Rail),              4,         8,          1 },
-		{ cItem(E_ITEM_MELON_SEEDS),      2,         4,         10 },
-		{ cItem(E_ITEM_PUMPKIN_SEEDS),    2,         4,         10 },
+		// Item,                        MinAmount, MaxAmount, Weight
+		{ cItem(Item::IronIngot),       1,         5,         10 },
+		{ cItem(Item::GoldIngot),       1,         3,          5 },
+		{ cItem(Item::Redstone),        4,         9,          5 },
+		{ cItem(Item::Diamond),         1,         2,          3 },
+		{ cItem(Item::LapisLazuli),     4,         9,          5 },
+		{ cItem(Item::Coal),            3,         8,         10 },
+		{ cItem(Item::Bread),           1,         3,         15 },
+		{ cItem(Item::IronPickaxe),     1,         1,          1 },
+		{ cItem(Item::Rail),            4,         8,          1 },
+		{ cItem(Item::MelonSeeds),      2,         4,         10 },
+		{ cItem(Item::PumpkinSeeds),    2,         4,         10 },
 	} ;
 
 	if (m_ChestPosition < 0)

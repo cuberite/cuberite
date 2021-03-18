@@ -263,7 +263,7 @@ void cHorse::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_LEATHER);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, Item::Leather);
 	if (IsSaddled())
 	{
 		a_Drops.push_back(m_Saddle);

@@ -803,7 +803,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 	if (GetName() == "Notch")
 	{
-		Pickups.Add(cItem(E_ITEM_RED_APPLE));
+		Pickups.Add(cItem(Item::Apple));
 	}
 	m_Stats.AddValue(Statistic::Drop, static_cast<cStatManager::StatValue>(Pickups.Size()));
 

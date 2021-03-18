@@ -33,7 +33,7 @@ public:
 		ASSERT(a_Player != nullptr);
 
 		// Check if the player has an arrow in the inventory, or is in Creative:
-		if (!(a_Player->IsGameModeCreative() || a_Player->GetInventory().HasItems(cItem(E_ITEM_ARROW))))
+		if (!(a_Player->IsGameModeCreative() || a_Player->GetInventory().HasItems(cItem(Item::Arrow))))
 		{
 			return false;
 		}
@@ -61,7 +61,7 @@ public:
 		Force = std::min(Force, 1.0);
 
 		// Does the player have an arrow?
-		if (!a_Player->IsGameModeCreative() && !a_Player->GetInventory().HasItems(cItem(E_ITEM_ARROW)))
+		if (!a_Player->IsGameModeCreative() && !a_Player->GetInventory().HasItems(cItem(Item::Arrow)))
 		{
 			return;
 		}
@@ -83,7 +83,7 @@ public:
 		{
 			if (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchInfinity) == 0)
 			{
-				a_Player->GetInventory().RemoveItem(cItem(E_ITEM_ARROW));
+				a_Player->GetInventory().RemoveItem(cItem(Item::Arrow));
 			}
 			else
 			{
