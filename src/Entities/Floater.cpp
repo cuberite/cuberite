@@ -112,7 +112,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	auto & Random = GetRandomProvider();
 	auto ContainedBlock = Chunk->GetBlock(Rel);
-	if ((ContainedBlock.Type() == Water) && (cBlockFluidHandler::GetFalloff(ContainedBlock) == 0))
+	if ((ContainedBlock.Type() == BlockType::Water) && (cBlockFluidHandler::GetFalloff(ContainedBlock) == 0))
 	{
 		if (!m_CanPickupItem && (m_AttachedMobID == cEntity::INVALID_ID))  // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
 		{
@@ -159,7 +159,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Check water at the top of floater otherwise it floats into the air above the water
 	if (
 		const auto Above = Rel.addedY(FloorC(GetPosY() + GetHeight()));
-		(Above.y < cChunkDef::Height) && (m_World->GetBlock(Above).Type() == Water)
+		(Above.y < cChunkDef::Height) && (m_World->GetBlock(Above).Type() == BlockType::Water)
 	)
 	{
 		SetSpeedY(0.7);

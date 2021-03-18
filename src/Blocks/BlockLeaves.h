@@ -194,7 +194,7 @@ private:
 				DropProbability = FortuneDropProbability(200, 20, FortuneLevel);
 				if (Random.RandBool(DropProbability))
 				{
-					Res.Add(E_ITEM_RED_APPLE);
+					Res.Add(Item::Apple);
 				}
 				break;
 			}
@@ -214,7 +214,7 @@ private:
 		if (Random.RandBool(DropProbability))
 		{
 			// 1 or 2 sticks are dropped on success:
-			Res.Add(E_ITEM_STICK, Random.RandInt<char>(1, 2));
+			Res.Add(Item::Stick, Random.RandInt<char>(1, 2));
 		}
 
 		return Res;

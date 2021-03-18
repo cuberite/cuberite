@@ -54,7 +54,7 @@ private:
 	{
 		// If fully grown, give 3 items, otherwise just one:
 		auto GrowState = Block::Cocoa::Age(a_Block);
-		return cItem(E_ITEM_DYE, ((GrowState >= 2) ? 3 : 1), E_META_DYE_BROWN);
+		return cItem(Item::CocoaBeans, ((GrowState >= 2) ? 3 : 1));
 	}
 
 

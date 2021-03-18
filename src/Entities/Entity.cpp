@@ -955,8 +955,8 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
 	int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
-	BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ);
-	BLOCKTYPE BlockBelow = (BlockY > 0) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
+	auto BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ);
+	auto BlockBelow = (BlockY > 0) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : Block::Air::Air();
 	if (!cBlockInfo::IsSolid(BlockIn))  // Making sure we are not inside a solid block
 	{
 		if (m_bOnGround)  // check if it's still on the ground
@@ -970,31 +970,28 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	else if (!(IsMinecart() || IsTNT() || (IsPickup() && (m_TicksAlive < 15))))
 	{
 		// Push out entity.
-		BLOCKTYPE GotBlock;
+		BlockState GotBlock;
 
-		static const struct
+		static const std::array<Vector3i, 4> gCrossCoords =
 		{
-			int x, y, z;
-		} gCrossCoords[] =
-		{
-			{ 1, 0,  0},
-			{-1, 0,  0},
-			{ 0, 0,  1},
-			{ 0, 0, -1},
+			Vector3i( 1, 0,  0),
+			Vector3i(-1, 0,  0),
+			Vector3i( 0, 0,  1),
+			Vector3i( 0, 0, -1),
 		} ;
 
 		bool IsNoAirSurrounding = true;
-		for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+		for (const auto & Offset : gCrossCoords)
 		{
-			if (!NextChunk->UnboundedRelGetBlockType(RelBlockX + gCrossCoords[i].x, BlockY, RelBlockZ + gCrossCoords[i].z, GotBlock))
+			if (!NextChunk->UnboundedRelGetBlockType(RelBlockX + Offset.x, BlockY, RelBlockZ + Offset.z, GotBlock))
 			{
 				// The pickup is too close to an unloaded chunk, bail out of any physics handling
 				return;
 			}
 			if (!cBlockInfo::IsSolid(GotBlock))
 			{
-				NextPos.x += gCrossCoords[i].x;
-				NextPos.z += gCrossCoords[i].z;
+				NextPos.x += Offset.x;
+				NextPos.z += Offset.z;
 				IsNoAirSurrounding = false;
 				break;
 			}
@@ -1018,32 +1015,32 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (!m_bOnGround)
 	{
-		double fallspeed;
-		if (IsBlockWater(BlockIn))
+		double FallSpeed;
+		if (BlockIn.Type() == BlockType::Water)
 		{
-			fallspeed = m_Gravity * DtSec.count() / 3;  // Fall 3x slower in water
+			FallSpeed = m_Gravity * DtSec.count() / 3;  // Fall 3x slower in water
 			ApplyFriction(NextSpeed, 0.7, static_cast<float>(DtSec.count()));
 		}
-		else if (BlockIn == E_BLOCK_COBWEB)
+		else if (BlockIn == BlockType::Cobweb)
 		{
 			NextSpeed.y *= 0.05;  // Reduce overall falling speed
-			fallspeed = 0;  // No falling
+			FallSpeed = 0;  // No falling
 		}
 		else
 		{
 			// Normal gravity
-			fallspeed = m_Gravity * DtSec.count();
+			FallSpeed = m_Gravity * DtSec.count();
 			NextSpeed -= NextSpeed * (m_AirDrag * 20.0f) * DtSec.count();
 		}
-		NextSpeed.y += static_cast<float>(fallspeed);
+		NextSpeed.y += static_cast<float>(FallSpeed);
 
 		// A real boat floats
 		if (IsBoat())
 		{
 			// Find top water block and sit there
 			int NextBlockY = BlockY;
-			BLOCKTYPE NextBlock = NextChunk->GetBlock(RelBlockX, NextBlockY, RelBlockZ);
-			while (IsBlockWater(NextBlock))
+			auto NextBlock = NextChunk->GetBlock(RelBlockX, NextBlockY, RelBlockZ);
+			while (NextBlock.Type() == BlockType::Water)
 			{
 				NextBlock = NextChunk->GetBlock(RelBlockX, ++NextBlockY, RelBlockZ);
 			}
@@ -1058,14 +1055,14 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	// Adjust X and Z speed for COBWEB temporary. This speed modification should be handled inside block handlers since we
 	// might have different speed modifiers according to terrain.
-	if (BlockIn == E_BLOCK_COBWEB)
+	if (BlockIn.Type() == BlockType::Cobweb)
 	{
 		NextSpeed.x *= 0.25;
 		NextSpeed.z *= 0.25;
 	}
 
 	// Get water direction
-	Vector3f WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
+	Vector3f WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection({BlockX, BlockY, BlockZ});
 
 	m_WaterSpeed *= 0.9;  // Reduce speed each tick
 
@@ -1308,7 +1305,7 @@ void cEntity::DetectCacti(void)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				if (GetWorld()->GetBlock({ x, y, z }) == E_BLOCK_CACTUS)
+				if (GetWorld()->GetBlock({ x, y, z }).Type() == BlockType::Cactus)
 				{
 					TakeDamage(dtCactusContact, nullptr, 1, 0);
 					return;
@@ -1337,7 +1334,7 @@ void cEntity::DetectMagma(void)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				if (GetWorld()->GetBlock({ x, y, z }) == E_BLOCK_MAGMA)
+				if (GetWorld()->GetBlock({ x, y, z }) == BlockType::MagmaBlock)
 				{
 					TakeDamage(dtMagmaContact, nullptr, 1, 0);
 					return;
@@ -1369,9 +1366,9 @@ bool cEntity::DetectPortal()
 
 	if (const auto Position = m_Position.Floor(); cChunkDef::IsValidHeight(Position.y))
 	{
-		switch (GetWorld()->GetBlock(Position))
+		switch (GetWorld()->GetBlock(Position).Type())
 		{
-			case E_BLOCK_NETHER_PORTAL:
+			case BlockType::NetherPortal:
 			{
 				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
 				{
@@ -1434,7 +1431,7 @@ bool cEntity::DetectPortal()
 					return true;
 				}
 			}
-			case E_BLOCK_END_PORTAL:
+			case BlockType::EndPortal:
 			{
 				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
 				{
@@ -1660,7 +1657,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				BLOCKTYPE Block;
+				BlockState Block;
 				if (!a_Chunk.UnboundedRelGetBlockType(x, y, z, Block))
 				{ /*
 					LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
@@ -1669,7 +1666,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 					continue;
 				}
 
-				if (Block == E_BLOCK_FIRE)
+				if (Block.Type() == BlockType::Fire)
 				{
 					m_IsInFire = true;
 				}
@@ -1677,7 +1674,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 				{
 					m_IsInLava = true;
 				}
-				else if (IsBlockWater(Block))
+				else if (Block.Type() == BlockType::Water)
 				{
 					m_IsInWater = true;
 				}
@@ -1689,7 +1686,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	int RelX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
 	int HeadHeight = CeilC(GetPosY() + GetHeight()) - 1;
-	BLOCKTYPE BlockIn;
+	BlockState BlockIn;
 	if (!a_Chunk.UnboundedRelGetBlockType(RelX, HeadHeight, RelZ, BlockIn))
 	{
 		LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
@@ -1697,7 +1694,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 		);
 		return;
 	}
-	m_IsHeadInWater = IsBlockWater(BlockIn);
+	m_IsHeadInWater = BlockIn.Type() == BlockType::Water;
 }
 
 

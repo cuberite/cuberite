@@ -1409,7 +1409,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 // cFinishGenFluidSprings:
 
 cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BlockType a_Fluid, cIniFile & a_IniFile, eDimension a_Dimension) :
-	m_Noise(a_Seed + a_Fluid * 100),  // Need to take fluid into account, otherwise water and lava springs generate next to each other
+	m_Noise(a_Seed + static_cast<int>(a_Fluid) * 100),  // Need to take fluid into account, otherwise water and lava springs generate next to each other
 	m_HeightDistribution(cChunkDef::Height - 1),
 	m_Fluid(a_Fluid)
 {

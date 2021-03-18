@@ -32,7 +32,8 @@ public:
 	virtual void TickFollowPlayer();
 	virtual void GetBreedingItems(cItems & a_Items) override
 	{
-		a_Items.Add(E_ITEM_RAW_FISH);
+		a_Items.Add(Item::Cod);
+		a_Items.Add(Item::Salmon);
 	}
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 

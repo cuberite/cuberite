@@ -7,6 +7,7 @@
 #include "json/value.h"
 #include "SignEntity.h"
 #include "../ClientHandle.h"
+#include "../Blocks/BlockWallSign.h"
 
 
 
@@ -15,7 +16,7 @@
 cSignEntity::cSignEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
 	Super(a_Block, a_Pos, a_World)
 {
-	ASSERT((a_BlockType ==  E_BLOCK_WALLSIGN) || (a_BlockType == E_BLOCK_SIGN_POST));
+	ASSERT(cBlockWallSignHandler::IsBlockSignPost(a_Block) ||cBlockWallSignHandler::IsBlockWallSign(a_Block));
 	ASSERT(cChunkDef::IsValidHeight(a_Pos.y));
 }
 

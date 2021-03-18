@@ -72,41 +72,41 @@ private:
 			{
 				if (Beetroots::Age(a_Block) < BeetrootsMaxAge)
 				{
-					return cItem(E_ITEM_BEETROOT_SEEDS);
+					return cItem(Item::BeetrootSeeds);
 				}
 				const auto SeedCount = CalculateSeedCount(0, 3, ToolFortuneLevel(a_Tool));
 				cItems Res;
-				Res.Add(E_ITEM_BEETROOT_SEEDS, SeedCount);
-				Res.Add(E_ITEM_BEETROOT);
+				Res.Add(Item::BeetrootSeeds, SeedCount);
+				Res.Add(Item::Beetroot);
 				return Res;
 			}
 			case BlockType::Carrots:
 			{
 				if (Carrots::Age(a_Block) < CarrotsMaxAge)
 				{
-					return cItem(E_ITEM_CARROT);
+					return cItem(Item::Carrot);
 				}
 				cItems Res;
 				// https://minecraft.gamepedia.com/Carrot#Breaking
 				const auto CarrotCount = CalculateSeedCount(1, 4, ToolFortuneLevel(a_Tool));
-				Res.Add(E_ITEM_CARROT, CarrotCount);
+				Res.Add(Item::Carrot, CarrotCount);
 				return Res;
 			}
 			case BlockType::Potatoes:
 			{
 				if (Potatoes::Age(a_Block) < PotatoesMaxAge)
 				{
-					return cItem(E_ITEM_POTATO);
+					return cItem(Item::Potato);
 				}
 				cItems Res;
 				// https://minecraft.gamepedia.com/Potato#Breaking
 				const auto PotatoCount = CalculateSeedCount(2, 3, ToolFortuneLevel(a_Tool));
-				Res.Add(E_ITEM_POTATO, PotatoCount);
+				Res.Add(Item::Potato, PotatoCount);
 				if (Rand.RandBool(0.02))
 				{
 					// https://minecraft.gamepedia.com/Poisonous_Potato#Obtaining
 					// With a 2% chance, drop a poisonous potato as well:
-					Res.Add(E_ITEM_POISONOUS_POTATO);
+					Res.Add(Item::PoisonousPotato);
 				}
 				return Res;
 			}
@@ -114,13 +114,13 @@ private:
 			{
 				if (Wheat::Age(a_Block) < WheatMaxAge)
 				{
-					return cItem(E_ITEM_SEEDS);
+					return cItem(Item::WheatSeeds);
 				}
 				cItems Res;
 				// https://minecraft.fandom.com/wiki/Seeds_(Wheat)
-				Res.Add(E_ITEM_WHEAT);
+				Res.Add(Item::Wheat);
 				const auto SeedCount = CalculateSeedCount(1, 3, ToolFortuneLevel(a_Tool));
-				Res.Add(E_ITEM_SEEDS, SeedCount);
+				Res.Add(Item::WheatSeeds, SeedCount);
 				return Res;
 			}
 			default:

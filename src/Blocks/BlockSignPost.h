@@ -14,6 +14,10 @@ class cBlockSignPostHandler final :
 {
 	using Super = cBlockHandler;
 
+public:
+
+	using Super::Super;
+
 	static inline bool IsBlockSignPost(BlockState a_Block)
 	{
 		switch (a_Block.Type())
@@ -31,15 +35,11 @@ class cBlockSignPostHandler final :
 		}
 	}
 
-public:
-
-	using Super::Super;
-
 private:
 
 	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		return cItem(E_ITEM_SIGN, 1, 0);
+		return cItem(BlockItemConverter::FromBlock(m_BlockType));
 	}
 
 

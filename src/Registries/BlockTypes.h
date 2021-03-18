@@ -1,6 +1,6 @@
 #pragma once
 
-enum BlockType
+enum class BlockType
 {
 	AcaciaButton,
 	AcaciaDoor,

@@ -61,6 +61,81 @@ public:
 		}
 	}
 
+	static inline eBlockFace GetBlockFace(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::BlackBed:     return BlackBed::Facing(a_Block);
+			case BlockType::BlueBed:      return BlueBed::Facing(a_Block);
+			case BlockType::BrownBed:     return BrownBed::Facing(a_Block);
+			case BlockType::CyanBed:      return CyanBed::Facing(a_Block);
+			case BlockType::GrayBed:      return GrayBed::Facing(a_Block);
+			case BlockType::GreenBed:     return GreenBed::Facing(a_Block);
+			case BlockType::LightBlueBed: return LightBlueBed::Facing(a_Block);
+			case BlockType::LightGrayBed: return LightGrayBed::Facing(a_Block);
+			case BlockType::LimeBed:      return LimeBed::Facing(a_Block);
+			case BlockType::MagentaBed:   return MagentaBed::Facing(a_Block);
+			case BlockType::OrangeBed:    return OrangeBed::Facing(a_Block);
+			case BlockType::PinkBed:      return PinkBed::Facing(a_Block);
+			case BlockType::PurpleBed:    return PurpleBed::Facing(a_Block);
+			case BlockType::RedBed:       return RedBed::Facing(a_Block);
+			case BlockType::WhiteBed:     return WhiteBed::Facing(a_Block);
+			case BlockType::YellowBed:    return YellowBed::Facing(a_Block);
+			default:                      return eBlockFace::BLOCK_FACE_NONE;
+		}
+	}
+
+	static inline bool IsHeadPart(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::BlackBed:     return BlackBed::Part(a_Block)     == BlackBed::Part::Head;
+			case BlockType::BlueBed:      return BlueBed::Part(a_Block)      == BlueBed::Part::Head;
+			case BlockType::BrownBed:     return BrownBed::Part(a_Block)     == BrownBed::Part::Head;
+			case BlockType::CyanBed:      return CyanBed::Part(a_Block)      == CyanBed::Part::Head;
+			case BlockType::GrayBed:      return GrayBed::Part(a_Block)      == GrayBed::Part::Head;
+			case BlockType::GreenBed:     return GreenBed::Part(a_Block)     == GreenBed::Part::Head;
+			case BlockType::LightBlueBed: return LightBlueBed::Part(a_Block) == LightBlueBed::Part::Head;
+			case BlockType::LightGrayBed: return LightGrayBed::Part(a_Block) == LightGrayBed::Part::Head;
+			case BlockType::LimeBed:      return LimeBed::Part(a_Block)      == LimeBed::Part::Head;
+			case BlockType::MagentaBed:   return MagentaBed::Part(a_Block)   == MagentaBed::Part::Head;
+			case BlockType::OrangeBed:    return OrangeBed::Part(a_Block)    == OrangeBed::Part::Head;
+			case BlockType::PinkBed:      return PinkBed::Part(a_Block)      == PinkBed::Part::Head;
+			case BlockType::PurpleBed:    return PurpleBed::Part(a_Block)    == PurpleBed::Part::Head;
+			case BlockType::RedBed:       return RedBed::Part(a_Block)       == RedBed::Part::Head;
+			case BlockType::WhiteBed:     return WhiteBed::Part(a_Block)     == WhiteBed::Part::Head;
+			case BlockType::YellowBed:    return YellowBed::Part(a_Block)    == YellowBed::Part::Head;
+			default: return false;
+		}
+	}
+
+	static inline bool IsBedOccupied(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::BlackBed:     return BlackBed::Occupied(a_Block);
+			case BlockType::BlueBed:      return BlueBed::Occupied(a_Block);
+			case BlockType::BrownBed:     return BrownBed::Occupied(a_Block);
+			case BlockType::CyanBed:      return CyanBed::Occupied(a_Block);
+			case BlockType::GrayBed:      return GrayBed::Occupied(a_Block);
+			case BlockType::GreenBed:     return GreenBed::Occupied(a_Block);
+			case BlockType::LightBlueBed: return LightBlueBed::Occupied(a_Block);
+			case BlockType::LightGrayBed: return LightGrayBed::Occupied(a_Block);
+			case BlockType::LimeBed:      return LimeBed::Occupied(a_Block);
+			case BlockType::MagentaBed:   return MagentaBed::Occupied(a_Block);
+			case BlockType::OrangeBed:    return OrangeBed::Occupied(a_Block);
+			case BlockType::PinkBed:      return PinkBed::Occupied(a_Block);
+			case BlockType::PurpleBed:    return PurpleBed::Occupied(a_Block);
+			case BlockType::RedBed:       return RedBed::Occupied(a_Block);
+			case BlockType::WhiteBed:     return WhiteBed::Occupied(a_Block);
+			case BlockType::YellowBed:    return YellowBed::Occupied(a_Block);
+			default: return false;
+		}
+	}
+
 	static inline void SetBedOccupationState(cChunkInterface & a_ChunkInterface, Vector3i a_BedPosition, bool a_IsOccupied)
 	{
 		using namespace Block;
@@ -105,7 +180,11 @@ private:
 		const Vector3i a_CursorPos
 	) const override;
 
-	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override;
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
+	{
+		// Drops handled by the block entity:
+		return {};
+	}
 
 	virtual void OnPlacedByPlayer(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,

@@ -115,7 +115,7 @@ private:
 
 				// 12.5% chance of dropping some seeds.
 				const auto DropNum = FortuneDiscreteRandom(1, 1, 2 * ToolFortuneLevel(a_Tool));
-				return cItem(E_ITEM_SEEDS, DropNum);
+				return cItem(Item::WheatSeeds, DropNum);
 			}
 			case BlockType::LargeFern:
 			{

@@ -11,7 +11,7 @@
 
 cItemFrame::cItemFrame(eBlockFace a_BlockFace, Vector3d a_Pos):
 	Super(etItemFrame, a_BlockFace, a_Pos),
-	m_Item(E_BLOCK_AIR),
+	m_Item(Item::Air),
 	m_ItemRotation(0)
 {
 }
@@ -84,7 +84,7 @@ void cItemFrame::GetDrops(cItems & a_Items, cEntity * a_Killer)
 {
 	if ((a_Killer != nullptr) && a_Killer->IsPlayer() && !static_cast<cPlayer *>(a_Killer)->IsGameModeCreative())
 	{
-		a_Items.emplace_back(E_ITEM_ITEM_FRAME);
+		a_Items.emplace_back(Item::ItemFrame);
 	}
 }
 

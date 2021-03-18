@@ -10,6 +10,7 @@
 #include "../Blocks/BlockHandler.h"
 #include "../EffectID.h"
 #include "../Mobs/Monster.h"
+#include "../Protocol/Palettes/Upgrade.h"
 
 
 
@@ -303,11 +304,11 @@ void cPawn::HandleFalling(void)
 	With this in mind, we first check the block at the player's feet, then the one below that (because fences),
 	and decide which behaviour we want to go with.
 	*/
-	BLOCKTYPE BlockAtFoot = (cChunkDef::IsValidHeight(POSY_TOINT)) ? GetWorld()->GetBlock(POS_TOINT) : E_BLOCK_AIR;
+	BlockState BlockAtFoot = (cChunkDef::IsValidHeight(POSY_TOINT)) ? GetWorld()->GetBlock(POS_TOINT) : Block::Air::Air();
 
 	/* We initialize these with what the foot is really IN, because for sampling we will move down with the epsilon above */
-	bool IsFootInWater = IsBlockWater(BlockAtFoot);
-	bool IsFootInLiquid = IsFootInWater || IsBlockLava(BlockAtFoot) || (BlockAtFoot == E_BLOCK_COBWEB);  // okay so cobweb is not _technically_ a liquid...
+	bool IsFootInWater = BlockAtFoot.Type() == BlockType::Water;
+	bool IsFootInLiquid = IsFootInWater || IsBlockLava(BlockAtFoot) || (BlockAtFoot.Type() == BlockType::Cobweb);  // okay so cobweb is not _technically_ a liquid...
 	bool IsFootOnSlimeBlock = false;
 
 	/* The "cross" we sample around to account for the player width/girth */
@@ -353,19 +354,18 @@ void cPawn::HandleFalling(void)
 				continue;
 			}
 
-			BLOCKTYPE BlockType = GetWorld()->GetBlock(BlockTestPosition);
-			NIBBLETYPE BlockMeta = GetWorld()->GetBlockMeta(BlockTestPosition);
+			auto TestBlock = GetWorld()->GetBlock(BlockTestPosition);
 
 			/* we do the cross-shaped sampling to check for water / liquids, but only on our level because water blocks are never bigger than unit voxels */
 			if (j == 0)
 			{
-				IsFootInWater |= IsBlockWater(BlockType);
-				IsFootInLiquid |= IsFootInWater || IsBlockLava(BlockType) || (BlockType == E_BLOCK_COBWEB);  // okay so cobweb is not _technically_ a liquid...
-				IsFootOnSlimeBlock |= (BlockType == E_BLOCK_SLIME_BLOCK);
+				IsFootInWater |= TestBlock == BlockType::Water;
+				IsFootInLiquid |= IsFootInWater || IsBlockLava(TestBlock) || (TestBlock.Type() == BlockType::Cobweb);  // okay so cobweb is not _technically_ a liquid...
+				IsFootOnSlimeBlock |= (TestBlock.Type() == BlockType::SlimeBlock);
 			}
 
 			/* If the block is solid, and the blockhandler confirms the block to be inside, we're officially on the ground. */
-			if ((cBlockInfo::IsSolid(BlockType)) && (cBlockHandler::For(BlockType).IsInsideBlock(CrossTestPosition - BlockTestPosition, BlockMeta)))
+			if ((cBlockInfo::IsSolid(TestBlock)) && (cBlockHandler::For(TestBlock.Type()).IsInsideBlock(CrossTestPosition - BlockTestPosition, TestBlock)))
 			{
 				OnGround = true;
 			}
@@ -420,6 +420,8 @@ void cPawn::HandleFalling(void)
 		{
 			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
 
+			auto NumericBlock = PaletteUpgrade::ToBlock(GetWorld()->GetBlock(POS_TOINT.addedY(-1)));
+
 			// Fall particles
 			GetWorld()->BroadcastParticleEffect(
 				"blockdust",
@@ -427,7 +429,7 @@ void cPawn::HandleFalling(void)
 				{ 0, 0, 0 },
 				(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
 				static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
-				{ { GetWorld()->GetBlock(POS_TOINT - Vector3i(0, 1, 0)), 0 } }
+				{ { NumericBlock.first, NumericBlock.second } }
 			);
 		}
 

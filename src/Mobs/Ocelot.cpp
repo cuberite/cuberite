@@ -51,7 +51,7 @@ void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			{
 				cItems Items;
 				GetBreedingItems(Items);
-				if (Items.ContainsType(a_Player.GetEquippedItem().m_ItemType))
+				if (Items.ContainsType(a_Player.GetEquippedItem()))
 				{
 					if (!IsBegging())
 					{
@@ -148,7 +148,7 @@ void cOcelot::OnRightClicked(cPlayer & a_Player)
 		{
 			cItems Items;
 			GetBreedingItems(Items);
-			if (Items.ContainsType(a_Player.GetEquippedItem().m_ItemType))
+			if (Items.ContainsType(a_Player.GetEquippedItem()))
 			{
 				if (!a_Player.IsGameModeCreative())
 				{

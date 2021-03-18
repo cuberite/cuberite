@@ -477,6 +477,12 @@ const char * ClickActionToString(int a_ClickAction);
 /** Returns a blockface mirrored around the Y axis (doesn't change up / down). */
 eBlockFace MirrorBlockFaceY(eBlockFace a_BlockFace);
 
+/** Returns a blockface mirrored around the XY plane. */
+eBlockFace MirrorBlockFaceXY(eBlockFace a_BlockFace);
+
+/** Returns a blockface mirrored around the YZ plane. */
+eBlockFace MirrorBlockFaceYZ(eBlockFace a_BlockFace);
+
 /** Returns a blockface rotated around the Y axis counter-clockwise. */
 eBlockFace RotateBlockFaceCCW(eBlockFace a_BlockFace);
 

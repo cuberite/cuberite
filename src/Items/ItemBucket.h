@@ -83,15 +83,15 @@ public:
 		}
 
 		auto Block = a_World->GetBlock(BlockPos);
-		ENUM_ITEM_TYPE NewItemType;
+		enum Item NewItemType;
 
 		if (Block.Type() == BlockType::Water)
 		{
-			NewItemType = E_ITEM_WATER_BUCKET;
+			NewItemType = Item::WaterBucket;
 		}
 		else if (Block.Type() == BlockType::Lava)
 		{
-			NewItemType = E_ITEM_LAVA_BUCKET;
+			NewItemType = Item::LavaBucket;
 		}
 		else
 		{
@@ -158,7 +158,7 @@ public:
 		// Give back an empty bucket if the gamemode is not creative:
 		if (!a_Player->IsGameModeCreative())
 		{
-			a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_BUCKET));
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
 		}
 
 		// Wash away anything that was there prior to placing:

@@ -29,16 +29,14 @@ cItem::cItem():
 
 
 cItem::cItem(
-	short a_ItemType,
+	enum Item a_ItemType,
 	char a_ItemCount,
 	short a_ItemDamage,
 	const AString & a_Enchantments,
 	const AString & a_CustomName,
 	const AStringVector & a_LoreTable
 ):
-	m_ItemType    (a_ItemType),
 	m_ItemCount   (a_ItemCount),
-	m_ItemDamage  (a_ItemDamage),
 	m_Enchantments(a_Enchantments),
 	m_CustomName  (a_CustomName),
 	m_LoreTable   (a_LoreTable),
@@ -46,6 +44,10 @@ cItem::cItem(
 	m_FireworkItem(),
 	m_ItemColor()
 {
+	auto NumericItem = PaletteUpgrade::ToItem(a_ItemType);
+	m_ItemType = NumericItem.first;
+	m_ItemDamage = NumericItem.second | a_ItemDamage;
+
 	if (!IsValidItem(m_ItemType))
 	{
 		if ((m_ItemType != E_BLOCK_AIR) && (m_ItemType != E_ITEM_EMPTY))

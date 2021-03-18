@@ -18,7 +18,7 @@ public:
 
 private:
 
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
+	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, BlockState a_Block) const override
 	{
 		return true;
 	}
@@ -38,7 +38,23 @@ private:
 		switch (BelowBlock.Type())
 		{
 			case BlockType::Clay:
-				// TODO(12xx12) add hardened clay and stained clay
+			case BlockType::Terracotta:
+			case BlockType::BlackTerracotta:
+			case BlockType::BlueTerracotta:
+			case BlockType::BrownTerracotta:
+			case BlockType::CyanTerracotta:
+			case BlockType::GrayTerracotta:
+			case BlockType::GreenTerracotta:
+			case BlockType::LightBlueTerracotta:
+			case BlockType::LightGrayTerracotta:
+			case BlockType::LimeTerracotta:
+			case BlockType::MagentaTerracotta:
+			case BlockType::OrangeTerracotta:
+			case BlockType::PinkTerracotta:
+			case BlockType::PurpleTerracotta:
+			case BlockType::RedTerracotta:
+			case BlockType::WhiteTerracotta:
+			case BlockType::YellowTerracotta:
 			case BlockType::Sand:
 			{
 				return true;
@@ -56,14 +72,14 @@ private:
 		// If cutting down with shears, drop self:
 		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == E_ITEM_SHEARS))
 		{
-			return cItem(m_BlockType, 1, a_BlockMeta);
+			return cItem(Item::DeadBush);
 		}
 
 		// Drop 0-3 sticks:
 		auto chance = GetRandomProvider().RandInt<char>(3);
 		if (chance > 0)
 		{
-			return cItem(E_ITEM_STICK, chance, 0);
+			return cItem(Item::Stick, chance, 0);
 		}
 		return {};
 	}

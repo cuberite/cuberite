@@ -41,7 +41,7 @@ public:
 		}
 	}
 
-	static inline BlockState GetConcreteFromConretePowder(BlockState a_Block)
+	static inline BlockState GetConcreteFromConcretePowder(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -96,7 +96,7 @@ private:
 
 		if (ShouldSoak)
 		{
-			a_Chunk.SetBlock(a_Rel, GetConcreteFromConretePowder(a_Chunk.GetBlock(a_Rel)));
+			a_Chunk.SetBlock(a_Rel, GetConcreteFromConcretePowder(a_Chunk.GetBlock(a_Rel)));
 		}
 	}
 

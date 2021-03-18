@@ -3,6 +3,8 @@
 
 #include "BlockHandler.h"
 #include "../Chunk.h"
+#include "../BlockInfo.h"
+#include "../Registries/BlockTypeItemTypeConverter.h"
 
 
 class cBlockWallSignHandler final :
@@ -69,8 +71,7 @@ private:
 
 	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		// TODO: add all signs when possible
-		return cItem(E_ITEM_SIGN, 1, 0);
+		return cItem(BlockItemConverter::FromBlock(m_BlockType));
 	}
 
 

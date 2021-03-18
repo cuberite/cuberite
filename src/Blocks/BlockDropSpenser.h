@@ -12,9 +12,9 @@
 
 
 class cBlockDropSpenserHandler final :
-	public cPitchYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>
+	public cBlockEntityHandler
 {
-	using Super = cPitchYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>;
+	using Super = cBlockEntityHandler;
 
 public:
 
@@ -22,7 +22,25 @@ public:
 
 private:
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+
+	virtual bool GetPlacementBlockTypeMeta(
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
+		BlockState & a_Block
+	) const
+	{
+		switch (m_BlockType)
+		{
+			case BlockType::Dispenser: a_Block = Block::Dispenser::Dispenser(RotationToBlockFace(a_Player.GetYaw()), false); break;
+			case BlockType::Dropper:   a_Block = Block::Dropper::Dropper(RotationToBlockFace(a_Player.GetYaw()), false); break;
+			default: return false;
+		}
+	}
+
+	virtual ColourID GetMapBaseColourID() const override
 	{
 		UNUSED(a_Meta);
 		return 11;

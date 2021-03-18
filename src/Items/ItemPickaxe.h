@@ -234,8 +234,8 @@ public:
 			{
 				return PickaxeLevel() >= 1;
 			}
+			default: return Super::CanHarvestBlock(a_Block);
 		}
-		return Super::CanHarvestBlock(a_Block);
 	}
 
 	virtual bool CanRepairWithRawMaterial(short a_ItemType) override

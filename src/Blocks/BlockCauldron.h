@@ -19,9 +19,9 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		return cItem(E_ITEM_CAULDRON, 1, 0);
+		return cItem(Item::Cauldron);
 	}
 
 
@@ -37,33 +37,33 @@ private:
 		const Vector3i a_CursorPos
 	) const override
 	{
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
+		auto FillState = Block::Cauldron::Level(a_ChunkInterface.GetBlock(a_BlockPos));
 		auto EquippedItem = a_Player.GetEquippedItem();
 
 		switch (EquippedItem.m_ItemType)
 		{
 			case E_ITEM_BUCKET:
 			{
-				if (Meta == 3)
+				if (FillState == 3)
 				{
-					a_ChunkInterface.SetBlockMeta(a_BlockPos, 0);
+					a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(0));
 					// Give new bucket, filled with fluid when the gamemode is not creative:
 					if (!a_Player.IsGameModeCreative())
 					{
-						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_WATER_BUCKET));
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::WaterBucket));
 					}
 				}
 				break;
 			}
 			case E_ITEM_WATER_BUCKET:
 			{
-				if (Meta < 3)
+				if (FillState < 3)
 				{
-					a_ChunkInterface.SetBlockMeta(a_BlockPos, 3);
+					a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(3));
 					// Give empty bucket back when the gamemode is not creative:
 					if (!a_Player.IsGameModeCreative())
 					{
-						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_BUCKET));
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
 					}
 					a_Player.GetStatManager().AddValue(Statistic::FillCauldron);
 				}
@@ -71,13 +71,13 @@ private:
 			}
 			case E_ITEM_GLASS_BOTTLE:
 			{
-				if (Meta > 0)
+				if (FillState > 0)
 				{
-					a_ChunkInterface.SetBlockMeta(a_BlockPos, --Meta);
+					a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(--FillState));
 					// Give new potion when the gamemode is not creative:
 					if (!a_Player.IsGameModeCreative())
 					{
-						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_POTION));
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Potion));
 					}
 					a_Player.GetStatManager().AddValue(Statistic::UseCauldron);
 				}
@@ -86,13 +86,13 @@ private:
 			case E_ITEM_POTION:
 			{
 				// Refill cauldron with water bottles.
-				if ((Meta < 3) && (EquippedItem.m_ItemDamage == 0))
+				if ((FillState < 3) && (EquippedItem.m_ItemDamage == 0))
 				{
-					a_ChunkInterface.SetBlockMeta(Vector3i(a_BlockPos), ++Meta);
+					a_ChunkInterface.FastSetBlock(Vector3i(a_BlockPos), Block::Cauldron::Cauldron(++FillState));
 					// Give back an empty bottle when the gamemode is not creative:
 					if (!a_Player.IsGameModeCreative())
 					{
-						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_GLASS_BOTTLE));
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::GlassBottle));
 					}
 				}
 				break;
@@ -103,9 +103,9 @@ private:
 			case E_ITEM_LEATHER_TUNIC:
 			{
 				// Resets any color to default:
-				if ((Meta > 0) && ((EquippedItem.m_ItemColor.GetRed() != 255) || (EquippedItem.m_ItemColor.GetBlue() != 255) || (EquippedItem.m_ItemColor.GetGreen() != 255)))
+				if ((FillState > 0) && ((EquippedItem.m_ItemColor.GetRed() != 255) || (EquippedItem.m_ItemColor.GetBlue() != 255) || (EquippedItem.m_ItemColor.GetGreen() != 255)))
 				{
-					a_ChunkInterface.SetBlockMeta(a_BlockPos, --Meta);
+					a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(--FillState));
 					auto NewItem = cItem(EquippedItem);
 					NewItem.m_ItemColor.Clear();
 					a_Player.ReplaceOneEquippedItemTossRest(NewItem);
@@ -130,18 +130,17 @@ private:
 				// Resets shulker box color.
 
 				// TODO: When there is an actual default shulker box add the appropriate changes here! - 19.09.2020 - 12xx12
-				if (Meta == 0)
+				if (FillState == 0)
 				{
 					// The cauldron is empty:
 					break;
 				}
 
 				// Proceed with normal cleaning:
-				a_ChunkInterface.SetBlockMeta(a_BlockPos, --Meta);
+				a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(--FillState));
 				auto NewShulker = cItem(EquippedItem);
 				NewShulker.m_ItemType = E_BLOCK_PURPLE_SHULKER_BOX;
 				a_Player.ReplaceOneEquippedItemTossRest(NewShulker);
-
 				break;
 			}
 		}
@@ -157,7 +156,7 @@ private:
 		const auto ResendPosition = AddFaceDirection(a_BlockPos, a_BlockFace);
 		a_Player.GetClientHandle()->SendBlockChange(
 			ResendPosition.x, ResendPosition.y, ResendPosition.z,
-			a_ChunkInterface.GetBlock(ResendPosition), a_ChunkInterface.GetBlockMeta(ResendPosition)
+			a_ChunkInterface.GetBlock(ResendPosition)
 		);
 
 		return true;
@@ -191,10 +190,10 @@ private:
 			return;
 		}
 
-		auto Meta = a_Chunk.GetMeta(a_RelPos);
-		if (Meta < 3)
+		auto FillState = Block::Cauldron::Level(a_Chunk.GetBlock(a_RelPos));
+		if (FillState < 3)
 		{
-			a_Chunk.SetMeta(a_RelPos, Meta + 1);
+			a_Chunk.FastSetBlock(a_RelPos, Block::Cauldron::Cauldron(FillState + 1));
 		}
 	}
 
@@ -202,9 +201,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 21;
 	}
 } ;

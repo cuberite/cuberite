@@ -34,7 +34,7 @@ private:
 		AString WindowName = "Enchant";
 		a_WorldInterface.DoWithBlockEntityAt(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, [&WindowName](cBlockEntity & a_Entity)
 		{
-			if (a_Entity.GetBlockType() != E_BLOCK_ENCHANTMENT_TABLE)
+			if (a_Entity.GetBlockType() != BlockType::EnchantingTable)
 			{
 				return false;
 			}
@@ -62,14 +62,14 @@ private:
 	}
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// Drops handled by the block entity:
 		return {};
 	}
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
 		UNUSED(a_Meta);
 		return 29;
