@@ -3240,15 +3240,46 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_WALL_BANNER:
-		case E_BLOCK_STANDING_BANNER:
+		case BlockType::BlackBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BrownBanner:
+		case BlockType::CyanBanner:
+		case BlockType::GrayBanner:
+		case BlockType::GreenBanner:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LimeBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::OrangeBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::RedBanner:
+		case BlockType::WhiteBanner:
+		case BlockType::YellowBanner:
+
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownWallBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedWallBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowWallBanner:
 		{
 			auto & BannerEntity = static_cast<const cBannerEntity &>(a_BlockEntity);
 			a_Writer.AddInt("Base", static_cast<Int32>(BannerEntity.GetBaseColor()));
 			break;
 		}
 
-		case E_BLOCK_BEACON:
+		case BlockType::Beacon:
 		{
 			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);
 			a_Writer.AddInt("Primary",   BeaconEntity.GetPrimaryEffect());
@@ -3257,7 +3288,9 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			break;
 		}
 
-		case E_BLOCK_COMMAND_BLOCK:
+		case BlockType::CommandBlock:
+		case BlockType::ChainCommandBlock:
+		case BlockType::RepeatingCommandBlock:
 		{
 			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
 			a_Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
@@ -3274,7 +3307,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			break;
 		}
 
-		case E_BLOCK_ENCHANTMENT_TABLE:
+		case BlockType::EnchantingTable:
 		{
 			auto & EnchantingTableEntity = static_cast<const cEnchantingTableEntity &>(a_BlockEntity);
 			if (!EnchantingTableEntity.GetCustomName().empty())
@@ -3284,13 +3317,24 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			break;
 		}
 
-		case E_BLOCK_END_PORTAL:
+		case BlockType::EndPortal:
 		{
 			// Nothing!
 			break;
 		}
 
-		case E_BLOCK_HEAD:
+		case BlockType::CreeperHead:
+		case BlockType::CreeperWallHead:
+		case BlockType::DragonHead:
+		case BlockType::DragonWallHead:
+		case BlockType::PlayerHead:
+		case BlockType::PlayerWallHead:
+		case BlockType::SkeletonSkull:
+		case BlockType::SkeletonWallSkull:
+		case BlockType::WitherSkeletonSkull:
+		case BlockType::WitherSkeletonWallSkull:
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:
 		{
 			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
 			a_Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
@@ -3312,7 +3356,35 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			break;
 		}
 
-		case E_BLOCK_FLOWER_POT:
+		case BlockType::PottedAcaciaSapling:
+		case BlockType::PottedAzureBluet:
+		case BlockType::PottedBamboo:
+		case BlockType::PottedBirchSapling:
+		case BlockType::PottedBlueOrchid:
+		case BlockType::PottedBrownMushroom:
+		case BlockType::PottedCactus:
+		case BlockType::PottedCornflower:
+		case BlockType::PottedCrimsonRoots:
+		case BlockType::PottedCrimsonFungus:
+		case BlockType::PottedDandelion:
+		case BlockType::PottedDarkOakSapling:
+		case BlockType::PottedDeadBush:
+		case BlockType::PottedFern:
+		case BlockType::PottedJungleSapling:
+		case BlockType::PottedLilyOfTheValley:
+		case BlockType::PottedOakSapling:
+		case BlockType::PottedOrangeTulip:
+		case BlockType::PottedOxeyeDaisy:
+		case BlockType::PottedPinkTulip:
+		case BlockType::PottedPoppy:
+		case BlockType::PottedRedMushroom:
+		case BlockType::PottedRedTulip:
+		case BlockType::PottedSpruceSapling:
+		case BlockType::PottedWarpedFungus:
+		case BlockType::PottedWarpedRoots:
+		case BlockType::PottedWhiteTulip:
+		case BlockType::PottedWitherRose:
+		case BlockType::PottedAllium:
 		{
 			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
 			a_Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
@@ -3320,7 +3392,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			break;
 		}
 
-		case E_BLOCK_MOB_SPAWNER:
+		case BlockType::Spawner:
 		{
 			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
 			a_Writer.AddString("EntityId", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));

@@ -1461,7 +1461,7 @@ void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
 	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
 
-	if (a_BlockEntity.GetBlockType() == E_BLOCK_MOB_SPAWNER)
+	if (a_BlockEntity.GetBlockType() == BlockType::Spawner)
 	{
 		auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
 		a_Writer.BeginCompound("SpawnData");  // New: SpawnData compound
