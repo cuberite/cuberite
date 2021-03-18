@@ -141,7 +141,7 @@ public:
 	static const size_t NumSections = (cChunkDef::Height / SectionHeight);
 
 	/** The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column */
-	typedef HEIGHTTYPE HeightMap[Width * Width];
+	using HeightMap = std::array<HEIGHTTYPE, Width * Width>;
 
 	/** The type used for any biomemap operations and storage inside Cuberite,
 	using Cuberite biomes (need not correspond to client representation!)
@@ -236,6 +236,12 @@ public:
 	inline static cChunkCoords BlockToChunk(const Vector3i a_Position)
 	{
 		return { FAST_FLOOR_DIV(a_Position.x, Width), FAST_FLOOR_DIV(a_Position.z, Width) };
+	}
+
+
+	inline static int MakeIndex(Vector3i a_Pos)
+	{
+		return MakeIndex(a_Pos.x, a_Pos.y, a_Pos.z);
 	}
 
 

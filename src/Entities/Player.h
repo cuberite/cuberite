@@ -562,13 +562,13 @@ public:
 	(1 would be completely mined)
 	Depends on hardness values so check those are correct.
 	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
-	float GetMiningProgressPerTick(BlockType a_Block);
+	float GetMiningProgressPerTick(BlockState a_Block);
 
 	/** Given tool, enchantments, status effects, and world position
 	returns whether a_Block would be instantly mined.
 	Depends on hardness values so check those are correct.
 	Source: https://minecraft.gamepedia.com/Breaking#Instant_breaking */
-	bool CanInstantlyMine(BlockType a_Block);
+	bool CanInstantlyMine(BlockState a_Block);
 
 	/** Adds an Item to the list of known items.
 	If the item is already known, does nothing. */
@@ -770,7 +770,7 @@ private:
 	In he is in water it gets divided by 5 except if his tool is enchanted with aqua affinity.
 	If he is not on ground it also gets divided by 5.
 	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
-	float GetDigSpeed(BlockType a_Block);
+	float GetDigSpeed(BlockState a_Block);
 
 	/** Add the recipe Id to the known recipes.
 	If the recipe is already known, does nothing. */

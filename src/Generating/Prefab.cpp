@@ -216,7 +216,7 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumR
 							// End the expansion for this column, reached the end
 							break;
 						}
-						a_Dest.SetBlock(RelX, y, RelZ, Block);
+						a_Dest.SetBlock({RelX, y, RelZ}, Block);
 					}  // for y
 				}  // for x
 			}  // for z
@@ -257,7 +257,7 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumR
 							// End the expansion for this column, reached the end
 							break;
 						}
-						a_Dest.SetBlock(RelX, y, RelZ, Block);
+						a_Dest.SetBlock({RelX, y, RelZ}, Block);
 					}  // for y
 				}  // for x
 			}  // for z

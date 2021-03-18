@@ -508,7 +508,7 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 					int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
 					if (Val < 0)
 					{
-						a_ChunkDesc.SetBlock(x, y + Segment, z, Block::Air::Air());
+						a_ChunkDesc.SetBlock({x, y + Segment, z}, Block::Air::Air());
 					}
 				}  // for y
 				break;
@@ -585,7 +585,7 @@ void cStructGenDistortedMembraneOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 				int MembraneHeight = 96 - static_cast<int>((DistortY + m_NoiseH.CubicNoise2D(NoiseX + DistortX, NoiseZ + DistortZ)) * 30);
 				if (MembraneHeight < y)
 				{
-					a_ChunkDesc.SetBlock(x, y, z, ReplacementBlock);
+					a_ChunkDesc.SetBlock({x, y, z}, ReplacementBlock);
 				}
 			}  // for y
 		}  // for x

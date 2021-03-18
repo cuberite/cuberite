@@ -38,6 +38,16 @@ public:
 		}
 	}
 
+	static inline BlockState SetFalloff (BlockState a_Block, unsigned char a_Falloff)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Lava:  return Block::Lava::Lava(a_Falloff);
+			case BlockType::Water: return Block::Water::Water(a_Falloff);
+			default: return a_Block;
+		}
+	}
+
 
 private:
 

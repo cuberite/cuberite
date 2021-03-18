@@ -188,7 +188,7 @@ void cEndGen::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape &
 			{
 				if (cChunkDesc::GetShapeIsSolidAt(a_Shape, x, y, z))
 				{
-					a_ChunkDesc.SetBlock(x, y, z, Block::EndStone::EndStone());
+					a_ChunkDesc.SetBlock({x, y, z}, Block::EndStone::EndStone());
 				}
 			}  // for y
 		}  // for x
