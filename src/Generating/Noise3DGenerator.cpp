@@ -335,6 +335,7 @@ void cNoise3DGenerator::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 						HasHadWater = true;
 						break;
 					}
+					default: break;
 				}  // switch (GetBlockType())
 			}  // for y
 			a_ChunkDesc.SetBlock({x, 0, z}, Block::Bedrock::Bedrock());
