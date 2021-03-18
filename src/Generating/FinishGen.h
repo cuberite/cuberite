@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <utility>
+
 #include "ComposableGenerator.h"
 #include "../Noise/Noise.h"
 #include "../ProbabDistrib.h"
@@ -272,8 +274,8 @@ class cFinishGenSingleTopBlock :
 	public cFinishGen
 {
 public:
-	typedef std::vector<BlockState> BlockList;
-	bool m_IsAllowedBelow[256];
+	typedef std::vector<BlockType> BlockList;
+	BlockList m_AllowedBlocks;
 
 	typedef std::vector<EMCSBiome> BiomeList;
 	bool m_IsBiomeAllowed[256];
@@ -285,20 +287,9 @@ public:
 	) :
 		m_Noise(a_Seed),
 		m_Block(a_Block),
-		m_Amount(a_Amount)
+		m_Amount(a_Amount),
+		m_AllowedBlocks(std::move(a_AllowedBelow))
 	{
-		// Initialize all the block types.
-		for (size_t idx = 0; idx < ARRAYCOUNT(m_IsAllowedBelow); ++idx)
-		{
-			m_IsAllowedBelow[idx] = false;
-		}
-
-		// Load the allowed blocks into m_IsAllowedBelow
-		for (BlockList::iterator itr = a_AllowedBelow.begin(); itr != a_AllowedBelow.end(); ++itr)
-		{
-			m_IsAllowedBelow[*itr] = true;
-		}
-
 		// Initialize all the biome types.
 		for (size_t idx = 0; idx < ARRAYCOUNT(m_IsBiomeAllowed); ++idx)
 		{
@@ -331,7 +322,7 @@ protected:
 	/** Returns true if the given blocktype may be below m_BlockType */
 	inline bool IsAllowedBlockBelow(BlockState a_BlockBelow)
 	{
-		return m_IsAllowedBelow[a_BlockBelow];
+		return std::find(m_AllowedBlocks.begin(), m_AllowedBlocks.end(), a_BlockBelow.Type()) != m_AllowedBlocks.end();
 	}
 
 
@@ -383,10 +374,9 @@ protected:
 	- if all surroundings are of the same fluid, makes it stationary; otherwise makes it flowing (excl. top)
 	- all fluid on the chunk's edge is made flowing */
 	void StationarizeFluid(
-		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::HeightMap & a_HeightMap,      // Height map to read
-		BLOCKTYPE a_Fluid,
-		BLOCKTYPE a_StationaryFluid
+		cChunkDef::BlockStates & a_BlockTypes,    // Block types to read and change
+		cChunkDef::HeightMap & a_HeightMap,       // Height map to read
+		BlockState a_Fluid
 	);
 
 	// cFinishGen override:
@@ -401,20 +391,20 @@ class cFinishGenFluidSprings :
 	public cFinishGen
 {
 public:
-	cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, eDimension a_Dimension);
+	cFinishGenFluidSprings(int a_Seed, BlockType a_Fluid, cIniFile & a_IniFile, eDimension a_Dimension);
 
 protected:
 
 	cNoise         m_Noise;
 	cProbabDistrib m_HeightDistribution;
-	BLOCKTYPE      m_Fluid;
+	BlockType      m_Fluid;
 	int            m_Chance;  ///< Chance, [0..100], that a spring will be generated in a chunk
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	/** Tries to place a spring at the specified coords, checks neighbors. Returns true if successful. */
-	bool TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z);
+	bool TryPlaceSpring(cChunkDesc & a_ChunkDesc, Vector3i a_Pos);
 } ;
 
 
@@ -443,7 +433,7 @@ protected:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	/** Returns false if an animal cannot spawn at given coords, else adds it to the chunk's entity list and returns true */
-	bool TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int x, int y, int z, eMonsterType AnimalToSpawn);
+	bool TrySpawnAnimals(cChunkDesc & a_ChunkDesc, Vector3i a_RelPos, eMonsterType AnimalToSpawn);
 
 	/** Picks a random animal from biome-dependant list for a random position in the chunk.
 	Returns the chosen mob type, or mtInvalid if no mob chosen. */
@@ -467,24 +457,21 @@ public:
 
 	struct OreInfo
 	{
-		BLOCKTYPE  m_BlockType;  // The type of the nest.
-		NIBBLETYPE m_BlockMeta;  // The block meta
+		BlockType  m_OreBlock;
 		int        m_MaxHeight;  // The highest possible a nest can occur
 		int        m_NumNests;   // How many nests per chunk
 		int        m_NestSize;   // The amount of blocks a nest can have.
 
 		OreInfo() :
-			m_BlockType(0),
-			m_BlockMeta(0),
+			m_OreBlock(BlockType::Air),
 			m_MaxHeight(0),
 			m_NumNests(0),
 			m_NestSize(0)
 		{
 		}
 
-		OreInfo(BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta, int a_MaxHeight, int a_NumNests, int a_NestSize) :
-			m_BlockType(a_OreType),
-			m_BlockMeta(a_OreMeta),
+		OreInfo(BlockType a_OreBlock, int a_MaxHeight, int a_NumNests, int a_NestSize) :
+			m_OreBlock(a_OreBlock),
 			m_MaxHeight(a_MaxHeight),
 			m_NumNests(a_NumNests),
 			m_NestSize(a_NestSize)
@@ -537,7 +524,7 @@ protected:
 	a_Seq is the sequencing number (used as a complement to seed to make each ore in the same chunk have different nests) */
 	virtual void GenerateOre(
 		cChunkDesc & a_ChunkDesc,
-		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
+		BlockState a_Block,
 		int a_MaxHeight, int a_NumNests, int a_NestSize,
 		int a_Seq
 	) = 0;
@@ -565,7 +552,7 @@ protected:
 	// cFinishGenOreClumps overrides:
 	virtual void GenerateOre(
 		cChunkDesc & a_ChunkDesc,
-		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
+		BlockState a_OreBlock,
 		int a_MaxHeight, int a_NumNests, int a_NestSize,
 		int a_Seq
 	) override;
@@ -595,17 +582,17 @@ protected:
 	// cFinishGenOreClumps overrides:
 	virtual void GenerateOre(
 		cChunkDesc & a_ChunkDesc,
-		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
+		BlockState a_OreBlock,
 		int a_MaxNestHeight, int a_NumNests, int a_NestSize,
 		int a_Seq
 	) override;
 
 	/** Calculates the pockets for the specified chunk and imprints them into the specified ChunkDesc (not necessarily the same chunk).
 	a_Seq is the sequence number of the ore, to provide another source of randomness. */
-	void imprintChunkOrePockets(
+	void ImprintChunkOrePockets(
 		int a_ChunkX, int a_ChunkZ,
 		cChunkDesc & a_ChunkDesc,
-		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
+		BlockState a_OreBlock,
 		int a_MaxHeight, int a_NumNests, int a_NestSize,
 		int a_Seq
 	);
@@ -613,18 +600,18 @@ protected:
 	/** Imprints a single pocket of the specified ore at the specified coords into the chunk.
 	The pocket shape has its minimum X and Z coords specified, Y can be anywhere around the specified Y coord.
 	a_Seq is the sequence number of the ore, to provide another source of randomness. */
-	void imprintPocket(
+	void ImprintPocket(
 		cChunkDesc & a_ChunkDesc,
 		int a_MinPocketX, int a_PocketY, int a_MinPocketZ,
 		int a_NestSize, int a_Seq,
-		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta
+		BlockState a_OreBlock
 	);
 
 	/** Imprints a single sphere of the specified ore at the specified coords. */
-	void imprintSphere(
+	void ImprintSphere(
 		cChunkDesc & a_ChunkDesc,
 		double a_SphereX, double a_SphereY, double a_SphereZ, double a_Radius,
-		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta
+		BlockState a_OreBlock
 	);
 };
 

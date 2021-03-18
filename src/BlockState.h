@@ -13,6 +13,8 @@ struct BlockState
 	{
 	}
 
+	constexpr BlockState(BlockType a_Type);
+
 	/** Gets the block type of this block state. */
 	BlockType Type() const;
 

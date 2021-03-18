@@ -10,6 +10,8 @@
 #include "../UI/InventoryWindow.h"
 #include "../UI/WindowOwner.h"
 #include "../Bindings/PluginManager.h"
+#include "../Blocks/BlockAir.h"
+#include "../Blocks/BlockFluid.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
 #include "../Root.h"
@@ -2207,11 +2209,11 @@ bool cPlayer::IsClimbing(void) const
 		return false;
 	}
 
-	BLOCKTYPE Block = m_World->GetBlock(Position);
-	switch (Block)
+	auto Block = m_World->GetBlock(Position);
+	switch (Block.Type())
 	{
-		case E_BLOCK_LADDER:
-		case E_BLOCK_VINES:
+		case BlockType::Ladder:
+		case BlockType::Vine:
 		{
 			return true;
 		}
@@ -2358,10 +2360,10 @@ void cPlayer::LoadRank(void)
 
 
 
-bool cPlayer::PlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPlayer::PlaceBlock(Vector3i a_Pos, BlockState a_Block)
 {
-	sSetBlockVector blk{{a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta}};
-	return PlaceBlocks(blk);
+	sSetBlockVector Block{{a_Pos, a_Block}};
+	return PlaceBlocks(Block);
 }
 
 
@@ -2378,7 +2380,7 @@ void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_R
 		{
 			for (int x = a_BlockX - a_Range + 1; x < a_BlockX + a_Range; x++)
 			{
-				blks.emplace_back(x, y, z, E_BLOCK_AIR, 0);  // Use fake blocktype, it will get set later on.
+				blks.emplace_back(x, y, z, Block::Air::Air());  // Use fake blocktype, it will get set later on.
 			}
 		}
 	}  // for y
@@ -2420,11 +2422,11 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 		int x = blk.GetX();
 		int y = blk.GetY();
 		int z = blk.GetZ();
-		cBoundingBox BlockBox = cBlockHandler::For(blk.m_BlockType).GetPlacementCollisionBox(
+		cBoundingBox BlockBox = cBlockHandler::For(blk.m_Block.Type()).GetPlacementCollisionBox(
 			m_World->GetBlock({ x - 1, y, z }),
 			m_World->GetBlock({ x + 1, y, z }),
-			(y == 0) ? E_BLOCK_AIR : m_World->GetBlock({ x, y - 1, z }),
-			(y == cChunkDef::Height - 1) ? E_BLOCK_AIR : m_World->GetBlock({ x, y + 1, z }),
+			(y == 0) ? Block::Air::Air() : m_World->GetBlock({ x, y - 1, z }),
+			(y == cChunkDef::Height - 1) ? Block::Air::Air() : m_World->GetBlock({ x, y + 1, z }),
 			m_World->GetBlock({ x, y, z - 1 }),
 			m_World->GetBlock({ x, y, z + 1 })
 		);
@@ -2505,10 +2507,10 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 	for (auto blk: a_Blocks)
 	{
 		// Set the blocks:
-		m_World->PlaceBlock(blk.GetAbsolutePos(), blk.m_BlockType, blk.m_BlockMeta);
+		m_World->PlaceBlock(blk.GetAbsolutePos(), blk.m_Block);
 
 		// Notify the blockhandlers:
-		cBlockHandler::For(blk.m_BlockType).OnPlacedByPlayer(ChunkInterface, *m_World, *this, blk);
+		cBlockHandler::For(blk.m_Block.Type()).OnPlacedByPlayer(ChunkInterface, *m_World, *this, blk);
 
 		// Call the "placed" hooks:
 		pm->CallHookPlayerPlacedBlock(*this, blk);
@@ -2589,8 +2591,8 @@ void cPlayer::Detach()
 			for (int z = PosZ - 1; z <= (PosZ + 1); ++z)
 			{
 				if (
-					(m_World->GetBlock({ x, y, z }) == E_BLOCK_AIR) &&
-					(m_World->GetBlock({ x, y + 1, z }) == E_BLOCK_AIR) &&
+					(cBlockAirHandler::IsBlockAir(m_World->GetBlock({ x, y, z }))) &&
+					(cBlockAirHandler::IsBlockAir(m_World->GetBlock({ x, y + 1, z }))) &&
 					cBlockInfo::IsSolid(m_World->GetBlock({ x, y - 1, z }))
 				)
 				{
@@ -2657,13 +2659,14 @@ void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
 
 
 
-float cPlayer::GetLiquidHeightPercent(NIBBLETYPE a_Meta)
+float cPlayer::GetLiquidHeightPercent(BlockState a_Block)
 {
-	if (a_Meta >= 8)
+	auto Falloff = cBlockFluidHandler::GetFalloff(a_Block);
+	if (Falloff >= 8)
 	{
-		a_Meta = 0;
+		Falloff = 0;
 	}
-	return static_cast<float>(a_Meta + 1) / 9.0f;
+	return static_cast<float>(Falloff + 1) / 9.0f;
 }
 
 
@@ -2672,13 +2675,12 @@ float cPlayer::GetLiquidHeightPercent(NIBBLETYPE a_Meta)
 
 bool cPlayer::IsInsideWater()
 {
-	BLOCKTYPE Block = m_World->GetBlock(Vector3d(GetPosX(), m_Stance, GetPosZ()).Floor());
-	if ((Block != E_BLOCK_WATER) && (Block != E_BLOCK_STATIONARY_WATER))
+	auto Block = m_World->GetBlock(Vector3d(GetPosX(), m_Stance, GetPosZ()).Floor());
+	if (Block.Type() != BlockType::Water)
 	{
 		return false;
 	}
-	NIBBLETYPE Meta = GetWorld()->GetBlockMeta(Vector3d(GetPosX(), m_Stance, GetPosZ()).Floor());
-	float f = GetLiquidHeightPercent(Meta) - 0.11111111f;
+	float f = GetLiquidHeightPercent(Block) - 0.11111111f;
 	float f1 = static_cast<float>(m_Stance + 1) - f;
 	bool flag = (m_Stance < f1);
 	return flag;
@@ -2688,7 +2690,7 @@ bool cPlayer::IsInsideWater()
 
 
 
-float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
+float cPlayer::GetDigSpeed(BlockState a_Block)
 {
 	// Based on: https://minecraft.gamepedia.com/Breaking#Speed
 
@@ -2736,7 +2738,7 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 	}
 
 	// 5x speed loss for being in water
-	if (IsInsideWater() && !(GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) > 0))
+	if (IsInsideWater() && GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) <= 0)
 	{
 		MiningSpeed /= 5.0f;
 	}
@@ -2754,7 +2756,7 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 
 
 
-float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
+float cPlayer::GetMiningProgressPerTick(BlockState a_Block)
 {
 	// Based on https://minecraft.gamepedia.com/Breaking#Calculation
 	// If we know it's instantly breakable then quit here:
@@ -2777,7 +2779,7 @@ float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 
 
 
-bool cPlayer::CanInstantlyMine(BLOCKTYPE a_Block)
+bool cPlayer::CanInstantlyMine(BlockState a_Block)
 {
 	// Based on: https://minecraft.gamepedia.com/Breaking#Calculation
 

@@ -137,23 +137,21 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	auto relPos = cChunkDef::AbsoluteToRelative(GetPosition());
-	auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relPos);
-	if (chunk == nullptr)
+	auto RelPos = cChunkDef::AbsoluteToRelative(GetPosition());
+	auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPos);
+	if (Chunk == nullptr)
 	{
-		// Inside an unloaded chunk, bail out all processing
+		// Inside an unloaded Chunk, bail out all processing
 		return;
 	}
 
-	BLOCKTYPE InsideType;
-	NIBBLETYPE InsideMeta;
-	chunk->GetBlockTypeMeta(relPos, InsideType, InsideMeta);
 
-	if (!IsBlockRail(InsideType))
+	auto ContainedBlock = Chunk->GetBlock(RelPos);
+	if (!IsBlockRail(ContainedBlock))
 	{
 		// When a descending minecart hits a flat rail, it goes through the ground; check for this
-		chunk->GetBlockTypeMeta(relPos.addedY(1), InsideType, InsideMeta);
-		if (IsBlockRail(InsideType))
+		auto BlockAbove = Chunk->GetBlock(RelPos.addedY(1));
+		if (IsBlockRail(BlockAbove))
 		{
 			// Push cart upwards
 			AddPosY(1);
@@ -161,8 +159,8 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		else
 		{
 			// When a minecart gets to a descending rail, it should go down.
-			chunk->GetBlockTypeMeta(relPos.addedY(-1), InsideType, InsideMeta);
-			if (IsBlockRail(InsideType))
+			auto BlockBelow = Chunk->GetBlock(RelPos.addedY(-1));
+			if (IsBlockRail(BlockBelow))
 			{
 				// Push cart downwards
 				AddPosY(-1);
@@ -171,25 +169,25 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	bool WasDetectorRail = false;
-	if (IsBlockRail(InsideType))
+	if (IsBlockRail(ContainedBlock))
 	{
-		if (InsideType == E_BLOCK_RAIL)
+		if (ContainedBlock.Type() == BlockType::Rail)
 		{
-			SnapToRail(InsideMeta);
+			SnapToRail(ContainedBlock);
 		}
 		else
 		{
-			SnapToRail(InsideMeta & 0x07);
+			SnapToRail(ContainedBlock);
 		}
 
-		switch (InsideType)
+		switch (ContainedBlock.Type())
 		{
-			case E_BLOCK_RAIL: HandleRailPhysics(InsideMeta, a_Dt); break;
-			case E_BLOCK_ACTIVATOR_RAIL: break;
-			case E_BLOCK_POWERED_RAIL: HandlePoweredRailPhysics(InsideMeta); break;
-			case E_BLOCK_DETECTOR_RAIL:
+			case BlockType::Rail: HandleRailPhysics(ContainedBlock, a_Dt); break;
+			case BlockType::ActivatorRail: break;
+			case BlockType::PoweredRail: HandlePoweredRailPhysics(ContainedBlock); break;
+			case BlockType::DetectorRail:
 			{
-				HandleDetectorRailPhysics(InsideMeta, a_Dt);
+				HandleDetectorRailPhysics(ContainedBlock, a_Dt);
 				WasDetectorRail = true;
 				break;
 			}
@@ -202,12 +200,12 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		// Not on rail, default physics
 		SetPosY(floor(GetPosY()) + 0.35);  // HandlePhysics overrides this if minecart can fall, else, it is to stop ground clipping minecart bottom when off-rail
-		Super::HandlePhysics(a_Dt, *chunk);
+		Super::HandlePhysics(a_Dt, *Chunk);
 	}
 
 	if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
 	{
-		m_World->SetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
+		m_World->SetBlock(m_DetectorRailPosition, Block::DetectorRail::DetectorRail(false, Block::DetectorRail::Shape(m_World->GetBlock(m_DetectorRailPosition))));
 		m_bIsOnDetectorRail = false;
 	}
 	else if (WasDetectorRail)
@@ -1241,7 +1239,7 @@ void cMinecart::OnRemoveFromWorld(cWorld & a_World)
 {
 	if (m_bIsOnDetectorRail)
 	{
-		m_World->SetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
+		m_World->SetBlock(m_DetectorRailPosition, BlockType::DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
 	}
 
 	Super::OnRemoveFromWorld(a_World);

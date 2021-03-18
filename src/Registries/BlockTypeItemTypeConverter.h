@@ -1,6 +1,9 @@
 
 #pragma once
 
+#include "BlockTypes.h"
+#include "Items.h"
+
 namespace BlockItemConverter
 {
 	// These two functions convert the Item and Block enums into each other - there is are many values that are not convertible

@@ -284,6 +284,9 @@ inline void PushCornerBlocks(int a_BlockX, int a_Height, int a_BlockZ, int a_Seq
 }
 
 
+
+
+
 inline BlockState DirToVineBlock(unsigned char a_Dir)
 {
 	switch (a_Dir)
@@ -295,6 +298,9 @@ inline BlockState DirToVineBlock(unsigned char a_Dir)
 	}
 	return Block::Vine::Vine();
 }
+
+
+
 
 
 inline void PushSomeVines(int a_BlockX, int a_Height, int a_BlockZ, int a_ColumnHeight, int a_Seq, cNoise & a_Noise, int a_Chance, sSetBlockVector & a_Blocks, const sDirectionCoords * a_Coords, size_t a_NumCoords)
@@ -1483,7 +1489,7 @@ void GetRedMushroomTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 		{
 			// .                                                                                                    Down   East   North South   Up    West)
 			// NORTH SIDE
-			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(-1, -2), Block::RedMushroomBlock::RedMushroomBlock(false, false, true, false, true, true ));  // NORTH_WEST
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(-1, -2), Block::RedMushroomBlock::RedMushroomBlock(false, false, true, false, true, true));  // NORTH_WEST
 			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(0, -2),  Block::RedMushroomBlock::RedMushroomBlock(false, false, true, false, true, false));  // NORTH
 			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(1, -2),  Block::RedMushroomBlock::RedMushroomBlock(false, true,  true, false, true, false));  // NORTH_EAST
 			// WEST SIDE
@@ -1491,7 +1497,7 @@ void GetRedMushroomTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(-2, 0),  Block::RedMushroomBlock::RedMushroomBlock(false, false, false, false, true, true));  // WEST
 			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(-2, 1),  Block::RedMushroomBlock::RedMushroomBlock(false, false, false, true,  true, true));  // SOUTH_WEST
 			// SOUTH SIDE
-			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(-1, 2), Block::RedMushroomBlock::RedMushroomBlock(false, false, false, true, true, true ));  // SOUTH_WEST
+			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(-1, 2), Block::RedMushroomBlock::RedMushroomBlock(false, false, false, true, true, true));  // SOUTH_WEST
 			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(0, 2),  Block::RedMushroomBlock::RedMushroomBlock(false, false, false, true, true, false));  // WEST
 			a_LogBlocks.emplace_back(a_BlockPos.addedY(i).addedXZ(1, 2),  Block::RedMushroomBlock::RedMushroomBlock(false, true,  false, true, true, false));  // SOUTH_EAST
 			// EAST SIDE

@@ -353,7 +353,7 @@ void cStructGenRavines::cRavine::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
 			// DEBUG: Make the ravine shapepoints visible on a single layer (so that we can see with Minutor what's going on)
 			if ((DifX + x == 0) && (DifZ + z == 0))
 			{
-				a_ChunkDesc.SetBlock(x, 4, z, Block::LapisOre::LapisOre());
+				a_ChunkDesc.SetBlock({x, 4, z}, Block::LapisOre::LapisOre());
 			}
 			#endif  // !NDEBUG
 
@@ -380,7 +380,7 @@ void cStructGenRavines::cRavine::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
 						case BlockType::DiamondOre:
 						case BlockType::RedstoneOre:
 						{
-							a_ChunkDesc.SetBlock(x, y, z, Block::Air::Air());
+							a_ChunkDesc.SetBlock({x, y, z}, Block::Air::Air());
 							break;
 						}
 						default: break;

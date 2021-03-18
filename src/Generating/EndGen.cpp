@@ -168,7 +168,7 @@ void cEndGen::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape &
 			{
 				if (a_Shape[(x + 16 * z) * 256 + y] != 0)
 				{
-					a_ChunkDesc.SetBlock(x, y, z, Block::EndStone::EndStone());
+					a_ChunkDesc.SetBlock({x, y, z}, Block::EndStone::EndStone());
 				}
 			}  // for y
 		}  // for x

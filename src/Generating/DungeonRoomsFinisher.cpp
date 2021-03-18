@@ -224,7 +224,7 @@ protected:
 			{ cItem(E_ITEM_PUMPKIN_SEEDS),       2,         4,        10 },
 		} ;
 
-		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity(RelX, m_FloorHeight + 1, RelZ));
+		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity({RelX, m_FloorHeight + 1, RelZ}));
 		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == BlockType::Chest));
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
 		int NumSlots = 3 + ((Noise.IntNoise3DInt(a_Chest.x, a_Chest.y, a_Chest.z) / 11) % 4);
@@ -272,7 +272,7 @@ protected:
 		)
 		{
 			a_ChunkDesc.SetBlock({CenterX, b, CenterZ}, Block::Spawner::Spawner());
-			cMobSpawnerEntity * MobSpawner = static_cast<cMobSpawnerEntity *>(a_ChunkDesc.GetBlockEntity(CenterX, b, CenterZ));
+			cMobSpawnerEntity * MobSpawner = static_cast<cMobSpawnerEntity *>(a_ChunkDesc.GetBlockEntity({CenterX, b, CenterZ}));
 			ASSERT((MobSpawner != nullptr) && (MobSpawner->GetBlockType() == BlockType::Spawner));
 			MobSpawner->SetEntity(m_MonsterType);
 		}
