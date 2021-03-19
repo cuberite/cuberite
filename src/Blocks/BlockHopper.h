@@ -8,9 +8,9 @@
 
 
 class cBlockHopperHandler final :
-	public cPitchYawRotator<cClearMetaOnDrop<cBlockEntityHandler>>
+	public cBlockEntityHandler
 {
-	using Super = cPitchYawRotator<cClearMetaOnDrop<cBlockEntityHandler>>;
+	using Super = cBlockEntityHandler;
 
 public:
 
@@ -24,22 +24,10 @@ private:
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState & a_Block
 	) const override
 	{
-		a_BlockType = m_BlockType;
-
-		// Convert the blockface into meta:
-		switch (a_ClickedBlockFace)
-		{
-			case BLOCK_FACE_BOTTOM: a_BlockMeta = E_META_HOPPER_FACING_YM;  break;
-			case BLOCK_FACE_TOP:    a_BlockMeta = E_META_HOPPER_FACING_YM;  break;
-			case BLOCK_FACE_EAST:   a_BlockMeta = E_META_HOPPER_FACING_XM;  break;
-			case BLOCK_FACE_NORTH:  a_BlockMeta = E_META_HOPPER_FACING_ZP;  break;
-			case BLOCK_FACE_SOUTH:  a_BlockMeta = E_META_HOPPER_FACING_ZM;  break;
-			case BLOCK_FACE_WEST:   a_BlockMeta = E_META_HOPPER_FACING_XP;  break;
-			case BLOCK_FACE_NONE:   a_BlockMeta = E_META_HOPPER_UNATTACHED; break;
-		}
+		a_Block = Block::Hopper::Hopper(true, a_ClickedBlockFace);
 		return true;
 	}
 
@@ -47,9 +35,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 11;
 	}
 } ;

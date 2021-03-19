@@ -18,29 +18,7 @@ public:
 
 private:
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
-	{
-		// We set meta to zero so Cuberite doesn't stop a Creative-mode player from building custom portal shapes
-		// CanBeAt doesn't do anything if meta is zero
-		// We set to zero because the client sends meta = 1 or 2 to the server (it calculates rotation itself)
-
-		a_BlockType = m_BlockType;
-		a_BlockMeta = 0;
-		return true;
-	}
-
-
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		// No pickups
 		return {};
@@ -78,9 +56,9 @@ private:
 			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1
 		}
 
-		switch (a_Chunk.GetMeta(a_RelPos))
+		switch (Block::NetherPortal::Axis(a_Chunk.GetBlock(a_RelPos)))
 		{
-			case 0x1:
+			case Block::NetherPortal::Axis::X:
 			{
 				static const std::array<Vector3i, 4> PortalCheck
 				{
@@ -94,16 +72,16 @@ private:
 
 				for (const auto & Direction : PortalCheck)
 				{
-					BLOCKTYPE Block;
+					BlockState Block;
 					a_Chunk.UnboundedRelGetBlockType(a_RelPos + Direction, Block);
-					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
+					if ((Block.Type() != BlockType::NetherPortal) && (Block.Type() != BlockType::Obsidian))
 					{
 						return false;
 					}
 				}
 				break;
 			}
-			case 0x2:
+			case Block::NetherPortal::Axis::Z:
 			{
 				static const std::array<Vector3i, 4> PortalCheck
 				{
@@ -117,9 +95,9 @@ private:
 
 				for (const auto & Direction : PortalCheck)
 				{
-					BLOCKTYPE Block;
+					BlockState Block;
 					a_Chunk.UnboundedRelGetBlockType(a_RelPos + Direction, Block);
-					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
+					if ((Block.Type() != BlockType::NetherPortal) && (Block.Type() != BlockType::Obsidian))
 					{
 						return false;
 					}
@@ -134,9 +112,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 24;
 	}
 } ;

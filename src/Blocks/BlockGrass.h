@@ -31,13 +31,13 @@ private:
 		DieInDarkness
 	};
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		if (!ToolHasSilkTouch(a_Tool))
 		{
-			return cItem(E_BLOCK_DIRT, 1, 0);
+			return cItem(Item::Dirt);
 		}
-		return cItem(E_BLOCK_GRASS, 1, 0);
+		return cItem(Item::GrassBlock);
 	}
 
 
@@ -64,7 +64,7 @@ private:
 			case Survivability::DoNothing: return;
 			case Survivability::DieInDarkness:
 			{
-				a_Chunk.FastSetBlock(a_RelPos, E_BLOCK_DIRT, E_META_DIRT_NORMAL);
+				a_Chunk.FastSetBlock(a_RelPos, Block::Dirt::Dirt());
 				return;
 			}
 		}
@@ -85,7 +85,7 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
 		UNUSED(a_Meta);
 		return 1;
@@ -108,8 +108,9 @@ private:
 		// It does not turn to dirt when a snow layer is above.
 		const auto Above = a_Chunk.GetBlock(AbovePos);
 		if (
-			(Above != E_BLOCK_SNOW) &&
-			(!cBlockInfo::IsTransparent(Above) || IsBlockWater(Above)))
+			(Above.Type() != BlockType::Snow) &&
+			(!cBlockInfo::IsTransparent(Above) || Above.Type() == BlockType::Water)
+		)
 		{
 			return Survivability::DieInDarkness;
 		}
@@ -139,11 +140,9 @@ private:
 			return;
 		}
 
-		BLOCKTYPE  DestBlock;
-		NIBBLETYPE DestMeta;
-		Chunk->GetBlockTypeMeta(a_RelPos, DestBlock, DestMeta);
+		auto DestBlock = Chunk->GetBlock(a_RelPos);
 
-		if ((DestBlock != E_BLOCK_DIRT) || (DestMeta != E_META_DIRT_NORMAL))
+		if (DestBlock.Type() != BlockType::Dirt)
 		{
 			// Not a regular dirt block
 			return;
@@ -163,7 +162,7 @@ private:
 			const auto AbsPos = Chunk->RelativeToAbsolute(a_RelPos);
 			if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*Chunk->GetWorld(), AbsPos.x, AbsPos.y, AbsPos.z, ssGrassSpread))
 			{
-				Chunk->FastSetBlock(a_RelPos, E_BLOCK_GRASS, 0);
+				Chunk->FastSetBlock(a_RelPos, Block::GrassBlock::GrassBlock());
 			}
 		}
 	}

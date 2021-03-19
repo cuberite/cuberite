@@ -82,7 +82,6 @@
 #include "BlockSand.h"
 #include "BlockSapling.h"
 #include "BlockSeaLantern.h"
-#include "BlockSideways.h"
 #include "BlockSignPost.h"
 #include "BlockSlab.h"
 #include "BlockSlime.h"
@@ -296,7 +295,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockBrownConcreteHandler(BlockType::BrownConcrete);
 	constexpr cBlockConcretePowderHandler                  BlockBrownConcretePowderHandler(BlockType::BrownConcretePowder);
 	constexpr cBlockGlazedTerracottaHandler                BlockBrownGlazedTerracottaHandler(BlockType::BrownGlazedTerracotta);
-	constexpr cBlockHugeMushroomHandler                    BlockBrownMushroomHandler(BlockType::BrownMushroom);
+	constexpr cDefaultBlockHandler                         BlockBrownMushroomHandler(BlockType::BrownMushroom);
 	constexpr cBlockHugeMushroomHandler                    BlockBrownMushroomBlockHandler(BlockType::BrownMushroomBlock);
 	constexpr cDefaultBlockHandler                         BlockBrownShulkerBoxHandler(BlockType::BrownShulkerBox);
 	constexpr cBlockGlassHandler                           BlockBrownStainedGlassHandler(BlockType::BrownStainedGlass);
@@ -312,7 +311,7 @@ namespace
 	constexpr cBlockCactusHandler                          BlockCactusHandler(BlockType::Cactus);
 	constexpr cBlockCakeHandler                            BlockCakeHandler(BlockType::Cake);
 	constexpr cDefaultBlockHandler                         BlockCampfireHandler(BlockType::Campfire);
-	constexpr cBlockCropsHandler<7>                        BlockCarrotsHandler(BlockType::Carrots);
+	constexpr cBlockCropsHandler                           BlockCarrotsHandler(BlockType::Carrots);
 	constexpr cDefaultBlockHandler                         BlockCartographyTableHandler(BlockType::CartographyTable);
 	constexpr cBlockPumpkinHandler                         BlockCarvedPumpkinHandler(BlockType::CarvedPumpkin);
 	constexpr cBlockCauldronHandler                        BlockCauldronHandler(BlockType::Cauldron);
@@ -399,7 +398,7 @@ namespace
 	constexpr cBlockStairsHandler                          BlockDarkOakStairsHandler(BlockType::DarkOakStairs);
 	constexpr cBlockTrapdoorHandler                        BlockDarkOakTrapdoorHandler(BlockType::DarkOakTrapdoor);
 	constexpr cBlockWallSignHandler                        BlockDarkOakWallSignHandler(BlockType::DarkOakWallSign);
-	constexpr cBlockWoodHandler                            BlockDarkOakWoodHandler(BlockType::DarkOakWood);
+	constexpr cDefaultBlockHandler                         BlockDarkOakWoodHandler(BlockType::DarkOakWood);
 	constexpr cDefaultBlockHandler                         BlockDarkPrismarineHandler(BlockType::DarkPrismarine);
 	constexpr cBlockSlabHandler                            BlockDarkPrismarineSlabHandler(BlockType::DarkPrismarineSlab);
 	constexpr cBlockStairsHandler                          BlockDarkPrismarineStairsHandler(BlockType::DarkPrismarineStairs);
@@ -975,8 +974,8 @@ bool cBlockHandler::GetPlacementBlockTypeMeta(
 	BlockState & a_Block
 ) const
 {
-	// By default, all blocks can be placed and the meta is copied over from the item's damage value:
-	a_BlockType = BlockState(m_BlockType);  // TODO: NONONONONO
+	// This creates a default Block of that type. Whatever that means foe the block state
+	a_Block = BlockState(m_BlockType);
 	return true;
 }
 

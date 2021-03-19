@@ -28,7 +28,7 @@ private:
 	{
 		a_WorldInterface.DoWithBlockEntityAt(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, [](cBlockEntity & a_BlockEntity)
 		{
-			if (a_BlockEntity.GetBlockType() != E_BLOCK_NOTE_BLOCK)
+			if (a_BlockEntity.GetBlockType() != BlockType::NoteBlock)
 			{
 				return false;
 			}

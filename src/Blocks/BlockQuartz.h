@@ -17,14 +17,14 @@ public:
 	using Super::Super;
 
 private:
-
+/*
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface,
 		cPlayer & a_Player,
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState & a_Block
 	) const override
 	{
 		a_BlockType = m_BlockType;
@@ -44,7 +44,7 @@ private:
 
 
 
-	/** Converts the block face of the pillar block's "base" to the block's metadata. */
+	** Converts the block face of the pillar block's "base" to the block's metadata. *
 	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
 	{
 		switch (a_BlockFace)
@@ -73,14 +73,13 @@ private:
 			}
 		}
 	}
+*/
 
 
 
 
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 8;
 	}
 } ;

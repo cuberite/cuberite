@@ -54,18 +54,17 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		return cItem(E_ITEM_FLOWER_POT, 1, 0);
+		return cItem(Item::FlowerPot);
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 0;
 	}
 } ;

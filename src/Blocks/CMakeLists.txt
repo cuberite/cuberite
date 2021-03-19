@@ -46,6 +46,7 @@ target_sources(
 	BlockFluid.h
 	BlockFurnace.h
 	BlockGlass.h
+	BlockGlassPane.h
 	BlockGlazedTerracotta.h
 	BlockGlowstone.h
 	BlockGrass.h
@@ -88,7 +89,6 @@ target_sources(
 	BlockSand.h
 	BlockSapling.h
 	BlockSeaLantern.h
-	BlockSideways.h
 	BlockSignPost.h
 	BlockSlab.h
 	BlockSlime.h

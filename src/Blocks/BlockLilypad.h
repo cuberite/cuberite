@@ -8,9 +8,9 @@
 
 
 class cBlockLilypadHandler final :
-	public cClearMetaOnDrop<cBlockHandler>
+	public cBlockHandler
 {
-	using Super = cClearMetaOnDrop<cBlockHandler>;
+	using Super = cBlockHandler;
 
 public:
 
@@ -18,9 +18,8 @@ public:
 
 private:
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 7;
 	}
 
@@ -35,12 +34,11 @@ private:
 		{
 			return false;
 		}
-		BLOCKTYPE UnderType;
-		NIBBLETYPE UnderMeta;
-		a_Chunk.GetBlockTypeMeta(UnderPos, UnderType, UnderMeta);
+
+		auto BlockBelow = a_Chunk.GetBlock(UnderPos);
 		return (
-			(((UnderType == E_BLOCK_STATIONARY_WATER) || (UnderType == E_BLOCK_WATER)) && (UnderMeta == 0)) ||  // A water source is below
-			(UnderType == E_BLOCK_ICE) || (UnderType == E_BLOCK_FROSTED_ICE)                                    // Or (frosted) ice
+			((BlockBelow.Type() == BlockType::Water) && (cBlockFluidHandler::GetFalloff(BlockBelow) == 0)) ||  // A water source is below
+			(BlockBelow.Type() == BlockType::Ice) || (BlockBelow.Type() == BlockType::FrostedIce)               // Or (frosted) ice
 		);
 	}
 };

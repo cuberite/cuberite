@@ -9,9 +9,9 @@
 
 
 class cBlockLadderHandler final :
-	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04> >
+	public cBlockHandler
 {
-	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>>;
+	using Super = cBlockHandler;
 
 public:
 
@@ -25,7 +25,7 @@ private:
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState & a_Block
 	) const override
 	{
 		// Try finding a suitable neighbor block face for the ladder; start with the given one.
@@ -38,49 +38,8 @@ private:
 			}
 		}
 
-		a_BlockType = m_BlockType;
-		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
+		a_Block = Block::Ladder::Ladder(a_ClickedBlockFace);
 		return true;
-	}
-
-
-
-
-
-	/** Converts the block face of the neighbor to which the ladder is attached to the ladder block's meta. */
-	static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_NeighborBlockFace)
-	{
-		switch (a_NeighborBlockFace)
-		{
-			case BLOCK_FACE_ZM: return 0x2;
-			case BLOCK_FACE_ZP: return 0x3;
-			case BLOCK_FACE_XM: return 0x4;
-			case BLOCK_FACE_XP: return 0x5;
-			case BLOCK_FACE_NONE:
-			case BLOCK_FACE_YM:
-			case BLOCK_FACE_YP:
-			{
-				return 0x2;
-			}
-		}
-		UNREACHABLE("Unsupported neighbor block face");
-	}
-
-
-
-
-
-	/** Converts the ladder block's meta to the block face of the neighbor to which the ladder is attached. */
-	static eBlockFace MetaDataToBlockFace(NIBBLETYPE a_MetaData)
-	{
-		switch (a_MetaData)
-		{
-			case 0x2: return BLOCK_FACE_ZM;
-			case 0x3: return BLOCK_FACE_ZP;
-			case 0x4: return BLOCK_FACE_XM;
-			case 0x5: return BLOCK_FACE_XP;
-			default:  return BLOCK_FACE_ZM;
-		}
 	}
 
 
@@ -129,18 +88,16 @@ private:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		auto NeighborBlockFace = MetaDataToBlockFace(a_Chunk.GetMeta(a_RelPos));
 		auto LadderAbsPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-		return LadderCanBePlacedAt(a_ChunkInterface, LadderAbsPos, NeighborBlockFace);
+		return LadderCanBePlacedAt(a_ChunkInterface, LadderAbsPos, Block::Ladder::Facing(a_Chunk.GetBlock(a_RelPos)));
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 0;
 	}
 } ;

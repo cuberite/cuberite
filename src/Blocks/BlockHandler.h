@@ -149,7 +149,7 @@ public:
 	) const;
 
 	/** Checks whether the block has an effect on growing the plant */
-	virtual bool CanSustainPlant(BlockType a_Block) const { return false; }
+	virtual bool CanSustainPlant(BlockState a_Block) const { return false; }
 
 	/** Called to check whether this block supports a rclk action.
 	If it returns true, OnUse() is called */

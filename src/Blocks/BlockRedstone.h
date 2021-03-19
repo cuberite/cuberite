@@ -26,21 +26,15 @@ private:
 			return false;
 		}
 
-		BLOCKTYPE BelowBlock;
-		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_RelPos.addedY(-1), BelowBlock, BelowBlockMeta);
+		auto BelowBlock = a_Chunk.GetBlock(a_RelPos.addedY(-1));
 
 		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
 		{
 			return true;
 		}
-		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
+		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock) && cBlockSlabHandler::IsSlabTop(BelowBlock))
 		{
-			// Check if the slab is turned up side down
-			if ((BelowBlockMeta & 0x08) == 0x08)
-			{
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}
@@ -49,18 +43,17 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
-		return cItem(E_ITEM_REDSTONE_DUST, 1, 0);
+		return cItem(Item::Redstone);
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 0;
 	}
 } ;
