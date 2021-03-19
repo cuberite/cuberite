@@ -184,7 +184,7 @@ void cStructGenTrees::ApplyTreeImage(
 				case BlockType::BrownMushroom:
 				case BlockType::RedMushroom:
 				{
-					if (cBlockLogHandler::IsBlockLog(InspectBlock.m_Block))
+					if (!cBlockLogHandler::IsBlockLog(InspectBlock.m_Block))
 					{
 						break;
 					}
