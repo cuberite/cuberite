@@ -61,14 +61,6 @@
 
 
 
-const int TIME_SUNSET        = 12000;
-const int TIME_NIGHT_START   = 13187;
-const int TIME_NIGHT_END     = 22812;
-const int TIME_SUNRISE       = 23999;
-const int TIME_SPAWN_DIVISOR =   148;
-
-
-
 
 
 namespace World
@@ -167,7 +159,7 @@ cWorld::cWorld(
 	m_BroadcastAchievementMessages(true),
 	m_IsDaylightCycleEnabled(true),
 	m_WorldAge(0),
-	m_TimeOfDay(0),
+	m_WorldDate(0),
 	m_WorldTickAge(0),
 	m_LastChunkCheck(0),
 	m_LastSave(0),
@@ -967,13 +959,7 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 
 	if (m_IsDaylightCycleEnabled)
 	{
-		m_TimeOfDay += a_Dt;
-
-		// Wrap time of day every 20 minutes (1200 seconds):
-		if (m_TimeOfDay > std::chrono::minutes(20))
-		{
-			m_TimeOfDay -= std::chrono::minutes(20);
-		}
+		m_WorldDate += a_Dt;
 
 		// Updates the sky darkness based on current time of day:
 		UpdateSkyDarkness();
@@ -1267,7 +1253,13 @@ void cWorld::TickQueuedTasks(void)
 
 void cWorld::UpdateSkyDarkness(void)
 {
-	int TempTime = std::chrono::duration_cast<cTickTime>(m_TimeOfDay).count();
+	const int TIME_SUNSET = 12000;
+	const int TIME_NIGHT_START = 13187;
+	const int TIME_NIGHT_END = 22812;
+	const int TIME_SUNRISE = 23999;
+	const int TIME_SPAWN_DIVISOR = 148;
+
+	const auto TempTime = GetTimeOfDay();
 	if (TempTime <= TIME_SUNSET)
 	{
 		m_SkyDarkness = 0;

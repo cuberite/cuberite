@@ -1870,7 +1870,7 @@ end
 							Type = "number",
 						},
 						{
-							Name = "TimeOfDay",
+							Name = "WorldDate",
 							Type = "number",
 						},
 						{
@@ -1878,7 +1878,7 @@ end
 							Type = "boolean",
 						},
 					},
-					Notes = "Sends the specified time update to the client. WorldAge is the total age of the world, in ticks. TimeOfDay is the current day's time, in ticks (0 - 24000). DoDaylightCycle is a bool that specifies whether the client should automatically move the sun (true) or keep it in the same place (false).",
+					Notes = "Sends the specified time update to the client. WorldAge is the total age of the world, in ticks. WorldDate is the current date, in ticks, and is used by the client to calculate the days elapsed (F3 debug overlay's day count) and the time of day (rendered sun position). DoDaylightCycle is a bool that specifies whether the client should automatically move the sun (true) or keep it in the same place (false).",
 				},
 				SetClientBrand =
 				{

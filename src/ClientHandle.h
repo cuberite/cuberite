@@ -219,7 +219,7 @@ public:  // tolua_export
 	void SendTabCompletionResults       (const AStringVector & a_Results);
 	void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks);  // tolua_export
-	void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle);  // tolua_export
+	void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_WorldDate, bool a_DoDaylightCycle);  // tolua_export
 	void SendUnleashEntity              (const cEntity & a_Entity);
 	void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ);
 	void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity);
