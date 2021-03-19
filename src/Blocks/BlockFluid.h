@@ -182,9 +182,9 @@ private:
 
 	}
 
-	virtual bool CanSustainPlant(BlockType a_Plant) const override
+	virtual bool CanSustainPlant(BlockState a_Plant) const override
 	{
-		switch (a_Plant)
+		switch (a_Plant.Type())
 		{
 			case BlockType::Beetroots:
 			case BlockType::Wheat:

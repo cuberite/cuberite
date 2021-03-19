@@ -7,17 +7,18 @@
 
 
 class cBlockSlimeHandler final :
-	public cClearMetaOnDrop<cBlockHandler>
+	public cBlockHandler
 {
+	using Super = cBlockHandler;
+
 public:
 
-	using cClearMetaOnDrop<cBlockHandler>::cClearMetaOnDrop;
+	using Super::Super;
 
 private:
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 1;
 	}
 };

@@ -89,6 +89,7 @@ public:
 					case Rail::Shape::NorthWest:      return Shape::NorthWest;
 					case Rail::Shape::NorthEast:      return Shape::NorthEast;
 				}
+				break;
 			}
 			case BlockType::ActivatorRail:
 			{
@@ -101,6 +102,7 @@ public:
 					case ActivatorRail::Shape::AscendingNorth: return Shape::AscendingNorth;
 					case ActivatorRail::Shape::AscendingSouth: return Shape::AscendingSouth;
 				}
+				break;
 			}
 			case BlockType::DetectorRail:
 			{
@@ -113,6 +115,7 @@ public:
 					case DetectorRail::Shape::AscendingNorth: return Shape::AscendingNorth;
 					case DetectorRail::Shape::AscendingSouth: return Shape::AscendingSouth;
 				}
+				break;
 			}
 			case BlockType::PoweredRail:
 			{
@@ -125,6 +128,7 @@ public:
 					case PoweredRail::Shape::AscendingNorth: return Shape::AscendingNorth;
 					case PoweredRail::Shape::AscendingSouth: return Shape::AscendingSouth;
 				}
+				break;
 			}
 			default: return Shape::None;
 		}
