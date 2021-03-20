@@ -475,6 +475,39 @@ void cWorld::CastThunderbolt(Vector3i a_Block)
 
 
 
+int cWorld::GetTimeOfDay(void) const
+{
+	using namespace std::chrono_literals;
+
+	return std::chrono::duration_cast<cTickTime>(m_WorldDate % 20min).count();
+}
+
+
+
+
+
+Int64 cWorld::GetWorldAge(void) const
+{
+	return std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count();
+}
+
+
+
+
+
+void cWorld::SetTimeOfDay(int a_TimeOfDay)
+{
+	using namespace std::chrono_literals;
+
+	m_WorldDate = (m_WorldDate / 20min) * 20min + cTickTime(a_TimeOfDay);
+	UpdateSkyDarkness();
+	BroadcastTimeUpdate();
+}
+
+
+
+
+
 int cWorld::GetDefaultWeatherInterval(eWeather a_Weather) const
 {
 	auto & Random = GetRandomProvider();

@@ -47,7 +47,7 @@ public:
 
 	CLASS_PROTODEF(cPlayer)
 
-	cPlayer(const cClientHandlePtr & a_Client);
+	cPlayer(const std::shared_ptr<cClientHandle> & a_Client);
 	virtual ~cPlayer() override;
 
 	// tolua_begin
@@ -656,7 +656,7 @@ private:
 	/** The item being dragged by the cursor while in a UI window */
 	cItem m_DraggingItem;
 
-	cClientHandlePtr m_ClientHandle;
+	std::shared_ptr<cClientHandle> m_ClientHandle;
 
 	cSlotNums m_InventoryPaintSlots;
 

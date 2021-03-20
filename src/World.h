@@ -1,10 +1,6 @@
 
 #pragma once
 
-#define MAX_PLAYERS 65535
-
-#include <functional>
-
 #include "Simulator/SimulatorManager.h"
 #include "ChunkMap.h"
 #include "WorldStorage/WorldStorage.h"
@@ -26,6 +22,8 @@
 
 
 
+
+
 class cFireSimulator;
 class cFluidSimulator;
 class cSandSimulator;
@@ -33,9 +31,6 @@ class cRedstoneSimulator;
 class cItem;
 class cPlayer;
 class cClientHandle;
-typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
-typedef std::list<cClientHandlePtr> cClientHandlePtrs;
-typedef std::list<cClientHandle *> cClientHandles;
 class cEntity;
 class cChunkGenerator;  // The thread responsible for generating chunks
 class cBeaconEntity;
@@ -120,20 +115,15 @@ public:
 		BroadcastTimeUpdate();
 	}
 
-	virtual Int64 GetWorldAge (void) const override { return std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count(); }
-	virtual int GetTimeOfDay(void) const override { return std::chrono::duration_cast<cTickTime>(m_WorldDate % std::chrono::minutes(20)).count(); }
+	virtual int GetTimeOfDay(void) const override;
+	virtual Int64 GetWorldAge(void) const override;
 
 	void SetTicksUntilWeatherChange(int a_WeatherInterval)
 	{
 		m_WeatherInterval = a_WeatherInterval;
 	}
 
-	virtual void SetTimeOfDay(int a_TimeOfDay) override
-	{
-		m_WorldDate = cTickTime(a_TimeOfDay);
-		UpdateSkyDarkness();
-		BroadcastTimeUpdate();
-	}
+	virtual void SetTimeOfDay(int a_TimeOfDay) override;
 
 	/** Returns the default weather interval for the specific weather type.
 	Returns -1 for any unknown weather. */
