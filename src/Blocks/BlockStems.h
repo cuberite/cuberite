@@ -10,7 +10,7 @@
 /** Handler for stems from which produce grows in an adjacent block (melon, pumpkin) after it becomes ripe (meta == 7).
 ProduceBlockType is the blocktype for the produce to be grown.
 StemPickupType is the item type for the pickup resulting from breaking the stem. */
-template <BLOCKTYPE ProduceBlockType, ENUM_ITEM_TYPE StemPickupType>
+template <BlockType ProduceBlockType, Item StemPickupType>
 class cBlockStemsHandler final :
 	public cBlockPlant<true>
 {
@@ -22,12 +22,12 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
 	{
 		/*
 			Use correct percent:
-			https://minecraft.wiki/w/Melon_Seeds#Breaking
-			https://minecraft.wiki/w/Pumpkin_Seeds#Breaking
+			https://minecraft.gamepedia.com/Melon_Seeds#Breaking
+			https://minecraft.gamepedia.com/Pumpkin_Seeds#Breaking
 		*/
 
 		// Age > 7 (Impossible)
@@ -56,19 +56,17 @@ private:
 
 
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		const auto BelowPos = a_Position.addedY(-1);
-		return cChunkDef::IsValidHeight(BelowPos) && (a_Chunk.GetBlock(BelowPos) == E_BLOCK_FARMLAND);
+		return ((a_RelPos.y > 0) && (a_Chunk.GetBlock(a_RelPos.addedY(-1)) == E_BLOCK_FARMLAND));
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 7;
 	}
 
@@ -76,7 +74,7 @@ private:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, unsigned char a_NumStages = 1) const override
 	{
 		const auto OldMeta = a_Chunk.GetMeta(a_RelPos);
 		const auto NewMeta = std::clamp<NIBBLETYPE>(static_cast<NIBBLETYPE>(OldMeta + a_NumStages), 0, 7);
@@ -172,8 +170,8 @@ private:
 
 private:
 
-	// https://minecraft.wiki/w/Pumpkin_Seeds#Breaking
-	// https://minecraft.wiki/w/Melon_Seeds#Breaking
+	// https://minecraft.gamepedia.com/Pumpkin_Seeds#Breaking
+	// https://minecraft.gamepedia.com/Melon_Seeds#Breaking
 	/** The array describes how many seed may be dropped at which age. The inner arrays describe the probability to drop 0, 1, 2, 3 seeds.
 	The outer describes the age of the stem. */
 	static constexpr std::array<std::array<double, 4>, 8> m_AgeSeedDropProbability
