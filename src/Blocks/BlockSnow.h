@@ -109,8 +109,7 @@ private:
 		}
 		auto BelowPos = a_RelPos.addedY(-1);
 		auto BlockBelow = a_Chunk.GetBlock(BelowPos);
-		auto MetaBelow = a_Chunk.GetMeta(BelowPos);
-		return CanBeOn(BlockBelow, MetaBelow);
+		return CanBeOn(BlockBelow);
 	}
 
 
