@@ -122,3 +122,12 @@ build-cuberite
 # clang-tidy
 tidy-build
 run-clang-tidy.py
+*.lua
+include/BuildInfo.h
+include/Globals.h
+lib/libdeflate
+Server/BACKERS
+*.txt
+Server/ThirdPartyLicenses/fmt-LICENSE.rst
+Server/ThirdPartyLicenses/LuaExpat-license.html
+lib/libdeflate

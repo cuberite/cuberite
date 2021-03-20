@@ -1216,6 +1216,9 @@ private:
 	/** Check if player starting point is acceptable */
 	bool CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ);
 
+	/*  Sets a starting chest near spawn point*/
+	void SpawnStartingChest(cChunkCoords a_Coords, const Vector3i & a_Chest);
+
 	/** Chooses a reasonable transition from the current weather to a new weather */
 	eWeather ChooseNewWeather(void);
 

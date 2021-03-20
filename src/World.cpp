@@ -28,8 +28,11 @@
 #include "Entities/Player.h"
 #include "Entities/TNTEntity.h"
 
+#include "BlockEntities/BlockEntity.h"
 #include "BlockEntities/CommandBlockEntity.h"
 #include "BlockEntities/BeaconEntity.h"
+#include "BlockEntities/ChestEntity.h"
+
 
 // Simulators:
 #include "Simulator/FloodyFluidSimulator.h"
@@ -625,6 +628,8 @@ void cWorld::InitializeSpawn(void)
 		GenerateRandomSpawn(DefaultViewDist);
 	}
 
+	
+
 	cIniFile IniFile;
 	IniFile.ReadFile(m_IniFileName);
 	int ViewDist = IniFile.GetValueSetI("SpawnPosition", "PregenerateDistance", DefaultViewDist);
@@ -633,6 +638,7 @@ void cWorld::InitializeSpawn(void)
 	int ChunkX = 0, ChunkZ = 0;
 	cChunkDef::BlockToChunk(FloorC(m_SpawnX), FloorC(m_SpawnZ), ChunkX, ChunkZ);
 	cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, ViewDist);
+	SpawnStartingChest(cChunkCoords(ChunkX, ChunkZ), Vector3i(m_SpawnX, m_SpawnY, m_SpawnZ));
 }
 
 
@@ -719,15 +725,21 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 				int ChunkX, ChunkZ;
 				cChunkDef::BlockToChunk(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ), ChunkX, ChunkZ);
 				cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, a_MaxSpawnRadius);
+				SpawnStartingChest(cChunkCoords(ChunkX, ChunkZ),Vector3i(m_SpawnX, m_SpawnY, m_SpawnZ));
+
 
 				FLOGINFO("World \"{0}\":Generated spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
+				//FLOGINFO("World \"{0}\":Generated starting chest position at ""{1:.2f}",m_WorldName, Vector3d{m_SpawnX + 2, m_SpawnY, m_SpawnZ + 2});
 				return;
 			}
 		}
 	}
 
+
 	m_SpawnY = GetHeight(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ));
+	SpawnStartingChest(cChunkCoords(m_SpawnX, m_SpawnZ), Vector3i(m_SpawnX, m_SpawnY, m_SpawnZ));
 	FLOGWARNING("World \"{0}\": Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
+	//FLOGINFO("World \"{0}\":Generated starting chest position at ""{1:.2f}",m_WorldName, Vector3d{m_SpawnX + 2, m_SpawnY, m_SpawnZ + 2});
 }
 
 
@@ -756,6 +768,8 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 	for (int PotentialY = HighestSpawnPoint; PotentialY > LowestSpawnPoint; --PotentialY)
 	{
 		BLOCKTYPE HeadBlock = GetBlock({ static_cast<int>(a_X), PotentialY, static_cast<int>(a_Z) });
+		BLOCKTYPE BodyBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 1, static_cast<int>(a_Z) });
+		BLOCKTYPE FloorBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 2, static_cast<int>(a_Z) });
 
 		// Is this block safe for spawning
 		if (HeadBlock != E_BLOCK_AIR)
@@ -763,21 +777,18 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 			continue;
 		}
 
-		BLOCKTYPE BodyBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 1, static_cast<int>(a_Z) });
-
 		// Is this block safe for spawning
 		if (BodyBlock != E_BLOCK_AIR)
 		{
 			continue;
 		}
 
-		BLOCKTYPE FloorBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 2, static_cast<int>(a_Z) });
-
 		// Early out - Is the floor block air
 		if (FloorBlock == E_BLOCK_AIR)
 		{
 			continue;
 		}
+
 
 		// Is the floor block ok
 		bool ValidSpawnBlock = false;
@@ -796,13 +807,14 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 			continue;
 		}
 
+
+
 		a_Y = PotentialY - 1.0;
 		return true;
 	}
 
 	return false;
 }
-
 
 
 
@@ -846,7 +858,46 @@ bool cWorld::CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
 }
 
 
+void cWorld::SpawnStartingChest(cChunkCoords a_Coords,const Vector3i & a_Chest)
+{
 
+	//Based off the chest spawning in DungeonRoomsFinisher.cpp
+	cChunkDesc a_ChunkDesc(a_Coords);
+
+	int RelX = a_Chest.x - a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+	int RelZ = a_Chest.z - a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+	if ((RelX < 0) ||
+		(RelX >= cChunkDef::Width) ||  // The X coord is not in this chunk
+		(RelZ < 0) ||
+		(RelZ >= cChunkDef::Width)	// The Z coord is not in this chunk
+	)
+	{
+		return;
+	}
+	a_ChunkDesc.SetBlockTypeMeta(RelX, m_SpawnY + 1, RelZ, E_BLOCK_CHEST,static_cast<NIBBLETYPE>(a_Chest.y));
+
+	static const cLootProbab LootProbab[] = {
+		// Item,                          MinAmount, MaxAmount, Weight
+		{cItem(E_ITEM_WOODEN_AXE),            1,		2,		  10	    },
+		{cItem(E_ITEM_BREAD),                 1,		4,	      5			},
+		{cItem(E_ITEM_WOODEN_PICKAXE),		  1,		1,        8		    },
+		{cItem(E_BLOCK_PLANKS),				  3,		5,	      8			},
+		{cItem(E_ITEM_RED_APPLE),			  1,        3,        5         },
+	}; 
+
+	cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity(a_Chest.x, a_Chest.y + 1, a_Chest.z));
+	ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
+	cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
+	int NumSlots =3 + ((Noise.IntNoise3DInt(a_Chest.x, a_Chest.y, a_Chest.z) / 11) % 4);
+	int Seed = Noise.IntNoise2DInt(RelX, RelZ);
+	ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab, ARRAYCOUNT(LootProbab), NumSlots, Seed);
+
+	
+
+	/*SetBlock(a_Chest, E_BLOCK_CHEST, 0X1);*/
+
+
+}
 
 
 eWeather cWorld::ChooseNewWeather()
