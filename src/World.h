@@ -1,10 +1,6 @@
 
 #pragma once
 
-#define MAX_PLAYERS 65535
-
-#include <functional>
-
 #include "Simulator/SimulatorManager.h"
 #include "ChunkMap.h"
 #include "WorldStorage/WorldStorage.h"
@@ -26,6 +22,8 @@
 
 
 
+
+
 class cFireSimulator;
 class cFluidSimulator;
 class cSandSimulator;
@@ -33,9 +31,6 @@ class cRedstoneSimulator;
 class cItem;
 class cPlayer;
 class cClientHandle;
-typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
-typedef std::list<cClientHandlePtr> cClientHandlePtrs;
-typedef std::list<cClientHandle *> cClientHandles;
 class cEntity;
 class cChunkGenerator;  // The thread responsible for generating chunks
 class cBeaconEntity;
@@ -120,20 +115,15 @@ public:
 		BroadcastTimeUpdate();
 	}
 
-	virtual Int64 GetWorldAge (void) const override { return std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count(); }
-	virtual int GetTimeOfDay(void) const override { return std::chrono::duration_cast<cTickTime>(m_TimeOfDay).count(); }
+	virtual int GetTimeOfDay(void) const override;
+	virtual Int64 GetWorldAge(void) const override;
 
 	void SetTicksUntilWeatherChange(int a_WeatherInterval)
 	{
 		m_WeatherInterval = a_WeatherInterval;
 	}
 
-	virtual void SetTimeOfDay(int a_TimeOfDay) override
-	{
-		m_TimeOfDay = cTickTime(a_TimeOfDay);
-		UpdateSkyDarkness();
-		BroadcastTimeUpdate();
-	}
+	virtual void SetTimeOfDay(int a_TimeOfDay) override;
 
 	/** Returns the default weather interval for the specific weather type.
 	Returns -1 for any unknown weather. */
@@ -1061,12 +1051,12 @@ private:
 	We need sub-tick precision here, that's why we store the time in milliseconds and calculate ticks off of it. */
 	std::chrono::milliseconds m_WorldAge;
 
-	/** The duration of one Minecraft day that has elapsed.
-	Wraps every 20 minutes.
+	/** The fully controllable age of the world.
+	A value used to calculate the current day, and time of day. Settable by plugins and players, and persistent.
 	We need sub-tick precision here, that's why we store the time in milliseconds and calculate ticks off of it. */
-	std::chrono::milliseconds  m_TimeOfDay;
+	std::chrono::milliseconds m_WorldDate;
 
-	/** The age of the world, in ticks.
+	/** The time since this world began, in ticks.
 	Monotonic, but does not persist across restarts.
 	Used for less important but heavy tasks that run periodically. These tasks don't need to follow wallclock time, and slowing their rate down if TPS drops is desirable. */
 	unsigned long long m_WorldTickAge;

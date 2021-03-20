@@ -1566,18 +1566,20 @@ void cProtocol_1_8_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int 
 
 
 
-void cProtocol_1_8_0::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
+void cProtocol_1_8_0::SendTimeUpdate(Int64 a_WorldAge, Int64 a_WorldDate, bool a_DoDaylightCycle)
 {
 	ASSERT(m_State == 3);  // In game mode?
+
 	if (!a_DoDaylightCycle)
 	{
-		// When writing a "-" before the number the client ignores it but it will stop the client-side time expiration.
-		a_TimeOfDay = std::min(-a_TimeOfDay, -1LL);
+		// Negating the date stops time from advancing on the client
+		// (the std::min construction is to handle the case where the date is exactly zero):
+		a_WorldDate = std::min(-a_WorldDate, -1LL);
 	}
 
 	cPacketizer Pkt(*this, pktTimeUpdate);
 	Pkt.WriteBEInt64(a_WorldAge);
-	Pkt.WriteBEInt64(a_TimeOfDay);
+	Pkt.WriteBEInt64(a_WorldDate);
 }
 
 

@@ -83,7 +83,7 @@ const int cPlayer::EATING_TICKS = 30;
 
 
 
-cPlayer::cPlayer(const cClientHandlePtr & a_Client) :
+cPlayer::cPlayer(const std::shared_ptr<cClientHandle> & a_Client) :
 	Super(etPlayer, 0.6, 1.8),
 	m_bVisible(true),
 	m_FoodLevel(MAX_FOOD_LEVEL),
