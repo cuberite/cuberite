@@ -10,17 +10,28 @@
 
 
 class cBlockTorchBaseHandler :
-	public cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>
+	public cBlockHandler
 {
-	using Super = cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>;
+	using Super = cBlockHandler;
 
 public:
 
 	using Super::Super;
 
-protected:
-
-	~cBlockTorchBaseHandler() = default;
+	static inline bool IsBlockTorch(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Torch:
+			case BlockType::WallTorch:
+			case BlockType::RedstoneTorch:
+			case BlockType::RedstoneWallTorch:
+			case BlockType::SoulTorch:
+			case BlockType::SoulWallTorch:
+				return true;
+			default: return false;
+		}
+	}
 
 private:
 
@@ -30,14 +41,12 @@ private:
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		BlockState & a_Block
 	) const override
 	{
-		BLOCKTYPE ClickedBlockType;
-		NIBBLETYPE ClickedBlockMeta;
 		auto ClickedBlockPos = AddFaceDirection(a_PlacedBlockPos, a_ClickedBlockFace, true);
-		a_ChunkInterface.GetBlockTypeMeta(ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
-		if (!CanBePlacedOn(ClickedBlockType, ClickedBlockMeta, a_ClickedBlockFace))
+		auto ClickedBlock = a_ChunkInterface.GetBlock(ClickedBlockPos);
+		if (!CanBePlacedOn(ClickedBlock, a_ClickedBlockFace))
 		{
 			// Couldn't be placed on whatever face was clicked, last ditch resort - find another face
 			a_ClickedBlockFace = FindSuitableFace(a_ChunkInterface, a_PlacedBlockPos);  // Set a_BlockFace to a valid direction which will be converted later to a metadata
@@ -47,57 +56,79 @@ private:
 				return false;
 			}
 		}
-		a_BlockType = m_BlockType;
-		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
-		return true;
-	}
-
-
-
-
-
-	/** Converts the block face of the neighbor to which the torch is attached, to the torch block's meta. */
-	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_NeighborBlockFace)
-	{
-		switch (a_NeighborBlockFace)
+		switch (m_BlockType)
 		{
-			case BLOCK_FACE_BOTTOM: ASSERT(!"Shouldn't be getting this face"); return 0;
-			case BLOCK_FACE_TOP:    return E_META_TORCH_FLOOR;
-			case BLOCK_FACE_EAST:   return E_META_TORCH_EAST;
-			case BLOCK_FACE_WEST:   return E_META_TORCH_WEST;
-			case BLOCK_FACE_NORTH:  return E_META_TORCH_NORTH;
-			case BLOCK_FACE_SOUTH:  return E_META_TORCH_SOUTH;
-			case BLOCK_FACE_NONE:
+			case BlockType::Torch:
+			case BlockType::WallTorch:
 			{
-				ASSERT(!"Unhandled torch direction!");
-				break;
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Block = Block::Torch::Torch();
+						return true;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Block = Block::WallTorch::WallTorch(a_ClickedBlockFace);
+						return true;
+					}
+					case BLOCK_FACE_NONE:
+					case BLOCK_FACE_YM:
+						return false;
+				}
 			}
-		}
-		return 0x0;
-	}
-
-
-
-
-
-	/** Converts the torch block's meta to the block face of the neighbor to which the torch is attached. */
-	inline static eBlockFace MetaDataToBlockFace(NIBBLETYPE a_MetaData)
-	{
-		switch (a_MetaData)
-		{
-			case 0:                  return BLOCK_FACE_TOP;  // By default, the torches stand on the ground
-			case E_META_TORCH_FLOOR: return BLOCK_FACE_TOP;
-			case E_META_TORCH_EAST:  return BLOCK_FACE_EAST;
-			case E_META_TORCH_WEST:  return BLOCK_FACE_WEST;
-			case E_META_TORCH_NORTH: return BLOCK_FACE_NORTH;
-			case E_META_TORCH_SOUTH: return BLOCK_FACE_SOUTH;
-			default:
+			case BlockType::RedstoneTorch:
+			case BlockType::RedstoneWallTorch:
 			{
-				ASSERT(!"Unhandled torch metadata");
-				break;
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Block = Block::RedstoneTorch::RedstoneTorch();
+						return true;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Block = Block::RedstoneWallTorch::RedstoneWallTorch(a_ClickedBlockFace, true);
+						return true;
+					}
+					case BLOCK_FACE_NONE:
+					case BLOCK_FACE_YM:
+						return false;
+				}
 			}
+			case BlockType::SoulTorch:
+			case BlockType::SoulWallTorch:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Block = Block::SoulTorch::SoulTorch();
+						return true;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Block = Block::SoulWallTorch::SoulWallTorch(a_ClickedBlockFace);
+						return true;
+					}
+					case BLOCK_FACE_NONE:
+					case BLOCK_FACE_YM:
+						return false;
+				}
+			}
+			default: return false;
 		}
-		return BLOCK_FACE_TOP;
 	}
 
 
@@ -105,55 +136,65 @@ private:
 
 
 	/** Returns true if the torch can be placed on the specified block's face. */
-	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_BlockFace)
+	static bool CanBePlacedOn(BlockState a_Block, eBlockFace a_BlockFace)
 	{
-		switch (a_BlockType)
+		if (cBlockStairsHandler::IsBlockStairs(a_Block) && cBlockStairsHandler::IsStairsTopHalf(a_Block))
 		{
-			case E_BLOCK_END_PORTAL_FRAME:
-			case E_BLOCK_SOULSAND:
+			return true;
+		}
+
+		if (cBlockSlabHandler::IsAnySlabType(a_Block))
+		{
+			if (cBlockSlabHandler::IsSlabTop(a_Block) && a_BlockFace == eBlockFace::BLOCK_FACE_YP)
+			{
+				return true;
+			}
+			else if (cBlockSlabHandler::IsSlabFull(a_Block))
+			{
+				return (a_BlockFace != BLOCK_FACE_YM);
+			}
+		}
+
+		switch (a_Block.Type())
+		{
+			case BlockType::EndPortalFrame:
+			case BlockType::SoulSand:
 			{
 				// Exceptional vanilla behaviour
 				return true;
 			}
-			case E_BLOCK_GLASS:
-			case E_BLOCK_STAINED_GLASS:
-			case E_BLOCK_FENCE:
-			case E_BLOCK_NETHER_BRICK_FENCE:
-			case E_BLOCK_SPRUCE_FENCE:
-			case E_BLOCK_BIRCH_FENCE:
-			case E_BLOCK_JUNGLE_FENCE:
-			case E_BLOCK_DARK_OAK_FENCE:
-			case E_BLOCK_ACACIA_FENCE:
-			case E_BLOCK_COBBLESTONE_WALL:
+			case BlockType::Glass:
+			case BlockType::BlackStainedGlass:
+			case BlockType::BlueStainedGlass:
+			case BlockType::BrownStainedGlass:
+			case BlockType::CyanStainedGlass:
+			case BlockType::GrayStainedGlass:
+			case BlockType::GreenStainedGlass:
+			case BlockType::LightBlueStainedGlass:
+			case BlockType::LightGrayStainedGlass:
+			case BlockType::LimeStainedGlass:
+			case BlockType::MagentaStainedGlass:
+			case BlockType::OrangeStainedGlass:
+			case BlockType::PinkStainedGlass:
+			case BlockType::PurpleStainedGlass:
+			case BlockType::RedStainedGlass:
+			case BlockType::YellowStainedGlass:
+			case BlockType::WhiteStainedGlass:
+			case BlockType::AcaciaFence:
+			case BlockType::BirchFence:
+			case BlockType::DarkOakFence:
+			case BlockType::JungleFence:
+			case BlockType::NetherBrickFence:
+			case BlockType::OakFence:
+			case BlockType::SpruceFence:
+			case BlockType::WarpedFence:
 			{
 				// Torches can only be placed on top of these blocks
 				return (a_BlockFace == BLOCK_FACE_YP);
 			}
-			case E_BLOCK_STONE_SLAB:
-			case E_BLOCK_WOODEN_SLAB:
-			{
-				// Toches can be placed only on the top of top-half-slabs
-				return ((a_BlockFace == BLOCK_FACE_YP) && ((a_BlockMeta & 0x08) == 0x08));
-			}
-			case E_BLOCK_OAK_WOOD_STAIRS:
-			case E_BLOCK_COBBLESTONE_STAIRS:
-			case E_BLOCK_BRICK_STAIRS:
-			case E_BLOCK_STONE_BRICK_STAIRS:
-			case E_BLOCK_NETHER_BRICK_STAIRS:
-			case E_BLOCK_SANDSTONE_STAIRS:
-			case E_BLOCK_SPRUCE_WOOD_STAIRS:
-			case E_BLOCK_BIRCH_WOOD_STAIRS:
-			case E_BLOCK_JUNGLE_WOOD_STAIRS:
-			case E_BLOCK_QUARTZ_STAIRS:
-			case E_BLOCK_ACACIA_WOOD_STAIRS:
-			case E_BLOCK_DARK_OAK_WOOD_STAIRS:
-			case E_BLOCK_RED_SANDSTONE_STAIRS:
-			{
-				return (a_BlockFace == BLOCK_FACE_TOP) && (a_BlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
-			}
 			default:
 			{
-				if (cBlockInfo::FullyOccupiesVoxel(a_BlockType))
+				if (cBlockInfo::FullyOccupiesVoxel(a_Block))
 				{
 					// Torches can be placed on all sides of full blocks except the bottom
 					return (a_BlockFace != BLOCK_FACE_YM);
@@ -175,10 +216,8 @@ private:
 		{
 			auto Face = static_cast<eBlockFace>(i);
 			auto NeighborPos = AddFaceDirection(a_TorchPos, Face, true);
-			BLOCKTYPE NeighborBlockType;
-			NIBBLETYPE NeighborBlockMeta;
-			a_ChunkInterface.GetBlockTypeMeta(NeighborPos, NeighborBlockType, NeighborBlockMeta);
-			if (CanBePlacedOn(NeighborBlockType, NeighborBlockMeta, Face))
+			auto Neighbor = a_ChunkInterface.GetBlock(NeighborPos);
+			if (CanBePlacedOn(Neighbor, Face))
 			{
 				return Face;
 			}
@@ -192,68 +231,35 @@ private:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		auto Face = MetaDataToBlockFace(a_Chunk.GetMeta(a_RelPos));
+		eBlockFace Face;
+		auto Self = a_Chunk.GetBlock(a_RelPos);
+		switch (Self.Type())
+		{
+			case BlockType::Torch:             Face = eBlockFace::BLOCK_FACE_YP; break;
+			case BlockType::WallTorch:         Face = Block::WallTorch::Facing(Self); break;
+			case BlockType::RedstoneTorch:     Face = eBlockFace::BLOCK_FACE_YP; break;
+			case BlockType::RedstoneWallTorch: Face = Block::RedstoneWallTorch::Facing(Self); break;
+			case BlockType::SoulTorch:         Face = eBlockFace::BLOCK_FACE_YP; break;
+			case BlockType::SoulWallTorch:     Face = Block::SoulWallTorch::Facing(Self); break;
+			default: return false;
+		}
 		auto NeighborRelPos = AddFaceDirection(a_RelPos, Face, true);
-		BLOCKTYPE NeighborBlockType;
-		NIBBLETYPE NeighborBlockMeta;
-		if (!a_Chunk.UnboundedRelGetBlock(NeighborRelPos, NeighborBlockType, NeighborBlockMeta))
+		BlockState Neighbor;
+		if (!a_Chunk.UnboundedRelGetBlock(NeighborRelPos, Neighbor))
 		{
 			// Neighbor in an unloaded chunk, bail out without changint this.
 			return false;
 		}
 
-		return CanBePlacedOn(NeighborBlockType, NeighborBlockMeta, Face);
+		return CanBePlacedOn(Neighbor, Face);
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 0;
 	}
 } ;
-
-
-
-
-
-class cBlockTorchHandler final :
-	public cClearMetaOnDrop<cBlockTorchBaseHandler>
-{
-	using Super = cClearMetaOnDrop<cBlockTorchBaseHandler>;
-
-public:
-
-	using Super::Super;
-};
-
-
-
-
-
-class cBlockRedstoneTorchHandler final :
-	public cBlockTorchBaseHandler
-{
-	using Super = cBlockTorchBaseHandler;
-
-public:
-
-	using Super::Super;
-
-private:
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
-	{
-		// Always drop the ON torch, meta 0:
-		return { E_BLOCK_REDSTONE_TORCH_ON };
-	}
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
-	{
-		UNUSED(a_Meta);
-		return 0;
-	}
-};

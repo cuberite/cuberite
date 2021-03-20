@@ -218,8 +218,8 @@ namespace
 	constexpr cBlockStairsHandler                          BlockAndesiteStairsHandler(BlockType::AndesiteStairs);
 	constexpr cDefaultBlockHandler                         BlockAndesiteWallHandler(BlockType::AndesiteWall);
 	constexpr cBlockAnvilHandler                           BlockAnvilHandler(BlockType::Anvil);
-	constexpr cBlockMelonStemHandler                       BlockAttachedMelonStemHandler(BlockType::AttachedMelonStem);
-	constexpr cBlockPumpkinStemHandler                     BlockAttachedPumpkinStemHandler(BlockType::AttachedPumpkinStem);
+	constexpr cBlockAttachedMelonStemHandler               BlockAttachedMelonStemHandler(BlockType::AttachedMelonStem);
+	constexpr cBlockAttachedPumpkinStemHandler             BlockAttachedPumpkinStemHandler(BlockType::AttachedPumpkinStem);
 	constexpr cBlockFlowerHandler                          BlockAzureBluetHandler(BlockType::AzureBluet);
 	constexpr cDefaultBlockHandler                         BlockBambooHandler(BlockType::Bamboo);
 	constexpr cDefaultBlockHandler                         BlockBambooSaplingHandler(BlockType::BambooSapling);
@@ -230,7 +230,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockBedrockHandler(BlockType::Bedrock);
 	constexpr cDefaultBlockHandler                         BlockBeeNestHandler(BlockType::BeeNest);
 	constexpr cDefaultBlockHandler                         BlockBeehiveHandler(BlockType::Beehive);
-	constexpr cBlockCropsHandler<3>                        BlockBeetrootsHandler(BlockType::Beetroots);
+	constexpr cBlockCropsHandler                           BlockBeetrootsHandler(BlockType::Beetroots);
 	constexpr cDefaultBlockHandler                         BlockBellHandler(BlockType::Bell);
 	constexpr cBlockButtonHandler                          BlockBirchButtonHandler(BlockType::BirchButton);
 	constexpr cBlockDoorHandler                            BlockBirchDoorHandler(BlockType::BirchDoor);

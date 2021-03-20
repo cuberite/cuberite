@@ -205,5 +205,7 @@ private:
 	};
 } ;
 
-using cBlockMelonStemHandler   = cBlockStemsHandler<E_BLOCK_MELON,   E_ITEM_MELON_SEEDS>;
-using cBlockPumpkinStemHandler = cBlockStemsHandler<E_BLOCK_PUMPKIN, E_ITEM_PUMPKIN_SEEDS>;
+using cBlockMelonStemHandler   = cBlockStemsHandler<BlockType::MelonStem,                 Item::MelonSeeds>;
+using cBlockAttachedMelonStemHandler   = cBlockStemsHandler<BlockType::AttachedMelonStem, Item::MelonSeeds>;
+using cBlockPumpkinStemHandler = cBlockStemsHandler<BlockType::PumpkinStem,         Item::PumpkinSeeds>;
+using cBlockAttachedPumpkinStemHandler = cBlockStemsHandler<BlockType::AttachedPumpkinStem, Item::PumpkinSeeds>;
