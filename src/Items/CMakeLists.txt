@@ -50,6 +50,7 @@ target_sources(
 	ItemSapling.h
 	ItemSeeds.h
 	ItemShears.h
+	ItemShulkerBox.h
 	ItemShovel.h
 	ItemSign.h
 	ItemSlab.h

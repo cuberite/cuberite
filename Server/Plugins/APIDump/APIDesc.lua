@@ -13183,6 +13183,10 @@ end
 			},
 			Constants =
 			{
+				wtShulkerBox =
+				{
+					Notes = "A shulker box window",
+				},
 				wtAnimalChest =
 				{
 					Notes = "A horse or donkey window",

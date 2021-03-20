@@ -75,6 +75,7 @@ const AString cWindow::GetWindowTypeName(void) const
 		case wtHopper:      return "minecraft:hopper";
 		case wtDropper:     return "minecraft:dropper";
 		case wtAnimalChest: return "EntityHorse";
+		case wtShulkerBox:  return "minecraft:shulker_box";
 		default:
 		{
 			ASSERT(!"Unknown inventory type!");

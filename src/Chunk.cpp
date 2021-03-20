@@ -26,6 +26,7 @@
 #include "BlockEntities/MobHeadEntity.h"
 #include "BlockEntities/MobSpawnerEntity.h"
 #include "BlockEntities/NoteEntity.h"
+#include "BlockEntities/ShulkerBoxEntity.h"
 #include "BlockEntities/SignEntity.h"
 #include "Entities/Pickup.h"
 #include "Item.h"
@@ -1847,6 +1848,30 @@ bool cChunk::ForEachFurnace(cFurnaceCallback a_Callback)
 
 
 
+bool cChunk::ForEachShulkerBox(cShulkerBoxCallback a_Callback)
+{
+	return GenericForEachBlockEntity<cShulkerBoxEntity,
+		E_BLOCK_BLACK_SHULKER_BOX,
+		E_BLOCK_BLUE_SHULKER_BOX,
+		E_BLOCK_BROWN_SHULKER_BOX,
+		E_BLOCK_CYAN_SHULKER_BOX,
+		E_BLOCK_GRAY_SHULKER_BOX,
+		E_BLOCK_GREEN_SHULKER_BOX,
+		E_BLOCK_LIGHT_BLUE_SHULKER_BOX,
+		E_BLOCK_LIGHT_GRAY_SHULKER_BOX,
+		E_BLOCK_LIME_SHULKER_BOX,
+		E_BLOCK_MAGENTA_SHULKER_BOX,
+		E_BLOCK_ORANGE_SHULKER_BOX,
+		E_BLOCK_PINK_SHULKER_BOX,
+		E_BLOCK_RED_SHULKER_BOX,
+		E_BLOCK_YELLOW_SHULKER_BOX
+	>(a_Callback);
+}
+
+
+
+
+
 template <class tyEntity, BLOCKTYPE... tBlocktype>
 bool cChunk::GenericDoWithBlockEntityAt(Vector3i a_Position, cFunctionRef<bool(tyEntity &)> a_Callback)
 {
@@ -2018,6 +2043,30 @@ bool cChunk::DoWithFlowerPotAt(Vector3i a_Position, cFlowerPotCallback a_Callbac
 {
 	return GenericDoWithBlockEntityAt<cFlowerPotEntity,
 		E_BLOCK_FLOWER_POT
+	>(a_Position, a_Callback);
+}
+
+
+
+
+
+bool cChunk::DoWithShulkerBoxAt(Vector3i a_Position, cShulkerBoxCallback a_Callback)
+{
+	return GenericDoWithBlockEntityAt<cShulkerBoxEntity,
+		E_BLOCK_BLACK_SHULKER_BOX,
+		E_BLOCK_BLUE_SHULKER_BOX,
+		E_BLOCK_BROWN_SHULKER_BOX,
+		E_BLOCK_CYAN_SHULKER_BOX,
+		E_BLOCK_GRAY_SHULKER_BOX,
+		E_BLOCK_GREEN_SHULKER_BOX,
+		E_BLOCK_LIGHT_BLUE_SHULKER_BOX,
+		E_BLOCK_LIGHT_GRAY_SHULKER_BOX,
+		E_BLOCK_LIME_SHULKER_BOX,
+		E_BLOCK_MAGENTA_SHULKER_BOX,
+		E_BLOCK_ORANGE_SHULKER_BOX,
+		E_BLOCK_PINK_SHULKER_BOX,
+		E_BLOCK_RED_SHULKER_BOX,
+		E_BLOCK_YELLOW_SHULKER_BOX
 	>(a_Position, a_Callback);
 }
 

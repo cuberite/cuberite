@@ -13,6 +13,7 @@
 #include "Enchantments.h"
 #include "WorldStorage/FireworksSerializer.h"
 #include "Color.h"
+#include "WorldStorage/BlockEntityTagSerializer.h"
 
 
 
@@ -200,6 +201,7 @@ public:
 	int            m_RepairCost;
 	cFireworkItem  m_FireworkItem;
 	cColor         m_ItemColor;
+	Json::Value    m_BlockEntityTag;
 };
 // tolua_end
 
