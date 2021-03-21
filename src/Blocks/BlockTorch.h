@@ -78,7 +78,9 @@ private:
 					}
 					case BLOCK_FACE_NONE:
 					case BLOCK_FACE_YM:
+					{
 						return false;
+					}
 				}
 			}
 			case BlockType::RedstoneTorch:
@@ -101,7 +103,9 @@ private:
 					}
 					case BLOCK_FACE_NONE:
 					case BLOCK_FACE_YM:
+					{
 						return false;
+					}
 				}
 			}
 			case BlockType::SoulTorch:
@@ -124,7 +128,9 @@ private:
 					}
 					case BLOCK_FACE_NONE:
 					case BLOCK_FACE_YM:
+					{
 						return false;
+					}
 				}
 			}
 			default: return false;
@@ -145,7 +151,7 @@ private:
 
 		if (cBlockSlabHandler::IsAnySlabType(a_Block))
 		{
-			if (cBlockSlabHandler::IsSlabTop(a_Block) && a_BlockFace == eBlockFace::BLOCK_FACE_YP)
+			if (cBlockSlabHandler::IsSlabTop(a_Block) && (a_BlockFace == eBlockFace::BLOCK_FACE_YP))
 			{
 				return true;
 			}

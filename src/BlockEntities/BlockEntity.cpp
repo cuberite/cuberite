@@ -43,7 +43,7 @@ cBlockEntity::cBlockEntity(BlockState a_Block, const Vector3i a_Pos, cWorld * co
 
 OwnedBlockEntity cBlockEntity::Clone(const Vector3i a_Pos)
 {
-	auto res = CreateByBlockType(m_BlockType, m_BlockMeta, a_Pos, nullptr);
+	auto res = CreateByBlockType(m_Block, a_Pos, nullptr);
 	res->CopyFrom(*this);
 	return res;
 }
@@ -64,8 +64,7 @@ cItems cBlockEntity::ConvertToPickups() const
 void cBlockEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	// Nothing to copy, but check that we're copying the right entity:
-	ASSERT(m_BlockType == a_Src.m_BlockType);
-	ASSERT(m_BlockMeta == a_Src.m_BlockMeta);
+	ASSERT(m_Block == a_Src.m_Block);
 }
 
 

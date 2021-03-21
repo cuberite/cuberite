@@ -53,9 +53,6 @@ public:
 
 	// tolua_begin
 
-	/** Modifies the block coords to match the dropspenser direction given (where the dropspensed pickups should materialize) */
-	void AddDropSpenserDir(Vector3i & a_RelCoord, unsigned char a_Direction);
-
 	/** Sets the dropspenser to dropspense an item in the next tick */
 	void Activate(void);
 

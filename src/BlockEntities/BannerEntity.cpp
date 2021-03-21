@@ -8,13 +8,15 @@
 
 #include "../World.h"
 #include "../ClientHandle.h"
+#include "../Chunk.h"
+#include "../Registries/BlockTypeItemTypeConverter.h"
 #include "../Blocks/BlockBanner.h"
 
 
 
 
 
-cBannerEntity::cBannerEntity(BlocState a_Block, Vector3i a_Pos, cWorld * a_World) :
+cBannerEntity::cBannerEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World) :
 	cBannerEntity(a_Block, a_Pos, a_World, 1)
 {
 }
@@ -28,6 +30,33 @@ cBannerEntity::cBannerEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_Worl
 	m_BaseColor(a_BaseColor)
 {
 	ASSERT(cBlockBannerHandler::IsBlockBanner(a_Block));
+}
+
+
+
+
+
+unsigned char cBannerEntity::GetBaseColor() const
+{
+	return m_BaseColor;
+}
+
+
+
+
+
+void cBannerEntity::SetBaseColor(const unsigned char a_Color)
+{
+	m_BaseColor = a_Color;
+}
+
+
+
+
+
+cItems cBannerEntity::ConvertToPickups() const
+{
+	return cItem(BlockItemConverter::FromBlock(m_Block.Type()));
 }
 
 
@@ -55,25 +84,8 @@ void cBannerEntity::SendTo(cClientHandle & a_Client)
 
 
 
-cItems cBannerEntity::ConvertToPickups() const
+bool cBannerEntity::UsedBy(cPlayer * a_Player)
 {
-	return cItem(E_ITEM_BANNER, 1, static_cast<NIBBLETYPE>(GetBaseColor()));
-}
-
-
-
-
-
-unsigned char cBannerEntity::GetBaseColor() const
-{
-	return m_BaseColor;
-}
-
-
-
-
-
-void cBannerEntity::SetBaseColor(const unsigned char a_Color)
-{
-	m_BaseColor = a_Color;
+	UNUSED(a_Player);
+	return false;
 }

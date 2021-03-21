@@ -39,20 +39,20 @@ void cHopperEntity::SetLocked(bool a_Value)
 
 
 
-std::pair<bool, Vector3i> cHopperEntity::GetOutputBlockPos(NIBBLETYPE a_BlockMeta)
+std::pair<bool, Vector3i> cHopperEntity::GetOutputBlockPos(BlockState a_Block)
 {
-	auto pos = GetPos();
-	switch (a_BlockMeta)
+	auto Pos = GetPos();
+	switch (Block::Hopper::Facing(a_Block))
 	{
-		case E_META_HOPPER_FACING_XM: return {true, pos.addedX(-1)};
-		case E_META_HOPPER_FACING_XP: return {true, pos.addedX( 1)};
-		case E_META_HOPPER_FACING_YM: return {true, pos.addedY(-1)};
-		case E_META_HOPPER_FACING_ZM: return {true, pos.addedZ(-1)};
-		case E_META_HOPPER_FACING_ZP: return {true, pos.addedZ( 1)};
+		case BLOCK_FACE_XM: return {true, Pos.addedX(-1)};
+		case BLOCK_FACE_XP: return {true, Pos.addedX( 1)};
+		case BLOCK_FACE_YM: return {true, Pos.addedY(-1)};
+		case BLOCK_FACE_ZM: return {true, Pos.addedZ(-1)};
+		case BLOCK_FACE_ZP: return {true, Pos.addedZ( 1)};
 		default:
 		{
 			// Not attached
-			return {false, pos};
+			return {false, Pos};
 		}
 	}
 }
@@ -162,39 +162,39 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 	}
 
 	// Try moving an item in:
-	bool res = false;
-	switch (a_Chunk.GetBlock(GetRelPos().addedY(1)))
+	bool Res = false;
+	switch (a_Chunk.GetBlock(GetRelPos().addedY(1)).Type())
 	{
-		case E_BLOCK_TRAPPED_CHEST:
-		case E_BLOCK_CHEST:
+		case BlockType::Chest:
+		case BlockType::TrappedChest:
 		{
 			// Chests have special handling because of double-chests
-			res = MoveItemsFromChest(a_Chunk);
+			Res = MoveItemsFromChest(a_Chunk);
 			break;
 		}
-		case E_BLOCK_LIT_FURNACE:
-		case E_BLOCK_FURNACE:
+		case BlockType::Furnace:
 		{
 			// Furnaces have special handling because only the output and leftover fuel buckets shall be moved
-			res = MoveItemsFromFurnace(a_Chunk);
+			Res = MoveItemsFromFurnace(a_Chunk);
 			break;
 		}
-		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER:
-		case E_BLOCK_HOPPER:
+		case BlockType::Dispenser:
+		case BlockType::Dropper:
+		case BlockType::Hopper:
 		{
-			res = MoveItemsFromGrid(*static_cast<cBlockEntityWithItems *>(a_Chunk.GetBlockEntity(this->GetPos().addedY(1))));
+			Res = MoveItemsFromGrid(*static_cast<cBlockEntityWithItems *>(a_Chunk.GetBlockEntity(this->GetPos().addedY(1))));
 			break;
 		}
+		default: break;
 	}
 
 	// If the item has been moved, reset the last tick:
-	if (res)
+	if (Res)
 	{
 		m_LastMoveItemsInTick = a_CurrentTick;
 	}
 
-	return res;
+	return Res;
 }
 
 
@@ -299,69 +299,69 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 	}
 
 	// Get the coords of the block where to output items:
-	auto meta = a_Chunk.GetMeta(GetRelPos());
-	auto out = GetOutputBlockPos(meta);
-	if (!out.first)
+	auto Self = a_Chunk.GetBlock(GetRelPos());
+	auto Out = GetOutputBlockPos(Self);
+	if (!Out.first)
 	{
 		// Not attached to another container
 		return false;
 	}
-	if (out.second.y < 0)
+	if (Out.second.y < 0)
 	{
 		// Cannot output below the zero-th block level
 		return false;
 	}
 
 	// Convert coords to relative:
-	auto relCoord = cChunkDef::AbsoluteToRelative(out.second);
-	auto destChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relCoord);
-	if (destChunk == nullptr)
+	auto RelCoord = cChunkDef::AbsoluteToRelative(Out.second);
+	auto DestChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelCoord);
+	if (DestChunk == nullptr)
 	{
 		// The destination chunk has been unloaded, don't tick
 		return false;
 	}
 
 	// Call proper moving function, based on the blocktype present at the coords:
-	bool res = false;
-	auto absCoord = destChunk->RelativeToAbsolute(relCoord);
-	switch (destChunk->GetBlock(relCoord))
+	bool Res = false;
+	auto AbsCoord = DestChunk->RelativeToAbsolute(RelCoord);
+	switch (DestChunk->GetBlock(RelCoord).Type())
 	{
-		case E_BLOCK_TRAPPED_CHEST:
-		case E_BLOCK_CHEST:
+		case BlockType::TrappedChest:
+		case BlockType::Chest:
 		{
 			// Chests have special handling because of double-chests
-			res = MoveItemsToChest(*destChunk, absCoord);
+			Res = MoveItemsToChest(*DestChunk, AbsCoord);
 			break;
 		}
-		case E_BLOCK_LIT_FURNACE:
-		case E_BLOCK_FURNACE:
+		case BlockType::Furnace:
 		{
 			// Furnaces have special handling because of the direction-to-slot relation
-			res = MoveItemsToFurnace(*destChunk, absCoord, meta);
+			Res = MoveItemsToFurnace(*DestChunk, AbsCoord, Self);
 			break;
 		}
-		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER:
-		case E_BLOCK_HOPPER:
+		case BlockType::Dispenser:
+		case BlockType::Dropper:
+		case BlockType::Hopper:
 		{
-			auto blockEntity = static_cast<cBlockEntityWithItems *>(destChunk->GetBlockEntity(absCoord));
+			auto blockEntity = static_cast<cBlockEntityWithItems *>(DestChunk->GetBlockEntity(AbsCoord));
 			if (blockEntity == nullptr)
 			{
-				FLOGWARNING("{0}: A block entity was not found where expected at {1}", __FUNCTION__, absCoord);
+				FLOGWARNING("{0}: A block entity was not found where expected at {1}", __FUNCTION__, AbsCoord);
 				return false;
 			}
-			res = MoveItemsToGrid(*blockEntity);
+			Res = MoveItemsToGrid(*blockEntity);
 			break;
 		}
+		default: break;
 	}
 
 	// If the item has been moved, reset the last tick:
-	if (res)
+	if (Res)
 	{
 		m_LastMoveItemsOutTick = a_CurrentTick;
 	}
 
-	return res;
+	return Res;
 }
 
 
@@ -391,31 +391,31 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		{ 0, 1,  1},
 		{ 0, 1, -1},
 	} ;
-	for (const auto & ofs: neighborOfs)
+	for (const auto & Offset: neighborOfs)
 	{
-		auto neighborRelCoord = ofs.addedXZ(m_RelX, m_RelZ);
-		auto neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(neighborRelCoord);
-		if (neighbor == nullptr)
+		auto NeighborRelCoord = Offset.addedXZ(m_RelX, m_RelZ);
+		auto DestChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(NeighborRelCoord);
+		if (DestChunk == nullptr)
 		{
 			continue;
 		}
 
-		BLOCKTYPE Block = neighbor->GetBlock(neighborRelCoord);
-		if (Block != mainChest->GetBlockType())
+		auto ChestBlock = DestChunk->GetBlock(NeighborRelCoord);
+		if (ChestBlock != mainChest->GetBlockType())
 		{
 			// Not the same kind of chest
 			continue;
 		}
 
-		auto neighborAbsCoord = neighbor->RelativeToAbsolute(neighborRelCoord);
-		auto sideChest = static_cast<cChestEntity *>(neighbor->GetBlockEntity(neighborAbsCoord));
-		if (sideChest == nullptr)
+		auto DestChunkAbsCoord = DestChunk->RelativeToAbsolute(NeighborRelCoord);
+		auto SideChest = static_cast<cChestEntity *>(DestChunk->GetBlockEntity(DestChunkAbsCoord));
+		if (SideChest == nullptr)
 		{
-			FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, neighborAbsCoord);
+			FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, DestChunkAbsCoord);
 		}
 		else
 		{
-			if (MoveItemsFromGrid(*sideChest))
+			if (MoveItemsFromGrid(*SideChest))
 			{
 				return true;
 			}
@@ -554,10 +554,10 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 		{ 0, 0,  1},
 		{ 0, 0, -1},
 	} ;
-	auto relCoord = cChunkDef::AbsoluteToRelative(a_Coords);
-	for (const auto & ofs: neighborOfs)
+	auto RelCoord = cChunkDef::AbsoluteToRelative(a_Coords);
+	for (const auto & Offset: neighborOfs)
 	{
-		auto otherHalfRelCoord = relCoord + ofs;
+		auto otherHalfRelCoord = RelCoord + Offset;
 		auto neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(otherHalfRelCoord);
 		if (neighbor == nullptr)
 		{
@@ -571,10 +571,10 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 			continue;
 		}
 
-		auto chest = static_cast<cChestEntity *>(neighbor->GetBlockEntity(a_Coords + ofs));
+		auto chest = static_cast<cChestEntity *>(neighbor->GetBlockEntity(a_Coords + Offset));
 		if (chest == nullptr)
 		{
-			FLOGWARNING("{0}: A chest entity was not found where expected, at {1} ({2}, {3}})", __FUNCTION__, a_Coords + ofs, ofs.x, ofs.z);
+			FLOGWARNING("{0}: A chest entity was not found where expected, at {1} ({2}, {3}})", __FUNCTION__, a_Coords + Offset, Offset.x, Offset.z);
 			continue;
 		}
 		return MoveItemsToGrid(*chest);
@@ -588,10 +588,10 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 
 
 
-bool cHopperEntity::MoveItemsToFurnace(cChunk & a_Chunk, Vector3i a_Coords, NIBBLETYPE a_HopperMeta)
+bool cHopperEntity::MoveItemsToFurnace(cChunk & a_Chunk, Vector3i a_Coords, BlockState a_Hopper)
 {
 	auto furnace = static_cast<cFurnaceEntity *>(a_Chunk.GetBlockEntity(a_Coords));
-	if (a_HopperMeta == E_META_HOPPER_FACING_YM)
+	if (Block::Hopper::Facing(a_Hopper) == BLOCK_FACE_YM)
 	{
 		// Feed the input slot of the furnace
 		return MoveItemsToSlot(*furnace, cFurnaceEntity::fsInput);
