@@ -7,7 +7,7 @@
 
 
 
-class cBlockOreHandler :
+class cBlockOreHandler:
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -15,10 +15,6 @@ class cBlockOreHandler :
 public:
 
 	using Super::Super;
-
-protected:
-
-	~cBlockOreHandler() = default;
 
 private:
 

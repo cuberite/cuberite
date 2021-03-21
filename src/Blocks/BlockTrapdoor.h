@@ -141,7 +141,7 @@ private:
 	) const override
 	{
 		bool IsBottom = false;
-		eBlockFace DestFacing;
+		eBlockFace DestFacing = BLOCK_FACE_NONE;
 		switch (a_ClickedBlockFace)
 		{
 			case BLOCK_FACE_NONE: return false;
@@ -167,6 +167,11 @@ private:
 				break;
 			}
 			case BLOCK_FACE_YP: break;
+		}
+
+		if (DestFacing == BLOCK_FACE_NONE)
+		{
+			return false;
 		}
 
 		using namespace Block;
