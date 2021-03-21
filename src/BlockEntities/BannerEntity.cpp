@@ -8,6 +8,8 @@
 
 #include "../World.h"
 #include "../ClientHandle.h"
+#include "../Chunk.h"
+#include "../Registries/BlockTypeItemTypeConverter.h"
 #include "../Blocks/BlockBanner.h"
 
 
@@ -54,7 +56,7 @@ void cBannerEntity::SetBaseColor(const unsigned char a_Color)
 
 cItems cBannerEntity::ConvertToPickups() const
 {
-	return cItem(E_ITEM_BANNER, 1, static_cast<NIBBLETYPE>(GetBaseColor()));
+	return cItem(BlockItemConverter::FromBlock(m_Block.Type()));
 }
 
 

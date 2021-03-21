@@ -66,7 +66,7 @@ void cChestEntity::OnRemoveFromWorld()
 void cChestEntity::SendTo(cClientHandle & a_Client)
 {
 	// Send a dummy "number of players with chest open" packet to make the chest visible:
-	a_Client.SendBlockAction(m_Pos.x, m_Pos.y, m_Pos.z, 1, 0, m_BlockType);
+	a_Client.SendBlockAction(m_Pos.x, m_Pos.y, m_Pos.z, 1, 0, m_Block);
 }
 
 
@@ -105,7 +105,7 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 		}
 	}
 
-	if (m_BlockType == E_BLOCK_CHEST)
+	if (m_Block.Type() == BlockType::Chest)
 	{
 		a_Player->GetStatManager().AddValue(Statistic::OpenChest);
 	}
@@ -149,7 +149,7 @@ void cChestEntity::ScanNeighbours()
 	// Callback for finding neighbouring chest:
 	auto FindNeighbour = [this](cChestEntity & a_Chest)
 	{
-		if (a_Chest.GetBlockType() != m_BlockType)
+		if (a_Chest.GetBlockType() != m_Block.Type())
 		{
 			// Neighboring block is not the same type of chest
 			return true;

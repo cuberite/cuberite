@@ -21,7 +21,7 @@ cEnchantingTableEntity::cEnchantingTableEntity(BlockState a_Block, Vector3i a_Po
 
 cItems cEnchantingTableEntity::ConvertToPickups() const
 {
-	cItem Item(E_BLOCK_ENCHANTMENT_TABLE);
+	cItem Item(Item::EnchantingTable);
 	Item.m_CustomName = m_CustomName;
 	return Item;
 }

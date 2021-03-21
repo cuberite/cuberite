@@ -229,7 +229,7 @@ protected:
 			2, 2, 2, 2,
 			3, 3,
 		} ;
-		auto Idx = m_MesaPattern.size() - 1;
+		auto Idx = static_cast<int>(m_MesaPattern.size() - 1);
 		while (Idx >= 0)
 		{
 			// A layer group of 1 - 2 color stained clay:
@@ -247,7 +247,7 @@ protected:
 				{
 					NumBlocks = 1;
 				}
-				NumBlocks = std::min(Idx + 1, NumBlocks);  // Limit by Idx so that we don't have to check inside the loop
+				NumBlocks = std::min<size_t>(Idx + 1, NumBlocks);  // Limit by Idx so that we don't have to check inside the loop
 				rnd /= 32;
 				for (size_t Block = 0; Block < NumBlocks; Block++, Idx--)
 				{

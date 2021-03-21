@@ -1108,6 +1108,17 @@ void cLuaState::Push(std::chrono::milliseconds a_Value)
 
 
 
+void cLuaState::Push(BlockState a_Block)
+{
+	ASSERT(IsValid());
+
+	tolua_pushnumber(m_LuaState, static_cast<lua_Number>(a_Block.ID));
+}
+
+
+
+
+
 void cLuaState::Pop(int a_NumValuesToPop)
 {
 	ASSERT(IsValid());

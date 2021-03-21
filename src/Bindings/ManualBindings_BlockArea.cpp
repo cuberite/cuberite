@@ -169,21 +169,21 @@ static int tolua_cBlockArea_FillRelCuboid(lua_State * a_LuaState)
 			(self->GetSize() - Vector3i{1, 1, 1})
 		);
 	}
-	int dataTypes = cBlockArea::baTypes | cBlockArea::baMetas | cBlockArea::baBlockEntities;
-	BLOCKTYPE blockType;
-	NIBBLETYPE blockMeta = 0, blockLight = 0, blockSkyLight = 0x0f;
-	if (!L.GetStackValues(nextIdx, dataTypes, blockType))
+	int DataTypes = cBlockArea::baTypes | cBlockArea::baMetas | cBlockArea::baBlockEntities;
+	unsigned char BlockType;
+	unsigned char BlockMeta = 0, BlockLight = 0, BlockSkyLight = 0x0f;
+	if (!L.GetStackValues(nextIdx, DataTypes, BlockType))
 	{
 		return L.ApiParamError("Cannot read the datatypes or block type params");
 	}
-	L.GetStackValues(nextIdx + 2, blockMeta, blockLight, blockSkyLight);  // These values are optional
-	if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
+	L.GetStackValues(nextIdx + 2, BlockMeta, BlockLight, BlockSkyLight);  // These values are optional
+	if (!cBlockArea::IsValidDataTypeCombination(DataTypes))
 	{
-		return L.ApiParamError("Invalid baDataTypes combination (%d)", dataTypes);
+		return L.ApiParamError("Invalid baDataTypes combination (%d)", DataTypes);
 	}
 
 	// Do the actual Fill:
-	self->FillRelCuboid(bounds, dataTypes, blockType, blockMeta, blockLight, blockSkyLight);
+	self->FillRelCuboid(bounds, DataTypes, PaletteUpgrade::FromBlock(BlockType, BlockMeta), BlockLight, BlockSkyLight);
 	return 0;
 }
 
@@ -219,10 +219,10 @@ static int tolua_cBlockArea_GetBlockTypeMeta(lua_State * a_LuaState)
 			coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}
-	BLOCKTYPE blockType;
-	NIBBLETYPE blockMeta;
-	self->GetBlockTypeMeta(coords.x, coords.y, coords.z, blockType, blockMeta);
-	L.Push(blockType, blockMeta);
+
+	auto Block = self->GetBlock({coords.x, coords.y, coords.z});
+	auto NumericBlock = PaletteUpgrade::ToBlock(Block);
+	L.Push(NumericBlock.first, NumericBlock.second);
 	return 2;
 }
 

@@ -53,7 +53,7 @@ char cBeaconEntity::CalculatePyramidLevel(void)
 		{
 			for (int Z = MiddleXZ - Layer; Z <= (MiddleXZ + Layer); Z++)
 			{
-				if (!IsMineralBlock(Area.GetRelBlockType(X, Y, Z)))
+				if (!IsMineralBlock(Area.GetRelBlock(X, Y, Z)))
 				{
 					return static_cast<char>(Layer - 1);
 				}
@@ -141,8 +141,8 @@ bool cBeaconEntity::IsBeaconBlocked(void)
 {
 	for (int Y = m_Pos.y; Y < cChunkDef::Height; ++Y)
 	{
-		BLOCKTYPE Block = m_World->GetBlock({m_Pos.x, Y, m_Pos.z});
-		if (!cBlockInfo::IsTransparent(Block))
+		auto Self = m_World->GetBlock({m_Pos.x, Y, m_Pos.z});
+		if (!cBlockInfo::IsTransparent(Self))
 		{
 			return true;
 		}

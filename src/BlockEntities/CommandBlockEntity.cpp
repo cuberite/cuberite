@@ -68,7 +68,7 @@ void cCommandBlockEntity::SetLastOutput(const AString & a_LastOut)
 
 
 
-void cCommandBlockEntity::SetResult(const NIBBLETYPE a_Result)
+void cCommandBlockEntity::SetResult(const unsigned char a_Result)
 {
 	m_Result = a_Result;
 }
@@ -95,7 +95,7 @@ const AString & cCommandBlockEntity::GetLastOutput(void) const
 
 
 
-NIBBLETYPE cCommandBlockEntity::GetResult(void) const
+unsigned char cCommandBlockEntity::GetResult(void) const
 {
 	return m_Result;
 }

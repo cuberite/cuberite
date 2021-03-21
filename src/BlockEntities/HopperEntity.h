@@ -42,7 +42,7 @@ public:
 	/** Returns the block coords of the block receiving the output items, based on the meta
 	Returns <false, undefined> if unattached.
 	Exported in ManualBindings.cpp. */
-	std::pair<bool, Vector3i> GetOutputBlockPos(unsigned char a_BlockMeta);
+	std::pair<bool, Vector3i> GetOutputBlockPos(BlockState a_Block);
 
 	void SetLocked(bool a_Value);
 

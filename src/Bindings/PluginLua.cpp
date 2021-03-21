@@ -230,7 +230,7 @@ bool cPluginLua::OnBlockSpread(cWorld & a_World, int a_BlockX, int a_BlockY, int
 bool cPluginLua::OnBlockToPickups(
 	cWorld & a_World,
 	Vector3i a_BlockPos,
-	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	BlockState a_Block,
 	const cBlockEntity * a_BlockEntity,
 	const cEntity * a_Digger,
 	const cItem * a_Tool,
@@ -243,7 +243,7 @@ bool cPluginLua::OnBlockToPickups(
 		&a_World,
 		a_Digger,
 		a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
-		a_BlockType, a_BlockMeta, &a_Pickups
+		a_Block, &a_Pickups
 	);
 }
 
@@ -592,18 +592,18 @@ bool cPluginLua::OnPlayerAnimation(cPlayer & a_Player, int a_Animation)
 
 
 
-bool cPluginLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BlockState a_Block)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_BREAKING_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_BREAKING_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Block);
 }
 
 
 
 
 
-bool cPluginLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BlockState a_Block)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_BROKEN_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_BROKEN_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Block);
 }
 
 
@@ -706,7 +706,7 @@ bool cPluginLua::OnPlayerPlacedBlock(cPlayer & a_Player, const sSetBlock & a_Blo
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_PLACED_BLOCK,
 		&a_Player,
 		a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(),
-		a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta
+		a_BlockChange.m_Block
 	);
 }
 
@@ -719,7 +719,7 @@ bool cPluginLua::OnPlayerPlacingBlock(cPlayer & a_Player, const sSetBlock & a_Bl
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_PLACING_BLOCK,
 		&a_Player,
 		a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(),
-		a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta
+		a_BlockChange.m_Block
 	);
 }
 
@@ -782,9 +782,9 @@ bool cPluginLua::OnPlayerTossingItem(cPlayer & a_Player)
 
 
 
-bool cPluginLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BlockState a_Block)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_USED_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_USED_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_Block);
 }
 
 
@@ -800,9 +800,9 @@ bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY
 
 
 
-bool cPluginLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BlockState a_Block)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_USING_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_USING_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_Block);
 }
 
 

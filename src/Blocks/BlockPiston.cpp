@@ -28,7 +28,7 @@ inline Vector3i cBlockPistonHandler::GetExtensionDirection(BlockState a_Block)
 		default: return Vector3i();
 	}
 
-	switch(Facing)
+	switch (Facing)
 	{
 		case BLOCK_FACE_NONE: return Vector3i();
 		case BLOCK_FACE_XM:   return Vector3i(-1,  0,  0);

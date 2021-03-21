@@ -47,7 +47,7 @@ public:  // tolua_export
 	}
 
 	/** Returns a unit vector in the cardinal direction of where the dispenser with the specified meta would be facing. */
-	static Vector3d GetShootVector(unsigned char a_BlockMeta);
+	static Vector3d GetShootVector(BlockState a_Self);
 
 	// tolua_end
 
@@ -57,7 +57,7 @@ private:
 	virtual void DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum) override;
 
 	/** If such a bucket can fit, adds it to m_Contents and returns true */
-	bool ScoopUpLiquid(int a_SlotNum, short a_ResultingBucketItemType);
+	bool ScoopUpLiquid(int a_SlotNum, Item a_ResultingBucketItemType);
 
 	/** If the a_BlockInFront can be washed away by liquid and the empty bucket can fit,
 	does the m_Contents processing and returns true. Returns false otherwise. */

@@ -93,7 +93,7 @@ bool cFurnaceEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_TimeCooked = std::max((m_TimeCooked - 2), 0);
 
 		// Reset progressbars, block type, and bail out
-		a_Chunk.FastSetBlock(GetRelPos(), Block::Furnace::Furnace(Block::Furnace::Facing(a_Chunk.GetBlock(GetRelPos())), true));
+		a_Chunk.FastSetBlock(GetRelPos(), Block::Furnace::Furnace(Block::Furnace::Facing(a_Chunk.GetBlock(GetRelPos())), false));
 		UpdateProgressBars();
 		return false;
 	}
@@ -416,7 +416,6 @@ void cFurnaceEntity::SetIsCooking(bool a_IsCooking)
 	// Only light the furnace as it is extinguished only when the fuel runs out, not when cooking stops - handled in this::Tick()
 	if (m_IsCooking)
 	{
-		m_BlockType = E_BLOCK_LIT_FURNACE;
-		m_World->FastSetBlock(m_Pos, E_BLOCK_LIT_FURNACE, m_BlockMeta);
+		m_World->FastSetBlock(GetRelPos(), Block::Furnace::Furnace(Block::Furnace::Facing(m_World->GetBlock(GetRelPos())), true));
 	}
 }
