@@ -38,11 +38,11 @@ private:
 			case BlockType::Dropper:   a_Block = Block::Dropper::Dropper(RotationToBlockFace(a_Player.GetYaw()), false); break;
 			default: return false;
 		}
+		return true;
 	}
 
 	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 11;
 	}
 } ;

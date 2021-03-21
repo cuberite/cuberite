@@ -12,8 +12,6 @@ public:
 
 	using Super::Super;
 
-private:
-
 	enum class Directions
 	{
 		East = 0,
@@ -23,29 +21,78 @@ private:
 		West = 4
 	};
 
+	static inline bool IsAttachedTo(BlockState a_Block, eBlockFace a_Face)
+	{
+		switch (a_Face)
+		{
+			case BLOCK_FACE_XM: return Block::Vine::West(a_Block);
+			case BLOCK_FACE_XP: return Block::Vine::East(a_Block);
+			case BLOCK_FACE_YP: return Block::Vine::Up(a_Block);
+			case BLOCK_FACE_ZM: return Block::Vine::North(a_Block);
+			case BLOCK_FACE_ZP: return Block::Vine::South(a_Block);
+			default: return false;
+		}
+	}
+
+	static inline bool OnlyAttachedTo(BlockState a_Block, eBlockFace a_Face)
+	{
+		using namespace Block;
+		switch (a_Face)
+		{
+			case BLOCK_FACE_XM: return (Vine::West(a_Block) &&  !(Vine::East(a_Block) || Vine::Up(a_Block)     || Vine::North(a_Block) || Vine::South(a_Block)));
+			case BLOCK_FACE_XP: return (Vine::East(a_Block) &&  !(Vine::West(a_Block) || Vine::Up(a_Block)     || Vine::North(a_Block) || Vine::South(a_Block)));
+			case BLOCK_FACE_YP: return (Vine::Up(a_Block) &&    !(Vine::East(a_Block) || Vine::West(a_Block)   || Vine::North(a_Block) || Vine::South(a_Block)));
+			case BLOCK_FACE_ZM: return (Vine::North(a_Block) && !(Vine::East(a_Block) || Vine::West(a_Block)   || Vine::Up(a_Block)    || Vine::South(a_Block)));
+			case BLOCK_FACE_ZP: return (Vine::South(a_Block) && !(Vine::East(a_Block) || Vine::West(a_Block)   || Vine::Up(a_Block)    || Vine::North(a_Block)));
+			default: return false;
+		}
+	}
+
+private:
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface,
 		cPlayer & a_Player,
 		const Vector3i a_PlacedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos,
-		BlockState & a_BlockType
+		BlockState & a_Block
 	) const override
 	{
+		using namespace Block;
 		// TODO: Disallow placement where the vine doesn't attach to something properly
-		BLOCKTYPE BlockType = 0;
-		BlockState BlockMeta;
-		a_ChunkInterface.GetBlockTypeMeta(a_PlacedBlockPos, BlockType, BlockMeta);
-		if (BlockType == m_BlockType)
+		auto BlockToReplace = a_ChunkInterface.GetBlock(a_PlacedBlockPos);
+		if (BlockToReplace.Type() == m_BlockType)
 		{
-			a_BlockMeta = BlockMeta | DirectionToMetaData(a_ClickedBlockFace);
+			if (IsAttachedTo(BlockToReplace, a_ClickedBlockFace))
+			{
+				// There is already a vine at that rotation
+				return false;
+			}
+			switch (a_ClickedBlockFace)
+			{
+				//                                      East                         North                        South                        Up                        West
+				case BLOCK_FACE_XM: a_Block = Vine::Vine(Vine::East(BlockToReplace), Vine::North(BlockToReplace), Vine::South(BlockToReplace), Vine::Up(BlockToReplace), true);                       break;
+				case BLOCK_FACE_XP: a_Block = Vine::Vine(true,                       Vine::North(BlockToReplace), Vine::South(BlockToReplace), Vine::Up(BlockToReplace), Vine::West(BlockToReplace)); break;
+				case BLOCK_FACE_YP: a_Block = Vine::Vine(Vine::East(BlockToReplace), Vine::North(BlockToReplace), Vine::South(BlockToReplace), true,                     Vine::West(BlockToReplace)); break;
+				case BLOCK_FACE_ZM: a_Block = Vine::Vine(Vine::East(BlockToReplace), true,                        Vine::South(BlockToReplace), Vine::Up(BlockToReplace), Vine::West(BlockToReplace)); break;
+				case BLOCK_FACE_ZP: a_Block = Vine::Vine(Vine::East(BlockToReplace), Vine::North(BlockToReplace), true,                        Vine::Up(BlockToReplace), Vine::West(BlockToReplace)); break;
+				default: return false;
+			}
 		}
 		else
 		{
-			a_BlockMeta = DirectionToMetaData(a_ClickedBlockFace);
+			switch (a_ClickedBlockFace)
+			{
+				//                                       East   North  South  Up     West
+				case BLOCK_FACE_XM: a_Block = Vine::Vine(false, false, false, false, true); break;
+				case BLOCK_FACE_XP: a_Block = Vine::Vine(true,  false, false, false, false); break;
+				case BLOCK_FACE_YP: a_Block = Vine::Vine(false, false, false, true,  false); break;
+				case BLOCK_FACE_ZM: a_Block = Vine::Vine(false, true,  false, false, false); break;
+				case BLOCK_FACE_ZP: a_Block = Vine::Vine(false, false, true,  false, false); break;
+				default: return false;
+			}
 		}
-		a_BlockType = m_BlockType;
-		Block::Vine::Vine()
 		return true;
 	}
 
@@ -111,71 +158,72 @@ private:
 
 
 
-	/** Returns the meta that has the maximum allowable sides of the vine, given the surroundings */
-	static BlockState GetMaxMeta(cChunk & a_Chunk, Vector3i a_RelPos)
-	{
-		static const struct
-		{
-			int x, z;
-			BlockState Bit;
-		} Coords[] =
-		{
-			{ 0,  1, 1},  // south, ZP
-			{-1,  0, 2},  // west,  XM
-			{ 0, -1, 4},  // north, ZM
-			{ 1,  0, 8},  // east,  XP
-		} ;
-		BlockState res = 0;
-		for (auto & Coord : Coords)
-		{
-			BLOCKTYPE  BlockType;
-			BlockState BlockMeta;
-			auto checkPos = a_RelPos.addedXZ(Coord.x, Coord.z);
-			if (
-				a_Chunk.UnboundedRelGetBlock(checkPos.x, checkPos.y, checkPos.z, BlockType, BlockMeta) &&
-				IsBlockAttachable(BlockType)
-			)
-			{
-				res |= Coord.Bit;
-			}
-		}
-		return res;
-	}
-
-
-
-
-
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
 	{
-		a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk)
+		using namespace Block;
+		BlockState Self = a_ChunkInterface.GetBlock(a_BlockPos);
+
+		// If not attached - ignore
+		if (!IsAttachedTo(Self, a_WhichNeighbor))
 		{
-			const auto a_RelPos = cChunkDef::AbsoluteToRelative(a_BlockPos);
-			BlockState CurMeta = a_Chunk.GetMeta(a_RelPos);
-			BlockState MaxMeta = GetMaxMeta(a_Chunk, a_RelPos);
+			return;
+		}
 
-			// Check if vine above us, add its meta to MaxMeta
-			if ((a_RelPos.y < cChunkDef::Height - 1) && (a_Chunk.GetBlock(a_RelPos.addedY(1)) == m_BlockType))
-			{
-				MaxMeta |= a_Chunk.GetMeta(a_RelPos.addedY(1));
-			}
+		auto BlockToCheck = a_ChunkInterface.GetBlock(AddFaceDirection(a_BlockPos, a_WhichNeighbor));
 
-			BlockState Common = CurMeta & MaxMeta;  // Neighbors that we have and are legal
-			if (Common != CurMeta)
+		// If only attached to this face: destroy
+		if (OnlyAttachedTo(Self, a_WhichNeighbor) && !IsBlockAttachable(BlockToCheck))
+		{
+			a_ChunkInterface.SetBlock(a_BlockPos, Block::Air::Air());
+			return;
+		}
+
+		switch (a_WhichNeighbor)
+		{
+			case BLOCK_FACE_XM:
 			{
-				// There is a neighbor missing, need to update the meta or even destroy the block
-				bool HasTop = (a_RelPos.y < cChunkDef::Height - 1) && IsBlockAttachable(a_Chunk.GetBlock(a_RelPos.addedY(1)));
-				if ((Common == 0) && !HasTop)
+				if (!IsBlockAttachable(BlockToCheck))
 				{
-					// The vine just lost all its support, destroy the block:
-					a_Chunk.SetBlock(a_RelPos, BlockType::AIR, 0);
-					return false;
+					Self = Vine::Vine(Vine::East(Self), Vine::North(Self), Vine::South(Self), Vine::Up(Self), false);
 				}
-				a_Chunk.SetBlock(a_RelPos, m_BlockType, Common);
+				break;
 			}
-
-			return false;
-		});
+			case BLOCK_FACE_XP:
+			{
+				if (!IsBlockAttachable(BlockToCheck))
+				{
+					Self = Vine::Vine(false, Vine::North(Self), Vine::South(Self), Vine::Up(Self), Vine::West(Self));
+				}
+				break;
+			}
+			case BLOCK_FACE_YP:
+			{
+				if (!IsBlockAttachable(BlockToCheck))
+				{
+					Self = Vine::Vine(Vine::East(Self), Vine::North(Self), Vine::South(Self), false, Vine::West(Self));
+				}
+				break;
+			}
+			case BLOCK_FACE_ZM:
+			{
+				if (!IsBlockAttachable(BlockToCheck))
+				{
+					Self = Vine::Vine(Vine::East(Self), false, Vine::South(Self), Vine::Up(Self), Vine::West(Self));
+				}
+				break;
+			}
+			case BLOCK_FACE_ZP:
+			{
+				if (!IsBlockAttachable(BlockToCheck))
+				{
+					Self = Vine::Vine(Vine::East(Self), Vine::North(Self), false, Vine::Up(Self), Vine::West(Self));
+				}
+				break;
+			}
+			default: break;
+		}
+		a_ChunkInterface.SetBlock(a_BlockPos, Self);
+		return;
 	}
 
 

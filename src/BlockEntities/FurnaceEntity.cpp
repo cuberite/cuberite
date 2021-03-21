@@ -93,8 +93,7 @@ bool cFurnaceEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_TimeCooked = std::max((m_TimeCooked - 2), 0);
 
 		// Reset progressbars, block type, and bail out
-		m_BlockType = E_BLOCK_FURNACE;
-		a_Chunk.FastSetBlock(GetRelPos(), E_BLOCK_FURNACE, m_BlockMeta);
+		a_Chunk.FastSetBlock(GetRelPos(), Block::Furnace::Furnace(Block::Furnace::Facing(a_Chunk.GetBlock(GetRelPos())), true));
 		UpdateProgressBars();
 		return false;
 	}
@@ -231,7 +230,7 @@ void cFurnaceEntity::BurnNewFuel(void)
 	SetIsCooking(true);
 	if (m_Contents.GetSlot(fsFuel).m_ItemType == E_ITEM_LAVA_BUCKET)
 	{
-		m_Contents.SetSlot(fsFuel, cItem(E_ITEM_BUCKET));
+		m_Contents.SetSlot(fsFuel, cItem(Item::Bucket));
 	}
 	else
 	{

@@ -78,7 +78,7 @@ private:
 	) const override
 	{
 		using namespace Block;
-		enum Lever::Face Face;
+		enum Lever::Face Face = Lever::Face::Floor;
 		switch (a_ClickedBlockFace)
 		{
 			case BLOCK_FACE_TOP:    Face = Lever::Face::Floor; break;

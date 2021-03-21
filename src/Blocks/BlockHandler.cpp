@@ -49,6 +49,7 @@
 #include "BlockGrass.h"
 #include "BlockGravel.h"
 #include "BlockHopper.h"
+#include "BlockHayBale.h"
 #include "BlockHugeMushroom.h"
 #include "BlockIce.h"
 #include "BlockJukebox.h"
@@ -56,6 +57,7 @@
 #include "BlockLeaves.h"
 #include "BlockLever.h"
 #include "BlockLilypad.h"
+#include "BlockLog.h"
 #include "BlockMelon.h"
 #include "BlockMobHead.h"
 #include "BlockMobSpawner.h"
@@ -199,7 +201,7 @@ namespace
 	constexpr cBlockFenceHandler                           BlockAcaciaFenceHandler(BlockType::AcaciaFence);
 	constexpr cBlockFenceGateHandler                       BlockAcaciaFenceGateHandler(BlockType::AcaciaFenceGate);
 	constexpr cBlockLeavesHandler                          BlockAcaciaLeavesHandler(BlockType::AcaciaLeaves);
-	constexpr cBlockSidewaysHandler                        BlockAcaciaLogHandler(BlockType::AcaciaLog);
+	constexpr cBlockLogHandler                             BlockAcaciaLogHandler(BlockType::AcaciaLog);
 	constexpr cBlockPlanksHandler                          BlockAcaciaPlanksHandler(BlockType::AcaciaPlanks);
 	constexpr cBlockPressurePlateHandler                   BlockAcaciaPressurePlateHandler(BlockType::AcaciaPressurePlate);
 	constexpr cBlockSaplingHandler                         BlockAcaciaSaplingHandler(BlockType::AcaciaSapling);
@@ -237,7 +239,7 @@ namespace
 	constexpr cBlockFenceHandler                           BlockBirchFenceHandler(BlockType::BirchFence);
 	constexpr cBlockFenceGateHandler                       BlockBirchFenceGateHandler(BlockType::BirchFenceGate);
 	constexpr cBlockLeavesHandler                          BlockBirchLeavesHandler(BlockType::BirchLeaves);
-	constexpr cBlockSidewaysHandler                        BlockBirchLogHandler(BlockType::BirchLog);
+	constexpr cBlockLogHandler                             BlockBirchLogHandler(BlockType::BirchLog);
 	constexpr cBlockPlanksHandler                          BlockBirchPlanksHandler(BlockType::BirchPlanks);
 	constexpr cBlockPressurePlateHandler                   BlockBirchPressurePlateHandler(BlockType::BirchPressurePlate);
 	constexpr cBlockSaplingHandler                         BlockBirchSaplingHandler(BlockType::BirchSapling);
@@ -246,7 +248,7 @@ namespace
 	constexpr cBlockStairsHandler                          BlockBirchStairsHandler(BlockType::BirchStairs);
 	constexpr cBlockTrapdoorHandler                        BlockBirchTrapdoorHandler(BlockType::BirchTrapdoor);
 	constexpr cBlockWallSignHandler                        BlockBirchWallSignHandler(BlockType::BirchWallSign);
-	constexpr cBlockWoodHandler                            BlockBirchWoodHandler(BlockType::BirchWood);
+	constexpr cDefaultBlockHandler                         BlockBirchWoodHandler(BlockType::BirchWood);
 	constexpr cDefaultBlockHandler                         BlockBlackBannerHandler(BlockType::BlackBanner);
 	constexpr cBlockBedHandler                             BlockBlackBedHandler(BlockType::BlackBed);
 	constexpr cBlockCarpetHandler                          BlockBlackCarpetHandler(BlockType::BlackCarpet);
@@ -389,7 +391,7 @@ namespace
 	constexpr cBlockFenceHandler                           BlockDarkOakFenceHandler(BlockType::DarkOakFence);
 	constexpr cBlockFenceGateHandler                       BlockDarkOakFenceGateHandler(BlockType::DarkOakFenceGate);
 	constexpr cBlockLeavesHandler                          BlockDarkOakLeavesHandler(BlockType::DarkOakLeaves);
-	constexpr cBlockSidewaysHandler                        BlockDarkOakLogHandler(BlockType::DarkOakLog);
+	constexpr cBlockLogHandler                             BlockDarkOakLogHandler(BlockType::DarkOakLog);
 	constexpr cBlockPlanksHandler                          BlockDarkOakPlanksHandler(BlockType::DarkOakPlanks);
 	constexpr cBlockPressurePlateHandler                   BlockDarkOakPressurePlateHandler(BlockType::DarkOakPressurePlate);
 	constexpr cBlockSaplingHandler                         BlockDarkOakSaplingHandler(BlockType::DarkOakSapling);
@@ -501,7 +503,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockGreenWallBannerHandler(BlockType::GreenWallBanner);
 	constexpr cBlockWoolHandler                            BlockGreenWoolHandler(BlockType::GreenWool);
 	constexpr cDefaultBlockHandler                         BlockGrindstoneHandler(BlockType::Grindstone);
-	constexpr cBlockSidewaysHandler                        BlockHayBaleHandler(BlockType::HayBale);
+	constexpr cBlockHayBaleHandler                         BlockHayBaleHandler(BlockType::HayBale);
 	constexpr cBlockPressurePlateHandler                   BlockHeavyWeightedPressurePlateHandler(BlockType::HeavyWeightedPressurePlate);
 	constexpr cDefaultBlockHandler                         BlockHoneyBlockHandler(BlockType::HoneyBlock);
 	constexpr cDefaultBlockHandler                         BlockHoneycombBlockHandler(BlockType::HoneycombBlock);
@@ -530,7 +532,7 @@ namespace
 	constexpr cBlockFenceHandler                           BlockJungleFenceHandler(BlockType::JungleFence);
 	constexpr cBlockFenceGateHandler                       BlockJungleFenceGateHandler(BlockType::JungleFenceGate);
 	constexpr cBlockLeavesHandler                          BlockJungleLeavesHandler(BlockType::JungleLeaves);
-	constexpr cBlockSidewaysHandler                        BlockJungleLogHandler(BlockType::JungleLog);
+	constexpr cBlockLogHandler                             BlockJungleLogHandler(BlockType::JungleLog);
 	constexpr cBlockPlanksHandler                          BlockJunglePlanksHandler(BlockType::JunglePlanks);
 	constexpr cBlockPressurePlateHandler                   BlockJunglePressurePlateHandler(BlockType::JunglePressurePlate);
 	constexpr cBlockSaplingHandler                         BlockJungleSaplingHandler(BlockType::JungleSapling);
@@ -637,7 +639,7 @@ namespace
 	constexpr cBlockFenceHandler                           BlockOakFenceHandler(BlockType::OakFence);
 	constexpr cBlockFenceGateHandler                       BlockOakFenceGateHandler(BlockType::OakFenceGate);
 	constexpr cBlockLeavesHandler                          BlockOakLeavesHandler(BlockType::OakLeaves);
-	constexpr cBlockSidewaysHandler                        BlockOakLogHandler(BlockType::OakLog);
+	constexpr cBlockLogHandler                             BlockOakLogHandler(BlockType::OakLog);
 	constexpr cBlockPlanksHandler                          BlockOakPlanksHandler(BlockType::OakPlanks);
 	constexpr cBlockPressurePlateHandler                   BlockOakPressurePlateHandler(BlockType::OakPressurePlate);
 	constexpr cBlockSaplingHandler                         BlockOakSaplingHandler(BlockType::OakSapling);
@@ -646,7 +648,7 @@ namespace
 	constexpr cBlockStairsHandler                          BlockOakStairsHandler(BlockType::OakStairs);
 	constexpr cBlockTrapdoorHandler                        BlockOakTrapdoorHandler(BlockType::OakTrapdoor);
 	constexpr cBlockWallSignHandler                        BlockOakWallSignHandler(BlockType::OakWallSign);
-	constexpr cBlockWoodHandler                            BlockOakWoodHandler(BlockType::OakWood);
+	constexpr cDefaultBlockHandler                         BlockOakWoodHandler(BlockType::OakWood);
 	constexpr cBlockObserverHandler                        BlockObserverHandler(BlockType::Observer);
 	constexpr cDefaultBlockHandler                         BlockObsidianHandler(BlockType::Obsidian);
 	constexpr cDefaultBlockHandler                         BlockOrangeBannerHandler(BlockType::OrangeBanner);
@@ -676,11 +678,11 @@ namespace
 	constexpr cBlockGlassHandler                           BlockPinkStainedGlassHandler(BlockType::PinkStainedGlass);
 	constexpr cBlockGlassHandler                           BlockPinkStainedGlassPaneHandler(BlockType::PinkStainedGlassPane);
 	constexpr cDefaultBlockHandler                         BlockPinkTerracottaHandler(BlockType::PinkTerracotta);
-	constexpr cBlockFlowerHander                           BlockPinkTulipHandler(BlockType::PinkTulip);
+	constexpr cBlockFlowerHandler                           BlockPinkTulipHandler(BlockType::PinkTulip);
 	constexpr cDefaultBlockHandler                         BlockPinkWallBannerHandler(BlockType::PinkWallBanner);
 	constexpr cBlockWoolHandler                            BlockPinkWoolHandler(BlockType::PinkWool);
 	constexpr cBlockPistonHandler                          BlockPistonHandler(BlockType::Piston);
-	constexpr cBlockPistonHeadHandler                      BlockPistonHeadHandler(BlockType::PistonHead);
+	constexpr cBlockPistonHeadHandler                      BlockPistonHeadHandler;
 	constexpr cBlockMobHeadHandler                         BlockPlayerHeadHandler(BlockType::PlayerHead);
 	constexpr cBlockMobHeadHandler                         BlockPlayerWallHeadHandler(BlockType::PlayerWallHead);
 	constexpr cDefaultBlockHandler                         BlockPodzolHandler(BlockType::Podzol);
@@ -705,7 +707,7 @@ namespace
 	constexpr cBlockSlabHandler                            BlockPolishedGraniteSlabHandler(BlockType::PolishedGraniteSlab);
 	constexpr cBlockStairsHandler                          BlockPolishedGraniteStairsHandler(BlockType::PolishedGraniteStairs);
 	constexpr cBlockFlowerHandler                          BlockPoppyHandler(BlockType::Poppy);
-	constexpr cBlockCropsHandler<7>                        BlockPotatoesHandler(BlockType::Potatoes);
+	constexpr cBlockCropsHandler                           BlockPotatoesHandler(BlockType::Potatoes);
 	constexpr cBlockFlowerPotHandler                       BlockPottedAcaciaSaplingHandler(BlockType::PottedAcaciaSapling);
 	constexpr cBlockFlowerPotHandler                       BlockPottedAlliumHandler(BlockType::PottedAllium);
 	constexpr cBlockFlowerPotHandler                       BlockPottedAzureBluetHandler(BlockType::PottedAzureBluet);
@@ -794,8 +796,8 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockRedstoneBlockHandler(BlockType::RedstoneBlock);
 	constexpr cBlockRedstoneLampHandler                    BlockRedstoneLampHandler(BlockType::RedstoneLamp);
 	constexpr cBlockRedstoneOreHandler                     BlockRedstoneOreHandler(BlockType::RedstoneOre);
-	constexpr cBlockRedstoneTorchHandler                   BlockRedstoneTorchHandler(BlockType::RedstoneTorch);
-	constexpr cBlockRedstoneTorchHandler                   BlockRedstoneWallTorchHandler(BlockType::RedstoneWallTorch);
+	constexpr cBlockTorchBaseHandler                       BlockRedstoneTorchHandler(BlockType::RedstoneTorch);
+	constexpr cBlockTorchBaseHandler                       BlockRedstoneWallTorchHandler(BlockType::RedstoneWallTorch);
 	constexpr cBlockRedstoneHandler                        BlockRedstoneWireHandler(BlockType::RedstoneWire);
 	constexpr cBlockRedstoneRepeaterHandler                BlockRepeaterHandler(BlockType::Repeater);
 	constexpr cBlockCommandBlockHandler                    BlockRepeatingCommandBlockHandler(BlockType::RepeatingCommandBlock);
@@ -844,7 +846,7 @@ namespace
 	constexpr cBlockFenceHandler                           BlockSpruceFenceHandler(BlockType::SpruceFence);
 	constexpr cBlockFenceGateHandler                       BlockSpruceFenceGateHandler(BlockType::SpruceFenceGate);
 	constexpr cBlockLeavesHandler                          BlockSpruceLeavesHandler(BlockType::SpruceLeaves);
-	constexpr cBlockSidewaysHandler                        BlockSpruceLogHandler(BlockType::SpruceLog);
+	constexpr cBlockLogHandler                             BlockSpruceLogHandler(BlockType::SpruceLog);
 	constexpr cBlockPlanksHandler                          BlockSprucePlanksHandler(BlockType::SprucePlanks);
 	constexpr cBlockPressurePlateHandler                   BlockSprucePressurePlateHandler(BlockType::SprucePressurePlate);
 	constexpr cBlockSaplingHandler                         BlockSpruceSaplingHandler(BlockType::SpruceSapling);
@@ -853,7 +855,7 @@ namespace
 	constexpr cBlockStairsHandler                          BlockSpruceStairsHandler(BlockType::SpruceStairs);
 	constexpr cBlockTrapdoorHandler                        BlockSpruceTrapdoorHandler(BlockType::SpruceTrapdoor);
 	constexpr cBlockWallSignHandler                        BlockSpruceWallSignHandler(BlockType::SpruceWallSign);
-	constexpr cBlockWoodHandler                            BlockSpruceWoodHandler(BlockType::SpruceWood);
+	constexpr cDefaultBlockHandler                         BlockSpruceWoodHandler(BlockType::SpruceWood);
 	constexpr cBlockPistonHandler                          BlockStickyPistonHandler(BlockType::StickyPiston);
 	constexpr cBlockStoneHandler                           BlockStoneHandler(BlockType::Stone);
 	constexpr cBlockSlabHandler                            BlockStoneBrickSlabHandler(BlockType::StoneBrickSlab);
@@ -891,7 +893,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockTallSeagrassHandler(BlockType::TallSeagrass);
 	constexpr cDefaultBlockHandler                         BlockTargetHandler(BlockType::Target);
 	constexpr cDefaultBlockHandler                         BlockTerracottaHandler(BlockType::Terracotta);
-	constexpr cBlockTorchHandler                           BlockTorchHandler(BlockType::Torch);
+	constexpr cBlockTorchBaseHandler                       BlockTorchHandler(BlockType::Torch);
 	constexpr cBlockChestHandler                           BlockTrappedChestHandler(BlockType::TrappedChest);
 	constexpr cBlockTripwireHandler                        BlockTripwireHandler(BlockType::Tripwire);
 	constexpr cBlockTripwireHookHandler                    BlockTripwireHookHandler(BlockType::TripwireHook);
@@ -904,7 +906,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockTwistingVinesPlantHandler(BlockType::TwistingVinesPlant);
 	constexpr cBlockVineHandler                            BlockVineHandler(BlockType::Vine);
 	constexpr cBlockAirHandler                             BlockVoidAirHandler(BlockType::VoidAir);
-	constexpr cBlockTorchHandler                           BlockWallTorchHandler(BlockType::WallTorch);
+	constexpr cBlockTorchBaseHandler                       BlockWallTorchHandler(BlockType::WallTorch);
 	constexpr cBlockButtonHandler                          BlockWarpedButtonHandler(BlockType::WarpedButton);
 	constexpr cBlockDoorHandler                            BlockWarpedDoorHandler(BlockType::WarpedDoor);
 	constexpr cBlockFenceHandler                           BlockWarpedFenceHandler(BlockType::WarpedFence);
@@ -926,7 +928,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockWeepingVinesHandler(BlockType::WeepingVines);
 	constexpr cDefaultBlockHandler                         BlockWeepingVinesPlantHandler(BlockType::WeepingVinesPlant);
 	constexpr cBlockSpongeHandler                          BlockWetSpongeHandler(BlockType::WetSponge);
-	constexpr cBlockCropsHandler<7>                        BlockWheatHandler(BlockType::Wheat);
+	constexpr cBlockCropsHandler                           BlockWheatHandler(BlockType::Wheat);
 	constexpr cDefaultBlockHandler                         BlockWhiteBannerHandler(BlockType::WhiteBanner);
 	constexpr cBlockBedHandler                             BlockWhiteBedHandler(BlockType::WhiteBed);
 	constexpr cBlockCarpetHandler                          BlockWhiteCarpetHandler(BlockType::WhiteCarpet);
@@ -1018,20 +1020,20 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i
 		return;
 	}
 
-	cBlockHandler::For(a_ChunkInterface.GetBlock(a_NeighborPos)).OnNeighborChanged(a_ChunkInterface, a_NeighborPos, a_WhichNeighbor);
+	cBlockHandler::For(a_ChunkInterface.GetBlock(a_NeighborPos).Type()).OnNeighborChanged(a_ChunkInterface, a_NeighborPos, a_WhichNeighbor);
 }
 
 
 
 
 
-cItems cBlockHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const
+cItems cBlockHandler::ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const
 {
 	UNUSED(a_Digger);
 	UNUSED(a_Tool);
 
 	// Add self:
-	return cItem(m_BlockType, 1, a_BlockMeta);
+	return cItem(BlockItemConverter::FromBlock(m_BlockType));
 }
 
 
@@ -1065,16 +1067,16 @@ bool cBlockHandler::IsClickedThrough(void) const
 
 
 
-bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const
+bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, BlockState a_Block) const
 {
-	return (m_BlockType == E_BLOCK_AIR);
+	return cBlockAirHandler::IsBlockAir(m_BlockType);
 }
 
 
 
 
 
-bool cBlockHandler::IsInsideBlock(const Vector3d a_RelPosition, const NIBBLETYPE a_BlockMeta) const
+bool cBlockHandler::IsInsideBlock(const Vector3d a_RelPosition, const BlockState a_Block) const
 {
 	// Default functionality: Test the height, since we assume full voxels with varying height
 	return (a_RelPosition.y < cBlockInfo::GetBlockHeight(m_BlockType));
@@ -1084,7 +1086,7 @@ bool cBlockHandler::IsInsideBlock(const Vector3d a_RelPosition, const NIBBLETYPE
 
 
 
-cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const
+cBoundingBox cBlockHandler::GetPlacementCollisionBox(BlockState a_XM, BlockState a_XP, BlockState a_YM, BlockState a_YP, BlockState a_ZM, BlockState a_ZP) const
 {
 	if (!cBlockInfo::IsSolid(m_BlockType))
 	{

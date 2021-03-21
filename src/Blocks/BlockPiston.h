@@ -24,18 +24,32 @@ public:
 
 	using Super::Super;
 
-	/** Converts piston block's metadata into a unit vector representing the direction in which the piston will extend. */
-	static Vector3i MetadataToOffset(BlockState a_Block);
+	static inline bool IsBlockPiston(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Piston:
+			case BlockType::StickyPiston:
+				return true;
+			default: return false;
+		}
+	}
 
-	static void ExtendPiston(Vector3i aBlockPos, cWorld & aWorld);
-	static void RetractPiston(Vector3i aBlockPos, cWorld & aWorld);
+	/** Converts piston block's metadata into a unit vector representing the direction in which the piston will extend. */
+	static inline Vector3i GetExtensionDirection(BlockState a_Block);
+
+	/** Returns UCHAR_MAX on error. */
+	static inline Byte GetExtensionByte(BlockState a_Block);
+
+	static void ExtendPiston(Vector3i a_BlockPos, cWorld & a_World);
+	static void RetractPiston(Vector3i a_BlockPos, cWorld & a_World);
 
 	/** Returns true if the piston (with the specified meta) is extended */
 	static inline bool IsExtended(BlockState a_Block) { return Block::Piston::Extended(a_Block); }
 
 private:
 
-	typedef std::unordered_set<Vector3i, VectorHasher<int>> Vector3iSet;
+	using Vector3iSet = std::unordered_set<Vector3i, VectorHasher<int>>;
 
 	/** Piston extension block action */
 	static const Byte PistonExtendAction = 0U;
@@ -165,7 +179,7 @@ class cBlockPistonHeadHandler final :
 public:
 
 	constexpr cBlockPistonHeadHandler(void) :
-		Super(BlockType::MovingPiston)
+		Super(BlockType::PistonHead)
 	{
 	}
 

@@ -480,7 +480,7 @@ private:
 			BlockState & a_Block
 	) const override
 	{
-		bool IsTop;
+		bool IsTop = false;
 
 		// Set the correct metadata based on player equipped item (i.e. a_BlockMeta not initialised yet)
 		switch (a_ClickedBlockFace)
