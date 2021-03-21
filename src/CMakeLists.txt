@@ -243,6 +243,7 @@ set(symlinks
 	Plugins
 	Prefabs
 	Protocol
+	MobAi
 	webadmin
 	brewing.txt
 	crafting.txt

@@ -1662,10 +1662,10 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 			{
 				BLOCKTYPE Block;
 				if (!a_Chunk.UnboundedRelGetBlockType(x, y, z, Block))
-				{
+				{ /*
 					LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
 						x, y, z, GetPosX(), GetPosZ()
-					);
+					); */
 					continue;
 				}
 
