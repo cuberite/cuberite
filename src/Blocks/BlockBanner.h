@@ -6,7 +6,7 @@
 #include "BlockEntity.h"
 
 class cBlockBannerHandler final :
-		public cBlockHandler
+	public cBlockEntityHandler
 {
 
 public:
