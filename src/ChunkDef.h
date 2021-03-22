@@ -150,12 +150,10 @@ public:
 
 	// typedef unsigned char BlockTypes[NumBlocks];
 	/** The type used for block type operations and storage, AXIS_ORDER ordering */
-	using BlockStates = BlockState[NumBlocks];
+	using BlockStates = std::array<BlockState, NumBlocks>;
 
 	/** The type used for block data in nibble format, AXIS_ORDER ordering */
-	// typedef NIBBLETYPE BlockNibbles[NumBlocks / 2];
-
-	typedef LIGHTTYPE LightNibbles[NumBlocks / 2];
+	using LightNibbles = LIGHTTYPE[NumBlocks / 2];
 
 
 	/** Converts absolute block coords into relative (chunk + block) coords: */
@@ -389,12 +387,11 @@ public:
 		);
 	}
 
-
-	inline static NIBBLETYPE ExpandNibble(const NIBBLETYPE * const a_Buffer, const size_t a_Index)
+*/
+	inline static unsigned char ExpandNibble(const unsigned char * const a_Buffer, const size_t a_Index)
 	{
 		return (a_Buffer[a_Index / 2] >> ((a_Index & 1) * 4)) & 0x0f;
 	}
-*/
 } ;
 
 

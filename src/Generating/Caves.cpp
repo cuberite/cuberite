@@ -100,7 +100,7 @@ public:
 	/** Carves the tunnel into the chunk specified */
 	void ProcessChunk(
 		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockStates & a_BlockStates,
+		cBlockArea::BLOCKVECTOR & a_BlockStates,
 		cChunkDef::HeightMap & a_HeightMap
 	);
 
@@ -456,7 +456,7 @@ void cCaveTunnel::CalcBoundingBox(void)
 
 void cCaveTunnel::ProcessChunk(
 	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockStates & a_BlockStates,
+	cBlockArea::BLOCKVECTOR & a_BlockStates,
 	cChunkDef::HeightMap & a_HeightMap
 )
 {
@@ -502,18 +502,18 @@ void cCaveTunnel::ProcessChunk(
 				int SqDist = (DifX - x) * (DifX - x) + (DifY - y) * (DifY - y) + (DifZ - z) * (DifZ - z);
 				if (4 * SqDist <= SqRad)
 				{
-					if (cBlockInfo::CanBeTerraformed(cChunkDef::GetBlock(a_BlockStates, x, y, z)))
+					if (cBlockInfo::CanBeTerraformed(cChunkDef::GetBlock(a_BlockStates->data(), x, y, z)))
 					{
-						cChunkDef::SetBlock(a_BlockStates, x, y, z, Block::CaveAir::CaveAir());
+						cChunkDef::SetBlock(a_BlockStates->data(), x, y, z, Block::CaveAir::CaveAir());
 					}
 				}
 				else if (SqDist <= SqRad * 2)
 				{
-					auto InspectBlock = cChunkDef::GetBlock(a_BlockStates, x, y, z);
+					auto InspectBlock = cChunkDef::GetBlock(a_BlockStates->data(), x, y, z);
 					switch (InspectBlock.Type())
 					{
-						case BlockType::Sand:    cChunkDef::SetBlock(a_BlockStates, x, y, z, Block::Sandstone::Sandstone()); break;
-						case BlockType::RedSand: cChunkDef::SetBlock(a_BlockStates, x, y, z, Block::RedSandstone::RedSandstone()); break;
+						case BlockType::Sand:    cChunkDef::SetBlock(a_BlockStates->data(), x, y, z, Block::Sandstone::Sandstone()); break;
+						case BlockType::RedSand: cChunkDef::SetBlock(a_BlockStates->data(), x, y, z, Block::RedSandstone::RedSandstone()); break;
 						default: break;
 					}
 				}
@@ -607,8 +607,8 @@ void cStructGenWormNestCaves::cCaveSystem::DrawIntoChunk(cChunkDesc & a_ChunkDes
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
-	cChunkDef::BlockStates       & BlockStates = a_ChunkDesc.GetBlocks();
-	cChunkDef::HeightMap         & HeightMap   = a_ChunkDesc.GetHeightMap();
+	auto         & BlockStates = a_ChunkDesc.GetBlocks();
+	auto         & HeightMap   = a_ChunkDesc.GetHeightMap();
 	for (cCaveTunnels::const_iterator itr = m_Tunnels.begin(), end = m_Tunnels.end(); itr != end; ++itr)
 	{
 		(*itr)->ProcessChunk(ChunkX, ChunkZ, BlockStates, HeightMap);

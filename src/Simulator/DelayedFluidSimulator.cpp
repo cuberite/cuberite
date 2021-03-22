@@ -20,18 +20,22 @@
 bool cDelayedFluidSimulatorChunkData::cSlot::Add(int a_RelX, int a_RelY, int a_RelZ)
 {
 	ASSERT(a_RelZ >= 0);
-	ASSERT(a_RelZ < static_cast<int>(ARRAYCOUNT(m_Blocks)));
+	ASSERT(a_RelZ < static_cast<int>(m_Blocks.size()));
 
 	cCoordWithIntVector & Blocks = m_Blocks[a_RelZ];
 	int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	for (cCoordWithIntVector::const_iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
+	for (auto & Block : Blocks)
 	{
-		if (itr->Data == Index)
+		if (Block.Data == Index)
 		{
 			// Already present
 			return false;
 		}
 	}  // for itr - Blocks[]
+	if (Blocks.capacity() == 0)
+	{
+		Blocks.reserve(10);
+	}
 	Blocks.emplace_back(a_RelX, a_RelY, a_RelZ, Index);
 	return true;
 }
@@ -99,16 +103,15 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_SimSlotNum];
 
 	// Simulate all the blocks in the scheduled slot:
-	for (size_t i = 0; i < ARRAYCOUNT(Slot.m_Blocks); i++)
+	for (auto & Blocks : Slot.m_Blocks)
 	{
-		cCoordWithIntVector & Blocks = Slot.m_Blocks[i];
 		if (Blocks.empty())
 		{
 			continue;
 		}
-		for (cCoordWithIntVector::iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
+		for (auto & Block : Blocks)
 		{
-			SimulateBlock(a_Chunk, {itr->x, itr->y, itr->z});
+			SimulateBlock(a_Chunk, {Block.x, Block.y, Block.z});
 		}
 		m_TotalBlocks -= static_cast<int>(Blocks.size());
 		Blocks.clear();
@@ -128,6 +131,11 @@ void cDelayedFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, Blo
 
 	auto ChunkDataRaw = (m_FluidBlock == BlockType::Water) ? a_Chunk.GetWaterSimulatorData() : a_Chunk.GetLavaSimulatorData();
 	cDelayedFluidSimulatorChunkData * ChunkData = static_cast<cDelayedFluidSimulatorChunkData *>(ChunkDataRaw);
+	if (ChunkData == nullptr)
+	{
+		ASSERT("Got Null for ChunkSimulatorData");
+		return;
+	}
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_AddSlotNum];
 
 	// Add, if not already present:

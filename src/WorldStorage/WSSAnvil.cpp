@@ -401,9 +401,21 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			MetaData = GetSectionData(a_NBT, Child, "Data", ChunkBlockData::SectionMetaCount),
 			BlockLightData = GetSectionData(a_NBT, Child, "BlockLight", ChunkLightData::SectionLightCount),
 			SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount);
-		if ((BlockData != nullptr) && (MetaData != nullptr) && (SkyLightData != nullptr) && (BlockLightData != nullptr))
+		if ((BlockData != nullptr) && (SkyLightData != nullptr) && (BlockLightData != nullptr))
 		{
-			Data.BlockData.SetSection(*reinterpret_cast<const ChunkBlockData::SectionType *>(BlockData), static_cast<size_t>(Y));
+			auto Blocks = std::make_unique<std::array<BlockState, ChunkBlockData::SectionBlockCount>>();
+			for (size_t I = 0; I < ChunkBlockData::SectionBlockCount; I++)
+			{
+				unsigned char Meta = 0;
+				if (MetaData != nullptr)
+				{
+					Meta = static_cast<unsigned char>(MetaData[I]);
+				}
+
+				Blocks->at(I) = PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockData[I]), Meta);
+				ASSERT(PaletteUpgrade::ToBlock(Blocks->at(I)).first == static_cast<unsigned char>(BlockData[I]) || Blocks->at(I).Type() == PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockData[I]), 0).Type());  // Make shure the block is still the same
+			}
+			Data.BlockData.SetSection(Blocks, static_cast<size_t>(Y));
 			Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
 		}
 		else

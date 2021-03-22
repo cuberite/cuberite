@@ -1122,7 +1122,7 @@ static int GetLightValue(lua_State * a_LuaState)
 	if (!self->IsValidCoords(Coords))
 	{
 		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
-								Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
+			Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}
 
@@ -1130,6 +1130,9 @@ static int GetLightValue(lua_State * a_LuaState)
 
 	return 0;
 }
+
+
+
 
 
 template<
@@ -1164,13 +1167,14 @@ static int GetRelLightValue(lua_State * a_LuaState)
 	if (!self->IsValidRelCoords(Coords))
 	{
 		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
-								Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
+			Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}
 	L.Push(self->*Fn(Coords));
 
 	return 0;
 }
+
 
 
 
@@ -1208,7 +1212,7 @@ static int SetLightValue(lua_State * a_LuaState)
 	if (!self->IsValidCoords(Coords))
 	{
 		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
-								Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
+			Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}
 
@@ -1219,6 +1223,10 @@ static int SetLightValue(lua_State * a_LuaState)
 
 	return 0;
 }
+
+
+
+
 
 template<
 	int DataTypeFlag,
@@ -1253,7 +1261,7 @@ static int SetRelLightValue(lua_State * a_LuaState)
 	if (!self->IsValidRelCoords(Coords))
 	{
 		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
-								Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
+			Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
 		);
 	}
 

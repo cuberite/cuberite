@@ -26,7 +26,7 @@ namespace
 		return
 		{
 			static_cast<size_t>(a_RelPos.y / cChunkDef::SectionHeight),
-			static_cast<size_t>(cChunkDef::MakeIndexNoCheck(a_RelPos.x, a_RelPos.y % cChunkDef::SectionHeight, a_RelPos.z))
+			static_cast<size_t>(cChunkDef::MakeIndex(a_RelPos.x, a_RelPos.y % cChunkDef::SectionHeight, a_RelPos.z))
 		};
 	}
 
@@ -79,7 +79,14 @@ ElementType ChunkDataStore<ElementType, ElementCount>::Get(const Vector3i a_Posi
 
 	if (Section != nullptr)
 	{
-		return (*Section)[Indices.Index];
+		if (IsCompressed(ElementCount))
+		{
+			return cChunkDef::ExpandNibble(Section->data(), Indices.Index);
+		}
+		else
+		{
+			return (*Section)[Indices.Index];
+		}
 	}
 
 	return UnpackDefaultValue<ElementCount>(m_DefaultValue);
@@ -148,7 +155,63 @@ void ChunkDataStore<ElementType, ElementCount>::SetAll(const ElementType (& a_So
 
 void ChunkBlockData::Assign(const ChunkBlockData & a_Other)
 {
-	m_Blocks.Assign(a_Other.m_Blocks);
+	for (size_t Y = 0; Y != cChunkDef::NumSections; Y++)
+	{
+		m_Blocks[Y].reset();
+
+		if (const auto & Other = a_Other.m_Blocks[Y]; Other != nullptr)
+		{
+			m_Blocks.at(Y) = std::make_unique<std::array<BlockState, SectionBlockCount>>(*Other);
+		}
+	}
+}
+
+
+
+
+
+BlockState ChunkBlockData::GetBlock(Vector3i a_Position) const
+{
+	const auto Indices = IndicesFromRelPos(a_Position);
+	const auto & Section = m_Blocks[Indices.Section];
+
+	if (Section != nullptr)
+	{
+		return (*Section)[Indices.Index];
+	}
+
+	return UnpackDefaultValue<SectionBlockCount>(DefaultValue);
+}
+
+
+
+
+
+const ChunkBlockData::SectionType & ChunkBlockData::GetSection(size_t a_Y) const
+{
+	return m_Blocks.at(a_Y);
+}
+
+
+
+
+
+void ChunkBlockData::SetBlock(Vector3i a_Position, BlockState a_Block)
+{
+	const auto Indices = IndicesFromRelPos(a_Position);
+	auto & Section = m_Blocks[Indices.Section];
+
+	if (Section == nullptr)
+	{
+		if (a_Block == UnpackDefaultValue<SectionBlockCount>(DefaultValue))
+		{
+			return;
+		}
+
+		Section = cpp20::make_unique_for_overwrite<std::array<BlockState, SectionBlockCount>>();
+		std::fill(Section->begin(), Section->end(), DefaultValue);
+	}
+	(*Section)[Indices.Index] = a_Block;
 }
 
 
@@ -157,7 +220,12 @@ void ChunkBlockData::Assign(const ChunkBlockData & a_Other)
 
 void ChunkBlockData::SetAll(const cChunkDef::BlockStates & a_BlockSource)
 {
-	m_Blocks.SetAll(a_BlockSource);
+	for (size_t Y = 0; Y != cChunkDef::NumSections; Y++)
+	{
+		auto Section = std::make_unique<std::array<BlockState, SectionBlockCount>>();
+		std::memmove(Section->data(), a_BlockSource.data() + (Y * SectionBlockCount), SectionBlockCount);
+		SetSection(std::move(Section), Y);
+	}
 }
 
 
@@ -166,7 +234,20 @@ void ChunkBlockData::SetAll(const cChunkDef::BlockStates & a_BlockSource)
 
 void ChunkBlockData::SetSection(const SectionType & a_BlockSource, const size_t a_Y)
 {
-	m_Blocks.SetSection(a_BlockSource, a_Y);
+	auto & Section = m_Blocks[a_Y];
+
+	if (Section != nullptr)
+	{
+		std::copy(a_BlockSource->begin(), a_BlockSource->end(), Section->begin());
+		return;
+	}
+	/*
+	else if (std::any_of(a_BlockSource->begin(), a_BlockSource->end(), [&](const auto Value) { return Value != Block::Air::Air(); }))
+	{
+	*/
+		Section = cpp20::make_unique_for_overwrite<std::array<BlockState, SectionBlockCount>>();
+		std::copy(a_BlockSource->begin(), a_BlockSource->end(), Section->begin());
+	// }  // TODO(12xx12)
 }
 
 
@@ -202,8 +283,6 @@ void ChunkLightData::SetSection(const SectionType & a_BlockLightSource, const Se
 
 
 
-/*
-template struct ChunkDataStore<BLOCKTYPE, ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue>;
-template struct ChunkDataStore<NIBBLETYPE, ChunkBlockData::SectionMetaCount, ChunkLightData::DefaultBlockLightValue>;
-template struct ChunkDataStore<NIBBLETYPE, ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue>;
-*/
+
+template struct ChunkDataStore<LIGHTTYPE, ChunkLightData::SectionLightCount>;
+
