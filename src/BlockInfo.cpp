@@ -79,6 +79,7 @@ bool IsBlockStateOfDirt(BlockState a_Block)
 
 
 
+
 bool IsBlockShulkerBox(BlockState a_Block)
 {
 	switch (a_Block.Type())

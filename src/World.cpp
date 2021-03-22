@@ -1839,7 +1839,6 @@ void cWorld::SetBlock(Vector3i a_BlockPos, BlockState a_Block)
 
 
 
-
 LIGHTTYPE cWorld::GetBlockSkyLight(Vector3i a_BlockPos) const
 {
 	return m_ChunkMap.GetBlockSkyLight(a_BlockPos);
@@ -3208,7 +3207,9 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 
 	struct SetChunkData Data({ a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ() });
 	{
-		Data.BlockData.SetAll(a_ChunkDesc.GetBlocks());
+		auto States = cChunkDef::BlockStates();
+		std::memmove(States.data(), a_ChunkDesc.GetBlocks()->data(), a_ChunkDesc.GetBlocks()->size());
+		Data.BlockData.SetAll(States);
 
 		std::copy(a_ChunkDesc.GetBiomeMap().begin(),  a_ChunkDesc.GetBiomeMap().end(),  Data.BiomeMap.data());
 		std::copy(a_ChunkDesc.GetHeightMap().begin(), a_ChunkDesc.GetHeightMap().end(), Data.HeightMap.data());

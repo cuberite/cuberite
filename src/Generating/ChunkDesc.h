@@ -208,13 +208,13 @@ public:
 
 	// Accessors used by cChunkGenerator::Generator descendants:
 	inline cChunkDef::BiomeMap &     GetBiomeMap              (void) { return m_BiomeMap; }
-	inline cChunkDef::BlockStates &  GetBlocks                (void) { return *(reinterpret_cast<cChunkDef::BlockStates *>(m_BlockArea.GetBlocks())); }
+	inline cBlockArea::BLOCKVECTOR & GetBlocks                (void) { return m_BlockArea.GetBlocks(); }
 	inline cChunkDef::HeightMap &    GetHeightMap             (void) { return m_HeightMap; }
 	inline cEntityList &             GetEntities              (void) { return m_Entities; }
 	inline cBlockEntities &          GetBlockEntities         (void) { return m_BlockEntities; }
 
 	inline const cChunkDef::BiomeMap &     GetBiomeMap()   const { return m_BiomeMap; }
-	inline const cChunkDef::BlockStates &  GetBlocks()     const { return *(reinterpret_cast<cChunkDef::BlockStates *>(m_BlockArea.GetBlocks())); }
+	inline const cBlockArea::BLOCKVECTOR & GetBlocks()     const { return m_BlockArea.GetBlocks(); }
 	inline const cChunkDef::HeightMap &    GetHeightMap()  const { return m_HeightMap; }
 
 	#ifndef NDEBUG

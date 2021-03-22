@@ -69,8 +69,8 @@ public:
 
 	// tolua_end
 
-	using LIGHTARRAY = std::unique_ptr<LIGHTTYPE[]>;
-	using BLOCKARRAY = std::unique_ptr<BlockState[]>;
+	using LIGHTARRAY  = std::unique_ptr<LIGHTTYPE[]>;
+	using BLOCKVECTOR = std::unique_ptr<std::vector<BlockState>>;
 	using cBlockEntitiesPtr = std::unique_ptr<cBlockEntities>;
 
 	// tolua_begin
@@ -357,9 +357,10 @@ public:
 
 	// Clients can use these for faster access to all blocktypes. Be careful though!
 	/** Returns the internal pointer to the block types */
-	BlockState * GetBlocks       (void) const { return m_Blocks.get();        }
-	LIGHTTYPE  * GetBlockLight   (void) const { return m_BlockLight.get();    }  // NOTE: one byte per block!
-	LIGHTTYPE  * GetBlockSkyLight(void) const { return m_BlockSkyLight.get(); }  // NOTE: one byte per block!
+	const BLOCKVECTOR & GetBlocks (void) const { return m_Blocks; }
+	BLOCKVECTOR &       GetBlocks (void) { return m_Blocks; }
+	LIGHTTYPE  * GetBlockLight         (void) const { return m_BlockLight.get();    }  // NOTE: one byte per block!
+	LIGHTTYPE  * GetBlockSkyLight      (void) const { return m_BlockSkyLight.get(); }  // NOTE: one byte per block!
 
 	size_t        GetBlockCount(void) const { return static_cast<size_t>(m_Size.x * m_Size.y * m_Size.z); }
 	static size_t MakeIndexForSize(Vector3i a_RelPos, Vector3i a_Size);
@@ -429,7 +430,7 @@ protected:
 	cBlockArea doesn't use this value in any way. */
 	Vector3i m_WEOffset;
 
-	BLOCKARRAY m_Blocks;
+	BLOCKVECTOR m_Blocks;
 	LIGHTARRAY m_BlockLight;     // Each light value is stored as a separate byte for faster access
 	LIGHTARRAY m_BlockSkyLight;  // Each light value is stored as a separate byte for faster access
 

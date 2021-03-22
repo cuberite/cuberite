@@ -38,7 +38,7 @@ typedef void (CombinatorFunc)(BlockState & a_DstBlock, BlockState a_SrcBlock);
 This wild construct allows us to pass a function argument and still have it inlined by the compiler. */
 template <CombinatorFunc Combinator>
 void InternalMergeBlocks(
-	BlockState * a_DstBlocks, const BlockState * a_SrcBlocks,
+	cBlockArea::BLOCKVECTOR & a_DstBlocks, const cBlockArea::BLOCKVECTOR & a_SrcBlocks,
 	int a_SizeX, int a_SizeY, int a_SizeZ,
 	int a_SrcOffX, int a_SrcOffY, int a_SrcOffZ,
 	int a_DstOffX, int a_DstOffY, int a_DstOffZ,
@@ -60,7 +60,7 @@ void InternalMergeBlocks(
 			int DstIdx = DstBaseZ + a_DstOffX;
 			for (int x = 0; x < a_SizeX; x++)
 			{
-				Combinator(a_DstBlocks[DstIdx], a_SrcBlocks[SrcIdx]);
+				Combinator(a_DstBlocks->at(DstIdx), a_SrcBlocks->at(SrcIdx));
 				++DstIdx;
 				++SrcIdx;
 			}  // for x
@@ -478,7 +478,7 @@ void cBlockArea::CopyTo(cBlockArea & a_Into) const
 	size_t BlockCount = GetBlockCount();
 	if (HasBlocks())
 	{
-		memcpy(a_Into.GetBlocks(), GetBlocks(), BlockCount * sizeof(BlockState));
+		memcpy(a_Into.GetBlocks()->data(), GetBlocks()->data(), BlockCount * sizeof(BlockState));
 	}
 	if (HasBlockLights())
 	{
@@ -531,7 +531,7 @@ void cBlockArea::DumpToRawFile(const AString & a_FileName)
 	size_t NumBlocks = GetBlockCount();
 	if (HasBlocks())
 	{
-		f.Write(GetBlocks(), NumBlocks * sizeof(BlockState));
+		f.Write(GetBlocks()->data(), NumBlocks * sizeof(BlockState));
 	}
 	if (HasBlockLights())
 	{
@@ -670,7 +670,7 @@ void cBlockArea::Fill(int a_DataTypes, BlockState a_Block, LIGHTTYPE a_BlockLigh
 	{
 		for (size_t i = 0; i < BlockCount; i++)
 		{
-			m_Blocks[i] = a_Block;
+			m_Blocks->at(i) = a_Block;
 		}
 	}
 	if ((a_DataTypes & baLight) != 0)
@@ -723,7 +723,7 @@ void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int 
 	{
 		for (int y = a_MinRelY; y <= a_MaxRelY; y++) for (int z = a_MinRelZ; z <= a_MaxRelZ; z++) for (int x = a_MinRelX; x <= a_MaxRelX; x++)
 		{
-			m_Blocks[MakeIndex(x, y, z)] = a_Block;
+			m_Blocks->at(MakeIndex(x, y, z)) = a_Block;
 		}  // for x, z, y
 	}
 	if ((a_DataTypes & baLight) != 0)
@@ -778,7 +778,7 @@ void cBlockArea::FillRelCuboid(const cCuboid & a_RelCuboid,
 
 void cBlockArea::RelLine(Vector3i a_RelPos1, Vector3i a_RelPos2,
 	int a_DataTypes, BlockState a_Block,
- 	LIGHTTYPE a_BlockLight, LIGHTTYPE a_BlockSkyLight
+	LIGHTTYPE a_BlockLight, LIGHTTYPE a_BlockSkyLight
 )
 {
 	// Bresenham-3D algorithm for drawing lines:
@@ -901,7 +901,7 @@ void cBlockArea::RotateCCW(void)
 		return;
 	}
 
-	BLOCKARRAY NewTypes{ new BlockState[GetBlockCount()] };
+	BLOCKVECTOR NewBlocks = std::make_unique<std::vector<BlockState>>(m_Size.x * m_Size.y * m_Size.z);
 	for (int x = 0; x < m_Size.x; x++)
 	{
 		int NewZ = m_Size.x - x - 1;
@@ -912,11 +912,11 @@ void cBlockArea::RotateCCW(void)
 			{
 				auto NewIdx = MakeIndexForSize({ NewX, y, NewZ }, { m_Size.z, m_Size.y, m_Size.x });
 				auto OldIdx = MakeIndex(x, y, z);
-				NewTypes[NewIdx] = cBlockHandler::For(m_Blocks[OldIdx].Type()).RotateCCW(m_Blocks[OldIdx]);
+				NewBlocks->at(NewIdx) = cBlockHandler::For(m_Blocks->at(OldIdx).Type()).RotateCCW(m_Blocks->at(OldIdx));
 			}  // for y
 		}  // for z
 	}  // for x
-	m_Blocks = std::move(NewTypes);
+	m_Blocks = std::move(NewBlocks);
 
 	// Rotate the BlockEntities:
 	if (HasBlockEntities())
@@ -950,7 +950,7 @@ void cBlockArea::RotateCW(void)
 		return;
 	}
 
-	BLOCKARRAY NewTypes{ new BlockState[GetBlockCount()] };
+	BLOCKVECTOR NewBlocks = std::make_unique<std::vector<BlockState>>(m_Size.x * m_Size.y * m_Size.z);
 	for (int x = 0; x < m_Size.x; x++)
 	{
 		int NewZ = x;
@@ -961,11 +961,11 @@ void cBlockArea::RotateCW(void)
 			{
 				auto NewIdx = MakeIndexForSize({ NewX, y, NewZ }, { m_Size.z, m_Size.y, m_Size.x });
 				auto OldIdx = MakeIndex(x, y, z);
-				NewTypes[NewIdx] = cBlockHandler::For(m_Blocks[OldIdx].Type()).RotateCW(m_Blocks[OldIdx]);
+				NewBlocks->at(NewIdx) = cBlockHandler::For(m_Blocks->at(OldIdx).Type()).RotateCW(m_Blocks->at(OldIdx));
 			}  // for y
 		}  // for z
 	}  // for x
-	m_Blocks = std::move(NewTypes);
+	m_Blocks = std::move(NewBlocks);
 
 	// Rotate the BlockEntities:
 	if (HasBlockEntities())
@@ -1009,10 +1009,10 @@ void cBlockArea::MirrorXY(void)
 			{
 				auto Idx1 = MakeIndex(x, y, z);
 				auto Idx2 = MakeIndex(x, y, MaxZ - z);
-				auto Block1 = cBlockHandler::For(m_Blocks[Idx1].Type()).MirrorXY(m_Blocks[Idx1]);
-				auto Block2 = cBlockHandler::For(m_Blocks[Idx2].Type()).MirrorXY(m_Blocks[Idx2]);
-				m_Blocks[Idx1] = Block1;
-				m_Blocks[Idx2] = Block2;
+				auto Block1 = cBlockHandler::For(m_Blocks->at(Idx1).Type()).MirrorXY(m_Blocks->at(Idx1));
+				auto Block2 = cBlockHandler::For(m_Blocks->at(Idx2).Type()).MirrorXY(m_Blocks->at(Idx2));
+				m_Blocks->at(Idx1) = Block1;
+				m_Blocks->at(Idx2) = Block2;
 			}  // for x
 		}  // for z
 	}  // for y
@@ -1057,10 +1057,10 @@ void cBlockArea::MirrorXZ(void)
 			{
 				auto Idx1 = MakeIndex(x, y, z);
 				auto Idx2 = MakeIndex(x, MaxY - y, z);
-				auto Block1 = cBlockHandler::For(m_Blocks[Idx1].Type()).MirrorXZ(m_Blocks[Idx1]);
-				auto Block2 = cBlockHandler::For(m_Blocks[Idx2].Type()).MirrorXZ(m_Blocks[Idx2]);
-				m_Blocks[Idx1] = Block1;
-				m_Blocks[Idx2] = Block2;
+				auto Block1 = cBlockHandler::For(m_Blocks->at(Idx1).Type()).MirrorXZ(m_Blocks->at(Idx1));
+				auto Block2 = cBlockHandler::For(m_Blocks->at(Idx2).Type()).MirrorXZ(m_Blocks->at(Idx2));
+				m_Blocks->at(Idx1) = Block1;
+				m_Blocks->at(Idx2) = Block2;
 			}  // for x
 		}  // for z
 	}  // for y
@@ -1106,10 +1106,10 @@ void cBlockArea::MirrorYZ(void)
 				auto Idx1 = MakeIndex(x, y, z);
 				auto Idx2 = MakeIndex(MaxX - x, y, z);
 
-				auto Block1 = cBlockHandler::For(m_Blocks[Idx1].Type()).MirrorYZ(m_Blocks[Idx1]);
-				auto Block2 = cBlockHandler::For(m_Blocks[Idx2].Type()).MirrorYZ(m_Blocks[Idx2]);
-				m_Blocks[Idx1] = Block1;
-				m_Blocks[Idx2] = Block2;
+				auto Block1 = cBlockHandler::For(m_Blocks->at(Idx1).Type()).MirrorYZ(m_Blocks->at(Idx1));
+				auto Block2 = cBlockHandler::For(m_Blocks->at(Idx2).Type()).MirrorYZ(m_Blocks->at(Idx2));
+				m_Blocks->at(Idx1) = Block1;
+				m_Blocks->at(Idx2) = Block2;
 			}  // for x
 		}  // for z
 	}  // for y
@@ -1140,7 +1140,7 @@ void cBlockArea::SetRelBlock(Vector3i a_RelPos, BlockState a_Block)
 {
 	ASSERT(m_Blocks != nullptr);
 	auto idx = MakeIndex(a_RelPos);
-	m_Blocks[idx] = a_Block;
+	m_Blocks->at(idx) = a_Block;
 
 	// Update the block entities, if appropriate:
 	if (HasBlockEntities())
@@ -1218,7 +1218,7 @@ BlockState cBlockArea::GetRelBlock(Vector3i a_RelPos) const
 		LOGWARNING("cBlockArea: BlockTypes have not been read!");
 		return Block::Air::Air();
 	}
-	return m_Blocks[MakeIndex(a_RelPos)];
+	return m_Blocks->at(MakeIndex(a_RelPos));
 }
 
 
@@ -1299,7 +1299,7 @@ size_t cBlockArea::CountNonAirBlocks(void) const
 		{
 			for (int x = 0; x < m_Size.x; x++)
 			{
-				if (m_Blocks[MakeIndex(x, y, z)].Type() != BlockType::Air)
+				if (m_Blocks->at(MakeIndex(x, y, z)).Type() != BlockType::Air)
 				{
 					++res;
 				}
@@ -1327,7 +1327,7 @@ size_t cBlockArea::CountSpecificBlocks(BlockType a_BlockType) const
 	size_t res = 0;
 	for (size_t i = 0; i < num; i++)
 	{
-		if (m_Blocks[i].Type() == a_BlockType)
+		if (m_Blocks->at(i).Type() == a_BlockType)
 		{
 			res++;
 		}
@@ -1360,7 +1360,7 @@ void cBlockArea::GetNonAirCropRelCoords(int & a_MinRelX, int & a_MinRelY, int & 
 		{
 			for (int x = 0; x < m_Size.x; x++)
 			{
-				if (m_Blocks[MakeIndex(x, y, z)].Type() == a_IgnoreBlockType)
+				if (m_Blocks->at(MakeIndex(x, y, z)).Type() == a_IgnoreBlockType)
 				{
 					continue;
 				}
@@ -1436,7 +1436,7 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 {
 	ASSERT(IsValidDataTypeCombination(a_DataTypes));
 
-	BLOCKARRAY NewBlocks;
+	BLOCKVECTOR NewBlocks = std::make_unique<std::vector<BlockState>>(a_SizeX * a_SizeY * a_SizeZ);
 	LIGHTARRAY NewLight;
 	LIGHTARRAY NewSkyLight;
 	cBlockEntitiesPtr NewBlockEntities;
@@ -1444,7 +1444,6 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 	// Try to allocate the new storage
 	if ((a_DataTypes & baBlocks) != 0)
 	{
-		NewBlocks.reset(new BlockState[ToUnsigned(a_SizeX * a_SizeY * a_SizeZ)]);
 		if (NewBlocks == nullptr)
 		{
 			return false;
@@ -1552,6 +1551,7 @@ bool cBlockArea::ForEachBlockEntity(cBlockEntityCallback a_Callback)
 
 
 
+
 void cBlockArea::SetRelNibble(Vector3i a_RelPos, LIGHTTYPE a_Value, LIGHTTYPE * a_Array)
 {
 	if (a_Array == nullptr)
@@ -1603,7 +1603,8 @@ void cBlockArea::CropBlocks(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_S
 	int NewSizeX = GetSizeX() - a_AddMinX - a_SubMaxX;
 	int NewSizeY = GetSizeY() - a_AddMinY - a_SubMaxY;
 	int NewSizeZ = GetSizeZ() - a_AddMinZ - a_SubMaxZ;
-	BLOCKARRAY NewBlockTypes{ new BlockState[ToUnsigned(NewSizeX * NewSizeY * NewSizeZ)] };
+	BLOCKVECTOR NewBlockTypes;
+	NewBlockTypes->reserve(NewSizeX * NewSizeY * NewSizeZ);
 	size_t idx = 0;
 	for (int y = 0; y < NewSizeY; y++)
 	{
@@ -1612,7 +1613,7 @@ void cBlockArea::CropBlocks(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_S
 			for (int x = 0; x < NewSizeX; x++)
 			{
 				auto OldIndex = MakeIndex(x + a_AddMinX, y + a_AddMinY, z + a_AddMinZ);
-				NewBlockTypes[idx++] = m_Blocks[OldIndex];
+				NewBlockTypes->at(idx++) = m_Blocks->at(OldIndex);
 			}  // for x
 		}  // for z
 	}  // for y
@@ -1653,8 +1654,9 @@ void cBlockArea::ExpandBlocks(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a
 	int NewSizeY = m_Size.y + a_SubMinY + a_AddMaxY;
 	int NewSizeZ = m_Size.z + a_SubMinZ + a_AddMaxZ;
 	size_t BlockCount = static_cast<size_t>(NewSizeX * NewSizeY * NewSizeZ);
-	BLOCKARRAY NewBlocks{ new BlockState[BlockCount] };
-	memset(NewBlocks.get(), 0, BlockCount * sizeof(BlockState));
+	BLOCKVECTOR NewBlockTypes;
+	NewBlockTypes->reserve(NewSizeX * NewSizeY * NewSizeZ);
+	memset(NewBlockTypes.get(), 0, BlockCount * sizeof(BlockState));
 	size_t OldIndex = 0;
 	for (int y = 0; y < m_Size.y; y++)
 	{
@@ -1665,11 +1667,11 @@ void cBlockArea::ExpandBlocks(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a
 			auto idx = static_cast<size_t>(IndexBaseZ + a_SubMinX);
 			for (int x = 0; x < m_Size.x; x++)
 			{
-				NewBlocks[idx++] = m_Blocks[OldIndex++];
+				NewBlockTypes->at(idx++) = m_Blocks->at(OldIndex++);
 			}  // for x
 		}  // for z
 	}  // for y
-	m_Blocks = std::move(NewBlocks);
+	m_Blocks = std::move(NewBlockTypes);
 }
 
 
@@ -1719,7 +1721,7 @@ void cBlockArea::RelSetData(
 	auto Index = MakeIndex(a_RelPos);
 	if ((a_DataTypes & baBlocks) != 0)
 	{
-		m_Blocks[Index] = a_Block;
+		m_Blocks->at(Index) = a_Block;
 	}
 	if ((a_DataTypes & baLight) != 0)
 	{
@@ -1921,7 +1923,7 @@ void cBlockArea::MergeBlockEntities(Vector3i a_RelPos, const cBlockArea & a_Src)
 	for (int y = 0; y < m_Size.y; ++y) for (int z = 0; z < m_Size.z; ++z) for (int x = 0; x < m_Size.x; ++x)
 	{
 		auto idx = MakeIndex(x, y, z);
-		auto Block = m_Blocks[idx];
+		auto Block = m_Blocks->at(idx);
 		if (!cBlockEntity::IsBlockEntityBlockType(Block.Type()))
 		{
 			continue;
@@ -1973,7 +1975,7 @@ void cBlockArea::RescanBlockEntities(void)
 	for (int y = 0; y < m_Size.y; ++y) for (int z = 0; z < m_Size.z; ++z) for (int x = 0; x < m_Size.x; ++x)
 	{
 		auto idx = MakeIndex(x, y, z);
-		auto Block = m_Blocks[idx];
+		auto Block = m_Blocks->at(idx);
 		if (!cBlockEntity::IsBlockEntityBlockType(Block.Type()))
 		{
 			continue;
@@ -2003,7 +2005,7 @@ void cBlockArea::RemoveNonMatchingBlockEntities(void)
 	std::swap(oldBE, *m_BlockEntities);
 	for (auto & keyPair: oldBE)
 	{
-		auto Block = m_Blocks[static_cast<size_t>(keyPair.first)];
+		auto Block = m_Blocks->at(static_cast<size_t>(keyPair.first));
 		if (Block.Type() == keyPair.second->GetBlockType())
 		{
 			m_BlockEntities->insert(std::move(keyPair));
@@ -2115,7 +2117,7 @@ void cBlockArea::cChunkReader::ChunkData(const ChunkBlockData & a_BlockData, con
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_Blocks[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockData.GetBlock({ InChunkX, InChunkY, InChunkZ });
+					m_Area.m_Blocks->at(m_Area.MakeIndex(AreaX, AreaY, AreaZ)) = a_BlockData.GetBlock({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y
