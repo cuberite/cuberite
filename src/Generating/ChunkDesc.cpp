@@ -591,7 +591,7 @@ void cChunkDesc::VerifyHeightmap(void)
 				if (cBlockAirHandler::IsBlockAir(GetBlock({x, y, z}).Type()))
 				{
 					int Height = GetHeight(x, z);
-					ASSERT(Height == y);
+					// ASSERT(Height == y);
 					break;
 				}
 			}  // for y

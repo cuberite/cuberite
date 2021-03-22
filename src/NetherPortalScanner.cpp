@@ -68,7 +68,7 @@ void cNetherPortalScanner::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 		{
 			for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 			{
-				const auto Blocks = a_BlockData.GetSection(Y);
+				const auto & Blocks = a_BlockData.GetSection(Y);
 				if (Blocks == nullptr)
 				{
 					continue;
@@ -128,7 +128,7 @@ bool cNetherPortalScanner::IsValidBuildLocation(Vector3i a_BlockPos)
 	{
 		for (int j = 0; j < PortalLength; j++)
 		{
-			 auto BlockToCheck = m_World.GetBlock(a_BlockPos.addedXZ(i, j));
+			auto BlockToCheck = m_World.GetBlock(a_BlockPos.addedXZ(i, j));
 			if (!cBlockInfo::IsSolid(BlockToCheck))
 			{
 				return false;

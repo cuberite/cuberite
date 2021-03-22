@@ -366,7 +366,7 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeH
 
 	// Hollow out a few bubbles inside the blockarea:
 	int NumBubbles = 4 + ((Rnd >> 18) & 0x03);  // 4 .. 7 bubbles
-	auto Blocks = a_Lake.GetBlocks();
+	auto & Blocks = a_Lake.GetBlocks();
 	for (int i = 0; i < NumBubbles; i++)
 	{
 		int BubbleRnd = m_Noise.IntNoise3DInt(a_ChunkX, i, a_ChunkZ) / 13;
@@ -396,7 +396,7 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeH
 				{
 					if (x * x + DistYZ < RSquared)
 					{
-						Blocks[x + IdxYZ] = Block::Air::Air();
+						Blocks->at(x + IdxYZ) = Block::Air::Air();
 					}
 				}  // for x
 			}  // for z
@@ -408,12 +408,12 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeH
 	{
 		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
 		{
-			if (Blocks[x + z * 16 + y * 16 * 16] == Block::Air::Air())
+			if (Blocks->at(x + z * 16 + y * 16 * 16) == Block::Air::Air())
 			{
 				switch (m_Fluid)
 				{
-					case BlockType::Lava:  Blocks[x + z * 16 + y * 16 * 16] = Block::Lava::Lava(); break;
-					case BlockType::Water: Blocks[x + z * 16 + y * 16 * 16] = Block::Water::Water(); break;
+					case BlockType::Lava:  Blocks->at(x + z * 16 + y * 16 * 16) = Block::Lava::Lava(); break;
+					case BlockType::Water: Blocks->at(x + z * 16 + y * 16 * 16) = Block::Water::Water(); break;
 					default:
 					{
 						ASSERT(!"Unhandled Fluid Block in lake generator.");

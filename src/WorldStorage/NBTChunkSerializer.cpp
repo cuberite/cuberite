@@ -1249,11 +1249,13 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 			}
 
 			aWriter.AddByteArray("Blocks", BlockData);
+			aWriter.AddByteArray("MetaData", MetaData);
 		}
 		else
 		{
 			AString Dummy(ChunkBlockData::SectionBlockCount, 0);
 			aWriter.AddByteArray("Blocks", Dummy);
+			aWriter.AddByteArray("MetaData", Dummy);
 		}
 
 		if (BlockLights != nullptr)

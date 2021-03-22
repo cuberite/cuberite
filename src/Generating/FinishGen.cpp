@@ -1216,9 +1216,9 @@ void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
-			if (BlockTypes[Index] == BlockType::Air)
+			if (BlockTypes->at(Index) == BlockType::Air)
 			{
-				BlockTypes[Index] = Block::Lava::Lava();
+				BlockTypes->at(Index) = Block::Lava::Lava();
 			}
 		}  // for x, for z
 	}  // for y
@@ -1326,7 +1326,7 @@ void cFinishGenPreSimulator::CollapseSandGravel(cChunkDesc & a_ChunkDesc)
 
 
 void cFinishGenPreSimulator::StationarizeFluid(
-	cChunkDef::BlockStates & a_BlockTypes,    // Block types to read and change
+	cBlockArea::BLOCKVECTOR & a_BlockTypes,    // Block types to read and change
 	cChunkDef::HeightMap & a_HeightMap,      // Height map to read
 	BlockState a_Block
 )
@@ -1338,7 +1338,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 		{
 			for (int y = cChunkDef::GetHeight(a_HeightMap, x, z); y >= 0; y--)
 			{
-				auto Block = cChunkDef::GetBlock(a_BlockTypes, x, y, z);
+				auto Block = cChunkDef::GetBlock(a_BlockTypes->data(), {x, y, z});
 				if (Block.Type() != a_Block.Type())
 				{
 					continue;
@@ -1358,7 +1358,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 					{
 						continue;
 					}
-					auto Neighbor = cChunkDef::GetBlock(a_BlockTypes, x + Offset.x, y + Offset.y, z + Offset.z);
+					auto Neighbor = cChunkDef::GetBlock(a_BlockTypes->data(), x + Offset.x, y + Offset.y, z + Offset.z);
 					if ((Neighbor.Type() == BlockType::Air) || cFluidSimulator::CanWashAway(Neighbor))
 					{
 						// There is an air / washable neighbor, simulate this block
@@ -1371,7 +1371,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 						break;
 					}
 				}  // for i - Coords[]
-				cChunkDef::SetBlock(a_BlockTypes, x, y, z, BlockToSet);
+				cChunkDef::SetBlock(a_BlockTypes->data(), x, y, z, BlockToSet);
 			}  // for y
 		}  // for x
 	}  // for z
@@ -1381,21 +1381,21 @@ void cFinishGenPreSimulator::StationarizeFluid(
 	{
 		for (int i = 0; i < cChunkDef::Width; i++)  // i stands for both x and z here
 		{
-			if (cBlockFluidHandler::GetFalloff(cChunkDef::GetBlock(a_BlockTypes, 0, y, i)) == 0)
+			if (cBlockFluidHandler::GetFalloff(cChunkDef::GetBlock(a_BlockTypes->data(), 0, y, i)) == 0)
 			{
-				cChunkDef::SetBlock(a_BlockTypes, 0, y, i, cBlockFluidHandler::SetFalloff(a_Block, 1));
+				cChunkDef::SetBlock(a_BlockTypes->data(), 0, y, i, cBlockFluidHandler::SetFalloff(a_Block, 1));
 			}
-			if (cBlockFluidHandler::GetFalloff(cChunkDef::GetBlock(a_BlockTypes, i, y, 0)) == 0)
+			if (cBlockFluidHandler::GetFalloff(cChunkDef::GetBlock(a_BlockTypes->data(), i, y, 0)) == 0)
 			{
-				cChunkDef::SetBlock(a_BlockTypes, i, y, 0, cBlockFluidHandler::SetFalloff(a_Block, 1));
+				cChunkDef::SetBlock(a_BlockTypes->data(), i, y, 0, cBlockFluidHandler::SetFalloff(a_Block, 1));
 			}
-			if (cBlockFluidHandler::GetFalloff(cChunkDef::GetBlock(a_BlockTypes, cChunkDef::Width - 1, y, i)) == 0)
+			if (cBlockFluidHandler::GetFalloff(cChunkDef::GetBlock(a_BlockTypes->data(), cChunkDef::Width - 1, y, i)) == 0)
 			{
-				cChunkDef::SetBlock(a_BlockTypes, cChunkDef::Width - 1, y, i, cBlockFluidHandler::SetFalloff(a_Block, 1));
+				cChunkDef::SetBlock(a_BlockTypes->data(), cChunkDef::Width - 1, y, i, cBlockFluidHandler::SetFalloff(a_Block, 1));
 			}
-			if (cBlockFluidHandler::GetFalloff(cChunkDef::GetBlock(a_BlockTypes, i, y, cChunkDef::Width - 1)) == 0)
+			if (cBlockFluidHandler::GetFalloff(cChunkDef::GetBlock(a_BlockTypes->data(), i, y, cChunkDef::Width - 1)) == 0)
 			{
-				cChunkDef::SetBlock(a_BlockTypes, i, y, cChunkDef::Width - 1, cBlockFluidHandler::SetFalloff(a_Block, 1));
+				cChunkDef::SetBlock(a_BlockTypes->data(), i, y, cChunkDef::Width - 1, cBlockFluidHandler::SetFalloff(a_Block, 1));
 			}
 		}
 	}
@@ -1989,11 +1989,11 @@ void cFinishGenOreNests::GenerateOre(
 						}
 
 						int Index = cChunkDef::MakeIndexNoCheck(BlockX, BlockY, BlockZ);
-						auto Block = Blocks[Index];
+						auto Block = Blocks->at(Index);
 						if ((Block.Type() == BlockType::Stone) || (Block.Type() == BlockType::Netherrack))
 						{
 							// TODO: Check if this actually creates the ore
-							Blocks[Index] = a_OreBlock;
+							Blocks->at(Index) = a_OreBlock;
 						}
 						Num++;
 					}  // for z

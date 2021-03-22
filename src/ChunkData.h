@@ -47,7 +47,7 @@ struct ChunkDataStore
 	void SetAll(const ElementType (& a_Source)[cChunkDef::NumSections * ElementCount]);
 
 	/** Contains all the sections this ChunkDataStore manages. */
-	std::unique_ptr<Type> Store[cChunkDef::NumSections];
+	std::array<std::unique_ptr<Type>, cChunkDef::NumSections> Store;
 
 	ElementType m_DefaultValue;
 };
@@ -60,30 +60,27 @@ class ChunkBlockData
 {
 public:
 
-	ChunkBlockData() : m_Blocks(DefaultValue) {};
-
 	static constexpr size_t SectionBlockCount = cChunkDef::SectionHeight * cChunkDef::Width * cChunkDef::Width;
 	static constexpr size_t SectionMetaCount = SectionBlockCount / 2;
 
 	static constexpr BlockState DefaultValue = Block::Air::Air();
 
-	using SectionType = BlockState[SectionBlockCount];
+	using SectionType = std::unique_ptr<std::array<BlockState, SectionBlockCount>>;
+	using BlockArray = std::array<SectionType, cChunkDef::NumSections>;
 
 private:
 
-	ChunkDataStore<BlockState, SectionBlockCount> m_Blocks;
+	BlockArray m_Blocks;
 
 public:
 
-	using BlockArray = decltype(m_Blocks)::Type;
-
 	void Assign(const ChunkBlockData & a_Other);
 
-	BlockState GetBlock(Vector3i a_Position) const { return m_Blocks.Get(a_Position); }
+	BlockState GetBlock(Vector3i a_Position) const;
 
-	BlockArray * GetSection(size_t a_Y) const { return m_Blocks.GetSection(a_Y); }
+	const SectionType & GetSection(size_t a_Y) const;
 
-	void SetBlock(Vector3i a_Position, BlockState a_Block) { m_Blocks.Set(a_Position, a_Block); }
+	void SetBlock(Vector3i a_Position, BlockState a_Block);
 
 	void SetAll(const cChunkDef::BlockStates & a_BlockSource);
 	void SetSection(const SectionType & a_BlockSource, size_t a_Y);
@@ -139,7 +136,7 @@ In macro form to work around a Visual Studio 2017 ICE bug. */
 	{ \
 		for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y) \
 		{ \
-			const auto Blocks = BlockData.GetSection(Y); \
+			const auto & Blocks = BlockData.GetSection(Y); \
 			const auto BlockLights = LightData.GetBlockLightSection(Y); \
 			const auto SkyLights = LightData.GetSkyLightSection(Y); \
 			if ((Blocks != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr)) \
@@ -152,8 +149,6 @@ In macro form to work around a Visual Studio 2017 ICE bug. */
 
 
 
-/*
-extern template struct ChunkDataStore<BlockState, ChunkBlockData::SectionBlockCount>;
-extern template struct ChunkDataStore<NIBBLETYPE, ChunkBlockData::SectionMetaCount, ChunkLightData::DefaultBlockLightValue>;
-extern template struct ChunkDataStore<NIBBLETYPE, ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue>;
-*/
+
+extern template struct ChunkDataStore<LIGHTTYPE, ChunkLightData::SectionLightCount>;
+

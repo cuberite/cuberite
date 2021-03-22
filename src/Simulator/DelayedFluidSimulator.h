@@ -31,7 +31,7 @@ public:
 		/** Array of block containers, each item stores blocks for one Z coord
 		Int param is the block index (for faster duplicate comparison in Add())
 		*/
-		cCoordWithIntVector m_Blocks[16];
+		std::array<cCoordWithIntVector, 16> m_Blocks;
 	} ;
 
 	cDelayedFluidSimulatorChunkData(int a_TickDelay);
