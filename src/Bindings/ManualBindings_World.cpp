@@ -79,7 +79,7 @@ static int tolua_cWorld_BroadcastBlockAction(lua_State * tolua_S)
 	cWorld * Self;
 	Vector3i BlockPos;
 	Byte Byte1, Byte2;
-	BLOCKTYPE BlockType;
+	unsigned char BlockType;
 	const cClientHandle * Exclude = nullptr;
 
 	if (
@@ -94,7 +94,7 @@ static int tolua_cWorld_BroadcastBlockAction(lua_State * tolua_S)
 	// Optional param
 	L.GetStackValue(Byte1Index + 3, Exclude);
 
-	Self->BroadcastBlockAction(BlockPos, Byte1, Byte2, BlockType, Exclude);
+	Self->BroadcastBlockAction(BlockPos, Byte1, Byte2, PaletteUpgrade::FromBlock(BlockType, 0).Type(), Exclude);
 	return 0;
 }
 
@@ -535,8 +535,8 @@ static int tolua_cWorld_FastSetBlock(lua_State * tolua_S)
 
 	cWorld * World;
 	Vector3i Position;
-	BLOCKTYPE Type;
-	NIBBLETYPE Meta;
+	unsigned char Type;
+	unsigned char Meta;
 
 	// Read the params:
 	if (
@@ -558,7 +558,7 @@ static int tolua_cWorld_FastSetBlock(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
 
-	World->FastSetBlock(Position, Type, Meta);
+	World->FastSetBlock(Position, PaletteUpgrade::FromBlock(Type, Meta));
 	return 0;
 }
 
@@ -780,17 +780,19 @@ static int tolua_cWorld_GetBlockInfo(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
 
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta, BlockSkyLight, BlockBlockLight;
+	BlockState Block;
+	LIGHTTYPE BlockSkyLight, BlockBlockLight;
 
 	// Call the function:
-	bool res = World->GetBlockInfo(Position, BlockType, BlockMeta, BlockSkyLight, BlockBlockLight);
+	bool res = World->GetBlockInfo(Position, Block, BlockSkyLight, BlockBlockLight);
+
+	auto NumericBlock = PaletteUpgrade::ToBlock(Block);
 
 	// Push the returned values:
 	L.Push(res);
 	if (res)
 	{
-		L.Push(BlockType, BlockMeta, BlockSkyLight, BlockBlockLight);
+		L.Push(NumericBlock.first, NumericBlock.second, BlockSkyLight, BlockBlockLight);
 		return 5;
 	}
 	return 1;
@@ -848,7 +850,7 @@ static int tolua_cWorld_GetBlockMeta(lua_State * tolua_S)
 		return 1;
 	}
 
-	L.Push(World->GetBlockMeta(Position));
+	L.Push(PaletteUpgrade::ToBlock(World->GetBlock(Position)).second);
 	return 1;
 }
 
@@ -961,17 +963,17 @@ static int tolua_cWorld_GetBlockTypeMeta(lua_State * tolua_S)
 		return 2;
 	}
 
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-
 	// Call the function:
-	bool res = World->GetBlockTypeMeta(Position, BlockType, BlockMeta);
+	BlockState Block;
+	bool res = World->GetBlock(Position, Block);
+
+	auto NumericBlock = PaletteUpgrade::ToBlock(Block);
 
 	// Push the returned values:
 	L.Push(res);
 	if (res)
 	{
-		L.Push(BlockType, BlockMeta);
+		L.Push(NumericBlock.first, NumericBlock.second);
 		return 3;
 	}
 	return 1;
@@ -1147,8 +1149,8 @@ static int tolua_cWorld_SetBlock(lua_State * tolua_S)
 
 	cWorld * World;
 	Vector3i Position;
-	BLOCKTYPE Type;
-	NIBBLETYPE Meta;
+	unsigned char Type;
+	unsigned char Meta;
 
 	// Read the params:
 	if (
@@ -1170,7 +1172,7 @@ static int tolua_cWorld_SetBlock(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
 
-	World->SetBlock(Position, Type, Meta);
+	World->SetBlock(Position, PaletteUpgrade::FromBlock(Type, Meta));
 	return 0;
 }
 

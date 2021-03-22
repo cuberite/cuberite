@@ -1,5 +1,4 @@
 
-#include "Globals.h"
 #include "BlockState.h"
 
 constexpr BlockState::BlockState(BlockType a_Type) : ID([a_Type]
@@ -772,4 +771,5 @@ constexpr BlockState::BlockState(BlockType a_Type) : ID([a_Type]
 		case BlockType::ZombieWallHead:                  return ZombieWallHead::ZombieWallHead().ID; break;
 		default:                                         return uint_least16_t(0); break;
 	}
-}());
+}())
+{}

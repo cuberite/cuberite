@@ -136,10 +136,10 @@ private:
 
 		std::array<BlockState, 4> Neighbors;
 		if (
-			!a_Chunk.UnboundedRelGetBlockType(a_StemRelPos + NeighborOfs[0], Neighbors[0]) ||
-			!a_Chunk.UnboundedRelGetBlockType(a_StemRelPos + NeighborOfs[1], Neighbors[1]) ||
-			!a_Chunk.UnboundedRelGetBlockType(a_StemRelPos + NeighborOfs[2], Neighbors[2]) ||
-			!a_Chunk.UnboundedRelGetBlockType(a_StemRelPos + NeighborOfs[3], Neighbors[3]) ||
+			!a_Chunk.UnboundedRelGetBlock(a_StemRelPos + NeighborOfs[0], Neighbors[0]) ||
+			!a_Chunk.UnboundedRelGetBlock(a_StemRelPos + NeighborOfs[1], Neighbors[1]) ||
+			!a_Chunk.UnboundedRelGetBlock(a_StemRelPos + NeighborOfs[2], Neighbors[2]) ||
+			!a_Chunk.UnboundedRelGetBlock(a_StemRelPos + NeighborOfs[3], Neighbors[3]) ||
 			(Neighbors[0].Type() == ProduceBlockType) ||
 			(Neighbors[1].Type() == ProduceBlockType) ||
 			(Neighbors[2].Type() == ProduceBlockType) ||
@@ -179,7 +179,7 @@ private:
 		// Check if there's soil under the neighbor. We already know the neighbors are valid. Place produce if ok
 		BlockState SoilBlock;
 		const auto ProduceRelPos = a_StemRelPos + Vector3i(x, 0, z);
-		VERIFY(a_Chunk.UnboundedRelGetBlockType(ProduceRelPos.addedY(-1), SoilBlock));
+		VERIFY(a_Chunk.UnboundedRelGetBlock(ProduceRelPos.addedY(-1), SoilBlock));
 
 		switch (SoilBlock.Type())
 		{

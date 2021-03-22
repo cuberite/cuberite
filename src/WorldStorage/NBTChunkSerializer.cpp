@@ -12,6 +12,7 @@
 #include "../UUID.h"
 #include "../BlockInfo.h"
 #include "FastNBT.h"
+#include "../Blocks/BlockAnvil.h"
 
 #include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
@@ -791,7 +792,7 @@ public:
 			mWriter.AddByte("Data", static_cast<unsigned char>(BlockData.second));
 			mWriter.AddByte("Time", 1);  // Unused in Cuberite, Vanilla said to need nonzero
 			mWriter.AddByte("DropItem", 1);
-			mWriter.AddByte("HurtEntities", IsAnvil(a_FallingBlock->GetBlock()));
+			mWriter.AddByte("HurtEntities", cBlockAnvilHandler::IsBlockAnvil(a_FallingBlock->GetBlock()));
 		mWriter.EndCompound();
 	}
 

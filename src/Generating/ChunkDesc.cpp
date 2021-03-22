@@ -54,7 +54,7 @@ void cChunkDesc::SetChunkCoords(cChunkCoords a_Coords)
 
 void cChunkDesc::FillBlocks(BlockState a_Block)
 {
-	m_BlockArea.Fill(cBlockArea::baTypes | cBlockArea::baMetas, a_Block);
+	m_BlockArea.Fill(cBlockArea::baBlocks, a_Block);
 }
 
 
@@ -233,9 +233,9 @@ bool cChunkDesc::IsUsingDefaultFinish(void) const
 
 
 
-void cChunkDesc::WriteBlockArea(const cBlockArea & a_BlockArea, int a_RelX, int a_RelY, int a_RelZ, cBlockArea::eMergeStrategy a_MergeStrategy)
+void cChunkDesc::WriteBlockArea(const cBlockArea & a_BlockArea, Vector3i a_RelPos, cBlockArea::eMergeStrategy a_MergeStrategy)
 {
-	m_BlockArea.Merge(a_BlockArea, a_RelX, a_RelY, a_RelZ, a_MergeStrategy);
+	m_BlockArea.Merge(a_BlockArea, a_RelPos, a_MergeStrategy);
 }
 
 
@@ -335,7 +335,7 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 	a_Dest.m_Origin.x = m_Coords.m_ChunkX * cChunkDef::Width + a_MinRelX;
 	a_Dest.m_Origin.y = a_MinRelY;
 	a_Dest.m_Origin.z = m_Coords.m_ChunkZ * cChunkDef::Width + a_MinRelZ;
-	a_Dest.SetSize(SizeX, SizeY, SizeZ, cBlockArea::baTypes | cBlockArea::baMetas);
+	a_Dest.SetSize(SizeX, SizeY, SizeZ, cBlockArea::baBlocks);
 
 	for (int y = 0; y < SizeY; y++)
 	{

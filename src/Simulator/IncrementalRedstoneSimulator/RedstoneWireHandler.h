@@ -328,7 +328,7 @@ namespace RedstoneWireHandler
 					if (
 						BlockState QueryBlock = 0;
 						cChunkDef::IsValidHeight(YMDiagonalPosition.y) &&
-						a_Chunk.UnboundedRelGetBlockType(YMDiagonalPosition, QueryBlock) &&
+						a_Chunk.UnboundedRelGetBlock(YMDiagonalPosition, QueryBlock) &&
 						(QueryBlock == BlockType::RedstoneWire)
 					)
 					{

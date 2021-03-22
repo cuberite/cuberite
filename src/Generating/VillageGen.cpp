@@ -64,8 +64,8 @@ public:
 		for (int len = 27; len < 60; len += 12)
 		{
 			cBlockArea BA;
-			BA.Create(len, 1, 3, cBlockArea::baTypes | cBlockArea::baMetas);
-			BA.Fill(cBlockArea::baTypes | cBlockArea::baMetas, E_BLOCK_GRAVEL, 0);
+			BA.Create(len, 1, 3, cBlockArea::baBlocks);
+			BA.Fill(cBlockArea::baBlocks, E_BLOCK_GRAVEL, 0);
 			cPrefab * RoadPiece = new cPrefab(BA, 1);
 			RoadPiece->AddConnector(0,       0, 1, cPiece::cConnector::dirXM, -2);
 			RoadPiece->AddConnector(len - 1, 0, 1, cPiece::cConnector::dirXP, -2);

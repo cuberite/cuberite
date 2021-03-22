@@ -201,7 +201,7 @@ AString BlockFaceToString(eBlockFace a_BlockFace)
 
 
 
-eBlockFace RotationToBlockFace(double a_Rotation, bool a_Inverse = false)
+eBlockFace RotationToBlockFace(double a_Rotation, bool a_Inverse)
 {
 	if (a_Inverse)
 	{
@@ -241,6 +241,7 @@ eBlockFace RotationToBlockFace(double a_Rotation, bool a_Inverse = false)
 			return eBlockFace::BLOCK_FACE_EAST;
 		}
 	}
+	return BLOCK_FACE_NONE;
 }
 
 

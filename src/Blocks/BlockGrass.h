@@ -155,7 +155,7 @@ private:
 		if (
 			(Light > 4) &&
 			cBlockInfo::IsTransparent(Above) &&
-			!IsBlockLava(Above) &&
+			(Above.Type() != BlockType::Lava) &&
 			!IsBlockWaterOrIce(Above)
 		)
 		{

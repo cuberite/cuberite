@@ -1819,8 +1819,8 @@ unsigned cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 	for (size_t i = 0; i < ARRAYCOUNT(CheckCoords); i++)
 	{
 		if (
-			(Area.GetRelBlock(CheckCoords[i].m_AirX, CheckCoords[i].m_AirY, CheckCoords[i].m_AirZ).Type() == BlockType::Air) &&  // There's air in the checkspot
-			(Area.GetRelBlock(CheckCoords[i].m_BookX, CheckCoords[i].m_BookY, CheckCoords[i].m_BookZ).Type() == BlockType::Bookshelf)  // There's Bookshelf in the wanted place
+			(Area.GetRelBlock({CheckCoords[i].m_AirX, CheckCoords[i].m_AirY, CheckCoords[i].m_AirZ}).Type() == BlockType::Air) &&  // There's air in the checkspot
+			(Area.GetRelBlock({CheckCoords[i].m_BookX, CheckCoords[i].m_BookY, CheckCoords[i].m_BookZ}).Type() == BlockType::Bookshelf)  // There's Bookshelf in the wanted place
 		)
 		{
 			Bookshelves++;

@@ -20,7 +20,7 @@ public:
 	}
 
 	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
-	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block) override
 	{
 		UNUSED(a_Block);
 		UNUSED(a_Chunk);

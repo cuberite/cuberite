@@ -32,7 +32,7 @@ struct ChunkDataStore
 
 	/** Returns a raw pointer to the internal representation of the specified section.
 	Will be nullptr if the section is not allocated. */
-	Type * GetSection(size_t a_Y) const;
+	Type * GetSection(size_t a_Y) const { return Store[a_Y].get(); };
 
 	/** Sets one value at the given position.
 	Allocates a section if needed for the operation. */

@@ -17,7 +17,7 @@ cBedEntity::cBedEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World, sho
 	Super(a_Block, a_Pos, a_World),
 	m_Color(a_Color)
 {
-	ASSERT(IsBed(a_Block.Type()));
+	ASSERT(cBlockBedHandler::IsBlockBed(a_Block.Type()));
 }
 
 

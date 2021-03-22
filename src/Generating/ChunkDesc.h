@@ -94,7 +94,7 @@ public:
 	bool IsUsingDefaultFinish(void) const;
 
 	/** Writes the block area into the chunk, with its origin set at the specified relative coords. Area's data overwrite everything in the chunk. */
-	void WriteBlockArea(const cBlockArea & a_BlockArea, int a_RelX, int a_RelY, int a_RelZ, cBlockArea::eMergeStrategy a_MergeStrategy = cBlockArea::msOverwrite);
+	void WriteBlockArea(const cBlockArea & a_BlockArea, Vector3i a_RelPos, cBlockArea::eMergeStrategy a_MergeStrategy = cBlockArea::msOverwrite);
 
 	/** Reads an area from the chunk into a cBlockArea, blocktypes and blockmetas */
 	void ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ);

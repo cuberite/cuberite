@@ -495,7 +495,7 @@ eBlockFace ReverseBlockFace(eBlockFace  a_BlockFace);
 /** Returns the textual representation of the BlockFace constant. */
 AString BlockFaceToString(eBlockFace a_BlockFace);
 
-eBlockFace RotationToBlockFace(double a_Rotation);
+eBlockFace RotationToBlockFace(double a_Rotation, bool a_Inverse = false);
 
 unsigned char RotationToFineFace(double a_Rotation);
 

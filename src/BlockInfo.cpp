@@ -10,15 +10,6 @@
 
 
 
-bool IsBlockWater(BlockType a_BlockType)
-{
-	return a_BlockType == BlockType::Water;
-}
-
-
-
-
-
 bool IsBlockIce(BlockState a_Block)
 {
 	switch (a_Block.Type())
@@ -68,6 +59,22 @@ bool IsBlockTypeOfDirt(BlockState a_Block)
 	}
 }
 
+
+
+
+
+bool IsBlockStateOfDirt(BlockState a_Block)
+{
+	switch (a_Block.Type())
+	{
+		case BlockType::Dirt:
+		case BlockType::CoarseDirt:
+		case BlockType::GrassBlock:
+		case BlockType::GrassPath:
+			return true;
+		default: return false;
+	}
+}
 
 
 
@@ -1200,95 +1207,214 @@ bool cBlockInfo::IsOneHitDig(BlockState a_Block)
 
 
 
-bool cBlockInfo::IsPistonBreakable(const BLOCKTYPE Block)
+bool cBlockInfo::IsPistonBreakable(const BlockState a_Block)
 {
 	// Blocks that break when pushed by piston:
-	switch (Block)
+	switch (a_Block.Type())
 	{
-		case BlockType::ACACIA_DOOR:
-		case BlockType::ACTIVE_COMPARATOR:
-		case BlockType::AIR:
-		case BlockType::BED:
-		case BlockType::BEETROOTS:
-		case BlockType::BIG_FLOWER:
-		case BlockType::BIRCH_DOOR:
-		case BlockType::BLACK_SHULKER_BOX:
-		case BlockType::BLUE_SHULKER_BOX:
-		case BlockType::BROWN_MUSHROOM:
-		case BlockType::BROWN_SHULKER_BOX:
-		case BlockType::CACTUS:
-		case BlockType::CAKE:
-		case BlockType::CARROTS:
-		case BlockType::CHORUS_FLOWER:
-		case BlockType::CHORUS_PLANT:
-		case BlockType::COCOA_POD:
-		case BlockType::COBWEB:
-		case BlockType::CROPS:
-		case BlockType::CYAN_SHULKER_BOX:
-		case BlockType::DANDELION:
-		case BlockType::DARK_OAK_DOOR:
-		case BlockType::DEAD_BUSH:
-		case BlockType::DRAGON_EGG:
-		case BlockType::FIRE:
-		case BlockType::FLOWER:
-		case BlockType::FLOWER_POT:
-		case BlockType::GRAY_SHULKER_BOX:
-		case BlockType::GREEN_SHULKER_BOX:
-		case BlockType::HEAD:
-		case BlockType::HEAVY_WEIGHTED_PRESSURE_PLATE:
-		case BlockType::INACTIVE_COMPARATOR:
-		case BlockType::IRON_DOOR:
-		case BlockType::IRON_TRAPDOOR:
-		case BlockType::JACK_O_LANTERN:
-		case BlockType::JUNGLE_DOOR:
-		case BlockType::LIGHT_BLUE_SHULKER_BOX:
-		case BlockType::LIGHT_GRAY_SHULKER_BOX:
-		case BlockType::LIGHT_WEIGHTED_PRESSURE_PLATE:
-		case BlockType::LILY_PAD:
-		case BlockType::LIME_SHULKER_BOX:
-		case BlockType::LADDER:
-		case BlockType::LAVA:
-		case BlockType::LEAVES:
-		case BlockType::LEVER:
-		case BlockType::MAGENTA_SHULKER_BOX:
-		case BlockType::MELON:
-		case BlockType::MELON_STEM:
-		case BlockType::NETHER_WART:
-		case BlockType::OAK_DOOR:
-		case BlockType::ORANGE_SHULKER_BOX:
-		case BlockType::PINK_SHULKER_BOX:
-		case BlockType::POTATOES:
-		case BlockType::PUMPKIN:
-		case BlockType::PUMPKIN_STEM:
-		case BlockType::PURPLE_SHULKER_BOX:
-		case BlockType::REDSTONE_REPEATER_OFF:
-		case BlockType::REDSTONE_REPEATER_ON:
-		case BlockType::REDSTONE_TORCH_OFF:
-		case BlockType::REDSTONE_TORCH_ON:
-		case BlockType::REDSTONE_WIRE:
-		case BlockType::RED_MUSHROOM:
-		case BlockType::RED_SHULKER_BOX:
-		case BlockType::REEDS:
-		case BlockType::SAPLING:
-		case BlockType::SIGN_POST:
-		case BlockType::SNOW:
-		case BlockType::SPRUCE_DOOR:
-		case BlockType::STATIONARY_LAVA:
-		case BlockType::STATIONARY_WATER:
-		case BlockType::STONE_BUTTON:
-		case BlockType::STONE_PRESSURE_PLATE:
-		case BlockType::TALL_GRASS:
-		case BlockType::TORCH:
-		case BlockType::TRAPDOOR:
-		case BlockType::TRIPWIRE:
-		case BlockType::TRIPWIRE_HOOK:
-		case BlockType::VINES:
-		case BlockType::WALLSIGN:
-		case BlockType::WATER:
-		case BlockType::WHITE_SHULKER_BOX:
-		case BlockType::WOODEN_BUTTON:
-		case BlockType::WOODEN_PRESSURE_PLATE:
-		case BlockType::YELLOW_SHULKER_BOX: return true;
+		case BlockType::AcaciaButton:
+		case BlockType::AcaciaDoor:
+		case BlockType::AcaciaLeaves:
+		case BlockType::AcaciaPressurePlate:
+		case BlockType::AcaciaSapling:
+		case BlockType::AcaciaSign:
+		case BlockType::AcaciaTrapdoor:
+		case BlockType::AcaciaWallSign:
+		case BlockType::Air:
+		case BlockType::Allium:
+		case BlockType::AttachedMelonStem:
+		case BlockType::AttachedPumpkinStem:
+		case BlockType::AzureBluet:
+		case BlockType::Beetroots:
+		case BlockType::BirchButton:
+		case BlockType::BirchDoor:
+		case BlockType::BirchLeaves:
+		case BlockType::BirchPressurePlate:
+		case BlockType::BirchSapling:
+		case BlockType::BirchSign:
+		case BlockType::BirchTrapdoor:
+		case BlockType::BirchWallSign:
+		case BlockType::BlackBed:
+		case BlockType::BlackShulkerBox:
+		case BlockType::BlueBed:
+		case BlockType::BlueOrchid:
+		case BlockType::BlueShulkerBox:
+		case BlockType::BrownBed:
+		case BlockType::BrownMushroom:
+		case BlockType::BrownShulkerBox:
+		case BlockType::Cactus:
+		case BlockType::Cake:
+		case BlockType::Carrots:
+		case BlockType::CaveAir:
+		case BlockType::ChorusFlower:
+		case BlockType::ChorusPlant:
+		case BlockType::Cobweb:
+		case BlockType::Cocoa:
+		case BlockType::Comparator:
+		case BlockType::Cornflower:
+		case BlockType::CreeperHead:
+		case BlockType::CreeperWallHead:
+		case BlockType::CrimsonButton:
+		case BlockType::CrimsonPressurePlate:
+		case BlockType::CrimsonSign:
+		case BlockType::CrimsonTrapdoor:
+		case BlockType::CrimsonWallSign:
+		case BlockType::CyanBed:
+		case BlockType::CyanShulkerBox:
+		case BlockType::Dandelion:
+		case BlockType::DarkOakButton:
+		case BlockType::DarkOakDoor:
+		case BlockType::DarkOakLeaves:
+		case BlockType::DarkOakPressurePlate:
+		case BlockType::DarkOakSapling:
+		case BlockType::DarkOakSign:
+		case BlockType::DarkOakTrapdoor:
+		case BlockType::DarkOakWallSign:
+		case BlockType::DeadBush:
+		case BlockType::DragonEgg:
+		case BlockType::DragonHead:
+		case BlockType::DragonWallHead:
+		case BlockType::Fire:
+		case BlockType::GrayBed:
+		case BlockType::GrayShulkerBox:
+		case BlockType::GreenBed:
+		case BlockType::GreenShulkerBox:
+		case BlockType::HeavyWeightedPressurePlate:
+		case BlockType::IronDoor:
+		case BlockType::IronTrapdoor:
+		case BlockType::JackOLantern:
+		case BlockType::JungleButton:
+		case BlockType::JungleDoor:
+		case BlockType::JungleLeaves:
+		case BlockType::JunglePressurePlate:
+		case BlockType::JungleSapling:
+		case BlockType::JungleSign:
+		case BlockType::JungleTrapdoor:
+		case BlockType::JungleWallSign:
+		case BlockType::Ladder:
+		case BlockType::LargeFern:
+		case BlockType::Lava:
+		case BlockType::Lever:
+		case BlockType::LightBlueBed:
+		case BlockType::LightBlueShulkerBox:
+		case BlockType::LightGrayBed:
+		case BlockType::LightGrayShulkerBox:
+		case BlockType::LightWeightedPressurePlate:
+		case BlockType::Lilac:
+		case BlockType::LilyOfTheValley:
+		case BlockType::LilyPad:
+		case BlockType::LimeBed:
+		case BlockType::LimeShulkerBox:
+		case BlockType::MagentaBed:
+		case BlockType::MagentaShulkerBox:
+		case BlockType::Melon:
+		case BlockType::MelonStem:
+		case BlockType::NetherWart:
+		case BlockType::NetherWartBlock:
+		case BlockType::OakButton:
+		case BlockType::OakDoor:
+		case BlockType::OakLeaves:
+		case BlockType::OakPressurePlate:
+		case BlockType::OakSapling:
+		case BlockType::OakSign:
+		case BlockType::OakTrapdoor:
+		case BlockType::OakWallSign:
+		case BlockType::OrangeBed:
+		case BlockType::OrangeShulkerBox:
+		case BlockType::OrangeTulip:
+		case BlockType::OxeyeDaisy:
+		case BlockType::Peony:
+		case BlockType::PinkBed:
+		case BlockType::PinkShulkerBox:
+		case BlockType::PinkTulip:
+		case BlockType::PlayerHead:
+		case BlockType::PlayerWallHead:
+		case BlockType::PolishedBlackstoneButton:
+		case BlockType::PolishedBlackstonePressurePlate:
+		case BlockType::Poppy:
+		case BlockType::Potatoes:
+		case BlockType::PottedAcaciaSapling:
+		case BlockType::PottedAllium:
+		case BlockType::PottedAzureBluet:
+		case BlockType::PottedBamboo:
+		case BlockType::PottedBirchSapling:
+		case BlockType::PottedBlueOrchid:
+		case BlockType::PottedBrownMushroom:
+		case BlockType::PottedCactus:
+		case BlockType::PottedCornflower:
+		case BlockType::PottedCrimsonFungus:
+		case BlockType::PottedCrimsonRoots:
+		case BlockType::PottedDandelion:
+		case BlockType::PottedDarkOakSapling:
+		case BlockType::PottedDeadBush:
+		case BlockType::PottedFern:
+		case BlockType::PottedJungleSapling:
+		case BlockType::PottedLilyOfTheValley:
+		case BlockType::PottedOakSapling:
+		case BlockType::PottedOrangeTulip:
+		case BlockType::PottedOxeyeDaisy:
+		case BlockType::PottedPinkTulip:
+		case BlockType::PottedPoppy:
+		case BlockType::PottedRedMushroom:
+		case BlockType::PottedRedTulip:
+		case BlockType::PottedSpruceSapling:
+		case BlockType::PottedWarpedFungus:
+		case BlockType::PottedWarpedRoots:
+		case BlockType::PottedWhiteTulip:
+		case BlockType::PottedWitherRose:
+		case BlockType::Pumpkin:
+		case BlockType::PumpkinStem:
+		case BlockType::PurpleBed:
+		case BlockType::PurpleShulkerBox:
+		case BlockType::RedBed:
+		case BlockType::RedMushroom:
+		case BlockType::RedShulkerBox:
+		case BlockType::RedTulip:
+		case BlockType::RedstoneTorch:
+		case BlockType::RedstoneWallTorch:
+		case BlockType::RedstoneWire:
+		case BlockType::Repeater:
+		case BlockType::RoseBush:
+		case BlockType::SkeletonSkull:
+		case BlockType::SkeletonWallSkull:
+		case BlockType::Snow:
+		case BlockType::SpruceButton:
+		case BlockType::SpruceDoor:
+		case BlockType::SpruceLeaves:
+		case BlockType::SprucePressurePlate:
+		case BlockType::SpruceSapling:
+		case BlockType::SpruceSign:
+		case BlockType::SpruceTrapdoor:
+		case BlockType::SpruceWallSign:
+		case BlockType::StoneButton:
+		case BlockType::StonePressurePlate:
+		case BlockType::SugarCane:
+		case BlockType::Sunflower:
+		case BlockType::TallGrass:
+		case BlockType::Torch:
+		case BlockType::Tripwire:
+		case BlockType::TripwireHook:
+		case BlockType::Vine:
+		case BlockType::VoidAir:
+		case BlockType::WallTorch:
+		case BlockType::WarpedButton:
+		case BlockType::WarpedPressurePlate:
+		case BlockType::WarpedSign:
+		case BlockType::WarpedTrapdoor:
+		case BlockType::WarpedWallSign:
+		case BlockType::Water:
+		case BlockType::Wheat:
+		case BlockType::WhiteBed:
+		case BlockType::WhiteShulkerBox:
+		case BlockType::WhiteTulip:
+		case BlockType::WitherSkeletonSkull:
+		case BlockType::WitherSkeletonWallSkull:
+		case BlockType::YellowBed:
+		case BlockType::YellowShulkerBox:
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:
+
+			return true;
 		default: return false;
 	}
 }
@@ -1297,16 +1423,60 @@ bool cBlockInfo::IsPistonBreakable(const BLOCKTYPE Block)
 
 
 
-bool cBlockInfo::IsRainBlocker(const BLOCKTYPE Block)
+bool cBlockInfo::IsRainBlocker(const BlockState a_Block)
 {
 	// Blocks that block rain or snow's passage:
-	switch (Block)
+	switch (a_Block.Type())
 	{
-		case BlockType::SIGN_POST:
-		case BlockType::WALLSIGN:
-		case BlockType::WALL_BANNER:
-		case BlockType::STANDING_BANNER: return true;
-		default: return IsSolid(Block);
+		case BlockType::AcaciaSign:
+		case BlockType::AcaciaWallSign:
+		case BlockType::BirchSign:
+		case BlockType::BirchWallSign:
+		case BlockType::BlackBanner:
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownBanner:
+		case BlockType::BrownWallBanner:
+		case BlockType::CrimsonSign:
+		case BlockType::CrimsonWallSign:
+		case BlockType::CyanBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::DarkOakSign:
+		case BlockType::DarkOakWallSign:
+		case BlockType::GrayBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::JungleSign:
+		case BlockType::JungleWallSign:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::OakSign:
+		case BlockType::OakWallSign:
+		case BlockType::OrangeBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedBanner:
+		case BlockType::RedWallBanner:
+		case BlockType::SpruceSign:
+		case BlockType::SpruceWallSign:
+		case BlockType::WarpedSign:
+		case BlockType::WarpedWallSign:
+		case BlockType::WhiteBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowBanner:
+		case BlockType::YellowWallBanner: return true;
+		default: return IsSolid(a_Block);
 	}
 }
 
@@ -1337,11 +1507,20 @@ bool cBlockInfo::IsSkylightDispersant(BlockState a_Block)
 
 bool cBlockInfo::IsSnowable(BlockState a_Block)
 {
-	return (
-		(a_Block.Type() == BlockType::Ice) ||
-		(a_BlockType == BlockType::LEAVES) ||
-		(!IsTransparent(a_BlockType) && (a_BlockType != BlockType::PACKED_ICE))
-	);
+	switch (a_Block.Type())
+	{
+		case BlockType::AcaciaLeaves:
+		case BlockType::BirchLeaves:
+		case BlockType::DarkOakLeaves:
+		case BlockType::JungleLeaves:
+		case BlockType::OakLeaves:
+		case BlockType::SpruceLeaves:
+		case BlockType::Ice:
+			return true;
+		case BlockType::PackedIce:
+			return false;
+		default: return (!IsTransparent(a_Block));
+	}
 }
 
 
@@ -1353,61 +1532,158 @@ bool cBlockInfo::IsSolid(BlockState a_Block)
 	// Nonsolid blocks:
 	switch (a_Block.Type())
 	{
-		case BlockType::ACTIVATOR_RAIL:
-		case BlockType::ACTIVE_COMPARATOR:
-		case BlockType::AIR:
-		case BlockType::BIG_FLOWER:
-		case BlockType::BROWN_MUSHROOM:
-		case BlockType::CARPET:
-		case BlockType::CARROTS:
-		case BlockType::CHORUS_FLOWER:
-		case BlockType::CHORUS_PLANT:
-		case BlockType::COBWEB:
-		case BlockType::CROPS:
-		case BlockType::DANDELION:
-		case BlockType::DEAD_BUSH:
-		case BlockType::DETECTOR_RAIL:
-		case BlockType::END_GATEWAY:
-		case BlockType::END_PORTAL:
-		case BlockType::END_ROD:
-		case BlockType::FIRE:
-		case BlockType::FLOWER:
-		case BlockType::HEAVY_WEIGHTED_PRESSURE_PLATE:
-		case BlockType::INACTIVE_COMPARATOR:
-		case BlockType::LADDER:
-		case BlockType::LAVA:
-		case BlockType::LEVER:
-		case BlockType::LIGHT_WEIGHTED_PRESSURE_PLATE:
-		case BlockType::MELON_STEM:
-		case BlockType::NETHER_PORTAL:
-		case BlockType::POTATOES:
-		case BlockType::POWERED_RAIL:
-		case BlockType::RAIL:
-		case BlockType::RED_MUSHROOM:
-		case BlockType::REDSTONE_REPEATER_OFF:
-		case BlockType::REDSTONE_REPEATER_ON:
-		case BlockType::REDSTONE_TORCH_OFF:
-		case BlockType::REDSTONE_TORCH_ON:
-		case BlockType::REDSTONE_WIRE:
-		case BlockType::REEDS:
-		case BlockType::SAPLING:
-		case BlockType::SIGN_POST:
-		case BlockType::SNOW:
-		case BlockType::STANDING_BANNER:
-		case BlockType::STATIONARY_LAVA:
-		case BlockType::STATIONARY_WATER:
-		case BlockType::STONE_BUTTON:
-		case BlockType::STONE_PRESSURE_PLATE:
-		case BlockType::TALL_GRASS:
-		case BlockType::TORCH:
-		case BlockType::TRIPWIRE:
-		case BlockType::TRIPWIRE_HOOK:
-		case BlockType::VINES:
-		case BlockType::WALL_BANNER:
-		case BlockType::WALLSIGN:
-		case BlockType::WATER:
-		case BlockType::WOODEN_BUTTON:
-		case BlockType::WOODEN_PRESSURE_PLATE: return false;
+		case BlockType::AcaciaButton:
+		case BlockType::AcaciaPressurePlate:
+		case BlockType::AcaciaSapling:
+		case BlockType::AcaciaSign:
+		case BlockType::AcaciaWallSign:
+		case BlockType::ActivatorRail:
+		case BlockType::Air:
+		case BlockType::Allium:
+		case BlockType::AttachedMelonStem:
+		case BlockType::AzureBluet:
+		case BlockType::BirchButton:
+		case BlockType::BirchPressurePlate:
+		case BlockType::BirchSapling:
+		case BlockType::BirchSign:
+		case BlockType::BirchWallSign:
+		case BlockType::BlackBanner:
+		case BlockType::BlackCarpet:
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BlueCarpet:
+		case BlockType::BlueOrchid:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownBanner:
+		case BlockType::BrownCarpet:
+		case BlockType::BrownMushroom:
+		case BlockType::BrownWallBanner:
+		case BlockType::Carrots:
+		case BlockType::CaveAir:
+		case BlockType::ChorusFlower:
+		case BlockType::ChorusPlant:
+		case BlockType::Cobweb:
+		case BlockType::Comparator:
+		case BlockType::Cornflower:
+		case BlockType::CrimsonButton:
+		case BlockType::CrimsonPressurePlate:
+		case BlockType::CrimsonSign:
+		case BlockType::CrimsonWallSign:
+		case BlockType::CyanBanner:
+		case BlockType::CyanCarpet:
+		case BlockType::CyanWallBanner:
+		case BlockType::Dandelion:
+		case BlockType::DarkOakButton:
+		case BlockType::DarkOakPressurePlate:
+		case BlockType::DarkOakSapling:
+		case BlockType::DarkOakSign:
+		case BlockType::DarkOakWallSign:
+		case BlockType::DeadBush:
+		case BlockType::DetectorRail:
+		case BlockType::EndGateway:
+		case BlockType::EndPortal:
+		case BlockType::EndRod:
+		case BlockType::Fire:
+		case BlockType::GrayBanner:
+		case BlockType::GrayCarpet:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenBanner:
+		case BlockType::GreenCarpet:
+		case BlockType::GreenWallBanner:
+		case BlockType::HeavyWeightedPressurePlate:
+		case BlockType::JungleButton:
+		case BlockType::JunglePressurePlate:
+		case BlockType::JungleSapling:
+		case BlockType::JungleSign:
+		case BlockType::JungleWallSign:
+		case BlockType::Ladder:
+		case BlockType::LargeFern:
+		case BlockType::Lava:
+		case BlockType::Lever:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightBlueCarpet:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LightGrayCarpet:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LightWeightedPressurePlate:
+		case BlockType::Lilac:
+		case BlockType::LilyOfTheValley:
+		case BlockType::LimeBanner:
+		case BlockType::LimeCarpet:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::MagentaCarpet:
+		case BlockType::MagentaWallBanner:
+		case BlockType::MelonStem:
+		case BlockType::NetherPortal:
+		case BlockType::OakButton:
+		case BlockType::OakPressurePlate:
+		case BlockType::OakSapling:
+		case BlockType::OakSign:
+		case BlockType::OakWallSign:
+		case BlockType::OrangeBanner:
+		case BlockType::OrangeCarpet:
+		case BlockType::OrangeTulip:
+		case BlockType::OrangeWallBanner:
+		case BlockType::OxeyeDaisy:
+		case BlockType::Peony:
+		case BlockType::PinkBanner:
+		case BlockType::PinkCarpet:
+		case BlockType::PinkTulip:
+		case BlockType::PinkWallBanner:
+		case BlockType::PolishedBlackstoneButton:
+		case BlockType::PolishedBlackstonePressurePlate:
+		case BlockType::Poppy:
+		case BlockType::Potatoes:
+		case BlockType::PoweredRail:
+		case BlockType::PurpleBanner:
+		case BlockType::PurpleCarpet:
+		case BlockType::PurpleWallBanner:
+		case BlockType::Rail:
+		case BlockType::RedBanner:
+		case BlockType::RedCarpet:
+		case BlockType::RedMushroom:
+		case BlockType::RedTulip:
+		case BlockType::RedWallBanner:
+		case BlockType::RedstoneTorch:
+		case BlockType::RedstoneWallTorch:
+		case BlockType::RedstoneWire:
+		case BlockType::Repeater:
+		case BlockType::RoseBush:
+		case BlockType::Snow:
+		case BlockType::SoulTorch:
+		case BlockType::SoulWallTorch:
+		case BlockType::SpruceButton:
+		case BlockType::SprucePressurePlate:
+		case BlockType::SpruceSapling:
+		case BlockType::SpruceSign:
+		case BlockType::SpruceWallSign:
+		case BlockType::StoneButton:
+		case BlockType::StonePressurePlate:
+		case BlockType::SugarCane:
+		case BlockType::Sunflower:
+		case BlockType::TallGrass:
+		case BlockType::Torch:
+		case BlockType::Tripwire:
+		case BlockType::TripwireHook:
+		case BlockType::Vine:
+		case BlockType::VoidAir:
+		case BlockType::WallTorch:
+		case BlockType::WarpedButton:
+		case BlockType::WarpedPressurePlate:
+		case BlockType::WarpedSign:
+		case BlockType::WarpedWallSign:
+		case BlockType::Water:
+		case BlockType::Wheat:
+		case BlockType::WhiteBanner:
+		case BlockType::WhiteCarpet:
+		case BlockType::WhiteTulip:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowBanner:
+		case BlockType::YellowCarpet:
+		case BlockType::YellowWallBanner:
+			return false;
 		default: return true;
 	}
 }

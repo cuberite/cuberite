@@ -51,6 +51,12 @@
 #include "Bindings/PluginManager.h"
 #include "Blocks/BlockHandler.h"
 
+// BlockHandler
+#include "Blocks/BlockAir.h"
+#include "Blocks/BlockLog.h"
+#include "Blocks/BlockSapling.h"
+#include "Blocks/BlockTrapdoor.h"
+
 #ifndef _WIN32
 	#include <stdlib.h>
 #endif
@@ -420,8 +426,8 @@ cWorld::cWorld(
 
 	// Simulators:
 	m_SimulatorManager  = std::make_unique<cSimulatorManager>(*this);
-	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
-	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
+	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", BlockType::Lava);
+	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  BlockType::Water);
 	m_SandSimulator     = std::make_unique<cSandSimulator>(*this, IniFile);
 	m_FireSimulator     = std::make_unique<cFireSimulator>(*this, IniFile);
 	m_RedstoneSimulator = InitializeRedstoneSimulator(IniFile);
@@ -738,16 +744,15 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 {
 	// All this blocks can only be found above ground.
 	// Apart from netherrack (as the Nether is technically a massive cave)
-	static const BLOCKTYPE ValidSpawnBlocks[] =
+	static constexpr std::array<BlockType, 6> ValidSpawnBlocks =
 	{
-		E_BLOCK_GRASS,
-		E_BLOCK_SAND,
-		E_BLOCK_SNOW,
-		E_BLOCK_SNOW_BLOCK,
-		E_BLOCK_NETHERRACK
+		BlockType::Grass,
+		BlockType::Sand,
+		BlockType::Snow,
+		BlockType::SnowBlock,
+		BlockType::Netherrack,
+		BlockType::EndStone
 	};
-
-	static const int ValidSpawnBlocksCount = ARRAYCOUNT(ValidSpawnBlocks);
 
 	// Increase this by two, because we need two more blocks for body and head
 	static const int HighestSpawnPoint = GetHeight(static_cast<int>(a_X), static_cast<int>(a_Z)) + 2;
@@ -755,38 +760,38 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 
 	for (int PotentialY = HighestSpawnPoint; PotentialY > LowestSpawnPoint; --PotentialY)
 	{
-		BLOCKTYPE HeadBlock = GetBlock({ static_cast<int>(a_X), PotentialY, static_cast<int>(a_Z) });
+		auto HeadBlock = GetBlock({ static_cast<int>(a_X), PotentialY, static_cast<int>(a_Z) });
 
 		// Is this block safe for spawning
-		if (HeadBlock != E_BLOCK_AIR)
+		if (!cBlockAirHandler::IsBlockAir(HeadBlock))
 		{
 			continue;
 		}
 
-		BLOCKTYPE BodyBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 1, static_cast<int>(a_Z) });
+		auto BodyBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 1, static_cast<int>(a_Z) });
 
 		// Is this block safe for spawning
-		if (BodyBlock != E_BLOCK_AIR)
+		if (!cBlockAirHandler::IsBlockAir(BodyBlock))
 		{
 			continue;
 		}
 
-		BLOCKTYPE FloorBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 2, static_cast<int>(a_Z) });
+		auto FloorBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 2, static_cast<int>(a_Z) });
 
 		// Early out - Is the floor block air
-		if (FloorBlock == E_BLOCK_AIR)
+		if (!cBlockAirHandler::IsBlockAir(FloorBlock))
 		{
 			continue;
 		}
 
 		// Is the floor block ok
-		bool ValidSpawnBlock = false;
-		for (int BlockIndex = 0; BlockIndex < ValidSpawnBlocksCount; ++BlockIndex)
+		bool IsValidSpawnBlock = false;
+		for (const auto & ValidSpawnBlock : ValidSpawnBlocks)
 		{
-			ValidSpawnBlock |= (ValidSpawnBlocks[BlockIndex] == FloorBlock);
+			IsValidSpawnBlock |= (ValidSpawnBlock == FloorBlock.Type());
 		}
 
-		if (!ValidSpawnBlock)
+		if (!IsValidSpawnBlock)
 		{
 			continue;
 		}
@@ -835,7 +840,7 @@ bool cWorld::CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
 		const int XPos = a_PosX + SurroundingCoords[CoordIndex].x;
 		const int ZPos = a_PosZ + SurroundingCoords[CoordIndex].z;
 
-		const BLOCKTYPE BlockType = GetBlock({ XPos, a_PosY, ZPos });
+		auto BlockType = GetBlock({ XPos, a_PosY, ZPos });
 		if (cBlockInfo::IsSolid(BlockType) || IsBlockLiquid(BlockType))
 		{
 			return false;
@@ -1270,7 +1275,7 @@ void cWorld::UpdateSkyDarkness(void)
 	}
 	else if (TempTime <= TIME_NIGHT_START)
 	{
-		m_SkyDarkness = static_cast<NIBBLETYPE>((TIME_NIGHT_START - TempTime) / TIME_SPAWN_DIVISOR);
+		m_SkyDarkness = static_cast<LIGHTTYPE>((TIME_NIGHT_START - TempTime) / TIME_SPAWN_DIVISOR);
 	}
 	else if (TempTime <= TIME_NIGHT_END)
 	{
@@ -1278,7 +1283,7 @@ void cWorld::UpdateSkyDarkness(void)
 	}
 	else
 	{
-		m_SkyDarkness = static_cast<NIBBLETYPE>((TIME_SUNRISE - TempTime) / TIME_SPAWN_DIVISOR);
+		m_SkyDarkness = static_cast<LIGHTTYPE>((TIME_SUNRISE - TempTime) / TIME_SPAWN_DIVISOR);
 	}
 }
 
@@ -1557,7 +1562,7 @@ bool cWorld::DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callback)
 
 bool cWorld::GrowTree(const Vector3i a_BlockPos)
 {
-	if (GetBlock(a_BlockPos) == E_BLOCK_SAPLING)
+	if (cBlockSaplingHandler::IsBlockSapling(GetBlock(a_BlockPos)))
 	{
 		// There is a sapling here, grow a tree according to its type:
 		return GrowTreeFromSapling(a_BlockPos);
@@ -1578,32 +1583,37 @@ bool cWorld::GrowTreeFromSapling(Vector3i a_BlockPos)
 	cNoise Noise(m_Generator.GetSeed());
 	sSetBlockVector Logs, Other;
 	auto WorldAge = static_cast<int>(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count() & 0xffffffff);
-	auto SaplingMeta = GetBlockMeta(a_BlockPos);
-	switch (SaplingMeta & 0x07)
+	auto Sapling = GetBlock(a_BlockPos);
+	switch (Sapling.Type())
 	{
-		case E_META_SAPLING_APPLE:    GetAppleTreeImage  (a_BlockPos, Noise, WorldAge, Logs, Other); break;
-		case E_META_SAPLING_BIRCH:    GetBirchTreeImage  (a_BlockPos, Noise, WorldAge, Logs, Other); break;
-		case E_META_SAPLING_CONIFER:
+		case BlockType::OakSapling:    GetAppleTreeImage  (a_BlockPos, Noise, WorldAge, Logs, Other); break;
+		case BlockType::BirchSapling:    GetBirchTreeImage  (a_BlockPos, Noise, WorldAge, Logs, Other); break;
+		case BlockType::SpruceSapling:
 		{
-			bool IsLarge = GetLargeTreeAdjustment(a_BlockPos, SaplingMeta);
+			bool IsLarge = GetLargeTreeAdjustment(a_BlockPos, Sapling);
 			GetConiferTreeImage(a_BlockPos, Noise, WorldAge, Logs, Other, IsLarge);
 			break;
 		}
-		case E_META_SAPLING_ACACIA:   GetAcaciaTreeImage (a_BlockPos, Noise, WorldAge, Logs, Other); break;
-		case E_META_SAPLING_JUNGLE:
+		case BlockType::AcaciaSapling:   GetAcaciaTreeImage (a_BlockPos, Noise, WorldAge, Logs, Other); break;
+		case BlockType::JungleSapling:
 		{
-			bool IsLarge = GetLargeTreeAdjustment(a_BlockPos, SaplingMeta);
+			bool IsLarge = GetLargeTreeAdjustment(a_BlockPos, Sapling);
 			GetJungleTreeImage(a_BlockPos, Noise, WorldAge, Logs, Other, IsLarge);
 			break;
 		}
-		case E_META_SAPLING_DARK_OAK:
+		case BlockType::DarkOakSapling:
 		{
-			if (!GetLargeTreeAdjustment(a_BlockPos, SaplingMeta))
+			if (!GetLargeTreeAdjustment(a_BlockPos, Sapling))
 			{
 				return false;
 			}
 
 			GetDarkoakTreeImage(a_BlockPos, Noise, WorldAge, Logs, Other);
+			break;
+		}
+		default:
+		{
+			LOGD("Got unknown block type");  // TODO(12xx12): add conversion to string
 			break;
 		}
 	}
@@ -1616,20 +1626,17 @@ bool cWorld::GrowTreeFromSapling(Vector3i a_BlockPos)
 
 
 
-bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
+bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, BlockState a_Block)
 {
 	bool IsLarge = true;
-	a_Meta = a_Meta & 0x07;
 
 	// Check to see if we are the northwest corner
 	for (int x = 0; x  < 2; ++x)
 	{
 		for (int z = 0; z < 2; ++z)
 		{
-			NIBBLETYPE meta;
-			BLOCKTYPE type;
-			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+			auto OtherSapling = GetBlock(a_BlockPos.addedXZ(x, z));
+			IsLarge = IsLarge && (OtherSapling.Type() == a_Block.Type());
 		}
 	}
 
@@ -1644,10 +1651,8 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
 	{
 		for (int z = 0; z > -2; --z)
 		{
-			NIBBLETYPE meta;
-			BLOCKTYPE type;
-			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+			auto OtherSapling = GetBlock(a_BlockPos.addedXZ(x, z));
+			IsLarge = IsLarge && (OtherSapling.Type() == a_Block.Type());
 		}
 	}
 
@@ -1663,10 +1668,8 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
 	{
 		for (int z = 0; z > -2; --z)
 		{
-			NIBBLETYPE meta;
-			BLOCKTYPE type;
-			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+			auto OtherSapling = GetBlock(a_BlockPos.addedXZ(x, z));
+			IsLarge = IsLarge && (OtherSapling.Type() == a_Block.Type());
 		}
 	}
 
@@ -1683,10 +1686,8 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
 	{
 		for (int z = 0; z < 2; ++z)
 		{
-			NIBBLETYPE meta;
-			BLOCKTYPE type;
-			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+			auto OtherSapling = GetBlock(a_BlockPos.addedXZ(x, z));
+			IsLarge = IsLarge && (OtherSapling.Type() == a_Block.Type());
 		}
 	}
 
@@ -1722,25 +1723,25 @@ bool cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 	// Check that the tree has place to grow
 
 	// Make a copy of the log blocks:
-	sSetBlockVector b2;
-	for (sSetBlockVector::const_iterator itr = a_Blocks.begin(); itr != a_Blocks.end(); ++itr)
+	sSetBlockVector CopyBlocks;
+	for (const auto BlockToSet : a_Blocks)
 	{
-		if (itr->m_BlockType == E_BLOCK_LOG)
+		if (cBlockLogHandler::IsBlockLog(BlockToSet.m_Block))
 		{
-			b2.push_back(*itr);
+			CopyBlocks.push_back(BlockToSet);
 		}
-	}  // for itr - a_Blocks[]
+	}
 
 	// Query blocktypes and metas at those log blocks:
-	if (!GetBlocks(b2, false))
+	if (!GetBlocks(CopyBlocks, false))
 	{
 		return false;
 	}
 
 	// Check that at each log's coord there's an block allowed to be overwritten:
-	for (sSetBlockVector::const_iterator itr = b2.begin(); itr != b2.end(); ++itr)
+	for (const auto & BlockToSet : CopyBlocks)
 	{
-		switch (itr->m_BlockType)
+		switch (BlockToSet.m_Block.Type())
 		{
 			CASE_TREE_ALLOWED_BLOCKS:
 			{
@@ -1751,7 +1752,7 @@ bool cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 				return false;
 			}
 		}
-	}  // for itr - b2[]
+	}
 
 	// All ok, replace blocks with the tree image:
 	m_ChunkMap.ReplaceTreeBlocks(a_Blocks);
@@ -1762,7 +1763,7 @@ bool cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 
 
 
-int cWorld::GrowPlantAt(Vector3i a_BlockPos, int a_NumStages)
+int cWorld::GrowPlantAt(Vector3i a_BlockPos, unsigned char a_NumStages)
 {
 	return m_ChunkMap.GrowPlantAt(a_BlockPos, a_NumStages);
 }
@@ -1829,25 +1830,17 @@ void cWorld::SetMaxViewDistance(int a_MaxViewDistance)
 
 
 
-void cWorld::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cWorld::SetBlock(Vector3i a_BlockPos, BlockState a_Block)
 {
-	m_ChunkMap.SetBlock(a_BlockPos, a_BlockType, a_BlockMeta);
+	m_ChunkMap.SetBlock(a_BlockPos, a_Block);
 }
 
 
 
 
 
-void cWorld::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData)
-{
-	m_ChunkMap.SetBlockMeta(a_BlockPos, a_MetaData);
-}
 
-
-
-
-
-NIBBLETYPE cWorld::GetBlockSkyLight(Vector3i a_BlockPos)
+LIGHTTYPE cWorld::GetBlockSkyLight(Vector3i a_BlockPos) const
 {
 	return m_ChunkMap.GetBlockSkyLight(a_BlockPos);
 }
@@ -1856,7 +1849,7 @@ NIBBLETYPE cWorld::GetBlockSkyLight(Vector3i a_BlockPos)
 
 
 
-NIBBLETYPE cWorld::GetBlockBlockLight(Vector3i a_BlockPos)
+LIGHTTYPE cWorld::GetBlockBlockLight(Vector3i a_BlockPos) const
 {
 	return m_ChunkMap.GetBlockBlockLight(a_BlockPos);
 }
@@ -1865,18 +1858,18 @@ NIBBLETYPE cWorld::GetBlockBlockLight(Vector3i a_BlockPos)
 
 
 
-bool cWorld::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+bool cWorld::GetBlock(Vector3i a_BlockPos, BlockState & a_Block) const
 {
-	return m_ChunkMap.GetBlockTypeMeta(a_BlockPos, a_BlockType, a_BlockMeta);
+	return m_ChunkMap.GetBlock(a_BlockPos, a_Block);
 }
 
 
 
 
 
-bool cWorld::GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
+bool cWorld::GetBlockInfo(Vector3i a_BlockPos, BlockState & a_Block, LIGHTTYPE & a_SkyLight, LIGHTTYPE & a_BlockLight) const
 {
-	return m_ChunkMap.GetBlockInfo(a_BlockPos, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
+	return m_ChunkMap.GetBlockInfo(a_BlockPos, a_Block, a_SkyLight, a_BlockLight);
 }
 
 
@@ -1908,9 +1901,9 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a
 {
 	auto & Random = GetRandomProvider();
 	a_FlyAwaySpeed /= 100;  // Pre-divide, so that we don't have to divide each time inside the loop
-	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
+	for (const auto & Pickup : a_Pickups)
 	{
-		if (!IsValidItem(itr->m_ItemType) || (itr->m_ItemType == E_BLOCK_AIR))
+		if (!IsValidItem(Pickup.m_ItemType) || (Pickup.m_ItemType == E_BLOCK_AIR))
 		{
 			// Don't spawn pickup if item isn't even valid; should prevent client crashing too
 			continue;
@@ -1920,9 +1913,9 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a
 		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(40, 50));
 		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-10, 10));
 
-		auto Pickup = std::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, Vector3f{SpeedX, SpeedY, SpeedZ});
-		auto PickupPtr = Pickup.get();
-		PickupPtr->Initialize(std::move(Pickup), *this);
+		auto PickupEntity = std::make_unique<cPickup>(a_Pos, Pickup, a_IsPlayerCreated, Vector3f{SpeedX, SpeedY, SpeedZ});
+		auto PickupPtr = PickupEntity.get();
+		PickupPtr->Initialize(std::move(PickupEntity), *this);
 	}
 }
 
@@ -1932,16 +1925,16 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a
 
 void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d a_Speed, bool a_IsPlayerCreated)
 {
-	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
+	for (const auto & Pickup : a_Pickups)
 	{
-		if (!IsValidItem(itr->m_ItemType) || (itr->m_ItemType == E_BLOCK_AIR))
+		if (!IsValidItem(Pickup.m_ItemType) || (Pickup.m_ItemType == E_BLOCK_AIR))
 		{
 			continue;
 		}
 
-		auto pickup = std::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, a_Speed);
-		auto pickupPtr = pickup.get();
-		pickupPtr->Initialize(std::move(pickup), *this);
+		auto PickupEntity = std::make_unique<cPickup>(a_Pos, Pickup, a_IsPlayerCreated, a_Speed);
+		auto PickupPtr = PickupEntity.get();
+		PickupPtr->Initialize(std::move(PickupEntity), *this);
 	}
 }
 
@@ -1964,9 +1957,9 @@ UInt32 cWorld::SpawnItemPickup(Vector3d a_Pos, const cItem & a_Item, Vector3f a_
 
 
 
-UInt32 cWorld::SpawnFallingBlock(Vector3d a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+UInt32 cWorld::SpawnFallingBlock(Vector3d a_Pos, BlockState a_Block)
 {
-	auto fallingBlock = std::make_unique<cFallingBlock>(a_Pos, a_BlockType, a_BlockMeta);
+	auto fallingBlock = std::make_unique<cFallingBlock>(a_Pos, a_Block);
 	auto fallingBlockPtr = fallingBlock.get();
 	auto ID = fallingBlock->GetUniqueID();
 	if (!fallingBlockPtr->Initialize(std::move(fallingBlock), *this))
@@ -2129,12 +2122,12 @@ UInt32 cWorld::SpawnEnderCrystal(Vector3d a_Pos, bool a_ShowBottom)
 
 
 
-void cWorld::PlaceBlock(const Vector3i a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
+void cWorld::PlaceBlock(const Vector3i a_Position, BlockState a_Block)
 {
-	SetBlock(a_Position, a_BlockType, a_BlockMeta);
+	SetBlock(a_Position, a_Block);
 
 	cChunkInterface ChunkInterface(GetChunkMap());
-	cBlockHandler::For(a_BlockType).OnPlaced(ChunkInterface, *this, a_Position, a_BlockType, a_BlockMeta);
+	cBlockHandler::For(a_Block.Type()).OnPlaced(ChunkInterface, *this, a_Position, a_Block);
 }
 
 
@@ -2152,9 +2145,7 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 bool cWorld::DigBlock(Vector3i a_BlockPos, const cEntity * a_Digger)
 {
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta);
+	auto Block = GetBlock(a_BlockPos);
 
 	if (!m_ChunkMap.DigBlock(a_BlockPos))
 	{
@@ -2162,7 +2153,7 @@ bool cWorld::DigBlock(Vector3i a_BlockPos, const cEntity * a_Digger)
 	}
 
 	cChunkInterface ChunkInterface(GetChunkMap());
-	cBlockHandler::For(BlockType).OnBroken(ChunkInterface, *this, a_BlockPos, BlockType, BlockMeta, a_Digger);
+	cBlockHandler::For(Block.Type()).OnBroken(ChunkInterface, *this, a_BlockPos, Block, a_Digger);
 
 	return true;
 }
@@ -2272,8 +2263,8 @@ void cWorld::QueueSetChunkData(struct SetChunkData && a_SetChunkData)
 
 void cWorld::ChunkLighted(
 	int a_ChunkX, int a_ChunkZ,
-	const cChunkDef::BlockNibbles & a_BlockLight,
-	const cChunkDef::BlockNibbles & a_SkyLight
+	const cChunkDef::LightNibbles & a_BlockLight,
+	const cChunkDef::LightNibbles & a_SkyLight
 )
 {
 	m_ChunkMap.ChunkLighted(a_ChunkX, a_ChunkZ, a_BlockLight, a_SkyLight);
@@ -2672,15 +2663,7 @@ bool cWorld::SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, co
 
 bool cWorld::IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	BLOCKTYPE Block;
-	NIBBLETYPE Meta;
-	GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, Block, Meta);
-	if ((Block != E_BLOCK_TRAPDOOR) && (Block != E_BLOCK_IRON_TRAPDOOR))
-	{
-		return false;
-	}
-
-	return (Meta & 0x4) > 0;
+	return cBlockTrapdoorHandler::IsTrapdoorOpen(GetBlock({ a_BlockX, a_BlockY, a_BlockZ }));
 }
 
 
@@ -2689,18 +2672,15 @@ bool cWorld::IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
 {
-	BLOCKTYPE Block;
-	NIBBLETYPE Meta;
-	GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, Block, Meta);
-	if ((Block != E_BLOCK_TRAPDOOR) && (Block != E_BLOCK_IRON_TRAPDOOR))
+	auto Trapdoor = GetBlock({ a_BlockX, a_BlockY, a_BlockZ });
+	if (cBlockTrapdoorHandler::IsBlockTrapdoor(Trapdoor))
 	{
 		return false;
 	}
 
-	bool IsOpen = (Meta & 0x4) != 0;
-	if (a_Open != IsOpen)
+	if (!cBlockTrapdoorHandler::IsTrapdoorOpen(Trapdoor))
 	{
-		SetBlockMeta({ a_BlockX, a_BlockY, a_BlockZ }, Meta ^ 0x4);
+		FastSetBlock({ a_BlockX, a_BlockY, a_BlockZ }, cBlockTrapdoorHandler::ToggleTrapdoor(Trapdoor));
 		BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_TRAPDOOR_OPEN, { a_BlockX, a_BlockY, a_BlockZ }, 0);
 		return true;
 	}
@@ -2940,10 +2920,10 @@ void cWorld::QueueBlockForTick(int a_BlockX, int a_BlockY, int a_BlockZ, int a_T
 bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	return (
-		IsBlockWater(GetBlock({ a_BlockX - 1, a_BlockY, a_BlockZ })) ||
-		IsBlockWater(GetBlock({ a_BlockX + 1, a_BlockY, a_BlockZ })) ||
-		IsBlockWater(GetBlock({ a_BlockX,     a_BlockY, a_BlockZ - 1 })) ||
-		IsBlockWater(GetBlock({ a_BlockX,     a_BlockY, a_BlockZ + 1 }))
+		(GetBlock({ a_BlockX - 1, a_BlockY, a_BlockZ }).Type() == BlockType::Water) ||
+		(GetBlock({ a_BlockX + 1, a_BlockY, a_BlockZ }).Type() == BlockType::Water) ||
+		(GetBlock({ a_BlockX,     a_BlockY, a_BlockZ - 1 }).Type() == BlockType::Water) ||
+		(GetBlock({ a_BlockX,     a_BlockY, a_BlockZ + 1 }).Type() == BlockType::Water)
 	);
 }
 
@@ -3139,7 +3119,7 @@ cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
 
 
 
-cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock)
+cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BlockType a_SimulateBlock)
 {
 	AString SimulatorNameKey;
 	Printf(SimulatorNameKey, "%sSimulator", a_FluidName);
@@ -3161,7 +3141,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 		(NoCaseCompare(SimulatorName, "vaporise") == 0)
 	)
 	{
-		res = new cVaporizeFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock);
+		res = new cVaporizeFluidSimulator(*this, a_SimulateBlock, 0);
 	}
 	else if (
 		(NoCaseCompare(SimulatorName, "noop") == 0) ||
@@ -3170,11 +3150,11 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 		(NoCaseCompare(SimulatorName, "nil") == 0)
 	)
 	{
-		res = new cNoopFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock);
+		res = new cNoopFluidSimulator(*this, a_SimulateBlock, 0);
 	}
 	else
 	{
-		int Falloff               = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",               IsWater ? 1 : 2);
+		unsigned int Falloff      = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",               IsWater ? 1 : 2);
 		int TickDelay             = a_IniFile.GetValueSetI(SimulatorSectionName, "TickDelay",             IsWater ? 5 : 30);
 		int NumNeighborsForSource = a_IniFile.GetValueSetI(SimulatorSectionName, "NumNeighborsForSource", IsWater ? 2 : -1);
 
@@ -3184,19 +3164,21 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 			Falloff = IsWater ? 1 : 2;
 		}
 
+		static constexpr unsigned char StationaryFalloffValue = 0;
+
 		if (NoCaseCompare(SimulatorName, "floody") == 0)
 		{
-			res = new cFloodyFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, static_cast<NIBBLETYPE>(Falloff), TickDelay, NumNeighborsForSource);
+			res = new cFloodyFluidSimulator(*this, a_SimulateBlock, StationaryFalloffValue, static_cast<unsigned char>(Falloff), TickDelay, NumNeighborsForSource);
 		}
 		else if (NoCaseCompare(SimulatorName, "vanilla") == 0)
 		{
-			res = new cVanillaFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, static_cast<NIBBLETYPE>(Falloff), TickDelay, NumNeighborsForSource);
+			res = new cVanillaFluidSimulator(*this, a_SimulateBlock, StationaryFalloffValue, static_cast<unsigned char>(Falloff), TickDelay, NumNeighborsForSource);
 		}
 		else
 		{
 			// The simulator name doesn't match anything we have, issue a warning:
 			LOGWARNING("%s [Physics]:%s specifies an unknown simulator, using the default \"Vanilla\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
-			res = new cVanillaFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, static_cast<NIBBLETYPE>(Falloff), TickDelay, NumNeighborsForSource);
+			res = new cVanillaFluidSimulator(*this, a_SimulateBlock, StationaryFalloffValue, static_cast<unsigned char>(Falloff), TickDelay, NumNeighborsForSource);
 		}
 	}
 
@@ -3223,15 +3205,13 @@ cWorld::cChunkGeneratorCallbacks::cChunkGeneratorCallbacks(cWorld & a_World) :
 
 void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc)
 {
-	cChunkDef::BlockNibbles BlockMetas;
-	a_ChunkDesc.CompressBlockMetas(BlockMetas);
 
 	struct SetChunkData Data({ a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ() });
 	{
-		Data.BlockData.SetAll(a_ChunkDesc.GetBlockTypes(), BlockMetas);
+		Data.BlockData.SetAll(a_ChunkDesc.GetBlocks());
 
-		std::copy(a_ChunkDesc.GetBiomeMap(), a_ChunkDesc.GetBiomeMap() + std::size(a_ChunkDesc.GetBiomeMap()), Data.BiomeMap);
-		std::copy(a_ChunkDesc.GetHeightMap(), a_ChunkDesc.GetHeightMap() + std::size(a_ChunkDesc.GetHeightMap()), Data.HeightMap);
+		std::copy(a_ChunkDesc.GetBiomeMap().begin(),  a_ChunkDesc.GetBiomeMap().end(),  Data.BiomeMap.data());
+		std::copy(a_ChunkDesc.GetHeightMap().begin(), a_ChunkDesc.GetHeightMap().end(), Data.HeightMap.data());
 
 		Data.Entities = std::move(a_ChunkDesc.GetEntities());
 		Data.BlockEntities = std::move(a_ChunkDesc.GetBlockEntities());

@@ -3,7 +3,7 @@
 
 #include "ItemHandler.h"
 #include "../Protocol/Palettes/Upgrade.h"
-#include "../Registries/BlockTypeItemTypeConverter.h"
+#include "../Registries/BlockItemConverter.h"
 
 
 

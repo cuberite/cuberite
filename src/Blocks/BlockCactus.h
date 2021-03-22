@@ -100,7 +100,7 @@ private:
 		for (int i = 0; i < NumToGrow; ++i)
 		{
 			Vector3i NewPos(a_RelPos.x, Top + i, a_RelPos.z);
-			if (!a_Chunk.UnboundedRelGetBlockType(NewPos, BlockToReplace) || (BlockToReplace.Type() != BlockType::Air))
+			if (!a_Chunk.UnboundedRelGetBlock(NewPos, BlockToReplace) || (BlockToReplace.Type() != BlockType::Air))
 			{
 				// Cannot grow there
 				return i;
@@ -120,7 +120,7 @@ private:
 			{
 				BlockState BlockToCheck;
 				if (
-					a_Chunk.UnboundedRelGetBlockType(NewPos + Offset, BlockToCheck) &&
+					a_Chunk.UnboundedRelGetBlock(NewPos + Offset, BlockToCheck) &&
 					(
 						cBlockInfo::IsSolid(BlockToCheck) ||
 						(BlockToCheck.Type() == BlockType::Lava)

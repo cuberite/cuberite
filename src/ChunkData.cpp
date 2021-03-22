@@ -36,14 +36,14 @@ namespace
 	}
 
 	template <size_t ElementCount, typename ValueType>
-	ValueType UnpackDefaultValue(const ValueType DefaultValue)
+	ValueType UnpackDefaultValue(const ValueType m_DefaultValue)
 	{
 		if (IsCompressed(ElementCount))
 		{
-			return DefaultValue & 0xF;
+			return m_DefaultValue;
 		}
 
-		return DefaultValue;
+		return m_DefaultValue;
 	}
 }  // namespace (anonymous)
 
@@ -79,27 +79,10 @@ ElementType ChunkDataStore<ElementType, ElementCount>::Get(const Vector3i a_Posi
 
 	if (Section != nullptr)
 	{
-		if (IsCompressed(ElementCount))
-		{
-			return cChunkDef::ExpandNibble(Section->data(), Indices.Index);
-		}
-		else
-		{
-			return (*Section)[Indices.Index];
-		}
+		return (*Section)[Indices.Index];
 	}
 
-	return UnpackDefaultValue<ElementCount>(DefaultValue);
-}
-
-
-
-
-
-template<class ElementType, size_t ElementCount>
-typename ChunkDataStore<ElementType, ElementCount>::Type * ChunkDataStore<ElementType, ElementCount>::GetSection(const size_t a_Y) const
-{
-	return Store[a_Y].get();
+	return UnpackDefaultValue<ElementCount>(m_DefaultValue);
 }
 
 
@@ -114,23 +97,15 @@ void ChunkDataStore<ElementType, ElementCount>::Set(const Vector3i a_Position, c
 
 	if (Section == nullptr)
 	{
-		if (a_Value == UnpackDefaultValue<ElementCount>(DefaultValue))
+		if (a_Value == UnpackDefaultValue<ElementCount>(m_DefaultValue))
 		{
 			return;
 		}
 
 		Section = cpp20::make_unique_for_overwrite<Type>();
-		std::fill(Section->begin(), Section->end(), DefaultValue);
+		std::fill(Section->begin(), Section->end(), m_DefaultValue);
 	}
-
-	if (IsCompressed(ElementCount))
-	{
-		cChunkDef::PackNibble(Section->data(), Indices.Index, a_Value);
-	}
-	else
-	{
-		(*Section)[Indices.Index] = a_Value;
-	}
+	(*Section)[Indices.Index] = a_Value;
 }
 
 
@@ -180,7 +155,7 @@ void ChunkBlockData::Assign(const ChunkBlockData & a_Other)
 
 
 
-void ChunkBlockData::SetAll(const cChunkDef::BlockTypes & a_BlockSource)
+void ChunkBlockData::SetAll(const cChunkDef::BlockStates & a_BlockSource)
 {
 	m_Blocks.SetAll(a_BlockSource);
 }

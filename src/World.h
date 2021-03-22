@@ -377,8 +377,7 @@ public:
 		m_ChunkMap.FastSetBlock(a_BlockPos, a_Block);
 	}
 
-	/** Returns the block type at the specified position.
-	Returns 0 if the chunk is not valid. */
+	/** Returns the block type at the specified position. */
 	BlockState GetBlock(Vector3i a_BlockPos) const
 	{
 		return m_ChunkMap.GetBlock(a_BlockPos);
@@ -389,16 +388,16 @@ public:
 	/** Returns the sky light value at the specified block position.
 	The sky light is "raw" - not affected by time-of-day.
 	Returns 0 if chunk not valid. */
-	LIGHTTYPE GetBlockSkyLight(Vector3i a_BlockPos);
+	LIGHTTYPE GetBlockSkyLight(Vector3i a_BlockPos) const;
 
 	/** Returns the block-light value at the specified block position.
 	Returns 0 if chunk not valid. */
-	LIGHTTYPE GetBlockBlockLight(Vector3i a_BlockPos);
+	LIGHTTYPE GetBlockBlockLight(Vector3i a_BlockPos) const;
 
 	/** Queries the whole block specification from the world.
 	Returns true if all block info was retrieved successfully, false if not (invalid chunk / bad position).
 	Exported in ManualBindings_World.cpp. */
-	bool GetBlockInfo(Vector3i a_BlockPos, BlockState & a_Block, LIGHTTYPE & a_SkyLight, LIGHTTYPE & a_BlockLight);
+	bool GetBlockInfo(Vector3i a_BlockPos, BlockState & a_Block, LIGHTTYPE & a_SkyLight, LIGHTTYPE & a_BlockLight) const;
 
 	// TODO: NIBBLETYPE GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);
 
@@ -720,7 +719,7 @@ public:
 	/** Grows the plant at the specified position by at most a_NumStages.
 	The block's Grow handler is invoked.
 	Returns the number of stages the plant has grown, 0 if not a plant. */
-	int GrowPlantAt(Vector3i a_BlockPos, int a_NumStages = 1);
+	int GrowPlantAt(Vector3i a_BlockPos, unsigned char a_NumStages = 1);
 
 	/** Grows the plant at the specified block to its ripe stage.
 	Returns true if grown, false if not (invalid chunk, non-growable block, already ripe). */
@@ -1198,7 +1197,7 @@ private:
 	eWeather ChooseNewWeather(void);
 
 	/** Creates a new fluid simulator, loads its settings from the inifile (a_FluidName section) */
-	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BlockState a_Block);
+	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BlockType a_Block);
 
 	/** Creates a new redstone simulator. */
 	cRedstoneSimulator * InitializeRedstoneSimulator(cIniFile & a_IniFile);

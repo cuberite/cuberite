@@ -149,11 +149,11 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 	auto ContainedBlock = Chunk->GetBlock(RelPos);
-	if (!IsBlockRail(ContainedBlock))
+	if (!cBlockRailHandler::IsBlockRail(ContainedBlock))
 	{
 		// When a descending minecart hits a flat rail, it goes through the ground; check for this
 		auto BlockAbove = Chunk->GetBlock(RelPos.addedY(1));
-		if (IsBlockRail(BlockAbove))
+		if (cBlockRailHandler::IsBlockRail(BlockAbove))
 		{
 			// Push cart upwards
 			AddPosY(1);
@@ -162,7 +162,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			// When a minecart gets to a descending rail, it should go down.
 			auto BlockBelow = Chunk->GetBlock(RelPos.addedY(-1));
-			if (IsBlockRail(BlockBelow))
+			if (cBlockRailHandler::IsBlockRail(BlockBelow))
 			{
 				// Push cart downwards
 				AddPosY(-1);
@@ -171,7 +171,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	bool WasDetectorRail = false;
-	if (IsBlockRail(ContainedBlock))
+	if (cBlockRailHandler::IsBlockRail(ContainedBlock))
 	{
 		if (ContainedBlock.Type() == BlockType::Rail)
 		{
@@ -799,7 +799,7 @@ void cMinecart::SnapToRail(BlockState a_Rail)
 bool cMinecart::IsSolidBlockAtPosition(Vector3i a_Pos)
 {
 	auto Block = m_World->GetBlock(a_Pos);
-	return !IsBlockRail(Block) && cBlockInfo::IsSolid(Block);
+	return !cBlockRailHandler::IsBlockRail(Block) && cBlockInfo::IsSolid(Block);
 }
 
 

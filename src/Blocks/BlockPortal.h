@@ -73,7 +73,7 @@ private:
 				for (const auto & Direction : PortalCheck)
 				{
 					BlockState Block;
-					a_Chunk.UnboundedRelGetBlockType(a_RelPos + Direction, Block);
+					a_Chunk.UnboundedRelGetBlock(a_RelPos + Direction, Block);
 					if ((Block.Type() != BlockType::NetherPortal) && (Block.Type() != BlockType::Obsidian))
 					{
 						return false;
@@ -96,7 +96,7 @@ private:
 				for (const auto & Direction : PortalCheck)
 				{
 					BlockState Block;
-					a_Chunk.UnboundedRelGetBlockType(a_RelPos + Direction, Block);
+					a_Chunk.UnboundedRelGetBlock(a_RelPos + Direction, Block);
 					if ((Block.Type() != BlockType::NetherPortal) && (Block.Type() != BlockType::Obsidian))
 					{
 						return false;

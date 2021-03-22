@@ -37,7 +37,7 @@ static int tolua_get_AllToLua_g_BlockLightValue(lua_State* tolua_S)
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	LuaState.Push(cBlockInfo::GetLightValue(static_cast<BLOCKTYPE>(BlockType)));
+	LuaState.Push(cBlockInfo::GetLightValue(PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockType), 0)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -67,7 +67,7 @@ static int tolua_get_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	LuaState.Push(cBlockInfo::GetSpreadLightFalloff(static_cast<BLOCKTYPE>(BlockType)));
+	LuaState.Push(cBlockInfo::GetSpreadLightFalloff(PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockType), 0)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -97,7 +97,7 @@ static int tolua_get_AllToLua_g_BlockTransparent(lua_State* tolua_S)
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	LuaState.Push(cBlockInfo::IsTransparent(static_cast<BLOCKTYPE>(BlockType)));
+	LuaState.Push(cBlockInfo::IsTransparent(PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockType), 0)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -127,7 +127,7 @@ static int tolua_get_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	LuaState.Push(cBlockInfo::IsOneHitDig(static_cast<BLOCKTYPE>(BlockType)));
+	LuaState.Push(cBlockInfo::IsOneHitDig(PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockType), 0)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -157,7 +157,7 @@ static int tolua_get_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	LuaState.Push(cBlockInfo::IsPistonBreakable(static_cast<BLOCKTYPE>(BlockType)));
+	LuaState.Push(cBlockInfo::IsPistonBreakable(PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockType), 0)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -187,7 +187,7 @@ static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	LuaState.Push(cBlockInfo::IsSnowable(static_cast<BLOCKTYPE>(BlockType)));
+	LuaState.Push(cBlockInfo::IsSnowable(PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockType), 0)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -217,7 +217,7 @@ static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	LuaState.Push(cBlockInfo::IsSolid(static_cast<BLOCKTYPE>(BlockType)));
+	LuaState.Push(cBlockInfo::IsSolid(PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockType), 0)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
@@ -247,7 +247,7 @@ static int tolua_get_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
 	{
 		tolua_error(tolua_S, "array indexing out of range.", nullptr);
 	}
-	LuaState.Push(cBlockInfo::FullyOccupiesVoxel(static_cast<BLOCKTYPE>(BlockType)));
+	LuaState.Push(cBlockInfo::FullyOccupiesVoxel(PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockType), 0)));
 	return 1;
 }
 #endif  // #ifndef TOLUA_DISABLE
