@@ -8,6 +8,7 @@
 #include "json/json.h"
 #include "../Entities/Player.h"
 #include "../ClientHandle.h"
+#include "../Blocks/BlockMobHead.h"
 
 
 
@@ -18,7 +19,7 @@ cMobHeadEntity::cMobHeadEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_Wo
 	m_Type(SKULL_TYPE_SKELETON),
 	m_Rotation(SKULL_ROTATION_NORTH)
 {
-	ASSERT(IsHead(a_Block));
+	ASSERT(cBlockMobHeadHandler::IsBlockMobHead(a_Block));
 }
 
 

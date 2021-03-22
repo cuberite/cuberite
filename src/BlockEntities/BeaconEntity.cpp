@@ -41,7 +41,7 @@ char cBeaconEntity::CalculatePyramidLevel(void)
 		GetPosX() - 4, GetPosX() + 4,
 		MinY, MaxY,
 		GetPosZ() - 4, GetPosZ() + 4,
-		cBlockArea::baTypes
+		cBlockArea::baBlocks
 	);
 
 	int Layer = 1;
@@ -53,7 +53,7 @@ char cBeaconEntity::CalculatePyramidLevel(void)
 		{
 			for (int Z = MiddleXZ - Layer; Z <= (MiddleXZ + Layer); Z++)
 			{
-				if (!IsMineralBlock(Area.GetRelBlock(X, Y, Z)))
+				if (!IsMineralBlock(Area.GetRelBlock({X, Y, Z})))
 				{
 					return static_cast<char>(Layer - 1);
 				}

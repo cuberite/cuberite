@@ -2,11 +2,11 @@ target_sources(
 	${CMAKE_PROJECT_NAME} PRIVATE
 
 	BlockStates.cpp
-	BlockTypeItemTypeConverter.cpp
+	BlockItemConverter.cpp
 
 	BlockStates.h
 	BlockTypes.h
-	BlockTypeItemTypeConverter.h
+    BlockItemConverter.h
 	Items.h
 	Statistics.h
 )

@@ -9,7 +9,7 @@
 #include "../World.h"
 #include "../ClientHandle.h"
 #include "../Chunk.h"
-#include "../Registries/BlockTypeItemTypeConverter.h"
+#include "../Registries/BlockItemConverter.h"
 #include "../Blocks/BlockBanner.h"
 
 

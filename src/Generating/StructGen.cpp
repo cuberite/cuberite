@@ -337,7 +337,7 @@ void cStructGenLakes::GenFinish(cChunkDesc & a_ChunkDesc)
 		int OfsZ = Lake.GetOriginZ() + z * cChunkDef::Width;
 
 		// Merge the lake into the current data
-		a_ChunkDesc.WriteBlockArea(Lake, OfsX, Lake.GetOriginY(), OfsZ, cBlockArea::msLake);
+		a_ChunkDesc.WriteBlockArea(Lake, {OfsX, Lake.GetOriginY(), OfsZ}, cBlockArea::msLake);
 	}  // for x, z - neighbor chunks
 }
 
@@ -348,7 +348,7 @@ void cStructGenLakes::GenFinish(cChunkDesc & a_ChunkDesc)
 void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeHeight, cBlockArea & a_Lake)
 {
 	a_Lake.Create(16, 8, 16);
-	a_Lake.Fill(cBlockArea::baTypes, E_BLOCK_SPONGE);  // Sponge is the NOP blocktype for lake merging strategy
+	a_Lake.Fill(cBlockArea::baBlocks, E_BLOCK_SPONGE);  // Sponge is the NOP blocktype for lake merging strategy
 
 	// Make a random position in the chunk by using a random 16 block XZ offset and random height up to chunk's max height minus 6
 	int MinHeight = std::max(a_MaxLakeHeight - 6, 2);

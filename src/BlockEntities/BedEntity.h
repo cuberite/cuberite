@@ -30,10 +30,6 @@ public:  // tolua_export
 	/** Set the color of the bed. */
 	void SetColor(short a_Color);
 
-	/** Returns true if this is the pillow block, it has then the meta 8. */
-	bool IsPillowBlock(void) const;
-	// bool IsPillowBlock(void) { return ((m_BlockMeta & 0x08) == 0x08); }
-
 	// tolua_end
 
 	// cBlockEntity overrides:

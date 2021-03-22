@@ -133,6 +133,7 @@ public:
 	void CollectPickupsByPlayer(cPlayer & a_Player);
 
 	BlockState GetBlock          (Vector3i a_BlockPos) const;
+	bool       GetBlock          (Vector3i a_BlockPos, BlockState & a_Block) const;
 	LIGHTTYPE  GetBlockSkyLight  (Vector3i a_BlockPos) const;
 	LIGHTTYPE  GetBlockBlockLight(Vector3i a_BlockPos) const;
 
@@ -345,7 +346,7 @@ public:
 	/** Grows the plant at the specified position by at most a_NumStages.
 	The block's Grow handler is invoked.
 	Returns the number of stages the plant has grown, 0 if not a plant. */
-	int GrowPlantAt(Vector3i a_BlockPos, int a_NumStages = 1);
+	int GrowPlantAt(Vector3i a_BlockPos, unsigned char a_NumStages = 1);
 
 	/** Causes the specified block to be ticked on the next Tick() call.
 	Plugins can use this via the cWorld:SetNextBlockToTick() API.

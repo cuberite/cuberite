@@ -58,21 +58,11 @@ public:
 };
 // tolua_end
 
-
-
-
-
-bool IsBlockWater(BlockType a_Block);
-
 bool IsBlockIce(BlockState a_Block);
 
 bool IsBlockWaterOrIce(BlockState a_Block);
 
-bool IsBlockLava(BlockState a_Block);
-
 bool IsBlockLiquid(BlockState a_Block);
-
-bool IsBlockRail(BlockState a_Block);
 
 bool IsBlockStateOfDirt(BlockState a_Block);
 
@@ -86,16 +76,6 @@ bool IsBlockMaterialVine(BlockState a_Block);
 
 bool IsBlockMaterialIron(BlockState a_Block);
 
-bool IsBlockMaterialLeaves(BlockState a_Block);
-
 bool IsBlockMaterialGourd(BlockState a_Block);
 
 bool IsBlockMaterialRock(BlockState a_Block);
-
-bool IsBed(BlockState a_Block);
-
-bool IsHead(BlockState a_Block);
-
-bool IsSign(BlockState a_Block);
-
-bool IsAnvil(BlockState a_Block);

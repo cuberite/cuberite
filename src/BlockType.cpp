@@ -2,12 +2,13 @@
 
 // Implements the helper functions for converting Block Type string to int etc.
 
+
 #include "Globals.h"
+/*
 #include "IniFile.h"
 #include "Item.h"
 #include "Mobs/Monster.h"
-
-
+*/
 
 
 
@@ -22,7 +23,7 @@ class cBlockIDMap
 		}
 	} ;
 
-	typedef std::map<AString, std::pair<short, short>, Comparator> ItemMap;
+	using ItemMap = std::map<AString, std::pair<short, short>, Comparator>;
 
 public:
 

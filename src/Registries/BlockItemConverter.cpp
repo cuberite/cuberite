@@ -1,7 +1,7 @@
 
 #include "Globals.h"
 
-#include "BlockTypeItemTypeConverter.h"
+#include "BlockItemConverter.h"
 
 namespace BlockItemConverter
 {

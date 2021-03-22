@@ -983,7 +983,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		bool IsNoAirSurrounding = true;
 		for (const auto & Offset : gCrossCoords)
 		{
-			if (!NextChunk->UnboundedRelGetBlockType(RelBlockX + Offset.x, BlockY, RelBlockZ + Offset.z, GotBlock))
+			if (!NextChunk->UnboundedRelGetBlock(RelBlockX + Offset.x, BlockY, RelBlockZ + Offset.z, GotBlock))
 			{
 				// The pickup is too close to an unloaded chunk, bail out of any physics handling
 				return;
@@ -1658,7 +1658,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 			for (int y = MinY; y <= MaxY; y++)
 			{
 				BlockState Block;
-				if (!a_Chunk.UnboundedRelGetBlockType(x, y, z, Block))
+				if (!a_Chunk.UnboundedRelGetBlock(x, y, z, Block))
 				{ /*
 					LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
 						x, y, z, GetPosX(), GetPosZ()
@@ -1670,7 +1670,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 				{
 					m_IsInFire = true;
 				}
-				else if (IsBlockLava(Block))
+				else if (Block.Type() == BlockType::Lava)
 				{
 					m_IsInLava = true;
 				}
@@ -1687,7 +1687,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	int RelZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
 	int HeadHeight = CeilC(GetPosY() + GetHeight()) - 1;
 	BlockState BlockIn;
-	if (!a_Chunk.UnboundedRelGetBlockType(RelX, HeadHeight, RelZ, BlockIn))
+	if (!a_Chunk.UnboundedRelGetBlock(RelX, HeadHeight, RelZ, BlockIn))
 	{
 		LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
 			RelX, HeadHeight, RelZ, GetPosX(), GetPosZ()

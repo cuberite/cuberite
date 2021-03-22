@@ -183,7 +183,7 @@ public:
 		};
 
 		cBlockArea Area;
-		Area.Read(a_World, a_BlockPos - Vector3i(2, 2, 2), a_BlockPos + Vector3i(2, 0, 2), cBlockArea::baTypes);
+		Area.Read(a_World, a_BlockPos - Vector3i(2, 2, 2), a_BlockPos + Vector3i(2, 0, 2), cBlockArea::baBlocks);
 
 		auto RelHeadPos = Vector3i(3, 2, 3);
 		Vector3i CenterHeadPos;

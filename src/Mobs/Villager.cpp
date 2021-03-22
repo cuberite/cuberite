@@ -161,7 +161,7 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 			int Z = m_World->GetTickRandomNumber(11);
 
 			// A villager can't farm this.
-			if (!IsBlockFarmable(Surrounding.GetRelBlock(X, Y, Z)))
+			if (!IsBlockFarmable(Surrounding.GetRelBlock({X, Y, Z})))
 			{
 				continue;
 			}

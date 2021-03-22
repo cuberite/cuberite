@@ -65,7 +65,7 @@
 
 #include "../Blocks/BlockHandler.h"
 #include "SimplePlaceableItemHandler.h"
-#include "../Registries/BlockTypeItemTypeConverter.h"
+#include "../Registries/BlockItemConverter.h"
 #include "../Protocol/Palettes/Upgrade.h"
 
 

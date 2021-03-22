@@ -20,11 +20,6 @@
 		#endif
 	#elif defined(__APPLE__)
 		#include <mach/mach.h>
-	#elif defined(__FreeBSD__)
-		#include <kvm.h>
-		#include <fcntl.h>
-		#include <sys/sysctl.h>
-		#include <sys/user.h>
 	#endif
 #endif
 
@@ -51,9 +46,7 @@
 #include "Logger.h"
 #include "ClientHandle.h"
 
-// temp
-#include "Protocol/Palettes/BlockMap.h"
-#include <fstream>
+
 
 
 
@@ -141,27 +134,6 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 		m_SettingsFilename = a_OverridesRepo.GetValue("Server","ConfigFile");
 	}
 
-	auto & loadmap = *BlockMap::BlMap::GetMap();
-	auto & savemap = *BlockMap::BlMap::GetSaveMap();
-
-	loadmap.reserve(30000);
-	savemap.reserve(30000);
-	std::fstream f;
-	f.open("Protocol/Blocks.txt", std::ios::in);
-	ASSERT(!f.fail());
-	AString line;
-	while(std::getline(f, line))
-	{
-		auto pos = std::find(line.begin(), line.end(), '-');
-		size_t b = static_cast<size_t>(std::distance(line.begin(), pos))+1;
-		auto id = static_cast<ENUM_BLOCKS>(std::stoi(line,nullptr,10));
-		auto strid = line.substr(b, std::string::npos);
-		loadmap[strid] = id;
-		savemap[id] = strid;
-	}
-
-	// LOGD("%d hash tbl size", (*BlockMap::BlMap::GetMap()).size());
-
 	auto IniFile = std::make_unique<cIniFile>();
 	bool IsNewIniFile = !IniFile->ReadFile(m_SettingsFilename);
 
@@ -191,8 +163,6 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	m_WebAdmin = new cWebAdmin();
 	m_WebAdmin->Init();
 
-
-
 	LOGD("Loading settings...");
 	m_RankManager.reset(new cRankManager());
 	m_RankManager->Initialize(*m_MojangAPI);
@@ -207,9 +177,6 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOGD("Loading plugin manager...");
 	m_PluginManager = new cPluginManager(dd);
 	m_PluginManager->ReloadPluginsNow(*settingsRepo);
-	m_PluginManager->SetupNewCommands();
-
-
 
 	LOGD("Loading MonsterConfig...");
 	m_MonsterConfig = new cMonsterConfig;
@@ -240,7 +207,6 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 		m_StartTime = std::chrono::steady_clock::now();
 
 		HandleInput();
-
 		s_StopEvent.Wait();
 
 		// Stop the server:
@@ -271,6 +237,8 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 
 	LOGD("Stopping plugin manager...");
 	delete m_PluginManager; m_PluginManager = nullptr;
+
+	cItemHandler::Deinit();
 
 	LOG("Cleaning up...");
 	delete m_Server; m_Server = nullptr;
@@ -325,8 +293,8 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 
 		const AStringVector WorldNames{ "world", "world_nether", "world_the_end" };
 		m_pDefaultWorld = &m_WorldsByName.try_emplace("world", "world", "world", a_dd, WorldNames).first->second;
-		//m_WorldsByName.try_emplace("world_nether", "world_nether", "world_nether", a_dd, WorldNames, dimNether, "world");
-		//m_WorldsByName.try_emplace("world_the_end", "world_the_end", "world_the_end", a_dd, WorldNames, dimEnd, "world");
+		m_WorldsByName.try_emplace("world_nether", "world_nether", "world_nether", a_dd, WorldNames, dimNether, "world");
+		m_WorldsByName.try_emplace("world_the_end", "world_the_end", "world_the_end", a_dd, WorldNames, dimEnd, "world");
 		return;
 	}
 
@@ -579,6 +547,15 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd)
 void cRoot::KickUser(int a_ClientID, const AString & a_Reason)
 {
 	m_Server->KickUser(a_ClientID, a_Reason);
+}
+
+
+
+
+
+void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
+{
+	m_Server->AuthenticateUser(a_ClientID, a_Name, a_UUID, a_Properties);
 }
 
 
@@ -908,37 +885,6 @@ int cRoot::GetPhysicalRAMUsage(void)
 			return static_cast<int>(t_info.resident_size / 1024);
 		}
 		return -1;
-	#elif defined (__FreeBSD__)
-		/*
-		struct rusage self_usage;
-		int status = getrusage(RUSAGE_SELF, &self_usage);
-		if (!status)
-		{
-			return static_cast<int>(self_usage.ru_maxrss);
-		}
-		return -1;
-		*/
-		// Good to watch: https://www.youtube.com/watch?v=Os5cK0H8EOA - getrusage.
-		// Unfortunately, it only gives peak memory usage a.k.a max resident set size
-		// So it is better to use FreeBSD kvm function to get the size of resident pages.
-
-		static kvm_t* kd = NULL;
-
-		if (kd == NULL)
-		{
-			kd = kvm_open(NULL, "/dev/null", NULL, O_RDONLY, "kvm_open");  // returns a descriptor used to access kernel virtual memory
-		}
-		if (kd != NULL)
-		{
-			int pc = 0;  // number of processes found
-			struct kinfo_proc* kp;
-			kp = kvm_getprocs(kd, KERN_PROC_PID, getpid(), &pc);
-			if ((kp != NULL) && (pc >= 1))
-			{
-				return static_cast<int>(kp->ki_rssize * getpagesize() / 1024);
-			}
-		}
-		return -1;
 	#else
 		LOGINFO("%s: Unknown platform, cannot query memory usage", __FUNCTION__);
 		return -1;
@@ -954,7 +900,7 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 	int SumNumValid = 0;
 	int SumNumDirty = 0;
 	int SumNumInLighting = 0;
-	size_t SumNumInGenerator = 0;
+	int SumNumInGenerator = 0;
 	int SumMem = 0;
 	for (auto & Entry : m_WorldsByName)
 	{
@@ -966,33 +912,32 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 		int NumDirty = 0;
 		int NumInLighting = 0;
 		World.GetChunkStats(NumValid, NumDirty, NumInLighting);
-		a_Output.OutLn(fmt::format(FMT_STRING("World {}:"), World.GetName()));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Num loaded chunks: {}"), NumValid));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Num dirty chunks: {}"), NumDirty));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in lighting queue: {}"), NumInLighting));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in generator queue: {}"), NumInGenerator));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in storage load queue: {}"), NumInLoadQueue));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in storage save queue: {}"), NumInSaveQueue));
+		a_Output.Out("World %s:", World.GetName().c_str());
+		a_Output.Out("  Num loaded chunks: %d", NumValid);
+		a_Output.Out("  Num dirty chunks: %d", NumDirty);
+		a_Output.Out("  Num chunks in lighting queue: %d", NumInLighting);
+		a_Output.Out("  Num chunks in generator queue: %zu", NumInGenerator);
+		a_Output.Out("  Num chunks in storage load queue: %zu", NumInLoadQueue);
+		a_Output.Out("  Num chunks in storage save queue: %zu", NumInSaveQueue);
 		int Mem = NumValid * static_cast<int>(sizeof(cChunk));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Memory used by chunks: {} KiB ({} MiB)"), (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024)));
+		a_Output.Out("  Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
+		a_Output.Out("  Per-chunk memory size breakdown:");
+		a_Output.Out("    block types:    %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BlockStates), (sizeof(cChunkDef::BlockStates) + 1023) / 1024);
+		a_Output.Out("    block lighting: %6zu bytes (%3zu KiB)", 2 * sizeof(cChunkDef::LightNibbles), (2 * sizeof(cChunkDef::LightNibbles) + 1023) / 1024);
+		a_Output.Out("    heightmap:      %6zu bytes (%3zu KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
+		a_Output.Out("    biomemap:       %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
 		SumNumValid += NumValid;
 		SumNumDirty += NumDirty;
 		SumNumInLighting += NumInLighting;
 		SumNumInGenerator += NumInGenerator;
 		SumMem += Mem;
 	}
-	a_Output.OutLn("Totals:");
-	a_Output.OutLn(fmt::format(FMT_STRING("  Num loaded chunks: {}"), SumNumValid));
-	a_Output.OutLn(fmt::format(FMT_STRING("  Num dirty chunks: {}"), SumNumDirty));
-	a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in lighting queue: {}"), SumNumInLighting));
-	a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in generator queue: {}"), SumNumInGenerator));
-	a_Output.OutLn(fmt::format(FMT_STRING("  Memory used by chunks: {} KiB ({} MiB)"), (SumMem + 1023) / 1024, (SumMem + 1024 * 1024 - 1) / (1024 * 1024)));
-	a_Output.OutLn("Per-chunk memory size breakdown:");
-	a_Output.OutLn(fmt::format(FMT_STRING("  block types:    {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::BlockTypes), (sizeof(cChunkDef::BlockTypes) + 1023) / 1024));
-	a_Output.OutLn(fmt::format(FMT_STRING("  block metadata: {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::BlockNibbles), (sizeof(cChunkDef::BlockNibbles) + 1023) / 1024));
-	a_Output.OutLn(fmt::format(FMT_STRING("  block lighting: {:06} bytes ({:3} KiB)"), 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024));
-	a_Output.OutLn(fmt::format(FMT_STRING("  heightmap:      {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024));
-	a_Output.OutLn(fmt::format(FMT_STRING("  biomemap:       {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024));
+	a_Output.Out("Totals:");
+	a_Output.Out("  Num loaded chunks: %d", SumNumValid);
+	a_Output.Out("  Num dirty chunks: %d", SumNumDirty);
+	a_Output.Out("  Num chunks in lighting queue: %d", SumNumInLighting);
+	a_Output.Out("  Num chunks in generator queue: %d", SumNumInGenerator);
+	a_Output.Out("  Memory used by chunks: %d KiB (%d MiB)", (SumMem + 1023) / 1024, (SumMem + 1024 * 1024 - 1) / (1024 * 1024));
 }
 
 
@@ -1027,7 +972,7 @@ AStringVector cRoot::GetPlayerTabCompletionMultiWorld(const AString & a_Text)
 
 void cRoot::HandleInput()
 {
-	if (g_RunAsService || g_DetachedStdin)
+	if (g_RunAsService)
 	{
 		// Ignore input when running as a service, cin was never opened in that case:
 		return;
@@ -1100,6 +1045,7 @@ void cRoot::TransitionNextState(NextState a_NextState)
 	s_StopEvent.Set();
 
 #ifdef WIN32
+
 	DWORD Length;
 	INPUT_RECORD Record
 	{

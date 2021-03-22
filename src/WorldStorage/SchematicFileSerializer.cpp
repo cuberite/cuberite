@@ -113,10 +113,9 @@ void cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, co
 	{
 		throw std::runtime_error(fmt::format("BlockTypes are invalid in the schematic file: {}", TBlockTypes));
 	}
-	bool AreMetasPresent = (TBlockMetas > 0) && (a_NBT.GetType(TBlockMetas) == TAG_ByteArray);
 
 	a_BlockArea.Clear();
-	a_BlockArea.SetSize(SizeX, SizeY, SizeZ, AreMetasPresent ? (cBlockArea::baTypes | cBlockArea::baMetas) : cBlockArea::baTypes);
+	a_BlockArea.SetSize(SizeX, SizeY, SizeZ, cBlockArea::baBlocks);
 
 	int TOffsetX = a_NBT.FindChildByName(a_NBT.GetRoot(), "WEOffsetX");
 	int TOffsetY = a_NBT.FindChildByName(a_NBT.GetRoot(), "WEOffsetY");

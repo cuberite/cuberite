@@ -159,24 +159,8 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumR
 		return;
 	}
 
-	if (m_Modifiers.size() == 0)
-	{
-		// Write the image:
-		a_Dest.WriteBlockArea(Image, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
-	}
-	else
-	{
-		cBlockArea RandomizedImage;
-		Image.CopyTo(RandomizedImage);
-
-		for (size_t i = 0; i < m_Modifiers.size(); i++)
-		{
-			m_Modifiers[i]->Modify(RandomizedImage, a_Placement, a_NumRotations);
-		}
-
-		// Write the modified image:
-		a_Dest.WriteBlockArea(RandomizedImage, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
-	}
+	// Write the image:
+	a_Dest.WriteBlockArea(Image, Placement, m_MergeStrategy);
 
 	// If requested, draw the floor (from the bottom of the prefab down to the nearest non-air)
 	switch (m_ExtendFloorStrategy)
@@ -202,7 +186,7 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumR
 						// X coord outside the chunk
 						continue;
 					}
-					auto Block = Image.GetRelBlock(x, 0, z);
+					auto Block = Image.GetRelBlock({x, 0, z});
 					if ((Block.Type() == BlockType::Air) || (Block.Type() == BlockType::Sponge))
 					{
 						// Do not expand air nor sponge blocks

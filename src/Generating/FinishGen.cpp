@@ -20,7 +20,7 @@
 #include "../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
 #include "../Simulator/FireSimulator.h"
 #include "../Protocol/Palettes/Upgrade.h"
-#include "../Registries/BlockTypeItemTypeConverter.h"
+#include "../Registries/BlockItemConverter.h"
 
 
 

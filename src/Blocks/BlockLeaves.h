@@ -3,7 +3,7 @@
 #include "../FastRandom.h"
 #include "../BlockArea.h"
 
-#include "../Registries/BlockTypeItemTypeConverter.h"
+#include "../Registries/BlockItemConverter.h"
 
 
 
@@ -287,7 +287,7 @@ private:
 			*a_World,
 			a_BlockPos - Vector3i(LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE),
 			a_BlockPos + Vector3i(LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE),
-			cBlockArea::baTypes)
+			cBlockArea::baBlocks)
 			)
 		{
 			// Cannot check leaves, a chunk is missing too close

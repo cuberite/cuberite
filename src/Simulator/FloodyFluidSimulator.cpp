@@ -92,7 +92,7 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, Vector3i a_RelPos)
 	{
 		bool SpreadFurther = true;
 		auto Below = a_Chunk->GetBlock(a_RelPos);
-		if (IsPassableForFluid(Below) || IsBlockLava(Below) || IsBlockWater(Below.Type()))
+		if (IsPassableForFluid(Below) || (Below.Type() == BlockType::Lava) || (Below.Type() == BlockType::Water))
 		{
 			// Spread only down, possibly washing away what's there or turning lava to stone / cobble / obsidian:
 			SpreadToNeighbor(a_Chunk, a_RelPos.addedY(-1), 8);

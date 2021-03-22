@@ -386,23 +386,11 @@ public:
 	bool UnboundedRelGetBlock(Vector3i a_RelCoords, BlockState & a_Block) const;
 
 	/** OBSOLETE, use the Vector3i-based overload.
-	Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
+	Same as GetBlockType(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
 	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState & a_Block) const
 	{
 		return UnboundedRelGetBlock({a_RelX, a_RelY, a_RelZ}, a_Block);
-	}
-
-	/** Same as GetBlockType(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
-	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockType(Vector3i a_RelCoords, BlockState & a_Block) const;
-
-	/** OBSOLETE, use the Vector3i-based overload.
-	Same as GetBlockType(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
-	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockType(int a_RelX, int a_RelY, int a_RelZ, BlockState & a_Block) const
-	{
-		return UnboundedRelGetBlockType({a_RelX, a_RelY, a_RelZ}, a_Block);
 	}
 
 	/** Same as GetBlockBlockLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
@@ -610,7 +598,7 @@ private:
 	/** Grows the plant at the specified position by at most a_NumStages.
 	The block's Grow handler is invoked.
 	Returns the number of stages the plant has grown, 0 if not a plant. */
-	int GrowPlantAt(Vector3i a_RelPos, int a_NumStages = 1);
+	int GrowPlantAt(Vector3i a_RelPos, unsigned char a_NumStages = 1);
 
 	/** Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients */
 	void MoveEntityToNewChunk(OwnedEntity a_Entity);

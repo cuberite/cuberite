@@ -259,7 +259,7 @@ private:
 
 		// Grow one block down, if possible:
 		BlockState DestBlock;
-		a_Chunk.UnboundedRelGetBlockType(GrowPos, DestBlock);
+		a_Chunk.UnboundedRelGetBlock(GrowPos, DestBlock);
 		if (cBlockAirHandler::IsBlockAir(DestBlock))
 		{
 			auto WorldPos = a_Chunk.RelativeToAbsolute(GrowPos);

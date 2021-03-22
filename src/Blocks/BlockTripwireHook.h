@@ -59,7 +59,7 @@ private:
 		const auto RearPosition = AddFaceDirection(a_RelPos, TripwireHook::Facing(Self), true);
 
 		BlockState Other = 0;
-		if (!a_Chunk.UnboundedRelGetBlockType(RearPosition, Other))
+		if (!a_Chunk.UnboundedRelGetBlock(RearPosition, Other))
 		{
 			return false;
 		}

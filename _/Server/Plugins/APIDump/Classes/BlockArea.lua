@@ -146,7 +146,7 @@ return
 							Type = "number",
 						},
 					},
-					Notes = "Initializes this BlockArea to an empty area of the specified size and origin of {0, 0, 0}. Datatypes are set to baTypes + baMetas. Any previous contents are lost.",
+					Notes = "Initializes this BlockArea to an empty area of the specified size and origin of {0, 0, 0}. Datatypes are set to baBlocks + baMetas. Any previous contents are lost.",
 				},
 				{
 					Params =
@@ -178,7 +178,7 @@ return
 							Type = "Vector3i",
 						},
 					},
-					Notes = "Creates a new area of the specified size. Datatypes are set to baTypes + baMetas. Origin is set to all zeroes. BlockTypes are set to air, block metas to zero, blocklights to zero and skylights to full light.",
+					Notes = "Creates a new area of the specified size. Datatypes are set to baBlocks + baMetas. Origin is set to all zeroes. BlockTypes are set to air, block metas to zero, blocklights to zero and skylights to full light.",
 				},
 				{
 					Params =
@@ -1109,7 +1109,7 @@ return
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if the specified combination of datatypes (ba* constants added together) is valid. Most combinations are valid, but for example baBlockEntities without baTypes is an invalid combination.",
+				Notes = "Returns true if the specified combination of datatypes (ba* constants added together) is valid. Most combinations are valid, but for example baBlockEntities without baBlocks is an invalid combination.",
 			},  -- IsValidDataTypeCombination
 
 			IsValidRelCoords =
@@ -1278,7 +1278,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Reads the area from World, returns true if successful. baTypes and baMetas are read.",
+					Notes = "Reads the area from World, returns true if successful. baBlocks and baMetas are read.",
 				},
 				{
 					Params =
@@ -1328,7 +1328,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Reads the area from World, returns true if successful. baTypes and baMetas are read.",
+					Notes = "Reads the area from World, returns true if successful. baBlocks and baMetas are read.",
 				},
 				{
 					Params =
@@ -1397,7 +1397,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Reads the area from World, returns true if successful. baTypes and baMetas are read.",
+					Notes = "Reads the area from World, returns true if successful. baBlocks and baMetas are read.",
 				},
 				{
 					Params =
@@ -1996,7 +1996,7 @@ return
 		{
 			baBlockEntities =
 			{
-				Notes = "Operations should work on block entities. Note that this flag is invalid without baTypes.",
+				Notes = "Operations should work on block entities. Note that this flag is invalid without baBlocks.",
 			},
 			baLight =
 			{
@@ -2010,7 +2010,7 @@ return
 			{
 				Notes = "Operations should work on skylight",
 			},
-			baTypes =
+			baBlocks =
 			{
 				Notes = "Operation should work on block types",
 			},
@@ -2049,7 +2049,7 @@ return
 		},
 		ConstantGroups =
 		{
-			BATypes =
+			baBlocks =
 			{
 				Include = "ba.*",
 				TextBefore = [[

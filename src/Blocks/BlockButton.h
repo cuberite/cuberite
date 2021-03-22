@@ -212,7 +212,7 @@ private:
 			return false;
 		}
 		BlockState SupportBlock = 0;
-		a_Chunk.UnboundedRelGetBlockType(SupportRelPos, SupportBlock);
+		a_Chunk.UnboundedRelGetBlock(SupportRelPos, SupportBlock);
 
 		return cBlockInfo::FullyOccupiesVoxel(SupportBlock);
 	}

@@ -6,7 +6,9 @@
 #include "../BlockInfo.h"
 #include "../Defines.h"
 #include "../World.h"
+#include "../Blocks/ChunkInterface.h"
 #include "../Blocks/BlockAir.h"
+#include "../Blocks/BlockRail.h"
 #include "../Entities/Boat.h"
 #include "../Entities/ProjectileEntity.h"
 #include "../Simulator/FluidSimulator.h"
@@ -42,7 +44,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 	// Dispense the item:
 	const cItem & SlotItem = m_Contents.GetSlot(a_SlotNum);
-	if (ItemCategory::IsMinecart(SlotItem.m_ItemType) && IsBlockRail(DispBlock))  // only actually place the minecart if there are rails!
+	if (ItemCategory::IsMinecart(SlotItem.m_ItemType) && cBlockRailHandler::IsBlockRail(DispBlock))  // only actually place the minecart if there are rails!
 	{
 		if (m_World->SpawnMinecart(DispAbsCoord.x + 0.5, DispAbsCoord.y + 0.5, DispAbsCoord.z + 0.5, SlotItem.m_ItemType) != cEntity::INVALID_ID)
 		{

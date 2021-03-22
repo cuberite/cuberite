@@ -238,7 +238,7 @@ public:
 	void    Delete(int a_Idx);
 	void    Clear (void) {clear(); }
 	size_t  Size  (void) const { return size(); }
-	void    Set   (int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDamage);
+	void    Set   (int a_Idx, Item a_Item, char a_ItemCount, short a_ItemDamage);
 	bool    Contains(const cItem & a_Item);
 	bool    ContainsType(const cItem & a_Item);
 

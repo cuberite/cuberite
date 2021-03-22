@@ -3,6 +3,7 @@
 
 #include "ItemHandler.h"
 #include "../BlockInfo.h"
+#include "../Blocks/BlockLeaves.h"
 
 
 
@@ -94,7 +95,7 @@ public:
 			if (
 				IsBlockMaterialPlants(a_Block) ||
 				IsBlockMaterialVine(a_Block)   ||
-				IsBlockMaterialLeaves(a_Block) ||
+				cBlockLeavesHandler::IsBlockLeaves(a_Block) ||
 				IsBlockMaterialGourd(a_Block)
 			)
 			{

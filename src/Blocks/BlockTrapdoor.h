@@ -77,6 +77,24 @@ public:
 		}
 	}
 
+	static inline bool IsTrapdoorOpen(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaTrapdoor:  return AcaciaTrapdoor::Open(a_Block);
+			case BlockType::BirchTrapdoor:   return BirchTrapdoor::Open(a_Block);
+			case BlockType::CrimsonTrapdoor: return CrimsonTrapdoor::Open(a_Block);
+			case BlockType::DarkOakTrapdoor: return DarkOakTrapdoor::Open(a_Block);
+			case BlockType::IronTrapdoor:    return IronTrapdoor::Open(a_Block);
+			case BlockType::JungleTrapdoor:  return JungleTrapdoor::Open(a_Block);
+			case BlockType::OakTrapdoor:     return OakTrapdoor::Open(a_Block);
+			case BlockType::SpruceTrapdoor:  return SpruceTrapdoor::Open(a_Block);
+			case BlockType::WarpedTrapdoor:  return WarpedTrapdoor::Open(a_Block);
+			default: return false;
+		}
+	}
+
 private:
 
 	virtual bool IsUseable(void) const override

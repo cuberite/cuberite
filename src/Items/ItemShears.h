@@ -93,7 +93,7 @@ public:
 
 	virtual float GetBlockBreakingStrength(BlockState a_Block) override
 	{
-		if ((a_Block == BlockType::Cobweb) || IsBlockMaterialLeaves(a_Block))
+		if ((a_Block == BlockType::Cobweb) || cBlockLeavesHandler::IsBlockLeaves(a_Block))
 		{
 			return 15.0f;
 		}

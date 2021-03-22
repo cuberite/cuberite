@@ -79,7 +79,7 @@ cItem & cCraftingGrid::GetItem(int x, int y) const
 
 
 
-void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_TYPE a_ItemType, char a_ItemCount, short a_ItemHealth)
+void cCraftingGrid::SetItem(int x, int y, Item a_Item, char a_ItemCount, short a_ItemHealth)
 {
 	// Accessible through scripting, must verify parameters:
 	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
@@ -90,7 +90,7 @@ void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_TYPE a_ItemType, char a_Item
 		return;
 	}
 
-	m_Items[x + m_Width * y] = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
+	m_Items[x + m_Width * y] = cItem(a_Item, a_ItemCount, a_ItemHealth);
 }
 
 
@@ -166,7 +166,7 @@ void cCraftingGrid::ConsumeGrid(const cCraftingGrid & a_Grid)
 		{
 			if ((m_Items[ThisIdx].m_ItemType == E_ITEM_MILK) || (m_Items[ThisIdx].m_ItemType == E_ITEM_WATER_BUCKET) || (m_Items[ThisIdx].m_ItemType == E_ITEM_LAVA_BUCKET))
 			{
-				m_Items[ThisIdx] = cItem(E_ITEM_BUCKET);
+				m_Items[ThisIdx] = cItem(Item::Bucket);
 			}
 			else
 			{
@@ -229,9 +229,9 @@ void cCraftingRecipe::Clear(void)
 
 
 
-void cCraftingRecipe::SetResult(ENUM_ITEM_TYPE a_ItemType, char a_ItemCount, short a_ItemHealth)
+void cCraftingRecipe::SetResult(Item a_Item, char a_ItemCount, short a_ItemHealth)
 {
-	m_Result = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
+	m_Result = cItem(a_Item, a_ItemCount, a_ItemHealth);
 }
 
 
@@ -930,7 +930,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 				case E_ITEM_DYE:
 				{
 					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
-					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(static_cast<NIBBLETYPE>(a_CraftingGrid[GridID].m_ItemDamage & 0x0f)));
+					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(static_cast<unsigned char>(a_CraftingGrid[GridID].m_ItemDamage & 0x0f)));
 					break;
 				}
 				case E_ITEM_GUNPOWDER: break;

@@ -4,7 +4,7 @@
 #include "BlockHandler.h"
 #include "../Chunk.h"
 #include "../BlockInfo.h"
-#include "../Registries/BlockTypeItemTypeConverter.h"
+#include "../Registries/BlockItemConverter.h"
 
 
 class cBlockWallSignHandler final :

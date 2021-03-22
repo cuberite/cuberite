@@ -98,7 +98,7 @@ private:
 		*/
 
 		using namespace Block;
-		if (Area.GetRelBlock(0, 0, 1).Type() == m_BlockType)
+		if (Area.GetRelBlock({0, 0, 1}).Type() == m_BlockType)
 		{
 			switch (m_BlockType)
 			{
@@ -108,7 +108,7 @@ private:
 			}
 			a_ChunkInterface.FastSetBlock(a_PlacedBlockPos.addedZ(1), SetChestOrientation(a_ChunkInterface.GetBlock(a_PlacedBlockPos.addedZ(1)), ChestType::Left));
 		}
-		else if (Area.GetRelBlock(2, 0, 1).Type() == m_BlockType)
+		else if (Area.GetRelBlock({2, 0, 1}).Type() == m_BlockType)
 		{
 			switch (m_BlockType)
 			{
@@ -118,7 +118,7 @@ private:
 			}
 			a_ChunkInterface.FastSetBlock(a_PlacedBlockPos.addedXZ(2, 1), SetChestOrientation(a_ChunkInterface.GetBlock(a_PlacedBlockPos.addedXZ(2, 1)), ChestType::Right));
 		}
-		else if (Area.GetRelBlock(1, 0, 0).Type() == m_BlockType)
+		else if (Area.GetRelBlock({1, 0, 0}).Type() == m_BlockType)
 		{
 			switch (m_BlockType)
 			{
@@ -128,7 +128,7 @@ private:
 			}
 			a_ChunkInterface.FastSetBlock(a_PlacedBlockPos.addedX(1), SetChestOrientation(a_ChunkInterface.GetBlock(a_PlacedBlockPos.addedX(1)), ChestType::Left));
 		}
-		else if (Area.GetRelBlock(1, 0, 2).Type() == m_BlockType)
+		else if (Area.GetRelBlock({1, 0, 2}).Type() == m_BlockType)
 		{
 			switch (m_BlockType)
 			{
@@ -174,12 +174,12 @@ private:
 		}
 
 		int NumChestNeighbors = 0;
-		if (Area.GetRelBlock(1, 0, 2).Type() == m_BlockType)
+		if (Area.GetRelBlock({1, 0, 2}).Type() == m_BlockType)
 		{
 			if (
-				(Area.GetRelBlock(0, 0, 2).Type() == m_BlockType) ||
-				(Area.GetRelBlock(1, 0, 1).Type() == m_BlockType) ||
-				(Area.GetRelBlock(1, 0, 3).Type() == m_BlockType)
+				(Area.GetRelBlock({0, 0, 2}).Type() == m_BlockType) ||
+				(Area.GetRelBlock({1, 0, 1}).Type() == m_BlockType) ||
+				(Area.GetRelBlock({1, 0, 3}).Type() == m_BlockType)
 			)
 			{
 				// Already a doublechest neighbor, disallow:
@@ -187,12 +187,12 @@ private:
 			}
 			NumChestNeighbors += 1;
 		}
-		if (Area.GetRelBlock(3, 0, 2).Type() == m_BlockType)
+		if (Area.GetRelBlock({3, 0, 2}).Type() == m_BlockType)
 		{
 			if (
-				(Area.GetRelBlock(4, 0, 2).Type() == m_BlockType) ||
-				(Area.GetRelBlock(3, 0, 1).Type() == m_BlockType) ||
-				(Area.GetRelBlock(3, 0, 3).Type() == m_BlockType)
+				(Area.GetRelBlock({4, 0, 2}).Type() == m_BlockType) ||
+				(Area.GetRelBlock({3, 0, 1}).Type() == m_BlockType) ||
+				(Area.GetRelBlock({3, 0, 3}).Type() == m_BlockType)
 			)
 			{
 				// Already a doublechest neighbor, disallow:
@@ -200,12 +200,12 @@ private:
 			}
 			NumChestNeighbors += 1;
 		}
-		if (Area.GetRelBlock(2, 0, 1).Type() == m_BlockType)
+		if (Area.GetRelBlock({2, 0, 1}).Type() == m_BlockType)
 		{
 			if (
-				(Area.GetRelBlock(2, 0, 0).Type() == m_BlockType) ||
-				(Area.GetRelBlock(1, 0, 1).Type() == m_BlockType) ||
-				(Area.GetRelBlock(3, 0, 1).Type() == m_BlockType)
+				(Area.GetRelBlock({2, 0, 0}).Type() == m_BlockType) ||
+				(Area.GetRelBlock({1, 0, 1}).Type() == m_BlockType) ||
+				(Area.GetRelBlock({3, 0, 1}).Type() == m_BlockType)
 			)
 			{
 				// Already a doublechest neighbor, disallow:
@@ -213,12 +213,12 @@ private:
 			}
 			NumChestNeighbors += 1;
 		}
-		if (Area.GetRelBlock(2, 0, 3).Type() == m_BlockType)
+		if (Area.GetRelBlock({2, 0, 3}).Type() == m_BlockType)
 		{
 			if (
-				(Area.GetRelBlock(2, 0, 4).Type() == m_BlockType) ||
-				(Area.GetRelBlock(1, 0, 3).Type() == m_BlockType) ||
-				(Area.GetRelBlock(3, 0, 3).Type() == m_BlockType)
+				(Area.GetRelBlock({2, 0, 4}).Type() == m_BlockType) ||
+				(Area.GetRelBlock({1, 0, 3}).Type() == m_BlockType) ||
+				(Area.GetRelBlock({3, 0, 3}).Type() == m_BlockType)
 			)
 			{
 				// Already a doublechest neighbor, disallow:

@@ -189,6 +189,4 @@ public:
 		BlockState a_Block,
 		const cEntity * aDigger
 	) const override;
-
-	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * aDigger, const cItem * aTool) const override;
 } ;
