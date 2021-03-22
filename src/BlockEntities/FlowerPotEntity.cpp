@@ -8,6 +8,7 @@
 #include "../Entities/Player.h"
 #include "../ClientHandle.h"
 #include "../Item.h"
+#include "../Blocks/BlockFlowerPot.h"
 
 
 
@@ -16,7 +17,7 @@
 cFlowerPotEntity::cFlowerPotEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
 	Super(a_Block, a_Pos, a_World)
 {
-	ASSERT(a_Block.Type() == BlockType::FlowerPot);
+	ASSERT(cBlockFlowerPotHandler::IsBlockFlowerPot(a_Block));
 }
 
 
