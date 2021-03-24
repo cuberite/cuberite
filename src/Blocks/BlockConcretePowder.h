@@ -84,7 +84,7 @@ private:
 	/** Check blocks above and around to see if they are water. If one is, converts this into concrete block. */
 	static void CheckSoaked(Vector3i a_Rel, cChunk & a_Chunk)
 	{
-		const auto & WaterCheck = cSimulator::AdjacentOffsets;
+		const auto & WaterCheck = cSimulator::ThreeDimensionalNeighborCoords;
 		const bool ShouldSoak = std::any_of(WaterCheck.cbegin(), WaterCheck.cend(), [a_Rel, & a_Chunk](Vector3i a_Offset)
 		{
 			BlockState Neighbor = 0;

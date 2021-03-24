@@ -613,7 +613,7 @@ static int tolua_cBlockArea_RelLine(lua_State * a_LuaState)
 	}
 
 	// Draw the line:
-	self->RelLine(p1, p2, dataTypes, PaletteUpgrade::FromBlock(BlockType, BlockMeta), BlockLight, BlockSkyLight);
+	self->RelLine(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, dataTypes, PaletteUpgrade::FromBlock(BlockType, BlockMeta), BlockLight, BlockSkyLight);
 	return 0;
 }
 
@@ -1091,7 +1091,7 @@ static int tolua_cBlockArea_SetRelBlockTypeMeta(lua_State * a_LuaState)
 
 template<
 	int DataTypeFlag,
-	LIGHTTYPE (cBlockArea::*Fn)(Vector3i)
+	LIGHTTYPE (cBlockArea::*Fn)(Vector3i) const
 >
 static int GetLightValue(lua_State * a_LuaState)
 {

@@ -150,7 +150,7 @@ public:
 
 	// typedef unsigned char BlockTypes[NumBlocks];
 	/** The type used for block type operations and storage, AXIS_ORDER ordering */
-	using BlockStates = std::array<BlockState, NumBlocks>;
+	using BlockStates = BlockState[NumBlocks];
 
 	/** The type used for block data in nibble format, AXIS_ORDER ordering */
 	using LightNibbles = LIGHTTYPE[NumBlocks / 2];
@@ -337,7 +337,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		return a_HeightMap[a_X + Width * a_Z];
+		return a_HeightMap[static_cast<size_t>(a_X + Width * a_Z)];
 	}
 
 
@@ -345,7 +345,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		a_HeightMap[a_X + Width * a_Z] = a_Height;
+		a_HeightMap[static_cast<size_t>(a_X + Width * a_Z)] = a_Height;
 	}
 
 
@@ -353,7 +353,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		return a_BiomeMap[a_X + Width * a_Z];
+		return a_BiomeMap[static_cast<size_t>(a_X + Width * a_Z)];
 	}
 
 
@@ -361,36 +361,46 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		a_BiomeMap[a_X + Width * a_Z] = a_Biome;
+		a_BiomeMap[static_cast<size_t>(a_X + Width * a_Z)] = a_Biome;
 	}
 
-/*
-	static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, int x, int y, int z)
+
+	static LIGHTTYPE GetLightType(const LIGHTTYPE * a_Buffer, int x, int y, int z)
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
 			int Index = MakeIndexNoCheck(x, y, z);
-			return ExpandNibble(a_Buffer, static_cast<size_t>(Index));
+			return ExpandLightType(a_Buffer, static_cast<size_t>(Index));
 		}
 		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
 		return 0;
 	}
 
 
-	inline static void PackNibble(NIBBLETYPE * const a_Buffer, const size_t a_Index, const NIBBLETYPE a_Nibble)
+	inline static void PackLightType(LIGHTTYPE * const a_Buffer, const size_t a_Index, const LIGHTTYPE a_Nibble)
 	{
 		ASSERT((a_Nibble & 0xF) == a_Nibble);  // Only the lower bits should be set
 
-		a_Buffer[a_Index / 2] = static_cast<NIBBLETYPE>(
+		a_Buffer[a_Index / 2] = static_cast<LIGHTTYPE>(
 			(a_Buffer[a_Index / 2] & (0xf0 >> ((a_Index & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((a_Index & 1) * 4))  // The nibble being set
 		);
 	}
 
-*/
-	inline static unsigned char ExpandNibble(const unsigned char * const a_Buffer, const size_t a_Index)
+	inline static void PackLightType(const BlockState * const a_Buffer, const size_t a_Index, const BlockState a_Block)
+	{
+		// Do nothing - just make the compiler happy
+	}
+
+
+	inline static LIGHTTYPE ExpandLightType(const LIGHTTYPE * const a_Buffer, const size_t a_Index)
 	{
 		return (a_Buffer[a_Index / 2] >> ((a_Index & 1) * 4)) & 0x0f;
+	}
+
+	inline static BlockState ExpandLightType(const BlockState * const a_Buffer, const size_t a_Index)
+	{
+		return a_Buffer[a_Index];
 	}
 } ;
 

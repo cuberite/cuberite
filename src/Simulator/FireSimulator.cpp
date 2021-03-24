@@ -36,32 +36,6 @@
 
 
 
-static constexpr std::array<Vector3i, 4> FlatCrossCoords =
-{
-	Vector3i( 1, 0,  0),
-	Vector3i(-1, 0,  0),
-	Vector3i( 0, 0,  1),
-	Vector3i( 0, 0, -1),
-} ;
-
-
-
-
-
-static constexpr std::array<Vector3i, 6> ThreeDimensionalNeighborCoords =
-{
-	Vector3i( 1,  0,  0),
-	Vector3i(-1,  0,  0),
-	Vector3i( 0,  1,  0),
-	Vector3i( 0, -1,  0),
-	Vector3i( 0,  0,  1),
-	Vector3i( 0,  0, -1),
-};
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cFireSimulator:
 

@@ -407,7 +407,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 	int BaseZ = BlockStartZ - a_MinBlockZ;
 
 	// Copy blocktype and blockmeta:
-	auto & Blocks = a_Area.GetBlocks();
+	auto Blocks = a_Area.GetBlocks();
 	for (int y = 0; y < SizeY; y++)
 	{
 		int ChunkY = a_MinBlockY + y;
@@ -421,7 +421,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 				int ChunkX = OffX + x;
 				int AreaX = BaseX + x;
 				auto idx = a_Area.MakeIndex(AreaX, AreaY, AreaZ);
-				FastSetBlock(ChunkX, ChunkY, ChunkZ, Blocks->at(idx));
+				FastSetBlock(ChunkX, ChunkY, ChunkZ, Blocks[idx]);
 			}  // for x
 		}  // for z
 	}  // for y

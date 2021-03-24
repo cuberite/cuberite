@@ -38,7 +38,7 @@ typedef void (CombinatorFunc)(BlockState & a_DstBlock, BlockState a_SrcBlock);
 This wild construct allows us to pass a function argument and still have it inlined by the compiler. */
 template <CombinatorFunc Combinator>
 void InternalMergeBlocks(
-	cBlockArea::BLOCKVECTOR & a_DstBlocks, const cBlockArea::BLOCKVECTOR & a_SrcBlocks,
+	BlockState * a_DstBlocks, const BlockState * a_SrcBlocks,
 	int a_SizeX, int a_SizeY, int a_SizeZ,
 	int a_SrcOffX, int a_SrcOffY, int a_SrcOffZ,
 	int a_DstOffX, int a_DstOffY, int a_DstOffZ,
@@ -60,7 +60,7 @@ void InternalMergeBlocks(
 			int DstIdx = DstBaseZ + a_DstOffX;
 			for (int x = 0; x < a_SizeX; x++)
 			{
-				Combinator(a_DstBlocks->at(DstIdx), a_SrcBlocks->at(SrcIdx));
+				Combinator(a_DstBlocks[DstIdx], a_SrcBlocks[SrcIdx]);
 				++DstIdx;
 				++SrcIdx;
 			}  // for x
@@ -73,7 +73,7 @@ void InternalMergeBlocks(
 
 
 /** Combinator used for cBlockArea::msOverwrite merging */
-void MergeCombinatorOverwrite(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorOverwrite(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	a_DstBlock = a_SrcBlock;
 }
@@ -83,7 +83,7 @@ void MergeCombinatorOverwrite(BlockState & a_DstBlock, BlockState a_SrcBlock)
 
 
 /** Combinator used for cBlockArea::msFillAir merging */
-void MergeCombinatorFillAir(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorFillAir(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	if (cBlockAirHandler::IsBlockAir(a_DstBlock))
 	{
@@ -97,12 +97,13 @@ void MergeCombinatorFillAir(BlockState & a_DstBlock, BlockState a_SrcBlock)
 
 
 /** Combinator used for cBlockArea::msImprint merging */
-void MergeCombinatorImprint(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorImprint(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	if (!cBlockAirHandler::IsBlockAir(a_SrcBlock))
 	{
 		a_DstBlock = a_SrcBlock;
 	}
+	// "else" is the default, already in place
 }
 
 
@@ -110,10 +111,10 @@ void MergeCombinatorImprint(BlockState & a_DstBlock, BlockState a_SrcBlock)
 
 
 /** Combinator used for cBlockArea::msLake merging */
-void MergeCombinatorLake(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorLake(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	// Sponge is the NOP block
-	if (a_SrcBlock.Type() == BlockType::Sponge)
+	if (a_SrcBlock == BlockType::Sponge)
 	{
 		return;
 	}
@@ -153,10 +154,10 @@ void MergeCombinatorLake(BlockState & a_DstBlock, BlockState a_SrcBlock)
 		switch (a_DstBlock.Type())
 		{
 			case BlockType::Dirt:
-			case BlockType::GrassBlock:
+			case BlockType::Grass:
 			case BlockType::Mycelium:
 			{
-				a_DstBlock = Block::Stone::Stone();
+				a_DstBlock = BlockType::Stone;
 				return;
 			}
 			default: break;
@@ -170,10 +171,10 @@ void MergeCombinatorLake(BlockState & a_DstBlock, BlockState a_SrcBlock)
 
 
 /** Combinator used for cBlockArea::msSpongePrint merging */
-void MergeCombinatorSpongePrint(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorSpongePrint(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	// Sponge overwrites nothing, everything else overwrites anything
-	if (a_SrcBlock.Type() != BlockType::Sponge)
+	if (a_SrcBlock != BlockType::Sponge)
 	{
 		a_DstBlock = a_SrcBlock;
 	}
@@ -184,11 +185,11 @@ void MergeCombinatorSpongePrint(BlockState & a_DstBlock, BlockState a_SrcBlock)
 
 
 /** Combinator used for cBlockArea::msDifference merging */
-void MergeCombinatorDifference(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorDifference(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
-	if (a_DstBlock == a_SrcBlock)
+	if (a_DstBlock.Type() == a_SrcBlock.Type())
 	{
-		a_DstBlock = Block::Air::Air();
+		a_DstBlock = BlockType::Air;
 	}
 	else
 	{
@@ -201,7 +202,7 @@ void MergeCombinatorDifference(BlockState & a_DstBlock, BlockState a_SrcBlock)
 
 
 /** Combinator used for cBlockArea::msSimpleCompare merging */
-void MergeCombinatorSimpleCompare(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorSimpleCompare(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	if (a_DstBlock == a_SrcBlock)
 	{
@@ -220,12 +221,12 @@ void MergeCombinatorSimpleCompare(BlockState & a_DstBlock, BlockState a_SrcBlock
 
 
 /** Combinator used for cBlockArea::msMask merging */
-void MergeCombinatorMask(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorMask(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	// If the blocks are the same, keep the dest; otherwise replace with air
-	if (a_SrcBlock != a_DstBlock)
+	if (a_SrcBlock.Type() != a_DstBlock.Type())
 	{
-		a_DstBlock = Block::Air::Air();
+		a_DstBlock = BlockType::Air;
 	}
 }
 
@@ -343,12 +344,12 @@ void cBlockArea::SetOrigin(const Vector3i & a_Origin)
 
 
 
-bool cBlockArea::IsValidRelCoords(const Vector3i a_RelCoords) const
+bool cBlockArea::IsValidRelCoords(Vector3i a_RelPos) const
 {
 	return (
-			(a_RelCoords.x >= 0) && (a_RelCoords.x < m_Size.x) &&
-			(a_RelCoords.y >= 0) && (a_RelCoords.y < m_Size.y) &&
-			(a_RelCoords.z >= 0) && (a_RelCoords.z < m_Size.z)
+		(a_RelPos.x >= 0) && (a_RelPos.x < m_Size.x) &&
+		(a_RelPos.y >= 0) && (a_RelPos.y < m_Size.y) &&
+		(a_RelPos.z >= 0) && (a_RelPos.z < m_Size.z)
 	);
 }
 
@@ -356,9 +357,9 @@ bool cBlockArea::IsValidRelCoords(const Vector3i a_RelCoords) const
 
 
 
-bool cBlockArea::IsValidCoords(const Vector3i a_Pos) const
+bool cBlockArea::IsValidCoords(const Vector3i a_Coords) const
 {
-	return IsValidRelCoords(a_Pos - m_Origin);
+	return IsValidRelCoords(a_Coords - m_Origin);
 }
 
 
@@ -478,7 +479,7 @@ void cBlockArea::CopyTo(cBlockArea & a_Into) const
 	size_t BlockCount = GetBlockCount();
 	if (HasBlocks())
 	{
-		memcpy(a_Into.GetBlocks()->data(), GetBlocks()->data(), BlockCount * sizeof(BlockState));
+		memcpy(a_Into.GetBlocks(), GetBlocks(), BlockCount * sizeof(BlockState));
 	}
 	if (HasBlockLights())
 	{
@@ -531,7 +532,7 @@ void cBlockArea::DumpToRawFile(const AString & a_FileName)
 	size_t NumBlocks = GetBlockCount();
 	if (HasBlocks())
 	{
-		f.Write(GetBlocks()->data(), NumBlocks * sizeof(BlockState));
+		f.Write(GetBlocks(), NumBlocks * sizeof(BlockState));
 	}
 	if (HasBlockLights())
 	{
@@ -568,11 +569,11 @@ void cBlockArea::Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY
 	}
 	if (HasBlockLights())
 	{
-		CropNibbles(m_BlockLight, a_AddMinX, a_SubMaxX, a_AddMinY, a_SubMaxY, a_AddMinZ, a_SubMaxZ);
+		CropLightValues(m_BlockLight, a_AddMinX, a_SubMaxX, a_AddMinY, a_SubMaxY, a_AddMinZ, a_SubMaxZ);
 	}
 	if (HasBlockSkyLights())
 	{
-		CropNibbles(m_BlockSkyLight, a_AddMinX, a_SubMaxX, a_AddMinY, a_SubMaxY, a_AddMinZ, a_SubMaxZ);
+		CropLightValues(m_BlockSkyLight, a_AddMinX, a_SubMaxX, a_AddMinY, a_SubMaxY, a_AddMinZ, a_SubMaxZ);
 	}
 	if (HasBlockEntities())
 	{
@@ -614,11 +615,11 @@ void cBlockArea::Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMa
 	}
 	if (HasBlockLights())
 	{
-		ExpandNibbles(m_BlockLight, a_SubMinX, a_AddMaxX, a_SubMinY, a_AddMaxY, a_SubMinZ, a_AddMaxZ);
+		ExpandLightValues(m_BlockLight, a_SubMinX, a_AddMaxX, a_SubMinY, a_AddMaxY, a_SubMinZ, a_AddMaxZ);
 	}
 	if (HasBlockSkyLights())
 	{
-		ExpandNibbles(m_BlockSkyLight, a_SubMinX, a_AddMaxX, a_SubMinY, a_AddMaxY, a_SubMinZ, a_AddMaxZ);
+		ExpandLightValues(m_BlockSkyLight, a_SubMinX, a_AddMaxX, a_SubMinY, a_AddMaxY, a_SubMinZ, a_AddMaxZ);
 	}
 	if (HasBlockEntities())
 	{
@@ -670,7 +671,7 @@ void cBlockArea::Fill(int a_DataTypes, BlockState a_Block, LIGHTTYPE a_BlockLigh
 	{
 		for (size_t i = 0; i < BlockCount; i++)
 		{
-			m_Blocks->at(i) = a_Block;
+			m_Blocks[i] = a_Block;
 		}
 	}
 	if ((a_DataTypes & baLight) != 0)
@@ -723,7 +724,7 @@ void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int 
 	{
 		for (int y = a_MinRelY; y <= a_MaxRelY; y++) for (int z = a_MinRelZ; z <= a_MaxRelZ; z++) for (int x = a_MinRelX; x <= a_MaxRelX; x++)
 		{
-			m_Blocks->at(MakeIndex(x, y, z)) = a_Block;
+			m_Blocks[MakeIndex(x, y, z)] = a_Block;
 		}  // for x, z, y
 	}
 	if ((a_DataTypes & baLight) != 0)
@@ -776,18 +777,18 @@ void cBlockArea::FillRelCuboid(const cCuboid & a_RelCuboid,
 
 
 
-void cBlockArea::RelLine(Vector3i a_RelPos1, Vector3i a_RelPos2,
+void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int a_RelY2, int a_RelZ2,
 	int a_DataTypes, BlockState a_Block,
 	LIGHTTYPE a_BlockLight, LIGHTTYPE a_BlockSkyLight
 )
 {
 	// Bresenham-3D algorithm for drawing lines:
-	int dx = abs(a_RelPos2.x - a_RelPos1.x);
-	int dy = abs(a_RelPos2.y - a_RelPos1.y);
-	int dz = abs(a_RelPos2.z - a_RelPos1.z);
-	int sx = (a_RelPos1.x < a_RelPos2.x) ? 1 : -1;
-	int sy = (a_RelPos1.y < a_RelPos2.y) ? 1 : -1;
-	int sz = (a_RelPos1.z < a_RelPos2.z) ? 1 : -1;
+	int dx = abs(a_RelX2 - a_RelX1);
+	int dy = abs(a_RelY2 - a_RelY1);
+	int dz = abs(a_RelZ2 - a_RelZ1);
+	int sx = (a_RelX1 < a_RelX2) ? 1 : -1;
+	int sy = (a_RelY1 < a_RelY2) ? 1 : -1;
+	int sz = (a_RelZ1 < a_RelZ2) ? 1 : -1;
 
 	if (dx >= std::max(dy, dz))  // x dominant
 	{
@@ -796,27 +797,27 @@ void cBlockArea::RelLine(Vector3i a_RelPos1, Vector3i a_RelPos2,
 
 		for (;;)
 		{
-			RelSetData(a_RelPos1, a_DataTypes, a_Block, a_BlockLight, a_BlockSkyLight);
+			RelSetData({a_RelX1, a_RelY1, a_RelZ1}, a_DataTypes, a_Block, a_BlockLight, a_BlockSkyLight);
 
-			if (a_RelPos1.x == a_RelPos2.x)
+			if (a_RelX1 == a_RelX2)
 			{
 				break;
 			}
 
 			if (yd >= 0)  // move along y
 			{
-				a_RelPos1.y += sy;
+				a_RelY1 += sy;
 				yd -= dx;
 			}
 
 			if (zd >= 0)  // move along z
 			{
-				a_RelPos1.z += sz;
+				a_RelZ1 += sz;
 				zd -= dx;
 			}
 
 			// move along x
-			a_RelPos1.x  += sx;
+			a_RelX1  += sx;
 			yd += dy;
 			zd += dz;
 		}
@@ -828,27 +829,27 @@ void cBlockArea::RelLine(Vector3i a_RelPos1, Vector3i a_RelPos2,
 
 		for (;;)
 		{
-			RelSetData(a_RelPos1, a_DataTypes, a_Block, a_BlockLight, a_BlockSkyLight);
+			RelSetData({a_RelX1, a_RelY1, a_RelZ1}, a_DataTypes, a_Block, a_BlockLight, a_BlockSkyLight);
 
-			if (a_RelPos1.y == a_RelPos2.y)
+			if (a_RelY1 == a_RelY2)
 			{
 				break;
 			}
 
 			if (xd >= 0)  // move along x
 			{
-				a_RelPos1.x += sx;
+				a_RelX1 += sx;
 				xd -= dy;
 			}
 
 			if (zd >= 0)  // move along z
 			{
-				a_RelPos1.z += sz;
+				a_RelZ1 += sz;
 				zd -= dy;
 			}
 
 			// move along y
-			a_RelPos1.y += sy;
+			a_RelY1 += sy;
 			xd += dx;
 			zd += dz;
 		}
@@ -862,27 +863,27 @@ void cBlockArea::RelLine(Vector3i a_RelPos1, Vector3i a_RelPos2,
 
 		for (;;)
 		{
-			RelSetData(a_RelPos1, a_DataTypes, a_Block, a_BlockLight, a_BlockSkyLight);
+			RelSetData({a_RelX1, a_RelY1, a_RelZ1}, a_DataTypes, a_Block, a_BlockLight, a_BlockSkyLight);
 
-			if (a_RelPos1.z == a_RelPos2.z)
+			if (a_RelZ1 == a_RelZ2)
 			{
 				break;
 			}
 
 			if (xd >= 0)  // move along x
 			{
-				a_RelPos1.x += sx;
+				a_RelX1 += sx;
 				xd -= dz;
 			}
 
 			if (yd >= 0)  // move along y
 			{
-				a_RelPos1.y += sy;
+				a_RelY1 += sy;
 				yd -= dz;
 			}
 
 			// move along z
-			a_RelPos1.z += sz;
+			a_RelZ1 += sz;
 			xd += dx;
 			yd += dy;
 		}
@@ -893,15 +894,32 @@ void cBlockArea::RelLine(Vector3i a_RelPos1, Vector3i a_RelPos2,
 
 
 
+void cBlockArea::RelLine(const Vector3i & a_Point1, const Vector3i & a_Point2,
+	int a_DataTypes, BlockState a_Block,
+	LIGHTTYPE a_BlockLight, LIGHTTYPE a_BlockSkyLight
+)
+{
+	RelLine(
+		a_Point1.x, a_Point1.y, a_Point1.z,
+		a_Point2.x, a_Point2.y, a_Point2.z,
+		a_DataTypes, a_Block, a_BlockLight, a_BlockSkyLight
+	);
+}
+
+
+
+
+
 void cBlockArea::RotateCCW(void)
 {
 	if (!HasBlocks())
 	{
-		LOGWARNING("cBlockArea: Cannot rotate blocks without blocks!");
+		LOGWARNING("cBlockArea: Cannot rotate blockmeta without blocktypes!");
 		return;
 	}
 
-	BLOCKVECTOR NewBlocks = std::make_unique<std::vector<BlockState>>(m_Size.x * m_Size.y * m_Size.z);
+	// We are guaranteed that both blocktypes and blockmetas exist; rotate both at the same time:
+	BLOCKARRAY NewBlocks{ new BlockState[GetBlockCount()] };
 	for (int x = 0; x < m_Size.x; x++)
 	{
 		int NewZ = m_Size.x - x - 1;
@@ -912,7 +930,7 @@ void cBlockArea::RotateCCW(void)
 			{
 				auto NewIdx = MakeIndexForSize({ NewX, y, NewZ }, { m_Size.z, m_Size.y, m_Size.x });
 				auto OldIdx = MakeIndex(x, y, z);
-				NewBlocks->at(NewIdx) = cBlockHandler::For(m_Blocks->at(OldIdx).Type()).RotateCCW(m_Blocks->at(OldIdx));
+				NewBlocks[NewIdx] = m_Blocks[OldIdx];
 			}  // for y
 		}  // for z
 	}  // for x
@@ -946,11 +964,12 @@ void cBlockArea::RotateCW(void)
 {
 	if (!HasBlocks())
 	{
-		LOGWARNING("cBlockArea: Cannot rotate blocks without blocks!");
+		LOGWARNING("cBlockArea: Cannot rotate blockmeta without blocktypes!");
 		return;
 	}
 
-	BLOCKVECTOR NewBlocks = std::make_unique<std::vector<BlockState>>(m_Size.x * m_Size.y * m_Size.z);
+	// We are guaranteed that both blocktypes and blockmetas exist; rotate both at the same time:
+	BLOCKARRAY NewBlocks{ new BlockState[GetBlockCount()] };
 	for (int x = 0; x < m_Size.x; x++)
 	{
 		int NewZ = x;
@@ -961,7 +980,7 @@ void cBlockArea::RotateCW(void)
 			{
 				auto NewIdx = MakeIndexForSize({ NewX, y, NewZ }, { m_Size.z, m_Size.y, m_Size.x });
 				auto OldIdx = MakeIndex(x, y, z);
-				NewBlocks->at(NewIdx) = cBlockHandler::For(m_Blocks->at(OldIdx).Type()).RotateCW(m_Blocks->at(OldIdx));
+				NewBlocks[NewIdx] = m_Blocks[OldIdx];
 			}  // for y
 		}  // for z
 	}  // for x
@@ -995,10 +1014,11 @@ void cBlockArea::MirrorXY(void)
 {
 	if (!HasBlocks())
 	{
-		LOGWARNING("cBlockArea: Cannot mirror without blocks!");
+		LOGWARNING("cBlockArea: Cannot mirror meta without blocktypes!");
 		return;
 	}
 
+	// We are guaranteed that both blocktypes and blockmetas exist; mirror both at the same time:
 	int HalfZ = m_Size.z / 2;
 	int MaxZ = m_Size.z - 1;
 	for (int y = 0; y < m_Size.y; y++)
@@ -1009,10 +1029,10 @@ void cBlockArea::MirrorXY(void)
 			{
 				auto Idx1 = MakeIndex(x, y, z);
 				auto Idx2 = MakeIndex(x, y, MaxZ - z);
-				auto Block1 = cBlockHandler::For(m_Blocks->at(Idx1).Type()).MirrorXY(m_Blocks->at(Idx1));
-				auto Block2 = cBlockHandler::For(m_Blocks->at(Idx2).Type()).MirrorXY(m_Blocks->at(Idx2));
-				m_Blocks->at(Idx1) = Block1;
-				m_Blocks->at(Idx2) = Block2;
+				auto Block2 = cBlockHandler::For(m_Blocks[Idx2].Type()).MirrorXY(m_Blocks[Idx2]);
+				auto Block1 = cBlockHandler::For(m_Blocks[Idx1].Type()).MirrorXY(m_Blocks[Idx1]);
+				m_Blocks[Idx1] = Block2;
+				m_Blocks[Idx2] = Block1;
 			}  // for x
 		}  // for z
 	}  // for y
@@ -1047,6 +1067,7 @@ void cBlockArea::MirrorXZ(void)
 		return;
 	}
 
+	// We are guaranteed that both blocktypes and blockmetas exist; mirror both at the same time:
 	int HalfY = m_Size.y / 2;
 	int MaxY = m_Size.y - 1;
 	for (int y = 0; y < HalfY; y++)
@@ -1057,10 +1078,10 @@ void cBlockArea::MirrorXZ(void)
 			{
 				auto Idx1 = MakeIndex(x, y, z);
 				auto Idx2 = MakeIndex(x, MaxY - y, z);
-				auto Block1 = cBlockHandler::For(m_Blocks->at(Idx1).Type()).MirrorXZ(m_Blocks->at(Idx1));
-				auto Block2 = cBlockHandler::For(m_Blocks->at(Idx2).Type()).MirrorXZ(m_Blocks->at(Idx2));
-				m_Blocks->at(Idx1) = Block1;
-				m_Blocks->at(Idx2) = Block2;
+				auto Block2 = cBlockHandler::For(m_Blocks[Idx2].Type()).MirrorXZ(m_Blocks[Idx2]);
+				auto Block1 = cBlockHandler::For(m_Blocks[Idx1].Type()).MirrorXZ(m_Blocks[Idx1]);
+				m_Blocks[Idx1] = Block2;
+				m_Blocks[Idx2] = Block1;
 			}  // for x
 		}  // for z
 	}  // for y
@@ -1095,6 +1116,7 @@ void cBlockArea::MirrorYZ(void)
 		return;
 	}
 
+	// We are guaranteed that both blocktypes and blockmetas exist; mirror both at the same time:
 	int HalfX = m_Size.x / 2;
 	int MaxX = m_Size.x - 1;
 	for (int y = 0; y < m_Size.y; y++)
@@ -1105,11 +1127,10 @@ void cBlockArea::MirrorYZ(void)
 			{
 				auto Idx1 = MakeIndex(x, y, z);
 				auto Idx2 = MakeIndex(MaxX - x, y, z);
-
-				auto Block1 = cBlockHandler::For(m_Blocks->at(Idx1).Type()).MirrorYZ(m_Blocks->at(Idx1));
-				auto Block2 = cBlockHandler::For(m_Blocks->at(Idx2).Type()).MirrorYZ(m_Blocks->at(Idx2));
-				m_Blocks->at(Idx1) = Block1;
-				m_Blocks->at(Idx2) = Block2;
+				auto Block2 = cBlockHandler::For(m_Blocks[Idx2].Type()).MirrorXZ(m_Blocks[Idx2]);
+				auto Block1 = cBlockHandler::For(m_Blocks[Idx1].Type()).MirrorXZ(m_Blocks[Idx1]);
+				m_Blocks[Idx1] = Block2;
+				m_Blocks[Idx2] = Block1;
 			}  // for x
 		}  // for z
 	}  // for y
@@ -1140,7 +1161,7 @@ void cBlockArea::SetRelBlock(Vector3i a_RelPos, BlockState a_Block)
 {
 	ASSERT(m_Blocks != nullptr);
 	auto idx = MakeIndex(a_RelPos);
-	m_Blocks->at(idx) = a_Block;
+	m_Blocks[idx] = a_Block;
 
 	// Update the block entities, if appropriate:
 	if (HasBlockEntities())
@@ -1166,9 +1187,9 @@ void cBlockArea::SetRelBlock(Vector3i a_RelPos, BlockState a_Block)
 
 
 
-void cBlockArea::SetBlock(Vector3i a_Pos, BlockState a_Block)
+void cBlockArea::SetBlock(Vector3i a_Pos, BlockState a_BlockType)
 {
-	SetRelBlock(a_Pos - m_Origin, a_Block);
+	SetRelBlock(a_Pos - m_Origin, a_BlockType);
 }
 
 
@@ -1177,7 +1198,7 @@ void cBlockArea::SetBlock(Vector3i a_Pos, BlockState a_Block)
 
 void cBlockArea::SetRelBlockLight(Vector3i a_RelPos, LIGHTTYPE a_BlockLight)
 {
-	SetRelNibble(a_RelPos, a_BlockLight, GetBlockLight());
+	SetRelLightValue(a_RelPos, a_BlockLight, GetBlockLight());
 }
 
 
@@ -1186,7 +1207,7 @@ void cBlockArea::SetRelBlockLight(Vector3i a_RelPos, LIGHTTYPE a_BlockLight)
 
 void cBlockArea::SetBlockLight(Vector3i a_Pos, LIGHTTYPE a_BlockLight)
 {
-	SetNibble(a_Pos, a_BlockLight, GetBlockLight());
+	SetLightValue(a_Pos, a_BlockLight, GetBlockLight());
 }
 
 
@@ -1195,7 +1216,7 @@ void cBlockArea::SetBlockLight(Vector3i a_Pos, LIGHTTYPE a_BlockLight)
 
 void cBlockArea::SetRelBlockSkyLight(Vector3i a_RelPos, LIGHTTYPE a_BlockSkyLight)
 {
-	SetRelNibble(a_RelPos, a_BlockSkyLight, GetBlockSkyLight());
+	SetRelLightValue(a_RelPos, a_BlockSkyLight, GetBlockSkyLight());
 }
 
 
@@ -1204,7 +1225,7 @@ void cBlockArea::SetRelBlockSkyLight(Vector3i a_RelPos, LIGHTTYPE a_BlockSkyLigh
 
 void cBlockArea::SetBlockSkyLight(Vector3i a_Pos, LIGHTTYPE a_BlockSkyLight)
 {
-	SetNibble(a_Pos, a_BlockSkyLight, GetBlockSkyLight());
+	SetLightValue(a_Pos, a_BlockSkyLight, GetBlockSkyLight());
 }
 
 
@@ -1218,7 +1239,7 @@ BlockState cBlockArea::GetRelBlock(Vector3i a_RelPos) const
 		LOGWARNING("cBlockArea: BlockTypes have not been read!");
 		return Block::Air::Air();
 	}
-	return m_Blocks->at(MakeIndex(a_RelPos));
+	return m_Blocks[MakeIndex(a_RelPos)];
 }
 
 
@@ -1236,7 +1257,7 @@ BlockState cBlockArea::GetBlock(Vector3i a_Pos) const
 
 LIGHTTYPE cBlockArea::GetRelBlockLight(Vector3i a_RelPos) const
 {
-	return GetRelNibble(a_RelPos, GetBlockLight());
+	return GetRelLightValue(a_RelPos, GetBlockLight());
 }
 
 
@@ -1245,7 +1266,7 @@ LIGHTTYPE cBlockArea::GetRelBlockLight(Vector3i a_RelPos) const
 
 LIGHTTYPE cBlockArea::GetBlockLight(Vector3i a_Pos) const
 {
-	return GetNibble(a_Pos, GetBlockLight());
+	return GetLightValue(a_Pos, GetBlockLight());
 }
 
 
@@ -1254,7 +1275,7 @@ LIGHTTYPE cBlockArea::GetBlockLight(Vector3i a_Pos) const
 
 LIGHTTYPE cBlockArea::GetRelBlockSkyLight(Vector3i a_RelPos) const
 {
-	return GetRelNibble(a_RelPos, GetBlockSkyLight());
+	return GetRelLightValue(a_RelPos, GetBlockSkyLight());
 }
 
 
@@ -1263,7 +1284,7 @@ LIGHTTYPE cBlockArea::GetRelBlockSkyLight(Vector3i a_RelPos) const
 
 LIGHTTYPE cBlockArea::GetBlockSkyLight(Vector3i a_Pos) const
 {
-	return GetNibble(a_Pos, GetBlockSkyLight());
+	return GetLightValue(a_Pos, GetBlockSkyLight());
 }
 
 
@@ -1299,7 +1320,7 @@ size_t cBlockArea::CountNonAirBlocks(void) const
 		{
 			for (int x = 0; x < m_Size.x; x++)
 			{
-				if (m_Blocks->at(MakeIndex(x, y, z)).Type() != BlockType::Air)
+				if (!cBlockAirHandler::IsBlockAir(m_Blocks[MakeIndex(x, y, z)]))
 				{
 					++res;
 				}
@@ -1313,7 +1334,7 @@ size_t cBlockArea::CountNonAirBlocks(void) const
 
 
 
-size_t cBlockArea::CountSpecificBlocks(BlockType a_BlockType) const
+size_t cBlockArea::CountSpecificBlocks(BlockType a_Block) const
 {
 	// If blocktypes are not valid, log a warning and return zero occurences:
 	if (m_Blocks == nullptr)
@@ -1327,7 +1348,7 @@ size_t cBlockArea::CountSpecificBlocks(BlockType a_BlockType) const
 	size_t res = 0;
 	for (size_t i = 0; i < num; i++)
 	{
-		if (m_Blocks->at(i).Type() == a_BlockType)
+		if (m_Blocks[i].Type() == a_Block)
 		{
 			res++;
 		}
@@ -1360,7 +1381,7 @@ void cBlockArea::GetNonAirCropRelCoords(int & a_MinRelX, int & a_MinRelY, int & 
 		{
 			for (int x = 0; x < m_Size.x; x++)
 			{
-				if (m_Blocks->at(MakeIndex(x, y, z)).Type() == a_IgnoreBlockType)
+				if (m_Blocks[MakeIndex(x, y, z)] == a_IgnoreBlockType)
 				{
 					continue;
 				}
@@ -1436,7 +1457,7 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 {
 	ASSERT(IsValidDataTypeCombination(a_DataTypes));
 
-	BLOCKVECTOR NewBlocks = std::make_unique<std::vector<BlockState>>(a_SizeX * a_SizeY * a_SizeZ);
+	BLOCKARRAY NewBlocks;
 	LIGHTARRAY NewLight;
 	LIGHTARRAY NewSkyLight;
 	cBlockEntitiesPtr NewBlockEntities;
@@ -1444,6 +1465,7 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 	// Try to allocate the new storage
 	if ((a_DataTypes & baBlocks) != 0)
 	{
+		NewBlocks.reset(new BlockState[ToUnsigned(a_SizeX * a_SizeY * a_SizeZ)]);
 		if (NewBlocks == nullptr)
 		{
 			return false;
@@ -1552,7 +1574,7 @@ bool cBlockArea::ForEachBlockEntity(cBlockEntityCallback a_Callback)
 
 
 
-void cBlockArea::SetRelNibble(Vector3i a_RelPos, LIGHTTYPE a_Value, LIGHTTYPE * a_Array)
+void cBlockArea::SetRelLightValue(Vector3i a_RelPos, LIGHTTYPE a_Value, LIGHTTYPE * a_Array)
 {
 	if (a_Array == nullptr)
 	{
@@ -1566,16 +1588,16 @@ void cBlockArea::SetRelNibble(Vector3i a_RelPos, LIGHTTYPE a_Value, LIGHTTYPE * 
 
 
 
-void cBlockArea::SetNibble(Vector3i a_Pos, LIGHTTYPE a_Value, LIGHTTYPE * a_Array)
+void cBlockArea::SetLightValue(Vector3i a_Pos, LIGHTTYPE a_Value, LIGHTTYPE * a_Array)
 {
-	SetRelNibble(a_Pos - m_Origin, a_Value, a_Array);
+	SetRelLightValue(a_Pos - m_Origin, a_Value, a_Array);
 }
 
 
 
 
 
-LIGHTTYPE cBlockArea::GetRelNibble(Vector3i a_RelPos, LIGHTTYPE * a_Array) const
+LIGHTTYPE cBlockArea::GetRelLightValue(Vector3i a_RelPos, LIGHTTYPE * a_Array) const
 {
 	if (a_Array == nullptr)
 	{
@@ -1589,9 +1611,9 @@ LIGHTTYPE cBlockArea::GetRelNibble(Vector3i a_RelPos, LIGHTTYPE * a_Array) const
 
 
 
-LIGHTTYPE cBlockArea::GetNibble(Vector3i a_Pos, LIGHTTYPE * a_Array) const
+LIGHTTYPE cBlockArea::GetLightValue(Vector3i a_Pos, LIGHTTYPE * a_Array) const
 {
-	return GetRelNibble(a_Pos - m_Origin, a_Array);
+	return GetRelLightValue(a_Pos - m_Origin, a_Array);
 }
 
 
@@ -1603,8 +1625,7 @@ void cBlockArea::CropBlocks(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_S
 	int NewSizeX = GetSizeX() - a_AddMinX - a_SubMaxX;
 	int NewSizeY = GetSizeY() - a_AddMinY - a_SubMaxY;
 	int NewSizeZ = GetSizeZ() - a_AddMinZ - a_SubMaxZ;
-	BLOCKVECTOR NewBlockTypes;
-	NewBlockTypes->reserve(NewSizeX * NewSizeY * NewSizeZ);
+	BLOCKARRAY NewBlocks{ new BlockState[ToUnsigned(NewSizeX * NewSizeY * NewSizeZ)] };
 	size_t idx = 0;
 	for (int y = 0; y < NewSizeY; y++)
 	{
@@ -1613,23 +1634,23 @@ void cBlockArea::CropBlocks(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_S
 			for (int x = 0; x < NewSizeX; x++)
 			{
 				auto OldIndex = MakeIndex(x + a_AddMinX, y + a_AddMinY, z + a_AddMinZ);
-				NewBlockTypes->at(idx++) = m_Blocks->at(OldIndex);
+				NewBlocks[idx++] = m_Blocks[OldIndex];
 			}  // for x
 		}  // for z
 	}  // for y
-	m_Blocks = std::move(NewBlockTypes);
+	m_Blocks = std::move(NewBlocks);
 }
 
 
 
 
 
-void cBlockArea::CropNibbles(LIGHTARRAY & a_Array, int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
+void cBlockArea::CropLightValues(LIGHTARRAY & a_Array, int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
 {
 	int NewSizeX = GetSizeX() - a_AddMinX - a_SubMaxX;
 	int NewSizeY = GetSizeY() - a_AddMinY - a_SubMaxY;
 	int NewSizeZ = GetSizeZ() - a_AddMinZ - a_SubMaxZ;
-	LIGHTARRAY NewNibbles{ new LIGHTTYPE[ToUnsigned(NewSizeX * NewSizeY * NewSizeZ)] };
+	LIGHTARRAY NewLightValues{ new LIGHTTYPE[ToUnsigned(NewSizeX * NewSizeY * NewSizeZ)] };
 	size_t idx = 0;
 	for (int y = 0; y < NewSizeY; y++)
 	{
@@ -1637,11 +1658,11 @@ void cBlockArea::CropNibbles(LIGHTARRAY & a_Array, int a_AddMinX, int a_SubMaxX,
 		{
 			for (int x = 0; x < NewSizeX; x++)
 			{
-				NewNibbles[idx++] = a_Array[MakeIndex(x + a_AddMinX, y + a_AddMinY, z + a_AddMinZ)];
+				NewLightValues[idx++] = a_Array[MakeIndex(x + a_AddMinX, y + a_AddMinY, z + a_AddMinZ)];
 			}  // for x
 		}  // for z
 	}  // for y
-	a_Array = std::move(NewNibbles);
+	a_Array = std::move(NewLightValues);
 }
 
 
@@ -1654,9 +1675,8 @@ void cBlockArea::ExpandBlocks(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a
 	int NewSizeY = m_Size.y + a_SubMinY + a_AddMaxY;
 	int NewSizeZ = m_Size.z + a_SubMinZ + a_AddMaxZ;
 	size_t BlockCount = static_cast<size_t>(NewSizeX * NewSizeY * NewSizeZ);
-	BLOCKVECTOR NewBlockTypes;
-	NewBlockTypes->reserve(NewSizeX * NewSizeY * NewSizeZ);
-	memset(NewBlockTypes.get(), 0, BlockCount * sizeof(BlockState));
+	BLOCKARRAY NewBlocks{ new BlockState[BlockCount] };
+	memset(NewBlocks.get(), 0, BlockCount * sizeof(BlockState));
 	size_t OldIndex = 0;
 	for (int y = 0; y < m_Size.y; y++)
 	{
@@ -1667,25 +1687,25 @@ void cBlockArea::ExpandBlocks(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a
 			auto idx = static_cast<size_t>(IndexBaseZ + a_SubMinX);
 			for (int x = 0; x < m_Size.x; x++)
 			{
-				NewBlockTypes->at(idx++) = m_Blocks->at(OldIndex++);
+				NewBlocks[idx++] = m_Blocks[OldIndex++];
 			}  // for x
 		}  // for z
 	}  // for y
-	m_Blocks = std::move(NewBlockTypes);
+	m_Blocks = std::move(NewBlocks);
 }
 
 
 
 
 
-void cBlockArea::ExpandNibbles(LIGHTARRAY & a_Array, int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ)
+void cBlockArea::ExpandLightValues(LIGHTARRAY & a_Array, int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ)
 {
 	int NewSizeX = m_Size.x + a_SubMinX + a_AddMaxX;
 	int NewSizeY = m_Size.y + a_SubMinY + a_AddMaxY;
 	int NewSizeZ = m_Size.z + a_SubMinZ + a_AddMaxZ;
 	size_t BlockCount = static_cast<size_t>(NewSizeX * NewSizeY * NewSizeZ);
-	LIGHTARRAY NewNibbles{ new LIGHTTYPE[BlockCount] };
-	memset(NewNibbles.get(), 0, BlockCount * sizeof(LIGHTTYPE));
+	LIGHTARRAY NewLightValues{ new LIGHTTYPE [BlockCount] };
+	memset(NewLightValues.get(), 0, BlockCount * sizeof(LIGHTTYPE));
 	size_t OldIndex = 0;
 	for (int y = 0; y < m_Size.y; y++)
 	{
@@ -1696,11 +1716,11 @@ void cBlockArea::ExpandNibbles(LIGHTARRAY & a_Array, int a_SubMinX, int a_AddMax
 			auto idx = static_cast<size_t>(IndexBaseZ + a_SubMinX);
 			for (int x = 0; x < m_Size.x; x++)
 			{
-				NewNibbles[idx++] = a_Array[OldIndex++];
+				NewLightValues[idx++] = a_Array[OldIndex++];
 			}  // for x
 		}  // for z
 	}  // for y
-	a_Array = std::move(NewNibbles);
+	a_Array = std::move(NewLightValues);
 }
 
 
@@ -1721,7 +1741,7 @@ void cBlockArea::RelSetData(
 	auto Index = MakeIndex(a_RelPos);
 	if ((a_DataTypes & baBlocks) != 0)
 	{
-		m_Blocks->at(Index) = a_Block;
+		m_Blocks[Index] = a_Block;
 	}
 	if ((a_DataTypes & baLight) != 0)
 	{
@@ -1772,8 +1792,8 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, Vector3i a_RelPos, eM
 	int DstOffX = std::max(0,  a_RelPos.x);  // Offset in Dst where to start writing
 	int SizeX   = std::min(a_Src.GetSizeX() - SrcOffX, GetSizeX() - DstOffX);  // How many blocks to copy
 
-	int SrcOffY = std::max(0, -a_RelPos.x);  // Offset in Src where to start reading
-	int DstOffY = std::max(0,  a_RelPos.x);  // Offset in Dst where to start writing
+	int SrcOffY = std::max(0, -a_RelPos.y);  // Offset in Src where to start reading
+	int DstOffY = std::max(0,  a_RelPos.y);  // Offset in Dst where to start writing
 	int SizeY   = std::min(a_Src.GetSizeY() - SrcOffY, GetSizeY() - DstOffY);  // How many blocks to copy
 
 	int SrcOffZ = std::max(0, -a_RelPos.z);  // Offset in Src where to start reading
@@ -1923,7 +1943,7 @@ void cBlockArea::MergeBlockEntities(Vector3i a_RelPos, const cBlockArea & a_Src)
 	for (int y = 0; y < m_Size.y; ++y) for (int z = 0; z < m_Size.z; ++z) for (int x = 0; x < m_Size.x; ++x)
 	{
 		auto idx = MakeIndex(x, y, z);
-		auto Block = m_Blocks->at(idx);
+		auto Block = m_Blocks[idx];
 		if (!cBlockEntity::IsBlockEntityBlockType(Block.Type()))
 		{
 			continue;
@@ -1975,7 +1995,7 @@ void cBlockArea::RescanBlockEntities(void)
 	for (int y = 0; y < m_Size.y; ++y) for (int z = 0; z < m_Size.z; ++z) for (int x = 0; x < m_Size.x; ++x)
 	{
 		auto idx = MakeIndex(x, y, z);
-		auto Block = m_Blocks->at(idx);
+		auto Block = m_Blocks[idx];
 		if (!cBlockEntity::IsBlockEntityBlockType(Block.Type()))
 		{
 			continue;
@@ -2005,8 +2025,8 @@ void cBlockArea::RemoveNonMatchingBlockEntities(void)
 	std::swap(oldBE, *m_BlockEntities);
 	for (auto & keyPair: oldBE)
 	{
-		auto Block = m_Blocks->at(static_cast<size_t>(keyPair.first));
-		if (Block.Type() == keyPair.second->GetBlockType())
+		auto Block = m_Blocks[static_cast<size_t>(keyPair.first)];
+		if (Block == keyPair.second->GetBlockType())
 		{
 			m_BlockEntities->insert(std::move(keyPair));
 		}
@@ -2117,7 +2137,7 @@ void cBlockArea::cChunkReader::ChunkData(const ChunkBlockData & a_BlockData, con
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_Blocks->at(m_Area.MakeIndex(AreaX, AreaY, AreaZ)) = a_BlockData.GetBlock({ InChunkX, InChunkY, InChunkZ });
+					m_Area.m_Blocks[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockData.GetBlock({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y

@@ -90,6 +90,7 @@ private:
 		const Vector3i a_RelPos
 	) const override
 	{
+
 		if (a_Chunk.GetWorld()->ShouldLavaSpawnFire())
 		{
 			// Try to start up to 5 fires:

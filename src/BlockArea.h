@@ -4,7 +4,7 @@
 // Interfaces to the cBlockArea object representing an area of block data that can be queried from cWorld and then accessed again without further queries
 // The object also supports writing the blockdata back into cWorld, even into other coords
 
-// NOTE: All Nibble values (meta, blocklight, skylight) are stored one-nibble-per-byte for faster access / editting!
+// NOTE: All LightValue values (meta, blocklight, skylight) are stored one-LightValue-per-byte for faster access / editting!
 // NOTE: Lua bindings for this object explicitly check parameter values. C++ code is expected to pass in valid params, so the functions ASSERT on invalid params.
 //    This includes the datatypes (must be present / valid combination), coords and sizes.
 
@@ -70,7 +70,7 @@ public:
 	// tolua_end
 
 	using LIGHTARRAY  = std::unique_ptr<LIGHTTYPE[]>;
-	using BLOCKVECTOR = std::unique_ptr<std::vector<BlockState>>;
+	using BLOCKARRAY  = std::unique_ptr<BlockState[]>;
 	using cBlockEntitiesPtr = std::unique_ptr<cBlockEntities>;
 
 	// tolua_begin
@@ -259,7 +259,12 @@ public:
 	);
 
 	/** Draws a line between two points with the specified data. The line endpoints needn't be valid coords inside the area. */
-	void RelLine(Vector3i a_RelPos1, Vector3i a_RelPos2,
+	void RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int a_RelY2, int a_RelZ2,
+		int a_DataTypes, BlockState a_Block,
+		LIGHTTYPE a_BlockLight = 0, LIGHTTYPE a_BlockSkyLight = 0x0f
+	);
+
+	void RelLine(const Vector3i & a_Rel1, const Vector3i & a_Rel2,
 		int a_DataTypes, BlockState a_Block,
 		LIGHTTYPE a_BlockLight = 0, LIGHTTYPE a_BlockSkyLight = 0x0f
 	);
@@ -292,8 +297,8 @@ public:
 	void SetBlockSkyLight   (Vector3i a_Pos,    LIGHTTYPE a_SkyLight);
 
 	// Basic Setters:
-	void SetRelNibble(Vector3i a_RelPos,   LIGHTTYPE a_Value, LIGHTTYPE * a_Array);
-	void SetNibble   (Vector3i a_Pos, LIGHTTYPE a_Value, LIGHTTYPE * a_Array);
+	void SetRelLightValue(Vector3i a_RelPos,   LIGHTTYPE a_Value, LIGHTTYPE * a_Array);
+	void SetLightValue   (Vector3i a_Pos, LIGHTTYPE a_Value, LIGHTTYPE * a_Array);
 
 	// tolua_begin
 
@@ -312,8 +317,8 @@ public:
 	LIGHTTYPE  GetBlockSkyLight   (Vector3i a_Pos) const;
 
 	// Basic Getters:
-	LIGHTTYPE GetRelNibble(Vector3i a_RelPos,   LIGHTTYPE * a_Array) const;
-	LIGHTTYPE GetNibble   (Vector3i a_Pos, LIGHTTYPE * a_Array) const;
+	LIGHTTYPE GetRelLightValue(Vector3i a_RelPos,   LIGHTTYPE * a_Array) const;
+	LIGHTTYPE GetLightValue   (Vector3i a_Pos, LIGHTTYPE * a_Array) const;
 
 	const Vector3i & GetSize(void) const { return m_Size; }
 	const Vector3i & GetOrigin(void) const { return m_Origin; }
@@ -357,8 +362,8 @@ public:
 
 	// Clients can use these for faster access to all blocktypes. Be careful though!
 	/** Returns the internal pointer to the block types */
-	const BLOCKVECTOR & GetBlocks (void) const { return m_Blocks; }
-	BLOCKVECTOR &       GetBlocks (void) { return m_Blocks; }
+	const BlockState * GetBlocks (void) const { return m_Blocks.get(); }
+	BlockState *       GetBlocks (void)       { return m_Blocks.get(); }
 	LIGHTTYPE  * GetBlockLight         (void) const { return m_BlockLight.get();    }  // NOTE: one byte per block!
 	LIGHTTYPE  * GetBlockSkyLight      (void) const { return m_BlockSkyLight.get(); }  // NOTE: one byte per block!
 
@@ -431,7 +436,7 @@ protected:
 	cBlockArea doesn't use this value in any way. */
 	Vector3i m_WEOffset;
 
-	BLOCKVECTOR m_Blocks;
+	BLOCKARRAY m_Blocks;
 	LIGHTARRAY m_BlockLight;     // Each light value is stored as a separate byte for faster access
 	LIGHTARRAY m_BlockSkyLight;  // Each light value is stored as a separate byte for faster access
 
@@ -444,12 +449,12 @@ protected:
 	bool SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes);
 
 	// Crop helpers:
-	void CropBlocks  (int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ);
-	void CropNibbles (LIGHTARRAY & a_Array, int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ);
+	void CropBlocks      (int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ);
+	void CropLightValues (LIGHTARRAY & a_Array, int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ);
 
 	// Expand helpers:
-	void ExpandBlocks  (int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
-	void ExpandNibbles (LIGHTARRAY & a_Array, int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
+	void ExpandBlocks      (int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
+	void ExpandLightValues (LIGHTARRAY & a_Array, int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
 
 	/** Sets the specified datatypes at the specified location.
 	If the coords are not valid, ignores the call (so that RelLine() can work simply). */

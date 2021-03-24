@@ -260,7 +260,6 @@ private:
 
 	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 15;
 	}
 };
