@@ -153,5 +153,5 @@ In macro form to work around a Visual Studio 2017 ICE bug. */
 
 
 
-extern template struct ChunkDataStore<BlockState , ChunkBlockData::SectionBlockCount>;
+extern template struct ChunkDataStore<BlockState, ChunkBlockData::SectionBlockCount>;
 extern template struct ChunkDataStore<LIGHTTYPE, ChunkLightData::SectionLightCount>;

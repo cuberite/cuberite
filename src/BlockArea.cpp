@@ -1195,6 +1195,7 @@ void cBlockArea::SetBlock(Vector3i a_Pos, BlockState a_BlockType)
 
 
 
+
 void cBlockArea::SetRelBlockLight(Vector3i a_RelPos, LIGHTTYPE a_BlockLight)
 {
 	SetRelLightValue(a_RelPos, a_BlockLight, GetBlockLight());
