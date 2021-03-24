@@ -19,9 +19,9 @@
 template <class ElementType, size_t ElementCount>
 struct ChunkDataStore
 {
-	ChunkDataStore(ElementType m_DefaultValue) : m_DefaultValue(m_DefaultValue){};
-
 	using Type = std::array<ElementType, ElementCount>;
+
+	ChunkDataStore(ElementType a_DefaultValue) : DefaultValue(a_DefaultValue) {}
 
 	/** Copy assign from another ChunkDataStore. */
 	void Assign(const ChunkDataStore<ElementType, ElementCount> & a_Other);
@@ -32,7 +32,7 @@ struct ChunkDataStore
 
 	/** Returns a raw pointer to the internal representation of the specified section.
 	Will be nullptr if the section is not allocated. */
-	Type * GetSection(size_t a_Y) const { return Store[a_Y].get(); };
+	Type * GetSection(size_t a_Y) const;
 
 	/** Sets one value at the given position.
 	Allocates a section if needed for the operation. */
@@ -47,9 +47,8 @@ struct ChunkDataStore
 	void SetAll(const ElementType (& a_Source)[cChunkDef::NumSections * ElementCount]);
 
 	/** Contains all the sections this ChunkDataStore manages. */
-	std::array<std::unique_ptr<Type>, cChunkDef::NumSections> Store;
-
-	ElementType m_DefaultValue;
+	std::unique_ptr<Type> Store[cChunkDef::NumSections];
+	ElementType DefaultValue;
 };
 
 
@@ -60,27 +59,31 @@ class ChunkBlockData
 {
 public:
 
+	ChunkBlockData() : m_Blocks(DefaultValue) {}
+
 	static constexpr size_t SectionBlockCount = cChunkDef::SectionHeight * cChunkDef::Width * cChunkDef::Width;
 	static constexpr size_t SectionMetaCount = SectionBlockCount / 2;
 
 	static constexpr BlockState DefaultValue = Block::Air::Air();
 
-	using SectionType = std::unique_ptr<std::array<BlockState, SectionBlockCount>>;
-	using BlockArray = std::array<SectionType, cChunkDef::NumSections>;
+	using SectionType = BlockState[SectionBlockCount];
+	using SectionMetaType = unsigned char[SectionMetaCount];
 
 private:
 
-	BlockArray m_Blocks;
+	ChunkDataStore<BlockState, SectionBlockCount> m_Blocks;
 
 public:
 
+	using BlockArray = decltype(m_Blocks)::Type;
+
 	void Assign(const ChunkBlockData & a_Other);
 
-	BlockState GetBlock(Vector3i a_Position) const;
+	BlockState GetBlock(Vector3i a_Position) const { return m_Blocks.Get(a_Position); }
 
-	const SectionType & GetSection(size_t a_Y) const;
+	BlockArray * GetSection(size_t a_Y) const { return m_Blocks.GetSection(a_Y); }
 
-	void SetBlock(Vector3i a_Position, BlockState a_Block);
+	void SetBlock(Vector3i a_Position, BlockState a_Block) { m_Blocks.Set(a_Position, a_Block); }
 
 	void SetAll(const cChunkDef::BlockStates & a_BlockSource);
 	void SetSection(const SectionType & a_BlockSource, size_t a_Y);
@@ -94,7 +97,7 @@ class ChunkLightData
 {
 public:
 
-	ChunkLightData() : m_BlockLights(DefaultBlockLightValue), m_SkyLights(DefaultSkyLightValue) {};
+	ChunkLightData() : m_BlockLights(DefaultBlockLightValue), m_SkyLights(DefaultBlockLightValue) {}
 
 	static constexpr size_t SectionLightCount = (cChunkDef::SectionHeight * cChunkDef::Width * cChunkDef::Width) / 2;
 
@@ -136,7 +139,7 @@ In macro form to work around a Visual Studio 2017 ICE bug. */
 	{ \
 		for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y) \
 		{ \
-			const auto & Blocks = BlockData.GetSection(Y); \
+			const auto Blocks = BlockData.GetSection(Y); \
 			const auto BlockLights = LightData.GetBlockLightSection(Y); \
 			const auto SkyLights = LightData.GetSkyLightSection(Y); \
 			if ((Blocks != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr)) \
@@ -150,5 +153,5 @@ In macro form to work around a Visual Studio 2017 ICE bug. */
 
 
 
+extern template struct ChunkDataStore<BlockState , ChunkBlockData::SectionBlockCount>;
 extern template struct ChunkDataStore<LIGHTTYPE, ChunkLightData::SectionLightCount>;
-

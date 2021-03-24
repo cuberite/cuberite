@@ -137,10 +137,10 @@ private:
 		}
 
 		size_t NumBlocks = Area.GetBlockCount();
-		auto & Blocks = Area.GetBlocks();
+		auto Blocks = Area.GetBlocks();
 		for (size_t i = 0; i < NumBlocks; i++)
 		{
-			if (Blocks->at(i).Type() == BlockType::Water)
+			if (Blocks[i].Type() == BlockType::Water)
 			{
 				return true;
 			}

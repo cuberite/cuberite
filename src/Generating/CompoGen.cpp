@@ -409,7 +409,7 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::
 		m_CacheOrder[0] = Idx;
 
 		// Use the cached data:
-		memcpy(a_ChunkDesc.GetBlocks()->data(),      m_CacheData[Idx].m_BlockTypes.data(), sizeof(a_ChunkDesc.GetBlocks()));
+		memcpy(a_ChunkDesc.GetBlocks(),             m_CacheData[Idx].m_BlockTypes,        sizeof(a_ChunkDesc.GetBlocks()));
 		memcpy(a_ChunkDesc.GetHeightMap().data(),   m_CacheData[Idx].m_HeightMap.data(),  sizeof(a_ChunkDesc.GetHeightMap()));
 
 		m_NumHits++;
@@ -428,7 +428,7 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::
 		m_CacheOrder[i] = m_CacheOrder[i - 1];
 	}  // for i - m_CacheOrder[]
 	m_CacheOrder[0] = Idx;
-	memcpy(m_CacheData[Idx].m_BlockTypes.data(), a_ChunkDesc.GetBlocks()->data(), sizeof(a_ChunkDesc.GetBlocks()));
+	memcpy(m_CacheData[Idx].m_BlockTypes,        a_ChunkDesc.GetBlocks(),           sizeof(a_ChunkDesc.GetBlocks()));
 	memcpy(m_CacheData[Idx].m_HeightMap.data(),  a_ChunkDesc.GetHeightMap().data(), sizeof(a_ChunkDesc.GetHeightMap()));
 	m_CacheData[Idx].m_ChunkX = ChunkX;
 	m_CacheData[Idx].m_ChunkZ = ChunkZ;
