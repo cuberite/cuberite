@@ -55,7 +55,7 @@ private:
 			return;
 		}
 
-		const auto & WaterCheck = cSimulator::AdjacentOffsets;
+		const auto & WaterCheck = cSimulator::ThreeDimensionalNeighborCoords;
 		const bool ShouldSoak = std::any_of(WaterCheck.cbegin(), WaterCheck.cend(), [a_Rel, &a_Chunk](Vector3i a_Offset)
 		{
 			return IsWet(a_Rel + a_Offset, a_Chunk);

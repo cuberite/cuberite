@@ -4,6 +4,7 @@
 #include "Path.h"
 #include "../BlockInfo.h"
 #include "../Chunk.h"
+#include "../Entities/Player.h"
 #include "../Blocks/BlockFence.h"
 #include "../Blocks/BlockDoor.h"
 #include "../Blocks/BlockTrapdoor.h"

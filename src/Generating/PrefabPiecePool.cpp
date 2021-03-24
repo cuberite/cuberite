@@ -9,7 +9,8 @@
 #include "../Bindings/LuaState.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 #include "../StringCompression.h"
-
+#include "../Registries/BlockItemConverter.h"
+#include "../Protocol/Palettes/Upgrade.h"
 
 
 

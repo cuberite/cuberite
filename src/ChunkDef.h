@@ -337,7 +337,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		return a_HeightMap[a_X + Width * a_Z];
+		return a_HeightMap[static_cast<size_t>(a_X + Width * a_Z)];
 	}
 
 
@@ -345,7 +345,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		a_HeightMap[a_X + Width * a_Z] = a_Height;
+		a_HeightMap[static_cast<size_t>(a_X + Width * a_Z)] = a_Height;
 	}
 
 
@@ -353,7 +353,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		return a_BiomeMap[a_X + Width * a_Z];
+		return a_BiomeMap[static_cast<size_t>(a_X + Width * a_Z)];
 	}
 
 
@@ -361,7 +361,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		a_BiomeMap[a_X + Width * a_Z] = a_Biome;
+		a_BiomeMap[static_cast<size_t>(a_X + Width * a_Z)] = a_Biome;
 	}
 
 

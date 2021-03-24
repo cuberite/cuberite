@@ -73,7 +73,7 @@ void InternalMergeBlocks(
 
 
 /** Combinator used for cBlockArea::msOverwrite merging */
-void MergeCombinatorOverwrite(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorOverwrite(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	a_DstBlock = a_SrcBlock;
 }
@@ -83,7 +83,7 @@ void MergeCombinatorOverwrite(BlockState & a_DstBlock, BlockState a_SrcBlock)
 
 
 /** Combinator used for cBlockArea::msFillAir merging */
-void MergeCombinatorFillAir(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorFillAir(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	if (cBlockAirHandler::IsBlockAir(a_DstBlock))
 	{
@@ -97,7 +97,7 @@ void MergeCombinatorFillAir(BlockState & a_DstBlock, BlockState a_SrcBlock)
 
 
 /** Combinator used for cBlockArea::msImprint merging */
-void MergeCombinatorImprint(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorImprint(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	if (!cBlockAirHandler::IsBlockAir(a_SrcBlock))
 	{
@@ -111,7 +111,7 @@ void MergeCombinatorImprint(BlockState & a_DstBlock, BlockState a_SrcBlock)
 
 
 /** Combinator used for cBlockArea::msLake merging */
-void MergeCombinatorLake(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorLake(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	// Sponge is the NOP block
 	if (a_SrcBlock == BlockType::Sponge)
@@ -171,7 +171,7 @@ void MergeCombinatorLake(BlockState & a_DstBlock, BlockState a_SrcBlock)
 
 
 /** Combinator used for cBlockArea::msSpongePrint merging */
-void MergeCombinatorSpongePrint(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorSpongePrint(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	// Sponge overwrites nothing, everything else overwrites anything
 	if (a_SrcBlock != BlockType::Sponge)
@@ -185,7 +185,7 @@ void MergeCombinatorSpongePrint(BlockState & a_DstBlock, BlockState a_SrcBlock)
 
 
 /** Combinator used for cBlockArea::msDifference merging */
-void MergeCombinatorDifference(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorDifference(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	if (a_DstBlock.Type() == a_SrcBlock.Type())
 	{
@@ -202,7 +202,7 @@ void MergeCombinatorDifference(BlockState & a_DstBlock, BlockState a_SrcBlock)
 
 
 /** Combinator used for cBlockArea::msSimpleCompare merging */
-void MergeCombinatorSimpleCompare(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorSimpleCompare(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	if (a_DstBlock == a_SrcBlock)
 	{
@@ -221,7 +221,7 @@ void MergeCombinatorSimpleCompare(BlockState & a_DstBlock, BlockState a_SrcBlock
 
 
 /** Combinator used for cBlockArea::msMask merging */
-void MergeCombinatorMask(BlockState & a_DstBlock, BlockState a_SrcBlock)
+static inline void MergeCombinatorMask(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	// If the blocks are the same, keep the dest; otherwise replace with air
 	if (a_SrcBlock.Type() != a_DstBlock.Type())

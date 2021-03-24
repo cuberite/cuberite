@@ -14,14 +14,18 @@
 #include "../MobSpawner.h"
 #include "../BlockInfo.h"
 
-#include "../Blocks/BlockAir.h"
-#include "../Blocks/BlockBigFlower.h"
-#include "../Blocks/BlockFluid.h"
+#include "../Chunk.h"
+#include "../World.h"
+
 #include "../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
 #include "../Simulator/FireSimulator.h"
+
 #include "../Protocol/Palettes/Upgrade.h"
 #include "../Registries/BlockItemConverter.h"
 
+#include "../Blocks/BlockAir.h"
+#include "../Blocks/BlockBigFlower.h"
+#include "../Blocks/BlockFluid.h"
 
 
 

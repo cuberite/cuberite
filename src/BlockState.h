@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdint.h>
 #include "Registries/BlockTypes.h"
 
 /** The UINT_LEAST16_MAX value is used to mark the value invalid if needed. */

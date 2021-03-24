@@ -8,6 +8,7 @@
 #include "../Entities/Player.h"
 #include "../ClientHandle.h"
 #include "../Blocks/BlockBed.h"
+#include "../Registries/BlockItemConverter.h"
 
 
 
