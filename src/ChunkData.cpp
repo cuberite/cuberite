@@ -227,6 +227,6 @@ void ChunkLightData::SetSection(const SectionType & a_BlockLightSource, const Se
 
 
 
-template struct ChunkDataStore<BlockState , ChunkBlockData::SectionBlockCount>;
+template struct ChunkDataStore<BlockState, ChunkBlockData::SectionBlockCount>;
 template struct ChunkDataStore<LIGHTTYPE, ChunkLightData::SectionLightCount>;
 
