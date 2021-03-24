@@ -128,7 +128,6 @@ void ChunkDataStore<ElementType, ElementCount>::Set(const Vector3i a_Position, c
 	else
 	{
 		(*Section)[Indices.Index] = a_Value;
-		std::fill(Section->begin(), Section->end(), DefaultValue);
 	}
 }
 
@@ -146,7 +145,7 @@ void ChunkDataStore<ElementType, ElementCount>::SetSection(const ElementType (& 
 	{
 		std::copy(a_Source, SourceEnd, Section->begin());
 	}
-	else if (std::any_of(a_Source, SourceEnd, [this](const auto Value) { return Value != DefaultValue; }))
+	else if (std::any_of(a_Source, SourceEnd, [&](const auto Value) { return Value != DefaultValue; }))
 	{
 		Section = cpp20::make_unique_for_overwrite<Type>();
 		std::copy(a_Source, SourceEnd, Section->begin());
