@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdint.h>
 #include "Registries/BlockTypes.h"
 #include "ChunkDef.h"
 

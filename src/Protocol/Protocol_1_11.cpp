@@ -30,6 +30,7 @@ Implements the 1.11 protocol classes:
 
 #include "../Mobs/IncludeAllMonsters.h"
 
+#include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BedEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
@@ -410,111 +411,48 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocol_1_11_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity)
+void cProtocol_1_11_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks)
 {
-	cFastNBTWriter Writer;
+	ASSERT(m_State == 3);  // In game mode?
 
+	cPacketizer Pkt(*this, pktTitle);
+	Pkt.WriteVarInt32(3);  // Set title display times
+	Pkt.WriteBEInt32(a_FadeInTicks);
+	Pkt.WriteBEInt32(a_DisplayTicks);
+	Pkt.WriteBEInt32(a_FadeOutTicks);
+}
+
+
+
+
+
+void cProtocol_1_11_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	Byte Action;
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case BlockType::Beacon:
-		{
-			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);
-			Writer.AddInt("x", BeaconEntity.GetPosX());
-			Writer.AddInt("y", BeaconEntity.GetPosY());
-			Writer.AddInt("z", BeaconEntity.GetPosZ());
-			Writer.AddInt("Primary", BeaconEntity.GetPrimaryEffect());
-			Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
-			Writer.AddInt("Levels", BeaconEntity.GetBeaconLevel());
-			Writer.AddString("id", "Beacon");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
+		case BlockType::EnchantingTable:   Action = 0;  break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
+		case BlockType::EndPortal:         Action = 0;  break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
 
-		case BlockType::BlackBed:
-		case BlockType::BlueBed:
-		case BlockType::BrownBed:
-		case BlockType::CyanBed:
-		case BlockType::GrayBed:
-		case BlockType::GreenBed:
-		case BlockType::LightBlueBed:
-		case BlockType::LightGrayBed:
-		case BlockType::LimeBed:
-		case BlockType::MagentaBed:
-		case BlockType::OrangeBed:
-		case BlockType::PinkBed:
-		case BlockType::PurpleBed:
-		case BlockType::RedBed:
-		case BlockType::WhiteBed:
-		case BlockType::YellowBed:
-		{
-			auto & BedEntity = static_cast<const cBedEntity &>(a_BlockEntity);
-			Writer.AddInt("x", BedEntity.GetPosX());
-			Writer.AddInt("y", BedEntity.GetPosY());
-			Writer.AddInt("z", BedEntity.GetPosZ());
-			Writer.AddInt("color", BedEntity.GetColor());
-			Writer.AddString("id", "Bed");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
-
+		case BlockType::Spawner:           Action = 1;  break;  // Update mob spawner spinny mob thing
 		case BlockType::CommandBlock:
 		case BlockType::ChainCommandBlock:
-		case BlockType::RepeatingCommandBlock:
-		{
-			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
-			Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
-			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
-			Writer.AddInt("x", CommandBlockEntity.GetPosX());
-			Writer.AddInt("y", CommandBlockEntity.GetPosY());
-			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
-			Writer.AddString("Command", CommandBlockEntity.GetCommand());
-			// You can set custom names for windows in Vanilla
-			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
-			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
-			Writer.AddString("CustomName", "@");
-			Writer.AddString("id", "Control");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			if (!CommandBlockEntity.GetLastOutput().empty())
-			{
-				Writer.AddString("LastOutput", Printf("{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str()));
-			}
-			break;
-		}
-
+		case BlockType::RepeatingCommandBlock: Action = 2;  break;  // Update command block text
+		case BlockType::Beacon:            Action = 3;  break;  // Update beacon entity
 		case BlockType::CreeperHead:
 		case BlockType::CreeperWallHead:
 		case BlockType::DragonHead:
 		case BlockType::DragonWallHead:
 		case BlockType::PlayerHead:
 		case BlockType::PlayerWallHead:
-		case BlockType::ZombieHead:
-		case BlockType::ZombieWallHead:
 		case BlockType::SkeletonSkull:
 		case BlockType::SkeletonWallSkull:
 		case BlockType::WitherSkeletonSkull:
 		case BlockType::WitherSkeletonWallSkull:
-		{
-			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
-			Writer.AddInt("x", MobHeadEntity.GetPosX());
-			Writer.AddInt("y", MobHeadEntity.GetPosY());
-			Writer.AddInt("z", MobHeadEntity.GetPosZ());
-			Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
-			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
-			Writer.AddString("id", "Skull");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-
-			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
-			Writer.BeginCompound("Owner");
-			Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
-			Writer.AddString("Name", MobHeadEntity.GetOwnerName());
-			Writer.BeginCompound("Properties");
-			Writer.BeginList("textures", TAG_Compound);
-			Writer.BeginCompound("");
-			Writer.AddString("Signature", MobHeadEntity.GetOwnerTextureSignature());
-			Writer.AddString("Value", MobHeadEntity.GetOwnerTexture());
-			Writer.EndCompound();
-			Writer.EndList();
-			Writer.EndCompound();
-			Writer.EndCompound();
-			break;
-		}
-
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:    Action = 4;  break;  // Update mobhead entity
 		case BlockType::PottedAcaciaSapling:
 		case BlockType::PottedAzureBluet:
 		case BlockType::PottedBamboo:
@@ -543,55 +481,68 @@ void cProtocol_1_11_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity 
 		case BlockType::PottedWarpedRoots:
 		case BlockType::PottedWhiteTulip:
 		case BlockType::PottedWitherRose:
-		case BlockType::PottedAllium:
-		{
-			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
-			Writer.AddInt("x", FlowerPotEntity.GetPosX());
-			Writer.AddInt("y", FlowerPotEntity.GetPosY());
-			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
-			Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
-			Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
-			Writer.AddString("id", "FlowerPot");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
+		case BlockType::PottedAllium:      Action = 5;  break;  // Update flower pot
+		case BlockType::BlackBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BrownBanner:
+		case BlockType::CyanBanner:
+		case BlockType::GrayBanner:
+		case BlockType::GreenBanner:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LimeBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::OrangeBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::RedBanner:
+		case BlockType::WhiteBanner:
+		case BlockType::YellowBanner:
 
-		case BlockType::Spawner:
-		{
-			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
-			Writer.AddInt("x", MobSpawnerEntity.GetPosX());
-			Writer.AddInt("y", MobSpawnerEntity.GetPosY());
-			Writer.AddInt("z", MobSpawnerEntity.GetPosZ());
-			Writer.BeginCompound("SpawnData");
-				Writer.AddString("id", "minecraft:" + cMonster::MobTypeToVanillaNBT(MobSpawnerEntity.GetEntity()));
-			Writer.EndCompound();
-			Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
-			Writer.AddString("id", "MobSpawner");
-			break;
-		}
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownWallBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedWallBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowWallBanner:  Action = 6;  break;  // Update banner
+		case BlockType::BlackBed:
+		case BlockType::BlueBed:
+		case BlockType::BrownBed:
+		case BlockType::CyanBed:
+		case BlockType::GrayBed:
+		case BlockType::GreenBed:
+		case BlockType::LightBlueBed:
+		case BlockType::LightGrayBed:
+		case BlockType::LimeBed:
+		case BlockType::MagentaBed:
+		case BlockType::OrangeBed:
+		case BlockType::PinkBed:
+		case BlockType::PurpleBed:
+		case BlockType::RedBed:
+		case BlockType::WhiteBed:
+		case BlockType::YellowBed:          Action = 11; break;  // Update bed color (new!)
 
-		default:
-		{
-			break;
-		}
+		default: return;  // Block entities change between versions
 	}
 
+	cPacketizer Pkt(*this, pktUpdateBlockEntity);
+	Pkt.WriteXYZPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
+	Pkt.WriteBEUInt8(Action);
+
+	cFastNBTWriter Writer;
+	WriteBlockEntity(Writer, a_BlockEntity);
 	Writer.Finish();
-	a_Pkt.WriteBuf(Writer.GetResult());
-}
-
-
-
-
-
-void cProtocol_1_11_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktTitle);
-	Pkt.WriteVarInt32(3);  // Set title display times
-	Pkt.WriteBEInt32(a_FadeInTicks);
-	Pkt.WriteBEInt32(a_DisplayTicks);
-	Pkt.WriteBEInt32(a_FadeOutTicks);
+	Pkt.WriteBuf(Writer.GetResult());
 }
 
 
@@ -681,6 +632,54 @@ void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorZ);
 	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16), HandIntToEnum(Hand));
+}
+
+
+
+
+
+void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity)
+{
+	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
+
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case BlockType::BlackBed:
+		case BlockType::BlueBed:
+		case BlockType::BrownBed:
+		case BlockType::CyanBed:
+		case BlockType::GrayBed:
+		case BlockType::GreenBed:
+		case BlockType::LightBlueBed:
+		case BlockType::LightGrayBed:
+		case BlockType::LimeBed:
+		case BlockType::MagentaBed:
+		case BlockType::OrangeBed:
+		case BlockType::PinkBed:
+		case BlockType::PurpleBed:
+		case BlockType::RedBed:
+		case BlockType::WhiteBed:
+		case BlockType::YellowBed:
+		{
+			auto & BedEntity = static_cast<const cBedEntity &>(a_BlockEntity);
+			a_Writer.AddInt("color", BedEntity.GetColor());  // New: multicoloured beds
+			break;
+		}
+
+		case BlockType::Spawner:
+		{
+			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
+			a_Writer.BeginCompound("SpawnData");
+				a_Writer.AddString("id", cMonster::MobTypeToVanillaNBT(MobSpawnerEntity.GetEntity()));  // New: uses namespaced ID
+			a_Writer.EndCompound();
+			a_Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
+			break;
+		}
+
+		default: Super::WriteBlockEntity(a_Writer, a_BlockEntity);
+	}
 }
 
 

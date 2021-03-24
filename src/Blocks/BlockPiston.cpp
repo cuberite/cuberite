@@ -1,6 +1,7 @@
 
 #include "Globals.h"
 #include "BlockPiston.h"
+#include "BlockAir.h"
 #include "../BlockInfo.h"
 #include "../Item.h"
 #include "../World.h"
@@ -52,12 +53,12 @@ inline Byte cBlockPistonHandler::GetExtensionByte(BlockState a_Block)
 	{
 		case BlockType::Piston:       Facing = Block::Piston::Facing(a_Block); break;
 		case BlockType::StickyPiston: Facing = Block::StickyPiston::Facing(a_Block); break;
-		default: return UCHAR_MAX;
+		default: return std::numeric_limits<Byte>::max();
 	}
 
 	switch (Facing)
 	{
-		case BLOCK_FACE_NONE: return UCHAR_MAX;
+		case BLOCK_FACE_NONE: return std::numeric_limits<Byte>::max();
 		case BLOCK_FACE_XM:   return 3;  // West
 		case BLOCK_FACE_XP:   return 5;  // East
 		case BLOCK_FACE_YM:   return 0;  // Down
@@ -65,7 +66,7 @@ inline Byte cBlockPistonHandler::GetExtensionByte(BlockState a_Block)
 		case BLOCK_FACE_ZM:   return 4;  // North
 		case BLOCK_FACE_ZP:   return 2;  // South
 	}
-	return UCHAR_MAX;
+	return std::numeric_limits<Byte>::max();
 }
 
 
@@ -79,7 +80,7 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 	{
 		auto Self = a_World.GetBlock(a_BlockPos);
 		auto DirectionByte = GetExtensionByte(Self);
-		if (DirectionByte == UCHAR_MAX)
+		if (DirectionByte == std::numeric_limits<Byte>::max())
 		{
 			return;
 		}
@@ -151,7 +152,7 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 	{
 		auto Self = a_World.GetBlock(a_BlockPos);
 		auto DirectionByte = GetExtensionByte(Self);
-		if (DirectionByte == UCHAR_MAX)
+		if (DirectionByte == std::numeric_limits<Byte>::max())
 		{
 			return;
 		}

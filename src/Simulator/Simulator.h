@@ -30,17 +30,23 @@ public:
 	virtual ~cSimulator() {}
 
 	/** Contains offsets for direct adjacents of any position. */
-	static constexpr std::array<Vector3i, 6> AdjacentOffsets
+	static constexpr std::array<Vector3i, 4> FlatCrossCoords =
 	{
-		{
-			{  1,  0,  0 },
-			{ -1,  0,  0 },
-			{  0,  1,  0 },
-			{  0, -1,  0 },
-			{  0,  0,  1 },
-			{  0,  0, -1 },
-		}
-	};
+		Vector3i( 1, 0,  0),
+		Vector3i(-1, 0,  0),
+		Vector3i( 0, 0,  1),
+		Vector3i( 0, 0, -1),
+	} ;
+
+	static constexpr std::array<Vector3i, 6> ThreeDimensionalNeighborCoords =
+	{
+		Vector3i( 1,  0,  0),
+		Vector3i(-1,  0,  0),
+		Vector3i( 0,  1,  0),
+		Vector3i( 0, -1,  0),
+		Vector3i( 0,  0,  1),
+		Vector3i( 0,  0, -1),
+		};
 
 	/** For a given offset from a position, return the offsets that represent the adjacents of the newly offset position, excluding the old position. */
 	static std::array<Vector3i, 5> GetLinkedOffsets(Vector3i Offset);

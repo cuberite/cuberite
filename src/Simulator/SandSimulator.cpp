@@ -14,6 +14,7 @@
 #include "../Blocks/BlockAnvil.h"
 #include "../Blocks/BlockConcretePowder.h"
 #include "../Protocol/Palettes/Upgrade.h"
+#include "../Registries/BlockItemConverter.h"
 
 
 

@@ -10,8 +10,6 @@
 #include "../UI/InventoryWindow.h"
 #include "../UI/WindowOwner.h"
 #include "../Bindings/PluginManager.h"
-#include "../Blocks/BlockAir.h"
-#include "../Blocks/BlockFluid.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
 #include "../Root.h"
@@ -30,6 +28,9 @@
 #include "../IniFile.h"
 #include "../JsonUtils.h"
 #include "json/json.h"
+
+#include "../Blocks/BlockAir.h"
+#include "../Blocks/BlockFluid.h"
 
 #include "../CraftingRecipes.h"
 

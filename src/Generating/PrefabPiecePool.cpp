@@ -9,7 +9,8 @@
 #include "../Bindings/LuaState.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 #include "../StringCompression.h"
-
+#include "../Registries/BlockItemConverter.h"
+#include "../Protocol/Palettes/Upgrade.h"
 
 /** Returns the map of string => eMergeStrategy used when translating cubeset file merge strategies. */
 static std::map<AString, cBlockArea::eMergeStrategy> & GetMergeStrategyMap(void)

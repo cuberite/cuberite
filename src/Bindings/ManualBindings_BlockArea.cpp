@@ -1091,7 +1091,7 @@ static int tolua_cBlockArea_SetRelBlockTypeMeta(lua_State * a_LuaState)
 
 template<
 	int DataTypeFlag,
-	LIGHTTYPE (cBlockArea::*Fn)(Vector3i)
+	LIGHTTYPE (cBlockArea::*Fn)(Vector3i) const
 >
 static int GetLightValue(lua_State * a_LuaState)
 {
