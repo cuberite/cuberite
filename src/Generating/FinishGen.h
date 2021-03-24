@@ -375,8 +375,8 @@ protected:
 	- if all surroundings are of the same fluid, makes it stationary; otherwise makes it flowing (excl. top)
 	- all fluid on the chunk's edge is made flowing */
 	void StationarizeFluid(
-		cBlockArea::BLOCKVECTOR & a_BlockTypes,   // Block types to read and change
-		cChunkDef::HeightMap & a_HeightMap,       // Height map to read
+		cChunkDef::BlockStates a_BlockTypes,     // Block types to read and change
+		cChunkDef::HeightMap   & a_HeightMap,    // Height map to read
 		BlockState a_Fluid
 	);
 

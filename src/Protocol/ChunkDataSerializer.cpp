@@ -500,7 +500,7 @@ inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_C
 
 
 template <auto Palette>
-inline void cChunkDataSerializer::WriteBlockSectionSeamless(const ChunkBlockData::SectionType & a_Blocks, const UInt8 a_BitsPerEntry)
+inline void cChunkDataSerializer::WriteBlockSectionSeamless(const ChunkBlockData::BlockArray * a_Blocks, const UInt8 a_BitsPerEntry)
 {
 	// https://wiki.vg/Chunk_Format#Data_structure
 

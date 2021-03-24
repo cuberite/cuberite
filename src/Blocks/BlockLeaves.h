@@ -294,10 +294,10 @@ private:
 			return;
 		}
 		// Filter the blocks into a {leaves, log, other (air)} set:
-		auto & Types = Area.GetBlocks();
-		for (auto & Block : *Types)
+		auto Types = Area.GetBlocks();
+		for (size_t I = 0; I < ARRAYCOUNT(Types); I++)
 		{
-			switch (Block.Type())
+			switch (Types[I].Type())
 			{
 				case BlockType::AcaciaLeaves:
 				case BlockType::BirchLeaves:
@@ -317,7 +317,7 @@ private:
 				}
 				default:
 				{
-					Block = Block::Air::Air();
+					Types[I] = Block::Air::Air();
 					break;
 				}
 			}
