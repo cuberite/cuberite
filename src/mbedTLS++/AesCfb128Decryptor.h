@@ -9,7 +9,7 @@
 
 #pragma once
 
-#ifdef _WIN32
+#if PLATFORM_CRYPTOGRAPHY && defined(_WIN32)
 #include <wincrypt.h>
 #else
 #include "mbedtls/aes.h"
@@ -38,7 +38,7 @@ public:
 
 protected:
 
-#ifdef _WIN32
+#if PLATFORM_CRYPTOGRAPHY && defined(_WIN32)
 	HCRYPTPROV m_Aes;
 	HCRYPTKEY m_Key;
 #else

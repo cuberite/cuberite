@@ -126,7 +126,7 @@ AString cMCADefrag::GetNextFileName(void)
 // cMCADefrag::cThread:
 
 cMCADefrag::cThread::cThread(cMCADefrag & a_Parent) :
-	super("MCADefrag thread"),
+	super("MCA Defragmentor"),
 	m_Parent(a_Parent),
 	m_IsChunkUncompressed(false),
 	m_Compressor(12)  // Set the highest compression factor

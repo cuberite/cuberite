@@ -32,7 +32,7 @@ protected:
 	std::atomic<bool> m_ShouldTerminate;
 
 public:
-	cIsThread(const AString & a_ThreadName);
+	cIsThread(AString && a_ThreadName);
 	virtual ~cIsThread();
 
 	/** Starts the thread; returns without waiting for the actual start. */

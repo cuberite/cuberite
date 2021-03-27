@@ -26,7 +26,7 @@
 
 
 cAuthenticator::cAuthenticator(void) :
-	Super("cAuthenticator"),
+	Super("Authenticator"),
 	m_Server(DEFAULT_AUTH_SERVER),
 	m_Address(DEFAULT_AUTH_ADDRESS),
 	m_ShouldAuthenticate(true)
