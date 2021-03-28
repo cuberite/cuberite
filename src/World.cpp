@@ -96,7 +96,7 @@ cWorld::cLock::cLock(const cWorld & a_World) :
 // cWorld::cTickThread:
 
 cWorld::cTickThread::cTickThread(cWorld & a_World) :
-	Super(Printf("WorldTickThread: %s", a_World.GetName().c_str())),
+	Super(Printf("World Ticker (%s)", a_World.GetName().c_str())),
 	m_World(a_World)
 {
 }

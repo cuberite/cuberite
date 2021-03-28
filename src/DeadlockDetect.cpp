@@ -21,7 +21,7 @@ const int CYCLE_MILLISECONDS = 100;
 
 
 cDeadlockDetect::cDeadlockDetect(void) :
-	Super("DeadlockDetect"),
+	Super("Deadlock Detector"),
 	m_IntervalSec(1000)
 {
 }

@@ -13,7 +13,7 @@
 cAesCfb128Decryptor::cAesCfb128Decryptor(void) :
 	m_IsValid(false)
 {
-#ifdef _WIN32
+#if PLATFORM_CRYPTOGRAPHY && defined(_WIN32)
 	if (!CryptAcquireContext(&m_Aes, nullptr, nullptr, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
 	{
 		throw std::system_error(GetLastError(), std::system_category());
@@ -30,7 +30,7 @@ cAesCfb128Decryptor::cAesCfb128Decryptor(void) :
 cAesCfb128Decryptor::~cAesCfb128Decryptor()
 {
 	// Clear the leftover in-memory data, so that they can't be accessed by a backdoor:
-#ifdef _WIN32
+#if PLATFORM_CRYPTOGRAPHY && defined(_WIN32)
 	CryptReleaseContext(m_Aes, 0);
 #else
 	mbedtls_aes_free(&m_Aes);
@@ -45,7 +45,7 @@ void cAesCfb128Decryptor::Init(const Byte a_Key[16], const Byte a_IV[16])
 {
 	ASSERT(!IsValid());  // Cannot Init twice
 
-#ifdef _WIN32
+#if PLATFORM_CRYPTOGRAPHY && defined(_WIN32)
 	struct Key
 	{
 		PUBLICKEYSTRUC Header;
@@ -77,7 +77,7 @@ void cAesCfb128Decryptor::ProcessData(std::byte * const a_EncryptedIn, const siz
 {
 	ASSERT(IsValid());  // Must Init() first
 
-#ifdef _WIN32
+#if PLATFORM_CRYPTOGRAPHY && defined(_WIN32)
 	ASSERT(a_Length <= std::numeric_limits<DWORD>::max());
 
 	DWORD Length = static_cast<DWORD>(a_Length);

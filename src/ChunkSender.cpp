@@ -59,7 +59,7 @@ public:
 // cChunkSender:
 
 cChunkSender::cChunkSender(cWorld & a_World) :
-	Super("ChunkSender"),
+	Super("Chunk Sender"),
 	m_World(a_World),
 	m_Serializer(m_World.GetDimension())
 {
