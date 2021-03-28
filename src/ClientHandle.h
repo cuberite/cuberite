@@ -90,12 +90,6 @@ public:  // tolua_export
 	and the results are passed to MCS running in offline mode. */
 	void SetProperties(const Json::Value & a_Properties) { m_Properties = a_Properties; }
 
-	/** Generates an UUID based on the username stored for this client, and stores it in the m_UUID member.
-	This is used for the offline (non-auth) mode, when there's no UUID source.
-	Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same.
-	Internally calls the GenerateOfflineUUID static function. */
-	void GenerateOfflineUUID(void);
-
 	/** Generates an UUID based on the player name provided.
 	This is used for the offline (non-auth) mode, when there's no UUID source.
 	Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same. */
