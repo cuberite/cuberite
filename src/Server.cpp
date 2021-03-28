@@ -411,7 +411,8 @@ bool cServer::Start(void)
 		LOGERROR("Couldn't open any ports. Aborting the server");
 		return false;
 	}
-	return m_TickThread.Start();
+	m_TickThread.Start();
+	return true;
 }
 
 

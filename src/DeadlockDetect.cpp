@@ -51,18 +51,18 @@ cDeadlockDetect::~cDeadlockDetect()
 
 
 
-bool cDeadlockDetect::Start(int a_IntervalSec)
+void cDeadlockDetect::Start(int a_IntervalSec)
 {
 	m_IntervalSec = a_IntervalSec;
 
 	// Read the initial world data:
 	cRoot::Get()->ForEachWorld([=](cWorld & a_World)
-		{
-			SetWorldAge(a_World.GetName(), a_World.GetWorldAge());
-			return false;
-		}
-	);
-	return Super::Start();
+	{
+		SetWorldAge(a_World.GetName(), a_World.GetWorldAge());
+		return false;
+	});
+
+	Super::Start();
 }
 
 

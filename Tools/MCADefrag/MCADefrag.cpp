@@ -86,7 +86,7 @@ void cMCADefrag::Run(void)
 	// Wait for all the threads to finish:
 	while (!m_Threads.empty())
 	{
-		m_Threads.front()->Wait();
+		m_Threads.front()->Stop();
 		delete m_Threads.front();
 		m_Threads.pop_front();
 	}
