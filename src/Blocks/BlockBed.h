@@ -68,7 +68,7 @@ private:
 		const Vector3i a_CursorPos
 	) const override;
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override;
+	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cItem * a_Tool) const override;
 
 	virtual void OnPlacedByPlayer(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,

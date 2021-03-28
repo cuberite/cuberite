@@ -970,10 +970,9 @@ cItems cChunk::PickupsFromBlock(Vector3i a_RelPos, const cEntity * a_Digger, con
 	cItems Pickups;
 	const auto BlockEntity = GetBlockEntityRel(a_RelPos);
 
-	const auto ToolHandler = (a_Tool != nullptr) ? a_Tool->GetHandler() : cItemHandler::GetItemHandler(E_ITEM_EMPTY);
-	if (ToolHandler->CanHarvestBlock(BlockType))
+	if ((a_Tool == nullptr) || a_Tool->GetHandler()->CanHarvestBlock(BlockType))
 	{
-		Pickups = cBlockHandler::For(BlockType).ConvertToPickups(BlockMeta, a_Digger, a_Tool);
+		Pickups = cBlockHandler::For(BlockType).ConvertToPickups(BlockMeta, a_Tool);
 
 		if (BlockEntity != nullptr)
 		{
