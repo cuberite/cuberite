@@ -21,6 +21,7 @@
 #include "Bindings/PluginManager.h"
 #include "Blocks/BlockHandler.h"
 #include "Simulator/FluidSimulator.h"
+#include "Simulator/RedstoneSimulator.h"
 #include "MobCensus.h"
 #include "MobSpawner.h"
 #include "BlockInServerPluginInterface.h"

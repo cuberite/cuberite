@@ -2,6 +2,7 @@
 #include "Globals.h"
 
 #include "ForEachSourceCallback.h"
+#include "BlockType.h"
 #include "../../BlockInfo.h"
 #include "../../Chunk.h"
 #include "IncrementalRedstoneSimulator.h"

@@ -6,7 +6,6 @@
 
 #include "Simulator/FireSimulator.h"
 #include "Simulator/SandSimulator.h"
-#include "Simulator/RedstoneSimulator.h"
 
 #include "ChunkMap.h"
 
@@ -25,10 +24,11 @@ class cBlockArea;
 class cFluidSimulatorData;
 class cMobCensus;
 class cMobSpawner;
+class cRedstoneSimulatorChunkData;
 
 struct SetChunkData;
 
-typedef std::list<cClientHandle *>                cClientHandleList;
+typedef std::list<cClientHandle *> cClientHandleList;
 
 // A convenience macro for calling GetChunkAndRelByAbsolute.
 #define PREPARE_REL_AND_CHUNK(Position, OriginalChunk) cChunk * Chunk; Vector3i Rel; bool RelSuccess = (OriginalChunk).GetChunkAndRelByAbsolute(Position, &Chunk, Rel)

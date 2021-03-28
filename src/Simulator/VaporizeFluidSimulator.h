@@ -23,7 +23,7 @@ class cVaporizeFluidSimulator:
 
 public:
 
-	using Super::cFluidSimulator;
+	using Super::Super;
 
 private:
 
