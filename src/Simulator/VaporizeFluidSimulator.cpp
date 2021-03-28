@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "VaporizeFluidSimulator.h"
+#include "BlockType.h"
 #include "../OpaqueWorld.h"
 #include "../Chunk.h"
 #include "../Blocks/BroadcastInterface.h"
