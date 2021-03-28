@@ -116,6 +116,55 @@ cChunk::~cChunk()
 
 
 
+void cChunk::BroadcastPendingChanges(void)
+{
+	if (const auto PendingBlocksCount = m_PendingSendBlocks.size(); PendingBlocksCount >= 10240)
+	{
+		// Resend the full chunk:
+		for (const auto ClientHandle : m_LoadedByClient)
+		{
+			m_World->ForceSendChunkTo(m_PosX, m_PosZ, cChunkSender::Priority::Medium, ClientHandle);
+		}
+	}
+	else if (PendingBlocksCount == 0)
+	{
+		// Only send block entity changes:
+		for (const auto ClientHandle : m_LoadedByClient)
+		{
+			for (const auto BlockEntity : m_PendingSendBlockEntities)
+			{
+				BlockEntity->SendTo(*ClientHandle);
+			}
+		}
+	}
+	else
+	{
+		// Send block and block entity changes:
+		for (const auto ClientHandle : m_LoadedByClient)
+		{
+			ClientHandle->SendBlockChanges(m_PosX, m_PosZ, m_PendingSendBlocks);
+
+			for (const auto BlockEntity : m_PendingSendBlockEntities)
+			{
+				BlockEntity->SendTo(*ClientHandle);
+			}
+		}
+	}
+
+	// Flush out all buffered data:
+	for (const auto ClientHandle : m_LoadedByClient)
+	{
+		ClientHandle->ProcessProtocolOut();
+	}
+
+	m_PendingSendBlocks.clear();
+	m_PendingSendBlockEntities.clear();
+}
+
+
+
+
+
 void cChunk::SetPresence(cChunk::ePresence a_Presence)
 {
 	m_Presence = a_Presence;
@@ -707,9 +756,6 @@ void cChunk::Tick(std::chrono::milliseconds a_Dt)
 
 	// Check blocks after everything else to apply at least one round of queued ticks (i.e. cBlockHandler::Check) this tick:
 	CheckBlocks();
-
-	// Finally, tell the client about all block changes:
-	BroadcastPendingBlockChanges();
 }
 
 
@@ -765,42 +811,6 @@ void cChunk::MoveEntityToNewChunk(OwnedEntity a_Entity)
 	} Mover(Entity);
 
 	m_ChunkMap->CompareChunkClients(this, Neighbor, Mover);
-}
-
-
-
-
-
-void cChunk::BroadcastPendingBlockChanges(void)
-{
-	if (const auto PendingBlocksCount = m_PendingSendBlocks.size(); PendingBlocksCount >= 10240)
-	{
-		// Resend the full chunk:
-		for (const auto ClientHandle : m_LoadedByClient)
-		{
-			m_World->ForceSendChunkTo(m_PosX, m_PosZ, cChunkSender::Priority::Medium, ClientHandle);
-		}
-	}
-	else if (PendingBlocksCount != 0)
-	{
-		// Send block changes:
-		for (const auto ClientHandle : m_LoadedByClient)
-		{
-			ClientHandle->SendBlockChanges(m_PosX, m_PosZ, m_PendingSendBlocks);
-		}
-	}
-
-	// Send block entity changes:
-	for (const auto Entity : m_PendingSendBlockEntities)
-	{
-		for (const auto ClientHandle : m_LoadedByClient)
-		{
-			Entity->SendTo(*ClientHandle);
-		}
-	}
-
-	m_PendingSendBlocks.clear();
-	m_PendingSendBlockEntities.clear();
 }
 
 
