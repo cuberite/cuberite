@@ -3075,14 +3075,14 @@ void cPlayer::OnRemoveFromWorld(cWorld & a_World)
 		AwardAchievement(Statistic::AchPortal);
 	}
 
+	// Clientside warp start:
+	m_ClientHandle->SendRespawn(DestinationDimension, false);
+
 	// Clear sent chunk lists from the clienthandle:
 	m_ClientHandle->RemoveFromWorld();
 
 	// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
 	m_ClientHandle->InvalidateCachedSentChunk();
-
-	// Clientside warp start:
-	m_ClientHandle->SendRespawn(DestinationDimension, false);
 }
 
 

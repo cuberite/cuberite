@@ -130,8 +130,9 @@ void cClientHandle::Destroy(void)
 
 	{
 		cCSLock Lock(m_CSOutgoingData);
-		m_Link->Shutdown();  // Cleanly close the connection
-		m_Link.reset();  // Release the strong reference cTCPLink holds to ourself
+		m_Link->Send(m_OutgoingData.data(), m_OutgoingData.size());  // Flush remaining data.
+		m_Link->Shutdown();  // Cleanly close the connection.
+		m_Link.reset();  // Release the strong reference cTCPLink holds to ourself.
 	}
 }
 
@@ -1933,9 +1934,12 @@ void cClientHandle::RemoveFromWorld(void)
 		m_SentChunks.clear();
 	}
 
+	// Flush outgoing data:
+	ProcessProtocolOut();
+
 	// No need to send Unload Chunk packets, the client unloads automatically.
 
-	// Here, we set last streamed values to bogus ones so everything is resent
+	// Here, we set last streamed values to bogus ones so everything is resent:
 	m_LastStreamedChunkX = 0x7fffffff;
 	m_LastStreamedChunkZ = 0x7fffffff;
 }
@@ -2105,6 +2109,7 @@ void cClientHandle::Tick(float a_Dt)
 void cClientHandle::ServerTick(float a_Dt)
 {
 	ProcessProtocolIn();
+	ProcessProtocolOut();
 
 	m_TicksSinceLastPacket += 1;
 	if (m_TicksSinceLastPacket > 600)  // 30 seconds
