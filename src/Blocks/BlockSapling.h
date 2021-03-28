@@ -19,7 +19,7 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// The low 3 bits store the sapling type; bit 0x08 is the growth timer (not used in pickups)
 		return cItem(m_BlockType, 1, a_BlockMeta & 0x07);

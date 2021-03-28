@@ -81,7 +81,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// No drop unless dug up with a shovel
 		if ((a_Tool == nullptr) || !ItemCategory::IsShovel(a_Tool->m_ItemType))
