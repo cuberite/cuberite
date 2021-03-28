@@ -105,6 +105,9 @@ public:  // tolua_export
 	We use Version-3 UUIDs for offline UUIDs, online UUIDs are Version-4, thus we can tell them apart. */
 	static bool IsUUIDOnline(const cUUID & a_UUID);  // Exported in ManualBindings.cpp
 
+	/** Flushes all buffered outgoing data to the network. */
+	void ProcessProtocolOut();
+
 	/** Formats the type of message with the proper color and prefix for sending to the client. */
 	static AString FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData);
 
@@ -443,12 +446,16 @@ private:
 	/** Protects m_IncomingData against multithreaded access. */
 	cCriticalSection m_CSIncomingData;
 
-	/** Queue for the incoming data received on the link until it is processed in Tick().
+	/** Queue for the incoming data received on the link until it is processed in ProcessProtocolIn().
 	Protected by m_CSIncomingData. */
 	ContiguousByteBuffer m_IncomingData;
 
 	/** Protects m_OutgoingData against multithreaded access. */
 	cCriticalSection m_CSOutgoingData;
+
+	/** Buffer for storing outgoing data from any thread; will get sent in ProcessProtocolOut() at the end of each tick.
+	Protected by m_CSOutgoingData. */
+	ContiguousByteBuffer m_OutgoingData;
 
 	/** A pointer to a World-owned player object, created in FinishAuthenticate when authentication succeeds.
 	The player should only be accessed from the tick thread of the World that owns him.

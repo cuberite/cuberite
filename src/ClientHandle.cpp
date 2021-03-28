@@ -231,6 +231,27 @@ bool cClientHandle::IsUUIDOnline(const cUUID & a_UUID)
 
 
 
+void cClientHandle::ProcessProtocolOut()
+{
+	decltype(m_OutgoingData) OutgoingData;
+	{
+		cCSLock Lock(m_CSOutgoingData);
+		std::swap(OutgoingData, m_OutgoingData);
+	}
+
+	// Due to cTCPLink's design of holding a strong pointer to ourself, we need to explicitly reset m_Link.
+	// This means we need to check it's not nullptr before trying to send, but also capture the link,
+	// to prevent it being reset between the null check and the Send:
+	if (auto Link = m_Link; Link != nullptr)
+	{
+		Link->Send(OutgoingData.data(), OutgoingData.size());
+	}
+}
+
+
+
+
+
 void cClientHandle::Kick(const AString & a_Reason)
 {
 	if (m_State >= csAuthenticating)  // Don't log pings
@@ -1899,14 +1920,8 @@ void cClientHandle::SendData(const ContiguousByteBufferView a_Data)
 		return;
 	}
 
-	// Due to cTCPLink's design of holding a strong pointer to ourself, we need to explicitly reset m_Link.
-	// This means we need to check it's not nullptr before trying to send, but also capture the link,
-	// to prevent it being reset between the null check and the Send:
-	if (auto Link = m_Link; Link != nullptr)
-	{
-		cCSLock Lock(m_CSOutgoingData);
-		Link->Send(a_Data.data(), a_Data.size());
-	}
+	cCSLock Lock(m_CSOutgoingData);
+	m_OutgoingData += a_Data;
 }
 
 

@@ -53,6 +53,9 @@ public:
 	cChunk(const cChunk & Other) = delete;
 	~cChunk();
 
+	/** Flushes the pending block (entity) queue, and clients' outgoing data buffers. */
+	void BroadcastPendingChanges(void);
+
 	/** Returns true iff the chunk block data is valid (loaded / generated) */
 	bool IsValid(void) const {return (m_Presence == cpPresent); }
 
@@ -545,9 +548,6 @@ private:
 
 	/** Wakes up each simulator for its specific blocks; through all the blocks in the chunk */
 	void WakeUpSimulators(void);
-
-	/** Sends m_PendingSendBlocks to all clients */
-	void BroadcastPendingBlockChanges(void);
 
 	/** Checks the block scheduled for checking in m_ToTickBlocks[] */
 	void CheckBlocks();

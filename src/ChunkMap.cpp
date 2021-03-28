@@ -1339,9 +1339,17 @@ void cChunkMap::SpawnMobs(cMobSpawner & a_MobSpawner)
 void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
 {
 	cCSLock Lock(m_CSChunks);
+
+	// Do the magic of updating the world:
 	for (auto & Chunk : m_Chunks)
 	{
 		Chunk.second.Tick(a_Dt);
+	}
+
+	// Finally, only after all chunks are ticked, tell the client about all aggregated changes:
+	for (auto & Chunk : m_Chunks)
+	{
+		Chunk.second.BroadcastPendingChanges();
 	}
 }
 
