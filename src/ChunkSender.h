@@ -72,7 +72,7 @@ public:
 
 	/** Queues a chunk to be sent to a specific client */
 	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cClientHandle * a_Client);
-	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cChunkClientHandles a_Client);
+	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, std::vector<cClientHandle *> a_Client);
 
 protected:
 

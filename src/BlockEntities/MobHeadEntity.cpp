@@ -33,7 +33,6 @@ void cMobHeadEntity::SetType(const eMobHeadType & a_Type)
 		m_OwnerUUID = cUUID{};
 	}
 	m_Type = a_Type;
-	m_World->BroadcastBlockEntity(GetPos());
 }
 
 
@@ -43,7 +42,6 @@ void cMobHeadEntity::SetType(const eMobHeadType & a_Type)
 void cMobHeadEntity::SetRotation(eMobHeadRotation a_Rotation)
 {
 	m_Rotation = a_Rotation;
-	m_World->BroadcastBlockEntity(GetPos());
 }
 
 
@@ -70,8 +68,6 @@ void cMobHeadEntity::SetOwner(const cPlayer & a_Owner)
 			break;
 		}
 	}
-
-	m_World->BroadcastBlockEntity(GetPos());
 }
 
 
@@ -89,7 +85,6 @@ void cMobHeadEntity::SetOwner(const cUUID & a_OwnerUUID, const AString & a_Owner
 	m_OwnerName = a_OwnerName;
 	m_OwnerTexture = a_OwnerTexture;
 	m_OwnerTextureSignature = a_OwnerTextureSignature;
-	m_World->BroadcastBlockEntity(GetPos());
 }
 
 

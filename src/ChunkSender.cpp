@@ -121,7 +121,7 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Prior
 
 
 
-void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cChunkClientHandles a_Clients)
+void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, std::vector<cClientHandle *> a_Clients)
 {
 	{
 		cChunkCoords Chunk{a_ChunkX, a_ChunkZ};

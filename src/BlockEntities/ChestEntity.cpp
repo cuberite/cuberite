@@ -146,24 +146,25 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 
 void cChestEntity::ScanNeighbours()
 {
-	// Callback for finding neighbouring chest:
-	auto FindNeighbour = [this](cChestEntity & a_Chest)
+	// Callback for finding neighbouring chest.
+	auto FindNeighbour = [this](cBlockEntity & a_BlockEntity)
 	{
-		if (a_Chest.GetBlockType() != m_BlockType)
+		if (a_BlockEntity.GetBlockType() != m_BlockType)
 		{
 			// Neighboring block is not the same type of chest
-			return true;
+			return false;
 		}
-		m_Neighbour = &a_Chest;
-		return false;
+
+		m_Neighbour = static_cast<cChestEntity *>(&a_BlockEntity);
+		return true;
 	};
 
 	// Scan horizontally adjacent blocks for any neighbouring chest of the same type:
 	if (
-		m_World->DoWithChestAt(m_Pos.x - 1, m_Pos.y, m_Pos.z,     FindNeighbour) ||
-		m_World->DoWithChestAt(m_Pos.x + 1, m_Pos.y, m_Pos.z,     FindNeighbour) ||
-		m_World->DoWithChestAt(m_Pos.x,     m_Pos.y, m_Pos.z - 1, FindNeighbour) ||
-		m_World->DoWithChestAt(m_Pos.x,     m_Pos.y, m_Pos.z + 1, FindNeighbour)
+		m_World->DoWithBlockEntityAt(m_Pos.addedX(-1), FindNeighbour) ||
+		m_World->DoWithBlockEntityAt(m_Pos.addedX(+1), FindNeighbour) ||
+		m_World->DoWithBlockEntityAt(m_Pos.addedZ(-1), FindNeighbour) ||
+		m_World->DoWithBlockEntityAt(m_Pos.addedX(+1), FindNeighbour)
 	)
 	{
 		m_Neighbour->m_Neighbour = this;

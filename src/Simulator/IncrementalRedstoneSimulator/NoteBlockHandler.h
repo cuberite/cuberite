@@ -31,9 +31,14 @@ namespace NoteBlockHandler
 			return;
 		}
 
-		a_Chunk.DoWithNoteBlockAt(a_Position, [](cNoteEntity & a_NoteBlock)
+		a_Chunk.DoWithBlockEntityAt(a_Position, [](cBlockEntity & a_BlockEntity)
 		{
-			a_NoteBlock.MakeSound();
+			if (a_BlockEntity.GetBlockType() != E_BLOCK_NOTE_BLOCK)
+			{
+				return false;
+			}
+
+			static_cast<cNoteEntity &>(a_BlockEntity).MakeSound();
 			return false;
 		});
 	}
