@@ -140,15 +140,6 @@ void cClientHandle::Destroy(void)
 
 
 
-void cClientHandle::GenerateOfflineUUID(void)
-{
-	m_UUID = GenerateOfflineUUID(m_Username);
-}
-
-
-
-
-
 AString cClientHandle::FormatChatPrefix(
 	bool ShouldAppendChatPrefixes, const AString & a_ChatPrefixS,
 	const AString & m_Color1, const AString & m_Color2
@@ -318,7 +309,19 @@ void cClientHandle::Authenticate(const AString & a_Name, const cUUID & a_UUID, c
 void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
 {
 	// Serverside spawned player (so data are loaded).
-	auto Player = std::make_unique<cPlayer>(shared_from_this());
+	std::unique_ptr<cPlayer> Player;
+
+	try
+	{
+		Player = std::make_unique<cPlayer>(shared_from_this());
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING("Error reading player \"%s\": %s", GetUsername().c_str(), Oops.what());
+		Kick("Contact an operator.\n\nYour player's save files could not be parsed.\nTo avoid data loss you are prevented from joining.");
+		return;
+	}
+
 	m_Player = Player.get();
 
 	/*
@@ -1461,9 +1464,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 {
 	if ((a_Message.size()) > MAX_CHAT_MSG_LENGTH)
 	{
-		this->Kick(std::string("Please don't exceed the maximum message length of ")
-			+ std::to_string(MAX_CHAT_MSG_LENGTH)
-		);
+		Kick("Please don't exceed the maximum message length of " + std::to_string(MAX_CHAT_MSG_LENGTH));
 		return;
 	}
 	// We no longer need to postpone message processing, because the messages already arrive in the Tick thread
