@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "BlockType.h"
 #include "../RedstoneSimulator.h"
 #include "RedstoneSimulatorChunkData.h"
 

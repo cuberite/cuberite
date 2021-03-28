@@ -2,7 +2,6 @@
 #pragma once
 
 #include "BlockEntities/BlockEntity.h"
-#include "Entities/Entity.h"
 #include "ChunkData.h"
 
 #include "Simulator/FireSimulator.h"
@@ -19,19 +18,8 @@ class cWorld;
 class cClientHandle;
 class cPlayer;
 class cChunkMap;
-class cBeaconEntity;
-class cBedEntity;
-class cBrewingstandEntity;
 class cBoundingBox;
-class cChestEntity;
 class cChunkDataCallback;
-class cCommandBlockEntity;
-class cDispenserEntity;
-class cFurnaceEntity;
-class cHopperEntity;
-class cNoteEntity;
-class cMobHeadEntity;
-class cFlowerPotEntity;
 class cBlockArea;
 class cBlockArea;
 class cFluidSimulatorData;
@@ -212,9 +200,6 @@ public:
 	Sends the chunk to all relevant clients. */
 	void SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_MaxRelZ, EMCSBiome a_Biome);
 
-	/** Sets the sign text. Returns true if successful. Also sends update packets to all clients in the chunk */
-	bool SetSignLines(int a_RelX, int a_RelY, int a_RelZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
-
 	int GetHeight( int a_X, int a_Z) const;
 
 	/** Returns true if it is sunny at the specified location. This takes into account biomes. */
@@ -259,83 +244,11 @@ public:
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found. */
 	bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback a_Callback, bool & a_CallbackResult) const;  // Lua-accessible
 
-	/** Calls the callback for each tyEntity; returns true if all block entities processed, false if the callback aborted by returning true
-	tBlocktypes are all blocktypes convertible to tyEntity which are to be called. If no block type is given the callback is called for every block entity
-	Accessible only from within Chunk.cpp */
-	template <class tyEntity, BLOCKTYPE... tBlocktype>
-	bool GenericForEachBlockEntity(cFunctionRef<bool(tyEntity &)> a_Callback);
-
 	/** Calls the callback for each block entity; returns true if all block entities processed, false if the callback aborted by returning true */
 	bool ForEachBlockEntity(cBlockEntityCallback a_Callback);  // Lua-accessible
 
-	/** Calls the callback for each brewingstand; returns true if all brewingstands processed, false if the callback aborted by returning true */
-	bool ForEachBrewingstand(cBrewingstandCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for each chest; returns true if all chests processed, false if the callback aborted by returning true */
-	bool ForEachChest(cChestCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for each dispenser; returns true if all dispensers processed, false if the callback aborted by returning true */
-	bool ForEachDispenser(cDispenserCallback a_Callback);
-
-	/** Calls the callback for each dropper; returns true if all droppers processed, false if the callback aborted by returning true */
-	bool ForEachDropper(cDropperCallback a_Callback);
-
-	/** Calls the callback for each dropspenser; returns true if all dropspensers processed, false if the callback aborted by returning true */
-	bool ForEachDropSpenser(cDropSpenserCallback a_Callback);
-
-	/** Calls the callback for each furnace; returns true if all furnaces processed, false if the callback aborted by returning true */
-	bool ForEachFurnace(cFurnaceCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for the tyEntity at the specified coords; returns false if there's no such block entity at those coords, true if found
-	tBlocktype is a list of the blocktypes to be called. If no BLOCKTYPE template arguments are given the callback is called for any block entity
-	Accessible only from within Chunk.cpp */
-	template <class tyEntity, BLOCKTYPE... tBlocktype>
-	bool GenericDoWithBlockEntityAt(Vector3i a_Position, cFunctionRef<bool(tyEntity &)> a_Callback);
-
-	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
+	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, and whatever the callback returns if found. */
 	bool DoWithBlockEntityAt(Vector3i a_Position, cBlockEntityCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
-	bool DoWithBeaconAt(Vector3i a_Position, cBeaconCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the brewingstand at the specified coords; returns false if there's no brewingstand at those coords, true if found */
-	bool DoWithBrewingstandAt(Vector3i a_Position, cBrewingstandCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the bed at the specified coords; returns false if there's no bed at those coords, true if found */
-	bool DoWithBedAt(Vector3i a_Position, cBedCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found */
-	bool DoWithChestAt(Vector3i a_Position, cChestCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords or callback returns true, returns true if found */
-	bool DoWithDispenserAt(Vector3i a_Position, cDispenserCallback a_Callback);
-
-	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dropper at those coords or callback returns true, returns true if found */
-	bool DoWithDropperAt(Vector3i a_Position, cDropperCallback a_Callback);
-
-	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dropspenser at those coords or callback returns true, returns true if found */
-	bool DoWithDropSpenserAt(Vector3i a_Position, cDropSpenserCallback a_Callback);
-
-	/** Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found */
-	bool DoWithFurnaceAt(Vector3i a_Position, cFurnaceCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for the hopper at the specified coords; returns false if there's no hopper at those coords or callback returns true, returns true if found */
-	bool DoWithHopperAt(Vector3i a_Position, cHopperCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found */
-	bool DoWithNoteBlockAt(Vector3i a_Position, cNoteBlockCallback a_Callback);
-
-	/** Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found */
-	bool DoWithCommandBlockAt(Vector3i a_Position, cCommandBlockCallback a_Callback);
-
-	/** Calls the callback for the mob head block at the specified coords; returns false if there's no mob head block at those coords or callback returns true, returns true if found */
-	bool DoWithMobHeadAt(Vector3i a_Position, cMobHeadCallback a_Callback);
-
-	/** Calls the callback for the flower pot at the specified coords; returns false if there's no flower pot at those coords or callback returns true, returns true if found */
-	bool DoWithFlowerPotAt(Vector3i a_Position, cFlowerPotCallback a_Callback);
-
-	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
-	bool GetSignLines (Vector3i a_Position, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
 	/** Use block entity on coordinate.
 	returns true if the use was successful, return false to use the block as a "normal" block */
@@ -529,9 +442,9 @@ public:
 	as at least one requests is active the chunk will be ticked). */
 	void SetAlwaysTicked(bool a_AlwaysTicked);
 
-	cChunkClientHandles GetAllClients(void) const
+	const auto & GetAllClients(void) const
 	{
-		return cChunkClientHandles(m_LoadedByClient);
+		return m_LoadedByClient;
 	}
 
 	/** Converts the coord relative to this chunk into an absolute coord.
@@ -570,8 +483,19 @@ private:
 	bool m_IsDirty;        // True if the chunk has changed since it was last saved
 	bool m_IsSaving;       // True if the chunk is being saved
 
-	std::queue<Vector3i>  m_ToTickBlocks;
-	sSetBlockVector       m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
+	/** Blocks that have changed and need to be sent to all clients.
+	The protocol has a provision for coalescing block changes, and this is the buffer.
+	It will collect the block changes that occur in a tick, before being flushed in BroadcastPendingSendBlocks. */
+	sSetBlockVector m_PendingSendBlocks;
+
+	/** Block entities that have been touched and need to be sent to all clients.
+	Because block changes are buffered and we need to happen after them, this buffer exists too.
+	Pointers to block entities that were destroyed are guaranteed to be removed from this array by RemoveBlockEntity. */
+	std::vector<cBlockEntity *> m_PendingSendBlockEntities;
+
+	/** A queue of relative positions to call cBlockHandler::Check on.
+	Processed at the end of each tick by CheckBlocks. */
+	std::queue<Vector3i> m_BlocksToCheck;
 
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	std::vector<cClientHandle *> m_LoadedByClient;

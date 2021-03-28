@@ -43,15 +43,6 @@ bool cCommandBlockEntity::UsedBy(cPlayer * a_Player)
 void cCommandBlockEntity::SetCommand(const AString & a_Cmd)
 {
 	m_Command = a_Cmd;
-
-	/*
-	Vanilla requires that the server send a Block Entity Update after a command has been set
-	Therefore, command blocks don't support on-the-fly (when window is open) updating of a command and therefore...
-	...the following code can't be put in UsedBy just before the window opens
-
-	Just documenting my experience in getting this to work :P
-	*/
-	m_World->BroadcastBlockEntity(GetPos());
 }
 
 
@@ -60,7 +51,6 @@ void cCommandBlockEntity::SetCommand(const AString & a_Cmd)
 
 void cCommandBlockEntity::SetLastOutput(const AString & a_LastOut)
 {
-	m_World->BroadcastBlockEntity(GetPos());
 	m_LastOutput = a_LastOut;
 }
 
@@ -180,7 +170,6 @@ void cCommandBlockEntity::Execute()
 		{
 			// Overwrite field
 			m_CmdBlock->SetLastOutput(cClientHandle::FormatChatPrefix(m_CmdBlock->GetWorld()->ShouldUseChatPrefixes(), "SUCCESS", cChatColor::Green, cChatColor::White) + a_Text);
-			m_CmdBlock->GetWorld()->BroadcastBlockEntity(m_CmdBlock->GetPos());
 		}
 	};
 
