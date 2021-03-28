@@ -49,10 +49,6 @@
 /** Maximum number of bytes that a chat message sent by a player may consist of */
 #define MAX_CHAT_MSG_LENGTH 1024
 
-/** The interval for sending pings to clients.
-Vanilla sends one ping every 1 second. */
-static const std::chrono::milliseconds PING_TIME_MS = std::chrono::milliseconds(1000);
-
 
 
 
@@ -100,7 +96,6 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 {
 	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
-	m_PingStartTime = std::chrono::steady_clock::now();
 
 	LOGD("New ClientHandle created at %p", static_cast<void *>(this));
 }
@@ -2057,10 +2052,11 @@ void cClientHandle::Tick(float a_Dt)
 	// Send a ping packet:
 	if (m_State == csPlaying)
 	{
-		if ((m_PingStartTime + PING_TIME_MS <= std::chrono::steady_clock::now()))
+		const auto Now = std::chrono::steady_clock::now();
+		if ((m_PingStartTime + std::chrono::seconds(2)) <= Now)  // 2 second interval between pings
 		{
 			m_PingID++;
-			m_PingStartTime = std::chrono::steady_clock::now();
+			m_PingStartTime = Now;
 			m_Protocol->SendKeepAlive(m_PingID);
 		}
 	}
