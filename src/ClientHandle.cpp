@@ -232,6 +232,13 @@ void cClientHandle::ProcessProtocolOut()
 	decltype(m_OutgoingData) OutgoingData;
 	{
 		cCSLock Lock(m_CSOutgoingData);
+
+		// Bail out when there's nothing to send to avoid TCPLink::Send overhead:
+		if (m_OutgoingData.empty())
+		{
+			return;
+		}
+
 		std::swap(OutgoingData, m_OutgoingData);
 	}
 
@@ -3318,12 +3325,14 @@ void cClientHandle::ProcessProtocolIn(void)
 	decltype(m_IncomingData) IncomingData;
 	{
 		cCSLock Lock(m_CSIncomingData);
-		std::swap(IncomingData, m_IncomingData);
-	}
 
-	if (IncomingData.empty())
-	{
-		return;
+		// Bail out when nothing was received:
+		if (m_IncomingData.empty())
+		{
+			return;
+		}
+
+		std::swap(IncomingData, m_IncomingData);
 	}
 
 	try
