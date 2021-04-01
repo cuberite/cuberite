@@ -130,33 +130,24 @@ public:
 
 
 
-namespace ChunkDef
-{
-	using cForEachSectionCallback = cFunctionRef<void(
-		size_t,
-		ChunkBlockData::BlockArray *,
-		ChunkBlockData::MetaArray *,
-		ChunkLightData::LightArray *,
-		ChunkLightData::LightArray *)>;
-
-	/** Invokes the callback functor for every chunk section containing at least one present block or light section data.
-	This is used to collect all data for all sections. */
-	inline void ForEachSection(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, cForEachSectionCallback a_Callback)
-	{
-		for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
-		{
-			const auto Blocks = a_BlockData.GetSection(Y);
-			const auto Metas = a_BlockData.GetMetaSection(Y);
-			const auto BlockLights = a_LightData.GetBlockLightSection(Y);
-			const auto SkyLights = a_LightData.GetSkyLightSection(Y);
-
-			if ((Blocks != nullptr) || (Metas != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr))
-			{
-				a_Callback(Y, Blocks, Metas, BlockLights, SkyLights);
-			}
-		}
-	}
-}
+/** Invokes the callback functor for every chunk section containing at least one present block or light section data.
+This is used to collect all data for all sections.
+In macro form to work around a Visual Studio 2017 ICE bug. */
+#define ChunkDef_ForEachSection(BlockData, LightData, Callback) \
+	do \
+	{ \
+		for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y) \
+		{ \
+			const auto Blocks = BlockData.GetSection(Y); \
+			const auto Metas = BlockData.GetMetaSection(Y); \
+			const auto BlockLights = LightData.GetBlockLightSection(Y); \
+			const auto SkyLights = LightData.GetSkyLightSection(Y); \
+			if ((Blocks != nullptr) || (Metas != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr)) \
+			{ \
+				Callback \
+			} \
+		} \
+	} while (false)
 
 
 

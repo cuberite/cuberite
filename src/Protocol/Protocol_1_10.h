@@ -26,7 +26,7 @@ class cProtocol_1_10_0:
 
 public:
 
-	using Super::cProtocol_1_9_4;
+	using Super::Super;
 
 protected:
 
@@ -37,5 +37,4 @@ protected:
 	virtual void HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer) override;
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override;
-	virtual void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity) override;
 };

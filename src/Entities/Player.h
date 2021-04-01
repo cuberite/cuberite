@@ -47,7 +47,7 @@ public:
 
 	CLASS_PROTODEF(cPlayer)
 
-	cPlayer(const cClientHandlePtr & a_Client);
+	cPlayer(const std::shared_ptr<cClientHandle> & a_Client);
 	virtual ~cPlayer() override;
 
 	// tolua_begin
@@ -380,21 +380,18 @@ public:
 	void SetVisible( bool a_bVisible);  // tolua_export
 	bool IsVisible(void) const { return m_bVisible; }  // tolua_export
 
-	/** Saves all player data, such as inventory, to JSON */
-	bool SaveToDisk(void);
+	/** Saves all player data, such as inventory, to JSON. */
+	void SaveToDisk(void);
 
 	typedef cWorld * cWorldPtr;
 
-	/** Loads the player data from the disk file
-	Sets a_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile()
-	Returns true on success, false on failure
-	*/
-	bool LoadFromDisk(cWorldPtr & a_World);
+	/** Loads the player data from the disk file.
+	Sets a_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile(). */
+	void LoadFromDisk(cWorldPtr & a_World);
 
-	/** Loads the player data from the specified file
-	Sets a_World to the world where the player will spawn, based on the stored world name or the default world
-	Returns true on success, false on failure
-	*/
+	/** Loads the player data from the specified file.
+	Sets a_World to the world where the player will spawn, based on the stored world name or the default world.
+	Returns true on success, false if the player wasn't found, and excepts with base std::runtime_error if the data couldn't be read or parsed. */
 	bool LoadFromFile(const AString & a_FileName, cWorldPtr & a_World);
 
 	const AString & GetLoadedWorldName() const { return m_CurrentWorldName; }
@@ -503,7 +500,7 @@ public:
 	bool DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks);
 
 	/** Returns the UUID that has been read from the client, or nil if not available. */
-	const cUUID & GetUUID(void) const { return m_UUID; }  // Exported in ManualBindings.cpp
+	const cUUID & GetUUID(void) const;  // Exported in ManualBindings.cpp
 
 	void StartFallFlying(void);
 
@@ -513,7 +510,6 @@ public:
 	virtual bool CanFly(void) const { return m_CanFly; }
 
 	/** (Re)loads the rank and permissions from the cRankManager.
-	Expects the m_UUID member to be valid.
 	Loads the m_Rank, m_Permissions, m_MsgPrefix, m_MsgSuffix and m_MsgNameColorCode members. */
 	void LoadRank(void);
 
@@ -665,9 +661,7 @@ private:
 	/** The item being dragged by the cursor while in a UI window */
 	cItem m_DraggingItem;
 
-	std::chrono::steady_clock::time_point m_LastPlayerListTime;
-
-	cClientHandlePtr m_ClientHandle;
+	std::shared_ptr<cClientHandle> m_ClientHandle;
 
 	cSlotNums m_InventoryPaintSlots;
 
@@ -729,10 +723,6 @@ private:
 	Will not apply food penalties if found to be true; will set to false after processing
 	*/
 	bool m_bIsTeleporting;
-
-	/** The UUID of the player, as read from the ClientHandle.
-	If no ClientHandle is given, the UUID is nil. */
-	cUUID m_UUID;
 
 	AString m_CustomName;
 

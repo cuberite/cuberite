@@ -21,7 +21,7 @@ namespace
 		size_t Present = 0;
 		UInt16 Mask = 0;
 
-		ChunkDef::ForEachSection(a_BlockData, a_LightData, [&Present, &Mask](const auto Y, auto, auto, auto, auto)
+		ChunkDef_ForEachSection(a_BlockData, a_LightData,
 		{
 			Present++;
 			Mask |= (1 << Y);
@@ -206,7 +206,7 @@ inline void cChunkDataSerializer::Serialize47(const int a_ChunkX, const int a_Ch
 	// each array stores all present sections of the same kind packed together
 
 	// Write the block types to the packet:
-	ChunkDef::ForEachSection(a_BlockData, a_LightData, [this](auto, const auto Blocks, const auto Metas, auto, auto)
+	ChunkDef_ForEachSection(a_BlockData, a_LightData,
 	{
 		const bool BlocksExist = Blocks != nullptr;
 		const bool MetasExist = Metas != nullptr;
@@ -221,7 +221,7 @@ inline void cChunkDataSerializer::Serialize47(const int a_ChunkX, const int a_Ch
 	});
 
 	// Write the block lights:
-	ChunkDef::ForEachSection(a_BlockData, a_LightData, [this](auto, auto, auto, const auto BlockLights, auto)
+	ChunkDef_ForEachSection(a_BlockData, a_LightData,
 	{
 		if (BlockLights == nullptr)
 		{
@@ -234,7 +234,7 @@ inline void cChunkDataSerializer::Serialize47(const int a_ChunkX, const int a_Ch
 	});
 
 	// Write the sky lights:
-	ChunkDef::ForEachSection(a_BlockData, a_LightData, [this](auto, auto, auto, auto, const auto SkyLights)
+	ChunkDef_ForEachSection(a_BlockData, a_LightData,
 	{
 		if (SkyLights == nullptr)
 		{
@@ -295,7 +295,7 @@ inline void cChunkDataSerializer::Serialize107(const int a_ChunkX, const int a_C
 	m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSize));
 
 	// Write each chunk section...
-	ChunkDef::ForEachSection(a_BlockData, a_LightData, [this](auto, const auto Blocks, const auto Metas, const auto BlockLights, const auto SkyLights)
+	ChunkDef_ForEachSection(a_BlockData, a_LightData,
 	{
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(0);  // Palette length is 0
@@ -353,7 +353,7 @@ inline void cChunkDataSerializer::Serialize110(const int a_ChunkX, const int a_C
 	m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSize));
 
 	// Write each chunk section...
-	ChunkDef::ForEachSection(a_BlockData, a_LightData, [this](auto, const auto Blocks, const auto Metas, const auto BlockLights, const auto SkyLights)
+	ChunkDef_ForEachSection(a_BlockData, a_LightData,
 	{
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(0);  // Palette length is 0
@@ -414,7 +414,7 @@ inline void cChunkDataSerializer::Serialize393(const int a_ChunkX, const int a_C
 	m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSize));
 
 	// Write each chunk section...
-	ChunkDef::ForEachSection(a_BlockData, a_LightData, [this](auto, const auto Blocks, const auto Metas, const auto BlockLights, const auto SkyLights)
+	ChunkDef_ForEachSection(a_BlockData, a_LightData,
 	{
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
@@ -479,7 +479,7 @@ inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_C
 	m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSize));
 
 	// Write each chunk section...
-	ChunkDef::ForEachSection(a_BlockData, a_LightData, [this](auto, const auto Blocks, const auto Metas, auto, auto)
+	ChunkDef_ForEachSection(a_BlockData, a_LightData,
 	{
 		m_Packet.WriteBEInt16(-1);
 		m_Packet.WriteBEUInt8(BitsPerEntry);

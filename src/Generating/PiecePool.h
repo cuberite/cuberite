@@ -115,7 +115,7 @@ public:
 
 		/** Called when the piece pool is assigned to a generator,
 		so that the strategies may bind to the underlying subgenerators. */
-		virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) {}
+		virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) {}
 	};
 
 	typedef std::shared_ptr<cVerticalStrategy> cVerticalStrategyPtr;
@@ -142,7 +142,7 @@ public:
 
 		/** Called when the piece pool is assigned to a generator,
 		so that the limits may bind to the underlying subgenerators. */
-		virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) {}
+		virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) {}
 	};
 
 	typedef std::shared_ptr<cVerticalLimit> cVerticalLimitPtr;
@@ -328,8 +328,3 @@ protected:
 
 typedef std::unique_ptr<cPlacedPiece> cPlacedPiecePtr;
 typedef std::vector<cPlacedPiecePtr> cPlacedPieces;
-
-
-
-
-

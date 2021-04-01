@@ -128,7 +128,7 @@ bool cNetherPortalScanner::IsValidBuildLocation(Vector3i a_BlockPos)
 	{
 		for (int j = 0; j < PortalLength; j++)
 		{
-			BLOCKTYPE blocktype = m_World.GetBlock(a_BlockPos.x + i, a_BlockPos.y, a_BlockPos.z + j);
+			BLOCKTYPE blocktype = m_World.GetBlock(a_BlockPos.addedXZ(i, j));
 			if (!cBlockInfo::IsSolid(blocktype))
 			{
 				return false;
@@ -137,7 +137,7 @@ bool cNetherPortalScanner::IsValidBuildLocation(Vector3i a_BlockPos)
 			// Check the airspace
 			for (int k = 1; k < PortalHeight; k++)
 			{
-				blocktype = m_World.GetBlock(a_BlockPos.x + i, a_BlockPos.y + k, a_BlockPos.z + j);
+				blocktype = m_World.GetBlock(a_BlockPos + Vector3i(i, k, j));
 				if (blocktype != E_BLOCK_AIR)
 				{
 					return false;
@@ -157,15 +157,15 @@ bool cNetherPortalScanner::OnAllChunksAvailable(void)
 	if (m_FoundPortal)
 	{
 		// Find the bottom of this portal
-		while (m_World.GetBlock(m_PortalLoc.x, m_PortalLoc.y, m_PortalLoc.z) == E_BLOCK_NETHER_PORTAL)
+		while (m_World.GetBlock(m_PortalLoc) == E_BLOCK_NETHER_PORTAL)
 		{
 			m_PortalLoc.y -= 1;
 		}
 		m_PortalLoc.y += 1;
 
 		// Figure out which way the portal is facing
-		int BXP = m_World.GetBlock(m_PortalLoc.x + 1, m_PortalLoc.y, m_PortalLoc.z);
-		int BXM = m_World.GetBlock(m_PortalLoc.x - 1, m_PortalLoc.y, m_PortalLoc.z);
+		int BXP = m_World.GetBlock(m_PortalLoc.addedX(1));
+		int BXM = m_World.GetBlock(m_PortalLoc.addedX(-1));
 		if ((BXP == E_BLOCK_NETHER_PORTAL) || (BXM == E_BLOCK_NETHER_PORTAL))
 		{
 			// The long axis is along X
@@ -196,7 +196,7 @@ bool cNetherPortalScanner::OnAllChunksAvailable(void)
 					Vector3i Location = Vector3i(x, y, z);
 					if (IsValidBuildLocation(Location))
 					{
-						Possibilities.push_back(Vector3i(x, y, z));
+						Possibilities.emplace_back(x, y, z);
 					}
 				}
 			}
@@ -244,11 +244,11 @@ void cNetherPortalScanner::BuildNetherPortal(Vector3i a_Location, Direction a_Di
 			{
 				if (a_Direction == Direction::Y)
 				{
-					m_World.SetBlock(x + i, y + k, z + j, E_BLOCK_AIR, 0);
+					m_World.SetBlock({ x + i, y + k, z + j }, E_BLOCK_AIR, 0);
 				}
 				else if (a_Direction == Direction::X)
 				{
-					m_World.SetBlock(x + j, y + k, z + i, E_BLOCK_AIR, 0);
+					m_World.SetBlock({ x + j, y + k, z + i }, E_BLOCK_AIR, 0);
 				}
 			}
 		}
@@ -262,11 +262,11 @@ void cNetherPortalScanner::BuildNetherPortal(Vector3i a_Location, Direction a_Di
 			// +2 on the short axis because that's where we deposit the entity
 			if (a_Direction == Direction::Y)
 			{
-				m_World.SetBlock(x + 2, y, z + j, E_BLOCK_OBSIDIAN, 0);
+				m_World.SetBlock({ x + 2, y, z + j }, E_BLOCK_OBSIDIAN, 0);
 			}
 			else if (a_Direction == Direction::X)
 			{
-				m_World.SetBlock(x + j, y, z + 2, E_BLOCK_OBSIDIAN, 0);
+				m_World.SetBlock({ x + j, y, z + 2 }, E_BLOCK_OBSIDIAN, 0);
 			}
 		}
 	}
@@ -276,26 +276,26 @@ void cNetherPortalScanner::BuildNetherPortal(Vector3i a_Location, Direction a_Di
 	{
 		if (a_Direction == Direction::Y)
 		{
-			m_World.SetBlock(x + 1, y + i, z, E_BLOCK_OBSIDIAN, 0);
-			m_World.SetBlock(x + 1, y + i, z + 3, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({ x + 1, y + i, z }, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({ x + 1, y + i, z + 3 }, E_BLOCK_OBSIDIAN, 0);
 		}
 		else if (a_Direction == Direction::X)
 		{
-			m_World.SetBlock(x, y + i, z + 1, E_BLOCK_OBSIDIAN, 0);
-			m_World.SetBlock(x + 3, y + i, z + 1, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({ x, y + i, z + 1 }, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({ x + 3, y + i, z + 1 }, E_BLOCK_OBSIDIAN, 0);
 		}
 	}
 	for (int i = 0; i < PortalLength; i++)
 	{
 		if (a_Direction == Direction::Y)
 		{
-			m_World.SetBlock(x + 1, y + 4, z + i, E_BLOCK_OBSIDIAN, 0);
-			m_World.SetBlock(x + 1, y, z + i, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({ x + 1, y + 4, z + i }, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({ x + 1, y, z + i }, E_BLOCK_OBSIDIAN, 0);
 		}
 		else if (a_Direction == Direction::X)
 		{
-			m_World.SetBlock(x + i, y + 4, z + 1, E_BLOCK_OBSIDIAN, 0);
-			m_World.SetBlock(x + i, y, z + 1, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({ x + i, y + 4, z + 1 }, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({ x + i, y, z + 1 }, E_BLOCK_OBSIDIAN, 0);
 		}
 	}
 

@@ -931,7 +931,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 					else if ((val1 > 0.5) && (val2 < -0.5))
 					{
 						float val3 = m_Noise.CubicNoise2D(xx * 0.01f + 10, zz * 0.01f + 10);
-						a_ChunkDesc.SetBlockTypeMeta(x, ++Top, z, E_BLOCK_PUMPKIN, static_cast<int>(val3 * 8) % 4);
+						a_ChunkDesc.SetBlockTypeMeta(x, ++Top, z, E_BLOCK_PUMPKIN, static_cast<unsigned>(val3 * 8) % 4);
 					}
 					break;
 				}  // case E_BLOCK_GRASS

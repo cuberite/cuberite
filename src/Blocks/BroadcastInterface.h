@@ -24,6 +24,7 @@ public:
 	virtual void BroadcastBlockAction                (Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastBlockBreakAnimation        (UInt32 a_EntityID, Vector3i a_BlockPos, Int8 a_Stage, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastBlockEntity                (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr) = 0;
+	virtual void BroadcastBossBarUpdateHealth        (const cEntity & a_Entity, UInt32 a_UniqueID, float a_FractionFilled) = 0;
 	virtual void BroadcastChat                       (const AString & a_Message, const cClientHandle * a_Exclude = nullptr, eMessageType a_ChatPrefix = mtCustom) = 0;
 	virtual void BroadcastChatInfo                   (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastChatFailure                (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) = 0;
@@ -50,9 +51,9 @@ public:
 	virtual void BroadcastPlayerListAddPlayer        (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer) = 0;
 	virtual void BroadcastPlayerListRemovePlayer     (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) = 0;
-	virtual void BroadcastPlayerListUpdateGameMode   (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) = 0;
-	virtual void BroadcastPlayerListUpdatePing       (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude = nullptr) = 0;
+	virtual void BroadcastPlayerListUpdateGameMode   (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) = 0;
+	virtual void BroadcastPlayerListUpdatePing       () = 0;
 	virtual void BroadcastRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) = 0;
 	virtual void BroadcastScoreUpdate                (const AString & a_Objective, const AString & a_PlayerName, cObjective::Score a_Score, Byte a_Mode) = 0;

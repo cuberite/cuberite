@@ -75,26 +75,22 @@ public:
 		auto BlockMeta = static_cast<NIBBLETYPE>(a_ClickedBlockFace);
 
 		// Use a callback to set the properties of the mob head block entity:
-		a_World.DoWithBlockEntityAt(a_PlacePos.x, a_PlacePos.y, a_PlacePos.z, [&](cBlockEntity & a_BlockEntity)
+		a_World.DoWithBlockEntityAt(a_PlacePos, [&](cBlockEntity & a_BlockEntity)
+		{
+			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_HEAD);
+
+			auto & MobHeadEntity = static_cast<cMobHeadEntity &>(a_BlockEntity);
+
+			int Rotation = 0;
+			if (BlockMeta == 1)
 			{
-				if (a_BlockEntity.GetBlockType() != E_BLOCK_HEAD)
-				{
-					return false;
-				}
-				auto & MobHeadEntity = static_cast<cMobHeadEntity &>(a_BlockEntity);
-
-				int Rotation = 0;
-				if (BlockMeta == 1)
-				{
-					Rotation = FloorC(a_Player.GetYaw() * 16.0f / 360.0f + 0.5f) & 0x0f;
-				}
-
-				MobHeadEntity.SetType(HeadType);
-				MobHeadEntity.SetRotation(static_cast<eMobHeadRotation>(Rotation));
-				MobHeadEntity.GetWorld()->BroadcastBlockEntity(MobHeadEntity.GetPos());
-				return false;
+				Rotation = FloorC(a_Player.GetYaw() * 16.0f / 360.0f + 0.5f) & 0x0f;
 			}
-		);
+
+			MobHeadEntity.SetType(HeadType);
+			MobHeadEntity.SetRotation(static_cast<eMobHeadRotation>(Rotation));
+			return false;
+		});
 	}
 
 
@@ -231,7 +227,7 @@ public:
 			// Query the world block:
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
-			if (!a_World.GetBlockTypeMeta(BlockX, BlockY, BlockZ, BlockType, BlockMeta))
+			if (!a_World.GetBlockTypeMeta({ BlockX, BlockY, BlockZ }, BlockType, BlockMeta))
 			{
 				// Cannot query block, assume unloaded chunk, fail to spawn the wither
 				return false;
@@ -243,23 +239,23 @@ public:
 				return false;
 			}
 
-			// If it is a mob head, check the correct head type using the block entity:
-			if (BlockType == E_BLOCK_HEAD)
-			{
-				bool IsWitherHead = false;
-				a_World.DoWithBlockEntityAt(BlockX, BlockY, BlockZ, [&](cBlockEntity & a_Entity)
-					{
-						ASSERT(a_Entity.GetBlockType() == E_BLOCK_HEAD);
-						auto & MobHead = static_cast<cMobHeadEntity &>(a_Entity);
-						IsWitherHead = (MobHead.GetType() == SKULL_TYPE_WITHER);
-						return true;
-					}
-				);
-				if (!IsWitherHead)
+			// If it is a mob head, check it's a wither skull using the block entity:
+			if (
+				(BlockType == E_BLOCK_HEAD) &&
+				!a_World.DoWithBlockEntityAt({ BlockX, BlockY, BlockZ }, [&](cBlockEntity & a_BlockEntity)
 				{
-					return false;
-				}
+					if (a_BlockEntity.GetBlockType() != E_BLOCK_HEAD)
+					{
+						return false;
+					}
+
+					return static_cast<cMobHeadEntity &>(a_BlockEntity).GetType() == SKULL_TYPE_WITHER;
+				})
+			)
+			{
+				return false;
 			}
+
 			// Matched, continue checking
 			AirBlocks.emplace_back(BlockX, BlockY, BlockZ, E_BLOCK_AIR, 0);
 		}  // for i - a_Image

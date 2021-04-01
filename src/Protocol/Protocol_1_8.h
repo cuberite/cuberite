@@ -36,8 +36,9 @@ public:
 
 	cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State);
 
-	/** Called when client sends some data: */
-	virtual void DataReceived(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size) override;
+	/** Called to process them, when client sends some data.
+	The protocol uses the provided buffers for storage and processing, and must have exclusive access to them. */
+	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer && a_Data) override;
 
 	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
@@ -45,6 +46,12 @@ public:
 	virtual void SendBlockBreakAnim	            (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
 	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
+	virtual void SendBossBarAdd                 (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
+	virtual void SendBossBarRemove              (UInt32 a_UniqueID) override;
+	virtual void SendBossBarUpdateFlags         (UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
+	virtual void SendBossBarUpdateHealth        (UInt32 a_UniqueID, float a_FractionFilled) override;
+	virtual void SendBossBarUpdateStyle         (UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType) override;
+	virtual void SendBossBarUpdateTitle         (UInt32 a_UniqueID, const cCompositeChat & a_Title) override;
 	virtual void SendCameraSetTo                (const cEntity & a_Entity) override;
 	virtual void SendChat                       (const AString & a_Message, eChatType a_Type) override;
 	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) override;
@@ -85,9 +92,9 @@ public:
 	virtual void SendPlayerListAddPlayer        (const cPlayer & a_Player) override;
 	virtual void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer) override;
 	virtual void SendPlayerListRemovePlayer     (const cPlayer & a_Player) override;
-	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) override;
-	virtual void SendPlayerListUpdatePing       (const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) override;
+	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) override;
+	virtual void SendPlayerListUpdatePing       () override;
 	virtual void SendPlayerMaxSpeed             (void) override;
 	virtual void SendPlayerMoveLook             (void) override;
 	virtual void SendPlayerPosition             (void) override;
@@ -112,7 +119,7 @@ public:
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
-	virtual void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle) override;
+	virtual void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_WorldDate, bool a_DoDaylightCycle) override;
 	virtual void SendUnleashEntity              (const cEntity & a_Entity) override;
 	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
@@ -139,9 +146,6 @@ protected:
 
 	/** State of the protocol. */
 	State m_State;
-
-	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
-	virtual void AddReceivedData(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size);
 
 	/** Nobody inherits 1.8, so it doesn't use this method */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
@@ -219,6 +223,9 @@ protected:
 	/** Sends the entity type and entity-dependent data required for the entity to initially spawn. */
 	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData);
 
+	/** Writes the block entity data for the specified block entity into the packet. */
+	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity);
+
 	/** Writes the item data into a packet. */
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
 
@@ -230,9 +237,6 @@ protected:
 
 	/** Writes the entity properties for the specified entity, including the Count field. */
 	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity);
-
-	/** Writes the block entity data for the specified block entity into the packet. */
-	virtual void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
 
 private:
 
@@ -250,6 +254,9 @@ private:
 
 	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
 	cFile m_CommLogFile;
+
+	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
+	void AddReceivedData(cByteBuffer & a_Buffer, ContiguousByteBufferView a_Data);
 
 	/** Handle a complete packet stored in the given buffer. */
 	void HandlePacket(cByteBuffer & a_Buffer);

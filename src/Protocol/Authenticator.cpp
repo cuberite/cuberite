@@ -26,7 +26,7 @@
 
 
 cAuthenticator::cAuthenticator(void) :
-	Super("cAuthenticator"),
+	Super("Authenticator"),
 	m_Server(DEFAULT_AUTH_SERVER),
 	m_Address(DEFAULT_AUTH_ADDRESS),
 	m_ShouldAuthenticate(true)
@@ -67,7 +67,7 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 	}
 
 	cCSLock LOCK(m_CS);
-	m_Queue.push_back(cUser(a_ClientID, a_UserName, a_ServerHash));
+	m_Queue.emplace_back(a_ClientID, a_UserName, a_ServerHash);
 	m_QueueNonempty.Set();
 }
 

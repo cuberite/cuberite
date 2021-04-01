@@ -149,7 +149,7 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i
 
 
 
-cItems cBlockHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const
+cItems cBlockHandler::ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const
 {
 	return cItems();
 }
@@ -188,15 +188,6 @@ bool cBlockHandler::IsClickedThrough(void) const
 bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const
 {
 	return (m_BlockType == E_BLOCK_AIR);
-}
-
-
-
-
-
-bool cBlockHandler::DoesDropOnUnsuitable(void) const
-{
-	return true;
 }
 
 

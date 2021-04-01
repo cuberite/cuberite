@@ -21,7 +21,7 @@ const int CYCLE_MILLISECONDS = 100;
 
 
 cDeadlockDetect::cDeadlockDetect(void) :
-	Super("DeadlockDetect"),
+	Super("Deadlock Detector"),
 	m_IntervalSec(1000)
 {
 }
@@ -51,18 +51,18 @@ cDeadlockDetect::~cDeadlockDetect()
 
 
 
-bool cDeadlockDetect::Start(int a_IntervalSec)
+void cDeadlockDetect::Start(int a_IntervalSec)
 {
 	m_IntervalSec = a_IntervalSec;
 
 	// Read the initial world data:
 	cRoot::Get()->ForEachWorld([=](cWorld & a_World)
-		{
-			SetWorldAge(a_World.GetName(), a_World.GetWorldAge());
-			return false;
-		}
-	);
-	return Super::Start();
+	{
+		SetWorldAge(a_World.GetName(), a_World.GetWorldAge());
+		return false;
+	});
+
+	Super::Start();
 }
 
 
@@ -72,7 +72,7 @@ bool cDeadlockDetect::Start(int a_IntervalSec)
 void cDeadlockDetect::TrackCriticalSection(cCriticalSection & a_CS, const AString & a_Name)
 {
 	cCSLock lock(m_CS);
-	m_TrackedCriticalSections.emplace_back(std::make_pair(&a_CS, a_Name));
+	m_TrackedCriticalSections.emplace_back(&a_CS, a_Name);
 }
 
 

@@ -1569,6 +1569,128 @@ end
 					},
 					Notes = "Sends a BlockChange packet to the client. This can be used to create fake blocks only for that player.",
 				},
+				SendBossBarAdd =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+						{
+							Name = "Title",
+							Type = "cCompositeChat",
+						},
+						{
+							Name = "FractionFilled",
+							Type = "number",
+						},
+						{
+							Name = "Colour",
+							Type = "BossBarColor",
+						},
+						{
+							Name = "DivisionType",
+							Type = "BossBarDivisionType",
+						},
+						{
+							Name = "DarkenSky",
+							Type = "boolean",
+						},
+						{
+							Name = "PlayEndMusic",
+							Type = "boolean",
+						},
+						{
+							Name = "CreateFog",
+							Type = "boolean",
+						},
+					},
+					Notes = "Creates a boss bar on the client's UI. The boss bar is independent of any entity and has a lifetime and properties fully controlled by the plugin. Plugins are responsible for assigning a unique ID and removal.",
+				},
+				SendBossBarUpdateFlags =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+						{
+							Name = "DarkenSky",
+							Type = "boolean",
+						},
+						{
+							Name = "PlayEndMusic",
+							Type = "boolean",
+						},
+						{
+							Name = "CreateFog",
+							Type = "boolean",
+						},
+					},
+					Notes = "Updates a boss bar on the client's UI. Only updates some meta flags for additional effects.",
+				},
+				SendBossBarUpdateStyle =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+						{
+							Name = "Color",
+							Type = "BossBarColor",
+						},
+						{
+							Name = "DivisionType",
+							Type = "BossBarDivisionType",
+						},
+					},
+					Notes = "Updates a boss bar on the client's UI. Only updates the visuals of the Boss Bar.",
+				},
+				SendBossBarUpdateTitle =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+						{
+							Name = "Title",
+							Type = "cCompositeChat",
+						},
+					},
+					Notes = "Updates a boss bar on the client's UI. Only Updates the text at the top.",
+				},
+				SendBossBarRemove =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+					},
+					Notes = "Removes the boss bar with the given ID from the client's UI.",
+				},
+				SendBossBarUpdateHealth =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+						{
+							Name = "FractionFilled",
+							Type = "number",
+						},
+					},
+					Notes = "Updates the health displayed by the boss bar with the given ID.",
+				},
 				SendEntityAnimation =
 				{
 					Params =
@@ -1748,7 +1870,7 @@ end
 							Type = "number",
 						},
 						{
-							Name = "TimeOfDay",
+							Name = "WorldDate",
 							Type = "number",
 						},
 						{
@@ -1756,7 +1878,7 @@ end
 							Type = "boolean",
 						},
 					},
-					Notes = "Sends the specified time update to the client. WorldAge is the total age of the world, in ticks. TimeOfDay is the current day's time, in ticks (0 - 24000). DoDaylightCycle is a bool that specifies whether the client should automatically move the sun (true) or keep it in the same place (false).",
+					Notes = "Sends the specified time update to the client. WorldAge is the total age of the world, in ticks. WorldDate is the current date, in ticks, and is used by the client to calculate the days elapsed (F3 debug overlay's day count) and the time of day (rendered sun position). DoDaylightCycle is a bool that specifies whether the client should automatically move the sun (true) or keep it in the same place (false).",
 				},
 				SetClientBrand =
 				{
@@ -13151,6 +13273,242 @@ end
 			},  -- ConstantGroups
 		},  -- cWindow
 
+		BannerPattern =
+		{
+			Desc = [[
+				An enumeration of banner patterns.
+			]],
+			Constants =
+			{
+				BottomStripe =
+				{
+					Notes = "A base pattern."
+				},
+				TopStripe =
+				{
+					Notes = "A chief pattern."
+				},
+				LeftStripe =
+				{
+					Notes = "A pale dexter pattern."
+				},
+				RightStripe =
+				{
+					Notes = "A pale sinister pattern."
+				},
+				CenterStripeVertical =
+				{
+					Notes = "A pale pattern."
+				},
+				MiddleStripeHorizontal =
+				{
+					Notes = "A fess pattern."
+				},
+				DownRightStripe =
+				{
+					Notes = "A bend pattern."
+				},
+				DownLeftStripe =
+				{
+					Notes = "A bend sinister pattern."
+				},
+				SmallVerticalStripes =
+				{
+					Notes = "A paly pattern."
+				},
+				DiagonalCross =
+				{
+					Notes = "A saltire pattern."
+				},
+				SquareCross =
+				{
+					Notes = "A cross pattern."
+				},
+				LeftOfDiagonal =
+				{
+					Notes = "A per bend sinister pattern."
+				},
+				RightOfUpsideDownDiagonal =
+				{
+					Notes = "A per bend pattern."
+				},
+				LeftOfUpsideDownDiagonal =
+				{
+					Notes = "A per bend inverted pattern."
+				},
+				RightOfDiagonal =
+				{
+					Notes = "A per bend sinister inverted pattern."
+				},
+				VerticalHalfLeft =
+				{
+					Notes = "A per pale pattern."
+				},
+				VerticalHalfRight =
+				{
+					Notes = "A per pale inverted pattern."
+				},
+				HorizontalHalfTop =
+				{
+					Notes = "A per fess pattern."
+				},
+				HorizontalHalfBottom =
+				{
+					Notes = "A per fess inverted pattern."
+				},
+				BottomLeftCorner =
+				{
+					Notes = "A base dexter canton pattern."
+				},
+				BottomRightCorner =
+				{
+					Notes = "A base sinister canton pattern."
+				},
+				TopLeftCorner =
+				{
+					Notes = "A chief dexter canton pattern."
+				},
+				TopRightCorner =
+				{
+					Notes = "A chief sinister canton pattern."
+				},
+				BottomTriangle =
+				{
+					Notes = "A chevron pattern."
+				},
+				TopTriangle =
+				{
+					Notes = "An inverted chevron pattern."
+				},
+				BottomTriangleSawtooth =
+				{
+					Notes = "A base indented pattern."
+				},
+				TopTriangleSawtooth =
+				{
+					Notes = "A chief indented pattern."
+				},
+				MiddleCircle =
+				{
+					Notes = "A roundel pattern."
+				},
+				MiddleRhombus =
+				{
+					Notes = "A lozenge pattern."
+				},
+				Border =
+				{
+					Notes = "A bordure pattern."
+				},
+				CurlyBorder =
+				{
+					Notes = "A bordure indented pattern."
+				},
+				Brick =
+				{
+					Notes = "A field masoned pattern."
+				},
+				Gradient =
+				{
+					Notes = "A gradient pattern."
+				},
+				GradientUpsideDown =
+				{
+					Notes = "A base gradient pattern."
+				},
+				Creeper =
+				{
+					Notes = "A creeper charge pattern."
+				},
+				Skull =
+				{
+					Notes = "A skull charge pattern."
+				},
+				Flower =
+				{
+					Notes = "A flower charge pattern."
+				},
+				Mojang =
+				{
+					Notes = "A... thing."
+				},
+				Globe =
+				{
+					Notes = "A globe."
+				},
+				Piglin =
+				{
+					Notes = "A snoot."
+				},
+			},
+		},
+		BossBarColor =
+		{
+			Desc = [[
+				An enumeration of boss bar display colours which can be used with {{cClientHandle#SendBossBarAdd|SendBossBarAdd}}.
+			]],
+			Constants =
+			{
+				Pink =
+				{
+					Notes = "A pink boss bar."
+				},
+				Blue =
+				{
+					Notes = "A blue boss bar."
+				},
+				Red =
+				{
+					Notes = "A red boss bar."
+				},
+				Green =
+				{
+					Notes = "A green boss bar."
+				},
+				Yellow =
+				{
+					Notes = "A yellow boss bar."
+				},
+				Purple =
+				{
+					Notes = "A purple boss bar."
+				},
+				White =
+				{
+					Notes = "A white boss bar."
+				},
+			},
+		},
+		BossBarDivisionType =
+		{
+			Desc = [[
+				An enumeration of boss bar division types which can be used with {{cClientHandle#SendBossBarAdd|SendBossBarAdd}}.
+				These constants control the number of notches the bar itself renders with.
+			]],
+			Constants =
+			{
+				None =
+				{
+					Notes = "A completely smooth boss bar."
+				},
+				SixNotches =
+				{
+					Notes = "A six-notch'd boss bar."
+				},
+				TenNotches =
+				{
+					Notes = "A ten-notch'd boss bar."
+				},
+				TwelveNotches =
+				{
+					Notes = "A twelve notch'd boss bar."
+				},
+				TwentyNotches =
+				{
+					Notes = "A twenty notch'd boss bar."
+				},
+			},
+		},
 		EffectID =
 		{
 			Desc = [[

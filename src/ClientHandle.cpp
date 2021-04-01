@@ -49,10 +49,6 @@
 /** Maximum number of bytes that a chat message sent by a player may consist of */
 #define MAX_CHAT_MSG_LENGTH 1024
 
-/** The interval for sending pings to clients.
-Vanilla sends one ping every 1 second. */
-static const std::chrono::milliseconds PING_TIME_MS = std::chrono::milliseconds(1000);
-
 
 
 
@@ -100,7 +96,6 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 {
 	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
-	m_PingStartTime = std::chrono::steady_clock::now();
 
 	LOGD("New ClientHandle created at %p", static_cast<void *>(this));
 }
@@ -135,18 +130,10 @@ void cClientHandle::Destroy(void)
 
 	{
 		cCSLock Lock(m_CSOutgoingData);
-		m_Link->Shutdown();  // Cleanly close the connection
-		m_Link.reset();  // Release the strong reference cTCPLink holds to ourself
+		m_Link->Send(m_OutgoingData.data(), m_OutgoingData.size());  // Flush remaining data.
+		m_Link->Shutdown();  // Cleanly close the connection.
+		m_Link.reset();  // Release the strong reference cTCPLink holds to ourself.
 	}
-}
-
-
-
-
-
-void cClientHandle::GenerateOfflineUUID(void)
-{
-	m_UUID = GenerateOfflineUUID(m_Username);
 }
 
 
@@ -231,6 +218,34 @@ bool cClientHandle::IsUUIDOnline(const cUUID & a_UUID)
 
 
 
+void cClientHandle::ProcessProtocolOut()
+{
+	decltype(m_OutgoingData) OutgoingData;
+	{
+		cCSLock Lock(m_CSOutgoingData);
+
+		// Bail out when there's nothing to send to avoid TCPLink::Send overhead:
+		if (m_OutgoingData.empty())
+		{
+			return;
+		}
+
+		std::swap(OutgoingData, m_OutgoingData);
+	}
+
+	// Due to cTCPLink's design of holding a strong pointer to ourself, we need to explicitly reset m_Link.
+	// This means we need to check it's not nullptr before trying to send, but also capture the link,
+	// to prevent it being reset between the null check and the Send:
+	if (auto Link = m_Link; Link != nullptr)
+	{
+		Link->Send(OutgoingData.data(), OutgoingData.size());
+	}
+}
+
+
+
+
+
 void cClientHandle::Kick(const AString & a_Reason)
 {
 	if (m_State >= csAuthenticating)  // Don't log pings
@@ -294,7 +309,19 @@ void cClientHandle::Authenticate(const AString & a_Name, const cUUID & a_UUID, c
 void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
 {
 	// Serverside spawned player (so data are loaded).
-	auto Player = std::make_unique<cPlayer>(shared_from_this());
+	std::unique_ptr<cPlayer> Player;
+
+	try
+	{
+		Player = std::make_unique<cPlayer>(shared_from_this());
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING("Error reading player \"%s\": %s", GetUsername().c_str(), Oops.what());
+		Kick("Contact an operator.\n\nYour player's save files could not be parsed.\nTo avoid data loss you are prevented from joining.");
+		return;
+	}
+
 	m_Player = Player.get();
 
 	/*
@@ -1013,7 +1040,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 		if (
 			cChunkDef::IsValidHeight(BlockY) &&
-			cBlockHandler::For(m_Player->GetWorld()->GetBlock(BlockX, BlockY, BlockZ)).IsClickedThrough()
+			cBlockHandler::For(m_Player->GetWorld()->GetBlock({ BlockX, BlockY, BlockZ })).IsClickedThrough()
 		)
 		{
 			a_BlockX = BlockX;
@@ -1150,7 +1177,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	BLOCKTYPE DiggingBlock;
 	NIBBLETYPE DiggingMeta;
-	m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, DiggingBlock, DiggingMeta);
+	m_Player->GetWorld()->GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, DiggingBlock, DiggingMeta);
 
 	if (
 		m_Player->IsGameModeCreative() &&
@@ -1235,7 +1262,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	BLOCKTYPE DugBlock;
 	NIBBLETYPE DugMeta;
-	m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, DugBlock, DugMeta);
+	m_Player->GetWorld()->GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, DugBlock, DugMeta);
 
 	if (!m_Player->IsGameModeCreative())
 	{
@@ -1447,9 +1474,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 {
 	if ((a_Message.size()) > MAX_CHAT_MSG_LENGTH)
 	{
-		this->Kick(std::string("Please don't exceed the maximum message length of ")
-			+ std::to_string(MAX_CHAT_MSG_LENGTH)
-		);
+		Kick("Please don't exceed the maximum message length of " + std::to_string(MAX_CHAT_MSG_LENGTH));
 		return;
 	}
 	// We no longer need to postpone message processing, because the messages already arrive in the Tick thread
@@ -1909,14 +1934,8 @@ void cClientHandle::SendData(const ContiguousByteBufferView a_Data)
 		return;
 	}
 
-	// Due to cTCPLink's design of holding a strong pointer to ourself, we need to explicitly reset m_Link.
-	// This means we need to check it's not nullptr before trying to send, but also capture the link,
-	// to prevent it being reset between the null check and the Send:
-	if (auto Link = m_Link; Link != nullptr)
-	{
-		cCSLock Lock(m_CSOutgoingData);
-		Link->Send(a_Data.data(), a_Data.size());
-	}
+	cCSLock Lock(m_CSOutgoingData);
+	m_OutgoingData += a_Data;
 }
 
 
@@ -1933,9 +1952,12 @@ void cClientHandle::RemoveFromWorld(void)
 		m_SentChunks.clear();
 	}
 
+	// Flush outgoing data:
+	ProcessProtocolOut();
+
 	// No need to send Unload Chunk packets, the client unloads automatically.
 
-	// Here, we set last streamed values to bogus ones so everything is resent
+	// Here, we set last streamed values to bogus ones so everything is resent:
 	m_LastStreamedChunkX = 0x7fffffff;
 	m_LastStreamedChunkZ = 0x7fffffff;
 }
@@ -1987,7 +2009,7 @@ void cClientHandle::Tick(float a_Dt)
 	// anticheat fastbreak
 	if (m_HasStartedDigging)
 	{
-		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock(m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ);
+		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock({ m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ });
 		m_BreakProgress += m_Player->GetMiningProgressPerTick(Block);
 	}
 
@@ -2052,10 +2074,11 @@ void cClientHandle::Tick(float a_Dt)
 	// Send a ping packet:
 	if (m_State == csPlaying)
 	{
-		if ((m_PingStartTime + PING_TIME_MS <= std::chrono::steady_clock::now()))
+		const auto Now = std::chrono::steady_clock::now();
+		if ((m_PingStartTime + std::chrono::seconds(2)) <= Now)  // 2 second interval between pings
 		{
 			m_PingID++;
-			m_PingStartTime = std::chrono::steady_clock::now();
+			m_PingStartTime = Now;
 			m_Protocol->SendKeepAlive(m_PingID);
 		}
 	}
@@ -2104,6 +2127,7 @@ void cClientHandle::Tick(float a_Dt)
 void cClientHandle::ServerTick(float a_Dt)
 {
 	ProcessProtocolIn();
+	ProcessProtocolOut();
 
 	m_TicksSinceLastPacket += 1;
 	if (m_TicksSinceLastPacket > 600)  // 30 seconds
@@ -2192,6 +2216,60 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 		Lock.Unlock();
 		m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
 	}
+}
+
+
+
+
+
+void cClientHandle::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	m_Protocol->SendBossBarAdd(a_UniqueID, a_Title, a_FractionFilled, a_Color, a_DivisionType, a_DarkenSky, a_PlayEndMusic, a_CreateFog);
+}
+
+
+
+
+
+void cClientHandle::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	m_Protocol->SendBossBarUpdateFlags(a_UniqueID, a_DarkenSky, a_PlayEndMusic, a_CreateFog);
+}
+
+
+
+
+
+void cClientHandle::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType)
+{
+	m_Protocol->SendBossBarUpdateStyle(a_UniqueID, a_Color, a_DivisionType);
+}
+
+
+
+
+
+void cClientHandle::SendBossBarUpdateTitle(UInt32 a_UniqueID, const cCompositeChat & a_Title)
+{
+	m_Protocol->SendBossBarUpdateTitle(a_UniqueID, a_Title);
+}
+
+
+
+
+
+void cClientHandle::SendBossBarRemove(UInt32 a_UniqueID)
+{
+	m_Protocol->SendBossBarRemove(a_UniqueID);
+}
+
+
+
+
+
+void cClientHandle::SendBossBarUpdateHealth(UInt32 a_UniqueID, float a_FractionFilled)
+{
+	m_Protocol->SendBossBarUpdateHealth(a_UniqueID, a_FractionFilled);
 }
 
 
@@ -2653,6 +2731,15 @@ void cClientHandle::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 
 
 
+void cClientHandle::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
+{
+	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
+}
+
+
+
+
+
 void cClientHandle::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 {
 	m_Protocol->SendPlayerListUpdateGameMode(a_Player);
@@ -2662,18 +2749,9 @@ void cClientHandle::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 
 
 
-void cClientHandle::SendPlayerListUpdatePing(const cPlayer & a_Player)
+void cClientHandle::SendPlayerListUpdatePing()
 {
-	m_Protocol->SendPlayerListUpdatePing(a_Player);
-}
-
-
-
-
-
-void cClientHandle::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
-{
-	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
+	m_Protocol->SendPlayerListUpdatePing();
 }
 
 
@@ -2959,9 +3037,9 @@ void cClientHandle::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_
 
 
 
-void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
+void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_WorldDate, bool a_DoDaylightCycle)
 {
-	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay, a_DoDaylightCycle);
+	m_Protocol->SendTimeUpdate(a_WorldAge, a_WorldDate, a_DoDaylightCycle);
 }
 
 
@@ -3255,20 +3333,22 @@ bool cClientHandle::SetState(eState a_NewState)
 void cClientHandle::ProcessProtocolIn(void)
 {
 	// Process received network data:
-	AString IncomingData;
+	decltype(m_IncomingData) IncomingData;
 	{
 		cCSLock Lock(m_CSIncomingData);
-		std::swap(IncomingData, m_IncomingData);
-	}
 
-	if (IncomingData.empty())
-	{
-		return;
+		// Bail out when nothing was received:
+		if (m_IncomingData.empty())
+		{
+			return;
+		}
+
+		std::swap(IncomingData, m_IncomingData);
 	}
 
 	try
 	{
-		m_Protocol.HandleIncomingData(*this, IncomingData);
+		m_Protocol.HandleIncomingData(*this, std::move(IncomingData));
 	}
 	catch (const std::exception & Oops)
 	{
@@ -3296,7 +3376,7 @@ void cClientHandle::OnReceivedData(const char * a_Data, size_t a_Length)
 
 	// Queue the incoming data to be processed in the tick thread:
 	cCSLock Lock(m_CSIncomingData);
-	m_IncomingData.append(a_Data, a_Length);
+	m_IncomingData.append(reinterpret_cast<const std::byte *>(a_Data), a_Length);
 }
 
 

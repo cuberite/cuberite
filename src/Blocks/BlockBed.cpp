@@ -158,19 +158,19 @@ bool cBlockBedHandler::OnUse(
 
 void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange) const
 {
-	a_Player.GetWorld()->DoWithBedAt(a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(), [&](cBedEntity & a_Bed)
-		{
-			a_Bed.SetColor(a_Player.GetEquippedItem().m_ItemDamage);
-			return true;
-		}
-	);
+	a_Player.GetWorld()->DoWithBlockEntityAt(a_BlockChange.GetAbsolutePos(), [&a_Player](cBlockEntity & a_BlockEntity)
+	{
+		ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_BED);
+		static_cast<cBedEntity &>(a_BlockEntity).SetColor(a_Player.GetEquippedItem().m_ItemDamage);
+		return false;
+	});
 }
 
 
 
 
 
-cItems cBlockBedHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const
+cItems cBlockBedHandler::ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const
 {
 	// Drops handled by the block entity:
 	return {};
