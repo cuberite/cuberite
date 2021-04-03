@@ -188,7 +188,6 @@ bool cItem::DamageItem(short a_Amount)
 	}
 
 	m_ItemDamage += a_Amount;
-
 	return (m_ItemDamage > MaxDamage);
 }
 

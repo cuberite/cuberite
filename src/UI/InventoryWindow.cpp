@@ -6,7 +6,6 @@
 #include "Globals.h"
 #include "InventoryWindow.h"
 #include "SlotArea.h"
-#include "../Entities/Player.h"
 
 
 
@@ -49,11 +48,6 @@ void cInventoryWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer 
 	}
 	else if (a_ClickedArea == m_SlotAreas[1])
 	{
-		if ((a_ItemStack.m_ItemType == E_ITEM_ELYTRA) && a_Player.IsElytraFlying())
-		{
-			a_Player.SetElytraFlight(false);
-		}
-
 		// Armor Area
 		AreasInOrder.push_back(m_SlotAreas[2]);  /* Inventory */
 		AreasInOrder.push_back(m_SlotAreas[3]);  /* Hotbar    */
@@ -73,7 +67,6 @@ void cInventoryWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer 
 		AreasInOrder.push_back(m_SlotAreas[2]);  /* Inventory */
 		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
-
 }
 
 
