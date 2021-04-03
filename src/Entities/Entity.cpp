@@ -59,6 +59,8 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 	m_IsInLava(false),
 	m_IsInWater(false),
 	m_IsHeadInWater(false),
+	m_Width(a_Width),
+	m_Height(a_Height),
 	m_AirLevel(MAX_AIR_LEVEL),
 	m_AirTickTimer(DROWNING_TICKS),
 	m_TicksAlive(0),
@@ -69,8 +71,6 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 	m_Position(a_Pos),
 	m_WaterSpeed(0, 0, 0),
 	m_Mass (0.001),  // Default 1g
-	m_Width(a_Width),
-	m_Height(a_Height),
 	m_InvulnerableTicks(0)
 {
 	m_WorldChangeInfo.m_NewWorld = nullptr;
@@ -2028,15 +2028,6 @@ void cEntity::SetHeadYaw(double a_HeadYaw)
 
 
 
-void cEntity::SetHeight(double a_Height)
-{
-	m_Height = a_Height;
-}
-
-
-
-
-
 void cEntity::SetMass(double a_Mass)
 {
 	// Make sure that mass is not zero. 1g is the default because we
@@ -2112,15 +2103,6 @@ void cEntity::SetSpeedY(double a_SpeedY)
 void cEntity::SetSpeedZ(double a_SpeedZ)
 {
 	SetSpeed(m_Speed.x, m_Speed.y, a_SpeedZ);
-}
-
-
-
-
-
-void cEntity::SetWidth(double a_Width)
-{
-	m_Width = a_Width;
 }
 
 

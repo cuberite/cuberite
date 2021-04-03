@@ -574,12 +574,9 @@ void cClientHandle::HandleNPCTrade(int a_SlotNum)
 
 
 
-void cClientHandle::HandleOpenHorseInventory(UInt32 a_EntityID)
+void cClientHandle::HandleOpenHorseInventory()
 {
-	if (m_Player->GetUniqueID() == a_EntityID)
-	{
-		m_Player->OpenHorseInventory();
-	}
+	m_Player->OpenHorseInventory();
 }
 
 
@@ -659,6 +656,15 @@ void cClientHandle::HandleCreativeInventory(Int16 a_SlotNum, const cItem & a_Hel
 	}
 
 	m_Player->GetWindow()->Clicked(*m_Player, 0, a_SlotNum, a_ClickAction, a_HeldItem);
+}
+
+
+
+
+
+void cClientHandle::HandleCrouch(const bool a_IsCrouching)
+{
+	m_Player->SetCrouch(a_IsCrouching);
 }
 
 
@@ -749,7 +755,7 @@ void cClientHandle::HandlePlayerAbilities(bool a_IsFlying, float FlyingSpeed, fl
 
 
 
-void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround)
+void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround)
 {
 	if (m_Player->IsFrozen())
 	{
@@ -759,7 +765,6 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 	Vector3d NewPosition(a_PosX, a_PosY, a_PosZ);
 	Vector3d OldPosition = GetPlayer()->GetPosition();
-	double OldStance = GetPlayer()->GetStance();
 	auto PreviousIsOnGround = GetPlayer()->IsOnGround();
 
 	#ifdef __clang__
@@ -769,7 +774,6 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 	if (
 		(OldPosition == NewPosition) &&
-		(OldStance == a_Stance) &&
 		(PreviousIsOnGround == a_IsOnGround)
 	)
 	{
@@ -799,7 +803,6 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 	// TODO: Official server refuses position packets too far away from each other, kicking "hacked" clients; we should, too
 
 	m_Player->SetPosition(NewPosition);
-	m_Player->SetStance(a_Stance);
 	m_Player->SetTouchGround(a_IsOnGround);
 	m_Player->UpdateMovementStats(NewPosition - OldPosition, PreviousIsOnGround);
 }
@@ -1513,9 +1516,9 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 
 
 
-void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround)
+void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
-	HandlePlayerPos(a_PosX, a_PosY, a_PosZ, a_Stance, a_IsOnGround);
+	HandlePlayerPos(a_PosX, a_PosY, a_PosZ, a_IsOnGround);
 	HandlePlayerLook(a_Rotation, a_Pitch, a_IsOnGround);
 }
 
@@ -1561,6 +1564,24 @@ void cClientHandle::HandleSpectate(const cUUID & a_PlayerUUID)
 		m_Player->TeleportToEntity(a_ToSpectate);
 		return true;
 	});
+}
+
+
+
+
+
+void cClientHandle::HandleSprint(const bool a_IsSprinting)
+{
+	m_Player->SetSprint(a_IsSprinting);
+}
+
+
+
+
+
+void cClientHandle::HandleStartElytraFlight()
+{
+	m_Player->SetElytraFlight(true);
 }
 
 
@@ -1831,47 +1852,11 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 
 
 
-void cClientHandle::HandleEntityCrouch(UInt32 a_EntityID, bool a_IsCrouching)
+void cClientHandle::HandleLeaveBed()
 {
-	if (a_EntityID != m_Player->GetUniqueID())
-	{
-		// We should only receive entity actions from the entity that is performing the action
-		return;
-	}
-
-	m_Player->SetCrouch(a_IsCrouching);
-}
-
-
-
-
-
-void cClientHandle::HandleEntityLeaveBed(UInt32 a_EntityID)
-{
-	if (a_EntityID != m_Player->GetUniqueID())
-	{
-		// We should only receive entity actions from the entity that is performing the action
-		return;
-	}
-
-	cChunkInterface Interface(GetPlayer()->GetWorld()->GetChunkMap());
-	cBlockBedHandler::SetBedOccupationState(Interface, GetPlayer()->GetLastBedPos(), false);
-	GetPlayer()->SetIsInBed(false);
-}
-
-
-
-
-
-void cClientHandle::HandleEntitySprinting(UInt32 a_EntityID, bool a_IsSprinting)
-{
-	if (a_EntityID != m_Player->GetUniqueID())
-	{
-		// We should only receive entity actions from the entity that is performing the action
-		return;
-	}
-
-	m_Player->SetSprint(a_IsSprinting);
+	cChunkInterface Interface(m_Player->GetWorld()->GetChunkMap());
+	cBlockBedHandler::SetBedOccupationState(Interface, m_Player->GetLastBedPos(), false);
+	m_Player->SetIsInBed(false);
 }
 
 

@@ -33,16 +33,7 @@ class cPlayer;
 class cClientHandle;
 class cEntity;
 class cChunkGenerator;  // The thread responsible for generating chunks
-class cBeaconEntity;
-class cBrewingstandEntity;
-class cChestEntity;
 class cCuboid;
-class cDispenserEntity;
-class cFlowerPotEntity;
-class cFurnaceEntity;
-class cHopperEntity;
-class cNoteEntity;
-class cMobHeadEntity;
 class cCompositeChat;
 class cDeadlockDetect;
 class cUUID;

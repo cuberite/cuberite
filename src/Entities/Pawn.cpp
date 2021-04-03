@@ -418,6 +418,11 @@ void cPawn::HandleFalling(void)
 		auto Damage = static_cast<int>(m_LastGroundHeight - GetPosY() - 3.0);
 		if ((Damage > 0) && !FallDamageAbsorbed)
 		{
+			if (IsElytraFlying())
+			{
+				Damage = static_cast<int>(static_cast<float>(Damage) * 0.33);
+			}
+
 			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
 
 			// Fall particles

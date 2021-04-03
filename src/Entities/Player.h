@@ -27,10 +27,56 @@ class cTeam;
 class cPlayer:
 	public cPawn
 {
-
 	// tolua_end
 
 	using Super = cPawn;
+
+	/** Tag representing a sneaking pose. */
+	struct BodyStanceCrouching
+	{
+		BodyStanceCrouching(cPlayer & a_Player);
+	};
+
+	/** Tag representing a sleeping pose.
+	Set by a right click on unoccupied bed, unset by a time fast forward or teleport. */
+	struct BodyStanceSleeping
+	{
+		BodyStanceSleeping(cPlayer & a_Player);
+	};
+
+	/** Tag representing a sprinting pose. */
+	struct BodyStanceSprinting
+	{
+	};
+
+	/** Tag representing the neutral stance. */
+	struct BodyStanceStanding
+	{
+		BodyStanceStanding(cPlayer & a_Player);
+	};
+
+	/** Tag representing a swimming or elytra flying pose. */
+	struct BodyStanceGliding
+	{
+		BodyStanceGliding(cPlayer & a_Player);
+
+		cTickTime TicksElytraFlying;
+	};
+
+	/*
+	struct HandStanceNeutral
+	{
+	};
+
+	struct HandStandChargingBow
+	{
+		int m_BowCharge;
+	};
+
+	struct HandStanceEating
+	{
+	};
+	*/
 
 	// tolua_begin
 
@@ -105,11 +151,8 @@ public:
 	bool IsChargingBow(void) const { return m_IsChargingBow; }
 
 	void SetTouchGround(bool a_bTouchGround);
-	inline void SetStance(const double a_Stance) { m_Stance = a_Stance; }
 	double GetEyeHeight(void) const;  // tolua_export
 	Vector3d GetEyePosition(void) const;  // tolua_export
-	virtual bool IsOnGround(void) const override { return m_bTouchGround; }
-	inline double GetStance(void) const { return m_Stance; }  // tolua_export
 	inline cInventory &       GetInventory(void)       { return m_Inventory; }  // tolua_export
 	inline const cInventory & GetInventory(void) const { return m_Inventory; }
 
@@ -333,8 +376,8 @@ public:
 	/** Returns true if the player is currently flying */
 	bool IsFlying(void) const { return m_IsFlying; }
 
-	/** Returns true if a player is sleeping in a bed */
-	bool IsInBed(void) const { return m_bIsInBed; }
+	/** Returns true if a player is sleeping in a bed. */
+	bool IsInBed(void) const;
 
 	/** Returns true if the player has thrown out a floater */
 	bool IsFishing(void) const { return m_IsFishing; }
@@ -345,21 +388,16 @@ public:
 
 	// tolua_end
 
+	/** Returns true if a player is standing normally, that is, in a neutral pose. */
+	bool IsStanding() const;
+
 	/** Tosses a list of items. */
 	void TossItems(const cItems & a_Items);
 
-	/** Sets a player's in-bed state
-	We can't be sure plugins will keep this value updated, so no exporting
-	If value is false (not in bed), will update players of the fact that they have been ejected from the bed
-	*/
-	void SetIsInBed(bool a_Flag)
-	{
-		m_bIsInBed = a_Flag;
-		if (!a_Flag)
-		{
-			GetWorld()->BroadcastEntityAnimation(*this, 2);
-		}
-	}
+	/** Sets a player's in-bed state.
+	We can't be sure plugins will keep this value updated, so no exporting.
+	If value is false (not in bed), will update players of the fact that they have been ejected from the bed. */
+	void SetIsInBed(bool a_IsInBed);
 
 	/** Starts eating the currently equipped item. Resets the eating timer and sends the proper animation packet */
 	void StartEating(void);
@@ -377,7 +415,7 @@ public:
 	void Respawn(void);  // tolua_export
 
 	void SetVisible( bool a_bVisible);  // tolua_export
-	bool IsVisible(void) const { return m_bVisible; }  // tolua_export
+	bool IsVisible(void) const { return m_IsVisible; }  // tolua_export
 
 	/** Saves all player data, such as inventory, to JSON. */
 	void SaveToDisk(void);
@@ -450,14 +488,17 @@ public:
 	/** Sets the flying relative maximum speed. Sends the update to player, if needed. */
 	void SetFlyingMaxSpeed(double a_Speed);
 
-	/** Sets the crouch status, broadcasts to all visible players */
-	void SetCrouch(bool a_IsCrouched);
+	/** Starts or stops crouching, if our current body stance permits, broadcasting the state change. */
+	void SetCrouch(bool a_ShouldCrouch);
 
-	/** Starts or stops sprinting, sends the max speed update to the client, if needed */
-	void SetSprint(bool a_IsSprinting);
+	/** Starts or stops elytra flight, if our current body stance permits, broadcasting the state change. */
+	void SetElytraFlight(bool a_ShouldElytraFly);
 
-	/** Flags the player as flying */
-	void SetFlying(bool a_IsFlying);
+	/** Starts or stops flying, broadcasting the state change. */
+	void SetFlying(bool a_ShouldFly);
+
+	/** Starts or stops sprinting, if our current body stance permits, broadcasting the state change. */
+	void SetSprint(bool a_ShouldSprint);
 
 	/** If true the player can fly even when he's not in creative. */
 	void SetCanFly(bool a_CanFly);
@@ -501,7 +542,7 @@ public:
 	// tolua_begin
 
 	/** Returns wheter the player can fly or not. */
-	virtual bool CanFly(void) const { return m_CanFly; }
+	virtual bool CanFly(void) const { return m_IsFlightCapable; }
 
 	/** (Re)loads the rank and permissions from the cRankManager.
 	Loads the m_Rank, m_Permissions, m_MsgPrefix, m_MsgSuffix and m_MsgNameColorCode members. */
@@ -541,14 +582,6 @@ public:
 	*/
 	void NotifyNearbyWolves(cPawn * a_Opponent, bool a_IsPlayerInvolved);
 
-	// cEntity overrides:
-	virtual bool IsCrouched (void) const override { return m_IsCrouched; }
-	virtual bool IsSprinting(void) const override { return m_IsSprinting; }
-	virtual bool IsRclking  (void) const override { return IsEating() || IsChargingBow(); }
-
-	virtual void AttachTo(cEntity * a_AttachTo) override;
-	virtual void Detach(void) override;
-
 	/** Returns the progress mined per tick for the block a_Block as a fraction
 	(1 would be completely mined)
 	Depends on hardness values so check those are correct.
@@ -565,17 +598,37 @@ public:
 	If the item is already known, does nothing. */
 	void AddKnownItem(const cItem & a_Item);
 
+	/** Update a player's size, for example, on body stance changes. */
+	void SetSize(float a_Width, float a_Height);
+
 	// cEntity overrides:
+	virtual void AttachTo(cEntity * a_AttachTo) override;
+	virtual void Detach(void) override;
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
 	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
 	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
 	virtual cItem GetEquippedLeggings(void) const override { return m_Inventory.GetEquippedLeggings(); }
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
 	virtual cItem GetOffHandEquipedItem(void) const override { return m_Inventory.GetShieldSlot(); }
+	virtual bool IsCrouched(void) const override;
+	virtual bool IsElytraFlying(void) const override;
+	virtual bool IsOnGround(void) const override { return m_bTouchGround; }
+	virtual bool IsSprinting(void) const override;
 
 private:
 
+	/** Xp Level stuff */
+	enum
+	{
+		XP_TO_LEVEL15 = 255,
+		XP_PER_LEVEL_TO15 = 17,
+		XP_TO_LEVEL30 = 825
+	} ;
+
 	typedef std::vector<std::vector<AString> > AStringVectorVector;
+
+	/** The current body stance the player has adopted. */
+	std::variant<BodyStanceCrouching, BodyStanceSleeping, BodyStanceSprinting, BodyStanceStanding, BodyStanceGliding> m_BodyStance;
 
 	/** The name of the rank assigned to this player. */
 	AString m_Rank;
@@ -599,16 +652,6 @@ private:
 	AString m_MsgPrefix, m_MsgSuffix;
 	AString m_MsgNameColorCode;
 
-	/** Xp Level stuff */
-	enum
-	{
-		XP_TO_LEVEL15 = 255,
-		XP_PER_LEVEL_TO15 = 17,
-		XP_TO_LEVEL30 = 825
-	} ;
-
-	bool m_bVisible;
-
 	// Food-related variables:
 	/** Represents the food bar, one point equals half a "drumstick" */
 	int m_FoodLevel;
@@ -621,8 +664,6 @@ private:
 
 	/** A "buffer" which adds up hunger before it is substracted from m_FoodSaturationLevel or m_FoodLevel. Each action adds a little */
 	double m_FoodExhaustionLevel;
-
-	double m_Stance;
 
 	/** Stores the player's inventory, consisting of crafting grid, hotbar, and main slots */
 	cInventory m_Inventory;
@@ -656,12 +697,6 @@ private:
 
 	cSlotNums m_InventoryPaintSlots;
 
-	/** If true, we are locking m_Position to m_FrozenPosition. */
-	bool m_IsFrozen;
-
-	/** Was the player frozen manually by a plugin or automatically by the server? */
-	bool m_IsManuallyFrozen;
-
 	/** Max speed, relative to the game default.
 	1 means regular speed, 2 means twice as fast, 0.5 means half-speed.
 	Default value is 1. */
@@ -677,12 +712,25 @@ private:
 	Default value is 1. */
 	double m_FlyingMaxSpeed;
 
-	bool m_IsCrouched;
-	bool m_IsSprinting;
-	bool m_IsFlying;
+	bool m_IsChargingBow;
 	bool m_IsFishing;
 
-	bool m_CanFly;  // If this is true the player can fly. Even if he is not in creative.
+	/** If this is true the player can fly. Even if he is not in creative. */
+	bool m_IsFlightCapable;
+
+	bool m_IsFlying;
+
+	/** If true, we are locking m_Position to m_FrozenPosition. */
+	bool m_IsFrozen;
+
+	/** Was the player frozen manually by a plugin or automatically by the server? */
+	bool m_IsManuallyFrozen;
+
+	/** Flag used by food handling system to determine whether a teleport has just happened.
+	Will not apply food penalties if found to be true; will set to false after processing. */
+	bool m_IsTeleporting;
+
+	bool m_IsVisible;
 
 	/** The world tick in which eating will be finished. -1 if not eating */
 	Int64 m_EatingFinishTick;
@@ -692,8 +740,7 @@ private:
 	int m_CurrentXp;
 	unsigned int m_EnchantmentSeed;
 
-	bool m_IsChargingBow;
-	int  m_BowCharge;
+	int m_BowCharge;
 
 	UInt32 m_FloaterID;
 
@@ -701,18 +748,9 @@ private:
 
 	cStatManager m_Stats;
 
-	/** Flag representing whether the player is currently in a bed
-	Set by a right click on unoccupied bed, unset by a time fast forward or teleport */
-	bool m_bIsInBed;
-
 	/** How long till the player's inventory will be saved
 	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
 	unsigned int m_TicksUntilNextSave;
-
-	/** Flag used by food handling system to determine whether a teleport has just happened
-	Will not apply food penalties if found to be true; will set to false after processing
-	*/
-	bool m_bIsTeleporting;
 
 	AString m_CustomName;
 
@@ -769,6 +807,7 @@ private:
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual float GetEnchantmentBlastKnockbackReduction() override;
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
+	virtual bool IsRclking(void) const override { return IsEating() || IsChargingBow(); }
 	virtual void OnAddToWorld(cWorld & a_World) override;
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 	virtual void SpawnOn(cClientHandle & a_Client) override;

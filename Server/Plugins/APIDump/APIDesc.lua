@@ -4071,6 +4071,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity is sprinting. Entities that cannot sprint return always false",
 				},
+				IsElytraFlying =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is flying with an elytra. Entities that cannot fly with an elytra return always false",
+				},
 				IsSubmerged =
 				{
 					Returns =
@@ -10537,16 +10547,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the player's current set of skin part flags.  This is a bitwise OR of various {{Globals#eSkinPart|eSkinPart}} constants.  Note that HasSkinPart may be easier to use in most situations.",
 				},
-				GetStance =
-				{
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the player's stance (Y-pos of player's eyes)",
-				},
 				GetTeam =
 				{
 					Returns =
@@ -11276,6 +11276,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the skin part flags of the player.  The value should be a bitwise OR of several {{Globals#eSkinPart|eSkinPart}} constants.",
+				},
+				SetElytraFlight =
+				{
+					Params =
+					{
+						{
+							Name = "IsElytraFlying",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether the player is elytra flying or not.",
 				},
 				SetSprintingMaxSpeed =
 				{
