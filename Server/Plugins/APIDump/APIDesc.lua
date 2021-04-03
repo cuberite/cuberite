@@ -4079,7 +4079,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the entity is elytra flying. Entities that cannot fly with elytra return always false",
+					Notes = "Returns true if the entity is flying with an elytra. Entities that cannot fly with an elytra return always false",
 				},
 				IsSubmerged =
 				{
@@ -10344,16 +10344,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the height of the player's eyes, in absolute coords",
 				},
-				GetRelativeEyeHeight =
-				{
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the height of the player's eyes, in relative coords",
-				},
 				GetEyePosition =
 				{
 					Returns =
@@ -10556,16 +10546,6 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the player's current set of skin part flags.  This is a bitwise OR of various {{Globals#eSkinPart|eSkinPart}} constants.  Note that HasSkinPart may be easier to use in most situations.",
-				},
-				GetStance =
-				{
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the player's stance (Y-pos of player's eyes)",
 				},
 				GetTeam =
 				{

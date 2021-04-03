@@ -574,24 +574,9 @@ void cClientHandle::HandleNPCTrade(int a_SlotNum)
 
 
 
-void cClientHandle::HandleOpenHorseInventory(UInt32 a_EntityID)
+void cClientHandle::HandleOpenHorseInventory()
 {
-	if (m_Player->GetUniqueID() == a_EntityID)
-	{
-		m_Player->OpenHorseInventory();
-	}
-}
-
-
-
-
-
-void cClientHandle::HandleStartFallFlying(UInt32 a_EntityID)
-{
-	if (m_Player->GetUniqueID() == a_EntityID)
-	{
-		m_Player->StartFallFlying();
-	}
+	m_Player->OpenHorseInventory();
 }
 
 
@@ -671,6 +656,15 @@ void cClientHandle::HandleCreativeInventory(Int16 a_SlotNum, const cItem & a_Hel
 	}
 
 	m_Player->GetWindow()->Clicked(*m_Player, 0, a_SlotNum, a_ClickAction, a_HeldItem);
+}
+
+
+
+
+
+void cClientHandle::HandleCrouch(const bool a_IsCrouching)
+{
+	m_Player->SetCrouch(a_IsCrouching);
 }
 
 
@@ -809,7 +803,6 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 	// TODO: Official server refuses position packets too far away from each other, kicking "hacked" clients; we should, too
 
 	m_Player->SetPosition(NewPosition);
-	m_Player->SetStance(NewPosition.y + m_Player->GetRelativeEyeHeight());
 	m_Player->SetTouchGround(a_IsOnGround);
 	m_Player->UpdateMovementStats(NewPosition - OldPosition, PreviousIsOnGround);
 }
@@ -1577,6 +1570,24 @@ void cClientHandle::HandleSpectate(const cUUID & a_PlayerUUID)
 
 
 
+void cClientHandle::HandleSprint(const bool a_IsSprinting)
+{
+	m_Player->SetSprint(a_IsSprinting);
+}
+
+
+
+
+
+void cClientHandle::HandleStartElytraFlight()
+{
+	m_Player->SetElytraFlight(true);
+}
+
+
+
+
+
 void cClientHandle::HandleSteerVehicle(float a_Forward, float a_Sideways)
 {
 	m_Player->SteerVehicle(a_Forward, a_Sideways);
@@ -1841,47 +1852,11 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 
 
 
-void cClientHandle::HandleEntityCrouch(UInt32 a_EntityID, bool a_IsCrouching)
+void cClientHandle::HandleLeaveBed()
 {
-	if (a_EntityID != m_Player->GetUniqueID())
-	{
-		// We should only receive entity actions from the entity that is performing the action
-		return;
-	}
-
-	m_Player->SetCrouch(a_IsCrouching);
-}
-
-
-
-
-
-void cClientHandle::HandleEntityLeaveBed(UInt32 a_EntityID)
-{
-	if (a_EntityID != m_Player->GetUniqueID())
-	{
-		// We should only receive entity actions from the entity that is performing the action
-		return;
-	}
-
-	cChunkInterface Interface(GetPlayer()->GetWorld()->GetChunkMap());
-	cBlockBedHandler::SetBedOccupationState(Interface, GetPlayer()->GetLastBedPos(), false);
-	GetPlayer()->SetIsInBed(false);
-}
-
-
-
-
-
-void cClientHandle::HandleEntitySprinting(UInt32 a_EntityID, bool a_IsSprinting)
-{
-	if (a_EntityID != m_Player->GetUniqueID())
-	{
-		// We should only receive entity actions from the entity that is performing the action
-		return;
-	}
-
-	m_Player->SetSprint(a_IsSprinting);
+	cChunkInterface Interface(m_Player->GetWorld()->GetChunkMap());
+	cBlockBedHandler::SetBedOccupationState(Interface, m_Player->GetLastBedPos(), false);
+	m_Player->SetIsInBed(false);
 }
 
 

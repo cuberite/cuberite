@@ -282,6 +282,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_RABBIT_STEW: return new cItemSoupHandler(a_ItemType, FoodInfo(10, 12));
 
 		// Armor:
+		case E_ITEM_ELYTRA:
 		case E_ITEM_LEATHER_CAP:
 		case E_ITEM_GOLD_HELMET:
 		case E_ITEM_CHAIN_HELMET:
@@ -302,7 +303,6 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_CHAIN_BOOTS:
 		case E_ITEM_IRON_BOOTS:
 		case E_ITEM_DIAMOND_BOOTS:
-		case E_ITEM_ELYTRA:
 		{
 			return new cItemArmorHandler(a_ItemType);
 		}

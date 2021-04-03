@@ -322,12 +322,11 @@ public:  // tolua_export
 	a_ClickAction specifies whether the click was inside the window or not (caLeftClick or caLeftClickOutside). */
 	void HandleCreativeInventory(Int16 a_SlotNum, const cItem & a_HeldItem, eClickAction a_ClickAction);
 
+	/** Handles a player sneaking or unsneaking. */
+	void HandleCrouch(bool a_IsCrouching);
+
 	/** Called when the player enchants an Item in the Enchanting table UI. */
 	void HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment);
-
-	void HandleEntityCrouch           (UInt32 a_EntityID, bool a_IsCrouching);
-	void HandleEntityLeaveBed         (UInt32 a_EntityID);
-	void HandleEntitySprinting        (UInt32 a_EntityID, bool a_IsSprinting);
 
 	/** Kicks the client if the same username is already logged in.
 	Returns false if the client has been kicked, true otherwise. */
@@ -339,6 +338,9 @@ public:  // tolua_export
 	*/
 	bool HandleHandshake        (const AString & a_Username);
 
+	/** Handles a player exiting his bed. */
+	void HandleLeaveBed();
+
 	void HandleKeepAlive        (UInt32 a_KeepAliveID);
 	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, UInt8 a_Status);
 
@@ -346,12 +348,8 @@ public:  // tolua_export
 	the NPC UI. */
 	void HandleNPCTrade(int a_SlotNum);
 
-	/** Handles a player opening their inventory while riding a horse.
-	@param a_EntityID ID of the player that is to open the inventory. Should be the same as GetPlayer()->GetUniqueID().  */
-	void HandleOpenHorseInventory(UInt32 a_EntityID);
-
-	/** Handles a player starting elytra flight while falling. */
-	void HandleStartFallFlying(UInt32 a_EntityID);
+	/** Handles a player opening his inventory while riding a horse. */
+	void HandleOpenHorseInventory();
 
 	void HandlePing             (void);
 	void HandlePlayerAbilities  (bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
@@ -370,6 +368,13 @@ public:  // tolua_export
 	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, eHand a_Hand);
 	void HandleSlotSelected     (Int16 a_SlotNum);
 	void HandleSpectate         (const cUUID & a_PlayerUUID);
+
+	/** Handles a player sprinting or slowing back down. */
+	void HandleSprint(bool a_IsSprinting);
+
+	/** Handles a player starting elytra flight while falling. */
+	void HandleStartElytraFlight();
+
 	void HandleSteerVehicle     (float Forward, float Sideways);
 	void HandleTabCompletion    (const AString & a_Text);
 	void HandleUpdateSign       (

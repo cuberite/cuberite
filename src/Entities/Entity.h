@@ -328,10 +328,6 @@ public:
 
 	// tolua_end
 
-	void SetHeight(double a_Height);
-
-	void SetWidth(double a_Width);
-
 	/** Exported in ManualBindings */
 	const Vector3d & GetPosition(void) const { return m_Position; }
 
@@ -522,13 +518,13 @@ public:
 	// tolua_begin
 
 	// COMMON metadata flags; descendants may override the defaults:
-	virtual bool IsOnFire      (void) const {return (m_TicksLeftBurning > 0); }
-	virtual bool IsCrouched    (void) const {return false; }
-	virtual bool IsRiding      (void) const {return false; }
-	virtual bool IsSprinting   (void) const {return false; }
-	virtual bool IsRclking     (void) const {return false; }
-	virtual bool IsInvisible   (void) const {return false; }
-	virtual bool IsElytraFlying(void) const {return false; }
+	virtual bool IsCrouched    (void) const { return false; }
+	virtual bool IsElytraFlying(void) const { return false; }
+	virtual bool IsInvisible   (void) const { return false; }
+	virtual bool IsOnFire      (void) const { return m_TicksLeftBurning > 0; }
+	virtual bool IsRclking     (void) const { return false; }
+	virtual bool IsRiding      (void) const { return false; }
+	virtual bool IsSprinting   (void) const { return false; }
 
 	/** Returns true if any part of the entity is in a fire block */
 	virtual bool IsInFire(void) const { return m_IsInFire; }
@@ -690,6 +686,12 @@ protected:
 	/** If the entity's head is in a water block */
 	bool m_IsHeadInWater;
 
+	/** Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter. */
+	double m_Width;
+
+	/** Height of the entity (Y axis). */
+	double m_Height;
+
 	/** Air level of a mobile */
 	int m_AirLevel;
 	int m_AirTickTimer;
@@ -723,8 +725,6 @@ protected:
 	/** If has any mobs are leashed, broadcasts every leashed entity to this. */
 	void BroadcastLeashedMobs();
 
-	void SetSize(float a_Width, float a_Height) { m_Width = a_Width; m_Height = a_Height;  }
-
 private:
 
 	/** Whether the entity is ticking or not. If not, it is scheduled for removal or world-teleportation. */
@@ -747,12 +747,6 @@ private:
 
 	/** Measured in Kilograms (Kg) */
 	double m_Mass;
-
-	/** Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter. */
-	double m_Width;
-
-	/** Height of the entity (Y axis) */
-	double m_Height;
 
 	/** If a player hit a entity, the entity receive a invulnerable of 10 ticks.
 	While this ticks, a player can't hit this entity. */
