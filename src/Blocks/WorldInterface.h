@@ -21,8 +21,8 @@ class cWorldInterface
 public:
 	virtual ~cWorldInterface() {}
 
-	virtual int GetTimeOfDay(void) const = 0;
-	virtual Int64 GetWorldAge(void)  const = 0;
+	virtual cTickTime GetTimeOfDay(void) const = 0;
+	virtual cTickTimeLong GetWorldAge(void)  const = 0;
 
 	virtual eDimension GetDimension(void) const = 0;
 
@@ -70,7 +70,7 @@ public:
 	If any chunk in the box is missing, ignores the entities in that chunk silently. */
 	virtual bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback) = 0;
 
-	virtual void SetTimeOfDay(int a_TimeOfDay) = 0;
+	virtual void SetTimeOfDay(cTickTime a_TimeOfDay) = 0;
 
 	/** Returns true if it is raining or storming at the specified location. This takes into account biomes. */
 	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) = 0;

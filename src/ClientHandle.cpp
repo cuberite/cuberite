@@ -538,6 +538,8 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 		m_Player->GetWorld()->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
 		SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}
+
+	m_LastUnloadCheck = m_Player->GetWorld()->GetWorldAge();
 }
 
 
@@ -1981,6 +1983,8 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 
 void cClientHandle::Tick(float a_Dt)
 {
+	using namespace std::chrono_literals;
+
 	// anticheat fastbreak
 	if (m_HasStartedDigging)
 	{
@@ -2069,8 +2073,8 @@ void cClientHandle::Tick(float a_Dt)
 		}
 	}
 
-	// Unload all chunks that are out of the view distance (every 5 seconds)
-	if ((m_Player->GetWorld()->GetWorldAge() % 100) == 0)
+	// Unload all chunks that are out of the view distance (every 5 seconds):
+	if ((m_Player->GetWorld()->GetWorldAge() - m_LastUnloadCheck) > 5s)
 	{
 		UnloadOutOfRangeChunks();
 	}
@@ -3012,7 +3016,7 @@ void cClientHandle::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_
 
 
 
-void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_WorldDate, bool a_DoDaylightCycle)
+void cClientHandle::SendTimeUpdate(const cTickTimeLong a_WorldAge, const cTickTimeLong a_WorldDate, const bool a_DoDaylightCycle)
 {
 	m_Protocol->SendTimeUpdate(a_WorldAge, a_WorldDate, a_DoDaylightCycle);
 }

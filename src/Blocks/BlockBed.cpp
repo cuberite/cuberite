@@ -75,7 +75,7 @@ bool cBlockBedHandler::OnUse(
 
 	// Sleeping is allowed only during night and thunderstorms:
 	if (
-		!(((a_WorldInterface.GetTimeOfDay() > 12541) && (a_WorldInterface.GetTimeOfDay() < 23458)) ||
+		!(((a_WorldInterface.GetTimeOfDay() > 12541_tick) && (a_WorldInterface.GetTimeOfDay() < 23458_tick)) ||
 		(a_Player.GetWorld()->GetWeather() == wThunderstorm))
 	)  // Source: https://minecraft.gamepedia.com/Bed#Sleeping
 	{
@@ -146,7 +146,7 @@ bool cBlockBedHandler::OnUse(
 				return false;
 			}
 		);
-		a_WorldInterface.SetTimeOfDay(0);
+		a_WorldInterface.SetTimeOfDay(0_tick);
 		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta & 0x0b);  // Clear the "occupied" bit of the bed's block
 	}
 	return true;

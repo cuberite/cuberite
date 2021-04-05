@@ -288,8 +288,8 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 void cBrewingstandEntity::UpdateProgressBars(bool a_ForceUpdate)
 {
-	/** Sending an update every 3th tick, using a higher value lets look the progressbar ugly */
-	if (!a_ForceUpdate && (m_World->GetWorldAge() % 3 != 0))
+	// Send an update every 3rd tick, using a higher value makes the progressbar look ugly:
+	if (!a_ForceUpdate && ((m_World->GetWorldTickAge() % 3_tick) != 0_tick))
 	{
 		return;
 	}

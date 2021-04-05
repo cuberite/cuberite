@@ -106,15 +106,10 @@ public:
 		BroadcastTimeUpdate();
 	}
 
-	virtual int GetTimeOfDay(void) const override;
-	virtual Int64 GetWorldAge(void) const override;
-
 	void SetTicksUntilWeatherChange(int a_WeatherInterval)
 	{
 		m_WeatherInterval = a_WeatherInterval;
 	}
-
-	virtual void SetTimeOfDay(int a_TimeOfDay) override;
 
 	/** Returns the default weather interval for the specific weather type.
 	Returns -1 for any unknown weather. */
@@ -149,6 +144,13 @@ public:
 	virtual int GetHeight(int a_BlockX, int a_BlockZ) override;
 
 	// tolua_end
+
+	virtual cTickTime GetTimeOfDay(void) const override;
+	virtual cTickTimeLong GetWorldAge(void) const override;
+	cTickTimeLong GetWorldDate() const;
+	cTickTimeLong GetWorldTickAge() const;
+
+	virtual void SetTimeOfDay(cTickTime a_TimeOfDay) override;
 
 	/** Retrieves the world height at the specified coords; returns false if chunk not loaded / generated */
 	bool TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height);  // Exported in ManualBindings.cpp
@@ -754,7 +756,7 @@ public:
 	void QueueTask(std::function<void(cWorld &)> a_Task);  // Exported in ManualBindings.cpp
 
 	/** Queues a lambda task onto the tick thread, with the specified delay. */
-	void ScheduleTask(int a_DelayTicks, std::function<void(cWorld &)> a_Task);
+	void ScheduleTask(cTickTime a_DelayTicks, std::function<void(cWorld &)> a_Task);
 
 	/** Returns the number of chunks loaded	 */
 	size_t GetNumChunks() const;  // tolua_export
@@ -993,10 +995,10 @@ private:
 	/** The time since this world began, in ticks.
 	Monotonic, but does not persist across restarts.
 	Used for less important but heavy tasks that run periodically. These tasks don't need to follow wallclock time, and slowing their rate down if TPS drops is desirable. */
-	unsigned long long m_WorldTickAge;
+	cTickTimeLong m_WorldTickAge;
 
-	cTickTimeLong  m_LastChunkCheck;        // The last WorldAge (in ticks) in which unloading and possibly saving was triggered
-	cTickTimeLong  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
+	std::chrono::milliseconds m_LastChunkCheck;  // The last WorldAge in which unloading and possibly saving was triggered.
+	std::chrono::milliseconds m_LastSave;  // The last WorldAge in which save-all was triggerred.
 	std::map<cMonster::eFamily, cTickTimeLong> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
 
 	NIBBLETYPE m_SkyDarkness;
@@ -1093,7 +1095,7 @@ private:
 	cCriticalSection m_CSTasks;
 
 	/** Tasks that have been queued onto the tick thread, possibly to be executed at target tick in the future; guarded by m_CSTasks */
-	std::vector<std::pair<Int64, std::function<void(cWorld &)>>> m_Tasks;
+	std::vector<std::pair<std::chrono::milliseconds, std::function<void(cWorld &)>>> m_Tasks;
 
 	/** Guards m_EntitiesToAdd */
 	cCriticalSection m_CSEntitiesToAdd;

@@ -25,7 +25,7 @@ void cCaveSpider::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	m_EMPersonality = (GetWorld()->GetTimeOfDay() < (12000 + 1000)) ? PASSIVE : AGGRESSIVE;
+	m_EMPersonality = (GetWorld()->GetTimeOfDay() < 13000_tick) ? PASSIVE : AGGRESSIVE;
 }
 
 

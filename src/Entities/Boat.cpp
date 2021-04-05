@@ -46,8 +46,8 @@ void cBoat::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 	// Cannot use super::BroadcastMovementUpdate here, broadcasting position when not
 	// expected by the client breaks things. See https://github.com/cuberite/cuberite/pull/4488
 
-	// Process packet sending every two ticks
-	if (GetWorld()->GetWorldAge() % 2 != 0)
+	// Process packet sending every two ticks:
+	if ((GetWorld()->GetWorldTickAge() % 2_tick) != 0_tick)
 	{
 		return;
 	}

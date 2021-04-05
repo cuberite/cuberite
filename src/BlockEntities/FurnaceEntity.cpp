@@ -388,8 +388,8 @@ bool cFurnaceEntity::CanCookInputToOutput(void) const
 
 void cFurnaceEntity::UpdateProgressBars(bool a_ForceUpdate)
 {
-	// In order to preserve bandwidth, an update is sent only every 10th tick
-	if (!a_ForceUpdate && (m_World->GetWorldAge() % 10 != 0))
+	// In order to preserve bandwidth, an update is sent only every 10th tick:
+	if (!a_ForceUpdate && ((m_World->GetWorldTickAge() % 10_tick) != 0_tick))
 	{
 		return;
 	}

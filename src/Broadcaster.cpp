@@ -596,7 +596,7 @@ void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 {
 	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendTimeUpdate(GetWorldAge(), std::chrono::duration_cast<cTickTimeLong>(m_WorldDate).count(), IsDaylightCycleEnabled());
+			a_Client.SendTimeUpdate(GetWorldAge(), GetWorldDate(), IsDaylightCycleEnabled());
 		}
 	);
 }
