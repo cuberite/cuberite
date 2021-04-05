@@ -425,15 +425,18 @@ void cPawn::HandleFalling(void)
 
 			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
 
-			// Fall particles
-			GetWorld()->BroadcastParticleEffect(
-				"blockdust",
-				GetPosition(),
-				{ 0, 0, 0 },
-				(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
-				static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
-				{ { GetWorld()->GetBlock(POS_TOINT - Vector3i(0, 1, 0)), 0 } }
-			);
+			// Fall particles:
+			if (const auto Below = POS_TOINT.addedY(-1); Below.y >= 0)
+			{
+				GetWorld()->BroadcastParticleEffect(
+					"blockdust",
+					GetPosition(),
+					{ 0, 0, 0 },
+					(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
+					static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
+					{ { GetWorld()->GetBlock(Below), 0 } }
+				);
+			}
 		}
 
 		m_bTouchGround = true;
