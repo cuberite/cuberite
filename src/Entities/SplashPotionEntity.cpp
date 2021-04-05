@@ -65,8 +65,11 @@ void cSplashPotionEntity::Splash(Vector3d a_HitPos)
 				return false;
 			}
 
-			double SplashDistance = (a_Entity.GetPosition() - a_HitPos).Length();
-			if (SplashDistance >= 20)
+			Vector3d SplashDistanceCube = (a_Entity.GetPosition() - a_HitPos);
+			double SplashDistance = SplashDistanceCube.Length();
+
+			// Wiki says 8.25 x 8.25 x 4.25 Cuboid.
+			if ((std::max(SplashDistanceCube.x, SplashDistanceCube.z)) > 8.25 || (SplashDistanceCube.y > 4.25))
 			{
 				// Too far away
 				return false;
