@@ -109,8 +109,8 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 		Writer.AddInt("SpawnY", FloorC(a_World->GetSpawnY()));
 		Writer.AddInt("SpawnZ", FloorC(a_World->GetSpawnZ()));
 		Writer.AddInt("version", 19133);
-		Writer.AddLong("DayTime", a_World->GetTimeOfDay());
-		Writer.AddLong("Time", a_World->GetWorldAge());
+		Writer.AddLong("DayTime", a_World->GetWorldDate().count());
+		Writer.AddLong("Time", a_World->GetWorldAge().count());
 		Writer.AddLong("SizeOnDisk", 0);
 		Writer.AddString("generatorName", "default");
 		Writer.AddString("generatorOptions", "");

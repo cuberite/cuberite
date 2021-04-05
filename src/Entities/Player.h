@@ -86,9 +86,6 @@ public:
 
 	static const int MAX_FOOD_LEVEL;
 
-	/** Number of ticks it takes to eat an item */
-	static const int EATING_TICKS;
-
 	// tolua_end
 
 	CLASS_PROTODEF(cPlayer)
@@ -371,7 +368,7 @@ public:
 	void AddFoodExhaustion(double a_Exhaustion);
 
 	/** Returns true if the player is currently in the process of eating the currently equipped item */
-	bool IsEating(void) const { return (m_EatingFinishTick >= 0); }
+	bool IsEating(void) const { return m_EatingFinishTick >= 0_tick; }
 
 	/** Returns true if the player is currently flying */
 	bool IsFlying(void) const { return m_IsFlying; }
@@ -734,7 +731,7 @@ private:
 	bool m_IsVisible;
 
 	/** The world tick in which eating will be finished. -1 if not eating */
-	Int64 m_EatingFinishTick;
+	cTickTimeLong m_EatingFinishTick;
 
 	/** Player Xp level */
 	int m_LifetimeTotalXp;

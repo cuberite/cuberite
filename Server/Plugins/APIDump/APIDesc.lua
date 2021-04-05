@@ -9138,24 +9138,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the relative walk speed of this mob. Standard is 1.0",
 				},
-				GetSpawnDelay =
-				{
-					IsStatic = true,
-					Params =
-					{
-						{
-							Name = "MobFamily",
-							Type = "cMonster#eFamily",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family.",
-				},
 				HasCustomName =
 				{
 					Returns =
@@ -11392,10 +11374,6 @@ a_Player:OpenWindow(Window);
 			},
 			Constants =
 			{
-				EATING_TICKS =
-				{
-					Notes = "Number of ticks required for consuming an item.",
-				},
 				MAX_FOOD_LEVEL =
 				{
 					Notes = "The maximum food level value. When the food level is at this value, the player cannot eat.",

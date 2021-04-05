@@ -1884,8 +1884,8 @@ void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 
 void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 {
-	// Process packet sending every two ticks
-	if (GetWorld()->GetWorldAge() % 2 != 0)
+	// Process packet sending every two ticks:
+	if ((GetWorld()->GetWorldTickAge() % 2_tick) != 0_tick)
 	{
 		return;
 	}

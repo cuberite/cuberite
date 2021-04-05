@@ -438,7 +438,7 @@ public:
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) = 0;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) = 0;
-	virtual void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_WorldDate, bool a_DoDaylightCycle) = 0;
+	virtual void SendTimeUpdate                 (cTickTimeLong a_WorldAge, cTickTimeLong a_WorldDate, bool a_DoDaylightCycle) = 0;
 	virtual void SendUnleashEntity              (const cEntity & a_Entity) = 0;
 	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) = 0;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) = 0;

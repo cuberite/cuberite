@@ -2338,6 +2338,36 @@ static int tolua_cClientHandle_SendPluginMessage(lua_State * L)
 
 
 
+static int tolua_cClientHandle_SendTimeUpdate(lua_State * L)
+{
+	cLuaState S(L);
+	if (
+		!S.CheckParamSelf("cClientHandle") ||
+		!S.CheckParamNumber(2, 3) ||
+		!S.CheckParamBool(4) ||
+		!S.CheckParamEnd(5)
+	)
+	{
+		return 0;
+	}
+
+	cClientHandle * Client;
+	cTickTimeLong::rep WorldAge, WorldDate;
+	bool DoDayLightCycle;
+	S.GetStackValues(1, Client, WorldAge, WorldDate, DoDayLightCycle);
+	if (Client == nullptr)
+	{
+		return S.ApiParamError("Invalid 'self'");
+	}
+
+	Client->SendTimeUpdate(cTickTimeLong(WorldAge), cTickTimeLong(WorldDate), DoDayLightCycle);
+	return 0;
+}
+
+
+
+
+
 static int tolua_cClientHandle_GetForgeMods(lua_State * L)
 {
 	cLuaState S(L);
@@ -4361,6 +4391,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 
 			tolua_function(tolua_S, "GetForgeMods", tolua_cClientHandle_GetForgeMods);
 			tolua_function(tolua_S, "SendPluginMessage",   tolua_cClientHandle_SendPluginMessage);
+			tolua_function(tolua_S, "SendTimeUpdate",      tolua_cClientHandle_SendTimeUpdate);
 			tolua_function(tolua_S, "GetUUID",             tolua_cClientHandle_GetUUID);
 			tolua_function(tolua_S, "GenerateOfflineUUID", tolua_cClientHandle_GenerateOfflineUUID);
 			tolua_function(tolua_S, "IsUUIDOnline",        tolua_cClientHandle_IsUUIDOnline);

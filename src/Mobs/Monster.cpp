@@ -1150,34 +1150,26 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtZombieHorse:     return mfPassive;
 		case mtZombiePigman:    return mfHostile;
 		case mtZombieVillager:  return mfHostile;
-
-		default:
-		{
-			ASSERT(!"Unhandled mob type");
-			return mfUnhandled;
-		}
+		case mtInvalidType:     break;
 	}
+	UNREACHABLE("Unhandled mob type");
 }
 
 
 
 
 
-int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
+cTickTime cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 {
 	switch (a_MobFamily)
 	{
-		case mfHostile:   return 40;
-		case mfPassive:   return 40;
-		case mfAmbient:   return 40;
-		case mfWater:     return 400;
-		case mfNoSpawn:   return -1;
-		default:
-		{
-			ASSERT(!"Unhandled mob family");
-			return -1;
-		}
+		case mfHostile:   return 40_tick;
+		case mfPassive:   return 40_tick;
+		case mfAmbient:   return 40_tick;
+		case mfWater:     return 400_tick;
+		case mfNoSpawn:   return -1_tick;
 	}
+	UNREACHABLE("Unhandled mob family");
 }
 
 
@@ -1654,7 +1646,7 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 
 	if (
 		(Chunk->GetBlock(Rel) != E_BLOCK_SOULSAND) &&   // Not on soulsand
-		(GetWorld()->GetTimeOfDay() < 12000 + 1000) &&  // Daytime
+		(GetWorld()->GetTimeOfDay() < 13000_tick) &&    // Daytime
 		Chunk->IsWeatherSunnyAt(Rel.x, Rel.z) &&        // Not raining
 		!IsInWater()                                    // Isn't swimming
 	)

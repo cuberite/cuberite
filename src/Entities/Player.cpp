@@ -59,8 +59,8 @@ const int cPlayer::MAX_HEALTH = 20;
 
 const int cPlayer::MAX_FOOD_LEVEL = 20;
 
-/** Number of ticks it takes to eat an item */
-const int cPlayer::EATING_TICKS = 30;
+// Number of ticks it takes to eat an item.
+#define EATING_TICKS 30_tick
 
 
 
@@ -530,7 +530,7 @@ void cPlayer::StartEating(void)
 void cPlayer::FinishEating(void)
 {
 	// Reset the timer:
-	m_EatingFinishTick = -1;
+	m_EatingFinishTick = -1_tick;
 
 	// Send the packets:
 	m_ClientHandle->SendEntityStatus(*this, esPlayerEatingAccepted);
@@ -553,7 +553,7 @@ void cPlayer::FinishEating(void)
 
 void cPlayer::AbortEating(void)
 {
-	m_EatingFinishTick = -1;
+	m_EatingFinishTick = -1_tick;
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -2929,7 +2929,7 @@ void cPlayer::TickFreezeCode()
 				}
 			}
 		}
-		else if (GetWorld()->GetWorldAge() % 100 == 0)
+		else if ((GetWorld()->GetWorldTickAge() % 100_tick) == 0_tick)
 		{
 			// Despite the client side freeze, the player may be able to move a little by
 			// Jumping or canceling flight. Re-freeze every now and then
@@ -3115,7 +3115,7 @@ void cPlayer::OnAddToWorld(cWorld & a_World)
 	m_ClientHandle->SendWeather(a_World.GetWeather());
 
 	// Send time:
-	m_ClientHandle->SendTimeUpdate(a_World.GetWorldAge(), a_World.GetTimeOfDay(), a_World.IsDaylightCycleEnabled());
+	m_ClientHandle->SendTimeUpdate(a_World.GetWorldAge(), a_World.GetWorldDate(), a_World.IsDaylightCycleEnabled());
 
 	// Finally, deliver the notification hook:
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*this);
@@ -3298,7 +3298,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		m_World->CollectPickupsByPlayer(*this);
 
-		if ((m_EatingFinishTick >= 0) && (m_EatingFinishTick <= m_World->GetWorldAge()))
+		if ((m_EatingFinishTick >= 0_tick) && (m_EatingFinishTick <= m_World->GetWorldAge()))
 		{
 			FinishEating();
 		}
