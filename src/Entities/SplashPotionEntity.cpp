@@ -70,7 +70,6 @@ void cSplashPotionEntity::Splash(Vector3d a_HitPos)
 			}
 
 			// y = -0.25x + 1, where x is the distance from the player. Approximation for potion splash.
-			// TODO: better equation
 			double SplashDistance = (a_Entity.GetPosition() - a_HitPos).Length();
 			double Reduction = -0.25 * SplashDistance + 1.0;
 			Reduction = std::max(Reduction, 0.0);
