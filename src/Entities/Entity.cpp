@@ -33,7 +33,7 @@ static UInt32 GetNextUniqueID(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cEntity:
 
-cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, double a_Height):
+cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, float a_Width, float a_Height):
 	m_UniqueID(GetNextUniqueID()),
 	m_Health(1),
 	m_MaxHealth(1),
@@ -59,8 +59,6 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 	m_IsInLava(false),
 	m_IsInWater(false),
 	m_IsHeadInWater(false),
-	m_Width(a_Width),
-	m_Height(a_Height),
 	m_AirLevel(MAX_AIR_LEVEL),
 	m_AirTickTimer(DROWNING_TICKS),
 	m_TicksAlive(0),
@@ -71,6 +69,8 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 	m_Position(a_Pos),
 	m_WaterSpeed(0, 0, 0),
 	m_Mass (0.001),  // Default 1g
+	m_Width(a_Width),
+	m_Height(a_Height),
 	m_InvulnerableTicks(0)
 {
 	m_WorldChangeInfo.m_NewWorld = nullptr;
@@ -1098,7 +1098,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			NextPos = HitCoords;
 
 			// Avoid movement in the direction of the blockface that has been hit and correct for collision box:
-			double HalfWidth = GetWidth() / 2.0;
+			const auto HalfWidth = GetWidth() / 2;
 			switch (HitBlockFace)
 			{
 				case BLOCK_FACE_XM:
@@ -1708,6 +1708,16 @@ void cEntity::SetIsTicking(bool a_IsTicking)
 {
 	m_IsTicking = a_IsTicking;
 	ASSERT(!(m_IsTicking && (m_ParentChunk == nullptr)));  // We shouldn't be ticking if we have no parent chunk
+}
+
+
+
+
+
+void cEntity::SetSize(const float a_Width, const float a_Height)
+{
+	m_Width = a_Width;
+	m_Height = a_Height;
 }
 
 

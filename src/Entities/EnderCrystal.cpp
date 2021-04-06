@@ -20,7 +20,7 @@ cEnderCrystal::cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom) :
 
 
 cEnderCrystal::cEnderCrystal(Vector3d a_Pos, Vector3i a_BeamTarget, bool a_DisplayBeam, bool a_ShowBottom) :
-	Super(etEnderCrystal, a_Pos, 1.0, 1.0),
+	Super(etEnderCrystal, a_Pos, 2.0f, 2.0f),
 	m_BeamTarget(a_BeamTarget),
 	m_DisplayBeam(a_DisplayBeam),
 	m_ShowBottom(a_ShowBottom)
@@ -92,7 +92,7 @@ void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 	// Destroy first so the Explodinator doesn't find us (when iterating through entities):
 	Destroy();
 
-	m_World->DoExplosionAt(6.0, GetPosX(), GetPosY() + (GetHeight() / 2.0), GetPosZ(), true, esEnderCrystal, this);
+	m_World->DoExplosionAt(6.0, GetPosX(), GetPosY() + GetHeight() / 2, GetPosZ(), true, esEnderCrystal, this);
 
 	const auto Position = GetPosition().Floor();
 	if (cChunkDef::IsValidHeight(Position.y))
