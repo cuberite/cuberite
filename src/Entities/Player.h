@@ -163,8 +163,8 @@ public:
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
-	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
-	void SetCapabilities();
+	/** Updates player's capabilities - flying, visibility, etc. from their gamemode. */
+	void UpdateCapabilities();
 
 	// tolua_begin
 
@@ -412,21 +412,18 @@ public:
 	void Respawn(void);  // tolua_export
 
 	void SetVisible( bool a_bVisible);  // tolua_export
-	bool IsVisible(void) const { return m_IsVisible; }  // tolua_export
 
 	/** Saves all player data, such as inventory, to JSON. */
 	void SaveToDisk(void);
 
-	typedef cWorld * cWorldPtr;
-
 	/** Loads the player data from the disk file.
-	Sets a_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile(). */
-	void LoadFromDisk(cWorldPtr & a_World);
+	Sets m_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile(). */
+	void LoadFromDisk();
 
 	/** Loads the player data from the specified file.
-	Sets a_World to the world where the player will spawn, based on the stored world name or the default world.
+	Sets m_World to the world where the player will spawn, based on the stored world name or the default world.
 	Returns true on success, false if the player wasn't found, and excepts with base std::runtime_error if the data couldn't be read or parsed. */
-	bool LoadFromFile(const AString & a_FileName, cWorldPtr & a_World);
+	bool LoadFromFile(const AString & a_FileName);
 
 	const AString & GetLoadedWorldName() const { return m_CurrentWorldName; }
 
@@ -805,6 +802,7 @@ private:
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual float GetEnchantmentBlastKnockbackReduction() override;
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
+	virtual bool IsInvisible() const override;
 	virtual bool IsRclking(void) const override { return IsEating() || IsChargingBow(); }
 	virtual void OnAddToWorld(cWorld & a_World) override;
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;

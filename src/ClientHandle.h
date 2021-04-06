@@ -169,6 +169,7 @@ public:  // tolua_export
 	void SendEntityLook                 (const cEntity & a_Entity);
 	void SendEntityMetadata             (const cEntity & a_Entity);
 	void SendEntityPosition             (const cEntity & a_Entity);
+	void SendEntityProperties           (const cEntity & a_Entity);
 	void SendEntityStatus               (const cEntity & a_Entity, char a_Status);
 	void SendEntityVelocity             (const cEntity & a_Entity);
 	void SendExperience                 (void);
@@ -191,7 +192,6 @@ public:  // tolua_export
 	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
 	void SendPlayerListUpdateGameMode   (const cPlayer & a_Player);
 	void SendPlayerListUpdatePing       ();
-	void SendPlayerMaxSpeed             (void);  ///< Informs the client of the maximum player speed (1.6.1+)
 	void SendPlayerMoveLook             (void);
 	void SendPlayerPosition             (void);
 	void SendPlayerSpawn                (const cPlayer & a_Player);

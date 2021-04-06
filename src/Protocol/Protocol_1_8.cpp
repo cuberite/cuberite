@@ -832,9 +832,6 @@ void cProtocol_1_8_0::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 		cPacketizer Pkt(*this, pktDifficulty);
 		Pkt.WriteBEInt8(1);
 	}
-
-	// Send player abilities:
-	SendPlayerAbilities();
 }
 
 
@@ -1132,35 +1129,6 @@ void cProtocol_1_8_0::SendPlayerListUpdatePing()
 
 
 
-void cProtocol_1_8_0::SendPlayerMaxSpeed(void)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktEntityProperties);
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteVarInt32(Player->GetUniqueID());
-	Pkt.WriteBEInt32(1);  // Count
-	Pkt.WriteString("generic.movementSpeed");
-	// The default game speed is 0.1, multiply that value by the relative speed:
-	Pkt.WriteBEDouble(0.1 * Player->GetNormalMaxSpeed());
-	if (Player->IsSprinting())
-	{
-		Pkt.WriteVarInt32(1);  // Modifier count
-		Pkt.WriteBEUInt64(0x662a6b8dda3e4c1c);
-		Pkt.WriteBEUInt64(0x881396ea6097278d);  // UUID of the modifier
-		Pkt.WriteBEDouble(Player->GetSprintingMaxSpeed() - Player->GetNormalMaxSpeed());
-		Pkt.WriteBEUInt8(2);
-	}
-	else
-	{
-		Pkt.WriteVarInt32(0);  // Modifier count
-	}
-}
-
-
-
-
-
 void cProtocol_1_8_0::SendPlayerMoveLook(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1201,12 +1169,8 @@ void cProtocol_1_8_0::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteFPInt(LastSentPos.z);
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
-	short ItemType = a_Player.GetEquippedItem().IsEmpty() ? 0 : a_Player.GetEquippedItem().m_ItemType;
-	Pkt.WriteBEInt16(ItemType);
-	Pkt.WriteBEUInt8((3 << 5) | 6);  // Metadata: float + index 6
-	Pkt.WriteBEFloat(static_cast<float>(a_Player.GetHealth()));
-	Pkt.WriteBEUInt8((4 << 5 | (2 & 0x1F)) & 0xFF);
-	Pkt.WriteString(a_Player.GetName());
+	Pkt.WriteBEInt16(a_Player.GetEquippedItem().IsEmpty() ? 0 : a_Player.GetEquippedItem().m_ItemType);
+	WriteEntityMetadata(Pkt, a_Player);
 	Pkt.WriteBEUInt8(0x7f);  // Metadata: end
 }
 
@@ -3377,11 +3341,15 @@ void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 		{
 			auto & Player = static_cast<const cPlayer &>(a_Entity);
 
-			// Player health (not handled since players aren't monsters)
+			// Player name:
+			a_Pkt.WriteBEUInt8(0x82);
+			a_Pkt.WriteString(Player.GetName());
+
+			// Player health:
 			a_Pkt.WriteBEUInt8(0x66);
 			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
 
-			// Skin flags
+			// Skin flags:
 			a_Pkt.WriteBEUInt8(0x0A);
 			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
 
@@ -3815,18 +3783,38 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 
 void cProtocol_1_8_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity)
 {
-	if (!a_Entity.IsMob())
+	if (a_Entity.IsPlayer())
 	{
-		// No properties for anything else than mobs
-		a_Pkt.WriteBEInt32(0);
-		return;
+		const auto & Player = static_cast<const cPlayer &>(a_Entity);
+
+		a_Pkt.WriteBEInt32(1);  // Count.
+		a_Pkt.WriteString("generic.movementSpeed");
+		a_Pkt.WriteBEDouble(0.1 * Player.GetNormalMaxSpeed());  // The default game speed is 0.1, multiply that value by the relative speed.
+
+		// It seems the modifiers aren't conditionally activated; their effects are applied immediately!
+		// We have to keep on re-sending this packet when the client notifies us of sprint start and end, and so on. Strange.
+
+		if (Player.IsSprinting())
+		{
+			a_Pkt.WriteVarInt32(1);  // Modifier count.
+			a_Pkt.WriteBEUInt64(0x662a6b8dda3e4c1c);
+			a_Pkt.WriteBEUInt64(0x881396ea6097278d);  // UUID of the modifier (sprinting speed boost).
+			a_Pkt.WriteBEDouble(Player.GetSprintingMaxSpeed() - Player.GetNormalMaxSpeed());
+			a_Pkt.WriteBEUInt8(2);
+		}
+		else
+		{
+			a_Pkt.WriteVarInt32(0);
+		}
 	}
+	else
+	{
+		// const cMonster & Mob = (const cMonster &)a_Entity;
 
-	// const cMonster & Mob = (const cMonster &)a_Entity;
+		// TODO: Send properties and modifiers based on the mob type
 
-	// TODO: Send properties and modifiers based on the mob type
-
-	a_Pkt.WriteBEInt32(0);  // NumProperties
+		a_Pkt.WriteBEInt32(0);
+	}
 }
 
 

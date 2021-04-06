@@ -490,35 +490,6 @@ void cProtocol_1_9_0::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Da
 
 
 
-void cProtocol_1_9_0::SendPlayerMaxSpeed(void)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktPlayerMaxSpeed);
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteVarInt32(Player->GetUniqueID());
-	Pkt.WriteBEInt32(1);  // Count
-	Pkt.WriteString("generic.movementSpeed");
-	// The default game speed is 0.1, multiply that value by the relative speed:
-	Pkt.WriteBEDouble(0.1 * Player->GetNormalMaxSpeed());
-	if (Player->IsSprinting())
-	{
-		Pkt.WriteVarInt32(1);  // Modifier count
-		Pkt.WriteBEUInt64(0x662a6b8dda3e4c1c);
-		Pkt.WriteBEUInt64(0x881396ea6097278d);  // UUID of the modifier
-		Pkt.WriteBEDouble(Player->GetSprintingMaxSpeed() - Player->GetNormalMaxSpeed());
-		Pkt.WriteBEUInt8(2);
-	}
-	else
-	{
-		Pkt.WriteVarInt32(0);  // Modifier count
-	}
-}
-
-
-
-
-
 void cProtocol_1_9_0::SendPlayerMoveLook(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -690,7 +661,6 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 		case pktPlayerAbilities:        return 0x2b;
 		case pktPlayerList:             return 0x2d;
 		case pktPlayerListHeaderFooter: return 0x48;
-		case pktPlayerMaxSpeed:         return 0x4b;
 		case pktPlayerMoveLook:         return 0x2e;
 		case pktPluginMessage:          return 0x18;
 		case pktRemoveEntityEffect:     return 0x31;
@@ -2271,26 +2241,6 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 
 
 
-void cProtocol_1_9_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity)
-{
-	if (!a_Entity.IsMob())
-	{
-		// No properties for anything else than mobs
-		a_Pkt.WriteBEInt32(0);
-		return;
-	}
-
-	// const cMonster & Mob = (const cMonster &)a_Entity;
-
-	// TODO: Send properties and modifiers based on the mob type
-
-	a_Pkt.WriteBEInt32(0);  // NumProperties
-}
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_1:
 
@@ -2320,9 +2270,6 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 		cPacketizer Pkt(*this, pktDifficulty);
 		Pkt.WriteBEInt8(1);
 	}
-
-	// Send player abilities:
-	SendPlayerAbilities();
 }
 
 
@@ -2405,7 +2352,6 @@ UInt32 cProtocol_1_9_4::GetPacketID(cProtocol::ePacketType a_Packet)
 		case pktCollectEntity:          return 0x48;
 		case pktEntityEffect:           return 0x4b;
 		case pktEntityProperties:       return 0x4a;
-		case pktPlayerMaxSpeed:         return 0x4a;
 		case pktPlayerListHeaderFooter: return 0x47;
 		case pktTeleportEntity:         return 0x49;
 

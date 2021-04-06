@@ -99,7 +99,6 @@ AString cPacketizer::PacketTypeToStr(cProtocol::ePacketType a_PacketType)
 		case cProtocol::pktPlayerAbilities:        return "pktPlayerAbilities";
 		case cProtocol::pktPlayerList:             return "pktPlayerList";
 		case cProtocol::pktPlayerListHeaderFooter: return "pktPlayerListHeaderFooter";
-		case cProtocol::pktPlayerMaxSpeed:         return "pktPlayerMaxSpeed";
 		case cProtocol::pktPlayerMoveLook:         return "pktPlayerMoveLook";
 		case cProtocol::pktPluginMessage:          return "pktPluginMessage";
 		case cProtocol::pktRemoveEntityEffect:     return "pktRemoveEntityEffect";

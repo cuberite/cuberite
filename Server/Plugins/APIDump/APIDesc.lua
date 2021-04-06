@@ -10781,16 +10781,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns true if the player is satiated (cannot eat).",
 				},
-				IsVisible =
-				{
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the player is visible to other players",
-				},
 				LoadRank =
 				{
 					Notes = "Reloads the player's rank, message visuals and permissions from the {{cRankManager}}, based on the player's current rank.",
