@@ -14,7 +14,7 @@
 
 
 
-cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
+cPawn::cPawn(eEntityType a_EntityType, float a_Width, float a_Height) :
 	Super(a_EntityType, Vector3d(), a_Width, a_Height),
 	m_EntityEffects(tEffectMap()),
 	m_LastGroundHeight(0),

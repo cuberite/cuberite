@@ -169,7 +169,7 @@ public:
 	static const UInt32 INVALID_ID = 0;  // Exported to Lua in ManualBindings.cpp, ToLua doesn't parse initialized constants.
 
 
-	cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, double a_Height);
+	cEntity(eEntityType a_EntityType, Vector3d a_Pos, float a_Width, float a_Height);
 	virtual ~cEntity() = default;
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
@@ -225,7 +225,7 @@ public:
 	cWorld * GetWorld(void) const { return m_World; }
 
 	double           GetHeadYaw   (void) const { return m_HeadYaw; }  // In degrees
-	double           GetHeight    (void) const { return m_Height;  }
+	float            GetHeight    (void) const { return m_Height;  }
 	double           GetMass      (void) const { return m_Mass;    }
 	double           GetPosX      (void) const { return m_Position.x; }
 	double           GetPosY      (void) const { return m_Position.y; }
@@ -237,7 +237,7 @@ public:
 	double           GetSpeedX    (void) const { return m_Speed.x; }
 	double           GetSpeedY    (void) const { return m_Speed.y; }
 	double           GetSpeedZ    (void) const { return m_Speed.z; }
-	double           GetWidth     (void) const { return m_Width;   }
+	float            GetWidth     (void) const { return m_Width;   }
 
 	int GetChunkX(void) const { return FloorC(m_Position.x / cChunkDef::Width); }
 	int GetChunkZ(void) const { return FloorC(m_Position.z / cChunkDef::Width); }
@@ -579,6 +579,9 @@ public:
 	/** Set the entity's status to either ticking or not ticking. */
 	void SetIsTicking(bool a_IsTicking);
 
+	/** Update an entity's size, for example, on body stance changes. */
+	void SetSize(float a_Width, float a_Height);
+
 	/** Adds a mob to the leashed list of mobs. */
 	void AddLeashedMob(cMonster * a_Monster);
 
@@ -686,12 +689,6 @@ protected:
 	/** If the entity's head is in a water block */
 	bool m_IsHeadInWater;
 
-	/** Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter. */
-	double m_Width;
-
-	/** Height of the entity (Y axis). */
-	double m_Height;
-
 	/** Air level of a mobile */
 	int m_AirLevel;
 	int m_AirTickTimer;
@@ -747,6 +744,12 @@ private:
 
 	/** Measured in Kilograms (Kg) */
 	double m_Mass;
+
+	/** Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter. */
+	float m_Width;
+
+	/** Height of the entity (Y axis). */
+	float m_Height;
 
 	/** If a player hit a entity, the entity receive a invulnerable of 10 ticks.
 	While this ticks, a player can't hit this entity. */

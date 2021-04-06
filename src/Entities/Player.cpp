@@ -104,7 +104,7 @@ cPlayer::BodyStanceGliding::BodyStanceGliding(cPlayer & a_Player) :
 
 
 cPlayer::cPlayer(const std::shared_ptr<cClientHandle> & a_Client) :
-	Super(etPlayer, 0.6, 1.8),
+	Super(etPlayer, 0.6f, 1.8f),
 	m_BodyStance(BodyStanceStanding(*this)),
 	m_FoodLevel(MAX_FOOD_LEVEL),
 	m_FoodSaturationLevel(5.0),
@@ -2815,16 +2815,6 @@ void cPlayer::AddKnownItem(const cItem & a_Item)
 	{
 		AddKnownRecipe(RecipeId);
 	}
-}
-
-
-
-
-
-void cPlayer::SetSize(const float a_Width, const float a_Height)
-{
-	m_Width = a_Width;
-	m_Height = a_Height;
 }
 
 

@@ -8,7 +8,7 @@
 
 
 cThrownEggEntity::cThrownEggEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	Super(pkEgg, a_Creator, a_Pos, 0.25, 0.25),
+	Super(pkEgg, a_Creator, a_Pos, 0.25f, 0.25f),
 	m_DestroyTimer(-1)
 {
 	SetSpeed(a_Speed);

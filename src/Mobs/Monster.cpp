@@ -80,7 +80,7 @@ static const struct
 ////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
-cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height)
+cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height)
 	: Super(etMonster, a_Width, a_Height)
 	, m_EMState(IDLE)
 	, m_EMPersonality(AGGRESSIVE)

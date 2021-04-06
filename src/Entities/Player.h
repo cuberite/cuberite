@@ -592,9 +592,6 @@ public:
 	If the item is already known, does nothing. */
 	void AddKnownItem(const cItem & a_Item);
 
-	/** Update a player's size, for example, on body stance changes. */
-	void SetSize(float a_Width, float a_Height);
-
 	// cEntity overrides:
 	virtual void AttachTo(cEntity * a_AttachTo) override;
 	virtual void Detach(void) override;

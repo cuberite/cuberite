@@ -95,7 +95,7 @@ protected:
 // cMinecart:
 
 cMinecart::cMinecart(ePayload a_Payload, Vector3d a_Pos):
-	Super(etMinecart, a_Pos, 0.98, 0.7),
+	Super(etMinecart, a_Pos, 0.98f, 0.7f),
 	m_Payload(a_Payload),
 	m_LastDamage(0),
 	m_DetectorRailPosition(0, 0, 0),

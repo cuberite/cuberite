@@ -14,10 +14,7 @@ class cSilverfish:
 
 public:
 
-	cSilverfish():
-		Super("Silverfish", mtSilverfish, "entity.silverfish.hurt", "entity.silverfish.death", "entity.silverfish.ambient", 0.3, 0.4)
-	{
-	}
+	cSilverfish();
 
 	CLASS_PROTODEF(cSilverfish)
 
