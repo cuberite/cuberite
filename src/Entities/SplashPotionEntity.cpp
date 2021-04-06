@@ -57,7 +57,11 @@ void cSplashPotionEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 
 void cSplashPotionEntity::Splash(Vector3d a_HitPos)
 {
-	m_World->ForEachEntity([=](cEntity & a_Entity)
+	double XZCalculation = 8.25/2;
+	double YCalculation = 4.25/2;
+	cBoundingBox SplashDistanceBox = cBoundingBox(a_HitPos.x - XZCalculation, a_HitPos.x + XZCalculation, a_HitPos.y - YCalculation, a_HitPos.y + YCalculation, a_HitPos.z - XZCalculation, a_HitPos.z + XZCalculation);
+
+	m_World->ForEachEntityInBox(SplashDistanceBox, [=](cEntity & a_Entity)
 		{
 			if (!a_Entity.IsPawn())
 			{
@@ -65,15 +69,8 @@ void cSplashPotionEntity::Splash(Vector3d a_HitPos)
 				return false;
 			}
 
-			double SplashDistance = (a_Entity.GetPosition() - a_HitPos).Length();
-			if (SplashDistance >= 20)
-			{
-				// Too far away
-				return false;
-			}
-
 			// y = -0.25x + 1, where x is the distance from the player. Approximation for potion splash.
-			// TODO: better equation
+			double SplashDistance = (a_Entity.GetPosition() - a_HitPos).Length();
 			double Reduction = -0.25 * SplashDistance + 1.0;
 			Reduction = std::max(Reduction, 0.0);
 
