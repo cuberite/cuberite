@@ -57,7 +57,6 @@ public:
 	virtual void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
-	virtual void SendPlayerMaxSpeed             (void) override;
 	virtual void SendPlayerMoveLook             (void) override;
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) override;
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
@@ -124,9 +123,6 @@ protected:
 
 	/** Writes the mob-specific metadata for the specified mob */
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override;
-
-	/** Writes the entity properties for the specified entity, including the Count field. */
-	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
 
 	/** Types used within metadata */
 	enum eMetadataType

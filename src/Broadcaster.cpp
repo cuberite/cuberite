@@ -345,6 +345,19 @@ void cWorld::BroadcastEntityPosition(const cEntity & a_Entity, const cClientHand
 
 
 
+void cWorld::BroadcastEntityProperties(const cEntity & a_Entity)
+{
+	ForClientsWithEntity(a_Entity, *this, nullptr, [&](cClientHandle & a_Client)
+		{
+			a_Client.SendEntityProperties(a_Entity);
+		}
+	);
+}
+
+
+
+
+
 void cWorld::BroadcastEntityStatus(const cEntity & a_Entity, Int8 a_Status, const cClientHandle * a_Exclude)
 {
 	ForClientsWithEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)

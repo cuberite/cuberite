@@ -372,8 +372,7 @@ UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType)
 		case pktParticleEffect:         return 0x24;
 		case pktPlayerAbilities:        return 0x2e;
 		case pktPlayerList:             return 0x30;
-		case pktPlayerListHeaderFooter: return 0x4E;
-		case pktPlayerMaxSpeed:         return 0x52;
+		case pktPlayerListHeaderFooter: return 0x4e;
 		case pktPlayerMoveLook:         return 0x32;
 		case pktPluginMessage:          return 0x19;
 		case pktRemoveEntityEffect:     return 0x36;

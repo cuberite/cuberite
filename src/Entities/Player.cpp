@@ -144,30 +144,10 @@ cPlayer::cPlayer(const std::shared_ptr<cClientHandle> & a_Client) :
 	SetMaxHealth(MAX_HEALTH);
 	m_Health = MAX_HEALTH;
 
-	cWorld * World = nullptr;
-	LoadFromDisk(World);
+	LoadFromDisk();
+	UpdateCapabilities();
 
 	m_LastGroundHeight = static_cast<float>(GetPosY());
-
-	if (m_GameMode == gmNotSet)
-	{
-		if (World->IsGameModeCreative())
-		{
-			m_IsFlightCapable = true;
-		}
-		if (World->IsGameModeSpectator())  // Otherwise Player will fall out of the world on join
-		{
-			m_IsFlightCapable = true;
-			m_IsFlying = true;
-		}
-	}
-
-	if (m_GameMode == gmSpectator)  // If player is reconnecting to the server in spectator mode
-	{
-		m_IsFlightCapable = true;
-		m_IsFlying = true;
-		m_IsVisible = false;
-	}
 }
 
 
@@ -614,10 +594,11 @@ double cPlayer::GetMaxSpeed(void) const
 void cPlayer::SetNormalMaxSpeed(double a_Speed)
 {
 	m_NormalMaxSpeed = a_Speed;
-	if (!IsSprinting() && !IsFlying() && !IsFrozen())
+
+	if (!m_IsFrozen)
 	{
 		// If we are frozen, we do not send this yet. We send when unfreeze() is called
-		m_ClientHandle->SendPlayerMaxSpeed();
+		m_World->BroadcastEntityProperties(*this);
 	}
 }
 
@@ -628,10 +609,11 @@ void cPlayer::SetNormalMaxSpeed(double a_Speed)
 void cPlayer::SetSprintingMaxSpeed(double a_Speed)
 {
 	m_SprintingMaxSpeed = a_Speed;
-	if (IsSprinting() && !m_IsFlying && !m_IsFrozen)
+
+	if (!m_IsFrozen)
 	{
 		// If we are frozen, we do not send this yet. We send when unfreeze() is called
-		m_ClientHandle->SendPlayerMaxSpeed();
+		m_World->BroadcastEntityProperties(*this);
 	}
 }
 
@@ -643,7 +625,6 @@ void cPlayer::SetFlyingMaxSpeed(double a_Speed)
 {
 	m_FlyingMaxSpeed = a_Speed;
 
-	// Update the flying speed, always:
 	if (!m_IsFrozen)
 	{
 		// If we are frozen, we do not send this yet. We send when unfreeze() is called
@@ -723,6 +704,7 @@ void cPlayer::SetSprint(const bool a_ShouldSprint)
 	}
 
 	m_World->BroadcastEntityMetadata(*this);
+	m_World->BroadcastEntityProperties(*this);
 }
 
 
@@ -1325,49 +1307,38 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 	}
 
 	m_GameMode = a_GameMode;
+	UpdateCapabilities();
+
 	m_ClientHandle->SendGameMode(a_GameMode);
-
-	SetCapabilities();
-
+	m_ClientHandle->SendInventorySlot(-1, -1, m_DraggingItem);
 	m_World->BroadcastPlayerListUpdateGameMode(*this);
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
 
 
 
-void cPlayer::SetCapabilities()
+void cPlayer::UpdateCapabilities()
 {
-	// Fly ability
+	// Fly ability:
 	if (IsGameModeCreative() || IsGameModeSpectator())
 	{
-		SetCanFly(true);
+		m_IsFlightCapable = true;
 	}
 	else
 	{
-		SetFlying(false);
-		SetCanFly(false);
+		m_IsFlying = false;
+		m_IsFlightCapable = false;
 	}
 
-	// Visible
-	if (IsGameModeSpectator())
-	{
-		SetVisible(false);
-	}
-	else
-	{
-		SetVisible(true);
-	}
+	// Visible:
+	m_IsVisible = !IsGameModeSpectator();
 
-	// Set for spectator
+	// Clear the current dragging item of spectators:
 	if (IsGameModeSpectator())
 	{
-		// Clear the current dragging item of the player
-		if (GetWindow() != nullptr)
-		{
-			m_DraggingItem.Empty();
-			GetClientHandle()->SendInventorySlot(-1, -1, m_DraggingItem);
-		}
+		m_DraggingItem.Empty();
 	}
 }
 
@@ -1449,8 +1420,8 @@ void cPlayer::Unfreeze()
 		m_World->BroadcastEntityMetadata(*this);
 	}
 
-	GetClientHandle()->SendPlayerAbilities();
-	GetClientHandle()->SendPlayerMaxSpeed();
+	m_ClientHandle->SendPlayerAbilities();
+	m_World->BroadcastEntityProperties(*this);
 
 	m_IsFrozen = false;
 	BroadcastMovementUpdate(m_ClientHandle.get());
@@ -1521,21 +1492,7 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 
 eGameMode cPlayer::GetEffectiveGameMode(void) const
 {
-	// Since entities' m_World aren't set until Initialize, but cClientHandle sends the player's gamemode early
-	// the below block deals with m_World being nullptr when called.
-
-	auto World = m_World;
-
-	if (World == nullptr)
-	{
-		World = cRoot::Get()->GetDefaultWorld();
-	}
-	else if (IsWorldChangeScheduled())
-	{
-		World = m_WorldChangeInfo.m_NewWorld;
-	}
-
-	return (m_GameMode == gmNotSet) ? World->GetGameMode() : m_GameMode;
+	return (m_GameMode == gmNotSet) ? m_World->GetGameMode() : m_GameMode;
 }
 
 
@@ -1553,17 +1510,16 @@ void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
 
 void cPlayer::SetVisible(bool a_bVisible)
 {
-	// Need to Check if the player or other players are in gamemode spectator, but will break compatibility
-	if (a_bVisible && !m_IsVisible)  // Make visible
+	if (a_bVisible && !m_IsVisible)
 	{
 		m_IsVisible = true;
-		m_World->BroadcastSpawnEntity(*this);
 	}
 	if (!a_bVisible && m_IsVisible)
 	{
 		m_IsVisible = false;
-		m_World->BroadcastDestroyEntity(*this, m_ClientHandle.get());  // Destroy on all clients
 	}
+
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -1806,25 +1762,25 @@ void cPlayer::TossPickup(const cItem & a_Item)
 
 
 
-void cPlayer::LoadFromDisk(cWorldPtr & a_World)
+void cPlayer::LoadFromDisk()
 {
 	LoadRank();
 
 	const auto & UUID = GetUUID();
 
 	// Load from the UUID file:
-	if (LoadFromFile(GetUUIDFileName(UUID), a_World))
+	if (LoadFromFile(GetUUIDFileName(UUID)))
 	{
 		return;
 	}
 
 	// Player not found:
-	a_World = cRoot::Get()->GetDefaultWorld();
+	m_World = cRoot::Get()->GetDefaultWorld();
 	LOG("Player \"%s\" (%s) data not found, resetting to defaults", GetName().c_str(), UUID.ToShortString().c_str());
 
-	const Vector3i WorldSpawn(static_cast<int>(a_World->GetSpawnX()), static_cast<int>(a_World->GetSpawnY()), static_cast<int>(a_World->GetSpawnZ()));
+	const Vector3i WorldSpawn(static_cast<int>(m_World->GetSpawnX()), static_cast<int>(m_World->GetSpawnY()), static_cast<int>(m_World->GetSpawnZ()));
 	SetPosition(WorldSpawn);
-	SetBedPos(WorldSpawn, a_World);
+	SetBedPos(WorldSpawn, m_World);
 
 	m_Inventory.Clear();
 	m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();  // Use a random number to seed the enchantment generator
@@ -1836,7 +1792,7 @@ void cPlayer::LoadFromDisk(cWorldPtr & a_World)
 
 
 
-bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
+bool cPlayer::LoadFromFile(const AString & a_FileName)
 {
 	Json::Value Root;
 
@@ -1925,16 +1881,15 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	cEnderChestEntity::LoadFromJson(Root["enderchestinventory"], m_EnderChestContents);
 
 	m_CurrentWorldName = Root.get("world", "world").asString();
-	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName());
-	if (a_World == nullptr)
+	m_World = cRoot::Get()->GetWorld(m_CurrentWorldName);
+	if (m_World == nullptr)
 	{
-		a_World = cRoot::Get()->GetDefaultWorld();
+		m_World = cRoot::Get()->GetDefaultWorld();
 	}
 
-
-	m_LastBedPos.x = Root.get("SpawnX", a_World->GetSpawnX()).asInt();
-	m_LastBedPos.y = Root.get("SpawnY", a_World->GetSpawnY()).asInt();
-	m_LastBedPos.z = Root.get("SpawnZ", a_World->GetSpawnZ()).asInt();
+	m_LastBedPos.x = Root.get("SpawnX", m_World->GetSpawnX()).asInt();
+	m_LastBedPos.y = Root.get("SpawnY", m_World->GetSpawnY()).asInt();
+	m_LastBedPos.z = Root.get("SpawnZ", m_World->GetSpawnZ()).asInt();
 	m_SpawnWorldName = Root.get("SpawnWorld", cRoot::Get()->GetDefaultWorld()->GetName()).asString();
 
 	try
@@ -1949,7 +1904,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	}
 
 	FLOGD("Player {0} was read from file \"{1}\", spawning at {2:.2f} in world \"{3}\"",
-		GetName(), a_FileName, GetPosition(), a_World->GetName()
+		GetName(), a_FileName, GetPosition(), m_World->GetName()
 	);
 
 	return true;
@@ -2689,10 +2644,10 @@ void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
 	m_IsFlying = true;
 
 	// Send the client its fake speed and max speed of 0
-	GetClientHandle()->SendPlayerMoveLook();
-	GetClientHandle()->SendPlayerAbilities();
-	GetClientHandle()->SendPlayerMaxSpeed();
-	GetClientHandle()->SendEntityVelocity(*this);
+	m_ClientHandle->SendPlayerMoveLook();
+	m_ClientHandle->SendPlayerAbilities();
+	m_ClientHandle->SendEntityVelocity(*this);
+	m_World->BroadcastEntityProperties(*this);
 
 	// Keep the server side speed variables as they were in the first place
 	m_NormalMaxSpeed = NormalMaxSpeed;
@@ -3050,6 +3005,15 @@ float cPlayer::GetEnchantmentBlastKnockbackReduction()
 
 
 
+bool cPlayer::IsInvisible() const
+{
+	return !m_IsVisible || Super::IsInvisible();
+}
+
+
+
+
+
 bool cPlayer::IsCrouched(void) const
 {
 	return std::holds_alternative<BodyStanceCrouching>(m_BodyStance);
@@ -3079,6 +3043,7 @@ bool cPlayer::IsSprinting(void) const
 
 void cPlayer::OnAddToWorld(cWorld & a_World)
 {
+	// Sends player spawn:
 	Super::OnAddToWorld(a_World);
 
 	// Update world name tracking:
@@ -3087,8 +3052,10 @@ void cPlayer::OnAddToWorld(cWorld & a_World)
 	// Fix to stop the player falling through the world, until we get serversided collision detection:
 	FreezeInternal(GetPosition(), false);
 
-	// Set capabilities based on new world:
-	SetCapabilities();
+	// UpdateCapabilities was called in the constructor, and in OnRemoveFromWorld, possibly changing our visibility.
+	// If world is in spectator mode, invisibility will need updating. If we just connected, we might be on fire from a previous game.
+	// Hence, tell the client by sending metadata:
+	m_ClientHandle->SendEntityMetadata(*this);
 
 	// Send contents of the inventory window:
 	m_ClientHandle->SendWholeInventory(*m_CurrentWindow);
@@ -3168,8 +3135,13 @@ void cPlayer::OnRemoveFromWorld(cWorld & a_World)
 		AwardAchievement(Statistic::AchPortal);
 	}
 
+	// Set capabilities based on new world:
+	UpdateCapabilities();
+
 	// Clientside warp start:
 	m_ClientHandle->SendRespawn(DestinationDimension, false);
+	m_ClientHandle->SendPlayerListUpdateGameMode(*this);
+	m_World->BroadcastPlayerListUpdateGameMode(*this);
 
 	// Clear sent chunk lists from the clienthandle:
 	m_ClientHandle->RemoveFromWorld();
@@ -3184,7 +3156,7 @@ void cPlayer::OnRemoveFromWorld(cWorld & a_World)
 
 void cPlayer::SpawnOn(cClientHandle & a_Client)
 {
-	if (!m_IsVisible || (m_ClientHandle.get() == (&a_Client)))
+	if (m_ClientHandle.get() == &a_Client)
 	{
 		return;
 	}

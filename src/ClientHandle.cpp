@@ -2528,6 +2528,15 @@ void cClientHandle::SendEntityPosition(const cEntity & a_Entity)
 
 
 
+void cClientHandle::SendEntityProperties(const cEntity & a_Entity)
+{
+	m_Protocol->SendEntityProperties(a_Entity);
+}
+
+
+
+
+
 void cClientHandle::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 {
 	m_Protocol->SendEntityStatus(a_Entity, a_Status);
@@ -2731,15 +2740,6 @@ void cClientHandle::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 void cClientHandle::SendPlayerListUpdatePing()
 {
 	m_Protocol->SendPlayerListUpdatePing();
-}
-
-
-
-
-
-void cClientHandle::SendPlayerMaxSpeed(void)
-{
-	m_Protocol->SendPlayerMaxSpeed();
 }
 
 

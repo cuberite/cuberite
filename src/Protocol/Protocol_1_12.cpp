@@ -1003,7 +1003,6 @@ UInt32 cProtocol_1_12::GetPacketID(cProtocol::ePacketType a_Packet)
 		case pktExperience:          return 0x3f;
 		case pktHeldItemChange:      return 0x39;
 		case pktLeashEntity:         return 0x3c;
-		case pktPlayerMaxSpeed:      return 0x4d;
 		case pktRemoveEntityEffect:  return 0x32;
 		case pktResourcePack:        return 0x33;
 		case pktRespawn:             return 0x34;
@@ -1184,7 +1183,6 @@ UInt32 cProtocol_1_12_1::GetPacketID(ePacketType a_Packet)
 		case pktPlayerList:             return 0x2e;
 		case pktPlayerListHeaderFooter: return 0x4a;
 		case pktPlayerAbilities:        return 0x2c;
-		case pktPlayerMaxSpeed:         return 0x4e;
 		case pktPlayerMoveLook:         return 0x2f;
 		case pktRemoveEntityEffect:     return 0x33;
 		case pktResourcePack:           return 0x34;

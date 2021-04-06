@@ -122,7 +122,7 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 	*/
 
 
-	ASSERT(m_World == nullptr);
+	ASSERT(a_Self->IsPlayer() || (m_World == nullptr));  // Players' worlds are loaded from disk.
 	ASSERT(GetParentChunk() == nullptr);
 	SetWorld(&a_EntityWorld);
 	a_EntityWorld.AddEntity(std::move(a_Self));
