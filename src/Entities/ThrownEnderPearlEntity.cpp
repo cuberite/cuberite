@@ -44,7 +44,7 @@ void cThrownEnderPearlEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitP
 				return false;
 			}
 
-			return attachedEntity->GetUniqueID() == a_EntityHit.GetUniqueID()
+			return attachedEntity->GetUniqueID() == a_EntityHit.GetUniqueID();
 		}
 	);
 	// TODO: If entity is Ender Crystal, destroy it
