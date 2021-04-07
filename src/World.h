@@ -56,8 +56,6 @@ class cWorld  // tolua_export
 public:
 	// tolua_end
 
-
-
 	/** A simple RAII locker for the chunkmap - locks the chunkmap in its constructor, unlocks it in the destructor */
 	class cLock:
 		public cCSLock
@@ -66,13 +64,6 @@ public:
 	public:
 		cLock(const cWorld & a_World);
 	};
-
-
-
-	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
-	{
-		return "cWorld";
-	}
 
 	/** Construct the world and read settings from its ini file.
 	@param a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock.
