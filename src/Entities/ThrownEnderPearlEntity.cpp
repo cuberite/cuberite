@@ -43,13 +43,8 @@ void cThrownEnderPearlEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitP
 				// nothing attached
 				return false;
 			}
-			if (attachedEntity->GetUniqueID() == a_EntityHit.GetUniqueID())
-			{
-				// it's attached, ignore damage
-				return true;
-			}
 
-			return false;
+			return attachedEntity->GetUniqueID() == a_EntityHit.GetUniqueID()
 		}
 	);
 	// TODO: If entity is Ender Crystal, destroy it
