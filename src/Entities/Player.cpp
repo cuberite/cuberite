@@ -2598,7 +2598,7 @@ void cPlayer::Detach()
 
 
 
-void cPlayer::Detach(bool isTeleporting)
+void cPlayer::Detach(bool a_IsTeleporting)
 {
 	if (m_AttachedTo == nullptr)
 	{
@@ -2618,7 +2618,7 @@ void cPlayer::Detach(bool isTeleporting)
 	Super::Detach();
 
 	// If they are teleporting, no need to figure out position
-	if (isTeleporting)
+	if (a_IsTeleporting)
 	{
 		return;
 	}
