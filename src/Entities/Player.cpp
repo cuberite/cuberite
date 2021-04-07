@@ -2591,6 +2591,15 @@ void cPlayer::AttachTo(cEntity * a_AttachTo)
 
 void cPlayer::Detach()
 {
+	Detach(false);
+}
+
+
+
+
+
+void cPlayer::Detach(bool isTeleporting)
+{
 	if (m_AttachedTo == nullptr)
 	{
 		// The player is not attached to anything. Bail out.
@@ -2607,6 +2616,13 @@ void cPlayer::Detach()
 	}
 
 	Super::Detach();
+
+	// If they are teleporting, no need to figure out position
+	if (isTeleporting)
+	{
+		return;
+	}
+
 	int PosX = POSX_TOINT;
 	int PosY = POSY_TOINT;
 	int PosZ = POSZ_TOINT;
