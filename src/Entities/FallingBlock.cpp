@@ -58,7 +58,7 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	auto BlockBelow = a_Chunk.GetBlock(cChunkDef::RelativeToAbsolute({BlockX, BlockY, BlockZ}, a_Chunk.GetPos()));
+	auto BlockBelow = a_Chunk.GetBlock(cChunkDef::AbsoluteToRelative({BlockX, BlockY, BlockZ}));
 	if (cSandSimulator::DoesBreakFallingThrough(BlockBelow))
 	{
 		// Fallen onto a block that breaks this into pickups (e. g. half-slab)

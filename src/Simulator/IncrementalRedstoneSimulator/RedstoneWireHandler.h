@@ -266,7 +266,7 @@ namespace RedstoneWireHandler
 
 	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BlockState a_Block, const PowerLevel a_Power)
 	{
-		LOGREDSTONE("Evaluating dusty the wire (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, Power);
+		LOGREDSTONE("Evaluating dusty the wire (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, a_Power);
 
 		if (Block::RedstoneWire::Power(a_Block) == a_Power)
 		{
@@ -303,7 +303,12 @@ namespace RedstoneWireHandler
 		Callback(a_Position + OffsetYM);
 
 		const auto & Data = DataForChunk(a_Chunk);
-		const auto Block = Data.WireStates.find(a_Position)->second;
+		const auto Iterator = Data.WireStates.find(a_Position);
+		if(Iterator == Data.WireStates.end())
+		{
+			return;
+		}
+		const auto Block = Iterator->second;
 
 		// Figure out, based on our pre-computed block, where we connect to:
 		for (const auto & Offset : RelativeLaterals)
