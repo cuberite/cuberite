@@ -34,12 +34,29 @@ void cThrownEnderPearlEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_Hi
 void cThrownEnderPearlEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
 	int TotalDamage = 0;
+
+	bool isAttachedEntity = GetWorld()->FindAndDoWithPlayer(m_CreatorData.m_Name, [& a_EntityHit](cPlayer & a_Entity)
+		{
+			const cEntity * attachedEntity = a_Entity.GetAttached();
+			if (attachedEntity == nullptr)
+			{
+				// nothing attached
+				return false;
+			}
+
+			return attachedEntity->GetUniqueID() == a_EntityHit.GetUniqueID();
+		}
+	);
 	// TODO: If entity is Ender Crystal, destroy it
 
-	TeleportCreator(a_HitPos);
-	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
 
-	m_DestroyTimer = 5;
+	if (!isAttachedEntity)
+	{
+		TeleportCreator(a_HitPos);
+		a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
+		m_DestroyTimer = 5;
+	}
+
 }
 
 
@@ -79,6 +96,7 @@ void cThrownEnderPearlEntity::TeleportCreator(Vector3d a_HitPos)
 			// Teleport the creator here, make them take 5 damage:
 			a_Entity.TeleportToCoords(a_HitPos.x, a_HitPos.y + 0.2, a_HitPos.z);
 			a_Entity.TakeDamage(dtEnderPearl, this, 5, 0);
+			a_Entity.Detach(true);
 			return true;
 		}
 	);
