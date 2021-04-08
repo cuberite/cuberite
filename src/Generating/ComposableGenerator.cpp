@@ -23,6 +23,7 @@
 #include "DistortedHeightmap.h"
 #include "DungeonRoomsFinisher.h"
 #include "EndGen.h"
+#include "EnderDragonFightStructuresGen.h"
 #include "MineShafts.h"
 #include "Noise3DGenerator.h"
 #include "Ravines.h"
@@ -38,10 +39,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cTerrainCompositionGen:
 
-cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(
+std::unique_ptr<cTerrainCompositionGen> cTerrainCompositionGen::CreateCompositionGen(
 	cIniFile & a_IniFile,
-	const cBiomeGenPtr & a_BiomeGen,
-	const cTerrainShapeGenPtr & a_ShapeGen,
+	cBiomeGen & a_BiomeGen,
+	cTerrainShapeGen & a_ShapeGen,
 	int a_Seed
 )
 {
@@ -53,7 +54,7 @@ cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(
 	}
 
 	// Compositor list is alpha-sorted
-	cTerrainCompositionGenPtr res;
+	std::unique_ptr<cTerrainCompositionGen> res;
 	if (NoCaseCompare(CompoGenName, "Biomal") == 0)
 	{
 		res = CreateCompoGenBiomal(a_Seed);
@@ -65,11 +66,11 @@ cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(
 	}
 	else if (NoCaseCompare(CompoGenName, "Classic") == 0)
 	{
-		res = std::make_shared<cCompoGenClassic>();
+		res = std::make_unique<cCompoGenClassic>();
 	}
 	else if (NoCaseCompare(CompoGenName, "DebugBiomes") == 0)
 	{
-		res = std::make_shared<cCompoGenDebugBiomes>();
+		res = std::make_unique<cCompoGenDebugBiomes>();
 	}
 	else if (NoCaseCompare(CompoGenName, "DistortedHeightmap") == 0)
 	{
@@ -78,11 +79,11 @@ cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(
 	}
 	else if (NoCaseCompare(CompoGenName, "End") == 0)
 	{
-		res = std::make_shared<cEndGen>(a_Seed);
+		res = std::make_unique<cEndGen>(a_Seed);
 	}
 	else if (NoCaseCompare(CompoGenName, "Nether") == 0)
 	{
-		res = std::make_shared<cCompoGenNether>(a_Seed);
+		res = std::make_unique<cCompoGenNether>(a_Seed);
 	}
 	else if (NoCaseCompare(CompoGenName, "Noise3D") == 0)
 	{
@@ -91,7 +92,7 @@ cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(
 	}
 	else if (NoCaseCompare(CompoGenName, "SameBlock") == 0)
 	{
-		res = std::make_shared<cCompoGenSameBlock>();
+		res = std::make_unique<cCompoGenSameBlock>();
 	}
 	else
 	{
@@ -104,7 +105,7 @@ cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(
 	// Read the settings from the ini file:
 	res->InitializeCompoGen(a_IniFile);
 
-	return cTerrainCompositionGenPtr(res);
+	return res;
 }
 
 
@@ -181,10 +182,10 @@ void cComposableGenerator::Generate(cChunkDesc & a_ChunkDesc)
 
 	if (a_ChunkDesc.IsUsingDefaultFinish())
 	{
-		for (cFinishGenList::iterator itr = m_FinishGens.begin(); itr != m_FinishGens.end(); ++itr)
+		for (const auto & Finisher : m_FinishGens)
 		{
-			(*itr)->GenFinish(a_ChunkDesc);
-		}  // for itr - m_FinishGens[]
+			Finisher->GenFinish(a_ChunkDesc);
+		}
 		ShouldUpdateHeightmap = true;
 	}
 
@@ -262,7 +263,7 @@ void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDi
 			a_IniFile.GetValueSet("Generator", "ConstantBiome",  "End");
 			a_IniFile.GetValueSet("Generator", "ShapeGen",       "End");
 			a_IniFile.GetValueSet("Generator", "CompositionGen", "End");
-			a_IniFile.GetValueSet("Generator", "Finishers",      "");
+			a_IniFile.GetValueSet("Generator", "Finishers",      "EnderDragonFightStructures");
 			break;
 		}  // dimEnd
 
@@ -302,11 +303,11 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 	if (MultiCacheLength > 0)
 	{
 		LOGD("Enabling multicache for biomegen of length %d.", MultiCacheLength);
-		m_BiomeGen = std::make_shared<cBioGenMulticache>(m_BiomeGen, static_cast<size_t>(CacheSize), static_cast<size_t>(MultiCacheLength));
+		m_BiomeGen = std::make_unique<cBioGenMulticache>(std::move(m_BiomeGen), static_cast<size_t>(CacheSize), static_cast<size_t>(MultiCacheLength));
 	}
 	else
 	{
-		m_BiomeGen = std::make_shared<cBioGenCache>(m_BiomeGen, static_cast<size_t>(CacheSize));
+		m_BiomeGen = std::make_unique<cBioGenMulticache>(std::move(m_BiomeGen), static_cast<size_t>(CacheSize), 1);
 	}
 }
 
@@ -319,7 +320,7 @@ void cComposableGenerator::InitShapeGen(cIniFile & a_IniFile)
 	bool CacheOffByDefault = false;
 	m_ShapeGen = cTerrainShapeGen::CreateShapeGen(
 		a_IniFile,
-		m_BiomeGen,
+		*m_BiomeGen,
 		m_Seed,
 		CacheOffByDefault
 	);
@@ -351,8 +352,8 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 {
 	m_CompositionGen = cTerrainCompositionGen::CreateCompositionGen(
 		a_IniFile,
-		m_BiomeGen,
-		m_ShapeGen,
+		*m_BiomeGen,
+		*m_ShapeGen,
 		m_Seed
 	);
 
@@ -361,11 +362,11 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 	int CompoGenCacheSize = a_IniFile.GetValueSetI("Generator", "CompositionGenCacheSize", 64);
 	if (CompoGenCacheSize > 0)
 	{
-		m_CompositionGen = std::make_shared<cCompoGenCache>(m_CompositionGen, CompoGenCacheSize);
+		m_CompositionGen = std::make_unique<cCompoGenCache>(std::move(m_CompositionGen), CompoGenCacheSize);
 	}
 
 	// Create a cache of the composited heightmaps, so that finishers may use it:
-	m_CompositedHeightCache = std::make_shared<cHeiGenMultiCache>(std::make_shared<cCompositedHeiGen>(m_BiomeGen, m_ShapeGen, m_CompositionGen), 16, 128);
+	m_CompositedHeightCache = std::make_unique<cHeiGenMultiCache>(std::make_unique<cCompositedHeiGen>(*m_BiomeGen, *m_ShapeGen, *m_CompositionGen), 16, 128);
 	// 128 subcaches of depth 16 each = 0.5 MiB of RAM. Acceptable, for the amount of work this saves.
 }
 
@@ -392,13 +393,13 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		// Finishers, alpha-sorted:
 		if (NoCaseCompare(finisher, "Animals") == 0)
 		{
-			m_FinishGens.emplace_back(new cFinishGenPassiveMobs(m_Seed, a_IniFile, m_Dimension));
+			m_FinishGens.push_back(std::make_unique<cFinishGenPassiveMobs>(m_Seed, a_IniFile, m_Dimension));
 		}
 		else if (NoCaseCompare(finisher, "BottomLava") == 0)
 		{
 			int DefaultBottomLavaLevel = (m_Dimension == dimNether) ? 30 : 10;
 			int BottomLavaLevel = a_IniFile.GetValueSetI("Generator", "BottomLavaLevel", DefaultBottomLavaLevel);
-			m_FinishGens.emplace_back(new cFinishGenBottomLava(BottomLavaLevel));
+			m_FinishGens.push_back(std::make_unique<cFinishGenBottomLava>(BottomLavaLevel));
 		}
 		else if (NoCaseCompare(finisher, "DeadBushes") == 0)
 		{
@@ -417,44 +418,30 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 
 			// A list with all the allowed blocks that can be below the dead bush.
 			cFinishGenSingleTopBlock::BlockList AllowedBlocks;
-			AllowedBlocks.push_back(BlockType::Sand);
-			AllowedBlocks.push_back(BlockType::Terracotta);
-			AllowedBlocks.push_back(BlockType::BlackTerracotta);
-			AllowedBlocks.push_back(BlockType::BlueTerracotta);
-			AllowedBlocks.push_back(BlockType::BrownTerracotta);
-			AllowedBlocks.push_back(BlockType::CyanTerracotta);
-			AllowedBlocks.push_back(BlockType::GrayTerracotta);
-			AllowedBlocks.push_back(BlockType::GreenTerracotta);
-			AllowedBlocks.push_back(BlockType::LimeTerracotta);
-			AllowedBlocks.push_back(BlockType::LightBlueTerracotta);
-			AllowedBlocks.push_back(BlockType::MagentaTerracotta);
-			AllowedBlocks.push_back(BlockType::OrangeTerracotta);
-			AllowedBlocks.push_back(BlockType::PinkTerracotta);
-			AllowedBlocks.push_back(BlockType::PurpleTerracotta);
-			AllowedBlocks.push_back(BlockType::RedTerracotta);
-			AllowedBlocks.push_back(BlockType::YellowTerracotta);
-			AllowedBlocks.push_back(BlockType::WhiteTerracotta);
+			AllowedBlocks.push_back(E_BLOCK_SAND);
+			AllowedBlocks.push_back(E_BLOCK_HARDENED_CLAY);
+			AllowedBlocks.push_back(E_BLOCK_STAINED_CLAY);
 
-			m_FinishGens.emplace_back(new cFinishGenSingleTopBlock(m_Seed, Block::DeadBush::DeadBush(), AllowedBiomes, 2, AllowedBlocks));
+			m_FinishGens.push_back(std::make_unique<cFinishGenSingleTopBlock>(m_Seed, E_BLOCK_DEAD_BUSH, AllowedBiomes, 2, AllowedBlocks));
 		}
 		else if (NoCaseCompare(finisher, "DirectOverhangs") == 0)
 		{
-			m_FinishGens.emplace_back(new cStructGenDirectOverhangs(m_Seed));
+			m_FinishGens.push_back(std::make_unique<cStructGenDirectOverhangs>(m_Seed));
 		}
 		else if (NoCaseCompare(finisher, "DirtPockets") == 0)
 		{
-			auto gen = std::make_shared<cFinishGenOrePockets>(m_Seed + 1, cFinishGenOrePockets::DefaultNaturalPatches());
-			gen->Initialize(a_IniFile, "DirtPockets");
-			m_FinishGens.push_back(gen);
+			auto Gen = std::make_unique<cFinishGenOrePockets>(m_Seed + 1, cFinishGenOrePockets::DefaultNaturalPatches());
+			Gen->Initialize(a_IniFile, "DirtPockets");
+			m_FinishGens.push_back(std::move(Gen));
 		}
 		else if (NoCaseCompare(finisher, "DistortedMembraneOverhangs") == 0)
 		{
-			m_FinishGens.emplace_back(new cStructGenDistortedMembraneOverhangs(m_Seed));
+			m_FinishGens.push_back(std::make_unique<cStructGenDistortedMembraneOverhangs>(m_Seed));
 		}
 		else if (NoCaseCompare(finisher, "DualRidgeCaves") == 0)
 		{
 			float Threshold = static_cast<float>(a_IniFile.GetValueSetF("Generator", "DualRidgeCavesThreshold", 0.3));
-			m_FinishGens.emplace_back(new cStructGenDualRidgeCaves(m_Seed, Threshold));
+			m_FinishGens.push_back(std::make_unique<cStructGenDualRidgeCaves>(m_Seed, Threshold));
 		}
 		else if (NoCaseCompare(finisher, "DungeonRooms") == 0)
 		{
@@ -462,24 +449,36 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int     MaxSize       = a_IniFile.GetValueSetI("Generator", "DungeonRoomsMaxSize", 7);
 			int     MinSize       = a_IniFile.GetValueSetI("Generator", "DungeonRoomsMinSize", 5);
 			AString HeightDistrib = a_IniFile.GetValueSet ("Generator", "DungeonRoomsHeightDistrib", "0, 0; 10, 10; 11, 500; 40, 500; 60, 40; 90, 1");
-			m_FinishGens.emplace_back(new cDungeonRoomsFinisher(m_ShapeGen, m_Seed, GridSize, MaxSize, MinSize, HeightDistrib));
+			m_FinishGens.push_back(std::make_unique<cDungeonRoomsFinisher>(*m_ShapeGen, m_Seed, GridSize, MaxSize, MinSize, HeightDistrib));
+		}
+		else if (NoCaseCompare(finisher, "EnderDragonFightStructures") == 0)
+		{
+			AString Pillars = a_IniFile.GetValueSet("Generator", "ObsidianPillars",
+				"76|3|false; 79|3|true; 82|3|true; "
+				"85|4|false; 88|4|false; 91|4|false; "
+				"94|5|false; 97|5|false; 100|5|false; "
+				"103|6|false");
+			int Radius = a_IniFile.GetValueSetI("Generator", "ObsidianPillarsRadius", 43);
+			auto Gen = std::make_unique<cEnderDragonFightStructuresGen>(m_Seed);
+			Gen->Init(Pillars, Radius);
+			m_FinishGens.push_back(std::move(Gen));
 		}
 		else if (NoCaseCompare(finisher, "GlowStone") == 0)
 		{
-			m_FinishGens.emplace_back(new cFinishGenGlowStone(m_Seed));
+			m_FinishGens.push_back(std::make_unique<cFinishGenGlowStone>(m_Seed));
 		}
 		else if (NoCaseCompare(finisher, "Ice") == 0)
 		{
-			m_FinishGens.emplace_back(new cFinishGenIce);
+			m_FinishGens.push_back(std::make_unique<cFinishGenIce>());
 		}
 		else if (NoCaseCompare(finisher, "LavaLakes") == 0)
 		{
 			int Probability = a_IniFile.GetValueSetI("Generator", "LavaLakesProbability", 10);
-			m_FinishGens.emplace_back(new cStructGenLakes(m_Seed * 5 + 16873, BlockType::Lava, m_ShapeGen, Probability));
+			m_FinishGens.push_back(std::make_unique<cStructGenLakes>(m_Seed * 5 + 16873, E_BLOCK_STATIONARY_LAVA, *m_ShapeGen, Probability));
 		}
 		else if (NoCaseCompare(finisher, "LavaSprings") == 0)
 		{
-			m_FinishGens.emplace_back(new cFinishGenFluidSprings(m_Seed, BlockType::Lava, a_IniFile, m_Dimension));
+			m_FinishGens.push_back(std::make_unique<cFinishGenFluidSprings>(m_Seed, E_BLOCK_LAVA, a_IniFile, m_Dimension));
 		}
 		else if (NoCaseCompare(finisher, "Lilypads") == 0)
 		{
@@ -490,13 +489,14 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 
 			// A list with all the allowed blocks that can be below the lilypad.
 			cFinishGenSingleTopBlock::BlockList AllowedBlocks;
-			AllowedBlocks.push_back(BlockType::Water);
+			AllowedBlocks.push_back(E_BLOCK_WATER);
+			AllowedBlocks.push_back(E_BLOCK_STATIONARY_WATER);
 
-			m_FinishGens.emplace_back(new cFinishGenSingleTopBlock(m_Seed, Block::LilyPad::LilyPad(), AllowedBiomes, 4, AllowedBlocks));
+			m_FinishGens.push_back(std::make_unique<cFinishGenSingleTopBlock>(m_Seed, E_BLOCK_LILY_PAD, AllowedBiomes, 4, AllowedBlocks));
 		}
 		else if (NoCaseCompare(finisher, "MarbleCaves") == 0)
 		{
-			m_FinishGens.emplace_back(new cStructGenMarbleCaves(m_Seed));
+			m_FinishGens.push_back(std::make_unique<cStructGenMarbleCaves>(m_Seed));
 		}
 		else if (NoCaseCompare(finisher, "MineShafts") == 0)
 		{
@@ -506,37 +506,37 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int ChanceCorridor  = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceCorridor",  600);
 			int ChanceCrossing  = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceCrossing",  200);
 			int ChanceStaircase = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceStaircase", 200);
-			m_FinishGens.emplace_back(new cStructGenMineShafts(
+			m_FinishGens.push_back(std::make_unique<cStructGenMineShafts>(
 				m_Seed, GridSize, MaxOffset, MaxSystemSize,
 				ChanceCorridor, ChanceCrossing, ChanceStaircase
 			));
 		}
 		else if (NoCaseCompare(finisher, "NaturalPatches") == 0)
 		{
-			m_FinishGens.emplace_back(new cFinishGenOreNests(m_Seed + 1, cFinishGenOreNests::DefaultNaturalPatches()));
+			m_FinishGens.push_back(std::make_unique<cFinishGenOreNests>(m_Seed + 1, cFinishGenOreNests::DefaultNaturalPatches()));
 		}
 		else if (NoCaseCompare(finisher, "NetherClumpFoliage") == 0)
 		{
-			m_FinishGens.emplace_back(new cFinishGenNetherClumpFoliage(m_Seed));
+			m_FinishGens.push_back(std::make_unique<cFinishGenNetherClumpFoliage>(m_Seed));
 		}
 		else if (NoCaseCompare(finisher, "NetherOreNests") == 0)
 		{
-			m_FinishGens.emplace_back(new cFinishGenOreNests(m_Seed + 2, cFinishGenOreNests::DefaultNetherOres()));
+			m_FinishGens.push_back(std::make_unique<cFinishGenOreNests>(m_Seed + 2, cFinishGenOreNests::DefaultNetherOres()));
 		}
 		else if (NoCaseCompare(finisher, "OreNests") == 0)
 		{
-			m_FinishGens.emplace_back(new cFinishGenOreNests(m_Seed + 3, cFinishGenOreNests::DefaultOverworldOres()));
+			m_FinishGens.push_back(std::make_unique<cFinishGenOreNests>(m_Seed + 3, cFinishGenOreNests::DefaultOverworldOres()));
 		}
 		else if (NoCaseCompare(finisher, "OrePockets") == 0)
 		{
-			auto gen = std::make_shared<cFinishGenOrePockets>(m_Seed + 2, cFinishGenOrePockets::DefaultOverworldOres());
-			gen->Initialize(a_IniFile, "OrePockets");
-			m_FinishGens.push_back(gen);
+			auto Gen = std::make_unique<cFinishGenOrePockets>(m_Seed + 2, cFinishGenOrePockets::DefaultOverworldOres());
+			Gen->Initialize(a_IniFile, "OrePockets");
+			m_FinishGens.push_back(std::move(Gen));
 		}
 		else if (NoCaseCompare(finisher, "OverworldClumpFlowers") == 0)
 		{
 			auto flowers = cFinishGenClumpTopBlock::ParseIniFile(a_IniFile, "OverworldClumpFlowers");
-			m_FinishGens.emplace_back(new cFinishGenClumpTopBlock(m_Seed, flowers));
+			m_FinishGens.push_back(std::make_unique<cFinishGenClumpTopBlock>(m_Seed, flowers));
 		}
 		else if (NoCaseCompare(finisher, "PieceStructures") == 0)
 		{
@@ -546,10 +546,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 				continue;
 			}
 
-			auto gen = std::make_shared<cPieceStructuresGen>(m_Seed);
-			if (gen->Initialize(split[1], seaLevel, m_BiomeGen, m_CompositedHeightCache))
+			auto Gen = std::make_unique<cPieceStructuresGen>(m_Seed);
+			if (Gen->Initialize(split[1], seaLevel, *m_BiomeGen, *m_CompositedHeightCache))
 			{
-				m_FinishGens.push_back(gen);
+				m_FinishGens.push_back(std::move(Gen));
 			}
 		}
 		else if (NoCaseCompare(finisher, "PreSimulator") == 0)
@@ -559,11 +559,11 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			bool PreSimulateWater         = a_IniFile.GetValueSetB("Generator", "PreSimulatorWater", true);
 			bool PreSimulateLava          = a_IniFile.GetValueSetB("Generator", "PreSimulatorLava", true);
 
-			m_FinishGens.emplace_back(new cFinishGenPreSimulator(PreSimulateFallingBlocks, PreSimulateWater, PreSimulateLava));
+			m_FinishGens.push_back(std::make_unique<cFinishGenPreSimulator>(PreSimulateFallingBlocks, PreSimulateWater, PreSimulateLava));
 		}
 		else if (NoCaseCompare(finisher, "Ravines") == 0)
 		{
-			m_FinishGens.emplace_back(new cStructGenRavines(m_Seed, 128));
+			m_FinishGens.push_back(std::make_unique<cStructGenRavines>(m_Seed, 128));
 		}
 		else if (NoCaseCompare(finisher, "RoughRavines") == 0)
 		{
@@ -583,7 +583,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			double MinCeilingHeightEdge   = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinCeilingHeightEdge",   38);
 			double MaxCeilingHeightCenter = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxCeilingHeightCenter", 58);
 			double MinCeilingHeightCenter = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinCeilingHeightCenter", 36);
-			m_FinishGens.emplace_back(new cRoughRavines(
+			m_FinishGens.push_back(std::make_unique<cRoughRavines>(
 				m_Seed, MaxSize, MinSize,
 				static_cast<float>(MaxCenterWidth),
 				static_cast<float>(MinCenterWidth),
@@ -608,33 +608,33 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 				continue;
 			}
 
-			auto Gen = std::make_shared<cSinglePieceStructuresGen>(m_Seed);
-			if (Gen->Initialize(split[1], seaLevel, m_BiomeGen, m_CompositedHeightCache))
+			auto Gen = std::make_unique<cSinglePieceStructuresGen>(m_Seed);
+			if (Gen->Initialize(split[1], seaLevel, *m_BiomeGen, *m_CompositedHeightCache))
 			{
-				m_FinishGens.push_back(Gen);
+				m_FinishGens.push_back(std::move(Gen));
 			}
 		}
 		else if (NoCaseCompare(finisher, "SoulsandRims") == 0)
 		{
-			m_FinishGens.emplace_back(new cFinishGenSoulsandRims(m_Seed));
+			m_FinishGens.push_back(std::make_unique<cFinishGenSoulsandRims>(m_Seed));
 		}
 		else if (NoCaseCompare(finisher, "Snow") == 0)
 		{
-			m_FinishGens.emplace_back(new cFinishGenSnow);
+			m_FinishGens.push_back(std::make_unique<cFinishGenSnow>());
 		}
 		else if (NoCaseCompare(finisher, "SprinkleFoliage") == 0)
 		{
 			int MaxCactusHeight 	= a_IniFile.GetValueI("Plants", "MaxCactusHeight", 3);
 			int MaxSugarcaneHeight 	= a_IniFile.GetValueI("Plants", "MaxSugarcaneHeight", 3);
-			m_FinishGens.emplace_back(new cFinishGenSprinkleFoliage(m_Seed, MaxCactusHeight, MaxSugarcaneHeight));
+			m_FinishGens.push_back(std::make_unique<cFinishGenSprinkleFoliage>(m_Seed, MaxCactusHeight, MaxSugarcaneHeight));
 		}
 		else if (NoCaseCompare(finisher, "TallGrass") == 0)
 		{
-			m_FinishGens.emplace_back(new cFinishGenTallGrass(m_Seed));
+			m_FinishGens.push_back(std::make_unique<cFinishGenTallGrass>(m_Seed));
 		}
 		else if (NoCaseCompare(finisher, "Trees") == 0)
 		{
-			m_FinishGens.emplace_back(new cStructGenTrees(m_Seed, m_BiomeGen, m_ShapeGen, m_CompositionGen));
+			m_FinishGens.push_back(std::make_unique<cStructGenTrees>(m_Seed, *m_BiomeGen, *m_ShapeGen, *m_CompositionGen));
 		}
 		else if (NoCaseCompare(finisher, "Villages") == 0)
 		{
@@ -646,28 +646,28 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int MaxDensity = a_IniFile.GetValueSetI("Generator", "VillageMaxDensity", 80);
 			AString PrefabList = a_IniFile.GetValueSet("Generator", "VillagePrefabs", "PlainsVillage, SandVillage");
 			auto Prefabs = StringSplitAndTrim(PrefabList, ",");
-			m_FinishGens.emplace_back(new cVillageGen(m_Seed, GridSize, MaxOffset, MaxDepth, MaxSize, MinDensity, MaxDensity, m_BiomeGen, m_CompositedHeightCache, seaLevel, Prefabs));
+			m_FinishGens.push_back(std::make_unique<cVillageGen>(m_Seed, GridSize, MaxOffset, MaxDepth, MaxSize, MinDensity, MaxDensity, *m_BiomeGen, *m_CompositedHeightCache, seaLevel, Prefabs));
 		}
 		else if (NoCaseCompare(finisher, "Vines") == 0)
 		{
 			int Level = a_IniFile.GetValueSetI("Generator", "VinesLevel", 40);
-			m_FinishGens.emplace_back(new cFinishGenVines(m_Seed, Level));
+			m_FinishGens.push_back(std::make_unique<cFinishGenVines>(m_Seed, Level));
 		}
 		else if (NoCaseCompare(finisher, "WaterLakes") == 0)
 		{
 			int Probability = a_IniFile.GetValueSetI("Generator", "WaterLakesProbability", 25);
-			m_FinishGens.emplace_back(new cStructGenLakes(m_Seed * 3 + 652, BlockType::Water, m_ShapeGen, Probability));
+			m_FinishGens.push_back(std::make_unique<cStructGenLakes>(m_Seed * 3 + 652, E_BLOCK_STATIONARY_WATER, *m_ShapeGen, Probability));
 		}
 		else if (NoCaseCompare(finisher, "WaterSprings") == 0)
 		{
-			m_FinishGens.emplace_back(new cFinishGenFluidSprings(m_Seed, BlockType::Water, a_IniFile, m_Dimension));
+			m_FinishGens.push_back(std::make_unique<cFinishGenFluidSprings>(m_Seed, E_BLOCK_WATER, a_IniFile, m_Dimension));
 		}
 		else if (NoCaseCompare(finisher, "WormNestCaves") == 0)
 		{
 			int Size      = a_IniFile.GetValueSetI("Generator", "WormNestCavesSize", 64);
 			int Grid      = a_IniFile.GetValueSetI("Generator", "WormNestCavesGrid", 96);
 			int MaxOffset = a_IniFile.GetValueSetI("Generator", "WormNestMaxOffset", 32);
-			m_FinishGens.emplace_back(new cStructGenWormNestCaves(m_Seed, Size, Grid, MaxOffset));
+			m_FinishGens.push_back(std::make_unique<cStructGenWormNestCaves>(m_Seed, Size, Grid, MaxOffset));
 		}
 		else
 		{
@@ -675,7 +675,3 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 	}  // for itr - Str[]
 }
-
-
-
-

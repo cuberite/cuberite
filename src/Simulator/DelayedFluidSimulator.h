@@ -22,23 +22,20 @@ public:
 	class cSlot
 	{
 	public:
-		/** Returns true if the specified block is stored */
-		bool HasBlock(int a_RelX, int a_RelY, int a_RelZ);
-
 		/** Adds the specified block unless already present; returns true if added, false if the block was already present */
-		bool Add(int a_RelX, int a_RelY, int a_RelZ);
+		bool Add(Vector3i a_RelPos);
 
 		/** Array of block containers, each item stores blocks for one Z coord
 		Int param is the block index (for faster duplicate comparison in Add())
 		*/
-		std::array<cCoordWithIntVector, 16> m_Blocks;
+		std::unordered_map<int, Vector3i> m_Blocks;
 	} ;
 
 	cDelayedFluidSimulatorChunkData(int a_TickDelay);
-	virtual ~cDelayedFluidSimulatorChunkData();
+	virtual ~cDelayedFluidSimulatorChunkData() override {};
 
 	/** Slots, one for each delay tick, each containing the blocks to simulate */
-	cSlot * m_Slots;
+	std::vector<cSlot> m_Slots;
 } ;
 
 

@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "PieceModifier.h"
 #include "../Noise/Noise.h"
+#include "../Protocol/Palettes/Upgrade.h"
 
 
 
@@ -13,6 +14,21 @@
 
 // Constant that is added to seed
 static const int SEED_OFFSET = 135 * 13;
+
+
+
+
+
+// Emit a warning if the first param is true
+#define CONDWARNING(ShouldLog, Fmt, ...) \
+	do { \
+		if (ShouldLog) \
+		{ \
+			LOGWARNING(Fmt, __VA_ARGS__); \
+		} \
+	} while (false)
+
+
 
 
 
@@ -41,13 +57,13 @@ public:
 			auto blocksToReplace = StringSplitAndTrim(blocksToReplaceStr, ",");
 			for (size_t i = 0; i < blocksToReplace.size(); i++)
 			{
-				BLOCKTYPE blockType = static_cast<BLOCKTYPE>(BlockStringToType(blocksToReplace[i]));
-				if ((blockType == E_BLOCK_AIR) && !NoCaseCompare(blocksToReplace[i], "Air"))
+				auto Block = PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockStringToType(blocksToReplace[i])), 0);
+				if ((Block.Type() == BlockType::Air) && !NoCaseCompare(blocksToReplace[i], "Air"))
 				{
 					CONDWARNING(a_LogWarnings, "Cannot parse block type from string \"%s\"!", blocksToReplace[i].c_str());
 					return false;
 				}
-				m_BlocksToReplace[blockType] = 1;
+				m_BlocksToReplace[Block.Type()] = 1;
 			}
 
 			Params = Params.substr(idxPipe + 1, Params.length() - 1);
@@ -137,9 +153,9 @@ public:
 				return false;
 			}
 
-			BLOCKTYPE BlockType = static_cast<BLOCKTYPE>(BlockStringToType(BlockParams[0]));
+			auto SetBlock = PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockStringToType(BlockParams[0])), 0);
 			int BlockWeight = 0;
-			if ((BlockType != E_BLOCK_AIR) && !NoCaseCompare(BlockParams[0], "Air"))
+			if ((SetBlock.Type() != BlockType::Air) && !NoCaseCompare(BlockParams[0], "Air"))
 			{
 				// Failed to parse block type
 				CONDWARNING(
@@ -159,7 +175,7 @@ public:
 			}
 
 
-			Block.m_Type = BlockType;
+			Block.m_Type = SetBlock.Type();
 			Block.m_Weight = BlockWeight;
 			m_AllWeights += BlockWeight;
 
@@ -230,14 +246,16 @@ public:
 		cNoise PieceNoise(Noise.IntNoise3DInt(a_PiecePos));
 
 		size_t NumBlocks = a_Image.GetBlockCount();
-		BLOCKTYPE * BlockTypes = a_Image.GetBlockTypes();
-		NIBBLETYPE * BlockMetas = a_Image.GetBlockMetas();
+		auto BlockTypes = a_Image.GetBlocks();
 
+		ASSERT("This needs to be done!!!");
+		return;
+/*
 		for (size_t i = 0; i < NumBlocks; i++)
 		{
-			if (m_BlocksToReplace.count(BlockTypes[i]))
+			if (m_BlocksToReplace.count(BlockTypes[i].Type()))
 			{
-				float BlockRnd = PieceNoise.IntNoise2DInRange(a_PieceRot, static_cast<int>(i), 0.0F, static_cast<float>(m_AllWeights));
+				float BlockRnd = PieceNoise.IntNoise2DInRange(a_PieceRot, static_cast<int>(i), 0, m_AllWeights);
 
 				int weightDelta = 0;
 				for (auto & blockToRnd : m_BlocksToRandomize)
@@ -250,7 +268,7 @@ public:
 						// Per block meta params
 						if (blockToRnd.m_MinMeta < blockToRnd.m_MaxMeta)
 						{
-							int BlockMetaRnd = std::clamp(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot*2, static_cast<int>(i), static_cast<float>(blockToRnd.m_MinNoiseMeta), static_cast<float>(blockToRnd.m_MaxNoiseMeta))), blockToRnd.m_MinMeta, blockToRnd.m_MaxMeta);
+							int BlockMetaRnd = std::clamp(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot*2, static_cast<int>(i), blockToRnd.m_MinNoiseMeta, blockToRnd.m_MaxNoiseMeta)), blockToRnd.m_MinMeta, blockToRnd.m_MaxMeta);
 							BlockMetas[i] = static_cast<NIBBLETYPE>(BlockMetaRnd);
 						}
 						else if ((blockToRnd.m_MaxMeta > -1) && (blockToRnd.m_MaxMeta == blockToRnd.m_MinMeta))
@@ -265,7 +283,7 @@ public:
 				// All blocks meta params
 				if (m_MaxMeta > m_MinMeta)
 				{
-					int BlockMetaRnd = std::clamp(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot * 2, static_cast<int>(i), static_cast<float>(m_MinNoiseMeta), static_cast<float>(m_MaxNoiseMeta))), m_MinMeta, m_MaxMeta);
+					int BlockMetaRnd = std::clamp(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot*2, static_cast<int>(i), m_MinNoiseMeta, m_MaxNoiseMeta)), m_MinMeta, m_MaxMeta);
 					BlockMetas[i] = static_cast<NIBBLETYPE>(BlockMetaRnd);
 				}
 				else if ((m_MaxMeta > -1) && (m_MaxMeta == m_MinMeta))
@@ -275,6 +293,7 @@ public:
 				}
 			}
 		}  // for i - BlockTypes[]
+*/
 	}
 
 	virtual void AssignSeed(int a_Seed) override
@@ -287,7 +306,7 @@ protected:
 
 
 	/** Block types of a blocks which are being replaced by this strategy */
-	std::map<BLOCKTYPE, int> m_BlocksToReplace;
+	std::map<BlockType, int> m_BlocksToReplace;
 
 	/** Randomized blocks with their weights and meta params */
 	cRandomizedBlocks m_BlocksToRandomize;

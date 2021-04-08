@@ -398,6 +398,11 @@ public:
 		return (a_Buffer[a_Index / 2] >> ((a_Index & 1) * 4)) & 0x0f;
 	}
 
+	inline static LIGHTTYPE ExpandLightType(const std::byte * const a_Buffer, const size_t a_Index)
+	{
+		return static_cast<LIGHTTYPE>(a_Buffer[a_Index / 2] >> ((a_Index & 1) * 4)) & 0x0f;
+	}
+
 	inline static BlockState ExpandLightType(const BlockState * const a_Buffer, const size_t a_Index)
 	{
 		return a_Buffer[a_Index];
