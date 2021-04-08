@@ -44,6 +44,7 @@ set (GENERATING_SRCS
 	${PROJECT_SOURCE_DIR}/src/Generating/DistortedHeightmap.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/DungeonRoomsFinisher.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/EndGen.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/EnderDragonFightStructuresGen.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/FinishGen.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/GridStructGen.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/HeiGen.cpp
