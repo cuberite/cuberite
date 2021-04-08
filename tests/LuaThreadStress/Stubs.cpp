@@ -297,3 +297,12 @@ bool cUUID::FromString(const AString &)
 {
 	return true;
 }
+
+
+
+
+
+int BlockStringToType(const AString &)
+{
+	return 0;
+}
