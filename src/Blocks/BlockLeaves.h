@@ -230,13 +230,13 @@ private:
 		auto Self = a_ChunkInterface.GetBlock(a_BlockPos);
 
 		switch (Self.Type())
-		{
-			case BlockType::AcaciaLeaves: a_ChunkInterface.SetBlock(a_BlockPos, AcaciaLeaves::AcaciaLeaves(AcaciaLeaves::Distance(Self), false));
-			case BlockType::BirchLeaves:
-			case BlockType::DarkOakLeaves:
-			case BlockType::JungleLeaves:
-			case BlockType::OakLeaves:
-			case BlockType::SpruceLeaves:
+		{  // TODO (12xx12) NONONO
+			case BlockType::AcaciaLeaves:  a_ChunkInterface.FastSetBlock(a_BlockPos, AcaciaLeaves::AcaciaLeaves  (AcaciaLeaves::Distance(Self), false));
+			case BlockType::BirchLeaves:   a_ChunkInterface.FastSetBlock(a_BlockPos, BirchLeaves::BirchLeaves    (BirchLeaves::Distance(Self), false));
+			case BlockType::DarkOakLeaves: a_ChunkInterface.FastSetBlock(a_BlockPos, DarkOakLeaves::DarkOakLeaves(DarkOakLeaves::Distance(Self), false));
+			case BlockType::JungleLeaves:  a_ChunkInterface.FastSetBlock(a_BlockPos, JungleLeaves::JungleLeaves  (JungleLeaves::Distance(Self), false));
+			case BlockType::OakLeaves:     a_ChunkInterface.FastSetBlock(a_BlockPos, OakLeaves::OakLeaves        (OakLeaves::Distance(Self), false));
+			case BlockType::SpruceLeaves:  a_ChunkInterface.FastSetBlock(a_BlockPos, SpruceLeaves::SpruceLeaves  (SpruceLeaves::Distance(Self), false));
 			default: return;
 		}
 	}

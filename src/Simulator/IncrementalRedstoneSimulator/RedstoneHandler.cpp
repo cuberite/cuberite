@@ -1,6 +1,8 @@
 
 #include "Globals.h"
 
+#define RedstoneLogger
+
 // Some wrapper for the LOGD function to enable - disable the redstone logging
 #ifdef RedstoneLogger
 	#define LOGREDSTONE LOGD
