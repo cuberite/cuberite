@@ -139,7 +139,7 @@ public:
 	a_Digger is the entity that caused the conversion, usually the player digging.
 	a_Tool is the tool used for the digging.
 	The default implementation drops a single item created from m_BlockType and the current meta. */
-	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr) const;
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool = nullptr) const;
 
 	/** Checks if the block can stay at the specified relative coords in the chunk */
 	virtual bool CanBeAt(
@@ -165,10 +165,6 @@ public:
 	@param a_Player Player trying to build on the block
 	@param a_Meta Meta value of the block currently at a_Pos */
 	virtual bool DoesIgnoreBuildCollision(cChunkInterface & ChunkInterface, const Vector3i a_Pos, cPlayer & a_Player, BlockState a_Block) const;
-
-	/** Returns if this block drops if it gets destroyed by an unsuitable situation.
-	Default: true */
-	virtual bool DoesDropOnUnsuitable(void) const;
 
 	/** Tests if a_RelPosition is inside the block, where a_RelPosition is relative to the origin of the block.
 	Coords in a_RelPosition are guaranteed to be in the [0..1] range. */

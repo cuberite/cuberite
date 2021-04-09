@@ -17,7 +17,7 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// Convert stone to cobblestone, unless using silk-touch:
 		if (!ToolHasSilkTouch(a_Tool))
