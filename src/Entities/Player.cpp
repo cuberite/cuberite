@@ -481,11 +481,12 @@ void cPlayer::SetIsInBed(const bool a_GoToBed)
 	if (a_GoToBed && IsStanding())
 	{
 		m_BodyStance = BodyStanceSleeping(*this);
+		m_World->BroadcastEntityAnimation(*this, EntityAnimation::PlayerEntersBed);
 	}
 	else if (!a_GoToBed && IsInBed())
 	{
 		m_BodyStance = BodyStanceStanding(*this);
-		GetWorld()->BroadcastEntityAnimation(*this, 2);
+		m_World->BroadcastEntityAnimation(*this, EntityAnimation::PlayerLeavesBed);
 	}
 }
 
@@ -3250,6 +3251,14 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		if (IsOnGround() || IsInWater() || IsRiding() || (GetEquippedChestplate().m_ItemType != E_ITEM_ELYTRA))
 		{
 			SetElytraFlight(false);
+		}
+	}
+	else if (IsInBed())
+	{
+		// Check if sleeping is still possible:
+		if ((GetPosition().Floor() != m_LastBedPos) || (m_World->GetBlock(m_LastBedPos) != E_BLOCK_BED))
+		{
+			m_ClientHandle->HandleLeaveBed();
 		}
 	}
 

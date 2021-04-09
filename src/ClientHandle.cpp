@@ -1857,8 +1857,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 void cClientHandle::HandleLeaveBed()
 {
 	cChunkInterface Interface(m_Player->GetWorld()->GetChunkMap());
-	cBlockBedHandler::SetBedOccupationState(Interface, m_Player->GetLastBedPos(), false);
-	m_Player->SetIsInBed(false);
+	cBlockBedHandler::VacateBed(Interface, *m_Player);
 }
 
 

@@ -36,19 +36,40 @@ public:
 		return Vector3i();
 	}
 
-	static void SetBedOccupationState(cChunkInterface & a_ChunkInterface, Vector3i a_BedPosition, bool a_IsOccupied)
+	static void VacateBed(cChunkInterface & a_ChunkInterface, cPlayer & a_Player)
 	{
-		auto Meta = a_ChunkInterface.GetBlockMeta(a_BedPosition);
-		if (a_IsOccupied)
+		auto BedPosition = a_Player.GetLastBedPos();
+
+		BLOCKTYPE Type;
+		NIBBLETYPE Meta;
+		a_ChunkInterface.GetBlockTypeMeta(BedPosition, Type, Meta);
+
+		if (Type != E_BLOCK_BED)
 		{
-			Meta |= 0x04;  // Where 0x4 = occupied bit
-		}
-		else
-		{
-			Meta &= 0x0b;  // Clear the "occupied" bit of the bed's block
+			// Bed was incomplete, just wake:
+			a_Player.SetIsInBed(false);
+			return;
 		}
 
-		a_ChunkInterface.SetBlockMeta(a_BedPosition, Meta);
+		if ((Meta & 0x8) == 0)
+		{
+			// BedPosition is the foot of the bed, adjust to the head:
+			BedPosition += MetaDataToDirection(Meta & 0x03);
+
+			a_ChunkInterface.GetBlockTypeMeta(BedPosition, Type, Meta);
+			if (Type != E_BLOCK_BED)
+			{
+				// Bed was incomplete, just wake:
+				a_Player.SetIsInBed(false);
+				return;
+			}
+		}
+
+		// Clear the "occupied" bit of the bed's pillow block:
+		a_ChunkInterface.SetBlockMeta(BedPosition, Meta & 0x0b);
+
+		// Wake the player:
+		a_Player.SetIsInBed(false);
 	}
 
 private:
@@ -79,19 +100,9 @@ private:
 
 
 
-	static void SetBedPos(cPlayer & a_Player, const Vector3i a_BedPosition);
-
-
-
-
-
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 28;
 	}
 } ;
-
-
-
-
