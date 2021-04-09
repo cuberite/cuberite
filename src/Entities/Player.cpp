@@ -2075,6 +2075,7 @@ void cPlayer::UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action)
 void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
 {
 	const cItem & Item = m_Inventory.GetSlot(a_SlotNumber);
+
 	if (Item.IsEmpty())
 	{
 		return;
@@ -2089,9 +2090,34 @@ void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
 	// Unbreaking is applied for each point of reduction.
 	std::binomial_distribution<short> Dist(a_Damage, chance);
 	short ReducedDamage = Dist(GetRandomProvider().Engine());
+
 	if (m_Inventory.DamageItem(a_SlotNumber, ReducedDamage))
 	{
-		m_World->BroadcastSoundEffect("entity.item.break", GetPosition(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+		// The item broke. Broadcast the correct animation:
+		if (Item.m_ItemType == E_ITEM_SHIELD)
+		{
+			m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnShieldBreaks);
+		}
+		else if (a_SlotNumber == (cInventory::invHotbarOffset + m_Inventory.GetEquippedSlotNum()))
+		{
+			m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnMainHandEquipmentBreaks);
+		}
+		else
+		{
+			switch (a_SlotNumber)
+			{
+				case cInventory::invArmorOffset:     return m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnHeadEquipmentBreaks);
+				case cInventory::invArmorOffset + 1: return m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnChestEquipmentBreaks);
+				case cInventory::invArmorOffset + 2: return m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnLegsEquipmentBreaks);
+				case cInventory::invArmorOffset + 3: return m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnFeetEquipmentBreaks);
+				case cInventory::invShieldOffset:    return m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnOffHandEquipmentBreaks);
+			}
+		}
+	}
+	else if (Item.m_ItemType == E_ITEM_SHIELD)
+	{
+		// The item survived. Special case for shield blocking:
+		m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnShieldBlocks);
 	}
 }
 
