@@ -21,7 +21,7 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(BlockState a_BlockMeta, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		if (Block::NetherWart::Age(a_Block) == RipeAge)
 		{

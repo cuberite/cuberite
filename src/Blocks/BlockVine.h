@@ -100,7 +100,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(BlockState a_BlockMeta, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// Only drops self when using shears, otherwise drops nothing:
 		if ((a_Tool == nullptr) || (a_Tool->m_ItemType != E_ITEM_SHEARS))

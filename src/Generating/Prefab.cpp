@@ -175,7 +175,7 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumR
 		}
 
 		// Write the modified image:
-		a_Dest.WriteBlockArea(RandomizedImage, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
+		a_Dest.WriteBlockArea(RandomizedImage, Placement, m_MergeStrategy);
 	}
 
 	// If requested, draw the floor (from the bottom of the prefab down to the nearest non-air)

@@ -32,7 +32,7 @@ namespace HopperHandler
 
 		a_Chunk.DoWithBlockEntityAt(a_Position, [Power](cBlockEntity & a_BlockEntity)
 		{
-			if (a_BlockEntity.GetBlockType() != E_BLOCK_HOPPER)
+			if (a_BlockEntity.GetBlockType() != BlockType::Hopper)
 			{
 				return false;
 			}

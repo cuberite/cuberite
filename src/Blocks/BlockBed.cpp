@@ -161,7 +161,7 @@ void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWor
 {
 	a_Player.GetWorld()->DoWithBlockEntityAt(a_BlockChange.GetAbsolutePos(), [&a_Player](cBlockEntity & a_BlockEntity)
 	{
-		ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_BED);
+		ASSERT(IsBlockBed(a_BlockEntity.GetBlock()));
 		static_cast<cBedEntity &>(a_BlockEntity).SetColor(a_Player.GetEquippedItem().m_ItemDamage);
 		return false;
 	});

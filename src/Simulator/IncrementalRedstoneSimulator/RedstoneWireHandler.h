@@ -304,7 +304,7 @@ namespace RedstoneWireHandler
 
 		const auto & Data = DataForChunk(a_Chunk);
 		const auto Iterator = Data.WireStates.find(a_Position);
-		if(Iterator == Data.WireStates.end())
+		if (Iterator == Data.WireStates.end())
 		{
 			return;
 		}

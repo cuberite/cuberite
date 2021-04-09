@@ -53,9 +53,13 @@
 
 // BlockHandler
 #include "Blocks/BlockAir.h"
+#include "Blocks/BlockCommandBlock.h"
 #include "Blocks/BlockLog.h"
 #include "Blocks/BlockSapling.h"
+#include "Blocks/BlockSignPost.h"
 #include "Blocks/BlockTrapdoor.h"
+#include "Blocks/BlockWallSign.h"
+
 
 #ifndef _WIN32
 	#include <stdlib.h>
@@ -1395,7 +1399,7 @@ bool cWorld::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 {
 	return DoWithBlockEntityAt({ a_BlockX, a_BlockY, a_BlockZ }, [&a_Line1, &a_Line2, &a_Line3, &a_Line4](cBlockEntity & a_BlockEntity)
 	{
-		if ((a_BlockEntity.GetBlockType() != E_BLOCK_WALLSIGN) && (a_BlockEntity.GetBlockType() != E_BLOCK_SIGN_POST))
+		if (!cBlockWallSignHandler::IsBlockWallSign(a_BlockEntity.GetBlock()) && !cBlockSignPostHandler::IsBlockSignPost(a_BlockEntity.GetBlock()))
 		{
 			return false;  // Not a sign
 		}
@@ -2519,7 +2523,7 @@ bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AStrin
 	if (
 		DoWithBlockEntityAt({ a_BlockX, a_BlockY, a_BlockZ }, [&Line1, &Line2, &Line3, &Line4](cBlockEntity & a_BlockEntity)
 		{
-			if ((a_BlockEntity.GetBlockType() != E_BLOCK_WALLSIGN) && (a_BlockEntity.GetBlockType() != E_BLOCK_SIGN_POST))
+			if (!cBlockWallSignHandler::IsBlockWallSign(a_BlockEntity.GetBlock()) && !cBlockSignPostHandler::IsBlockSignPost(a_BlockEntity.GetBlock()))
 			{
 				return false;  // Not a sign
 			}
@@ -2544,7 +2548,7 @@ bool cWorld::SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, co
 {
 	return DoWithBlockEntityAt({ a_BlockX, a_BlockY, a_BlockZ }, [&](cBlockEntity & a_BlockEntity)
 	{
-		if (a_BlockEntity.GetBlockType() != E_BLOCK_COMMAND_BLOCK)
+		if (cBlockCommandBlockHandler::IsBlockCommandBlock(a_BlockEntity.GetBlock()))
 		{
 			return false;
 		}

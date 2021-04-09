@@ -1328,7 +1328,7 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 	if (a_Client == nullptr)
 	{
 		// Queue the block (entity) for all clients in the chunk (will be sent in BroadcastPendingBlockChanges()):
-		m_PendingSendBlocks.emplace_back(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
+		m_PendingSendBlocks.emplace_back(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ));
 		if (BlockEntity != nullptr)
 		{
 			m_PendingSendBlockEntities.push_back(BlockEntity);
@@ -1337,7 +1337,7 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 	}
 
 	const auto Position = PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
-	a_Client->SendBlockChange(Position.x, Position.y, Position.z, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
+	a_Client->SendBlockChange(Position.x, Position.y, Position.z, GetBlock(a_RelX, a_RelY, a_RelZ));
 
 	// FS #268 - if a BlockEntity digging is cancelled by a plugin, the entire block entity must be re-sent to the client:
 	if (BlockEntity != nullptr)

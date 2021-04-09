@@ -18,7 +18,7 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(BlockState a_BlockMeta, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// Only drop self when using silk-touch:
 		if (ToolHasSilkTouch(a_Tool))

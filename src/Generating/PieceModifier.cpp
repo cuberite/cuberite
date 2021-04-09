@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "PieceModifier.h"
 #include "../Noise/Noise.h"
+#include "../Protocol/Palettes/Upgrade.h"
 
 
 
@@ -56,13 +57,13 @@ public:
 			auto blocksToReplace = StringSplitAndTrim(blocksToReplaceStr, ",");
 			for (size_t i = 0; i < blocksToReplace.size(); i++)
 			{
-				BLOCKTYPE blockType = static_cast<BLOCKTYPE>(BlockStringToType(blocksToReplace[i]));
-				if ((blockType == E_BLOCK_AIR) && !NoCaseCompare(blocksToReplace[i], "Air"))
+				auto Block = PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockStringToType(blocksToReplace[i])), 0);
+				if ((Block.Type() == BlockType::Air) && !NoCaseCompare(blocksToReplace[i], "Air"))
 				{
 					CONDWARNING(a_LogWarnings, "Cannot parse block type from string \"%s\"!", blocksToReplace[i].c_str());
 					return false;
 				}
-				m_BlocksToReplace[blockType] = 1;
+				m_BlocksToReplace[Block.Type()] = 1;
 			}
 
 			Params = Params.substr(idxPipe + 1, Params.length() - 1);
@@ -152,9 +153,9 @@ public:
 				return false;
 			}
 
-			BLOCKTYPE BlockType = static_cast<BLOCKTYPE>(BlockStringToType(BlockParams[0]));
+			auto SetBlock = PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockStringToType(BlockParams[0])), 0);
 			int BlockWeight = 0;
-			if ((BlockType != E_BLOCK_AIR) && !NoCaseCompare(BlockParams[0], "Air"))
+			if ((SetBlock.Type() != BlockType::Air) && !NoCaseCompare(BlockParams[0], "Air"))
 			{
 				// Failed to parse block type
 				CONDWARNING(
@@ -174,7 +175,7 @@ public:
 			}
 
 
-			Block.m_Type = BlockType;
+			Block.m_Type = SetBlock.Type();
 			Block.m_Weight = BlockWeight;
 			m_AllWeights += BlockWeight;
 
@@ -245,12 +246,14 @@ public:
 		cNoise PieceNoise(Noise.IntNoise3DInt(a_PiecePos));
 
 		size_t NumBlocks = a_Image.GetBlockCount();
-		BLOCKTYPE * BlockTypes = a_Image.GetBlockTypes();
-		BLOCKTYPE * BlockMetas = a_Image.GetBlockMetas();
+		auto BlockTypes = a_Image.GetBlocks();
 
+		ASSERT("This needs to be done!!!");
+		return;
+/*
 		for (size_t i = 0; i < NumBlocks; i++)
 		{
-			if (m_BlocksToReplace.count(BlockTypes[i]))
+			if (m_BlocksToReplace.count(BlockTypes[i].Type()))
 			{
 				float BlockRnd = PieceNoise.IntNoise2DInRange(a_PieceRot, static_cast<int>(i), 0, m_AllWeights);
 
@@ -290,6 +293,7 @@ public:
 				}
 			}
 		}  // for i - BlockTypes[]
+*/
 	}
 
 	virtual void AssignSeed(int a_Seed) override
@@ -302,7 +306,7 @@ protected:
 
 
 	/** Block types of a blocks which are being replaced by this strategy */
-	std::map<BLOCKTYPE, int> m_BlocksToReplace;
+	std::map<BlockType, int> m_BlocksToReplace;
 
 	/** Randomized blocks with their weights and meta params */
 	cRandomizedBlocks m_BlocksToRandomize;

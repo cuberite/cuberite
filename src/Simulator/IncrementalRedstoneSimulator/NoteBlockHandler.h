@@ -33,7 +33,7 @@ namespace NoteBlockHandler
 
 		a_Chunk.DoWithBlockEntityAt(a_Position, [](cBlockEntity & a_BlockEntity)
 		{
-			if (a_BlockEntity.GetBlockType() != E_BLOCK_NOTE_BLOCK)
+			if (a_BlockEntity.GetBlockType() != BlockType::NoteBlock)
 			{
 				return false;
 			}

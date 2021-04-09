@@ -18,7 +18,7 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(BlockState a_BlockMeta, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		const auto DropNum = FortuneDiscreteRandom(3, 7, ToolFortuneLevel(a_Tool), 9);
 		return cItem(Item::MelonSlice, DropNum);

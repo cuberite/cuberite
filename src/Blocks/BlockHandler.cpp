@@ -1027,7 +1027,7 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i
 
 
 
-cItems cBlockHandler::ConvertToPickups(BlockState a_BlockMeta, const cItem * a_Tool) const
+cItems cBlockHandler::ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const
 {
 	UNUSED(a_Tool);
 
