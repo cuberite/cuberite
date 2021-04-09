@@ -48,6 +48,22 @@ void cProtocol_1_14::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+void cProtocol_1_14::SendEntityAnimation(const cEntity & a_Entity, EntityAnimation a_Animation)
+{
+	if (a_Animation == EntityAnimation::PlayerEntersBed)
+	{
+		// Use Bed packet removed, through metadata instead:
+		SendEntityMetadata(a_Entity);
+		return;
+	}
+
+	Super::SendEntityAnimation(a_Entity, a_Animation);
+}
+
+
+
+
+
 void cProtocol_1_14::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	// Send the Join Game packet:
@@ -108,14 +124,6 @@ void cProtocol_1_14::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 
 
 void cProtocol_1_14::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
-{
-}
-
-
-
-
-
-void cProtocol_1_14::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
 
@@ -197,6 +205,33 @@ std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolI
 UInt32 cProtocol_1_14::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 {
 	return Palette_1_14::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+}
+
+
+
+
+
+signed char cProtocol_1_14::GetProtocolEntityStatus(EntityAnimation a_Animation) const
+{
+	switch (a_Animation)
+	{
+		case EntityAnimation::FoxChews: return 45;
+		case EntityAnimation::OcelotTrusts: return 40;
+		case EntityAnimation::OcelotDistrusts: return 41;
+		case EntityAnimation::PawnBerryBushPricks: return 44;
+		case EntityAnimation::PawnChestEquipmentBreaks: return 50;
+		case EntityAnimation::PawnFeetEquipmentBreaks: return 52;
+		case EntityAnimation::PawnHeadEquipmentBreaks: return 49;
+		case EntityAnimation::PawnLegsEquipmentBreaks: return 51;
+		case EntityAnimation::PawnMainHandEquipmentBreaks: return 47;
+		case EntityAnimation::PawnOffHandEquipmentBreaks: return 48;
+		case EntityAnimation::PawnTeleports: return 46;
+		case EntityAnimation::PlayerBadOmenActivates: return 43;
+		case EntityAnimation::RavagerAttacks: return 4;
+		case EntityAnimation::RavagerBecomesStunned: return 39;
+		case EntityAnimation::VillagerSweats: return 42;
+		default: return Super::GetProtocolEntityStatus(a_Animation);
+	}
 }
 
 

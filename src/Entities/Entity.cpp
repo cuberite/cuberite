@@ -525,7 +525,15 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		SetSpeed(a_TDI.Knockback);
 	}
 
-	m_World->BroadcastEntityStatus(*this, esGenericHurt);
+	m_World->BroadcastEntityAnimation(*this, [&a_TDI]
+	{
+		switch (a_TDI.DamageType)
+		{
+			case eDamageType::dtBurning: return EntityAnimation::PawnBurns;
+			case eDamageType::dtDrowning: return EntityAnimation::PawnDrowns;
+			default: return EntityAnimation::PawnHurts;
+		}
+	}());
 
 	m_InvulnerableTicks = 10;
 
@@ -797,7 +805,7 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 	// If the victim is a player the hook is handled by the cPlayer class
 	if (!IsPlayer())
 	{
-		AString emptystring = AString("");
+		AString emptystring;
 		cRoot::Get()->GetPluginManager()->CallHookKilled(*this, a_TDI, emptystring);
 	}
 
@@ -813,7 +821,7 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 	}
 
-	m_World->BroadcastEntityStatus(*this, esGenericDead);
+	m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnDies);
 }
 
 

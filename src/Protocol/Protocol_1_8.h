@@ -62,7 +62,7 @@ public:
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendDisconnect                 (const AString & a_Reason) override;
 	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
-	virtual void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation) override;
+	virtual void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation) override;
 	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration) override;
 	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityHeadLook             (const cEntity & a_Entity) override;
@@ -70,7 +70,6 @@ public:
 	virtual void SendEntityMetadata             (const cEntity & a_Entity) override;
 	virtual void SendEntityPosition             (const cEntity & a_Entity) override;
 	virtual void SendEntityProperties           (const cEntity & a_Entity) override;
-	virtual void SendEntityStatus               (const cEntity & a_Entity, char a_Status) override;
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) override;
 	virtual void SendExperience                 (void) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
@@ -123,7 +122,6 @@ public:
 	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
 	virtual void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
-	virtual void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendUnlockRecipe               (UInt32 a_RecipeID) override;
 	virtual void SendInitRecipes                (UInt32 a_RecipeID) override;
 	virtual void SendWeather                    (eWeather a_Weather) override;
@@ -138,26 +136,30 @@ public:
 	a_Compressed will be set to the compressed packet includes packet length and data length. */
 	static void CompressPacket(CircularBufferCompressor & a_Packet, ContiguousByteBuffer & a_Compressed);
 
-	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
-	static int GetParticleID(const AString & a_ParticleName);
-
 protected:
 
 	/** State of the protocol. */
 	State m_State;
 
-	/** Nobody inherits 1.8, so it doesn't use this method */
+	/** Get the packet ID for a given packet. */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 
 	/** Returns 1.8. */
 	virtual Version GetProtocolVersion() override;
 
+	/** Converts an animation into an ID suitable for use with the Entity Animation packet.
+	Returns (uchar)-1 if the protocol version doesn't support this animation. */
+	virtual unsigned char GetProtocolEntityAnimation(EntityAnimation a_Animation) const;
+
+	/** Converts an animation into an ID suitable for use with the Entity Status packet.
+	Returns -1 if the protocol version doesn't support this animation. */
+	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const;
+
 	/** Converts eMonsterType to protocol-specific mob types */
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType);
 
 	/** Reads and handles the packet. The packet length and type have already been read.
-	Returns true if the packet was understood, false if it was an unknown packet
-	*/
+	Returns true if the packet was understood, false if it was an unknown packet. */
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
 
 	// Packet handlers while in the Status state (m_State == 1):
@@ -268,6 +270,9 @@ private:
 	/** Converts an entity to a protocol-specific entity type.
 	Only entities that the Send Spawn Entity packet supports are valid inputs to this method */
 	static UInt8 GetProtocolEntityType(const cEntity & a_Entity);
+
+	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
+	static int GetProtocolParticleID(const AString & a_ParticleName);
 
 	/** Converts a statistic to a protocol-specific string.
 	Protocols <= 1.12 use strings, hence this is a static as the string-mapping was append-only for the versions that used it.

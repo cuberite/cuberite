@@ -74,7 +74,7 @@ void cFireworkEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (m_TicksToExplosion <= 0)
 	{
 		// TODO: Notify the plugins
-		m_World->BroadcastEntityStatus(*this, esFireworkExploding);
+		m_World->BroadcastEntityAnimation(*this, EntityAnimation::FireworkRocketExplodes);
 		Destroy();
 		return;
 	}

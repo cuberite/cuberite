@@ -472,13 +472,35 @@ void cProtocol_1_8_0::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cProtocol_1_8_0::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
+void cProtocol_1_8_0::SendEntityAnimation(const cEntity & a_Entity, const EntityAnimation a_Animation)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktEntityAnimation);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEInt8(a_Animation);
+	if (a_Animation == EntityAnimation::PlayerEntersBed)
+	{
+		ASSERT(a_Entity.IsPlayer());
+		const auto BedPosition = static_cast<const cPlayer &>(a_Entity).GetLastBedPos();
+
+		cPacketizer Pkt(*this, pktUseBed);
+		Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+		Pkt.WriteXYZPosition64(BedPosition.x, BedPosition.y, BedPosition.z);
+		return;
+	}
+
+	if (const auto AnimationID = GetProtocolEntityAnimation(a_Animation); AnimationID != static_cast<unsigned char>(-1))
+	{
+		cPacketizer Pkt(*this, pktEntityAnimation);
+		Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+		Pkt.WriteBEUInt8(AnimationID);
+		return;
+	}
+
+	if (const auto StatusID = GetProtocolEntityStatus(a_Animation); StatusID != -1)
+	{
+		cPacketizer Pkt(*this, pktEntityStatus);
+		Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
+		Pkt.WriteBEInt8(StatusID);
+	}
 }
 
 
@@ -610,19 +632,6 @@ void cProtocol_1_8_0::SendEntityProperties(const cEntity & a_Entity)
 	cPacketizer Pkt(*this, pktEntityProperties);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	WriteEntityProperties(Pkt, a_Entity);
-}
-
-
-
-
-
-void cProtocol_1_8_0::SendEntityStatus(const cEntity & a_Entity, char a_Status)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktEntityStatus);
-	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEInt8(a_Status);
 }
 
 
@@ -942,10 +951,9 @@ void cProtocol_1_8_0::SendPlayerAbilities(void)
 void cProtocol_1_8_0::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	int ParticleID = GetParticleID(a_ParticleName);
 
 	cPacketizer Pkt(*this, pktParticleEffect);
-	Pkt.WriteBEInt32(ParticleID);
+	Pkt.WriteBEInt32(GetProtocolParticleID(a_ParticleName));
 	Pkt.WriteBool(false);
 	Pkt.WriteBEFloat(a_SrcX);
 	Pkt.WriteBEFloat(a_SrcY);
@@ -964,7 +972,8 @@ void cProtocol_1_8_0::SendParticleEffect(const AString & a_ParticleName, float a
 void cProtocol_1_8_0::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	int ParticleID = GetParticleID(a_ParticleName);
+
+	const auto ParticleID = GetProtocolParticleID(a_ParticleName);
 
 	cPacketizer Pkt(*this, pktParticleEffect);
 	Pkt.WriteBEInt32(ParticleID);
@@ -977,6 +986,7 @@ void cProtocol_1_8_0::SendParticleEffect(const AString & a_ParticleName, Vector3
 	Pkt.WriteBEFloat(a_Offset.z);
 	Pkt.WriteBEFloat(a_ParticleData);
 	Pkt.WriteBEInt32(a_ParticleAmount);
+
 	switch (ParticleID)
 	{
 		// iconcrack
@@ -1624,19 +1634,6 @@ void cProtocol_1_8_0::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-void cProtocol_1_8_0::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktUseBed);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
-}
-
-
-
-
-
 void cProtocol_1_8_0::SendUnlockRecipe(UInt32 a_RecipeID)
 {
 	// Client doesn't support this feature
@@ -1835,136 +1832,6 @@ void cProtocol_1_8_0::CompressPacket(CircularBufferCompressor & a_Packet, Contig
 
 
 
-int cProtocol_1_8_0::GetParticleID(const AString & a_ParticleName)
-{
-	static const std::unordered_map<AString, int> ParticleMap
-	{
-		// Initialize the ParticleMap:
-		{ "explode",          0 },
-		{ "largeexplode",     1 },
-		{ "hugeexplosion",    2 },
-		{ "fireworksspark",   3 },
-		{ "bubble",           4 },
-		{ "splash",           5 },
-		{ "wake",             6 },
-		{ "suspended",        7 },
-		{ "depthsuspend",     8 },
-		{ "crit",             9 },
-		{ "magiccrit",        10 },
-		{ "smoke",            11 },
-		{ "largesmoke",       12 },
-		{ "spell",            13 },
-		{ "instantspell",     14 },
-		{ "mobspell",         15 },
-		{ "mobspellambient",  16 },
-		{ "witchmagic",       17 },
-		{ "dripwater",        18 },
-		{ "driplava",         19 },
-		{ "angryvillager",    20 },
-		{ "happyvillager",    21 },
-		{ "townaura",         22 },
-		{ "note",             23 },
-		{ "portal",           24 },
-		{ "enchantmenttable", 25 },
-		{ "flame",            26 },
-		{ "lava",             27 },
-		{ "footstep",         28 },
-		{ "cloud",            29 },
-		{ "reddust",          30 },
-		{ "snowballpoof",     31 },
-		{ "snowshovel",       32 },
-		{ "slime",            33 },
-		{ "heart",            34 },
-		{ "barrier",          35 },
-		{ "iconcrack",        36 },
-		{ "blockcrack",       37 },
-		{ "blockdust",        38 },
-		{ "droplet",          39 },
-		{ "take",             40 },
-		{ "mobappearance",    41 },
-		{ "dragonbreath",     42 },
-		{ "endrod",           43 },
-		{ "damageindicator",  44 },
-		{ "sweepattack",      45 },
-		{ "fallingdust",      46 },
-		{ "totem",            47 },
-		{ "spit",             48 }
-	};
-
-	const auto ParticleName = StrToLower(a_ParticleName);
-	const auto FindResult = ParticleMap.find(ParticleName);
-	if (FindResult == ParticleMap.end())
-	{
-		LOGWARNING("Unknown particle: %s", a_ParticleName.c_str());
-		ASSERT(!"Unknown particle");
-		return 0;
-	}
-
-	return FindResult->second;
-}
-
-
-
-
-
-UInt32 cProtocol_1_8_0::GetProtocolMobType(const eMonsterType a_MobType)
-{
-	switch (a_MobType)
-	{
-		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
-		case mtInvalidType:           return 53;
-		case mtBat:                   return 65;
-		case mtBlaze:                 return 61;
-		case mtCaveSpider:            return 59;
-		case mtChicken:               return 93;
-		case mtCow:                   return 92;
-		case mtCreeper:               return 50;
-		case mtEnderDragon:           return 63;
-		case mtEnderman:              return 58;
-		case mtEndermite:             return 67;
-		case mtGhast:                 return 56;
-		case mtGiant:                 return 53;
-		case mtGuardian:              return 68;
-		case mtHorse:                 return 100;
-		case mtIronGolem:             return 99;
-		case mtMagmaCube:             return 62;
-		case mtMooshroom:             return 96;
-		case mtOcelot:                return 98;
-		case mtPig:                   return 90;
-		case mtRabbit:                return 101;
-		case mtSheep:                 return 91;
-		case mtSilverfish:            return 60;
-		case mtSkeleton:              return 51;
-		case mtSlime:                 return 55;
-		case mtSnowGolem:             return 97;
-		case mtSpider:                return 52;
-		case mtSquid:                 return 94;
-		case mtVillager:              return 120;
-		case mtWitch:                 return 66;
-		case mtWither:                return 64;
-		case mtWitherSkeleton:        return 51;
-		case mtWolf:                  return 95;
-		case mtZombie:                return 54;
-		case mtZombiePigman:          return 57;
-		case mtZombieVillager:        return 27;
-
-		// Mobs that get replaced with another because they were added later
-		case mtCat:                   return GetProtocolMobType(mtOcelot);
-		case mtDonkey:                return GetProtocolMobType(mtHorse);
-		case mtMule:                  return GetProtocolMobType(mtHorse);
-		case mtSkeletonHorse:         return GetProtocolMobType(mtHorse);
-		case mtZombieHorse:           return GetProtocolMobType(mtHorse);
-		case mtStray:                 return GetProtocolMobType(mtSkeleton);
-		case mtHusk:                  return GetProtocolMobType(mtZombie);
-
-		default:                      return 0;
-	}
-}
-
-
-
-
-
 UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType)
 {
 	switch (a_PacketType)
@@ -2059,6 +1926,122 @@ UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType)
 cProtocol::Version cProtocol_1_8_0::GetProtocolVersion()
 {
 	return Version::v1_8_0;
+}
+
+
+
+
+
+unsigned char cProtocol_1_8_0::GetProtocolEntityAnimation(const EntityAnimation a_Animation) const
+{
+	switch (a_Animation)
+	{
+		case EntityAnimation::EntityGetsCriticalHit: return 4;
+		case EntityAnimation::EntityGetsMagicalCriticalHit: return 5;
+		case EntityAnimation::PlayerLeavesBed: return 2;
+		case EntityAnimation::PlayerMainHandSwings: return 0;
+		case EntityAnimation::PlayerOffHandSwings: return 0;
+		default: return static_cast<unsigned char>(-1);
+	}
+}
+
+
+
+
+
+signed char cProtocol_1_8_0::GetProtocolEntityStatus(const EntityAnimation a_Animation) const
+{
+	switch (a_Animation)
+	{
+		case EntityAnimation::AnimalFallsInLove: return 18;
+		case EntityAnimation::FireworkRocketExplodes: return 17;
+		case EntityAnimation::GuardianAttacks: return 21;
+		case EntityAnimation::HorseTamingFails: return 6;
+		case EntityAnimation::HorseTamingSucceeds: return 7;
+		case EntityAnimation::IronGolemAttacks: return 4;
+		case EntityAnimation::IronGolemOffersGift: return 11;
+		case EntityAnimation::MinecartSpawnerDelayResets: return 1;
+		case EntityAnimation::MinecartTNTIgnites: return 10;
+		case EntityAnimation::MobSpawns: return 20;
+		case EntityAnimation::OcelotTrusts: return 6;
+		case EntityAnimation::OcelotDistrusts: return 7;
+		case EntityAnimation::PawnBerryBushPricks: return 2;
+		case EntityAnimation::PawnBurns: return 2;
+		case EntityAnimation::PawnDies: return 3;
+		case EntityAnimation::PawnDrowns: return 2;
+		case EntityAnimation::PawnHurts: return 2;
+		case EntityAnimation::PawnThornsPricks: return 2;
+		case EntityAnimation::PlayerFinishesEating: return 9;
+		case EntityAnimation::RabbitJumps: return 1;
+		case EntityAnimation::SheepEatsGrass: return 10;
+		case EntityAnimation::VillagerKisses: return 12;
+		case EntityAnimation::VillagerShowsAnger: return 13;
+		case EntityAnimation::VillagerShowsHappiness: return 14;
+		case EntityAnimation::WitchMagicks: return 15;
+		case EntityAnimation::WolfShakesWater: return 8;
+		case EntityAnimation::WolfTamingFails: return 6;
+		case EntityAnimation::WolfTamingSucceeds: return 7;
+		case EntityAnimation::ZombieVillagerCureFinishes: return 16;
+		default: return -1;
+	}
+}
+
+
+
+
+
+UInt32 cProtocol_1_8_0::GetProtocolMobType(const eMonsterType a_MobType)
+{
+	switch (a_MobType)
+	{
+		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
+		case mtInvalidType:           return 53;
+		case mtBat:                   return 65;
+		case mtBlaze:                 return 61;
+		case mtCaveSpider:            return 59;
+		case mtChicken:               return 93;
+		case mtCow:                   return 92;
+		case mtCreeper:               return 50;
+		case mtEnderDragon:           return 63;
+		case mtEnderman:              return 58;
+		case mtEndermite:             return 67;
+		case mtGhast:                 return 56;
+		case mtGiant:                 return 53;
+		case mtGuardian:              return 68;
+		case mtHorse:                 return 100;
+		case mtIronGolem:             return 99;
+		case mtMagmaCube:             return 62;
+		case mtMooshroom:             return 96;
+		case mtOcelot:                return 98;
+		case mtPig:                   return 90;
+		case mtRabbit:                return 101;
+		case mtSheep:                 return 91;
+		case mtSilverfish:            return 60;
+		case mtSkeleton:              return 51;
+		case mtSlime:                 return 55;
+		case mtSnowGolem:             return 97;
+		case mtSpider:                return 52;
+		case mtSquid:                 return 94;
+		case mtVillager:              return 120;
+		case mtWitch:                 return 66;
+		case mtWither:                return 64;
+		case mtWitherSkeleton:        return 51;
+		case mtWolf:                  return 95;
+		case mtZombie:                return 54;
+		case mtZombiePigman:          return 57;
+		case mtZombieVillager:        return 27;
+
+		// Mobs that get replaced with another because they were added later
+		case mtCat:                   return GetProtocolMobType(mtOcelot);
+		case mtDonkey:                return GetProtocolMobType(mtHorse);
+		case mtMule:                  return GetProtocolMobType(mtHorse);
+		case mtSkeletonHorse:         return GetProtocolMobType(mtHorse);
+		case mtZombieHorse:           return GetProtocolMobType(mtHorse);
+		case mtStray:                 return GetProtocolMobType(mtSkeleton);
+		case mtHusk:                  return GetProtocolMobType(mtZombie);
+
+		default:                      return 0;
+	}
 }
 
 
@@ -4073,6 +4056,78 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity)
 		case Type::etPainting: break;
 	}
 	UNREACHABLE("Unhandled entity kind");
+}
+
+
+
+
+
+int cProtocol_1_8_0::GetProtocolParticleID(const AString & a_ParticleName)
+{
+	static const std::unordered_map<AString, int> ParticleMap
+	{
+		// Initialize the ParticleMap:
+		{ "explode",          0 },
+		{ "largeexplode",     1 },
+		{ "hugeexplosion",    2 },
+		{ "fireworksspark",   3 },
+		{ "bubble",           4 },
+		{ "splash",           5 },
+		{ "wake",             6 },
+		{ "suspended",        7 },
+		{ "depthsuspend",     8 },
+		{ "crit",             9 },
+		{ "magiccrit",        10 },
+		{ "smoke",            11 },
+		{ "largesmoke",       12 },
+		{ "spell",            13 },
+		{ "instantspell",     14 },
+		{ "mobspell",         15 },
+		{ "mobspellambient",  16 },
+		{ "witchmagic",       17 },
+		{ "dripwater",        18 },
+		{ "driplava",         19 },
+		{ "angryvillager",    20 },
+		{ "happyvillager",    21 },
+		{ "townaura",         22 },
+		{ "note",             23 },
+		{ "portal",           24 },
+		{ "enchantmenttable", 25 },
+		{ "flame",            26 },
+		{ "lava",             27 },
+		{ "footstep",         28 },
+		{ "cloud",            29 },
+		{ "reddust",          30 },
+		{ "snowballpoof",     31 },
+		{ "snowshovel",       32 },
+		{ "slime",            33 },
+		{ "heart",            34 },
+		{ "barrier",          35 },
+		{ "iconcrack",        36 },
+		{ "blockcrack",       37 },
+		{ "blockdust",        38 },
+		{ "droplet",          39 },
+		{ "take",             40 },
+		{ "mobappearance",    41 },
+		{ "dragonbreath",     42 },
+		{ "endrod",           43 },
+		{ "damageindicator",  44 },
+		{ "sweepattack",      45 },
+		{ "fallingdust",      46 },
+		{ "totem",            47 },
+		{ "spit",             48 }
+	};
+
+	const auto ParticleName = StrToLower(a_ParticleName);
+	const auto FindResult = ParticleMap.find(ParticleName);
+	if (FindResult == ParticleMap.end())
+	{
+		LOGWARNING("Unknown particle: %s", a_ParticleName.c_str());
+		ASSERT(!"Unknown particle");
+		return 0;
+	}
+
+	return FindResult->second;
 }
 
 

@@ -49,6 +49,8 @@ protected:
 	/** Translates outgoing packet types. */
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) override;
 
+	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
+
 	/** Returns 1.13. */
 	virtual Version GetProtocolVersion() override;
 

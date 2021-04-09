@@ -34,7 +34,7 @@ bool cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		if (GetRandomProvider().RandBool(1.0 / 6.0))
 		{
-			m_World->BroadcastEntityStatus(*this, esVillagerAngry);
+			m_World->BroadcastEntityAnimation(*this, EntityAnimation::VillagerShowsAnger);
 		}
 	}
 

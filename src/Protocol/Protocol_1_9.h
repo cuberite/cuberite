@@ -51,7 +51,6 @@ public:
 	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityMetadata             (const cEntity & a_Entity) override;
 	virtual void SendEntityPosition             (const cEntity & a_Entity) override;
-	virtual void SendEntityStatus               (const cEntity & a_Entity, char a_Status) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
 	virtual void SendKeepAlive                  (UInt32 a_PingID) override;
 	virtual void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
@@ -73,6 +72,9 @@ protected:
 
 	/** Get the packet ID for a given packet. */
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
+
+	virtual unsigned char GetProtocolEntityAnimation(EntityAnimation a_Animation) const override;
+	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
 
 	/** Returns 1.9. */
 	virtual Version GetProtocolVersion() override;

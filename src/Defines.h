@@ -467,9 +467,91 @@ enum class BossBarDivisionType
 	TwentyNotches
 };
 
+// tolua_end
 
 
 
+
+
+enum class EntityAnimation
+{
+	AnimalFallsInLove,
+	ArmorStandGetsHit,
+	ArrowTipSparkles,
+	DolphinShowsHappiness,
+	EggCracks,
+	EntityGetsCriticalHit,
+	EntityGetsMagicalCriticalHit,
+	EntityTrailsHoney,
+	EvokerFangsAttacks,
+	FireworkRocketExplodes,
+	// FishingHookReels,
+	FoxChews,
+	GuardianAttacks,
+	HoglinAttacks,
+	HorseTamingFails,
+	HorseTamingSucceeds,
+	IronGolemAttacks,
+	IronGolemOffersGift,
+	IronGolemStashesGift,
+	MinecartSpawnerDelayResets,
+	MinecartTNTIgnites,
+	MobSpawns,
+	OcelotTrusts,
+	OcelotDistrusts,
+	PawnBerryBushPricks,
+	PawnBurns,
+	PawnChestEquipmentBreaks,
+	PawnDies,
+	PawnDrowns,
+	PawnFeetEquipmentBreaks,
+	PawnHandItemSwaps,
+	PawnHeadEquipmentBreaks,
+	PawnHurts,
+	PawnLegsEquipmentBreaks,
+	PawnMainHandEquipmentBreaks,
+	PawnOffHandEquipmentBreaks,
+	PawnShieldBlocks,
+	PawnShieldBreaks,
+	PawnTeleports,
+	PawnThornsPricks,
+	PawnTotemActivates,
+	PlayerBadOmenActivates,
+	PlayerEntersBed,
+	PlayerFinishesEating,
+	PlayerLeavesBed,
+	PlayerMainHandSwings,
+	// PlayerReducedDebugScreenDisables,
+	// PlayerReducedDebugScreenEnables,
+	// PlayerSetsOperatorLevelFour,
+	// PlayerSetsOperatorLevelOne,
+	// PlayerSetsOperatorLevelThree,
+	// PlayerSetsOperatorLevelTwo,
+	// PlayerSetsOperatorLevelZero,
+	PlayerOffHandSwings,
+	RabbitJumps,
+	RavagerAttacks,
+	RavagerBecomesStunned,
+	SheepEatsGrass,
+	SnowballPoofs,
+	// SquidResetsRotation,
+	VillagerKisses,
+	VillagerShowsAnger,
+	VillagerShowsHappiness,
+	VillagerSweats,
+	WitchMagicks,
+	WolfShakesWater,
+	WolfTamingFails,
+	WolfTamingSucceeds,
+	ZoglinAttacks,
+	ZombieVillagerCureFinishes
+};
+
+
+
+
+
+// tolua_begin
 
 /** Returns a textual representation of the click action. */
 const char * ClickActionToString(int a_ClickAction);

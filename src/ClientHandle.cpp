@@ -2537,15 +2537,6 @@ void cClientHandle::SendEntityProperties(const cEntity & a_Entity)
 
 
 
-void cClientHandle::SendEntityStatus(const cEntity & a_Entity, char a_Status)
-{
-	m_Protocol->SendEntityStatus(a_Entity, a_Status);
-}
-
-
-
-
-
 void cClientHandle::SendEntityVelocity(const cEntity & a_Entity)
 {
 	m_Protocol->SendEntityVelocity(a_Entity);
@@ -2674,7 +2665,7 @@ void cClientHandle::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cClientHandle::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
+void cClientHandle::SendEntityAnimation(const cEntity & a_Entity, EntityAnimation a_Animation)
 {
 	m_Protocol->SendEntityAnimation(a_Entity, a_Animation);
 }
@@ -3058,15 +3049,6 @@ void cClientHandle::SendUpdateSign(
 		a_BlockX, a_BlockY, a_BlockZ,
 		a_Line1, a_Line2, a_Line3, a_Line4
 	);
-}
-
-
-
-
-
-void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
 }
 
 
