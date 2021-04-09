@@ -18,7 +18,7 @@ public:
 
 private:
 
-	virtual ColourID GetMapBaseColourID() const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		return 10;
 	}

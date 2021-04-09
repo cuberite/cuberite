@@ -488,11 +488,11 @@ void cWorld::BroadcastPlayerListUpdateGameMode(const cPlayer & a_Player, const c
 
 
 
-void cWorld::BroadcastPlayerListUpdatePing(const cPlayer & a_Player, const cClientHandle * a_Exclude)
+void cWorld::BroadcastPlayerListUpdatePing()
 {
-	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, nullptr, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendPlayerListUpdatePing(a_Player);
+			a_Client.SendPlayerListUpdatePing();
 		}
 	);
 }
@@ -596,7 +596,7 @@ void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 {
 	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendTimeUpdate(GetWorldAge(), GetTimeOfDay(), IsDaylightCycleEnabled());
+			a_Client.SendTimeUpdate(GetWorldAge(), std::chrono::duration_cast<cTickTimeLong>(m_WorldDate).count(), IsDaylightCycleEnabled());
 		}
 	);
 }

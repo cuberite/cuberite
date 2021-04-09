@@ -91,7 +91,7 @@ public:
 				case BlockType::ZombieHead:
 				case BlockType::ZombieWallHead:
 					break;
-				default: return false;
+				default: ASSERT(false); return false;
 			}
 
 			auto & MobHeadEntity = static_cast<cMobHeadEntity &>(a_BlockEntity);
@@ -104,7 +104,6 @@ public:
 
 			MobHeadEntity.SetType(HeadType);
 			MobHeadEntity.SetRotation(static_cast<eMobHeadRotation>(Rotation));
-			MobHeadEntity.GetWorld()->BroadcastBlockEntity(MobHeadEntity.GetPos());
 			return false;
 		});
 	}

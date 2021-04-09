@@ -147,12 +147,14 @@ public:
 		}
 
 		const auto BannerPos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-		return a_World.DoWithBlockEntityAt(BannerPos.x, BannerPos.y, BannerPos.z, [Color](cBlockEntity & a_BlockEntity)
+		a_World.DoWithBlockEntityAt(BannerPos, [Color](cBlockEntity & a_BlockEntity)
 		{
 			ASSERT(cBlockBannerHandler::IsBlockBanner(a_BlockEntity.GetBlock()));
 			auto & Banner = static_cast<cBannerEntity &>(a_BlockEntity);
 			Banner.SetBaseColor(Color);
-			return true;
+			return false;
 		});
+
+		return true;
 	}
 };

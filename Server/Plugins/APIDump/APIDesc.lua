@@ -1870,7 +1870,7 @@ end
 							Type = "number",
 						},
 						{
-							Name = "TimeOfDay",
+							Name = "WorldDate",
 							Type = "number",
 						},
 						{
@@ -1878,7 +1878,7 @@ end
 							Type = "boolean",
 						},
 					},
-					Notes = "Sends the specified time update to the client. WorldAge is the total age of the world, in ticks. TimeOfDay is the current day's time, in ticks (0 - 24000). DoDaylightCycle is a bool that specifies whether the client should automatically move the sun (true) or keep it in the same place (false).",
+					Notes = "Sends the specified time update to the client. WorldAge is the total age of the world, in ticks. WorldDate is the current date, in ticks, and is used by the client to calculate the days elapsed (F3 debug overlay's day count) and the time of day (rendered sun position). DoDaylightCycle is a bool that specifies whether the client should automatically move the sun (true) or keep it in the same place (false).",
 				},
 				SetClientBrand =
 				{
@@ -4070,6 +4070,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns true if the entity is sprinting. Entities that cannot sprint return always false",
+				},
+				IsElytraFlying =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is flying with an elytra. Entities that cannot fly with an elytra return always false",
 				},
 				IsSubmerged =
 				{
@@ -10537,16 +10547,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the player's current set of skin part flags.  This is a bitwise OR of various {{Globals#eSkinPart|eSkinPart}} constants.  Note that HasSkinPart may be easier to use in most situations.",
 				},
-				GetStance =
-				{
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the player's stance (Y-pos of player's eyes)",
-				},
 				GetTeam =
 				{
 					Returns =
@@ -11276,6 +11276,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the skin part flags of the player.  The value should be a bitwise OR of several {{Globals#eSkinPart|eSkinPart}} constants.",
+				},
+				SetElytraFlight =
+				{
+					Params =
+					{
+						{
+							Name = "IsElytraFlying",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether the player is elytra flying or not.",
 				},
 				SetSprintingMaxSpeed =
 				{

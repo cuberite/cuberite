@@ -2,6 +2,7 @@
 #include "Globals.h"
 
 #include "Path.h"
+#include "BlockType.h"
 #include "../BlockInfo.h"
 #include "../Chunk.h"
 #include "../Entities/Player.h"

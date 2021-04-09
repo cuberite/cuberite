@@ -4,13 +4,11 @@
 #include "../FunctionRef.h"
 #include "../Mobs/MonsterTypes.h"
 
-class cBedEntity;
 class cBlockEntity;
 class cBroadcastInterface;
 class cItems;
 class cPlayer;
 
-using cBedCallback         = cFunctionRef<bool(cBedEntity   &)>;
 using cBlockEntityCallback = cFunctionRef<bool(cBlockEntity &)>;
 using cPlayerListCallback  = cFunctionRef<bool(cPlayer      &)>;
 using cEntityCallback      = cFunctionRef<bool(cEntity      &)>;
@@ -32,10 +30,8 @@ public:
 
 	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) = 0;
 
-	virtual bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback a_Callback) = 0;
-
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
-	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback) = 0;
+	virtual bool DoWithBlockEntityAt(Vector3i a_Position, cBlockEntityCallback a_Callback) = 0;
 
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities: */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false) = 0;

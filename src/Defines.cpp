@@ -714,6 +714,7 @@ bool ItemCategory::IsHelmet(short a_ItemType)
 bool ItemCategory::IsChestPlate(short a_ItemType)
 {
 	return (
+		(a_ItemType == E_ITEM_ELYTRA) ||
 		(a_ItemType == E_ITEM_LEATHER_TUNIC) ||
 		(a_ItemType == E_ITEM_GOLD_CHESTPLATE) ||
 		(a_ItemType == E_ITEM_CHAIN_CHESTPLATE) ||

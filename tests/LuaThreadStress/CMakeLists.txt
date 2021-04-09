@@ -14,6 +14,7 @@ set (SHARED_SRCS
 	${PROJECT_SOURCE_DIR}/src/Bindings/LuaState.cpp
 
 	${PROJECT_SOURCE_DIR}/src/Generating/ChunkDesc.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/PieceModifier.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/PiecePool.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/Prefab.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/PrefabPiecePool.cpp
@@ -45,6 +46,7 @@ set (SHARED_HDRS
 	${PROJECT_SOURCE_DIR}/src/Bindings/LuaState.h
 
 	${PROJECT_SOURCE_DIR}/src/Generating/ChunkDesc.h
+	${PROJECT_SOURCE_DIR}/src/Generating/PieceModifier.h
 	${PROJECT_SOURCE_DIR}/src/Generating/PiecePool.h
 	${PROJECT_SOURCE_DIR}/src/Generating/Prefab.h
 	${PROJECT_SOURCE_DIR}/src/Generating/PrefabPiecePool.h

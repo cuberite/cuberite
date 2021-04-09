@@ -139,7 +139,7 @@ public:
 	a_Digger is the entity that caused the conversion, usually the player digging.
 	a_Tool is the tool used for the digging.
 	The default implementation drops a single item created from m_BlockType and the current meta. */
-	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr) const;
+	virtual cItems ConvertToPickups(BlockState a_BlockMeta, const cItem * a_Tool = nullptr) const;
 
 	/** Checks if the block can stay at the specified relative coords in the chunk */
 	virtual bool CanBeAt(

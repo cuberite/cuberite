@@ -30,9 +30,14 @@ namespace HopperHandler
 			return;
 		}
 
-		a_Chunk.DoWithHopperAt(a_Position, [Power](cHopperEntity & a_Hopper)
+		a_Chunk.DoWithBlockEntityAt(a_Position, [Power](cBlockEntity & a_BlockEntity)
 		{
-			a_Hopper.SetLocked(Power != 0);
+			if (a_BlockEntity.GetBlockType() != E_BLOCK_HOPPER)
+			{
+				return false;
+			}
+
+			static_cast<cHopperEntity &>(a_BlockEntity).SetLocked(Power != 0);
 			return false;
 		});
 	}

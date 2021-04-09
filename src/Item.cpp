@@ -135,6 +135,7 @@ short cItem::GetMaxDamage(void) const
 		case E_ITEM_DIAMOND_PICKAXE: return 1561;
 		case E_ITEM_DIAMOND_SHOVEL:  return 1561;
 		case E_ITEM_DIAMOND_SWORD:   return 1561;
+		case E_ITEM_ELYTRA:          return 432;
 		case E_ITEM_FLINT_AND_STEEL: return 64;
 		case E_ITEM_FISHING_ROD:     return 65;
 		case E_ITEM_GOLD_AXE:        return 32;

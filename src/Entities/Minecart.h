@@ -105,10 +105,10 @@ public:
 
 	CLASS_PROTODEF(cRideableMinecart)
 
-	cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, int a_Height);
+	cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, int a_ContentHeight);
 
-	const cItem & GetContent(void) const {return m_Content;}
-	int GetBlockHeight(void) const {return m_Height;}
+	const cItem & GetContent(void) const { return m_Content; }
+	int GetBlockHeight(void) const { return m_ContentHeight; }
 
 	// cEntity overrides:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
@@ -116,9 +116,8 @@ public:
 
 protected:
 
-
 	cItem m_Content;
-	int m_Height;
+	int m_ContentHeight;
 } ;
 
 

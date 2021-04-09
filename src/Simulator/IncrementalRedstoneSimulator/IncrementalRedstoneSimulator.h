@@ -2,7 +2,6 @@
 #pragma once
 
 #include "../RedstoneSimulator.h"
-#include "RedstoneSimulatorChunkData.h"
 
 
 
@@ -15,7 +14,7 @@ class cIncrementalRedstoneSimulator final :
 
 public:
 
-	using Super::cRedstoneSimulator;
+	using Super::Super;
 
 private:
 
@@ -127,16 +126,13 @@ private:
 		}
 	}
 
+	void ProcessWorkItem(cChunk & Chunk, cChunk & TickingSource, const Vector3i Position);
+
 	virtual void Simulate(float Dt) override {}
 	virtual void SimulateChunk(std::chrono::milliseconds Dt, int ChunkX, int ChunkZ, cChunk * Chunk) override;
 
 	void ProcessWorkItem(cChunk & Chunk, cChunk & TickingSource, const Vector3i Position);
-
 	virtual cIncrementalRedstoneSimulatorChunkData * CreateChunkData() override
-	{
-		return new cIncrementalRedstoneSimulatorChunkData;
-	}
-
 	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block) override;
 	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block) override;
 	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BlockState a_Block) override;

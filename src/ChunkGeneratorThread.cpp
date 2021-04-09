@@ -18,7 +18,7 @@ const size_t QUEUE_SKIP_LIMIT = 500;
 
 
 cChunkGeneratorThread::cChunkGeneratorThread(void) :
-	Super("cChunkGeneratorThread"),
+	Super("Chunk Generator"),
 	m_Generator(nullptr),
 	m_PluginInterface(nullptr),
 	m_ChunkSink(nullptr)

@@ -32,9 +32,14 @@ namespace CommandBlockHandler
 			return;
 		}
 
-		a_Chunk.DoWithCommandBlockAt(a_Position, [](cCommandBlockEntity & a_CommandBlock)
+		a_Chunk.DoWithBlockEntityAt(a_Position, [](cBlockEntity & a_BlockEntity)
 		{
-			a_CommandBlock.Activate();
+			if (a_BlockEntity.GetBlockType() != E_BLOCK_COMMAND_BLOCK)
+			{
+				return false;
+			}
+
+			static_cast<cCommandBlockEntity &>(a_BlockEntity).Activate();
 			return false;
 		});
 	}

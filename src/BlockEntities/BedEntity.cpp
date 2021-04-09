@@ -57,12 +57,4 @@ void cBedEntity::SendTo(cClientHandle & a_Client)
 void cBedEntity::SetColor(short a_Color)
 {
 	m_Color = a_Color;
-	auto Pos = GetPos();
-
-	// If the bed entity is send immediately, the client (maybe) still has not the bed.
-	// Fix that by delaying the broadcast of the bed entity by a tick:
-	m_World->ScheduleTask(1, [Pos](cWorld & a_World)
-	{
-		a_World.BroadcastBlockEntity(Pos);
-	});
 }

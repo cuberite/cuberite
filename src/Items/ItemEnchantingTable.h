@@ -46,16 +46,12 @@ private:
 		}
 
 		const auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-		a_World.DoWithBlockEntityAt(PlacePos.x, PlacePos.y, PlacePos.z, [&a_EquippedItem](cBlockEntity & a_Entity)
+		a_World.DoWithBlockEntityAt(PlacePos, [&a_EquippedItem](cBlockEntity & a_Entity)
 		{
-			if (a_Entity.GetBlockType() != BlockType::EnchantingTable)
-			{
-				return true;
-			}
+			ASSERT(a_Entity.GetBlockType() == BlockType::EnchantingTable);
 
-			auto & EnchantingTable = static_cast<cEnchantingTableEntity &>(a_Entity);
-			EnchantingTable.SetCustomName(a_EquippedItem.m_CustomName);
-			return true;
+			static_cast<cEnchantingTableEntity &>(a_Entity).SetCustomName(a_EquippedItem.m_CustomName);
+			return false;
 		});
 
 		return true;

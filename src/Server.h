@@ -141,15 +141,6 @@ public:
 	/** Returns true if limit for number of block changes per tick by a player has been turned on in server settings. */
 	bool ShouldLimitPlayerBlockChanges(void) const { return m_ShouldLimitPlayerBlockChanges; }
 
-	/** Returns true if offline UUIDs should be used to load data for players whose normal UUIDs cannot be found.
-	Loaded from the settings.ini [PlayerData].LoadOfflinePlayerData setting. */
-	bool ShouldLoadOfflinePlayerData(void) const { return m_ShouldLoadOfflinePlayerData; }
-
-	/** Returns true if old-style playernames should be used to load data for players whose regular datafiles cannot be found.
-	This allows a seamless transition from name-based to UUID-based player storage.
-	Loaded from the settings.ini [PlayerData].LoadNamedPlayerData setting. */
-	bool ShouldLoadNamedPlayerData(void) const { return m_ShouldLoadNamedPlayerData; }
-
 	/** Returns true if BungeeCord logins (that specify the player's UUID) are allowed.
 	Read from settings, admins should set this to true only when they chain to BungeeCord,
 	it makes the server vulnerable to identity theft through direct connections. */
@@ -242,16 +233,6 @@ private:
 
 	/** True if limit for number of block changes per tick by a player should be enabled. */
 	bool m_ShouldLimitPlayerBlockChanges;
-
-	/** True if offline UUIDs should be used to load data for players whose normal UUIDs cannot be found.
-	This allows transitions from an offline (no-auth) server to an online one.
-	Loaded from the settings.ini [PlayerData].LoadOfflinePlayerData setting. */
-	bool m_ShouldLoadOfflinePlayerData;
-
-	/** True if old-style playernames should be used to load data for players whose regular datafiles cannot be found.
-	This allows a seamless transition from name-based to UUID-based player storage.
-	Loaded from the settings.ini [PlayerData].LoadNamedPlayerData setting. */
-	bool m_ShouldLoadNamedPlayerData;
 
 	/** True if BungeeCord handshake packets (with player UUID) should be accepted. */
 	bool m_ShouldAllowBungeeCord;

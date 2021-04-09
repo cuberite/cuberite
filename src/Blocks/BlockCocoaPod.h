@@ -50,7 +50,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// If fully grown, give 3 items, otherwise just one:
 		auto GrowState = Block::Cocoa::Age(a_Block);

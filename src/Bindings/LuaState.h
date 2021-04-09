@@ -35,9 +35,6 @@ extern "C"
 	#include "lua/src/lauxlib.h"
 }
 
-
-#include <functional>
-
 #include "../Defines.h"
 #include "../FunctionRef.h"
 #include "PluginManager.h"

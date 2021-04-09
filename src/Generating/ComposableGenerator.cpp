@@ -23,6 +23,7 @@
 #include "DistortedHeightmap.h"
 #include "DungeonRoomsFinisher.h"
 #include "EndGen.h"
+#include "EnderDragonFightStructuresGen.h"
 #include "MineShafts.h"
 #include "Noise3DGenerator.h"
 #include "Ravines.h"
@@ -262,7 +263,7 @@ void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDi
 			a_IniFile.GetValueSet("Generator", "ConstantBiome",  "End");
 			a_IniFile.GetValueSet("Generator", "ShapeGen",       "End");
 			a_IniFile.GetValueSet("Generator", "CompositionGen", "End");
-			a_IniFile.GetValueSet("Generator", "Finishers",      "");
+			a_IniFile.GetValueSet("Generator", "Finishers",      "EnderDragonFightStructures");
 			break;
 		}  // dimEnd
 
@@ -463,6 +464,18 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int     MinSize       = a_IniFile.GetValueSetI("Generator", "DungeonRoomsMinSize", 5);
 			AString HeightDistrib = a_IniFile.GetValueSet ("Generator", "DungeonRoomsHeightDistrib", "0, 0; 10, 10; 11, 500; 40, 500; 60, 40; 90, 1");
 			m_FinishGens.push_back(std::make_unique<cDungeonRoomsFinisher>(*m_ShapeGen, m_Seed, GridSize, MaxSize, MinSize, HeightDistrib));
+		}
+		else if (NoCaseCompare(finisher, "EnderDragonFightStructures") == 0)
+		{
+			AString Pillars = a_IniFile.GetValueSet("Generator", "ObsidianPillars",
+				"76|3|false; 79|3|true; 82|3|true; "
+				"85|4|false; 88|4|false; 91|4|false; "
+				"94|5|false; 97|5|false; 100|5|false; "
+				"103|6|false");
+			int Radius = a_IniFile.GetValueSetI("Generator", "ObsidianPillarsRadius", 43);
+			auto Gen = std::make_unique<cEnderDragonFightStructuresGen>(m_Seed);
+			Gen->Init(Pillars, Radius);
+			m_FinishGens.push_back(std::move(Gen));
 		}
 		else if (NoCaseCompare(finisher, "GlowStone") == 0)
 		{

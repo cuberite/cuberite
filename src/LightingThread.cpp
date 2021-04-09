@@ -100,7 +100,7 @@ public:
 // cLightingThread:
 
 cLightingThread::cLightingThread(cWorld & a_World):
-	Super("cLightingThread"),
+	Super("Lighting Executor"),
 	m_World(a_World),
 	m_MaxHeight(0),
 	m_NumSeeds(0)

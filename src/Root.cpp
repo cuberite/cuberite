@@ -1045,7 +1045,6 @@ void cRoot::TransitionNextState(NextState a_NextState)
 	s_StopEvent.Set();
 
 #ifdef WIN32
-
 	DWORD Length;
 	INPUT_RECORD Record
 	{

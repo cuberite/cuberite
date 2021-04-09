@@ -29,7 +29,7 @@
 #include "Entities/TNTEntity.h"
 
 #include "BlockEntities/CommandBlockEntity.h"
-#include "BlockEntities/BeaconEntity.h"
+#include "BlockEntities/SignEntity.h"
 
 // Simulators:
 #include "Simulator/FloodyFluidSimulator.h"
@@ -67,14 +67,6 @@
 
 
 
-const int TIME_SUNSET        = 12000;
-const int TIME_NIGHT_START   = 13187;
-const int TIME_NIGHT_END     = 22812;
-const int TIME_SUNRISE       = 23999;
-const int TIME_SPAWN_DIVISOR =   148;
-
-
-
 
 
 namespace World
@@ -97,7 +89,7 @@ namespace World
 ////////////////////////////////////////////////////////////////////////////////
 // cWorld::cLock:
 
-cWorld::cLock::cLock(cWorld & a_World) :
+cWorld::cLock::cLock(const cWorld & a_World) :
 	Super(&(a_World.m_ChunkMap.GetCS()))
 {
 }
@@ -110,7 +102,7 @@ cWorld::cLock::cLock(cWorld & a_World) :
 // cWorld::cTickThread:
 
 cWorld::cTickThread::cTickThread(cWorld & a_World) :
-	Super(Printf("WorldTickThread: %s", a_World.GetName().c_str())),
+	Super(Printf("World Ticker (%s)", a_World.GetName().c_str())),
 	m_World(a_World)
 {
 }
@@ -173,8 +165,8 @@ cWorld::cWorld(
 	m_BroadcastAchievementMessages(true),
 	m_IsDaylightCycleEnabled(true),
 	m_WorldAge(0),
-	m_TimeOfDay(0),
-	m_LastTimeUpdate(0),
+	m_WorldDate(0),
+	m_WorldTickAge(0),
 	m_LastChunkCheck(0),
 	m_LastSave(0),
 	m_SkyDarkness(0),
@@ -483,6 +475,39 @@ void cWorld::CastThunderbolt(Vector3i a_Block)
 {
 	BroadcastThunderbolt(a_Block);
 	BroadcastSoundEffect("entity.lightning.thunder", a_Block, 50, 1);
+}
+
+
+
+
+
+int cWorld::GetTimeOfDay(void) const
+{
+	using namespace std::chrono_literals;
+
+	return std::chrono::duration_cast<cTickTime>(m_WorldDate % 20min).count();
+}
+
+
+
+
+
+Int64 cWorld::GetWorldAge(void) const
+{
+	return std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count();
+}
+
+
+
+
+
+void cWorld::SetTimeOfDay(int a_TimeOfDay)
+{
+	using namespace std::chrono_literals;
+
+	m_WorldDate = (m_WorldDate / 20min) * 20min + cTickTime(a_TimeOfDay);
+	UpdateSkyDarkness();
+	BroadcastTimeUpdate();
 }
 
 
@@ -964,31 +989,30 @@ void cWorld::Stop(cDeadlockDetect & a_DeadlockDetect)
 
 void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec)
 {
-	// Call the plugins
+	// Notify the plugins:
 	cPluginManager::Get()->CallHookWorldTick(*this, a_Dt, a_LastTickDurationMSec);
 
 	m_WorldAge += a_Dt;
+	m_WorldTickAge += 1;
 
 	if (m_IsDaylightCycleEnabled)
 	{
-		// We need sub-tick precision here, that's why we store the time in milliseconds and calculate ticks off of it
-		m_TimeOfDay += a_Dt;
+		m_WorldDate += a_Dt;
 
-		// Wrap time of day each 20 minutes (1200 seconds)
-		if (m_TimeOfDay > std::chrono::minutes(20))
-		{
-			m_TimeOfDay -= std::chrono::minutes(20);
-		}
-
-		// Updates the sky darkness based on current time of day
+		// Updates the sky darkness based on current time of day:
 		UpdateSkyDarkness();
 
-		// Broadcast time update every 40 ticks (2 seconds)
-		if (m_LastTimeUpdate < m_WorldAge - cTickTime(40))
+		// Broadcast time update every 64 ticks (3.2 seconds):
+		if ((m_WorldTickAge % 64) == 0)
 		{
 			BroadcastTimeUpdate();
-			m_LastTimeUpdate = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
 		}
+	}
+
+	// Broadcast player list pings every 256 ticks (12.8 seconds):
+	if ((m_WorldTickAge % 256) == 0)
+	{
+		BroadcastPlayerListUpdatePing();
 	}
 
 	TickQueuedChunkDataSets();
@@ -998,10 +1022,9 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	TickQueuedEntityAdditions();
 	m_MapManager.TickMaps();
 	TickQueuedTasks();
+	TickWeather(static_cast<float>(a_Dt.count()));
 
 	GetSimulatorManager()->Simulate(static_cast<float>(a_Dt.count()));
-
-	TickWeather(static_cast<float>(a_Dt.count()));
 
 	if (m_WorldAge - m_LastChunkCheck > std::chrono::seconds(10))
 	{
@@ -1268,7 +1291,13 @@ void cWorld::TickQueuedTasks(void)
 
 void cWorld::UpdateSkyDarkness(void)
 {
-	int TempTime = std::chrono::duration_cast<cTickTime>(m_TimeOfDay).count();
+	const int TIME_SUNSET = 12000;
+	const int TIME_NIGHT_START = 13187;
+	const int TIME_NIGHT_END = 22812;
+	const int TIME_SUNRISE = 23999;
+	const int TIME_SPAWN_DIVISOR = 148;
+
+	const auto TempTime = GetTimeOfDay();
 	if (TempTime <= TIME_SUNSET)
 	{
 		m_SkyDarkness = 0;
@@ -1318,60 +1347,6 @@ bool cWorld::ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityC
 
 
 
-bool cWorld::ForEachBrewingstandInChunk(int a_ChunkX, int a_ChunkZ, cBrewingstandCallback a_Callback)
-{
-	return m_ChunkMap.ForEachBrewingstandInChunk(a_ChunkX, a_ChunkZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback a_Callback)
-{
-	return m_ChunkMap.ForEachChestInChunk(a_ChunkX, a_ChunkZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, cDispenserCallback a_Callback)
-{
-	return m_ChunkMap.ForEachDispenserInChunk(a_ChunkX, a_ChunkZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, cDropperCallback a_Callback)
-{
-	return m_ChunkMap.ForEachDropperInChunk(a_ChunkX, a_ChunkZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, cDropSpenserCallback a_Callback)
-{
-	return m_ChunkMap.ForEachDropSpenserInChunk(a_ChunkX, a_ChunkZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback a_Callback)
-{
-	return m_ChunkMap.ForEachFurnaceInChunk(a_ChunkX, a_ChunkZ, a_Callback);
-}
-
-
-
-
-
 void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData)
 {
 	cLock Lock(*this);
@@ -1407,126 +1382,9 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 
 
 
-bool cWorld::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback)
+bool cWorld::DoWithBlockEntityAt(const Vector3i a_Position, cBlockEntityCallback a_Callback)
 {
-	return m_ChunkMap.DoWithBlockEntityAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback a_Callback)
-{
-	return m_ChunkMap.DoWithBeaconAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback a_Callback)
-{
-	return m_ChunkMap.DoWithBedAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback a_Callback)
-{
-	return m_ChunkMap.DoWithBrewingstandAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback a_Callback)
-{
-	return m_ChunkMap.DoWithChestAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback a_Callback)
-{
-	return m_ChunkMap.DoWithDispenserAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback a_Callback)
-{
-	return m_ChunkMap.DoWithDropperAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback a_Callback)
-{
-	return m_ChunkMap.DoWithDropSpenserAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback)
-{
-	return m_ChunkMap.DoWithFurnaceAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::DoWithHopperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperCallback a_Callback)
-{
-	return m_ChunkMap.DoWithHopperAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback)
-{
-	return m_ChunkMap.DoWithNoteBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback a_Callback)
-{
-	return m_ChunkMap.DoWithCommandBlockAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback a_Callback)
-{
-	return m_ChunkMap.DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
-}
-
-
-
-
-
-bool cWorld::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback)
-{
-	return m_ChunkMap.DoWithFlowerPotAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+	return m_ChunkMap.DoWithBlockEntityAt(a_Position, a_Callback);
 }
 
 
@@ -1535,7 +1393,20 @@ bool cWorld::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlower
 
 bool cWorld::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
 {
-	return m_ChunkMap.GetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4);
+	return DoWithBlockEntityAt({ a_BlockX, a_BlockY, a_BlockZ }, [&a_Line1, &a_Line2, &a_Line3, &a_Line4](cBlockEntity & a_BlockEntity)
+	{
+		if ((a_BlockEntity.GetBlockType() != E_BLOCK_WALLSIGN) && (a_BlockEntity.GetBlockType() != E_BLOCK_SIGN_POST))
+		{
+			return false;  // Not a sign
+		}
+
+		const auto & Sign = static_cast<cSignEntity &>(a_BlockEntity);
+		a_Line1 = Sign.GetLine(0);
+		a_Line2 = Sign.GetLine(1);
+		a_Line3 = Sign.GetLine(2);
+		a_Line4 = Sign.GetLine(3);
+		return true;
+	});
 }
 
 
@@ -2525,6 +2396,16 @@ bool cWorld::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Ca
 
 
 
+size_t cWorld::GetPlayerCount() const
+{
+	cLock Lock(*this);
+	return m_Players.size();
+}
+
+
+
+
+
 bool cWorld::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback a_Callback)
 {
 	// First check the entities-to-add:
@@ -2623,6 +2504,8 @@ void cWorld::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ)
 
 bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
 {
+	// TODO: rvalue these strings
+
 	AString Line1(a_Line1);
 	AString Line2(a_Line2);
 	AString Line3(a_Line3);
@@ -2633,7 +2516,18 @@ bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AStrin
 		return false;
 	}
 
-	if (m_ChunkMap.SetSignLines(a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4))
+	if (
+		DoWithBlockEntityAt({ a_BlockX, a_BlockY, a_BlockZ }, [&Line1, &Line2, &Line3, &Line4](cBlockEntity & a_BlockEntity)
+		{
+			if ((a_BlockEntity.GetBlockType() != E_BLOCK_WALLSIGN) && (a_BlockEntity.GetBlockType() != E_BLOCK_SIGN_POST))
+			{
+				return false;  // Not a sign
+			}
+
+			static_cast<cSignEntity &>(a_BlockEntity).SetLines(Line1, Line2, Line3, Line4);
+			return true;
+		})
+	)
 	{
 		cRoot::Get()->GetPluginManager()->CallHookUpdatedSign(*this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player);
 		return true;
@@ -2648,12 +2542,16 @@ bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AStrin
 
 bool cWorld::SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command)
 {
-	return DoWithCommandBlockAt(a_BlockX, a_BlockY, a_BlockZ, [&](cCommandBlockEntity & a_CommandBlock)
+	return DoWithBlockEntityAt({ a_BlockX, a_BlockY, a_BlockZ }, [&](cBlockEntity & a_BlockEntity)
+	{
+		if (a_BlockEntity.GetBlockType() != E_BLOCK_COMMAND_BLOCK)
 		{
-			a_CommandBlock.SetCommand(a_Command);
 			return false;
 		}
-	);
+
+		static_cast<cCommandBlockEntity &>(a_BlockEntity).SetCommand(a_Command);
+		return true;
+	});
 }
 
 

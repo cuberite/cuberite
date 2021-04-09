@@ -94,7 +94,7 @@ public:
 	virtual void SendPlayerListRemovePlayer     (const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) override;
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) override;
-	virtual void SendPlayerListUpdatePing       (const cPlayer & a_Player) override;
+	virtual void SendPlayerListUpdatePing       () override;
 	virtual void SendPlayerMaxSpeed             (void) override;
 	virtual void SendPlayerMoveLook             (void) override;
 	virtual void SendPlayerPosition             (void) override;
@@ -119,7 +119,7 @@ public:
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
-	virtual void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle) override;
+	virtual void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_WorldDate, bool a_DoDaylightCycle) override;
 	virtual void SendUnleashEntity              (const cEntity & a_Entity) override;
 	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;

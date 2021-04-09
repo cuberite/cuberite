@@ -63,14 +63,7 @@ public:
 		}
 
 		a_Player->GetInventory().SetArmorSlot(SlotNum, a_HeldItem.CopyOne());
-
-		cItem Item(a_HeldItem);
-		Item.m_ItemCount--;
-		if (Item.m_ItemCount <= 0)
-		{
-			Item.Empty();
-		}
-		a_Player->GetInventory().SetEquippedItem(Item);
+		a_Player->GetInventory().RemoveOneEquippedItem();
 		return true;
 	}
 
@@ -110,6 +103,7 @@ public:
 			{
 				return (a_ItemType == E_ITEM_GOLD);
 			}
+			case E_ITEM_ELYTRA:  // TODO: require Phantom Membrane instead of leather starting from protocol version 369 or 1.13 release
 			case E_ITEM_LEATHER_BOOTS:
 			case E_ITEM_LEATHER_CAP:
 			case E_ITEM_LEATHER_PANTS:

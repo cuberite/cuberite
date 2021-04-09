@@ -36,7 +36,7 @@ private:
 	}
 
 
-	virtual cItems ConvertToPickups(BlockState, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		UNUSED(a_Digger);
 		UNUSED(a_Tool);

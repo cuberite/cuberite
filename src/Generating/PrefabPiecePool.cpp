@@ -616,6 +616,12 @@ bool cPrefabPiecePool::ReadPieceMetadataCubesetVer1(
 	}
 	a_Prefab->SetVerticalStrategyFromString(VerticalStrategy, a_LogWarnings);
 
+	AString ModifiersStr;
+	if (a_LuaState.GetNamedValue("Modifiers", ModifiersStr))
+	{
+		a_Prefab->SetPieceModifiersFromString(ModifiersStr, a_LogWarnings);
+	}
+
 	return true;
 }
 
@@ -759,6 +765,14 @@ void cPrefabPiecePool::AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHe
 		if (verticalLimit != nullptr)
 		{
 			verticalLimit->AssignGens(a_Seed, a_BiomeGen, a_HeightGen, a_SeaLevel);
+		}
+		auto modifiers = piece->GetModifiers();
+		if (modifiers.size() > 0)
+		{
+			for (size_t i = 0; i < modifiers.size(); i++)
+			{
+				modifiers[i]->AssignSeed(a_Seed);
+			}
 		}
 	}  // for piece - m_AllPieces[]
 }
