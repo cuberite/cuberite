@@ -396,7 +396,8 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		Player->GetEquippedItem().GetHandler()->OnEntityAttack(Player, this);
 
-		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
+		// Whether an enchantment boosted this attack's damage.
+		bool MagicalCriticalHit = false;
 
 		// IsOnGround() only is false if the player is moving downwards
 		// Ref: https://minecraft.gamepedia.com/Damage#Critical_Hits
@@ -405,7 +406,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
 			{
 				a_TDI.FinalDamage *= 1.5f;  // 150% damage
-				m_World->BroadcastEntityAnimation(*this, 4);  // Critical hit
+				m_World->BroadcastEntityAnimation(*this, EntityAnimation::EntityGetsCriticalHit);
 			}
 		}
 
@@ -417,6 +418,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		if (SharpnessLevel > 0)
 		{
+			MagicalCriticalHit = true;
 			a_TDI.FinalDamage += 1.25f * SharpnessLevel;
 		}
 		else if (SmiteLevel > 0)
@@ -432,6 +434,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtZombiePigman:
 					case mtZombieVillager:
 					{
+						MagicalCriticalHit = true;
 						a_TDI.FinalDamage += 2.5f * SmiteLevel;
 						break;
 					}
@@ -450,11 +453,13 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtCaveSpider:
 					case mtSilverfish:
 					{
+						MagicalCriticalHit = true;
 						a_TDI.FinalDamage += 2.5f * BaneOfArthropodsLevel;
+
 						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
-						// increasing the max duration by 0.5 seconds each level
+						// increasing the max duration by 0.5 seconds each level.
 						// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
-						int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks
+						int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks.
 						Monster->AddEntityEffect(cEntityEffect::effSlowness, Duration, 4);
 
 						break;
@@ -473,6 +478,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			{
 				BurnTicks += 4 * (FireAspectLevel - 1);
 			}
+
 			if (!IsMob() && !IsInWater())
 			{
 				StartBurning(BurnTicks * 20);
@@ -488,9 +494,18 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					{
 						break;
 					}
-					default: StartBurning(BurnTicks * 20);
+					default:
+					{
+						MagicalCriticalHit = true;
+						StartBurning(BurnTicks * 20);
+					}
 				}
 			}
+		}
+
+		if (MagicalCriticalHit)
+		{
+			m_World->BroadcastEntityAnimation(*this, EntityAnimation::EntityGetsMagicalCriticalHit);
 		}
 
 		unsigned int ThornsLevel = 0;
