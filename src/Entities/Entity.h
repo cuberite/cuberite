@@ -109,47 +109,6 @@ public:
 
 	// tolua_end
 
-	enum eEntityStatus
-	{
-		// TODO: Investigate 0, 1, and 5 as Wiki.vg is not certain
-
-		// Entity becomes coloured red
-		esGenericHurt            = 2,
-		// Entity plays death animation (entity falls to ground)
-		esGenericDead            = 3,
-		// Iron Golem plays attack animation (arms lift and fall)
-		esIronGolemAttacking     = 4,
-		// Wolf taming particles spawn (smoke)
-		esWolfTaming             = 6,
-		// Wolf tamed particles spawn (hearts)
-		esWolfTamed              = 7,
-		// Wolf plays water removal animation (shaking and water particles)
-		esWolfDryingWater        = 8,
-		// Informs client that eating was accepted
-		esPlayerEatingAccepted   = 9,
-		// Sheep plays eating animation (head lowers to ground)
-		esSheepEating            = 10,
-		// Iron Golem holds gift to villager children
-		esIronGolemGivingPlant   = 11,
-		// Villager spawns heart particles
-		esVillagerBreeding       = 12,
-		// Villager spawns thunderclound particles
-		esVillagerAngry          = 13,
-		// Villager spawns green crosses
-		esVillagerHappy          = 14,
-		// Witch spawns magic particle (TODO: investigation into what this is)
-		esWitchMagicking         = 15,
-
-		// It seems 16 (zombie conversion) is now done with metadata
-
-		// Informs client to explode a firework based on its metadata
-		esFireworkExploding      = 17,
-		// Passive mob is in "love mode"
-		esMobInLove              = 18,
-		// Plays totem of undying animation and sound
-		esTotemOfUndying         = 35,
-	} ;
-
 	static const int FIRE_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in fire
 	static const int FIRE_DAMAGE           = 1;    ///< Damage to deal when standing in fire
 	static const int LAVA_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in lava

@@ -498,8 +498,7 @@ void cPlayer::StartEating(void)
 	// Set the timer:
 	m_EatingFinishTick = m_World->GetWorldAge() + EATING_TICKS;
 
-	// Send the packets:
-	m_World->BroadcastEntityAnimation(*this, 3);
+	// Send the packet:
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -513,7 +512,7 @@ void cPlayer::FinishEating(void)
 	m_EatingFinishTick = -1_tick;
 
 	// Send the packets:
-	m_ClientHandle->SendEntityStatus(*this, esPlayerEatingAccepted);
+	m_ClientHandle->SendEntityAnimation(*this, EntityAnimation::PlayerFinishesEating);
 	m_World->BroadcastEntityMetadata(*this);
 
 	// consume the item:

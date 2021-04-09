@@ -129,7 +129,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			if (m_World->GetBlock({ PosX, PosY, PosZ }) == E_BLOCK_GRASS)
 			{
-				m_World->BroadcastEntityStatus(*this, esSheepEating);
+				m_World->BroadcastEntityAnimation(*this, EntityAnimation::SheepEatsGrass);
 				m_TimeToStopEating = 40;
 			}
 		}

@@ -367,19 +367,6 @@ void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 
 
 
-void cProtocol_1_9_0::SendEntityStatus(const cEntity & a_Entity, char a_Status)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktEntityStatus);
-	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEInt8(a_Status);
-}
-
-
-
-
-
 void cProtocol_1_9_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -702,6 +689,37 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 		}
 	}
 	UNREACHABLE("Unsupported outgoing packet type");
+}
+
+
+
+
+
+unsigned char cProtocol_1_9_0::GetProtocolEntityAnimation(const EntityAnimation a_Animation) const
+{
+	if (a_Animation == EntityAnimation::PlayerOffHandSwings)
+	{
+		return 3;
+	}
+
+	return Super::GetProtocolEntityAnimation(a_Animation);
+}
+
+
+
+
+
+signed char cProtocol_1_9_0::GetProtocolEntityStatus(const EntityAnimation a_Animation) const
+{
+	switch (a_Animation)
+	{
+		case EntityAnimation::ArmorStandGetsHit: return 32;
+		case EntityAnimation::ArrowTipSparkles: return 0;
+		case EntityAnimation::PawnShieldBlocks: return 29;
+		case EntityAnimation::PawnShieldBreaks: return 30;
+		case EntityAnimation::PawnThornsPricks: return 33;
+		default: return Super::GetProtocolEntityStatus(a_Animation);
+	}
 }
 
 

@@ -166,14 +166,12 @@ void cOcelot::OnRightClicked(cPlayer & a_Player)
 					SetIsTame(true);
 					SetOwner(a_Player.GetName(), a_Player.GetUUID());
 					SetCatType(static_cast<eCatType>(Random.RandInt<int>(1, 3)));
-					m_World->BroadcastEntityStatus(*this, esWolfTamed);
-					m_World->BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+					m_World->BroadcastEntityAnimation(*this, EntityAnimation::OcelotTrusts);
 				}
 				else
 				{
 					// Taming failed
-					m_World->BroadcastEntityStatus(*this, esWolfTaming);
-					m_World->BroadcastParticleEffect("smoke", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+					m_World->BroadcastEntityAnimation(*this, EntityAnimation::OcelotDistrusts);
 				}
 			}
 		}

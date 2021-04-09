@@ -403,6 +403,19 @@ UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType)
 
 
 
+signed char cProtocol_1_13::GetProtocolEntityStatus(const EntityAnimation a_Animation) const
+{
+	switch (a_Animation)
+	{
+		case EntityAnimation::DolphinShowsHappiness: return 38;
+		default: return Super::GetProtocolEntityStatus(a_Animation);
+	}
+}
+
+
+
+
+
 UInt32 cProtocol_1_13::GetProtocolMobType(eMonsterType a_MobType)
 {
 	switch (a_MobType)

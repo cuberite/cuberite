@@ -115,7 +115,7 @@ void cPawn::KilledBy(TakeDamageInfo & a_TDI)
 	// Is death eligible for totem reanimation?
 	if (DeductTotem(a_TDI.DamageType))
 	{
-		m_World->BroadcastEntityStatus(*this, esTotemOfUndying);
+		m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnTotemActivates);
 
 		AddEntityEffect(cEntityEffect::effAbsorption, 100, 1);
 		AddEntityEffect(cEntityEffect::effRegeneration, 900, 1);

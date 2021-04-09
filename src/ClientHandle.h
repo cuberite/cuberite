@@ -162,7 +162,7 @@ public:  // tolua_export
 	void SendDisconnect                 (const AString & a_Reason);
 	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ);
-	void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation);  // tolua_export
+	void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation);  // tolua_export
 	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration);
 	void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
 	void SendEntityHeadLook             (const cEntity & a_Entity);
@@ -170,7 +170,6 @@ public:  // tolua_export
 	void SendEntityMetadata             (const cEntity & a_Entity);
 	void SendEntityPosition             (const cEntity & a_Entity);
 	void SendEntityProperties           (const cEntity & a_Entity);
-	void SendEntityStatus               (const cEntity & a_Entity, char a_Status);
 	void SendEntityVelocity             (const cEntity & a_Entity);
 	void SendExperience                 (void);
 	void SendExperienceOrb              (const cExpOrb & a_ExpOrb);
@@ -221,7 +220,6 @@ public:  // tolua_export
 	void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ);
 	void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity);
 	void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
-	void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	/** Send a newly discovered recipe to show the notification and unlock in the recipe book */
 	void SendUnlockRecipe               (UInt32 a_RecipeId);

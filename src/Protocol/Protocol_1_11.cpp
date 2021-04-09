@@ -346,6 +346,41 @@ void cProtocol_1_11_0::SendCollectEntity(const cEntity & a_Collected, const cEnt
 
 
 
+void cProtocol_1_11_0::SendEntityAnimation(const cEntity & a_Entity, const EntityAnimation a_Animation)
+{
+	switch (a_Animation)
+	{
+		case EntityAnimation::EggCracks:
+		case EntityAnimation::SnowballPoofs:
+		{
+			// Vanilla stopped doing clientside prediction for thrown projectile particle effects (for some reason).
+			// But they're still doing motion prediction, and latency exists, hence re-send the server position to avoid particle effects happening inside a block:
+			SendEntityPosition(a_Entity);
+			break;
+		}
+		case EntityAnimation::PawnChestEquipmentBreaks:
+		case EntityAnimation::PawnFeetEquipmentBreaks:
+		case EntityAnimation::PawnHeadEquipmentBreaks:
+		case EntityAnimation::PawnLegsEquipmentBreaks:
+		case EntityAnimation::PawnMainHandEquipmentBreaks:
+		case EntityAnimation::PawnOffHandEquipmentBreaks:
+		{
+			const auto Position = a_Entity.GetPosition();
+
+			// 1.11 dropped the automatic particle effect + sound on item break. Emulate at least some of it:
+			SendSoundEffect("entity.item.break", Position.x, Position.y, Position.z, 1, 0.75f + ((a_Entity.GetUniqueID() * 23) % 32) / 64.f);
+			break;
+		}
+		default: break;
+	}
+
+	Super::SendEntityAnimation(a_Entity, a_Animation);
+}
+
+
+
+
+
 void cProtocol_1_11_0::SendHideTitle(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -526,6 +561,23 @@ UInt32 cProtocol_1_11_0::GetProtocolMobType(const eMonsterType a_MobType)
 
 
 
+signed char cProtocol_1_11_0::GetProtocolEntityStatus(const EntityAnimation a_Animation) const
+{
+	switch (a_Animation)
+	{
+		case EntityAnimation::EggCracks: return 3;
+		case EntityAnimation::EvokerFangsAttacks: return 4;
+		case EntityAnimation::IronGolemStashesGift: return 34;
+		case EntityAnimation::PawnTotemActivates: return 35;
+		case EntityAnimation::SnowballPoofs: return 3;
+		default: return Super::GetProtocolEntityStatus(a_Animation);
+	}
+}
+
+
+
+
+
 void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
 	int BlockX, BlockY, BlockZ;
@@ -539,6 +591,7 @@ void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorZ);
+
 	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16), HandIntToEnum(Hand));
 }
 

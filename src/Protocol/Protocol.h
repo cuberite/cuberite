@@ -381,14 +381,13 @@ public:
 	virtual void SendDisconnect                 (const AString & a_Reason) = 0;
 	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration) = 0;
-	virtual void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation) = 0;
+	virtual void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation) = 0;
 	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendEntityHeadLook             (const cEntity & a_Entity) = 0;
 	virtual void SendEntityLook                 (const cEntity & a_Entity) = 0;
 	virtual void SendEntityMetadata             (const cEntity & a_Entity) = 0;
 	virtual void SendEntityPosition             (const cEntity & a_Entity) = 0;
 	virtual void SendEntityProperties           (const cEntity & a_Entity) = 0;
-	virtual void SendEntityStatus               (const cEntity & a_Entity, char a_Status) = 0;
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) = 0;
 	virtual void SendExplosion                  (Vector3f a_Position, float a_Power) = 0;
 	virtual void SendGameMode                   (eGameMode a_GameMode) = 0;
@@ -441,7 +440,6 @@ public:
 	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) = 0;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) = 0;
 	virtual void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) = 0;
-	virtual void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
 	virtual void SendUnlockRecipe               (UInt32 a_RecipeID) = 0;
 	virtual void SendInitRecipes                (UInt32 a_RecipeID) = 0;
 	virtual void SendWeather                    (eWeather a_Weather) = 0;

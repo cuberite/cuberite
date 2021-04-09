@@ -1070,6 +1070,20 @@ cProtocol::Version cProtocol_1_12::GetProtocolVersion()
 
 
 
+signed char cProtocol_1_12::GetProtocolEntityStatus(EntityAnimation a_Animation) const
+{
+	switch (a_Animation)
+	{
+		case EntityAnimation::PawnBurns: return 37;
+		case EntityAnimation::PawnDrowns: return 36;
+		default: return Super::GetProtocolEntityStatus(a_Animation);
+	}
+}
+
+
+
+
+
 UInt32 cProtocol_1_12::GetProtocolMobType(const eMonsterType a_MobType)
 {
 	switch (a_MobType)

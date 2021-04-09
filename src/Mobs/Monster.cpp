@@ -1463,7 +1463,7 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 				a_Player.GetInventory().RemoveOneEquippedItem();
 			}
 			m_LoveTimer = TPS * 30;  // half a minute
-			m_World->BroadcastEntityStatus(*this, esMobInLove);
+			m_World->BroadcastEntityAnimation(*this, EntityAnimation::AnimalFallsInLove);
 		}
 	}
 	// If a player holding my spawn egg right-clicked me, spawn a new baby

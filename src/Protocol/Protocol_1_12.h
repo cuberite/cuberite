@@ -36,6 +36,7 @@ protected:
 
 	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
 	virtual Version GetProtocolVersion() override;
+	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer);
