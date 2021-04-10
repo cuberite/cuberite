@@ -552,7 +552,7 @@ private:
 	/** Checks the block scheduled for checking in m_ToTickBlocks[] */
 	void CheckBlocks();
 
-	/** Ticks several random blocks in the chunk */
+	/** Ticks several random blocks in the chunk. */
 	void TickBlocks(void);
 
 	/** Adds snow to the top of snowy biomes and hydrates farmland / fills cauldrons in rainy biomes */
