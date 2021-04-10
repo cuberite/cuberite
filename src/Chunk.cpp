@@ -842,27 +842,35 @@ void cChunk::CheckBlocks()
 
 void cChunk::TickBlocks(void)
 {
-	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
-	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
+	cChunkInterface ChunkInterface(m_World->GetChunkMap());
+	cBlockInServerPluginInterface PluginInterface(*m_World);
 
-	// Tick random blocks, but the first one should be m_BlockToTick (so that SetNextBlockToTick() works)
-	auto Idx = cChunkDef::MakeIndexNoCheck(m_BlockToTick);
+	// Tick random blocks, but the first one should be m_BlockToTick (so that SetNextBlockToTick() works):
+	cBlockHandler::For(GetBlock(m_BlockToTick)).OnUpdate(ChunkInterface, *m_World, PluginInterface, *this, m_BlockToTick);
+
 	auto & Random = GetRandomProvider();
 
-	for (int i = 0; i < 50; ++i)
+	// Set a new random coord for the next tick:
+	m_BlockToTick = cChunkDef::IndexToCoordinate(Random.RandInt<size_t>(cChunkDef::NumBlocks - 1));
+
+	// Choose a number of blocks for each section to randomly tick.
+	// http://minecraft.fandom.com/wiki/Tick#Random_tick
+	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 	{
-		auto Pos = cChunkDef::IndexToCoordinate(static_cast<size_t>(Idx));
-		Idx = Random.RandInt(cChunkDef::NumBlocks - 1);
-		if (Pos.y > cChunkDef::GetHeight(m_HeightMap, Pos.x, Pos.z))
+		const auto Section = m_BlockData.GetSection(Y);
+		if (Section == nullptr)
 		{
-			continue;  // It's all air up here
+			continue;
 		}
 
-		cBlockHandler::For(GetBlock(Pos)).OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, Pos);
-	}  // for i
+		for (int Tick = 0; Tick != 3; Tick++)  // TODO: configurability via gamerule randomTickSpeed
+		{
+			const auto Index = Random.RandInt<size_t>(ChunkBlockData::SectionBlockCount - 1);
+			const auto Position = cChunkDef::IndexToCoordinate(Y * ChunkBlockData::SectionBlockCount + Index);
 
-	// Set a new random coord for the next tick:
-	m_BlockToTick = cChunkDef::IndexToCoordinate(static_cast<size_t>(Idx));
+			cBlockHandler::For((*Section)[Index]).OnUpdate(ChunkInterface, *m_World, PluginInterface, *this, Position);
+		}
+	}
 }
 
 
