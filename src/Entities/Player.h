@@ -376,6 +376,9 @@ public:
 	/** Returns true if a player is sleeping in a bed. */
 	bool IsInBed(void) const;
 
+	/** Returns true if the player's left hand is dominant. */
+	bool IsLeftHanded() const;
+
 	/** Returns true if the player has thrown out a floater */
 	bool IsFishing(void) const { return m_IsFishing; }
 
@@ -491,6 +494,9 @@ public:
 	/** Starts or stops flying, broadcasting the state change. */
 	void SetFlying(bool a_ShouldFly);
 
+	/** Sets the dominant hand of the player. */
+	void SetLeftHanded(bool a_IsLeftHanded);
+
 	/** Starts or stops sprinting, if our current body stance permits, broadcasting the state change. */
 	void SetSprint(bool a_ShouldSprint);
 
@@ -556,9 +562,6 @@ public:
 	bool HasSkinPart(eSkinPart a_Part) const { return (m_SkinParts & a_Part) != 0; }
 	int GetSkinParts(void) const { return m_SkinParts; }
 	void SetSkinParts(int a_Parts);
-
-	eMainHand GetMainHand(void) const { return m_MainHand; }
-	void SetMainHand(eMainHand a_Hand);
 
 	// tolua_end
 
@@ -715,6 +718,9 @@ private:
 	/** If true, we are locking m_Position to m_FrozenPosition. */
 	bool m_IsFrozen;
 
+	/** Whether the player is left-handed, or right-handed. */
+	bool m_IsLeftHanded;
+
 	/** Was the player frozen manually by a plugin or automatically by the server? */
 	bool m_IsManuallyFrozen;
 
@@ -748,9 +754,6 @@ private:
 
 	/** Displayed skin part bit mask */
 	int m_SkinParts;
-
-	/** The main hand of the player */
-	eMainHand m_MainHand;
 
 	/** List on known recipes as Ids */
 	std::set<UInt32> m_KnownRecipes;

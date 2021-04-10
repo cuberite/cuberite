@@ -492,16 +492,24 @@ void cProtocol_1_11_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 
 
 
-cProtocol::Version cProtocol_1_11_0::GetProtocolVersion()
+signed char cProtocol_1_11_0::GetProtocolEntityStatus(const EntityAnimation a_Animation) const
 {
-	return Version::v1_11_0;
+	switch (a_Animation)
+	{
+		case EntityAnimation::EggCracks: return 3;
+		case EntityAnimation::EvokerFangsAttacks: return 4;
+		case EntityAnimation::IronGolemStashesGift: return 34;
+		case EntityAnimation::PawnTotemActivates: return 35;
+		case EntityAnimation::SnowballPoofs: return 3;
+		default: return Super::GetProtocolEntityStatus(a_Animation);
+	}
 }
 
 
 
 
 
-UInt32 cProtocol_1_11_0::GetProtocolMobType(const eMonsterType a_MobType)
+UInt32 cProtocol_1_11_0::GetProtocolMobType(const eMonsterType a_MobType) const
 {
 	switch (a_MobType)
 	{
@@ -561,17 +569,9 @@ UInt32 cProtocol_1_11_0::GetProtocolMobType(const eMonsterType a_MobType)
 
 
 
-signed char cProtocol_1_11_0::GetProtocolEntityStatus(const EntityAnimation a_Animation) const
+cProtocol::Version cProtocol_1_11_0::GetProtocolVersion() const
 {
-	switch (a_Animation)
-	{
-		case EntityAnimation::EggCracks: return 3;
-		case EntityAnimation::EvokerFangsAttacks: return 4;
-		case EntityAnimation::IronGolemStashesGift: return 34;
-		case EntityAnimation::PawnTotemActivates: return 35;
-		case EntityAnimation::SnowballPoofs: return 3;
-		default: return Super::GetProtocolEntityStatus(a_Animation);
-	}
+	return Version::v1_11_0;
 }
 
 
@@ -592,14 +592,14 @@ void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorZ);
 
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16), HandIntToEnum(Hand));
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16), Hand == 0);
 }
 
 
 
 
 
-void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity)
+void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
 	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
 	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
@@ -632,7 +632,7 @@ void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockE
 
 
 
-void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
+void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
 {
 	using namespace Metadata_1_11;
 
@@ -685,7 +685,7 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 			a_Pkt.WriteBEUInt8(PLAYER_MAIN_HAND);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetMainHand()));
+			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
 			break;
 		}
 		case cEntity::etPickup:
@@ -855,7 +855,7 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 
 
-void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
+void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
 {
 	using namespace Metadata_1_11;
 
@@ -1273,7 +1273,7 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_11_1:
 
-cProtocol::Version cProtocol_1_11_1::GetProtocolVersion()
+cProtocol::Version cProtocol_1_11_1::GetProtocolVersion() const
 {
 	return Version::v1_11_1;
 }
