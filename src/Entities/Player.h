@@ -612,14 +612,6 @@ public:
 
 private:
 
-	/** Xp Level stuff */
-	enum
-	{
-		XP_TO_LEVEL15 = 255,
-		XP_PER_LEVEL_TO15 = 17,
-		XP_TO_LEVEL30 = 825
-	} ;
-
 	typedef std::vector<std::vector<AString> > AStringVectorVector;
 
 	/** The current body stance the player has adopted. */
