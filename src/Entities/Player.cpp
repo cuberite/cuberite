@@ -1410,9 +1410,11 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	//  ask plugins to allow teleport to the new position.
 	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
+		m_IsTeleporting = true;
+
+		Detach();
 		SetPosition({a_PosX, a_PosY, a_PosZ});
 		FreezeInternal(GetPosition(), false);
-		m_IsTeleporting = true;
 
 		m_ClientHandle->SendPlayerMoveLook();
 	}
@@ -2589,22 +2591,13 @@ void cPlayer::AttachTo(cEntity * a_AttachTo)
 
 void cPlayer::Detach()
 {
-	Detach(false);
-}
-
-
-
-
-
-void cPlayer::Detach(bool a_IsTeleporting)
-{
 	if (m_AttachedTo == nullptr)
 	{
 		// The player is not attached to anything. Bail out.
 		return;
 	}
 
-	// Different detach, if this is a spectator
+	// Different detach, if this is a spectator:
 	if (IsGameModeSpectator())
 	{
 		GetClientHandle()->SendCameraSetTo(*this);
@@ -2615,8 +2608,8 @@ void cPlayer::Detach(bool a_IsTeleporting)
 
 	Super::Detach();
 
-	// If they are teleporting, no need to figure out position
-	if (a_IsTeleporting)
+	// If they are teleporting, no need to figure out position:
+	if (m_IsTeleporting)
 	{
 		return;
 	}
