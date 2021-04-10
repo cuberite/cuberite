@@ -598,7 +598,6 @@ public:
 	// cEntity overrides:
 	virtual void AttachTo(cEntity * a_AttachTo) override;
 	virtual void Detach(void) override;
-	virtual void Detach(bool a_IsTeleporting);
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
 	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
 	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
