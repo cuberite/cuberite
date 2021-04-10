@@ -294,8 +294,8 @@ public:  // tolua_export
 	void PacketUnknown(UInt32 a_PacketType);
 	void PacketError(UInt32 a_PacketType);
 
-	// Calls that cProtocol descendants use for handling packets:
-	void HandleAnimation(int a_Animation);
+	/** Called when the protocol receives a (hand swing) animation packet. */
+	void HandleAnimation(bool a_SwingMainHand);
 
 	/** Called when the protocol receives a MC|ItemName plugin message, indicating that the player named
 	an item in the anvil UI. */
@@ -352,18 +352,18 @@ public:  // tolua_export
 	void HandlePing             (void);
 	void HandlePlayerAbilities  (bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
-	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
 
-	/** Verifies and sets player position, performing relevant checks
-	Calls relevant methods to process movement related statistics
-	Requires state of previous position and on-ground status, so must be called when these are still intact
-	*/
-	void HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround);
+	/** Verifies and sets player position, performing relevant checks.
+	Calls relevant methods to process movement related statistics.
+	Requires state of previous position and on-ground status, so must be called when these are still intact. */
+	void HandlePlayerMove(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround);
+
+	void HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, float a_Rotation, float a_Pitch, bool a_IsOnGround);
 
 
 	void HandlePluginMessage    (const AString & a_Channel, ContiguousByteBufferView a_Message);
 	void HandleRespawn          (void);
-	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, eHand a_Hand);
+	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, bool a_UsedMainHand);
 	void HandleSlotSelected     (Int16 a_SlotNum);
 	void HandleSpectate         (const cUUID & a_PlayerUUID);
 
@@ -382,7 +382,7 @@ public:  // tolua_export
 	);
 	void HandleUnmount          (void);
 	void HandleUseEntity        (UInt32 a_TargetEntityID, bool a_IsLeftClick);
-	void HandleUseItem          (eHand a_Hand);
+	void HandleUseItem          (bool a_UsedMainHand);
 	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
 	void HandleWindowClose      (UInt8 a_WindowID);
 

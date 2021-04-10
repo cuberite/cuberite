@@ -131,7 +131,7 @@ void cProtocol_1_14::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, co
 
 
 
-UInt32 cProtocol_1_14::GetPacketID(ePacketType a_PacketType)
+UInt32 cProtocol_1_14::GetPacketID(ePacketType a_PacketType) const
 {
 	switch (a_PacketType)
 	{
@@ -184,16 +184,7 @@ UInt32 cProtocol_1_14::GetPacketID(ePacketType a_PacketType)
 
 
 
-cProtocol::Version cProtocol_1_14::GetProtocolVersion()
-{
-	return Version::v1_14;
-}
-
-
-
-
-
-std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolID)
+std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolID) const
 {
 	return PaletteUpgrade::ToItem(Palette_1_14::ToItem(a_ProtocolID));
 }
@@ -202,7 +193,7 @@ std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolI
 
 
 
-UInt32 cProtocol_1_14::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+UInt32 cProtocol_1_14::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const
 {
 	return Palette_1_14::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
 }
@@ -238,7 +229,7 @@ signed char cProtocol_1_14::GetProtocolEntityStatus(EntityAnimation a_Animation)
 
 
 
-UInt32 cProtocol_1_14::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
+UInt32 cProtocol_1_14::GetProtocolItemType(short a_ItemID, short a_ItemDamage) const
 {
 	return Palette_1_14::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
 }
@@ -247,9 +238,18 @@ UInt32 cProtocol_1_14::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
 
 
 
-UInt32 cProtocol_1_14::GetProtocolStatisticType(Statistic a_Statistic)
+UInt32 cProtocol_1_14::GetProtocolStatisticType(Statistic a_Statistic) const
 {
 	return Palette_1_14::From(a_Statistic);
+}
+
+
+
+
+
+cProtocol::Version cProtocol_1_14::GetProtocolVersion() const
+{
+	return Version::v1_14;
 }
 
 

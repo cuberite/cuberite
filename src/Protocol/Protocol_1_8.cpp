@@ -1004,10 +1004,6 @@ void cProtocol_1_8_0::SendParticleEffect(const AString & a_ParticleName, Vector3
 			Pkt.WriteVarInt32(static_cast<UInt32>(a_Data[0]));
 			break;
 		}
-		default:
-		{
-			break;
-		}
 	}
 }
 
@@ -1832,7 +1828,27 @@ void cProtocol_1_8_0::CompressPacket(CircularBufferCompressor & a_Packet, Contig
 
 
 
-UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType)
+eBlockFace cProtocol_1_8_0::FaceIntToBlockFace(const Int32 a_BlockFace)
+{
+	// Normalize the blockface values returned from the protocol
+	// Anything known gets mapped 1:1, everything else returns BLOCK_FACE_NONE
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_XM;
+		case BLOCK_FACE_XP: return BLOCK_FACE_XP;
+		case BLOCK_FACE_YM: return BLOCK_FACE_YM;
+		case BLOCK_FACE_YP: return BLOCK_FACE_YP;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_ZM;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_ZP;
+		default: return BLOCK_FACE_NONE;
+	}
+}
+
+
+
+
+
+UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType) const
 {
 	switch (a_PacketType)
 	{
@@ -1923,15 +1939,6 @@ UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType)
 
 
 
-cProtocol::Version cProtocol_1_8_0::GetProtocolVersion()
-{
-	return Version::v1_8_0;
-}
-
-
-
-
-
 unsigned char cProtocol_1_8_0::GetProtocolEntityAnimation(const EntityAnimation a_Animation) const
 {
 	switch (a_Animation)
@@ -1990,7 +1997,7 @@ signed char cProtocol_1_8_0::GetProtocolEntityStatus(const EntityAnimation a_Ani
 
 
 
-UInt32 cProtocol_1_8_0::GetProtocolMobType(const eMonsterType a_MobType)
+UInt32 cProtocol_1_8_0::GetProtocolMobType(const eMonsterType a_MobType) const
 {
 	switch (a_MobType)
 	{
@@ -2042,6 +2049,15 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(const eMonsterType a_MobType)
 
 		default:                      return 0;
 	}
+}
+
+
+
+
+
+cProtocol::Version cProtocol_1_8_0::GetProtocolVersion() const
+{
+	return Version::v1_8_0;
 }
 
 
@@ -2275,7 +2291,7 @@ void cProtocol_1_8_0::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_8_0::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
-	m_Client->HandleAnimation(0);  // Packet exists solely for arm-swing notification
+	m_Client->HandleAnimation(true);  // Packet exists solely for arm-swing notification (main hand).
 }
 
 
@@ -2293,6 +2309,7 @@ void cProtocol_1_8_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 	}
 
 	HANDLE_READ(a_ByteBuffer, ReadBEInt8, Int8, Face);
+
 	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), Status);
 }
 
@@ -2316,14 +2333,15 @@ void cProtocol_1_8_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
+
 	eBlockFace blockFace = FaceIntToBlockFace(Face);
 	if (blockFace == eBlockFace::BLOCK_FACE_NONE)
 	{
-		m_Client->HandleUseItem(eHand::hMain);
+		m_Client->HandleUseItem(true);
 	}
 	else
 	{
-		m_Client->HandleRightClick(BlockX, BlockY, BlockZ, blockFace, CursorX, CursorY, CursorZ, eHand::hMain);
+		m_Client->HandleRightClick(BlockX, BlockY, BlockZ, blockFace, CursorX, CursorY, CursorZ, true);
 	}
 }
 
@@ -2334,6 +2352,7 @@ void cProtocol_1_8_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_8_0::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Message);
+
 	m_Client->HandleChat(Message);
 }
 
@@ -2362,6 +2381,7 @@ void cProtocol_1_8_0::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_8_0::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, ActionID);
+
 	switch (ActionID)
 	{
 		case 0:
@@ -2394,6 +2414,7 @@ void cProtocol_1_8_0::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_8_0::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEInt16, Int16, SlotNum);
+
 	cItem Item;
 	if (!ReadItem(a_ByteBuffer, Item))
 	{
@@ -2436,6 +2457,7 @@ void cProtocol_1_8_0::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_8_0::HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, KeepAliveID);
+
 	m_Client->HandleKeepAlive(KeepAliveID);
 }
 
@@ -2478,6 +2500,7 @@ void cProtocol_1_8_0::HandlePacketPlayerLook(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Yaw);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Pitch);
 	HANDLE_READ(a_ByteBuffer, ReadBool,    bool,  IsOnGround);
+
 	m_Client->HandlePlayerLook(Yaw, Pitch, IsOnGround);
 }
 
@@ -2491,7 +2514,8 @@ void cProtocol_1_8_0::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosY);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
 	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
-	m_Client->HandlePlayerPos(PosX, PosY, PosZ, IsOnGround);
+
+	m_Client->HandlePlayerMove(PosX, PosY, PosZ, IsOnGround);
 }
 
 
@@ -2506,6 +2530,7 @@ void cProtocol_1_8_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Yaw);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Pitch);
 	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
+
 	m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, Yaw, Pitch, IsOnGround);
 }
 
@@ -2557,6 +2582,7 @@ void cProtocol_1_8_0::HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_8_0::HandlePacketSlotSelect(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEInt16, Int16, SlotNum);
+
 	m_Client->HandleSlotSelected(SlotNum);
 }
 
@@ -2633,6 +2659,7 @@ void cProtocol_1_8_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 	for (int i = 0; i < 4; i++)
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line);
+
 		if (JsonUtils::ParseString(Line, root) && root.isString())
 		{
 			Lines[i] = root.asString();
@@ -2703,6 +2730,7 @@ void cProtocol_1_8_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  Button);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt16, UInt16, TransactionID);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  Mode);
+
 	cItem Item;
 	ReadItem(a_ByteBuffer, Item);
 
@@ -2757,6 +2785,7 @@ void cProtocol_1_8_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_8_0::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, WindowID);
+
 	m_Client->HandleWindowClose(WindowID);
 }
 
@@ -2769,6 +2798,7 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 	if (a_Channel == "MC|AdvCdm")
 	{
 		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Mode);
+
 		switch (Mode)
 		{
 			case 0x00:
@@ -2777,6 +2807,7 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockY);
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockZ);
 				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+
 				m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
 				break;
 			}
@@ -2793,6 +2824,7 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 	else if (a_Channel == "MC|Brand")
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
+
 		m_Client->SetClientBrand(Brand);
 		// Send back our brand, including the length:
 		m_Client->SendPluginMessage("MC|Brand", "\x08""Cuberite");
@@ -2802,18 +2834,21 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 	{
 		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, Effect1);
 		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, Effect2);
+
 		m_Client->HandleBeaconSelection(Effect1, Effect2);
 		return;
 	}
 	else if (a_Channel == "MC|ItemName")
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, ItemName);
+
 		m_Client->HandleAnvilItemName(ItemName);
 		return;
 	}
 	else if (a_Channel == "MC|TrSel")
 	{
 		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, SlotNum);
+
 		m_Client->HandleNPCTrade(SlotNum);
 		return;
 	}
@@ -2829,67 +2864,7 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 
 
 
-void cProtocol_1_8_0::SendData(ContiguousByteBufferView a_Data)
-{
-	if (m_IsEncrypted)
-	{
-		std::byte Encrypted[8 KiB];  // Larger buffer, we may be sending lots of data (chunks)
-
-		while (a_Data.size() > 0)
-		{
-			const auto NumBytes = (a_Data.size() > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Data.size();
-			m_Encryptor.ProcessData(Encrypted, a_Data.data(), NumBytes);
-			m_Client->SendData({ Encrypted, NumBytes });
-
-			a_Data = a_Data.substr(NumBytes);
-		}
-	}
-	else
-	{
-		m_Client->SendData(a_Data);
-	}
-}
-
-
-
-
-
-bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes)
-{
-	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemType);
-	if (ItemType == -1)
-	{
-		// The item is empty, no more data follows
-		a_Item.Empty();
-		return true;
-	}
-	a_Item.m_ItemType = ItemType;
-
-	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8,  Int8,  ItemCount);
-	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemDamage);
-	a_Item.m_ItemCount  = ItemCount;
-	a_Item.m_ItemDamage = ItemDamage;
-	if (ItemCount <= 0)
-	{
-		a_Item.Empty();
-	}
-
-	ContiguousByteBuffer Metadata;
-	if (!a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes) || Metadata.empty() || (Metadata[0] == std::byte(0)))
-	{
-		// No metadata
-		return true;
-	}
-
-	ParseItemMetadata(a_Item, Metadata);
-	return true;
-}
-
-
-
-
-
-void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBufferView a_Metadata)
+void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBufferView a_Metadata) const
 {
 	// Parse into NBT:
 	cParsedNBT NBT(a_Metadata);
@@ -2962,50 +2937,98 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 
 
 
-void cProtocol_1_8_0::StartEncryption(const Byte * a_Key)
+bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) const
 {
-	m_Encryptor.Init(a_Key, a_Key);
-	m_Decryptor.Init(a_Key, a_Key);
-	m_IsEncrypted = true;
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemType);
 
-	// Prepare the m_AuthServerID:
-	cSha1Checksum Checksum;
-	cServer * Server = cRoot::Get()->GetServer();
-	const AString & ServerID = Server->GetServerID();
-	Checksum.Update(reinterpret_cast<const Byte *>(ServerID.c_str()), ServerID.length());
-	Checksum.Update(a_Key, 16);
-	Checksum.Update(reinterpret_cast<const Byte *>(Server->GetPublicKeyDER().data()), Server->GetPublicKeyDER().size());
-	Byte Digest[20];
-	Checksum.Finalize(Digest);
-	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
+	if (ItemType == -1)
+	{
+		// The item is empty, no more data follows
+		a_Item.Empty();
+		return true;
+	}
+	a_Item.m_ItemType = ItemType;
+
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8,  Int8,  ItemCount);
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemDamage);
+
+	a_Item.m_ItemCount  = ItemCount;
+	a_Item.m_ItemDamage = ItemDamage;
+	if (ItemCount <= 0)
+	{
+		a_Item.Empty();
+	}
+
+	ContiguousByteBuffer Metadata;
+	if (!a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes) || Metadata.empty() || (Metadata[0] == std::byte(0)))
+	{
+		// No metadata
+		return true;
+	}
+
+	ParseItemMetadata(a_Item, Metadata);
+	return true;
 }
 
 
 
 
 
-eBlockFace cProtocol_1_8_0::FaceIntToBlockFace(const Int32 a_BlockFace)
+void cProtocol_1_8_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData)
 {
-	// Normalize the blockface values returned from the protocol
-	// Anything known gets mapped 1:1, everything else returns BLOCK_FACE_NONE
-	switch (a_BlockFace)
+	ASSERT(m_State == 3);  // In game mode?
+
 	{
-		case BLOCK_FACE_XM: return BLOCK_FACE_XM;
-		case BLOCK_FACE_XP: return BLOCK_FACE_XP;
-		case BLOCK_FACE_YM: return BLOCK_FACE_YM;
-		case BLOCK_FACE_YP: return BLOCK_FACE_YP;
-		case BLOCK_FACE_ZM: return BLOCK_FACE_ZM;
-		case BLOCK_FACE_ZP: return BLOCK_FACE_ZP;
-		default: return BLOCK_FACE_NONE;
+		cPacketizer Pkt(*this, pktSpawnObject);
+		Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+		Pkt.WriteBEUInt8(a_ObjectType);
+		Pkt.WriteFPInt(a_Entity.GetPosX());  // Position appears to be ignored...
+		Pkt.WriteFPInt(a_Entity.GetPosY());
+		Pkt.WriteFPInt(a_Entity.GetPosY());
+		Pkt.WriteByteAngle(a_Entity.GetPitch());
+		Pkt.WriteByteAngle(a_Entity.GetYaw());
+		Pkt.WriteBEInt32(a_ObjectData);
+
+		if (a_ObjectData != 0)
+		{
+			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
+			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
+			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
+		}
+	}
+
+	// Otherwise 1.8 clients don't show the entity
+	SendEntityTeleport(a_Entity);
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendData(ContiguousByteBufferView a_Data)
+{
+	if (m_IsEncrypted)
+	{
+		std::byte Encrypted[8 KiB];  // Larger buffer, we may be sending lots of data (chunks)
+
+		while (a_Data.size() > 0)
+		{
+			const auto NumBytes = (a_Data.size() > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Data.size();
+			m_Encryptor.ProcessData(Encrypted, a_Data.data(), NumBytes);
+			m_Client->SendData({ Encrypted, NumBytes });
+
+			a_Data = a_Data.substr(NumBytes);
+		}
+	}
+	else
+	{
+		m_Client->SendData(a_Data);
 	}
 }
 
 
 
 
-
-////////////////////////////////////////////////////////////////////////////////
-// cProtocol_1_8_0::cPacketizer:
 
 void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 {
@@ -3067,38 +3090,7 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 
 
 
-void cProtocol_1_8_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	{
-		cPacketizer Pkt(*this, pktSpawnObject);
-		Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-		Pkt.WriteBEUInt8(a_ObjectType);
-		Pkt.WriteFPInt(a_Entity.GetPosX());  // Position appears to be ignored...
-		Pkt.WriteFPInt(a_Entity.GetPosY());
-		Pkt.WriteFPInt(a_Entity.GetPosY());
-		Pkt.WriteByteAngle(a_Entity.GetPitch());
-		Pkt.WriteByteAngle(a_Entity.GetYaw());
-		Pkt.WriteBEInt32(a_ObjectData);
-
-		if (a_ObjectData != 0)
-		{
-			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
-			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
-			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
-		}
-	}
-
-	// Otherwise 1.8 clients don't show the entity
-	SendEntityTeleport(a_Entity);
-}
-
-
-
-
-
-void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity)
+void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
 	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
 	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
@@ -3205,89 +3197,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 
 
 
-void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
-{
-	short ItemType = a_Item.m_ItemType;
-	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
-	if (ItemType <= 0)
-	{
-		// Fix, to make sure no invalid values are sent.
-		ItemType = -1;
-	}
-
-	if (a_Item.IsEmpty())
-	{
-		a_Pkt.WriteBEInt16(-1);
-		return;
-	}
-
-	a_Pkt.WriteBEInt16(ItemType);
-	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
-	a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
-
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid())
-	{
-		a_Pkt.WriteBEInt8(0);
-		return;
-	}
-
-
-	// Send the enchantments and custom names:
-	cFastNBTWriter Writer;
-	if (a_Item.m_RepairCost != 0)
-	{
-		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
-	}
-	if (!a_Item.m_Enchantments.IsEmpty())
-	{
-		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
-	}
-	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
-	{
-		Writer.BeginCompound("display");
-		if (a_Item.m_ItemColor.IsValid())
-		{
-			Writer.AddInt("color", static_cast<Int32>(a_Item.m_ItemColor.m_Color));
-		}
-
-		if (!a_Item.IsCustomNameEmpty())
-		{
-			Writer.AddString("Name", a_Item.m_CustomName);
-		}
-		if (!a_Item.IsLoreEmpty())
-		{
-			Writer.BeginList("Lore", TAG_String);
-
-			for (const auto & Line : a_Item.m_LoreTable)
-			{
-				Writer.AddString("", Line);
-			}
-
-			Writer.EndList();
-		}
-		Writer.EndCompound();
-	}
-	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
-	{
-		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
-	}
-	Writer.Finish();
-
-	const auto Result = Writer.GetResult();
-	if (Result.empty())
-	{
-		a_Pkt.WriteBEInt8(0);
-		return;
-	}
-	a_Pkt.WriteBuf(Result);
-}
-
-
-
-
-
-void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
+void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
 {
 	// Common metadata:
 	Byte Flags = 0;
@@ -3438,7 +3348,129 @@ void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 
 
 
-void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
+void cProtocol_1_8_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+{
+	if (a_Entity.IsPlayer())
+	{
+		const auto & Player = static_cast<const cPlayer &>(a_Entity);
+
+		a_Pkt.WriteBEInt32(1);  // Count.
+		a_Pkt.WriteString("generic.movementSpeed");
+		a_Pkt.WriteBEDouble(0.1 * Player.GetNormalMaxSpeed());  // The default game speed is 0.1, multiply that value by the relative speed.
+
+		// It seems the modifiers aren't conditionally activated; their effects are applied immediately!
+		// We have to keep on re-sending this packet when the client notifies us of sprint start and end, and so on. Strange.
+
+		if (Player.IsSprinting())
+		{
+			a_Pkt.WriteVarInt32(1);  // Modifier count.
+			a_Pkt.WriteBEUInt64(0x662a6b8dda3e4c1c);
+			a_Pkt.WriteBEUInt64(0x881396ea6097278d);  // UUID of the modifier (sprinting speed boost).
+			a_Pkt.WriteBEDouble(Player.GetSprintingMaxSpeed() - Player.GetNormalMaxSpeed());
+			a_Pkt.WriteBEUInt8(2);
+		}
+		else
+		{
+			a_Pkt.WriteVarInt32(0);
+		}
+	}
+	else
+	{
+		// const cMonster & Mob = (const cMonster &)a_Entity;
+
+		// TODO: Send properties and modifiers based on the mob type
+
+		a_Pkt.WriteBEInt32(0);
+	}
+}
+
+
+
+
+
+void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
+{
+	short ItemType = a_Item.m_ItemType;
+	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
+	if (ItemType <= 0)
+	{
+		// Fix, to make sure no invalid values are sent.
+		ItemType = -1;
+	}
+
+	if (a_Item.IsEmpty())
+	{
+		a_Pkt.WriteBEInt16(-1);
+		return;
+	}
+
+	a_Pkt.WriteBEInt16(ItemType);
+	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
+	a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
+
+	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid())
+	{
+		a_Pkt.WriteBEInt8(0);
+		return;
+	}
+
+
+	// Send the enchantments and custom names:
+	cFastNBTWriter Writer;
+	if (a_Item.m_RepairCost != 0)
+	{
+		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
+	}
+	if (!a_Item.m_Enchantments.IsEmpty())
+	{
+		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
+	}
+	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
+	{
+		Writer.BeginCompound("display");
+		if (a_Item.m_ItemColor.IsValid())
+		{
+			Writer.AddInt("color", static_cast<Int32>(a_Item.m_ItemColor.m_Color));
+		}
+
+		if (!a_Item.IsCustomNameEmpty())
+		{
+			Writer.AddString("Name", a_Item.m_CustomName);
+		}
+		if (!a_Item.IsLoreEmpty())
+		{
+			Writer.BeginList("Lore", TAG_String);
+
+			for (const auto & Line : a_Item.m_LoreTable)
+			{
+				Writer.AddString("", Line);
+			}
+
+			Writer.EndList();
+		}
+		Writer.EndCompound();
+	}
+	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
+	{
+		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+	}
+	Writer.Finish();
+
+	const auto Result = Writer.GetResult();
+	if (Result.empty())
+	{
+		a_Pkt.WriteBEInt8(0);
+		return;
+	}
+	a_Pkt.WriteBuf(Result);
+}
+
+
+
+
+
+void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
 {
 	// Living Enitiy Metadata
 	if (a_Mob.HasCustomName())
@@ -3764,46 +3796,6 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 
 
 
-void cProtocol_1_8_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity)
-{
-	if (a_Entity.IsPlayer())
-	{
-		const auto & Player = static_cast<const cPlayer &>(a_Entity);
-
-		a_Pkt.WriteBEInt32(1);  // Count.
-		a_Pkt.WriteString("generic.movementSpeed");
-		a_Pkt.WriteBEDouble(0.1 * Player.GetNormalMaxSpeed());  // The default game speed is 0.1, multiply that value by the relative speed.
-
-		// It seems the modifiers aren't conditionally activated; their effects are applied immediately!
-		// We have to keep on re-sending this packet when the client notifies us of sprint start and end, and so on. Strange.
-
-		if (Player.IsSprinting())
-		{
-			a_Pkt.WriteVarInt32(1);  // Modifier count.
-			a_Pkt.WriteBEUInt64(0x662a6b8dda3e4c1c);
-			a_Pkt.WriteBEUInt64(0x881396ea6097278d);  // UUID of the modifier (sprinting speed boost).
-			a_Pkt.WriteBEDouble(Player.GetSprintingMaxSpeed() - Player.GetNormalMaxSpeed());
-			a_Pkt.WriteBEUInt8(2);
-		}
-		else
-		{
-			a_Pkt.WriteVarInt32(0);
-		}
-	}
-	else
-	{
-		// const cMonster & Mob = (const cMonster &)a_Entity;
-
-		// TODO: Send properties and modifiers based on the mob type
-
-		a_Pkt.WriteBEInt32(0);
-	}
-}
-
-
-
-
-
 void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousByteBufferView a_Data)
 {
 	// Write the incoming data into the comm log file:
@@ -3915,98 +3907,6 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousBy
 		);
 		m_CommLogFile.Flush();
 	}
-}
-
-
-
-
-
-void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
-{
-	UInt32 PacketType;
-	if (!a_Buffer.ReadVarInt(PacketType))
-	{
-		// Not enough data
-		return;
-	}
-
-	// Log the packet info into the comm log file:
-	if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
-	{
-		ContiguousByteBuffer PacketData;
-		a_Buffer.ReadAll(PacketData);
-		a_Buffer.ResetRead();
-		a_Buffer.ReadVarInt(PacketType);  // We have already read the packet type once, it will be there again
-		ASSERT(PacketData.size() > 0);  // We have written an extra NUL, so there had to be at least one byte read
-		PacketData.resize(PacketData.size() - 1);
-		AString PacketDataHex;
-		CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);
-		m_CommLogFile.Printf("Next incoming packet is type %u (0x%x), length %u (0x%x) at state %d. Payload:\n%s\n",
-			PacketType, PacketType, a_Buffer.GetUsedSpace(), a_Buffer.GetUsedSpace(), m_State, PacketDataHex.c_str()
-		);
-	}
-
-	if (!HandlePacket(a_Buffer, PacketType))
-	{
-		// Unknown packet, already been reported, but without the length. Log the length here:
-		LOGWARNING("Unhandled packet: type 0x%x, state %d, length %u", PacketType, m_State, a_Buffer.GetUsedSpace());
-
-#ifndef NDEBUG
-		// Dump the packet contents into the log:
-		a_Buffer.ResetRead();
-		ContiguousByteBuffer Packet;
-		a_Buffer.ReadAll(Packet);
-		Packet.resize(Packet.size() - 1);  // Drop the final NUL pushed there for over-read detection
-		AString Out;
-		CreateHexDump(Out, Packet.data(), Packet.size(), 24);
-		LOGD("Packet contents:\n%s", Out.c_str());
-#endif  // !NDEBUG
-
-		// Put a message in the comm log:
-		if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
-		{
-			m_CommLogFile.Printf("^^^^^^ Unhandled packet ^^^^^^\n\n\n");
-		}
-
-		return;
-	}
-
-	// The packet should have nothing left in the buffer:
-	if (a_Buffer.GetReadableSpace() != 0)
-	{
-		// Read more or less than packet length, report as error
-		LOGWARNING("Protocol 1.8: Wrong number of bytes read for packet 0x%x, state %d. Read %zu bytes, packet contained %u bytes",
-			PacketType, m_State, a_Buffer.GetUsedSpace() - a_Buffer.GetReadableSpace(), a_Buffer.GetUsedSpace()
-		);
-
-		// Put a message in the comm log:
-		if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
-		{
-			m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got %zu left) ^^^^^^\n\n\n",
-				1, a_Buffer.GetReadableSpace()
-			);
-			m_CommLogFile.Flush();
-		}
-
-		ASSERT(!"Read wrong number of bytes!");
-		m_Client->PacketError(PacketType);
-	}
-}
-
-
-
-
-
-void cProtocol_1_8_0::SendEntityTeleport(const cEntity & a_Entity)
-{
-	cPacketizer Pkt(*this, pktTeleportEntity);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteFPInt(a_Entity.GetPosX());
-	Pkt.WriteFPInt(a_Entity.GetPosY());
-	Pkt.WriteFPInt(a_Entity.GetPosZ());
-	Pkt.WriteByteAngle(a_Entity.GetYaw());
-	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
 
@@ -4229,4 +4129,118 @@ const char * cProtocol_1_8_0::GetProtocolStatisticName(Statistic a_Statistic)
 		case Statistic::SneakTime:                 return "stat.sneakTime";
 		default:                                   return "";
 	}
+}
+
+
+
+
+
+void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
+{
+	UInt32 PacketType;
+	if (!a_Buffer.ReadVarInt(PacketType))
+	{
+		// Not enough data
+		return;
+	}
+
+	// Log the packet info into the comm log file:
+	if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
+	{
+		ContiguousByteBuffer PacketData;
+		a_Buffer.ReadAll(PacketData);
+		a_Buffer.ResetRead();
+		a_Buffer.ReadVarInt(PacketType);  // We have already read the packet type once, it will be there again
+		ASSERT(PacketData.size() > 0);  // We have written an extra NUL, so there had to be at least one byte read
+		PacketData.resize(PacketData.size() - 1);
+		AString PacketDataHex;
+		CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);
+		m_CommLogFile.Printf("Next incoming packet is type %u (0x%x), length %u (0x%x) at state %d. Payload:\n%s\n",
+			PacketType, PacketType, a_Buffer.GetUsedSpace(), a_Buffer.GetUsedSpace(), m_State, PacketDataHex.c_str()
+		);
+	}
+
+	if (!HandlePacket(a_Buffer, PacketType))
+	{
+		// Unknown packet, already been reported, but without the length. Log the length here:
+		LOGWARNING("Unhandled packet: type 0x%x, state %d, length %u", PacketType, m_State, a_Buffer.GetUsedSpace());
+
+#ifndef NDEBUG
+		// Dump the packet contents into the log:
+		a_Buffer.ResetRead();
+		ContiguousByteBuffer Packet;
+		a_Buffer.ReadAll(Packet);
+		Packet.resize(Packet.size() - 1);  // Drop the final NUL pushed there for over-read detection
+		AString Out;
+		CreateHexDump(Out, Packet.data(), Packet.size(), 24);
+		LOGD("Packet contents:\n%s", Out.c_str());
+#endif  // !NDEBUG
+
+		// Put a message in the comm log:
+		if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
+		{
+			m_CommLogFile.Printf("^^^^^^ Unhandled packet ^^^^^^\n\n\n");
+		}
+
+		return;
+	}
+
+	// The packet should have nothing left in the buffer:
+	if (a_Buffer.GetReadableSpace() != 0)
+	{
+		// Read more or less than packet length, report as error
+		LOGWARNING("Protocol 1.8: Wrong number of bytes read for packet 0x%x, state %d. Read %zu bytes, packet contained %u bytes",
+			PacketType, m_State, a_Buffer.GetUsedSpace() - a_Buffer.GetReadableSpace(), a_Buffer.GetUsedSpace()
+		);
+
+		// Put a message in the comm log:
+		if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
+		{
+			m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got %zu left) ^^^^^^\n\n\n",
+				1, a_Buffer.GetReadableSpace()
+			);
+			m_CommLogFile.Flush();
+		}
+
+		ASSERT(!"Read wrong number of bytes!");
+		m_Client->PacketError(PacketType);
+	}
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendEntityTeleport(const cEntity & a_Entity)
+{
+	cPacketizer Pkt(*this, pktTeleportEntity);
+	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	Pkt.WriteFPInt(a_Entity.GetPosX());
+	Pkt.WriteFPInt(a_Entity.GetPosY());
+	Pkt.WriteFPInt(a_Entity.GetPosZ());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteByteAngle(a_Entity.GetPitch());
+	Pkt.WriteBool(a_Entity.IsOnGround());
+}
+
+
+
+
+
+void cProtocol_1_8_0::StartEncryption(const Byte * a_Key)
+{
+	m_Encryptor.Init(a_Key, a_Key);
+	m_Decryptor.Init(a_Key, a_Key);
+	m_IsEncrypted = true;
+
+	// Prepare the m_AuthServerID:
+	cSha1Checksum Checksum;
+	cServer * Server = cRoot::Get()->GetServer();
+	const AString & ServerID = Server->GetServerID();
+	Checksum.Update(reinterpret_cast<const Byte *>(ServerID.c_str()), ServerID.length());
+	Checksum.Update(a_Key, 16);
+	Checksum.Update(reinterpret_cast<const Byte *>(Server->GetPublicKeyDER().data()), Server->GetPublicKeyDER().size());
+	Byte Digest[20];
+	Checksum.Finalize(Digest);
+	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
 }

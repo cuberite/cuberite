@@ -211,26 +211,6 @@ enum eMobHeadRotation
 
 
 
-enum eHand
-{
-	hMain = 0,
-	hOff = 1,
-} ;
-
-
-
-
-
-enum eMainHand
-{
-	mhLeft = 0,
-	mhRight = 1,
-} ;
-
-
-
-
-
 enum eSkinPart
 {
 	spCape = 0x01,

@@ -566,6 +566,21 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::Priori
 
 
 
+void cClientHandle::HandleAnimation(const bool a_SwingMainHand)
+{
+	if (cPluginManager::Get()->CallHookPlayerAnimation(*m_Player, a_SwingMainHand ? 0 : 1))
+	{
+		// Plugin disagrees, bail out:
+		return;
+	}
+
+	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, a_SwingMainHand ? EntityAnimation::PlayerMainHandSwings : EntityAnimation::PlayerOffHandSwings, this);
+}
+
+
+
+
+
 void cClientHandle::HandleNPCTrade(int a_SlotNum)
 {
 	// TODO
@@ -751,62 +766,6 @@ void cClientHandle::HandlePlayerAbilities(bool a_IsFlying, float FlyingSpeed, fl
 	UNUSED(WalkingSpeed);
 
 	m_Player->SetFlying(a_IsFlying);
-}
-
-
-
-
-
-void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround)
-{
-	if (m_Player->IsFrozen())
-	{
-		// Ignore client-side updates if the player is frozen
-		return;
-	}
-
-	Vector3d NewPosition(a_PosX, a_PosY, a_PosZ);
-	Vector3d OldPosition = GetPlayer()->GetPosition();
-	auto PreviousIsOnGround = GetPlayer()->IsOnGround();
-
-	#ifdef __clang__
-		#pragma clang diagnostic push
-		#pragma clang diagnostic ignored "-Wfloat-equal"
-	#endif
-
-	if (
-		(OldPosition == NewPosition) &&
-		(PreviousIsOnGround == a_IsOnGround)
-	)
-	{
-		// Nothing changed, no need to do anything
-		return;
-	}
-
-	#ifdef __clang__
-		#pragma clang diagnostic pop
-	#endif
-
-	// If the player has moved too far, "repair" them:
-	if ((OldPosition - NewPosition).SqrLength() > 100 * 100)
-	{
-		LOGD("Too far away (%0.2f), \"repairing\" the client", (OldPosition - NewPosition).Length());
-		SendPlayerMoveLook();
-		return;
-	}
-
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*m_Player, OldPosition, NewPosition, PreviousIsOnGround))
-	{
-		SendPlayerMoveLook();
-		return;
-	}
-
-	// TODO: should do some checks to see if player is not moving through terrain
-	// TODO: Official server refuses position packets too far away from each other, kicking "hacked" clients; we should, too
-
-	m_Player->SetPosition(NewPosition);
-	m_Player->SetTouchGround(a_IsOnGround);
-	m_Player->UpdateMovementStats(NewPosition - OldPosition, PreviousIsOnGround);
 }
 
 
@@ -1342,7 +1301,7 @@ void cClientHandle::FinishDigAnimation()
 
 
 
-void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, eHand a_Hand)
+void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, bool a_UsedMainHand)
 {
 	// This function handles three actions:
 	// (1) Place a block;
@@ -1359,8 +1318,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	// E.g., when opening a chest with a dirt in hand, if the plugin rejects opening the chest, the dirt will not be placed.
 
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
-	a_Hand = eHand::hMain;
-	const cItem & HeldItem = (a_Hand == eHand::hOff) ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
+	a_UsedMainHand = true;
+	const cItem & HeldItem = a_UsedMainHand ? m_Player->GetEquippedItem() : m_Player->GetInventory().GetShieldSlot();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(HeldItem.m_ItemType);
 
 	// TODO: This distance should be calculated from the point that the cursor pointing at, instead of the center of the block
@@ -1369,7 +1328,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	auto CursorPos = Vector3i(a_CursorX, a_CursorY, a_CursorZ);
 	double Dist = (Vector3d(ClickedBlockPos) + Vector3d(0.5, 0.5, 0.5) - m_Player->GetEyePosition()).Length();
 	FLOGD("HandleRightClick: {0}, face {1}, Cursor {2}, Hand: {3}, HeldItem: {4}; Dist: {5:.02f}",
-		ClickedBlockPos, a_BlockFace, CursorPos, a_Hand, ItemToFullString(HeldItem), Dist
+		ClickedBlockPos, a_BlockFace, CursorPos, a_UsedMainHand, ItemToFullString(HeldItem), Dist
 	);
 
 	// Check the reach distance:
@@ -1518,25 +1477,66 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 
 
 
-void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, float a_Rotation, float a_Pitch, bool a_IsOnGround)
+void cClientHandle::HandlePlayerMove(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround)
 {
-	HandlePlayerPos(a_PosX, a_PosY, a_PosZ, a_IsOnGround);
-	HandlePlayerLook(a_Rotation, a_Pitch, a_IsOnGround);
+	if (m_Player->IsFrozen())
+	{
+		// Ignore client-side updates if the player is frozen:
+		return;
+	}
+
+	const Vector3d NewPosition(a_PosX, a_PosY, a_PosZ);
+	const Vector3d OldPosition = GetPlayer()->GetPosition();
+	const auto PreviousIsOnGround = GetPlayer()->IsOnGround();
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
+
+	if (
+		(OldPosition == NewPosition) &&
+		(PreviousIsOnGround == a_IsOnGround)
+	)
+	{
+		// Nothing changed, no need to do anything:
+		return;
+	}
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
+	// If the player has moved too far, "repair" them:
+	if ((OldPosition - NewPosition).SqrLength() > 100 * 100)
+	{
+		LOGD("Too far away (%0.2f), \"repairing\" the client", (OldPosition - NewPosition).Length());
+		SendPlayerMoveLook();
+		return;
+	}
+
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*m_Player, OldPosition, NewPosition, PreviousIsOnGround))
+	{
+		SendPlayerMoveLook();
+		return;
+	}
+
+	// TODO: should do some checks to see if player is not moving through terrain
+	// TODO: Official server refuses position packets too far away from each other, kicking "hacked" clients; we should, too
+
+	m_Player->SetPosition(NewPosition);
+	m_Player->SetTouchGround(a_IsOnGround);
+	m_Player->UpdateMovementStats(NewPosition - OldPosition, PreviousIsOnGround);
 }
 
 
 
 
 
-void cClientHandle::HandleAnimation(int a_Animation)
+void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
-	if (cPluginManager::Get()->CallHookPlayerAnimation(*m_Player, a_Animation))
-	{
-		// Plugin disagrees, bail out
-		return;
-	}
-
-	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, static_cast<char>(a_Animation), this);
+	HandlePlayerMove(a_PosX, a_PosY, a_PosZ, a_IsOnGround);
+	HandlePlayerLook(a_Rotation, a_Pitch, a_IsOnGround);
 }
 
 
@@ -1717,20 +1717,20 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 
 
 
-void cClientHandle::HandleUseItem(eHand a_Hand)
+void cClientHandle::HandleUseItem(bool a_UsedMainHand)
 {
 	// Use the held item without targeting a block: eating, drinking, charging a bow, using buckets
 	// In version 1.8.x, this function shares the same packet id with HandleRightClick.
 	// In version >= 1.9, there is a new packet id for "Use Item".
 
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
-	a_Hand = eHand::hMain;
-	const cItem & HeldItem = (a_Hand == eHand::hOff) ? m_Player->GetInventory().GetShieldSlot() : m_Player->GetEquippedItem();
+	a_UsedMainHand = true;
+	const cItem & HeldItem = a_UsedMainHand ? m_Player->GetEquippedItem() : m_Player->GetInventory().GetShieldSlot();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(HeldItem.m_ItemType);
 	cWorld * World = m_Player->GetWorld();
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
-	LOGD("HandleUseItem: Hand: %d; HeldItem: %s", a_Hand, ItemToFullString(HeldItem).c_str());
+	LOGD("HandleUseItem: Hand: %d; HeldItem: %s", a_UsedMainHand, ItemToFullString(HeldItem).c_str());
 
 	if (PlgMgr->CallHookPlayerRightClick(*m_Player, -1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0))
 	{

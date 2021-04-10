@@ -25,21 +25,12 @@ class cExpOrb;
 class cPlayer;
 class cEntity;
 class cWindow;
-class cPickup;
 class cPainting;
 class cWorld;
 class cMonster;
-class cChunkDataSerializer;
-class cFallingBlock;
 class cCompositeChat;
 class cStatManager;
 class cPacketizer;
-
-
-
-
-
-typedef unsigned char Byte;
 
 
 
@@ -469,10 +460,10 @@ protected:
 	cByteBuffer m_OutPacketLenBuffer;
 
 	/** Returns the protocol-specific packet ID given the protocol-agnostic packet enum. */
-	virtual UInt32 GetPacketID(ePacketType a_Packet) = 0;
+	virtual UInt32 GetPacketID(ePacketType a_Packet) const = 0;
 
 	/** Returns the current protocol's version, for handling status requests. */
-	virtual Version GetProtocolVersion() = 0;
+	virtual Version GetProtocolVersion() const = 0;
 
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
 	virtual void SendData(ContiguousByteBufferView a_Data) = 0;

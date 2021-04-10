@@ -123,6 +123,7 @@ cPlayer::cPlayer(const std::shared_ptr<cClientHandle> & a_Client) :
 	m_IsFlightCapable(false),
 	m_IsFlying(false),
 	m_IsFrozen(false),
+	m_IsLeftHanded(false),
 	m_IsTeleporting(false),
 	m_IsVisible(true),
 	m_EatingFinishTick(-1),
@@ -132,8 +133,7 @@ cPlayer::cPlayer(const std::shared_ptr<cClientHandle> & a_Client) :
 	m_FloaterID(cEntity::INVALID_ID),
 	m_Team(nullptr),
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
-	m_SkinParts(0),
-	m_MainHand(mhRight)
+	m_SkinParts(0)
 {
 	ASSERT(GetName().length() <= 16);  // Otherwise this player could crash many clients...
 
@@ -449,6 +449,15 @@ bool cPlayer::IsInBed(void) const
 
 
 
+bool cPlayer::IsLeftHanded() const
+{
+	return m_IsLeftHanded;
+}
+
+
+
+
+
 bool cPlayer::IsStanding() const
 {
 	return std::holds_alternative<BodyStanceStanding>(m_BodyStance);
@@ -686,6 +695,16 @@ void cPlayer::SetFlying(const bool a_ShouldFly)
 		// If we are frozen, we do not send this yet. We send when unfreeze() is called
 		m_ClientHandle->SendPlayerAbilities();
 	}
+}
+
+
+
+
+
+void cPlayer::SetLeftHanded(const bool a_IsLeftHanded)
+{
+	m_IsLeftHanded = a_IsLeftHanded;
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -2537,16 +2556,6 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 void cPlayer::SetSkinParts(int a_Parts)
 {
 	m_SkinParts = a_Parts & spMask;
-	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
-}
-
-
-
-
-
-void cPlayer::SetMainHand(eMainHand a_Hand)
-{
-	m_MainHand = a_Hand;
 	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
 }
 

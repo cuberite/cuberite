@@ -40,18 +40,15 @@ protected:
 	virtual void SendTitleTimes       (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
 	virtual void SendUpdateBlockEntity(cBlockEntity & a_BlockEntity) override;
 
-	/** Returns 1.11. */
-	virtual Version GetProtocolVersion() override;
-
-	/** Converts eMonsterType to protocol-specific mob IDs */
-	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) override;
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
+	virtual Version GetProtocolVersion() const override;
 
-	virtual void HandlePacketBlockPlace   (cByteBuffer & a_ByteBuffer) override;
+	virtual void HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer) override;
 
-	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) override;
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
-	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override;
+	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const override;
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
+	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const override;
 };
 
 
@@ -69,5 +66,5 @@ public:
 
 protected:
 
-	virtual Version GetProtocolVersion() override;
+	virtual Version GetProtocolVersion() const override;
 };
