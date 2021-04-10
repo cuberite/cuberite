@@ -31,8 +31,9 @@
 
 #include "../CraftingRecipes.h"
 
-// 6000 ticks or 5 minutes
-#define PLAYER_INVENTORY_SAVE_INTERVAL 6000
+
+
+
 
 namespace
 {
@@ -61,6 +62,13 @@ const int cPlayer::MAX_FOOD_LEVEL = 20;
 
 // Number of ticks it takes to eat an item.
 #define EATING_TICKS 30_tick
+
+// 6000 ticks or 5 minutes
+#define PLAYER_INVENTORY_SAVE_INTERVAL 6000
+
+#define XP_TO_LEVEL15 255
+#define XP_PER_LEVEL_TO15 17
+#define XP_TO_LEVEL30 825
 
 
 
