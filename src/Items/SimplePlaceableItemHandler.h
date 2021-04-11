@@ -26,14 +26,9 @@ public:
 	}
 
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player, const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) override
+	virtual bool OnPlacementCommit(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = 0;
-		return true;
+		return a_Player.PlaceBlock(a_PlacePosition, m_BlockType, 0);
 	}
 
 private:

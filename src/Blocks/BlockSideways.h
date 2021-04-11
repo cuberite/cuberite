@@ -8,7 +8,6 @@
 
 
 /** Handler for blocks that have 3 orientations (hay bale, log), specified by the upper 2 bits in meta.
-Handles setting the correct orientation on placement.
 Additionally supports the metadata specifying block sub-type in its lower 2 bits. */
 class cBlockSidewaysHandler final :
 	public cBlockHandler
@@ -21,66 +20,9 @@ public:
 
 private:
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
-	{
-		a_BlockType = m_BlockType;
-		NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage);
-		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace, Meta);
-		return true;
-	}
-
-
-
-
-
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
-		// Reset the orientation part of meta, keep the sub-type part of meta
+		// Reset the orientation part of meta, keep the sub-type part of meta:
 		return cItem(m_BlockType, 1, a_BlockMeta & 0x03);
 	}
-
-
-
-
-
-	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace, NIBBLETYPE a_Meta)
-	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_YM:
-			case BLOCK_FACE_YP:
-			{
-				return a_Meta;  // Top or bottom, just return original
-			}
-
-			case BLOCK_FACE_ZP:
-			case BLOCK_FACE_ZM:
-			{
-				return a_Meta | 0x8;  // North or south
-			}
-
-			case BLOCK_FACE_XP:
-			case BLOCK_FACE_XM:
-			{
-				return a_Meta | 0x4;  // East or west
-			}
-
-			case BLOCK_FACE_NONE:
-			{
-				break;
-			}
-		}
-		UNREACHABLE("Unsupported block face");
-	}
 } ;
-
-
-
-

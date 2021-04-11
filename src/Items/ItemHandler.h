@@ -9,6 +9,7 @@
 
 
 // fwd:
+class cChunk;
 class cWorld;
 class cPlayer;
 class cBlockPluginInterface;
@@ -37,53 +38,21 @@ public:
 	virtual ~cItemHandler() {}
 
 
+	/** Called by OnPlayerPlace to perform the actual placement of this placeable item.
+	The descendant handler should call a_Player.PlaceBlock(s) supplying correct values for the newly placed block.
+	The default handler uses the stored block type and meta copied from the lowest 4 bits of the player's equipped item's damage value.
+	Handlers return what a_Player.PlaceBlock(s) returns, indicating whether the placement was successful. */
+	virtual bool OnPlacementCommit(cPlayer & a_Player, const cItem & a_HeldItem, Vector3i a_PlacePosition, eBlockFace a_ClickedBlockFace, Vector3i a_CursorPosition);
+
+
 	/** Called when the player tries to place the item (right mouse button, IsPlaceable() == true).
 	a_ClickedBlockPos is the (neighbor) block that has been clicked to place this item.
 	a_ClickedBlockFace is the face of the neighbor that has been clicked to place this item.
 	a_CursorPos is the position of the player's cursor within a_ClickedBlockFace.
 	The default handler uses GetBlocksToPlace() and places the returned blocks.
 	Override if the item needs advanced processing, such as spawning a mob based on the blocks being placed.
-	If the block placement is refused inside this call, it will automatically revert the client-side changes.
-	Returns true if the placement succeeded, false if the placement was aborted for any reason. */
-	virtual bool OnPlayerPlace(
-		cWorld & a_World,
-		cPlayer & a_Player,
-		const cItem & a_EquippedItem,
-		const Vector3i a_ClickedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos
-	);
-
-
-	/** Called from OnPlayerPlace() to determine the blocks that the current placement operation should set.
-	a_PlacedBlockPos points to the location where the new block should be set.
-	a_ClickedBlockFace is the block face of the neighbor that was clicked to place this block.
-	a_CursorPos is the position of the mouse cursor within the clicked (neighbor's) block face.
-	The blocks in a_BlocksToPlace will be sent through cPlayer::PlaceBlocks() after returning from this function.
-	The default handler uses GetPlacementBlockTypeMeta() and provides that as the single block at the specified coords.
-	Returns true if the placement succeeded, false if the placement was aborted for any reason.
-	If aborted, the server then sends all original blocks in the coords provided in a_BlocksToSet to the client. */
-	virtual bool GetBlocksToPlace(
-		cWorld & a_World,
-		cPlayer & a_Player,
-		const cItem & a_EquippedItem,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		sSetBlockVector & a_BlocksToPlace
-	);
-
-
-	/** Called when the player right-clicks with this item and IsPlaceable() == true, and OnPlayerPlace() is not overridden.
-	This function should provide the block type and meta for the placed block, or refuse the placement.
-	Returns true to allow placement, false to refuse. */
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	);
+	If the block placement is refused inside this call, it will automatically revert the client-side changes. */
+	void OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, Vector3i a_ClickedBlockPosition, eBlockFace a_ClickedBlockFace, Vector3i a_CursorPosition);
 
 
 	/** Called when the player tries to use the item (right mouse button).

@@ -374,22 +374,22 @@ public:
 	/** Returns the sky light value at the specified block position.
 	The sky light is "raw" - not affected by time-of-day.
 	Returns 0 if chunk not valid. */
-	NIBBLETYPE GetBlockSkyLight(Vector3i a_BlockPos);
+	NIBBLETYPE GetBlockSkyLight(Vector3i a_BlockPos) const;
 
 	/** Returns the block-light value at the specified block position.
 	Returns 0 if chunk not valid. */
-	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos);
+	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos) const;
 
 	/** Retrieves the block type and meta at the specified coords.
 	Stores the result into a_BlockType and a_BlockMeta.
 	Returns true if successful, false if chunk not present.
 	TODO: Export in ManualBindings_World.cpp. */
-	bool GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
+	bool GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 
 	/** Queries the whole block specification from the world.
 	Returns true if all block info was retrieved successfully, false if not (invalid chunk / bad position).
 	Exported in ManualBindings_World.cpp. */
-	bool GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
+	bool GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
 
 	// TODO: NIBBLETYPE GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);
 
@@ -529,7 +529,7 @@ public:
 	// tolua_end
 
 	/** Replaces the specified block with another, and calls the OnPlaced block handler.
-	Callers MUST ensure the replaced block was destroyed or can handle replacement correctly. Wakes up the simulators.
+	The OnBroken block handler is called for the replaced block. Wakes up the simulators.
 	If the chunk for any of the blocks is not loaded, the set operation is ignored silently. */
 	void PlaceBlock(const Vector3i a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta);
 
@@ -571,7 +571,7 @@ public:
 
 	/** Sends the block at the specified coords to the player.
 	Used mainly when plugins disable block-placing or block-breaking, to restore the previous block. */
-	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player) override;
+	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, const cPlayer & a_Player) override;
 
 	/** Set default spawn at the given coordinates.
 	Returns false if the new spawn couldn't be stored in the INI file. */

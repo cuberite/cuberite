@@ -33,28 +33,14 @@ public:
 
 
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	virtual bool OnPlacementCommit(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
 		// Only allow planting nether wart onto the top side of the block:
 		if (a_ClickedBlockFace != BLOCK_FACE_TOP)
 		{
-			return false;
+			return true;
 		}
 
-		// Only allow placement on soulsand
-		if ((a_PlacedBlockPos.y < 1) || (a_World->GetBlock(a_PlacedBlockPos.addedY(-1)) != E_BLOCK_SOULSAND))
-		{
-			return false;
-		}
-
-		a_BlockMeta = 0;
-		a_BlockType = E_BLOCK_NETHER_WART;
-		return true;
+		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_NETHER_WART, 0);
 	}
 } ;

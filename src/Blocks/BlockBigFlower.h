@@ -20,14 +20,14 @@ public:
 
 private:
 
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
 	{
 		if (IsMetaTopPart(a_Meta))
 		{
 			BLOCKTYPE BottomType;
 			if (
-				(a_Pos.y < 1) ||
-				!a_ChunkInterface.GetBlockTypeMeta(a_Pos - Vector3i(0, 1, 0), BottomType, a_Meta) ||
+				(a_Position.y < 1) ||
+				!a_World.GetBlockTypeMeta(a_Position - Vector3i(0, 1, 0), BottomType, a_Meta) ||
 				(BottomType != E_BLOCK_BIG_FLOWER)
 			)
 			{
@@ -98,17 +98,13 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_RelPos.y <= 0)
-		{
-			return false;
-		}
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_RelPos.addedY(-1), BlockType, BlockMeta);
+		// CanBeAt is also called on placement, so the top part can't check for the bottom part.
+		// Both parts can only that they're rooted in grass.
 
-		return IsBlockTypeOfDirt(BlockType) || ((BlockType == E_BLOCK_BIG_FLOWER) && !IsMetaTopPart(BlockMeta));
+		const auto RootPosition = a_Position.addedY(IsMetaTopPart(a_Meta) ? -2 : -1);
+		return (RootPosition.y >= 0) && IsBlockTypeOfDirt(a_Chunk.GetBlock(RootPosition));
 	}
 
 
