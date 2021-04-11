@@ -253,9 +253,9 @@ void cChunk::OnUnload()
 	}
 
 	// Notify all block entities of imminent unload:
-	for (auto & BlockEntity : m_BlockEntities)
+	for (auto & KeyPair : m_BlockEntities)
 	{
-		BlockEntity.second->OnRemoveFromWorld();
+		KeyPair.second->OnRemoveFromWorld();
 	}
 }
 
@@ -362,19 +362,26 @@ void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 		Entity->SetIsTicking(true);
 	}
 
-	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
+	// Remove the block entities present - either the loader / saver has better, or we'll create empty ones:
+	for (auto & KeyPair : m_BlockEntities)
+	{
+		KeyPair.second->Destroy();
+		KeyPair.second->OnRemoveFromWorld();
+	}
+
+	// Clear the old ones:
 	m_BlockEntities = std::move(a_SetChunkData.BlockEntities);
 
 	// Check that all block entities have a valid blocktype at their respective coords (DEBUG-mode only):
-	#ifndef NDEBUG
-		for (auto & KeyPair : m_BlockEntities)
-		{
-			cBlockEntity * Block = KeyPair.second.get();
-			BLOCKTYPE EntityBlockType = Block->GetBlockType();
-			BLOCKTYPE WorldBlockType = GetBlock(Block->GetRelX(), Block->GetPosY(), Block->GetRelZ());
-			ASSERT(WorldBlockType == EntityBlockType);
-		}  // for KeyPair - m_BlockEntities
-	#endif  // !NDEBUG
+#ifndef NDEBUG
+	for (auto & KeyPair : m_BlockEntities)
+	{
+		cBlockEntity * Block = KeyPair.second.get();
+		BLOCKTYPE EntityBlockType = Block->GetBlockType();
+		BLOCKTYPE WorldBlockType = GetBlock(Block->GetRelX(), Block->GetPosY(), Block->GetRelZ());
+		ASSERT(WorldBlockType == EntityBlockType);
+	}
+#endif
 
 	// Set all block entities' World variable:
 	for (auto & KeyPair : m_BlockEntities)
