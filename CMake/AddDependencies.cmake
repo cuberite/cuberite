@@ -20,6 +20,9 @@ function(build_dependencies)
 	set(JSONCPP_WITH_TESTS OFF CACHE BOOL "Compile and (for jsoncpp_check) run JsonCpp test executables")
 	set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "Automatically run unit-tests as a post build step")
 	set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE BOOL "Generate and install .pc files")
+	set(JSONCPP_WITH_CMAKE_PACKAGE OFF CACHE BOOL "Generate and install cmake package files")
+	set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build jsoncpp_lib as a shared library.")
+	set(BUILD_OBJECT_LIBS OFF CACHE BOOL "Build jsoncpp_lib as a object library.")
 
 	# Set options for mbedtls:
 	set(ENABLE_PROGRAMS OFF CACHE BOOL "Build mbed TLS programs.")
@@ -60,7 +63,7 @@ function(link_dependencies TARGET)
 		event_core
 		event_extra
 		fmt::fmt
-		jsoncpp_lib
+		jsoncpp_static
 		libdeflate
 		lsqlite
 		lualib
@@ -80,6 +83,6 @@ function(link_dependencies TARGET)
 		target_link_libraries(${TARGET} PRIVATE event_pthreads)
 	endif()
 
-	# Prettify jsoncpp_lib name in VS solution explorer:
-	set_property(TARGET jsoncpp_lib PROPERTY PROJECT_LABEL "jsoncpp")
+	# Prettify jsoncpp_static name in VS solution explorer:
+	set_property(TARGET jsoncpp_static PROPERTY PROJECT_LABEL "jsoncpp")
 endfunction()
