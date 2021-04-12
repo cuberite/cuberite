@@ -847,7 +847,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values)
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int * a_Values) override
 	{
 		// Generate the underlying biome groups:
 		size_t lowerSizeX = a_SizeX + 2;
