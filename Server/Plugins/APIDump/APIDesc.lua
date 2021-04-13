@@ -12162,6 +12162,72 @@ end
 				},
 			},
 		},
+		cStatManager = 
+		{
+			Desc = [[
+				This class manages the Statistics and Achievements of the player. In the API layer, it will allow
+				getting and setting of player statistics and achievments,</p>
+			]],
+			Functions = 
+			{
+				SetValue =
+				{
+					Params =
+					{
+						{
+							Name = "a_Stat",
+							Type = "<unknown>"
+						}
+					
+						{
+							Name = "a_Value",
+							Type = "<unknown>"
+						},
+					}
+						
+					Returns =
+					{
+						Type = "void",	
+					},
+					Notes = "Set the value of the specified statistic."
+				},
+				AddValue = 
+				{
+					Params = 
+					{
+						{
+							Name = "a_Stat",
+							Type = "<unknown>"
+						},
+						{
+							Name = "a_Delta",
+							Type = "<unknown>"
+						}	
+					},
+					Returns = 
+					{
+						Type = "StatValue",
+						
+					},
+					Notes = "Adds to the value of a stat and returns the new value."
+				},
+				SatisfiesPrerequisite = 
+				{
+					Params = 
+					{
+						{
+							Name = "a_Stat",
+							Type = "<unknown>"
+						}
+					},
+					Returns = 
+					{
+						Type = "bool"
+					},
+					Notes = "Returns whether the prerequisite for awarding an achievement are satisfied."
+				}
+			}
+		}
 		cServer =
 		{
 			Desc = [[
