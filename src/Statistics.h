@@ -1,5 +1,4 @@
 
-
 // Statistics.h
 
 #pragma once
@@ -33,6 +32,7 @@ server https://wiki.vg/Data_Generators
 class cStatManager
 {
   public:
+
 	typedef unsigned StatValue;
 	typedef std::unordered_map<Statistic, StatValue> CustomStore;
 
@@ -42,8 +42,7 @@ class cStatManager
 	/** Increments the specified statistic. Returns the new value. */
 	StatValue AddValue(Statistic a_Stat, StatValue a_Delta = 1);
 
-	/** Returns whether the prerequisite for awarding an achievement are
-	 * satisfied. */
+	/** Returns whether the prerequisite for awarding an achievement are satisfied. */
 	bool SatisfiesPrerequisite(Statistic a_Stat);
 
 	// tolua_end
