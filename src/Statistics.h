@@ -62,4 +62,3 @@ class cStatManager
 
 	CustomStore m_CustomStatistics;
 };
-
