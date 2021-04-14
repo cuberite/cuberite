@@ -1,5 +1,5 @@
 #pragma once
-
+// tolua_begin
 enum class Statistic
 {
 	/* Achievements */
@@ -117,3 +117,4 @@ enum class Statistic
 	JunkFished,
 	TreasureFished,
 };
+// tolua_end
