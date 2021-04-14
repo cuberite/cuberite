@@ -12181,7 +12181,7 @@ end
 					
 						{
 							Name = "a_Value",
-							Type = "<unknown>"
+							Type = "number"
 						},
 					}
 						
