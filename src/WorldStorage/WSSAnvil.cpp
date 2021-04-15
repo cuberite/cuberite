@@ -789,7 +789,7 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 
 void cWSSAnvil::LoadItemGridFromNBT(cItemGrid & a_ItemGrid, const cParsedNBT & a_NBT, int a_ItemsTagIdx, int a_SlotOffset)
 {
-	int NumSlots = a_ItemGrid.GetNumSlots();
+	int NumSlots = a_ItemGrid.OldGetNumSlots();
 	for (int Child = a_NBT.GetFirstChild(a_ItemsTagIdx); Child != -1; Child = a_NBT.GetNextSibling(Child))
 	{
 		int SlotTag = a_NBT.FindChildByName(Child, "Slot");

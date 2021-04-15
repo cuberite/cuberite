@@ -2594,7 +2594,7 @@ bool cSlotAreaArmor::CanPlaceArmorInSlot(int a_SlotNum, const cItem & a_Item)
 // cSlotAreaItemGrid:
 
 cSlotAreaItemGrid::cSlotAreaItemGrid(cItemGrid & a_ItemGrid, cWindow & a_ParentWindow) :
-	Super(a_ItemGrid.GetNumSlots(), a_ParentWindow),
+	Super(a_ItemGrid.OldGetNumSlots(), a_ParentWindow),
 	m_ItemGrid(a_ItemGrid)
 {
 	m_ItemGrid.AddListener(*this);

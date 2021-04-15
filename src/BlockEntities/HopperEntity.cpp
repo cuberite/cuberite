@@ -389,12 +389,12 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 	}
 
 	// Check if the chest is a double-chest (chest directly above was empty), if so, try to move from there:
-	static const Vector3i neighborOfs[] =
+	static const std::array neighborOfs =
 	{
-		{ 1, 1,  0},
-		{-1, 1,  0},
-		{ 0, 1,  1},
-		{ 0, 1, -1},
+		Vector3i { 1, 1,  0},
+		Vector3i {-1, 1,  0},
+		Vector3i { 0, 1,  1},
+		Vector3i { 0, 1, -1},
 	} ;
 	for (const auto & ofs: neighborOfs)
 	{
@@ -474,9 +474,9 @@ bool cHopperEntity::MoveItemsFromFurnace(cChunk & a_Chunk)
 bool cHopperEntity::MoveItemsFromGrid(cBlockEntityWithItems & a_Entity)
 {
 	auto & Grid = a_Entity.GetContents();
-	int NumSlots = Grid.GetNumSlots();
+	size_t NumSlots = Grid.GetNumSlots();
 
-	for (int i = 0; i < NumSlots; i++)
+	for (size_t i = 0; i < NumSlots; i++)
 	{
 		if (Grid.IsSlotEmpty(i))
 		{
@@ -495,7 +495,7 @@ bool cHopperEntity::MoveItemsFromGrid(cBlockEntityWithItems & a_Entity)
 
 
 
-bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_SlotNum)
+bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, size_t a_SlotNum)
 {
 	cItem One(a_Entity.GetSlot(a_SlotNum).CopyOne());
 	for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
@@ -552,12 +552,12 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 	}
 
 	// Check if the chest is a double-chest (chest block directly connected was full), if so, try to move into the other half:
-	static const Vector3i neighborOfs [] =
+	static const std::array neighborOfs =
 	{
-		{ 1, 0,  0},
-		{-1, 0,  0},
-		{ 0, 0,  1},
-		{ 0, 0, -1},
+		Vector3i { 1, 0,  0},
+		Vector3i {-1, 0,  0},
+		Vector3i { 0, 0,  1},
+		Vector3i { 0, 0, -1},
 	} ;
 	auto relCoord = cChunkDef::AbsoluteToRelative(a_Coords);
 	for (const auto & ofs: neighborOfs)
@@ -615,7 +615,7 @@ bool cHopperEntity::MoveItemsToFurnace(cChunk & a_Chunk, Vector3i a_Coords, NIBB
 bool cHopperEntity::MoveItemsToGrid(cBlockEntityWithItems & a_Entity)
 {
 	// Iterate through our slots, try to move from each one:
-	int NumSlots = a_Entity.GetContents().GetNumSlots();
+	int NumSlots = a_Entity.GetContents().OldGetNumSlots();
 	for (int i = 0; i < NumSlots; i++)
 	{
 		if (MoveItemsToSlot(a_Entity, i))

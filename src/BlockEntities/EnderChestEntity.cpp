@@ -114,7 +114,7 @@ void cEnderChestEntity::LoadFromJson(const Json::Value & a_Value, cItemGrid & a_
 
 void cEnderChestEntity::SaveToJson(Json::Value & a_Value, const cItemGrid & a_Grid)
 {
-	for (int i = 0; i < a_Grid.GetNumSlots(); i++)
+	for (size_t i = 0; i < a_Grid.GetNumSlots(); i++)
 	{
 		Json::Value Slot;
 		a_Grid.GetSlot(i).GetJson(Slot);

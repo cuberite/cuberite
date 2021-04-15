@@ -29,14 +29,8 @@ void cBrewingstandEntity::CopyFrom(const cBlockEntity & a_Src)
 	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cBrewingstandEntity &>(a_Src);
 	m_IsBrewing = src.m_IsBrewing;
-	for (size_t i = 0; i < ARRAYCOUNT(m_CurrentBrewingRecipes); ++i)
-	{
-		m_CurrentBrewingRecipes[i] = src.m_CurrentBrewingRecipes[i];
-	}
-	for (size_t i = 0; i < ARRAYCOUNT(m_Results); ++i)
-	{
-		m_Results[i] = src.m_Results[i];
-	}
+	m_CurrentBrewingRecipes = src.m_CurrentBrewingRecipes;
+	m_Results = src.m_Results;
 	m_TimeBrewed = src.m_TimeBrewed;
 	m_RemainingFuel = src.m_RemainingFuel;
 }
@@ -117,7 +111,7 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		// Loop over all bottle slots and update available bottles
 		const cBrewingRecipes::cRecipe * Recipe = nullptr;
-		for (int i = 0; i < 3; i++)
+		for (size_t i = 0; i < 3; i++)
 		{
 			if (m_Contents.GetSlot(i).IsEmpty() || (m_CurrentBrewingRecipes[i] == nullptr))
 			{
@@ -234,7 +228,7 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
 	const cBrewingRecipes::cRecipe * Recipe = nullptr;
 	bool Stop = true;
-	for (int i = 0; i < 3; i++)
+	for (size_t i = 0; i < 3; i++)
 	{
 		if (GetSlot(i).IsEmpty())
 		{
@@ -323,7 +317,7 @@ void cBrewingstandEntity::LoadRecipes(void)
 
 	cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
 	const cBrewingRecipes::cRecipe * Recipe = nullptr;
-	for (int i = 0; i < 3; i++)
+	for (size_t i = 0; i < 3; i++)
 	{
 		if (GetSlot(i).IsEmpty())
 		{
