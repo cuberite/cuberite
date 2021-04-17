@@ -2450,8 +2450,14 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
 	bool HasInitializedBounds = false;
 	for (auto blk: a_Blocks)
 	{
-		int x = blk.GetX();
 		int y = blk.GetY();
+		if (!cChunkDef::IsValidHeight(y))
+		{
+			// Block out of bounds. No point in calculating further.
+			continue;
+		}
+
+		int x = blk.GetX();
 		int z = blk.GetZ();
 		cBoundingBox BlockBox = cBlockHandler::For(blk.m_BlockType).GetPlacementCollisionBox(
 			m_World->GetBlock({ x - 1, y, z }),
