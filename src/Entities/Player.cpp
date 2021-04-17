@@ -778,8 +778,7 @@ void cPlayer::SetCustomName(const AString & a_CustomName)
 
 void cPlayer::SetBedPos(const Vector3i & a_Pos)
 {
-	m_LastBedPos = a_Pos;
-	m_SpawnWorldName = m_World->GetName();
+	SetBedPos(a_Pos, nullptr);
 }
 
 
@@ -789,8 +788,7 @@ void cPlayer::SetBedPos(const Vector3i & a_Pos)
 void cPlayer::SetBedPos(const Vector3i & a_Pos, cWorld * a_World)
 {
 	m_LastBedPos = a_Pos;
-	ASSERT(a_World != nullptr);
-	m_SpawnWorldName = a_World->GetName();
+	m_SpawnWorldName = a_World ? a_World->GetName() : m_World->GetName();
 }
 
 
