@@ -321,6 +321,7 @@ namespace LootTable
 				case dtOnFire:
 				case dtLavaContact:
 				case dtLightning:
+				case dtMagmaContact:
 				case dtPoisoning:
 				case dtPotionOfHarming:
 				case dtRangedAttack:
@@ -356,6 +357,7 @@ namespace LootTable
 				case dtOnFire:
 				case dtLavaContact:
 				case dtLightning:
+				case dtMagmaContact:
 				case dtPoisoning:
 				case dtPotionOfHarming:
 				case dtRangedAttack:
@@ -387,6 +389,7 @@ namespace LootTable
 				case dtInVoid:
 				case dtLavaContact:
 				case dtLightning:
+				case dtMagmaContact:
 				case dtPoisoning:
 				case dtPotionOfHarming:
 				case dtRangedAttack:
@@ -422,6 +425,7 @@ namespace LootTable
 				case dtOnFire:
 				case dtLavaContact:
 				case dtLightning:
+				case dtMagmaContact:
 				case dtRangedAttack:
 				case dtStarving:
 				case dtSuffocating:
@@ -455,6 +459,7 @@ namespace LootTable
 				case dtOnFire:
 				case dtLavaContact:
 				case dtLightning:
+				case dtMagmaContact:
 				case dtPoisoning:
 				case dtPotionOfHarming:
 				case dtStarving:
@@ -483,6 +488,7 @@ namespace LootTable
 				case dtInVoid:
 				case dtOnFire:
 				case dtLavaContact:
+				case dtMagmaContact:
 				case dtPoisoning:
 				case dtPotionOfHarming:
 				case dtRangedAttack:
@@ -2569,7 +2575,7 @@ namespace LootTable
 			LOGWARNING("Loot table: Item %s can not be enchanted in loot table", ItemToString(a_Item));
 			return;
 		}
-		int Levels = (a_Noise.IntNoise3DInt(a_Pos) / 13) % (m_LevelsMax - m_LevelsMin) + m_LevelsMin;
+		unsigned int Levels = static_cast<unsigned int>((a_Noise.IntNoise3DInt(a_Pos) / 13) % (m_LevelsMax - m_LevelsMin) + m_LevelsMin);
 		a_Item.EnchantByXPLevels(Levels, GetRandomProvider());
 		if (a_Item.m_ItemType == E_ITEM_BOOK)
 		{
