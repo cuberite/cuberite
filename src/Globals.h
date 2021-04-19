@@ -338,14 +338,14 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 
 
 
-/** Floors a value, then casts it to C (an int by default) */
+/** Floors a value, then casts it to C (an int by default). */
 template <typename C = int, typename T>
 typename std::enable_if<std::is_arithmetic<T>::value, C>::type FloorC(T a_Value)
 {
 	return static_cast<C>(std::floor(a_Value));
 }
 
-/** Ceils a value, then casts it to C (an int by default) */
+/** Ceils a value, then casts it to C (an int by default). */
 template <typename C = int, typename T>
 typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
 {
@@ -356,9 +356,17 @@ typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
 
 
 
-// a tick is 50 ms
-using cTickTime = std::chrono::duration<int,  std::ratio_multiply<std::chrono::milliseconds::period, std::ratio<50>>>;
-using cTickTimeLong = std::chrono::duration<Int64,  cTickTime::period>;
+// A time duration representing a Minecraft tick (50 ms), capable of storing at least 32'767 ticks.
+using cTickTime = std::chrono::duration<signed int, std::ratio_multiply<std::chrono::milliseconds::period, std::ratio<50>>>;
+
+// A time duration representing a Minecraft tick (50 ms), capable of storing at least a 64 bit signed duration.
+using cTickTimeLong = std::chrono::duration<signed long long int, cTickTime::period>;
+
+/** Converts a literal to a tick time. */
+constexpr cTickTimeLong operator ""_tick(const unsigned long long a_Ticks)
+{
+	return cTickTimeLong(a_Ticks);
+}
 
 using ContiguousByteBuffer = std::basic_string<std::byte>;
 using ContiguousByteBufferView = std::basic_string_view<std::byte>;

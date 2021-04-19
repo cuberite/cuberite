@@ -17,6 +17,13 @@
 
 
 
+// How many ticks at minimum between two item transfers to or from the hopper.
+#define TICKS_PER_TRANSFER 8_tick
+
+
+
+
+
 cHopperEntity::cHopperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_LastMoveItemsInTick(0),
@@ -76,14 +83,14 @@ void cHopperEntity::CopyFrom(const cBlockEntity & a_Src)
 bool cHopperEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
-	Int64 CurrentTick = a_Chunk.GetWorld()->GetWorldAge();
 
 	bool isDirty = false;
 	if (!m_Locked)
 	{
-		isDirty = MoveItemsIn  (a_Chunk, CurrentTick) || isDirty;
-		isDirty = MovePickupsIn(a_Chunk, CurrentTick) || isDirty;
-		isDirty = MoveItemsOut (a_Chunk, CurrentTick) || isDirty;
+		const auto CurrentTick = a_Chunk.GetWorld()->GetWorldAge();
+		isDirty = MoveItemsIn(a_Chunk, CurrentTick) || isDirty;
+		isDirty = MovePickupsIn(a_Chunk) || isDirty;
+		isDirty = MoveItemsOut(a_Chunk, CurrentTick) || isDirty;
 	}
 	return isDirty;
 }
@@ -150,7 +157,7 @@ void cHopperEntity::OpenNewWindow(void)
 
 
 
-bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
+bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, const cTickTimeLong a_CurrentTick)
 {
 	if (m_Pos.y >= cChunkDef::Height)
 	{
@@ -158,7 +165,7 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 		return false;
 	}
 
-	if (a_CurrentTick - m_LastMoveItemsInTick < TICKS_PER_TRANSFER)
+	if ((a_CurrentTick - m_LastMoveItemsInTick) < TICKS_PER_TRANSFER)
 	{
 		// Too early after the previous transfer
 		return false;
@@ -204,10 +211,8 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 
 
-bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
+bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk)
 {
-	UNUSED(a_CurrentTick);
-
 	class cHopperPickupSearchCallback
 	{
 	public:
@@ -293,9 +298,9 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 
 
-bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
+bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, const cTickTimeLong a_CurrentTick)
 {
-	if (a_CurrentTick - m_LastMoveItemsOutTick < TICKS_PER_TRANSFER)
+	if ((a_CurrentTick - m_LastMoveItemsOutTick) < TICKS_PER_TRANSFER)
 	{
 		// Too early after the previous transfer
 		return false;

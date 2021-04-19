@@ -193,7 +193,7 @@ private:
 	The given block type is checked when the task is executed to ensure the position still contains a button. */
 	static void QueueButtonRelease(cWorld & a_ButtonWorld, const Vector3i a_Position, const BLOCKTYPE a_BlockType)
 	{
-		const auto TickDelay = (a_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
+		const auto TickDelay = (a_BlockType == E_BLOCK_STONE_BUTTON) ? 20_tick : 30_tick;
 		a_ButtonWorld.ScheduleTask(
 			TickDelay,
 			[a_Position, a_BlockType](cWorld & a_World)

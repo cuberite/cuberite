@@ -13,7 +13,7 @@
 
 
 cWither::cWither(void) :
-	Super("Wither", mtWither, "entity.wither.hurt", "entity.wither.death", "entity.wither.ambient", 0.9, 4.0),
+	Super("Wither", mtWither, "entity.wither.hurt", "entity.wither.death", "entity.wither.ambient", 0.9f, 3.5f),
 	m_WitherInvulnerableTicks(220)
 {
 	SetMaxHealth(300);

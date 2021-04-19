@@ -57,8 +57,6 @@ class cWorld  // tolua_export
 public:
 	// tolua_end
 
-
-
 	/** A simple RAII locker for the chunkmap - locks the chunkmap in its constructor, unlocks it in the destructor */
 	class cLock:
 		public cCSLock
@@ -67,13 +65,6 @@ public:
 	public:
 		cLock(const cWorld & a_World);
 	};
-
-
-
-	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
-	{
-		return "cWorld";
-	}
 
 	/** Construct the world and read settings from its ini file.
 	@param a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock.
@@ -107,15 +98,10 @@ public:
 		BroadcastTimeUpdate();
 	}
 
-	virtual int GetTimeOfDay(void) const override;
-	virtual Int64 GetWorldAge(void) const override;
-
 	void SetTicksUntilWeatherChange(int a_WeatherInterval)
 	{
 		m_WeatherInterval = a_WeatherInterval;
 	}
-
-	virtual void SetTimeOfDay(int a_TimeOfDay) override;
 
 	/** Returns the default weather interval for the specific weather type.
 	Returns -1 for any unknown weather. */
@@ -151,6 +137,13 @@ public:
 
 	// tolua_end
 
+	virtual cTickTime GetTimeOfDay(void) const override;
+	virtual cTickTimeLong GetWorldAge(void) const override;
+	cTickTimeLong GetWorldDate() const;
+	cTickTimeLong GetWorldTickAge() const;
+
+	virtual void SetTimeOfDay(cTickTime a_TimeOfDay) override;
+
 	/** Retrieves the world height at the specified coords; returns false if chunk not loaded / generated */
 	bool TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height);  // Exported in ManualBindings.cpp
 
@@ -183,9 +176,9 @@ public:
 	virtual void BroadcastEntityLook                 (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastEntityMetadata             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastEntityPosition             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
-	virtual void BroadcastEntityStatus               (const cEntity & a_Entity, Int8 a_Status, const cClientHandle * a_Exclude = nullptr) override;
+	void         BroadcastEntityProperties           (const cEntity & a_Entity);
 	virtual void BroadcastEntityVelocity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
-	virtual void BroadcastEntityAnimation            (const cEntity & a_Entity, Int8 a_Animation, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
+	virtual void BroadcastEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
 	virtual void BroadcastLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
 	virtual void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
 	virtual void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
@@ -205,7 +198,6 @@ public:
 	virtual void BroadcastThunderbolt                (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastTimeUpdate                 (const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastUnleashEntity              (const cEntity & a_Entity) override;
-	virtual void BroadcastUseBed                     (const cEntity & a_Entity, Vector3i a_BlockPos) override;
 	virtual void BroadcastWeather                    (eWeather a_Weather, const cClientHandle * a_Exclude = nullptr) override;
 
 	virtual cBroadcastInterface & GetBroadcastManager(void) override
@@ -755,7 +747,7 @@ public:
 	void QueueTask(std::function<void(cWorld &)> a_Task);  // Exported in ManualBindings.cpp
 
 	/** Queues a lambda task onto the tick thread, with the specified delay. */
-	void ScheduleTask(int a_DelayTicks, std::function<void(cWorld &)> a_Task);
+	void ScheduleTask(cTickTime a_DelayTicks, std::function<void(cWorld &)> a_Task);
 
 	/** Returns the number of chunks loaded	 */
 	size_t GetNumChunks() const;  // tolua_export
@@ -996,10 +988,10 @@ private:
 	/** The time since this world began, in ticks.
 	Monotonic, but does not persist across restarts.
 	Used for less important but heavy tasks that run periodically. These tasks don't need to follow wallclock time, and slowing their rate down if TPS drops is desirable. */
-	unsigned long long m_WorldTickAge;
+	cTickTimeLong m_WorldTickAge;
 
-	cTickTimeLong  m_LastChunkCheck;        // The last WorldAge (in ticks) in which unloading and possibly saving was triggered
-	cTickTimeLong  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
+	std::chrono::milliseconds m_LastChunkCheck;  // The last WorldAge in which unloading and possibly saving was triggered.
+	std::chrono::milliseconds m_LastSave;  // The last WorldAge in which save-all was triggerred.
 	std::map<cMonster::eFamily, cTickTimeLong> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
 
 	NIBBLETYPE m_SkyDarkness;
@@ -1096,7 +1088,7 @@ private:
 	cCriticalSection m_CSTasks;
 
 	/** Tasks that have been queued onto the tick thread, possibly to be executed at target tick in the future; guarded by m_CSTasks */
-	std::vector<std::pair<Int64, std::function<void(cWorld &)>>> m_Tasks;
+	std::vector<std::pair<std::chrono::milliseconds, std::function<void(cWorld &)>>> m_Tasks;
 
 	/** Guards m_EntitiesToAdd */
 	cCriticalSection m_CSEntitiesToAdd;

@@ -448,7 +448,7 @@ void cEnderCrystal::KilledBy(struct TakeDamageInfo & a_TakeDamageInfo)
 
 
 
-cEntity::cEntity(enum cEntity::eEntityType a_EntityType, class Vector3<double> a_Pos, double a_Height, double a_Width)
+cEntity::cEntity(enum cEntity::eEntityType a_EntityType, class Vector3<double> a_Pos, float a_Height, float a_Width)
 {
 }
 
@@ -792,7 +792,7 @@ void cEntity::ResetPosition(class Vector3<double> a_Pos)
 
 
 
-cPawn::cPawn(enum cEntity::eEntityType,double a_Width, double a_Height) :
+cPawn::cPawn(enum cEntity::eEntityType, float a_Width, float a_Height) :
 	cEntity(etMonster, Vector3d(), a_Height, a_Width)
 {
 }
@@ -864,7 +864,7 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-cMonster::cMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, double a_Width, double a_Height) :
+cMonster::cMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, float a_Width, float a_Height) :
 	cPawn(etMonster, a_Width, a_Height),
 	m_PathFinder(a_Width, a_Height)
 {
@@ -872,7 +872,7 @@ cMonster::cMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, c
 
 
 
-cPathFinder::cPathFinder(double a_Width, double a_Height)
+cPathFinder::cPathFinder(float a_Width, float a_Height)
 {
 
 }
@@ -1004,7 +1004,7 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt ,class cChunk & a_
 
 
 
-cAggressiveMonster::cAggressiveMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, double a_Width, double a_Height) :
+cAggressiveMonster::cAggressiveMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, float a_Width, float a_Height) :
 	cMonster(a_StringA, a_MonsterType, a_StringB, a_StringC, a_StringD, a_Width, a_Height)
 {
 }

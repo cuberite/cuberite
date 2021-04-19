@@ -162,14 +162,14 @@ public:  // tolua_export
 	void SendDisconnect                 (const AString & a_Reason);
 	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ);
-	void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation);  // tolua_export
+	void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation);  // tolua_export
 	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration);
 	void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
 	void SendEntityHeadLook             (const cEntity & a_Entity);
 	void SendEntityLook                 (const cEntity & a_Entity);
 	void SendEntityMetadata             (const cEntity & a_Entity);
 	void SendEntityPosition             (const cEntity & a_Entity);
-	void SendEntityStatus               (const cEntity & a_Entity, char a_Status);
+	void SendEntityProperties           (const cEntity & a_Entity);
 	void SendEntityVelocity             (const cEntity & a_Entity);
 	void SendExperience                 (void);
 	void SendExperienceOrb              (const cExpOrb & a_ExpOrb);
@@ -191,7 +191,6 @@ public:  // tolua_export
 	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
 	void SendPlayerListUpdateGameMode   (const cPlayer & a_Player);
 	void SendPlayerListUpdatePing       ();
-	void SendPlayerMaxSpeed             (void);  ///< Informs the client of the maximum player speed (1.6.1+)
 	void SendPlayerMoveLook             (void);
 	void SendPlayerPosition             (void);
 	void SendPlayerSpawn                (const cPlayer & a_Player);
@@ -216,12 +215,11 @@ public:  // tolua_export
 	void SendTabCompletionResults       (const AStringVector & a_Results);
 	void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks);  // tolua_export
-	void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_WorldDate, bool a_DoDaylightCycle);  // tolua_export
+	void SendTimeUpdate                 (cTickTimeLong a_WorldAge, cTickTimeLong a_WorldDate, bool a_DoDaylightCycle);
 	void SendUnleashEntity              (const cEntity & a_Entity);
 	void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ);
 	void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity);
 	void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
-	void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	/** Send a newly discovered recipe to show the notification and unlock in the recipe book */
 	void SendUnlockRecipe               (UInt32 a_RecipeId);
@@ -296,8 +294,8 @@ public:  // tolua_export
 	void PacketUnknown(UInt32 a_PacketType);
 	void PacketError(UInt32 a_PacketType);
 
-	// Calls that cProtocol descendants use for handling packets:
-	void HandleAnimation(int a_Animation);
+	/** Called when the protocol receives a (hand swing) animation packet. */
+	void HandleAnimation(bool a_SwingMainHand);
 
 	/** Called when the protocol receives a MC|ItemName plugin message, indicating that the player named
 	an item in the anvil UI. */
@@ -354,18 +352,18 @@ public:  // tolua_export
 	void HandlePing             (void);
 	void HandlePlayerAbilities  (bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
-	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
 
-	/** Verifies and sets player position, performing relevant checks
-	Calls relevant methods to process movement related statistics
-	Requires state of previous position and on-ground status, so must be called when these are still intact
-	*/
-	void HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround);
+	/** Verifies and sets player position, performing relevant checks.
+	Calls relevant methods to process movement related statistics.
+	Requires state of previous position and on-ground status, so must be called when these are still intact. */
+	void HandlePlayerMove(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround);
+
+	void HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, float a_Rotation, float a_Pitch, bool a_IsOnGround);
 
 
 	void HandlePluginMessage    (const AString & a_Channel, ContiguousByteBufferView a_Message);
 	void HandleRespawn          (void);
-	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, eHand a_Hand);
+	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, bool a_UsedMainHand);
 	void HandleSlotSelected     (Int16 a_SlotNum);
 	void HandleSpectate         (const cUUID & a_PlayerUUID);
 
@@ -384,7 +382,7 @@ public:  // tolua_export
 	);
 	void HandleUnmount          (void);
 	void HandleUseEntity        (UInt32 a_TargetEntityID, bool a_IsLeftClick);
-	void HandleUseItem          (eHand a_Hand);
+	void HandleUseItem          (bool a_UsedMainHand);
 	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
 	void HandleWindowClose      (UInt8 a_WindowID);
 
@@ -477,6 +475,9 @@ private:
 	// Chunk position when the last StreamChunks() was called; used to avoid re-streaming while in the same chunk
 	int m_LastStreamedChunkX;
 	int m_LastStreamedChunkZ;
+
+	/** The last time UnloadOutOfRangeChunks was called. */
+	cTickTimeLong m_LastUnloadCheck;
 
 	/** Number of ticks since the last network packet was received (increased in Tick(), reset in OnReceivedData()) */
 	std::atomic<int> m_TicksSinceLastPacket;

@@ -582,7 +582,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, typename Super::Values & a_Values)
+	virtual void GetInts(int a_MinX, int a_MinZ, typename Super::Values & a_Values) override
 	{
 		// Generate the underlying biome groups:
 		int lowerValues[m_UnderlyingSizeX * m_UnderlyingSizeZ];

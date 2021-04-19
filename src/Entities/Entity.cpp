@@ -33,7 +33,7 @@ static UInt32 GetNextUniqueID(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cEntity:
 
-cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, double a_Height):
+cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, float a_Width, float a_Height):
 	m_UniqueID(GetNextUniqueID()),
 	m_Health(1),
 	m_MaxHealth(1),
@@ -59,8 +59,6 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 	m_IsInLava(false),
 	m_IsInWater(false),
 	m_IsHeadInWater(false),
-	m_Width(a_Width),
-	m_Height(a_Height),
 	m_AirLevel(MAX_AIR_LEVEL),
 	m_AirTickTimer(DROWNING_TICKS),
 	m_TicksAlive(0),
@@ -71,6 +69,8 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 	m_Position(a_Pos),
 	m_WaterSpeed(0, 0, 0),
 	m_Mass (0.001),  // Default 1g
+	m_Width(a_Width),
+	m_Height(a_Height),
 	m_InvulnerableTicks(0)
 {
 	m_WorldChangeInfo.m_NewWorld = nullptr;
@@ -122,7 +122,7 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 	*/
 
 
-	ASSERT(m_World == nullptr);
+	ASSERT(a_Self->IsPlayer() || (m_World == nullptr));  // Players' worlds are loaded from disk.
 	ASSERT(GetParentChunk() == nullptr);
 	SetWorld(&a_EntityWorld);
 	a_EntityWorld.AddEntity(std::move(a_Self));
@@ -396,7 +396,8 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		Player->GetEquippedItem().GetHandler()->OnEntityAttack(Player, this);
 
-		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
+		// Whether an enchantment boosted this attack's damage.
+		bool MagicalCriticalHit = false;
 
 		// IsOnGround() only is false if the player is moving downwards
 		// Ref: https://minecraft.gamepedia.com/Damage#Critical_Hits
@@ -405,7 +406,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
 			{
 				a_TDI.FinalDamage *= 1.5f;  // 150% damage
-				m_World->BroadcastEntityAnimation(*this, 4);  // Critical hit
+				m_World->BroadcastEntityAnimation(*this, EntityAnimation::EntityGetsCriticalHit);
 			}
 		}
 
@@ -417,6 +418,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		if (SharpnessLevel > 0)
 		{
+			MagicalCriticalHit = true;
 			a_TDI.FinalDamage += 1.25f * SharpnessLevel;
 		}
 		else if (SmiteLevel > 0)
@@ -432,6 +434,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtZombiePigman:
 					case mtZombieVillager:
 					{
+						MagicalCriticalHit = true;
 						a_TDI.FinalDamage += 2.5f * SmiteLevel;
 						break;
 					}
@@ -450,11 +453,13 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtCaveSpider:
 					case mtSilverfish:
 					{
+						MagicalCriticalHit = true;
 						a_TDI.FinalDamage += 2.5f * BaneOfArthropodsLevel;
+
 						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
-						// increasing the max duration by 0.5 seconds each level
+						// increasing the max duration by 0.5 seconds each level.
 						// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
-						int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks
+						int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks.
 						Monster->AddEntityEffect(cEntityEffect::effSlowness, Duration, 4);
 
 						break;
@@ -473,6 +478,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			{
 				BurnTicks += 4 * (FireAspectLevel - 1);
 			}
+
 			if (!IsMob() && !IsInWater())
 			{
 				StartBurning(BurnTicks * 20);
@@ -488,9 +494,18 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					{
 						break;
 					}
-					default: StartBurning(BurnTicks * 20);
+					default:
+					{
+						MagicalCriticalHit = true;
+						StartBurning(BurnTicks * 20);
+					}
 				}
 			}
+		}
+
+		if (MagicalCriticalHit)
+		{
+			m_World->BroadcastEntityAnimation(*this, EntityAnimation::EntityGetsMagicalCriticalHit);
 		}
 
 		unsigned int ThornsLevel = 0;
@@ -525,7 +540,15 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		SetSpeed(a_TDI.Knockback);
 	}
 
-	m_World->BroadcastEntityStatus(*this, esGenericHurt);
+	m_World->BroadcastEntityAnimation(*this, [&a_TDI]
+	{
+		switch (a_TDI.DamageType)
+		{
+			case eDamageType::dtBurning: return EntityAnimation::PawnBurns;
+			case eDamageType::dtDrowning: return EntityAnimation::PawnDrowns;
+			default: return EntityAnimation::PawnHurts;
+		}
+	}());
 
 	m_InvulnerableTicks = 10;
 
@@ -797,7 +820,7 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 	// If the victim is a player the hook is handled by the cPlayer class
 	if (!IsPlayer())
 	{
-		AString emptystring = AString("");
+		AString emptystring;
 		cRoot::Get()->GetPluginManager()->CallHookKilled(*this, a_TDI, emptystring);
 	}
 
@@ -813,7 +836,7 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 	}
 
-	m_World->BroadcastEntityStatus(*this, esGenericDead);
+	m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnDies);
 }
 
 
@@ -1098,7 +1121,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			NextPos = HitCoords;
 
 			// Avoid movement in the direction of the blockface that has been hit and correct for collision box:
-			double HalfWidth = GetWidth() / 2.0;
+			const auto HalfWidth = GetWidth() / 2;
 			switch (HitBlockFace)
 			{
 				case BLOCK_FACE_XM:
@@ -1714,6 +1737,16 @@ void cEntity::SetIsTicking(bool a_IsTicking)
 
 
 
+void cEntity::SetSize(const float a_Width, const float a_Height)
+{
+	m_Width = a_Width;
+	m_Height = a_Height;
+}
+
+
+
+
+
 void cEntity::HandleAir(void)
 {
 	// Ref.: https://minecraft.gamepedia.com/Chunk_format
@@ -1884,8 +1917,8 @@ void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 
 void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 {
-	// Process packet sending every two ticks
-	if (GetWorld()->GetWorldAge() % 2 != 0)
+	// Process packet sending every two ticks:
+	if ((GetWorld()->GetWorldTickAge() % 2_tick) != 0_tick)
 	{
 		return;
 	}

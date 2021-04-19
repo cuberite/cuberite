@@ -92,8 +92,10 @@ void cMobSpawnerEntity::UpdateActiveState(void)
 
 bool cMobSpawnerEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	// Update the active flag every 5 seconds
-	if ((m_World->GetWorldAge() % 100) == 0)
+	using namespace std::chrono_literals;
+
+	// Update the active flag every 5 seconds:
+	if ((m_World->GetWorldTickAge() % 5s) == 0s)
 	{
 		UpdateActiveState();
 	}

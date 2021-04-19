@@ -62,7 +62,7 @@ public:
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendDisconnect                 (const AString & a_Reason) override;
 	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
-	virtual void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation) override;
+	virtual void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation) override;
 	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration) override;
 	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityHeadLook             (const cEntity & a_Entity) override;
@@ -70,7 +70,6 @@ public:
 	virtual void SendEntityMetadata             (const cEntity & a_Entity) override;
 	virtual void SendEntityPosition             (const cEntity & a_Entity) override;
 	virtual void SendEntityProperties           (const cEntity & a_Entity) override;
-	virtual void SendEntityStatus               (const cEntity & a_Entity, char a_Status) override;
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) override;
 	virtual void SendExperience                 (void) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
@@ -95,7 +94,6 @@ public:
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) override;
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdatePing       () override;
-	virtual void SendPlayerMaxSpeed             (void) override;
 	virtual void SendPlayerMoveLook             (void) override;
 	virtual void SendPlayerPosition             (void) override;
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) override;
@@ -119,12 +117,11 @@ public:
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
-	virtual void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_WorldDate, bool a_DoDaylightCycle) override;
+	virtual void SendTimeUpdate                 (cTickTimeLong a_WorldAge, cTickTimeLong a_WorldDate, bool a_DoDaylightCycle) override;
 	virtual void SendUnleashEntity              (const cEntity & a_Entity) override;
 	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
 	virtual void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
-	virtual void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendUnlockRecipe               (UInt32 a_RecipeID) override;
 	virtual void SendInitRecipes                (UInt32 a_RecipeID) override;
 	virtual void SendWeather                    (eWeather a_Weather) override;
@@ -139,26 +136,34 @@ public:
 	a_Compressed will be set to the compressed packet includes packet length and data length. */
 	static void CompressPacket(CircularBufferCompressor & a_Packet, ContiguousByteBuffer & a_Compressed);
 
-	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
-	static int GetParticleID(const AString & a_ParticleName);
-
 protected:
 
 	/** State of the protocol. */
 	State m_State;
 
-	/** Nobody inherits 1.8, so it doesn't use this method */
-	virtual UInt32 GetPacketID(ePacketType a_Packet) override;
+	/** Converts the BlockFace received by the protocol into eBlockFace constants.
+	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
+	static eBlockFace FaceIntToBlockFace(Int32 a_FaceInt);
 
-	/** Returns 1.8. */
-	virtual Version GetProtocolVersion() override;
+	/** Get the packet ID for a given packet. */
+	virtual UInt32 GetPacketID(ePacketType a_Packet) const override;
+
+	/** Converts an animation into an ID suitable for use with the Entity Animation packet.
+	Returns (uchar)-1 if the protocol version doesn't support this animation. */
+	virtual unsigned char GetProtocolEntityAnimation(EntityAnimation a_Animation) const;
+
+	/** Converts an animation into an ID suitable for use with the Entity Status packet.
+	Returns -1 if the protocol version doesn't support this animation. */
+	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const;
 
 	/** Converts eMonsterType to protocol-specific mob types */
-	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType);
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const;
+
+	/** Returns the protocol version. */
+	virtual Version GetProtocolVersion() const override;
 
 	/** Reads and handles the packet. The packet length and type have already been read.
-	Returns true if the packet was understood, false if it was an unknown packet
-	*/
+	Returns true if the packet was understood, false if it was an unknown packet. */
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
 
 	// Packet handlers while in the Status state (m_State == 1):
@@ -200,43 +205,37 @@ protected:
 	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel */
 	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel);
 
+	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
+	virtual void ParseItemMetadata(cItem & a_Item, ContiguousByteBufferView a_Metadata) const;
+
+	/** Reads an item out of the received data, sets a_Item to the values read.
+	Returns false if not enough received data.
+	a_KeepRemainingBytes tells the function to keep that many bytes at the end of the buffer. */
+	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes = 0) const;
+
+	/** Sends the entity type and entity-dependent data required for the entity to initially spawn. */
+	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData);
+
 	/** Sends the data to the client, encrypting them if needed. */
 	virtual void SendData(ContiguousByteBufferView a_Size) override;
 
 	/** Sends the packet to the client. Called by the cPacketizer's destructor. */
 	virtual void SendPacket(cPacketizer & a_Packet) override;
 
-	/** Reads an item out of the received data, sets a_Item to the values read.
-	Returns false if not enough received data.
-	a_KeepRemainingBytes tells the function to keep that many bytes at the end of the buffer. */
-	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes = 0);
-
-	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
-	virtual void ParseItemMetadata(cItem & a_Item, ContiguousByteBufferView a_Metadata);
-
-	virtual void StartEncryption(const Byte * a_Key);
-
-	/** Converts the BlockFace received by the protocol into eBlockFace constants.
-	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
-	static eBlockFace FaceIntToBlockFace(Int32 a_FaceInt);
-
-	/** Sends the entity type and entity-dependent data required for the entity to initially spawn. */
-	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData);
-
 	/** Writes the block entity data for the specified block entity into the packet. */
-	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity);
-
-	/** Writes the item data into a packet. */
-	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
+	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const;
 
 	/** Writes the metadata for the specified entity, not including the terminating 0x7f. */
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
-
-	/** Writes the mob-specific metadata for the specified mob */
-	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob);
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const;
 
 	/** Writes the entity properties for the specified entity, including the Count field. */
-	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity);
+	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) const;
+
+	/** Writes the item data into a packet. */
+	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const;
+
+	/** Writes the mob-specific metadata for the specified mob */
+	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const;
 
 private:
 
@@ -258,6 +257,18 @@ private:
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
 	void AddReceivedData(cByteBuffer & a_Buffer, ContiguousByteBufferView a_Data);
 
+	/** Converts an entity to a protocol-specific entity type.
+	Only entities that the Send Spawn Entity packet supports are valid inputs to this method */
+	static UInt8 GetProtocolEntityType(const cEntity & a_Entity);
+
+	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
+	static int GetProtocolParticleID(const AString & a_ParticleName);
+
+	/** Converts a statistic to a protocol-specific string.
+	Protocols <= 1.12 use strings, hence this is a static as the string-mapping was append-only for the versions that used it.
+	Returns an empty string, handled correctly by the client, for newer, unsupported statistics. */
+	static const char * GetProtocolStatisticName(Statistic a_Statistic);
+
 	/** Handle a complete packet stored in the given buffer. */
 	void HandlePacket(cByteBuffer & a_Buffer);
 
@@ -266,12 +277,5 @@ private:
 	and so entities don't show up until a teleport is sent. */
 	void SendEntityTeleport(const cEntity & a_Entity);
 
-	/** Converts an entity to a protocol-specific entity type.
-	Only entities that the Send Spawn Entity packet supports are valid inputs to this method */
-	static UInt8 GetProtocolEntityType(const cEntity & a_Entity);
-
-	/** Converts a statistic to a protocol-specific string.
-	Protocols <= 1.12 use strings, hence this is a static as the string-mapping was append-only for the versions that used it.
-	Returns an empty string, handled correctly by the client, for newer, unsupported statistics. */
-	static const char * GetProtocolStatisticName(Statistic a_Statistic);
+	void StartEncryption(const Byte * a_Key);
 } ;

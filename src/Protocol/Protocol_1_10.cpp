@@ -329,22 +329,22 @@ void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, double a_X, 
 
 
 
-cProtocol::Version cProtocol_1_10_0::GetProtocolVersion()
-{
-	return Version::v1_10_0;
-}
-
-
-
-
-
-UInt32 cProtocol_1_10_0::GetProtocolMobType(const eMonsterType a_MobType)
+UInt32 cProtocol_1_10_0::GetProtocolMobType(const eMonsterType a_MobType) const
 {
 	switch (a_MobType)
 	{
 		case mtPolarBear: return 102;
 		default:          return Super::GetProtocolMobType(a_MobType);
 	}
+}
+
+
+
+
+
+cProtocol::Version cProtocol_1_10_0::GetProtocolVersion() const
+{
+	return Version::v1_10_0;
 }
 
 
@@ -360,7 +360,7 @@ void cProtocol_1_10_0::HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer
 
 
 
-void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
+void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
 {
 	using namespace Metadata;
 
@@ -413,7 +413,7 @@ void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 			a_Pkt.WriteBEUInt8(PLAYER_MAIN_HAND);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetMainHand()));
+			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
 			break;
 		}
 		case cEntity::etPickup:
@@ -581,7 +581,7 @@ void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 
 
-void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
+void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
 {
 	using namespace Metadata;
 

@@ -296,8 +296,10 @@ void cBeaconEntity::SendTo(cClientHandle & a_Client)
 
 bool cBeaconEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	// Update the beacon every 4 seconds
-	if ((GetWorld()->GetWorldAge() % 80) == 0)
+	using namespace std::chrono_literals;
+
+	// Update the beacon every 4 seconds:
+	if ((GetWorld()->GetWorldTickAge() % 4s) == 0s)
 	{
 		UpdateBeacon();
 		GiveEffects();

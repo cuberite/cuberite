@@ -9,7 +9,7 @@
 
 
 cFireworkEntity::cFireworkEntity(cEntity * a_Creator, Vector3d a_Pos, const cItem & a_Item) :
-	Super(pkFirework, a_Creator, a_Pos, 0.25, 0.25),
+	Super(pkFirework, a_Creator, a_Pos, 0.25f, 0.25f),
 	m_TicksToExplosion(a_Item.m_FireworkItem.m_FlightTimeInTicks),
 	m_FireworkItem(a_Item)
 {
@@ -74,7 +74,7 @@ void cFireworkEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (m_TicksToExplosion <= 0)
 	{
 		// TODO: Notify the plugins
-		m_World->BroadcastEntityStatus(*this, esFireworkExploding);
+		m_World->BroadcastEntityAnimation(*this, EntityAnimation::FireworkRocketExplodes);
 		Destroy();
 		return;
 	}

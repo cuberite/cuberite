@@ -86,9 +86,6 @@ public:
 
 	static const int MAX_FOOD_LEVEL;
 
-	/** Number of ticks it takes to eat an item */
-	static const int EATING_TICKS;
-
 	// tolua_end
 
 	CLASS_PROTODEF(cPlayer)
@@ -166,8 +163,8 @@ public:
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
-	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
-	void SetCapabilities();
+	/** Updates player's capabilities - flying, visibility, etc. from their gamemode. */
+	void UpdateCapabilities();
 
 	// tolua_begin
 
@@ -371,13 +368,16 @@ public:
 	void AddFoodExhaustion(double a_Exhaustion);
 
 	/** Returns true if the player is currently in the process of eating the currently equipped item */
-	bool IsEating(void) const { return (m_EatingFinishTick >= 0); }
+	bool IsEating(void) const { return m_EatingFinishTick >= 0_tick; }
 
 	/** Returns true if the player is currently flying */
 	bool IsFlying(void) const { return m_IsFlying; }
 
 	/** Returns true if a player is sleeping in a bed. */
 	bool IsInBed(void) const;
+
+	/** Returns true if the player's left hand is dominant. */
+	bool IsLeftHanded() const;
 
 	/** Returns true if the player has thrown out a floater */
 	bool IsFishing(void) const { return m_IsFishing; }
@@ -415,21 +415,18 @@ public:
 	void Respawn(void);  // tolua_export
 
 	void SetVisible( bool a_bVisible);  // tolua_export
-	bool IsVisible(void) const { return m_IsVisible; }  // tolua_export
 
 	/** Saves all player data, such as inventory, to JSON. */
 	void SaveToDisk(void);
 
-	typedef cWorld * cWorldPtr;
-
 	/** Loads the player data from the disk file.
-	Sets a_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile(). */
-	void LoadFromDisk(cWorldPtr & a_World);
+	Sets m_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile(). */
+	void LoadFromDisk();
 
 	/** Loads the player data from the specified file.
-	Sets a_World to the world where the player will spawn, based on the stored world name or the default world.
+	Sets m_World to the world where the player will spawn, based on the stored world name or the default world.
 	Returns true on success, false if the player wasn't found, and excepts with base std::runtime_error if the data couldn't be read or parsed. */
-	bool LoadFromFile(const AString & a_FileName, cWorldPtr & a_World);
+	bool LoadFromFile(const AString & a_FileName);
 
 	const AString & GetLoadedWorldName() const { return m_CurrentWorldName; }
 
@@ -497,6 +494,9 @@ public:
 	/** Starts or stops flying, broadcasting the state change. */
 	void SetFlying(bool a_ShouldFly);
 
+	/** Sets the dominant hand of the player. */
+	void SetLeftHanded(bool a_IsLeftHanded);
+
 	/** Starts or stops sprinting, if our current body stance permits, broadcasting the state change. */
 	void SetSprint(bool a_ShouldSprint);
 
@@ -563,9 +563,6 @@ public:
 	int GetSkinParts(void) const { return m_SkinParts; }
 	void SetSkinParts(int a_Parts);
 
-	eMainHand GetMainHand(void) const { return m_MainHand; }
-	void SetMainHand(eMainHand a_Hand);
-
 	// tolua_end
 
 	/** Calls the block placement hooks and places the blocks in the world.
@@ -598,13 +595,9 @@ public:
 	If the item is already known, does nothing. */
 	void AddKnownItem(const cItem & a_Item);
 
-	/** Update a player's size, for example, on body stance changes. */
-	void SetSize(float a_Width, float a_Height);
-
 	// cEntity overrides:
 	virtual void AttachTo(cEntity * a_AttachTo) override;
 	virtual void Detach(void) override;
-	virtual void Detach(bool a_IsTeleporting);
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
 	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
 	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
@@ -617,14 +610,6 @@ public:
 	virtual bool IsSprinting(void) const override;
 
 private:
-
-	/** Xp Level stuff */
-	enum
-	{
-		XP_TO_LEVEL15 = 255,
-		XP_PER_LEVEL_TO15 = 17,
-		XP_TO_LEVEL30 = 825
-	} ;
 
 	typedef std::vector<std::vector<AString> > AStringVectorVector;
 
@@ -724,6 +709,9 @@ private:
 	/** If true, we are locking m_Position to m_FrozenPosition. */
 	bool m_IsFrozen;
 
+	/** Whether the player is left-handed, or right-handed. */
+	bool m_IsLeftHanded;
+
 	/** Was the player frozen manually by a plugin or automatically by the server? */
 	bool m_IsManuallyFrozen;
 
@@ -734,7 +722,7 @@ private:
 	bool m_IsVisible;
 
 	/** The world tick in which eating will be finished. -1 if not eating */
-	Int64 m_EatingFinishTick;
+	cTickTimeLong m_EatingFinishTick;
 
 	/** Player Xp level */
 	int m_LifetimeTotalXp;
@@ -757,9 +745,6 @@ private:
 
 	/** Displayed skin part bit mask */
 	int m_SkinParts;
-
-	/** The main hand of the player */
-	eMainHand m_MainHand;
 
 	/** List on known recipes as Ids */
 	std::set<UInt32> m_KnownRecipes;
@@ -808,6 +793,7 @@ private:
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual float GetEnchantmentBlastKnockbackReduction() override;
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
+	virtual bool IsInvisible() const override;
 	virtual bool IsRclking(void) const override { return IsEating() || IsChargingBow(); }
 	virtual void OnAddToWorld(cWorld & a_World) override;
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;

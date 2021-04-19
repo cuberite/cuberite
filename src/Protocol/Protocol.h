@@ -25,21 +25,12 @@ class cExpOrb;
 class cPlayer;
 class cEntity;
 class cWindow;
-class cPickup;
 class cPainting;
 class cWorld;
 class cMonster;
-class cChunkDataSerializer;
-class cFallingBlock;
 class cCompositeChat;
 class cStatManager;
 class cPacketizer;
-
-
-
-
-
-typedef unsigned char Byte;
 
 
 
@@ -105,7 +96,6 @@ public:
 		pktPlayerAbilities,
 		pktPlayerList,
 		pktPlayerListHeaderFooter,
-		pktPlayerMaxSpeed,
 		pktPlayerMoveLook,
 		pktPluginMessage,
 		pktRemoveEntityEffect,
@@ -382,14 +372,13 @@ public:
 	virtual void SendDisconnect                 (const AString & a_Reason) = 0;
 	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration) = 0;
-	virtual void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation) = 0;
+	virtual void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation) = 0;
 	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendEntityHeadLook             (const cEntity & a_Entity) = 0;
 	virtual void SendEntityLook                 (const cEntity & a_Entity) = 0;
 	virtual void SendEntityMetadata             (const cEntity & a_Entity) = 0;
 	virtual void SendEntityPosition             (const cEntity & a_Entity) = 0;
 	virtual void SendEntityProperties           (const cEntity & a_Entity) = 0;
-	virtual void SendEntityStatus               (const cEntity & a_Entity, char a_Status) = 0;
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) = 0;
 	virtual void SendExplosion                  (Vector3f a_Position, float a_Power) = 0;
 	virtual void SendGameMode                   (eGameMode a_GameMode) = 0;
@@ -412,7 +401,6 @@ public:
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerListUpdatePing       () = 0;
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) = 0;
-	virtual void SendPlayerMaxSpeed             (void) = 0;  ///< Informs the client of the maximum player speed (1.6.1+)
 	virtual void SendPlayerMoveLook             (void) = 0;
 	virtual void SendPlayerPosition             (void) = 0;
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) = 0;
@@ -438,12 +426,11 @@ public:
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) = 0;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) = 0;
-	virtual void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_WorldDate, bool a_DoDaylightCycle) = 0;
+	virtual void SendTimeUpdate                 (cTickTimeLong a_WorldAge, cTickTimeLong a_WorldDate, bool a_DoDaylightCycle) = 0;
 	virtual void SendUnleashEntity              (const cEntity & a_Entity) = 0;
 	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) = 0;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) = 0;
 	virtual void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) = 0;
-	virtual void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
 	virtual void SendUnlockRecipe               (UInt32 a_RecipeID) = 0;
 	virtual void SendInitRecipes                (UInt32 a_RecipeID) = 0;
 	virtual void SendWeather                    (eWeather a_Weather) = 0;
@@ -473,10 +460,10 @@ protected:
 	cByteBuffer m_OutPacketLenBuffer;
 
 	/** Returns the protocol-specific packet ID given the protocol-agnostic packet enum. */
-	virtual UInt32 GetPacketID(ePacketType a_Packet) = 0;
+	virtual UInt32 GetPacketID(ePacketType a_Packet) const = 0;
 
 	/** Returns the current protocol's version, for handling status requests. */
-	virtual Version GetProtocolVersion() = 0;
+	virtual Version GetProtocolVersion() const = 0;
 
 	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
 	virtual void SendData(ContiguousByteBufferView a_Data) = 0;

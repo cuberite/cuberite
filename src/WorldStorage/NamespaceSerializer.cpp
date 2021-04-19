@@ -656,11 +656,12 @@ eMonsterType NamespaceSerializer::ToMonsterType(const std::string_view a_ID)
 		{ "zoglin",           mtZoglin },
 		{ "zombie",           mtZombie },
 		{ "zombie_horse",     mtZombieHorse },
-		{ "zombie_pigman",    mtZombiePigman },
+		{ "zombified_piglin", mtZombiePigman },
 		{ "zombie_villager",  mtZombieVillager },
 
-		{ "villager_golem",   mtIronGolem },
 		{ "snowman",          mtSnowGolem },
+		{ "villager_golem",   mtIronGolem },
+		{ "zombie_pigman",    mtZombiePigman },
 
 		// Old names:
 		{ "Bat",            mtBat },

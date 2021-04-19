@@ -48,8 +48,8 @@ public:
 
 	CLASS_PROTODEF(cProjectileEntity)
 
-	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, double a_Width, double a_Height);
-	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, double a_Width, double a_Height);
+	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, float a_Width, float a_Height);
+	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, float a_Width, float a_Height);
 
 	/** Creates a new instance of the specified projectile entity.
 	a_Item is the item from which the projectile originated (such as firework or arrow). */

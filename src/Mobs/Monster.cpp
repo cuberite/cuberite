@@ -80,7 +80,7 @@ static const struct
 ////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
-cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height)
+cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height)
 	: Super(etMonster, a_Width, a_Height)
 	, m_EMState(IDLE)
 	, m_EMPersonality(AGGRESSIVE)
@@ -1150,34 +1150,26 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtZombieHorse:     return mfPassive;
 		case mtZombiePigman:    return mfHostile;
 		case mtZombieVillager:  return mfHostile;
-
-		default:
-		{
-			ASSERT(!"Unhandled mob type");
-			return mfUnhandled;
-		}
+		case mtInvalidType:     break;
 	}
+	UNREACHABLE("Unhandled mob type");
 }
 
 
 
 
 
-int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
+cTickTime cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 {
 	switch (a_MobFamily)
 	{
-		case mfHostile:   return 40;
-		case mfPassive:   return 40;
-		case mfAmbient:   return 40;
-		case mfWater:     return 400;
-		case mfNoSpawn:   return -1;
-		default:
-		{
-			ASSERT(!"Unhandled mob family");
-			return -1;
-		}
+		case mfHostile:   return 40_tick;
+		case mfPassive:   return 40_tick;
+		case mfAmbient:   return 40_tick;
+		case mfWater:     return 400_tick;
+		case mfNoSpawn:   return -1_tick;
 	}
+	UNREACHABLE("Unhandled mob family");
 }
 
 
@@ -1471,7 +1463,7 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 				a_Player.GetInventory().RemoveOneEquippedItem();
 			}
 			m_LoveTimer = TPS * 30;  // half a minute
-			m_World->BroadcastEntityStatus(*this, esMobInLove);
+			m_World->BroadcastEntityAnimation(*this, EntityAnimation::AnimalFallsInLove);
 		}
 	}
 	// If a player holding my spawn egg right-clicked me, spawn a new baby
@@ -1654,7 +1646,7 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 
 	if (
 		(Chunk->GetBlock(Rel) != E_BLOCK_SOULSAND) &&   // Not on soulsand
-		(GetWorld()->GetTimeOfDay() < 12000 + 1000) &&  // Daytime
+		(GetWorld()->GetTimeOfDay() < 13000_tick) &&    // Daytime
 		Chunk->IsWeatherSunnyAt(Rel.x, Rel.z) &&        // Not raining
 		!IsInWater()                                    // Isn't swimming
 	)

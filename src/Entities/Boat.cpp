@@ -15,7 +15,7 @@
 
 
 cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
-	Super(etBoat, a_Pos, 0.98, 0.7),
+	Super(etBoat, a_Pos, 1.375f, 0.5625f),
 	m_LastDamage(0), m_ForwardDirection(0),
 	m_DamageTaken(0.0f), m_Material(a_Material),
 	m_RightPaddleUsed(false), m_LeftPaddleUsed(false)
@@ -46,8 +46,8 @@ void cBoat::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 	// Cannot use super::BroadcastMovementUpdate here, broadcasting position when not
 	// expected by the client breaks things. See https://github.com/cuberite/cuberite/pull/4488
 
-	// Process packet sending every two ticks
-	if (GetWorld()->GetWorldAge() % 2 != 0)
+	// Process packet sending every two ticks:
+	if ((GetWorld()->GetWorldTickAge() % 2_tick) != 0_tick)
 	{
 		return;
 	}

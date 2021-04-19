@@ -10,8 +10,7 @@
 
 
 cEnderDragon::cEnderDragon(void) :
-	// TODO: Vanilla source says this, but is it right? Dragons fly, they don't stand
-	Super("EnderDragon", mtEnderDragon, "entity.enderdragon.hurt", "entity.enderdragon.death", "entity.enderdragon.ambient", 16.0, 8.0)
+	Super("EnderDragon", mtEnderDragon, "entity.enderdragon.hurt", "entity.enderdragon.death", "entity.enderdragon.ambient", 16, 8)
 {
 }
 
