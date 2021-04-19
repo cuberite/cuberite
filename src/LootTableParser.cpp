@@ -2006,8 +2006,8 @@ namespace LootTable
 		UInt32 a_KilledID, UInt32 a_KillerID) const
 	{
 		ACTIVECHECK
-		return ((a_World.GetTimeOfDay() % m_Period) >= m_Min) &&
-			((a_World.GetTimeOfDay() % m_Period) <= m_Max);
+		return ((a_World.GetTimeOfDay().count() % m_Period) >= m_Min) &&
+			((a_World.GetTimeOfDay().count() % m_Period) <= m_Max);
 	}
 
 ////////////////////////////////////////////////////////////////////////////////

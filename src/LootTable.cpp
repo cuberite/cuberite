@@ -308,7 +308,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 					case E_BLOCK_CHEST:
 					case E_BLOCK_TRAPPED_CHEST:
 					{
-						a_World.DoWithBlockEntityAt(a_Pos.x, a_Pos.y, a_Pos.z, [&] (cBlockEntity & a_Entity)
+						a_World.DoWithBlockEntityAt(a_Pos, [&] (cBlockEntity & a_Entity)
 						{
 							Items = a_Entity.ConvertToPickups();
 							return true;
@@ -339,7 +339,7 @@ cItems cLootTable::GetItems(const LootTable::cLootTablePoolEntry & a_Entry, cWor
 					}
 					default:
 					{
-						a_World.DoWithBlockEntityAt(a_Pos.x, a_Pos.y, a_Pos.z, [&] (cBlockEntity & a_Entity)
+						a_World.DoWithBlockEntityAt(a_Pos, [&] (cBlockEntity & a_Entity)
 						{
 							Items = a_Entity.ConvertToPickups();
 							return true;
