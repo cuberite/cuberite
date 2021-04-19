@@ -46,7 +46,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Only drops self when using shears, otherwise drops nothing:
 		if ((a_Tool == nullptr) || (a_Tool->m_ItemType != E_ITEM_SHEARS))
@@ -180,10 +180,6 @@ private:
 			if ((Common == 0) && !HasTop)
 			{
 				// The vine just lost all its support, destroy the block:
-				if (DoesDropOnUnsuitable())
-				{
-					a_ChunkInterface.DropBlockAsPickups(a_Chunk.RelativeToAbsolute(a_RelPos));
-				}
 				a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0);
 				return false;
 			}
@@ -201,15 +197,6 @@ private:
 	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
 	{
 		return true;
-	}
-
-
-
-
-
-	virtual bool DoesDropOnUnsuitable(void) const override
-	{
-		return false;
 	}
 
 

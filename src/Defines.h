@@ -393,6 +393,83 @@ enum eMessageType
 
 
 
+
+enum class BannerPattern
+{
+	BottomStripe,
+	TopStripe,
+	LeftStripe,
+	RightStripe,
+	CenterStripeVertical,
+	MiddleStripeHorizontal,
+	DownRightStripe,
+	DownLeftStripe,
+	SmallVerticalStripes,
+	DiagonalCross,
+	SquareCross,
+	LeftOfDiagonal,
+	RightOfUpsideDownDiagonal,
+	LeftOfUpsideDownDiagonal,
+	RightOfDiagonal,
+	VerticalHalfLeft,
+	VerticalHalfRight,
+	HorizontalHalfTop,
+	HorizontalHalfBottom,
+	BottomLeftCorner,
+	BottomRightCorner,
+	TopLeftCorner,
+	TopRightCorner,
+	BottomTriangle,
+	TopTriangle,
+	BottomTriangleSawtooth,
+	TopTriangleSawtooth,
+	MiddleCircle,
+	MiddleRhombus,
+	Border,
+	CurlyBorder,
+	Brick,
+	Gradient,
+	GradientUpsideDown,
+	Creeper,
+	Skull,
+	Flower,
+	Mojang,
+	Globe,
+	Piglin
+};
+
+
+
+
+
+enum class BossBarColor
+{
+	Pink,
+	Blue,
+	Red,
+	Green,
+	Yellow,
+	Purple,
+	White
+};
+
+
+
+
+
+enum class BossBarDivisionType
+{
+	None,
+	SixNotches,
+	TenNotches,
+	TwelveNotches,
+	TwentyNotches
+};
+
+
+
+
+
 /** Returns a textual representation of the click action. */
 const char * ClickActionToString(int a_ClickAction);
 

@@ -59,6 +59,8 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 	m_IsInLava(false),
 	m_IsInWater(false),
 	m_IsHeadInWater(false),
+	m_Width(a_Width),
+	m_Height(a_Height),
 	m_AirLevel(MAX_AIR_LEVEL),
 	m_AirTickTimer(DROWNING_TICKS),
 	m_TicksAlive(0),
@@ -69,8 +71,6 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, doubl
 	m_Position(a_Pos),
 	m_WaterSpeed(0, 0, 0),
 	m_Mass (0.001),  // Default 1g
-	m_Width(a_Width),
-	m_Height(a_Height),
 	m_InvulnerableTicks(0)
 {
 	m_WorldChangeInfo.m_NewWorld = nullptr;
@@ -1308,7 +1308,7 @@ void cEntity::DetectCacti(void)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				if (GetWorld()->GetBlock(x, y, z) == E_BLOCK_CACTUS)
+				if (GetWorld()->GetBlock({ x, y, z }) == E_BLOCK_CACTUS)
 				{
 					TakeDamage(dtCactusContact, nullptr, 1, 0);
 					return;
@@ -1337,7 +1337,7 @@ void cEntity::DetectMagma(void)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				if (GetWorld()->GetBlock(x, y, z) == E_BLOCK_MAGMA)
+				if (GetWorld()->GetBlock({ x, y, z }) == E_BLOCK_MAGMA)
 				{
 					TakeDamage(dtMagmaContact, nullptr, 1, 0);
 					return;
@@ -1367,10 +1367,9 @@ bool cEntity::DetectPortal()
 		return false;
 	}
 
-	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
-	if (cChunkDef::IsValidHeight(Y))
+	if (const auto Position = m_Position.Floor(); cChunkDef::IsValidHeight(Position.y))
 	{
-		switch (GetWorld()->GetBlock(X, Y, Z))
+		switch (GetWorld()->GetBlock(Position))
 		{
 			case E_BLOCK_NETHER_PORTAL:
 			{
@@ -2029,15 +2028,6 @@ void cEntity::SetHeadYaw(double a_HeadYaw)
 
 
 
-void cEntity::SetHeight(double a_Height)
-{
-	m_Height = a_Height;
-}
-
-
-
-
-
 void cEntity::SetMass(double a_Mass)
 {
 	// Make sure that mass is not zero. 1g is the default because we
@@ -2113,15 +2103,6 @@ void cEntity::SetSpeedY(double a_SpeedY)
 void cEntity::SetSpeedZ(double a_SpeedZ)
 {
 	SetSpeed(m_Speed.x, m_Speed.y, a_SpeedZ);
-}
-
-
-
-
-
-void cEntity::SetWidth(double a_Width)
-{
-	m_Width = a_Width;
 }
 
 

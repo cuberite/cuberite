@@ -45,12 +45,7 @@ Implements the 1.9 protocol classes:
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/HorseWindow.h"
 
-#include "../BlockEntities/BeaconEntity.h"
-#include "../BlockEntities/CommandBlockEntity.h"
-#include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"
-#include "../BlockEntities/FlowerPotEntity.h"
-#include "../Bindings/PluginManager.h"
 
 
 
@@ -98,6 +93,176 @@ void cProtocol_1_9_0::SendAttachEntity(const cEntity & a_Entity, const cEntity &
 	Pkt.WriteVarInt32(a_Vehicle.GetUniqueID());
 	Pkt.WriteVarInt32(1);  // 1 passenger
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(0);  // Add
+	Pkt.WriteString(a_Title.CreateJsonString());
+	Pkt.WriteBEFloat(a_FractionFilled);
+	Pkt.WriteVarInt32([a_Color]
+	{
+		switch (a_Color)
+		{
+			case BossBarColor::Pink: return 0U;
+			case BossBarColor::Blue: return 1U;
+			case BossBarColor::Red: return 2U;
+			case BossBarColor::Green: return 3U;
+			case BossBarColor::Yellow: return 4U;
+			case BossBarColor::Purple: return 5U;
+			case BossBarColor::White: return 6U;
+		}
+		UNREACHABLE("Unsupported boss bar property");
+	}());
+	Pkt.WriteVarInt32([a_DivisionType]
+	{
+		switch (a_DivisionType)
+		{
+			case BossBarDivisionType::None: return 0U;
+			case BossBarDivisionType::SixNotches: return 1U;
+			case BossBarDivisionType::TenNotches: return 2U;
+			case BossBarDivisionType::TwelveNotches: return 3U;
+			case BossBarDivisionType::TwentyNotches: return 4U;
+		}
+		UNREACHABLE("Unsupported boss bar property");
+	}());
+	{
+		UInt8 Flags = 0x00;
+		if (a_DarkenSky)
+		{
+			Flags |= 0x01;
+		}
+		if (a_PlayEndMusic || a_CreateFog)
+		{
+			Flags |= 0x02;
+		}
+		Pkt.WriteBEUInt8(Flags);
+	}
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarRemove(UInt32 a_UniqueID)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(1);  // Remove
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(5);  // Update Flags
+	{
+		UInt8 Flags = 0x00;
+		if (a_DarkenSky)
+		{
+			Flags |= 0x01;
+		}
+		if (a_PlayEndMusic || a_CreateFog)
+		{
+			Flags |= 0x02;
+		}
+		Pkt.WriteBEUInt8(Flags);
+	}
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarUpdateHealth(UInt32 a_UniqueID, float a_FractionFilled)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(2);  // Update health
+	Pkt.WriteBEFloat(a_FractionFilled);
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(4);  // Update health
+	Pkt.WriteVarInt32([a_Color]
+	{
+		switch (a_Color)
+		{
+			case BossBarColor::Pink: return 0U;
+			case BossBarColor::Blue: return 1U;
+			case BossBarColor::Red: return 2U;
+			case BossBarColor::Green: return 3U;
+			case BossBarColor::Yellow: return 4U;
+			case BossBarColor::Purple: return 5U;
+			case BossBarColor::White: return 6U;
+		}
+		UNREACHABLE("Unsupported boss bar property");
+	}());
+	Pkt.WriteVarInt32([a_DivisionType]
+	{
+		switch (a_DivisionType)
+		{
+			case BossBarDivisionType::None: return 0U;
+			case BossBarDivisionType::SixNotches: return 1U;
+			case BossBarDivisionType::TenNotches: return 2U;
+			case BossBarDivisionType::TwelveNotches: return 3U;
+			case BossBarDivisionType::TwentyNotches: return 4U;
+		}
+		UNREACHABLE("Unsupported boss bar property");
+	}());
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarUpdateTitle(UInt32 a_UniqueID, const cCompositeChat & a_Title)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(3);  // Update title
+	Pkt.WriteString(a_Title.CreateJsonString());
 }
 
 
@@ -488,6 +653,7 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 		case pktBlockBreakAnim:         return 0x08;
 		case pktBlockChange:            return 0x0b;
 		case pktBlockChanges:           return 0x10;
+		case pktBossBar:                return 0x0c;
 		case pktCameraSetTo:            return 0x36;
 		case pktChatRaw:                return 0x0f;
 		case pktCollectEntity:          return 0x49;
@@ -779,14 +945,21 @@ void cProtocol_1_9_0::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8,  Action);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt,  UInt32, JumpBoost);
 
+	if (PlayerID != m_Client->GetPlayer()->GetUniqueID())
+	{
+		m_Client->Kick("Mind your own business! Hacked client?");
+		return;
+	}
+
 	switch (Action)
 	{
-		case 0: m_Client->HandleEntityCrouch(PlayerID, true);     break;  // Crouch
-		case 1: m_Client->HandleEntityCrouch(PlayerID, false);    break;  // Uncrouch
-		case 2: m_Client->HandleEntityLeaveBed(PlayerID);         break;  // Leave Bed
-		case 3: m_Client->HandleEntitySprinting(PlayerID, true);  break;  // Start sprinting
-		case 4: m_Client->HandleEntitySprinting(PlayerID, false); break;  // Stop sprinting
-		case 7: m_Client->HandleOpenHorseInventory(PlayerID);     break;  // Open horse inventory
+		case 0: return m_Client->HandleCrouch(true);
+		case 1: return m_Client->HandleCrouch(false);
+		case 2: return m_Client->HandleLeaveBed();
+		case 3: return m_Client->HandleSprint(true);
+		case 4: return m_Client->HandleSprint(false);
+		case 7: return m_Client->HandleOpenHorseInventory();
+		case 8: return m_Client->HandleStartElytraFlight();
 	}
 }
 
@@ -803,7 +976,7 @@ void cProtocol_1_9_0::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 
 	if (m_IsTeleportIdConfirmed)
 	{
-		m_Client->HandlePlayerPos(PosX, PosY, PosZ, PosY + (m_Client->GetPlayer()->IsCrouched() ? 1.54 : 1.62), IsOnGround);
+		m_Client->HandlePlayerPos(PosX, PosY, PosZ, IsOnGround);
 	}
 }
 
@@ -822,7 +995,7 @@ void cProtocol_1_9_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 
 	if (m_IsTeleportIdConfirmed)
 	{
-		m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, PosY + 1.62, Yaw, Pitch, IsOnGround);
+		m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, Yaw, Pitch, IsOnGround);
 	}
 }
 
@@ -1282,6 +1455,30 @@ void cProtocol_1_9_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Ob
 
 
 
+void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity)
+{
+	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
+
+	if (a_BlockEntity.GetBlockType() == E_BLOCK_MOB_SPAWNER)
+	{
+		auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
+		a_Writer.BeginCompound("SpawnData");  // New: SpawnData compound
+			a_Writer.AddString("id", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
+		a_Writer.EndCompound();
+		a_Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
+	}
+	else
+	{
+		Super::WriteBlockEntity(a_Writer, a_BlockEntity);
+	}
+}
+
+
+
+
+
 void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 {
 	short ItemType = a_Item.m_ItemType;
@@ -1452,112 +1649,6 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 
 
 
-void cProtocol_1_9_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity)
-{
-	cFastNBTWriter Writer;
-
-	switch (a_BlockEntity.GetBlockType())
-	{
-		case E_BLOCK_BEACON:
-		{
-			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);
-			Writer.AddInt("x",         BeaconEntity.GetPosX());
-			Writer.AddInt("y",         BeaconEntity.GetPosY());
-			Writer.AddInt("z",         BeaconEntity.GetPosZ());
-			Writer.AddInt("Primary",   BeaconEntity.GetPrimaryEffect());
-			Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
-			Writer.AddInt("Levels",    BeaconEntity.GetBeaconLevel());
-			Writer.AddString("id", "Beacon");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
-
-		case E_BLOCK_COMMAND_BLOCK:
-		{
-			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
-			Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
-			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
-			Writer.AddInt("x", CommandBlockEntity.GetPosX());
-			Writer.AddInt("y", CommandBlockEntity.GetPosY());
-			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
-			Writer.AddString("Command", CommandBlockEntity.GetCommand());
-			// You can set custom names for windows in Vanilla
-			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
-			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
-			Writer.AddString("CustomName", "@");
-			Writer.AddString("id", "Control");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			if (!CommandBlockEntity.GetLastOutput().empty())
-			{
-				Writer.AddString("LastOutput", Printf("{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str()));
-			}
-			break;
-		}
-
-		case E_BLOCK_HEAD:
-		{
-			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
-			Writer.AddInt("x", MobHeadEntity.GetPosX());
-			Writer.AddInt("y", MobHeadEntity.GetPosY());
-			Writer.AddInt("z", MobHeadEntity.GetPosZ());
-			Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
-			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
-			Writer.AddString("id", "Skull");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-
-			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
-			Writer.BeginCompound("Owner");
-				Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
-				Writer.AddString("Name", MobHeadEntity.GetOwnerName());
-				Writer.BeginCompound("Properties");
-					Writer.BeginList("textures", TAG_Compound);
-						Writer.BeginCompound("");
-							Writer.AddString("Signature", MobHeadEntity.GetOwnerTextureSignature());
-							Writer.AddString("Value", MobHeadEntity.GetOwnerTexture());
-						Writer.EndCompound();
-					Writer.EndList();
-				Writer.EndCompound();
-			Writer.EndCompound();
-			break;
-		}
-
-		case E_BLOCK_FLOWER_POT:
-		{
-			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
-			Writer.AddInt("x", FlowerPotEntity.GetPosX());
-			Writer.AddInt("y", FlowerPotEntity.GetPosY());
-			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
-			Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
-			Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
-			Writer.AddString("id", "FlowerPot");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
-
-		case E_BLOCK_MOB_SPAWNER:
-		{
-			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
-			Writer.AddInt("x", MobSpawnerEntity.GetPosX());
-			Writer.AddInt("y", MobSpawnerEntity.GetPosY());
-			Writer.AddInt("z", MobSpawnerEntity.GetPosZ());
-			Writer.BeginCompound("SpawnData");
-				Writer.AddString("id", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
-			Writer.EndCompound();
-			Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
-			Writer.AddString("id", "MobSpawner");
-			break;
-		}
-
-		default:
-		{
-			break;
-		}
-	}
-
-	Writer.Finish();
-	a_Pkt.WriteBuf(Writer.GetResult());
-}
-
-
-
-
-
 void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
 {
 	// Common metadata:
@@ -1581,6 +1672,10 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 	if (a_Entity.IsInvisible())
 	{
 		Flags |= 0x20;
+	}
+	if (a_Entity.IsElytraFlying())
+	{
+		Flags |= 0x80;
 	}
 	a_Pkt.WriteBEUInt8(0);  // Index 0
 	a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type

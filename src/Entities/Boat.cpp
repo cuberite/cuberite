@@ -153,7 +153,7 @@ void cBoat::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT)))
+	if (IsBlockWater(m_World->GetBlock(POS_TOINT)))
 	{
 		if (GetSpeedY() < 2)
 		{

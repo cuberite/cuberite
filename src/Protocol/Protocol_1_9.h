@@ -41,6 +41,12 @@ public:
 
 	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
+	virtual void SendBossBarAdd                 (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
+	virtual void SendBossBarRemove              (UInt32 a_UniqueID) override;
+	virtual void SendBossBarUpdateFlags         (UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
+	virtual void SendBossBarUpdateHealth        (UInt32 a_UniqueID, float a_FractionFilled) override;
+	virtual void SendBossBarUpdateStyle         (UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType) override;
+	virtual void SendBossBarUpdateTitle         (UInt32 a_UniqueID, const cCompositeChat & a_Title) override;
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityMetadata             (const cEntity & a_Entity) override;
@@ -107,6 +113,9 @@ protected:
 	/** Sends the entity type and entity-dependent data required for the entity to initially spawn. */
 	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData) override;
 
+	/** Writes the block entity data for the specified block entity into the packet. */
+	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) override;
+
 	/** Writes the item data into a packet. */
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) override;
 
@@ -118,9 +127,6 @@ protected:
 
 	/** Writes the entity properties for the specified entity, including the Count field. */
 	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
-
-	/** Writes the block entity data for the specified block entity into the packet. */
-	virtual void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity) override;
 
 	/** Types used within metadata */
 	enum eMetadataType
@@ -153,7 +159,7 @@ class cProtocol_1_9_1:
 
 public:
 
-	using Super::cProtocol_1_9_0;
+	using Super::Super;
 
 protected:
 
@@ -175,7 +181,7 @@ class cProtocol_1_9_2:
 
 public:
 
-	using Super::cProtocol_1_9_1;
+	using Super::Super;
 
 protected:
 
@@ -195,7 +201,7 @@ class cProtocol_1_9_4:
 
 public:
 
-	using Super::cProtocol_1_9_2;
+	using Super::Super;
 
 protected:
 

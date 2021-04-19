@@ -106,8 +106,6 @@ cMinecart::cMinecart(ePayload a_Payload, Vector3d a_Pos):
 	SetAirDrag(0.05f);
 	SetMaxHealth(6);
 	SetHealth(6);
-	SetWidth(1);
-	SetHeight(0.9);
 }
 
 
@@ -1241,7 +1239,7 @@ void cMinecart::OnRemoveFromWorld(cWorld & a_World)
 {
 	if (m_bIsOnDetectorRail)
 	{
-		m_World->SetBlock(m_DetectorRailPosition.x, m_DetectorRailPosition.y, m_DetectorRailPosition.z, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
+		m_World->SetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
 	}
 
 	Super::OnRemoveFromWorld(a_World);
@@ -1274,10 +1272,10 @@ void cMinecart::ApplyAcceleration(Vector3d a_ForwardDirection, double a_Accelera
 ////////////////////////////////////////////////////////////////////////////////
 // cRideableMinecart:
 
-cRideableMinecart::cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, int a_Height):
+cRideableMinecart::cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, int a_ContentHeight):
 	Super(mpNone, a_Pos),
 	m_Content(a_Content),
-	m_Height(a_Height)
+	m_ContentHeight(a_ContentHeight)
 {
 }
 

@@ -69,7 +69,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// If fully grown, give 3 items, otherwise just one:
 		auto growState = a_BlockMeta >> 2;

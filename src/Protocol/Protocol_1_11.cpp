@@ -30,12 +30,8 @@ Implements the 1.11 protocol classes:
 
 #include "../Mobs/IncludeAllMonsters.h"
 
-#include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BedEntity.h"
-#include "../BlockEntities/CommandBlockEntity.h"
-#include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"
-#include "../BlockEntities/FlowerPotEntity.h"
 
 #include "../Root.h"
 #include "../Server.h"
@@ -410,123 +406,6 @@ void cProtocol_1_11_0::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocol_1_11_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity)
-{
-	cFastNBTWriter Writer;
-
-	switch (a_BlockEntity.GetBlockType())
-	{
-		case E_BLOCK_BEACON:
-		{
-			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);
-			Writer.AddInt("x", BeaconEntity.GetPosX());
-			Writer.AddInt("y", BeaconEntity.GetPosY());
-			Writer.AddInt("z", BeaconEntity.GetPosZ());
-			Writer.AddInt("Primary", BeaconEntity.GetPrimaryEffect());
-			Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
-			Writer.AddInt("Levels", BeaconEntity.GetBeaconLevel());
-			Writer.AddString("id", "Beacon");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
-
-		case E_BLOCK_BED:
-		{
-			auto & BedEntity = static_cast<const cBedEntity &>(a_BlockEntity);
-			Writer.AddInt("x", BedEntity.GetPosX());
-			Writer.AddInt("y", BedEntity.GetPosY());
-			Writer.AddInt("z", BedEntity.GetPosZ());
-			Writer.AddInt("color", BedEntity.GetColor());
-			Writer.AddString("id", "Bed");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
-
-		case E_BLOCK_COMMAND_BLOCK:
-		{
-			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
-			Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
-			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
-			Writer.AddInt("x", CommandBlockEntity.GetPosX());
-			Writer.AddInt("y", CommandBlockEntity.GetPosY());
-			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
-			Writer.AddString("Command", CommandBlockEntity.GetCommand());
-			// You can set custom names for windows in Vanilla
-			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
-			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
-			Writer.AddString("CustomName", "@");
-			Writer.AddString("id", "Control");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			if (!CommandBlockEntity.GetLastOutput().empty())
-			{
-				Writer.AddString("LastOutput", Printf("{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str()));
-			}
-			break;
-		}
-
-		case E_BLOCK_HEAD:
-		{
-			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
-			Writer.AddInt("x", MobHeadEntity.GetPosX());
-			Writer.AddInt("y", MobHeadEntity.GetPosY());
-			Writer.AddInt("z", MobHeadEntity.GetPosZ());
-			Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
-			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
-			Writer.AddString("id", "Skull");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-
-			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
-			Writer.BeginCompound("Owner");
-			Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
-			Writer.AddString("Name", MobHeadEntity.GetOwnerName());
-			Writer.BeginCompound("Properties");
-			Writer.BeginList("textures", TAG_Compound);
-			Writer.BeginCompound("");
-			Writer.AddString("Signature", MobHeadEntity.GetOwnerTextureSignature());
-			Writer.AddString("Value", MobHeadEntity.GetOwnerTexture());
-			Writer.EndCompound();
-			Writer.EndList();
-			Writer.EndCompound();
-			Writer.EndCompound();
-			break;
-		}
-
-		case E_BLOCK_FLOWER_POT:
-		{
-			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
-			Writer.AddInt("x", FlowerPotEntity.GetPosX());
-			Writer.AddInt("y", FlowerPotEntity.GetPosY());
-			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
-			Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
-			Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
-			Writer.AddString("id", "FlowerPot");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
-
-		case E_BLOCK_MOB_SPAWNER:
-		{
-			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
-			Writer.AddInt("x", MobSpawnerEntity.GetPosX());
-			Writer.AddInt("y", MobSpawnerEntity.GetPosY());
-			Writer.AddInt("z", MobSpawnerEntity.GetPosZ());
-			Writer.BeginCompound("SpawnData");
-				Writer.AddString("id", "minecraft:" + cMonster::MobTypeToVanillaNBT(MobSpawnerEntity.GetEntity()));
-			Writer.EndCompound();
-			Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
-			Writer.AddString("id", "MobSpawner");
-			break;
-		}
-
-		default:
-		{
-			break;
-		}
-	}
-
-	Writer.Finish();
-	a_Pkt.WriteBuf(Writer.GetResult());
-}
-
-
-
-
-
 void cProtocol_1_11_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -536,6 +415,42 @@ void cProtocol_1_11_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int
 	Pkt.WriteBEInt32(a_FadeInTicks);
 	Pkt.WriteBEInt32(a_DisplayTicks);
 	Pkt.WriteBEInt32(a_FadeOutTicks);
+}
+
+
+
+
+
+void cProtocol_1_11_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	Byte Action;
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case E_BLOCK_ENCHANTMENT_TABLE: Action = 0;  break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
+		case E_BLOCK_END_PORTAL:        Action = 0;  break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
+
+		case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
+		case E_BLOCK_BEACON:            Action = 3;  break;  // Update beacon entity
+		case E_BLOCK_HEAD:              Action = 4;  break;  // Update mobhead entity
+		case E_BLOCK_FLOWER_POT:        Action = 5;  break;  // Update flower pot
+		case E_BLOCK_WALL_BANNER:
+		case E_BLOCK_STANDING_BANNER:   Action = 6;  break;  // Update banner
+		case E_BLOCK_BED:               Action = 11; break;  // Update bed color (new!)
+
+		default: return;  // Block entities change between versions
+	}
+
+	cPacketizer Pkt(*this, pktUpdateBlockEntity);
+	Pkt.WriteXYZPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
+	Pkt.WriteBEUInt8(Action);
+
+	cFastNBTWriter Writer;
+	WriteBlockEntity(Writer, a_BlockEntity);
+	Writer.Finish();
+	Pkt.WriteBuf(Writer.GetResult());
 }
 
 
@@ -625,6 +540,39 @@ void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorZ);
 	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16), HandIntToEnum(Hand));
+}
+
+
+
+
+
+void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity)
+{
+	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
+
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case E_BLOCK_BED:
+		{
+			auto & BedEntity = static_cast<const cBedEntity &>(a_BlockEntity);
+			a_Writer.AddInt("color", BedEntity.GetColor());  // New: multicoloured beds
+			break;
+		}
+
+		case E_BLOCK_MOB_SPAWNER:
+		{
+			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
+			a_Writer.BeginCompound("SpawnData");
+				a_Writer.AddString("id", cMonster::MobTypeToVanillaNBT(MobSpawnerEntity.GetEntity()));  // New: uses namespaced ID
+			a_Writer.EndCompound();
+			a_Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
+			break;
+		}
+
+		default: Super::WriteBlockEntity(a_Writer, a_BlockEntity);
+	}
 }
 
 

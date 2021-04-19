@@ -541,26 +541,26 @@ void cMonster::HandleFalling()
 
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
-	int PosY = POSY_TOINT;
-	PosY = Clamp(PosY, 0, cChunkDef::Height);
+	auto Position = GetPosition().Floor();
+	Position.y = Clamp(Position.y, 0, cChunkDef::Height);
 
-	if (!cBlockInfo::IsSolid(m_World->GetBlock(FloorC(a_PosX), PosY, FloorC(a_PosZ))))
+	if (!cBlockInfo::IsSolid(m_World->GetBlock(Position)))
 	{
-		while (!cBlockInfo::IsSolid(m_World->GetBlock(FloorC(a_PosX), PosY, FloorC(a_PosZ))) && (PosY > 0))
+		while (!cBlockInfo::IsSolid(m_World->GetBlock(Position)) && (Position.y > 0))
 		{
-			PosY--;
+			Position.y--;
 		}
 
-		return PosY + 1;
+		return Position.y + 1;
 	}
 	else
 	{
-		while ((PosY < cChunkDef::Height) && cBlockInfo::IsSolid(m_World->GetBlock(static_cast<int>(floor(a_PosX)), PosY, static_cast<int>(floor(a_PosZ)))))
+		while ((Position.y < cChunkDef::Height) && cBlockInfo::IsSolid(m_World->GetBlock(Position)))
 		{
-			PosY++;
+			Position.y++;
 		}
 
-		return PosY;
+		return Position.y;
 	}
 }
 
@@ -1521,7 +1521,7 @@ void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short
 {
 	if (GetRandomProvider().RandBool(a_Chance / 100.0))
 	{
-		a_Drops.push_back(cItem(a_Item, 1, a_ItemHealth));
+		a_Drops.emplace_back(a_Item, 1, a_ItemHealth);
 	}
 }
 

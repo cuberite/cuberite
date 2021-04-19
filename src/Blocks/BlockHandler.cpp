@@ -7,6 +7,7 @@
 #include "BlockPluginInterface.h"
 #include "BlockAir.h"
 #include "BlockAnvil.h"
+#include "BlockBanner.h"
 #include "BlockBed.h"
 #include "BlockBigFlower.h"
 #include "BlockBookShelf.h"
@@ -48,6 +49,7 @@
 #include "BlockGrass.h"
 #include "BlockGravel.h"
 #include "BlockHopper.h"
+#include "BlockHugeMushroom.h"
 #include "BlockIce.h"
 #include "BlockJukebox.h"
 #include "BlockLadder.h"
@@ -236,7 +238,7 @@ namespace
 	constexpr cDefaultBlockHandler            BlockChorusPlantHandler           (E_BLOCK_CHORUS_PLANT);
 	constexpr cDefaultOreHandler              BlockClayHandler                  (E_BLOCK_CLAY);
 	constexpr cDefaultOreHandler              BlockCoalOreHandler               (E_BLOCK_COAL_ORE);
-	constexpr cBlockStoneHandler              BlockCobblestoneHandler           (E_BLOCK_COBBLESTONE);
+	constexpr cDefaultBlockHandler            BlockCobblestoneHandler           (E_BLOCK_COBBLESTONE);
 	constexpr cBlockStairsHandler             BlockCobblestoneStairsHandler     (E_BLOCK_COBBLESTONE_STAIRS);
 	constexpr cDefaultBlockHandler            BlockCobblestoneWallHandler       (E_BLOCK_COBBLESTONE_WALL);
 	constexpr cBlockCobWebHandler             BlockCobwebHandler                (E_BLOCK_COBWEB);
@@ -296,8 +298,8 @@ namespace
 	constexpr cBlockMobHeadHandler            BlockHeadHandler                  (E_BLOCK_HEAD);
 	constexpr cBlockPressurePlateHandler      BlockHeavyWeightedPressurePHandler(E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE);
 	constexpr cBlockHopperHandler             BlockHopperHandler                (E_BLOCK_HOPPER);
-	constexpr cDefaultBlockHandler            BlockHugeBrownMushroomHandler     (E_BLOCK_HUGE_BROWN_MUSHROOM);
-	constexpr cDefaultBlockHandler            BlockHugeRedMushroomHandler       (E_BLOCK_HUGE_RED_MUSHROOM);
+	constexpr cBlockHugeMushroomHandler       BlockHugeBrownMushroomHandler     (E_BLOCK_HUGE_BROWN_MUSHROOM);
+	constexpr cBlockHugeMushroomHandler       BlockHugeRedMushroomHandler       (E_BLOCK_HUGE_RED_MUSHROOM);
 	constexpr cBlockIceHandler                BlockIceHandler                   (E_BLOCK_ICE);
 	constexpr cBlockComparatorHandler         BlockInactiveComparatorHandler    (E_BLOCK_INACTIVE_COMPARATOR);
 	constexpr cBlockInfestedHandler           BlockInfestedBlockHandler         (E_BLOCK_SILVERFISH_EGG);
@@ -411,7 +413,7 @@ namespace
 	constexpr cDefaultBlockHandler            BlockStainedClayHandler           (E_BLOCK_STAINED_CLAY);
 	constexpr cBlockGlassHandler              BlockStainedGlassHandler          (E_BLOCK_STAINED_GLASS);
 	constexpr cBlockGlassHandler              BlockStainedGlassPaneHandler      (E_BLOCK_STAINED_GLASS_PANE);
-	constexpr cDefaultBlockHandler            BlockStandingBannerHandler        (E_BLOCK_STANDING_BANNER);  // TODO: drops correct?
+	constexpr cBlockBannerHandler             BlockStandingBannerHandler        (E_BLOCK_STANDING_BANNER);
 	constexpr cBlockLavaHandler               BlockStationaryLavaHandler        (E_BLOCK_STATIONARY_LAVA);
 	constexpr cBlockWaterHandler              BlockStationaryWaterHandler       (E_BLOCK_STATIONARY_WATER);
 	constexpr cBlockPistonHandler             BlockStickyPistonHandler          (E_BLOCK_STICKY_PISTON);
@@ -432,7 +434,7 @@ namespace
 	constexpr cBlockTripwireHandler           BlockTripwireHandler              (E_BLOCK_TRIPWIRE);
 	constexpr cBlockTripwireHookHandler       BlockTripwireHookHandler          (E_BLOCK_TRIPWIRE_HOOK);
 	constexpr cBlockVineHandler               BlockVinesHandler                 (E_BLOCK_VINES);
-	constexpr cDefaultBlockHandler            BlockWallBannerHandler            (E_BLOCK_WALL_BANNER);  // TODO: drops correct?
+	constexpr cBlockBannerHandler             BlockWallBannerHandler            (E_BLOCK_WALL_BANNER);
 	constexpr cBlockWallSignHandler           BlockWallsignHandler              (E_BLOCK_WALLSIGN);
 	constexpr cBlockWaterHandler              BlockWaterHandler                 (E_BLOCK_WATER);
 	constexpr cBlockGlazedTerracottaHandler   BlockWhiteGlazedTerracottaHandler (E_BLOCK_WHITE_GLAZED_TERRACOTTA);
@@ -493,14 +495,7 @@ void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector
 		return;
 	}
 
-	if (DoesDropOnUnsuitable())
-	{
-		a_ChunkInterface.DropBlockAsPickups(a_BlockPos);
-	}
-	else
-	{
-		a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_AIR, 0);
-	}
+	a_ChunkInterface.DropBlockAsPickups(a_BlockPos);
 }
 
 
@@ -521,9 +516,8 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i
 
 
 
-cItems cBlockHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const
+cItems cBlockHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const
 {
-	UNUSED(a_Digger);
 	UNUSED(a_Tool);
 
 	// Add self:
@@ -564,15 +558,6 @@ bool cBlockHandler::IsClickedThrough(void) const
 bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const
 {
 	return (m_BlockType == E_BLOCK_AIR);
-}
-
-
-
-
-
-bool cBlockHandler::DoesDropOnUnsuitable(void) const
-{
-	return true;
 }
 
 

@@ -31,7 +31,7 @@ public:
 	virtual ~cDeadlockDetect() override;
 
 	/** Starts the detection. Hides cIsThread's Start, because we need some initialization */
-	bool Start(int a_IntervalSec);
+	void Start(int a_IntervalSec);
 
 	/** Adds the critical section for tracking.
 	Tracked CSs are listed, together with ownership details, when a deadlock is detected.

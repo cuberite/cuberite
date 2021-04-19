@@ -1569,6 +1569,128 @@ end
 					},
 					Notes = "Sends a BlockChange packet to the client. This can be used to create fake blocks only for that player.",
 				},
+				SendBossBarAdd =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+						{
+							Name = "Title",
+							Type = "cCompositeChat",
+						},
+						{
+							Name = "FractionFilled",
+							Type = "number",
+						},
+						{
+							Name = "Colour",
+							Type = "BossBarColor",
+						},
+						{
+							Name = "DivisionType",
+							Type = "BossBarDivisionType",
+						},
+						{
+							Name = "DarkenSky",
+							Type = "boolean",
+						},
+						{
+							Name = "PlayEndMusic",
+							Type = "boolean",
+						},
+						{
+							Name = "CreateFog",
+							Type = "boolean",
+						},
+					},
+					Notes = "Creates a boss bar on the client's UI. The boss bar is independent of any entity and has a lifetime and properties fully controlled by the plugin. Plugins are responsible for assigning a unique ID and removal.",
+				},
+				SendBossBarUpdateFlags =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+						{
+							Name = "DarkenSky",
+							Type = "boolean",
+						},
+						{
+							Name = "PlayEndMusic",
+							Type = "boolean",
+						},
+						{
+							Name = "CreateFog",
+							Type = "boolean",
+						},
+					},
+					Notes = "Updates a boss bar on the client's UI. Only updates some meta flags for additional effects.",
+				},
+				SendBossBarUpdateStyle =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+						{
+							Name = "Color",
+							Type = "BossBarColor",
+						},
+						{
+							Name = "DivisionType",
+							Type = "BossBarDivisionType",
+						},
+					},
+					Notes = "Updates a boss bar on the client's UI. Only updates the visuals of the Boss Bar.",
+				},
+				SendBossBarUpdateTitle =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+						{
+							Name = "Title",
+							Type = "cCompositeChat",
+						},
+					},
+					Notes = "Updates a boss bar on the client's UI. Only Updates the text at the top.",
+				},
+				SendBossBarRemove =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+					},
+					Notes = "Removes the boss bar with the given ID from the client's UI.",
+				},
+				SendBossBarUpdateHealth =
+				{
+					Params =
+					{
+						{
+							Name = "UniqueID",
+							Type = "number",
+						},
+						{
+							Name = "FractionFilled",
+							Type = "number",
+						},
+					},
+					Notes = "Updates the health displayed by the boss bar with the given ID.",
+				},
 				SendEntityAnimation =
 				{
 					Params =
@@ -1748,7 +1870,7 @@ end
 							Type = "number",
 						},
 						{
-							Name = "TimeOfDay",
+							Name = "WorldDate",
 							Type = "number",
 						},
 						{
@@ -1756,7 +1878,7 @@ end
 							Type = "boolean",
 						},
 					},
-					Notes = "Sends the specified time update to the client. WorldAge is the total age of the world, in ticks. TimeOfDay is the current day's time, in ticks (0 - 24000). DoDaylightCycle is a bool that specifies whether the client should automatically move the sun (true) or keep it in the same place (false).",
+					Notes = "Sends the specified time update to the client. WorldAge is the total age of the world, in ticks. WorldDate is the current date, in ticks, and is used by the client to calculate the days elapsed (F3 debug overlay's day count) and the time of day (rendered sun position). DoDaylightCycle is a bool that specifies whether the client should automatically move the sun (true) or keep it in the same place (false).",
 				},
 				SetClientBrand =
 				{
@@ -3948,6 +4070,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns true if the entity is sprinting. Entities that cannot sprint return always false",
+				},
+				IsElytraFlying =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is flying with an elytra. Entities that cannot fly with an elytra return always false",
 				},
 				IsSubmerged =
 				{
@@ -10433,16 +10565,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the player's current set of skin part flags.  This is a bitwise OR of various {{Globals#eSkinPart|eSkinPart}} constants.  Note that HasSkinPart may be easier to use in most situations.",
 				},
-				GetStance =
-				{
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the player's stance (Y-pos of player's eyes)",
-				},
 				GetTeam =
 				{
 					Returns =
@@ -11172,6 +11294,17 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the skin part flags of the player.  The value should be a bitwise OR of several {{Globals#eSkinPart|eSkinPart}} constants.",
+				},
+				SetElytraFlight =
+				{
+					Params =
+					{
+						{
+							Name = "IsElytraFlying",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether the player is elytra flying or not.",
 				},
 				SetSprintingMaxSpeed =
 				{
@@ -13138,6 +13271,242 @@ end
 			},  -- ConstantGroups
 		},  -- cWindow
 
+		BannerPattern =
+		{
+			Desc = [[
+				An enumeration of banner patterns.
+			]],
+			Constants =
+			{
+				BottomStripe =
+				{
+					Notes = "A base pattern."
+				},
+				TopStripe =
+				{
+					Notes = "A chief pattern."
+				},
+				LeftStripe =
+				{
+					Notes = "A pale dexter pattern."
+				},
+				RightStripe =
+				{
+					Notes = "A pale sinister pattern."
+				},
+				CenterStripeVertical =
+				{
+					Notes = "A pale pattern."
+				},
+				MiddleStripeHorizontal =
+				{
+					Notes = "A fess pattern."
+				},
+				DownRightStripe =
+				{
+					Notes = "A bend pattern."
+				},
+				DownLeftStripe =
+				{
+					Notes = "A bend sinister pattern."
+				},
+				SmallVerticalStripes =
+				{
+					Notes = "A paly pattern."
+				},
+				DiagonalCross =
+				{
+					Notes = "A saltire pattern."
+				},
+				SquareCross =
+				{
+					Notes = "A cross pattern."
+				},
+				LeftOfDiagonal =
+				{
+					Notes = "A per bend sinister pattern."
+				},
+				RightOfUpsideDownDiagonal =
+				{
+					Notes = "A per bend pattern."
+				},
+				LeftOfUpsideDownDiagonal =
+				{
+					Notes = "A per bend inverted pattern."
+				},
+				RightOfDiagonal =
+				{
+					Notes = "A per bend sinister inverted pattern."
+				},
+				VerticalHalfLeft =
+				{
+					Notes = "A per pale pattern."
+				},
+				VerticalHalfRight =
+				{
+					Notes = "A per pale inverted pattern."
+				},
+				HorizontalHalfTop =
+				{
+					Notes = "A per fess pattern."
+				},
+				HorizontalHalfBottom =
+				{
+					Notes = "A per fess inverted pattern."
+				},
+				BottomLeftCorner =
+				{
+					Notes = "A base dexter canton pattern."
+				},
+				BottomRightCorner =
+				{
+					Notes = "A base sinister canton pattern."
+				},
+				TopLeftCorner =
+				{
+					Notes = "A chief dexter canton pattern."
+				},
+				TopRightCorner =
+				{
+					Notes = "A chief sinister canton pattern."
+				},
+				BottomTriangle =
+				{
+					Notes = "A chevron pattern."
+				},
+				TopTriangle =
+				{
+					Notes = "An inverted chevron pattern."
+				},
+				BottomTriangleSawtooth =
+				{
+					Notes = "A base indented pattern."
+				},
+				TopTriangleSawtooth =
+				{
+					Notes = "A chief indented pattern."
+				},
+				MiddleCircle =
+				{
+					Notes = "A roundel pattern."
+				},
+				MiddleRhombus =
+				{
+					Notes = "A lozenge pattern."
+				},
+				Border =
+				{
+					Notes = "A bordure pattern."
+				},
+				CurlyBorder =
+				{
+					Notes = "A bordure indented pattern."
+				},
+				Brick =
+				{
+					Notes = "A field masoned pattern."
+				},
+				Gradient =
+				{
+					Notes = "A gradient pattern."
+				},
+				GradientUpsideDown =
+				{
+					Notes = "A base gradient pattern."
+				},
+				Creeper =
+				{
+					Notes = "A creeper charge pattern."
+				},
+				Skull =
+				{
+					Notes = "A skull charge pattern."
+				},
+				Flower =
+				{
+					Notes = "A flower charge pattern."
+				},
+				Mojang =
+				{
+					Notes = "A... thing."
+				},
+				Globe =
+				{
+					Notes = "A globe."
+				},
+				Piglin =
+				{
+					Notes = "A snoot."
+				},
+			},
+		},
+		BossBarColor =
+		{
+			Desc = [[
+				An enumeration of boss bar display colours which can be used with {{cClientHandle#SendBossBarAdd|SendBossBarAdd}}.
+			]],
+			Constants =
+			{
+				Pink =
+				{
+					Notes = "A pink boss bar."
+				},
+				Blue =
+				{
+					Notes = "A blue boss bar."
+				},
+				Red =
+				{
+					Notes = "A red boss bar."
+				},
+				Green =
+				{
+					Notes = "A green boss bar."
+				},
+				Yellow =
+				{
+					Notes = "A yellow boss bar."
+				},
+				Purple =
+				{
+					Notes = "A purple boss bar."
+				},
+				White =
+				{
+					Notes = "A white boss bar."
+				},
+			},
+		},
+		BossBarDivisionType =
+		{
+			Desc = [[
+				An enumeration of boss bar division types which can be used with {{cClientHandle#SendBossBarAdd|SendBossBarAdd}}.
+				These constants control the number of notches the bar itself renders with.
+			]],
+			Constants =
+			{
+				None =
+				{
+					Notes = "A completely smooth boss bar."
+				},
+				SixNotches =
+				{
+					Notes = "A six-notch'd boss bar."
+				},
+				TenNotches =
+				{
+					Notes = "A ten-notch'd boss bar."
+				},
+				TwelveNotches =
+				{
+					Notes = "A twelve notch'd boss bar."
+				},
+				TwentyNotches =
+				{
+					Notes = "A twenty notch'd boss bar."
+				},
+			},
+		},
 		EffectID =
 		{
 			Desc = [[
@@ -17016,6 +17385,58 @@ end
 				E_META_SPONGE_WET =
 				{
 					Notes = "A flag in the metadata of sponges that indicates that the sponge is wet.",
+				},
+				E_META_MUSHROOM_ALL_SIDES  =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on all sides.",
+				},
+				E_META_MUSHROOM_NORTH_WEST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the pore texture on north and west side.",
+				},
+				E_META_MUSHROOM_NORTH =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on north side.",
+				},
+				E_META_MUSHROOM_NORTH_EAST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on north and east side.",
+				},
+				E_META_MUSHROOM_WEST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on west side.",
+				},
+				E_META_MUSHROOM_CENTER =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on top.",
+				},
+				E_META_MUSHROOM_EAST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on east side.",
+				},
+				E_META_MUSHROOM_SOUTH_WEST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on south and west side.",
+				},
+				E_META_MUSHROOM_SOUTH =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on south side.",
+				},
+				E_META_MUSHROOM_SOUTH_EAST =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on south and east side.",
+				},
+				E_META_MUSHROOM_STEM =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the stem texture on all sides but not on top and bottom.",
+				},
+				E_META_MUSHROOM_CAP =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the outside texture on all sides.",
+				},
+				E_META_MUSHROOM_FULL_STEM =
+				{
+					Notes = "A flag in the metadata of mushroom blocks to display the stem texture on all sides.",
 				},
 				esBed =
 				{

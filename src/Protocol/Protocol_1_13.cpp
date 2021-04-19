@@ -23,11 +23,13 @@ Implements the 1.13 protocol classes:
 
 #include "../Mobs/IncludeAllMonsters.h"
 
+#include "../CompositeChat.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
 #include "../JsonUtils.h"
+#include "../WorldStorage/FastNBT.h"
 
 #include "../Bindings/PluginManager.h"
 
@@ -199,13 +201,13 @@ void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results)
 void cProtocol_1_13::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	cPacketizer Pkt(*this, pktUpdateBlockEntity);
 
-	Pkt.WriteXYZPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
-
-	Byte Action = 0;
+	Byte Action;
 	switch (a_BlockEntity.GetBlockType())
 	{
+		case E_BLOCK_ENCHANTMENT_TABLE: Action = 0; break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
+		case E_BLOCK_END_PORTAL:        Action = 0; break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
+
 		case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
 		case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
 		case E_BLOCK_BEACON:            Action = 3;  break;  // Update beacon entity
@@ -219,14 +221,17 @@ void cProtocol_1_13::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 		// case E_BLOCK_SHULKER_BOX:    Action = 10; break;  // sets shulker box - not used just here if anyone is confused from reading the protocol wiki
 		case E_BLOCK_BED:               Action = 11; break;  // Update bed color
 
-		case E_BLOCK_ENCHANTMENT_TABLE: Action = 0; break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
-		case E_BLOCK_END_PORTAL:        Action = 0; break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
-
-		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
+		default: return;  // Block entities change between versions
 	}
+
+	cPacketizer Pkt(*this, pktUpdateBlockEntity);
+	Pkt.WriteXYZPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
 	Pkt.WriteBEUInt8(Action);
 
-	WriteBlockEntity(Pkt, a_BlockEntity);
+	cFastNBTWriter Writer;
+	WriteBlockEntity(Writer, a_BlockEntity);
+	Writer.Finish();
+	Pkt.WriteBuf(Writer.GetResult());
 }
 
 
@@ -465,7 +470,6 @@ UInt32 cProtocol_1_13::GetProtocolMobType(eMonsterType a_MobType)
 		case mtZombieVillager:        return 89;
 		default:                      return 0;
 	}
-	UNREACHABLE("Unsupported mob type");
 }
 
 
@@ -1337,6 +1341,96 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_13_1:
+
+void cProtocol_1_13_1::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(0);  // Add
+	Pkt.WriteString(a_Title.CreateJsonString());
+	Pkt.WriteBEFloat(a_FractionFilled);
+	Pkt.WriteVarInt32([a_Color]
+	{
+		switch (a_Color)
+		{
+			case BossBarColor::Pink: return 0U;
+			case BossBarColor::Blue: return 1U;
+			case BossBarColor::Red: return 2U;
+			case BossBarColor::Green: return 3U;
+			case BossBarColor::Yellow: return 4U;
+			case BossBarColor::Purple: return 5U;
+			case BossBarColor::White: return 6U;
+		}
+		UNREACHABLE("Unsupported boss bar property");
+	}());
+	Pkt.WriteVarInt32([a_DivisionType]
+	{
+		switch (a_DivisionType)
+		{
+			case BossBarDivisionType::None: return 0U;
+			case BossBarDivisionType::SixNotches: return 1U;
+			case BossBarDivisionType::TenNotches: return 2U;
+			case BossBarDivisionType::TwelveNotches: return 3U;
+			case BossBarDivisionType::TwentyNotches: return 4U;
+		}
+		UNREACHABLE("Unsupported boss bar property");
+	}());
+	{
+		UInt8 Flags = 0x00;
+		if (a_DarkenSky)
+		{
+			Flags |= 0x01;
+		}
+		if (a_PlayEndMusic)
+		{
+			Flags |= 0x02;
+		}
+		if (a_CreateFog)
+		{
+			Flags |= 0x04;  // Only difference to 1.9 is fog now a separate flag
+		}
+		Pkt.WriteBEUInt8(Flags);
+	}
+}
+
+
+
+
+
+void cProtocol_1_13_1::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(5);  // Update Flags
+	{
+		UInt8 Flags = 0x00;
+		if (a_DarkenSky)
+		{
+			Flags |= 0x01;
+		}
+		if (a_PlayEndMusic)
+		{
+			Flags |= 0x02;
+		}
+		if (a_CreateFog)
+		{
+			Flags |= 0x04;  // Only difference to 1.9 is fog now a separate flag
+		}
+		Pkt.WriteBEUInt8(Flags);
+	}
+}
+
+
+
+
 
 cProtocol::Version cProtocol_1_13_1::GetProtocolVersion()
 {

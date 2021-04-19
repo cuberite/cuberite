@@ -4,6 +4,7 @@
 // Implements the cBlockEntity class that is the common ancestor for all block entities
 
 #include "Globals.h"
+#include "BannerEntity.h"
 #include "BeaconEntity.h"
 #include "BedEntity.h"
 #include "BlockEntity.h"
@@ -77,6 +78,11 @@ OwnedBlockEntity cBlockEntity::CreateByBlockType(const BLOCKTYPE a_BlockType, co
 {
 	switch (a_BlockType)
 	{
+		// Banners:
+		case E_BLOCK_STANDING_BANNER:
+		case E_BLOCK_WALL_BANNER:       return std::make_unique<cBannerEntity         >(a_BlockType, a_BlockMeta, a_Pos, a_World);
+
+		// Others:
 		case E_BLOCK_BEACON:            return std::make_unique<cBeaconEntity         >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_BED:               return std::make_unique<cBedEntity            >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_BREWING_STAND:     return std::make_unique<cBrewingstandEntity   >(a_BlockType, a_BlockMeta, a_Pos, a_World);
@@ -144,7 +150,9 @@ bool cBlockEntity::IsBlockEntityBlockType(const BLOCKTYPE a_BlockType)
 		case E_BLOCK_MOB_SPAWNER:
 		case E_BLOCK_NOTE_BLOCK:
 		case E_BLOCK_SIGN_POST:
+		case E_BLOCK_STANDING_BANNER:
 		case E_BLOCK_TRAPPED_CHEST:
+		case E_BLOCK_WALL_BANNER:
 		case E_BLOCK_WALLSIGN:
 		{
 			return true;

@@ -237,7 +237,7 @@ class cMojangAPI::cUpdateThread:
 public:
 
 	cUpdateThread(cMojangAPI & a_MojangAPI):
-		Super("cMojangAPI::cUpdateThread"),
+		Super("MojangAPI Updater"),
 		m_MojangAPI(a_MojangAPI)
 	{
 	}

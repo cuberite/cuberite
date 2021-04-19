@@ -44,12 +44,14 @@ set (GENERATING_SRCS
 	${PROJECT_SOURCE_DIR}/src/Generating/DistortedHeightmap.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/DungeonRoomsFinisher.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/EndGen.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/EnderDragonFightStructuresGen.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/FinishGen.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/GridStructGen.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/HeiGen.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/MineShafts.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/Noise3DGenerator.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/PieceGeneratorBFSTree.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/PieceModifier.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/PiecePool.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/PieceStructuresGen.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/Prefab.cpp
@@ -118,6 +120,7 @@ set (GENERATING_HDRS
 	${PROJECT_SOURCE_DIR}/src/Generating/MineShafts.h
 	${PROJECT_SOURCE_DIR}/src/Generating/Noise3DGenerator.h
 	${PROJECT_SOURCE_DIR}/src/Generating/PieceGeneratorBFSTree.h
+	${PROJECT_SOURCE_DIR}/src/Generating/PieceModifier.h
 	${PROJECT_SOURCE_DIR}/src/Generating/PiecePool.h
 	${PROJECT_SOURCE_DIR}/src/Generating/PieceStructuresGen.h
 	${PROJECT_SOURCE_DIR}/src/Generating/Prefab.h

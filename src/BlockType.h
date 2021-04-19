@@ -712,6 +712,21 @@ enum ENUM_BLOCK_META : NIBBLETYPE
 	E_META_LEAVES_BIRCH_CHECK_DECAY   = 10,
 	E_META_LEAVES_JUNGLE_CHECK_DECAY  = 11,
 
+	// E_BLOCK_MUSHROOM metas:
+	E_META_MUSHROOM_ALL_SIDES  = 0,
+	E_META_MUSHROOM_NORTH_WEST = 1,
+	E_META_MUSHROOM_NORTH      = 2,
+	E_META_MUSHROOM_NORTH_EAST = 3,
+	E_META_MUSHROOM_WEST       = 4,
+	E_META_MUSHROOM_CENTER     = 5,
+	E_META_MUSHROOM_EAST       = 6,
+	E_META_MUSHROOM_SOUTH_WEST = 7,
+	E_META_MUSHROOM_SOUTH      = 8,
+	E_META_MUSHROOM_SOUTH_EAST = 9,
+	E_META_MUSHROOM_STEM       = 10,
+	E_META_MUSHROOM_CAP        = 14,
+	E_META_MUSHROOM_FULL_STEM  = 15,
+
 	// E_BLOCK_LEAVES meta cont. (Block ID 161):
 	E_META_NEWLEAVES_ACACIA               = 0,
 	E_META_NEWLEAVES_DARK_OAK             = 1,
@@ -1166,36 +1181,3 @@ extern AString ItemToFullString(const cItem & a_Item);
 extern cItem GetIniItemSet(cIniFile & a_IniFile, const char * a_Section, const char * a_Key, const char * a_Default);
 
 // tolua_end
-
-
-
-
-
-/** Base case for IsOneOf to handle empty template aguments. */
-template <class = void>
-bool IsOneOf(BLOCKTYPE a_BlockType)
-{
-	return false;
-}
-
-
-/** Returns true if a_BlockType is equal to any of the variadic template arguments.
-Some example usage:
-\code
-	IsOneOf<>(E_BLOCK_AIR)                           == false
-	IsOneOf<E_BLOCK_AIR>(E_BLOCK_DIRT)               == false
-	IsOneOf<E_BLOCK_AIR, E_BLOCK_DIRT>(E_BLOCK_DIRT) == true
-\endcode
-The implementation is ugly but it is equivalent to this C++17 fold expression:
-\code
-	((a_BlockType == Types) || ...)
-\endcode
-Just written to be valid without fold expressions or SFINAE. */
-template <BLOCKTYPE Head, BLOCKTYPE ... Tail>
-bool IsOneOf(BLOCKTYPE a_BlockType)
-{
-	return ((a_BlockType == Head) || (IsOneOf<Tail...>(a_BlockType)));
-}
-
-
-

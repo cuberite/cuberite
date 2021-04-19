@@ -19,6 +19,9 @@
 protocol version instance and redirects everything to it. */
 class cMultiVersionProtocol
 {
+	// Work around the style checker complaining about && in template.
+	using OwnedContiguousByteBuffer = ContiguousByteBuffer &&;
+
 public:
 
 	cMultiVersionProtocol();
@@ -39,7 +42,7 @@ public:
 	}
 
 	/** The function that's responsible for processing incoming protocol data. */
-	std::function<void(cClientHandle &, std::string_view)> HandleIncomingData;
+	std::function<void(cClientHandle &, OwnedContiguousByteBuffer)> HandleIncomingData;
 
 	/** Sends a disconnect to the client as a result of a recognition error.
 	This function can be used to disconnect before any protocol has been recognised. */
@@ -50,14 +53,14 @@ private:
 	/** Handles data reception in a newly-created client handle that doesn't yet have a known protocol.
 	a_Data contains a view of data that were just received.
 	Tries to recognize a protocol, populate m_Protocol, and transitions to another mode depending on success. */
-	void HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, std::string_view a_Data);
+	void HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, ContiguousByteBuffer && a_Data);
 
 	/** Handles and responds to unsupported clients sending pings. */
-	void HandleIncomingDataInOldPingResponseStage(cClientHandle & a_Client, std::string_view a_Data);
+	void HandleIncomingDataInOldPingResponseStage(cClientHandle & a_Client, ContiguousByteBufferView a_Data);
 
 	/** Tries to recognize a protocol in the lengthed family (1.7+), based on m_Buffer.
 	Returns a cProtocol_XXX instance if recognized. */
-	std::unique_ptr<cProtocol> TryRecognizeLengthedProtocol(cClientHandle & a_Client, std::string_view a_Data);
+	std::unique_ptr<cProtocol> TryRecognizeLengthedProtocol(cClientHandle & a_Client);
 
 	/** Sends one packet inside a cByteBuffer.
 	This is used only when handling an outdated server ping. */

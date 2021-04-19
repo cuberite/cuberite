@@ -24,6 +24,7 @@ class cMonster;
 class cProjectileEntity;
 class cHangingEntity;
 class cUUID;
+class ChunkBlockData;
 
 
 
@@ -106,6 +107,9 @@ protected:
 	/** Gets chunk data from the correct file; locks file CS as needed */
 	bool GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data);
 
+	/** Copies a_Length bytes of data from the specified NBT Tag's Child into the a_Destination buffer */
+	const std::byte * GetSectionData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, size_t a_Length);
+
 	/** Sets chunk data into the correct file; locks file CS as needed */
 	bool SetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBufferView a_Data);
 
@@ -119,17 +123,17 @@ protected:
 	a_RawChunkData is the raw (compressed) chunk data, used for offloading when chunk loading fails. */
 	bool LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, ContiguousByteBufferView a_RawChunkData);
 
-	/** Loads the chunk's biome map from vanilla-format; returns a_BiomeMap if biomes present and valid, nullptr otherwise */
-	cChunkDef::BiomeMap * LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx);
+	/** Loads the chunk's biome map into a_BiomeMap if biomes present and valid; returns false otherwise. */
+	bool LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx);
 
-	/** Loads the chunk's biome map from MCS format; returns a_BiomeMap if biomes present and valid, nullptr otherwise */
-	cChunkDef::BiomeMap * LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx);
+	/** Loads the chunk's height map into a_HeightMap if heights present and valid; returns false otherwise. */
+	bool LoadHeightMapFromNBT(cChunkDef::HeightMap & a_HeightMap, const cParsedNBT & a_NBT, int a_TagIdx);
 
 	/** Loads the chunk's entities from NBT data (a_Tag is the Level\\Entities list tag; may be -1) */
 	void LoadEntitiesFromNBT(cEntityList & a_Entitites, const cParsedNBT & a_NBT, int a_Tag);
 
 	/** Loads the chunk's BlockEntities from NBT data (a_Tag is the Level\\TileEntities list tag; may be -1) */
-	void LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntitites, const cParsedNBT & a_NBT, int a_Tag, BLOCKTYPE * a_BlockTypes, NIBBLETYPE * a_BlockMetas);
+	void LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntitites, const cParsedNBT & a_NBT, int a_Tag, const ChunkBlockData & a_BlockData);
 
 	/** Loads the data for a block entity from the specified NBT tag.
 	Returns the loaded block entity, or nullptr upon failure. */
@@ -153,6 +157,7 @@ protected:
 	The coordinates are used only for the log message. */
 	bool CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, const AStringVector & a_ExpectedTypes, Vector3i a_Pos);
 
+	OwnedBlockEntity LoadBannerFromNBT           (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
 	OwnedBlockEntity LoadBeaconFromNBT           (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
 	OwnedBlockEntity LoadBedFromNBT              (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
 	OwnedBlockEntity LoadBrewingstandFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
@@ -297,9 +302,6 @@ protected:
 
 	/** Gets the correct MCA file either from cache or from disk, manages the m_MCAFiles cache; assumes m_CS is locked */
 	cMCAFile * LoadMCAFile(const cChunkCoords & a_Chunk);
-
-	/** Copies a_Length bytes of data from the specified NBT Tag's Child into the a_Destination buffer */
-	void CopyNBTData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, char * a_Destination, size_t a_Length);
 
 	// cWSSchema overrides:
 	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override;

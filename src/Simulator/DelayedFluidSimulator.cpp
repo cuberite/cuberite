@@ -32,7 +32,7 @@ bool cDelayedFluidSimulatorChunkData::cSlot::Add(int a_RelX, int a_RelY, int a_R
 			return false;
 		}
 	}  // for itr - Blocks[]
-	Blocks.push_back(cCoordWithInt(a_RelX, a_RelY, a_RelZ, Index));
+	Blocks.emplace_back(a_RelX, a_RelY, a_RelZ, Index);
 	return true;
 }
 

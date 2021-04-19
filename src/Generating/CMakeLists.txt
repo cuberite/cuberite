@@ -11,12 +11,14 @@ target_sources(
 	DistortedHeightmap.cpp
 	DungeonRoomsFinisher.cpp
 	EndGen.cpp
+	EnderDragonFightStructuresGen.cpp
 	FinishGen.cpp
 	GridStructGen.cpp
 	HeiGen.cpp
 	MineShafts.cpp
 	Noise3DGenerator.cpp
 	PieceGeneratorBFSTree.cpp
+	PieceModifier.cpp
 	PiecePool.cpp
 	PieceStructuresGen.cpp
 	Prefab.cpp
@@ -43,6 +45,7 @@ target_sources(
 	DistortedHeightmap.h
 	DungeonRoomsFinisher.h
 	EndGen.h
+	EnderDragonFightStructuresGen.h
 	FinishGen.h
 	GridStructGen.h
 	HeiGen.h
@@ -50,6 +53,7 @@ target_sources(
 	MineShafts.h
 	Noise3DGenerator.h
 	PieceGeneratorBFSTree.h
+	PieceModifier.h
 	PiecePool.h
 	PieceStructuresGen.h
 	Prefab.h

@@ -71,7 +71,7 @@ public:
 // cServer::cTickThread:
 
 cServer::cTickThread::cTickThread(cServer & a_Server) :
-	Super("ServerTickThread"),
+	Super("Server Ticker"),
 	m_Server(a_Server)
 {
 }
@@ -117,9 +117,7 @@ cServer::cServer(void) :
 	m_MaxPlayers(0),
 	m_bIsHardcore(false),
 	m_TickThread(*this),
-	m_ShouldAuthenticate(false),
-	m_ShouldLoadOfflinePlayerData(false),
-	m_ShouldLoadNamedPlayerData(true)
+	m_ShouldAuthenticate(false)
 {
 	// Initialize the LuaStateTracker singleton before the app goes multithreaded:
 	cLuaStateTracker::GetStats();
@@ -206,8 +204,6 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 
 	m_ShouldAllowMultiWorldTabCompletion = a_Settings.GetValueSetB("Server", "AllowMultiWorldTabCompletion", true);
 	m_ShouldLimitPlayerBlockChanges = a_Settings.GetValueSetB("AntiCheat", "LimitPlayerBlockChanges", true);
-	m_ShouldLoadOfflinePlayerData = a_Settings.GetValueSetB("PlayerData", "LoadOfflinePlayerData", false);
-	m_ShouldLoadNamedPlayerData   = a_Settings.GetValueSetB("PlayerData", "LoadNamedPlayerData", true);
 
 	const auto ClientViewDistance = a_Settings.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
 	if (ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
@@ -411,7 +407,8 @@ bool cServer::Start(void)
 		LOGERROR("Couldn't open any ports. Aborting the server");
 		return false;
 	}
-	return m_TickThread.Start();
+	m_TickThread.Start();
+	return true;
 }
 
 

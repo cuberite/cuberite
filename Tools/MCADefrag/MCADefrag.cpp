@@ -86,7 +86,7 @@ void cMCADefrag::Run(void)
 	// Wait for all the threads to finish:
 	while (!m_Threads.empty())
 	{
-		m_Threads.front()->Wait();
+		m_Threads.front()->Stop();
 		delete m_Threads.front();
 		m_Threads.pop_front();
 	}
@@ -126,7 +126,7 @@ AString cMCADefrag::GetNextFileName(void)
 // cMCADefrag::cThread:
 
 cMCADefrag::cThread::cThread(cMCADefrag & a_Parent) :
-	super("MCADefrag thread"),
+	super("MCA Defragmentor"),
 	m_Parent(a_Parent),
 	m_IsChunkUncompressed(false),
 	m_Compressor(12)  // Set the highest compression factor

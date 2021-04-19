@@ -60,7 +60,6 @@ target_sources(
 	Root.cpp
 	Scoreboard.cpp
 	Server.cpp
-	SetChunkData.cpp
 	SpawnPrepare.cpp
 	Statistics.cpp
 	StringCompression.cpp
@@ -71,7 +70,6 @@ target_sources(
 	World.cpp
 	main.cpp
 
-	AllocationPool.h
 	BiomeDef.h
 	BlockArea.h
 	BlockInServerPluginInterface.h

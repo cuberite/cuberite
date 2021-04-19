@@ -160,6 +160,7 @@ namespace RedstoneWireHandler
 			if (
 				// IsYMTerracingBlocked (i.e. check block above lower terracing position, a.k.a. just the plain adjacent)
 				(!cBlockInfo::IsSolid(LateralBlock) || cBlockInfo::IsTransparent(LateralBlock)) &&
+				(Adjacent.y > 0) &&
 				(NeighbourChunk->GetBlock(Adjacent + OffsetYM) == E_BLOCK_REDSTONE_WIRE)  // Only terrace YM with another wire
 			)
 			{

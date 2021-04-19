@@ -62,6 +62,7 @@ AString cPacketizer::PacketTypeToStr(cProtocol::ePacketType a_PacketType)
 		case cProtocol::pktBlockBreakAnim:         return "pktBlockBreakAnim";
 		case cProtocol::pktBlockChange:            return "pktBlockChange";
 		case cProtocol::pktBlockChanges:           return "pktBlockChanges";
+		case cProtocol::pktBossBar:                return "pktBossBar";
 		case cProtocol::pktCameraSetTo:            return "pktCameraSetTo";
 		case cProtocol::pktChatRaw:                return "pktChatRaw";
 		case cProtocol::pktCollectEntity:          return "pktCollectEntity";
