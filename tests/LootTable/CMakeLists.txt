@@ -28,7 +28,7 @@ add_executable(LootTableParseTest
         )
 
 
-target_link_libraries(jsoncpp_lib)
+target_link_libraries(jsoncpp_static)
 
 link_dependencies(LootTableParseTest)
 target_include_directories(LootTableParseTest SYSTEM PRIVATE
