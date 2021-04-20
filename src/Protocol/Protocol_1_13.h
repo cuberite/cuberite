@@ -46,6 +46,8 @@ protected:
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
 
+	virtual void SendWeather                    (eWeather a_Weather) override {}  // This packet was removed. This keeps players from joining the server with 1.13 while there is downfall
+
 	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata) const;
 	virtual UInt8 GetEntityMetadataID(EntityMetadataType a_FieldType) const;
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const;
