@@ -476,6 +476,7 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 		case biMesaPlateauM:
 		{
 			GetSmallAppleTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			return;
 		}
 		case biMushroomIsland:
 		case biMushroomShore:
@@ -488,6 +489,7 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 			{
 				GetRedMushroomTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
 			}
+			return;
 		}
 		case biDesert:
 		case biDesertHills:
