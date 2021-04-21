@@ -500,7 +500,7 @@ public:
 	/** Gets remaining air of a monster */
 	int GetAirLevel(void) const { return m_AirLevel; }
 
-	/** Gets number of ticks this entity has existed for */
+	/** Gets number of ticks this entity has been alive for */
 	long int GetTicksAlive(void) const { return m_TicksAlive; }
 
 	/** Gets the invulnerable ticks from the entity */
