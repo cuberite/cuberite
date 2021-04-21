@@ -1,5 +1,9 @@
 
-#pragma once
+// StartAsService.h
+
+// Handles startup as a Windows Service or UNIX daemon.
+
+// This file MUST NOT be included from anywhere other than main.cpp.
 
 
 

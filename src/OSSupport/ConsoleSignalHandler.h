@@ -1,5 +1,13 @@
 
-#pragma once
+// ConsoleSignalHandler.h
+
+// Intercepts signals for graceful CTRL-C (and others) handling.
+
+// This file MUST NOT be included from anywhere other than main.cpp.
+
+
+
+
 
 #include <csignal>
 

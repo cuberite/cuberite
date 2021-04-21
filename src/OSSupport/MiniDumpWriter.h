@@ -1,5 +1,11 @@
 
-#pragma once
+// MiniDumpWriter.h
+
+// 32-bit only:
+// When the server crashes, create a "dump file" containing the callstack of each thread and some variables;
+// let the user send us that crash file for analysis.
+
+// This file MUST NOT be included from anywhere other than main.cpp.
 
 
 
@@ -18,7 +24,7 @@ enum class MiniDumpFlags
 
 #if defined(_WIN32) && !defined(_WIN64) && defined(_MSC_VER)  // 32-bit Windows app compiled in MSVC
 
-#include <dbghelp.h>
+#include <DbgHelp.h>
 
 
 
@@ -44,7 +50,6 @@ static LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a
 	char * oldStack;
 
 	// Use the substitute stack:
-	// This code is the reason why we don't support 64-bit (yet)
 	_asm
 	{
 		mov oldStack, esp
@@ -74,9 +79,6 @@ static LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a
 
 
 
-/** Windows 32-bit stuff:
-When the server crashes, create a "dump file" containing the callstack of each thread and some variables;
-let the user send us that crash file for analysis */
 namespace MiniDumpWriter
 {
 	static void Register()

@@ -5,16 +5,14 @@
 #include "BuildInfo.h"
 #include "Logger.h"
 #include "MemorySettingsRepository.h"
+#include "Root.h"
+#include "tclap/CmdLine.h"
+
 #include "OSSupport/ConsoleSignalHandler.h"
 #include "OSSupport/NetworkSingleton.h"
 #include "OSSupport/MiniDumpWriter.h"
 #include "OSSupport/SleepResolutionBooster.h"
 #include "OSSupport/StartAsService.h"
-#include "Root.h"
-#include "tclap/CmdLine.h"
-
-#include <csignal>
-#include <cstdlib>
 
 
 

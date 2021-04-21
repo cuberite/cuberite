@@ -1,5 +1,9 @@
 
-#pragma once
+// SleepResolutionBooster.h
+
+// Increases the accuracy of Sleep on Windows (GH #5140).
+
+// This file MUST NOT be included from anywhere other than main.cpp.
 
 
 
