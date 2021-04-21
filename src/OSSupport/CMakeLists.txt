@@ -2,7 +2,6 @@ target_sources(
 	${CMAKE_PROJECT_NAME} PRIVATE
 
 	CriticalSection.cpp
-	Errors.cpp
 	Event.cpp
 	File.cpp
 	GZipFile.cpp
@@ -19,8 +18,8 @@ target_sources(
 	WinStackWalker.cpp
 
 	AtomicUniquePtr.h
+	ConsoleSignalHandler.h
 	CriticalSection.h
-	Errors.h
 	Event.h
 	File.h
 	GetAddressInfoError.h
@@ -34,6 +33,7 @@ target_sources(
 	NetworkSingleton.h
 	Queue.h
 	ServerHandleImpl.h
+	SleepResolutionBooster.h
 	StackTrace.h
 	StartAsService.h
 	TCPLinkImpl.h
