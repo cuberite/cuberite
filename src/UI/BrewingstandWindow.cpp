@@ -13,8 +13,8 @@
 
 
 
-cBrewingstandWindow::cBrewingstandWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandEntity * a_Brewingstand) :
-	cWindow(wtBrewery, "Brewingstand")
+cBrewingstandWindow::cBrewingstandWindow(cBrewingstandEntity * a_Brewingstand):
+	Super(wtBrewery, "Brewingstand")
 {
 	m_SlotAreas.push_back(new cSlotAreaBrewingstand(a_Brewingstand, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
@@ -36,13 +36,13 @@ void cBrewingstandWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlay
 			// Brewing stand Area
 			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar */
 			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
-			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
+			Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
 		}
 		else
 		{
 			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
 			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar */
-			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+			Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 		}
 	}
 	else
@@ -63,6 +63,6 @@ void cBrewingstandWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlay
 			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
 		}
 
-		super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
 }

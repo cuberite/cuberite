@@ -34,9 +34,10 @@ typedef std::vector<cTCPLinkImplPtr> cTCPLinkImplPtrs;
 class cTCPLinkImpl:
 	public cTCPLink
 {
-	typedef cTCPLink super;
+	using Super = cTCPLink;
 
 public:
+
 	/** Creates a new link based on the given socket.
 	Used for connections accepted in a server using cNetwork::Listen().
 	a_Address and a_AddrLen describe the remote peer that has connected.

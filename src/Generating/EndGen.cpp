@@ -34,151 +34,123 @@ enum
 
 cEndGen::cEndGen(int a_Seed) :
 	m_Seed(a_Seed),
-	m_IslandSizeX(256),
-	m_IslandSizeY(96),
-	m_IslandSizeZ(256),
+	m_Perlin(a_Seed),
+	m_VoidOffsetNoise(a_Seed + 1000),
+	m_AirThresholdMainIsland(0.0f),
+	m_AirThresholdOtherIslands(0.5f),
+	m_MainIslandSize(450),
+	m_BaseHeight(64),
+	m_TerrainTopMultiplier(10),
+	m_TerrainBottomMultiplier(40),
+	m_VoidOffsetNoiseMultiplier(50),
 	m_FrequencyX(80),
 	m_FrequencyY(80),
-	m_FrequencyZ(80),
-	m_MinChunkX(0),
-	m_MaxChunkX(0),
-	m_MinChunkZ(0),
-	m_MaxChunkZ(0),
-	m_LastChunkX(0x7fffffff),  // Use dummy coords that won't ever be used by real chunks
-	m_LastChunkZ(0x7fffffff)
+	m_FrequencyZ(80)
 {
 	m_Perlin.AddOctave(1, 1);
 	m_Perlin.AddOctave(2, 0.5);
 	m_Perlin.AddOctave(4, 0.25);
+
+	m_VoidOffsetNoise.AddOctave(1, 1);
+	m_VoidOffsetNoise.AddOctave(2, 0.5);
+	m_VoidOffsetNoise.AddOctave(4, 0.25);
 }
 
 
 
 
 
-void cEndGen::InitializeCompoGen(cIniFile & a_IniFile)
+void cEndGen::InitializeShapeGen(cIniFile & a_IniFile)
 {
-	m_IslandSizeX = a_IniFile.GetValueSetI("Generator", "EndGenIslandSizeX", m_IslandSizeX);
-	m_IslandSizeY = a_IniFile.GetValueSetI("Generator", "EndGenIslandSizeY", m_IslandSizeY);
-	m_IslandSizeZ = a_IniFile.GetValueSetI("Generator", "EndGenIslandSizeZ", m_IslandSizeZ);
+	m_AirThresholdMainIsland = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "EndGenAirThresholdMainIsland", m_AirThresholdMainIsland));
+	m_AirThresholdOtherIslands = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "EndGenAirThresholdOtherIslands", m_AirThresholdOtherIslands));
+	m_MainIslandSize = a_IniFile.GetValueSetI("Generator", "EndGenMainIslandSize", m_MainIslandSize);
+	m_BaseHeight = a_IniFile.GetValueSetI("Generator", "EndGenBaseHeight", m_BaseHeight);
+	m_TerrainTopMultiplier = a_IniFile.GetValueSetI("Generator", "EndGenTerrainTopMultipler", m_TerrainTopMultiplier);
+	m_TerrainBottomMultiplier = a_IniFile.GetValueSetI("Generator", "EndGenTerrainBottomMultiplier", m_TerrainBottomMultiplier);
+	m_VoidOffsetNoiseMultiplier = a_IniFile.GetValueSetI("Generator", "EndGenVoidOffsetNoiseMultiplier", m_VoidOffsetNoiseMultiplier);
 
 	m_FrequencyX = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "EndGenFrequencyX", m_FrequencyX));
 	m_FrequencyY = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "EndGenFrequencyY", m_FrequencyY));
 	m_FrequencyZ = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "EndGenFrequencyZ", m_FrequencyZ));
-
-	// Recalculate the min and max chunk coords of the island
-	m_MaxChunkX = (m_IslandSizeX + cChunkDef::Width - 1) / cChunkDef::Width;
-	m_MinChunkX = -m_MaxChunkX;
-	m_MaxChunkZ = (m_IslandSizeZ + cChunkDef::Width - 1) / cChunkDef::Width;
-	m_MinChunkZ = -m_MaxChunkZ;
 }
 
 
 
 
 
-void cEndGen::PrepareState(int a_ChunkX, int a_ChunkZ)
+void cEndGen::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape)
 {
-	ASSERT(!IsChunkOutsideRange(a_ChunkX, a_ChunkZ));  // Should be filtered before calling this function
-
-	if ((m_LastChunkX == a_ChunkX) && (m_LastChunkZ == a_ChunkZ))
+	for (size_t i = 0; i < ARRAYCOUNT(a_Shape); i++)
 	{
-		return;
+		a_Shape[i] = 0;
 	}
 
-	m_LastChunkX = a_ChunkX;
-	m_LastChunkZ = a_ChunkZ;
+	NOISE_DATATYPE NoiseData[cChunkDef::Width * cChunkDef::Width];
+	NOISE_DATATYPE VoidOffsetData[cChunkDef::Width * cChunkDef::Width];
+	NOISE_DATATYPE Workspace[cChunkDef::Width * cChunkDef::Width];
+	NOISE_DATATYPE StartX = static_cast<NOISE_DATATYPE>(a_ChunkCoords.m_ChunkX       * cChunkDef::Width) / m_FrequencyX;
+	NOISE_DATATYPE EndX   = static_cast<NOISE_DATATYPE>((a_ChunkCoords.m_ChunkX + 1) * cChunkDef::Width) / m_FrequencyX;
+	NOISE_DATATYPE StartZ = static_cast<NOISE_DATATYPE>(a_ChunkCoords.m_ChunkZ       * cChunkDef::Width) / m_FrequencyZ;
+	NOISE_DATATYPE EndZ   = static_cast<NOISE_DATATYPE>((a_ChunkCoords.m_ChunkZ + 1) * cChunkDef::Width) / m_FrequencyZ;
 
-	GenerateNoiseArray();
-}
+	m_Perlin.Generate2D(NoiseData, cChunkDef::Width, cChunkDef::Width, StartX, EndX, StartZ, EndZ, Workspace);
+	m_VoidOffsetNoise.Generate2D(VoidOffsetData, cChunkDef::Width, cChunkDef::Width, StartX, EndX, StartZ, EndZ, Workspace);
 
-
-
-
-
-void cEndGen::GenerateNoiseArray(void)
-{
-	NOISE_DATATYPE NoiseData[DIM_X * DIM_Y * DIM_Z];  // [x + DIM_X * z + DIM_X * DIM_Z * y]
-	NOISE_DATATYPE Workspace[DIM_X * DIM_Y * DIM_Z];  // [x + DIM_X * z + DIM_X * DIM_Z * y]
-
-	// Generate the downscaled noise:
-	NOISE_DATATYPE StartX = static_cast<NOISE_DATATYPE>(m_LastChunkX       * cChunkDef::Width) / m_FrequencyX;
-	NOISE_DATATYPE EndX   = static_cast<NOISE_DATATYPE>((m_LastChunkX + 1) * cChunkDef::Width) / m_FrequencyX;
-	NOISE_DATATYPE StartZ = static_cast<NOISE_DATATYPE>(m_LastChunkZ       * cChunkDef::Width) / m_FrequencyZ;
-	NOISE_DATATYPE EndZ   = static_cast<NOISE_DATATYPE>((m_LastChunkZ + 1) * cChunkDef::Width) / m_FrequencyZ;
-	NOISE_DATATYPE StartY = 0;
-	NOISE_DATATYPE EndY   = static_cast<NOISE_DATATYPE>(257) / m_FrequencyY;
-	m_Perlin.Generate3D(NoiseData, DIM_X, DIM_Z, DIM_Y, StartX, EndX, StartZ, EndZ, StartY, EndY, Workspace);
-
-	// Add distance:
-	int idx = 0;
-	for (int y = 0; y < DIM_Y; y++)
-	{
-		NOISE_DATATYPE ValY = static_cast<NOISE_DATATYPE>(2 * INTERPOL_Y * y - m_IslandSizeY) / m_IslandSizeY;
-		ValY = ValY * ValY;
-		for (int z = 0; z < DIM_Z; z++)
-		{
-			NOISE_DATATYPE ValZ = static_cast<NOISE_DATATYPE>(m_LastChunkZ * cChunkDef::Width + (z * cChunkDef::Width / (DIM_Z - 1))) / m_IslandSizeZ;
-			ValZ = ValZ * ValZ;
-			for (int x = 0; x < DIM_X; x++)
-			{
-				// NOISE_DATATYPE ValX = StartX + (EndX - StartX) * x / (DIM_X - 1);
-				NOISE_DATATYPE ValX = static_cast<NOISE_DATATYPE>(m_LastChunkX * cChunkDef::Width + (x * cChunkDef::Width / (DIM_X - 1))) / m_IslandSizeX;
-				ValX = ValX * ValX;
-				NoiseData[idx++] += ValX + ValZ + ValY;
-			}  // for x
-		}  // for z
-	}  // for y
-
-	// Upscale into real chunk size:
-	LinearUpscale3DArray(NoiseData, DIM_X, DIM_Z, DIM_Y, m_NoiseArray, INTERPOL_X, INTERPOL_Z, INTERPOL_Y);
-}
-
-
-
-
-
-bool cEndGen::IsChunkOutsideRange(int a_ChunkX, int a_ChunkZ)
-{
-	return (
-		(a_ChunkX < m_MinChunkX) || (a_ChunkX > m_MaxChunkX) ||
-		(a_ChunkZ < m_MinChunkZ) || (a_ChunkZ > m_MaxChunkZ)
-	);
-}
-
-
-
-
-
-void cEndGen::GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape)
-{
-	// If the chunk is outside out range, fill the shape with zeroes:
-	if (IsChunkOutsideRange(a_ChunkX, a_ChunkZ))
-	{
-		for (size_t i = 0; i < ARRAYCOUNT(a_Shape); i++)
-		{
-			a_Shape[i] = 0;
-		}
-		return;
-	}
-
-	PrepareState(a_ChunkX, a_ChunkZ);
-
-	int MaxY = std::min(static_cast<int>(1.75 * m_IslandSizeY + 1), cChunkDef::Height - 1);
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			for (int y = 0; y < MaxY; y++)
+			NOISE_DATATYPE noise = NoiseData[z * cChunkDef::Width + x];
+
+			// The distance from spawn is used to create the void between the main island and the other islands.
+			double distanceFromSpawn = cChunkDef::RelativeToAbsolute({ x, 0, z }, a_ChunkCoords).Length();
+
+			// The main island can get a different airthreshold. This way the other island can be more sparse while the main island
+			// is one big island.
+			if (distanceFromSpawn > m_MainIslandSize)
 			{
-				a_Shape[(x + 16 * z) * 256 + y] = (m_NoiseArray[y * 17 * 17 + z * 17 + z] > 0) ? 1 : 0;
+				if (noise <= m_AirThresholdOtherIslands)
+				{
+					continue;
+				}
+				noise -= m_AirThresholdOtherIslands;
 			}
-			for (int y = MaxY; y < cChunkDef::Height; y++)
+			else
 			{
-				a_Shape[(x + 16 * z) * 256 + y] = 0;
+				if (noise <= m_AirThresholdMainIsland)
+				{
+					continue;
+				}
+				noise -= m_AirThresholdMainIsland;
 			}
-		}  // for x
-	}  // for z
+			NOISE_DATATYPE voidOffset = VoidOffsetData[z * cChunkDef::Width + x];
+
+
+			double maxHeightLimit;
+			if (distanceFromSpawn > m_MainIslandSize * 3)
+			{
+				// The distance from spawn is so big we don't need to calculate the max height anymore.
+				// In fact, if we don't cut it off somewhere there is a chance the maxheight gets too big which
+				// can cause corrupted looking terrain.
+				maxHeightLimit = static_cast<float>(cChunkDef::Height);
+			}
+			else
+			{
+				// Create a void between the main island and the other island using the formula 'x^3 - 3 * x' where x is distance from spawn.
+				double pow = std::pow((distanceFromSpawn - m_MainIslandSize) / m_MainIslandSize, 3);
+				double mult = 3 * ((distanceFromSpawn - m_MainIslandSize) / m_MainIslandSize);
+				maxHeightLimit = Clamp((pow - mult) * 100 + static_cast<double>(voidOffset) * m_VoidOffsetNoiseMultiplier, 0.0, static_cast<double>(cChunkDef::Height));
+			}
+			int maxHeight = static_cast<int>(Clamp(m_BaseHeight + static_cast<double>(noise) * m_TerrainTopMultiplier, 0.0, maxHeightLimit));
+			int minHeight = static_cast<int>(Clamp(m_BaseHeight - static_cast<double>(noise) * m_TerrainBottomMultiplier, 0.0, static_cast<double>(cChunkDef::Height)));
+
+			for (int y = minHeight; y < maxHeight; y++)
+			{
+				a_Shape[y + x * 256 + z * 256 * 16] = 1;
+			}
+		}
+	}
 }
 
 

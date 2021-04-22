@@ -8,18 +8,6 @@ end
 
 
 
-function GetTableSize(Table)
-	local Size = 0
-	for key,value in pairs(Table) do
-		Size = Size + 1
-	end
-	return Size
-end
-
-
-
-
-
 local function GetDefaultPage()
 	local PM = cRoot:Get():GetPluginManager()
 
@@ -44,7 +32,7 @@ local function GetDefaultPage()
 		end
 	)
 
-	Content = Content .. "</ul><br>";
+	Content = Content .. "</ul>";
 
 	return Content, SubTitle
 end
@@ -70,68 +58,47 @@ function ShowPage(WebAdmin, TemplateRequest)
 		PageContent, SubTitle = GetDefaultPage()
 	end
 
-	--[[
-	-- 2016-01-15 Mattes: This wasn't used anywhere in the code, no idea what it was supposed to do
-	local reqParamsClass = ""
-	for key, value in pairs(TemplateRequest.Request.Params) do
-		reqParamsClass = reqParamsClass .. " param-" .. string.lower(string.gsub(key, "[^a-zA-Z0-9]+", "-") .. "-" .. string.gsub(value, "[^a-zA-Z0-9]+", "-"))
-	end
-	if (string.gsub(reqParamsClass, "%s", "") == "") then
-		reqParamsClass = " no-param"
-	end
-	--]]
-
 	Output([[
 <!-- Copyright Justin S and Cuberite Team, licensed under CC-BY-SA 3.0 -->
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>]] .. Title .. [[</title>
-	<meta charset="UTF-8">
 	<link rel="stylesheet" type="text/css" href="/style.css">
-	<link rel="icon" href="/favicon.png">
 </head>
 <body>
-<div class="contention push25">
-	<div class="pagehead">
-		<div class="row1">
-			<div class="wrapper">
-				<img src="/logo_login.png" alt="Cuberite Logo" class="logo">
-			</div>
-		</div>
-		<div id="panel">
-			<div class="upper">
-				<div class="wrapper">
-					<ul class="menu top_links">
-						<li><a>Players online: <strong>]] .. NumPlayers .. [[</strong></a></li>
-						<li><a>Memory: <strong>]] .. string.format("%.2f", MemoryUsageKiB / 1024) .. [[MB</strong></a></li>
-						<li><a>Chunks: <strong>]] .. NumChunks .. [[</strong></a></li>
-					</ul>
-					<div class="welcome"><strong>Welcome back, ]] .. TemplateRequest.Request.Username .. [[</strong>&nbsp;&nbsp;&nbsp;<a href=".././"><img src="/log_out.png" style="vertical-align:bottom;"> Log Out</a></div>
-				</div>
-			</div>
-		</div>
+<div class="header color-background">
+	<div class="wrapper">
+		<a href="]] .. BaseURL .. [[" class="logo">Cuberite</a>
 	</div>
-	<div class="row2">
-		<div class="wrapper">
-			<table width="100%" border="0" align="center">
-				<tbody>
-					<tr>
-						<td width="180" valign="top">
-							<table border="0" cellspacing="0" cellpadding="5" class="tborder">
-							<tbody>
-								<tr>
-									<td class="thead"><strong>Menu</strong></td>
-								</tr>
-								<tr>
-									<td class="trow1 smalltext"><a href=']] .. BaseURL .. [[' class='usercp_nav_item usercp_nav_home'>Home</a></td>
-								</tr>
-								<tr>
-									<td class="tcat"><div><span class="smalltext"><strong><font color="#000">Server Management</font></strong></span></div></td>
-								</tr>
-							</tbody>
-							<tbody style="" id="usercppms_e">
-								<tr>
-									<td class="trow1 smalltext">
+</div>
+<div class="panel">
+	<div class="wrapper">
+		<div class="welcome">
+			<strong>Welcome back, ]] .. TemplateRequest.Request.Username .. [[</strong>
+			<a href="/" class="link-logout">Log out</a>
+		</div>
+		<ul class="stats">
+			<li>Players online: <strong>]] .. NumPlayers .. [[</strong></li>
+			<li>Memory: <strong>]] .. string.format("%.2f", MemoryUsageKiB / 1024) .. [[MB</strong></li>
+			<li>Chunks: <strong>]] .. NumChunks .. [[</strong></li>
+		</ul>
+	</div>
+</div>
+<div class="columns">
+	<div class="columns-wrapper">
+		<div class="columns-spacing">
+			<div class="box left">
+				<h2 class="head color-background">Menu</h2>
+				<ul class="sidebar">
+					<li>
+						<a href="]] .. BaseURL .. [[" class="link-home">Home</a>
+					</li>
+				</ul>
+				<div class="category">Server Management</div>
+				<ul class="sidebar">
 	]])
 
 	-- Get all tabs:
@@ -160,57 +127,38 @@ function ShowPage(WebAdmin, TemplateRequest)
 		
 		-- Translate the plugin name into the folder name (-> title)
 		local pluginWebTitle = cPluginManager:Get():GetPluginFolderName(pluginName) or pluginName
-		Output("<div><a class='usercp_nav_item usercp_nav_pmfolder' style='text-decoration:none;'><b>" .. pluginWebTitle .. "</b></a></div>\n");
+		Output("<li><strong class=\"link-page\">" .. pluginWebTitle .. "</strong></li>\n");
 
 		-- Output each tab:
 		for _, tab in pairs(pluginTabs) do
-			Output("<div><a href='" .. BaseURL .. pluginName .. "/" .. tab.UrlPath .. "' class='usercp_nav_item usercp_nav_sub_pmfolder'>" .. tab.Title .. "</a></div>\n")
+			Output("<li><a href=\"" .. BaseURL .. pluginName .. "/" .. tab.UrlPath .. "\" class=\"sidebar-item link-subpage\">" .. tab.Title .. "</a></li>\n")
 		end
-		Output("<br>\n");
+		Output("\n");
 	end
 
 
 	Output([[
-								</td>
-							</tr>
-						</tbody>
-						</table>
-					</td>
-					<td valign="top" style='padding-left:25px;'>
-						<table border="0" cellspacing="0" cellpadding="5" class="tborder">
-						<tbody>
-							<tr>
-								<td class="thead" colspan="2"><strong>]] .. SubTitle .. [[</strong></td>
-							</tr>
-							<tr>
-								<td class="trow2">]] .. PageContent .. [[</td>
-							</tr>
-						</tbody>
-						</table>
-					</td>
-				</tr>
-			</tbody>
-			</table>
+				</ul>
+			</div>
+			<div class="box right">
+				<h1 class="head color-background">]] .. SubTitle .. [[</h1>
+				<div class="main-content">]] .. PageContent .. [[</div>
+			</div>
 		</div>
 	</div>
-<div id="footer">
-	<div class="upper">
+</div>
+<div class="footer">
+	<div class="footer-container">
 		<div class="wrapper">
-			<ul class="menu bottom_links">
+			<span class="copyright">Copyright © <a href="https://cuberite.org/" target="_blank">Cuberite Team</a></span>
+			<ul class="footer-links">
 				<li><a href="https://cuberite.org/" target="_blank">Cuberite</a></li>
 				<li><a href="https://forum.cuberite.org/" target="_blank">Forums</a></li>
-				<li><a href="https://builds.cuberite.org/" target="_blank">Buildserver</a></li>
-				<li><a href="https://api.cuberite.org/" target="_blank">API Documentation</a></li>
+				<li><a href="https://api.cuberite.org/" target="_blank">API Docs</a></li>
 				<li><a href="https://book.cuberite.org/" target="_blank">User's Manual</a></li>
 			</ul>
 		</div>
 	</div>
-	<div class="lower">
-		<div class="wrapper">
-			<span id="copyright">Copyright © <a href="https://cuberite.org/" target="_blank">Cuberite Team</a>.</span>
-		</div>
-	</div>
-</div>
 </div>
 </body>
 </html>

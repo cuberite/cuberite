@@ -6,7 +6,7 @@
 
 #include <fstream>
 
-#define FURNACE_RECIPE_FILE FILE_IO_PREFIX "furnace.txt"
+#define FURNACE_RECIPE_FILE "furnace.txt"
 
 
 
@@ -68,20 +68,18 @@ void cFurnaceRecipe::ReloadRecipes(void)
 	while (std::getline(f, ParsingLine))
 	{
 		LineNum++;
-		if (ParsingLine.empty())
-		{
-			// There is a problem here on Android. Text files transferred from another OS may have a newline representation Android's implementation of getline doesn't expect
-			// Thus, part of a newline may be left in ParsingLine. ::empty() thus thinks the string isn't empty, and the below code outputs interesting errors since it was passed a nearly empty string
-			// Ref: https://stackoverflow.com/questions/6089231/getting-std-ifstream-to-handle-lf-cr-and-crlf
-			// TODO: There is a solution in the above reference, but it isn't very pretty. Fix it somehow.
-			continue;
-		}
 
 		// Remove comments from the line:
 		size_t FirstCommentSymbol = ParsingLine.find('#');
 		if ((FirstCommentSymbol != AString::npos) && (FirstCommentSymbol != 0))
 		{
 			ParsingLine.erase(ParsingLine.begin() + static_cast<const long>(FirstCommentSymbol), ParsingLine.end());
+		}
+
+		if (IsOnlyWhitespace(ParsingLine))
+		{
+			// Ignore empty and whitespace only lines
+			continue;
 		}
 
 		switch (ParsingLine[0])
@@ -119,7 +117,7 @@ void cFurnaceRecipe::AddFuelFromLine(const AString & a_Line, unsigned int a_Line
 	Line.erase(Line.begin());  // Remove the beginning "!"
 	Line.erase(std::remove_if(Line.begin(), Line.end(), isspace), Line.end());
 
-	std::unique_ptr<cItem> Item = cpp14::make_unique<cItem>();
+	std::unique_ptr<cItem> Item = std::make_unique<cItem>();
 	int BurnTime;
 
 	const AStringVector & Sides = StringSplit(Line, "=");
@@ -161,8 +159,9 @@ void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, unsigned int a_Li
 	Line.erase(std::remove_if(Line.begin(), Line.end(), isspace), Line.end());
 
 	int CookTime = 200;
-	std::unique_ptr<cItem> InputItem = cpp14::make_unique<cItem>();
-	std::unique_ptr<cItem> OutputItem = cpp14::make_unique<cItem>();
+	float Reward = 0;
+	std::unique_ptr<cItem> InputItem = std::make_unique<cItem>();
+	std::unique_ptr<cItem> OutputItem = std::make_unique<cItem>();
 
 	const AStringVector & Sides = StringSplit(Line, "=");
 	if (Sides.size() != 2)
@@ -189,18 +188,27 @@ void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, unsigned int a_Li
 			return;
 		}
 	}
-
-	if (!ParseItem(Sides[1], *OutputItem))
+	const AStringVector & OutputSplit = StringSplit(Sides[1], "$");
+	if (!ParseItem(OutputSplit[0], *OutputItem))
 	{
-		LOGWARNING("furnace.txt: line %d: Cannot parse output item \"%s\".", a_LineNum, Sides[1].c_str());
+		LOGWARNING("furnace.txt: line %d: Cannot parse output item \"%s\".", a_LineNum, OutputSplit[0].c_str());
 		LOGINFO("Offending line: \"%s\"", a_Line.c_str());
 		return;
 	}
-
+	if (OutputSplit.size() > 1)
+	{
+		if (!StringToFloat(OutputSplit[1], Reward))
+		{
+			LOGWARNING("furnace.txt: line %d: Cannot parse reward \"%s\".", a_LineNum, OutputSplit[1].c_str());
+			LOGINFO("Offending line: \"%s\"", a_Line.c_str());
+			return;
+		}
+	}
 	cRecipe Recipe;
 	Recipe.In = InputItem.release();
 	Recipe.Out = OutputItem.release();
 	Recipe.CookTime = CookTime;
+	Recipe.Reward = Reward;
 	m_pState->Recipes.push_back(Recipe);
 }
 
@@ -225,7 +233,7 @@ bool cFurnaceRecipe::ParseItem(const AString & a_String, cItem & a_Item)
 
 	if (SplitAmount.size() > 1)
 	{
-		if (!StringToInteger<char>(SplitAmount[1].c_str(), a_Item.m_ItemCount))
+		if (!StringToInteger<char>(SplitAmount[1], a_Item.m_ItemCount))
 		{
 			return false;
 		}
@@ -233,7 +241,7 @@ bool cFurnaceRecipe::ParseItem(const AString & a_String, cItem & a_Item)
 
 	if (SplitMeta.size() > 1)
 	{
-		if (!StringToInteger<short>(SplitMeta[1].c_str(), a_Item.m_ItemDamage))
+		if (!StringToInteger<short>(SplitMeta[1], a_Item.m_ItemDamage))
 		{
 			return false;
 		}
@@ -282,7 +290,7 @@ const cFurnaceRecipe::cRecipe * cFurnaceRecipe::GetRecipeFrom(const cItem & a_In
 			{
 				continue;
 			}
-			else
+			else if ((Recipe.In->m_ItemDamage == -1) || (Recipe.In->m_ItemDamage == a_Ingredient.m_ItemDamage))
 			{
 				BestRecipe = &Recipe;
 			}
@@ -331,7 +339,6 @@ int cFurnaceRecipe::GetBurnTime(const cItem & a_Fuel) const
 	}
 	return BestFuel;
 }
-
 
 
 

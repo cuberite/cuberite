@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <unordered_set>
 #include "PiecePool.h"
 #include "Prefab.h"
 
@@ -44,10 +43,6 @@ public:
 		const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs,
 		int a_DefaultStartingPieceHeight = -1
 	);
-
-	/** Creates a pool and loads the contents of the specified file into it.
-	If a_LogWarnings is true, logs a warning to console when loading fails. */
-	cPrefabPiecePool(const AString & a_FileName, bool a_LogWarnings);
 
 	/** Destroys the pool, freeing all pieces. */
 	virtual ~cPrefabPiecePool() override;
@@ -113,7 +108,7 @@ public:
 
 	/** Called when the piece pool is assigned to a generator,
 	so that the individual starting pieces' vertical strategies may bind to the underlying subgenerators. */
-	void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_HeightGen, int a_SeaLevel);
+	void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel);
 
 	// cPiecePool overrides:
 	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override;

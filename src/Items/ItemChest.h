@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "../BlockInfo.h"
 #include "../Blocks/BlockChest.h"
 
 
@@ -11,10 +12,12 @@
 class cItemChestHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
+
 	cItemChestHandler(int a_ItemType):
-		super(a_ItemType)
+		Super(a_ItemType)
 	{
 	}
 
@@ -22,52 +25,51 @@ public:
 	/** We need an OnPlayerPlace override because we're processing neighbor chests and changing their metas,
 	the parent class cannot do that. */
 	virtual bool OnPlayerPlace(
-		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ
+		cWorld & a_World,
+		cPlayer & a_Player,
+		const cItem & a_EquippedItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos
 	) override
 	{
-		if (a_BlockFace < 0)
+		if (a_ClickedBlockFace < 0)
 		{
 			// Clicked in air
 			return false;
 		}
 
-		if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+		if (!cChunkDef::IsValidHeight(a_ClickedBlockPos.y))
 		{
 			// The clicked block is outside the world, ignore this call altogether (#128)
 			return false;
 		}
 
 		// Check if the block ignores build collision (water, grass etc.):
-		BLOCKTYPE ClickedBlock;
+		BLOCKTYPE ClickedBlockType;
 		NIBBLETYPE ClickedBlockMeta;
-		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
+		a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
 		cChunkInterface ChunkInterface(a_World.GetChunkMap());
-		if (BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY, a_BlockZ }, a_Player, ClickedBlockMeta))
+		Vector3i PlacePos;
+		if (cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
 		{
-			BlockHandler(ClickedBlock)->OnDestroyedByPlayer(ChunkInterface, a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ);
+			PlacePos = a_ClickedBlockPos;
 		}
 		else
 		{
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-
-			if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+			PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+			if (!cChunkDef::IsValidHeight(PlacePos.y))
 			{
 				// The block is being placed outside the world, ignore this packet altogether (#128)
 				return false;
 			}
 
-			NIBBLETYPE PlaceMeta;
+			// Check if the chest can overwrite the block at PlacePos:
 			BLOCKTYPE PlaceBlock;
-			a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, PlaceBlock, PlaceMeta);
-
-			// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
-			// No need to do combinability (dblslab) checks, client will do that here.
-			if (BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY, a_BlockZ }, a_Player, ClickedBlockMeta))
+			NIBBLETYPE PlaceMeta;
+			a_World.GetBlockTypeMeta(PlacePos, PlaceBlock, PlaceMeta);
+			if (!cBlockHandler::For(PlaceBlock).DoesIgnoreBuildCollision(ChunkInterface, PlacePos, a_Player, PlaceMeta))
 			{
-				// Tried to place a block into another?
-				// Happens when you place a block aiming at side of block with a torch on it or stem beside it
 				return false;
 			}
 		}
@@ -83,7 +85,8 @@ public:
 		int NeighborIdx = -1;
 		for (size_t i = 0; i < ARRAYCOUNT(CrossCoords); i++)
 		{
-			if (a_World.GetBlock(a_BlockX + CrossCoords[i].x, a_BlockY, a_BlockZ + CrossCoords[i].z) != m_ItemType)
+			auto NeighborPos = PlacePos + CrossCoords[i];
+			if (a_World.GetBlock(NeighborPos) != m_ItemType)
 			{
 				continue;
 			}
@@ -95,12 +98,11 @@ public:
 			NeighborIdx = static_cast<int>(i);
 
 			// Check that this neighbor is a single chest:
-			int bx = a_BlockX + CrossCoords[i].x;
-			int bz = a_BlockZ + CrossCoords[i].z;
 			for (size_t j = 0; j < ARRAYCOUNT(CrossCoords); j++)
 			{
-				if (a_World.GetBlock(bx + CrossCoords[j].x, a_BlockY, bz + CrossCoords[j].z) == m_ItemType)
+				if (a_World.GetBlock(NeighborPos + CrossCoords[j]) == m_ItemType)
 				{
+					// Trying to place next to a dblchest
 					return false;
 				}
 			}  // for j
@@ -128,13 +130,14 @@ public:
 			}
 			default:
 			{
+				// No neighbor, place based on yaw:
 				Meta = cBlockChestHandler::PlayerYawToMetaData(yaw);
 				break;
 			}
 		}  // switch (NeighborIdx)
 
 		// Place the new chest:
-		if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, ChestBlockType, Meta))
+		if (!a_Player.PlaceBlock(PlacePos.x, PlacePos.y, PlacePos.z, ChestBlockType, Meta))
 		{
 			return false;
 		}
@@ -142,10 +145,10 @@ public:
 		// Adjust the existing chest, if any:
 		if (NeighborIdx != -1)
 		{
-			a_World.FastSetBlock(a_BlockX + CrossCoords[NeighborIdx].x, a_BlockY, a_BlockZ + CrossCoords[NeighborIdx].z, ChestBlockType, Meta);
+			a_World.FastSetBlock(PlacePos + CrossCoords[NeighborIdx], ChestBlockType, Meta);
 		}
 
-		// Remove the "placed" item:
+		// Remove the "placed" item from inventory:
 		if (a_Player.IsGameModeSurvival())
 		{
 			a_Player.GetInventory().RemoveOneEquippedItem();

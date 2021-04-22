@@ -848,7 +848,7 @@ public:
 
 	virtual void OnBodyData(const void * a_Data, size_t a_Size) override
 	{
-		m_Callbacks->CallTableFnWithSelf("OnBodyData", AString(reinterpret_cast<const char *>(a_Data), a_Size));
+		m_Callbacks->CallTableFnWithSelf("OnBodyData", AString(static_cast<const char *>(a_Data), a_Size));
 	}
 
 
@@ -907,7 +907,7 @@ public:
 
 	virtual void OnBodyData(const void * a_Data, size_t a_Size) override
 	{
-		m_ResponseBody.append(reinterpret_cast<const char *>(a_Data), a_Size);
+		m_ResponseBody.append(static_cast<const char *>(a_Data), a_Size);
 	}
 
 
@@ -967,7 +967,7 @@ static int tolua_cUrlClient_Request_Common(lua_State * a_LuaState, const AString
 		{
 			return L.ApiParamError("Cannot read the CallbacksTable parameter at idx %d", a_UrlStackIdx + 1);
 		}
-		urlClientCallbacks = cpp14::make_unique<cFullUrlClientCallbacks>(std::move(callbacks));
+		urlClientCallbacks = std::make_unique<cFullUrlClientCallbacks>(std::move(callbacks));
 	}
 	else if (lua_isfunction(L, a_UrlStackIdx + 1))
 	{
@@ -975,7 +975,7 @@ static int tolua_cUrlClient_Request_Common(lua_State * a_LuaState, const AString
 		{
 			return L.ApiParamError("Cannot read the CallbackFn parameter at idx %d", a_UrlStackIdx + 1);
 		}
-		urlClientCallbacks = cpp14::make_unique<cSimpleUrlClientCallbacks>(std::move(onCompleteBodyCallback));
+		urlClientCallbacks = std::make_unique<cSimpleUrlClientCallbacks>(std::move(onCompleteBodyCallback));
 	}
 	else
 	{

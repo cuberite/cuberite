@@ -715,6 +715,7 @@ WinStackWalker::WinStackWalker(DWORD dwProcessId, HANDLE hProcess)
 
 
 
+
 WinStackWalker::WinStackWalker(int options, LPCSTR szSymPath, DWORD dwProcessId, HANDLE hProcess)
 {
 	this->m_options = options;

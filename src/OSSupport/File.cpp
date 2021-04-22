@@ -6,9 +6,11 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "File.h"
-#include <fstream>
+#include <sys/stat.h>
 #ifdef _WIN32
 	#include <share.h>  // for _SH_DENYWRITE
+#else
+	#include <dirent.h>
 #endif  // _WIN32
 
 
@@ -71,9 +73,9 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 	}
 
 	#ifdef _WIN32
-		m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), Mode, _SH_DENYWR);
+		m_File = _fsopen((iFileName).c_str(), Mode, _SH_DENYWR);
 	#else
-		m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), Mode);
+		m_File = fopen((iFileName).c_str(), Mode);
 	#endif  // _WIN32
 
 	if ((m_File == nullptr) && (iMode == fmReadWrite))
@@ -84,9 +86,9 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 		// Simply re-open for read-writing, erasing existing contents:
 
 		#ifdef _WIN32
-			m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+", _SH_DENYWR);
+			m_File = _fsopen((iFileName).c_str(), "wb+", _SH_DENYWR);
 		#else
-			m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+");
+			m_File = fopen((iFileName).c_str(), "wb+");
 		#endif  // _WIN32
 
 	}
@@ -155,19 +157,18 @@ int cFile::Read (void * a_Buffer, size_t a_NumBytes)
 
 
 
-AString cFile::Read(size_t a_NumBytes)
+ContiguousByteBuffer cFile::Read(size_t a_NumBytes)
 {
 	ASSERT(IsOpen());
 
 	if (!IsOpen())
 	{
-		return AString();
+		return {};
 	}
 
-	// HACK: This depends on the knowledge that AString::data() returns the internal buffer, rather than a copy of it.
-	AString res;
-	res.resize(a_NumBytes);
-	auto newSize = fread(const_cast<char *>(res.data()), 1, a_NumBytes, m_File);
+	ContiguousByteBuffer res;
+	res.resize(a_NumBytes);  // TODO: investigate if worth hacking around std::string internals to avoid initialisation
+	auto newSize = fread(res.data(), sizeof(std::byte), a_NumBytes, m_File);
 	res.resize(newSize);
 	return res;
 }
@@ -208,7 +209,6 @@ long cFile::Seek (int iPosition)
 	}
 	return ftell(m_File);
 }
-
 
 
 
@@ -283,9 +283,8 @@ int cFile::ReadRestOfFile(AString & a_Contents)
 
 	auto DataSize = static_cast<size_t>(TotalSize - Position);
 
-	// HACK: This depends on the internal knowledge that AString's data() function returns the internal buffer directly
-	a_Contents.assign(DataSize, '\0');
-	return Read(reinterpret_cast<void *>(const_cast<char *>(a_Contents.data())), DataSize);
+	a_Contents.resize(DataSize);  // TODO: investigate if worth hacking around std::string internals to avoid initialisation
+	return Read(a_Contents.data(), DataSize);
 }
 
 
@@ -475,10 +474,13 @@ bool cFile::CreateFolderRecursive(const AString & a_FolderPath)
 
 	// Go through each path element and create the folder:
 	auto len = a_FolderPath.length();
-	auto PathSep = GetPathSeparator()[0];
 	for (decltype(len) i = 0; i < len; i++)
 	{
-		if (a_FolderPath[i] == PathSep)
+	#ifdef _WIN32
+		if ((a_FolderPath[i] == '\\') || (a_FolderPath[i] == '/'))
+	#else
+		if (a_FolderPath[i] == '/')
+	#endif
 		{
 			CreateFolder(a_FolderPath.substr(0, i));
 		}
@@ -690,10 +692,11 @@ AString cFile::GetExecutableExt(void)
 
 
 
-int cFile::Printf(const char * a_Fmt, fmt::ArgList a_ArgList)
+int cFile::vPrintf(const char * a_Format, fmt::printf_args a_ArgList)
 {
-	AString buf = ::Printf(a_Fmt, a_ArgList);
-	return Write(buf.c_str(), buf.length());
+	fmt::memory_buffer Buffer;
+	fmt::vprintf(Buffer, fmt::to_string_view(a_Format), a_ArgList);
+	return Write(Buffer.data(), Buffer.size());
 }
 
 
@@ -708,3 +711,50 @@ void cFile::Flush(void)
 
 
 
+
+template <class StreamType>
+FileStream<StreamType>::FileStream(const std::string & Path)
+{
+	// Except on failbit, which is what open sets on failure:
+	FileStream::exceptions(FileStream::failbit | FileStream::badbit);
+
+	// Open the file:
+	FileStream::open(Path);
+
+	// Only subsequently except on serious errors, and not on conditions like EOF or malformed input:
+	FileStream::exceptions(FileStream::badbit);
+}
+
+
+
+
+
+template <class StreamType>
+FileStream<StreamType>::FileStream(const std::string & Path, const typename FileStream::openmode Mode)
+{
+	// Except on failbit, which is what open sets on failure:
+	FileStream::exceptions(FileStream::failbit | FileStream::badbit);
+
+	// Open the file:
+	FileStream::open(Path, Mode);
+
+	// Only subsequently except on serious errors, and not on conditions like EOF or malformed input:
+	FileStream::exceptions(FileStream::badbit);
+}
+
+
+
+
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-template-vtables"  // http://bugs.llvm.org/show_bug.cgi?id=18733
+#endif
+
+// Instantiate the templated wrapper for input and output:
+template class FileStream<std::ifstream>;
+template class FileStream<std::ofstream>;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

@@ -9,9 +9,10 @@
 #include "../UUID.h"
 
 #include "../IniFile.h"
+#include "../JsonUtils.h"
 #include "json/json.h"
 
-#include "mbedTLS++/BlockingSslClientSocket.h"
+#include "../mbedTLS++/BlockingSslClientSocket.h"
 
 
 
@@ -25,7 +26,7 @@
 
 
 cAuthenticator::cAuthenticator(void) :
-	super("cAuthenticator"),
+	Super("Authenticator"),
 	m_Server(DEFAULT_AUTH_SERVER),
 	m_Address(DEFAULT_AUTH_ADDRESS),
 	m_ShouldAuthenticate(true)
@@ -66,7 +67,7 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 	}
 
 	cCSLock LOCK(m_CS);
-	m_Queue.push_back(cUser(a_ClientID, a_UserName, a_ServerHash));
+	m_Queue.emplace_back(a_ClientID, a_UserName, a_ServerHash);
 	m_QueueNonempty.Set();
 }
 
@@ -77,8 +78,7 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 void cAuthenticator::Start(cSettingsRepositoryInterface & a_Settings)
 {
 	ReadSettings(a_Settings);
-	m_ShouldTerminate = false;
-	super::Start();
+	Super::Start();
 }
 
 
@@ -89,7 +89,7 @@ void cAuthenticator::Stop(void)
 {
 	m_ShouldTerminate = true;
 	m_QueueNonempty.Set();
-	Wait();
+	Super::Stop();
 }
 
 
@@ -186,8 +186,7 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 		return false;
 	}
 	Json::Value root;
-	Json::Reader reader;
-	if (!reader.parse(Response, root, false))
+	if (!JsonUtils::ParseString(Response, root))
 	{
 		LOGWARNING("cAuthenticator: Cannot parse received data (authentication) to JSON!");
 		return false;

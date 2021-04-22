@@ -10,12 +10,10 @@
 
 
 
-cAnvilWindow::cAnvilWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
+cAnvilWindow::cAnvilWindow(Vector3i a_BlockPos) :
 	cWindow(wtAnvil, "Repair"),
 	m_RepairedItemName(""),
-	m_BlockX(a_BlockX),
-	m_BlockY(a_BlockY),
-	m_BlockZ(a_BlockZ)
+	m_BlockPos(a_BlockPos)
 {
 	m_AnvilSlotArea = new cSlotAreaAnvil(*this);
 	m_SlotAreas.push_back(m_AnvilSlotArea);
@@ -49,17 +47,6 @@ void cAnvilWindow::SetRepairedItemName(const AString & a_Name, cPlayer * a_Playe
 
 
 
-void cAnvilWindow::GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ)
-{
-	a_PosX = m_BlockX;
-	a_PosY = m_BlockY;
-	a_PosZ = m_BlockZ;
-}
-
-
-
-
-
 void cAnvilWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
 {
 	cSlotAreas AreasInOrder;
@@ -75,7 +62,7 @@ void cAnvilWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_
 		// Inventory or Hotbar
 		AreasInOrder.push_back(m_SlotAreas[0]);  /* Anvil */
 	}
-	super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+	Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 }
 
 

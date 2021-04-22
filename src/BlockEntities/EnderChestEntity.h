@@ -2,7 +2,7 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "UI/WindowOwner.h"
+#include "../UI/WindowOwner.h"
 
 
 
@@ -13,17 +13,16 @@ class cEnderChestEntity :
 	public cBlockEntity,
 	public cBlockEntityWindowOwner
 {
-	typedef cBlockEntity Super;
-
-public:
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cEnderChestEntity)
+	using Super = cBlockEntity;
 
-	cEnderChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
-	virtual ~cEnderChestEntity() override;
+public:  // tolua_export
+
+	cEnderChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// cBlockEntity overrides:
+	virtual void OnRemoveFromWorld() override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 
@@ -33,7 +32,3 @@ public:
 	/** Opens a new enderchest window for this enderchest */
 	void OpenNewWindow(void);
 } ;  // tolua_export
-
-
-
-

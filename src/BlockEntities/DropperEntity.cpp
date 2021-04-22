@@ -10,8 +10,8 @@
 
 
 
-cDropperEntity::cDropperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World)
+cDropperEntity::cDropperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World)
 {
 	ASSERT(a_BlockType == E_BLOCK_DROPPER);
 }

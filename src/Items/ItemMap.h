@@ -7,20 +7,21 @@
 
 
 
-class cItemMapHandler :
+class cItemMapHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 	static const unsigned int DEFAULT_RADIUS = 128;
 
 public:
-	cItemMapHandler() :
-		super(E_ITEM_MAP)
+
+	cItemMapHandler():
+		Super(E_ITEM_MAP)
 	{
 	}
 
-	virtual void OnUpdate(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item)
+	virtual void OnUpdate(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item) override
 	{
 		cMap * Map = a_World->GetMapManager().GetMapData(static_cast<unsigned>(a_Item.m_ItemDamage));
 

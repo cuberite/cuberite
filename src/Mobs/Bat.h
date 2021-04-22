@@ -7,13 +7,14 @@
 
 
 
-class cBat :
+class cBat:
 	public cPassiveMonster
 {
-	typedef cPassiveMonster super;
+	using Super = cPassiveMonster;
 
 public:
-	cBat(void);
+
+	cBat();
 
 	CLASS_PROTODEF(cBat)
 

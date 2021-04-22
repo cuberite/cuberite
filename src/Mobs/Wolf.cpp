@@ -5,19 +5,18 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "../Items/ItemHandler.h"
-#include "Broadcaster.h"
+#include "../Items/ItemSpawnEgg.h"
 
 
 
 
 
 cWolf::cWolf(void) :
-	super("Wolf", mtWolf, "entity.wolf.hurt", "entity.wolf.death", 0.6, 0.8),
+	Super("Wolf", mtWolf, "entity.wolf.hurt", "entity.wolf.death", "entity.wolf.ambient", 0.6f, 0.85f),
 	m_IsSitting(false),
 	m_IsTame(false),
 	m_IsBegging(false),
 	m_IsAngry(false),
-	m_OwnerName(""),
 	m_CollarColor(E_META_DYE_ORANGE),
 	m_NotificationCooldown(0)
 {
@@ -31,7 +30,7 @@ cWolf::cWolf(void) :
 bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	cPawn * PreviousTarget = GetTarget();
-	if (!super::DoTakeDamage(a_TDI))
+	if (!Super::DoTakeDamage(a_TDI))
 	{
 		return false;
 	}
@@ -89,6 +88,10 @@ void cWolf::NotifyAlliesOfFight(cPawn * a_Opponent)
 	);
 }
 
+
+
+
+
 bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);
@@ -103,7 +106,7 @@ bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 	}
 
 	NotifyAlliesOfFight(static_cast<cPawn*>(GetTarget()));
-	return super::Attack(a_Dt);
+	return Super::Attack(a_Dt);
 
 }
 
@@ -182,19 +185,21 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				SetMaxHealth(20);
 				SetIsTame(true);
 				SetOwner(a_Player.GetName(), a_Player.GetUUID());
-				m_World->BroadcastEntityStatus(*this, esWolfTamed);
-				m_World->GetBroadcaster().BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+				m_World->BroadcastEntityAnimation(*this, EntityAnimation::WolfTamingSucceeds);
 			}
 			else
 			{
 				// Taming failed
-				m_World->BroadcastEntityStatus(*this, esWolfTaming);
-				m_World->GetBroadcaster().BroadcastParticleEffect("smoke", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+				m_World->BroadcastEntityAnimation(*this, EntityAnimation::WolfTamingFails);
 			}
 		}
 	}
 	else if (IsTame())
 	{
+		if (a_Player.GetUUID() == m_OwnerUUID)
+		{
+			cMonster::RightClickFeed(a_Player);
+		}
 		// Feed the wolf, restoring its health, or dye its collar:
 		switch (EquippedItemType)
 		{
@@ -205,6 +210,10 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			case E_ITEM_RAW_CHICKEN:
 			case E_ITEM_COOKED_CHICKEN:
 			case E_ITEM_ROTTEN_FLESH:
+			case E_ITEM_RAW_MUTTON:
+			case E_ITEM_RAW_RABBIT:
+			case E_ITEM_COOKED_RABBIT:
+			case E_ITEM_COOKED_MUTTON:
 			{
 				if (m_Health < m_MaxHealth)
 				{
@@ -212,6 +221,13 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 					if (!a_Player.IsGameModeCreative())
 					{
 						a_Player.GetInventory().RemoveOneEquippedItem();
+					}
+				}
+				else if (a_Player.GetUUID() == m_OwnerUUID)  // Is the player the owner of the dog?
+				{
+					if (IsBaby())
+					{
+						m_AgingTimer = FloorC(m_AgingTimer * 0.9);
 					}
 				}
 				break;
@@ -228,12 +244,32 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				}
 				break;
 			}
+			// Multiplication is handled in cMonster. Just prevents from sitting down.
+			case E_ITEM_SPAWN_EGG:
+			{
+				break;
+			}
 			default:
 			{
 				if (a_Player.GetUUID() == m_OwnerUUID)  // Is the player the owner of the dog?
 				{
 					SetIsSitting(!IsSitting());
 				}
+			}
+		}
+	}
+
+	if ((EquippedItemType == E_ITEM_SPAWN_EGG) && (!IsTame()))
+	{
+		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(EquippedItem.m_ItemDamage);
+		if (
+			(MonsterType == m_MobType) &&
+			(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID))  // Spawning succeeded
+		{
+			if (!a_Player.IsGameModeCreative())
+			{
+				// The mob was spawned, "use" the item:
+				a_Player.GetInventory().RemoveOneEquippedItem();
 			}
 		}
 	}
@@ -257,7 +293,7 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	else
 	{
-		super::Tick(a_Dt, a_Chunk);
+		Super::Tick(a_Dt, a_Chunk);
 	}
 
 	if (!IsTicking())
@@ -268,10 +304,9 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (GetTarget() == nullptr)
 	{
-		cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), static_cast<float>(m_SightDistance));
-		if (a_Closest_Player != nullptr)
+		m_World->DoWithNearestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
 		{
-			switch (a_Closest_Player->GetEquippedItem().m_ItemType)
+			switch (a_Player.GetEquippedItem().m_ItemType)
 			{
 				case E_ITEM_BONE:
 				case E_ITEM_RAW_BEEF:
@@ -288,12 +323,12 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 						m_World->BroadcastEntityMetadata(*this);
 					}
 
-					m_FinalDestination = a_Closest_Player->GetPosition();  // So that we will look at a player holding food
+					m_FinalDestination = a_Player.GetPosition();  // So that we will look at a player holding food
 
 					// Don't move to the player if the wolf is sitting.
 					if (!IsSitting())
 					{
-						MoveToPosition(a_Closest_Player->GetPosition());
+						MoveToPosition(a_Player.GetPosition());
 					}
 
 					break;
@@ -307,7 +342,9 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 					}
 				}
 			}
-		}
+
+			return true;
+		});
 	}
 	else
 	{
@@ -333,6 +370,8 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		StopMovingToPosition();
 	}
+
+	cMonster::LoveTick();
 }
 
 
@@ -385,6 +424,8 @@ void cWolf::TickFollowPlayer()
 
 
 
+
+
 void cWolf::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	if (!IsTame())
@@ -394,3 +435,29 @@ void cWolf::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 }
 
 
+
+
+
+void cWolf::InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2)
+{
+	const auto Parent1 = static_cast<cWolf *>(a_Parent1);
+	const auto Parent2 = static_cast<cWolf *>(a_Parent2);
+	if (Parent1->GetOwnerUUID() == Parent2->GetOwnerUUID())
+	{
+		SetOwner(Parent1->GetOwnerName(), Parent2->GetOwnerUUID());
+	}
+	else
+	{
+		auto Parent1Age = Parent1->GetAge();
+		auto Parent2Age = Parent2->GetAge();
+
+		if (Parent1Age > Parent2Age)
+		{
+			SetOwner(Parent2->GetOwnerName(), Parent2->GetOwnerUUID());
+		}
+		else
+		{
+			SetOwner(Parent1->GetOwnerName(), Parent1->GetOwnerUUID());
+		}
+	}
+}

@@ -11,7 +11,6 @@
 
 
 
-
 enum
 {
 	PROGRESSBAR_FUEL = 0,
@@ -23,15 +22,15 @@ enum
 
 
 
-cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_CurrentRecipe(nullptr),
-	m_IsDestroyed(false),
 	m_IsCooking(a_BlockType == E_BLOCK_LIT_FURNACE),
 	m_NeedCookTime(0),
 	m_TimeCooked(0),
 	m_FuelBurnTime(0),
 	m_TimeBurned(0),
+	m_RewardCounter(0),
 	m_IsLoading(false)
 {
 	m_Contents.AddListener(*this);
@@ -41,44 +40,33 @@ cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, in
 
 
 
-cFurnaceEntity::~cFurnaceEntity()
-{
-	// Tell window its owner is destroyed
-	cWindow * Window = GetWindow();
-	if (Window != nullptr)
-	{
-		Window->OwnerDestroyed();
-	}
-}
-
-
-
-
-
-void cFurnaceEntity::Destroy()
-{
-	m_IsDestroyed = true;
-	Super::Destroy();
-}
-
-
-
-
-
 void cFurnaceEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cFurnaceEntity &>(a_Src);
+	auto & src = static_cast<const cFurnaceEntity &>(a_Src);
 	m_Contents.CopyFrom(src.m_Contents);
 	m_CurrentRecipe = src.m_CurrentRecipe;
 	m_FuelBurnTime = src.m_FuelBurnTime;
 	m_IsCooking = src.m_IsCooking;
-	m_IsDestroyed = src.m_IsDestroyed;
 	m_IsLoading = src.m_IsLoading;
 	m_LastInput = src.m_LastInput;
 	m_NeedCookTime = src.m_NeedCookTime;
 	m_TimeBurned = src.m_TimeBurned;
 	m_TimeCooked = src.m_TimeCooked;
+}
+
+
+
+
+
+void cFurnaceEntity::OnRemoveFromWorld()
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		// Tell window its owner is destroyed:
+		Window->OwnerDestroyed();
+	}
 }
 
 
@@ -106,7 +94,7 @@ bool cFurnaceEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		// Reset progressbars, block type, and bail out
 		m_BlockType = E_BLOCK_FURNACE;
-		a_Chunk.FastSetBlock(GetRelX(), m_PosY, GetRelZ(), E_BLOCK_FURNACE, m_BlockMeta);
+		a_Chunk.FastSetBlock(GetRelPos(), E_BLOCK_FURNACE, m_BlockMeta);
 		UpdateProgressBars();
 		return false;
 	}
@@ -139,10 +127,12 @@ bool cFurnaceEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cFurnaceEntity::UsedBy(cPlayer * a_Player)
 {
+	a_Player->GetStatManager().AddValue(Statistic::InteractWithFurnace);
+
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
 	{
-		OpenWindow(new cFurnaceWindow(m_PosX, m_PosY, m_PosZ, this));
+		OpenWindow(new cFurnaceWindow(this));
 		Window = GetWindow();
 	}
 
@@ -173,7 +163,24 @@ bool cFurnaceEntity::ContinueCooking(void)
 
 
 
-void cFurnaceEntity::BroadcastProgress(short a_ProgressbarID, short a_Value)
+int cFurnaceEntity::GetAndResetReward(void)
+{
+	int Reward = FloorC(m_RewardCounter);
+	float Remainder = m_RewardCounter - static_cast<float>(Reward);
+	// Remainder is used as the percent chance of getting an extra xp point
+	if (GetRandomProvider().RandBool(Remainder))
+	{
+		Reward++;
+	}
+	m_RewardCounter = 0.0;
+	return Reward;
+}
+
+
+
+
+
+void cFurnaceEntity::BroadcastProgress(size_t a_ProgressbarID, short a_Value)
 {
 	cWindow * Window = GetWindow();
 	if (Window != nullptr)
@@ -189,6 +196,7 @@ void cFurnaceEntity::BroadcastProgress(short a_ProgressbarID, short a_Value)
 void cFurnaceEntity::FinishOne()
 {
 	m_TimeCooked = 0;
+	m_RewardCounter += m_CurrentRecipe->Reward;
 
 	if (m_Contents.GetSlot(fsOutput).IsEmpty())
 	{
@@ -239,11 +247,6 @@ void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
 	Super::OnSlotChanged(a_ItemGrid, a_SlotNum);
 
-	if (m_IsDestroyed)
-	{
-		return;
-	}
-
 	if (m_IsLoading)
 	{
 		return;
@@ -258,7 +261,6 @@ void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		default: ASSERT(!"Invalid furnace slot update!"); break;
 	}
 }
-
 
 
 
@@ -386,8 +388,8 @@ bool cFurnaceEntity::CanCookInputToOutput(void) const
 
 void cFurnaceEntity::UpdateProgressBars(bool a_ForceUpdate)
 {
-	// In order to preserve bandwidth, an update is sent only every 10th tick
-	if (!a_ForceUpdate && (m_World->GetWorldAge() % 10 != 0))
+	// In order to preserve bandwidth, an update is sent only every 10th tick:
+	if (!a_ForceUpdate && ((m_World->GetWorldTickAge() % 10_tick) != 0_tick))
 	{
 		return;
 	}
@@ -416,6 +418,6 @@ void cFurnaceEntity::SetIsCooking(bool a_IsCooking)
 	if (m_IsCooking)
 	{
 		m_BlockType = E_BLOCK_LIT_FURNACE;
-		m_World->FastSetBlock(m_PosX, m_PosY, m_PosZ, E_BLOCK_LIT_FURNACE, m_BlockMeta);
+		m_World->FastSetBlock(m_Pos, E_BLOCK_LIT_FURNACE, m_BlockMeta);
 	}
 }

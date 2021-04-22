@@ -9,6 +9,7 @@
 #include "LuaState.h"
 #include "tolua++/include/tolua++.h"
 #include "json/json.h"
+#include "../JsonUtils.h"
 
 
 
@@ -28,7 +29,8 @@ Keeps track of the error message and the problematic value's path in the table.
 class CannotSerializeException:
 	public std::runtime_error
 {
-	typedef std::runtime_error Super;
+	using Super = std::runtime_error;
+
 public:
 	/** Constructs a new instance of the exception based on the provided values directly. */
 	explicit CannotSerializeException(const AString & a_ValueName, const char * a_ErrorMsg):
@@ -294,10 +296,10 @@ static int tolua_cJson_Parse(lua_State * a_LuaState)
 
 	// Parse the string:
 	Json::Value root;
-	Json::Reader reader;
-	if (!reader.parse(input, root, false))
+	AString ParseError;
+	if (!JsonUtils::ParseString(input, root, &ParseError))
 	{
-		L.Push(cLuaState::Nil, Printf("Parsing Json failed: %s", reader.getFormattedErrorMessages().c_str()));
+		L.Push(cLuaState::Nil, Printf("Parsing Json failed: %s", ParseError));
 		return 2;
 	}
 

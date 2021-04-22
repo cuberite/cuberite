@@ -1,10 +1,7 @@
-project (Cuberite)
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
-SET (SRCS
 	CriticalSection.cpp
-	Errors.cpp
 	Event.cpp
 	File.cpp
 	GZipFile.cpp
@@ -19,11 +16,10 @@ SET (SRCS
 	TCPLinkImpl.cpp
 	UDPEndpointImpl.cpp
 	WinStackWalker.cpp
-)
 
-SET (HDRS
+	AtomicUniquePtr.h
+	ConsoleSignalHandler.h
 	CriticalSection.h
-	Errors.h
 	Event.h
 	File.h
 	GetAddressInfoError.h
@@ -31,22 +27,17 @@ SET (HDRS
 	HostnameLookup.h
 	IPLookup.h
 	IsThread.h
+	MiniDumpWriter.h
 	Network.h
 	NetworkLookup.h
 	NetworkSingleton.h
 	Queue.h
 	ServerHandleImpl.h
+	SleepResolutionBooster.h
 	StackTrace.h
+	StartAsService.h
 	TCPLinkImpl.h
 	UDPEndpointImpl.h
 	WinStackWalker.h
 )
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	add_flags_cxx("-Wno-error=global-constructors ")
-endif()
-
-if(NOT MSVC)
-	add_library(OSSupport ${SRCS} ${HDRS})
-	target_link_libraries(OSSupport fmt::fmt)
-endif()

@@ -2,97 +2,79 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "MetaRotator.h"
+#include "Mixins.h"
 #include "../EffectID.h"
 
 
 
 
-class cBlockFenceGateHandler :
-	public cMetaRotator<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01, true>
+class cBlockFenceGateHandler final :
+	public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01>>
 {
+	using Super = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01>>;
+
 public:
-	cBlockFenceGateHandler(BLOCKTYPE a_BlockType) :
-		cMetaRotator<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01, true>(a_BlockType)
-	{
-	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		a_Pickups.Add(m_BlockType, 1, 0);  // Reset meta to zero
-	}
+	using Super::Super;
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = PlayerYawToMetaData(a_Player.GetYaw());
-		return true;
-	}
+private:
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) const override
 	{
-		NIBBLETYPE OldMetaData = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
-		NIBBLETYPE NewMetaData = PlayerYawToMetaData(a_Player.GetYaw());
+		NIBBLETYPE OldMetaData = a_ChunkInterface.GetBlockMeta(a_BlockPos);
+		NIBBLETYPE NewMetaData = YawToMetaData(a_Player.GetYaw());
 		OldMetaData ^= 4;  // Toggle the gate
 
 		if ((OldMetaData & 1) == (NewMetaData & 1))
 		{
 			// Standing in front of the gate - apply new direction
-			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, (OldMetaData & 4) | (NewMetaData & 3));
+			a_ChunkInterface.SetBlockMeta(a_BlockPos, (OldMetaData & 4) | (NewMetaData & 3));
 		}
 		else
 		{
 			// Standing aside - use last direction
-			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, OldMetaData);
+			a_ChunkInterface.SetBlockMeta(a_BlockPos, OldMetaData);
 		}
-		a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player.GetClientHandle());
+		a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
 		return true;
 	}
 
-	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+
+
+
+
+	virtual void OnCancelRightClick(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace
+	) const override
 	{
-		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
 	}
 
-	virtual bool IsUseable(void) override
+
+
+
+
+	virtual bool IsUseable(void) const override
 	{
 		return true;
 	}
 
-	/** Converts the player's yaw to placed gate's blockmeta */
-	inline static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
-	{
-		ASSERT((a_Yaw >= -180) && (a_Yaw < 180));
 
-		a_Yaw += 360 + 45;
-		if (a_Yaw > 360)
-		{
-			a_Yaw -= 360;
-		}
-		if ((a_Yaw >= 0) && (a_Yaw < 90))
-		{
-			return 0x0;
-		}
-		else if ((a_Yaw >= 180) && (a_Yaw < 270))
-		{
-			return 0x2;
-		}
-		else if ((a_Yaw >= 90) && (a_Yaw < 180))
-		{
-			return 0x1;
-		}
-		else
-		{
-			return 0x3;
-		}
-	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		switch (m_BlockType)

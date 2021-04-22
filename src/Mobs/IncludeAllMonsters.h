@@ -26,6 +26,8 @@
 #include "Villager.h"
 #include "Witch.h"
 #include "Wither.h"
+#include "WitherSkeleton.h"
 #include "Wolf.h"
 #include "Zombie.h"
 #include "ZombiePigman.h"
+#include "ZombieVillager.h"

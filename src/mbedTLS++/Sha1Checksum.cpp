@@ -49,7 +49,6 @@ public:
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // cSha1Checksum:
 
@@ -80,6 +79,20 @@ void cSha1Checksum::Finalize(cSha1Checksum::Checksum & a_Output)
 
 	mbedtls_sha1_finish(&m_Sha1, a_Output);
 	m_DoesAcceptInput = false;
+}
+
+
+
+
+
+void cSha1Checksum::DigestToHex(const Checksum & a_Digest, AString & a_Out)
+{
+	a_Out.clear();
+	a_Out.reserve(40);
+	for (int i = 0; i < 20; i++)
+	{
+		AppendPrintf(a_Out, "%x", a_Digest[i]);
+	}
 }
 
 
@@ -121,7 +134,6 @@ void cSha1Checksum::DigestToJava(const Checksum & a_Digest, AString & a_Out)
 		a_Out.insert(0, "-");
 	}
 }
-
 
 
 

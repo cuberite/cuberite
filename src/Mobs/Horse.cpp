@@ -4,15 +4,14 @@
 #include "../World.h"
 #include "../EffectID.h"
 #include "../Entities/Player.h"
-#include "Broadcaster.h"
-#include "UI/HorseWindow.h"
+#include "../UI/HorseWindow.h"
 
 
 
 
 
 cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
-	super("Horse", mtHorse, "entity.horse.hurt", "entity.horse.death", 1.4, 1.6),
+	Super("Horse", mtHorse, "entity.horse.hurt", "entity.horse.death", "entity.horse.ambient", 1.4f, 1.6f),
 	cEntityWindowOwner(this),
 	m_bHasChest(false),
 	m_bIsEating(false),
@@ -33,34 +32,23 @@ cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
 
 
 
-cHorse::~cHorse()
-{
-	auto Window = GetWindow();
-	if (Window != nullptr)
-	{
-		Window->OwnerDestroyed();
-	}
-}
-
-
-
-
-
 void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
 		return;
 	}
 
+	bool MetadataDirty = false;
 	auto & Random = GetRandomProvider();
 
 	if (!m_bIsMouthOpen)
 	{
 		if (Random.RandBool(0.02))
 		{
+			MetadataDirty = true;
 			m_bIsMouthOpen = true;
 		}
 	}
@@ -68,6 +56,7 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (Random.RandBool(0.10))
 		{
+			MetadataDirty = true;
 			m_bIsMouthOpen = false;
 		}
 	}
@@ -78,19 +67,21 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			if (Random.RandBool(0.02))
 			{
-				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::SOUTH_EAST));
-				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::SOUTH_WEST));
-				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::NORTH_EAST));
-				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, FloorC(GetPosX()), FloorC(GetPosY()), FloorC(GetPosZ()), int(SmokeDirection::NORTH_WEST));
+				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, GetPosition().Floor(), int(SmokeDirection::SOUTH_EAST));
+				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, GetPosition().Floor(), int(SmokeDirection::SOUTH_WEST));
+				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, GetPosition().Floor(), int(SmokeDirection::NORTH_EAST));
+				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, GetPosition().Floor(), int(SmokeDirection::NORTH_WEST));
 
 				m_World->BroadcastSoundEffect("entity.horse.angry", GetPosition(), 1.0f, 1.0f);
 				m_Attachee->Detach();
+				MetadataDirty = true;
 				m_bIsRearing = true;
 			}
 		}
 		else
 		{
-			m_World->GetBroadcaster().BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+			m_World->BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+			MetadataDirty = true;
 			m_bIsTame = true;
 		}
 	}
@@ -99,6 +90,7 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (m_RearTickCount == 20)
 		{
+			MetadataDirty = true;
 			m_bIsRearing = false;
 			m_RearTickCount = 0;
 		}
@@ -108,7 +100,25 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	m_World->BroadcastEntityMetadata(*this);
+	if (MetadataDirty)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
+}
+
+
+
+
+
+void cHorse::OnRemoveFromWorld(cWorld & a_World)
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		Window->OwnerDestroyed();
+	}
+
+	Super::OnRemoveFromWorld(a_World);
 }
 
 
@@ -117,7 +127,7 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cHorse::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	if (m_bIsTame)
 	{
@@ -273,7 +283,7 @@ void cHorse::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// If horse is tame and someone is sitting on it, don't walk around
 	if ((!m_bIsTame) || (m_Attachee == nullptr))
 	{
-		super::InStateIdle(a_Dt, a_Chunk);
+		Super::InStateIdle(a_Dt, a_Chunk);
 	}
 }
 
@@ -285,7 +295,7 @@ void cHorse::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 {
 	if ((m_bIsTame) && IsSaddled())
 	{
-		super::HandleSpeedFromAttachee(a_Forward * m_MaxSpeed, a_Sideways * m_MaxSpeed);
+		Super::HandleSpeedFromAttachee(a_Forward * m_MaxSpeed, a_Sideways * m_MaxSpeed);
 	}
 }
 

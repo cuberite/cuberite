@@ -6,6 +6,7 @@
 
 #include "Globals.h"
 #include "DropSpenserEntity.h"
+#include "../Bindings/PluginManager.h"
 #include "../EffectID.h"
 #include "../Entities/Player.h"
 #include "../Chunk.h"
@@ -15,8 +16,8 @@
 
 
 
-cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_ShouldDropSpense(false)
 {
 }
@@ -25,33 +26,18 @@ cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_Block
 
 
 
-cDropSpenserEntity::~cDropSpenserEntity()
-{
-	// Tell window its owner is destroyed
-	cWindow * Window = GetWindow();
-	if (Window != nullptr)
-	{
-		Window->OwnerDestroyed();
-	}
-}
-
-
-
-
-
-void cDropSpenserEntity::AddDropSpenserDir(int & a_BlockX, int & a_BlockY, int & a_BlockZ, NIBBLETYPE a_Direction)
+void cDropSpenserEntity::AddDropSpenserDir(Vector3i & a_RelCoord, NIBBLETYPE a_Direction)
 {
 	switch (a_Direction & E_META_DROPSPENSER_FACING_MASK)
 	{
-		case E_META_DROPSPENSER_FACING_YM: a_BlockY--; return;
-		case E_META_DROPSPENSER_FACING_YP: a_BlockY++; return;
-		case E_META_DROPSPENSER_FACING_ZM: a_BlockZ--; return;
-		case E_META_DROPSPENSER_FACING_ZP: a_BlockZ++; return;
-		case E_META_DROPSPENSER_FACING_XM: a_BlockX--; return;
-		case E_META_DROPSPENSER_FACING_XP: a_BlockX++; return;
+		case E_META_DROPSPENSER_FACING_YM: a_RelCoord.y--; return;
+		case E_META_DROPSPENSER_FACING_YP: a_RelCoord.y++; return;
+		case E_META_DROPSPENSER_FACING_ZM: a_RelCoord.z--; return;
+		case E_META_DROPSPENSER_FACING_ZP: a_RelCoord.z++; return;
+		case E_META_DROPSPENSER_FACING_XM: a_RelCoord.x--; return;
+		case E_META_DROPSPENSER_FACING_XP: a_RelCoord.x++; return;
 	}
 	LOGWARNING("%s: Unhandled direction: %d", __FUNCTION__, a_Direction);
-	return;
 }
 
 
@@ -75,17 +61,24 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 	if (SlotsCnt == 0)
 	{
 		// Nothing in the dropspenser, play the click sound
-		m_World->BroadcastSoundEffect("block.dispenser.fail", Vector3d(m_PosX, m_PosY, m_PosZ), 1.0f, 1.2f);
+		m_World->BroadcastSoundEffect("block.dispenser.fail", m_Pos, 1.0f, 1.2f);
 		return;
 	}
 
-	int RandomSlot = 	m_World->GetTickRandomNumber(SlotsCnt - 1);
+	const int RandomSlot = m_World->GetTickRandomNumber(SlotsCnt - 1);
+	const int SpenseSlot = OccupiedSlots[RandomSlot];
+
+	if (cPluginManager::Get()->CallHookDropSpense(*m_World, *this, SpenseSlot))
+	{
+		// Plugin disagrees with the move
+		return;
+	}
 
 	// DropSpense the item, using the specialized behavior in the subclasses:
-	DropSpenseFromSlot(a_Chunk, OccupiedSlots[RandomSlot]);
+	DropSpenseFromSlot(a_Chunk, SpenseSlot);
 
 	// Broadcast a smoke and click effects:
-	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
+	NIBBLETYPE Meta = a_Chunk.GetMeta(GetRelPos());
 	int SmokeDir = 0;
 	switch (Meta & E_META_DROPSPENSER_FACING_MASK)
 	{
@@ -96,8 +89,8 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 		case E_META_DROPSPENSER_FACING_ZM: SmokeDir = static_cast<int>(SmokeDirection::SOUTH); break;
 		case E_META_DROPSPENSER_FACING_ZP: SmokeDir = static_cast<int>(SmokeDirection::NORTH); break;
 	}
-	m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, m_PosX, m_PosY, m_PosZ, SmokeDir);
-	m_World->BroadcastSoundEffect("block.dispenser.dispense", Vector3d(m_PosX, m_PosY, m_PosZ), 1.0f, 1.0f);
+	m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, GetPos(), SmokeDir);
+	m_World->BroadcastSoundEffect("block.dispenser.dispense", m_Pos, 1.0f, 1.0f);
 }
 
 
@@ -116,9 +109,23 @@ void cDropSpenserEntity::Activate(void)
 void cDropSpenserEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cDropSpenserEntity &>(a_Src);
+	auto & src = static_cast<const cDropSpenserEntity &>(a_Src);
 	m_Contents.CopyFrom(src.m_Contents);
 	m_ShouldDropSpense = src.m_ShouldDropSpense;
+}
+
+
+
+
+
+void cDropSpenserEntity::OnRemoveFromWorld()
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		// Tell window its owner is destroyed:
+		Window->OwnerDestroyed();
+	}
 }
 
 
@@ -154,10 +161,19 @@ void cDropSpenserEntity::SendTo(cClientHandle & a_Client)
 
 bool cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 {
+	if (m_BlockType == E_BLOCK_DISPENSER)
+	{
+		a_Player->GetStatManager().AddValue(Statistic::InspectDispenser);
+	}
+	else  // E_BLOCK_DROPPER
+	{
+		a_Player->GetStatManager().AddValue(Statistic::InspectDropper);
+	}
+
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
 	{
-		OpenWindow(new cDropSpenserWindow(m_PosX, m_PosY, m_PosZ, this));
+		OpenWindow(new cDropSpenserWindow(this));
 		Window = GetWindow();
 	}
 
@@ -177,11 +193,9 @@ bool cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 
 void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 {
-	int DispX = m_PosX;
-	int DispY = m_PosY;
-	int DispZ = m_PosZ;
-	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
-	AddDropSpenserDir(DispX, DispY, DispZ, Meta);
+	Vector3i dispCoord(m_Pos);
+	auto Meta = a_Chunk.GetMeta(GetRelPos());
+	AddDropSpenserDir(dispCoord, Meta);
 
 	cItems Pickups;
 	Pickups.push_back(m_Contents.RemoveOneItem(a_SlotNum));
@@ -199,9 +213,9 @@ void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 	}
 
 	double MicroX, MicroY, MicroZ;
-	MicroX = DispX + 0.5;
-	MicroY = DispY + 0.4;  // Slightly less than half, to accomodate actual texture hole on DropSpenser
-	MicroZ = DispZ + 0.5;
+	MicroX = dispCoord.x + 0.5;
+	MicroY = dispCoord.y + 0.4;  // Slightly less than half, to accomodate actual texture hole on DropSpenser
+	MicroZ = dispCoord.z + 0.5;
 
 
 	m_World->SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ, PickupSpeedX, PickupSpeedY, PickupSpeedZ);

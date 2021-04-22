@@ -20,15 +20,13 @@
 class cExpBottleEntity :
 	public cProjectileEntity
 {
-	typedef cProjectileEntity super;
-
-public:
-
 	// tolua_end
 
-	CLASS_PROTODEF(cExpBottleEntity)
+	using Super = cProjectileEntity;
 
-	cExpBottleEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, Vector3d a_Speed);
+public:  // tolua_export
+
+	CLASS_PROTODEF(cExpBottleEntity)
 
 	cExpBottleEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed);
 

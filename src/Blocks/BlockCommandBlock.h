@@ -7,21 +7,28 @@
 
 
 
-class cBlockCommandBlockHandler :
+class cBlockCommandBlockHandler final :
 	public cBlockEntityHandler
 {
+	using Super = cBlockEntityHandler;
+
 public:
-	cBlockCommandBlockHandler(BLOCKTYPE a_BlockType)
-		: cBlockEntityHandler(a_BlockType)
+
+	using Super::Super;
+
+private:
+
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
+		// Don't allow as a pickup:
+		return {};
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		a_Pickups.push_back(cItem(E_BLOCK_AIR, 8, 0));
-	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 10;

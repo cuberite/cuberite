@@ -12,7 +12,7 @@
 
 
 
-cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest) :
+cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest):
 	cWindow(wtChest, "Ender Chest"),
 	m_World(a_EnderChest->GetWorld()),
 	m_BlockPos(a_EnderChest->GetPos())
@@ -63,13 +63,13 @@ void cEnderChestWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer
 		// Chest Area
 		AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
 		AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
-		super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
+		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
 	}
 	else
 	{
 		// Hotbar or Inventory
 		AreasInOrder.push_back(m_SlotAreas[0]);  /* Chest */
-		super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
 }
 

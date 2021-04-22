@@ -34,10 +34,11 @@ typedef std::vector<cServerHandleImplPtr> cServerHandleImplPtrs;
 class cServerHandleImpl:
 	public cServerHandle
 {
-	typedef cServerHandle super;
+	using Super = cServerHandle;
 	friend class cTCPLinkImpl;
 
 public:
+
 	/** Closes the server, dropping all the connections. */
 	virtual ~cServerHandleImpl() override;
 

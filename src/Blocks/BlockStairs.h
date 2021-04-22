@@ -2,37 +2,37 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "MetaRotator.h"
+#include "Mixins.h"
 
 
 
 
-class cBlockStairsHandler :
-	public cMetaRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>
+class cBlockStairsHandler final :
+	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>>
 {
-public:
-	cBlockStairsHandler(BLOCKTYPE a_BlockType) :
-		cMetaRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>(a_BlockType)
-	{
+	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x02, 0x01, true>>;
 
-	}
+public:
+
+	using Super::Super;
+
+private:
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		UNUSED(a_ChunkInterface);
-		UNUSED(a_BlockX);
-		UNUSED(a_BlockY);
-		UNUSED(a_BlockZ);
-		UNUSED(a_CursorX);
-		UNUSED(a_CursorZ);
+		UNUSED(a_PlacedBlockPos);
+		UNUSED(a_CursorPos);
 		a_BlockType = m_BlockType;
 		a_BlockMeta = RotationToMetaData(a_Player.GetYaw());
-		switch (a_BlockFace)
+		switch (a_ClickedBlockFace)
 		{
 			case BLOCK_FACE_TOP:    break;
 			case BLOCK_FACE_BOTTOM: a_BlockMeta = a_BlockMeta | 0x4; break;  // When placing onto a bottom face, always place an upside-down stairs block
@@ -42,7 +42,7 @@ public:
 			case BLOCK_FACE_WEST:
 			{
 				// When placing onto a sideways face, check cursor, if in top half, make it an upside-down stairs block
-				if (a_CursorY > 8)
+				if (a_CursorPos.y > 8)
 				{
 					a_BlockMeta |= 0x4;
 				}
@@ -53,11 +53,9 @@ public:
 		return true;
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		// Reset meta to zero
-		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
-	}
+
+
+
 
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{
@@ -84,13 +82,21 @@ public:
 		}
 	}
 
-	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
+
+
+
+
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) const override
 	{
 		// Toggle bit 3:
 		return (a_Meta & 0x0b) | ((~a_Meta) & 0x04);
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		switch (m_BlockType)
@@ -117,12 +123,16 @@ public:
 		}
 	}
 
+
+
+
+
 	/** EXCEPTION a.k.a. why is this removed:
 	This collision-detection is actually more accurate than the client, but since the client itself
 	sends inaccurate / sparse data, it's easier to just err on the side of the client and keep the
 	two in sync by assuming that if a player hit ANY of the stair's bounding cube, it counts as the ground. */
 	#if 0
-	bool IsInsideBlock(const Vector3d & a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
+	bool IsInsideBlock(Vector3d a_RelPosition, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
 	{
 		if (a_BlockMeta & 0x4)  // upside down
 		{
@@ -130,19 +140,19 @@ public:
 		}
 		else if ((a_BlockMeta & 0x3) == 0)  // tall side is east (+X)
 		{
-			return a_Position.y < ((a_Position.x > 0.5) ? 1.0 : 0.5);
+			return (a_RelPosition.y < ((a_RelPosition.x > 0.5) ? 1.0 : 0.5));
 		}
 		else if ((a_BlockMeta & 0x3) == 1)  // tall side is west (-X)
 		{
-			return a_Position.y < ((a_Position.x < 0.5) ? 1.0 : 0.5);
+			return (a_RelPosition.y < ((a_RelPosition.x < 0.5) ? 1.0 : 0.5));
 		}
 		else if ((a_BlockMeta & 0x3) == 2)  // tall side is south (+Z)
 		{
-			return a_Position.y < ((a_Position.z > 0.5) ? 1.0 : 0.5);
+			return (a_RelPosition.y < ((a_RelPosition.z > 0.5) ? 1.0 : 0.5));
 		}
 		else if ((a_BlockMeta & 0x3) == 3)  // tall side is north (-Z)
 		{
-			return a_Position.y < ((a_Position.z < 0.5) ? 1.0 : 0.5);
+			return (a_RelPosition.y < ((a_RelPosition.z < 0.5) ? 1.0 : 0.5));
 		}
 		return false;
 	}

@@ -10,7 +10,7 @@
 
 
 cPig::cPig(void) :
-	super("Pig", mtPig, "entity.pig.hurt", "entity.pig.death", 0.9, 0.9),
+	Super("Pig", mtPig, "entity.pig.hurt", "entity.pig.death", "entity.pig.ambient", 0.9f, 0.9f),
 	m_bIsSaddled(false)
 {
 }
@@ -34,7 +34,7 @@ void cPig::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? E_ITEM_COOKED_PORKCHOP : E_ITEM_RAW_PORKCHOP);
 	if (m_bIsSaddled)
 	{
-		a_Drops.push_back(cItem(E_ITEM_SADDLE, 1));
+		a_Drops.emplace_back(E_ITEM_SADDLE, 1);
 	}
 }
 
@@ -44,7 +44,7 @@ void cPig::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cPig::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	if (m_bIsSaddled)
 	{
@@ -89,7 +89,7 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 
 void cPig::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -112,7 +112,7 @@ void cPig::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cPig::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	if (!super::DoTakeDamage(a_TDI))
+	if (!Super::DoTakeDamage(a_TDI))
 	{
 		return false;
 	}

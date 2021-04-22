@@ -22,12 +22,28 @@ g_PluginInfo =
 			Handler = HandleArrowCmd,
 			HelpString = "Creates an arrow going away from the player"
 		},
+
 		["/blk"] =
 		{
 			Permission = "debuggers",
 			Handler = HandleBlkCmd,
 			HelpString = "Gets info about the block you are looking at"
 		},
+
+		["/boom"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleBoomCmd,
+			HelpString = "Playes a sound and displays an effect at the player's position",
+		},
+
+		["/cake"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleCakeCmd,
+			HelpString = "Throws a cake in the direction the player's looking, in a slow arc.",
+		},
+
 		["/clientversion"] =
 		{
 			Permission = "debuggers",
@@ -244,6 +260,14 @@ g_PluginInfo =
 			Handler = HandleTestWndCmd,
 			HelpString = "Opens up a window using plugin API"
 		},
+
+		["/vector"] =
+		{
+			Permission = "debuggers",
+			Handler = HandleVectorCmd,
+			HelpString = "Tests the Vector3 API",
+		},
+
 		["/wesel"] =
 		{
 			Permission = "debuggers",
@@ -368,6 +392,12 @@ g_PluginInfo =
 			HelpString = "Tests the cLineBlockTracer",
 		},
 
+		["testtracerdeprecated"] =
+		{
+			Handler = HandleConsoleTestTracerDeprecated,
+			HelpString = "Tests the cLineBlockTracer's deprecated API",
+		},
+
 		["testurlclient"] =
 		{
 			Handler = HandleConsoleTestUrlClient,
@@ -387,7 +417,6 @@ g_PluginInfo =
 		}
 	},  -- ConsoleCommands
 }  -- g_PluginInfo
-
 
 
 

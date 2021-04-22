@@ -9,17 +9,21 @@
 
 
 
-class cItemLilypadHandler :
+class cItemLilypadHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
+
 	cItemLilypadHandler(int a_ItemType):
-		super(a_ItemType)
+		Super(a_ItemType)
 	{
 
 	}
+
+
+
 
 
 	virtual bool IsPlaceable(void) override
@@ -29,79 +33,110 @@ public:
 
 
 
+
+
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
 	) override
 	{
-		if (a_BlockFace > BLOCK_FACE_NONE)
+		// The client sends BLOCK_FACE_NONE when it determines it should do a tracing-based placement.
+		// Otherwise, a normal block face is sent.
+
+		if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
-			// Clicked on the side of a submerged block; vanilla allows placement, so should we
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_LILY_PAD, 0);
+			// The position the client wants the lilypad placed.
+			const auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+
+			// Lilypad should not replace non air and non water blocks:
+			if (
+				const auto BlockToReplace = a_World->GetBlock(PlacePos);
+				(BlockToReplace != E_BLOCK_AIR) &&
+				(BlockToReplace != E_BLOCK_WATER) &&
+				(BlockToReplace != E_BLOCK_STATIONARY_WATER)
+			)
+			{
+				return false;
+			}
+
+			const auto Below = PlacePos.addedY(-1);
+			if (Below.y < 0)
+			{
+				return false;
+			}
+
+			// Lilypad should be placed only if there is a water block below:
+			if (
+				const auto BlockBelow = a_World->GetBlock(Below);
+				(BlockBelow != E_BLOCK_WATER) &&
+				(BlockBelow != E_BLOCK_STATIONARY_WATER)
+			)
+			{
+				return false;
+			}
+
+			a_World->SetBlock(PlacePos, E_BLOCK_LILY_PAD, 0);
 			if (!a_Player->IsGameModeCreative())
 			{
 				a_Player->GetInventory().RemoveOneEquippedItem();
 			}
+
 			return true;
 		}
 
-		class cCallbacks :
+		class cCallbacks:
 			public cBlockTracer::cCallbacks
 		{
 		public:
 
-			cCallbacks(void) :
-				m_HasHitFluid(false)
+			virtual bool OnNextBlock(Vector3i a_CBBlockPos, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
 			{
-			}
-
-			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
-			{
-				if (IsBlockWater(a_CBBlockType))
+				if (
+					!IsBlockWater(a_CBBlockType) ||
+					(a_CBBlockMeta != 0)  // The hit block should be a source
+				)
 				{
-					if ((a_CBBlockMeta != 0) || (a_CBEntryFace == BLOCK_FACE_NONE))  // The hit block should be a source. The FACE_NONE check is clicking whilst submerged
-					{
-						return false;
-					}
-					AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, BLOCK_FACE_YP);  // Always place pad at top of water block
-					if (
-						!IsBlockWater(a_CBBlockType) &&
-						cBlockInfo::FullyOccupiesVoxel(a_CBBlockType)
-						)
-					{
-						// Can't place lilypad on air / in another block!
-						return true;
-					}
-					m_HasHitFluid = true;
-					m_Pos.Set(a_CBBlockX, a_CBBlockY, a_CBBlockZ);
-					return true;
+					// TODO: Vanilla stops the trace. However, we need to continue the trace, to work around our lack of block bounding box support
+					// which would otherwise mean we misbehave when clicking through the voxel a (e.g.) button occupies. Now, however, we misbehave
+					// when clicking on a block near water... Nonetheless, the former would cause ghost blocks, so continue for now.
+
+					// Ignore and continue trace:
+					return false;
 				}
-				return false;
+
+				Position = AddFaceDirection(a_CBBlockPos, BLOCK_FACE_YP);  // Always place pad at top of water block
+				return true;
 			}
 
-			Vector3i m_Pos;
-			bool m_HasHitFluid;
+			Vector3i Position;
 
-		};
+		} Callbacks;
 
-		cCallbacks Callbacks;
-		cLineBlockTracer Tracer(*a_Player->GetWorld(), Callbacks);
-		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
-		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
-
-		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
-
-		if (Callbacks.m_HasHitFluid)
+		const auto EyePosition = a_Player->GetEyePosition();
+		const auto End = EyePosition + a_Player->GetLookVector() * 5;
+		if (cLineBlockTracer::Trace(*a_Player->GetWorld(), Callbacks, EyePosition, End))
 		{
-			a_World->SetBlock(Callbacks.m_Pos.x, Callbacks.m_Pos.y, Callbacks.m_Pos.z, E_BLOCK_LILY_PAD, 0);
-			if (!a_Player->IsGameModeCreative())
-			{
-				a_Player->GetInventory().RemoveOneEquippedItem();
-			}
-			return true;
+			// The line traced to completion; no suitable water was found:
+			return false;
 		}
 
-		return false;
+		const auto BlockToReplace = a_World->GetBlock(Callbacks.Position);
+		if (BlockToReplace != E_BLOCK_AIR)
+		{
+			// Lilypad should not replace non air blocks:
+			return false;
+		}
+
+		a_World->SetBlock(Callbacks.Position, E_BLOCK_LILY_PAD, 0);
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->GetInventory().RemoveOneEquippedItem();
+		}
+
+		return true;
 	}
 };

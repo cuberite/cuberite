@@ -8,43 +8,52 @@
 
 
 
-class cItemArmorHandler :
+class cItemArmorHandler:
 	public cItemHandler
 {
+	using Super = cItemHandler;
+
 public:
-	cItemArmorHandler(int a_ItemType) :
-		cItemHandler(a_ItemType)
+
+	cItemArmorHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
 
 
 
+
+
 	/** Move the armor to the armor slot of the player's inventory */
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
 	) override
 	{
 		int SlotNum;
-		if (ItemCategory::IsHelmet(a_Item.m_ItemType))
+		if (ItemCategory::IsHelmet(a_HeldItem.m_ItemType))
 		{
 			SlotNum = 0;
 		}
-		else if (ItemCategory::IsChestPlate(a_Item.m_ItemType))
+		else if (ItemCategory::IsChestPlate(a_HeldItem.m_ItemType))
 		{
 			SlotNum = 1;
 		}
-		else if (ItemCategory::IsLeggings(a_Item.m_ItemType))
+		else if (ItemCategory::IsLeggings(a_HeldItem.m_ItemType))
 		{
 			SlotNum = 2;
 		}
-		else if (ItemCategory::IsBoots(a_Item.m_ItemType))
+		else if (ItemCategory::IsBoots(a_HeldItem.m_ItemType))
 		{
 			SlotNum = 3;
 		}
 		else
 		{
-			LOGWARNING("Used unknown armor: %i", a_Item.m_ItemType);
+			LOGWARNING("Used unknown armor: %i", a_HeldItem.m_ItemType);
 			return false;
 		}
 
@@ -53,17 +62,12 @@ public:
 			return false;
 		}
 
-		a_Player->GetInventory().SetArmorSlot(SlotNum, a_Item.CopyOne());
-
-		cItem Item(a_Item);
-		Item.m_ItemCount--;
-		if (Item.m_ItemCount <= 0)
-		{
-			Item.Empty();
-		}
-		a_Player->GetInventory().SetHotbarSlot(a_Player->GetInventory().GetEquippedSlotNum(), Item);
+		a_Player->GetInventory().SetArmorSlot(SlotNum, a_HeldItem.CopyOne());
+		a_Player->GetInventory().RemoveOneEquippedItem();
 		return true;
 	}
+
+
 
 
 
@@ -99,6 +103,7 @@ public:
 			{
 				return (a_ItemType == E_ITEM_GOLD);
 			}
+			case E_ITEM_ELYTRA:  // TODO: require Phantom Membrane instead of leather starting from protocol version 369 or 1.13 release
 			case E_ITEM_LEATHER_BOOTS:
 			case E_ITEM_LEATHER_CAP:
 			case E_ITEM_LEATHER_PANTS:

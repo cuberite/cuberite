@@ -20,15 +20,15 @@
 class cWitherSkullEntity :
 public cProjectileEntity
 {
-	typedef cProjectileEntity super;
-
-public:
-
 	// tolua_end
+
+	using Super = cProjectileEntity;
+
+public:  // tolua_export
 
 	CLASS_PROTODEF(cWitherSkullEntity)
 
-	cWitherSkullEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
+	cWitherSkullEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed);
 
 protected:
 

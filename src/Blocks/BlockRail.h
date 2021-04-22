@@ -16,94 +16,116 @@ enum ENUM_PURE
 
 
 
-class cBlockRailHandler :
-	public cBlockHandler
+class cBlockRailHandler final :
+	public cClearMetaOnDrop<cBlockHandler>
 {
-	typedef cBlockHandler super;
+	using Super = cClearMetaOnDrop<cBlockHandler>;
 
 public:
-	cBlockRailHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
-	{
-	}
+
+	using Super::Super;
+
+private:
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		cChunkInterface & a_ChunkInterface,
+		cPlayer & a_Player,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) const override
 	{
 		a_BlockType = m_BlockType;
-		Vector3i Pos{ a_BlockX, a_BlockY, a_BlockZ };
-		a_BlockMeta = FindMeta(a_ChunkInterface, Pos);
-		return a_Player.GetWorld()->DoWithChunkAt(Pos,
-			[this, Pos, &a_ChunkInterface](cChunk & a_Chunk)
+		a_BlockMeta = FindMeta(a_ChunkInterface, a_PlacedBlockPos);
+		return a_Player.GetWorld()->DoWithChunkAt(a_PlacedBlockPos,
+			[this, a_PlacedBlockPos, &a_ChunkInterface](cChunk & a_Chunk)
 			{
-				auto RelPos = cChunkDef::AbsoluteToRelative(Pos);
-				return CanBeAt(a_ChunkInterface, RelPos.x, RelPos.y, RelPos.z, a_Chunk);
+				auto RelPos = cChunkDef::AbsoluteToRelative(a_PlacedBlockPos);
+				return CanBeAt(a_ChunkInterface, RelPos, a_Chunk);
 			}
 		);
 	}
 
-	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
-	{
-		super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 
-		// Alert diagonal rails
-		NeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ + 1, BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ - 1, BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY - 1, a_BlockZ, BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY - 1, a_BlockZ, BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ + 1, BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ - 1, BLOCK_FACE_NONE);
+
+
+
+	virtual void OnPlaced(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+	) const override
+	{
+		Super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_BlockType, a_BlockMeta);
+
+		// Alert diagonal rails:
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1,  1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1,  1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1,  1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1, -1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1, -1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, -1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1,  1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1, -1), BLOCK_FACE_NONE);
 	}
 
-	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
-	{
-		super::OnDestroyed(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ);
 
-		// Alert diagonal rails
-		NeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ + 1, BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ - 1, BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockX + 1, a_BlockY - 1, a_BlockZ, BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockX - 1, a_BlockY - 1, a_BlockZ, BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ + 1, BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ - 1, BLOCK_FACE_NONE);
+
+
+
+	virtual void OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+	) const override
+	{
+		Super::OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlockType, a_OldBlockMeta, a_Digger);
+
+		// Alert diagonal rails:
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1,  1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1,  1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1,  1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1, -1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1, -1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, -1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1,  1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1, -1), BLOCK_FACE_NONE);
 	}
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_WhichNeighbor) override
+
+
+
+
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
 	{
-		Vector3i Pos(a_BlockX, a_BlockY, a_BlockZ);
-		auto Meta = a_ChunkInterface.GetBlockMeta(Pos);
-		auto NewMeta = FindMeta(a_ChunkInterface, Pos);
-		if (IsUnstable(a_ChunkInterface, Pos) && (Meta != NewMeta))
+		const auto Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
+		const auto NewMeta = FindMeta(a_ChunkInterface, a_BlockPos);
+		if ((Meta != NewMeta) && IsUnstable(a_ChunkInterface, a_BlockPos))
 		{
-			a_ChunkInterface.FastSetBlock(Pos, m_BlockType, (m_BlockType == E_BLOCK_RAIL) ? NewMeta : NewMeta | (Meta & 0x08));
+			a_ChunkInterface.FastSetBlock(a_BlockPos, m_BlockType, (m_BlockType == E_BLOCK_RAIL) ? NewMeta : NewMeta | (Meta & 0x08));
 		}
+
+		Super::OnNeighborChanged(a_ChunkInterface, a_BlockPos, a_WhichNeighbor);
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		super::ConvertToPickups(a_Pickups, 0);
-	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+
+
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		if (a_RelY <= 0)
+		if (a_RelPos.y <= 0)
 		{
 			return false;
 		}
-		if (!cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)))
+		if (!cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_RelPos.addedY(-1))))
 		{
 			return false;
 		}
 
-		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelPos);
 		switch (Meta)
 		{
 			case E_META_RAIL_ASCEND_XP:
@@ -113,19 +135,16 @@ public:
 			{
 				// Mapping between the meta and the neighbors that need checking
 				Meta -= E_META_RAIL_ASCEND_XP;  // Base index at zero
-				static const struct
+				static const Vector3i Coords[] =
 				{
-					int x, z;
-				} Coords[] =
-				{
-					{ 1,  0},  // east,  XP
-					{-1,  0},  // west,  XM
-					{ 0, -1},  // north, ZM
-					{ 0,  1},  // south, ZP
+					{ 1, 0,  0},  // east,  XP
+					{-1, 0,  0},  // west,  XM
+					{ 0, 0, -1},  // north, ZM
+					{ 0, 0,  1},  // south, ZP
 				} ;
 				BLOCKTYPE  BlockType;
 				NIBBLETYPE BlockMeta;
-				if (!a_Chunk.UnboundedRelGetBlock(a_RelX + Coords[Meta].x, a_RelY, a_RelZ + Coords[Meta].z, BlockType, BlockMeta))
+				if (!a_Chunk.UnboundedRelGetBlock(a_RelPos + Coords[Meta], BlockType, BlockMeta))
 				{
 					// Too close to the edge, cannot simulate
 					return true;
@@ -136,7 +155,11 @@ public:
 		return true;
 	}
 
-	NIBBLETYPE FindMeta(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos)
+
+
+
+
+	NIBBLETYPE FindMeta(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos) const
 	{
 		NIBBLETYPE Meta = 0;
 		char RailsCnt = 0;
@@ -260,12 +283,14 @@ public:
 		return Meta;
 	}
 
-	inline bool CanThisRailCurve(void)
+
+	bool CanThisRailCurve(void) const
 	{
 		return m_BlockType == E_BLOCK_RAIL;
 	}
 
-	bool IsUnstable(cChunkInterface & a_ChunkInterface, Vector3i a_Pos)
+
+	static bool IsUnstable(cChunkInterface & a_ChunkInterface, Vector3i a_Pos)
 	{
 		if (!IsBlockRail(a_ChunkInterface.GetBlock(a_Pos)))
 		{
@@ -397,7 +422,8 @@ public:
 		return false;
 	}
 
-	bool IsNotConnected(cChunkInterface  & a_ChunkInterface, Vector3i a_Pos, eBlockFace a_BlockFace, char a_Pure = 0)
+
+	static bool IsNotConnected(cChunkInterface  & a_ChunkInterface, Vector3i a_Pos, eBlockFace a_BlockFace, char a_Pure = 0)
 	{
 		AddFaceDirection(a_Pos.x, a_Pos.y, a_Pos.z, a_BlockFace, false);
 		NIBBLETYPE Meta;
@@ -494,7 +520,8 @@ public:
 		return true;
 	}
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override
 	{
 		// Bit 0x08 is a flag when a_Meta is in the range 0x00--0x05 and 0x0A--0x0F.
 		// Bit 0x08 specifies direction when a_Meta is in the range 0x06-0x09.
@@ -531,8 +558,7 @@ public:
 	}
 
 
-
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const override
 	{
 		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
 		if ((a_Meta < 0x06) || (a_Meta > 0x09))
@@ -568,8 +594,7 @@ public:
 	}
 
 
-
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) const override
 	{
 		// MirrorXY basically flips the ZP and ZM parts of the meta
 		if (m_BlockType == E_BLOCK_RAIL)
@@ -608,8 +633,7 @@ public:
 	}
 
 
-
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) const override
 	{
 		// MirrorYZ basically flips the XP and XM parts of the meta
 		if (m_BlockType == E_BLOCK_RAIL)
@@ -648,14 +672,9 @@ public:
 	}
 
 
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 0;
 	}
 } ;
-
-
-
-

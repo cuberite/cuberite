@@ -10,10 +10,12 @@
 
 // Emit a warning if the first param is true
 #define CONDWARNING(ShouldLog, Fmt, ...) \
-	if (ShouldLog) \
-	{ \
-		LOGWARNING(Fmt, __VA_ARGS__); \
-	}
+	do { \
+		if (ShouldLog) \
+		{ \
+			LOGWARNING(Fmt, __VA_ARGS__); \
+		} \
+	} while (false)
 
 
 
@@ -28,36 +30,39 @@ If a_LogWarnings is true, outputs failure reasons to console.
 The range is returned in a_Min and a_Max.
 If no value is in the string, both values are left unchanged.
 If only the minimum is in the string, it is assigned to both a_Min and a_Max. */
-static bool ParseRange(const AString & a_Params, int & a_Min, int & a_Max, bool a_LogWarnings)
+namespace VerticalLimit
 {
-	auto params = StringSplitAndTrim(a_Params, "|");
-	if (params.size() == 0)
+	static bool ParseRange(const AString & a_Params, int & a_Min, int & a_Max, bool a_LogWarnings)
 	{
-		// No params, generate directly on top:
+		auto params = StringSplitAndTrim(a_Params, "|");
+		if (params.size() == 0)
+		{
+			// No params, generate directly on top:
+			return true;
+		}
+		if (!StringToInteger(params[0], a_Min))
+		{
+			// Failed to parse the min rel height:
+			CONDWARNING(a_LogWarnings, "Cannot parse minimum height from string \"%s\"!", params[0].c_str());
+			return false;
+		}
+		if (params.size() == 1)
+		{
+			// Only one param was given, there's no range
+			a_Max = a_Min;
+			return true;
+		}
+		if (!StringToInteger(params[1], a_Max))
+		{
+			CONDWARNING(a_LogWarnings, "Cannot parse maximum height from string \"%s\"!", params[1].c_str());
+			return false;
+		}
+		if (a_Max < a_Min)
+		{
+			std::swap(a_Max, a_Min);
+		}
 		return true;
 	}
-	if (!StringToInteger(params[0], a_Min))
-	{
-		// Failed to parse the min rel height:
-		CONDWARNING(a_LogWarnings, "Cannot parse minimum height from string \"%s\"!", params[0].c_str());
-		return false;
-	}
-	if (params.size() == 1)
-	{
-		// Only one param was given, there's no range
-		a_Max = a_Min;
-		return true;
-	}
-	if (!StringToInteger(params[1], a_Max))
-	{
-		CONDWARNING(a_LogWarnings, "Cannot parse maximum height from string \"%s\"!", params[1].c_str());
-		return false;
-	}
-	if (a_Max < a_Min)
-	{
-		std::swap(a_Max, a_Min);
-	}
-	return true;
 }
 
 
@@ -128,6 +133,7 @@ class cVerticalLimitAboveTerrain:
 public:
 	virtual bool CanBeAtHeight(int a_BlockX, int a_BlockZ, int a_Height) override
 	{
+		ASSERT(m_TerrainHeightGen != nullptr);
 		auto terrainHeight = m_TerrainHeightGen->GetHeightAt(a_BlockX, a_BlockZ);
 		int compareHeight = a_Height - terrainHeight;
 		return (
@@ -142,18 +148,18 @@ public:
 		// Parameters: "<MinBlocksAbove>|<MaxBlocksAbove>", both optional
 		m_MinBlocksAbove = 0;
 		m_MaxBlocksAbove = 0;
-		return ParseRange(a_Params, m_MinBlocksAbove, m_MaxBlocksAbove, a_LogWarnings);
+		return VerticalLimit::ParseRange(a_Params, m_MinBlocksAbove, m_MaxBlocksAbove, a_LogWarnings);
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
 	{
-		m_TerrainHeightGen = a_TerrainHeightGen;
+		m_TerrainHeightGen = &a_TerrainHeightGen;
 	}
 
 protected:
 	/** The underlying height generator. */
-	cTerrainHeightGenPtr m_TerrainHeightGen;
+	cTerrainHeightGen * m_TerrainHeightGen;
 
 	/** How many blocks above the terrain level do we accept on minimum. */
 	int m_MinBlocksAbove;
@@ -189,19 +195,19 @@ public:
 		// Parameters: "<MinBlocksAbove>|<MaxBlocksAbove>", both optional
 		m_MinBlocksAbove = 0;
 		m_MaxBlocksAbove = 0;
-		return ParseRange(a_Params, m_MinBlocksAbove, m_MaxBlocksAbove, a_LogWarnings);
+		return VerticalLimit::ParseRange(a_Params, m_MinBlocksAbove, m_MaxBlocksAbove, a_LogWarnings);
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
 	{
-		m_TerrainHeightGen = a_TerrainHeightGen;
+		m_TerrainHeightGen = &a_TerrainHeightGen;
 		m_SeaLevel = a_SeaLevel;
 	}
 
 protected:
 	/** The underlying height generator. */
-	cTerrainHeightGenPtr m_TerrainHeightGen;
+	cTerrainHeightGen * m_TerrainHeightGen;
 
 	/** The sealevel for the current world. */
 	int m_SeaLevel;
@@ -273,18 +279,18 @@ public:
 		// Parameters: "<MinBlocksBelow>|<MaxBlocksBelow>", both optional
 		m_MinBlocksBelow = 0;
 		m_MaxBlocksBelow = 0;
-		return ParseRange(a_Params, m_MinBlocksBelow, m_MaxBlocksBelow, a_LogWarnings);
+		return VerticalLimit::ParseRange(a_Params, m_MinBlocksBelow, m_MaxBlocksBelow, a_LogWarnings);
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
 	{
-		m_TerrainHeightGen = a_TerrainHeightGen;
+		m_TerrainHeightGen = &a_TerrainHeightGen;
 	}
 
 protected:
 	/** The underlying height generator. */
-	cTerrainHeightGenPtr m_TerrainHeightGen;
+	cTerrainHeightGen * m_TerrainHeightGen;
 
 	/** How many blocks below the terrain level do we accept on minimum. */
 	int m_MinBlocksBelow;
@@ -319,19 +325,19 @@ public:
 		// Parameters: "<MinBlocksBelow>|<MaxBlocksBelow>", both optional
 		m_MinBlocksBelow = 0;
 		m_MaxBlocksBelow = 0;
-		return ParseRange(a_Params, m_MinBlocksBelow, m_MaxBlocksBelow, a_LogWarnings);
+		return VerticalLimit::ParseRange(a_Params, m_MinBlocksBelow, m_MaxBlocksBelow, a_LogWarnings);
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
 	{
-		m_TerrainHeightGen = a_TerrainHeightGen;
+		m_TerrainHeightGen = &a_TerrainHeightGen;
 		m_SeaLevel = a_SeaLevel;
 	}
 
 protected:
 	/** The underlying height generator. */
-	cTerrainHeightGenPtr m_TerrainHeightGen;
+	cTerrainHeightGen * m_TerrainHeightGen;
 
 	/** The sealevel for the current world. */
 	int m_SeaLevel;
@@ -408,7 +414,3 @@ cPiece::cVerticalLimitPtr CreateVerticalLimitFromString(const AString & a_LimitD
 
 	return Limit;
 }
-
-
-
-

@@ -39,7 +39,7 @@ class cNetworkSingleton
 {
 public:
 	cNetworkSingleton();
-	~cNetworkSingleton() CAN_THROW;
+	~cNetworkSingleton() noexcept(false);
 
 	/** Returns the singleton instance of this class */
 	static cNetworkSingleton & Get(void);
@@ -61,7 +61,7 @@ public:
 
 	/** Adds the specified link to m_Connections.
 	Used by the underlying link implementation when a new link is created. */
-	void AddLink(cTCPLinkPtr a_Link);
+	void AddLink(const cTCPLinkPtr & a_Link);
 
 	/** Removes the specified link from m_Connections.
 	Used by the underlying link implementation when the link is closed / errored. */
@@ -70,7 +70,7 @@ public:
 	/** Adds the specified link to m_Servers.
 	Used by the underlying server handle implementation when a new listening server is created.
 	Only servers that succeed in listening are added. */
-	void AddServer(cServerHandlePtr a_Server);
+	void AddServer(const cServerHandlePtr & a_Server);
 
 	/** Removes the specified server from m_Servers.
 	Used by the underlying server handle implementation when the server is closed. */

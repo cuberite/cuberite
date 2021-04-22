@@ -18,10 +18,11 @@
 class cBrewingstandWindow :
 	public cWindow
 {
-	typedef cWindow super;
+	using Super = cWindow;
 
 public:
-	cBrewingstandWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandEntity * a_Brewingstand);
+
+	cBrewingstandWindow(cBrewingstandEntity * a_Brewingstand);
 
 	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
 };

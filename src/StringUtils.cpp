@@ -52,21 +52,36 @@ static unsigned char HexToDec(char a_HexChar)
 
 
 
-AString & Printf(AString & str, const char * format, fmt::ArgList args)
+AString & vPrintf(AString & a_String, const char * a_Format, fmt::printf_args a_ArgList)
 {
-	ASSERT(format != nullptr);
-	str = fmt::sprintf(format, args);
-	return str;
+	ASSERT(a_Format != nullptr);
+	fmt::memory_buffer Buffer;  // Save a string allocation compared to vsprintf
+	fmt::vprintf(Buffer, fmt::to_string_view(a_Format), a_ArgList);
+	a_String.assign(Buffer.data(), Buffer.size());
+	return a_String;
 }
 
 
 
 
 
-AString Printf(const char * format, fmt::ArgList args)
+AString vPrintf(const char * a_Format, fmt::printf_args a_ArgList)
 {
-	ASSERT(format != nullptr);
-	return fmt::sprintf(format, args);
+	ASSERT(a_Format != nullptr);
+	return fmt::vsprintf(a_Format, a_ArgList);
+}
+
+
+
+
+
+AString & vAppendPrintf(AString & a_String, const char * a_Format, fmt::printf_args a_ArgList)
+{
+	ASSERT(a_Format != nullptr);
+	fmt::memory_buffer Buffer;
+	fmt::vprintf(Buffer, fmt::to_string_view(a_Format), a_ArgList);
+	a_String.append(Buffer.data(), Buffer.size());
+	return a_String;
 }
 
 
@@ -89,6 +104,7 @@ AStringVector StringSplit(const AString & str, const AString & delim)
 	}
 	return results;
 }
+
 
 
 
@@ -185,6 +201,7 @@ AString StringJoin(const AStringVector & a_Strings, const AString & a_Delimeter)
 
 
 
+
 AStringVector StringSplitAndTrim(const AString & str, const AString & delim)
 {
 	AStringVector results;
@@ -201,6 +218,7 @@ AStringVector StringSplitAndTrim(const AString & str, const AString & delim)
 	}
 	return results;
 }
+
 
 
 
@@ -346,6 +364,7 @@ void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString &
 
 
 
+
 AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8)
 {
 	a_UTF8.clear();
@@ -356,6 +375,7 @@ AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UT
 	}
 	return a_UTF8;
 }
+
 
 
 
@@ -409,6 +429,10 @@ AString UnicodeCharToUtf8(unsigned a_UnicodeChar)
 
 
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
 // UTF-8 conversion code adapted from:
 //  https://stackoverflow.com/questions/2867123/convert-utf-16-to-utf-8-under-windows-and-linux-in-c
 
@@ -503,11 +527,7 @@ static bool isLegalUTF8(const unsigned char * source, int length)
 		}
 		case 1: if ((*source >= 0x80) && (*source < 0xc2)) return false;
 	}
-	if (*source > 0xf4)
-	{
-		return false;
-	}
-	return true;
+	return (*source <= 0xf4);
 }
 
 
@@ -605,7 +625,9 @@ are equivalent to the following loop:
 ////////////////////////////////////////////////////////////////////////////////
 // End of Unicode, Inc.'s code / information
 ////////////////////////////////////////////////////////////////////////////////
-
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 
 
@@ -619,18 +641,18 @@ format binary data this way:
 */
 AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, size_t a_BytesPerLine)
 {
-	fmt::MemoryWriter Output;
+	fmt::memory_buffer Output;
 	/* If formatting the data from the comment above:
 		Hex holds:   "31 32 33 34 35 36 37 38 39 30 61 62 63 64 65 66 "
 		Chars holds: "1234567890abcdef" */
-	fmt::MemoryWriter Hex, Chars;
+	fmt::memory_buffer Hex, Chars;
 
 	if (a_Size > 0)
 	{
 		// Same as std::ceil(static_cast<float>(a_Size) / a_BytesPerLine);
 		const size_t NumLines = a_Size / a_BytesPerLine + (a_Size % a_BytesPerLine != 0);
 		const size_t CharsPerLine = 14 + 4 * a_BytesPerLine;
-		Output.buffer().reserve(NumLines * CharsPerLine);
+		Output.reserve(NumLines * CharsPerLine);
 	}
 
 	for (size_t i = 0; i < a_Size; i += a_BytesPerLine)
@@ -638,13 +660,21 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 		size_t k = std::min(a_Size - i, a_BytesPerLine);
 		for (size_t j = 0; j < k; j++)
 		{
-			Byte c = (reinterpret_cast<const Byte *>(a_Data))[i + j];
-			Hex << HEX(c >> 4) << HEX(c & 0xf) << ' ';
-			Chars << ((c >= ' ') ? static_cast<char>(c) : '.');
+			Byte c = (static_cast<const Byte *>(a_Data))[i + j];
+			Hex.push_back(HEX(c >> 4));
+			Hex.push_back(HEX(c & 0xf));
+			Hex.push_back(' ');
+			Chars.push_back((c >= ' ') ? static_cast<char>(c) : '.');
 		}  // for j
 
 		// Write Hex with a dynamic fixed width
-		Output.write("{0:08x}: {1:{2}}   {3}\n", i, Hex.c_str(), a_BytesPerLine * 3, Chars.c_str());
+		auto HexStr = fmt::string_view(Hex.data(), Hex.size());
+		auto CharsStr = fmt::string_view(Chars.data(), Chars.size());
+		fmt::format_to(
+			Output, "{0:08x}: {1:{2}}   {3}\n",
+			i, HexStr, a_BytesPerLine * 3, CharsStr
+		);
+
 		Hex.clear();
 		Chars.clear();
 	}  // for i
@@ -942,10 +972,12 @@ AString Base64Encode(const AString & a_Input)
 
 
 
-short GetBEShort(const char * a_Mem)
+short GetBEShort(const std::byte * const a_Mem)
 {
-	const Byte * Bytes = reinterpret_cast<const Byte *>(a_Mem);
-	return static_cast<short>((Bytes[0] << 8) | Bytes[1]);
+	return static_cast<short>(
+		(static_cast<short>(a_Mem[0]) << 8) |
+		static_cast<short>(a_Mem[1])
+	);
 }
 
 
@@ -962,22 +994,26 @@ unsigned short GetBEUShort(const char * a_Mem)
 
 
 
-int GetBEInt(const char * a_Mem)
+int GetBEInt(const std::byte * const a_Mem)
 {
-	const Byte * Bytes = reinterpret_cast<const Byte *>(a_Mem);
-	return (Bytes[0] << 24) | (Bytes[1] << 16) | (Bytes[2] << 8) | Bytes[3];
+	return
+		(static_cast<int>(a_Mem[0]) << 24) |
+		(static_cast<int>(a_Mem[1]) << 16) |
+		(static_cast<int>(a_Mem[2]) << 8) |
+		static_cast<int>(a_Mem[3])
+	;
 }
 
 
 
 
 
-void SetBEInt(char * a_Mem, Int32 a_Value)
+void SetBEInt(std::byte * a_Mem, Int32 a_Value)
 {
-	a_Mem[0] = a_Value >> 24;
-	a_Mem[1] = static_cast<char>((a_Value >> 16) & 0xff);
-	a_Mem[2] = static_cast<char>((a_Value >> 8) & 0xff);
-	a_Mem[3] = static_cast<char>(a_Value & 0xff);
+	a_Mem[0] = std::byte(a_Value >> 24);
+	a_Mem[1] = std::byte((a_Value >> 16) & 0xff);
+	a_Mem[2] = std::byte((a_Value >> 8) & 0xff);
+	a_Mem[3] = std::byte(a_Value & 0xff);
 }
 
 
@@ -1018,7 +1054,7 @@ AStringVector MergeStringVectors(const AStringVector & a_Strings1, const AString
 	AStringVector res = a_Strings1;
 
 	// Add each item from strings2 that is not already present:
-	for (auto item : a_Strings2)
+	for (const auto & item : a_Strings2)
 	{
 		if (std::find(res.begin(), res.end(), item) == res.end())
 		{
@@ -1050,4 +1086,24 @@ AString StringsConcat(const AStringVector & a_Strings, char a_Separator)
 		res.append(*itr);
 	}
 	return res;
+}
+
+
+
+
+
+bool StringToFloat(const AString & a_String, float & a_Num)
+{
+	char *err;
+	a_Num = strtof(a_String.c_str(), &err);
+	return (*err == 0);
+}
+
+
+
+
+
+bool IsOnlyWhitespace(const AString & a_String)
+{
+	return std::all_of(a_String.cbegin(), a_String.cend(), isspace);
 }

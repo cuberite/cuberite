@@ -1,18 +1,19 @@
 #include "Globals.h"
 #include "PathFinder.h"
+#include "BlockType.h"
+#include "../BlockInfo.h"
 #include "../Chunk.h"
 
 
 
 
 
-cPathFinder::cPathFinder(double a_MobWidth, double a_MobHeight) :
-	m_Path(),
+cPathFinder::cPathFinder(float a_MobWidth, float a_MobHeight) :
+	m_Width(a_MobWidth),
+	m_Height(a_MobHeight),
 	m_GiveUpCounter(0),
 	m_NotFoundCooldown(0)
 {
-	m_Width = a_MobWidth;
-	m_Height = a_MobHeight;
 }
 
 
@@ -277,9 +278,6 @@ bool cPathFinder::PathIsTooOld() const
 	{
 		acceptableDeviation = 1;
 	}
-	if ((m_FinalDestination - m_DeviationOrigin).SqrLength() > acceptableDeviation * acceptableDeviation)
-	{
-		return true;
-	}
-	return false;
+	const auto DeviationSqr = (m_FinalDestination - m_DeviationOrigin).SqrLength();
+	return (DeviationSqr > (acceptableDeviation * acceptableDeviation));
 }

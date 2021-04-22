@@ -17,14 +17,13 @@
 
 
 
-cCommandBlockEntity::cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_BlockX, a_BlockY, a_BlockZ, a_World),
+cCommandBlockEntity::cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_ShouldExecute(false),
 	m_Result(0)
 {
 	ASSERT(a_BlockType == E_BLOCK_COMMAND_BLOCK);
 }
-
 
 
 
@@ -44,15 +43,6 @@ bool cCommandBlockEntity::UsedBy(cPlayer * a_Player)
 void cCommandBlockEntity::SetCommand(const AString & a_Cmd)
 {
 	m_Command = a_Cmd;
-
-	/*
-	Vanilla requires that the server send a Block Entity Update after a command has been set
-	Therefore, command blocks don't support on-the-fly (when window is open) updating of a command and therefore...
-	...the following code can't be put in UsedBy just before the window opens
-
-	Just documenting my experience in getting this to work :P
-	*/
-	m_World->BroadcastBlockEntity(GetPos());
 }
 
 
@@ -61,7 +51,6 @@ void cCommandBlockEntity::SetCommand(const AString & a_Cmd)
 
 void cCommandBlockEntity::SetLastOutput(const AString & a_LastOut)
 {
-	m_World->BroadcastBlockEntity(GetPos());
 	m_LastOutput = a_LastOut;
 }
 
@@ -117,7 +106,7 @@ void cCommandBlockEntity::Activate(void)
 void cCommandBlockEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
-	auto & src = reinterpret_cast<const cCommandBlockEntity &>(a_Src);
+	auto & src = static_cast<const cCommandBlockEntity &>(a_Src);
 	m_Command = src.m_Command;
 	m_LastOutput = src.m_LastOutput;
 	m_Result = src.m_Result;
@@ -164,33 +153,46 @@ void cCommandBlockEntity::Execute()
 		return;
 	}
 
+	if (m_Command.empty())
+	{
+		return;
+	}
+
 	class CommandBlockOutCb :
-		public cCommandOutputCallback
+		public cLogCommandDeleteSelfOutputCallback
 	{
 		cCommandBlockEntity * m_CmdBlock;
 
 	public:
 		CommandBlockOutCb(cCommandBlockEntity * a_CmdBlock) : m_CmdBlock(a_CmdBlock) {}
 
-		virtual void Out(const AString & a_Text)
+		virtual void Out(const AString & a_Text) override
 		{
 			// Overwrite field
 			m_CmdBlock->SetLastOutput(cClientHandle::FormatChatPrefix(m_CmdBlock->GetWorld()->ShouldUseChatPrefixes(), "SUCCESS", cChatColor::Green, cChatColor::White) + a_Text);
 		}
-	} CmdBlockOutCb(this);
+	};
+
+	AString RealCommand = m_Command;
+
+	// Remove leading slash if it exists, since console commands don't use them
+	if (RealCommand[0] == '/')
+	{
+		RealCommand = RealCommand.substr(1, RealCommand.length());
+	}
 
 	// Administrator commands are not executable by command blocks:
 	if (
-		(m_Command != "stop") &&
-		(m_Command != "restart") &&
-		(m_Command != "kick") &&
-		(m_Command != "ban") &&
-		(m_Command != "ipban")
+		(RealCommand != "stop") &&
+		(RealCommand != "restart") &&
+		(RealCommand != "kick") &&
+		(RealCommand != "ban") &&
+		(RealCommand != "ipban")
 	)
 	{
 		cServer * Server = cRoot::Get()->GetServer();
 		LOGD("cCommandBlockEntity: Executing command %s", m_Command.c_str());
-		Server->ExecuteConsoleCommand(m_Command, CmdBlockOutCb);
+		Server->QueueExecuteConsoleCommand(RealCommand, *new CommandBlockOutCb(this));
 	}
 	else
 	{

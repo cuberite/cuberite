@@ -27,13 +27,14 @@ namespace Json
 
 
 
-class cAuthenticator :
+class cAuthenticator:
 	public cIsThread
 {
-	typedef cIsThread super;
+	using Super = cIsThread;
 
 public:
-	cAuthenticator(void);
+
+	cAuthenticator();
 	virtual ~cAuthenticator() override;
 
 	/** (Re-)read server and address from INI: */

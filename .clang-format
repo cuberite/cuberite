@@ -1,0 +1,39 @@
+# Not the exact style guide but enough for basic clang-tidy fix-its
+Language: Cpp
+BasedOnStyle: LLVM
+
+AlignAfterOpenBracket: AlwaysBreak
+BreakConstructorInitializers: AfterColon
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+PointerAlignment: Middle
+SortIncludes: false
+SpacesBeforeTrailingComments: 2
+UseTab: Always
+MaxEmptyLinesToKeep: 5
+
+TabWidth: 4
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+IndentWidth: 4
+IndentCaseLabels: true
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterExternBlock: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  IndentBraces: false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+
+# Always include globals first
+IncludeCategories:
+  - Regex: 'Globals.h'
+    Priority: -1

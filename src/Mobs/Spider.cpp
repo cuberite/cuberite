@@ -9,7 +9,7 @@
 
 
 cSpider::cSpider(void) :
-	super("Spider", mtSpider, "entity.spider.hurt", "entity.spider.death", 1.4, 0.9)
+	Super("Spider", mtSpider, "entity.spider.hurt", "entity.spider.death", "entity.spider.ambient", 1.4f, 0.9f)
 {
 }
 
@@ -48,12 +48,9 @@ void cSpider::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 		return;
 	}
 
-	if (
-		a_Player->CanMobsTarget() &&
-		!((Chunk->GetSkyLightAltered(Rel.x, Rel.y, Rel.z) > 11) || (Chunk->GetBlockLight(Rel.x, Rel.y, Rel.z) > 11))
-	)
+	if ((Chunk->GetSkyLightAltered(Rel.x, Rel.y, Rel.z) <= 11) && (Chunk->GetBlockLight(Rel.x, Rel.y, Rel.z) <= 11))
 	{
-		super::EventSeePlayer(a_Player, a_Chunk);
+		Super::EventSeePlayer(a_Player, a_Chunk);
 	}
 }
 
@@ -63,7 +60,7 @@ void cSpider::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 
 bool cSpider::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	if (!super::DoTakeDamage(a_TDI))
+	if (!Super::DoTakeDamage(a_TDI))
 	{
 		return false;
 	}

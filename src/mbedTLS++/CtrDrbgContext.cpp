@@ -41,7 +41,7 @@ int cCtrDrbgContext::Initialize(const void * a_Custom, size_t a_CustomSize)
 		return 0;
 	}
 
-	int res = mbedtls_ctr_drbg_seed(&m_CtrDrbg, mbedtls_entropy_func, &(m_EntropyContext->m_Entropy), reinterpret_cast<const unsigned char *>(a_Custom), a_CustomSize);
+	int res = mbedtls_ctr_drbg_seed(&m_CtrDrbg, mbedtls_entropy_func, &(m_EntropyContext->m_Entropy), static_cast<const unsigned char *>(a_Custom), a_CustomSize);
 	m_IsValid = (res == 0);
 	return res;
 }

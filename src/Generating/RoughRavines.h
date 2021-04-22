@@ -14,12 +14,13 @@
 
 
 
-class cRoughRavines :
+class cRoughRavines:
 	public cGridStructGen
 {
-	typedef cGridStructGen super;
+	using Super = cGridStructGen;
 
 public:
+
 	cRoughRavines(
 		int a_Seed,
 		int a_MaxSize, int a_MinSize,

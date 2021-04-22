@@ -11,15 +11,15 @@
 class cItemFrame :
 	public cHangingEntity
 {
-	typedef cHangingEntity super;
-
-public:
-
 	// tolua_end
+
+	using Super = cHangingEntity;
+
+public:  // tolua_export
 
 	CLASS_PROTODEF(cItemFrame)
 
-	cItemFrame(eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z);
+	cItemFrame(eBlockFace a_BlockFace, Vector3d a_Pos);
 
 	// tolua_begin
 

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockEntity.h"
+#include "../BlockType.h"
 
 
 
@@ -12,16 +13,13 @@
 class cJukeboxEntity :
 	public cBlockEntity
 {
-	typedef cBlockEntity Super;
-
-public:
-
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cJukeboxEntity)
+	using Super = cBlockEntity;
 
-	cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
-	virtual ~cJukeboxEntity() override;
+public:  // tolua_export
+
+	cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// tolua_begin
 
@@ -36,7 +34,7 @@ public:
 	bool EjectRecord(void);
 
 	/** Is in the Jukebox a Record? */
-	bool IsPlayingRecord(void);
+	bool IsPlayingRecord(void) const;
 
 	static bool IsRecordItem(int a_Item)
 	{
@@ -46,6 +44,8 @@ public:
 	// tolua_end
 
 	// cBlockEntity overrides:
+	virtual void Destroy(void) override;
+	virtual cItems ConvertToPickups() const override;
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle &) override {}
@@ -53,7 +53,3 @@ public:
 private:
 	int m_Record;
 } ;  // tolua_end
-
-
-
-

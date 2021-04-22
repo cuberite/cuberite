@@ -33,16 +33,16 @@ struct cRavDefPoint
 	}
 } ;
 
-typedef std::vector<cRavDefPoint> cRavDefPoints;
+using cRavDefPoints = std::vector<cRavDefPoint>;
 
 
 
 
 
-class cStructGenRavines::cRavine :
+class cStructGenRavines::cRavine:
 	public cGridStructGen::cStructure
 {
-	typedef cGridStructGen::cStructure super;
+	using Super = cGridStructGen::cStructure;
 
 	cRavDefPoints m_Points;
 
@@ -63,10 +63,10 @@ public:
 
 	cRavine(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_Size, cNoise & a_Noise);
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 	/** Exports itself as a SVG line definition */
 	AString ExportAsSVG(int a_Color, int a_OffsetX = 0, int a_OffsetZ = 0) const;
-	#endif  // _DEBUG
+	#endif  // !NDEBUG
 
 protected:
 	// cGridStructGen::cStructure overrides:
@@ -81,7 +81,7 @@ protected:
 // cStructGenRavines:
 
 cStructGenRavines::cStructGenRavines(int a_Seed, int a_Size) :
-	super(a_Seed, a_Size, a_Size, a_Size, a_Size, a_Size * 2, a_Size * 2, 100),
+	Super(a_Seed, a_Size, a_Size, a_Size, a_Size, a_Size * 2, a_Size * 2, 100),
 	m_Size(a_Size)
 {
 }
@@ -99,12 +99,11 @@ cGridStructGen::cStructurePtr cStructGenRavines::CreateStructure(int a_GridX, in
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // cStructGenRavines::cRavine
 
 cStructGenRavines::cRavine::cRavine(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_Size, cNoise & a_Noise) :
-	super(a_GridX, a_GridZ, a_OriginX, a_OriginZ)
+	Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ)
 {
 	// Calculate the ravine shape-defining points:
 	GenerateBaseDefPoints(a_OriginX, a_OriginZ, a_Size, a_Noise);
@@ -144,7 +143,7 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 	int Mid = (Top + Bottom) / 2;
 	int DefinitionPointX = CenterX - static_cast<int>(xc * a_Size / 2);
 	int DefinitionPointZ = CenterZ - static_cast<int>(zc * a_Size / 2);
-	m_Points.push_back(cRavDefPoint(DefinitionPointX, DefinitionPointZ, 0, (Mid + Top) / 2, (Mid + Bottom) / 2));
+	m_Points.emplace_back(DefinitionPointX, DefinitionPointZ, 0, (Mid + Top) / 2, (Mid + Bottom) / 2);
 	for (int i = 1; i < NUM_RAVINE_POINTS - 1; i++)
 	{
 		int LineX = CenterX + static_cast<int>(xc * a_Size * (i - NUM_RAVINE_POINTS / 2) / NUM_RAVINE_POINTS);
@@ -157,11 +156,11 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 		int Radius = MaxRadius - abs(i - NUM_RAVINE_POINTS / 2);  // TODO: better radius function
 		int ThisTop    = Top    + ((a_Noise.IntNoise3DInt(7 *  a_BlockX, 19 * a_BlockZ, i * 31) / 13) % 8) - 4;
 		int ThisBottom = Bottom + ((a_Noise.IntNoise3DInt(19 * a_BlockX, 7 *  a_BlockZ, i * 31) / 13) % 8) - 4;
-		m_Points.push_back(cRavDefPoint(PointX, PointZ, Radius, ThisTop, ThisBottom));
+		m_Points.emplace_back(PointX, PointZ, Radius, ThisTop, ThisBottom);
 	}  // for i - m_Points[]
 	DefinitionPointX = CenterX + static_cast<int>(xc * a_Size / 2);
 	DefinitionPointZ = CenterZ + static_cast<int>(zc * a_Size / 2);
-	m_Points.push_back(cRavDefPoint(DefinitionPointX, DefinitionPointZ, 0, Mid, Mid));
+	m_Points.emplace_back(DefinitionPointX, DefinitionPointZ, 0, Mid, Mid);
 }
 
 
@@ -202,8 +201,8 @@ void cStructGenRavines::cRavine::RefineDefPoints(const cRavDefPoints & a_Src, cR
 		int db = itr->m_Bottom - PrevB;
 		int Rad1 = std::max(PrevR + 1 * dr / 4, 1);
 		int Rad2 = std::max(PrevR + 3 * dr / 4, 1);
-		a_Dst.push_back(cRavDefPoint(PrevX + 1 * dx / 4, PrevZ + 1 * dz / 4, Rad1, PrevT + 1 * dt / 4, PrevB + 1 * db / 4));
-		a_Dst.push_back(cRavDefPoint(PrevX + 3 * dx / 4, PrevZ + 3 * dz / 4, Rad2, PrevT + 3 * dt / 4, PrevB + 3 * db / 4));
+		a_Dst.emplace_back(PrevX + 1 * dx / 4, PrevZ + 1 * dz / 4, Rad1, PrevT + 1 * dt / 4, PrevB + 1 * db / 4);
+		a_Dst.emplace_back(PrevX + 3 * dx / 4, PrevZ + 3 * dz / 4, Rad2, PrevT + 3 * dt / 4, PrevB + 3 * db / 4);
 		PrevX = itr->m_BlockX;
 		PrevZ = itr->m_BlockZ;
 		PrevR = itr->m_Radius;
@@ -254,7 +253,7 @@ void cStructGenRavines::cRavine::FinishLinear(void)
 		int B = itr->m_Bottom;
 		for (;;)
 		{
-			m_Points.push_back(cRavDefPoint(PrevX, PrevZ, R, T, B));
+			m_Points.emplace_back(PrevX, PrevZ, R, T, B);
 			if ((PrevX == x1) && (PrevZ == z1))
 			{
 				break;
@@ -278,7 +277,7 @@ void cStructGenRavines::cRavine::FinishLinear(void)
 
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 AString cStructGenRavines::cRavine::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) const
 {
 	AString SVG;
@@ -319,7 +318,7 @@ AString cStructGenRavines::cRavine::ExportAsSVG(int a_Color, int a_OffsetX, int 
 	}
 	return SVG;
 }
-#endif  // _DEBUG
+#endif  // !NDEBUG
 
 
 
@@ -350,13 +349,13 @@ void cStructGenRavines::cRavine::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
 		int DifZ = BlockStartZ - itr->m_BlockZ;  // substitution for faster calc
 		for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
 		{
-			#ifdef _DEBUG
+			#ifndef NDEBUG
 			// DEBUG: Make the ravine shapepoints visible on a single layer (so that we can see with Minutor what's going on)
 			if ((DifX + x == 0) && (DifZ + z == 0))
 			{
 				a_ChunkDesc.SetBlockType(x, 4, z, E_BLOCK_LAPIS_ORE);
 			}
-			#endif  // _DEBUG
+			#endif  // !NDEBUG
 
 			int DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
 			if (DistSq <= RadiusSq)

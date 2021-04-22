@@ -5,13 +5,15 @@
 
 #include "../World.h"
 #include "../Entities/Player.h"
+#include "../ClientHandle.h"
+#include "../CompositeChat.h"
 
 
 
 
 
 cWither::cWither(void) :
-	super("Wither", mtWither, "entity.wither.hurt", "entity.wither.death", 0.9, 4.0),
+	Super("Wither", mtWither, "entity.wither.hurt", "entity.wither.death", "entity.wither.ambient", 0.9f, 3.5f),
 	m_WitherInvulnerableTicks(220)
 {
 	SetMaxHealth(300);
@@ -48,7 +50,57 @@ bool cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	return super::DoTakeDamage(a_TDI);
+	if (!Super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
+
+	m_World->BroadcastBossBarUpdateHealth(*this, GetUniqueID(), GetHealth() / GetMaxHealth());
+	return true;
+}
+
+
+
+
+
+void cWither::GetDrops(cItems & a_Drops, cEntity * a_Killer)
+{
+	AddRandomDropItem(a_Drops, 1, 1, E_ITEM_NETHER_STAR);
+}
+
+
+
+
+
+void cWither::KilledBy(TakeDamageInfo & a_TDI)
+{
+	Super::KilledBy(a_TDI);
+
+	Vector3d Pos = GetPosition();
+	m_World->ForEachPlayer([=](cPlayer & a_Player)
+		{
+			// TODO 2014-05-21 xdot: Vanilla minecraft uses an AABB check instead of a radius one
+			double Dist = (a_Player.GetPosition() - Pos).Length();
+			if (Dist < 50.0)
+			{
+				// If player is close, award achievement
+				a_Player.AwardAchievement(Statistic::AchKillWither);
+			}
+			return false;
+		}
+	);
+}
+
+
+
+
+
+void cWither::SpawnOn(cClientHandle & a_Client)
+{
+	Super::SpawnOn(a_Client);
+
+	// Purple boss bar with no divisions that darkens the sky:
+	a_Client.SendBossBarAdd(GetUniqueID(), cCompositeChat("Wither"), GetHealth() / GetMaxHealth(), BossBarColor::Purple, BossBarDivisionType::None, true, false, false);
 }
 
 
@@ -57,7 +109,7 @@ bool cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cWither::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -83,39 +135,3 @@ void cWither::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	m_World->BroadcastEntityMetadata(*this);
 }
-
-
-
-
-
-void cWither::GetDrops(cItems & a_Drops, cEntity * a_Killer)
-{
-	AddRandomDropItem(a_Drops, 1, 1, E_ITEM_NETHER_STAR);
-}
-
-
-
-
-
-void cWither::KilledBy(TakeDamageInfo & a_TDI)
-{
-	super::KilledBy(a_TDI);
-
-	Vector3d Pos = GetPosition();
-	m_World->ForEachPlayer([=](cPlayer & a_Player)
-		{
-			// TODO 2014-05-21 xdot: Vanilla minecraft uses an AABB check instead of a radius one
-			double Dist = (a_Player.GetPosition() - Pos).Length();
-			if (Dist < 50.0)
-			{
-				// If player is close, award achievement
-				a_Player.AwardAchievement(achKillWither);
-			}
-			return false;
-		}
-	);
-}
-
-
-
-

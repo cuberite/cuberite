@@ -8,44 +8,77 @@
 
 
 
-class cBlockMobSpawnerHandler :
+class cBlockMobSpawnerHandler final :
 	public cBlockHandler
 {
+	using Super = cBlockHandler;
+
 public:
-	cBlockMobSpawnerHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	using Super::Super;
+
+private:
+
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) const override
 	{
+		return a_ChunkInterface.UseBlockEntity(&a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
 	}
 
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
-	{
-		return a_ChunkInterface.UseBlockEntity(&a_Player, a_BlockX, a_BlockY, a_BlockZ);
-	}
 
 
-	virtual bool IsUseable() override
+
+	virtual bool IsUseable() const override
 	{
 		return true;
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+
+
+
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// No pickups
+		return {};
 	}
 
 
-	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
+
+
+
+	virtual void OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+	) const override
 	{
-		cItemHandler * Handler = a_Player.GetEquippedItem().GetHandler();
-		if (a_Player.IsGameModeCreative() || !Handler->CanHarvestBlock(E_BLOCK_MOB_SPAWNER))
+		if (a_Digger == nullptr)
+		{
+			return;
+		}
+		if (!a_Digger->IsPlayer())
+		{
+			return;
+		}
+
+		const auto Player = static_cast<const cPlayer *>(a_Digger);
+		auto Handler = Player->GetEquippedItem().GetHandler();
+		if (!Player->IsGameModeSurvival() || !Handler->CanHarvestBlock(E_BLOCK_MOB_SPAWNER))
 		{
 			return;
 		}
 
 		auto & Random = GetRandomProvider();
 		int Reward = 15 + Random.RandInt(14) + Random.RandInt(14);
-		a_WorldInterface.SpawnExperienceOrb(static_cast<double>(a_BlockX), static_cast<double>(a_BlockY + 1), static_cast<double>(a_BlockZ), Reward);
+		a_WorldInterface.SpawnSplitExperienceOrbs(Vector3d(0.5, 0.5, 0.5) + a_BlockPos, Reward);
 	}
 } ;

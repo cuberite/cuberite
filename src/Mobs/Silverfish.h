@@ -7,20 +7,16 @@
 
 
 
-class cSilverfish :
+class cSilverfish:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
-	cSilverfish(void) :
-		super("Silverfish", mtSilverfish, "entity.silverfish.hurt", "entity.silverfish.death", 0.3, 0.4)
-	{
-	}
+
+	cSilverfish();
 
 	CLASS_PROTODEF(cSilverfish)
+
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 } ;
-
-
-
-

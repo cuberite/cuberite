@@ -1,15 +1,10 @@
-cmake_minimum_required(VERSION 3.0.2)
-enable_testing()
+include_directories(${PROJECT_SOURCE_DIR}/src/)
 
-include_directories(${CMAKE_SOURCE_DIR}/src/)
-
-
-add_definitions(-DTEST_GLOBALS=1)
-add_library(ChunkBuffer ${CMAKE_SOURCE_DIR}/src/ChunkData.cpp ${CMAKE_SOURCE_DIR}/src/StringUtils.cpp)
+add_library(ChunkBuffer ${PROJECT_SOURCE_DIR}/src/ChunkData.cpp ${PROJECT_SOURCE_DIR}/src/StringUtils.cpp)
 
 target_link_libraries(ChunkBuffer PUBLIC fmt::fmt)
 
-add_executable(creatable-exe creatable.cpp)
+add_executable(creatable-exe Creatable.cpp)
 target_link_libraries(creatable-exe ChunkBuffer)
 add_test(NAME creatable-test COMMAND creatable-exe)
 
@@ -25,23 +20,15 @@ add_executable(arraystocoords-exe ArraytoCoord.cpp)
 target_link_libraries(arraystocoords-exe ChunkBuffer)
 add_test(NAME arraystocoords-test COMMAND arraystocoords-exe)
 
-add_executable(copyblocks-exe CopyBlocks.cpp)
-target_link_libraries(copyblocks-exe ChunkBuffer)
-add_test(NAME copyblocks-test COMMAND copyblocks-exe)
-
-
-
-
 # Put all test projects into a separate folder:
 set_target_properties(
 	arraystocoords-exe
 	coordinates-exe
 	copies-exe
-	copyblocks-exe
 	creatable-exe
 	PROPERTIES FOLDER Tests/ChunkData
 )
 set_target_properties(
 	ChunkBuffer
-	PROPERTIES FOLDER Lib
+	PROPERTIES FOLDER Tests/Libraries
 )

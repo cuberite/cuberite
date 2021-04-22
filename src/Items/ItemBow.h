@@ -8,22 +8,29 @@
 
 
 
-class cItemBowHandler :
+class cItemBowHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
-	cItemBowHandler(void) :
-		super(E_ITEM_BOW)
+
+	cItemBowHandler(void):
+		Super(E_ITEM_BOW)
 	{
 	}
 
 
 
+
+
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
 	) override
 	{
 		ASSERT(a_Player != nullptr);
@@ -40,9 +47,10 @@ public:
 
 
 
-	virtual void OnItemShoot(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+	virtual void OnItemShoot(cPlayer * a_Player, const Vector3i a_BlockPos, eBlockFace a_BlockFace) override
 	{
-		// Actual shot - produce the arrow with speed based on the ticks that the bow was charged
+		// Actual shot - produce the arrow with speed based on the number of ticks that the bow was charged
+		UNUSED(a_BlockPos);
 		ASSERT(a_Player != nullptr);
 
 		int BowCharge = a_Player->FinishChargingBow();
@@ -62,7 +70,7 @@ public:
 		}
 
 		// Create the arrow entity:
-		auto Arrow = cpp14::make_unique<cArrowEntity>(*a_Player, Force * 2);
+		auto Arrow = std::make_unique<cArrowEntity>(*a_Player, Force * 2);
 		auto ArrowPtr = Arrow.get();
 		if (!ArrowPtr->Initialize(std::move(Arrow), *a_Player->GetWorld()))
 		{
@@ -87,7 +95,6 @@ public:
 
 			a_Player->UseEquippedItem();
 		}
-
 		if (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchFlame) > 0)
 		{
 			ArrowPtr->StartBurning(100);

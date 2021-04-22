@@ -1,8 +1,6 @@
-project (Cuberite)
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-include_directories ("${PROJECT_SOURCE_DIR}/../")
-
-set(SRCS
 	AesCfb128Decryptor.cpp
 	AesCfb128Encryptor.cpp
 	BlockingSslClientSocket.cpp
@@ -16,9 +14,7 @@ set(SRCS
 	SslConfig.cpp
 	SslContext.cpp
 	X509Cert.cpp
-)
 
-set(HDRS
 	AesCfb128Decryptor.h
 	AesCfb128Encryptor.h
 	BlockingSslClientSocket.h
@@ -34,8 +30,3 @@ set(HDRS
 	Sha1Checksum.h
 	X509Cert.h
 )
-
-if(NOT MSVC)
-	add_library(mbedTLS++ ${SRCS} ${HDRS})
-	target_link_libraries(mbedTLS++ fmt::fmt mbedtls)
-endif()

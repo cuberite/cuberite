@@ -3,24 +3,42 @@
 
 #include "BlockHandler.h"
 #include "ChunkInterface.h"
+#include "../Item.h"
 
 
 
 
-class cBlockEntityHandler : public cBlockHandler
+
+/** Wrapper for blocks that have a cBlockEntity descendant attached to them and can be "used" by the player.
+Forwards the "use" event to the block entity. */
+class cBlockEntityHandler :
+	public cBlockHandler
 {
+	using Super = cBlockHandler;
+
 public:
-	cBlockEntityHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	using Super::Super;
+
+protected:
+
+	~cBlockEntityHandler() = default;
+
+private:
+
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) const override
 	{
+		return a_ChunkInterface.UseBlockEntity(&a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
 	}
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
-	{
-		return a_ChunkInterface.UseBlockEntity(&a_Player, a_BlockX, a_BlockY, a_BlockZ);
-	}
-
-	virtual bool IsUseable() override
+	virtual bool IsUseable() const override
 	{
 		return true;
 	}
@@ -29,3 +47,11 @@ public:
 
 
 
+
+class cDefaultBlockEntityHandler final :
+	public cBlockEntityHandler
+{
+public:
+
+	using cBlockEntityHandler::cBlockEntityHandler;
+};

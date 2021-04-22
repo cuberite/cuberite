@@ -1,36 +1,29 @@
-cmake_minimum_required(VERSION 3.0.2)
-enable_testing()
-
-include_directories(${CMAKE_SOURCE_DIR}/src/)
-
-add_definitions(-DTEST_GLOBALS=1)
+find_package(Threads REQUIRED)
+include_directories(${PROJECT_SOURCE_DIR}/src/)
 
 # Create a single OSSupport library that contains all the OSSupport code used in the tests:
-# Only needed for Windows; Linux already defines the OSSupport lib
-if (WIN32)
-	set (OSSupport_SRCS
-		${CMAKE_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
-		${CMAKE_SOURCE_DIR}/src/OSSupport/Event.cpp
-		${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
-	)
-	set (OSSupport_HDRS
-		${CMAKE_SOURCE_DIR}/src/OSSupport/CriticalSection.h
-		${CMAKE_SOURCE_DIR}/src/OSSupport/Event.h
-		${CMAKE_SOURCE_DIR}/src/StringUtils.h
-		${CMAKE_SOURCE_DIR}/src/Globals.h
-	)
-	add_library(OSSupport
-		${OSSupport_SRCS}
-		${OSSupport_HDRS}
-	)
-	target_link_libraries(OSSupport PUBLIC fmt::fmt)
-endif()
+set (OSSupport_SRCS
+	${PROJECT_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
+	${PROJECT_SOURCE_DIR}/src/OSSupport/Event.cpp
+	${PROJECT_SOURCE_DIR}/src/StringUtils.cpp
+)
+set (OSSupport_HDRS
+	${PROJECT_SOURCE_DIR}/src/OSSupport/CriticalSection.h
+	${PROJECT_SOURCE_DIR}/src/OSSupport/Event.h
+	${PROJECT_SOURCE_DIR}/src/StringUtils.h
+	${PROJECT_SOURCE_DIR}/src/Globals.h
+)
+add_library(OSSupport
+	${OSSupport_SRCS}
+	${OSSupport_HDRS}
+)
+target_link_libraries(OSSupport PUBLIC fmt::fmt)
 
 # Define individual tests:
 
 # StressEvent: Stress-test the cEvent implementation:
 add_executable(StressEvent-exe StressEvent.cpp)
-target_link_libraries(StressEvent-exe OSSupport fmt::fmt)
+target_link_libraries(StressEvent-exe OSSupport fmt::fmt Threads::Threads)
 add_test(NAME StressEvent-test COMMAND StressEvent-exe)
 
 
@@ -42,7 +35,7 @@ set_target_properties(
 )
 set_target_properties(
 	OSSupport
-	PROPERTIES FOLDER Lib
+	PROPERTIES FOLDER Tests/Libraries
 )
 
 

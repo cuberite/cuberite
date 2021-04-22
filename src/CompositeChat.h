@@ -3,9 +3,10 @@
 
 // Declares the cCompositeChat class used to wrap a chat message with multiple parts (text, url, cmd)
 
+#pragma once
+
 #include "Defines.h"
 #include "json/json.h"
-#include "Logger.h"
 
 
 
@@ -33,94 +34,68 @@ class cCompositeChat
 public:
 	// tolua_end
 
-	enum ePartType
+
+	struct BasePart
 	{
-		ptText,
-		ptClientTranslated,
-		ptUrl,
-		ptRunCommand,
-		ptSuggestCommand,
-		ptShowAchievement,
+		AString Text;
+		AString Style;
+		AString AdditionalStyleData;
 	} ;
 
-	class cBasePart
+
+
+	struct TextPart:
+		public BasePart
 	{
-	public:
-		ePartType m_PartType;
-		AString m_Text;
-		AString m_Style;
-		AString m_AdditionalStyleData;
-
-		cBasePart(ePartType a_PartType, const AString & a_Text, const AString & a_Style = "");
-
-		// Force a virtual destructor in descendants
-		virtual ~cBasePart() {}
 	} ;
 
-	class cTextPart :
-		public cBasePart
+
+
+	struct ClientTranslatedPart:
+		public BasePart
 	{
-		typedef cBasePart super;
-	public:
-		cTextPart(const AString & a_Text, const AString & a_Style = "");
+		AStringVector Parameters;
 	} ;
 
-	class cClientTranslatedPart :
-		public cBasePart
-	{
-		typedef cBasePart super;
-	public:
-		AStringVector m_Parameters;
 
-		cClientTranslatedPart(const AString & a_TranslationID, const AStringVector & a_Parameters, const AString & a_Style = "");
+
+	struct UrlPart:
+		public BasePart
+	{
+		AString Url;
 	} ;
 
-	class cUrlPart :
-		public cBasePart
-	{
-		typedef cBasePart super;
-	public:
-		AString m_Url;
 
-		cUrlPart(const AString & a_Text, const AString & a_Url, const AString & a_Style = "");
+
+	struct CommandPart:
+		public BasePart
+	{
+		AString Command;
 	} ;
 
-	class cCommandPart :
-		public cBasePart
-	{
-		typedef cBasePart super;
-	public:
-		AString m_Command;
 
-		cCommandPart(ePartType a_PartType, const AString & a_Text, const AString & a_Command, const AString & a_Style = "");
+
+	struct RunCommandPart:
+		public CommandPart
+	{
 	} ;
 
-	class cRunCommandPart :
-		public cCommandPart
+
+
+	struct SuggestCommandPart:
+		public CommandPart
 	{
-		typedef cCommandPart super;
-	public:
-		cRunCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "");
 	} ;
 
-	class cSuggestCommandPart :
-		public cCommandPart
+
+
+	struct ShowAchievementPart:
+		public BasePart
 	{
-		typedef cCommandPart super;
-	public:
-		cSuggestCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "");
+		AString PlayerName;
 	} ;
 
-	class cShowAchievementPart :
-		public cBasePart
-	{
-		typedef cBasePart super;
-	public:
-		AString m_PlayerName;
-		cShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style = "");
-	} ;
 
-	typedef std::vector<cBasePart *> cParts;
 
 	/** Creates a new empty chat message.
 	Exported manually due to the other overload needing a manual export. */
@@ -131,8 +106,6 @@ public:
 	Uses ParseText() for the actual parsing.
 	Exported manually due to ToLua++ generating extra output parameter. */
 	cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType = mtCustom);
-
-	~cCompositeChat();  // tolua_export
 
 	// The following are exported in ManualBindings in order to support chaining - they return "self" in Lua (#755)
 
@@ -192,18 +165,19 @@ public:
 
 	// tolua_end
 
-	const cParts & GetParts(void) const { return m_Parts; }
+	const auto & GetParts(void) const { return m_Parts; }
 
 	/** Converts the MessageType to a LogLevel value.
 	Used by the logging bindings when logging a cCompositeChat object. */
-	static cLogger::eLogLevel MessageTypeToLogLevel(eMessageType a_MessageType);
+	static eLogLevel MessageTypeToLogLevel(eMessageType a_MessageType);
 
 	/** Adds the chat part's style (represented by the part's stylestring) into the Json object. */
 	void AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle) const;
 
 protected:
+
 	/** All the parts that */
-	cParts m_Parts;
+	std::vector<std::variant<TextPart, ClientTranslatedPart, UrlPart, RunCommandPart, SuggestCommandPart, ShowAchievementPart>> m_Parts;
 
 	/** The message type, as indicated by prefixes. */
 	eMessageType m_MessageType;
@@ -216,7 +190,3 @@ protected:
 	If the style already contains something that a_AddStyle overrides, it is erased first. */
 	void AddStyle(AString & a_Style, const AString & a_AddStyle);
 } ;  // tolua_export
-
-
-
-

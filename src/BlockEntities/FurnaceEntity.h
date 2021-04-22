@@ -18,9 +18,14 @@ class cClientHandle;
 class cFurnaceEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems Super;
+	// tolua_end
+
+	using Super = cBlockEntityWithItems;
+
+	// tolua_begin
 
 public:
+
 	enum
 	{
 		fsInput  = 0,  // Input slot number
@@ -33,16 +38,12 @@ public:
 
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cFurnaceEntity)
-
 	/** Constructor used for normal operation */
-	cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
-
-	virtual ~cFurnaceEntity() override;
+	cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// cBlockEntity overrides:
-	virtual void Destroy() override;
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
+	virtual void OnRemoveFromWorld() override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
@@ -84,6 +85,9 @@ public:
 	/** Returns true if there's time left before the current fuel is depleted */
 	bool HasFuelTimeLeft(void) const { return (GetFuelBurnTimeLeft() > 0); }
 
+	/** Calculates, resets, and returns the experience reward in this furnace */
+	int GetAndResetReward(void);
+
 	// tolua_end
 
 	void SetBurnTimes(int a_FuelBurnTime, int a_TimeBurned)
@@ -112,9 +116,6 @@ protected:
 	/** The item that is being smelted */
 	cItem m_LastInput;
 
-	/** Set to true when the furnace entity has been destroyed to prevent the block being set again */
-	bool m_IsDestroyed;
-
 	/** Set to true if the furnace is cooking an item */
 	bool m_IsCooking;
 
@@ -130,11 +131,14 @@ protected:
 	/** Amount of ticks that the current fuel has been burning */
 	int m_TimeBurned;
 
+	/** Running total of experience that can be picked up */
+	float m_RewardCounter;
+
 	/** Is the block currently being loaded into the world? */
 	bool m_IsLoading;
 
 	/** Sends the specified progressbar value to all clients of the window */
-	void BroadcastProgress(short a_ProgressbarID, short a_Value);
+	void BroadcastProgress(size_t a_ProgressbarID, short a_Value);
 
 	/** One item finished cooking */
 	void FinishOne();
@@ -164,7 +168,3 @@ protected:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 
 } ;  // tolua_export
-
-
-
-

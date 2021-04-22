@@ -23,12 +23,9 @@ bool cMemorySettingsRepository::HasValue(const AString & a_KeyName, const AStrin
 		return false;
 	}
 	auto iter = outerIter->second.find(a_ValueName);
-	if (iter == outerIter->second.end())
-	{
-		return false;
-	}
-	return true;
+	return (iter != outerIter->second.end());
 }
+
 
 
 
@@ -70,7 +67,6 @@ bool cMemorySettingsRepository::DeleteKeyComment(const AString & keyname, const 
 
 
 
-
 void cMemorySettingsRepository::AddValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value)
 {
 	if (m_Writable)
@@ -78,6 +74,7 @@ void cMemorySettingsRepository::AddValue (const AString & a_KeyName, const AStri
 		m_Map[a_KeyName].emplace(a_ValueName, sValue(a_Value));
 	}
 }
+
 
 
 
@@ -109,7 +106,7 @@ void cMemorySettingsRepository::AddValue (const AString & a_KeyName, const AStri
 std::vector<std::pair<AString, AString>> cMemorySettingsRepository::GetValues(AString a_keyName)
 {
 	std::vector<std::pair<AString, AString>> ret;
-	for (auto pair : m_Map[a_keyName])
+	for (const auto & pair : m_Map[a_keyName])
 	{
 		ret.emplace_back(pair.first, pair.second.getStringValue());
 	}
@@ -201,6 +198,7 @@ Int64 cMemorySettingsRepository::GetValueSetI(const AString & a_KeyName, const A
 
 
 
+
 bool cMemorySettingsRepository::GetValueSetB(const AString & a_KeyName, const AString & a_ValueName, const bool defValue)
 {
 	auto outerIter = m_Map.find(a_KeyName);
@@ -249,6 +247,7 @@ bool cMemorySettingsRepository::SetValue (const AString & a_KeyName, const AStri
 	iter->second = sValue(a_Value);
 	return true;
 }
+
 
 
 
@@ -304,6 +303,10 @@ bool cMemorySettingsRepository::DeleteValue(const AString & a_KeyName, const ASt
 	outerIter->second.erase(iter);
 	return true;
 }
+
+
+
+
 
 bool cMemorySettingsRepository::Flush()
 {

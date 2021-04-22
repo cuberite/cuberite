@@ -19,17 +19,17 @@
 class cBeaconEntity :
 	public cBlockEntityWithItems
 {
-	typedef cBlockEntityWithItems Super;
-
-public:
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cBeaconEntity)
+	using Super = cBlockEntityWithItems;
 
-	cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+public:  // tolua_export
+
+	cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
+	virtual void OnRemoveFromWorld() override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
@@ -75,12 +75,9 @@ public:
 	// tolua_end
 
 protected:
+
 	bool m_IsActive;
 	char m_BeaconLevel;
 
 	cEntityEffect::eType m_PrimaryEffect, m_SecondaryEffect;
 } ;  // tolua_export
-
-
-
-

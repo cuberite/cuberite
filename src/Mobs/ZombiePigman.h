@@ -6,13 +6,14 @@
 
 
 
-class cZombiePigman :
+class cZombiePigman:
 	public cPassiveAggressiveMonster
 {
-	typedef cPassiveAggressiveMonster super;
+	using Super = cPassiveAggressiveMonster;
 
 public:
-	cZombiePigman(void);
+
+	cZombiePigman();
 
 	CLASS_PROTODEF(cZombiePigman)
 

@@ -330,22 +330,6 @@ local function WriteHtmlHook(a_Hook, a_HookNav, a_API)
 	end
 	f:write([[</td></tr></table></div><script>prettyPrint();</script>]])
 	f:write(GetHtmlTimestamp())
-	f:write([[<!-- Piwik -->
-		<script type="text/javascript">
-		  var _paq = _paq || [];
-		  _paq.push(['trackPageView']);
-		  _paq.push(['enableLinkTracking']);
-		  (function() {
-			var u="https://analytics.cuberite.org/";
-			_paq.push(['setTrackerUrl', u+'piwik.php']);
-			_paq.push(['setSiteId', 5]);
-			var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-			g.type='text/javascript'; g.async=true; g.defer=true; g.src='piwik.js'; s.parentNode.insertBefore(g,s);
-		  })();
-		</script>
-		<noscript><p><img src="https://analytics.cuberite.org/piwik.php?idsite=5" style="border:0;" alt="" /></p></noscript>
-		<!-- End Piwik Code -->
-	]])
 	f:write([[</body></html>]])
 	f:close();
 end
@@ -1092,22 +1076,6 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu, a_API)
 
 	cf:write([[</td></tr></table></div><script>prettyPrint();</script>]])
 	cf:write(GetHtmlTimestamp())
-	cf:write([[<!-- Piwik -->
-		<script type="text/javascript">
-		  var _paq = _paq || [];
-		  _paq.push(['trackPageView']);
-		  _paq.push(['enableLinkTracking']);
-		  (function() {
-		    var u="https://analytics.cuberite.org/";
-		    _paq.push(['setTrackerUrl', u+'piwik.php']);
-		    _paq.push(['setSiteId', 5]);
-		    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-		    g.type='text/javascript'; g.async=true; g.defer=true; g.src='piwik.js'; s.parentNode.insertBefore(g,s);
-		  })();
-		</script>
-		<noscript><p><img src="https://analytics.cuberite.org/piwik.php?idsite=5" style="border:0;" alt="" /></p></noscript>
-		<!-- End Piwik Code -->
-	]])
 	cf:write([[</body></html>]])
 	cf:close()
 end
@@ -1475,7 +1443,6 @@ local function DumpAPIHtml(a_API, a_Descs)
 	local StaticFiles =
 	{
 		"main.css",
-		"piwik.js",
 		"prettify.js",
 		"prettify.css",
 		"lang-lua.js",
@@ -1495,22 +1462,6 @@ local function DumpAPIHtml(a_API, a_Descs)
 
 	f:write([[</ul></div>]])
 	f:write(GetHtmlTimestamp())
-	f:write([[<!-- Piwik -->
-		<script type="text/javascript">
-		  var _paq = _paq || [];
-		  _paq.push(['trackPageView']);
-		  _paq.push(['enableLinkTracking']);
-		  (function() {
-		    var u="https://analytics.cuberite.org/";
-		    _paq.push(['setTrackerUrl', u+'piwik.php']);
-		    _paq.push(['setSiteId', 5]);
-		    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-		    g.type='text/javascript'; g.async=true; g.defer=true; g.src='piwik.js'; s.parentNode.insertBefore(g,s);
-		  })();
-		</script>
-		<noscript><p><img src="https://analytics.cuberite.org/piwik.php?idsite=5" style="border:0;" alt="" /></p></noscript>
-		<!-- End Piwik Code -->
-	]])
 	f:write([[</body></html>]])
 	f:close()
 

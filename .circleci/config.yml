@@ -1,0 +1,41 @@
+version: 2
+jobs:
+  checkout_cuberite:
+    working_directory: ~/cuberite
+    docker: &cube_docker
+    - image: cuberite/docker-build-image:circle-ci
+    steps:
+    - checkout
+    - run: git submodule update --init
+    - persist_to_workspace:
+        root: ~/
+        paths:
+        - cuberite
+
+  check_basic_style:
+    working_directory: ~/cuberite/src
+    docker: *cube_docker
+    steps:
+    - attach_workspace: { at: ~/ }
+    - run: find . -name \*.cpp -or -name \*.h > AllFiles.lst
+    - run: lua CheckBasicStyle.lua
+    - run: cd Bindings && lua CheckBindingsDependencies.lua
+
+  clang-tidy:
+    working_directory: ~/cuberite
+    docker: *cube_docker
+    steps:
+    - attach_workspace: { at: ~/ }
+    - run: ./clang-tidy.sh -j 2
+
+workflows:
+  version: 2
+  checks:
+    jobs:
+    - checkout_cuberite
+    - check_basic_style:
+        requires:
+        - checkout_cuberite
+    - clang-tidy:
+        requires:
+        - checkout_cuberite

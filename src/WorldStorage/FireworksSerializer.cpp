@@ -1,13 +1,14 @@
 
 #include "Globals.h"
 #include "FireworksSerializer.h"
-#include "WorldStorage/FastNBT.h"
+#include "../WorldStorage/FastNBT.h"
+#include "../BlockType.h"
 
 
 
 
 
-void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFastNBTWriter & a_Writer, const ENUM_ITEM_ID a_Type)
+void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFastNBTWriter & a_Writer, const ENUM_ITEM_TYPE a_Type)
 {
 	switch (a_Type)
 	{
@@ -58,7 +59,7 @@ void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFa
 
 
 
-void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, int a_TagIdx, const ENUM_ITEM_ID a_Type)
+void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, int a_TagIdx, const ENUM_ITEM_TYPE a_Type)
 {
 	if (a_TagIdx < 0)
 	{
@@ -104,7 +105,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 							continue;
 						}
 
-						const char * ColourData = (a_NBT.GetData(explosiontag));
+						const auto * ColourData = (a_NBT.GetData(explosiontag));
 						for (size_t i = 0; i < DataLength; i += 4)
 						{
 							a_FireworkItem.m_Colours.push_back(GetBEInt(ColourData + i));
@@ -120,7 +121,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 							continue;
 						}
 
-						const char * FadeColourData = (a_NBT.GetData(explosiontag));
+						const auto * FadeColourData = (a_NBT.GetData(explosiontag));
 						for (size_t i = 0; i < DataLength; i += 4)
 						{
 							a_FireworkItem.m_FadeColours.push_back(GetBEInt(FadeColourData + i));

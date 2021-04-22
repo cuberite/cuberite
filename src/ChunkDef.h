@@ -9,7 +9,7 @@
 
 #pragma once
 
-
+#include "BiomeDef.h"
 
 
 
@@ -29,9 +29,8 @@ class cClientHandle;
 class cBlockEntity;
 class cChunkCoords;
 
-typedef std::unique_ptr<cEntity> OwnedEntity;
-typedef std::vector<OwnedEntity> cEntityList;
-typedef std::map<int, cBlockEntity *> cBlockEntities;
+using OwnedEntity = std::unique_ptr<cEntity>;
+using cEntityList = std::vector<OwnedEntity>;
 
 
 
@@ -61,9 +60,37 @@ public:
 
 	cChunkCoords(int a_ChunkX, int a_ChunkZ) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ) {}
 
+
 	bool operator == (const cChunkCoords & a_Other) const
 	{
 		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ));
+	}
+
+
+	bool operator != (const cChunkCoords & a_Other) const
+	{
+		return !(operator == (a_Other));
+	}
+
+
+	/** Simple comparison, to support ordering. */
+	bool operator < (const cChunkCoords & a_Other) const
+	{
+		if (a_Other.m_ChunkX == m_ChunkX)
+		{
+			return (m_ChunkZ < a_Other.m_ChunkZ);
+		}
+		else
+		{
+			return (m_ChunkX < a_Other.m_ChunkX);
+		}
+	}
+
+
+	/** Returns a string that describes the chunk coords, suitable for logging. */
+	AString ToString() const
+	{
+		return Printf("[%d, %d]", m_ChunkX, m_ChunkZ);
 	}
 } ;
 
@@ -75,13 +102,14 @@ public:
 class cChunkDef
 {
 public:
+
 	// Chunk dimensions:
 	static const int Width = 16;
 	static const int Height = 256;
 	static const int NumBlocks = Width * Height * Width;
 
-	/** If the data is collected into a single buffer, how large it needs to be: */
-	static const int BlockDataSize = cChunkDef::NumBlocks * 2 + (cChunkDef::NumBlocks / 2);  // 2.5 * numblocks
+	static const int SectionHeight = 16;
+	static const size_t NumSections = (cChunkDef::Height / SectionHeight);
 
 	/** The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column */
 	typedef HEIGHTTYPE HeightMap[Width * Width];
@@ -97,12 +125,6 @@ public:
 	/** The type used for block data in nibble format, AXIS_ORDER ordering */
 	typedef NIBBLETYPE BlockNibbles[NumBlocks / 2];
 
-	/** The storage wrapper used for compressed blockdata residing in RAMz */
-	typedef std::vector<BLOCKTYPE> COMPRESSED_BLOCKTYPE;
-
-	/** The storage wrapper used for compressed nibbledata residing in RAMz */
-	typedef std::vector<NIBBLETYPE> COMPRESSED_NIBBLETYPE;
-
 
 	/** Converts absolute block coords into relative (chunk + block) coords: */
 	inline static void AbsoluteToRelative(/* in-out */ int & a_X, int & a_Y, int & a_Z, /* out */ int & a_ChunkX, int & a_ChunkZ)
@@ -114,23 +136,33 @@ public:
 		a_Z = a_Z - a_ChunkZ * Width;
 	}
 
+
+	/** Converts the specified absolute position into a relative position within its chunk.
+	Use BlockToChunk to query the chunk coords. */
 	inline static Vector3i AbsoluteToRelative(Vector3i a_BlockPosition)
 	{
-		cChunkCoords ChunckPos = BlockToChunk(a_BlockPosition);
-
-		return {a_BlockPosition.x - ChunckPos.m_ChunkX * Width, a_BlockPosition.y, a_BlockPosition.z - ChunckPos.m_ChunkZ * Width};
+		cChunkCoords chunkPos = BlockToChunk(a_BlockPosition);
+		return AbsoluteToRelative(a_BlockPosition, chunkPos);
 	}
 
+
+	/** Converts the absolute coords into coords relative to the specified chunk. */
 	inline static Vector3i AbsoluteToRelative(Vector3i a_BlockPosition, cChunkCoords a_ChunkPos)
 	{
-		return {a_BlockPosition.x - a_ChunkPos.m_ChunkX * Width, a_BlockPosition.y, a_BlockPosition.z - a_ChunkPos.m_ChunkZ * Width};
+		return { a_BlockPosition.x - a_ChunkPos.m_ChunkX * Width, a_BlockPosition.y, a_BlockPosition.z - a_ChunkPos.m_ChunkZ * Width };
 	}
 
+
 	/** Converts relative block coordinates into absolute coordinates with a known chunk location */
-	inline static Vector3i RelativeToAbsolute(Vector3i a_RelBlockPosition, int a_ChunkX, int a_ChunkZ)
+	inline static Vector3i RelativeToAbsolute(Vector3i a_RelBlockPosition, cChunkCoords a_ChunkCoords)
 	{
-		return {a_RelBlockPosition.x + a_ChunkX * Width, a_RelBlockPosition.y, a_RelBlockPosition.z + a_ChunkZ * Width};
+		return Vector3i(
+			a_RelBlockPosition.x + a_ChunkCoords.m_ChunkX * Width,
+			a_RelBlockPosition.y,
+			a_RelBlockPosition.z + a_ChunkCoords.m_ChunkZ * Width
+		);
 	}
+
 
 	/** Validates a height-coordinate. Returns false if height-coordiante is out of height bounds */
 	inline static bool IsValidHeight(int a_Height)
@@ -138,11 +170,13 @@ public:
 		return ((a_Height >= 0) && (a_Height < Height));
 	}
 
+
 	/** Validates a width-coordinate. Returns false if width-coordiante is out of width bounds */
 	inline static bool IsValidWidth(int a_Width)
 	{
 		return ((a_Width >= 0) && (a_Width < Width));
 	}
+
 
 	/** Validates a chunk relative coordinate. Returns false if the coordiante is out of bounds for a chunk. */
 	inline static bool IsValidRelPos(Vector3i a_RelPos)
@@ -154,29 +188,22 @@ public:
 		);
 	}
 
+
 	/** Converts absolute block coords to chunk coords: */
 	inline static void BlockToChunk(int a_X, int a_Z, int & a_ChunkX, int & a_ChunkZ)
 	{
 		// This version is deprecated in favor of the vector version
 		// If you're developing new code, use the other version.
-		auto ChunkCoords = BlockToChunk({a_X, 0, a_Z});
+		const auto ChunkCoords = BlockToChunk({ a_X, 0, a_Z });
 		a_ChunkX = ChunkCoords.m_ChunkX;
 		a_ChunkZ = ChunkCoords.m_ChunkZ;
 	}
 
+
 	/** The Y coordinate of a_Pos is ignored */
-	inline static cChunkCoords BlockToChunk(Vector3i a_Pos)
+	inline static cChunkCoords BlockToChunk(const Vector3i a_Position)
 	{
-		cChunkCoords Chunk(a_Pos.x / Width, a_Pos.z / Width);
-		if ((a_Pos.x < 0) && (a_Pos.x % Width != 0))
-		{
-			Chunk.m_ChunkX--;
-		}
-		if ((a_Pos.z < 0) && (a_Pos.z % Width != 0))
-		{
-			Chunk.m_ChunkZ--;
-		}
-		return Chunk;
+		return { FAST_FLOOR_DIV(a_Position.x, Width), FAST_FLOOR_DIV(a_Position.z, Width) };
 	}
 
 
@@ -190,7 +217,7 @@ public:
 		{
 			return MakeIndexNoCheck(x, y, z);
 		}
-		LOGERROR("cChunkDef::MakeIndex(): coords out of range: {%d, %d, %d}; returning fake index 0", x, y, z);
+		FLOGERROR("cChunkDef::MakeIndex(): coords out of range: {0}; returning fake index 0", Vector3i{x, y, z});
 		ASSERT(!"cChunkDef::MakeIndex(): coords out of chunk range!");
 		return 0;
 	}
@@ -207,19 +234,25 @@ public:
 	}
 
 
-	inline static Vector3i IndexToCoordinate( unsigned int index)
+	inline static int MakeIndexNoCheck(Vector3i a_RelPos)
+	{
+		return MakeIndexNoCheck(a_RelPos.x, a_RelPos.y, a_RelPos.z);
+	}
+
+
+	inline static Vector3i IndexToCoordinate(size_t index)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			return Vector3i(  // 1.2
-				index % cChunkDef::Width,                       // X
-				index / (cChunkDef::Width * cChunkDef::Width),  // Y
-				(index / cChunkDef::Width) % cChunkDef::Width   // Z
+				static_cast<int>(index % cChunkDef::Width),                       // X
+				static_cast<int>(index / (cChunkDef::Width * cChunkDef::Width)),  // Y
+				static_cast<int>((index / cChunkDef::Width) % cChunkDef::Width)   // Z
 			);
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
 			return Vector3i(  // 1.1
-				index / (cChunkDef::Height * cChunkDef::Width),  // X
-				index % cChunkDef::Height,                       // Y
-				(index / cChunkDef::Height) % cChunkDef::Width   // Z
+				static_cast<int>(index / (cChunkDef::Height * cChunkDef::Width)),  // X
+				static_cast<int>(index % cChunkDef::Height),                       // Y
+				static_cast<int>((index / cChunkDef::Height) % cChunkDef::Width)   // Z
 			);
 		#endif
 	}
@@ -238,6 +271,13 @@ public:
 	{
 		ASSERT((a_Index >= 0) && (a_Index <= NumBlocks));
 		a_BlockTypes[a_Index] = a_Type;
+	}
+
+
+	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, Vector3i a_RelPos)
+	{
+		ASSERT(IsValidRelPos(a_RelPos));
+		return a_BlockTypes[MakeIndexNoCheck(a_RelPos)];
 	}
 
 
@@ -289,103 +329,33 @@ public:
 	}
 
 
-	static NIBBLETYPE GetNibble(const COMPRESSED_NIBBLETYPE & a_Buffer, int a_BlockIdx, bool a_IsSkyLightNibble = false)
-	{
-		if ((a_BlockIdx > -1) && (a_BlockIdx < NumBlocks))
-		{
-			if (static_cast<size_t>(a_BlockIdx / 2) >= a_Buffer.size())
-			{
-				return (a_IsSkyLightNibble ? 0xff : 0);
-			}
-			return (a_Buffer[static_cast<size_t>(a_BlockIdx / 2)] >> ((a_BlockIdx & 1) * 4)) & 0x0f;
-		}
-		ASSERT(!"cChunkDef::GetNibble(): index out of chunk range!");
-		return 0;
-	}
-
-
-	static NIBBLETYPE GetNibble(const COMPRESSED_NIBBLETYPE & a_Buffer, int x, int y, int z, bool a_IsSkyLightNibble = false)
-	{
-		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
-		{
-			size_t Index = static_cast<size_t>(MakeIndexNoCheck(x, y, z));
-			if ((Index / 2) >= a_Buffer.size())
-			{
-				return (a_IsSkyLightNibble ? 0xff : 0);
-			}
-			return ExpandNibble(a_Buffer, Index);
-		}
-		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
-		return 0;
-	}
-
-
 	static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, int x, int y, int z)
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
 			int Index = MakeIndexNoCheck(x, y, z);
-			return (a_Buffer[static_cast<size_t>(Index / 2)] >> ((Index & 1) * 4)) & 0x0f;
+			return ExpandNibble(a_Buffer, static_cast<size_t>(Index));
 		}
 		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
 		return 0;
 	}
 
 
-	static void SetNibble(COMPRESSED_NIBBLETYPE & a_Buffer, int a_BlockIdx, NIBBLETYPE a_Nibble)
+	inline static void PackNibble(NIBBLETYPE * const a_Buffer, const size_t a_Index, const NIBBLETYPE a_Nibble)
 	{
-		if ((a_BlockIdx < 0) || (a_BlockIdx >= NumBlocks))
-		{
-			ASSERT(!"cChunkDef::SetNibble(): index out of range!");
-			return;
-		}
-		if (static_cast<size_t>(a_BlockIdx / 2) >= a_Buffer.size())
-		{
-			a_Buffer.resize(static_cast<size_t>((a_BlockIdx / 2) + 1));
-		}
-		a_Buffer[static_cast<size_t>(a_BlockIdx / 2)] = PackNibble(a_Buffer, static_cast<size_t>(a_BlockIdx), a_Nibble);
-	}
+		ASSERT((a_Nibble & 0xF) == a_Nibble);  // Only the lower bits should be set
 
-
-	static void SetNibble(COMPRESSED_NIBBLETYPE & a_Buffer, int x, int y, int z, NIBBLETYPE a_Nibble)
-	{
-		if (
-			(x >= Width)  || (x < 0) ||
-			(y >= Height) || (y < 0) ||
-			(z >= Width)  || (z < 0)
-		)
-		{
-			ASSERT(!"cChunkDef::SetNibble(): index out of range!");
-			return;
-		}
-
-		size_t Index = static_cast<size_t>(MakeIndexNoCheck(x, y, z));
-		if ((Index / 2) >= a_Buffer.size())
-		{
-			a_Buffer.resize(((Index / 2) + 1));
-		}
-		a_Buffer[(Index / 2)] = PackNibble(a_Buffer, Index, a_Nibble);
-	}
-
-
-private:
-
-
-	inline static NIBBLETYPE PackNibble(const COMPRESSED_NIBBLETYPE & a_Buffer, size_t a_Index, NIBBLETYPE a_Nibble)
-	{
-		return static_cast<NIBBLETYPE>(
+		a_Buffer[a_Index / 2] = static_cast<NIBBLETYPE>(
 			(a_Buffer[a_Index / 2] & (0xf0 >> ((a_Index & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((a_Index & 1) * 4))  // The nibble being set
 		);
 	}
 
 
-	inline static NIBBLETYPE ExpandNibble(const COMPRESSED_NIBBLETYPE & a_Buffer, size_t a_Index)
+	inline static NIBBLETYPE ExpandNibble(const NIBBLETYPE * const a_Buffer, const size_t a_Index)
 	{
 		return (a_Buffer[a_Index / 2] >> ((a_Index & 1) * 4)) & 0x0f;
 	}
-
-
 } ;
 
 
@@ -418,7 +388,20 @@ struct sSetBlock
 	BLOCKTYPE m_BlockType;
 	NIBBLETYPE m_BlockMeta;
 
-	sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta):
+		m_RelX(a_BlockX),
+		m_RelY(a_BlockY),
+		m_RelZ(a_BlockZ),
+		m_BlockType(a_BlockType),
+		m_BlockMeta(a_BlockMeta)
+	{
+		cChunkDef::AbsoluteToRelative(m_RelX, m_RelY, m_RelZ, m_ChunkX, m_ChunkZ);
+	}
+
+	sSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
+		sSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockType, a_BlockMeta)
+	{
+	}
 
 	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
 		m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ),
@@ -440,8 +423,17 @@ struct sSetBlock
 	/** Returns the absolute Z coord of the stored block. */
 	int GetZ(void) const { return m_RelZ + cChunkDef::Width * m_ChunkZ; }
 
-	/** Returns the absolute position of the stored block. */
-	Vector3i GetPos(void) const { return Vector3i(GetX(), GetY(), GetZ()); }
+	/** Returns the absolute coords of the stored block. */
+	Vector3i GetAbsolutePos() const
+	{
+		return Vector3i(GetX(), GetY(), GetZ());
+	}
+
+	/** Returns the relative position of the stored block within its chunk. */
+	Vector3i GetRelativePos() const
+	{
+		return Vector3i(m_RelX, m_RelY, m_RelZ);
+	}
 };
 
 typedef std::list<sSetBlock> sSetBlockList;
@@ -498,29 +490,8 @@ public:
 	virtual ~cChunkCoordCallback() {}
 
 	/** Called with the chunk's coords, and an optional operation status flag for operations that support it. */
-	virtual void Call(int a_ChunkX, int a_ChunkZ, bool a_IsSuccess) = 0;
+	virtual void Call(cChunkCoords a_Coords, bool a_IsSuccess) = 0;
 } ;
-
-
-
-
-
-/** Provides storage for a set of chunk coords together with a callback.
-Used for chunk queues that notify about processed items. */
-class cChunkCoordsWithCallback
-{
-public:
-	cChunkCoordsWithCallback(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback):
-		m_ChunkX(a_ChunkX),
-		m_ChunkZ(a_ChunkZ),
-		m_Callback(a_Callback)
-	{
-	}
-
-	int m_ChunkX;
-	int m_ChunkZ;
-	cChunkCoordCallback * m_Callback;
-};
 
 
 

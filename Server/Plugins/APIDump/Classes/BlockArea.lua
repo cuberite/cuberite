@@ -37,6 +37,9 @@ return
 				<li>Modify blocks inside cBlockArea</li>
 				<li>Write the area back to a world / save to file</li>
 			</ul></p>
+			<p>
+			Calls to any setter of this class will not trigger simulator updates (lava, water, redstone).
+			</p>
 		]],
 		Functions =
 		{
@@ -1621,7 +1624,7 @@ return
 						Type = "number",
 					},
 				},
-				Notes = "Sets the block meta at the specified absolute coords",
+				Notes = "Sets the block meta at the specified absolute coords.",
 			},
 			SetBlockSkyLight =
 			{
@@ -1898,7 +1901,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Writes the area into World at the specified coords, returns true if successful. baTypes and baMetas are written.",
+					Notes = "Writes the area into World at the specified coords, returns true if successful. All present data types are written.",
 				},
 				{
 					Params =
@@ -1952,7 +1955,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Writes the area into World at the specified coords, returns true if successful. baTypes and baMetas are written.",
+					Notes = "Writes the area into World at the specified coords, returns true if successful. All present data types are written.",
 				},
 				{
 					Params =

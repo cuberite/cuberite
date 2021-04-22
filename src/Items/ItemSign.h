@@ -11,46 +11,54 @@
 
 
 
-class cItemSignHandler :
+class cItemSignHandler:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
-	cItemSignHandler(int a_ItemType) :
-		super(a_ItemType)
+
+	cItemSignHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
 
 
+
+
+
 	virtual bool OnPlayerPlace(
-		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ
+		cWorld & a_World,
+		cPlayer & a_Player,
+		const cItem & a_EquippedItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos
 	) override
 	{
 		// Check if placing on something ignoring build collision to edit the correct sign later on:
-		BLOCKTYPE ClickedBlock;
+		BLOCKTYPE ClickedBlockType;
 		NIBBLETYPE ClickedBlockMeta;
-		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
+		a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
 		cChunkInterface ChunkInterface(a_World.GetChunkMap());
-		bool isReplacingClickedBlock = BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(ChunkInterface, { a_BlockX, a_BlockY, a_BlockZ }, a_Player, ClickedBlockMeta);
+		bool IsReplacingClickedBlock = cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta);
 
 		// If the regular placement doesn't work, do no further processing:
-		if (!super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		if (!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_CursorPos))
 		{
 			return false;
 		}
 
-		// Use isReplacingClickedBlock to make sure we will edit the right sign:
-		if (!isReplacingClickedBlock)
-		{
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		}
+		// Use IsReplacingClickedBlock to make sure we will edit the right sign:
+		auto SignPos = IsReplacingClickedBlock ? a_ClickedBlockPos : AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
 
 		// After successfully placing the sign, open the sign editor for the player:
-		a_Player.GetClientHandle()->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
+		a_Player.GetClientHandle()->SendEditSign(SignPos.x, SignPos.y, SignPos.z);
 		return true;
 	}
+
+
+
 
 
 	virtual bool IsPlaceable(void) override
@@ -59,21 +67,25 @@ public:
 	}
 
 
+
+
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
+		const Vector3i a_PlacedBlockPos,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPos,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		if (a_BlockFace == BLOCK_FACE_TOP)
+		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
 		{
 			a_BlockMeta = cBlockSignPostHandler::RotationToMetaData(a_Player->GetYaw());
 			a_BlockType = E_BLOCK_SIGN_POST;
 		}
 		else
 		{
-			a_BlockMeta = cBlockWallSignHandler::DirectionToMetaData(a_BlockFace);
+			a_BlockMeta = cBlockWallSignHandler::BlockFaceToMetaData(a_ClickedBlockFace);
 			a_BlockType = E_BLOCK_WALLSIGN;
 		}
 		return true;

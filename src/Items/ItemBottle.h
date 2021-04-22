@@ -2,25 +2,35 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 
 
 
 
 
-class cItemBottleHandler :
+class cItemBottleHandler:
 	public cItemHandler
 {
+	using Super = cItemHandler;
+
 public:
-	cItemBottleHandler() :
-		cItemHandler(E_ITEM_GLASS_BOTTLE)
+
+	cItemBottleHandler():
+		Super(E_ITEM_GLASS_BOTTLE)
 	{
 	}
 
 
+
+
+
+	/** Searches for a water source block in the line of sight.
+	Returns true and sets a_BlockPos if a water source block is found within line-of-sight.
+	Returns false if not. */
 	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos)
 	{
-		class cCallbacks :
+		class cCallbacks:
 			public cBlockTracer::cCallbacks
 		{
 		public:
@@ -28,12 +38,12 @@ public:
 			bool     m_HasHitFluid;
 
 
-			cCallbacks(void) :
+			cCallbacks():
 				m_HasHitFluid(false)
 			{
 			}
 
-			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+			virtual bool OnNextBlock(Vector3i a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 			{
 				if (IsBlockWater(a_BlockType))
 				{
@@ -42,24 +52,19 @@ public:
 						return false;
 					}
 					m_HasHitFluid = true;
-					m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);
+					m_Pos = a_BlockPosition;
 					return true;
 				}
 				return false;
 			}
 		} Callbacks;
-
-		cLineBlockTracer Tracer(*a_World, Callbacks);
-		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
-		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
-
-		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
-
+		auto Start = a_Player->GetEyePosition() + a_Player->GetLookVector();
+		auto End = a_Player->GetEyePosition() + a_Player->GetLookVector() * 5;
+		cLineBlockTracer::Trace(*a_World, Callbacks, Start, End);
 		if (!Callbacks.m_HasHitFluid)
 		{
 			return false;
 		}
-
 
 		a_BlockPos = Callbacks.m_Pos;
 		return true;
@@ -67,12 +72,18 @@ public:
 
 
 
+
+
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
-		) override
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
+	) override
 	{
-		if (a_BlockFace != BLOCK_FACE_NONE)
+		if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
 		}
@@ -83,9 +94,11 @@ public:
 			return false;  // Nothing in range.
 		}
 
-		a_Player->GetInventory().RemoveOneEquippedItem();
-		cItem NewItem(E_ITEM_POTION, 1, 0);
-		a_Player->GetInventory().AddItem(NewItem);
+		// Give back a filled water bottle if gamemode is not creative:
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_POTION));
+		}
 		return true;
 	}
 } ;

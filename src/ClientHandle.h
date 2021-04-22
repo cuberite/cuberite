@@ -17,6 +17,7 @@
 #include "ChunkSender.h"
 #include "EffectID.h"
 #include "Protocol/ForgeHandshake.h"
+#include "Protocol/ProtocolRecognizer.h"
 #include "UUID.h"
 
 
@@ -44,7 +45,7 @@ typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 
 
 class cClientHandle  // tolua_export
-	: public cTCPLink::cCallbacks
+	: public cTCPLink::cCallbacks, public std::enable_shared_from_this<cClientHandle>
 {  // tolua_export
 public:  // tolua_export
 
@@ -89,12 +90,6 @@ public:  // tolua_export
 	and the results are passed to MCS running in offline mode. */
 	void SetProperties(const Json::Value & a_Properties) { m_Properties = a_Properties; }
 
-	/** Generates an UUID based on the username stored for this client, and stores it in the m_UUID member.
-	This is used for the offline (non-auth) mode, when there's no UUID source.
-	Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same.
-	Internally calls the GenerateOfflineUUID static function. */
-	void GenerateOfflineUUID(void);
-
 	/** Generates an UUID based on the player name provided.
 	This is used for the offline (non-auth) mode, when there's no UUID source.
 	Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same. */
@@ -104,10 +99,16 @@ public:  // tolua_export
 	We use Version-3 UUIDs for offline UUIDs, online UUIDs are Version-4, thus we can tell them apart. */
 	static bool IsUUIDOnline(const cUUID & a_UUID);  // Exported in ManualBindings.cpp
 
+	/** Flushes all buffered outgoing data to the network. */
+	void ProcessProtocolOut();
+
 	/** Formats the type of message with the proper color and prefix for sending to the client. */
 	static AString FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData);
 
-	static AString FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2);
+	static AString FormatChatPrefix(
+		bool ShouldAppendChatPrefixes, const AString & a_ChatPrefixS,
+		const AString & m_Color1, const AString & m_Color2
+	);
 
 	void Kick(const AString & a_Reason);  // tolua_export
 
@@ -119,10 +120,6 @@ public:  // tolua_export
 
 	/** Remove all loaded chunks that are no longer in range */
 	void UnloadOutOfRangeChunks(void);
-
-	/** Removes the client from all chunks. Used when destroying the player.
-	When switching worlds, RemoveFromWorld does this function's job so it isn't called. */
-	void RemoveFromAllChunks(void);
 
 	inline bool IsLoggedIn(void) const { return (m_State >= csAuthenticating); }
 
@@ -136,7 +133,6 @@ public:  // tolua_export
 
 	bool IsPlaying   (void) const { return (m_State == csPlaying); }
 	bool IsDestroyed (void) const { return (m_State == csDestroyed); }
-	bool IsDestroying(void) const { return (m_State == csDestroying); }
 
 	// The following functions send the various packets:
 	// (Please keep these alpha-sorted)
@@ -145,6 +141,12 @@ public:  // tolua_export
 	void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
 	void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // tolua_export
 	void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
+	void SendBossBarAdd                 (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog);  // tolua_export
+	void SendBossBarUpdateFlags         (UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog);  // tolua_export
+	void SendBossBarUpdateStyle         (UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType);  // tolua_export
+	void SendBossBarUpdateTitle         (UInt32 a_UniqueID, const cCompositeChat & a_Title);  // tolua_export
+	void SendBossBarRemove              (UInt32 a_UniqueID);  // tolua_export
+	void SendBossBarUpdateHealth        (UInt32 a_UniqueID, float a_FractionFilled);  // tolua_export
 	void SendCameraSetTo                (const cEntity & a_Entity);
 	void SendChat                       (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChat                       (const cCompositeChat & a_Message);
@@ -153,29 +155,28 @@ public:  // tolua_export
 	void SendChatAboveActionBar         (const cCompositeChat & a_Message);
 	void SendChatSystem                 (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChatSystem                 (const cCompositeChat & a_Message);
-	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
-	void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player, int a_Count);
+	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, ContiguousByteBufferView a_ChunkData);
+	void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count);
 	void SendDestroyEntity              (const cEntity & a_Entity);
 	void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
 	void SendDisconnect                 (const AString & a_Reason);
 	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ);
-	void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation);  // tolua_export
-	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration);
+	void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation);  // tolua_export
+	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration);
 	void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
 	void SendEntityHeadLook             (const cEntity & a_Entity);
 	void SendEntityLook                 (const cEntity & a_Entity);
 	void SendEntityMetadata             (const cEntity & a_Entity);
+	void SendEntityPosition             (const cEntity & a_Entity);
 	void SendEntityProperties           (const cEntity & a_Entity);
-	void SendEntityRelMove              (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
-	void SendEntityRelMoveLook          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
-	void SendEntityStatus               (const cEntity & a_Entity, char a_Status);
 	void SendEntityVelocity             (const cEntity & a_Entity);
 	void SendExperience                 (void);
 	void SendExperienceOrb              (const cExpOrb & a_ExpOrb);
-	void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion);
+	void SendExplosion                  (Vector3f a_Position, float a_Power);
 	void SendGameMode                   (eGameMode a_GameMode);
 	void SendHealth                     (void);
+	void SendHeldItemChange             (int a_ItemIndex);
 	void SendHideTitle                  (void);   // tolua_export
 	void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item);
 	void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo);
@@ -183,21 +184,22 @@ public:  // tolua_export
 	void SendPaintingSpawn              (const cPainting & a_Painting);
 	void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount);
 	void SendParticleEffect             (const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data);
-	void SendPickupSpawn                (const cPickup & a_Pickup);
 	void SendPlayerAbilities            (void);
 	void SendPlayerListAddPlayer        (const cPlayer & a_Player);
+	void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer);   // tolua_export
 	void SendPlayerListRemovePlayer     (const cPlayer & a_Player);
 	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
 	void SendPlayerListUpdateGameMode   (const cPlayer & a_Player);
-	void SendPlayerListUpdatePing       (const cPlayer & a_Player);
-	void SendPlayerMaxSpeed             (void);  ///< Informs the client of the maximum player speed (1.6.1+)
+	void SendPlayerListUpdatePing       ();
 	void SendPlayerMoveLook             (void);
 	void SendPlayerPosition             (void);
 	void SendPlayerSpawn                (const cPlayer & a_Player);
-	void SendPluginMessage              (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
+	void SendPluginMessage              (const AString & a_Channel, std::string_view a_Message);  // Exported in ManualBindings.cpp
+	void SendPluginMessage              (const AString & a_Channel, ContiguousByteBufferView a_Message);
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
+	void SendResourcePack               (const AString & a_ResourcePackUrl);
 	void SendResetTitle                 (void);  // tolua_export
-	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks = false);
+	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks);
 	void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
 	void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void SendSetSubTitle                (const cCompositeChat & a_SubTitle);  // tolua_export
@@ -207,30 +209,34 @@ public:  // tolua_export
 	void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch);  // tolua_export
 	void SendSoundEffect                (const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch);  // tolua_export
 	void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
-	void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock);
+	void SendSpawnEntity                (const cEntity & a_Entity);
 	void SendSpawnMob                   (const cMonster & a_Mob);
-	void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch);
-	void SendSpawnVehicle               (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType = 0);
 	void SendStatistics                 (const cStatManager & a_Manager);
 	void SendTabCompletionResults       (const AStringVector & a_Results);
-	void SendTeleportEntity             (const cEntity & a_Entity);
 	void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks);  // tolua_export
-	void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle);  // tolua_export
+	void SendTimeUpdate                 (cTickTimeLong a_WorldAge, cTickTimeLong a_WorldDate, bool a_DoDaylightCycle);
 	void SendUnleashEntity              (const cEntity & a_Entity);
 	void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ);
 	void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity);
 	void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
-	void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
+
+	/** Send a newly discovered recipe to show the notification and unlock in the recipe book */
+	void SendUnlockRecipe               (UInt32 a_RecipeId);
+
+	/** Send already known recipes without notification but visible in the recipe book */
+	void SendInitRecipes                (UInt32 a_RecipeId);
+
 	void SendWeather                    (eWeather a_Weather);
 	void SendWholeInventory             (const cWindow & a_Window);
 	void SendWindowClose                (const cWindow & a_Window);
 	void SendWindowOpen                 (const cWindow & a_Window);
-	void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value);
+	void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value);
+
+	const AString & GetUsername(void) const;  // tolua_export
+	void SetUsername(AString && a_Username);
 
 	// tolua_begin
-	const AString & GetUsername(void) const;
-	void SetUsername( const AString & a_Username);
 
 	inline short GetPing(void) const { return static_cast<short>(std::chrono::duration_cast<std::chrono::milliseconds>(m_Ping).count()); }
 
@@ -288,8 +294,8 @@ public:  // tolua_export
 	void PacketUnknown(UInt32 a_PacketType);
 	void PacketError(UInt32 a_PacketType);
 
-	// Calls that cProtocol descendants use for handling packets:
-	void HandleAnimation(int a_Animation);
+	/** Called when the protocol receives a (hand swing) animation packet. */
+	void HandleAnimation(bool a_SwingMainHand);
 
 	/** Called when the protocol receives a MC|ItemName plugin message, indicating that the player named
 	an item in the anvil UI. */
@@ -297,7 +303,7 @@ public:  // tolua_export
 
 	/** Called when the protocol receives a MC|Beacon plugin message, indicating that the player set an effect
 	in the beacon UI. */
-	void HandleBeaconSelection(int a_PrimaryEffect, int a_SecondaryEffect);
+	void HandleBeaconSelection(unsigned a_PrimaryEffect, unsigned a_SecondaryEffect);
 
 	/** Called when the protocol detects a chat packet. */
 	void HandleChat(const AString & a_Message);
@@ -314,12 +320,11 @@ public:  // tolua_export
 	a_ClickAction specifies whether the click was inside the window or not (caLeftClick or caLeftClickOutside). */
 	void HandleCreativeInventory(Int16 a_SlotNum, const cItem & a_HeldItem, eClickAction a_ClickAction);
 
+	/** Handles a player sneaking or unsneaking. */
+	void HandleCrouch(bool a_IsCrouching);
+
 	/** Called when the player enchants an Item in the Enchanting table UI. */
 	void HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment);
-
-	void HandleEntityCrouch           (UInt32 a_EntityID, bool a_IsCrouching);
-	void HandleEntityLeaveBed         (UInt32 a_EntityID);
-	void HandleEntitySprinting        (UInt32 a_EntityID, bool a_IsSprinting);
 
 	/** Kicks the client if the same username is already logged in.
 	Returns false if the client has been kicked, true otherwise. */
@@ -331,6 +336,9 @@ public:  // tolua_export
 	*/
 	bool HandleHandshake        (const AString & a_Username);
 
+	/** Handles a player exiting his bed. */
+	void HandleLeaveBed();
+
 	void HandleKeepAlive        (UInt32 a_KeepAliveID);
 	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, UInt8 a_Status);
 
@@ -338,27 +346,33 @@ public:  // tolua_export
 	the NPC UI. */
 	void HandleNPCTrade(int a_SlotNum);
 
-	/** Handles a player opening their inventory while riding a horse.
-	@param a_EntityID ID of the player that is to open the inventory. Should be the same as GetPlayer()->GetUniqueID().  */
-	void HandleOpenHorseInventory(UInt32 a_EntityID);
+	/** Handles a player opening his inventory while riding a horse. */
+	void HandleOpenHorseInventory();
 
 	void HandlePing             (void);
-	void HandlePlayerAbilities  (bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
+	void HandlePlayerAbilities  (bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
-	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
 
-	/** Verifies and sets player position, performing relevant checks
-	Calls relevant methods to process movement related statistics
-	Requires state of previous position and on-ground status, so must be called when these are still intact
-	*/
-	void HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
+	/** Verifies and sets player position, performing relevant checks.
+	Calls relevant methods to process movement related statistics.
+	Requires state of previous position and on-ground status, so must be called when these are still intact. */
+	void HandlePlayerMove(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround);
+
+	void HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, float a_Rotation, float a_Pitch, bool a_IsOnGround);
 
 
-	void HandlePluginMessage    (const AString & a_Channel, const AString & a_Message);
+	void HandlePluginMessage    (const AString & a_Channel, ContiguousByteBufferView a_Message);
 	void HandleRespawn          (void);
-	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, eHand a_Hand);
+	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, bool a_UsedMainHand);
 	void HandleSlotSelected     (Int16 a_SlotNum);
 	void HandleSpectate         (const cUUID & a_PlayerUUID);
+
+	/** Handles a player sprinting or slowing back down. */
+	void HandleSprint(bool a_IsSprinting);
+
+	/** Handles a player starting elytra flight while falling. */
+	void HandleStartElytraFlight();
+
 	void HandleSteerVehicle     (float Forward, float Sideways);
 	void HandleTabCompletion    (const AString & a_Text);
 	void HandleUpdateSign       (
@@ -368,16 +382,18 @@ public:  // tolua_export
 	);
 	void HandleUnmount          (void);
 	void HandleUseEntity        (UInt32 a_TargetEntityID, bool a_IsLeftClick);
-	void HandleUseItem          (eHand a_Hand);
+	void HandleUseItem          (bool a_UsedMainHand);
 	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
 	void HandleWindowClose      (UInt8 a_WindowID);
 
-	/** Called when the protocol has finished logging the user in.
-	Return true to allow the user in; false to kick them.
-	*/
-	bool HandleLogin(const AString & a_Username);
+	/** Called when a recipe from the recipe book is selected */
+	void HandleCraftRecipe      (UInt32 a_RecipeId);
 
-	void SendData(const char * a_Data, size_t a_Size);
+	/** Called when the protocol has finished logging the user in.
+	Return true to allow the user in; false to kick them. */
+	bool HandleLogin();
+
+	void SendData(ContiguousByteBufferView a_Data);
 
 	/** Called when the player moves into a different world.
 	Sends an UnloadChunk packet for each loaded chunk and resets the streamed chunks. */
@@ -394,9 +410,6 @@ public:  // tolua_export
 	bool IsPlayerChunkSent();
 
 private:
-	/** The dimension that was last sent to a player in a Respawn or Login packet.
-	Used to avoid Respawning into the same dimension, which confuses the client. */
-	eDimension m_LastSentDimension;
 
 	friend class cServer;  // Needs access to SetSelf()
 
@@ -428,28 +441,27 @@ private:
 	std::unordered_set<cChunkCoords, cChunkCoordsHash> m_ChunksToSend;  // Chunks that need to be sent to the player (queued because they weren't generated yet or there's not enough time to send them)
 	cChunkCoordsList                                   m_SentChunks;    // Chunks that are currently sent to the client
 
-	std::unique_ptr<cProtocol> m_Protocol;
+	cMultiVersionProtocol m_Protocol;
 
 	/** Protects m_IncomingData against multithreaded access. */
 	cCriticalSection m_CSIncomingData;
 
-	/** Queue for the incoming data received on the link until it is processed in Tick().
+	/** Queue for the incoming data received on the link until it is processed in ProcessProtocolIn().
 	Protected by m_CSIncomingData. */
-	AString m_IncomingData;
+	ContiguousByteBuffer m_IncomingData;
 
 	/** Protects m_OutgoingData against multithreaded access. */
 	cCriticalSection m_CSOutgoingData;
 
-	/** Buffer for storing outgoing data from any thread; will get sent in Tick() (to prevent deadlocks).
+	/** Buffer for storing outgoing data from any thread; will get sent in ProcessProtocolOut() at the end of each tick.
 	Protected by m_CSOutgoingData. */
-	AString m_OutgoingData;
+	ContiguousByteBuffer m_OutgoingData;
 
-	Vector3d m_ConfirmPosition;
-
+	/** A pointer to a World-owned player object, created in FinishAuthenticate when authentication succeeds.
+	The player should only be accessed from the tick thread of the World that owns him.
+	After the player object is handed off to the World, lifetime is managed automatically, guaranteed to outlast this client handle.
+	The player self-destructs some time after the client handle enters the Destroyed state. */
 	cPlayer * m_Player;
-
-	// Temporary (#3115-will-fix): maintain temporary ownership of created cPlayer objects while they are in limbo
-	std::unique_ptr<cPlayer> m_PlayerPtr;
 
 	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know
 	whether or not the player is standing at a sent chunk.
@@ -463,6 +475,9 @@ private:
 	// Chunk position when the last StreamChunks() was called; used to avoid re-streaming while in the same chunk
 	int m_LastStreamedChunkX;
 	int m_LastStreamedChunkZ;
+
+	/** The last time UnloadOutOfRangeChunks was called. */
+	cTickTimeLong m_LastUnloadCheck;
 
 	/** Number of ticks since the last network packet was received (increased in Tick(), reset in OnReceivedData()) */
 	std::atomic<int> m_TicksSinceLastPacket;
@@ -493,13 +508,8 @@ private:
 	{
 		csConnected,             ///< The client has just connected, waiting for their handshake / login
 		csAuthenticating,        ///< The client has logged in, waiting for external authentication
-		csAuthenticated,         ///< The client has been authenticated, will start streaming chunks in the next tick
 		csDownloadingWorld,      ///< The client is waiting for chunks, we're waiting for the loader to provide and send them
-		csConfirmingPos,         ///< The client has been sent the position packet, waiting for them to repeat the position back
 		csPlaying,               ///< Normal gameplay
-		csKicked,                ///< Disconnect packet sent, awaiting connection closure
-		csQueuedForDestruction,  ///< The client will be destroyed in the next tick (flag set when socket closed)
-		csDestroying,            ///< The client is being destroyed, don't queue any more packets / don't add to chunks
 		csDestroyed,             ///< The client has been destroyed, the destructor is to be called from the owner thread
 	} ;
 
@@ -512,9 +522,6 @@ private:
 	However, if it only uses m_State for a quick bail out, or it doesn't break if the client disconnects in the middle of it,
 	it may just read m_State without locking m_CSState. */
 	std::atomic<eState> m_State;
-
-	/** If set to true during csDownloadingWorld, the tick thread calls CheckIfWorldDownloaded() */
-	bool m_ShouldCheckDownloaded;
 
 	/** Number of explosions sent this tick */
 	int m_NumExplosionsThisTick;
@@ -552,9 +559,8 @@ private:
 	m_CSOutgoingData is used to synchronize access for sending data. */
 	cTCPLinkPtr m_Link;
 
-	/** Shared pointer to self, so that this instance can keep itself alive when needed. */
-	cClientHandlePtr m_Self;
-
+	/** The fraction between 0 and 1 (or above), of how far through mining the currently mined block is.
+	0 for just started, 1 and above for broken. Used for anti-cheat. */
 	float m_BreakProgress;
 
 	/** Finish logging the user in after authenticating. */
@@ -564,19 +570,19 @@ private:
 	bool CheckBlockInteractionsRate(void);
 
 	/** Adds a single chunk to be streamed to the client; used by StreamChunks() */
-	void StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority);
+	void StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority);
 
 	/** Handles the DIG_STARTED dig packet: */
-	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
+	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace);
 
 	/** Handles the DIG_FINISHED dig packet: */
-	void HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
+	void HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace);
 
 	/** The clients will receive a finished dig animation */
 	void FinishDigAnimation();
 
 	/** Converts the protocol-formatted channel list (NUL-separated) into a proper string vector. */
-	AStringVector BreakApartPluginChannels(const AString & a_PluginChannels);
+	AStringVector BreakApartPluginChannels(ContiguousByteBufferView a_PluginChannels);
 
 	/** Adds all of the channels to the list of current plugin channels. Handles duplicates gracefully. */
 	void RegisterPluginChannels(const AStringVector & a_ChannelList);
@@ -587,12 +593,13 @@ private:
 	/** Called when the network socket has been closed. */
 	void SocketClosed(void);
 
-	/** Called right after the instance is created to store its SharedPtr inside. */
-	void SetSelf(cClientHandlePtr a_Self);
+	/** Called to update m_State.
+	Only succeeds if a_NewState > m_State, otherwise returns false. */
+	bool SetState(eState a_NewState);
 
-	/** Processes the data in the network input and output buffers.
+	/** Processes the data in the network input buffer.
 	Called by both Tick() and ServerTick(). */
-	void ProcessProtocolInOut(void);
+	void ProcessProtocolIn(void);
 
 	// cTCPLink::cCallbacks overrides:
 	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override;

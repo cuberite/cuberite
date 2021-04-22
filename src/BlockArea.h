@@ -14,16 +14,20 @@
 
 #pragma once
 
+#include "BlockType.h"
 #include "ForEachChunkProvider.h"
 #include "ChunkDataCallback.h"
 #include "Cuboid.h"
 #include "FunctionRef.h"
+#include "BlockEntities/BlockEntity.h"
 
 
 
 
 // fwd:
 class cCuboid;
+class cItem;
+class cItems;
 using cBlockEntityCallback = cFunctionRef<bool(cBlockEntity &)>;
 
 
@@ -120,11 +124,27 @@ public:
 
 	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
 	Doesn't wake up the simulators. */
-	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes = baTypes | baMetas | baBlockEntities);
+	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
 
 	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
 	Doesn't wake up the simulators. */
-	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_MinCoords, int a_DataTypes = baTypes | baMetas | baBlockEntities);
+	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ)
+	{
+		// Write all available data
+		return Write(a_ForEachChunkProvider, a_MinBlockX, a_MinBlockY, a_MinBlockZ, GetDataTypes());
+	}
+
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
+	Doesn't wake up the simulators. */
+	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_MinCoords, int a_DataTypes);
+
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
+	Doesn't wake up the simulators. */
+	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_MinCoords)
+	{
+		// Write all available data
+		return Write(a_ForEachChunkProvider, a_MinCoords.x, a_MinCoords.y, a_MinCoords.z, GetDataTypes());
+	}
 
 	// tolua_begin
 
@@ -372,6 +392,15 @@ public:
 	NIBBLETYPE * GetBlockSkyLight(void) const { return m_BlockSkyLight.get(); }  // NOTE: one byte per block!
 	size_t       GetBlockCount(void) const { return static_cast<size_t>(m_Size.x * m_Size.y * m_Size.z); }
 	static size_t MakeIndexForSize(Vector3i a_RelPos, Vector3i a_Size);
+
+	/** Returns the index into the internal arrays for the specified coords */
+	size_t MakeIndex(Vector3i a_RelPos) const
+	{
+		return MakeIndexForSize(a_RelPos, m_Size);
+	}
+
+	/** OBSOLETE, use the Vector3i-based overload instead.
+	Returns the index into the internal arrays for the specified coords */
 	size_t MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const
 	{
 		return MakeIndexForSize({ a_RelX, a_RelY, a_RelZ }, m_Size);
@@ -397,6 +426,7 @@ public:
 	const cBlockEntities & GetBlockEntities(void) const { ASSERT(HasBlockEntities()); return *m_BlockEntities; }
 
 
+
 protected:
 
 	friend class cChunkDesc;
@@ -419,12 +449,13 @@ protected:
 
 		// cChunkDataCallback overrides:
 		virtual bool Coords(int a_ChunkX, int a_ChunkZ) override;
-		virtual void ChunkData(const cChunkData &  a_BlockTypes) override;
+		virtual void ChunkData(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData) override;
 		virtual void BlockEntity(cBlockEntity * a_BlockEntity) override;
 	} ;
 
 	using NIBBLEARRAY = std::unique_ptr<NIBBLETYPE[]>;
 	using BLOCKARRAY = std::unique_ptr<BLOCKTYPE[]>;
+	using cBlockEntitiesPtr = std::unique_ptr<cBlockEntities>;
 
 	Vector3i m_Origin;
 	Vector3i m_Size;
@@ -437,14 +468,6 @@ protected:
 	NIBBLEARRAY m_BlockMetas;     // Each meta is stored as a separate byte for faster access
 	NIBBLEARRAY m_BlockLight;     // Each light value is stored as a separate byte for faster access
 	NIBBLEARRAY m_BlockSkyLight;  // Each light value is stored as a separate byte for faster access
-
-	/** Deleter to clear the block entities before deleting the container. */
-	struct sBlockEntitiesDeleter
-	{
-		void operator () (cBlockEntities * a_BlockEntities);
-	};
-
-	using cBlockEntitiesPtr = std::unique_ptr<cBlockEntities, sBlockEntitiesDeleter>;
 
 	/** The block entities contained within the area.
 	Only valid if the area was created / read with the baBlockEntities flag.
@@ -481,9 +504,6 @@ protected:
 	template <bool MetasValid>
 	void MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy, const NIBBLETYPE * SrcMetas, NIBBLETYPE * DstMetas);
 
-	/** Clears the block entities from the specified container, freeing each blockentity. */
-	static void ClearBlockEntities(cBlockEntities & a_BlockEntities);
-
 	/** Updates m_BlockEntities to remove BEs that no longer match the blocktype at their coords, and clones from a_Src the BEs that are missing.
 	a_RelX, a_RelY and a_RelZ are relative coords that should be added to all BEs from a_Src before checking them.
 	If a block should have a BE but one cannot be found in either this or a_Src, a new one is created. */
@@ -494,6 +514,9 @@ protected:
 
 	/** Removes from m_BlockEntities those BEs that no longer match the blocktype at their coords. */
 	void RemoveNonMatchingBlockEntities(void);
+
+	/** Returns the cBlockEntity at the specified coords, or nullptr if none. */
+	cBlockEntity * GetBlockEntityRel(Vector3i a_RelPos);
 
 	// tolua_begin
 } ;

@@ -7,21 +7,26 @@
 
 
 
-class cItemGoldenAppleHandler :
+class cItemGoldenAppleHandler:
 	public cItemFoodHandler
 {
-	typedef cItemFoodHandler super;
+	using Super = cItemFoodHandler;
 
 public:
-	cItemGoldenAppleHandler()
-		: super(E_ITEM_GOLDEN_APPLE)
+
+	cItemGoldenAppleHandler():
+		Super(E_ITEM_GOLDEN_APPLE, FoodInfo(4, 9.6))
 	{
 	}
 
-
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
 	{
-		super::EatItem(a_Player, a_Item);
+		cItemHandler::EatItem(a_Player, a_Item);
+
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->GetInventory().RemoveOneEquippedItem();
+		}
 
 		// Enchanted golden apples have stronger effects:
 		if (a_Item->m_ItemDamage >= E_META_GOLDEN_APPLE_ENCHANTED)
@@ -37,13 +42,6 @@ public:
 		a_Player->AddEntityEffect(cEntityEffect::effRegeneration, 100, 1);
 
 		return true;
-	}
-
-
-	virtual FoodInfo GetFoodInfo(const cItem * a_Item) override
-	{
-		UNUSED(a_Item);
-		return FoodInfo(4, 9.6);
 	}
 
 };

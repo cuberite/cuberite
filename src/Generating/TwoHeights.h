@@ -16,8 +16,4 @@
 
 /** Creates and returns a new instance of the cTwoHeights terrain shape generator.
 The instance must be Initialize()-d before it is used. */
-extern cTerrainShapeGenPtr CreateShapeGenTwoHeights(int a_Seed, cBiomeGenPtr a_BiomeGen);
-
-
-
-
+extern std::unique_ptr<cTerrainShapeGen> CreateShapeGenTwoHeights(int a_Seed, cBiomeGen & a_BiomeGen);

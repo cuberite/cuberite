@@ -11,9 +11,6 @@
 
 
 
-
-
-
 cBrewingRecipes::cBrewingRecipes()
 {
 	ReloadRecipes();
@@ -48,8 +45,9 @@ void cBrewingRecipes::ReloadRecipes(void)
 			ParsingLine.erase(FirstCommentSymbol);
 		}
 
-		if (ParsingLine.empty())
+		if (IsOnlyWhitespace(ParsingLine))
 		{
+			// Ignore empty and whitespace only lines
 			continue;
 		}
 		AddRecipeFromLine(ParsingLine, LineNum);
@@ -66,7 +64,7 @@ void cBrewingRecipes::AddRecipeFromLine(AString a_Line, unsigned int a_LineNum)
 {
 	a_Line.erase(std::remove_if(a_Line.begin(), a_Line.end(), isspace), a_Line.end());
 
-	auto Recipe = cpp14::make_unique<cRecipe>();
+	auto Recipe = std::make_unique<cRecipe>();
 
 	const AStringVector & InputAndIngredient = StringSplit(a_Line, "+");
 
@@ -77,7 +75,7 @@ void cBrewingRecipes::AddRecipeFromLine(AString a_Line, unsigned int a_LineNum)
 		return;
 	}
 
-	const AStringVector & IngredientAndOutput = StringSplit(InputAndIngredient[1].c_str(), "=");
+	const AStringVector & IngredientAndOutput = StringSplit(InputAndIngredient[1], "=");
 	if (IngredientAndOutput.size() != 2)
 	{
 		LOGWARNING("brewing.txt: line %d: A line with '=' was expected", a_LineNum);
@@ -147,7 +145,7 @@ const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_
 		if (a_Input.m_ItemDamage & 0x2000)
 		{
 			// Create new recipe and add it to list
-			auto Recipe = cpp14::make_unique<cRecipe>();
+			auto Recipe = std::make_unique<cRecipe>();
 
 			Recipe->Input.m_ItemType = a_Input.m_ItemDamage;
 			Recipe->Output.m_ItemDamage = a_Input.m_ItemDamage + 8192;
@@ -180,7 +178,7 @@ const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_
 		}
 
 		// Create new recipe and add it to list
-		auto Recipe = cpp14::make_unique<cRecipe>();
+		auto Recipe = std::make_unique<cRecipe>();
 
 		Recipe->Input.m_ItemDamage = a_Input.m_ItemDamage;
 		Recipe->Output.m_ItemDamage = (*FoundRecipe)->Output.m_ItemDamage + 8192;
@@ -192,7 +190,6 @@ const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_
 	}
 	return nullptr;
 }
-
 
 
 

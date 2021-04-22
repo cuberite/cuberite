@@ -8,7 +8,6 @@
 #include "Logger.h"
 #include "LoggerSimple.h"
 #include "LoggerListeners.h"
-#include "zlib/zlib.h"
 
 
 
@@ -87,7 +86,7 @@ void cMCADefrag::Run(void)
 	// Wait for all the threads to finish:
 	while (!m_Threads.empty())
 	{
-		m_Threads.front()->Wait();
+		m_Threads.front()->Stop();
 		delete m_Threads.front();
 		m_Threads.pop_front();
 	}
@@ -127,9 +126,10 @@ AString cMCADefrag::GetNextFileName(void)
 // cMCADefrag::cThread:
 
 cMCADefrag::cThread::cThread(cMCADefrag & a_Parent) :
-	super("MCADefrag thread"),
+	super("MCA Defragmentor"),
 	m_Parent(a_Parent),
-	m_IsChunkUncompressed(false)
+	m_IsChunkUncompressed(false),
+	m_Compressor(12)  // Set the highest compression factor
 {
 }
 
@@ -384,27 +384,33 @@ bool cMCADefrag::cThread::UncompressChunkGzip(void)
 
 bool cMCADefrag::cThread::UncompressChunkZlib(void)
 {
-	// Uncompress the data:
-	z_stream strm;
-	strm.zalloc = nullptr;
-	strm.zfree = nullptr;
-	strm.opaque = nullptr;
-	inflateInit(&strm);
-	strm.next_out  = m_RawChunkData;
-	strm.avail_out = sizeof(m_RawChunkData);
-	strm.next_in   = m_CompressedChunkData + 1;  // The first byte is the compression method, skip it
-	strm.avail_in  = static_cast<uInt>(m_CompressedChunkDataSize);
-	int res = inflate(&strm, Z_FINISH);
-	inflateEnd(&strm);
-	if (res != Z_STREAM_END)
+	try
 	{
-		LOGWARNING("Failed to uncompress chunk data: %s", strm.msg);
+		// Uncompress the data
+
+		const auto ExtractedData = m_Extractor.ExtractZLib(
+		{
+			reinterpret_cast<const std::byte *>(m_CompressedChunkData + 1),  // The first byte is the compression method, skip it
+			static_cast<size_t>(m_CompressedChunkDataSize - 1)
+		});
+		const auto Extracted = ExtractedData.GetView();
+
+		if (Extracted.size() > MAX_RAW_CHUNK_DATA_SIZE)
+		{
+			LOGINFO("Too much data for the internal decompression buffer!");
+			return false;
+		}
+
+		std::copy(Extracted.begin(), Extracted.end(), reinterpret_cast<std::byte *>(m_RawChunkData));
+		m_RawChunkDataSize = static_cast<int>(Extracted.size());
+
+		return true;
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING("Failed to uncompress chunk data. %s", Oops.what());
 		return false;
 	}
-	ASSERT(strm.total_out < static_cast<uLong>(std::numeric_limits<int>::max()));
-	m_RawChunkDataSize = static_cast<int>(strm.total_out);
-
-	return true;
 }
 
 
@@ -413,23 +419,33 @@ bool cMCADefrag::cThread::UncompressChunkZlib(void)
 
 bool cMCADefrag::cThread::CompressChunk(void)
 {
-	// Check that the compressed data can fit:
-	uLongf CompressedSize = compressBound(static_cast<uLong>(m_RawChunkDataSize));
-	if (CompressedSize > sizeof(m_CompressedChunkData))
+	try
 	{
-		LOGINFO("Too much data for the internal compression buffer!");
-		return false;
-	}
+		// Compress the data (using the highest compression factor, as set in the constructor)
 
-	// Compress the data using the highest compression factor:
-	int errorcode = compress2(m_CompressedChunkData + 1, &CompressedSize, m_RawChunkData, static_cast<uLong>(m_RawChunkDataSize), Z_BEST_COMPRESSION);
-	if (errorcode != Z_OK)
+		const auto CompressedData = m_Compressor.CompressZLib(
+		{
+			reinterpret_cast<const std::byte *>(m_RawChunkData),
+			static_cast<size_t>(m_RawChunkDataSize)
+		});
+		const auto Compressed = CompressedData.GetView();
+
+		// Check that the compressed data can fit:
+		if (Compressed.size() > MAX_COMPRESSED_CHUNK_DATA_SIZE)
+		{
+			LOGINFO("Too much data for the internal compression buffer!");
+			return false;
+		}
+
+		m_CompressedChunkData[0] = COMPRESSION_ZLIB;
+		std::copy(Compressed.begin(), Compressed.end(), reinterpret_cast<std::byte *>(m_CompressedChunkData + 1));
+		m_CompressedChunkDataSize = static_cast<int>(Compressed.size()) + 1;
+
+		return true;
+	}
+	catch (const std::exception & Oops)
 	{
-		LOGINFO("Recompression failed: %d", errorcode);
+		LOGWARNING("Recompression failed. %s", Oops.what());
 		return false;
 	}
-	m_CompressedChunkData[0] = COMPRESSION_ZLIB;
-	ASSERT(CompressedSize < static_cast<uLong>(std::numeric_limits<int>::max()));
-	m_CompressedChunkDataSize = static_cast<int>(CompressedSize + 1);
-	return true;
 }

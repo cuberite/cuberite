@@ -94,21 +94,21 @@ bool cPluginLua::Load(void)
 		lua_setglobal(m_LuaState, LUA_PLUGIN_NAME_VAR_NAME);
 
 		// Add the plugin's folder to the package.path and package.cpath variables (#693):
-		m_LuaState.AddPackagePath("path", FILE_IO_PREFIX + GetLocalFolder() + "/?.lua");
+		m_LuaState.AddPackagePath("path", GetLocalFolder() + "/?.lua");
 		#ifdef _WIN32
 			m_LuaState.AddPackagePath("cpath", GetLocalFolder() + "\\?.dll");
 		#else
-			m_LuaState.AddPackagePath("cpath", FILE_IO_PREFIX + GetLocalFolder() + "/?.so");
+			m_LuaState.AddPackagePath("cpath", GetLocalFolder() + "/?.so");
 		#endif
 
 		tolua_pushusertype(m_LuaState, this, "cPluginLua");
 		lua_setglobal(m_LuaState, "g_Plugin");
 	}
 
-	std::string PluginPath = FILE_IO_PREFIX + GetLocalFolder() + "/";
+	std::string PluginPath = GetLocalFolder() + "/";
 
 	// List all Lua files for this plugin. Info.lua has a special handling - make it the last to load:
-	AStringVector Files = cFile::GetFolderContents(PluginPath.c_str());
+	AStringVector Files = cFile::GetFolderContents(PluginPath);
 	AStringVector LuaFiles;
 	bool HasInfoLua = false;
 	for (AStringVector::const_iterator itr = Files.begin(), end = Files.end(); itr != end; ++itr)
@@ -187,7 +187,7 @@ bool cPluginLua::Load(void)
 void cPluginLua::Unload(void)
 {
 	ClearWebTabs();
-	super::Unload();
+	Super::Unload();
 	Close();
 }
 
@@ -227,9 +227,24 @@ bool cPluginLua::OnBlockSpread(cWorld & a_World, int a_BlockX, int a_BlockY, int
 
 
 
-bool cPluginLua::OnBlockToPickups(cWorld & a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups)
+bool cPluginLua::OnBlockToPickups(
+	cWorld & a_World,
+	Vector3i a_BlockPos,
+	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	const cBlockEntity * a_BlockEntity,
+	const cEntity * a_Digger,
+	const cItem * a_Tool,
+	cItems & a_Pickups
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_BLOCK_TO_PICKUPS, &a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, &a_Pickups);
+	// TODO: Change the hook signature to reflect the real parameters to this function, once we are allowed to make breaking API changes
+	return CallSimpleHooks(
+		cPluginManager::HOOK_BLOCK_TO_PICKUPS,
+		&a_World,
+		a_Digger,
+		a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
+		a_BlockType, a_BlockMeta, &a_Pickups
+	);
 }
 
 
@@ -414,15 +429,15 @@ bool cPluginLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_Can
 	{
 		switch (a_Source)
 		{
-			case esBed:           hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<Vector3i *>            (a_SourceData), cLuaState::Return, res); break;
-			case esEnderCrystal:  hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cEntity *>             (a_SourceData), cLuaState::Return, res); break;
-			case esGhastFireball: hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cGhastFireballEntity *>(a_SourceData), cLuaState::Return, res); break;
-			case esMonster:       hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
+			case esBed:           hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<Vector3i *>            (a_SourceData), cLuaState::Return, res); break;
+			case esEnderCrystal:  hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cEntity *>             (a_SourceData), cLuaState::Return, res); break;
+			case esGhastFireball: hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cGhastFireballEntity *>(a_SourceData), cLuaState::Return, res); break;
+			case esMonster:       hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
 			case esOther:         hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, cLuaState::Return, res); break;
 			case esPlugin:        hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, cLuaState::Return, res); break;
-			case esPrimedTNT:     hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res); break;
-			case esWitherBirth:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
-			case esWitherSkull:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res); break;
+			case esPrimedTNT:     hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res); break;
+			case esWitherBirth:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
+			case esWitherSkull:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res); break;
 			case esMax:
 			{
 				ASSERT(!"Invalid explosion source");
@@ -454,15 +469,15 @@ bool cPluginLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & 
 	{
 		switch (a_Source)
 		{
-			case esBed:           hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<Vector3i *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esEnderCrystal:  hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cEntity *>             (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esGhastFireball: hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cGhastFireballEntity *>(a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esMonster:       hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esBed:           hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<Vector3i *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esEnderCrystal:  hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cEntity *>             (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esGhastFireball: hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cGhastFireballEntity *>(a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esMonster:       hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esOther:         hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source,                                                         cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esPlugin:        hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source,                                                         cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esPrimedTNT:     hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esWitherBirth:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cMonster *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esWitherSkull:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, reinterpret_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esPrimedTNT:     hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esWitherBirth:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esWitherSkull:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esMax:
 			{
 				ASSERT(!"Invalid explosion source");
@@ -502,6 +517,15 @@ bool cPluginLua::OnHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper,
 bool cPluginLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_HOPPER_PUSHING_ITEM, &a_World, &a_Hopper, a_SrcSlotNum, &a_DstEntity, a_DstSlotNum);
+}
+
+
+
+
+
+bool cPluginLua::OnDropSpense(cWorld & a_World, cDropSpenserEntity & a_DropSpenser, int a_SlotNum)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_DROPSPENSE, &a_World, &a_DropSpenser, a_SlotNum);
 }
 
 
@@ -650,9 +674,9 @@ bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
+bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition, bool a_PreviousIsOnGround)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_MOVING, &a_Player, a_OldPosition, a_NewPosition);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_MOVING, &a_Player, a_OldPosition, a_NewPosition, a_PreviousIsOnGround);
 }
 
 
@@ -706,6 +730,16 @@ bool cPluginLua::OnPlayerPlacingBlock(cPlayer & a_Player, const sSetBlock & a_Bl
 		a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(),
 		a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta
 	);
+}
+
+
+
+
+
+bool cPluginLua::OnPlayerCrouched(cPlayer & a_Player)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_CROUCHED,
+		&a_Player);
 }
 
 
@@ -793,7 +827,7 @@ bool cPluginLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message)
+bool cPluginLua::OnPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const ContiguousByteBufferView a_Message)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLUGIN_MESSAGE, &a_Client, a_Channel, a_Message);
 }
@@ -1088,6 +1122,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_PLAYER_OPENING_WINDOW:        return "OnPlayerOpeningWindow";
 		case cPluginManager::HOOK_PLAYER_PLACED_BLOCK:          return "OnPlayerPlacedBlock";
 		case cPluginManager::HOOK_PLAYER_PLACING_BLOCK:         return "OnPlayerPlacingBlock";
+		case cPluginManager::HOOK_PLAYER_CROUCHED:        		return "OnPlayerCrouched";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICK:           return "OnPlayerRightClick";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY: return "OnPlayerRightClickingEntity";
 		case cPluginManager::HOOK_PLAYER_SHOOTING:              return "OnPlayerShooting";

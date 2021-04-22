@@ -30,6 +30,7 @@ public:
 		cItem * In;
 		cItem * Out;
 		int CookTime;  ///< How long this recipe takes to smelt, in ticks
+		float Reward;  ///< Experience reward for creating 1 of this item
 	};
 
 	/** Returns a recipe for the specified input, nullptr if no recipe found */

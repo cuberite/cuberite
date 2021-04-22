@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "Defines.h"
+#include "ChunkDef.h"
 
 
 
@@ -166,17 +168,6 @@ public:
 	const cMapDecoratorList GetDecorators(void) const { return m_Decorators; }
 
 	const cColorList & GetData(void) const { return m_Data; }
-
-	static const char * GetClassStatic(void)  // Needed for ManualBindings's DoWith templates
-	{
-		return "cMap";
-	}
-
-	const char * GetClass(void)  // Needed for ManualBindings' DoWith templates
-	{
-		return "cMap";
-	}
-
 
 private:
 

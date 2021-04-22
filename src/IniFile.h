@@ -30,10 +30,14 @@
 
 // tolua_begin
 
-class cIniFile : public cSettingsRepositoryInterface
+class cIniFile:
+	public cSettingsRepositoryInterface
 {
 private:
-	typedef cSettingsRepositoryInterface Super;
+
+	// tolua_end
+
+	using Super = cSettingsRepositoryInterface;
 
 
 	bool m_IsCaseInsensitive;
@@ -42,20 +46,22 @@ private:
 
 	struct key
 	{
-		std::vector<AString> names;
-		std::vector<AString> values;
-		std::vector<AString> comments;
+		std::vector<AString> m_Names;
+		std::vector<AString> m_Values;
+		std::vector<AString> m_Comments;
 	} ;
 
-	std::vector<key>     keys;
-	std::vector<AString> names;
-	std::vector<AString> comments;
+	std::vector<key>     m_Keys;
+	std::vector<AString> m_Names;
+	std::vector<AString> m_Comments;
 
 	/** If the object is case-insensitive, returns s as lowercase; otherwise returns s as-is */
 	AString CheckCase(const AString & s) const;
 
 	/** Removes the UTF-8 BOMs (Byte order makers), if present. */
 	void RemoveBom(AString & a_line) const;
+
+	// tolua_begin
 
 public:
 
@@ -71,7 +77,6 @@ public:
 	cIniFile(void);
 
 	// tolua_end
-	virtual ~cIniFile() override = default;
 
 	virtual std::vector<std::pair<AString, AString>> GetValues(AString a_keyName) override;
 
@@ -109,7 +114,7 @@ public:
 	int FindValue(const int keyID, const AString & valuename) const;
 
 	/** Returns number of keys currently in the ini */
-	int GetNumKeys(void) const { return static_cast<int>(keys.size()); }
+	int GetNumKeys(void) const { return static_cast<int>(m_Keys.size()); }
 
 	/** Add a key name */
 	int AddKeyName(const AString & keyname) override;
@@ -184,7 +189,7 @@ public:
 	// Header comments are those comments before the first key.
 
 	/** Returns the number of header comments */
-	int GetNumHeaderComments(void) {return static_cast<int>(comments.size());}
+	int GetNumHeaderComments(void) {return static_cast<int>(m_Comments.size());}
 
 	/** Adds a header comment */
 	void AddHeaderComment(const AString & comment);
@@ -196,7 +201,7 @@ public:
 	bool DeleteHeaderComment(int commentID);
 
 	/** Deletes all header comments */
-	void DeleteHeaderComments(void) {comments.clear();}
+	void DeleteHeaderComments(void) {m_Comments.clear();}
 
 
 	// Key comment functions.

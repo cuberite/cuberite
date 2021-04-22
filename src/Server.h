@@ -83,7 +83,7 @@ public:
 
 	/** Check if the player is queued to be transferred to a World.
 	Returns true is Player is found in queue. */
-	bool IsPlayerInQueue(AString a_Username);
+	bool IsPlayerInQueue(const AString & a_Username);
 
 	/** Can login more than once with same username.
 	Returns false if it is not allowed, true otherwise. */
@@ -94,12 +94,16 @@ public:
 
 	// tolua_end
 
+	const AString & GetResourcePackUrl(void) { return m_ResourcePackUrl; }
+
 	bool Start(void);
 
 	bool Command(cClientHandle & a_Client, AString & a_Cmd);
 
-	/** Executes the console command, sends output through the specified callback */
-	void ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
+	/** Queues a console command for execution through the cServer class.
+	The command will be executed in the server tick thread.
+	The command's output will be written to the a_Output callback. */
+	void QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
 
 	/** Lists all available console commands and their helpstrings */
 	void PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & a_Output);
@@ -129,22 +133,13 @@ public:
 	const AString & GetFaviconData(void) const { return m_FaviconData; }
 
 	cRsaPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
-	const AString & GetPublicKeyDER(void) const { return m_PublicKeyDER; }
+	ContiguousByteBufferView GetPublicKeyDER(void) const { return m_PublicKeyDER; }
 
 	/** Returns true if authentication has been turned on in server settings. */
 	bool ShouldAuthenticate(void) const { return m_ShouldAuthenticate; }  // tolua_export
 
 	/** Returns true if limit for number of block changes per tick by a player has been turned on in server settings. */
 	bool ShouldLimitPlayerBlockChanges(void) const { return m_ShouldLimitPlayerBlockChanges; }
-
-	/** Returns true if offline UUIDs should be used to load data for players whose normal UUIDs cannot be found.
-	Loaded from the settings.ini [PlayerData].LoadOfflinePlayerData setting. */
-	bool ShouldLoadOfflinePlayerData(void) const { return m_ShouldLoadOfflinePlayerData; }
-
-	/** Returns true if old-style playernames should be used to load data for players whose regular datafiles cannot be found.
-	This allows a seamless transition from name-based to UUID-based player storage.
-	Loaded from the settings.ini [PlayerData].LoadNamedPlayerData setting. */
-	bool ShouldLoadNamedPlayerData(void) const { return m_ShouldLoadNamedPlayerData; }
 
 	/** Returns true if BungeeCord logins (that specify the player's UUID) are allowed.
 	Read from settings, admins should set this to true only when they chain to BungeeCord,
@@ -163,13 +158,16 @@ private:
 	friend class cRoot;  // so cRoot can create and destroy cServer
 	friend class cServerListenCallbacks;  // Accessing OnConnectionAccepted()
 
+
+
 	/** The server tick thread takes care of the players who aren't yet spawned in a world */
-	class cTickThread :
+	class cTickThread:
 		public cIsThread
 	{
-		typedef cIsThread super;
+		using Super = cIsThread;
 
 	public:
+
 		cTickThread(cServer & a_Server);
 
 	protected:
@@ -178,6 +176,7 @@ private:
 		// cIsThread overrides:
 		virtual void Execute(void) override;
 	} ;
+
 
 
 	/** The network sockets listening for client connections. */
@@ -195,17 +194,18 @@ private:
 	/** Number of players currently playing in the server. */
 	std::atomic_size_t m_PlayerCount;
 
+	cCriticalSection m_CSPendingCommands;
+	std::vector<std::pair<AString, cCommandOutputCallback *>> m_PendingCommands;
+
 	int m_ClientViewDistance;  // The default view distance for clients; settable in Settings.ini
 
 	bool m_bIsConnected;  // true - connected false - not connected
-
-	std::atomic<bool> m_bRestarting;
 
 	/** The private key used for the assymetric encryption start in the protocols */
 	cRsaPrivateKey m_PrivateKey;
 
 	/** Public key for m_PrivateKey, ASN1-DER-encoded */
-	AString m_PublicKeyDER;
+	ContiguousByteBuffer m_PublicKeyDER;
 
 	cRCONServer m_RCONServer;
 
@@ -214,6 +214,7 @@ private:
 	AString m_FaviconData;
 	size_t m_MaxPlayers;
 	bool m_bIsHardcore;
+	AString m_ResourcePackUrl;
 
 	/** Map of protocol version to Forge mods (map of ModName -> ModVersionString) */
 	std::map<UInt32, AStringMap> m_ForgeModsByVersion;
@@ -222,7 +223,6 @@ private:
 	bool m_bAllowMultiLogin;
 
 	cTickThread m_TickThread;
-	cEvent m_RestartEvent;
 
 	/** The server ID used for client authentication */
 	AString m_ServerID;
@@ -233,16 +233,6 @@ private:
 
 	/** True if limit for number of block changes per tick by a player should be enabled. */
 	bool m_ShouldLimitPlayerBlockChanges;
-
-	/** True if offline UUIDs should be used to load data for players whose normal UUIDs cannot be found.
-	This allows transitions from an offline (no-auth) server to an online one.
-	Loaded from the settings.ini [PlayerData].LoadOfflinePlayerData setting. */
-	bool m_ShouldLoadOfflinePlayerData;
-
-	/** True if old-style playernames should be used to load data for players whose regular datafiles cannot be found.
-	This allows a seamless transition from name-based to UUID-based player storage.
-	Loaded from the settings.ini [PlayerData].LoadNamedPlayerData setting. */
-	bool m_ShouldLoadNamedPlayerData;
 
 	/** True if BungeeCord handshake packets (with player UUID) should be accepted. */
 	bool m_ShouldAllowBungeeCord;
@@ -257,6 +247,9 @@ private:
 
 	cServer(void);
 
+	/** Executes the console command, sends output through the specified callback. */
+	void ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
+
 	/** Get the Forge mods registered for a given protocol, for modification */
 	AStringMap & RegisteredForgeMods(const UInt32 a_Protocol);
 
@@ -267,10 +260,14 @@ private:
 	Returns the cClientHandle reinterpreted as cTCPLink callbacks. */
 	cTCPLink::cCallbacksPtr OnConnectionAccepted(const AString & a_RemoteIPAddress);
 
-	bool Tick(float a_Dt);
+	void Tick(float a_Dt);
 
 	/** Ticks the clients in m_Clients, manages the list in respect to removing clients */
 	void TickClients(float a_Dt);
+
+	/** Executes commands queued in the command queue. */
+	void TickCommands(void);
+
 };  // tolua_export
 
 

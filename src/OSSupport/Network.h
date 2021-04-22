@@ -13,6 +13,14 @@
 
 
 
+#ifdef __FreeBSD__
+	#include <netinet/in.h>
+#endif
+
+
+
+
+
 // fwd:
 class cTCPLink;
 typedef std::shared_ptr<cTCPLink> cTCPLinkPtr;
@@ -24,7 +32,6 @@ class cCryptoKey;
 typedef std::shared_ptr<cCryptoKey> cCryptoKeyPtr;
 class cX509Cert;
 typedef std::shared_ptr<cX509Cert> cX509CertPtr;
-
 
 
 
@@ -133,7 +140,7 @@ protected:
 
 	/** Creates a new link, with the specified callbacks. */
 	cTCPLink(cCallbacksPtr a_Callbacks):
-		m_Callbacks(a_Callbacks)
+		m_Callbacks(std::move(a_Callbacks))
 	{
 	}
 };
@@ -355,7 +362,6 @@ public:
 	/** Returns all local IP addresses for network interfaces currently available. */
 	static AStringVector EnumLocalIPAddresses(void);
 };
-
 
 
 

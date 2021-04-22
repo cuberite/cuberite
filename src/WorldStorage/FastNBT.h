@@ -126,7 +126,7 @@ enum class eNBTParseError
 };
 
 // The following is required to make an error_code constructible from an eNBTParseError
-std::error_code make_error_code(eNBTParseError a_Err) NOEXCEPT;
+std::error_code make_error_code(eNBTParseError a_Err) noexcept;
 
 namespace std
 {
@@ -152,7 +152,7 @@ Each primitive tag also stores the length of the contained data, in bytes.
 class cParsedNBT
 {
 public:
-	cParsedNBT(const char * a_Data, size_t a_Length);
+	cParsedNBT(ContiguousByteBufferView a_Data);
 
 	bool IsValid(void) const { return (m_Error == eNBTParseError::npSuccess); }
 
@@ -179,7 +179,7 @@ public:
 
 	/** Returns the length of the tag's data, in bytes.
 	Not valid for Compound or List tags! */
-	size_t GetDataLength (int a_Tag) const
+	size_t GetDataLength(int a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type != TAG_List);
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type != TAG_Compound);
@@ -188,11 +188,11 @@ public:
 
 	/** Returns the data stored in this tag.
 	Not valid for Compound or List tags! */
-	const char * GetData(int a_Tag) const
+	const std::byte * GetData(int a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type != TAG_List);
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type != TAG_Compound);
-		return m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart;
+		return m_Data.data() + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart;
 	}
 
 	/** Returns the direct child tag of the specified name, or -1 if no such tag. */
@@ -227,21 +227,21 @@ public:
 	inline Int16 GetShort(int a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Short);
-		return GetBEShort(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart);
+		return GetBEShort(GetData(a_Tag));
 	}
 
 	/** Returns the value stored in an Int tag. Not valid for any other tag type. */
 	inline Int32 GetInt(int a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Int);
-		return GetBEInt(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart);
+		return GetBEInt(GetData(a_Tag));
 	}
 
 	/** Returns the value stored in a Long tag. Not valid for any other tag type. */
 	inline Int64 GetLong(int a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Long);
-		return NetworkToHostLong8(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart);
+		return NetworkToHostLong8(GetData(a_Tag));
 	}
 
 	/** Returns the value stored in a Float tag. Not valid for any other tag type. */
@@ -256,7 +256,7 @@ public:
 		UNUSED_VAR(Check1);
 		UNUSED_VAR(Check2);
 
-		Int32 i = GetBEInt(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart);
+		Int32 i = GetBEInt(GetData(a_Tag));
 		float f;
 		memcpy(&f, &i, sizeof(f));
 		return f;
@@ -273,29 +273,33 @@ public:
 		UNUSED_VAR(Check2);
 
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Double);
-		return NetworkToHostDouble8(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart);
+		return NetworkToHostDouble8(GetData(a_Tag));
 	}
 
 	/** Returns the value stored in a String tag. Not valid for any other tag type. */
 	inline AString GetString(int a_Tag) const
 	{
+		return AString(GetStringView(a_Tag));
+	}
+
+	/** Returns the value stored in a String tag. Not valid for any other tag type. */
+	inline std::string_view GetStringView(int a_Tag) const
+	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_String);
-		AString res;
-		res.assign(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_DataStart, static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_DataLength));
-		return res;
+		return { reinterpret_cast<const char *>(GetData(a_Tag)), GetDataLength(a_Tag) };
 	}
 
 	/** Returns the tag's name. For tags that are not named, returns an empty string. */
 	inline AString GetName(int a_Tag) const
 	{
 		AString res;
-		res.assign(m_Data + m_Tags[static_cast<size_t>(a_Tag)].m_NameStart, static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_NameLength));
+		res.assign(reinterpret_cast<const char *>(m_Data.data()) + m_Tags[static_cast<size_t>(a_Tag)].m_NameStart, static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_NameLength));
 		return res;
 	}
 
 protected:
-	const char *             m_Data;
-	size_t                   m_Length;
+
+	ContiguousByteBufferView m_Data;
 	std::vector<cFastNBTTag> m_Tags;
 	eNBTParseError           m_Error;  // npSuccess if parsing succeeded
 
@@ -307,6 +311,10 @@ protected:
 	eNBTParseError ReadCompound(void);  // Reads the latest tag as a compound
 	eNBTParseError ReadList(eTagType a_ChildrenType);  // Reads the latest tag as a list of items of type a_ChildrenType
 	eNBTParseError ReadTag(void);       // Reads the latest tag, depending on its m_Type setting
+
+	/** Returns the minimum size, in bytes, of the specified tag type.
+	Used for sanity-checking. */
+	static size_t GetMinTagSize(eTagType a_TagType);
 } ;
 
 
@@ -330,16 +338,17 @@ public:
 	void AddLong     (const AString & a_Name, Int64 a_Value);
 	void AddFloat    (const AString & a_Name, float a_Value);
 	void AddDouble   (const AString & a_Name, double a_Value);
-	void AddString   (const AString & a_Name, const AString & a_Value);
+	void AddString   (const AString & a_Name, std::string_view a_Value);
 	void AddByteArray(const AString & a_Name, const char * a_Value, size_t a_NumElements);
-	void AddIntArray (const AString & a_Name, const int *  a_Value, size_t a_NumElements);
+	void AddByteArray(const AString & a_Name, size_t a_NumElements, unsigned char a_Value);
+	void AddIntArray (const AString & a_Name, const Int32 * a_Value, size_t a_NumElements);
 
 	void AddByteArray(const AString & a_Name, const AString & a_Value)
 	{
 		AddByteArray(a_Name, a_Value.data(), a_Value.size());
 	}
 
-	const AString & GetResult(void) const {return m_Result; }
+	ContiguousByteBufferView GetResult(void) const { return m_Result; }
 
 	void Finish(void);
 
@@ -359,11 +368,11 @@ protected:
 	sParent m_Stack[MAX_STACK];
 	int     m_CurrentStack;
 
-	AString m_Result;
+	ContiguousByteBuffer m_Result;
 
 	bool IsStackTopCompound(void) const { return (m_Stack[m_CurrentStack].m_Type == TAG_Compound); }
 
-	void WriteString(const char * a_Data, UInt16 a_Length);
+	void WriteString(std::string_view a_Data);
 
 	inline void TagCommon(const AString & a_Name, eTagType a_Type)
 	{
@@ -373,8 +382,8 @@ protected:
 		if (IsStackTopCompound())
 		{
 			// Compound: add the type and name:
-			m_Result.push_back(static_cast<char>(a_Type));
-			WriteString(a_Name.c_str(), static_cast<UInt16>(a_Name.length()));
+			m_Result.push_back(std::byte(a_Type));
+			WriteString(a_Name);
 		}
 		else
 		{
@@ -383,7 +392,3 @@ protected:
 		}
 	}
 } ;
-
-
-
-

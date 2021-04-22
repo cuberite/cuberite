@@ -12,18 +12,17 @@ class cMonster;
 
 
 // tolua_begin
-class cPawn :
+class cPawn:
 	public cEntity
 {
 	// tolua_end
-	typedef cEntity super;
+	using Super = cEntity;
 
 public:
+
 	CLASS_PROTODEF(cPawn)
 
-	cPawn(eEntityType a_EntityType, double a_Width, double a_Height);
-	virtual ~cPawn() override;
-	virtual void Destroyed() override;
+	cPawn(eEntityType a_EntityType, float a_Width, float a_Height);
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
@@ -32,6 +31,7 @@ public:
 	virtual bool IsInvisible() const override;
 	virtual void HandleAir(void) override;
 	virtual void HandleFalling(void);
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 
 	/** Tells all pawns which are targeting us to stop targeting us. */
 	void StopEveryoneFromTargetingMe();
@@ -65,24 +65,27 @@ public:
 	void TargetingMe(cMonster * a_Monster);
 
 	/** Returns all entity effects */
-	std::map<cEntityEffect::eType, cEntityEffect *> GetEntityEffects();
+	std::map<cEntityEffect::eType, cEntityEffect *> GetEntityEffects() const;
 
 	/** Returns the entity effect, if it is currently applied or nullptr if not. */
-	cEntityEffect * GetEntityEffect(cEntityEffect::eType a_EffectType);
+	cEntityEffect * GetEntityEffect(cEntityEffect::eType a_EffectType) const;
 
 protected:
+
 	typedef std::map<cEntityEffect::eType, std::unique_ptr<cEntityEffect>> tEffectMap;
 	tEffectMap m_EntityEffects;
 
 	double m_LastGroundHeight;
 	bool m_bTouchGround;
 
+	virtual void ResetPosition(Vector3d a_NewPosition) override;
+
 private:
 
 	/** A list of all monsters that are targeting this pawn. */
 	std::vector<cMonster*> m_TargetingMe;
+
+	/** Attempt to activate a Totem of Undying.
+	If activation for the given type of damage was successful, consumes the totem and returns true. */
+	bool DeductTotem(eDamageType a_DamageType);
 } ;  // tolua_export
-
-
-
-

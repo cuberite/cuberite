@@ -24,54 +24,74 @@ class cTeam;
 
 
 // tolua_begin
-class cPlayer :
+class cPlayer:
 	public cPawn
 {
-	typedef cPawn super;
+	// tolua_end
+
+	using Super = cPawn;
+
+	/** Tag representing a sneaking pose. */
+	struct BodyStanceCrouching
+	{
+		BodyStanceCrouching(cPlayer & a_Player);
+	};
+
+	/** Tag representing a sleeping pose.
+	Set by a right click on unoccupied bed, unset by a time fast forward or teleport. */
+	struct BodyStanceSleeping
+	{
+		BodyStanceSleeping(cPlayer & a_Player);
+	};
+
+	/** Tag representing a sprinting pose. */
+	struct BodyStanceSprinting
+	{
+	};
+
+	/** Tag representing the neutral stance. */
+	struct BodyStanceStanding
+	{
+		BodyStanceStanding(cPlayer & a_Player);
+	};
+
+	/** Tag representing a swimming or elytra flying pose. */
+	struct BodyStanceGliding
+	{
+		BodyStanceGliding(cPlayer & a_Player);
+
+		cTickTime TicksElytraFlying;
+	};
+
+	/*
+	struct HandStanceNeutral
+	{
+	};
+
+	struct HandStandChargingBow
+	{
+		int m_BowCharge;
+	};
+
+	struct HandStanceEating
+	{
+	};
+	*/
+
+	// tolua_begin
 
 public:
+
 	static const int MAX_HEALTH;
 
 	static const int MAX_FOOD_LEVEL;
-
-	/** Number of ticks it takes to eat an item */
-	static const int EATING_TICKS;
 
 	// tolua_end
 
 	CLASS_PROTODEF(cPlayer)
 
-
-	cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName);
-
-	virtual bool Initialize(OwnedEntity a_Self, cWorld & a_World) override;
-
+	cPlayer(const std::shared_ptr<cClientHandle> & a_Client);
 	virtual ~cPlayer() override;
-
-	virtual void SpawnOn(cClientHandle & a_Client) override;
-
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-
-	void TickFreezeCode();
-
-	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
-
-	/** Returns the currently equipped weapon; empty item if none */
-	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
-
-	/** Returns the currently equipped helmet; empty item if none */
-	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
-
-	/** Returns the currently equipped chestplate; empty item if none */
-	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
-
-	/** Returns the currently equipped leggings; empty item if none */
-	virtual cItem GetEquippedLeggings(void) const override { return m_Inventory.GetEquippedLeggings(); }
-
-	/** Returns the currently equipped boots; empty item if none */
-	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
-
-	virtual void ApplyArmorDamage(int DamageBlocked) override;
 
 	// tolua_begin
 
@@ -94,10 +114,10 @@ public:
 	inline int GetCurrentXp(void) { return m_CurrentXp; }
 
 	/** Gets the current level - XpLevel */
-	int GetXpLevel(void);
+	int GetXpLevel(void) const;
 
 	/** Gets the experience bar percentage - XpP */
-	float GetXpPercentage(void);
+	float GetXpPercentage(void) const;
 
 	/** Calculates the amount of XP needed for a given level
 	Ref: https://minecraft.gamepedia.com/XP
@@ -112,6 +132,9 @@ public:
 
 	// tolua_end
 
+	/** Gets the set of IDs for recipes this player has discovered. */
+	const std::set<UInt32> & GetKnownRecipes() const;
+
 	/** Starts charging the equipped bow */
 	void StartChargingBow(void);
 
@@ -125,11 +148,8 @@ public:
 	bool IsChargingBow(void) const { return m_IsChargingBow; }
 
 	void SetTouchGround(bool a_bTouchGround);
-	inline void SetStance(const double a_Stance) { m_Stance = a_Stance; }
 	double GetEyeHeight(void) const;  // tolua_export
 	Vector3d GetEyePosition(void) const;  // tolua_export
-	virtual bool IsOnGround(void) const override { return m_bTouchGround; }
-	inline double GetStance(void) const { return m_Stance; }  // tolua_export
 	inline cInventory &       GetInventory(void)       { return m_Inventory; }  // tolua_export
 	inline const cInventory & GetInventory(void) const { return m_Inventory; }
 
@@ -143,11 +163,8 @@ public:
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
-	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
-	void LoginSetGameMode(eGameMode a_GameMode);
-
-	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
-	void SetCapabilities();
+	/** Updates player's capabilities - flying, visibility, etc. from their gamemode. */
+	void UpdateCapabilities();
 
 	// tolua_begin
 
@@ -166,6 +183,9 @@ public:
 	*/
 	void SendRotation(double a_YawDegrees, double a_PitchDegrees);
 
+	/** Spectates the target entity. If a_Target is nullptr or a pointer to self, end spectation. */
+	void SpectateEntity(cEntity * a_Target);
+
 	/** Returns the position where projectiles thrown by this player should start, player eye position + adjustment */
 	Vector3d GetThrowStartPos(void) const;
 
@@ -176,7 +196,7 @@ public:
 	eGameMode GetGameMode(void) const { return m_GameMode; }
 
 	/** Returns the current effective gamemode (inherited gamemode is resolved before returning) */
-	eGameMode GetEffectiveGameMode(void) const { return (m_GameMode == gmNotSet) ? m_World->GetGameMode() : m_GameMode; }
+	eGameMode GetEffectiveGameMode(void) const;
 
 	/** Sets the gamemode for the player.
 	The gamemode may be gmNotSet, in that case the player inherits the world's gamemode.
@@ -208,10 +228,13 @@ public:
 	/** Returns true if the player can be targeted by Mobs */
 	bool CanMobsTarget(void) const;
 
-	AString GetIP(void) const { return m_IP; }  // tolua_export
+	AString GetIP(void) const;  // tolua_export
 
 	/** Returns the associated team, nullptr if none */
 	cTeam * GetTeam(void) { return m_Team; }  // tolua_export
+
+	/** Returns the associated team, nullptr if none */
+	const cTeam * GetTeam(void) const { return m_Team; }
 
 	/** Sets the player team, nullptr if none */
 	void SetTeam(cTeam * a_Team);
@@ -226,11 +249,8 @@ public:
 
 	/** Awards the player an achievement.
 	If all prerequisites are met, this method will award the achievement and will broadcast a chat message.
-	If the achievement has been already awarded to the player, this method will just increment the stat counter.
-	Returns the _new_ stat value. (0 = Could not award achievement) */
-	unsigned int AwardAchievement(const eStatistic a_Ach);
-
-	void SetIP(const AString & a_IP);
+	If the achievement has been already awarded to the player, this method will just increment the stat counter. */
+	void AwardAchievement(Statistic a_Ach);
 
 	/** Forces the player to move in the given direction.
 	@deprecated Use SetSpeed instead. */
@@ -250,13 +270,16 @@ public:
 	/** Closes the current window if it matches the specified ID, resets current window to m_InventoryWindow */
 	void CloseWindowIfID(char a_WindowID, bool a_CanRefuse = true);
 
-	/** Returns the raw client handle associated with the player. */
 	cClientHandle * GetClientHandle(void) const { return m_ClientHandle.get(); }
 
 	// tolua_end
 
-	/** Returns the SharedPtr to client handle associated with the player. */
-	cClientHandlePtr GetClientHandlePtr(void) const { return m_ClientHandle; }
+	/** Get a copy of the PRNG for enchanting related generation, don't use this for other purposes.
+	The PRNG's state is initialised with an internal seed, such that until PermuteEnchantmentSeed is called, this function returns the same PRNG. */
+	MTRand GetEnchantmentRandomProvider();
+
+	/** Permute the seed for enchanting related PRNGs, don't use this for other purposes. */
+	void PermuteEnchantmentSeed();
 
 	// tolua_begin
 
@@ -274,8 +297,7 @@ public:
 	void SendSystemMessage        (const cCompositeChat & a_Message);
 	void SendAboveActionBarMessage(const cCompositeChat & a_Message);
 
-	const AString & GetName(void) const { return m_PlayerName; }
-	void SetName(const AString & a_Name) { m_PlayerName = a_Name; }
+	const AString & GetName(void) const;
 
 	// tolua_end
 
@@ -310,6 +332,13 @@ public:
 	/** tosses the item in the selected hotbar slot */
 	void TossEquippedItem(char a_Amount = 1);
 
+	/** Removes one item from the the current equipped item stack, and attempts to add the specified item stack
+	back to the same slot. If it is not possible to place the item in the same slot, tries to place the specified
+	item elsewhere in the inventory. If this is not possible, then any remaining items are tossed. If the currently
+	equipped slot is empty, its contents are simply set to the given Item.
+	*/
+	void ReplaceOneEquippedItemTossRest(const cItem &);
+
 	/** tosses the item held in hand (when in UI windows) */
 	void TossHeldItem(char a_Amount = 1);
 
@@ -339,13 +368,16 @@ public:
 	void AddFoodExhaustion(double a_Exhaustion);
 
 	/** Returns true if the player is currently in the process of eating the currently equipped item */
-	bool IsEating(void) const { return (m_EatingFinishTick >= 0); }
+	bool IsEating(void) const { return m_EatingFinishTick >= 0_tick; }
 
 	/** Returns true if the player is currently flying */
 	bool IsFlying(void) const { return m_IsFlying; }
 
-	/** Returns true if a player is sleeping in a bed */
-	bool IsInBed(void) const { return m_bIsInBed; }
+	/** Returns true if a player is sleeping in a bed. */
+	bool IsInBed(void) const;
+
+	/** Returns true if the player's left hand is dominant. */
+	bool IsLeftHanded() const;
 
 	/** Returns true if the player has thrown out a floater */
 	bool IsFishing(void) const { return m_IsFishing; }
@@ -356,18 +388,16 @@ public:
 
 	// tolua_end
 
-	/** Sets a player's in-bed state
-	We can't be sure plugins will keep this value updated, so no exporting
-	If value is false (not in bed), will update players of the fact that they have been ejected from the bed
-	*/
-	void SetIsInBed(bool a_Flag)
-	{
-		m_bIsInBed = a_Flag;
-		if (!a_Flag)
-		{
-			GetWorld()->BroadcastEntityAnimation(*this, 2);
-		}
-	}
+	/** Returns true if a player is standing normally, that is, in a neutral pose. */
+	bool IsStanding() const;
+
+	/** Tosses a list of items. */
+	void TossItems(const cItems & a_Items);
+
+	/** Sets a player's in-bed state.
+	We can't be sure plugins will keep this value updated, so no exporting.
+	If value is false (not in bed), will update players of the fact that they have been ejected from the bed. */
+	void SetIsInBed(bool a_IsInBed);
 
 	/** Starts eating the currently equipped item. Resets the eating timer and sends the proper animation packet */
 	void StartEating(void);
@@ -385,30 +415,20 @@ public:
 	void Respawn(void);  // tolua_export
 
 	void SetVisible( bool a_bVisible);  // tolua_export
-	bool IsVisible(void) const { return m_bVisible; }  // tolua_export
 
-	/** Moves the player to the specified world.
-	Returns true if successful, false on failure (world not found). */
-	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition) override;
+	/** Saves all player data, such as inventory, to JSON. */
+	void SaveToDisk(void);
 
-	/** Saves all player data, such as inventory, to JSON */
-	bool SaveToDisk(void);
+	/** Loads the player data from the disk file.
+	Sets m_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile(). */
+	void LoadFromDisk();
 
-	typedef cWorld * cWorldPtr;
+	/** Loads the player data from the specified file.
+	Sets m_World to the world where the player will spawn, based on the stored world name or the default world.
+	Returns true on success, false if the player wasn't found, and excepts with base std::runtime_error if the data couldn't be read or parsed. */
+	bool LoadFromFile(const AString & a_FileName);
 
-	/** Loads the player data from the disk file
-	Sets a_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile()
-	Returns true on success, false on failure
-	*/
-	bool LoadFromDisk(cWorldPtr & a_World);
-
-	/** Loads the player data from the specified file
-	Sets a_World to the world where the player will spawn, based on the stored world name or the default world
-	Returns true on success, false on failure
-	*/
-	bool LoadFromFile(const AString & a_FileName, cWorldPtr & a_World);
-
-	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
+	const AString & GetLoadedWorldName() const { return m_CurrentWorldName; }
 
 	/** Opens the inventory of any tame horse the player is riding.
 	If the player is not riding a horse or if the horse is untamed, does nothing. */
@@ -422,9 +442,9 @@ public:
 	is damaged by when used for a_Action */
 	void UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action);
 
-	void SendHealth(void);
-
-	void SendExperience(void);
+	/** Damage the item in a_SlotNumber by a_Damage, possibly less if the
+	equipped item is enchanted. */
+	void UseItem(int a_SlotNumber, short a_Damage = 1);
 
 	/** In UI windows, get the item that the player is dragging */
 	cItem & GetDraggingItem(void) {return m_DraggingItem; }  // tolua_export
@@ -465,14 +485,20 @@ public:
 	/** Sets the flying relative maximum speed. Sends the update to player, if needed. */
 	void SetFlyingMaxSpeed(double a_Speed);
 
-	/** Sets the crouch status, broadcasts to all visible players */
-	void SetCrouch(bool a_IsCrouched);
+	/** Starts or stops crouching, if our current body stance permits, broadcasting the state change. */
+	void SetCrouch(bool a_ShouldCrouch);
 
-	/** Starts or stops sprinting, sends the max speed update to the client, if needed */
-	void SetSprint(bool a_IsSprinting);
+	/** Starts or stops elytra flight, if our current body stance permits, broadcasting the state change. */
+	void SetElytraFlight(bool a_ShouldElytraFly);
 
-	/** Flags the player as flying */
-	void SetFlying(bool a_IsFlying);
+	/** Starts or stops flying, broadcasting the state change. */
+	void SetFlying(bool a_ShouldFly);
+
+	/** Sets the dominant hand of the player. */
+	void SetLeftHanded(bool a_IsLeftHanded);
+
+	/** Starts or stops sprinting, if our current body stance permits, broadcasting the state change. */
+	void SetSprint(bool a_ShouldSprint);
 
 	/** If true the player can fly even when he's not in creative. */
 	void SetCanFly(bool a_CanFly);
@@ -511,15 +537,14 @@ public:
 	bool DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks);
 
 	/** Returns the UUID that has been read from the client, or nil if not available. */
-	const cUUID & GetUUID(void) const { return m_UUID; }  // Exported in ManualBindings.cpp
+	const cUUID & GetUUID(void) const;  // Exported in ManualBindings.cpp
 
 	// tolua_begin
 
 	/** Returns wheter the player can fly or not. */
-	virtual bool CanFly(void) const { return m_CanFly; }
+	virtual bool CanFly(void) const { return m_IsFlightCapable; }
 
 	/** (Re)loads the rank and permissions from the cRankManager.
-	Expects the m_UUID member to be valid.
 	Loads the m_Rank, m_Permissions, m_MsgPrefix, m_MsgSuffix and m_MsgNameColorCode members. */
 	void LoadRank(void);
 
@@ -538,9 +563,6 @@ public:
 	int GetSkinParts(void) const { return m_SkinParts; }
 	void SetSkinParts(int a_Parts);
 
-	eMainHand GetMainHand(void) const { return m_MainHand; }
-	void SetMainHand(eMainHand a_Hand);
-
 	// tolua_end
 
 	/** Calls the block placement hooks and places the blocks in the world.
@@ -557,27 +579,42 @@ public:
 	*/
 	void NotifyNearbyWolves(cPawn * a_Opponent, bool a_IsPlayerInvolved);
 
-	// cEntity overrides:
-	virtual bool IsCrouched (void) const override { return m_IsCrouched; }
-	virtual bool IsSprinting(void) const override { return m_IsSprinting; }
-	virtual bool IsRclking  (void) const override { return IsEating() || IsChargingBow(); }
+	/** Returns the progress mined per tick for the block a_Block as a fraction
+	(1 would be completely mined)
+	Depends on hardness values so check those are correct.
+	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
+	float GetMiningProgressPerTick(BLOCKTYPE a_Block);
 
+	/** Given tool, enchantments, status effects, and world position
+	returns whether a_Block would be instantly mined.
+	Depends on hardness values so check those are correct.
+	Source: https://minecraft.gamepedia.com/Breaking#Instant_breaking */
+	bool CanInstantlyMine(BLOCKTYPE a_Block);
+
+	/** Adds an Item to the list of known items.
+	If the item is already known, does nothing. */
+	void AddKnownItem(const cItem & a_Item);
+
+	// cEntity overrides:
 	virtual void AttachTo(cEntity * a_AttachTo) override;
 	virtual void Detach(void) override;
+	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
+	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
+	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
+	virtual cItem GetEquippedLeggings(void) const override { return m_Inventory.GetEquippedLeggings(); }
+	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
+	virtual cItem GetOffHandEquipedItem(void) const override { return m_Inventory.GetShieldSlot(); }
+	virtual bool IsCrouched(void) const override;
+	virtual bool IsElytraFlying(void) const override;
+	virtual bool IsOnGround(void) const override { return m_bTouchGround; }
+	virtual bool IsSprinting(void) const override;
 
-	/** Called by cClientHandle when the client is being destroyed.
-	The player removes its m_ClientHandle ownership so that the ClientHandle gets deleted. */
-	void RemoveClientHandle(void);
-
-	/** Returns the relative block hardness for the block a_Block.
-	The bigger it is the faster the player can break the block.
-	Returns zero if the block is instant breakable.
-	Otherwise it returns the dig speed (float GetDigSpeed(BLOCKTYPE a_Block)) divided by the block hardness (cBlockInfo::GetHardness(BLOCKTYPE a_Block)) divided by 30 if the player can harvest the block and divided by 100 if he can't. */
-	float GetPlayerRelativeBlockHardness(BLOCKTYPE a_Block);
-
-protected:
+private:
 
 	typedef std::vector<std::vector<AString> > AStringVectorVector;
+
+	/** The current body stance the player has adopted. */
+	std::variant<BodyStanceCrouching, BodyStanceSleeping, BodyStanceSprinting, BodyStanceStanding, BodyStanceGliding> m_BodyStance;
 
 	/** The name of the rank assigned to this player. */
 	AString m_Rank;
@@ -601,19 +638,6 @@ protected:
 	AString m_MsgPrefix, m_MsgSuffix;
 	AString m_MsgNameColorCode;
 
-	AString m_PlayerName;
-	AString m_LoadedWorldName;
-
-	/** Xp Level stuff */
-	enum
-	{
-		XP_TO_LEVEL15 = 255,
-		XP_PER_LEVEL_TO15 = 17,
-		XP_TO_LEVEL30 = 825
-	} ;
-
-	bool m_bVisible;
-
 	// Food-related variables:
 	/** Represents the food bar, one point equals half a "drumstick" */
 	int m_FoodLevel;
@@ -627,8 +651,6 @@ protected:
 	/** A "buffer" which adds up hunger before it is substracted from m_FoodSaturationLevel or m_FoodLevel. Each action adds a little */
 	double m_FoodExhaustionLevel;
 
-	double m_Stance;
-
 	/** Stores the player's inventory, consisting of crafting grid, hotbar, and main slots */
 	cInventory m_Inventory;
 
@@ -641,26 +663,25 @@ protected:
 	/** The player's last saved bed position */
 	Vector3i m_LastBedPos;
 
-	/** The world which the player respawns in upon death */
-	cWorld * m_SpawnWorld;
+	/** The name of the world which the player respawns in upon death.
+	This is stored as a string to enable SaveToDisk to not touch cRoot, and thus can be safely called in the player's destructor. */
+	std::string m_SpawnWorldName;
+
+	/** The name of the world which the player currently resides in.
+	Stored in addition to m_World to allow SaveToDisk to be safely called in the player's destructor. */
+	std::string m_CurrentWorldName;
+
+	/** The save path of the default world. */
+	std::string m_DefaultWorldPath;
 
 	eGameMode m_GameMode;
-	AString m_IP;
 
 	/** The item being dragged by the cursor while in a UI window */
 	cItem m_DraggingItem;
 
-	std::chrono::steady_clock::time_point m_LastPlayerListTime;
-
-	cClientHandlePtr m_ClientHandle;
+	std::shared_ptr<cClientHandle> m_ClientHandle;
 
 	cSlotNums m_InventoryPaintSlots;
-
-	/** If true, we are locking m_Position to m_FrozenPosition. */
-	bool m_IsFrozen;
-
-	/** Was the player frozen manually by a plugin or automatically by the server? */
-	bool m_IsManuallyFrozen;
 
 	/** Max speed, relative to the game default.
 	1 means regular speed, 2 means twice as fast, 0.5 means half-speed.
@@ -677,25 +698,38 @@ protected:
 	Default value is 1. */
 	double m_FlyingMaxSpeed;
 
-	bool m_IsCrouched;
-	bool m_IsSprinting;
-	bool m_IsFlying;
+	bool m_IsChargingBow;
 	bool m_IsFishing;
 
-	bool m_CanFly;  // If this is true the player can fly. Even if he is not in creative.
+	/** If this is true the player can fly. Even if he is not in creative. */
+	bool m_IsFlightCapable;
+
+	bool m_IsFlying;
+
+	/** If true, we are locking m_Position to m_FrozenPosition. */
+	bool m_IsFrozen;
+
+	/** Whether the player is left-handed, or right-handed. */
+	bool m_IsLeftHanded;
+
+	/** Was the player frozen manually by a plugin or automatically by the server? */
+	bool m_IsManuallyFrozen;
+
+	/** Flag used by food handling system to determine whether a teleport has just happened.
+	Will not apply food penalties if found to be true; will set to false after processing. */
+	bool m_IsTeleporting;
+
+	bool m_IsVisible;
 
 	/** The world tick in which eating will be finished. -1 if not eating */
-	Int64 m_EatingFinishTick;
+	cTickTimeLong m_EatingFinishTick;
 
 	/** Player Xp level */
 	int m_LifetimeTotalXp;
 	int m_CurrentXp;
+	unsigned int m_EnchantmentSeed;
 
-	// flag saying we need to send a xp update to client
-	bool m_bDirtyExperience;
-
-	bool m_IsChargingBow;
-	int  m_BowCharge;
+	int m_BowCharge;
 
 	UInt32 m_FloaterID;
 
@@ -703,41 +737,20 @@ protected:
 
 	cStatManager m_Stats;
 
-	/** Flag representing whether the player is currently in a bed
-	Set by a right click on unoccupied bed, unset by a time fast forward or teleport */
-	bool m_bIsInBed;
-
 	/** How long till the player's inventory will be saved
 	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
 	unsigned int m_TicksUntilNextSave;
-
-	/** Flag used by food handling system to determine whether a teleport has just happened
-	Will not apply food penalties if found to be true; will set to false after processing
-	*/
-	bool m_bIsTeleporting;
-
-	/** The UUID of the player, as read from the ClientHandle.
-	If no ClientHandle is given, the UUID is nil. */
-	cUUID m_UUID;
 
 	AString m_CustomName;
 
 	/** Displayed skin part bit mask */
 	int m_SkinParts;
 
-	/** The main hand of the player */
-	eMainHand m_MainHand;
+	/** List on known recipes as Ids */
+	std::set<UInt32> m_KnownRecipes;
 
-	/** Sets the speed and sends it to the client, so that they are forced to move so. */
-	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
-
-	void ResolvePermissions(void);
-	void ResolveGroups(void);
-
-	virtual void Destroyed(void) override;
-
-	/** Filters out damage for creative mode / friendly fire */
-	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
+	/** List of known items as Ids */
+	std::set<cItem, cItem::sItemCompare> m_KnownItems;
 
 	/** Called in each tick to handle food-related processing */
 	void HandleFood(void);
@@ -745,14 +758,9 @@ protected:
 	/** Called in each tick if the player is fishing to make sure the floater dissapears when the player doesn't have a fishing rod as equipped item. */
 	void HandleFloater(void);
 
-	/** Tosses a list of items. */
-	void TossItems(const cItems & a_Items);
-
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const cUUID & a_UUID);
-
-private:
 
 	/** Pins the player to a_Location until Unfreeze() is called.
 	If ManuallyFrozen is false, the player will unfreeze when the chunk is loaded. */
@@ -768,8 +776,28 @@ private:
 	Returns one if using hand.
 	If the player is using a tool that is good to break the block the value is higher.
 	If he has an enchanted tool with efficiency or he has a haste or mining fatique effect it gets multiplied by a specific factor depending on the strength of the effect or enchantment.
-	In he is in water it gets divided by 5 except his tool is enchanted with aqa affinity.
-	If he is not on ground it also gets divided by 5. */
+	In he is in water it gets divided by 5 except if his tool is enchanted with aqua affinity.
+	If he is not on ground it also gets divided by 5.
+	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
 	float GetDigSpeed(BLOCKTYPE a_Block);
+
+	/** Add the recipe Id to the known recipes.
+	If the recipe is already known, does nothing. */
+	void AddKnownRecipe(UInt32 RecipeId);
+
+	void TickFreezeCode();
+
+	// cEntity overrides:
+	virtual void ApplyArmorDamage(int DamageBlocked) override;
+	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
+	virtual float GetEnchantmentBlastKnockbackReduction() override;
+	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
+	virtual bool IsInvisible() const override;
+	virtual bool IsRclking(void) const override { return IsEating() || IsChargingBow(); }
+	virtual void OnAddToWorld(cWorld & a_World) override;
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
+	virtual void SpawnOn(cClientHandle & a_Client) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 } ;  // tolua_export

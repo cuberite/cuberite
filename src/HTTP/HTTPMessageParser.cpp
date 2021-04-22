@@ -119,6 +119,7 @@ void cHTTPMessageParser::Reset(void)
 
 
 
+
 size_t cHTTPMessageParser::ParseFirstLine(void)
 {
 	auto idxLineEnd = m_Buffer.find("\r\n");
@@ -132,6 +133,7 @@ size_t cHTTPMessageParser::ParseFirstLine(void)
 	m_Callbacks.OnFirstLine(m_FirstLine);
 	return idxLineEnd + 2;
 }
+
 
 
 

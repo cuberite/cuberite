@@ -1,0 +1,147 @@
+
+-- WitchHut.cubeset
+
+-- Defines the prefabs in the group WitchHut
+
+-- NOTE: This file has been generated automatically by GalExport!
+-- Any manual changes will be overwritten by the next automatic export!
+
+
+
+
+Cubeset =
+{
+	Metadata =
+	{
+		CubesetFormatVersion = 1,
+		ExportDate = "2020-08-27 10:42:17",
+		["AllowedBiomes"] = "Swampland, SwamplandM",
+		["GridSizeX"] = "750",
+		["GridSizeZ"] = "750",
+		["IntendedUse"] = "SinglePieceStructures",
+		["MaxOffsetX"] = "100",
+		["MaxOffsetZ"] = "100",
+		["SeedOffset"] = "4136893",
+	},
+
+	Pieces =
+	{
+		{
+			OriginData =
+			{
+				ExportName   = "WitchHut",
+				Name         = "WitchHut",
+				GalleryName  = "Cube",
+				GalleryIndex = "161",
+				ID           = "1704",
+				CreatorName  = "12xx12",
+			},
+			Size =
+			{
+				x = 9,
+				y = 5,
+				z = 7,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 8,
+				MaxY = 4,
+				MaxZ = 6,
+			},
+			StructureBox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 8,
+				MaxY = 4,
+				MaxZ = 6,
+			},
+			Connectors =
+			{
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "RepeatBottomTillNonAir",
+				["IsStarting"] = "1",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+				["VerticalStrategy"] = "TerrainOrOceanTop",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 17: 0",  -- tree
+				"b:  5: 1",  -- planks
+				"c: 85: 0",  -- fence
+				"d:118: 0",  -- cauldronblock
+				"e: 58: 0",  -- workbench
+				"f:140: 0",  -- flowerpotblock
+				"g:134: 2",  -- sprucewoodstairs
+				"h:134: 0",  -- sprucewoodstairs
+				"i:134: 1",  -- sprucewoodstairs
+				"j:134: 3",  -- sprucewoodstairs
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				".........",  --  0
+				".a....a..",  --  1
+				".........",  --  2
+				".........",  --  3
+				".........",  --  4
+				".a....a..",  --  5
+				".........",  --  6
+
+				-- Level 1
+				".........",  --  0
+				".abbbbab.",  --  1
+				".bbbbbbbb",  --  2
+				".bbbbbbbb",  --  3
+				".bbbbbbbb",  --  4
+				".abbbbab.",  --  5
+				".........",  --  6
+
+				-- Level 2
+				".........",  --  0
+				".abbbbac.",  --  1
+				".bd......",  --  2
+				".be...b..",  --  3
+				".b....b..",  --  4
+				".abbbbac.",  --  5
+				".........",  --  6
+
+				-- Level 3
+				".........",  --  0
+				".ab..ba..",  --  1
+				".b.......",  --  2
+				".c....b..",  --  3
+				".b....c..",  --  4
+				".abf.ba..",  --  5
+				".........",  --  6
+
+				-- Level 4
+				"gggggggg.",  --  0
+				"hbbbbbbi.",  --  1
+				"hbbbbbbi.",  --  2
+				"hbbbbbbi.",  --  3
+				"hbbbbbbi.",  --  4
+				"hbbbbbbi.",  --  5
+				"hjjjjjjj.",  --  6
+
+			},
+		},  -- WitchHut
+	},  -- Pieces
+}
+
+
+
+

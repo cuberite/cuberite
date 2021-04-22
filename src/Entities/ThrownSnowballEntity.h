@@ -20,30 +20,20 @@
 class cThrownSnowballEntity :
 	public cProjectileEntity
 {
-	typedef cProjectileEntity super;
-
-public:
-
 	// tolua_end
+
+	using Super = cProjectileEntity;
+
+public:  // tolua_export
 
 	CLASS_PROTODEF(cThrownSnowballEntity)
 
-	cThrownSnowballEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
-
-protected:
-
-	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace) override;
-	virtual void OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	cThrownSnowballEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed);
 
 private:
 
-	/** Time in ticks to wait for the hit animation to begin before destroying */
-	int m_DestroyTimer;
+	// cProjectileEntity overrides:
+	virtual void OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos) override;
+	virtual void OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace) override;
 
 } ;  // tolua_export
-
-
-
-

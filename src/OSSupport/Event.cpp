@@ -7,7 +7,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Event.h"
-#include "Errors.h"
 
 
 
@@ -58,6 +57,7 @@ void cEvent::Set(void)
 	}
 	m_CondVar.notify_one();
 }
+
 
 
 

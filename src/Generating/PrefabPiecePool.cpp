@@ -5,9 +5,9 @@
 
 #include "Globals.h"
 #include "PrefabPiecePool.h"
-#include "../Bindings/LuaState.h"
-#include "WorldStorage/SchematicFileSerializer.h"
 #include "VerticalStrategy.h"
+#include "../Bindings/LuaState.h"
+#include "../WorldStorage/SchematicFileSerializer.h"
 #include "../StringCompression.h"
 
 
@@ -16,10 +16,12 @@
 
 // Conditionally log a warning
 #define CONDWARNING(ShouldLog, ...) \
-	if (ShouldLog) \
-	{ \
-		LOGWARNING(__VA_ARGS__); \
-	}
+	do { \
+		if (ShouldLog) \
+		{ \
+			LOGWARNING(__VA_ARGS__); \
+		} \
+	} while (false)
 
 
 
@@ -70,15 +72,6 @@ cPrefabPiecePool::cPrefabPiecePool(
 	{
 		AddStartingPieceDefs(a_StartingPieceDefs, a_NumStartingPieceDefs, a_DefaultStartingPieceHeight);
 	}
-}
-
-
-
-
-
-cPrefabPiecePool::cPrefabPiecePool(const AString & a_FileName, bool a_LogWarnings)
-{
-	LoadFromFile(a_FileName, a_LogWarnings);
 }
 
 
@@ -172,21 +165,28 @@ bool cPrefabPiecePool::LoadFromString(const AString & a_Contents, const AString 
 	// If the contents start with GZip signature, ungzip and retry:
 	if (a_Contents.substr(0, 3) == "\x1f\x8b\x08")
 	{
-		AString Uncompressed;
-		auto res = UncompressStringGZIP(a_Contents.data(), a_Contents.size(), Uncompressed);
-		if (res == Z_OK)
+		try
 		{
-			return LoadFromString(Uncompressed, a_FileName, a_LogWarnings);
+			const auto Extracted = Compression::Extractor().ExtractGZip(
+			{
+				reinterpret_cast<const std::byte *>(a_Contents.data()), a_Contents.size()
+			});
+
+			// Here we do an extra std::string conversion, hardly efficient, but...
+			// Better would be refactor into LoadFromByteView for the GZip decompression path, and getting cFile to support std::byte.
+			// ...so it'll do for now.
+
+			return LoadFromString(std::string(Extracted.GetStringView()), a_FileName, a_LogWarnings);
 		}
-		else
+		catch (const std::exception & Oops)
 		{
-			CONDWARNING(a_LogWarnings, "Failed to decompress Gzip data in file %s: %d", a_FileName.c_str(), res);
+			CONDWARNING(a_LogWarnings, "Failed to decompress Gzip data in file %s. %s", a_FileName.c_str(), Oops.what());
 			return false;
 		}
 	}
 
 	// Search the first 8 KiB of the file for the format auto-detection string:
-	auto Header = a_Contents.substr(0, 8192);
+	const auto Header = a_Contents.substr(0, 8 KiB);
 	if (Header.find("CubesetFormatVersion =") != AString::npos)
 	{
 		return LoadFromCubeset(a_Contents, a_FileName, a_LogWarnings);
@@ -389,14 +389,18 @@ std::unique_ptr<cPrefab> cPrefabPiecePool::LoadPrefabFromCubesetVer1(
 			SchematicFileName = a_FileName.substr(0, PathEnd) + SchematicFileName;
 		}
 		cBlockArea area;
-		if (!cSchematicFileSerializer::LoadFromSchematicFile(area, SchematicFileName))
+		try
 		{
-			CONDWARNING(a_LogWarnings, "Cannot load schematic file \"%s\" for piece %s in cubeset %s.",
-				SchematicFileName.c_str(), a_PieceName.c_str(), a_FileName.c_str()
+			cSchematicFileSerializer::LoadFromSchematicFile(area, SchematicFileName);
+		}
+		catch (const std::exception & Oops)
+		{
+			CONDWARNING(a_LogWarnings, "Cannot load schematic file \"%s\" for piece %s in cubeset %s. %s",
+				SchematicFileName.c_str(), a_PieceName.c_str(), a_FileName.c_str(), Oops.what()
 			);
 			return nullptr;
 		}
-		return cpp14::make_unique<cPrefab>(area);
+		return std::make_unique<cPrefab>(area);
 	}  // if (SchematicFileName)
 
 	// There's no referenced schematic file, load from BlockDefinitions / BlockData.
@@ -450,7 +454,7 @@ std::unique_ptr<cPrefab> cPrefabPiecePool::LoadPrefabFromCubesetVer1(
 		return nullptr;
 	}
 
-	return cpp14::make_unique<cPrefab>(BlockDefStr, BlockDataStr, SizeX, SizeY, SizeZ);
+	return std::make_unique<cPrefab>(BlockDefStr, BlockDataStr, SizeX, SizeY, SizeZ);
 }
 
 
@@ -498,9 +502,12 @@ bool cPrefabPiecePool::ReadConnectorsCubesetVer1(
 			!cPiece::cConnector::StringToDirection(DirectionStr, Direction)
 		)
 		{
-			CONDWARNING(a_LogWarnings, "Piece %s in file %s has a malformed Connector at index %d ({%d, %d, %d}, type %d, direction %s). Skipping the connector.",
-				a_PieceName.c_str(), a_FileName.c_str(), idx, RelX, RelY, RelZ, Type, DirectionStr.c_str()
-			);
+			if (a_LogWarnings)
+			{
+				FLOGWARNING("Piece {0} in file {1} has a malformed Connector at index {2} ({3}, type {4}, direction {5}). Skipping the connector.",
+					a_PieceName, a_FileName, idx, Vector3i{RelX, RelY, RelZ}, Type, DirectionStr
+				);
+			}
 			res = false;
 			lua_pop(a_LuaState, 1);  // stk: [Connectors]
 			idx += 1;
@@ -607,6 +614,12 @@ bool cPrefabPiecePool::ReadPieceMetadataCubesetVer1(
 		}
 	}
 	a_Prefab->SetVerticalStrategyFromString(VerticalStrategy, a_LogWarnings);
+
+	AString ModifiersStr;
+	if (a_LuaState.GetNamedValue("Modifiers", ModifiersStr))
+	{
+		a_Prefab->SetPieceModifiersFromString(ModifiersStr, a_LogWarnings);
+	}
 
 	return true;
 }
@@ -717,7 +730,7 @@ AString cPrefabPiecePool::GetMetadata(const AString & a_ParamName) const
 
 
 
-void cPrefabPiecePool::AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_HeightGen, int a_SeaLevel)
+void cPrefabPiecePool::AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel)
 {
 	// Assign the generator linkage to all starting pieces' VerticalStrategies:
 	for (auto & piece: m_StartingPieces)
@@ -736,6 +749,14 @@ void cPrefabPiecePool::AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrai
 		if (verticalLimit != nullptr)
 		{
 			verticalLimit->AssignGens(a_Seed, a_BiomeGen, a_HeightGen, a_SeaLevel);
+		}
+		auto modifiers = piece->GetModifiers();
+		if (modifiers.size() > 0)
+		{
+			for (size_t i = 0; i < modifiers.size(); i++)
+			{
+				modifiers[i]->AssignSeed(a_Seed);
+			}
 		}
 	}  // for piece - m_AllPieces[]
 }
@@ -771,7 +792,7 @@ cPieces cPrefabPiecePool::GetStartingPieces(void)
 
 int cPrefabPiecePool::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece)
 {
-	return (reinterpret_cast<const cPrefab &>(a_NewPiece)).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
+	return (static_cast<const cPrefab &>(a_NewPiece)).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
 }
 
 
@@ -780,7 +801,7 @@ int cPrefabPiecePool::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const c
 
 int cPrefabPiecePool::GetStartingPieceWeight(const cPiece & a_NewPiece)
 {
-	return (reinterpret_cast<const cPrefab &>(a_NewPiece)).GetDefaultWeight();
+	return (static_cast<const cPrefab &>(a_NewPiece)).GetDefaultWeight();
 }
 
 
@@ -801,7 +822,3 @@ void cPrefabPiecePool::Reset(void)
 {
 	// Do nothing
 }
-
-
-
-

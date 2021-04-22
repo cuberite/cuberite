@@ -19,10 +19,10 @@
 class cBeaconWindow :
 	public cWindow
 {
-	typedef cWindow super;
+	using Super = cWindow;
 
 public:
-	cBeaconWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconEntity * a_Beacon);
+	cBeaconWindow(cBeaconEntity * a_Beacon);
 
 	cBeaconEntity * GetBeaconEntity(void) const { return m_Beacon; }
 
