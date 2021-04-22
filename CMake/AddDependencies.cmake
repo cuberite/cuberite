@@ -73,9 +73,9 @@ function(link_dependencies TARGET)
 		tolualib
 	)
 
-	# Link process information library:
+	# Link process information, multimedia (for sleep resolution) libraries:
 	if (WIN32)
-		target_link_libraries(${TARGET} PRIVATE Psapi.lib)
+		target_link_libraries(${TARGET} PRIVATE Psapi.lib Winmm.lib)
 	endif()
 
 	# Special case handling for libevent pthreads:
