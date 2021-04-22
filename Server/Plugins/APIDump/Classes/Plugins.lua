@@ -821,6 +821,10 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			{
 				Notes = "Called when a Forge client has sent its ModList to the server, during the login handshake.",
 			},
+			HOOK_MONSTER_MOVED =
+			{
+				Notes = "Called when a Monster moves.",
+			},
 			HOOK_PLAYER_ANIMATION =
 			{
 				Notes = "Called when a client send the Animation packet.",

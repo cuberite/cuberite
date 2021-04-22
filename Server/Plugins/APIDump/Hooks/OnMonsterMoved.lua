@@ -6,7 +6,7 @@ return
 		DefaultFnName = "OnMonsterMoved",  -- also used as pagename
 		Desc = [[
             This hook is called after a {{cMonster|monster}} has moved, and the
-            entity move packet has been broadcast to clients.</p>
+            entity move packet has been broadcast to clients.
 		]],
 		Params =
 		{

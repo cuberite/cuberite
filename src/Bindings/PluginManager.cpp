@@ -699,17 +699,11 @@ bool cPluginManager::CallHookLoginForge(cClientHandle & a_Client, AStringMap & a
 
 bool cPluginManager::CallHookMonsterMoved(cMonster & a_Monster, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
 {
-	FIND_HOOK(HOOK_MONSTER_MOVED);
-	VERIFY_HOOK;
-
-	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
-	{
-		if ((*itr)->OnMonsterMoved(a_Monster, a_OldPosition, a_NewPosition))
+	return GenericCallHook(HOOK_MONSTER_MOVED, [&](cPlugin * a_Plugin)
 		{
-			return true;
+			return a_Plugin->OnMonsterMoved(a_Monster, a_OldPosition, a_NewPosition);
 		}
-	}
-	return false;
+	);
 }
 
 
