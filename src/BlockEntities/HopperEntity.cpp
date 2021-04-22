@@ -12,6 +12,7 @@
 #include "../UI/HopperWindow.h"
 #include "ChestEntity.h"
 #include "FurnaceEntity.h"
+#include <iostream>
 
 
 
@@ -376,7 +377,8 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, const cTickTimeLong a_Current
 bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 {
 	auto chestPos = GetPos().addedY(1);
-	auto mainChest = static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(chestPos));
+	auto mainChest =
+		static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(chestPos));
 	bool second = false;
 	if (mainChest == nullptr)
 	{
@@ -388,7 +390,8 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 
 	// Check if the chest is a double-chest (chest directly above was empty), if
 	// so, try to move from there:
-	static const Vector3i neighborOfs[] = {
+	static const Vector3i neighborOfs[] =
+	{
 		{1, 1, 0},
 		{-1, 1, 0},
 		{0, 1, 1},
@@ -417,9 +420,7 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 			neighbor->GetBlockEntity(neighborAbsCoord));
 		if (sideChest == nullptr)
 		{
-			FLOGWARNING(
-				"{0}: A chest entity was not found where expected, at {1}",
-				__FUNCTION__, neighborAbsCoord);
+			FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, neighborAbsCoord);
 		}
 		else
 		{
@@ -611,26 +612,30 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 	// Try the chest directly connected to the hopper:
 	bool second = false;
 	auto chestPos = GetPos().addedY(1);
-	auto ConnectedChest = static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(a_Coords));
+	auto ConnectedChest =
+		static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(a_Coords));
 	if (ConnectedChest == nullptr)
 	{
-		FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, a_Coords);
+		FLOGWARNING(
+			"{0}: A chest entity was not found where expected, at {1}",
+			__FUNCTION__, a_Coords);
 		return false;
 	}
 
-	// Check if the chest is a double-chest (chest block directly connected was full), if so, try to move into the other half:
-	static const Vector3i neighborOfs [] =
-	{
-		{ 1, 0,  0},
-		{-1, 0,  0},
-		{ 0, 0,  1},
-		{ 0, 0, -1},
-	} ;
+	// Check if the chest is a double-chest (chest block directly connected was
+	// full), if so, try to move into the other half:
+	static const Vector3i neighborOfs[] = {
+		{1, 0, 0},
+		{-1, 0, 0},
+		{0, 0, 1},
+		{0, 0, -1},
+	};
 	auto relCoord = cChunkDef::AbsoluteToRelative(a_Coords);
-	for (const auto & ofs: neighborOfs)
+	for (const auto & ofs : neighborOfs)
 	{
 		auto otherHalfRelCoord = relCoord + ofs;
-		auto neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(otherHalfRelCoord);
+		auto neighbor =
+			a_Chunk.GetRelNeighborChunkAdjustCoords(otherHalfRelCoord);
 		if (neighbor == nullptr)
 		{
 			continue;
@@ -643,23 +648,38 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 			continue;
 		}
 		second = true;
-		auto chest = static_cast<cChestEntity *>(neighbor->GetBlockEntity(a_Coords + ofs));
+		auto chest = static_cast<cChestEntity *>(
+			neighbor->GetBlockEntity(a_Coords + ofs));
 		if (chest == nullptr)
 		{
-			FLOGWARNING("{0}: A chest entity was not found where expected, at {1} ({2}, {3}})", __FUNCTION__, a_Coords + ofs, ofs.x, ofs.z);
+			FLOGWARNING(
+				"{0}: A chest entity was not found where expected, at {1} "
+				"({2}, {3}})",
+				__FUNCTION__, a_Coords + ofs, ofs.x, ofs.z);
 			continue;
 		}
 		auto chestAbsCoords = neighbor->RelativeToAbsolute(otherHalfRelCoord);
-		if (chestAbsCoords.z > chestPos.z ||
-			chestAbsCoords.x > chestPos.x)
+		if (chestAbsCoords.z > chestPos.z || chestAbsCoords.x > chestPos.x)
 		{
-			return MoveItemsToGrid(*chest);
-			return MoveItemsToGrid(*ConnectedChest);
-		} 
+			if (MoveItemsToGrid(*chest))
+			{
+				return true;
+			}
+			if (MoveItemsToGrid(*ConnectedChest))
+			{
+				return true;
+			}
+		}
 		else
 		{
-			return MoveItemsToGrid(*ConnectedChest);
-			return MoveItemsToGrid(*chest);
+			if (MoveItemsToGrid(*ConnectedChest))
+			{
+				return true;
+			}
+			if (MoveItemsToGrid(*chest))
+			{
+				return true;
+			}
 		}
 	}
 	if (!second)
@@ -668,6 +688,10 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 	}
 	return false;
 }
+
+
+
+
 
 bool cHopperEntity::MoveItemsToFurnace(cChunk & a_Chunk, Vector3i a_Coords, NIBBLETYPE a_HopperMeta)
 {
