@@ -144,6 +144,15 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 
 
 
+cChestEntity * cChestEntity::ReturnNeighbour()
+{
+	return m_Neighbour;
+}
+
+
+
+
+
 void cChestEntity::ScanNeighbours()
 {
 	// Callback for finding neighbouring chest.

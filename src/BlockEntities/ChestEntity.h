@@ -46,6 +46,9 @@ public:
 	/** Search horizontally adjacent blocks for neighbouring chests of the same type and links them together. */
 	void ScanNeighbours();
 
+	/** Returns the value of m_Neighbour. */
+	cChestEntity * ReturnNeighbour();
+
 	/** Opens a new chest window where this is the primary chest and any neighbour is the secondary. */
 	void OpenNewWindow();
 
