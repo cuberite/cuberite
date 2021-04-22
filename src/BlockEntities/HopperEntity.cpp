@@ -382,7 +382,7 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, ChestPos);
 		return false;
 	}
-	auto SideChest = MainChest->ReturnNeighbour();
+	auto SideChest = MainChest->GetNeighbour();
 	if (SideChest == nullptr)
 	{
 		if (MoveItemsFromGrid(*MainChest))
@@ -536,7 +536,7 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 		FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, a_Coords);
 		return false;
 	}
-	auto SideChest = ConnectedChest->ReturnNeighbour();
+	auto SideChest = ConnectedChest->GetNeighbour();
 	if (SideChest == nullptr)
 	{
 		if (MoveItemsToGrid(*ConnectedChest))

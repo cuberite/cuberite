@@ -144,7 +144,7 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 
 
 
-cChestEntity * cChestEntity::ReturnNeighbour()
+cChestEntity * cChestEntity::GetNeighbour()
 {
 	return m_Neighbour;
 }

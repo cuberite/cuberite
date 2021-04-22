@@ -47,7 +47,7 @@ public:
 	void ScanNeighbours();
 
 	/** Returns the value of m_Neighbour. */
-	cChestEntity * ReturnNeighbour();
+	cChestEntity * GetNeighbour();
 
 	/** Opens a new chest window where this is the primary chest and any neighbour is the secondary. */
 	void OpenNewWindow();
