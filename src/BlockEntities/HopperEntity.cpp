@@ -624,7 +624,8 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 
 	// Check if the chest is a double-chest (chest block directly connected was
 	// full), if so, try to move into the other half:
-	static const Vector3i neighborOfs[] = {
+	static const Vector3i neighborOfs[] =
+	{
 		{1, 0, 0},
 		{-1, 0, 0},
 		{0, 0, 1},
