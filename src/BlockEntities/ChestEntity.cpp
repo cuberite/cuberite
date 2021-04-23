@@ -32,6 +32,97 @@ cChestEntity::cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector
 
 
 
+cChestEntity * cChestEntity::GetNeighbour()
+{
+	return m_Neighbour;
+}
+
+
+
+
+
+void cChestEntity::DestroyWindow()
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		Window->OwnerDestroyed();
+	}
+}
+
+
+
+
+
+bool cChestEntity::IsBlocked()
+{
+	return (
+		(GetPosY() < cChunkDef::Height - 1) &&
+		(
+			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPos().addedY(1))) ||
+			!cOcelot::IsCatSittingOnBlock(GetWorld(), Vector3d(GetPos()))
+		)
+	);
+}
+
+
+
+
+
+void cChestEntity::OpenNewWindow(void)
+{
+	if (m_Neighbour != nullptr)
+	{
+		ASSERT(  // This should be the primary chest
+			(m_Neighbour->GetPosX() < GetPosX()) ||
+			(m_Neighbour->GetPosZ() < GetPosZ())
+		);
+		OpenWindow(new cChestWindow(this, m_Neighbour));
+	}
+	else
+	{
+		// There is no chest neighbour, open a single-chest window:
+		OpenWindow(new cChestWindow(this));
+	}
+}
+
+
+
+
+
+void cChestEntity::ScanNeighbours()
+{
+	// Callback for finding neighbouring chest.
+	auto FindNeighbour = [this](cBlockEntity & a_BlockEntity)
+	{
+		if (a_BlockEntity.GetBlockType() != m_BlockType)
+		{
+			// Neighboring block is not the same type of chest
+			return false;
+		}
+
+		m_Neighbour = static_cast<cChestEntity *>(&a_BlockEntity);
+		return true;
+	};
+
+	// Scan horizontally adjacent blocks for any neighbouring chest of the same type:
+	if (
+		m_World->DoWithBlockEntityAt(m_Pos.addedX(-1), FindNeighbour) ||
+		m_World->DoWithBlockEntityAt(m_Pos.addedX(+1), FindNeighbour) ||
+		m_World->DoWithBlockEntityAt(m_Pos.addedZ(-1), FindNeighbour) ||
+		m_World->DoWithBlockEntityAt(m_Pos.addedX(+1), FindNeighbour)
+	)
+	{
+		m_Neighbour->m_Neighbour = this;
+		// Force neighbour's window shut. Does Mojang server do this or should a double window open?
+		m_Neighbour->DestroyWindow();
+	}
+}
+
+
+
+
+
 void cChestEntity::CopyFrom(const cBlockEntity & a_Src)
 {
 	Super::CopyFrom(a_Src);
@@ -138,97 +229,6 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 	auto chunkCoords = cChunkDef::BlockToChunk(m_Pos);
 	m_World->MarkChunkDirty(chunkCoords.m_ChunkX, chunkCoords.m_ChunkZ);
 	return true;
-}
-
-
-
-
-
-cChestEntity * cChestEntity::GetNeighbour()
-{
-	return m_Neighbour;
-}
-
-
-
-
-
-void cChestEntity::ScanNeighbours()
-{
-	// Callback for finding neighbouring chest.
-	auto FindNeighbour = [this](cBlockEntity & a_BlockEntity)
-	{
-		if (a_BlockEntity.GetBlockType() != m_BlockType)
-		{
-			// Neighboring block is not the same type of chest
-			return false;
-		}
-
-		m_Neighbour = static_cast<cChestEntity *>(&a_BlockEntity);
-		return true;
-	};
-
-	// Scan horizontally adjacent blocks for any neighbouring chest of the same type:
-	if (
-		m_World->DoWithBlockEntityAt(m_Pos.addedX(-1), FindNeighbour) ||
-		m_World->DoWithBlockEntityAt(m_Pos.addedX(+1), FindNeighbour) ||
-		m_World->DoWithBlockEntityAt(m_Pos.addedZ(-1), FindNeighbour) ||
-		m_World->DoWithBlockEntityAt(m_Pos.addedX(+1), FindNeighbour)
-	)
-	{
-		m_Neighbour->m_Neighbour = this;
-		// Force neighbour's window shut. Does Mojang server do this or should a double window open?
-		m_Neighbour->DestroyWindow();
-	}
-}
-
-
-
-
-
-void cChestEntity::OpenNewWindow(void)
-{
-	if (m_Neighbour != nullptr)
-	{
-		ASSERT(  // This should be the primary chest
-			(m_Neighbour->GetPosX() < GetPosX()) ||
-			(m_Neighbour->GetPosZ() < GetPosZ())
-		);
-		OpenWindow(new cChestWindow(this, m_Neighbour));
-	}
-	else
-	{
-		// There is no chest neighbour, open a single-chest window:
-		OpenWindow(new cChestWindow(this));
-	}
-}
-
-
-
-
-
-void cChestEntity::DestroyWindow()
-{
-	const auto Window = GetWindow();
-	if (Window != nullptr)
-	{
-		Window->OwnerDestroyed();
-	}
-}
-
-
-
-
-
-bool cChestEntity::IsBlocked()
-{
-	return (
-		(GetPosY() < cChunkDef::Height - 1) &&
-		(
-			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPos().addedY(1))) ||
-			!cOcelot::IsCatSittingOnBlock(GetWorld(), Vector3d(GetPos()))
-		)
-	);
 }
 
 
