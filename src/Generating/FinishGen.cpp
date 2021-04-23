@@ -542,6 +542,32 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 				continue;
 			}
 
+			// Walk below trees:
+			auto BlockBelow = a_ChunkDesc.GetBlockType(x, y - 1, z);
+			bool failed = false;  // marker if the search for a valid position was successful
+
+			while (
+				(BlockBelow == E_BLOCK_LEAVES) ||
+				(BlockBelow == E_BLOCK_NEW_LEAVES) ||
+				(BlockBelow == E_BLOCK_LOG) ||
+				(BlockBelow == E_BLOCK_NEW_LOG) ||
+				(BlockBelow == E_BLOCK_AIR)
+			)
+			{
+				y--;
+				if (!cChunkDef::IsValidHeight(y - 1))
+				{
+					failed = true;
+					break;
+				}
+				BlockBelow = a_ChunkDesc.GetBlockType(x, y - 1, z);
+			}
+
+			if (failed)
+			{
+				continue;
+			}
+
 			// Check if long grass can be placed:
 			if (
 				(a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR) ||
