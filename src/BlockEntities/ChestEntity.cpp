@@ -156,8 +156,7 @@ void cChestEntity::OnRemoveFromWorld()
 
 void cChestEntity::SendTo(cClientHandle & a_Client)
 {
-	// Send a dummy "number of players with chest open" packet to make the chest visible:
-	a_Client.SendBlockAction(m_Pos.x, m_Pos.y, m_Pos.z, 1, 0, m_BlockType);
+	a_Client.SendUpdateBlockEntity(*this);
 }
 
 
