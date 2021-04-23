@@ -375,59 +375,50 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, const cTickTimeLong a_Current
 
 bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 {
-	auto chestPos = GetPos().addedY(1);
-	auto mainChest = static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(chestPos));
-	if (mainChest == nullptr)
+	auto ChestPos = GetPos().addedY(1);
+	auto MainChest = static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(ChestPos));
+	if (MainChest == nullptr)
 	{
-		FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, chestPos);
+		FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, ChestPos);
 		return false;
 	}
-	if (MoveItemsFromGrid(*mainChest))
+	auto SideChest = MainChest->GetNeighbour();
+	if (SideChest == nullptr)
 	{
-		// Moved the item from the chest directly above the hopper
-		return true;
+		if (MoveItemsFromGrid(*MainChest))
+		{
+			return true;
+		}
 	}
-
-	// Check if the chest is a double-chest (chest directly above was empty), if so, try to move from there:
-	static const Vector3i neighborOfs[] =
+	else
 	{
-		{ 1, 1,  0},
-		{-1, 1,  0},
-		{ 0, 1,  1},
-		{ 0, 1, -1},
-	} ;
-	for (const auto & ofs: neighborOfs)
-	{
-		auto neighborRelCoord = ofs.addedXZ(m_RelX, m_RelZ);
-		auto neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(neighborRelCoord);
-		if (neighbor == nullptr)
+		auto SideAbsCoords = SideChest->GetPos();
+		// the "primary" chest is the one with the higher z or x value
+		if (SideAbsCoords.z > ChestPos.z || SideAbsCoords.x > ChestPos.x)
 		{
-			continue;
-		}
-
-		BLOCKTYPE Block = neighbor->GetBlock(neighborRelCoord);
-		if (Block != mainChest->GetBlockType())
-		{
-			// Not the same kind of chest
-			continue;
-		}
-
-		auto neighborAbsCoord = neighbor->RelativeToAbsolute(neighborRelCoord);
-		auto sideChest = static_cast<cChestEntity *>(neighbor->GetBlockEntity(neighborAbsCoord));
-		if (sideChest == nullptr)
-		{
-			FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, neighborAbsCoord);
-		}
-		else
-		{
-			if (MoveItemsFromGrid(*sideChest))
+			// side is "primary" so pull from it first
+			if (MoveItemsFromGrid(*SideChest))
+			{
+				return true;
+			}
+			// main is secondary, pull from next
+			if (MoveItemsFromGrid(*MainChest))
 			{
 				return true;
 			}
 		}
-		return false;
+		else
+		{
+			if (MoveItemsFromGrid(*MainChest))
+			{
+				return true;
+			}
+			if (MoveItemsFromGrid(*SideChest))
+			{
+				return true;
+			}
+		}
 	}
-
 	// The chest was empty
 	return false;
 }
@@ -545,47 +536,40 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 		FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, a_Coords);
 		return false;
 	}
-	if (MoveItemsToGrid(*ConnectedChest))
+	auto SideChest = ConnectedChest->GetNeighbour();
+	if (SideChest == nullptr)
 	{
-		// Chest block directly connected was not full
-		return true;
+		if (MoveItemsToGrid(*ConnectedChest))
+		{
+			return true;
+		}
 	}
-
-	// Check if the chest is a double-chest (chest block directly connected was full), if so, try to move into the other half:
-	static const Vector3i neighborOfs [] =
+	else
 	{
-		{ 1, 0,  0},
-		{-1, 0,  0},
-		{ 0, 0,  1},
-		{ 0, 0, -1},
-	} ;
-	auto relCoord = cChunkDef::AbsoluteToRelative(a_Coords);
-	for (const auto & ofs: neighborOfs)
-	{
-		auto otherHalfRelCoord = relCoord + ofs;
-		auto neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(otherHalfRelCoord);
-		if (neighbor == nullptr)
+		auto SideAbsCoords = SideChest->GetPos();
+		if (SideAbsCoords.z > a_Coords.z || SideAbsCoords.x > a_Coords.x)
 		{
-			continue;
+			if (MoveItemsToGrid(*SideChest))
+			{
+				return true;
+			}
+			if (MoveItemsToGrid(*ConnectedChest))
+			{
+				return true;
+			}
 		}
-
-		auto Block = neighbor->GetBlock(otherHalfRelCoord);
-		if (Block != ConnectedChest->GetBlockType())
+		else
 		{
-			// Not the same kind of chest
-			continue;
+			if (MoveItemsToGrid(*ConnectedChest))
+			{
+				return true;
+			}
+			if (MoveItemsToGrid(*SideChest))
+			{
+				return true;
+			}
 		}
-
-		auto chest = static_cast<cChestEntity *>(neighbor->GetBlockEntity(a_Coords + ofs));
-		if (chest == nullptr)
-		{
-			FLOGWARNING("{0}: A chest entity was not found where expected, at {1} ({2}, {3}})", __FUNCTION__, a_Coords + ofs, ofs.x, ofs.z);
-			continue;
-		}
-		return MoveItemsToGrid(*chest);
 	}
-
-	// The chest was single and nothing could be moved
 	return false;
 }
 
