@@ -19051,6 +19051,10 @@ end
 				{
 					Notes = "",
 				},
+				JunkFished =
+				{
+					Notes = "",
+				},
 				Jump =
 				{
 					Notes = "",
@@ -19152,6 +19156,10 @@ end
 					Notes = "",
 				},
 				TradedWithVillager =
+				{
+					Notes = "",
+				},
+				TreasureFished =
 				{
 					Notes = "",
 				},
