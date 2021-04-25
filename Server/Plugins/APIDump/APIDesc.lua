@@ -3841,6 +3841,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity is an ender crystal.",
 				},
+				IsElytraFlying =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is flying with an elytra. Entities that cannot fly with an elytra return always false.",
+				},
 				IsExpOrb =
 				{
 					Returns =
@@ -3881,6 +3891,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity represents a fishing rod floater",
 				},
+				IsHeadInWater =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity's head is in a water block",
+				},
 				IsInvisible =
 				{
 					Returns =
@@ -3889,7 +3909,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the entity is invisible",
+					Notes = "Returns true if the entity is invisible.",
 				},
 				IsInFire =
 				{
@@ -3920,16 +3940,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns true if any part of the entity is in a water block",
-				},
-				IsHeadInWater =
-				{
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the entity's head is in a water block",
 				},
 				IsItemFrame =
 				{
@@ -4070,16 +4080,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns true if the entity is sprinting. Entities that cannot sprint return always false",
-				},
-				IsElytraFlying =
-				{
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the entity is flying with an elytra. Entities that cannot fly with an elytra return always false",
 				},
 				IsSubmerged =
 				{
@@ -9138,24 +9138,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the relative walk speed of this mob. Standard is 1.0",
 				},
-				GetSpawnDelay =
-				{
-					IsStatic = true,
-					Params =
-					{
-						{
-							Name = "MobFamily",
-							Type = "cMonster#eFamily",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family.",
-				},
 				HasCustomName =
 				{
 					Returns =
@@ -10467,16 +10449,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the player's current maximum speed, relative to the game default speed. Takes into account the sprinting / flying status.",
 				},
-				GetMainHand =
-				{
-					Returns =
-					{
-						{
-							Type = "eMainHand",
-						},
-					},
-					Notes = "Returns the player's main hand.",
-				},
 				GetName =
 				{
 					Returns =
@@ -10789,6 +10761,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns true if the player is currently lying in a bed.",
 				},
+				IsLeftHanded =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player's left hand is dominant.",
+				},
 				IsSatiated =
 				{
 					Returns =
@@ -10798,16 +10780,6 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns true if the player is satiated (cannot eat).",
-				},
-				IsVisible =
-				{
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the player is visible to other players",
 				},
 				LoadRank =
 				{
@@ -11129,6 +11101,17 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the item that the player is dragging in a UI window. If no UI window is open, this function does nothing."
 				},
+				SetElytraFlight =
+				{
+					Params =
+					{
+						{
+							Name = "IsElytraFlying",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether the player is elytra flying or not.",
+				},
 				SetFlying =
 				{
 					Params =
@@ -11222,16 +11205,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the 'IsFishing' flag for the player. The floater entity ID is expected for the true variant, it can be omitted when IsFishing is false. FIXME: Undefined behavior when multiple fishing rods are used simultanously",
 				},
-				SetMainHand =
+				SetLeftHanded =
 				{
 					Params =
 					{
 						{
-							Name = "Hand",
-							Type = "eMainHand",
+							Name = "IsLeftHanded",
+							Type = "boolean",
 						},
 					},
-					Notes = "Sets the main hand of the player.",
+					Notes = "Sets the dominant hand of the player.",
 				},
 				SetName =
 				{
@@ -11276,17 +11259,6 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the skin part flags of the player.  The value should be a bitwise OR of several {{Globals#eSkinPart|eSkinPart}} constants.",
-				},
-				SetElytraFlight =
-				{
-					Params =
-					{
-						{
-							Name = "IsElytraFlying",
-							Type = "boolean",
-						},
-					},
-					Notes = "Sets whether the player is elytra flying or not.",
 				},
 				SetSprintingMaxSpeed =
 				{
@@ -11392,10 +11364,6 @@ a_Player:OpenWindow(Window);
 			},
 			Constants =
 			{
-				EATING_TICKS =
-				{
-					Notes = "Number of ticks required for consuming an item.",
-				},
 				MAX_FOOD_LEVEL =
 				{
 					Notes = "The maximum food level value. When the food level is at this value, the player cannot eat.",
@@ -18461,20 +18429,6 @@ end
 					TextBefore = [[
 						The following constants are used for the gamemode - survival, creative or adventure. Use the
 						gmXXX constants, the eGameMode_ constants are deprecated and will be removed from the API.
-					]],
-				},
-				eHand =
-				{
-					Include =
-					{
-						"hMain",
-						"hOff",
-					},
-					TextBefore = [[
-						These constants represent the main and off hand.  Currently, these constants are not used, but
-						are provided for future use when dual-wielding is functional.  An action or item can be in the
-						main hand or the off hand.  The main hand can be either the left or the right hand - use
-						{{cPlayer}}:GetMainHand() to determine which (see {{Globals#eMainHand|eMainHand}}).
 					]],
 				},
 				eMainHand =
