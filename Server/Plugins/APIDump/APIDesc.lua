@@ -12655,13 +12655,12 @@ end
 						{
 							Name = "a_Stat",
 							Type = "Statistic",
-						}
-					
+						},
 						{
 							Name = "a_Value",
 							Type = "number",
 						},
-					}
+					},
 					Notes = "Set the value of the specified statistic.",
 				},
 				AddValue = 
@@ -12700,7 +12699,7 @@ end
 					Notes = "Returns whether the prerequisite for awarding an achievement are satisfied.",
 				}
 			}
-		}
+		},
 		cServer =
 		{
 			Desc = [[
