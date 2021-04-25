@@ -3831,16 +3831,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "(<b>DEPRECATED</b>) Please use cEntity:IsTicking().",
 				},
-				IsEnderCrystal =
-				{
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the entity is an ender crystal.",
-				},
 				IsElytraFlying =
 				{
 					Returns =
@@ -3850,6 +3840,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns true if the entity is flying with an elytra. Entities that cannot fly with an elytra return always false.",
+				},
+				IsEnderCrystal =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is an ender crystal.",
 				},
 				IsExpOrb =
 				{
