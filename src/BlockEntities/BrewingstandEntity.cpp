@@ -147,6 +147,9 @@ bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 {
 	a_Player->GetStatManager().AddValue(Statistic::InteractWithBrewingstand);
 
+	// Loot table processing
+	ApplyLootTable(a_Player);
+
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
 	{

@@ -2,6 +2,8 @@
 
 #include "Globals.h"
 #include "BlockEntityWithItems.h"
+
+#include "../Entities/Player.h"
 #include "../Simulator/RedstoneSimulator.h"
 
 
@@ -68,3 +70,29 @@ void cBlockEntityWithItems::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 	// Notify comparators:
 	m_World->WakeUpSimulators(m_Pos);
 }
+
+
+
+
+
+void cBlockEntityWithItems::SetLootTable(const AString & a_LootTable)
+{
+	m_LootTable = a_LootTable;
+}
+
+
+
+
+
+void cBlockEntityWithItems::ApplyLootTable(cPlayer * a_Player)
+{
+	if (!m_LootTable.empty())
+	{
+		m_World->GetLootTableProvider()->GetLootTable(m_LootTable)->FillWithLoot(GetContents(), * m_World, m_Pos, a_Player->GetUniqueID(), m_LootTableSeed);
+		m_LootTable = "";
+	}
+}
+
+
+
+

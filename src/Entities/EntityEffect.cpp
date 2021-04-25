@@ -6,9 +6,6 @@
 #include "../Mobs/Monster.h"
 
 
-
-
-
 int cEntityEffect::GetPotionColor(short a_ItemDamage)
 {
 	// Lowest six bits

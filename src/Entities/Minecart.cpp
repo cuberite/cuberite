@@ -1365,6 +1365,12 @@ void cMinecartWithChest::OnRemoveFromWorld(cWorld & a_World)
 
 void cMinecartWithChest::OnRightClicked(cPlayer & a_Player)
 {
+	if (!m_LootTable.empty())
+	{
+		m_World->GetLootTableProvider()->GetLootTable(m_LootTable)->FillWithLoot(m_Contents, * m_World, GetBlockPos(), a_Player.GetUniqueID(), m_LootTableSeed);
+		m_LootTable = "";
+	}
+
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)

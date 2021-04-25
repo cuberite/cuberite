@@ -169,12 +169,6 @@ public:
 	/** Returns true if slot number is within the grid. */
 	bool IsValidSlotNum(int a_SlotNum) const;
 
-	/** Generates random loot from the specified loot probability table, with a chance of enchanted books added.
-	A total of a_NumSlots are taken by the loot.
-	Cannot export to Lua due to raw array a_LootProbabs. TODO: Make this exportable / export through ManualBindings.cpp with a Lua table as LootProbabs
-	*/
-	void GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, size_t a_CountLootProbabs, int a_NumSlots, int a_Seed);
-
 	/** Adds a callback that gets called whenever a slot changes. Must not be called from within the listener callback! */
 	void AddListener(cListener & a_Listener);
 

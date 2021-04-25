@@ -750,63 +750,6 @@ bool cItemGrid::DamageItem(int a_X, int a_Y, short a_Amount)
 
 
 
-void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, size_t a_CountLootProbabs, int a_NumSlots, int a_Seed)
-{
-	// Calculate the total weight:
-	int TotalProbab = 1;
-	for (size_t i = 0; i < a_CountLootProbabs; i++)
-	{
-		TotalProbab += a_LootProbabs[i].m_Weight;
-	}
-
-	// Pick the loot items:
-	cNoise Noise(a_Seed);
-	for (int i = 0; i < a_NumSlots; i++)
-	{
-		int Rnd = (Noise.IntNoise1DInt(i) / 7);
-		int LootRnd = Rnd % TotalProbab;
-		Rnd >>= 8;
-		cItem CurrentLoot = cItem(E_ITEM_ENCHANTED_BOOK, 1, 0);
-
-		// Choose the enchantments
-		cWeightedEnchantments Enchantments;
-		cEnchantments::AddItemEnchantmentWeights(Enchantments, E_ITEM_BOOK, 24 + Noise.IntNoise2DInt(a_Seed, TotalProbab) % 7);
-		int NumEnchantments = Noise.IntNoise3DInt(TotalProbab, Rnd, a_Seed) % 5;  // The number of enchantments this book wil get.
-
-		for (int j = 0; j <= NumEnchantments; j++)
-		{
-			cEnchantments Enchantment = cEnchantments::SelectEnchantmentFromVector(Enchantments, Noise.IntNoise2DInt(NumEnchantments, i));
-			CurrentLoot.m_Enchantments.Add(Enchantment);
-			cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment);
-			cEnchantments::CheckEnchantmentConflictsFromVector(Enchantments, Enchantment);
-		}
-
-		for (size_t j = 0; j < a_CountLootProbabs; j++)
-		{
-			LootRnd -= a_LootProbabs[j].m_Weight;
-			if (LootRnd < 0)
-			{
-				CurrentLoot = a_LootProbabs[j].m_Item;
-				if ((a_LootProbabs[j].m_MaxAmount - a_LootProbabs[j].m_MinAmount) > 0)
-				{
-					CurrentLoot.m_ItemCount = static_cast<char>(a_LootProbabs[j].m_MinAmount + (Rnd % (a_LootProbabs[j].m_MaxAmount - a_LootProbabs[j].m_MinAmount)));
-				}
-				else
-				{
-					CurrentLoot.m_ItemCount = static_cast<char>(a_LootProbabs[j].m_MinAmount);
-				}
-				Rnd >>= 8;
-				break;
-			}
-		}  // for j - a_LootProbabs[]
-		SetSlot(Rnd % m_Slots.size(), CurrentLoot);
-	}  // for i - NumSlots
-}
-
-
-
-
-
 void cItemGrid::AddListener(cListener & a_Listener)
 {
 	cCSLock Lock(m_CSListeners);

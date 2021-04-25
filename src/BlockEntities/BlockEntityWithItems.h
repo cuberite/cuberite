@@ -52,6 +52,12 @@ public:  // tolua_export
 	void SetSlot(int a_SlotNum,    const cItem & a_Item) { m_Contents.SetSlot(a_SlotNum, a_Item); }
 	void SetSlot(int a_X, int a_Y, const cItem & a_Item) { m_Contents.SetSlot(a_X, a_Y, a_Item); }
 
+	void SetLootTable(const AString & a_LootTable);
+	const AString & GetLootTable() { return m_LootTable; }
+
+	int GetLootTableSeed() const { return m_LootTableSeed; }
+	void SetLootTableSeed(int a_LootTableSeed) { m_LootTableSeed = a_LootTableSeed; }
+
 	/** Returns the ItemGrid used for storing the contents */
 	cItemGrid & GetContents(void) { return m_Contents; }
 
@@ -63,6 +69,17 @@ public:  // tolua_export
 protected:
 
 	cItemGrid m_Contents;
+
+	/** This string is the filename of the loottable without the ".json" end.
+	Check root / LootTables / * for available names. If you put a file into the worldfolder / LootTables / * you can set them per world.
+	If the string is not empty loot will be generated. */
+	AString m_LootTable;
+	int m_LootTableSeed;
+
+protected:
+
+	/** If there's a loot table in this container, generates the loot according to it. */
+	void ApplyLootTable(cPlayer * a_Player);
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override;

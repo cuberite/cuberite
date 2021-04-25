@@ -28,7 +28,7 @@ public:
 	/** Minecart payload, values correspond to packet subtype */
 	enum ePayload
 	{
-		mpNone    = 0,  // Empty minecart, ridable by player or mobs
+		mpNone    = 0,  // Empty minecart, rideable by player or mobs
 		mpChest   = 1,  // Minecart-with-chest, can store a grid of 3 * 8 items
 		mpFurnace = 2,  // Minecart-with-furnace, can be powered
 		mpTNT     = 3,  // Minecart-with-TNT, can be blown up with activator rail
@@ -75,7 +75,7 @@ protected:
 	/** Handles activator rails - placeholder for future implementation */
 	void HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
 
-	/** Snaps a mincecart to a rail's axis, resetting its speed
+	/** Snaps a minecart to a rail's axis, resetting its speed
 		For curved rails, it changes the cart's direction as well as snapping it to axis */
 	void SnapToRail(NIBBLETYPE a_RailMeta);
 	/** Tests if a solid block is in front of a cart, and stops the cart (and returns true) if so; returns false if no obstruction */
@@ -87,9 +87,8 @@ protected:
 
 	bool IsBlockCollisionAtOffset(Vector3i a_Offset);
 
-	/** Tests if this mincecart's bounding box is intersecting another entity's bounding box (collision) and pushes mincecart away if necessary */
+	/** Tests if this minecart's bounding box is intersecting another entity's bounding box (collision) and pushes minecart away if necessary */
 	bool TestEntityCollision(NIBBLETYPE a_RailMeta);
-
 } ;
 
 
@@ -146,11 +145,22 @@ public:
 	const cItem & GetSlot(int a_Idx) const { return m_Contents.GetSlot(a_Idx); }
 	void SetSlot(int a_Idx, const cItem & a_Item) { m_Contents.SetSlot(a_Idx, a_Item); }
 
+	const AString & GetLootTable() const { return m_LootTable; }
+	void SetLootTable(const AString & a_LootTable) { m_LootTable = a_LootTable; }
+
+	int GetLootTableSeed() const { return m_LootTableSeed; }
+	void SetLootTableSeed(int a_LootTableSeed) { m_LootTableSeed = a_LootTableSeed; }
 
 protected:
 
 	cItemGrid m_Contents;
 	void OpenNewWindow(void);
+
+	/** This string is the filename of the loottable without the ".json" end.
+	Check root / LootTables / * for available names. If you put a file into the worldfolder / LootTables / * you can set them per world.
+	If the string is not empty loot will be generated. */
+	AString m_LootTable;
+	int m_LootTableSeed = 0;
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override
@@ -243,6 +253,12 @@ public:
 
 	cMinecartWithHopper(Vector3d a_Pos);
 
+protected:
+	/** This string is the filename of the loottable without the ".json" end.
+	Check root / LootTables / * for available names. If you put a file into the worldfolder / LootTables / * you can set them per world */
+	AString m_LootTable;
+
+	// Todo - 14.10.2020 add loot table handling when window is added
 private:
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;

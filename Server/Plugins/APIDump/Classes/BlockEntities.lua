@@ -338,6 +338,26 @@ return
 				},
 				Notes = "Returns the cItemGrid object representing the items stored within this block entity",
 			},
+			GetLootTable =
+			{
+				Returns =
+				{
+					{
+						Type = "string",
+					},
+				},
+				Notes = "Returns the loot table stored in the entity.",
+			},
+			GetLootTableSeed =
+			{
+				Returns =
+				{
+					{
+						Type = "number",
+					},
+				},
+				Notes  = "Returns the seed stored in the entity.",
+			},
 			GetSlot =
 			{
 				{
@@ -411,6 +431,28 @@ return
 					},
 					Notes = "Sets the cItem for the specified slot coords. Ignored if invalid slot coords",
 				},
+			},
+			SetLootTable =
+			{
+				Params =
+				{
+					{
+						Name = "LootTable",
+						Type = "string",
+					},
+				},
+				Notes = "Sets the loot table of the entity. For example: 'JungleTemple'.",
+			},
+			SetLootTableSeed =
+			{
+				Params =
+				{
+					{
+						Name = "LootTableSeed",
+						Type = "number",
+					}
+				},
+				Notes = "Sets the seed used for generation of the loot in the entity.",
 			},
 		},
 		Inherits = "cBlockEntity",

@@ -19,7 +19,6 @@ constexpr inline const int TPS = 20;
 
 
 
-
 // tolua_begin
 
 /** Experience Orb setup */

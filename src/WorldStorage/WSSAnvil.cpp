@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "WSSAnvil.h"
+#include "NamespaceSerializer.h"
 #include "NBTChunkSerializer.h"
 #include "EnchantmentSerializer.h"
 #include "NamespaceSerializer.h"
@@ -936,13 +937,31 @@ OwnedBlockEntity cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_Ta
 	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Primary");
 	if (CurrentLine >= 0)
 	{
-		Beacon->SetPrimaryEffect(static_cast<cEntityEffect::eType>(a_NBT.GetInt(CurrentLine)));
+		if (a_NBT.GetType(CurrentLine) == TAG_String)
+		{
+			auto EffectString = a_NBT.GetString(CurrentLine);
+			auto EffectPair = NamespaceSerializer::SplitNamespacedID(EffectString);
+			Beacon->SetPrimaryEffect(NamespaceSerializer::ToEntityEffect(EffectPair.second));
+		}
+		else if (a_NBT.GetType(CurrentLine) == TAG_Int)
+		{
+			Beacon->SetPrimaryEffect(static_cast<cEntityEffect::eType>(a_NBT.GetInt(CurrentLine)));
+		}
 	}
 
 	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Secondary");
 	if (CurrentLine >= 0)
 	{
-		Beacon->SetSecondaryEffect(static_cast<cEntityEffect::eType>(a_NBT.GetInt(CurrentLine)));
+		if (a_NBT.GetType(CurrentLine) == TAG_String)
+		{
+			auto EffectString = a_NBT.GetString(CurrentLine);
+			auto EffectPair = NamespaceSerializer::SplitNamespacedID(EffectString);
+			Beacon->SetSecondaryEffect(NamespaceSerializer::ToEntityEffect(EffectPair.second));
+		}
+		else if (a_NBT.GetType(CurrentLine) == TAG_Int)
+		{
+			Beacon->SetSecondaryEffect(static_cast<cEntityEffect::eType>(a_NBT.GetInt(CurrentLine)));
+		}
 	}
 
 	// We are better than mojang, we load / save the beacon inventory!
@@ -950,6 +969,13 @@ OwnedBlockEntity cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_Ta
 	if ((Items >= 0) && (a_NBT.GetType(Items) == TAG_List))
 	{
 		LoadItemGridFromNBT(Beacon->GetContents(), a_NBT, Items);
+	}
+
+	// Loads the LootTable
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "LootTable");
+	if (CurrentLine >= 0)
+	{
+		Beacon->SetLootTable(a_NBT.GetString(CurrentLine));
 	}
 
 	return Beacon;
@@ -1032,6 +1058,13 @@ OwnedBlockEntity cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, in
 		Brewingstand->SetTimeBrewed(tb);
 	}
 
+	// Loads the LootTable
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "LootTable");
+	if (CurrentLine >= 0)
+	{
+		Brewingstand->SetLootTable(a_NBT.GetString(CurrentLine));
+	}
+
 	// Restart brewing:
 	Brewingstand->LoadRecipes();
 	Brewingstand->ContinueBrewing();
@@ -1059,6 +1092,14 @@ OwnedBlockEntity cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	}
 	auto Chest = std::make_unique<cChestEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Chest->GetContents(), a_NBT, Items);
+
+	// Loads the LootTable
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "LootTable");
+	if (CurrentLine >= 0)
+	{
+		Chest->SetLootTable(a_NBT.GetString(CurrentLine));
+	}
+
 	return Chest;
 }
 
@@ -1120,6 +1161,14 @@ OwnedBlockEntity cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a
 	}
 	auto Dispenser = std::make_unique<cDispenserEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Dispenser->GetContents(), a_NBT, Items);
+
+	// Loads the LootTable
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "LootTable");
+	if (CurrentLine >= 0)
+	{
+		Dispenser->SetLootTable(a_NBT.GetString(CurrentLine));
+	}
+
 	return Dispenser;
 }
 
@@ -1143,6 +1192,14 @@ OwnedBlockEntity cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_T
 	}
 	auto Dropper = std::make_unique<cDropperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Dropper->GetContents(), a_NBT, Items);
+
+	// Loads the LootTable
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "LootTable");
+	if (CurrentLine >= 0)
+	{
+		Dropper->SetLootTable(a_NBT.GetString(CurrentLine));
+	}
+
 	return Dropper;
 }
 
@@ -1294,6 +1351,14 @@ OwnedBlockEntity cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_T
 		// Anvil doesn't store the time that an item takes to cook. We simply use the default - 10 seconds (200 ticks)
 		Furnace->SetCookTimes(200, ct);
 	}
+
+	// Loads the LootTable
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "LootTable");
+	if (CurrentLine >= 0)
+	{
+		Furnace->SetLootTable(a_NBT.GetString(CurrentLine));
+	}
+
 	// Restart cooking:
 	Furnace->ContinueCooking();
 	Furnace->SetLoading(false);
@@ -1320,6 +1385,14 @@ OwnedBlockEntity cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_Ta
 	}
 	auto Hopper = std::make_unique<cHopperEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
 	LoadItemGridFromNBT(Hopper->GetContents(), a_NBT, Items);
+
+	// Loads the LootTable
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "LootTable");
+	if (CurrentLine >= 0)
+	{
+		Hopper->SetLootTable(a_NBT.GetString(CurrentLine));
+	}
+
 	return Hopper;
 }
 
@@ -2198,13 +2271,49 @@ void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedN
 		return;
 	}
 
-	int EffectDuration         = a_NBT.FindChildByName(a_TagIdx, "EffectDuration");
-	int EffectIntensity        = a_NBT.FindChildByName(a_TagIdx, "EffectIntensity");
-	int EffectDistanceModifier = a_NBT.FindChildByName(a_TagIdx, "EffectDistanceModifier");
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "EffectType");
+	if (CurrentLine >= 0)
+	{
+		if (a_NBT.GetType(CurrentLine) == TAG_String)
+		{
+			auto EffectString = a_NBT.GetString(CurrentLine);
+			auto EffectPair = NamespaceSerializer::SplitNamespacedID(EffectString);
+			SplashPotion->SetEntityEffectType(NamespaceSerializer::ToEntityEffect(EffectPair.second));
+		}
+		else if (a_NBT.GetType(CurrentLine) == TAG_Int)
+		{
+			SplashPotion->SetEntityEffectType(static_cast<cEntityEffect::eType>(a_NBT.GetInt(CurrentLine)));
+		}
+	}
 
-	SplashPotion->SetEntityEffectType(static_cast<cEntityEffect::eType>(a_NBT.FindChildByName(a_TagIdx, "EffectType")));
-	SplashPotion->SetEntityEffect(cEntityEffect(EffectDuration, static_cast<Int16>(EffectIntensity), EffectDistanceModifier));
-	SplashPotion->SetPotionColor(a_NBT.FindChildByName(a_TagIdx, "PotionName"));
+	int EffectDuration = 0;
+	short EffectIntensity = 0;
+	double EffectDistanceModifier = 0.0;
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "EffectDuration");
+	if (CurrentLine >= 0)
+	{
+		EffectDuration = a_NBT.GetInt(CurrentLine);
+	}
+
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "EffectIntensity");
+	if (CurrentLine >= 0)
+	{
+		EffectIntensity = a_NBT.GetShort(CurrentLine);
+	}
+
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "EffectDistanceModifier");
+	if (CurrentLine >= 0)
+	{
+		EffectDistanceModifier = a_NBT.GetDouble(CurrentLine);
+	}
+
+	SplashPotion->SetEntityEffect(cEntityEffect(EffectDuration, EffectIntensity, EffectDistanceModifier));
+
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "PotionName");
+	if (CurrentLine >= 0)
+	{
+		SplashPotion->SetPotionColor(a_NBT.GetInt(CurrentLine));
+	}
 
 	// Store the new splash potion in the entities list:
 	a_Entities.emplace_back(std::move(SplashPotion));

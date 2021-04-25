@@ -4708,6 +4708,24 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 		{
 			Functions =
 			{
+				GetTypeFromString =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "Name",
+							Type = "string",
+						},
+					},
+					Returns =
+					{
+						{
+							Name = "eType",
+							Type = "cEntityEffect#eType",
+						},
+					},
+				},
 				GetPotionColor =
 				{
 					IsStatic = true,

@@ -430,6 +430,161 @@ std::pair<NamespaceSerializer::Namespace, std::string_view> NamespaceSerializer:
 
 
 
+const char * NamespaceSerializer::From(cEntityEffect::eType a_ID)
+{
+	switch (a_ID)
+	{
+		case cEntityEffect::effNoEffect:       return "no_effect";
+		case cEntityEffect::effSpeed:          return "speed";
+		case cEntityEffect::effSlowness:       return "slowness";
+		case cEntityEffect::effHaste:          return "haste";
+		case cEntityEffect::effMiningFatigue:  return "mining_fatigue";
+		case cEntityEffect::effStrength:       return "strength";
+		case cEntityEffect::effInstantHealth:  return "instant_health";
+		case cEntityEffect::effInstantDamage:  return "instant_damage";
+		case cEntityEffect::effJumpBoost:      return "jump_boost";
+		case cEntityEffect::effNausea:         return "nausea";
+		case cEntityEffect::effRegeneration:   return "regeneration";
+		case cEntityEffect::effResistance:     return "resistance";
+		case cEntityEffect::effFireResistance: return "fire_resistance";
+		case cEntityEffect::effWaterBreathing: return "water_breathing";
+		case cEntityEffect::effInvisibility:   return "invisibility";
+		case cEntityEffect::effBlindness:      return "blindness";
+		case cEntityEffect::effNightVision:    return "night_vision";
+		case cEntityEffect::effHunger:         return "hunger";
+		case cEntityEffect::effWeakness:       return "weakness";
+		case cEntityEffect::effPoison:         return "poison";
+		case cEntityEffect::effWither:         return "wither";
+		case cEntityEffect::effHealthBoost:    return "health_boost";
+		case cEntityEffect::effAbsorption:     return "absorption";
+		case cEntityEffect::effSaturation:     return "saturation";
+	}
+
+	UNREACHABLE("Tried to save unhandled entity effect");
+}
+
+
+
+
+
+cEntityEffect::eType NamespaceSerializer::ToEntityEffect(std::string_view a_ID)
+{
+	static const std::unordered_map<std::string_view, cEntityEffect::eType> Effects =
+	{
+		{ "no_effect",       cEntityEffect::effNoEffect },
+		{ "speed",           cEntityEffect::effSpeed },
+		{ "slowness",        cEntityEffect::effSlowness },
+		{ "haste",           cEntityEffect::effHaste },
+		{ "mining_fatigue",  cEntityEffect::effMiningFatigue },
+		{ "strength",        cEntityEffect::effStrength },
+		{ "instant_health",  cEntityEffect::effInstantHealth },
+		{ "instant_damage",  cEntityEffect::effInstantDamage },
+		{ "jump_boost",      cEntityEffect::effJumpBoost },
+		{ "nausea",          cEntityEffect::effNausea },
+		{ "regeneration",    cEntityEffect::effRegeneration },
+		{ "resistance",      cEntityEffect::effResistance },
+		{ "fire_resistance", cEntityEffect::effFireResistance },
+		{ "water_breathing", cEntityEffect::effWaterBreathing },
+		{ "invisibility",    cEntityEffect::effInvisibility },
+		{ "hunger",          cEntityEffect::effHunger },
+		{ "weakness",        cEntityEffect::effWeakness },
+		{ "poison",          cEntityEffect::effPoison },
+		{ "wither",          cEntityEffect::effWither },
+		{ "healthBoost",     cEntityEffect::effHealthBoost },
+		{ "absorption",      cEntityEffect::effAbsorption },
+		{ "saturation",      cEntityEffect::effSaturation }
+	};
+
+	return Effects.at(a_ID);
+}
+
+
+
+
+
+const char * NamespaceSerializer::From(cEnchantments::eEnchantment a_Enchantment)
+{
+	switch (a_Enchantment)
+	{
+		case cEnchantments::enchProtection:           return "protection";
+		case cEnchantments::enchFireProtection:       return "fire_protection";
+		case cEnchantments::enchFeatherFalling:       return "feather_falling";
+		case cEnchantments::enchBlastProtection:      return "blast_protection";
+		case cEnchantments::enchProjectileProtection: return "projectile_protection";
+		case cEnchantments::enchRespiration:          return "respiration";
+		case cEnchantments::enchAquaAffinity:         return "aqua_affinity";
+		case cEnchantments::enchThorns:               return "thorns";
+		case cEnchantments::enchDepthStrider:         return "depth_strider";
+		case cEnchantments::enchSharpness:            return "sharpness";
+		case cEnchantments::enchSmite:                return "smite";
+		case cEnchantments::enchBaneOfArthropods:     return "bane_of_arthropods";
+		case cEnchantments::enchKnockback:            return "knockback";
+		case cEnchantments::enchFireAspect:           return "fire_aspect";
+		case cEnchantments::enchLooting:              return "looting";
+		case cEnchantments::enchEfficiency:           return "efficiency";
+		case cEnchantments::enchSilkTouch:            return "silk_touch";
+		case cEnchantments::enchUnbreaking:           return "unbreaking";
+		case cEnchantments::enchFortune:              return "fortune";
+		case cEnchantments::enchPower:                return "power";
+		case cEnchantments::enchPunch:                return "punch";
+		case cEnchantments::enchFlame:                return "flame";
+		case cEnchantments::enchInfinity:             return "infinity";
+		case cEnchantments::enchLuckOfTheSea:         return "luck_of_the_sea";
+		case cEnchantments::enchLure:                 return "lure";
+	}
+
+	UNREACHABLE("Tried to save unhandled enchantment");
+}
+
+
+
+
+
+cEnchantments::eEnchantment NamespaceSerializer::ToEnchantmentID(std::string_view a_ID)
+{
+	static const std::unordered_map<std::string_view, cEnchantments::eEnchantment> Enchantments =
+	{
+		{ "protection",            cEnchantments::enchProtection },
+		{ "fire_protection",       cEnchantments::enchFireProtection },
+		{ "feather_falling",       cEnchantments::enchFeatherFalling },
+		{ "blast_protection",      cEnchantments::enchBlastProtection },
+		{ "projectile_protection", cEnchantments::enchProjectileProtection },
+		{ "respiration",           cEnchantments::enchRespiration },
+		{ "aqua_affinity",         cEnchantments::enchAquaAffinity },
+		{ "thorns",                cEnchantments::enchThorns },
+		{ "depth_strider",         cEnchantments::enchDepthStrider },
+		{ "sharpness",             cEnchantments::enchSharpness },
+		{ "smite",                 cEnchantments::enchSmite },
+		{ "bane_of_arthropods",    cEnchantments::enchBaneOfArthropods },
+		{ "knockback",             cEnchantments::enchKnockback },
+		{ "fire_aspect",           cEnchantments::enchFireAspect },
+		{ "looting",               cEnchantments::enchLooting },
+		{ "efficiency",            cEnchantments::enchEfficiency },
+		{ "silk_touch",            cEnchantments::enchSilkTouch },
+		{ "unbreaking",            cEnchantments::enchUnbreaking },
+		{ "fortune",               cEnchantments::enchFortune },
+		{ "power",                 cEnchantments::enchPower },
+		{ "punch",                 cEnchantments::enchPunch },
+		{ "flame",                 cEnchantments::enchFlame },
+		{ "infinity",              cEnchantments::enchInfinity },
+		{ "luck_of_the_sea",       cEnchantments::enchLuckOfTheSea },
+		{ "lure",                  cEnchantments::enchLure },
+	};
+	try
+	{
+		return Enchantments.at(a_ID);
+	}
+	catch (...)
+	{
+		LOG(a_ID);
+		UNREACHABLE(Printf("Tried to load unknown enchantment: %s", a_ID));
+	}
+}
+
+
+
+
+
 eMonsterType NamespaceSerializer::ToMonsterType(const std::string_view a_ID)
 {
 	static const std::unordered_map<std::string_view, eMonsterType> MonsterTypes

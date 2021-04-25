@@ -388,11 +388,12 @@ public:
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_Entity, "Beacon");
 			mWriter.AddInt("Levels", a_Entity->GetBeaconLevel());
-			mWriter.AddInt("Primary", static_cast<int>(a_Entity->GetPrimaryEffect()));
-			mWriter.AddInt("Secondary", static_cast<int>(a_Entity->GetSecondaryEffect()));
+			mWriter.AddString("Primary", AString("minecraft:") + NamespaceSerializer::From(a_Entity->GetPrimaryEffect()));
+			mWriter.AddString("Secondary", AString("minecraft:") + NamespaceSerializer::From(a_Entity->GetSecondaryEffect()));
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
+			mWriter.AddString("LootTable", a_Entity->GetLootTable());
 		mWriter.EndCompound();
 	}
 
@@ -421,6 +422,7 @@ public:
 			mWriter.EndList();
 			mWriter.AddShort("BrewTime", a_Brewingstand->GetTimeBrewed());
 			mWriter.AddShort("Fuel", a_Brewingstand->GetRemainingFuel());
+			mWriter.AddString("LootTable", a_Brewingstand->GetLootTable());
 		mWriter.EndCompound();
 	}
 
@@ -435,6 +437,7 @@ public:
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
+			mWriter.AddString("LootTable", a_Entity->GetLootTable());
 		mWriter.EndCompound();
 	}
 
@@ -449,6 +452,7 @@ public:
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
+			mWriter.AddString("LootTable", a_Entity->GetLootTable());
 		mWriter.EndCompound();
 	}
 
@@ -463,6 +467,7 @@ public:
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
+			mWriter.AddString("LootTable", a_Entity->GetLootTable());
 		mWriter.EndCompound();
 	}
 
@@ -514,6 +519,7 @@ public:
 			mWriter.EndList();
 			mWriter.AddShort("BurnTime", static_cast<Int16>(a_Furnace->GetFuelBurnTimeLeft()));
 			mWriter.AddShort("CookTime", static_cast<Int16>(a_Furnace->GetTimeCooked()));
+			mWriter.AddString("LootTable", a_Furnace->GetLootTable());
 		mWriter.EndCompound();
 	}
 
@@ -528,6 +534,7 @@ public:
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
+			mWriter.AddString("LootTable", a_Entity->GetLootTable());
 		mWriter.EndCompound();
 	}
 
@@ -1046,7 +1053,7 @@ public:
 				{
 					cSplashPotionEntity * Potion = static_cast<cSplashPotionEntity *>(a_Projectile);
 
-					mWriter.AddInt("EffectType",                static_cast<Int16>(Potion->GetEntityEffectType()));
+					mWriter.AddString("EffectType",             AString("minecraft:") + NamespaceSerializer::From(Potion->GetEntityEffectType()));
 					mWriter.AddInt("EffectDuration",            static_cast<Int16>(Potion->GetEntityEffect().GetDuration()));
 					mWriter.AddShort("EffectIntensity",         Potion->GetEntityEffect().GetIntensity());
 					mWriter.AddDouble("EffectDistanceModifier", Potion->GetEntityEffect().GetDistanceModifier());
