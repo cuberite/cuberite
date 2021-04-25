@@ -79,6 +79,7 @@ function(enable_bindings_generation)
 		Mobs/MonsterTypes.h
 		OSSupport/File.h
 		Protocol/MojangAPI.h
+		Registries/Statistics.h
 		Root.h
 		Scoreboard.h
 		Server.h
