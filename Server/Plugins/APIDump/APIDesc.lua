@@ -12162,487 +12162,26 @@ end
 				},
 			},
 		},
-		
-
-		Statistic =
-		{
-			Desc = [[
-				An enumeration of class to be used with {cStatManager}.
-			]],
-			Constants =
-			{
-				AchOpenInventory =
-				{
-					Notes = "",
-				},
-				AchMineWood =
-				{
-					Notes = "",
-				},
-				AchBuildWorkBench =
-				{
-					Notes = "",
-				},
-				AchBuildPickaxe =
-				{
-					Notes = "",
-				},
-				AchBuildFurnace =
-				{
-					Notes = "",
-				},
-				AchAcquireIron =
-				{
-					Notes = "",
-				},
-				AchBuildHoe =
-				{
-					Notes = "",
-				},
-				AchMakeBread =
-				{
-					Notes = "",
-				},
-				AchBakeCake =
-				{
-					Notes = "",
-				},
-				AchBuildBetterPickaxe =
-				{
-					Notes = "",
-				},
-				AchCookFish =
-				{
-					Notes = "",
-				},
-				AchOnARail =
-				{
-					Notes = "",
-				},
-				AchBuildSword =
-				{
-					Notes = "",
-				},
-				AchKillEnemy =
-				{
-					Notes = "",
-				},
-				AchKillCow =
-				{
-					Notes = "",
-				},
-				AchOnARail =
-				{
-					Notes = "",
-				},
-				AchFlyPig =
-				{
-					Notes = "",
-				},
-				AchSnipeSkeleton =
-				{
-					Notes = "",
-				},
-				AchDiamonds =
-				{
-					Notes = "",
-				},
-				AchPortal =
-				{
-					Notes = "",
-				},
-				AchGhast =
-				{
-					Notes = "",
-				},
-				AchBlazeRod =
-				{
-					Notes = "",
-				},
-				AchPotion =
-				{
-					Notes = "",
-				},
-				AchTheEnd =
-				{
-					Notes = "",
-				},
-				AchTheEnd2 =
-				{
-					Notes = "",
-				},
-				AchEnchantments =
-				{
-					Notes = "",
-				},
-				AchOverkill =
-				{
-					Notes = "",
-				},
-				AchBookcase =
-				{
-					Notes = "",
-				},
-				AchExploreAllBiomes =
-				{
-					Notes = "",
-				},
-				AchSpawnWither =
-				{
-					Notes = "",
-				},
-				AchKillWither =
-				{
-					Notes = "",
-				},
-				AchFullBeacon =
-				{
-					Notes = "",
-				},
-				AchBreedCow =
-				{
-					Notes = "",
-				},
-				AchDiamondsToYou =
-				{
-					Notes = "",
-				},
-				AnimalsBred =
-				{
-					Notes = "",
-				},
-				AviateOneCm =
-				{
-					Notes = "",
-				},
-				BellRing =
-				{
-					Notes = "",
-				},
-				BoatOneCm =
-				{
-					Notes = "",
-				},
-				CleanArmor =
-				{
-					Notes = "",
-				},
-				CleanBanner =
-				{
-					Notes = "",
-				},
-				CleanShulkerBox =
-				{
-					Notes = "",
-				},
-				ClimbOneCm =
-				{
-					Notes = "",
-				},
-				CrouchOneCm =
-				{
-					Notes = "",
-				},
-				DamageAbsorbed =
-				{
-					Notes = "",
-				},
-				DamageBlockedByShield =
-				{
-					Notes = "",
-				},
-				DamageDealt =
-				{
-					Notes = "",
-				},
-				DamageDealtAbsorbed =
-				{
-					Notes = "",
-				},
-				DamageDealtResisted =
-				{
-					Notes = "",
-				},
-				DamageResisted =
-				{
-					Notes = "",
-				},
-				DamageTaken =
-				{
-					Notes = "",
-				},
-				Deaths =
-				{
-					Notes = "",
-				},
-				Drop =
-				{
-					Notes = "",
-				},
-				EatCakeSlice =
-				{
-					Notes = "",
-				},
-				EnchantItem =
-				{
-					Notes = "",
-				},
-				FallOneCm =
-				{
-					Notes = "",
-				},
-				FillCauldron =
-				{
-					Notes = "",
-				},
-				FishCaught =
-				{
-					Notes = "",
-				},
-				FlyOneCm =
-				{
-					Notes = "",
-				},
-				HorseOneCm =
-				{
-					Notes = "",
-				},
-				InspectDispenser =
-				{
-					Notes = "",
-				},
-				InspectDropper =
-				{
-					Notes = "",
-				},
-				InspectHopper =
-				{
-					Notes = "",
-				},
-				InteractWithAnvil =
-				{
-					Notes = "",
-				},
-				InteractWithBeacon =
-				{
-					Notes = "",
-				},
-				InteractWithBlastFurnace =
-				{
-					Notes = "",
-				},
-				InteractWithBrewingstand =
-				{
-					Notes = "",
-				},
-				InteractWithCampfire =
-				{
-					Notes = "",
-				},
-				InteractWithCartographyTable =
-				{
-					Notes = "",
-				},
-				InteractWithCraftingTable =
-				{
-					Notes = "",
-				},
-				InteractWithFurnace =
-				{
-					Notes = "",
-				},
-				InteractWithGrindstone =
-				{
-					Notes = "",
-				},
-				InteractWithLectern =
-				{
-					Notes = "",
-				},
-				InteractWithLoom =
-				{
-					Notes = "",
-				},
-				InteractWithSmithingTable =
-				{
-					Notes = "",
-				},
-				InteractWithSmoker =
-				{
-					Notes = "",
-				},
-				InteractWithStonecutter =
-				{
-					Notes = "",
-				},
-				Jump = 
-				{
-					Notes = "",
-				},
-				LeaveGame = 
-				{
-					Notes = "",
-				},
-				MinecartOneCm = 
-				{
-					Notes = "",
-				},
-				MobKills = 
-				{
-					Notes = "",
-				},
-				OpenBarrel = 
-				{
-					Notes = "",
-				},
-				OpenChest = 
-				{
-					Notes = "",
-				},
-				OpenEnderchest = 
-				{
-					Notes = "",
-				},
-				OpenShulkerBox = 
-				{
-					Notes = "",
-				},
-				PigOneCm = 
-				{
-					Notes = "",
-				},
-				PlayNoteblock = 
-				{
-					Notes = "",
-				},
-				PlayOneMinute = 
-				{
-					Notes = "",
-				},
-				PlayRecord = 
-				{
-					Notes = "",
-				},
-				PlayerKills = 
-				{
-					Notes = "",
-				},
-				PotFlower = 
-				{
-					Notes = "",
-				},
-				RaidTrigger = 
-				{
-					Notes = "",
-				},
-				RaidWin = 
-				{
-					Notes = "",
-				},
-				SleepInBed = 
-				{
-					Notes = "",
-				},
-				SneakTime = 
-				{
-					Notes = "",
-				},
-				SprintOneCm = 
-				{
-					Notes = "",
-				},
-				StriderOneCm = 
-				{
-					Notes = "",
-				},
-				SwimOneCm = 
-				{
-					Notes = "",
-				},
-				TalkedToVillager = 
-				{
-					Notes = "",
-				},
-				TargetHit = 
-				{
-					Notes = "",
-				},
-				TimeSinceDeath = 
-				{
-					Notes = "",
-				},
-				TimeSinceRest = 
-				{
-					Notes = "",
-				},
-				TradedWithVillager = 
-				{
-					Notes = "",
-				},
-				TriggerTrappedChest = 
-				{
-					Notes = "",
-				},
-				TuneNoteblock = 
-				{
-					Notes = "",
-				},
-				UseCauldron = 
-				{
-					Notes = "",
-				},
-				WalkOnWaterOneCm = 
-				{
-					Notes = "",
-				},
-				WalkOneCm = 
-				{
-					Notes = "",
-				},
-				WalkUnderWaterOneCm = 
-				{
-					Notes = "",
-				},
-			
-			},
-		},
-
 		cStatManager = 
 		{
 			Desc = [[
 				This class manages the Statistics and Achievements of the player. In the API layer, it will allow
-				getting and setting of player statistics and achievments,</p>
+				getting and setting of player statistics and achievements.
 			]],
-			
 			Functions = 
 			{
-				SetValue =
-				{
-					Params =
-					{
-						{
-							Name = "a_Stat",
-							Type = "Statistic",
-						},
-						{
-							Name = "a_Value",
-							Type = "number",
-						},
-					},
-					Notes = "Set the value of the specified statistic.",
-				},
 				AddValue = 
 				{
 					Params = 
 					{
 						{
-							Name = "a_Stat",
-							Type = "Statistics",
+							Name = "Statistic",
+							Type = "Statistic",
 						},
 						{
-							Name = "a_Delta",
+							Name = "Delta",
 							Type = "number",
-						}	
+						},
 					},
 					Returns = 
 					{
@@ -12656,17 +12195,32 @@ end
 					Params = 
 					{
 						{
-							Name = "a_Stat",
-							Type = "Statistics",
-						}
+							Name = "Statistic",
+							Type = "Statistic",
+						},
 					},
 					Returns = 
 					{
 						Type = "boolean",
 					},
 					Notes = "Returns whether the prerequisite for awarding an achievement are satisfied.",
-				}
-			}
+				},
+				SetValue =
+				{
+					Params =
+					{
+						{
+							Name = "Statistic",
+							Type = "Statistic",
+						},
+						{
+							Name = "Value",
+							Type = "number",
+						},
+					},
+					Notes = "Set the value of the specified statistic.",
+				},
+			},
 		},
 		cServer =
 		{
@@ -19195,6 +18749,447 @@ end
 						},
 					},
 					Notes = "Returns a string representing the type of the object. This works similar to Lua's built-in type() function, but recognizes the underlying C++ classes, too.",
+				},
+			},
+		},
+		Statistics =
+		{
+			Desc = [[
+				An enumeration of class to be used with {cStatManager}.
+			]],
+			Constants =
+			{
+				AchOpenInventory =
+				{
+					Notes = "",
+				},
+				AchMineWood =
+				{
+					Notes = "",
+				},
+				AchBuildWorkBench =
+				{
+					Notes = "",
+				},
+				AchBuildPickaxe =
+				{
+					Notes = "",
+				},
+				AchBuildFurnace =
+				{
+					Notes = "",
+				},
+				AchAcquireIron =
+				{
+					Notes = "",
+				},
+				AchBuildHoe =
+				{
+					Notes = "",
+				},
+				AchMakeBread =
+				{
+					Notes = "",
+				},
+				AchBakeCake =
+				{
+					Notes = "",
+				},
+				AchBuildBetterPickaxe =
+				{
+					Notes = "",
+				},
+				AchCookFish =
+				{
+					Notes = "",
+				},
+				AchOnARail =
+				{
+					Notes = "",
+				},
+				AchBuildSword =
+				{
+					Notes = "",
+				},
+				AchKillEnemy =
+				{
+					Notes = "",
+				},
+				AchKillCow =
+				{
+					Notes = "",
+				},
+				AchOnARail =
+				{
+					Notes = "",
+				},
+				AchFlyPig =
+				{
+					Notes = "",
+				},
+				AchSnipeSkeleton =
+				{
+					Notes = "",
+				},
+				AchDiamonds =
+				{
+					Notes = "",
+				},
+				AchPortal =
+				{
+					Notes = "",
+				},
+				AchGhast =
+				{
+					Notes = "",
+				},
+				AchBlazeRod =
+				{
+					Notes = "",
+				},
+				AchPotion =
+				{
+					Notes = "",
+				},
+				AchTheEnd =
+				{
+					Notes = "",
+				},
+				AchTheEnd2 =
+				{
+					Notes = "",
+				},
+				AchEnchantments =
+				{
+					Notes = "",
+				},
+				AchOverkill =
+				{
+					Notes = "",
+				},
+				AchBookcase =
+				{
+					Notes = "",
+				},
+				AchExploreAllBiomes =
+				{
+					Notes = "",
+				},
+				AchSpawnWither =
+				{
+					Notes = "",
+				},
+				AchKillWither =
+				{
+					Notes = "",
+				},
+				AchFullBeacon =
+				{
+					Notes = "",
+				},
+				AchBreedCow =
+				{
+					Notes = "",
+				},
+				AchDiamondsToYou =
+				{
+					Notes = "",
+				},
+				AnimalsBred =
+				{
+					Notes = "",
+				},
+				AviateOneCm =
+				{
+					Notes = "",
+				},
+				BellRing =
+				{
+					Notes = "",
+				},
+				BoatOneCm =
+				{
+					Notes = "",
+				},
+				CleanArmor =
+				{
+					Notes = "",
+				},
+				CleanBanner =
+				{
+					Notes = "",
+				},
+				CleanShulkerBox =
+				{
+					Notes = "",
+				},
+				ClimbOneCm =
+				{
+					Notes = "",
+				},
+				CrouchOneCm =
+				{
+					Notes = "",
+				},
+				DamageAbsorbed =
+				{
+					Notes = "",
+				},
+				DamageBlockedByShield =
+				{
+					Notes = "",
+				},
+				DamageDealt =
+				{
+					Notes = "",
+				},
+				DamageDealtAbsorbed =
+				{
+					Notes = "",
+				},
+				DamageDealtResisted =
+				{
+					Notes = "",
+				},
+				DamageResisted =
+				{
+					Notes = "",
+				},
+				DamageTaken =
+				{
+					Notes = "",
+				},
+				Deaths =
+				{
+					Notes = "",
+				},
+				Drop =
+				{
+					Notes = "",
+				},
+				EatCakeSlice =
+				{
+					Notes = "",
+				},
+				EnchantItem =
+				{
+					Notes = "",
+				},
+				FallOneCm =
+				{
+					Notes = "",
+				},
+				FillCauldron =
+				{
+					Notes = "",
+				},
+				FishCaught =
+				{
+					Notes = "",
+				},
+				FlyOneCm =
+				{
+					Notes = "",
+				},
+				HorseOneCm =
+				{
+					Notes = "",
+				},
+				InspectDispenser =
+				{
+					Notes = "",
+				},
+				InspectDropper =
+				{
+					Notes = "",
+				},
+				InspectHopper =
+				{
+					Notes = "",
+				},
+				InteractWithAnvil =
+				{
+					Notes = "",
+				},
+				InteractWithBeacon =
+				{
+					Notes = "",
+				},
+				InteractWithBlastFurnace =
+				{
+					Notes = "",
+				},
+				InteractWithBrewingstand =
+				{
+					Notes = "",
+				},
+				InteractWithCampfire =
+				{
+					Notes = "",
+				},
+				InteractWithCartographyTable =
+				{
+					Notes = "",
+				},
+				InteractWithCraftingTable =
+				{
+					Notes = "",
+				},
+				InteractWithFurnace =
+				{
+					Notes = "",
+				},
+				InteractWithGrindstone =
+				{
+					Notes = "",
+				},
+				InteractWithLectern =
+				{
+					Notes = "",
+				},
+				InteractWithLoom =
+				{
+					Notes = "",
+				},
+				InteractWithSmithingTable =
+				{
+					Notes = "",
+				},
+				InteractWithSmoker =
+				{
+					Notes = "",
+				},
+				InteractWithStonecutter =
+				{
+					Notes = "",
+				},
+				Jump =
+				{
+					Notes = "",
+				},
+				LeaveGame =
+				{
+					Notes = "",
+				},
+				MinecartOneCm =
+				{
+					Notes = "",
+				},
+				MobKills =
+				{
+					Notes = "",
+				},
+				OpenBarrel =
+				{
+					Notes = "",
+				},
+				OpenChest =
+				{
+					Notes = "",
+				},
+				OpenEnderchest =
+				{
+					Notes = "",
+				},
+				OpenShulkerBox =
+				{
+					Notes = "",
+				},
+				PigOneCm =
+				{
+					Notes = "",
+				},
+				PlayNoteblock =
+				{
+					Notes = "",
+				},
+				PlayOneMinute =
+				{
+					Notes = "",
+				},
+				PlayRecord =
+				{
+					Notes = "",
+				},
+				PlayerKills =
+				{
+					Notes = "",
+				},
+				PotFlower =
+				{
+					Notes = "",
+				},
+				RaidTrigger =
+				{
+					Notes = "",
+				},
+				RaidWin =
+				{
+					Notes = "",
+				},
+				SleepInBed =
+				{
+					Notes = "",
+				},
+				SneakTime =
+				{
+					Notes = "",
+				},
+				SprintOneCm =
+				{
+					Notes = "",
+				},
+				StriderOneCm =
+				{
+					Notes = "",
+				},
+				SwimOneCm =
+				{
+					Notes = "",
+				},
+				TalkedToVillager =
+				{
+					Notes = "",
+				},
+				TargetHit =
+				{
+					Notes = "",
+				},
+				TimeSinceDeath =
+				{
+					Notes = "",
+				},
+				TimeSinceRest =
+				{
+					Notes = "",
+				},
+				TradedWithVillager =
+				{
+					Notes = "",
+				},
+				TriggerTrappedChest =
+				{
+					Notes = "",
+				},
+				TuneNoteblock =
+				{
+					Notes = "",
+				},
+				UseCauldron =
+				{
+					Notes = "",
+				},
+				WalkOnWaterOneCm =
+				{
+					Notes = "",
+				},
+				WalkOneCm =
+				{
+					Notes = "",
+				},
+				WalkUnderWaterOneCm =
+				{
+					Notes = "",
 				},
 			},
 		},
