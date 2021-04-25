@@ -17985,18 +17985,6 @@ end
 						gmXXX constants, the eGameMode_ constants are deprecated and will be removed from the API.
 					]],
 				},
-				eMainHand =
-				{
-					Include =
-					{
-						"^mh.*",
-					},
-					TextBefore = [[
-						These constants identify which hand is the main hand.  The main hand can either be the left hand
-						or the right hand.  Note that this is only visual, as the client behaves the same regardless of the
-						main hand setting.  See {{cPlayer}}:GetMainHand().
-					]],
-				},
 				EMCSBiome =
 				{
 					Include = "^bi.*",
