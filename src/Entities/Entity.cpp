@@ -836,6 +836,7 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 	}
 
+	m_TicksAlive = 0;
 	m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnDies);
 }
 

@@ -1266,6 +1266,9 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtSnowGolem:
 		case mtSpider:
 		case mtZombieVillager:
+
+		case mtElderGuardian:
+		case mtGuardian:
 		{
 			// TODO: Mobs with extra fields that aren't implemented
 			break;
@@ -1280,9 +1283,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtDonkey:
 
 		case mtDrowned:
-
-		case mtElderGuardian:
-		case mtGuardian:
 
 		case mtEndermite:
 
