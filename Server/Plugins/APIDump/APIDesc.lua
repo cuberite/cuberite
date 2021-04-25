@@ -18740,7 +18740,7 @@ end
 				},
 			},
 		},
-		Statistics =
+		Statistic =
 		{
 			Desc = [[
 				An enumeration of class to be used with {cStatManager}.
