@@ -31,8 +31,7 @@ server https://wiki.vg/Data_Generators
 // tolua_begin
 class cStatManager
 {
-  public:
-
+public:
 	typedef unsigned StatValue;
 	typedef std::unordered_map<Statistic, StatValue> CustomStore;
 
@@ -54,11 +53,13 @@ class cStatManager
 		a_Custom(m_CustomStatistics);
 	}
 
-  private:
+private:
 	/** Returns if a statistic is both present and has nonzero value. */
 	bool IsStatisticPresent(Statistic a_Stat) const;
 
 	// TODO: Block tallies, entities killed, all the others
 
 	CustomStore m_CustomStatistics;
+	// tolua_begin
 };
+// tolua_end
