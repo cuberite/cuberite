@@ -472,6 +472,7 @@ UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType) const
 		case pktUpdateScore:            return 0x48;
 		case pktUpdateSign:             return GetPacketID(pktUpdateBlockEntity);
 		case pktUseBed:                 return 0x33;
+		case pktWeather:                return 0x20;
 		case pktWindowClose:            return 0x13;
 		case pktWindowItems:            return 0x15;
 		case pktWindowOpen:             return 0x14;
