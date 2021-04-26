@@ -38,7 +38,6 @@ public:
 			a_Entity.AttachTo(m_Minecart);
 			return true;
 		}
-		
 		return false;
 	}
 
