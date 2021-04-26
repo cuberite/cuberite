@@ -29,8 +29,9 @@ class cPainting;
 class cWorld;
 class cMonster;
 class cCompositeChat;
-class cStatManager;
 class cPacketizer;
+
+struct StatisticsManager;
 
 
 
@@ -422,7 +423,7 @@ public:
 	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) = 0;
 	virtual void SendSpawnEntity                (const cEntity & a_Entity) = 0;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) = 0;
-	virtual void SendStatistics                 (const cStatManager & a_Manager) = 0;
+	virtual void SendStatistics                 (const StatisticsManager & a_Manager) = 0;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) = 0;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) = 0;

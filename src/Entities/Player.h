@@ -230,6 +230,9 @@ public:
 
 	AString GetIP(void) const;  // tolua_export
 
+	/** Return the associated statistic and achievement manager. */
+	StatisticsManager & GetStatistics() { return m_Stats; }
+
 	/** Returns the associated team, nullptr if none */
 	cTeam * GetTeam(void) { return m_Team; }  // tolua_export
 
@@ -244,13 +247,10 @@ public:
 	/** Forces the player to query the scoreboard for his team */
 	cTeam * UpdateTeam(void);
 
-	/** Return the associated statistic and achievement manager. */
-	cStatManager & GetStatManager() { return m_Stats; }
-
 	/** Awards the player an achievement.
 	If all prerequisites are met, this method will award the achievement and will broadcast a chat message.
 	If the achievement has been already awarded to the player, this method will just increment the stat counter. */
-	void AwardAchievement(Statistic a_Ach);
+	void AwardAchievement(CustomStatistic a_Ach);
 
 	/** Forces the player to move in the given direction.
 	@deprecated Use SetSpeed instead. */
@@ -735,7 +735,7 @@ private:
 
 	cTeam * m_Team;
 
-	cStatManager m_Stats;
+	StatisticsManager m_Stats;
 
 	/** How long till the player's inventory will be saved
 	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */

@@ -657,6 +657,7 @@ public:
 	bool GetStackValue(int a_StackPos, cTrackedRefPtr & a_Ref);
 	bool GetStackValue(int a_StackPos, cTrackedRefSharedPtr & a_Ref);
 	bool GetStackValue(int a_StackPos, ContiguousByteBuffer & a_Data);
+	bool GetStackValue(int a_StackPos, enum class CustomStatistic & a_Value);
 	bool GetStackValue(int a_StackPos, double & a_Value);
 	bool GetStackValue(int a_StackPos, eBlockFace & a_Value);
 	bool GetStackValue(int a_StackPos, eWeather & a_Value);

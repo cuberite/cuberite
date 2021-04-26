@@ -142,24 +142,22 @@ void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AStri
 
 
 
-void cProtocol_1_13::SendStatistics(const cStatManager & a_Manager)
+void cProtocol_1_13::SendStatistics(const StatisticsManager & a_Manager)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	UInt32 Size = 0;
-	a_Manager.ForEachStatisticType([this, &Size](const auto & Store)
-	{
-		for (const auto & Item : Store)
-		{
-			// Client balks at out-of-range values so there is no good default value
-			// We're forced to not send the statistics this protocol version doesn't support
 
-			if (GetProtocolStatisticType(Item.first) != static_cast<UInt32>(-1))
-			{
-				Size++;
-			}
+	for (const auto & [Statistic, Value] : a_Manager.Custom)
+	{
+		// Client balks at out-of-range values so there is no good default value.
+		// We're forced to not send the statistics this protocol version doesn't support.
+
+		if (GetProtocolStatisticType(Statistic) != static_cast<UInt32>(-1))
+		{
+			Size++;
 		}
-	});
+	}
 
 	// No need to check Size != 0
 	// Assume that the vast majority of the time there's at least one statistic to send
@@ -167,22 +165,19 @@ void cProtocol_1_13::SendStatistics(const cStatManager & a_Manager)
 	cPacketizer Pkt(*this, pktStatistics);
 	Pkt.WriteVarInt32(Size);
 
-	a_Manager.ForEachStatisticType([this, &Pkt](const cStatManager::CustomStore & Store)
+	for (const auto & [Statistic, Value] : a_Manager.Custom)
 	{
-		for (const auto & Item : Store)
+		const auto ID = GetProtocolStatisticType(Statistic);
+		if (ID == static_cast<UInt32>(-1))
 		{
-			const auto ID = GetProtocolStatisticType(Item.first);
-			if (ID == static_cast<UInt32>(-1))
-			{
-				// Unsupported, don't send:
-				continue;
-			}
-
-			Pkt.WriteVarInt32(8);  // "Custom" category
-			Pkt.WriteVarInt32(ID);
-			Pkt.WriteVarInt32(static_cast<UInt32>(Item.second));
+			// Unsupported, don't send:
+			continue;
 		}
-	});
+
+		Pkt.WriteVarInt32(8);  // "Custom" category.
+		Pkt.WriteVarInt32(ID);
+		Pkt.WriteVarInt32(static_cast<UInt32>(Value));
+	}
 }
 
 
@@ -579,7 +574,7 @@ UInt32 cProtocol_1_13::GetProtocolMobType(eMonsterType a_MobType) const
 
 
 
-UInt32 cProtocol_1_13::GetProtocolStatisticType(Statistic a_Statistic) const
+UInt32 cProtocol_1_13::GetProtocolStatisticType(const CustomStatistic a_Statistic) const
 {
 	return Palette_1_13::From(a_Statistic);
 }
@@ -1471,7 +1466,7 @@ UInt32 cProtocol_1_13_1::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
 
 
 
-UInt32 cProtocol_1_13_1::GetProtocolStatisticType(Statistic a_Statistic) const
+UInt32 cProtocol_1_13_1::GetProtocolStatisticType(const CustomStatistic a_Statistic) const
 {
 	return Palette_1_13_1::From(a_Statistic);
 }

@@ -33,115 +33,112 @@ namespace StatSerializer
 
 
 
-	static void SaveStatToJSON(const cStatManager & Manager, Json::Value & a_Out)
+	static void SaveStatToJSON(const StatisticsManager & Manager, Json::Value & a_Out)
 	{
-		Manager.ForEachStatisticType([&a_Out](const cStatManager::CustomStore & Store)
+		if (Manager.Custom.empty())
 		{
-			if (Store.empty())
-			{
-				// Avoid saving "custom": null to disk:
-				return;
-			}
+			// Avoid saving "custom": null to disk:
+			return;
+		}
 
-			auto & Custom = a_Out["custom"];
-			for (const auto & Item : Store)
-			{
-				Custom[NamespaceSerializer::From(Item.first).data()] = Item.second;
-			}
-		});
+		auto & Custom = a_Out["custom"];
+		for (const auto & [Statistic, Value] : Manager.Custom)
+		{
+			Custom[NamespaceSerializer::From(Statistic).data()] = Value;
+		}
 	}
 
 
 
 
 
-	static void LoadLegacyFromJSON(cStatManager & Manager, const Json::Value & In)
+	static void LoadLegacyFromJSON(StatisticsManager & Manager, const Json::Value & In)
 	{
 		// Upgrade mapping from pre-1.13 names. TODO: remove on 2020-09-18
-		static const std::unordered_map<std::string_view, Statistic> LegacyMapping
+		static const std::unordered_map<std::string_view, CustomStatistic> LegacyMapping
 		{
-			{ "achievement.openInventory", Statistic::AchOpenInventory },
-			{ "achievement.mineWood", Statistic::AchMineWood },
-			{ "achievement.buildWorkBench", Statistic::AchBuildWorkBench },
-			{ "achievement.buildPickaxe", Statistic::AchBuildPickaxe },
-			{ "achievement.buildFurnace", Statistic::AchBuildFurnace },
-			{ "achievement.acquireIron", Statistic::AchAcquireIron },
-			{ "achievement.buildHoe", Statistic::AchBuildHoe },
-			{ "achievement.makeBread", Statistic::AchMakeBread },
-			{ "achievement.bakeCake", Statistic::AchBakeCake },
-			{ "achievement.buildBetterPickaxe", Statistic::AchBuildBetterPickaxe },
-			{ "achievement.cookFish", Statistic::AchCookFish },
-			{ "achievement.onARail", Statistic::AchOnARail },
-			{ "achievement.buildSword", Statistic::AchBuildSword },
-			{ "achievement.killEnemy", Statistic::AchKillEnemy },
-			{ "achievement.killCow", Statistic::AchKillCow },
-			{ "achievement.flyPig", Statistic::AchFlyPig },
-			{ "achievement.snipeSkeleton", Statistic::AchSnipeSkeleton },
-			{ "achievement.diamonds", Statistic::AchDiamonds },
-			{ "achievement.portal", Statistic::AchPortal },
-			{ "achievement.ghast", Statistic::AchGhast },
-			{ "achievement.blazeRod", Statistic::AchBlazeRod },
-			{ "achievement.potion", Statistic::AchPotion },
-			{ "achievement.theEnd", Statistic::AchTheEnd },
-			{ "achievement.theEnd2", Statistic::AchTheEnd2 },
-			{ "achievement.enchantments", Statistic::AchEnchantments },
-			{ "achievement.overkill", Statistic::AchOverkill },
-			{ "achievement.bookcase", Statistic::AchBookcase },
-			{ "achievement.exploreAllBiomes", Statistic::AchExploreAllBiomes },
-			{ "achievement.spawnWither", Statistic::AchSpawnWither },
-			{ "achievement.killWither", Statistic::AchKillWither },
-			{ "achievement.fullBeacon", Statistic::AchFullBeacon },
-			{ "achievement.breedCow", Statistic::AchBreedCow },
-			{ "achievement.diamondsToYou", Statistic::AchDiamondsToYou },
-			{ "stat.animalsBred", Statistic::AnimalsBred },
-			{ "stat.boatOneCm", Statistic::BoatOneCm },
-			{ "stat.climbOneCm", Statistic::ClimbOneCm },
-			{ "stat.crouchOneCm", Statistic::CrouchOneCm },
-			{ "stat.damageDealt", Statistic::DamageDealt },
-			{ "stat.damageTaken", Statistic::DamageTaken },
-			{ "stat.deaths", Statistic::Deaths },
-			{ "stat.drop", Statistic::Drop },
-			{ "stat.fallOneCm", Statistic::FallOneCm },
-			{ "stat.fishCaught", Statistic::FishCaught },
-			{ "stat.flyOneCm", Statistic::FlyOneCm },
-			{ "stat.horseOneCm", Statistic::HorseOneCm },
-			{ "stat.jump", Statistic::Jump },
-			{ "stat.leaveGame", Statistic::LeaveGame },
-			{ "stat.minecartOneCm", Statistic::MinecartOneCm },
-			{ "stat.mobKills", Statistic::MobKills },
-			{ "stat.pigOneCm", Statistic::PigOneCm },
-			{ "stat.playerKills", Statistic::PlayerKills },
-			{ "stat.playOneMinute", Statistic::PlayOneMinute },
-			{ "stat.sprintOneCm", Statistic::SprintOneCm },
-			{ "stat.swimOneCm", Statistic::SwimOneCm },
-			{ "stat.talkedToVillager", Statistic::TalkedToVillager },
-			{ "stat.timeSinceDeath", Statistic::TimeSinceDeath },
-			{ "stat.tradedWithVillager", Statistic::TradedWithVillager },
-			{ "stat.walkOneCm", Statistic::WalkOneCm },
-			{ "stat.diveOneCm", Statistic::WalkUnderWaterOneCm },
-			{ "stat.armorCleaned", Statistic::CleanArmor },
-			{ "stat.bannerCleaned", Statistic::CleanBanner },
-			{ "stat.cakeSlicesEaten", Statistic::EatCakeSlice },
-			{ "stat.itemEnchanted", Statistic::EnchantItem },
-			{ "stat.cauldronFilled", Statistic::FillCauldron },
-			{ "stat.dispenserInspected", Statistic::InspectDispenser },
-			{ "stat.dropperInspected", Statistic::InspectDropper },
-			{ "stat.hopperInspected", Statistic::InspectHopper },
-			{ "stat.beaconInteraction", Statistic::InteractWithBeacon },
-			{ "stat.brewingstandInteraction", Statistic::InteractWithBrewingstand },
-			{ "stat.craftingTableInteraction", Statistic::InteractWithCraftingTable },
-			{ "stat.furnaceInteraction", Statistic::InteractWithFurnace },
-			{ "stat.chestOpened", Statistic::OpenChest },
-			{ "stat.enderchestOpened", Statistic::OpenEnderchest },
-			{ "stat.noteblockPlayed", Statistic::PlayNoteblock },
-			{ "stat.recordPlayed", Statistic::PlayRecord },
-			{ "stat.flowerPotted", Statistic::PotFlower },
-			{ "stat.trappedChestTriggered", Statistic::TriggerTrappedChest },
-			{ "stat.noteblockTuned", Statistic::TuneNoteblock },
-			{ "stat.cauldronUsed", Statistic::UseCauldron },
-			{ "stat.aviateOneCm", Statistic::AviateOneCm },
-			{ "stat.sleepInBed", Statistic::SleepInBed },
-			{ "stat.sneakTime", Statistic::SneakTime }
+			{ "achievement.openInventory", CustomStatistic::AchOpenInventory },
+			{ "achievement.mineWood", CustomStatistic::AchMineWood },
+			{ "achievement.buildWorkBench", CustomStatistic::AchBuildWorkBench },
+			{ "achievement.buildPickaxe", CustomStatistic::AchBuildPickaxe },
+			{ "achievement.buildFurnace", CustomStatistic::AchBuildFurnace },
+			{ "achievement.acquireIron", CustomStatistic::AchAcquireIron },
+			{ "achievement.buildHoe", CustomStatistic::AchBuildHoe },
+			{ "achievement.makeBread", CustomStatistic::AchMakeBread },
+			{ "achievement.bakeCake", CustomStatistic::AchBakeCake },
+			{ "achievement.buildBetterPickaxe", CustomStatistic::AchBuildBetterPickaxe },
+			{ "achievement.cookFish", CustomStatistic::AchCookFish },
+			{ "achievement.onARail", CustomStatistic::AchOnARail },
+			{ "achievement.buildSword", CustomStatistic::AchBuildSword },
+			{ "achievement.killEnemy", CustomStatistic::AchKillEnemy },
+			{ "achievement.killCow", CustomStatistic::AchKillCow },
+			{ "achievement.flyPig", CustomStatistic::AchFlyPig },
+			{ "achievement.snipeSkeleton", CustomStatistic::AchSnipeSkeleton },
+			{ "achievement.diamonds", CustomStatistic::AchDiamonds },
+			{ "achievement.portal", CustomStatistic::AchPortal },
+			{ "achievement.ghast", CustomStatistic::AchGhast },
+			{ "achievement.blazeRod", CustomStatistic::AchBlazeRod },
+			{ "achievement.potion", CustomStatistic::AchPotion },
+			{ "achievement.theEnd", CustomStatistic::AchTheEnd },
+			{ "achievement.theEnd2", CustomStatistic::AchTheEnd2 },
+			{ "achievement.enchantments", CustomStatistic::AchEnchantments },
+			{ "achievement.overkill", CustomStatistic::AchOverkill },
+			{ "achievement.bookcase", CustomStatistic::AchBookcase },
+			{ "achievement.exploreAllBiomes", CustomStatistic::AchExploreAllBiomes },
+			{ "achievement.spawnWither", CustomStatistic::AchSpawnWither },
+			{ "achievement.killWither", CustomStatistic::AchKillWither },
+			{ "achievement.fullBeacon", CustomStatistic::AchFullBeacon },
+			{ "achievement.breedCow", CustomStatistic::AchBreedCow },
+			{ "achievement.diamondsToYou", CustomStatistic::AchDiamondsToYou },
+			{ "stat.animalsBred", CustomStatistic::AnimalsBred },
+			{ "stat.boatOneCm", CustomStatistic::BoatOneCm },
+			{ "stat.climbOneCm", CustomStatistic::ClimbOneCm },
+			{ "stat.crouchOneCm", CustomStatistic::CrouchOneCm },
+			{ "stat.damageDealt", CustomStatistic::DamageDealt },
+			{ "stat.damageTaken", CustomStatistic::DamageTaken },
+			{ "stat.deaths", CustomStatistic::Deaths },
+			{ "stat.drop", CustomStatistic::Drop },
+			{ "stat.fallOneCm", CustomStatistic::FallOneCm },
+			{ "stat.fishCaught", CustomStatistic::FishCaught },
+			{ "stat.flyOneCm", CustomStatistic::FlyOneCm },
+			{ "stat.horseOneCm", CustomStatistic::HorseOneCm },
+			{ "stat.jump", CustomStatistic::Jump },
+			{ "stat.leaveGame", CustomStatistic::LeaveGame },
+			{ "stat.minecartOneCm", CustomStatistic::MinecartOneCm },
+			{ "stat.mobKills", CustomStatistic::MobKills },
+			{ "stat.pigOneCm", CustomStatistic::PigOneCm },
+			{ "stat.playerKills", CustomStatistic::PlayerKills },
+			{ "stat.playOneMinute", CustomStatistic::PlayOneMinute },
+			{ "stat.sprintOneCm", CustomStatistic::SprintOneCm },
+			{ "stat.swimOneCm", CustomStatistic::SwimOneCm },
+			{ "stat.talkedToVillager", CustomStatistic::TalkedToVillager },
+			{ "stat.timeSinceDeath", CustomStatistic::TimeSinceDeath },
+			{ "stat.tradedWithVillager", CustomStatistic::TradedWithVillager },
+			{ "stat.walkOneCm", CustomStatistic::WalkOneCm },
+			{ "stat.diveOneCm", CustomStatistic::WalkUnderWaterOneCm },
+			{ "stat.armorCleaned", CustomStatistic::CleanArmor },
+			{ "stat.bannerCleaned", CustomStatistic::CleanBanner },
+			{ "stat.cakeSlicesEaten", CustomStatistic::EatCakeSlice },
+			{ "stat.itemEnchanted", CustomStatistic::EnchantItem },
+			{ "stat.cauldronFilled", CustomStatistic::FillCauldron },
+			{ "stat.dispenserInspected", CustomStatistic::InspectDispenser },
+			{ "stat.dropperInspected", CustomStatistic::InspectDropper },
+			{ "stat.hopperInspected", CustomStatistic::InspectHopper },
+			{ "stat.beaconInteraction", CustomStatistic::InteractWithBeacon },
+			{ "stat.brewingstandInteraction", CustomStatistic::InteractWithBrewingstand },
+			{ "stat.craftingTableInteraction", CustomStatistic::InteractWithCraftingTable },
+			{ "stat.furnaceInteraction", CustomStatistic::InteractWithFurnace },
+			{ "stat.chestOpened", CustomStatistic::OpenChest },
+			{ "stat.enderchestOpened", CustomStatistic::OpenEnderchest },
+			{ "stat.noteblockPlayed", CustomStatistic::PlayNoteblock },
+			{ "stat.recordPlayed", CustomStatistic::PlayRecord },
+			{ "stat.flowerPotted", CustomStatistic::PotFlower },
+			{ "stat.trappedChestTriggered", CustomStatistic::TriggerTrappedChest },
+			{ "stat.noteblockTuned", CustomStatistic::TuneNoteblock },
+			{ "stat.cauldronUsed", CustomStatistic::UseCauldron },
+			{ "stat.aviateOneCm", CustomStatistic::AviateOneCm },
+			{ "stat.sleepInBed", CustomStatistic::SleepInBed },
+			{ "stat.sneakTime", CustomStatistic::SneakTime }
 		};
 
 		for (auto Entry = In.begin(); Entry != In.end(); ++Entry)
@@ -151,7 +148,7 @@ namespace StatSerializer
 
 			if ((FindResult != LegacyMapping.end()) && Entry->isInt())
 			{
-				Manager.SetValue(FindResult->second, Entry->asUInt());
+				Manager.Custom[FindResult->second] = Entry->asUInt();
 			}
 		}
 	}
@@ -160,7 +157,7 @@ namespace StatSerializer
 
 
 
-	static void LoadCustomStatFromJSON(cStatManager & Manager, const Json::Value & a_In)
+	static void LoadCustomStatFromJSON(StatisticsManager & Manager, const Json::Value & a_In)
 	{
 		for (auto it = a_In.begin(); it != a_In.end(); ++it)
 		{
@@ -175,7 +172,7 @@ namespace StatSerializer
 			const auto & StatName = StatInfo.second;
 			try
 			{
-				Manager.SetValue(NamespaceSerializer::ToCustomStatistic(StatName), it->asUInt());
+				Manager.Custom[NamespaceSerializer::ToCustomStatistic(StatName)] = it->asUInt();
 			}
 			catch (const std::out_of_range &)
 			{
@@ -192,7 +189,7 @@ namespace StatSerializer
 
 
 
-	void Load(cStatManager & Manager, const std::string & WorldPath, std::string && FileName)
+	void Load(StatisticsManager & Manager, const std::string & WorldPath, std::string && FileName)
 	{
 		Json::Value Root;
 		InputFileStream(MakeStatisticsDirectory(WorldPath, std::move(FileName))) >> Root;
@@ -205,7 +202,7 @@ namespace StatSerializer
 
 
 
-	void Save(const cStatManager & Manager, const std::string & WorldPath, std::string && FileName)
+	void Save(const StatisticsManager & Manager, const std::string & WorldPath, std::string && FileName)
 	{
 		Json::Value Root;
 

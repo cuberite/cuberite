@@ -13,8 +13,7 @@
 
 
 
-// fwd:
-class cStatManager;
+struct StatisticsManager;
 namespace Json { class Value; }
 
 
@@ -24,8 +23,8 @@ namespace Json { class Value; }
 namespace StatSerializer
 {
 	/* Try to load the player statistics. */
-	void Load(cStatManager & Manager, const std::string & WorldPath, std::string && FileName);
+	void Load(StatisticsManager & Manager, const std::string & WorldPath, std::string && FileName);
 
 	/* Try to save the player statistics. */
-	void Save(const cStatManager & Manager, const std::string & WorldPath, std::string && FileName);
+	void Save(const StatisticsManager & Manager, const std::string & WorldPath, std::string && FileName);
 }

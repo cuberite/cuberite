@@ -369,7 +369,7 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 	cRoot::Get()->SendPlayerLists(m_Player);  // Add everyone else to ourself
 
 	// Send statistics:
-	SendStatistics(m_Player->GetStatManager());
+	SendStatistics(m_Player->GetStatistics());
 
 	// Delay the first ping until the client "settles down"
 	// This should fix #889, "BadCast exception, cannot convert bit to fm" error in client
@@ -2970,7 +2970,7 @@ void cClientHandle::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cClientHandle::SendStatistics(const cStatManager & a_Manager)
+void cClientHandle::SendStatistics(const StatisticsManager & a_Manager)
 {
 	m_Protocol->SendStatistics(a_Manager);
 }

@@ -35,9 +35,11 @@ class cProtocol;
 class cWindow;
 class cFallingBlock;
 class cCompositeChat;
-class cStatManager;
 class cMap;
 class cClientHandle;
+
+struct StatisticsManager;
+
 typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 
 
@@ -211,7 +213,7 @@ public:  // tolua_export
 	void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnEntity                (const cEntity & a_Entity);
 	void SendSpawnMob                   (const cMonster & a_Mob);
-	void SendStatistics                 (const cStatManager & a_Manager);
+	void SendStatistics                 (const StatisticsManager & a_Manager);
 	void SendTabCompletionResults       (const AStringVector & a_Results);
 	void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks);  // tolua_export

@@ -123,8 +123,7 @@ $cfile "../BlockEntities/MobHeadEntity.h"
 $cfile "../BlockEntities/MobSpawnerEntity.h"
 $cfile "../BlockEntities/FlowerPotEntity.h"
 
-// Registries
-
+// Registries:
 $cfile "../Registries/Statistics.h"
 
 

@@ -134,7 +134,7 @@ bool cBlockBedHandler::OnUse(
 
 	// Occupy the bed, where 0x4 = occupied bit:
 	a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta | 0x04);
-	a_Player.GetStatManager().AddValue(Statistic::SleepInBed);
+	a_Player.GetStatistics().Custom[CustomStatistic::SleepInBed]++;
 
 	// When sleeping, the player's bounding box moves to approximately where his head is.
 	// Set the player's position to somewhere close to the edge of the pillow block:
