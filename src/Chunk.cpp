@@ -1292,7 +1292,7 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 	GetWorld()->GetSimulatorManager()->WakeUp(*this, a_RelPos);
 
 	// If there was a block entity, remove it:
-	if (const auto FindResult = m_BlockEntities.find(static_cast<size_t>(cChunkDef::MakeIndexNoCheck(a_RelPos))); FindResult != m_BlockEntities.end())
+	if (const auto FindResult = m_BlockEntities.find(cChunkDef::MakeIndex(a_RelPos)); FindResult != m_BlockEntities.end())
 	{
 		auto & BlockEntity = *FindResult->second;
 
@@ -1446,7 +1446,7 @@ cBlockEntity * cChunk::GetBlockEntity(Vector3i a_AbsPos)
 		return nullptr;
 	}
 
-	auto itr = m_BlockEntities.find(static_cast<size_t>(cChunkDef::MakeIndexNoCheck(relPos)));
+	auto itr = m_BlockEntities.find(cChunkDef::MakeIndex(relPos));
 	return (itr == m_BlockEntities.end()) ? nullptr : itr->second.get();
 }
 
@@ -1457,7 +1457,7 @@ cBlockEntity * cChunk::GetBlockEntity(Vector3i a_AbsPos)
 cBlockEntity * cChunk::GetBlockEntityRel(Vector3i a_RelPos)
 {
 	ASSERT(cChunkDef::IsValidRelPos(a_RelPos));
-	auto itr = m_BlockEntities.find(static_cast<size_t>(cChunkDef::MakeIndexNoCheck(a_RelPos)));
+	auto itr = m_BlockEntities.find(cChunkDef::MakeIndex(a_RelPos));
 	return (itr == m_BlockEntities.end()) ? nullptr : itr->second.get();
 }
 
