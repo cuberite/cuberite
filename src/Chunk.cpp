@@ -343,6 +343,9 @@ void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 	m_LightData = std::move(a_SetChunkData.LightData);
 	m_IsLightValid = a_SetChunkData.IsLightValid;
 
+	m_PendingSendBlocks.clear();
+	m_PendingSendBlockEntities.clear();
+
 	// Entities need some extra steps to destroy, so here we're keeping the old ones.
 	// Move the entities already in the chunk, including player entities, so that we don't lose any:
 	a_SetChunkData.Entities.insert(
@@ -468,22 +471,34 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 	}  // for y
 
 	// Erase all affected block entities:
-	cCuboid affectedArea(  // In world coordinates
-		{BlockStartX, a_MinBlockY, BlockStartZ},
-		{BlockEndX, a_MinBlockY + SizeY - 1, BlockEndZ}
-	);
-	for (auto itr = m_BlockEntities.begin(); itr != m_BlockEntities.end();)
 	{
-		if (affectedArea.IsInside(itr->second->GetPos()))
+		// The affected area, in world coordinates.
+		cCuboid affectedArea(
+			{ BlockStartX, a_MinBlockY, BlockStartZ },
+			{ BlockEndX, a_MinBlockY + SizeY - 1, BlockEndZ }
+		);
+
+		// Where in the pending block entity send list to start removing the invalidated elements from.
+		auto PendingRemove = m_PendingSendBlockEntities.end();
+
+		for (auto itr = m_BlockEntities.begin(); itr != m_BlockEntities.end();)
 		{
-			itr->second->Destroy();
-			itr->second->OnRemoveFromWorld();
-			itr = m_BlockEntities.erase(itr);
+			if (affectedArea.IsInside(itr->second->GetPos()))
+			{
+				itr->second->Destroy();
+				itr->second->OnRemoveFromWorld();
+
+				PendingRemove = std::remove(m_PendingSendBlockEntities.begin(), PendingRemove, itr->second.get());  // Search the remaining valid pending sends.
+				itr = m_BlockEntities.erase(itr);
+			}
+			else
+			{
+				++itr;
+			}
 		}
-		else
-		{
-			++itr;
-		}
+
+		// Remove all the deleted block entities from the pending send list:
+		m_PendingSendBlockEntities.erase(PendingRemove, m_PendingSendBlockEntities.end());
 	}
 
 	// Clone block entities from a_Area into this chunk:
@@ -502,25 +517,15 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 			{
 				continue;
 			}
-			// This block entity is inside the chunk, clone it (and remove any that is there currently):
-			auto idx = static_cast<size_t>(cChunkDef::MakeIndex(posX - m_PosX * cChunkDef::Width, posY, posZ - m_PosZ * cChunkDef::Width));
-			auto itr = m_BlockEntities.find(idx);
-			if (itr != m_BlockEntities.end())
-			{
-				m_BlockEntities.erase(itr);
-			}
+
+			// This block entity is inside the chunk.
+			// The code above should have removed any that were here before:
+			ASSERT(GetBlockEntityRel(cChunkDef::AbsoluteToRelative({ posX, posY, posZ })) == nullptr);
+
+			// Clone, and add the new one:
 			AddBlockEntity(be->Clone({posX, posY, posZ}));
 		}
 	}
-}
-
-
-
-
-
-bool cChunk::HasBlockEntityAt(Vector3i a_BlockPos)
-{
-	return (GetBlockEntity(a_BlockPos) != nullptr);
 }
 
 
@@ -1287,12 +1292,15 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 	GetWorld()->GetSimulatorManager()->WakeUp(*this, a_RelPos);
 
 	// If there was a block entity, remove it:
-	cBlockEntity * BlockEntity = GetBlockEntityRel(a_RelPos);
-	if (BlockEntity != nullptr)
+	if (const auto FindResult = m_BlockEntities.find(static_cast<size_t>(cChunkDef::MakeIndexNoCheck(a_RelPos))); FindResult != m_BlockEntities.end())
 	{
-		BlockEntity->Destroy();
-		BlockEntity->OnRemoveFromWorld();
-		RemoveBlockEntity(BlockEntity);
+		auto & BlockEntity = *FindResult->second;
+
+		BlockEntity.Destroy();
+		BlockEntity.OnRemoveFromWorld();
+
+		m_BlockEntities.erase(FindResult);
+		m_PendingSendBlockEntities.erase(std::remove(m_PendingSendBlockEntities.begin(), m_PendingSendBlockEntities.end(), &BlockEntity), m_PendingSendBlockEntities.end());
 	}
 
 	// If the new block is a block entity, create the entity object:
@@ -1524,18 +1532,6 @@ void cChunk::SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_Max
 	{
 		m_World->ForceSendChunkTo(m_PosX, m_PosZ, cChunkSender::Priority::Medium, ClientHandle);
 	}  // for itr - m_LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::RemoveBlockEntity(cBlockEntity * a_BlockEntity)
-{
-	MarkDirty();
-	ASSERT(a_BlockEntity != nullptr);
-	m_BlockEntities.erase(static_cast<size_t>(cChunkDef::MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ())));
-	m_PendingSendBlockEntities.erase(std::remove(m_PendingSendBlockEntities.begin(), m_PendingSendBlockEntities.end(), a_BlockEntity), m_PendingSendBlockEntities.end());
 }
 
 
