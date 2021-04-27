@@ -172,15 +172,15 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, const cTickTimeLong a_CurrentT
 	bool res = false;
 	switch (a_Chunk.GetBlock(GetRelPos().addedY(1)))
 	{
-		case E_BLOCK_TRAPPED_CHEST:
 		case E_BLOCK_CHEST:
+		case E_BLOCK_TRAPPED_CHEST:
 		{
 			// Chests have special handling because of double-chests
 			res = MoveItemsFromChest(a_Chunk);
 			break;
 		}
-		case E_BLOCK_LIT_FURNACE:
 		case E_BLOCK_FURNACE:
+		case E_BLOCK_LIT_FURNACE:
 		{
 			// Furnaces have special handling because only the output and leftover fuel buckets shall be moved
 			res = MoveItemsFromFurnace(a_Chunk);
@@ -331,15 +331,15 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, const cTickTimeLong a_Current
 	auto absCoord = destChunk->RelativeToAbsolute(relCoord);
 	switch (destChunk->GetBlock(relCoord))
 	{
-		case E_BLOCK_TRAPPED_CHEST:
 		case E_BLOCK_CHEST:
+		case E_BLOCK_TRAPPED_CHEST:
 		{
 			// Chests have special handling because of double-chests
 			res = MoveItemsToChest(*destChunk, absCoord);
 			break;
 		}
-		case E_BLOCK_LIT_FURNACE:
 		case E_BLOCK_FURNACE:
+		case E_BLOCK_LIT_FURNACE:
 		{
 			// Furnaces have special handling because of the direction-to-slot relation
 			res = MoveItemsToFurnace(*destChunk, absCoord, meta);
@@ -375,52 +375,22 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, const cTickTimeLong a_Current
 
 bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 {
-	auto ChestPos = GetPos().addedY(1);
-	auto MainChest = static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(ChestPos));
-	if (MainChest == nullptr)
+	const auto ConnectedBlockEntity = a_Chunk.GetBlockEntityRel(GetRelPos().addedY(1));
+
+	if (ConnectedBlockEntity == nullptr)
 	{
-		FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, ChestPos);
 		return false;
 	}
-	auto SideChest = MainChest->GetNeighbour();
-	if (SideChest == nullptr)
+
+	const auto ConnectedChest = static_cast<cChestEntity *>(ConnectedBlockEntity);
+
+	if (MoveItemsFromGrid(ConnectedChest->GetPrimaryChest()))
 	{
-		if (MoveItemsFromGrid(*MainChest))
-		{
-			return true;
-		}
+		return true;
 	}
-	else
-	{
-		auto SideAbsCoords = SideChest->GetPos();
-		// the "primary" chest is the one with the higher z or x value
-		if (SideAbsCoords.z > ChestPos.z || SideAbsCoords.x > ChestPos.x)
-		{
-			// side is "primary" so pull from it first
-			if (MoveItemsFromGrid(*SideChest))
-			{
-				return true;
-			}
-			// main is secondary, pull from next
-			if (MoveItemsFromGrid(*MainChest))
-			{
-				return true;
-			}
-		}
-		else
-		{
-			if (MoveItemsFromGrid(*MainChest))
-			{
-				return true;
-			}
-			if (MoveItemsFromGrid(*SideChest))
-			{
-				return true;
-			}
-		}
-	}
-	// The chest was empty
-	return false;
+
+	const auto SecondaryChest = ConnectedChest->GetSecondaryChest();
+	return (SecondaryChest != nullptr) && MoveItemsFromGrid(*SecondaryChest);
 }
 
 
@@ -529,48 +499,22 @@ bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_Sl
 
 bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 {
-	// Try the chest directly connected to the hopper:
-	auto ConnectedChest = static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(a_Coords));
-	if (ConnectedChest == nullptr)
+	const auto ConnectedBlockEntity = a_Chunk.GetBlockEntity(a_Coords);
+
+	if (ConnectedBlockEntity == nullptr)
 	{
-		FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, a_Coords);
 		return false;
 	}
-	auto SideChest = ConnectedChest->GetNeighbour();
-	if (SideChest == nullptr)
+
+	const auto ConnectedChest = static_cast<cChestEntity *>(ConnectedBlockEntity);
+
+	if (MoveItemsToGrid(ConnectedChest->GetPrimaryChest()))
 	{
-		if (MoveItemsToGrid(*ConnectedChest))
-		{
-			return true;
-		}
+		return true;
 	}
-	else
-	{
-		auto SideAbsCoords = SideChest->GetPos();
-		if (SideAbsCoords.z > a_Coords.z || SideAbsCoords.x > a_Coords.x)
-		{
-			if (MoveItemsToGrid(*SideChest))
-			{
-				return true;
-			}
-			if (MoveItemsToGrid(*ConnectedChest))
-			{
-				return true;
-			}
-		}
-		else
-		{
-			if (MoveItemsToGrid(*ConnectedChest))
-			{
-				return true;
-			}
-			if (MoveItemsToGrid(*SideChest))
-			{
-				return true;
-			}
-		}
-	}
-	return false;
+
+	const auto SecondaryChest = ConnectedChest->GetSecondaryChest();
+	return (SecondaryChest != nullptr) && MoveItemsToGrid(*SecondaryChest);
 }
 
 
@@ -661,7 +605,3 @@ bool cHopperEntity::MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstS
 		return false;
 	}
 }
-
-
-
-

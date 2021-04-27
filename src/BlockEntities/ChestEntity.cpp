@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ChestEntity.h"
+#include "../Chunk.h"
 #include "../BlockInfo.h"
 #include "../Item.h"
 #include "../Entities/Player.h"
@@ -18,23 +19,60 @@ cChestEntity::cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector
 	m_NumActivePlayers(0),
 	m_Neighbour(nullptr)
 {
-	auto chunkCoord = cChunkDef::BlockToChunk(a_Pos);
-	if (
-		(m_World != nullptr) &&
-		m_World->IsChunkValid(chunkCoord.m_ChunkX, chunkCoord.m_ChunkZ)
-	)
-	{
-		ScanNeighbours();
-	}
 }
 
 
 
 
 
-cChestEntity * cChestEntity::GetNeighbour()
+cChestEntity & cChestEntity::GetPrimaryChest()
 {
-	return m_Neighbour;
+	if (m_Neighbour == nullptr)
+	{
+		return *this;
+	}
+
+	// The primary chest should be the one with lesser X or Z coord:
+	return (
+		(m_Neighbour->GetPosX() < GetPosX()) ||
+		(m_Neighbour->GetPosZ() < GetPosZ())
+	) ? *m_Neighbour : *this;
+}
+
+
+
+
+
+cChestEntity * cChestEntity::GetSecondaryChest()
+{
+	// If we're the primary, then our neighbour is the secondary, and vice versa:
+	return (&GetPrimaryChest() == this) ? m_Neighbour : this;
+}
+
+
+
+
+
+bool cChestEntity::ScanNeighbour(cChunk & a_Chunk, Vector3i a_Position)
+{
+	const auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(a_Position);
+
+	if ((Chunk == nullptr) || !Chunk->IsValid())
+	{
+		// If a chest was in fact there, they'll find us when their chunk loads.
+		return false;
+	}
+
+	const auto BlockEntity = Chunk->GetBlockEntityRel(a_Position);
+
+	if ((BlockEntity == nullptr) || (BlockEntity->GetBlockType() != m_BlockType))
+	{
+		// Neighbouring block is not the same type of chest:
+		return false;
+	}
+
+	m_Neighbour = static_cast<cChestEntity *>(BlockEntity);
+	return true;
 }
 
 
@@ -73,49 +111,14 @@ void cChestEntity::OpenNewWindow(void)
 {
 	if (m_Neighbour != nullptr)
 	{
-		ASSERT(  // This should be the primary chest
-			(m_Neighbour->GetPosX() < GetPosX()) ||
-			(m_Neighbour->GetPosZ() < GetPosZ())
-		);
+		ASSERT(&GetPrimaryChest() == this);  // Should only open windows for the primary chest.
+
 		OpenWindow(new cChestWindow(this, m_Neighbour));
 	}
 	else
 	{
 		// There is no chest neighbour, open a single-chest window:
 		OpenWindow(new cChestWindow(this));
-	}
-}
-
-
-
-
-
-void cChestEntity::ScanNeighbours()
-{
-	// Callback for finding neighbouring chest.
-	auto FindNeighbour = [this](cBlockEntity & a_BlockEntity)
-	{
-		if (a_BlockEntity.GetBlockType() != m_BlockType)
-		{
-			// Neighboring block is not the same type of chest
-			return false;
-		}
-
-		m_Neighbour = static_cast<cChestEntity *>(&a_BlockEntity);
-		return true;
-	};
-
-	// Scan horizontally adjacent blocks for any neighbouring chest of the same type:
-	if (
-		m_World->DoWithBlockEntityAt(m_Pos.addedX(-1), FindNeighbour) ||
-		m_World->DoWithBlockEntityAt(m_Pos.addedX(+1), FindNeighbour) ||
-		m_World->DoWithBlockEntityAt(m_Pos.addedZ(-1), FindNeighbour) ||
-		m_World->DoWithBlockEntityAt(m_Pos.addedX(+1), FindNeighbour)
-	)
-	{
-		m_Neighbour->m_Neighbour = this;
-		// Force neighbour's window shut. Does Mojang server do this or should a double window open?
-		m_Neighbour->DestroyWindow();
 	}
 }
 
@@ -132,6 +135,29 @@ void cChestEntity::CopyFrom(const cBlockEntity & a_Src)
 	// Reset the neighbor and player count, there's no sense in copying these:
 	m_Neighbour = nullptr;
 	m_NumActivePlayers = 0;
+}
+
+
+
+
+
+void cChestEntity::OnAddToWorld(cWorld & a_World, cChunk & a_Chunk)
+{
+	Super::OnAddToWorld(a_World, a_Chunk);
+
+	// Scan horizontally adjacent blocks for any neighbouring chest of the same type:
+	if (
+		const auto Position = GetRelPos();
+
+		ScanNeighbour(a_Chunk, Position.addedX(-1)) ||
+		ScanNeighbour(a_Chunk, Position.addedX(+1)) ||
+		ScanNeighbour(a_Chunk, Position.addedZ(-1)) ||
+		ScanNeighbour(a_Chunk, Position.addedZ(+1))
+	)
+	{
+		m_Neighbour->m_Neighbour = this;
+		m_Neighbour->DestroyWindow();  // Force neighbour's window shut. Does Mojang server do this or should a double window open?
+	}
 }
 
 
@@ -171,28 +197,9 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 		return true;
 	}
 
-	if (m_Neighbour == nullptr)
+	if ((m_Neighbour != nullptr) && m_Neighbour->IsBlocked())
 	{
-		ScanNeighbours();
-	}
-
-	// The primary chest should be the one with lesser X or Z coord:
-	cChestEntity * PrimaryChest = this;
-	if (m_Neighbour != nullptr)
-	{
-		if (m_Neighbour->IsBlocked())
-		{
-			// Obstruction, don't open
-			return true;
-		}
-
-		if (
-			(m_Neighbour->GetPosX() > GetPosX()) ||
-			(m_Neighbour->GetPosZ() > GetPosZ())
-		)
-		{
-			PrimaryChest = m_Neighbour;
-		}
+		return true;
 	}
 
 	if (m_BlockType == E_BLOCK_CHEST)
@@ -204,12 +211,14 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 		a_Player->GetStatManager().AddValue(Statistic::TriggerTrappedChest);
 	}
 
+	auto & PrimaryChest = GetPrimaryChest();
+	cWindow * Window = PrimaryChest.GetWindow();
+
 	// If the window is not created, open it anew:
-	cWindow * Window = PrimaryChest->GetWindow();
 	if (Window == nullptr)
 	{
-		PrimaryChest->OpenNewWindow();
-		Window = PrimaryChest->GetWindow();
+		PrimaryChest.OpenNewWindow();
+		Window = PrimaryChest.GetWindow();
 	}
 
 	// Open the window for the player:

@@ -336,8 +336,8 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback) const
 
 void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 {
-	std::copy(a_SetChunkData.HeightMap, a_SetChunkData.HeightMap + std::size(a_SetChunkData.HeightMap), m_HeightMap);
-	std::copy(a_SetChunkData.BiomeMap, a_SetChunkData.BiomeMap + std::size(a_SetChunkData.BiomeMap), m_BiomeMap);
+	std::copy_n(a_SetChunkData.HeightMap, std::size(a_SetChunkData.HeightMap), m_HeightMap);
+	std::copy_n(a_SetChunkData.BiomeMap, std::size(a_SetChunkData.BiomeMap), m_BiomeMap);
 
 	m_BlockData = std::move(a_SetChunkData.BlockData);
 	m_LightData = std::move(a_SetChunkData.LightData);
@@ -383,14 +383,16 @@ void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 	}
 #endif
 
-	// Set all block entities' World variable:
+	// Set the chunk data as valid.
+	// This may be needed for some simulators that perform actions upon block adding (Vaporize),
+	// as well as some block entities upon being added to the chunk (Chests).
+	SetPresence(cpPresent);
+
+	// Initialise all block entities:
 	for (auto & KeyPair : m_BlockEntities)
 	{
-		KeyPair.second->SetWorld(m_World);
+		KeyPair.second->OnAddToWorld(*m_World, *this);
 	}
-
-	// Set the chunk data as valid. This may be needed for some simulators that perform actions upon block adding (Vaporize)
-	SetPresence(cpPresent);
 
 	// Wake up all simulators for their respective blocks:
 	WakeUpSimulators();
@@ -507,9 +509,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 			{
 				m_BlockEntities.erase(itr);
 			}
-			auto clone = be->Clone({posX, posY, posZ});
-			clone->SetWorld(m_World);
-			AddBlockEntity(std::move(clone));
+			AddBlockEntity(be->Clone({posX, posY, posZ}));
 		}
 	}
 }
@@ -1414,11 +1414,14 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 
 void cChunk::AddBlockEntity(OwnedBlockEntity a_BlockEntity)
 {
+	const auto BlockEntityPtr = a_BlockEntity.get();
 	[[maybe_unused]] const auto Result = m_BlockEntities.emplace(
 		cChunkDef::MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ()),
 		std::move(a_BlockEntity)
 	);
-	ASSERT(Result.second);  // No block entity already at this position
+
+	ASSERT(Result.second);  // No block entity already at this position.
+	BlockEntityPtr->OnAddToWorld(*m_World, *this);
 }
 
 
