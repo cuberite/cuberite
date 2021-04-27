@@ -20,7 +20,6 @@ extern "C"
 #include "../Entities/Entity.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../DeadlockDetect.h"
-#include "../Registries/Statistics.h"
 #include "../UUID.h"
 
 
@@ -1379,21 +1378,14 @@ bool cLuaState::GetStackValue(int a_StackPos, ContiguousByteBuffer & a_Data)
 
 
 
-extern int tolua_isCustomStatistic(lua_State* L, int lo, int def, tolua_Error* err);
-
-
-
-
-
 bool cLuaState::GetStackValue(int a_StackPos, CustomStatistic & a_Value)
 {
-	tolua_Error Error;
-	if (tolua_isCustomStatistic(m_LuaState, a_StackPos, 0, &Error) == 0)
+	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
-		return false;
+		a_Value = static_cast<CustomStatistic>(static_cast<std::underlying_type_t<CustomStatistic>>(lua_tonumber(m_LuaState, a_StackPos)));
+		return true;
 	}
 
-	a_Value = static_cast<CustomStatistic>(static_cast<std::underlying_type_t<CustomStatistic>>(lua_tonumber(m_LuaState, a_StackPos)));
 	return true;
 }
 
