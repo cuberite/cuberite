@@ -10245,36 +10245,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the full color code to be used for this player's messages (based on their rank). Prefix player messages with this code.",
 				},
-				GetDraggingItem =
-				{
-					Returns =
-					{
-						{
-							Type = "cItem",
-						},
-					},
-					Notes = "Returns the item the player is dragging in a UI window."
-				},
-				GetPrefix =
-				{
-					Returns =
-					{
-						{
-							Type = "string",
-						},
-					},
-					Notes = "Returns the prefix to player names for messages (based on their rank), may contain @ format codes.",
-				},
-				GetSuffix =
-				{
-					Returns =
-					{
-						{
-							Type = "string",
-						},
-					},
-					Notes = "Returns the suffix to player names for messages (based on their rank), may contain @ format codes.",
-				},
 				GetCurrentXp =
 				{
 					Returns =
@@ -10294,6 +10264,16 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the custom name of this player. If the player hasn't a custom name, it will return an empty string.",
+				},
+				GetDraggingItem =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item the player is dragging in a UI window."
 				},
 				GetEffectiveGameMode =
 				{
@@ -10489,6 +10469,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the name that is used in the playerlist.",
 				},
+				GetPrefix =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the prefix to player names for messages (based on their rank), may contain @ format codes.",
+				},
 				GetRestrictions =
 				{
 					Returns =
@@ -10518,6 +10508,26 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the player's current set of skin part flags.  This is a bitwise OR of various {{Globals#eSkinPart|eSkinPart}} constants.  Note that HasSkinPart may be easier to use in most situations.",
+				},
+				GetStatistics =
+				{
+					Returns =
+					{
+						{
+							Type = "StatisticsManager",
+						},
+					},
+					Notes = "Returns the player's statistics manager."
+				},
+				GetSuffix =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the suffix to player names for messages (based on their rank), may contain @ format codes.",
 				},
 				GetTeam =
 				{
