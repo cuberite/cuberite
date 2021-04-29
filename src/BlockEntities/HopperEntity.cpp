@@ -132,12 +132,6 @@ bool cHopperEntity::UsedBy(cPlayer * a_Player)
 		}
 	}
 
-	// This is rather a hack
-	// Instead of marking the chunk as dirty upon chest contents change, we mark it dirty now
-	// We cannot properly detect contents change, but such a change doesn't happen without a player opening the chest first.
-	// The few false positives aren't much to worry about
-	cChunkCoords ChunkPos = cChunkDef::BlockToChunk(GetPos());
-	m_World->MarkChunkDirty(ChunkPos.m_ChunkX, ChunkPos.m_ChunkZ);
 	return true;
 }
 

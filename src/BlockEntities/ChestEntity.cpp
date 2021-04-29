@@ -230,12 +230,6 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 		}
 	}
 
-	// This is rather a hack
-	// Instead of marking the chunk as dirty upon chest contents change, we mark it dirty now
-	// We cannot properly detect contents change, but such a change doesn't happen without a player opening the chest first.
-	// The few false positives aren't much to worry about
-	auto chunkCoords = cChunkDef::BlockToChunk(m_Pos);
-	m_World->MarkChunkDirty(chunkCoords.m_ChunkX, chunkCoords.m_ChunkZ);
 	return true;
 }
 
@@ -246,11 +240,6 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 void cChestEntity::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 {
 	ASSERT(a_Grid == &m_Contents);
-
-	if (m_World == nullptr)
-	{
-		return;
-	}
 
 	// Have cBlockEntityWithItems update redstone and try to broadcast our window:
 	Super::OnSlotChanged(a_Grid, a_SlotNum);
@@ -267,9 +256,4 @@ void cChestEntity::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 	{
 		Window->BroadcastWholeWindow();
 	}
-
-	m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
-
-	// Notify comparators:
-	m_World->WakeUpSimulators(m_Pos);
 }
