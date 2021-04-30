@@ -1227,7 +1227,7 @@ void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
+			const auto Index = cChunkDef::MakeIndex(x, y, z);
 			if (BlockTypes[Index] == E_BLOCK_AIR)
 			{
 				BlockTypes[Index] = E_BLOCK_STATIONARY_LAVA;
@@ -2000,8 +2000,8 @@ void cFinishGenOreNests::GenerateOre(
 							continue;
 						}
 
-						int Index = cChunkDef::MakeIndexNoCheck(BlockX, BlockY, BlockZ);
-						auto blockType = blockTypes[Index];
+						const auto Index = cChunkDef::MakeIndex(BlockX, BlockY, BlockZ);
+						const auto blockType = blockTypes[Index];
 						if ((blockType == E_BLOCK_STONE) || (blockType == E_BLOCK_NETHERRACK))
 						{
 							blockTypes[Index] = a_OreType;

@@ -43,10 +43,7 @@ namespace HopperHandler
 
 		a_Chunk.DoWithBlockEntityAt(a_Position, [ShouldBeLocked](cBlockEntity & a_BlockEntity)
 		{
-			if (a_BlockEntity.GetBlockType() != E_BLOCK_HOPPER)
-			{
-				return false;
-			}
+			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_HOPPER);
 
 			static_cast<cHopperEntity &>(a_BlockEntity).SetLocked(ShouldBeLocked);
 			return false;

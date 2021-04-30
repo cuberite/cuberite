@@ -33,10 +33,7 @@ namespace CommandBlockHandler
 
 		a_Chunk.DoWithBlockEntityAt(a_Position, [](cBlockEntity & a_BlockEntity)
 		{
-			if (a_BlockEntity.GetBlockType() != E_BLOCK_COMMAND_BLOCK)
-			{
-				return false;
-			}
+			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_COMMAND_BLOCK);
 
 			static_cast<cCommandBlockEntity &>(a_BlockEntity).Activate();
 			return false;

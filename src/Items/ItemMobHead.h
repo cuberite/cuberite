@@ -244,10 +244,7 @@ public:
 				(BlockType == E_BLOCK_HEAD) &&
 				!a_World.DoWithBlockEntityAt({ BlockX, BlockY, BlockZ }, [&](cBlockEntity & a_BlockEntity)
 				{
-					if (a_BlockEntity.GetBlockType() != E_BLOCK_HEAD)
-					{
-						return false;
-					}
+					ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_HEAD);
 
 					return static_cast<cMobHeadEntity &>(a_BlockEntity).GetType() == SKULL_TYPE_WITHER;
 				})

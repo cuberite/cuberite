@@ -48,10 +48,7 @@ namespace DropSpenserHandler
 		{
 			a_Chunk.DoWithBlockEntityAt(a_Position, [](cBlockEntity & a_BlockEntity)
 			{
-				if ((a_BlockEntity.GetBlockType() != E_BLOCK_DISPENSER) && (a_BlockEntity.GetBlockType() != E_BLOCK_DROPPER))
-				{
-					return false;
-				}
+				ASSERT((a_BlockEntity.GetBlockType() == E_BLOCK_DISPENSER) || (a_BlockEntity.GetBlockType() == E_BLOCK_DROPPER));
 
 				static_cast<cDropSpenserEntity &>(a_BlockEntity).Activate();
 				return false;
