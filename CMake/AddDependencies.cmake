@@ -85,7 +85,7 @@ function(link_dependencies TARGET)
 
 	# Prettify jsoncpp_static name in VS solution explorer:
 	set_property(TARGET jsoncpp_static PROPERTY PROJECT_LABEL "jsoncpp")
-	if(UNIX)
+	if(${CMAKE_SYSTEM_NAME} MATCHES FreeBSD)
 		target_link_libraries(${TARGET} PRIVATE kvm)
 	endif()
 endfunction()
