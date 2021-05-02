@@ -21,9 +21,8 @@ Here are the conventions:
    - `SomeFunction()<Space><Space>//<Space>Note the two spaces prefixed to me and the space after the slashes.`
  - All variable names and function names use CamelCase style, with the exception of single letter variables.  
    - `ThisIsAProperFunction()` `This_is_bad()` `this_is_bad()` `GoodVariableName` `badVariableName`.
- - All private member variables start with `m_`, function parameters start with `a_`, class names, public member variables unprefixed.
-   - `class Monster { int m_Health; int DecreaseHealth(int a_Amount); }`
-   - `struct Damage { void * Attacker; int Damage; }`
+ - All private member variables start with `m_`, function parameters start with `a_`, class names start with `c`.
+   - `class cMonster { int m_Health; int DecreaseHealth(int a_Amount); }`
  - Put spaces after commas. `Vector3d(1, 2, 3)` instead of `Vector3d(1,2,3)`
  - Put spaces before and after every operator, except unary operators.
    - `a = b + c;`
