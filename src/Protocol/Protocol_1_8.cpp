@@ -1573,8 +1573,16 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	Byte Action;
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_ENCHANTMENT_TABLE: Action = 0;  break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
-		case E_BLOCK_END_PORTAL:        Action = 0;  break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
+		case E_BLOCK_CHEST:
+		case E_BLOCK_ENCHANTMENT_TABLE:
+		case E_BLOCK_END_PORTAL:
+		case E_BLOCK_TRAPPED_CHEST:
+		{
+			// The ones with a action of 0 is just a workaround to send the block entities to a client.
+			// Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
+			Action = 0;
+			break;
+		}
 
 		case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
 		case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
