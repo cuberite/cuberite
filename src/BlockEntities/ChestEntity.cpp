@@ -204,11 +204,11 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 
 	if (m_BlockType == E_BLOCK_CHEST)
 	{
-		a_Player->GetStatManager().AddValue(Statistic::OpenChest);
+		a_Player->GetStatistics().Custom[CustomStatistic::OpenChest]++;
 	}
 	else  // E_BLOCK_TRAPPED_CHEST
 	{
-		a_Player->GetStatManager().AddValue(Statistic::TriggerTrappedChest);
+		a_Player->GetStatistics().Custom[CustomStatistic::TriggerTrappedChest]++;
 	}
 
 	auto & PrimaryChest = GetPrimaryChest();

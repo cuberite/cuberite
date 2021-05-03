@@ -113,7 +113,7 @@ public:
 	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnEntity                (const cEntity & a_Entity) override;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
-	virtual void SendStatistics                 (const cStatManager & a_Manager) override;
+	virtual void SendStatistics                 (const StatisticsManager & a_Manager) override;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
@@ -267,7 +267,7 @@ private:
 	/** Converts a statistic to a protocol-specific string.
 	Protocols <= 1.12 use strings, hence this is a static as the string-mapping was append-only for the versions that used it.
 	Returns an empty string, handled correctly by the client, for newer, unsupported statistics. */
-	static const char * GetProtocolStatisticName(Statistic a_Statistic);
+	static const char * GetProtocolStatisticName(CustomStatistic a_Statistic);
 
 	/** Handle a complete packet stored in the given buffer. */
 	void HandlePacket(cByteBuffer & a_Buffer);

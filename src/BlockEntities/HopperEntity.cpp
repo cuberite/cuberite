@@ -113,7 +113,7 @@ void cHopperEntity::SendTo(cClientHandle & a_Client)
 
 bool cHopperEntity::UsedBy(cPlayer * a_Player)
 {
-	a_Player->GetStatManager().AddValue(Statistic::InspectHopper);
+	a_Player->GetStatistics().Custom[CustomStatistic::InspectHopper]++;
 
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();

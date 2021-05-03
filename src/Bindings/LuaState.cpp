@@ -1378,6 +1378,21 @@ bool cLuaState::GetStackValue(int a_StackPos, ContiguousByteBuffer & a_Data)
 
 
 
+bool cLuaState::GetStackValue(int a_StackPos, CustomStatistic & a_Value)
+{
+	if (lua_isnumber(m_LuaState, a_StackPos))
+	{
+		a_Value = static_cast<CustomStatistic>(static_cast<std::underlying_type_t<CustomStatistic>>(lua_tonumber(m_LuaState, a_StackPos)));
+		return true;
+	}
+
+	return true;
+}
+
+
+
+
+
 bool cLuaState::GetStackValue(int a_StackPos, double & a_ReturnedVal)
 {
 	if (lua_isnumber(m_LuaState, a_StackPos))

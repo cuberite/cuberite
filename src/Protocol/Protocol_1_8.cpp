@@ -1458,30 +1458,21 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocol_1_8_0::SendStatistics(const cStatManager & a_Manager)
+void cProtocol_1_8_0::SendStatistics(const StatisticsManager & a_Manager)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	UInt32 Size = 0;
-	a_Manager.ForEachStatisticType([&Size](const auto & Store)
-	{
-		Size += static_cast<UInt32>(Store.size());
-	});
-
-	// No need to check Size != 0
-	// Assume that the vast majority of the time there's at least one statistic to send
-
 	cPacketizer Pkt(*this, pktStatistics);
-	Pkt.WriteVarInt32(Size);
 
-	a_Manager.ForEachStatisticType([&Pkt](const cStatManager::CustomStore & Store)
+	// No need to check Size != 0.
+	// Assume that the vast majority of the time there's at least one statistic to send:
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Manager.Custom.size()));
+
+	for (const auto & [Statistic, Value] : a_Manager.Custom)
 	{
-		for (const auto & Item : Store)
-		{
-			Pkt.WriteString(GetProtocolStatisticName(Item.first));
-			Pkt.WriteVarInt32(static_cast<UInt32>(Item.second));
-		}
-	});
+		Pkt.WriteString(GetProtocolStatisticName(Statistic));
+		Pkt.WriteVarInt32(static_cast<UInt32>(Value));
+	}
 }
 
 
@@ -2401,15 +2392,13 @@ void cProtocol_1_8_0::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 		case 1:
 		{
 			// Request stats
-			const cStatManager & Manager = m_Client->GetPlayer()->GetStatManager();
-			SendStatistics(Manager);
-
+			SendStatistics(m_Client->GetPlayer()->GetStatistics());
 			break;
 		}
 		case 2:
 		{
 			// Open Inventory achievement
-			m_Client->GetPlayer()->AwardAchievement(Statistic::AchOpenInventory);
+			m_Client->GetPlayer()->AwardAchievement(CustomStatistic::AchOpenInventory);
 			break;
 		}
 	}
@@ -4042,99 +4031,99 @@ int cProtocol_1_8_0::GetProtocolParticleID(const AString & a_ParticleName)
 
 
 
-const char * cProtocol_1_8_0::GetProtocolStatisticName(Statistic a_Statistic)
+const char * cProtocol_1_8_0::GetProtocolStatisticName(const CustomStatistic a_Statistic)
 {
 	switch (a_Statistic)
 	{
 		// V1.8 Achievements
-		case Statistic::AchOpenInventory:        return "achievement.openInventory";
-		case Statistic::AchMineWood:             return "achievement.mineWood";
-		case Statistic::AchBuildWorkBench:       return "achievement.buildWorkBench";
-		case Statistic::AchBuildPickaxe:         return "achievement.buildPickaxe";
-		case Statistic::AchBuildFurnace:         return "achievement.buildFurnace";
-		case Statistic::AchAcquireIron:          return "achievement.acquireIron";
-		case Statistic::AchBuildHoe:             return "achievement.buildHoe";
-		case Statistic::AchMakeBread:            return "achievement.makeBread";
-		case Statistic::AchBakeCake:             return "achievement.bakeCake";
-		case Statistic::AchBuildBetterPickaxe:   return "achievement.buildBetterPickaxe";
-		case Statistic::AchCookFish:             return "achievement.cookFish";
-		case Statistic::AchOnARail:              return "achievement.onARail";
-		case Statistic::AchBuildSword:           return "achievement.buildSword";
-		case Statistic::AchKillEnemy:            return "achievement.killEnemy";
-		case Statistic::AchKillCow:              return "achievement.killCow";
-		case Statistic::AchFlyPig:               return "achievement.flyPig";
-		case Statistic::AchSnipeSkeleton:        return "achievement.snipeSkeleton";
-		case Statistic::AchDiamonds:             return "achievement.diamonds";
-		case Statistic::AchPortal:               return "achievement.portal";
-		case Statistic::AchGhast:                return "achievement.ghast";
-		case Statistic::AchBlazeRod:             return "achievement.blazeRod";
-		case Statistic::AchPotion:               return "achievement.potion";
-		case Statistic::AchTheEnd:               return "achievement.theEnd";
-		case Statistic::AchTheEnd2:              return "achievement.theEnd2";
-		case Statistic::AchEnchantments:         return "achievement.enchantments";
-		case Statistic::AchOverkill:             return "achievement.overkill";
-		case Statistic::AchBookcase:             return "achievement.bookcase";
-		case Statistic::AchExploreAllBiomes:     return "achievement.exploreAllBiomes";
-		case Statistic::AchSpawnWither:          return "achievement.spawnWither";
-		case Statistic::AchKillWither:           return "achievement.killWither";
-		case Statistic::AchFullBeacon:           return "achievement.fullBeacon";
-		case Statistic::AchBreedCow:             return "achievement.breedCow";
-		case Statistic::AchDiamondsToYou:        return "achievement.diamondsToYou";
+		case CustomStatistic::AchOpenInventory:        return "achievement.openInventory";
+		case CustomStatistic::AchMineWood:             return "achievement.mineWood";
+		case CustomStatistic::AchBuildWorkBench:       return "achievement.buildWorkBench";
+		case CustomStatistic::AchBuildPickaxe:         return "achievement.buildPickaxe";
+		case CustomStatistic::AchBuildFurnace:         return "achievement.buildFurnace";
+		case CustomStatistic::AchAcquireIron:          return "achievement.acquireIron";
+		case CustomStatistic::AchBuildHoe:             return "achievement.buildHoe";
+		case CustomStatistic::AchMakeBread:            return "achievement.makeBread";
+		case CustomStatistic::AchBakeCake:             return "achievement.bakeCake";
+		case CustomStatistic::AchBuildBetterPickaxe:   return "achievement.buildBetterPickaxe";
+		case CustomStatistic::AchCookFish:             return "achievement.cookFish";
+		case CustomStatistic::AchOnARail:              return "achievement.onARail";
+		case CustomStatistic::AchBuildSword:           return "achievement.buildSword";
+		case CustomStatistic::AchKillEnemy:            return "achievement.killEnemy";
+		case CustomStatistic::AchKillCow:              return "achievement.killCow";
+		case CustomStatistic::AchFlyPig:               return "achievement.flyPig";
+		case CustomStatistic::AchSnipeSkeleton:        return "achievement.snipeSkeleton";
+		case CustomStatistic::AchDiamonds:             return "achievement.diamonds";
+		case CustomStatistic::AchPortal:               return "achievement.portal";
+		case CustomStatistic::AchGhast:                return "achievement.ghast";
+		case CustomStatistic::AchBlazeRod:             return "achievement.blazeRod";
+		case CustomStatistic::AchPotion:               return "achievement.potion";
+		case CustomStatistic::AchTheEnd:               return "achievement.theEnd";
+		case CustomStatistic::AchTheEnd2:              return "achievement.theEnd2";
+		case CustomStatistic::AchEnchantments:         return "achievement.enchantments";
+		case CustomStatistic::AchOverkill:             return "achievement.overkill";
+		case CustomStatistic::AchBookcase:             return "achievement.bookcase";
+		case CustomStatistic::AchExploreAllBiomes:     return "achievement.exploreAllBiomes";
+		case CustomStatistic::AchSpawnWither:          return "achievement.spawnWither";
+		case CustomStatistic::AchKillWither:           return "achievement.killWither";
+		case CustomStatistic::AchFullBeacon:           return "achievement.fullBeacon";
+		case CustomStatistic::AchBreedCow:             return "achievement.breedCow";
+		case CustomStatistic::AchDiamondsToYou:        return "achievement.diamondsToYou";
 
 		// V1.8 stats
-		case Statistic::AnimalsBred:               return "stat.animalsBred";
-		case Statistic::BoatOneCm:                 return "stat.boatOneCm";
-		case Statistic::ClimbOneCm:                return "stat.climbOneCm";
-		case Statistic::CrouchOneCm:               return "stat.crouchOneCm";
-		case Statistic::DamageDealt:               return "stat.damageDealt";
-		case Statistic::DamageTaken:               return "stat.damageTaken";
-		case Statistic::Deaths:                    return "stat.deaths";
-		case Statistic::Drop:                      return "stat.drop";
-		case Statistic::FallOneCm:                 return "stat.fallOneCm";
-		case Statistic::FishCaught:                return "stat.fishCaught";
-		case Statistic::FlyOneCm:                  return "stat.flyOneCm";
-		case Statistic::HorseOneCm:                return "stat.horseOneCm";
-		case Statistic::Jump:                      return "stat.jump";
-		case Statistic::LeaveGame:                 return "stat.leaveGame";
-		case Statistic::MinecartOneCm:             return "stat.minecartOneCm";
-		case Statistic::MobKills:                  return "stat.mobKills";
-		case Statistic::PigOneCm:                  return "stat.pigOneCm";
-		case Statistic::PlayerKills:               return "stat.playerKills";
-		case Statistic::PlayOneMinute:             return "stat.playOneMinute";
-		case Statistic::SprintOneCm:               return "stat.sprintOneCm";
-		case Statistic::SwimOneCm:                 return "stat.swimOneCm";
-		case Statistic::TalkedToVillager:          return "stat.talkedToVillager";
-		case Statistic::TimeSinceDeath:            return "stat.timeSinceDeath";
-		case Statistic::TradedWithVillager:        return "stat.tradedWithVillager";
-		case Statistic::WalkOneCm:                 return "stat.walkOneCm";
-		case Statistic::WalkUnderWaterOneCm:       return "stat.diveOneCm";
+		case CustomStatistic::AnimalsBred:               return "stat.animalsBred";
+		case CustomStatistic::BoatOneCm:                 return "stat.boatOneCm";
+		case CustomStatistic::ClimbOneCm:                return "stat.climbOneCm";
+		case CustomStatistic::CrouchOneCm:               return "stat.crouchOneCm";
+		case CustomStatistic::DamageDealt:               return "stat.damageDealt";
+		case CustomStatistic::DamageTaken:               return "stat.damageTaken";
+		case CustomStatistic::Deaths:                    return "stat.deaths";
+		case CustomStatistic::Drop:                      return "stat.drop";
+		case CustomStatistic::FallOneCm:                 return "stat.fallOneCm";
+		case CustomStatistic::FishCaught:                return "stat.fishCaught";
+		case CustomStatistic::FlyOneCm:                  return "stat.flyOneCm";
+		case CustomStatistic::HorseOneCm:                return "stat.horseOneCm";
+		case CustomStatistic::Jump:                      return "stat.jump";
+		case CustomStatistic::LeaveGame:                 return "stat.leaveGame";
+		case CustomStatistic::MinecartOneCm:             return "stat.minecartOneCm";
+		case CustomStatistic::MobKills:                  return "stat.mobKills";
+		case CustomStatistic::PigOneCm:                  return "stat.pigOneCm";
+		case CustomStatistic::PlayerKills:               return "stat.playerKills";
+		case CustomStatistic::PlayOneMinute:             return "stat.playOneMinute";
+		case CustomStatistic::SprintOneCm:               return "stat.sprintOneCm";
+		case CustomStatistic::SwimOneCm:                 return "stat.swimOneCm";
+		case CustomStatistic::TalkedToVillager:          return "stat.talkedToVillager";
+		case CustomStatistic::TimeSinceDeath:            return "stat.timeSinceDeath";
+		case CustomStatistic::TradedWithVillager:        return "stat.tradedWithVillager";
+		case CustomStatistic::WalkOneCm:                 return "stat.walkOneCm";
+		case CustomStatistic::WalkUnderWaterOneCm:       return "stat.diveOneCm";
 
 		// V1.8.2 stats
-		case Statistic::CleanArmor:                return "stat.armorCleaned";
-		case Statistic::CleanBanner:               return "stat.bannerCleaned";
-		case Statistic::EatCakeSlice:              return "stat.cakeSlicesEaten";
-		case Statistic::EnchantItem:               return "stat.itemEnchanted";
-		case Statistic::FillCauldron:              return "stat.cauldronFilled";
-		case Statistic::InspectDispenser:          return "stat.dispenserInspected";
-		case Statistic::InspectDropper:            return "stat.dropperInspected";
-		case Statistic::InspectHopper:             return "stat.hopperInspected";
-		case Statistic::InteractWithBeacon:        return "stat.beaconInteraction";
-		case Statistic::InteractWithBrewingstand:  return "stat.brewingstandInteraction";
-		case Statistic::InteractWithCraftingTable: return "stat.craftingTableInteraction";
-		case Statistic::InteractWithFurnace:       return "stat.furnaceInteraction";
-		case Statistic::OpenChest:                 return "stat.chestOpened";
-		case Statistic::OpenEnderchest:            return "stat.enderchestOpened";
-		case Statistic::PlayNoteblock:             return "stat.noteblockPlayed";
-		case Statistic::PlayRecord:                return "stat.recordPlayed";
-		case Statistic::PotFlower:                 return "stat.flowerPotted";
-		case Statistic::TriggerTrappedChest:       return "stat.trappedChestTriggered";
-		case Statistic::TuneNoteblock:             return "stat.noteblockTuned";
-		case Statistic::UseCauldron:               return "stat.cauldronUsed";
+		case CustomStatistic::CleanArmor:                return "stat.armorCleaned";
+		case CustomStatistic::CleanBanner:               return "stat.bannerCleaned";
+		case CustomStatistic::EatCakeSlice:              return "stat.cakeSlicesEaten";
+		case CustomStatistic::EnchantItem:               return "stat.itemEnchanted";
+		case CustomStatistic::FillCauldron:              return "stat.cauldronFilled";
+		case CustomStatistic::InspectDispenser:          return "stat.dispenserInspected";
+		case CustomStatistic::InspectDropper:            return "stat.dropperInspected";
+		case CustomStatistic::InspectHopper:             return "stat.hopperInspected";
+		case CustomStatistic::InteractWithBeacon:        return "stat.beaconInteraction";
+		case CustomStatistic::InteractWithBrewingstand:  return "stat.brewingstandInteraction";
+		case CustomStatistic::InteractWithCraftingTable: return "stat.craftingTableInteraction";
+		case CustomStatistic::InteractWithFurnace:       return "stat.furnaceInteraction";
+		case CustomStatistic::OpenChest:                 return "stat.chestOpened";
+		case CustomStatistic::OpenEnderchest:            return "stat.enderchestOpened";
+		case CustomStatistic::PlayNoteblock:             return "stat.noteblockPlayed";
+		case CustomStatistic::PlayRecord:                return "stat.recordPlayed";
+		case CustomStatistic::PotFlower:                 return "stat.flowerPotted";
+		case CustomStatistic::TriggerTrappedChest:       return "stat.trappedChestTriggered";
+		case CustomStatistic::TuneNoteblock:             return "stat.noteblockTuned";
+		case CustomStatistic::UseCauldron:               return "stat.cauldronUsed";
 
 		// V1.9 stats
-		case Statistic::AviateOneCm:               return "stat.aviateOneCm";
-		case Statistic::SleepInBed:                return "stat.sleepInBed";
-		case Statistic::SneakTime:                 return "stat.sneakTime";
+		case CustomStatistic::AviateOneCm:               return "stat.aviateOneCm";
+		case CustomStatistic::SleepInBed:                return "stat.sleepInBed";
+		case CustomStatistic::SneakTime:                 return "stat.sneakTime";
 		default:                                   return "";
 	}
 }

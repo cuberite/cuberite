@@ -167,7 +167,7 @@ cPlayer::~cPlayer(void)
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), static_cast<void *>(this), GetUniqueID());
 
 	// "Times ragequit":
-	m_Stats.AddValue(Statistic::LeaveGame);
+	m_Stats.Custom[CustomStatistic::LeaveGame]++;
 
 	SaveToDisk();
 
@@ -482,7 +482,7 @@ void cPlayer::TossItems(const cItems & a_Items)
 		return;
 	}
 
-	m_Stats.AddValue(Statistic::Drop, static_cast<cStatManager::StatValue>(a_Items.Size()));
+	m_Stats.Custom[CustomStatistic::Drop] += static_cast<StatisticsManager::StatValue>(a_Items.Size());
 
 	const auto Speed = (GetLookVector() + Vector3d(0, 0.2, 0)) * 6;  // A dash of height and a dollop of speed
 	const auto Position = GetEyePosition() - Vector3d(0, 0.2, 0);  // Correct for eye-height weirdness
@@ -859,7 +859,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	{
 		Pickups.Add(cItem(E_ITEM_RED_APPLE));
 	}
-	m_Stats.AddValue(Statistic::Drop, static_cast<cStatManager::StatValue>(Pickups.Size()));
+	m_Stats.Custom[CustomStatistic::Drop] +=  static_cast<StatisticsManager::StatValue>(Pickups.Size());
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
@@ -923,8 +923,8 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		}
 	}
 
-	m_Stats.AddValue(Statistic::Deaths);
-	m_Stats.SetValue(Statistic::TimeSinceDeath, 0);
+	m_Stats.Custom[CustomStatistic::Deaths]++;
+	m_Stats.Custom[CustomStatistic::TimeSinceDeath] = 0;
 
 	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::otDeathCount, 1);
 }
@@ -939,7 +939,7 @@ void cPlayer::Killed(cEntity * a_Victim)
 
 	if (a_Victim->IsPlayer())
 	{
-		m_Stats.AddValue(Statistic::PlayerKills);
+		m_Stats.Custom[CustomStatistic::PlayerKills]++;
 
 		ScoreBoard.AddPlayerScore(GetName(), cObjective::otPlayerKillCount, 1);
 	}
@@ -947,10 +947,10 @@ void cPlayer::Killed(cEntity * a_Victim)
 	{
 		if (static_cast<cMonster *>(a_Victim)->GetMobFamily() == cMonster::mfHostile)
 		{
-			AwardAchievement(Statistic::AchKillEnemy);
+			AwardAchievement(CustomStatistic::AchKillEnemy);
 		}
 
-		m_Stats.AddValue(Statistic::MobKills);
+		m_Stats.Custom[CustomStatistic::MobKills]++;
 	}
 
 	ScoreBoard.AddPlayerScore(GetName(), cObjective::otTotalKillCount, 1);
@@ -1373,7 +1373,7 @@ void cPlayer::UpdateCapabilities()
 
 
 
-void cPlayer::AwardAchievement(const Statistic a_Ach)
+void cPlayer::AwardAchievement(const CustomStatistic a_Ach)
 {
 	// Check if the prerequisites are met:
 	if (!m_Stats.SatisfiesPrerequisite(a_Ach))
@@ -1382,7 +1382,7 @@ void cPlayer::AwardAchievement(const Statistic a_Ach)
 	}
 
 	// Increment the statistic and check if we already have it:
-	if (m_Stats.AddValue(a_Ach) != 1)
+	if (m_Stats.Custom[a_Ach]++ != 1)
 	{
 		return;
 	}
@@ -2262,12 +2262,12 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		return;
 	}
 
-	const auto Value = FloorC<cStatManager::StatValue>(a_DeltaPos.Length() * 100 + 0.5);
+	const auto Value = FloorC<StatisticsManager::StatValue>(a_DeltaPos.Length() * 100 + 0.5);
 	if (m_AttachedTo == nullptr)
 	{
 		if (IsFlying())
 		{
-			m_Stats.AddValue(Statistic::FlyOneCm, Value);
+			m_Stats.Custom[CustomStatistic::FlyOneCm] += Value;
 			// May be flying and doing any of the following:
 		}
 
@@ -2275,18 +2275,18 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		{
 			if (a_DeltaPos.y > 0.0)  // Going up
 			{
-				m_Stats.AddValue(Statistic::ClimbOneCm, FloorC<cStatManager::StatValue>(a_DeltaPos.y * 100 + 0.5));
+				m_Stats.Custom[CustomStatistic::ClimbOneCm] += FloorC<StatisticsManager::StatValue>(a_DeltaPos.y * 100 + 0.5);
 			}
 		}
 		else if (IsInWater())
 		{
 			if (m_IsHeadInWater)
 			{
-				m_Stats.AddValue(Statistic::WalkUnderWaterOneCm, Value);
+				m_Stats.Custom[CustomStatistic::WalkUnderWaterOneCm] += Value;
 			}
 			else
 			{
-				m_Stats.AddValue(Statistic::WalkOnWaterOneCm, Value);
+				m_Stats.Custom[CustomStatistic::WalkOnWaterOneCm] += Value;
 			}
 			AddFoodExhaustion(0.00015 * static_cast<double>(Value));
 		}
@@ -2294,17 +2294,17 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		{
 			if (IsCrouched())
 			{
-				m_Stats.AddValue(Statistic::CrouchOneCm, Value);
+				m_Stats.Custom[CustomStatistic::CrouchOneCm] += Value;
 				AddFoodExhaustion(0.0001 * static_cast<double>(Value));
 			}
 			if (IsSprinting())
 			{
-				m_Stats.AddValue(Statistic::SprintOneCm, Value);
+				m_Stats.Custom[CustomStatistic::SprintOneCm] += Value;
 				AddFoodExhaustion(0.001 * static_cast<double>(Value));
 			}
 			else
 			{
-				m_Stats.AddValue(Statistic::WalkOneCm, Value);
+				m_Stats.Custom[CustomStatistic::WalkOneCm] += Value;
 				AddFoodExhaustion(0.0001 * static_cast<double>(Value));
 			}
 		}
@@ -2313,13 +2313,13 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 			// If a jump just started, process food exhaustion:
 			if ((a_DeltaPos.y > 0.0) && a_PreviousIsOnGround)
 			{
-				m_Stats.AddValue(Statistic::Jump, 1);
+				m_Stats.Custom[CustomStatistic::Jump]++;
 				AddFoodExhaustion((IsSprinting() ? 0.008 : 0.002) * static_cast<double>(Value));
 			}
 			else if (a_DeltaPos.y < 0.0)
 			{
 				// Increment statistic
-				m_Stats.AddValue(Statistic::FallOneCm, static_cast<cStatManager::StatValue>(std::abs(a_DeltaPos.y) * 100 + 0.5));
+				m_Stats.Custom[CustomStatistic::FallOneCm] += static_cast<StatisticsManager::StatValue>(-a_DeltaPos.y * 100 + 0.5);
 			}
 			// TODO: good opportunity to detect illegal flight (check for falling tho)
 		}
@@ -2328,15 +2328,15 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 	{
 		switch (m_AttachedTo->GetEntityType())
 		{
-			case cEntity::etMinecart: m_Stats.AddValue(Statistic::MinecartOneCm, Value); break;
-			case cEntity::etBoat:     m_Stats.AddValue(Statistic::BoatOneCm,     Value); break;
+			case cEntity::etMinecart: m_Stats.Custom[CustomStatistic::MinecartOneCm] += Value; break;
+			case cEntity::etBoat:     m_Stats.Custom[CustomStatistic::BoatOneCm]     += Value; break;
 			case cEntity::etMonster:
 			{
 				cMonster * Monster = static_cast<cMonster *>(m_AttachedTo);
 				switch (Monster->GetMobType())
 				{
-					case mtPig:   m_Stats.AddValue(Statistic::PigOneCm,   Value); break;
-					case mtHorse: m_Stats.AddValue(Statistic::HorseOneCm, Value); break;
+					case mtPig:   m_Stats.Custom[CustomStatistic::PigOneCm]   += Value; break;
+					case mtHorse: m_Stats.Custom[CustomStatistic::HorseOneCm] += Value; break;
 					default: break;
 				}
 				break;
@@ -3004,7 +3004,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 				NotifyNearbyWolves(static_cast<cPawn*>(a_TDI.Attacker), true);
 			}
 		}
-		m_Stats.AddValue(Statistic::DamageTaken, FloorC<cStatManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5));
+		m_Stats.Custom[CustomStatistic::DamageTaken] += FloorC<StatisticsManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5);
 		return true;
 	}
 	return false;
@@ -3154,11 +3154,11 @@ void cPlayer::OnRemoveFromWorld(cWorld & a_World)
 	// Award relevant achievements:
 	if (DestinationDimension == dimEnd)
 	{
-		AwardAchievement(Statistic::AchTheEnd);
+		AwardAchievement(CustomStatistic::AchTheEnd);
 	}
 	else if (DestinationDimension == dimNether)
 	{
-		AwardAchievement(Statistic::AchPortal);
+		AwardAchievement(CustomStatistic::AchPortal);
 	}
 
 	// Set capabilities based on new world:
@@ -3218,12 +3218,16 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	m_Stats.AddValue(Statistic::PlayOneMinute);
-	m_Stats.AddValue(Statistic::TimeSinceDeath);
-
-	if (IsCrouched())
 	{
-		m_Stats.AddValue(Statistic::SneakTime);
+		const auto TicksElapsed = static_cast<StatisticsManager::StatValue>(std::chrono::duration_cast<cTickTime>(a_Dt).count());
+
+		m_Stats.Custom[CustomStatistic::PlayOneMinute] += TicksElapsed;
+		m_Stats.Custom[CustomStatistic::TimeSinceDeath] += TicksElapsed;
+
+		if (IsCrouched())
+		{
+			m_Stats.Custom[CustomStatistic::SneakTime] += TicksElapsed;
+		}
 	}
 
 	// Handle the player detach, when the player is in spectator mode

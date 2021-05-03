@@ -1361,10 +1361,10 @@ void cMonster::LoveTick(void)
 
 			m_World->DoWithPlayerByUUID(m_Feeder, [&] (cPlayer & a_Player)
 			{
-				a_Player.GetStatManager().AddValue(Statistic::AnimalsBred);
+				a_Player.GetStatistics().Custom[CustomStatistic::AnimalsBred]++;
 				if (GetMobType() == eMonsterType::mtCow)
 				{
-					a_Player.AwardAchievement(Statistic::AchBreedCow);
+					a_Player.AwardAchievement(CustomStatistic::AchBreedCow);
 				}
 				return true;
 			});

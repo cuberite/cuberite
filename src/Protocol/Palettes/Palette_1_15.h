@@ -8,6 +8,6 @@ namespace Palette_1_15
 {
 	UInt32 From(BlockState Block);
 	UInt32 From(Item ID);
-	UInt32 From(Statistic ID);
+	UInt32 From(CustomStatistic ID);
 	Item ToItem(UInt32 ID);
 }

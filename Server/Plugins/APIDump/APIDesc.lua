@@ -10245,36 +10245,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the full color code to be used for this player's messages (based on their rank). Prefix player messages with this code.",
 				},
-				GetDraggingItem =
-				{
-					Returns =
-					{
-						{
-							Type = "cItem",
-						},
-					},
-					Notes = "Returns the item the player is dragging in a UI window."
-				},
-				GetPrefix =
-				{
-					Returns =
-					{
-						{
-							Type = "string",
-						},
-					},
-					Notes = "Returns the prefix to player names for messages (based on their rank), may contain @ format codes.",
-				},
-				GetSuffix =
-				{
-					Returns =
-					{
-						{
-							Type = "string",
-						},
-					},
-					Notes = "Returns the suffix to player names for messages (based on their rank), may contain @ format codes.",
-				},
 				GetCurrentXp =
 				{
 					Returns =
@@ -10294,6 +10264,16 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the custom name of this player. If the player hasn't a custom name, it will return an empty string.",
+				},
+				GetDraggingItem =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item the player is dragging in a UI window."
 				},
 				GetEffectiveGameMode =
 				{
@@ -10489,6 +10469,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the name that is used in the playerlist.",
 				},
+				GetPrefix =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the prefix to player names for messages (based on their rank), may contain @ format codes.",
+				},
 				GetRestrictions =
 				{
 					Returns =
@@ -10518,6 +10508,26 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the player's current set of skin part flags.  This is a bitwise OR of various {{Globals#eSkinPart|eSkinPart}} constants.  Note that HasSkinPart may be easier to use in most situations.",
+				},
+				GetStatistics =
+				{
+					Returns =
+					{
+						{
+							Type = "StatisticsManager",
+						},
+					},
+					Notes = "Returns the player's statistics manager."
+				},
+				GetSuffix =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the suffix to player names for messages (based on their rank), may contain @ format codes.",
 				},
 				GetTeam =
 				{
@@ -13219,7 +13229,41 @@ end
 					Include = { "wt.*" },
 				}
 			},  -- ConstantGroups
-		},  -- cWindow
+		},
+		StatisticsManager =
+		{
+			Desc = [[
+				This class provides a store for various types of player statistics. The store will be read and sent to the client when the Statistics button is pressed.
+			]],
+			Variables =
+			{
+				Custom =
+				{
+					Type = "Map of {{CustomStatistic}} to number",
+					Notes = "Gets or sets the value of a custom statistic.",
+				},
+			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Example usage",
+					Contents = [[
+						Each store is a table, keyed by the statistic that the entry tracks, with value typically representing the number of times the event happened:
+<pre class="prettyprint lang-lua">
+function ModifyPlayerFurnaceInteractions(Player)
+	local Statistics = Player:GetStatistics()
+
+	if (Statistics.Custom[CustomStatistic.WalkOneCm] > 10) then
+		Statistics.Custom[CustomStatistic.InteractWithFurnace] = 1337
+	end
+
+	-- Next time the player presses Statistics they will see the updated value for furnace interactions.
+end
+</pre>
+					]],
+				},
+			},
+		},
 
 		BannerPattern =
 		{
@@ -13699,6 +13743,319 @@ end
 					Notes = "Smoke drifts west",
 				},
 			}
+		},
+		CustomStatistic =
+		{
+			Desc = [[
+				An enumeration of statistics of the custom type to be used with the {{StatisticsManager#Custom|Custom}} statistics store.
+			]],
+			Constants =
+			{
+				AnimalsBred =
+				{
+					Notes = "",
+				},
+				AviateOneCm =
+				{
+					Notes = "",
+				},
+				BellRing =
+				{
+					Notes = "",
+				},
+				BoatOneCm =
+				{
+					Notes = "",
+				},
+				CleanArmor =
+				{
+					Notes = "",
+				},
+				CleanBanner =
+				{
+					Notes = "",
+				},
+				CleanShulkerBox =
+				{
+					Notes = "",
+				},
+				ClimbOneCm =
+				{
+					Notes = "",
+				},
+				CrouchOneCm =
+				{
+					Notes = "",
+				},
+				DamageAbsorbed =
+				{
+					Notes = "",
+				},
+				DamageBlockedByShield =
+				{
+					Notes = "",
+				},
+				DamageDealt =
+				{
+					Notes = "",
+				},
+				DamageDealtAbsorbed =
+				{
+					Notes = "",
+				},
+				DamageDealtResisted =
+				{
+					Notes = "",
+				},
+				DamageResisted =
+				{
+					Notes = "",
+				},
+				DamageTaken =
+				{
+					Notes = "",
+				},
+				Deaths =
+				{
+					Notes = "",
+				},
+				Drop =
+				{
+					Notes = "",
+				},
+				EatCakeSlice =
+				{
+					Notes = "",
+				},
+				EnchantItem =
+				{
+					Notes = "",
+				},
+				FallOneCm =
+				{
+					Notes = "",
+				},
+				FillCauldron =
+				{
+					Notes = "",
+				},
+				FishCaught =
+				{
+					Notes = "",
+				},
+				FlyOneCm =
+				{
+					Notes = "",
+				},
+				HorseOneCm =
+				{
+					Notes = "",
+				},
+				InspectDispenser =
+				{
+					Notes = "",
+				},
+				InspectDropper =
+				{
+					Notes = "",
+				},
+				InspectHopper =
+				{
+					Notes = "",
+				},
+				InteractWithAnvil =
+				{
+					Notes = "",
+				},
+				InteractWithBeacon =
+				{
+					Notes = "",
+				},
+				InteractWithBlastFurnace =
+				{
+					Notes = "",
+				},
+				InteractWithBrewingstand =
+				{
+					Notes = "",
+				},
+				InteractWithCampfire =
+				{
+					Notes = "",
+				},
+				InteractWithCartographyTable =
+				{
+					Notes = "",
+				},
+				InteractWithCraftingTable =
+				{
+					Notes = "",
+				},
+				InteractWithFurnace =
+				{
+					Notes = "",
+				},
+				InteractWithGrindstone =
+				{
+					Notes = "",
+				},
+				InteractWithLectern =
+				{
+					Notes = "",
+				},
+				InteractWithLoom =
+				{
+					Notes = "",
+				},
+				InteractWithSmithingTable =
+				{
+					Notes = "",
+				},
+				InteractWithSmoker =
+				{
+					Notes = "",
+				},
+				InteractWithStonecutter =
+				{
+					Notes = "",
+				},
+				JunkFished =
+				{
+					Notes = "",
+				},
+				Jump =
+				{
+					Notes = "",
+				},
+				LeaveGame =
+				{
+					Notes = "",
+				},
+				MinecartOneCm =
+				{
+					Notes = "",
+				},
+				MobKills =
+				{
+					Notes = "",
+				},
+				OpenBarrel =
+				{
+					Notes = "",
+				},
+				OpenChest =
+				{
+					Notes = "",
+				},
+				OpenEnderchest =
+				{
+					Notes = "",
+				},
+				OpenShulkerBox =
+				{
+					Notes = "",
+				},
+				PigOneCm =
+				{
+					Notes = "",
+				},
+				PlayNoteblock =
+				{
+					Notes = "",
+				},
+				PlayOneMinute =
+				{
+					Notes = "",
+				},
+				PlayRecord =
+				{
+					Notes = "",
+				},
+				PlayerKills =
+				{
+					Notes = "",
+				},
+				PotFlower =
+				{
+					Notes = "",
+				},
+				RaidTrigger =
+				{
+					Notes = "",
+				},
+				RaidWin =
+				{
+					Notes = "",
+				},
+				SleepInBed =
+				{
+					Notes = "",
+				},
+				SneakTime =
+				{
+					Notes = "",
+				},
+				SprintOneCm =
+				{
+					Notes = "",
+				},
+				StriderOneCm =
+				{
+					Notes = "",
+				},
+				SwimOneCm =
+				{
+					Notes = "",
+				},
+				TalkedToVillager =
+				{
+					Notes = "",
+				},
+				TargetHit =
+				{
+					Notes = "",
+				},
+				TimeSinceDeath =
+				{
+					Notes = "",
+				},
+				TimeSinceRest =
+				{
+					Notes = "",
+				},
+				TradedWithVillager =
+				{
+					Notes = "",
+				},
+				TreasureFished =
+				{
+					Notes = "",
+				},
+				TriggerTrappedChest =
+				{
+					Notes = "",
+				},
+				TuneNoteblock =
+				{
+					Notes = "",
+				},
+				UseCauldron =
+				{
+					Notes = "",
+				},
+				WalkOnWaterOneCm =
+				{
+					Notes = "",
+				},
+				WalkOneCm =
+				{
+					Notes = "",
+				},
+				WalkUnderWaterOneCm =
+				{
+					Notes = "",
+				},
+			},
 		},
 		Globals =
 		{

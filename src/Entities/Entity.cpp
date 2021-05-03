@@ -528,7 +528,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			}
 		}
 
-		Player->GetStatManager().AddValue(Statistic::DamageDealt, FloorC<cStatManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5));
+		Player->GetStatistics().Custom[CustomStatistic::DamageDealt] += FloorC<StatisticsManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5);
 	}
 
 	m_Health -= a_TDI.FinalDamage;
