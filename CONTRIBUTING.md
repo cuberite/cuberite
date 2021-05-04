@@ -46,7 +46,7 @@ Here are the conventions:
    - `Foo(Vector3d a_Param1, const cCuboid & a_Param2)`
    - See the discussion in issue #3853
  - Use the provided wrappers for OS stuff:
-   - Threading is done by inheriting from `cIsThread`, thread synchronization through `cCriticalSection` and `cEvent`, file access and filesystem operations through the `cFile` class, high-precision timing through `cStopWatch`
+   - Threading is done by inheriting from `cIsThread`, thread synchronization through `cCriticalSection` and `cEvent`, file access and filesystem operations through the `cFile` class, high-precision timing through `cStopwatch`
  - No magic numbers, use named constants:
    - `E_ITEM_XXX`, `E_BLOCK_XXX` and `E_META_XXX` for items and blocks.
    - `cEntity::etXXX` for entity types, `cMonster::mtXXX` for mob types.

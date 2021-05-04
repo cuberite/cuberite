@@ -1,5 +1,5 @@
 
-// StatSerializer.h
+// StatisticsSerializer.h
 
 // Declares the cStatSerializer class that is used for saving stats into JSON
 
@@ -20,7 +20,7 @@ namespace Json { class Value; }
 
 
 
-namespace StatSerializer
+namespace StatisticsSerializer
 {
 	/* Try to load the player statistics. */
 	void Load(StatisticsManager & Manager, const std::string & WorldPath, std::string && FileName);

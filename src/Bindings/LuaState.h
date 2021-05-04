@@ -37,7 +37,7 @@ extern "C"
 
 #include "../Defines.h"
 #include "../FunctionRef.h"
-#include "../Registries/Statistics.h"
+#include "../Registries/CustomStatistics.h"
 #include "PluginManager.h"
 #include "LuaState_Typedefs.inc"
 

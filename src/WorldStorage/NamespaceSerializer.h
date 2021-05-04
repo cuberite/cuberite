@@ -2,7 +2,7 @@
 
 #include "Defines.h"
 #include "Mobs/MonsterTypes.h"
-#include "Registries/Statistics.h"
+#include "Registries/CustomStatistics.h"
 
 namespace NamespaceSerializer
 {

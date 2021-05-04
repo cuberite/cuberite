@@ -18,7 +18,7 @@
 #include "../FastRandom.h"
 #include "../ClientHandle.h"
 
-#include "../WorldStorage/StatSerializer.h"
+#include "../WorldStorage/StatisticsSerializer.h"
 #include "../CompositeChat.h"
 
 #include "../Blocks/BlockHandler.h"
@@ -1925,7 +1925,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName)
 	{
 		// Load the player stats.
 		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-		StatSerializer::Load(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
+		StatisticsSerializer::Load(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
 	}
 	catch (...)
 	{
@@ -2059,7 +2059,7 @@ void cPlayer::SaveToDisk()
 		// Save the player stats.
 		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
 		// TODO: save together with player.dat, not in some other place.
-		StatSerializer::Save(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
+		StatisticsSerializer::Save(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
 	}
 	catch (...)
 	{

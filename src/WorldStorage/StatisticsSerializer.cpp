@@ -1,10 +1,10 @@
 
-// StatSerializer.cpp
+// StatisticsSerializer.cpp
 
 
 #include "Globals.h"
-#include "../Statistics.h"
-#include "StatSerializer.h"
+#include "StatisticsManager.h"
+#include "StatisticsSerializer.h"
 #include "NamespaceSerializer.h"
 
 #include <json/json.h>
@@ -13,7 +13,7 @@
 
 
 
-namespace StatSerializer
+namespace StatisticsSerializer
 {
 	static auto MakeStatisticsDirectory(const std::string & WorldPath, std::string && FileName)
 	{

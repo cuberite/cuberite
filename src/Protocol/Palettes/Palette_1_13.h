@@ -2,7 +2,7 @@
 
 #include "BlockState.h"
 #include "Registries/Items.h"
-#include "Registries/Statistics.h"
+#include "Registries/CustomStatistics.h"
 
 namespace Palette_1_13
 {

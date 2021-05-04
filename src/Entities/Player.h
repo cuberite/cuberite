@@ -7,7 +7,7 @@
 #include "../World.h"
 #include "../Items/ItemHandler.h"
 
-#include "../Statistics.h"
+#include "../StatisticsManager.h"
 
 #include "../UUID.h"
 

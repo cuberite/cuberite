@@ -1,10 +1,6 @@
 
 // Statistics.h
 
-#pragma once
-
-#include "Registries/Statistics.h"
-
 /* Hello fellow developer !
 In case you are trying to add new statistics to Cuberite you need to do a few things:
 ---------------------------------------------------------------------------
@@ -19,6 +15,14 @@ it will provide you with information how to use it. you need a registries.json
 exported from the server https://wiki.vg/Data_Generators
 
 		Greetings 12xx12 */
+
+
+
+
+
+#pragma once
+
+#include "Registries/CustomStatistics.h"
 
 
 
