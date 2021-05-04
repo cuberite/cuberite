@@ -66,7 +66,7 @@ private:
 			a_ClickedBlockFace = FindSuitableFace(World, a_PlacePosition);
 			if (a_ClickedBlockFace == BLOCK_FACE_NONE)
 			{
-				// No attachable face found - don't place the torch:
+				// No attachable face found - don't place the ladder:
 				return false;
 			}
 		}

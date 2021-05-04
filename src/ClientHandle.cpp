@@ -987,15 +987,13 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		/* Check for clickthrough-blocks:
 		When the user breaks a fire block, the client send the wrong block location.
 		We must find the right block with the face direction. */
+
 		int BlockX = a_BlockX;
 		int BlockY = a_BlockY;
 		int BlockZ = a_BlockZ;
 		AddFaceDirection(BlockX, BlockY, BlockZ, a_BlockFace);
 
-		if (
-			cChunkDef::IsValidHeight(BlockY) &&
-			(m_Player->GetWorld()->GetBlock({ BlockX, BlockY, BlockZ }) == E_BLOCK_FIRE)
-		)
+		if (cChunkDef::IsValidHeight(BlockY) && cBlockInfo::IsClickedThrough(m_Player->GetWorld()->GetBlock({ BlockX, BlockY, BlockZ })))
 		{
 			a_BlockX = BlockX;
 			a_BlockY = BlockY;
