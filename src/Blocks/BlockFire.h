@@ -65,14 +65,6 @@ private:
 	}
 
 
-
-
-
-	virtual bool IsClickedThrough(void) const override
-	{
-		return true;
-	}
-
 	/** Traces along YP until it finds an obsidian block, returns Y difference or 0 if no portal, and -1 for border
 	Takes the X, Y, and Z of the base block; with an optional MaxY for portal border finding */
 	static int FindObsidianCeiling(int X, int Y, int Z, cChunkInterface & a_ChunkInterface, int MaxY = 0)
@@ -256,7 +248,7 @@ private:
 		return (FoundFrameZP && FoundFrameZM);
 	}
 
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
 	{
 		return true;
 	}

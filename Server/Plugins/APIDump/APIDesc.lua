@@ -222,6 +222,24 @@ return
 					},
 					Notes = "Returns how much light the specified block type consumes.",
 				},
+				IsClickedThrough =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified block type is ignored by the client on left and right clicks, that is, treated as if it were air.",
+				},
 				IsOneHitDig =
 				{
 					IsStatic = true,

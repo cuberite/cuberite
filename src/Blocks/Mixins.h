@@ -167,27 +167,6 @@ public:
 
 	using Super::Super;
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		const Vector3i a_BlockPos,
-		eBlockFace a_BlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
-	{
-		NIBBLETYPE BaseMeta;
-		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockPos, a_BlockFace, a_CursorPos, a_BlockType, BaseMeta))
-		{
-			return false;
-		}
-
-		a_BlockMeta = (BaseMeta & ~BitMask) | YawToMetaData(a_Player.GetYaw());
-		return true;
-	}
-
-
-
-
 
 	/** Converts the rotation value as returned by cPlayer::GetYaw() to the appropriate metadata
 	value for a block placed by a player facing that way */
@@ -241,48 +220,6 @@ public:
 
 	using Super::Super;
 
-protected:
-
-	~cPitchYawRotator() = default;
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
-	{
-		NIBBLETYPE BaseMeta;
-		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, BaseMeta))
-		{
-			return false;
-		}
-
-		a_BlockMeta = (BaseMeta & ~BitMask) |  PitchYawToMetaData(a_Player.GetYaw(), a_Player.GetPitch());
-		return true;
-	}
-
-
-
-
-
-	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) const override
-	{
-		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
-		switch (a_Meta & BitMask)
-		{
-			case Down: return Up | OtherMeta;  // Down -> Up
-			case Up: return Down | OtherMeta;  // Up -> Down
-		}
-		// Not Facing Up or Down; No change.
-		return a_Meta;
-	}
-
-
-
-
 
 	/** Converts the rotation and pitch values as returned by cPlayer::GetYaw() and cPlayer::GetPitch()
 	respectively to the appropriate metadata value for a block placed by a player facing that way */
@@ -298,5 +235,22 @@ protected:
 		}
 
 		return Super::YawToMetaData(a_Rotation);
+	}
+
+protected:
+
+	~cPitchYawRotator() = default;
+
+
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) const override
+	{
+		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
+		switch (a_Meta & BitMask)
+		{
+			case Down: return Up | OtherMeta;  // Down -> Up
+			case Up: return Down | OtherMeta;  // Up -> Down
+		}
+		// Not Facing Up or Down; No change.
+		return a_Meta;
 	}
 };

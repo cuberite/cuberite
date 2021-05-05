@@ -20,7 +20,7 @@ public:
 
 private:
 
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
 	{
 		return true;
 	}
@@ -52,14 +52,14 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_RelPos.y <= 0)
+		if (a_Position.y <= 0)
 		{
 			return false;
 		}
 
-		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(a_RelPos.addedY(-1));
+		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(a_Position.addedY(-1));
 		return IsBlockTypeOfDirt(BelowBlock);
 	}
 

@@ -715,6 +715,17 @@ bool cBlockInfo::FullyOccupiesVoxel(const BLOCKTYPE Block)
 
 
 
+bool cBlockInfo::IsClickedThrough(const BLOCKTYPE a_Block)
+{
+	// TODO: Nether Fire too.
+
+	return a_Block == E_BLOCK_FIRE;
+}
+
+
+
+
+
 bool cBlockInfo::IsOneHitDig(const BLOCKTYPE Block)
 {
 #ifdef __clang__

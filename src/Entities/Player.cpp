@@ -2391,10 +2391,9 @@ void cPlayer::LoadRank(void)
 
 
 
-bool cPlayer::PlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPlayer::PlaceBlock(const Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	sSetBlockVector blk{{a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta}};
-	return PlaceBlocks(blk);
+	return PlaceBlocks({ { a_Position, a_BlockType, a_BlockMeta } });
 }
 
 
@@ -2442,7 +2441,7 @@ void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_R
 
 
 
-bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
+bool cPlayer::DoesPlacingBlocksIntersectEntity(const std::initializer_list<sSetBlock> a_Blocks) const
 {
 	// Compute the bounding box for each block to be placed
 	std::vector<cBoundingBox> PlacementBoxes;
@@ -2516,44 +2515,52 @@ const cUUID & cPlayer::GetUUID(void) const
 
 
 
-bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
+bool cPlayer::PlaceBlocks(const std::initializer_list<sSetBlock> a_Blocks)
 {
 	if (DoesPlacingBlocksIntersectEntity(a_Blocks))
 	{
 		// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
-		for (auto blk2: a_Blocks)
+		for (const auto & ResendBlock : a_Blocks)
 		{
-			m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), *this);
+			m_World->SendBlockTo(ResendBlock.GetX(), ResendBlock.GetY(), ResendBlock.GetZ(), *this);
 		}
 		return false;
 	}
 
-	// Call the "placing" hooks; if any fail, abort:
 	cPluginManager * pm = cPluginManager::Get();
-	for (auto blk: a_Blocks)
+
+	// Check the blocks CanBeAt, and call the "placing" hooks; if any fail, abort:
+	for (const auto & Block : a_Blocks)
 	{
-		if (pm->CallHookPlayerPlacingBlock(*this, blk))
+		if (
+			!m_World->DoWithChunkAt(Block.GetAbsolutePos(), [&Block](cChunk & a_Chunk)
+			{
+				return cBlockHandler::For(Block.m_BlockType).CanBeAt(a_Chunk, Block.GetRelativePos(), Block.m_BlockMeta);
+			})
+		)
+		{
+			return false;
+		}
+
+		if (pm->CallHookPlayerPlacingBlock(*this, Block))
 		{
 			// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
-			for (auto blk2: a_Blocks)
+			for (const auto & ResendBlock : a_Blocks)
 			{
-				m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), *this);
+				m_World->SendBlockTo(ResendBlock.GetX(), ResendBlock.GetY(), ResendBlock.GetZ(), *this);
 			}
 			return false;
 		}
-	}  // for blk - a_Blocks[]
+	}
 
 	cChunkInterface ChunkInterface(m_World->GetChunkMap());
-	for (auto blk: a_Blocks)
+	for (const auto & Block : a_Blocks)
 	{
 		// Set the blocks:
-		m_World->PlaceBlock(blk.GetAbsolutePos(), blk.m_BlockType, blk.m_BlockMeta);
-
-		// Notify the blockhandlers:
-		cBlockHandler::For(blk.m_BlockType).OnPlacedByPlayer(ChunkInterface, *m_World, *this, blk);
+		m_World->PlaceBlock(Block.GetAbsolutePos(), Block.m_BlockType, Block.m_BlockMeta);
 
 		// Call the "placed" hooks:
-		pm->CallHookPlayerPlacedBlock(*this, blk);
+		pm->CallHookPlayerPlacedBlock(*this, Block);
 	}
 
 	return true;

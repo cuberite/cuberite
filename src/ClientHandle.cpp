@@ -987,15 +987,13 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		/* Check for clickthrough-blocks:
 		When the user breaks a fire block, the client send the wrong block location.
 		We must find the right block with the face direction. */
+
 		int BlockX = a_BlockX;
 		int BlockY = a_BlockY;
 		int BlockZ = a_BlockZ;
 		AddFaceDirection(BlockX, BlockY, BlockZ, a_BlockFace);
 
-		if (
-			cChunkDef::IsValidHeight(BlockY) &&
-			cBlockHandler::For(m_Player->GetWorld()->GetBlock({ BlockX, BlockY, BlockZ })).IsClickedThrough()
-		)
+		if (cChunkDef::IsValidHeight(BlockY) && cBlockInfo::IsClickedThrough(m_Player->GetWorld()->GetBlock({ BlockX, BlockY, BlockZ })))
 		{
 			a_BlockX = BlockX;
 			a_BlockY = BlockY;
@@ -1338,7 +1336,6 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	cWorld * World = m_Player->GetWorld();
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
-	bool Success = false;
 	if (
 		!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ) &&
 		IsWithinReach && !m_Player->IsFrozen()
@@ -1354,29 +1351,24 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 		if (BlockUsable && !(m_Player->IsCrouched() && !HeldItem.IsEmpty()))
 		{
-			// use a block
 			cChunkInterface ChunkInterface(World->GetChunkMap());
 			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 			{
+				// Use a block:
 				if (BlockHandler.OnUse(ChunkInterface, *World, *m_Player, ClickedBlockPos, a_BlockFace, CursorPos))
 				{
-					// block use was successful, we're done
 					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
-					Success = true;
+					return;  // Block use was successful, we're done.
 				}
 
-				// Check if the item is place able, for example a torch on a fence
-				if (!Success && Placeable)
+				// Check if the item is place able, for example a torch on a fence:
+				if (Placeable)
 				{
-					// place a block
-					Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, {a_CursorX, a_CursorY, a_CursorZ});
+					// Place a block:
+					ItemHandler->OnPlayerPlace(*m_Player, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, {a_CursorX, a_CursorY, a_CursorZ});
 				}
-			}
-			else
-			{
-				// TODO: OnCancelRightClick seems to do the same thing with updating blocks at the end of this function. Need to double check
-				// A plugin doesn't agree with the action, replace the block on the client and quit:
-				BlockHandler.OnCancelRightClick(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
+
+				return;
 			}
 		}
 		else if (Placeable)
@@ -1388,36 +1380,30 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				Kick("Too many blocks were placed / interacted with per unit time - hacked client?");
 				return;
 			}
-			// place a block
-			Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, {a_CursorX, a_CursorY, a_CursorZ});
+
+			// Place a block:
+			ItemHandler->OnPlayerPlace(*m_Player, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, {a_CursorX, a_CursorY, a_CursorZ});
+			return;
 		}
-		else
+		else if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 		{
-			// Use an item in hand with a target block
-			if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
-			{
-				// All plugins agree with using the item
-				cBlockInServerPluginInterface PluginInterface(*World);
-				ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
-				PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
-				Success = true;
-			}
+			// All plugins agree with using the item.
+			// Use an item in hand with a target block.
+
+			cBlockInServerPluginInterface PluginInterface(*World);
+			ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
+			PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			return;
 		}
 	}
-	if (!Success)
-	{
-		// Update the target block including the block above and below for 2 block high things
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		for (int y = a_BlockY - 1; y <= a_BlockY + 1; y++)
-		{
-			if (cChunkDef::IsValidHeight(y))
-			{
-				World->SendBlockTo(a_BlockX, y, a_BlockZ, *m_Player);
-			}
-		}
-		// TODO: Send corresponding slot based on hand
-		m_Player->GetInventory().SendEquippedSlot();
-	}
+
+	// TODO: delete OnItemUse bool return, delete onCancelRightClick
+
+	// Update the target block including the block above and below for 2 block high things:
+	m_Player->SendBlocksAround(a_BlockX, a_BlockY, a_BlockZ, 2);
+
+	// TODO: Send corresponding slot based on hand
+	m_Player->GetInventory().SendEquippedSlot();
 }
 
 

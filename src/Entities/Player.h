@@ -534,7 +534,7 @@ public:
 	void UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIsOnGround);
 
 	/** Whether placing the given blocks would intersect any entitiy */
-	bool DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks);
+	bool DoesPlacingBlocksIntersectEntity(std::initializer_list<sSetBlock> a_Blocks) const;
 
 	/** Returns the UUID that has been read from the client, or nil if not available. */
 	const cUUID & GetUUID(void) const;  // Exported in ManualBindings.cpp
@@ -552,7 +552,7 @@ public:
 	If the hook prevents the placement, sends the current block at the specified coords back to the client.
 	Assumes that the block is in a currently loaded chunk.
 	Returns true if the block is successfully placed. */
-	bool PlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool PlaceBlock(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	/** Sends the block in the specified range around the specified coord to the client
 	as a block change packet.
@@ -571,7 +571,7 @@ public:
 	If the any of the "placing" hooks aborts, none of the blocks are placed and the function returns false.
 	Returns true if all the blocks are placed.
 	Assumes that all the blocks are in currently loaded chunks. */
-	bool PlaceBlocks(const sSetBlockVector & a_Blocks);
+	bool PlaceBlocks(std::initializer_list<sSetBlock> a_Blocks);
 
 	/** Notify nearby wolves that the player or one of the player's wolves took damage or did damage to an entity
 	@param a_Opponent the opponent we're fighting.

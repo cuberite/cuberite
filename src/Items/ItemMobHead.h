@@ -25,38 +25,30 @@ public:
 
 
 
-	virtual bool OnPlayerPlace(
-		cWorld & a_World,
-		cPlayer & a_Player,
-		const cItem & a_EquippedItem,
-		const Vector3i a_ClickedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos
-	) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
 		// Cannot place a head at "no face" and from the bottom:
 		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_BOTTOM))
 		{
-			return true;
+			return false;
 		}
-		const auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
 
 		// If the placed head is a wither, try to spawn the wither first:
-		if (a_EquippedItem.m_ItemDamage == E_META_HEAD_WITHER)
+		if (a_HeldItem.m_ItemDamage == E_META_HEAD_WITHER)
 		{
-			if (TrySpawnWitherAround(a_World, a_Player, PlacePos))
+			if (TrySpawnWitherAround(a_Player, a_PlacePosition))
 			{
 				return true;
 			}
 			// Wither not created, proceed with regular head placement
 		}
 
-		cItem ItemCopy(a_EquippedItem);  // Make a copy in case this is the player's last head item and OnPlayerPlace removes it
-		if (!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_CursorPos))
+		if (!a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_HEAD, BlockFaceToBlockMeta(a_ClickedBlockFace)))
 		{
 			return false;
 		}
-		RegularHeadPlaced(a_World, a_Player, ItemCopy, PlacePos, a_ClickedBlockFace);
+
+		RegularHeadPlaced(a_Player, a_HeldItem, a_PlacePosition, a_ClickedBlockFace);
 		return true;
 	}
 
@@ -66,16 +58,13 @@ public:
 
 	/** Called after placing a regular head block with no mob spawning.
 	Adjusts the mob head entity based on the equipped item's data. */
-	void RegularHeadPlaced(
-		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
-		const Vector3i a_PlacePos, eBlockFace a_ClickedBlockFace
-	)
+	void RegularHeadPlaced(const cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace)
 	{
-		auto HeadType = static_cast<eMobHeadType>(a_EquippedItem.m_ItemDamage);
-		auto BlockMeta = static_cast<NIBBLETYPE>(a_ClickedBlockFace);
+		const auto HeadType = static_cast<eMobHeadType>(a_HeldItem.m_ItemDamage);
+		const auto BlockMeta = static_cast<NIBBLETYPE>(a_ClickedBlockFace);
 
 		// Use a callback to set the properties of the mob head block entity:
-		a_World.DoWithBlockEntityAt(a_PlacePos, [&](cBlockEntity & a_BlockEntity)
+		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_Player, HeadType, BlockMeta](cBlockEntity & a_BlockEntity)
 		{
 			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_HEAD);
 
@@ -99,10 +88,7 @@ public:
 
 	/** Spawns a wither if the wither skull placed at the specified coords completes wither's spawning formula.
 	Returns true if the wither was created. */
-	bool TrySpawnWitherAround(
-		cWorld & a_World, cPlayer & a_Player,
-		const Vector3i a_BlockPos
-	)
+	bool TrySpawnWitherAround(cPlayer & a_Player, const Vector3i a_BlockPos)
 	{
 		// No wither can be created at Y < 2 - not enough space for the formula:
 		if (a_BlockPos.y < 2)
@@ -119,10 +105,11 @@ public:
 			{ 0, 0,  1},
 			{ 0, 0, -1},
 		};
+
 		for (auto & RelCoord : RelCoords)
 		{
 			if (TrySpawnWitherAt(
-				a_World, a_Player,
+				*a_Player.GetWorld(), a_Player,
 				a_BlockPos,
 				RelCoord.x, RelCoord.z
 			))
@@ -177,12 +164,12 @@ public:
 		// Try to spawn the wither from each image:
 		return (
 			TrySpawnWitherFromImage(
-				a_World, a_Player, ImageWitherX, ARRAYCOUNT(ImageWitherX),
+				a_World, a_Player, ImageWitherX,
 				a_PlacedHeadPos,
 				a_OffsetX, a_OffsetZ
 			) ||
 			TrySpawnWitherFromImage(
-				a_World, a_Player, ImageWitherZ, ARRAYCOUNT(ImageWitherZ),
+				a_World, a_Player, ImageWitherZ,
 				a_PlacedHeadPos,
 				a_OffsetX, a_OffsetZ
 			)
@@ -199,35 +186,39 @@ public:
 	Offset is used to shift the image around the X and Z axis.
 	Returns true iff the wither was created successfully. */
 	bool TrySpawnWitherFromImage(
-		cWorld & a_World, cPlayer & a_Player, const sSetBlock * a_Image, size_t a_ImageCount,
+		cWorld & a_World, cPlayer & a_Player, const sSetBlock (& a_Image)[9],
 		Vector3i a_PlacedHeadPos,
 		int a_OffsetX, int a_OffsetZ
 	)
 	{
-		// Check each block individually; simultaneously build the SetBlockVector for clearing the blocks:
-		sSetBlockVector AirBlocks;
-		AirBlocks.reserve(a_ImageCount);
-		for (size_t i = 0; i < a_ImageCount; i++)
-		{
-			// Get the absolute coords of the image:
-			int BlockX = a_PlacedHeadPos.x + a_OffsetX + a_Image[i].GetX();
-			int BlockY = a_PlacedHeadPos.y + a_Image[i].GetY();
-			int BlockZ = a_PlacedHeadPos.z + a_OffsetZ + a_Image[i].GetZ();
+		std::array<Vector3i, 9> PositionsToClear;
 
-			// If the query is for the placed head, short-circuit-evaluate it:
-			if ((BlockX == a_PlacedHeadPos.x) && (BlockY == a_PlacedHeadPos.y) && (BlockZ == a_PlacedHeadPos.z))
+		// Check each block individually:
+		for (size_t i = 0; i != std::size(a_Image); i++)
+		{
+			// The absolute coords of the block in the image to check.
+			const Vector3i Block(
+				a_PlacedHeadPos.x + a_OffsetX + a_Image[i].GetX(),
+				a_PlacedHeadPos.y + a_Image[i].GetY(),
+				a_PlacedHeadPos.z + a_OffsetZ + a_Image[i].GetZ()
+			);
+
+			// If the query is for the head the player is about to place (remember, it hasn't been set into the world yet), short-circuit-evaluate it:
+			if (Block == a_PlacedHeadPos)
 			{
 				if (a_Image[i].m_BlockType != E_BLOCK_HEAD)
 				{
-					return false;  // Didn't match
+					return false;  // Didn't match.
 				}
-				continue;  // Matched, continue checking the rest of the image
+
+				PositionsToClear[i] = Block;
+				continue;  // Matched, continue checking the rest of the image.
 			}
 
 			// Query the world block:
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
-			if (!a_World.GetBlockTypeMeta({ BlockX, BlockY, BlockZ }, BlockType, BlockMeta))
+			if (!a_World.GetBlockTypeMeta(Block, BlockType, BlockMeta))
 			{
 				// Cannot query block, assume unloaded chunk, fail to spawn the wither
 				return false;
@@ -242,7 +233,7 @@ public:
 			// If it is a mob head, check it's a wither skull using the block entity:
 			if (
 				(BlockType == E_BLOCK_HEAD) &&
-				!a_World.DoWithBlockEntityAt({ BlockX, BlockY, BlockZ }, [&](cBlockEntity & a_BlockEntity)
+				!a_World.DoWithBlockEntityAt(Block, [&](cBlockEntity & a_BlockEntity)
 				{
 					ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_HEAD);
 
@@ -253,12 +244,25 @@ public:
 				return false;
 			}
 
-			// Matched, continue checking
-			AirBlocks.emplace_back(BlockX, BlockY, BlockZ, E_BLOCK_AIR, 0);
+			// Matched, continue checking:
+			PositionsToClear[i] = Block;
 		}  // for i - a_Image
 
 		// All image blocks matched, try replace the image with air blocks:
-		if (!a_Player.PlaceBlocks(AirBlocks))
+		if (
+			!a_Player.PlaceBlocks(
+			{
+				{ PositionsToClear[0], E_BLOCK_AIR, 0 },
+				{ PositionsToClear[1], E_BLOCK_AIR, 0 },
+				{ PositionsToClear[2], E_BLOCK_AIR, 0 },
+				{ PositionsToClear[3], E_BLOCK_AIR, 0 },
+				{ PositionsToClear[4], E_BLOCK_AIR, 0 },
+				{ PositionsToClear[5], E_BLOCK_AIR, 0 },
+				{ PositionsToClear[6], E_BLOCK_AIR, 0 },
+				{ PositionsToClear[7], E_BLOCK_AIR, 0 },
+				{ PositionsToClear[8], E_BLOCK_AIR, 0 },
+			})
+		)
 		{
 			return false;
 		}
@@ -321,23 +325,6 @@ public:
 
 	virtual bool IsPlaceable(void) override
 	{
-		return true;
-	}
-
-
-
-
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		a_BlockType = E_BLOCK_HEAD;
-		a_BlockMeta = BlockFaceToBlockMeta(a_ClickedBlockFace);
 		return true;
 	}
 } ;

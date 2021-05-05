@@ -18,28 +18,6 @@ public:
 
 private:
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
-	{
-		// We set meta to zero so Cuberite doesn't stop a Creative-mode player from building custom portal shapes
-		// CanBeAt doesn't do anything if meta is zero
-		// We set to zero because the client sends meta = 1 or 2 to the server (it calculates rotation itself)
-
-		a_BlockType = m_BlockType;
-		a_BlockMeta = 0;
-		return true;
-	}
-
-
-
-
-
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// No pickups
@@ -71,14 +49,14 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if ((a_RelPos.y <= 0) || (a_RelPos.y >= cChunkDef::Height - 1))
+		if ((a_Position.y <= 0) || (a_Position.y >= cChunkDef::Height - 1))
 		{
-			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1
+			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1.
 		}
 
-		switch (a_Chunk.GetMeta(a_RelPos))
+		switch (a_Meta)
 		{
 			case 0x1:
 			{
@@ -95,7 +73,7 @@ private:
 				for (const auto & Direction : PortalCheck)
 				{
 					BLOCKTYPE Block;
-					a_Chunk.UnboundedRelGetBlockType(a_RelPos + Direction, Block);
+					a_Chunk.UnboundedRelGetBlockType(a_Position + Direction, Block);
 					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
 					{
 						return false;
@@ -118,7 +96,7 @@ private:
 				for (const auto & Direction : PortalCheck)
 				{
 					BLOCKTYPE Block;
-					a_Chunk.UnboundedRelGetBlockType(a_RelPos + Direction, Block);
+					a_Chunk.UnboundedRelGetBlockType(a_Position + Direction, Block);
 					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
 					{
 						return false;
