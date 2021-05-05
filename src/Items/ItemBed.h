@@ -22,13 +22,7 @@ public:
 	}
 
 
-	virtual bool IsPlaceable(void) override
-	{
-		return true;
-	}
-
-
-	virtual bool OnPlacementCommit(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
 		const auto BlockMeta = cBlockBedHandler::YawToMetaData(a_Player.GetYaw());
 		const auto HeadPosition = a_PlacePosition + cBlockBedHandler::MetaDataToDirection(BlockMeta);
@@ -67,6 +61,12 @@ public:
 		World.DoWithBlockEntityAt(a_PlacePosition, SetColor);
 		World.DoWithBlockEntityAt(HeadPosition, SetColor);
 
+		return true;
+	}
+
+
+	virtual bool IsPlaceable(void) override
+	{
 		return true;
 	}
 };

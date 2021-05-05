@@ -26,6 +26,34 @@ public:
 
 private:
 
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	{
+		// Cannot place a banner at "no face" and from the bottom:
+		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_BOTTOM))
+		{
+			return false;
+		}
+
+		if (!TryPlaceBanner(a_Player, a_PlacePosition, a_ClickedBlockFace))
+		{
+			return false;
+		}
+
+		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_HeldItem](cBlockEntity & a_BlockEntity)
+		{
+			ASSERT((a_BlockEntity.GetBlockType() == E_BLOCK_STANDING_BANNER) || (a_BlockEntity.GetBlockType() == E_BLOCK_WALL_BANNER));
+
+			static_cast<cBannerEntity &>(a_BlockEntity).SetBaseColor(static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage));
+			return false;
+		});
+
+		return true;
+	}
+
+
+
+
+
 	virtual bool IsPlaceable(void) override
 	{
 		return true;
@@ -149,33 +177,5 @@ private:
 		}
 
 		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_WALL_BANNER, Meta);
-	}
-
-
-
-
-
-	virtual bool OnPlacementCommit(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
-	{
-		// Cannot place a banner at "no face" and from the bottom:
-		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_BOTTOM))
-		{
-			return false;
-		}
-
-		if (!TryPlaceBanner(a_Player, a_PlacePosition, a_ClickedBlockFace))
-		{
-			return false;
-		}
-
-		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_HeldItem](cBlockEntity & a_BlockEntity)
-		{
-			ASSERT((a_BlockEntity.GetBlockType() == E_BLOCK_STANDING_BANNER) || (a_BlockEntity.GetBlockType() == E_BLOCK_WALL_BANNER));
-
-			static_cast<cBannerEntity &>(a_BlockEntity).SetBaseColor(static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage));
-			return false;
-		});
-
-		return true;
 	}
 };

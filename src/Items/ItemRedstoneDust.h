@@ -23,18 +23,18 @@ public:
 
 
 
-	virtual bool IsPlaceable(void) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
-		return true;
+		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_REDSTONE_WIRE, 0);
 	}
 
 
 
 
 
-	virtual bool OnPlacementCommit(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	virtual bool IsPlaceable(void) override
 	{
-		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_REDSTONE_WIRE, 0);
+		return true;
 	}
 } ;
 

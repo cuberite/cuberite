@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "ItemHandler.h"
@@ -34,27 +35,7 @@ private:
 	}
 
 
-	/** Returns a suitable neighbor's blockface to place the ladder at the specified position.
-	Returns BLOCK_FACE_NONE on failure. */
-	static eBlockFace FindSuitableFace(const cWorld & a_World, const Vector3i a_Position)
-	{
-		for (const auto Face : { BLOCK_FACE_ZM, BLOCK_FACE_XP, BLOCK_FACE_ZP, BLOCK_FACE_XM })  // Loop through all faces in specific order.
-		{
-			// The direction of Face is relative to the direction the ladder faces.
-			// This is the position, computed inverted, that such a ladder would attach to.
-			const auto NeighborPosition = AddFaceDirection(a_Position, Face, true);
-
-			if (cBlockLadderHandler::CanBePlacedOn(a_World.GetBlock(NeighborPosition), Face))
-			{
-				return Face;
-			}
-		}
-
-		return BLOCK_FACE_NONE;
-	}
-
-
-	virtual bool OnPlacementCommit(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
 		const auto & World = *a_Player.GetWorld();
 		const auto ClickedBlockType = World.GetBlock(AddFaceDirection(a_PlacePosition, a_ClickedBlockFace, true));
@@ -72,5 +53,25 @@ private:
 		}
 
 		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_LADDER, BlockFaceToMetaData(a_ClickedBlockFace));
+	}
+
+
+	/** Returns a suitable neighbor's blockface to place the ladder at the specified position.
+	Returns BLOCK_FACE_NONE on failure. */
+	static eBlockFace FindSuitableFace(const cWorld & a_World, const Vector3i a_Position)
+	{
+		for (const auto Face : { BLOCK_FACE_ZM, BLOCK_FACE_XP, BLOCK_FACE_ZP, BLOCK_FACE_XM })  // Loop through all faces in specific order.
+		{
+			// The direction of Face is relative to the direction the ladder faces.
+			// This is the position, computed inverted, that such a ladder would attach to.
+			const auto NeighborPosition = AddFaceDirection(a_Position, Face, true);
+
+			if (cBlockLadderHandler::CanBePlacedOn(a_World.GetBlock(NeighborPosition), Face))
+			{
+				return Face;
+			}
+		}
+
+		return BLOCK_FACE_NONE;
 	}
 };

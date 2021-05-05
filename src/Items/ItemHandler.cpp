@@ -450,22 +450,6 @@ cItemHandler::cItemHandler(int a_ItemType)
 
 
 
-bool cItemHandler::OnPlacementCommit(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition)
-{
-	ASSERT(m_ItemType < 256);  // Items with IDs above 255 should all be handled by specific handlers.
-
-	// By default, all blocks can be placed and the meta is copied over from the item's damage value:
-	return a_Player.PlaceBlock(
-		a_PlacePosition,
-		static_cast<BLOCKTYPE>(m_ItemType),
-		static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage & 0x0f)
-	);
-}
-
-
-
-
-
 void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_ClickedBlockPosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition)
 {
 	if (a_ClickedBlockFace == BLOCK_FACE_NONE)
@@ -489,7 +473,7 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 	if (cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(World, a_HeldItem, a_ClickedBlockPosition, ClickedBlockMeta, a_ClickedBlockFace, true))
 	{
 		// Try to place the block at the clicked position:
-		if (!OnPlacementCommit(a_Player, a_HeldItem, a_ClickedBlockPosition, a_ClickedBlockFace, a_CursorPosition))
+		if (!CommitPlacement(a_Player, a_HeldItem, a_ClickedBlockPosition, a_ClickedBlockFace, a_CursorPosition))
 		{
 			// The placement failed, the blocks have already been re-sent, re-send inventory:
 			a_Player.GetInventory().SendEquippedSlot();
@@ -520,7 +504,7 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 		}
 
 		// Try to place the block:
-		if (!OnPlacementCommit(a_Player, a_HeldItem, PlacedPosition, a_ClickedBlockFace, a_CursorPosition))
+		if (!CommitPlacement(a_Player, a_HeldItem, PlacedPosition, a_ClickedBlockFace, a_CursorPosition))
 		{
 			// The placement failed, the blocks have already been re-sent, re-send inventory:
 			a_Player.GetInventory().SendEquippedSlot();
@@ -922,4 +906,20 @@ cItemHandler::FoodInfo cItemHandler::GetFoodInfo(const cItem * a_Item)
 float cItemHandler::GetBlockBreakingStrength(BLOCKTYPE a_Block)
 {
 	return 1.0f;
+}
+
+
+
+
+
+bool cItemHandler::CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition)
+{
+	ASSERT(m_ItemType < 256);  // Items with IDs above 255 should all be handled by specific handlers.
+
+	// By default, all blocks can be placed and the meta is copied over from the item's damage value:
+	return a_Player.PlaceBlock(
+		a_PlacePosition,
+		static_cast<BLOCKTYPE>(m_ItemType),
+		static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage & 0x0f)
+	);
 }

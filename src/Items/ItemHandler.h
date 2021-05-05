@@ -37,14 +37,6 @@ public:
 	/** Force virtual destructor */
 	virtual ~cItemHandler() {}
 
-
-	/** Called by OnPlayerPlace to perform the actual placement of this placeable item.
-	The descendant handler should call a_Player.PlaceBlock(s) supplying correct values for the newly placed block.
-	The default handler uses the stored block type and meta copied from the lowest 4 bits of the player's equipped item's damage value.
-	Handlers return what a_Player.PlaceBlock(s) returns, indicating whether the placement was successful. */
-	virtual bool OnPlacementCommit(cPlayer & a_Player, const cItem & a_HeldItem, Vector3i a_PlacePosition, eBlockFace a_ClickedBlockFace, Vector3i a_CursorPosition);
-
-
 	/** Called when the player tries to place the item (right mouse button, IsPlaceable() == true).
 	a_ClickedBlockPos is the (neighbor) block that has been clicked to place this item.
 	a_ClickedBlockFace is the face of the neighbor that has been clicked to place this item.
@@ -53,7 +45,6 @@ public:
 	Override if the item needs advanced processing, such as spawning a mob based on the blocks being placed.
 	If the block placement is refused inside this call, it will automatically revert the client-side changes. */
 	void OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, Vector3i a_ClickedBlockPosition, eBlockFace a_ClickedBlockFace, Vector3i a_CursorPosition);
-
 
 	/** Called when the player tries to use the item (right mouse button).
 	Descendants can return false to abort the usage (default behavior). */
@@ -65,7 +56,6 @@ public:
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
 	);
-
 
 	/** Called when the client sends the SHOOT status in the lclk packet (releasing the bow). */
 	virtual void OnItemShoot(cPlayer *, const Vector3i a_BlockPos, eBlockFace a_BlockFace)
@@ -150,8 +140,15 @@ public:
 	static void Deinit();
 
 protected:
+
 	int m_ItemType;
 	static cItemHandler * CreateItemHandler(int m_ItemType);
+
+	/** Performs the actual placement of this placeable item.
+	The descendant handler should call a_Player.PlaceBlock(s) supplying correct values for the newly placed block.
+	The default handler uses the stored block type and meta copied from the lowest 4 bits of the player's equipped item's damage value.
+	Handlers return what a_Player.PlaceBlock(s) returns, indicating whether the placement was successful. */
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, Vector3i a_PlacePosition, eBlockFace a_ClickedBlockFace, Vector3i a_CursorPosition);
 
 	static cItemHandler * m_ItemHandler[E_ITEM_LAST + 1];
 	static bool m_HandlerInitialized;  // used to detect if the itemhandlers are initialized

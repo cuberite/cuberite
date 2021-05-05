@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "ItemHandler.h"
@@ -33,6 +34,29 @@ private:
 	}
 
 
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	{
+		const auto & World = *a_Player.GetWorld();
+		BLOCKTYPE ClickedBlockType;
+		NIBBLETYPE ClickedBlockMeta;
+		World.GetBlockTypeMeta(AddFaceDirection(a_PlacePosition, a_ClickedBlockFace, true), ClickedBlockType, ClickedBlockMeta);
+
+		// Try finding a suitable neighbor block face for the torch; start with the given one:
+		if (!cBlockTorchHandler::CanBePlacedOn(ClickedBlockType, ClickedBlockMeta, a_ClickedBlockFace))
+		{
+			// Couldn't be placed on whatever face was clicked, last ditch resort - find another face:
+			a_ClickedBlockFace = FindSuitableFace(World, a_PlacePosition);
+			if (a_ClickedBlockFace == BLOCK_FACE_NONE)
+			{
+				// No attachable face found - don't place the torch:
+				return false;
+			}
+		}
+
+		return a_Player.PlaceBlock(a_PlacePosition, static_cast<BLOCKTYPE>(a_HeldItem.m_ItemType), BlockFaceToMetaData(a_ClickedBlockFace));
+	}
+
+
 	/** Returns a suitable neighbor's blockface to place the torch at the specified position.
 	Returns BLOCK_FACE_NONE on failure. */
 	static eBlockFace FindSuitableFace(const cWorld & a_World, const Vector3i a_Position)
@@ -54,27 +78,5 @@ private:
 		}
 
 		return BLOCK_FACE_NONE;
-	}
-
-	virtual bool OnPlacementCommit(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
-	{
-		const auto & World = *a_Player.GetWorld();
-		BLOCKTYPE ClickedBlockType;
-		NIBBLETYPE ClickedBlockMeta;
-		World.GetBlockTypeMeta(AddFaceDirection(a_PlacePosition, a_ClickedBlockFace, true), ClickedBlockType, ClickedBlockMeta);
-
-		// Try finding a suitable neighbor block face for the torch; start with the given one:
-		if (!cBlockTorchHandler::CanBePlacedOn(ClickedBlockType, ClickedBlockMeta, a_ClickedBlockFace))
-		{
-			// Couldn't be placed on whatever face was clicked, last ditch resort - find another face:
-			a_ClickedBlockFace = FindSuitableFace(World, a_PlacePosition);
-			if (a_ClickedBlockFace == BLOCK_FACE_NONE)
-			{
-				// No attachable face found - don't place the torch:
-				return false;
-			}
-		}
-
-		return a_Player.PlaceBlock(a_PlacePosition, static_cast<BLOCKTYPE>(a_HeldItem.m_ItemType), BlockFaceToMetaData(a_ClickedBlockFace));
 	}
 };
