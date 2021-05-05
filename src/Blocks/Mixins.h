@@ -10,7 +10,6 @@ class cBlockLadder: public cMetaRotator<cClearMetaOnDrop, ...>
 #pragma once
 
 #include "../Item.h"
-#include "../Entities/Player.h"
 
 
 
@@ -169,7 +168,7 @@ public:
 
 
 	/** Converts the rotation value as returned by cPlayer::GetYaw() to the appropriate metadata
-	value for a block placed by a player facing that way */
+	value for a block placed by a player facing that way. */
 	static NIBBLETYPE YawToMetaData(double a_Rotation)
 	{
 		if ((a_Rotation >= -135) && (a_Rotation < -45))
@@ -199,8 +198,8 @@ protected:
 
 
 
-/** Mixin for blocks whose meta on placement depends on the pitch and yaw of the player placing the block. BitMask
-selects the direction bits from the block's meta values. */
+/** Mixin for blocks whose meta on placement depends on the relative position of the player to the block in
+addition to the yaw of the player placing the block. BitMask selects the direction bits from the block's meta values. */
 template <
 	class Base,
 	NIBBLETYPE BitMask = 0x07,
@@ -211,7 +210,7 @@ template <
 	NIBBLETYPE Up = 0x00,
 	NIBBLETYPE Down = 0x01
 >
-class cPitchYawRotator:
+class cDisplacementYawRotator:
 	public cYawRotator<Base, BitMask, North, East, South, West>
 {
 	using Super = cYawRotator<Base, BitMask, North, East, South, West>;
@@ -221,17 +220,24 @@ public:
 	using Super::Super;
 
 
-	/** Converts the rotation and pitch values as returned by cPlayer::GetYaw() and cPlayer::GetPitch()
-	respectively to the appropriate metadata value for a block placed by a player facing that way */
-	static NIBBLETYPE PitchYawToMetaData(double a_Rotation, double a_Pitch)
+	/** Converts the placement position, eye position as returned by cPlayer::GetEyePosition(), and
+	rotation value as returned by cPlayer::GetYaw() to the appropriate metadata value for a block placed by a player facing that way. */
+	static NIBBLETYPE DisplacementYawToMetaData(const Vector3d a_PlacePosition, const Vector3d a_EyePosition, const double a_Rotation)
 	{
-		if (a_Pitch >= 50)
+		if (
+			const auto Displacement = a_EyePosition - a_PlacePosition.addedXZ(0.5, 0.5);
+			(std::abs(Displacement.x) < 2) && (std::abs(Displacement.z) < 2)
+		)
 		{
-			return Up;
-		}
-		else if (a_Pitch <= -50)
-		{
-			return Down;
+			if (Displacement.y > 2)
+			{
+				return Up;
+			}
+
+			if (Displacement.y < 0)
+			{
+				return Down;
+			}
 		}
 
 		return Super::YawToMetaData(a_Rotation);
@@ -239,7 +245,7 @@ public:
 
 protected:
 
-	~cPitchYawRotator() = default;
+	~cDisplacementYawRotator() = default;
 
 
 	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) const override
