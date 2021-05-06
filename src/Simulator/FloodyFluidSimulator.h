@@ -48,7 +48,7 @@ protected:
 
 	/** Spread fluid to XZ neighbors.
 	The coords are of the block currently being processed; a_NewMeta is the new meta for the new fluid block.
-	Descendants may overridde to provide more sophisticated algorithms. */
+	Descendants may override to provide more sophisticated algorithms. */
 	virtual void SpreadXZ(cChunk * a_Chunk, Vector3i a_RelPos, unsigned char a_Falloff);
 } ;
 

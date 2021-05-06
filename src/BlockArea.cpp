@@ -114,7 +114,7 @@ static inline void MergeCombinatorImprint(BlockState & a_DstBlock, BlockState a_
 static inline void MergeCombinatorLake(BlockState & a_DstBlock, BlockState a_SrcBlock)
 {
 	// Sponge is the NOP block
-	if (a_SrcBlock == BlockType::Sponge)
+	if (a_SrcBlock.Type() == BlockType::Sponge)
 	{
 		return;
 	}

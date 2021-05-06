@@ -568,7 +568,7 @@ void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBlockFace
 			case BLOCK_FACE_XM: a_BlockX--; break;
 			case BLOCK_FACE_NONE:
 			{
-				LOGWARNING("%s: Unknown face: %d", __FUNCTION__, a_BlockFace);
+				LOGWARNING("%s: Unknown face: %s", __FUNCTION__, BlockFaceToString(a_BlockFace));
 				ASSERT(!"AddFaceDirection(): Unknown face");
 				break;
 			}

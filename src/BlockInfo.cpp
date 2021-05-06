@@ -45,30 +45,13 @@ bool IsBlockLiquid(BlockState a_Block)
 
 
 
-bool IsBlockTypeOfDirt(BlockState a_Block)
+bool IsBlockStateOfDirt(BlockState a_Block)
 {
 	switch (a_Block.Type())
 	{
 		case BlockType::CoarseDirt:
 		case BlockType::Dirt:
 		case BlockType::Farmland:
-		case BlockType::GrassBlock:
-		case BlockType::GrassPath:
-			return true;
-		default: return false;
-	}
-}
-
-
-
-
-
-bool IsBlockStateOfDirt(BlockState a_Block)
-{
-	switch (a_Block.Type())
-	{
-		case BlockType::Dirt:
-		case BlockType::CoarseDirt:
 		case BlockType::GrassBlock:
 		case BlockType::GrassPath:
 			return true;
@@ -479,40 +462,6 @@ bool IsBlockMaterialRock(BlockState a_Block)
 		case BlockType::RedNetherBricks:
 		case BlockType::BoneBlock:
 		case BlockType::Observer:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
-bool IsBed(BlockType a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case BlockType::BlackBed:
-		case BlockType::BlueBed:
-		case BlockType::BrownBed:
-		case BlockType::CyanBed:
-		case BlockType::GrayBed:
-		case BlockType::GreenBed:
-		case BlockType::LightBlueBed:
-		case BlockType::LightGrayBed:
-		case BlockType::LimeBed:
-		case BlockType::MagentaBed:
-		case BlockType::OrangeBed:
-		case BlockType::PinkBed:
-		case BlockType::PurpleBed:
-		case BlockType::RedBed:
-		case BlockType::WhiteBed:
-		case BlockType::YellowBed:
 		{
 			return true;
 		}
