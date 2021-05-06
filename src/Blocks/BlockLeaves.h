@@ -295,7 +295,7 @@ private:
 		}
 		// Filter the blocks into a {leaves, log, other (air)} set:
 		auto Types = Area.GetBlocks();
-		for (size_t I = 0; I < ARRAYCOUNT(Types); I++)
+		for (size_t I = 0; I < Area.GetBlockCount(); I++)
 		{
 			switch (Types[I].Type())
 			{
@@ -323,12 +323,14 @@ private:
 			}
 		}  // for i - Types[]
 
+		constexpr int OffsetValue = 10000;
+
 		// Perform a breadth-first search to see if there's a log connected within 6 blocks of the leaves block:
 		// Simply replace all reachable leaves blocks with a sponge block plus iteration (in the Area) and see if we can reach a log
-		Area.SetBlock(a_BlockPos, 0);
+		Area.SetBlock(a_BlockPos, OffsetValue);
 		for (unsigned char i = 0; i < LEAVES_CHECK_DISTANCE; i++)
 		{
-			auto ProcessNeighbor = [&Area, i](int X, int Y, int Z) -> bool
+			auto ProcessNeighbor = [&Area, i, OffsetValue](int X, int Y, int Z) -> bool
 			{
 				switch (Area.GetBlock({X, Y, Z}).Type())
 				{
@@ -338,7 +340,7 @@ private:
 					case BlockType::JungleLeaves:
 					case BlockType::OakLeaves:
 					case BlockType::SpruceLeaves:
-						Area.SetBlock({X, Y, Z}, BlockState(i + 1)); break;
+						Area.SetBlock({X, Y, Z}, BlockState(OffsetValue + i + 1)); break;
 					case BlockType::AcaciaLog:
 					case BlockType::BirchLog:
 					case BlockType::DarkOakLog:
@@ -356,7 +358,7 @@ private:
 				{
 					for (int x = a_BlockPos.x - i; x <= a_BlockPos.x + i; x++)
 					{
-						if (Area.GetBlock({x, y, z}).ID != i)
+						if (Area.GetBlock({x, y, z}).ID != OffsetValue + i)
 						{
 							continue;
 						}

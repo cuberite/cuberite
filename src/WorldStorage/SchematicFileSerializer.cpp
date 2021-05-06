@@ -149,7 +149,7 @@ void cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, co
 	auto BlockTypes = a_NBT.GetData(TBlockTypes);
 	auto BlockMetas = a_NBT.GetData(TBlockMetas);
 
-	std::unique_ptr<BlockState[]> Blocks;
+	auto Blocks = std::make_unique<BlockState[]>(NumBytes);
 
 	for (size_t I = 0; I < NumBytes; I ++)
 	{
