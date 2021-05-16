@@ -3581,6 +3581,46 @@ static int tolua_cServer_RegisterForgeMod(lua_State * a_LuaState)
 	return 0;
 }
 
+static int tolua_cServer_ScheduleTask(lua_State * a_LuaState)
+{
+	// Function signature:
+	// Server:ScheduleTask(NumTicks, Callback)
+
+	// Retrieve the args:
+	cLuaState L(a_LuaState);
+	if (!L.CheckParamUserType(1, "cServer") || !L.CheckParamNumber(2) ||
+		!L.CheckParamFunction(3))
+	{
+		return 0;
+	}
+	cServer * Server;
+	int NumTicks;
+	auto Task = std::make_shared<cLuaState::cCallback>();
+	if (!L.GetStackValues(1, Server, NumTicks, Task))
+	{
+		return cManualBindings::lua_do_error(
+			a_LuaState,
+			"Error in function call '#funcname#': Cannot read parameters");
+	}
+	if (Server == nullptr)
+	{
+		return cManualBindings::lua_do_error(
+			a_LuaState, "Error in function call '#funcname#': Not called on an "
+					 "object instance");
+	}
+	if (!Task->IsValid())
+	{
+		return cManualBindings::lua_do_error(
+			a_LuaState, "Error in function call '#funcname#': Could not store the "
+					 "callback parameter");
+	}
+
+	Server->ScheduleTask(cTickTime(NumTicks), [Task](cServer & a_Server) {
+		Task->Call(&a_Server);
+	});
+	return 0;
+}
+
 
 
 
@@ -4625,6 +4665,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 
 		tolua_beginmodule(tolua_S, "cServer");
 			tolua_function(tolua_S, "RegisterForgeMod",            tolua_cServer_RegisterForgeMod);
+			tolua_function(tolua_S, "ScheduleTask", tolua_cServer_ScheduleTask);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cStringCompression");
