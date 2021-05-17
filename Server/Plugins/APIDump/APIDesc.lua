@@ -12307,6 +12307,21 @@ end
 					},
 					Notes = "Add a Forge mod name/version to the server ping list.",
 				},
+				ScheduleTask =
+				{
+					Params =
+					{
+						{
+							Name = "DelayTicks",
+							Type = "number",
+						},
+						{
+							Name = "TaskFunction",
+							Type = "function",
+						},
+					},
+					Notes = "Queues the specified function to be executed in the server's tick thread after a the specified number of ticks. This enables operations to be queued for execution in the future. The function signature is <pre class=\"pretty-print lang-lua\">function({{cServer|Server}})</pre>All return values from the function are ignored. Note that it is unsafe to store references to Cuberite objects, such as entities, across from the caller to the task handler function; store the EntityID instead.",
+				},
 				SetMaxPlayers =
 				{
 					Params =

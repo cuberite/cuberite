@@ -3581,6 +3581,10 @@ static int tolua_cServer_RegisterForgeMod(lua_State * a_LuaState)
 	return 0;
 }
 
+
+
+
+
 static int tolua_cServer_ScheduleTask(lua_State * a_LuaState)
 {
 	// Function signature:
@@ -3588,8 +3592,11 @@ static int tolua_cServer_ScheduleTask(lua_State * a_LuaState)
 
 	// Retrieve the args:
 	cLuaState L(a_LuaState);
-	if (!L.CheckParamUserType(1, "cServer") || !L.CheckParamNumber(2) ||
-		!L.CheckParamFunction(3))
+	if (
+		!L.CheckParamUserType(1, "cServer") ||
+		!L.CheckParamNumber(2) ||
+		!L.CheckParamFunction(3)
+	)
 	{
 		return 0;
 	}
@@ -3598,24 +3605,19 @@ static int tolua_cServer_ScheduleTask(lua_State * a_LuaState)
 	auto Task = std::make_shared<cLuaState::cCallback>();
 	if (!L.GetStackValues(1, Server, NumTicks, Task))
 	{
-		return cManualBindings::lua_do_error(
-			a_LuaState,
-			"Error in function call '#funcname#': Cannot read parameters");
+		return cManualBindings::lua_do_error(a_LuaState, "Error in function call '#funcname#': Cannot read parameters");
 	}
 	if (Server == nullptr)
 	{
-		return cManualBindings::lua_do_error(
-			a_LuaState, "Error in function call '#funcname#': Not called on an "
-					 "object instance");
+		return cManualBindings::lua_do_error(a_LuaState, "Error in function call '#funcname#': Not called on an object instance");
 	}
 	if (!Task->IsValid())
 	{
-		return cManualBindings::lua_do_error(
-			a_LuaState, "Error in function call '#funcname#': Could not store the "
-					 "callback parameter");
+		return cManualBindings::lua_do_error(a_LuaState, "Error in function call '#funcname#': Could not store the callback parameter");
 	}
 
-	Server->ScheduleTask(cTickTime(NumTicks), [Task](cServer & a_Server) {
+	Server->ScheduleTask(cTickTime(NumTicks), [Task](cServer & a_Server)
+	{
 		Task->Call(&a_Server);
 	});
 	return 0;

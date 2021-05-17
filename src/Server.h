@@ -105,8 +105,7 @@ public:
 	The command's output will be written to the a_Output callback. */
 	void QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
 
-	/** Queues a lambda task onto the server tick thread, with the specified
-	 * delay in ticks. */
+	/** Queues a lambda task onto the server tick thread, with the specified delay in ticks. */
 	void ScheduleTask(cTickTime a_DelayTicks, std::function<void(class cServer &)> a_Task);
 
 	/** Lists all available console commands and their helpstrings */
@@ -257,7 +256,7 @@ private:
 	cCriticalSection m_CSTasks;
 
 	/** Tasks that have been queued onto the tick thread, possibly to be
-	 * executed at target tick in the future; guarded by m_CSTasks */
+	executed at target tick in the future; guarded by m_CSTasks */
 	std::vector<std::pair<std::chrono::milliseconds, std::function<void(class cServer &)>>> m_Tasks;
 
 

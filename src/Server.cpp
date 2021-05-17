@@ -435,12 +435,19 @@ bool cServer::Command(cClientHandle & a_Client, AString & a_Cmd)
 }
 
 
+
+
+
 void cServer::QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
 {
 	// Put the command into a queue (Alleviates FS #363):
 	cCSLock Lock(m_CSPendingCommands);
 	m_PendingCommands.emplace_back(a_Cmd, &a_Output);
 }
+
+
+
+
 
 void cServer::ScheduleTask(cTickTime a_DelayTicks, std::function<void(cServer &)> a_Task)
 {
@@ -451,6 +458,10 @@ void cServer::ScheduleTask(cTickTime a_DelayTicks, std::function<void(cServer &)
 		m_Tasks.emplace_back(TargetTick, std::move(a_Task));
 	}
 }
+
+
+
+
 
 void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
 {
@@ -736,6 +747,10 @@ void cServer::TickCommands(void)
 	}
 }
 
+
+
+
+
 void cServer::TickQueuedTasks(void)
 {
 	// Move the tasks to be executed to a seperate vector to avoid deadlocks on
@@ -752,7 +767,8 @@ void cServer::TickQueuedTasks(void)
 		// of list if time reached
 		auto MoveBeginIterator = std::partition(
 			m_Tasks.begin(), m_Tasks.end(),
-			[this](const decltype(m_Tasks)::value_type & a_Task) {
+			[this](const decltype(m_Tasks)::value_type & a_Task)
+			{
 				return a_Task.first >= m_UpTime;
 			});
 
