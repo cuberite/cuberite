@@ -9,7 +9,7 @@
 
 
 cZombiePigman::cZombiePigman(void) :
-	Super("ZombiePigman", mtZombiePigman, "entity.zombie_pig.hurt", "entity.zombie_pig.death", "entity.zombie_pig.ambient", 0.6, 1.8)
+	Super("ZombiePigman", mtZombiePigman, "entity.zombie_pig.hurt", "entity.zombie_pig.death", "entity.zombie_pig.ambient", 0.6f, 1.95f)
 {
 }
 

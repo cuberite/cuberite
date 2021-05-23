@@ -18,7 +18,7 @@
 #include "../FastRandom.h"
 #include "../ClientHandle.h"
 
-#include "../WorldStorage/StatSerializer.h"
+#include "../WorldStorage/StatisticsSerializer.h"
 #include "../CompositeChat.h"
 
 #include "../Blocks/BlockHandler.h"
@@ -34,8 +34,9 @@
 
 #include "../CraftingRecipes.h"
 
-// 6000 ticks or 5 minutes
-#define PLAYER_INVENTORY_SAVE_INTERVAL 6000
+
+
+
 
 namespace
 {
@@ -62,8 +63,15 @@ const int cPlayer::MAX_HEALTH = 20;
 
 const int cPlayer::MAX_FOOD_LEVEL = 20;
 
-/** Number of ticks it takes to eat an item */
-const int cPlayer::EATING_TICKS = 30;
+// Number of ticks it takes to eat an item.
+#define EATING_TICKS 30_tick
+
+// 6000 ticks or 5 minutes
+#define PLAYER_INVENTORY_SAVE_INTERVAL 6000
+
+#define XP_TO_LEVEL15 255
+#define XP_PER_LEVEL_TO15 17
+#define XP_TO_LEVEL30 825
 
 
 
@@ -107,7 +115,7 @@ cPlayer::BodyStanceGliding::BodyStanceGliding(cPlayer & a_Player) :
 
 
 cPlayer::cPlayer(const std::shared_ptr<cClientHandle> & a_Client) :
-	Super(etPlayer, 0.6, 1.8),
+	Super(etPlayer, 0.6f, 1.8f),
 	m_BodyStance(BodyStanceStanding(*this)),
 	m_FoodLevel(MAX_FOOD_LEVEL),
 	m_FoodSaturationLevel(5.0),
@@ -126,6 +134,7 @@ cPlayer::cPlayer(const std::shared_ptr<cClientHandle> & a_Client) :
 	m_IsFlightCapable(false),
 	m_IsFlying(false),
 	m_IsFrozen(false),
+	m_IsLeftHanded(false),
 	m_IsTeleporting(false),
 	m_IsVisible(true),
 	m_EatingFinishTick(-1),
@@ -135,8 +144,7 @@ cPlayer::cPlayer(const std::shared_ptr<cClientHandle> & a_Client) :
 	m_FloaterID(cEntity::INVALID_ID),
 	m_Team(nullptr),
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
-	m_SkinParts(0),
-	m_MainHand(mhRight)
+	m_SkinParts(0)
 {
 	ASSERT(GetName().length() <= 16);  // Otherwise this player could crash many clients...
 
@@ -147,30 +155,10 @@ cPlayer::cPlayer(const std::shared_ptr<cClientHandle> & a_Client) :
 	SetMaxHealth(MAX_HEALTH);
 	m_Health = MAX_HEALTH;
 
-	cWorld * World = nullptr;
-	LoadFromDisk(World);
+	LoadFromDisk();
+	UpdateCapabilities();
 
 	m_LastGroundHeight = static_cast<float>(GetPosY());
-
-	if (m_GameMode == gmNotSet)
-	{
-		if (World->IsGameModeCreative())
-		{
-			m_IsFlightCapable = true;
-		}
-		if (World->IsGameModeSpectator())  // Otherwise Player will fall out of the world on join
-		{
-			m_IsFlightCapable = true;
-			m_IsFlying = true;
-		}
-	}
-
-	if (m_GameMode == gmSpectator)  // If player is reconnecting to the server in spectator mode
-	{
-		m_IsFlightCapable = true;
-		m_IsFlying = true;
-		m_IsVisible = false;
-	}
 }
 
 
@@ -182,7 +170,7 @@ cPlayer::~cPlayer(void)
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), static_cast<void *>(this), GetUniqueID());
 
 	// "Times ragequit":
-	m_Stats.AddValue(Statistic::LeaveGame);
+	m_Stats.Custom[CustomStatistic::LeaveGame]++;
 
 	SaveToDisk();
 
@@ -472,6 +460,15 @@ bool cPlayer::IsInBed(void) const
 
 
 
+bool cPlayer::IsLeftHanded() const
+{
+	return m_IsLeftHanded;
+}
+
+
+
+
+
 bool cPlayer::IsStanding() const
 {
 	return std::holds_alternative<BodyStanceStanding>(m_BodyStance);
@@ -488,7 +485,7 @@ void cPlayer::TossItems(const cItems & a_Items)
 		return;
 	}
 
-	m_Stats.AddValue(Statistic::Drop, static_cast<cStatManager::StatValue>(a_Items.Size()));
+	m_Stats.Custom[CustomStatistic::Drop] += static_cast<StatisticsManager::StatValue>(a_Items.Size());
 
 	const auto Speed = (GetLookVector() + Vector3d(0, 0.2, 0)) * 6;  // A dash of height and a dollop of speed
 	const auto Position = GetEyePosition() - Vector3d(0, 0.2, 0);  // Correct for eye-height weirdness
@@ -504,11 +501,12 @@ void cPlayer::SetIsInBed(const bool a_GoToBed)
 	if (a_GoToBed && IsStanding())
 	{
 		m_BodyStance = BodyStanceSleeping(*this);
+		m_World->BroadcastEntityAnimation(*this, EntityAnimation::PlayerEntersBed);
 	}
 	else if (!a_GoToBed && IsInBed())
 	{
 		m_BodyStance = BodyStanceStanding(*this);
-		GetWorld()->BroadcastEntityAnimation(*this, 2);
+		m_World->BroadcastEntityAnimation(*this, EntityAnimation::PlayerLeavesBed);
 	}
 }
 
@@ -521,8 +519,7 @@ void cPlayer::StartEating(void)
 	// Set the timer:
 	m_EatingFinishTick = m_World->GetWorldAge() + EATING_TICKS;
 
-	// Send the packets:
-	m_World->BroadcastEntityAnimation(*this, 3);
+	// Send the packet:
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -533,10 +530,10 @@ void cPlayer::StartEating(void)
 void cPlayer::FinishEating(void)
 {
 	// Reset the timer:
-	m_EatingFinishTick = -1;
+	m_EatingFinishTick = -1_tick;
 
 	// Send the packets:
-	m_ClientHandle->SendEntityStatus(*this, esPlayerEatingAccepted);
+	m_ClientHandle->SendEntityAnimation(*this, EntityAnimation::PlayerFinishesEating);
 	m_World->BroadcastEntityMetadata(*this);
 
 	// consume the item:
@@ -556,7 +553,7 @@ void cPlayer::FinishEating(void)
 
 void cPlayer::AbortEating(void)
 {
-	m_EatingFinishTick = -1;
+	m_EatingFinishTick = -1_tick;
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -617,10 +614,11 @@ double cPlayer::GetMaxSpeed(void) const
 void cPlayer::SetNormalMaxSpeed(double a_Speed)
 {
 	m_NormalMaxSpeed = a_Speed;
-	if (!IsSprinting() && !IsFlying() && !IsFrozen())
+
+	if (!m_IsFrozen)
 	{
 		// If we are frozen, we do not send this yet. We send when unfreeze() is called
-		m_ClientHandle->SendPlayerMaxSpeed();
+		m_World->BroadcastEntityProperties(*this);
 	}
 }
 
@@ -631,10 +629,11 @@ void cPlayer::SetNormalMaxSpeed(double a_Speed)
 void cPlayer::SetSprintingMaxSpeed(double a_Speed)
 {
 	m_SprintingMaxSpeed = a_Speed;
-	if (IsSprinting() && !m_IsFlying && !m_IsFrozen)
+
+	if (!m_IsFrozen)
 	{
 		// If we are frozen, we do not send this yet. We send when unfreeze() is called
-		m_ClientHandle->SendPlayerMaxSpeed();
+		m_World->BroadcastEntityProperties(*this);
 	}
 }
 
@@ -646,7 +645,6 @@ void cPlayer::SetFlyingMaxSpeed(double a_Speed)
 {
 	m_FlyingMaxSpeed = a_Speed;
 
-	// Update the flying speed, always:
 	if (!m_IsFrozen)
 	{
 		// If we are frozen, we do not send this yet. We send when unfreeze() is called
@@ -714,6 +712,16 @@ void cPlayer::SetFlying(const bool a_ShouldFly)
 
 
 
+void cPlayer::SetLeftHanded(const bool a_IsLeftHanded)
+{
+	m_IsLeftHanded = a_IsLeftHanded;
+	m_World->BroadcastEntityMetadata(*this);
+}
+
+
+
+
+
 void cPlayer::SetSprint(const bool a_ShouldSprint)
 {
 	if (a_ShouldSprint && IsStanding())
@@ -726,6 +734,7 @@ void cPlayer::SetSprint(const bool a_ShouldSprint)
 	}
 
 	m_World->BroadcastEntityMetadata(*this);
+	m_World->BroadcastEntityProperties(*this);
 }
 
 
@@ -853,7 +862,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	{
 		Pickups.Add(cItem(Item::Apple));
 	}
-	m_Stats.AddValue(Statistic::Drop, static_cast<cStatManager::StatValue>(Pickups.Size()));
+	m_Stats.Custom[CustomStatistic::Drop] +=  static_cast<StatisticsManager::StatValue>(Pickups.Size());
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
@@ -917,8 +926,8 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		}
 	}
 
-	m_Stats.AddValue(Statistic::Deaths);
-	m_Stats.SetValue(Statistic::TimeSinceDeath, 0);
+	m_Stats.Custom[CustomStatistic::Deaths]++;
+	m_Stats.Custom[CustomStatistic::TimeSinceDeath] = 0;
 
 	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::otDeathCount, 1);
 }
@@ -933,7 +942,7 @@ void cPlayer::Killed(cEntity * a_Victim)
 
 	if (a_Victim->IsPlayer())
 	{
-		m_Stats.AddValue(Statistic::PlayerKills);
+		m_Stats.Custom[CustomStatistic::PlayerKills]++;
 
 		ScoreBoard.AddPlayerScore(GetName(), cObjective::otPlayerKillCount, 1);
 	}
@@ -941,10 +950,10 @@ void cPlayer::Killed(cEntity * a_Victim)
 	{
 		if (static_cast<cMonster *>(a_Victim)->GetMobFamily() == cMonster::mfHostile)
 		{
-			AwardAchievement(Statistic::AchKillEnemy);
+			AwardAchievement(CustomStatistic::AchKillEnemy);
 		}
 
-		m_Stats.AddValue(Statistic::MobKills);
+		m_Stats.Custom[CustomStatistic::MobKills]++;
 	}
 
 	ScoreBoard.AddPlayerScore(GetName(), cObjective::otTotalKillCount, 1);
@@ -1328,49 +1337,38 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 	}
 
 	m_GameMode = a_GameMode;
+	UpdateCapabilities();
+
 	m_ClientHandle->SendGameMode(a_GameMode);
-
-	SetCapabilities();
-
+	m_ClientHandle->SendInventorySlot(-1, -1, m_DraggingItem);
 	m_World->BroadcastPlayerListUpdateGameMode(*this);
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
 
 
 
-void cPlayer::SetCapabilities()
+void cPlayer::UpdateCapabilities()
 {
-	// Fly ability
+	// Fly ability:
 	if (IsGameModeCreative() || IsGameModeSpectator())
 	{
-		SetCanFly(true);
+		m_IsFlightCapable = true;
 	}
 	else
 	{
-		SetFlying(false);
-		SetCanFly(false);
+		m_IsFlying = false;
+		m_IsFlightCapable = false;
 	}
 
-	// Visible
-	if (IsGameModeSpectator())
-	{
-		SetVisible(false);
-	}
-	else
-	{
-		SetVisible(true);
-	}
+	// Visible:
+	m_IsVisible = !IsGameModeSpectator();
 
-	// Set for spectator
+	// Clear the current dragging item of spectators:
 	if (IsGameModeSpectator())
 	{
-		// Clear the current dragging item of the player
-		if (GetWindow() != nullptr)
-		{
-			m_DraggingItem.Empty();
-			GetClientHandle()->SendInventorySlot(-1, -1, m_DraggingItem);
-		}
+		m_DraggingItem.Empty();
 	}
 }
 
@@ -1378,7 +1376,7 @@ void cPlayer::SetCapabilities()
 
 
 
-void cPlayer::AwardAchievement(const Statistic a_Ach)
+void cPlayer::AwardAchievement(const CustomStatistic a_Ach)
 {
 	// Check if the prerequisites are met:
 	if (!m_Stats.SatisfiesPrerequisite(a_Ach))
@@ -1387,7 +1385,7 @@ void cPlayer::AwardAchievement(const Statistic a_Ach)
 	}
 
 	// Increment the statistic and check if we already have it:
-	if (m_Stats.AddValue(a_Ach) != 1)
+	if (m_Stats.Custom[a_Ach]++ != 1)
 	{
 		return;
 	}
@@ -1415,9 +1413,11 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	//  ask plugins to allow teleport to the new position.
 	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
+		m_IsTeleporting = true;
+
+		Detach();
 		SetPosition({a_PosX, a_PosY, a_PosZ});
 		FreezeInternal(GetPosition(), false);
-		m_IsTeleporting = true;
 
 		m_ClientHandle->SendPlayerMoveLook();
 	}
@@ -1452,8 +1452,8 @@ void cPlayer::Unfreeze()
 		m_World->BroadcastEntityMetadata(*this);
 	}
 
-	GetClientHandle()->SendPlayerAbilities();
-	GetClientHandle()->SendPlayerMaxSpeed();
+	m_ClientHandle->SendPlayerAbilities();
+	m_World->BroadcastEntityProperties(*this);
 
 	m_IsFrozen = false;
 	BroadcastMovementUpdate(m_ClientHandle.get());
@@ -1524,21 +1524,7 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 
 eGameMode cPlayer::GetEffectiveGameMode(void) const
 {
-	// Since entities' m_World aren't set until Initialize, but cClientHandle sends the player's gamemode early
-	// the below block deals with m_World being nullptr when called.
-
-	auto World = m_World;
-
-	if (World == nullptr)
-	{
-		World = cRoot::Get()->GetDefaultWorld();
-	}
-	else if (IsWorldChangeScheduled())
-	{
-		World = m_WorldChangeInfo.m_NewWorld;
-	}
-
-	return (m_GameMode == gmNotSet) ? World->GetGameMode() : m_GameMode;
+	return (m_GameMode == gmNotSet) ? m_World->GetGameMode() : m_GameMode;
 }
 
 
@@ -1556,17 +1542,16 @@ void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
 
 void cPlayer::SetVisible(bool a_bVisible)
 {
-	// Need to Check if the player or other players are in gamemode spectator, but will break compatibility
-	if (a_bVisible && !m_IsVisible)  // Make visible
+	if (a_bVisible && !m_IsVisible)
 	{
 		m_IsVisible = true;
-		m_World->BroadcastSpawnEntity(*this);
 	}
 	if (!a_bVisible && m_IsVisible)
 	{
 		m_IsVisible = false;
-		m_World->BroadcastDestroyEntity(*this, m_ClientHandle.get());  // Destroy on all clients
 	}
+
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -1809,25 +1794,25 @@ void cPlayer::TossPickup(const cItem & a_Item)
 
 
 
-void cPlayer::LoadFromDisk(cWorldPtr & a_World)
+void cPlayer::LoadFromDisk()
 {
 	LoadRank();
 
 	const auto & UUID = GetUUID();
 
 	// Load from the UUID file:
-	if (LoadFromFile(GetUUIDFileName(UUID), a_World))
+	if (LoadFromFile(GetUUIDFileName(UUID)))
 	{
 		return;
 	}
 
 	// Player not found:
-	a_World = cRoot::Get()->GetDefaultWorld();
+	m_World = cRoot::Get()->GetDefaultWorld();
 	LOG("Player \"%s\" (%s) data not found, resetting to defaults", GetName().c_str(), UUID.ToShortString().c_str());
 
-	const Vector3i WorldSpawn(static_cast<int>(a_World->GetSpawnX()), static_cast<int>(a_World->GetSpawnY()), static_cast<int>(a_World->GetSpawnZ()));
+	const Vector3i WorldSpawn(static_cast<int>(m_World->GetSpawnX()), static_cast<int>(m_World->GetSpawnY()), static_cast<int>(m_World->GetSpawnZ()));
 	SetPosition(WorldSpawn);
-	SetBedPos(WorldSpawn, a_World);
+	SetBedPos(WorldSpawn, m_World);
 
 	m_Inventory.Clear();
 	m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();  // Use a random number to seed the enchantment generator
@@ -1839,7 +1824,7 @@ void cPlayer::LoadFromDisk(cWorldPtr & a_World)
 
 
 
-bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
+bool cPlayer::LoadFromFile(const AString & a_FileName)
 {
 	Json::Value Root;
 
@@ -1928,23 +1913,22 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	cEnderChestEntity::LoadFromJson(Root["enderchestinventory"], m_EnderChestContents);
 
 	m_CurrentWorldName = Root.get("world", "world").asString();
-	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName());
-	if (a_World == nullptr)
+	m_World = cRoot::Get()->GetWorld(m_CurrentWorldName);
+	if (m_World == nullptr)
 	{
-		a_World = cRoot::Get()->GetDefaultWorld();
+		m_World = cRoot::Get()->GetDefaultWorld();
 	}
 
-
-	m_LastBedPos.x = Root.get("SpawnX", a_World->GetSpawnX()).asInt();
-	m_LastBedPos.y = Root.get("SpawnY", a_World->GetSpawnY()).asInt();
-	m_LastBedPos.z = Root.get("SpawnZ", a_World->GetSpawnZ()).asInt();
+	m_LastBedPos.x = Root.get("SpawnX", m_World->GetSpawnX()).asInt();
+	m_LastBedPos.y = Root.get("SpawnY", m_World->GetSpawnY()).asInt();
+	m_LastBedPos.z = Root.get("SpawnZ", m_World->GetSpawnZ()).asInt();
 	m_SpawnWorldName = Root.get("SpawnWorld", cRoot::Get()->GetDefaultWorld()->GetName()).asString();
 
 	try
 	{
 		// Load the player stats.
 		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-		StatSerializer::Load(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
+		StatisticsSerializer::Load(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
 	}
 	catch (...)
 	{
@@ -1952,7 +1936,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	}
 
 	FLOGD("Player {0} was read from file \"{1}\", spawning at {2:.2f} in world \"{3}\"",
-		GetName(), a_FileName, GetPosition(), a_World->GetName()
+		GetName(), a_FileName, GetPosition(), m_World->GetName()
 	);
 
 	return true;
@@ -2078,7 +2062,7 @@ void cPlayer::SaveToDisk()
 		// Save the player stats.
 		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
 		// TODO: save together with player.dat, not in some other place.
-		StatSerializer::Save(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
+		StatisticsSerializer::Save(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
 	}
 	catch (...)
 	{
@@ -2123,6 +2107,7 @@ void cPlayer::UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action)
 void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
 {
 	const cItem & Item = m_Inventory.GetSlot(a_SlotNumber);
+
 	if (Item.IsEmpty())
 	{
 		return;
@@ -2137,9 +2122,34 @@ void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
 	// Unbreaking is applied for each point of reduction.
 	std::binomial_distribution<short> Dist(a_Damage, chance);
 	short ReducedDamage = Dist(GetRandomProvider().Engine());
+
 	if (m_Inventory.DamageItem(a_SlotNumber, ReducedDamage))
 	{
-		m_World->BroadcastSoundEffect("entity.item.break", GetPosition(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+		// The item broke. Broadcast the correct animation:
+		if (Item.m_ItemType == E_ITEM_SHIELD)
+		{
+			m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnShieldBreaks);
+		}
+		else if (a_SlotNumber == (cInventory::invHotbarOffset + m_Inventory.GetEquippedSlotNum()))
+		{
+			m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnMainHandEquipmentBreaks);
+		}
+		else
+		{
+			switch (a_SlotNumber)
+			{
+				case cInventory::invArmorOffset:     return m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnHeadEquipmentBreaks);
+				case cInventory::invArmorOffset + 1: return m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnChestEquipmentBreaks);
+				case cInventory::invArmorOffset + 2: return m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnLegsEquipmentBreaks);
+				case cInventory::invArmorOffset + 3: return m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnFeetEquipmentBreaks);
+				case cInventory::invShieldOffset:    return m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnOffHandEquipmentBreaks);
+			}
+		}
+	}
+	else if (Item.m_ItemType == E_ITEM_SHIELD)
+	{
+		// The item survived. Special case for shield blocking:
+		m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnShieldBlocks);
 	}
 }
 
@@ -2255,12 +2265,12 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		return;
 	}
 
-	const auto Value = FloorC<cStatManager::StatValue>(a_DeltaPos.Length() * 100 + 0.5);
+	const auto Value = FloorC<StatisticsManager::StatValue>(a_DeltaPos.Length() * 100 + 0.5);
 	if (m_AttachedTo == nullptr)
 	{
 		if (IsFlying())
 		{
-			m_Stats.AddValue(Statistic::FlyOneCm, Value);
+			m_Stats.Custom[CustomStatistic::FlyOneCm] += Value;
 			// May be flying and doing any of the following:
 		}
 
@@ -2268,18 +2278,18 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		{
 			if (a_DeltaPos.y > 0.0)  // Going up
 			{
-				m_Stats.AddValue(Statistic::ClimbOneCm, FloorC<cStatManager::StatValue>(a_DeltaPos.y * 100 + 0.5));
+				m_Stats.Custom[CustomStatistic::ClimbOneCm] += FloorC<StatisticsManager::StatValue>(a_DeltaPos.y * 100 + 0.5);
 			}
 		}
 		else if (IsInWater())
 		{
 			if (m_IsHeadInWater)
 			{
-				m_Stats.AddValue(Statistic::WalkUnderWaterOneCm, Value);
+				m_Stats.Custom[CustomStatistic::WalkUnderWaterOneCm] += Value;
 			}
 			else
 			{
-				m_Stats.AddValue(Statistic::WalkOnWaterOneCm, Value);
+				m_Stats.Custom[CustomStatistic::WalkOnWaterOneCm] += Value;
 			}
 			AddFoodExhaustion(0.00015 * static_cast<double>(Value));
 		}
@@ -2287,17 +2297,17 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		{
 			if (IsCrouched())
 			{
-				m_Stats.AddValue(Statistic::CrouchOneCm, Value);
+				m_Stats.Custom[CustomStatistic::CrouchOneCm] += Value;
 				AddFoodExhaustion(0.0001 * static_cast<double>(Value));
 			}
 			if (IsSprinting())
 			{
-				m_Stats.AddValue(Statistic::SprintOneCm, Value);
+				m_Stats.Custom[CustomStatistic::SprintOneCm] += Value;
 				AddFoodExhaustion(0.001 * static_cast<double>(Value));
 			}
 			else
 			{
-				m_Stats.AddValue(Statistic::WalkOneCm, Value);
+				m_Stats.Custom[CustomStatistic::WalkOneCm] += Value;
 				AddFoodExhaustion(0.0001 * static_cast<double>(Value));
 			}
 		}
@@ -2306,13 +2316,13 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 			// If a jump just started, process food exhaustion:
 			if ((a_DeltaPos.y > 0.0) && a_PreviousIsOnGround)
 			{
-				m_Stats.AddValue(Statistic::Jump, 1);
+				m_Stats.Custom[CustomStatistic::Jump]++;
 				AddFoodExhaustion((IsSprinting() ? 0.008 : 0.002) * static_cast<double>(Value));
 			}
 			else if (a_DeltaPos.y < 0.0)
 			{
 				// Increment statistic
-				m_Stats.AddValue(Statistic::FallOneCm, static_cast<cStatManager::StatValue>(std::abs(a_DeltaPos.y) * 100 + 0.5));
+				m_Stats.Custom[CustomStatistic::FallOneCm] += static_cast<StatisticsManager::StatValue>(-a_DeltaPos.y * 100 + 0.5);
 			}
 			// TODO: good opportunity to detect illegal flight (check for falling tho)
 		}
@@ -2321,15 +2331,15 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 	{
 		switch (m_AttachedTo->GetEntityType())
 		{
-			case cEntity::etMinecart: m_Stats.AddValue(Statistic::MinecartOneCm, Value); break;
-			case cEntity::etBoat:     m_Stats.AddValue(Statistic::BoatOneCm,     Value); break;
+			case cEntity::etMinecart: m_Stats.Custom[CustomStatistic::MinecartOneCm] += Value; break;
+			case cEntity::etBoat:     m_Stats.Custom[CustomStatistic::BoatOneCm]     += Value; break;
 			case cEntity::etMonster:
 			{
 				cMonster * Monster = static_cast<cMonster *>(m_AttachedTo);
 				switch (Monster->GetMobType())
 				{
-					case mtPig:   m_Stats.AddValue(Statistic::PigOneCm,   Value); break;
-					case mtHorse: m_Stats.AddValue(Statistic::HorseOneCm, Value); break;
+					case mtPig:   m_Stats.Custom[CustomStatistic::PigOneCm]   += Value; break;
+					case mtHorse: m_Stats.Custom[CustomStatistic::HorseOneCm] += Value; break;
 					default: break;
 				}
 				break;
@@ -2384,10 +2394,9 @@ void cPlayer::LoadRank(void)
 
 
 
-bool cPlayer::PlaceBlock(Vector3i a_Pos, BlockState a_Block)
+bool cPlayer::PlaceBlock(Vector3i a_Position, BlockState a_Block)
 {
-	sSetBlockVector Block{{a_Pos, a_Block}};
-	return PlaceBlocks(Block);
+	return PlaceBlocks({ { a_Position, a_Block } });
 }
 
 
@@ -2435,7 +2444,7 @@ void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_R
 
 
 
-bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
+bool cPlayer::DoesPlacingBlocksIntersectEntity(const std::initializer_list<sSetBlock> a_Blocks) const
 {
 	// Compute the bounding box for each block to be placed
 	std::vector<cBoundingBox> PlacementBoxes;
@@ -2509,44 +2518,52 @@ const cUUID & cPlayer::GetUUID(void) const
 
 
 
-bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
+bool cPlayer::PlaceBlocks(const std::initializer_list<sSetBlock> a_Blocks)
 {
 	if (DoesPlacingBlocksIntersectEntity(a_Blocks))
 	{
 		// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
-		for (auto blk2: a_Blocks)
+		for (const auto & ResendBlock : a_Blocks)
 		{
-			m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), *this);
+			m_World->SendBlockTo(ResendBlock.GetX(), ResendBlock.GetY(), ResendBlock.GetZ(), *this);
 		}
 		return false;
 	}
 
-	// Call the "placing" hooks; if any fail, abort:
 	cPluginManager * pm = cPluginManager::Get();
-	for (auto blk: a_Blocks)
+
+	// Check the blocks CanBeAt, and call the "placing" hooks; if any fail, abort:
+	for (const auto & Block : a_Blocks)
 	{
-		if (pm->CallHookPlayerPlacingBlock(*this, blk))
+		if (
+			!m_World->DoWithChunkAt(Block.GetAbsolutePos(), [&Block](cChunk & a_Chunk)
+			{
+				return cBlockHandler::For(Block.m_BlockType).CanBeAt(a_Chunk, Block.GetRelativePos(), Block.m_BlockMeta);
+			})
+		)
+		{
+			return false;
+		}
+
+		if (pm->CallHookPlayerPlacingBlock(*this, Block))
 		{
 			// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
-			for (auto blk2: a_Blocks)
+			for (const auto & ResendBlock : a_Blocks)
 			{
-				m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), *this);
+				m_World->SendBlockTo(ResendBlock.GetX(), ResendBlock.GetY(), ResendBlock.GetZ(), *this);
 			}
 			return false;
 		}
-	}  // for blk - a_Blocks[]
+	}
 
 	cChunkInterface ChunkInterface(m_World->GetChunkMap());
-	for (auto blk: a_Blocks)
+	for (const auto & Block : a_Blocks)
 	{
 		// Set the blocks:
-		m_World->PlaceBlock(blk.GetAbsolutePos(), blk.m_Block);
-
-		// Notify the blockhandlers:
-		cBlockHandler::For(blk.m_Block.Type()).OnPlacedByPlayer(ChunkInterface, *m_World, *this, blk);
+		m_World->PlaceBlock(Block.GetAbsolutePos(), Block.m_Block);
 
 		// Call the "placed" hooks:
-		pm->CallHookPlayerPlacedBlock(*this, blk);
+		pm->CallHookPlayerPlacedBlock(*this, Block);
 	}
 
 	return true;
@@ -2559,16 +2576,6 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 void cPlayer::SetSkinParts(int a_Parts)
 {
 	m_SkinParts = a_Parts & spMask;
-	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
-}
-
-
-
-
-
-void cPlayer::SetMainHand(eMainHand a_Hand)
-{
-	m_MainHand = a_Hand;
 	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
 }
 
@@ -2594,22 +2601,13 @@ void cPlayer::AttachTo(cEntity * a_AttachTo)
 
 void cPlayer::Detach()
 {
-	Detach(false);
-}
-
-
-
-
-
-void cPlayer::Detach(bool a_IsTeleporting)
-{
 	if (m_AttachedTo == nullptr)
 	{
 		// The player is not attached to anything. Bail out.
 		return;
 	}
 
-	// Different detach, if this is a spectator
+	// Different detach, if this is a spectator:
 	if (IsGameModeSpectator())
 	{
 		GetClientHandle()->SendCameraSetTo(*this);
@@ -2620,8 +2618,8 @@ void cPlayer::Detach(bool a_IsTeleporting)
 
 	Super::Detach();
 
-	// If they are teleporting, no need to figure out position
-	if (a_IsTeleporting)
+	// If they are teleporting, no need to figure out position:
+	if (m_IsTeleporting)
 	{
 		return;
 	}
@@ -2692,10 +2690,10 @@ void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
 	m_IsFlying = true;
 
 	// Send the client its fake speed and max speed of 0
-	GetClientHandle()->SendPlayerMoveLook();
-	GetClientHandle()->SendPlayerAbilities();
-	GetClientHandle()->SendPlayerMaxSpeed();
-	GetClientHandle()->SendEntityVelocity(*this);
+	m_ClientHandle->SendPlayerMoveLook();
+	m_ClientHandle->SendPlayerAbilities();
+	m_ClientHandle->SendEntityVelocity(*this);
+	m_World->BroadcastEntityProperties(*this);
 
 	// Keep the server side speed variables as they were in the first place
 	m_NormalMaxSpeed = NormalMaxSpeed;
@@ -2867,16 +2865,6 @@ void cPlayer::AddKnownItem(const cItem & a_Item)
 
 
 
-void cPlayer::SetSize(const float a_Width, const float a_Height)
-{
-	m_Width = a_Width;
-	m_Height = a_Height;
-}
-
-
-
-
-
 void cPlayer::AddKnownRecipe(UInt32 a_RecipeId)
 {
 	auto Response = m_KnownRecipes.insert(a_RecipeId);
@@ -2930,7 +2918,7 @@ void cPlayer::TickFreezeCode()
 				}
 			}
 		}
-		else if (GetWorld()->GetWorldAge() % 100 == 0)
+		else if ((GetWorld()->GetWorldTickAge() % 100_tick) == 0_tick)
 		{
 			// Despite the client side freeze, the player may be able to move a little by
 			// Jumping or canceling flight. Re-freeze every now and then
@@ -3024,7 +3012,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 				NotifyNearbyWolves(static_cast<cPawn*>(a_TDI.Attacker), true);
 			}
 		}
-		m_Stats.AddValue(Statistic::DamageTaken, FloorC<cStatManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5));
+		m_Stats.Custom[CustomStatistic::DamageTaken] += FloorC<StatisticsManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5);
 		return true;
 	}
 	return false;
@@ -3045,6 +3033,15 @@ float cPlayer::GetEnchantmentBlastKnockbackReduction()
 	}
 
 	return Super::GetEnchantmentBlastKnockbackReduction();
+}
+
+
+
+
+
+bool cPlayer::IsInvisible() const
+{
+	return !m_IsVisible || Super::IsInvisible();
 }
 
 
@@ -3080,6 +3077,7 @@ bool cPlayer::IsSprinting(void) const
 
 void cPlayer::OnAddToWorld(cWorld & a_World)
 {
+	// Sends player spawn:
 	Super::OnAddToWorld(a_World);
 
 	// Update world name tracking:
@@ -3088,8 +3086,10 @@ void cPlayer::OnAddToWorld(cWorld & a_World)
 	// Fix to stop the player falling through the world, until we get serversided collision detection:
 	FreezeInternal(GetPosition(), false);
 
-	// Set capabilities based on new world:
-	SetCapabilities();
+	// UpdateCapabilities was called in the constructor, and in OnRemoveFromWorld, possibly changing our visibility.
+	// If world is in spectator mode, invisibility will need updating. If we just connected, we might be on fire from a previous game.
+	// Hence, tell the client by sending metadata:
+	m_ClientHandle->SendEntityMetadata(*this);
 
 	// Send contents of the inventory window:
 	m_ClientHandle->SendWholeInventory(*m_CurrentWindow);
@@ -3116,7 +3116,7 @@ void cPlayer::OnAddToWorld(cWorld & a_World)
 	m_ClientHandle->SendWeather(a_World.GetWeather());
 
 	// Send time:
-	m_ClientHandle->SendTimeUpdate(a_World.GetWorldAge(), a_World.GetTimeOfDay(), a_World.IsDaylightCycleEnabled());
+	m_ClientHandle->SendTimeUpdate(a_World.GetWorldAge(), a_World.GetWorldDate(), a_World.IsDaylightCycleEnabled());
 
 	// Finally, deliver the notification hook:
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*this);
@@ -3162,15 +3162,20 @@ void cPlayer::OnRemoveFromWorld(cWorld & a_World)
 	// Award relevant achievements:
 	if (DestinationDimension == dimEnd)
 	{
-		AwardAchievement(Statistic::AchTheEnd);
+		AwardAchievement(CustomStatistic::AchTheEnd);
 	}
 	else if (DestinationDimension == dimNether)
 	{
-		AwardAchievement(Statistic::AchPortal);
+		AwardAchievement(CustomStatistic::AchPortal);
 	}
+
+	// Set capabilities based on new world:
+	UpdateCapabilities();
 
 	// Clientside warp start:
 	m_ClientHandle->SendRespawn(DestinationDimension, false);
+	m_ClientHandle->SendPlayerListUpdateGameMode(*this);
+	m_World->BroadcastPlayerListUpdateGameMode(*this);
 
 	// Clear sent chunk lists from the clienthandle:
 	m_ClientHandle->RemoveFromWorld();
@@ -3185,7 +3190,7 @@ void cPlayer::OnRemoveFromWorld(cWorld & a_World)
 
 void cPlayer::SpawnOn(cClientHandle & a_Client)
 {
-	if (!m_IsVisible || (m_ClientHandle.get() == (&a_Client)))
+	if (m_ClientHandle.get() == &a_Client)
 	{
 		return;
 	}
@@ -3221,12 +3226,16 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	m_Stats.AddValue(Statistic::PlayOneMinute);
-	m_Stats.AddValue(Statistic::TimeSinceDeath);
-
-	if (IsCrouched())
 	{
-		m_Stats.AddValue(Statistic::SneakTime);
+		const auto TicksElapsed = static_cast<StatisticsManager::StatValue>(std::chrono::duration_cast<cTickTime>(a_Dt).count());
+
+		m_Stats.Custom[CustomStatistic::PlayOneMinute] += TicksElapsed;
+		m_Stats.Custom[CustomStatistic::TimeSinceDeath] += TicksElapsed;
+
+		if (IsCrouched())
+		{
+			m_Stats.Custom[CustomStatistic::SneakTime] += TicksElapsed;
+		}
 	}
 
 	// Handle the player detach, when the player is in spectator mode
@@ -3292,6 +3301,14 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			SetElytraFlight(false);
 		}
 	}
+	else if (IsInBed())
+	{
+		// Check if sleeping is still possible:
+		if ((GetPosition().Floor() != m_LastBedPos) || (m_World->GetBlock(m_LastBedPos) != E_BLOCK_BED))
+		{
+			m_ClientHandle->HandleLeaveBed();
+		}
+	}
 
 	BroadcastMovementUpdate(m_ClientHandle.get());
 
@@ -3299,7 +3316,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		m_World->CollectPickupsByPlayer(*this);
 
-		if ((m_EatingFinishTick >= 0) && (m_EatingFinishTick <= m_World->GetWorldAge()))
+		if ((m_EatingFinishTick >= 0_tick) && (m_EatingFinishTick <= m_World->GetWorldAge()))
 		{
 			FinishEating();
 		}

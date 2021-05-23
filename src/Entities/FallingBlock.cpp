@@ -14,7 +14,7 @@
 
 
 cFallingBlock::cFallingBlock(Vector3d a_Position, BlockState a_Block):
-	Super(etFallingBlock, a_Position, 0.98, 0.98),
+	Super(etFallingBlock, a_Position, 0.98f, 0.98f),
 	m_Block(a_Block)
 {
 	SetGravity(-16.0f);

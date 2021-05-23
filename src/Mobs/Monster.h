@@ -32,8 +32,7 @@ public:
 		mfAmbient  = 2,  // Bats
 		mfWater    = 3,  // Squid, Guardian
 
-		mfNoSpawn,
-		mfUnhandled,  // Nothing. Be sure this is the last and the others are in order
+		mfNoSpawn
 	} ;
 
 	// tolua_end
@@ -46,7 +45,7 @@ public:
 	a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs 2012_12_22))
 	a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
 	*/
-	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height);
+	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height);
 
 	CLASS_PROTODEF(cMonster)
 
@@ -187,10 +186,10 @@ public:
 	/** Returns the mob family based on the type */
 	static eFamily FamilyFromType(eMonsterType a_MobType);
 
-	/** Returns the spawn delay (number of game ticks between spawn attempts) for the given mob family */
-	static int GetSpawnDelay(cMonster::eFamily a_MobFamily);
-
 	// tolua_end
+
+	/** Returns the spawn delay (number of game ticks between spawn attempts) for the given mob family */
+	static cTickTime GetSpawnDelay(cMonster::eFamily a_MobFamily);
 
 	/**  Translates the MobType enum to the vanilla nbt name */
 	static AString MobTypeToVanillaNBT(eMonsterType a_MobType);

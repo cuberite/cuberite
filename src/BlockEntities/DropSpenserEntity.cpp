@@ -155,11 +155,11 @@ bool cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 {
 	if (m_Block.Type() == BlockType::Dispenser)
 	{
-		a_Player->GetStatManager().AddValue(Statistic::InspectDispenser);
+		a_Player->GetStatistics().Custom[CustomStatistic::InspectDispenser]++;
 	}
 	else  // BlockType::Dropper
 	{
-		a_Player->GetStatManager().AddValue(Statistic::InspectDropper);
+		a_Player->GetStatistics().Custom[CustomStatistic::InspectDropper]++;
 	}
 
 	cWindow * Window = GetWindow();

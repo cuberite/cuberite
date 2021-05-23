@@ -38,9 +38,19 @@ public:
 
 private:
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
-		return ((a_RelPos.y > 0) && IsBlockStateOfDirt(a_Chunk.GetBlock(a_RelPos.addedY(-1))));
+		NIBBLETYPE meta = a_BlockMeta & 0x7;
+		return cItem(m_BlockType, 1, meta);
+	}
+
+
+
+
+
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	{
+		return ((a_Position.y > 0) && IsBlockStateOfDirt(a_Chunk.GetBlock(a_Position.addedY(-1))));
 	}
 
 

@@ -222,6 +222,24 @@ return
 					},
 					Notes = "Returns how much light the specified block type consumes.",
 				},
+				IsClickedThrough =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified block type is ignored by the client on left and right clicks, that is, treated as if it were air.",
+				},
 				IsOneHitDig =
 				{
 					IsStatic = true,
@@ -3831,6 +3849,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "(<b>DEPRECATED</b>) Please use cEntity:IsTicking().",
 				},
+				IsElytraFlying =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity is flying with an elytra. Entities that cannot fly with an elytra return always false.",
+				},
 				IsEnderCrystal =
 				{
 					Returns =
@@ -3881,6 +3909,16 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					},
 					Notes = "Returns true if the entity represents a fishing rod floater",
 				},
+				IsHeadInWater =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the entity's head is in a water block",
+				},
 				IsInvisible =
 				{
 					Returns =
@@ -3889,7 +3927,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if the entity is invisible",
+					Notes = "Returns true if the entity is invisible.",
 				},
 				IsInFire =
 				{
@@ -3920,16 +3958,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns true if any part of the entity is in a water block",
-				},
-				IsHeadInWater =
-				{
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the entity's head is in a water block",
 				},
 				IsItemFrame =
 				{
@@ -4070,16 +4098,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 					},
 					Notes = "Returns true if the entity is sprinting. Entities that cannot sprint return always false",
-				},
-				IsElytraFlying =
-				{
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the entity is flying with an elytra. Entities that cannot fly with an elytra return always false",
 				},
 				IsSubmerged =
 				{
@@ -9138,24 +9156,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the relative walk speed of this mob. Standard is 1.0",
 				},
-				GetSpawnDelay =
-				{
-					IsStatic = true,
-					Params =
-					{
-						{
-							Name = "MobFamily",
-							Type = "cMonster#eFamily",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family.",
-				},
 				HasCustomName =
 				{
 					Returns =
@@ -10263,36 +10263,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the full color code to be used for this player's messages (based on their rank). Prefix player messages with this code.",
 				},
-				GetDraggingItem =
-				{
-					Returns =
-					{
-						{
-							Type = "cItem",
-						},
-					},
-					Notes = "Returns the item the player is dragging in a UI window."
-				},
-				GetPrefix =
-				{
-					Returns =
-					{
-						{
-							Type = "string",
-						},
-					},
-					Notes = "Returns the prefix to player names for messages (based on their rank), may contain @ format codes.",
-				},
-				GetSuffix =
-				{
-					Returns =
-					{
-						{
-							Type = "string",
-						},
-					},
-					Notes = "Returns the suffix to player names for messages (based on their rank), may contain @ format codes.",
-				},
 				GetCurrentXp =
 				{
 					Returns =
@@ -10312,6 +10282,16 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the custom name of this player. If the player hasn't a custom name, it will return an empty string.",
+				},
+				GetDraggingItem =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item the player is dragging in a UI window."
 				},
 				GetEffectiveGameMode =
 				{
@@ -10467,16 +10447,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the player's current maximum speed, relative to the game default speed. Takes into account the sprinting / flying status.",
 				},
-				GetMainHand =
-				{
-					Returns =
-					{
-						{
-							Type = "eMainHand",
-						},
-					},
-					Notes = "Returns the player's main hand.",
-				},
 				GetName =
 				{
 					Returns =
@@ -10517,6 +10487,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the name that is used in the playerlist.",
 				},
+				GetPrefix =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the prefix to player names for messages (based on their rank), may contain @ format codes.",
+				},
 				GetRestrictions =
 				{
 					Returns =
@@ -10546,6 +10526,26 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the player's current set of skin part flags.  This is a bitwise OR of various {{Globals#eSkinPart|eSkinPart}} constants.  Note that HasSkinPart may be easier to use in most situations.",
+				},
+				GetStatistics =
+				{
+					Returns =
+					{
+						{
+							Type = "StatisticsManager",
+						},
+					},
+					Notes = "Returns the player's statistics manager."
+				},
+				GetSuffix =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the suffix to player names for messages (based on their rank), may contain @ format codes.",
 				},
 				GetTeam =
 				{
@@ -10789,6 +10789,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns true if the player is currently lying in a bed.",
 				},
+				IsLeftHanded =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player's left hand is dominant.",
+				},
 				IsSatiated =
 				{
 					Returns =
@@ -10798,16 +10808,6 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns true if the player is satiated (cannot eat).",
-				},
-				IsVisible =
-				{
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the player is visible to other players",
 				},
 				LoadRank =
 				{
@@ -11129,6 +11129,17 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the item that the player is dragging in a UI window. If no UI window is open, this function does nothing."
 				},
+				SetElytraFlight =
+				{
+					Params =
+					{
+						{
+							Name = "IsElytraFlying",
+							Type = "boolean",
+						},
+					},
+					Notes = "Sets whether the player is elytra flying or not.",
+				},
 				SetFlying =
 				{
 					Params =
@@ -11222,16 +11233,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the 'IsFishing' flag for the player. The floater entity ID is expected for the true variant, it can be omitted when IsFishing is false. FIXME: Undefined behavior when multiple fishing rods are used simultanously",
 				},
-				SetMainHand =
+				SetLeftHanded =
 				{
 					Params =
 					{
 						{
-							Name = "Hand",
-							Type = "eMainHand",
+							Name = "IsLeftHanded",
+							Type = "boolean",
 						},
 					},
-					Notes = "Sets the main hand of the player.",
+					Notes = "Sets the dominant hand of the player.",
 				},
 				SetName =
 				{
@@ -11276,17 +11287,6 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the skin part flags of the player.  The value should be a bitwise OR of several {{Globals#eSkinPart|eSkinPart}} constants.",
-				},
-				SetElytraFlight =
-				{
-					Params =
-					{
-						{
-							Name = "IsElytraFlying",
-							Type = "boolean",
-						},
-					},
-					Notes = "Sets whether the player is elytra flying or not.",
 				},
 				SetSprintingMaxSpeed =
 				{
@@ -11392,10 +11392,6 @@ a_Player:OpenWindow(Window);
 			},
 			Constants =
 			{
-				EATING_TICKS =
-				{
-					Notes = "Number of ticks required for consuming an item.",
-				},
 				MAX_FOOD_LEVEL =
 				{
 					Notes = "The maximum food level value. When the food level is at this value, the player cannot eat.",
@@ -13251,7 +13247,41 @@ end
 					Include = { "wt.*" },
 				}
 			},  -- ConstantGroups
-		},  -- cWindow
+		},
+		StatisticsManager =
+		{
+			Desc = [[
+				This class provides a store for various types of player statistics. The store will be read and sent to the client when the Statistics button is pressed.
+			]],
+			Variables =
+			{
+				Custom =
+				{
+					Type = "Map of {{CustomStatistic}} to number",
+					Notes = "Gets or sets the value of a custom statistic.",
+				},
+			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Example usage",
+					Contents = [[
+						Each store is a table, keyed by the statistic that the entry tracks, with value typically representing the number of times the event happened:
+<pre class="prettyprint lang-lua">
+function ModifyPlayerFurnaceInteractions(Player)
+	local Statistics = Player:GetStatistics()
+
+	if (Statistics.Custom[CustomStatistic.WalkOneCm] > 10) then
+		Statistics.Custom[CustomStatistic.InteractWithFurnace] = 1337
+	end
+
+	-- Next time the player presses Statistics they will see the updated value for furnace interactions.
+end
+</pre>
+					]],
+				},
+			},
+		},
 
 		BannerPattern =
 		{
@@ -13731,6 +13761,319 @@ end
 					Notes = "Smoke drifts west",
 				},
 			}
+		},
+		CustomStatistic =
+		{
+			Desc = [[
+				An enumeration of statistics of the custom type to be used with the {{StatisticsManager#Custom|Custom}} statistics store.
+			]],
+			Constants =
+			{
+				AnimalsBred =
+				{
+					Notes = "",
+				},
+				AviateOneCm =
+				{
+					Notes = "",
+				},
+				BellRing =
+				{
+					Notes = "",
+				},
+				BoatOneCm =
+				{
+					Notes = "",
+				},
+				CleanArmor =
+				{
+					Notes = "",
+				},
+				CleanBanner =
+				{
+					Notes = "",
+				},
+				CleanShulkerBox =
+				{
+					Notes = "",
+				},
+				ClimbOneCm =
+				{
+					Notes = "",
+				},
+				CrouchOneCm =
+				{
+					Notes = "",
+				},
+				DamageAbsorbed =
+				{
+					Notes = "",
+				},
+				DamageBlockedByShield =
+				{
+					Notes = "",
+				},
+				DamageDealt =
+				{
+					Notes = "",
+				},
+				DamageDealtAbsorbed =
+				{
+					Notes = "",
+				},
+				DamageDealtResisted =
+				{
+					Notes = "",
+				},
+				DamageResisted =
+				{
+					Notes = "",
+				},
+				DamageTaken =
+				{
+					Notes = "",
+				},
+				Deaths =
+				{
+					Notes = "",
+				},
+				Drop =
+				{
+					Notes = "",
+				},
+				EatCakeSlice =
+				{
+					Notes = "",
+				},
+				EnchantItem =
+				{
+					Notes = "",
+				},
+				FallOneCm =
+				{
+					Notes = "",
+				},
+				FillCauldron =
+				{
+					Notes = "",
+				},
+				FishCaught =
+				{
+					Notes = "",
+				},
+				FlyOneCm =
+				{
+					Notes = "",
+				},
+				HorseOneCm =
+				{
+					Notes = "",
+				},
+				InspectDispenser =
+				{
+					Notes = "",
+				},
+				InspectDropper =
+				{
+					Notes = "",
+				},
+				InspectHopper =
+				{
+					Notes = "",
+				},
+				InteractWithAnvil =
+				{
+					Notes = "",
+				},
+				InteractWithBeacon =
+				{
+					Notes = "",
+				},
+				InteractWithBlastFurnace =
+				{
+					Notes = "",
+				},
+				InteractWithBrewingstand =
+				{
+					Notes = "",
+				},
+				InteractWithCampfire =
+				{
+					Notes = "",
+				},
+				InteractWithCartographyTable =
+				{
+					Notes = "",
+				},
+				InteractWithCraftingTable =
+				{
+					Notes = "",
+				},
+				InteractWithFurnace =
+				{
+					Notes = "",
+				},
+				InteractWithGrindstone =
+				{
+					Notes = "",
+				},
+				InteractWithLectern =
+				{
+					Notes = "",
+				},
+				InteractWithLoom =
+				{
+					Notes = "",
+				},
+				InteractWithSmithingTable =
+				{
+					Notes = "",
+				},
+				InteractWithSmoker =
+				{
+					Notes = "",
+				},
+				InteractWithStonecutter =
+				{
+					Notes = "",
+				},
+				JunkFished =
+				{
+					Notes = "",
+				},
+				Jump =
+				{
+					Notes = "",
+				},
+				LeaveGame =
+				{
+					Notes = "",
+				},
+				MinecartOneCm =
+				{
+					Notes = "",
+				},
+				MobKills =
+				{
+					Notes = "",
+				},
+				OpenBarrel =
+				{
+					Notes = "",
+				},
+				OpenChest =
+				{
+					Notes = "",
+				},
+				OpenEnderchest =
+				{
+					Notes = "",
+				},
+				OpenShulkerBox =
+				{
+					Notes = "",
+				},
+				PigOneCm =
+				{
+					Notes = "",
+				},
+				PlayNoteblock =
+				{
+					Notes = "",
+				},
+				PlayOneMinute =
+				{
+					Notes = "",
+				},
+				PlayRecord =
+				{
+					Notes = "",
+				},
+				PlayerKills =
+				{
+					Notes = "",
+				},
+				PotFlower =
+				{
+					Notes = "",
+				},
+				RaidTrigger =
+				{
+					Notes = "",
+				},
+				RaidWin =
+				{
+					Notes = "",
+				},
+				SleepInBed =
+				{
+					Notes = "",
+				},
+				SneakTime =
+				{
+					Notes = "",
+				},
+				SprintOneCm =
+				{
+					Notes = "",
+				},
+				StriderOneCm =
+				{
+					Notes = "",
+				},
+				SwimOneCm =
+				{
+					Notes = "",
+				},
+				TalkedToVillager =
+				{
+					Notes = "",
+				},
+				TargetHit =
+				{
+					Notes = "",
+				},
+				TimeSinceDeath =
+				{
+					Notes = "",
+				},
+				TimeSinceRest =
+				{
+					Notes = "",
+				},
+				TradedWithVillager =
+				{
+					Notes = "",
+				},
+				TreasureFished =
+				{
+					Notes = "",
+				},
+				TriggerTrappedChest =
+				{
+					Notes = "",
+				},
+				TuneNoteblock =
+				{
+					Notes = "",
+				},
+				UseCauldron =
+				{
+					Notes = "",
+				},
+				WalkOnWaterOneCm =
+				{
+					Notes = "",
+				},
+				WalkOneCm =
+				{
+					Notes = "",
+				},
+				WalkUnderWaterOneCm =
+				{
+					Notes = "",
+				},
+			},
 		},
 		Globals =
 		{
@@ -17955,32 +18298,6 @@ end
 					TextBefore = [[
 						The following constants are used for the gamemode - survival, creative or adventure. Use the
 						gmXXX constants, the eGameMode_ constants are deprecated and will be removed from the API.
-					]],
-				},
-				eHand =
-				{
-					Include =
-					{
-						"hMain",
-						"hOff",
-					},
-					TextBefore = [[
-						These constants represent the main and off hand.  Currently, these constants are not used, but
-						are provided for future use when dual-wielding is functional.  An action or item can be in the
-						main hand or the off hand.  The main hand can be either the left or the right hand - use
-						{{cPlayer}}:GetMainHand() to determine which (see {{Globals#eMainHand|eMainHand}}).
-					]],
-				},
-				eMainHand =
-				{
-					Include =
-					{
-						"^mh.*",
-					},
-					TextBefore = [[
-						These constants identify which hand is the main hand.  The main hand can either be the left hand
-						or the right hand.  Note that this is only visual, as the client behaves the same regardless of the
-						main hand setting.  See {{cPlayer}}:GetMainHand().
 					]],
 				},
 				EMCSBiome =

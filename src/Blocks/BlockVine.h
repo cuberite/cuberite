@@ -50,6 +50,14 @@ public:
 
 private:
 
+	static const NIBBLETYPE VINE_LOST_SUPPORT = 16;
+	static const NIBBLETYPE VINE_UNCHANGED = 17;
+
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	{
+		return GetMaxMeta(a_Chunk, a_Position, a_Meta) != VINE_LOST_SUPPORT;
+	}
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface,
 		cPlayer & a_Player,
@@ -95,9 +103,6 @@ private:
 		}
 		return true;
 	}
-
-
-
 
 
 	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
@@ -169,6 +174,8 @@ private:
 			return;
 		}
 
+		const auto Position = cChunkDef::AbsoluteToRelative(a_BlockPos);
+		const auto MaxMeta = GetMaxMeta(a_Chunk, Position, a_Chunk.GetMeta(Position));
 		auto BlockToCheck = a_ChunkInterface.GetBlock(AddFaceDirection(a_BlockPos, a_WhichNeighbor));
 
 		// If only attached to this face: destroy
@@ -230,9 +237,9 @@ private:
 
 
 
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, BlockState a_Block) const override
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
 	{
-		return true;
+		return !a_ClickedDirectly || (a_HeldItem.m_ItemType != m_BlockType);
 	}
 
 

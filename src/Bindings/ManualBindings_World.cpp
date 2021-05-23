@@ -1268,6 +1268,70 @@ static int tolua_cWorld_GetSignLines(lua_State * tolua_S)
 
 
 
+static int tolua_cWorld_GetTimeOfDay(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get params:
+	cWorld * Self = nullptr;
+	L.GetStackValues(1, Self);
+	if (Self == nullptr)
+	{
+		return L.ApiParamError("Invalid 'self'");
+	}
+
+	// Call the function:
+	const auto Time = Self->GetTimeOfDay();
+
+	// Push the returned value:
+	L.Push(Time.count());
+	return 1;
+}
+
+
+
+
+
+static int tolua_cWorld_GetWorldAge(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get params:
+	cWorld * Self = nullptr;
+	L.GetStackValues(1, Self);
+	if (Self == nullptr)
+	{
+		return L.ApiParamError("Invalid 'self'");
+	}
+
+	// Call the function:
+	const auto Time = Self->GetWorldAge();
+
+	// Push the returned value:
+	L.Push(static_cast<lua_Number>(Time.count()));
+	return 1;
+}
+
+
+
+
+
 static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
 {
 	/* Function signature:
@@ -1461,6 +1525,37 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 
 
 
+static int tolua_cWorld_SetTimeOfDay(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamNumber(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Get params:
+	cWorld * Self = nullptr;
+	cTickTime::rep Time;
+	L.GetStackValues(1, Self, Time);
+	if (Self == nullptr)
+	{
+		return L.ApiParamError("Invalid 'self'");
+	}
+
+	// Call the function:
+	Self->SetTimeOfDay(cTickTime(Time));
+	return 0;
+}
+
+
+
+
+
 static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 {
 	// Function signature:
@@ -1492,7 +1587,7 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Could not store the callback parameter");
 	}
 
-	World->ScheduleTask(NumTicks, [Task](cWorld & a_World)
+	World->ScheduleTask(cTickTime(NumTicks), [Task](cWorld & a_World)
 		{
 			Task->Call(&a_World);
 		}
@@ -1635,17 +1730,16 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetBlockSkyLight",             tolua_cWorld_GetBlockSkyLight);
 			tolua_function(tolua_S, "GetBlockTypeMeta",             tolua_cWorld_GetBlockTypeMeta);
 			tolua_function(tolua_S, "GetSignLines",                 tolua_cWorld_GetSignLines);
+			tolua_function(tolua_S, "GetTimeOfDay",                 tolua_cWorld_GetTimeOfDay);
+			tolua_function(tolua_S, "GetWorldAge",                  tolua_cWorld_GetWorldAge);
 			tolua_function(tolua_S, "PrepareChunk",                 tolua_cWorld_PrepareChunk);
 			tolua_function(tolua_S, "QueueTask",                    tolua_cWorld_QueueTask);
 			tolua_function(tolua_S, "ScheduleTask",                 tolua_cWorld_ScheduleTask);
 			tolua_function(tolua_S, "SetBlock",                     tolua_cWorld_SetBlock);
 			tolua_function(tolua_S, "SetSignLines",                 tolua_cWorld_SetSignLines);
+			tolua_function(tolua_S, "SetTimeOfDay",                 tolua_cWorld_SetTimeOfDay);
 			tolua_function(tolua_S, "SpawnSplitExperienceOrbs",     tolua_cWorld_SpawnSplitExperienceOrbs);
 			tolua_function(tolua_S, "TryGetHeight",                 tolua_cWorld_TryGetHeight);
 		tolua_endmodule(tolua_S);
 	tolua_endmodule(tolua_S);
 }
-
-
-
-

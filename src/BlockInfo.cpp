@@ -1138,6 +1138,22 @@ bool cBlockInfo::FullyOccupiesVoxel(const BlockState Block)
 
 
 
+bool cBlockInfo::IsClickedThrough(const BlockState a_Block)
+{
+	// TODO: Nether Fire too.
+	switch (a_Block.Type())
+	{
+		case BlockType::Fire:
+		case BlockType::SoulFire:
+			return true;
+		default: return false;
+	}
+}
+
+
+
+
+
 bool cBlockInfo::IsOneHitDig(BlockState a_Block)
 {
 #ifdef __clang__

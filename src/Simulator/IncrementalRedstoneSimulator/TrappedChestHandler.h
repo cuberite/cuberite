@@ -24,10 +24,7 @@ namespace TrappedChestHandler
 		int NumberOfPlayers = 0;
 		a_Chunk.DoWithBlockEntityAt(a_Position, [&NumberOfPlayers](cBlockEntity & a_BlockEntity)
 		{
-			if (a_BlockEntity.GetBlockType() != BlockType::TrappedChest)
-			{
-				return false;
-			}
+			ASSERT(a_BlockEntity.GetBlockType() == BlockType::TrappedChest);
 
 			NumberOfPlayers = static_cast<cChestEntity &>(a_BlockEntity).GetNumberOfPlayers();
 			return false;

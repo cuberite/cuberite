@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "BlockInfo.h"
 #include "Mixins.h"
 
 
@@ -17,29 +18,20 @@ public:
 
 	using Super::Super;
 
-private:
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BlockState & a_Block
-	) const override
+	/** Returns true if the ladder will be supported by the block through the given blockface. */
+	static bool CanBePlacedOn(const BLOCKTYPE a_BlockType, const eBlockFace a_BlockFace)
 	{
-		// Try finding a suitable neighbor block face for the ladder; start with the given one.
-		if (!LadderCanBePlacedAt(a_ChunkInterface, a_PlacedBlockPos, a_ClickedBlockFace))
+		if (
+			(a_BlockFace == BLOCK_FACE_NONE) ||
+			(a_BlockFace == BLOCK_FACE_BOTTOM) ||
+			(a_BlockFace == BLOCK_FACE_TOP)
+		)
 		{
-			a_ClickedBlockFace = FindSuitableBlockFace(a_ChunkInterface, a_PlacedBlockPos);
-			if (a_ClickedBlockFace == BLOCK_FACE_NONE)
-			{
-				return false;
-			}
+			return false;
 		}
 
-		a_Block = Block::Ladder::Ladder(a_ClickedBlockFace);
-		return true;
+		return cBlockInfo::IsSolid(a_BlockType);
 	}
 
 
@@ -88,8 +80,11 @@ private:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		auto LadderAbsPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-		return LadderCanBePlacedAt(a_ChunkInterface, LadderAbsPos, Block::Ladder::Facing(a_Chunk.GetBlock(a_RelPos)));
+		auto Face = MetaDataToBlockFace(a_Meta);
+		auto NeighborRelPos = AddFaceDirection(a_Position, Face, true);
+		BLOCKTYPE NeighborBlockType;
+		a_Chunk.UnboundedRelGetBlockType(NeighborRelPos, NeighborBlockType);
+		return CanBePlacedOn(NeighborBlockType, Face);
 	}
 
 

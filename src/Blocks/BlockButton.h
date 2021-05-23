@@ -172,12 +172,12 @@ private:
 }
 
 	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BlockState & a_Block
+			cChunkInterface & a_ChunkInterface,
+			cPlayer & a_Player,
+			const Vector3i a_PlacedBlockPos,
+			eBlockFace a_ClickedBlockFace,
+			const Vector3i a_CursorPos,
+			BlockState & a_Block
 	) const override
 	{
 		using namespace Block;
@@ -203,10 +203,10 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		auto Self = a_Chunk.GetBlock(a_RelPos);
-		auto SupportRelPos = AddFaceDirection(a_RelPos, GetBlockFace(Self), true);
+		auto Self = a_Chunk.GetBlock(a_Position);
+		auto SupportRelPos = AddFaceDirection(a_Position, GetBlockFace(Self), true);
 		if (!cChunkDef::IsValidHeight(SupportRelPos.y))
 		{
 			return false;
@@ -230,7 +230,7 @@ private:
 	The given block type is checked when the task is executed to ensure the position still contains a button. */
 	static void QueueButtonRelease(cWorld & a_ButtonWorld, const Vector3i a_Position, const BlockState a_Block)
 	{
-		const auto TickDelay = (a_Block.Type() == BlockType::StoneButton) ? 20 : 30;
+		const auto TickDelay = (a_Block.Type() == BlockType::StoneButton) ? 20_tick : 30_tick;
 		a_ButtonWorld.ScheduleTask(
 			TickDelay,
 			[a_Position, a_Block](cWorld & a_World)

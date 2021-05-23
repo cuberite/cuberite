@@ -40,7 +40,3 @@ private:
 		return 11;
 	}
 } ;
-
-
-
-

@@ -7,7 +7,7 @@
 #include "../World.h"
 #include "../Items/ItemHandler.h"
 
-#include "../Statistics.h"
+#include "../StatisticsManager.h"
 
 #include "../UUID.h"
 
@@ -86,9 +86,6 @@ public:
 
 	static const int MAX_FOOD_LEVEL;
 
-	/** Number of ticks it takes to eat an item */
-	static const int EATING_TICKS;
-
 	// tolua_end
 
 	CLASS_PROTODEF(cPlayer)
@@ -166,8 +163,8 @@ public:
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
-	// Updates player's capabilities - flying, visibility, etc. from their gamemode.
-	void SetCapabilities();
+	/** Updates player's capabilities - flying, visibility, etc. from their gamemode. */
+	void UpdateCapabilities();
 
 	// tolua_begin
 
@@ -233,6 +230,9 @@ public:
 
 	AString GetIP(void) const;  // tolua_export
 
+	/** Return the associated statistic and achievement manager. */
+	StatisticsManager & GetStatistics() { return m_Stats; }
+
 	/** Returns the associated team, nullptr if none */
 	cTeam * GetTeam(void) { return m_Team; }  // tolua_export
 
@@ -247,13 +247,10 @@ public:
 	/** Forces the player to query the scoreboard for his team */
 	cTeam * UpdateTeam(void);
 
-	/** Return the associated statistic and achievement manager. */
-	cStatManager & GetStatManager() { return m_Stats; }
-
 	/** Awards the player an achievement.
 	If all prerequisites are met, this method will award the achievement and will broadcast a chat message.
 	If the achievement has been already awarded to the player, this method will just increment the stat counter. */
-	void AwardAchievement(Statistic a_Ach);
+	void AwardAchievement(CustomStatistic a_Ach);
 
 	/** Forces the player to move in the given direction.
 	@deprecated Use SetSpeed instead. */
@@ -371,13 +368,16 @@ public:
 	void AddFoodExhaustion(double a_Exhaustion);
 
 	/** Returns true if the player is currently in the process of eating the currently equipped item */
-	bool IsEating(void) const { return (m_EatingFinishTick >= 0); }
+	bool IsEating(void) const { return m_EatingFinishTick >= 0_tick; }
 
 	/** Returns true if the player is currently flying */
 	bool IsFlying(void) const { return m_IsFlying; }
 
 	/** Returns true if a player is sleeping in a bed. */
 	bool IsInBed(void) const;
+
+	/** Returns true if the player's left hand is dominant. */
+	bool IsLeftHanded() const;
 
 	/** Returns true if the player has thrown out a floater */
 	bool IsFishing(void) const { return m_IsFishing; }
@@ -415,21 +415,18 @@ public:
 	void Respawn(void);  // tolua_export
 
 	void SetVisible( bool a_bVisible);  // tolua_export
-	bool IsVisible(void) const { return m_IsVisible; }  // tolua_export
 
 	/** Saves all player data, such as inventory, to JSON. */
 	void SaveToDisk(void);
 
-	typedef cWorld * cWorldPtr;
-
 	/** Loads the player data from the disk file.
-	Sets a_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile(). */
-	void LoadFromDisk(cWorldPtr & a_World);
+	Sets m_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile(). */
+	void LoadFromDisk();
 
 	/** Loads the player data from the specified file.
-	Sets a_World to the world where the player will spawn, based on the stored world name or the default world.
+	Sets m_World to the world where the player will spawn, based on the stored world name or the default world.
 	Returns true on success, false if the player wasn't found, and excepts with base std::runtime_error if the data couldn't be read or parsed. */
-	bool LoadFromFile(const AString & a_FileName, cWorldPtr & a_World);
+	bool LoadFromFile(const AString & a_FileName);
 
 	const AString & GetLoadedWorldName() const { return m_CurrentWorldName; }
 
@@ -497,6 +494,9 @@ public:
 	/** Starts or stops flying, broadcasting the state change. */
 	void SetFlying(bool a_ShouldFly);
 
+	/** Sets the dominant hand of the player. */
+	void SetLeftHanded(bool a_IsLeftHanded);
+
 	/** Starts or stops sprinting, if our current body stance permits, broadcasting the state change. */
 	void SetSprint(bool a_ShouldSprint);
 
@@ -534,7 +534,7 @@ public:
 	void UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIsOnGround);
 
 	/** Whether placing the given blocks would intersect any entitiy */
-	bool DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks);
+	bool DoesPlacingBlocksIntersectEntity(std::initializer_list<sSetBlock> a_Blocks) const;
 
 	/** Returns the UUID that has been read from the client, or nil if not available. */
 	const cUUID & GetUUID(void) const;  // Exported in ManualBindings.cpp
@@ -552,11 +552,6 @@ public:
 	If the hook prevents the placement, sends the current block at the specified coords back to the client.
 	Assumes that the block is in a currently loaded chunk.
 	Returns true if the block is successfully placed. */
-	bool PlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BlockState a_Block)
-	{
-		return PlaceBlock({a_BlockX, a_BlockY, a_BlockZ}, a_Block);
-	}
-
 	bool PlaceBlock(Vector3i a_Pos, BlockState a_Block);
 
 	/** Sends the block in the specified range around the specified coord to the client
@@ -568,9 +563,6 @@ public:
 	int GetSkinParts(void) const { return m_SkinParts; }
 	void SetSkinParts(int a_Parts);
 
-	eMainHand GetMainHand(void) const { return m_MainHand; }
-	void SetMainHand(eMainHand a_Hand);
-
 	// tolua_end
 
 	/** Calls the block placement hooks and places the blocks in the world.
@@ -579,7 +571,7 @@ public:
 	If the any of the "placing" hooks aborts, none of the blocks are placed and the function returns false.
 	Returns true if all the blocks are placed.
 	Assumes that all the blocks are in currently loaded chunks. */
-	bool PlaceBlocks(const sSetBlockVector & a_Blocks);
+	bool PlaceBlocks(std::initializer_list<sSetBlock> a_Blocks);
 
 	/** Notify nearby wolves that the player or one of the player's wolves took damage or did damage to an entity
 	@param a_Opponent the opponent we're fighting.
@@ -603,13 +595,9 @@ public:
 	If the item is already known, does nothing. */
 	void AddKnownItem(const cItem & a_Item);
 
-	/** Update a player's size, for example, on body stance changes. */
-	void SetSize(float a_Width, float a_Height);
-
 	// cEntity overrides:
 	virtual void AttachTo(cEntity * a_AttachTo) override;
 	virtual void Detach(void) override;
-	virtual void Detach(bool a_IsTeleporting);
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
 	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
 	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
@@ -622,14 +610,6 @@ public:
 	virtual bool IsSprinting(void) const override;
 
 private:
-
-	/** Xp Level stuff */
-	enum
-	{
-		XP_TO_LEVEL15 = 255,
-		XP_PER_LEVEL_TO15 = 17,
-		XP_TO_LEVEL30 = 825
-	} ;
 
 	typedef std::vector<std::vector<AString> > AStringVectorVector;
 
@@ -729,6 +709,9 @@ private:
 	/** If true, we are locking m_Position to m_FrozenPosition. */
 	bool m_IsFrozen;
 
+	/** Whether the player is left-handed, or right-handed. */
+	bool m_IsLeftHanded;
+
 	/** Was the player frozen manually by a plugin or automatically by the server? */
 	bool m_IsManuallyFrozen;
 
@@ -739,7 +722,7 @@ private:
 	bool m_IsVisible;
 
 	/** The world tick in which eating will be finished. -1 if not eating */
-	Int64 m_EatingFinishTick;
+	cTickTimeLong m_EatingFinishTick;
 
 	/** Player Xp level */
 	int m_LifetimeTotalXp;
@@ -752,7 +735,7 @@ private:
 
 	cTeam * m_Team;
 
-	cStatManager m_Stats;
+	StatisticsManager m_Stats;
 
 	/** How long till the player's inventory will be saved
 	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
@@ -762,9 +745,6 @@ private:
 
 	/** Displayed skin part bit mask */
 	int m_SkinParts;
-
-	/** The main hand of the player */
-	eMainHand m_MainHand;
 
 	/** List on known recipes as Ids */
 	std::set<UInt32> m_KnownRecipes;
@@ -813,6 +793,7 @@ private:
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual float GetEnchantmentBlastKnockbackReduction() override;
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
+	virtual bool IsInvisible() const override;
 	virtual bool IsRclking(void) const override { return IsEating() || IsChargingBow(); }
 	virtual void OnAddToWorld(cWorld & a_World) override;
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;

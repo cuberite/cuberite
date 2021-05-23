@@ -1336,7 +1336,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 	}
 
 	// Save the world age to the chunk data. Required by vanilla and mcedit.
-	aWriter.AddLong("LastUpdate", aWorld.GetWorldAge());
+	aWriter.AddLong("LastUpdate", aWorld.GetWorldAge().count());
 
 	// Store the flag that the chunk has all the ores, trees, dungeons etc. Cuberite chunks are always complete.
 	aWriter.AddByte("TerrainPopulated", 1);

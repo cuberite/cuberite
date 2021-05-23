@@ -104,13 +104,13 @@ private:
 
 		// Find the type of block the lever is attached to:
 		auto NeighborFace = Block::Lever::Facing(Self);
-		auto NeighborPos = AddFaceDirection(a_RelPos, NeighborFace, true);
+		auto NeighborPos = AddFaceDirection(a_Position, NeighborFace, true);
 		if (!cChunkDef::IsValidHeight(NeighborPos.y))
 		{
 			return false;
 		}
 
-		BlockState Neighbour = 0;
+		BlockState Neighbour;
 		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, Neighbour))
 		{
 			return false;

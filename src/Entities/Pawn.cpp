@@ -15,7 +15,7 @@
 
 
 
-cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
+cPawn::cPawn(eEntityType a_EntityType, float a_Width, float a_Height) :
 	Super(a_EntityType, Vector3d(), a_Width, a_Height),
 	m_EntityEffects(tEffectMap()),
 	m_LastGroundHeight(0),
@@ -116,7 +116,7 @@ void cPawn::KilledBy(TakeDamageInfo & a_TDI)
 	// Is death eligible for totem reanimation?
 	if (DeductTotem(a_TDI.DamageType))
 	{
-		m_World->BroadcastEntityStatus(*this, esTotemOfUndying);
+		m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnTotemActivates);
 
 		AddEntityEffect(cEntityEffect::effAbsorption, 100, 1);
 		AddEntityEffect(cEntityEffect::effRegeneration, 900, 1);
@@ -425,17 +425,19 @@ void cPawn::HandleFalling(void)
 
 			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
 
-			auto NumericBlock = PaletteUpgrade::ToBlock(GetWorld()->GetBlock(POS_TOINT.addedY(-1)));
-
-			// Fall particles
-			GetWorld()->BroadcastParticleEffect(
-				"blockdust",
-				GetPosition(),
-				{ 0, 0, 0 },
-				(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
-				static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
-				{ { NumericBlock.first, NumericBlock.second } }
-			);
+			// Fall particles:
+			if (const auto Below = POS_TOINT.addedY(-1); Below.y >= 0)
+			{
+				auto NumericBlock = PaletteUpgrade::ToBlock(GetWorld()->GetBlock(Below));
+				GetWorld()->BroadcastParticleEffect(
+					"blockdust",
+					GetPosition(),
+					{ 0, 0, 0 },
+					(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
+					static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
+					{ { NumericBlock.first, NumericBlock.second } }
+				);
+			}
 		}
 
 		m_bTouchGround = true;

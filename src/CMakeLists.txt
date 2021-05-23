@@ -59,7 +59,7 @@ target_sources(
 	Scoreboard.cpp
 	Server.cpp
 	SpawnPrepare.cpp
-	Statistics.cpp
+	StatisticsManager.cpp
 	StringCompression.cpp
 	StringUtils.cpp
 	UUID.cpp
@@ -139,8 +139,7 @@ target_sources(
 	SetChunkData.h
 	SettingsRepositoryInterface.h
 	SpawnPrepare.h
-	Statistics.h
-	Stopwatch.h
+	StatisticsManager.h
 	StringCompression.h
 	StringUtils.h
 	UUID.h

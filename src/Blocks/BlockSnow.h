@@ -20,7 +20,7 @@ private:
 
 	enum
 	{
-		FullBlockLayers = 7  // Meta value of a full-height snow block
+		FullBlockLayers = 7  // Meta value of a full-height snow block.
 	};
 
 	virtual bool GetPlacementBlockTypeMeta(
@@ -57,18 +57,17 @@ private:
 
 
 
-
-
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, BlockState a_Block) const override
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
 	{
-		if ((a_Player.GetEquippedItem().m_ItemType == E_BLOCK_SNOW) && (Block::Snow::Layers(a_Block) < FullBlockLayers))
-		{
-			return true;  // If a player is holding a (thin) snow block and it's size can be increased, return collision ignored
-		}
-
 		if (Block::Snow::Layers(a_Block) == 0)
 		{
-			return true;  // If at normal snowfall height (lowest), we ignore collision
+			return true;  // If at normal snowfall height (lowest), we ignore collision.
+		}
+
+		// Special case if a player is holding a (thin) snow block and its size can be increased:
+		if ((a_HeldItem.m_ItemType == E_BLOCK_SNOW) && (a_Meta < FullBlockMeta))
+		{
+			return !a_ClickedDirectly || (a_ClickedBlockFace == BLOCK_FACE_YP);  // If clicked an adjacent block, or clicked YP directly, we ignore collision.
 		}
 
 		return false;
@@ -80,7 +79,7 @@ private:
 
 	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
-		// No drop unless dug up with a shovel
+		// No drop unless dug up with a shovel:
 		if ((a_Tool == nullptr) || !ItemCategory::IsShovel(a_Tool->m_ItemType))
 		{
 			return {};
@@ -101,13 +100,13 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_RelPos.y <= 0)
+		if (a_Position.y <= 0)
 		{
 			return false;
 		}
-		auto BelowPos = a_RelPos.addedY(-1);
+		auto BelowPos = a_Position.addedY(-1);
 		auto BlockBelow = a_Chunk.GetBlock(BelowPos);
 		return CanBeOn(BlockBelow);
 	}
@@ -136,7 +135,7 @@ private:
 	/** Returns true if snow can be placed on top of a block with the given type and meta. */
 	static bool CanBeOn(BlockState a_Block)
 	{
-		// If block below is snowable, or it is a thin slow block and is a full thin snow block, say yay
+		// If block below is snowable, or it is a thin snow block and is a full thin snow block, say yay:
 		return (
 			cBlockInfo::IsSnowable(a_Block) ||
 			(

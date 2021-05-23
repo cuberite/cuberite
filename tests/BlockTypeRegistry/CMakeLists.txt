@@ -23,7 +23,7 @@ add_executable(BlockTypePaletteTest
 	${PROJECT_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
 	${PROJECT_SOURCE_DIR}/src/OSSupport/File.cpp
 )
-target_link_libraries(BlockTypePaletteTest fmt::fmt jsoncpp_lib)
+target_link_libraries(BlockTypePaletteTest fmt::fmt jsoncpp_static)
 
 # BlockTypeRegistryTest: Verify that the BlockTypeRegistry class works as intended:
 add_executable(BlockTypeRegistryTest
@@ -48,7 +48,7 @@ add_executable(PalettedBlockAreaTest
 	${PROJECT_SOURCE_DIR}/src/StringUtils.cpp
 	${PROJECT_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
 )
-target_link_libraries(PalettedBlockAreaTest fmt::fmt jsoncpp_lib)
+target_link_libraries(PalettedBlockAreaTest fmt::fmt jsoncpp_static)
 
 # Extra files for BlockTypePalette test:
 file (COPY

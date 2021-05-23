@@ -8,7 +8,7 @@
 
 
 cCaveSpider::cCaveSpider(void) :
-	Super("CaveSpider", mtCaveSpider, "entity.spider.hurt", "entity.spider.death", "entity.spider.ambient", 0.7, 0.5)
+	Super("CaveSpider", mtCaveSpider, "entity.spider.hurt", "entity.spider.death", "entity.spider.ambient", 0.7f, 0.5f)
 {
 }
 
@@ -25,7 +25,7 @@ void cCaveSpider::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	m_EMPersonality = (GetWorld()->GetTimeOfDay() < (12000 + 1000)) ? PASSIVE : AGGRESSIVE;
+	m_EMPersonality = (GetWorld()->GetTimeOfDay() < 13000_tick) ? PASSIVE : AGGRESSIVE;
 }
 
 

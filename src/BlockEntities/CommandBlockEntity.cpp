@@ -166,7 +166,7 @@ void cCommandBlockEntity::Execute()
 	public:
 		CommandBlockOutCb(cCommandBlockEntity * a_CmdBlock) : m_CmdBlock(a_CmdBlock) {}
 
-		virtual void Out(const AString & a_Text)
+		virtual void Out(const AString & a_Text) override
 		{
 			// Overwrite field
 			m_CmdBlock->SetLastOutput(cClientHandle::FormatChatPrefix(m_CmdBlock->GetWorld()->ShouldUseChatPrefixes(), "SUCCESS", cChatColor::Green, cChatColor::White) + a_Text);

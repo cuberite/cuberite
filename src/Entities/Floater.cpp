@@ -76,7 +76,7 @@ protected:
 
 
 cFloater::cFloater(Vector3d a_Pos, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime) :
-	Super(etFloater, a_Pos, 0.2, 0.2),
+	Super(etFloater, a_Pos, 0.25f, 0.25f),
 	m_BitePos(a_Pos),
 	m_CanPickupItem(false),
 	m_PickupCountDown(0),

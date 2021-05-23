@@ -33,7 +33,7 @@ private:
 			return false;
 		}
 
-		a_Player.GetStatManager().AddValue(Statistic::EatCakeSlice);
+		a_Player.GetStatistics().Custom[CustomStatistic::EatCakeSlice]++;
 		auto EatenSlices = Block::Cake::Bites(Self);
 		if (EatenSlices >= 5)
 		{

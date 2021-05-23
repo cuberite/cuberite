@@ -18,7 +18,7 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// No pickups
 		return {};
@@ -49,11 +49,11 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if ((a_RelPos.y <= 0) || (a_RelPos.y >= cChunkDef::Height - 1))
+		if ((a_Position.y <= 0) || (a_Position.y >= cChunkDef::Height - 1))
 		{
-			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1
+			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1.
 		}
 
 		switch (Block::NetherPortal::Axis(a_Chunk.GetBlock(a_RelPos)))
@@ -73,7 +73,7 @@ private:
 				for (const auto & Direction : PortalCheck)
 				{
 					BlockState Block;
-					a_Chunk.UnboundedRelGetBlock(a_RelPos + Direction, Block);
+					a_Chunk.UnboundedRelGetBlock(a_Position + Direction, Block);
 					if ((Block.Type() != BlockType::NetherPortal) && (Block.Type() != BlockType::Obsidian))
 					{
 						return false;
@@ -96,7 +96,7 @@ private:
 				for (const auto & Direction : PortalCheck)
 				{
 					BlockState Block;
-					a_Chunk.UnboundedRelGetBlock(a_RelPos + Direction, Block);
+					a_Chunk.UnboundedRelGetBlock(a_Position + Direction, Block);
 					if ((Block.Type() != BlockType::NetherPortal) && (Block.Type() != BlockType::Obsidian))
 					{
 						return false;

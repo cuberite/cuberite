@@ -11,6 +11,8 @@
 
 
 
+
+
 class cBlockDoorHandler final :
 	public cBlockHandler
 {
@@ -40,23 +42,6 @@ public:
 		else
 		{
 			return !cBlockInfo::IsTransparent(a_Block);
-		}
-	}
-
-	static bool CanReplaceBlock(BlockState a_Block)
-	{
-		switch (a_Block.Type())
-		{
-			case BlockType::Air:
-			case BlockType::TallGrass:
-			case BlockType::Water:
-			case BlockType::Lava:
-			case BlockType::Snow:
-			case BlockType::Fire:
-			{
-				return true;
-			}
-			default: return false;
 		}
 	}
 
@@ -377,9 +362,13 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Self) const override
 	{
-		return ((a_RelPos.y > 0) && CanBeOn(a_Chunk.GetBlock(a_RelPos.addedY(-1))));
+		const auto BasePosition = a_Position.addedY(IsTop(a_Self.Type()) ? -2 : -1);
+		auto BlockToReplace = a_Chunk.GetBlock(BasePosition);
+
+		return (BasePosition.y >= 0) && CanBeOn(BlockType, BlockMeta);
+		return ((a_RelPos.y > 0) && CanBeOn(BlockToReplace);
 	}
 
 

@@ -21,8 +21,8 @@ class cWorldInterface
 public:
 	virtual ~cWorldInterface() {}
 
-	virtual int GetTimeOfDay(void) const = 0;
-	virtual Int64 GetWorldAge(void)  const = 0;
+	virtual cTickTime GetTimeOfDay(void) const = 0;
+	virtual cTickTimeLong GetWorldAge(void)  const = 0;
 
 	virtual eDimension GetDimension(void) const = 0;
 
@@ -54,10 +54,10 @@ public:
 	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(Vector3d a_Pos, int a_Reward) = 0;
 
 	/** Sends the block on those coords to the player */
-	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer & a_Player) = 0;
+	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, const cPlayer & a_Player) = 0;
 
 	/** Sends the block on those coords to the player */
-	inline void SendBlockTo(const Vector3i a_BlockPos, cPlayer & a_Player)
+	inline void SendBlockTo(const Vector3i a_BlockPos, const cPlayer & a_Player)
 	{
 		SendBlockTo(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Player);
 	}
@@ -70,7 +70,7 @@ public:
 	If any chunk in the box is missing, ignores the entities in that chunk silently. */
 	virtual bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback) = 0;
 
-	virtual void SetTimeOfDay(int a_TimeOfDay) = 0;
+	virtual void SetTimeOfDay(cTickTime a_TimeOfDay) = 0;
 
 	/** Returns true if it is raining or storming at the specified location. This takes into account biomes. */
 	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) = 0;

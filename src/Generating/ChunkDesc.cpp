@@ -518,8 +518,8 @@ void cChunkDesc::RandomFillRelCuboid(
 
 cBlockEntity * cChunkDesc::GetBlockEntity(Vector3i a_RelPos)
 {
-	auto Idx = static_cast<size_t>(cChunkDef::MakeIndex(a_RelPos));
-	auto itr = m_BlockEntities.find(Idx);
+	const auto Idx = cChunkDef::MakeIndex(a_RelPos);
+	const auto itr = m_BlockEntities.find(Idx);
 
 	if (itr != m_BlockEntities.end())
 	{

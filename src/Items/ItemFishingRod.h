@@ -210,7 +210,7 @@ public:
 				}
 			}
 
-			a_Player.GetStatManager().AddValue(Statistic::TreasureFished, 1);
+			a_Player.GetStatistics().Custom[CustomStatistic::TreasureFished]++;
 		}
 		else if (ItemCategory < JunkChances[LotSLevel])
 		{
@@ -262,7 +262,7 @@ public:
 				Drops.Add(cItem(Item::TripwireHook));
 			}
 
-			a_Player.GetStatManager().AddValue(Statistic::JunkFished, 1);
+			a_Player.GetStatistics().Custom[CustomStatistic::JunkFished]++;
 		}
 		else
 		{
@@ -284,7 +284,7 @@ public:
 				Drops.Add(cItem(Item::Cod));
 			}
 
-			a_Player.GetStatManager().AddValue(Statistic::FishCaught, 1);
+			a_Player.GetStatistics().Custom[CustomStatistic::FishCaught]++;
 		}
 
 		// Check with plugins if this loot is acceptable:

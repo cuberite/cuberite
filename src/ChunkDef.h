@@ -210,7 +210,7 @@ public:
 	}
 
 
-	inline static int MakeIndex(Vector3i a_Pos)
+	inline static size_t MakeIndex(Vector3i a_Pos)
 	{
 		return MakeIndex(a_Pos.x, a_Pos.y, a_Pos.z);
 	}
@@ -218,34 +218,20 @@ public:
 
 	inline static int MakeIndex(int x, int y, int z)
 	{
-		if (
-			(x < Width)  && (x > -1) &&
-			(y < Height) && (y > -1) &&
-			(z < Width)  && (z > -1)
-		)
-		{
-			return MakeIndexNoCheck(x, y, z);
-		}
-		FLOGERROR("cChunkDef::MakeIndex(): coords out of range: {0}; returning fake index 0", Vector3i{x, y, z});
-		ASSERT(!"cChunkDef::MakeIndex(): coords out of chunk range!");
-		return 0;
-	}
+		ASSERT(IsValidRelPos({ x, y, z }));
 
-
-	inline static int MakeIndexNoCheck(int x, int y, int z)
-	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			// For some reason, NOT using the Horner schema is faster. Weird.
-			return x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width);   // 1.2 uses XZY
+			return static_cast<size_t>(x + (z * Width) + (y * Width * Width));   // 1.2 uses XZY
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width);  // 1.1 uses YZX
+			return static_cast<size_t>(y + (z * Width) + (x * Height * Width));  // 1.1 uses YZX
 		#endif
 	}
 
 
-	inline static int MakeIndexNoCheck(Vector3i a_RelPos)
+	inline static size_t MakeIndex(Vector3i a_RelPos)
 	{
-		return MakeIndexNoCheck(a_RelPos.x, a_RelPos.y, a_RelPos.z);
+		return MakeIndex(a_RelPos.x, a_RelPos.y, a_RelPos.z);
 	}
 
 
@@ -272,7 +258,7 @@ public:
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Y >= 0) && (a_Y < Height));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		a_BlockTypes[MakeIndexNoCheck(a_X, a_Y, a_Z)] = a_Type;
+		a_BlockTypes[MakeIndex(a_X, a_Y, a_Z)] = a_Type;
 	}
 
 
@@ -286,7 +272,7 @@ public:
 	inline static BlockState GetBlock(const BlockState * a_BlockTypes, Vector3i a_RelPos)
 	{
 		ASSERT(IsValidRelPos(a_RelPos));
-		return a_BlockTypes[MakeIndexNoCheck(a_RelPos)];
+		return a_BlockTypes[MakeIndex(a_RelPos)];
 	}
 
 
@@ -295,7 +281,7 @@ public:
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Y >= 0) && (a_Y < Height));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		return a_BlockTypes[MakeIndexNoCheck(a_X, a_Y, a_Z)];
+		return a_BlockTypes[MakeIndex(a_X, a_Y, a_Z)];
 	}
 
 
@@ -342,8 +328,7 @@ public:
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
-			int Index = MakeIndexNoCheck(x, y, z);
-			return ExpandLightType(a_Buffer, static_cast<size_t>(Index));
+			return ExpandLightType(a_Buffer, MakeIndex(x, y, z));
 		}
 		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
 		return 0;
@@ -457,7 +442,6 @@ struct sSetBlock
 	}
 };
 
-typedef std::list<sSetBlock> sSetBlockList;
 typedef std::vector<sSetBlock> sSetBlockVector;
 
 typedef std::list<cChunkCoords> cChunkCoordsList;
@@ -477,27 +461,6 @@ public:
 		return (static_cast<size_t>(a_Coords.m_ChunkX) << 16) ^ static_cast<size_t>(a_Coords.m_ChunkZ);
 	}
 };
-
-
-
-
-
-class cChunkCoordsWithBool
-{
-public:
-	int m_ChunkX;
-	int m_ChunkZ;
-	bool m_ForceGenerate;
-
-	cChunkCoordsWithBool(int a_ChunkX, int a_ChunkZ, bool a_ForceGenerate) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ), m_ForceGenerate(a_ForceGenerate){}
-
-	bool operator == (const cChunkCoordsWithBool & a_Other) const
-	{
-		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ) && (m_ForceGenerate == a_Other.m_ForceGenerate));
-	}
-};
-
-typedef std::list<cChunkCoordsWithBool> cChunkCoordsWithBoolList;
 
 
 
@@ -539,7 +502,6 @@ public:
 } ;
 
 typedef cCoordWithData<int>        cCoordWithInt;
-typedef cCoordWithData<BlockState>  cCoordWithBlock;
 
 typedef std::list<cCoordWithInt>   cCoordWithIntList;
 typedef std::vector<cCoordWithInt> cCoordWithIntVector;

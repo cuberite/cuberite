@@ -14,8 +14,38 @@
 
 
 
+class cBoatCollisionCallback
+{
+public:
+	cBoatCollisionCallback(cBoat * a_Boat, cEntity * a_Attachee) :
+		m_Boat(a_Boat), m_Attachee(a_Attachee)
+	{
+	}
+
+	bool operator()(cEntity & a_Entity)
+	{
+		// Checks if boat is empty and if given entity is a mob
+		if ((m_Attachee == nullptr) && (a_Entity.IsMob()))
+		{
+			// if so attach and return true
+			a_Entity.AttachTo(m_Boat);
+			return true;
+		}
+
+		return false;
+	}
+
+protected:
+	cBoat * m_Boat;
+	cEntity * m_Attachee;
+};
+
+
+
+
+
 cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
-	Super(etBoat, a_Pos, 0.98, 0.7),
+	Super(etBoat, a_Pos, 1.375f, 0.5625f),
 	m_LastDamage(0), m_ForwardDirection(0),
 	m_DamageTaken(0.0f), m_Material(a_Material),
 	m_RightPaddleUsed(false), m_LeftPaddleUsed(false)
@@ -46,8 +76,8 @@ void cBoat::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 	// Cannot use super::BroadcastMovementUpdate here, broadcasting position when not
 	// expected by the client breaks things. See https://github.com/cuberite/cuberite/pull/4488
 
-	// Process packet sending every two ticks
-	if (GetWorld()->GetWorldAge() % 2 != 0)
+	// Process packet sending every two ticks:
+	if ((GetWorld()->GetWorldTickAge() % 2_tick) != 0_tick)
 	{
 		return;
 	}
@@ -311,3 +341,20 @@ cItem cBoat::MaterialToItem(eMaterial a_Material)
 
 
 
+
+void cBoat::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	/** Special version of cEntity::HandlePhysics(...) function for boats, checks if mobs
+	colliding with the boat can be attached and does if that's the case, then returns to
+	normal physics calcualtions */
+
+	// Calculate boat's bounding box, run collision callback on all entities in said box
+	cBoatCollisionCallback BoatCollisionCallback(this, m_Attachee);
+	Vector3d BoatPosition = GetPosition();
+	cBoundingBox bbBoat(
+		Vector3d(BoatPosition.x, floor(BoatPosition.y), BoatPosition.z), GetWidth() / 2, GetHeight());
+	m_World->ForEachEntityInBox(bbBoat, BoatCollisionCallback);
+
+	// Return to calculating physics normally
+	Super::HandlePhysics(a_Dt, a_Chunk);
+}

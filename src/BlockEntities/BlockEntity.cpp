@@ -382,6 +382,15 @@ bool cBlockEntity::IsBlockEntityBlockType(const BlockType a_Block)
 
 
 
+void cBlockEntity::OnAddToWorld(cWorld & a_World, cChunk & a_Chunk)
+{
+	m_World = &a_World;
+}
+
+
+
+
+
 void cBlockEntity::OnRemoveFromWorld()
 {
 }

@@ -66,7 +66,7 @@ void cEndGen::InitializeShapeGen(cIniFile & a_IniFile)
 	m_AirThresholdOtherIslands = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "EndGenAirThresholdOtherIslands", m_AirThresholdOtherIslands));
 	m_MainIslandSize = a_IniFile.GetValueSetI("Generator", "EndGenMainIslandSize", m_MainIslandSize);
 	m_BaseHeight = a_IniFile.GetValueSetI("Generator", "EndGenBaseHeight", m_BaseHeight);
-	m_TerrainTopMultiplier = a_IniFile.GetValueSetI("Generator", "EndGenTerrainTopMultipler", m_TerrainTopMultiplier);
+	m_TerrainTopMultiplier = a_IniFile.GetValueSetI("Generator", "EndGenTerrainTopMultiplier", m_TerrainTopMultiplier);
 	m_TerrainBottomMultiplier = a_IniFile.GetValueSetI("Generator", "EndGenTerrainBottomMultiplier", m_TerrainBottomMultiplier);
 	m_VoidOffsetNoiseMultiplier = a_IniFile.GetValueSetI("Generator", "EndGenVoidOffsetNoiseMultiplier", m_VoidOffsetNoiseMultiplier);
 

@@ -968,23 +968,6 @@ namespace
 ////////////////////////////////////////////////////////////////////////////////
 // cBlockHandler:
 
-bool cBlockHandler::GetPlacementBlockTypeMeta(
-	cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-	const Vector3i a_ClickedBlockPos,
-	eBlockFace a_ClickedBlockFace,
-	const Vector3i a_CursorPos,
-	BlockState & a_Block
-) const
-{
-	// This creates a default Block of that type. Whatever that means foe the block state
-	a_Block = BlockState(m_BlockType);
-	return true;
-}
-
-
-
-
-
 void cBlockHandler::OnUpdate(
 	cChunkInterface & a_ChunkInterface,
 	cWorldInterface & a_WorldInterface,
@@ -1001,7 +984,7 @@ void cBlockHandler::OnUpdate(
 
 void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const
 {
-	if (a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { return CanBeAt(a_ChunkInterface, cChunkDef::AbsoluteToRelative(a_BlockPos), a_Chunk); }))
+	if (a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { return CanBeAt(a_Chunk, cChunkDef::AbsoluteToRelative(a_BlockPos), a_Chunk.GetMeta(cChunkDef::AbsoluteToRelative(a_BlockPos))); }))
 	{
 		return;
 	}
@@ -1039,7 +1022,7 @@ cItems cBlockHandler::ConvertToPickups(BlockState a_Block, const cItem * a_Tool)
 
 
 
-bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const
+bool cBlockHandler::CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const
 {
 	return true;
 }
@@ -1057,16 +1040,7 @@ bool cBlockHandler::IsUseable() const
 
 
 
-bool cBlockHandler::IsClickedThrough(void) const
-{
-	return false;
-}
-
-
-
-
-
-bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, BlockState a_Block) const
+bool cBlockHandler::DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const
 {
 	return cBlockAirHandler::IsBlockAir(m_BlockType);
 }

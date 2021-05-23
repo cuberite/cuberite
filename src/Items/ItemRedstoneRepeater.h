@@ -24,24 +24,17 @@ public:
 
 
 
-	virtual bool IsPlaceable() override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
-		return true;
+		return a_Player.PlaceBlock(a_PlacePosition, Block::Repeater::Repeater(0, RotationToBlockFace(a_Player->GetYaw()), false, false));
 	}
 
 
 
 
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BlockState & a_Block
-	) override
+	virtual bool IsPlaceable() override
 	{
-		a_Block = Block::Repeater::Repeater(0, RotationToBlockFace(a_Player->GetYaw()), false, false);
 		return true;
 	}
 } ;

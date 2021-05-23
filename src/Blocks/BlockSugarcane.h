@@ -18,14 +18,14 @@ public:
 
 private:
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_RelPos.y <= 0)
+		if (a_Position.y <= 0)
 		{
 			return false;
 		}
 
-		switch (a_Chunk.GetBlock(a_RelPos.addedY(-1)).Type())
+		switch (a_Chunk.GetBlock(a_Position.addedY(-1)).Type())
 		{
 			case BlockType::Dirt:
 			case BlockType::GrassBlock:
@@ -42,7 +42,7 @@ private:
 				for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 				{
 					BlockState Block;
-					if (!a_Chunk.UnboundedRelGetBlock(a_RelPos + Coords[i], Block))
+					if (!a_Chunk.UnboundedRelGetBlock(a_Position + Coords[i], Block))
 					{
 						// Too close to the edge, cannot simulate
 						return true;

@@ -210,35 +210,37 @@ private:
 		}
 	}
 
+protected:
 
+	~cBlockTorchBaseHandler() = default;
 
+private:
 
-
-	/** Returns a suitable neighbor's blockface to place the torch at the specified pos
-	Returns BLOCK_FACE_NONE on failure */
-	static eBlockFace FindSuitableFace(cChunkInterface & a_ChunkInterface, const Vector3i a_TorchPos)
+	/** Converts the torch block's meta to the block face of the neighbor to which the torch is attached. */
+	inline static eBlockFace MetaDataToBlockFace(NIBBLETYPE a_MetaData)
 	{
-		for (int i = BLOCK_FACE_YM; i <= BLOCK_FACE_XP; i++)  // Loop through all faces
+		switch (a_MetaData)
 		{
 			auto Face = static_cast<eBlockFace>(i);
 			auto NeighborPos = AddFaceDirection(a_TorchPos, Face, true);
 			auto Neighbor = a_ChunkInterface.GetBlock(NeighborPos);
 			if (CanBePlacedOn(Neighbor, Face))
 			{
-				return Face;
+				ASSERT(!"Unhandled torch metadata");
+				break;
 			}
 		}
-		return BLOCK_FACE_NONE;
+		return BLOCK_FACE_TOP;
 	}
 
 
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
 		eBlockFace Face;
-		auto Self = a_Chunk.GetBlock(a_RelPos);
+		auto Self = a_Chunk.GetBlock(a_Position);
 		switch (Self.Type())
 		{
 			case BlockType::Torch:             Face = eBlockFace::BLOCK_FACE_YP; break;

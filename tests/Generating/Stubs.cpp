@@ -112,21 +112,6 @@ cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a
 
 
 
-bool cBlockHandler::GetPlacementBlockTypeMeta(
-	cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-	const Vector3i a_BlockPos,
-	eBlockFace a_BlockFace,
-	const Vector3i a_CursorPos,
-	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-) const
-{
-	return true;
-}
-
-
-
-
-
 void cBlockHandler::OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, const Vector3i a_RelPos) const
 {
 }
@@ -160,7 +145,7 @@ cItems cBlockHandler::ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem
 
 
 
-bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const
+bool cBlockHandler::CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const
 {
 	return true;
 }
@@ -178,18 +163,9 @@ bool cBlockHandler::IsUseable() const
 
 
 
-bool cBlockHandler::IsClickedThrough(void) const
+bool cBlockHandler::DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, Vector3i a_Position, NIBBLETYPE a_Meta, eBlockFace a_ClickedBlockFace, bool a_ClickedDirectly) const
 {
-	return false;
-}
-
-
-
-
-
-bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const
-{
-	return (m_BlockType == E_BLOCK_AIR);
+	return m_BlockType == E_BLOCK_AIR;
 }
 
 
@@ -446,7 +422,7 @@ void cEnderCrystal::KilledBy(struct TakeDamageInfo & a_TakeDamageInfo)
 
 
 
-cEntity::cEntity(enum cEntity::eEntityType a_EntityType, class Vector3<double> a_Pos, double a_Height, double a_Width)
+cEntity::cEntity(enum cEntity::eEntityType a_EntityType, class Vector3<double> a_Pos, float a_Height, float a_Width)
 {
 }
 
@@ -790,7 +766,7 @@ void cEntity::ResetPosition(class Vector3<double> a_Pos)
 
 
 
-cPawn::cPawn(enum cEntity::eEntityType,double a_Width, double a_Height) :
+cPawn::cPawn(enum cEntity::eEntityType, float a_Width, float a_Height) :
 	cEntity(etMonster, Vector3d(), a_Height, a_Width)
 {
 }
@@ -862,7 +838,7 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-cMonster::cMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, double a_Width, double a_Height) :
+cMonster::cMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, float a_Width, float a_Height) :
 	cPawn(etMonster, a_Width, a_Height),
 	m_PathFinder(a_Width, a_Height)
 {
@@ -870,7 +846,7 @@ cMonster::cMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, c
 
 
 
-cPathFinder::cPathFinder(double a_Width, double a_Height)
+cPathFinder::cPathFinder(float a_Width, float a_Height)
 {
 
 }
@@ -1002,7 +978,7 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt ,class cChunk & a_
 
 
 
-cAggressiveMonster::cAggressiveMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, double a_Width, double a_Height) :
+cAggressiveMonster::cAggressiveMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, float a_Width, float a_Height) :
 	cMonster(a_StringA, a_MonsterType, a_StringB, a_StringC, a_StringD, a_Width, a_Height)
 {
 }

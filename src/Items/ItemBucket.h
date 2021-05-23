@@ -105,8 +105,8 @@ public:
 			return false;
 		}
 
-		// Remove water / lava block (unless plugins disagree)
-		if (!a_Player->PlaceBlock(BlockPos.x, BlockPos.y, BlockPos.z, Block::Air::Air()))
+		// Remove water / lava block (unless plugins disagree):
+		if (!a_Player->PlaceBlock(BlockPos, Block::Air::Air()))
 		{
 			return false;
 		}
@@ -174,7 +174,7 @@ public:
 		}
 
 		// Place the actual fluid block:
-		return a_Player->PlaceBlock(BlockPos.x, BlockPos.y, BlockPos.z, a_FluidBlock);
+		return a_Player->PlaceBlock(BlockPos, a_FluidBlock);
 	}
 
 

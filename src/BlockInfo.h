@@ -24,6 +24,10 @@ public:
 	/** Does this block fully occupy its voxel - is it a 'full' block? */
 	static bool FullyOccupiesVoxel(BlockState a_Block);
 
+	/** Does the client pretend the block doesn't exist when clicking?
+	For example, digging a fire will hit the block below the fire, so fire is "clicked through". */
+	static bool IsClickedThrough(BLOCKTYPE a_Block);
+
 	/** Is a block destroyed after a single hit?
 	Warning: IsOneHitDig does not take into account enchantments / status effects / swim state / floating state
 	and therefore may be incorrect. Only use to check if hardness is 0.

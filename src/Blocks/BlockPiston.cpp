@@ -90,7 +90,7 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 	// However, we don't confuse animation with the underlying state of the world, so emulate by delaying 1 tick
 	// (Probably why vanilla has so many dupe glitches with sand and pistons lolol)
 
-	a_World.ScheduleTask(1, [a_BlockPos](cWorld & World)
+	a_World.ScheduleTask(1_tick, [a_BlockPos](cWorld & World)
 		{
 
 			auto Self = World.GetBlock(a_BlockPos);
@@ -159,7 +159,7 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 		a_World.BroadcastBlockAction(a_BlockPos, PistonRetractAction, DirectionByte, Self.Type());
 	}
 
-	a_World.ScheduleTask(1, [a_BlockPos](cWorld & World)
+	a_World.ScheduleTask(1_tick, [a_BlockPos](cWorld & World)
 	{
 		auto Self = World.GetBlock(a_BlockPos);
 

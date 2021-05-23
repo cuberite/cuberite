@@ -2,8 +2,8 @@
 #pragma once
 
 #include "ItemHandler.h"
-#include "../World.h"
-#include "../Blocks/BlockBed.h"
+#include "Blocks/BlockBed.h"
+#include "BlockEntities/BedEntity.h"
 
 
 
@@ -22,28 +22,14 @@ public:
 	}
 
 
-	virtual bool IsPlaceable(void) override
-	{
-		return true;
-	}
-
-
-	virtual bool GetBlocksToPlace(
-		cWorld & a_World,
-		cPlayer & a_Player,
-		const cItem & a_EquippedItem,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		sSetBlockVector & a_BlocksToPlace
-	) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
 		const auto Rotation = RotationToBlockFace(a_Player.GetYaw());
 		const auto HeadPosition = a_PlacedBlockPos + cBlockBedHandler::BlockFaceToDirection(Rotation);
 
-		// Vanilla only allows beds to be placed into air
+		// Vanilla only allows beds to be placed into air.
 		// Check if there is empty space for the "head" block:
-		if (a_World.GetBlock(HeadPosition) != Block::Air::Air())
+		if (!cBlockHandler::For(a_World.GetBlock(HeadPosition).Type()).DoesIgnoreBuildCollision(World, a_HeldItem, HeadPosition, HeadMeta, a_ClickedBlockFace, false))
 		{
 			return false;
 		}
@@ -165,6 +151,22 @@ public:
 			}
 			default: return false;
 		}
+
+		auto SetColor = [&a_HeldItem](cBlockEntity & a_BlockEntity)
+		{
+			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_BED);
+
+			static_cast<cBedEntity &>(a_BlockEntity).SetColor(a_HeldItem.m_ItemDamage);
+			return false;
+		};
+		World.DoWithBlockEntityAt(a_PlacePosition, SetColor);
+		World.DoWithBlockEntityAt(HeadPosition, SetColor);
+
+		return true;
+	}
+
+	virtual bool IsPlaceable(void) override
+	{
 		return true;
 	}
 };

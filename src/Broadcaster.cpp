@@ -345,11 +345,11 @@ void cWorld::BroadcastEntityPosition(const cEntity & a_Entity, const cClientHand
 
 
 
-void cWorld::BroadcastEntityStatus(const cEntity & a_Entity, Int8 a_Status, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityProperties(const cEntity & a_Entity)
 {
-	ForClientsWithEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsWithEntity(a_Entity, *this, nullptr, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendEntityStatus(a_Entity, a_Status);
+			a_Client.SendEntityProperties(a_Entity);
 		}
 	);
 }
@@ -371,7 +371,7 @@ void cWorld::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHand
 
 
 
-void cWorld::BroadcastEntityAnimation(const cEntity & a_Entity, Int8 a_Animation, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityAnimation(const cEntity & a_Entity, EntityAnimation a_Animation, const cClientHandle * a_Exclude)
 {
 	ForClientsWithEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
@@ -596,7 +596,7 @@ void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 {
 	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendTimeUpdate(GetWorldAge(), std::chrono::duration_cast<cTickTimeLong>(m_WorldDate).count(), IsDaylightCycleEnabled());
+			a_Client.SendTimeUpdate(GetWorldAge(), GetWorldDate(), IsDaylightCycleEnabled());
 		}
 	);
 }
@@ -610,19 +610,6 @@ void cWorld::BroadcastUnleashEntity(const cEntity & a_Entity)
 	ForClientsWithEntity(a_Entity, *this, nullptr, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendUnleashEntity(a_Entity);
-		}
-	);
-}
-
-
-
-
-
-void cWorld::BroadcastUseBed(const cEntity & a_Entity, Vector3i a_BedPos)
-{
-	ForClientsWithChunkAtPos(a_BedPos, *this, nullptr, [&](cClientHandle & a_Client)
-		{
-			a_Client.SendUseBed(a_Entity, a_BedPos.x, a_BedPos.y, a_BedPos.z);
 		}
 	);
 }

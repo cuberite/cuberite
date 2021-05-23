@@ -416,6 +416,7 @@ std::vector<cFinishGenClumpTopBlock::BiomeInfo> cFinishGenClumpTopBlock::ParseIn
 		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-5", "Swampland; SwamplandM = brownmushroom; redmushroom; blueorchid"), Foliage);
 		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-6", "MushroomIsland; MushroomShore; MegaTaiga; MegaTaigaHills; MegaSpruceTaiga; MegaSpruceTaigaHills = brownmushroom; redmushroom"), Foliage);
 		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-7", "RoofedForest, 1, 5; RoofedForestM, 1, 5 = rosebush; peony; lilac; grass"), Foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-8", "MegaTaiga; MegaTaigaHills = deadbush"), Foliage);
 	}
 
 	return Foliage;
@@ -564,6 +565,32 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 				continue;
 			}
 
+			// Walk below trees:
+			auto BlockBelow = a_ChunkDesc.GetBlockType(x, y - 1, z);
+			bool failed = false;  // marker if the search for a valid position was successful
+
+			while (
+				(BlockBelow == E_BLOCK_LEAVES) ||
+				(BlockBelow == E_BLOCK_NEW_LEAVES) ||
+				(BlockBelow == E_BLOCK_LOG) ||
+				(BlockBelow == E_BLOCK_NEW_LOG) ||
+				(BlockBelow == E_BLOCK_AIR)
+			)
+			{
+				y--;
+				if (!cChunkDef::IsValidHeight(y - 1))
+				{
+					failed = true;
+					break;
+				}
+				BlockBelow = a_ChunkDesc.GetBlockType(x, y - 1, z);
+			}
+
+			if (failed)
+			{
+				continue;
+			}
+
 			// Check if long grass can be placed:
 			if (
 				(a_ChunkDesc.GetBlock({x, y, z}).Type() != BlockType::Air) ||
@@ -576,7 +603,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 
 			// Choose what long grass meta we should use:
 			int GrassType = m_Noise.IntNoise2DInt(xx * 50, zz * 50) / 7 % 100;
-			if (GrassType < 60)
+			if ((GrassType < 60) && CanGrassGrow(a_ChunkDesc.GetBiome(x, z)))
 			{
 				a_ChunkDesc.SetBlock({x, y, z}, Block::Grass::Grass());
 				a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(y));
@@ -591,7 +618,15 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 				// If double long grass we have to choose what type we should use:
 				if (a_ChunkDesc.GetBlock({x, y + 1, z}).Type() == BlockType::Air)
 				{
-					auto BlockToPlace = (m_Noise.IntNoise2DInt(xx * 100, zz * 100) / 7 % 100) > 25 ? BlockType::TallGrass : BlockType::LargeFern;
+					BlockType BlockToPlace;
+					if (CanGrassGrow(a_ChunkDesc.GetBiome(x, z)))
+					{
+						BlockToPlace = (m_Noise.IntNoise2DInt(xx * 100, zz * 100) / 7 % 100) > 25 ? BlockType::TallGrass : BlockType::LargeFern;
+					}
+					else
+					{
+						BlockToPlace = BlockType::LargeFern;
+					}
 
 					switch (BlockToPlace)
 					{
@@ -711,6 +746,26 @@ int cFinishGenTallGrass::GetBiomeDensity(EMCSBiome a_Biome)
 		default:
 		{
 			return 20;
+		}
+	}
+}
+
+
+
+
+
+bool cFinishGenTallGrass::CanGrassGrow(EMCSBiome a_Biome)
+{
+	switch (a_Biome)
+	{
+		case biMegaTaiga:
+		case biMegaTaigaHills:
+		{
+			return false;
+		}
+		default:
+		{
+			return true;
 		}
 	}
 }
@@ -1219,7 +1274,7 @@ void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
+			const auto Index = cChunkDef::MakeIndex(x, y, z);
 			if (BlockTypes[Index] == BlockType::Air)
 			{
 				BlockTypes[Index] = Block::Lava::Lava();
@@ -1992,7 +2047,7 @@ void cFinishGenOreNests::GenerateOre(
 							continue;
 						}
 
-						int Index = cChunkDef::MakeIndexNoCheck(BlockX, BlockY, BlockZ);
+						const auto Index = cChunkDef::MakeIndex(BlockX, BlockY, BlockZ);
 						auto Block = Blocks[Index];
 						if ((Block.Type() == BlockType::Stone) || (Block.Type() == BlockType::Netherrack))
 						{
@@ -2231,3 +2286,81 @@ void cFinishGenOrePockets::ImprintSphere(
 
 
 
+cFinishGenForestRocks::cFinishGenForestRocks(int a_Seed, cIniFile & a_IniFile) : m_Noise(a_Seed)
+{
+}
+
+
+
+
+
+void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
+{
+	// Choose random position in chunk and place boulder around it
+	auto Pos = Vector3i(
+		m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % cChunkDef::Width,
+		0,
+		m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % cChunkDef::Width
+		);
+	Pos.y = a_ChunkDesc.GetHeight(Pos.x, Pos.z) % cChunkDef::Height;
+
+	auto Biome = a_ChunkDesc.GetBiome(Pos.x, Pos.z);
+	if ((Biome != biMegaTaiga) && (Biome != biMegaTaigaHills))
+	{
+		return;
+	}
+
+	// Determines the size of the boulder
+	const int TwoLimit = 70;
+	const int ThreeLimit = 90;
+
+	auto RadiusChance = m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % 100;
+	int Radius = 1;
+	if (RadiusChance > TwoLimit && RadiusChance <= ThreeLimit)
+	{
+		Radius = 2;
+	}
+	else if (RadiusChance > ThreeLimit)
+	{
+		Radius = 3;
+	}
+
+	Pos.x = Clamp(Pos.x, Radius, cChunkDef::Width - Radius - 1);
+	Pos.z = Clamp(Pos.z, Radius, cChunkDef::Width - Radius - 1);
+
+	auto StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y, Pos.z);
+	while (!((StartBlock == E_BLOCK_DIRT) || (StartBlock == E_BLOCK_GRASS)))
+	{
+		Pos.y -= 1;
+		if (!cChunkDef::IsValidRelPos(Pos.addedY(-Radius)))
+		{
+			return;
+		}
+		StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y, Pos.z);
+	}
+
+
+	Pos.y -= Radius - 1;
+	// Pos.y = Clamp(Pos.y - m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % Radius + 1, 0, cChunkDef::Height);
+
+	for (int x = -Radius; x <= Radius; x++)
+	{
+		for (int y = -Radius; y <= Radius; y++)
+		{
+			for (int z = -Radius; z <= Radius; z++)
+			{
+				if (!cChunkDef::IsValidRelPos({ Pos.x + x, Pos.y + y, Pos.z + z }))
+				{
+					continue;
+				}
+
+				if (Vector3d(x, y, z).SqrLength() > Radius * Radius + 1)
+				{
+					continue;
+				}
+
+				a_ChunkDesc.SetBlockTypeMeta(Pos.x + x, Pos.y + y, Pos.z + z, E_BLOCK_MOSSY_COBBLESTONE, 0);
+			}
+		}
+	}
+}

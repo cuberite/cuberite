@@ -25,38 +25,30 @@ public:
 
 
 
-	virtual bool OnPlayerPlace(
-		cWorld & a_World,
-		cPlayer & a_Player,
-		const cItem & a_EquippedItem,
-		const Vector3i a_ClickedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos
-	) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
 		// Cannot place a head at "no face" and from the bottom:
 		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_BOTTOM))
 		{
-			return true;
+			return false;
 		}
-		const auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
 
 		// If the placed head is a wither, try to spawn the wither first:
-		if (a_EquippedItem.m_ItemDamage == E_META_HEAD_WITHER)
+		if (a_HeldItem.m_ItemDamage == E_META_HEAD_WITHER)
 		{
-			if (TrySpawnWitherAround(a_World, a_Player, PlacePos))
+			if (TrySpawnWitherAround(a_Player, a_PlacePosition))
 			{
 				return true;
 			}
 			// Wither not created, proceed with regular head placement
 		}
 
-		cItem ItemCopy(a_EquippedItem);  // Make a copy in case this is the player's last head item and OnPlayerPlace removes it
-		if (!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_CursorPos))
+		if (!a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_HEAD, BlockFaceToBlockMeta(a_ClickedBlockFace)))
 		{
 			return false;
 		}
-		RegularHeadPlaced(a_World, a_Player, ItemCopy, PlacePos, a_ClickedBlockFace);
+
+		RegularHeadPlaced(a_Player, a_HeldItem, a_PlacePosition, a_ClickedBlockFace);
 		return true;
 	}
 
@@ -66,15 +58,12 @@ public:
 
 	/** Called after placing a regular head block with no mob spawning.
 	Adjusts the mob head entity based on the equipped item's data. */
-	void RegularHeadPlaced(
-		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
-		const Vector3i a_PlacePos, eBlockFace a_ClickedBlockFace
-	)
+	void RegularHeadPlaced(const cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace)
 	{
-		auto HeadType = static_cast<eMobHeadType>(a_EquippedItem.m_ItemDamage);
+		const auto HeadType = static_cast<eMobHeadType>(a_EquippedItem.m_ItemDamage);
 
 		// Use a callback to set the properties of the mob head block entity:
-		a_World.DoWithBlockEntityAt(a_PlacePos, [&](cBlockEntity & a_BlockEntity)
+		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_Player, HeadType, BlockMeta](cBlockEntity & a_BlockEntity)
 		{
 			switch (a_BlockEntity.GetBlockType())
 			{
@@ -114,10 +103,7 @@ public:
 
 	/** Spawns a wither if the wither skull placed at the specified coords completes wither's spawning formula.
 	Returns true if the wither was created. */
-	bool TrySpawnWitherAround(
-		cWorld & a_World, cPlayer & a_Player,
-		const Vector3i a_BlockPos
-	)
+	bool TrySpawnWitherAround(cPlayer & a_Player, const Vector3i a_BlockPos)
 	{
 		// No wither can be created at Y < 2 - not enough space for the formula:
 		if (a_BlockPos.y < 2)
@@ -276,7 +262,7 @@ public:
 				double Dist = (a_Player.GetPosition() - Pos).Length();
 				if (Dist < 50.0)
 				{
-					a_Player.AwardAchievement(Statistic::AchSpawnWither);
+					a_Player.AwardAchievement(CustomStatistic::AchSpawnWither);
 				}
 				return false;
 			}

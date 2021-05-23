@@ -15,8 +15,8 @@ cSlime::cSlime(int a_Size) :
 		Printf("entity.%sslime.hurt", GetSizeName(a_Size).c_str()),
 		Printf("entity.%sslime.death", GetSizeName(a_Size).c_str()),
 		"",
-		0.6 * a_Size,
-		0.6 * a_Size
+		0.51f * a_Size,
+		0.51f * a_Size
 	),
 	m_Size(a_Size)
 {

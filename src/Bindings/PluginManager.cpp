@@ -541,7 +541,7 @@ bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVec
 		if (world != nullptr)
 		{
 			worldName = world->GetName();
-			worldAge = world->GetWorldAge();
+			worldAge = world->GetWorldAge().count();
 		}
 		else
 		{

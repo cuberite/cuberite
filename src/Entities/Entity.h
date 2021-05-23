@@ -109,47 +109,6 @@ public:
 
 	// tolua_end
 
-	enum eEntityStatus
-	{
-		// TODO: Investigate 0, 1, and 5 as Wiki.vg is not certain
-
-		// Entity becomes coloured red
-		esGenericHurt            = 2,
-		// Entity plays death animation (entity falls to ground)
-		esGenericDead            = 3,
-		// Iron Golem plays attack animation (arms lift and fall)
-		esIronGolemAttacking     = 4,
-		// Wolf taming particles spawn (smoke)
-		esWolfTaming             = 6,
-		// Wolf tamed particles spawn (hearts)
-		esWolfTamed              = 7,
-		// Wolf plays water removal animation (shaking and water particles)
-		esWolfDryingWater        = 8,
-		// Informs client that eating was accepted
-		esPlayerEatingAccepted   = 9,
-		// Sheep plays eating animation (head lowers to ground)
-		esSheepEating            = 10,
-		// Iron Golem holds gift to villager children
-		esIronGolemGivingPlant   = 11,
-		// Villager spawns heart particles
-		esVillagerBreeding       = 12,
-		// Villager spawns thunderclound particles
-		esVillagerAngry          = 13,
-		// Villager spawns green crosses
-		esVillagerHappy          = 14,
-		// Witch spawns magic particle (TODO: investigation into what this is)
-		esWitchMagicking         = 15,
-
-		// It seems 16 (zombie conversion) is now done with metadata
-
-		// Informs client to explode a firework based on its metadata
-		esFireworkExploding      = 17,
-		// Passive mob is in "love mode"
-		esMobInLove              = 18,
-		// Plays totem of undying animation and sound
-		esTotemOfUndying         = 35,
-	} ;
-
 	static const int FIRE_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in fire
 	static const int FIRE_DAMAGE           = 1;    ///< Damage to deal when standing in fire
 	static const int LAVA_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in lava
@@ -169,7 +128,7 @@ public:
 	static const UInt32 INVALID_ID = 0;  // Exported to Lua in ManualBindings.cpp, ToLua doesn't parse initialized constants.
 
 
-	cEntity(eEntityType a_EntityType, Vector3d a_Pos, double a_Width, double a_Height);
+	cEntity(eEntityType a_EntityType, Vector3d a_Pos, float a_Width, float a_Height);
 	virtual ~cEntity() = default;
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
@@ -225,7 +184,7 @@ public:
 	cWorld * GetWorld(void) const { return m_World; }
 
 	double           GetHeadYaw   (void) const { return m_HeadYaw; }  // In degrees
-	double           GetHeight    (void) const { return m_Height;  }
+	float            GetHeight    (void) const { return m_Height;  }
 	double           GetMass      (void) const { return m_Mass;    }
 	double           GetPosX      (void) const { return m_Position.x; }
 	double           GetPosY      (void) const { return m_Position.y; }
@@ -237,7 +196,7 @@ public:
 	double           GetSpeedX    (void) const { return m_Speed.x; }
 	double           GetSpeedY    (void) const { return m_Speed.y; }
 	double           GetSpeedZ    (void) const { return m_Speed.z; }
-	double           GetWidth     (void) const { return m_Width;   }
+	float            GetWidth     (void) const { return m_Width;   }
 
 	int GetChunkX(void) const { return FloorC(m_Position.x / cChunkDef::Width); }
 	int GetChunkZ(void) const { return FloorC(m_Position.z / cChunkDef::Width); }
@@ -541,7 +500,7 @@ public:
 	/** Gets remaining air of a monster */
 	int GetAirLevel(void) const { return m_AirLevel; }
 
-	/** Gets number of ticks this entity has existed for */
+	/** Gets number of ticks this entity has been alive for */
 	long int GetTicksAlive(void) const { return m_TicksAlive; }
 
 	/** Gets the invulnerable ticks from the entity */
@@ -578,6 +537,9 @@ public:
 
 	/** Set the entity's status to either ticking or not ticking. */
 	void SetIsTicking(bool a_IsTicking);
+
+	/** Update an entity's size, for example, on body stance changes. */
+	void SetSize(float a_Width, float a_Height);
 
 	/** Adds a mob to the leashed list of mobs. */
 	void AddLeashedMob(cMonster * a_Monster);
@@ -686,12 +648,6 @@ protected:
 	/** If the entity's head is in a water block */
 	bool m_IsHeadInWater;
 
-	/** Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter. */
-	double m_Width;
-
-	/** Height of the entity (Y axis). */
-	double m_Height;
-
 	/** Air level of a mobile */
 	int m_AirLevel;
 	int m_AirTickTimer;
@@ -747,6 +703,12 @@ private:
 
 	/** Measured in Kilograms (Kg) */
 	double m_Mass;
+
+	/** Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter. */
+	float m_Width;
+
+	/** Height of the entity (Y axis). */
+	float m_Height;
 
 	/** If a player hit a entity, the entity receive a invulnerable of 10 ticks.
 	While this ticks, a player can't hit this entity. */

@@ -52,9 +52,11 @@ Implements the 1.9 protocol classes:
 
 
 
-/** Value for main hand in Hand parameter for Protocol 1.9. */
-static const UInt32 MAIN_HAND = 0;
-static const UInt32 OFF_HAND = 1;
+// Value for main hand in Hand parameter for Protocol 1.9.
+#define MAIN_HAND 0
+
+// Value for left hand in MainHand parameter for Protocol 1.9.
+#define LEFT_HAND 0
 
 
 
@@ -368,19 +370,6 @@ void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 
 
 
-void cProtocol_1_9_0::SendEntityStatus(const cEntity & a_Entity, char a_Status)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktEntityStatus);
-	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEInt8(a_Status);
-}
-
-
-
-
-
 void cProtocol_1_9_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -484,35 +473,6 @@ void cProtocol_1_9_0::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Da
 	for (auto itr = a_Map.GetData().cbegin(); itr != a_Map.GetData().cend(); ++itr)
 	{
 		Pkt.WriteBEUInt8(*itr);
-	}
-}
-
-
-
-
-
-void cProtocol_1_9_0::SendPlayerMaxSpeed(void)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktPlayerMaxSpeed);
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteVarInt32(Player->GetUniqueID());
-	Pkt.WriteBEInt32(1);  // Count
-	Pkt.WriteString("generic.movementSpeed");
-	// The default game speed is 0.1, multiply that value by the relative speed:
-	Pkt.WriteBEDouble(0.1 * Player->GetNormalMaxSpeed());
-	if (Player->IsSprinting())
-	{
-		Pkt.WriteVarInt32(1);  // Modifier count
-		Pkt.WriteBEUInt64(0x662a6b8dda3e4c1c);
-		Pkt.WriteBEUInt64(0x881396ea6097278d);  // UUID of the modifier
-		Pkt.WriteBEDouble(Player->GetSprintingMaxSpeed() - Player->GetNormalMaxSpeed());
-		Pkt.WriteBEUInt8(2);
-	}
-	else
-	{
-		Pkt.WriteVarInt32(0);  // Modifier count
 	}
 }
 
@@ -645,7 +605,7 @@ void cProtocol_1_9_0::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
+UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet) const
 {
 	switch (a_Packet)
 	{
@@ -691,7 +651,6 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 		case pktPlayerAbilities:        return 0x2b;
 		case pktPlayerList:             return 0x2d;
 		case pktPlayerListHeaderFooter: return 0x48;
-		case pktPlayerMaxSpeed:         return 0x4b;
 		case pktPlayerMoveLook:         return 0x2e;
 		case pktPluginMessage:          return 0x18;
 		case pktRemoveEntityEffect:     return 0x31;
@@ -739,22 +698,53 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 
 
 
-cProtocol::Version cProtocol_1_9_0::GetProtocolVersion()
+unsigned char cProtocol_1_9_0::GetProtocolEntityAnimation(const EntityAnimation a_Animation) const
 {
-	return Version::v1_9_0;
+	if (a_Animation == EntityAnimation::PlayerOffHandSwings)
+	{
+		return 3;
+	}
+
+	return Super::GetProtocolEntityAnimation(a_Animation);
 }
 
 
 
 
 
-UInt32 cProtocol_1_9_0::GetProtocolMobType(const eMonsterType a_MobType)
+signed char cProtocol_1_9_0::GetProtocolEntityStatus(const EntityAnimation a_Animation) const
+{
+	switch (a_Animation)
+	{
+		case EntityAnimation::ArmorStandGetsHit: return 32;
+		case EntityAnimation::ArrowTipSparkles: return 0;
+		case EntityAnimation::PawnShieldBlocks: return 29;
+		case EntityAnimation::PawnShieldBreaks: return 30;
+		case EntityAnimation::PawnThornsPricks: return 33;
+		default: return Super::GetProtocolEntityStatus(a_Animation);
+	}
+}
+
+
+
+
+
+UInt32 cProtocol_1_9_0::GetProtocolMobType(const eMonsterType a_MobType) const
 {
 	switch (a_MobType)
 	{
 		case mtShulker: return 69;
 		default:        return Super::GetProtocolMobType(a_MobType);
 	}
+}
+
+
+
+
+
+cProtocol::Version cProtocol_1_9_0::GetProtocolVersion() const
+{
+	return Version::v1_9_0;
 }
 
 
@@ -837,7 +827,7 @@ void cProtocol_1_9_0::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
 
-	m_Client->HandleAnimation(0);  // Packet exists solely for arm-swing notification
+	m_Client->HandleAnimation(Hand == MAIN_HAND);  // Packet exists solely for arm-swing notification (main and off-hand).
 }
 
 
@@ -875,7 +865,8 @@ void cProtocol_1_9_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, HandIntToEnum(Hand));
+
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, Hand == MAIN_HAND);
 }
 
 
@@ -912,12 +903,12 @@ void cProtocol_1_9_0::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   ChatFlags);
 	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    ChatColors);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   SkinParts);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt,        UInt32,   MainHand);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt,        UInt32,  MainHand);
 
 	m_Client->SetLocale(Locale);
 	m_Client->SetViewDistance(ViewDistance);
 	m_Client->GetPlayer()->SetSkinParts(SkinParts);
-	m_Client->GetPlayer()->SetMainHand(static_cast<eMainHand>(MainHand));
+	m_Client->GetPlayer()->SetLeftHanded(MainHand == LEFT_HAND);
 	// TODO: Handle chat flags and chat colors
 }
 
@@ -977,7 +968,7 @@ void cProtocol_1_9_0::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 
 	if (m_IsTeleportIdConfirmed)
 	{
-		m_Client->HandlePlayerPos(PosX, PosY, PosZ, IsOnGround);
+		m_Client->HandlePlayerMove(PosX, PosY, PosZ, IsOnGround);
 	}
 }
 
@@ -1078,6 +1069,7 @@ void cProtocol_1_9_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 		case 0:
 		{
 			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand);
+
 			if (Hand == MAIN_HAND)  // TODO: implement handling of off-hand actions; ignore them for now to avoid processing actions twice
 			{
 				m_Client->HandleUseEntity(EntityID, false);
@@ -1115,7 +1107,7 @@ void cProtocol_1_9_0::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
 
-	m_Client->HandleUseItem(HandIntToEnum(Hand));
+	m_Client->HandleUseItem(Hand == MAIN_HAND);
 }
 
 
@@ -1206,7 +1198,7 @@ void cProtocol_1_9_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBufferView a_Metadata)
+void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBufferView a_Metadata) const
 {
 	// Parse into NBT:
 	cParsedNBT NBT(a_Metadata);
@@ -1410,25 +1402,6 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 
 
 
-eHand cProtocol_1_9_0::HandIntToEnum(Int32 a_Hand)
-{
-	// Convert hand parameter into eHand enum
-	switch (a_Hand)
-	{
-		case MAIN_HAND: return eHand::hMain;
-		case OFF_HAND: return eHand::hOff;
-		default:
-		{
-			ASSERT(!"Unknown hand value");
-			return eHand::hMain;
-		}
-	}
-}
-
-
-
-
-
 void cProtocol_1_9_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1456,7 +1429,7 @@ void cProtocol_1_9_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Ob
 
 
 
-void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity)
+void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
 	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
 	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
@@ -1480,7 +1453,229 @@ void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 
 
 
-void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
+void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+{
+	// Common metadata:
+	Int8 Flags = 0;
+	if (a_Entity.IsOnFire())
+	{
+		Flags |= 0x01;
+	}
+	if (a_Entity.IsCrouched())
+	{
+		Flags |= 0x02;
+	}
+	if (a_Entity.IsSprinting())
+	{
+		Flags |= 0x08;
+	}
+	if (a_Entity.IsRclking())
+	{
+		Flags |= 0x10;
+	}
+	if (a_Entity.IsInvisible())
+	{
+		Flags |= 0x20;
+	}
+	if (a_Entity.IsElytraFlying())
+	{
+		Flags |= 0x80;
+	}
+	a_Pkt.WriteBEUInt8(0);  // Index 0
+	a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
+	a_Pkt.WriteBEInt8(Flags);
+
+	switch (a_Entity.GetEntityType())
+	{
+		case cEntity::etPlayer:
+		{
+			auto & Player = static_cast<const cPlayer &>(a_Entity);
+
+			// TODO Set player custom name to their name.
+			// Then it's possible to move the custom name of mobs to the entities
+			// and to remove the "special" player custom name.
+			a_Pkt.WriteBEUInt8(2);  // Index 2: Custom name
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
+			a_Pkt.WriteString(Player.GetName());
+
+			a_Pkt.WriteBEUInt8(6);  // Index 6: Health
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
+			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
+
+			a_Pkt.WriteBEUInt8(12);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
+
+			a_Pkt.WriteBEUInt8(13);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
+			break;
+		}
+		case cEntity::etPickup:
+		{
+			a_Pkt.WriteBEUInt8(5);  // Index 5: Item
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
+			WriteItem(a_Pkt, static_cast<const cPickup &>(a_Entity).GetItem());
+			break;
+		}
+		case cEntity::etMinecart:
+		{
+			a_Pkt.WriteBEUInt8(5);  // Index 5: Shaking power
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+
+			// The following expression makes Minecarts shake more with less health or higher damage taken
+			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
+			auto maxHealth = a_Entity.GetMaxHealth();
+			auto curHealth = a_Entity.GetHealth();
+			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
+
+			a_Pkt.WriteBEUInt8(6);  // Index 6: Shaking direction (doesn't seem to effect anything)
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(1);
+
+			a_Pkt.WriteBEUInt8(7);  // Index 7: Shake multiplier / damage taken
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
+			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));
+
+			if (Minecart.GetPayload() == cMinecart::mpNone)
+			{
+				auto & RideableMinecart = static_cast<const cRideableMinecart &>(Minecart);
+				const cItem & MinecartContent = RideableMinecart.GetContent();
+				if (!MinecartContent.IsEmpty())
+				{
+					a_Pkt.WriteBEUInt8(8);  // Index 8: Block ID and damage
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+					int Content = MinecartContent.m_ItemType;
+					Content |= MinecartContent.m_ItemDamage << 8;
+					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
+
+					a_Pkt.WriteBEUInt8(9);  // Index 9: Block ID and damage
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
+
+					a_Pkt.WriteBEUInt8(10);  // Index 10: Show block
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+					a_Pkt.WriteBool(true);
+				}
+			}
+			else if (Minecart.GetPayload() == cMinecart::mpFurnace)
+			{
+				a_Pkt.WriteBEUInt8(11);  // Index 11: Is powered
+				a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+				a_Pkt.WriteBool(static_cast<const cMinecartWithFurnace &>(Minecart).IsFueled());
+			}
+			break;
+		}  // case etMinecart
+
+		case cEntity::etProjectile:
+		{
+			auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
+			switch (Projectile.GetProjectileKind())
+			{
+				case cProjectileEntity::pkArrow:
+				{
+					a_Pkt.WriteBEUInt8(5);  // Index 5: Is critical
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+					a_Pkt.WriteBEInt8(static_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
+					break;
+				}
+				case cProjectileEntity::pkFirework:
+				{
+					a_Pkt.WriteBEUInt8(5);  // Index 5: Firework item used for this firework
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
+					WriteItem(a_Pkt, static_cast<const cFireworkEntity &>(Projectile).GetItem());
+					break;
+				}
+				case cProjectileEntity::pkSplashPotion:
+				{
+					a_Pkt.WriteBEUInt8(5);  // Index 5: Potion item which was thrown
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
+					WriteItem(a_Pkt, static_cast<const cSplashPotionEntity &>(Projectile).GetItem());
+				}
+				default:
+				{
+					break;
+				}
+			}
+			break;
+		}  // case etProjectile
+
+		case cEntity::etMonster:
+		{
+			WriteMobMetadata(a_Pkt, static_cast<const cMonster &>(a_Entity));
+			break;
+		}
+
+		case cEntity::etBoat:
+		{
+			auto & Boat = static_cast<const cBoat &>(a_Entity);
+
+			a_Pkt.WriteBEInt8(5);  // Index 6: Time since last hit
+			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetLastDamage()));
+
+			a_Pkt.WriteBEInt8(6);  // Index 7: Forward direction
+			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetForwardDirection()));
+
+			a_Pkt.WriteBEInt8(7);  // Index 8: Damage taken
+			a_Pkt.WriteBEInt8(METADATA_TYPE_FLOAT);
+			a_Pkt.WriteBEFloat(Boat.GetDamageTaken());
+
+			a_Pkt.WriteBEInt8(8);  // Index 9: Type
+			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
+
+			a_Pkt.WriteBEInt8(9);  // Index 10: Right paddle turning
+			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Boat.IsRightPaddleUsed());
+
+			a_Pkt.WriteBEInt8(10);  // Index 11: Left paddle turning
+			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Boat.IsLeftPaddleUsed());
+
+			break;
+		}  // case etBoat
+
+		case cEntity::etItemFrame:
+		{
+			auto & Frame = static_cast<const cItemFrame &>(a_Entity);
+			a_Pkt.WriteBEUInt8(5);  // Index 5: Item
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
+			WriteItem(a_Pkt, Frame.GetItem());
+			a_Pkt.WriteBEUInt8(6);  // Index 6: Rotation
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Frame.GetItemRotation());
+			break;
+		}  // case etItemFrame
+
+		case cEntity::etEnderCrystal:
+		{
+			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
+			a_Pkt.WriteBEUInt8(5);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_OPTIONAL_POSITION);
+			a_Pkt.WriteBool(EnderCrystal.DisplaysBeam());
+			if (EnderCrystal.DisplaysBeam())
+			{
+				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
+			}
+			a_Pkt.WriteBEUInt8(6);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
+			break;
+		}  // case etEnderCrystal
+		default:
+		{
+			break;
+		}
+	}
+}
+
+
+
+
+
+void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 {
 	short ItemType = a_Item.m_ItemType;
 	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
@@ -1650,229 +1845,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 
 
 
-void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
-{
-	// Common metadata:
-	Int8 Flags = 0;
-	if (a_Entity.IsOnFire())
-	{
-		Flags |= 0x01;
-	}
-	if (a_Entity.IsCrouched())
-	{
-		Flags |= 0x02;
-	}
-	if (a_Entity.IsSprinting())
-	{
-		Flags |= 0x08;
-	}
-	if (a_Entity.IsRclking())
-	{
-		Flags |= 0x10;
-	}
-	if (a_Entity.IsInvisible())
-	{
-		Flags |= 0x20;
-	}
-	if (a_Entity.IsElytraFlying())
-	{
-		Flags |= 0x80;
-	}
-	a_Pkt.WriteBEUInt8(0);  // Index 0
-	a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
-	a_Pkt.WriteBEInt8(Flags);
-
-	switch (a_Entity.GetEntityType())
-	{
-		case cEntity::etPlayer:
-		{
-			auto & Player = static_cast<const cPlayer &>(a_Entity);
-
-			// TODO Set player custom name to their name.
-			// Then it's possible to move the custom name of mobs to the entities
-			// and to remove the "special" player custom name.
-			a_Pkt.WriteBEUInt8(2);  // Index 2: Custom name
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
-			a_Pkt.WriteString(Player.GetName());
-
-			a_Pkt.WriteBEUInt8(6);  // Index 6: Health
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
-			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
-
-			a_Pkt.WriteBEUInt8(12);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
-
-			a_Pkt.WriteBEUInt8(13);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetMainHand()));
-			break;
-		}
-		case cEntity::etPickup:
-		{
-			a_Pkt.WriteBEUInt8(5);  // Index 5: Item
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
-			WriteItem(a_Pkt, static_cast<const cPickup &>(a_Entity).GetItem());
-			break;
-		}
-		case cEntity::etMinecart:
-		{
-			a_Pkt.WriteBEUInt8(5);  // Index 5: Shaking power
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-
-			// The following expression makes Minecarts shake more with less health or higher damage taken
-			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
-			auto maxHealth = a_Entity.GetMaxHealth();
-			auto curHealth = a_Entity.GetHealth();
-			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
-
-			a_Pkt.WriteBEUInt8(6);  // Index 6: Shaking direction (doesn't seem to effect anything)
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(1);
-
-			a_Pkt.WriteBEUInt8(7);  // Index 7: Shake multiplier / damage taken
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
-			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));
-
-			if (Minecart.GetPayload() == cMinecart::mpNone)
-			{
-				auto & RideableMinecart = static_cast<const cRideableMinecart &>(Minecart);
-				const cItem & MinecartContent = RideableMinecart.GetContent();
-				if (!MinecartContent.IsEmpty())
-				{
-					a_Pkt.WriteBEUInt8(8);  // Index 8: Block ID and damage
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-					int Content = MinecartContent.m_ItemType;
-					Content |= MinecartContent.m_ItemDamage << 8;
-					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
-
-					a_Pkt.WriteBEUInt8(9);  // Index 9: Block ID and damage
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
-
-					a_Pkt.WriteBEUInt8(10);  // Index 10: Show block
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-					a_Pkt.WriteBool(true);
-				}
-			}
-			else if (Minecart.GetPayload() == cMinecart::mpFurnace)
-			{
-				a_Pkt.WriteBEUInt8(11);  // Index 11: Is powered
-				a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-				a_Pkt.WriteBool(static_cast<const cMinecartWithFurnace &>(Minecart).IsFueled());
-			}
-			break;
-		}  // case etMinecart
-
-		case cEntity::etProjectile:
-		{
-			auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
-			switch (Projectile.GetProjectileKind())
-			{
-				case cProjectileEntity::pkArrow:
-				{
-					a_Pkt.WriteBEUInt8(5);  // Index 5: Is critical
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-					a_Pkt.WriteBEInt8(static_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
-					break;
-				}
-				case cProjectileEntity::pkFirework:
-				{
-					a_Pkt.WriteBEUInt8(5);  // Index 5: Firework item used for this firework
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
-					WriteItem(a_Pkt, static_cast<const cFireworkEntity &>(Projectile).GetItem());
-					break;
-				}
-				case cProjectileEntity::pkSplashPotion:
-				{
-					a_Pkt.WriteBEUInt8(5);  // Index 5: Potion item which was thrown
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
-					WriteItem(a_Pkt, static_cast<const cSplashPotionEntity &>(Projectile).GetItem());
-				}
-				default:
-				{
-					break;
-				}
-			}
-			break;
-		}  // case etProjectile
-
-		case cEntity::etMonster:
-		{
-			WriteMobMetadata(a_Pkt, static_cast<const cMonster &>(a_Entity));
-			break;
-		}
-
-		case cEntity::etBoat:
-		{
-			auto & Boat = static_cast<const cBoat &>(a_Entity);
-
-			a_Pkt.WriteBEInt8(5);  // Index 6: Time since last hit
-			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetLastDamage()));
-
-			a_Pkt.WriteBEInt8(6);  // Index 7: Forward direction
-			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetForwardDirection()));
-
-			a_Pkt.WriteBEInt8(7);  // Index 8: Damage taken
-			a_Pkt.WriteBEInt8(METADATA_TYPE_FLOAT);
-			a_Pkt.WriteBEFloat(Boat.GetDamageTaken());
-
-			a_Pkt.WriteBEInt8(8);  // Index 9: Type
-			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
-
-			a_Pkt.WriteBEInt8(9);  // Index 10: Right paddle turning
-			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Boat.IsRightPaddleUsed());
-
-			a_Pkt.WriteBEInt8(10);  // Index 11: Left paddle turning
-			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Boat.IsLeftPaddleUsed());
-
-			break;
-		}  // case etBoat
-
-		case cEntity::etItemFrame:
-		{
-			auto & Frame = static_cast<const cItemFrame &>(a_Entity);
-			a_Pkt.WriteBEUInt8(5);  // Index 5: Item
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
-			WriteItem(a_Pkt, Frame.GetItem());
-			a_Pkt.WriteBEUInt8(6);  // Index 6: Rotation
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Frame.GetItemRotation());
-			break;
-		}  // case etItemFrame
-
-		case cEntity::etEnderCrystal:
-		{
-			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
-			a_Pkt.WriteBEUInt8(5);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_OPTIONAL_POSITION);
-			a_Pkt.WriteBool(EnderCrystal.DisplaysBeam());
-			if (EnderCrystal.DisplaysBeam())
-			{
-				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
-			}
-			a_Pkt.WriteBEUInt8(6);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
-			break;
-		}  // case etEnderCrystal
-		default:
-		{
-			break;
-		}
-	}
-}
-
-
-
-
-
-void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
+void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
 {
 	// Living entity metadata
 	if (a_Mob.HasCustomName())
@@ -2273,26 +2246,6 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 
 
 
-void cProtocol_1_9_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity)
-{
-	if (!a_Entity.IsMob())
-	{
-		// No properties for anything else than mobs
-		a_Pkt.WriteBEInt32(0);
-		return;
-	}
-
-	// const cMonster & Mob = (const cMonster &)a_Entity;
-
-	// TODO: Send properties and modifiers based on the mob type
-
-	a_Pkt.WriteBEInt32(0);  // NumProperties
-}
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_1:
 
@@ -2322,16 +2275,13 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 		cPacketizer Pkt(*this, pktDifficulty);
 		Pkt.WriteBEInt8(1);
 	}
-
-	// Send player abilities:
-	SendPlayerAbilities();
 }
 
 
 
 
 
-cProtocol::Version cProtocol_1_9_1::GetProtocolVersion()
+cProtocol::Version cProtocol_1_9_1::GetProtocolVersion() const
 {
 	return Version::v1_9_1;
 }
@@ -2343,7 +2293,7 @@ cProtocol::Version cProtocol_1_9_1::GetProtocolVersion()
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_2:
 
-cProtocol::Version cProtocol_1_9_2::GetProtocolVersion()
+cProtocol::Version cProtocol_1_9_2::GetProtocolVersion() const
 {
 	return Version::v1_9_2;
 }
@@ -2391,26 +2341,25 @@ void cProtocol_1_9_4::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-cProtocol::Version cProtocol_1_9_4::GetProtocolVersion()
-{
-	return Version::v1_9_4;
-}
-
-
-
-
-
-UInt32 cProtocol_1_9_4::GetPacketID(cProtocol::ePacketType a_Packet)
+UInt32 cProtocol_1_9_4::GetPacketID(cProtocol::ePacketType a_Packet) const
 {
 	switch (a_Packet)
 	{
 		case pktCollectEntity:          return 0x48;
 		case pktEntityEffect:           return 0x4b;
 		case pktEntityProperties:       return 0x4a;
-		case pktPlayerMaxSpeed:         return 0x4a;
 		case pktPlayerListHeaderFooter: return 0x47;
 		case pktTeleportEntity:         return 0x49;
 
 		default: return Super::GetPacketID(a_Packet);
 	}
+}
+
+
+
+
+
+cProtocol::Version cProtocol_1_9_4::GetProtocolVersion() const
+{
+	return Version::v1_9_4;
 }

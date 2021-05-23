@@ -34,10 +34,7 @@ private:
 		AString WindowName = "Enchant";
 		a_WorldInterface.DoWithBlockEntityAt(a_BlockPos, [&WindowName](cBlockEntity & a_Entity)
 		{
-			if (a_Entity.GetBlockType() != BlockType::EnchantingTable)
-			{
-				return false;
-			}
+			ASSERT(a_Entity.GetBlockType() == BlockType::EnchantingTable);
 
 			const auto & EnchantingTable = static_cast<cEnchantingTableEntity &>(a_Entity);
 			const auto & CustomName = EnchantingTable.GetCustomName();

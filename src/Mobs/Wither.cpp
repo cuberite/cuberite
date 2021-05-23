@@ -13,7 +13,7 @@
 
 
 cWither::cWither(void) :
-	Super("Wither", mtWither, "entity.wither.hurt", "entity.wither.death", "entity.wither.ambient", 0.9, 4.0),
+	Super("Wither", mtWither, "entity.wither.hurt", "entity.wither.death", "entity.wither.ambient", 0.9f, 3.5f),
 	m_WitherInvulnerableTicks(220)
 {
 	SetMaxHealth(300);
@@ -84,7 +84,7 @@ void cWither::KilledBy(TakeDamageInfo & a_TDI)
 			if (Dist < 50.0)
 			{
 				// If player is close, award achievement
-				a_Player.AwardAchievement(Statistic::AchKillWither);
+				a_Player.AwardAchievement(CustomStatistic::AchKillWither);
 			}
 			return false;
 		}

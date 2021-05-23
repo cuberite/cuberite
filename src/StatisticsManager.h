@@ -1,10 +1,6 @@
 
 // Statistics.h
 
-#pragma once
-
-#include "Registries/Statistics.h"
-
 /* Hello fellow developer !
 In case you are trying to add new statistics to Cuberite you need to do a few things:
 ---------------------------------------------------------------------------
@@ -24,36 +20,28 @@ exported from the server https://wiki.vg/Data_Generators
 
 
 
+#pragma once
+
+#include "Registries/CustomStatistics.h"
+
+
+
+
+
 /** Class that manages the statistics and achievements of a single player. */
-class cStatManager
+struct StatisticsManager
 {
-public:
-
 	typedef unsigned StatValue;
-	typedef std::unordered_map<Statistic, StatValue> CustomStore;
 
-	/** Set the value of the specified statistic. */
-	void SetValue(Statistic a_Stat, StatValue a_Value);
+	// TODO: Block tallies, entities killed, all the others
 
-	/** Increments the specified statistic. Returns the new value. */
-	StatValue AddValue(Statistic a_Stat, StatValue a_Delta = 1);
+	std::unordered_map<CustomStatistic, StatValue> Custom;
 
 	/** Returns whether the prerequisite for awarding an achievement are satisfied. */
-	bool SatisfiesPrerequisite(Statistic a_Stat);
-
-	/** Invokes the given callbacks for each category of tracked statistics. */
-	template <class CustomCallback>
-	void ForEachStatisticType(CustomCallback a_Custom) const
-	{
-		a_Custom(m_CustomStatistics);
-	}
+	bool SatisfiesPrerequisite(CustomStatistic a_Stat) const;
 
 private:
 
 	/** Returns if a statistic is both present and has nonzero value. */
-	bool IsStatisticPresent(Statistic a_Stat) const;
-
-	// TODO: Block tallies, entities killed, all the others
-
-	CustomStore m_CustomStatistics;
+	bool IsStatisticPresent(CustomStatistic a_Stat) const;
 };

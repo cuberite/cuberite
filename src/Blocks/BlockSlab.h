@@ -470,6 +470,26 @@ private:
 		}
 	}
 
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
+	{
+		/* Double slab combining uses build collision checks to replace single slabs with double slabs in the right conditions.
+		For us to be replaced, the player must be:
+		1. Placing the same slab material.
+		2. Placing the same slab sub-kind (and existing slab is single). */
+		if ((m_BlockType != a_HeldItem.m_ItemType) || ((a_Meta & 0x07) != a_HeldItem.m_ItemDamage))
+		{
+			return false;
+		}
+
+		const bool IsTopSlab = (a_Meta & 0x08) == 0x08;
+		const auto CanClickCombine = ((a_ClickedBlockFace == BLOCK_FACE_TOP) && !IsTopSlab) || ((a_ClickedBlockFace == BLOCK_FACE_BOTTOM) && IsTopSlab);
+
+		/* When the player clicks on us directly, we'll combine if we're
+		a bottom slab and he clicked the top, or vice versa. Clicking on the sides will not combine.
+		However, when indirectly clicked (on the side of another block, that caused placement to go to us)
+		the conditions are exactly the opposite. */
+		return a_ClickedDirectly ? CanClickCombine : !CanClickCombine;
+	}
 
 	virtual bool GetPlacementBlockTypeMeta(
 			cChunkInterface &a_ChunkInterface,
@@ -1292,7 +1312,11 @@ private:
 			default: return false;
 		}
 
-		return true;
+		/* When the player clicks on us directly, we'll combine if we're
+		a bottom slab and he clicked the top, or vice versa. Clicking on the sides will not combine.
+		However, when indirectly clicked (on the side of another block, that caused placement to go to us)
+		the conditions are exactly the opposite. */
+		return a_ClickedDirectly ? CanClickCombine : !CanClickCombine;
 	}
 
 

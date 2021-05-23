@@ -52,7 +52,6 @@ end
 
 
 
-
 --- Returns the API currently detected from the global environment
 local function CreateAPITables()
 	--[[
@@ -121,14 +120,15 @@ local function CreateAPITables()
 		end
 
 		-- Member variables:
+		local GetField = a_ClassObj[".get"];
 		local SetField = a_ClassObj[".set"] or {};
-		if ((a_ClassObj[".get"] ~= nil) and (type(a_ClassObj[".get"]) == "table")) then
-			for k in pairs(a_ClassObj[".get"]) do
-				if (SetField[k] == nil) then
-					-- It is a read-only variable, add it as a constant:
+		if ((GetField ~= nil) and (type(GetField) == "table")) then
+			for k, v in pairs(GetField) do
+				if ((SetField[k] == nil) and ((type(v) ~= "table") or (v["__newindex"] == nil))) then
+					-- It is a read-only variable or array, add it as a constant:
 					table.insert(res.Constants, {Name = k, Value = ""});
 				else
-					-- It is a read-write variable, add it as a variable:
+					-- It is a read-write variable or array, add it as a variable:
 					table.insert(res.Variables, { Name = k });
 				end
 			end

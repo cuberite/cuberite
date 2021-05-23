@@ -9,7 +9,7 @@
 
 
 cGuardian::cGuardian(void) :
-	Super("Guardian", mtGuardian, "entity.guardian.hurt", "entity.guardian.death", "entity.guardian.ambient", 0.875, 0.8)
+	Super("Guardian", mtGuardian, "entity.guardian.hurt", "entity.guardian.death", "entity.guardian.ambient", 0.85f, 0.85f)
 {
 }
 

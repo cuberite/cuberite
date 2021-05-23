@@ -23,6 +23,35 @@
 
 
 
+class cMinecartAttachCallback
+{
+public:
+	cMinecartAttachCallback(cMinecart * a_Minecart, cEntity * a_Attachee) :
+		m_Minecart(a_Minecart), m_Attachee(a_Attachee)
+	{
+	}
+
+	bool operator () (cEntity & a_Entity)
+	{
+		// Check if minecart is empty and if given entity is a mob
+		if ((m_Attachee == nullptr) && (a_Entity.IsMob()))
+		{
+			// if so, attach to minecart and return true
+			a_Entity.AttachTo(m_Minecart);
+			return true;
+		}
+		return false;
+	}
+
+protected:
+	cMinecart * m_Minecart;
+	cEntity * m_Attachee;
+};
+
+
+
+
+
 class cMinecartCollisionCallback
 {
 public:
@@ -97,7 +126,7 @@ protected:
 // cMinecart:
 
 cMinecart::cMinecart(ePayload a_Payload, Vector3d a_Pos):
-	Super(etMinecart, a_Pos, 0.98, 0.7),
+	Super(etMinecart, a_Pos, 0.98f, 0.7f),
 	m_Payload(a_Payload),
 	m_LastDamage(0),
 	m_DetectorRailPosition(0, 0, 0),
@@ -1064,6 +1093,12 @@ bool cMinecart::TestEntityCollision(BlockState a_Rail)
 	{
 		return false;
 	}
+
+	// Collision was true, create bounding box for minecart, call attach callback for all entities within that box
+	cMinecartAttachCallback MinecartAttachCallback(this, m_Attachee);
+	Vector3d MinecartPosition = GetPosition();
+	cBoundingBox bbMinecart(Vector3d(MinecartPosition.x, floor(MinecartPosition.y), MinecartPosition.z), GetWidth() / 2, GetHeight());
+	m_World->ForEachEntityInBox(bbMinecart, MinecartAttachCallback);
 
 	switch (cBlockRailHandler::GetShapeFromRail(a_Rail))
 	{

@@ -59,7 +59,7 @@ public:
 			case BLOCK_FACE_ZP: return Vector3i( 0, 0,  1);
 			default: return Vector3i();
 		}
-	}
+	}  // Todo(12xx12) Move this to a better place
 
 	static inline eBlockFace GetBlockFace(BlockState a_Block)
 	{
@@ -163,6 +163,43 @@ public:
 		a_ChunkInterface.SetBlock(a_BedPosition, Self);
 	}
 
+	static void VacateBed(cChunkInterface & a_ChunkInterface, cPlayer & a_Player)
+	{
+		auto BedPosition = a_Player.GetLastBedPos();
+
+		BLOCKTYPE Type;
+		NIBBLETYPE Meta;
+		a_ChunkInterface.GetBlockTypeMeta(BedPosition, Type, Meta);
+
+		if (Type != E_BLOCK_BED)
+		{
+			// Bed was incomplete, just wake:
+			a_Player.SetIsInBed(false);
+			return;
+		}
+
+		if ((Meta & 0x8) == 0)
+		{
+			// BedPosition is the foot of the bed, adjust to the head:
+			BedPosition += MetaDataToDirection(Meta & 0x03);
+
+			a_ChunkInterface.GetBlockTypeMeta(BedPosition, Type, Meta);
+			if (Type != E_BLOCK_BED)
+			{
+				// Bed was incomplete, just wake:
+				a_Player.SetIsInBed(false);
+				return;
+			}
+		}
+	}
+
+		// Clear the "occupied" bit of the bed's pillow block:
+		a_ChunkInterface.SetBlockMeta(BedPosition, Meta & 0x0b);
+
+		// Wake the player:
+		a_Player.SetIsInBed(false);
+	}
+
 private:
 
 	// Overrides:
@@ -186,17 +223,6 @@ private:
 		return {};
 	}
 
-	virtual void OnPlacedByPlayer(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
-		const sSetBlock & a_BlockChange
-	) const override;
-
-
-
-
-
-	static void SetBedPos(cPlayer & a_Player, const Vector3i a_BedPosition);
-
 
 
 
@@ -206,7 +232,3 @@ private:
 		return 28;
 	}
 } ;
-
-
-
-

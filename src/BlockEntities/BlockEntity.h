@@ -51,12 +51,19 @@ public:
 	Returns nullptr for unknown block types. */
 	static OwnedBlockEntity CreateByBlockType(BlockState a_Block, Vector3i a_Pos, cWorld * a_World = nullptr);
 
+	/** Called when this block entity's associated block is destroyed.
+	It is guaranteed that this function is called before OnRemoveFromWorld. */
 	virtual void Destroy();
 
 	/** Returns true if the specified blocktype is supposed to have an associated block entity. */
 	static bool IsBlockEntityBlockType(BlockType a_Block);
 
-	/** Called when the block entity is removed from a world. */
+	/** Called when the block entity object is added to a world. */
+	virtual void OnAddToWorld(cWorld & a_World, cChunk & a_Chunk);
+
+	/** Called when the block entity object is removed from a world.
+	This occurs when the chunk it resides in is unloaded, or when the associated block is destroyed.
+	If it is the latter, Destroy() is guaranteed to be called first. */
 	virtual void OnRemoveFromWorld();
 
 	/** Sends the packet defining the block entity to the client specified.
