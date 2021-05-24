@@ -133,6 +133,11 @@ public:
 	cPluginManager::ePluginStatus GetStatus(void) const { return m_Status; }
 
 	bool IsLoaded(void) const { return (m_Status == cPluginManager::psLoaded); }
+
+	void Log(const AString & a_Message) const        { LOG("[%s]: %s", m_Name, a_Message); }
+	void LogInfo(const AString & a_Message) const    { LOGINFO("[%s]: %s", m_Name, a_Message); }
+	void LogWarning(const AString & a_Message) const { LOGWARNING("[%s]: %s", m_Name, a_Message); }
+	void LogError(const AString & a_Message) const   { LOGERROR("[%s]: %s", m_Name, a_Message); }
 	// tolua_end
 
 	// Needed for ManualBindings' tolua_ForEach<>
