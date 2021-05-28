@@ -362,7 +362,7 @@ static void LogFromLuaStack(lua_State * tolua_S, eLogLevel a_LogLevel)
 
 	size_t len = 0;
 	const char * str = lua_tolstring(tolua_S, 1, &len);
-	Logger::LogSimple(std::string_view(str, len), a_LogLevel);
+	Logger::LogSimple(AString("[" + cManualBindings::GetLuaPlugin(tolua_S)->GetName() + "]: ") + AString(str, len), a_LogLevel);
 }
 
 

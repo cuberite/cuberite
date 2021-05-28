@@ -90,50 +90,6 @@ return
 					},
 				},
 			},
-			Log =
-			{
-				Notes = "Logs in the default severity to the console with a info which plugin is the source.",
-				Params =
-				{
-					{
-						Name = "Message",
-						Type = "string",
-					},
-				},
-			},
-			LogInfo =
-			{
-				Notes = "Logs in the information severity to the console with a info which plugin is the source.",
-				Params =
-				{
-					{
-						Name = "Message",
-						Type = "string",
-					},
-				},
-			},
-			LogWarning =
-			{
-				Notes = "Logs in the warning severity to the console with a info which plugin is the source.",
-				Params =
-				{
-					{
-						Name = "Message",
-						Type = "string",
-					},
-				},
-			},
-			LogError =
-			{
-				Notes = "Logs in the error severity to the console with a info which plugin is the source.",
-				Params =
-				{
-					{
-						Name = "Message",
-						Type = "string",
-					},
-				},
-			},
 			SetName =
 			{
 				Params =
