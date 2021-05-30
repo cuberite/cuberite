@@ -14696,6 +14696,29 @@ end
 						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'warning' severity (red text)",
 					},
 				},
+				LOGRAW =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "Message",
+								Type = "string",
+							},
+						},
+						Notes = "Logs a text into the server console and logfile using 'warning' severity (red text)",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "Message",
+								Type = "cCompositeChat",
+							},
+						},
+						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using default severity without adding the plugin name as prefix.",
+					},
+				},
 				md5 =
 				{
 					Params =

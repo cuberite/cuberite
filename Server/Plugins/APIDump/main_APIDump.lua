@@ -36,7 +36,7 @@ local function LoadAPIFiles(a_Folder, a_DstTable)
 				if (a_DstTable[k]) then
 					-- The class is documented in two files, warn and store into a file (so that CIs can mark build as failure):
 					LOGWARNING(string.format(
-						"APIDump warning: class %s is documented at two places, the documentation in file %s will overwrite the previously loaded one!",
+						"class %s is documented at two places, the documentation in file %s will overwrite the previously loaded one!",
 						k, FileName
 					))
 					local f = io.open("DuplicateDocs.txt", "a")
@@ -2115,7 +2115,7 @@ function Initialize(Plugin)
 	g_Plugin = Plugin;
 	g_PluginFolder = Plugin:GetLocalFolder();
 
-	LOG("Initialising " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+	LOG("Initialising v." .. Plugin:GetVersion())
 
 	-- Bind a console command to dump the API:
 	cPluginManager:BindConsoleCommand("api",      HandleCmdApi,      "Dumps the Lua API docs into the API/ subfolder")
