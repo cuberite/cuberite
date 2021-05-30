@@ -353,23 +353,24 @@ Can take either a string or a cCompositeChat.
 static void LogFromLuaStack(lua_State * tolua_S, eLogLevel a_LogLevel)
 {
 	tolua_Error err;
+	AString Message;
+	size_t len = 0;
 	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
 	{
-		auto Msg = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->ExtractText();
-		Logger::LogSimple(Msg, a_LogLevel);
-		return;
+		Message = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->ExtractText();
+	}
+	else
+	{
+		Message = lua_tolstring(tolua_S, 1, &len);
 	}
 
-	const char * Prefix = cManualBindings::GetLuaPlugin(tolua_S)->GetName().c_str();
-
-	size_t len = 0;
+	auto Prefix = fmt::format("[{}] ", cManualBindings::GetLuaPlugin(tolua_S)->GetName());
 	if (lua_isstring(tolua_S, 2))
 	{
 		Prefix = lua_tolstring(tolua_S, 2, &len);
 	}
 
-	const char * str = lua_tolstring(tolua_S, 1, &len);
-	Logger::LogSimple(fmt::format("[{}] {}", Prefix, std::string_view(str, len)), a_LogLevel);
+	Logger::LogSimple(fmt::format("{}{}", Prefix, Message), a_LogLevel);
 }
 
 
