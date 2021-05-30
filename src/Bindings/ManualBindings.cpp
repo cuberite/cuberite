@@ -454,28 +454,28 @@ static int tolua_LOGERROR(lua_State * tolua_S)
 
 static int tolua_LOGRAW(lua_State * tolua_S)
 {
-    // If there's no param, spit out an error message instead of crashing:
-    if (lua_isnil(tolua_S, 1))
-    {
-        LOGWARNING("Attempting to LOGRAW a nil value!");
-        cLuaState::LogStackTrace(tolua_S);
-        return 0;
-    }
+	// If there's no param, spit out an error message instead of crashing:
+	if (lua_isnil(tolua_S, 1))
+	{
+		LOGWARNING("Attempting to LOGRAW a nil value!");
+		cLuaState::LogStackTrace(tolua_S);
+		return 0;
+	}
 
-    tolua_Error err;
-    if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
-    {
-        auto CompositeChat = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
-        eLogLevel LogLevel = cCompositeChat::MessageTypeToLogLevel(CompositeChat->GetMessageType());
-        Logger::LogSimple(CompositeChat->ExtractText(), LogLevel);
-        return 0;
-    }
+	tolua_Error err;
+	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
+	{
+		auto CompositeChat = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+		eLogLevel LogLevel = cCompositeChat::MessageTypeToLogLevel(CompositeChat->GetMessageType());
+		Logger::LogSimple(CompositeChat->ExtractText(), LogLevel);
+		return 0;
+	}
 
-    // Log the message:
-    size_t len = 0;
-    const char * str = lua_tolstring(tolua_S, 1, &len);
-    Logger::LogSimple(std::string_view(str, len), eLogLevel::Regular);
-    return 0;
+	// Log the message:
+	size_t len = 0;
+	const char * str = lua_tolstring(tolua_S, 1, &len);
+	Logger::LogSimple(std::string_view(str, len), eLogLevel::Regular);
+	return 0;
 }
 
 
