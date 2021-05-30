@@ -4509,6 +4509,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_function(tolua_S, "LOGWARN",               tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGWARNING",            tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGERROR",              tolua_LOGERROR);
+		tolua_function(tolua_S, "LOGRAW",                tolua_LOGRAW);
 		tolua_function(tolua_S, "Base64Encode",          tolua_Base64Encode);
 		tolua_function(tolua_S, "Base64Decode",          tolua_Base64Decode);
 		tolua_function(tolua_S, "md5",                   tolua_md5_obsolete);  // OBSOLETE, use cCryptoHash.md5() instead

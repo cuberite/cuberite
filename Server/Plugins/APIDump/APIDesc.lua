@@ -14706,7 +14706,7 @@ end
 								Type = "string",
 							},
 						},
-						Notes = "Logs a text into the server console and logfile using 'warning' severity (red text)",
+						Notes = "Logs a text into the server console and logfile using 'default' severity without adding the plugin name as prefix.",
 					},
 					{
 						Params =
@@ -14716,7 +14716,7 @@ end
 								Type = "cCompositeChat",
 							},
 						},
-						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using default severity without adding the plugin name as prefix.",
+						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'default' severity without adding the plugin name as prefix.",
 					},
 				},
 				md5 =
