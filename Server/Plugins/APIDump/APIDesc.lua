@@ -14590,6 +14590,11 @@ end
 								Name = "Message",
 								Type = "string",
 							},
+							{
+								Name = "Prefix",
+								Type = "string",
+								IsOptional = true,
+							},
 						},
 						Notes = "Logs a text into the server console and logfile using 'normal' severity (gray text)",
 					},
@@ -14599,6 +14604,11 @@ end
 							{
 								Name = "Message",
 								Type = "cCompositeChat",
+							},
+							{
+								Name = "Prefix",
+								Type = "string",
+								IsOptional = true,
 							},
 						},
 						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console. The severity is converted from the CompositeChat's MessageType.",
@@ -14613,6 +14623,11 @@ end
 								Name = "Message",
 								Type = "string",
 							},
+							{
+								Name = "Prefix",
+								Type = "string",
+								IsOptional = true,
+							},
 						},
 						Notes = "Logs a text into the server console and logfile using 'error' severity (black text on red background)",
 					},
@@ -14622,6 +14637,11 @@ end
 							{
 								Name = "Message",
 								Type = "cCompositeChat",
+							},
+							{
+								Name = "Prefix",
+								Type = "string",
+								IsOptional = true,
 							},
 						},
 						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'error' severity (black text on red background)",
@@ -14636,6 +14656,11 @@ end
 								Name = "Message",
 								Type = "string",
 							},
+							{
+								Name = "Prefix",
+								Type = "string",
+								IsOptional = true,
+							},
 						},
 						Notes = "Logs a text into the server console and logfile using 'info' severity (yellow text)",
 					},
@@ -14645,6 +14670,11 @@ end
 							{
 								Name = "Message",
 								Type = "cCompositeChat",
+							},
+							{
+								Name = "Prefix",
+								Type = "string",
+								IsOptional = true,
 							},
 						},
 						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'info' severity (yellow text)",
@@ -14659,6 +14689,11 @@ end
 								Name = "Message",
 								Type = "string",
 							},
+							{
+								Name = "Prefix",
+								Type = "string",
+								IsOptional = true,
+							},
 						},
 						Notes = "Logs a text into the server console and logfile using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead",
 					},
@@ -14668,6 +14703,11 @@ end
 							{
 								Name = "Message",
 								Type = "cCompositeChat",
+							},
+							{
+								Name = "Prefix",
+								Type = "string",
+								IsOptional = true,
 							},
 						},
 						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead",
@@ -14682,6 +14722,11 @@ end
 								Name = "Message",
 								Type = "string",
 							},
+							{
+								Name = "Prefix",
+								Type = "string",
+								IsOptional = true,
+							},
 						},
 						Notes = "Logs a text into the server console and logfile using 'warning' severity (red text)",
 					},
@@ -14692,31 +14737,13 @@ end
 								Name = "Message",
 								Type = "cCompositeChat",
 							},
+							{
+								Name = "Prefix",
+								Type = "string",
+								IsOptional = true,
+							},
 						},
 						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'warning' severity (red text)",
-					},
-				},
-				LOGRAW =
-				{
-					{
-						Params =
-						{
-							{
-								Name = "Message",
-								Type = "string",
-							},
-						},
-						Notes = "Logs a text into the server console and logfile using 'default' severity without adding the plugin name as prefix.",
-					},
-					{
-						Params =
-						{
-							{
-								Name = "Message",
-								Type = "cCompositeChat",
-							},
-						},
-						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'default' severity without adding the plugin name as prefix.",
 					},
 				},
 				md5 =

@@ -360,9 +360,16 @@ static void LogFromLuaStack(lua_State * tolua_S, eLogLevel a_LogLevel)
 		return;
 	}
 
+	const char * Prefix = cManualBindings::GetLuaPlugin(tolua_S)->GetName().c_str();
+
 	size_t len = 0;
+	if (lua_isstring(tolua_S, 2))
+	{
+		Prefix = lua_tolstring(tolua_S, 2, &len);
+	}
+
 	const char * str = lua_tolstring(tolua_S, 1, &len);
-	Logger::LogSimple(fmt::format("[{}] {}", cManualBindings::GetLuaPlugin(tolua_S)->GetName(), std::string_view(str, len)), a_LogLevel);
+	Logger::LogSimple(fmt::format("[{}] {}", Prefix, std::string_view(str, len)), a_LogLevel);
 }
 
 
@@ -445,36 +452,6 @@ static int tolua_LOGERROR(lua_State * tolua_S)
 	}
 
 	LogFromLuaStack(tolua_S, eLogLevel::Error);
-	return 0;
-}
-
-
-
-
-
-static int tolua_LOGRAW(lua_State * tolua_S)
-{
-	// If there's no param, spit out an error message instead of crashing:
-	if (lua_isnil(tolua_S, 1))
-	{
-		LOGWARNING("Attempting to LOGRAW a nil value!");
-		cLuaState::LogStackTrace(tolua_S);
-		return 0;
-	}
-
-	tolua_Error err;
-	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
-	{
-		auto CompositeChat = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
-		eLogLevel LogLevel = cCompositeChat::MessageTypeToLogLevel(CompositeChat->GetMessageType());
-		Logger::LogSimple(CompositeChat->ExtractText(), LogLevel);
-		return 0;
-	}
-
-	// Log the message:
-	size_t len = 0;
-	const char * str = lua_tolstring(tolua_S, 1, &len);
-	Logger::LogSimple(std::string_view(str, len), eLogLevel::Regular);
 	return 0;
 }
 
@@ -4509,7 +4486,6 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_function(tolua_S, "LOGWARN",               tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGWARNING",            tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGERROR",              tolua_LOGERROR);
-		tolua_function(tolua_S, "LOGRAW",                tolua_LOGRAW);
 		tolua_function(tolua_S, "Base64Encode",          tolua_Base64Encode);
 		tolua_function(tolua_S, "Base64Decode",          tolua_Base64Decode);
 		tolua_function(tolua_S, "md5",                   tolua_md5_obsolete);  // OBSOLETE, use cCryptoHash.md5() instead
