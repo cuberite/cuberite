@@ -384,9 +384,9 @@ void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 #ifndef NDEBUG
 	for (auto & KeyPair : m_BlockEntities)
 	{
-		cBlockEntity * Block = KeyPair.second.get();
-		auto EntityBlockType = Block->GetBlockType();
-		auto WorldBlockType = GetBlock(Block->GetRelX(), Block->GetPosY(), Block->GetRelZ());
+		cBlockEntity * BlockEntity = KeyPair.second.get();
+		auto EntityBlockType = BlockEntity->GetBlockType();
+		auto WorldBlockType = GetBlock(BlockEntity->GetRelPos()).Type();
 		ASSERT(WorldBlockType == EntityBlockType);
 	}
 #endif

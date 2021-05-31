@@ -22,7 +22,7 @@ private:
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
 		cChunkInterface ChunkInterface(a_Player.GetWorld()->GetChunkMap());
-		const auto RailType = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage));
+		BlockState RailType = cBlockRailHandler::GetRailFromRotation(BlockItemConverter::FromItem(PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage)), a_Player.GetYaw());
 		return a_Player.PlaceBlock(a_PlacePosition, cBlockRailHandler::FindBlock(ChunkInterface, a_PlacePosition, RailType));
 	}
 };
