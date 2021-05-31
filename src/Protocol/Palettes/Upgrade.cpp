@@ -220,7 +220,8 @@ namespace PaletteUpgrade
 			case (29 << 4) | 12: return StickyPiston::StickyPiston(true, eBlockFace::BLOCK_FACE_XM);
 			case (29 << 4) | 13: return StickyPiston::StickyPiston(true, eBlockFace::BLOCK_FACE_XP);
 			case (30 << 4) | 0: return Cobweb::Cobweb();
-			case (31 << 4) | 0: return DeadBush::DeadBush();
+			// case (31 << 4) | 0: return DeadBush::DeadBush();  // TODO(12xx12)
+			case (31 << 4) | 0: return Grass::Grass();
 			case (31 << 4) | 1: return Grass::Grass();
 			case (31 << 4) | 2: return Fern::Fern();
 			case (32 << 4) | 0: return DeadBush::DeadBush();

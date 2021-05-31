@@ -157,10 +157,7 @@ public:
 					case Shape::SouthWest:       return Rail::Rail(Rail::Shape::SouthWest);
 					case Shape::NorthWest:       return Rail::Rail(Rail::Shape::NorthWest);
 					case Shape::NorthEast:       return Rail::Rail(Rail::Shape::NorthEast);
-					case Shape::None:
-					{
-						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
-					}
+					case Shape::None:            return a_Block;
 				}
 			}
 			case BlockType::ActivatorRail:
@@ -173,11 +170,11 @@ public:
 					case Shape::AscendingWest:   return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest);
 					case Shape::AscendingNorth:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth);
 					case Shape::AscendingSouth:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingSouth);
+					case Shape::None:            return a_Block;
 					case Shape::SouthEast:
 					case Shape::SouthWest:
 					case Shape::NorthWest:
 					case Shape::NorthEast:
-					case Shape::None:
 					{
 						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
 					}
@@ -193,11 +190,11 @@ public:
 					case Shape::AscendingWest:   return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest);
 					case Shape::AscendingNorth:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth);
 					case Shape::AscendingSouth:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingSouth);
+					case Shape::None:            return a_Block;
 					case Shape::SouthEast:
 					case Shape::SouthWest:
 					case Shape::NorthWest:
 					case Shape::NorthEast:
-					case Shape::None:
 					{
 						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
 					}
@@ -213,11 +210,11 @@ public:
 					case Shape::AscendingWest:   return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest);
 					case Shape::AscendingNorth:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth);
 					case Shape::AscendingSouth:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingSouth);
+					case Shape::None:            return a_Block;
 					case Shape::SouthEast:
 					case Shape::SouthWest:
 					case Shape::NorthWest:
 					case Shape::NorthEast:
-					case Shape::None:
 					{
 						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
 					}
@@ -231,9 +228,36 @@ public:
 
 
 
+	BlockState static GetRailFromRotation(BlockState a_RailType, double a_Yaw)
+	{
+		switch (RotationToBlockFace(a_Yaw))
+		{
+			case BLOCK_FACE_WEST:
+			case BLOCK_FACE_EAST:
+			{
+				return GetRailFromShape(a_RailType, Shape::EastWest);
+			}
+			case BLOCK_FACE_NORTH:
+			case BLOCK_FACE_SOUTH:
+			{
+				return GetRailFromShape(a_RailType, Shape::NorthSouth);
+			}
+			case BLOCK_FACE_YM:
+			case BLOCK_FACE_YP:
+			case BLOCK_FACE_NONE:
+			{
+				UNREACHABLE("Got unknown rotation!");
+			}
+		}
+	}
+
+
+
+
+
 	BlockState static FindBlock(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, BlockState a_OldBlock)
 	{
-		Shape NewShape;
+		Shape NewShape = Shape::None;
 
 		char RailsCnt = 0;
 		bool Neighbors[8];  // 0 - EAST, 1 - WEST, 2 - NORTH, 3 - SOUTH, 4 - EAST UP, 5 - WEST UP, 6 - NORTH UP, 7 - SOUTH UP
@@ -298,8 +322,10 @@ public:
 			{
 				NewShape = Shape::NorthSouth;
 			}
-			ASSERT(!"Weird neighbor count");
-			return GetRailFromShape(a_OldBlock, NewShape);
+			else
+			{
+				ASSERT(!"Weird neighbor count");
+			}
 		}
 
 		for (int i = 0; i < 4; i++)

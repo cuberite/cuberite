@@ -46,7 +46,7 @@ bool cDelayedFluidSimulatorChunkData::cSlot::Add(Vector3i a_RelPos)
 cDelayedFluidSimulatorChunkData::cDelayedFluidSimulatorChunkData(int a_TickDelay)
 {
 	auto Default = cSlot();
-	m_Slots = std::vector<cSlot>(a_TickDelay + 2, Default);
+	m_Slots = std::vector<cSlot>(a_TickDelay, Default);
 }
 
 
@@ -87,6 +87,10 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 {
 	auto ChunkDataRaw = (m_FluidBlock == BlockType::Water) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
 	cDelayedFluidSimulatorChunkData * ChunkData = static_cast<cDelayedFluidSimulatorChunkData *>(ChunkDataRaw);
+	while (ChunkData->m_Slots.size() <= m_SimSlotNum)
+	{
+		ChunkData->m_Slots.emplace_back();
+	}
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_SimSlotNum];
 
 	// Simulate all the blocks in the scheduled slot:
