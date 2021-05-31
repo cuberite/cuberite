@@ -20,6 +20,7 @@
 #include "Cuboid.h"
 #include "FunctionRef.h"
 #include "BlockEntities/BlockEntity.h"
+#include "Protocol/Palettes/Upgrade.h"
 
 
 
@@ -315,6 +316,17 @@ public:
 	LIGHTTYPE  GetBlockLight      (Vector3i a_Pos) const;
 	LIGHTTYPE  GetRelBlockSkyLight(Vector3i a_RelPos) const;
 	LIGHTTYPE  GetBlockSkyLight   (Vector3i a_Pos) const;
+
+	/** TODO: 12xx12 remove - deprecated */
+	unsigned char GetBlockType(Vector3i a_Pos) const    { return PaletteUpgrade::ToBlock(GetBlock(a_Pos)).first; }
+	unsigned char GetRelBlockType(Vector3i a_Pos) const { return PaletteUpgrade::ToBlock(GetRelBlock(a_Pos)).first; }
+	unsigned char GetBlockMeta(Vector3i a_Pos) const    { return PaletteUpgrade::ToBlock(GetBlock(a_Pos)).second; }
+	unsigned char GetRelBlockMeta(Vector3i a_Pos) const { return PaletteUpgrade::ToBlock(GetRelBlock(a_Pos)).second; }
+	void SetBlockType(Vector3i a_Pos, unsigned char a_Block);
+	void SetRelBlockType(Vector3i a_Pos, unsigned char a_Block);
+	void SetBlockMeta(Vector3i a_Pos, unsigned char a_Meta);
+	void SetRelBlockMeta(Vector3i a_Pos, unsigned char a_Meta);
+
 
 	// Basic Getters:
 	LIGHTTYPE GetRelLightValue(Vector3i a_RelPos,   LIGHTTYPE * a_Array) const;

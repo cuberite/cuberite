@@ -159,6 +159,7 @@ public:
 					case Shape::NorthEast:       return Rail::Rail(Rail::Shape::NorthEast);
 					case Shape::None:            return a_Block;
 				}
+				break;
 			}
 			case BlockType::ActivatorRail:
 			{
@@ -177,8 +178,10 @@ public:
 					case Shape::NorthEast:
 					{
 						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
+						return a_Block;
 					}
 				}
+				break;
 			}
 			case BlockType::DetectorRail:
 			{
@@ -197,8 +200,10 @@ public:
 					case Shape::NorthEast:
 					{
 						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
+						return a_Block;
 					}
 				}
+				break;
 			}
 			case BlockType::PoweredRail:
 			{
@@ -217,11 +222,14 @@ public:
 					case Shape::NorthEast:
 					{
 						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
+						return a_Block;
 					}
 				}
+				break;
 			}
 			default: UNREACHABLE("Got unknown block type in cBlockRailHandler!");
 		}
+		return a_Block;
 	}
 
 
@@ -249,6 +257,8 @@ public:
 				UNREACHABLE("Got unknown rotation!");
 			}
 		}
+		UNREACHABLE("Got unknown rotation!");
+		return Block::Air::Air();
 	}
 
 
@@ -380,9 +390,9 @@ public:
 			{
 				NewShape = Shape::NorthSouth;
 			}
-
-			if (CanCurve)
+			else if (CanCurve)
 			{
+				FLOG("{}", a_BlockPos);
 				ASSERT(!"Weird neighbor count");
 			}
 		}
@@ -1043,6 +1053,7 @@ private:
 					case Rail::Shape::NorthWest:      return Rail::Rail(Rail::Shape::SouthWest);
 					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::NorthWest);
 				}
+				break;
 			}
 			case BlockType::ActivatorRail:
 			{
@@ -1055,6 +1066,7 @@ private:
 					case ActivatorRail::Shape::AscendingNorth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest);
 					case ActivatorRail::Shape::AscendingSouth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast);
 				}
+				break;
 			}
 			case BlockType::DetectorRail:
 			{
@@ -1067,6 +1079,7 @@ private:
 					case DetectorRail::Shape::AscendingNorth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest);
 					case DetectorRail::Shape::AscendingSouth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast);
 				}
+				break;
 			}
 			case BlockType::PoweredRail:
 			{
@@ -1079,9 +1092,11 @@ private:
 					case PoweredRail::Shape::AscendingNorth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest);
 					case PoweredRail::Shape::AscendingSouth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast);
 				}
+				break;
 			}
 			default: return a_Block;
 		}
+		return a_Block;
 	}
 
 

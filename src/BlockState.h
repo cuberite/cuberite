@@ -2,8 +2,7 @@
 
 #include <stdint.h>
 #include "Registries/BlockTypes.h"
-#include "ChunkDef.h"
-
+#include "WorldStorage/NamespaceSerializer.h"
 
 /** The UINT_LEAST16_MAX value is used to mark the value invalid if needed. */
 
@@ -12,12 +11,11 @@ struct BlockState
 	constexpr BlockState() : ID(0) {}
 
 	constexpr BlockState(uint_least16_t StateID) :
-		ID(StateID),
-		ID2(0)
+		ID(StateID)
 	{
 	}
 
-	constexpr BlockState(BlockType a_Type);
+	BlockState(BlockType a_Type);  // TODO(12xx12) constexpr this
 
 	/** Gets the block type of this block state. */
 	BlockType Type() const;
@@ -34,6 +32,15 @@ struct BlockState
 
 	/** The state ID of the block state. */
 	uint_least16_t ID;
+};
 
-	NEWBLOCKTYPE ID2;
+
+template<> class fmt::formatter<BlockState> : public fmt::formatter<std::string_view>
+{
+public:
+	template <typename FormatContext>
+	auto format(const BlockState & a_Block, FormatContext & a_Ctx)
+	{
+		return fmt::format_to(a_Ctx.out(), "{}", NamespaceSerializer::From(a_Block.Type()));
+	}
 };

@@ -147,8 +147,8 @@ private:
 				// No neighbor, place based on yaw:
 				switch (ChestType)
 				{
-					case BlockType::Chest:        BlockToPlace = Chest::Chest(RotationToBlockFace(a_Player.GetYaw()), Chest::Type::Single);
-					case BlockType::TrappedChest: BlockToPlace = TrappedChest::TrappedChest(RotationToBlockFace(a_Player.GetYaw()), TrappedChest::Type::Single);
+					case BlockType::Chest:        BlockToPlace = Chest::Chest(RotationToBlockFace(a_Player.GetYaw()), Chest::Type::Single); break;
+					case BlockType::TrappedChest: BlockToPlace = TrappedChest::TrappedChest(RotationToBlockFace(a_Player.GetYaw()), TrappedChest::Type::Single); break;
 					default: return false;
 				}
 				break;
@@ -235,6 +235,7 @@ private:
 								break;
 							}
 						}
+						default: return false;
 					}
 					break;
 				}

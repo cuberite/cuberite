@@ -862,10 +862,10 @@ void cFinishGenVines::GenFinish(cChunkDesc & a_ChunkDesc)
 				auto Dir = Places[static_cast<size_t>(m_Noise.IntNoise3DInt(xx, y, zz)) % Places.size()];
 				switch (Dir)
 				{
-					case 1:  a_ChunkDesc.SetBlock({x, y, z}, Block::Vine::Vine(false, false, true, false, false));
-					case 2:  a_ChunkDesc.SetBlock({x, y, z}, Block::Vine::Vine(false, false, false, false, true));
-					case 4:  a_ChunkDesc.SetBlock({x, y, z}, Block::Vine::Vine(false, true, false, false, false));
-					case 8:  a_ChunkDesc.SetBlock({x, y, z}, Block::Vine::Vine(true, false, false, false, false));
+					case 1:  a_ChunkDesc.SetBlock({x, y, z}, Block::Vine::Vine(false, false, true, false, false)); break;
+					case 2:  a_ChunkDesc.SetBlock({x, y, z}, Block::Vine::Vine(false, false, false, false, true)); break;
+					case 4:  a_ChunkDesc.SetBlock({x, y, z}, Block::Vine::Vine(false, true, false, false, false)); break;
+					case 8:  a_ChunkDesc.SetBlock({x, y, z}, Block::Vine::Vine(true, false, false, false, false)); break;
 					default: a_ChunkDesc.SetBlock({x, y, z}, Block::Vine::Vine());
 				}
 			}
@@ -1440,7 +1440,8 @@ void cFinishGenPreSimulator::StationarizeFluid(
 	{
 		for (int i = 0; i < cChunkDef::Width; i++)  // i stands for both x and z here
 		{
-			if (cBlockFluidHandler::GetFalloff(cChunkDef::GetBlock(a_BlockTypes, 0, y, i)) == 0)
+
+			if ((cBlockFluidHandler::GetFalloff(cChunkDef::GetBlock(a_BlockTypes, 0, y, i)) == 0))
 			{
 				cChunkDef::SetBlock(a_BlockTypes, 0, y, i, cBlockFluidHandler::SetFalloff(a_Block, 1));
 			}
@@ -1704,7 +1705,7 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, Vector3i a
 	auto BlockUnderFeet = a_ChunkDesc.GetBlock(a_RelPos.addedY(-1));
 
 	// Check block below (opaque, grass, water), and above (air)
-	if ((AnimalToSpawn == mtSquid) && (BlockAtFeet != BlockType::Water))
+	if ((AnimalToSpawn == mtSquid) && (BlockAtFeet.Type() != BlockType::Water))
 	{
 		return false;
 	}
@@ -1718,13 +1719,13 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, Vector3i a
 		return false;
 	}
 	if (
-		(BlockUnderFeet != BlockType::GrassBlock) &&
+		(BlockUnderFeet.Type() != BlockType::GrassBlock) &&
 		((AnimalToSpawn == mtWolf) || (AnimalToSpawn == mtRabbit) || (AnimalToSpawn == mtCow) || (AnimalToSpawn == mtSheep) || (AnimalToSpawn == mtChicken) || (AnimalToSpawn == mtPig))
 	)
 	{
 		return false;
 	}
-	if ((AnimalToSpawn == mtMooshroom) && (BlockUnderFeet != BlockType::Mycelium))
+	if ((AnimalToSpawn == mtMooshroom) && (BlockUnderFeet.Type() != BlockType::Mycelium))
 	{
 		return false;
 	}

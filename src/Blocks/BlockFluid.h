@@ -4,7 +4,7 @@
 #include "BlockHandler.h"
 #include "../Simulator/FireSimulator.h"
 
-
+#define ILLEGAL_FALLOFF std::numeric_limits<unsigned char>::max()
 
 
 
@@ -34,7 +34,7 @@ public:
 		{
 			case BlockType::Lava:  return Block::Lava::Level(a_Block);
 			case BlockType::Water: return Block::Water::Level(a_Block);
-			default: return 0;
+			default: return ILLEGAL_FALLOFF;
 		}
 	}
 

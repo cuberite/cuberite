@@ -15,6 +15,66 @@
 
 
 
+/** Template for the bindings for the DoWithXYZAt(X, Y, Z) functions that need to check their coords. */
+template <
+	class SELF,
+	class ITEM,
+	bool (SELF::*DoWithFn)(Vector3i, cFunctionRef<bool(ITEM &)>),
+	bool (SELF::*CoordCheckFn)(Vector3i) const
+>
+static int DoWithXYZ(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamNumber(2, 4) ||
+		!L.CheckParamFunction(5) ||
+		!L.CheckParamEnd(6)
+	)
+	{
+		return 0;
+	}
+
+	// Get parameters:
+	SELF * Self = nullptr;
+	int BlockX = 0;
+	int BlockY = 0;
+	int BlockZ = 0;
+	cLuaState::cRef FnRef;
+	L.GetStackValues(1, Self, BlockX, BlockY, BlockZ, FnRef);
+	if (Self == nullptr)
+	{
+		return L.ApiParamError("Invalid 'self'");
+	}
+	if (!FnRef.IsValid())
+	{
+		return L.ApiParamError("Expected a valid callback function for parameter #5");
+	}
+	if (!(Self->*CoordCheckFn)({ BlockX, BlockY, BlockZ }))
+	{
+		return L.FApiParamError("The provided coordinates ({0}) are not valid",
+			Vector3i{BlockX, BlockY, BlockZ}
+		);
+	}
+
+	// Call the DoWith function:
+	bool res = (Self->*DoWithFn)({ BlockX, BlockY, BlockZ }, [&](ITEM & a_Item)
+		{
+			bool ret = false;
+			L.Call(FnRef, &a_Item, cLuaState::Return, ret);
+			return ret;
+		}
+	);
+
+	// Push the result as the return value:
+	L.Push(res);
+	return 1;
+}
+
+
+
+
+
 /** Reads params that together form a Cuboid.
 These can be:
 	- 6 numbers (MinX, MaxX, MinY, MaxY, MinZ, MaxZ)
@@ -790,7 +850,7 @@ Also supports the Vector3i overloads (TODO: document these (?)). */
 template <
 	typename DataType,
 	int DataTypeFlag,
-	DataType (cBlockArea::*Fn)(int, int, int) const
+	DataType (cBlockArea::*Fn)(Vector3i) const
 >
 static int GetBlock(lua_State * a_LuaState)
 {
@@ -825,7 +885,7 @@ static int GetBlock(lua_State * a_LuaState)
 	}
 
 	// Get the block info:
-	L.Push((self->*Fn)(Coords.x, Coords.y, Coords.z));
+	L.Push((self->*Fn)(Coords));
 	return 1;
 }
 
@@ -841,7 +901,7 @@ Also supports the Vector3i overloads (TODO: document these (?)). */
 template <
 	typename DataType,
 	int DataTypeFlag,
-	DataType (cBlockArea::*Fn)(int, int, int) const
+	DataType (cBlockArea::*Fn)(Vector3i) const
 >
 static int GetRelBlock(lua_State * a_LuaState)
 {
@@ -876,7 +936,7 @@ static int GetRelBlock(lua_State * a_LuaState)
 	}
 
 	// Get the block info:
-	L.Push((self->*Fn)(Coords.x, Coords.y, Coords.z));
+	L.Push((self->*Fn)(Coords));
 	return 1;
 }
 
@@ -886,7 +946,11 @@ static int GetRelBlock(lua_State * a_LuaState)
 
 /** Templated bindings for the SetBlock___() functions.
 Also supports the Vector3i overloads (TODO: document these (?)). */
-template <bool SetMeta>
+template <
+	typename DataType,
+	int DataTypeFlag,
+	DataType (cBlockArea::*Fn)(Vector3i, DataType)
+>
 static int SetBlock(lua_State * a_LuaState)
 {
 	// Check the common params:
@@ -904,7 +968,7 @@ static int SetBlock(lua_State * a_LuaState)
 	}
 
 	// Check the datatype's presence:
-	if ((self->GetDataTypes() & cBlockArea::baBlocks) == 0)
+	if ((self->GetDataTypes() & DataTypeFlag) == 0)
 	{
 		return L.ApiParamError("The area doesn't contain the datatype baBlocks");
 	}
@@ -921,15 +985,7 @@ static int SetBlock(lua_State * a_LuaState)
 	unsigned char Data;
 	L.GetStackValues(idx, Data);
 
-	auto SetBlock = self->GetBlock(Coords);
-	if (SetMeta)
-	{
-		self->SetBlock(Coords, PaletteUpgrade::FromBlock(PaletteUpgrade::ToBlock(SetBlock).first, Data));
-	}
-	else
-	{
-		self->SetBlock(Coords, PaletteUpgrade::FromBlock(Data, PaletteUpgrade::ToBlock(SetBlock).second));
-	}
+	self->*Fn(Coords, Data);
 	return 0;
 }
 
@@ -942,7 +998,11 @@ DataType is either BLOCKTYPE or NIBBLETYPE.
 DataTypeFlag is the ba___ constant used for the datatypebeing manipulated.
 Fn is the setter function.
 Also supports the Vector3i overloads (TODO: document these (?)). */
-template <bool SetMeta>
+template <
+	typename DataType,
+	int DataTypeFlag,
+	DataType (cBlockArea::*Fn)(Vector3i, DataType)
+>
 static int SetRelBlock(lua_State * a_LuaState)
 {
 	// Check the common params:
@@ -960,7 +1020,7 @@ static int SetRelBlock(lua_State * a_LuaState)
 	}
 
 	// Check the datatype's presence:
-	if ((self->GetDataTypes() & cBlockArea::baBlocks) == 0)
+	if ((self->GetDataTypes() & DataTypeFlag) == 0)
 	{
 		return L.ApiParamError("The area doesn't contain the datatype baBlocks");
 	}
@@ -977,15 +1037,8 @@ static int SetRelBlock(lua_State * a_LuaState)
 	unsigned char Data;
 	L.GetStackValues(idx, Data);
 
-	auto SetBlock = self->GetBlock(Coords);
-	if (SetMeta)
-	{
-		self->SetRelBlock(Coords, PaletteUpgrade::FromBlock(PaletteUpgrade::ToBlock(SetBlock).first, Data));
-	}
-	else
-	{
-		self->SetRelBlock(Coords, PaletteUpgrade::FromBlock(Data, PaletteUpgrade::ToBlock(SetBlock).second));
-	}
+	self->*Fn(Coords, Data);
+
 	return 0;
 }
 
@@ -1088,193 +1141,6 @@ static int tolua_cBlockArea_SetRelBlockTypeMeta(lua_State * a_LuaState)
 
 
 
-
-template<
-	int DataTypeFlag,
-	LIGHTTYPE (cBlockArea::*Fn)(Vector3i) const
->
-static int GetLightValue(lua_State * a_LuaState)
-{
-	// Check the common params:
-	cLuaState L(a_LuaState);
-	if (!L.CheckParamSelf("cBlockArea"))
-	{
-		return 0;
-	}
-
-	// Read the common params:
-	cBlockArea * self;
-	if (!L.GetStackValues(1, self))
-	{
-		return L.ApiParamError("Cannot read the 'self' param");
-	}
-
-	// Check the datatype's presence:
-	if ((self->GetDataTypes() & DataTypeFlag) == 0)
-	{
-		return L.ApiParamError("The area doesn't contain the datatype (%d)", DataTypeFlag);
-	}
-
-	// Read the overloaded params:
-	Vector3i Coords;
-	auto idx = readVector3iOverloadParams(L, 2, Coords, "Coords");
-
-	if (!self->IsValidCoords(Coords))
-	{
-		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
-			Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
-		);
-	}
-
-	L.Push(self->*Fn(Coords));
-
-	return 0;
-}
-
-
-
-
-
-template<
-	int DataTypeFlag,
-	LIGHTTYPE (cBlockArea::*Fn)(Vector3i) const
->
-static int GetRelLightValue(lua_State * a_LuaState)
-{
-	// Check the common params:
-	cLuaState L(a_LuaState);
-	if (!L.CheckParamSelf("cBlockArea"))
-	{
-		return 0;
-	}
-
-	// Read the common params:
-	cBlockArea * self;
-	if (!L.GetStackValues(1, self))
-	{
-		return L.ApiParamError("Cannot read the 'self' param");
-	}
-
-	// Check the datatype's presence:
-	if ((self->GetDataTypes() & DataTypeFlag) == 0)
-	{
-		return L.ApiParamError("The area doesn't contain the datatype (%d)", DataTypeFlag);
-	}
-
-	// Read the overloaded params:
-	Vector3i Coords;
-	auto idx = readVector3iOverloadParams(L, 2, Coords, "Coords");
-	if (!self->IsValidRelCoords(Coords))
-	{
-		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
-			Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
-		);
-	}
-	L.Push(self->*Fn(Coords));
-
-	return 0;
-}
-
-
-
-
-
-template<
-	int DataTypeFlag,
-	LIGHTTYPE (cBlockArea::*Fn)(Vector3i, LIGHTTYPE)
->
-static int SetLightValue(lua_State * a_LuaState)
-{
-	// Check the common params:
-	cLuaState L(a_LuaState);
-	if (!L.CheckParamSelf("cBlockArea"))
-	{
-		return 0;
-	}
-
-	// Read the common params:
-	cBlockArea * self;
-	if (!L.GetStackValues(1, self))
-	{
-		return L.ApiParamError("Cannot read the 'self' param");
-	}
-
-	// Check the datatype's presence:
-	if ((self->GetDataTypes() & DataTypeFlag) == 0)
-	{
-		return L.ApiParamError("The area doesn't contain the datatype (%d)", DataTypeFlag);
-	}
-
-	// Read the overloaded params:
-	Vector3i Coords;
-	auto idx = readVector3iOverloadParams(L, 2, Coords, "Coords");
-
-	if (!self->IsValidCoords(Coords))
-	{
-		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
-			Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
-		);
-	}
-
-	LIGHTTYPE Data;
-	L.GetStackValues(idx, Data);
-
-	self->*Fn(Coords, Data);
-
-	return 0;
-}
-
-
-
-
-
-template<
-	int DataTypeFlag,
-	void (cBlockArea::*Fn)(Vector3i, LIGHTTYPE)
->
-static int SetRelLightValue(lua_State * a_LuaState)
-{
-
-	// Check the common params:
-	cLuaState L(a_LuaState);
-	if (!L.CheckParamSelf("cBlockArea"))
-	{
-		return 0;
-	}
-
-	// Read the common params:
-	cBlockArea * self;
-	if (!L.GetStackValues(1, self))
-	{
-		return L.ApiParamError("Cannot read the 'self' param");
-	}
-
-	// Check the datatype's presence:
-	if ((self->GetDataTypes() & DataTypeFlag) == 0)
-	{
-		return L.ApiParamError("The area doesn't contain the datatype (%d)", DataTypeFlag);
-	}
-
-	// Read the overloaded params:
-	Vector3i Coords;
-	auto idx = readVector3iOverloadParams(L, 2, Coords, "Coords");
-	if (!self->IsValidRelCoords(Coords))
-	{
-		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
-			Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
-		);
-	}
-
-	LIGHTTYPE Data;
-	L.GetStackValues(idx, Data);
-
-	self->*Fn(Coords, Data);
-
-	return 0;
-}
-
-
-
 // TODO(12xx12): uncomment everything.
 void cManualBindings::BindBlockArea(lua_State * a_LuaState)
 {
@@ -1282,21 +1148,22 @@ void cManualBindings::BindBlockArea(lua_State * a_LuaState)
 		tolua_beginmodule(a_LuaState, "cBlockArea");
 			tolua_function(a_LuaState, "Create",                  tolua_cBlockArea_Create);
 			tolua_function(a_LuaState, "DoWithBlockEntityAt",     DoWithXYZ<cBlockArea, cBlockEntity, &cBlockArea::DoWithBlockEntityAt,    &cBlockArea::IsValidCoords>);
-			// tolua_function(a_LuaState, "DoWithBlockEntityRelAt",  DoWithXYZ<cBlockArea, cBlockEntity, &cBlockArea::DoWithBlockEntityRelAt, &cBlockArea::IsValidRelCoords>);
+			tolua_function(a_LuaState, "DoWithBlockEntityRelAt",  DoWithXYZ<cBlockArea, cBlockEntity, &cBlockArea::DoWithBlockEntityRelAt, &cBlockArea::IsValidRelCoords>);
 			tolua_function(a_LuaState, "FillRelCuboid",           tolua_cBlockArea_FillRelCuboid);
 			tolua_function(a_LuaState, "ForEachBlockEntity",      ForEach<  cBlockArea, cBlockEntity, &cBlockArea::ForEachBlockEntity>);
-			// tolua_function(a_LuaState, "GetBlockLight",           GetLightValue<cBlockArea::baLight,  &cBlockArea::GetRelBlockLight>);
-			// tolua_function(a_LuaState, "GetBlockMeta",            GetBlock<true>);
-			// tolua_function(a_LuaState, "GetBlockSkyLight",        GetLightValue<cBlockArea::baSkyLight, &cBlockArea::GetRelBlockSkyLight>);
-			// tolua_function(a_LuaState, "GetBlockType",            GetBlock<false>);
+			tolua_function(a_LuaState, "GetBlockLight",           GetBlock<LIGHTTYPE, cBlockArea::baLight,  &cBlockArea::GetBlockLight>);
+			tolua_function(a_LuaState, "GetBlockMeta",            GetBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::GetBlockMeta>);
+			tolua_function(a_LuaState, "GetBlockSkyLight",        GetBlock<LIGHTTYPE, cBlockArea::baSkyLight, &cBlockArea::GetRelBlockSkyLight>);
+			tolua_function(a_LuaState, "GetBlockType",            GetBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::GetBlockType>);
+			tolua_function(a_LuaState, "GetBlock",                GetBlock<BlockState, cBlockArea::baBlocks, &cBlockArea::GetBlock>);
 			tolua_function(a_LuaState, "GetBlockTypeMeta",        tolua_cBlockArea_GetBlockTypeMeta);
 			tolua_function(a_LuaState, "GetCoordRange",           tolua_cBlockArea_GetCoordRange);
 			tolua_function(a_LuaState, "GetNonAirCropRelCoords",  tolua_cBlockArea_GetNonAirCropRelCoords);
 			tolua_function(a_LuaState, "GetOrigin",               tolua_cBlockArea_GetOrigin);
-			// tolua_function(a_LuaState, "GetRelBlockLight",        GetRelLightValue<cBlockArea::baLight,    &cBlockArea::GetRelBlockLight>);
-			// tolua_function(a_LuaState, "GetRelBlockSkyLight",     GetRelLightValue<cBlockArea::baSkyLight, &cBlockArea::GetRelBlockSkyLight>);
-			// tolua_function(a_LuaState, "GetRelBlockMeta",         GetRelBlock<true>);
-			// tolua_function(a_LuaState, "GetRelBlockType",         GetRelBlock<false>);
+			tolua_function(a_LuaState, "GetRelBlockLight",        GetRelBlock<LIGHTTYPE, cBlockArea::baLight,    &cBlockArea::GetRelBlockLight>);
+			tolua_function(a_LuaState, "GetRelBlockSkyLight",     GetRelBlock<LIGHTTYPE, cBlockArea::baSkyLight, &cBlockArea::GetRelBlockSkyLight>);
+			tolua_function(a_LuaState, "GetRelBlockMeta",         GetRelBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::GetRelBlockMeta>);
+			tolua_function(a_LuaState, "GetRelBlockType",         GetRelBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::GetRelBlockType>);
 			tolua_function(a_LuaState, "GetRelBlockTypeMeta",     tolua_cBlockArea_GetRelBlockTypeMeta);
 			tolua_function(a_LuaState, "GetSize",                 tolua_cBlockArea_GetSize);
 			tolua_function(a_LuaState, "LoadFromSchematicFile",   tolua_cBlockArea_LoadFromSchematicFile);
@@ -1305,15 +1172,16 @@ void cManualBindings::BindBlockArea(lua_State * a_LuaState)
 			tolua_function(a_LuaState, "RelLine",                 tolua_cBlockArea_RelLine);
 			tolua_function(a_LuaState, "SaveToSchematicFile",     tolua_cBlockArea_SaveToSchematicFile);
 			tolua_function(a_LuaState, "SaveToSchematicString",   tolua_cBlockArea_SaveToSchematicString);
-			tolua_function(a_LuaState, "SetBlockType",            SetBlock<false>);
-			tolua_function(a_LuaState, "SetBlockMeta",            SetBlock<true>);
-			// tolua_function(a_LuaState, "SetBlockLight",           SetLightValue<&cBlockArea::SetBlockLight>);
-			// tolua_function(a_LuaState, "SetBlockSkyLight",        SetLightValue<&cBlockArea::SetBlockSkyLight>);
+			// tolua_function(a_LuaState, "SetBlock",                SetBlock<BlockState, cBlockArea::baBlocks, &cBlockArea::SetBlock>);
+			// tolua_function(a_LuaState, "SetBlockType",            SetBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::SetBlockType>);
+			// tolua_function(a_LuaState, "SetBlockMeta",            SetBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::SetBlockMeta>);
+			// tolua_function(a_LuaState, "SetBlockLight",           SetBlock<LIGHTTYPE, cBlockArea::baLight,    &cBlockArea::SetBlockLight>);
+			// tolua_function(a_LuaState, "SetBlockSkyLight",        SetBlock<LIGHTTYPE, cBlockArea::baSkyLight, &cBlockArea::SetBlockSkyLight>);
 			tolua_function(a_LuaState, "SetBlockTypeMeta",        tolua_cBlockArea_SetBlockTypeMeta);
-			tolua_function(a_LuaState, "SetRelBlockType",         SetRelBlock<true>);
-			tolua_function(a_LuaState, "SetRelBlockMeta",         SetRelBlock<false>);
-			// tolua_function(a_LuaState, "SetRelBlockLight",        SetRelLightValue<cBlockArea::baLight,    &cBlockArea::SetRelBlockLight>);
-			// tolua_function(a_LuaState, "SetRelBlockSkyLight",     SetRelLightValue<cBlockArea::baSkyLight, &cBlockArea::SetRelBlockSkyLight>);
+			// tolua_function(a_LuaState, "SetRelBlockType",         SetRelBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::SetRelBlockType>);
+			// tolua_function(a_LuaState, "SetRelBlockMeta",         SetRelBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::SetRelBlockMeta>);
+			// tolua_function(a_LuaState, "SetRelBlockLight",        SetRelBlock<LIGHTTYPE, cBlockArea::baLight,    &cBlockArea::SetRelBlockLight>);
+			// tolua_function(a_LuaState, "SetRelBlockSkyLight",     SetRelBlock<LIGHTTYPE, cBlockArea::baSkyLight, &cBlockArea::SetRelBlockSkyLight>);
 			tolua_function(a_LuaState, "SetRelBlockTypeMeta",     tolua_cBlockArea_SetRelBlockTypeMeta);
 			tolua_function(a_LuaState, "Write",                   tolua_cBlockArea_Write);
 		tolua_endmodule(a_LuaState);

@@ -111,7 +111,7 @@ void cStructGenTrees::GenerateSingleTree(
 
 	// Check the block underneath the tree:
 	auto TopBlock = a_ChunkDesc.GetBlock(a_Pos);
-	if ((TopBlock != E_BLOCK_DIRT) && (TopBlock != E_BLOCK_GRASS) && (TopBlock != E_BLOCK_FARMLAND) && (TopBlock != E_BLOCK_MYCELIUM))
+	if (IsBlockStateOfDirt(TopBlock))
 	{
 		return;
 	}

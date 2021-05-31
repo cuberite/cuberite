@@ -10,10 +10,6 @@ namespace PaletteUpgrade
 	BlockState FromBlock(const BLOCKTYPE Block, const NIBBLETYPE Meta)
 	{
 		using namespace Block;
-		if (Block == 0)
-		{
-			return Air::Air();
-		}
 		switch ((Block << 4) | Meta & 0x04)
 		{
 			case (0 << 4) | 0: return Air::Air();
@@ -359,6 +355,8 @@ namespace PaletteUpgrade
 			case (53 << 4) | 5: return OakStairs::OakStairs(eBlockFace::BLOCK_FACE_XM, OakStairs::Half::Top, OakStairs::Shape::Straight);
 			case (53 << 4) | 6: return OakStairs::OakStairs(eBlockFace::BLOCK_FACE_ZP, OakStairs::Half::Top, OakStairs::Shape::Straight);
 			case (53 << 4) | 7: return OakStairs::OakStairs(eBlockFace::BLOCK_FACE_ZM, OakStairs::Half::Top, OakStairs::Shape::Straight);
+			case (54 << 4) | 0: return Chest::Chest();  // TODO (12xx12)
+			case (54 << 4) | 1: return Chest::Chest();  // TODO (12xx12)
 			case (54 << 4) | 2: return Chest::Chest(eBlockFace::BLOCK_FACE_ZM, Chest::Type::Single);
 			case (54 << 4) | 3: return Chest::Chest(eBlockFace::BLOCK_FACE_ZP, Chest::Type::Single);
 			case (54 << 4) | 4: return Chest::Chest(eBlockFace::BLOCK_FACE_XM, Chest::Type::Single);
@@ -1709,7 +1707,7 @@ namespace PaletteUpgrade
 			case (255 << 4) | 3: return StructureBlock::StructureBlock(StructureBlock::Mode::Data);
 			default:
 			{
-				// LOGWARNING("%d, %d, %s", Block, Meta, std::bitset<8>(Meta), std::bitset<8>(Meta >> 1));
+				// LOGWARNING("%d, %d, %s", Block, Meta, std::bitset<8>(Meta));
 				if (Meta != 0)
 				{
 					return FromBlock(Block, Meta >> 1);
