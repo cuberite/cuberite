@@ -10,7 +10,6 @@ class cBlockLadder: public cMetaRotator<cClearMetaOnDrop, ...>
 #pragma once
 
 #include "../Item.h"
-#include "../Entities/Player.h"
 
 
 
