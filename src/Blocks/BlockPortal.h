@@ -18,7 +18,7 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// No pickups
 		return {};
@@ -33,7 +33,7 @@ private:
 		cWorldInterface & a_WorldInterface,
 		cBlockPluginInterface & a_PluginInterface,
 		cChunk & a_Chunk,
-		const Vector3i a_RelPos
+		const Vector3i a_Position
 	) const override
 	{
 		// Spawn zombie pigmen with a 0.05% chance:
@@ -41,7 +41,7 @@ private:
 		{
 			return;
 		}
-		auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+		auto WorldPos = a_Chunk.RelativeToAbsolute(a_Position);
 		a_WorldInterface.SpawnMob(WorldPos.x, WorldPos.y, WorldPos.z, mtZombiePigman, false);
 	}
 
@@ -49,14 +49,14 @@ private:
 
 
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		if ((a_Position.y <= 0) || (a_Position.y >= cChunkDef::Height - 1))
 		{
 			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1.
 		}
 
-		switch (Block::NetherPortal::Axis(a_Chunk.GetBlock(a_RelPos)))
+		switch (Block::NetherPortal::Axis(a_Chunk.GetBlock(a_Position)))
 		{
 			case Block::NetherPortal::Axis::X:
 			{

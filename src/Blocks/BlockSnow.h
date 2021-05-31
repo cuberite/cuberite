@@ -23,49 +23,15 @@ private:
 		FullBlockLayers = 7  // Meta value of a full-height snow block.
 	};
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BlockState & a_Block
-	) const override
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, Vector3i a_Position, BlockState a_ClickedBlock, eBlockFace a_ClickedBlockFace, bool a_ClickedDirectly) const override
 	{
-		unsigned char NewLayerCount = 0;
-
-		// Check if incrementing existing snow height:
-		auto BlockToReplace = a_ChunkInterface.GetBlock(a_PlacedBlockPos);
-		if ((BlockToReplace.Type() == BlockType::Snow) && (Block::Snow::Layers(a_Block) < FullBlockLayers))
-		{
-			// Only increment if:
-			//  - A snow block was already there (not first time placement) AND
-			//  - Height is smaller than the maximum possible
-			NewLayerCount = Block::Snow::Layers(a_Block) + 1;
-			a_Block = Block::Snow::Snow(NewLayerCount);
-			return true;
-		}
-
-		// First time placement, check placement is valid
-		a_Block = Block::Snow::Snow();
-		auto BlockBelow = a_ChunkInterface.GetBlock(a_PlacedBlockPos.addedY(-1));
-		return (
-			(a_PlacedBlockPos.y > 0) &&
-			CanBeOn(BlockBelow)
-		);
-	}
-
-
-
-	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
-	{
-		if (Block::Snow::Layers(a_Block) == 0)
+		if (Block::Snow::Layers(a_ClickedBlock) == 0)
 		{
 			return true;  // If at normal snowfall height (lowest), we ignore collision.
 		}
 
 		// Special case if a player is holding a (thin) snow block and its size can be increased:
-		if ((a_HeldItem.m_ItemType == E_BLOCK_SNOW) && (a_Meta < FullBlockMeta))
+		if ((a_HeldItem.m_ItemType == E_BLOCK_SNOW) && (Block::Snow::Layers(a_ClickedBlock) < FullBlockLayers))
 		{
 			return !a_ClickedDirectly || (a_ClickedBlockFace == BLOCK_FACE_YP);  // If clicked an adjacent block, or clicked YP directly, we ignore collision.
 		}
@@ -100,7 +66,7 @@ private:
 
 
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		if (a_Position.y <= 0)
 		{

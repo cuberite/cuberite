@@ -50,24 +50,6 @@ public:
 
 private:
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
-	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = a_Player.GetEquippedItem().m_ItemDamage & 0x0f;
-		return true;
-	}
-
-
-
-
-
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Self) const override
 	{
 		return (a_Position.y > 0) && IsBlockAir(a_Chunk.GetBlock(a_Position.addedY(-1)));

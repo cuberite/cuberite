@@ -57,7 +57,6 @@
 #include "ItemPainting.h"
 #include "ItemPickaxe.h"
 #include "ItemPiston.h"
-#include "ItemPlanks.h"
 #include "ItemPoisonousPotato.h"
 #include "ItemPotion.h"
 #include "ItemPumpkin.h"
@@ -68,11 +67,9 @@
 #include "ItemRedstoneDust.h"
 #include "ItemRedstoneRepeater.h"
 #include "ItemRottenFlesh.h"
-#include "ItemSapling.h"
 #include "ItemSeeds.h"
 #include "ItemShears.h"
 #include "ItemShovel.h"
-#include "ItemSideways.h"
 #include "ItemSign.h"
 #include "ItemSlab.h"
 #include "ItemSnow.h"
@@ -96,7 +93,7 @@
 
 
 bool cItemHandler::m_HandlerInitialized = false;
-cItemHandler * cItemHandler::m_ItemHandler[2268];
+cItemHandler * cItemHandler::m_ItemHandler[E_ITEM_LAST + 1];
 
 
 
@@ -141,18 +138,16 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BANNER:              return new cItemBannerHandler(a_ItemType);
 		case E_BLOCK_BIG_FLOWER:         return new cItemBigFlowerHandler;
 		case E_BLOCK_CHEST:              return new cItemChestHandler(a_ItemType);
-		case E_BLOCK_ENCHANTMENT_TABLE:  return new cItemEnchantingTableHandler(a_ItemType);
 		case E_BLOCK_LEAVES:             return new cItemLeavesHandler(a_ItemType);
 		case E_BLOCK_LILY_PAD:           return new cItemLilypadHandler(a_ItemType);
 		case E_BLOCK_HEAD:               return new cItemMobHeadHandler(a_ItemType);
 		case E_BLOCK_NEW_LEAVES:         return new cItemLeavesHandler(a_ItemType);
-		case E_BLOCK_PUMPKIN:            return new cItemPumpkinHandler;
-		case E_BLOCK_PURPUR_SLAB:        return new cItemSlabHandler(E_BLOCK_PURPUR_SLAB,  E_BLOCK_PURPUR_DOUBLE_SLAB);
-		case E_BLOCK_RED_SANDSTONE_SLAB: return new cItemSlabHandler(E_BLOCK_RED_SANDSTONE_SLAB,  E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB);
-		case E_BLOCK_SAPLING:            return new cItemSaplingHandler(a_ItemType);
-		case E_BLOCK_STONE_SLAB:         return new cItemSlabHandler(E_BLOCK_STONE_SLAB,  E_BLOCK_DOUBLE_STONE_SLAB);
+		case E_BLOCK_PURPUR_SLAB:        return new cItemSlabHandler(a_ItemType);
+		case E_BLOCK_RED_SANDSTONE_SLAB: return new cItemSlabHandler(a_ItemType);
+		case E_BLOCK_SAPLING:            return new cSimplePlaceableItemHandler(a_ItemType, BlockType::OakSapling);
+		case E_BLOCK_STONE_SLAB:         return new cItemSlabHandler(a_ItemType);
 		case E_BLOCK_TRAPPED_CHEST:      return new cItemChestHandler(a_ItemType);
-		case E_BLOCK_WOODEN_SLAB:        return new cItemSlabHandler(E_BLOCK_WOODEN_SLAB, E_BLOCK_DOUBLE_WOODEN_SLAB);
+		case E_BLOCK_WOODEN_SLAB:        return new cItemSlabHandler(a_ItemType);
 		case E_BLOCK_WOOL:               return new cItemClothHandler(a_ItemType);
 		case E_ITEM_BED:                 return new cItemBedHandler(a_ItemType);
 		case E_ITEM_BOTTLE_O_ENCHANTING: return new cItemBottleOEnchantingHandler();
@@ -190,8 +185,6 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_SUGARCANE:           return new cSimplePlaceableItemHandler(a_ItemType, BlockType::SugarCane);
 		case E_BLOCK_ACTIVATOR_RAIL:       return new cItemRailHandler(a_ItemType);
 		case E_BLOCK_ANVIL:                return new cItemAnvilHandler(a_ItemType);
-		case E_BLOCK_BIG_FLOWER:           return new cItemBigFlowerHandler;
-		case E_BLOCK_CHEST:                return new cItemChestHandler(a_ItemType);
 		case E_BLOCK_DETECTOR_RAIL:        return new cItemRailHandler(a_ItemType);
 		case E_BLOCK_DISPENSER:            return new cItemDropSpenserHandler(a_ItemType);
 		case E_BLOCK_DROPPER:              return new cItemDropSpenserHandler(a_ItemType);
@@ -199,76 +192,30 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_BLOCK_ENDER_CHEST:          return new cItemEnderchestHandler(a_ItemType);
 		case E_BLOCK_END_PORTAL_FRAME:     return new cItemEndPortalFrameHandler(a_ItemType);
 		case E_BLOCK_FURNACE:              return new cItemFurnaceHandler(a_ItemType);
-		case E_BLOCK_HAY_BALE:             return new cItemSidewaysHandler(a_ItemType);
-		case E_BLOCK_HEAD:                 return new cItemMobHeadHandler(a_ItemType);
+		// case E_BLOCK_HAY_BALE:             return new cItemSidewaysHandler(a_ItemType);  // TODO(12xx12)
 		case E_BLOCK_HOPPER:               return new cItemHopperHandler(a_ItemType);
 		case E_BLOCK_IRON_TRAPDOOR:        return new cItemTrapdoorHandler(a_ItemType);
 		case E_BLOCK_JACK_O_LANTERN:       return new cItemJackOLanternHandler(a_ItemType);
-		case E_BLOCK_LADDER:               return new cItemLadderHandler(a_ItemType);
-		case E_BLOCK_LEAVES:               return new cItemLeavesHandler(a_ItemType);
+		case E_BLOCK_LADDER:               return new cItemLadderHandler(a_ItemType);;
 		case E_BLOCK_LEVER:                return new cItemLeverHandler(a_ItemType);
-		case E_BLOCK_LILY_PAD:             return new cItemLilypadHandler(a_ItemType);
-		case E_BLOCK_LOG:                  return new cItemSidewaysHandler(a_ItemType);
-		case E_BLOCK_NEW_LEAVES:           return new cItemLeavesHandler(a_ItemType);
-		case E_BLOCK_NEW_LOG:              return new cItemSidewaysHandler(a_ItemType);
+		// case E_BLOCK_LOG:                  return new cItemSidewaysHandler(a_ItemType);  // TODO(12xx12)
+		// case E_BLOCK_NEW_LOG:              return new cItemSidewaysHandler(a_ItemType);  // TODO(12xx12)
 		case E_BLOCK_OBSERVER:             return new cItemObserverHandler(a_ItemType);
 		case E_BLOCK_PISTON:               return new cItemPistonHandler(a_ItemType);
-		case E_BLOCK_PLANKS:               return new cItemPlanksHandler(a_ItemType);
+		// case E_BLOCK_PLANKS:               return new cItemPlanksHandler(a_ItemType);  // TODO(12xx12)
 		case E_BLOCK_POWERED_RAIL:         return new cItemRailHandler(a_ItemType);
 		case E_BLOCK_PUMPKIN:              return new cItemPumpkinHandler(a_ItemType);
-		case E_BLOCK_PURPUR_SLAB:          return new cItemSlabHandler(a_ItemType);
 		case E_BLOCK_QUARTZ_BLOCK:         return new cItemQuartzHandler(a_ItemType);
 		case E_BLOCK_RAIL:                 return new cItemRailHandler(a_ItemType);
 		case E_BLOCK_REDSTONE_TORCH_ON:    return new cItemTorchHandler(a_ItemType);
-		case E_BLOCK_RED_SANDSTONE_SLAB:   return new cItemSlabHandler(a_ItemType);
-		case E_BLOCK_SAPLING:              return new cItemSaplingHandler(a_ItemType);
 		case E_BLOCK_SNOW:                 return new cItemSnowHandler(a_ItemType);
 		case E_BLOCK_STICKY_PISTON:        return new cItemPistonHandler(a_ItemType);
 		case E_BLOCK_STONE_BUTTON:         return new cItemButtonHandler(a_ItemType);
-		case E_BLOCK_STONE_SLAB:           return new cItemSlabHandler(a_ItemType);
 		case E_BLOCK_TORCH:                return new cItemTorchHandler(a_ItemType);
 		case E_BLOCK_TRAPDOOR:             return new cItemTrapdoorHandler(a_ItemType);
-		case E_BLOCK_TRAPPED_CHEST:        return new cItemChestHandler(a_ItemType);
 		case E_BLOCK_TRIPWIRE_HOOK:        return new cItemTripwireHookHandler(a_ItemType);
 		case E_BLOCK_VINES:                return new cItemVineHandler(a_ItemType);
 		case E_BLOCK_WOODEN_BUTTON:        return new cItemButtonHandler(a_ItemType);
-		case E_BLOCK_WOODEN_SLAB:          return new cItemSlabHandler(a_ItemType);
-		case E_BLOCK_WOOL:                 return new cItemClothHandler(a_ItemType);
-		case E_ITEM_BANNER:                return new cItemBannerHandler(a_ItemType);
-		case E_ITEM_BED:                   return new cItemBedHandler(a_ItemType);
-		case E_ITEM_BOTTLE_O_ENCHANTING:   return new cItemBottleOEnchantingHandler();
-		case E_ITEM_BOW:                   return new cItemBowHandler();
-		case E_ITEM_BREWING_STAND:         return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_BREWING_STAND);
-		case E_ITEM_CAKE:                  return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_CAKE);
-		case E_ITEM_CAULDRON:              return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_CAULDRON);
-		case E_ITEM_COMPARATOR:            return new cItemComparatorHandler(a_ItemType);
-		case E_ITEM_DYE:                   return new cItemDyeHandler(a_ItemType);
-		case E_ITEM_EGG:                   return new cItemEggHandler();
-		case E_ITEM_EMPTY_MAP:             return new cItemEmptyMapHandler();
-		case E_ITEM_ENDER_PEARL:           return new cItemEnderPearlHandler();
-		case E_ITEM_END_CRYSTAL:           return new cItemEndCrystalHandler(a_ItemType);
-		case E_ITEM_EYE_OF_ENDER:          return new cItemEyeOfEnderHandler();
-		case E_ITEM_FIREWORK_ROCKET:       return new cItemFireworkHandler();
-		case E_ITEM_FIRE_CHARGE:           return new cItemLighterHandler(a_ItemType);
-		case E_ITEM_FISHING_ROD:           return new cItemFishingRodHandler(a_ItemType);
-		case E_ITEM_FLINT_AND_STEEL:       return new cItemLighterHandler(a_ItemType);
-		case E_ITEM_FLOWER_POT:            return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_FLOWER_POT);
-		case E_ITEM_GLASS_BOTTLE:          return new cItemBottleHandler();
-		case E_ITEM_HEAD:                  return new cItemMobHeadHandler(a_ItemType);
-		case E_ITEM_ITEM_FRAME:            return new cItemItemFrameHandler(a_ItemType);
-		case E_ITEM_MAP:                   return new cItemMapHandler();
-		case E_ITEM_MILK:                  return new cItemMilkHandler();
-		case E_ITEM_NETHER_WART:           return new cItemNetherWartHandler(a_ItemType);
-		case E_ITEM_PAINTING:              return new cItemPaintingHandler(a_ItemType);
-		case E_ITEM_POTIONS:               return new cItemPotionHandler();
-		case E_ITEM_REDSTONE_DUST:         return new cItemRedstoneDustHandler(a_ItemType);
-		case E_ITEM_REDSTONE_REPEATER:     return new cItemRedstoneRepeaterHandler(a_ItemType);
-		case E_ITEM_SHEARS:                return new cItemShearsHandler(a_ItemType);
-		case E_ITEM_SIGN:                  return new cItemSignHandler(a_ItemType);
-		case E_ITEM_SNOWBALL:              return new cItemSnowballHandler();
-		case E_ITEM_SPAWN_EGG:             return new cItemSpawnEggHandler(a_ItemType);
-		case E_ITEM_STRING:                return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_TRIPWIRE);
-		case E_ITEM_SUGARCANE:             return new cSimplePlaceableItemHandler(a_ItemType, E_BLOCK_SUGARCANE);
 
 		case E_ITEM_WOODEN_HOE:
 		case E_ITEM_STONE_HOE:
@@ -516,11 +463,10 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 	}
 
 	const auto & World = *a_Player.GetWorld();
-	auto ClickedBlock = World.GetBlock(a_ClickedBlockPos);
-	cChunkInterface ChunkInterface(a_World.GetChunkMap());
+	auto ClickedBlock = World.GetBlock(a_ClickedBlockPosition);
 
 	// Check if the block ignores build collision (water, grass etc.):
-	if (cBlockHandler::For(ClickedBlock.Type()).DoesIgnoreBuildCollision(World, a_HeldItem, a_ClickedBlockPosition, ClickedBlockMeta, a_ClickedBlockFace, true))
+	if (cBlockHandler::For(ClickedBlock.Type()).DoesIgnoreBuildCollision(World, a_HeldItem, a_ClickedBlockPosition, ClickedBlock, a_ClickedBlockFace, true))
 	{
 		// Try to place the block at the clicked position:
 		if (!CommitPlacement(a_Player, a_HeldItem, a_ClickedBlockPosition, a_ClickedBlockFace, a_CursorPosition))
@@ -540,11 +486,11 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 			return;
 		}
 
-		auto PlaceBlock = a_World.GetBlock(PlacedBlockPos);
+		auto PlacedBlock = World.GetBlock(PlacedPosition);
 
 		// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
 		// No need to do combinability (dblslab) checks, client will do that here.
-		if (!cBlockHandler::For(PlaceBlock.Type()).DoesIgnoreBuildCollision(ChunkInterface, PlacedBlockPos, a_Player, OldBlock))
+		if (!cBlockHandler::For(PlacedBlock.Type()).DoesIgnoreBuildCollision(World, a_HeldItem, PlacedPosition, PlacedBlock, a_ClickedBlockFace, false))
 		{
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it
@@ -573,14 +519,14 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 
 bool cItemHandler::OnItemUse(
 	cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-	const Vector3i a_ClickedBlockPos, eBlockFace a_ClickedBlockFace
+	const Vector3i a_ClickedBlockPosition, eBlockFace a_ClickedBlockFace
 )
 {
 	UNUSED(a_World);
 	UNUSED(a_Player);
 	UNUSED(a_PluginInterface);
 	UNUSED(a_Item);
-	UNUSED(a_ClickedBlockPos);
+	UNUSED(a_ClickedBlockPosition);
 	UNUSED(a_ClickedBlockFace);
 
 	return false;
@@ -594,14 +540,14 @@ bool cItemHandler::OnDiggingBlock(
 	cWorld * a_World,
 	cPlayer * a_Player,
 	const cItem & a_HeldItem,
-	const Vector3i a_ClickedBlockPos,
+	const Vector3i a_ClickedBlockPosition,
 	eBlockFace a_ClickedBlockFace
 )
 {
 	UNUSED(a_World);
 	UNUSED(a_Player);
 	UNUSED(a_HeldItem);
-	UNUSED(a_ClickedBlockPos);
+	UNUSED(a_ClickedBlockPosition);
 	UNUSED(a_ClickedBlockFace);
 
 	return false;
@@ -979,7 +925,6 @@ bool cItemHandler::CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem,
 	// By default, all blocks can be placed and the meta is copied over from the item's damage value:
 	return a_Player.PlaceBlock(
 		a_PlacePosition,
-		static_cast<BLOCKTYPE>(m_ItemType),
-		static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage & 0x0f)
+		BlockItemConverter::FromItem(PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage))
 	);
 }

@@ -137,35 +137,238 @@ public:
 		return Shape::None;
 	}
 
-private:
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BlockState & a_Block
-	) const override
+	static inline BlockState GetRailFromShape(BlockState a_Block, Shape a_Shape)
 	{
-		a_Block = FindBlock(a_ChunkInterface, a_PlacedBlockPos);
-		return a_Player.GetWorld()->DoWithChunkAt(a_PlacedBlockPos,
-			[this, a_PlacedBlockPos, &a_ChunkInterface](cChunk & a_Chunk)
+		using namespace Block;
+
+		switch (a_Block.Type())
+		{
+			case BlockType::Rail:
 			{
-				auto RelPos = cChunkDef::AbsoluteToRelative(a_PlacedBlockPos);
-				return CanBeAt(a_ChunkInterface, RelPos, a_Chunk);
+				switch (a_Shape)
+				{
+					case Shape::NorthSouth:      return Rail::Rail(Rail::Shape::NorthSouth);
+					case Shape::EastWest:        return Rail::Rail(Rail::Shape::EastWest);
+					case Shape::AscendingEast:   return Rail::Rail(Rail::Shape::AscendingEast);
+					case Shape::AscendingWest:   return Rail::Rail(Rail::Shape::AscendingWest);
+					case Shape::AscendingNorth:  return Rail::Rail(Rail::Shape::AscendingNorth);
+					case Shape::AscendingSouth:  return Rail::Rail(Rail::Shape::AscendingSouth);
+					case Shape::SouthEast:       return Rail::Rail(Rail::Shape::SouthEast);
+					case Shape::SouthWest:       return Rail::Rail(Rail::Shape::SouthWest);
+					case Shape::NorthWest:       return Rail::Rail(Rail::Shape::NorthWest);
+					case Shape::NorthEast:       return Rail::Rail(Rail::Shape::NorthEast);
+					case Shape::None:
+					{
+						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
+					}
+				}
 			}
-		);
+			case BlockType::ActivatorRail:
+			{
+				switch (a_Shape)
+				{
+					case Shape::NorthSouth:      return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::NorthSouth);
+					case Shape::EastWest:        return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::EastWest);
+					case Shape::AscendingEast:   return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast);
+					case Shape::AscendingWest:   return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest);
+					case Shape::AscendingNorth:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth);
+					case Shape::AscendingSouth:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingSouth);
+					case Shape::SouthEast:
+					case Shape::SouthWest:
+					case Shape::NorthWest:
+					case Shape::NorthEast:
+					case Shape::None:
+					{
+						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
+					}
+				}
+			}
+			case BlockType::DetectorRail:
+			{
+				switch (a_Shape)
+				{
+					case Shape::NorthSouth:      return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::NorthSouth);
+					case Shape::EastWest:        return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::EastWest);
+					case Shape::AscendingEast:   return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast);
+					case Shape::AscendingWest:   return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest);
+					case Shape::AscendingNorth:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth);
+					case Shape::AscendingSouth:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingSouth);
+					case Shape::SouthEast:
+					case Shape::SouthWest:
+					case Shape::NorthWest:
+					case Shape::NorthEast:
+					case Shape::None:
+					{
+						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
+					}
+				}
+			}
+			case BlockType::PoweredRail:
+			{
+				switch (a_Shape)
+				{
+					case Shape::NorthSouth:      return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::NorthSouth);
+					case Shape::EastWest:        return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::EastWest);
+					case Shape::AscendingEast:   return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast);
+					case Shape::AscendingWest:   return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest);
+					case Shape::AscendingNorth:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth);
+					case Shape::AscendingSouth:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingSouth);
+					case Shape::SouthEast:
+					case Shape::SouthWest:
+					case Shape::NorthWest:
+					case Shape::NorthEast:
+					case Shape::None:
+					{
+						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
+					}
+				}
+			}
+			default: UNREACHABLE("Got unknown block type in cBlockRailHandler!");
+		}
 	}
 
 
 
 
 
+	BlockState static FindBlock(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, BlockState a_OldBlock)
+	{
+		Shape NewShape;
+
+		char RailsCnt = 0;
+		bool Neighbors[8];  // 0 - EAST, 1 - WEST, 2 - NORTH, 3 - SOUTH, 4 - EAST UP, 5 - WEST UP, 6 - NORTH UP, 7 - SOUTH UP
+		memset(Neighbors, 0, sizeof(Neighbors));
+		Neighbors[0] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 1, 0,  0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_EAST, E_PURE_DOWN));
+		Neighbors[1] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(-1, 0,  0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_WEST, E_PURE_DOWN));
+		Neighbors[2] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 0, 0, -1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_NORTH, E_PURE_DOWN));
+		Neighbors[3] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 0, 0,  1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_SOUTH, E_PURE_DOWN));
+		Neighbors[4] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 1, 1,  0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_EAST, E_PURE_NONE));
+		Neighbors[5] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(-1, 1,  0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_WEST, E_PURE_NONE));
+		Neighbors[6] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 0, 1, -1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_NORTH, E_PURE_NONE));
+		Neighbors[7] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 0, 1,  1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_SOUTH, E_PURE_NONE));
+
+		if (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(1, -1, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_EAST))
+		{
+			Neighbors[0] = true;
+		}
+		if (IsUnstable(a_ChunkInterface, a_BlockPos - Vector3i(1, 1, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_WEST))
+		{
+			Neighbors[1] = true;
+		}
+		if (IsUnstable(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_NORTH))
+		{
+			Neighbors[2] = true;
+		}
+		if (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, -1, 1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_SOUTH))
+		{
+			Neighbors[3] = true;
+		}
+
+		for (int i = 0; i < 8; i++)
+		{
+			if (Neighbors[i])
+			{
+				RailsCnt++;
+			}
+		}
+
+		if (RailsCnt == 1)
+		{
+			if (Neighbors[7])
+			{
+				NewShape = Shape::AscendingSouth;
+			}
+			else if (Neighbors[6])
+			{
+				NewShape = Shape::AscendingNorth;
+			}
+			else if (Neighbors[5])
+			{
+				NewShape = Shape::AscendingWest;
+			}
+			else if (Neighbors[4])
+			{
+				NewShape = Shape::AscendingEast;
+			}
+			else if (Neighbors[0] || Neighbors[1])
+			{
+				NewShape = Shape::EastWest;
+			}
+			else if (Neighbors[2] || Neighbors[3])
+			{
+				NewShape = Shape::NorthSouth;
+			}
+			ASSERT(!"Weird neighbor count");
+			return GetRailFromShape(a_OldBlock, NewShape);
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			if (Neighbors[i + 4])
+			{
+				Neighbors[i] = true;
+			}
+		}
+
+		if (RailsCnt > 1)
+		{
+			bool CanCurve = CanThisRailCurve(a_OldBlock);
+
+			if (Neighbors[3] && Neighbors[0] && CanCurve)
+			{
+				NewShape = Shape::SouthEast;
+			}
+			else if (Neighbors[3] && Neighbors[1] && CanCurve)
+			{
+				NewShape = Shape::SouthWest;
+			}
+			else if (Neighbors[2] && Neighbors[0] && CanCurve)
+			{
+				NewShape = Shape::NorthEast;
+			}
+			else if (Neighbors[2] && Neighbors[1] && CanCurve)
+			{
+				NewShape = Shape::NorthWest;
+			}
+			else if (Neighbors[7] && Neighbors[2])
+			{
+				NewShape = Shape::AscendingSouth;
+			}
+			else if (Neighbors[3] && Neighbors[6])
+			{
+				NewShape = Shape::AscendingNorth;
+			}
+			else if (Neighbors[5] && Neighbors[0])
+			{
+				NewShape = Shape::AscendingWest;
+			}
+			else if (Neighbors[4] && Neighbors[1])
+			{
+				NewShape = Shape::AscendingEast;
+			}
+			else if (Neighbors[0] && Neighbors[1])
+			{
+				NewShape = Shape::EastWest;
+			}
+			else if (Neighbors[2] && Neighbors[3])
+			{
+				NewShape = Shape::NorthSouth;
+			}
+
+			if (CanCurve)
+			{
+				ASSERT(!"Weird neighbor count");
+			}
+		}
+		return GetRailFromShape(a_OldBlock, NewShape);
+	}
+
+private:
+
 	virtual void OnPlaced(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		Vector3i a_BlockPos,
-		BlockState a_Block
+			cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+			Vector3i a_BlockPos,
+			BlockState a_Block
 	) const override
 	{
 		Super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_Block);
@@ -186,10 +389,10 @@ private:
 
 
 	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		Vector3i a_BlockPos,
-		BlockState a_OldBlock,
-		const cEntity * a_Digger
+			cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+			Vector3i a_BlockPos,
+			BlockState a_OldBlock,
+			const cEntity * a_Digger
 	) const override
 	{
 		Super::OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlock, a_Digger);
@@ -207,22 +410,6 @@ private:
 
 
 
-
-
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
-	{
-		const auto OldBlock = a_ChunkInterface.GetBlock(a_BlockPos);
-		const auto NewBlock = FindBlock(a_ChunkInterface, a_BlockPos);
-		if ((OldBlock != NewBlock) && IsUnstable(a_ChunkInterface, a_BlockPos))
-		{
-			a_ChunkInterface.FastSetBlock(a_BlockPos, NewBlock);
-		}
-
-		Super::OnNeighborChanged(a_ChunkInterface, a_BlockPos, a_WhichNeighbor);
-	}
-
-
-
 #define GETOFFSET(RailType) \
 { \
 	switch (Rail::Shape(Self)) \
@@ -236,213 +423,46 @@ private:
 	break; \
 }
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
-	{
-		if (a_RelPos.y <= 0)
-		{
-			return false;
-		}
-		if (!cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_RelPos.addedY(-1))))
-		{
-			return false;
-		}
-
-		using namespace Block;
-
-		auto Self = a_Chunk.GetBlock(a_RelPos);
-		Vector3i Offset;
-		switch (Self.Type())
-		{
-			case BlockType::Rail:          GETOFFSET(Rail)
-			case BlockType::ActivatorRail: GETOFFSET(ActivatorRail)
-			case BlockType::DetectorRail:  GETOFFSET(DetectorRail)
-			case BlockType::PoweredRail:   GETOFFSET(PoweredRail)
-			default: break;
-		}
-
-		if (Offset != Vector3i(0, 0, 0))
-		{
-			BlockState BelowBlock = 0;
-			if (!a_Chunk.UnboundedRelGetBlock(a_RelPos + Offset, BelowBlock))
-			{
-				// Too close to the edge, cannot simulate
-				return true;
-			}
-			return cBlockInfo::FullyOccupiesVoxel(BelowBlock);
-		}
-		return true;
-	}
-
-
-
-
-
-	BlockState FindBlock(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos) const
-	{
-		BlockState Meta = 0;
-		char RailsCnt = 0;
-		bool Neighbors[8];  // 0 - EAST, 1 - WEST, 2 - NORTH, 3 - SOUTH, 4 - EAST UP, 5 - WEST UP, 6 - NORTH UP, 7 - SOUTH UP
-		memset(Neighbors, 0, sizeof(Neighbors));
-		Neighbors[0] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 1, 0,  0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_EAST, E_PURE_DOWN));
-		Neighbors[1] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(-1, 0,  0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_WEST, E_PURE_DOWN));
-		Neighbors[2] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 0, 0, -1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_NORTH, E_PURE_DOWN));
-		Neighbors[3] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 0, 0,  1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_SOUTH, E_PURE_DOWN));
-		Neighbors[4] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 1, 1,  0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_EAST, E_PURE_NONE));
-		Neighbors[5] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(-1, 1,  0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_WEST, E_PURE_NONE));
-		Neighbors[6] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 0, 1, -1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_NORTH, E_PURE_NONE));
-		Neighbors[7] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 0, 1,  1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_SOUTH, E_PURE_NONE));
-		if (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(1, -1, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_EAST))
-		{
-			Neighbors[0] = true;
-		}
-		if (IsUnstable(a_ChunkInterface, a_BlockPos - Vector3i(1, 1, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_WEST))
-		{
-			Neighbors[1] = true;
-		}
-		if (IsUnstable(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_NORTH))
-		{
-			Neighbors[2] = true;
-		}
-		if (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, -1, 1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_SOUTH))
-		{
-			Neighbors[3] = true;
-		}
-		for (int i = 0; i < 8; i++)
-		{
-			if (Neighbors[i])
-			{
-				RailsCnt++;
-			}
-		}
-		if (RailsCnt == 1)
-		{
-			if (Neighbors[7])
-			{
-				return E_META_RAIL_ASCEND_ZP;
-			}
-			else if (Neighbors[6])
-			{
-				return E_META_RAIL_ASCEND_ZM;
-			}
-			else if (Neighbors[5])
-			{
-				return E_META_RAIL_ASCEND_XM;
-			}
-			else if (Neighbors[4])
-			{
-				return E_META_RAIL_ASCEND_XP;
-			}
-			else if (Neighbors[0] || Neighbors[1])
-			{
-				return E_META_RAIL_XM_XP;
-			}
-			else if (Neighbors[2] || Neighbors[3])
-			{
-				return E_META_RAIL_ZM_ZP;
-			}
-			ASSERT(!"Weird neighbor count");
-			return Meta;
-		}
-		for (int i = 0; i < 4; i++)
-		{
-			if (Neighbors[i + 4])
-			{
-				Neighbors[i] = true;
-			}
-		}
-		if (RailsCnt > 1)
-		{
-			const bool CanCurve = a_RailType == E_BLOCK_RAIL;
-
-			if (Neighbors[3] && Neighbors[0] && CanCurve)
-			{
-				return E_META_RAIL_CURVED_ZP_XP;
-			}
-			else if (Neighbors[3] && Neighbors[1] && CanCurve)
-			{
-				return E_META_RAIL_CURVED_ZP_XM;
-			}
-			else if (Neighbors[2] && Neighbors[0] && CanCurve)
-			{
-				return E_META_RAIL_CURVED_ZM_XP;
-			}
-			else if (Neighbors[2] && Neighbors[1] && CanCurve)
-			{
-				return E_META_RAIL_CURVED_ZM_XM;
-			}
-			else if (Neighbors[7] && Neighbors[2])
-			{
-				return E_META_RAIL_ASCEND_ZP;
-			}
-			else if (Neighbors[3] && Neighbors[6])
-			{
-				return E_META_RAIL_ASCEND_ZM;
-			}
-			else if (Neighbors[5] && Neighbors[0])
-			{
-				return E_META_RAIL_ASCEND_XM;
-			}
-			else if (Neighbors[4] && Neighbors[1])
-			{
-				return E_META_RAIL_ASCEND_XP;
-			}
-			else if (Neighbors[0] && Neighbors[1])
-			{
-				return E_META_RAIL_XM_XP;
-			}
-			else if (Neighbors[2] && Neighbors[3])
-			{
-				return E_META_RAIL_ZM_ZP;
-			}
-
-			if (CanCurve)
-			{
-				ASSERT(!"Weird neighbor count");
-			}
-		}
-		return Meta;
-	}
-
-private:
-
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		if ((a_Position.y <= 0) || !cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_Position.addedY(-1))))
 		{
 			return false;
 		}
-		switch (a_Meta)
+
+		auto Shape = GetShapeFromRail(a_Self);
+
+		switch (Shape)
 		{
-			case E_META_RAIL_ASCEND_XP:
-			case E_META_RAIL_ASCEND_XM:
-			case E_META_RAIL_ASCEND_ZM:
-			case E_META_RAIL_ASCEND_ZP:
+			case Shape::AscendingEast:
+			case Shape::AscendingWest:
+			case Shape::AscendingNorth:
+			case Shape::AscendingSouth:
 			{
 				// Mapping between the meta and the neighbors that need checking
-				a_Meta -= E_META_RAIL_ASCEND_XP;  // Base index at zero
-				static const Vector3i Coords[] =
-						{
-								{ 1, 0,  0},  // east,  XP
-								{-1, 0,  0},  // west,  XM
-								{ 0, 0, -1},  // north, ZM
-								{ 0, 0,  1},  // south, ZP
-						} ;
-				BLOCKTYPE  BlockType;
-				NIBBLETYPE BlockMeta;
-				if (!a_Chunk.UnboundedRelGetBlock(a_Position + Coords[a_Meta], BlockType, BlockMeta))
+				size_t Index = static_cast<size_t>(Shape) - static_cast<size_t>(Shape::AscendingEast);  // Base index at zero
+				static const std::array<Vector3i, 4> Coords =
+				{
+					Vector3i( 1, 0,  0),  // east,  XP
+					Vector3i(-1, 0,  0),  // west,  XM
+					Vector3i( 0, 0, -1),  // north, ZM
+					Vector3i( 0, 0,  1),  // south, ZP
+				} ;
+				BlockState Block;
+				if (!a_Chunk.UnboundedRelGetBlock(a_Position + Coords[Index], Block))
 				{
 					// Too close to the edge, cannot simulate
 					return true;
 				}
-				return cBlockInfo::FullyOccupiesVoxel(BlockType);
+				return cBlockInfo::FullyOccupiesVoxel(Block);
 			}
+			default: return true;
 		}
-		return true;
 	}
 
-	bool CanThisRailCurve(void) const
+	static bool CanThisRailCurve(BlockState a_Block)
 	{
-		return m_BlockType == BlockType::Rail;
+		return a_Block.Type() == BlockType::Rail;
 	}
 
 #define ISUNSTABLE(RailType) \
@@ -963,56 +983,17 @@ private:
 		return true;
 	}
 
-	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
-		const cEntity * a_Digger
-	) const override
-	{
-		Super::OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlockType, a_OldBlockMeta, a_Digger);
-
-		// Alert diagonal rails:
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1,  1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1,  1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1,  1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1, -1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1, -1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, -1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1,  1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1, -1), BLOCK_FACE_NONE);
-	}
-
 
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
 	{
-		const auto Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
-		const auto NewMeta = FindMeta(a_ChunkInterface, a_BlockPos, m_BlockType);
-		if ((Meta != NewMeta) && IsUnstable(a_ChunkInterface, a_BlockPos))
+		const auto OldBlock = a_ChunkInterface.GetBlock(a_BlockPos);
+		const auto NewBlock = FindBlock(a_ChunkInterface, a_BlockPos, OldBlock);
+		if ((OldBlock != NewBlock) && IsUnstable(a_ChunkInterface, a_BlockPos))
 		{
-			a_ChunkInterface.FastSetBlock(a_BlockPos, m_BlockType, (m_BlockType == E_BLOCK_RAIL) ? NewMeta : NewMeta | (Meta & 0x08));
+			a_ChunkInterface.FastSetBlock(a_BlockPos, NewBlock);
 		}
 
 		Super::OnNeighborChanged(a_ChunkInterface, a_BlockPos, a_WhichNeighbor);
-	}
-
-	virtual void OnPlaced(
-			cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-			Vector3i a_BlockPos,
-			BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) const override
-	{
-		Super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_BlockType, a_BlockMeta);
-
-		// Alert diagonal rails:
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1,  1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1,  1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1,  1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1, -1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1, -1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, -1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1,  1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1, -1), BLOCK_FACE_NONE);
 	}
 
 	virtual BlockState RotateCCW(BlockState a_Block) const override
@@ -1162,7 +1143,6 @@ private:
 					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::SouthEast);
 					default: return a_Block;
 				}
-				break;
 			}
 			case BlockType::ActivatorRail:
 			{
@@ -1172,7 +1152,6 @@ private:
 					case ActivatorRail::Shape::AscendingSouth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth);
 					default: return a_Block;
 				}
-				break;
 			}
 			case BlockType::DetectorRail:
 			{
@@ -1182,7 +1161,6 @@ private:
 					case DetectorRail::Shape::AscendingSouth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth);
 					default: return a_Block;
 				}
-				break;
 			}
 			case BlockType::PoweredRail:
 			{
@@ -1192,7 +1170,6 @@ private:
 					case PoweredRail::Shape::AscendingSouth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth);
 					default: return a_Block;
 				}
-				break;
 			}
 			default: return a_Block;
 		}
@@ -1216,7 +1193,6 @@ private:
 					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::NorthWest);
 					default: return a_Block;
 				}
-				break;
 			}
 			case BlockType::ActivatorRail:
 			{
@@ -1226,7 +1202,6 @@ private:
 					case ActivatorRail::Shape::AscendingWest:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast);
 					default: return a_Block;
 				}
-				break;
 			}
 			case BlockType::DetectorRail:
 			{
@@ -1236,7 +1211,6 @@ private:
 					case DetectorRail::Shape::AscendingWest:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast);
 					default: return a_Block;
 				}
-				break;
 			}
 			case BlockType::PoweredRail:
 			{
@@ -1246,7 +1220,6 @@ private:
 					case PoweredRail::Shape::AscendingWest:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast);
 					default: return a_Block;
 				}
-				break;
 			}
 			default: return a_Block;
 		}

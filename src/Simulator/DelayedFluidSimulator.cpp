@@ -90,19 +90,9 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_SimSlotNum];
 
 	// Simulate all the blocks in the scheduled slot:
-	for (auto & [Index, Block] : Slot.m_Blocks)
+	for (auto & [Index, Position] : Slot.m_Blocks)
 	{
-		cCoordWithIntVector & Blocks = Slot.m_Blocks[i];
-		if (Blocks.empty())
-		{
-			continue;
-		}
-		for (cCoordWithIntVector::iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
-		{
-			SimulateBlock(a_Chunk, itr->x, itr->y, itr->z);
-		}
-		m_TotalBlocks -= static_cast<int>(Blocks.size());
-		Blocks.clear();
+		SimulateBlock(a_Chunk, Position);
 	}
 
 	m_TotalBlocks -= static_cast<int>(Slot.m_Blocks.size());

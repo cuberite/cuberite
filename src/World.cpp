@@ -2017,8 +2017,7 @@ void cWorld::PlaceBlock(const Vector3i a_Position, BlockState a_Block)
 	SetBlock(a_Position, a_Block);
 
 	cChunkInterface ChunkInterface(GetChunkMap());
-	cBlockHandler::For(BlockType).OnBroken(ChunkInterface, *this, a_Position, BlockType, BlockMeta, nullptr);
-	cBlockHandler::For(a_BlockType).OnPlaced(ChunkInterface, *this, a_Position, a_BlockType, a_BlockMeta);
+	cBlockHandler::For(OldBlock.Type()).OnBroken(ChunkInterface, *this, a_Position, OldBlock, nullptr);
 	cBlockHandler::For(a_Block.Type()).OnPlaced(ChunkInterface, *this, a_Position, a_Block);
 }
 

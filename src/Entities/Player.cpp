@@ -2538,7 +2538,7 @@ bool cPlayer::PlaceBlocks(const std::initializer_list<sSetBlock> a_Blocks)
 		if (
 			!m_World->DoWithChunkAt(Block.GetAbsolutePos(), [&Block](cChunk & a_Chunk)
 			{
-				return cBlockHandler::For(Block.m_BlockType).CanBeAt(a_Chunk, Block.GetRelativePos(), Block.m_BlockMeta);
+				return cBlockHandler::For(Block.m_Block.Type()).CanBeAt(a_Chunk, Block.GetRelativePos(), Block.m_Block);
 			})
 		)
 		{

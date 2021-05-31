@@ -49,7 +49,7 @@ protected:
 	virtual UInt8 GetEntityMetadataID(EntityMetadataType a_FieldType) const;
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const;
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
-	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const;
+	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const;
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
 	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) const;
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;

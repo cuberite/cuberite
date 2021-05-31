@@ -216,7 +216,7 @@ public:
 	}
 
 
-	inline static int MakeIndex(int x, int y, int z)
+	inline static size_t MakeIndex(int x, int y, int z)
 	{
 		ASSERT(IsValidRelPos({ x, y, z }));
 
@@ -226,12 +226,6 @@ public:
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
 			return static_cast<size_t>(y + (z * Width) + (x * Height * Width));  // 1.1 uses YZX
 		#endif
-	}
-
-
-	inline static size_t MakeIndex(Vector3i a_RelPos)
-	{
-		return MakeIndex(a_RelPos.x, a_RelPos.y, a_RelPos.z);
 	}
 
 

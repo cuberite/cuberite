@@ -30,7 +30,7 @@ private:
 		}
 
 		// No golem at these coords, place the block normally:
-		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_PUMPKIN, cBlockPumpkinHandler::YawToMetaData(a_Player.GetYaw()));
+		return a_Player.PlaceBlock(a_PlacePosition, Block::CarvedPumpkin::CarvedPumpkin(RotationToBlockFace(a_Player.GetYaw())));
 	}
 
 
@@ -139,11 +139,11 @@ private:
 			if (
 				!a_Player.PlaceBlocks(
 				{
-					{ a_PumpkinPos,            Block::Air::Air() },  // Head
-					{ BodyPos,                 Block::Air::Air() },  // Torso
-					{ BodyPos.addedY(-1),      Block::Air::Air() },  // Legs
-					{ BodyPos + ArmOffsets[i], Block::Air::Air() },  // Arm
-					{ BodyPos - ArmOffsets[i], Block::Air::Air() }   // Arm
+					{ a_PumpkinPos,       Block::Air::Air() },  // Head
+					{ BodyPos,            Block::Air::Air() },  // Torso
+					{ BodyPos.addedY(-1), Block::Air::Air() },  // Legs
+					{ BodyPos + Offset,   Block::Air::Air() },  // Arm
+					{ BodyPos - Offset,   Block::Air::Air() }   // Arm
 				})
 			)
 			{

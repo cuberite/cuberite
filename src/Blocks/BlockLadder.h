@@ -20,7 +20,7 @@ public:
 
 
 	/** Returns true if the ladder will be supported by the block through the given blockface. */
-	static bool CanBePlacedOn(const BLOCKTYPE a_BlockType, const eBlockFace a_BlockFace)
+	static bool CanBePlacedOn(BlockState a_Block, const eBlockFace a_BlockFace)
 	{
 		if (
 			(a_BlockFace == BLOCK_FACE_NONE) ||
@@ -31,7 +31,7 @@ public:
 			return false;
 		}
 
-		return cBlockInfo::IsSolid(a_BlockType);
+		return cBlockInfo::IsSolid(a_Block);
 	}
 
 
@@ -78,13 +78,12 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		auto Face = MetaDataToBlockFace(a_Meta);
-		auto NeighborRelPos = AddFaceDirection(a_Position, Face, true);
-		BLOCKTYPE NeighborBlockType;
-		a_Chunk.UnboundedRelGetBlockType(NeighborRelPos, NeighborBlockType);
-		return CanBePlacedOn(NeighborBlockType, Face);
+		auto NeighborRelPos = AddFaceDirection(a_Position, Block::Ladder::Facing(a_Self), true);
+		BlockState Neighbor;
+		a_Chunk.UnboundedRelGetBlock(NeighborRelPos, Neighbor);
+		return CanBePlacedOn(Neighbor, Block::Ladder::Facing(a_Self));
 	}
 
 

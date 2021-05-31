@@ -18,7 +18,7 @@ public:
 
 private:
 
-	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) const override
+	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BlockState a_Block) const override
 	{
 		// E_META_END_PORTAL_FRAME_EYE is the bit which signifies the eye of ender is in it.
 		// LOG("PortalPlaced, meta %d", a_BlockMeta);

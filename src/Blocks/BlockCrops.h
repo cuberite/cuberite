@@ -178,7 +178,7 @@ private:
 
 
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		return ((a_Position.y > 0) && (a_Chunk.GetBlock(a_Position.addedY(-1)).Type() == BlockType::Farmland));
 	}

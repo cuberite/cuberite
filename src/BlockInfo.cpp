@@ -9,6 +9,22 @@
 
 
 
+bool IsBlockAir(BlockState a_Block)
+{
+	switch (a_Block.Type())
+	{
+		case BlockType::Air:
+		case BlockType::CaveAir:
+		case BlockType::VoidAir:
+			return true;
+		default:
+			return false;
+	}
+}
+
+
+
+
 
 bool IsBlockIce(BlockState a_Block)
 {

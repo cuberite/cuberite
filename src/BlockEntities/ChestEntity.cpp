@@ -65,7 +65,7 @@ bool cChestEntity::ScanNeighbour(cChunk & a_Chunk, Vector3i a_Position)
 
 	const auto BlockEntity = Chunk->GetBlockEntityRel(a_Position);
 
-	if ((BlockEntity == nullptr) || (BlockEntity->GetBlockType() != m_BlockType))
+	if ((BlockEntity == nullptr) || (BlockEntity->GetBlockType() != m_Block.Type()))
 	{
 		// Neighbouring block is not the same type of chest:
 		return false;

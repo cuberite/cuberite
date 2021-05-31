@@ -50,59 +50,16 @@ public:
 
 private:
 
-	static const NIBBLETYPE VINE_LOST_SUPPORT = 16;
-	static const NIBBLETYPE VINE_UNCHANGED = 17;
+	static const unsigned char VINE_LOST_SUPPORT = 16;
+	static const unsigned char VINE_UNCHANGED = 17;
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		return GetMaxMeta(a_Chunk, a_Position, a_Meta) != VINE_LOST_SUPPORT;
-	}
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BlockState & a_Block
-	) const override
-	{
-		using namespace Block;
-		// TODO: Disallow placement where the vine doesn't attach to something properly
-		auto BlockToReplace = a_ChunkInterface.GetBlock(a_PlacedBlockPos);
-		if (BlockToReplace.Type() == m_BlockType)
-		{
-			if (IsAttachedTo(BlockToReplace, a_ClickedBlockFace))
-			{
-				// There is already a vine at that rotation
-				return false;
-			}
-			switch (a_ClickedBlockFace)
-			{
-				//                                      East                         North                        South                        Up                        West
-				case BLOCK_FACE_XM: a_Block = Vine::Vine(Vine::East(BlockToReplace), Vine::North(BlockToReplace), Vine::South(BlockToReplace), Vine::Up(BlockToReplace), true);                       break;
-				case BLOCK_FACE_XP: a_Block = Vine::Vine(true,                       Vine::North(BlockToReplace), Vine::South(BlockToReplace), Vine::Up(BlockToReplace), Vine::West(BlockToReplace)); break;
-				case BLOCK_FACE_YP: a_Block = Vine::Vine(Vine::East(BlockToReplace), Vine::North(BlockToReplace), Vine::South(BlockToReplace), true,                     Vine::West(BlockToReplace)); break;
-				case BLOCK_FACE_ZM: a_Block = Vine::Vine(Vine::East(BlockToReplace), true,                        Vine::South(BlockToReplace), Vine::Up(BlockToReplace), Vine::West(BlockToReplace)); break;
-				case BLOCK_FACE_ZP: a_Block = Vine::Vine(Vine::East(BlockToReplace), Vine::North(BlockToReplace), true,                        Vine::Up(BlockToReplace), Vine::West(BlockToReplace)); break;
-				default: return false;
-			}
-		}
-		else
-		{
-			switch (a_ClickedBlockFace)
-			{
-				//                                       East   North  South  Up     West
-				case BLOCK_FACE_XM: a_Block = Vine::Vine(false, false, false, false, true); break;
-				case BLOCK_FACE_XP: a_Block = Vine::Vine(true,  false, false, false, false); break;
-				case BLOCK_FACE_YP: a_Block = Vine::Vine(false, false, false, true,  false); break;
-				case BLOCK_FACE_ZM: a_Block = Vine::Vine(false, true,  false, false, false); break;
-				case BLOCK_FACE_ZP: a_Block = Vine::Vine(false, false, true,  false, false); break;
-				default: return false;
-			}
-		}
+		// return GetMaxMeta(a_Chunk, a_Position, a_Self) != VINE_LOST_SUPPORT;
+		// TODO(12xx12)
 		return true;
 	}
+
 
 
 	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
@@ -175,7 +132,6 @@ private:
 		}
 
 		const auto Position = cChunkDef::AbsoluteToRelative(a_BlockPos);
-		const auto MaxMeta = GetMaxMeta(a_Chunk, Position, a_Chunk.GetMeta(Position));
 		auto BlockToCheck = a_ChunkInterface.GetBlock(AddFaceDirection(a_BlockPos, a_WhichNeighbor));
 
 		// If only attached to this face: destroy
@@ -237,9 +193,9 @@ private:
 
 
 
-	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, Vector3i a_Position, BlockState a_ClickedBlock, eBlockFace a_ClickedBlockFace, bool a_ClickedDirectly) const override
 	{
-		return !a_ClickedDirectly || (a_HeldItem.m_ItemType != m_BlockType);
+		return !a_ClickedDirectly || (BlockItemConverter::FromItem(PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage)) != m_BlockType);
 	}
 
 
@@ -288,17 +244,11 @@ private:
 	}
 
 
-
-
-
 	virtual BlockState RotateCW(BlockState a_Block) const override
 	{
 		using namespace Block;
 		return Vine::Vine(Vine::South(a_Block), Vine::East(a_Block), Vine::West(a_Block), Vine::Up(a_Block), Vine::North(a_Block));
 	}
-
-
-
 
 
 	virtual BlockState MirrorXY(BlockState a_Block) const override
@@ -308,17 +258,11 @@ private:
 	}
 
 
-
-
-
 	virtual BlockState MirrorYZ(BlockState a_Block) const override
 	{
 		using namespace Block;
 		return Vine::Vine(Vine::East(a_Block), Vine::South(a_Block), Vine::North(a_Block), Vine::Up(a_Block), Vine::West(a_Block));
 	}
-
-
-
 
 
 	virtual ColourID GetMapBaseColourID() const override

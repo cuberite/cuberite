@@ -65,16 +65,6 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
-	{
-		// The low 3 bits store the sapling type; bit 0x08 is the growth timer (not used in pickups)
-		return cItem(m_BlockType, 1, a_BlockMeta & 0x07);
-	}
-
-
-
-
-
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Self) const override
 	{
 		return (a_Position.y > 0) && IsBlockStateOfDirt(a_Self);

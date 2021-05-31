@@ -32,7 +32,6 @@ public:
 	} ;
 
 	cDelayedFluidSimulatorChunkData(int a_TickDelay);
-	virtual ~cDelayedFluidSimulatorChunkData() override;
 
 	/** Slots, one for each delay tick, each containing the blocks to simulate */
 	std::vector<cSlot> m_Slots;

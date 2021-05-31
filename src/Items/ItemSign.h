@@ -20,36 +20,42 @@ public:
 
 private:
 
-	/** Converts the block face of the neighbor to which the wallsign is attached to the wallsign block's meta. */
-	static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_NeighborBlockFace)
-	{
-		switch (a_NeighborBlockFace)
-		{
-			case BLOCK_FACE_ZM: return 0x02;
-			case BLOCK_FACE_ZP: return 0x03;
-			case BLOCK_FACE_XM: return 0x04;
-			case BLOCK_FACE_XP: return 0x05;
-			case BLOCK_FACE_NONE:
-			case BLOCK_FACE_YP:
-			case BLOCK_FACE_YM:
-			{
-				break;
-			}
-		}
-		return 0x02;
-	}
-
-
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
+		BlockState BlockToPlace;
+
 		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
 		{
-			if (!a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_SIGN_POST, RotationToMetaData(a_Player.GetYaw())))
+			switch (PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage))
 			{
-				return false;
+				case Item::AcaciaSign:  BlockToPlace = Block::AcaciaSign::AcaciaSign(RotationToFineFace(a_Player.GetYaw())); break;
+				case Item::BirchSign:   BlockToPlace = Block::BirchSign::BirchSign(RotationToFineFace(a_Player.GetYaw())); break;
+				case Item::CrimsonSign: BlockToPlace = Block::CrimsonSign::CrimsonSign(RotationToFineFace(a_Player.GetYaw())); break;
+				case Item::DarkOakSign: BlockToPlace = Block::DarkOakSign::DarkOakSign(RotationToFineFace(a_Player.GetYaw())); break;
+				case Item::JungleSign:  BlockToPlace = Block::JungleSign::JungleSign(RotationToFineFace(a_Player.GetYaw())); break;
+				case Item::OakSign:     BlockToPlace = Block::OakSign::OakSign(RotationToFineFace(a_Player.GetYaw())); break;
+				case Item::SpruceSign:  BlockToPlace = Block::SpruceSign::SpruceSign(RotationToFineFace(a_Player.GetYaw())); break;
+				case Item::WarpedSign:  BlockToPlace = Block::WarpedSign::WarpedSign(RotationToFineFace(a_Player.GetYaw())); break;
+				default: return false;
 			}
 		}
-		else if (!a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_WALLSIGN, BlockFaceToMetaData(a_ClickedBlockFace)))
+		else
+		{
+			switch (PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage))
+			{
+				case Item::AcaciaSign:  BlockToPlace = Block::AcaciaWallSign::AcaciaWallSign(); break;
+				case Item::BirchSign:   BlockToPlace = Block::BirchWallSign::BirchWallSign(); break;
+				case Item::CrimsonSign: BlockToPlace = Block::CrimsonWallSign::CrimsonWallSign(); break;
+				case Item::DarkOakSign: BlockToPlace = Block::DarkOakWallSign::DarkOakWallSign(); break;
+				case Item::JungleSign:  BlockToPlace = Block::JungleWallSign::JungleWallSign(); break;
+				case Item::OakSign:     BlockToPlace = Block::OakWallSign::OakWallSign(); break;
+				case Item::SpruceSign:  BlockToPlace = Block::SpruceWallSign::SpruceWallSign(); break;
+				case Item::WarpedSign:  BlockToPlace = Block::WarpedWallSign::WarpedWallSign(); break;
+				default: return false;
+			}
+		}
+
+		if (!a_Player.PlaceBlock(a_PlacePosition, BlockToPlace))
 		{
 			return false;
 		}
@@ -64,35 +70,6 @@ private:
 	{
 		return true;
 	}
-
-
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BlockState & a_Block
-	) override
-	{
-		switch (a_ClickedBlockFace)
-		{
-			case BLOCK_FACE_YP:
-			{
-				a_Block = Block::OakSign::OakSign(RotationToFineFace(a_Player->GetYaw()));
-				break;
-			}
-			case BLOCK_FACE_XM:
-			case BLOCK_FACE_XP:
-			case BLOCK_FACE_ZM:
-			case BLOCK_FACE_ZP:
-			{
-				a_Block = Block::OakWallSign::OakWallSign(RotationToBlockFace(a_Player->GetYaw()));
-				break;
-			}
-			default: return false;
-		}
-		return true;
 } ;
 
 

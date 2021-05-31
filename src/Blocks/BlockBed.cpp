@@ -74,16 +74,14 @@ bool cBlockBedHandler::OnUse(
 		return true;
 	}
 
-	auto Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
+	auto ClickedBlock = a_ChunkInterface.GetBlock(a_BlockPos);
 
-	if ((Meta & 0x8) == 0)
+	if (!IsHeadPart(ClickedBlock))
 	{
 		// Clicked on the foot of the bed, adjust to the head:
-		a_BlockPos += MetaDataToDirection(Meta & 0x03);
-
-		BLOCKTYPE Type;
-		a_ChunkInterface.GetBlockTypeMeta(a_BlockPos, Type, Meta);
-		if (Type != E_BLOCK_BED)
+		a_BlockPos = AddFaceDirection(a_BlockPos, GetBlockFace(ClickedBlock));
+		auto FootBlock = a_ChunkInterface.GetBlock(a_BlockPos);
+		if (!IsBlockBed(FootBlock))
 		{
 			// Bed was incomplete, bail:
 			return true;
@@ -134,12 +132,12 @@ bool cBlockBedHandler::OnUse(
 	}
 
 	// Occupy the bed, where 0x4 = occupied bit:
-	a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta | 0x04);
+	SetBedOccupationState(a_ChunkInterface, a_BlockPos, true);
 	a_Player.GetStatistics().Custom[CustomStatistic::SleepInBed]++;
 
 	// When sleeping, the player's bounding box moves to approximately where his head is.
 	// Set the player's position to somewhere close to the edge of the pillow block:
-	a_Player.SetPosition(Vector3f(0.4f, 1, 0.4f) * MetaDataToDirection(Meta & 0x03) + Vector3f(0.5f, 0.6875, 0.5f) + a_BlockPos);
+	a_Player.SetPosition(AddFaceDirection(Vector3f(0.4f, 1, 0.4f), GetBlockFace(Self)) + Vector3f(0.5f, 0.6875, 0.5f) + a_BlockPos);  // TODO(12xx12) Sanity check
 
 	// Fast-forward the time if all players in the world are in their beds:
 	if (a_WorldInterface.ForEachPlayer([](cPlayer & a_OtherPlayer) { return !a_OtherPlayer.IsInBed(); }))
@@ -153,14 +151,4 @@ bool cBlockBedHandler::OnUse(
 	}
 
 	return true;
-}
-
-
-
-
-
-cItems cBlockBedHandler::ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const
-{
-	// Drops handled by the block entity:
-	return {};
 }

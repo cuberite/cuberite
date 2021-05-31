@@ -561,6 +561,8 @@ eBlockFace RotationToBlockFace(double a_Rotation, bool a_Inverse = false);
 
 unsigned char RotationToFineFace(double a_Rotation);
 
+eBlockFace DisplacementYawToFacing(Vector3d a_Rotation, Vector3d a_EyePos, double a_Yaw);
+
 /** Returns true if the specified block type is valid (known). */
 bool IsValidBlock(int a_BlockType);
 

@@ -78,7 +78,7 @@ private:
 
 
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		auto NeighborPos = a_Position + GetOffsetBehindTheSign(a_Chunk.GetBlock(a_Position));
 		BlockState Neighbor;

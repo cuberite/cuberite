@@ -291,37 +291,6 @@ private:
 	virtual BlockState MirrorXY(BlockState a_Block)  const override;
 	virtual BlockState MirrorYZ(BlockState a_Block)  const override;
 
-
-
-
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BlockState & a_Block
-	) const override
-	{
-		// If clicking a bottom face, place the door one block lower:
-		auto PlacedPos = a_PlacedBlockPos;
-		if (a_ClickedBlockFace == BLOCK_FACE_BOTTOM)
-		{
-			PlacedPos.y--;
-		}
-
-		if (
-			!CanReplaceBlock(a_ChunkInterface.GetBlock(PlacedPos)) ||
-			!CanReplaceBlock(a_ChunkInterface.GetBlock(PlacedPos.addedY(1)))
-		)
-		{
-			return false;
-		}
-
-		return Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, PlacedPos, a_ClickedBlockFace, a_CursorPos, a_Block);
-	}
-
 	virtual cBoundingBox GetPlacementCollisionBox(BlockState a_XM, BlockState a_XP, BlockState a_YM, BlockState a_YP, BlockState a_ZM, BlockState a_ZP) const override;
 
 
@@ -367,8 +336,7 @@ private:
 		const auto BasePosition = a_Position.addedY(IsTop(a_Self.Type()) ? -2 : -1);
 		auto BlockToReplace = a_Chunk.GetBlock(BasePosition);
 
-		return (BasePosition.y >= 0) && CanBeOn(BlockType, BlockMeta);
-		return ((a_RelPos.y > 0) && CanBeOn(BlockToReplace);
+		return (BasePosition.y >= 0) && CanBeOn(BlockToReplace);
 	}
 
 

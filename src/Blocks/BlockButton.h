@@ -154,56 +154,9 @@ private:
 
 
 
-#define GETPLACEMENTBLOCKTYPEMETA(ButtonType) \
-{\
-	enum ButtonType::Face Facing;\
-	switch (a_ClickedBlockFace)\
-	{\
-		case BLOCK_FACE_BOTTOM: Facing = ButtonType::Face::Ceiling; break;\
-		case BLOCK_FACE_TOP:    Facing = ButtonType::Face::Floor; break;\
-		case BLOCK_FACE_NORTH:\
-		case BLOCK_FACE_SOUTH:\
-		case BLOCK_FACE_WEST:\
-		case BLOCK_FACE_EAST:   Facing = ButtonType::Face::Wall; break;   \
-		default: return false;\
-	}\
-	a_Block = ButtonType::ButtonType(Facing, a_ClickedBlockFace, false);\
-	break;\
-}
-
-	virtual bool GetPlacementBlockTypeMeta(
-			cChunkInterface & a_ChunkInterface,
-			cPlayer & a_Player,
-			const Vector3i a_PlacedBlockPos,
-			eBlockFace a_ClickedBlockFace,
-			const Vector3i a_CursorPos,
-			BlockState & a_Block
-	) const override
-	{
-		using namespace Block;
-
-		switch (m_BlockType)
-		{
-			case BlockType::AcaciaButton:             GETPLACEMENTBLOCKTYPEMETA(AcaciaButton)
-			case BlockType::BirchButton:              GETPLACEMENTBLOCKTYPEMETA(BirchButton)
-			case BlockType::CrimsonButton:            GETPLACEMENTBLOCKTYPEMETA(CrimsonButton)
-			case BlockType::DarkOakButton:            GETPLACEMENTBLOCKTYPEMETA(DarkOakButton)
-			case BlockType::JungleButton:             GETPLACEMENTBLOCKTYPEMETA(JungleButton)
-			case BlockType::OakButton:                GETPLACEMENTBLOCKTYPEMETA(OakButton)
-			case BlockType::PolishedBlackstoneButton: GETPLACEMENTBLOCKTYPEMETA(PolishedBlackstoneButton)
-			case BlockType::SpruceButton:             GETPLACEMENTBLOCKTYPEMETA(SpruceButton)
-			case BlockType::StoneButton:              GETPLACEMENTBLOCKTYPEMETA(StoneButton)
-			case BlockType::WarpedButton:             GETPLACEMENTBLOCKTYPEMETA(WarpedButton)
-			default: return false;
-		}
-		return true;
-	}
 
 
-
-
-
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		auto Self = a_Chunk.GetBlock(a_Position);
 		auto SupportRelPos = AddFaceDirection(a_Position, GetBlockFace(Self), true);

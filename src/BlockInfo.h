@@ -26,7 +26,7 @@ public:
 
 	/** Does the client pretend the block doesn't exist when clicking?
 	For example, digging a fire will hit the block below the fire, so fire is "clicked through". */
-	static bool IsClickedThrough(BLOCKTYPE a_Block);
+	static bool IsClickedThrough(BlockState a_Block);
 
 	/** Is a block destroyed after a single hit?
 	Warning: IsOneHitDig does not take into account enchantments / status effects / swim state / floating state
@@ -61,6 +61,8 @@ public:
 	static float GetHardness(BlockState a_Block);
 };
 // tolua_end
+
+bool IsBlockAir(BlockState a_Block);
 
 bool IsBlockIce(BlockState a_Block);
 

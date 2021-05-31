@@ -27,28 +27,141 @@ public:
 
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
-		// Cannot place a head at "no face" and from the bottom:
-		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_BOTTOM))
-		{
-			return false;
-		}
+		using namespace Block;
 
-		// If the placed head is a wither, try to spawn the wither first:
-		if (a_HeldItem.m_ItemDamage == E_META_HEAD_WITHER)
+		switch (a_Player.GetEquippedItem().m_ItemDamage)
 		{
-			if (TrySpawnWitherAround(a_Player, a_PlacePosition))
+			case E_META_HEAD_SKELETON:
 			{
-				return true;
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Player.PlaceBlock(a_PlacePosition, SkeletonSkull::SkeletonSkull(RotationToFineFace(a_Player.GetYaw())));
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Player.PlaceBlock(a_PlacePosition, SkeletonWallSkull::SkeletonWallSkull(RotationToBlockFace(a_Player.GetYaw())));
+						break;
+					}
+					default: return false;
+				}
+				break;
 			}
-			// Wither not created, proceed with regular head placement
+			case E_META_HEAD_WITHER:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Player.PlaceBlock(a_PlacePosition, WitherSkeletonSkull::WitherSkeletonSkull(RotationToFineFace(a_Player.GetYaw())));
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Player.PlaceBlock(a_PlacePosition, WitherSkeletonWallSkull::WitherSkeletonWallSkull(RotationToBlockFace(a_Player.GetYaw())));
+						break;
+					}
+					default: return false;
+				}
+				break;
+			}
+			case E_META_HEAD_ZOMBIE:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Player.PlaceBlock(a_PlacePosition, ZombieHead::ZombieHead(RotationToFineFace(a_Player.GetYaw())));
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Player.PlaceBlock(a_PlacePosition, ZombieWallHead::ZombieWallHead(RotationToBlockFace(a_Player.GetYaw())));
+						break;
+					}
+					default: return false;
+				}
+				break;
+			}
+			case E_META_HEAD_PLAYER:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Player.PlaceBlock(a_PlacePosition, PlayerHead::PlayerHead(RotationToFineFace(a_Player.GetYaw())));
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Player.PlaceBlock(a_PlacePosition, PlayerWallHead::PlayerWallHead(RotationToBlockFace(a_Player.GetYaw())));
+						break;
+					}
+					default: return false;
+				}
+				break;
+			}
+			case E_META_HEAD_CREEPER:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Player.PlaceBlock(a_PlacePosition, CreeperHead::CreeperHead(RotationToFineFace(a_Player.GetYaw())));
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Player.PlaceBlock(a_PlacePosition, CreeperWallHead::CreeperWallHead(RotationToBlockFace(a_Player.GetYaw())));
+						break;
+					}
+					default: return false;
+				}
+				break;
+			}
+			case E_META_HEAD_DRAGON:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Player.PlaceBlock(a_PlacePosition, CreeperHead::CreeperHead(RotationToFineFace(a_Player.GetYaw())));
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Player.PlaceBlock(a_PlacePosition, CreeperWallHead::CreeperWallHead(RotationToBlockFace(a_Player.GetYaw())));
+						break;
+					}
+					default: return false;
+				}
+				break;
+			}
+			default:
+			{
+				ASSERT(!"UNHANDLED MOB HEAD TYPE IN ITEMMOBHEAD");
+			}
 		}
-
-		if (!a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_HEAD, BlockFaceToBlockMeta(a_ClickedBlockFace)))
-		{
-			return false;
-		}
-
-		RegularHeadPlaced(a_Player, a_HeldItem, a_PlacePosition, a_ClickedBlockFace);
 		return true;
 	}
 
@@ -60,10 +173,10 @@ public:
 	Adjusts the mob head entity based on the equipped item's data. */
 	void RegularHeadPlaced(const cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace)
 	{
-		const auto HeadType = static_cast<eMobHeadType>(a_EquippedItem.m_ItemDamage);
+		const auto HeadType = static_cast<eMobHeadType>(a_HeldItem.m_ItemDamage);
 
 		// Use a callback to set the properties of the mob head block entity:
-		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_Player, HeadType, BlockMeta](cBlockEntity & a_BlockEntity)
+		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_Player, HeadType, a_ClickedBlockFace](cBlockEntity & a_BlockEntity)
 		{
 			switch (a_BlockEntity.GetBlockType())
 			{
@@ -168,7 +281,7 @@ public:
 		};
 
 		cBlockArea Area;
-		Area.Read(a_World, a_BlockPos - Vector3i(2, 2, 2), a_BlockPos + Vector3i(2, 0, 2), cBlockArea::baBlocks);
+		Area.Read(*a_Player.GetWorld(), a_BlockPos - Vector3i(2, 2, 2), a_BlockPos + Vector3i(2, 0, 2), cBlockArea::baBlocks);
 
 		auto RelHeadPos = Vector3i(3, 2, 3);
 		Vector3i CenterHeadPos;
@@ -203,8 +316,8 @@ public:
 
 		// Spawn the wither:
 		Vector3d WitherPos = CenterHeadPos - RelHeadPos + a_BlockPos + Vector3d(0.5, -2, 0.5);
-		a_World.SpawnMob(WitherPos.x, WitherPos.y, WitherPos.z, mtWither, false);
-		AwardSpawnWitherAchievement(a_World, CenterHeadPos - RelHeadPos + a_BlockPos);
+		a_Player.GetWorld()->SpawnMob(WitherPos.x, WitherPos.y, WitherPos.z, mtWither, false);
+		AwardSpawnWitherAchievement(a_Player.GetWorld(), CenterHeadPos - RelHeadPos + a_BlockPos);
 		return true;
 	}
 
@@ -240,12 +353,14 @@ public:
 
 	static bool ReplaceAir(cPlayer & a_Player, const std::array<Vector3i, 7> a_Offsets, Vector3i a_StartPos)
 	{
-		sSetBlockVector AirBlocks;
 		for (const auto & Offset : a_Offsets)
 		{
-			AirBlocks.emplace_back(a_StartPos + Offset, Block::Air::Air());
+			if (!a_Player.PlaceBlock(a_StartPos + Offset, Block::Air::Air()))
+			{
+				return false;
+			}
 		}
-		return a_Player.PlaceBlocks(AirBlocks);
+		return true;
 	}
 
 
@@ -253,10 +368,10 @@ public:
 
 
 	/** Awards the achievement to all players close to the specified point. */
-	void AwardSpawnWitherAchievement(cWorld & a_World, Vector3i a_BlockPos)
+	void AwardSpawnWitherAchievement(cWorld * a_World, Vector3i a_BlockPos)
 	{
 		Vector3f Pos(a_BlockPos);
-		a_World.ForEachPlayer([=](cPlayer & a_Player)
+		a_World->ForEachPlayer([=](cPlayer & a_Player)
 			{
 				// If player is close, award achievement:
 				double Dist = (a_Player.GetPosition() - Pos).Length();
@@ -275,160 +390,6 @@ public:
 
 	virtual bool IsPlaceable(void) override
 	{
-		return true;
-	}
-
-
-
-
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BlockState & a_Block
-	) override
-	{
-		if (a_Player == nullptr)
-		{
-			return false;
-		}
-		using namespace Block;
-
-		switch (a_Player->GetEquippedItem().m_ItemDamage)
-		{
-			case E_META_HEAD_SKELETON:
-			{
-				switch (a_ClickedBlockFace)
-				{
-					case BLOCK_FACE_YP:
-					{
-						a_Block = SkeletonSkull::SkeletonSkull(RotationToFineFace(a_Player->GetYaw()));
-						break;
-					}
-					case BLOCK_FACE_XM:
-					case BLOCK_FACE_XP:
-					case BLOCK_FACE_ZM:
-					case BLOCK_FACE_ZP:
-					{
-						a_Block = SkeletonWallSkull::SkeletonWallSkull(RotationToBlockFace(a_Player->GetYaw()));
-						break;
-					}
-					default: return false;
-				}
-				break;
-			}
-			case E_META_HEAD_WITHER:
-			{
-				switch (a_ClickedBlockFace)
-				{
-					case BLOCK_FACE_YP:
-					{
-						a_Block = WitherSkeletonSkull::WitherSkeletonSkull(RotationToFineFace(a_Player->GetYaw()));
-						break;
-					}
-					case BLOCK_FACE_XM:
-					case BLOCK_FACE_XP:
-					case BLOCK_FACE_ZM:
-					case BLOCK_FACE_ZP:
-					{
-						a_Block = WitherSkeletonWallSkull::WitherSkeletonWallSkull(RotationToBlockFace(a_Player->GetYaw()));
-						break;
-					}
-					default: return false;
-				}
-				break;
-			}
-			case E_META_HEAD_ZOMBIE:
-			{
-				switch (a_ClickedBlockFace)
-				{
-					case BLOCK_FACE_YP:
-					{
-						a_Block = ZombieHead::ZombieHead(RotationToFineFace(a_Player->GetYaw()));
-						break;
-					}
-					case BLOCK_FACE_XM:
-					case BLOCK_FACE_XP:
-					case BLOCK_FACE_ZM:
-					case BLOCK_FACE_ZP:
-					{
-						a_Block = ZombieWallHead::ZombieWallHead(RotationToBlockFace(a_Player->GetYaw()));
-						break;
-					}
-					default: return false;
-				}
-				break;
-			}
-			case E_META_HEAD_PLAYER:
-			{
-				switch (a_ClickedBlockFace)
-				{
-					case BLOCK_FACE_YP:
-					{
-						a_Block = PlayerHead::PlayerHead(RotationToFineFace(a_Player->GetYaw()));
-						break;
-					}
-					case BLOCK_FACE_XM:
-					case BLOCK_FACE_XP:
-					case BLOCK_FACE_ZM:
-					case BLOCK_FACE_ZP:
-					{
-						a_Block = PlayerWallHead::PlayerWallHead(RotationToBlockFace(a_Player->GetYaw()));
-						break;
-					}
-					default: return false;
-				}
-				break;
-			}
-			case E_META_HEAD_CREEPER:
-			{
-				switch (a_ClickedBlockFace)
-				{
-					case BLOCK_FACE_YP:
-					{
-						a_Block = CreeperHead::CreeperHead(RotationToFineFace(a_Player->GetYaw()));
-						break;
-					}
-					case BLOCK_FACE_XM:
-					case BLOCK_FACE_XP:
-					case BLOCK_FACE_ZM:
-					case BLOCK_FACE_ZP:
-					{
-						a_Block = CreeperWallHead::CreeperWallHead(RotationToBlockFace(a_Player->GetYaw()));
-						break;
-					}
-					default: return false;
-				}
-				break;
-			}
-			case E_META_HEAD_DRAGON:
-			{
-				switch (a_ClickedBlockFace)
-				{
-					case BLOCK_FACE_YP:
-					{
-						a_Block = CreeperHead::CreeperHead(RotationToFineFace(a_Player->GetYaw()));
-						break;
-					}
-					case BLOCK_FACE_XM:
-					case BLOCK_FACE_XP:
-					case BLOCK_FACE_ZM:
-					case BLOCK_FACE_ZP:
-					{
-						a_Block = CreeperWallHead::CreeperWallHead(RotationToBlockFace(a_Player->GetYaw()));
-						break;
-					}
-					default: return false;
-				}
-				break;
-			}
-			default:
-			{
-				ASSERT(!"UNHANDLED MOB HEAD TYPE IN ITEMMOBHEAD");
-			}
-		}
 		return true;
 	}
 } ;

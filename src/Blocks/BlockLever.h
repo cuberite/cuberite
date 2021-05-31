@@ -68,39 +68,9 @@ private:
 
 
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BlockState & a_Block
-	) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		using namespace Block;
-		enum Lever::Face Face = Lever::Face::Floor;
-		switch (a_ClickedBlockFace)
-		{
-			case BLOCK_FACE_TOP:    Face = Lever::Face::Floor; break;
-			case BLOCK_FACE_BOTTOM: Face = Lever::Face::Ceiling; break;
-			case BLOCK_FACE_SOUTH:
-			case BLOCK_FACE_WEST:
-			case BLOCK_FACE_EAST:
-			case BLOCK_FACE_NORTH:  Face = Lever::Face::Wall; break;
-			case BLOCK_FACE_NONE:   return false;
-		}
-
-		a_Block = Block::Lever::Lever(Face, RotationToBlockFace(a_Player.GetYaw()), false);
-		return true;
-	}
-
-
-
-
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
-	{
-		auto Self = a_Chunk.GetBlock(a_RelPos);
+		auto Self = a_Chunk.GetBlock(a_Position);
 
 		// Find the type of block the lever is attached to:
 		auto NeighborFace = Block::Lever::Facing(Self);

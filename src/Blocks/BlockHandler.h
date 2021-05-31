@@ -122,7 +122,7 @@ public:
 	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool = nullptr) const;
 
 	/** Checks if the block can stay at the specified relative coords in the chunk */
-	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, NIBBLETYPE a_Meta) const;
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const;
 
 	/** Checks whether the block has an effect on growing the plant */
 	virtual bool CanSustainPlant(BlockState a_Block) const { return false; }
@@ -136,7 +136,7 @@ public:
 	@param a_Pos Position of the block
 	@param a_Player Player trying to build on the block
 	@param a_Meta Meta value of the block currently at a_Pos */
-	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, Vector3i a_Position, NIBBLETYPE a_Meta, eBlockFace a_ClickedBlockFace, bool a_ClickedDirectly) const;
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, Vector3i a_Position, BlockState a_ClickedBlock, eBlockFace a_ClickedBlockFace, bool a_ClickedDirectly) const;
 
 	/** Tests if a_RelPosition is inside the block, where a_RelPosition is relative to the origin of the block.
 	Coords in a_RelPosition are guaranteed to be in the [0..1] range. */

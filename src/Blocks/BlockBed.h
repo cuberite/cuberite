@@ -171,34 +171,31 @@ public:
 	{
 		auto BedPosition = a_Player.GetLastBedPos();
 
-		BLOCKTYPE Type;
-		NIBBLETYPE Meta;
-		a_ChunkInterface.GetBlockTypeMeta(BedPosition, Type, Meta);
+		auto BedBlock = a_ChunkInterface.GetBlock(BedPosition);
 
-		if (Type != E_BLOCK_BED)
+		if (!IsBlockBed(BedBlock))
 		{
 			// Bed was incomplete, just wake:
 			a_Player.SetIsInBed(false);
 			return;
 		}
 
-		if ((Meta & 0x8) == 0)
+		if (!IsHeadPart(BedBlock))
 		{
 			// BedPosition is the foot of the bed, adjust to the head:
-			BedPosition += MetaDataToDirection(Meta & 0x03);
+			BedPosition = AddFaceDirection(BedPosition, GetBlockFace(BedBlock));
 
-			a_ChunkInterface.GetBlockTypeMeta(BedPosition, Type, Meta);
-			if (Type != E_BLOCK_BED)
+			BedBlock = a_ChunkInterface.GetBlock(BedPosition);
+			if (!IsBlockBed(BedBlock))
 			{
 				// Bed was incomplete, just wake:
 				a_Player.SetIsInBed(false);
 				return;
 			}
 		}
-	}
 
 		// Clear the "occupied" bit of the bed's pillow block:
-		a_ChunkInterface.SetBlockMeta(BedPosition, Meta & 0x0b);
+		SetBedOccupationState(a_ChunkInterface, BedPosition, false);
 
 		// Wake the player:
 		a_Player.SetIsInBed(false);

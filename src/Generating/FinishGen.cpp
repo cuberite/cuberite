@@ -566,7 +566,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			}
 
 			// Walk below trees:
-			auto BlockBelow = a_ChunkDesc.GetBlockType(x, y - 1, z);
+			auto BlockBelow = a_ChunkDesc.GetBlock({x, y - 1, z});
 			bool failed = false;  // marker if the search for a valid position was successful
 
 			while (
@@ -583,7 +583,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 					failed = true;
 					break;
 				}
-				BlockBelow = a_ChunkDesc.GetBlockType(x, y - 1, z);
+				BlockBelow = a_ChunkDesc.GetBlock({x, y - 1, z});
 			}
 
 			if (failed)
@@ -2328,7 +2328,7 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 	Pos.x = Clamp(Pos.x, Radius, cChunkDef::Width - Radius - 1);
 	Pos.z = Clamp(Pos.z, Radius, cChunkDef::Width - Radius - 1);
 
-	auto StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y, Pos.z);
+	auto StartBlock = a_ChunkDesc.GetBlock(Pos);
 	while (!((StartBlock == E_BLOCK_DIRT) || (StartBlock == E_BLOCK_GRASS)))
 	{
 		Pos.y -= 1;
@@ -2336,7 +2336,7 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 		{
 			return;
 		}
-		StartBlock = a_ChunkDesc.GetBlockType(Pos.x, Pos.y, Pos.z);
+		StartBlock = a_ChunkDesc.GetBlock(Pos);
 	}
 
 
@@ -2359,7 +2359,7 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 					continue;
 				}
 
-				a_ChunkDesc.SetBlockTypeMeta(Pos.x + x, Pos.y + y, Pos.z + z, E_BLOCK_MOSSY_COBBLESTONE, 0);
+				a_ChunkDesc.SetBlock({Pos.x + x, Pos.y + y, Pos.z + z}, Block::MossyCobblestone::MossyCobblestone());
 			}
 		}
 	}

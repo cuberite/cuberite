@@ -341,8 +341,8 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback) const
 
 void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 {
-	std::copy_n(a_SetChunkData.HeightMap, std::size(a_SetChunkData.HeightMap), m_HeightMap);
-	std::copy_n(a_SetChunkData.BiomeMap, std::size(a_SetChunkData.BiomeMap), m_BiomeMap);
+	std::copy_n(a_SetChunkData.HeightMap.data(), a_SetChunkData.HeightMap.size(), m_HeightMap.data());
+	std::copy_n(a_SetChunkData.BiomeMap.data(), a_SetChunkData.BiomeMap.size(), m_BiomeMap.data());
 
 	m_BlockData = std::move(a_SetChunkData.BlockData);
 	m_LightData = std::move(a_SetChunkData.LightData);
@@ -860,7 +860,7 @@ void cChunk::TickBlocks(void)
 	cBlockInServerPluginInterface PluginInterface(*m_World);
 
 	// Tick random blocks, but the first one should be m_BlockToTick (so that SetNextBlockToTick() works):
-	cBlockHandler::For(GetBlock(m_BlockToTick)).OnUpdate(ChunkInterface, *m_World, PluginInterface, *this, m_BlockToTick);
+	cBlockHandler::For(GetBlock(m_BlockToTick).Type()).OnUpdate(ChunkInterface, *m_World, PluginInterface, *this, m_BlockToTick);
 
 	auto & Random = GetRandomProvider();
 
@@ -882,7 +882,7 @@ void cChunk::TickBlocks(void)
 			const auto Index = Random.RandInt<size_t>(ChunkBlockData::SectionBlockCount - 1);
 			const auto Position = cChunkDef::IndexToCoordinate(Y * ChunkBlockData::SectionBlockCount + Index);
 
-			cBlockHandler::For((*Section)[Index]).OnUpdate(ChunkInterface, *m_World, PluginInterface, *this, Position);
+			cBlockHandler::For((*Section)[Index].Type()).OnUpdate(ChunkInterface, *m_World, PluginInterface, *this, Position);
 		}
 	}
 }

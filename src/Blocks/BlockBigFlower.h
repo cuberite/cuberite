@@ -56,8 +56,7 @@ private:
 		{
 			if (
 				(a_Position.y < 1) ||
-				!a_World.GetBlockTypeMeta(a_Position - Vector3i(0, 1, 0), BottomType, a_Meta) ||
-				(BottomType != E_BLOCK_BIG_FLOWER)
+				(IsBlockBigFlower(a_Block))
 			)
 			{
 				// Can't find the flower meta so assume grass
@@ -129,12 +128,12 @@ private:
 
 
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		// CanBeAt is also called on placement, so the top part can't check for the bottom part.
 		// Both parts can only that they're rooted in grass.
 
-		const auto RootPosition = a_Position.addedY(IsTopPart(a_Meta) ? -2 : -1);
+		const auto RootPosition = a_Position.addedY(IsTopPart(a_Self) ? -2 : -1);
 		return (RootPosition.y >= 0) && IsBlockStateOfDirt(a_Chunk.GetBlock(RootPosition));
 	}
 
