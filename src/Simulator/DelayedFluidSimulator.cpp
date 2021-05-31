@@ -26,7 +26,7 @@ bool cDelayedFluidSimulatorChunkData::cSlot::Add(Vector3i a_RelPos)
 		return false;
 	}
 
-	int Index = cChunkDef::MakeIndexNoCheck(a_RelPos);
+	int Index = cChunkDef::MakeIndex(a_RelPos);
 	if (m_Blocks.find(Index) == m_Blocks.end())
 	{
 		return false;
@@ -46,7 +46,7 @@ bool cDelayedFluidSimulatorChunkData::cSlot::Add(Vector3i a_RelPos)
 cDelayedFluidSimulatorChunkData::cDelayedFluidSimulatorChunkData(int a_TickDelay)
 {
 	auto Default = cSlot();
-	m_Slots = std::vector<cSlot>(a_TickDelay + 2, Default);
+	m_Slots = std::vector<cSlot>(a_TickDelay, Default);
 }
 
 
@@ -87,12 +87,16 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 {
 	auto ChunkDataRaw = (m_FluidBlock == BlockType::Water) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
 	cDelayedFluidSimulatorChunkData * ChunkData = static_cast<cDelayedFluidSimulatorChunkData *>(ChunkDataRaw);
+	while (ChunkData->m_Slots.size() <= m_SimSlotNum)
+	{
+		ChunkData->m_Slots.emplace_back();
+	}
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_SimSlotNum];
 
 	// Simulate all the blocks in the scheduled slot:
-	for (auto & [Index, Block] : Slot.m_Blocks)
+	for (auto & [Index, Position] : Slot.m_Blocks)
 	{
-		SimulateBlock(a_Chunk, {Block.x, Block.y, Block.z});
+		SimulateBlock(a_Chunk, Position);
 	}
 
 	m_TotalBlocks -= static_cast<int>(Slot.m_Blocks.size());

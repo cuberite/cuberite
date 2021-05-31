@@ -3,8 +3,6 @@
 
 #include "ItemHandler.h"
 #include "../World.h"
-#include "../Blocks/BlockSignPost.h"
-#include "../Blocks/BlockWallSign.h"
 #include "../ClientHandle.h"
 
 
@@ -18,81 +16,58 @@ class cItemSignHandler:
 
 public:
 
-	cItemSignHandler(int a_ItemType):
-		Super(a_ItemType)
+	using Super::Super;
+
+private:
+
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
-	}
+		BlockState BlockToPlace;
 
+		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
+		{
+			switch (PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage))
+			{
+				case Item::AcaciaSign:  BlockToPlace = Block::AcaciaSign::AcaciaSign(RotationToFineFace(a_Player.GetYaw())); break;
+				case Item::BirchSign:   BlockToPlace = Block::BirchSign::BirchSign(RotationToFineFace(a_Player.GetYaw())); break;
+				case Item::CrimsonSign: BlockToPlace = Block::CrimsonSign::CrimsonSign(RotationToFineFace(a_Player.GetYaw())); break;
+				case Item::DarkOakSign: BlockToPlace = Block::DarkOakSign::DarkOakSign(RotationToFineFace(a_Player.GetYaw())); break;
+				case Item::JungleSign:  BlockToPlace = Block::JungleSign::JungleSign(RotationToFineFace(a_Player.GetYaw())); break;
+				case Item::OakSign:     BlockToPlace = Block::OakSign::OakSign(RotationToFineFace(a_Player.GetYaw())); break;
+				case Item::SpruceSign:  BlockToPlace = Block::SpruceSign::SpruceSign(RotationToFineFace(a_Player.GetYaw())); break;
+				case Item::WarpedSign:  BlockToPlace = Block::WarpedSign::WarpedSign(RotationToFineFace(a_Player.GetYaw())); break;
+				default: return false;
+			}
+		}
+		else
+		{
+			switch (PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage))
+			{
+				case Item::AcaciaSign:  BlockToPlace = Block::AcaciaWallSign::AcaciaWallSign(); break;
+				case Item::BirchSign:   BlockToPlace = Block::BirchWallSign::BirchWallSign(); break;
+				case Item::CrimsonSign: BlockToPlace = Block::CrimsonWallSign::CrimsonWallSign(); break;
+				case Item::DarkOakSign: BlockToPlace = Block::DarkOakWallSign::DarkOakWallSign(); break;
+				case Item::JungleSign:  BlockToPlace = Block::JungleWallSign::JungleWallSign(); break;
+				case Item::OakSign:     BlockToPlace = Block::OakWallSign::OakWallSign(); break;
+				case Item::SpruceSign:  BlockToPlace = Block::SpruceWallSign::SpruceWallSign(); break;
+				case Item::WarpedSign:  BlockToPlace = Block::WarpedWallSign::WarpedWallSign(); break;
+				default: return false;
+			}
+		}
 
-
-
-
-	virtual bool OnPlayerPlace(
-		cWorld & a_World,
-		cPlayer & a_Player,
-		const cItem & a_EquippedItem,
-		const Vector3i a_ClickedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos
-	) override
-	{
-		// Check if placing on something ignoring build collision to edit the correct sign later on:
-		auto ClickedBlock = a_World.GetBlock(a_ClickedBlockPos);
-		cChunkInterface ChunkInterface(a_World.GetChunkMap());
-		bool IsReplacingClickedBlock = cBlockHandler::For(ClickedBlock.Type()).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlock);
-
-		// If the regular placement doesn't work, do no further processing:
-		if (!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_CursorPos))
+		if (!a_Player.PlaceBlock(a_PlacePosition, BlockToPlace))
 		{
 			return false;
 		}
 
-		// Use IsReplacingClickedBlock to make sure we will edit the right sign:
-		auto SignPos = IsReplacingClickedBlock ? a_ClickedBlockPos : AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-
 		// After successfully placing the sign, open the sign editor for the player:
-		a_Player.GetClientHandle()->SendEditSign(SignPos.x, SignPos.y, SignPos.z);
+		a_Player.GetClientHandle()->SendEditSign(a_PlacePosition.x, a_PlacePosition.y, a_PlacePosition.z);
 		return true;
 	}
-
-
-
 
 
 	virtual bool IsPlaceable(void) override
 	{
-		return true;
-	}
-
-
-
-
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BlockState & a_Block
-	) override
-	{
-		switch (a_ClickedBlockFace)
-		{
-			case BLOCK_FACE_YP:
-			{
-				a_Block = Block::OakSign::OakSign(RotationToFineFace(a_Player->GetYaw()));
-				break;
-			}
-			case BLOCK_FACE_XM:
-			case BLOCK_FACE_XP:
-			case BLOCK_FACE_ZM:
-			case BLOCK_FACE_ZP:
-			{
-				a_Block = Block::OakWallSign::OakWallSign(RotationToBlockFace(a_Player->GetYaw()));
-				break;
-			}
-			default: return false;
-		}
 		return true;
 	}
 } ;

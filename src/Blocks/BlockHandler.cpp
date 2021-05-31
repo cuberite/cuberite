@@ -796,8 +796,8 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockRedstoneBlockHandler(BlockType::RedstoneBlock);
 	constexpr cBlockRedstoneLampHandler                    BlockRedstoneLampHandler(BlockType::RedstoneLamp);
 	constexpr cBlockRedstoneOreHandler                     BlockRedstoneOreHandler(BlockType::RedstoneOre);
-	constexpr cBlockTorchBaseHandler                       BlockRedstoneTorchHandler(BlockType::RedstoneTorch);
-	constexpr cBlockTorchBaseHandler                       BlockRedstoneWallTorchHandler(BlockType::RedstoneWallTorch);
+	constexpr cBlockTorchHandler                           BlockRedstoneTorchHandler(BlockType::RedstoneTorch);
+	constexpr cBlockTorchHandler                           BlockRedstoneWallTorchHandler(BlockType::RedstoneWallTorch);
 	constexpr cBlockRedstoneHandler                        BlockRedstoneWireHandler(BlockType::RedstoneWire);
 	constexpr cBlockRedstoneRepeaterHandler                BlockRepeaterHandler(BlockType::Repeater);
 	constexpr cBlockCommandBlockHandler                    BlockRepeatingCommandBlockHandler(BlockType::RepeatingCommandBlock);
@@ -893,7 +893,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockTallSeagrassHandler(BlockType::TallSeagrass);
 	constexpr cDefaultBlockHandler                         BlockTargetHandler(BlockType::Target);
 	constexpr cDefaultBlockHandler                         BlockTerracottaHandler(BlockType::Terracotta);
-	constexpr cBlockTorchBaseHandler                       BlockTorchHandler(BlockType::Torch);
+	constexpr cBlockTorchHandler                           BlockTorchHandler(BlockType::Torch);
 	constexpr cBlockChestHandler                           BlockTrappedChestHandler(BlockType::TrappedChest);
 	constexpr cBlockTripwireHandler                        BlockTripwireHandler(BlockType::Tripwire);
 	constexpr cBlockTripwireHookHandler                    BlockTripwireHookHandler(BlockType::TripwireHook);
@@ -906,7 +906,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockTwistingVinesPlantHandler(BlockType::TwistingVinesPlant);
 	constexpr cBlockVineHandler                            BlockVineHandler(BlockType::Vine);
 	constexpr cBlockAirHandler                             BlockVoidAirHandler(BlockType::VoidAir);
-	constexpr cBlockTorchBaseHandler                       BlockWallTorchHandler(BlockType::WallTorch);
+	constexpr cBlockTorchHandler                           BlockWallTorchHandler(BlockType::WallTorch);
 	constexpr cBlockButtonHandler                          BlockWarpedButtonHandler(BlockType::WarpedButton);
 	constexpr cBlockDoorHandler                            BlockWarpedDoorHandler(BlockType::WarpedDoor);
 	constexpr cBlockFenceHandler                           BlockWarpedFenceHandler(BlockType::WarpedFence);
@@ -968,23 +968,6 @@ namespace
 ////////////////////////////////////////////////////////////////////////////////
 // cBlockHandler:
 
-bool cBlockHandler::GetPlacementBlockTypeMeta(
-	cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-	const Vector3i a_ClickedBlockPos,
-	eBlockFace a_ClickedBlockFace,
-	const Vector3i a_CursorPos,
-	BlockState & a_Block
-) const
-{
-	// This creates a default Block of that type. Whatever that means foe the block state
-	a_Block = BlockState(m_BlockType);
-	return true;
-}
-
-
-
-
-
 void cBlockHandler::OnUpdate(
 	cChunkInterface & a_ChunkInterface,
 	cWorldInterface & a_WorldInterface,
@@ -1001,7 +984,7 @@ void cBlockHandler::OnUpdate(
 
 void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const
 {
-	if (a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { return CanBeAt(a_ChunkInterface, cChunkDef::AbsoluteToRelative(a_BlockPos), a_Chunk); }))
+	if (a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { return CanBeAt(a_Chunk, cChunkDef::AbsoluteToRelative(a_BlockPos), a_Chunk.GetBlock(cChunkDef::AbsoluteToRelative(a_BlockPos))); }))
 	{
 		return;
 	}
@@ -1039,7 +1022,7 @@ cItems cBlockHandler::ConvertToPickups(BlockState a_Block, const cItem * a_Tool)
 
 
 
-bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const
+bool cBlockHandler::CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, BlockState a_Self) const
 {
 	return true;
 }
@@ -1057,16 +1040,7 @@ bool cBlockHandler::IsUseable() const
 
 
 
-bool cBlockHandler::IsClickedThrough(void) const
-{
-	return false;
-}
-
-
-
-
-
-bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, BlockState a_Block) const
+bool cBlockHandler::DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, Vector3i a_Position, BlockState a_ClickedBlock, eBlockFace a_ClickedBlockFace, bool a_ClickedDirectly) const
 {
 	return cBlockAirHandler::IsBlockAir(m_BlockType);
 }

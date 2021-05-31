@@ -18,11 +18,11 @@ public:
 
 private:
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Self) const override
 	{
 		// Check that we're attached to a jungle log block:
-		eBlockFace BlockFace = Block::Cocoa::Facing(a_Chunk.GetBlock(a_RelPos));
-		auto LogPos = AddFaceDirection(a_RelPos, BlockFace, true);
+		eBlockFace BlockFace = Block::Cocoa::Facing(a_Chunk.GetBlock(a_Position));
+		auto LogPos = AddFaceDirection(a_Position, BlockFace, true);
 		BlockState LogBlock;
 		a_Chunk.UnboundedRelGetBlock(LogPos, LogBlock);
 		return (LogBlock.Type() == BlockType::JungleLog);
@@ -50,7 +50,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// If fully grown, give 3 items, otherwise just one:
 		auto GrowState = Block::Cocoa::Age(a_Block);

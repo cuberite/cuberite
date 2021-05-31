@@ -136,7 +136,7 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i
 
 
 
-cItems cBlockHandler::ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const
+cItems cBlockHandler::ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const
 {
 	return cItems();
 }

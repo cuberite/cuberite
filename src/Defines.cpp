@@ -336,6 +336,31 @@ unsigned char RotationToFineFace(double a_Rotation)
 
 
 
+eBlockFace DisplacementYawToFacing(Vector3d a_PlacePosition, Vector3d a_EyePosition, double a_Yaw)
+{
+	if (
+		const auto Displacement = a_EyePosition - a_PlacePosition.addedXZ(0.5, 0.5);
+			(std::abs(Displacement.x) < 2) && (std::abs(Displacement.z) < 2)
+			)
+	{
+		if (Displacement.y > 2)
+		{
+			return BLOCK_FACE_TOP;
+		}
+
+		if (Displacement.y < 0)
+		{
+			return BLOCK_FACE_BOTTOM;
+		}
+	}
+
+	return RotationToBlockFace(a_Yaw);
+}
+
+
+
+
+
 bool IsValidBlock(int a_BlockType)
 {
 	return (

@@ -24,20 +24,21 @@ namespace HopperHandler
 	{
 		LOGREDSTONE("Evaluating holey the hopper (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		const auto Previous = DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, Power);
-		if (Previous == Power)
+		const bool ShouldBeLocked = Power != 0;
+		const bool PreviouslyLocked = !Block::Hopper::Enabled(a_Block);
+
+		if (ShouldBeLocked == PreviouslyLocked)
 		{
 			return;
 		}
 
-		a_Chunk.DoWithBlockEntityAt(a_Position, [Power](cBlockEntity & a_BlockEntity)
-		{
-			if (a_BlockEntity.GetBlockType() != BlockType::Hopper)
-			{
-				return false;
-			}
+		a_Chunk.SetBlock(a_Position, Block::Hopper::Hopper(!PreviouslyLocked, Block::Hopper::Facing(a_Block)));
 
-			static_cast<cHopperEntity &>(a_BlockEntity).SetLocked(Power != 0);
+		a_Chunk.DoWithBlockEntityAt(a_Position, [ShouldBeLocked](cBlockEntity & a_BlockEntity)
+		{
+			ASSERT(a_BlockEntity.GetBlockType() == BlockType::Hopper);
+
+			static_cast<cHopperEntity &>(a_BlockEntity).SetLocked(ShouldBeLocked);
 			return false;
 		});
 	}

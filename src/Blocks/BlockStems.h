@@ -86,7 +86,7 @@ private:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
 	{
-		return ((a_RelPos.y > 0) && (a_Chunk.GetBlock(a_RelPos.addedY(-1)) == BlockType::Farmland));
+		return ((a_Position.y > 0) && (a_Chunk.GetBlock(a_Position.addedY(-1)) == BlockType::Farmland));
 	}
 
 
@@ -102,14 +102,14 @@ private:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, unsigned char a_NumStages = 1) const override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_Position, unsigned char a_NumStages = 1) const override
 	{
-		const auto OldAge = GetStemAge(a_Chunk.GetBlock(a_RelPos));
+		const auto OldAge = GetStemAge(a_Chunk.GetBlock(a_Position));
 		const auto NewAge = std::clamp<unsigned char>((OldAge + a_NumStages), 0, 7);
 		switch (m_BlockType)
 		{
-			case BlockType::PumpkinStem: a_Chunk.SetBlock(a_RelPos, Block::PumpkinStem::PumpkinStem(NewAge)); break;
-			case BlockType::MelonStem:   a_Chunk.SetBlock(a_RelPos, Block::MelonStem::Age(NewAge)); break;
+			case BlockType::PumpkinStem: a_Chunk.SetBlock(a_Position, Block::PumpkinStem::PumpkinStem(NewAge)); break;
+			case BlockType::MelonStem:   a_Chunk.SetBlock(a_Position, Block::MelonStem::Age(NewAge)); break;
 			default: return 0;
 		}
 		return NewAge - OldAge;

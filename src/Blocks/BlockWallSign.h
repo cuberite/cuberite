@@ -78,9 +78,9 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		auto NeighborPos = a_RelPos + GetOffsetBehindTheSign(a_Chunk.GetBlock(a_RelPos));
+		auto NeighborPos = a_Position + GetOffsetBehindTheSign(a_Chunk.GetBlock(a_Position));
 		BlockState Neighbor;
 		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, Neighbor))
 		{

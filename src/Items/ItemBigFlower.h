@@ -23,80 +23,79 @@ public:
 	}
 
 
-	virtual bool GetBlocksToPlace(
-		cWorld & a_World,
-		cPlayer & a_Player,
-		const cItem & a_EquippedItem,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		sSetBlockVector & a_BlocksToPlace
-	) override
+
+
+
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
-		// Can only be placed on dirt:
-		if ((a_PlacedBlockPos.y <= 0) || !IsBlockStateOfDirt(a_World.GetBlock(a_PlacedBlockPos.addedY(-1))))
+		// Needs at least two free blocks to build in:
+		if (a_PlacePosition.y >= (cChunkDef::Height - 1))
 		{
 			return false;
 		}
 
-		// Needs at least two free blocks to build in
-		if (a_PlacedBlockPos.y >= cChunkDef::Height - 1)
-		{
-			return false;
-		}
+		const auto & World = *a_Player.GetWorld();
+		const auto TopPos = a_PlacePosition.addedY(1);
+		auto BlockToReplace = World.GetBlock(TopPos);
 
-		auto TopPos = a_PlacedBlockPos.addedY(1);
-		auto TopBlock = a_World.GetBlock(TopPos);
-		cChunkInterface ChunkInterface(a_World.GetChunkMap());
-
-		if (!cBlockHandler::For(TopBlock.Type()).DoesIgnoreBuildCollision(ChunkInterface, TopPos, a_Player, TopBlock))
+		if (!cBlockHandler::For(BlockToReplace.Type()).DoesIgnoreBuildCollision(World, a_HeldItem, TopPos, BlockToReplace, a_ClickedBlockFace, false))
 		{
 			return false;
 		}
 
 		using namespace Block;
 
-		switch (a_EquippedItem.m_ItemDamage)
+		switch (a_HeldItem.m_ItemDamage)
 		{
 			case E_META_BIG_FLOWER_SUNFLOWER:
 			{
-				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, Sunflower::Sunflower(Sunflower::Half::Lower));
-				a_BlocksToPlace.emplace_back(TopPos,           Sunflower::Sunflower(Sunflower::Half::Upper));
-				break;
+				return a_Player.PlaceBlocks(
+				{
+					{ a_PlacePosition, Sunflower::Sunflower(Sunflower::Half::Lower) },
+					{ TopPos,          Sunflower::Sunflower(Sunflower::Half::Upper) }
+				});
 			}
 			case E_META_BIG_FLOWER_LILAC:
 			{
-				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, Lilac::Lilac(Lilac::Half::Lower));
-				a_BlocksToPlace.emplace_back(TopPos,           Lilac::Lilac(Lilac::Half::Upper));
-				break;
+				return a_Player.PlaceBlocks(
+				{
+					{ a_PlacePosition, Lilac::Lilac(Lilac::Half::Lower) },
+					{ TopPos,           Lilac::Lilac(Lilac::Half::Upper) }
+				});
 			}
 			case E_META_BIG_FLOWER_DOUBLE_TALL_GRASS:
 			{
-				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, TallGrass::TallGrass(TallGrass::Half::Lower));
-				a_BlocksToPlace.emplace_back(TopPos,           TallGrass::TallGrass(TallGrass::Half::Upper));
-				break;
+				return a_Player.PlaceBlocks(
+				{
+					{ a_PlacePosition, TallGrass::TallGrass(TallGrass::Half::Lower) },
+					{ TopPos,          TallGrass::TallGrass(TallGrass::Half::Upper) }
+				});
 			}
 			case E_META_BIG_FLOWER_LARGE_FERN:
 			{
-				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, LargeFern::LargeFern(LargeFern::Half::Lower));
-				a_BlocksToPlace.emplace_back(TopPos,           LargeFern::LargeFern(LargeFern::Half::Upper));
-				break;
+				return a_Player.PlaceBlocks(
+				{
+					{ a_PlacePosition, LargeFern::LargeFern(LargeFern::Half::Lower) },
+					{ TopPos,          LargeFern::LargeFern(LargeFern::Half::Upper) }
+				});
 			}
 			case E_META_BIG_FLOWER_ROSE_BUSH:
 			{
-				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, RoseBush::RoseBush(RoseBush::Half::Lower));
-				a_BlocksToPlace.emplace_back(TopPos,           RoseBush::RoseBush(RoseBush::Half::Upper));
-				break;
+				return a_Player.PlaceBlocks(
+				{
+					{ a_PlacePosition, RoseBush::RoseBush(RoseBush::Half::Lower) },
+					{ TopPos,          RoseBush::RoseBush(RoseBush::Half::Upper) }
+				});
 			}
 			case E_META_BIG_FLOWER_PEONY:
 			{
-				a_BlocksToPlace.emplace_back(a_PlacedBlockPos, Peony::Peony(Peony::Half::Lower));
-				a_BlocksToPlace.emplace_back(TopPos,           Peony::Peony(Peony::Half::Upper));
-				break;
+				return a_Player.PlaceBlocks(
+				{
+					{ a_PlacePosition, Peony::Peony(Peony::Half::Lower) },
+					{ TopPos,          Peony::Peony(Peony::Half::Upper) }
+				});
 			}
 			default: return false;
 		}
-
-		return true;
 	}
 };

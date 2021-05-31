@@ -26,13 +26,12 @@ public:
 		bool Add(Vector3i a_RelPos);
 
 		/** Array of block containers, each item stores blocks for one Z coord
-		Int param is the block index (for faster duplicate comparison in Add())
+		size_t param is the block index (for faster duplicate comparison in Add())
 		*/
-		std::unordered_map<int, Vector3i> m_Blocks;
+		std::unordered_map<size_t, Vector3i> m_Blocks;
 	} ;
 
 	cDelayedFluidSimulatorChunkData(int a_TickDelay);
-	virtual ~cDelayedFluidSimulatorChunkData() override {};
 
 	/** Slots, one for each delay tick, each containing the blocks to simulate */
 	std::vector<cSlot> m_Slots;
@@ -60,8 +59,8 @@ protected:
 	virtual cFluidSimulatorData * CreateChunkData(void) override { return new cDelayedFluidSimulatorChunkData(m_TickDelay); }
 
 	int m_TickDelay;   // Count of the m_Slots array in each ChunkData
-	int m_AddSlotNum;  // Index into m_Slots[] where to add new blocks in each ChunkData
-	int m_SimSlotNum;  // Index into m_Slots[] where to simulate blocks in each ChunkData
+	size_t m_AddSlotNum;  // Index into m_Slots[] where to add new blocks in each ChunkData
+	size_t m_SimSlotNum;  // Index into m_Slots[] where to simulate blocks in each ChunkData
 
 	int m_TotalBlocks;  // Statistics only: the total number of blocks currently queued
 

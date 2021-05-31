@@ -1281,7 +1281,7 @@ void cManualBindings::BindBlockArea(lua_State * a_LuaState)
 	tolua_beginmodule(a_LuaState, nullptr);
 		tolua_beginmodule(a_LuaState, "cBlockArea");
 			tolua_function(a_LuaState, "Create",                  tolua_cBlockArea_Create);
-			// tolua_function(a_LuaState, "DoWithBlockEntityAt",     DoWithXYZ<cBlockArea, cBlockEntity, &cBlockArea::DoWithBlockEntityAt,    &cBlockArea::IsValidCoords>);
+			tolua_function(a_LuaState, "DoWithBlockEntityAt",     DoWithXYZ<cBlockArea, cBlockEntity, &cBlockArea::DoWithBlockEntityAt,    &cBlockArea::IsValidCoords>);
 			// tolua_function(a_LuaState, "DoWithBlockEntityRelAt",  DoWithXYZ<cBlockArea, cBlockEntity, &cBlockArea::DoWithBlockEntityRelAt, &cBlockArea::IsValidRelCoords>);
 			tolua_function(a_LuaState, "FillRelCuboid",           tolua_cBlockArea_FillRelCuboid);
 			tolua_function(a_LuaState, "ForEachBlockEntity",      ForEach<  cBlockArea, cBlockEntity, &cBlockArea::ForEachBlockEntity>);

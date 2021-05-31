@@ -258,9 +258,9 @@ void cChunk::OnUnload()
 	}
 
 	// Notify all block entities of imminent unload:
-	for (auto & BlockEntity : m_BlockEntities)
+	for (auto & KeyPair : m_BlockEntities)
 	{
-		BlockEntity.second->OnRemoveFromWorld();
+		KeyPair.second->OnRemoveFromWorld();
 	}
 }
 
@@ -341,12 +341,15 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback) const
 
 void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 {
-	std::copy(a_SetChunkData.HeightMap.begin(), a_SetChunkData.HeightMap.end(), m_HeightMap.data());
-	std::copy(a_SetChunkData.BiomeMap.begin(), a_SetChunkData.BiomeMap.end(), m_BiomeMap.data());
+	std::copy_n(a_SetChunkData.HeightMap.data(), a_SetChunkData.HeightMap.size(), m_HeightMap.data());
+	std::copy_n(a_SetChunkData.BiomeMap.data(), a_SetChunkData.BiomeMap.size(), m_BiomeMap.data());
 
 	m_BlockData = std::move(a_SetChunkData.BlockData);
 	m_LightData = std::move(a_SetChunkData.LightData);
 	m_IsLightValid = a_SetChunkData.IsLightValid;
+
+	m_PendingSendBlocks.clear();
+	m_PendingSendBlockEntities.clear();
 
 	// Entities need some extra steps to destroy, so here we're keeping the old ones.
 	// Move the entities already in the Chunk, including player entities, so that we don't lose any:
@@ -367,29 +370,37 @@ void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 		Entity->SetIsTicking(true);
 	}
 
-	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
+	// Remove the block entities present - either the loader / saver has better, or we'll create empty ones:
+	for (auto & KeyPair : m_BlockEntities)
+	{
+		KeyPair.second->Destroy();
+		KeyPair.second->OnRemoveFromWorld();
+	}
+
+	// Clear the old ones:
 	m_BlockEntities = std::move(a_SetChunkData.BlockEntities);
 
 	// Check that all block entities have a valid blocktype at their respective coords (DEBUG-mode only):
-	#ifndef NDEBUG
-		for (auto & KeyPair : m_BlockEntities)
-		{
-			cBlockEntity * Block = KeyPair.second.get();
-			auto EntityBlock = Block->GetBlockType();
-			auto WorldBlock = GetBlock(Block->GetRelX(), Block->GetPosY(), Block->GetRelZ()).Type();
-
-			// ASSERT(WorldBlock == EntityBlock);  // TODO (12xx12) readd check
-		}  // for KeyPair - m_BlockEntities
-	#endif  // !NDEBUG
-
-	// Set all block entities' World variable:
+#ifndef NDEBUG
 	for (auto & KeyPair : m_BlockEntities)
 	{
-		KeyPair.second->SetWorld(m_World);
+		cBlockEntity * BlockEntity = KeyPair.second.get();
+		auto EntityBlockType = BlockEntity->GetBlockType();
+		auto WorldBlockType = GetBlock(BlockEntity->GetRelPos()).Type();
+		ASSERT(WorldBlockType == EntityBlockType);
 	}
+#endif
 
-	// Set the Chunk data as valid. This may be needed for some simulators that perform actions upon block adding (Vaporize)
+	// Set the chunk data as valid.
+	// This may be needed for some simulators that perform actions upon block adding (Vaporize),
+	// as well as some block entities upon being added to the chunk (Chests).
 	SetPresence(cpPresent);
+
+	// Initialise all block entities:
+	for (auto & KeyPair : m_BlockEntities)
+	{
+		KeyPair.second->OnAddToWorld(*m_World, *this);
+	}
 
 	// Wake up all simulators for their respective blocks:
 	WakeUpSimulators();
@@ -462,25 +473,37 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 	}  // for y
 
 	// Erase all affected block entities:
-	cCuboid affectedArea(  // In world coordinates
-		{BlockStartX, a_MinBlockY, BlockStartZ},
-		{BlockEndX, a_MinBlockY + SizeY - 1, BlockEndZ}
-	);
-	for (auto itr = m_BlockEntities.begin(); itr != m_BlockEntities.end();)
 	{
-		if (affectedArea.IsInside(itr->second->GetPos()))
+		// The affected area, in world coordinates.
+		cCuboid affectedArea(
+			{ BlockStartX, a_MinBlockY, BlockStartZ },
+			{ BlockEndX, a_MinBlockY + SizeY - 1, BlockEndZ }
+		);
+
+		// Where in the pending block entity send list to start removing the invalidated elements from.
+		auto PendingRemove = m_PendingSendBlockEntities.end();
+
+		for (auto itr = m_BlockEntities.begin(); itr != m_BlockEntities.end();)
 		{
-			itr->second->Destroy();
-			itr->second->OnRemoveFromWorld();
-			itr = m_BlockEntities.erase(itr);
+			if (affectedArea.IsInside(itr->second->GetPos()))
+			{
+				itr->second->Destroy();
+				itr->second->OnRemoveFromWorld();
+
+				PendingRemove = std::remove(m_PendingSendBlockEntities.begin(), PendingRemove, itr->second.get());  // Search the remaining valid pending sends.
+				itr = m_BlockEntities.erase(itr);
+			}
+			else
+			{
+				++itr;
+			}
 		}
-		else
-		{
-			++itr;
-		}
+
+		// Remove all the deleted block entities from the pending send list:
+		m_PendingSendBlockEntities.erase(PendingRemove, m_PendingSendBlockEntities.end());
 	}
 
-	// Clone block entities from a_Area into this Chunk:
+	// Clone block entities from a_Area into this chunk:
 	if ((a_DataTypes & cBlockArea::baBlockEntities) != 0)
 	{
 		for (const auto & keyPair: a_Area.GetBlockEntities())
@@ -496,27 +519,15 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 			{
 				continue;
 			}
-			// This block entity is inside the Chunk, clone it (and remove any that is there currently):
-			auto idx = static_cast<size_t>(cChunkDef::MakeIndex(posX - m_PosX * cChunkDef::Width, posY, posZ - m_PosZ * cChunkDef::Width));
-			auto itr = m_BlockEntities.find(idx);
-			if (itr != m_BlockEntities.end())
-			{
-				m_BlockEntities.erase(itr);
-			}
-			auto clone = be->Clone({posX, posY, posZ});
-			clone->SetWorld(m_World);
-			AddBlockEntity(std::move(clone));
+
+			// This block entity is inside the chunk.
+			// The code above should have removed any that were here before:
+			ASSERT(GetBlockEntityRel(cChunkDef::AbsoluteToRelative({ posX, posY, posZ })) == nullptr);
+
+			// Clone, and add the new one:
+			AddBlockEntity(be->Clone({posX, posY, posZ}));
 		}
 	}
-}
-
-
-
-
-
-bool cChunk::HasBlockEntityAt(Vector3i a_BlockPos)
-{
-	return (GetBlockEntity(a_BlockPos) != nullptr);
 }
 
 
@@ -845,27 +856,35 @@ void cChunk::CheckBlocks()
 
 void cChunk::TickBlocks(void)
 {
-	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
-	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
+	cChunkInterface ChunkInterface(m_World->GetChunkMap());
+	cBlockInServerPluginInterface PluginInterface(*m_World);
 
-	// Tick random blocks, but the first one should be m_BlockToTick (so that SetNextBlockToTick() works)
-	auto Idx = cChunkDef::MakeIndexNoCheck(m_BlockToTick);
+	// Tick random blocks, but the first one should be m_BlockToTick (so that SetNextBlockToTick() works):
+	cBlockHandler::For(GetBlock(m_BlockToTick).Type()).OnUpdate(ChunkInterface, *m_World, PluginInterface, *this, m_BlockToTick);
+
 	auto & Random = GetRandomProvider();
 
-	for (int i = 0; i < 50; ++i)
+	// Set a new random coord for the next tick:
+	m_BlockToTick = cChunkDef::IndexToCoordinate(Random.RandInt<size_t>(cChunkDef::NumBlocks - 1));
+
+	// Choose a number of blocks for each section to randomly tick.
+	// http://minecraft.fandom.com/wiki/Tick#Random_tick
+	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 	{
-		auto Pos = cChunkDef::IndexToCoordinate(static_cast<size_t>(Idx));
-		Idx = Random.RandInt(cChunkDef::NumBlocks - 1);
-		if (Pos.y > cChunkDef::GetHeight(m_HeightMap, Pos.x, Pos.z))
+		const auto Section = m_BlockData.GetSection(Y);
+		if (Section == nullptr)
 		{
-			continue;  // It's all air up here
+			continue;
 		}
 
-		cBlockHandler::For(GetBlock(Pos).Type()).OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, Pos);
-	}  // for i
+		for (int Tick = 0; Tick != 3; Tick++)  // TODO: configurability via gamerule randomTickSpeed
+		{
+			const auto Index = Random.RandInt<size_t>(ChunkBlockData::SectionBlockCount - 1);
+			const auto Position = cChunkDef::IndexToCoordinate(Y * ChunkBlockData::SectionBlockCount + Index);
 
-	// Set a new random coord for the next tick:
-	m_BlockToTick = cChunkDef::IndexToCoordinate(static_cast<size_t>(Idx));
+			cBlockHandler::For((*Section)[Index].Type()).OnUpdate(ChunkInterface, *m_World, PluginInterface, *this, Position);
+		}
+	}
 }
 
 
@@ -1140,7 +1159,7 @@ bool cChunk::UnboundedRelFastSetBlock(Vector3i a_RelPos, BlockState a_Block)
 int cChunk::GetHeight(int a_X, int a_Z) const
 {
 	ASSERT((a_X >= 0) && (a_X < cChunkDef::Width) && (a_Z >= 0) && (a_Z < cChunkDef::Width));
-	return m_HeightMap[a_X + a_Z * cChunkDef::Width];
+	return m_HeightMap[static_cast<size_t>(a_X + a_Z * cChunkDef::Width)];
 }
 
 
@@ -1234,12 +1253,15 @@ void cChunk::SetBlock(Vector3i a_RelPos, BlockState a_Block)
 	GetWorld()->GetSimulatorManager()->WakeUp(*this, a_RelPos);
 
 	// If there was a block entity, remove it:
-	cBlockEntity * BlockEntity = GetBlockEntityRel(a_RelPos);
-	if (BlockEntity != nullptr)
+	if (const auto FindResult = m_BlockEntities.find(cChunkDef::MakeIndex(a_RelPos)); FindResult != m_BlockEntities.end())
 	{
-		BlockEntity->Destroy();
-		BlockEntity->OnRemoveFromWorld();
-		RemoveBlockEntity(BlockEntity);
+		auto & BlockEntity = *FindResult->second;
+
+		BlockEntity.Destroy();
+		BlockEntity.OnRemoveFromWorld();
+
+		m_BlockEntities.erase(FindResult);
+		m_PendingSendBlockEntities.erase(std::remove(m_PendingSendBlockEntities.begin(), m_PendingSendBlockEntities.end(), &BlockEntity), m_PendingSendBlockEntities.end());
 	}
 
 	// If the new block is a block entity, create the entity object:
@@ -1297,7 +1319,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block
 	}
 
 	// Update heightmap, if needed:
-	if (a_RelY >= m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width])
+	if (a_RelY >= m_HeightMap[static_cast<size_t>(a_RelX + a_RelZ * cChunkDef::Width)])
 	{
 		if (cBlockAirHandler::IsBlockAir(a_Block.Type()))
 		{
@@ -1309,7 +1331,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block
 			{
 				if (!cBlockAirHandler::IsBlockAir(GetBlock(a_RelX, y, a_RelZ)))
 				{
-					m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width] = static_cast<HEIGHTTYPE>(y);
+					m_HeightMap[static_cast<size_t>(a_RelX + a_RelZ * cChunkDef::Width)] = static_cast<HEIGHTTYPE>(y);
 					break;
 				}
 			}  // for y - column in m_BlockData
@@ -1352,11 +1374,14 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 
 void cChunk::AddBlockEntity(OwnedBlockEntity a_BlockEntity)
 {
+	const auto BlockEntityPtr = a_BlockEntity.get();
 	[[maybe_unused]] const auto Result = m_BlockEntities.emplace(
 		cChunkDef::MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ()),
 		std::move(a_BlockEntity)
 	);
-	ASSERT(Result.second);  // No block entity already at this position
+
+	ASSERT(Result.second);  // No block entity already at this position.
+	BlockEntityPtr->OnAddToWorld(*m_World, *this);
 }
 
 
@@ -1373,7 +1398,7 @@ cBlockEntity * cChunk::GetBlockEntity(Vector3i a_AbsPos)
 		return nullptr;
 	}
 
-	auto itr = m_BlockEntities.find(static_cast<size_t>(cChunkDef::MakeIndexNoCheck(relPos)));
+	auto itr = m_BlockEntities.find(cChunkDef::MakeIndex(relPos));
 	return (itr == m_BlockEntities.end()) ? nullptr : itr->second.get();
 }
 
@@ -1384,7 +1409,7 @@ cBlockEntity * cChunk::GetBlockEntity(Vector3i a_AbsPos)
 cBlockEntity * cChunk::GetBlockEntityRel(Vector3i a_RelPos)
 {
 	ASSERT(cChunkDef::IsValidRelPos(a_RelPos));
-	auto itr = m_BlockEntities.find(static_cast<size_t>(cChunkDef::MakeIndexNoCheck(a_RelPos)));
+	auto itr = m_BlockEntities.find(cChunkDef::MakeIndex(a_RelPos));
 	return (itr == m_BlockEntities.end()) ? nullptr : itr->second.get();
 }
 
@@ -1459,18 +1484,6 @@ void cChunk::SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_Max
 	{
 		m_World->ForceSendChunkTo(m_PosX, m_PosZ, cChunkSender::Priority::Medium, ClientHandle);
 	}  // for itr - m_LoadedByClient[]
-}
-
-
-
-
-
-void cChunk::RemoveBlockEntity(cBlockEntity * a_BlockEntity)
-{
-	MarkDirty();
-	ASSERT(a_BlockEntity != nullptr);
-	m_BlockEntities.erase(static_cast<size_t>(cChunkDef::MakeIndex(a_BlockEntity->GetRelX(), a_BlockEntity->GetPosY(), a_BlockEntity->GetRelZ())));
-	m_PendingSendBlockEntities.erase(std::remove(m_PendingSendBlockEntities.begin(), m_PendingSendBlockEntities.end(), a_BlockEntity), m_PendingSendBlockEntities.end());
 }
 
 

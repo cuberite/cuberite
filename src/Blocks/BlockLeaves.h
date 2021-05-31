@@ -86,7 +86,7 @@ public:
 		}
 	}
 
-	static inline BlockState SetLeafPermission(BlockState a_Block, bool a_IsPersistant)
+	static inline BlockState setLeafPersistance(BlockState a_Block, bool a_IsPersistant)
 	{
 		using namespace Block;
 		switch (a_Block.Type())
@@ -323,14 +323,14 @@ private:
 			}
 		}  // for i - Types[]
 
-		constexpr int OffsetValue = 10000;
+#define OffsetValue 10000
 
 		// Perform a breadth-first search to see if there's a log connected within 6 blocks of the leaves block:
 		// Simply replace all reachable leaves blocks with a sponge block plus iteration (in the Area) and see if we can reach a log
 		Area.SetBlock(a_BlockPos, OffsetValue);
 		for (unsigned char i = 0; i < LEAVES_CHECK_DISTANCE; i++)
 		{
-			auto ProcessNeighbor = [&Area, i, OffsetValue](int X, int Y, int Z) -> bool
+			auto ProcessNeighbor = [&Area, i](int X, int Y, int Z) -> bool
 			{
 				switch (Area.GetBlock({X, Y, Z}).Type())
 				{

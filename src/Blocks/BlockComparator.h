@@ -148,23 +148,6 @@ private:
 
 
 
-	virtual bool GetPlacementBlockTypeMeta(
-			cChunkInterface & a_ChunkInterface,
-			cPlayer & a_Player,
-			const Vector3i a_PlacedBlockPos,
-			eBlockFace a_ClickedBlockFace,
-			const Vector3i a_CursorPos,
-			BlockState & a_Block
-	) const override
-	{
-		a_Block = Block::Comparator::Comparator(RotationToBlockFace(a_Player.GetYaw()), Block::Comparator::Mode::Compare, false);
-		return true;
-	}
-
-
-
-
-
 	virtual bool IsUseable(void) const override
 	{
 		return true;
@@ -174,15 +157,15 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		if (a_RelPos.y <= 0)
+		if (a_Position.y <= 0)
 		{
 			return false;
 		}
 
 
-		auto Below = a_Chunk.GetBlock(a_RelPos.addedY(-1));
+		auto Below = a_Chunk.GetBlock(a_Position.addedY(-1));
 
 		if (cBlockInfo::FullyOccupiesVoxel(Below))
 		{
@@ -207,7 +190,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		return cItem(Item::Comparator);
 	}
