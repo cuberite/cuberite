@@ -3,7 +3,8 @@
 
 #include "ItemHandler.h"
 #include "Blocks/BlockAnvil.h"
-
+#include "Registries/BlockItemConverter.h"
+#include "Protocol/Palettes/Upgrade.h"
 
 
 
@@ -23,8 +24,9 @@ private:
 	{
 		return a_Player.PlaceBlock(
 			a_PlacePosition,
-			static_cast<BLOCKTYPE>(a_HeldItem.m_ItemType),
-			cBlockAnvilHandler::YawToMetaData(a_Player.GetYaw()) | static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage << 2)
+			Block::Anvil::Anvil(RotationToBlockFace(a_Player.GetYaw()))
 		);
+
+		// TODO(12xx12) Other types
 	}
 };

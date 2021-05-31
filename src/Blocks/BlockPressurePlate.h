@@ -61,15 +61,15 @@ public:
 
 private:
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		if (a_RelPos.y <= 1)
+		if (a_Position.y <= 0)
 		{
 			return false;
 		}
 
 		// TODO: check if the block is upside-down slab or upside-down stairs
-		auto Block = a_Chunk.GetBlock(a_RelPos.addedY(-1));
+		auto Block = a_Chunk.GetBlock(a_Position.addedY(-1));
 		if (cBlockSlabHandler::IsAnySlabType(Block))
 		{
 			return cBlockSlabHandler::IsSlabTop(Block) || cBlockSlabHandler::IsSlabFull(Block);
@@ -91,7 +91,7 @@ private:
 			}
 			default:
 			{
-				return (!cBlockInfo::IsTransparent(Block));
+				return !cBlockInfo::IsTransparent(Block);
 			}
 		}
 	}

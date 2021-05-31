@@ -86,7 +86,7 @@ public:
 		}
 	}
 
-	static inline BlockState SetLeafPermission(BlockState a_Block, bool a_IsPersistant)
+	static inline BlockState setLeafPersistance(BlockState a_Block, bool a_IsPersistant)
 	{
 		using namespace Block;
 		switch (a_Block.Type())

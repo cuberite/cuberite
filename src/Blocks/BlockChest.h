@@ -62,102 +62,11 @@ public:
 
 private:
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BlockState & a_Block
-	) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		// Cannot place right next to double-chest:
-		if (!CanBeAt(a_ChunkInterface, a_PlacedBlockPos))
-		{
-			// Yup, cannot form a triple-chest, refuse:
-			return false;
-		}
-
-		// Try to read double-chest information:
-		cBlockArea Area;
-		if (!Area.Read(a_ChunkInterface, a_PlacedBlockPos - Vector3i(1, 0, 1), a_PlacedBlockPos + Vector3i(1, 0, 1)))
-		{
-			return false;
-		}
-
-		auto Facing = RotationToBlockFace(a_Player.GetYaw());
-		/*
-		x is the placed chest
-			| 0 | 1 | 2 |
-		---------------
-		0   |   |   |   |
-		---------------
-		1   |   | x |   |
-		---------------
-		2   |   |   |   |
-		*/
-
-		using namespace Block;
-		if (Area.GetRelBlock({0, 0, 1}).Type() == m_BlockType)
-		{
-			switch (m_BlockType)
-			{
-				case BlockType::Chest:        a_Block = Chest::Chest              (Facing, Chest::Type::Right); break;
-				case BlockType::TrappedChest: a_Block = TrappedChest::TrappedChest(Facing, TrappedChest::Type::Right); break;
-				default: return false;
-			}
-			a_ChunkInterface.FastSetBlock(a_PlacedBlockPos.addedZ(1), SetChestOrientation(a_ChunkInterface.GetBlock(a_PlacedBlockPos.addedZ(1)), ChestType::Left));
-		}
-		else if (Area.GetRelBlock({2, 0, 1}).Type() == m_BlockType)
-		{
-			switch (m_BlockType)
-			{
-				case BlockType::Chest:        a_Block = Chest::Chest              (Facing, Chest::Type::Left); break;
-				case BlockType::TrappedChest: a_Block = TrappedChest::TrappedChest(Facing, TrappedChest::Type::Left); break;
-				default: return false;
-			}
-			a_ChunkInterface.FastSetBlock(a_PlacedBlockPos.addedXZ(2, 1), SetChestOrientation(a_ChunkInterface.GetBlock(a_PlacedBlockPos.addedXZ(2, 1)), ChestType::Right));
-		}
-		else if (Area.GetRelBlock({1, 0, 0}).Type() == m_BlockType)
-		{
-			switch (m_BlockType)
-			{
-				case BlockType::Chest:        a_Block = Chest::Chest              (Facing, Chest::Type::Right); break;
-				case BlockType::TrappedChest: a_Block = TrappedChest::TrappedChest(Facing, TrappedChest::Type::Right); break;
-				default: return false;
-			}
-			a_ChunkInterface.FastSetBlock(a_PlacedBlockPos.addedX(1), SetChestOrientation(a_ChunkInterface.GetBlock(a_PlacedBlockPos.addedX(1)), ChestType::Left));
-		}
-		else if (Area.GetRelBlock({1, 0, 2}).Type() == m_BlockType)
-		{
-			switch (m_BlockType)
-			{
-				case BlockType::Chest:        a_Block = Chest::Chest              (Facing, Chest::Type::Left); break;
-				case BlockType::TrappedChest: a_Block = TrappedChest::TrappedChest(Facing, TrappedChest::Type::Left); break;
-				default: return false;
-			}
-			a_ChunkInterface.FastSetBlock(a_PlacedBlockPos.addedXZ(1, 2), SetChestOrientation(a_ChunkInterface.GetBlock(a_PlacedBlockPos.addedXZ(1, 2)), ChestType::Right));
-		}
-		else
-		{
-			switch (m_BlockType)
-			{
-				case BlockType::Chest:        a_Block = Chest::Chest              (Facing, Chest::Type::Single); break;
-				case BlockType::TrappedChest: a_Block = TrappedChest::TrappedChest(Facing, TrappedChest::Type::Single); break;
-				default: return false;
-			}
-		}
-		return true;
-	}
-
-
-
-
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
-	{
-		auto BlockPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-		return CanBeAt(a_ChunkInterface, BlockPos);
+		auto BlockPos = a_Chunk.RelativeToAbsolute(a_Position);
+		auto ChunkInterface = cChunkInterface(a_Chunk.GetWorld()->GetChunkMap());
+		return CanBeAt(ChunkInterface, BlockPos);
 	}
 
 

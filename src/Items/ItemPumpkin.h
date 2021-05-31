@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "Blocks/BlockPumpkin.h"
 
 
 
@@ -14,35 +15,22 @@ class cItemPumpkinHandler:
 
 public:
 
-	cItemPumpkinHandler():
-		Super(E_BLOCK_PUMPKIN)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual bool OnPlayerPlace(
-		cWorld & a_World,
-		cPlayer & a_Player,
-		const cItem & a_EquippedItem,
-		const Vector3i a_ClickedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos
-	) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
 		// First try spawning a snow golem or an iron golem:
-		auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-		if (TrySpawnGolem(a_World, a_Player, PlacePos))
+		if (TrySpawnGolem(a_Player, a_PlacePosition))
 		{
 			// The client thinks that they placed the pumpkin, let them know it's been replaced:
-			a_Player.SendBlocksAround(PlacePos.x, PlacePos.y, PlacePos.z);
+			a_Player.SendBlocksAround(a_PlacePosition.x, a_PlacePosition.y, a_PlacePosition.z);
 			return true;
 		}
 
 		// No golem at these coords, place the block normally:
-		return Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_CursorPos);
+		return a_Player.PlaceBlock(a_PlacePosition, Block::CarvedPumpkin::CarvedPumpkin(RotationToBlockFace(a_Player.GetYaw())));
 	}
 
 
@@ -51,22 +39,24 @@ public:
 
 	/** Spawns a snow / iron golem if the shape matches the recipe, supposing that the block placed at the specified coords is a pumpkin.
 	Returns true if the golem blocks are removed (for spawning), false if the recipe is not matched. */
-	bool TrySpawnGolem(cWorld & a_World, cPlayer & a_Player, const Vector3i a_PumpkinPos)
+	bool TrySpawnGolem(cPlayer & a_Player, const Vector3i a_PumpkinPos)
 	{
-		// A golem can't form with a pumpkin below level 2 or above level 255
+		// A golem can't form with a pumpkin below level 2 or above level 255:
 		if ((a_PumpkinPos.y < 2) || (a_PumpkinPos.y >= cChunkDef::Height))
 		{
 			return false;
 		}
 
+		auto & World = *a_Player.GetWorld();
+
 		// Decide which golem to try spawning based on the block below the placed pumpkin:
-		switch (a_World.GetBlock(a_PumpkinPos.addedY(-1)).Type())
+		switch (World.GetBlock(a_PumpkinPos.addedY(-1)).Type())
 		{
-			case BlockType::SnowBlock: return TrySpawnSnowGolem(a_World, a_Player, a_PumpkinPos);
-			case BlockType::IronBlock: return TrySpawnIronGolem(a_World, a_Player, a_PumpkinPos);
+			case BlockType::SnowBlock: return TrySpawnSnowGolem(World, a_Player, a_PumpkinPos);
+			case BlockType::IronBlock: return TrySpawnIronGolem(World, a_Player, a_PumpkinPos);
 			default:
 			{
-				// No golem here
+				// No golem here:
 				return false;
 			}
 		}
@@ -91,11 +81,14 @@ public:
 		}
 
 		// Try to place air blocks where the original recipe blocks were:
-		sSetBlockVector AirBlocks;
-		AirBlocks.emplace_back(a_PumpkinPos,            Block::Air::Air());  // Head
-		AirBlocks.emplace_back(a_PumpkinPos.addedY(-1), Block::Air::Air());  // Torso
-		AirBlocks.emplace_back(a_PumpkinPos.addedY(-2), Block::Air::Air());  // Legs
-		if (!a_Player.PlaceBlocks(AirBlocks))
+		if (
+			!a_Player.PlaceBlocks(
+			{
+				{ a_PumpkinPos,            Block::Air::Air() },  // Head
+				{ a_PumpkinPos.addedY(-1), Block::Air::Air() },  // Torso
+				{ a_PumpkinPos.addedY(-2), Block::Air::Air() }	  // Legs
+			})
+		)
 		{
 			return false;
 		}
@@ -143,13 +136,16 @@ public:
 			}
 
 			// Try to place air blocks where the original recipe blocks were:
-			sSetBlockVector AirBlocks;
-			AirBlocks.emplace_back(a_PumpkinPos,       Block::Air::Air());  // Head
-			AirBlocks.emplace_back(BodyPos,            Block::Air::Air());  // Torso
-			AirBlocks.emplace_back(BodyPos.addedY(-1), Block::Air::Air());  // Legs
-			AirBlocks.emplace_back(BodyPos + Offset,   Block::Air::Air());  // Arm
-			AirBlocks.emplace_back(BodyPos - Offset,   Block::Air::Air());  // Arm
-			if (!a_Player.PlaceBlocks(AirBlocks))
+			if (
+				!a_Player.PlaceBlocks(
+				{
+					{ a_PumpkinPos,       Block::Air::Air() },  // Head
+					{ BodyPos,            Block::Air::Air() },  // Torso
+					{ BodyPos.addedY(-1), Block::Air::Air() },  // Legs
+					{ BodyPos + Offset,   Block::Air::Air() },  // Arm
+					{ BodyPos - Offset,   Block::Air::Air() }   // Arm
+				})
+			)
 			{
 				return false;
 			}

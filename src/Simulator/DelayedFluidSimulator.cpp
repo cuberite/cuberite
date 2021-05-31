@@ -26,7 +26,7 @@ bool cDelayedFluidSimulatorChunkData::cSlot::Add(Vector3i a_RelPos)
 		return false;
 	}
 
-	int Index = cChunkDef::MakeIndexNoCheck(a_RelPos);
+	int Index = cChunkDef::MakeIndex(a_RelPos);
 	if (m_Blocks.find(Index) == m_Blocks.end())
 	{
 		return false;
@@ -90,9 +90,9 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_SimSlotNum];
 
 	// Simulate all the blocks in the scheduled slot:
-	for (auto & [Index, Block] : Slot.m_Blocks)
+	for (auto & [Index, Position] : Slot.m_Blocks)
 	{
-		SimulateBlock(a_Chunk, {Block.x, Block.y, Block.z});
+		SimulateBlock(a_Chunk, Position);
 	}
 
 	m_TotalBlocks -= static_cast<int>(Slot.m_Blocks.size());

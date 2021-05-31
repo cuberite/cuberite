@@ -55,8 +55,7 @@ public:
 
 
 
-
-	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// Drops handled by the block entity:
 		return {};
@@ -66,14 +65,14 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		if (a_RelPos.y < 1)
+		if (a_Position.y < 1)
 		{
 			return false;
 		}
 
-		return cBlockInfo::IsSolid(a_Chunk.GetBlock(a_RelPos.addedY(-1)));
+		return cBlockInfo::IsSolid(a_Chunk.GetBlock(a_Position.addedY(-1)));
 	}
 
 

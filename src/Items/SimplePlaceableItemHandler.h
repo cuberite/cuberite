@@ -26,14 +26,9 @@ public:
 	}
 
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player, const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPos,
-		BlockState & a_Block) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
-		cChunkInterface ChunkInterface(a_World->GetChunkMap());
-		cBlockHandler::For(m_BlockType).GetPlacementBlockTypeMeta(ChunkInterface, *a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_Block);
-		return true;
+		return a_Player.PlaceBlock(a_PlacePosition, m_BlockType);
 	}
 
 private:

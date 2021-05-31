@@ -2,8 +2,7 @@
 #pragma once
 
 #include "ItemHandler.h"
-#include "../BlockInfo.h"
-#include "../Blocks/BlockChest.h"
+#include "Blocks/BlockChest.h"
 
 
 
@@ -21,59 +20,12 @@ public:
 	{
 	}
 
-/*
-	// We need an OnPlayerPlace override because we're processing neighbor chests and changing their metas,
-	// the parent class cannot do that.
-	virtual bool OnPlayerPlace(
-		cWorld & a_World,
-		cPlayer & a_Player,
-		const cItem & a_EquippedItem,
-		const Vector3i a_ClickedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos
-	) override
+	cItemChestHandler(const cItemChestHandler &) = delete;
+
+private:
+
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
-		if (a_ClickedBlockFace < 0)
-		{
-			// Clicked in air
-			return false;
-		}
-
-		if (!cChunkDef::IsValidHeight(a_ClickedBlockPos.y))
-		{
-			// The clicked block is outside the world, ignore this call altogether (#128)
-			return false;
-		}
-
-		// Check if the block ignores build collision (water, grass etc.):
-		BLOCKTYPE ClickedBlockType;
-		NIBBLETYPE ClickedBlockMeta;
-		a_World.GetBlockTypeMeta(a_ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
-		cChunkInterface ChunkInterface(a_World.GetChunkMap());
-		Vector3i PlacePos;
-		if (cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(ChunkInterface, a_ClickedBlockPos, a_Player, ClickedBlockMeta))
-		{
-			PlacePos = a_ClickedBlockPos;
-		}
-		else
-		{
-			PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-			if (!cChunkDef::IsValidHeight(PlacePos.y))
-			{
-				// The block is being placed outside the world, ignore this packet altogether (#128)
-				return false;
-			}
-
-			// Check if the chest can overwrite the block at PlacePos:
-			BLOCKTYPE PlaceBlock;
-			NIBBLETYPE PlaceMeta;
-			a_World.GetBlockTypeMeta(PlacePos, PlaceBlock, PlaceMeta);
-			if (!cBlockHandler::For(PlaceBlock).DoesIgnoreBuildCollision(ChunkInterface, PlacePos, a_Player, PlaceMeta))
-			{
-				return false;
-			}
-		}
-
 		// Check that there is at most one single neighbor of the same chest type:
 		static const Vector3i CrossCoords[] =
 		{
@@ -82,11 +34,15 @@ public:
 			{ 1, 0,  0},
 			{ 0, 0,  1},
 		};
+
+		auto & World = *a_Player.GetWorld();
 		int NeighborIdx = -1;
+		auto ChestType = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(m_ItemType, 0));
+
 		for (size_t i = 0; i < ARRAYCOUNT(CrossCoords); i++)
 		{
-			auto NeighborPos = PlacePos + CrossCoords[i];
-			if (a_World.GetBlock(NeighborPos) != m_ItemType)
+			const auto NeighborPos = a_PlacePosition + CrossCoords[i];
+			if (World.GetBlock(NeighborPos) != ChestType)
 			{
 				continue;
 			}
@@ -100,7 +56,7 @@ public:
 			// Check that this neighbor is a single chest:
 			for (size_t j = 0; j < ARRAYCOUNT(CrossCoords); j++)
 			{
-				if (a_World.GetBlock(NeighborPos + CrossCoords[j]) == m_ItemType)
+				if (World.GetBlock(NeighborPos + CrossCoords[j]) == m_ItemType)
 				{
 					// Trying to place next to a dblchest
 					return false;
@@ -109,35 +65,98 @@ public:
 		}  // for i
 
 		// Get the meta of the placed chest; take existing neighbors into account:
-		BLOCKTYPE ChestBlockType = static_cast<BLOCKTYPE>(m_ItemType);
-		NIBBLETYPE Meta;
-		auto yaw = a_Player.GetYaw();
+		const auto Yaw = a_Player.GetYaw();
+		BlockState BlockToPlace;
+		using namespace Block;
 		switch (NeighborIdx)
 		{
 			case 0:
 			case 2:
 			{
 				// The neighbor is in the X axis, form a X-axis-aligned dblchest:
-				Meta = ((yaw >= -90) && (yaw < 90)) ? E_META_CHEST_FACING_ZM : E_META_CHEST_FACING_ZP;
+				switch (ChestType)
+				{
+					case BlockType::Chest:
+					{
+						if ((Yaw >= -90) && (Yaw < 90))
+						{
+							BlockToPlace = Chest::Chest(BLOCK_FACE_NORTH, Chest::Type::Left);
+							break;
+						}
+						else
+						{
+							BlockToPlace = Chest::Chest(BLOCK_FACE_SOUTH, Chest::Type::Right);
+							break;
+						}
+					}
+					case BlockType::TrappedChest:
+					{
+						if ((Yaw >= -90) && (Yaw < 90))
+						{
+							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_NORTH, TrappedChest::Type::Left);
+							break;
+						}
+						else
+						{
+							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_SOUTH, TrappedChest::Type::Right);
+							break;
+						}
+					}
+					default: return false;
+				}
 				break;
 			}
 			case 1:
 			case 3:
 			{
 				// The neighbor is in the Z axis, form a Z-axis-aligned dblchest:
-				Meta = (yaw < 0) ? E_META_CHEST_FACING_XM : E_META_CHEST_FACING_XP;
+				switch (ChestType)
+				{
+					case BlockType::Chest:
+					{
+						if ((Yaw < 0))
+						{
+							BlockToPlace = Chest::Chest(BLOCK_FACE_EAST, Chest::Type::Left);
+							break;
+						}
+						else
+						{
+							BlockToPlace = Chest::Chest(BLOCK_FACE_WEST, Chest::Type::Right);
+							break;
+						}
+					}
+					case BlockType::TrappedChest:
+					{
+						if ((Yaw < 0))
+						{
+							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_EAST, TrappedChest::Type::Left);
+							break;
+						}
+						else
+						{
+							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_WEST, TrappedChest::Type::Right);
+							break;
+						}
+					}
+					default: return false;
+				}
 				break;
 			}
 			default:
 			{
 				// No neighbor, place based on yaw:
-				Meta = cBlockChestHandler::PlayerYawToMetaData(yaw);
+				switch (ChestType)
+				{
+					case BlockType::Chest:        BlockToPlace = Chest::Chest(RotationToBlockFace(a_Player.GetYaw()), Chest::Type::Single);
+					case BlockType::TrappedChest: BlockToPlace = TrappedChest::TrappedChest(RotationToBlockFace(a_Player.GetYaw()), TrappedChest::Type::Single);
+					default: return false;
+				}
 				break;
 			}
 		}  // switch (NeighborIdx)
 
 		// Place the new chest:
-		if (!a_Player.PlaceBlock(PlacePos.x, PlacePos.y, PlacePos.z, ChestBlockType, Meta))
+		if (!a_Player.PlaceBlock(a_PlacePosition, BlockToPlace))
 		{
 			return false;
 		}
@@ -145,17 +164,84 @@ public:
 		// Adjust the existing chest, if any:
 		if (NeighborIdx != -1)
 		{
-			a_World.FastSetBlock(PlacePos + CrossCoords[NeighborIdx], ChestBlockType, Meta);
+			BlockState Neighbour = World.GetBlock(a_PlacePosition + CrossCoords[NeighborIdx]);
+			switch (NeighborIdx)
+			{
+				case 0:
+				case 2:
+				{
+					// The neighbor is in the X axis, form a X-axis-aligned dblchest:
+					switch (ChestType)
+					{
+						case BlockType::Chest:
+						{
+							if ((Yaw >= -90) && (Yaw < 90))
+							{
+								Neighbour = Chest::Chest(BLOCK_FACE_NORTH, Chest::Type::Right);
+								break;
+							}
+							else
+							{
+								Neighbour = Chest::Chest(BLOCK_FACE_SOUTH, Chest::Type::Left);
+								break;
+							}
+						}
+						case BlockType::TrappedChest:
+						{
+							if ((Yaw >= -90) && (Yaw < 90))
+							{
+								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_NORTH, TrappedChest::Type::Right);
+								break;
+							}
+							else
+							{
+								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_SOUTH, TrappedChest::Type::Left);
+								break;
+							}
+						}
+						default: return false;
+					}
+					break;
+				}
+				case 1:
+				case 3:
+				{
+					// The neighbor is in the Z axis, form a Z-axis-aligned dblchest:
+					switch (ChestType)
+					{
+						case BlockType::Chest:
+						{
+							if ((Yaw < 0))
+							{
+								Neighbour = Chest::Chest(BLOCK_FACE_EAST, Chest::Type::Right);
+								break;
+							}
+							else
+							{
+								Neighbour = Chest::Chest(BLOCK_FACE_WEST, Chest::Type::Left);
+								break;
+							}
+						}
+						case BlockType::TrappedChest:
+						{
+							if ((Yaw < 0))
+							{
+								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_EAST, TrappedChest::Type::Right);
+								break;
+							}
+							else
+							{
+								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_WEST, TrappedChest::Type::Left);
+								break;
+							}
+						}
+					}
+					break;
+				}
+			}
+			World.FastSetBlock(a_PlacePosition + CrossCoords[NeighborIdx], Neighbour);
 		}
 
-		// Remove the "placed" item from inventory:
-		if (a_Player.IsGameModeSurvival())
-		{
-			a_Player.GetInventory().RemoveOneEquippedItem();
-		}
 		return true;
 	}
-*/
-private:
-	cItemChestHandler(const cItemChestHandler &) = delete;
 };

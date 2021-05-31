@@ -11,6 +11,8 @@
 
 
 
+
+
 class cBlockDoorHandler final :
 	public cBlockHandler
 {
@@ -40,23 +42,6 @@ public:
 		else
 		{
 			return !cBlockInfo::IsTransparent(a_Block);
-		}
-	}
-
-	static bool CanReplaceBlock(BlockState a_Block)
-	{
-		switch (a_Block.Type())
-		{
-			case BlockType::Air:
-			case BlockType::TallGrass:
-			case BlockType::Water:
-			case BlockType::Lava:
-			case BlockType::Snow:
-			case BlockType::Fire:
-			{
-				return true;
-			}
-			default: return false;
 		}
 	}
 
@@ -306,44 +291,13 @@ private:
 	virtual BlockState MirrorXY(BlockState a_Block)  const override;
 	virtual BlockState MirrorYZ(BlockState a_Block)  const override;
 
-
-
-
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BlockState & a_Block
-	) const override
-	{
-		// If clicking a bottom face, place the door one block lower:
-		auto PlacedPos = a_PlacedBlockPos;
-		if (a_ClickedBlockFace == BLOCK_FACE_BOTTOM)
-		{
-			PlacedPos.y--;
-		}
-
-		if (
-			!CanReplaceBlock(a_ChunkInterface.GetBlock(PlacedPos)) ||
-			!CanReplaceBlock(a_ChunkInterface.GetBlock(PlacedPos.addedY(1)))
-		)
-		{
-			return false;
-		}
-
-		return Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, PlacedPos, a_ClickedBlockFace, a_CursorPos, a_Block);
-	}
-
 	virtual cBoundingBox GetPlacementCollisionBox(BlockState a_XM, BlockState a_XP, BlockState a_YM, BlockState a_YP, BlockState a_ZM, BlockState a_ZP) const override;
 
 
 
 
 
-	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		switch (m_BlockType)
 		{
@@ -377,9 +331,12 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Self) const override
 	{
-		return ((a_RelPos.y > 0) && CanBeOn(a_Chunk.GetBlock(a_RelPos.addedY(-1))));
+		const auto BasePosition = a_Position.addedY(IsTop(a_Self.Type()) ? -2 : -1);
+		auto BlockToReplace = a_Chunk.GetBlock(BasePosition);
+
+		return (BasePosition.y >= 0) && CanBeOn(BlockToReplace);
 	}
 
 

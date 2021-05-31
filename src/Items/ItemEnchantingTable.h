@@ -20,44 +20,32 @@ public:
 
 private:
 
-	virtual bool IsPlaceable(void) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
-		return true;
-	}
-
-
-	virtual bool OnPlayerPlace(
-		cWorld & a_World,
-		cPlayer & a_Player,
-		const cItem & a_EquippedItem,
-		const Vector3i a_ClickedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos
-	) override
-	{
-		if (!Super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_ClickedBlockPos, a_ClickedBlockFace, a_CursorPos))
+		if (!Super::CommitPlacement(a_Player, a_HeldItem, a_PlacePosition, a_ClickedBlockFace, a_CursorPosition))
 		{
 			return false;
 		}
 
-		if (a_EquippedItem.IsCustomNameEmpty())
+		if (a_HeldItem.IsCustomNameEmpty())
 		{
 			return true;
 		}
 
-		const auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-		a_World.DoWithBlockEntityAt(PlacePos.x, PlacePos.y, PlacePos.z, [&a_EquippedItem](cBlockEntity & a_Entity)
+		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_HeldItem](cBlockEntity & a_BlockEntity)
 		{
-			if (a_Entity.GetBlockType() != BlockType::EnchantingTable)
-			{
-				return true;
-			}
+			ASSERT(a_BlockEntity.GetBlockType() == BlockType::EnchantingTable);
 
-			auto & EnchantingTable = static_cast<cEnchantingTableEntity &>(a_Entity);
-			EnchantingTable.SetCustomName(a_EquippedItem.m_CustomName);
-			return true;
+			static_cast<cEnchantingTableEntity &>(a_BlockEntity).SetCustomName(a_HeldItem.m_CustomName);
+			return false;
 		});
 
+		return true;
+	}
+
+
+	virtual bool IsPlaceable(void) override
+	{
 		return true;
 	}
 } ;
