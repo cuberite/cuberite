@@ -1614,7 +1614,7 @@ bool cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 
 	// Make a copy of the log blocks:
 	sSetBlockVector CopyBlocks;
-	for (const auto BlockToSet : a_Blocks)
+	for (const auto & BlockToSet : a_Blocks)
 	{
 		if (cBlockLogHandler::IsBlockLog(BlockToSet.m_Block))
 		{
@@ -3072,7 +3072,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	}
 	else
 	{
-		unsigned int Falloff      = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",               IsWater ? 1 : 2);
+		int Falloff               = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",               IsWater ? 1 : 2);
 		int TickDelay             = a_IniFile.GetValueSetI(SimulatorSectionName, "TickDelay",             IsWater ? 5 : 30);
 		int NumNeighborsForSource = a_IniFile.GetValueSetI(SimulatorSectionName, "NumNeighborsForSource", IsWater ? 2 : -1);
 

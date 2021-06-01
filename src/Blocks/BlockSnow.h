@@ -58,7 +58,7 @@ private:
 		else
 		{
 			// Drop as many snowballs as there were "layers" of snow:
-			return cItem(Item::Snowball, 1 + Block::Snow::Layers(a_Block));
+			return cItem(Item::Snowball, static_cast<unsigned char>(Block::Snow::Layers(a_Block) + 1));
 		}
 	}
 

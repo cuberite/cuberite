@@ -352,11 +352,11 @@ void cSandSimulator::FinishFalling(
 {
 	ASSERT(a_Pos.y < cChunkDef::Height);
 	auto CurrentBlock = a_World->GetBlock(a_Pos);
-	if (cBlockAnvilHandler::IsBlockAnvil(a_FallingBlock) || IsReplacedOnRematerialization(CurrentBlock))
+	if (IsBlockAnvil(a_FallingBlock) || IsReplacedOnRematerialization(CurrentBlock))
 	{
 		// Rematerialize the material here:
 		a_World->SetBlock(a_Pos, a_FallingBlock);
-		if (cBlockAnvilHandler::IsBlockAnvil(a_FallingBlock))
+		if (IsBlockAnvil(a_FallingBlock))
 		{
 			a_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_LAND, a_Pos, 0);
 		}

@@ -1159,7 +1159,7 @@ bool cChunk::UnboundedRelFastSetBlock(Vector3i a_RelPos, BlockState a_Block)
 int cChunk::GetHeight(int a_X, int a_Z) const
 {
 	ASSERT((a_X >= 0) && (a_X < cChunkDef::Width) && (a_Z >= 0) && (a_Z < cChunkDef::Width));
-	return m_HeightMap[a_X + a_Z * cChunkDef::Width];
+	return m_HeightMap[static_cast<size_t>(a_X + a_Z * cChunkDef::Width)];
 }
 
 
@@ -1319,7 +1319,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block
 	}
 
 	// Update heightmap, if needed:
-	if (a_RelY >= m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width])
+	if (a_RelY >= m_HeightMap[static_cast<size_t>(a_RelX + a_RelZ * cChunkDef::Width)])
 	{
 		if (cBlockAirHandler::IsBlockAir(a_Block.Type()))
 		{
@@ -1331,7 +1331,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block
 			{
 				if (!cBlockAirHandler::IsBlockAir(GetBlock(a_RelX, y, a_RelZ)))
 				{
-					m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width] = static_cast<HEIGHTTYPE>(y);
+					m_HeightMap[static_cast<size_t>(a_RelX + a_RelZ * cChunkDef::Width)] = static_cast<HEIGHTTYPE>(y);
 					break;
 				}
 			}  // for y - column in m_BlockData
