@@ -364,13 +364,16 @@ static void LogFromLuaStack(lua_State * tolua_S, eLogLevel a_LogLevel)
 		Message = lua_tolstring(tolua_S, 1, &len);
 	}
 
-	auto Prefix = fmt::format("[{}] ", cManualBindings::GetLuaPlugin(tolua_S)->GetName());
 	if (lua_isstring(tolua_S, 2))
 	{
-		Prefix = lua_tolstring(tolua_S, 2, &len);
+		auto Prefix = lua_tolstring(tolua_S, 2, &len);
+		Logger::LogSimple(fmt::format("{}{}", Prefix, Message), a_LogLevel);
 	}
-
-	Logger::LogSimple(fmt::format("{}{}", Prefix, Message), a_LogLevel);
+	else
+	{
+		auto Prefix = fmt::format("[{}] ", cManualBindings::GetLuaPlugin(tolua_S)->GetName());
+		Logger::LogSimple(fmt::format("{}{}", Prefix, Message), a_LogLevel);
+	}
 }
 
 
