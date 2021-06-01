@@ -64,6 +64,8 @@ public:
 
 bool IsBlockAir(BlockState a_Block);
 
+bool IsBlockAnvil(BlockState a_Block);
+
 bool IsBlockIce(BlockState a_Block);
 
 bool IsBlockWaterOrIce(BlockState a_Block);
@@ -85,3 +87,5 @@ bool IsBlockMaterialIron(BlockState a_Block);
 bool IsBlockMaterialGourd(BlockState a_Block);
 
 bool IsBlockMaterialRock(BlockState a_Block);
+
+bool IsBlockMobHead(BlockState a_Block);

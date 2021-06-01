@@ -19,20 +19,6 @@ public:
 
 	using Super::Super;
 
-	static inline bool IsBlockAnvil(BlockState a_Block)
-	{
-		switch (a_Block.Type())
-		{
-			case BlockType::Anvil:
-			case BlockType::ChippedAnvil:
-			case BlockType::DamagedAnvil:
-			{
-				return true;
-			}
-			default: return false;
-		}
-	}
-
 	static inline eBlockFace GetFacing(BlockState a_Block)
 	{
 		switch (a_Block.Type())

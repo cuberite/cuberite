@@ -492,9 +492,9 @@ bool IsBlockMaterialRock(BlockState a_Block)
 
 
 
-bool IsHead(BlockType a_BlockType)
+bool IsBlockMobHead(BlockState a_Block)
 {
-	switch (a_BlockType)
+	switch (a_Block.Type())
 	{
 		case BlockType::CreeperHead:
 		case BlockType::CreeperWallHead:
@@ -522,9 +522,9 @@ bool IsHead(BlockType a_BlockType)
 
 
 
-bool IsAnvil(BlockType a_BlockType)
+bool IsBlockAnvil(BlockState a_Block)
 {
-	switch (a_BlockType)
+	switch (a_Block.Type())
 	{
 		case BlockType::Anvil:
 		case BlockType::ChippedAnvil:
@@ -960,6 +960,7 @@ bool cBlockInfo::CanBeTerraformed(BlockState a_Block)
 bool cBlockInfo::FullyOccupiesVoxel(const BlockState Block)
 {
 	return cBlockHandler::For(Block.Type()).FullyOccupiesVoxel(Block);
+	/*
 	// Blocks that fully occupy their voxel - used as a guide for torch placeable blocks, amongst other things:
 	switch (Block.Type())
 	{
@@ -1148,6 +1149,7 @@ bool cBlockInfo::FullyOccupiesVoxel(const BlockState Block)
 			return true;
 		default: return false;
 	}
+	 */
 }
 
 

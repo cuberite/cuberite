@@ -745,7 +745,7 @@ public:
 			mWriter.AddByte("Data", static_cast<unsigned char>(BlockData.second));
 			mWriter.AddByte("Time", 1);  // Unused in Cuberite, Vanilla said to need nonzero
 			mWriter.AddByte("DropItem", 1);
-			mWriter.AddByte("HurtEntities", cBlockAnvilHandler::IsBlockAnvil(a_FallingBlock->GetBlock()));
+			mWriter.AddByte("HurtEntities", IsBlockAnvil(a_FallingBlock->GetBlock()));
 		mWriter.EndCompound();
 	}
 

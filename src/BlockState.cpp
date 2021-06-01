@@ -2,7 +2,8 @@
 #include "BlockState.h"
 #include "Registries/BlockStates.h"
 
-constexpr BlockState::BlockState(BlockType a_Type) : ID([a_Type]
+constexpr BlockState::BlockState(BlockType a_Type) :
+	ID([&]
 {
 	using namespace Block;
 	switch (a_Type)

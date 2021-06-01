@@ -1072,7 +1072,7 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 
 	auto Self = a_Player.GetWorld()->GetBlock(BlockPos);
 
-	if (!a_Player.IsGameModeCreative() && (cBlockAnvilHandler::IsBlockAnvil(Self)) && GetRandomProvider().RandBool(0.12))
+	if (!a_Player.IsGameModeCreative() && (IsBlockAnvil(Self)) && GetRandomProvider().RandBool(0.12))
 	{
 		using namespace Block;
 

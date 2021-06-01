@@ -279,7 +279,7 @@ public:
 
 	virtual float GetBlockBreakingStrength(BlockState a_Block) override
 	{
-		if (!IsBlockMaterialIron(a_Block) && (cBlockAnvilHandler::IsBlockAnvil(a_Block)) && !IsBlockMaterialRock(a_Block))
+		if (!IsBlockMaterialIron(a_Block) && (IsBlockAnvil(a_Block)) && !IsBlockMaterialRock(a_Block))
 		{
 			return Super::GetBlockBreakingStrength(a_Block);
 		}
