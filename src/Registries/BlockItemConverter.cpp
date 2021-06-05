@@ -1,11 +1,10 @@
 
 #include "Globals.h"
-
 #include "BlockItemConverter.h"
 
 namespace BlockItemConverter
 {
-	constexpr BlockType FromItem(Item a_Item)
+	BlockType FromItem(Item a_Item)
 	{
 		switch (a_Item)
 		{
@@ -683,7 +682,7 @@ namespace BlockItemConverter
 		}
 	}
 
-	constexpr Item FromBlock(BlockType a_Block)
+	Item FromBlock(BlockType a_Block)
 	{
 		switch (a_Block)
 		{

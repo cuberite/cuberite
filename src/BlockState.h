@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include "Registries/BlockTypes.h"
+#include "WorldStorage/NamespaceSerializer.h"
 
 /** The UINT_LEAST16_MAX value is used to mark the value invalid if needed. */
 
@@ -31,4 +32,15 @@ struct BlockState
 
 	/** The state ID of the block state. */
 	uint_least16_t ID;
+};
+
+
+template<> class fmt::formatter<BlockState> : public fmt::formatter<std::string_view>
+{
+public:
+	template <typename FormatContext>
+	auto format(const BlockState & a_Block, FormatContext & a_Ctx)
+	{
+		return fmt::format_to(a_Ctx.out(), "{}", NamespaceSerializer::From(a_Block.Type()));
+	}
 };
