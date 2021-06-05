@@ -38,7 +38,6 @@ private:
 
 	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
-		UNUSED(a_Digger);
 		UNUSED(a_Tool);
 		// Always drop the regular daylight sensor:
 		return { Item::DaylightDetector };
