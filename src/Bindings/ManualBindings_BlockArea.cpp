@@ -1172,7 +1172,7 @@ void cManualBindings::BindBlockArea(lua_State * a_LuaState)
 			tolua_function(a_LuaState, "RelLine",                 tolua_cBlockArea_RelLine);
 			tolua_function(a_LuaState, "SaveToSchematicFile",     tolua_cBlockArea_SaveToSchematicFile);
 			tolua_function(a_LuaState, "SaveToSchematicString",   tolua_cBlockArea_SaveToSchematicString);
-			//tolua_function(a_LuaState, "SetBlock",                SetBlock<BlockState, cBlockArea::baBlocks, &cBlockArea::SetBlock>);
+			// tolua_function(a_LuaState, "SetBlock",                SetBlock<BlockState, cBlockArea::baBlocks, &cBlockArea::SetBlock>);
 			// tolua_function(a_LuaState, "SetBlockType",            SetBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::SetBlockType>);
 			// tolua_function(a_LuaState, "SetBlockMeta",            SetBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::SetBlockMeta>);
 			// tolua_function(a_LuaState, "SetBlockLight",           SetBlock<LIGHTTYPE, cBlockArea::baLight,    &cBlockArea::SetBlockLight>);
