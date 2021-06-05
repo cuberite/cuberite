@@ -2,7 +2,7 @@
 #include "BlockState.h"
 #include "Registries/BlockStates.h"
 
-BlockState::BlockState(BlockType a_Type) :	ID([&]
+BlockState::BlockState(BlockType a_Type) : ID([&]
 {
 	using namespace Block;
 	switch (a_Type)
