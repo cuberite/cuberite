@@ -18,10 +18,10 @@ public:
 
 	using Super::Super;
 
-	static const unsigned char BeetrootsMaxAge = 3;
-	static const unsigned char CarrotsMaxAge = 7;
-	static const unsigned char PotatoesMaxAge = 7;
-	static const unsigned char WheatMaxAge = 7;
+	static inline unsigned char BeetrootsMaxAge = 3;
+	static inline unsigned char CarrotsMaxAge = 7;
+	static inline unsigned char PotatoesMaxAge = 7;
+	static inline unsigned char WheatMaxAge = 7;
 
 	static inline bool IsBlockCrop(BlockState a_Block)
 	{
