@@ -15,7 +15,7 @@ struct BlockState
 	{
 	}
 
-	constexpr BlockState(BlockType a_Type);
+	BlockState(BlockType a_Type);  // TODO(12xx12) constexpr this
 
 	/** Gets the block type of this block state. */
 	BlockType Type() const;

@@ -1705,7 +1705,7 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, Vector3i a
 	auto BlockUnderFeet = a_ChunkDesc.GetBlock(a_RelPos.addedY(-1));
 
 	// Check block below (opaque, grass, water), and above (air)
-	if ((AnimalToSpawn == mtSquid) && (BlockAtFeet != BlockType::Water))
+	if ((AnimalToSpawn == mtSquid) && (BlockAtFeet.Type() != BlockType::Water))
 	{
 		return false;
 	}
@@ -1719,13 +1719,13 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, Vector3i a
 		return false;
 	}
 	if (
-		(BlockUnderFeet != BlockType::GrassBlock) &&
+		(BlockUnderFeet.Type() != BlockType::GrassBlock) &&
 		((AnimalToSpawn == mtWolf) || (AnimalToSpawn == mtRabbit) || (AnimalToSpawn == mtCow) || (AnimalToSpawn == mtSheep) || (AnimalToSpawn == mtChicken) || (AnimalToSpawn == mtPig))
 	)
 	{
 		return false;
 	}
-	if ((AnimalToSpawn == mtMooshroom) && (BlockUnderFeet != BlockType::Mycelium))
+	if ((AnimalToSpawn == mtMooshroom) && (BlockUnderFeet.Type() != BlockType::Mycelium))
 	{
 		return false;
 	}
