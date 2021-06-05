@@ -414,10 +414,19 @@ protected:
 		}
 		for (int y = top; y > 0; y--)
 		{
+			// FLOG("{}", a_ShapeColumn[y]);
 			if (a_ShapeColumn[y] > 0)
 			{
 				// "ground" part, use the pattern:
-				a_ChunkDesc.SetBlock({a_RelX, y, a_RelZ}, a_Pattern[PatternIdx]);
+				auto Block =  a_Pattern[PatternIdx];
+				if (Block.Type() == BlockType::Air)
+				{
+					a_ChunkDesc.SetBlock({a_RelX, y, a_RelZ}, Block::Stone::Stone());
+				}
+				else
+				{
+					a_ChunkDesc.SetBlock({a_RelX, y, a_RelZ}, Block);
+				}
 				PatternIdx++;
 				continue;
 			}

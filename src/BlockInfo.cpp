@@ -1149,7 +1149,7 @@ bool cBlockInfo::FullyOccupiesVoxel(const BlockState Block)
 			return true;
 		default: return false;
 	}
-	 */
+	*/
 }
 
 

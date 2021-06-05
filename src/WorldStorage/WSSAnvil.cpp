@@ -760,10 +760,10 @@ OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int
 			// Get the "id" tag:
 			int TagID = a_NBT.FindChildByName(a_Tag, "id");
 			auto NumericBlock = PaletteUpgrade::ToBlock(a_Block);
-			FLOGINFO("WorldLoader({0}): Block entity mismatch: block type {1} ({2}), type \"{3}\", at {4}; the entity will be lost.",
+			FLOGINFO("WorldLoader({0}): Block entity mismatch: block type {1}, type \"{2}\", at {3}; the entity will be lost.",
 				m_World->GetName(),
-				NumericBlock.first,
-				ItemTypeToString(NumericBlock.first), NumericBlock.first, (TagID >= 0) ? a_NBT.GetStringView(TagID) : "unknown",
+				a_Block,
+				NumericBlock.first, (TagID >= 0) ? a_NBT.GetStringView(TagID) : "unknown",
 				a_Pos
 			);
 			return nullptr;
