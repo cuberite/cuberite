@@ -6,7 +6,7 @@ pipeline {
         stage("CheckBasicStyle") {
             steps {
                 dir("src") {
-                    sh 'find . -name *.cpp -or -name *.h > AllFiles.lst'
+                    sh 'find . -name \\*.cpp -or -name \\*.h > AllFiles.lst'
                     sh 'lua CheckBasicStyle.lua'
                     sh 'cd Bindings && lua CheckBindingsDependencies.lua'
                 }
