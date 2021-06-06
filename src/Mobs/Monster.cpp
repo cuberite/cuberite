@@ -872,7 +872,7 @@ void cMonster::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			if (YBelowUs >= 0)
 			{
 				auto BlockToCheck = Chunk->GetBlock(RelX, YBelowUs, RelZ);
-				if ((BlockToCheck.Type() != BlockType::Water) && (Block::Water::Level(BlockToCheck) == 0))  // Idle mobs shouldn't enter water on purpose
+				if ((BlockToCheck.Type() != BlockType::Water) || (Block::Water::Level(BlockToCheck) != 0))  // Idle mobs shouldn't enter water on purpose
 				{
 					MoveToPosition(Destination);
 				}
