@@ -50,7 +50,7 @@ cItem::cItem(
 
 	if (!IsValidItem(m_ItemType))
 	{
-		if ((m_ItemType != E_BLOCK_AIR) && (m_ItemType != E_ITEM_EMPTY))
+		if ((m_ItemType != E_ITEM_AIR) && (m_ItemType != E_ITEM_EMPTY))
 		{
 			LOGWARNING("%s: creating an invalid item type (%d), resetting to empty.", __FUNCTION__, a_ItemType);
 		}

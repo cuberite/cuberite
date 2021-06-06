@@ -36,7 +36,7 @@ void cFireworkEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_C
 
 	if (m_IsInGround)
 	{
-		if (a_Chunk.GetBlock(RelX, POSY_TOINT + 1, RelZ) == E_BLOCK_AIR)
+		if (IsBlockAir(a_Chunk.GetBlock(RelX, POSY_TOINT + 1, RelZ)))
 		{
 			m_IsInGround = false;
 		}
@@ -47,7 +47,7 @@ void cFireworkEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_C
 	}
 	else
 	{
-		if (a_Chunk.GetBlock(RelX, POSY_TOINT + 1, RelZ) != E_BLOCK_AIR)
+		if (IsBlockAir(a_Chunk.GetBlock(RelX, POSY_TOINT + 1, RelZ)))
 		{
 			OnHitSolidBlock(GetPosition(), BLOCK_FACE_YM);
 			return;

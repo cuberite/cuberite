@@ -87,7 +87,7 @@ void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 	// Wooden buttons will be depressed by the arrow
 	cBlockButtonHandler::OnArrowHit(*m_World, m_HitBlockPos, a_HitFace);
 
-	if ((m_World->GetBlock(m_HitBlockPos) == E_BLOCK_TNT) && IsOnFire())
+	if ((m_World->GetBlock(m_HitBlockPos) == BlockType::TNT) && IsOnFire())
 	{
 		m_World->SetBlock(m_HitBlockPos, Block::Air::Air());
 		m_World->SpawnPrimedTNT(m_HitBlockPos);
@@ -189,7 +189,7 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_IsInGround)
 	{
-		if (m_World->GetBlock(m_HitBlockPos) == E_BLOCK_AIR)  // Block attached to was destroyed?
+		if (IsBlockAir(m_World->GetBlock(m_HitBlockPos)))  // Block attached to was destroyed?
 		{
 			m_IsInGround = false;  // Yes, begin simulating physics again
 		}
