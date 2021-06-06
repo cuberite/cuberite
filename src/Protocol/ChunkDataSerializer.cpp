@@ -207,16 +207,24 @@ inline void cChunkDataSerializer::Serialize47(const int a_ChunkX, const int a_Ch
 	// each array stores all present sections of the same kind packed together
 
 	// Write the block types to the packet:
-	ChunkDef_ForEachSection(a_BlockData, a_LightData,
 	{
-		const bool BlocksExist = Blocks != nullptr;
-		for (size_t BlockIdx = 0; BlockIdx != ChunkBlockData::SectionBlockCount; ++BlockIdx)
+		for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 		{
-			auto NumericBlock = PaletteUpgrade::ToBlock((*Blocks)[BlockIdx]);
-			m_Packet.WriteBEUInt8(static_cast<unsigned char>(BlocksExist ? ((NumericBlock.first << 4) | NumericBlock.second) : 0));
-			m_Packet.WriteBEUInt8(static_cast<unsigned char>(BlocksExist ? (NumericBlock.first >> 4) : 0));
+			const auto Blocks = a_BlockData.GetSection(Y);
+			const auto BlockLights = a_LightData.GetBlockLightSection(Y);
+			const auto SkyLights = a_LightData.GetSkyLightSection(Y);
+			if ((Blocks != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr))
+			{
+				const bool BlocksExist = Blocks != nullptr;
+				for (size_t BlockIdx = 0; BlockIdx != ChunkBlockData::SectionBlockCount; ++BlockIdx)
+				{
+					auto NumericBlock = BlocksExist ? PaletteUpgrade::ToBlock((*Blocks)[BlockIdx]) : std::make_pair<unsigned char, unsigned char>(0, 0);
+					m_Packet.WriteBEUInt8(static_cast<unsigned char>(BlocksExist ? ((NumericBlock.first << 4) | NumericBlock.second) : 0));
+					m_Packet.WriteBEUInt8(static_cast<unsigned char>(BlocksExist ? (NumericBlock.first >> 4) : 0));
+				}
+			}
 		}
-	});
+	}
 
 	// Write the block lights:
 	ChunkDef_ForEachSection(a_BlockData, a_LightData,
