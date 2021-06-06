@@ -1427,9 +1427,9 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 static int tolua_cWorld_SetBlock(lua_State * tolua_S)
 {
 	/* Function signature:
-	World:SetBlock(BlockX, BlockY, BlockZ)
+	World:SetBlock(BlockX, BlockY, BlockZ, BlockType, BlockMeta)
 	--or--
-	World:SetBlock(Position)
+	World:SetBlock(Position, BlockType, BlockMeta)
 	*/
 
 	cLuaState L(tolua_S);
@@ -1476,6 +1476,64 @@ static int tolua_cWorld_SetBlock(lua_State * tolua_S)
 	}
 
 	World->SetBlock(Position, Type, Meta);
+	return 0;
+}
+
+
+
+
+
+static int tolua_cWorld_SetBlockMeta(lua_State * tolua_S)
+{
+	/* Function signature:
+	World:SetBlockMeta(BlockX, BlockY, BlockZ, BlockMeta)
+	--or--
+	World:SetBlockMeta(Position, BlockMeta)
+	*/
+
+	cLuaState L(tolua_S);
+	int OffsetIndex;
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!CheckParamVectorOr3Numbers(L, "Vector3<int>", 2, OffsetIndex) ||
+		!L.CheckParamNumber(OffsetIndex) ||
+		!L.CheckParamEnd(OffsetIndex + 1)
+	)
+	{
+		return 0;
+	}
+
+	if (OffsetIndex != 3)  // Not the vector overload
+	{
+		L.LogStackTrace();
+		LOGWARN("SetBlockMeta with 3 position arguments is deprecated, use vector-parametered version instead.");
+	}
+
+	cWorld * World;
+	Vector3i Position;
+	NIBBLETYPE Meta;
+
+	// Read the params:
+	if (
+		!L.GetStackValue(1, World) ||
+		!GetStackVectorOr3Numbers(L, 2, Position) ||
+		!L.GetStackValue(OffsetIndex, Meta)
+	)
+	{
+		return 0;
+	}
+
+	if (World == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+	}
+
+	if (!cChunkDef::IsValidHeight(Position.y))
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
+	}
+
+	World->SetBlockMeta(Position, Meta);
 	return 0;
 }
 
@@ -1725,6 +1783,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "QueueTask",                    tolua_cWorld_QueueTask);
 			tolua_function(tolua_S, "ScheduleTask",                 tolua_cWorld_ScheduleTask);
 			tolua_function(tolua_S, "SetBlock",                     tolua_cWorld_SetBlock);
+			tolua_function(tolua_S, "SetBlockMeta",                 tolua_cWorld_SetBlockMeta);
 			tolua_function(tolua_S, "SetSignLines",                 tolua_cWorld_SetSignLines);
 			tolua_function(tolua_S, "SetTimeOfDay",                 tolua_cWorld_SetTimeOfDay);
 			tolua_function(tolua_S, "SpawnSplitExperienceOrbs",     tolua_cWorld_SpawnSplitExperienceOrbs);
