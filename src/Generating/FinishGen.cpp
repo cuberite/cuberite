@@ -9,23 +9,25 @@
 
 #include "Globals.h"
 
-#include "FinishGen.h"
-#include "../IniFile.h"
-#include "../MobSpawner.h"
-#include "../BlockInfo.h"
+#include "IniFile.h"
+#include "MobSpawner.h"
+#include "BlockInfo.h"
+#include "Chunk.h"
+#include "World.h"
 
-#include "../Chunk.h"
-#include "../World.h"
+#include "Generating/FinishGen.h"
 
-#include "../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
-#include "../Simulator/FireSimulator.h"
+#include "Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
+#include "Simulator/FireSimulator.h"
 
-#include "../Protocol/Palettes/Upgrade.h"
-#include "../Registries/BlockItemConverter.h"
+#include "Protocol/Palettes/Upgrade.h"
+#include "Registries/BlockItemConverter.h"
 
-#include "../Blocks/BlockAir.h"
-#include "../Blocks/BlockBigFlower.h"
-#include "../Blocks/BlockFluid.h"
+#include "Blocks/BlockAir.h"
+#include "Blocks/BlockBigFlower.h"
+#include "Blocks/BlockFluid.h"
+#include "Blocks/BlockLeaves.h"
+#include "Blocks/BlockLog.h"
 
 
 
@@ -570,11 +572,9 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			bool failed = false;  // marker if the search for a valid position was successful
 
 			while (
-				(BlockBelow == E_BLOCK_LEAVES) ||
-				(BlockBelow == E_BLOCK_NEW_LEAVES) ||
-				(BlockBelow == E_BLOCK_LOG) ||
-				(BlockBelow == E_BLOCK_NEW_LOG) ||
-				(BlockBelow == E_BLOCK_AIR)
+				cBlockLeavesHandler::IsBlockLeaves(BlockBelow) ||
+				cBlockLogHandler::IsBlockLog(BlockBelow) ||
+				IsBlockAir(BlockBelow)
 			)
 			{
 				y--;
@@ -2330,7 +2330,7 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 	Pos.z = Clamp(Pos.z, Radius, cChunkDef::Width - Radius - 1);
 
 	auto StartBlock = a_ChunkDesc.GetBlock(Pos);
-	while (!((StartBlock == E_BLOCK_DIRT) || (StartBlock == E_BLOCK_GRASS)))
+	while (!((StartBlock.Type() == BlockType::Dirt) || (StartBlock.Type() == BlockType::GrassBlock)))
 	{
 		Pos.y -= 1;
 		if (!cChunkDef::IsValidRelPos(Pos.addedY(-Radius)))

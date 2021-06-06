@@ -40,7 +40,7 @@ void cBlockBedHandler::OnBroken(
 	{
 		// Was foot end
 		Vector3i PillowPos(a_BlockPos + BlockFaceToDirection(Direction));
-		if (a_ChunkInterface.GetBlock(PillowPos) == E_BLOCK_BED)
+		if (IsBlockBed(a_ChunkInterface.GetBlock(PillowPos)))
 		{
 			// First replace the bed with air
 			a_ChunkInterface.FastSetBlock(PillowPos, Block::Air::Air());

@@ -905,7 +905,7 @@ static int tolua_cWorld_GetBlock(lua_State * tolua_S)
 
 	if (!cChunkDef::IsValidHeight(Position))
 	{
-		L.Push(E_BLOCK_AIR);
+		L.Push(Block::Air::Air());
 		return 1;
 	}
 
@@ -1200,7 +1200,7 @@ static int tolua_cWorld_GetBlockTypeMeta(lua_State * tolua_S)
 
 	if (!cChunkDef::IsValidHeight(Position))
 	{
-		L.Push(E_BLOCK_AIR, 0);
+		L.Push(Block::Air::Air());
 		return 2;
 	}
 

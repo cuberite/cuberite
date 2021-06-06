@@ -1240,7 +1240,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		return;
 	}
 
-	if (DugBlock == E_BLOCK_AIR)
+	if (IsBlockAir(DugBlock))
 	{
 		return;
 	}

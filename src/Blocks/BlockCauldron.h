@@ -112,20 +112,20 @@ private:
 				}
 				break;
 			}
-			case E_BLOCK_BLACK_SHULKER_BOX:
-			case E_BLOCK_BLUE_SHULKER_BOX:
-			case E_BLOCK_BROWN_SHULKER_BOX:
-			case E_BLOCK_CYAN_SHULKER_BOX:
-			case E_BLOCK_GRAY_SHULKER_BOX:
-			case E_BLOCK_GREEN_SHULKER_BOX:
-			case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
-			case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
-			case E_BLOCK_LIME_SHULKER_BOX:
-			case E_BLOCK_MAGENTA_SHULKER_BOX:
-			case E_BLOCK_ORANGE_SHULKER_BOX:
-			case E_BLOCK_PINK_SHULKER_BOX:
-			case E_BLOCK_RED_SHULKER_BOX:
-			case E_BLOCK_YELLOW_SHULKER_BOX:
+			case E_ITEM_BLACK_SHULKER_BOX:
+			case E_ITEM_BLUE_SHULKER_BOX:
+			case E_ITEM_BROWN_SHULKER_BOX:
+			case E_ITEM_CYAN_SHULKER_BOX:
+			case E_ITEM_GRAY_SHULKER_BOX:
+			case E_ITEM_GREEN_SHULKER_BOX:
+			case E_ITEM_LIGHT_BLUE_SHULKER_BOX:
+			case E_ITEM_LIGHT_GRAY_SHULKER_BOX:
+			case E_ITEM_LIME_SHULKER_BOX:
+			case E_ITEM_MAGENTA_SHULKER_BOX:
+			case E_ITEM_ORANGE_SHULKER_BOX:
+			case E_ITEM_PINK_SHULKER_BOX:
+			case E_ITEM_RED_SHULKER_BOX:
+			case E_ITEM_YELLOW_SHULKER_BOX:
 			{
 				// Resets shulker box color.
 
@@ -139,7 +139,7 @@ private:
 				// Proceed with normal cleaning:
 				a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(--FillState));
 				auto NewShulker = cItem(EquippedItem);
-				NewShulker.m_ItemType = E_BLOCK_PURPLE_SHULKER_BOX;
+				NewShulker.m_ItemType = E_ITEM_PURPLE_SHULKER_BOX;
 				a_Player.ReplaceOneEquippedItemTossRest(NewShulker);
 				break;
 			}

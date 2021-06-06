@@ -21,7 +21,7 @@ cFireChargeEntity::cFireChargeEntity(cEntity * a_Creator, Vector3d a_Pos, Vector
 
 void cFireChargeEntity::Explode(Vector3i a_Block)
 {
-	if (m_World->GetBlock(a_Block) == E_BLOCK_AIR)
+	if (IsBlockAir(m_World->GetBlock(a_Block)))
 	{
 		m_World->SetBlock(a_Block, Block::Fire::Fire());
 	}

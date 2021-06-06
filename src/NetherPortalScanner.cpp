@@ -78,7 +78,7 @@ void cNetherPortalScanner::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 				// Iterate through all of the blocks in the chunk:
 				for (size_t i = 0; i < ChunkBlockData::SectionBlockCount; i++)
 				{
-					if ((*Blocks)[i] != E_BLOCK_NETHER_PORTAL)
+					if ((*Blocks)[i].Type() != BlockType::NetherPortal)
 					{
 						continue;
 					}
