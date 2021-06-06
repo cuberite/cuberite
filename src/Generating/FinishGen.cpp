@@ -1023,7 +1023,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 			float val2 = m_Noise.CubicNoise2D(xx * 0.01f, zz * 0.01f);
 			switch (a_ChunkDesc.GetBlock({x, Top, z}).Type())
 			{
-				case BlockType::Grass:
+				case BlockType::GrassBlock:
 				{
 					if (TryAddSugarcane(a_ChunkDesc, x, Top, z))
 					{
@@ -1034,7 +1034,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 						a_ChunkDesc.SetBlock({x, ++Top, z}, Block::Pumpkin::Pumpkin());
 					}
 					break;
-				}  // case BlockType::GRASS
+				}  // case BlockType::GrassBlock
 
 				case BlockType::Sand:
 				{
