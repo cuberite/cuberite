@@ -250,14 +250,14 @@ protected:
 
 		int b = m_FloorHeight + 1;  // Bottom
 		int t = m_FloorHeight + 1 + ROOM_HEIGHT;  // Top
-		ReplaceCuboidRandom(a_ChunkDesc, m_StartX, m_FloorHeight, m_StartZ, m_EndX + 1, b, m_EndZ + 1, E_BLOCK_MOSSY_COBBLESTONE, E_BLOCK_COBBLESTONE);  // Floor
-		ReplaceCuboid(a_ChunkDesc, m_StartX + 1, b, m_StartZ + 1, m_EndX, t, m_EndZ, E_BLOCK_AIR);  // Insides
+		ReplaceCuboidRandom(a_ChunkDesc, m_StartX, m_FloorHeight, m_StartZ, m_EndX + 1, b, m_EndZ + 1, Block::MossyCobblestone::MossyCobblestone(), Block::Cobblestone::Cobblestone());  // Floor
+		ReplaceCuboid(a_ChunkDesc, m_StartX + 1, b, m_StartZ + 1, m_EndX, t, m_EndZ, Block::CaveAir::CaveAir());  // Insides
 
 		// Walls:
-		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_StartZ, m_StartX + 1, t, m_EndZ,       E_BLOCK_COBBLESTONE);  // XM wall
-		ReplaceCuboid(a_ChunkDesc, m_EndX,   b, m_StartZ, m_EndX + 1,   t, m_EndZ,       E_BLOCK_COBBLESTONE);  // XP wall
-		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_StartZ, m_EndX + 1,   t, m_StartZ + 1, E_BLOCK_COBBLESTONE);  // ZM wall
-		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_EndZ,   m_EndX + 1,   t, m_EndZ + 1,   E_BLOCK_COBBLESTONE);  // ZP wall
+		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_StartZ, m_StartX + 1, t, m_EndZ,       Block::Cobblestone::Cobblestone());  // XM wall
+		ReplaceCuboid(a_ChunkDesc, m_EndX,   b, m_StartZ, m_EndX + 1,   t, m_EndZ,       Block::Cobblestone::Cobblestone());  // XP wall
+		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_StartZ, m_EndX + 1,   t, m_StartZ + 1, Block::Cobblestone::Cobblestone());  // ZM wall
+		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_EndZ,   m_EndX + 1,   t, m_EndZ + 1,   Block::Cobblestone::Cobblestone());  // ZP wall
 
 		// Place chests:
 		TryPlaceChest(a_ChunkDesc, m_Chest1);

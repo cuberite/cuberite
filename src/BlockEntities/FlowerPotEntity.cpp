@@ -83,17 +83,17 @@ bool cFlowerPotEntity::IsFlower(short m_ItemType, short m_ItemData)
 {
 	switch (m_ItemType)
 	{
-		case E_BLOCK_DANDELION:
-		case E_BLOCK_FLOWER:
-		case E_BLOCK_CACTUS:
-		case E_BLOCK_BROWN_MUSHROOM:
-		case E_BLOCK_RED_MUSHROOM:
-		case E_BLOCK_SAPLING:
-		case E_BLOCK_DEAD_BUSH:
+		case E_ITEM_DANDELION:
+		case E_ITEM_FLOWER:
+		case E_ITEM_CACTUS:
+		case E_ITEM_BROWN_MUSHROOM:
+		case E_ITEM_RED_MUSHROOM:
+		case E_ITEM_SAPLING:
+		case E_ITEM_DEAD_BUSH:
 		{
 			return true;
 		}
-		case E_BLOCK_TALL_GRASS:
+		case E_ITEM_TALL_GRASS:
 		{
 			return (m_ItemData == static_cast<short>(2));
 		}

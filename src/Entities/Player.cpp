@@ -21,12 +21,13 @@
 #include "../WorldStorage/StatisticsSerializer.h"
 #include "../CompositeChat.h"
 
-#include "../Blocks/BlockHandler.h"
-#include "../Blocks/BlockSlab.h"
-#include "../Blocks/ChunkInterface.h"
+#include "Blocks/BlockHandler.h"
+#include "Blocks/BlockBed.h"
+#include "Blocks/BlockSlab.h"
+#include "Blocks/ChunkInterface.h"
 
-#include "../IniFile.h"
-#include "../JsonUtils.h"
+#include "IniFile.h"
+#include "JsonUtils.h"
 #include "json/json.h"
 
 #include "../Blocks/BlockAir.h"
@@ -3304,7 +3305,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	else if (IsInBed())
 	{
 		// Check if sleeping is still possible:
-		if ((GetPosition().Floor() != m_LastBedPos) || (m_World->GetBlock(m_LastBedPos) != E_BLOCK_BED))
+		if ((GetPosition().Floor() != m_LastBedPos) || cBlockBedHandler::IsBlockBed(m_World->GetBlock(m_LastBedPos)))
 		{
 			m_ClientHandle->HandleLeaveBed();
 		}
