@@ -92,12 +92,13 @@ void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 	Pkt.WriteBEInt32(a_ChunkX);
 	Pkt.WriteBEInt32(a_ChunkZ);
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
+
 	for (const auto & Change : a_Changes)
 	{
 		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
 		Pkt.WriteBEInt16(Coords);
 		Pkt.WriteVarInt32(GetProtocolBlockType(Change.m_BlockType, Change.m_BlockMeta));
-	}  // for itr - a_Changes[]
+	}
 }
 
 
