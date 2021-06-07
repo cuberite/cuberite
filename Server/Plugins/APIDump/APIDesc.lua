@@ -114,24 +114,6 @@ return
 					},
 					Notes = "Returns whether the specified block fully occupies its voxel.",
 				},
-				Get =
-				{
-					IsStatic = true,
-					Params =
-					{
-						{
-							Name = "BlockType",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "cBlockInfo",
-						},
-					},
-					Notes = "Returns the {{cBlockInfo}} structure for the specified block type. <b>OBSOLETE</b>, use static functions instead",
-				},
 				GetHardness =
 				{
 					IsStatic = true,
@@ -4248,31 +4230,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 						Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). The Position parameter specifies the location that the entity should be placed in, in the new world.",
 					},
-				},
-				ScheduleMoveToWorld =
-				{
-					Params =
-					{
-						{
-							Name = "World",
-							Type = "cWorld",
-						},
-						{
-							Name = "NewPosition",
-							Type = "Vector3d",
-						},
-						{
-							Name = "ShouldSetPortalCooldown",
-							Type = "boolean",
-							IsOptional = true,
-						},
-						{
-							Name = "ShouldSendRespawn",
-							Type = "boolean",
-							IsOptional  = true,
-						},
-					},
-					Notes = "Schedules a MoveToWorld call to occur on the next Tick of the entity. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity. If ShouldSendRespawn is false, no respawn packet is sent, if it is true (default) then a respawn packet is sent to the client. <b>OBSOLETE</b>, use MoveToWorld instead.",
 				},
 				SetGravity =
 				{
@@ -9361,10 +9318,6 @@ a_Player:OpenWindow(Window);
 				{
 					Notes = "Family: hostile (blaze, cavespider, creeper, enderdragon, enderman, ghast, giant, magmacube, silverfish, skeleton, slime, spider, witch, wither, zombie, zombiepigman)",
 				},
-				mfMaxplusone =
-				{
-					Notes = "The maximum family value, plus one. Returned when monster family not recognized.",
-				},
 				mfPassive =
 				{
 					Notes = "Family: passive (chicken, cow, horse, irongolem, mooshroom, ocelot, pig, sheep, snowgolem, villager, wolf)",
@@ -9589,16 +9542,6 @@ a_Player:OpenWindow(Window);
 			Desc = "This class represents a painting in the world. These paintings are special and different from Vanilla in that they can be critical-hit.",
 			Functions =
 			{
-				GetDirection =
-				{
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the direction the painting faces. Directions: ZP - 0, ZM - 2, XM - 1, XP - 3. Note that these are not the BLOCK_FACE constants.",
-				},
 				GetName =
 				{
 					Returns =
@@ -18151,22 +18094,6 @@ end
 				mtWitherSkeleton =
 				{
 					Notes = ""
-				},
-				hMain =
-				{
-					Notes = "The main hand",
-				},
-				hOff =
-				{
-					Notes = "The off hand",
-				},
-				mhLeft =
-				{
-					Notes = "The left hand is the main hand",
-				},
-				mhRight =
-				{
-					Notes = "The right hand is the main hand",
 				},
 				SKULL_TYPE_CREEPER =
 				{
