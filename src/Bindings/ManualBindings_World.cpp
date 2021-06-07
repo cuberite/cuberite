@@ -724,7 +724,7 @@ static int tolua_cWorld_FastSetBlock(lua_State * tolua_S)
 	if (OffsetIndex != 3)  // Not the vector overload
 	{
 		L.LogStackTrace();
-		LOGWARN("GetBlockBlockLight with 3 position arguments is deprecated, use vector-parametered version instead.");
+		LOGWARN("FastSetBlock with 3 position arguments is deprecated, use vector-parametered version instead.");
 	}
 
 	cWorld * World;
@@ -1447,7 +1447,7 @@ static int tolua_cWorld_SetBlock(lua_State * tolua_S)
 	if (OffsetIndex != 3)  // Not the vector overload
 	{
 		L.LogStackTrace();
-		LOGWARN("GetBlockBlockLight with 3 position arguments is deprecated, use vector-parametered version instead.");
+		LOGWARN("SetBlock with 3 position arguments is deprecated, use vector-parametered version instead.");
 	}
 
 	cWorld * World;
