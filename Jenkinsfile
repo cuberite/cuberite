@@ -21,7 +21,7 @@ pipeline {
                 }
                 stage("clang-tidy") {
                     steps {
-                        sh './clang-tidy.sh -j 2'
+                        sh './clang-tidy.sh -j 3'
                     }
                 }
             }
