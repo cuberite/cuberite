@@ -3,7 +3,7 @@
 set -e
 
 FIXES_FILE="tidy-fixes.yaml"
-REGEX="src/\.?[^\.]"
+REGEX="cuberite_[^/\.]+/src/\.?[^\.]"
 ARGS="-header-filter $REGEX -quiet -export-fixes $FIXES_FILE "$@" $REGEX"
 
 # Generate the compilation database
