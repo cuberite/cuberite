@@ -90,7 +90,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_IdleInterval(0)
 	, m_DestroyTimer(0)
 	, m_MobType(a_MobType)
-	, m_CustomName("")
+	, m_CustomName()
 	, m_CustomNameAlwaysVisible(false)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
