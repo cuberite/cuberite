@@ -27,8 +27,16 @@ pipeline {
             }
         }
         stage("Build") {
-            steps {
-                sh 'echo "TODO: Replace Travis here."'
+            parallel {
+                stage("gcc") {
+                    environment {
+                        TRAVIS_CUBERITE_BUILD_TYPE = 'Debug'
+                        TRAVIS_JOB_NUMBER = "{$env.BUILD_ID}"
+                    }
+                    steps {
+                        sh './travisbuild.sh'
+                    }
+                }
             }
         }
     }
