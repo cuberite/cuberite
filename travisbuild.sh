@@ -20,9 +20,9 @@ if [ `which ccache` ]; then
 	ccache --zero-stats
 fi
 
-workdir="$CC_$TRAVIS_CUBERITE_BUILD_TYPE"
-mkdir $workdir
-cd $workdir
+workdir="$CC"_"$TRAVIS_CUBERITE_BUILD_TYPE"
+mkdir "$workdir"
+cd "$workdir"
 
 # Work around a Clang + ccache issue with failing builds by disabling
 # precompiled headers. Turn off LTO for faster build speeds
