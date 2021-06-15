@@ -34,7 +34,7 @@ pipeline {
                         TRAVIS_JOB_NUMBER = "{$env.BUILD_ID}"
                     }
                     steps {
-                        sh './travisbuild.sh'
+                        sh 'bash ./travisbuild.sh'
                     }
                 }
             }
