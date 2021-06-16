@@ -30,7 +30,7 @@ pipeline {
             parallel {
                 stage("gcc") {
                     environment {
-                        TRAVIS_CUBERITE_BUILD_TYPE = 'Debug'
+                        TRAVIS_CUBERITE_BUILD_TYPE = 'Release'
                         TRAVIS_JOB_NUMBER = "{$env.BUILD_ID}"
                         CC = "gcc"
                         CXX = "g++"
