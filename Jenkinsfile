@@ -27,9 +27,35 @@ pipeline {
             }
         }
         stage("Build") {
-            steps {
-                sh 'echo "TODO: Replace Travis here."'
+            parallel {
+                stage("gcc") {
+                    environment {
+                        TRAVIS_CUBERITE_BUILD_TYPE = 'Release'
+                        TRAVIS_JOB_NUMBER = "{$env.BUILD_ID}"
+                        CC = "gcc"
+                        CXX = "g++"
+                    }
+                    steps {
+                        sh 'bash ./travisbuild.sh'
+                    }
+                }
+                stage("clang") {
+                    environment {
+                        TRAVIS_CUBERITE_BUILD_TYPE = 'Debug'
+                        TRAVIS_JOB_NUMBER = "{$env.BUILD_ID}"
+                        CC = "clang"
+                        CXX = "clang++"
+                    }
+                    steps {
+                        sh 'bash ./travisbuild.sh'
+                    }
+                }
             }
+        }
+    }
+    post {
+        always {
+            cleanWs()
         }
     }
 }
