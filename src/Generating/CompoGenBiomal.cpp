@@ -419,7 +419,7 @@ protected:
 			{
 				// "ground" part, use the pattern:
 				auto Block =  a_Pattern[PatternIdx];
-				if (Block.Type() == BlockType::Air)
+				if (IsBlockAir(Block))
 				{
 					a_ChunkDesc.SetBlock({a_RelX, y, a_RelZ}, Block::Stone::Stone());
 				}

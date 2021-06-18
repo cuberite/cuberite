@@ -203,7 +203,7 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumR
 						continue;
 					}
 					auto Block = Image.GetRelBlock({x, 0, z});
-					if ((Block.Type() == BlockType::Air) || (Block.Type() == BlockType::Sponge))
+					if (IsBlockAir(Block) || (Block.Type() == BlockType::Sponge))
 					{
 						// Do not expand air nor sponge blocks
 						continue;
@@ -244,7 +244,7 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumR
 						continue;
 					}
 					auto Block = Image.GetRelBlock({x, 0, z});
-					if ((Block.Type() == BlockType::Air) || (Block.Type() == BlockType::Sponge))
+					if (IsBlockAir(Block) || (Block.Type() == BlockType::Sponge))
 					{
 						// Do not expand air nor sponge blocks
 						continue;
