@@ -2,7 +2,7 @@
 
 #include "FireChargeEntity.h"
 #include "../World.h"
-
+#include "BlockInfo.h"
 
 
 

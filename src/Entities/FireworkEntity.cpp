@@ -3,6 +3,7 @@
 #include "FireworkEntity.h"
 #include "../World.h"
 #include "../Chunk.h"
+#include "BlockInfo.h"
 
 
 
