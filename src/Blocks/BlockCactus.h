@@ -140,7 +140,7 @@ private:
 	virtual PlantAction CanGrow(cChunk & a_Chunk, Vector3i a_RelPos) const override
 	{
 		// Only allow growing if there's an air block above:
-		if (((a_RelPos.y + 1) < cChunkDef::Height) && (a_Chunk.GetBlock(a_RelPos.addedY(1)).Type() == BlockType::Air))
+		if (((a_RelPos.y + 1) < cChunkDef::Height) && IsBlockAir(a_Chunk.GetBlock(a_RelPos.addedY(1))))
 		{
 			return Super::CanGrow(a_Chunk, a_RelPos);
 		}

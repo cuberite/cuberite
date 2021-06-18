@@ -113,7 +113,7 @@ bool cFluidSimulator::IsSolidBlock(BlockState a_Block)
 bool cFluidSimulator::IsPassableForFluid(BlockState a_Block)
 {
 	return (
-		(a_Block.Type() == BlockType::Air) ||
+		IsBlockAir(a_Block) ||
 		(a_Block.Type() == BlockType::Fire) ||
 		IsAllowedBlock(a_Block) ||
 		CanWashAway(a_Block)
