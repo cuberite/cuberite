@@ -13,6 +13,7 @@ bool StatisticsManager::SatisfiesPrerequisite(const CustomStatistic a_Stat) cons
 {
 	switch (a_Stat)
 	{
+		case CustomStatistic::AchOpenInventory:      return true;
 		case CustomStatistic::AchMineWood:           return IsStatisticPresent(CustomStatistic::AchOpenInventory);
 		case CustomStatistic::AchBuildWorkBench:     return IsStatisticPresent(CustomStatistic::AchMineWood);
 		case CustomStatistic::AchBuildHoe:           return IsStatisticPresent(CustomStatistic::AchBuildWorkBench);
