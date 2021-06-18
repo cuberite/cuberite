@@ -12,7 +12,7 @@
 
 cAnvilWindow::cAnvilWindow(Vector3i a_BlockPos) :
 	cWindow(wtAnvil, "Repair"),
-	m_RepairedItemName(""),
+	m_RepairedItemName(),
 	m_BlockPos(a_BlockPos)
 {
 	m_AnvilSlotArea = new cSlotAreaAnvil(*this);
