@@ -1,6 +1,7 @@
 
+#include "Globals.h"
+
 #include "BlockState.h"
-#include "Registries/BlockStates.h"
 
 BlockState::BlockState(BlockType a_Type) : ID([&]
 {
