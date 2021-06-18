@@ -3,6 +3,7 @@
 
 #include "BlockHandler.h"
 #include "../Simulator/FireSimulator.h"
+#include "BlockInfo.h"
 
 #define ILLEGAL_FALLOFF std::numeric_limits<unsigned char>::max()
 
@@ -143,7 +144,7 @@ private:
 			if (
 				cChunkDef::IsValidHeight(NeighborPos.y) &&
 				a_Chunk.UnboundedRelGetBlock(NeighborPos, Self) &&
-				(Self.Type() == BlockType::Air)
+				IsBlockAir(Self)
 			)
 			{
 				// This is an air block next to a fuel next to lava, light the fuel block up:

@@ -51,7 +51,7 @@ void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	else if (const auto Below = Rel.addedY(-1); Below.y >= 0)
 	{
-		if ((Chunk->GetBlock(Rel).Type() == BlockType::Air) && cBlockInfo::IsSolid(Chunk->GetBlock(Below)))
+		if (IsBlockAir(Chunk->GetBlock(Rel)) && cBlockInfo::IsSolid(Chunk->GetBlock(Below)))
 		{
 			Chunk->SetBlock(Rel, Block::Snow::Snow(1));
 		}

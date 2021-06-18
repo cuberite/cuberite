@@ -6,8 +6,8 @@
 #include "Globals.h"
 #include "PieceModifier.h"
 #include "../Noise/Noise.h"
-#include "../Protocol/Palettes/Upgrade.h"
-
+// #include "../Protocol/Palettes/Upgrade.h"
+#include "BlockInfo.h"
 
 
 
@@ -58,7 +58,7 @@ public:
 			for (size_t i = 0; i < blocksToReplace.size(); i++)
 			{
 				auto Block = PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockStringToType(blocksToReplace[i])), 0);
-				if ((Block.Type() == BlockType::Air) && !NoCaseCompare(blocksToReplace[i], "Air"))
+				if (IsBlockAir(Block) && !NoCaseCompare(blocksToReplace[i], "Air"))
 				{
 					CONDWARNING(a_LogWarnings, "Cannot parse block type from string \"%s\"!", blocksToReplace[i].c_str());
 					return false;

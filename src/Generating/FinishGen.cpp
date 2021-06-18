@@ -616,7 +616,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			else if (!IsBiomeVeryCold(a_ChunkDesc.GetBiome(x, z)))
 			{
 				// If double long grass we have to choose what type we should use:
-				if (a_ChunkDesc.GetBlock({x, y + 1, z}).Type() == BlockType::Air)
+				if (IsBlockAir(a_ChunkDesc.GetBlock({x, y + 1, z})))
 				{
 					BlockType BlockToPlace;
 					if (CanGrassGrow(a_ChunkDesc.GetBiome(x, z)))
@@ -1275,7 +1275,7 @@ void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			const auto Index = cChunkDef::MakeIndex(x, y, z);
-			if (BlockTypes[Index] == BlockType::Air)
+			if (IsBlockAir(BlockTypes[Index]))
 			{
 				BlockTypes[Index] = Block::Lava::Lava();
 			}
@@ -1418,7 +1418,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 						continue;
 					}
 					auto Neighbor = cChunkDef::GetBlock(a_BlockTypes, x + Offset.x, y + Offset.y, z + Offset.z);
-					if ((Neighbor.Type() == BlockType::Air) || cFluidSimulator::CanWashAway(Neighbor))
+					if (IsBlockAir(Neighbor) || cFluidSimulator::CanWashAway(Neighbor))
 					{
 						// There is an air / washable neighbor, simulate this block
 						switch (Block.Type())

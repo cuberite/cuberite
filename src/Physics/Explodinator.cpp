@@ -435,7 +435,7 @@ namespace Explodinator
 	static void DestroyBlock(cChunk & a_Chunk, const Vector3i a_Position, const int a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
 		const auto DestroyedBlock = a_Chunk.GetBlock(a_Position);
-		if (DestroyedBlock == BlockType::Air)
+		if (IsBlockAir(DestroyedBlock))
 		{
 			// There's nothing left for us here, but a barren and empty land
 			// Let's go.

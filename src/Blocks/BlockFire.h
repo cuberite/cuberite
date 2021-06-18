@@ -77,7 +77,7 @@ private:
 		for (int newY = Y + 1; newY < cChunkDef::Height; newY++)
 		{
 			auto Block = a_ChunkInterface.GetBlock({X, newY, Z});
-			if ((Block.Type() == BlockType::Air) || (Block.Type() == BlockType::Fire))
+			if (IsBlockAir(Block) || (Block.Type() == BlockType::Fire))
 			{
 				continue;
 			}
