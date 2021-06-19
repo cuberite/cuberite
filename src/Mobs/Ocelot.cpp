@@ -26,8 +26,8 @@ cOcelot::cOcelot(void) :
 	m_IsTame(false),
 	m_IsBegging(false),
 	m_CatType(ctWildOcelot),
-	m_OwnerName(),
-	m_CheckPlayerTickCount()
+	m_CheckPlayerTickCount(),
+	m_OwnerName()
 {
 }
 
