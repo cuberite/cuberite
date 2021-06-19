@@ -2294,7 +2294,7 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 {
 	cPluginManager * PluginManager = cRoot::Get()->GetPluginManager();
 
-	AString Name = "";
+	AString Name;
 	if (IsPlayer())
 	{
 		cPlayer * Player = static_cast<cPlayer *>(this);
