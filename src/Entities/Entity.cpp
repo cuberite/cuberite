@@ -2300,7 +2300,7 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 		cPlayer * Player = static_cast<cPlayer *>(this);
 		Name = Player->GetName();
 	}
-	else
+	else if (IsMob())
 	{
 		cMonster * Monster = static_cast<cMonster *>(this);
 		if (Monster->HasCustomName())
@@ -2320,6 +2320,11 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 				Name.erase(Name.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
 			}
 		}
+	}
+	else
+	{
+		// If the entity is neither a player nor a mob, we should quit.
+		return;
 	}
 
 	if (a_TDI.Attacker == nullptr)
