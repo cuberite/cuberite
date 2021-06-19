@@ -550,6 +550,8 @@ public:
 	/** Returs whether the entity has any mob leashed to it. */
 	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }
 
+	/** Announces a death message on chat about killing the entity. */
+	void BroadcastDeathMessage(TakeDamageInfo & a_TDI);
 
 protected:
 
