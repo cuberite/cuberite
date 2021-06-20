@@ -555,7 +555,7 @@ AString NamespaceSerializer::Prettify(AString a_Name, const bool a_IsTamed)
 {
 	// In older vanilla Minecraft version (before 1.14) ocelots and cats were the same mob.
 	// So after killing a tamed ocelot without a custom name the message will say "Cat was slain by [PlayerName]".
-	if (a_Name == "ocelot" && a_IsTamed)
+	if ((a_Name == "ocelot") && a_IsTamed)
 	{
 		return "Cat";
 	}
