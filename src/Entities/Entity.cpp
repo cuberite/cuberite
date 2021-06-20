@@ -16,6 +16,7 @@
 #include "../FastRandom.h"
 #include "../NetherPortalScanner.h"
 #include "../BoundingBox.h"
+#include "../WorldStorage/NamespaceSerializer.h"
 
 
 
@@ -2364,16 +2365,7 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 		}
 		else
 		{
-			// Tamed ocelots are really cats in vanilla.
-			if (Monster->IsTame() && (Monster->GetClass() == AString("cOcelot")))
-			{
-				Name = "Cat";
-			}
-			else
-			{
-				Name = Monster->GetClass();
-				Name.erase(Name.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
-			}
+			Name = AString(NamespaceSerializer::Prettify(Monster->GetMobType(), Monster->IsTame()));
 		}
 	}
 	else
