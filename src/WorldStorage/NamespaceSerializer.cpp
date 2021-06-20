@@ -1,6 +1,7 @@
 #include "Globals.h"
 
 #include "NamespaceSerializer.h"
+#include <cctype>
 
 
 
