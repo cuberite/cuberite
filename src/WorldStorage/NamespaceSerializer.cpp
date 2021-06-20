@@ -566,7 +566,7 @@ AString NamespaceSerializer::Prettify(AString a_Name, const bool a_IsTamed)
 	{
 		if (NextLetterCapitalized)
 		{
-			a_Letter = std::toupper(a_Letter);
+			a_Letter = static_cast<char>(std::toupper(a_Letter));
 			NextLetterCapitalized = false;
 		}
 		else if (a_Letter == '_')
