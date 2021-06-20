@@ -553,13 +553,6 @@ eMonsterType NamespaceSerializer::ToMonsterType(const std::string_view a_ID)
 
 AString NamespaceSerializer::Prettify(AString a_Name, const bool a_IsTamed)
 {
-	/**
-		Examples:
-		Input: "wolf", Output: "Wolf"
-		Input: "snow_golem", Output: "Snow Golem"
-		Input: "skeleton_horse", Output: "Skeleton Horse"
-	*/
-
 	// In older vanilla Minecraft version (before 1.14) ocelots and cats were the same mob.
 	// So after killing a tamed ocelot without a custom name the message will say "Cat was slain by [PlayerName]".
 	if (a_Name == "ocelot" && a_IsTamed)
