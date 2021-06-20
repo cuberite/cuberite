@@ -546,3 +546,87 @@ eMonsterType NamespaceSerializer::ToMonsterType(const std::string_view a_ID)
 
 	return MonsterTypes.at(a_ID);
 }
+
+
+
+
+
+std::string_view NamespaceSerializer::Prettify(const eMonsterType a_ID, const bool a_IsTamed)
+{
+	switch (a_ID)
+	{
+		case mtBat:            return "Bat";
+		case mtBlaze:          return "Blaze";
+		case mtCat:            return "Cat";
+		case mtCaveSpider:     return "Cave Spider";
+		case mtChicken:        return "Chicken";
+		case mtCod:            return "Cod";
+		case mtCow:            return "Cow";
+		case mtCreeper:        return "Creeper";
+		case mtDolphin:        return "Dolphin";
+		case mtDonkey:         return "Donkey";
+		case mtDrowned:        return "Drowned";
+		case mtElderGuardian:  return "Elder Guardian";
+		case mtEnderDragon:    return "Ender Dragon";
+		case mtEnderman:       return "Enderman";
+		case mtEndermite:      return "Endermite";
+		case mtEvoker:         return "Evoker";
+		case mtFox:            return "Fox";
+		case mtGhast:          return "Ghast";
+		case mtGiant:          return "Giant";
+		case mtGuardian:       return "Guardian";
+		case mtHorse:          return "Horse";
+		case mtHoglin:         return "Hoglin";
+		case mtHusk:           return "Husk";
+		case mtIllusioner:     return "Illusioner";
+		case mtIronGolem:      return "Iron Golem";
+		case mtLlama:          return "Llama";
+		case mtMagmaCube:      return "Magma Cube";
+		case mtMooshroom:      return "Mooshroom";
+		case mtMule:           return "Mule";
+		// In older vanilla Minecraft version (before 1.14) ocelots and cats were the same mob.
+		// So after killing a tamed ocelot without a custom name the message will say "Cat was slain by [PlayerName]".
+		case mtOcelot:		   return (a_IsTamed ? "Cat" : "Ocelot");
+		case mtPanda:          return "Panda";
+		case mtParrot:         return "Parrot";
+		case mtPhantom:        return "Phantom";
+		case mtPig:            return "Pig";
+		case mtPiglin:         return "Piglin";
+		case mtPiglinBrute:    return "Piglin_brute";
+		case mtPillager:       return "Pillager";
+		case mtPolarBear:      return "Polar Bear";
+		case mtPufferfish:     return "Pufferfish";
+		case mtRabbit:         return "Rabbit";
+		case mtRavager:        return "Ravager";
+		case mtSalmon:         return "Salmon";
+		case mtSheep:          return "Sheep";
+		case mtShulker:        return "Shulker";
+		case mtSilverfish:     return "Silverfish";
+		case mtSkeleton:       return "Skeleton";
+		case mtSkeletonHorse:  return "Skeleton Horse";
+		case mtSlime:          return "Slime";
+		case mtSnowGolem:      return "Snow Golem";
+		case mtSpider:         return "Spider";
+		case mtSquid:          return "Squid";
+		case mtStray:          return "Stray";
+		case mtStrider:        return "Strider";
+		case mtTraderLlama:    return "Trader Llama";
+		case mtTropicalFish:   return "Tropical Fish";
+		case mtTurtle:         return "Turtle";
+		case mtVex:            return "Vex";
+		case mtVillager:       return "Villager";
+		case mtVindicator:     return "Vindicator";
+		case mtWanderingTrader:return "Wandering Trader";
+		case mtWitch:          return "Witch";
+		case mtWither:         return "Wither";
+		case mtWitherSkeleton: return "Wither Skeleton";
+		case mtWolf:           return "Wolf";
+		case mtZoglin:         return "Zoglin";
+		case mtZombie:         return "Zombie";
+		case mtZombieHorse:    return "Zombie Horse";
+		case mtZombiePigman:   return "Zombified Piglin";
+		case mtZombieVillager: return "Zombie Villager";
+		case mtInvalidType:    break;
+	}
+	UNREACHABLE("Tried to save unknown monster type");
+}
