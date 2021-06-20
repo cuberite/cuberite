@@ -24,5 +24,5 @@ namespace NamespaceSerializer
 
 	std::pair<Namespace, std::string_view> SplitNamespacedID(std::string_view ID);
 
-	std::string_view Prettify(eMonsterType a_ID, bool a_IsTamed = false);
+	AString Prettify(AString a_Name, const bool a_IsTamed = false);
 }
