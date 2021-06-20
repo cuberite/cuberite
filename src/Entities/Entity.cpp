@@ -2364,7 +2364,7 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 		{
 			GetWorld()->BroadcastChatDeath(DeathMessage);
 		}
-	}  // This will trigger if a player/tamed pet has been killed by another mob/tamed pet.
+	}  // This will trigger if a player / tamed pet has been killed by another mob / tamed pet.
 	else if (a_TDI.Attacker->IsMob())
 	{
 		cMonster * Monster = static_cast<cMonster *>(a_TDI.Attacker);
