@@ -353,8 +353,10 @@ void cPawn::HandleFalling(void)
 				continue;
 			}
 
-			BLOCKTYPE BlockType = GetWorld()->GetBlock(BlockTestPosition);
-			NIBBLETYPE BlockMeta = GetWorld()->GetBlockMeta(BlockTestPosition);
+			BLOCKTYPE BlockType;
+			NIBBLETYPE BlockMeta;
+
+			GetWorld()->GetBlockTypeMeta(BlockTestPosition, BlockType, BlockMeta);
 
 			/* we do the cross-shaped sampling to check for water / liquids, but only on our level because water blocks are never bigger than unit voxels */
 			if (j == 0)
