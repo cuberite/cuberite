@@ -10,6 +10,7 @@
 #include "../Blocks/BlockHandler.h"
 #include "../EffectID.h"
 #include "../Mobs/Monster.h"
+#include "Chunk.h"
 
 
 
@@ -101,7 +102,7 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// The base class tick destroyed us
 		return;
 	}
-	HandleFalling();
+	HandleFalling(a_Chunk);
 }
 
 
@@ -276,7 +277,7 @@ void cPawn::TargetingMe(cMonster * a_Monster)
 
 
 
-void cPawn::HandleFalling(void)
+void cPawn::HandleFalling(cChunk & a_Chunk)
 {
 	/* Not pretty looking, and is more suited to wherever server-sided collision detection is implemented.
 	The following condition sets on-ground-ness if
@@ -303,7 +304,12 @@ void cPawn::HandleFalling(void)
 	With this in mind, we first check the block at the player's feet, then the one below that (because fences),
 	and decide which behaviour we want to go with.
 	*/
-	BLOCKTYPE BlockAtFoot = (cChunkDef::IsValidHeight(POSY_TOINT)) ? GetWorld()->GetBlock(POS_TOINT) : E_BLOCK_AIR;
+	BLOCKTYPE BlockAtFoot;
+
+	if (!cChunkDef::IsValidHeight(POS_TOINT.y) || !a_Chunk.UnboundedRelGetBlockType(POS_TOINT, BlockAtFoot))
+	{
+		BlockAtFoot = E_BLOCK_AIR;
+	}
 
 	/* We initialize these with what the foot is really IN, because for sampling we will move down with the epsilon above */
 	bool IsFootInWater = IsBlockWater(BlockAtFoot);
@@ -348,15 +354,13 @@ void cPawn::HandleFalling(void)
 		{
 			Vector3i BlockTestPosition = CrossTestPosition.Floor() + BlockSampleOffsets[j];
 
-			if (!cChunkDef::IsValidHeight(BlockTestPosition.y))
-			{
-				continue;
-			}
-
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
 
-			GetWorld()->GetBlockTypeMeta(BlockTestPosition, BlockType, BlockMeta);
+			if (!cChunkDef::IsValidHeight(BlockTestPosition.y) || !a_Chunk.UnboundedRelGetBlock(cChunkDef::AbsoluteToRelative(BlockTestPosition), BlockType, BlockMeta))
+			{
+				continue;
+			}
 
 			/* we do the cross-shaped sampling to check for water / liquids, but only on our level because water blocks are never bigger than unit voxels */
 			if (j == 0)

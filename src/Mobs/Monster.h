@@ -61,7 +61,7 @@ public:
 
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
-	virtual void HandleFalling(void) override;
+	virtual void HandleFalling(cChunk & a_Chunk) override;
 
 	/** Engage pathfinder and tell it to calculate a path to a given position, and move the mob accordingly. */
 	virtual void MoveToPosition(const Vector3d & a_Position);  // tolua_export

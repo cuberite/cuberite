@@ -30,7 +30,7 @@ public:
 	virtual bool IsFireproof(void) const override;
 	virtual bool IsInvisible() const override;
 	virtual void HandleAir(void) override;
-	virtual void HandleFalling(void);
+	virtual void HandleFalling(cChunk & a_Chunk);
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 
 	/** Tells all pawns which are targeting us to stop targeting us. */
