@@ -97,6 +97,22 @@ public:
 
 
 
+/** Used to hash ChunkCoors in cChunkMap */
+class cChunkChoordHasher
+{
+  public:
+	// Use sum of lengths of first and last names
+	// as hash function.
+	size_t operator()(const cChunkCoords & a_Coords) const
+	{
+		// https://stackoverflow.com/questions/22826326/good-hashcode-function-for-2d-coordinates
+		size_t Temp = (a_Coords.m_ChunkZ + ((a_Coords.m_ChunkX + 1) / 2));
+		return a_Coords.m_ChunkX + (Temp * Temp);
+	}
+};
+
+
+
 
 /** Constants used throughout the code, useful typedefs and utility functions */
 class cChunkDef

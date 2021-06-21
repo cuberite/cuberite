@@ -299,7 +299,7 @@ private:
 
 	/** A map of chunk coordinates to chunks.
 	Uses a map (as opposed to unordered_map) because sorted maps are apparently faster. */
-	std::map<cChunkCoords, cChunk> m_Chunks;
+	std::unordered_map<cChunkCoords, cChunk, cChunkChoordHasher> m_Chunks;
 
 	cEvent m_evtChunkValid;  // Set whenever any chunk becomes valid, via ChunkValidated()
 
