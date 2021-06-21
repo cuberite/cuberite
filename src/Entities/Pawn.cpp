@@ -304,7 +304,7 @@ void cPawn::HandleFalling(cChunk & a_Chunk)
 	With this in mind, we first check the block at the player's feet, then the one below that (because fences),
 	and decide which behaviour we want to go with.
 	*/
-	BLOCKTYPE BlockAtFoot;
+	BLOCKTYPE BlockAtFoot = E_BLOCK_AIR;
 
 	if (!cChunkDef::IsValidHeight(POS_TOINT.y) || !a_Chunk.UnboundedRelGetBlockType(POS_TOINT, BlockAtFoot))
 	{
