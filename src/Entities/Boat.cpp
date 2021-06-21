@@ -182,8 +182,8 @@ void cBoat::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		return;
 	}
-
-	if (IsBlockWater(m_World->GetBlock(POS_TOINT)))
+	BLOCKTYPE BlockType;
+	if (a_Chunk.UnboundedRelGetBlockType(POS_TOINT, BlockType) && IsBlockWater(BlockType))
 	{
 		if (GetSpeedY() < 2)
 		{

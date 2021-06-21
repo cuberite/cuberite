@@ -75,9 +75,10 @@ void cEnderCrystal::SpawnOn(cClientHandle & a_ClientHandle)
 void cEnderCrystal::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
-	if ((m_World->GetDimension() == dimEnd) && (m_World->GetBlock(POS_TOINT) != E_BLOCK_FIRE))
+	BLOCKTYPE BlockType;
+	if ((m_World->GetDimension() == dimEnd) && a_Chunk.UnboundedRelGetBlockType(POS_TOINT, BlockType) && (BlockType != E_BLOCK_FIRE))
 	{
-		m_World->SetBlock(POS_TOINT, E_BLOCK_FIRE, 0);
+		a_Chunk.UnboundedRelSetBlock(POS_TOINT, E_BLOCK_FIRE, 0);
 	}
 }
 
