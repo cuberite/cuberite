@@ -152,12 +152,6 @@ void cChunk::BroadcastPendingChanges(void)
 		}
 	}
 
-	// Flush out all buffered data:
-	for (const auto ClientHandle : m_LoadedByClient)
-	{
-		ClientHandle->ProcessProtocolOut();
-	}
-
 	m_PendingSendBlocks.clear();
 	m_PendingSendBlockEntities.clear();
 }
