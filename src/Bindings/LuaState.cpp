@@ -1489,6 +1489,22 @@ bool cLuaState::GetStackValue(int a_StackPos, cUUID & a_Value)
 
 
 
+bool cLuaState::GetStackValue(int a_StackPos, std::string_view & a_Value)
+{
+	size_t Length = 0;
+	const char * const Value = lua_tolstring(m_LuaState, a_StackPos, &Length);
+	if (Value != nullptr)
+	{
+		a_Value = { Value, Length };
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
 template <typename T>
 bool cLuaState::GetStackValue(int a_StackPos, Vector3<T> & a_ReturnedVal)
 {
