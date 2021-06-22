@@ -10931,14 +10931,26 @@ a_Player:OpenWindow(Window);
 				},
 				SendMessage =
 				{
-					Params =
 					{
+						Params =
 						{
-							Name = "Message",
-							Type = "string",
+							{
+								Name = "Message",
+								Type = "string",
+							},
 						},
+						Notes = "Sends the specified message to the player.",
 					},
-					Notes = "Sends the specified message to the player.",
+					{
+						Params =
+						{
+							{
+								Name = "Message",
+								Type = "cCompositeChat",
+							},
+						},
+						Notes = "Sends the {{cCompositeChat}} to the player, using a severity defined by the CompositeChat's MessageType.",
+					},
 				},
 				SendMessageRaw =
 				{
@@ -14591,12 +14603,12 @@ end
 								Type = "string",
 							},
 							{
-								Name = "Prefix",
-								Type = "string",
+								Name = "SuppressPluginNamePrefix",
+								Type = "boolean",
 								IsOptional = true,
 							},
 						},
-						Notes = "Logs a text into the server console and logfile using 'normal' severity (gray text)",
+						Notes = "Logs a text into the server console and logfile using 'normal' severity (gray text).",
 					},
 					{
 						Params =
@@ -14606,145 +14618,77 @@ end
 								Type = "cCompositeChat",
 							},
 							{
-								Name = "Prefix",
-								Type = "string",
+								Name = "SuppressPluginNamePrefix",
+								Type = "boolean",
 								IsOptional = true,
 							},
 						},
-						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console. The severity is converted from the CompositeChat's MessageType.",
+						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console, using a severity defined by the CompositeChat's MessageType.",
 					},
 				},
 				LOGERROR =
 				{
+					Params =
 					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "string",
-							},
-							{
-								Name = "Prefix",
-								Type = "string",
-								IsOptional = true,
-							},
+							Name = "Message",
+							Type = "string",
 						},
-						Notes = "Logs a text into the server console and logfile using 'error' severity (black text on red background)",
-					},
-					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "cCompositeChat",
-							},
-							{
-								Name = "Prefix",
-								Type = "string",
-								IsOptional = true,
-							},
+							Name = "SuppressPluginNamePrefix",
+							Type = "boolean",
+							IsOptional = true,
 						},
-						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'error' severity (black text on red background)",
 					},
+					Notes = "Logs a text into the server console and logfile using 'error' severity (black text on red background).",
 				},
 				LOGINFO =
 				{
+					Params =
 					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "string",
-							},
-							{
-								Name = "Prefix",
-								Type = "string",
-								IsOptional = true,
-							},
+							Name = "Message",
+							Type = "string",
 						},
-						Notes = "Logs a text into the server console and logfile using 'info' severity (yellow text)",
-					},
-					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "cCompositeChat",
-							},
-							{
-								Name = "Prefix",
-								Type = "string",
-								IsOptional = true,
-							},
+							Name = "SuppressPluginNamePrefix",
+							Type = "boolean",
+							IsOptional = true,
 						},
-						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'info' severity (yellow text)",
 					},
+					Notes = "Logs a text into the server console and logfile using 'info' severity (yellow text).",
 				},
 				LOGWARN =
 				{
+					Params =
 					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "string",
-							},
-							{
-								Name = "Prefix",
-								Type = "string",
-								IsOptional = true,
-							},
+							Name = "Message",
+							Type = "string",
 						},
-						Notes = "Logs a text into the server console and logfile using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead",
-					},
-					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "cCompositeChat",
-							},
-							{
-								Name = "Prefix",
-								Type = "string",
-								IsOptional = true,
-							},
+							Name = "SuppressPluginNamePrefix",
+							Type = "boolean",
+							IsOptional = true,
 						},
-						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead",
 					},
+					Notes = "Logs a text into the server console and logfile using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead.",
 				},
 				LOGWARNING =
 				{
+					Params =
 					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "string",
-							},
-							{
-								Name = "Prefix",
-								Type = "string",
-								IsOptional = true,
-							},
+							Name = "Message",
+							Type = "string",
 						},
-						Notes = "Logs a text into the server console and logfile using 'warning' severity (red text)",
-					},
-					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "cCompositeChat",
-							},
-							{
-								Name = "Prefix",
-								Type = "string",
-								IsOptional = true,
-							},
+							Name = "SuppressPluginNamePrefix",
+							Type = "boolean",
+							IsOptional = true,
 						},
-						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'warning' severity (red text)",
 					},
+					Notes = "Logs a text into the server console and logfile using 'warning' severity (red text).",
 				},
 				md5 =
 				{

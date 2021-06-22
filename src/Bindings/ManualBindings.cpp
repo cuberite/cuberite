@@ -347,33 +347,37 @@ static int tolua_StringSplitAndTrim(lua_State * tolua_S)
 
 
 
-/** Retrieves the log message from the first param on the Lua stack.
-Can take either a string or a cCompositeChat.
-*/
-static void LogFromLuaStack(lua_State * tolua_S, eLogLevel a_LogLevel)
+/** Prints the message to the console, optionally formatting it with a plugin name prefix if the second param on the Lua stack is true. */
+static void LogFromLuaStack(lua_State * tolua_S, const std::string_view a_Message, const eLogLevel a_LogLevel)
 {
-	tolua_Error err;
-	AString Message;
-	size_t len = 0;
-	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
+	if (lua_isboolean(tolua_S, 2) && (lua_toboolean(tolua_S, 2) == 1))
 	{
-		Message = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->ExtractText();
+		Logger::LogSimple(a_Message, a_LogLevel);
 	}
 	else
 	{
-		Message = lua_tolstring(tolua_S, 1, &len);
+		Logger::LogSimple(fmt::format("[{}] {}", cManualBindings::GetLuaPlugin(tolua_S)->GetName(), a_Message), a_LogLevel);
+	}
+}
+
+
+
+
+
+/** Retrieves a string log message from the first param on the Lua stack, optionally prefixes it with plugin name, and prints it to the console. */
+static void LogFromLuaStack(lua_State * tolua_S, const eLogLevel a_LogLevel)
+{
+	cLuaState L(tolua_S);
+
+	// If there's no param, spit out an error message instead of crashing:
+	if (!L.CheckParamString(1))
+	{
+		return;
 	}
 
-	if (lua_isstring(tolua_S, 2))
-	{
-		auto Prefix = lua_tolstring(tolua_S, 2, &len);
-		Logger::LogSimple(fmt::format("{}{}", Prefix, Message), a_LogLevel);
-	}
-	else
-	{
-		auto Prefix = fmt::format("[{}] ", cManualBindings::GetLuaPlugin(tolua_S)->GetName());
-		Logger::LogSimple(fmt::format("{}{}", Prefix, Message), a_LogLevel);
-	}
+	std::string_view Message;
+	L.GetStackValue(1, Message);
+	LogFromLuaStack(tolua_S, Message, a_LogLevel);
 }
 
 
@@ -382,26 +386,20 @@ static void LogFromLuaStack(lua_State * tolua_S, eLogLevel a_LogLevel)
 
 static int tolua_LOG(lua_State * tolua_S)
 {
-	// If there's no param, spit out an error message instead of crashing:
-	if (lua_isnil(tolua_S, 1))
-	{
-		LOGWARNING("Attempting to LOG a nil value!");
-		cLuaState::LogStackTrace(tolua_S);
-		return 0;
-	}
-
-	// If the param is a cCompositeChat, read the log level from it:
-	eLogLevel LogLevel = eLogLevel::Regular;
+	// If the param is a cCompositeChat, read the data from it:
 	tolua_Error err;
 	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
 	{
-		LogLevel = cCompositeChat::MessageTypeToLogLevel(
-			static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->GetMessageType()
-		);
+		const auto CompositeChat = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+		if (CompositeChat != nullptr)  // isusertype returns true for nil values
+		{
+			LogFromLuaStack(tolua_S, CompositeChat->ExtractText(), cCompositeChat::MessageTypeToLogLevel(CompositeChat->GetMessageType()));
+			return 0;
+		}
 	}
 
 	// Log the message:
-	LogFromLuaStack(tolua_S, LogLevel);
+	LogFromLuaStack(tolua_S, eLogLevel::Regular);
 	return 0;
 }
 
@@ -411,14 +409,6 @@ static int tolua_LOG(lua_State * tolua_S)
 
 static int tolua_LOGINFO(lua_State * tolua_S)
 {
-	// If there's no param, spit out an error message instead of crashing:
-	if (lua_isnil(tolua_S, 1))
-	{
-		LOGWARNING("Attempting to LOGINFO a nil value!");
-		cLuaState::LogStackTrace(tolua_S);
-		return 0;
-	}
-
 	LogFromLuaStack(tolua_S, eLogLevel::Info);
 	return 0;
 }
@@ -429,14 +419,6 @@ static int tolua_LOGINFO(lua_State * tolua_S)
 
 static int tolua_LOGWARN(lua_State * tolua_S)
 {
-	// If there's no param, spit out an error message instead of crashing:
-	if (lua_isnil(tolua_S, 1))
-	{
-		LOGWARNING("Attempting to LOGWARN a nil value!");
-		cLuaState::LogStackTrace(tolua_S);
-		return 0;
-	}
-
 	LogFromLuaStack(tolua_S, eLogLevel::Warning);
 	return 0;
 }
@@ -447,14 +429,6 @@ static int tolua_LOGWARN(lua_State * tolua_S)
 
 static int tolua_LOGERROR(lua_State * tolua_S)
 {
-	// If there's no param, spit out an error message instead of crashing:
-	if (lua_isnil(tolua_S, 1))
-	{
-		LOGWARNING("Attempting to LOGERROR a nil value!");
-		cLuaState::LogStackTrace(tolua_S);
-		return 0;
-	}
-
 	LogFromLuaStack(tolua_S, eLogLevel::Error);
 	return 0;
 }
