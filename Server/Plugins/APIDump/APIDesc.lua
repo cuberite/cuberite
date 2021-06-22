@@ -13741,307 +13741,307 @@ end
 			{
 				AnimalsBred =
 				{
-					Notes = "",
+					Notes = "The number of times the player bred two mobs.",
 				},
 				AviateOneCm =
 				{
-					Notes = "",
+					Notes = "The total distance travelled by elytra.",
 				},
 				BellRing =
 				{
-					Notes = "",
+					Notes = "The number of times the player has rung a bell.",
 				},
 				BoatOneCm =
 				{
-					Notes = "",
+					Notes = "The total distance travelled by boats.",
 				},
 				CleanArmor =
 				{
-					Notes = "",
+					Notes = "The number of dyed leather armors washed with a cauldron.",
 				},
 				CleanBanner =
 				{
-					Notes = "",
+					Notes = "The number of banner patterns washed with a cauldron.",
 				},
 				CleanShulkerBox =
 				{
-					Notes = "",
+					Notes = "The number of times the player has washed a Shulker Box with a cauldron.",
 				},
 				ClimbOneCm =
 				{
-					Notes = "",
+					Notes = "The total distance travelled up ladders or vines.",
 				},
 				CrouchOneCm =
 				{
-					Notes = "",
+					Notes = "The total distance walked while sneaking.",
 				},
 				DamageAbsorbed =
 				{
-					Notes = "",
+					Notes = "The amount of damage the player has absorbed in tenths of 1.",
 				},
 				DamageBlockedByShield =
 				{
-					Notes = "",
+					Notes = "The amount of damage the player has blocked with a shield in tenths of 1.",
 				},
 				DamageDealt =
 				{
-					Notes = "",
+					Notes = "The amount of damage the player has dealt in tenths 1. Includes only melee attacks.",
 				},
 				DamageDealtAbsorbed =
 				{
-					Notes = "",
+					Notes = "The amount of damage the player has dealt that was absorbed, in tenths of 1.",
 				},
 				DamageDealtResisted =
 				{
-					Notes = "",
+					Notes = "The amount of damage the player has dealt that was resisted, in tenths of 1.",
 				},
 				DamageResisted =
 				{
-					Notes = "",
+					Notes = "The amount of damage the player has resisted in tenths of 1.",
 				},
 				DamageTaken =
 				{
-					Notes = "",
+					Notes = "The amount of damage the player has taken in tenths of 1.",
 				},
 				Deaths =
 				{
-					Notes = "",
+					Notes = "The number of times the player died.",
 				},
 				Drop =
 				{
-					Notes = "",
+					Notes = "The number of items the drop key was pressed.",
 				},
 				EatCakeSlice =
 				{
-					Notes = "",
+					Notes = "The number of cake slices eaten.",
 				},
 				EnchantItem =
 				{
-					Notes = "",
+					Notes = "The number of items enchanted.",
 				},
 				FallOneCm =
 				{
-					Notes = "",
+					Notes = "The total distance fallen.",
 				},
 				FillCauldron =
 				{
-					Notes = "",
+					Notes = "The number of times the player filled cauldrons with water buckets.",
 				},
 				FishCaught =
 				{
-					Notes = "",
+					Notes = "The number of fish caught.",
 				},
 				FlyOneCm =
 				{
-					Notes = "",
+					Notes = "The total distance flown.",
 				},
 				HorseOneCm =
 				{
-					Notes = "",
+					Notes = "The total distance travelled by horses.",
 				},
 				InspectDispenser =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with dispensers.",
 				},
 				InspectDropper =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with droppers.",
 				},
 				InspectHopper =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with hoppers.",
 				},
 				InteractWithAnvil =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with anvils.",
 				},
 				InteractWithBeacon =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with beacons.",
 				},
 				InteractWithBlastFurnace =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with Blast Furnaces.",
 				},
 				InteractWithBrewingstand =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with brewing stands.",
 				},
 				InteractWithCampfire =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with campfires.",
 				},
 				InteractWithCartographyTable =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with cartography tables.",
 				},
 				InteractWithCraftingTable =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with crafting tables.",
 				},
 				InteractWithFurnace =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with furnaces.",
 				},
 				InteractWithGrindstone =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with grindstones.",
 				},
 				InteractWithLectern =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with lecterns.",
 				},
 				InteractWithLoom =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with looms.",
 				},
 				InteractWithSmithingTable =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with smithing tables.",
 				},
 				InteractWithSmoker =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with smokers.",
 				},
 				InteractWithStonecutter =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with stonecutters.",
 				},
 				JunkFished =
 				{
-					Notes = "",
+					Notes = "The amount of junk fished.",
 				},
 				Jump =
 				{
-					Notes = "",
+					Notes = "The number of jumps performed.",
 				},
 				LeaveGame =
 				{
-					Notes = "",
+					Notes = "The number of times disconnected from the server.",
 				},
 				MinecartOneCm =
 				{
-					Notes = "",
+					Notes = "The total distance travelled by minecarts.",
 				},
 				MobKills =
 				{
-					Notes = "",
+					Notes = "The number of mobs the player killed.",
 				},
 				OpenBarrel =
 				{
-					Notes = "",
+					Notes = "The number of times the player has opened a barrel.",
 				},
 				OpenChest =
 				{
-					Notes = "",
+					Notes = "The number of times the player opened chests.",
 				},
 				OpenEnderchest =
 				{
-					Notes = "",
+					Notes = "The number of times the player opened ender chests.",
 				},
 				OpenShulkerBox =
 				{
-					Notes = "",
+					Notes = "The number of times the player has opened a shulker box.",
 				},
 				PigOneCm =
 				{
-					Notes = "",
+					Notes = "The total distance travelled by pigs via saddles.",
 				},
 				PlayNoteblock =
 				{
-					Notes = "",
+					Notes = "The number of note blocks hit.",
 				},
 				PlayOneMinute =
 				{
-					Notes = "",
+					Notes = "The total time played.",
 				},
 				PlayRecord =
 				{
-					Notes = "",
+					Notes = "The number of music discs played on a jukebox.",
 				},
 				PlayerKills =
 				{
-					Notes = "",
+					Notes = "The number of players the player directly killed.",
 				},
 				PotFlower =
 				{
-					Notes = "",
+					Notes = "The number of plants potted into flower pots.",
 				},
 				RaidTrigger =
 				{
-					Notes = "",
+					Notes = "The number of times the player has triggered a raid.",
 				},
 				RaidWin =
 				{
-					Notes = "",
+					Notes = "The number of times the player has won a raid.",
 				},
 				SleepInBed =
 				{
-					Notes = "",
+					Notes = "The number of times the player has slept in a bed.",
 				},
 				SneakTime =
 				{
-					Notes = "",
+					Notes = "The time the player has held down the sneak button.",
 				},
 				SprintOneCm =
 				{
-					Notes = "",
+					Notes = "The total distance sprinted.",
 				},
 				StriderOneCm =
 				{
-					Notes = "",
+					Notes = "The total distance travelled by striders via saddles.",
 				},
 				SwimOneCm =
 				{
-					Notes = "",
+					Notes = "The total distance swum.",
 				},
 				TalkedToVillager =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with villagers (opened the trading GUI).",
 				},
 				TargetHit =
 				{
-					Notes = "",
+					Notes = "The number of times the player has shot a target block.",
 				},
 				TimeSinceDeath =
 				{
-					Notes = "",
+					Notes = "The time since the player's last death.",
 				},
 				TimeSinceRest =
 				{
-					Notes = "",
+					Notes = "The time since the player's last rest. This is used to spawn phantoms.",
 				},
 				TradedWithVillager =
 				{
-					Notes = "",
+					Notes = "The number of times traded with villagers.",
 				},
 				TreasureFished =
 				{
-					Notes = "",
+					Notes = "The number of treasures fished.",
 				},
 				TriggerTrappedChest =
 				{
-					Notes = "",
+					Notes = "The number of times the player opened trapped chests.",
 				},
 				TuneNoteblock =
 				{
-					Notes = "",
+					Notes = "The number of times interacted with note blocks.",
 				},
 				UseCauldron =
 				{
-					Notes = "",
+					Notes = "The number of times the player took water from cauldrons with glass bottles.",
 				},
 				WalkOnWaterOneCm =
 				{
-					Notes = "",
+					Notes = "The distance covered while bobbing up and down over water.",
 				},
 				WalkOneCm =
 				{
-					Notes = "",
+					Notes = "The total distance walked.",
 				},
 				WalkUnderWaterOneCm =
 				{
-					Notes = "",
+					Notes = "The total distance walked underwater.",
 				},
 			},
 		},
