@@ -36,7 +36,7 @@ local function LoadAPIFiles(a_Folder, a_DstTable)
 				if (a_DstTable[k]) then
 					-- The class is documented in two files, warn and store into a file (so that CIs can mark build as failure):
 					LOGWARNING(string.format(
-						"class %s is documented at two places, the documentation in file %s will overwrite the previously loaded one!",
+						"Warning: class %s is documented at two places, the documentation in file %s will overwrite the previously loaded one!",
 						k, FileName
 					))
 					local f = io.open("DuplicateDocs.txt", "a")
