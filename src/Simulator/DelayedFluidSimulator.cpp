@@ -26,13 +26,17 @@ bool cDelayedFluidSimulatorChunkData::cSlot::Add(Vector3i a_RelPos)
 		return false;
 	}
 
+	auto OldCount = m_Blocks.size();
+
 	int Index = cChunkDef::MakeIndex(a_RelPos);
-	if (m_Blocks.find(Index) == m_Blocks.end())
+	if (m_Blocks.count(Index) == 1)
 	{
 		return false;
 	}
 
 	m_Blocks.insert(std::make_pair(Index, a_RelPos));
+
+	ASSERT(OldCount + 1 == m_Blocks.size());
 	return true;
 }
 
@@ -109,7 +113,7 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 
 void cDelayedFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block)
 {
-	if ((a_Block != m_FluidBlock) && cBlockFluidHandler::GetFalloff(a_Block) != m_StationaryFalloffValue)
+	if (a_Block.Type() != m_FluidBlock)
 	{
 		return;
 	}
@@ -122,11 +126,6 @@ void cDelayedFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, Blo
 		return;
 	}
 
-	while (ChunkData->m_Slots.size() <= m_AddSlotNum)
-	{
-		ChunkData->m_Slots.push_back(cDelayedFluidSimulatorChunkData::cSlot());
-	}
-
 	auto & Slot = ChunkData->m_Slots[m_AddSlotNum];
 
 	// Add, if not already present:
@@ -135,7 +134,7 @@ void cDelayedFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, Blo
 		return;
 	}
 
-	++m_TotalBlocks;
+	m_TotalBlocks++;
 }
 
 

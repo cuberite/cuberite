@@ -131,7 +131,7 @@ bool cFluidSimulator::IsHigherMeta(unsigned char a_Falloff1, unsigned char a_Fal
 		// Source block is higher than anything, even itself.
 		return true;
 	}
-	if ((a_Falloff1 & 0x08) != 0)
+	if (a_Falloff1 >= 8)
 	{
 		// Falling fluid is higher than anything, including self
 		return true;
@@ -142,7 +142,7 @@ bool cFluidSimulator::IsHigherMeta(unsigned char a_Falloff1, unsigned char a_Fal
 		// Second block is a source and first block isn't
 		return false;
 	}
-	if ((a_Falloff2 & 0x08) != 0)
+	if (a_Falloff2 >= 8)
 	{
 		// Second block is falling and the first one is neither a source nor falling
 		return false;
