@@ -422,8 +422,8 @@ cWorld::cWorld(
 
 	// Simulators:
 	m_SimulatorManager  = std::make_unique<cSimulatorManager>(*this);
-	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", BlockType::Lava);
-	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  BlockType::Water);
+	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", BlockType::Water);
+	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  BlockType::Lava);
 	m_SandSimulator     = std::make_unique<cSandSimulator>(*this, IniFile);
 	m_FireSimulator     = std::make_unique<cFireSimulator>(*this, IniFile);
 	m_RedstoneSimulator = InitializeRedstoneSimulator(IniFile);

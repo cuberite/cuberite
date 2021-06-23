@@ -1228,12 +1228,12 @@ void cChunk::WakeUpSimulators(void)
 
 		for (size_t BlockIdx = 0; BlockIdx != ChunkBlockData::SectionBlockCount; ++BlockIdx)
 		{
-			const auto BlockType = (*Section)[BlockIdx];
+			const auto Block = (*Section)[BlockIdx];
 			const auto Position = cChunkDef::IndexToCoordinate(BlockIdx + SectionIdx * ChunkBlockData::SectionBlockCount);
 
-			RedstoneSimulator->AddBlock(*this, Position, BlockType);
-			WaterSimulator->AddBlock(*this, Position, BlockType);
-			LavaSimulator->AddBlock(*this, Position, BlockType);
+			RedstoneSimulator->AddBlock(*this, Position, Block);
+			WaterSimulator->AddBlock(*this, Position, Block);
+			LavaSimulator->AddBlock(*this, Position, Block);
 		}
 	}
 }
@@ -1287,8 +1287,8 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block
 	}
 
 	bool ReplacingLiquids = (
-		((OldBlock.Type() == BlockType::Water)            || (a_Block.Type() == BlockType::Water)) ||  // Replacing water with stationary water
-		((OldBlock.Type() == BlockType::Lava)             || (a_Block.Type() == BlockType::Lava))      // Replacing lava with stationary lava
+		((OldBlock.Type() == BlockType::Water)            && (a_Block.Type() == BlockType::Water)) ||  // Replacing water with stationary water
+		((OldBlock.Type() == BlockType::Lava)             && (a_Block.Type() == BlockType::Lava))      // Replacing lava with stationary lava
 	);
 
 	if (!ReplacingLiquids)
@@ -1300,7 +1300,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block
 
 	// Queue block to be sent only if ...
 	if (
-		!(cBlockLeavesHandler::IsBlockLeaves(OldBlock) || cBlockLeavesHandler::IsBlockLeaves(a_Block)) &&  // ... the old and new blocktypes AREN'T leaves (because the client doesn't need meta updates)
+		!(cBlockLeavesHandler::IsBlockLeaves(OldBlock) && cBlockLeavesHandler::IsBlockLeaves(a_Block)) &&  // ... the old and new blocktypes AREN'T leaves (because the client doesn't need meta updates)
 		// ... AND ...
 		(!ReplacingLiquids)
 	)
