@@ -88,6 +88,11 @@ function(set_global_flags)
 
 		# Make build use Unicode:
 		add_compile_definitions(UNICODE _UNICODE)
+
+		# Turn off CRT warnings:
+		add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+
+		return ()
 	endif()
 
 	# Allow for a forced 32-bit build under 64-bit OS:
@@ -99,7 +104,7 @@ function(set_global_flags)
 	# https://en.wikipedia.org/wiki/Uname
 	# https://gcc.gnu.org/onlinedocs/gcc/index.html
 	# Have the compiler generate code specifically targeted at the current machine on Linux:
-	if(UNIX AND NOT NO_NATIVE_OPTIMIZATION AND NOT CMAKE_CROSSCOMPILING)
+	if(NOT NO_NATIVE_OPTIMIZATION AND NOT CMAKE_CROSSCOMPILING)
 		string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} SYSTEM_PROCESSOR)
 		if (SYSTEM_PROCESSOR MATCHES "^(i386|i686|x86|amd64|mips)")
 			message(STATUS "Optimising for this machine (march=native)")
