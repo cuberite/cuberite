@@ -18,10 +18,7 @@
 #include "../Root.h"
 #include "../WebAdmin.h"
 
-extern "C"
-{
-	#include "lua/src/lauxlib.h"
-}
+#include "lua/src/lauxlib.h"
 
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
