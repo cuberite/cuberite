@@ -116,12 +116,12 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, Vector3i a_RelPos)
 		// If source creation is on, check for it here:
 		if (
 			(m_NumNeighborsForSource > 0) &&    // Source creation is on
-			(OldFalloff == m_Falloff) &&            // Only exactly one block away from a source (fast bail-out)
+			(OldFalloff == m_Falloff) &&        // Only exactly one block away from a source (fast bail-out)
 			(
-				!IsPassableForFluid(Below) ||  // Only exactly 1 block deep
+				!IsPassableForFluid(Below) ||   // Only exactly 1 block deep
 				((Below.Type() == m_FluidBlock) && (cBlockFluidHandler::GetFalloff(Below) == m_StationaryFalloffValue))  // Or a source block underneath
-			) /*&&
-			CheckNeighborsForSource(a_Chunk, a_RelPos)  // Did we create a source? */
+			) &&
+			CheckNeighborsForSource(a_Chunk, a_RelPos)  // Did we create a source?
 		)
 		{
 			// We created a source, no more spreading is to be done now
@@ -170,6 +170,10 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, Vector3i a_RelPos
 			{
 				continue;
 			}
+			if (!IsFluidBlock(Neighbor.Type()))
+			{
+				continue;
+			}
 			if (IsAllowedBlock(Neighbor) && IsHigherMeta(cBlockFluidHandler::GetFalloff(Neighbor), a_OldFalloff))
 			{
 				// This block is fed, no more processing needed
@@ -188,8 +192,8 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, Vector3i a_RelPos
 		FLUID_FLOG("  Not fed and downwards, turning into non-downwards meta {0}", m_Falloff);
 		switch (m_FluidBlock)
 		{
-			case BlockType::Lava:  a_Chunk->FastSetBlock(a_RelPos,  Block::Lava::Lava(m_Falloff));   break;
-			case BlockType::Water: a_Chunk->FastSetBlock (a_RelPos, Block::Water::Water(m_Falloff)); break;
+			case BlockType::Lava:  a_Chunk->SetBlock(a_RelPos,  Block::Lava::Lava (m_Falloff)); break;
+			case BlockType::Water: a_Chunk->SetBlock(a_RelPos, Block::Water::Water(m_Falloff)); break;
 			default: UNREACHABLE("Unsupported Fluid Block");
 		}
 	}
@@ -201,8 +205,8 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, Vector3i a_RelPos
 			FLUID_FLOG("  Not fed, decreasing from {0} to {1}", a_OldFalloff - m_Falloff, a_OldFalloff);
 			switch (m_FluidBlock)
 			{
-				case BlockType::Lava:  a_Chunk->FastSetBlock(a_RelPos,  Block::Lava::Lava(a_OldFalloff));   break;
-				case BlockType::Water: a_Chunk->FastSetBlock (a_RelPos, Block::Water::Water(a_OldFalloff)); break;
+				case BlockType::Lava:  a_Chunk->SetBlock(a_RelPos, Block::Lava::Lava(a_OldFalloff));   break;
+				case BlockType::Water: a_Chunk->SetBlock(a_RelPos, Block::Water::Water(a_OldFalloff)); break;
 				default: UNREACHABLE("Unsupported Fluid Block");
 			}
 		}
@@ -308,8 +312,8 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, Vector3i a_Re
 	FLUID_FLOG("  Spreading to {0} with meta {1}", AbsPos, a_NewFalloff);
 	switch (m_FluidBlock)
 	{
-		case BlockType::Lava:  a_NearChunk->FastSetBlock(RelPos, Block::Lava::Lava(a_NewFalloff));   break;
-		case BlockType::Water: a_NearChunk->FastSetBlock(RelPos, Block::Water::Water(a_NewFalloff)); break;
+		case BlockType::Lava:  a_NearChunk->SetBlock(RelPos, Block::Lava::Lava(a_NewFalloff));   break;
+		case BlockType::Water: a_NearChunk->SetBlock(RelPos, Block::Water::Water(a_NewFalloff)); break;
 		default: UNREACHABLE("Unsupported Fluid Block");
 	}
 
@@ -345,8 +349,8 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, Vector3i a
 				FLUID_FLOG("    Found enough neighbor sources, turning into a source");
 				switch (m_FluidBlock)
 				{
-					case BlockType::Lava:  a_Chunk->FastSetBlock(a_RelPos, Block::Lava::Lava());   break;
-					case BlockType::Water: a_Chunk->FastSetBlock(a_RelPos, Block::Water::Water()); break;
+					case BlockType::Lava:  a_Chunk->SetBlock(a_RelPos, Block::Lava::Lava());   break;
+					case BlockType::Water: a_Chunk->SetBlock(a_RelPos, Block::Water::Water()); break;
 					default: UNREACHABLE("Unsupported Fluid Block");
 				}
 				return true;
