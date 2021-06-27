@@ -31,4 +31,9 @@ private:
 		// Don't drop anything:
 		return {};
 	}
+
+	virtual bool FullyOccupiesVoxel(const BlockState a_Block) const override
+	{
+		return false;
+	}
 };
