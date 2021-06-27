@@ -34,7 +34,7 @@ protected:
 	virtual void SimulateBlock(cChunk * a_Chunk, Vector3i a_RelPos) override;
 
 	/** Checks tributaries, if not fed, decreases the block's level and returns true. */
-	bool CheckTributaries(cChunk * a_Chunk, Vector3i a_RelPos, unsigned char a_Falloff);
+	bool CheckTributaries(cChunk * a_Chunk, Vector3i a_RelPos, unsigned char a_OldFalloff);
 
 	/** Spreads into the specified block, if the blocktype there allows. a_Area is for checking. */
 	void SpreadToNeighbor(cChunk * a_NearChunk, Vector3i a_RelPos, unsigned char a_NewFalloff);
@@ -44,7 +44,7 @@ protected:
 
 	/** Checks if the specified block should harden (Water / Lava interaction) and if so, converts it to a suitable block.
 	Returns whether the block was changed or not. */
-	bool HardenBlock(cChunk * a_Chunk, Vector3i a_RelPos, BlockType a_Block);
+	bool HardenBlock(cChunk * a_Chunk, Vector3i a_RelPos, BlockType a_Block, unsigned char a_NewFalloff);
 
 	/** Spread fluid to XZ neighbors.
 	The coords are of the block currently being processed; a_NewMeta is the new meta for the new fluid block.
