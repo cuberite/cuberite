@@ -1,10 +1,7 @@
-
 #include "Globals.h"
 
 #include "FluidSimulator.h"
-#include "../Chunk.h"
 #include "../World.h"
-#include "../Blocks/BlockFluid.h"
 
 
 
@@ -165,7 +162,7 @@ Vector3f cFluidSimulator::GetFlowingDirection(Vector3i a_Pos)
 
 	auto Self = m_World.GetBlock(a_Pos);
 
-	if (!IsAllowedBlock(m_World.GetBlock(a_Pos)))  // No Fluid -> No Flowing direction :D
+	if (!IsAllowedBlock(Self))  // No Fluid -> No Flowing direction :D
 	{
 		return {};
 	}
@@ -208,7 +205,7 @@ Vector3f cFluidSimulator::GetFlowingDirection(Vector3i a_Pos)
 	Direction.x = (LevelPoint[0] - LevelPoint[2]) / 2.0f;
 	Direction.z = (LevelPoint[1] - LevelPoint[3]) / 2.0f;
 
-	if ((cBlockFluidHandler::GetFalloff(Self) & 0x08) != 0)  // Test falling bit
+	if (cBlockFluidHandler::GetFalloff(Self) >= 8)  // Test falling bit
 	{
 		Direction.y = -1.0f;
 	}
