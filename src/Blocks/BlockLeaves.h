@@ -222,82 +222,14 @@ private:
 
 
 
-
-
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
+	/** Returns true if the area contains a continous path from the specified block to a log block entirely made out of leaves blocks. */
+	static bool HasNearLog(cBlockArea & a_Area, const Vector3i a_BlockPos)
 	{
-		using namespace Block;
-		auto Self = a_ChunkInterface.GetBlock(a_BlockPos);
-
-		switch (Self.Type())
-		{  // TODO (12xx12) NONONO
-			case BlockType::AcaciaLeaves:  a_ChunkInterface.FastSetBlock(a_BlockPos, AcaciaLeaves::AcaciaLeaves  (AcaciaLeaves::Distance(Self), false)); break;
-			case BlockType::BirchLeaves:   a_ChunkInterface.FastSetBlock(a_BlockPos, BirchLeaves::BirchLeaves    (BirchLeaves::Distance(Self), false)); break;
-			case BlockType::DarkOakLeaves: a_ChunkInterface.FastSetBlock(a_BlockPos, DarkOakLeaves::DarkOakLeaves(DarkOakLeaves::Distance(Self), false)); break;
-			case BlockType::JungleLeaves:  a_ChunkInterface.FastSetBlock(a_BlockPos, JungleLeaves::JungleLeaves  (JungleLeaves::Distance(Self), false)); break;
-			case BlockType::OakLeaves:     a_ChunkInterface.FastSetBlock(a_BlockPos, OakLeaves::OakLeaves        (OakLeaves::Distance(Self), false)); break;
-			case BlockType::SpruceLeaves:  a_ChunkInterface.FastSetBlock(a_BlockPos, SpruceLeaves::SpruceLeaves  (SpruceLeaves::Distance(Self), false)); break;
-			default: return;
-		}
-	}
-
-
-
-
-
-	virtual void OnUpdate(
-		cChunkInterface & a_ChunkInterface,
-		cWorldInterface & a_WorldInterface,
-		cBlockPluginInterface & a_PluginInterface,
-		cChunk & a_Chunk,
-		const Vector3i a_RelPos
-	) const override
-	{
-		auto Self = a_Chunk.GetBlock(a_RelPos);
-
-		if (IsLeafPersistent(Self))
-		{
-			return;
-		}
-
-		// Get the data around the leaves:
-		auto AbsPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-
-		// Get new distance from Log
-		SetNewLeafDistance(a_Chunk.GetWorld(), AbsPos, Self);
-
-		// If distance > breaking distance - replace with air
-		if (GetLeafDistance(Self) <= LEAVES_CHECK_DISTANCE)
-		{
-			return;
-		}
-		// Decay the leaves:
-		a_ChunkInterface.DropBlockAsPickups(AbsPos);
-		return;
-	}
-
-
-
-
-
-	void SetNewLeafDistance(cWorld * a_World, Vector3i a_BlockPos, BlockState & a_Block) const
-	{
-		cBlockArea Area;
-		if (!Area.Read(
-			*a_World,
-			a_BlockPos - Vector3i(LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE),
-			a_BlockPos + Vector3i(LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE),
-			cBlockArea::baBlocks)
-			)
-		{
-			// Cannot check leaves, a chunk is missing too close
-			return;
-		}
 		// Filter the blocks into a {leaves, log, other (air)} set:
-		auto Types = Area.GetBlocks();
-		for (size_t I = 0; I < Area.GetBlockCount(); I++)
+		auto * Types = a_Area.GetBlocks();
+		for (size_t i = a_Area.GetBlockCount() - 1; i > 0; i--)
 		{
-			switch (Types[I].Type())
+			switch (Types[i].Type())
 			{
 				case BlockType::AcaciaLeaves:
 				case BlockType::BirchLeaves:
@@ -305,7 +237,6 @@ private:
 				case BlockType::JungleLeaves:
 				case BlockType::OakLeaves:
 				case BlockType::SpruceLeaves:
-
 				case BlockType::AcaciaLog:
 				case BlockType::BirchLog:
 				case BlockType::DarkOakLog:
@@ -317,22 +248,20 @@ private:
 				}
 				default:
 				{
-					Types[I] = Block::Air::Air();
+					Types[i] = Block::Air::Air();
 					break;
 				}
 			}
 		}  // for i - Types[]
 
-#define OffsetValue 10000
-
-		// Perform a breadth-first search to see if there's a log connected within 6 blocks of the leaves block:
+		// Perform a breadth-first search to see if there's a log connected within 4 blocks of the leaves block:
 		// Simply replace all reachable leaves blocks with a sponge block plus iteration (in the Area) and see if we can reach a log
-		Area.SetBlock(a_BlockPos, OffsetValue);
-		for (unsigned char i = 0; i < LEAVES_CHECK_DISTANCE; i++)
+		a_Area.SetBlock(a_BlockPos, Block::Sponge::Sponge());
+		for (int i = 0; i < LEAVES_CHECK_DISTANCE; i++)
 		{
-			auto ProcessNeighbor = [&Area, i](int X, int Y, int Z) -> bool
+			auto ProcessNeighbor = [&a_Area, i](int cbx, int cby, int cbz) -> bool
 			{
-				switch (Area.GetBlock({X, Y, Z}).Type())
+				switch (a_Area.GetBlock({cbx, cby, cbz}).Type())
 				{
 					case BlockType::AcaciaLeaves:
 					case BlockType::BirchLeaves:
@@ -340,15 +269,13 @@ private:
 					case BlockType::JungleLeaves:
 					case BlockType::OakLeaves:
 					case BlockType::SpruceLeaves:
-						Area.SetBlock({X, Y, Z}, BlockState(OffsetValue + i + 1)); break;
+						a_Area.SetBlock({cbx, cby, cbz}, BlockState(static_cast<uint_least16_t>(Block::Sponge::Sponge().ID + i + 1))); break;
 					case BlockType::AcaciaLog:
 					case BlockType::BirchLog:
 					case BlockType::DarkOakLog:
 					case BlockType::JungleLog:
 					case BlockType::OakLog:
-					case BlockType::SpruceLog:
-						return true;
-					default: break;
+					case BlockType::SpruceLog: return true;
 				}
 				return false;
 			};
@@ -358,7 +285,7 @@ private:
 				{
 					for (int x = a_BlockPos.x - i; x <= a_BlockPos.x + i; x++)
 					{
-						if (Area.GetBlock({x, y, z}).ID != OffsetValue + i)
+						if (a_Area.GetBlock({x, y, z}).ID != Block::Sponge::Sponge().ID + i)
 						{
 							continue;
 						}
@@ -371,16 +298,53 @@ private:
 							ProcessNeighbor(x,     y - 1, z)
 							)
 						{
-							a_Block = SetLeaveDistance(a_Block, i);
-							return;
+							return true;
 						}
 					}  // for x
 				}  // for z
 			}  // for y
 		}  // for i - BFS iterations
+		return false;
+	}
 
-		// No wood nearby - destroy the leaf
-		a_Block = SetLeaveDistance(a_Block, LEAVES_CHECK_DISTANCE + 1);
+
+
+	virtual void OnUpdate(
+			cChunkInterface & a_ChunkInterface,
+			cWorldInterface & a_WorldInterface,
+			cBlockPluginInterface & a_PluginInterface,
+			cChunk & a_Chunk,
+			const Vector3i a_RelPos
+	) const override
+	{
+		auto Self = a_Chunk.GetBlock(a_RelPos);
+
+		if (IsLeafPersistent(Self))
+		{
+			return;
+		}
+
+		// Get the data around the leaves:
+		auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+		cBlockArea Area;
+		if (!Area.Read(
+			*a_Chunk.GetWorld(),
+			WorldPos - Vector3i(LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE),
+			WorldPos + Vector3i(LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE),
+			cBlockArea::baBlocks)
+		)
+		{
+			// Cannot check leaves, a chunk is missing too close
+			return;
+		}
+
+		if (HasNearLog(Area, WorldPos))
+		{
+			return;
+		}
+
+		// Decay the leaves:
+		a_ChunkInterface.DropBlockAsPickups(WorldPos);
 	}
 
 
