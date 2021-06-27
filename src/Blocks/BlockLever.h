@@ -70,17 +70,21 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		auto Self = a_Chunk.GetBlock(a_Position);
-
 		// Find the type of block the lever is attached to:
-		auto NeighborFace = Block::Lever::Facing(Self);
-		auto NeighborPos = AddFaceDirection(a_RelPos, NeighborFace, true);
+		eBlockFace NeighbourFace;
+		switch (Block::Lever::Face(a_Self))
+		{
+			case Block::Lever::Face::Floor:   NeighbourFace = BLOCK_FACE_YP; break;
+			case Block::Lever::Face::Ceiling: NeighbourFace = BLOCK_FACE_YM; break;
+			case Block::Lever::Face::Wall:    NeighbourFace = Block::Lever::Facing(a_Self); break;
+		}
+		auto NeighborPos = AddFaceDirection(a_Position, NeighbourFace, true);
 		if (!cChunkDef::IsValidHeight(NeighborPos.y))
 		{
 			return false;
 		}
 
-		BlockState Neighbour = 0;
+		BlockState Neighbour;
 		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, Neighbour))
 		{
 			return false;
@@ -94,7 +98,7 @@ private:
 
 		else if (cBlockSlabHandler::IsAnySlabType(Neighbour))
 		{
-			switch (Block::Lever::Face(Self))
+			switch (Block::Lever::Face(a_Self))
 			{
 				case Block::Lever::Face::Floor:   return cBlockSlabHandler::IsSlabTop(Neighbour);
 				case Block::Lever::Face::Wall:    return false;

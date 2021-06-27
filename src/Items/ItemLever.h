@@ -29,7 +29,7 @@ private:
 			case BLOCK_FACE_ZP:
 			{
 				Facing = Block::Lever::Face::Wall;
-				break;
+				return a_Player.PlaceBlock(a_PlacePosition, Block::Lever::Lever(Facing, a_ClickedBlockFace, false));
 			}
 			case BLOCK_FACE_YM:
 			{
@@ -44,6 +44,7 @@ private:
 			default: return false;
 		}
 
-		return a_Player.PlaceBlock(a_PlacePosition, Block::Lever::Lever(Facing, RotationToBlockFace(a_Player.GetYaw()), false));
+		auto Lever = Block::Lever::Lever(Facing, RotationToBlockFace(a_Player.GetYaw()), false);
+		return a_Player.PlaceBlock(a_PlacePosition, Lever);
 	}
 };
