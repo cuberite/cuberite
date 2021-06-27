@@ -710,6 +710,7 @@ LIGHTTYPE cBlockInfo::GetSpreadLightFalloff(BlockState a_Block)
 		case BlockType::GrayStainedGlass:
 		case BlockType::GrayStainedGlassPane:
 		case BlockType::GrayWallBanner:
+		case BlockType::Grass:
 		case BlockType::GreenBanner:
 		case BlockType::GreenBed:
 		case BlockType::GreenCarpet:
@@ -1791,6 +1792,7 @@ bool cBlockInfo::IsTransparent(BlockState a_Block)
 		case BlockType::GrayStainedGlass:
 		case BlockType::GrayStainedGlassPane:
 		case BlockType::GrayWallBanner:
+		case BlockType::Grass:
 		case BlockType::GreenBanner:
 		case BlockType::GreenBed:
 		case BlockType::GreenCarpet:
