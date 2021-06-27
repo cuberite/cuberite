@@ -209,15 +209,15 @@ eBlockFace RotationToBlockFace(double a_Rotation, bool a_Inverse)
 		{
 			return eBlockFace::BLOCK_FACE_NORTH;
 		}
-		if ((-45 > a_Rotation) || (a_Rotation >= -135))  // -90
+		if ((-45 > a_Rotation) && (a_Rotation >= -135))  // -90
 		{
 			return eBlockFace::BLOCK_FACE_EAST;
 		}
-		if ((45 > a_Rotation)  || (a_Rotation >= -45))  // 0
+		if ((45 > a_Rotation)  && (a_Rotation >= -45))  // 0
 		{
 			return eBlockFace::BLOCK_FACE_SOUTH;
 		}
-		if ((135 > a_Rotation) || (a_Rotation >= 45))  // 90
+		if ((135 > a_Rotation) && (a_Rotation >= 45))  // 90
 		{
 			return eBlockFace::BLOCK_FACE_WEST;
 		}
@@ -228,15 +228,15 @@ eBlockFace RotationToBlockFace(double a_Rotation, bool a_Inverse)
 		{
 			return eBlockFace::BLOCK_FACE_SOUTH;
 		}
-		if ((-45 > a_Rotation) || (a_Rotation >= -135))   // -90
+		if ((-45 > a_Rotation) && (a_Rotation >= -135))   // -90
 		{
 			return eBlockFace::BLOCK_FACE_WEST;
 		}
-		if ((45 > a_Rotation)  || (a_Rotation >= -45))    // 0
+		if ((45 > a_Rotation)  && (a_Rotation >= -45))    // 0
 		{
 			return eBlockFace::BLOCK_FACE_NORTH;
 		}
-		if ((135 > a_Rotation) || (a_Rotation >= 45))      // 90
+		if ((135 > a_Rotation) && (a_Rotation >= 45))      // 90
 		{
 			return eBlockFace::BLOCK_FACE_EAST;
 		}
