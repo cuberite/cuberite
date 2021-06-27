@@ -606,6 +606,15 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 	{
 		m_World->BroadcastSoundEffect(m_SoundDeath, GetPosition(), 1.0f, 0.8f);
 	}
+
+	if (IsTame())
+	{
+		if ((m_MobType == mtWolf) || (m_MobType == mtOcelot) || (m_MobType == mtCat) || (m_MobType == mtParrot))
+		{
+			BroadcastDeathMessage(a_TDI);
+		}
+	}
+
 	int Reward;
 	switch (m_MobType)
 	{

@@ -454,7 +454,7 @@ namespace Explodinator
 			// Activate the TNT, with initial velocity and no fuse sound:
 			World.SpawnPrimedTNT(Vector3d(0.5, 0, 0.5) + Absolute, FuseTime, 1, false);
 		}
-		else if (a_ExplodingEntity->IsTNT() || BlockAlwaysDrops(DestroyedBlock) || Random.RandBool(1.f / a_Power))  // For TNT explosions, destroying a block that always drops, or if RandBool, drop pickups
+		else if ((a_ExplodingEntity != nullptr) && (a_ExplodingEntity->IsTNT() || BlockAlwaysDrops(DestroyedBlock) || Random.RandBool(1.f / a_Power)))  // For TNT explosions, destroying a block that always drops, or if RandBool, drop pickups
 		{
 			a_Chunk.GetWorld()->SpawnItemPickups(cBlockHandler::For(DestroyedBlock.Type()).ConvertToPickups(DestroyedBlock), Absolute);
 		}
