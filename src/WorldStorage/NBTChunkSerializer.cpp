@@ -1244,8 +1244,8 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 			for (size_t I = 0; I < Blocks->size(); I++)
 			{
 				auto NumericBlock = PaletteUpgrade::ToBlock(Blocks->at(I));
-				BlockData += NumericBlock.first;
-				MetaData += NumericBlock.second;
+				BlockData += static_cast<char>(NumericBlock.first);
+				MetaData += static_cast<char>(NumericBlock.second);
 			}
 
 			aWriter.AddByteArray("Blocks", BlockData);

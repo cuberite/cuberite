@@ -156,7 +156,7 @@ void cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, co
 		Blocks[I] = PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockTypes[I]), static_cast<unsigned char>(BlockMetas[I]));
 	}
 
-	memcpy((void *) a_BlockArea.GetBlocks(), Blocks.get(), NumBytes);
+	memcpy(a_BlockArea.GetBlocks(), Blocks.get(), NumBytes);
 }
 
 
@@ -177,11 +177,11 @@ ContiguousByteBuffer cSchematicFileSerializer::SaveToSchematicNBT(const cBlockAr
 		std::string BlockData;
 		std::string MetaData;
 
-		for (size_t I = 0; I < ARRAYCOUNT(Blocks); I++)
+		for (size_t I = 0; I < a_BlockArea.GetBlockCount(); I++)
 		{
 			auto NumericBlock = PaletteUpgrade::ToBlock(Blocks[I]);
-			BlockData += NumericBlock.first;
-			MetaData += NumericBlock.second;
+			BlockData += static_cast<char>(NumericBlock.first);
+			MetaData += static_cast<char>(NumericBlock.second);
 		}
 
 		Writer.AddByteArray("Blocks", BlockData);

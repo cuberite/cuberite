@@ -692,7 +692,7 @@ void cBlockArea::Fill(int a_DataTypes, BlockState a_Block, LIGHTTYPE a_BlockLigh
 	// If the area contains block entities, remove those not matching and replace with whatever block entity block was filled
 	if (HasBlockEntities() && ((a_DataTypes & baBlocks) != 0))
 	{
-		if (cBlockEntity::IsBlockEntityBlockType(a_Block.Type()))
+		if (cBlockEntity::IsBlockEntityBlockType(a_Block))
 		{
 			RescanBlockEntities();
 		}
@@ -745,7 +745,7 @@ void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int 
 	// If the area contains block entities, remove those in the affected cuboid and replace with whatever block entity block was filled:
 	if (HasBlockEntities() && ((a_DataTypes & baBlocks) != 0))
 	{
-		if (cBlockEntity::IsBlockEntityBlockType(a_Block.Type()))
+		if (cBlockEntity::IsBlockEntityBlockType(a_Block))
 		{
 			RescanBlockEntities();
 		}
@@ -1176,7 +1176,7 @@ void cBlockArea::SetRelBlock(Vector3i a_RelPos, BlockState a_Block)
 			}
 			m_BlockEntities->erase(itr);
 		}
-		if (cBlockEntity::IsBlockEntityBlockType(a_Block.Type()))
+		if (cBlockEntity::IsBlockEntityBlockType(a_Block))
 		{
 			m_BlockEntities->emplace(idx, cBlockEntity::CreateByBlockType(a_Block, a_RelPos));
 		}
@@ -1676,7 +1676,7 @@ void cBlockArea::ExpandBlocks(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a
 	int NewSizeZ = m_Size.z + a_SubMinZ + a_AddMaxZ;
 	size_t BlockCount = static_cast<size_t>(NewSizeX * NewSizeY * NewSizeZ);
 	BLOCKARRAY NewBlocks{ new BlockState[BlockCount] };
-	memset(NewBlocks.get(), 0, BlockCount * sizeof(BlockState));
+	memset(NewBlocks.get(), 0, BlockCount * sizeof(NewBlocks[0]));
 	size_t OldIndex = 0;
 	for (int y = 0; y < m_Size.y; y++)
 	{
@@ -1766,7 +1766,7 @@ void cBlockArea::RelSetData(
 			// The block entity is for a different block type, remove it:
 			m_BlockEntities->erase(itr);
 		}
-		if (cBlockEntity::IsBlockEntityBlockType(a_Block.Type()))
+		if (cBlockEntity::IsBlockEntityBlockType(a_Block))
 		{
 			// The block type should have a block entity attached to it, create an empty one:
 			m_BlockEntities->emplace(Index, cBlockEntity::CreateByBlockType(a_Block, {a_RelPos}));
@@ -1944,7 +1944,7 @@ void cBlockArea::MergeBlockEntities(Vector3i a_RelPos, const cBlockArea & a_Src)
 	{
 		auto idx = MakeIndex(x, y, z);
 		auto Block = m_Blocks[idx];
-		if (!cBlockEntity::IsBlockEntityBlockType(Block.Type()))
+		if (!cBlockEntity::IsBlockEntityBlockType(Block))
 		{
 			continue;
 		}
@@ -1996,7 +1996,7 @@ void cBlockArea::RescanBlockEntities(void)
 	{
 		auto idx = MakeIndex(x, y, z);
 		auto Block = m_Blocks[idx];
-		if (!cBlockEntity::IsBlockEntityBlockType(Block.Type()))
+		if (!cBlockEntity::IsBlockEntityBlockType(Block))
 		{
 			continue;
 		}

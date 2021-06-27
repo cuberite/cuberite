@@ -42,7 +42,7 @@ bool cDelayedFluidSimulatorChunkData::cSlot::Add(Vector3i a_RelPos)
 ////////////////////////////////////////////////////////////////////////////////
 // cDelayedFluidSimulatorChunkData:
 
-cDelayedFluidSimulatorChunkData::cDelayedFluidSimulatorChunkData(int a_TickDelay)
+cDelayedFluidSimulatorChunkData::cDelayedFluidSimulatorChunkData(size_t a_TickDelay)
 {
 	auto Default = cSlot();
 	m_Slots = std::vector<cSlot>(a_TickDelay, Default);
@@ -55,7 +55,7 @@ cDelayedFluidSimulatorChunkData::cDelayedFluidSimulatorChunkData(int a_TickDelay
 ////////////////////////////////////////////////////////////////////////////////
 // cDelayedFluidSimulator:
 
-cDelayedFluidSimulator::cDelayedFluidSimulator(cWorld & a_World, BlockType a_Fluid, unsigned char a_StationaryFlowValue, int a_TickDelay) :
+cDelayedFluidSimulator::cDelayedFluidSimulator(cWorld & a_World, BlockType a_Fluid, unsigned char a_StationaryFlowValue, size_t a_TickDelay) :
 	Super(a_World, a_Fluid, a_StationaryFlowValue),
 	m_TickDelay(a_TickDelay),
 	m_AddSlotNum(a_TickDelay - 1),

@@ -31,7 +31,7 @@ public:
 		std::unordered_map<size_t, Vector3i> m_Blocks;
 	} ;
 
-	cDelayedFluidSimulatorChunkData(int a_TickDelay);
+	cDelayedFluidSimulatorChunkData(size_t a_TickDelay);
 
 	/** Slots, one for each delay tick, each containing the blocks to simulate */
 	std::vector<cSlot> m_Slots;
@@ -48,7 +48,7 @@ class cDelayedFluidSimulator:
 
 public:
 
-	cDelayedFluidSimulator(cWorld & a_World, BlockType a_Fluid, unsigned char a_StationaryFlowValue, int a_TickDelay);
+	cDelayedFluidSimulator(cWorld & a_World, BlockType a_Fluid, unsigned char a_StationaryFlowValue, size_t a_TickDelay);
 
 protected:
 
@@ -58,7 +58,7 @@ protected:
 	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block) override;
 	virtual cFluidSimulatorData * CreateChunkData(void) override { return new cDelayedFluidSimulatorChunkData(m_TickDelay); }
 
-	int m_TickDelay;   // Count of the m_Slots array in each ChunkData
+	size_t m_TickDelay;   // Count of the m_Slots array in each ChunkData
 	size_t m_AddSlotNum;  // Index into m_Slots[] where to add new blocks in each ChunkData
 	size_t m_SimSlotNum;  // Index into m_Slots[] where to simulate blocks in each ChunkData
 

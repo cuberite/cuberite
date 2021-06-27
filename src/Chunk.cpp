@@ -1020,7 +1020,7 @@ cItems cChunk::PickupsFromBlock(Vector3i a_RelPos, const cEntity * a_Digger, con
 
 
 
-int cChunk::GrowPlantAt(Vector3i a_RelPos, unsigned char a_NumStages)
+int cChunk::GrowPlantAt(Vector3i a_RelPos, char a_NumStages)
 {
 	return cBlockHandler::For(GetBlock(a_RelPos).Type()).Grow(*this, a_RelPos, a_NumStages);
 }
@@ -1265,7 +1265,7 @@ void cChunk::SetBlock(Vector3i a_RelPos, BlockState a_Block)
 	}
 
 	// If the new block is a block entity, create the entity object:
-	if (cBlockEntity::IsBlockEntityBlockType(a_Block.Type()))
+	if (cBlockEntity::IsBlockEntityBlockType(a_Block))
 	{
 		AddBlockEntity(cBlockEntity::CreateByBlockType(a_Block, RelativeToAbsolute(a_RelPos), m_World));
 	}
@@ -1323,7 +1323,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block
 	{
 		if (cBlockAirHandler::IsBlockAir(a_Block.Type()))
 		{
-			m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width] = static_cast<HEIGHTTYPE>(a_RelY);
+			m_HeightMap[static_cast<size_t>(a_RelX + a_RelZ * cChunkDef::Width)] = static_cast<HEIGHTTYPE>(a_RelY);
 		}
 		else
 		{

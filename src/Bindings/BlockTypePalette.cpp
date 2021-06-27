@@ -40,7 +40,7 @@ BlockTypePalette::BlockTypePalette():
 
 
 
-UInt32 BlockTypePalette::index(const AString & aBlockTypeName, const BlockState & aBlockState)
+UInt32 BlockTypePalette::index(const AString & aBlockTypeName, const CustomBlockState & aBlockState)
 {
 	auto idx = maybeIndex(aBlockTypeName, aBlockState);
 	if (idx.second)
@@ -59,7 +59,7 @@ UInt32 BlockTypePalette::index(const AString & aBlockTypeName, const BlockState 
 
 
 
-std::pair<UInt32, bool> BlockTypePalette::maybeIndex(const AString & aBlockTypeName, const BlockState & aBlockState) const
+std::pair<UInt32, bool> BlockTypePalette::maybeIndex(const AString & aBlockTypeName, const CustomBlockState & aBlockState) const
 {
 	auto itr1 = mBlockToNumber.find(aBlockTypeName);
 	if (itr1 == mBlockToNumber.end())
@@ -87,7 +87,7 @@ UInt32 BlockTypePalette::count() const
 
 
 
-const std::pair<AString, BlockState> & BlockTypePalette::entry(UInt32 aIndex) const
+const std::pair<AString, CustomBlockState> & BlockTypePalette::entry(UInt32 aIndex) const
 {
 	auto itr = mNumberToBlock.find(aIndex);
 	if (itr == mNumberToBlock.end())
@@ -108,8 +108,8 @@ std::map<UInt32, UInt32> BlockTypePalette::createTransformMapAddMissing(const Bl
 	{
 		auto fromIndex = fromEntry.first;
 		const auto & blockTypeName = fromEntry.second.first;
-		const auto & blockState = fromEntry.second.second;
-		res[fromIndex] = index(blockTypeName, blockState);
+		const auto & CustomBlockState = fromEntry.second.second;
+		res[fromIndex] = index(blockTypeName, CustomBlockState);
 	}
 	return res;
 }
@@ -125,8 +125,8 @@ std::map<UInt32, UInt32> BlockTypePalette::createTransformMapWithFallback(const 
 	{
 		auto fromIndex = fromEntry.first;
 		const auto & blockTypeName = fromEntry.second.first;
-		const auto & blockState = fromEntry.second.second;
-		auto thisIndex = maybeIndex(blockTypeName, blockState);
+		const auto & CustomBlockState = fromEntry.second.second;
+		auto thisIndex = maybeIndex(blockTypeName, CustomBlockState);
 		if (thisIndex.second)
 		{
 			// The entry was found in this
@@ -189,7 +189,7 @@ void BlockTypePalette::loadFromJsonString(const AString & aJsonPalette)
 		const auto & states = (*itr)["states"];
 		if (states == Json::Value())
 		{
-			throw LoadFailedException(fmt::format(FMT_STRING("Missing \"states\" for block type \"{}\""), blockTypeName));
+			throw LoadFailedException(Printf("Missing \"states\" for block type \"%s\"", blockTypeName));
 		}
 		for (const auto & state: states)
 		{
@@ -200,7 +200,7 @@ void BlockTypePalette::loadFromJsonString(const AString & aJsonPalette)
 				const auto & properties = state["properties"];
 				if (!properties.isObject())
 				{
-					throw LoadFailedException(fmt::format(FMT_STRING("Member \"properties\" is not a JSON object (block type \"{}\", id {})."), blockTypeName, id));
+					throw LoadFailedException(Printf("Member \"properties\" is not a JSON object (block type \"%s\", id %u).", blockTypeName, id));
 				}
 				for (const auto & key: properties.getMemberNames())
 				{
@@ -249,7 +249,7 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 		auto keyEnd = findNextSeparator(aTsvPalette, idx + 1);
 		if (keyEnd == AString::npos)
 		{
-			throw LoadFailedException(fmt::format(FMT_STRING("Invalid header key format on line {}"), line));
+			throw LoadFailedException(Printf("Invalid header key format on line %u", line));
 		}
 		if (keyEnd == idx + 1)  // Empty line, end of headers
 		{
@@ -264,7 +264,7 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 		auto valueEnd = findNextSeparator(aTsvPalette, keyEnd + 1);
 		if ((valueEnd == AString::npos) || (aTsvPalette[valueEnd] == '\t'))
 		{
-			throw LoadFailedException(fmt::format(FMT_STRING("Invalid header value format on line {}"), line));
+			throw LoadFailedException(Printf("Invalid header value format on line %u", line));
 		}
 		auto key = aTsvPalette.substr(keyStart, keyEnd - keyStart);
 		if (key == "FileVersion")
@@ -277,7 +277,7 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 			}
 			else if (version != 1)
 			{
-				throw LoadFailedException(fmt::format(FMT_STRING("Unknown FileVersion: {}. Only version 1 is supported."), version));
+				throw LoadFailedException(Printf("Unknown FileVersion: %u. Only version 1 is supported.", version));
 			}
 			hasHadVersion = true;
 		}
@@ -304,12 +304,12 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 		auto idEnd = findNextSeparator(aTsvPalette, lineStart);
 		if ((idEnd == AString::npos) || (aTsvPalette[idEnd] != '\t'))
 		{
-			throw LoadFailedException(fmt::format(FMT_STRING("Incomplete data on line {} (id)"), line));
+			throw LoadFailedException(Printf("Incomplete data on line %u (id)", line));
 		}
 		UInt32 id;
 		if (!StringToInteger(aTsvPalette.substr(lineStart, idEnd - lineStart), id))
 		{
-			throw LoadFailedException(fmt::format(FMT_STRING("Failed to parse id on line {}"), line));
+			throw LoadFailedException(Printf("Failed to parse id on line %u", line));
 		}
 		size_t metaEnd = idEnd;
 		if (isUpgrade)
@@ -317,45 +317,45 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 			metaEnd = findNextSeparator(aTsvPalette, idEnd + 1);
 			if ((metaEnd == AString::npos) || (aTsvPalette[metaEnd] != '\t'))
 			{
-				throw LoadFailedException(fmt::format(FMT_STRING("Incomplete data on line {} (meta)"), line));
+				throw LoadFailedException(Printf("Incomplete data on line %u (meta)", line));
 			}
 			UInt32 meta = 0;
 			if (!StringToInteger(aTsvPalette.substr(idEnd + 1, metaEnd - idEnd - 1), meta))
 			{
-				throw LoadFailedException(fmt::format(FMT_STRING("Failed to parse meta on line {}"), line));
+				throw LoadFailedException(Printf("Failed to parse meta on line %u", line));
 			}
 			if (meta > 15)
 			{
-				throw LoadFailedException(fmt::format(FMT_STRING("Invalid meta value on line {}: {}"), line, meta));
+				throw LoadFailedException(Printf("Invalid meta value on line %u: %u", line, meta));
 			}
 			id = (id * 16) | meta;
 		}
 		auto blockTypeEnd = findNextSeparator(aTsvPalette, metaEnd + 1);
 		if (blockTypeEnd == AString::npos)
 		{
-			throw LoadFailedException(fmt::format(FMT_STRING("Incomplete data on line {} (blockTypeName)"), line));
+			throw LoadFailedException(Printf("Incomplete data on line %u (blockTypeName)", line));
 		}
 		auto blockTypeName = aTsvPalette.substr(metaEnd + 1, blockTypeEnd - metaEnd - 1);
 		auto blockStateEnd = blockTypeEnd;
-		AStringMap blockState;
+		AStringMap CustomBlockState;
 		while (aTsvPalette[blockStateEnd] == '\t')
 		{
 			auto keyEnd = findNextSeparator(aTsvPalette, blockStateEnd + 1);
 			if ((keyEnd == AString::npos) || (aTsvPalette[keyEnd] != '\t'))
 			{
-				throw LoadFailedException(fmt::format(FMT_STRING("Incomplete data on line {} (blockState key)"), line));
+				throw LoadFailedException(Printf("Incomplete data on line %u (CustomBlockState key)", line));
 			}
 			auto valueEnd = findNextSeparator(aTsvPalette, keyEnd + 1);
 			if (valueEnd == AString::npos)
 			{
-				throw LoadFailedException(fmt::format(FMT_STRING("Incomplete data on line {} (blockState value)"), line));
+				throw LoadFailedException(Printf("Incomplete data on line %u (CustomBlockState value)", line));
 			}
 			auto key = aTsvPalette.substr(blockStateEnd + 1, keyEnd - blockStateEnd - 1);
 			auto value = aTsvPalette.substr(keyEnd + 1, valueEnd - keyEnd - 1);
-			blockState[key] = value;
+			CustomBlockState[key] = value;
 			blockStateEnd = valueEnd;
 		}
-		addMapping(id, commonPrefix + blockTypeName, std::move(blockState));
+		addMapping(id, commonPrefix + blockTypeName, std::move(CustomBlockState));
 		++line;
 		if (aTsvPalette[blockStateEnd] == '\r')  // CR of the CRLF pair, skip the LF:
 		{
@@ -369,7 +369,7 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 
 
 
-void BlockTypePalette::addMapping(UInt32 aID, const AString & aBlockTypeName, const BlockState & aBlockState)
+void BlockTypePalette::addMapping(UInt32 aID, const AString & aBlockTypeName, const CustomBlockState & aBlockState)
 {
 	mNumberToBlock[aID] = {aBlockTypeName, aBlockState};
 	mBlockToNumber[aBlockTypeName][aBlockState] = aID;

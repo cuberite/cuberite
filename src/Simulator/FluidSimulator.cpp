@@ -1,7 +1,10 @@
 #include "Globals.h"
 
 #include "FluidSimulator.h"
-#include "../World.h"
+#include "World.h"
+#include "Chunk.h"
+#include "Blocks/BlockFluid.h"
+#include "BlockInfo.h"
 
 
 

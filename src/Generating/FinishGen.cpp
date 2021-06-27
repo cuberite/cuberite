@@ -635,6 +635,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 							a_ChunkDesc.SetBlock({x, y, z},     Block::TallGrass::TallGrass(Block::TallGrass::Half::Lower));
 							a_ChunkDesc.SetBlock({x, y + 1, z}, Block::TallGrass::TallGrass(Block::TallGrass::Half::Upper));
 							a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(y + 1));
+							break;
 						}
 						case BlockType::LargeFern:
 						{
@@ -1476,6 +1477,7 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BlockType a_Fluid, cI
 	bool IsWater = (a_Fluid == BlockType::Water);
 	AString SectionName = IsWater ? "WaterSprings" : "LavaSprings";
 	AString DefaultHeightDistribution;
+
 	int DefaultChance = 0;
 	switch (a_Dimension)
 	{
@@ -1551,6 +1553,7 @@ void cFinishGenFluidSprings::GenFinish(cChunkDesc & a_ChunkDesc)
 							// Succeeded, bail out
 							return;
 						}
+						break;
 					}
 					default: break;
 				}
@@ -1886,7 +1889,7 @@ cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_Or
 			LOGWARNING("Cannot parse ore information from string, invalid number in OreInfo \"%s\".", ore.c_str());
 			continue;
 		}
-		res.emplace_back(PaletteUpgrade::FromBlock(oreType, oreMeta).Type(), maxHeight, numNests, nestSize);
+		res.emplace_back(PaletteUpgrade::FromBlock(static_cast<unsigned char>(oreType), static_cast<unsigned char>(oreMeta)).Type(), maxHeight, numNests, nestSize);
 	}  // for i - split[]
 	return res;
 }

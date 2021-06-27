@@ -23,7 +23,7 @@ class cFloodyFluidSimulator:
 
 public:
 
-	cFloodyFluidSimulator(cWorld & a_World, BlockType a_Fluid, unsigned char a_StationaryFalloffValue, unsigned char a_Falloff, int a_TickDelay, int a_NumNeighborsForSource);
+	cFloodyFluidSimulator(cWorld & a_World, BlockType a_Fluid, unsigned char a_StationaryFalloffValue, unsigned char a_Falloff, size_t a_TickDelay, int a_NumNeighborsForSource);
 
 protected:
 

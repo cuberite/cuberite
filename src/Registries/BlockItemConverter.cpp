@@ -1449,7 +1449,7 @@ namespace BlockItemConverter
 			case BlockType::YellowWool:                      return Item::YellowWool;
 			case BlockType::ZombieHead:                      return Item::ZombieHead;
 			case BlockType::ZombieWallHead:                  return Item::ZombieHead;
-			default:                                         return Item::Air;
 		}
+		UNREACHABLE("Unsupported BlockType");
 	}
 }

@@ -176,7 +176,7 @@ public:
 
 	/** Grows this block, if it supports growing, by the specified amount of stages (at most).
 	Returns the number of stages actually grown, zero if not supported (default). */
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, unsigned char a_NumStages = 1) const { return 0; }
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, char a_NumStages = 1) const { return 0; }
 
 	virtual bool FullyOccupiesVoxel(const BlockState a_Block) const { return true; }
 

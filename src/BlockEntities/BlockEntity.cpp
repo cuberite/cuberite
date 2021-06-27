@@ -195,9 +195,9 @@ void cBlockEntity::Destroy()
 
 
 
-bool cBlockEntity::IsBlockEntityBlockType(const BlockType a_Block)
+bool cBlockEntity::IsBlockEntityBlockType(const BlockState a_Block)
 {
-	switch (a_Block)
+	switch (a_Block.Type())
 	{
 		case BlockType::BlackBanner:
 		case BlockType::BlueBanner:

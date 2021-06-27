@@ -27,7 +27,7 @@ cVanillaFluidSimulator::cVanillaFluidSimulator(
 		BlockType a_Fluid,
 		unsigned char a_StationaryFlowValue,
 		unsigned char a_Falloff,
-		int a_TickDelay,
+		size_t a_TickDelay,
 		int a_NumNeighborsForSource
 ):
 	Super(a_World, a_Fluid, a_StationaryFlowValue, a_Falloff, a_TickDelay, a_NumNeighborsForSource)
