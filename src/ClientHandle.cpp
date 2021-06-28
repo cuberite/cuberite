@@ -40,14 +40,17 @@
 
 
 
-/** Maximum number of explosions to send this tick, server will start dropping if exceeded */
+/** Maximum number of explosions to send this tick, server will start dropping if exceeded. */
 #define MAX_EXPLOSIONS_PER_TICK 20
 
-/** Maximum number of block change interactions a player can perform per tick - exceeding this causes a kick */
+/** Maximum number of block change interactions a player can perform per tick - exceeding this causes a kick. */
 #define MAX_BLOCK_CHANGE_INTERACTIONS 20
 
-/** Maximum number of bytes that a chat message sent by a player may consist of */
+/** Maximum number of bytes that a chat message sent by a player may consist of. */
 #define MAX_CHAT_MSG_LENGTH 1024
+
+/** Maximum number of chunks to stream per tick. */
+#define MAX_CHUNKS_STREAMED_PER_TICK 4
 
 
 
@@ -389,25 +392,30 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 
 
 
-bool cClientHandle::StreamNextChunk(void)
+void cClientHandle::StreamNextChunks(void)
 {
 	ASSERT(m_Player != nullptr);
 
 	int ChunkPosX = m_Player->GetChunkX();
 	int ChunkPosZ = m_Player->GetChunkZ();
+
 	if ((m_LastStreamedChunkX == ChunkPosX) && (m_LastStreamedChunkZ == ChunkPosZ))
 	{
 		// All chunks are already loaded. Abort loading.
-		return true;
+		return;
+	}
+	else
+	{
+		m_LastStreamedChunkX = 0x7fffffff;
+		m_LastStreamedChunkZ = 0x7fffffff;
 	}
 
-	// Get the look vector and normalize it.
+	int StreamedChunks = 0;
 	Vector3d Position = m_Player->GetEyePosition();
 	Vector3d LookVector = m_Player->GetLookVector();
-	LookVector.Normalize();
 
-	// Lock the list
-	cCSLock Lock(m_CSChunkLists);
+	// Get the look vector and normalize it.
+	LookVector.Normalize();
 
 	// High priority: Load the chunks that are in the view-direction of the player (with a radius of 3)
 	for (int Range = 0; Range < m_CurrentViewDistance; Range++)
@@ -433,18 +441,24 @@ bool cClientHandle::StreamNextChunk(void)
 				}
 
 				// If the chunk already loading / loaded -> skip
-				if (
-					(m_ChunksToSend.find(Coords) != m_ChunksToSend.end()) ||
-					(m_LoadedChunks.find(Coords) != m_LoadedChunks.end())
-				)
 				{
-					continue;
+					cCSLock Lock(m_CSChunkLists);
+					if (
+						(m_ChunksToSend.find(Coords) != m_ChunksToSend.end()) ||
+						(m_LoadedChunks.find(Coords) != m_LoadedChunks.end())
+					)
+					{
+						continue;
+					}
 				}
 
 				// Unloaded chunk found -> Send it to the client.
-				Lock.Unlock();
 				StreamChunk(ChunkX, ChunkZ, ((Range <= 2) ? cChunkSender::Priority::Critical : cChunkSender::Priority::Medium));
-				return false;
+
+				if (++StreamedChunks == MAX_CHUNKS_STREAMED_PER_TICK)
+				{
+					return;
+				}
 			}
 		}
 	}
@@ -452,19 +466,21 @@ bool cClientHandle::StreamNextChunk(void)
 	// Low priority: Add all chunks that are in range. (From the center out to the edge)
 	for (int d = 0; d <= m_CurrentViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
 	{
-		const auto StreamIfUnloaded = [this, &Lock](const cChunkCoords Chunk)
+		const auto StreamIfUnloaded = [this](const cChunkCoords Chunk)
 		{
 			// If the chunk already loading / loaded -> skip
-			if (
-				(m_ChunksToSend.find(Chunk) != m_ChunksToSend.end()) ||
-				(m_LoadedChunks.find(Chunk) != m_LoadedChunks.end())
-			)
 			{
-				return false;
+				cCSLock Lock(m_CSChunkLists);
+				if (
+					(m_ChunksToSend.find(Chunk) != m_ChunksToSend.end()) ||
+					(m_LoadedChunks.find(Chunk) != m_LoadedChunks.end())
+				)
+				{
+					return false;
+				}
 			}
 
 			// Unloaded chunk found -> Send it to the client.
-			Lock.Unlock();
 			StreamChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, cChunkSender::Priority::Low);
 			return true;
 		};
@@ -474,14 +490,20 @@ bool cClientHandle::StreamNextChunk(void)
 		{
 			if (StreamIfUnloaded({ ChunkPosX + d, ChunkPosZ + i }) || StreamIfUnloaded({ ChunkPosX - d, ChunkPosZ + i }))
 			{
-				return false;
+				if (++StreamedChunks == MAX_CHUNKS_STREAMED_PER_TICK)
+				{
+					return;
+				}
 			}
 		}
 		for (int i = -d + 1; i < d; ++i)
 		{
 			if (StreamIfUnloaded({ ChunkPosX + i, ChunkPosZ + d }) || StreamIfUnloaded({ ChunkPosX + i, ChunkPosZ - d }))
 			{
-				return false;
+				if (++StreamedChunks == MAX_CHUNKS_STREAMED_PER_TICK)
+				{
+					return;
+				}
 			}
 		}
 	}
@@ -489,7 +511,6 @@ bool cClientHandle::StreamNextChunk(void)
 	// All chunks are loaded -> Sets the last loaded chunk coordinates to current coordinates
 	m_LastStreamedChunkX = ChunkPosX;
 	m_LastStreamedChunkZ = ChunkPosZ;
-	return true;
 }
 
 
@@ -1923,18 +1944,9 @@ void cClientHandle::RemoveFromWorld(void)
 	// Here, we set last streamed values to bogus ones so everything is resent:
 	m_LastStreamedChunkX = 0x7fffffff;
 	m_LastStreamedChunkZ = 0x7fffffff;
-}
 
-
-
-
-
-void cClientHandle::InvalidateCachedSentChunk()
-{
-	ASSERT(m_Player != nullptr);
-	// Sets this to a junk value different from the player's current chunk, which invalidates it and
-	// ensures its value will not be used.
-	m_CachedSentChunk = cChunkCoords(m_Player->GetChunkX() + 500, m_Player->GetChunkZ());
+	// Restart player unloaded chunk checking and freezing:
+	m_CachedSentChunk = cChunkCoords(0x7fffffff, 0x7fffffff);
 }
 
 
@@ -2048,16 +2060,8 @@ void cClientHandle::Tick(float a_Dt)
 		}
 	}
 
-	// Stream 4 chunks per tick
-	for (int i = 0; i < 4; i++)
-	{
-		// Stream the next chunk
-		if (StreamNextChunk())
-		{
-			// Streaming finished. All chunks are loaded.
-			break;
-		}
-	}
+	// Send a couple of chunks to the player:
+	StreamNextChunks();
 
 	// Unload all chunks that are out of the view distance (every 5 seconds):
 	if ((m_Player->GetWorld()->GetWorldAge() - m_LastUnloadCheck) > 5s)
@@ -3160,6 +3164,10 @@ void cClientHandle::SetViewDistance(int a_ViewDistance)
 	{
 		// Set the current view distance based on the requested VD and world max VD:
 		m_CurrentViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, world->GetMaxViewDistance());
+
+		// Restart chunk streaming to respond to new view distance:
+		m_LastStreamedChunkX = 0x7fffffff;
+		m_LastStreamedChunkZ = 0x7fffffff;
 	}
 }
 
