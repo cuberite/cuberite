@@ -2,6 +2,8 @@
 
 #include "FluidSimulator.h"
 #include "../World.h"
+#include "Blocks/BlockFluid.h"
+#include "BlockInfo.h"
 
 
 
