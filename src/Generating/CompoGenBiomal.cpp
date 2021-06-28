@@ -10,6 +10,7 @@
 #include "../IniFile.h"
 #include "../Noise/Noise.h"
 #include "../LinearUpscale.h"
+#include "BlockInfo.h"
 
 
 
