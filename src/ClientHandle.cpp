@@ -2440,15 +2440,11 @@ void cClientHandle::SendDetachEntity(const cEntity & a_Entity, const cEntity & a
 
 void cClientHandle::SendDisconnect(const AString & a_Reason)
 {
-	// Destruction (Destroy()) is called when the client disconnects, not when a disconnect packet (or anything else) is sent
-	// Otherwise, the cClientHandle instance is can be unexpectedly removed from the associated player - Core/#142
-	if (!m_HasSentDC)
-	{
-		LOGD("Sending a DC: \"%s\"", StripColorCodes(a_Reason).c_str());
-		m_Protocol.SendDisconnect(*this, a_Reason);
-		m_HasSentDC = true;
-		Destroy();
-	}
+	LOGD("Sending a DC: \"%s\"", StripColorCodes(a_Reason).c_str());
+
+	m_Protocol.SendDisconnect(*this, a_Reason);
+	m_HasSentDC = true;
+	Destroy();
 }
 
 
