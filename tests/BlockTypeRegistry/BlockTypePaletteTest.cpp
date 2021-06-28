@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "../TestHelpers.h"
 #include "Bindings/BlockTypePalette.h"
+#include "Bindings/BlockState.h"
 #include "OSSupport/Stopwatch.h"
 
 
@@ -14,33 +15,33 @@ static void testBasic()
 
 	// Check inserting different block type names:
 	BlockTypePalette pal;
-	TEST_EQUAL(pal.index("testblock", BlockState()), 0);  // Insert the first entry
-	TEST_EQUAL(pal.index("testblock", BlockState()), 0);  // Check that it's not inserted again
-	TEST_EQUAL(pal.maybeIndex("testblock", BlockState()), (std::make_pair<UInt32, bool>(0, true)));
-	TEST_EQUAL(pal.maybeIndex("nonexistent", BlockState()).second, false);
+	TEST_EQUAL(pal.index("testblock", CustomBlockState()), 0);  // Insert the first entry
+	TEST_EQUAL(pal.index("testblock", CustomBlockState()), 0);  // Check that it's not inserted again
+	TEST_EQUAL(pal.maybeIndex("testblock", CustomBlockState()), (std::make_pair<UInt32, bool>(0, true)));
+	TEST_EQUAL(pal.maybeIndex("nonexistent", CustomBlockState()).second, false);
 
-	TEST_EQUAL(pal.index("another", BlockState()), 1);  // Insert the second entry
-	TEST_EQUAL(pal.index("another", BlockState()), 1);  // Check that it's not inserted twice
-	TEST_EQUAL(pal.maybeIndex("another", BlockState()), (std::make_pair<UInt32, bool>(1, true)));
-	TEST_EQUAL(pal.maybeIndex("testblock", BlockState()), (std::make_pair<UInt32, bool>(0, true)));  // The first one stayed
+	TEST_EQUAL(pal.index("another", CustomBlockState()), 1);  // Insert the second entry
+	TEST_EQUAL(pal.index("another", CustomBlockState()), 1);  // Check that it's not inserted twice
+	TEST_EQUAL(pal.maybeIndex("another", CustomBlockState()), (std::make_pair<UInt32, bool>(1, true)));
+	TEST_EQUAL(pal.maybeIndex("testblock", CustomBlockState()), (std::make_pair<UInt32, bool>(0, true)));  // The first one stayed
 
-	// Check same block type name, different BlockState:
-	BlockState bs1;
-	BlockState bs2("key1", "value1");
-	BlockState bs3({{"key1", "value1"}, {"key2", "value2"}});
-	BlockState bs2Copy(bs2);
+	// Check same block type name, different CustomBlockState:
+	CustomBlockState bs1;
+	CustomBlockState bs2("key1", "value1");
+	CustomBlockState bs3({{"key1", "value1"}, {"key2", "value2"}});
+	CustomBlockState bs2Copy(bs2);
 	TEST_EQUAL(pal.index("multistate", bs1), 2);
 	TEST_EQUAL(pal.index("multistate", bs2), 3);
 	TEST_EQUAL(pal.index("multistate", bs3), 4);
-	TEST_EQUAL(pal.index("multistate", bs2Copy), 3);  // Different BlockState instance, but same content
+	TEST_EQUAL(pal.index("multistate", bs2Copy), 3);  // Different CustomBlockState instance, but same content
 	TEST_EQUAL(pal.count(), 5);
 
 	// Check the entry() API:
-	TEST_EQUAL(pal.entry(0), (std::make_pair<AString, BlockState>("testblock",  BlockState())));
-	TEST_EQUAL(pal.entry(1), (std::make_pair<AString, BlockState>("another",    BlockState())));
-	TEST_EQUAL(pal.entry(2), (std::make_pair<AString, BlockState>("multistate", BlockState(bs1))));  // make_pair requires a copy of the state
-	TEST_EQUAL(pal.entry(3), (std::make_pair<AString, BlockState>("multistate", BlockState(bs2))));
-	TEST_EQUAL(pal.entry(4), (std::make_pair<AString, BlockState>("multistate", BlockState(bs3))));
+	TEST_EQUAL(pal.entry(0), (std::make_pair<AString, CustomBlockState>("testblock",  CustomBlockState())));
+	TEST_EQUAL(pal.entry(1), (std::make_pair<AString, CustomBlockState>("another",    CustomBlockState())));
+	TEST_EQUAL(pal.entry(2), (std::make_pair<AString, CustomBlockState>("multistate", CustomBlockState(bs1))));  // make_pair requires a copy of the state
+	TEST_EQUAL(pal.entry(3), (std::make_pair<AString, CustomBlockState>("multistate", CustomBlockState(bs2))));
+	TEST_EQUAL(pal.entry(4), (std::make_pair<AString, CustomBlockState>("multistate", CustomBlockState(bs3))));
 	TEST_THROWS(pal.entry(5), BlockTypePalette::NoSuchIndexException);
 }
 
@@ -55,28 +56,28 @@ static void testTransformAddMissing()
 
 	// Create two palettes with some overlap:
 	BlockTypePalette pal1, pal2;
-	/* 0 */ pal1.index("block1", BlockState());
-	/* 1 */ pal1.index("block2", BlockState());
-	/* 2 */ pal1.index("block3", BlockState());
-	/* 3 */ pal1.index("block4", BlockState());
-	/* 4 */ pal1.index("block5", BlockState("key1", "value1"));
-	/* 0 */ pal2.index("block0", BlockState());
-	/* 1 */ pal2.index("block2", BlockState());  // overlap
-	/* 2 */ pal2.index("block4", BlockState());  // overlap
-	/* 3 */ pal2.index("block4", BlockState("key1", "value1"));
-	/* 4 */ pal2.index("block5", BlockState("key1", "value1"));  // overlap
-	/* 5 */ pal2.index("block6", BlockState("key1", "value1"));
+	/* 0 */ pal1.index("block1", CustomBlockState());
+	/* 1 */ pal1.index("block2", CustomBlockState());
+	/* 2 */ pal1.index("block3", CustomBlockState());
+	/* 3 */ pal1.index("block4", CustomBlockState());
+	/* 4 */ pal1.index("block5", CustomBlockState("key1", "value1"));
+	/* 0 */ pal2.index("block0", CustomBlockState());
+	/* 1 */ pal2.index("block2", CustomBlockState());  // overlap
+	/* 2 */ pal2.index("block4", CustomBlockState());  // overlap
+	/* 3 */ pal2.index("block4", CustomBlockState("key1", "value1"));
+	/* 4 */ pal2.index("block5", CustomBlockState("key1", "value1"));  // overlap
+	/* 5 */ pal2.index("block6", CustomBlockState("key1", "value1"));
 
 	// Check the transform map:
 	auto trans = pal1.createTransformMapAddMissing(pal2);
-	TEST_EQUAL(pal1.maybeIndex("block1", BlockState()),                 (std::make_pair<UInt32, bool>(0, true)));
-	TEST_EQUAL(pal1.maybeIndex("block2", BlockState()),                 (std::make_pair<UInt32, bool>(1, true)));
-	TEST_EQUAL(pal1.maybeIndex("block3", BlockState()),                 (std::make_pair<UInt32, bool>(2, true)));
-	TEST_EQUAL(pal1.maybeIndex("block4", BlockState()),                 (std::make_pair<UInt32, bool>(3, true)));
-	TEST_EQUAL(pal1.maybeIndex("block5", BlockState("key1", "value1")), (std::make_pair<UInt32, bool>(4, true)));
-	TEST_EQUAL(pal1.maybeIndex("block0", BlockState()),                 (std::make_pair<UInt32, bool>(5, true)));
-	TEST_EQUAL(pal1.maybeIndex("block4", BlockState("key1", "value1")), (std::make_pair<UInt32, bool>(6, true)));
-	TEST_EQUAL(pal1.maybeIndex("block6", BlockState("key1", "value1")), (std::make_pair<UInt32, bool>(7, true)));
+	TEST_EQUAL(pal1.maybeIndex("block1", CustomBlockState()),                 (std::make_pair<UInt32, bool>(0, true)));
+	TEST_EQUAL(pal1.maybeIndex("block2", CustomBlockState()),                 (std::make_pair<UInt32, bool>(1, true)));
+	TEST_EQUAL(pal1.maybeIndex("block3", CustomBlockState()),                 (std::make_pair<UInt32, bool>(2, true)));
+	TEST_EQUAL(pal1.maybeIndex("block4", CustomBlockState()),                 (std::make_pair<UInt32, bool>(3, true)));
+	TEST_EQUAL(pal1.maybeIndex("block5", CustomBlockState("key1", "value1")), (std::make_pair<UInt32, bool>(4, true)));
+	TEST_EQUAL(pal1.maybeIndex("block0", CustomBlockState()),                 (std::make_pair<UInt32, bool>(5, true)));
+	TEST_EQUAL(pal1.maybeIndex("block4", CustomBlockState("key1", "value1")), (std::make_pair<UInt32, bool>(6, true)));
+	TEST_EQUAL(pal1.maybeIndex("block6", CustomBlockState("key1", "value1")), (std::make_pair<UInt32, bool>(7, true)));
 	TEST_EQUAL(trans.size(), 6);
 	TEST_EQUAL(trans[0], 5);  // Added
 	TEST_EQUAL(trans[1], 1);  // Mapped
@@ -97,17 +98,17 @@ static void testTransformWithFallback()
 
 	// Create two palettes with some overlap:
 	BlockTypePalette pal1, pal2;
-	/* 0 */ pal1.index("block1", BlockState());
-	/* 1 */ pal1.index("block2", BlockState());
-	/* 2 */ pal1.index("block3", BlockState());
-	/* 3 */ pal1.index("block4", BlockState());
-	/* 4 */ pal1.index("block5", BlockState("key1", "value1"));
-	/* 0 */ pal2.index("block0", BlockState());
-	/* 1 */ pal2.index("block2", BlockState());  // overlap
-	/* 2 */ pal2.index("block4", BlockState());  // overlap
-	/* 3 */ pal2.index("block4", BlockState("key1", "value1"));
-	/* 4 */ pal2.index("block5", BlockState("key1", "value1"));  // overlap
-	/* 5 */ pal2.index("block6", BlockState("key1", "value1"));
+	/* 0 */ pal1.index("block1", CustomBlockState());
+	/* 1 */ pal1.index("block2", CustomBlockState());
+	/* 2 */ pal1.index("block3", CustomBlockState());
+	/* 3 */ pal1.index("block4", CustomBlockState());
+	/* 4 */ pal1.index("block5", CustomBlockState("key1", "value1"));
+	/* 0 */ pal2.index("block0", CustomBlockState());
+	/* 1 */ pal2.index("block2", CustomBlockState());  // overlap
+	/* 2 */ pal2.index("block4", CustomBlockState());  // overlap
+	/* 3 */ pal2.index("block4", CustomBlockState("key1", "value1"));
+	/* 4 */ pal2.index("block5", CustomBlockState("key1", "value1"));  // overlap
+	/* 5 */ pal2.index("block6", CustomBlockState("key1", "value1"));
 
 	// Check the transform map:
 	auto trans = pal1.createTransformMapWithFallback(pal2, 0);
@@ -161,9 +162,9 @@ static void testLoadJsonSimple(void)
 	}";
 
 	palette.loadFromString(example);
-	TEST_EQUAL(palette.maybeIndex("minecraft:air", BlockState()), (std::make_pair<UInt32, bool>(0, true)));
-	TEST_EQUAL(palette.maybeIndex("minecraft:air", BlockState({{"foo", "baz"}})).second, false);
-	TEST_EQUAL(palette.maybeIndex("minecraft:a",   BlockState()).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:air", CustomBlockState()), (std::make_pair<UInt32, bool>(0, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:air", CustomBlockState({{"foo", "baz"}})).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:a",   CustomBlockState()).second, false);
 }
 
 
@@ -237,13 +238,13 @@ CommonPrefix\tminecraft:\n\
 3\tgrass\tsnow_covered\t1\n\
 ";
 	palette.loadFromString(str);
-	TEST_EQUAL(palette.maybeIndex("minecraft:air",   BlockState()), (std::make_pair<UInt32, bool>(0, true)));
-	TEST_EQUAL(palette.maybeIndex("minecraft:stone", BlockState()), (std::make_pair<UInt32, bool>(1, true)));
-	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState({{"snow_covered", "0"}})), (std::make_pair<UInt32, bool>(2, true)));
-	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState({{"snow_covered", "1"}})), (std::make_pair<UInt32, bool>(3, true)));
-	TEST_EQUAL(palette.maybeIndex("minecraft:air",   BlockState({{"snow_covered", "0"}})).second, false);
-	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState({{"snow_covered", "2"}})).second, false);
-	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState()).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:air",   CustomBlockState()), (std::make_pair<UInt32, bool>(0, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:stone", CustomBlockState()), (std::make_pair<UInt32, bool>(1, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", CustomBlockState({{"snow_covered", "0"}})), (std::make_pair<UInt32, bool>(2, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", CustomBlockState({{"snow_covered", "1"}})), (std::make_pair<UInt32, bool>(3, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:air",   CustomBlockState({{"snow_covered", "0"}})).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", CustomBlockState({{"snow_covered", "2"}})).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", CustomBlockState()).second, false);
 }
 
 
@@ -266,13 +267,13 @@ CommonPrefix\tminecraft:\r\n\
 2\t1\tgrass\tsnow_covered\t1\n\
 ";
 	palette.loadFromString(str);
-	TEST_EQUAL(palette.maybeIndex("minecraft:air",   BlockState()), (std::make_pair<UInt32, bool>(0, true)));
-	TEST_EQUAL(palette.maybeIndex("minecraft:stone", BlockState()), (std::make_pair<UInt32, bool>(16, true)));
-	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState({{"snow_covered", "0"}})), (std::make_pair<UInt32, bool>(32, true)));
-	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState({{"snow_covered", "1"}})), (std::make_pair<UInt32, bool>(33, true)));
-	TEST_EQUAL(palette.maybeIndex("minecraft:air",   BlockState({{"snow_covered", "0"}})).second, false);
-	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState({{"snow_covered", "2"}})).second, false);
-	TEST_EQUAL(palette.maybeIndex("minecraft:grass", BlockState()).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:air",   CustomBlockState()), (std::make_pair<UInt32, bool>(0, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:stone", CustomBlockState()), (std::make_pair<UInt32, bool>(16, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", CustomBlockState({{"snow_covered", "0"}})), (std::make_pair<UInt32, bool>(32, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", CustomBlockState({{"snow_covered", "1"}})), (std::make_pair<UInt32, bool>(33, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:air",   CustomBlockState({{"snow_covered", "0"}})).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", CustomBlockState({{"snow_covered", "2"}})).second, false);
+	TEST_EQUAL(palette.maybeIndex("minecraft:grass", CustomBlockState()).second, false);
 }
 
 
@@ -290,19 +291,19 @@ static void testLoadFromBaseFile(void)
 		palette.loadFromString(fileContents);
 	}
 
-	TEST_EQUAL(palette.maybeIndex("minecraft:air",   BlockState()), (std::make_pair<UInt32, bool>(0, true)));
-	TEST_EQUAL(palette.maybeIndex("minecraft:stone", BlockState()), (std::make_pair<UInt32, bool>(1, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:air",   CustomBlockState()), (std::make_pair<UInt32, bool>(0, true)));
+	TEST_EQUAL(palette.maybeIndex("minecraft:stone", CustomBlockState()), (std::make_pair<UInt32, bool>(1, true)));
 	TEST_EQUAL(
 		palette.maybeIndex(
 			"minecraft:dark_oak_leaves",
-			BlockState({{"persistent", "false"}, {"distance", "6"}})
+			CustomBlockState({{"persistent", "false"}, {"distance", "6"}})
 		),
 		(std::make_pair<UInt32, bool>(225, true))
 	);
 	TEST_EQUAL(
 		palette.maybeIndex(
 			"minecraft:dark_oak_leaves",
-			BlockState({{"persistent", "false"}})
+			CustomBlockState({{"persistent", "false"}})
 		).second,
 		false
 	);
@@ -323,8 +324,8 @@ static void testLoadFromUpgradeFile(void)
 		palette.loadFromString(fileContents);
 	}
 
-	TEST_EQUAL(palette.entry(0), (std::make_pair<AString, BlockState>("minecraft:air", {})));
-	TEST_EQUAL(palette.entry(44 * 16 + 8), (std::make_pair<AString, BlockState>("minecraft:stone_slab", {{"type", "top"}})));
+	TEST_EQUAL(palette.entry(0), (std::make_pair<AString, CustomBlockState>("minecraft:air", {})));
+	TEST_EQUAL(palette.entry(44 * 16 + 8), (std::make_pair<AString, CustomBlockState>("minecraft:stone_slab", {{"type", "top"}})));
 }
 
 
