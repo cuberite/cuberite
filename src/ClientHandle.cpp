@@ -238,6 +238,7 @@ void cClientHandle::ProcessProtocolOut()
 	// to prevent it being reset between the null check and the Send:
 	if (auto Link = m_Link; Link != nullptr)
 	{
+		m_Protocol->DataPrepared(OutgoingData);
 		Link->Send(OutgoingData.data(), OutgoingData.size());
 	}
 }
