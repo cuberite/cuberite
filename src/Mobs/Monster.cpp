@@ -529,10 +529,10 @@ void cMonster::SetPitchAndYawFromDestination(bool a_IsFollowingPath)
 
 
 
-void cMonster::HandleFalling()
+void cMonster::HandleFalling(cChunk & a_Chunk)
 {
 	m_bTouchGround = IsOnGround();
-	Super::HandleFalling();
+	Super::HandleFalling(a_Chunk);
 }
 
 

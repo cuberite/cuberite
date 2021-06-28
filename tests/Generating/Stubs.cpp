@@ -800,7 +800,7 @@ void cPawn::HandleAir(void)
 
 
 
-void cPawn::HandleFalling()
+void cPawn::HandleFalling(cChunk & a_Chunk)
 {
 }
 
@@ -921,7 +921,7 @@ void cMonster::OnRightClicked(class cPlayer & a_Player)
 
 
 
-void cMonster::HandleFalling(void)
+void cMonster::HandleFalling(cChunk & a_Chunk)
 {
 }
 

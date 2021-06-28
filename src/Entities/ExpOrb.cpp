@@ -33,7 +33,7 @@ void cExpOrb::SpawnOn(cClientHandle & a_Client)
 
 void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	DetectCacti();
+	DetectCacti(a_Chunk);
 	m_TicksAlive++;
 
 	// Find closest player within 6.5 meter (slightly increase detect range to have same effect in client)

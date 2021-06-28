@@ -97,7 +97,6 @@ public:
 
 
 
-
 /** Constants used throughout the code, useful typedefs and utility functions */
 class cChunkDef
 {

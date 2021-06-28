@@ -917,7 +917,7 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			(IsPlayer() && !((static_cast<cPlayer *>(this))->IsGameModeCreative() || (static_cast<cPlayer *>(this))->IsGameModeSpectator()))
 		)
 		{
-			DetectCacti();
+			DetectCacti(a_Chunk);
 		}
 
 		// Handle magma block damage
@@ -934,7 +934,7 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			)
 		)
 		{
-			DetectMagma();
+			DetectMagma(a_Chunk);
 		}
 
 		// Handle drowning:
@@ -1317,7 +1317,7 @@ void cEntity::TickInVoid(cChunk & a_Chunk)
 
 
 
-void cEntity::DetectCacti(void)
+void cEntity::DetectCacti(cChunk & a_Chunk)
 {
 	int MinX = FloorC(GetPosX() - m_Width / 2);
 	int MaxX = FloorC(GetPosX() + m_Width / 2);
@@ -1332,7 +1332,12 @@ void cEntity::DetectCacti(void)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				if (GetWorld()->GetBlock({ x, y, z }) == E_BLOCK_CACTUS)
+				BLOCKTYPE BlockType;
+				if (!a_Chunk.UnboundedRelGetBlockType({x, y, z}, BlockType))
+				{
+					continue;
+				}
+				if (BlockType == E_BLOCK_CACTUS)
 				{
 					TakeDamage(dtCactusContact, nullptr, 1, 0);
 					return;
@@ -1346,7 +1351,7 @@ void cEntity::DetectCacti(void)
 
 
 
-void cEntity::DetectMagma(void)
+void cEntity::DetectMagma(cChunk & a_Chunk)
 {
 	int MinX = FloorC(GetPosX() - m_Width / 2);
 	int MaxX = FloorC(GetPosX() + m_Width / 2);
@@ -1361,7 +1366,12 @@ void cEntity::DetectMagma(void)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				if (GetWorld()->GetBlock({ x, y, z }) == E_BLOCK_MAGMA)
+				BLOCKTYPE BlockType;
+				if (!a_Chunk.UnboundedRelGetBlockType({x, y, z}, BlockType))
+				{
+					continue;
+				}
+				if (BlockType == E_BLOCK_MAGMA)
 				{
 					TakeDamage(dtMagmaContact, nullptr, 1, 0);
 					return;

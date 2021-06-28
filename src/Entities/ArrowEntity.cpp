@@ -189,7 +189,8 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_IsInGround)
 	{
-		if (m_World->GetBlock(m_HitBlockPos) == E_BLOCK_AIR)  // Block attached to was destroyed?
+		BLOCKTYPE BlockType;
+		if (a_Chunk.UnboundedRelGetBlockType(m_HitBlockPos, BlockType) && (BlockType == E_BLOCK_AIR))  // Block attached to was destroyed?
 		{
 			m_IsInGround = false;  // Yes, begin simulating physics again
 		}

@@ -234,8 +234,12 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
 	{
-		m_World->SetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
-		m_bIsOnDetectorRail = false;
+		NIBBLETYPE Meta;
+		if (a_Chunk.UnboundedRelGetBlockMeta(m_DetectorRailPosition, Meta))
+		{
+			a_Chunk.UnboundedRelSetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, (Meta & 0x07));
+			m_bIsOnDetectorRail = false;
+		}
 	}
 	else if (WasDetectorRail)
 	{
