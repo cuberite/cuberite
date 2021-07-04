@@ -1317,7 +1317,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block
 	{
 		if (cBlockAirHandler::IsBlockAir(a_Block.Type()))
 		{
-			m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width] = static_cast<HEIGHTTYPE>(a_RelY);
+			m_HeightMap[static_cast<size_t>(a_RelX + a_RelZ * cChunkDef::Width)] = static_cast<HEIGHTTYPE>(a_RelY);
 		}
 		else
 		{

@@ -276,6 +276,7 @@ private:
 					case BlockType::JungleLog:
 					case BlockType::OakLog:
 					case BlockType::SpruceLog: return true;
+					default: break;
 				}
 				return false;
 			};
