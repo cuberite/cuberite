@@ -131,7 +131,6 @@ private:
 			return;
 		}
 
-		const auto Position = cChunkDef::AbsoluteToRelative(a_BlockPos);
 		auto BlockToCheck = a_ChunkInterface.GetBlock(AddFaceDirection(a_BlockPos, a_WhichNeighbor));
 
 		// If only attached to this face: destroy

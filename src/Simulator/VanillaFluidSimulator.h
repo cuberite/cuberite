@@ -25,7 +25,7 @@ public:
 		BlockType a_Fluid,
 		unsigned char a_StationaryFlowValue,
 		unsigned char a_Falloff,
-		int a_TickDelay,
+		size_t a_TickDelay,
 		int a_NumNeighborsForSource
 	);
 

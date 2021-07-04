@@ -1676,7 +1676,7 @@ void cBlockArea::ExpandBlocks(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a
 	int NewSizeZ = m_Size.z + a_SubMinZ + a_AddMaxZ;
 	size_t BlockCount = static_cast<size_t>(NewSizeX * NewSizeY * NewSizeZ);
 	BLOCKARRAY NewBlocks{ new BlockState[BlockCount] };
-	memset(NewBlocks.get(), 0, BlockCount * sizeof(BlockState));
+	memset(NewBlocks.get(), 0, BlockCount * sizeof(NewBlocks[0]));
 	size_t OldIndex = 0;
 	for (int y = 0; y < m_Size.y; y++)
 	{
