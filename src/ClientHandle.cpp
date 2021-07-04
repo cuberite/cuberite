@@ -2179,7 +2179,7 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 	if (a_Changes.size() == 1)
 	{
 		const auto & Change = a_Changes[0];
-		m_Protocol->SendBlockChange(Change.GetX(), Change.GetY(), Change.GetZ(), Change.m_BlockType, Change.m_BlockMeta);
+		m_Protocol->SendBlockChange(Change.GetX(), Change.GetY(), Change.GetZ(), Change.m_Block);
 		return;
 	}
 
