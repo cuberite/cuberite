@@ -780,9 +780,9 @@ void cPlayer::SetCustomName(const AString & a_CustomName)
 
 
 
-void cPlayer::SetBedPos(const Vector3i & a_Pos)
+void cPlayer::SetBedPos(const Vector3i a_Position)
 {
-	m_LastBedPos = a_Pos;
+	m_LastBedPos = a_Position;
 	m_SpawnWorldName = m_World->GetName();
 }
 
@@ -790,11 +790,10 @@ void cPlayer::SetBedPos(const Vector3i & a_Pos)
 
 
 
-void cPlayer::SetBedPos(const Vector3i & a_Pos, cWorld * a_World)
+void cPlayer::SetBedPos(const Vector3i a_Position, const cWorld & a_World)
 {
-	m_LastBedPos = a_Pos;
-	ASSERT(a_World != nullptr);
-	m_SpawnWorldName = a_World->GetName();
+	m_LastBedPos = a_Position;
+	m_SpawnWorldName = a_World.GetName();
 }
 
 
@@ -1756,7 +1755,7 @@ void cPlayer::LoadFromDisk()
 
 	const Vector3i WorldSpawn(static_cast<int>(m_World->GetSpawnX()), static_cast<int>(m_World->GetSpawnY()), static_cast<int>(m_World->GetSpawnZ()));
 	SetPosition(WorldSpawn);
-	SetBedPos(WorldSpawn, m_World);
+	SetBedPos(WorldSpawn, *m_World);
 
 	m_Inventory.Clear();
 	m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();  // Use a random number to seed the enchantment generator
@@ -3138,8 +3137,6 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 	{
 		return;
 	}
-
-	LOGD("Spawing %s on %s", GetName().c_str(), a_Client.GetUsername().c_str());
 
 	a_Client.SendPlayerSpawn(*this);
 	a_Client.SendEntityHeadLook(*this);

@@ -78,14 +78,12 @@
 
 // OS-dependent stuff:
 #ifdef _WIN32
-	#include <sdkddkver.h>
-
 	#define NOMINMAX  // Windows SDK defines min and max macros, messing up with our std::min and std::max usage.
 	#define WIN32_LEAN_AND_MEAN
-	#define _WIN32_WINNT _WIN32_WINNT_WINXP  // We want to target Windows XP with Service Pack 2 & Windows Server 2003 with Service Pack 1 and higher.
+	#define _WIN32_WINNT 0x0501  // We want to target Windows XP with Service Pack 2 & Windows Server 2003 with Service Pack 1 and higher.
 
 	// Use CryptoAPI primitives when targeting a version that supports encrypting with AES-CFB8 smaller than a full block at a time.
-	#define PLATFORM_CRYPTOGRAPHY (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
+	#define PLATFORM_CRYPTOGRAPHY (_WIN32_WINNT >= 0x0602)
 
 	#include <Windows.h>
 	#include <winsock2.h>

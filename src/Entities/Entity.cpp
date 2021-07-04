@@ -1683,10 +1683,12 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 			{
 				BlockState Block;
 				if (!a_Chunk.UnboundedRelGetBlock(x, y, z, Block))
-				{ /*
+				{
+					/*
 					LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
 						x, y, z, GetPosX(), GetPosZ()
-					); */
+					);
+					*/
 					continue;
 				}
 
@@ -1713,9 +1715,11 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	BlockState BlockIn;
 	if (!a_Chunk.UnboundedRelGetBlock(RelX, HeadHeight, RelZ, BlockIn))
 	{
+		/*
 		LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
 			RelX, HeadHeight, RelZ, GetPosX(), GetPosZ()
 		);
+		*/
 		return;
 	}
 	m_IsHeadInWater = BlockIn.Type() == BlockType::Water;

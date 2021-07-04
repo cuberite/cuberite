@@ -520,10 +520,10 @@ public:
 
 	/** Sets the player's bed (home / respawn) position to the specified position.
 	Sets the respawn world to the player's world. */
-	void SetBedPos(const Vector3i & a_Pos);
+	void SetBedPos(const Vector3i a_Position);
 
 	/** Sets the player's bed (home / respawn) position and respawn world to the specified parameters. */
-	void SetBedPos(const Vector3i & a_Pos, cWorld * a_World);
+	void SetBedPos(const Vector3i a_Position, const cWorld & a_World);
 
 	// tolua_end
 

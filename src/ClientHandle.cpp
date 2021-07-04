@@ -2167,13 +2167,23 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 	ASSERT(!a_Changes.empty());  // We don't want to be sending empty change packets!
 
 	// Do not send block changes in chunks that weren't sent to the client yet:
-	cChunkCoords ChunkCoords = cChunkCoords(a_ChunkX, a_ChunkZ);
-	cCSLock Lock(m_CSChunkLists);
-	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
 	{
-		Lock.Unlock();
-		m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
+		cCSLock Lock(m_CSChunkLists);
+		if (std::find(m_SentChunks.begin(), m_SentChunks.end(), cChunkCoords(a_ChunkX, a_ChunkZ)) == m_SentChunks.end())
+		{
+			return;
+		}
 	}
+
+	// Use a dedicated packet for single changes:
+	if (a_Changes.size() == 1)
+	{
+		const auto & Change = a_Changes[0];
+		m_Protocol->SendBlockChange(Change.GetX(), Change.GetY(), Change.GetZ(), Change.m_BlockType, Change.m_BlockMeta);
+		return;
+	}
+
+	m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
 }
 
 

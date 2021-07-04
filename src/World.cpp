@@ -1048,6 +1048,12 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 
 	GetSimulatorManager()->Simulate(static_cast<float>(a_Dt.count()));
 
+	// Flush out all clients' buffered data:
+	for (const auto Player : m_Players)
+	{
+		Player->GetClientHandle()->ProcessProtocolOut();
+	}
+
 	if (m_WorldAge - m_LastChunkCheck > std::chrono::seconds(10))
 	{
 		// Unload every 10 seconds
@@ -2273,16 +2279,16 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 	size_t NameLength = a_PlayerNameHint.length();
 
 	cLock Lock(*this);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	for (const auto Player : m_Players)
 	{
-		if (!(*itr)->IsTicking())
+		if (!Player->IsTicking())
 		{
 			continue;
 		}
-		size_t Rating = RateCompareString (a_PlayerNameHint, (*itr)->GetName());
+		size_t Rating = RateCompareString (a_PlayerNameHint, Player->GetName());
 		if (Rating >= BestRating)
 		{
-			BestMatch = *itr;
+			BestMatch = Player;
 			BestRating = Rating;
 		}
 		if (Rating == NameLength)  // Perfect match
@@ -2325,19 +2331,19 @@ bool cWorld::DoWithNearestPlayer(Vector3d a_Pos, double a_RangeLimit, cPlayerLis
 	cPlayer * ClosestPlayer = nullptr;
 
 	cLock Lock(*this);
-	for (cPlayerList::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	for (const auto Player : m_Players)
 	{
-		if (!(*itr)->IsTicking())
+		if (!Player->IsTicking())
 		{
 			continue;
 		}
 
-		if (a_IgnoreSpectator && (*itr)->IsGameModeSpectator())
+		if (a_IgnoreSpectator && Player->IsGameModeSpectator())
 		{
 			continue;
 		}
 
-		Vector3f Pos = (*itr)->GetPosition();
+		Vector3f Pos = Player->GetPosition();
 		double Distance = (Pos - a_Pos).Length();
 
 		// If the player is too far, skip them:
@@ -2356,7 +2362,7 @@ bool cWorld::DoWithNearestPlayer(Vector3d a_Pos, double a_RangeLimit, cPlayerLis
 		}
 
 		ClosestDistance = Distance;
-		ClosestPlayer = *itr;
+		ClosestPlayer = Player;
 	}
 
 	if (ClosestPlayer)
@@ -2729,7 +2735,7 @@ OwnedEntity cWorld::RemoveEntity(cEntity & a_Entity)
 		cLock Lock(*this);
 		const auto Player = static_cast<cPlayer *>(&a_Entity);
 		LOGD("Removing player %s from world \"%s\"", Player->GetName().c_str(), m_WorldName.c_str());
-		m_Players.remove(Player);
+		m_Players.erase(std::remove(m_Players.begin(), m_Players.end(), Player), m_Players.end());
 	}
 
 	// Check if the entity is in the chunkmap:
@@ -2953,13 +2959,9 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 	std::vector<pair_t> UsernamesByWeight;
 
 	cLock Lock(*this);
-	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
+	for (const auto Player : m_Players)
 	{
-		AString PlayerName ((*itr)->GetName());
-		if ((*itr)->HasCustomName())
-		{
-			PlayerName = (*itr)->GetCustomName();
-		}
+		AString PlayerName = Player->HasCustomName() ? Player->GetCustomName() : Player->GetName();
 
 		AString::size_type Found = StrToLower(PlayerName).find(StrToLower(LastWord));  // Try to find last word in playername
 		if (Found == AString::npos)

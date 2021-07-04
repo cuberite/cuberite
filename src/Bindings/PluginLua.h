@@ -13,7 +13,6 @@
 #include "LuaState.h"
 
 // Names for the global variables through which the plugin is identified in its LuaState
-#define LUA_PLUGIN_NAME_VAR_NAME     "_CuberiteInternal_PluginName"
 #define LUA_PLUGIN_INSTANCE_VAR_NAME "_CuberiteInternal_PluginInstance"
 
 

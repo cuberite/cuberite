@@ -40,8 +40,6 @@ class cUUID;
 
 struct SetChunkData;
 
-typedef std::list< cPlayer * > cPlayerList;
-
 
 
 
@@ -994,9 +992,9 @@ private:
 	cRedstoneSimulator * m_RedstoneSimulator;
 
 	// Protect with chunk map CS
-	cPlayerList      m_Players;
+	std::vector<cPlayer *> m_Players;
 
-	cWorldStorage    m_Storage;
+	cWorldStorage m_Storage;
 
 	unsigned int m_MaxPlayers;
 
