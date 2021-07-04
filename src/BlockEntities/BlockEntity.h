@@ -56,7 +56,7 @@ public:
 	virtual void Destroy();
 
 	/** Returns true if the specified blocktype is supposed to have an associated block entity. */
-	static bool IsBlockEntityBlockType(BlockType a_Block);
+	static bool IsBlockEntityBlockType(BlockState a_Block);
 
 	/** Called when the block entity object is added to a world. */
 	virtual void OnAddToWorld(cWorld & a_World, cChunk & a_Chunk);
