@@ -4,6 +4,7 @@
 #include "ItemHandler.h"
 #include "../World.h"
 #include "../Entities/Player.h"
+#include "BlockInfo.h"
 
 
 
@@ -41,48 +42,39 @@ public:
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			switch (m_ItemType)
+			if (m_ItemType == E_ITEM_FLINT_AND_STEEL)
 			{
-				case E_ITEM_FLINT_AND_STEEL:
-				{
-					a_Player->UseEquippedItem();
-					break;
-				}
-				case E_ITEM_FIRE_CHARGE:
-				{
-					a_Player->GetInventory().RemoveOneEquippedItem();
-					break;
-				}
-				default:
-				{
-					ASSERT(!"Unknown Lighter Item!");
-				}
+				a_Player->UseEquippedItem();
+			}
+			else  // Fire charge.
+			{
+				a_Player->GetInventory().RemoveOneEquippedItem();
 			}
 		}
 
-		switch (a_World->GetBlock(a_ClickedBlockPos).Type())
+		// Activate TNT if we clicked on it while not crouched:
+		if ((a_World->GetBlock(a_ClickedBlockPos).Type() == BlockType::TNT) && !a_Player->IsCrouched())
 		{
-			case BlockType::TNT:
+			a_World->DigBlock(a_ClickedBlockPos, a_Player);
+			a_World->SpawnPrimedTNT(Vector3d(a_ClickedBlockPos) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
+			return false;
+		}
+
+		const auto FirePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+		if (!cChunkDef::IsValidHeight(FirePos.y))
+		{
+			return false;
+		}
+
+		// Light a fire next to / on top of the block if air:
+		if (IsBlockAir(a_World->GetBlock(FirePos)))
+		{
+			a_World->PlaceBlock(FirePos, Block::Fire::Fire());
+
+			// The client plays flint and steel sounds, only need to handle fire charges:
+			if (m_ItemType == E_ITEM_FIRE_CHARGE)
 			{
-				// Activate the TNT:
-				a_World->DigBlock(a_ClickedBlockPos, a_Player);
-				a_World->SpawnPrimedTNT(Vector3d(a_ClickedBlockPos) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
-				break;
-			}
-			default:
-			{
-				// Light a fire next to / on top of the block if air:
-				auto FirePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-				if (!cChunkDef::IsValidHeight(FirePos.y))
-				{
-					break;
-				}
-				if (a_World->GetBlock(FirePos) == Block::Air::Air())
-				{
-					a_World->PlaceBlock(FirePos, Block::Fire::Fire());
-					a_World->BroadcastSoundEffect("item.flintandsteel.use", FirePos, 1.0f, 1.04f);
-					break;
-				}
+				a_World->BroadcastSoundEffect("item.firecharge.use", FirePos, 1.0f, 1.04f);
 			}
 		}
 

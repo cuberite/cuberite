@@ -1477,7 +1477,6 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BlockType a_Fluid, cI
 	AString SectionName = IsWater ? "WaterSprings" : "LavaSprings";
 	AString DefaultHeightDistribution;
 
-	LOGERROR("SectionName");
 	int DefaultChance = 0;
 	switch (a_Dimension)
 	{
