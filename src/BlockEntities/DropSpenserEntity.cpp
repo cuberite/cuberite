@@ -210,6 +210,7 @@ void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		case BLOCK_FACE_XP: PickupSpeedX =  PickupSpeed; break;
 		case BLOCK_FACE_ZM: PickupSpeedZ = -PickupSpeed; break;
 		case BLOCK_FACE_ZP: PickupSpeedZ =  PickupSpeed; break;
+		default: UNREACHABLE("Got unknown Block face");
 	}
 
 	double MicroX, MicroY, MicroZ;

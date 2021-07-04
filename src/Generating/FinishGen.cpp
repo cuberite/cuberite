@@ -635,6 +635,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 							a_ChunkDesc.SetBlock({x, y, z},     Block::TallGrass::TallGrass(Block::TallGrass::Half::Lower));
 							a_ChunkDesc.SetBlock({x, y + 1, z}, Block::TallGrass::TallGrass(Block::TallGrass::Half::Upper));
 							a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(y + 1));
+							break;
 						}
 						case BlockType::LargeFern:
 						{

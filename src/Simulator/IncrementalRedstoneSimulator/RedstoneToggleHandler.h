@@ -47,12 +47,9 @@ namespace RedstoneToggleHandler
 			case BlockType::SpruceButton:             GETOFFSETATTACHEDTO(SpruceButton)
 			case BlockType::StoneButton:              GETOFFSETATTACHEDTO(StoneButton)
 			case BlockType::WarpedButton:             GETOFFSETATTACHEDTO(WarpedButton)
-			default:
-			{
-				ASSERT(!"Unexpected block passed to button/lever handler");
-				return { 0, 0, 0 };
-			}
+			default: break;
 		}
+		UNREACHABLE(!"Unexpected block passed to button/lever handler");
 	}
 
 	static unsigned char GetPowerLevel(BlockState a_Block)

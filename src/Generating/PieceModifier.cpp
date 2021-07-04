@@ -19,19 +19,6 @@ static const int SEED_OFFSET = 135 * 13;
 
 
 
-// Emit a warning if the first param is true
-#define CONDWARNING(ShouldLog, Fmt, ...) \
-	do { \
-		if (ShouldLog) \
-		{ \
-			LOGWARNING(Fmt, __VA_ARGS__); \
-		} \
-	} while (false)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 /** A modifier which is pseudo-randomly replacing blocks to other types and metas. */
 class cPieceModifierRandomizeBlocks:
@@ -245,12 +232,10 @@ public:
 		cNoise Noise(m_Seed);
 		cNoise PieceNoise(Noise.IntNoise3DInt(a_PiecePos));
 
-		size_t NumBlocks = a_Image.GetBlockCount();
+		const size_t NumBlocks = a_Image.GetBlockCount();
 		auto BlockTypes = a_Image.GetBlocks();
+		std::vector<unsigned char> BlockMetas;
 
-		ASSERT("This needs to be done!!!");
-		return;
-/*
 		for (size_t i = 0; i < NumBlocks; i++)
 		{
 			if (m_BlocksToReplace.count(BlockTypes[i].Type()))
@@ -269,12 +254,12 @@ public:
 						if (blockToRnd.m_MinMeta < blockToRnd.m_MaxMeta)
 						{
 							int BlockMetaRnd = std::clamp(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot*2, static_cast<int>(i), blockToRnd.m_MinNoiseMeta, blockToRnd.m_MaxNoiseMeta)), blockToRnd.m_MinMeta, blockToRnd.m_MaxMeta);
-							BlockMetas[i] = static_cast<NIBBLETYPE>(BlockMetaRnd);
+							BlockMetas[i] = static_cast<unsigned char>(BlockMetaRnd);
 						}
 						else if ((blockToRnd.m_MaxMeta > -1) && (blockToRnd.m_MaxMeta == blockToRnd.m_MinMeta))
 						{
 							// Change meta if at least minimum meta was specified
-							BlockMetas[i] = static_cast<NIBBLETYPE>(blockToRnd.m_MaxMeta);
+							BlockMetas[i] = static_cast<unsigned char>(blockToRnd.m_MaxMeta);
 						}
 						break;
 					}
@@ -284,16 +269,15 @@ public:
 				if (m_MaxMeta > m_MinMeta)
 				{
 					int BlockMetaRnd = std::clamp(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot*2, static_cast<int>(i), m_MinNoiseMeta, m_MaxNoiseMeta)), m_MinMeta, m_MaxMeta);
-					BlockMetas[i] = static_cast<NIBBLETYPE>(BlockMetaRnd);
+					BlockMetas[i] = static_cast<unsigned char>(BlockMetaRnd);
 				}
 				else if ((m_MaxMeta > -1) && (m_MaxMeta == m_MinMeta))
 				{
 					// Change meta if at least minimum meta was specified
-					BlockMetas[i] = static_cast<NIBBLETYPE>(m_MaxMeta);
+					BlockMetas[i] = static_cast<unsigned char>(m_MaxMeta);
 				}
 			}
 		}  // for i - BlockTypes[]
-*/
 	}
 
 	virtual void AssignSeed(int a_Seed) override

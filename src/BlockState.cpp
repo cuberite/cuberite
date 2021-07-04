@@ -772,5 +772,6 @@ BlockState::BlockState(BlockType a_Type) : ID([&]
 		case BlockType::ZombieHead:                      return ZombieHead::ZombieHead().ID;
 		case BlockType::ZombieWallHead:                  return ZombieWallHead::ZombieWallHead().ID;
 	}
+	return Air::Air().ID;
 }())
 {}

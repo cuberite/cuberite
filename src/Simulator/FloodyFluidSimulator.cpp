@@ -36,7 +36,7 @@ cFloodyFluidSimulator::cFloodyFluidSimulator(
 	BlockType a_Fluid,
 	unsigned char a_StationaryFalloffValue,
 	unsigned char a_Falloff,
-	int a_TickDelay,
+	size_t a_TickDelay,
 	int a_NumNeighborsForSource
 ) :
 	Super(a_World, a_Fluid, a_StationaryFalloffValue, a_TickDelay),
