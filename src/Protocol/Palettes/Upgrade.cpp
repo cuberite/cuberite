@@ -10,7 +10,7 @@ namespace PaletteUpgrade
 	BlockState FromBlock(const BLOCKTYPE Block, const NIBBLETYPE Meta)
 	{
 		using namespace Block;
-		switch ((Block << 4) | Meta & 0x04)
+		switch ((Block << 4) | (Meta & 0x04))
 		{
 			case (0 << 4) | 0: return Air::Air();
 			case (1 << 4) | 0: return Stone::Stone();
