@@ -1476,6 +1476,8 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BlockType a_Fluid, cI
 	bool IsWater = (a_Fluid == BlockType::Water);
 	AString SectionName = IsWater ? "WaterSprings" : "LavaSprings";
 	AString DefaultHeightDistribution;
+
+	LOGERROR("SectionName");
 	int DefaultChance = 0;
 	switch (a_Dimension)
 	{
@@ -1551,6 +1553,7 @@ void cFinishGenFluidSprings::GenFinish(cChunkDesc & a_ChunkDesc)
 							// Succeeded, bail out
 							return;
 						}
+						break;
 					}
 					default: break;
 				}

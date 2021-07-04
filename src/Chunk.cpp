@@ -1265,7 +1265,7 @@ void cChunk::SetBlock(Vector3i a_RelPos, BlockState a_Block)
 	}
 
 	// If the new block is a block entity, create the entity object:
-	if (cBlockEntity::IsBlockEntityBlockType(a_Block.Type()))
+	if (cBlockEntity::IsBlockEntityBlockType(a_Block))
 	{
 		AddBlockEntity(cBlockEntity::CreateByBlockType(a_Block, RelativeToAbsolute(a_RelPos), m_World));
 	}
