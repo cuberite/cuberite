@@ -56,7 +56,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 	{
 		case E_ITEM_BUCKET:
 		{
-			// LOGD("Dispensing empty bucket in slot %d; DispBlock is \"%s\" (%d).", a_SlotNum, ItemTypeToString(DispBlock).c_str(), DispBlock);  // TODO(12xx12) Add function for string conversion
+			FLOGD("Dispensing empty bucket in slot {}}; DispBlock is \"{}\".", a_SlotNum, DispBlock);
 			switch (DispBlock.Type())
 			{
 				case BlockType::Water:
@@ -86,7 +86,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_WATER_BUCKET:
 		{
-			// LOGD("Dispensing water bucket in slot %d; DispBlock is \"%s\" (%d).", a_SlotNum, ItemTypeToString(DispBlock).c_str(), DispBlock);  // TODO(12xx12) Add function for string conversion
+			FLOGD("Dispensing water bucket in slot {}; DispBlock is \"{}\".", a_SlotNum, DispBlock);
 			if (EmptyLiquidBucket(DispBlock, a_SlotNum))
 			{
 				DispChunk->SetBlock(DispRelCoord, Block::Air::Air());
@@ -100,7 +100,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_LAVA_BUCKET:
 		{
-			// LOGD("Dispensing lava bucket in slot %d; DispBlock is \"%s\" (%d).", a_SlotNum, ItemTypeToString(DispBlock).c_str(), DispBlock);// TODO(12xx12) Add function for string conversion
+			FLOGD("Dispensing lava bucket in slot {}; DispBlock is \"{}\".", a_SlotNum, DispBlock);
 			if (EmptyLiquidBucket(DispBlock, a_SlotNum))
 			{
 				DispChunk->SetBlock(DispRelCoord, Block::Lava::Lava());

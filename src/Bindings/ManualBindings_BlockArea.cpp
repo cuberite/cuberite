@@ -1141,7 +1141,7 @@ static int tolua_cBlockArea_SetRelBlockTypeMeta(lua_State * a_LuaState)
 
 
 
-// TODO(12xx12): uncomment everything.
+
 void cManualBindings::BindBlockArea(lua_State * a_LuaState)
 {
 	tolua_beginmodule(a_LuaState, nullptr);

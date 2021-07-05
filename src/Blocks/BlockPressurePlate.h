@@ -104,18 +104,18 @@ private:
 	{
 		switch (m_BlockType)
 		{
-			case BlockType::AcaciaPressurePlate:             return 0;  // TODO(12xx12)
-			case BlockType::BirchPressurePlate:              return 0;  // TODO(12xx12)
-			case BlockType::CrimsonPressurePlate:            return 0;  // TODO(12xx12)
-			case BlockType::DarkOakPressurePlate:            return 0;  // TODO(12xx12)
+			case BlockType::AcaciaPressurePlate:             return 15;
+			case BlockType::BirchPressurePlate:              return 2;
+			case BlockType::CrimsonPressurePlate:            return 35;
+			case BlockType::DarkOakPressurePlate:            return 26;
 			case BlockType::HeavyWeightedPressurePlate:      return 6;
-			case BlockType::JunglePressurePlate:             return 0;  // TODO(12xx12)
+			case BlockType::JunglePressurePlate:             return 10;
 			case BlockType::LightWeightedPressurePlate:      return 30;
 			case BlockType::OakPressurePlate:                return 13;
 			case BlockType::PolishedBlackstonePressurePlate: return 0;  // TODO(12xx12)
-			case BlockType::SprucePressurePlate:             return 0;  // TODO(12xx12)
+			case BlockType::SprucePressurePlate:             return 34;
 			case BlockType::StonePressurePlate:              return 11;
-			case BlockType::WarpedPressurePlate:             return 0;  // TODO(12xx12)
+			case BlockType::WarpedPressurePlate:             return 56;
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in pressure plate handler!");

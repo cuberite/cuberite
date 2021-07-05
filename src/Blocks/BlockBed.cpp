@@ -137,7 +137,7 @@ bool cBlockBedHandler::OnUse(
 
 	// When sleeping, the player's bounding box moves to approximately where his head is.
 	// Set the player's position to somewhere close to the edge of the pillow block:
-	a_Player.SetPosition(AddFaceDirection(Vector3f(0.4f, 1, 0.4f), GetBlockFace(Self)) + Vector3f(0.5f, 0.6875, 0.5f) + a_BlockPos);  // TODO(12xx12) Sanity check
+	a_Player.SetPosition(AddFaceDirection(Vector3f(0.4f, 1, 0.4f), GetBlockFace(Self)) + Vector3f(0.5f, 0.6875, 0.5f) + a_BlockPos);
 
 	// Fast-forward the time if all players in the world are in their beds:
 	if (a_WorldInterface.ForEachPlayer([](cPlayer & a_OtherPlayer) { return !a_OtherPlayer.IsInBed(); }))
