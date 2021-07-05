@@ -209,8 +209,8 @@ OwnedBlockEntity cBlockEntity::CreateByBlockType(BlockState a_Block, const Vecto
 		case BlockType::TrappedChest:   return std::make_unique<cChestEntity>(a_Block, a_Pos, a_World);
 		default:
 		{
-			LOGD("%s: Requesting creation of an unknown block entity - block type %d (%s)",
-				__FUNCTION__, a_Block.Type(), ""  // ItemTypeToString(a_BlockType).c_str()  // TODO(12xx12)
+			FLOGD("{}: Requesting creation of an unknown block entity - block {}",
+				__FUNCTION__, a_Block.Type()
 			);
 			ASSERT(!"Requesting creation of an unknown block entity");
 			return nullptr;

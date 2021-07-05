@@ -187,17 +187,13 @@ private:
 			case BlockType::Grass:
 			case BlockType::Farmland:
 			{
-				// TODO(12xx12): readd notification
-				/*
-				const NIBBLETYPE Meta = (ProduceBlockType == BlockType::MELON) ? 0 : static_cast<NIBBLETYPE>(Random.RandInt(4) % 4);
+				const auto Meta = (ProduceBlockType == BlockType::Melon) ? 0 : static_cast<unsigned char>(Random.RandInt(4) % 4);
 				FLOGD("Growing melon / pumpkin at {0} (<{1}, {2}> from stem), overwriting {3}, growing on top of {4}, meta {5}",
 					a_Chunk.RelativeToAbsolute(ProduceRelPos),
 					x, z,
-					ItemTypeToString(BlockType[CheckType]),
-					ItemTypeToString(SoilBlock),
-					Meta
+					Neighbors[CheckType],
+					SoilBlock
 				);
-				*/
 				// Place a randomly-facing produce:
 				a_Chunk.SetBlock(ProduceRelPos, ProduceBlockType);
 				break;
