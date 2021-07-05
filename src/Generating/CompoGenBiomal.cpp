@@ -227,11 +227,13 @@ protected:
 			Block::LightGrayTerracotta::LightGrayTerracotta(),
 		} ;
 		static const std::array<size_t, 12> LayerSizes[] =  // Adjust the chance so that thinner layers occur more commonly
-		{{
-			1, 1, 1, 1, 1, 1,
-			2, 2, 2, 2,
-			3, 3,
-		}} ;
+		{
+			{
+				1, 1, 1, 1, 1, 1,
+				2, 2, 2, 2,
+				3, 3,
+			}
+		} ;
 		auto Idx = static_cast<int>(m_MesaPattern.size() - 1);
 		while (Idx >= 0)
 		{
