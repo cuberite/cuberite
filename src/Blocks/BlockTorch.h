@@ -9,7 +9,7 @@
 
 
 
-class cBlockTorchHandler :
+class cBlockTorchHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

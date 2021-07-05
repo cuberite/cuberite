@@ -1240,7 +1240,7 @@ void cChunkMap::GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty) co
 
 
 
-int cChunkMap::GrowPlantAt(Vector3i a_BlockPos, unsigned char a_NumStages)
+int cChunkMap::GrowPlantAt(Vector3i a_BlockPos, char a_NumStages)
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto RelPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);

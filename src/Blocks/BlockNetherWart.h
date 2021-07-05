@@ -37,10 +37,12 @@ private:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, unsigned char a_NumStages = 1) const override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, char a_NumStages = 1) const override
 	{
 		auto OldAge = Block::NetherWart::Age(a_Chunk.GetBlock(a_RelPos));
-		auto NewAge = std::min<unsigned char>(OldAge + a_NumStages, RipeAge);
+		const auto NumStages = static_cast<unsigned char>(std::clamp<char>(a_NumStages, 0, std::numeric_limits<char>::max()));
+
+		auto NewAge = std::min<unsigned char>(OldAge + NumStages, RipeAge);
 		if ((OldAge < RipeAge) && (CanGrow(a_Chunk, a_RelPos) == paGrowth))
 		{
 			a_Chunk.FastSetBlock(a_RelPos, Block::NetherWart::NetherWart(NewAge));

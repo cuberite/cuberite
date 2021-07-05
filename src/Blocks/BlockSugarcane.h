@@ -76,7 +76,7 @@ private:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, unsigned char a_NumStages = 1) const override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, char a_NumStages = 1) const override
 	{
 		// Check the total height of the sugarcane blocks here:
 		int TopY = a_RelPos.y + 1;
@@ -95,9 +95,10 @@ private:
 		{
 			--bottom;
 		}
+		const auto NumStages = static_cast<unsigned char>(std::clamp<char>(a_NumStages, 0, std::numeric_limits<char>::max()));
 
 		// Grow by at most a_NumStages, but no more than max height:
-		auto toGrow = std::min<unsigned char>(a_NumStages, a_Chunk.GetWorld()->GetMaxSugarcaneHeight() + 1 - (TopY - bottom));
+		auto toGrow = std::min<unsigned char>(NumStages, static_cast<unsigned char>(a_Chunk.GetWorld()->GetMaxSugarcaneHeight() + 1 - (TopY - bottom)));
 		Vector3i TopYPos(a_RelPos.x, TopY, a_RelPos.z);
 		for (int i = 0; i < toGrow; i++)
 		{

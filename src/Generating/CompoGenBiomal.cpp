@@ -53,98 +53,100 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // Land top block patterns:
 
-static const cPattern patGrass =
+namespace
 {
-	Block::GrassBlock::GrassBlock(),
-	Block::Dirt::Dirt(),
-	Block::Dirt::Dirt(),
-	Block::Dirt::Dirt(),
-} ;
+	static constexpr cPattern patGrass =
+	{
+		Block::GrassBlock::GrassBlock(false),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+	} ;
 
-static const cPattern patSand =
-{
-	Block::Sand::Sand(),
-	Block::Sand::Sand(),
-	Block::Sand::Sand(),
-	Block::Sandstone::Sandstone(),
-} ;
+	static constexpr cPattern patSand =
+	{
+		Block::Sand::Sand(),
+		Block::Sand::Sand(),
+		Block::Sand::Sand(),
+		Block::Sandstone::Sandstone(),
+	} ;
 
-static const cPattern patDirt =
-{
-	Block::Dirt::Dirt(),
-	Block::Dirt::Dirt(),
-	Block::Dirt::Dirt(),
-	Block::Dirt::Dirt(),
-} ;
+	static constexpr cPattern patDirt =
+	{
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+	} ;
 
-static const cPattern patPodzol =
-{
-	Block::Podzol::Podzol(),
-	Block::Podzol::Podzol(),
-	Block::Podzol::Podzol(),
-	Block::Podzol::Podzol(),
-} ;
+	static constexpr cPattern patPodzol =
+	{
+		Block::Podzol::Podzol(false),
+		Block::Podzol::Podzol(false),
+		Block::Podzol::Podzol(false),
+		Block::Podzol::Podzol(false),
+	} ;
 
-static const cPattern patGrassLess =
-{
-	Block::CoarseDirt::CoarseDirt(),
-	Block::Dirt::Dirt(),
-	Block::Dirt::Dirt(),
-	Block::Dirt::Dirt(),
-} ;
+	static constexpr cPattern patGrassLess =
+	{
+		Block::CoarseDirt::CoarseDirt(),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+	} ;
 
-static const cPattern patMycelium =
-{
-	Block::Mycelium::Mycelium(),
-	Block::Dirt::Dirt(),
-	Block::Dirt::Dirt(),
-	Block::Dirt::Dirt(),
-} ;
+	static constexpr cPattern patMycelium =
+	{
+		Block::Mycelium::Mycelium(false),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+	} ;
 
-static const cPattern patGravel =
-{
-	Block::Gravel::Gravel(),
-	Block::Gravel::Gravel(),
-	Block::Gravel::Gravel(),
+	static constexpr cPattern patGravel =
+	{
+		Block::Gravel::Gravel(),
+		Block::Gravel::Gravel(),
+		Block::Gravel::Gravel(),
 
-} ;
+	} ;
 
-static const cPattern patStone =
-{
-	Block::Stone::Stone(),
-	Block::Stone::Stone(),
-	Block::Stone::Stone(),
-	Block::Stone::Stone(),
-} ;
+	static constexpr cPattern patStone =
+	{
+		Block::Stone::Stone(),
+		Block::Stone::Stone(),
+		Block::Stone::Stone(),
+		Block::Stone::Stone(),
+	} ;
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Ocean floor patterns:
+	////////////////////////////////////////////////////////////////////////////////
+	// Ocean floor patterns:
 
-static const cPattern patOFSand =
-{
-	Block::Sand::Sand(),
-	Block::Sand::Sand(),
-	Block::Sand::Sand(),
-	Block::Sandstone::Sandstone()
-} ;
+	static const cPattern patOFSand =
+	{
+		Block::Sand::Sand(),
+		Block::Sand::Sand(),
+		Block::Sand::Sand(),
+		Block::Sandstone::Sandstone()
+	} ;
 
-static const cPattern patOFClay =
-{
-	Block::Clay::Clay(),
-	Block::Clay::Clay(),
-	Block::Sand::Sand(),
-	Block::Sand::Sand(),
-} ;
+	static const cPattern patOFClay =
+	{
+		Block::Clay::Clay(),
+		Block::Clay::Clay(),
+		Block::Sand::Sand(),
+		Block::Sand::Sand(),
+	} ;
 
-static const cPattern patOFOrangeClay =
-{
-	Block::OrangeTerracotta::OrangeTerracotta(),
-	Block::OrangeTerracotta::OrangeTerracotta(),
-	Block::OrangeTerracotta::OrangeTerracotta(),
-} ;
-
+	static const cPattern patOFOrangeClay =
+	{
+		Block::OrangeTerracotta::OrangeTerracotta(),
+		Block::OrangeTerracotta::OrangeTerracotta(),
+		Block::OrangeTerracotta::OrangeTerracotta(),
+	} ;
+}
 
 
 
@@ -225,11 +227,11 @@ protected:
 			Block::LightGrayTerracotta::LightGrayTerracotta(),
 		} ;
 		static const std::array<size_t, 12> LayerSizes[] =  // Adjust the chance so that thinner layers occur more commonly
-		{
+		{{
 			1, 1, 1, 1, 1, 1,
 			2, 2, 2, 2,
 			3, 3,
-		} ;
+		}} ;
 		auto Idx = static_cast<int>(m_MesaPattern.size() - 1);
 		while (Idx >= 0)
 		{
@@ -239,7 +241,7 @@ protected:
 			rnd /= 2;
 			for (int lay = 0; lay < NumLayers; lay++)
 			{
-				auto NumBlocks = LayerSizes->at(static_cast<size_t>(rnd) % LayerSizes->size());
+				auto NumBlocks = static_cast<size_t>(LayerSizes->at(static_cast<size_t>(rnd) % LayerSizes->size()));
 				auto BlockToPlace = AllowedColors.at(static_cast<size_t>(rnd / 4) % AllowedColors.size());
 				if (
 					((NumBlocks == 3) && (NumLayers == 2)) ||  // In two-layer mode disallow the 3-high layers:
@@ -248,25 +250,25 @@ protected:
 				{
 					NumBlocks = 1;
 				}
-				NumBlocks = std::min<size_t>(Idx + 1, NumBlocks);  // Limit by Idx so that we don't have to check inside the loop
+				NumBlocks = std::min<size_t>(static_cast<size_t>(Idx + 1), NumBlocks);  // Limit by Idx so that we don't have to check inside the loop
 				rnd /= 32;
 				for (size_t Block = 0; Block < NumBlocks; Block++, Idx--)
 				{
-					m_MesaPattern[Idx] = BlockToPlace;
+					m_MesaPattern[static_cast<size_t>(Idx)] = BlockToPlace;
 				}  // for block
 			}  // for lay
 
 			// A layer of hardened clay in between the layer group:
-			int NumBlocks = (rnd % 4) + 1;  // All heights the same probability
+			size_t NumBlocks = static_cast<size_t>(rnd % 4) + 1;  // All heights the same probability
 			if ((NumLayers == 2) && (NumBlocks < 4))
 			{
 				// For two layers of stained clay, add an extra block of hardened clay:
 				NumBlocks++;
 			}
-			NumBlocks = std::min<size_t>(Idx + 1, NumBlocks);  // Limit by Idx so that we don't have to check inside the loop
-			for (int block = 0; block < NumBlocks; block++, Idx--)
+			NumBlocks = std::min<size_t>(static_cast<size_t>(Idx + 1), NumBlocks);  // Limit by Idx so that we don't have to check inside the loop
+			for (size_t Block = 0; Block < NumBlocks; Block++, Idx--)
 			{
-				m_MesaPattern[Idx] = Block::Terracotta::Terracotta();
+				m_MesaPattern[static_cast<size_t>(Idx)] = Block::Terracotta::Terracotta();
 			}  // for block
 		}  // while (Idx >= 0)
 	}

@@ -195,7 +195,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_HOPPER:               return new cItemHopperHandler(a_ItemType);
 		case E_ITEM_IRON_TRAPDOOR:        return new cItemTrapdoorHandler(a_ItemType);
 		case E_ITEM_JACK_O_LANTERN:       return new cItemJackOLanternHandler(a_ItemType);
-		case E_ITEM_LADDER:               return new cItemLadderHandler(a_ItemType);;
+		case E_ITEM_LADDER:               return new cItemLadderHandler(a_ItemType);
 		case E_ITEM_LEVER:                return new cItemLeverHandler(a_ItemType);
 		// case E_ITEM_LOG:                  return new cItemSidewaysHandler(a_ItemType);  // TODO(12xx12)
 		// case E_ITEM_NEW_LOG:              return new cItemSidewaysHandler(a_ItemType);  // TODO(12xx12)

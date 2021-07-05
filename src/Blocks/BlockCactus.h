@@ -69,7 +69,7 @@ private:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, unsigned char a_NumStages = 1) const override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, char a_NumStages = 1) const override
 	{
 		// Check the total height of the cacti blocks here:
 		auto Top = a_RelPos.y + 1;
@@ -90,7 +90,7 @@ private:
 		}
 
 		// Refuse if already too high:
-		auto NumToGrow = std::min<unsigned char>(a_NumStages, a_Chunk.GetWorld()->GetMaxCactusHeight() + 1 - (Top - Bottom));
+		auto NumToGrow = std::min<char>(a_NumStages, static_cast<char>(a_Chunk.GetWorld()->GetMaxCactusHeight() + 1 - (Top - Bottom)));
 		if (NumToGrow <= 0)
 		{
 			return 0;

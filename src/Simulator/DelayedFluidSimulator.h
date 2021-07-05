@@ -31,7 +31,7 @@ public:
 		std::unordered_map<size_t, Vector3i> m_Blocks;
 	} ;
 
-	cDelayedFluidSimulatorChunkData(int a_TickDelay);
+	cDelayedFluidSimulatorChunkData(size_t a_TickDelay);
 
 	/** Slots, one for each delay tick, each containing the blocks to simulate */
 	std::vector<cSlot> m_Slots;

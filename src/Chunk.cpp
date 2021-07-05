@@ -1014,7 +1014,7 @@ cItems cChunk::PickupsFromBlock(Vector3i a_RelPos, const cEntity * a_Digger, con
 
 
 
-int cChunk::GrowPlantAt(Vector3i a_RelPos, unsigned char a_NumStages)
+int cChunk::GrowPlantAt(Vector3i a_RelPos, char a_NumStages)
 {
 	return cBlockHandler::For(GetBlock(a_RelPos).Type()).Grow(*this, a_RelPos, a_NumStages);
 }

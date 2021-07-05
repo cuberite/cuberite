@@ -135,38 +135,39 @@ private:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, unsigned char a_NumStages = 1) const override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, char a_NumStages = 1) const override
 	{
 		using namespace Block;
 		const auto OldSelf = a_Chunk.GetBlock(a_RelPos);
+		const auto NumStages = static_cast<unsigned char>(std::clamp<char>(a_NumStages, 0, std::numeric_limits<char>::max()));
 
 		switch (OldSelf.Type())
 		{
 			case BlockType::Beetroots:
 			{
 				auto OldAge = Beetroots::Age(OldSelf);
-				auto NewAge = std::clamp<unsigned char>(OldAge + a_NumStages, 0, BeetrootsMaxAge);
+				auto NewAge = std::clamp<unsigned char>(OldAge + NumStages, 0, BeetrootsMaxAge);
 				a_Chunk.SetBlock(a_RelPos, Beetroots::Beetroots(NewAge));
 				return NewAge - OldAge;
 			}
 			case BlockType::Carrots:
 			{
 				auto OldAge = Carrots::Age(OldSelf);
-				auto NewAge = std::clamp<unsigned char>(OldAge + a_NumStages, 0, CarrotsMaxAge);
+				auto NewAge = std::clamp<unsigned char>(OldAge + NumStages, 0, CarrotsMaxAge);
 				a_Chunk.SetBlock(a_RelPos, Carrots::Carrots(NewAge));
 				return NewAge - OldAge;
 			}
 			case BlockType::Potatoes:
 			{
 				auto OldAge = Potatoes::Age(OldSelf);
-				auto NewAge = std::clamp<unsigned char>(OldAge + a_NumStages, 0, PotatoesMaxAge);
+				auto NewAge = std::clamp<unsigned char>(OldAge + NumStages, 0, PotatoesMaxAge);
 				a_Chunk.SetBlock(a_RelPos, Potatoes::Potatoes(NewAge));
 				return NewAge - OldAge;
 			}
 			case BlockType::Wheat:
 			{
 				auto OldAge = Wheat::Age(OldSelf);
-				auto NewAge = std::clamp<unsigned char>(OldAge + a_NumStages, 0, WheatMaxAge);
+				auto NewAge = std::clamp<unsigned char>(OldAge + NumStages, 0, WheatMaxAge);
 				a_Chunk.SetBlock(a_RelPos, Wheat::Wheat(NewAge));
 				return NewAge - OldAge;
 			}

@@ -1659,7 +1659,7 @@ bool cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 
 
 
-int cWorld::GrowPlantAt(Vector3i a_BlockPos, unsigned char a_NumStages)
+int cWorld::GrowPlantAt(Vector3i a_BlockPos, char a_NumStages)
 {
 	return m_ChunkMap.GrowPlantAt(a_BlockPos, a_NumStages);
 }

@@ -73,7 +73,7 @@ public:
 		// Decide whether the hinge is on the left (default) or on the right:
 		auto LeftNeighborBlock = World.GetBlock(LeftNeighborPos);
 		auto RightNeighborBlock = World.GetBlock(RightNeighborPos);
-		bool HingeRight;
+		bool HingeRight = false;
 		/*
 		// DEBUG:
 		FLOGD("Door being placed at {0}", a_PlacePosition);

@@ -949,7 +949,7 @@ Also supports the Vector3i overloads (TODO: document these (?)). */
 template <
 	typename DataType,
 	int DataTypeFlag,
-	DataType (cBlockArea::*Fn)(Vector3i, DataType)
+	void (cBlockArea::*Fn)(Vector3i, DataType)
 >
 static int SetBlock(lua_State * a_LuaState)
 {
@@ -985,7 +985,7 @@ static int SetBlock(lua_State * a_LuaState)
 	unsigned char Data;
 	L.GetStackValues(idx, Data);
 
-	self->*Fn(Coords, Data);
+	(self->*Fn)(Coords, Data);
 	return 0;
 }
 
@@ -1001,7 +1001,7 @@ Also supports the Vector3i overloads (TODO: document these (?)). */
 template <
 	typename DataType,
 	int DataTypeFlag,
-	DataType (cBlockArea::*Fn)(Vector3i, DataType)
+	void (cBlockArea::*Fn)(Vector3i, DataType)
 >
 static int SetRelBlock(lua_State * a_LuaState)
 {
@@ -1037,7 +1037,7 @@ static int SetRelBlock(lua_State * a_LuaState)
 	unsigned char Data;
 	L.GetStackValues(idx, Data);
 
-	self->*Fn(Coords, Data);
+	(self->*Fn)(Coords, Data);
 
 	return 0;
 }
@@ -1172,16 +1172,16 @@ void cManualBindings::BindBlockArea(lua_State * a_LuaState)
 			tolua_function(a_LuaState, "RelLine",                 tolua_cBlockArea_RelLine);
 			tolua_function(a_LuaState, "SaveToSchematicFile",     tolua_cBlockArea_SaveToSchematicFile);
 			tolua_function(a_LuaState, "SaveToSchematicString",   tolua_cBlockArea_SaveToSchematicString);
-			// tolua_function(a_LuaState, "SetBlock",                SetBlock<BlockState, cBlockArea::baBlocks, &cBlockArea::SetBlock>);
-			// tolua_function(a_LuaState, "SetBlockType",            SetBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::SetBlockType>);
-			// tolua_function(a_LuaState, "SetBlockMeta",            SetBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::SetBlockMeta>);
-			// tolua_function(a_LuaState, "SetBlockLight",           SetBlock<LIGHTTYPE, cBlockArea::baLight,    &cBlockArea::SetBlockLight>);
-			// tolua_function(a_LuaState, "SetBlockSkyLight",        SetBlock<LIGHTTYPE, cBlockArea::baSkyLight, &cBlockArea::SetBlockSkyLight>);
+			tolua_function(a_LuaState, "SetBlock",                SetBlock<BlockState, cBlockArea::baBlocks, &cBlockArea::SetBlock>);
+			tolua_function(a_LuaState, "SetBlockType",            SetBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::SetBlockType>);
+			tolua_function(a_LuaState, "SetBlockMeta",            SetBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::SetBlockMeta>);
+			tolua_function(a_LuaState, "SetBlockLight",           SetBlock<LIGHTTYPE, cBlockArea::baLight,    &cBlockArea::SetBlockLight>);
+			tolua_function(a_LuaState, "SetBlockSkyLight",        SetBlock<LIGHTTYPE, cBlockArea::baSkyLight, &cBlockArea::SetBlockSkyLight>);
 			tolua_function(a_LuaState, "SetBlockTypeMeta",        tolua_cBlockArea_SetBlockTypeMeta);
-			// tolua_function(a_LuaState, "SetRelBlockType",         SetRelBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::SetRelBlockType>);
-			// tolua_function(a_LuaState, "SetRelBlockMeta",         SetRelBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::SetRelBlockMeta>);
-			// tolua_function(a_LuaState, "SetRelBlockLight",        SetRelBlock<LIGHTTYPE, cBlockArea::baLight,    &cBlockArea::SetRelBlockLight>);
-			// tolua_function(a_LuaState, "SetRelBlockSkyLight",     SetRelBlock<LIGHTTYPE, cBlockArea::baSkyLight, &cBlockArea::SetRelBlockSkyLight>);
+			tolua_function(a_LuaState, "SetRelBlockType",         SetRelBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::SetRelBlockType>);
+			tolua_function(a_LuaState, "SetRelBlockMeta",         SetRelBlock<unsigned char, cBlockArea::baBlocks, &cBlockArea::SetRelBlockMeta>);
+			tolua_function(a_LuaState, "SetRelBlockLight",        SetRelBlock<LIGHTTYPE, cBlockArea::baLight,    &cBlockArea::SetRelBlockLight>);
+			tolua_function(a_LuaState, "SetRelBlockSkyLight",     SetRelBlock<LIGHTTYPE, cBlockArea::baSkyLight, &cBlockArea::SetRelBlockSkyLight>);
 			tolua_function(a_LuaState, "SetRelBlockTypeMeta",     tolua_cBlockArea_SetRelBlockTypeMeta);
 			tolua_function(a_LuaState, "Write",                   tolua_cBlockArea_Write);
 		tolua_endmodule(a_LuaState);

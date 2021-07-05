@@ -16,6 +16,8 @@ public:
 
 	using Super::Super;
 
+	static constexpr unsigned char MaxAge = 2;
+
 private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Self) const override
@@ -61,15 +63,15 @@ private:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, unsigned char a_NumStages = 1) const override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, char a_NumStages = 1) const override
 	{
 		auto OldAge = Block::Cocoa::Age(a_Chunk.GetBlock(a_RelPos));
 
-		if (OldAge >= 2)
+		if (OldAge >= MaxAge)
 		{
 			return 0;
 		}
-		auto NewAge = std::min<unsigned char>(OldAge + a_NumStages, 2);
+		auto NewAge = std::min<unsigned char>(Clamp(static_cast<unsigned char>(static_cast<char>(OldAge) + a_NumStages), static_cast<unsigned char>(0), MaxAge), MaxAge);
 		a_Chunk.FastSetBlock(a_RelPos, Block::Cocoa::Cocoa(NewAge, Block::Cocoa::Facing(a_Chunk.GetBlock(a_RelPos))));
 		return NewAge - OldAge;
 	}
