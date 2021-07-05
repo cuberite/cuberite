@@ -37,7 +37,7 @@ private:
 
 		auto & World = *a_Player.GetWorld();
 		int NeighborIdx = -1;
-		auto ChestType = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(m_ItemType, 0));
+		auto ChestType = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(static_cast<short>(m_ItemType), 0));
 
 		for (size_t i = 0; i < ARRAYCOUNT(CrossCoords); i++)
 		{
@@ -56,7 +56,7 @@ private:
 			// Check that this neighbor is a single chest:
 			for (size_t j = 0; j < ARRAYCOUNT(CrossCoords); j++)
 			{
-				if (World.GetBlock(NeighborPos + CrossCoords[j]) == m_ItemType)
+				if (World.GetBlock(NeighborPos + CrossCoords[j]) == ChestType)
 				{
 					// Trying to place next to a dblchest
 					return false;

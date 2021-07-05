@@ -176,7 +176,7 @@ private:
 			// Check if the slab is turned up side down or double slab
 			if (cBlockSlabHandler::IsSlabFull(Below) || cBlockSlabHandler::IsSlabTop(Below))
 			{
-				return true;;
+				return true;
 			}
 		}
 		else if (cBlockStairsHandler::IsBlockStairs(Below) && cBlockStairsHandler::IsStairsTopHalf(Below))

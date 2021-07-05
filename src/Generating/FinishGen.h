@@ -286,10 +286,10 @@ public:
 		int a_Seed, BlockState a_Block, BiomeList a_Biomes, int a_Amount,
 		BlockList a_AllowedBelow
 	) :
+		m_AllowedBlocks(std::move(a_AllowedBelow)),
 		m_Noise(a_Seed),
 		m_Block(a_Block),
-		m_Amount(a_Amount),
-		m_AllowedBlocks(std::move(a_AllowedBelow))
+		m_Amount(a_Amount)
 	{
 		// Initialize all the biome types.
 		for (size_t idx = 0; idx < ARRAYCOUNT(m_IsBiomeAllowed); ++idx)

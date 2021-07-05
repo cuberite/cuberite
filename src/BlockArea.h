@@ -322,10 +322,10 @@ public:
 	unsigned char GetRelBlockType(Vector3i a_Pos) const { return PaletteUpgrade::ToBlock(GetRelBlock(a_Pos)).first; }
 	unsigned char GetBlockMeta(Vector3i a_Pos) const    { return PaletteUpgrade::ToBlock(GetBlock(a_Pos)).second; }
 	unsigned char GetRelBlockMeta(Vector3i a_Pos) const { return PaletteUpgrade::ToBlock(GetRelBlock(a_Pos)).second; }
-	void SetBlockType(Vector3i a_Pos, unsigned char a_Block);
-	void SetRelBlockType(Vector3i a_Pos, unsigned char a_Block);
-	void SetBlockMeta(Vector3i a_Pos, unsigned char a_Meta);
-	void SetRelBlockMeta(Vector3i a_Pos, unsigned char a_Meta);
+	void SetBlockType(Vector3i a_Pos, unsigned char a_Block)     { SetBlock(a_Pos, PaletteUpgrade::FromBlock(a_Block, GetBlockMeta(a_Pos))); }
+	void SetRelBlockType(Vector3i a_Pos, unsigned char a_Block)  { SetRelBlock(a_Pos, PaletteUpgrade::FromBlock(a_Block, GetRelBlockMeta(a_Pos))); }
+	void SetBlockMeta(Vector3i a_Pos, unsigned char a_Meta)      { SetBlock(a_Pos, PaletteUpgrade::FromBlock(GetBlockType(a_Pos), a_Meta)); }
+	void SetRelBlockMeta(Vector3i a_Pos, unsigned char a_Meta)   { SetRelBlock(a_Pos, PaletteUpgrade::FromBlock(GetRelBlockType(a_Pos), a_Meta)); }
 
 
 	// Basic Getters:

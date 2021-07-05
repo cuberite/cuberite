@@ -13645,6 +13645,6 @@ BlockType BlockState::Type() const
 		case 8169: case 8170: case 8171: case 8172: return BlockType::YellowWallBanner;
 		case 1388: return BlockType::YellowWool;
 		case 6530: case 6531: case 6532: case 6533: case 6534: case 6535: case 6536: case 6537: case 6538: case 6539: case 6540: case 6541: case 6542: case 6543: case 6544: case 6545: return BlockType::ZombieHead;
-		default: return BlockType::ZombieWallHead;
+		default: return BlockType::ZombieWallHead;  // TODO(12xx12) no default case!
 	}
 }

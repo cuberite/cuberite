@@ -332,7 +332,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockChorusPlantHandler(BlockType::ChorusPlant);
 	constexpr cDefaultOreHandler                           BlockClayHandler(BlockType::Clay);
 	constexpr cDefaultBlockHandler                         BlockCoalBlockHandler(BlockType::CoalBlock);
-	constexpr cBlockOreHandler                             BlockCoalOreHandler(BlockType::CoalOre);
+	constexpr cDefaultOreHandler                           BlockCoalOreHandler(BlockType::CoalOre);
 	constexpr cBlockDirtHandler                            BlockCoarseDirtHandler(BlockType::CoarseDirt);
 	constexpr cBlockStoneHandler                           BlockCobblestoneHandler(BlockType::Cobblestone);
 	constexpr cBlockSlabHandler                            BlockCobblestoneSlabHandler(BlockType::CobblestoneSlab);
@@ -428,7 +428,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockDeadTubeCoralWallFanHandler(BlockType::DeadTubeCoralWallFan);
 	constexpr cBlockRailHandler                            BlockDetectorRailHandler(BlockType::DetectorRail);
 	constexpr cDefaultBlockHandler                         BlockDiamondBlockHandler(BlockType::DiamondBlock);
-	constexpr cBlockOreHandler                             BlockDiamondOreHandler(BlockType::DiamondOre);
+	constexpr cDefaultOreHandler                           BlockDiamondOreHandler(BlockType::DiamondOre);
 	constexpr cDefaultBlockHandler                         BlockDioriteHandler(BlockType::Diorite);
 	constexpr cBlockSlabHandler                            BlockDioriteSlabHandler(BlockType::DioriteSlab);
 	constexpr cBlockStairsHandler                          BlockDioriteStairsHandler(BlockType::DioriteStairs);
@@ -441,7 +441,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockDriedKelpBlockHandler(BlockType::DriedKelpBlock);
 	constexpr cBlockDropSpenserHandler                     BlockDropperHandler(BlockType::Dropper);
 	constexpr cDefaultBlockHandler                         BlockEmeraldBlockHandler(BlockType::EmeraldBlock);
-	constexpr cBlockOreHandler                             BlockEmeraldOreHandler(BlockType::EmeraldOre);
+	constexpr cDefaultOreHandler                           BlockEmeraldOreHandler(BlockType::EmeraldOre);
 	constexpr cBlockEnchantingTableHandler                 BlockEnchantingTableHandler(BlockType::EnchantingTable);
 	constexpr cDefaultBlockHandler                         BlockEndGatewayHandler(BlockType::EndGateway);
 	constexpr cDefaultBlockHandler                         BlockEndPortalHandler(BlockType::EndPortal);
@@ -469,7 +469,7 @@ namespace
 	constexpr cBlockGlassHandler                           BlockGlassPaneHandler(BlockType::GlassPane);
 	constexpr cBlockGlowstoneHandler                       BlockGlowstoneHandler(BlockType::Glowstone);
 	constexpr cDefaultBlockHandler                         BlockGoldBlockHandler(BlockType::GoldBlock);
-	constexpr cBlockOreHandler                             BlockGoldOreHandler(BlockType::GoldOre);
+	constexpr cDefaultOreHandler                           BlockGoldOreHandler(BlockType::GoldOre);
 	constexpr cDefaultBlockHandler                         BlockGraniteHandler(BlockType::Granite);
 	constexpr cBlockSlabHandler                            BlockGraniteSlabHandler(BlockType::GraniteSlab);
 	constexpr cBlockStairsHandler                          BlockGraniteStairsHandler(BlockType::GraniteStairs);
@@ -522,7 +522,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockIronBarsHandler(BlockType::IronBars);
 	constexpr cDefaultBlockHandler                         BlockIronBlockHandler(BlockType::IronBlock);
 	constexpr cBlockDoorHandler                            BlockIronDoorHandler(BlockType::IronDoor);
-	constexpr cBlockOreHandler                             BlockIronOreHandler(BlockType::IronOre);
+	constexpr cDefaultOreHandler                           BlockIronOreHandler(BlockType::IronOre);
 	constexpr cBlockTrapdoorHandler                        BlockIronTrapdoorHandler(BlockType::IronTrapdoor);
 	constexpr cBlockPumpkinHandler                         BlockJackOLanternHandler(BlockType::JackOLantern);
 	constexpr cDefaultBlockHandler                         BlockJigsawHandler(BlockType::Jigsaw);
@@ -547,7 +547,7 @@ namespace
 	constexpr cBlockLadderHandler                          BlockLadderHandler(BlockType::Ladder);
 	constexpr cDefaultBlockHandler                         BlockLanternHandler(BlockType::Lantern);
 	constexpr cDefaultBlockHandler                         BlockLapisBlockHandler(BlockType::LapisBlock);
-	constexpr cBlockOreHandler                             BlockLapisOreHandler(BlockType::LapisOre);
+	constexpr cDefaultOreHandler                           BlockLapisOreHandler(BlockType::LapisOre);
 	constexpr cBlockTallGrassHandler                       BlockLargeFernHandler(BlockType::LargeFern);
 	constexpr cBlockLavaHandler                            BlockLavaHandler(BlockType::Lava);
 	constexpr cDefaultBlockHandler                         BlockLecternHandler(BlockType::Lectern);
@@ -625,13 +625,13 @@ namespace
 	constexpr cBlockStairsHandler                          BlockNetherBrickStairsHandler(BlockType::NetherBrickStairs);
 	constexpr cDefaultBlockHandler                         BlockNetherBrickWallHandler(BlockType::NetherBrickWall);
 	constexpr cDefaultBlockHandler                         BlockNetherBricksHandler(BlockType::NetherBricks);
-	constexpr cBlockOreHandler                             BlockNetherGoldOreHandler(BlockType::NetherGoldOre);
+	constexpr cDefaultOreHandler                           BlockNetherGoldOreHandler(BlockType::NetherGoldOre);
 	constexpr cBlockPortalHandler                          BlockNetherPortalHandler(BlockType::NetherPortal);
-	constexpr cBlockOreHandler                             BlockNetherQuartzOreHandler(BlockType::NetherQuartzOre);
+	constexpr cDefaultOreHandler                           BlockNetherQuartzOreHandler(BlockType::NetherQuartzOre);
 	constexpr cDefaultBlockHandler                         BlockNetherSproutsHandler(BlockType::NetherSprouts);
 	constexpr cBlockNetherWartHandler                      BlockNetherWartHandler(BlockType::NetherWart);
 	constexpr cBlockNetherWartHandler                      BlockNetherWartBlockHandler(BlockType::NetherWartBlock);
-	constexpr cBlockOreHandler                             BlockNetheriteBlockHandler(BlockType::NetheriteBlock);
+	constexpr cDefaultOreHandler                           BlockNetheriteBlockHandler(BlockType::NetheriteBlock);
 	constexpr cDefaultBlockHandler                         BlockNetherrackHandler(BlockType::Netherrack);
 	constexpr cBlockNoteBlockHandler                       BlockNoteBlockHandler(BlockType::NoteBlock);
 	constexpr cBlockButtonHandler                          BlockOakButtonHandler(BlockType::OakButton);

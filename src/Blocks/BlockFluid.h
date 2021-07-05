@@ -48,7 +48,8 @@ public:
 			default: return a_Block;
 		}
 	}
-
+protected:
+	~cBlockFluidHandler() = default;
 
 private:
 

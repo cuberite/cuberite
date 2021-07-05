@@ -104,7 +104,7 @@ void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunk
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			auto Block = Blocks[a_ChunkDesc.GetBiome(x, z)];
+			auto Block = Blocks[static_cast<size_t>(a_ChunkDesc.GetBiome(x, z))];
 			for (int y = a_ChunkDesc.GetHeight(x, z); y >= 0; y--)
 			{
 				a_ChunkDesc.SetBlock({x, y, z}, Block);
@@ -186,7 +186,7 @@ void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc
 			// Fill from height till the bottom:
 			for (int y = Height; y >= 1; y--)
 			{
-				a_ChunkDesc.SetBlock({x, y, z}, (Height - y < static_cast<int>(PatternLength)) ? Pattern->at(Height - y) : m_BlockBottom);
+				a_ChunkDesc.SetBlock({x, y, z}, (Height - y < static_cast<int>(PatternLength)) ? Pattern->at(static_cast<size_t>(Height - y)) : m_BlockBottom);
 			}
 
 			// The last layer is always bedrock:

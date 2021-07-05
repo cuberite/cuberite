@@ -116,7 +116,7 @@ public:
 			case BlockType::AttachedPumpkinStem:
 			{
 				// Grow by 2 - 5 stages:
-				auto NumStages = GetRandomProvider().RandInt(2, 5);
+				auto NumStages = static_cast<char>(GetRandomProvider().RandInt(2, 5));
 				if (a_World.GrowPlantAt(a_BlockPos, NumStages) <= 0)
 				{
 					return false;

@@ -345,7 +345,7 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 			int CDZ = a_MinRelZ + z;
 			for (int x = 0; x < SizeX; x++)
 			{
-				int CDX = a_MinRelX + x;;
+				int CDX = a_MinRelX + x;
 				a_Dest.SetRelBlock({x, y, z}, GetBlock({CDX, CDY, CDZ}));
 			}  // for x
 		}  // for z

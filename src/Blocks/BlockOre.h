@@ -16,6 +16,9 @@ public:
 
 	using Super::Super;
 
+protected:
+	~cBlockOreHandler() = default;
+
 private:
 
 	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override

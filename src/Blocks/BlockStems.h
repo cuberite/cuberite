@@ -102,10 +102,10 @@ private:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_Position, unsigned char a_NumStages = 1) const override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_Position, char a_NumStages = 1) const override
 	{
 		const auto OldAge = GetStemAge(a_Chunk.GetBlock(a_Position));
-		const auto NewAge = std::clamp<unsigned char>((OldAge + a_NumStages), 0, 7);
+		const auto NewAge = std::clamp<unsigned char>(static_cast<unsigned char>(OldAge + a_NumStages), 0, 7);
 		switch (m_BlockType)
 		{
 			case BlockType::PumpkinStem: a_Chunk.SetBlock(a_Position, Block::PumpkinStem::PumpkinStem(NewAge)); break;

@@ -73,7 +73,7 @@ private:
 			// Placing on the floor
 			case BLOCK_FACE_YP:
 			{
-				auto Rotation = RotationToBlockFace(a_Player.GetYaw());
+				auto Rotation = static_cast<unsigned char>(RotationToBlockFace(a_Player.GetYaw()));
 				switch (a_Player.GetEquippedItem().m_ItemDamage)
 				{
 					case E_META_BANNER_BLACK:      BlockToPlace = BlackBanner::BlackBanner(Rotation);         break;

@@ -1889,7 +1889,7 @@ cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_Or
 			LOGWARNING("Cannot parse ore information from string, invalid number in OreInfo \"%s\".", ore.c_str());
 			continue;
 		}
-		res.emplace_back(PaletteUpgrade::FromBlock(oreType, oreMeta).Type(), maxHeight, numNests, nestSize);
+		res.emplace_back(PaletteUpgrade::FromBlock(static_cast<unsigned char>(oreType), static_cast<unsigned char>(oreMeta)).Type(), maxHeight, numNests, nestSize);
 	}  // for i - split[]
 	return res;
 }

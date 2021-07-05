@@ -719,7 +719,7 @@ public:
 	/** Grows the plant at the specified position by at most a_NumStages.
 	The block's Grow handler is invoked.
 	Returns the number of stages the plant has grown, 0 if not a plant. */
-	int GrowPlantAt(Vector3i a_BlockPos, unsigned char a_NumStages = 1);
+	int GrowPlantAt(Vector3i a_BlockPos, char a_NumStages = 1);
 
 	/** Grows the plant at the specified block to its ripe stage.
 	Returns true if grown, false if not (invalid chunk, non-growable block, already ripe). */
