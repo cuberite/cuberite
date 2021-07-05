@@ -106,14 +106,14 @@ private:
 	{
 		switch (m_BlockType)
 		{
-			case BlockType::AcaciaFenceGate: return 15;
-			case BlockType::BirchFenceGate: return 2;
-			case BlockType::CrimsonFenceGate: return 0;  // TODO(12xx12)
+			case BlockType::AcaciaFenceGate:  return 15;
+			case BlockType::BirchFenceGate:   return 2;
+			case BlockType::CrimsonFenceGate: return 35;
 			case BlockType::DarkOakFenceGate: return 26;
-			case BlockType::JungleFenceGate: return 10;
-			case BlockType::OakFenceGate: return 13;
-			case BlockType::SpruceFenceGate: return 34;
-			case BlockType::WarpedFenceGate: return 0;  // TODO(12xx12)
+			case BlockType::JungleFenceGate:  return 10;
+			case BlockType::OakFenceGate:     return 13;
+			case BlockType::SpruceFenceGate:  return 34;
+			case BlockType::WarpedFenceGate:  return 56;
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in fence gate handler!");
