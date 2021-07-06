@@ -87,7 +87,7 @@ namespace RedstoneWireHandler
 			}
 			case BlockType::Comparator:
 			{
-				return Block::Comparator::Powered(a_Block);  // TODO: Sanity Check
+				return Block::Comparator::Powered(a_Block);
 			}
 			case BlockType::RedstoneBlock:
 			case BlockType::Lever:
@@ -103,7 +103,7 @@ namespace RedstoneWireHandler
 			case BlockType::PolishedBlackstoneButton:
 			case BlockType::SpruceButton:
 			case BlockType::StoneButton:
-			case BlockType::WarpedButton: return true;  // TODO: Sanity Check
+			case BlockType::WarpedButton: return true;
 			default: return false;
 		}
 	}

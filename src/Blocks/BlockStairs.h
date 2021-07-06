@@ -109,12 +109,14 @@ public:
 
 private:
 
+	// TODO(12xx12)
+	/*
 	virtual BlockState MirrorXZ(BlockState a_Block) const override
 	{
-		// TODO(12xx12)
+
 		return a_Block;
 	}
-
+	*/
 
 
 

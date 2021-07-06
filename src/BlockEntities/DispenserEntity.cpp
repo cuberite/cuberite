@@ -301,7 +301,7 @@ Vector3d cDispenserEntity::GetShootVector(BlockState a_Self)
 		case BLOCK_FACE_ZP: return Vector3d( 0,  0,  1);
 		default:
 		{
-			// LOGWARNING("Unhandled dispenser meta: %d", a_Self);  // TODO(12xxx12) add string conversion
+			FLOGWARNING("Unhandled dispenser facing: {}", Block::Dispenser::Facing(a_Self));
 			ASSERT(!"Unhandled dispenser facing");
 			return Vector3d(0, 1, 0);
 		}

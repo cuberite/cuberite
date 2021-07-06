@@ -101,7 +101,7 @@ private:
 
 
 
-	// TODO: Sanity Check
+
 	virtual BlockState MirrorXY(BlockState a_Block) const override
 	{
 		// Mirrors signs over the XY plane (North-South Mirroring)

@@ -53,13 +53,14 @@ private:
 	static const unsigned char VINE_LOST_SUPPORT = 16;
 	static const unsigned char VINE_UNCHANGED = 17;
 
+	// TODO(12xx12)
+	/*
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		// return GetMaxMeta(a_Chunk, a_Position, a_Self) != VINE_LOST_SUPPORT;
-		// TODO(12xx12)
 		return true;
 	}
-
+	*/
 
 
 	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override

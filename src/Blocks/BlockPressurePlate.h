@@ -68,7 +68,6 @@ private:
 			return false;
 		}
 
-		// TODO: check if the block is upside-down slab or upside-down stairs
 		auto Block = a_Chunk.GetBlock(a_Position.addedY(-1));
 		if (cBlockSlabHandler::IsAnySlabType(Block))
 		{
