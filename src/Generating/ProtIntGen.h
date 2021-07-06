@@ -768,7 +768,7 @@ public:
 					{
 						// First convert the value to a regular biome (drop the M flag), then modulo by our biome count:
 						// KINGCOL13TODO: work out same as above in IntGen
-						val = ToBeach[static_cast<unsigned long>(val % 128) % ARRAYCOUNT(ToBeach)];
+						val = ToBeach[static_cast<size_t>(val % 128) % ARRAYCOUNT(ToBeach)];
 					}
 				}
 				a_Values[x + z * a_SizeX] = val;
