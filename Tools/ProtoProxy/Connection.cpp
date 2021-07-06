@@ -421,7 +421,7 @@ bool cConnection::RelayFromClient(void)
 		case csEncryptedUnknown:
 		{
 			DataLog(Buffer, static_cast<size_t>(res), "Decrypted %d bytes from the CLIENT", res);
-			m_ServerEncryptor.ProcessData(reinterpret_cast<std::byte *>(Buffer), reinterpret_cast<const std::byte *>(Buffer), static_cast<size_t>(res));
+			m_ServerEncryptor.ProcessData(reinterpret_cast<std::byte *>(Buffer), static_cast<size_t>(res));
 			return SERVERSEND({ reinterpret_cast<const std::byte *>(Buffer), static_cast<size_t>(res) });
 		}
 	}
@@ -472,22 +472,12 @@ bool cConnection::SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a
 
 
 
-bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, ContiguousByteBufferView a_Data, const char * a_Peer)
+bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, ContiguousByteBuffer & a_Data, const char * a_Peer)
 {
 	DataLog(a_Data.data(), a_Data.size(), "Encrypting %zu bytes to %s", a_Data.size(), a_Peer);
-	while (a_Data.size() > 0)
-	{
-		std::byte Buffer[64 KiB];
-		size_t NumBytes = (a_Data.size() > sizeof(Buffer)) ? sizeof(Buffer) : a_Data.size();
-		a_Encryptor.ProcessData(Buffer, a_Data.data(), NumBytes);
-		bool res = SendData(a_Socket, { Buffer, NumBytes }, a_Peer);
-		if (!res)
-		{
-			return false;
-		}
-		a_Data = a_Data.substr(NumBytes);
-	}
-	return true;
+
+	a_Encryptor.ProcessData(a_Data.data(), a_Data.size());
+	return SendData(a_Socket, a_Data, a_Peer);
 }
 
 
