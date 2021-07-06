@@ -9,6 +9,7 @@
 #include "../Noise/Noise.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../Entities/Entity.h"
+#include "BlockInfo.h"
 
 
 
@@ -563,7 +564,7 @@ void cChunkDesc::UpdateHeightmap(void)
 			HEIGHTTYPE Height = 0;
 			for (HEIGHTTYPE y = cChunkDef::Height - 1; y > 0; y--)
 			{
-				if (GetBlock({x, y, z}).Type() != BlockType::Air)
+				if (!IsBlockAir(GetBlock({x, y, z})))
 				{
 					Height = y;
 					break;
@@ -588,10 +589,10 @@ void cChunkDesc::VerifyHeightmap(void)
 		{
 			for (int y = cChunkDef::Height - 1; y > 0; y--)
 			{
-				if (cBlockAirHandler::IsBlockAir(GetBlock({x, y, z}).Type()))
+				if (!IsBlockAir(GetBlock({x, y, z})))
 				{
 					int Height = GetHeight(x, z);
-					// ASSERT(Height == y);
+					ASSERT(Height == y);
 					break;
 				}
 			}  // for y
