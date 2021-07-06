@@ -63,7 +63,7 @@ public:
 			case BLOCK_FACE_ZP: return Vector3i( 0, 0,  1);
 			default: return Vector3i();
 		}
-	}  // Todo(12xx12) Move this to a better place
+	}
 
 	static inline eBlockFace GetBlockFace(BlockState a_Block)
 	{

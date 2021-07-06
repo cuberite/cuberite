@@ -1509,7 +1509,7 @@ bool cWorld::GrowTreeFromSapling(Vector3i a_BlockPos)
 		}
 		default:
 		{
-			LOGD("Got unknown block type");  // TODO(12xx12): add conversion to string
+			FLOGWARNING("{}: Got unknown block type: {}", __FUNCTION__, Sapling);
 			break;
 		}
 	}

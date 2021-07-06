@@ -1159,7 +1159,6 @@ bool cBlockInfo::FullyOccupiesVoxel(const BlockState Block)
 
 bool cBlockInfo::IsClickedThrough(const BlockState a_Block)
 {
-	// TODO: Nether Fire too.
 	switch (a_Block.Type())
 	{
 		case BlockType::Fire:
