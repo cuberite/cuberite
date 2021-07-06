@@ -72,10 +72,10 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_IPString),
 	m_Player(nullptr),
-	m_CachedSentChunk(0x7fffffff, 0x7fffffff),
+	m_CachedSentChunk(std::numeric_limits<decltype(m_CachedSentChunk.m_ChunkX)>::max(), std::numeric_limits<decltype(m_CachedSentChunk.m_ChunkZ)>::max()),
 	m_HasSentDC(false),
-	m_LastStreamedChunkX(0x7fffffff),  // bogus chunk coords to force streaming upon login
-	m_LastStreamedChunkZ(0x7fffffff),
+	m_LastStreamedChunkX(std::numeric_limits<decltype(m_LastStreamedChunkX)>::max()),  // bogus chunk coords to force streaming upon login
+	m_LastStreamedChunkZ(std::numeric_limits<decltype(m_LastStreamedChunkZ)>::max()),
 	m_TicksSinceLastPacket(0),
 	m_Ping(1000),
 	m_PingID(1),
@@ -401,14 +401,13 @@ void cClientHandle::StreamNextChunks(void)
 
 	if ((m_LastStreamedChunkX == ChunkPosX) && (m_LastStreamedChunkZ == ChunkPosZ))
 	{
-		// All chunks are already loaded. Abort loading.
+		// All chunks are already loaded and the player has not moved, work is done:
 		return;
 	}
-	else
-	{
-		m_LastStreamedChunkX = 0x7fffffff;
-		m_LastStreamedChunkZ = 0x7fffffff;
-	}
+
+	// Player moved chunks and / or loading is not finished, reset to bogus (GH #4531):
+	m_LastStreamedChunkX = std::numeric_limits<decltype(m_LastStreamedChunkX)>::max();
+	m_LastStreamedChunkZ = std::numeric_limits<decltype(m_LastStreamedChunkZ)>::max();
 
 	int StreamedChunks = 0;
 	Vector3d Position = m_Player->GetEyePosition();
@@ -1942,11 +1941,11 @@ void cClientHandle::RemoveFromWorld(void)
 	// No need to send Unload Chunk packets, the client unloads automatically.
 
 	// Here, we set last streamed values to bogus ones so everything is resent:
-	m_LastStreamedChunkX = 0x7fffffff;
-	m_LastStreamedChunkZ = 0x7fffffff;
+	m_LastStreamedChunkX = std::numeric_limits<decltype(m_LastStreamedChunkX)>::max();
+	m_LastStreamedChunkZ = std::numeric_limits<decltype(m_LastStreamedChunkZ)>::max();
 
 	// Restart player unloaded chunk checking and freezing:
-	m_CachedSentChunk = cChunkCoords(0x7fffffff, 0x7fffffff);
+	m_CachedSentChunk = cChunkCoords(std::numeric_limits<decltype(m_CachedSentChunk.m_ChunkX)>::max(), std::numeric_limits<decltype(m_CachedSentChunk.m_ChunkZ)>::max());
 }
 
 
@@ -3166,8 +3165,8 @@ void cClientHandle::SetViewDistance(int a_ViewDistance)
 		m_CurrentViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, world->GetMaxViewDistance());
 
 		// Restart chunk streaming to respond to new view distance:
-		m_LastStreamedChunkX = 0x7fffffff;
-		m_LastStreamedChunkZ = 0x7fffffff;
+		m_LastStreamedChunkX = std::numeric_limits<decltype(m_LastStreamedChunkX)>::max();
+		m_LastStreamedChunkZ = std::numeric_limits<decltype(m_LastStreamedChunkZ)>::max();
 	}
 }
 
