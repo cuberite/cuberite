@@ -513,6 +513,32 @@ return
 				Notes = "Calls the specified callback with the block entity for each block entity contained in the object. Returns true if all block entities have been processed (including when there are zero block entities), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBlockEntity|BlockEntity}})</pre> The callback should return false or no value to continue with the next block entity, or true to abort the enumeration.",
 			},  -- ForEachBlockEntity
 
+			GetBlock =
+			{
+				Params =
+				{
+					{
+						Name = "BlockX",
+						Type = "number",
+					},
+					{
+						Name = "BlockY",
+						Type = "number",
+					},
+					{
+						Name = "BlockZ",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "Block",
+						Type = "number",
+					},
+				},
+				Notes = "Returns the block at the specified absolute coords",
+			},
 			GetBlockLight =
 			{
 				Params =
@@ -1026,7 +1052,17 @@ return
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if current datatypes include block metas",
+				Notes = "Returns true if current datatypes include block metas. DEPRECATED!",
+			},
+			HasBlocks =
+			{
+				Return =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns true if current datatypes include blocks",
 			},
 			HasBlockSkyLights =
 			{
@@ -1602,6 +1638,29 @@ return
 					},
 				},
 				Notes = "Sets the blocklight at the specified absolute coords",
+			},
+			SetBlock =
+			{
+				Params =
+				{
+					{
+						Name = "BlockX",
+						Type = "number",
+					},
+					{
+						Name = "BlockY",
+						Type = "number",
+					},
+					{
+						Name = "BlockZ",
+						Type = "number",
+					},
+					{
+						Name = "Block",
+						Type = "number",
+					},
+				},
+				Notes = "Sets the block at the specified absolute coords",
 			},
 			SetBlockMeta =
 			{

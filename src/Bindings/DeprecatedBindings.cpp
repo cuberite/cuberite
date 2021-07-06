@@ -297,6 +297,48 @@ tolua_lerror:
 
 
 
+static int tolua_cBlockArea_HasBlockMetas(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cBlockArea") ||
+		!L.CheckParamNumber(1)
+	)
+	{
+		return 0;
+	}
+
+	L.Push(0);
+	LOGWARNING("cBlockArea:HasBlockMetas() is deprecated.");
+	L.LogStackTrace(0);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cBlockArea_HasBlockTypes(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+			!L.CheckParamSelf("cBlockArea") ||
+			!L.CheckParamNumber(1)
+			)
+	{
+		return 0;
+	}
+
+	L.Push(0);
+	LOGWARNING("cBlockArea:HasBlockTypes() is deprecated.");
+	L.LogStackTrace(0);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cBlockInfo_GetPlaceSound(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
@@ -683,6 +725,11 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 	tolua_array(tolua_S, "g_BlockFullyOccupiesVoxel",  tolua_get_AllToLua_g_BlockFullyOccupiesVoxel,  nullptr);
 
 	tolua_function(tolua_S, "StringToMobType", tolua_AllToLua_StringToMobType00);
+
+	tolua_beginmodule(tolua_S, "cBlockArea");
+		tolua_function(tolua_S, "HasBlockMetas", tolua_cBlockArea_HasBlockMetas);
+		tolua_function(tolua_S, "HasBlockTypes", tolua_cBlockArea_HasBlockTypes);
+	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cBlockInfo");
 		tolua_function(tolua_S, "GetPlaceSound",          tolua_cBlockInfo_GetPlaceSound);

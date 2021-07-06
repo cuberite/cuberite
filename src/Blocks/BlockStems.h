@@ -187,7 +187,6 @@ private:
 			case BlockType::Grass:
 			case BlockType::Farmland:
 			{
-				const auto Meta = (ProduceBlockType == BlockType::Melon) ? 0 : static_cast<unsigned char>(Random.RandInt(4) % 4);
 				FLOGD("Growing melon / pumpkin at {0} (<{1}, {2}> from stem), overwriting {3}, growing on top of {4}, meta {5}",
 					a_Chunk.RelativeToAbsolute(ProduceRelPos),
 					x, z,

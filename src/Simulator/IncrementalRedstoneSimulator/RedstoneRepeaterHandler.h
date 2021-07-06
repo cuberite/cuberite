@@ -116,7 +116,7 @@ namespace RedstoneRepeaterHandler
 			bool ShouldBeOn = (Power != 0);
 			if (ShouldBeOn != IsOn(a_Block))
 			{
-				Data.m_MechanismDelays[a_Position] = std::make_pair((Block::Repeater::Delay(a_Block)), ShouldBeOn);  // TODO: Sanity Check
+				Data.m_MechanismDelays[a_Position] = std::make_pair((Block::Repeater::Delay(a_Block)), ShouldBeOn);
 			}
 
 			return;

@@ -359,12 +359,12 @@ private:
 		{
 			case BlockType::AcaciaDoor:  return 15;
 			case BlockType::BirchDoor:   return 2;
-			case BlockType::CrimsonDoor: return 0;  // TODO
+			case BlockType::CrimsonDoor: return 35;
 			case BlockType::DarkOakDoor: return 26;
 			case BlockType::JungleDoor:  return 10;
 			case BlockType::OakDoor:     return 13;
 			case BlockType::SpruceDoor:  return 34;
-			case BlockType::WarpedDoor:  return 0;  // TODO
+			case BlockType::WarpedDoor:  return 56;
 			case BlockType::IronDoor:    return 6;
 			default:
 			{
