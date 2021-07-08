@@ -7,13 +7,7 @@
 #include "../LineBlockTracer.h"
 #include "../BlockInfo.h"
 
-/** Function used by enderman and chorus fruit.
-Checks for valid destinations in a cube of a_LinearLength centred at a_Centre.
-Returns true and places destination in a_Destination if successful.
-Returns false if destination could be found after a_NumTries attempts.
-Details at: https://minecraft.fandom.com/wiki/Enderman#Teleportation
-*/
-bool AttemptTeleport(cWorld &a_World, Vector3i a_Centre, const int a_LinearLength, const int a_HeightRequired, const unsigned int a_NumTries, Vector3i &a_Destination)
+bool FindTeleportDestination(cWorld *a_World, Vector3i a_Centre, const int a_CubeWidth, const int a_HeightRequired, const unsigned int a_NumTries, Vector3i &a_Destination)
 {
 	/*
 	Algorithm:
@@ -25,15 +19,15 @@ bool AttemptTeleport(cWorld &a_World, Vector3i a_Centre, const int a_LinearLengt
 
 	for (unsigned int i=0; i<a_NumTries; i++)
 	{
-		const int DestX = a_Centre.x + Random.RandInt(-a_LinearLength, a_LinearLength);
-		int DestY = a_Centre.y + Random.RandInt(-a_LinearLength, a_LinearLength);
-		const int DestZ = a_Centre.z + Random.RandInt(-a_LinearLength, a_LinearLength);
+		const int DestX = a_Centre.x + Random.RandInt(-a_CubeWidth, a_CubeWidth);
+		int DestY = a_Centre.y + Random.RandInt(-a_CubeWidth, a_CubeWidth);
+		const int DestZ = a_Centre.z + Random.RandInt(-a_CubeWidth, a_CubeWidth);
 
 		// Seek downwards from initial destination until we find a solid block or go into the void
-		BLOCKTYPE DestBlock = a_World.GetBlock({DestX, DestY, DestZ});
+		BLOCKTYPE DestBlock = a_World->GetBlock({DestX, DestY, DestZ});
 		while ((DestY >= 0) && !cBlockInfo::IsSolid(DestBlock))
 		{
-			DestBlock = a_World.GetBlock({DestX, DestY, DestZ});
+			DestBlock = a_World->GetBlock({DestX, DestY, DestZ});
 			DestY--;
 		}
 
@@ -47,7 +41,7 @@ bool AttemptTeleport(cWorld &a_World, Vector3i a_Centre, const int a_LinearLengt
 		bool Success = true;
 		for (int j=1; j <= a_HeightRequired; j++)
 		{
-			BLOCKTYPE TestBlock = a_World.GetBlock({DestX, DestY + j, DestZ});
+			BLOCKTYPE TestBlock = a_World->GetBlock({DestX, DestY + j, DestZ});
 			if (cBlockInfo::IsSolid(TestBlock) || IsBlockLiquid(TestBlock))
 			{
 				Success = false;
