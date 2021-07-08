@@ -25,9 +25,9 @@ bool AttemptTeleport(cWorld &a_World, Vector3i a_Centre, const int a_LinearLengt
 
 	for (unsigned int i=0; i<a_NumTries; i++)
 	{
-		const int DestX = Random.RandInt(a_LinearLength, a_LinearLength);
-		const int DestZ = Random.RandInt(a_LinearLength, a_LinearLength);
-		int DestY = Random.RandInt(a_LinearLength, a_LinearLength);
+		const int DestX = a_Centre.x + Random.RandInt(-a_LinearLength, a_LinearLength);
+		int DestY = a_Centre.y + Random.RandInt(-a_LinearLength, a_LinearLength);
+		const int DestZ = a_Centre.z + Random.RandInt(-a_LinearLength, a_LinearLength);
 
 		// Seek downwards from initial destination until we find a solid block or go into the void
 		BLOCKTYPE DestBlock = a_World.GetBlock({DestX, DestY, DestZ});

@@ -32,12 +32,11 @@ public:
 		LOGD("Eating chorus fruit.");
 		// Attempt to find a teleport destination
 		Vector3i Destination;
-		if (AttemptTeleport(*a_World, a_Player->GetPosition(), 8, 2, 16, Destination))
+		if (AttemptTeleport(*a_Player->GetWorld(), a_Player->GetPosition(), 8, 2, 16, Destination))
 		{
 			a_Player->TeleportToCoords(Destination.x, Destination.y, Destination.z);
 			// TODO: send particle effects
 		}
-
 		return true;
 	}
 
