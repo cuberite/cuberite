@@ -4,7 +4,7 @@
 #include "ItemFrame.h"
 #include "Player.h"
 #include "../ClientHandle.h"
-
+#include "Chunk.h"
 
 
 
@@ -46,6 +46,7 @@ void cItemFrame::OnRightClicked(cPlayer & a_Player)
 	}
 
 	GetWorld()->BroadcastEntityMetadata(*this);  // Update clients
+	GetParentChunk()->MarkDirty();               // Mark chunk dirty to save rotation or item
 }
 
 
