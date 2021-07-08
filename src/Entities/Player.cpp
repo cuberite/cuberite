@@ -3120,9 +3120,6 @@ void cPlayer::OnRemoveFromWorld(cWorld & a_World)
 
 	// Clear sent chunk lists from the clienthandle:
 	m_ClientHandle->RemoveFromWorld();
-
-	// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
-	m_ClientHandle->InvalidateCachedSentChunk();
 }
 
 

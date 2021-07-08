@@ -188,6 +188,18 @@ void cProtocol_1_8_0::DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer 
 
 
 
+void cProtocol_1_8_0::DataPrepared(ContiguousByteBuffer & a_Data)
+{
+	if (m_IsEncrypted)
+	{
+		m_Encryptor.ProcessData(a_Data.data(), a_Data.size());
+	}
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -370,7 +382,7 @@ void cProtocol_1_8_0::SendChunkData(const ContiguousByteBufferView a_ChunkData)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cCSLock Lock(m_CSPacket);
-	SendData(a_ChunkData);
+	m_Client->SendData(a_ChunkData);
 }
 
 
@@ -3003,31 +3015,6 @@ void cProtocol_1_8_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Ob
 
 
 
-void cProtocol_1_8_0::SendData(ContiguousByteBufferView a_Data)
-{
-	if (m_IsEncrypted)
-	{
-		std::byte Encrypted[8 KiB];  // Larger buffer, we may be sending lots of data (chunks)
-
-		while (a_Data.size() > 0)
-		{
-			const auto NumBytes = (a_Data.size() > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Data.size();
-			m_Encryptor.ProcessData(Encrypted, a_Data.data(), NumBytes);
-			m_Client->SendData({ Encrypted, NumBytes });
-
-			a_Data = a_Data.substr(NumBytes);
-		}
-	}
-	else
-	{
-		m_Client->SendData(a_Data);
-	}
-}
-
-
-
-
-
 void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 {
 	ASSERT(m_OutPacketBuffer.GetReadableSpace() == m_OutPacketBuffer.GetUsedSpace());
@@ -3045,7 +3032,7 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 		cProtocol_1_8_0::CompressPacket(m_Compressor, CompressedPacket);
 
 		// Send the packet's payload compressed:
-		SendData(CompressedPacket);
+		m_Client->SendData(CompressedPacket);
 	}
 	else
 	{
@@ -3054,10 +3041,10 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 		ContiguousByteBuffer LengthData;
 		m_OutPacketLenBuffer.ReadAll(LengthData);
 		m_OutPacketLenBuffer.CommitRead();
-		SendData(LengthData);
+		m_Client->SendData(LengthData);
 
 		// Send the packet's payload directly:
-		SendData(PacketData);
+		m_Client->SendData(PacketData);
 	}
 
 	// Log the comm into logfile:
