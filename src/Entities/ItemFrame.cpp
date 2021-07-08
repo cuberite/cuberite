@@ -26,7 +26,7 @@ void cItemFrame::OnRightClicked(cPlayer & a_Player)
 
 	if (!m_Item.IsEmpty())
 	{
-		// Item not empty, rotate, clipping values to zero to three inclusive
+		// Item not empty, rotate, clipping values to zero to seven inclusive
 		m_ItemRotation++;
 		if (m_ItemRotation >= 8)
 		{
@@ -100,6 +100,9 @@ void cItemFrame::SpawnOn(cClientHandle & a_ClientHandle)
 	if (m_Item.m_ItemType == E_ITEM_MAP)
 	{
 		cMap * Map = GetWorld()->GetMapManager().GetMapData(static_cast<unsigned>(m_Item.m_ItemDamage));
-		a_ClientHandle.SendMapData(*Map, 0, 0);
+		if (Map != nullptr)
+		{
+			a_ClientHandle.SendMapData(*Map, 0, 0);
+		}
 	}
 }
