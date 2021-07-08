@@ -7,7 +7,7 @@
 #include "../LineBlockTracer.h"
 #include "../BlockInfo.h"
 
-bool FindTeleportDestination(cWorld *a_World, Vector3i a_Centre, const int a_CubeWidth, const int a_HeightRequired, const unsigned int a_NumTries, Vector3i &a_Destination)
+bool FindTeleportDestination(cWorld *a_World, Vector3i a_Centre, const int a_HalfCubeWidth, const int a_HeightRequired, const unsigned int a_NumTries, Vector3i &a_Destination)
 {
 	/*
 	Algorithm:
@@ -19,9 +19,9 @@ bool FindTeleportDestination(cWorld *a_World, Vector3i a_Centre, const int a_Cub
 
 	for (unsigned int i=0; i<a_NumTries; i++)
 	{
-		const int DestX = a_Centre.x + Random.RandInt(-a_CubeWidth, a_CubeWidth);
-		int DestY = a_Centre.y + Random.RandInt(-a_CubeWidth, a_CubeWidth);
-		const int DestZ = a_Centre.z + Random.RandInt(-a_CubeWidth, a_CubeWidth);
+		const int DestX = a_Centre.x + Random.RandInt(-a_HalfCubeWidth, a_HalfCubeWidth);
+		int DestY = a_Centre.y + Random.RandInt(-a_HalfCubeWidth, a_HalfCubeWidth);
+		const int DestZ = a_Centre.z + Random.RandInt(-a_HalfCubeWidth, a_HalfCubeWidth);
 
 		// Seek downwards from initial destination until we find a solid block or go into the void
 		BLOCKTYPE DestBlock = a_World->GetBlock({DestX, DestY, DestZ});
