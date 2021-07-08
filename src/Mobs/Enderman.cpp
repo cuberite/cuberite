@@ -5,6 +5,7 @@
 #include "Enderman.h"
 #include "../Entities/Player.h"
 #include "../LineBlockTracer.h"
+#include "../BlockInfo.h"
 
 /** Function used by enderman and chorus fruit.
 Checks for valid destinations in a cube of a_LinearLength centred at a_Centre.
@@ -12,7 +13,7 @@ Returns true and places destination in a_Destination if successful.
 Returns false if destination could be found after a_NumTries attempts.
 Details at: https://minecraft.fandom.com/wiki/Enderman#Teleportation
 */
-bool AttemptTeleport(cWorld &a_World, Vector3i a_Centre, double a_LinearLength, unsigned int a_HeightRequired, unsigned int a_NumTries, Vector3i &a_Destination)
+bool AttemptTeleport(cWorld &a_World, Vector3i a_Centre, const int a_LinearLength, const int a_HeightRequired, const unsigned int a_NumTries, Vector3i &a_Destination)
 {
 	/*
 	Algorithm:
@@ -29,7 +30,7 @@ bool AttemptTeleport(cWorld &a_World, Vector3i a_Centre, double a_LinearLength, 
 		int DestY = Random.RandInt(a_LinearLength, a_LinearLength);
 
 		// Seek downwards from initial destination until we find a solid block or go into the void
-		BLOCKTYPE DestBlock == a_World.GetBlock({DestX, DestY, DestZ});
+		BLOCKTYPE DestBlock = a_World.GetBlock({DestX, DestY, DestZ});
 		while ((DestY >= 0) && !cBlockInfo::IsSolid(DestBlock))
 		{
 			DestBlock = a_World.GetBlock({DestX, DestY, DestZ});
@@ -44,9 +45,9 @@ bool AttemptTeleport(cWorld &a_World, Vector3i a_Centre, double a_LinearLength, 
 
 		// Succeed if blocks above destination are empty
 		bool Success = true;
-		for (unsigned int j=1; j <= a_HeightRequired; j++)
+		for (int j=1; j <= a_HeightRequired; j++)
 		{
-			BLOCKTYPE TestBlock = a_World.GetBlocks(DestX, DestY + j, DestZ);
+			BLOCKTYPE TestBlock = a_World.GetBlock({DestX, DestY + j, DestZ});
 			if (cBlockInfo::IsSolid(TestBlock) || IsBlockLiquid(TestBlock))
 			{
 				Success = false;

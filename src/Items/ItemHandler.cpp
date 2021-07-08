@@ -20,6 +20,7 @@
 #include "ItemBucket.h"
 #include "ItemButton.h"
 #include "ItemChest.h"
+#include "ItemChorusFruit.h"
 #include "ItemCloth.h"
 #include "ItemComparator.h"
 #include "ItemCookedFish.h"
@@ -354,7 +355,6 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BAKED_POTATO:     return new cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
 		case E_ITEM_BEETROOT:         return new cItemFoodHandler(a_ItemType, FoodInfo(1, 1.2));
 		case E_ITEM_BREAD:            return new cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
-		case E_ITEM_CHORUS_FRUIT:     return new cItemFoodHandler(a_ItemType, FoodInfo(4, 2.4));
 		case E_ITEM_COOKED_CHICKEN:   return new cItemFoodHandler(a_ItemType, FoodInfo(6, 7.2));
 		case E_ITEM_COOKED_MUTTON:    return new cItemFoodHandler(a_ItemType, FoodInfo(6, 9.6));
 		case E_ITEM_COOKED_PORKCHOP:  return new cItemFoodHandler(a_ItemType, FoodInfo(8, 12.8));
@@ -371,6 +371,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_STEAK:            return new cItemFoodHandler(a_ItemType, FoodInfo(8, 12.8));
 
 		// Special-case food with their own handler
+		case E_ITEM_CHORUS_FRUIT:     return new cItemChorusFruitHandler();
 		case E_ITEM_COOKED_FISH: return new cItemCookedFishHandler();
 		case E_ITEM_GOLDEN_APPLE:        return new cItemGoldenAppleHandler();
 		case E_ITEM_POISONOUS_POTATO: return new cItemPoisonousPotatoHandler();

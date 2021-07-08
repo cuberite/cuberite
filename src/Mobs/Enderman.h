@@ -7,6 +7,12 @@
 
 
 
+bool AttemptTeleport(cWorld &a_World, Vector3i a_Centre, const int a_LinearLength, const int a_HeightRequired, const unsigned int a_NumTries, Vector3i &a_Destination);
+
+
+
+
+
 class cEnderman:
 	public cPassiveAggressiveMonster
 {
