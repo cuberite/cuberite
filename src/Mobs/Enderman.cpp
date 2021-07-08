@@ -6,8 +6,64 @@
 #include "../Entities/Player.h"
 #include "../LineBlockTracer.h"
 
+/** Function used by enderman and chorus fruit.
+Checks for valid destinations in a cube of a_LinearLength centred at a_Centre.
+Returns true and places destination in a_Destination if successful.
+Returns false if destination could be found after a_NumTries attempts.
+Details at: https://minecraft.fandom.com/wiki/Enderman#Teleportation
+*/
+bool AttemptTeleport(cWorld &a_World, Vector3i a_Centre, double a_LinearLength, unsigned int a_HeightRequired, unsigned int a_NumTries, Vector3i &a_Destination)
+{
+	/*
+	Algorithm:
+	Choose random destination.
+	Seek downwards, regardless of distance until the block is made of movement-blocking material: https://minecraft.fandom.com/wiki/Materials
+	Succeeds if no liquid or solid blocks prevents from standing at destination.
+	*/
+	auto & Random = GetRandomProvider();
 
+	for (unsigned int i=0; i<a_NumTries; i++)
+	{
+		const int DestX = Random.RandInt(a_LinearLength, a_LinearLength);
+		const int DestZ = Random.RandInt(a_LinearLength, a_LinearLength);
+		int DestY = Random.RandInt(a_LinearLength, a_LinearLength);
 
+		// Seek downwards from initial destination until we find a solid block or go into the void
+		BLOCKTYPE DestBlock == a_World.GetBlock({DestX, DestY, DestZ});
+		while ((DestY >= 0) && !cBlockInfo::IsSolid(DestBlock))
+		{
+			DestBlock = a_World.GetBlock({DestX, DestY, DestZ});
+			DestY--;
+		}
+
+		// Couldn't find a solid block so move to next attempt
+		if (DestY<0)
+		{
+			continue;
+		}
+
+		// Succeed if blocks above destination are empty
+		bool Success = true;
+		for (unsigned int j=1; j <= a_HeightRequired; j++)
+		{
+			BLOCKTYPE TestBlock = a_World.GetBlocks(DestX, DestY + j, DestZ);
+			if (cBlockInfo::IsSolid(TestBlock) || IsBlockLiquid(TestBlock))
+			{
+				Success = false;
+				break;
+			}
+		}
+
+		if (!Success)
+		{
+			continue;
+		}
+
+		a_Destination = Vector3i(DestX, DestY, DestZ);
+		return true;
+	}
+	return false;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // cPlayerLookCheck
