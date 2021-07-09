@@ -174,7 +174,7 @@ cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_Ser
 
 
 
-void cProtocol_1_8_0::DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer && a_Data)
+void cProtocol_1_8_0::DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer & a_Data)
 {
 	if (m_IsEncrypted)
 	{

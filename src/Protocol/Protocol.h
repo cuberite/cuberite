@@ -348,7 +348,7 @@ public:
 
 	/** Called by cClientHandle to process data, when the client sends some.
 	The protocol uses the provided buffers for storage and processing, and must have exclusive access to them. */
-	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer && a_Data) = 0;
+	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer & a_Data) = 0;
 
 	/** Called by cClientHandle to finalise a buffer of prepared data before they are sent to the client.
 	Descendants may for example, encrypt the data if needed.

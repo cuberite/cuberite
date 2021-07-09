@@ -36,7 +36,7 @@ public:
 
 	cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State);
 
-	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer && a_Data) override;
+	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer & a_Data) override;
 	virtual void DataPrepared(ContiguousByteBuffer & a_Data) override;
 
 	// Sending stuff to clients (alphabetically sorted):
