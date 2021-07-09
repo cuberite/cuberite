@@ -32,14 +32,14 @@ bool FindTeleportDestination(cWorld *a_World, Vector3i a_Centre, const int a_Hal
 		}
 
 		// Couldn't find a solid block so move to next attempt
-		if (DestY<0)
+		if (DestY < 0)
 		{
 			continue;
 		}
 
 		// Succeed if blocks above destination are empty
 		bool Success = true;
-		for (int j=1; j <= a_HeightRequired; j++)
+		for (int j = 1; j <= a_HeightRequired; j++)
 		{
 			BLOCKTYPE TestBlock = a_World->GetBlock({DestX, DestY + j, DestZ});
 			if (cBlockInfo::IsSolid(TestBlock) || IsBlockLiquid(TestBlock))

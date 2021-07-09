@@ -31,7 +31,7 @@ public:
 
 		// Attempt to find a teleport destination
 		Vector3i Destination;
-		cWorld *World = a_Player->GetWorld();
+		cWorld * World = a_Player->GetWorld();
 		if (FindTeleportDestination(World, a_Player->GetPosition(), 8, 2, 16, Destination))
 		{
 			// Broadcast sound effect to _pre-teleport_ location, then teleport player.
