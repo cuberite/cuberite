@@ -36,7 +36,7 @@ public:
 		{
 			// Broadcast sound effect to _pre-teleport_ location, then teleport player.
 			World->BroadcastSoundEffect("item.chorus_fruit.teleport", a_Player->GetPosition(), 1, 1);
-			a_Player->TeleportToCoords(Destination.x, Destination.y, Destination.z);
+			a_Player->TeleportToCoords(Destination.x+0.5, Destination.y+1, Destination.z+0.5);
 		}
 		return true;
 	}
