@@ -552,7 +552,7 @@ bool cPawn::DeductTotem(const eDamageType a_DamageType)
 
 
 
-bool cPawn::FindTeleportDestination(cWorld * a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const Vector3i a_MinBoxCorner, const Vector3i a_MaxBoxCorner)
+bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const Vector3i a_MinBoxCorner, const Vector3i a_MaxBoxCorner)
 {
 	/*
 	Algorithm:
@@ -569,10 +569,10 @@ bool cPawn::FindTeleportDestination(cWorld * a_World, const int a_HeightRequired
 		const int DestZ = Random.RandInt(a_MinBoxCorner.z, a_MaxBoxCorner.z);
 
 		// Seek downwards from initial destination until we find a solid block or go into the void
-		BLOCKTYPE DestBlock = a_World->GetBlock({DestX, DestY, DestZ});
+		BLOCKTYPE DestBlock = a_World.GetBlock({DestX, DestY, DestZ});
 		while ((DestY >= 0) && !cBlockInfo::IsSolid(DestBlock))
 		{
-			DestBlock = a_World->GetBlock({DestX, DestY, DestZ});
+			DestBlock = a_World.GetBlock({DestX, DestY, DestZ});
 			DestY--;
 		}
 
@@ -586,7 +586,7 @@ bool cPawn::FindTeleportDestination(cWorld * a_World, const int a_HeightRequired
 		bool Success = true;
 		for (int j = 1; j <= a_HeightRequired; j++)
 		{
-			BLOCKTYPE TestBlock = a_World->GetBlock({DestX, DestY + j, DestZ});
+			BLOCKTYPE TestBlock = a_World.GetBlock({DestX, DestY + j, DestZ});
 			if (cBlockInfo::IsSolid(TestBlock) || IsBlockLiquid(TestBlock))
 			{
 				Success = false;
@@ -610,7 +610,7 @@ bool cPawn::FindTeleportDestination(cWorld * a_World, const int a_HeightRequired
 
 
 
-bool cPawn::FindTeleportDestination(cWorld * a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const cBoundingBox a_BoundingBox)
+bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const cBoundingBox a_BoundingBox)
 {
 	return FindTeleportDestination(a_World, a_HeightRequired, a_NumTries, a_Destination, a_BoundingBox.GetMin(), a_BoundingBox.GetMax());
 }
@@ -619,7 +619,7 @@ bool cPawn::FindTeleportDestination(cWorld * a_World, const int a_HeightRequired
 
 
 
-bool cPawn::FindTeleportDestination(cWorld * a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, Vector3i a_Centre, const int a_HalfCubeWidth)
+bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, Vector3i a_Centre, const int a_HalfCubeWidth)
 {
 	Vector3i MinCorner(a_Centre.x - a_HalfCubeWidth, a_Centre.y - a_HalfCubeWidth, a_Centre.z - a_HalfCubeWidth);
 	Vector3i MaxCorner(a_Centre.x + a_HalfCubeWidth, a_Centre.y + a_HalfCubeWidth, a_Centre.z + a_HalfCubeWidth);
