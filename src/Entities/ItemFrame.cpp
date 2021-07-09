@@ -9,6 +9,7 @@
 
 
 
+
 cItemFrame::cItemFrame(eBlockFace a_BlockFace, Vector3d a_Pos):
 	Super(etItemFrame, a_BlockFace, a_Pos),
 	m_Item(E_BLOCK_AIR),
@@ -98,6 +99,7 @@ void cItemFrame::SpawnOn(cClientHandle & a_ClientHandle)
 	Super::SpawnOn(a_ClientHandle);
 	a_ClientHandle.SendSpawnEntity(*this);
 	a_ClientHandle.SendEntityMetadata(*this);
+
 	if (m_Item.m_ItemType == E_ITEM_MAP)
 	{
 		cMap * Map = GetWorld()->GetMapManager().GetMapData(static_cast<unsigned>(m_Item.m_ItemDamage));
