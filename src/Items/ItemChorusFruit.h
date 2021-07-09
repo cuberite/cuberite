@@ -29,7 +29,6 @@ public:
 			a_Player->GetInventory().RemoveOneEquippedItem();
 		}
 
-		LOGD("Eating chorus fruit.");
 		// Attempt to find a teleport destination
 		Vector3i Destination;
 		cWorld *World = a_Player->GetWorld();
