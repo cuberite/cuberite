@@ -552,7 +552,7 @@ bool cPawn::DeductTotem(const eDamageType a_DamageType)
 
 
 
-bool cPawn::FindTeleportDestination(cWorld *a_World, Vector3i a_Centre, const int a_HalfCubeWidth, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d &a_Destination)
+bool cPawn::FindTeleportDestination(cWorld * a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const Vector3i a_MinBoxCorner, const Vector3i a_MaxBoxCorner)
 {
 	/*
 	Algorithm:
@@ -564,9 +564,9 @@ bool cPawn::FindTeleportDestination(cWorld *a_World, Vector3i a_Centre, const in
 
 	for (unsigned int i = 0; i < a_NumTries; i++)
 	{
-		const int DestX = a_Centre.x + Random.RandInt(-a_HalfCubeWidth, a_HalfCubeWidth);
-		int DestY = a_Centre.y + Random.RandInt(-a_HalfCubeWidth, a_HalfCubeWidth);
-		const int DestZ = a_Centre.z + Random.RandInt(-a_HalfCubeWidth, a_HalfCubeWidth);
+		const int DestX = Random.RandInt(a_MinBoxCorner.x, a_MaxBoxCorner.x);
+		int DestY = Random.RandInt(a_MinBoxCorner.y, a_MaxBoxCorner.y);
+		const int DestZ = Random.RandInt(a_MinBoxCorner.z, a_MaxBoxCorner.z);
 
 		// Seek downwards from initial destination until we find a solid block or go into the void
 		BLOCKTYPE DestBlock = a_World->GetBlock({DestX, DestY, DestZ});
@@ -604,4 +604,24 @@ bool cPawn::FindTeleportDestination(cWorld *a_World, Vector3i a_Centre, const in
 		return true;
 	}
 	return false;
+}
+
+
+
+
+
+bool cPawn::FindTeleportDestination(cWorld * a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const cBoundingBox a_BoundingBox)
+{
+	return FindTeleportDestination(a_World, a_HeightRequired, a_NumTries, a_Destination, a_BoundingBox.GetMin(), a_BoundingBox.GetMax());
+}
+
+
+
+
+
+bool cPawn::FindTeleportDestination(cWorld * a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, Vector3i a_Centre, const int a_HalfCubeWidth)
+{
+	Vector3i MinCorner(a_Centre.x - a_HalfCubeWidth, a_Centre.y - a_HalfCubeWidth, a_Centre.z - a_HalfCubeWidth);
+	Vector3i MaxCorner(a_Centre.x + a_HalfCubeWidth, a_Centre.y + a_HalfCubeWidth, a_Centre.z + a_HalfCubeWidth);
+	return FindTeleportDestination(a_World, a_HeightRequired, a_NumTries, a_Destination, MinCorner, MaxCorner);
 }
