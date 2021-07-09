@@ -30,13 +30,13 @@ public:
 		}
 
 		// Attempt to find a teleport destination
-		Vector3i Destination;
+		Vector3d Destination;
 		cWorld * World = a_Player->GetWorld();
-		if (FindTeleportDestination(World, a_Player->GetPosition(), 8, 2, 16, Destination))
+		if (cPawn::FindTeleportDestination(World, a_Player->GetPosition(), 8, 2, 16, Destination))
 		{
 			// Broadcast sound effect to _pre-teleport_ location, then teleport player.
 			World->BroadcastSoundEffect("item.chorus_fruit.teleport", a_Player->GetPosition(), 1, 1);
-			a_Player->TeleportToCoords(Destination.x+0.5, Destination.y+1, Destination.z+0.5);
+			a_Player->TeleportToCoords(Destination.x, Destination.y, Destination.z);
 		}
 		return true;
 	}

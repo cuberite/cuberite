@@ -547,3 +547,61 @@ bool cPawn::DeductTotem(const eDamageType a_DamageType)
 	}
 	return false;
 }
+
+
+
+
+
+bool cPawn::FindTeleportDestination(cWorld *a_World, Vector3i a_Centre, const int a_HalfCubeWidth, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d &a_Destination)
+{
+	/*
+	Algorithm:
+	Choose random destination.
+	Seek downwards, regardless of distance until the block is made of movement-blocking material: https://minecraft.fandom.com/wiki/Materials
+	Succeeds if no liquid or solid blocks prevents from standing at destination.
+	*/
+	auto & Random = GetRandomProvider();
+
+	for (unsigned int i = 0; i < a_NumTries; i++)
+	{
+		const int DestX = a_Centre.x + Random.RandInt(-a_HalfCubeWidth, a_HalfCubeWidth);
+		int DestY = a_Centre.y + Random.RandInt(-a_HalfCubeWidth, a_HalfCubeWidth);
+		const int DestZ = a_Centre.z + Random.RandInt(-a_HalfCubeWidth, a_HalfCubeWidth);
+
+		// Seek downwards from initial destination until we find a solid block or go into the void
+		BLOCKTYPE DestBlock = a_World->GetBlock({DestX, DestY, DestZ});
+		while ((DestY >= 0) && !cBlockInfo::IsSolid(DestBlock))
+		{
+			DestBlock = a_World->GetBlock({DestX, DestY, DestZ});
+			DestY--;
+		}
+
+		// Couldn't find a solid block so move to next attempt
+		if (DestY < 0)
+		{
+			continue;
+		}
+
+		// Succeed if blocks above destination are empty
+		bool Success = true;
+		for (int j = 1; j <= a_HeightRequired; j++)
+		{
+			BLOCKTYPE TestBlock = a_World->GetBlock({DestX, DestY + j, DestZ});
+			if (cBlockInfo::IsSolid(TestBlock) || IsBlockLiquid(TestBlock))
+			{
+				Success = false;
+				break;
+			}
+		}
+
+		if (!Success)
+		{
+			continue;
+		}
+
+		// Offsets for entity to be centred and standing on solid block
+		a_Destination = Vector3d(DestX + 0.5, DestY + 1, DestZ + 0.5);
+		return true;
+	}
+	return false;
+}
