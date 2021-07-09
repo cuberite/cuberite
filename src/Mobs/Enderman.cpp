@@ -17,7 +17,7 @@ bool FindTeleportDestination(cWorld *a_World, Vector3i a_Centre, const int a_Hal
 	*/
 	auto & Random = GetRandomProvider();
 
-	for (unsigned int i=0; i<a_NumTries; i++)
+	for (unsigned int i = 0; i < a_NumTries; i++)
 	{
 		const int DestX = a_Centre.x + Random.RandInt(-a_HalfCubeWidth, a_HalfCubeWidth);
 		int DestY = a_Centre.y + Random.RandInt(-a_HalfCubeWidth, a_HalfCubeWidth);
