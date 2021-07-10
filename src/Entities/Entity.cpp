@@ -2249,7 +2249,7 @@ void cEntity::SetPosition(const Vector3d & a_Position, bool a_Cancelable)
 
 	if (
 		a_Cancelable &&
-		m_Position != NewPos &&
+		(m_Position != NewPos) &&
 		cPluginManager::Get()->CallHookEntityMoving(*this, m_Position, NewPos)
 		)
 	{
