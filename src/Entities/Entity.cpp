@@ -16,6 +16,7 @@
 #include "../FastRandom.h"
 #include "../NetherPortalScanner.h"
 #include "../BoundingBox.h"
+#include "Bindings/PluginManager.h"
 
 
 
@@ -2234,7 +2235,7 @@ Vector3d cEntity::GetLookVector(void) const
 
 ////////////////////////////////////////////////////////////////////////////////
 // Set position
-void cEntity::SetPosition(const Vector3d & a_Position)
+void cEntity::SetPosition(const Vector3d & a_Position, bool a_Cancelable)
 {
 	// Clamp the positions to exactly representable single-precision floating point values
 	// This is necessary to avoid rounding errors in the noise generator and overflows in the chunk loader
@@ -2244,8 +2245,29 @@ void cEntity::SetPosition(const Vector3d & a_Position)
 	const double ClampedPosY = Clamp(a_Position.y, -MaxFloat, MaxFloat);
 	const double ClampedPosZ = Clamp(a_Position.z, -MaxFloat, MaxFloat);
 
+	auto NewPos = Vector3d(ClampedPosX, ClampedPosY, ClampedPosZ);
+
+	if (
+		a_Cancelable &&
+		m_Position != NewPos &&
+		cPluginManager::Get()->CallHookEntityMoving(*this, m_Position, NewPos)
+		)
+	{
+		// Hook canceled
+		if (m_EntityType == etPlayer)
+		{
+			// Lock the player to position
+			auto Player = static_cast<cPlayer *>(this);
+			auto Client = Player->GetClientHandle();
+			Client->SendPlayerMoveLook();
+			Client->SendEntityVelocity(*this);
+			m_World->BroadcastEntityProperties(*this);
+		}
+		return;
+	}
+
 	m_LastPosition = m_Position;
-	m_Position = {ClampedPosX, ClampedPosY, ClampedPosZ};
+	m_Position = NewPos;
 }
 
 

@@ -60,6 +60,7 @@ public:
 	virtual bool OnEntityTeleport           (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition) = 0;
 	virtual bool OnEntityChangingWorld      (cEntity & a_Entity, cWorld & a_World) = 0;
 	virtual bool OnEntityChangedWorld       (cEntity & a_Entity, cWorld & a_World) = 0;
+	virtual bool OnEntityMoving             (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition) = 0;
 	virtual bool OnExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, cPluginManager::CommandResult & a_Result) = 0;
 	virtual bool OnExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) = 0;
 	virtual bool OnExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) = 0;
@@ -71,7 +72,6 @@ public:
 	virtual bool OnKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI) = 0;
 	virtual bool OnLogin                    (cClientHandle & a_Client, UInt32 a_ProtocolVersion, const AString & a_Username) = 0;
 	virtual bool OnLoginForge               (cClientHandle & a_Client, const AStringMap & a_Mods) = 0;
-	virtual bool OnMonsterMoved             (cMonster & a_Monster, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition) = 0;
 	virtual bool OnPlayerAnimation          (cPlayer & a_Player, int a_Animation) = 0;
 	virtual bool OnPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual bool OnPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;

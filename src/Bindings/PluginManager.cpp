@@ -697,11 +697,11 @@ bool cPluginManager::CallHookLoginForge(cClientHandle & a_Client, AStringMap & a
 
 
 
-bool cPluginManager::CallHookMonsterMoved(cMonster & a_Monster, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
+bool cPluginManager::CallHookEntityMoving(cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
 {
-	return GenericCallHook(HOOK_MONSTER_MOVED, [&](cPlugin * a_Plugin)
+	return GenericCallHook(HOOK_ENTITY_MOVING, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnMonsterMoved(a_Monster, a_OldPosition, a_NewPosition);
+			return a_Plugin->OnEntityMoving(a_Entity, a_OldPosition, a_NewPosition);
 		}
 	);
 }

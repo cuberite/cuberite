@@ -80,6 +80,7 @@ public:
 	virtual bool OnEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier) override;
 	virtual bool OnEntityChangingWorld      (cEntity & a_Entity, cWorld & a_World) override;
 	virtual bool OnEntityChangedWorld       (cEntity & a_Entity, cWorld & a_World) override;
+	virtual bool OnEntityMoving             (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition) override;
 	virtual bool OnExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, cPluginManager::CommandResult & a_Result) override;
 	virtual bool OnExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) override;
 	virtual bool OnExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) override;
@@ -91,7 +92,6 @@ public:
 	virtual bool OnKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI) override;
 	virtual bool OnLogin                    (cClientHandle & a_Client, UInt32 a_ProtocolVersion, const AString & a_Username) override;
 	virtual bool OnLoginForge               (cClientHandle & a_Client, const AStringMap & a_Mods) override;
-	virtual bool OnMonsterMoved             (cMonster & a_Monster, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition) override;
 	virtual bool OnPlayerAnimation          (cPlayer & a_Player, int a_Animation) override;
 	virtual bool OnPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual bool OnPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;

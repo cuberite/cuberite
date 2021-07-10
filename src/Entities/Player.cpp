@@ -1750,7 +1750,7 @@ void cPlayer::LoadFromDisk()
 	LOG("Player \"%s\" (%s) data not found, resetting to defaults", GetName().c_str(), UUID.ToShortString().c_str());
 
 	const Vector3i WorldSpawn(static_cast<int>(m_World->GetSpawnX()), static_cast<int>(m_World->GetSpawnY()), static_cast<int>(m_World->GetSpawnZ()));
-	SetPosition(WorldSpawn);
+	SetPosition(WorldSpawn, false);
 	SetBedPos(WorldSpawn, *m_World);
 
 	m_Inventory.Clear();
@@ -1792,9 +1792,9 @@ bool cPlayer::LoadFromFile(const AString & a_FileName)
 	Json::Value & JSON_PlayerPosition = Root["position"];
 	if (JSON_PlayerPosition.size() == 3)
 	{
-		SetPosX(JSON_PlayerPosition[0].asDouble());
-		SetPosY(JSON_PlayerPosition[1].asDouble());
-		SetPosZ(JSON_PlayerPosition[2].asDouble());
+		SetPosX(JSON_PlayerPosition[0].asDouble(), false);
+		SetPosY(JSON_PlayerPosition[1].asDouble(), false);
+		SetPosZ(JSON_PlayerPosition[2].asDouble(), false);
 		m_LastPosition = GetPosition();
 	}
 

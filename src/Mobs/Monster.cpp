@@ -14,7 +14,6 @@
 #include "../Entities/ExpOrb.h"
 #include "../MonsterConfig.h"
 #include "../BoundingBox.h"
-#include "../Bindings/PluginManager.h"
 
 #include "Items/ItemSpawnEgg.h"
 
@@ -263,8 +262,6 @@ void cMonster::StopMovingToPosition()
 
 void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	Vector3d OldPosition = GetPosition();
-
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
@@ -386,8 +383,6 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 		m_AmbientSoundTimer = 100;
 	}
-
-	cRoot::Get()->GetPluginManager()->CallHookMonsterMoved(*this, OldPosition, GetPosition());
 
 	if (m_AgingTimer > 0)
 	{
