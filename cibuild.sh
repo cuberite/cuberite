@@ -2,8 +2,8 @@
 
 set -e
 
-export CUBERITE_BUILD_SERIES_NAME="Travis $CC $TRAVIS_CUBERITE_BUILD_TYPE"
-export CUBERITE_BUILD_ID=$TRAVIS_JOB_NUMBER
+export CUBERITE_BUILD_SERIES_NAME="CI $CC $CI_CUBERITE_BUILD_TYPE"
+export CUBERITE_BUILD_ID=$CI_JOB_NUMBER
 export CUBERITE_BUILD_DATETIME=`date`
 
 # Use ccache if available
@@ -20,17 +20,17 @@ if [ `which ccache` ]; then
 	ccache --zero-stats
 fi
 
-workdir="$CC"_"$TRAVIS_CUBERITE_BUILD_TYPE"
+workdir="$CC"_"$CI_CUBERITE_BUILD_TYPE"
 mkdir "$workdir"
 cd "$workdir"
 
 # Work around a Clang + ccache issue with failing builds by disabling
 # precompiled headers. Turn off LTO for faster build speeds
-cmake .. -DCMAKE_BUILD_TYPE=${TRAVIS_CUBERITE_BUILD_TYPE} \
+cmake .. -DCMAKE_BUILD_TYPE=${CI_CUBERITE_BUILD_TYPE} \
         -DBUILD_TOOLS=Yes \
         -DPRECOMPILE_HEADERS=No \
         -DSELF_TEST=Yes \
-        -DUNITY_BUILDS=${TRAVIS_CUBERITE_UNITY_BUILDS-Yes} \
+        -DUNITY_BUILDS=${CI_CUBERITE_UNITY_BUILDS-Yes} \
         -DWHOLE_PROGRAM_OPTIMISATION=No \
         ${CACHE_ARGS};
 
@@ -47,7 +47,7 @@ ctest --output-on-failure --parallel 2;
 
 cd Server/;
 touch apiCheckFailed.flag
-if [ "$TRAVIS_CUBERITE_BUILD_TYPE" != "COVERAGE" ]; then
+if [ "$CI_CUBERITE_BUILD_TYPE" != "COVERAGE" ]; then
 	./Cuberite <<- EOF
 		load APIDump
 		apicheck
