@@ -1,6 +1,5 @@
 # Cuberite
 
-[![Travis Build Status](https://img.shields.io/travis/cuberite/cuberite/master.svg?label=Travis)](https://travis-ci.org/cuberite/cuberite)
 [![Jenkins Build Status](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fbuilds.cuberite.org%2Fjob%2Fcuberite%2Fjob%2Fmaster&label=Jenkins)](https://builds.cuberite.org/job/cuberite/job/master/)
 [![AppVeyor Build Status](https://img.shields.io/appveyor/ci/cuberite/cuberite/master.svg?label=AppVeyor)](https://ci.appveyor.com/project/cuberite/cuberite)
 
