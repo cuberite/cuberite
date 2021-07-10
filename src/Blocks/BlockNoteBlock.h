@@ -28,10 +28,7 @@ private:
 	{
 		a_WorldInterface.DoWithBlockEntityAt(a_BlockPos, [](cBlockEntity & a_BlockEntity)
 		{
-			if (a_BlockEntity.GetBlockType() != E_BLOCK_NOTE_BLOCK)
-			{
-				return false;
-			}
+			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_NOTE_BLOCK);
 
 			static_cast<cNoteEntity &>(a_BlockEntity).MakeSound();
 			return false;

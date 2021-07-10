@@ -91,7 +91,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_IdleInterval(0)
 	, m_DestroyTimer(0)
 	, m_MobType(a_MobType)
-	, m_CustomName("")
+	, m_CustomName()
 	, m_CustomNameAlwaysVisible(false)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
@@ -610,6 +610,15 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 	{
 		m_World->BroadcastSoundEffect(m_SoundDeath, GetPosition(), 1.0f, 0.8f);
 	}
+
+	if (IsTame())
+	{
+		if ((m_MobType == mtWolf) || (m_MobType == mtOcelot) || (m_MobType == mtCat) || (m_MobType == mtParrot))
+		{
+			BroadcastDeathMessage(a_TDI);
+		}
+	}
+
 	int Reward;
 	switch (m_MobType)
 	{
@@ -1366,10 +1375,10 @@ void cMonster::LoveTick(void)
 
 			m_World->DoWithPlayerByUUID(m_Feeder, [&] (cPlayer & a_Player)
 			{
-				a_Player.GetStatManager().AddValue(Statistic::AnimalsBred);
+				a_Player.GetStatistics().Custom[CustomStatistic::AnimalsBred]++;
 				if (GetMobType() == eMonsterType::mtCow)
 				{
-					a_Player.AwardAchievement(Statistic::AchBreedCow);
+					a_Player.AwardAchievement(CustomStatistic::AchBreedCow);
 				}
 				return true;
 			});

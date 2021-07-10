@@ -29,8 +29,9 @@ class cPainting;
 class cWorld;
 class cMonster;
 class cCompositeChat;
-class cStatManager;
 class cPacketizer;
+
+struct StatisticsManager;
 
 
 
@@ -345,9 +346,14 @@ public:
 		Game = 3,
 	};
 
-	/** Called to process them, when client sends some data.
+	/** Called by cClientHandle to process data, when the client sends some.
 	The protocol uses the provided buffers for storage and processing, and must have exclusive access to them. */
 	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer && a_Data) = 0;
+
+	/** Called by cClientHandle to finalise a buffer of prepared data before they are sent to the client.
+	Descendants may for example, encrypt the data if needed.
+	The protocol modifies the provided buffer in-place. */
+	virtual void DataPrepared(ContiguousByteBuffer & a_Data) = 0;
 
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;
@@ -422,7 +428,7 @@ public:
 	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) = 0;
 	virtual void SendSpawnEntity                (const cEntity & a_Entity) = 0;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) = 0;
-	virtual void SendStatistics                 (const cStatManager & a_Manager) = 0;
+	virtual void SendStatistics                 (const StatisticsManager & a_Manager) = 0;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) = 0;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) = 0;
@@ -464,9 +470,6 @@ protected:
 
 	/** Returns the current protocol's version, for handling status requests. */
 	virtual Version GetProtocolVersion() const = 0;
-
-	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
-	virtual void SendData(ContiguousByteBufferView a_Data) = 0;
 
 	/** Sends a single packet contained within the cPacketizer class.
 	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */

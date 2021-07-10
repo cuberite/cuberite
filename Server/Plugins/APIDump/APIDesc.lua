@@ -114,24 +114,6 @@ return
 					},
 					Notes = "Returns whether the specified block fully occupies its voxel.",
 				},
-				Get =
-				{
-					IsStatic = true,
-					Params =
-					{
-						{
-							Name = "BlockType",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "cBlockInfo",
-						},
-					},
-					Notes = "Returns the {{cBlockInfo}} structure for the specified block type. <b>OBSOLETE</b>, use static functions instead",
-				},
 				GetHardness =
 				{
 					IsStatic = true,
@@ -221,6 +203,24 @@ return
 						},
 					},
 					Notes = "Returns how much light the specified block type consumes.",
+				},
+				IsClickedThrough =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified block type is ignored by the client on left and right clicks, that is, treated as if it were air.",
 				},
 				IsOneHitDig =
 				{
@@ -2118,10 +2118,10 @@ end
 				<tr><td>u</td><td>Underlined text</td></tr>
 				<tr><td>s</td><td>Strikethrough text</td></tr>
 				<tr><td>o</td><td>Obfuscated text</td></tr>
-				<tr><td>@X</td><td>color X (X is 0 - 9 or a - f, same as dye meta</td></tr>
+				<tr><td>@X</td><td>color [0–9a–f], same as dye meta</td></tr>
 				</table>
-				The following picture, taken from MineCraft Wiki, illustrates the color codes:</p>
-				<img src="https://hydra-media.cursecdn.com/minecraft.gamepedia.com/4/4c/Colors.png?version=34a0f56789a95326e1f7d82047b12232" />
+				The following picture, taken from the Minecraft Wiki, illustrates the color codes:</p>
+				<img src="http://images.wikia.com/minecraft_gamepedia/images/archive/4/4c/20200824112326!Colors.png" />
 			]],
 			Functions =
 			{
@@ -4230,31 +4230,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 						},
 						Notes = "Removes the entity from this world and starts moving it to the specified world. Note that to avoid deadlocks, the move is asynchronous - the entity is moved into a queue and will be moved from that queue into the destination world at some (unpredictable) time in the future. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity. ShouldSendRespawn is used only for players, it specifies whether the player should be sent a Respawn packet upon leaving the world (The client handles respawns only between different dimensions). The Position parameter specifies the location that the entity should be placed in, in the new world.",
 					},
-				},
-				ScheduleMoveToWorld =
-				{
-					Params =
-					{
-						{
-							Name = "World",
-							Type = "cWorld",
-						},
-						{
-							Name = "NewPosition",
-							Type = "Vector3d",
-						},
-						{
-							Name = "ShouldSetPortalCooldown",
-							Type = "boolean",
-							IsOptional = true,
-						},
-						{
-							Name = "ShouldSendRespawn",
-							Type = "boolean",
-							IsOptional  = true,
-						},
-					},
-					Notes = "Schedules a MoveToWorld call to occur on the next Tick of the entity. If ShouldSetPortalCooldown is false (default), doesn't set any portal cooldown, if it is true, the default portal cooldown is applied to the entity. If ShouldSendRespawn is false, no respawn packet is sent, if it is true (default) then a respawn packet is sent to the client. <b>OBSOLETE</b>, use MoveToWorld instead.",
 				},
 				SetGravity =
 				{
@@ -9343,10 +9318,6 @@ a_Player:OpenWindow(Window);
 				{
 					Notes = "Family: hostile (blaze, cavespider, creeper, enderdragon, enderman, ghast, giant, magmacube, silverfish, skeleton, slime, spider, witch, wither, zombie, zombiepigman)",
 				},
-				mfMaxplusone =
-				{
-					Notes = "The maximum family value, plus one. Returned when monster family not recognized.",
-				},
 				mfPassive =
 				{
 					Notes = "Family: passive (chicken, cow, horse, irongolem, mooshroom, ocelot, pig, sheep, snowgolem, villager, wolf)",
@@ -9571,16 +9542,6 @@ a_Player:OpenWindow(Window);
 			Desc = "This class represents a painting in the world. These paintings are special and different from Vanilla in that they can be critical-hit.",
 			Functions =
 			{
-				GetDirection =
-				{
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the direction the painting faces. Directions: ZP - 0, ZM - 2, XM - 1, XP - 3. Note that these are not the BLOCK_FACE constants.",
-				},
 				GetName =
 				{
 					Returns =
@@ -10245,36 +10206,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the full color code to be used for this player's messages (based on their rank). Prefix player messages with this code.",
 				},
-				GetDraggingItem =
-				{
-					Returns =
-					{
-						{
-							Type = "cItem",
-						},
-					},
-					Notes = "Returns the item the player is dragging in a UI window."
-				},
-				GetPrefix =
-				{
-					Returns =
-					{
-						{
-							Type = "string",
-						},
-					},
-					Notes = "Returns the prefix to player names for messages (based on their rank), may contain @ format codes.",
-				},
-				GetSuffix =
-				{
-					Returns =
-					{
-						{
-							Type = "string",
-						},
-					},
-					Notes = "Returns the suffix to player names for messages (based on their rank), may contain @ format codes.",
-				},
 				GetCurrentXp =
 				{
 					Returns =
@@ -10294,6 +10225,16 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the custom name of this player. If the player hasn't a custom name, it will return an empty string.",
+				},
+				GetDraggingItem =
+				{
+					Returns =
+					{
+						{
+							Type = "cItem",
+						},
+					},
+					Notes = "Returns the item the player is dragging in a UI window."
 				},
 				GetEffectiveGameMode =
 				{
@@ -10489,6 +10430,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the name that is used in the playerlist.",
 				},
+				GetPrefix =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the prefix to player names for messages (based on their rank), may contain @ format codes.",
+				},
 				GetRestrictions =
 				{
 					Returns =
@@ -10518,6 +10469,26 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns the player's current set of skin part flags.  This is a bitwise OR of various {{Globals#eSkinPart|eSkinPart}} constants.  Note that HasSkinPart may be easier to use in most situations.",
+				},
+				GetStatistics =
+				{
+					Returns =
+					{
+						{
+							Type = "StatisticsManager",
+						},
+					},
+					Notes = "Returns the player's statistics manager."
+				},
+				GetSuffix =
+				{
+					Returns =
+					{
+						{
+							Type = "string",
+						},
+					},
+					Notes = "Returns the suffix to player names for messages (based on their rank), may contain @ format codes.",
 				},
 				GetTeam =
 				{
@@ -10903,14 +10874,26 @@ a_Player:OpenWindow(Window);
 				},
 				SendMessage =
 				{
-					Params =
 					{
+						Params =
 						{
-							Name = "Message",
-							Type = "string",
+							{
+								Name = "Message",
+								Type = "string",
+							},
 						},
+						Notes = "Sends the specified message to the player.",
 					},
-					Notes = "Sends the specified message to the player.",
+					{
+						Params =
+						{
+							{
+								Name = "Message",
+								Type = "cCompositeChat",
+							},
+						},
+						Notes = "Sends the {{cCompositeChat}} to the player, using a severity defined by the CompositeChat's MessageType.",
+					},
 				},
 				SendMessageRaw =
 				{
@@ -12279,6 +12262,21 @@ end
 					},
 					Notes = "Add a Forge mod name/version to the server ping list.",
 				},
+				ScheduleTask =
+				{
+					Params =
+					{
+						{
+							Name = "DelayTicks",
+							Type = "number",
+						},
+						{
+							Name = "TaskFunction",
+							Type = "function",
+						},
+					},
+					Notes = "Queues the specified function to be executed in the server's tick thread after a the specified number of ticks. This enables operations to be queued for execution in the future. The function signature is <pre class=\"pretty-print lang-lua\">function({{cServer|Server}})</pre>All return values from the function are ignored. Note that it is unsafe to store references to Cuberite objects, such as entities, across from the caller to the task handler function; store the EntityID instead.",
+				},
 				SetMaxPlayers =
 				{
 					Params =
@@ -13219,7 +13217,41 @@ end
 					Include = { "wt.*" },
 				}
 			},  -- ConstantGroups
-		},  -- cWindow
+		},
+		StatisticsManager =
+		{
+			Desc = [[
+				This class provides a store for various types of player statistics. The store will be read and sent to the client when the Statistics button is pressed.
+			]],
+			Variables =
+			{
+				Custom =
+				{
+					Type = "Map of {{CustomStatistic}} to number",
+					Notes = "Gets or sets the value of a custom statistic.",
+				},
+			},
+			AdditionalInfo =
+			{
+				{
+					Header = "Example usage",
+					Contents = [[
+						Each store is a table, keyed by the statistic that the entry tracks, with value typically representing the number of times the event happened:
+<pre class="prettyprint lang-lua">
+function ModifyPlayerFurnaceInteractions(Player)
+	local Statistics = Player:GetStatistics()
+
+	if (Statistics.Custom[CustomStatistic.WalkOneCm] > 10) then
+		Statistics.Custom[CustomStatistic.InteractWithFurnace] = 1337
+	end
+
+	-- Next time the player presses Statistics they will see the updated value for furnace interactions.
+end
+</pre>
+					]],
+				},
+			},
+		},
 
 		BannerPattern =
 		{
@@ -13699,6 +13731,319 @@ end
 					Notes = "Smoke drifts west",
 				},
 			}
+		},
+		CustomStatistic =
+		{
+			Desc = [[
+				An enumeration of statistics of the custom type to be used with the {{StatisticsManager#Custom|Custom}} statistics store.
+			]],
+			Constants =
+			{
+				AnimalsBred =
+				{
+					Notes = "The number of times the player bred two mobs.",
+				},
+				AviateOneCm =
+				{
+					Notes = "The total distance travelled by elytra.",
+				},
+				BellRing =
+				{
+					Notes = "The number of times the player has rung a bell.",
+				},
+				BoatOneCm =
+				{
+					Notes = "The total distance travelled by boats.",
+				},
+				CleanArmor =
+				{
+					Notes = "The number of dyed leather armors washed with a cauldron.",
+				},
+				CleanBanner =
+				{
+					Notes = "The number of banner patterns washed with a cauldron.",
+				},
+				CleanShulkerBox =
+				{
+					Notes = "The number of times the player has washed a Shulker Box with a cauldron.",
+				},
+				ClimbOneCm =
+				{
+					Notes = "The total distance travelled up ladders or vines.",
+				},
+				CrouchOneCm =
+				{
+					Notes = "The total distance walked while sneaking.",
+				},
+				DamageAbsorbed =
+				{
+					Notes = "The amount of damage the player has absorbed in tenths of 1.",
+				},
+				DamageBlockedByShield =
+				{
+					Notes = "The amount of damage the player has blocked with a shield in tenths of 1.",
+				},
+				DamageDealt =
+				{
+					Notes = "The amount of damage the player has dealt in tenths 1. Includes only melee attacks.",
+				},
+				DamageDealtAbsorbed =
+				{
+					Notes = "The amount of damage the player has dealt that was absorbed, in tenths of 1.",
+				},
+				DamageDealtResisted =
+				{
+					Notes = "The amount of damage the player has dealt that was resisted, in tenths of 1.",
+				},
+				DamageResisted =
+				{
+					Notes = "The amount of damage the player has resisted in tenths of 1.",
+				},
+				DamageTaken =
+				{
+					Notes = "The amount of damage the player has taken in tenths of 1.",
+				},
+				Deaths =
+				{
+					Notes = "The number of times the player died.",
+				},
+				Drop =
+				{
+					Notes = "The number of items the drop key was pressed.",
+				},
+				EatCakeSlice =
+				{
+					Notes = "The number of cake slices eaten.",
+				},
+				EnchantItem =
+				{
+					Notes = "The number of items enchanted.",
+				},
+				FallOneCm =
+				{
+					Notes = "The total distance fallen.",
+				},
+				FillCauldron =
+				{
+					Notes = "The number of times the player filled cauldrons with water buckets.",
+				},
+				FishCaught =
+				{
+					Notes = "The number of fish caught.",
+				},
+				FlyOneCm =
+				{
+					Notes = "The total distance flown.",
+				},
+				HorseOneCm =
+				{
+					Notes = "The total distance travelled by horses.",
+				},
+				InspectDispenser =
+				{
+					Notes = "The number of times interacted with dispensers.",
+				},
+				InspectDropper =
+				{
+					Notes = "The number of times interacted with droppers.",
+				},
+				InspectHopper =
+				{
+					Notes = "The number of times interacted with hoppers.",
+				},
+				InteractWithAnvil =
+				{
+					Notes = "The number of times interacted with anvils.",
+				},
+				InteractWithBeacon =
+				{
+					Notes = "The number of times interacted with beacons.",
+				},
+				InteractWithBlastFurnace =
+				{
+					Notes = "The number of times interacted with Blast Furnaces.",
+				},
+				InteractWithBrewingstand =
+				{
+					Notes = "The number of times interacted with brewing stands.",
+				},
+				InteractWithCampfire =
+				{
+					Notes = "The number of times interacted with campfires.",
+				},
+				InteractWithCartographyTable =
+				{
+					Notes = "The number of times interacted with cartography tables.",
+				},
+				InteractWithCraftingTable =
+				{
+					Notes = "The number of times interacted with crafting tables.",
+				},
+				InteractWithFurnace =
+				{
+					Notes = "The number of times interacted with furnaces.",
+				},
+				InteractWithGrindstone =
+				{
+					Notes = "The number of times interacted with grindstones.",
+				},
+				InteractWithLectern =
+				{
+					Notes = "The number of times interacted with lecterns.",
+				},
+				InteractWithLoom =
+				{
+					Notes = "The number of times interacted with looms.",
+				},
+				InteractWithSmithingTable =
+				{
+					Notes = "The number of times interacted with smithing tables.",
+				},
+				InteractWithSmoker =
+				{
+					Notes = "The number of times interacted with smokers.",
+				},
+				InteractWithStonecutter =
+				{
+					Notes = "The number of times interacted with stonecutters.",
+				},
+				JunkFished =
+				{
+					Notes = "The amount of junk fished.",
+				},
+				Jump =
+				{
+					Notes = "The number of jumps performed.",
+				},
+				LeaveGame =
+				{
+					Notes = "The number of times disconnected from the server.",
+				},
+				MinecartOneCm =
+				{
+					Notes = "The total distance travelled by minecarts.",
+				},
+				MobKills =
+				{
+					Notes = "The number of mobs the player killed.",
+				},
+				OpenBarrel =
+				{
+					Notes = "The number of times the player has opened a barrel.",
+				},
+				OpenChest =
+				{
+					Notes = "The number of times the player opened chests.",
+				},
+				OpenEnderchest =
+				{
+					Notes = "The number of times the player opened ender chests.",
+				},
+				OpenShulkerBox =
+				{
+					Notes = "The number of times the player has opened a shulker box.",
+				},
+				PigOneCm =
+				{
+					Notes = "The total distance travelled by pigs via saddles.",
+				},
+				PlayNoteblock =
+				{
+					Notes = "The number of note blocks hit.",
+				},
+				PlayOneMinute =
+				{
+					Notes = "The total time played.",
+				},
+				PlayRecord =
+				{
+					Notes = "The number of music discs played on a jukebox.",
+				},
+				PlayerKills =
+				{
+					Notes = "The number of players the player directly killed.",
+				},
+				PotFlower =
+				{
+					Notes = "The number of plants potted into flower pots.",
+				},
+				RaidTrigger =
+				{
+					Notes = "The number of times the player has triggered a raid.",
+				},
+				RaidWin =
+				{
+					Notes = "The number of times the player has won a raid.",
+				},
+				SleepInBed =
+				{
+					Notes = "The number of times the player has slept in a bed.",
+				},
+				SneakTime =
+				{
+					Notes = "The time the player has held down the sneak button.",
+				},
+				SprintOneCm =
+				{
+					Notes = "The total distance sprinted.",
+				},
+				StriderOneCm =
+				{
+					Notes = "The total distance travelled by striders via saddles.",
+				},
+				SwimOneCm =
+				{
+					Notes = "The total distance swum.",
+				},
+				TalkedToVillager =
+				{
+					Notes = "The number of times interacted with villagers (opened the trading GUI).",
+				},
+				TargetHit =
+				{
+					Notes = "The number of times the player has shot a target block.",
+				},
+				TimeSinceDeath =
+				{
+					Notes = "The time since the player's last death.",
+				},
+				TimeSinceRest =
+				{
+					Notes = "The time since the player's last rest. This is used to spawn phantoms.",
+				},
+				TradedWithVillager =
+				{
+					Notes = "The number of times traded with villagers.",
+				},
+				TreasureFished =
+				{
+					Notes = "The number of treasures fished.",
+				},
+				TriggerTrappedChest =
+				{
+					Notes = "The number of times the player opened trapped chests.",
+				},
+				TuneNoteblock =
+				{
+					Notes = "The number of times interacted with note blocks.",
+				},
+				UseCauldron =
+				{
+					Notes = "The number of times the player took water from cauldrons with glass bottles.",
+				},
+				WalkOnWaterOneCm =
+				{
+					Notes = "The distance covered while bobbing up and down over water.",
+				},
+				WalkOneCm =
+				{
+					Notes = "The total distance walked.",
+				},
+				WalkUnderWaterOneCm =
+				{
+					Notes = "The total distance walked underwater.",
+				},
+			},
 		},
 		Globals =
 		{
@@ -14200,8 +14545,13 @@ end
 								Name = "Message",
 								Type = "string",
 							},
+							{
+								Name = "SuppressPluginNamePrefix",
+								Type = "boolean",
+								IsOptional = true,
+							},
 						},
-						Notes = "Logs a text into the server console and logfile using 'normal' severity (gray text)",
+						Notes = "Logs a text into the server console and logfile using 'normal' severity (gray text).",
 					},
 					{
 						Params =
@@ -14210,101 +14560,78 @@ end
 								Name = "Message",
 								Type = "cCompositeChat",
 							},
+							{
+								Name = "SuppressPluginNamePrefix",
+								Type = "boolean",
+								IsOptional = true,
+							},
 						},
-						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console. The severity is converted from the CompositeChat's MessageType.",
+						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console, using a severity defined by the CompositeChat's MessageType.",
 					},
 				},
 				LOGERROR =
 				{
+					Params =
 					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "string",
-							},
+							Name = "Message",
+							Type = "string",
 						},
-						Notes = "Logs a text into the server console and logfile using 'error' severity (black text on red background)",
-					},
-					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "cCompositeChat",
-							},
+							Name = "SuppressPluginNamePrefix",
+							Type = "boolean",
+							IsOptional = true,
 						},
-						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'error' severity (black text on red background)",
 					},
+					Notes = "Logs a text into the server console and logfile using 'error' severity (black text on red background).",
 				},
 				LOGINFO =
 				{
+					Params =
 					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "string",
-							},
+							Name = "Message",
+							Type = "string",
 						},
-						Notes = "Logs a text into the server console and logfile using 'info' severity (yellow text)",
-					},
-					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "cCompositeChat",
-							},
+							Name = "SuppressPluginNamePrefix",
+							Type = "boolean",
+							IsOptional = true,
 						},
-						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'info' severity (yellow text)",
 					},
+					Notes = "Logs a text into the server console and logfile using 'info' severity (yellow text).",
 				},
 				LOGWARN =
 				{
+					Params =
 					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "string",
-							},
+							Name = "Message",
+							Type = "string",
 						},
-						Notes = "Logs a text into the server console and logfile using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead",
-					},
-					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "cCompositeChat",
-							},
+							Name = "SuppressPluginNamePrefix",
+							Type = "boolean",
+							IsOptional = true,
 						},
-						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead",
 					},
+					Notes = "Logs a text into the server console and logfile using 'warning' severity (red text); OBSOLETE, use LOGWARNING() instead.",
 				},
 				LOGWARNING =
 				{
+					Params =
 					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "string",
-							},
+							Name = "Message",
+							Type = "string",
 						},
-						Notes = "Logs a text into the server console and logfile using 'warning' severity (red text)",
-					},
-					{
-						Params =
 						{
-							{
-								Name = "Message",
-								Type = "cCompositeChat",
-							},
+							Name = "SuppressPluginNamePrefix",
+							Type = "boolean",
+							IsOptional = true,
 						},
-						Notes = "Logs the {{cCompositeChat}}'s human-readable text into the server console and logfile using 'warning' severity (red text)",
 					},
+					Notes = "Logs a text into the server console and logfile using 'warning' severity (red text).",
 				},
 				md5 =
 				{
@@ -17767,22 +18094,6 @@ end
 				mtWitherSkeleton =
 				{
 					Notes = ""
-				},
-				hMain =
-				{
-					Notes = "The main hand",
-				},
-				hOff =
-				{
-					Notes = "The off hand",
-				},
-				mhLeft =
-				{
-					Notes = "The left hand is the main hand",
-				},
-				mhRight =
-				{
-					Notes = "The right hand is the main hand",
 				},
 				SKULL_TYPE_CREEPER =
 				{

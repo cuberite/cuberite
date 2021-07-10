@@ -20,6 +20,11 @@
 		#endif
 	#elif defined(__APPLE__)
 		#include <mach/mach.h>
+	#elif defined(__FreeBSD__)
+		#include <kvm.h>
+		#include <fcntl.h>
+		#include <sys/sysctl.h>
+		#include <sys/user.h>
 	#endif
 #endif
 
@@ -883,6 +888,37 @@ int cRoot::GetPhysicalRAMUsage(void)
 		))
 		{
 			return static_cast<int>(t_info.resident_size / 1024);
+		}
+		return -1;
+	#elif defined (__FreeBSD__)
+		/*
+		struct rusage self_usage;
+		int status = getrusage(RUSAGE_SELF, &self_usage);
+		if (!status)
+		{
+			return static_cast<int>(self_usage.ru_maxrss);
+		}
+		return -1;
+		*/
+		// Good to watch: https://www.youtube.com/watch?v=Os5cK0H8EOA - getrusage.
+		// Unfortunately, it only gives peak memory usage a.k.a max resident set size
+		// So it is better to use FreeBSD kvm function to get the size of resident pages.
+
+		static kvm_t* kd = NULL;
+
+		if (kd == NULL)
+		{
+			kd = kvm_open(NULL, "/dev/null", NULL, O_RDONLY, "kvm_open");  // returns a descriptor used to access kernel virtual memory
+		}
+		if (kd != NULL)
+		{
+			int pc = 0;  // number of processes found
+			struct kinfo_proc* kp;
+			kp = kvm_getprocs(kd, KERN_PROC_PID, getpid(), &pc);
+			if ((kp != NULL) && (pc >= 1))
+			{
+				return static_cast<int>(kp->ki_rssize * getpagesize() / 1024);
+			}
 		}
 		return -1;
 	#else

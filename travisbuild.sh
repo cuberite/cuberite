@@ -1,4 +1,4 @@
- #!/usr/bin/env bash
+#!/usr/bin/env bash
 
 set -e
 
@@ -20,9 +20,13 @@ if [ `which ccache` ]; then
 	ccache --zero-stats
 fi
 
+workdir="$CC"_"$TRAVIS_CUBERITE_BUILD_TYPE"
+mkdir "$workdir"
+cd "$workdir"
+
 # Work around a Clang + ccache issue with failing builds by disabling
 # precompiled headers. Turn off LTO for faster build speeds
-cmake . -DCMAKE_BUILD_TYPE=${TRAVIS_CUBERITE_BUILD_TYPE} \
+cmake .. -DCMAKE_BUILD_TYPE=${TRAVIS_CUBERITE_BUILD_TYPE} \
         -DBUILD_TOOLS=Yes \
         -DPRECOMPILE_HEADERS=No \
         -DSELF_TEST=Yes \
@@ -31,7 +35,7 @@ cmake . -DCMAKE_BUILD_TYPE=${TRAVIS_CUBERITE_BUILD_TYPE} \
         ${CACHE_ARGS};
 
 echo "Building..."
-cmake --build . --parallel 2;
+cmake --build . --parallel 3;
 
 if [ `which ccache` ]; then
 	echo "Built with ccache, outputting cache stats..."

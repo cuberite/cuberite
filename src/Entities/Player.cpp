@@ -18,7 +18,7 @@
 #include "../FastRandom.h"
 #include "../ClientHandle.h"
 
-#include "../WorldStorage/StatSerializer.h"
+#include "../WorldStorage/StatisticsSerializer.h"
 #include "../CompositeChat.h"
 
 #include "../Blocks/BlockHandler.h"
@@ -167,7 +167,7 @@ cPlayer::~cPlayer(void)
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), static_cast<void *>(this), GetUniqueID());
 
 	// "Times ragequit":
-	m_Stats.AddValue(Statistic::LeaveGame);
+	m_Stats.Custom[CustomStatistic::LeaveGame]++;
 
 	SaveToDisk();
 
@@ -482,7 +482,7 @@ void cPlayer::TossItems(const cItems & a_Items)
 		return;
 	}
 
-	m_Stats.AddValue(Statistic::Drop, static_cast<cStatManager::StatValue>(a_Items.Size()));
+	m_Stats.Custom[CustomStatistic::Drop] += static_cast<StatisticsManager::StatValue>(a_Items.Size());
 
 	const auto Speed = (GetLookVector() + Vector3d(0, 0.2, 0)) * 6;  // A dash of height and a dollop of speed
 	const auto Position = GetEyePosition() - Vector3d(0, 0.2, 0);  // Correct for eye-height weirdness
@@ -776,9 +776,9 @@ void cPlayer::SetCustomName(const AString & a_CustomName)
 
 
 
-void cPlayer::SetBedPos(const Vector3i & a_Pos)
+void cPlayer::SetBedPos(const Vector3i a_Position)
 {
-	m_LastBedPos = a_Pos;
+	m_LastBedPos = a_Position;
 	m_SpawnWorldName = m_World->GetName();
 }
 
@@ -786,11 +786,10 @@ void cPlayer::SetBedPos(const Vector3i & a_Pos)
 
 
 
-void cPlayer::SetBedPos(const Vector3i & a_Pos, cWorld * a_World)
+void cPlayer::SetBedPos(const Vector3i a_Position, const cWorld & a_World)
 {
-	m_LastBedPos = a_Pos;
-	ASSERT(a_World != nullptr);
-	m_SpawnWorldName = a_World->GetName();
+	m_LastBedPos = a_Position;
+	m_SpawnWorldName = a_World.GetName();
 }
 
 
@@ -859,72 +858,15 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	{
 		Pickups.Add(cItem(E_ITEM_RED_APPLE));
 	}
-	m_Stats.AddValue(Statistic::Drop, static_cast<cStatManager::StatValue>(Pickups.Size()));
+	m_Stats.Custom[CustomStatistic::Drop] +=  static_cast<StatisticsManager::StatValue>(Pickups.Size());
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
-	cPluginManager * PluginManager = cRoot::Get()->GetPluginManager();
 
-	if (a_TDI.Attacker == nullptr)
-	{
-		const AString DamageText = [&]
-			{
-				switch (a_TDI.DamageType)
-				{
-					case dtRangedAttack:    return "was shot";
-					case dtLightning:       return "was plasmified by lightining";
-					case dtFalling:         return GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard";
-					case dtDrowning:        return "drowned";
-					case dtSuffocating:     return GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block";
-					case dtStarving:        return "forgot the importance of food";
-					case dtCactusContact:   return "was impaled on a cactus";
-					case dtMagmaContact:    return "discovered the floor was lava";
-					case dtLavaContact:     return "was melted by lava";
-					case dtPoisoning:       return "died from septicaemia";
-					case dtWithering:       return "is a husk of their former selves";
-					case dtOnFire:          return "forgot to stop, drop, and roll";
-					case dtFireContact:     return "burnt themselves to death";
-					case dtInVoid:          return "somehow fell out of the world";
-					case dtPotionOfHarming: return "was magicked to death";
-					case dtEnderPearl:      return "misused an ender pearl";
-					case dtAdmin:           return "was administrator'd";
-					case dtExplosion:       return "blew up";
-					case dtAttack:          return "was attacked by thin air";
-					case dtEnvironment:     return "played too much dress up";  // This is not vanilla - added a own pun
-				}
-				UNREACHABLE("Unsupported damage type");
-			}();
-		AString DeathMessage = Printf("%s %s", GetName().c_str(), DamageText.c_str());
-		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (DeathMessage != AString(""))
-		{
-			GetWorld()->BroadcastChatDeath(DeathMessage);
-		}
-	}
-	else if (a_TDI.Attacker->IsPlayer())
-	{
-		cPlayer * Killer = static_cast<cPlayer *>(a_TDI.Attacker);
-		AString DeathMessage = Printf("%s was killed by %s", GetName().c_str(), Killer->GetName().c_str());
-		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (DeathMessage != AString(""))
-		{
-			GetWorld()->BroadcastChatDeath(DeathMessage);
-		}
-	}
-	else
-	{
-		AString KillerClass = a_TDI.Attacker->GetClass();
-		KillerClass.erase(KillerClass.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
-		AString DeathMessage = Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str());
-		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (DeathMessage != AString(""))
-		{
-			GetWorld()->BroadcastChatDeath(DeathMessage);
-		}
-	}
+	BroadcastDeathMessage(a_TDI);
 
-	m_Stats.AddValue(Statistic::Deaths);
-	m_Stats.SetValue(Statistic::TimeSinceDeath, 0);
+	m_Stats.Custom[CustomStatistic::Deaths]++;
+	m_Stats.Custom[CustomStatistic::TimeSinceDeath] = 0;
 
 	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::otDeathCount, 1);
 }
@@ -939,7 +881,7 @@ void cPlayer::Killed(cEntity * a_Victim)
 
 	if (a_Victim->IsPlayer())
 	{
-		m_Stats.AddValue(Statistic::PlayerKills);
+		m_Stats.Custom[CustomStatistic::PlayerKills]++;
 
 		ScoreBoard.AddPlayerScore(GetName(), cObjective::otPlayerKillCount, 1);
 	}
@@ -947,10 +889,10 @@ void cPlayer::Killed(cEntity * a_Victim)
 	{
 		if (static_cast<cMonster *>(a_Victim)->GetMobFamily() == cMonster::mfHostile)
 		{
-			AwardAchievement(Statistic::AchKillEnemy);
+			AwardAchievement(CustomStatistic::AchKillEnemy);
 		}
 
-		m_Stats.AddValue(Statistic::MobKills);
+		m_Stats.Custom[CustomStatistic::MobKills]++;
 	}
 
 	ScoreBoard.AddPlayerScore(GetName(), cObjective::otTotalKillCount, 1);
@@ -1373,7 +1315,7 @@ void cPlayer::UpdateCapabilities()
 
 
 
-void cPlayer::AwardAchievement(const Statistic a_Ach)
+void cPlayer::AwardAchievement(const CustomStatistic a_Ach)
 {
 	// Check if the prerequisites are met:
 	if (!m_Stats.SatisfiesPrerequisite(a_Ach))
@@ -1382,7 +1324,7 @@ void cPlayer::AwardAchievement(const Statistic a_Ach)
 	}
 
 	// Increment the statistic and check if we already have it:
-	if (m_Stats.AddValue(a_Ach) != 1)
+	if (m_Stats.Custom[a_Ach]++ != 1)
 	{
 		return;
 	}
@@ -1809,7 +1751,7 @@ void cPlayer::LoadFromDisk()
 
 	const Vector3i WorldSpawn(static_cast<int>(m_World->GetSpawnX()), static_cast<int>(m_World->GetSpawnY()), static_cast<int>(m_World->GetSpawnZ()));
 	SetPosition(WorldSpawn);
-	SetBedPos(WorldSpawn, m_World);
+	SetBedPos(WorldSpawn, *m_World);
 
 	m_Inventory.Clear();
 	m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();  // Use a random number to seed the enchantment generator
@@ -1925,7 +1867,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName)
 	{
 		// Load the player stats.
 		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-		StatSerializer::Load(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
+		StatisticsSerializer::Load(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
 	}
 	catch (...)
 	{
@@ -2059,7 +2001,7 @@ void cPlayer::SaveToDisk()
 		// Save the player stats.
 		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
 		// TODO: save together with player.dat, not in some other place.
-		StatSerializer::Save(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
+		StatisticsSerializer::Save(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
 	}
 	catch (...)
 	{
@@ -2262,12 +2204,12 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		return;
 	}
 
-	const auto Value = FloorC<cStatManager::StatValue>(a_DeltaPos.Length() * 100 + 0.5);
+	const auto Value = FloorC<StatisticsManager::StatValue>(a_DeltaPos.Length() * 100 + 0.5);
 	if (m_AttachedTo == nullptr)
 	{
 		if (IsFlying())
 		{
-			m_Stats.AddValue(Statistic::FlyOneCm, Value);
+			m_Stats.Custom[CustomStatistic::FlyOneCm] += Value;
 			// May be flying and doing any of the following:
 		}
 
@@ -2275,18 +2217,18 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		{
 			if (a_DeltaPos.y > 0.0)  // Going up
 			{
-				m_Stats.AddValue(Statistic::ClimbOneCm, FloorC<cStatManager::StatValue>(a_DeltaPos.y * 100 + 0.5));
+				m_Stats.Custom[CustomStatistic::ClimbOneCm] += FloorC<StatisticsManager::StatValue>(a_DeltaPos.y * 100 + 0.5);
 			}
 		}
 		else if (IsInWater())
 		{
 			if (m_IsHeadInWater)
 			{
-				m_Stats.AddValue(Statistic::WalkUnderWaterOneCm, Value);
+				m_Stats.Custom[CustomStatistic::WalkUnderWaterOneCm] += Value;
 			}
 			else
 			{
-				m_Stats.AddValue(Statistic::WalkOnWaterOneCm, Value);
+				m_Stats.Custom[CustomStatistic::WalkOnWaterOneCm] += Value;
 			}
 			AddFoodExhaustion(0.00015 * static_cast<double>(Value));
 		}
@@ -2294,17 +2236,17 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 		{
 			if (IsCrouched())
 			{
-				m_Stats.AddValue(Statistic::CrouchOneCm, Value);
+				m_Stats.Custom[CustomStatistic::CrouchOneCm] += Value;
 				AddFoodExhaustion(0.0001 * static_cast<double>(Value));
 			}
 			if (IsSprinting())
 			{
-				m_Stats.AddValue(Statistic::SprintOneCm, Value);
+				m_Stats.Custom[CustomStatistic::SprintOneCm] += Value;
 				AddFoodExhaustion(0.001 * static_cast<double>(Value));
 			}
 			else
 			{
-				m_Stats.AddValue(Statistic::WalkOneCm, Value);
+				m_Stats.Custom[CustomStatistic::WalkOneCm] += Value;
 				AddFoodExhaustion(0.0001 * static_cast<double>(Value));
 			}
 		}
@@ -2313,13 +2255,13 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 			// If a jump just started, process food exhaustion:
 			if ((a_DeltaPos.y > 0.0) && a_PreviousIsOnGround)
 			{
-				m_Stats.AddValue(Statistic::Jump, 1);
+				m_Stats.Custom[CustomStatistic::Jump]++;
 				AddFoodExhaustion((IsSprinting() ? 0.008 : 0.002) * static_cast<double>(Value));
 			}
 			else if (a_DeltaPos.y < 0.0)
 			{
 				// Increment statistic
-				m_Stats.AddValue(Statistic::FallOneCm, static_cast<cStatManager::StatValue>(std::abs(a_DeltaPos.y) * 100 + 0.5));
+				m_Stats.Custom[CustomStatistic::FallOneCm] += static_cast<StatisticsManager::StatValue>(-a_DeltaPos.y * 100 + 0.5);
 			}
 			// TODO: good opportunity to detect illegal flight (check for falling tho)
 		}
@@ -2328,15 +2270,15 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 	{
 		switch (m_AttachedTo->GetEntityType())
 		{
-			case cEntity::etMinecart: m_Stats.AddValue(Statistic::MinecartOneCm, Value); break;
-			case cEntity::etBoat:     m_Stats.AddValue(Statistic::BoatOneCm,     Value); break;
+			case cEntity::etMinecart: m_Stats.Custom[CustomStatistic::MinecartOneCm] += Value; break;
+			case cEntity::etBoat:     m_Stats.Custom[CustomStatistic::BoatOneCm]     += Value; break;
 			case cEntity::etMonster:
 			{
 				cMonster * Monster = static_cast<cMonster *>(m_AttachedTo);
 				switch (Monster->GetMobType())
 				{
-					case mtPig:   m_Stats.AddValue(Statistic::PigOneCm,   Value); break;
-					case mtHorse: m_Stats.AddValue(Statistic::HorseOneCm, Value); break;
+					case mtPig:   m_Stats.Custom[CustomStatistic::PigOneCm]   += Value; break;
+					case mtHorse: m_Stats.Custom[CustomStatistic::HorseOneCm] += Value; break;
 					default: break;
 				}
 				break;
@@ -2391,10 +2333,9 @@ void cPlayer::LoadRank(void)
 
 
 
-bool cPlayer::PlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPlayer::PlaceBlock(const Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	sSetBlockVector blk{{a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta}};
-	return PlaceBlocks(blk);
+	return PlaceBlocks({ { a_Position, a_BlockType, a_BlockMeta } });
 }
 
 
@@ -2442,7 +2383,7 @@ void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_R
 
 
 
-bool cPlayer::DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks)
+bool cPlayer::DoesPlacingBlocksIntersectEntity(const std::initializer_list<sSetBlock> a_Blocks) const
 {
 	// Compute the bounding box for each block to be placed
 	std::vector<cBoundingBox> PlacementBoxes;
@@ -2516,44 +2457,52 @@ const cUUID & cPlayer::GetUUID(void) const
 
 
 
-bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
+bool cPlayer::PlaceBlocks(const std::initializer_list<sSetBlock> a_Blocks)
 {
 	if (DoesPlacingBlocksIntersectEntity(a_Blocks))
 	{
 		// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
-		for (auto blk2: a_Blocks)
+		for (const auto & ResendBlock : a_Blocks)
 		{
-			m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), *this);
+			m_World->SendBlockTo(ResendBlock.GetX(), ResendBlock.GetY(), ResendBlock.GetZ(), *this);
 		}
 		return false;
 	}
 
-	// Call the "placing" hooks; if any fail, abort:
 	cPluginManager * pm = cPluginManager::Get();
-	for (auto blk: a_Blocks)
+
+	// Check the blocks CanBeAt, and call the "placing" hooks; if any fail, abort:
+	for (const auto & Block : a_Blocks)
 	{
-		if (pm->CallHookPlayerPlacingBlock(*this, blk))
+		if (
+			!m_World->DoWithChunkAt(Block.GetAbsolutePos(), [&Block](cChunk & a_Chunk)
+			{
+				return cBlockHandler::For(Block.m_BlockType).CanBeAt(a_Chunk, Block.GetRelativePos(), Block.m_BlockMeta);
+			})
+		)
+		{
+			return false;
+		}
+
+		if (pm->CallHookPlayerPlacingBlock(*this, Block))
 		{
 			// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
-			for (auto blk2: a_Blocks)
+			for (const auto & ResendBlock : a_Blocks)
 			{
-				m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), *this);
+				m_World->SendBlockTo(ResendBlock.GetX(), ResendBlock.GetY(), ResendBlock.GetZ(), *this);
 			}
 			return false;
 		}
-	}  // for blk - a_Blocks[]
+	}
 
 	cChunkInterface ChunkInterface(m_World->GetChunkMap());
-	for (auto blk: a_Blocks)
+	for (const auto & Block : a_Blocks)
 	{
 		// Set the blocks:
-		m_World->PlaceBlock(blk.GetAbsolutePos(), blk.m_BlockType, blk.m_BlockMeta);
-
-		// Notify the blockhandlers:
-		cBlockHandler::For(blk.m_BlockType).OnPlacedByPlayer(ChunkInterface, *m_World, *this, blk);
+		m_World->PlaceBlock(Block.GetAbsolutePos(), Block.m_BlockType, Block.m_BlockMeta);
 
 		// Call the "placed" hooks:
-		pm->CallHookPlayerPlacedBlock(*this, blk);
+		pm->CallHookPlayerPlacedBlock(*this, Block);
 	}
 
 	return true;
@@ -3004,7 +2953,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 				NotifyNearbyWolves(static_cast<cPawn*>(a_TDI.Attacker), true);
 			}
 		}
-		m_Stats.AddValue(Statistic::DamageTaken, FloorC<cStatManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5));
+		m_Stats.Custom[CustomStatistic::DamageTaken] += FloorC<StatisticsManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5);
 		return true;
 	}
 	return false;
@@ -3154,11 +3103,11 @@ void cPlayer::OnRemoveFromWorld(cWorld & a_World)
 	// Award relevant achievements:
 	if (DestinationDimension == dimEnd)
 	{
-		AwardAchievement(Statistic::AchTheEnd);
+		AwardAchievement(CustomStatistic::AchTheEnd);
 	}
 	else if (DestinationDimension == dimNether)
 	{
-		AwardAchievement(Statistic::AchPortal);
+		AwardAchievement(CustomStatistic::AchPortal);
 	}
 
 	// Set capabilities based on new world:
@@ -3171,9 +3120,6 @@ void cPlayer::OnRemoveFromWorld(cWorld & a_World)
 
 	// Clear sent chunk lists from the clienthandle:
 	m_ClientHandle->RemoveFromWorld();
-
-	// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
-	m_ClientHandle->InvalidateCachedSentChunk();
 }
 
 
@@ -3186,8 +3132,6 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 	{
 		return;
 	}
-
-	LOGD("Spawing %s on %s", GetName().c_str(), a_Client.GetUsername().c_str());
 
 	a_Client.SendPlayerSpawn(*this);
 	a_Client.SendEntityHeadLook(*this);
@@ -3218,12 +3162,16 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	m_Stats.AddValue(Statistic::PlayOneMinute);
-	m_Stats.AddValue(Statistic::TimeSinceDeath);
-
-	if (IsCrouched())
 	{
-		m_Stats.AddValue(Statistic::SneakTime);
+		const auto TicksElapsed = static_cast<StatisticsManager::StatValue>(std::chrono::duration_cast<cTickTime>(a_Dt).count());
+
+		m_Stats.Custom[CustomStatistic::PlayOneMinute] += TicksElapsed;
+		m_Stats.Custom[CustomStatistic::TimeSinceDeath] += TicksElapsed;
+
+		if (IsCrouched())
+		{
+			m_Stats.Custom[CustomStatistic::SneakTime] += TicksElapsed;
+		}
 	}
 
 	// Handle the player detach, when the player is in spectator mode

@@ -40,14 +40,17 @@
 
 
 
-/** Maximum number of explosions to send this tick, server will start dropping if exceeded */
+/** Maximum number of explosions to send this tick, server will start dropping if exceeded. */
 #define MAX_EXPLOSIONS_PER_TICK 20
 
-/** Maximum number of block change interactions a player can perform per tick - exceeding this causes a kick */
+/** Maximum number of block change interactions a player can perform per tick - exceeding this causes a kick. */
 #define MAX_BLOCK_CHANGE_INTERACTIONS 20
 
-/** Maximum number of bytes that a chat message sent by a player may consist of */
+/** Maximum number of bytes that a chat message sent by a player may consist of. */
 #define MAX_CHAT_MSG_LENGTH 1024
+
+/** Maximum number of chunks to stream per tick. */
+#define MAX_CHUNKS_STREAMED_PER_TICK 4
 
 
 
@@ -69,10 +72,10 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_IPString),
 	m_Player(nullptr),
-	m_CachedSentChunk(0x7fffffff, 0x7fffffff),
+	m_CachedSentChunk(std::numeric_limits<decltype(m_CachedSentChunk.m_ChunkX)>::max(), std::numeric_limits<decltype(m_CachedSentChunk.m_ChunkZ)>::max()),
 	m_HasSentDC(false),
-	m_LastStreamedChunkX(0x7fffffff),  // bogus chunk coords to force streaming upon login
-	m_LastStreamedChunkZ(0x7fffffff),
+	m_LastStreamedChunkX(std::numeric_limits<decltype(m_LastStreamedChunkX)>::max()),  // bogus chunk coords to force streaming upon login
+	m_LastStreamedChunkZ(std::numeric_limits<decltype(m_LastStreamedChunkZ)>::max()),
 	m_TicksSinceLastPacket(0),
 	m_Ping(1000),
 	m_PingID(1),
@@ -238,6 +241,7 @@ void cClientHandle::ProcessProtocolOut()
 	// to prevent it being reset between the null check and the Send:
 	if (auto Link = m_Link; Link != nullptr)
 	{
+		m_Protocol->DataPrepared(OutgoingData);
 		Link->Send(OutgoingData.data(), OutgoingData.size());
 	}
 }
@@ -369,7 +373,7 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 	cRoot::Get()->SendPlayerLists(m_Player);  // Add everyone else to ourself
 
 	// Send statistics:
-	SendStatistics(m_Player->GetStatManager());
+	SendStatistics(m_Player->GetStatistics());
 
 	// Delay the first ping until the client "settles down"
 	// This should fix #889, "BadCast exception, cannot convert bit to fm" error in client
@@ -388,25 +392,29 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 
 
 
-bool cClientHandle::StreamNextChunk(void)
+void cClientHandle::StreamNextChunks(void)
 {
 	ASSERT(m_Player != nullptr);
 
 	int ChunkPosX = m_Player->GetChunkX();
 	int ChunkPosZ = m_Player->GetChunkZ();
+
 	if ((m_LastStreamedChunkX == ChunkPosX) && (m_LastStreamedChunkZ == ChunkPosZ))
 	{
-		// All chunks are already loaded. Abort loading.
-		return true;
+		// All chunks are already loaded and the player has not moved, work is done:
+		return;
 	}
 
-	// Get the look vector and normalize it.
+	// Player moved chunks and / or loading is not finished, reset to bogus (GH #4531):
+	m_LastStreamedChunkX = std::numeric_limits<decltype(m_LastStreamedChunkX)>::max();
+	m_LastStreamedChunkZ = std::numeric_limits<decltype(m_LastStreamedChunkZ)>::max();
+
+	int StreamedChunks = 0;
 	Vector3d Position = m_Player->GetEyePosition();
 	Vector3d LookVector = m_Player->GetLookVector();
-	LookVector.Normalize();
 
-	// Lock the list
-	cCSLock Lock(m_CSChunkLists);
+	// Get the look vector and normalize it.
+	LookVector.Normalize();
 
 	// High priority: Load the chunks that are in the view-direction of the player (with a radius of 3)
 	for (int Range = 0; Range < m_CurrentViewDistance; Range++)
@@ -432,18 +440,24 @@ bool cClientHandle::StreamNextChunk(void)
 				}
 
 				// If the chunk already loading / loaded -> skip
-				if (
-					(m_ChunksToSend.find(Coords) != m_ChunksToSend.end()) ||
-					(m_LoadedChunks.find(Coords) != m_LoadedChunks.end())
-				)
 				{
-					continue;
+					cCSLock Lock(m_CSChunkLists);
+					if (
+						(m_ChunksToSend.find(Coords) != m_ChunksToSend.end()) ||
+						(m_LoadedChunks.find(Coords) != m_LoadedChunks.end())
+					)
+					{
+						continue;
+					}
 				}
 
 				// Unloaded chunk found -> Send it to the client.
-				Lock.Unlock();
 				StreamChunk(ChunkX, ChunkZ, ((Range <= 2) ? cChunkSender::Priority::Critical : cChunkSender::Priority::Medium));
-				return false;
+
+				if (++StreamedChunks == MAX_CHUNKS_STREAMED_PER_TICK)
+				{
+					return;
+				}
 			}
 		}
 	}
@@ -451,19 +465,21 @@ bool cClientHandle::StreamNextChunk(void)
 	// Low priority: Add all chunks that are in range. (From the center out to the edge)
 	for (int d = 0; d <= m_CurrentViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
 	{
-		const auto StreamIfUnloaded = [this, &Lock](const cChunkCoords Chunk)
+		const auto StreamIfUnloaded = [this](const cChunkCoords Chunk)
 		{
 			// If the chunk already loading / loaded -> skip
-			if (
-				(m_ChunksToSend.find(Chunk) != m_ChunksToSend.end()) ||
-				(m_LoadedChunks.find(Chunk) != m_LoadedChunks.end())
-			)
 			{
-				return false;
+				cCSLock Lock(m_CSChunkLists);
+				if (
+					(m_ChunksToSend.find(Chunk) != m_ChunksToSend.end()) ||
+					(m_LoadedChunks.find(Chunk) != m_LoadedChunks.end())
+				)
+				{
+					return false;
+				}
 			}
 
 			// Unloaded chunk found -> Send it to the client.
-			Lock.Unlock();
 			StreamChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, cChunkSender::Priority::Low);
 			return true;
 		};
@@ -473,14 +489,20 @@ bool cClientHandle::StreamNextChunk(void)
 		{
 			if (StreamIfUnloaded({ ChunkPosX + d, ChunkPosZ + i }) || StreamIfUnloaded({ ChunkPosX - d, ChunkPosZ + i }))
 			{
-				return false;
+				if (++StreamedChunks == MAX_CHUNKS_STREAMED_PER_TICK)
+				{
+					return;
+				}
 			}
 		}
 		for (int i = -d + 1; i < d; ++i)
 		{
 			if (StreamIfUnloaded({ ChunkPosX + i, ChunkPosZ + d }) || StreamIfUnloaded({ ChunkPosX + i, ChunkPosZ - d }))
 			{
-				return false;
+				if (++StreamedChunks == MAX_CHUNKS_STREAMED_PER_TICK)
+				{
+					return;
+				}
 			}
 		}
 	}
@@ -488,7 +510,6 @@ bool cClientHandle::StreamNextChunk(void)
 	// All chunks are loaded -> Sets the last loaded chunk coordinates to current coordinates
 	m_LastStreamedChunkX = ChunkPosX;
 	m_LastStreamedChunkZ = ChunkPosZ;
-	return true;
 }
 
 
@@ -987,15 +1008,13 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		/* Check for clickthrough-blocks:
 		When the user breaks a fire block, the client send the wrong block location.
 		We must find the right block with the face direction. */
+
 		int BlockX = a_BlockX;
 		int BlockY = a_BlockY;
 		int BlockZ = a_BlockZ;
 		AddFaceDirection(BlockX, BlockY, BlockZ, a_BlockFace);
 
-		if (
-			cChunkDef::IsValidHeight(BlockY) &&
-			cBlockHandler::For(m_Player->GetWorld()->GetBlock({ BlockX, BlockY, BlockZ })).IsClickedThrough()
-		)
+		if (cChunkDef::IsValidHeight(BlockY) && cBlockInfo::IsClickedThrough(m_Player->GetWorld()->GetBlock({ BlockX, BlockY, BlockZ })))
 		{
 			a_BlockX = BlockX;
 			a_BlockY = BlockY;
@@ -1338,7 +1357,6 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	cWorld * World = m_Player->GetWorld();
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
-	bool Success = false;
 	if (
 		!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ) &&
 		IsWithinReach && !m_Player->IsFrozen()
@@ -1354,29 +1372,24 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 		if (BlockUsable && !(m_Player->IsCrouched() && !HeldItem.IsEmpty()))
 		{
-			// use a block
 			cChunkInterface ChunkInterface(World->GetChunkMap());
 			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 			{
+				// Use a block:
 				if (BlockHandler.OnUse(ChunkInterface, *World, *m_Player, ClickedBlockPos, a_BlockFace, CursorPos))
 				{
-					// block use was successful, we're done
 					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
-					Success = true;
+					return;  // Block use was successful, we're done.
 				}
 
-				// Check if the item is place able, for example a torch on a fence
-				if (!Success && Placeable)
+				// Check if the item is place able, for example a torch on a fence:
+				if (Placeable)
 				{
-					// place a block
-					Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, {a_CursorX, a_CursorY, a_CursorZ});
+					// Place a block:
+					ItemHandler->OnPlayerPlace(*m_Player, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, {a_CursorX, a_CursorY, a_CursorZ});
 				}
-			}
-			else
-			{
-				// TODO: OnCancelRightClick seems to do the same thing with updating blocks at the end of this function. Need to double check
-				// A plugin doesn't agree with the action, replace the block on the client and quit:
-				BlockHandler.OnCancelRightClick(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
+
+				return;
 			}
 		}
 		else if (Placeable)
@@ -1388,36 +1401,30 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				Kick("Too many blocks were placed / interacted with per unit time - hacked client?");
 				return;
 			}
-			// place a block
-			Success = ItemHandler->OnPlayerPlace(*World, *m_Player, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, {a_CursorX, a_CursorY, a_CursorZ});
+
+			// Place a block:
+			ItemHandler->OnPlayerPlace(*m_Player, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, {a_CursorX, a_CursorY, a_CursorZ});
+			return;
 		}
-		else
+		else if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 		{
-			// Use an item in hand with a target block
-			if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
-			{
-				// All plugins agree with using the item
-				cBlockInServerPluginInterface PluginInterface(*World);
-				ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
-				PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
-				Success = true;
-			}
+			// All plugins agree with using the item.
+			// Use an item in hand with a target block.
+
+			cBlockInServerPluginInterface PluginInterface(*World);
+			ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
+			PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			return;
 		}
 	}
-	if (!Success)
-	{
-		// Update the target block including the block above and below for 2 block high things
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		for (int y = a_BlockY - 1; y <= a_BlockY + 1; y++)
-		{
-			if (cChunkDef::IsValidHeight(y))
-			{
-				World->SendBlockTo(a_BlockX, y, a_BlockZ, *m_Player);
-			}
-		}
-		// TODO: Send corresponding slot based on hand
-		m_Player->GetInventory().SendEquippedSlot();
-	}
+
+	// TODO: delete OnItemUse bool return, delete onCancelRightClick
+
+	// Update the target block including the block above and below for 2 block high things:
+	m_Player->SendBlocksAround(a_BlockX, a_BlockY, a_BlockZ, 2);
+
+	// TODO: Send corresponding slot based on hand
+	m_Player->GetInventory().SendEquippedSlot();
 }
 
 
@@ -1934,20 +1941,11 @@ void cClientHandle::RemoveFromWorld(void)
 	// No need to send Unload Chunk packets, the client unloads automatically.
 
 	// Here, we set last streamed values to bogus ones so everything is resent:
-	m_LastStreamedChunkX = 0x7fffffff;
-	m_LastStreamedChunkZ = 0x7fffffff;
-}
+	m_LastStreamedChunkX = std::numeric_limits<decltype(m_LastStreamedChunkX)>::max();
+	m_LastStreamedChunkZ = std::numeric_limits<decltype(m_LastStreamedChunkZ)>::max();
 
-
-
-
-
-void cClientHandle::InvalidateCachedSentChunk()
-{
-	ASSERT(m_Player != nullptr);
-	// Sets this to a junk value different from the player's current chunk, which invalidates it and
-	// ensures its value will not be used.
-	m_CachedSentChunk = cChunkCoords(m_Player->GetChunkX() + 500, m_Player->GetChunkZ());
+	// Restart player unloaded chunk checking and freezing:
+	m_CachedSentChunk = cChunkCoords(std::numeric_limits<decltype(m_CachedSentChunk.m_ChunkX)>::max(), std::numeric_limits<decltype(m_CachedSentChunk.m_ChunkZ)>::max());
 }
 
 
@@ -2061,16 +2059,8 @@ void cClientHandle::Tick(float a_Dt)
 		}
 	}
 
-	// Stream 4 chunks per tick
-	for (int i = 0; i < 4; i++)
-	{
-		// Stream the next chunk
-		if (StreamNextChunk())
-		{
-			// Streaming finished. All chunks are loaded.
-			break;
-		}
-	}
+	// Send a couple of chunks to the player:
+	StreamNextChunks();
 
 	// Unload all chunks that are out of the view distance (every 5 seconds):
 	if ((m_Player->GetWorld()->GetWorldAge() - m_LastUnloadCheck) > 5s)
@@ -2187,13 +2177,23 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 	ASSERT(!a_Changes.empty());  // We don't want to be sending empty change packets!
 
 	// Do not send block changes in chunks that weren't sent to the client yet:
-	cChunkCoords ChunkCoords = cChunkCoords(a_ChunkX, a_ChunkZ);
-	cCSLock Lock(m_CSChunkLists);
-	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
 	{
-		Lock.Unlock();
-		m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
+		cCSLock Lock(m_CSChunkLists);
+		if (std::find(m_SentChunks.begin(), m_SentChunks.end(), cChunkCoords(a_ChunkX, a_ChunkZ)) == m_SentChunks.end())
+		{
+			return;
+		}
 	}
+
+	// Use a dedicated packet for single changes:
+	if (a_Changes.size() == 1)
+	{
+		const auto & Change = a_Changes[0];
+		m_Protocol->SendBlockChange(Change.GetX(), Change.GetY(), Change.GetZ(), Change.m_BlockType, Change.m_BlockMeta);
+		return;
+	}
+
+	m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
 }
 
 
@@ -2444,15 +2444,11 @@ void cClientHandle::SendDetachEntity(const cEntity & a_Entity, const cEntity & a
 
 void cClientHandle::SendDisconnect(const AString & a_Reason)
 {
-	// Destruction (Destroy()) is called when the client disconnects, not when a disconnect packet (or anything else) is sent
-	// Otherwise, the cClientHandle instance is can be unexpectedly removed from the associated player - Core/#142
-	if (!m_HasSentDC)
-	{
-		LOGD("Sending a DC: \"%s\"", StripColorCodes(a_Reason).c_str());
-		m_Protocol.SendDisconnect(*this, a_Reason);
-		m_HasSentDC = true;
-		Destroy();
-	}
+	LOGD("Sending a DC: \"%s\"", StripColorCodes(a_Reason).c_str());
+
+	m_Protocol.SendDisconnect(*this, a_Reason);
+	m_HasSentDC = true;
+	Destroy();
 }
 
 
@@ -2970,7 +2966,7 @@ void cClientHandle::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cClientHandle::SendStatistics(const cStatManager & a_Manager)
+void cClientHandle::SendStatistics(const StatisticsManager & a_Manager)
 {
 	m_Protocol->SendStatistics(a_Manager);
 }
@@ -3167,6 +3163,10 @@ void cClientHandle::SetViewDistance(int a_ViewDistance)
 	{
 		// Set the current view distance based on the requested VD and world max VD:
 		m_CurrentViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, world->GetMaxViewDistance());
+
+		// Restart chunk streaming to respond to new view distance:
+		m_LastStreamedChunkX = std::numeric_limits<decltype(m_LastStreamedChunkX)>::max();
+		m_LastStreamedChunkZ = std::numeric_limits<decltype(m_LastStreamedChunkZ)>::max();
 	}
 }
 

@@ -748,6 +748,10 @@ bool cChunkMap::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 			res = false;
 			continue;
 		}
+		if (!cChunkDef::IsValidHeight(itr->m_RelY))
+		{
+			continue;
+		}
 		itr->m_BlockType = Chunk->GetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ);
 		itr->m_BlockMeta = Chunk->GetMeta(itr->m_RelX, itr->m_RelY, itr->m_RelZ);
 	}
@@ -798,7 +802,7 @@ cItems cChunkMap::PickupsFromBlock(Vector3i a_BlockPos, const cEntity * a_Digger
 
 
 
-void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player)
+void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, const cPlayer & a_Player)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_X, a_Y, a_Z, ChunkX, ChunkZ);

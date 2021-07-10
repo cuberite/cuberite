@@ -68,7 +68,7 @@ $cfile "../CompositeChat.h"
 $cfile "../Map.h"
 $cfile "../MapManager.h"
 $cfile "../Scoreboard.h"
-$cfile "../Statistics.h"
+$cfile "../StatisticsManager.h"
 $cfile "../Protocol/MojangAPI.h"
 $cfile "../UUID.h"
 
@@ -123,6 +123,8 @@ $cfile "../BlockEntities/MobHeadEntity.h"
 $cfile "../BlockEntities/MobSpawnerEntity.h"
 $cfile "../BlockEntities/FlowerPotEntity.h"
 
+// Registries:
+$cfile "../Registries/CustomStatistics.h"
 
 
 

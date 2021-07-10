@@ -1154,6 +1154,9 @@ BOOL __stdcall WinStackWalker::myReadProcMem(
 
 void WinStackWalker::OnLoadModule(LPCSTR img, LPCSTR mod, DWORD64 baseAddr, DWORD size, DWORD result, LPCSTR symType, LPCSTR pdbName, ULONGLONG fileVersion)
 {
+	/*
+	// Uncomment to be notified of loaded DLL modules.
+
 	char buffer[STACKWALK_MAX_NAMELEN];
 	if (fileVersion == 0)
 	{
@@ -1168,6 +1171,7 @@ void WinStackWalker::OnLoadModule(LPCSTR img, LPCSTR mod, DWORD64 baseAddr, DWOR
 		_snprintf_s(buffer, sizeof(buffer), "%s:%s (%p), size: %d (result: %d), SymType: '%s', PDB: '%s', fileVersion: %d.%d.%d.%d\n", img, mod, (LPVOID)baseAddr, size, result, symType, pdbName, v1, v2, v3, v4);
 	}
 	OnOutput(buffer);
+	*/
 }
 
 

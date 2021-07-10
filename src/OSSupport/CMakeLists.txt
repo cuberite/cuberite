@@ -36,6 +36,7 @@ target_sources(
 	SleepResolutionBooster.h
 	StackTrace.h
 	StartAsService.h
+	Stopwatch.h
 	TCPLinkImpl.h
 	UDPEndpointImpl.h
 	WinStackWalker.h

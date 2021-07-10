@@ -455,7 +455,7 @@ static int tolua_cNoteEntity_SetPitch(lua_State * tolua_S)
 		tolua_error(LuaState, "invalid 'self' in function 'SetPitch'", nullptr);
 	}
 
-	Self->SetNote(Note % 25);
+	Self->SetNote(static_cast<unsigned char>(Note % 25));
 	LOGWARNING("Warning: 'cNoteEntity:SetPitch' function is deprecated. Please use 'cNoteEntity:SetNote' instead.");
 	LuaState.LogStackTrace(0);
 	return 1;

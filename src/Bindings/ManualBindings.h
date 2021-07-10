@@ -298,7 +298,3 @@ public:
 		return 1;
 	}
 };
-
-
-
-

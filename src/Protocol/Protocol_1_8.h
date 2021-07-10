@@ -15,7 +15,7 @@ Declares the 1.8 protocol classes:
 
 #include "Protocol.h"
 #include "../ByteBuffer.h"
-#include "../Registries/Statistics.h"
+#include "../Registries/CustomStatistics.h"
 
 #include "../mbedTLS++/AesCfb128Decryptor.h"
 #include "../mbedTLS++/AesCfb128Encryptor.h"
@@ -36,11 +36,10 @@ public:
 
 	cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State);
 
-	/** Called to process them, when client sends some data.
-	The protocol uses the provided buffers for storage and processing, and must have exclusive access to them. */
 	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer && a_Data) override;
+	virtual void DataPrepared(ContiguousByteBuffer & a_Data) override;
 
-	/** Sending stuff to clients (alphabetically sorted): */
+	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
 	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
 	virtual void SendBlockBreakAnim	            (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
@@ -113,7 +112,7 @@ public:
 	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnEntity                (const cEntity & a_Entity) override;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
-	virtual void SendStatistics                 (const cStatManager & a_Manager) override;
+	virtual void SendStatistics                 (const StatisticsManager & a_Manager) override;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
@@ -216,9 +215,6 @@ protected:
 	/** Sends the entity type and entity-dependent data required for the entity to initially spawn. */
 	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData);
 
-	/** Sends the data to the client, encrypting them if needed. */
-	virtual void SendData(ContiguousByteBufferView a_Size) override;
-
 	/** Sends the packet to the client. Called by the cPacketizer's destructor. */
 	virtual void SendPacket(cPacketizer & a_Packet) override;
 
@@ -267,7 +263,7 @@ private:
 	/** Converts a statistic to a protocol-specific string.
 	Protocols <= 1.12 use strings, hence this is a static as the string-mapping was append-only for the versions that used it.
 	Returns an empty string, handled correctly by the client, for newer, unsupported statistics. */
-	static const char * GetProtocolStatisticName(Statistic a_Statistic);
+	static const char * GetProtocolStatisticName(CustomStatistic a_Statistic);
 
 	/** Handle a complete packet stored in the given buffer. */
 	void HandlePacket(cByteBuffer & a_Buffer);

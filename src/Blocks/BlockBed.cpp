@@ -9,7 +9,6 @@
 #include "../World.h"
 #include "../BoundingBox.h"
 #include "../Mobs/Monster.h"
-#include "../BlockEntities/BedEntity.h"
 
 
 
@@ -134,7 +133,7 @@ bool cBlockBedHandler::OnUse(
 
 	// Occupy the bed, where 0x4 = occupied bit:
 	a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta | 0x04);
-	a_Player.GetStatManager().AddValue(Statistic::SleepInBed);
+	a_Player.GetStatistics().Custom[CustomStatistic::SleepInBed]++;
 
 	// When sleeping, the player's bounding box moves to approximately where his head is.
 	// Set the player's position to somewhere close to the edge of the pillow block:
@@ -152,20 +151,6 @@ bool cBlockBedHandler::OnUse(
 	}
 
 	return true;
-}
-
-
-
-
-
-void cBlockBedHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange) const
-{
-	a_Player.GetWorld()->DoWithBlockEntityAt(a_BlockChange.GetAbsolutePos(), [&a_Player](cBlockEntity & a_BlockEntity)
-	{
-		ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_BED);
-		static_cast<cBedEntity &>(a_BlockEntity).SetColor(a_Player.GetEquippedItem().m_ItemDamage);
-		return false;
-	});
 }
 
 

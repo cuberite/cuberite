@@ -528,7 +528,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			}
 		}
 
-		Player->GetStatManager().AddValue(Statistic::DamageDealt, FloorC<cStatManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5));
+		Player->GetStatistics().Custom[CustomStatistic::DamageDealt] += FloorC<StatisticsManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5);
 	}
 
 	m_Health -= a_TDI.FinalDamage;
@@ -1687,9 +1687,11 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 				BLOCKTYPE Block;
 				if (!a_Chunk.UnboundedRelGetBlockType(x, y, z, Block))
 				{
+					/*
 					LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
 						x, y, z, GetPosX(), GetPosZ()
 					);
+					*/
 					continue;
 				}
 
@@ -1716,9 +1718,11 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	BLOCKTYPE BlockIn;
 	if (!a_Chunk.UnboundedRelGetBlockType(RelX, HeadHeight, RelZ, BlockIn))
 	{
+		/*
 		LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
 			RelX, HeadHeight, RelZ, GetPosX(), GetPosZ()
 		);
+		*/
 		return;
 	}
 	m_IsHeadInWater = IsBlockWater(BlockIn);
@@ -2282,6 +2286,106 @@ void cEntity::BroadcastLeashedMobs()
 		for (auto LeashedMob : m_LeashedMobs)
 		{
 			m_World->BroadcastLeashEntity(*LeashedMob, *this);
+		}
+	}
+}
+
+
+
+
+
+void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
+{
+	cPluginManager * PluginManager = cRoot::Get()->GetPluginManager();
+
+	AString Name;
+	if (IsPlayer())
+	{
+		cPlayer * Player = static_cast<cPlayer *>(this);
+		Name = Player->GetName();
+	}
+	else if (IsMob())
+	{
+		cMonster * Monster = static_cast<cMonster *>(this);
+		if (Monster->HasCustomName())
+		{
+			Name = Monster->GetCustomName();
+		}
+		else
+		{
+			// Tamed ocelots are really cats in vanilla.
+			if (Monster->IsTame() && (Monster->GetClass() == AString("cOcelot")))
+			{
+				Name = "Cat";
+			}
+			else
+			{
+				Name = Monster->GetClass();
+				Name.erase(Name.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
+			}
+		}
+	}
+	else
+	{
+		// If the entity is neither a player nor a mob, we should quit.
+		return;
+	}
+
+	if (a_TDI.Attacker == nullptr)
+	{
+		const AString DamageText = [&]
+			{
+				switch (a_TDI.DamageType)
+				{
+					case dtRangedAttack:    return "was shot";
+					case dtLightning:       return "was plasmified by lightining";
+					case dtFalling:         return GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard";
+					case dtDrowning:        return "drowned";
+					case dtSuffocating:     return GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block";
+					case dtStarving:        return "forgot the importance of food";
+					case dtCactusContact:   return "was impaled on a cactus";
+					case dtMagmaContact:    return "discovered the floor was lava";
+					case dtLavaContact:     return "was melted by lava";
+					case dtPoisoning:       return "died from septicaemia";
+					case dtWithering:       return "is a husk of their former selves";
+					case dtOnFire:          return "forgot to stop, drop, and roll";
+					case dtFireContact:     return "burnt themselves to death";
+					case dtInVoid:          return "somehow fell out of the world";
+					case dtPotionOfHarming: return "was magicked to death";
+					case dtEnderPearl:      return "misused an ender pearl";
+					case dtAdmin:           return "was administrator'd";
+					case dtExplosion:       return "blew up";
+					case dtAttack:          return "was attacked by thin air";
+					case dtEnvironment:     return "played too much dress up";  // This is not vanilla - added a own pun
+				}
+				UNREACHABLE("Unsupported damage type");
+			}();
+		AString DeathMessage = Printf("%s %s", Name.c_str(), DamageText.c_str());
+		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
+		if (DeathMessage != AString(""))
+		{
+			GetWorld()->BroadcastChatDeath(DeathMessage);
+		}
+	}
+	else if (a_TDI.Attacker->IsPlayer())
+	{
+		cPlayer * Killer = static_cast<cPlayer *>(a_TDI.Attacker);
+		AString DeathMessage = Printf("%s was killed by %s", Name.c_str(), Killer->GetName().c_str());
+		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
+		if (DeathMessage != AString(""))
+		{
+			GetWorld()->BroadcastChatDeath(DeathMessage);
+		}
+	}
+	else
+	{
+		AString KillerClass = a_TDI.Attacker->GetClass();
+		KillerClass.erase(KillerClass.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
+		AString DeathMessage = Printf("%s was killed by a %s", Name.c_str(), KillerClass.c_str());
+		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
+		if (DeathMessage != AString(""))
+		{
+			GetWorld()->BroadcastChatDeath(DeathMessage);
 		}
 	}
 }

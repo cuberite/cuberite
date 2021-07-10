@@ -35,9 +35,11 @@ class cProtocol;
 class cWindow;
 class cFallingBlock;
 class cCompositeChat;
-class cStatManager;
 class cMap;
 class cClientHandle;
+
+struct StatisticsManager;
+
 typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
 
 
@@ -115,8 +117,8 @@ public:  // tolua_export
 	/** Authenticates the specified user, called by cAuthenticator */
 	void Authenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
 
-	/** This function sends a new unloaded chunk to the player. Returns true if all chunks are loaded. */
-	bool StreamNextChunk();
+	/** Sends a set number of new chunks to the player on every invocation, until all chunks in the view distance have been sent. */
+	void StreamNextChunks();
 
 	/** Remove all loaded chunks that are no longer in range */
 	void UnloadOutOfRangeChunks(void);
@@ -211,7 +213,7 @@ public:  // tolua_export
 	void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnEntity                (const cEntity & a_Entity);
 	void SendSpawnMob                   (const cMonster & a_Mob);
-	void SendStatistics                 (const cStatManager & a_Manager);
+	void SendStatistics                 (const StatisticsManager & a_Manager);
 	void SendTabCompletionResults       (const AStringVector & a_Results);
 	void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks);  // tolua_export
@@ -404,8 +406,6 @@ public:  // tolua_export
 
 	/** Returns the protocol version number of the protocol that the client is talking. Returns zero if the protocol version is not (yet) known. */
 	UInt32 GetProtocolVersion(void) const { return m_ProtocolVersion; }  // tolua_export
-
-	void InvalidateCachedSentChunk();
 
 	bool IsPlayerChunkSent();
 

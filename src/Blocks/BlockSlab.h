@@ -46,64 +46,25 @@ private:
 	}
 
 
-
-
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
 	{
-		a_BlockType = m_BlockType;
-		NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage);
-
-		// Set the correct metadata based on player equipped item (i.e. a_BlockMeta not initialised yet)
-		switch (a_ClickedBlockFace)
+		/* Double slab combining uses build collision checks to replace single slabs with double slabs in the right conditions.
+		For us to be replaced, the player must be:
+		1. Placing the same slab material.
+		2. Placing the same slab sub-kind (and existing slab is single). */
+		if ((m_BlockType != a_HeldItem.m_ItemType) || ((a_Meta & 0x07) != a_HeldItem.m_ItemDamage))
 		{
-			case BLOCK_FACE_TOP:
-			{
-				// Bottom half slab block
-				a_BlockMeta = Meta & 0x07;
-				break;
-			}
-			case BLOCK_FACE_BOTTOM:
-			{
-				// Top half slab block
-				a_BlockMeta = Meta | 0x08;
-				break;
-			}
-			case BLOCK_FACE_EAST:
-			case BLOCK_FACE_NORTH:
-			case BLOCK_FACE_SOUTH:
-			case BLOCK_FACE_WEST:
-			{
-				if (a_CursorPos.y > 7)
-				{
-					// Cursor at top half of block, place top slab
-					a_BlockMeta = Meta | 0x08; break;
-				}
-				else
-				{
-					// Cursor at bottom half of block, place bottom slab
-					a_BlockMeta = Meta & 0x07; break;
-				}
-			}
-			case BLOCK_FACE_NONE: return false;
-		}  // switch (a_BlockFace)
-
-		// Check if the block at the coordinates is a single slab. Eligibility for combining has already been processed in ClientHandle
-		// Changed to-be-placed to a double slab if we are clicking on a single slab, as opposed to placing one for the first time
-		if (IsAnySlabType(a_ChunkInterface.GetBlock(a_PlacedBlockPos)))
-		{
-			a_BlockType = GetDoubleSlabType(m_BlockType);
-			a_BlockMeta = a_BlockMeta & 0x07;
+			return false;
 		}
 
-		return true;
+		const bool IsTopSlab = (a_Meta & 0x08) == 0x08;
+		const auto CanClickCombine = ((a_ClickedBlockFace == BLOCK_FACE_TOP) && !IsTopSlab) || ((a_ClickedBlockFace == BLOCK_FACE_BOTTOM) && IsTopSlab);
+
+		/* When the player clicks on us directly, we'll combine if we're
+		a bottom slab and he clicked the top, or vice versa. Clicking on the sides will not combine.
+		However, when indirectly clicked (on the side of another block, that caused placement to go to us)
+		the conditions are exactly the opposite. */
+		return a_ClickedDirectly ? CanClickCombine : !CanClickCombine;
 	}
 
 
@@ -125,24 +86,6 @@ private:
 
 		// Sends the slab back to the client. It's to refuse a doubleslab placement. */
 		a_Player.GetWorld()->SendBlockTo(a_BlockPos, a_Player);
-	}
-
-
-
-
-
-	/** Converts the single-slab blocktype to its equivalent double-slab blocktype */
-	static BLOCKTYPE GetDoubleSlabType(BLOCKTYPE a_SingleSlabBlockType)
-	{
-		switch (a_SingleSlabBlockType)
-		{
-			case E_BLOCK_STONE_SLAB: return E_BLOCK_DOUBLE_STONE_SLAB;
-			case E_BLOCK_WOODEN_SLAB: return E_BLOCK_DOUBLE_WOODEN_SLAB;
-			case E_BLOCK_RED_SANDSTONE_SLAB: return E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB;
-			case E_BLOCK_PURPUR_SLAB: return E_BLOCK_PURPUR_DOUBLE_SLAB;
-		}
-		ASSERT(!"Unhandled slab type!");
-		return E_BLOCK_AIR;
 	}
 
 

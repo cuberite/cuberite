@@ -74,7 +74,7 @@ public:
 			{
 				return false;
 			}
-			if (a_Player->PlaceBlock(CocoaPos.x, CocoaPos.y, CocoaPos.z, E_BLOCK_COCOA_POD, BlockMeta))
+			if (a_Player->PlaceBlock(CocoaPos, E_BLOCK_COCOA_POD, BlockMeta))
 			{
 				if (a_Player->IsGameModeSurvival())
 				{

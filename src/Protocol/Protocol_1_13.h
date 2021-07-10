@@ -42,12 +42,9 @@ protected:
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
-	virtual void SendStatistics                 (const cStatManager & a_Manager) override;
+	virtual void SendStatistics                 (const StatisticsManager & a_Manager) override;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
-
-	virtual void SendWeather                    (eWeather a_Weather) override {}  // This packet was removed. This keeps players from joining the server with 1.13 while there is downfall
-
 	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata) const;
 	virtual UInt8 GetEntityMetadataID(EntityMetadataType a_FieldType) const;
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const;
@@ -56,7 +53,7 @@ protected:
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
 	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) const;
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
-	virtual UInt32 GetProtocolStatisticType(Statistic a_Statistic) const;
+	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const;
 	virtual Version GetProtocolVersion() const override;
 
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
@@ -91,7 +88,7 @@ protected:
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
 	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override;
 	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) const override;
-	virtual UInt32 GetProtocolStatisticType(Statistic a_Statistic) const override;
+	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const override;
 	virtual Version GetProtocolVersion() const override;
 };
 

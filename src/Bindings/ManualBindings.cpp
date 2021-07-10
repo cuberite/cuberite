@@ -347,22 +347,37 @@ static int tolua_StringSplitAndTrim(lua_State * tolua_S)
 
 
 
-/** Retrieves the log message from the first param on the Lua stack.
-Can take either a string or a cCompositeChat.
-*/
-static void LogFromLuaStack(lua_State * tolua_S, eLogLevel a_LogLevel)
+/** Prints the message to the console, optionally formatting it with a plugin name prefix if the second param on the Lua stack is true. */
+static void LogFromLuaStack(lua_State * tolua_S, const std::string_view a_Message, const eLogLevel a_LogLevel)
 {
-	tolua_Error err;
-	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
+	if (lua_isboolean(tolua_S, 2) && (lua_toboolean(tolua_S, 2) == 1))
 	{
-		auto Msg = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->ExtractText();
-		Logger::LogSimple(Msg, a_LogLevel);
+		Logger::LogSimple(a_Message, a_LogLevel);
+	}
+	else
+	{
+		Logger::LogSimple(fmt::format("[{}] {}", cManualBindings::GetLuaPlugin(tolua_S)->GetName(), a_Message), a_LogLevel);
+	}
+}
+
+
+
+
+
+/** Retrieves a string log message from the first param on the Lua stack, optionally prefixes it with plugin name, and prints it to the console. */
+static void LogFromLuaStack(lua_State * tolua_S, const eLogLevel a_LogLevel)
+{
+	cLuaState L(tolua_S);
+
+	// If there's no param, spit out an error message instead of crashing:
+	if (!L.CheckParamString(1))
+	{
 		return;
 	}
 
-	size_t len = 0;
-	const char * str = lua_tolstring(tolua_S, 1, &len);
-	Logger::LogSimple(std::string_view(str, len), a_LogLevel);
+	std::string_view Message;
+	L.GetStackValue(1, Message);
+	LogFromLuaStack(tolua_S, Message, a_LogLevel);
 }
 
 
@@ -371,26 +386,20 @@ static void LogFromLuaStack(lua_State * tolua_S, eLogLevel a_LogLevel)
 
 static int tolua_LOG(lua_State * tolua_S)
 {
-	// If there's no param, spit out an error message instead of crashing:
-	if (lua_isnil(tolua_S, 1))
-	{
-		LOGWARNING("Attempting to LOG a nil value!");
-		cLuaState::LogStackTrace(tolua_S);
-		return 0;
-	}
-
-	// If the param is a cCompositeChat, read the log level from it:
-	eLogLevel LogLevel = eLogLevel::Regular;
+	// If the param is a cCompositeChat, read the data from it:
 	tolua_Error err;
 	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
 	{
-		LogLevel = cCompositeChat::MessageTypeToLogLevel(
-			static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->GetMessageType()
-		);
+		const auto CompositeChat = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+		if (CompositeChat != nullptr)  // isusertype returns true for nil values
+		{
+			LogFromLuaStack(tolua_S, CompositeChat->ExtractText(), cCompositeChat::MessageTypeToLogLevel(CompositeChat->GetMessageType()));
+			return 0;
+		}
 	}
 
 	// Log the message:
-	LogFromLuaStack(tolua_S, LogLevel);
+	LogFromLuaStack(tolua_S, eLogLevel::Regular);
 	return 0;
 }
 
@@ -400,14 +409,6 @@ static int tolua_LOG(lua_State * tolua_S)
 
 static int tolua_LOGINFO(lua_State * tolua_S)
 {
-	// If there's no param, spit out an error message instead of crashing:
-	if (lua_isnil(tolua_S, 1))
-	{
-		LOGWARNING("Attempting to LOGINFO a nil value!");
-		cLuaState::LogStackTrace(tolua_S);
-		return 0;
-	}
-
 	LogFromLuaStack(tolua_S, eLogLevel::Info);
 	return 0;
 }
@@ -418,14 +419,6 @@ static int tolua_LOGINFO(lua_State * tolua_S)
 
 static int tolua_LOGWARN(lua_State * tolua_S)
 {
-	// If there's no param, spit out an error message instead of crashing:
-	if (lua_isnil(tolua_S, 1))
-	{
-		LOGWARNING("Attempting to LOGWARN a nil value!");
-		cLuaState::LogStackTrace(tolua_S);
-		return 0;
-	}
-
 	LogFromLuaStack(tolua_S, eLogLevel::Warning);
 	return 0;
 }
@@ -436,14 +429,6 @@ static int tolua_LOGWARN(lua_State * tolua_S)
 
 static int tolua_LOGERROR(lua_State * tolua_S)
 {
-	// If there's no param, spit out an error message instead of crashing:
-	if (lua_isnil(tolua_S, 1))
-	{
-		LOGWARNING("Attempting to LOGERROR a nil value!");
-		cLuaState::LogStackTrace(tolua_S);
-		return 0;
-	}
-
 	LogFromLuaStack(tolua_S, eLogLevel::Error);
 	return 0;
 }
@@ -3585,6 +3570,48 @@ static int tolua_cServer_RegisterForgeMod(lua_State * a_LuaState)
 
 
 
+static int tolua_cServer_ScheduleTask(lua_State * a_LuaState)
+{
+	// Function signature:
+	// Server:ScheduleTask(NumTicks, Callback)
+
+	// Retrieve the args:
+	cLuaState L(a_LuaState);
+	if (
+		!L.CheckParamUserType(1, "cServer") ||
+		!L.CheckParamNumber(2) ||
+		!L.CheckParamFunction(3)
+	)
+	{
+		return 0;
+	}
+	cServer * Server;
+	int NumTicks;
+	auto Task = std::make_shared<cLuaState::cCallback>();
+	if (!L.GetStackValues(1, Server, NumTicks, Task))
+	{
+		return cManualBindings::lua_do_error(a_LuaState, "Error in function call '#funcname#': Cannot read parameters");
+	}
+	if (Server == nullptr)
+	{
+		return cManualBindings::lua_do_error(a_LuaState, "Error in function call '#funcname#': Not called on an object instance");
+	}
+	if (!Task->IsValid())
+	{
+		return cManualBindings::lua_do_error(a_LuaState, "Error in function call '#funcname#': Could not store the callback parameter");
+	}
+
+	Server->ScheduleTask(cTickTime(NumTicks), [Task](cServer & a_Server)
+	{
+		Task->Call(&a_Server);
+	});
+	return 0;
+}
+
+
+
+
+
 static int tolua_cScoreboard_GetTeamNames(lua_State * L)
 {
 	cLuaState S(L);
@@ -4348,6 +4375,69 @@ static int tolua_cEntity_GetSpeed(lua_State * tolua_S)
 
 
 
+static int tolua_get_StatisticsManager_Custom(lua_State * tolua_S)
+{
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamNumber(2))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	lua_pushstring(tolua_S, ".self");
+	lua_rawget(tolua_S, 1);
+	StatisticsManager * Self = static_cast<StatisticsManager *>(lua_touserdata(tolua_S, -1));
+	CustomStatistic Statistic;
+	if (!L.GetStackValue(2, Statistic))
+	{
+		return L.ApiParamError("Expected a valid custom statistic ID");
+	}
+
+	// Push result if statistic exists:
+	if (const auto Result = Self->Custom.find(Statistic); Result != Self->Custom.end())
+	{
+		L.Push(Result->second);
+		return 1;
+	}
+
+	return 0;
+}
+
+
+
+
+
+static int tolua_set_StatisticsManager_Custom(lua_State * tolua_S)
+{
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamNumber(2))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	lua_pushstring(tolua_S, ".self");
+	lua_rawget(tolua_S, 1);
+	StatisticsManager * Self = static_cast<StatisticsManager *>(lua_touserdata(tolua_S, -1));
+	CustomStatistic Statistic;
+	StatisticsManager::StatValue Value;
+	if (!L.GetStackValues(2, Statistic, Value))
+	{
+		return L.ApiParamError("Expected a valid custom statistic ID and value");
+	}
+
+	// Set the value:
+	Self->Custom[Statistic] = Value;
+
+	return 0;
+}
+
+
+
+
+
 void cManualBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, nullptr);
@@ -4357,10 +4447,12 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_usertype(tolua_S, "cLineBlockTracer");
 		tolua_usertype(tolua_S, "cStringCompression");
 		tolua_usertype(tolua_S, "cUrlParser");
+		// StatisticsManager was already created by cPlayer::GetStatistics' autogenerated bindings.
 		tolua_cclass(tolua_S, "cCryptoHash",        "cCryptoHash",        "", nullptr);
 		tolua_cclass(tolua_S, "cLineBlockTracer",   "cLineBlockTracer",   "", nullptr);
 		tolua_cclass(tolua_S, "cStringCompression", "cStringCompression", "", nullptr);
 		tolua_cclass(tolua_S, "cUrlParser",         "cUrlParser",         "", nullptr);
+		tolua_cclass(tolua_S, "StatisticsManager",  "StatisticsManager",  "", nullptr);
 
 		// Globals:
 		tolua_function(tolua_S, "Clamp",                 tolua_Clamp);
@@ -4560,6 +4652,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 
 		tolua_beginmodule(tolua_S, "cServer");
 			tolua_function(tolua_S, "RegisterForgeMod",            tolua_cServer_RegisterForgeMod);
+			tolua_function(tolua_S, "ScheduleTask", tolua_cServer_ScheduleTask);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cStringCompression");
@@ -4590,6 +4683,10 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_variable(tolua_S, "FormData",   tolua_get_HTTPRequest_FormData,   nullptr);
 			tolua_variable(tolua_S, "Params",     tolua_get_HTTPRequest_Params,     nullptr);
 			tolua_variable(tolua_S, "PostParams", tolua_get_HTTPRequest_PostParams, nullptr);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "StatisticsManager");
+			tolua_array(tolua_S, "Custom", tolua_get_StatisticsManager_Custom, tolua_set_StatisticsManager_Custom);
 		tolua_endmodule(tolua_S);
 
 		BindNetwork(tolua_S);

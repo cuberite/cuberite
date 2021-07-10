@@ -28,12 +28,6 @@
 
 
 
-typedef std::list< cClientHandle* > ClientList;
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cServerListenCallbacks:
 
@@ -117,7 +111,8 @@ cServer::cServer(void) :
 	m_MaxPlayers(0),
 	m_bIsHardcore(false),
 	m_TickThread(*this),
-	m_ShouldAuthenticate(false)
+	m_ShouldAuthenticate(false),
+	m_UpTime(0)
 {
 	// Initialize the LuaStateTracker singleton before the app goes multithreaded:
 	cLuaStateTracker::GetStats();
@@ -326,6 +321,9 @@ cTCPLink::cCallbacksPtr cServer::OnConnectionAccepted(const AString & a_RemoteIP
 
 void cServer::Tick(float a_Dt)
 {
+	// Update server uptime
+	m_UpTime++;
+
 	// Send the tick to the plugins, as well as let the plugin manager reload, if asked to (issue #102):
 	cPluginManager::Get()->Tick(a_Dt);
 
@@ -334,6 +332,9 @@ void cServer::Tick(float a_Dt)
 
 	// Tick all clients not yet assigned to a world:
 	TickClients(a_Dt);
+
+	// Process all queued tasks
+	TickQueuedTasks();
 }
 
 
@@ -436,6 +437,20 @@ void cServer::QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCa
 	// Put the command into a queue (Alleviates FS #363):
 	cCSLock Lock(m_CSPendingCommands);
 	m_PendingCommands.emplace_back(a_Cmd, &a_Output);
+}
+
+
+
+
+
+void cServer::ScheduleTask(cTickTime a_DelayTicks, std::function<void(cServer &)> a_Task)
+{
+	const auto TargetTick = a_DelayTicks + m_UpTime;
+	// Insert the task into the list of scheduled tasks
+	{
+		cCSLock Lock(m_CSTasks);
+		m_Tasks.emplace_back(TargetTick, std::move(a_Task));
+	}
 }
 
 
@@ -724,4 +739,43 @@ void cServer::TickCommands(void)
 	{
 		ExecuteConsoleCommand(Command.first, *Command.second);
 	}
+}
+
+
+
+
+
+void cServer::TickQueuedTasks(void)
+{
+	// Move the tasks to be executed to a seperate vector to avoid deadlocks on
+	// accessing m_Tasks
+	decltype(m_Tasks) Tasks;
+	{
+		cCSLock Lock(m_CSTasks);
+		if (m_Tasks.empty())
+		{
+			return;
+		}
+
+		// Partition everything to be executed by returning false to move to end
+		// of list if time reached
+		auto MoveBeginIterator = std::partition(
+			m_Tasks.begin(), m_Tasks.end(),
+			[this](const decltype(m_Tasks)::value_type & a_Task)
+			{
+				return a_Task.first >= m_UpTime;
+			});
+
+		// Cut all the due tasks from m_Tasks into Tasks:
+		Tasks.insert(
+			Tasks.end(), std::make_move_iterator(MoveBeginIterator),
+			std::make_move_iterator(m_Tasks.end()));
+		m_Tasks.erase(MoveBeginIterator, m_Tasks.end());
+	}
+
+	// Execute each task:
+	for (const auto & Task : Tasks)
+	{
+		Task.second(*this);
+	}  // for itr - m_Tasks[]
 }

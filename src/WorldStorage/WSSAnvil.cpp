@@ -439,7 +439,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	{
 		for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
 		{
-			int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
+			const auto Index = cChunkDef::MakeIndex(x, y, z);
 			if (ShouldInvert[x + cChunkDef::Width * z])
 			{
 				BlockTypes[Index] = (BlockTypes[Index] == E_BLOCK_AIR) ? E_BLOCK_STONE : E_BLOCK_AIR;
@@ -618,10 +618,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 		}
 
 		// Index computed before Entity moved.
-		const auto Idx = cChunkDef::MakeIndexNoCheck(Entity->GetRelPos());
+		const auto Index = cChunkDef::MakeIndex(Entity->GetRelPos());
 
 		// Add the BlockEntity to the loaded data:
-		a_BlockEntities.emplace(Idx, std::move(Entity));
+		a_BlockEntities.emplace(Index, std::move(Entity));
 	}  // for Child - tag children
 }
 

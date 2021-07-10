@@ -28,8 +28,6 @@ class cRedstoneSimulatorChunkData;
 
 struct SetChunkData;
 
-typedef std::list<cClientHandle *> cClientHandleList;
-
 // A convenience macro for calling GetChunkAndRelByAbsolute.
 #define PREPARE_REL_AND_CHUNK(Position, OriginalChunk) cChunk * Chunk; Vector3i Rel; bool RelSuccess = (OriginalChunk).GetChunkAndRelByAbsolute(Position, &Chunk, Rel)
 
@@ -113,9 +111,6 @@ public:
 
 	/** Writes the specified cBlockArea at the coords specified. Note that the coords may extend beyond the chunk! */
 	void WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
-
-	/** Returns true if there is a block entity at the coords specified */
-	bool HasBlockEntityAt(Vector3i a_BlockPos);
 
 	/** Sets or resets the internal flag that prevents chunk from being unloaded.
 	The flag is cumulative - it can be set multiple times and then needs to be un-set that many times
@@ -493,7 +488,7 @@ private:
 
 	/** Block entities that have been touched and need to be sent to all clients.
 	Because block changes are buffered and we need to happen after them, this buffer exists too.
-	Pointers to block entities that were destroyed are guaranteed to be removed from this array by RemoveBlockEntity. */
+	Pointers to block entities that were destroyed are guaranteed to be removed from this array by SetAllData, SetBlock, WriteBlockArea. */
 	std::vector<cBlockEntity *> m_PendingSendBlockEntities;
 
 	/** A queue of relative positions to call cBlockHandler::Check on.
@@ -543,8 +538,8 @@ private:
 	void GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z);
 	void GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z, int a_MaxX, int a_MaxY, int a_MaxZ);
 
-	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
-	void AddBlockEntity   (OwnedBlockEntity a_BlockEntity);
+	/** Takes ownership of a block entity, which MUST actually reside in this chunk. */
+	void AddBlockEntity(OwnedBlockEntity a_BlockEntity);
 
 	/** Wakes up each simulator for its specific blocks; through all the blocks in the chunk */
 	void WakeUpSimulators(void);

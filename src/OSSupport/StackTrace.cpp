@@ -26,7 +26,7 @@ void PrintStackTrace(void)
 		{
 			virtual void OnOutput(LPCSTR szText) override
 			{
-				puts(szText);
+				std::fputs(szText, stdout);
 			}
 		} sw;
 		sw.ShowCallstack();

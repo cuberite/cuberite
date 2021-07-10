@@ -92,12 +92,13 @@ void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 	Pkt.WriteBEInt32(a_ChunkX);
 	Pkt.WriteBEInt32(a_ChunkZ);
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
+
 	for (const auto & Change : a_Changes)
 	{
 		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
 		Pkt.WriteBEInt16(Coords);
 		Pkt.WriteVarInt32(GetProtocolBlockType(Change.m_BlockType, Change.m_BlockMeta));
-	}  // for itr - a_Changes[]
+	}
 }
 
 
@@ -142,24 +143,22 @@ void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AStri
 
 
 
-void cProtocol_1_13::SendStatistics(const cStatManager & a_Manager)
+void cProtocol_1_13::SendStatistics(const StatisticsManager & a_Manager)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	UInt32 Size = 0;
-	a_Manager.ForEachStatisticType([this, &Size](const auto & Store)
-	{
-		for (const auto & Item : Store)
-		{
-			// Client balks at out-of-range values so there is no good default value
-			// We're forced to not send the statistics this protocol version doesn't support
 
-			if (GetProtocolStatisticType(Item.first) != static_cast<UInt32>(-1))
-			{
-				Size++;
-			}
+	for (const auto & [Statistic, Value] : a_Manager.Custom)
+	{
+		// Client balks at out-of-range values so there is no good default value.
+		// We're forced to not send the statistics this protocol version doesn't support.
+
+		if (GetProtocolStatisticType(Statistic) != static_cast<UInt32>(-1))
+		{
+			Size++;
 		}
-	});
+	}
 
 	// No need to check Size != 0
 	// Assume that the vast majority of the time there's at least one statistic to send
@@ -167,22 +166,19 @@ void cProtocol_1_13::SendStatistics(const cStatManager & a_Manager)
 	cPacketizer Pkt(*this, pktStatistics);
 	Pkt.WriteVarInt32(Size);
 
-	a_Manager.ForEachStatisticType([this, &Pkt](const cStatManager::CustomStore & Store)
+	for (const auto & [Statistic, Value] : a_Manager.Custom)
 	{
-		for (const auto & Item : Store)
+		const auto ID = GetProtocolStatisticType(Statistic);
+		if (ID == static_cast<UInt32>(-1))
 		{
-			const auto ID = GetProtocolStatisticType(Item.first);
-			if (ID == static_cast<UInt32>(-1))
-			{
-				// Unsupported, don't send:
-				continue;
-			}
-
-			Pkt.WriteVarInt32(8);  // "Custom" category
-			Pkt.WriteVarInt32(ID);
-			Pkt.WriteVarInt32(static_cast<UInt32>(Item.second));
+			// Unsupported, don't send:
+			continue;
 		}
-	});
+
+		Pkt.WriteVarInt32(8);  // "Custom" category.
+		Pkt.WriteVarInt32(ID);
+		Pkt.WriteVarInt32(static_cast<UInt32>(Value));
+	}
 }
 
 
@@ -205,8 +201,16 @@ void cProtocol_1_13::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	Byte Action;
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_ENCHANTMENT_TABLE: Action = 0; break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
-		case E_BLOCK_END_PORTAL:        Action = 0; break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
+		case E_BLOCK_CHEST:
+		case E_BLOCK_ENCHANTMENT_TABLE:
+		case E_BLOCK_END_PORTAL:
+		case E_BLOCK_TRAPPED_CHEST:
+		{
+			// The ones with a action of 0 is just a workaround to send the block entities to a client.
+			// Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
+			Action = 0;
+			break;
+		}
 
 		case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
 		case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
@@ -464,6 +468,7 @@ UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType) const
 		case pktUpdateScore:            return 0x48;
 		case pktUpdateSign:             return GetPacketID(pktUpdateBlockEntity);
 		case pktUseBed:                 return 0x33;
+		case pktWeather:                return 0x20;
 		case pktWindowClose:            return 0x13;
 		case pktWindowItems:            return 0x15;
 		case pktWindowOpen:             return 0x14;
@@ -579,7 +584,7 @@ UInt32 cProtocol_1_13::GetProtocolMobType(eMonsterType a_MobType) const
 
 
 
-UInt32 cProtocol_1_13::GetProtocolStatisticType(Statistic a_Statistic) const
+UInt32 cProtocol_1_13::GetProtocolStatisticType(const CustomStatistic a_Statistic) const
 {
 	return Palette_1_13::From(a_Statistic);
 }
@@ -1471,7 +1476,7 @@ UInt32 cProtocol_1_13_1::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
 
 
 
-UInt32 cProtocol_1_13_1::GetProtocolStatisticType(Statistic a_Statistic) const
+UInt32 cProtocol_1_13_1::GetProtocolStatisticType(const CustomStatistic a_Statistic) const
 {
 	return Palette_1_13_1::From(a_Statistic);
 }

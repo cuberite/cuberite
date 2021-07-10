@@ -7,7 +7,7 @@
 #include "../World.h"
 #include "../Items/ItemHandler.h"
 
-#include "../Statistics.h"
+#include "../StatisticsManager.h"
 
 #include "../UUID.h"
 
@@ -230,6 +230,9 @@ public:
 
 	AString GetIP(void) const;  // tolua_export
 
+	/** Return the associated statistic and achievement manager. */
+	StatisticsManager & GetStatistics() { return m_Stats; }
+
 	/** Returns the associated team, nullptr if none */
 	cTeam * GetTeam(void) { return m_Team; }  // tolua_export
 
@@ -244,13 +247,10 @@ public:
 	/** Forces the player to query the scoreboard for his team */
 	cTeam * UpdateTeam(void);
 
-	/** Return the associated statistic and achievement manager. */
-	cStatManager & GetStatManager() { return m_Stats; }
-
 	/** Awards the player an achievement.
 	If all prerequisites are met, this method will award the achievement and will broadcast a chat message.
 	If the achievement has been already awarded to the player, this method will just increment the stat counter. */
-	void AwardAchievement(Statistic a_Ach);
+	void AwardAchievement(CustomStatistic a_Ach);
 
 	/** Forces the player to move in the given direction.
 	@deprecated Use SetSpeed instead. */
@@ -520,10 +520,10 @@ public:
 
 	/** Sets the player's bed (home / respawn) position to the specified position.
 	Sets the respawn world to the player's world. */
-	void SetBedPos(const Vector3i & a_Pos);
+	void SetBedPos(const Vector3i a_Position);
 
 	/** Sets the player's bed (home / respawn) position and respawn world to the specified parameters. */
-	void SetBedPos(const Vector3i & a_Pos, cWorld * a_World);
+	void SetBedPos(const Vector3i a_Position, const cWorld & a_World);
 
 	// tolua_end
 
@@ -534,7 +534,7 @@ public:
 	void UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIsOnGround);
 
 	/** Whether placing the given blocks would intersect any entitiy */
-	bool DoesPlacingBlocksIntersectEntity(const sSetBlockVector & a_Blocks);
+	bool DoesPlacingBlocksIntersectEntity(std::initializer_list<sSetBlock> a_Blocks) const;
 
 	/** Returns the UUID that has been read from the client, or nil if not available. */
 	const cUUID & GetUUID(void) const;  // Exported in ManualBindings.cpp
@@ -552,7 +552,7 @@ public:
 	If the hook prevents the placement, sends the current block at the specified coords back to the client.
 	Assumes that the block is in a currently loaded chunk.
 	Returns true if the block is successfully placed. */
-	bool PlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool PlaceBlock(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	/** Sends the block in the specified range around the specified coord to the client
 	as a block change packet.
@@ -571,7 +571,7 @@ public:
 	If the any of the "placing" hooks aborts, none of the blocks are placed and the function returns false.
 	Returns true if all the blocks are placed.
 	Assumes that all the blocks are in currently loaded chunks. */
-	bool PlaceBlocks(const sSetBlockVector & a_Blocks);
+	bool PlaceBlocks(std::initializer_list<sSetBlock> a_Blocks);
 
 	/** Notify nearby wolves that the player or one of the player's wolves took damage or did damage to an entity
 	@param a_Opponent the opponent we're fighting.
@@ -735,7 +735,7 @@ private:
 
 	cTeam * m_Team;
 
-	cStatManager m_Stats;
+	StatisticsManager m_Stats;
 
 	/** How long till the player's inventory will be saved
 	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
