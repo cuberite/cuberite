@@ -38,8 +38,8 @@ struct TriedToJoinWithUnsupportedProtocolException : public std::runtime_error
 
 
 cMultiVersionProtocol::cMultiVersionProtocol() :
-	HandleIncomingData(std::bind(&cMultiVersionProtocol::HandleIncomingDataInRecognitionStage, this, std::placeholders::_1, std::placeholders::_2)),
-	m_Buffer(32 KiB)
+	m_Buffer(32 KiB),
+	m_WaitingForData(true)
 {
 }
 
@@ -76,7 +76,7 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 
 
 
-void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, ContiguousByteBuffer && a_Data)
+void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, ContiguousByteBuffer & a_Data)
 {
 	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and MCS_PROTOCOL_VERSIONS macros in the header file
 
@@ -115,26 +115,14 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 	3. Exception: the data sent were garbage, the client handle deals with it by disconnecting */
 	m_Protocol = TryRecognizeLengthedProtocol(a_Client);
 
-	if (m_Protocol == nullptr)
-	{
-		// Got a server list ping for an unrecognised version,
-		// switch into responding to unknown protocols mode:
-		HandleIncomingData = [this](cClientHandle & a_Clyent, ContiguousByteBuffer && a_In)
-		{
-			HandleIncomingDataInOldPingResponseStage(a_Clyent, a_In);
-		};
-	}
-	else
-	{
-		// The protocol recogniser succesfully identified, switch mode:
-		HandleIncomingData = [this](cClientHandle &, ContiguousByteBuffer && a_In)
-		{
-			m_Protocol->DataReceived(m_Buffer, std::move(a_In));
-		};
-	}
+	// Version recognised. Cause HandleIncomingData to stop calling us to handle data:
+	m_WaitingForData = false;
 
 	// Explicitly process any remaining data (already written to m_Buffer) with the new handler:
-	HandleIncomingData(a_Client, {});
+	{
+		ContiguousByteBuffer Empty;
+		HandleIncomingData(a_Client, Empty);
+	}
 }
 
 
@@ -170,12 +158,10 @@ void cMultiVersionProtocol::HandleIncomingDataInOldPingResponseStage(cClientHand
 		if ((PacketID == 0x00) && (PacketLen == 1))  // Request packet
 		{
 			HandlePacketStatusRequest(a_Client, OutPacketBuffer);
-			SendPacket(a_Client, OutPacketBuffer);
 		}
 		else if ((PacketID == 0x01) && (PacketLen == 9))  // Ping packet
 		{
 			HandlePacketStatusPing(a_Client, OutPacketBuffer);
-			SendPacket(a_Client, OutPacketBuffer);
 		}
 		else
 		{
@@ -184,6 +170,43 @@ void cMultiVersionProtocol::HandleIncomingDataInOldPingResponseStage(cClientHand
 		}
 
 		m_Buffer.CommitRead();
+	}
+}
+
+
+
+
+
+void cMultiVersionProtocol::HandleIncomingData(cClientHandle & a_Client, ContiguousByteBuffer & a_Data)
+{
+	if (m_WaitingForData)
+	{
+		HandleIncomingDataInRecognitionStage(a_Client, a_Data);
+	}
+	else if (m_Protocol == nullptr)
+	{
+		// Got a Handshake for an unrecognised version, process future data accordingly:
+		HandleIncomingDataInOldPingResponseStage(a_Client, a_Data);
+	}
+	else
+	{
+		// The protocol recogniser succesfully identified a supported version, direct data to that protocol:
+		m_Protocol->DataReceived(m_Buffer, a_Data);
+	}
+}
+
+
+
+
+
+void cMultiVersionProtocol::HandleOutgoingData(ContiguousByteBuffer & a_Data)
+{
+	// Normally only the protocol sends data, so outgoing data are only present when m_Protocol != nullptr.
+	// However, for unrecognised protocols we send data too, and that's when m_Protocol == nullptr. Check to avoid crashing (GH #5260).
+
+	if (m_Protocol != nullptr)
+	{
+		m_Protocol->DataPrepared(a_Data);
 	}
 }
 
@@ -382,6 +405,8 @@ void cMultiVersionProtocol::HandlePacketStatusRequest(cClientHandle & a_Client, 
 
 	VERIFY(a_Out.WriteVarInt32(GetPacketID(cProtocol::ePacketType::pktStatusResponse)));
 	VERIFY(a_Out.WriteVarUTF8String(Response));
+
+	SendPacket(a_Client, a_Out);
 }
 
 
@@ -398,4 +423,6 @@ void cMultiVersionProtocol::HandlePacketStatusPing(cClientHandle & a_Client, cBy
 
 	VERIFY(a_Out.WriteVarInt32(GetPacketID(cProtocol::ePacketType::pktPingResponse)));
 	VERIFY(a_Out.WriteBEInt64(Timestamp));
+
+	SendPacket(a_Client, a_Out);
 }
