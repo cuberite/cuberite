@@ -278,7 +278,7 @@ bool cUUID::FromString(const AString&)
 
 
 
-void cEntity::SetPosition(const Vector3d & a_Position)
+void cEntity::SetPosition(const Vector3d & a_Position, bool a_Cancelable)
 {
 }
 
