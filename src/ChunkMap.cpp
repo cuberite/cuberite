@@ -568,13 +568,18 @@ void cChunkMap::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta)
 
 void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
+	if (!cChunkDef::IsValidHeight(a_BlockPos.y))
+	{
+		return;
+	}
+
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
-	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(chunkPos.m_ChunkX, chunkPos.m_ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
+		auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 		Chunk->SetBlock(relPos, a_BlockType, a_BlockMeta);
 	}
 }
@@ -585,13 +590,18 @@ void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE 
 
 bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
+	if (!cChunkDef::IsValidHeight(a_BlockPos.y))
+	{
+		return false;
+	}
+
 	auto chunkCoord = cChunkDef::BlockToChunk(a_BlockPos);
-	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkCoord);
 
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(chunkCoord.m_ChunkX, chunkCoord.m_ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
+		auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkCoord);
 		Chunk->GetBlockTypeMeta(relPos, a_BlockType, a_BlockMeta);
 		return true;
 	}
@@ -604,14 +614,19 @@ bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, N
 
 bool cChunkMap::GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const
 {
+	if (!cChunkDef::IsValidHeight(a_BlockPos.y))
+	{
+		return false;
+	}
+
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
-	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 
 	// Query the chunk, if loaded:
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(chunkPos.m_ChunkX, chunkPos.m_ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
+		auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 		Chunk->GetBlockInfo(relPos, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
 		return true;
 	}
