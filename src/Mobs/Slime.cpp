@@ -80,7 +80,7 @@ void cSlime::KilledBy(TakeDamageInfo & a_TDI)
 			double AddZ = (i / 2 - 0.5) * m_Size / 4.0;
 
 			auto NewSlime = std::make_unique<cSlime>(m_Size / 2);
-			NewSlime->SetPosition(GetPosX() + AddX, GetPosY() + 0.5, GetPosZ() + AddZ);
+			NewSlime->SetPosition(GetPosX() + AddX, GetPosY() + 0.5, GetPosZ() + AddZ, false);
 			NewSlime->SetYaw(Random.RandReal(360.0f));
 			m_World->SpawnMobFinalize(std::move(NewSlime));
 		}

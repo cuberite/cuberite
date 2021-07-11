@@ -2882,7 +2882,7 @@ UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterTyp
 	{
 		return cEntity::INVALID_ID;
 	}
-	Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
+	Monster->SetPosition(a_PosX, a_PosY, a_PosZ, false);
 
 	if (a_Baby)
 	{

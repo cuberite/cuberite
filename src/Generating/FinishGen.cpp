@@ -1688,7 +1688,7 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 
 	auto NewMob = cMonster::NewMonsterFromType(AnimalToSpawn);
 	NewMob->SetHealth(NewMob->GetMaxHealth());
-	NewMob->SetPosition(AnimalX, AnimalY, AnimalZ);
+	NewMob->SetPosition(AnimalX, AnimalY, AnimalZ, false);
 	FLOGD("Spawning {0} #{1} at {2:.02f}", NewMob->GetClass(), NewMob->GetUniqueID(), NewMob->GetPosition());
 	a_ChunkDesc.GetEntities().emplace_back(std::move(NewMob));
 

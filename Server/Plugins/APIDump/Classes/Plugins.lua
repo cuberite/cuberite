@@ -777,6 +777,10 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			{
 				Notes = "Called when an {{cEntity|entity}} is being teleported. Plugin may refuse the teleportation.",
 			},
+			HOOK_ENTITY_MOVING =
+			{
+				Notes = "Called when a entity is moving.",
+			},
 			HOOK_EXECUTE_COMMAND =
 			{
 				Notes = "Called when a client sends a chat message that is recognized as a command, before handing that command to the regular command handler. A plugin may stop the command from being handled. This hook is called even when the player doesn't have permissions for the command.",

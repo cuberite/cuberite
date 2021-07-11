@@ -697,6 +697,19 @@ bool cPluginManager::CallHookLoginForge(cClientHandle & a_Client, AStringMap & a
 
 
 
+bool cPluginManager::CallHookEntityMoving(cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
+{
+	return GenericCallHook(HOOK_ENTITY_MOVING, [&](cPlugin * a_Plugin)
+		{
+			return a_Plugin->OnEntityMoving(a_Entity, a_OldPosition, a_NewPosition);
+		}
+	);
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation)
 {
 	return GenericCallHook(HOOK_PLAYER_ANIMATION, [&](cPlugin * a_Plugin)

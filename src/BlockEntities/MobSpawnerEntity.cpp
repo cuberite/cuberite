@@ -175,7 +175,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					{
 						continue;
 					}
-					Monster->SetPosition(AbsPos);
+					Monster->SetPosition(AbsPos, false);
 					Monster->SetYaw(Random.RandReal(360.0f));
 					if (Chunk->GetWorld()->SpawnMobFinalize(std::move(Monster)) != cEntity::INVALID_ID)
 					{

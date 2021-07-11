@@ -96,6 +96,7 @@ public:
 		HOOK_ENTITY_ADD_EFFECT,
 		HOOK_ENTITY_CHANGING_WORLD,
 		HOOK_ENTITY_CHANGED_WORLD,
+		HOOK_ENTITY_MOVING,
 		HOOK_EXECUTE_COMMAND,
 		HOOK_EXPLODED,
 		HOOK_EXPLODING,
@@ -253,6 +254,7 @@ public:
 	bool CallHookEntityTeleport           (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition);
 	bool CallHookEntityChangingWorld      (cEntity & a_Entity, cWorld & a_World);
 	bool CallHookEntityChangedWorld       (cEntity & a_Entity, cWorld & a_World);
+	bool CallHookEntityMoving             (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition);
 	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, CommandResult & a_Result);  // If a_Player == nullptr, it is a console cmd
 	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);

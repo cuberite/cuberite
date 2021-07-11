@@ -2032,7 +2032,8 @@ void cWSSAnvil::LoadHangingFromNBT(cHangingEntity & a_Hanging, const cParsedNBT 
 		a_Hanging.SetPosition(
 			static_cast<double>(a_NBT.GetInt(TileX)),
 			static_cast<double>(a_NBT.GetInt(TileY)),
-			static_cast<double>(a_NBT.GetInt(TileZ))
+			static_cast<double>(a_NBT.GetInt(TileZ)),
+			false
 		);
 	}
 }
@@ -3625,7 +3626,7 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 	{
 		return false;
 	}
-	a_Entity.SetPosition(Pos[0], Pos[1], Pos[2]);
+	a_Entity.SetPosition(Pos[0], Pos[1], Pos[2], false);
 
 	double Speed[3];
 	if (!LoadDoublesListFromNBT(Speed, 3, a_NBT, a_NBT.FindChildByName(a_TagIdx, "Motion")))
