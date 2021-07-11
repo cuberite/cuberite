@@ -542,6 +542,32 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 				continue;
 			}
 
+			// Walk below trees:
+			auto BlockBelow = a_ChunkDesc.GetBlockType(x, y - 1, z);
+			bool failed = false;  // marker if the search for a valid position was successful
+
+			while (
+				(BlockBelow == E_BLOCK_LEAVES) ||
+				(BlockBelow == E_BLOCK_NEW_LEAVES) ||
+				(BlockBelow == E_BLOCK_LOG) ||
+				(BlockBelow == E_BLOCK_NEW_LOG) ||
+				(BlockBelow == E_BLOCK_AIR)
+			)
+			{
+				y--;
+				if (!cChunkDef::IsValidHeight(y - 1))
+				{
+					failed = true;
+					break;
+				}
+				BlockBelow = a_ChunkDesc.GetBlockType(x, y - 1, z);
+			}
+
+			if (failed)
+			{
+				continue;
+			}
+
 			// Check if long grass can be placed:
 			if (
 				(a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR) ||
@@ -587,7 +613,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			}
 			else
 			{
-				NIBBLETYPE meta = (m_Noise.IntNoise2DInt(xx * 50, zz * 50) / 7 % 2) + 1;
+				NIBBLETYPE meta = static_cast<NIBBLETYPE>((m_Noise.IntNoise2DInt(xx * 50, zz * 50) / 7 % 2) + 1);
 				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, meta);
 				a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(y));
 			}
@@ -1201,7 +1227,7 @@ void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
+			const auto Index = cChunkDef::MakeIndex(x, y, z);
 			if (BlockTypes[Index] == E_BLOCK_AIR)
 			{
 				BlockTypes[Index] = E_BLOCK_STATIONARY_LAVA;
@@ -1974,8 +2000,8 @@ void cFinishGenOreNests::GenerateOre(
 							continue;
 						}
 
-						int Index = cChunkDef::MakeIndexNoCheck(BlockX, BlockY, BlockZ);
-						auto blockType = blockTypes[Index];
+						const auto Index = cChunkDef::MakeIndex(BlockX, BlockY, BlockZ);
+						const auto blockType = blockTypes[Index];
 						if ((blockType == E_BLOCK_STONE) || (blockType == E_BLOCK_NETHERRACK))
 						{
 							blockTypes[Index] = a_OreType;

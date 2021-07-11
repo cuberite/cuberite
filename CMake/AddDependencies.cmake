@@ -73,9 +73,9 @@ function(link_dependencies TARGET)
 		tolualib
 	)
 
-	# Link process information library:
+	# Link process information, multimedia (for sleep resolution) libraries:
 	if (WIN32)
-		target_link_libraries(${TARGET} PRIVATE Psapi.lib)
+		target_link_libraries(${TARGET} PRIVATE Psapi.lib Winmm.lib)
 	endif()
 
 	# Special case handling for libevent pthreads:
@@ -85,4 +85,7 @@ function(link_dependencies TARGET)
 
 	# Prettify jsoncpp_static name in VS solution explorer:
 	set_property(TARGET jsoncpp_static PROPERTY PROJECT_LABEL "jsoncpp")
+	if(${CMAKE_SYSTEM_NAME} MATCHES FreeBSD)
+		target_link_libraries(${TARGET} PRIVATE kvm)
+	endif()
 endfunction()

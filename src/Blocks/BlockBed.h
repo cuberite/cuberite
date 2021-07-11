@@ -4,13 +4,17 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "Mixins.h"
 #include "ChunkInterface.h"
+#include "Entities/Player.h"
+#include "Mixins.h"
+
+
+
 
 
 class cEntity;
-class cPlayer;
 class cWorldInterface;
+
 
 
 
@@ -90,11 +94,6 @@ private:
 	) const override;
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cItem * a_Tool) const override;
-
-	virtual void OnPlacedByPlayer(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
-		const sSetBlock & a_BlockChange
-	) const override;
 
 
 

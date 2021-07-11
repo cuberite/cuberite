@@ -33,7 +33,7 @@ private:
 			return false;
 		}
 
-		a_Player.GetStatManager().AddValue(Statistic::EatCakeSlice);
+		a_Player.GetStatistics().Custom[CustomStatistic::EatCakeSlice]++;
 		if (Meta >= 5)
 		{
 			a_ChunkInterface.DigBlock(a_WorldInterface, a_BlockPos, &a_Player);

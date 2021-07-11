@@ -4,7 +4,7 @@ function Initialize(a_Plugin)
 	
 	-- Check if the infodump file exists.
 	if (not cFile:IsFile("Plugins/InfoDump.lua")) then
-		LOGWARN("[DumpInfo] InfoDump.lua was not found.")
+		LOGWARN("InfoDump.lua was not found.")
 		return false
 	end
 	

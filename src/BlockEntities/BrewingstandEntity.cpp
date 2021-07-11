@@ -145,7 +145,7 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 {
-	a_Player->GetStatManager().AddValue(Statistic::InteractWithBrewingstand);
+	a_Player->GetStatistics().Custom[CustomStatistic::InteractWithBrewingstand]++;
 
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)

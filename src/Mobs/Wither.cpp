@@ -84,7 +84,7 @@ void cWither::KilledBy(TakeDamageInfo & a_TDI)
 			if (Dist < 50.0)
 			{
 				// If player is close, award achievement
-				a_Player.AwardAchievement(Statistic::AchKillWither);
+				a_Player.AwardAchievement(CustomStatistic::AchKillWither);
 			}
 			return false;
 		}

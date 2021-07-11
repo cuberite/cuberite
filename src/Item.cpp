@@ -17,7 +17,7 @@ cItem::cItem():
 	m_ItemType(E_ITEM_EMPTY),
 	m_ItemCount(0),
 	m_ItemDamage(0),
-	m_CustomName(""),
+	m_CustomName(),
 	m_RepairCost(0),
 	m_FireworkItem(),
 	m_ItemColor()

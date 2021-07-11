@@ -129,7 +129,7 @@ protected:
 	bool SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a_Peer);
 
 	/** Sends data to the specfied socket, after encrypting it using a_Encryptor. If sending fails, prints a fail message using a_Peer and returns false */
-	bool SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, ContiguousByteBufferView a_Data, const char * a_Peer);
+	bool SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, ContiguousByteBuffer & a_Data, const char * a_Peer);
 
 	/** Sends data to the specfied socket, after encrypting it using a_Encryptor. If sending fails, prints a fail message using a_Peer and returns false */
 	bool SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer);

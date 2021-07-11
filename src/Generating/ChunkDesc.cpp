@@ -572,8 +572,8 @@ void cChunkDesc::RandomFillRelCuboid(
 
 cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 {
-	auto Idx = static_cast<size_t>(cChunkDef::MakeIndex(a_RelX, a_RelY, a_RelZ));
-	auto itr = m_BlockEntities.find(Idx);
+	const auto Idx = cChunkDef::MakeIndex(a_RelX, a_RelY, a_RelZ);
+	const auto itr = m_BlockEntities.find(Idx);
 
 	if (itr != m_BlockEntities.end())
 	{

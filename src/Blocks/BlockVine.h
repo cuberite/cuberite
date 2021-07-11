@@ -17,33 +17,14 @@ public:
 
 private:
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
+	static const NIBBLETYPE VINE_LOST_SUPPORT = 16;
+	static const NIBBLETYPE VINE_UNCHANGED = 17;
+
+
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		// TODO: Disallow placement where the vine doesn't attach to something properly
-		BLOCKTYPE BlockType = 0;
-		NIBBLETYPE BlockMeta;
-		a_ChunkInterface.GetBlockTypeMeta(a_PlacedBlockPos, BlockType, BlockMeta);
-		if (BlockType == m_BlockType)
-		{
-			a_BlockMeta = BlockMeta | DirectionToMetaData(a_ClickedBlockFace);
-		}
-		else
-		{
-			a_BlockMeta = DirectionToMetaData(a_ClickedBlockFace);
-		}
-		a_BlockType = m_BlockType;
-		return true;
+		return GetMaxMeta(a_Chunk, a_Position, a_Meta) != VINE_LOST_SUPPORT;
 	}
-
-
-
 
 
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
@@ -54,22 +35,6 @@ private:
 			return {};
 		}
 		return cItem(E_BLOCK_VINES, 1, 0);
-	}
-
-
-
-
-
-	static NIBBLETYPE DirectionToMetaData(char a_BlockFace)
-	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_NORTH: return 0x1;
-			case BLOCK_FACE_SOUTH: return 0x4;
-			case BLOCK_FACE_WEST:  return 0x8;
-			case BLOCK_FACE_EAST:  return 0x2;
-			default: return 0x0;
-		}
 	}
 
 
@@ -122,8 +87,9 @@ private:
 
 
 
-	/** Returns the meta that has the maximum allowable sides of the vine, given the surroundings */
-	static NIBBLETYPE GetMaxMeta(cChunk & a_Chunk, Vector3i a_RelPos)
+	/** Returns the meta that has the maximum allowable sides of the vine, given the surroundings and current vine meta.
+	Returns special values for a vine that can continue to exist unchanged, or must die completely. */
+	static NIBBLETYPE GetMaxMeta(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_CurrentMeta)
 	{
 		static const struct
 		{
@@ -136,21 +102,41 @@ private:
 			{ 0, -1, 4},  // north, ZM
 			{ 1,  0, 8},  // east,  XP
 		} ;
-		NIBBLETYPE res = 0;
+
+		NIBBLETYPE MaxMeta = 0;
 		for (auto & Coord : Coords)
 		{
 			BLOCKTYPE  BlockType;
 			NIBBLETYPE BlockMeta;
-			auto checkPos = a_RelPos.addedXZ(Coord.x, Coord.z);
+			auto checkPos = a_Position.addedXZ(Coord.x, Coord.z);
 			if (
 				a_Chunk.UnboundedRelGetBlock(checkPos.x, checkPos.y, checkPos.z, BlockType, BlockMeta) &&
 				IsBlockAttachable(BlockType)
 			)
 			{
-				res |= Coord.Bit;
+				MaxMeta |= Coord.Bit;
 			}
 		}
-		return res;
+
+		// Check if vine above us, add its meta to MaxMeta:
+		if ((a_Position.y < cChunkDef::Height - 1) && (a_Chunk.GetBlock(a_Position.addedY(1)) == E_BLOCK_VINES))
+		{
+			MaxMeta |= a_Chunk.GetMeta(a_Position.addedY(1));
+		}
+
+		NIBBLETYPE Common = a_CurrentMeta & MaxMeta;  // Neighbors that we have and are legal.
+		if (Common != a_CurrentMeta)
+		{
+			bool HasTop = (a_Position.y < (cChunkDef::Height - 1)) && IsBlockAttachable(a_Chunk.GetBlock(a_Position.addedY(1)));
+			if ((Common == 0) && !HasTop)  // Meta equals 0 also means top. Make a last-ditch attempt to save the vine.
+			{
+				return VINE_LOST_SUPPORT;
+			}
+
+			return Common;
+		}
+
+		return VINE_UNCHANGED;
 	}
 
 
@@ -162,28 +148,25 @@ private:
 		a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk)
 		{
 
-		const auto a_RelPos = cChunkDef::AbsoluteToRelative(a_BlockPos);
-		NIBBLETYPE CurMeta = a_Chunk.GetMeta(a_RelPos);
-		NIBBLETYPE MaxMeta = GetMaxMeta(a_Chunk, a_RelPos);
+		const auto Position = cChunkDef::AbsoluteToRelative(a_BlockPos);
+		const auto MaxMeta = GetMaxMeta(a_Chunk, Position, a_Chunk.GetMeta(Position));
 
-		// Check if vine above us, add its meta to MaxMeta
-		if ((a_RelPos.y < cChunkDef::Height - 1) && (a_Chunk.GetBlock(a_RelPos.addedY(1)) == m_BlockType))
+		if (MaxMeta == VINE_UNCHANGED)
 		{
-			MaxMeta |= a_Chunk.GetMeta(a_RelPos.addedY(1));
+			return false;
 		}
 
-		NIBBLETYPE Common = CurMeta & MaxMeta;  // Neighbors that we have and are legal
-		if (Common != CurMeta)
+		// There is a neighbor missing, need to update the meta or even destroy the block.
+
+		if (MaxMeta == VINE_LOST_SUPPORT)
 		{
-			// There is a neighbor missing, need to update the meta or even destroy the block
-			bool HasTop = (a_RelPos.y < cChunkDef::Height - 1) && IsBlockAttachable(a_Chunk.GetBlock(a_RelPos.addedY(1)));
-			if ((Common == 0) && !HasTop)
-			{
-				// The vine just lost all its support, destroy the block:
-				a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0);
-				return false;
-			}
-			a_Chunk.SetBlock(a_RelPos, m_BlockType, Common);
+			// The vine just lost all its support, destroy the block:
+			a_Chunk.SetBlock(Position, E_BLOCK_AIR, 0);
+		}
+		else
+		{
+			// It lost some of its support, set it to what remains (SetBlock to notify neighbors):
+			a_Chunk.SetBlock(Position, E_BLOCK_VINES, MaxMeta);
 		}
 
 		return false;
@@ -194,9 +177,9 @@ private:
 
 
 
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
 	{
-		return true;
+		return !a_ClickedDirectly || (a_HeldItem.m_ItemType != m_BlockType);
 	}
 
 

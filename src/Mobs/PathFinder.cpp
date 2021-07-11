@@ -192,7 +192,7 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 	// This fixes the player leaning issue.
 	// If that failed, we instead go down to the lowest air block.
 	int YBelowUs = FloorC(a_Vector.y) - 1;
-	if (YBelowUs < 0)
+	if (!cChunkDef::IsValidHeight(YBelowUs))
 	{
 		return false;
 

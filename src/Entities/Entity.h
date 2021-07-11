@@ -500,7 +500,7 @@ public:
 	/** Gets remaining air of a monster */
 	int GetAirLevel(void) const { return m_AirLevel; }
 
-	/** Gets number of ticks this entity has existed for */
+	/** Gets number of ticks this entity has been alive for */
 	long int GetTicksAlive(void) const { return m_TicksAlive; }
 
 	/** Gets the invulnerable ticks from the entity */
@@ -550,6 +550,8 @@ public:
 	/** Returs whether the entity has any mob leashed to it. */
 	bool HasAnyMobLeashed() const { return m_LeashedMobs.size() > 0; }
 
+	/** Announces a death message on chat about killing the entity. */
+	void BroadcastDeathMessage(TakeDamageInfo & a_TDI);
 
 protected:
 

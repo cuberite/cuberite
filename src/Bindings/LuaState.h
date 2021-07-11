@@ -30,13 +30,11 @@ stays valid but doesn't call into Lua code anymore, returning false for "failure
 
 #pragma once
 
-extern "C"
-{
-	#include "lua/src/lauxlib.h"
-}
+#include "lua/src/lauxlib.h"
 
 #include "../Defines.h"
 #include "../FunctionRef.h"
+#include "../Registries/CustomStatistics.h"
 #include "PluginManager.h"
 #include "LuaState_Typedefs.inc"
 
@@ -657,11 +655,13 @@ public:
 	bool GetStackValue(int a_StackPos, cTrackedRefPtr & a_Ref);
 	bool GetStackValue(int a_StackPos, cTrackedRefSharedPtr & a_Ref);
 	bool GetStackValue(int a_StackPos, ContiguousByteBuffer & a_Data);
+	bool GetStackValue(int a_StackPos, CustomStatistic & a_Value);
 	bool GetStackValue(int a_StackPos, double & a_Value);
 	bool GetStackValue(int a_StackPos, eBlockFace & a_Value);
 	bool GetStackValue(int a_StackPos, eWeather & a_Value);
 	bool GetStackValue(int a_StackPos, float & a_ReturnedVal);
 	bool GetStackValue(int a_StackPos, cUUID & a_Value);
+	bool GetStackValue(int a_StackPos, std::string_view & a_Value);
 
 	// template to catch all of the various c++ integral types without overload conflicts
 	template <class T, typename = std::enable_if_t<std::is_integral_v<T>>>

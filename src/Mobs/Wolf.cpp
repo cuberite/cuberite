@@ -166,6 +166,7 @@ void cWolf::ReceiveNearbyFightInfo(const cUUID & a_PlayerID, cPawn * a_Opponent,
 
 void cWolf::OnRightClicked(cPlayer & a_Player)
 {
+	cMonster::OnRightClicked(a_Player);
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
 	const int EquippedItemType = EquippedItem.m_ItemType;
 

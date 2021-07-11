@@ -10,7 +10,6 @@ class cBlockLadder: public cMetaRotator<cClearMetaOnDrop, ...>
 #pragma once
 
 #include "../Item.h"
-#include "../Entities/Player.h"
 
 
 
@@ -167,30 +166,9 @@ public:
 
 	using Super::Super;
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		const Vector3i a_BlockPos,
-		eBlockFace a_BlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
-	{
-		NIBBLETYPE BaseMeta;
-		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_BlockPos, a_BlockFace, a_CursorPos, a_BlockType, BaseMeta))
-		{
-			return false;
-		}
-
-		a_BlockMeta = (BaseMeta & ~BitMask) | YawToMetaData(a_Player.GetYaw());
-		return true;
-	}
-
-
-
-
 
 	/** Converts the rotation value as returned by cPlayer::GetYaw() to the appropriate metadata
-	value for a block placed by a player facing that way */
+	value for a block placed by a player facing that way. */
 	static NIBBLETYPE YawToMetaData(double a_Rotation)
 	{
 		if ((a_Rotation >= -135) && (a_Rotation < -45))
@@ -220,8 +198,8 @@ protected:
 
 
 
-/** Mixin for blocks whose meta on placement depends on the pitch and yaw of the player placing the block. BitMask
-selects the direction bits from the block's meta values. */
+/** Mixin for blocks whose meta on placement depends on the relative position of the player to the block in
+addition to the yaw of the player placing the block. BitMask selects the direction bits from the block's meta values. */
 template <
 	class Base,
 	NIBBLETYPE BitMask = 0x07,
@@ -232,7 +210,7 @@ template <
 	NIBBLETYPE Up = 0x00,
 	NIBBLETYPE Down = 0x01
 >
-class cPitchYawRotator:
+class cDisplacementYawRotator:
 	public cYawRotator<Base, BitMask, North, East, South, West>
 {
 	using Super = cYawRotator<Base, BitMask, North, East, South, West>;
@@ -241,31 +219,33 @@ public:
 
 	using Super::Super;
 
-protected:
 
-	~cPitchYawRotator() = default;
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
+	/** Converts the placement position, eye position as returned by cPlayer::GetEyePosition(), and
+	rotation value as returned by cPlayer::GetYaw() to the appropriate metadata value for a block placed by a player facing that way. */
+	static NIBBLETYPE DisplacementYawToMetaData(const Vector3d a_PlacePosition, const Vector3d a_EyePosition, const double a_Rotation)
 	{
-		NIBBLETYPE BaseMeta;
-		if (!Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, a_PlacedBlockPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, BaseMeta))
+		if (
+			const auto Displacement = a_EyePosition - a_PlacePosition.addedXZ(0.5, 0.5);
+			(std::abs(Displacement.x) < 2) && (std::abs(Displacement.z) < 2)
+		)
 		{
-			return false;
+			if (Displacement.y > 2)
+			{
+				return Up;
+			}
+
+			if (Displacement.y < 0)
+			{
+				return Down;
+			}
 		}
 
-		a_BlockMeta = (BaseMeta & ~BitMask) |  PitchYawToMetaData(a_Player.GetYaw(), a_Player.GetPitch());
-		return true;
+		return Super::YawToMetaData(a_Rotation);
 	}
 
+protected:
 
-
+	~cDisplacementYawRotator() = default;
 
 
 	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) const override
@@ -278,25 +258,5 @@ protected:
 		}
 		// Not Facing Up or Down; No change.
 		return a_Meta;
-	}
-
-
-
-
-
-	/** Converts the rotation and pitch values as returned by cPlayer::GetYaw() and cPlayer::GetPitch()
-	respectively to the appropriate metadata value for a block placed by a player facing that way */
-	static NIBBLETYPE PitchYawToMetaData(double a_Rotation, double a_Pitch)
-	{
-		if (a_Pitch >= 50)
-		{
-			return Up;
-		}
-		else if (a_Pitch <= -50)
-		{
-			return Down;
-		}
-
-		return Super::YawToMetaData(a_Rotation);
 	}
 };

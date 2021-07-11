@@ -42,12 +42,12 @@ function Initialize(Plugin)
 
 	-- Command Bindings
 
-	LOG("Initialised " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+	LOG("Initialised version " .. Plugin:GetVersion())
 	return true
 end
 
 function OnDisable()
-	LOG(PLUGIN:GetName() .. " is shutting down...")
+	LOG("Shutting down...")
 end
 			</pre>
 			<p>
@@ -56,7 +56,7 @@ end
 				<li><b>function Initialize</b> is called on plugin startup. It is the place where the plugin is set up.</li>
 				<li><b>Plugin:SetName</b> sets the name of the plugin.</li>
 				<li><b>Plugin:SetVersion</b> sets the revision number of the plugin. This must be an integer.</li>
-				<li><b>LOG</b> logs to console a message, in this case, it prints that the plugin was initialised.</li>
+				<li><b>LOG</b> logs to console a message, in this case, it prints that the plugin was initialised. This will add a prefix with the name of your plugin.</li>
 				<li>The <b>PLUGIN</b> variable just stores this plugin's object, so GetName() can be called in OnDisable (as no Plugin parameter is passed there, contrary to Initialize).
 					This global variable is only needed if you want to know the plugin details (name, etc.) when shutting down.</li>
 				<li><b>function OnDisable</b> is called when the plugin is disabled, commonly when the server is shutting down. Perform cleanup and logging here.</li>

@@ -242,10 +242,10 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 		// Check achievements
 		switch (m_Item.m_ItemType)
 		{
-			case E_BLOCK_LOG:      a_Dest.AwardAchievement(Statistic::AchMineWood); break;
-			case E_ITEM_LEATHER:   a_Dest.AwardAchievement(Statistic::AchKillCow);  break;
-			case E_ITEM_DIAMOND:   a_Dest.AwardAchievement(Statistic::AchDiamonds); break;
-			case E_ITEM_BLAZE_ROD: a_Dest.AwardAchievement(Statistic::AchBlazeRod); break;
+			case E_BLOCK_LOG:      a_Dest.AwardAchievement(CustomStatistic::AchMineWood); break;
+			case E_ITEM_LEATHER:   a_Dest.AwardAchievement(CustomStatistic::AchKillCow);  break;
+			case E_ITEM_DIAMOND:   a_Dest.AwardAchievement(CustomStatistic::AchDiamonds); break;
+			case E_ITEM_BLAZE_ROD: a_Dest.AwardAchievement(CustomStatistic::AchBlazeRod); break;
 			default: break;
 		}
 

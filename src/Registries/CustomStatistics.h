@@ -1,7 +1,10 @@
 #pragma once
 
-enum class Statistic
+// tolua_begin
+enum class CustomStatistic
 {
+	// tolua_end
+
 	/* Achievements */
 	AchOpenInventory,     /* Taking Inventory     */
 	AchMineWood,          /* Getting Wood         */
@@ -36,6 +39,8 @@ enum class Statistic
 	AchFullBeacon,        /* Beaconator           */
 	AchBreedCow,          /* Repopulation         */
 	AchDiamondsToYou,     /* Diamonds to you!     */
+
+	// tolua_begin
 
 	/* Statistics */
 	AnimalsBred,
@@ -117,3 +122,4 @@ enum class Statistic
 	JunkFished,
 	TreasureFished,
 };
+// tolua_end

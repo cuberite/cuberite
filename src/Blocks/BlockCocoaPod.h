@@ -36,11 +36,11 @@ public:
 
 private:
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
 		// Check that we're attached to a jungle log block:
-		eBlockFace BlockFace = MetaToBlockFace(a_Chunk.GetMeta(a_RelPos));
-		auto LogPos = AddFaceDirection(a_RelPos, BlockFace, true);
+		eBlockFace BlockFace = MetaToBlockFace(a_Meta);
+		auto LogPos = AddFaceDirection(a_Position, BlockFace, true);
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
 		a_Chunk.UnboundedRelGetBlock(LogPos, BlockType, BlockMeta);

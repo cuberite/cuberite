@@ -238,7 +238,7 @@ UInt32 cProtocol_1_14::GetProtocolItemType(short a_ItemID, short a_ItemDamage) c
 
 
 
-UInt32 cProtocol_1_14::GetProtocolStatisticType(Statistic a_Statistic) const
+UInt32 cProtocol_1_14::GetProtocolStatisticType(const CustomStatistic a_Statistic) const
 {
 	return Palette_1_14::From(a_Statistic);
 }

@@ -1,4 +1,3 @@
-
 // IntGen.h
 
 // Declares the cIntGen class and descendants for generating and filtering various 2D arrays of ints
@@ -494,7 +493,7 @@ public:
 					if (IsBiomeOcean(above) || IsBiomeOcean(below) || IsBiomeOcean(left) || IsBiomeOcean(right))
 					{
 						// First convert the value to a regular biome (drop the M flag), then modulo by our biome count:
-						val = ToBeach[(val % 128) % ARRAYCOUNT(ToBeach)];
+						val = ToBeach[static_cast<size_t>((val % 128)) % ARRAYCOUNT(ToBeach)];
 					}
 				}
 				a_Values[x + z * SizeX] = val;

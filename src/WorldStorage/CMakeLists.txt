@@ -9,7 +9,7 @@ target_sources(
 	NBTChunkSerializer.cpp
 	SchematicFileSerializer.cpp
 	ScoreboardSerializer.cpp
-	StatSerializer.cpp
+	StatisticsSerializer.cpp
 	WSSAnvil.cpp
 	WorldStorage.cpp
 
@@ -21,7 +21,7 @@ target_sources(
 	NBTChunkSerializer.h
 	SchematicFileSerializer.h
 	ScoreboardSerializer.h
-	StatSerializer.h
+	StatisticsSerializer.h
 	WSSAnvil.h
 	WorldStorage.h
 )

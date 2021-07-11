@@ -11,6 +11,8 @@
 
 
 
+
+
 class cBlockDoorHandler final :
 	public cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>
 {
@@ -41,25 +43,6 @@ public:
 		{
 			return !cBlockInfo::IsTransparent(a_BlockType);
 		}
-	}
-
-	static bool CanReplaceBlock(BLOCKTYPE a_BlockType)
-	{
-		switch (a_BlockType)
-		{
-			case E_BLOCK_AIR:
-			case E_BLOCK_TALL_GRASS:
-			case E_BLOCK_WATER:
-			case E_BLOCK_STATIONARY_WATER:
-			case E_BLOCK_LAVA:
-			case E_BLOCK_STATIONARY_LAVA:
-			case E_BLOCK_SNOW:
-			case E_BLOCK_FIRE:
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/** Returns a vector pointing one block in the direction the door is facing (where the outside is). */
@@ -167,38 +150,6 @@ private:
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta)  const override;
 	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta)  const override;
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta)  const override;
-
-
-
-
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
-	{
-		// If clicking a bottom face, place the door one block lower:
-		auto PlacedPos = a_PlacedBlockPos;
-		if (a_ClickedBlockFace == BLOCK_FACE_BOTTOM)
-		{
-			PlacedPos.y--;
-		}
-
-		if (
-			!CanReplaceBlock(a_ChunkInterface.GetBlock(PlacedPos)) ||
-			!CanReplaceBlock(a_ChunkInterface.GetBlock(PlacedPos.addedY(1)))
-		)
-		{
-			return false;
-		}
-
-		return Super::GetPlacementBlockTypeMeta(a_ChunkInterface, a_Player, PlacedPos, a_ClickedBlockFace, a_CursorPos, a_BlockType, a_BlockMeta);
-	}
-
 	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const override;
 
 
@@ -237,9 +188,17 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		return ((a_RelPos.y > 0) && CanBeOn(a_Chunk.GetBlock(a_RelPos.addedY(-1)), a_Chunk.GetMeta(a_RelPos.addedY(-1))));
+		// CanBeAt is also called on placement, so the top part can't check for the bottom part.
+		// Both parts can only that their base is a valid block.
+
+		BLOCKTYPE BlockType;
+		NIBBLETYPE BlockMeta;
+		const auto BasePosition = a_Position.addedY(((a_Meta & 0x8) == 0x8) ? -2 : -1);
+		a_Chunk.GetBlockTypeMeta(BasePosition, BlockType, BlockMeta);
+
+		return (BasePosition.y >= 0) && CanBeOn(BlockType, BlockMeta);
 	}
 
 

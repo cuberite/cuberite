@@ -5,14 +5,14 @@
 #include "BuildInfo.h"
 #include "Logger.h"
 #include "MemorySettingsRepository.h"
-#include "OSSupport/NetworkSingleton.h"
-#include "OSSupport/MiniDumpWriter.h"
-#include "OSSupport/StartAsService.h"
 #include "Root.h"
 #include "tclap/CmdLine.h"
 
-#include <csignal>
-#include <cstdlib>
+#include "OSSupport/ConsoleSignalHandler.h"
+#include "OSSupport/NetworkSingleton.h"
+#include "OSSupport/MiniDumpWriter.h"
+#include "OSSupport/SleepResolutionBooster.h"
+#include "OSSupport/StartAsService.h"
 
 
 
@@ -22,107 +22,6 @@ bool g_ShouldLogCommIn;
 bool g_ShouldLogCommOut;
 bool g_RunAsService;
 
-/** Global that registers itself as a last chance exception handler to write a minidump on crash. */
-static MiniDumpWriter g_MiniDumpWriter;
-
-
-
-
-
-// Because SIG_DFL or SIG_IGN could be NULL instead of nullptr, we need to disable the Clang warning here
-#ifdef __clang__
-	#pragma clang diagnostic push
-	#pragma clang diagnostic ignored "-Wunknown-warning-option"
-	#pragma clang diagnostic ignored "-Wunknown-pragmas"
-	#pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
-#endif  // __clang__
-
-static void NonCtrlHandler(int a_Signal)
-{
-	LOGD("Terminate event raised from std::signal");
-
-	switch (a_Signal)
-	{
-		case SIGSEGV:
-		{
-			PrintStackTrace();
-
-			LOGERROR(
-				"Failure report: \n\n"
-				"  :(   | Cuberite has encountered an error and needs to close\n"
-				"       | SIGSEGV: Segmentation fault\n"
-				"       |\n"
-#ifdef BUILD_ID
-				"       | Cuberite " BUILD_SERIES_NAME " (id: " BUILD_ID ")\n"
-				"       | from commit " BUILD_COMMIT_ID "\n"
-#endif
-			);
-
-			std::signal(SIGSEGV, SIG_DFL);
-			return;
-		}
-		case SIGABRT:
-#ifdef SIGABRT_COMPAT
-		case SIGABRT_COMPAT:
-#endif
-		{
-			PrintStackTrace();
-
-			LOGERROR(
-				"Failure report: \n\n"
-				"  :(   | Cuberite has encountered an error and needs to close\n"
-				"       | SIGABRT: Server self-terminated due to an internal fault\n"
-				"       |\n"
-#ifdef BUILD_ID
-				"       | Cuberite " BUILD_SERIES_NAME " (id: " BUILD_ID ")\n"
-				"       | from commit " BUILD_COMMIT_ID "\n"
-#endif
-			);
-
-			std::signal(SIGSEGV, SIG_DFL);
-			return;
-		}
-		case SIGINT:
-		case SIGTERM:
-		{
-			// Server is shutting down, wait for it...
-			cRoot::Stop();
-			return;
-		}
-#ifdef SIGPIPE
-		case SIGPIPE:
-		{
-			// Ignore (PR #2487)
-			return;
-		}
-#endif
-	}
-}
-
-#ifdef __clang__
-	#pragma clang diagnostic pop
-#endif  // __clang__
-
-
-
-
-
-#ifdef _WIN32
-// Handle CTRL events in windows, including console window close
-static BOOL CtrlHandler(DWORD fdwCtrlType)
-{
-	cRoot::Stop();
-	LOGD("Terminate event raised from the Windows CtrlHandler");
-
-	// Delay as much as possible to try to get the server to shut down cleanly - 10 seconds given by Windows
-	std::this_thread::sleep_for(std::chrono::seconds(10));
-
-	// Returning from main() automatically aborts this handler thread
-
-	return TRUE;
-}
-#endif
-
 
 
 
@@ -130,7 +29,7 @@ static BOOL CtrlHandler(DWORD fdwCtrlType)
 ////////////////////////////////////////////////////////////////////////////////
 // ParseArguments - Read the startup arguments and store into a settings object
 
-static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & Settings)
+static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & a_Settings)
 {
 	// Parse the comand line args:
 	TCLAP::CmdLine cmd("Cuberite");
@@ -151,23 +50,23 @@ static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & S
 	if (confArg.isSet())
 	{
 		AString conf_file = confArg.getValue();
-		Settings.AddValue("Server", "ConfigFile", conf_file);
+		a_Settings.AddValue("Server", "ConfigFile", conf_file);
 	}
 	if (slotsArg.isSet())
 	{
 		int slots = slotsArg.getValue();
-		Settings.AddValue("Server", "MaxPlayers", static_cast<Int64>(slots));
+		a_Settings.AddValue("Server", "MaxPlayers", static_cast<Int64>(slots));
 	}
 	if (portsArg.isSet())
 	{
 		for (auto port: portsArg.getValue())
 		{
-			Settings.AddValue("Server", "Ports", std::to_string(port));
+			a_Settings.AddValue("Server", "Ports", std::to_string(port));
 		}
 	}
 	if (noFileLogArg.getValue())
 	{
-		Settings.AddValue("Server", "DisableLogFile", true);
+		a_Settings.AddValue("Server", "DisableLogFile", true);
 	}
 	if (commLogArg.getValue())
 	{
@@ -183,7 +82,7 @@ static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & S
 	{
 		setvbuf(stdout, nullptr, _IONBF, 0);
 	}
-	Settings.SetReadOnly();
+	a_Settings.SetReadOnly();
 
 	if (runAsServiceArg.getValue())
 	{
@@ -193,11 +92,11 @@ static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & S
 	// Apply the CrashDump flags for platforms that support them:
 	if (crashDumpGlobals.getValue())
 	{
-		g_MiniDumpWriter.AddDumpFlags(MiniDumpFlags::WithDataSegments);
+		MiniDumpWriter::AddDumpFlags(MiniDumpFlags::WithDataSegments);
 	}
 	if (crashDumpFull.getValue())
 	{
-		g_MiniDumpWriter.AddDumpFlags(MiniDumpFlags::WithFullMemory);
+		MiniDumpWriter::AddDumpFlags(MiniDumpFlags::WithFullMemory);
 	}
 }
 
@@ -208,36 +107,52 @@ static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & S
 ////////////////////////////////////////////////////////////////////////////////
 // UniversalMain - Main startup logic for both standard running and as a service
 
-static int UniversalMain(int argc, char * argv[], bool RunningAsService)
+static int UniversalMain(int argc, char * argv[], const bool a_RunningAsService)
 {
+	const struct MiniDumpWriterRAII
+	{
+		MiniDumpWriterRAII()
+		{
+			// Registers a last chance exception handler to write a minidump on crash:
+			MiniDumpWriter::Register();
+		}
+
+		~MiniDumpWriterRAII()
+		{
+			MiniDumpWriter::Unregister();
+		}
+	} MiniDumpWriter;
+
+	const struct SleepResolutionBoosterRAII
+	{
+		SleepResolutionBoosterRAII()
+		{
+			// Boost timer resolution to keep TPS high:
+			SleepResolutionBooster::Register();
+		}
+
+		~SleepResolutionBoosterRAII()
+		{
+			SleepResolutionBooster::Unregister();
+		}
+	} SleepResolutionBooster;
+
+	// Register signal handlers, enabling graceful shutdown from the terminal:
+	ConsoleSignalHandler::Register();
+
 	// Initialize logging subsystem:
 	cLogger::InitiateMultithreading();
-
-	struct NetworkRAII
-	{
-		NetworkRAII()
-		{
-			// Initialize LibEvent:
-			cNetworkSingleton::Get().Initialise();
-		}
-
-		~NetworkRAII()
-		{
-			// Shutdown all of LibEvent:
-			cNetworkSingleton::Get().Terminate();
-		}
-	};
 
 	try
 	{
 		cMemorySettingsRepository Settings;
-		ParseArguments(argc, argv, Settings);  // Make sure g_RunAsService is set correctly before checking it's value
+		ParseArguments(argc, argv, Settings);  // Make sure g_RunAsService is set correctly before checking its value.
 
 		// Attempt to run as a service:
-		if (!RunningAsService && g_RunAsService)
+		if (g_RunAsService && !a_RunningAsService)
 		{
 			// This will either fork or call UniversalMain again:
-			if (cStartAsService::MakeIntoService<&UniversalMain>())
+			if (StartAsService::MakeIntoService<&UniversalMain>())
 			{
 				return EXIT_SUCCESS;
 			}
@@ -245,9 +160,22 @@ static int UniversalMain(int argc, char * argv[], bool RunningAsService)
 
 		while (true)
 		{
-			NetworkRAII LibEvent;
-			cRoot Root;
+			const struct NetworkRAII
+			{
+				NetworkRAII()
+				{
+					// Initialize LibEvent:
+					cNetworkSingleton::Get().Initialise();
+				}
 
+				~NetworkRAII()
+				{
+					// Shutdown all of LibEvent:
+					cNetworkSingleton::Get().Terminate();
+				}
+			} LibEvent;
+
+			cRoot Root;
 			if (!Root.Run(Settings))
 			{
 				break;
@@ -290,21 +218,6 @@ int main(int argc, char ** argv)
 	// _CrtSetBreakAlloc(85950);
 
 #endif  // !NDEBUG && _MSC_VER
-
-	std::signal(SIGSEGV, NonCtrlHandler);
-	std::signal(SIGTERM, NonCtrlHandler);
-	std::signal(SIGINT,  NonCtrlHandler);
-	std::signal(SIGABRT, NonCtrlHandler);
-#ifdef SIGABRT_COMPAT
-	std::signal(SIGABRT_COMPAT, NonCtrlHandler);
-#endif
-#ifdef SIGPIPE
-	std::signal(SIGPIPE, SIG_IGN);
-#endif
-
-#ifdef _WIN32
-	VERIFY(SetConsoleCtrlHandler(reinterpret_cast<PHANDLER_ROUTINE>(CtrlHandler), TRUE) == TRUE);
-#endif
 
 	return UniversalMain(argc, argv, false);
 }

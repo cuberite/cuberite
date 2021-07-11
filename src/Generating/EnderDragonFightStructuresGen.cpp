@@ -111,7 +111,7 @@ void cEnderDragonFightStructuresGen::Init(const AString & a_TowerProperties, int
 	// A random angle in radian
 	double Angle = m_Noise.IntNoise1D(m_Noise.GetSeed()) * M_PI + M_PI;
 	// Shuffles the order of the towers
-	std::shuffle(TowerProperties.begin(), TowerProperties.end(), std::default_random_engine(static_cast<size_t>(m_Noise.GetSeed())));
+	std::shuffle(TowerProperties.begin(), TowerProperties.end(), std::default_random_engine(static_cast<std::default_random_engine::result_type>(m_Noise.GetSeed())));
 	// Generate Positions in a circle
 	for (size_t I = 0; I < TowerProperties.size(); I++)
 	{

@@ -26,7 +26,7 @@ namespace
 		return
 		{
 			static_cast<size_t>(a_RelPos.y / cChunkDef::SectionHeight),
-			static_cast<size_t>(cChunkDef::MakeIndexNoCheck(a_RelPos.x, a_RelPos.y % cChunkDef::SectionHeight, a_RelPos.z))
+			cChunkDef::MakeIndex(a_RelPos.x, a_RelPos.y % cChunkDef::SectionHeight, a_RelPos.z)
 		};
 	}
 

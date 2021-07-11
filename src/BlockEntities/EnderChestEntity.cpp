@@ -62,7 +62,7 @@ bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 		return false;
 	}
 
-	a_Player->GetStatManager().AddValue(Statistic::OpenEnderchest);
+	a_Player->GetStatistics().Custom[CustomStatistic::OpenEnderchest]++;
 
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();

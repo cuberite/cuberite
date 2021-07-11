@@ -64,45 +64,6 @@ private:
 
 
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
-	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = LeverDirectionToMetaData(a_ClickedBlockFace);
-		return true;
-	}
-
-
-
-
-
-	/** Converts the block face of the neighbor to which the lever is attached to the lever block's meta. */
-	inline static NIBBLETYPE LeverDirectionToMetaData(eBlockFace a_Dir)
-	{
-		// Determine lever direction:
-		switch (a_Dir)
-		{
-			case BLOCK_FACE_YP:   return 0x6;
-			case BLOCK_FACE_XP:   return 0x1;
-			case BLOCK_FACE_XM:   return 0x2;
-			case BLOCK_FACE_ZP:   return 0x3;
-			case BLOCK_FACE_ZM:   return 0x4;
-			case BLOCK_FACE_YM:   return 0x0;
-			case BLOCK_FACE_NONE: return 0x6;
-		}
-		UNREACHABLE("Unsupported block face");
-	}
-
-
-
-
-
 	/** Converts the leve block's meta to the block face of the neighbor to which the lever is attached. */
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
@@ -128,18 +89,18 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
 		// Find the type of block the lever is attached to:
-		auto Meta = a_Chunk.GetMeta(a_RelPos);
-		auto NeighborFace = BlockMetaDataToBlockFace(Meta);
-		auto NeighborPos = AddFaceDirection(a_RelPos, NeighborFace, true);
+		auto NeighborFace = BlockMetaDataToBlockFace(a_Meta);
+		auto NeighborPos = AddFaceDirection(a_Position, NeighborFace, true);
 		if (!cChunkDef::IsValidHeight(NeighborPos.y))
 		{
 			return false;
 		}
 		BLOCKTYPE NeighborBlockType;
-		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, NeighborBlockType, Meta))
+		NIBBLETYPE NeighborMeta;
+		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, NeighborBlockType, NeighborMeta))
 		{
 			return false;
 		}
@@ -152,8 +113,8 @@ private:
 		else if (cBlockSlabHandler::IsAnySlabType(NeighborBlockType))
 		{
 			return (
-				(((Meta & 0x08) == 0x08) && (NeighborFace == BLOCK_FACE_TOP)) ||
-				(((Meta & 0x08) == 0)    && (NeighborFace == BLOCK_FACE_BOTTOM))
+				(((NeighborMeta & 0x08) == 0x08) && (NeighborFace == BLOCK_FACE_TOP)) ||
+				(((NeighborMeta & 0x08) == 0)    && (NeighborFace == BLOCK_FACE_BOTTOM))
 			);
 		}
 

@@ -30,57 +30,9 @@ public:
 
 private:
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		a_BlockType = m_BlockType;
-
-		switch (a_ClickedBlockFace)
-		{
-			case BLOCK_FACE_XM:
-			{
-				a_BlockMeta = 0x1;
-				return true;
-			}
-			case BLOCK_FACE_XP:
-			{
-				a_BlockMeta = 0x3;
-				return true;
-			}
-			case BLOCK_FACE_ZM:
-			{
-				a_BlockMeta = 0x2;
-				return true;
-			}
-			case BLOCK_FACE_ZP:
-			{
-				a_BlockMeta = 0x0;
-				return true;
-			}
-			case BLOCK_FACE_NONE:
-			case BLOCK_FACE_YM:
-			case BLOCK_FACE_YP:
-			{
-				return false;
-			}
-		}
-		UNREACHABLE("Unsupported block face");
-	}
-
-
-
-
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
-	{
-		const auto Meta = a_Chunk.GetMeta(a_RelPos);
-		const auto RearPosition = AddFaceDirection(a_RelPos, MetadataToDirection(Meta), true);
+		const auto RearPosition = AddFaceDirection(a_Position, MetadataToDirection(a_Meta), true);
 
 		BLOCKTYPE NeighborBlockType;
 		if (!a_Chunk.UnboundedRelGetBlockType(RearPosition, NeighborBlockType))

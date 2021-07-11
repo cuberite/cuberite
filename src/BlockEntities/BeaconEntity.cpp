@@ -206,7 +206,7 @@ void cBeaconEntity::UpdateBeacon(void)
 					(std::abs(Distance.z) <= 20)
 				)
 				{
-					a_Player.AwardAchievement(Statistic::AchFullBeacon);
+					a_Player.AwardAchievement(CustomStatistic::AchFullBeacon);
 				}
 				return false;
 			}
@@ -313,7 +313,7 @@ bool cBeaconEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 {
-	a_Player->GetStatManager().AddValue(Statistic::InteractWithBeacon);
+	a_Player->GetStatistics().Custom[CustomStatistic::InteractWithBeacon]++;
 
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)

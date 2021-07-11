@@ -17,20 +17,6 @@ public:
 
 	using Super::Super;
 
-	/** Converts the (player) rotation to placed-signpost block meta. */
-	static NIBBLETYPE RotationToMetaData(double a_Rotation)
-	{
-		a_Rotation += 180 + (180 / 16);  // So it's not aligned with axis
-		if (a_Rotation > 360)
-		{
-			a_Rotation -= 360;
-		}
-
-		a_Rotation = (a_Rotation / 360) * 16;
-
-		return (static_cast<char>(a_Rotation)) % 16;
-	}
-
 private:
 
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
@@ -42,14 +28,15 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_RelPos.y <= 0)
+		if (a_Position.y <= 0)
 		{
 			return false;
 		}
-		BLOCKTYPE Type = a_Chunk.GetBlock(a_RelPos.addedY(-1));
-		return ((Type == E_BLOCK_SIGN_POST) || (Type == E_BLOCK_WALLSIGN) || cBlockInfo::IsSolid(Type));
+
+		BLOCKTYPE Type = a_Chunk.GetBlock(a_Position.addedY(-1));
+		return (Type == E_BLOCK_SIGN_POST) || (Type == E_BLOCK_WALLSIGN) || cBlockInfo::IsSolid(Type);
 	}
 
 

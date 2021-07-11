@@ -29,14 +29,14 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_RelPos.y < 1)
+		if (a_Position.y < 1)
 		{
 			return false;
 		}
 
-		return cBlockInfo::IsSolid(a_Chunk.GetBlock(a_RelPos.addedY(-1)));
+		return cBlockInfo::IsSolid(a_Chunk.GetBlock(a_Position.addedY(-1)));
 	}
 
 

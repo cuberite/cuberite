@@ -29,7 +29,7 @@ private:
 		const Vector3i a_CursorPos
 	) const override
 	{
-		a_Player.GetStatManager().AddValue(Statistic::InteractWithCraftingTable);
+		a_Player.GetStatistics().Custom[CustomStatistic::InteractWithCraftingTable]++;
 
 		cWindow * Window = new cCraftingWindow();
 		a_Player.OpenWindow(*Window);

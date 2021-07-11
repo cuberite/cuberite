@@ -17,25 +17,6 @@ public:
 
 	using Super::Super;
 
-	/** Converts the block face of the neighbor to which the wallsign is attached to the wallsign block's meta. */
-	static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_NeighborBlockFace)
-	{
-		switch (a_NeighborBlockFace)
-		{
-			case BLOCK_FACE_ZM: return 0x02;
-			case BLOCK_FACE_ZP: return 0x03;
-			case BLOCK_FACE_XM: return 0x04;
-			case BLOCK_FACE_XP: return 0x05;
-			case BLOCK_FACE_NONE:
-			case BLOCK_FACE_YP:
-			case BLOCK_FACE_YM:
-			{
-				break;
-			}
-		}
-		return 0x02;
-	}
-
 private:
 
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
@@ -47,16 +28,16 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		auto NeighborPos = a_RelPos + GetOffsetBehindTheSign(a_Chunk.GetMeta(a_RelPos));
+		auto NeighborPos = a_Position + GetOffsetBehindTheSign(a_Meta);
 		BLOCKTYPE NeighborType;
 		if (!a_Chunk.UnboundedRelGetBlockType(NeighborPos, NeighborType))
 		{
 			// The neighbor is not accessible (unloaded chunk), bail out without changing this
 			return true;
 		}
-		return ((NeighborType == E_BLOCK_WALLSIGN) || (NeighborType == E_BLOCK_SIGN_POST) || cBlockInfo::IsSolid(NeighborType));
+		return (NeighborType == E_BLOCK_WALLSIGN) || (NeighborType == E_BLOCK_SIGN_POST) || cBlockInfo::IsSolid(NeighborType);
 	}
 
 

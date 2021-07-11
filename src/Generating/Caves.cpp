@@ -513,7 +513,7 @@ void cCaveTunnel::ProcessChunk(
 				{
 					if (cChunkDef::GetBlock(a_BlockTypes, x, y, z) == E_BLOCK_SAND)
 					{
-						int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
+						const auto Index = cChunkDef::MakeIndex(x, y, z);
 						if (a_BlockMetas[Index] == 1)
 						{
 							a_BlockMetas[Index] = 0;

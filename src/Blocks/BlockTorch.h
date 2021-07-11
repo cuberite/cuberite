@@ -18,91 +18,6 @@ public:
 
 	using Super::Super;
 
-protected:
-
-	~cBlockTorchBaseHandler() = default;
-
-private:
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
-	{
-		BLOCKTYPE ClickedBlockType;
-		NIBBLETYPE ClickedBlockMeta;
-		auto ClickedBlockPos = AddFaceDirection(a_PlacedBlockPos, a_ClickedBlockFace, true);
-		a_ChunkInterface.GetBlockTypeMeta(ClickedBlockPos, ClickedBlockType, ClickedBlockMeta);
-		if (!CanBePlacedOn(ClickedBlockType, ClickedBlockMeta, a_ClickedBlockFace))
-		{
-			// Couldn't be placed on whatever face was clicked, last ditch resort - find another face
-			a_ClickedBlockFace = FindSuitableFace(a_ChunkInterface, a_PlacedBlockPos);  // Set a_BlockFace to a valid direction which will be converted later to a metadata
-			if (a_ClickedBlockFace == BLOCK_FACE_NONE)
-			{
-				// No attachable face found - don't place the torch
-				return false;
-			}
-		}
-		a_BlockType = m_BlockType;
-		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
-		return true;
-	}
-
-
-
-
-
-	/** Converts the block face of the neighbor to which the torch is attached, to the torch block's meta. */
-	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_NeighborBlockFace)
-	{
-		switch (a_NeighborBlockFace)
-		{
-			case BLOCK_FACE_BOTTOM: ASSERT(!"Shouldn't be getting this face"); return 0;
-			case BLOCK_FACE_TOP:    return E_META_TORCH_FLOOR;
-			case BLOCK_FACE_EAST:   return E_META_TORCH_EAST;
-			case BLOCK_FACE_WEST:   return E_META_TORCH_WEST;
-			case BLOCK_FACE_NORTH:  return E_META_TORCH_NORTH;
-			case BLOCK_FACE_SOUTH:  return E_META_TORCH_SOUTH;
-			case BLOCK_FACE_NONE:
-			{
-				ASSERT(!"Unhandled torch direction!");
-				break;
-			}
-		}
-		return 0x0;
-	}
-
-
-
-
-
-	/** Converts the torch block's meta to the block face of the neighbor to which the torch is attached. */
-	inline static eBlockFace MetaDataToBlockFace(NIBBLETYPE a_MetaData)
-	{
-		switch (a_MetaData)
-		{
-			case 0:                  return BLOCK_FACE_TOP;  // By default, the torches stand on the ground
-			case E_META_TORCH_FLOOR: return BLOCK_FACE_TOP;
-			case E_META_TORCH_EAST:  return BLOCK_FACE_EAST;
-			case E_META_TORCH_WEST:  return BLOCK_FACE_WEST;
-			case E_META_TORCH_NORTH: return BLOCK_FACE_NORTH;
-			case E_META_TORCH_SOUTH: return BLOCK_FACE_SOUTH;
-			default:
-			{
-				ASSERT(!"Unhandled torch metadata");
-				break;
-			}
-		}
-		return BLOCK_FACE_TOP;
-	}
-
-
-
-
 
 	/** Returns true if the torch can be placed on the specified block's face. */
 	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_BlockFace)
@@ -163,37 +78,40 @@ private:
 		}
 	}
 
+protected:
 
+	~cBlockTorchBaseHandler() = default;
 
+private:
 
-
-	/** Returns a suitable neighbor's blockface to place the torch at the specified pos
-	Returns BLOCK_FACE_NONE on failure */
-	static eBlockFace FindSuitableFace(cChunkInterface & a_ChunkInterface, const Vector3i a_TorchPos)
+	/** Converts the torch block's meta to the block face of the neighbor to which the torch is attached. */
+	inline static eBlockFace MetaDataToBlockFace(NIBBLETYPE a_MetaData)
 	{
-		for (int i = BLOCK_FACE_YM; i <= BLOCK_FACE_XP; i++)  // Loop through all faces
+		switch (a_MetaData)
 		{
-			auto Face = static_cast<eBlockFace>(i);
-			auto NeighborPos = AddFaceDirection(a_TorchPos, Face, true);
-			BLOCKTYPE NeighborBlockType;
-			NIBBLETYPE NeighborBlockMeta;
-			a_ChunkInterface.GetBlockTypeMeta(NeighborPos, NeighborBlockType, NeighborBlockMeta);
-			if (CanBePlacedOn(NeighborBlockType, NeighborBlockMeta, Face))
+			case 0:                  return BLOCK_FACE_TOP;  // By default, the torches stand on the ground
+			case E_META_TORCH_FLOOR: return BLOCK_FACE_TOP;
+			case E_META_TORCH_EAST:  return BLOCK_FACE_EAST;
+			case E_META_TORCH_WEST:  return BLOCK_FACE_WEST;
+			case E_META_TORCH_NORTH: return BLOCK_FACE_NORTH;
+			case E_META_TORCH_SOUTH: return BLOCK_FACE_SOUTH;
+			default:
 			{
-				return Face;
+				ASSERT(!"Unhandled torch metadata");
+				break;
 			}
 		}
-		return BLOCK_FACE_NONE;
+		return BLOCK_FACE_TOP;
 	}
 
 
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		auto Face = MetaDataToBlockFace(a_Chunk.GetMeta(a_RelPos));
-		auto NeighborRelPos = AddFaceDirection(a_RelPos, Face, true);
+		auto Face = MetaDataToBlockFace(a_Meta);
+		auto NeighborRelPos = AddFaceDirection(a_Position, Face, true);
 		BLOCKTYPE NeighborBlockType;
 		NIBBLETYPE NeighborBlockMeta;
 		if (!a_Chunk.UnboundedRelGetBlock(NeighborRelPos, NeighborBlockType, NeighborBlockMeta))

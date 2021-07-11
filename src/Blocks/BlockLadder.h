@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "BlockInfo.h"
 #include "Mixins.h"
 
 
@@ -17,58 +18,23 @@ public:
 
 	using Super::Super;
 
+
+	/** Returns true if the ladder will be supported by the block through the given blockface. */
+	static bool CanBePlacedOn(const BLOCKTYPE a_BlockType, const eBlockFace a_BlockFace)
+	{
+		if (
+			(a_BlockFace == BLOCK_FACE_NONE) ||
+			(a_BlockFace == BLOCK_FACE_BOTTOM) ||
+			(a_BlockFace == BLOCK_FACE_TOP)
+		)
+		{
+			return false;
+		}
+
+		return cBlockInfo::IsSolid(a_BlockType);
+	}
+
 private:
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
-	{
-		// Try finding a suitable neighbor block face for the ladder; start with the given one.
-		if (!LadderCanBePlacedAt(a_ChunkInterface, a_PlacedBlockPos, a_ClickedBlockFace))
-		{
-			a_ClickedBlockFace = FindSuitableBlockFace(a_ChunkInterface, a_PlacedBlockPos);
-			if (a_ClickedBlockFace == BLOCK_FACE_NONE)
-			{
-				return false;
-			}
-		}
-
-		a_BlockType = m_BlockType;
-		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
-		return true;
-	}
-
-
-
-
-
-	/** Converts the block face of the neighbor to which the ladder is attached to the ladder block's meta. */
-	static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_NeighborBlockFace)
-	{
-		switch (a_NeighborBlockFace)
-		{
-			case BLOCK_FACE_ZM: return 0x2;
-			case BLOCK_FACE_ZP: return 0x3;
-			case BLOCK_FACE_XM: return 0x4;
-			case BLOCK_FACE_XP: return 0x5;
-			case BLOCK_FACE_NONE:
-			case BLOCK_FACE_YM:
-			case BLOCK_FACE_YP:
-			{
-				return 0x2;
-			}
-		}
-		UNREACHABLE("Unsupported neighbor block face");
-	}
-
-
-
-
 
 	/** Converts the ladder block's meta to the block face of the neighbor to which the ladder is attached. */
 	static eBlockFace MetaDataToBlockFace(NIBBLETYPE a_MetaData)
@@ -87,51 +53,13 @@ private:
 
 
 
-	/** Finds a suitable block face value for the Ladder.
-	The returned value is the block face of the neighbor of the specified block to which a ladder at a_LadderPos can be attached.
-	Returns BLOCK_FACE_NONE if no valid location is found */
-	static eBlockFace FindSuitableBlockFace(cChunkInterface & a_ChunkInterface, const Vector3i a_LadderPos)
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		for (int FaceInt = BLOCK_FACE_ZM; FaceInt <= BLOCK_FACE_XP; FaceInt++)
-		{
-			eBlockFace Face = static_cast<eBlockFace>(FaceInt);
-			if (LadderCanBePlacedAt(a_ChunkInterface, a_LadderPos, Face))
-			{
-				return Face;
-			}
-		}
-		return BLOCK_FACE_NONE;
-	}
-
-
-
-
-
-	/** Returns true if the ladder in the specified position will be supported by its neghbor through the specified neighbor's blockface. */
-	static bool LadderCanBePlacedAt(cChunkInterface & a_ChunkInterface, const Vector3i a_LadderPos, eBlockFace a_NeighborBlockFace)
-	{
-		if (
-			(a_NeighborBlockFace == BLOCK_FACE_NONE) ||
-			(a_NeighborBlockFace == BLOCK_FACE_BOTTOM) ||
-			(a_NeighborBlockFace == BLOCK_FACE_TOP)
-		)
-		{
-			return false;
-		}
-
-		auto NeighborPos = AddFaceDirection(a_LadderPos, a_NeighborBlockFace, true);
-		return cBlockInfo::IsSolid(a_ChunkInterface.GetBlock(NeighborPos));
-	}
-
-
-
-
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
-	{
-		auto NeighborBlockFace = MetaDataToBlockFace(a_Chunk.GetMeta(a_RelPos));
-		auto LadderAbsPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-		return LadderCanBePlacedAt(a_ChunkInterface, LadderAbsPos, NeighborBlockFace);
+		auto Face = MetaDataToBlockFace(a_Meta);
+		auto NeighborRelPos = AddFaceDirection(a_Position, Face, true);
+		BLOCKTYPE NeighborBlockType;
+		a_Chunk.UnboundedRelGetBlockType(NeighborRelPos, NeighborBlockType);
+		return CanBePlacedOn(NeighborBlockType, Face);
 	}
 
 
