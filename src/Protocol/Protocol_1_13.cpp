@@ -107,36 +107,48 @@ void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 
 void cProtocol_1_13::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY)
 {
-	ASSERT(m_State == 3); // In game mode?
+	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktMapData);
 	Pkt.WriteVarInt32(a_Map.GetID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Map.GetScale()));
-	
+
 	// TODO: don't hardcode it.
+	// this thing shows the map icons.
+	// for example: the player pointer, fortress, treasure marker..
+	// more info at wiki.vg
 	Pkt.WriteBool(true);
 
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetDecorators().size()));
-	for (const auto& Decorator : a_Map.GetDecorators())
+	for (const auto & Decorator : a_Map.GetDecorators())
 	{
 		Pkt.WriteVarInt32(static_cast<UInt32>(Decorator.GetType()));
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelX()));
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelZ()));
 
 		// TODO: don't hardcode them.
+		// the player direction.
 		Pkt.WriteBEUInt8(static_cast<UInt8>(0));
+		// has display name?
 		Pkt.WriteBool(false);
 		// TODO: Display Name
+		// should we get it from the cMap::GetName() method?
 	}
 
 	// I took them from the 1.8 implementation
+	// columns number.
+	// maybe it's not right for 1.13 maps, i don't know.
 	Pkt.WriteBEUInt8(128);
+
+	// rows.
+	// maybe it's not right too.
 	Pkt.WriteBEUInt8(128);
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_DataStartX));
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_DataStartY));
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetData().size()));
-	for (auto itr = a_Map.GetData().cbegin(); itr != a_Map.GetData().cend(); ++itr) {
-		Pkt.WriteBEUInt8(*itr);
+	for (const auto & Data : a_Map.GetData())
+	{
+		Pkt.WriteBEUInt8(Data);
 	}
 }
 
