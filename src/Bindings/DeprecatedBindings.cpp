@@ -300,7 +300,7 @@ tolua_lerror:
 static int tolua_cBlockArea_HasBlockMetas(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
-	if(
+	if (
 		!L.CheckParamSelf("cBlockArea") ||
 		!L.CheckParamNumber(1)
 	)
@@ -321,7 +321,7 @@ static int tolua_cBlockArea_HasBlockMetas(lua_State * tolua_S)
 static int tolua_cBlockArea_HasBlockTypes(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
-	if(
+	if (
 			!L.CheckParamSelf("cBlockArea") ||
 			!L.CheckParamNumber(1)
 			)
