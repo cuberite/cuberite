@@ -570,7 +570,7 @@ bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired
 		const int DestZ = Random.RandInt(a_MinBoxCorner.z, a_MaxBoxCorner.z);
 
 		// Seek downwards from initial destination until we find a solid block or go into the void
-		BLOCKTYPE DestBlock = a_World.GetBlock({DestX, DestY, DestZ});
+		auto DestBlock = a_World.GetBlock({DestX, DestY, DestZ});
 		while ((DestY >= 0) && !cBlockInfo::IsSolid(DestBlock))
 		{
 			DestBlock = a_World.GetBlock({DestX, DestY, DestZ});
@@ -587,7 +587,7 @@ bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired
 		bool Success = true;
 		for (int j = 1; j <= a_HeightRequired; j++)
 		{
-			BLOCKTYPE TestBlock = a_World.GetBlock({DestX, DestY + j, DestZ});
+			auto TestBlock = a_World.GetBlock({DestX, DestY + j, DestZ});
 			if (cBlockInfo::IsSolid(TestBlock) || IsBlockLiquid(TestBlock))
 			{
 				Success = false;
