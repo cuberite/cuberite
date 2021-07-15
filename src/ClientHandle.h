@@ -117,8 +117,8 @@ public:  // tolua_export
 	/** Authenticates the specified user, called by cAuthenticator */
 	void Authenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
 
-	/** This function sends a new unloaded chunk to the player. Returns true if all chunks are loaded. */
-	bool StreamNextChunk();
+	/** Sends a set number of new chunks to the player on every invocation, until all chunks in the view distance have been sent. */
+	void StreamNextChunks();
 
 	/** Remove all loaded chunks that are no longer in range */
 	void UnloadOutOfRangeChunks(void);
@@ -406,8 +406,6 @@ public:  // tolua_export
 
 	/** Returns the protocol version number of the protocol that the client is talking. Returns zero if the protocol version is not (yet) known. */
 	UInt32 GetProtocolVersion(void) const { return m_ProtocolVersion; }  // tolua_export
-
-	void InvalidateCachedSentChunk();
 
 	bool IsPlayerChunkSent();
 

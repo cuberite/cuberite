@@ -26,7 +26,6 @@ class cDeadlockDetect;
 
 struct SetChunkData;
 
-typedef std::list<cClientHandle *> cClientHandleList;
 using cChunkCallback        = cFunctionRef<bool(cChunk       &)>;
 using cEntityCallback       = cFunctionRef<bool(cEntity      &)>;
 using cBlockEntityCallback  = cFunctionRef<bool(cBlockEntity &)>;

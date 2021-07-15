@@ -9610,6 +9610,91 @@ a_Player:OpenWindow(Window);
 				{
 					Notes = "Removes all currently applied entity effects",
 				},
+				FindTeleportDestination =
+				{
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "HeightRequired",
+								Type = "number",
+							},
+							{
+								Name = "NumTries",
+								Type = "number",
+							},
+							{
+								Name = "Destination",
+								Type = "Vector3d",
+							},
+							{
+								Name = "MinBoxCorner",
+								Type = "Vector3i",
+							},
+							{
+								Name = "MaxBoxCorner",
+								Type = "Vector3i",
+							},
+						},
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: https://minecraft.fandom.com/wiki/Enderman#Teleportation.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "HeightRequired",
+								Type = "number",
+							},
+							{
+								Name = "NumTries",
+								Type = "number",
+							},
+							{
+								Name = "Destination",
+								Type = "Vector3d",
+							},
+							{
+								Name = "BoundingBox",
+								Type = "cBoundingBox",
+							},
+						},
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: https://minecraft.fandom.com/wiki/Enderman#Teleportation.",
+					},
+					{
+						Params =
+						{
+							{
+								Name = "World",
+								Type = "cWorld",
+							},
+							{
+								Name = "HeightRequired",
+								Type = "number",
+							},
+							{
+								Name = "NumTries",
+								Type = "number",
+							},
+							{
+								Name = "Centre",
+								Type = "Vector3i",
+							},
+							{
+								Name = "HalfCubeWidth",
+								Type = "number",
+							},
+						},
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: https://minecraft.fandom.com/wiki/Enderman#Teleportation.",
+					},
+				},
 				HasEntityEffect =
 				{
 					Params =
