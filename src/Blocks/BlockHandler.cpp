@@ -475,7 +475,7 @@ namespace
 	constexpr cBlockStairsHandler                          BlockGraniteStairsHandler(BlockType::GraniteStairs);
 	constexpr cDefaultBlockHandler                         BlockGraniteWallHandler(BlockType::GraniteWall);
 	constexpr cBlockTallGrassHandler                       BlockGrassHandler(BlockType::Grass);
-	constexpr cBlockGlassHandler                           BlockGrassBlockHandler(BlockType::GrassBlock);
+	constexpr cBlockGrassHandler                           BlockGrassBlockHandler(BlockType::GrassBlock);
 	constexpr cDefaultBlockHandler                         BlockGrassPathHandler(BlockType::GrassPath);
 	constexpr cBlockGravelHandler                          BlockGravelHandler(BlockType::Gravel);
 	constexpr cDefaultBlockHandler                         BlockGrayBannerHandler(BlockType::GrayBanner);
