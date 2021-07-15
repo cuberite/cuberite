@@ -14936,6 +14936,40 @@ end
 					},
 					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the Y axis (or rotating 180 degrees around it).",
 				},
+				MirrorBlockFaceXY =
+				{
+					Params =
+					{
+						{
+							Name = "eBlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the XY plane.",
+				},
+				MirrorBlockFaceYZ =
+				{
+					Params =
+					{
+						{
+							Name = "eBlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the YZ plane.",
+				},
 				NoCaseCompare =
 				{
 					Params =
@@ -15050,6 +15084,46 @@ end
 						},
 					},
 					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after rotating it around the Y axis 90 degrees clockwise.",
+				},
+				RotationToBlockFace =
+				{
+					Params =
+					{
+						{
+							Name = "player rotation",
+							Type = "number",
+						},
+						{
+							Name = "invert",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that is calculated from the player rotation. Can be inverted.",
+				},
+				unsigned char RotationToFineFace(double a_Rotation);
+				RotationToFineFace =
+				{
+					Params =
+					{
+						{
+							Name = "player rotation",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns a value [0, 15] that indicates the rotation. Is used to calculate banner, singn, ... rotation.",
 				},
 				StringSplit =
 				{
