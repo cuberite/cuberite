@@ -15107,7 +15107,6 @@ end
 					},
 					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that is calculated from the player rotation. Can be inverted.",
 				},
-				unsigned char RotationToFineFace(double a_Rotation);
 				RotationToFineFace =
 				{
 					Params =
