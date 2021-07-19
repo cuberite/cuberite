@@ -18,7 +18,7 @@ public:
 	using Super::Super;
 
 	cItemBigFlowerHandler():
-		Super(E_ITEM_BIG_FLOWER)
+		Super(E_BLOCK_BIG_FLOWER)
 	{
 	}
 

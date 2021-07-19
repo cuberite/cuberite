@@ -31,7 +31,7 @@ private:
 		}
 
 		// Special case if a player is holding a (thin) snow block and its size can be increased:
-		if ((a_HeldItem.m_ItemType == E_ITEM_SNOW) && (Block::Snow::Layers(a_ClickedBlock) < FullBlockLayers))
+		if ((a_HeldItem.m_ItemType == E_BLOCK_SNOW) && (Block::Snow::Layers(a_ClickedBlock) < FullBlockLayers))
 		{
 			return !a_ClickedDirectly || (a_ClickedBlockFace == BLOCK_FACE_YP);  // If clicked an adjacent block, or clicked YP directly, we ignore collision.
 		}
