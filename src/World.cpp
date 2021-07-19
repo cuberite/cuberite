@@ -1798,7 +1798,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a
 	a_FlyAwaySpeed /= 100;  // Pre-divide, so that we don't have to divide each time inside the loop
 	for (const auto & Pickup : a_Pickups)
 	{
-		if (!IsValidItem(Pickup.m_ItemType) || (Pickup.m_ItemType == E_ITEM_AIR))
+		if (!IsValidItem(Pickup.m_ItemType) || (Pickup.m_ItemType == E_BLOCK_AIR))
 		{
 			// Don't spawn pickup if item isn't even valid; should prevent client crashing too
 			continue;
@@ -1822,7 +1822,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d
 {
 	for (const auto & Pickup : a_Pickups)
 	{
-		if (!IsValidItem(Pickup.m_ItemType) || (Pickup.m_ItemType == E_ITEM_AIR))
+		if (!IsValidItem(Pickup.m_ItemType) || (Pickup.m_ItemType == E_BLOCK_AIR))
 		{
 			continue;
 		}

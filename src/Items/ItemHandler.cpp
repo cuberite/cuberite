@@ -137,18 +137,18 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 
 		// Single item per handler, alphabetically sorted:
 		case E_ITEM_BANNER:              return new cItemBannerHandler(a_ItemType);
-		case E_ITEM_BIG_FLOWER:          return new cItemBigFlowerHandler;
-		case E_ITEM_CHEST:               return new cItemChestHandler(a_ItemType);
-		case E_ITEM_LEAVES:              return new cItemLeavesHandler(a_ItemType);
-		case E_ITEM_LILY_PAD:            return new cItemLilypadHandler(a_ItemType);
-		case E_ITEM_NEW_LEAVES:          return new cItemLeavesHandler(a_ItemType);
-		case E_ITEM_PURPUR_SLAB:         return new cItemSlabHandler(a_ItemType);
-		case E_ITEM_RED_SANDSTONE_SLAB:  return new cItemSlabHandler(a_ItemType);
-		case E_ITEM_SAPLING:             return new cSimplePlaceableItemHandler(a_ItemType, BlockType::OakSapling);
-		case E_ITEM_STONE_SLAB:          return new cItemSlabHandler(a_ItemType);
-		case E_ITEM_TRAPPED_CHEST:       return new cItemChestHandler(a_ItemType);
-		case E_ITEM_WOODEN_SLAB:         return new cItemSlabHandler(a_ItemType);
-		case E_ITEM_WOOL:                return new cItemClothHandler(a_ItemType);
+		case E_BLOCK_BIG_FLOWER:          return new cItemBigFlowerHandler;
+		case E_BLOCK_CHEST:               return new cItemChestHandler(a_ItemType);
+		case E_BLOCK_LEAVES:              return new cItemLeavesHandler(a_ItemType);
+		case E_BLOCK_LILY_PAD:            return new cItemLilypadHandler(a_ItemType);
+		case E_BLOCK_NEW_LEAVES:          return new cItemLeavesHandler(a_ItemType);
+		case E_BLOCK_PURPUR_SLAB:         return new cItemSlabHandler(a_ItemType);
+		case E_BLOCK_RED_SANDSTONE_SLAB:  return new cItemSlabHandler(a_ItemType);
+		case E_BLOCK_SAPLING:             return new cSimplePlaceableItemHandler(a_ItemType, BlockType::OakSapling);
+		case E_BLOCK_STONE_SLAB:          return new cItemSlabHandler(a_ItemType);
+		case E_BLOCK_TRAPPED_CHEST:       return new cItemChestHandler(a_ItemType);
+		case E_BLOCK_WOODEN_SLAB:         return new cItemSlabHandler(a_ItemType);
+		case E_BLOCK_WOOL:                return new cItemClothHandler(a_ItemType);
 		case E_ITEM_BED:                 return new cItemBedHandler(a_ItemType);
 		case E_ITEM_BOTTLE_O_ENCHANTING: return new cItemBottleOEnchantingHandler();
 		case E_ITEM_BOW:                 return new cItemBowHandler();
@@ -183,39 +183,39 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_SPAWN_EGG:           return new cItemSpawnEggHandler(a_ItemType);
 		case E_ITEM_STRING:              return new cSimplePlaceableItemHandler(a_ItemType, BlockType::Tripwire);
 		case E_ITEM_SUGARCANE:           return new cSimplePlaceableItemHandler(a_ItemType, BlockType::SugarCane);
-		case E_ITEM_ACTIVATOR_RAIL:       return new cItemRailHandler(a_ItemType);
-		case E_ITEM_ANVIL:                return new cItemAnvilHandler(a_ItemType);
-		case E_ITEM_DETECTOR_RAIL:        return new cItemRailHandler(a_ItemType);
-		case E_ITEM_DISPENSER:            return new cItemDropSpenserHandler(a_ItemType);
-		case E_ITEM_DROPPER:              return new cItemDropSpenserHandler(a_ItemType);
-		case E_ITEM_ENCHANTMENT_TABLE:    return new cItemEnchantingTableHandler(a_ItemType);
-		case E_ITEM_ENDER_CHEST:          return new cItemEnderchestHandler(a_ItemType);
-		case E_ITEM_END_PORTAL_FRAME:     return new cItemEndPortalFrameHandler(a_ItemType);
-		case E_ITEM_FURNACE:              return new cItemFurnaceHandler(a_ItemType);
+		case E_BLOCK_ACTIVATOR_RAIL:       return new cItemRailHandler(a_ItemType);
+		case E_BLOCK_ANVIL:                return new cItemAnvilHandler(a_ItemType);
+		case E_BLOCK_DETECTOR_RAIL:        return new cItemRailHandler(a_ItemType);
+		case E_BLOCK_DISPENSER:            return new cItemDropSpenserHandler(a_ItemType);
+		case E_BLOCK_DROPPER:              return new cItemDropSpenserHandler(a_ItemType);
+		case E_BLOCK_ENCHANTMENT_TABLE:    return new cItemEnchantingTableHandler(a_ItemType);
+		case E_BLOCK_ENDER_CHEST:          return new cItemEnderchestHandler(a_ItemType);
+		case E_BLOCK_END_PORTAL_FRAME:     return new cItemEndPortalFrameHandler(a_ItemType);
+		case E_BLOCK_FURNACE:              return new cItemFurnaceHandler(a_ItemType);
 		// case E_ITEM_HAY_BALE:             return new cItemSidewaysHandler(a_ItemType);  // TODO(12xx12)
-		case E_ITEM_HOPPER:               return new cItemHopperHandler(a_ItemType);
-		case E_ITEM_IRON_TRAPDOOR:        return new cItemTrapdoorHandler(a_ItemType);
-		case E_ITEM_JACK_O_LANTERN:       return new cItemJackOLanternHandler(a_ItemType);
-		case E_ITEM_LADDER:               return new cItemLadderHandler(a_ItemType);
-		case E_ITEM_LEVER:                return new cItemLeverHandler(a_ItemType);
+		case E_BLOCK_HOPPER:               return new cItemHopperHandler(a_ItemType);
+		case E_BLOCK_IRON_TRAPDOOR:        return new cItemTrapdoorHandler(a_ItemType);
+		case E_BLOCK_JACK_O_LANTERN:       return new cItemJackOLanternHandler(a_ItemType);
+		case E_BLOCK_LADDER:               return new cItemLadderHandler(a_ItemType);
+		case E_BLOCK_LEVER:                return new cItemLeverHandler(a_ItemType);
 		// case E_ITEM_LOG:                  return new cItemSidewaysHandler(a_ItemType);  // TODO(12xx12)
 		// case E_ITEM_NEW_LOG:              return new cItemSidewaysHandler(a_ItemType);  // TODO(12xx12)
-		case E_ITEM_OBSERVER:             return new cItemObserverHandler(a_ItemType);
-		case E_ITEM_PISTON:               return new cItemPistonHandler(a_ItemType);
+		case E_BLOCK_OBSERVER:             return new cItemObserverHandler(a_ItemType);
+		case E_BLOCK_PISTON:               return new cItemPistonHandler(a_ItemType);
 		// case E_ITEM_PLANKS:               return new cItemPlanksHandler(a_ItemType);  // TODO(12xx12)
-		case E_ITEM_POWERED_RAIL:         return new cItemRailHandler(a_ItemType);
-		case E_ITEM_PUMPKIN:              return new cItemPumpkinHandler(a_ItemType);
-		case E_ITEM_QUARTZ_BLOCK:         return new cItemQuartzHandler(a_ItemType);
-		case E_ITEM_RAIL:                 return new cItemRailHandler(a_ItemType);
-		case E_ITEM_REDSTONE_TORCH_ON:    return new cItemTorchHandler(a_ItemType);
-		case E_ITEM_SNOW:                 return new cItemSnowHandler(a_ItemType);
-		case E_ITEM_STICKY_PISTON:        return new cItemPistonHandler(a_ItemType);
-		case E_ITEM_STONE_BUTTON:         return new cItemButtonHandler(a_ItemType);
-		case E_ITEM_TORCH:                return new cItemTorchHandler(a_ItemType);
-		case E_ITEM_TRAPDOOR:             return new cItemTrapdoorHandler(a_ItemType);
-		case E_ITEM_TRIPWIRE_HOOK:        return new cItemTripwireHookHandler(a_ItemType);
-		case E_ITEM_VINES:                return new cItemVineHandler(a_ItemType);
-		case E_ITEM_WOODEN_BUTTON:        return new cItemButtonHandler(a_ItemType);
+		case E_BLOCK_POWERED_RAIL:         return new cItemRailHandler(a_ItemType);
+		case E_BLOCK_PUMPKIN:              return new cItemPumpkinHandler(a_ItemType);
+		case E_BLOCK_QUARTZ_BLOCK:         return new cItemQuartzHandler(a_ItemType);
+		case E_BLOCK_RAIL:                 return new cItemRailHandler(a_ItemType);
+		case E_BLOCK_REDSTONE_TORCH_ON:    return new cItemTorchHandler(a_ItemType);
+		case E_BLOCK_SNOW:                 return new cItemSnowHandler(a_ItemType);
+		case E_BLOCK_STICKY_PISTON:        return new cItemPistonHandler(a_ItemType);
+		case E_BLOCK_STONE_BUTTON:         return new cItemButtonHandler(a_ItemType);
+		case E_BLOCK_TORCH:                return new cItemTorchHandler(a_ItemType);
+		case E_BLOCK_TRAPDOOR:             return new cItemTrapdoorHandler(a_ItemType);
+		case E_BLOCK_TRIPWIRE_HOOK:        return new cItemTripwireHookHandler(a_ItemType);
+		case E_BLOCK_VINES:                return new cItemVineHandler(a_ItemType);
+		case E_BLOCK_WOODEN_BUTTON:        return new cItemButtonHandler(a_ItemType);
 
 		case E_ITEM_WOODEN_HOE:
 		case E_ITEM_STONE_HOE:
@@ -300,50 +300,50 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 			return new cItemMinecartHandler(a_ItemType);
 		}
 
-		case E_ITEM_ACACIA_FENCE_GATE:
-		case E_ITEM_BIRCH_FENCE_GATE:
-		case E_ITEM_DARK_OAK_FENCE_GATE:
-		case E_ITEM_JUNGLE_FENCE_GATE:
-		case E_ITEM_OAK_FENCE_GATE:
-		case E_ITEM_SPRUCE_FENCE_GATE:
+		case E_BLOCK_ACACIA_FENCE_GATE:
+		case E_BLOCK_BIRCH_FENCE_GATE:
+		case E_BLOCK_DARK_OAK_FENCE_GATE:
+		case E_BLOCK_JUNGLE_FENCE_GATE:
+		case E_BLOCK_OAK_FENCE_GATE:
+		case E_BLOCK_SPRUCE_FENCE_GATE:
 		{
 			return new cItemFenceGateHandler(a_ItemType);
 		}
 
-		case E_ITEM_ACACIA_WOOD_STAIRS:
-		case E_ITEM_BIRCH_WOOD_STAIRS:
-		case E_ITEM_BRICK_STAIRS:
-		case E_ITEM_COBBLESTONE_STAIRS:
-		case E_ITEM_DARK_OAK_WOOD_STAIRS:
-		case E_ITEM_JUNGLE_WOOD_STAIRS:
-		case E_ITEM_NETHER_BRICK_STAIRS:
-		case E_ITEM_OAK_WOOD_STAIRS:
-		case E_ITEM_PURPUR_STAIRS:
-		case E_ITEM_QUARTZ_STAIRS:
-		case E_ITEM_RED_SANDSTONE_STAIRS:
-		case E_ITEM_SANDSTONE_STAIRS:
-		case E_ITEM_SPRUCE_WOOD_STAIRS:
-		case E_ITEM_STONE_BRICK_STAIRS:
+		case E_BLOCK_ACACIA_WOOD_STAIRS:
+		case E_BLOCK_BIRCH_WOOD_STAIRS:
+		case E_BLOCK_BRICK_STAIRS:
+		case E_BLOCK_COBBLESTONE_STAIRS:
+		case E_BLOCK_DARK_OAK_WOOD_STAIRS:
+		case E_BLOCK_JUNGLE_WOOD_STAIRS:
+		case E_BLOCK_NETHER_BRICK_STAIRS:
+		case E_BLOCK_OAK_WOOD_STAIRS:
+		case E_BLOCK_PURPUR_STAIRS:
+		case E_BLOCK_QUARTZ_STAIRS:
+		case E_BLOCK_RED_SANDSTONE_STAIRS:
+		case E_BLOCK_SANDSTONE_STAIRS:
+		case E_BLOCK_SPRUCE_WOOD_STAIRS:
+		case E_BLOCK_STONE_BRICK_STAIRS:
 		{
 			return new cItemStairsHandler(a_ItemType);
 		}
 
-		case E_ITEM_WHITE_GLAZED_TERRACOTTA:
-		case E_ITEM_ORANGE_GLAZED_TERRACOTTA:
-		case E_ITEM_MAGENTA_GLAZED_TERRACOTTA:
-		case E_ITEM_LIGHT_BLUE_GLAZED_TERRACOTTA:
-		case E_ITEM_YELLOW_GLAZED_TERRACOTTA:
-		case E_ITEM_LIME_GLAZED_TERRACOTTA:
-		case E_ITEM_PINK_GLAZED_TERRACOTTA:
-		case E_ITEM_GRAY_GLAZED_TERRACOTTA:
-		case E_ITEM_LIGHT_GRAY_GLAZED_TERRACOTTA:
-		case E_ITEM_CYAN_GLAZED_TERRACOTTA:
-		case E_ITEM_PURPLE_GLAZED_TERRACOTTA:
-		case E_ITEM_BLUE_GLAZED_TERRACOTTA:
-		case E_ITEM_BROWN_GLAZED_TERRACOTTA:
-		case E_ITEM_GREEN_GLAZED_TERRACOTTA:
-		case E_ITEM_RED_GLAZED_TERRACOTTA:
-		case E_ITEM_BLACK_GLAZED_TERRACOTTA:
+		case E_BLOCK_WHITE_GLAZED_TERRACOTTA:
+		case E_BLOCK_ORANGE_GLAZED_TERRACOTTA:
+		case E_BLOCK_MAGENTA_GLAZED_TERRACOTTA:
+		case E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA:
+		case E_BLOCK_YELLOW_GLAZED_TERRACOTTA:
+		case E_BLOCK_LIME_GLAZED_TERRACOTTA:
+		case E_BLOCK_PINK_GLAZED_TERRACOTTA:
+		case E_BLOCK_GRAY_GLAZED_TERRACOTTA:
+		case E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA:
+		case E_BLOCK_CYAN_GLAZED_TERRACOTTA:
+		case E_BLOCK_PURPLE_GLAZED_TERRACOTTA:
+		case E_BLOCK_BLUE_GLAZED_TERRACOTTA:
+		case E_BLOCK_BROWN_GLAZED_TERRACOTTA:
+		case E_BLOCK_GREEN_GLAZED_TERRACOTTA:
+		case E_BLOCK_RED_GLAZED_TERRACOTTA:
+		case E_BLOCK_BLACK_GLAZED_TERRACOTTA:
 		{
 			return new cItemGlazedTerracottaHandler(a_ItemType);
 		}
