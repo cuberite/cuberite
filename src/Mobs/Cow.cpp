@@ -29,8 +29,8 @@ void cCow::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_LEATHER);
-	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? E_ITEM_STEAK : E_ITEM_RAW_BEEF);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, Item::Leather);
+	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? Item::CookedBeef : Item::Beef);
 }
 
 
@@ -47,7 +47,7 @@ void cCow::OnRightClicked(cPlayer & a_Player)
 		// Milk the cow.
 		if (!a_Player.IsGameModeCreative())
 		{
-			a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_MILK));
+			a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::MilkBucket));
 		}
 	}
 }

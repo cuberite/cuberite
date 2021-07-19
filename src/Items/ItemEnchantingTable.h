@@ -34,7 +34,7 @@ private:
 
 		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_HeldItem](cBlockEntity & a_BlockEntity)
 		{
-			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_ENCHANTMENT_TABLE);
+			ASSERT(a_BlockEntity.GetBlockType() == BlockType::EnchantingTable);
 
 			static_cast<cEnchantingTableEntity &>(a_BlockEntity).SetCustomName(a_HeldItem.m_CustomName);
 			return false;

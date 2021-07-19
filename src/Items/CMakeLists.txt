@@ -54,7 +54,6 @@ target_sources(
 	ItemPainting.h
 	ItemPickaxe.h
 	ItemPiston.h
-	ItemPlanks.h
 	ItemPoisonousPotato.h
 	ItemPotion.h
 	ItemPumpkin.h
@@ -65,11 +64,9 @@ target_sources(
 	ItemRedstoneDust.h
 	ItemRedstoneRepeater.h
 	ItemRottenFlesh.h
-	ItemSapling.h
 	ItemSeeds.h
 	ItemShears.h
 	ItemShovel.h
-	ItemSideways.h
 	ItemSign.h
 	ItemSlab.h
 	ItemSnow.h

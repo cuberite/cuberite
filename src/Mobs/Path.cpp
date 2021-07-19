@@ -5,6 +5,10 @@
 #include "BlockType.h"
 #include "../BlockInfo.h"
 #include "../Chunk.h"
+#include "../Entities/Player.h"
+#include "../Blocks/BlockFence.h"
+#include "../Blocks/BlockDoor.h"
+#include "../Blocks/BlockTrapdoor.h"
 
 #define JUMP_G_COST 20
 #define NORMAL_G_COST 10
@@ -333,7 +337,7 @@ void cPath::BuildPath()
 	{
 		// Waypoints are cylinders that start at some particular x, y, z and have infinite height.
 		// Submerging water waypoints allows swimming mobs to be able to touch them.
-		if (IsBlockWater(GetCell(CurrentCell->m_Location + Vector3i(0, -1, 0))->m_BlockType))
+		if (GetCell(CurrentCell->m_Location + Vector3i(0, -1, 0))->m_Block.Type() == BlockType::Water)
 		{
 			CurrentCell->m_Location.y -= 30;
 		}
@@ -485,7 +489,7 @@ void cPath::FillCellAttributes(cPathCell & a_Cell)
 		// Players can't build outside the game height, so it must be air
 		a_Cell.m_IsSolid = false;
 		a_Cell.m_IsSpecial = false;
-		a_Cell.m_BlockType = E_BLOCK_AIR;
+		a_Cell.m_Block = Block::Air::Air();
 		return;
 	}
 	auto Chunk = m_Chunk->GetNeighborChunk(Location.x, Location.z);
@@ -494,27 +498,24 @@ void cPath::FillCellAttributes(cPathCell & a_Cell)
 		m_BadChunkFound = true;
 		a_Cell.m_IsSolid = true;
 		a_Cell.m_IsSpecial = false;
-		a_Cell.m_BlockType = E_BLOCK_AIR;  // m_BlockType is never used when m_IsSpecial is false, but it may be used if we implement dijkstra
+		a_Cell.m_Block = Block::Air::Air();  // m_Block is never used when m_IsSpecial is false, but it may be used if we implement dijkstra
 		return;
 	}
 	m_Chunk = Chunk;
 
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
 	int RelX = Location.x - m_Chunk->GetPosX() * cChunkDef::Width;
 	int RelZ = Location.z - m_Chunk->GetPosZ() * cChunkDef::Width;
 
-	m_Chunk->GetBlockTypeMeta(RelX, Location.y, RelZ, BlockType, BlockMeta);
-	a_Cell.m_BlockType = BlockType;
-	a_Cell.m_BlockMeta = BlockMeta;
+	auto BlockToCheck = m_Chunk->GetBlock(RelX, Location.y, RelZ);
+	a_Cell.m_Block = BlockToCheck;
 
 
-	if (BlockTypeIsSpecial(BlockType))
+	if (BlockTypeIsSpecial(BlockToCheck))
 	{
 		a_Cell.m_IsSpecial = true;
 		a_Cell.m_IsSolid = true;  // Specials are solids only from a certain direction. But their m_IsSolid is always true
 	}
-	else if ((!cBlockInfo::IsSolid(a_Cell.m_BlockType)) && IsBlockFence(GetCell(Location + Vector3i(0, -1, 0))->m_BlockType))
+	else if ((!cBlockInfo::IsSolid(a_Cell.m_Block)) && cBlockFenceHandler::IsBlockFence(GetCell(Location + Vector3i(0, -1, 0))->m_Block))
 	{
 		// Nonsolid blocks with fences below them are consider Special Solids. That is, they sometimes behave as solids.
 		a_Cell.m_IsSpecial = true;
@@ -524,7 +525,7 @@ void cPath::FillCellAttributes(cPathCell & a_Cell)
 	{
 
 		a_Cell.m_IsSpecial = false;
-		a_Cell.m_IsSolid = cBlockInfo::IsSolid(BlockType);
+		a_Cell.m_IsSolid = cBlockInfo::IsSolid(BlockToCheck);
 	}
 
 }
@@ -581,7 +582,7 @@ bool cPath::BodyFitsIn(const Vector3i & a_Location, const Vector3i & a_Source)
 				{
 					if (CurrentCell->m_IsSpecial)
 					{
-						if (SpecialIsSolidFromThisDirection(CurrentCell->m_BlockType, CurrentCell->m_BlockMeta, a_Location - a_Source))
+						if (SpecialIsSolidFromThisDirection(CurrentCell->m_Block, a_Location - a_Source))
 						{
 							return false;
 						}
@@ -601,20 +602,20 @@ bool cPath::BodyFitsIn(const Vector3i & a_Location, const Vector3i & a_Source)
 
 
 
-bool cPath::BlockTypeIsSpecial(BLOCKTYPE a_Type)
+bool cPath::BlockTypeIsSpecial(BlockState a_Block)
 {
-	if (IsBlockFence(a_Type))
+	if (
+		cBlockFenceHandler::IsBlockFence(a_Block) ||
+		cBlockDoorHandler::IsBlockDoor(a_Block) ||
+		cBlockTrapdoorHandler::IsBlockTrapdoor(a_Block)
+	)
 	{
 		return true;
 	}
 
-	switch (a_Type)
+	switch (a_Block.Type())
 	{
-		case E_BLOCK_OAK_DOOR:
-		case E_BLOCK_DARK_OAK_DOOR:
-		case E_BLOCK_TRAPDOOR:
-		case E_BLOCK_WATER:
-		case E_BLOCK_STATIONARY_WATER:
+		case BlockType::Water:
 		{
 			return true;
 		}
@@ -629,7 +630,7 @@ bool cPath::BlockTypeIsSpecial(BLOCKTYPE a_Type)
 
 
 
-bool cPath::SpecialIsSolidFromThisDirection(BLOCKTYPE a_Type, NIBBLETYPE a_Meta,  const Vector3i & a_Direction)
+bool cPath::SpecialIsSolidFromThisDirection(BlockState a_Block, const Vector3i & a_Direction)
 {
 	if (a_Direction == Vector3i(0, 0, 0))
 	{
@@ -638,7 +639,7 @@ bool cPath::SpecialIsSolidFromThisDirection(BLOCKTYPE a_Type, NIBBLETYPE a_Meta,
 
 
 	// If there is a nonsolid above a fence
-	if (!cBlockInfo::IsSolid(a_Type))
+	if (!cBlockInfo::IsSolid(a_Block))
 	{
 		// Only treat as solid when we're coming from below
 		return (a_Direction.y > 0);

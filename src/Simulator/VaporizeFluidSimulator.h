@@ -28,7 +28,7 @@ public:
 private:
 
 	virtual void Simulate(float a_Dt) override;
-	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block) override;
 	virtual cFluidSimulatorData * CreateChunkData(void) override { return nullptr; }
 } ;
 

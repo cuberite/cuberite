@@ -17,6 +17,7 @@ Implements the 1.9 protocol classes:
 #include "Protocol_1_9.h"
 #include "../mbedTLS++/Sha1Checksum.h"
 #include "Packetizer.h"
+#include "Palettes/Upgrade.h"
 
 #include "../ClientHandle.h"
 #include "../Root.h"
@@ -1434,7 +1435,7 @@ void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
 	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
 
-	if (a_BlockEntity.GetBlockType() == E_BLOCK_MOB_SPAWNER)
+	if (a_BlockEntity.GetBlockType() == BlockType::Spawner)
 	{
 		auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
 		a_Writer.BeginCompound("SpawnData");  // New: SpawnData compound
@@ -1916,9 +1917,10 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
 			a_Pkt.WriteBEUInt8(11);  // Index 11: Carried block
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BLOCKID);
+			auto NumericBlock = PaletteUpgrade::ToBlock(Enderman.GetCarriedBlock());
 			UInt32 Carried = 0;
-			Carried |= static_cast<UInt32>(Enderman.GetCarriedBlock() << 4);
-			Carried |= Enderman.GetCarriedMeta();
+			Carried |= static_cast<UInt32>(NumericBlock.first << 4);
+			Carried |= static_cast<UInt32>(NumericBlock.second);
 			a_Pkt.WriteVarInt32(Carried);
 
 			a_Pkt.WriteBEUInt8(12);  // Index 12: Is screaming
@@ -2061,6 +2063,7 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			a_Pkt.WriteBEUInt8(11);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			a_Pkt.WriteVarInt32(0);
+			break;
 		}
 
 		case mtSlime:

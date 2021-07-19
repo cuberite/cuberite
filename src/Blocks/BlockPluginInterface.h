@@ -30,8 +30,8 @@ public:
 	virtual ~cBlockPluginInterface() {}
 
 	virtual bool CallHookBlockSpread(int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source) = 0;
-	virtual bool CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
-	virtual bool CallHookPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
+	virtual bool CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BlockState a_Block) = 0;
+	virtual bool CallHookPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BlockState a_Block) = 0;
 };
 
 

@@ -44,6 +44,8 @@ Implements the 1.10 protocol classes:
 
 #include "../Bindings/PluginManager.h"
 
+#include "Palettes/Upgrade.h"
+
 
 
 
@@ -655,9 +657,10 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
 			a_Pkt.WriteBEUInt8(ENDERMAN_CARRIED_BLOCK);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BLOCKID);
+			auto NumericBlock = PaletteUpgrade::ToBlock(Enderman.GetCarriedBlock());
 			UInt32 Carried = 0;
-			Carried |= static_cast<UInt32>(Enderman.GetCarriedBlock() << 4);
-			Carried |= Enderman.GetCarriedMeta();
+			Carried |= static_cast<UInt32>(NumericBlock.first << 4);
+			Carried |= static_cast<UInt32>(NumericBlock.second);
 			a_Pkt.WriteVarInt32(Carried);
 
 			a_Pkt.WriteBEUInt8(ENDERMAN_SCREAMING);

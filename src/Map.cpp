@@ -133,25 +133,23 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 			}
 
 			static const std::array<unsigned char, 4> BrightnessID = { { 3, 0, 1, 2 } };  // Darkest to lightest
-			BLOCKTYPE TargetBlock;
-			NIBBLETYPE TargetMeta;
 
 			auto Height = a_Chunk.GetHeight(RelX, RelZ);
 			auto ChunkHeight = cChunkDef::Height;
-			a_Chunk.GetBlockTypeMeta(RelX, Height, RelZ, TargetBlock, TargetMeta);
-			auto ColourID = cBlockHandler::For(TargetBlock).GetMapBaseColourID(TargetMeta);
+			auto TargetBlock = a_Chunk.GetBlock({RelX, Height, RelZ});
+			auto ColourID = cBlockHandler::For(TargetBlock.Type()).GetMapBaseColourID();
 
-			if (IsBlockWater(TargetBlock))
+			if (TargetBlock.Type() == BlockType::Water)
 			{
 				ChunkHeight /= 4;
-				while (((--Height) != -1) && IsBlockWater(a_Chunk.GetBlock(RelX, Height, RelZ)))
+				while (((--Height) != -1) && (a_Chunk.GetBlock(RelX, Height, RelZ).Type() == BlockType::Water))
 				{
 					continue;
 				}
 			}
 			else if (ColourID == 0)
 			{
-				while (((--Height) != -1) && ((ColourID = cBlockHandler::For(a_Chunk.GetBlock(RelX, Height, RelZ)).GetMapBaseColourID(a_Chunk.GetMeta(RelX, Height, RelZ))) == 0))
+				while (((--Height) != -1) && ((ColourID = cBlockHandler::For(a_Chunk.GetBlock(RelX, Height, RelZ).Type()).GetMapBaseColourID()) == 0))
 				{
 					continue;
 				}

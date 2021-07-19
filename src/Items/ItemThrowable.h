@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "../Blocks/BlockAir.h"
+
 
 
 
@@ -160,7 +162,7 @@ public:
 		eBlockFace a_ClickedBlockFace
 	) override
 	{
-		if (a_World->GetBlock(a_ClickedBlockPos) == E_BLOCK_AIR)
+		if (cBlockAirHandler::IsBlockAir(a_World->GetBlock(a_ClickedBlockPos)))
 		{
 			return false;
 		}

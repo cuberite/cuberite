@@ -73,7 +73,7 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_GUNPOWDER);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, Item::Gunpowder);
 
 	// If the creeper was killed by a skeleton, add a random music disc drop:
 	if (
@@ -91,7 +91,7 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 		if (GetWorld()->DoWithEntityByID(static_cast<cProjectileEntity *>(a_Killer)->GetCreatorUniqueID(), ProjectileCreatorCallback))
 		{
-			AddRandomDropItem(a_Drops, 1, 1, static_cast<short>(m_World->GetTickRandomNumber(11) + E_ITEM_FIRST_DISC));
+			AddRandomDropItem(a_Drops, 1, 1, PaletteUpgrade::FromItem(static_cast<short>(m_World->GetTickRandomNumber(11) + E_ITEM_FIRST_DISC), 0));
 		}
 	}
 }

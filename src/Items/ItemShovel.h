@@ -41,13 +41,13 @@ public:
 
 
 
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
+	virtual bool CanHarvestBlock(BlockState a_Block) override
 	{
-		if (a_BlockType == E_BLOCK_SNOW)
+		if (a_Block.Type() == BlockType::SnowBlock)
 		{
 			return true;
 		}
-		return Super::CanHarvestBlock(a_BlockType);
+		return Super::CanHarvestBlock(a_Block);
 	}
 
 
@@ -58,8 +58,33 @@ public:
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_WOODEN_SHOVEL:  return (a_ItemType == E_BLOCK_PLANKS);
-			case E_ITEM_STONE_SHOVEL:   return (a_ItemType == E_BLOCK_COBBLESTONE);
+			case E_ITEM_WOODEN_SHOVEL:
+			{
+				auto NewItem = PaletteUpgrade::FromItem(a_ItemType, 0);
+				switch (NewItem)
+				{
+					case Item::AcaciaPlanks:
+					case Item::BirchPlanks:
+					case Item::CrimsonPlanks:
+					case Item::DarkOakPlanks:
+					case Item::JunglePlanks:
+					case Item::OakPlanks:
+					case Item::SprucePlanks:
+					case Item::WarpedPlanks:
+						return true;
+					default: return false;
+				}
+			}
+			case E_ITEM_STONE_SHOVEL:
+			{
+				auto NewItem = PaletteUpgrade::FromItem(a_ItemType, 0);
+				switch (NewItem)
+				{
+					case Item::Cobblestone:
+						return true;
+					default: return false;
+				}
+			}
 			case E_ITEM_IRON_SHOVEL:    return (a_ItemType == E_ITEM_IRON);
 			case E_ITEM_GOLD_SHOVEL:    return (a_ItemType == E_ITEM_GOLD);
 			case E_ITEM_DIAMOND_SHOVEL: return (a_ItemType == E_ITEM_DIAMOND);
@@ -71,22 +96,38 @@ public:
 
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) override
+	virtual float GetBlockBreakingStrength(BlockState a_Block) override
 	{
-		switch (a_Block)
+		switch (a_Block.Type())
 		{
-			case E_BLOCK_CLAY:
-			case E_BLOCK_CONCRETE_POWDER:
-			case E_BLOCK_DIRT:
-			case E_BLOCK_FARMLAND:
-			case E_BLOCK_GRASS:
-			case E_BLOCK_GRASS_PATH:
-			case E_BLOCK_GRAVEL:
-			case E_BLOCK_MYCELIUM:
-			case E_BLOCK_SAND:
-			case E_BLOCK_SNOW:
-			case E_BLOCK_SNOW_BLOCK:
-			case E_BLOCK_SOULSAND:
+			case BlockType::Clay:
+			case BlockType::Dirt:
+			case BlockType::Farmland:
+			case BlockType::GrassBlock:
+			case BlockType::GrassPath:
+			case BlockType::Gravel:
+			case BlockType::Mycelium:
+			case BlockType::Sand:
+			case BlockType::Snow:
+			case BlockType::SnowBlock:
+			case BlockType::SoulSand:
+
+			case BlockType::BlackConcretePowder:
+			case BlockType::BlueConcretePowder:
+			case BlockType::BrownConcretePowder:
+			case BlockType::CyanConcretePowder:
+			case BlockType::GrayConcretePowder:
+			case BlockType::GreenConcretePowder:
+			case BlockType::LightBlueConcretePowder:
+			case BlockType::LightGrayConcretePowder:
+			case BlockType::LimeConcretePowder:
+			case BlockType::MagentaConcretePowder:
+			case BlockType::OrangeConcretePowder:
+			case BlockType::PinkConcretePowder:
+			case BlockType::PurpleConcretePowder:
+			case BlockType::RedConcretePowder:
+			case BlockType::WhiteConcretePowder:
+			case BlockType::YellowConcretePowder:
 			{
 				switch (m_ItemType)
 				{
@@ -98,6 +139,7 @@ public:
 				}
 				break;
 			}
+			default: break;
 		}
 		return Super::GetBlockBreakingStrength(a_Block);
 	}

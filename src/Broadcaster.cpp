@@ -119,7 +119,7 @@ void cWorld::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_V
 
 
 
-void cWorld::BroadcastBlockAction(Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
+void cWorld::BroadcastBlockAction(Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BlockState a_BlockType, const cClientHandle * a_Exclude)
 {
 	ForClientsWithChunkAtPos(a_BlockPos, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{

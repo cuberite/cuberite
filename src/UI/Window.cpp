@@ -638,7 +638,7 @@ void cWindow::OnLeftPaintEnd(cPlayer & a_Player)
 	cItem ToDistribute(a_Player.GetDraggingItem());
 	int ToEachSlot = static_cast<int>(ToDistribute.m_ItemCount) / static_cast<int>(SlotNums.size());
 
-	int NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, ToEachSlot, SlotNums);
+	auto NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, ToEachSlot, SlotNums);
 
 	// Remove the items distributed from the dragging item:
 	a_Player.GetDraggingItem().m_ItemCount -= NumDistributed;

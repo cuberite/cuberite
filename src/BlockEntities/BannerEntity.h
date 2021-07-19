@@ -25,8 +25,8 @@ class cBannerEntity :
 
 public:
 
-	cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
-	cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, unsigned char a_BaseColor);
+	cBannerEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World);
+	cBannerEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World, unsigned char a_BaseColor);
 
 	unsigned char GetBaseColor() const;
 	void SetBaseColor(unsigned char a_Color);

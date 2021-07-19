@@ -31,10 +31,10 @@ void cPig::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? E_ITEM_COOKED_PORKCHOP : E_ITEM_RAW_PORKCHOP);
+	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? Item::CookedPorkchop : Item::Porkchop);
 	if (m_bIsSaddled)
 	{
-		a_Drops.emplace_back(E_ITEM_SADDLE, 1);
+		a_Drops.emplace_back(Item::Saddle, 1);
 	}
 }
 

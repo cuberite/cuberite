@@ -11,19 +11,30 @@
 
 
 class cBlockAnvilHandler final :
-	public cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>
+	public cBlockHandler
 {
-	using Super = cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>;
+	using Super = cBlockHandler;
 
 public:
 
 	using Super::Super;
 
+	static inline eBlockFace GetFacing(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Anvil:        return Block::Anvil::Facing(a_Block);
+			case BlockType::ChippedAnvil: return Block::ChippedAnvil::Facing(a_Block);
+			case BlockType::DamagedAnvil: return Block::DamagedAnvil::Facing(a_Block);
+			default: return BLOCK_FACE_NONE;
+		}
+	}
+
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
-		return cItem(m_BlockType, 1, a_BlockMeta >> 2);
+		return cItem(Item::Anvil, 1, 0);
 	}
 
 
@@ -57,9 +68,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 6;
 	}
 } ;

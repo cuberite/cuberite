@@ -30,7 +30,7 @@ public:
 
 protected:
 
-	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
+	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BlockState a_Block) override;
 	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
 	virtual void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation) override;
@@ -42,7 +42,7 @@ protected:
 
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
-	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override;
+	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const override;
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
 	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) const override;
 	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const override;

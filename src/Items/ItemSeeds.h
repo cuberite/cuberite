@@ -33,21 +33,23 @@ public:
 			return false;
 		}
 
-		BLOCKTYPE BlockType;
+		BlockState Block;
+
+		using namespace Block;
 
 		// Get the produce block based on the seed item:
 		switch (m_ItemType)
 		{
-			case E_ITEM_BEETROOT_SEEDS: BlockType = E_BLOCK_BEETROOTS;    break;
-			case E_ITEM_CARROT:         BlockType = E_BLOCK_CARROTS;      break;
-			case E_ITEM_MELON_SEEDS:    BlockType = E_BLOCK_MELON_STEM;   break;
-			case E_ITEM_POTATO:         BlockType = E_BLOCK_POTATOES;     break;
-			case E_ITEM_PUMPKIN_SEEDS:  BlockType = E_BLOCK_PUMPKIN_STEM; break;
-			case E_ITEM_SEEDS:          BlockType = E_BLOCK_CROPS;        break;
+			case E_ITEM_BEETROOT_SEEDS: Block = Beetroots::Beetroots();     break;
+			case E_ITEM_CARROT:         Block = Carrots::Carrots();         break;
+			case E_ITEM_MELON_SEEDS:    Block = MelonStem::MelonStem();     break;
+			case E_ITEM_POTATO:         Block = Potatoes::Potatoes();       break;
+			case E_ITEM_PUMPKIN_SEEDS:  Block = PumpkinStem::PumpkinStem(); break;
+			case E_ITEM_SEEDS:          Block = Wheat::Wheat();             break;
 			default:                    UNREACHABLE("Unsupported seed type");
 		}
 
-		return a_Player.PlaceBlock(a_PlacePosition, BlockType, 0);
+		return a_Player.PlaceBlock(a_PlacePosition, Block);
 	}
 
 

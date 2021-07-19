@@ -50,7 +50,7 @@ protected:
 	double m_SlowdownCoeff;
 
 	// cCallbacks overrides:
-	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	virtual bool OnNextBlock(Vector3i a_BlockPos, BlockState a_Block, eBlockFace a_EntryFace) override
 	{
 		/*
 		// DEBUG:
@@ -62,7 +62,7 @@ protected:
 		);
 		*/
 
-		if (cBlockInfo::IsSolid(a_BlockType))
+		if (cBlockInfo::IsSolid(a_Block))
 		{
 			// The projectile hit a solid block, calculate the exact hit coords:
 			cBoundingBox bb(a_BlockPos, a_BlockPos + Vector3i(1, 1, 1));  // Bounding box of the block hit
@@ -90,22 +90,21 @@ protected:
 		}
 
 		// Convey some special effects from special blocks:
-		switch (a_BlockType)
+		switch (a_Block.Type())
 		{
-			case E_BLOCK_LAVA:
-			case E_BLOCK_STATIONARY_LAVA:
+			case BlockType::Lava:
 			{
 				m_Projectile->StartBurning(30);
 				m_SlowdownCoeff = std::min(m_SlowdownCoeff, 0.9);  // Slow down to 0.9* the speed each tick when moving through lava
 				break;
 			}
-			case E_BLOCK_WATER:
-			case E_BLOCK_STATIONARY_WATER:
+			case BlockType::Water:
 			{
 				m_Projectile->StopBurning();
 				m_SlowdownCoeff = std::min(m_SlowdownCoeff, 0.8);  // Slow down to 0.8* the speed each tick when moving through water
 				break;
 			}
+			default: break;
 		}  // switch (a_BlockType)
 
 		// Continue tracing

@@ -35,7 +35,7 @@ public:
 
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) override
+	virtual float GetBlockBreakingStrength(BlockState a_Block) override
 	{
 		if (!IsBlockMaterialWood(a_Block) && !IsBlockMaterialPlants(a_Block) && !IsBlockMaterialVine(a_Block))
 		{

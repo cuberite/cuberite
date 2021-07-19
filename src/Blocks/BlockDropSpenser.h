@@ -12,9 +12,9 @@
 
 
 class cBlockDropSpenserHandler final :
-	public cDisplacementYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>
+	public cBlockEntityHandler
 {
-	using Super = cDisplacementYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>;
+	using Super = cBlockEntityHandler;
 
 public:
 
@@ -22,9 +22,8 @@ public:
 
 private:
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 11;
 	}
 } ;

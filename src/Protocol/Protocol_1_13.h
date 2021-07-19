@@ -36,7 +36,7 @@ public:
 
 protected:
 
-	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BlockState a_Block) override;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
@@ -49,7 +49,7 @@ protected:
 	virtual UInt8 GetEntityMetadataID(EntityMetadataType a_FieldType) const;
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const;
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
-	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const;
+	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const;
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
 	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) const;
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
@@ -86,7 +86,7 @@ protected:
 	virtual void SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
 
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
-	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override;
+	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const override;
 	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) const override;
 	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const override;
 	virtual Version GetProtocolVersion() const override;

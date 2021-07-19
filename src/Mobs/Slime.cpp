@@ -39,7 +39,7 @@ void cSlime::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	// Only slimes with the size 1 can drop slimeballs.
 	if (m_Size == 1)
 	{
-		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_SLIMEBALL);
+		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, Item::SlimeBall);
 	}
 }
 

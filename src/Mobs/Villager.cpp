@@ -3,8 +3,10 @@
 
 #include "Villager.h"
 #include "../World.h"
+#include "../Chunk.h"
 #include "../BlockArea.h"
 #include "../Blocks/BlockHandler.h"
+#include "../Blocks/BlockCrops.h"
 #include "../BlockInServerPluginInterface.h"
 
 
@@ -159,14 +161,17 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 			int Z = m_World->GetTickRandomNumber(11);
 
 			// A villager can't farm this.
-			if (!IsBlockFarmable(Surrounding.GetRelBlockType(X, Y, Z)))
+			if (!IsBlockFarmable(Surrounding.GetRelBlock({X, Y, Z})))
 			{
 				continue;
 			}
+			// TODO(12xx12) WHAT DOES THIS DO?
+			/*
 			if (Surrounding.GetRelBlockMeta(X, Y, Z) != 0x7)
 			{
 				continue;
 			}
+			*/
 
 			m_VillagerAction = true;
 			m_CropsPos = Vector3i(static_cast<int>(GetPosX()) + X - 5, static_cast<int>(GetPosY()) + Y - 3, static_cast<int>(GetPosZ()) + Z - 5);
@@ -186,8 +191,8 @@ void cVillager::HandleFarmerTryHarvestCrops()
 	if (!m_PathfinderActivated && (GetPosition() - m_CropsPos).Length() < 2)
 	{
 		// Check if the blocks didn't change while the villager was walking to the coordinates.
-		BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos);
-		if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos) == 0x7)
+		auto CropBlock = m_World->GetBlock(m_CropsPos);
+		if (IsBlockFarmable(CropBlock) && cBlockCropsHandler::IsFullyGrown(m_World->GetBlock(m_CropsPos)))
 		{
 			m_World->DropBlockAsPickups(m_CropsPos, this, nullptr);
 			m_ActionCountDown = 20;
@@ -202,9 +207,9 @@ void cVillager::HandleFarmerTryHarvestCrops()
 void cVillager::HandleFarmerPlaceCrops()
 {
 	// Check if there is still farmland at the spot where the crops were.
-	if (m_World->GetBlock(m_CropsPos.addedY(-1)) == E_BLOCK_FARMLAND)
+	if (m_World->GetBlock(m_CropsPos).Type() == BlockType::Farmland)
 	{
-		m_World->SetBlock(m_CropsPos, E_BLOCK_CROPS, 0);
+		m_World->SetBlock(m_CropsPos, Block::Wheat::Wheat(0));
 	}
 }
 
@@ -212,17 +217,15 @@ void cVillager::HandleFarmerPlaceCrops()
 
 
 
-bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType)
+bool cVillager::IsBlockFarmable(BlockState a_Block)
 {
-	switch (a_BlockType)
+	switch (a_Block.Type())
 	{
-		case E_BLOCK_BEETROOTS:
-		case E_BLOCK_CROPS:
-		case E_BLOCK_POTATOES:
-		case E_BLOCK_CARROTS:
-		{
+		case BlockType::Beetroots:
+		case BlockType::Wheat:
+		case BlockType::Potatoes:
+		case BlockType::Carrots:
 			return true;
-		}
 		default: return false;
 	}
 }
