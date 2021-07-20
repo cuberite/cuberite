@@ -2805,27 +2805,37 @@ void cProtocol_1_8_0::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel)
 {
-	if (a_Channel == "MC|AdvCdm")
+	if ((a_Channel == "MC|AdvCdm") || (a_Channel == "MC|AdvCmd"))  // Spelling was fixed in 15w34
 	{
-		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Mode);
+		// https://wiki.vg/index.php?title=Plugin_channels&oldid=14089#MC.7CAdvCmd
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Dest);
 
-		switch (Mode)
+		switch (Dest)
 		{
 			case 0x00:
 			{
+				// Editing a command-block
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockX);
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockY);
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockZ);
 				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
-
 				m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
+				break;
+			}
+
+			case 0x01:
+			{
+				// Editing a command-block-minecart
+				HANDLE_READ(a_ByteBuffer, ReadBEUInt32,      UInt32,  EntityID);
+				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+				m_Client->HandleCommandBlockEntityChange(EntityID, Command);
 				break;
 			}
 
 			default:
 			{
-				m_Client->SendChat(Printf("Failure setting command block command; unhandled mode %u (0x%02x)", Mode, Mode), mtFailure);
-				LOG("Unhandled MC|AdvCdm packet mode.");
+				m_Client->SendChat(Printf("Failure setting command block command; unhandled destination %u (0x%02x)", Dest, Dest), mtFailure);
+				LOG("Unhandled MC|AdvCmd packet destination.");
 				return;
 			}
 		}  // switch (Mode)

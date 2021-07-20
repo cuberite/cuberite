@@ -940,6 +940,11 @@ void cClientHandle::HandleCommandBlockBlockChange(int a_BlockX, int a_BlockY, in
 		Kick("Command block string unexpectedly empty - hacked client?");
 		return;
 	}
+	if ((m_Player == nullptr) || !m_Player->HasPermission("comandblock.set"))
+	{
+		SendChat("You cannot edit command blocks on this server", mtFailure);
+		return;
+	}
 
 	cWorld * World = m_Player->GetWorld();
 	if (World->AreCommandBlocksEnabled())

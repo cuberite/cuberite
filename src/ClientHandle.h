@@ -310,11 +310,11 @@ public:  // tolua_export
 	/** Called when the protocol detects a chat packet. */
 	void HandleChat(const AString & a_Message);
 
-	/** Called when the protocol receives a MC|AdvCdm plugin message, indicating that the player set a new
+	/** Called when the protocol receives a message, indicating that the player set a new
 	command in the command block UI, for a block-based commandblock. */
 	void HandleCommandBlockBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_NewCommand);
 
-	/** Called when the protocol receives a MC|AdvCdm plugin message, indicating that the player set a new
+	/** Called when the protocol receives a message, indicating that the player set a new
 	command in the command block UI, for an entity-based commandblock (minecart?). */
 	void HandleCommandBlockEntityChange(UInt32 a_EntityID, const AString & a_NewCommand);
 
