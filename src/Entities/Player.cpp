@@ -2333,15 +2333,6 @@ void cPlayer::LoadRank(void)
 
 
 
-bool cPlayer::PlaceBlock(const Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-	return PlaceBlocks({ { a_Position, a_BlockType, a_BlockMeta } });
-}
-
-
-
-
-
 void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Range)
 {
 	// Collect the coords of all the blocks to send:
@@ -2451,6 +2442,15 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const std::initializer_list<sSetB
 const cUUID & cPlayer::GetUUID(void) const
 {
 	return m_ClientHandle->GetUUID();
+}
+
+
+
+
+
+bool cPlayer::PlaceBlock(const Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	return PlaceBlocks({ { a_Position, a_BlockType, a_BlockMeta } });
 }
 
 

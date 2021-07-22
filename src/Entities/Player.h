@@ -548,12 +548,6 @@ public:
 	Loads the m_Rank, m_Permissions, m_MsgPrefix, m_MsgSuffix and m_MsgNameColorCode members. */
 	void LoadRank(void);
 
-	/** Calls the block-placement hook and places the block in the world, unless refused by the hook.
-	If the hook prevents the placement, sends the current block at the specified coords back to the client.
-	Assumes that the block is in a currently loaded chunk.
-	Returns true if the block is successfully placed. */
-	bool PlaceBlock(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-
 	/** Sends the block in the specified range around the specified coord to the client
 	as a block change packet.
 	The blocks in range (a_BlockX - a_Range, a_BlockX + a_Range) are sent (NY-metric). */
@@ -565,12 +559,13 @@ public:
 
 	// tolua_end
 
+	/** Attempts to place the block in the world with a call to PlaceBlocks. */
+	bool PlaceBlock(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+
 	/** Calls the block placement hooks and places the blocks in the world.
-	First the "placing" hooks for all the blocks are called, then the blocks are placed, and finally
-	the "placed" hooks are called.
+	First the "placing" hooks for all the blocks are called, then the blocks are placed, and finally the "placed" hooks are called.
 	If the any of the "placing" hooks aborts, none of the blocks are placed and the function returns false.
-	Returns true if all the blocks are placed.
-	Assumes that all the blocks are in currently loaded chunks. */
+	Returns true if all the blocks are placed. */
 	bool PlaceBlocks(std::initializer_list<sSetBlock> a_Blocks);
 
 	/** Notify nearby wolves that the player or one of the player's wolves took damage or did damage to an entity

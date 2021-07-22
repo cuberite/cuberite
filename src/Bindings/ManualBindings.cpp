@@ -1595,6 +1595,63 @@ static int tolua_cPlayer_GetRestrictions(lua_State * tolua_S)
 
 
 
+static int tolua_cPlayer_GetUUID(lua_State * tolua_S)
+{
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cPlayer"))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cPlayer * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	// Return the UUID as a string
+	L.Push(Self->GetUUID().ToShortString());
+	return 1;
+}
+
+
+
+
+
+static int tolua_cPlayer_PlaceBlock(lua_State * tolua_S)
+{
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cPlayer") ||
+		!L.CheckParamUserType(2, "Vector3<int>") ||
+		!L.CheckParamNumber(3, 4) ||
+		!L.CheckParamEnd(5)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cPlayer * Self;
+	Vector3i Position;
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	L.GetStackValues(1, Self, Position, BlockType, BlockMeta);
+
+	if (!cChunkDef::IsValidHeight(Position.y))
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
+	}
+
+	// Return the result of placement:
+	L.Push(Self->PlaceBlock(Position, BlockType, BlockMeta));
+	return 1;
+}
+
+
+
+
+
 static int tolua_cPlayer_PermissionMatches(lua_State * tolua_S)
 {
 	// Function signature: cPlayer:PermissionMatches(PermissionStr, TemplateStr) -> bool
@@ -1616,28 +1673,6 @@ static int tolua_cPlayer_PermissionMatches(lua_State * tolua_S)
 
 	// Push the result of the match:
 	L.Push(cPlayer::PermissionMatches(StringSplit(Permission, "."), StringSplit(Template, ".")));
-	return 1;
-}
-
-
-
-
-
-static int tolua_cPlayer_GetUUID(lua_State * tolua_S)
-{
-	// Check the params:
-	cLuaState L(tolua_S);
-	if (!L.CheckParamSelf("cPlayer"))
-	{
-		return 0;
-	}
-
-	// Get the params:
-	cPlayer * Self = nullptr;
-	L.GetStackValue(1, Self);
-
-	// Return the UUID as a string
-	L.Push(Self->GetUUID().ToShortString());
 	return 1;
 }
 
@@ -4601,8 +4636,9 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cPlayer");
 			tolua_function(tolua_S, "GetPermissions",    tolua_cPlayer_GetPermissions);
 			tolua_function(tolua_S, "GetRestrictions",   tolua_cPlayer_GetRestrictions);
-			tolua_function(tolua_S, "PermissionMatches", tolua_cPlayer_PermissionMatches);
 			tolua_function(tolua_S, "GetUUID",           tolua_cPlayer_GetUUID);
+			tolua_function(tolua_S, "PermissionMatches", tolua_cPlayer_PermissionMatches);
+			tolua_function(tolua_S, "PlaceBlock",        tolua_cPlayer_PlaceBlock);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cPlugin");
