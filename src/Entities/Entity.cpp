@@ -390,6 +390,18 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
+	if (IsPainting())
+	{
+		KilledBy(a_TDI);
+
+		if (a_TDI.Attacker != nullptr)
+		{
+			a_TDI.Attacker->Killed(this);
+		}
+
+		return true;
+	}
+
 	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPlayer()))
 	{
 		cPlayer * Player = static_cast<cPlayer *>(a_TDI.Attacker);
