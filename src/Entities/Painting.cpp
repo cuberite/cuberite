@@ -46,8 +46,8 @@ void cPainting::GetDrops(cItems & a_Items, cEntity * a_Killer)
 
 void cPainting::KilledBy(TakeDamageInfo & a_TDI)
 {
-        Super::KilledBy(a_TDI);
-        Destroy();
+	Super::KilledBy(a_TDI);
+	Destroy();
 
-        m_World->BroadcastSoundEffect("entity.painting.break", GetPosition(), 1, 1);
+	m_World->BroadcastSoundEffect("entity.painting.break", GetPosition(), 1, 1);
 }
