@@ -41,7 +41,3 @@ void cPainting::GetDrops(cItems & a_Items, cEntity * a_Killer)
 	
 	 m_World->BroadcastSoundEffect("entity.painting.break", GetPosition(), 1, 1);
 }
-
-
-
-
