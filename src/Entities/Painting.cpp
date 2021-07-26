@@ -24,6 +24,8 @@ void cPainting::SpawnOn(cClientHandle & a_Client)
 {
 	Super::SpawnOn(a_Client);
 	a_Client.SendPaintingSpawn(*this);
+	
+	m_World->BroadcastSoundEffect("entity.painting.place", GetPosition(), 1, 1);
 }
 
 
@@ -36,6 +38,8 @@ void cPainting::GetDrops(cItems & a_Items, cEntity * a_Killer)
 	{
 		a_Items.emplace_back(E_ITEM_PAINTING);
 	}
+	
+	 m_World->BroadcastSoundEffect("entity.painting.break", GetPosition(), 1, 1);
 }
 
 
