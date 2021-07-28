@@ -13,96 +13,93 @@
 
 
 
-namespace StatisticsSerializer
+static auto MakeStatisticsDirectory(const std::string & WorldPath, std::string && FileName)
 {
-	static auto MakeStatisticsDirectory(const std::string & WorldPath, std::string && FileName)
+	// Even though stats are shared between worlds, they are (usually) saved
+	// inside the folder of the default world.
+
+	// Path to the world's statistics folder.
+	const auto Path = WorldPath + cFile::GetPathSeparator() + "stats";
+
+	// Ensure that the directory exists.
+	cFile::CreateFolder(Path);
+
+	return Path + cFile::GetPathSeparator() + std::move(FileName) + ".json";
+}
+
+
+
+
+
+static void SaveStatToJSON(const StatisticsManager & Manager, Json::Value & a_Out)
+{
+	if (Manager.Custom.empty())
 	{
-		// Even though stats are shared between worlds, they are (usually) saved
-		// inside the folder of the default world.
-
-		// Path to the world's statistics folder.
-		const auto Path = WorldPath + cFile::GetPathSeparator() + "stats";
-
-		// Ensure that the directory exists.
-		cFile::CreateFolder(Path);
-
-		return Path + cFile::GetPathSeparator() + std::move(FileName) + ".json";
+		// Avoid saving "custom": null to disk:
+		return;
 	}
 
-
-
-
-
-	static void SaveStatToJSON(const StatisticsManager & Manager, Json::Value & a_Out)
+	auto & Custom = a_Out["custom"];
+	for (const auto & [Statistic, Value] : Manager.Custom)
 	{
-		if (Manager.Custom.empty())
+		Custom[NamespaceSerializer::From(Statistic).data()] = Value;
+	}
+}
+
+
+
+
+
+static void LoadCustomStatFromJSON(StatisticsManager & Manager, const Json::Value & a_In)
+{
+	for (auto it = a_In.begin(); it != a_In.end(); ++it)
+	{
+		const auto & Key = it.key().asString();
+		const auto StatInfo = NamespaceSerializer::SplitNamespacedID(Key);
+		if (StatInfo.first == NamespaceSerializer::Namespace::Unknown)
 		{
-			// Avoid saving "custom": null to disk:
-			return;
+			// Ignore non-Vanilla, non-Cuberite namespaces for now:
+			continue;
 		}
 
-		auto & Custom = a_Out["custom"];
-		for (const auto & [Statistic, Value] : Manager.Custom)
+		const auto & StatName = StatInfo.second;
+		try
 		{
-			Custom[NamespaceSerializer::From(Statistic).data()] = Value;
+			Manager.Custom[NamespaceSerializer::ToCustomStatistic(StatName)] = it->asUInt();
+		}
+		catch (const std::out_of_range &)
+		{
+			FLOGWARNING("Invalid statistic type \"{}\"", StatName);
+		}
+		catch (const Json::LogicError &)
+		{
+			FLOGWARNING("Invalid statistic value for type \"{}\"", StatName);
 		}
 	}
+}
 
 
 
 
 
-	static void LoadCustomStatFromJSON(StatisticsManager & Manager, const Json::Value & a_In)
-	{
-		for (auto it = a_In.begin(); it != a_In.end(); ++it)
-		{
-			const auto & Key = it.key().asString();
-			const auto StatInfo = NamespaceSerializer::SplitNamespacedID(Key);
-			if (StatInfo.first == NamespaceSerializer::Namespace::Unknown)
-			{
-				// Ignore non-Vanilla, non-Cuberite namespaces for now:
-				continue;
-			}
+void StatisticsSerializer::Load(StatisticsManager & Manager, const std::string & WorldPath, std::string && FileName)
+{
+	Json::Value Root;
+	InputFileStream(MakeStatisticsDirectory(WorldPath, std::move(FileName))) >> Root;
 
-			const auto & StatName = StatInfo.second;
-			try
-			{
-				Manager.Custom[NamespaceSerializer::ToCustomStatistic(StatName)] = it->asUInt();
-			}
-			catch (const std::out_of_range &)
-			{
-				FLOGWARNING("Invalid statistic type \"{}\"", StatName);
-			}
-			catch (const Json::LogicError &)
-			{
-				FLOGWARNING("Invalid statistic value for type \"{}\"", StatName);
-			}
-		}
-	}
+	LoadCustomStatFromJSON(Manager, Root["stats"]["custom"]);
+}
 
 
 
 
 
-	void Load(StatisticsManager & Manager, const std::string & WorldPath, std::string && FileName)
-	{
-		Json::Value Root;
-		InputFileStream(MakeStatisticsDirectory(WorldPath, std::move(FileName))) >> Root;
+void StatisticsSerializer::Save(const StatisticsManager & Manager, const std::string & WorldPath, std::string && FileName)
+{
+	Json::Value Root;
 
-		LoadCustomStatFromJSON(Manager, Root["stats"]["custom"]);
-	}
+	SaveStatToJSON(Manager, Root["stats"]);
+	Root["DataVersion"] = NamespaceSerializer::DataVersion();
 
-
-
-
-
-	void Save(const StatisticsManager & Manager, const std::string & WorldPath, std::string && FileName)
-	{
-		Json::Value Root;
-
-		SaveStatToJSON(Manager, Root["stats"]);
-		Root["DataVersion"] = NamespaceSerializer::DataVersion();
-
-		OutputFileStream(MakeStatisticsDirectory(WorldPath, std::move(FileName))) << Root;
-	}
+	OutputFileStream(MakeStatisticsDirectory(WorldPath, std::move(FileName))) << Root;
 }
