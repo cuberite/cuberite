@@ -423,20 +423,27 @@ void cPawn::HandleFalling(void)
 				Damage = static_cast<int>(static_cast<float>(Damage) * 0.33);
 			}
 
-			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
-
 			// Fall particles:
 			if (const auto Below = POS_TOINT.addedY(-1); Below.y >= 0)
 			{
+				const auto BlockBelow = GetWorld()->GetBlock(Below);
+
+				if (BlockBelow == E_BLOCK_HAY_BALE)
+				{
+					Damage = std::clamp(static_cast<int>(static_cast<float>(Damage) * 0.2), 1, 20);
+				}
+
 				GetWorld()->BroadcastParticleEffect(
 					"blockdust",
 					GetPosition(),
 					{ 0, 0, 0 },
 					(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
 					static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
-					{ { GetWorld()->GetBlock(Below), 0 } }
+					{ { BlockBelow, 0 } }
 				);
 			}
+
+			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
 		}
 
 		m_bTouchGround = true;
