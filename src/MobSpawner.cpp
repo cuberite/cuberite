@@ -209,7 +209,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		case mtSlime:
 		{
 			auto maxLight = Random.RandInt(0, 7);
-			auto phaseNumber = ((long long int)std::floor(a_Chunk->GetWorld()->GetWorldAge().count() / 24000)) % 8;
+			auto phaseNumber = int(std::floor(a_Chunk->GetWorld()->GetWorldAge().count() / 24000)) % 8;
 			return
 			(
 				(TargetBlock == E_BLOCK_AIR) &&
