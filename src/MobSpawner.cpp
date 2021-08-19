@@ -212,8 +212,19 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			(
 				(TargetBlock == E_BLOCK_AIR) &&
 				(BlockAbove == E_BLOCK_AIR) &&
-				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
-				((a_RelPos.y <= 40) || (a_Biome == biSwampland))
+				(
+					(!cBlockInfo::IsTransparent(BlockBelow)) ||
+					(a_DisableSolidBelowCheck)) &&
+				(
+					(a_RelPos.y <= 40) ||
+					(
+						(a_Biome == biSwampland) &&
+						(SkyLight <= 7) &&
+						(BlockLight <= 7) &&
+						(a_RelPos.y >= 50) &&
+						(a_RelPos.y <= 70)
+					)
+				)
 			);
 		}
 
