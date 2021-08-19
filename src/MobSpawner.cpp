@@ -208,6 +208,8 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		case mtMagmaCube:
 		case mtSlime:
 		{
+			auto maxLight = Random.RandInt(0, 7);
+			auto phaseNumber = ((long long int)std::floor(a_Chunk->GetWorld()->GetWorldAge().count() / 24000)) % 8;
 			return
 			(
 				(TargetBlock == E_BLOCK_AIR) &&
@@ -219,10 +221,12 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 					(a_RelPos.y <= 40) ||
 					(
 						(a_Biome == biSwampland) &&
-						(SkyLight <= 7) &&
-						(BlockLight <= 7) &&
 						(a_RelPos.y >= 50) &&
-						(a_RelPos.y <= 70)
+						(a_RelPos.y <= 70) &&
+						(SkyLight <= maxLight) &&
+						(BlockLight <= maxLight) &&
+						((std::abs(phaseNumber - 4) / 4) > Random.RandReal()) &&
+						(Random.RandBool(0.5))
 					)
 				)
 			);
