@@ -208,8 +208,10 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		case mtMagmaCube:
 		case mtSlime:
 		{
+			const int AMOUNT_MOON_PHASES = 8;
 			auto maxLight = Random.RandInt(0, 7);
-			auto phaseNumber = int(std::floor(a_Chunk->GetWorld()->GetWorldAge().count() / 24000)) % 8;
+			auto moonPhaseNumber = static_cast<int>(std::floor(a_Chunk->GetWorld()->GetWorldAge().count() / 24000)) % AMOUNT_MOON_PHASES;
+			auto moonThreshold = static_cast<float>(std::abs(moonPhaseNumber - (AMOUNT_MOON_PHASES / 2)) / (AMOUNT_MOON_PHASES / 2));
 			return
 			(
 				(TargetBlock == E_BLOCK_AIR) &&
@@ -225,7 +227,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 						(a_RelPos.y <= 70) &&
 						(SkyLight <= maxLight) &&
 						(BlockLight <= maxLight) &&
-						((std::abs(phaseNumber - 4) / 4) > Random.RandReal()) &&
+						(Random.RandBool(moonThreshold)) &&
 						(Random.RandBool(0.5))
 					)
 				)
