@@ -1335,7 +1335,7 @@ void cPlayer::AwardAchievement(const CustomStatistic a_Ach)
 		Msg.SetMessageType(mtSuccess);
 		// TODO: cCompositeChat should not use protocol-specific strings
 		// Msg.AddShowAchievementPart(GetName(), nameNew);
-		Msg.AddTextPart("Achivement get!");
+		Msg.AddTextPart("Achievement get!");
 		m_World->BroadcastChat(Msg);
 	}
 
