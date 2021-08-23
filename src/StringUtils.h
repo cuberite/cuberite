@@ -90,6 +90,9 @@ extern size_t RateCompareString(const AString & s1, const AString & s2);
 /** Replaces each occurence of iNeedle in iHayStack with iReplaceWith */
 extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith);  // tolua_export
 
+/** Replaces each occurence of iNeedle in iHayStack with iReplaceWith, after URL-encoding iReplaceWith */
+extern void ReplaceURL(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith);
+
 /** Converts a stream of BE shorts into UTF-8 string; returns a_UTF8. */
 extern AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8);
 

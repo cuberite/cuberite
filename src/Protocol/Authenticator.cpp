@@ -144,8 +144,8 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 
 	// Create the GET request:
 	AString ActualAddress = m_Address;
-	ReplaceString(ActualAddress, "%USERNAME%", a_UserName);
-	ReplaceString(ActualAddress, "%SERVERID%", a_ServerId);
+	ReplaceURL(ActualAddress, "%USERNAME%", a_UserName);
+	ReplaceURL(ActualAddress, "%SERVERID%", a_ServerId);
 
 	AString Request;
 	Request += "GET " + ActualAddress + " HTTP/1.0\r\n";
