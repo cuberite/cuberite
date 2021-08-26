@@ -133,6 +133,7 @@ void cClientHandle::Destroy(void)
 
 	{
 		cCSLock Lock(m_CSOutgoingData);
+		m_Protocol.HandleOutgoingData(m_OutgoingData);  // Finalise any encryption.
 		m_Link->Send(m_OutgoingData.data(), m_OutgoingData.size());  // Flush remaining data.
 		m_Link->Shutdown();  // Cleanly close the connection.
 		m_Link.reset();  // Release the strong reference cTCPLink holds to ourself.
