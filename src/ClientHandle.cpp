@@ -424,7 +424,7 @@ void cClientHandle::FinishAuthenticate()
 	}
 	catch (const std::exception & Oops)
 	{
-		LOGWARNING("Error reading player \"%s\": %s", GetUsername().c_str(), Oops.what());
+		LOGWARNING("Player \"%s\" save or statistics file loading failed: %s", GetUsername().c_str(), Oops.what());
 		Kick("Contact an operator.\n\nYour player's save files could not be parsed.\nTo avoid data loss you are prevented from joining.");
 		return;
 	}
@@ -845,8 +845,8 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		// Only allow enchantment if the player has sufficient levels and lapis to enchant:
 		if ((m_Player->GetCurrentXp() >= XpRequired) && (LapisStack.m_ItemCount >= LapisRequired))
 		{
-			/** We need to reduce the player's level by the number of lapis required.
-			However we need to keep the resulting percentage filled the same. */
+			// We need to reduce the player's level by the number of lapis required.
+			// However we need to keep the resulting percentage filled the same.
 
 			const auto TargetLevel = m_Player->GetXpLevel() - LapisRequired;
 			const auto CurrentFillPercent = m_Player->GetXpPercentage();
@@ -872,7 +872,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		}
 	}
 
-	// Retrieve the enchanted item corresponding to our chosen option (top, middle, bottom)
+	// The enchanted item corresponding to our chosen option (top, middle, bottom).
 	cItem EnchantedItem = Window->m_SlotArea->SelectEnchantedOption(a_Enchantment);
 
 	// Set the item slot to our new enchanted item:
