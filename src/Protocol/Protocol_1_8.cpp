@@ -934,13 +934,12 @@ void cProtocol_1_8_0::SendPlayerAbilities(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktPlayerAbilities);
 	Byte Flags = 0;
-	cPlayer * Player = m_Client->GetPlayer();
-	if (Player->IsGameModeCreative())
+	const cPlayer * Player = m_Client->GetPlayer();
+
+	if (Player->IsGameModeCreative() || Player->IsGameModeSpectator())
 	{
-		Flags |= 0x01;
-		Flags |= 0x08;  // Godmode, used for creative
+		Flags |= 0x01;  // Invulnerability.
 	}
 	if (Player->IsFlying())
 	{
@@ -950,6 +949,12 @@ void cProtocol_1_8_0::SendPlayerAbilities(void)
 	{
 		Flags |= 0x04;
 	}
+	if (Player->IsGameModeCreative())
+	{
+		Flags |= 0x08;  // Godmode: creative instant break.
+	}
+
+	cPacketizer Pkt(*this, pktPlayerAbilities);
 	Pkt.WriteBEUInt8(Flags);
 	Pkt.WriteBEFloat(static_cast<float>(0.05 * Player->GetFlyingMaxSpeed()));
 	Pkt.WriteBEFloat(static_cast<float>(0.1 * Player->GetNormalMaxSpeed()));
