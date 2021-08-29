@@ -2903,17 +2903,17 @@ void cClientHandle::SendResetTitle()
 
 
 
-void cClientHandle::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
+void cClientHandle::SendRespawn(const eDimension a_Dimension, const bool a_IsRespawningFromDeath)
 {
-	if (!a_ShouldIgnoreDimensionChecks && (a_Dimension == m_Player->GetWorld()->GetDimension()))
+	if (!a_IsRespawningFromDeath && (a_Dimension == m_Player->GetWorld()->GetDimension()))
 	{
 		// The client goes crazy if we send a respawn packet with the dimension of the current world
 		// So we send a temporary one first.
-		// This is not needed when the player dies, hence the a_ShouldIgnoreDimensionChecks flag.
-		// a_ShouldIgnoreDimensionChecks is true only at cPlayer::Respawn, which is called after
-		// the player dies.
-		eDimension TemporaryDimension = (a_Dimension == dimOverworld) ? dimNether : dimOverworld;
-		m_Protocol->SendRespawn(TemporaryDimension);
+		// This is not needed when the player dies, hence the a_IsRespawningFromDeath flag.
+		// a_IsRespawningFromDeath is true only at cPlayer::Respawn, which is called after the player dies.
+
+		// First send a temporary dimension to placate the client:
+		m_Protocol->SendRespawn((a_Dimension == dimOverworld) ? dimNether : dimOverworld);
 	}
 
 	m_Protocol->SendRespawn(a_Dimension);

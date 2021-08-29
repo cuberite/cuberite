@@ -208,7 +208,7 @@ public:  // tolua_export
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
 	void SendResourcePack               (const AString & a_ResourcePackUrl);
 	void SendResetTitle                 (void);  // tolua_export
-	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks);
+	void SendRespawn                    (eDimension a_Dimension, bool a_IsRespawningFromDeath);
 	void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
 	void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void SendSetSubTitle                (const cCompositeChat & a_SubTitle);  // tolua_export
