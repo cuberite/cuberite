@@ -104,6 +104,10 @@ public:  // tolua_export
 	/** Function to mark bungee / proxy connection on this client, and to add proxy-related data */
 	void ProxyInit(const AString & a_IPString, const cUUID & a_UUID);
 	void ProxyInit(const AString & a_IPString, const cUUID & a_UUID, const Json::Value & a_Properties);
+	
+	/** Processes the data in the network input buffer.
+	Called by both cWorld::Tick() and ServerTick(). */
+	void ProcessProtocolIn(void);
 
 	/** Flushes all buffered outgoing data to the network. */
 	void ProcessProtocolOut();
@@ -464,8 +468,9 @@ private:
 
 	/** A pointer to a World-owned player object, created in FinishAuthenticate when authentication succeeds.
 	The player should only be accessed from the tick thread of the World that owns him.
-	After the player object is handed off to the World, lifetime is managed automatically, guaranteed to outlast this client handle.
-	The player self-destructs some time after the client handle enters the Destroyed state. */
+	After the player object is handed off to the World, its lifetime is managed automatically, and strongly owns this client handle.
+	The player self-destructs some time after the client handle enters the Destroyed state.
+	We are therefore guaranteed that while m_State < Destroyed, that is when when we need to access m_Player, m_Player is valid. */
 	cPlayer * m_Player;
 
 	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know
@@ -603,10 +608,6 @@ private:
 	/** Called to update m_State.
 	Only succeeds if a_NewState > m_State, otherwise returns false. */
 	bool SetState(eState a_NewState);
-
-	/** Processes the data in the network input buffer.
-	Called by both Tick() and ServerTick(). */
-	void ProcessProtocolIn(void);
 
 	// cTCPLink::cCallbacks overrides:
 	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override;

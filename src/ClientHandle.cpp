@@ -243,6 +243,36 @@ void cClientHandle::ProxyInit(const AString & a_IPString, const cUUID & a_UUID, 
 
 
 
+void cClientHandle::ProcessProtocolIn(void)
+{
+	// Process received network data:
+	decltype(m_IncomingData) IncomingData;
+	{
+		cCSLock Lock(m_CSIncomingData);
+
+		// Bail out when nothing was received:
+		if (m_IncomingData.empty())
+		{
+			return;
+		}
+
+		std::swap(IncomingData, m_IncomingData);
+	}
+
+	try
+	{
+		m_Protocol.HandleIncomingData(*this, IncomingData);
+	}
+	catch (const std::exception & Oops)
+	{
+		Kick(Oops.what());
+	}
+}
+
+
+
+
+
 void cClientHandle::ProcessProtocolOut()
 {
 	decltype(m_OutgoingData) OutgoingData;
@@ -2075,15 +2105,6 @@ void cClientHandle::Tick(float a_Dt)
 {
 	using namespace std::chrono_literals;
 
-	// anticheat fastbreak
-	if (m_HasStartedDigging)
-	{
-		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock({ m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ });
-		m_BreakProgress += m_Player->GetMiningProgressPerTick(Block);
-	}
-
-	ProcessProtocolIn();
-
 	if (IsDestroyed())
 	{
 		return;
@@ -2159,6 +2180,13 @@ void cClientHandle::Tick(float a_Dt)
 	if ((m_Player->GetWorld()->GetWorldAge() - m_LastUnloadCheck) > 5s)
 	{
 		UnloadOutOfRangeChunks();
+	}
+
+	// anticheat fastbreak
+	if (m_HasStartedDigging)
+	{
+		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock({ m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ });
+		m_BreakProgress += m_Player->GetMiningProgressPerTick(Block);
 	}
 
 	// Handle block break animation:
@@ -3377,36 +3405,6 @@ bool cClientHandle::SetState(eState a_NewState)
 	}
 	m_State = a_NewState;
 	return true;
-}
-
-
-
-
-
-void cClientHandle::ProcessProtocolIn(void)
-{
-	// Process received network data:
-	decltype(m_IncomingData) IncomingData;
-	{
-		cCSLock Lock(m_CSIncomingData);
-
-		// Bail out when nothing was received:
-		if (m_IncomingData.empty())
-		{
-			return;
-		}
-
-		std::swap(IncomingData, m_IncomingData);
-	}
-
-	try
-	{
-		m_Protocol.HandleIncomingData(*this, IncomingData);
-	}
-	catch (const std::exception & Oops)
-	{
-		Kick(Oops.what());
-	}
 }
 
 
