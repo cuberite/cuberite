@@ -1329,24 +1329,23 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 
 void cPlayer::UpdateCapabilities()
 {
-	// Fly ability:
-	if (IsGameModeCreative() || IsGameModeSpectator())
+	if (IsGameModeCreative())
 	{
 		m_IsFlightCapable = true;
+		m_IsVisible = true;
+	}
+	else if (IsGameModeSpectator())
+	{
+		m_DraggingItem.Empty();  // Clear the current dragging item of spectators.
+		m_IsFlightCapable = true;
+		m_IsFlying = true;  // Spectators are always in flight mode.
+		m_IsVisible = false;  // Spectators are invisible.
 	}
 	else
 	{
-		m_IsFlying = false;
 		m_IsFlightCapable = false;
-	}
-
-	// Visible:
-	m_IsVisible = !IsGameModeSpectator();
-
-	// Clear the current dragging item of spectators:
-	if (IsGameModeSpectator())
-	{
-		m_DraggingItem.Empty();
+		m_IsFlying = false;
+		m_IsVisible = true;
 	}
 }
 
