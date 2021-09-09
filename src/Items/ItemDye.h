@@ -128,21 +128,18 @@ public:
 
 			case E_BLOCK_BEETROOTS:
 			{
+				// Fix GH #4805.
+				// Bonemeal should only advance growth, not spawn produce, and should not be consumed if plant at maturity:
 				if (a_World.GrowPlantAt(a_BlockPos, 1) <= 0)
 				{
-					// Fix GH #4805 (bonemeal should only advance growth, not spawn produce):
 					return false;
 				}
-
 				a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockPos, 0);
-
-				// 75% chance of 1-stage growth:
-				if (!GetRandomProvider().RandBool(0.75))
+				if (GetRandomProvider().RandBool(0.25))
 				{
-					// Hit the 25%, rollback:
+					// 75% chance of 1-stage growth, but we hit the 25%, rollback:
 					a_World.GrowPlantAt(a_BlockPos, -1);
 				}
-
 				return true;
 			}  // case beetroots
 
