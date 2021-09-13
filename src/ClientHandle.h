@@ -101,6 +101,10 @@ public:  // tolua_export
 	We use Version-3 UUIDs for offline UUIDs, online UUIDs are Version-4, thus we can tell them apart. */
 	static bool IsUUIDOnline(const cUUID & a_UUID);  // Exported in ManualBindings.cpp
 
+	/** Function to mark bungee / proxy connection on this client, and to add proxy-related data */
+	void ProxyInit(const AString & a_IPString, const cUUID & a_UUID);
+	void ProxyInit(const AString & a_IPString, const cUUID & a_UUID, const Json::Value & a_Properties);
+
 	/** Flushes all buffered outgoing data to the network. */
 	void ProcessProtocolOut();
 
@@ -113,6 +117,9 @@ public:  // tolua_export
 	);
 
 	void Kick(const AString & a_Reason);  // tolua_export
+
+	/** Authenticates the specified user with the bungee proxy server */
+	bool BungeeAuthenticate();
 
 	/** Authenticates the specified user, called by cAuthenticator */
 	void Authenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
@@ -469,6 +476,8 @@ private:
 	and a member of m_SentChunks.
 	Otherwise, this contains an arbitrary value which should not be used. */
 	cChunkCoords m_CachedSentChunk;
+
+	bool m_ProxyConnection;  ///< True if player connected from a proxy (Bungee / Velocity)
 
 	bool m_HasSentDC;  ///< True if a Disconnect packet has been sent in either direction
 

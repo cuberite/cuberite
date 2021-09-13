@@ -123,20 +123,18 @@ cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_Ser
 
 				LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
 
-				m_Client->SetIPString(Params[1]);
-
 				cUUID UUID;
 				UUID.FromString(Params[2]);
-				m_Client->SetUUID(UUID);
 
 				Json::Value root;
 				if (!JsonUtils::ParseString(Params[3], root))
 				{
 					LOGERROR("Unable to parse player properties: '%s'", Params[3]);
+					m_Client->ProxyInit(Params[1], UUID);
 				}
 				else
 				{
-					m_Client->SetProperties(root);
+					m_Client->ProxyInit(Params[1], UUID, root);
 				}
 			}
 			else
