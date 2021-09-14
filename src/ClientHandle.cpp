@@ -1492,9 +1492,10 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 
 void cClientHandle::HandlePlayerMove(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround)
 {
-	if (m_Player->IsFrozen())
+	if (m_Player->IsFrozen() || m_Player->GetHealth() <= 0)
 	{
-		// Ignore client-side updates if the player is frozen:
+		// Ignore client-side updates if the player is frozen or dead:
+		SendPlayerMoveLook();
 		return;
 	}
 
