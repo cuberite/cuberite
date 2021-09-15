@@ -1143,6 +1143,12 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 {
+	if (m_Player->IsGameModeAdventure())
+	{
+		// Players in adventure mode can't destroy blocks
+		return;
+	}
+
 	if (
 		m_HasStartedDigging &&
 		(a_BlockX == m_LastDigBlockX) &&
