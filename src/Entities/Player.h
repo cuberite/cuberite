@@ -518,12 +518,15 @@ public:
 	*/
 	Vector3i GetLastBedPos(void) const { return m_LastBedPos; }
 
+	/** Gets the current respawn position weather it is world spawn, bed or spawnpoint */
+	Vector3i GetRespawnPos(void);
+
 	/** Sets the player's bed (home / respawn) position to the specified position.
 	Sets the respawn world to the player's world. */
-	void SetBedPos(const Vector3i a_Position);
+	void SetBedPos(const Vector3i a_Position, const bool a_CheckBedUponRespawn = true);
 
 	/** Sets the player's bed (home / respawn) position and respawn world to the specified parameters. */
-	void SetBedPos(const Vector3i a_Position, const cWorld & a_World);
+	void SetBedPos(const Vector3i a_Position, const cWorld & a_World, const bool a_CheckBedUponRespawn = true);
 
 	// tolua_end
 
@@ -657,6 +660,9 @@ private:
 
 	/** The player's last saved bed position */
 	Vector3i m_LastBedPos;
+
+	/** Weather or not should perform a check upon respawn weather a bes is unobstructed and available */
+	bool m_CheckBedUponRespawn;
 
 	/** The name of the world which the player respawns in upon death.
 	This is stored as a string to enable SaveToDisk to not touch cRoot, and thus can be safely called in the player's destructor. */

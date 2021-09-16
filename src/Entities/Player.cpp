@@ -776,8 +776,38 @@ void cPlayer::SetCustomName(const AString & a_CustomName)
 
 
 
-void cPlayer::SetBedPos(const Vector3i a_Position)
+Vector3i cPlayer::GetRespawnPos(void)
 {
+	if (!m_CheckBedUponRespawn)
+	{
+		return m_LastBedPos;
+	}
+	// (0, 0, 0) As Null value => respawn at default world spawn
+	if (m_LastBedPos != Vector3i())
+	{
+		const auto BedWorld = GetBedWorld();
+		if (BedWorld->GetBlock(m_LastBedPos) == E_BLOCK_BED)
+		{
+			return m_LastBedPos;
+		}
+	}
+
+	const auto DefaultWorld = cRoot::Get()->GetDefaultWorld();
+
+	// Reset spawn position to 0, 0, 0 meaning to respawn at world spawn
+	SetBedPos(Vector3i(), *DefaultWorld, false);
+
+	// TODO return world spawn
+	return m_LastBedPos;
+}
+
+
+
+
+
+void cPlayer::SetBedPos(const Vector3i a_Position, const bool a_CheckBedUponRespawn)
+{
+	m_CheckBedUponRespawn = a_CheckBedUponRespawn;
 	m_LastBedPos = a_Position;
 	m_SpawnWorldName = m_World->GetName();
 }
@@ -786,8 +816,9 @@ void cPlayer::SetBedPos(const Vector3i a_Position)
 
 
 
-void cPlayer::SetBedPos(const Vector3i a_Position, const cWorld & a_World)
+void cPlayer::SetBedPos(const Vector3i a_Position, const cWorld & a_World, const bool a_CheckBedUponRespawn)
 {
+	m_CheckBedUponRespawn = a_CheckBedUponRespawn;
 	m_LastBedPos = a_Position;
 	m_SpawnWorldName = a_World.GetName();
 }
@@ -922,14 +953,18 @@ void cPlayer::Respawn(void)
 	// Extinguish the fire:
 	StopBurning();
 
+	// Disable flying
+	SetFlying(false);
+
 	if (const auto BedWorld = GetBedWorld(); m_World != BedWorld)
 	{
-		MoveToWorld(*BedWorld, GetLastBedPos(), false, false);
+		MoveToWorld(*BedWorld, GetRespawnPos(), false, false);
 	}
 	else
 	{
 		m_ClientHandle->SendRespawn(m_World->GetDimension(), true);
-		TeleportToCoords(GetLastBedPos().x, GetLastBedPos().y, GetLastBedPos().z);
+		const auto RespawnCords = GetRespawnPos();
+		TeleportToCoords(RespawnCords.x, RespawnCords.y, RespawnCords.z);
 	}
 
 	SetVisible(true);
@@ -1751,7 +1786,7 @@ void cPlayer::LoadFromDisk()
 
 	const Vector3i WorldSpawn(static_cast<int>(m_World->GetSpawnX()), static_cast<int>(m_World->GetSpawnY()), static_cast<int>(m_World->GetSpawnZ()));
 	SetPosition(WorldSpawn);
-	SetBedPos(WorldSpawn, *m_World);
+	SetBedPos(WorldSpawn, *m_World);  // TODO: possibly modify
 
 	m_Inventory.Clear();
 	m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();  // Use a random number to seed the enchantment generator
@@ -1858,9 +1893,10 @@ bool cPlayer::LoadFromFile(const AString & a_FileName)
 		m_World = cRoot::Get()->GetDefaultWorld();
 	}
 
-	m_LastBedPos.x = Root.get("SpawnX", m_World->GetSpawnX()).asInt();
+	m_LastBedPos.x = Root.get("SpawnX", m_World->GetSpawnX()).asInt();  // TODO change default to 0 probably
 	m_LastBedPos.y = Root.get("SpawnY", m_World->GetSpawnY()).asInt();
 	m_LastBedPos.z = Root.get("SpawnZ", m_World->GetSpawnZ()).asInt();
+	m_CheckBedUponRespawn = Root.get("CheckBedUponRespawn", true).asBool();
 	m_SpawnWorldName = Root.get("SpawnWorld", cRoot::Get()->GetDefaultWorld()->GetName()).asString();
 
 	try
@@ -1972,6 +2008,7 @@ void cPlayer::SaveToDisk()
 	root["SpawnX"]              = GetLastBedPos().x;
 	root["SpawnY"]              = GetLastBedPos().y;
 	root["SpawnZ"]              = GetLastBedPos().z;
+	root["CheckBedUponRespawn"] = m_CheckBedUponRespawn;
 	root["SpawnWorld"]          = m_SpawnWorldName;
 	root["enchantmentSeed"]     = m_EnchantmentSeed;
 	root["world"]               = m_CurrentWorldName;
