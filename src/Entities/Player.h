@@ -22,8 +22,19 @@ class cTeam;
 
 
 
-
 // tolua_begin
+/** Represent type of respawnPoint TODO: Move it to better place (or is this one ok?) */
+enum eRespawnPosType
+{
+	eDefaultRespawnPos = 0,
+	eForcefulRespawnPos = 1,
+	eBedRespawnPos = 2,
+};
+
+
+
+
+
 class cPlayer:
 	public cPawn
 {
@@ -523,10 +534,10 @@ public:
 
 	/** Sets the player's bed (home / respawn) position to the specified position.
 	Sets the respawn world to the player's world. */
-	void SetBedPos(const Vector3i a_Position, const bool a_CheckBedUponRespawn = true);
+	void SetBedPos(const Vector3i a_Position, const eRespawnPosType a_RespawnPosType  = eBedRespawnPos);
 
 	/** Sets the player's bed (home / respawn) position and respawn world to the specified parameters. */
-	void SetBedPos(const Vector3i a_Position, const cWorld & a_World, const bool a_CheckBedUponRespawn = true);
+	void SetBedPos(const Vector3i a_Position, const cWorld & a_World, const eRespawnPosType a_RespawnPosType  = eBedRespawnPos);
 
 	// tolua_end
 
@@ -662,7 +673,7 @@ private:
 	Vector3i m_LastBedPos;
 
 	/** Weather or not should perform a check upon respawn weather a bes is unobstructed and available */
-	bool m_CheckBedUponRespawn;
+	eRespawnPosType m_RespawnPosType;
 
 	/** The name of the world which the player respawns in upon death.
 	This is stored as a string to enable SaveToDisk to not touch cRoot, and thus can be safely called in the player's destructor. */

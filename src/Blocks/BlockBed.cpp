@@ -91,7 +91,7 @@ bool cBlockBedHandler::OnUse(
 	}
 
 	// Set the bed position to the pillow block:
-	a_Player.SetBedPos(a_BlockPos);
+	a_Player.SetBedPos(a_BlockPos, eBedRespawnPos);
 
 	// Sleeping is allowed only during night and thunderstorms:
 	if (
