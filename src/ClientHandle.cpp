@@ -1498,12 +1498,6 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 
 void cClientHandle::HandlePlayerMove(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround)
 {
-	if (m_Player->IsFrozen())
-	{
-		// Ignore client-side updates if the player is frozen:
-		return;
-	}
-
 	const Vector3d NewPosition(a_PosX, a_PosY, a_PosZ);
 	const Vector3d OldPosition = GetPlayer()->GetPosition();
 	const auto PreviousIsOnGround = GetPlayer()->IsOnGround();
@@ -1525,6 +1519,13 @@ void cClientHandle::HandlePlayerMove(double a_PosX, double a_PosY, double a_PosZ
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
+
+	if (m_Player->IsFrozen() || (m_Player->GetHealth() <= 0))
+	{
+		// "Repair" if the client tries to move while frozen or dead:
+		SendPlayerMoveLook();
+		return;
+	}
 
 	// If the player has moved too far, "repair" them:
 	if ((OldPosition - NewPosition).SqrLength() > 100 * 100)
