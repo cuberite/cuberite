@@ -3,6 +3,7 @@
 
 #include "HangingEntity.h"
 #include "Player.h"
+#include "Chunk.h"
 #include "../ClientHandle.h"
 
 
@@ -29,3 +30,38 @@ void cHangingEntity::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
+
+void cHangingEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	if (m_TickCounter++ >= 100)
+	{
+		m_TickCounter = 0;
+
+		const auto & Pos = GetPosition();
+		const auto SupportBlockPos =
+			AddFaceDirection(Pos, ProtocolFaceToBlockFace(m_Facing), true);
+
+		BLOCKTYPE Block;
+
+		const auto ChunkPos = a_Chunk.PositionToWorldPosition(Vector3i());
+		const auto RelPos = SupportBlockPos - ChunkPos;
+
+		if (!a_Chunk.UnboundedRelGetBlockType(RelPos, Block))
+		{
+			return;
+		}
+
+		if (!ValidSupportBlock(Block))
+		{
+			cItems Item;
+			GetDrops(Item);
+
+			GetWorld()->SpawnItemPickups(Item, GetPosition(), 5);
+
+			Destroy();
+			return;
+		}
+	}
+
+	UNUSED(a_Dt);
+}

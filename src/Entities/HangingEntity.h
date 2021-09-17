@@ -32,6 +32,48 @@ public:  // tolua_export
 		m_Facing = cHangingEntity::BlockFaceToProtocolFace(a_Facing);
 	}
 
+	inline static bool ValidSupportBlock(BLOCKTYPE BlockType)
+	{
+		switch (BlockType)
+		{
+			case E_BLOCK_AIR:
+			case E_BLOCK_RAIL:
+			case E_BLOCK_ACTIVATOR_RAIL:
+			case E_BLOCK_DETECTOR_RAIL:
+			case E_BLOCK_POWERED_RAIL:
+			case E_BLOCK_LEVER:
+			case E_BLOCK_STONE_BUTTON:
+			case E_BLOCK_WOODEN_BUTTON:
+			case E_BLOCK_TRIPWIRE:
+			case E_BLOCK_TRIPWIRE_HOOK:
+			case E_BLOCK_REDSTONE_WIRE:
+			case E_BLOCK_REDSTONE_TORCH_ON:
+			case E_BLOCK_REDSTONE_TORCH_OFF:
+			case E_BLOCK_TORCH:
+			case E_BLOCK_SAPLING:
+			case E_BLOCK_DEAD_BUSH:
+			case E_BLOCK_TALL_GRASS:
+			case E_BLOCK_BROWN_MUSHROOM:
+			case E_BLOCK_RED_MUSHROOM:
+			case E_BLOCK_CARPET:
+			case E_BLOCK_HEAD:
+			case E_BLOCK_FLOWER_POT:
+			case E_BLOCK_FLOWER:
+			case E_BLOCK_BIG_FLOWER:
+			case E_BLOCK_YELLOW_FLOWER:
+			case E_BLOCK_BREWING_STAND:
+			case E_BLOCK_END_ROD:
+			case E_BLOCK_LADDER:
+			case E_BLOCK_END_PORTAL:
+			case E_BLOCK_NETHER_PORTAL:
+				return false;
+			default:
+			{
+				return true;
+			}
+		}
+	}
+
 	// tolua_end
 
 	/** Returns the direction in which the entity is facing. */
@@ -48,13 +90,10 @@ protected:
 
 	Byte m_Facing;
 
+	Byte m_TickCounter = 0;
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override
-	{
-		UNUSED(a_Dt);
-		UNUSED(a_Chunk);
-	}
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 
 	/** Converts protocol hanging item facing to eBlockFace values */

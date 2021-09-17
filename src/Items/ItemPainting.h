@@ -45,6 +45,13 @@ public:
 			return false;
 		}
 
+		// Make sure the support block is a valid block to place a painting on
+		BLOCKTYPE SupportBlockType = a_World->GetBlock(a_ClickedBlockPos);
+		if (!cHangingEntity::ValidSupportBlock(SupportBlockType))
+		{
+			return false;
+		}
+
 		// Make sure block that will be occupied is free:
 		auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
 		BLOCKTYPE PlaceBlockType = a_World->GetBlock(PlacePos);
