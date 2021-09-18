@@ -72,7 +72,7 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			*GetWorld(),
 			GetPosition().addedY(GetHeight()),
 			GetTarget()->GetPosition().addedY(GetTarget()->GetHeight()),
-			cLineBlockTracer::losAirWaterLava  // TODO: Currently all mobs see through lava, but only Nether-native mobs should be able to.
+			(IsNetherNative() ? cLineBlockTracer::losAirWaterLava : cLineBlockTracer::losAirWater)
 		) &&
 		(GetHealth() > 0.0)
 	)

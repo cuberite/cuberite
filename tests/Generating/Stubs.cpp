@@ -954,9 +954,18 @@ void cMonster::CheckEventSeePlayer(class cChunk & a_Chunk)
 
 
 
+bool cMonster::IsNetherNative(void)
+{
+	return false;
+}
+
+
+
+
+
 bool cMonster::IsUndead(void)
 {
-	return true;
+	return false;
 }
 
 
