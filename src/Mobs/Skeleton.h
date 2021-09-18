@@ -25,7 +25,3 @@ public:
 	virtual bool IsUndead(void) override { return true; }
 
 } ;
-
-
-
-

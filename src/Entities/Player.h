@@ -410,7 +410,7 @@ public:
 
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
-	virtual void Killed(cEntity * a_Victim) override;
+	virtual void Killed(const cEntity & a_Victim, eDamageType a_DamageType) override;
 
 	void Respawn(void);  // tolua_export
 

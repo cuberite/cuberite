@@ -351,8 +351,8 @@ public:
 
 	// tolua_begin
 
-	/** Called when the entity kills another entity */
-	virtual void Killed(cEntity * a_Victim) {}
+	/** Called when the entity kills another entity. */
+	virtual void Killed(const cEntity & a_Victim, eDamageType a_DamageType) {}
 
 	/** Heals the specified amount of HPs */
 	virtual void Heal(int a_HitPoints);

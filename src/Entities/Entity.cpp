@@ -396,7 +396,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		if (a_TDI.Attacker != nullptr)
 		{
-			a_TDI.Attacker->Killed(this);
+			a_TDI.Attacker->Killed(*this, a_TDI.DamageType);
 		}
 
 		return true;
@@ -570,7 +570,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		if (a_TDI.Attacker != nullptr)
 		{
-			a_TDI.Attacker->Killed(this);
+			a_TDI.Attacker->Killed(*this, a_TDI.DamageType);
 		}
 	}
 	return true;

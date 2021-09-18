@@ -875,21 +875,34 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 
 
-void cPlayer::Killed(cEntity * a_Victim)
+void cPlayer::Killed(const cEntity & a_Victim, eDamageType a_DamageType)
 {
 	cScoreboard & ScoreBoard = m_World->GetScoreBoard();
 
-	if (a_Victim->IsPlayer())
+	if (a_Victim.IsPlayer())
 	{
 		m_Stats.Custom[CustomStatistic::PlayerKills]++;
 
 		ScoreBoard.AddPlayerScore(GetName(), cObjective::otPlayerKillCount, 1);
 	}
-	else if (a_Victim->IsMob())
+	else if (a_Victim.IsMob())
 	{
-		if (static_cast<cMonster *>(a_Victim)->GetMobFamily() == cMonster::mfHostile)
+		const auto & Monster = static_cast<const cMonster &>(a_Victim);
+
+		if (Monster.GetMobFamily() == cMonster::mfHostile)
 		{
 			AwardAchievement(CustomStatistic::AchKillEnemy);
+		}
+
+		if ((Monster.GetMobType() == eMonsterType::mtSkeleton) && (a_DamageType == eDamageType::dtRangedAttack))
+		{
+			const double DistX = GetPosX() - Monster.GetPosX();
+			const double DistZ = GetPosZ() - Monster.GetPosZ();
+
+			if ((DistX * DistX + DistZ * DistZ) >= 2500.0)
+			{
+				AwardAchievement(CustomStatistic::AchSnipeSkeleton);
+			}
 		}
 
 		m_Stats.Custom[CustomStatistic::MobKills]++;
