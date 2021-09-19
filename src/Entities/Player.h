@@ -184,7 +184,7 @@ public:
 	void SendRotation(double a_YawDegrees, double a_PitchDegrees);
 
 	/** Spectates the target entity. If a_Target is nullptr or a pointer to self, end spectation. */
-	void SpectateEntity(cEntity * a_Target);
+	void SpectateEntity(const cEntity * a_Target);
 
 	/** Returns the position where projectiles thrown by this player should start, player eye position + adjustment */
 	Vector3d GetThrowStartPos(void) const;
@@ -591,8 +591,6 @@ public:
 	void AddKnownItem(const cItem & a_Item);
 
 	// cEntity overrides:
-	virtual void AttachTo(cEntity * a_AttachTo) override;
-	virtual void Detach(void) override;
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
 	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
 	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
@@ -600,7 +598,6 @@ public:
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
 	virtual cItem GetOffHandEquipedItem(void) const override { return m_Inventory.GetShieldSlot(); }
 	virtual bool IsCrouched(void) const override;
-	virtual bool IsElytraFlying(void) const override;
 	virtual bool IsOnGround(void) const override { return m_bTouchGround; }
 	virtual bool IsSprinting(void) const override;
 
@@ -730,6 +727,9 @@ private:
 
 	cTeam * m_Team;
 
+	/** The entity that this player is spectating, nullptr if none. */
+	const cEntity * m_Spectating;
+
 	StatisticsManager m_Stats;
 
 	/** How long till the player's inventory will be saved
@@ -788,9 +788,11 @@ private:
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual float GetEnchantmentBlastKnockbackReduction() override;
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
+	virtual bool IsElytraFlying(void) const override;
 	virtual bool IsInvisible() const override;
 	virtual bool IsRclking(void) const override { return IsEating() || IsChargingBow(); }
 	virtual void OnAddToWorld(cWorld & a_World) override;
+	virtual void OnDetach() override;
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;

@@ -1675,7 +1675,7 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 	{
 		m_Player->GetWorld()->DoWithEntityByID(a_TargetEntityID, [=](cEntity & a_Entity)
 		{
-			m_Player->AttachTo(&a_Entity);
+			m_Player->SpectateEntity(&a_Entity);
 			return true;
 		});
 		return;

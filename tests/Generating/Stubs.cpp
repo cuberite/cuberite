@@ -766,6 +766,15 @@ void cEntity::ResetPosition(class Vector3<double> a_Pos)
 
 
 
+void cEntity::OnDetach()
+{
+
+}
+
+
+
+
+
 cPawn::cPawn(enum cEntity::eEntityType, float a_Width, float a_Height) :
 	cEntity(etMonster, Vector3d(), a_Height, a_Width)
 {
