@@ -1475,7 +1475,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	Msg.AddTextPart(m_Player->GetName(), Color);
 	Msg.ParseText(m_Player->GetSuffix());
 	Msg.AddTextPart("> ");
-	Msg.ParseText(Message);
+	Msg.AddTextPart(Message);
 	Msg.UnderlineUrls();
 	cRoot::Get()->BroadcastChat(Msg);
 }
