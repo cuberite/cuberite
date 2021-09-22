@@ -2136,7 +2136,8 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 	int IsSmallIdx = a_NBT.FindChildByName(a_TagIdx, "Small");
 	if ((IsSmallIdx > 0) && (a_NBT.GetType(IsSmallIdx) == TAG_Byte))
 	{
-		bool IsSmall = ((a_NBT.GetByte(IsSmallIdx) == 1) ? true : false);
+		bool IsSmall = a_NBT.GetByte(IsSmallIdx) == 1;
+
 		if (IsSmall)
 		{
 			ArmorStand->SetSizeSmall();
@@ -2146,7 +2147,8 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 	int NoGravityIdx = a_NBT.FindChildByName(a_TagIdx, "NoGravity");
 	if ((NoGravityIdx > 0) && (a_NBT.GetType(NoGravityIdx) == TAG_Byte))
 	{
-		bool NoGravity = ((a_NBT.GetByte(NoGravityIdx) == 1) ? true : false);
+		bool NoGravity = a_NBT.GetByte(NoGravityIdx) == 1;
+
 		if (NoGravity)
 		{
 			ArmorStand->SetGravity(0.0f);
@@ -2156,7 +2158,8 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 	int IsMarkerIdx = a_NBT.FindChildByName(a_TagIdx, "Marker");
 	if ((IsMarkerIdx > 0) && (a_NBT.GetType(IsMarkerIdx) == TAG_Byte))
 	{
-		bool IsMarker = ((a_NBT.GetByte(IsMarkerIdx) == 1) ? true : false);
+		bool IsMarker = a_NBT.GetByte(IsMarkerIdx) == 1;
+
 		if (IsMarker)
 		{
 			ArmorStand->SetIsMarker(true);
@@ -2166,21 +2169,21 @@ void cWSSAnvil::LoadArmorStandFromNBT(cEntityList & a_Entities, const cParsedNBT
 	int HasArmsIdx = a_NBT.FindChildByName(a_TagIdx, "ShowArms");
 	if ((HasArmsIdx > 0) && (a_NBT.GetType(HasArmsIdx) == TAG_Byte))
 	{
-		bool HasArms = ((a_NBT.GetByte(HasArmsIdx) == 1) ? true : false);
+		bool HasArms = a_NBT.GetByte(HasArmsIdx) == 1;
 		ArmorStand->SetHasArms(HasArms);
 	}
 
 	int NoBasePlateIdx = a_NBT.FindChildByName(a_TagIdx, "NoBasePlate");
 	if ((NoBasePlateIdx > 0) && (a_NBT.GetType(NoBasePlateIdx) == TAG_Byte))
 	{
-		bool NoBasePlate = ((a_NBT.GetByte(NoBasePlateIdx) == 1) ? true : false);
+		bool NoBasePlate = a_NBT.GetByte(NoBasePlateIdx) == 1;
 		ArmorStand->SetHasBasePlate(!NoBasePlate);
 	}
 
 	int IsInvisibleIdx = a_NBT.FindChildByName(a_TagIdx, "Invisible");
 	if ((IsInvisibleIdx > 0) && (a_NBT.GetType(IsInvisibleIdx) == TAG_Byte))
 	{
-		bool IsInvisible = ((a_NBT.GetByte(IsInvisibleIdx) == 1) ? true : false);
+		bool IsInvisible = a_NBT.GetByte(IsInvisibleIdx) == 1;
 		ArmorStand->SetVisible(!IsInvisible);
 	}
 

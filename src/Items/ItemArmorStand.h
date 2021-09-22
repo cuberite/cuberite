@@ -40,7 +40,7 @@ public:
 		BLOCKTYPE PlaceBlock = a_World->GetBlock(PlacePos);
 		BLOCKTYPE AboveBlock = a_World->GetBlock(AbovePos);
 
-		if (PlaceBlock != E_BLOCK_AIR || (AboveBlock != E_BLOCK_AIR))
+		if ((PlaceBlock != E_BLOCK_AIR) || (AboveBlock != E_BLOCK_AIR))
 		{
 			return false;
 		}
@@ -51,9 +51,9 @@ public:
 
 		a_World->ForEachEntityInBox(BoundingBox, [&FoundEntity](cEntity & ent)
 		{
-			if (ent.IsArmorStand() || ent.IsPawn() || ent.IsEnderCrystal())
+			if ((ent.IsArmorStand()) || (ent.IsPawn()) || (ent.IsEnderCrystal()))
 			{
-			  FoundEntity = true;
+				FoundEntity = true;
 			}
 
 			return false;
