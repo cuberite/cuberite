@@ -5206,6 +5206,23 @@ cFile:DeleteFile("/usr/bin/virus.exe");
 					},
 					Notes = "Set the direction in which the entity is facing.",
 				},
+				ValidSupportBlock =
+				{
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						}
+					},
+					Notes = "Returns true if the specified block is a valid support block.",
+				},
 			},
 			Inherits = "cEntity",
 		},
