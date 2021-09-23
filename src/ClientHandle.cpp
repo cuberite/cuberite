@@ -1478,7 +1478,9 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	if (m_Player->HasPermission("chat.format"))
 	{
 		Msg.ParseText(Message);
-	} else {
+	}
+	else
+	{
 		Msg.AddTextPart(Message);
 	}
 	Msg.UnderlineUrls();
