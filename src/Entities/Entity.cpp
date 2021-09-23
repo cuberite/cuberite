@@ -1500,9 +1500,9 @@ bool cEntity::DetectPortal()
 					if (IsPlayer())
 					{
 						cPlayer * Player = static_cast<cPlayer *>(this);
-						if (Player->GetBedWorld() == TargetWorld)
+						if (Player->GetRespawnWorld() == TargetWorld)
 						{
-							return MoveToWorld(*TargetWorld, Player->GetLastBedPos());
+							return MoveToWorld(*TargetWorld, Player->GetRespawnPos());
 						}
 					}
 

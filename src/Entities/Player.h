@@ -23,18 +23,6 @@ class cTeam;
 
 
 // tolua_begin
-/** Represent type of respawnPoint TODO: Move it to better place (or is this one ok?) */
-enum eRespawnPosType
-{
-	eDefaultRespawnPos = 0,
-	eForcefulRespawnPos = 1,
-	eBedRespawnPos = 2,
-};
-
-
-
-
-
 class cPlayer:
 	public cPawn
 {
@@ -524,25 +512,32 @@ public:
 	The custom name will be used in the tab-list, in the player nametag and in the tab-completion. */
 	void SetCustomName(const AString & a_CustomName);
 
-	/** Gets the last position that the player slept in
-	This is initialised to the world spawn point if the player has not slept in a bed as of yet
+	/** Gets the last player respawn position
+	This is initialised to the world spawn point if it haven't been changed as of yet
 	*/
-	Vector3i GetLastBedPos(void) const { return m_LastBedPos; }
+	Vector3i GetRespawnPos(void) const { return m_RespawnPos; }
 
-	/** Gets the current respawn position weather it is world spawn, bed or spawnpoint */
-	Vector3i GetRespawnPos(void);
+	/** Returns true if respawn point is forced */
+	bool IsRespawnPointForced(void) const { return m_IsRespawnPointForced; }
 
-	/** Sets the player's bed (home / respawn) position to the specified position.
+	/** Sets the player's bed position to the specified position.
 	Sets the respawn world to the player's world. */
-	void SetBedPos(const Vector3i a_Position, const eRespawnPosType a_RespawnPosType  = eBedRespawnPos);
+	void SetBedPos(const Vector3i a_Position);
 
-	/** Sets the player's bed (home / respawn) position and respawn world to the specified parameters. */
-	void SetBedPos(const Vector3i a_Position, const cWorld & a_World, const eRespawnPosType a_RespawnPosType  = eBedRespawnPos);
+	/** Sets the player's bed position and respawn world to the specified parameters. */
+	void SetBedPos(const Vector3i a_Position, const cWorld & a_World);
+
+	/** Sets the player's respawn position to the specified position.
+	Sets the respawn world to the player's world. */
+	void SetRespawnPos(const Vector3i a_Position);
+
+	/** Sets the player's respawn position and respawn world to the specified parameters. */
+	void SetRespawnPos(const Vector3i a_Position, const cWorld & a_World);
 
 	// tolua_end
 
-	// TODO lua export GetBedPos and GetBedWorld
-	cWorld * GetBedWorld();
+	// TODO lua export GetRespawnPos and GetRespawnWorld
+	cWorld * GetRespawnWorld();
 
 	/** Update movement-related statistics. */
 	void UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIsOnGround);
@@ -670,10 +665,10 @@ private:
 	cWindow * m_InventoryWindow;
 
 	/** The player's last saved bed position */
-	Vector3i m_LastBedPos;
+	Vector3i m_RespawnPos;
 
 	/** Weather or not should perform a check upon respawn weather a bes is unobstructed and available */
-	eRespawnPosType m_RespawnPosType;
+	bool m_IsRespawnPointForced;
 
 	/** The name of the world which the player respawns in upon death.
 	This is stored as a string to enable SaveToDisk to not touch cRoot, and thus can be safely called in the player's destructor. */

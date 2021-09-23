@@ -776,39 +776,10 @@ void cPlayer::SetCustomName(const AString & a_CustomName)
 
 
 
-Vector3i cPlayer::GetRespawnPos(void)
+void cPlayer::SetBedPos(const Vector3i a_Position)
 {
-	if (m_RespawnPosType == eForcefulRespawnPos)
-	{
-		return m_LastBedPos;
-	}
-
-	if (m_RespawnPosType == eBedRespawnPos)
-	{
-		const auto BedWorld = GetBedWorld();
-		if (BedWorld->GetBlock(m_LastBedPos) == E_BLOCK_BED)
-		{
-			return m_LastBedPos;
-		}
-		// Reset respawn pos to default and send message
-		SendMessage("Your home bed was missing or obstructed");  // Should it be here?
-		m_RespawnPosType = eDefaultRespawnPos;
-	}
-
-	const auto DefaultWorld = cRoot::Get()->GetDefaultWorld();
-
-
-	return Vector3d((DefaultWorld->GetSpawnX()), DefaultWorld->GetSpawnY(), DefaultWorld->GetSpawnZ());
-}
-
-
-
-
-
-void cPlayer::SetBedPos(const Vector3i a_Position, const eRespawnPosType a_RespawnPosType)
-{
-	m_RespawnPosType = a_RespawnPosType;
-	m_LastBedPos = a_Position;
+	m_IsRespawnPointForced = false;
+	m_RespawnPos = a_Position;
 	m_SpawnWorldName = m_World->GetName();
 }
 
@@ -816,10 +787,10 @@ void cPlayer::SetBedPos(const Vector3i a_Position, const eRespawnPosType a_Respa
 
 
 
-void cPlayer::SetBedPos(const Vector3i a_Position, const cWorld & a_World, const eRespawnPosType a_RespawnPosType)
+void cPlayer::SetBedPos(const Vector3i a_Position, const cWorld & a_World)
 {
-	m_RespawnPosType = a_RespawnPosType;
-	m_LastBedPos = a_Position;
+	m_IsRespawnPointForced = false;
+	m_RespawnPos = a_Position;
 	m_SpawnWorldName = a_World.GetName();
 }
 
@@ -827,7 +798,29 @@ void cPlayer::SetBedPos(const Vector3i a_Position, const cWorld & a_World, const
 
 
 
-cWorld * cPlayer::GetBedWorld()
+void cPlayer::SetRespawnPos(const Vector3i a_Position)
+{
+	m_IsRespawnPointForced = true;
+	m_RespawnPos = a_Position;
+	m_SpawnWorldName = m_World->GetName();
+}
+
+
+
+
+
+void cPlayer::SetRespawnPos(const Vector3i a_Position, const cWorld & a_World)
+{
+	m_IsRespawnPointForced = true;
+	m_RespawnPos = a_Position;
+	m_SpawnWorldName = a_World.GetName();
+}
+
+
+
+
+
+cWorld * cPlayer::GetRespawnWorld()
 {
 	if (const auto World = cRoot::Get()->GetWorld(m_SpawnWorldName); World != nullptr)
 	{
@@ -956,15 +949,33 @@ void cPlayer::Respawn(void)
 	// Disable flying
 	SetFlying(false);
 
-	if (const auto BedWorld = GetBedWorld(); m_World != BedWorld)
+	auto RespawnPos = GetRespawnPos();
+	auto RespawnWorld = GetRespawnWorld();
+
+	if (!m_IsRespawnPointForced)
 	{
-		MoveToWorld(*BedWorld, GetRespawnPos(), false, false);
+		// Bed destruction check
+		if (RespawnWorld->GetBlock(m_RespawnPos) != E_BLOCK_BED)
+		{
+			// Reset respawn pos to default and send message
+			RespawnWorld = cRoot::Get()->GetDefaultWorld();
+			RespawnPos = Vector3d((RespawnWorld->GetSpawnX()), RespawnWorld->GetSpawnY(), RespawnWorld->GetSpawnZ());
+			SetRespawnPos(RespawnPos, *RespawnWorld);
+
+			SendMessage("Your home bed was missing or obstructed");  // Should it be here?
+		}
+		// Bed obstructed check here
+	}
+
+
+	if (m_World != RespawnWorld)
+	{
+		MoveToWorld(*RespawnWorld, RespawnPos, false, false);
 	}
 	else
 	{
 		m_ClientHandle->SendRespawn(m_World->GetDimension(), true);
-		const auto RespawnCords = GetRespawnPos();
-		TeleportToCoords(RespawnCords.x, RespawnCords.y, RespawnCords.z);
+		TeleportToCoords(RespawnPos.x, RespawnPos.y, RespawnPos.z);
 	}
 
 	SetVisible(true);
@@ -1786,7 +1797,7 @@ void cPlayer::LoadFromDisk()
 
 	const Vector3i WorldSpawn(static_cast<int>(m_World->GetSpawnX()), static_cast<int>(m_World->GetSpawnY()), static_cast<int>(m_World->GetSpawnZ()));
 	SetPosition(WorldSpawn);
-	SetBedPos(WorldSpawn, *m_World, eDefaultRespawnPos);
+	SetRespawnPos(WorldSpawn, *m_World);
 
 	m_Inventory.Clear();
 	m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();  // Use a random number to seed the enchantment generator
@@ -1893,10 +1904,10 @@ bool cPlayer::LoadFromFile(const AString & a_FileName)
 		m_World = cRoot::Get()->GetDefaultWorld();
 	}
 
-	m_LastBedPos.x = Root.get("SpawnX", m_World->GetSpawnX()).asInt();  // TODO change default to 0 probably
-	m_LastBedPos.y = Root.get("SpawnY", m_World->GetSpawnY()).asInt();
-	m_LastBedPos.z = Root.get("SpawnZ", m_World->GetSpawnZ()).asInt();
-	m_RespawnPosType = static_cast<eRespawnPosType>(Root.get("RespawnPosType", true).asInt());
+	m_RespawnPos.x = Root.get("SpawnX", m_World->GetSpawnX()).asInt();
+	m_RespawnPos.y = Root.get("SpawnY", m_World->GetSpawnY()).asInt();
+	m_RespawnPos.z = Root.get("SpawnZ", m_World->GetSpawnZ()).asInt();
+	m_IsRespawnPointForced = Root.get("RespawnPosType", true).asBool();
 	m_SpawnWorldName = Root.get("SpawnWorld", cRoot::Get()->GetDefaultWorld()->GetName()).asString();
 
 	try
@@ -1988,31 +1999,31 @@ void cPlayer::SaveToDisk()
 	}
 
 	Json::Value root;
-	root["position"]            = JSON_PlayerPosition;
-	root["rotation"]            = JSON_PlayerRotation;
-	root["inventory"]           = JSON_Inventory;
-	root["knownItems"]          = JSON_KnownItems;
-	root["knownRecipes"]        = JSON_KnownRecipes;
-	root["equippedItemSlot"]    = m_Inventory.GetEquippedSlotNum();
-	root["enderchestinventory"] = JSON_EnderChestInventory;
-	root["health"]              = m_Health;
-	root["xpTotal"]             = m_LifetimeTotalXp;
-	root["xpCurrent"]           = m_CurrentXp;
-	root["air"]                 = m_AirLevel;
-	root["food"]                = m_FoodLevel;
-	root["foodSaturation"]      = m_FoodSaturationLevel;
-	root["foodTickTimer"]       = m_FoodTickTimer;
-	root["foodExhaustion"]      = m_FoodExhaustionLevel;
-	root["isflying"]            = IsFlying();
-	root["lastknownname"]       = GetName();
-	root["SpawnX"]              = GetLastBedPos().x;
-	root["SpawnY"]              = GetLastBedPos().y;
-	root["SpawnZ"]              = GetLastBedPos().z;
-	root["RespawnPosType"]      = m_RespawnPosType;
-	root["SpawnWorld"]          = m_SpawnWorldName;
-	root["enchantmentSeed"]     = m_EnchantmentSeed;
-	root["world"]               = m_CurrentWorldName;
-	root["gamemode"]            = static_cast<int>(m_GameMode);
+	root["position"]             = JSON_PlayerPosition;
+	root["rotation"]             = JSON_PlayerRotation;
+	root["inventory"]            = JSON_Inventory;
+	root["knownItems"]           = JSON_KnownItems;
+	root["knownRecipes"]         = JSON_KnownRecipes;
+	root["equippedItemSlot"]     = m_Inventory.GetEquippedSlotNum();
+	root["enderchestinventory"]  = JSON_EnderChestInventory;
+	root["health"]               = m_Health;
+	root["xpTotal"]              = m_LifetimeTotalXp;
+	root["xpCurrent"]            = m_CurrentXp;
+	root["air"]                  = m_AirLevel;
+	root["food"]                 = m_FoodLevel;
+	root["foodSaturation"]       = m_FoodSaturationLevel;
+	root["foodTickTimer"]        = m_FoodTickTimer;
+	root["foodExhaustion"]       = m_FoodExhaustionLevel;
+	root["isflying"]             = IsFlying();
+	root["lastknownname"]        = GetName();
+	root["SpawnX"]               = GetRespawnPos().x;
+	root["SpawnY"]               = GetRespawnPos().y;
+	root["SpawnZ"]               = GetRespawnPos().z;
+	root["IsRespawnPointForced"] = m_IsRespawnPointForced;
+	root["SpawnWorld"]           = m_SpawnWorldName;
+	root["enchantmentSeed"]      = m_EnchantmentSeed;
+	root["world"]                = m_CurrentWorldName;
+	root["gamemode"]             = static_cast<int>(m_GameMode);
 
 	auto JsonData = JsonUtils::WriteStyledString(root);
 	AString SourceFile = GetUUIDFileName(UUID);
@@ -3277,7 +3288,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	else if (IsInBed())
 	{
 		// Check if sleeping is still possible:
-		if ((GetPosition().Floor() != m_LastBedPos) || (m_World->GetBlock(m_LastBedPos) != E_BLOCK_BED))
+		if ((GetPosition().Floor() != m_RespawnPos) || (m_World->GetBlock(m_RespawnPos) != E_BLOCK_BED))
 		{
 			m_ClientHandle->HandleLeaveBed();
 		}

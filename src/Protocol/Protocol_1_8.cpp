@@ -492,7 +492,7 @@ void cProtocol_1_8_0::SendEntityAnimation(const cEntity & a_Entity, const Entity
 	if (a_Animation == EntityAnimation::PlayerEntersBed)
 	{
 		ASSERT(a_Entity.IsPlayer());
-		const auto BedPosition = static_cast<const cPlayer &>(a_Entity).GetLastBedPos();
+		const auto BedPosition = static_cast<const cPlayer &>(a_Entity).GetRespawnPos();
 
 		cPacketizer Pkt(*this, pktUseBed);
 		Pkt.WriteVarInt32(a_Entity.GetUniqueID());
