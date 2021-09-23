@@ -192,9 +192,17 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 
 	// Check if both BungeeCord and online mode are on, if so, warn the admin:
 	m_ShouldAllowBungeeCord = a_Settings.GetValueSetB("Authentication", "AllowBungeeCord", false);
+	m_OnlyAllowBungeeCord = a_Settings.GetValueSetB("Authentication", "OnlyAllowBungeeCord", false);
+	m_ProxySharedSecret = a_Settings.GetValueSet("Authentication", "ProxySharedSecret", "");
+
 	if (m_ShouldAllowBungeeCord && m_ShouldAuthenticate)
 	{
 		LOGWARNING("WARNING: BungeeCord is allowed and server set to online mode. This is unsafe and will not work properly. Disable either authentication or BungeeCord in settings.ini.");
+	}
+
+	if (m_ShouldAllowBungeeCord && m_ProxySharedSecret.empty())
+	{
+		LOGWARNING("WARNING: There is not a Proxy Forward Secret set up, and any proxy server can forward a player to this server unless closed from the internet.");
 	}
 
 	m_ShouldAllowMultiWorldTabCompletion = a_Settings.GetValueSetB("Server", "AllowMultiWorldTabCompletion", true);

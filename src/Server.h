@@ -149,6 +149,10 @@ public:
 	it makes the server vulnerable to identity theft through direct connections. */
 	bool ShouldAllowBungeeCord(void) const { return m_ShouldAllowBungeeCord; }
 
+	bool OnlyAllowBungeeCord(void) const { return m_OnlyAllowBungeeCord; }
+
+	const AString & GetProxySharedSecret(void) const { return m_ProxySharedSecret; }
+
 	/** Returns true if usernames should be completed across worlds. This is read
 	from the settings. */
 	bool ShouldAllowMultiWorldTabCompletion(void) const { return m_ShouldAllowMultiWorldTabCompletion; }
@@ -239,6 +243,12 @@ private:
 
 	/** True if BungeeCord handshake packets (with player UUID) should be accepted. */
 	bool m_ShouldAllowBungeeCord;
+
+	/** True if BungeeCord handshake packets should be the only ones accepted. */
+	bool m_OnlyAllowBungeeCord;
+
+	/** Security string that the proxy server should send, compatible with BungeeGuard */
+	AString m_ProxySharedSecret;
 
 	/** True if usernames should be completed across worlds. */
 	bool m_ShouldAllowMultiWorldTabCompletion;
