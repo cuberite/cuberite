@@ -92,6 +92,7 @@ cFloater::cFloater(Vector3d a_Pos, Vector3d a_Speed, UInt32 a_PlayerID, int a_Co
 
 void cFloater::SpawnOn(cClientHandle & a_Client)
 {
+	Super::SpawnOn(a_Client);
 	a_Client.SendSpawnEntity(*this);
 }
 

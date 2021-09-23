@@ -396,14 +396,6 @@ cEnderCrystal::cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom):
 
 
 
-void cEnderCrystal::SpawnOn(class cClientHandle & a_ClientHandle)
-{
-}
-
-
-
-
-
 
 void cEnderCrystal::Tick(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
 {
@@ -448,6 +440,14 @@ void cEntity::OnAddToWorld(class cWorld & a_World)
 
 
 void cEntity::OnRemoveFromWorld(class cWorld & a_World)
+{
+}
+
+
+
+
+
+void cEntity::SpawnOn(cClientHandle & a_Client)
 {
 }
 
@@ -713,6 +713,21 @@ void cEntity::Detach(void)
 
 
 
+bool cEntity::AttachToID(UInt32 a_UniqueID)
+{
+}
+
+
+
+
+
+UInt32 cEntity::GetAttachedID()
+{
+}
+
+
+
+
 
 void cEntity::SetSpeed(double a_XSpeed, double a_YSpeed, double a_ZSpeed)
 {
@@ -863,6 +878,13 @@ void cMonster::OnRemoveFromWorld(class cWorld & a_World)
 
 
 
+void cMonster::SpawnOn(cClientHandle & a_Client)
+{
+}
+
+
+
+
 
 void cMonster::Tick(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
 {
@@ -881,14 +903,6 @@ void cMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 
 
 void cMonster::InStateChasing(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
-{
-}
-
-
-
-
-
-void cMonster::SpawnOn(class cClientHandle & a_ClientHandle)
 {
 }
 

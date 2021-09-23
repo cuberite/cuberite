@@ -444,6 +444,7 @@ void cProjectileEntity::SpawnOn(cClientHandle & a_Client)
 {
 	a_Client.SendSpawnEntity(*this);
 	a_Client.SendEntityMetadata(*this);
+	Super::SpawnOn(a_Client);
 }
 
 
@@ -455,4 +456,3 @@ void cProjectileEntity::CollectedBy(cPlayer & a_Dest)
 	// Overriden in arrow
 	UNUSED(a_Dest);
 }
-

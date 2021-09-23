@@ -27,6 +27,7 @@ cFallingBlock::cFallingBlock(Vector3d a_Position, BLOCKTYPE a_BlockType, NIBBLET
 void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnEntity(*this);
+	Super::SpawnOn(a_ClientHandle);
 }
 
 
@@ -104,7 +105,3 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		BroadcastMovementUpdate();
 	}
 }
-
-
-
-

@@ -42,8 +42,9 @@ function(enable_bindings_generation)
 		Defines.h
 		EffectID.h
 		Enchantments.h
-		Entities/Boat.h
+		Entities/ArmorStand.h
 		Entities/ArrowEntity.h
+		Entities/Boat.h
 		Entities/Entity.h
 		Entities/ExpOrb.h
 		Entities/EnderCrystal.h

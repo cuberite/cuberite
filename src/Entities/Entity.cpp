@@ -171,6 +171,18 @@ void cEntity::OnRemoveFromWorld(cWorld & a_World)
 
 
 
+void cEntity::SpawnOn(cClientHandle & a_Client)
+{
+	if (m_AttachedTo != nullptr)
+	{
+		m_World->BroadcastAttachEntity(*this, *m_AttachedTo);
+	}
+}
+
+
+
+
+
 void cEntity::WrapHeadYaw(void)
 {
 	m_HeadYaw = NormalizeAngleDegrees(m_HeadYaw);
@@ -2020,6 +2032,15 @@ void cEntity::AttachTo(cEntity * a_AttachTo)
 
 
 
+bool cEntity::IsAttachedTo(const cEntity * a_Entity) const
+{
+	return (m_AttachedTo != nullptr) && (a_Entity->GetUniqueID() == m_AttachedTo->GetUniqueID());
+}
+
+
+
+
+
 void cEntity::Detach(void)
 {
 	if (m_AttachedTo == nullptr)
@@ -2037,21 +2058,47 @@ void cEntity::Detach(void)
 
 
 
-bool cEntity::IsA(const char * a_ClassName) const
+UInt32 cEntity::GetAttachedID()
 {
-	return ((a_ClassName != nullptr) && (strcmp(a_ClassName, "cEntity") == 0));
+	return m_AttachedTo->GetUniqueID();
 }
 
 
 
 
 
-bool cEntity::IsAttachedTo(const cEntity * a_Entity) const
+bool cEntity::AttachToID(UInt32 a_UniqueID)
 {
-	return (
-		(m_AttachedTo != nullptr) &&
-		(a_Entity->GetUniqueID() == m_AttachedTo->GetUniqueID())
+	if (IsAttachedToID(a_UniqueID))
+	{
+		// Already attached to that entity, nothing to do here
+		return true;
+	}
+	this->GetWorld()->DoWithEntityByID(a_UniqueID, [=](cEntity & a_Entity)
+		{
+			this->AttachTo(&a_Entity);
+			return true;
+		}
 	);
+	return false;
+}
+
+
+
+
+
+bool cEntity::IsAttachedToID(UInt32 a_UniqueID) const
+{
+	return ((m_AttachedTo != nullptr) && (a_UniqueID == m_AttachedTo->GetUniqueID()));
+}
+
+
+
+
+
+bool cEntity::IsA(const char * a_ClassName) const
+{
+	return ((a_ClassName != nullptr) && (strcmp(a_ClassName, "cEntity") == 0));
 }
 
 

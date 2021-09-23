@@ -3140,6 +3140,7 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 	a_Client.SendEntityEquipment(*this, 2, m_Inventory.GetEquippedLeggings());
 	a_Client.SendEntityEquipment(*this, 3, m_Inventory.GetEquippedChestplate());
 	a_Client.SendEntityEquipment(*this, 4, m_Inventory.GetEquippedHelmet());
+	a_Client.SendEntityEquipment(*this, 5, m_Inventory.GetShieldSlot());
 }
 
 

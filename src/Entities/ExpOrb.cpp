@@ -22,6 +22,7 @@ cExpOrb::cExpOrb(Vector3d a_Pos, int a_Reward):
 
 void cExpOrb::SpawnOn(cClientHandle & a_Client)
 {
+	Super::SpawnOn(a_Client);
 	a_Client.SendExperienceOrb(*this);
 	m_bDirtyOrientation = false;
 	m_bDirtyHead = false;
@@ -127,5 +128,3 @@ std::vector<int> cExpOrb::Split(int a_Reward)
 
 	return Rewards;
 }
-
-

@@ -145,6 +145,7 @@ void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnEntity(*this);
 	a_ClientHandle.SendEntityMetadata(*this);
+	Super::SpawnOn(a_ClientHandle);
 }
 
 
