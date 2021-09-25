@@ -42,7 +42,7 @@ public:
 
 	static void VacateBed(cChunkInterface & a_ChunkInterface, cPlayer & a_Player)
 	{
-		auto BedPosition = a_Player.GetRespawnPos();
+		auto BedPosition = a_Player.GetLastBedPos();
 
 		BLOCKTYPE Type;
 		NIBBLETYPE Meta;

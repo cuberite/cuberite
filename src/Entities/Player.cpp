@@ -949,7 +949,7 @@ void cPlayer::Respawn(void)
 	// Disable flying
 	SetFlying(false);
 
-	auto RespawnPos = GetRespawnPos();
+	auto RespawnPos = GetLastBedPos();
 	auto RespawnWorld = GetRespawnWorld();
 
 	if (!m_IsRespawnPointForced)
@@ -2016,9 +2016,9 @@ void cPlayer::SaveToDisk()
 	root["foodExhaustion"]       = m_FoodExhaustionLevel;
 	root["isflying"]             = IsFlying();
 	root["lastknownname"]        = GetName();
-	root["SpawnX"]               = GetRespawnPos().x;
-	root["SpawnY"]               = GetRespawnPos().y;
-	root["SpawnZ"]               = GetRespawnPos().z;
+	root["SpawnX"]               = GetLastBedPos().x;
+	root["SpawnY"]               = GetLastBedPos().y;
+	root["SpawnZ"]               = GetLastBedPos().z;
 	root["IsRespawnPointForced"] = m_IsRespawnPointForced;
 	root["SpawnWorld"]           = m_SpawnWorldName;
 	root["enchantmentSeed"]      = m_EnchantmentSeed;

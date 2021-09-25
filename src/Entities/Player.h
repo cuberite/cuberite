@@ -512,10 +512,10 @@ public:
 	The custom name will be used in the tab-list, in the player nametag and in the tab-completion. */
 	void SetCustomName(const AString & a_CustomName);
 
-	/** Gets the last player respawn position
+	/** Gets the last player respawn position (named LastBedPos for compatibility Reasons)
 	This is initialised to the world spawn point if it haven't been changed as of yet
 	*/
-	Vector3i GetRespawnPos(void) const { return m_RespawnPos; }
+	Vector3i GetLastBedPos(void) const { return m_RespawnPos; }
 
 	/** Returns true if respawn point is forced */
 	bool IsRespawnPointForced(void) const { return m_IsRespawnPointForced; }
