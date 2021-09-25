@@ -1,8 +1,5 @@
 #pragma once
 
-#include "OSSupport/IsThread.h"
-#include "ChunkDef.h"
-
 #include <shared_mutex>
 
 // The new and free macros break tbb
@@ -13,6 +10,12 @@
 #include <oneapi/tbb/concurrent_queue.h>
 #pragma pop_macro("free")
 #pragma pop_macro("new")
+
+#include "OSSupport/IsThread.h"
+#include "ChunkDef.h"
+
+
+
 
 
 // fwd:

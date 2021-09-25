@@ -25,9 +25,7 @@ Note that it may be called by world's BroadcastToChunk() if the client is still 
 
 #pragma once
 
-#include "OSSupport/IsThread.h"
-#include "ChunkDataCallback.h"
-#include "Protocol/ChunkDataSerializer.h"
+#include <shared_mutex>
 
 // The new and free macros break tbb
 #pragma push_macro("new")
@@ -38,6 +36,10 @@ Note that it may be called by world's BroadcastToChunk() if the client is still 
 #include <oneapi/tbb/concurrent_priority_queue.h>
 #pragma pop_macro("free")
 #pragma pop_macro("new")
+
+#include "OSSupport/IsThread.h"
+#include "ChunkDataCallback.h"
+#include "Protocol/ChunkDataSerializer.h"
 
 
 
