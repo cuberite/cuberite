@@ -521,10 +521,14 @@ public:
 	bool IsRespawnPointForced(void) const { return m_IsRespawnPointForced; }
 
 	/** Sets the player's bed position to the specified position.
-	Sets the respawn world to the player's world. */
+	Sets the respawn world to the player's world.
+	There will be block check for bed when respawning
+	If check failed will be reset do default World Spawn */
 	void SetBedPos(const Vector3i a_Position);
 
-	/** Sets the player's bed position and respawn world to the specified parameters. */
+	/** Sets the player's bed position and respawn world to the specified parameters.
+	There will be block check for bed when respawning
+	If check failed will be reset do default World Spawn */
 	void SetBedPos(const Vector3i a_Position, const cWorld & a_World);
 
 	/** Sets the player's respawn position to the specified position.
