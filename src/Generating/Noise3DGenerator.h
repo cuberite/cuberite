@@ -115,10 +115,10 @@ protected:
 	// Threshold for when the values are considered air:
 	NOISE_DATATYPE m_AirThreshold;
 
-	//TODO: Removed, not thread safe
+	// TODO: Removed, not thread safe
 	// Cache for the last calculated chunk (reused between heightmap and composition queries):
-	//cChunkCoords m_LastChunkCoords;
-	//NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // x + 17 * z + 17 * 17 * y
+	// cChunkCoords m_LastChunkCoords;
+	// NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // x + 17 * z + 17 * 17 * y
 
 
 	/** Generates the 3D noise array used for terrain generation (m_NoiseArray), unless the LastChunk coords are equal to coords given */
@@ -184,9 +184,9 @@ protected:
 	// Threshold for when the values are considered air:
 	NOISE_DATATYPE m_AirThreshold;
 
-	//TODO: Removed, not thread safe
+	// TODO: Removed, not thread safe
 	// Cache for the last calculated chunk (reused between heightmap and composition queries):
-	//cChunkCoords m_LastChunkCoords;
+	// cChunkCoords m_LastChunkCoords;
 
 	/** Weights for summing up neighboring biomes. */
 	NOISE_DATATYPE m_Weight[AVERAGING_SIZE * 2 + 1][AVERAGING_SIZE * 2 + 1];

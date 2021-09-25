@@ -425,13 +425,13 @@ void cNoise3DComposable::Initialize(cIniFile & a_IniFile)
 
 void cNoise3DComposable::GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCoords, NOISE_DATATYPE a_NoiseArray[17 * 17 * 257]) const
 {
-	//TODO: Removed, not thread safe
-	//if (a_ChunkCoords == m_LastChunkCoords)
-	//{
-	//	// The noise for this chunk is already generated in m_NoiseArray
-	//	return;
-	//}
-	//m_LastChunkCoords = a_ChunkCoords;
+	// TODO: Removed, not thread safe
+	/* if (a_ChunkCoords == m_LastChunkCoords)
+	{
+		// The noise for this chunk is already generated in m_NoiseArray
+		return;
+	}
+	m_LastChunkCoords = a_ChunkCoords; */
 
 	// Generate all the noises:
 	NOISE_DATATYPE ChoiceNoise[5 * 5 * 33];
@@ -584,13 +584,13 @@ void cBiomalNoise3DComposable::Initialize(cIniFile & a_IniFile)
 
 void cBiomalNoise3DComposable::GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCoords, NOISE_DATATYPE a_Noise[17 * 17 * 257])
 {
-	//TODO: Removed, not thread safe
-	//if (a_ChunkCoords == m_LastChunkCoords)
-	//{
-	//	// The noise for this chunk is already generated in m_NoiseArray
-	//	return;
-	//}
-	//m_LastChunkCoords = a_ChunkCoords;
+	// TODO: Removed, not thread safe
+	/* if (a_ChunkCoords == m_LastChunkCoords)
+	{
+		// The noise for this chunk is already generated in m_NoiseArray
+		return;
+	}
+	m_LastChunkCoords = a_ChunkCoords; */
 
 	// Calculate the parameters for the biomes:
 	ChunkParam MidPoint;

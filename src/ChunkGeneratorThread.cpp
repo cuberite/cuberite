@@ -48,8 +48,7 @@ cChunkGeneratorThread::~cChunkGeneratorThread()
 
 
 
-bool cChunkGeneratorThread::Initialize(const cPluginInterface & a_PluginInterface,
-                                       cChunkSink & a_ChunkSink, cIniFile & a_IniFile)
+bool cChunkGeneratorThread::Initialize(const cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile)
 {
 	m_PluginInterface = &a_PluginInterface;
 	m_ChunkSink = &a_ChunkSink;
@@ -144,10 +143,10 @@ void cChunkGeneratorThread::Execute(void)
 {
 	// To be able to display performance information, the generator counts the chunks generated.
 	// When the queue gets empty, the count is reset, so that waiting for the queue is not counted into the total time.
-	std::atomic_size_t NumChunksGenerated = 0;	// Number of chunks generated since the queue was last empty
-	std::atomic GenerationStart = clock();		// Clock tick when the queue started to fill
-	std::atomic LastReportTick = clock();		// Clock tick of the last report made (so that performance isn't reported too often)
-	tbb::task_group Pool;						// TBB task group for this generation thread
+	std::atomic_size_t NumChunksGenerated = 0;  // Number of chunks generated since the queue was last empty
+	std::atomic GenerationStart = clock();      // Clock tick when the queue started to fill
+	std::atomic LastReportTick = clock();       // Clock tick of the last report made (so that performance isn't reported too often)
+	tbb::task_group Pool;                       // TBB task group for this generation thread
 
 	while (!m_ShouldTerminate)
 	{
@@ -181,7 +180,8 @@ void cChunkGeneratorThread::Execute(void)
 			while (m_Queue.try_pop(Item))
 			{
 				// Take Item and SkipEnabled by copy
-				Pool.run([&, Item, SkipEnabled]() {
+				Pool.run([&, Item, SkipEnabled]()
+				{
 					Generate(Item, SkipEnabled);
 
 					++NumChunksGenerated;

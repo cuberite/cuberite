@@ -84,8 +84,7 @@ protected:
 		NOISE_DATATYPE a_DistortAmpZ[DIM_X * DIM_Z]) const;
 
 	/** Calculates the X and Z distortion amplitudes based on the neighbors' biomes. */
-	static void GetDistortAmpsAt(const BiomeNeighbors & a_Neighbors, int a_RelX, int a_RelZ, NOISE_DATATYPE &
-	                             a_DistortAmpX, NOISE_DATATYPE & a_DistortAmpZ);
+	static void GetDistortAmpsAt(const BiomeNeighbors & a_Neighbors, int a_RelX, int a_RelZ, NOISE_DATATYPE & a_DistortAmpX, NOISE_DATATYPE & a_DistortAmpZ);
 
 	/** Reads the settings from the ini file. Skips reading if already initialized. */
 	void Initialize(cIniFile & a_IniFile);

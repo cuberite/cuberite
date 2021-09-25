@@ -161,12 +161,12 @@ void cDistortedHeightmap::Initialize(cIniFile & a_IniFile)
 
 void cDistortedHeightmap::PrepareState(cChunkCoords a_ChunkCoords, NOISE_DATATYPE m_DistortedHeightmap[17 * 257 * 17])
 {
-	//TODO: Removed, not thread safe
-	//if (m_CurChunkCoords == a_ChunkCoords)
-	//{
-	//	return;
-	//}
-	//m_CurChunkCoords = a_ChunkCoords;
+	// TODO: Removed, not thread safe
+	/* if (m_CurChunkCoords == a_ChunkCoords)
+	{
+		return;
+	}
+	m_CurChunkCoords = a_ChunkCoords; */
 
 	cChunkDef::HeightMap CurChunkHeights;
 	NOISE_DATATYPE DistortAmpX[DIM_X * DIM_Z];
@@ -319,8 +319,7 @@ void cDistortedHeightmap::UpdateDistortAmps(
 
 
 
-void cDistortedHeightmap::GetDistortAmpsAt(const BiomeNeighbors & a_Neighbors, int a_RelX, int a_RelZ, NOISE_DATATYPE
-                                           & a_DistortAmpX, NOISE_DATATYPE & a_DistortAmpZ)
+void cDistortedHeightmap::GetDistortAmpsAt(const BiomeNeighbors & a_Neighbors, int a_RelX, int a_RelZ, NOISE_DATATYPE & a_DistortAmpX, NOISE_DATATYPE & a_DistortAmpZ)
 {
 	// Sum up how many biomes of each type there are in the neighborhood:
 	int BiomeCounts[256];

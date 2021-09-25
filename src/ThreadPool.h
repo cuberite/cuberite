@@ -30,13 +30,13 @@ class cThreadPool
 	/** OneAPI TBB global control. */
 	tbb::global_control m_Control;
 
-	/** Calculate the thread pool size.*/
+	/** Calculate the thread pool size. */
 	static std::size_t GenThreadCount();
 
-  public:
-	/** Constructor.*/
+public:
+	/** Constructor. */
 	cThreadPool();
 
-	/** Calculate the thread pool size.*/
+	/** Calculate the thread pool size. */
 	[[nodiscard]] std::size_t GetThreadsCount() const;
 };
