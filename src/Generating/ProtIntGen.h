@@ -59,7 +59,7 @@ public:
 	virtual ~cProtIntGen() {}
 
 	/** Generates the array of specified size into a_Values, based on given min coords. */
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) = 0;
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const = 0;
 };
 
 
@@ -83,14 +83,14 @@ protected:
 	cNoise m_Noise;
 
 	/** Chooses one of a_Val1 or a_Val2, based on m_Noise and the coordinates for querying the noise. */
-	int chooseRandomOne(int a_RndX, int a_RndZ, int a_Val1, int a_Val2)
+	int chooseRandomOne(int a_RndX, int a_RndZ, int a_Val1, int a_Val2) const
 	{
 		int rnd = m_Noise.IntNoise2DInt(a_RndX, a_RndZ) / 7;
 		return ((rnd & 1) == 0) ? a_Val1 : a_Val2;
 	}
 
 	/** Chooses one of a_ValN, based on m_Noise and the coordinates for querying the noise. */
-	int chooseRandomOne(int a_RndX, int a_RndZ, int a_Val1, int a_Val2, int a_Val3, int a_Val4)
+	int chooseRandomOne(int a_RndX, int a_RndZ, int a_Val1, int a_Val2, int a_Val3, int a_Val4) const
 	{
 		int rnd = m_Noise.IntNoise2DInt(a_RndX, a_RndZ) / 7;
 		switch (rnd % 4)
@@ -122,7 +122,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		for (size_t z = 0; z < a_SizeZ; z++)
 		{
@@ -159,7 +159,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		for (size_t z = 0; z < a_SizeZ; z++)
 		{
@@ -203,7 +203,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Get the coords for the lower generator:
 		int lowerMinX = a_MinX >> 1;
@@ -274,7 +274,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying values:
 		size_t lowerSizeX = a_SizeX + 2;
@@ -347,7 +347,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying values:
 		size_t lowerSizeX = a_SizeX + 1;
@@ -392,7 +392,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying values:
 		size_t lowerSizeX = a_SizeX + 4;
@@ -443,7 +443,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying values:
 		size_t lowerSizeX = a_SizeX + 3;
@@ -495,7 +495,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying values:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
@@ -542,7 +542,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying values:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
@@ -585,7 +585,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying values:
 		size_t lowerSizeX = a_SizeX + 2;
@@ -643,7 +643,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying values:
 		size_t lowerSizeX = a_SizeX + 2;
@@ -698,7 +698,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Map for biome -> its beach:
 		static const int ToBeach[] =
@@ -803,7 +803,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
 		for (size_t z = 0; z < a_SizeZ; z++)
@@ -847,7 +847,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int * a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int * a_Values) const override
 	{
 		// Generate the underlying biome groups:
 		size_t lowerSizeX = a_SizeX + 2;
@@ -907,7 +907,7 @@ protected:
 	Underlying m_Underlying;
 
 
-	inline bool isDesertCompatible(int a_BiomeGroup)
+	static inline bool isDesertCompatible(int a_BiomeGroup)
 	{
 		switch (a_BiomeGroup)
 		{
@@ -946,7 +946,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Define the per-biome-group biomes:
 		static const int oceanBiomes[] =
@@ -1077,7 +1077,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying values:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
@@ -1137,7 +1137,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying data:
 		ASSERT(a_SizeX * a_SizeZ <= m_BufferSize);
@@ -1202,7 +1202,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying data:
 		size_t lowerSizeX = a_SizeX + 2;
@@ -1261,7 +1261,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying data:
 		size_t lowerSizeX = a_SizeX + 2;
@@ -1352,7 +1352,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying data:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
@@ -1401,7 +1401,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying data:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
@@ -1450,7 +1450,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the base biomes and the alterations:
 		m_BaseBiomes->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
@@ -1515,7 +1515,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying biomes:
 		size_t lowerSizeX = a_SizeX + 2;
@@ -1611,7 +1611,7 @@ protected:
 	Underlying m_Underlying;
 
 
-	bool isMesaCompatible(int a_Biome)
+	static bool isMesaCompatible(int a_Biome)
 	{
 		switch (a_Biome)
 		{
@@ -1635,7 +1635,7 @@ protected:
 	}
 
 
-	bool isJungleCompatible(int a_Biome)
+	static bool isJungleCompatible(int a_Biome)
 	{
 		switch (a_Biome)
 		{
@@ -1676,7 +1676,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values) const override
 	{
 		// Generate the underlying biomes and the alterations:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);

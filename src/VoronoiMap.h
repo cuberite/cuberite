@@ -54,6 +54,9 @@ public:
 	);
 
 protected:
+	/** Generator state lock. */
+	mutable cCriticalSection m_CS;
+
 	/** The noise used for generating Voronoi seeds */
 	cNoise m_Noise1;
 	cNoise m_Noise2;

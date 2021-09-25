@@ -69,7 +69,7 @@ public:
 		virtual ~cStructure() {}
 
 		/** Draws self into the specified chunk */
-		virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) = 0;
+		virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) const = 0;
 
 		/** Returns the cost of keeping this structure in the cache */
 		virtual size_t GetCacheCost(void) const { return 1; }
@@ -98,6 +98,9 @@ public:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 protected:
+	/** Generator cache protection mutex. */
+	mutable cCriticalSection m_CS;
+
 	/** Base seed of the world for which the generator generates chunk. */
 	int m_BaseSeed;
 

@@ -70,7 +70,7 @@ public:
 
 protected:
 	// cGridStructGen::cStructure overrides:
-	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override;
+	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) const override;
 } ;
 
 
@@ -324,7 +324,7 @@ AString cStructGenRavines::cRavine::ExportAsSVG(int a_Color, int a_OffsetX, int 
 
 
 
-void cStructGenRavines::cRavine::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
+void cStructGenRavines::cRavine::DrawIntoChunk(cChunkDesc & a_ChunkDesc) const
 {
 	int BlockStartX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 	int BlockStartZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;

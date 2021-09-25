@@ -27,11 +27,11 @@ cPrefabStructure::cPrefabStructure(
 
 
 
-void cPrefabStructure::DrawIntoChunk(cChunkDesc & a_Chunk)
+void cPrefabStructure::DrawIntoChunk(cChunkDesc & a_Chunk) const
 {
 	// Iterate over all items
 	// Each intersecting prefab is placed on ground, if requested, then drawn
-	for (cPlacedPieces::iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
+	for (cPlacedPieces::const_iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
 	{
 		const cPrefab & Prefab = static_cast<const cPrefab &>((*itr)->GetPiece());
 		if (Prefab.ShouldMoveToGround() && !(*itr)->HasBeenMovedToGround())
@@ -46,7 +46,7 @@ void cPrefabStructure::DrawIntoChunk(cChunkDesc & a_Chunk)
 
 
 
-void cPrefabStructure::PlacePieceOnGround(cPlacedPiece & a_Piece)
+void cPrefabStructure::PlacePieceOnGround(cPlacedPiece & a_Piece) const
 {
 	cPiece::cConnector FirstConnector = a_Piece.GetRotatedConnector(0);
 	int ChunkX, ChunkZ;

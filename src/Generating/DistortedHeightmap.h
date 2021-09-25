@@ -49,9 +49,6 @@ protected:
 	NOISE_DATATYPE m_FrequencyY;
 	NOISE_DATATYPE m_FrequencyZ;
 
-	cChunkCoords m_CurChunkCoords;
-	NOISE_DATATYPE m_DistortedHeightmap[17 * 257 * 17];
-
 	/** The bime generator to query for biomes. */
 	cBiomeGen & m_BiomeGen;
 
@@ -61,9 +58,6 @@ protected:
 	/** Cache for m_UnderlyingHeiGen. */
 	cHeiGenCache m_HeightGen;
 
-	/** Heightmap for the current chunk, before distortion (from m_HeightGen). Used for optimization. */
-	cChunkDef::HeightMap m_CurChunkHeights;
-
 	// Per-biome terrain generator parameters:
 	struct sGenParam
 	{
@@ -72,28 +66,26 @@ protected:
 	} ;
 	static const sGenParam m_GenParam[256];
 
-	// Distortion amplitudes for each direction, before linear upscaling
-	NOISE_DATATYPE m_DistortAmpX[DIM_X * DIM_Z];
-	NOISE_DATATYPE m_DistortAmpZ[DIM_X * DIM_Z];
-
 	/** True if Initialize() has been called. Used to initialize-once even with multiple init entrypoints (HeiGen / CompoGen). */
 	bool m_IsInitialized;
 
 
 	/** Unless the LastChunk coords are equal to coords given, prepares the internal state (noise arrays, heightmap). */
-	void PrepareState(cChunkCoords a_ChunkCoords);
+	void PrepareState(cChunkCoords a_ChunkCoords, NOISE_DATATYPE m_DistortedHeightmap[17 * 257 * 17]);
 
 	/** Generates the m_DistortedHeightmap array for the current chunk. */
-	void GenerateHeightArray(void);
+	void GenerateHeightArray(cChunkCoords a_ChunkCoords, NOISE_DATATYPE a_DistortAmpX[DIM_X * DIM_Z], NOISE_DATATYPE a_DistortAmpZ[DIM_X * DIM_Z], const cChunkDef::HeightMap& a_CurChunkHeights, NOISE_DATATYPE m_DistortedHeightmap[17 * 257 * 17]);
 
 	/** Calculates the heightmap value (before distortion) at the specified (floating-point) coords. */
-	int GetHeightmapAt(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Z);
+	int GetHeightmapAt(cChunkCoords a_ChunkCoords, NOISE_DATATYPE a_X, NOISE_DATATYPE a_Z, const cChunkDef::HeightMap & a_CurChunkHeights);
 
 	/** Updates m_DistortAmpX/Z[] based on m_CurChunkX and m_CurChunkZ. */
-	void UpdateDistortAmps(void);
+	void UpdateDistortAmps(cChunkCoords a_ChunkCoords, NOISE_DATATYPE a_DistortAmpX[DIM_X * DIM_Z],
+		NOISE_DATATYPE a_DistortAmpZ[DIM_X * DIM_Z]) const;
 
 	/** Calculates the X and Z distortion amplitudes based on the neighbors' biomes. */
-	void GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_RelX, int a_RelZ, NOISE_DATATYPE & a_DistortAmpX, NOISE_DATATYPE & a_DistortAmpZ);
+	static void GetDistortAmpsAt(const BiomeNeighbors & a_Neighbors, int a_RelX, int a_RelZ, NOISE_DATATYPE &
+	                             a_DistortAmpX, NOISE_DATATYPE & a_DistortAmpZ);
 
 	/** Reads the settings from the ini file. Skips reading if already initialized. */
 	void Initialize(cIniFile & a_IniFile);

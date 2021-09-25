@@ -29,7 +29,7 @@ public:
 	}
 
 protected:
-	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override
+	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) const override
 	{
 		// Do nothing
 	}
@@ -146,24 +146,29 @@ void cGridStructGen::GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructur
 	int MinZ = MinGridZ * m_GridSizeZ;
 	int MaxZ = MaxGridZ * m_GridSizeZ;
 
-	// Walk the cache, move each structure that we want into a_Structures:
-	for (cStructurePtrs::iterator itr = m_Cache.begin(), end = m_Cache.end(); itr != end;)
+
 	{
-		if (
-			((*itr)->m_GridX >= MinX) && ((*itr)->m_GridX < MaxX) &&
-			((*itr)->m_GridZ >= MinZ) && ((*itr)->m_GridZ < MaxZ)
-		)
+		cCSLock Lock{ m_CS };
+
+		// Walk the cache, move each structure that we want into a_Structures:
+		for (auto itr = m_Cache.begin(), end = m_Cache.end(); itr != end;)
 		{
-			// want
-			a_Structures.push_back(*itr);
-			itr = m_Cache.erase(itr);
-		}
-		else
-		{
-			// don't want
-			++itr;
-		}
-	}  // for itr - m_Cache[]
+			if (
+				((*itr)->m_GridX >= MinX) && ((*itr)->m_GridX < MaxX) &&
+				((*itr)->m_GridZ >= MinZ) && ((*itr)->m_GridZ < MaxZ)
+				)
+			{
+				// want
+				a_Structures.push_back(*itr);
+				itr = m_Cache.erase(itr);
+			}
+			else
+			{
+				// don't want
+				++itr;
+			}
+		}  // for itr - m_Cache[]
+	}
 
 	// Create those structures that haven't been in the cache:
 	for (int x = MinGridX; x < MaxGridX; x++)
@@ -195,20 +200,24 @@ void cGridStructGen::GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructur
 		}  // for z
 	}  // for x
 
-	// Copy a_Forts into m_Cache to the beginning:
-	cStructurePtrs StructuresCopy (a_Structures);
-	m_Cache.splice(m_Cache.begin(), StructuresCopy, StructuresCopy.begin(), StructuresCopy.end());
-
-	// Trim the cache if it's too long:
-	size_t CacheSize = 0;
-	for (cStructurePtrs::iterator itr = m_Cache.begin(), end = m_Cache.end(); itr != end; ++itr)
 	{
-		CacheSize += (*itr)->GetCacheCost();
-		if (CacheSize > m_MaxCacheSize)
+		cStructurePtrs StructuresCopy (a_Structures);
+
+		cCSLock Lock{ m_CS };
+
+		m_Cache.splice(m_Cache.begin(), StructuresCopy, StructuresCopy.begin(), StructuresCopy.end());
+
+		// Trim the cache if it's too long:
+		size_t CacheSize = 0;
+		for (auto itr = m_Cache.begin(), end = m_Cache.end(); itr != end; ++itr)
 		{
-			// Erase all items from this one till the cache end
-			m_Cache.erase(itr, m_Cache.end());
-			break;
+			CacheSize += (*itr)->GetCacheCost();
+			if (CacheSize > m_MaxCacheSize)
+			{
+				// Erase all items from this one till the cache end
+				m_Cache.erase(itr, m_Cache.end());
+				break;
+			}
 		}
 	}
 }

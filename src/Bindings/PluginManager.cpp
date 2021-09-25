@@ -239,7 +239,7 @@ void cPluginManager::Tick(float a_Dt)
 
 
 template <typename HookFunction>
-bool cPluginManager::GenericCallHook(PluginHook a_HookName, HookFunction a_HookFunction)
+bool cPluginManager::GenericCallHook(PluginHook a_HookName, HookFunction a_HookFunction) const
 {
 	auto Plugins = m_Hooks.find(a_HookName);
 	if (Plugins == m_Hooks.end())
@@ -387,7 +387,7 @@ bool cPluginManager::CallHookChunkAvailable(cWorld & a_World, int a_ChunkX, int 
 
 
 
-bool cPluginManager::CallHookChunkGenerated(cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
+bool cPluginManager::CallHookChunkGenerated(cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc) const
 {
 	return GenericCallHook(HOOK_CHUNK_GENERATED, [&](cPlugin * a_Plugin)
 		{
@@ -400,7 +400,7 @@ bool cPluginManager::CallHookChunkGenerated(cWorld & a_World, int a_ChunkX, int 
 
 
 
-bool cPluginManager::CallHookChunkGenerating(cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
+bool cPluginManager::CallHookChunkGenerating(cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc) const
 {
 	return GenericCallHook(HOOK_CHUNK_GENERATING, [&](cPlugin * a_Plugin)
 		{

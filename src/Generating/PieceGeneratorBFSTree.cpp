@@ -30,7 +30,7 @@ cPieceGeneratorBFSTree::cPieceGeneratorBFSTree(cPiecePool & a_PiecePool, int a_S
 
 
 
-cPlacedPiecePtr cPieceGeneratorBFSTree::PlaceStartingPiece(int a_BlockX, int a_BlockZ, cFreeConnectors & a_OutConnectors)
+cPlacedPiecePtr cPieceGeneratorBFSTree::PlaceStartingPiece(int a_BlockX, int a_BlockZ, cFreeConnectors & a_OutConnectors) const
 {
 	m_PiecePool.Reset();
 	int rnd = m_Noise.IntNoise2DInt(a_BlockX, a_BlockZ) / 7;
@@ -102,7 +102,7 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 	const cPiece::cConnector & a_Connector,
 	cPlacedPieces & a_OutPieces,
 	cPieceGeneratorBFSTree::cFreeConnectors & a_OutConnectors
-)
+) const
 {
 	// Get a list of available connections:
 	cConnections Connections;
@@ -225,7 +225,7 @@ bool cPieceGeneratorBFSTree::CheckConnection(
 
 
 
-void cPieceGeneratorBFSTree::PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDepth, cPlacedPieces & a_OutPieces)
+void cPieceGeneratorBFSTree::PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDepth, cPlacedPieces & a_OutPieces) const
 {
 	a_OutPieces.clear();
 	cFreeConnectors ConnectorPool;

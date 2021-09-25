@@ -49,6 +49,9 @@ protected:
 		{}
 	} ;
 
+	/** Generator cache protection mutex. */
+	mutable cCriticalSection m_CS;
+
 	/** The terrain height generator that is being cached. */
 	cTerrainHeightGen & m_HeiGenToCache;
 
@@ -133,7 +136,7 @@ protected:
 	float m_HeightFreq2, m_HeightAmp2;
 	float m_HeightFreq3, m_HeightAmp3;
 
-	float GetNoise(float x, float y);
+	float GetNoise(float x, float y) const;
 
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap) override;
@@ -205,5 +208,5 @@ protected:
 	static const sGenParam m_GenParam[256];
 
 
-	NOISE_DATATYPE GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const BiomeNeighbors & a_BiomeNeighbors);
+	NOISE_DATATYPE GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const BiomeNeighbors & a_BiomeNeighbors) const;
 } ;

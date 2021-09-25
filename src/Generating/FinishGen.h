@@ -64,7 +64,7 @@ protected:
 	cNoise m_Noise;
 	int    m_Seed;
 
-	void TryPlaceClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block);
+	void TryPlaceClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block) const;
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
@@ -138,7 +138,7 @@ protected:
 	/** The maximum range a foliage can be placed from the center of the clump */
 	const int RANGE_FROM_CENTER = 5;
 
-	void TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_IsDoubleTall);
+	void TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_IsDoubleTall) const;
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 };
 
@@ -160,7 +160,7 @@ protected:
 	cNoise m_Noise;
 	int    m_Seed;
 
-	void TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, int a_Size, int a_NumStrings);
+	void TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, int a_Size, int a_NumStrings) const;
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
@@ -201,7 +201,7 @@ public:
 	{
 	}
 
-	bool IsJungleVariant(EMCSBiome a_Biome);
+	static bool IsJungleVariant(EMCSBiome a_Biome);
 
 protected:
 	cNoise m_Noise;
@@ -251,10 +251,10 @@ protected:
 	int    m_MaxSugarcaneHeight;
 
 	/** Tries to place sugarcane at the coords specified, returns true if successful, updates the top variable (hence the & a_RefY) */
-	bool TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ);
+	bool TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ) const;
 
 	/** Tries to place cactus at the coords specified, returns true if successful, updates the top variable (hence the & a_RefY) */
-	bool TryAddCactus(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ);
+	bool TryAddCactus(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ) const;
 
 	// Returns true is the specified biome is a desert or its variant
 	static bool IsDesertVariant(EMCSBiome a_biome);
@@ -323,16 +323,16 @@ protected:
 	int m_Amount;
 
 
-	int GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap);
+	int GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap) const;
 
 	/** Returns true if the given biome is a biome that is allowed. */
-	inline bool IsAllowedBiome(EMCSBiome a_Biome)
+	inline bool IsAllowedBiome(EMCSBiome a_Biome) const
 	{
 		return m_IsBiomeAllowed[a_Biome];
 	}
 
 	/** Returns true if the given blocktype may be below m_BlockType */
-	inline bool IsAllowedBlockBelow(BLOCKTYPE a_BlockBelow)
+	inline bool IsAllowedBlockBelow(BLOCKTYPE a_BlockBelow) const
 	{
 		return m_IsAllowedBelow[a_BlockBelow];
 	}
@@ -380,7 +380,7 @@ protected:
 	bool m_PreSimulateLava;
 
 	/** Drops hanging sand and gravel down to the ground, recalculates heightmap */
-	void CollapseSandGravel(cChunkDesc & a_ChunkDesc);
+	static void CollapseSandGravel(cChunkDesc & a_ChunkDesc);
 
 	/** For each fluid block:
 	- if all surroundings are of the same fluid, makes it stationary; otherwise makes it flowing (excl. top)
@@ -390,7 +390,7 @@ protected:
 		cChunkDef::HeightMap & a_HeightMap,      // Height map to read
 		BLOCKTYPE a_Fluid,
 		BLOCKTYPE a_StationaryFluid
-	);
+	) const;
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
@@ -417,7 +417,7 @@ protected:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	/** Tries to place a spring at the specified coords, checks neighbors. Returns true if successful. */
-	bool TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z);
+	bool TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z) const;
 } ;
 
 
@@ -446,11 +446,11 @@ protected:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	/** Returns false if an animal cannot spawn at given coords, else adds it to the chunk's entity list and returns true */
-	bool TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int x, int y, int z, eMonsterType AnimalToSpawn);
+	bool TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int x, int y, int z, eMonsterType AnimalToSpawn) const;
 
 	/** Picks a random animal from biome-dependant list for a random position in the chunk.
 	Returns the chosen mob type, or mtInvalid if no mob chosen. */
-	eMonsterType GetRandomMob(cChunkDesc & a_ChunkDesc);
+	eMonsterType GetRandomMob(cChunkDesc & a_ChunkDesc) const;
 } ;
 
 
@@ -543,7 +543,7 @@ protected:
 		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
 		int a_MaxHeight, int a_NumNests, int a_NestSize,
 		int a_Seq
-	) = 0;
+	) const = 0;
 
 	// TODO: Helper function to parse a config string into m_OreInfos
 };
@@ -571,7 +571,7 @@ protected:
 		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
 		int a_MaxHeight, int a_NumNests, int a_NestSize,
 		int a_Seq
-	) override;
+	) const override;
 } ;
 
 
@@ -601,7 +601,7 @@ protected:
 		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
 		int a_MaxNestHeight, int a_NumNests, int a_NestSize,
 		int a_Seq
-	) override;
+	) const override;
 
 	/** Calculates the pockets for the specified chunk and imprints them into the specified ChunkDesc (not necessarily the same chunk).
 	a_Seq is the sequence number of the ore, to provide another source of randomness. */
@@ -611,7 +611,7 @@ protected:
 		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
 		int a_MaxHeight, int a_NumNests, int a_NestSize,
 		int a_Seq
-	);
+	) const;
 
 	/** Imprints a single pocket of the specified ore at the specified coords into the chunk.
 	The pocket shape has its minimum X and Z coords specified, Y can be anywhere around the specified Y coord.
@@ -621,14 +621,14 @@ protected:
 		int a_MinPocketX, int a_PocketY, int a_MinPocketZ,
 		int a_NestSize, int a_Seq,
 		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta
-	);
+	) const;
 
 	/** Imprints a single sphere of the specified ore at the specified coords. */
 	void imprintSphere(
 		cChunkDesc & a_ChunkDesc,
 		double a_SphereX, double a_SphereY, double a_SphereZ, double a_Radius,
 		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta
-	);
+	) const;
 };
 
 

@@ -649,7 +649,7 @@ void cChunkDesc::CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas)
 
 #ifndef NDEBUG
 
-void cChunkDesc::VerifyHeightmap(void)
+void cChunkDesc::VerifyHeightmap(void) const
 {
 	for (int x = 0; x < cChunkDef::Width; x++)
 	{

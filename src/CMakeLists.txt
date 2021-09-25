@@ -3,6 +3,7 @@ target_sources(
 
 	Resources/Cuberite.rc
 
+	ThreadPool.cpp
 	BiomeDef.cpp
 	BlockArea.cpp
 	BlockInfo.cpp
@@ -67,6 +68,7 @@ target_sources(
 	World.cpp
 	main.cpp
 
+	ThreadPool.h
 	BiomeDef.h
 	BlockArea.h
 	BlockInServerPluginInterface.h

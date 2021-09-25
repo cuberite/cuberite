@@ -23,6 +23,16 @@ function(build_dependencies)
 	set(JSONCPP_WITH_CMAKE_PACKAGE OFF CACHE BOOL "Generate and install cmake package files")
 	set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build jsoncpp_lib as a shared library.")
 	set(BUILD_OBJECT_LIBS OFF CACHE BOOL "Build jsoncpp_lib as a object library.")
+	
+	set(TBB_TEST OFF CACHE BOOL "TBB: Enable testing")
+	set(TBB_EXAMPLES OFF CACHE BOOL "TBB: Enable examples")
+	set(TBB_STRICT ON CACHE BOOL "TBB: Treat compiler warnings as errors")
+	set(TBB4PY_BUILD OFF CACHE BOOL "TBB: Enable tbb4py build")
+	set(TBB_BUILD ON CACHE BOOL "TBB: Enable tbb build")
+	set(TBBMALLOC_BUILD OFF CACHE BOOL "TBB: Enable tbbmalloc build") # Not used for now maybe in the future?
+	set(TBB_CPF OFF CACHE BOOL "TBB: Enable preview features of the library")
+	set(TBB_FIND_PACKAGE OFF CACHE BOOL "TBB: Enable search for external oneTBB using find_package instead of build from sources")
+	set(TBB_DISABLE_HWLOC_AUTOMATIC_SEARCH OFF CACHE BOOL "TBB: Disable HWLOC automatic search by pkg-config tool")
 
 	# Set options for mbedtls:
 	set(ENABLE_PROGRAMS OFF CACHE BOOL "Build mbed TLS programs.")
@@ -30,7 +40,7 @@ function(build_dependencies)
 
 	# Enumerate all submodule libraries
 	# SQLiteCpp needs to be included before sqlite so the lsqlite target is available:
-	set(DEPENDENCIES expat fmt jsoncpp libdeflate libevent lua luaexpat mbedtls SQLiteCpp sqlite tolua++)
+	set(DEPENDENCIES expat fmt jsoncpp libdeflate libevent lua luaexpat mbedtls SQLiteCpp sqlite tolua++ oneTBB)
 	foreach(DEPENDENCY ${DEPENDENCIES})
 		# Check that the libraries are present:
 		if (NOT EXISTS "${PROJECT_SOURCE_DIR}/lib/${DEPENDENCY}/CMakeLists.txt")
@@ -71,6 +81,7 @@ function(link_dependencies TARGET)
 		mbedtls
 		SQLiteCpp
 		tolualib
+		TBB::tbb
 	)
 
 	# Link process information, multimedia (for sleep resolution) libraries:

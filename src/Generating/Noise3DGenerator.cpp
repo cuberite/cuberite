@@ -195,7 +195,7 @@ void cNoise3DGenerator::Initialize(cIniFile & a_IniFile)
 
 
 
-void cNoise3DGenerator::GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
+void cNoise3DGenerator::GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) const
 {
 	UNUSED(a_ChunkCoords);
 	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
@@ -208,7 +208,7 @@ void cNoise3DGenerator::GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef::Bi
 
 
 
-void cNoise3DGenerator::Generate(cChunkDesc & a_ChunkDesc)
+void cNoise3DGenerator::Generate(cChunkDesc & a_ChunkDesc) const
 {
 	NOISE_DATATYPE Noise[17 * 257 * 17];
 	GenerateNoiseArray(a_ChunkDesc.GetChunkCoords(), Noise);
@@ -244,7 +244,7 @@ void cNoise3DGenerator::Generate(cChunkDesc & a_ChunkDesc)
 
 
 
-void cNoise3DGenerator::GenerateNoiseArray(cChunkCoords a_ChunkCoords, NOISE_DATATYPE * a_OutNoise)
+void cNoise3DGenerator::GenerateNoiseArray(cChunkCoords a_ChunkCoords, NOISE_DATATYPE * a_OutNoise) const
 {
 	NOISE_DATATYPE NoiseO[DIM_X * DIM_Y * DIM_Z];  // Output for the Perlin noise
 	NOISE_DATATYPE NoiseW[DIM_X * DIM_Y * DIM_Z];  // Workspace that the noise calculation can use and trash
@@ -362,8 +362,7 @@ cNoise3DComposable::cNoise3DComposable(int a_Seed) :
 	m_ChoiceFrequencyX(0.0),
 	m_ChoiceFrequencyY(0.0),
 	m_ChoiceFrequencyZ(0.0),
-	m_AirThreshold(0.0),
-	m_LastChunkCoords(0x7fffffff, 0x7fffffff)  // Use dummy coords that won't ever be used by real chunks
+	m_AirThreshold(0.0)
 {
 }
 
@@ -424,14 +423,15 @@ void cNoise3DComposable::Initialize(cIniFile & a_IniFile)
 
 
 
-void cNoise3DComposable::GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCoords)
+void cNoise3DComposable::GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCoords, NOISE_DATATYPE a_NoiseArray[17 * 17 * 257]) const
 {
-	if (a_ChunkCoords == m_LastChunkCoords)
-	{
-		// The noise for this chunk is already generated in m_NoiseArray
-		return;
-	}
-	m_LastChunkCoords = a_ChunkCoords;
+	//TODO: Removed, not thread safe
+	//if (a_ChunkCoords == m_LastChunkCoords)
+	//{
+	//	// The noise for this chunk is already generated in m_NoiseArray
+	//	return;
+	//}
+	//m_LastChunkCoords = a_ChunkCoords;
 
 	// Generate all the noises:
 	NOISE_DATATYPE ChoiceNoise[5 * 5 * 33];
@@ -475,7 +475,7 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCoords)
 			}
 		}
 	}
-	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace, 33, 5, 5, m_NoiseArray, 8, 4, 4);
+	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace, 33, 5, 5, a_NoiseArray, 8, 4, 4);
 }
 
 
@@ -484,7 +484,8 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCoords)
 
 void cNoise3DComposable::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape)
 {
-	GenerateNoiseArrayIfNeeded(a_ChunkCoords);
+	NOISE_DATATYPE NoiseArray[17 * 17 * 257];
+	GenerateNoiseArrayIfNeeded(a_ChunkCoords, NoiseArray);
 
 	// Translate the noise array into Shape:
 	for (int z = 0; z < cChunkDef::Width; z++)
@@ -493,7 +494,7 @@ void cNoise3DComposable::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape 
 		{
 			for (int y = 0; y < cChunkDef::Height; y++)
 			{
-				a_Shape[y + x * 256 + z * 256 * 16] = (m_NoiseArray[y + 257 * x + 257 * 17 * z] > m_AirThreshold) ? 0 : 1;
+				a_Shape[y + x * 256 + z * 256 * 16] = (NoiseArray[y + 257 * x + 257 * 17 * z] > m_AirThreshold) ? 0 : 1;
 			}
 		}  // for x
 	}  // for z
@@ -511,8 +512,7 @@ cBiomalNoise3DComposable::cBiomalNoise3DComposable(int a_Seed, cBiomeGen & a_Bio
 	m_DensityNoiseA(a_Seed + 1),
 	m_DensityNoiseB(a_Seed + 2),
 	m_BaseNoise(a_Seed + 3),
-	m_BiomeGen(a_BiomeGen),
-	m_LastChunkCoords(0x7fffffff, 0x7fffffff)  // Set impossible coords for the chunk so that it's always considered stale
+	m_BiomeGen(a_BiomeGen)
 {
 	// Generate the weight distribution for summing up neighboring biomes:
 	m_WeightSum = 0;
@@ -582,14 +582,15 @@ void cBiomalNoise3DComposable::Initialize(cIniFile & a_IniFile)
 
 
 
-void cBiomalNoise3DComposable::GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCoords)
+void cBiomalNoise3DComposable::GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCoords, NOISE_DATATYPE a_Noise[17 * 17 * 257])
 {
-	if (a_ChunkCoords == m_LastChunkCoords)
-	{
-		// The noise for this chunk is already generated in m_NoiseArray
-		return;
-	}
-	m_LastChunkCoords = a_ChunkCoords;
+	//TODO: Removed, not thread safe
+	//if (a_ChunkCoords == m_LastChunkCoords)
+	//{
+	//	// The noise for this chunk is already generated in m_NoiseArray
+	//	return;
+	//}
+	//m_LastChunkCoords = a_ChunkCoords;
 
 	// Calculate the parameters for the biomes:
 	ChunkParam MidPoint;
@@ -639,7 +640,7 @@ void cBiomalNoise3DComposable::GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCo
 			}
 		}
 	}
-	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace, 33, 5, 5, m_NoiseArray, 8, 4, 4);
+	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace, 33, 5, 5, a_Noise, 8, 4, 4);
 }
 
 
@@ -777,7 +778,8 @@ void cBiomalNoise3DComposable::GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE 
 
 void cBiomalNoise3DComposable::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape)
 {
-	GenerateNoiseArrayIfNeeded(a_ChunkCoords);
+	NOISE_DATATYPE Noise[17 * 17 * 257];  // 257 * x + y + 257 * 17 * z
+	GenerateNoiseArrayIfNeeded(a_ChunkCoords, Noise);
 
 	// Translate the noise array into Shape:
 	for (int z = 0; z < cChunkDef::Width; z++)
@@ -786,7 +788,7 @@ void cBiomalNoise3DComposable::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::
 		{
 			for (int y = 0; y < cChunkDef::Height; y++)
 			{
-				a_Shape[y + x * 256 + z * 256 * 16] = (m_NoiseArray[y + 257 * x + 257 * 17 * z] > m_AirThreshold) ? 0 : 1;
+				a_Shape[y + x * 256 + z * 256 * 16] = (Noise[y + 257 * x + 257 * 17 * z] > m_AirThreshold) ? 0 : 1;
 			}
 		}  // for x
 	}  // for z

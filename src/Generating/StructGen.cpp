@@ -99,7 +99,7 @@ void cStructGenTrees::GenerateSingleTree(
 	cChunkDesc & a_ChunkDesc,
 	sSetBlockVector & a_OutsideLogs,
 	sSetBlockVector & a_OutsideOther
-)
+) const
 {
 	if ((a_Pos.y <= 0) || (a_Pos.y >= 230))
 	{
@@ -338,7 +338,7 @@ void cStructGenLakes::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeHeight, cBlockArea & a_Lake)
+void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeHeight, cBlockArea & a_Lake) const
 {
 	a_Lake.Create(16, 8, 16);
 	a_Lake.Fill(cBlockArea::baTypes, E_BLOCK_SPONGE);  // Sponge is the NOP blocktype for lake merging strategy
@@ -508,7 +508,7 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-bool cStructGenDirectOverhangs::HasWantedBiome(cChunkDesc & a_ChunkDesc) const
+bool cStructGenDirectOverhangs::HasWantedBiome(cChunkDesc & a_ChunkDesc)
 {
 	cChunkDef::BiomeMap & Biomes = a_ChunkDesc.GetBiomeMap();
 	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)

@@ -78,49 +78,58 @@ cBioGenCache::cBioGenCache(cBiomeGen & a_BioGenToCache, size_t a_CacheSize) :
 
 void cBioGenCache::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	if (((m_NumHits + m_NumMisses) % 1024) == 10)
 	{
-		// LOGD("BioGenCache: %u hits, %u misses, saved %.2f %%", static_cast<unsigned>(m_NumHits), static_cast<unsigned>(m_NumMisses), 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
-		// LOGD("BioGenCache: Avg cache chain length: %.2f", static_cast<double>(m_TotalChain) / m_NumHits);
+		cCSLock Lock{ m_CS };
+
+		if (((m_NumHits + m_NumMisses) % 1024) == 10)
+		{
+			// LOGD("BioGenCache: %u hits, %u misses, saved %.2f %%", static_cast<unsigned>(m_NumHits), static_cast<unsigned>(m_NumMisses), 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
+			// LOGD("BioGenCache: Avg cache chain length: %.2f", static_cast<double>(m_TotalChain) / m_NumHits);
+		}
+
+		for (size_t i = 0; i < m_CacheSize; i++)
+		{
+			if (m_CacheData[m_CacheOrder[i]].m_Coords != a_ChunkCoords)
+			{
+				continue;
+			}
+			// Found it in the cache
+			size_t Idx = m_CacheOrder[i];
+
+			// Move to front:
+			for (size_t j = i; j > 0; j--)
+			{
+				m_CacheOrder[j] = m_CacheOrder[j - 1];
+			}
+			m_CacheOrder[0] = Idx;
+
+			// Use the cached data:
+			memcpy(a_BiomeMap, m_CacheData[Idx].m_BiomeMap, sizeof(a_BiomeMap));
+
+			m_NumHits++;
+			m_TotalChain += i;
+			return;
+		}  // for i - cache
+
+		// Not in the cache:
+		m_NumMisses++;
 	}
 
-	for (size_t i = 0; i < m_CacheSize; i++)
-	{
-		if (m_CacheData[m_CacheOrder[i]].m_Coords != a_ChunkCoords)
-		{
-			continue;
-		}
-		// Found it in the cache
-		size_t Idx = m_CacheOrder[i];
-
-		// Move to front:
-		for (size_t j = i; j > 0; j--)
-		{
-			m_CacheOrder[j] = m_CacheOrder[j - 1];
-		}
-		m_CacheOrder[0] = Idx;
-
-		// Use the cached data:
-		memcpy(a_BiomeMap, m_CacheData[Idx].m_BiomeMap, sizeof(a_BiomeMap));
-
-		m_NumHits++;
-		m_TotalChain += i;
-		return;
-	}  // for i - cache
-
-	// Not in the cache:
-	m_NumMisses++;
+	// Generation is multi-threaded, but the rest can't be
 	m_BioGenToCache.GenBiomes(a_ChunkCoords, a_BiomeMap);
 
-	// Insert it as the first item in the MRU order:
-	size_t Idx = m_CacheOrder[m_CacheSize - 1];
-	for (size_t i = m_CacheSize - 1; i > 0; i--)
 	{
-		m_CacheOrder[i] = m_CacheOrder[i - 1];
-	}  // for i - m_CacheOrder[]
-	m_CacheOrder[0] = Idx;
-	memcpy(m_CacheData[Idx].m_BiomeMap, a_BiomeMap, sizeof(a_BiomeMap));
-	m_CacheData[Idx].m_Coords = a_ChunkCoords;
+		cCSLock Lock{ m_CS };
+		// Insert it as the first item in the MRU order:
+		size_t Idx = m_CacheOrder[m_CacheSize - 1];
+		for (size_t i = m_CacheSize - 1; i > 0; i--)
+		{
+			m_CacheOrder[i] = m_CacheOrder[i - 1];
+		}  // for i - m_CacheOrder[]
+		m_CacheOrder[0] = Idx;
+		memcpy(m_CacheData[Idx].m_BiomeMap, a_BiomeMap, sizeof(a_BiomeMap));
+		m_CacheData[Idx].m_Coords = a_ChunkCoords;
+	}
 }
 
 
@@ -375,7 +384,7 @@ void cBioGenDistortedVoronoi::InitializeBiomeGen(cIniFile & a_IniFile)
 
 
 
-void cBioGenDistortedVoronoi::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ)
+void cBioGenDistortedVoronoi::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ) const
 {
 	double NoiseX = m_Noise.CubicNoise3D(static_cast<float>(a_BlockX / m_CellSize), static_cast<float>(a_BlockZ / m_CellSize), 1000);
 	NoiseX += 0.5 * m_Noise.CubicNoise3D(2 *  static_cast<float>(a_BlockX / m_CellSize), 2 *  static_cast<float>(a_BlockZ / m_CellSize), 2000);
@@ -439,7 +448,7 @@ void cBioGenMultiStepMap::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::Biome
 
 
 
-void cBioGenMultiStepMap::DecideOceanLandMushroom(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenMultiStepMap::DecideOceanLandMushroom(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) const
 {
 	// Distorted Voronoi over 3 biomes, with mushroom having only a special occurence.
 
@@ -542,7 +551,7 @@ void cBioGenMultiStepMap::DecideOceanLandMushroom(cChunkCoords a_ChunkCoords, cC
 
 
 
-void cBioGenMultiStepMap::AddRivers(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenMultiStepMap::AddRivers(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) const
 {
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -573,7 +582,7 @@ void cBioGenMultiStepMap::AddRivers(cChunkCoords a_ChunkCoords, cChunkDef::Biome
 
 
 
-void cBioGenMultiStepMap::ApplyTemperatureHumidity(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenMultiStepMap::ApplyTemperatureHumidity(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) const
 {
 	IntMap TemperatureMap;
 	IntMap HumidityMap;
@@ -587,7 +596,7 @@ void cBioGenMultiStepMap::ApplyTemperatureHumidity(cChunkCoords a_ChunkCoords, c
 
 
 
-void cBioGenMultiStepMap::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ, int a_CellSize)
+void cBioGenMultiStepMap::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ, int a_CellSize) const
 {
 	double NoiseX = m_Noise3.CubicNoise2D(     static_cast<float>(a_BlockX / a_CellSize),      static_cast<float>(a_BlockZ / a_CellSize));
 	NoiseX += 0.5 * m_Noise2.CubicNoise2D(2 *  static_cast<float>(a_BlockX / a_CellSize), 2 *  static_cast<float>(a_BlockZ / a_CellSize));
@@ -604,7 +613,7 @@ void cBioGenMultiStepMap::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX
 
 
 
-void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(cChunkCoords a_ChunkCoords, IntMap & a_TemperatureMap, IntMap & a_HumidityMap)
+void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(cChunkCoords a_ChunkCoords, IntMap & a_TemperatureMap, IntMap & a_HumidityMap) const
 {
 	// Linear interpolation over 8x8 blocks; use double for better precision:
 	DblMap TemperatureMap;

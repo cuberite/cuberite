@@ -34,5 +34,5 @@ protected:
 	int m_MinX = -1, m_MaxX = 1, m_MinZ = -1, m_MaxZ = 1;
 
 	void GenFinish(cChunkDesc &a_ChunkDesc) override;
-	void PlaceTower(cChunkDesc & a_ChunkDesc, const sTowerProperties & a_TowerProperties);
+	static void PlaceTower(cChunkDesc & a_ChunkDesc, const sTowerProperties & a_TowerProperties);
 };

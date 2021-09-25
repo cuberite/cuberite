@@ -103,7 +103,7 @@ public:
 		cChunkDef::BlockTypes & a_BlockTypes,
 		cChunkDesc::BlockNibbleBytes & a_BlockMetas,
 		cChunkDef::HeightMap & a_HeightMap
-	);
+	) const;
 
 	#ifndef NDEBUG
 	AString ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) const;
@@ -147,7 +147,7 @@ protected:
 	int GetRadius(cNoise & a_Noise, int a_OriginX, int a_OriginY, int a_OriginZ);
 
 	// cGridStructGen::cStructure overrides:
-	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override;
+	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) const override;
 } ;
 
 
@@ -460,7 +460,7 @@ void cCaveTunnel::ProcessChunk(
 	cChunkDef::BlockTypes & a_BlockTypes,
 	cChunkDesc::BlockNibbleBytes & a_BlockMetas,
 	cChunkDef::HeightMap & a_HeightMap
-)
+) const
 {
 	int BaseX = a_ChunkX * cChunkDef::Width;
 	int BaseZ = a_ChunkZ * cChunkDef::Width;
@@ -611,7 +611,7 @@ cStructGenWormNestCaves::cCaveSystem::~cCaveSystem()
 
 
 
-void cStructGenWormNestCaves::cCaveSystem::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
+void cStructGenWormNestCaves::cCaveSystem::DrawIntoChunk(cChunkDesc & a_ChunkDesc) const
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();

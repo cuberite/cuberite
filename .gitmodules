@@ -65,3 +65,6 @@
 [submodule "lib/libdeflate"]
 	path = lib/libdeflate
 	url = https://github.com/cuberite/libdeflate
+[submodule "lib/oneTBB"]
+	path = lib/oneTBB
+	url = https://github.com/oneapi-src/oneTBB.git

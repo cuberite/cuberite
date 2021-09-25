@@ -280,7 +280,7 @@ protected:
 
 
 	/** Composes a single column in a_ChunkDesc. Chooses what to do based on the biome in that column. */
-	void ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, const Byte * a_ShapeColumn)
+	void ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, const Byte * a_ShapeColumn) const
 	{
 		// Frequencies for the podzol floor selecting noise:
 		const NOISE_DATATYPE FrequencyX = 8;
@@ -409,7 +409,7 @@ protected:
 
 	/** Fills the specified column with the specified pattern; restarts the pattern when air is reached,
 	switches to ocean floor pattern if ocean is reached. Always adds bedrock at the very bottom. */
-	void FillColumnPattern(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, const cPattern::BlockInfo * a_Pattern, const Byte * a_ShapeColumn)
+	void FillColumnPattern(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, const cPattern::BlockInfo * a_Pattern, const Byte * a_ShapeColumn) const
 	{
 		bool HasHadWater = false;
 		int PatternIdx = 0;
@@ -462,7 +462,7 @@ protected:
 
 
 	/** Fills the specified column with mesa pattern, based on the column height */
-	void FillColumnMesa(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, const Byte * a_ShapeColumn)
+	void FillColumnMesa(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, const Byte * a_ShapeColumn) const
 	{
 		// Frequencies for the clay floor noise:
 		const NOISE_DATATYPE FrequencyX = 50;
@@ -553,7 +553,7 @@ protected:
 
 	/** Returns the pattern to use for an ocean floor in the specified column.
 	The returned pattern is guaranteed to be 256 blocks long. */
-	const cPattern::BlockInfo * ChooseOceanFloorPattern(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ)
+	const cPattern::BlockInfo * ChooseOceanFloorPattern(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ) const
 	{
 		// Frequencies for the ocean floor selecting noise:
 		const NOISE_DATATYPE FrequencyX = 3;
