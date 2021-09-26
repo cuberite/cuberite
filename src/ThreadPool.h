@@ -1,13 +1,6 @@
 #pragma once
 
-// The new and free macros break tbb
-#pragma push_macro("new")
-#undef new
-#pragma push_macro("free")
-#undef free
-#include <oneapi/tbb/global_control.h>
-#pragma pop_macro("free")
-#pragma pop_macro("new")
+#include "TBBWrapper.h"
 
 
 

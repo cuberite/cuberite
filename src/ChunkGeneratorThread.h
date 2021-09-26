@@ -2,17 +2,9 @@
 
 #include <shared_mutex>
 
-// The new and free macros break tbb
-#pragma push_macro("new")
-#undef new
-#pragma push_macro("free")
-#undef free
-#include <oneapi/tbb/concurrent_queue.h>
-#pragma pop_macro("free")
-#pragma pop_macro("new")
-
 #include "OSSupport/IsThread.h"
 #include "ChunkDef.h"
+#include "TBBWrapper.h"
 
 
 

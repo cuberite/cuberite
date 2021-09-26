@@ -1,13 +1,3 @@
-
-// The new and free macros break tbb
-#pragma push_macro("new")
-#undef new
-#pragma push_macro("free")
-#undef free
-#include <oneapi/tbb/task_group.h>
-#pragma pop_macro("free")
-#pragma pop_macro("new")
-
 #include "Globals.h"
 #include "ChunkGeneratorThread.h"
 #include "Generating/ChunkGenerator.h"

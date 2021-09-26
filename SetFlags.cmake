@@ -167,6 +167,7 @@ function(set_exe_flags TARGET)
 			-Weverything -Wno-exit-time-destructors -Wno-error=disabled-macro-expansion
 			-Wno-weak-vtables -Wno-string-conversion -Wno-c++98-compat-pedantic -Wno-documentation
 			-Wno-documentation-unknown-command -Wno-reserved-id-macro -Wno-error=unused-command-line-argument
+			-Wno-ctad-maybe-unsupported
 		)
 
 		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7)

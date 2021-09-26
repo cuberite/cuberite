@@ -15,6 +15,7 @@
 
 
 // Conditionally log a warning
+#ifndef CONDWARNING
 #define CONDWARNING(ShouldLog, ...) \
 	do { \
 		if (ShouldLog) \
@@ -22,6 +23,7 @@
 			LOGWARNING(__VA_ARGS__); \
 		} \
 	} while (false)
+#endif
 
 
 
