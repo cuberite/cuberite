@@ -7,9 +7,6 @@
 
 
 
-/** If the generation queue size exceeds this number, a warning will be output */
-const size_t QUEUE_WARNING_LIMIT = 1000;
-
 /** If the generation queue size exceeds this number, chunks with no clients will be skipped */
 const size_t QUEUE_SKIP_LIMIT = 500;
 
