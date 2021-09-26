@@ -106,7 +106,7 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Prior
 
 	bool found{};
 	{
-		std::shared_lock Lock{m_ChunkInfoSharedMutex};
+		std::shared_lock<std::shared_mutex> Lock{m_ChunkInfoSharedMutex};
 		auto iter = m_ChunkInfo.find(Chunk);
 		found = iter != m_ChunkInfo.end();
 
@@ -160,7 +160,7 @@ void cChunkSender::Execute(void)
 
 			ChunkInfoMap::iterator itr;
 			{
-				std::shared_lock Lock{m_ChunkInfoSharedMutex};
+				std::shared_lock<std::shared_mutex> Lock{m_ChunkInfoSharedMutex};
 				itr = m_ChunkInfo.find(Chunk);
 				if (itr == m_ChunkInfo.end())
 				{
@@ -170,7 +170,7 @@ void cChunkSender::Execute(void)
 
 			cChunkSender::WeakClients clients;
 			{
-				std::unique_lock Lock{m_ChunkInfoSharedMutex};
+				std::unique_lock<std::shared_mutex> Lock{m_ChunkInfoSharedMutex};
 				clients = std::move(itr->second.m_Clients);
 				m_ChunkInfo.unsafe_erase(itr);
 			}

@@ -77,7 +77,7 @@ void cChunkGeneratorThread::QueueGenerateChunk(
 	ASSERT(m_ChunkSink->IsChunkQueued(a_Coords));
 
 	{
-		std::shared_lock SharedLock{m_SharedMutex};	 // This operation is thread safe unless someone calls GetQueueLength()
+		std::shared_lock<std::shared_mutex> SharedLock{m_SharedMutex};	 // This operation is thread safe unless someone calls GetQueueLength()
 		m_Queue.emplace(a_Coords, a_ForceRegeneration, a_Callback);
 	}
 
@@ -102,7 +102,7 @@ void cChunkGeneratorThread::GenerateBiomes(cChunkCoords a_Coords, cChunkDef::Bio
 
 size_t cChunkGeneratorThread::GetQueueLength(void) const
 {
-	std::unique_lock UniqueLock{m_SharedMutex};	 // This operation is not thread safe, meaning we must lock the queue
+	std::unique_lock<std::shared_mutex> UniqueLock{m_SharedMutex};	 // This operation is not thread safe, meaning we must lock the queue
 	return m_Queue.unsafe_size();
 }
 
@@ -134,8 +134,8 @@ void cChunkGeneratorThread::Execute(void)
 	// To be able to display performance information, the generator counts the chunks generated.
 	// When the queue gets empty, the count is reset, so that waiting for the queue is not counted into the total time.
 	std::atomic_size_t NumChunksGenerated = 0;  // Number of chunks generated since the queue was last empty
-	std::atomic GenerationStart = clock();      // Clock tick when the queue started to fill
-	std::atomic LastReportTick = clock();       // Clock tick of the last report made (so that performance isn't reported too often)
+	std::atomic<clock_t> GenerationStart = clock();      // Clock tick when the queue started to fill
+	std::atomic<clock_t> LastReportTick = clock();       // Clock tick of the last report made (so that performance isn't reported too often)
 	tbb::task_group Pool;                       // TBB task group for this generation thread
 
 	while (!m_ShouldTerminate)
@@ -164,7 +164,7 @@ void cChunkGeneratorThread::Execute(void)
 		const auto SkipEnabled = GetQueueLength() > QUEUE_SKIP_LIMIT;
 
 		{
-			std::shared_lock SharedLock{m_SharedMutex};	 // This operation is concurrent unless someone calls
+			std::shared_lock<std::shared_mutex> SharedLock{m_SharedMutex};	 // This operation is concurrent unless someone calls
 
 			QueueItem Item{};
 			while (m_Queue.try_pop(Item))
