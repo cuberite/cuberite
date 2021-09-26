@@ -41,7 +41,9 @@ if(WHOLE_PROGRAM_OPTIMISATION)
 endif()
 
 # Static CRT:
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+if (POLICY CMP0091)
+	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
 
 # TODO: set_build_stamp()
 set_global_flags()

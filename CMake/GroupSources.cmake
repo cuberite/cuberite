@@ -19,6 +19,7 @@ function(group_sources)
 		sqlite3
 		SQLiteCpp
 		tolualib
+		tbb
 		PROPERTIES FOLDER Libraries
 	)
 
