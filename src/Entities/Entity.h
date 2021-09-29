@@ -453,7 +453,7 @@ public:
 	cEntity * GetAttached();
 
 	/** Attaches to the specified entity; detaches from any previous one first. */
-	void AttachTo(cEntity * a_AttachTo);
+	void AttachTo(cEntity & a_AttachTo);
 
 	/** Detaches from the currently attached entity, if any. */
 	void Detach(void);

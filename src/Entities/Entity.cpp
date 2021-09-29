@@ -1994,9 +1994,9 @@ cEntity * cEntity::GetAttached()
 
 
 
-void cEntity::AttachTo(cEntity * a_AttachTo)
+void cEntity::AttachTo(cEntity & a_AttachTo)
 {
-	if (m_AttachedTo == a_AttachTo)
+	if (m_AttachedTo == &a_AttachTo)
 	{
 		// Already attached to that entity, nothing to do here:
 		return;
@@ -2009,10 +2009,10 @@ void cEntity::AttachTo(cEntity * a_AttachTo)
 	}
 
 	// Update state information:
-	m_AttachedTo = a_AttachTo;
-	a_AttachTo->m_Attachee = this;
+	m_AttachedTo = &a_AttachTo;
+	a_AttachTo.m_Attachee = this;
 
-	m_World->BroadcastAttachEntity(*this, *a_AttachTo);
+	m_World->BroadcastAttachEntity(*this, a_AttachTo);
 }
 
 

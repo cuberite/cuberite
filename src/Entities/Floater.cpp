@@ -180,7 +180,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		a_Chunk.ForEachEntity(Callback);
 		if (Callback.HasHit())
 		{
-			AttachTo(Callback.GetHitEntity());
+			AttachTo(*Callback.GetHitEntity());
 			Callback.GetHitEntity()->TakeDamage(*this);  // TODO: the player attacked the mob not the floater.
 			m_AttachedMobID = Callback.GetHitEntity()->GetUniqueID();
 		}

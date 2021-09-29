@@ -696,7 +696,7 @@ void cEntity::BroadcastMovementUpdate(class cClientHandle const * a_ClientHandle
 
 
 
-void cEntity::AttachTo(class cEntity * a_Entity)
+void cEntity::AttachTo(class cEntity & a_Entity)
 {
 }
 
