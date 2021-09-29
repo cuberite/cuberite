@@ -696,7 +696,7 @@ void cEntity::BroadcastMovementUpdate(class cClientHandle const * a_ClientHandle
 
 
 
-void cEntity::AttachTo(class cEntity * a_Entity)
+void cEntity::AttachTo(class cEntity & a_Entity)
 {
 }
 
@@ -760,6 +760,15 @@ void cEntity::SetSwimState(class cChunk & a_Chunk)
 
 void cEntity::ResetPosition(class Vector3<double> a_Pos)
 {
+}
+
+
+
+
+
+void cEntity::OnDetach()
+{
+
 }
 
 

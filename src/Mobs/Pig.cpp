@@ -67,8 +67,8 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 			m_Attachee->Detach();
 		}
 
-		// Attach the player to this pig
-		a_Player.AttachTo(this);
+		// Attach the player to this pig:
+		a_Player.AttachTo(*this);
 	}
 	else if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE)
 	{

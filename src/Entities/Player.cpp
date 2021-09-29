@@ -140,6 +140,7 @@ cPlayer::cPlayer(const std::shared_ptr<cClientHandle> & a_Client) :
 	m_BowCharge(0),
 	m_FloaterID(cEntity::INVALID_ID),
 	m_Team(nullptr),
+	m_Spectating(nullptr),
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
 	m_SkinParts(0)
 {
@@ -658,6 +659,13 @@ void cPlayer::SetCrouch(const bool a_ShouldCrouch)
 	if (a_ShouldCrouch && IsStanding())
 	{
 		m_BodyStance = BodyStanceCrouching(*this);
+
+		// Handle spectator mode detach:
+		if (IsGameModeSpectator())
+		{
+			SpectateEntity(nullptr);
+		}
+
 		cRoot::Get()->GetPluginManager()->CallHookPlayerCrouched(*this);
 	}
 	else if (!a_ShouldCrouch && IsCrouched())
@@ -1414,17 +1422,30 @@ void cPlayer::SendRotation(double a_YawDegrees, double a_PitchDegrees)
 
 
 
-void cPlayer::SpectateEntity(cEntity * a_Target)
+void cPlayer::SpectateEntity(const cEntity * a_Target)
 {
-	if ((a_Target == nullptr) || (static_cast<cEntity *>(this) == a_Target))
+	if (a_Target == this)
 	{
-		GetClientHandle()->SendCameraSetTo(*this);
-		m_AttachedTo = nullptr;
+		// Canonicalise self-pointers:
+		a_Target = nullptr;
+	}
+
+	if (m_Spectating == a_Target)
+	{
+		// Already spectating requested target:
 		return;
 	}
 
-	m_AttachedTo = a_Target;
-	GetClientHandle()->SendCameraSetTo(*m_AttachedTo);
+	if (a_Target == nullptr)
+	{
+		m_ClientHandle->SendCameraSetTo(*this);
+		m_ClientHandle->SendPlayerMoveLook();
+		m_Spectating = nullptr;
+		return;
+	}
+
+	m_Spectating = a_Target;
+	m_ClientHandle->SendCameraSetTo(*a_Target);
 }
 
 
@@ -2522,78 +2543,6 @@ void cPlayer::SetSkinParts(int a_Parts)
 
 
 
-void cPlayer::AttachTo(cEntity * a_AttachTo)
-{
-	// Different attach, if this is a spectator
-	if (IsGameModeSpectator())
-	{
-		SpectateEntity(a_AttachTo);
-		return;
-	}
-
-	Super::AttachTo(a_AttachTo);
-}
-
-
-
-
-
-void cPlayer::Detach()
-{
-	if (m_AttachedTo == nullptr)
-	{
-		// The player is not attached to anything. Bail out.
-		return;
-	}
-
-	// Different detach, if this is a spectator:
-	if (IsGameModeSpectator())
-	{
-		GetClientHandle()->SendCameraSetTo(*this);
-		TeleportToEntity(*m_AttachedTo);
-		m_AttachedTo = nullptr;
-		return;
-	}
-
-	Super::Detach();
-
-	// If they are teleporting, no need to figure out position:
-	if (m_IsTeleporting)
-	{
-		return;
-	}
-
-	int PosX = POSX_TOINT;
-	int PosY = POSY_TOINT;
-	int PosZ = POSZ_TOINT;
-
-	// Search for a position within an area to teleport player after detachment
-	// Position must be solid land with two air blocks above.
-	// If nothing found, player remains where they are
-	for (int x = PosX - 1; x <= (PosX + 1); ++x)
-	{
-		for (int y = PosY; y <= (PosY + 3); ++y)
-		{
-			for (int z = PosZ - 1; z <= (PosZ + 1); ++z)
-			{
-				if (
-					(m_World->GetBlock({ x, y, z }) == E_BLOCK_AIR) &&
-					(m_World->GetBlock({ x, y + 1, z }) == E_BLOCK_AIR) &&
-					cBlockInfo::IsSolid(m_World->GetBlock({ x, y - 1, z }))
-				)
-				{
-					TeleportToCoords(x + 0.5, y, z + 0.5);
-					return;
-				}
-			}
-		}
-	}
-}
-
-
-
-
-
 AString cPlayer::GetUUIDFileName(const cUUID & a_UUID)
 {
 	AString UUID = a_UUID.ToLongString();
@@ -2980,18 +2929,18 @@ float cPlayer::GetEnchantmentBlastKnockbackReduction()
 
 
 
-bool cPlayer::IsInvisible() const
+bool cPlayer::IsCrouched(void) const
 {
-	return !m_IsVisible || Super::IsInvisible();
+	return std::holds_alternative<BodyStanceCrouching>(m_BodyStance);
 }
 
 
 
 
 
-bool cPlayer::IsCrouched(void) const
+bool cPlayer::IsSprinting(void) const
 {
-	return std::holds_alternative<BodyStanceCrouching>(m_BodyStance);
+	return std::holds_alternative<BodyStanceSprinting>(m_BodyStance);
 }
 
 
@@ -3007,9 +2956,9 @@ bool cPlayer::IsElytraFlying(void) const
 
 
 
-bool cPlayer::IsSprinting(void) const
+bool cPlayer::IsInvisible() const
 {
-	return std::holds_alternative<BodyStanceSprinting>(m_BodyStance);
+	return !m_IsVisible || Super::IsInvisible();
 }
 
 
@@ -3061,6 +3010,45 @@ void cPlayer::OnAddToWorld(cWorld & a_World)
 
 	// Finally, deliver the notification hook:
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*this);
+}
+
+
+
+
+
+void cPlayer::OnDetach()
+{
+	if (m_IsTeleporting)
+	{
+		// If they are teleporting, no need to figure out position:
+		return;
+	}
+
+	int PosX = POSX_TOINT;
+	int PosY = POSY_TOINT;
+	int PosZ = POSZ_TOINT;
+
+	// Search for a position within an area to teleport player after detachment
+	// Position must be solid land with two air blocks above.
+	// If nothing found, player remains where they are.
+	for (int x = PosX - 1; x <= (PosX + 1); ++x)
+	{
+		for (int y = PosY; y <= (PosY + 3); ++y)
+		{
+			for (int z = PosZ - 1; z <= (PosZ + 1); ++z)
+			{
+				if (
+					(m_World->GetBlock({ x, y, z }) == E_BLOCK_AIR) &&
+					(m_World->GetBlock({ x, y + 1, z }) == E_BLOCK_AIR) &&
+					cBlockInfo::IsSolid(m_World->GetBlock({ x, y - 1, z }))
+				)
+				{
+					TeleportToCoords(x + 0.5, y, z + 0.5);
+					return;
+				}
+			}
+		}
+	}
 }
 
 
@@ -3174,20 +3162,6 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	// Handle the player detach, when the player is in spectator mode
-	if (
-		(IsGameModeSpectator()) &&
-		(m_AttachedTo != nullptr) &&
-		(
-			(m_AttachedTo->IsDestroyed()) ||  // Watching entity destruction
-			(m_AttachedTo->GetHealth() <= 0) ||  // Watching entity dead
-			(IsCrouched())  // Or the player wants to be detached
-		)
-	)
-	{
-		Detach();
-	}
-
 	if (!a_Chunk.IsValid())
 	{
 		// Players are ticked even if the parent chunk is invalid.
@@ -3215,6 +3189,15 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (m_IsChargingBow)
 	{
 		m_BowCharge += 1;
+	}
+
+	// Handle syncing our position with the entity being spectated:
+	if (IsGameModeSpectator() && (m_Spectating != nullptr))
+	{
+		SetYaw(m_Spectating->GetYaw());
+		SetPitch(m_Spectating->GetPitch());
+		SetRoll(m_Spectating->GetRoll());
+		SetPosition(m_Spectating->GetPosition());
 	}
 
 	if (IsElytraFlying())

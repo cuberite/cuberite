@@ -1994,26 +1994,25 @@ cEntity * cEntity::GetAttached()
 
 
 
-void cEntity::AttachTo(cEntity * a_AttachTo)
+void cEntity::AttachTo(cEntity & a_AttachTo)
 {
-	if (m_AttachedTo == a_AttachTo)
+	if (m_AttachedTo == &a_AttachTo)
 	{
-		// Already attached to that entity, nothing to do here
+		// Already attached to that entity, nothing to do here:
 		return;
 	}
+
 	if (m_AttachedTo != nullptr)
 	{
 		// Detach from any previous entity:
 		Detach();
 	}
 
-	// Update state information
-	m_AttachedTo = a_AttachTo;
-	a_AttachTo->m_Attachee = this;
-	if (a_AttachTo != nullptr)
-	{
-		m_World->BroadcastAttachEntity(*this, *a_AttachTo);
-	}
+	// Update state information:
+	m_AttachedTo = &a_AttachTo;
+	a_AttachTo.m_Attachee = this;
+
+	m_World->BroadcastAttachEntity(*this, a_AttachTo);
 }
 
 
@@ -2024,13 +2023,16 @@ void cEntity::Detach(void)
 {
 	if (m_AttachedTo == nullptr)
 	{
-		// Already not attached to any entity, our work is done
+		// Already not attached to any entity, our work is done:
 		return;
 	}
+
 	m_World->BroadcastDetachEntity(*this, *m_AttachedTo);
 
 	m_AttachedTo->m_Attachee = nullptr;
 	m_AttachedTo = nullptr;
+
+	OnDetach();
 }
 
 
@@ -2300,6 +2302,14 @@ void cEntity::BroadcastLeashedMobs()
 			m_World->BroadcastLeashEntity(*LeashedMob, *this);
 		}
 	}
+}
+
+
+
+
+
+void cEntity::OnDetach()
+{
 }
 
 
