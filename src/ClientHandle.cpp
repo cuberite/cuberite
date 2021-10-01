@@ -67,7 +67,6 @@ float cClientHandle::FASTBREAK_PERCENTAGE;
 // cClientHandle:
 
 cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
-	m_ForgeHandshake(this),
 	m_CurrentViewDistance(a_ViewDistance),
 	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_IPString),
@@ -334,7 +333,7 @@ bool cClientHandle::BungeeAuthenticate()
 
 
 
-void cClientHandle::Authenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
+void cClientHandle::Authenticate(AString && a_Name, const cUUID & a_UUID, Json::Value && a_Properties)
 {
 	{
 		cCSLock lock(m_CSState);
@@ -356,7 +355,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const cUUID & a_UUID, c
 			return;
 		}
 
-		m_Username = a_Name;
+		m_Username = std::move(a_Name);
 
 		// Only assign UUID and properties if not already pre-assigned (BungeeCord sends those in the Handshake packet):
 		if (m_UUID.IsNil())
@@ -365,19 +364,19 @@ void cClientHandle::Authenticate(const AString & a_Name, const cUUID & a_UUID, c
 		}
 		if (m_Properties.empty())
 		{
-			m_Properties = a_Properties;
+			m_Properties = std::move(a_Properties);
 		}
 
 		// Send login success (if the protocol supports it):
 		m_Protocol->SendLoginSuccess();
 
-		if (m_ForgeHandshake.m_IsForgeClient)
+		if (m_ForgeHandshake.IsForgeClient)
 		{
-			m_ForgeHandshake.BeginForgeHandshake(a_Name, a_UUID, a_Properties);
+			m_ForgeHandshake.BeginForgeHandshake(*this);
 		}
 		else
 		{
-			FinishAuthenticate(a_Name, a_UUID, a_Properties);
+			FinishAuthenticate();
 		}
 	}
 }
@@ -386,7 +385,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const cUUID & a_UUID, c
 
 
 
-void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
+void cClientHandle::FinishAuthenticate()
 {
 	// Serverside spawned player (so data are loaded).
 	std::unique_ptr<cPlayer> Player;
@@ -422,8 +421,8 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
 	{
-		cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", a_Name.c_str()));
-		LOGINFO("Player %s has joined the game", a_Name.c_str());
+		cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", m_Username.c_str()));
+		LOGINFO("Player %s has joined the game", m_Username.c_str());
 	}
 
 	// TODO: this accesses the world spawn from the authenticator thread
@@ -747,7 +746,7 @@ bool cClientHandle::HandleLogin()
 	}  // lock(m_CSState)
 
 	// Schedule for authentication; until then, let the player wait (but do not block)
-	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), GetUsername(), m_Protocol->GetAuthServerID());
+	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), std::move(m_Username), m_Protocol->GetAuthServerID());
 	return true;
 }
 
@@ -887,7 +886,7 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const Contigu
 	}
 	else if (a_Channel == "FML|HS")
 	{
-		m_ForgeHandshake.DataReceived(this, a_Message);
+		m_ForgeHandshake.DataReceived(*this, a_Message);
 	}
 	else if (!HasPluginChannel(a_Channel))
 	{

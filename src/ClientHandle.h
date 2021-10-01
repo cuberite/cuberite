@@ -121,8 +121,8 @@ public:  // tolua_export
 	/** Authenticates the specified user with the bungee proxy server */
 	bool BungeeAuthenticate();
 
-	/** Authenticates the specified user, called by cAuthenticator */
-	void Authenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
+	/** Authenticates ourselves, called by cAuthenticator supplying player details from Mojang. */
+	void Authenticate(AString && a_Name, const cUUID & a_UUID, Json::Value && a_Properties);
 
 	/** Sends a set number of new chunks to the player on every invocation, until all chunks in the view distance have been sent. */
 	void StreamNextChunks();
@@ -276,20 +276,20 @@ public:  // tolua_export
 	const AStringMap & GetForgeMods(void) const { return m_ForgeMods; }
 
 	/** Returns true if the client is modded with Forge. */
-	bool IsForgeClient(void) const { return m_ForgeHandshake.m_IsForgeClient; }
+	bool IsForgeClient(void) const { return m_ForgeHandshake.IsForgeClient; }
 
 	// tolua_end
 
 	/** Add the Forge mod list to the server ping response. */
 	void ForgeAugmentServerListPing(Json::Value & a_Response)
 	{
-		m_ForgeHandshake.AugmentServerListPing(a_Response);
+		m_ForgeHandshake.AugmentServerListPing(*this, a_Response);
 	}
 
 	/** Mark a client connection as using Forge. Set by the protocol. */
 	void SetIsForgeClient()
 	{
-		m_ForgeHandshake.m_IsForgeClient = true;
+		m_ForgeHandshake.IsForgeClient = true;
 	}
 
 	/** Returns true if the client wants the chunk specified to be sent (in m_ChunksToSend) */
@@ -417,8 +417,6 @@ public:  // tolua_export
 	bool IsPlayerChunkSent();
 
 private:
-
-	friend class cServer;  // Needs access to SetSelf()
 
 	friend class cForgeHandshake;   // Needs access to FinishAuthenticate()
 
@@ -573,7 +571,7 @@ private:
 	float m_BreakProgress;
 
 	/** Finish logging the user in after authenticating. */
-	void FinishAuthenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
+	void FinishAuthenticate();
 
 	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
 	bool CheckBlockInteractionsRate(void);

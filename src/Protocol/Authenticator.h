@@ -41,7 +41,7 @@ public:
 	void ReadSettings(cSettingsRepositoryInterface & a_Settings);
 
 	/** Queues a request for authenticating a user. If the auth fails, the user will be kicked */
-	void Authenticate(int a_ClientID, const AString & a_UserName, const AString & a_ServerHash);
+	void Authenticate(int a_ClientID, AString && a_Username, const AString & a_ServerHash);
 
 	/** Starts the authenticator thread. The thread may be started and stopped repeatedly */
 	void Start(cSettingsRepositoryInterface & a_Settings);

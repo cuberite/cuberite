@@ -558,15 +558,6 @@ void cRoot::KickUser(int a_ClientID, const AString & a_Reason)
 
 
 
-void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
-{
-	m_Server->AuthenticateUser(a_ClientID, a_Name, a_UUID, a_Properties);
-}
-
-
-
-
-
 size_t cRoot::GetTotalChunkCount(void)
 {
 	size_t Count = 0;
