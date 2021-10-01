@@ -31,7 +31,7 @@ void cExpOrb::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cExpOrb::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	DetectCacti();
 	m_TicksAlive++;

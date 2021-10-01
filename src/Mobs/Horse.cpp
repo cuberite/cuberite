@@ -32,7 +32,7 @@ cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
 
 
 
-void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cHorse::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
@@ -278,7 +278,7 @@ void cHorse::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cHorse::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cHorse::InStateIdle(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	// If horse is tame and someone is sitting on it, don't walk around
 	if ((!m_bIsTame) || (m_Attachee == nullptr))

@@ -57,7 +57,7 @@ public:
 	// tolua_end
 	// Exported in ManualBindings.cpp to support the old deprecated coord-based overload.
 
-	bool IsInside(Vector3i v) const
+	bool IsInside(const Vector3i & v) const
 	{
 		return (
 			(v.x >= p1.x) && (v.x <= p2.x) &&
@@ -66,7 +66,7 @@ public:
 		);
 	}
 
-	bool IsInside(Vector3d v) const
+	bool IsInside(const Vector3d & v) const
 	{
 		return (
 			(v.x >= p1.x) && (v.x <= p2.x) &&

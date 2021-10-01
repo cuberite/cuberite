@@ -922,7 +922,7 @@ void cWorld::InitializeAndLoadMobSpawningValues(cIniFile & a_IniFile)
 	{
 		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, guardian, horse, mooshroom, ocelot, pig, rabbit, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;  // TODO Re-add Enderman when bugs are fixed
 		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, witherskeleton, zombiepigman"; break;
-		case dimEnd:       DefaultMonsters = ""; break;  // TODO Re-add Enderman when bugs are fixed
+		case dimEnd:       DefaultMonsters.clear(); break;  // TODO Re-add Enderman when bugs are fixed
 		case dimNotSet:    ASSERT(!"Dimension not set"); break;
 	}
 
@@ -1000,13 +1000,13 @@ void cWorld::Stop(cDeadlockDetect & a_DeadlockDetect)
 
 
 
-void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec)
+void cWorld::Tick(const std::chrono::milliseconds & a_Dt, std::chrono::milliseconds a_LastTickDurationMSec)
 {
 	// Notify the plugins:
 	cPluginManager::Get()->CallHookWorldTick(*this, a_Dt, a_LastTickDurationMSec);
 
 	m_WorldAge += a_Dt;
-	m_WorldTickAge++;
+	++m_WorldTickAge;
 
 	if (m_IsDaylightCycleEnabled)
 	{
@@ -2968,7 +2968,7 @@ int cWorld::GetTickRandomNumber(int a_Range)
 void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Results)
 {
 	typedef std::pair<AString::size_type, AString> pair_t;
-	size_t LastSpace = a_Text.find_last_of(" ");  // Find the position of the last space
+	size_t LastSpace = a_Text.find_last_of(' ');  // Find the position of the last space
 	AString LastWord = a_Text.substr(LastSpace + 1, a_Text.length());  // Find the last word
 
 	if (LastWord.empty())
@@ -2989,7 +2989,7 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 			continue;  // No match
 		}
 
-		UsernamesByWeight.push_back(std::make_pair(Found, PlayerName));  // Match! Store it with the position of the match as a weight
+		UsernamesByWeight.emplace_back(Found, PlayerName);  // Match! Store it with the position of the match as a weight
 	}
 	Lock.Unlock();
 
@@ -3072,7 +3072,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	if (SimulatorName.empty())
 	{
 		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"%s\".", SimulatorNameKey.c_str(), GetIniFileName().c_str(), DefaultSimulatorName.c_str());
-		SimulatorName = DefaultSimulatorName;
+		SimulatorName = std::move(DefaultSimulatorName);
 	}
 	cFluidSimulator * res = nullptr;
 	int Rate = 1;

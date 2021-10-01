@@ -51,7 +51,7 @@ bool cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cVillager::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())

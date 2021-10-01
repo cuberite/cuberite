@@ -31,7 +31,7 @@ public:  // tolua_export
 
 	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
-	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual bool Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 

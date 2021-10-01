@@ -43,7 +43,7 @@ void cZombieVillager::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cZombieVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cZombieVillager::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())

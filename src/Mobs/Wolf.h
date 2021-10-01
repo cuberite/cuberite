@@ -23,7 +23,7 @@ public:
 	void NotifyAlliesOfFight(cPawn * a_Opponent);
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 	virtual void TickFollowPlayer();
 	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
 
@@ -57,7 +57,7 @@ public:
 	@param a_IsPlayerInvolved Whether the fighter a player or a wolf. */
 	void ReceiveNearbyFightInfo(const cUUID & a_PlayerUUID, cPawn * a_Opponent, bool a_IsPlayerInvolved);
 
-	virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void InStateIdle(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 
 	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2) override;
 	virtual void GetBreedingItems(cItems & a_Items) override

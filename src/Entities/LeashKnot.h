@@ -40,7 +40,7 @@ private:
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 	virtual void GetDrops(cItems & a_Items, cEntity * a_Killer) override;
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 
 };  // tolua_export
 

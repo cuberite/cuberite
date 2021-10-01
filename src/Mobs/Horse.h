@@ -21,9 +21,9 @@ public:
 	CLASS_PROTODEF(cHorse)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void InStateIdle(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 

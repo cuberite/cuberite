@@ -25,7 +25,7 @@ public:
 		float a_Height
 	);
 
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
 	/** When hit by someone, run away */

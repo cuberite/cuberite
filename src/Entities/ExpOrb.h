@@ -22,7 +22,7 @@ public:  // tolua_export
 	cExpOrb(Vector3d a_Pos, int a_Reward);
 
 	// Override functions
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 

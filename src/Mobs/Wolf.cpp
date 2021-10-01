@@ -74,7 +74,7 @@ bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cWolf::NotifyAlliesOfFight(cPawn * a_Opponent)
 {
-	if (GetOwnerName() == "")
+	if (GetOwnerName().empty())
 	{
 		return;
 	}
@@ -282,7 +282,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cWolf::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	if (!IsAngry())
 	{
@@ -427,7 +427,7 @@ void cWolf::TickFollowPlayer()
 
 
 
-void cWolf::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cWolf::InStateIdle(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	if (!IsTame())
 	{

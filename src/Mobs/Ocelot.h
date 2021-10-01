@@ -28,7 +28,7 @@ public:
 	CLASS_PROTODEF(cOcelot)
 
 	virtual void OnRightClicked(cPlayer & a_Player) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 	virtual void TickFollowPlayer();
 	virtual void GetBreedingItems(cItems & a_Items) override
 	{

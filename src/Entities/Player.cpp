@@ -3134,7 +3134,7 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cPlayer::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	m_ClientHandle->Tick(a_Dt.count());
 

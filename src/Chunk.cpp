@@ -682,7 +682,7 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 
 
 
-void cChunk::Tick(std::chrono::milliseconds a_Dt)
+void cChunk::Tick(const std::chrono::milliseconds & a_Dt)
 {
 	const auto ShouldTick = ShouldBeTicked();
 

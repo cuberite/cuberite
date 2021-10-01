@@ -953,7 +953,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 		else if (!DyeColours.empty())
 		{
 			// Only dye? Normal colours.
-			a_Recipe->m_Result.m_FireworkItem.m_Colours = DyeColours;
+			a_Recipe->m_Result.m_FireworkItem.m_Colours = std::move(DyeColours);
 		}
 	}
 }

@@ -119,7 +119,7 @@ void cAuthenticator::Execute(void)
 		m_Queue.pop_front();
 		Lock.Unlock();
 
-		AString NewUserName = UserName;
+		AString NewUserName = std::move(UserName);
 		cUUID UUID;
 		Json::Value Properties;
 		if (AuthWithYggdrasil(NewUserName, ServerID, UUID, Properties))

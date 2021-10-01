@@ -16,7 +16,7 @@ public:
 
 	cSquid();
 
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 
 	CLASS_PROTODEF(cSquid)
 

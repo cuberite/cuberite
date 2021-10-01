@@ -33,10 +33,7 @@ cChunkDesc::cChunkDesc(cChunkCoords a_Coords) :
 
 
 
-cChunkDesc::~cChunkDesc()
-{
-	// Nothing needed yet
-}
+cChunkDesc::~cChunkDesc() = default;
 
 
 

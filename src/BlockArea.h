@@ -394,7 +394,7 @@ public:
 	static size_t MakeIndexForSize(Vector3i a_RelPos, Vector3i a_Size);
 
 	/** Returns the index into the internal arrays for the specified coords */
-	size_t MakeIndex(Vector3i a_RelPos) const
+	size_t MakeIndex(const Vector3i & a_RelPos) const
 	{
 		return MakeIndexForSize(a_RelPos, m_Size);
 	}

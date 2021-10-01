@@ -80,7 +80,7 @@ void cHopperEntity::CopyFrom(const cBlockEntity & a_Src)
 
 
 
-bool cHopperEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+bool cHopperEntity::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 

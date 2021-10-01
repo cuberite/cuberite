@@ -62,7 +62,7 @@ void cFireworkEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_C
 
 
 
-void cFireworkEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cFireworkEntity::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())

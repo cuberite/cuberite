@@ -117,7 +117,7 @@ void cCommandBlockEntity::CopyFrom(const cBlockEntity & a_Src)
 
 
 
-bool cCommandBlockEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+bool cCommandBlockEntity::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);

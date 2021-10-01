@@ -133,7 +133,7 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 			case '[':
 			{
 				if (
-					((pRight = line.find_last_of("]")) != AString::npos) &&
+					((pRight = line.find_last_of(']')) != AString::npos) &&
 					(pRight > pLeft)
 					)
 				{

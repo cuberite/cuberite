@@ -72,7 +72,7 @@ void cEnderCrystal::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-void cEnderCrystal::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cEnderCrystal::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	if ((m_World->GetDimension() == dimEnd) && (m_World->GetBlock(POS_TOINT) != E_BLOCK_FIRE))

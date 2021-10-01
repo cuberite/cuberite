@@ -139,7 +139,7 @@ public:
 
 	/** Converts the specified absolute position into a relative position within its chunk.
 	Use BlockToChunk to query the chunk coords. */
-	inline static Vector3i AbsoluteToRelative(Vector3i a_BlockPosition)
+	inline static Vector3i AbsoluteToRelative(const Vector3i & a_BlockPosition)
 	{
 		cChunkCoords chunkPos = BlockToChunk(a_BlockPosition);
 		return AbsoluteToRelative(a_BlockPosition, chunkPos);
@@ -147,7 +147,7 @@ public:
 
 
 	/** Converts the absolute coords into coords relative to the specified chunk. */
-	inline static Vector3i AbsoluteToRelative(Vector3i a_BlockPosition, cChunkCoords a_ChunkPos)
+	inline static Vector3i AbsoluteToRelative(const Vector3i & a_BlockPosition, cChunkCoords a_ChunkPos)
 	{
 		return { a_BlockPosition.x - a_ChunkPos.m_ChunkX * Width, a_BlockPosition.y, a_BlockPosition.z - a_ChunkPos.m_ChunkZ * Width };
 	}
@@ -179,7 +179,7 @@ public:
 
 
 	/** Validates a chunk relative coordinate. Returns false if the coordiante is out of bounds for a chunk. */
-	inline static bool IsValidRelPos(Vector3i a_RelPos)
+	inline static bool IsValidRelPos(const Vector3i & a_RelPos)
 	{
 		return (
 			IsValidWidth(a_RelPos.x) &&
@@ -220,7 +220,7 @@ public:
 	}
 
 
-	inline static size_t MakeIndex(Vector3i a_RelPos)
+	inline static size_t MakeIndex(const Vector3i & a_RelPos)
 	{
 		return MakeIndex(a_RelPos.x, a_RelPos.y, a_RelPos.z);
 	}
@@ -260,7 +260,7 @@ public:
 	}
 
 
-	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, Vector3i a_RelPos)
+	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, const Vector3i & a_RelPos)
 	{
 		ASSERT(IsValidRelPos(a_RelPos));
 		return a_BlockTypes[MakeIndex(a_RelPos)];

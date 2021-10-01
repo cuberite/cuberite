@@ -32,7 +32,7 @@ void cSquid::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cSquid::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cSquid::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	m_PathfinderActivated = false;  // Disable Pathfinding until it's fixed. TODO
 

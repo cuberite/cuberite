@@ -346,21 +346,21 @@ public:
 	/** Sets the block at the specified coords to the specified value.
 	The replacement doesn't trigger block updates, nor wake up simulators.
 	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block) */
-	void FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	void FastSetBlock(const Vector3i & a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
 		m_ChunkMap.FastSetBlock(a_BlockPos, a_BlockType, a_BlockMeta);
 	}
 
 	/** Returns the block type at the specified position.
 	Returns 0 if the chunk is not valid. */
-	BLOCKTYPE GetBlock(Vector3i a_BlockPos) const
+	BLOCKTYPE GetBlock(const Vector3i & a_BlockPos) const
 	{
 		return m_ChunkMap.GetBlock(a_BlockPos);
 	}
 
 	/** Returns the block meta at the specified position.
 	Returns 0 if the chunk is not valid. */
-	NIBBLETYPE GetBlockMeta(Vector3i a_BlockPos) const
+	NIBBLETYPE GetBlockMeta(const Vector3i & a_BlockPos) const
 	{
 		return m_ChunkMap.GetBlockMeta(a_BlockPos);
 	}
@@ -443,7 +443,7 @@ public:
 
 	/** Spawns an falling block entity at the given position.
 	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnFallingBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	UInt32 SpawnFallingBlock(const Vector3i & a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
 		// When creating from a block position (Vector3i), move the spawn point to the middle of the block by adding (0.5, 0, 0.5)
 		return SpawnFallingBlock(Vector3d(0.5, 0, 0.5) + a_BlockPos, a_BlockType, a_BlockMeta);
@@ -1097,7 +1097,7 @@ private:
 	/** Queue for the chunk data to be set into m_ChunkMap by the tick thread. Protected by m_CSSetChunkDataQueue */
 	std::vector<SetChunkData> m_SetChunkDataQueue;
 
-	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
+	void Tick(const std::chrono::milliseconds & a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
 
 	/** Handles the weather in each tick */
 	void TickWeather(float a_Dt);

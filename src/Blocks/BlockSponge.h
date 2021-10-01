@@ -39,11 +39,7 @@ private:
 	{
 		struct sSeed
 		{
-			sSeed(Vector3i pos, int d)
-			{
-				m_Pos = pos;
-				m_Depth = d;
-			}
+			sSeed(Vector3i pos, int d) : m_Pos(pos), m_Depth(d) {}
 			Vector3i m_Pos;
 			int m_Depth;
 		};

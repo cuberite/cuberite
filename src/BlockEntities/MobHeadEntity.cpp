@@ -29,7 +29,9 @@ void cMobHeadEntity::SetType(const eMobHeadType & a_Type)
 {
 	if ((!m_OwnerName.empty()) && (a_Type != SKULL_TYPE_PLAYER))
 	{
-		m_OwnerName = m_OwnerTexture = m_OwnerTextureSignature = "";
+		m_OwnerName.clear();
+		m_OwnerTexture.clear();
+		m_OwnerTextureSignature.clear();
 		m_OwnerUUID = cUUID{};
 	}
 	m_Type = a_Type;

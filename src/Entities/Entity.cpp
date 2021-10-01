@@ -875,7 +875,7 @@ void cEntity::SetHealth(float a_Health)
 
 
 
-void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cEntity::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	ASSERT(IsTicking());
 	ASSERT(GetWorld() != nullptr);

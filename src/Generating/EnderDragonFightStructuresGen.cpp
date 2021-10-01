@@ -170,10 +170,11 @@ void cEnderDragonFightStructuresGen::GenFinish(cChunkDesc &a_ChunkDesc)
 		EnderDragon->SetPosition({0.0, static_cast<double>(a_ChunkDesc.GetHeight(0, 0) + 20), 0.0});  // Spawns the dragon 20 blocks above the terrain at (0, 0)
 		a_ChunkDesc.GetEntities().emplace_back(std::move(EnderDragon));
 		*/  // Todo: 25.10.20 - Add the ender dragon spawning when the dragon behaves properly - 12xx12
+		int size = static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2));
 		a_ChunkDesc.WriteBlockArea(m_Fountain,
-			static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)),
+			size,
 			62,
-			static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)),
+			size,
 			cBlockArea::msSpongePrint
 		);
 	}

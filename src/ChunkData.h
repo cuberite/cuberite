@@ -77,14 +77,14 @@ public:
 
 	void Assign(const ChunkBlockData & a_Other);
 
-	BLOCKTYPE GetBlock(Vector3i a_Position) const { return m_Blocks.Get(a_Position); }
-	NIBBLETYPE GetMeta(Vector3i a_Position) const { return m_Metas.Get(a_Position); }
+	BLOCKTYPE GetBlock(const Vector3i & a_Position) const { return m_Blocks.Get(a_Position); }
+	NIBBLETYPE GetMeta(const Vector3i & a_Position) const { return m_Metas.Get(a_Position); }
 
 	BlockArray * GetSection(size_t a_Y) const { return m_Blocks.GetSection(a_Y); }
 	MetaArray * GetMetaSection(size_t a_Y) const { return m_Metas.GetSection(a_Y); }
 
-	void SetBlock(Vector3i a_Position, BLOCKTYPE a_Block) { m_Blocks.Set(a_Position, a_Block); }
-	void SetMeta(Vector3i a_Position, NIBBLETYPE a_Meta) { m_Metas.Set(a_Position, a_Meta); }
+	void SetBlock(const Vector3i & a_Position, BLOCKTYPE a_Block) { m_Blocks.Set(a_Position, a_Block); }
+	void SetMeta(const Vector3i & a_Position, NIBBLETYPE a_Meta) { m_Metas.Set(a_Position, a_Meta); }
 
 	void SetAll(const cChunkDef::BlockTypes & a_BlockSource, const cChunkDef::BlockNibbles & a_MetaSource);
 	void SetSection(const SectionType & a_BlockSource, const SectionMetaType & a_MetaSource, size_t a_Y);
@@ -116,8 +116,8 @@ public:
 
 	void Assign(const ChunkLightData & a_Other);
 
-	NIBBLETYPE GetBlockLight(Vector3i a_Position) const { return m_BlockLights.Get(a_Position); }
-	NIBBLETYPE GetSkyLight(Vector3i a_Position) const { return m_SkyLights.Get(a_Position); }
+	NIBBLETYPE GetBlockLight(const Vector3i & a_Position) const { return m_BlockLights.Get(a_Position); }
+	NIBBLETYPE GetSkyLight(const Vector3i & a_Position) const { return m_SkyLights.Get(a_Position); }
 
 	LightArray * GetBlockLightSection(size_t a_Y) const { return m_BlockLights.GetSection(a_Y); }
 	LightArray * GetSkyLightSection(size_t a_Y) const { return m_SkyLights.GetSection(a_Y); }

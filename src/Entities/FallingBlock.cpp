@@ -33,7 +33,7 @@ void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cFallingBlock::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	// GetWorld()->BroadcastTeleportEntity(*this);  // Test position
 

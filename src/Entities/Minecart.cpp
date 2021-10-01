@@ -1477,7 +1477,7 @@ void cMinecartWithFurnace::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cMinecartWithFurnace::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cMinecartWithFurnace::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())

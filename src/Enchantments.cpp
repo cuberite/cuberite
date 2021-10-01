@@ -13,10 +13,7 @@
 
 
 
-cEnchantments::cEnchantments(void)
-{
-	// Nothing needed yet, but the constructor needs to be declared and impemented in order to be usable
-}
+cEnchantments::cEnchantments(void) = default;
 
 
 

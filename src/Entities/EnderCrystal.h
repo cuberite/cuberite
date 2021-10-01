@@ -45,7 +45,7 @@ private:
 
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 };  // tolua_export

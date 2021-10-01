@@ -78,7 +78,7 @@ public:
 	void SetWorld(cWorld * a_World);
 
 	/** Ticks the entity; returns true if the chunk should be marked as dirty as a result of this ticking. By default does nothing. */
-	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
+	virtual bool Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk);
 
 	/** Called when a player uses this entity; should open the UI window.
 	returns true if the use was successful, return false to use the block as a "normal" block */

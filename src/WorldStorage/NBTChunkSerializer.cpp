@@ -287,7 +287,7 @@ public:
 			(!a_Item.m_Enchantments.IsEmpty()) ||
 			((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR)) ||
 			(a_Item.m_RepairCost > 0) ||
-			(a_Item.m_CustomName != "") ||
+			(!a_Item.m_CustomName.empty()) ||
 			(!a_Item.m_LoreTable.empty())
 		)
 		{
@@ -297,10 +297,10 @@ public:
 					mWriter.AddInt("RepairCost", a_Item.m_RepairCost);
 				}
 
-				if ((a_Item.m_CustomName != "") || (!a_Item.m_LoreTable.empty()))
+				if ((!a_Item.m_CustomName.empty()) || (!a_Item.m_LoreTable.empty()))
 				{
 					mWriter.BeginCompound("display");
-					if (a_Item.m_CustomName != "")
+					if (!a_Item.m_CustomName.empty())
 					{
 						mWriter.AddString("Name", a_Item.m_CustomName);
 					}

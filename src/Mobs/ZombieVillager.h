@@ -19,7 +19,7 @@ public:
 	CLASS_PROTODEF(cZombieVillager)
 
 	virtual void GetDrops       (cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	virtual void Tick           (std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick           (const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 	virtual void OnRightClicked (cPlayer & a_Player) override;
 	virtual bool IsUndead       (void) override { return true; }
 

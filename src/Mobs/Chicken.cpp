@@ -19,7 +19,7 @@ cChicken::cChicken(void) :
 
 
 
-void cChicken::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cChicken::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())

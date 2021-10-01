@@ -29,7 +29,7 @@ void cSnowGolem::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cSnowGolem::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())

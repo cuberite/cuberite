@@ -168,7 +168,7 @@ void cBoat::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cBoat::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cBoat::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())

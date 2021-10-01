@@ -106,7 +106,7 @@ void cHTTPServerConnection::Terminate(void)
 void cHTTPServerConnection::OnLinkCreated(cTCPLinkPtr a_Link)
 {
 	ASSERT(m_Link == nullptr);
-	m_Link = a_Link;
+	m_Link = std::move(a_Link);
 }
 
 

@@ -24,8 +24,8 @@ public:
 		float a_Height
 	);
 
-	virtual void Tick          (std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-	virtual void InStateChasing(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick          (const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
+	virtual void InStateChasing(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 
 
 	virtual void EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk) override;

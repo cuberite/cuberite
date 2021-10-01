@@ -28,7 +28,7 @@ cPawn::cPawn(eEntityType a_EntityType, float a_Width, float a_Height) :
 
 
 
-void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cPawn::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	std::vector<cEntityEffect *> EffectsToTick;
 

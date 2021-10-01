@@ -1048,7 +1048,7 @@ void cProtocol_1_9_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 	for (int i = 0; i < 4; i++)
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line);
-		Lines[i] = Line;
+		Lines[i] = std::move(Line);
 	}
 
 	m_Client->HandleUpdateSign(BlockX, BlockY, BlockZ, Lines[0], Lines[1], Lines[2], Lines[3]);

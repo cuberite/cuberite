@@ -114,7 +114,7 @@ void cLeashKnot::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-void cLeashKnot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cLeashKnot::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	m_TicksAlive++;
 

@@ -219,7 +219,7 @@ public:
 	void SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 
 	/** Sets the speed of the entity, measured in m / sec */
-	void SetSpeed(Vector3d a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
+	void SetSpeed(const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
 
 	/** Sets the speed in the X axis, leaving the other speed components intact. Measured in m / sec. */
 	void SetSpeedX(double a_SpeedX);
@@ -365,7 +365,7 @@ public:
 
 	// tolua_end
 
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk);
 
 	/** Handles the physics of the entity - updates position based on speed, updates speed based on environment */
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
@@ -427,7 +427,7 @@ public:
 
 	bool MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = true);
 
-	bool MoveToWorld(cWorld & a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
+	bool MoveToWorld(cWorld & a_World, bool a_ShouldSendRespawn, const Vector3d & a_NewPosition)
 	{
 		return MoveToWorld(a_World, a_NewPosition, false, a_ShouldSendRespawn);
 	}

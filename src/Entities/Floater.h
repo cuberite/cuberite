@@ -22,7 +22,7 @@ public:  // tolua_export
 	cFloater(Vector3d a_Pos, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime);
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 
 	// tolua_begin
 	bool CanPickup(void)       const { return m_CanPickupItem; }

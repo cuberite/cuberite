@@ -35,7 +35,7 @@ public:  // tolua_export
 
 	bool CollectedBy(cPlayer & a_Dest);  // tolua_export
 
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 

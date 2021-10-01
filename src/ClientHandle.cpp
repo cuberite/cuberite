@@ -3418,7 +3418,7 @@ void cClientHandle::ProcessProtocolIn(void)
 
 void cClientHandle::OnLinkCreated(cTCPLinkPtr a_Link)
 {
-	m_Link = a_Link;
+	m_Link = std::move(a_Link);
 }
 
 

@@ -734,7 +734,7 @@ void GetAcaciaTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBl
 	// Calculate a height for the branch between 1 and 3
 	int BranchHeight = a_Noise.IntNoise3DInt(a_BlockPos) % 3 + 1;
 
-	Vector3i BranchPos = GetTreeBranch(E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD, a_BlockPos.addedY(Height - 1), BranchHeight, Vector3i(BranchDirection), Vector3i(BranchDirection), a_LogBlocks).Floor();
+	Vector3i BranchPos = GetTreeBranch(E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD, a_BlockPos.addedY(Height - 1), BranchHeight, BranchDirection, BranchDirection, a_LogBlocks).Floor();
 
 	// Add the leaves to the top of the branch
 	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_NEW_LEAVES, E_META_NEWLEAVES_ACACIA);

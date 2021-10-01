@@ -50,7 +50,7 @@ protected:
 
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override
 	{
 		UNUSED(a_Dt);
 		UNUSED(a_Chunk);

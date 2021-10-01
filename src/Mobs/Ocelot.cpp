@@ -35,7 +35,7 @@ cOcelot::cOcelot(void) :
 
 
 
-void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cOcelot::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())

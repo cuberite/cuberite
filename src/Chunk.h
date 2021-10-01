@@ -123,7 +123,7 @@ public:
 	/** Try to Spawn Monsters inside chunk */
 	void SpawnMobs(cMobSpawner & a_MobSpawner);
 
-	void Tick(std::chrono::milliseconds a_Dt);
+	void Tick(const std::chrono::milliseconds & a_Dt);
 
 	/** Ticks a single block. Used by cWorld::TickQueuedBlocks() to tick the queued blocks */
 	void TickBlock(const Vector3i a_RelPos);
@@ -138,13 +138,13 @@ public:
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
 
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
-	void FastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
+	void FastSetBlock(const Vector3i & a_RelPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
 	{
 		FastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_BlockType, a_BlockMeta);
 	}
 
 	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const { return m_BlockData.GetBlock({ a_RelX, a_RelY, a_RelZ }); }
-	BLOCKTYPE GetBlock(Vector3i a_RelCoords) const { return m_BlockData.GetBlock(a_RelCoords); }
+	BLOCKTYPE GetBlock(const Vector3i & a_RelCoords) const { return m_BlockData.GetBlock(a_RelCoords); }
 
 	void GetBlockTypeMeta(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	void GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
@@ -254,7 +254,7 @@ public:
 
 	void SendBlockEntity             (int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 
-	Vector3i PositionToWorldPosition(Vector3i a_RelPos)
+	Vector3i PositionToWorldPosition(const Vector3i & a_RelPos)
 	{
 		return PositionToWorldPosition(a_RelPos.x, a_RelPos.y, a_RelPos.z);
 	}
@@ -281,7 +281,7 @@ public:
 		return m_BlockData.GetMeta({ a_RelX, a_RelY, a_RelZ });
 	}
 
-	NIBBLETYPE GetMeta(Vector3i a_RelPos) const { return m_BlockData.GetMeta(a_RelPos); }
+	NIBBLETYPE GetMeta(const Vector3i & a_RelPos) const { return m_BlockData.GetMeta(a_RelPos); }
 
 	void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
@@ -299,15 +299,15 @@ public:
 	NIBBLETYPE GetTimeAlteredLight(NIBBLETYPE a_Skylight) const;
 
 	/** Get the level of artificial light illuminating the block (0 - 15) */
-	inline NIBBLETYPE GetBlockLight(Vector3i a_RelPos) const { return m_LightData.GetBlockLight(a_RelPos); }
+	inline NIBBLETYPE GetBlockLight(const Vector3i & a_RelPos) const { return m_LightData.GetBlockLight(a_RelPos); }
 	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetBlockLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15) independent of daytime. */
-	inline NIBBLETYPE GetSkyLight(Vector3i a_RelPos) const { return m_LightData.GetSkyLight(a_RelPos); }
+	inline NIBBLETYPE GetSkyLight(const Vector3i & a_RelPos) const { return m_LightData.GetSkyLight(a_RelPos); }
 	inline NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetSkyLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15), taking daytime into a account. */
-	inline NIBBLETYPE GetSkyLightAltered(Vector3i a_RelPos) const { return GetTimeAlteredLight(m_LightData.GetSkyLight(a_RelPos)); }
+	inline NIBBLETYPE GetSkyLightAltered(const Vector3i & a_RelPos) const { return GetTimeAlteredLight(m_LightData.GetSkyLight(a_RelPos)); }
 	inline NIBBLETYPE GetSkyLightAltered(int a_RelX, int a_RelY, int a_RelZ) const { return GetSkyLightAltered({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
@@ -447,7 +447,7 @@ public:
 
 	/** Converts the coord relative to this chunk into an absolute coord.
 	Doesn't check relative coord validity. */
-	Vector3i RelativeToAbsolute(Vector3i a_RelBlockPosition) const
+	Vector3i RelativeToAbsolute(const Vector3i & a_RelBlockPosition) const
 	{
 		return cChunkDef::RelativeToAbsolute(a_RelBlockPosition, {m_PosX, m_PosZ});
 	}

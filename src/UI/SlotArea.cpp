@@ -1228,7 +1228,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		{
 			NameChangeExp = (Target.IsDamageable()) ? 7 : (Target.m_ItemCount * 5);
 			NeedExp += NameChangeExp;
-			Output.m_CustomName = "";
+			Output.m_CustomName.clear();
 		}
 	}
 	else if (RepairedItemName != Target.m_CustomName)

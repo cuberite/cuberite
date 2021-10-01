@@ -132,7 +132,7 @@ void cDropSpenserEntity::OnRemoveFromWorld()
 
 
 
-bool cDropSpenserEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+bool cDropSpenserEntity::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	if (!m_ShouldDropSpense)

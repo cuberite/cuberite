@@ -23,7 +23,7 @@ cCreeper::cCreeper(void) :
 
 
 
-void cCreeper::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cCreeper::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())

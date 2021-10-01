@@ -368,7 +368,7 @@ cPiece::cVerticalLimitPtr CreateVerticalLimitFromString(const AString & a_LimitD
 
 	// Create a strategy class based on the class string:
 	cPiece::cVerticalLimitPtr Limit;
-	if ((LimitClass == "") || (NoCaseCompare(LimitClass, "None") == 0))
+	if ((LimitClass.empty()) || (NoCaseCompare(LimitClass, "None") == 0))
 	{
 		Limit = std::make_shared<cVerticalLimitNone>();
 	}

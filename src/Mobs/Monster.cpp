@@ -260,7 +260,7 @@ void cMonster::StopMovingToPosition()
 
 
 
-void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cMonster::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
@@ -601,7 +601,7 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 {
 	Super::KilledBy(a_TDI);
-	if (m_SoundHurt != "")
+	if (!m_SoundHurt.empty())
 	{
 		m_World->BroadcastSoundEffect(m_SoundDeath, GetPosition(), 1.0f, 0.8f);
 	}
@@ -842,7 +842,7 @@ void cMonster::EventLosePlayer(void)
 
 
 
-void cMonster::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cMonster::InStateIdle(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	if (m_PathfinderActivated)
 	{
@@ -897,7 +897,7 @@ void cMonster::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 // What to do if in Chasing State
 // This state should always be defined in each child class
-void cMonster::InStateChasing(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cMonster::InStateChasing(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 }
@@ -907,7 +907,7 @@ void cMonster::InStateChasing(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 // What to do if in Escaping State
-void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cMonster::InStateEscaping(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 

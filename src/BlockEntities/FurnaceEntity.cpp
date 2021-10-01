@@ -83,7 +83,7 @@ void cFurnaceEntity::SendTo(cClientHandle & a_Client)
 
 
 
-bool cFurnaceEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+bool cFurnaceEntity::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 

@@ -60,9 +60,7 @@ void cRecipeMapper::loadRecipes(const AString & a_ProtocolVersion)
 
 
 
-cRecipeMapper::~cRecipeMapper()
-{
-}
+cRecipeMapper::~cRecipeMapper() = default;
 
 
 

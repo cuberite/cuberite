@@ -194,7 +194,7 @@ cRCONServer::cConnection::cConnection(cRCONServer & a_RCONServer, const AString 
 
 void cRCONServer::cConnection::OnLinkCreated(cTCPLinkPtr a_Link)
 {
-	m_Link = a_Link;
+	m_Link = std::move(a_Link);
 }
 
 

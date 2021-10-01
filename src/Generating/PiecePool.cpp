@@ -24,7 +24,7 @@ bool cPiece::SetVerticalStrategyFromString(const AString & a_StrategyDesc, bool 
 	{
 		return false;
 	}
-	m_VerticalStrategy = strategy;
+	m_VerticalStrategy = std::move(strategy);
 	return true;
 }
 
@@ -39,7 +39,7 @@ bool cPiece::SetVerticalLimitFromString(const AString & a_LimitDesc, bool a_LogW
 	{
 		return false;
 	}
-	m_VerticalLimit = limit;
+	m_VerticalLimit = std::move(limit);
 	return true;
 }
 
@@ -61,7 +61,7 @@ bool cPiece::SetPieceModifiersFromString(const AString & a_Definition, bool a_Lo
 		Modifiers.push_back(std::move(modifiers->at(i)));
 	}
 
-	m_Modifiers = Modifiers;
+	m_Modifiers = std::move(Modifiers);
 
 	return true;
 }

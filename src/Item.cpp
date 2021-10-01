@@ -66,7 +66,7 @@ void cItem::Empty()
 	m_ItemCount = 0;
 	m_ItemDamage = 0;
 	m_Enchantments.Clear();
-	m_CustomName = "";
+	m_CustomName.clear();
 	m_LoreTable.clear();
 	m_RepairCost = 0;
 	m_FireworkItem.EmptyData();

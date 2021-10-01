@@ -123,7 +123,7 @@ void cPickup::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cPickup::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())

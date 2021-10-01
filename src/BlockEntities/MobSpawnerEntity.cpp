@@ -90,7 +90,7 @@ void cMobSpawnerEntity::UpdateActiveState(void)
 
 
 
-bool cMobSpawnerEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+bool cMobSpawnerEntity::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	using namespace std::chrono_literals;
 

@@ -53,7 +53,7 @@ public:
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
@@ -114,9 +114,9 @@ public:
 	virtual void EventLosePlayer(void);
 	virtual void CheckEventLostPlayer(std::chrono::milliseconds a_Dt);
 
-	virtual void InStateIdle    (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
-	virtual void InStateChasing (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
-	virtual void InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
+	virtual void InStateIdle    (const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk);
+	virtual void InStateChasing (const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk);
+	virtual void InStateEscaping(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk);
 
 	double GetAttackRate() { return m_AttackRate; }
 	void SetAttackRate(double a_AttackRate) { m_AttackRate = a_AttackRate; }

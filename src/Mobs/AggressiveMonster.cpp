@@ -22,7 +22,7 @@ cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterTyp
 
 
 // What to do if in Chasing State
-void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cAggressiveMonster::InStateChasing(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::InStateChasing(a_Dt, a_Chunk);
 
@@ -46,7 +46,7 @@ void cAggressiveMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 
 
 
-void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cAggressiveMonster::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())

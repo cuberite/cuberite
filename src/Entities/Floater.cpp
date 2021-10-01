@@ -99,7 +99,7 @@ void cFloater::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cFloater::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	HandlePhysics(a_Dt, a_Chunk);
 

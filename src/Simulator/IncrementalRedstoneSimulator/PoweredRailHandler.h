@@ -60,11 +60,11 @@ namespace PoweredRailHandler
 			case E_BLOCK_ACTIVATOR_RAIL:
 			case E_BLOCK_POWERED_RAIL:
 			{
-				const auto Offset = GetPoweredRailAdjacentXZCoordinateOffset(a_Meta);
 				if (Power != DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, Power))
 				{
 					a_Chunk.SetMeta(a_Position, (Power == 0) ? (a_Meta & 0x07) : (a_Meta | 0x08));
 
+					const auto Offset = GetPoweredRailAdjacentXZCoordinateOffset(a_Meta);
 					UpdateAdjustedRelative(a_Chunk, CurrentlyTickingChunk, a_Position, Offset);
 					UpdateAdjustedRelative(a_Chunk, CurrentlyTickingChunk, a_Position, -Offset);
 				}

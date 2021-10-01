@@ -19,9 +19,7 @@ cSimulatorManager::cSimulatorManager(cWorld & a_World) :
 
 
 
-cSimulatorManager::~cSimulatorManager()
-{
-}
+cSimulatorManager::~cSimulatorManager() = default;
 
 
 
@@ -111,5 +109,5 @@ void cSimulatorManager::WakeUp(const cCuboid & a_Area)
 
 void cSimulatorManager::RegisterSimulator(cSimulator * a_Simulator, int a_Rate)
 {
-	m_Simulators.push_back(std::make_pair(a_Simulator, a_Rate));
+	m_Simulators.emplace_back(a_Simulator, a_Rate);
 }

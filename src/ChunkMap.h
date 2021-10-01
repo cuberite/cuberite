@@ -251,7 +251,7 @@ public:
 	/** Try to Spawn Monsters inside all Chunks */
 	void SpawnMobs(cMobSpawner & a_MobSpawner);
 
-	void Tick(std::chrono::milliseconds a_Dt);
+	void Tick(const std::chrono::milliseconds & a_Dt);
 
 	/** Ticks a single block. Used by cWorld::TickQueuedBlocks() to tick the queued blocks */
 	void TickBlock(const Vector3i a_BlockPos);

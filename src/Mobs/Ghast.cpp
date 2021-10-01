@@ -71,7 +71,7 @@ bool cGhast::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cGhast::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cGhast::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())

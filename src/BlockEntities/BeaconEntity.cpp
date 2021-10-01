@@ -294,7 +294,7 @@ void cBeaconEntity::SendTo(cClientHandle & a_Client)
 
 
 
-bool cBeaconEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+bool cBeaconEntity::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	using namespace std::chrono_literals;
 

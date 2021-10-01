@@ -1026,7 +1026,6 @@ void cRankManager::RemoveRank(const AString & a_RankName, const AString & a_Repl
 		return;
 	}
 
-	AStringVector res;
 	try
 	{
 		// Get the RankID for the rank being removed:

@@ -24,7 +24,7 @@ public:
 
 	cPawn(eEntityType a_EntityType, float a_Width, float a_Height);
 
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 	virtual bool IsFireproof(void) const override;

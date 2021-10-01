@@ -795,6 +795,6 @@ private:
 	virtual void OnDetach() override;
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 	virtual void SpawnOn(cClientHandle & a_Client) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 
 } ;  // tolua_export

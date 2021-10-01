@@ -31,7 +31,7 @@ public:
 	virtual bool IsUndead(void) override { return true; }
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 	virtual void SpawnOn(cClientHandle & a_Client) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk) override;
 
 private:
 

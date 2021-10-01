@@ -317,7 +317,7 @@ void cProjectileEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 	UNUSED(a_HitPos);
 
 	// If we were created by a player and we hit a pawn, notify attacking player's wolves
-	if (a_EntityHit.IsPawn() && (GetCreatorName() != ""))
+	if (a_EntityHit.IsPawn() && (!GetCreatorName().empty()))
 	{
 		auto EntityHit = static_cast<cPawn *>(&a_EntityHit);
 		m_World->DoWithEntityByID(GetCreatorUniqueID(), [=](cEntity & a_Hitter)
@@ -355,7 +355,7 @@ AString cProjectileEntity::GetMCAClassName(void) const
 
 
 
-void cProjectileEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cProjectileEntity::Tick(const std::chrono::milliseconds & a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())

@@ -425,12 +425,12 @@ bool cChunkMap::TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height)
 void cChunkMap::FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
-	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(chunkPos.m_ChunkX, chunkPos.m_ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
+		auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 		Chunk->FastSetBlock(relPos, a_BlockType, a_BlockMeta);
 	}
 }
@@ -475,13 +475,13 @@ void cChunkMap::CollectPickupsByPlayer(cPlayer & a_Player)
 BLOCKTYPE cChunkMap::GetBlock(Vector3i a_BlockPos) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
-	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 
 	// Query the chunk, if loaded:
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(chunkPos.m_ChunkX, chunkPos.m_ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
+		auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 		return Chunk->GetBlock(relPos);
 	}
 	return 0;
@@ -494,13 +494,13 @@ BLOCKTYPE cChunkMap::GetBlock(Vector3i a_BlockPos) const
 NIBBLETYPE cChunkMap::GetBlockMeta(Vector3i a_BlockPos) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
-	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 
 	// Query the chunk, if loaded:
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(chunkPos.m_ChunkX, chunkPos.m_ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
+		auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 		return Chunk->GetMeta(relPos);
 	}
 	return 0;
@@ -513,13 +513,13 @@ NIBBLETYPE cChunkMap::GetBlockMeta(Vector3i a_BlockPos) const
 NIBBLETYPE cChunkMap::GetBlockSkyLight(Vector3i a_BlockPos) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
-	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 
 	// Query the chunk, if loaded:
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(chunkPos.m_ChunkX, chunkPos.m_ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
+		auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 		return Chunk->GetSkyLight(relPos);
 	}
 	return 0;
@@ -532,13 +532,13 @@ NIBBLETYPE cChunkMap::GetBlockSkyLight(Vector3i a_BlockPos) const
 NIBBLETYPE cChunkMap::GetBlockBlockLight(Vector3i a_BlockPos) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
-	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 
 	// Query the chunk, if loaded:
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(chunkPos.m_ChunkX, chunkPos.m_ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
+		auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 		return Chunk->GetBlockLight(relPos);
 	}
 	return 0;
@@ -551,13 +551,13 @@ NIBBLETYPE cChunkMap::GetBlockBlockLight(Vector3i a_BlockPos) const
 void cChunkMap::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta)
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
-	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 
 	// Query the chunk, if loaded:
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(chunkPos.m_ChunkX, chunkPos.m_ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
+		auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 		Chunk->SetMeta(relPos, a_BlockMeta);
 	}
 }
@@ -569,12 +569,12 @@ void cChunkMap::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta)
 void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
-	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(chunkPos.m_ChunkX, chunkPos.m_ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
+		auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 		Chunk->SetBlock(relPos, a_BlockType, a_BlockMeta);
 	}
 }
@@ -586,12 +586,12 @@ void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE 
 bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
 	auto chunkCoord = cChunkDef::BlockToChunk(a_BlockPos);
-	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkCoord);
 
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(chunkCoord.m_ChunkX, chunkCoord.m_ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
+		auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkCoord);
 		Chunk->GetBlockTypeMeta(relPos, a_BlockType, a_BlockMeta);
 		return true;
 	}
@@ -605,13 +605,13 @@ bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, N
 bool cChunkMap::GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
-	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 
 	// Query the chunk, if loaded:
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(chunkPos.m_ChunkX, chunkPos.m_ChunkZ);
 	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
+		auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 		Chunk->GetBlockInfo(relPos, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
 		return true;
 	}
@@ -1290,12 +1290,12 @@ int cChunkMap::GrowPlantAt(Vector3i a_BlockPos, int a_NumStages)
 void cChunkMap::SetNextBlockToTick(const Vector3i a_BlockPos)
 {
 	auto ChunkPos = cChunkDef::BlockToChunk(a_BlockPos);
-	auto RelPos = cChunkDef::AbsoluteToRelative(a_BlockPos, ChunkPos);
 
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(ChunkPos.m_ChunkX, ChunkPos.m_ChunkZ);
 	if (Chunk != nullptr)
 	{
+		auto RelPos = cChunkDef::AbsoluteToRelative(a_BlockPos, ChunkPos);
 		Chunk->SetNextBlockToTick(RelPos);
 	}
 }
@@ -1340,7 +1340,7 @@ void cChunkMap::SpawnMobs(cMobSpawner & a_MobSpawner)
 
 
 
-void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
+void cChunkMap::Tick(const std::chrono::milliseconds & a_Dt)
 {
 	cCSLock Lock(m_CSChunks);
 

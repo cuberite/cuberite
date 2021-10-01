@@ -49,8 +49,8 @@ class cQueue
 	typedef typename QueueType::iterator iterator;
 
 public:
-	cQueue() {}
-	~cQueue() {}
+	cQueue() = default;
+	~cQueue() = default;
 
 
 	/** Enqueues an item to the queue, may block if other threads are accessing the queue. */
