@@ -10463,7 +10463,7 @@ a_Player:OpenWindow(Window);
 							Type = "Vector3i",
 						},
 					},
-					Notes = "Returns the last player respawn position. This is initialised to the world spawn point if it haven't been changed as of yet",
+					Notes = "Returns the player's respawn position. The player is guaranteed to respawn from death here if {{cPlayer}}:IsRespawnPointForced is true or if a bed exists at this position.",
 				},
 				GetMaxSpeed =
 				{
@@ -10834,7 +10834,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Returns true if respawn point is forced",
+					Notes = "Returns true if the player unconditionally respawns from death at the position given by {{cPlayer}}:GetLastBedPos with no bed checks performed.",
 				},
 				IsSatiated =
 				{
@@ -11107,7 +11107,7 @@ a_Player:OpenWindow(Window);
 							IsOptional = true,
 						},
 					},
-					Notes = "Sets the position and world of the player's bed. The player will respawn at this position and world upon death if there is a bed block there otherwise it will be reset to default world spawn. If the world is not specified, it is set to the player's current world.",
+					Notes = "Sets the position and world of the player's bed. If the world is not specified, it is set to the player's current world. The player will respawn at this position and world upon death if there is a bed there.",
 				},
 				SetCanFly =
 				{
@@ -11318,10 +11318,9 @@ a_Player:OpenWindow(Window);
 						{
 							Name = "World",
 							Type = "cWorld",
-							IsOptional = true,
 						},
 					},
-					Notes = "Sets the position and world of the player's respawn point. The player will respawn at this position and world upon death. If the world is not specified, it is set to the player's current world.",
+					Notes = "Sets the position and world of the player's respawn point. The player will respawn at this position and world upon death.",
 				},
 				SetSprint =
 				{
