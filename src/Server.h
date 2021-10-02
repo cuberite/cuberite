@@ -118,8 +118,8 @@ public:
 
 	void KickUser(int a_ClientID, const AString & a_Reason);
 
-	/** Authenticates the specified user, called by cAuthenticator */
-	void AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
+	/** Authenticates the specified user, called by cAuthenticator supplying player details from Mojang. */
+	void AuthenticateUser(int a_ClientID, AString && a_Username, const cUUID & a_UUID, Json::Value && a_Properties);
 
 	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
 

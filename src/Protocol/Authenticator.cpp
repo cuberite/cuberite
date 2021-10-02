@@ -57,17 +57,17 @@ void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 
 
 
-void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, const AString & a_ServerHash)
+void cAuthenticator::Authenticate(int a_ClientID, AString && a_Username, const AString & a_ServerHash)
 {
 	if (!m_ShouldAuthenticate)
 	{
-		Json::Value Value;
-		cRoot::Get()->AuthenticateUser(a_ClientID, a_UserName, cClientHandle::GenerateOfflineUUID(a_UserName), Value);
+		const auto UUID = cClientHandle::GenerateOfflineUUID(a_Username);
+		cRoot::Get()->GetServer()->AuthenticateUser(a_ClientID, std::move(a_Username), UUID, Json::Value{});
 		return;
 	}
 
-	cCSLock LOCK(m_CS);
-	m_Queue.emplace_back(a_ClientID, a_UserName, a_ServerHash);
+	cCSLock Lock(m_CS);
+	m_Queue.emplace_back(a_ClientID, std::move(a_Username), a_ServerHash);
 	m_QueueNonempty.Set();
 }
 
@@ -112,20 +112,19 @@ void cAuthenticator::Execute(void)
 		}
 		ASSERT(!m_Queue.empty());
 
-		cAuthenticator::cUser & User = m_Queue.front();
-		int ClientID = User.m_ClientID;
-		AString UserName = User.m_Name;
-		AString ServerID = User.m_ServerID;
+		cAuthenticator::cUser User = std::move(m_Queue.front());
+		int & ClientID = User.m_ClientID;
+		AString & UserName = User.m_Name;
+		AString & ServerID = User.m_ServerID;
 		m_Queue.pop_front();
 		Lock.Unlock();
 
-		AString NewUserName = UserName;
 		cUUID UUID;
 		Json::Value Properties;
-		if (AuthWithYggdrasil(NewUserName, ServerID, UUID, Properties))
+		if (AuthWithYggdrasil(UserName, ServerID, UUID, Properties))
 		{
-			LOGINFO("User %s authenticated with UUID %s", NewUserName.c_str(), UUID.ToShortString().c_str());
-			cRoot::Get()->AuthenticateUser(ClientID, NewUserName, UUID, Properties);
+			LOGINFO("User %s authenticated with UUID %s", UserName.c_str(), UUID.ToShortString().c_str());
+			cRoot::Get()->GetServer()->AuthenticateUser(ClientID, std::move(UserName), UUID, std::move(Properties));
 		}
 		else
 		{

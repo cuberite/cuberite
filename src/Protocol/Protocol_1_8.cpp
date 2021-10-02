@@ -2161,6 +2161,7 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	auto NumPlayers = static_cast<signed>(Server->GetNumPlayers());
 	auto MaxPlayers = static_cast<signed>(Server->GetMaxPlayers());
 	AString Favicon = Server->GetFaviconData();
+
 	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
 
 	// Version:
@@ -2177,7 +2178,7 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	// Description:
 	Json::Value Description;
-	Description["text"] = ServerDescription.c_str();
+	Description["text"] = std::move(ServerDescription);
 
 	// Create the response:
 	Json::Value ResponseValue;
