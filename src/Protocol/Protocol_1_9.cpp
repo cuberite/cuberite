@@ -2265,7 +2265,7 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 	// Send the spawn position:
 	{
 		cPacketizer Pkt(*this, pktSpawnPosition);
-		Pkt.WriteXYZPosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
+		Pkt.WriteXYZPosition64(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ());
 	}
 
 	// Send the server difficulty:
