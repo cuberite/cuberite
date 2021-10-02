@@ -11307,7 +11307,7 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the normal (walking) maximum speed, relative to the game default speed. The default value is 1. Sends the updated speed to the client, if appropriate.",
 				},
-				SetRespawnPos =
+				SetRespawnPosition =
 				{
 					Params =
 					{
