@@ -786,8 +786,7 @@ void cPlayer::SetCustomName(const AString & a_CustomName)
 
 void cPlayer::SetBedPos(const Vector3i a_Position)
 {
-	m_LastBedPos = a_Position;
-	m_SpawnWorldName = m_World->GetName();
+	SetBedPos(a_Position, *m_World);
 }
 
 
@@ -796,7 +795,8 @@ void cPlayer::SetBedPos(const Vector3i a_Position)
 
 void cPlayer::SetBedPos(const Vector3i a_Position, const cWorld & a_World)
 {
-	m_LastBedPos = a_Position;
+	m_RespawnPosition = a_Position;
+	m_IsRespawnPointForced = false;
 	m_SpawnWorldName = a_World.GetName();
 }
 
@@ -804,7 +804,18 @@ void cPlayer::SetBedPos(const Vector3i a_Position, const cWorld & a_World)
 
 
 
-cWorld * cPlayer::GetBedWorld()
+void cPlayer::SetRespawnPosition(const Vector3i a_Position, const cWorld & a_World)
+{
+	m_RespawnPosition = a_Position;
+	m_IsRespawnPointForced = true;
+	m_SpawnWorldName = a_World.GetName();
+}
+
+
+
+
+
+cWorld * cPlayer::GetRespawnWorld()
 {
 	if (const auto World = cRoot::Get()->GetWorld(m_SpawnWorldName); World != nullptr)
 	{
@@ -943,14 +954,33 @@ void cPlayer::Respawn(void)
 	// Extinguish the fire:
 	StopBurning();
 
-	if (const auto BedWorld = GetBedWorld(); m_World != BedWorld)
+	// Disable flying:
+	SetFlying(false);
+
+	if (!m_IsRespawnPointForced)
 	{
-		MoveToWorld(*BedWorld, GetLastBedPos(), false, false);
+		// Check if the bed is still present:
+		if (GetRespawnWorld()->GetBlock(m_RespawnPosition) != E_BLOCK_BED)
+		{
+			const auto & DefaultWorld = *cRoot::Get()->GetDefaultWorld();
+
+			// If not, reset spawn to default and inform:
+			SetRespawnPosition(Vector3d(DefaultWorld.GetSpawnX(), DefaultWorld.GetSpawnY(), DefaultWorld.GetSpawnZ()), DefaultWorld);
+			SendAboveActionBarMessage("Your home bed was missing or obstructed");
+		}
+
+		// TODO: bed obstruction check here
+	}
+
+
+	if (const auto RespawnWorld = GetRespawnWorld(); m_World != RespawnWorld)
+	{
+		MoveToWorld(*RespawnWorld, m_RespawnPosition, false, false);
 	}
 	else
 	{
 		m_ClientHandle->SendRespawn(m_World->GetDimension(), true);
-		TeleportToCoords(GetLastBedPos().x, GetLastBedPos().y, GetLastBedPos().z);
+		TeleportToCoords(m_RespawnPosition.x, m_RespawnPosition.y, m_RespawnPosition.z);
 	}
 
 	SetVisible(true);
@@ -1785,7 +1815,7 @@ void cPlayer::LoadFromDisk()
 
 	const Vector3i WorldSpawn(static_cast<int>(m_World->GetSpawnX()), static_cast<int>(m_World->GetSpawnY()), static_cast<int>(m_World->GetSpawnZ()));
 	SetPosition(WorldSpawn);
-	SetBedPos(WorldSpawn, *m_World);
+	SetRespawnPosition(WorldSpawn, *m_World);
 
 	m_Inventory.Clear();
 	m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();  // Use a random number to seed the enchantment generator
@@ -1892,9 +1922,10 @@ bool cPlayer::LoadFromFile(const AString & a_FileName)
 		m_World = cRoot::Get()->GetDefaultWorld();
 	}
 
-	m_LastBedPos.x = Root.get("SpawnX", m_World->GetSpawnX()).asInt();
-	m_LastBedPos.y = Root.get("SpawnY", m_World->GetSpawnY()).asInt();
-	m_LastBedPos.z = Root.get("SpawnZ", m_World->GetSpawnZ()).asInt();
+	m_RespawnPosition.x = Root.get("SpawnX", m_World->GetSpawnX()).asInt();
+	m_RespawnPosition.y = Root.get("SpawnY", m_World->GetSpawnY()).asInt();
+	m_RespawnPosition.z = Root.get("SpawnZ", m_World->GetSpawnZ()).asInt();
+	m_IsRespawnPointForced = Root.get("SpawnForced", true).asBool();
 	m_SpawnWorldName = Root.get("SpawnWorld", cRoot::Get()->GetDefaultWorld()->GetName()).asString();
 
 	try
@@ -2006,6 +2037,7 @@ void cPlayer::SaveToDisk()
 	root["SpawnX"]              = GetLastBedPos().x;
 	root["SpawnY"]              = GetLastBedPos().y;
 	root["SpawnZ"]              = GetLastBedPos().z;
+	root["SpawnForced"]         = m_IsRespawnPointForced;
 	root["SpawnWorld"]          = m_SpawnWorldName;
 	root["enchantmentSeed"]     = m_EnchantmentSeed;
 	root["world"]               = m_CurrentWorldName;
@@ -3236,7 +3268,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	else if (IsInBed())
 	{
 		// Check if sleeping is still possible:
-		if ((GetPosition().Floor() != m_LastBedPos) || (m_World->GetBlock(m_LastBedPos) != E_BLOCK_BED))
+		if ((GetPosition().Floor() != m_RespawnPosition) || (m_World->GetBlock(m_RespawnPosition) != E_BLOCK_BED))
 		{
 			m_ClientHandle->HandleLeaveBed();
 		}

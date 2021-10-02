@@ -10463,7 +10463,7 @@ a_Player:OpenWindow(Window);
 							Type = "Vector3i",
 						},
 					},
-					Notes = "Returns the position of the last bed the player has slept in, or the world's spawn if no such position was recorded.",
+					Notes = "Returns the player's respawn position. The player is guaranteed to respawn from death here if {{cPlayer}}:IsRespawnPointForced is true or if a bed exists at this position.",
 				},
 				GetMaxSpeed =
 				{
@@ -10827,6 +10827,15 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns true if the player's left hand is dominant.",
 				},
+				IsRespawnPointForced = {
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the player unconditionally respawns from death at the position given by {{cPlayer}}:GetLastBedPos with no bed checks performed.",
+				},
 				IsSatiated =
 				{
 					Returns =
@@ -11098,7 +11107,7 @@ a_Player:OpenWindow(Window);
 							IsOptional = true,
 						},
 					},
-					Notes = "Sets the position and world of the player's respawn point, which is also known as the bed position. The player will respawn at this position and world upon death. If the world is not specified, it is set to the player's current world.",
+					Notes = "Sets the position and world of the player's bed. If the world is not specified, it is set to the player's current world. The player will respawn at this position and world upon death if there is a bed there.",
 				},
 				SetCanFly =
 				{
@@ -11297,6 +11306,21 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Sets the normal (walking) maximum speed, relative to the game default speed. The default value is 1. Sends the updated speed to the client, if appropriate.",
+				},
+				SetRespawnPosition =
+				{
+					Params =
+					{
+						{
+							Name = "Position",
+							Type = "Vector3i",
+						},
+						{
+							Name = "World",
+							Type = "cWorld",
+						},
+					},
+					Notes = "Sets the position and world of the player's respawn point. The player will respawn at this position and world upon death.",
 				},
 				SetSprint =
 				{

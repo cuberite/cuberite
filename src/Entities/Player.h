@@ -513,22 +513,28 @@ public:
 	The custom name will be used in the tab-list, in the player nametag and in the tab-completion. */
 	void SetCustomName(const AString & a_CustomName);
 
-	/** Gets the last position that the player slept in
-	This is initialised to the world spawn point if the player has not slept in a bed as of yet
-	*/
-	Vector3i GetLastBedPos(void) const { return m_LastBedPos; }
+	/** Gets the player's potential respawn position (named LastBedPos for compatibility reasons). */
+	Vector3i GetLastBedPos(void) const { return m_RespawnPosition; }
 
-	/** Sets the player's bed (home / respawn) position to the specified position.
-	Sets the respawn world to the player's world. */
-	void SetBedPos(const Vector3i a_Position);
+	/** Returns if the respawn point is unconditionally used. */
+	bool IsRespawnPointForced(void) const { return m_IsRespawnPointForced; }
 
-	/** Sets the player's bed (home / respawn) position and respawn world to the specified parameters. */
-	void SetBedPos(const Vector3i a_Position, const cWorld & a_World);
+	/** Sets the player's bed position to the specified position.
+	Sets the respawn world to the player's world and unforces the respawn point.
+	The given position will be used subject to bed checks when respawning. */
+	void SetBedPos(Vector3i a_Position);
+
+	/** Sets the player's bed position to the specified position.
+	The spawn point is unforced. The given position will be used subject to bed checks when respawning. */
+	void SetBedPos(Vector3i a_Position, const cWorld & a_World);
+
+	/** Sets the player's forced respawn position and world. */
+	void SetRespawnPosition(Vector3i a_Position, const cWorld & a_World);
 
 	// tolua_end
 
-	// TODO lua export GetBedPos and GetBedWorld
-	cWorld * GetBedWorld();
+	// TODO lua export GetRespawnWorld
+	cWorld * GetRespawnWorld();
 
 	/** Update movement-related statistics. */
 	void UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIsOnGround);
@@ -652,8 +658,9 @@ private:
 	cWindow * m_CurrentWindow;
 	cWindow * m_InventoryWindow;
 
-	/** The player's last saved bed position */
-	Vector3i m_LastBedPos;
+	/** The player's potential respawn position, initialised to world spawn by default.
+	During player respawn from death, if m_IsRespawnPointForced is false and no bed exists here, it will be reset to world spawn. */
+	Vector3i m_RespawnPosition;
 
 	/** The name of the world which the player respawns in upon death.
 	This is stored as a string to enable SaveToDisk to not touch cRoot, and thus can be safely called in the player's destructor. */
@@ -706,6 +713,9 @@ private:
 
 	/** Was the player frozen manually by a plugin or automatically by the server? */
 	bool m_IsManuallyFrozen;
+
+	/** Whether we unconditionally respawn to m_RespawnPosition, or check if a bed is unobstructed and available first. */
+	bool m_IsRespawnPointForced;
 
 	/** Flag used by food handling system to determine whether a teleport has just happened.
 	Will not apply food penalties if found to be true; will set to false after processing. */
