@@ -734,7 +734,7 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 	}
 
 	// A search grid (searches clockwise around the origin)
-	static const int HalfChunk = static_cast<int>(cChunkDef::Width / 2.0f);
+	static const int HalfChunk = cChunkDef::Width / 2;
 	static const Vector3i ChunkOffset[] =
 	{
 		Vector3i(0, 0, HalfChunk),
@@ -793,12 +793,12 @@ bool cWorld::CanSpawnAt(int a_X, int & a_Y, int a_Z)
 	static const int ValidSpawnBlocksCount = ARRAYCOUNT(ValidSpawnBlocks);
 
 	// Increase this by two, because we need two more blocks for body and head
-	static const int HighestSpawnPoint = GetHeight(static_cast<int>(a_X), static_cast<int>(a_Z)) + 2;
-	static const int LowestSpawnPoint = static_cast<int>(HighestSpawnPoint / 2.0f);
+	static const int HighestSpawnPoint = GetHeight(a_X, a_Z) + 2;
+	static const int LowestSpawnPoint = HighestSpawnPoint / 2;
 
 	for (int PotentialY = HighestSpawnPoint; PotentialY > LowestSpawnPoint; --PotentialY)
 	{
-		BLOCKTYPE HeadBlock = GetBlock({ static_cast<int>(a_X), PotentialY, static_cast<int>(a_Z) });
+		BLOCKTYPE HeadBlock = GetBlock({ a_X, PotentialY, a_Z });
 
 		// Is this block safe for spawning
 		if (HeadBlock != E_BLOCK_AIR)
@@ -806,7 +806,7 @@ bool cWorld::CanSpawnAt(int a_X, int & a_Y, int a_Z)
 			continue;
 		}
 
-		BLOCKTYPE BodyBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 1, static_cast<int>(a_Z) });
+		BLOCKTYPE BodyBlock = GetBlock({ a_X, PotentialY - 1, a_Z });
 
 		// Is this block safe for spawning
 		if (BodyBlock != E_BLOCK_AIR)
@@ -814,7 +814,7 @@ bool cWorld::CanSpawnAt(int a_X, int & a_Y, int a_Z)
 			continue;
 		}
 
-		BLOCKTYPE FloorBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 2, static_cast<int>(a_Z) });
+		BLOCKTYPE FloorBlock = GetBlock({ a_X, PotentialY - 2, a_Z });
 
 		// Early out - Is the floor block air
 		if (FloorBlock == E_BLOCK_AIR)
@@ -834,12 +834,12 @@ bool cWorld::CanSpawnAt(int a_X, int & a_Y, int a_Z)
 			continue;
 		}
 
-		if (!CheckPlayerSpawnPoint(static_cast<int>(a_X), PotentialY - 1, static_cast<int>(a_Z)))
+		if (!CheckPlayerSpawnPoint(a_X, PotentialY - 1, a_Z))
 		{
 			continue;
 		}
 
-		a_Y = PotentialY - 1.0;
+		a_Y = PotentialY - 1;
 		return true;
 	}
 
