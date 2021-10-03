@@ -335,49 +335,47 @@ bool cClientHandle::BungeeAuthenticate()
 
 void cClientHandle::Authenticate(AString && a_Name, const cUUID & a_UUID, Json::Value && a_Properties)
 {
+	cCSLock Lock(m_CSState);
+	/*
+	LOGD("Processing authentication for client %s @ %s (%p), state = %d",
+		m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this), m_State.load()
+	);
+	//*/
+
+	if (m_State != csAuthenticating)
 	{
-		cCSLock lock(m_CSState);
-		/*
-		LOGD("Processing authentication for client %s @ %s (%p), state = %d",
-			m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this), m_State.load()
-		);
-		//*/
+		return;
+	}
 
-		if (m_State != csAuthenticating)
-		{
-			return;
-		}
+	ASSERT(m_Player == nullptr);
 
-		ASSERT(m_Player == nullptr);
+	if (!BungeeAuthenticate())
+	{
+		return;
+	}
 
-		if (!BungeeAuthenticate())
-		{
-			return;
-		}
+	m_Username = std::move(a_Name);
 
-		m_Username = std::move(a_Name);
+	// Only assign UUID and properties if not already pre-assigned (BungeeCord sends those in the Handshake packet):
+	if (m_UUID.IsNil())
+	{
+		m_UUID = a_UUID;
+	}
+	if (m_Properties.empty())
+	{
+		m_Properties = std::move(a_Properties);
+	}
 
-		// Only assign UUID and properties if not already pre-assigned (BungeeCord sends those in the Handshake packet):
-		if (m_UUID.IsNil())
-		{
-			m_UUID = a_UUID;
-		}
-		if (m_Properties.empty())
-		{
-			m_Properties = std::move(a_Properties);
-		}
+	// Send login success (if the protocol supports it):
+	m_Protocol->SendLoginSuccess();
 
-		// Send login success (if the protocol supports it):
-		m_Protocol->SendLoginSuccess();
-
-		if (m_ForgeHandshake.IsForgeClient)
-		{
-			m_ForgeHandshake.BeginForgeHandshake(*this);
-		}
-		else
-		{
-			FinishAuthenticate();
-		}
+	if (m_ForgeHandshake.IsForgeClient)
+	{
+		m_ForgeHandshake.BeginForgeHandshake(*this);
+	}
+	else
+	{
+		FinishAuthenticate();
 	}
 }
 
@@ -745,8 +743,8 @@ bool cClientHandle::HandleLogin()
 		m_State = csAuthenticating;
 	}  // lock(m_CSState)
 
-	// Schedule for authentication; until then, let the player wait (but do not block)
-	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), std::move(m_Username), m_Protocol->GetAuthServerID());
+	// Schedule for authentication; until then, let the player wait (but do not block):
+	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), m_Username, m_Protocol->GetAuthServerID());
 	return true;
 }
 
