@@ -57,17 +57,23 @@ void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 
 
 
-void cAuthenticator::Authenticate(int a_ClientID, AString && a_Username, const AString & a_ServerHash)
+void cAuthenticator::Authenticate(int a_ClientID, const std::string_view a_Username, const std::string_view a_ServerHash)
 {
 	if (!m_ShouldAuthenticate)
 	{
-		const auto UUID = cClientHandle::GenerateOfflineUUID(a_Username);
-		cRoot::Get()->GetServer()->AuthenticateUser(a_ClientID, std::move(a_Username), UUID, Json::Value{});
+		// An "authenticated" username, which is just what the client sent since auth is off.
+		std::string OfflineUsername(a_Username);
+
+		// A specially constructed UUID based wholly on the username.
+		const auto OfflineUUID = cClientHandle::GenerateOfflineUUID(OfflineUsername);
+
+		// "Authenticate" the user based on what little information we have:
+		cRoot::Get()->GetServer()->AuthenticateUser(a_ClientID, std::move(OfflineUsername), OfflineUUID, Json::Value());
 		return;
 	}
 
 	cCSLock Lock(m_CS);
-	m_Queue.emplace_back(a_ClientID, std::move(a_Username), a_ServerHash);
+	m_Queue.emplace_back(a_ClientID, a_Username, a_ServerHash);
 	m_QueueNonempty.Set();
 }
 
@@ -114,17 +120,17 @@ void cAuthenticator::Execute(void)
 
 		cAuthenticator::cUser User = std::move(m_Queue.front());
 		int & ClientID = User.m_ClientID;
-		AString & UserName = User.m_Name;
+		AString & Username = User.m_Name;
 		AString & ServerID = User.m_ServerID;
 		m_Queue.pop_front();
 		Lock.Unlock();
 
 		cUUID UUID;
 		Json::Value Properties;
-		if (AuthWithYggdrasil(UserName, ServerID, UUID, Properties))
+		if (AuthWithYggdrasil(Username, ServerID, UUID, Properties))
 		{
-			LOGINFO("User %s authenticated with UUID %s", UserName.c_str(), UUID.ToShortString().c_str());
-			cRoot::Get()->GetServer()->AuthenticateUser(ClientID, std::move(UserName), UUID, std::move(Properties));
+			LOGINFO("User %s authenticated with UUID %s", Username.c_str(), UUID.ToShortString().c_str());
+			cRoot::Get()->GetServer()->AuthenticateUser(ClientID, std::move(Username), UUID, std::move(Properties));
 		}
 		else
 		{
