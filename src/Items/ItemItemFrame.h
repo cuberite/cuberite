@@ -54,7 +54,7 @@ public:
 			return false;
 		}
 
-		// Place the item frame:
+		// An item frame, centred so pickups spawn nicely.
 		auto ItemFrame = std::make_unique<cItemFrame>(a_ClickedBlockFace, Vector3d(0.5, 0.5, 0.5) + PlacePos);
 		auto ItemFramePtr = ItemFrame.get();
 		if (!ItemFramePtr->Initialize(std::move(ItemFrame), *a_World))

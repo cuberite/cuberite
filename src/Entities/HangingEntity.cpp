@@ -56,7 +56,7 @@ void cHangingEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 
-	// Check for supports once every 64 ticks (3.2 seconds):
+	// Check for a valid support block once every 64 ticks (3.2 seconds):
 	if ((m_World->GetWorldTickAge() % 64_tick) != 0_tick)
 	{
 		return;
@@ -69,5 +69,6 @@ void cHangingEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	TakeDamage(dtEnvironment, nullptr, GetMaxHealth(), 0);
+	// Take environmental damage, intending to self-destruct, with "take damage" handling done by child classes:
+	TakeDamage(dtEnvironment, nullptr, static_cast<int>(GetMaxHealth()), 0);
 }

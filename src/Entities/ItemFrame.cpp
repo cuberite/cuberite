@@ -23,16 +23,26 @@ cItemFrame::cItemFrame(eBlockFace a_BlockFace, Vector3d a_Pos):
 
 bool cItemFrame::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
+	// Take environmental or non-player damage normally:
 	if (m_Item.IsEmpty() || (a_TDI.Attacker == nullptr) || !a_TDI.Attacker->IsPlayer())
 	{
 		return Super::DoTakeDamage(a_TDI);
 	}
 
+	// Only pop out a pickup if attacked by a non-creative player:
 	if (!static_cast<cPlayer *>(a_TDI.Attacker)->IsGameModeCreative())
 	{
-		GetWorld()->SpawnItemPickup(GetPosition().addedY(-0.125), m_Item, AddFaceDirection(Vector3i(), ProtocolFaceToBlockFace(m_Facing)) * 2);
+		// Where the pickup spawns, offset by half cPickup height to centre in the block.
+		const auto SpawnPosition = GetPosition().addedY(-0.125);
+
+		// The direction the pickup travels to simulate a pop-out effect.
+		const auto FlyOutSpeed = AddFaceDirection(Vector3i(), ProtocolFaceToBlockFace(m_Facing)) * 2;
+
+		// Spawn the frame's held item:
+		GetWorld()->SpawnItemPickup(SpawnPosition, m_Item, FlyOutSpeed);
 	}
 
+	// In any case we have a held item and were hit by a player, so clear it:
 	m_Item.Empty();
 	m_ItemRotation = 0;
 	a_TDI.FinalDamage = 0;
