@@ -5195,6 +5195,24 @@ cFile:DeleteFile("/usr/bin/virus.exe");
 					},
 					Notes = "Returns the direction in which the entity is facing.",
 				},
+				IsValidSupportBlock =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "BlockType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						}
+					},
+					Notes = "Returns true if the specified block type can support a hanging entity. This means that paintings and item frames can be placed on such a block.",
+				},
 				SetFacing =
 				{
 					Params =

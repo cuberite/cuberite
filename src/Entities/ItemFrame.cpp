@@ -21,6 +21,54 @@ cItemFrame::cItemFrame(eBlockFace a_BlockFace, Vector3d a_Pos):
 
 
 
+bool cItemFrame::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	// Take environmental or non-player damage normally:
+	if (m_Item.IsEmpty() || (a_TDI.Attacker == nullptr) || !a_TDI.Attacker->IsPlayer())
+	{
+		return Super::DoTakeDamage(a_TDI);
+	}
+
+	// Only pop out a pickup if attacked by a non-creative player:
+	if (!static_cast<cPlayer *>(a_TDI.Attacker)->IsGameModeCreative())
+	{
+		// Where the pickup spawns, offset by half cPickup height to centre in the block.
+		const auto SpawnPosition = GetPosition().addedY(-0.125);
+
+		// The direction the pickup travels to simulate a pop-out effect.
+		const auto FlyOutSpeed = AddFaceDirection(Vector3i(), ProtocolFaceToBlockFace(m_Facing)) * 2;
+
+		// Spawn the frame's held item:
+		GetWorld()->SpawnItemPickup(SpawnPosition, m_Item, FlyOutSpeed);
+	}
+
+	// In any case we have a held item and were hit by a player, so clear it:
+	m_Item.Empty();
+	m_ItemRotation = 0;
+	a_TDI.FinalDamage = 0;
+	SetInvulnerableTicks(0);
+	GetWorld()->BroadcastEntityMetadata(*this);
+	return false;
+}
+
+
+
+
+
+void cItemFrame::GetDrops(cItems & a_Items, cEntity * a_Killer)
+{
+	if (!m_Item.IsEmpty())
+	{
+		a_Items.push_back(m_Item);
+	}
+
+	a_Items.emplace_back(E_ITEM_ITEM_FRAME);
+}
+
+
+
+
+
 void cItemFrame::OnRightClicked(cPlayer & a_Player)
 {
 	Super::OnRightClicked(a_Player);
@@ -48,46 +96,6 @@ void cItemFrame::OnRightClicked(cPlayer & a_Player)
 
 	GetWorld()->BroadcastEntityMetadata(*this);  // Update clients
 	GetParentChunk()->MarkDirty();               // Mark chunk dirty to save rotation or item
-}
-
-
-
-
-
-void cItemFrame::KilledBy(TakeDamageInfo & a_TDI)
-{
-	if (m_Item.IsEmpty())
-	{
-		Super::KilledBy(a_TDI);
-		Destroy();
-		return;
-	}
-
-	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPlayer() && !static_cast<cPlayer *>(a_TDI.Attacker)->IsGameModeCreative())
-	{
-		cItems Item;
-		Item.push_back(m_Item);
-
-		GetWorld()->SpawnItemPickups(Item, GetPosX(), GetPosY(), GetPosZ());
-	}
-
-	SetHealth(GetMaxHealth());
-	m_Item.Empty();
-	m_ItemRotation = 0;
-	SetInvulnerableTicks(0);
-	GetWorld()->BroadcastEntityMetadata(*this);
-}
-
-
-
-
-
-void cItemFrame::GetDrops(cItems & a_Items, cEntity * a_Killer)
-{
-	if ((a_Killer != nullptr) && a_Killer->IsPlayer() && !static_cast<cPlayer *>(a_Killer)->IsGameModeCreative())
-	{
-		a_Items.emplace_back(E_ITEM_ITEM_FRAME);
-	}
 }
 
 

@@ -39,16 +39,12 @@ public:  // tolua_export
 
 private:
 
-	virtual void OnRightClicked(cPlayer & a_Player) override;
-	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void GetDrops(cItems & a_Items, cEntity * a_Killer) override;
+	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
 	cItem m_Item;
 	Byte m_ItemRotation;
 
 };  // tolua_export
-
-
-
-
