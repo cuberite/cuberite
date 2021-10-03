@@ -45,9 +45,8 @@ public:
 			return false;
 		}
 
-		// Make sure the support block is a valid block to place a painting on
-		BLOCKTYPE SupportBlockType = a_World->GetBlock(a_ClickedBlockPos);
-		if (!cHangingEntity::ValidSupportBlock(SupportBlockType))
+		// Make sure the support block is a valid block to place a painting on:
+		if (!cHangingEntity::IsValidSupportBlock(a_World->GetBlock(a_ClickedBlockPos)))
 		{
 			return false;
 		}
@@ -92,7 +91,7 @@ public:
 		};
 
 		auto PaintingTitle = gPaintingTitlesList[a_World->GetTickRandomNumber(ARRAYCOUNT(gPaintingTitlesList) - 1)];
-		auto Painting = std::make_unique<cPainting>(PaintingTitle, a_ClickedBlockFace, PlacePos);
+		auto Painting = std::make_unique<cPainting>(PaintingTitle, a_ClickedBlockFace, Vector3d(0.5, 0.5, 0.5) + PlacePos);
 		auto PaintingPtr = Painting.get();
 		if (!PaintingPtr->Initialize(std::move(Painting), *a_World))
 		{

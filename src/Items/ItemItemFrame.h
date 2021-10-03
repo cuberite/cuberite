@@ -40,9 +40,8 @@ public:
 			return false;
 		}
 
-		// Make sure the support block is a valid block to place an item frame on
-		BLOCKTYPE SupportBlockType = a_World->GetBlock(a_ClickedBlockPos);
-		if (!cHangingEntity::ValidSupportBlock(SupportBlockType))
+		// Make sure the support block is a valid block to place an item frame on:
+		if (!cHangingEntity::IsValidSupportBlock(a_World->GetBlock(a_ClickedBlockPos)))
 		{
 			return false;
 		}
@@ -56,7 +55,7 @@ public:
 		}
 
 		// Place the item frame:
-		auto ItemFrame = std::make_unique<cItemFrame>(a_ClickedBlockFace, PlacePos);
+		auto ItemFrame = std::make_unique<cItemFrame>(a_ClickedBlockFace, Vector3d(0.5, 0.5, 0.5) + PlacePos);
 		auto ItemFramePtr = ItemFrame.get();
 		if (!ItemFramePtr->Initialize(std::move(ItemFrame), *a_World))
 		{

@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "HangingEntity.h"
+#include "BlockInfo.h"
 #include "Player.h"
 #include "Chunk.h"
 #include "../ClientHandle.h"
@@ -22,6 +23,26 @@ cHangingEntity::cHangingEntity(eEntityType a_EntityType, eBlockFace a_Facing, Ve
 
 
 
+bool cHangingEntity::IsValidSupportBlock(const BLOCKTYPE a_BlockType)
+{
+	return cBlockInfo::IsSolid(a_BlockType) && (a_BlockType != E_BLOCK_REDSTONE_REPEATER_OFF) && (a_BlockType != E_BLOCK_REDSTONE_REPEATER_ON);
+}
+
+
+
+
+
+void cHangingEntity::KilledBy(TakeDamageInfo & a_TDI)
+{
+	Super::KilledBy(a_TDI);
+
+	Destroy();
+}
+
+
+
+
+
 void cHangingEntity::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	SetYaw(GetProtocolFacing() * 90);
@@ -33,35 +54,20 @@ void cHangingEntity::SpawnOn(cClientHandle & a_ClientHandle)
 
 void cHangingEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	if (m_TickCounter++ >= 100)
+	UNUSED(a_Dt);
+
+	// Check for supports once every 64 ticks (3.2 seconds):
+	if ((m_World->GetWorldTickAge() % 64_tick) != 0_tick)
 	{
-		m_TickCounter = 0;
-
-		const auto & Pos = GetPosition();
-		const auto SupportBlockPos =
-			AddFaceDirection(Pos, ProtocolFaceToBlockFace(m_Facing), true);
-
-		BLOCKTYPE Block;
-
-		const auto ChunkPos = a_Chunk.PositionToWorldPosition(Vector3i());
-		const auto RelPos = SupportBlockPos - ChunkPos;
-
-		if (!a_Chunk.UnboundedRelGetBlockType(RelPos, Block))
-		{
-			return;
-		}
-
-		if (!ValidSupportBlock(Block))
-		{
-			cItems Item;
-			GetDrops(Item);
-
-			GetWorld()->SpawnItemPickups(Item, GetPosition(), 5);
-
-			Destroy();
-			return;
-		}
+		return;
 	}
 
-	UNUSED(a_Dt);
+	BLOCKTYPE Block;
+	const auto SupportPosition = AddFaceDirection(cChunkDef::AbsoluteToRelative(GetPosition()), ProtocolFaceToBlockFace(m_Facing), true);
+	if (!a_Chunk.UnboundedRelGetBlockType(SupportPosition, Block) || IsValidSupportBlock(Block))
+	{
+		return;
+	}
+
+	TakeDamage(dtEnvironment, nullptr, GetMaxHealth(), 0);
 }
