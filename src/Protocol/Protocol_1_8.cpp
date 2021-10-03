@@ -2997,27 +2997,22 @@ void cProtocol_1_8_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Ob
 {
 	ASSERT(m_State == 3);  // In game mode?
 
+	cPacketizer Pkt(*this, pktSpawnObject);
+	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEUInt8(a_ObjectType);
+	Pkt.WriteFPInt(a_Entity.GetPosX());
+	Pkt.WriteFPInt(a_Entity.GetPosY());
+	Pkt.WriteFPInt(a_Entity.GetPosZ());
+	Pkt.WriteByteAngle(a_Entity.GetPitch());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteBEInt32(a_ObjectData);
+
+	if (a_ObjectData != 0)
 	{
-		cPacketizer Pkt(*this, pktSpawnObject);
-		Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-		Pkt.WriteBEUInt8(a_ObjectType);
-		Pkt.WriteFPInt(a_Entity.GetPosX());  // Position appears to be ignored...
-		Pkt.WriteFPInt(a_Entity.GetPosY());
-		Pkt.WriteFPInt(a_Entity.GetPosY());
-		Pkt.WriteByteAngle(a_Entity.GetPitch());
-		Pkt.WriteByteAngle(a_Entity.GetYaw());
-		Pkt.WriteBEInt32(a_ObjectData);
-
-		if (a_ObjectData != 0)
-		{
-			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
-			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
-			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
-		}
+		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
+		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
+		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
 	}
-
-	// Otherwise 1.8 clients don't show the entity
-	SendEntityTeleport(a_Entity);
 }
 
 
