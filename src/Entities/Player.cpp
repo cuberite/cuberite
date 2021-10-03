@@ -965,7 +965,7 @@ void cPlayer::Respawn(void)
 			const auto & DefaultWorld = *cRoot::Get()->GetDefaultWorld();
 
 			// If not, reset spawn to default and inform:
-			SetRespawnPosition(Vector3d(DefaultWorld.GetSpawnX(), DefaultWorld.GetSpawnY(), DefaultWorld.GetSpawnZ()), DefaultWorld);
+			SetRespawnPosition(Vector3i(DefaultWorld.GetSpawnX(), DefaultWorld.GetSpawnY(), DefaultWorld.GetSpawnZ()), DefaultWorld);
 			SendAboveActionBarMessage("Your home bed was missing or obstructed");
 		}
 

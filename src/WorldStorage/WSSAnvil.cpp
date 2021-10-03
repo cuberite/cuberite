@@ -105,9 +105,9 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 		Writer.AddByte("thundering", a_World->IsWeatherStorm() ? 1 : 0);
 		Writer.AddInt("GameType", static_cast<int>(a_World->GetGameMode()));
 		Writer.AddInt("generatorVersion", 1);
-		Writer.AddInt("SpawnX", FloorC(a_World->GetSpawnX()));
-		Writer.AddInt("SpawnY", FloorC(a_World->GetSpawnY()));
-		Writer.AddInt("SpawnZ", FloorC(a_World->GetSpawnZ()));
+		Writer.AddInt("SpawnX", a_World->GetSpawnX());
+		Writer.AddInt("SpawnY", a_World->GetSpawnY());
+		Writer.AddInt("SpawnZ", a_World->GetSpawnZ());
 		Writer.AddInt("version", 19133);
 		Writer.AddLong("DayTime", a_World->GetWorldDate().count());
 		Writer.AddLong("Time", a_World->GetWorldAge().count());

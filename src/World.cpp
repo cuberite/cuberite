@@ -270,9 +270,9 @@ cWorld::cWorld(
 	if (m_IsSpawnExplicitlySet)
 	{
 		LOGD("Spawnpoint explicitly set!");
-		m_SpawnX = IniFile.GetValueF("SpawnPosition", "X", m_SpawnX);
-		m_SpawnY = IniFile.GetValueF("SpawnPosition", "Y", m_SpawnY);
-		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ);
+		m_SpawnX = IniFile.GetValueI("SpawnPosition", "X", m_SpawnX);
+		m_SpawnY = IniFile.GetValueI("SpawnPosition", "Y", m_SpawnY);
+		m_SpawnZ = IniFile.GetValueI("SpawnPosition", "Z", m_SpawnZ);
 	}
 
 	m_StorageSchema               = IniFile.GetValueSet ("Storage",       "Schema",                      m_StorageSchema);
@@ -626,27 +626,27 @@ void cWorld::SetNextBlockToTick(const Vector3i a_BlockPos)
 
 
 
-bool cWorld::SetSpawn(double a_X, double a_Y, double a_Z)
+bool cWorld::SetSpawn(int a_X, int a_Y, int a_Z)
 {
-		cIniFile IniFile;
+	cIniFile IniFile;
 
-		IniFile.ReadFile(m_IniFileName);
-		IniFile.SetValueF("SpawnPosition", "X", a_X);
-		IniFile.SetValueF("SpawnPosition", "Y", a_Y);
-		IniFile.SetValueF("SpawnPosition", "Z", a_Z);
-		if (IniFile.WriteFile(m_IniFileName))
-		{
-			m_SpawnX = a_X;
-			m_SpawnY = a_Y;
-			m_SpawnZ = a_Z;
-			FLOGD("Spawn set at {0}", Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
-			return true;
-		}
-		else
-		{
-			LOGWARNING("Couldn't write new spawn settings to \"%s\".", m_IniFileName.c_str());
-		}
-		return false;
+	IniFile.ReadFile(m_IniFileName);
+	IniFile.SetValueI("SpawnPosition", "X", a_X);
+	IniFile.SetValueI("SpawnPosition", "Y", a_Y);
+	IniFile.SetValueI("SpawnPosition", "Z", a_Z);
+	if (IniFile.WriteFile(m_IniFileName))
+	{
+		m_SpawnX = a_X;
+		m_SpawnY = a_Y;
+		m_SpawnZ = a_Z;
+		FLOGD("Spawn set at {}", Vector3i{m_SpawnX, m_SpawnY, m_SpawnZ});
+		return true;
+	}
+	else
+	{
+		LOGWARNING("Couldn't write new spawn settings to \"%s\".", m_IniFileName.c_str());
+	}
+	return false;
 }
 
 
@@ -674,7 +674,7 @@ void cWorld::InitializeSpawn(void)
 	IniFile.WriteFile(m_IniFileName);
 
 	int ChunkX = 0, ChunkZ = 0;
-	cChunkDef::BlockToChunk(FloorC(m_SpawnX), FloorC(m_SpawnZ), ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(m_SpawnX, m_SpawnZ, ChunkX, ChunkZ);
 	cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, ViewDist);
 }
 
@@ -724,17 +724,17 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 	}
 
 	// Check 0, 0 first.
-	double SpawnY = 0.0;
+	int SpawnY = 0;
 	if (CanSpawnAt(BiomeOffset.x, SpawnY, BiomeOffset.z))
 	{
-		SetSpawn(BiomeOffset.x + 0.5, SpawnY, BiomeOffset.z + 0.5);
+		SetSpawn(BiomeOffset.x, SpawnY, BiomeOffset.z);
 
-		FLOGINFO("World \"{0}\": Generated spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
+		FLOGINFO("World \"{}\": Generated spawnpoint position at {}", m_WorldName, Vector3i{m_SpawnX, m_SpawnY, m_SpawnZ});
 		return;
 	}
 
 	// A search grid (searches clockwise around the origin)
-	static const int HalfChunk = static_cast<int>(cChunkDef::Width / 2.0f);
+	static const int HalfChunk = cChunkDef::Width / 2;
 	static const Vector3i ChunkOffset[] =
 	{
 		Vector3i(0, 0, HalfChunk),
@@ -757,27 +757,27 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 
 			if (CanSpawnAt(PotentialSpawn.x, SpawnY, PotentialSpawn.z))
 			{
-				SetSpawn(PotentialSpawn.x + 0.5, SpawnY, PotentialSpawn.z + 0.5);
+				SetSpawn(PotentialSpawn.x, SpawnY, PotentialSpawn.z);
 
 				int ChunkX, ChunkZ;
-				cChunkDef::BlockToChunk(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ), ChunkX, ChunkZ);
+				cChunkDef::BlockToChunk(m_SpawnX, m_SpawnZ, ChunkX, ChunkZ);
 				cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, a_MaxSpawnRadius);
 
-				FLOGINFO("World \"{0}\":Generated spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
+				FLOGINFO("World \"{}\":Generated spawnpoint position at {}", m_WorldName, Vector3i{m_SpawnX, m_SpawnY, m_SpawnZ});
 				return;
 			}
 		}
 	}
 
-	m_SpawnY = GetHeight(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ));
-	FLOGWARNING("World \"{0}\": Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
+	m_SpawnY = GetHeight(m_SpawnX, m_SpawnZ);
+	FLOGWARNING("World \"{}\": Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {}", m_WorldName, Vector3i{m_SpawnX, m_SpawnY, m_SpawnZ});
 }
 
 
 
 
 
-bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
+bool cWorld::CanSpawnAt(int a_X, int & a_Y, int a_Z)
 {
 	// All this blocks can only be found above ground.
 	// Apart from netherrack (as the Nether is technically a massive cave)
@@ -793,12 +793,12 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 	static const int ValidSpawnBlocksCount = ARRAYCOUNT(ValidSpawnBlocks);
 
 	// Increase this by two, because we need two more blocks for body and head
-	static const int HighestSpawnPoint = GetHeight(static_cast<int>(a_X), static_cast<int>(a_Z)) + 2;
-	static const int LowestSpawnPoint = static_cast<int>(HighestSpawnPoint / 2.0f);
+	static const int HighestSpawnPoint = GetHeight(a_X, a_Z) + 2;
+	static const int LowestSpawnPoint = HighestSpawnPoint / 2;
 
 	for (int PotentialY = HighestSpawnPoint; PotentialY > LowestSpawnPoint; --PotentialY)
 	{
-		BLOCKTYPE HeadBlock = GetBlock({ static_cast<int>(a_X), PotentialY, static_cast<int>(a_Z) });
+		BLOCKTYPE HeadBlock = GetBlock({ a_X, PotentialY, a_Z });
 
 		// Is this block safe for spawning
 		if (HeadBlock != E_BLOCK_AIR)
@@ -806,7 +806,7 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 			continue;
 		}
 
-		BLOCKTYPE BodyBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 1, static_cast<int>(a_Z) });
+		BLOCKTYPE BodyBlock = GetBlock({ a_X, PotentialY - 1, a_Z });
 
 		// Is this block safe for spawning
 		if (BodyBlock != E_BLOCK_AIR)
@@ -814,7 +814,7 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 			continue;
 		}
 
-		BLOCKTYPE FloorBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 2, static_cast<int>(a_Z) });
+		BLOCKTYPE FloorBlock = GetBlock({ a_X, PotentialY - 2, a_Z });
 
 		// Early out - Is the floor block air
 		if (FloorBlock == E_BLOCK_AIR)
@@ -834,12 +834,12 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 			continue;
 		}
 
-		if (!CheckPlayerSpawnPoint(static_cast<int>(a_X), PotentialY - 1, static_cast<int>(a_Z)))
+		if (!CheckPlayerSpawnPoint(a_X, PotentialY - 1, a_Z))
 		{
 			continue;
 		}
 
-		a_Y = PotentialY - 1.0;
+		a_Y = PotentialY - 1;
 		return true;
 	}
 
