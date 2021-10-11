@@ -26,7 +26,7 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: bash ./compile.sh -m Release
     - name: 'Tar files'
-      run: chmod 777 -R /home/runner/work/cuberite/cuberite/build-cuberite/Server/Cuberite && tar -cvf my_files.tar /home/runner/work/cuberite/cuberite/build-cuberite/Server/Cuberite   
+      run: chmod 777 -R /home/runner/work/cuberite/cuberite/build-cuberite/Server/ && tar -cvf my_files.tar /home/runner/work/cuberite/cuberite/build-cuberite/Server/   
       
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2.2.4
