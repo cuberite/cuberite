@@ -30,8 +30,7 @@ jobs:
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: |
-       tar -hzcv --exclude .git -f ../Cuberite.tar.gz
-       sha1sum Cuberite.tar.gz > Cuberite.tar.gz.sha1  
+       tar -hzcv /home/runner/work/cuberite/cuberite/build-cuberite/Server/ -f Cuberite.tar.gz
       
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2.2.4
@@ -39,5 +38,4 @@ jobs:
         name: cuberite
         path: |
             Cuberite.tar.gz
-            Cuberite.tar.gz.sha1
       
