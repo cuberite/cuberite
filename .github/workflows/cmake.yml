@@ -23,7 +23,7 @@ jobs:
       with:
         submodules: 'true'
 
-    - name: Build and Pack
+    - name: Build and pack
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: |
@@ -32,10 +32,14 @@ jobs:
         cd Release
         cmake -DCMAKE_BUILD_TYPE=RELEASE ..
         make -j`nproc`
+        chmod -R 777 ./
+        tar -hzcv --exclude .git -T ${{ github.workspace }}/Server/Install/UnixExecutables.list -f Cuberite.tar.gz
       
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2.2.4
       with:
         name: cuberite
-        path: ${{ github.workspace }}/Release
+        path: |
+         Cuberite.tar.gz
+             
       
