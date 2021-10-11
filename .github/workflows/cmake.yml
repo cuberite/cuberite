@@ -20,6 +20,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'true'
 
     - name: Build and Pack
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -30,7 +32,6 @@ jobs:
         cd Release
         cmake -DCMAKE_BUILD_TYPE=RELEASE ..
         make -j`nproc`
-
       
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2.2.4
