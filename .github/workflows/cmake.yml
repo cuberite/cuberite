@@ -30,6 +30,7 @@ jobs:
       with:
         name: cuberite
         path: |
+            Server
             /home/runner/Server/Cuberite
             /home/runner/Server/
       
