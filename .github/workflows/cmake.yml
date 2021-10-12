@@ -53,13 +53,13 @@ jobs:
         CUBERITE_BUILD_DATETIME: ${{ steps.date.outputs.date }}
 
     - name: cleanup
-      run: rm !($(tr \\n \| < Install/UnixExecutables.list ))
+      run: tar -hzcv -T ${{ github.workspace }}/Server/Install/UnixExecutables.list -f Cuberite.tar.gz
       working-directory: Release/Server
 
     - uses: actions/upload-artifact@v1
       with:
         name: Cuberite
-        path: Release/Server/
+        path: Release/Server/Cuberite.tar.gz
       
              
       
