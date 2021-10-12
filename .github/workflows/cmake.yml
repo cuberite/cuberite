@@ -24,7 +24,11 @@ jobs:
         submodules: 'true'
 
     - name: Build and pack
-      run: sudo apt-get update -y && sudo apt-get upgrade && sh -c "$(curl -sSfL -o - https://compile.cuberite.org)"
+      run: ldd --version
+
+
+    #- name: Build and pack
+      #run: sudo apt-get update -y && sudo apt-get upgrade && sh -c "$(curl -sSfL -o - https://compile.cuberite.org)"
       
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2.2.4
