@@ -7,15 +7,10 @@ on:
     branches: [ master ]
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
 
 jobs:
   build:
-    # The CMake configure and build commands are platform agnostic and should work equally
-    # well on Windows or Mac.  You can convert this to a matrix build if you need
-    # cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ubuntu-18.04
 
     steps:
@@ -53,13 +48,10 @@ jobs:
         CUBERITE_BUILD_DATETIME: ${{ steps.date.outputs.date }}
 
     - name: cleanup
-      run: tar -hzcv Cuberite.tar.gz
+      run: chmod 777 -R ./ && tar -hzcv -T ${{ github.workspace }}/Server/Install/UnixExecutables.list -f Cuberite.tar.gz
       working-directory: Release/Server
 
-    - uses: actions/upload-artifact@v1
+    - uses: actions/upload-artifact@v2
       with:
         name: Cuberite
         path: Release/Server/Cuberite.tar.gz
-      
-             
-      
