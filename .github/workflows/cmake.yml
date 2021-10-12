@@ -23,18 +23,43 @@ jobs:
       with:
         submodules: 'true'
 
-    - name: Build and pack
+    - name: glibc
       run: ldd --version
 
+    - name: date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
-    #- name: Build and pack
-      #run: sudo apt-get update -y && sudo apt-get upgrade && sh -c "$(curl -sSfL -o - https://compile.cuberite.org)"
+    - name: builddir
+      run: mkdir Release
       
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v2.2.4
+    - name: cmake
+      run: cmake .. -DNO_NATIVE_OPTIMIZATION=1 -DCMAKE_BUILD_TYPE=RELEASE
+      working-directory: Release
+
+    - name: make
+      run: make -j`nproc`
+      working-directory: Release
+      env: 
+        CUBERITE_BUILD_SERIES_NAME: Linux
+        CUBERITE_BUILD_ID: ${{ github.run_number }}
+        CUBERITE_BUILD_DATETIME: ${{ steps.date.outputs.date }}
+
+    - run: echo Cuberite $CUBERITE_BUILD_SERIES_NAME-$CUBERITE_BUILD_ID > buildinfo.txt
+      working-directory: Release/Server
+      env: 
+        CUBERITE_BUILD_SERIES_NAME: Linux
+        CUBERITE_BUILD_ID: ${{ github.run_number }}
+        CUBERITE_BUILD_DATETIME: ${{ steps.date.outputs.date }}
+
+    - name: cleanup
+      run: rm !($(tr \\n \| < Install/UnixExecutables.list ))
+      working-directory: Release/Server
+
+    - uses: actions/upload-artifact@v1
       with:
-        name: cuberite
-        path: |
-         build-cuberite/Server/
+        name: Cuberite
+        path: Release/Server/
+      
              
       
