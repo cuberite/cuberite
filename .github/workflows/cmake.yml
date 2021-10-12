@@ -53,7 +53,7 @@ jobs:
         CUBERITE_BUILD_DATETIME: ${{ steps.date.outputs.date }}
 
     - name: cleanup
-      run: tar -hzcv -f Cuberite.tar.gz
+      run: tar -hzcv Cuberite.tar.gz
       working-directory: Release/Server
 
     - uses: actions/upload-artifact@v1
