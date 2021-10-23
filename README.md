@@ -1,4 +1,6 @@
-# This is my personal builds of Cuberite. It is used to run on Ubuntu 18.04 original readme below
+<h1 align="center">⚠️</h1>
+
+Fork based on [upstream](https://github.com/cuberite/cuberite) and [AndreVuillemot160's fork](https://github.com/AndreVuillemot160/cuberite) for minecolab to provide automated builds (compiled for `Ubuntu 18.04`). Please prefer to use above upstreams unless absolutely necessary.
 
 
 # Cuberite
