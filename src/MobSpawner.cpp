@@ -102,7 +102,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			(
 				(a_RelPos.y <= 63) &&
 				(BlockLight <= 4) &&
-				(SkyLight <= 4) &&
+				(SkyLight <= 4 && SkyLight >=0) &&
 				(TargetBlock == E_BLOCK_AIR) &&
 				(!cBlockInfo::IsTransparent(BlockAbove))
 			);
@@ -155,6 +155,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			(
 				(TargetBlock == E_BLOCK_AIR) &&
 				(BlockAbove == E_BLOCK_AIR) &&
+				(BlockBelow == E_BLOCK_GRASS) &&
 				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
 				(SkyLight <= 7) &&
 				(BlockLight <= 7) &&
@@ -546,7 +547,3 @@ bool cMobSpawner::CanSpawnAnything(void)
 {
 	return !m_AllowedTypes.empty();
 }
-
-
-
-
