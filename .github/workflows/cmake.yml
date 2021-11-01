@@ -55,3 +55,10 @@ jobs:
       with:
         name: Cuberite
         path: Release/Server/Cuberite.tar.gz
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: false
+        title: "Latest automated build"
+        files: Release/Server/Cuberite.tar.gz
