@@ -76,6 +76,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_LastStreamedChunkX(std::numeric_limits<decltype(m_LastStreamedChunkX)>::max()),  // bogus chunk coords to force streaming upon login
 	m_LastStreamedChunkZ(std::numeric_limits<decltype(m_LastStreamedChunkZ)>::max()),
 	m_TicksSinceLastPacket(0),
+	m_TimeSinceLastUnloadCheck(0),
 	m_Ping(1000),
 	m_PingID(1),
 	m_BlockDigAnimStage(-1),
@@ -662,8 +663,6 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 		m_Player->GetWorld()->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
 		SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}
-
-	m_LastUnloadCheck = m_Player->GetWorld()->GetWorldAge();
 }
 
 
@@ -2101,7 +2100,7 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 
 
 
-void cClientHandle::Tick(float a_Dt)
+void cClientHandle::Tick(std::chrono::milliseconds a_Dt)
 {
 	using namespace std::chrono_literals;
 
@@ -2177,9 +2176,10 @@ void cClientHandle::Tick(float a_Dt)
 	StreamNextChunks();
 
 	// Unload all chunks that are out of the view distance (every 5 seconds):
-	if ((m_Player->GetWorld()->GetWorldAge() - m_LastUnloadCheck) > 5s)
+	if ((m_TimeSinceLastUnloadCheck += a_Dt) > 5s)
 	{
 		UnloadOutOfRangeChunks();
+		m_TimeSinceLastUnloadCheck = 0s;
 	}
 
 	// anticheat fastbreak
@@ -2193,7 +2193,7 @@ void cClientHandle::Tick(float a_Dt)
 	if (m_BlockDigAnimStage > -1)
 	{
 		int lastAnimVal = m_BlockDigAnimStage;
-		m_BlockDigAnimStage += static_cast<int>(m_BlockDigAnimSpeed * a_Dt);
+		m_BlockDigAnimStage += static_cast<int>(m_BlockDigAnimSpeed * a_Dt.count());
 		if (m_BlockDigAnimStage > 9000)
 		{
 			m_BlockDigAnimStage = 9000;

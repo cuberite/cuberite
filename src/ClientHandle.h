@@ -104,7 +104,7 @@ public:  // tolua_export
 	/** Function to mark bungee / proxy connection on this client, and to add proxy-related data */
 	void ProxyInit(const AString & a_IPString, const cUUID & a_UUID);
 	void ProxyInit(const AString & a_IPString, const cUUID & a_UUID, const Json::Value & a_Properties);
-	
+
 	/** Processes the data in the network input buffer.
 	Called by both cWorld::Tick() and ServerTick(). */
 	void ProcessProtocolIn(void);
@@ -137,7 +137,7 @@ public:  // tolua_export
 	inline bool IsLoggedIn(void) const { return (m_State >= csAuthenticating); }
 
 	/** Called while the client is being ticked from the world via its cPlayer object */
-	void Tick(float a_Dt);
+	void Tick(std::chrono::milliseconds a_Dt);
 
 	/** Called while the client is being ticked from the cServer object */
 	void ServerTick(float a_Dt);
@@ -488,11 +488,11 @@ private:
 	int m_LastStreamedChunkX;
 	int m_LastStreamedChunkZ;
 
-	/** The last time UnloadOutOfRangeChunks was called. */
-	cTickTimeLong m_LastUnloadCheck;
-
 	/** Number of ticks since the last network packet was received (increased in Tick(), reset in OnReceivedData()) */
 	std::atomic<int> m_TicksSinceLastPacket;
+
+	/** The time since UnloadOutOfRangeChunks was last called. */
+	std::chrono::milliseconds m_TimeSinceLastUnloadCheck;
 
 	/** Duration of the last completed client ping. */
 	std::chrono::steady_clock::duration m_Ping;
