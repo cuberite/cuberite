@@ -9,7 +9,7 @@
 
 
 cCow::cCow(void) :
-	Super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", "entity.cow.ambient", 0.9, 1.3),
+	Super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", "entity.cow.ambient", 0.9f, 1.4f),
 	m_Blackboard(*this)
 {
 	using namespace BehaviorTree;

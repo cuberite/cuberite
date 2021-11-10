@@ -14,6 +14,7 @@ set (SHARED_SRCS
 	${PROJECT_SOURCE_DIR}/src/Bindings/LuaState.cpp
 
 	${PROJECT_SOURCE_DIR}/src/Generating/ChunkDesc.cpp
+	${PROJECT_SOURCE_DIR}/src/Generating/PieceModifier.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/PiecePool.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/Prefab.cpp
 	${PROJECT_SOURCE_DIR}/src/Generating/PrefabPiecePool.cpp
@@ -45,6 +46,7 @@ set (SHARED_HDRS
 	${PROJECT_SOURCE_DIR}/src/Bindings/LuaState.h
 
 	${PROJECT_SOURCE_DIR}/src/Generating/ChunkDesc.h
+	${PROJECT_SOURCE_DIR}/src/Generating/PieceModifier.h
 	${PROJECT_SOURCE_DIR}/src/Generating/PiecePool.h
 	${PROJECT_SOURCE_DIR}/src/Generating/Prefab.h
 	${PROJECT_SOURCE_DIR}/src/Generating/PrefabPiecePool.h
@@ -78,7 +80,7 @@ source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 source_group("Lua files" FILES Test.lua)
 add_executable(LuaThreadStress ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS} Test.lua)
-target_link_libraries(LuaThreadStress fmt::fmt Threads::Threads tolualib libdeflate)
+target_link_libraries(LuaThreadStress fmt::fmt libdeflate lsqlite luaexpat Threads::Threads tolualib)
 add_test(NAME LuaThreadStress-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND LuaThreadStress)
 
 

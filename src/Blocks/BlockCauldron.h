@@ -19,7 +19,7 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		return cItem(E_ITEM_CAULDRON, 1, 0);
 	}
@@ -65,7 +65,7 @@ private:
 					{
 						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_BUCKET));
 					}
-					a_Player.GetStatManager().AddValue(Statistic::FillCauldron);
+					a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
 				}
 				break;
 			}
@@ -79,7 +79,7 @@ private:
 					{
 						a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_POTION));
 					}
-					a_Player.GetStatManager().AddValue(Statistic::UseCauldron);
+					a_Player.GetStatistics().Custom[CustomStatistic::UseCauldron]++;
 				}
 				break;
 			}

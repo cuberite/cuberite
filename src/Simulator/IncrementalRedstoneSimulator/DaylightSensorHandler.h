@@ -18,7 +18,7 @@ namespace DaylightSensorHandler
 		}
 
 		// The [0, 1) proportion of the current day that has elapsed.
-		const auto ProportionOfDay = a_Chunk.GetWorld()->GetTimeOfDay() * (static_cast<float>(M_PI) / 12000.f);
+		const auto ProportionOfDay = a_Chunk.GetWorld()->GetTimeOfDay().count() * (static_cast<float>(M_PI) / 12000.f);
 
 		// The curved value of darkened skylight, with outputs somewhat similar to Vanilla.
 		const auto RawOutput = a_Chunk.GetSkyLightAltered(a_Position) * (0.6f * std::sin(ProportionOfDay) + 0.5f);

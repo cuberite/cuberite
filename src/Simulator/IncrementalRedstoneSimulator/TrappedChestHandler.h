@@ -22,14 +22,13 @@ namespace TrappedChestHandler
 	static unsigned char GetPowerLevel(cChunk & a_Chunk, Vector3i a_Position)
 	{
 		int NumberOfPlayers = 0;
-		VERIFY(
-			!a_Chunk.DoWithChestAt(a_Position, [&](cChestEntity & a_Chest)
-			{
-				ASSERT(a_Chest.GetBlockType() == E_BLOCK_TRAPPED_CHEST);
-				NumberOfPlayers = a_Chest.GetNumberOfPlayers();
-				return true;
-			})
-		);
+		a_Chunk.DoWithBlockEntityAt(a_Position, [&NumberOfPlayers](cBlockEntity & a_BlockEntity)
+		{
+			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_TRAPPED_CHEST);
+
+			NumberOfPlayers = static_cast<cChestEntity &>(a_BlockEntity).GetNumberOfPlayers();
+			return false;
+		});
 
 		return static_cast<unsigned char>(std::min(NumberOfPlayers, 15));
 	}

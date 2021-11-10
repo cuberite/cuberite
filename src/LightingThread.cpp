@@ -17,25 +17,25 @@
 class cReader :
 	public cChunkDataCallback
 {
-	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
+	virtual void ChunkData(const ChunkBlockData & a_BlockData, const ChunkLightData &) override
 	{
 		BLOCKTYPE * OutputRows = m_BlockTypes;
 		int OutputIdx = m_ReadingChunkX + m_ReadingChunkZ * cChunkDef::Width * 3;
-		for (size_t i = 0; i != cChunkData::NumSections; ++i)
+		for (size_t i = 0; i != cChunkDef::NumSections; ++i)
 		{
-			auto * Section = a_ChunkBuffer.GetSection(i);
+			const auto Section = a_BlockData.GetSection(i);
 			if (Section == nullptr)
 			{
 				// Skip to the next section
-				OutputIdx += 9 * cChunkData::SectionHeight * cChunkDef::Width;
+				OutputIdx += 9 * cChunkDef::SectionHeight * cChunkDef::Width;
 				continue;
 			}
 
-			for (size_t OffsetY = 0; OffsetY != cChunkData::SectionHeight; ++OffsetY)
+			for (size_t OffsetY = 0; OffsetY != cChunkDef::SectionHeight; ++OffsetY)
 			{
 				for (size_t Z = 0; Z != cChunkDef::Width; ++Z)
 				{
-					auto InPtr = Section->m_BlockTypes + Z * cChunkDef::Width + OffsetY * cChunkDef::Width * cChunkDef::Width;
+					auto InPtr = Section->data() + Z * cChunkDef::Width + OffsetY * cChunkDef::Width * cChunkDef::Width;
 					std::copy_n(InPtr, cChunkDef::Width, OutputRows + OutputIdx * cChunkDef::Width);
 
 					OutputIdx += 3;
@@ -48,7 +48,7 @@ class cReader :
 	}  // BlockTypes()
 
 
-	virtual void HeightMap(const cChunkDef::HeightMap * a_Heightmap) override
+	virtual void HeightMap(const cChunkDef::HeightMap & a_Heightmap) override
 	{
 		// Copy the entire heightmap, distribute it into the 3x3 chunk blob:
 		typedef struct {HEIGHTTYPE m_Row[16]; } ROW;
@@ -64,11 +64,11 @@ class cReader :
 
 		// Find the highest block in the entire chunk, use it as a base for m_MaxHeight:
 		HEIGHTTYPE MaxHeight = m_MaxHeight;
-		for (size_t i = 0; i < ARRAYCOUNT(*a_Heightmap); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(a_Heightmap); i++)
 		{
-			if ((*a_Heightmap)[i] > MaxHeight)
+			if (a_Heightmap[i] > MaxHeight)
 			{
-				MaxHeight = (*a_Heightmap)[i];
+				MaxHeight = a_Heightmap[i];
 			}
 		}
 		m_MaxHeight = MaxHeight;
@@ -100,7 +100,7 @@ public:
 // cLightingThread:
 
 cLightingThread::cLightingThread(cWorld & a_World):
-	Super("cLightingThread"),
+	Super("Lighting Executor"),
 	m_World(a_World),
 	m_MaxHeight(0),
 	m_NumSeeds(0)

@@ -57,9 +57,8 @@ target_sources(
 	Root.cpp
 	Scoreboard.cpp
 	Server.cpp
-	SetChunkData.cpp
 	SpawnPrepare.cpp
-	Statistics.cpp
+	StatisticsManager.cpp
 	StringCompression.cpp
 	StringUtils.cpp
 	UUID.cpp
@@ -68,7 +67,6 @@ target_sources(
 	World.cpp
 	main.cpp
 
-	AllocationPool.h
 	BiomeDef.h
 	BlockArea.h
 	BlockInServerPluginInterface.h
@@ -140,8 +138,7 @@ target_sources(
 	SetChunkData.h
 	SettingsRepositoryInterface.h
 	SpawnPrepare.h
-	Statistics.h
-	Stopwatch.h
+	StatisticsManager.h
 	StringCompression.h
 	StringUtils.h
 	UUID.h
@@ -195,7 +192,12 @@ SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES
 
 
 
-
+MACRO(TO_NATIVE_PATH PATH OUT)
+	FILE(TO_NATIVE_PATH "${PATH}" "${OUT}")
+	IF(MINGW)
+		STRING(REPLACE "/" "\\" "${OUT}" "${${OUT}}")
+	ENDIF(MINGW)
+ENDMACRO(TO_NATIVE_PATH)
 
 # Create a symbolic link from ${orig} to ${link}
 # If the orig and link point to the same thing, does nothing (-> in-source build)
@@ -214,8 +216,8 @@ function(make_symlink orig link)
 	if (CMAKE_HOST_UNIX)
 		set(command ln -s ${orig} ${link})
 	else()
-		file(TO_NATIVE_PATH "${orig}" orig)
-		file(TO_NATIVE_PATH "${link}" link)
+		TO_NATIVE_PATH("${orig}" orig)
+		TO_NATIVE_PATH("${link}" link)
 		if (IS_DIRECTORY ${orig})
 			set(command cmd.exe /c mklink /j ${link} ${orig})
 		else()

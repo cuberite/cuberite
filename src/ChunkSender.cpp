@@ -59,7 +59,7 @@ public:
 // cChunkSender:
 
 cChunkSender::cChunkSender(cWorld & a_World) :
-	Super("ChunkSender"),
+	Super("Chunk Sender"),
 	m_World(a_World),
 	m_Serializer(m_World.GetDimension())
 {
@@ -121,7 +121,7 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Prior
 
 
 
-void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cChunkClientHandles a_Clients)
+void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, const std::vector<cClientHandle *> & a_Clients)
 {
 	{
 		cChunkCoords Chunk{a_ChunkX, a_ChunkZ};
@@ -238,7 +238,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, const WeakClients & a_C
 	}
 
 	// Send:
-	m_Serializer.SendToClients(a_ChunkX, a_ChunkZ, m_Data, m_BiomeMap, Clients);
+	m_Serializer.SendToClients(a_ChunkX, a_ChunkZ, m_BlockData, m_LightData, m_BiomeMap, Clients);
 
 	for (const auto & Client : Clients)
 	{
@@ -276,7 +276,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, const WeakClients & a_C
 			});
 		}
 	}
-	m_Data.Clear();
+
 	m_BlockEntities.clear();
 	m_EntityIDs.clear();
 }
@@ -303,14 +303,14 @@ void cChunkSender::Entity(cEntity * a_Entity)
 
 
 
-void cChunkSender::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
+void cChunkSender::BiomeMap(const cChunkDef::BiomeMap & a_BiomeMap)
 {
 	for (size_t i = 0; i < ARRAYCOUNT(m_BiomeMap); i++)
 	{
-		if ((*a_BiomeMap)[i] < 255)
+		if (a_BiomeMap[i] < 255)
 		{
 			// Normal MC biome, copy as-is:
-			m_BiomeMap[i] = static_cast<unsigned char>((*a_BiomeMap)[i]);
+			m_BiomeMap[i] = static_cast<unsigned char>(a_BiomeMap[i]);
 		}
 		else
 		{
@@ -319,7 +319,3 @@ void cChunkSender::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
 		}
 	}  // for i - m_BiomeMap[]
 }
-
-
-
-

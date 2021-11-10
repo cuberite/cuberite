@@ -149,7 +149,7 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 				continue;
 			}
 			// Fits, add it to list of possibile connections:
-			Connections.push_back(cConnection(**itrP, *itrC, NumCCWRotations, Weight));
+			Connections.emplace_back(**itrP, *itrC, NumCCWRotations, Weight);
 			WeightTotal += Weight;
 		}  // for itrC - Connectors[]
 	}  // for itrP - AvailablePieces[]
@@ -188,7 +188,7 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 			// This is the connector through which we have been connected to the parent, don't add
 			continue;
 		}
-		a_OutConnectors.push_back(cFreeConnector(PlacedPiece.get(), Conn.m_Piece->RotateMoveConnector(*itr, Conn.m_NumCCWRotations, ConnPos.x, ConnPos.y, ConnPos.z)));
+		a_OutConnectors.emplace_back(PlacedPiece.get(), Conn.m_Piece->RotateMoveConnector(*itr, Conn.m_NumCCWRotations, ConnPos.x, ConnPos.y, ConnPos.z));
 	}
 	a_OutPieces.push_back(std::move(PlacedPiece));
 

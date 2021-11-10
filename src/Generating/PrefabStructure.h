@@ -27,7 +27,7 @@ public:
 		int a_GridX, int a_GridZ,
 		int a_OriginX, int a_OriginZ,
 		cPlacedPieces && a_Pieces,
-		cTerrainHeightGenPtr a_HeightGen
+		cTerrainHeightGen & a_HeightGen
 	);
 
 protected:
@@ -35,7 +35,7 @@ protected:
 	cPlacedPieces m_Pieces;
 
 	/** The height generator used when adjusting pieces onto the ground. */
-	cTerrainHeightGenPtr m_HeightGen;
+	cTerrainHeightGen & m_HeightGen;
 
 
 	// cGridStructGen::cStructure overrides:
@@ -45,7 +45,3 @@ protected:
 	Ground level is assumed to be represented by the first connector in the piece. */
 	void PlacePieceOnGround(cPlacedPiece & a_Piece);
 };
-
-
-
-

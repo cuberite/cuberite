@@ -237,7 +237,7 @@ class cMojangAPI::cUpdateThread:
 public:
 
 	cUpdateThread(cMojangAPI & a_MojangAPI):
-		Super("cMojangAPI::cUpdateThread"),
+		Super("MojangAPI Updater"),
 		m_MojangAPI(a_MojangAPI)
 	{
 	}
@@ -783,7 +783,7 @@ void cMojangAPI::QueryUUIDToProfile(const cUUID & a_UUID)
 {
 	// Create the request address:
 	AString Address = m_UUIDToProfileAddress;
-	ReplaceString(Address, "%UUID%", a_UUID.ToShortString());
+	ReplaceURL(Address, "%UUID%", a_UUID.ToShortString());
 
 	// Create the HTTP request:
 	AString Request;

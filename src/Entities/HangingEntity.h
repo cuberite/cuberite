@@ -21,21 +21,20 @@ public:  // tolua_export
 
 	cHangingEntity(eEntityType a_EntityType, eBlockFace a_BlockFace, Vector3d a_Pos);
 
-	// tolua_begin
+	/** Returns the direction in which the entity is facing. */
+	eBlockFace GetFacing() const { return cHangingEntity::ProtocolFaceToBlockFace(m_Facing); }  // tolua_export
 
 	/** Returns the direction in which the entity is facing. */
-	eBlockFace GetFacing() const { return cHangingEntity::ProtocolFaceToBlockFace(m_Facing); }
+	Byte GetProtocolFacing() const { return m_Facing; }
+
+	/** Returns if the given block can support hanging entity placements. */
+	static bool IsValidSupportBlock(BLOCKTYPE a_BlockType);  // tolua_export
 
 	/** Set the direction in which the entity is facing. */
 	void SetFacing(eBlockFace a_Facing)
 	{
 		m_Facing = cHangingEntity::BlockFaceToProtocolFace(a_Facing);
 	}
-
-	// tolua_end
-
-	/** Returns the direction in which the entity is facing. */
-	Byte GetProtocolFacing() const { return m_Facing; }
 
 	/** Set the direction in which the entity is facing. */
 	void SetProtocolFacing(Byte a_Facing)
@@ -48,14 +47,9 @@ protected:
 
 	Byte m_Facing;
 
-
+	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override
-	{
-		UNUSED(a_Dt);
-		UNUSED(a_Chunk);
-	}
-
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 	/** Converts protocol hanging item facing to eBlockFace values */
 	inline static eBlockFace ProtocolFaceToBlockFace(Byte a_ProtocolFace)
@@ -102,7 +96,3 @@ protected:
 		UNREACHABLE("Unsupported block face");
 	}
 };  // tolua_export
-
-
-
-

@@ -323,7 +323,7 @@ namespace Metadata_1_12
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_12:
 
-void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
+void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
 {
 	using namespace Metadata_1_12;
 
@@ -348,6 +348,10 @@ void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 	if (a_Entity.IsInvisible())
 	{
 		Flags |= 0x20;
+	}
+	if (a_Entity.IsElytraFlying())
+	{
+		Flags |= 0x80;
 	}
 	a_Pkt.WriteBEUInt8(ENTITY_FLAGS);  // Index
 	a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
@@ -376,7 +380,7 @@ void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 
 			a_Pkt.WriteBEUInt8(PLAYER_MAIN_HAND);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetMainHand()));
+			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
 			break;
 		}
 		case cEntity::etPickup:
@@ -546,7 +550,7 @@ void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 
 
 
-void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
+void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
 {
 	using namespace Metadata_1_12;
 
@@ -978,7 +982,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 
 
-UInt32 cProtocol_1_12::GetPacketID(cProtocol::ePacketType a_Packet)
+UInt32 cProtocol_1_12::GetPacketID(cProtocol::ePacketType a_Packet) const
 {
 	switch (a_Packet)
 	{
@@ -999,7 +1003,6 @@ UInt32 cProtocol_1_12::GetPacketID(cProtocol::ePacketType a_Packet)
 		case pktExperience:          return 0x3f;
 		case pktHeldItemChange:      return 0x39;
 		case pktLeashEntity:         return 0x3c;
-		case pktPlayerMaxSpeed:      return 0x4d;
 		case pktRemoveEntityEffect:  return 0x32;
 		case pktResourcePack:        return 0x33;
 		case pktRespawn:             return 0x34;
@@ -1058,16 +1061,21 @@ void cProtocol_1_12::HandlePacketAdvancementTab(cByteBuffer & a_ByteBuffer)
 
 
 
-cProtocol::Version cProtocol_1_12::GetProtocolVersion()
+signed char cProtocol_1_12::GetProtocolEntityStatus(EntityAnimation a_Animation) const
 {
-	return Version::v1_12;
+	switch (a_Animation)
+	{
+		case EntityAnimation::PawnBurns: return 37;
+		case EntityAnimation::PawnDrowns: return 36;
+		default: return Super::GetProtocolEntityStatus(a_Animation);
+	}
 }
 
 
 
 
 
-UInt32 cProtocol_1_12::GetProtocolMobType(const eMonsterType a_MobType)
+UInt32 cProtocol_1_12::GetProtocolMobType(const eMonsterType a_MobType) const
 {
 	switch (a_MobType)
 	{
@@ -1075,6 +1083,15 @@ UInt32 cProtocol_1_12::GetProtocolMobType(const eMonsterType a_MobType)
 		case mtParrot:     return 105;
 		default:           return Super::GetProtocolMobType(a_MobType);
 	}
+}
+
+
+
+
+
+cProtocol::Version cProtocol_1_12::GetProtocolVersion() const
+{
+	return Version::v1_12;
 }
 
 
@@ -1159,7 +1176,7 @@ bool cProtocol_1_12::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_12_1:
 
-UInt32 cProtocol_1_12_1::GetPacketID(ePacketType a_Packet)
+UInt32 cProtocol_1_12_1::GetPacketID(ePacketType a_Packet) const
 {
 	switch (a_Packet)
 	{
@@ -1180,7 +1197,6 @@ UInt32 cProtocol_1_12_1::GetPacketID(ePacketType a_Packet)
 		case pktPlayerList:             return 0x2e;
 		case pktPlayerListHeaderFooter: return 0x4a;
 		case pktPlayerAbilities:        return 0x2c;
-		case pktPlayerMaxSpeed:         return 0x4e;
 		case pktPlayerMoveLook:         return 0x2f;
 		case pktRemoveEntityEffect:     return 0x33;
 		case pktResourcePack:           return 0x34;
@@ -1203,7 +1219,7 @@ UInt32 cProtocol_1_12_1::GetPacketID(ePacketType a_Packet)
 
 
 
-cProtocol::Version cProtocol_1_12_1::GetProtocolVersion()
+cProtocol::Version cProtocol_1_12_1::GetProtocolVersion() const
 {
 	return Version::v1_12_1;
 }
@@ -1289,7 +1305,7 @@ bool cProtocol_1_12_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_12_2::
 
-cProtocol::Version cProtocol_1_12_2::GetProtocolVersion()
+cProtocol::Version cProtocol_1_12_2::GetProtocolVersion() const
 {
 	return Version::v1_12_2;
 }

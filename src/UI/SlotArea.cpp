@@ -754,7 +754,7 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 	cCraftingGrid   Grid(GetPlayerSlots(a_Player) + 1, m_GridSize, m_GridSize);
 	cCraftingRecipe Recipe(Grid);
 	cRoot::Get()->GetCraftingRecipes()->GetRecipe(a_Player, Grid, Recipe);
-	m_Recipes.push_back(std::make_pair(a_Player.GetUniqueID(), Recipe));
+	m_Recipes.emplace_back(a_Player.GetUniqueID(), Recipe);
 	return m_Recipes.back().second;
 }
 
@@ -766,16 +766,16 @@ void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Play
 {
 	switch (a_Result.m_ItemType)
 	{
-		case E_BLOCK_WORKBENCH:         a_Player.AwardAchievement(Statistic::AchBuildWorkBench);      break;
-		case E_BLOCK_FURNACE:           a_Player.AwardAchievement(Statistic::AchBuildFurnace);        break;
-		case E_BLOCK_CAKE:              a_Player.AwardAchievement(Statistic::AchBakeCake);            break;
-		case E_BLOCK_ENCHANTMENT_TABLE: a_Player.AwardAchievement(Statistic::AchEnchantments);        break;
-		case E_BLOCK_BOOKCASE:          a_Player.AwardAchievement(Statistic::AchBookcase);            break;
-		case E_ITEM_WOODEN_PICKAXE:     a_Player.AwardAchievement(Statistic::AchBuildPickaxe);        break;
-		case E_ITEM_WOODEN_SWORD:       a_Player.AwardAchievement(Statistic::AchBuildSword);          break;
-		case E_ITEM_STONE_PICKAXE:      a_Player.AwardAchievement(Statistic::AchBuildBetterPickaxe);  break;
-		case E_ITEM_WOODEN_HOE:         a_Player.AwardAchievement(Statistic::AchBuildHoe);            break;
-		case E_ITEM_BREAD:              a_Player.AwardAchievement(Statistic::AchMakeBread);           break;
+		case E_BLOCK_WORKBENCH:         a_Player.AwardAchievement(CustomStatistic::AchBuildWorkBench);      break;
+		case E_BLOCK_FURNACE:           a_Player.AwardAchievement(CustomStatistic::AchBuildFurnace);        break;
+		case E_BLOCK_CAKE:              a_Player.AwardAchievement(CustomStatistic::AchBakeCake);            break;
+		case E_BLOCK_ENCHANTMENT_TABLE: a_Player.AwardAchievement(CustomStatistic::AchEnchantments);        break;
+		case E_BLOCK_BOOKCASE:          a_Player.AwardAchievement(CustomStatistic::AchBookcase);            break;
+		case E_ITEM_WOODEN_PICKAXE:     a_Player.AwardAchievement(CustomStatistic::AchBuildPickaxe);        break;
+		case E_ITEM_WOODEN_SWORD:       a_Player.AwardAchievement(CustomStatistic::AchBuildSword);          break;
+		case E_ITEM_STONE_PICKAXE:      a_Player.AwardAchievement(CustomStatistic::AchBuildBetterPickaxe);  break;
+		case E_ITEM_WOODEN_HOE:         a_Player.AwardAchievement(CustomStatistic::AchBuildHoe);            break;
+		case E_ITEM_BREAD:              a_Player.AwardAchievement(CustomStatistic::AchMakeBread);           break;
 		default: break;
 	}
 }
@@ -2105,8 +2105,8 @@ void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Playe
 	/** TODO 2014-05-12 xdot: Figure out when to call this method. */
 	switch (a_Result.m_ItemType)
 	{
-		case E_ITEM_IRON:        a_Player.AwardAchievement(Statistic::AchAcquireIron); break;
-		case E_ITEM_COOKED_FISH: a_Player.AwardAchievement(Statistic::AchCookFish);    break;
+		case E_ITEM_IRON:        a_Player.AwardAchievement(CustomStatistic::AchAcquireIron); break;
+		case E_ITEM_COOKED_FISH: a_Player.AwardAchievement(CustomStatistic::AchCookFish);    break;
 		default: break;
 	}
 }
@@ -2255,7 +2255,7 @@ void cSlotAreaBrewingstand::HandleBrewedItem(cPlayer & a_Player, const cItem & a
 	// Award an achievement if the item is not a water bottle (is a real brewed potion)
 	if (a_ClickedItem.m_ItemDamage > 0)
 	{
-		a_Player.AwardAchievement(Statistic::AchPotion);
+		a_Player.AwardAchievement(CustomStatistic::AchPotion);
 	}
 }
 

@@ -10,7 +10,7 @@
 
 
 cSkeleton::cSkeleton(void) :
-	Super("Skeleton", mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", "entity.skeleton.ambient", 0.6, 1.8)
+	Super("Skeleton", mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", "entity.skeleton.ambient", 0.6f, 1.99f)
 {
 }
 
@@ -68,7 +68,3 @@ void cSkeleton::SpawnOn(cClientHandle & a_ClientHandle)
 	Super::SpawnOn(a_ClientHandle);
 	a_ClientHandle.SendEntityEquipment(*this, 0, cItem(E_ITEM_BOW));
 }
-
-
-
-

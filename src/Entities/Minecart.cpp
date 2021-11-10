@@ -21,6 +21,36 @@
 
 
 
+class cMinecartAttachCallback
+{
+public:
+	cMinecartAttachCallback(cMinecart & a_Minecart, cEntity * a_Attachee) :
+		m_Minecart(a_Minecart), m_Attachee(a_Attachee)
+	{
+	}
+
+	bool operator()(cEntity & a_Entity)
+	{
+		// Check if minecart is empty and if given entity is a mob:
+		if ((m_Attachee == nullptr) && a_Entity.IsMob())
+		{
+			// If so, attach to minecart and stop iterating:
+			a_Entity.AttachTo(m_Minecart);
+			return true;
+		}
+		return false;
+	}
+
+protected:
+
+	cMinecart & m_Minecart;
+	cEntity * m_Attachee;
+};
+
+
+
+
+
 class cMinecartCollisionCallback
 {
 public:
@@ -95,7 +125,7 @@ protected:
 // cMinecart:
 
 cMinecart::cMinecart(ePayload a_Payload, Vector3d a_Pos):
-	Super(etMinecart, a_Pos, 0.98, 0.7),
+	Super(etMinecart, a_Pos, 0.98f, 0.7f),
 	m_Payload(a_Payload),
 	m_LastDamage(0),
 	m_DetectorRailPosition(0, 0, 0),
@@ -106,8 +136,6 @@ cMinecart::cMinecart(ePayload a_Payload, Vector3d a_Pos):
 	SetAirDrag(0.05f);
 	SetMaxHealth(6);
 	SetHealth(6);
-	SetWidth(1);
-	SetHeight(0.9);
 }
 
 
@@ -1056,6 +1084,12 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 		return false;
 	}
 
+	// Collision was true, create bounding box for minecart, call attach callback for all entities within that box
+	cMinecartAttachCallback MinecartAttachCallback(*this, m_Attachee);
+	Vector3d MinecartPosition = GetPosition();
+	cBoundingBox bbMinecart(Vector3d(MinecartPosition.x, floor(MinecartPosition.y), MinecartPosition.z), GetWidth() / 2, GetHeight());
+	m_World->ForEachEntityInBox(bbMinecart, MinecartAttachCallback);
+
 	switch (a_RailMeta)
 	{
 		case E_META_RAIL_ZM_ZP:
@@ -1241,7 +1275,7 @@ void cMinecart::OnRemoveFromWorld(cWorld & a_World)
 {
 	if (m_bIsOnDetectorRail)
 	{
-		m_World->SetBlock(m_DetectorRailPosition.x, m_DetectorRailPosition.y, m_DetectorRailPosition.z, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
+		m_World->SetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
 	}
 
 	Super::OnRemoveFromWorld(a_World);
@@ -1274,10 +1308,10 @@ void cMinecart::ApplyAcceleration(Vector3d a_ForwardDirection, double a_Accelera
 ////////////////////////////////////////////////////////////////////////////////
 // cRideableMinecart:
 
-cRideableMinecart::cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, int a_Height):
+cRideableMinecart::cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, int a_ContentHeight):
 	Super(mpNone, a_Pos),
 	m_Content(a_Content),
-	m_Height(a_Height)
+	m_ContentHeight(a_ContentHeight)
 {
 }
 
@@ -1317,8 +1351,8 @@ void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 		m_Attachee->Detach();
 	}
 
-	// Attach the player to this minecart
-	a_Player.AttachTo(this);
+	// Attach the player to this minecart:
+	a_Player.AttachTo(*this);
 }
 
 

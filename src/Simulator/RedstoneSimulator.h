@@ -27,7 +27,7 @@ class cRedstoneSimulator:
 
 public:
 
-	using Super::cSimulator;
+	using Super::Super;
 
 	virtual cRedstoneSimulatorChunkData * CreateChunkData() = 0;
 };

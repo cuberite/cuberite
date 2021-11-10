@@ -8,7 +8,7 @@
 
 
 cFireChargeEntity::cFireChargeEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	Super(pkFireCharge, a_Creator, a_Pos, 0.3125, 0.3125)
+	Super(pkFireCharge, a_Creator, a_Pos, 0.3125f, 0.3125f)
 {
 	SetSpeed(a_Speed);
 	SetGravity(0);
@@ -23,7 +23,7 @@ void cFireChargeEntity::Explode(Vector3i a_Block)
 {
 	if (m_World->GetBlock(a_Block) == E_BLOCK_AIR)
 	{
-		m_World->SetBlock(a_Block.x, a_Block.y, a_Block.z, E_BLOCK_FIRE, 1);
+		m_World->SetBlock(a_Block, E_BLOCK_FIRE, 1);
 	}
 }
 

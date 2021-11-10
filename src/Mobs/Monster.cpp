@@ -80,7 +80,7 @@ static const struct
 ////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
-cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height)
+cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height)
 	: Super(etMonster, a_Width, a_Height)
 	, m_EMState(IDLE)
 	, m_EMPersonality(AGGRESSIVE)
@@ -90,7 +90,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_IdleInterval(0)
 	, m_DestroyTimer(0)
 	, m_MobType(a_MobType)
-	, m_CustomName("")
+	, m_CustomName()
 	, m_CustomNameAlwaysVisible(false)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
@@ -541,26 +541,26 @@ void cMonster::HandleFalling()
 
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
-	int PosY = POSY_TOINT;
-	PosY = Clamp(PosY, 0, cChunkDef::Height);
+	auto Position = GetPosition().Floor();
+	Position.y = Clamp(Position.y, 0, cChunkDef::Height);
 
-	if (!cBlockInfo::IsSolid(m_World->GetBlock(FloorC(a_PosX), PosY, FloorC(a_PosZ))))
+	if (!cBlockInfo::IsSolid(m_World->GetBlock(Position)))
 	{
-		while (!cBlockInfo::IsSolid(m_World->GetBlock(FloorC(a_PosX), PosY, FloorC(a_PosZ))) && (PosY > 0))
+		while (!cBlockInfo::IsSolid(m_World->GetBlock(Position)) && (Position.y > 0))
 		{
-			PosY--;
+			Position.y--;
 		}
 
-		return PosY + 1;
+		return Position.y + 1;
 	}
 	else
 	{
-		while ((PosY < cChunkDef::Height) && cBlockInfo::IsSolid(m_World->GetBlock(static_cast<int>(floor(a_PosX)), PosY, static_cast<int>(floor(a_PosZ)))))
+		while ((Position.y < cChunkDef::Height) && cBlockInfo::IsSolid(m_World->GetBlock(Position)))
 		{
-			PosY++;
+			Position.y++;
 		}
 
-		return PosY;
+		return Position.y;
 	}
 }
 
@@ -605,6 +605,15 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 	{
 		m_World->BroadcastSoundEffect(m_SoundDeath, GetPosition(), 1.0f, 0.8f);
 	}
+
+	if (IsTame())
+	{
+		if ((m_MobType == mtWolf) || (m_MobType == mtOcelot) || (m_MobType == mtCat) || (m_MobType == mtParrot))
+		{
+			BroadcastDeathMessage(a_TDI);
+		}
+	}
+
 	int Reward;
 	switch (m_MobType)
 	{
@@ -970,6 +979,15 @@ void cMonster::GetMonsterConfig(const AString & a_Name)
 
 
 
+bool cMonster::IsNetherNative(void)
+{
+	return false;
+}
+
+
+
+
+
 bool cMonster::IsUndead(void)
 {
 	return false;
@@ -1150,34 +1168,26 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtZombieHorse:     return mfPassive;
 		case mtZombiePigman:    return mfHostile;
 		case mtZombieVillager:  return mfHostile;
-
-		default:
-		{
-			ASSERT(!"Unhandled mob type");
-			return mfUnhandled;
-		}
+		case mtInvalidType:     break;
 	}
+	UNREACHABLE("Unhandled mob type");
 }
 
 
 
 
 
-int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
+cTickTime cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 {
 	switch (a_MobFamily)
 	{
-		case mfHostile:   return 40;
-		case mfPassive:   return 40;
-		case mfAmbient:   return 40;
-		case mfWater:     return 400;
-		case mfNoSpawn:   return -1;
-		default:
-		{
-			ASSERT(!"Unhandled mob family");
-			return -1;
-		}
+		case mfHostile:   return 40_tick;
+		case mfPassive:   return 40_tick;
+		case mfAmbient:   return 40_tick;
+		case mfWater:     return 400_tick;
+		case mfNoSpawn:   return -1_tick;
 	}
+	UNREACHABLE("Unhandled mob family");
 }
 
 
@@ -1369,10 +1379,10 @@ void cMonster::LoveTick(void)
 
 			m_World->DoWithPlayerByUUID(m_Feeder, [&] (cPlayer & a_Player)
 			{
-				a_Player.GetStatManager().AddValue(Statistic::AnimalsBred);
+				a_Player.GetStatistics().Custom[CustomStatistic::AnimalsBred]++;
 				if (GetMobType() == eMonsterType::mtCow)
 				{
-					a_Player.AwardAchievement(Statistic::AchBreedCow);
+					a_Player.AwardAchievement(CustomStatistic::AchBreedCow);
 				}
 				return true;
 			});
@@ -1471,7 +1481,7 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 				a_Player.GetInventory().RemoveOneEquippedItem();
 			}
 			m_LoveTimer = TPS * 30;  // half a minute
-			m_World->BroadcastEntityStatus(*this, esMobInLove);
+			m_World->BroadcastEntityAnimation(*this, EntityAnimation::AnimalFallsInLove);
 		}
 	}
 	// If a player holding my spawn egg right-clicked me, spawn a new baby
@@ -1521,7 +1531,7 @@ void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short
 {
 	if (GetRandomProvider().RandBool(a_Chance / 100.0))
 	{
-		a_Drops.push_back(cItem(a_Item, 1, a_ItemHealth));
+		a_Drops.emplace_back(a_Item, 1, a_ItemHealth);
 	}
 }
 
@@ -1654,7 +1664,7 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 
 	if (
 		(Chunk->GetBlock(Rel) != E_BLOCK_SOULSAND) &&   // Not on soulsand
-		(GetWorld()->GetTimeOfDay() < 12000 + 1000) &&  // Daytime
+		(GetWorld()->GetTimeOfDay() < 13000_tick) &&    // Daytime
 		Chunk->IsWeatherSunnyAt(Rel.x, Rel.z) &&        // Not raining
 		!IsInWater()                                    // Isn't swimming
 	)

@@ -40,6 +40,12 @@ public:
 			return false;
 		}
 
+		// Make sure the support block is a valid block to place an item frame on:
+		if (!cHangingEntity::IsValidSupportBlock(a_World->GetBlock(a_ClickedBlockPos)))
+		{
+			return false;
+		}
+
 		// Make sure block that will be occupied by the item frame is free now:
 		const auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
 		BLOCKTYPE Block = a_World->GetBlock(PlacePos);
@@ -48,8 +54,8 @@ public:
 			return false;
 		}
 
-		// Place the item frame:
-		auto ItemFrame = std::make_unique<cItemFrame>(a_ClickedBlockFace, PlacePos);
+		// An item frame, centred so pickups spawn nicely.
+		auto ItemFrame = std::make_unique<cItemFrame>(a_ClickedBlockFace, Vector3d(0.5, 0.5, 0.5) + PlacePos);
 		auto ItemFramePtr = ItemFrame.get();
 		if (!ItemFramePtr->Initialize(std::move(ItemFrame), *a_World))
 		{

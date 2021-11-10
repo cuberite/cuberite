@@ -5,6 +5,7 @@
 #include "RedstoneDataHelper.h"
 #include "ForEachSourceCallback.h"
 
+#include "BlockType.h"
 #include "CommandBlockHandler.h"
 #include "DaylightSensorHandler.h"
 #include "DoorHandler.h"

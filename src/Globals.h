@@ -78,22 +78,24 @@
 
 // OS-dependent stuff:
 #ifdef _WIN32
-
+	#define NOMINMAX  // Windows SDK defines min and max macros, messing up with our std::min and std::max usage.
 	#define WIN32_LEAN_AND_MEAN
-	#define _WIN32_WINNT _WIN32_WINNT_WS03  // We want to target Windows XP with Service Pack 2 & Windows Server 2003 with Service Pack 1 and higher
+	#define _WIN32_WINNT 0x0501  // We want to target Windows XP with Service Pack 2 & Windows Server 2003 with Service Pack 1 and higher.
 
-	// Windows SDK defines min and max macros, messing up with our std::min and std::max usage
-	#define NOMINMAX
+	// Use CryptoAPI primitives when targeting a version that supports encrypting with AES-CFB8 smaller than a full block at a time.
+	#define PLATFORM_CRYPTOGRAPHY (_WIN32_WINNT >= 0x0602)
 
 	#include <Windows.h>
 	#include <winsock2.h>
 	#include <Ws2tcpip.h>  // IPv6 stuff
 
-	// Windows SDK defines GetFreeSpace as a constant, probably a Win16 API remnant
+	// Windows SDK defines GetFreeSpace as a constant, probably a Win16 API remnant:
 	#ifdef GetFreeSpace
 		#undef GetFreeSpace
 	#endif  // GetFreeSpace
 #else
+	#define PLATFORM_CRYPTOGRAPHY 0
+
 	#include <arpa/inet.h>
 	#include <unistd.h>
 #endif
@@ -293,6 +295,12 @@ namespace cpp20
 	{
 		return std::unique_ptr<T>(new std::remove_extent_t<T>[a_Size]);
 	}
+
+	template <class T>
+	std::enable_if_t<!std::is_array_v<T>, std::unique_ptr<T>> make_unique_for_overwrite()
+	{
+		return std::unique_ptr<T>(new T);
+	}
 }
 
 
@@ -330,14 +338,14 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 
 
 
-/** Floors a value, then casts it to C (an int by default) */
+/** Floors a value, then casts it to C (an int by default). */
 template <typename C = int, typename T>
 typename std::enable_if<std::is_arithmetic<T>::value, C>::type FloorC(T a_Value)
 {
 	return static_cast<C>(std::floor(a_Value));
 }
 
-/** Ceils a value, then casts it to C (an int by default) */
+/** Ceils a value, then casts it to C (an int by default). */
 template <typename C = int, typename T>
 typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
 {
@@ -348,9 +356,17 @@ typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
 
 
 
-// a tick is 50 ms
-using cTickTime = std::chrono::duration<int,  std::ratio_multiply<std::chrono::milliseconds::period, std::ratio<50>>>;
-using cTickTimeLong = std::chrono::duration<Int64,  cTickTime::period>;
+// A time duration representing a Minecraft tick (50 ms), capable of storing at least 32'767 ticks.
+using cTickTime = std::chrono::duration<signed int, std::ratio_multiply<std::chrono::milliseconds::period, std::ratio<50>>>;
+
+// A time duration representing a Minecraft tick (50 ms), capable of storing at least a 64 bit signed duration.
+using cTickTimeLong = std::chrono::duration<signed long long int, cTickTime::period>;
+
+/** Converts a literal to a tick time. */
+constexpr cTickTimeLong operator ""_tick(const unsigned long long a_Ticks)
+{
+	return cTickTimeLong(a_Ticks);
+}
 
 using ContiguousByteBuffer = std::basic_string<std::byte>;
 using ContiguousByteBufferView = std::basic_string_view<std::byte>;

@@ -12,6 +12,7 @@
 #include "../UUID.h"
 #include "FastNBT.h"
 
+#include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BedEntity.h"
 #include "../BlockEntities/BrewingstandEntity.h"
@@ -53,16 +54,14 @@
 
 
 /** Collects and stores the chunk data via the cChunkDataCallback interface */
-class SerializerCollector:
+class SerializerCollector final :
 	public cChunkDataCopyCollector
 {
 public:
 
 	// The data collected from the chunk:
-	cChunkDef::BiomeMap mBiomes;
-	UInt8 mVanillaBiomes[cChunkDef::Width * cChunkDef::Width];
-	int mVanillaHeightMap[cChunkDef::Width * cChunkDef::Width];
-	bool mBiomesAreValid;
+	UInt8 Biomes[cChunkDef::Width * cChunkDef::Width];
+	int Heights[cChunkDef::Width * cChunkDef::Width];
 
 	/** True if a tag has been opened in the callbacks and not yet closed. */
 	bool mIsTagOpen;
@@ -84,7 +83,6 @@ public:
 
 
 	SerializerCollector(cFastNBTWriter & aWriter):
-		mBiomesAreValid(false),
 		mIsTagOpen(false),
 		mHasHadEntity(false),
 		mHasHadBlockEntity(false),
@@ -106,14 +104,13 @@ public:
 
 
 
-	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) override
+	virtual void HeightMap(const cChunkDef::HeightMap & a_HeightMap) override
 	{
-		for (int RelX = 0; RelX < cChunkDef::Width; RelX++)
+		for (int RelZ = 0; RelZ < cChunkDef::Width; RelZ++)
 		{
-			for (int RelZ = 0; RelZ < cChunkDef::Width; RelZ++)
+			for (int RelX = 0; RelX < cChunkDef::Width; RelX++)
 			{
-				int Height = cChunkDef::GetHeight(*a_HeightMap, RelX, RelZ);
-				mVanillaHeightMap[(RelZ << 4) | RelX] = Height;
+				Heights[RelX + RelZ * cChunkDef::Width] = cChunkDef::GetHeight(a_HeightMap, RelX, RelZ);
 			}
 		}
 	}
@@ -122,15 +119,14 @@ public:
 
 
 
-	virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) override
+	virtual void BiomeMap(const cChunkDef::BiomeMap & a_BiomeMap) override
 	{
-		memcpy(mBiomes, a_BiomeMap, sizeof(mBiomes));
-		for (size_t i = 0; i < ARRAYCOUNT(mBiomes); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
 		{
-			if ((*a_BiomeMap)[i] < 255)
+			if (a_BiomeMap[i] < 255)
 			{
 				// Normal MC biome, copy as-is:
-				mVanillaBiomes[i] = static_cast<Byte>((*a_BiomeMap)[i]);
+				Biomes[i] = static_cast<Byte>(a_BiomeMap[i]);
 			}
 			else
 			{
@@ -139,7 +135,6 @@ public:
 				return;
 			}
 		}  // for i - mBiomeMap[]
-		mBiomesAreValid = true;
 	}
 
 
@@ -211,6 +206,11 @@ public:
 		// Add tile-entity into NBT:
 		switch (a_Entity->GetBlockType())
 		{
+			// Banners:
+			case E_BLOCK_STANDING_BANNER:
+			case E_BLOCK_WALL_BANNER:       AddBannerEntity         (static_cast<cBannerEntity *>         (a_Entity)); break;
+
+			// Others:
 			case E_BLOCK_BEACON:            AddBeaconEntity         (static_cast<cBeaconEntity *>         (a_Entity)); break;
 			case E_BLOCK_BED:               AddBedEntity            (static_cast<cBedEntity *>            (a_Entity)); break;
 			case E_BLOCK_BREWING_STAND:     AddBrewingstandEntity   (static_cast<cBrewingstandEntity *>   (a_Entity)); break;
@@ -232,7 +232,6 @@ public:
 			case E_BLOCK_SIGN_POST:         AddSignEntity           (static_cast<cSignEntity *>           (a_Entity)); break;
 			case E_BLOCK_TRAPPED_CHEST:     AddChestEntity          (static_cast<cChestEntity *>          (a_Entity), a_Entity->GetBlockType()); break;
 			case E_BLOCK_WALLSIGN:          AddSignEntity           (static_cast<cSignEntity *>           (a_Entity)); break;
-
 			default:
 			{
 				ASSERT(!"Unhandled block entity saved into Anvil");
@@ -250,13 +249,6 @@ public:
 		if (mIsTagOpen)
 		{
 			mWriter.EndList();
-		}
-
-		// If light not valid, reset it to defaults:
-		if (!mIsLightValid)
-		{
-			m_Data.FillBlockLight(0x00);
-			m_Data.FillSkyLight(0x0f);
 		}
 
 		// Check if "Entity" and "TileEntities" lists exists. MCEdit requires this.
@@ -373,6 +365,18 @@ public:
 		mWriter.AddInt   ("y",  a_Entity->GetPosY());
 		mWriter.AddInt   ("z",  a_Entity->GetPosZ());
 		mWriter.AddString("id", a_EntityTypeID);
+	}
+
+
+
+
+
+	void AddBannerEntity(cBannerEntity * a_Entity)
+	{
+		mWriter.BeginCompound("");
+			AddBasicTileEntity(a_Entity,"Banner");
+			mWriter.AddInt("Base", static_cast<int>(a_Entity->GetBaseColor()));
+		mWriter.EndCompound();
 	}
 
 
@@ -1187,40 +1191,57 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 	ASSERT(Result);
 	serializer.Finish();  // Close NBT tags
 
-	// Save biomes, both MCS (IntArray) and MC-vanilla (ByteArray):
-	if (serializer.mBiomesAreValid)
-	{
-		aWriter.AddByteArray("Biomes",    reinterpret_cast<const char *>(serializer.mVanillaBiomes), ARRAYCOUNT(serializer.mVanillaBiomes));
-		aWriter.AddIntArray ("MCSBiomes", reinterpret_cast<const int *>(serializer.mBiomes),         ARRAYCOUNT(serializer.mBiomes));
-	}
+	// Save biomes:
+	aWriter.AddByteArray("Biomes", reinterpret_cast<const char *>(serializer.Biomes), ARRAYCOUNT(serializer.Biomes));
 
 	// Save heightmap (Vanilla require this):
-	aWriter.AddIntArray("HeightMap", reinterpret_cast<const int *>(serializer.mVanillaHeightMap), ARRAYCOUNT(serializer.mVanillaHeightMap));
+	aWriter.AddIntArray("HeightMap", reinterpret_cast<const int *>(serializer.Heights), ARRAYCOUNT(serializer.Heights));
 
 	// Save blockdata:
 	aWriter.BeginList("Sections", TAG_Compound);
-	for (size_t Y = 0; Y != cChunkData::NumSections; ++Y)
+	ChunkDef_ForEachSection(serializer.m_BlockData, serializer.m_LightData,
 	{
-		auto section = serializer.m_Data.GetSection(Y);
-		if (section == nullptr)
+		aWriter.BeginCompound("");
+
+		if (Blocks != nullptr)
 		{
-			continue;
+			aWriter.AddByteArray("Blocks", reinterpret_cast<const char *>(Blocks->data()), Blocks->size());
+		}
+		else
+		{
+			aWriter.AddByteArray("Blocks", ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue);
 		}
 
-		aWriter.BeginCompound("");
-		aWriter.AddByteArray("Blocks", reinterpret_cast<const char *>(section->m_BlockTypes), ARRAYCOUNT(section->m_BlockTypes));
-		aWriter.AddByteArray("Data",   reinterpret_cast<const char *>(section->m_BlockMetas), ARRAYCOUNT(section->m_BlockMetas));
+		if (Metas != nullptr)
+		{
+			aWriter.AddByteArray("Data", reinterpret_cast<const char *>(Metas->data()), Metas->size());
+		}
+		else
+		{
+			aWriter.AddByteArray("Data", ChunkBlockData::SectionMetaCount, ChunkBlockData::DefaultMetaValue);
+		}
 
-		#ifdef DEBUG_SKYLIGHT
-			aWriter.AddByteArray("BlockLight", reinterpret_cast<const char *>(section->m_BlockSkyLight), ARRAYCOUNT(section->m_BlockSkyLight));
-		#else
-			aWriter.AddByteArray("BlockLight", reinterpret_cast<const char *>(section->m_BlockLight),    ARRAYCOUNT(section->m_BlockLight));
-		#endif
+		if (BlockLights != nullptr)
+		{
+			aWriter.AddByteArray("BlockLight", reinterpret_cast<const char *>(BlockLights->data()), BlockLights->size());
+		}
+		else
+		{
+			aWriter.AddByteArray("BlockLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultBlockLightValue);
+		}
 
-		aWriter.AddByteArray("SkyLight", reinterpret_cast<const char *>(section->m_BlockSkyLight), ARRAYCOUNT(section->m_BlockSkyLight));
+		if (SkyLights != nullptr)
+		{
+			aWriter.AddByteArray("SkyLight", reinterpret_cast<const char *>(SkyLights->data()), SkyLights->size());
+		}
+		else
+		{
+			aWriter.AddByteArray("SkyLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue);
+		}
+
 		aWriter.AddByte("Y", static_cast<unsigned char>(Y));
 		aWriter.EndCompound();
-	}
+	});
 	aWriter.EndList();  // "Sections"
 
 	// Store the information that the lighting is valid.
@@ -1231,7 +1252,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 	}
 
 	// Save the world age to the chunk data. Required by vanilla and mcedit.
-	aWriter.AddLong("LastUpdate", aWorld.GetWorldAge());
+	aWriter.AddLong("LastUpdate", aWorld.GetWorldAge().count());
 
 	// Store the flag that the chunk has all the ores, trees, dungeons etc. Cuberite chunks are always complete.
 	aWriter.AddByte("TerrainPopulated", 1);

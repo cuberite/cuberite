@@ -1,7 +1,8 @@
 
 #pragma once
 
-#include "BlockHandler.h"
+#include "Blocks/BlockHandler.h"
+#include "Items/ItemHandler.h"
 
 
 
@@ -22,7 +23,7 @@ protected:
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// If using silk-touch, drop self rather than the resource:
 		if (ToolHasSilkTouch(a_Tool))
@@ -90,6 +91,11 @@ private:
 		if (Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) != 0)
 		{
 			// Don't drop XP when the ore is mined with the Silk Touch enchantment
+			return;
+		}
+
+		if (!ItemHandler(Player->GetEquippedItem().m_ItemType)->CanHarvestBlock(m_BlockType))
+		{
 			return;
 		}
 

@@ -18,43 +18,17 @@ class cItems;
 class cChunkStay;
 class cChunk;
 class cPlayer;
-class cBeaconEntity;
-class cBedEntity;
-class cBrewingstandEntity;
-class cChestEntity;
-class cDispenserEntity;
-class cDropperEntity;
-class cDropSpenserEntity;
-class cFurnaceEntity;
-class cHopperEntity;
-class cNoteEntity;
-class cCommandBlockEntity;
-class cMobHeadEntity;
-class cFlowerPotEntity;
 class cBlockArea;
 class cMobCensus;
 class cMobSpawner;
-class cSetChunkData;
 class cBoundingBox;
 class cDeadlockDetect;
 
-typedef std::list<cClientHandle *> cClientHandleList;
-using cEntityCallback       = cFunctionRef<bool(cEntity             &)>;
-using cBeaconCallback       = cFunctionRef<bool(cBeaconEntity       &)>;
-using cBedCallback          = cFunctionRef<bool(cBedEntity          &)>;
-using cBlockEntityCallback  = cFunctionRef<bool(cBlockEntity        &)>;
-using cBrewingstandCallback = cFunctionRef<bool(cBrewingstandEntity &)>;
-using cChestCallback        = cFunctionRef<bool(cChestEntity        &)>;
-using cChunkCallback        = cFunctionRef<bool(cChunk              &)>;
-using cDispenserCallback    = cFunctionRef<bool(cDispenserEntity    &)>;
-using cDropperCallback      = cFunctionRef<bool(cDropperEntity      &)>;
-using cDropSpenserCallback  = cFunctionRef<bool(cDropSpenserEntity  &)>;
-using cFurnaceCallback      = cFunctionRef<bool(cFurnaceEntity      &)>;
-using cHopperCallback       = cFunctionRef<bool(cHopperEntity       &)>;
-using cNoteBlockCallback    = cFunctionRef<bool(cNoteEntity         &)>;
-using cCommandBlockCallback = cFunctionRef<bool(cCommandBlockEntity &)>;
-using cMobHeadCallback      = cFunctionRef<bool(cMobHeadEntity      &)>;
-using cFlowerPotCallback    = cFunctionRef<bool(cFlowerPotEntity    &)>;
+struct SetChunkData;
+
+using cChunkCallback        = cFunctionRef<bool(cChunk       &)>;
+using cEntityCallback       = cFunctionRef<bool(cEntity      &)>;
+using cBlockEntityCallback  = cFunctionRef<bool(cBlockEntity &)>;
 
 
 
@@ -65,7 +39,6 @@ class cChunkMap
 public:
 
 	cChunkMap(cWorld * a_World);
-	~cChunkMap();
 
 	/** Sends the block entity, if it is at the coords specified, to a_Client */
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
@@ -99,7 +72,7 @@ public:
 	If MarkDirty is set, the chunk is set as dirty (used after generating)
 	Modifies the BlockEntity list in a_SetChunkData - moves the block entities into the chunk.
 	*/
-	void SetChunkData(cSetChunkData & a_SetChunkData);
+	void SetChunkData(SetChunkData && a_SetChunkData);
 
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
@@ -110,9 +83,6 @@ public:
 	/** Calls the callback with the chunk's data, if available (with ChunkCS locked).
 	Returns true if the chunk was reported successfully, false if not (chunk not present or callback failed). */
 	bool GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback) const;
-
-	/** Copies the chunk's blocktypes into a_Blocks; returns true if successful */
-	bool GetChunkBlockTypes (int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_Blocks);
 
 	/** Returns true iff the chunk is in the loader / generator queue. */
 	bool IsChunkQueued(int a_ChunkX, int a_ChunkZ) const;
@@ -182,7 +152,7 @@ public:
 	/** Sends the block at the specified coords to the specified player.
 	Uses a blockchange packet to send the block.
 	If the relevant chunk isn't loaded, doesn't do anything. */
-	void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer & a_Player);
+	void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, const cPlayer & a_Player);
 
 	/** Compares clients of two chunks, calls the callback accordingly */
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
@@ -231,88 +201,9 @@ public:
 	Returns true if all block entities processed, false if the callback aborted by returning true. */
 	bool ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityCallback a_Callback);  // Lua-accessible
 
-	/** Calls the callback for brewingstand in the specified chunk.
-	Returns true if all brewingstands processed, false if the callback aborted by returning true. */
-	bool ForEachBrewingstandInChunk(int a_ChunkX, int a_ChunkZ, cBrewingstandCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for each chest in the specified chunk.
-	Returns true if all chests processed, false if the callback aborted by returning true. */
-	bool ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for each dispenser in the specified chunk.
-	Returns true if all dispensers processed, false if the callback aborted by returning true. */
-	bool ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, cDispenserCallback a_Callback);
-
-	/** Calls the callback for each dropper in the specified chunk.
-	Returns true if all droppers processed, false if the callback aborted by returning true. */
-	bool ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, cDropperCallback a_Callback);
-
-	/** Calls the callback for each dropspenser in the specified chunk.
-	Returns true if all dropspensers processed, false if the callback aborted by returning true. */
-	bool ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, cDropSpenserCallback a_Callback);
-
-	/** Calls the callback for each furnace in the specified chunk.
-	Returns true if all furnaces processed, false if the callback aborted by returning true. */
-	bool ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback a_Callback);  // Lua-accessible
-
 	/** Calls the callback for the block entity at the specified coords.
-	Returns false if there's no block entity at those coords, true if found. */
-	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the beacon at the specified coords.
-	Returns false if there's no beacon at those coords, true if found. */
-	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the bed at the specified coords.
-	Returns false if there's no bed at those coords, true if found. */
-	bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the brewingstand at the specified coords; returns false if there's no brewingstand at those coords, true if found */
-	bool DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the chest at the specified coords.
-	Returns false if there's no chest at those coords, true if found. */
-	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the dispenser at the specified coords.
-	Returns false if there's no dispenser at those coords or callback returns true, returns true if found. */
-	bool DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for the dropper at the specified coords.
-	Returns false if there's no dropper at those coords or callback returns true, returns true if found. */
-	bool DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for the dropspenser at the specified coords.
-	Returns false if there's no dropspenser at those coords or callback returns true, returns true if found. */
-	bool DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for the furnace at the specified coords.
-	Returns false if there's no furnace at those coords or callback returns true, returns true if found. */
-	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for the hopper at the specified coords.
-	Returns false if there's no hopper at those coords or callback returns true, returns true if found. */
-	bool DoWithHopperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for the noteblock at the specified coords.
-	Returns false if there's no noteblock at those coords or callback returns true, returns true if found. */
-	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for the command block at the specified coords.
-	Returns false if there's no command block at those coords or callback returns true, returns true if found. */
-	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for the mob head block at the specified coords.
-	Returns false if there's no mob head block at those coords or callback returns true, returns true if found. */
-	bool DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for the flower pot at the specified coords.
-	Returns false if there's no flower pot at those coords or callback returns true, returns true if found. */
-	bool DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback);  // Lua-accessible
-
-	/** Retrieves the test on the sign at the specified coords.
-	Returns false if there's no sign at those coords, true if found. */
-	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
+	Returns false if there's no block entity at those coords, and whatever the callback returns if found. */
+	bool DoWithBlockEntityAt(Vector3i a_Position, cBlockEntityCallback a_Callback);  // Lua-acessible
 
 	/** Queues the chunk for preparing - making sure that it's generated and lit.
 	The specified chunk is queued to be loaded or generated, and lit if needed.
@@ -326,9 +217,6 @@ public:
 
 	/** Marks the chunk as failed-to-load */
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
-
-	/** Sets the sign text. Returns true if sign text changed. */
-	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 
 	/** Marks the chunk as being regenerated - all its clients want that chunk again (used by cWorld::RegenerateChunk()) */
 	void MarkChunkRegenerating(int a_ChunkX, int a_ChunkZ);
@@ -381,7 +269,7 @@ public:
 	void ChunkValidated(void);  // Called by chunks that have become valid
 
 	/** Returns the CS for locking the chunkmap; only cWorld::cLock may use this function! */
-	cCriticalSection & GetCS(void) { return m_CSChunks; }
+	cCriticalSection & GetCS(void) const { return m_CSChunks; }
 
 	/** Increments (a_AlwaysTicked == true) or decrements (false) the m_AlwaysTicked counter for the specified chunk.
 	If the m_AlwaysTicked counter is greater than zero, the chunk is ticked in the tick-thread regardless of
@@ -404,24 +292,6 @@ private:
 	// The chunkstay can (de-)register itself using AddChunkStay() and DelChunkStay()
 	friend class cChunkStay;
 
-
-	class cStarvationCallbacks
-		: public cAllocationPool<cChunkData::sChunkSection>::cStarvationCallbacks
-	{
-		virtual void OnStartUsingReserve() override
-		{
-			LOG("Using backup memory buffer");
-		}
-		virtual void OnEndUsingReserve() override
-		{
-			LOG("Stoped using backup memory buffer");
-		}
-		virtual void OnOutOfReserve() override
-		{
-			LOG("Out of Memory");
-		}
-	};
-
 	typedef std::list<cChunkStay *> cChunkStays;
 
 	mutable cCriticalSection m_CSChunks;
@@ -436,8 +306,6 @@ private:
 
 	/** The cChunkStay descendants that are currently enabled in this chunkmap */
 	cChunkStays m_ChunkStays;
-
-	std::unique_ptr<cAllocationPool<cChunkData::sChunkSection> > m_Pool;
 
 	/** Returns or creates and returns a chunk pointer corresponding to the given chunk coordinates.
 	Emplaces this chunk in the chunk map. */

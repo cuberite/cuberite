@@ -365,6 +365,16 @@ void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString &
 
 
 
+void ReplaceURL(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith)
+{
+	auto ReplaceWith = URLEncode(iReplaceWith);
+	ReplaceString(iHayStack, iNeedle, ReplaceWith);
+}
+
+
+
+
+
 AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8)
 {
 	a_UTF8.clear();
@@ -817,7 +827,7 @@ AString URLEncode(const AString & a_Text)
 	AString res;
 	auto len = a_Text.size();
 	res.reserve(len);
-	static const char HEX[] = "0123456789abcdef";
+	static const char HEX[] = "0123456789ABCDEF";
 	for (size_t i = 0; i < len; ++i)
 	{
 		if (isalnum(a_Text[i]))

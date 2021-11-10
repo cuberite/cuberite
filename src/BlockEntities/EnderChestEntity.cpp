@@ -53,7 +53,7 @@ bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 	if (
 		(GetPosY() < cChunkDef::Height - 1) &&
 		(
-			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())) ||
+			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPos().addedY(1))) ||
 			!cOcelot::IsCatSittingOnBlock(GetWorld(), Vector3d(GetPos()))
 		)
 	)
@@ -62,7 +62,7 @@ bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 		return false;
 	}
 
-	a_Player->GetStatManager().AddValue(Statistic::OpenEnderchest);
+	a_Player->GetStatistics().Custom[CustomStatistic::OpenEnderchest]++;
 
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();

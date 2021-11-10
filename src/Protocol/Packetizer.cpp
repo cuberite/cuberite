@@ -62,6 +62,7 @@ AString cPacketizer::PacketTypeToStr(cProtocol::ePacketType a_PacketType)
 		case cProtocol::pktBlockBreakAnim:         return "pktBlockBreakAnim";
 		case cProtocol::pktBlockChange:            return "pktBlockChange";
 		case cProtocol::pktBlockChanges:           return "pktBlockChanges";
+		case cProtocol::pktBossBar:                return "pktBossBar";
 		case cProtocol::pktCameraSetTo:            return "pktCameraSetTo";
 		case cProtocol::pktChatRaw:                return "pktChatRaw";
 		case cProtocol::pktCollectEntity:          return "pktCollectEntity";
@@ -98,7 +99,6 @@ AString cPacketizer::PacketTypeToStr(cProtocol::ePacketType a_PacketType)
 		case cProtocol::pktPlayerAbilities:        return "pktPlayerAbilities";
 		case cProtocol::pktPlayerList:             return "pktPlayerList";
 		case cProtocol::pktPlayerListHeaderFooter: return "pktPlayerListHeaderFooter";
-		case cProtocol::pktPlayerMaxSpeed:         return "pktPlayerMaxSpeed";
 		case cProtocol::pktPlayerMoveLook:         return "pktPlayerMoveLook";
 		case cProtocol::pktPluginMessage:          return "pktPluginMessage";
 		case cProtocol::pktRemoveEntityEffect:     return "pktRemoveEntityEffect";

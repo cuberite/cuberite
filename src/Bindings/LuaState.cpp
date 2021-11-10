@@ -6,10 +6,7 @@
 #include "Globals.h"
 #include "LuaState.h"
 
-extern "C"
-{
-	#include "lua/src/lualib.h"
-}
+#include "lua/src/lualib.h"
 
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
@@ -34,17 +31,11 @@ extern "C"
 
 
 
-// fwd: "SQLite/lsqlite3.c"
-extern "C"
-{
-	int luaopen_lsqlite3(lua_State * L);
-}
+// fwd: "SQLite/lsqlite3.cpp"
+int luaopen_lsqlite3(lua_State * L);
 
-// fwd: "LuaExpat/lxplib.c":
-extern "C"
-{
-	int luaopen_lxp(lua_State * L);
-}
+// fwd: "LuaExpat/lxplib.cpp":
+int luaopen_lxp(lua_State * L);
 
 
 
@@ -1378,6 +1369,21 @@ bool cLuaState::GetStackValue(int a_StackPos, ContiguousByteBuffer & a_Data)
 
 
 
+bool cLuaState::GetStackValue(int a_StackPos, CustomStatistic & a_Value)
+{
+	if (lua_isnumber(m_LuaState, a_StackPos))
+	{
+		a_Value = static_cast<CustomStatistic>(static_cast<std::underlying_type_t<CustomStatistic>>(lua_tonumber(m_LuaState, a_StackPos)));
+		return true;
+	}
+
+	return true;
+}
+
+
+
+
+
 bool cLuaState::GetStackValue(int a_StackPos, double & a_ReturnedVal)
 {
 	if (lua_isnumber(m_LuaState, a_StackPos))
@@ -1468,6 +1474,22 @@ bool cLuaState::GetStackValue(int a_StackPos, cUUID & a_Value)
 		return false;
 	}
 	return a_Value.FromString(StrUUID);
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, std::string_view & a_Value)
+{
+	size_t Length = 0;
+	const char * const Value = lua_tolstring(m_LuaState, a_StackPos, &Length);
+	if (Value != nullptr)
+	{
+		a_Value = { Value, Length };
+		return true;
+	}
+	return false;
 }
 
 

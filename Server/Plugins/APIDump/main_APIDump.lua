@@ -36,7 +36,7 @@ local function LoadAPIFiles(a_Folder, a_DstTable)
 				if (a_DstTable[k]) then
 					-- The class is documented in two files, warn and store into a file (so that CIs can mark build as failure):
 					LOGWARNING(string.format(
-						"APIDump warning: class %s is documented at two places, the documentation in file %s will overwrite the previously loaded one!",
+						"Warning: class %s is documented at two places, the documentation in file %s will overwrite the previously loaded one!",
 						k, FileName
 					))
 					local f = io.open("DuplicateDocs.txt", "a")
@@ -48,7 +48,6 @@ local function LoadAPIFiles(a_Folder, a_DstTable)
 		end  -- if (is lua file)
 	end  -- for fnam - Folder[]
 end
-
 
 
 
@@ -121,14 +120,15 @@ local function CreateAPITables()
 		end
 
 		-- Member variables:
+		local GetField = a_ClassObj[".get"];
 		local SetField = a_ClassObj[".set"] or {};
-		if ((a_ClassObj[".get"] ~= nil) and (type(a_ClassObj[".get"]) == "table")) then
-			for k in pairs(a_ClassObj[".get"]) do
-				if (SetField[k] == nil) then
-					-- It is a read-only variable, add it as a constant:
+		if ((GetField ~= nil) and (type(GetField) == "table")) then
+			for k, v in pairs(GetField) do
+				if ((SetField[k] == nil) and ((type(v) ~= "table") or (v["__newindex"] == nil))) then
+					-- It is a read-only variable or array, add it as a constant:
 					table.insert(res.Constants, {Name = k, Value = ""});
 				else
-					-- It is a read-write variable, add it as a variable:
+					-- It is a read-write variable or array, add it as a variable:
 					table.insert(res.Variables, { Name = k });
 				end
 			end
@@ -2115,7 +2115,7 @@ function Initialize(Plugin)
 	g_Plugin = Plugin;
 	g_PluginFolder = Plugin:GetLocalFolder();
 
-	LOG("Initialising " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+	LOG("Initialising v." .. Plugin:GetVersion())
 
 	-- Bind a console command to dump the API:
 	cPluginManager:BindConsoleCommand("api",      HandleCmdApi,      "Dumps the Lua API docs into the API/ subfolder")

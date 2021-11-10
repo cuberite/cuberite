@@ -11,7 +11,7 @@
 
 cRsaPrivateKey::cRsaPrivateKey(void)
 {
-	mbedtls_rsa_init(&m_Rsa, MBEDTLS_RSA_PKCS_V15, 0);
+	mbedtls_rsa_init(&m_Rsa);
 	m_CtrDrbg.Initialize("RSA", 3);
 }
 
@@ -21,7 +21,7 @@ cRsaPrivateKey::cRsaPrivateKey(void)
 
 cRsaPrivateKey::cRsaPrivateKey(const cRsaPrivateKey & a_Other)
 {
-	mbedtls_rsa_init(&m_Rsa, MBEDTLS_RSA_PKCS_V15, 0);
+	mbedtls_rsa_init(&m_Rsa);
 	mbedtls_rsa_copy(&m_Rsa, &a_Other.m_Rsa);
 	m_CtrDrbg.Initialize("RSA", 3);
 }
@@ -107,25 +107,22 @@ ContiguousByteBuffer cRsaPrivateKey::GetPubKeyDER(void)
 
 int cRsaPrivateKey::Decrypt(const ContiguousByteBufferView a_EncryptedData, Byte * a_DecryptedData, size_t a_DecryptedMaxLength)
 {
-	if (a_EncryptedData.size() < m_Rsa.len)
+	const auto KeyLength = mbedtls_rsa_get_len(&m_Rsa);
+	if (a_EncryptedData.size() < KeyLength)
 	{
-		LOGD("%s: Invalid a_EncryptedLength: got %u, exp at least %u",
-			__FUNCTION__, static_cast<unsigned>(a_EncryptedData.size()), static_cast<unsigned>(m_Rsa.len)
-		);
+		LOGD("%s: Invalid a_EncryptedLength: got %zu, exp at least %zu", __FUNCTION__, a_EncryptedData.size(), KeyLength);
 		ASSERT(!"Invalid a_DecryptedMaxLength!");
 		return -1;
 	}
-	if (a_DecryptedMaxLength < m_Rsa.len)
+	if (a_DecryptedMaxLength < KeyLength)
 	{
-		LOGD("%s: Invalid a_DecryptedMaxLength: got %u, exp at least %u",
-			__FUNCTION__, static_cast<unsigned>(a_DecryptedMaxLength), static_cast<unsigned>(m_Rsa.len)
-		);
+		LOGD("%s: Invalid a_DecryptedMaxLength: got %zu, exp at least %zu", __FUNCTION__, a_DecryptedMaxLength, KeyLength);
 		ASSERT(!"Invalid a_DecryptedMaxLength!");
 		return -1;
 	}
 	size_t DecryptedLength;
 	int res = mbedtls_rsa_pkcs1_decrypt(
-		&m_Rsa, mbedtls_ctr_drbg_random, m_CtrDrbg.GetInternal(), MBEDTLS_RSA_PRIVATE, &DecryptedLength,
+		&m_Rsa, mbedtls_ctr_drbg_random, m_CtrDrbg.GetInternal(), &DecryptedLength,
 		reinterpret_cast<const unsigned char *>(a_EncryptedData.data()), a_DecryptedData, a_DecryptedMaxLength
 	);
 	if (res != 0)

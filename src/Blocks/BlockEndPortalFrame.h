@@ -8,19 +8,19 @@
 
 
 class cBlockEndPortalFrameHandler final :
-	public cMetaRotator<cBlockHandler, 0x03,
-		E_META_END_PORTAL_FRAME_ZM,
-		E_META_END_PORTAL_FRAME_XP,
+	public cYawRotator<cBlockHandler, 0x03,
 		E_META_END_PORTAL_FRAME_ZP,
-		E_META_END_PORTAL_FRAME_XM
+		E_META_END_PORTAL_FRAME_XM,
+		E_META_END_PORTAL_FRAME_ZM,
+		E_META_END_PORTAL_FRAME_XP
 	>
 {
-	using Super = cMetaRotator<
+	using Super = cYawRotator<
 		cBlockHandler, 0x03,
-		E_META_END_PORTAL_FRAME_ZM,
-		E_META_END_PORTAL_FRAME_XP,
 		E_META_END_PORTAL_FRAME_ZP,
-		E_META_END_PORTAL_FRAME_XM
+		E_META_END_PORTAL_FRAME_XM,
+		E_META_END_PORTAL_FRAME_ZM,
+		E_META_END_PORTAL_FRAME_XP
 	>;
 
 public:
@@ -28,54 +28,6 @@ public:
 	using Super::Super;
 
 private:
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
-	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = YawToMetaData(a_Player.GetYaw());
-		return true;
-	}
-
-
-
-
-
-	inline static NIBBLETYPE YawToMetaData(double a_Rotation)
-	{
-		a_Rotation += 90 + 45;  // So its not aligned with axis
-		if (a_Rotation > 360)
-		{
-			a_Rotation -= 360;
-		}
-
-		if ((a_Rotation >= 0) && (a_Rotation < 90))
-		{
-			return E_META_END_PORTAL_FRAME_XM;
-		}
-		else if ((a_Rotation >= 180) && (a_Rotation < 270))
-		{
-			return E_META_END_PORTAL_FRAME_XP;
-		}
-		else if ((a_Rotation >= 90) && (a_Rotation < 180))
-		{
-			return E_META_END_PORTAL_FRAME_ZM;
-		}
-		else
-		{
-			return E_META_END_PORTAL_FRAME_ZP;
-		}
-	}
-
-
-
-
 
 	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) const override
 	{
@@ -231,16 +183,6 @@ private:
 	static bool IsPortalFrame(BLOCKTYPE BlockType)
 	{
 		return (BlockType == E_BLOCK_END_PORTAL_FRAME);
-	}
-
-
-
-
-
-	virtual bool IsClickedThrough(void) const override
-	{
-		// TODO: Colision
-		return true;
 	}
 
 

@@ -127,7 +127,7 @@ bool cFurnaceEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cFurnaceEntity::UsedBy(cPlayer * a_Player)
 {
-	a_Player->GetStatManager().AddValue(Statistic::InteractWithFurnace);
+	a_Player->GetStatistics().Custom[CustomStatistic::InteractWithFurnace]++;
 
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
@@ -388,8 +388,8 @@ bool cFurnaceEntity::CanCookInputToOutput(void) const
 
 void cFurnaceEntity::UpdateProgressBars(bool a_ForceUpdate)
 {
-	// In order to preserve bandwidth, an update is sent only every 10th tick
-	if (!a_ForceUpdate && (m_World->GetWorldAge() % 10 != 0))
+	// In order to preserve bandwidth, an update is sent only every 10th tick:
+	if (!a_ForceUpdate && ((m_World->GetWorldTickAge() % 10_tick) != 0_tick))
 	{
 		return;
 	}

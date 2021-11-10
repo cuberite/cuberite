@@ -15,6 +15,66 @@
 
 
 
+/** Template for the bindings for the DoWithXYZAt(X, Y, Z) functions that need to check their coords. */
+template <
+	class SELF,
+	class ITEM,
+	bool (SELF::*DoWithFn)(int, int, int, cFunctionRef<bool(ITEM &)>),
+	bool (SELF::*CoordCheckFn)(int, int, int) const
+>
+static int DoWithXYZ(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamNumber(2, 4) ||
+		!L.CheckParamFunction(5) ||
+		!L.CheckParamEnd(6)
+	)
+	{
+		return 0;
+	}
+
+	// Get parameters:
+	SELF * Self = nullptr;
+	int BlockX = 0;
+	int BlockY = 0;
+	int BlockZ = 0;
+	cLuaState::cRef FnRef;
+	L.GetStackValues(1, Self, BlockX, BlockY, BlockZ, FnRef);
+	if (Self == nullptr)
+	{
+		return L.ApiParamError("Invalid 'self'");
+	}
+	if (!FnRef.IsValid())
+	{
+		return L.ApiParamError("Expected a valid callback function for parameter #5");
+	}
+	if (!(Self->*CoordCheckFn)(BlockX, BlockY, BlockZ))
+	{
+		return L.FApiParamError("The provided coordinates ({0}) are not valid",
+			Vector3i{BlockX, BlockY, BlockZ}
+		);
+	}
+
+	// Call the DoWith function:
+	bool res = (Self->*DoWithFn)(BlockX, BlockY, BlockZ, [&](ITEM & a_Item)
+		{
+			bool ret = false;
+			L.Call(FnRef, &a_Item, cLuaState::Return, ret);
+			return ret;
+		}
+	);
+
+	// Push the result as the return value:
+	L.Push(res);
+	return 1;
+}
+
+
+
+
+
 /** Reads params that together form a Cuboid.
 These can be:
 	- 6 numbers (MinX, MaxX, MinY, MaxY, MinZ, MaxZ)

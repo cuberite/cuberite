@@ -70,6 +70,7 @@ bool cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
 		{
 			a_Player->GetInventory().RemoveOneEquippedItem();
 		}
+		m_World->BroadcastBlockEntity(GetPos());
 		FLOGD("Changed monster spawner at {0} to type {1}.", GetPos(), cMonster::MobTypeToString(MonsterType));
 		return true;
 	}
@@ -91,8 +92,10 @@ void cMobSpawnerEntity::UpdateActiveState(void)
 
 bool cMobSpawnerEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	// Update the active flag every 5 seconds
-	if ((m_World->GetWorldAge() % 100) == 0)
+	using namespace std::chrono_literals;
+
+	// Update the active flag every 5 seconds:
+	if ((m_World->GetWorldTickAge() % 5s) == 0s)
 	{
 		UpdateActiveState();
 	}
@@ -105,6 +108,7 @@ bool cMobSpawnerEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (m_SpawnDelay <= 0)
 	{
 		SpawnEntity();
+		m_World->BroadcastBlockEntity(GetPos());
 		return true;
 	}
 	else
@@ -121,7 +125,6 @@ bool cMobSpawnerEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cMobSpawnerEntity::ResetTimer(void)
 {
 	m_SpawnDelay = GetRandomProvider().RandInt<short>(m_MinSpawnDelay, m_MaxSpawnDelay);
-	m_World->BroadcastBlockEntity(GetPos());
 }
 
 

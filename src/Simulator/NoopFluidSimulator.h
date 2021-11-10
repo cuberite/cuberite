@@ -22,7 +22,7 @@ class cNoopFluidSimulator:
 
 public:
 
-	using Super::cFluidSimulator;
+	using Super::Super;
 
 private:
 

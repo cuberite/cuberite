@@ -11,7 +11,7 @@
 
 
 
-cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height) :
+cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height) :
 	Super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_SoundAmbient, a_Width, a_Height)
 {
 	m_EMPersonality = AGGRESSIVE;
@@ -72,7 +72,7 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			*GetWorld(),
 			GetPosition().addedY(GetHeight()),
 			GetTarget()->GetPosition().addedY(GetTarget()->GetHeight()),
-			cLineBlockTracer::losAirWaterLava  // TODO: Currently all mobs see through lava, but only Nether-native mobs should be able to.
+			(IsNetherNative() ? cLineBlockTracer::losAirWaterLava : cLineBlockTracer::losAirWater)
 		) &&
 		(GetHealth() > 0.0)
 	)

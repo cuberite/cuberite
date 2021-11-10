@@ -184,6 +184,7 @@ protected:
 	static bool CanFernGrow(EMCSBiome a_Biome);
 	static bool CanLargeFernGrow(EMCSBiome a_Biome);
 	static int GetBiomeDensity(EMCSBiome a_Biome);
+	static bool CanGrassGrow(EMCSBiome a_Biome);
 };
 
 
@@ -633,3 +634,14 @@ protected:
 
 
 
+
+class cFinishGenForestRocks:
+	public cFinishGen
+{
+public:
+	cFinishGenForestRocks(int a_Seed, cIniFile & a_IniFile);
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+
+private:
+	cNoise m_Noise;
+};

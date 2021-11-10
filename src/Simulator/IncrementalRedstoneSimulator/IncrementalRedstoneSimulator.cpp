@@ -2,8 +2,111 @@
 #include "Globals.h"
 
 #include "IncrementalRedstoneSimulator.h"
+#include "BlockType.h"
 #include "RedstoneHandler.h"
+#include "RedstoneSimulatorChunkData.h"
 #include "ForEachSourceCallback.h"
+
+
+
+
+
+bool cIncrementalRedstoneSimulator::IsAlwaysTicked(BLOCKTYPE a_Block)
+{
+	switch (a_Block)  // Call the appropriate simulator for the entry's block type
+	{
+		case E_BLOCK_DAYLIGHT_SENSOR:
+		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
+		case E_BLOCK_TRIPWIRE_HOOK:
+		case E_BLOCK_WOODEN_PRESSURE_PLATE:
+		case E_BLOCK_STONE_PRESSURE_PLATE:
+		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE: return true;
+		default: return false;
+	}
+}
+
+
+
+
+
+bool cIncrementalRedstoneSimulator::IsRedstone(BLOCKTYPE a_Block)
+
+{
+	switch (a_Block)
+	{
+		// All redstone devices, please alpha sort
+		case E_BLOCK_ACACIA_DOOR:
+		case E_BLOCK_ACACIA_FENCE_GATE:
+		case E_BLOCK_ACTIVATOR_RAIL:
+		case E_BLOCK_ACTIVE_COMPARATOR:
+		case E_BLOCK_BIRCH_DOOR:
+		case E_BLOCK_BIRCH_FENCE_GATE:
+		case E_BLOCK_BLOCK_OF_REDSTONE:
+		case E_BLOCK_COMMAND_BLOCK:
+		case E_BLOCK_DARK_OAK_DOOR:
+		case E_BLOCK_DARK_OAK_FENCE_GATE:
+		case E_BLOCK_DAYLIGHT_SENSOR:
+		case E_BLOCK_DETECTOR_RAIL:
+		case E_BLOCK_DISPENSER:
+		case E_BLOCK_DROPPER:
+		case E_BLOCK_FENCE_GATE:
+		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+		case E_BLOCK_HOPPER:
+		case E_BLOCK_INACTIVE_COMPARATOR:
+		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
+		case E_BLOCK_IRON_DOOR:
+		case E_BLOCK_IRON_TRAPDOOR:
+		case E_BLOCK_JUNGLE_DOOR:
+		case E_BLOCK_JUNGLE_FENCE_GATE:
+		case E_BLOCK_LEVER:
+		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+		case E_BLOCK_NOTE_BLOCK:
+		case E_BLOCK_OBSERVER:
+		case E_BLOCK_POWERED_RAIL:
+		case E_BLOCK_REDSTONE_LAMP_OFF:
+		case E_BLOCK_REDSTONE_LAMP_ON:
+		case E_BLOCK_REDSTONE_REPEATER_OFF:
+		case E_BLOCK_REDSTONE_REPEATER_ON:
+		case E_BLOCK_REDSTONE_TORCH_OFF:
+		case E_BLOCK_REDSTONE_TORCH_ON:
+		case E_BLOCK_REDSTONE_WIRE:
+		case E_BLOCK_SPRUCE_DOOR:
+		case E_BLOCK_SPRUCE_FENCE_GATE:
+		case E_BLOCK_STICKY_PISTON:
+		case E_BLOCK_STONE_BUTTON:
+		case E_BLOCK_STONE_PRESSURE_PLATE:
+		case E_BLOCK_TNT:
+		case E_BLOCK_TRAPDOOR:
+		case E_BLOCK_TRAPPED_CHEST:
+		case E_BLOCK_TRIPWIRE_HOOK:
+		case E_BLOCK_WOODEN_BUTTON:
+		case E_BLOCK_WOODEN_DOOR:
+		case E_BLOCK_WOODEN_PRESSURE_PLATE:
+		case E_BLOCK_PISTON:
+		{
+			return true;
+		}
+		default: return false;
+	}
+}
+
+
+
+
+
+void cIncrementalRedstoneSimulator::ProcessWorkItem(cChunk & Chunk, cChunk & TickingSource, const Vector3i Position)
+{
+	BLOCKTYPE CurrentBlock;
+	NIBBLETYPE CurrentMeta;
+	Chunk.GetBlockTypeMeta(Position, CurrentBlock, CurrentMeta);
+
+	ForEachSourceCallback Callback(Chunk, Position, CurrentBlock);
+	RedstoneHandler::ForValidSourcePositions(Chunk, Position, CurrentBlock, CurrentMeta, Callback);
+
+	// Inform the handler to update
+	RedstoneHandler::Update(Chunk, TickingSource, Position, CurrentBlock, CurrentMeta, Callback.Power);
+}
 
 
 
@@ -49,23 +152,6 @@ void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt
 
 
 
-void cIncrementalRedstoneSimulator::ProcessWorkItem(cChunk & Chunk, cChunk & TickingSource, const Vector3i Position)
-{
-	BLOCKTYPE CurrentBlock;
-	NIBBLETYPE CurrentMeta;
-	Chunk.GetBlockTypeMeta(Position, CurrentBlock, CurrentMeta);
-
-	ForEachSourceCallback Callback(Chunk, Position, CurrentBlock);
-	RedstoneHandler::ForValidSourcePositions(Chunk, Position, CurrentBlock, CurrentMeta, Callback);
-
-	// Inform the handler to update
-	RedstoneHandler::Update(Chunk, TickingSource, Position, CurrentBlock, CurrentMeta, Callback.Power);
-}
-
-
-
-
-
 void cIncrementalRedstoneSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
 	// Never update blocks without a handler:
@@ -89,6 +175,15 @@ void cIncrementalRedstoneSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Positi
 
 	// Always update redstone devices:
 	ChunkData.WakeUp(a_Position);
+}
+
+
+
+
+
+cRedstoneSimulatorChunkData * cIncrementalRedstoneSimulator::CreateChunkData()
+{
+	return new cIncrementalRedstoneSimulatorChunkData;
 }
 
 

@@ -14,10 +14,10 @@ class cSinglePieceStructuresGen::cGen :
 {
 	using Super = cGridStructGen;
 public:
-	cGen(int a_Seed, cBiomeGenPtr a_BiomeGen, cTerrainHeightGenPtr a_HeightGen, int a_SeaLevel, const AString & a_Name):
+	cGen(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel, const AString & a_Name):
 		Super(a_Seed),
-		m_BiomeGen(std::move(a_BiomeGen)),
-		m_HeightGen(std::move(a_HeightGen)),
+		m_BiomeGen(a_BiomeGen),
+		m_HeightGen(a_HeightGen),
 		m_SeaLevel(a_SeaLevel),
 		m_Name(a_Name)
 	{
@@ -61,10 +61,11 @@ public:
 		int ChunkX, ChunkZ;
 		cChunkDef::BlockToChunk(a_OriginX, a_OriginZ, ChunkX, ChunkZ);
 		cChunkDef::BiomeMap Biomes;
-		m_BiomeGen->GenBiomes({ChunkX, ChunkZ}, Biomes);
+		m_BiomeGen.GenBiomes({ChunkX, ChunkZ}, Biomes);
 
 		// Checks if the biome at the origin position is allowed
-		if (!m_PiecePool.IsBiomeAllowed(Biomes[ChunkX + cChunkDef::Width * ChunkZ]))
+		auto Relative = cChunkDef::AbsoluteToRelative(Vector3i(a_OriginX, 1, a_OriginZ), {ChunkX, ChunkZ});
+		if (!m_PiecePool.IsBiomeAllowed(Biomes[Relative.x + cChunkDef::Width * Relative.z]))
 		{
 			return cStructurePtr();
 		}
@@ -131,10 +132,10 @@ public:
 
 protected:
 	/** The underlying biome generator that defines whether the structure is created or not */
-	cBiomeGenPtr m_BiomeGen;
+	cBiomeGen & m_BiomeGen;
 
 	/** The underlying height generator, used to position the prefabs crossing chunk borders if they are set to FitGround. */
-	cTerrainHeightGenPtr m_HeightGen;
+	cTerrainHeightGen & m_HeightGen;
 
 	/** The world's sea level, if available. Used for some cVerticalStrategy descendants. */
 	int m_SeaLevel;
@@ -159,7 +160,7 @@ cSinglePieceStructuresGen::cSinglePieceStructuresGen(int a_Seed) :
 
 
 
-bool cSinglePieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaLevel, const cBiomeGenPtr & a_BiomeGen, const cTerrainHeightGenPtr & a_HeightGen)
+bool cSinglePieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaLevel, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen)
 {
 	// Load each piecepool:
 	auto Structures = StringSplitAndTrim(a_Prefabs, "|");

@@ -47,7 +47,7 @@ class cChunkSender;
 
 
 
-class cChunkSender:
+class cChunkSender final :
 	public cIsThread,
 	public cChunkDataCopyCollector
 {
@@ -72,7 +72,7 @@ public:
 
 	/** Queues a chunk to be sent to a specific client */
 	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cClientHandle * a_Client);
-	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cChunkClientHandles a_Client);
+	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, const std::vector<cClientHandle *> & a_Clients);
 
 protected:
 
@@ -125,7 +125,7 @@ protected:
 
 	// cChunkDataCollector overrides:
 	// (Note that they are called while the ChunkMap's CS is locked - don't do heavy calculations here!)
-	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) override;
+	virtual void BiomeMap     (const cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void Entity       (cEntity *      a_Entity) override;
 	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
 

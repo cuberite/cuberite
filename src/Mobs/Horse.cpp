@@ -11,7 +11,7 @@
 
 
 cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
-	Super("Horse", mtHorse, "entity.horse.hurt", "entity.horse.death", "entity.horse.ambient", 1.4, 1.6),
+	Super("Horse", mtHorse, "entity.horse.hurt", "entity.horse.death", "entity.horse.ambient", 1.4f, 1.6f),
 	cEntityWindowOwner(this),
 	m_bHasChest(false),
 	m_bIsEating(false),
@@ -152,7 +152,7 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 		}
 		else
 		{
-			a_Player.AttachTo(this);
+			a_Player.AttachTo(*this);
 		}
 	}
 	else if (a_Player.GetEquippedItem().IsEmpty())
@@ -177,7 +177,7 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 			}
 
 			m_TameAttemptTimes++;
-			a_Player.AttachTo(this);
+			a_Player.AttachTo(*this);
 		}
 	}
 	else

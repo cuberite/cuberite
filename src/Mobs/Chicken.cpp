@@ -8,7 +8,7 @@
 
 
 cChicken::cChicken(void) :
-	Super("Chicken", mtChicken, "entity.chicken.hurt", "entity.chicken.death", "entity.chicken.ambient", 0.4, 0.7),
+	Super("Chicken", mtChicken, "entity.chicken.hurt", "entity.chicken.death", "entity.chicken.ambient", 0.4f, 0.7f),
 	m_EggDropTimer(0)
 {
 	SetGravity(-2.0f);
@@ -40,7 +40,7 @@ void cChicken::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		cItems Drops;
 		m_EggDropTimer = 0;
-		Drops.push_back(cItem(E_ITEM_EGG, 1));
+		Drops.emplace_back(E_ITEM_EGG, 1);
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 	}
 	else

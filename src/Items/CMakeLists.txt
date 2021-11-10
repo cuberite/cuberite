@@ -3,32 +3,46 @@ target_sources(
 
 	ItemHandler.cpp
 
+	ItemAnvil.h
 	ItemArmor.h
 	ItemAxe.h
+	ItemBanner.h
 	ItemBed.h
 	ItemBigFlower.h
 	ItemBoat.h
 	ItemBottle.h
 	ItemBow.h
 	ItemBucket.h
+	ItemButton.h
 	ItemChest.h
+	ItemChorusFruit.h
 	ItemCloth.h
 	ItemComparator.h
 	ItemCookedFish.h
 	ItemDoor.h
+	ItemDropSpenser.h
 	ItemDye.h
 	ItemEmptyMap.h
 	ItemEnchantingTable.h
 	ItemEndCrystal.h
+	ItemEndPortalFrame.h
+	ItemEnderchest.h
 	ItemEyeOfEnder.h
+	ItemFenceGate.h
 	ItemFishingRod.h
 	ItemFood.h
 	ItemFoodSeeds.h
+	ItemFurnace.h
+	ItemGlazedTerracotta.h
 	ItemGoldenApple.h
 	ItemHandler.h
 	ItemHoe.h
+	ItemHopper.h
 	ItemItemFrame.h
+	ItemJackOLantern.h
+	ItemLadder.h
 	ItemLeaves.h
+	ItemLever.h
 	ItemLighter.h
 	ItemLilypad.h
 	ItemMap.h
@@ -36,11 +50,16 @@ target_sources(
 	ItemMinecart.h
 	ItemMobHead.h
 	ItemNetherWart.h
+	ItemObserver.h
 	ItemPainting.h
 	ItemPickaxe.h
+	ItemPiston.h
+	ItemPlanks.h
 	ItemPoisonousPotato.h
 	ItemPotion.h
 	ItemPumpkin.h
+	ItemQuartz.h
+	ItemRail.h
 	ItemRawChicken.h
 	ItemRawFish.h
 	ItemRedstoneDust.h
@@ -50,12 +69,19 @@ target_sources(
 	ItemSeeds.h
 	ItemShears.h
 	ItemShovel.h
+	ItemSideways.h
 	ItemSign.h
 	ItemSlab.h
+	ItemSnow.h
 	ItemSoup.h
 	ItemSpawnEgg.h
 	ItemSpiderEye.h
+	ItemStairs.h
 	ItemSword.h
 	ItemThrowable.h
+	ItemTorch.h
+	ItemTrapdoor.h
+	ItemTripwireHook.h
+	ItemVine.h
 	SimplePlaceableItemHandler.h
 )

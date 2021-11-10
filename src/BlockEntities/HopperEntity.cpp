@@ -17,6 +17,13 @@
 
 
 
+// How many ticks at minimum between two item transfers to or from the hopper.
+#define TICKS_PER_TRANSFER 8_tick
+
+
+
+
+
 cHopperEntity::cHopperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_LastMoveItemsInTick(0),
@@ -76,14 +83,14 @@ void cHopperEntity::CopyFrom(const cBlockEntity & a_Src)
 bool cHopperEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
-	Int64 CurrentTick = a_Chunk.GetWorld()->GetWorldAge();
 
 	bool isDirty = false;
 	if (!m_Locked)
 	{
-		isDirty = MoveItemsIn  (a_Chunk, CurrentTick) || isDirty;
-		isDirty = MovePickupsIn(a_Chunk, CurrentTick) || isDirty;
-		isDirty = MoveItemsOut (a_Chunk, CurrentTick) || isDirty;
+		const auto CurrentTick = a_Chunk.GetWorld()->GetWorldAge();
+		isDirty = MoveItemsIn(a_Chunk, CurrentTick) || isDirty;
+		isDirty = MovePickupsIn(a_Chunk) || isDirty;
+		isDirty = MoveItemsOut(a_Chunk, CurrentTick) || isDirty;
 	}
 	return isDirty;
 }
@@ -106,7 +113,7 @@ void cHopperEntity::SendTo(cClientHandle & a_Client)
 
 bool cHopperEntity::UsedBy(cPlayer * a_Player)
 {
-	a_Player->GetStatManager().AddValue(Statistic::InspectHopper);
+	a_Player->GetStatistics().Custom[CustomStatistic::InspectHopper]++;
 
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
@@ -125,12 +132,6 @@ bool cHopperEntity::UsedBy(cPlayer * a_Player)
 		}
 	}
 
-	// This is rather a hack
-	// Instead of marking the chunk as dirty upon chest contents change, we mark it dirty now
-	// We cannot properly detect contents change, but such a change doesn't happen without a player opening the chest first.
-	// The few false positives aren't much to worry about
-	cChunkCoords ChunkPos = cChunkDef::BlockToChunk(GetPos());
-	m_World->MarkChunkDirty(ChunkPos.m_ChunkX, ChunkPos.m_ChunkZ);
 	return true;
 }
 
@@ -147,7 +148,7 @@ void cHopperEntity::OpenNewWindow(void)
 
 
 
-bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
+bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, const cTickTimeLong a_CurrentTick)
 {
 	if (m_Pos.y >= cChunkDef::Height)
 	{
@@ -155,7 +156,7 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 		return false;
 	}
 
-	if (a_CurrentTick - m_LastMoveItemsInTick < TICKS_PER_TRANSFER)
+	if ((a_CurrentTick - m_LastMoveItemsInTick) < TICKS_PER_TRANSFER)
 	{
 		// Too early after the previous transfer
 		return false;
@@ -165,15 +166,15 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 	bool res = false;
 	switch (a_Chunk.GetBlock(GetRelPos().addedY(1)))
 	{
-		case E_BLOCK_TRAPPED_CHEST:
 		case E_BLOCK_CHEST:
+		case E_BLOCK_TRAPPED_CHEST:
 		{
 			// Chests have special handling because of double-chests
 			res = MoveItemsFromChest(a_Chunk);
 			break;
 		}
-		case E_BLOCK_LIT_FURNACE:
 		case E_BLOCK_FURNACE:
+		case E_BLOCK_LIT_FURNACE:
 		{
 			// Furnaces have special handling because only the output and leftover fuel buckets shall be moved
 			res = MoveItemsFromFurnace(a_Chunk);
@@ -201,10 +202,8 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 
 
-bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
+bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk)
 {
-	UNUSED(a_CurrentTick);
-
 	class cHopperPickupSearchCallback
 	{
 	public:
@@ -290,9 +289,9 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 
 
-bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
+bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, const cTickTimeLong a_CurrentTick)
 {
-	if (a_CurrentTick - m_LastMoveItemsOutTick < TICKS_PER_TRANSFER)
+	if ((a_CurrentTick - m_LastMoveItemsOutTick) < TICKS_PER_TRANSFER)
 	{
 		// Too early after the previous transfer
 		return false;
@@ -326,15 +325,15 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 	auto absCoord = destChunk->RelativeToAbsolute(relCoord);
 	switch (destChunk->GetBlock(relCoord))
 	{
-		case E_BLOCK_TRAPPED_CHEST:
 		case E_BLOCK_CHEST:
+		case E_BLOCK_TRAPPED_CHEST:
 		{
 			// Chests have special handling because of double-chests
 			res = MoveItemsToChest(*destChunk, absCoord);
 			break;
 		}
-		case E_BLOCK_LIT_FURNACE:
 		case E_BLOCK_FURNACE:
+		case E_BLOCK_LIT_FURNACE:
 		{
 			// Furnaces have special handling because of the direction-to-slot relation
 			res = MoveItemsToFurnace(*destChunk, absCoord, meta);
@@ -370,61 +369,22 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 {
-	auto chestPos = GetPos().addedY(1);
-	auto mainChest = static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(chestPos));
-	if (mainChest == nullptr)
+	const auto ConnectedBlockEntity = a_Chunk.GetBlockEntityRel(GetRelPos().addedY(1));
+
+	if (ConnectedBlockEntity == nullptr)
 	{
-		FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, chestPos);
 		return false;
 	}
-	if (MoveItemsFromGrid(*mainChest))
+
+	const auto ConnectedChest = static_cast<cChestEntity *>(ConnectedBlockEntity);
+
+	if (MoveItemsFromGrid(ConnectedChest->GetPrimaryChest()))
 	{
-		// Moved the item from the chest directly above the hopper
 		return true;
 	}
 
-	// Check if the chest is a double-chest (chest directly above was empty), if so, try to move from there:
-	static const Vector3i neighborOfs[] =
-	{
-		{ 1, 1,  0},
-		{-1, 1,  0},
-		{ 0, 1,  1},
-		{ 0, 1, -1},
-	} ;
-	for (const auto & ofs: neighborOfs)
-	{
-		auto neighborRelCoord = ofs.addedXZ(m_RelX, m_RelZ);
-		auto neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(neighborRelCoord);
-		if (neighbor == nullptr)
-		{
-			continue;
-		}
-
-		BLOCKTYPE Block = neighbor->GetBlock(neighborRelCoord);
-		if (Block != mainChest->GetBlockType())
-		{
-			// Not the same kind of chest
-			continue;
-		}
-
-		auto neighborAbsCoord = neighbor->RelativeToAbsolute(neighborRelCoord);
-		auto sideChest = static_cast<cChestEntity *>(neighbor->GetBlockEntity(neighborAbsCoord));
-		if (sideChest == nullptr)
-		{
-			FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, neighborAbsCoord);
-		}
-		else
-		{
-			if (MoveItemsFromGrid(*sideChest))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	// The chest was empty
-	return false;
+	const auto SecondaryChest = ConnectedChest->GetSecondaryChest();
+	return (SecondaryChest != nullptr) && MoveItemsFromGrid(*SecondaryChest);
 }
 
 
@@ -533,55 +493,22 @@ bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_Sl
 
 bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords)
 {
-	// Try the chest directly connected to the hopper:
-	auto ConnectedChest = static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(a_Coords));
-	if (ConnectedChest == nullptr)
+	const auto ConnectedBlockEntity = a_Chunk.GetBlockEntity(a_Coords);
+
+	if (ConnectedBlockEntity == nullptr)
 	{
-		FLOGWARNING("{0}: A chest entity was not found where expected, at {1}", __FUNCTION__, a_Coords);
 		return false;
 	}
-	if (MoveItemsToGrid(*ConnectedChest))
+
+	const auto ConnectedChest = static_cast<cChestEntity *>(ConnectedBlockEntity);
+
+	if (MoveItemsToGrid(ConnectedChest->GetPrimaryChest()))
 	{
-		// Chest block directly connected was not full
 		return true;
 	}
 
-	// Check if the chest is a double-chest (chest block directly connected was full), if so, try to move into the other half:
-	static const Vector3i neighborOfs [] =
-	{
-		{ 1, 0,  0},
-		{-1, 0,  0},
-		{ 0, 0,  1},
-		{ 0, 0, -1},
-	} ;
-	auto relCoord = cChunkDef::AbsoluteToRelative(a_Coords);
-	for (const auto & ofs: neighborOfs)
-	{
-		auto otherHalfRelCoord = relCoord + ofs;
-		auto neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(otherHalfRelCoord);
-		if (neighbor == nullptr)
-		{
-			continue;
-		}
-
-		auto Block = neighbor->GetBlock(otherHalfRelCoord);
-		if (Block != ConnectedChest->GetBlockType())
-		{
-			// Not the same kind of chest
-			continue;
-		}
-
-		auto chest = static_cast<cChestEntity *>(neighbor->GetBlockEntity(a_Coords + ofs));
-		if (chest == nullptr)
-		{
-			FLOGWARNING("{0}: A chest entity was not found where expected, at {1} ({2}, {3}})", __FUNCTION__, a_Coords + ofs, ofs.x, ofs.z);
-			continue;
-		}
-		return MoveItemsToGrid(*chest);
-	}
-
-	// The chest was single and nothing could be moved
-	return false;
+	const auto SecondaryChest = ConnectedChest->GetSecondaryChest();
+	return (SecondaryChest != nullptr) && MoveItemsToGrid(*SecondaryChest);
 }
 
 
@@ -672,7 +599,3 @@ bool cHopperEntity::MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstS
 		return false;
 	}
 }
-
-
-
-

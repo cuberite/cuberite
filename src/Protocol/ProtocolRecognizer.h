@@ -38,8 +38,12 @@ public:
 		return m_Protocol;
 	}
 
-	/** The function that's responsible for processing incoming protocol data. */
-	std::function<void(cClientHandle &, std::string_view)> HandleIncomingData;
+	/** Directs incoming protocol data along the correct pathway, depending on the state of the version recognition process.
+	The protocol modifies the provided buffer in-place. */
+	void HandleIncomingData(cClientHandle & a_Client, ContiguousByteBuffer & a_Data);
+
+	/** Allows the protocol (if any) to do a final pass on outgiong data, possibly modifying the provided buffer in-place. */
+	void HandleOutgoingData(ContiguousByteBuffer & a_Data);
 
 	/** Sends a disconnect to the client as a result of a recognition error.
 	This function can be used to disconnect before any protocol has been recognised. */
@@ -50,14 +54,14 @@ private:
 	/** Handles data reception in a newly-created client handle that doesn't yet have a known protocol.
 	a_Data contains a view of data that were just received.
 	Tries to recognize a protocol, populate m_Protocol, and transitions to another mode depending on success. */
-	void HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, std::string_view a_Data);
+	void HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, ContiguousByteBuffer & a_Data);
 
 	/** Handles and responds to unsupported clients sending pings. */
-	void HandleIncomingDataInOldPingResponseStage(cClientHandle & a_Client, std::string_view a_Data);
+	void HandleIncomingDataInOldPingResponseStage(cClientHandle & a_Client, ContiguousByteBufferView a_Data);
 
 	/** Tries to recognize a protocol in the lengthed family (1.7+), based on m_Buffer.
 	Returns a cProtocol_XXX instance if recognized. */
-	std::unique_ptr<cProtocol> TryRecognizeLengthedProtocol(cClientHandle & a_Client, std::string_view a_Data);
+	std::unique_ptr<cProtocol> TryRecognizeLengthedProtocol(cClientHandle & a_Client);
 
 	/** Sends one packet inside a cByteBuffer.
 	This is used only when handling an outdated server ping. */
@@ -72,11 +76,13 @@ private:
 	/* Ping handler for unrecognised versions. */
 	void HandlePacketStatusPing(cClientHandle & a_Client, cByteBuffer & a_Out);
 
+	/** Buffer for received protocol data. */
+	cByteBuffer m_Buffer;
+
 	/** The actual protocol implementation.
 	Created when recognition of the client version succeeds with a version we support. */
 	std::unique_ptr<cProtocol> m_Protocol;
 
-	/** Buffer for received protocol data. */
-	cByteBuffer m_Buffer;
-
+	/** If we're still waiting for data required for version recognition to arrive. */
+	bool m_WaitingForData;
 } ;
