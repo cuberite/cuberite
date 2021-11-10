@@ -557,11 +557,11 @@ public:
 
 	/** Set default spawn at the given coordinates.
 	Returns false if the new spawn couldn't be stored in the INI file. */
-	bool SetSpawn(double a_X, double a_Y, double a_Z);
+	bool SetSpawn(int a_X, int a_Y, int a_Z);
 
-	double GetSpawnX(void) const { return m_SpawnX; }
-	double GetSpawnY(void) const { return m_SpawnY; }
-	double GetSpawnZ(void) const { return m_SpawnZ; }
+	int GetSpawnX(void) const { return m_SpawnX; }
+	int GetSpawnY(void) const { return m_SpawnY; }
+	int GetSpawnZ(void) const { return m_SpawnZ; }
 
 	/** Wakes up the simulators for the specified block */
 	virtual void WakeUpSimulators(Vector3i a_Block) override;
@@ -939,9 +939,9 @@ private:
 	eDimension m_Dimension;
 
 	bool m_IsSpawnExplicitlySet;
-	double m_SpawnX;
-	double m_SpawnY;
-	double m_SpawnZ;
+	int m_SpawnX;
+	int m_SpawnY;
+	int m_SpawnZ;
 
 	// Variables defining the minimum and maximum size for a nether portal
 	int m_MinNetherPortalWidth;
@@ -1109,7 +1109,7 @@ private:
 
 	/** Can the specified coordinates be used as a spawn point?
 	Returns true if spawn position is valid and sets a_Y to the valid spawn height */
-	bool CanSpawnAt(double a_X, double & a_Y, double a_Z);
+	bool CanSpawnAt(int a_X, int & a_Y, int a_Z);
 
 	/** Check if player starting point is acceptable */
 	bool CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ);

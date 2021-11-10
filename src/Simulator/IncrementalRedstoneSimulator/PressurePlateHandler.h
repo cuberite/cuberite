@@ -18,17 +18,29 @@ namespace PressurePlateHandler
 
 		a_Chunk.ForEachEntityInBox(cBoundingBox(Vector3d(0.5, 0, 0.5) + a_Position, 0.5, 0.5), [&](cEntity & Entity)
 		{
-			if (Entity.IsPlayer())
+			if (Entity.GetHealth() <= 0)
 			{
-				FoundPlayer = true;
+				return false;
 			}
 
-			if (Entity.IsPickup())
+			if (Entity.IsPlayer())
+			{
+				const auto & Player = static_cast<cPlayer &>(Entity);
+
+				if (Player.IsGameModeSpectator())
+				{
+					return false;
+				}
+
+				FoundPlayer = true;
+			}
+			else if (Entity.IsPickup())
 			{
 				const auto & Pickup = static_cast<cPickup &>(Entity);
 				NumberOfEntities += static_cast<size_t>(Pickup.GetItem().m_ItemCount);
 				return false;
 			}
+
 			NumberOfEntities++;
 			return false;
 		});

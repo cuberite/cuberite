@@ -351,8 +351,8 @@ public:
 
 	// tolua_begin
 
-	/** Called when the entity kills another entity */
-	virtual void Killed(cEntity * a_Victim) {}
+	/** Called when the entity kills another entity. */
+	virtual void Killed(const cEntity & a_Victim, eDamageType a_DamageType) {}
 
 	/** Heals the specified amount of HPs */
 	virtual void Heal(int a_HitPoints);
@@ -452,11 +452,11 @@ public:
 	/** Gets entity (vehicle) attached to this entity */
 	cEntity * GetAttached();
 
-	/** Attaches to the specified entity; detaches from any previous one first */
-	virtual void AttachTo(cEntity * a_AttachTo);
+	/** Attaches to the specified entity; detaches from any previous one first. */
+	void AttachTo(cEntity & a_AttachTo);
 
-	/** Detaches from the currently attached entity, if any */
-	virtual void Detach(void);
+	/** Detaches from the currently attached entity, if any. */
+	void Detach(void);
 
 	/** Returns true if this entity is attached to the specified entity */
 	bool IsAttachedTo(const cEntity * a_Entity) const;
@@ -578,10 +578,10 @@ protected:
 	float m_Health;
 	float m_MaxHealth;
 
-	/** The entity to which this entity is attached (vehicle), nullptr if none */
+	/** The entity to which this entity is attached (vehicle), nullptr if none. */
 	cEntity * m_AttachedTo;
 
-	/** The entity which is attached to this entity (rider), nullptr if none */
+	/** The entity which is attached to this entity (rider), nullptr if none. */
 	cEntity * m_Attachee;
 
 	/** Stores whether head yaw has been set manually */
@@ -682,6 +682,9 @@ protected:
 
 	/** If has any mobs are leashed, broadcasts every leashed entity to this. */
 	void BroadcastLeashedMobs();
+
+	/** Called when this entity dismounts from m_AttachedTo. */
+	virtual void OnDetach();
 
 private:
 

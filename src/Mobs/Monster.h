@@ -108,6 +108,10 @@ public:
 	/** Reads the monster configuration for the specified monster name and assigns it to this object. */
 	void GetMonsterConfig(const AString & a_Name);
 
+	/** Returns whether this mob spawns in the Nether in Vanilla.
+	This is a fixed value and is not affected by custom mob spawning settings. */
+	virtual bool IsNetherNative(void);
+
 	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
 	virtual bool IsUndead(void);
 

@@ -101,6 +101,10 @@ public:  // tolua_export
 	We use Version-3 UUIDs for offline UUIDs, online UUIDs are Version-4, thus we can tell them apart. */
 	static bool IsUUIDOnline(const cUUID & a_UUID);  // Exported in ManualBindings.cpp
 
+	/** Function to mark bungee / proxy connection on this client, and to add proxy-related data */
+	void ProxyInit(const AString & a_IPString, const cUUID & a_UUID);
+	void ProxyInit(const AString & a_IPString, const cUUID & a_UUID, const Json::Value & a_Properties);
+
 	/** Flushes all buffered outgoing data to the network. */
 	void ProcessProtocolOut();
 
@@ -114,8 +118,11 @@ public:  // tolua_export
 
 	void Kick(const AString & a_Reason);  // tolua_export
 
-	/** Authenticates the specified user, called by cAuthenticator */
-	void Authenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
+	/** Authenticates the specified user with the bungee proxy server */
+	bool BungeeAuthenticate();
+
+	/** Authenticates ourselves, called by cAuthenticator supplying player details from Mojang. */
+	void Authenticate(AString && a_Name, const cUUID & a_UUID, Json::Value && a_Properties);
 
 	/** Sends a set number of new chunks to the player on every invocation, until all chunks in the view distance have been sent. */
 	void StreamNextChunks();
@@ -269,20 +276,20 @@ public:  // tolua_export
 	const AStringMap & GetForgeMods(void) const { return m_ForgeMods; }
 
 	/** Returns true if the client is modded with Forge. */
-	bool IsForgeClient(void) const { return m_ForgeHandshake.m_IsForgeClient; }
+	bool IsForgeClient(void) const { return m_ForgeHandshake.IsForgeClient; }
 
 	// tolua_end
 
 	/** Add the Forge mod list to the server ping response. */
 	void ForgeAugmentServerListPing(Json::Value & a_Response)
 	{
-		m_ForgeHandshake.AugmentServerListPing(a_Response);
+		m_ForgeHandshake.AugmentServerListPing(*this, a_Response);
 	}
 
 	/** Mark a client connection as using Forge. Set by the protocol. */
 	void SetIsForgeClient()
 	{
-		m_ForgeHandshake.m_IsForgeClient = true;
+		m_ForgeHandshake.IsForgeClient = true;
 	}
 
 	/** Returns true if the client wants the chunk specified to be sent (in m_ChunksToSend) */
@@ -310,11 +317,11 @@ public:  // tolua_export
 	/** Called when the protocol detects a chat packet. */
 	void HandleChat(const AString & a_Message);
 
-	/** Called when the protocol receives a MC|AdvCdm plugin message, indicating that the player set a new
+	/** Called when the protocol receives a message, indicating that the player set a new
 	command in the command block UI, for a block-based commandblock. */
 	void HandleCommandBlockBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_NewCommand);
 
-	/** Called when the protocol receives a MC|AdvCdm plugin message, indicating that the player set a new
+	/** Called when the protocol receives a message, indicating that the player set a new
 	command in the command block UI, for an entity-based commandblock (minecart?). */
 	void HandleCommandBlockEntityChange(UInt32 a_EntityID, const AString & a_NewCommand);
 
@@ -411,8 +418,6 @@ public:  // tolua_export
 
 private:
 
-	friend class cServer;  // Needs access to SetSelf()
-
 	friend class cForgeHandshake;   // Needs access to FinishAuthenticate()
 
 	/** The type used for storing the names of registered plugin channels. */
@@ -469,6 +474,8 @@ private:
 	and a member of m_SentChunks.
 	Otherwise, this contains an arbitrary value which should not be used. */
 	cChunkCoords m_CachedSentChunk;
+
+	bool m_ProxyConnection;  ///< True if player connected from a proxy (Bungee / Velocity)
 
 	bool m_HasSentDC;  ///< True if a Disconnect packet has been sent in either direction
 
@@ -564,7 +571,7 @@ private:
 	float m_BreakProgress;
 
 	/** Finish logging the user in after authenticating. */
-	void FinishAuthenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
+	void FinishAuthenticate();
 
 	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
 	bool CheckBlockInteractionsRate(void);

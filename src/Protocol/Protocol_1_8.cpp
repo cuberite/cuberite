@@ -124,20 +124,18 @@ cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_Ser
 
 				LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
 
-				m_Client->SetIPString(Params[1]);
-
 				cUUID UUID;
 				UUID.FromString(Params[2]);
-				m_Client->SetUUID(UUID);
 
 				Json::Value root;
 				if (!JsonUtils::ParseString(Params[3], root))
 				{
 					LOGERROR("Unable to parse player properties: '%s'", Params[3]);
+					m_Client->ProxyInit(Params[1], UUID);
 				}
 				else
 				{
-					m_Client->SetProperties(root);
+					m_Client->ProxyInit(Params[1], UUID, root);
 				}
 			}
 			else
@@ -850,7 +848,7 @@ void cProtocol_1_8_0::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 	// Send the spawn position:
 	{
 		cPacketizer Pkt(*this, pktSpawnPosition);
-		Pkt.WriteXYZPosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
+		Pkt.WriteXYZPosition64(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ());
 	}
 
 	// Send the server difficulty:
@@ -2253,6 +2251,7 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	auto NumPlayers = static_cast<signed>(Server->GetNumPlayers());
 	auto MaxPlayers = static_cast<signed>(Server->GetMaxPlayers());
 	AString Favicon = Server->GetFaviconData();
+
 	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
 
 	// Version:
@@ -2269,7 +2268,7 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	// Description:
 	Json::Value Description;
-	Description["text"] = ServerDescription.c_str();
+	Description["text"] = std::move(ServerDescription);
 
 	// Create the response:
 	Json::Value ResponseValue;
@@ -2895,27 +2894,37 @@ void cProtocol_1_8_0::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel)
 {
-	if (a_Channel == "MC|AdvCdm")
+	if ((a_Channel == "MC|AdvCdm") || (a_Channel == "MC|AdvCmd"))  // Spelling was fixed in 15w34
 	{
-		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Mode);
+		// https://wiki.vg/index.php?title=Plugin_channels&oldid=14089#MC.7CAdvCmd
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Dest);
 
-		switch (Mode)
+		switch (Dest)
 		{
 			case 0x00:
 			{
+				// Editing a command-block
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockX);
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockY);
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockZ);
 				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
-
 				m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
+				break;
+			}
+
+			case 0x01:
+			{
+				// Editing a command-block-minecart
+				HANDLE_READ(a_ByteBuffer, ReadBEUInt32,      UInt32,  EntityID);
+				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+				m_Client->HandleCommandBlockEntityChange(EntityID, Command);
 				break;
 			}
 
 			default:
 			{
-				m_Client->SendChat(Printf("Failure setting command block command; unhandled mode %u (0x%02x)", Mode, Mode), mtFailure);
-				LOG("Unhandled MC|AdvCdm packet mode.");
+				m_Client->SendChat(Printf("Failure setting command block command; unhandled destination %u (0x%02x)", Dest, Dest), mtFailure);
+				LOG("Unhandled MC|AdvCmd packet destination.");
 				return;
 			}
 		}  // switch (Mode)
@@ -3083,27 +3092,22 @@ void cProtocol_1_8_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Ob
 {
 	ASSERT(m_State == 3);  // In game mode?
 
+	cPacketizer Pkt(*this, pktSpawnObject);
+	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	Pkt.WriteBEUInt8(a_ObjectType);
+	Pkt.WriteFPInt(a_Entity.GetPosX());
+	Pkt.WriteFPInt(a_Entity.GetPosY());
+	Pkt.WriteFPInt(a_Entity.GetPosZ());
+	Pkt.WriteByteAngle(a_Entity.GetPitch());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteBEInt32(a_ObjectData);
+
+	if (a_ObjectData != 0)
 	{
-		cPacketizer Pkt(*this, pktSpawnObject);
-		Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-		Pkt.WriteBEUInt8(a_ObjectType);
-		Pkt.WriteFPInt(a_Entity.GetPosX());  // Position appears to be ignored...
-		Pkt.WriteFPInt(a_Entity.GetPosY());
-		Pkt.WriteFPInt(a_Entity.GetPosY());
-		Pkt.WriteByteAngle(a_Entity.GetPitch());
-		Pkt.WriteByteAngle(a_Entity.GetYaw());
-		Pkt.WriteBEInt32(a_ObjectData);
-
-		if (a_ObjectData != 0)
-		{
-			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
-			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
-			Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
-		}
+		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
+		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
+		Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
 	}
-
-	// Otherwise 1.8 clients don't show the entity
-	SendEntityTeleport(a_Entity);
 }
 
 

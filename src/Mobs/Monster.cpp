@@ -978,6 +978,15 @@ void cMonster::GetMonsterConfig(const AString & a_Name)
 
 
 
+bool cMonster::IsNetherNative(void)
+{
+	return false;
+}
+
+
+
+
+
 bool cMonster::IsUndead(void)
 {
 	return false;

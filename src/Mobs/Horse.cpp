@@ -152,7 +152,7 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 		}
 		else
 		{
-			a_Player.AttachTo(this);
+			a_Player.AttachTo(*this);
 		}
 	}
 	else if (a_Player.GetEquippedItem().IsEmpty())
@@ -177,7 +177,7 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 			}
 
 			m_TameAttemptTimes++;
-			a_Player.AttachTo(this);
+			a_Player.AttachTo(*this);
 		}
 	}
 	else

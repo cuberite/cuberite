@@ -45,6 +45,12 @@ public:
 			return false;
 		}
 
+		// Make sure the support block is a valid block to place a painting on:
+		if (!cHangingEntity::IsValidSupportBlock(a_World->GetBlock(a_ClickedBlockPos)))
+		{
+			return false;
+		}
+
 		// Make sure block that will be occupied is free:
 		auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
 		auto PlaceBlock = a_World->GetBlock(PlacePos);
@@ -85,7 +91,9 @@ public:
 		};
 
 		auto PaintingTitle = gPaintingTitlesList[static_cast<size_t>(a_World->GetTickRandomNumber(gPaintingTitlesList.size() - 1))];
-		auto Painting = std::make_unique<cPainting>(PaintingTitle, a_ClickedBlockFace, PlacePos);
+
+		// A painting, centred so pickups spawn nicely.
+		auto Painting = std::make_unique<cPainting>(PaintingTitle, a_ClickedBlockFace, Vector3d(0.5, 0.5, 0.5) + PlacePos);
 		auto PaintingPtr = Painting.get();
 		if (!PaintingPtr->Initialize(std::move(Painting), *a_World))
 		{

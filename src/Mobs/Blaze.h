@@ -18,11 +18,13 @@ public:
 
 	CLASS_PROTODEF(cBlaze)
 
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
-
 private:
+
+	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+	virtual bool IsNetherNative(void) override { return true; }
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+
 	/** Specifies whether or not the blaze has started shooting fireballs. */
 	bool m_IsCharging;
 

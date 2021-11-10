@@ -17,17 +17,18 @@
 class cBoatCollisionCallback
 {
 public:
-	cBoatCollisionCallback(cBoat * a_Boat, cEntity * a_Attachee) :
+
+	cBoatCollisionCallback(cBoat & a_Boat, cEntity * a_Attachee) :
 		m_Boat(a_Boat), m_Attachee(a_Attachee)
 	{
 	}
 
 	bool operator()(cEntity & a_Entity)
 	{
-		// Checks if boat is empty and if given entity is a mob
-		if ((m_Attachee == nullptr) && (a_Entity.IsMob()))
+		// Checks if boat is empty and if given entity is a mob:
+		if ((m_Attachee == nullptr) && a_Entity.IsMob())
 		{
-			// if so attach and return true
+			// If so attach and stop iterating:
 			a_Entity.AttachTo(m_Boat);
 			return true;
 		}
@@ -36,7 +37,8 @@ public:
 	}
 
 protected:
-	cBoat * m_Boat;
+
+	cBoat & m_Boat;
 	cEntity * m_Attachee;
 };
 
@@ -159,7 +161,7 @@ void cBoat::OnRightClicked(cPlayer & a_Player)
 	}
 
 	// Attach the player to this boat
-	a_Player.AttachTo(this);
+	a_Player.AttachTo(*this);
 }
 
 
@@ -349,7 +351,7 @@ void cBoat::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	normal physics calcualtions */
 
 	// Calculate boat's bounding box, run collision callback on all entities in said box
-	cBoatCollisionCallback BoatCollisionCallback(this, m_Attachee);
+	cBoatCollisionCallback BoatCollisionCallback(*this, m_Attachee);
 	Vector3d BoatPosition = GetPosition();
 	cBoundingBox bbBoat(
 		Vector3d(BoatPosition.x, floor(BoatPosition.y), BoatPosition.z), GetWidth() / 2, GetHeight());
