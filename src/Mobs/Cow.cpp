@@ -12,37 +12,6 @@ cCow::cCow(void) :
 	Super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", "entity.cow.ambient", 0.9f, 1.4f),
 	m_Blackboard(*this)
 {
-	using namespace BehaviorTree;
-	using std::chrono::seconds;
-
-	auto Wander = std::make_unique<cSequence>(
-		MakeVector<std::unique_ptr<cTask>>(
-			std::make_unique<cRandomPosition>("WanderPos", 10.0),
-			std::make_unique<cSucceeder>(std::make_unique<cMoveToPosition>("WanderPos")),
-			std::make_unique<cRandomWait>(seconds(1), seconds(4))
-		)
-	);
-
-	auto Panic = std::make_unique<cSequence>(
-		MakeVector<std::unique_ptr<cTask>>(
-			std::make_unique<cRandomPosition>("PanicPos", 20.0),
-			std::make_unique<cMoveToPosition>("PanicPos")
-		)
-	);
-
-	m_BehaviorTree = std::make_unique<cDynamicGuardSelector>(
-		MakeVector<std::unique_ptr<cGuardedTask>>(
-			std::make_unique<cGuardedTask>(
-				std::make_unique<cHealthRange>(0.0f, 0.5f * m_MaxHealth),
-				std::move(Panic)
-			),
-			std::make_unique<cGuardedTask>(
-				nullptr,
-				std::move(Wander)
-			)
-		)
-	);
-
 	m_BehaviorTree = BehaviorTree::CreateBehaviourTree(eMonsterType::mtCow);
 }
 

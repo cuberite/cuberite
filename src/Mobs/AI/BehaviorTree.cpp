@@ -77,7 +77,7 @@ std::unique_ptr<cTask> CreateBehaviourTree(eMonsterType a_MobType, const AString
 
 	if (!BehavioursLua.IsValid() || !lua_istable(Lua, 1))
 	{
-		LOGWARNING("The BehaviorTree file %s doesn't contain any behaviours", FilePath.c_str());
+		LOGWARNING("The BehaviorTree file %s doesn't contain any valid behaviours", FilePath.c_str());
 		return nullptr;
 	}
 
@@ -170,6 +170,7 @@ std::unique_ptr<cTask> CreateBehaviour(const AString & a_BehaviourName, cLuaStat
 	else
 	{
 		LOGERROR("Unimplemented behaviour parsed!: %s", a_BehaviourName);
+		ASSERT(!"Unimplemented behaviour parsed!");
 		return nullptr;
 	}
 }
