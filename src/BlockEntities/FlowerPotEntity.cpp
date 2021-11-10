@@ -54,7 +54,7 @@ bool cFlowerPotEntity::UsedBy(cPlayer * a_Player)
 	a_Player->GetStatistics().Custom[CustomStatistic::PotFlower]++;
 
 	cItem SelectedItem = a_Player->GetInventory().GetEquippedItem();
-	if (IsFlower(SelectedItem.m_ItemType, SelectedItem.m_ItemDamage))
+	if (IsFlower(SelectedItem.m_ItemType))
 	{
 		m_Item = SelectedItem.CopyOne();
 		if (!a_Player->IsGameModeCreative())
@@ -79,27 +79,26 @@ void cFlowerPotEntity::SendTo(cClientHandle & a_Client)
 
 
 
-bool cFlowerPotEntity::IsFlower(short m_ItemType, short m_ItemData)
+bool cFlowerPotEntity::IsFlower(Item m_ItemType)
 {
 	switch (m_ItemType)
 	{
-		case E_BLOCK_DANDELION:
-		case E_BLOCK_FLOWER:
-		case E_BLOCK_CACTUS:
-		case E_BLOCK_BROWN_MUSHROOM:
-		case E_BLOCK_RED_MUSHROOM:
-		case E_BLOCK_SAPLING:
-		case E_BLOCK_DEAD_BUSH:
-		{
+		case Item::Dandelion:
+		case Item::Cactus:
+		case Item::BrownMushroom:
+		case Item::RedMushroom:
+		case Item::AcaciaSapling:
+		case Item::BirchSapling:
+		case Item::JungleSapling:
+		case Item::DarkOakSapling:
+		case Item::OakSapling:
+		case Item::SpruceSapling:
+		case Item::DeadBush:
+		case Item::Lilac:
+		case Item::Peony:
+		case Item::RoseBush:
+		case Item::Sunflower:
 			return true;
-		}
-		case E_BLOCK_TALL_GRASS:
-		{
-			return (m_ItemData == static_cast<short>(2));
-		}
-		default:
-		{
-			return false;
-		}
+		default: return false;
 	}
 }

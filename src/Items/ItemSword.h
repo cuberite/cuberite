@@ -16,7 +16,7 @@ class cItemSwordHandler:
 
 public:
 
-	cItemSwordHandler(int a_ItemType):
+	cItemSwordHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}
@@ -32,14 +32,13 @@ public:
 	}
 
 
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
+	virtual bool CanRepairWithRawMaterial(const cItem & a_Item) override
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_WOODEN_SWORD:
+			case Item::WoodenSword:
 			{
-				auto NewItem = PaletteUpgrade::FromItem(a_ItemType, 0);
-				switch (NewItem)
+				switch (a_Item.m_ItemType)
 				{
 					case Item::AcaciaPlanks:
 					case Item::BirchPlanks:
@@ -53,21 +52,20 @@ public:
 					default: return false;
 				}
 			}
-			case E_ITEM_STONE_SWORD:
+			case Item::StoneSword:
 			{
-				auto NewItem = PaletteUpgrade::FromItem(a_ItemType, 0);
-				switch (NewItem)
+				switch (a_Item.m_ItemType)
 				{
 					case Item::Cobblestone:
 						return true;
 					default: return false;
 				}
 			}
-			case E_ITEM_IRON_SWORD:    return (a_ItemType == E_ITEM_IRON);
-			case E_ITEM_GOLD_SWORD:    return (a_ItemType == E_ITEM_GOLD);
-			case E_ITEM_DIAMOND_SWORD: return (a_ItemType == E_ITEM_DIAMOND);
+			case Item::IronSword:    return (a_Item.m_ItemType == Item::IronIngot);
+			case Item::GoldenSword:  return (a_Item.m_ItemType == Item::GoldIngot);
+			case Item::DiamondSword: return (a_Item.m_ItemType == Item::Diamond);
+			default: return false;
 		}
-		return false;
 	}
 
 

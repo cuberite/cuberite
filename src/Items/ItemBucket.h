@@ -20,7 +20,7 @@ class cItemBucketHandler :
 
 public:
 
-	cItemBucketHandler(int a_ItemType):
+	cItemBucketHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 

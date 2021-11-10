@@ -41,8 +41,7 @@ void cCow::OnRightClicked(cPlayer & a_Player)
 {
 	Super::OnRightClicked(a_Player);
 
-	short HeldItem = a_Player.GetEquippedItem().m_ItemType;
-	if (HeldItem == E_ITEM_BUCKET)
+	if (a_Player.GetEquippedItem().m_ItemType == Item::Bucket)
 	{
 		// Milk the cow.
 		if (!a_Player.IsGameModeCreative())

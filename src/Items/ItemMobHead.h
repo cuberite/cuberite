@@ -16,7 +16,7 @@ class cItemMobHeadHandler:
 
 public:
 
-	cItemMobHeadHandler(int a_ItemType):
+	cItemMobHeadHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

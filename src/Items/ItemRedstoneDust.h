@@ -14,7 +14,7 @@ class cItemRedstoneDustHandler:
 
 public:
 
-	cItemRedstoneDustHandler(int a_ItemType):
+	cItemRedstoneDustHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

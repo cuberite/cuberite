@@ -536,12 +536,12 @@ bool cPawn::DeductTotem(const eDamageType a_DamageType)
 	// main-hand slot and receives otherwise fatal damage, the totem saves the player from death.
 
 	auto & inv = static_cast<cPlayer *>(this)->GetInventory();
-	if (inv.GetEquippedItem().m_ItemType == E_ITEM_TOTEM_OF_UNDYING)
+	if (inv.GetEquippedItem().m_ItemType == Item::TotemOfUndying)
 	{
 		inv.SetEquippedItem({});
 		return true;
 	}
-	if (inv.GetShieldSlot().m_ItemType == E_ITEM_TOTEM_OF_UNDYING)
+	if (inv.GetShieldSlot().m_ItemType == Item::TotemOfUndying)
 	{
 		inv.SetShieldSlot({});
 		return true;

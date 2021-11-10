@@ -15,7 +15,7 @@ class cItemComparatorHandler:
 
 public:
 
-	cItemComparatorHandler(int a_ItemType):
+	cItemComparatorHandler(Item a_ItemType):
 		cItemHandler(a_ItemType)
 	{
 	}

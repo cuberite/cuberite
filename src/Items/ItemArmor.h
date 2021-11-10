@@ -8,14 +8,17 @@
 
 
 
-class cItemArmorHandler final :
+class cItemArmorHandler:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	using Super::Super;
+	cItemArmorHandler(Item a_ItemType):
+		Super(a_ItemType)
+	{
+	}
 
 
 
@@ -29,7 +32,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) const override
+	) override
 	{
 		int SlotNum;
 		if (ItemCategory::IsHelmet(a_HeldItem.m_ItemType))
@@ -68,45 +71,45 @@ public:
 
 
 
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) const override
+	virtual bool CanRepairWithRawMaterial(const cItem & a_Item) override
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_CHAIN_BOOTS:
-			case E_ITEM_CHAIN_CHESTPLATE:
-			case E_ITEM_CHAIN_HELMET:
-			case E_ITEM_CHAIN_LEGGINGS:
+			case Item::ChainmailBoots:
+			case Item::ChainmailChestplate:
+			case Item::ChainmailHelmet:
+			case Item::ChainmailLeggings:
 			{
-				return (a_ItemType == E_ITEM_IRON);
+				return (a_Item.m_ItemType == Item::IronIngot);
 			}
-			case E_ITEM_DIAMOND_BOOTS:
-			case E_ITEM_DIAMOND_CHESTPLATE:
-			case E_ITEM_DIAMOND_HELMET:
-			case E_ITEM_DIAMOND_LEGGINGS:
+			case Item::DiamondBoots:
+			case Item::DiamondChestplate:
+			case Item::DiamondHelmet:
+			case Item::DiamondLeggings:
 			{
-				return (a_ItemType == E_ITEM_DIAMOND);
+				return (a_Item.m_ItemType == Item::Diamond);
 			}
-			case E_ITEM_IRON_BOOTS:
-			case E_ITEM_IRON_CHESTPLATE:
-			case E_ITEM_IRON_HELMET:
-			case E_ITEM_IRON_LEGGINGS:
+			case Item::IronBoots:
+			case Item::IronChestplate:
+			case Item::IronHelmet:
+			case Item::IronLeggings:
 			{
-				return (a_ItemType == E_ITEM_IRON);
+				return (a_Item.m_ItemType == Item::IronIngot);
 			}
-			case E_ITEM_GOLD_BOOTS:
-			case E_ITEM_GOLD_CHESTPLATE:
-			case E_ITEM_GOLD_HELMET:
-			case E_ITEM_GOLD_LEGGINGS:
+			case Item::GoldenBoots:
+			case Item::GoldenChestplate:
+			case Item::GoldenHelmet:
+			case Item::GoldenLeggings:
 			{
-				return (a_ItemType == E_ITEM_GOLD);
+				return (a_Item.m_ItemType == Item::GoldIngot);
 			}
-			case E_ITEM_ELYTRA:  // TODO: require Phantom Membrane instead of leather starting from protocol version 369 or 1.13 release
-			case E_ITEM_LEATHER_BOOTS:
-			case E_ITEM_LEATHER_CAP:
-			case E_ITEM_LEATHER_PANTS:
-			case E_ITEM_LEATHER_TUNIC:
+			case Item::Elytra:  // TODO: require Phantom Membrane instead of leather starting from protocol version 369 or 1.13 release
+			case Item::LeatherBoots:
+			case Item::LeatherHelmet:
+			case Item::LeatherLeggings:
+			case Item::LeatherChestplate:
 			{
-				return (a_ItemType == E_ITEM_LEATHER);
+				return (a_Item.m_ItemType == Item::Leather);
 			}
 		}
 		return false;

@@ -85,7 +85,7 @@ private:
 		}
 
 		// With shears, drop self (even tall grass and fern):
-		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == E_ITEM_SHEARS))
+		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == Item::Shears))
 		{
 			switch (a_Block.Type())
 			{

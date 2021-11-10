@@ -16,13 +16,37 @@ class cItemDyeHandler :
 	using Super = cItemHandler;
 
 public:
-	cItemDyeHandler(int a_ItemType):
+	cItemDyeHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}
 
 
-
+	static inline bool IsDye(const cItem & a_Item)
+	{
+		switch (a_Item.m_ItemType)
+		{
+			case Item::BlackDye:
+			case Item::BlueDye:
+			case Item::BrownDye:
+			case Item::BoneMeal:
+			case Item::CyanDye:
+			case Item::GrayDye:
+			case Item::GreenDye:
+			case Item::LightBlueDye:
+			case Item::LightGrayDye:
+			case Item::LimeDye:
+			case Item::MagentaDye:
+			case Item::OrangeDye:
+			case Item::PinkDye:
+			case Item::PurpleDye:
+			case Item::RedDye:
+			case Item::WhiteDye:
+			case Item::YellowDye:
+				return true;
+			default: return false;
+		}
+	}
 
 
 	virtual bool OnItemUse(

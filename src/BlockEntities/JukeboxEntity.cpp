@@ -15,7 +15,7 @@
 
 cJukeboxEntity::cJukeboxEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
 	Super(a_Block, a_Pos, a_World),
-	m_Record(0)
+	m_Record(Item::Air)
 {
 	ASSERT(a_Block.Type() == BlockType::Jukebox);
 }
@@ -83,7 +83,7 @@ bool cJukeboxEntity::UsedBy(cPlayer * a_Player)
 
 
 
-bool cJukeboxEntity::PlayRecord(int a_Record)
+bool cJukeboxEntity::PlayRecord(Item a_Record)
 {
 	if (!IsRecordItem(a_Record))
 	{
@@ -98,7 +98,7 @@ bool cJukeboxEntity::PlayRecord(int a_Record)
 	}
 
 	m_Record = a_Record;
-	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), m_Record);
+	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), PaletteUpgrade::ToItem(m_Record).first);
 	m_World->FastSetBlock(m_Pos, Block::Jukebox::Jukebox(true));
 	return true;
 }
@@ -119,7 +119,7 @@ bool cJukeboxEntity::EjectRecord(void)
 	m_World->SetBlock(m_Pos, Block::Jukebox::Jukebox(false));
 	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), 0);
 
-	m_Record = 0;
+	m_Record = Item::Air;
 	return true;
 }
 
@@ -129,14 +129,14 @@ bool cJukeboxEntity::EjectRecord(void)
 
 bool cJukeboxEntity::IsPlayingRecord(void) const
 {
-	return m_Record != 0;
+	return m_Record != Item::Air;
 }
 
 
 
 
 
-int cJukeboxEntity::GetRecord(void)
+Item cJukeboxEntity::GetRecord(void)
 {
 	return m_Record;
 }
@@ -145,7 +145,7 @@ int cJukeboxEntity::GetRecord(void)
 
 
 
-void cJukeboxEntity::SetRecord(int a_Record)
+void cJukeboxEntity::SetRecord(Item a_Record)
 {
 	m_Record = a_Record;
 }

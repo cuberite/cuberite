@@ -9,14 +9,14 @@
 
 
 
-class cItemLilypadHandler final:
+class cItemLilypadHandler:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	constexpr cItemLilypadHandler(int a_ItemType):
+	cItemLilypadHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 
@@ -26,7 +26,7 @@ public:
 
 
 
-	virtual bool IsPlaceable(void) const override
+	virtual bool IsPlaceable(void) override
 	{
 		return false;  // Set as not placeable so OnItemUse is called
 	}
@@ -42,7 +42,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) const override
+	) override
 	{
 		// The client sends BLOCK_FACE_NONE when it determines it should do a tracing-based placement.
 		// Otherwise, a normal block face is sent.

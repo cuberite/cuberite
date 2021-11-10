@@ -49,14 +49,17 @@ protected:
 
 
 
-class cItemFishingRodHandler final:
+class cItemFishingRodHandler:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	using Super::Super;
+	cItemFishingRodHandler(Item a_ItemType):
+		Super(a_ItemType)
+	{
+	}
 
 
 
@@ -69,7 +72,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) const override
+	) override
 	{
 		if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
@@ -105,7 +108,7 @@ public:
 
 
 	/** Reels back the fishing line, reeling any attached mob, or creating fished loot, or just breaking the fishing rod. */
-	void ReelIn(cWorld & a_World, cPlayer & a_Player) const
+	void ReelIn(cWorld & a_World, cPlayer & a_Player)
 	{
 		cFloaterCallback FloaterInfo;
 		a_World.DoWithEntityByID(a_Player.GetFloaterID(), FloaterInfo);
@@ -137,7 +140,7 @@ public:
 
 
 	/** Reels back the entity, specified by the ID, and damages the fishing rod accordingly. */
-	void ReelInEntity(cWorld & a_World, cPlayer & a_Player, UInt32 a_EntityID) const
+	void ReelInEntity(cWorld & a_World, cPlayer & a_Player, UInt32 a_EntityID)
 	{
 		auto PlayerPos = a_Player.GetPosition();
 		a_World.DoWithEntityByID(a_EntityID, [=](cEntity & a_Entity)
@@ -154,7 +157,7 @@ public:
 
 
 
-	void ReelInLoot(cWorld & a_World, cPlayer & a_Player, const Vector3d a_FloaterBitePos) const
+	void ReelInLoot(cWorld & a_World, cPlayer & a_Player, const Vector3d a_FloaterBitePos)
 	{
 		auto LotSLevel = std::min(a_Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLuckOfTheSea), 3u);
 
@@ -284,10 +287,8 @@ public:
 			a_Player.GetStatistics().Custom[CustomStatistic::FishCaught]++;
 		}
 
-		auto Experience = Random.RandInt(1, 6);
-
 		// Check with plugins if this loot is acceptable:
-		if (cRoot::Get()->GetPluginManager()->CallHookPlayerFishing(a_Player, Drops, Experience))
+		if (cRoot::Get()->GetPluginManager()->CallHookPlayerFishing(a_Player, Drops))
 		{
 			return;
 		}
@@ -297,10 +298,10 @@ public:
 		const float FISH_SPEED_MULT = 2.25f;
 		Vector3d FlyDirection = (a_Player.GetEyePosition() - FloaterPos).addedY(1.0f) * FISH_SPEED_MULT;
 		a_World.SpawnItemPickups(Drops, FloaterPos, FlyDirection);
-		a_World.SpawnExperienceOrb(a_Player.GetPosition(), Experience);
+		a_World.SpawnExperienceOrb(a_Player.GetPosition(), Random.RandInt(1, 6));
 		a_Player.UseEquippedItem(1);
 
 		// Notify plugins
-		cRoot::Get()->GetPluginManager()->CallHookPlayerFished(a_Player, Drops, Experience);
+		cRoot::Get()->GetPluginManager()->CallHookPlayerFished(a_Player, Drops);
 	}
 } ;

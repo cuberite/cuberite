@@ -40,7 +40,7 @@ public:
 		}
 
 		// Don't check if the player has a pumpkin on his head:
-		if (a_Player.GetEquippedHelmet().m_ItemType == 86)  // E_BLOCK_PUMPKIN)  // TODO(12xx12)
+		if (a_Player.GetEquippedHelmet().m_ItemType == Item::CarvedPumpkin)
 		{
 			return false;
 		}

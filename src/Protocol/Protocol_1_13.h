@@ -47,11 +47,11 @@ protected:
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
 	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata) const;
 	virtual UInt8 GetEntityMetadataID(EntityMetadataType a_FieldType) const;
-	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const;
+	virtual Item GetItemFromProtocolID(UInt32 a_ProtocolID) const;
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
 	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const;
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
-	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) const;
+	virtual UInt32 GetProtocolItemType(Item a_ItemID) const;
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
 	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const;
 	virtual Version GetProtocolVersion() const override;
@@ -85,9 +85,9 @@ protected:
 	virtual void SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
 	virtual void SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
 
-	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
+	virtual Item GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
 	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const override;
-	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) const override;
+	virtual UInt32 GetProtocolItemType(Item a_ItemID) const override;
 	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const override;
 	virtual Version GetProtocolVersion() const override;
 };

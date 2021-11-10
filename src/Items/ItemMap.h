@@ -7,7 +7,7 @@
 
 
 
-class cItemMapHandler final:
+class cItemMapHandler:
 	public cItemHandler
 {
 	using Super = cItemHandler;
@@ -16,9 +16,12 @@ class cItemMapHandler final:
 
 public:
 
-	using Super::Super;
+	cItemMapHandler():
+		Super(Item::FilledMap)
+	{
+	}
 
-	virtual void OnUpdate(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item) const override
+	virtual void OnUpdate(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item) override
 	{
 		cMap * Map = a_World->GetMapManager().GetMapData(static_cast<unsigned>(a_Item.m_ItemDamage));
 

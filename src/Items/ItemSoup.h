@@ -8,20 +8,20 @@
 
 
 
-class cItemSoupHandler final:
+class cItemSoupHandler:
 	public cItemFoodHandler
 {
 	using Super = cItemFoodHandler;
 
 public:
 
-	constexpr cItemSoupHandler(int a_ItemType, FoodInfo a_FoodInfo):
+	cItemSoupHandler(Item a_ItemType, FoodInfo a_FoodInfo):
 		Super(a_ItemType, a_FoodInfo)
 	{
 
 	}
 
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
 	{
 		// Skip over food handler, which does removal for us.
 		if (!cItemHandler::EatItem(a_Player, a_Item))

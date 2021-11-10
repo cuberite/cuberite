@@ -57,7 +57,7 @@ void cCompoGenSameBlock::InitializeCompoGen(cIniFile & a_IniFile)
 {
 	auto Item = GetIniItemSet(a_IniFile, "Generator", "SameBlockType", "stone");
 
-	m_Block = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(Item.m_ItemType, Item.m_ItemDamage));
+	m_Block = BlockItemConverter::FromItem(Item.m_ItemType);
 	m_IsBedrocked = (a_IniFile.GetValueSetI("Generator", "SameBlockBedrocked", 1) != 0);
 }
 
@@ -210,15 +210,15 @@ void cCompoGenClassic::InitializeCompoGen(cIniFile & a_IniFile)
 	auto BlockBottom      = GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBottom",      "stone");
 	auto BlockBeach       = GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBeach",       "sand");
 	auto BlockBeachBottom = GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBeachBottom", "sandstone");
-	auto BlockSea         = GetIniItemSet(a_IniFile, "Generator", "ClassicBlockSea",         "stationarywater");
+	auto BlockSea         = GetIniItemSet(a_IniFile, "Generator", "ClassicBlockSea",         "water");
 
 
-	m_BlockTop         = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(BlockTop.m_ItemType,         BlockTop.m_ItemDamage));
-	m_BlockMiddle      = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(BlockMiddle.m_ItemType,      BlockMiddle.m_ItemDamage));
-	m_BlockBottom      = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(BlockBottom.m_ItemType,      BlockBottom.m_ItemDamage));
-	m_BlockBeach       = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(BlockBeach.m_ItemType,       BlockBeach.m_ItemDamage));
-	m_BlockBeachBottom = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(BlockBeachBottom.m_ItemType, BlockBeachBottom.m_ItemDamage));
-	m_BlockSea         = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(BlockSea.m_ItemType,         BlockSea.m_ItemDamage));
+	m_BlockTop         = BlockItemConverter::FromItem(BlockTop.m_ItemType);
+	m_BlockMiddle      = BlockItemConverter::FromItem(BlockMiddle.m_ItemType);
+	m_BlockBottom      = BlockItemConverter::FromItem(BlockBottom.m_ItemType);
+	m_BlockBeach       = BlockItemConverter::FromItem(BlockBeach.m_ItemType);
+	m_BlockBeachBottom = BlockItemConverter::FromItem(BlockBeachBottom.m_ItemType);
+	m_BlockSea         = BlockItemConverter::FromItem(BlockSea.m_ItemType);
 }
 
 

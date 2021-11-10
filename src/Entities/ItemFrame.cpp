@@ -4,6 +4,7 @@
 #include "ItemFrame.h"
 #include "Player.h"
 #include "../ClientHandle.h"
+#include "Chunk.h"
 
 
 
@@ -26,7 +27,7 @@ void cItemFrame::OnRightClicked(cPlayer & a_Player)
 
 	if (!m_Item.IsEmpty())
 	{
-		// Item not empty, rotate, clipping values to zero to three inclusive
+		// Item not empty, rotate, clipping values to zero to seven inclusive
 		m_ItemRotation++;
 		if (m_ItemRotation >= 8)
 		{
@@ -46,6 +47,7 @@ void cItemFrame::OnRightClicked(cPlayer & a_Player)
 	}
 
 	GetWorld()->BroadcastEntityMetadata(*this);  // Update clients
+	GetParentChunk()->MarkDirty();               // Mark chunk dirty to save rotation or item
 }
 
 
@@ -97,4 +99,13 @@ void cItemFrame::SpawnOn(cClientHandle & a_ClientHandle)
 	Super::SpawnOn(a_ClientHandle);
 	a_ClientHandle.SendSpawnEntity(*this);
 	a_ClientHandle.SendEntityMetadata(*this);
+
+	if (m_Item.m_ItemType == Item::FilledMap)
+	{
+		cMap * Map = GetWorld()->GetMapManager().GetMapData(static_cast<unsigned>(m_Item.m_ItemDamage));
+		if (Map != nullptr)
+		{
+			a_ClientHandle.SendMapData(*Map, 0, 0);
+		}
+	}
 }

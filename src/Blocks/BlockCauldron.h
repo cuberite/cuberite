@@ -42,7 +42,7 @@ private:
 
 		switch (EquippedItem.m_ItemType)
 		{
-			case E_ITEM_BUCKET:
+			case Item::Bucket:
 			{
 				if (FillState == 3)
 				{
@@ -55,7 +55,7 @@ private:
 				}
 				break;
 			}
-			case E_ITEM_WATER_BUCKET:
+			case Item::WaterBucket:
 			{
 				if (FillState < 3)
 				{
@@ -69,7 +69,7 @@ private:
 				}
 				break;
 			}
-			case E_ITEM_GLASS_BOTTLE:
+			case Item::GlassBottle:
 			{
 				if (FillState > 0)
 				{
@@ -83,7 +83,7 @@ private:
 				}
 				break;
 			}
-			case E_ITEM_POTION:
+			case Item::Potion:
 			{
 				// Refill cauldron with water bottles.
 				if ((FillState < 3) && (EquippedItem.m_ItemDamage == 0))
@@ -97,10 +97,10 @@ private:
 				}
 				break;
 			}
-			case E_ITEM_LEATHER_BOOTS:
-			case E_ITEM_LEATHER_CAP:
-			case E_ITEM_LEATHER_PANTS:
-			case E_ITEM_LEATHER_TUNIC:
+			case Item::LeatherBoots:
+			case Item::LeatherHelmet:
+			case Item::LeatherLeggings:
+			case Item::LeatherChestplate:
 			{
 				// Resets any color to default:
 				if ((FillState > 0) && ((EquippedItem.m_ItemColor.GetRed() != 255) || (EquippedItem.m_ItemColor.GetBlue() != 255) || (EquippedItem.m_ItemColor.GetGreen() != 255)))
@@ -112,24 +112,22 @@ private:
 				}
 				break;
 			}
-			case E_BLOCK_BLACK_SHULKER_BOX:
-			case E_BLOCK_BLUE_SHULKER_BOX:
-			case E_BLOCK_BROWN_SHULKER_BOX:
-			case E_BLOCK_CYAN_SHULKER_BOX:
-			case E_BLOCK_GRAY_SHULKER_BOX:
-			case E_BLOCK_GREEN_SHULKER_BOX:
-			case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
-			case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
-			case E_BLOCK_LIME_SHULKER_BOX:
-			case E_BLOCK_MAGENTA_SHULKER_BOX:
-			case E_BLOCK_ORANGE_SHULKER_BOX:
-			case E_BLOCK_PINK_SHULKER_BOX:
-			case E_BLOCK_RED_SHULKER_BOX:
-			case E_BLOCK_YELLOW_SHULKER_BOX:
+			case Item::BlackShulkerBox:
+			case Item::BlueShulkerBox:
+			case Item::BrownShulkerBox:
+			case Item::CyanShulkerBox:
+			case Item::GrayShulkerBox:
+			case Item::GreenShulkerBox:
+			case Item::LightBlueShulkerBox:
+			case Item::LightGrayShulkerBox:
+			case Item::LimeShulkerBox:
+			case Item::MagentaShulkerBox:
+			case Item::OrangeShulkerBox:
+			case Item::PinkShulkerBox:
+			case Item::RedShulkerBox:
+			case Item::YellowShulkerBox:
 			{
 				// Resets shulker box color.
-
-				// TODO: When there is an actual default shulker box add the appropriate changes here! - 19.09.2020 - 12xx12
 				if (FillState == 0)
 				{
 					// The cauldron is empty:
@@ -139,10 +137,11 @@ private:
 				// Proceed with normal cleaning:
 				a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(--FillState));
 				auto NewShulker = cItem(EquippedItem);
-				NewShulker.m_ItemType = E_BLOCK_PURPLE_SHULKER_BOX;
+				NewShulker.m_ItemType = Item::ShulkerBox;
 				a_Player.ReplaceOneEquippedItemTossRest(NewShulker);
 				break;
 			}
+			default: break;
 		}
 
 		if (!ItemHandler(EquippedItem.m_ItemType)->IsPlaceable())

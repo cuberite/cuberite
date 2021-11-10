@@ -66,7 +66,7 @@ private:
 	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// Only drops self when using shears, otherwise drops nothing:
-		if ((a_Tool == nullptr) || (a_Tool->m_ItemType != E_ITEM_SHEARS))
+		if ((a_Tool == nullptr) || (a_Tool->m_ItemType != Item::Shears))
 		{
 			return {};
 		}
@@ -195,7 +195,7 @@ private:
 
 	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, Vector3i a_Position, BlockState a_ClickedBlock, eBlockFace a_ClickedBlockFace, bool a_ClickedDirectly) const override
 	{
-		return !a_ClickedDirectly || (BlockItemConverter::FromItem(PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage)) != m_BlockType);
+		return !a_ClickedDirectly || (BlockItemConverter::FromItem(a_HeldItem.m_ItemType) != m_BlockType);
 	}
 
 

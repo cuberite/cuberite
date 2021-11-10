@@ -710,7 +710,7 @@ void cWindow::OnMiddlePaintEnd(cPlayer & a_Player)
 
 
 
-int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums, bool a_LimitItems)
+char cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums, bool a_LimitItems)
 {
 	if (a_LimitItems && (static_cast<size_t>(a_Item.m_ItemCount) < a_SlotNums.size()))
 	{
@@ -720,7 +720,7 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 	}
 
 	// Distribute to individual slots, keep track of how many items were actually distributed (full stacks etc.)
-	int NumDistributed = 0;
+	char NumDistributed = 0;
 	for (cSlotNums::const_iterator itr = a_SlotNums.begin(), end = a_SlotNums.end(); itr != end; ++itr)
 	{
 		int LocalSlotNum = 0;

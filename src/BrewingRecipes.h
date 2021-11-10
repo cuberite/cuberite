@@ -23,8 +23,8 @@ public:
 		cRecipe()
 		{
 			// These items always have the same type
-			Input.m_ItemType = E_ITEM_POTION;
-			Output.m_ItemType = E_ITEM_POTION;
+			Input.m_ItemType = Item::Potion;
+			Output.m_ItemType = Item::Potion;
 		}
 
 		cItem Input;

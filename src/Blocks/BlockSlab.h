@@ -475,7 +475,7 @@ private:
 		For us to be replaced, the player must be:
 		1. Placing the same slab material.
 		2. and existing slab is single. */
-		if ((m_BlockType !=  BlockItemConverter::FromItem(PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage))) || IsSlabFull(a_ClickedBlock))
+		if ((m_BlockType !=  BlockItemConverter::FromItem(a_HeldItem.m_ItemType)) || IsSlabFull(a_ClickedBlock))
 		{
 			return false;
 		}
@@ -499,7 +499,7 @@ private:
 			eBlockFace a_BlockFace
 	) const override
 	{
-		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_Player.GetEquippedItem().m_ItemType != static_cast<short>(m_BlockType)))
+		if ((a_BlockFace == BLOCK_FACE_NONE) || (BlockItemConverter::FromItem(a_Player.GetEquippedItem().m_ItemType) != m_BlockType))
 		{
 			return;
 		}

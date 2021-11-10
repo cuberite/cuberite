@@ -13,7 +13,7 @@ class cItemPickaxeHandler:
 
 public:
 
-	cItemPickaxeHandler(int a_ItemType):
+	cItemPickaxeHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 
@@ -38,11 +38,11 @@ public:
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_WOODEN_PICKAXE:  return 1;
-			case E_ITEM_GOLD_PICKAXE:    return 1;
-			case E_ITEM_STONE_PICKAXE:   return 2;
-			case E_ITEM_IRON_PICKAXE:    return 3;
-			case E_ITEM_DIAMOND_PICKAXE: return 4;
+			case Item::WoodenPickaxe:  return 1;
+			case Item::GoldenPickaxe:  return 1;
+			case Item::StonePickaxe:   return 2;
+			case Item::IronPickaxe:    return 3;
+			case Item::DiamondPickaxe: return 4;
 
 			default: return 0;
 		}
@@ -238,14 +238,13 @@ public:
 		}
 	}
 
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
+	virtual bool CanRepairWithRawMaterial(const cItem & a_Item) override
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_WOODEN_PICKAXE:
+			case Item::WoodenPickaxe:
 			{
-				auto NewItem = PaletteUpgrade::FromItem(a_ItemType, 0);
-				switch (NewItem)
+				switch (a_Item.m_ItemType)
 				{
 					case Item::AcaciaPlanks:
 					case Item::BirchPlanks:
@@ -259,21 +258,20 @@ public:
 					default: return false;
 				}
 			}
-			case E_ITEM_STONE_PICKAXE:
+			case Item::StonePickaxe:
 			{
-				auto NewItem = PaletteUpgrade::FromItem(a_ItemType, 0);
-				switch (NewItem)
+				switch (a_Item.m_ItemType)
 				{
 					case Item::Cobblestone:
 						return true;
 					default: return false;
 				}
 			}
-			case E_ITEM_IRON_PICKAXE:    return (a_ItemType == E_ITEM_IRON);
-			case E_ITEM_GOLD_PICKAXE:    return (a_ItemType == E_ITEM_GOLD);
-			case E_ITEM_DIAMOND_PICKAXE: return (a_ItemType == E_ITEM_DIAMOND);
+			case Item::IronPickaxe:    return (a_Item.m_ItemType == Item::IronIngot);
+			case Item::GoldenPickaxe:  return (a_Item.m_ItemType == Item::GoldIngot);
+			case Item::DiamondPickaxe: return (a_Item.m_ItemType == Item::Diamond);
+			default: return false;
 		}
-		return false;
 	}
 
 
@@ -287,11 +285,12 @@ public:
 		{
 			switch (m_ItemType)
 			{
-				case E_ITEM_WOODEN_PICKAXE:  return 2.0f;
-				case E_ITEM_STONE_PICKAXE:   return 4.0f;
-				case E_ITEM_IRON_PICKAXE:    return 6.0f;
-				case E_ITEM_GOLD_PICKAXE:    return 12.0f;
-				case E_ITEM_DIAMOND_PICKAXE: return 8.0f;
+				case Item::WoodenPickaxe:  return 2.0f;
+				case Item::StonePickaxe:   return 4.0f;
+				case Item::IronPickaxe:    return 6.0f;
+				case Item::GoldenPickaxe:  return 12.0f;
+				case Item::DiamondPickaxe: return 8.0f;
+				default: return 0.0f;
 			}
 		}
 		ASSERT(!"Something is wrong here... Maybe they are pickaxes out of a new material?");

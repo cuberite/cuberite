@@ -39,7 +39,7 @@ private:
 		}
 
 		// Set the correct metadata based on player equipped item:
-		if (!a_Player.PlaceBlock(a_PlacePosition, BlockItemConverter::FromItem(PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage))))
+		if (!a_Player.PlaceBlock(a_PlacePosition, BlockItemConverter::FromItem(a_HeldItem.m_ItemType)))
 		{
 			return false;
 		}

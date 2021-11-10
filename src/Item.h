@@ -1,4 +1,5 @@
 
+
 // Item.h
 
 // Declares the cItem class representing an item (in the inventory sense)
@@ -63,14 +64,10 @@ public:
 	/** Empties the item and frees up any dynamic storage used by the internals. */
 	void Empty(void);
 
-	/** Empties the item and frees up any dynamic storage used by the internals.
-	TODO: What is the usage difference? Merge with Empty()? */
-	void Clear(void);
-
 	/** Returns true if the item represents an empty stack - either the type is invalid, or count is zero. */
 	bool IsEmpty(void) const
 	{
-		return ((m_ItemType <= 0) || (m_ItemCount <= 0));
+		return ((m_ItemType == Item::Air) || (m_ItemCount <= 0));
 	}
 
 	/* Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.)
@@ -137,7 +134,7 @@ public:
 	/** Returns true if the specified item type is enchantable.
 	If FromBook is true, the function is used in the anvil inventory with book enchantments.
 	So it checks the "only book enchantments" too. Example: You can only enchant a hoe with a book. */
-	static bool IsEnchantable(short a_ItemType, bool a_FromBook = false);  // tolua_export
+	static bool IsEnchantable(Item a_ItemType, bool a_FromBook = false);  // tolua_export
 
 	/** Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0 */
 	unsigned GetEnchantability();  // tolua_export
@@ -162,7 +159,7 @@ public:
 
 	// tolua_begin
 
-	short          m_ItemType;
+	Item           m_ItemType;
 	char           m_ItemCount;
 	short          m_ItemDamage;
 	cEnchantments  m_Enchantments;

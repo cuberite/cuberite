@@ -989,6 +989,7 @@ namespace BlockItemConverter
 				return BlockType::Air;
 			}
 		}
+		return BlockType::Air;
 	}
 
 	Item FromBlock(BlockType a_Block)

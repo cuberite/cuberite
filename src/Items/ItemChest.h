@@ -15,7 +15,7 @@ class cItemChestHandler:
 
 public:
 
-	cItemChestHandler(int a_ItemType):
+	cItemChestHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

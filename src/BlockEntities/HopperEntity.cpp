@@ -449,7 +449,7 @@ bool cHopperEntity::MoveItemsFromFurnace(cChunk & a_Chunk)
 	}
 
 	// No output moved, check if we can move an empty bucket out of the fuel slot:
-	if (furnace->GetFuelSlot().m_ItemType == E_ITEM_BUCKET)
+	if (furnace->GetFuelSlot().m_ItemType == Item::Bucket)
 	{
 		if (MoveItemsFromSlot(*furnace, cFurnaceEntity::fsFuel))
 		{

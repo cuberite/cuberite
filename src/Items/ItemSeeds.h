@@ -15,7 +15,7 @@ class cItemSeedsHandler:
 
 public:
 
-	cItemSeedsHandler(int a_ItemType):
+	cItemSeedsHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 

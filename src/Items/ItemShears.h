@@ -18,7 +18,7 @@ class cItemShearsHandler:
 
 public:
 
-	cItemShearsHandler(int a_ItemType):
+	cItemShearsHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

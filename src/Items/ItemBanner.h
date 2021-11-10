@@ -20,7 +20,7 @@ class cItemBannerHandler:
 
 public:
 
-	cItemBannerHandler(int a_ItemType):
+	cItemBannerHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

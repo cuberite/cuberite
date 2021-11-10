@@ -377,15 +377,14 @@ void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClum
 		for (const auto & BlockName : Blocks)
 		{
 			cItem Block;
-			if (!StringToItem(BlockName, Block) || !IsValidBlock(Block.m_ItemType))
+			if (!StringToItem(BlockName, Block) || (Block.m_ItemType != Item::Air))
 			{
 				LOGWARNING("Block \"%s\" is invalid", BlockName.c_str());
 				continue;
 			}
 
 			// Construct the FoliageInfo:
-			auto InsertBlockType = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(Block.m_ItemType, Block.m_ItemDamage));
-			a_Output[BiomeIndex].m_Blocks.emplace_back(InsertBlockType, 100);
+			a_Output[BiomeIndex].m_Blocks.emplace_back(BlockItemConverter::FromItem(Block.m_ItemType), 100);
 		}
 	}
 }

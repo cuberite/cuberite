@@ -1,6 +1,6 @@
 
 #pragma once
-
+#include "Registries/Items.h"
 
 
 
@@ -314,7 +314,6 @@ enum eExplosionSource
 	esOther,
 	esPlugin,
 	esPrimedTNT,
-	esTNTMinecart,
 	esWitherBirth,
 	esWitherSkull,
 	esMax,
@@ -448,28 +447,6 @@ enum class BossBarDivisionType
 	TwentyNotches
 };
 
-
-
-
-
-enum class eGameStateReason
-{
-	NoRespawnBlock,
-	RainStarted,
-	RainStopped,
-	GamemodeChanged,
-	WinGame,
-	DemoMessageShown,
-	ProjectileHitPlayer,
-	RainGradientChanged,
-	ThunderGradientChanged,
-	PufferfishString,
-	ElderGuardianEffect,
-	ImmediateRespawn,
-	LimitedCraftingToggled,
-	InitialChunksComing
-};
-
 // tolua_end
 
 
@@ -526,6 +503,11 @@ enum class EntityAnimation
 	PlayerMainHandSwings,
 	// PlayerReducedDebugScreenDisables,
 	// PlayerReducedDebugScreenEnables,
+	// PlayerSetsOperatorLevelFour,
+	// PlayerSetsOperatorLevelOne,
+	// PlayerSetsOperatorLevelThree,
+	// PlayerSetsOperatorLevelTwo,
+	// PlayerSetsOperatorLevelZero,
 	PlayerOffHandSwings,
 	RabbitJumps,
 	RavagerAttacks,
@@ -605,8 +587,12 @@ If a_Inverse is true, the opposite direction is used instead. */
 void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBlockFace a_BlockFace, bool a_bInverse = false);
 
 /** Returns the coords of a block that is neighboring the specified position through its specified face.
-If a_InvertDirection is true, the opposite direction is used instead. */
-Vector3i AddFaceDirection(Vector3i a_Pos, eBlockFace a_BlockFace, bool a_InvertDirection = false);
+If a_IsInverse is true, the opposite direction is used instead. */
+inline Vector3i AddFaceDirection(Vector3i a_Pos, eBlockFace a_BlockFace, bool a_bInverse = false)
+{
+	AddFaceDirection(a_Pos.x, a_Pos.y, a_Pos.z, a_BlockFace, a_bInverse);
+	return a_Pos;
+}
 
 // tolua_end
 
@@ -676,33 +662,31 @@ inline double NormalizeAngleDegrees(const double a_Degrees)
 
 namespace ItemCategory
 {
-	bool IsPickaxe(short a_ItemType);
+	bool IsPickaxe(Item a_ItemType);
 
-	bool IsAxe(short a_ItemType);
+	bool IsAxe(Item a_ItemType);
 
-	bool IsSword(short a_ItemType);
+	bool IsSword(Item a_ItemType);
 
-	bool IsHoe(short a_ItemType);
+	bool IsHoe(Item a_ItemType);
 
-	bool IsShovel(short a_ItemType);
+	bool IsShovel(Item a_ItemType);
 
-	bool IsTool(short a_ItemType);
+	bool IsTool(Item a_ItemType);
 
-	bool IsHelmet(short a_ItemType);
+	bool IsHelmet(Item a_ItemType);
 
-	bool IsChestPlate(short a_ItemType);
+	bool IsChestPlate(Item a_ItemType);
 
-	bool IsLeggings(short a_ItemType);
+	bool IsLeggings(Item a_ItemType);
 
-	bool IsBoots(short a_ItemType);
+	bool IsBoots(Item a_ItemType);
 
-	bool IsMinecart(short a_ItemType);
+	bool IsMinecart(Item a_ItemType);
 
-	bool IsArmor(short a_ItemType);
+	bool IsArmor(Item a_ItemType);
 
-	bool IsHorseArmor(short a_ItemType);
-
-	bool IsVillagerFood(short a_ItemType);
+	bool IsHorseArmor(Item a_ItemType);
 }
 
 // tolua_end

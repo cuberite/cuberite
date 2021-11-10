@@ -783,6 +783,7 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 		return false;
 	}
 
+	short ItemType = 0;
 	if (a_NBT.GetType(Type) == TAG_String)
 	{
 		if (!StringToItem(a_NBT.GetString(Type), a_Item))
@@ -793,23 +794,30 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	}
 	else if (a_NBT.GetType(Type) == TAG_Short)
 	{
-		a_Item.m_ItemType = a_NBT.GetShort(Type);
+		ItemType = a_NBT.GetShort(Type);
 	}
 	else
 	{
 		return false;
 	}
 
-	if (a_Item.m_ItemType < 0)
+	if (ItemType < 0)
 	{
 		a_Item.Empty();
 		return true;
 	}
 
+	short ItemDamage = 0;
 	int Damage = a_NBT.FindChildByName(a_TagIdx, "Damage");
 	if ((Damage > 0) && (a_NBT.GetType(Damage) == TAG_Short))
 	{
-		a_Item.m_ItemDamage = a_NBT.GetShort(Damage);
+		ItemDamage = a_NBT.GetShort(Damage);
+	}
+
+	a_Item.m_ItemType = PaletteUpgrade::FromItem(ItemType, ItemDamage);
+	if (a_Item.GetHandler()->IsTool())  // Can sustain damage
+	{
+		a_Item.m_ItemDamage = ItemDamage;
 	}
 
 	int Count = a_NBT.FindChildByName(a_TagIdx, "Count");
@@ -860,7 +868,7 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	}
 
 	// Load enchantments:
-	const char * EnchName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
+	const char * EnchName = (a_Item.m_ItemType == Item::EnchantedBook) ? "StoredEnchantments" : "ench";
 	int EnchTag = a_NBT.FindChildByName(TagTag, EnchName);
 	if (EnchTag > 0)
 	{
@@ -868,7 +876,7 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	}
 
 	// Load firework data:
-	int FireworksTag = a_NBT.FindChildByName(TagTag, ((a_Item.m_ItemType == E_ITEM_FIREWORK_STAR) ? "Explosion" : "Fireworks"));
+	int FireworksTag = a_NBT.FindChildByName(TagTag, ((a_Item.m_ItemType == Item::FireworkStar) ? "Explosion" : "Fireworks"));
 	if (FireworksTag > 0)
 	{
 		cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, a_NBT, FireworksTag, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
@@ -1311,6 +1319,8 @@ OwnedBlockEntity cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a
 	auto FlowerPot = std::make_unique<cFlowerPotEntity>(a_Block, a_Pos, m_World);
 	cItem Item;
 
+	short ItemType = 0, ItemDamage = 0;
+
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Item");
 	if (currentLine >= 0)
 	{
@@ -1320,14 +1330,19 @@ OwnedBlockEntity cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a
 		}
 		else if (a_NBT.GetType(currentLine) == TAG_Int)
 		{
-			Item.m_ItemType = static_cast<short>(a_NBT.GetInt(currentLine));
+			ItemType = static_cast<short>(a_NBT.GetInt(currentLine));
 		}
 	}
 
 	currentLine = a_NBT.FindChildByName(a_TagIdx, "Data");
 	if ((currentLine >= 0) && (a_NBT.GetType(currentLine) == TAG_Int))
 	{
-		Item.m_ItemDamage = static_cast<short>(a_NBT.GetInt(currentLine));
+		ItemDamage = static_cast<short>(a_NBT.GetInt(currentLine));
+	}
+
+	if (ItemType != 0)
+	{
+		Item.m_ItemType = PaletteUpgrade::FromItem(ItemType, ItemDamage);
 	}
 
 	FlowerPot->SetItem(Item);
@@ -1434,7 +1449,7 @@ OwnedBlockEntity cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_T
 	int Record = a_NBT.FindChildByName(a_TagIdx, "Record");
 	if (Record >= 0)
 	{
-		Jukebox->SetRecord(a_NBT.GetInt(Record));
+		Jukebox->SetRecord(PaletteUpgrade::FromItem(a_NBT.GetInt(Record), 0));
 	}
 	return Jukebox;
 }

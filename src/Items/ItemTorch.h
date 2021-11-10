@@ -39,7 +39,7 @@ private:
 
 		BlockState BlockToPlace;
 
-		switch (BlockItemConverter::FromItem(PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage)))
+		switch (BlockItemConverter::FromItem(a_HeldItem.m_ItemType))
 		{
 			case BlockType::Torch:
 			case BlockType::WallTorch:

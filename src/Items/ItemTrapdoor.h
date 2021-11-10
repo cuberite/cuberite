@@ -60,7 +60,7 @@ private:
 		BlockState BlockToPlace;
 
 		using namespace Block;
-		switch (BlockItemConverter::FromItem(PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage)))
+		switch (BlockItemConverter::FromItem(a_HeldItem.m_ItemType))
 		{
 			case BlockType::AcaciaTrapdoor:
 			{

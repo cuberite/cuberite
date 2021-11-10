@@ -228,7 +228,7 @@ void cFurnaceEntity::BurnNewFuel(void)
 	// Burn one new fuel:
 	SetBurnTimes(NewTime, 0);
 	SetIsCooking(true);
-	if (m_Contents.GetSlot(fsFuel).m_ItemType == E_ITEM_LAVA_BUCKET)
+	if (m_Contents.GetSlot(fsFuel).m_ItemType == Item::LavaBucket)
 	{
 		m_Contents.SetSlot(fsFuel, cItem(Item::Bucket));
 	}

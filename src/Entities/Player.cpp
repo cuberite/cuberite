@@ -678,7 +678,7 @@ void cPlayer::SetCrouch(const bool a_ShouldCrouch)
 
 void cPlayer::SetElytraFlight(const bool a_ShouldElytraFly)
 {
-	if (a_ShouldElytraFly && IsStanding() && !IsOnGround() && !IsInWater() && !IsRiding() && (GetEquippedChestplate().m_ItemType == E_ITEM_ELYTRA))
+	if (a_ShouldElytraFly && IsStanding() && !IsOnGround() && !IsInWater() && !IsRiding() && (GetEquippedChestplate().m_ItemType == Item::Elytra))
 	{
 		m_BodyStance = BodyStanceGliding(*this);
 	}
@@ -2127,7 +2127,7 @@ void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
 	if (m_Inventory.DamageItem(a_SlotNumber, ReducedDamage))
 	{
 		// The item broke. Broadcast the correct animation:
-		if (Item.m_ItemType == E_ITEM_SHIELD)
+		if (Item.m_ItemType == Item::Shield)
 		{
 			m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnShieldBreaks);
 		}
@@ -2147,7 +2147,7 @@ void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
 			}
 		}
 	}
-	else if (Item.m_ItemType == E_ITEM_SHIELD)
+	else if (Item.m_ItemType == Item::Shield)
 	{
 		// The item survived. Special case for shield blocking:
 		m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnShieldBlocks);
@@ -2216,7 +2216,7 @@ void cPlayer::HandleFood(void)
 
 void cPlayer::HandleFloater()
 {
-	if (GetEquippedItem().m_ItemType == E_ITEM_FISHING_ROD)
+	if (GetEquippedItem().m_ItemType == Item::FishingRod)
 	{
 		return;
 	}
@@ -2842,11 +2842,6 @@ bool cPlayer::CanInstantlyMine(BlockState a_Block)
 
 void cPlayer::AddKnownItem(const cItem & a_Item)
 {
-	if (a_Item.m_ItemType < 0)
-	{
-		return;
-	}
-
 	auto Response = m_KnownItems.insert(a_Item.CopyOne());
 	if (!Response.second)
 	{
@@ -3297,7 +3292,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 
 		// Check if flight is still possible:
-		if (IsOnGround() || IsInWater() || IsRiding() || (GetEquippedChestplate().m_ItemType != E_ITEM_ELYTRA))
+		if (IsOnGround() || IsInWater() || IsRiding() || (GetEquippedChestplate().m_ItemType != Item::Elytra))
 		{
 			SetElytraFlight(false);
 		}

@@ -70,7 +70,7 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 		// Attach the player to this pig
 		a_Player.AttachTo(this);
 	}
-	else if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE)
+	else if (a_Player.GetEquippedItem().m_ItemType == Item::Saddle)
 	{
 		if (!a_Player.IsGameModeCreative())
 		{
@@ -99,7 +99,7 @@ void cPig::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// If the attachee player is holding a carrot-on-stick, let them drive this pig:
 	if (m_bIsSaddled && (m_Attachee != nullptr))
 	{
-		if (m_Attachee->IsPlayer() && (m_Attachee->GetEquippedWeapon().m_ItemType == E_ITEM_CARROT_ON_STICK))
+		if (m_Attachee->IsPlayer() && (m_Attachee->GetEquippedWeapon().m_ItemType == Item::CarrotOnAStick))
 		{
 			MoveToPosition((m_Attachee->GetPosition()) + (m_Attachee->GetLookVector()*10));
 		}

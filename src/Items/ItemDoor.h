@@ -16,7 +16,7 @@ class cItemDoorHandler:
 
 public:
 
-	cItemDoorHandler(int a_ItemType):
+	cItemDoorHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 
