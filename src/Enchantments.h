@@ -126,7 +126,7 @@ public:
 	static unsigned int GetLevelCap(int a_EnchantmentID);
 
 	/** Add enchantment weights from item to the vector */
-	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, unsigned a_EnchantmentLevel);
+	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, Item a_ItemType, unsigned a_EnchantmentLevel);
 
 	/** Add a enchantment with weight to the vector */
 	static void AddEnchantmentWeightToVector(cWeightedEnchantments & a_Enchantments, int a_Weight, int a_EnchantmentID, unsigned int a_EnchantmentLevel);

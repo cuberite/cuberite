@@ -22,7 +22,7 @@ private:
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		using namespace Block;
-		switch (BlockItemConverter::FromItem(PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage)))
+		switch (BlockItemConverter::FromItem(a_HeldItem.m_ItemType))
 		{
 			// TODO(12xx12) Check for neighbours
 			case BlockType::AcaciaFenceGate:  return a_Player.PlaceBlock(a_PlacePosition, AcaciaFenceGate::AcaciaFenceGate(RotationToBlockFace(a_Player.GetYaw()), false, false, false));

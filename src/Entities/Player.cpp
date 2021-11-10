@@ -144,6 +144,7 @@ cPlayer::cPlayer(const std::shared_ptr<cClientHandle> & a_Client) :
 	m_BowCharge(0),
 	m_FloaterID(cEntity::INVALID_ID),
 	m_Team(nullptr),
+	m_Spectating(nullptr),
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
 	m_SkinParts(0)
 {
@@ -662,6 +663,13 @@ void cPlayer::SetCrouch(const bool a_ShouldCrouch)
 	if (a_ShouldCrouch && IsStanding())
 	{
 		m_BodyStance = BodyStanceCrouching(*this);
+
+		// Handle spectator mode detach:
+		if (IsGameModeSpectator())
+		{
+			SpectateEntity(nullptr);
+		}
+
 		cRoot::Get()->GetPluginManager()->CallHookPlayerCrouched(*this);
 	}
 	else if (!a_ShouldCrouch && IsCrouched())
@@ -678,7 +686,7 @@ void cPlayer::SetCrouch(const bool a_ShouldCrouch)
 
 void cPlayer::SetElytraFlight(const bool a_ShouldElytraFly)
 {
-	if (a_ShouldElytraFly && IsStanding() && !IsOnGround() && !IsInWater() && !IsRiding() && (GetEquippedChestplate().m_ItemType == E_ITEM_ELYTRA))
+	if (a_ShouldElytraFly && IsStanding() && !IsOnGround() && !IsInWater() && !IsRiding() && (GetEquippedChestplate().m_ItemType == Item::Elytra))
 	{
 		m_BodyStance = BodyStanceGliding(*this);
 	}
@@ -780,28 +788,38 @@ void cPlayer::SetCustomName(const AString & a_CustomName)
 
 
 
-void cPlayer::SetBedPos(const Vector3i & a_Pos)
+void cPlayer::SetBedPos(const Vector3i a_Position)
 {
-	m_LastBedPos = a_Pos;
-	m_SpawnWorldName = m_World->GetName();
+	SetBedPos(a_Position, *m_World);
 }
 
 
 
 
 
-void cPlayer::SetBedPos(const Vector3i & a_Pos, cWorld * a_World)
+void cPlayer::SetBedPos(const Vector3i a_Position, const cWorld & a_World)
 {
-	m_LastBedPos = a_Pos;
-	ASSERT(a_World != nullptr);
-	m_SpawnWorldName = a_World->GetName();
+	m_RespawnPosition = a_Position;
+	m_IsRespawnPointForced = false;
+	m_SpawnWorldName = a_World.GetName();
 }
 
 
 
 
 
-cWorld * cPlayer::GetBedWorld()
+void cPlayer::SetRespawnPosition(const Vector3i a_Position, const cWorld & a_World)
+{
+	m_RespawnPosition = a_Position;
+	m_IsRespawnPointForced = true;
+	m_SpawnWorldName = a_World.GetName();
+}
+
+
+
+
+
+cWorld * cPlayer::GetRespawnWorld()
 {
 	if (const auto World = cRoot::Get()->GetWorld(m_SpawnWorldName); World != nullptr)
 	{
@@ -867,65 +885,8 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
-	cPluginManager * PluginManager = cRoot::Get()->GetPluginManager();
 
-	if (a_TDI.Attacker == nullptr)
-	{
-		const AString DamageText = [&]
-			{
-				switch (a_TDI.DamageType)
-				{
-					case dtRangedAttack:    return "was shot";
-					case dtLightning:       return "was plasmified by lightining";
-					case dtFalling:         return GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard";
-					case dtDrowning:        return "drowned";
-					case dtSuffocating:     return GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block";
-					case dtStarving:        return "forgot the importance of food";
-					case dtCactusContact:   return "was impaled on a cactus";
-					case dtMagmaContact:    return "discovered the floor was lava";
-					case dtLavaContact:     return "was melted by lava";
-					case dtPoisoning:       return "died from septicaemia";
-					case dtWithering:       return "is a husk of their former selves";
-					case dtOnFire:          return "forgot to stop, drop, and roll";
-					case dtFireContact:     return "burnt themselves to death";
-					case dtInVoid:          return "somehow fell out of the world";
-					case dtPotionOfHarming: return "was magicked to death";
-					case dtEnderPearl:      return "misused an ender pearl";
-					case dtAdmin:           return "was administrator'd";
-					case dtExplosion:       return "blew up";
-					case dtAttack:          return "was attacked by thin air";
-					case dtEnvironment:     return "played too much dress up";  // This is not vanilla - added a own pun
-				}
-				UNREACHABLE("Unsupported damage type");
-			}();
-		AString DeathMessage = Printf("%s %s", GetName().c_str(), DamageText.c_str());
-		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (DeathMessage != AString(""))
-		{
-			GetWorld()->BroadcastChatDeath(DeathMessage);
-		}
-	}
-	else if (a_TDI.Attacker->IsPlayer())
-	{
-		cPlayer * Killer = static_cast<cPlayer *>(a_TDI.Attacker);
-		AString DeathMessage = Printf("%s was killed by %s", GetName().c_str(), Killer->GetName().c_str());
-		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (DeathMessage != AString(""))
-		{
-			GetWorld()->BroadcastChatDeath(DeathMessage);
-		}
-	}
-	else
-	{
-		AString KillerClass = a_TDI.Attacker->GetClass();
-		KillerClass.erase(KillerClass.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
-		AString DeathMessage = Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str());
-		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (DeathMessage != AString(""))
-		{
-			GetWorld()->BroadcastChatDeath(DeathMessage);
-		}
-	}
+	BroadcastDeathMessage(a_TDI);
 
 	m_Stats.Custom[CustomStatistic::Deaths]++;
 	m_Stats.Custom[CustomStatistic::TimeSinceDeath] = 0;
@@ -937,21 +898,34 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 
 
-void cPlayer::Killed(cEntity * a_Victim)
+void cPlayer::Killed(const cEntity & a_Victim, eDamageType a_DamageType)
 {
 	cScoreboard & ScoreBoard = m_World->GetScoreBoard();
 
-	if (a_Victim->IsPlayer())
+	if (a_Victim.IsPlayer())
 	{
 		m_Stats.Custom[CustomStatistic::PlayerKills]++;
 
 		ScoreBoard.AddPlayerScore(GetName(), cObjective::otPlayerKillCount, 1);
 	}
-	else if (a_Victim->IsMob())
+	else if (a_Victim.IsMob())
 	{
-		if (static_cast<cMonster *>(a_Victim)->GetMobFamily() == cMonster::mfHostile)
+		const auto & Monster = static_cast<const cMonster &>(a_Victim);
+
+		if (Monster.GetMobFamily() == cMonster::mfHostile)
 		{
 			AwardAchievement(CustomStatistic::AchKillEnemy);
+		}
+
+		if ((Monster.GetMobType() == eMonsterType::mtSkeleton) && (a_DamageType == eDamageType::dtRangedAttack))
+		{
+			const double DistX = GetPosX() - Monster.GetPosX();
+			const double DistZ = GetPosZ() - Monster.GetPosZ();
+
+			if ((DistX * DistX + DistZ * DistZ) >= 2500.0)
+			{
+				AwardAchievement(CustomStatistic::AchSnipeSkeleton);
+			}
 		}
 
 		m_Stats.Custom[CustomStatistic::MobKills]++;
@@ -984,14 +958,33 @@ void cPlayer::Respawn(void)
 	// Extinguish the fire:
 	StopBurning();
 
-	if (const auto BedWorld = GetBedWorld(); m_World != BedWorld)
+	// Disable flying:
+	SetFlying(false);
+
+	if (!m_IsRespawnPointForced)
 	{
-		MoveToWorld(*BedWorld, GetLastBedPos(), false, false);
+		// Check if the bed is still present:
+		if (GetRespawnWorld()->GetBlock(m_RespawnPosition) != E_BLOCK_BED)
+		{
+			const auto & DefaultWorld = *cRoot::Get()->GetDefaultWorld();
+
+			// If not, reset spawn to default and inform:
+			SetRespawnPosition(Vector3i(DefaultWorld.GetSpawnX(), DefaultWorld.GetSpawnY(), DefaultWorld.GetSpawnZ()), DefaultWorld);
+			SendAboveActionBarMessage("Your home bed was missing or obstructed");
+		}
+
+		// TODO: bed obstruction check here
+	}
+
+
+	if (const auto RespawnWorld = GetRespawnWorld(); m_World != RespawnWorld)
+	{
+		MoveToWorld(*RespawnWorld, m_RespawnPosition, false, false);
 	}
 	else
 	{
 		m_ClientHandle->SendRespawn(m_World->GetDimension(), true);
-		TeleportToCoords(GetLastBedPos().x, GetLastBedPos().y, GetLastBedPos().z);
+		TeleportToCoords(m_RespawnPosition.x, m_RespawnPosition.y, m_RespawnPosition.z);
 	}
 
 	SetVisible(true);
@@ -1397,7 +1390,7 @@ void cPlayer::AwardAchievement(const CustomStatistic a_Ach)
 		Msg.SetMessageType(mtSuccess);
 		// TODO: cCompositeChat should not use protocol-specific strings
 		// Msg.AddShowAchievementPart(GetName(), nameNew);
-		Msg.AddTextPart("Achivement get!");
+		Msg.AddTextPart("Achievement get!");
 		m_World->BroadcastChat(Msg);
 	}
 
@@ -1476,17 +1469,30 @@ void cPlayer::SendRotation(double a_YawDegrees, double a_PitchDegrees)
 
 
 
-void cPlayer::SpectateEntity(cEntity * a_Target)
+void cPlayer::SpectateEntity(const cEntity * a_Target)
 {
-	if ((a_Target == nullptr) || (static_cast<cEntity *>(this) == a_Target))
+	if (a_Target == this)
 	{
-		GetClientHandle()->SendCameraSetTo(*this);
-		m_AttachedTo = nullptr;
+		// Canonicalise self-pointers:
+		a_Target = nullptr;
+	}
+
+	if (m_Spectating == a_Target)
+	{
+		// Already spectating requested target:
 		return;
 	}
 
-	m_AttachedTo = a_Target;
-	GetClientHandle()->SendCameraSetTo(*m_AttachedTo);
+	if (a_Target == nullptr)
+	{
+		m_ClientHandle->SendCameraSetTo(*this);
+		m_ClientHandle->SendPlayerMoveLook();
+		m_Spectating = nullptr;
+		return;
+	}
+
+	m_Spectating = a_Target;
+	m_ClientHandle->SendCameraSetTo(*a_Target);
 }
 
 
@@ -1813,7 +1819,7 @@ void cPlayer::LoadFromDisk()
 
 	const Vector3i WorldSpawn(static_cast<int>(m_World->GetSpawnX()), static_cast<int>(m_World->GetSpawnY()), static_cast<int>(m_World->GetSpawnZ()));
 	SetPosition(WorldSpawn);
-	SetBedPos(WorldSpawn, m_World);
+	SetRespawnPosition(WorldSpawn, *m_World);
 
 	m_Inventory.Clear();
 	m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();  // Use a random number to seed the enchantment generator
@@ -1920,9 +1926,10 @@ bool cPlayer::LoadFromFile(const AString & a_FileName)
 		m_World = cRoot::Get()->GetDefaultWorld();
 	}
 
-	m_LastBedPos.x = Root.get("SpawnX", m_World->GetSpawnX()).asInt();
-	m_LastBedPos.y = Root.get("SpawnY", m_World->GetSpawnY()).asInt();
-	m_LastBedPos.z = Root.get("SpawnZ", m_World->GetSpawnZ()).asInt();
+	m_RespawnPosition.x = Root.get("SpawnX", m_World->GetSpawnX()).asInt();
+	m_RespawnPosition.y = Root.get("SpawnY", m_World->GetSpawnY()).asInt();
+	m_RespawnPosition.z = Root.get("SpawnZ", m_World->GetSpawnZ()).asInt();
+	m_IsRespawnPointForced = Root.get("SpawnForced", true).asBool();
 	m_SpawnWorldName = Root.get("SpawnWorld", cRoot::Get()->GetDefaultWorld()->GetName()).asString();
 
 	try
@@ -2034,6 +2041,7 @@ void cPlayer::SaveToDisk()
 	root["SpawnX"]              = GetLastBedPos().x;
 	root["SpawnY"]              = GetLastBedPos().y;
 	root["SpawnZ"]              = GetLastBedPos().z;
+	root["SpawnForced"]         = m_IsRespawnPointForced;
 	root["SpawnWorld"]          = m_SpawnWorldName;
 	root["enchantmentSeed"]     = m_EnchantmentSeed;
 	root["world"]               = m_CurrentWorldName;
@@ -2127,7 +2135,7 @@ void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
 	if (m_Inventory.DamageItem(a_SlotNumber, ReducedDamage))
 	{
 		// The item broke. Broadcast the correct animation:
-		if (Item.m_ItemType == E_ITEM_SHIELD)
+		if (Item.m_ItemType == Item::Shield)
 		{
 			m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnShieldBreaks);
 		}
@@ -2147,7 +2155,7 @@ void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
 			}
 		}
 	}
-	else if (Item.m_ItemType == E_ITEM_SHIELD)
+	else if (Item.m_ItemType == Item::Shield)
 	{
 		// The item survived. Special case for shield blocking:
 		m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnShieldBlocks);
@@ -2216,7 +2224,7 @@ void cPlayer::HandleFood(void)
 
 void cPlayer::HandleFloater()
 {
-	if (GetEquippedItem().m_ItemType == E_ITEM_FISHING_ROD)
+	if (GetEquippedItem().m_ItemType == Item::FishingRod)
 	{
 		return;
 	}
@@ -2395,15 +2403,6 @@ void cPlayer::LoadRank(void)
 
 
 
-bool cPlayer::PlaceBlock(Vector3i a_Position, BlockState a_Block)
-{
-	return PlaceBlocks({ { a_Position, a_Block } });
-}
-
-
-
-
-
 void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Range)
 {
 	// Collect the coords of all the blocks to send:
@@ -2519,6 +2518,15 @@ const cUUID & cPlayer::GetUUID(void) const
 
 
 
+bool cPlayer::PlaceBlock(const Vector3i a_Position, BlockState a_Block)
+{
+	return PlaceBlocks({ { a_Position, a_Block } });
+}
+
+
+
+
+
 bool cPlayer::PlaceBlocks(const std::initializer_list<sSetBlock> a_Blocks)
 {
 	if (DoesPlacingBlocksIntersectEntity(a_Blocks))
@@ -2578,78 +2586,6 @@ void cPlayer::SetSkinParts(int a_Parts)
 {
 	m_SkinParts = a_Parts & spMask;
 	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
-}
-
-
-
-
-
-void cPlayer::AttachTo(cEntity * a_AttachTo)
-{
-	// Different attach, if this is a spectator
-	if (IsGameModeSpectator())
-	{
-		SpectateEntity(a_AttachTo);
-		return;
-	}
-
-	Super::AttachTo(a_AttachTo);
-}
-
-
-
-
-
-void cPlayer::Detach()
-{
-	if (m_AttachedTo == nullptr)
-	{
-		// The player is not attached to anything. Bail out.
-		return;
-	}
-
-	// Different detach, if this is a spectator:
-	if (IsGameModeSpectator())
-	{
-		GetClientHandle()->SendCameraSetTo(*this);
-		TeleportToEntity(*m_AttachedTo);
-		m_AttachedTo = nullptr;
-		return;
-	}
-
-	Super::Detach();
-
-	// If they are teleporting, no need to figure out position:
-	if (m_IsTeleporting)
-	{
-		return;
-	}
-
-	int PosX = POSX_TOINT;
-	int PosY = POSY_TOINT;
-	int PosZ = POSZ_TOINT;
-
-	// Search for a position within an area to teleport player after detachment
-	// Position must be solid land with two air blocks above.
-	// If nothing found, player remains where they are
-	for (int x = PosX - 1; x <= (PosX + 1); ++x)
-	{
-		for (int y = PosY; y <= (PosY + 3); ++y)
-		{
-			for (int z = PosZ - 1; z <= (PosZ + 1); ++z)
-			{
-				if (
-					(cBlockAirHandler::IsBlockAir(m_World->GetBlock({ x, y, z }))) &&
-					(cBlockAirHandler::IsBlockAir(m_World->GetBlock({ x, y + 1, z }))) &&
-					cBlockInfo::IsSolid(m_World->GetBlock({ x, y - 1, z }))
-				)
-				{
-					TeleportToCoords(x + 0.5, y, z + 0.5);
-					return;
-				}
-			}
-		}
-	}
 }
 
 
@@ -2842,11 +2778,6 @@ bool cPlayer::CanInstantlyMine(BlockState a_Block)
 
 void cPlayer::AddKnownItem(const cItem & a_Item)
 {
-	if (a_Item.m_ItemType < 0)
-	{
-		return;
-	}
-
 	auto Response = m_KnownItems.insert(a_Item.CopyOne());
 	if (!Response.second)
 	{
@@ -3040,18 +2971,18 @@ float cPlayer::GetEnchantmentBlastKnockbackReduction()
 
 
 
-bool cPlayer::IsInvisible() const
+bool cPlayer::IsCrouched(void) const
 {
-	return !m_IsVisible || Super::IsInvisible();
+	return std::holds_alternative<BodyStanceCrouching>(m_BodyStance);
 }
 
 
 
 
 
-bool cPlayer::IsCrouched(void) const
+bool cPlayer::IsSprinting(void) const
 {
-	return std::holds_alternative<BodyStanceCrouching>(m_BodyStance);
+	return std::holds_alternative<BodyStanceSprinting>(m_BodyStance);
 }
 
 
@@ -3067,9 +2998,9 @@ bool cPlayer::IsElytraFlying(void) const
 
 
 
-bool cPlayer::IsSprinting(void) const
+bool cPlayer::IsInvisible() const
 {
-	return std::holds_alternative<BodyStanceSprinting>(m_BodyStance);
+	return !m_IsVisible || Super::IsInvisible();
 }
 
 
@@ -3121,6 +3052,45 @@ void cPlayer::OnAddToWorld(cWorld & a_World)
 
 	// Finally, deliver the notification hook:
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*this);
+}
+
+
+
+
+
+void cPlayer::OnDetach()
+{
+	if (m_IsTeleporting)
+	{
+		// If they are teleporting, no need to figure out position:
+		return;
+	}
+
+	int PosX = POSX_TOINT;
+	int PosY = POSY_TOINT;
+	int PosZ = POSZ_TOINT;
+
+	// Search for a position within an area to teleport player after detachment
+	// Position must be solid land with two air blocks above.
+	// If nothing found, player remains where they are.
+	for (int x = PosX - 1; x <= (PosX + 1); ++x)
+	{
+		for (int y = PosY; y <= (PosY + 3); ++y)
+		{
+			for (int z = PosZ - 1; z <= (PosZ + 1); ++z)
+			{
+				if (
+					(cBlockAirHandler::IsBlockAir(m_World->GetBlock({ x, y, z }))) &&
+					(cBlockAirHandler::IsBlockAir(m_World->GetBlock({ x, y + 1, z }))) &&
+					cBlockInfo::IsSolid(m_World->GetBlock({ x, y - 1, z }))
+				)
+				{
+					TeleportToCoords(x + 0.5, y, z + 0.5);
+					return;
+				}
+			}
+		}
+	}
 }
 
 
@@ -3180,9 +3150,6 @@ void cPlayer::OnRemoveFromWorld(cWorld & a_World)
 
 	// Clear sent chunk lists from the clienthandle:
 	m_ClientHandle->RemoveFromWorld();
-
-	// The clienthandle caches the coords of the chunk we're standing at. Invalidate this.
-	m_ClientHandle->InvalidateCachedSentChunk();
 }
 
 
@@ -3195,8 +3162,6 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 	{
 		return;
 	}
-
-	LOGD("Spawing %s on %s", GetName().c_str(), a_Client.GetUsername().c_str());
 
 	a_Client.SendPlayerSpawn(*this);
 	a_Client.SendEntityHeadLook(*this);
@@ -3239,20 +3204,6 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	// Handle the player detach, when the player is in spectator mode
-	if (
-		(IsGameModeSpectator()) &&
-		(m_AttachedTo != nullptr) &&
-		(
-			(m_AttachedTo->IsDestroyed()) ||  // Watching entity destruction
-			(m_AttachedTo->GetHealth() <= 0) ||  // Watching entity dead
-			(IsCrouched())  // Or the player wants to be detached
-		)
-	)
-	{
-		Detach();
-	}
-
 	if (!a_Chunk.IsValid())
 	{
 		// Players are ticked even if the parent chunk is invalid.
@@ -3282,6 +3233,15 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_BowCharge += 1;
 	}
 
+	// Handle syncing our position with the entity being spectated:
+	if (IsGameModeSpectator() && (m_Spectating != nullptr))
+	{
+		SetYaw(m_Spectating->GetYaw());
+		SetPitch(m_Spectating->GetPitch());
+		SetRoll(m_Spectating->GetRoll());
+		SetPosition(m_Spectating->GetPosition());
+	}
+
 	if (IsElytraFlying())
 	{
 		// Damage elytra, once per second:
@@ -3297,7 +3257,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 
 		// Check if flight is still possible:
-		if (IsOnGround() || IsInWater() || IsRiding() || (GetEquippedChestplate().m_ItemType != E_ITEM_ELYTRA))
+		if (IsOnGround() || IsInWater() || IsRiding() || (GetEquippedChestplate().m_ItemType != Item::Elytra))
 		{
 			SetElytraFlight(false);
 		}
@@ -3305,7 +3265,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	else if (IsInBed())
 	{
 		// Check if sleeping is still possible:
-		if ((GetPosition().Floor() != m_LastBedPos) || cBlockBedHandler::IsBlockBed(m_World->GetBlock(m_LastBedPos)))
+		if ((GetPosition().Floor() != m_RespawnPosition) || (cBlockBedHandler::IsBlockBed(m_World->GetBlock(m_RespawnPosition))))
 		{
 			m_ClientHandle->HandleLeaveBed();
 		}

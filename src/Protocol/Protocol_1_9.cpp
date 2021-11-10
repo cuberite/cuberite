@@ -46,21 +46,17 @@ Implements the 1.9 protocol classes:
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/HorseWindow.h"
 
-#include "../BlockEntities/BannerEntity.h"
-#include "../BlockEntities/BeaconEntity.h"
-#include "../BlockEntities/CommandBlockEntity.h"
-#include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"
-#include "../BlockEntities/FlowerPotEntity.h"
-#include "../Bindings/PluginManager.h"
 
 
 
 
 
-/** Value for main hand in Hand parameter for Protocol 1.9. */
-static const UInt32 MAIN_HAND = 0;
-static const UInt32 OFF_HAND = 1;
+// Value for main hand in Hand parameter for Protocol 1.9.
+#define MAIN_HAND 0
+
+// Value for left hand in MainHand parameter for Protocol 1.9.
+#define LEFT_HAND 0
 
 
 
@@ -374,19 +370,6 @@ void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 
 
 
-void cProtocol_1_9_0::SendEntityStatus(const cEntity & a_Entity, char a_Status)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktEntityStatus);
-	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEInt8(a_Status);
-}
-
-
-
-
-
 void cProtocol_1_9_0::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -490,35 +473,6 @@ void cProtocol_1_9_0::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Da
 	for (auto itr = a_Map.GetData().cbegin(); itr != a_Map.GetData().cend(); ++itr)
 	{
 		Pkt.WriteBEUInt8(*itr);
-	}
-}
-
-
-
-
-
-void cProtocol_1_9_0::SendPlayerMaxSpeed(void)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktPlayerMaxSpeed);
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteVarInt32(Player->GetUniqueID());
-	Pkt.WriteBEInt32(1);  // Count
-	Pkt.WriteString("generic.movementSpeed");
-	// The default game speed is 0.1, multiply that value by the relative speed:
-	Pkt.WriteBEDouble(0.1 * Player->GetNormalMaxSpeed());
-	if (Player->IsSprinting())
-	{
-		Pkt.WriteVarInt32(1);  // Modifier count
-		Pkt.WriteBEUInt64(0x662a6b8dda3e4c1c);
-		Pkt.WriteBEUInt64(0x881396ea6097278d);  // UUID of the modifier
-		Pkt.WriteBEDouble(Player->GetSprintingMaxSpeed() - Player->GetNormalMaxSpeed());
-		Pkt.WriteBEUInt8(2);
-	}
-	else
-	{
-		Pkt.WriteVarInt32(0);  // Modifier count
 	}
 }
 
@@ -651,7 +605,7 @@ void cProtocol_1_9_0::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
+UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet) const
 {
 	switch (a_Packet)
 	{
@@ -697,7 +651,6 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 		case pktPlayerAbilities:        return 0x2b;
 		case pktPlayerList:             return 0x2d;
 		case pktPlayerListHeaderFooter: return 0x48;
-		case pktPlayerMaxSpeed:         return 0x4b;
 		case pktPlayerMoveLook:         return 0x2e;
 		case pktPluginMessage:          return 0x18;
 		case pktRemoveEntityEffect:     return 0x31;
@@ -745,22 +698,53 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 
 
 
-cProtocol::Version cProtocol_1_9_0::GetProtocolVersion()
+unsigned char cProtocol_1_9_0::GetProtocolEntityAnimation(const EntityAnimation a_Animation) const
 {
-	return Version::v1_9_0;
+	if (a_Animation == EntityAnimation::PlayerOffHandSwings)
+	{
+		return 3;
+	}
+
+	return Super::GetProtocolEntityAnimation(a_Animation);
 }
 
 
 
 
 
-UInt32 cProtocol_1_9_0::GetProtocolMobType(const eMonsterType a_MobType)
+signed char cProtocol_1_9_0::GetProtocolEntityStatus(const EntityAnimation a_Animation) const
+{
+	switch (a_Animation)
+	{
+		case EntityAnimation::ArmorStandGetsHit: return 32;
+		case EntityAnimation::ArrowTipSparkles: return 0;
+		case EntityAnimation::PawnShieldBlocks: return 29;
+		case EntityAnimation::PawnShieldBreaks: return 30;
+		case EntityAnimation::PawnThornsPricks: return 33;
+		default: return Super::GetProtocolEntityStatus(a_Animation);
+	}
+}
+
+
+
+
+
+UInt32 cProtocol_1_9_0::GetProtocolMobType(const eMonsterType a_MobType) const
 {
 	switch (a_MobType)
 	{
 		case mtShulker: return 69;
 		default:        return Super::GetProtocolMobType(a_MobType);
 	}
+}
+
+
+
+
+
+cProtocol::Version cProtocol_1_9_0::GetProtocolVersion() const
+{
+	return Version::v1_9_0;
 }
 
 
@@ -843,7 +827,7 @@ void cProtocol_1_9_0::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
 
-	m_Client->HandleAnimation(0);  // Packet exists solely for arm-swing notification
+	m_Client->HandleAnimation(Hand == MAIN_HAND);  // Packet exists solely for arm-swing notification (main and off-hand).
 }
 
 
@@ -881,7 +865,8 @@ void cProtocol_1_9_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, HandIntToEnum(Hand));
+
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, Hand == MAIN_HAND);
 }
 
 
@@ -918,12 +903,12 @@ void cProtocol_1_9_0::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   ChatFlags);
 	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    ChatColors);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   SkinParts);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt,        UInt32,   MainHand);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt,        UInt32,  MainHand);
 
 	m_Client->SetLocale(Locale);
 	m_Client->SetViewDistance(ViewDistance);
 	m_Client->GetPlayer()->SetSkinParts(SkinParts);
-	m_Client->GetPlayer()->SetMainHand(static_cast<eMainHand>(MainHand));
+	m_Client->GetPlayer()->SetLeftHanded(MainHand == LEFT_HAND);
 	// TODO: Handle chat flags and chat colors
 }
 
@@ -952,14 +937,21 @@ void cProtocol_1_9_0::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8,  Action);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt,  UInt32, JumpBoost);
 
+	if (PlayerID != m_Client->GetPlayer()->GetUniqueID())
+	{
+		m_Client->Kick("Mind your own business! Hacked client?");
+		return;
+	}
+
 	switch (Action)
 	{
-		case 0: m_Client->HandleEntityCrouch(PlayerID, true);     break;  // Crouch
-		case 1: m_Client->HandleEntityCrouch(PlayerID, false);    break;  // Uncrouch
-		case 2: m_Client->HandleEntityLeaveBed(PlayerID);         break;  // Leave Bed
-		case 3: m_Client->HandleEntitySprinting(PlayerID, true);  break;  // Start sprinting
-		case 4: m_Client->HandleEntitySprinting(PlayerID, false); break;  // Stop sprinting
-		case 7: m_Client->HandleOpenHorseInventory(PlayerID);     break;  // Open horse inventory
+		case 0: return m_Client->HandleCrouch(true);
+		case 1: return m_Client->HandleCrouch(false);
+		case 2: return m_Client->HandleLeaveBed();
+		case 3: return m_Client->HandleSprint(true);
+		case 4: return m_Client->HandleSprint(false);
+		case 7: return m_Client->HandleOpenHorseInventory();
+		case 8: return m_Client->HandleStartElytraFlight();
 	}
 }
 
@@ -976,7 +968,7 @@ void cProtocol_1_9_0::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 
 	if (m_IsTeleportIdConfirmed)
 	{
-		m_Client->HandlePlayerPos(PosX, PosY, PosZ, PosY + (m_Client->GetPlayer()->IsCrouched() ? 1.54 : 1.62), IsOnGround);
+		m_Client->HandlePlayerMove(PosX, PosY, PosZ, IsOnGround);
 	}
 }
 
@@ -995,7 +987,7 @@ void cProtocol_1_9_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 
 	if (m_IsTeleportIdConfirmed)
 	{
-		m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, PosY + 1.62, Yaw, Pitch, IsOnGround);
+		m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, Yaw, Pitch, IsOnGround);
 	}
 }
 
@@ -1077,6 +1069,7 @@ void cProtocol_1_9_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 		case 0:
 		{
 			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand);
+
 			if (Hand == MAIN_HAND)  // TODO: implement handling of off-hand actions; ignore them for now to avoid processing actions twice
 			{
 				m_Client->HandleUseEntity(EntityID, false);
@@ -1114,7 +1107,7 @@ void cProtocol_1_9_0::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
 
-	m_Client->HandleUseItem(HandIntToEnum(Hand));
+	m_Client->HandleUseItem(Hand == MAIN_HAND);
 }
 
 
@@ -1205,7 +1198,7 @@ void cProtocol_1_9_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBufferView a_Metadata)
+void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBufferView a_Metadata) const
 {
 	// Parse into NBT:
 	cParsedNBT NBT(a_Metadata);
@@ -1385,41 +1378,23 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 					{
 						a_Item.m_ItemDamage |= 0x40;
 					}
-
+					/* TODO(12xx12)
 					// Ugly special case with the changed splash potion ID in 1.9
 					if ((a_Item.m_ItemType == 438) || (a_Item.m_ItemType == 441))
 					{
 						// Splash or lingering potions - change the ID to the normal one and mark as splash potions
-						a_Item.m_ItemType = E_ITEM_POTION;
+						a_Item.m_ItemType = Item::Potion;
 						a_Item.m_ItemDamage |= 0x4000;  // Is splash potion
 					}
 					else
 					{
 						a_Item.m_ItemDamage |= 0x2000;  // Is drinkable
 					}
+					*/
 				}
 				break;
 			}
 			default: LOGD("Unimplemented NBT data when parsing!"); break;
-		}
-	}
-}
-
-
-
-
-
-eHand cProtocol_1_9_0::HandIntToEnum(Int32 a_Hand)
-{
-	// Convert hand parameter into eHand enum
-	switch (a_Hand)
-	{
-		case MAIN_HAND: return eHand::hMain;
-		case OFF_HAND: return eHand::hOff;
-		default:
-		{
-			ASSERT(!"Unknown hand value");
-			return eHand::hMain;
 		}
 	}
 }
@@ -1455,7 +1430,7 @@ void cProtocol_1_9_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Ob
 
 
 
-void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity)
+void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
 	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
 	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
@@ -1479,177 +1454,7 @@ void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 
 
 
-void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
-{
-	short ItemType = a_Item.m_ItemType;
-	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
-	if (ItemType <= 0)
-	{
-		// Fix, to make sure no invalid values are sent.
-		ItemType = -1;
-	}
-
-	if (a_Item.IsEmpty())
-	{
-		a_Pkt.WriteBEInt16(-1);
-		return;
-	}
-
-	if ((ItemType == E_ITEM_POTION) && ((a_Item.m_ItemDamage & 0x4000) != 0))
-	{
-		// Ugly special case for splash potion ids which changed in 1.9; this can be removed when the new 1.9 ids are implemented
-		a_Pkt.WriteBEInt16(438);  // minecraft:splash_potion
-	}
-	else
-	{
-		// Normal item
-		a_Pkt.WriteBEInt16(ItemType);
-	}
-	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
-	if ((ItemType == E_ITEM_POTION) || (ItemType == E_ITEM_SPAWN_EGG))
-	{
-		// These items lost their metadata; if it is sent they don't render correctly.
-		a_Pkt.WriteBEInt16(0);
-	}
-	else
-	{
-		a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
-	}
-
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (ItemType != E_ITEM_FIREWORK_ROCKET) && (ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid() && (ItemType != E_ITEM_POTION) && (ItemType != E_ITEM_SPAWN_EGG))
-	{
-		a_Pkt.WriteBEInt8(0);
-		return;
-	}
-
-
-	// Send the enchantments and custom names:
-	cFastNBTWriter Writer;
-	if (a_Item.m_RepairCost != 0)
-	{
-		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
-	}
-	if (!a_Item.m_Enchantments.IsEmpty())
-	{
-		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
-	}
-	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
-	{
-		Writer.BeginCompound("display");
-		if (a_Item.m_ItemColor.IsValid())
-		{
-			Writer.AddInt("color", static_cast<Int32>(a_Item.m_ItemColor.m_Color));
-		}
-
-		if (!a_Item.IsCustomNameEmpty())
-		{
-			Writer.AddString("Name", a_Item.m_CustomName);
-		}
-		if (!a_Item.IsLoreEmpty())
-		{
-			Writer.BeginList("Lore", TAG_String);
-
-			for (const auto & Line : a_Item.m_LoreTable)
-			{
-				Writer.AddString("", Line);
-			}
-
-			Writer.EndList();
-		}
-		Writer.EndCompound();
-	}
-	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
-	{
-		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
-	}
-	if (a_Item.m_ItemType == E_ITEM_POTION)
-	{
-		// 1.9 potions use a different format.  In the future (when only 1.9+ is supported) this should be its own class
-		AString PotionID = "empty";  // Fallback of "Uncraftable potion" for unhandled cases
-
-		cEntityEffect::eType Type = cEntityEffect::GetPotionEffectType(a_Item.m_ItemDamage);
-		if (Type != cEntityEffect::effNoEffect)
-		{
-			switch (Type)
-			{
-				case cEntityEffect::effRegeneration: PotionID = "regeneration"; break;
-				case cEntityEffect::effSpeed: PotionID = "swiftness"; break;
-				case cEntityEffect::effFireResistance: PotionID = "fire_resistance"; break;
-				case cEntityEffect::effPoison: PotionID = "poison"; break;
-				case cEntityEffect::effInstantHealth: PotionID = "healing"; break;
-				case cEntityEffect::effNightVision: PotionID = "night_vision"; break;
-				case cEntityEffect::effWeakness: PotionID = "weakness"; break;
-				case cEntityEffect::effStrength: PotionID = "strength"; break;
-				case cEntityEffect::effSlowness: PotionID = "slowness"; break;
-				case cEntityEffect::effJumpBoost: PotionID = "leaping"; break;
-				case cEntityEffect::effInstantDamage: PotionID = "harming"; break;
-				case cEntityEffect::effWaterBreathing: PotionID = "water_breathing"; break;
-				case cEntityEffect::effInvisibility: PotionID = "invisibility"; break;
-				default: ASSERT(!"Unknown potion effect"); break;
-			}
-			if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1)
-			{
-				PotionID = "strong_" + PotionID;
-			}
-			else if (a_Item.m_ItemDamage & 0x40)
-			{
-				// Extended potion bit
-				PotionID = "long_" + PotionID;
-			}
-		}
-		else
-		{
-			// Empty potions: Water bottles and other base ones
-			if (a_Item.m_ItemDamage == 0)
-			{
-				// No other bits set; thus it's a water bottle
-				PotionID = "water";
-			}
-			else
-			{
-				switch (a_Item.m_ItemDamage & 0x3f)
-				{
-					case 0x00: PotionID = "mundane"; break;
-					case 0x10: PotionID = "awkward"; break;
-					case 0x20: PotionID = "thick"; break;
-				}
-				// Default cases will use "empty" from before.
-			}
-		}
-
-		PotionID = "minecraft:" + PotionID;
-
-		Writer.AddString("Potion", PotionID);
-	}
-	if (a_Item.m_ItemType == E_ITEM_SPAWN_EGG)
-	{
-		// Convert entity ID to the name.
-		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(a_Item.m_ItemDamage);
-		if (MonsterType != eMonsterType::mtInvalidType)
-		{
-			Writer.BeginCompound("EntityTag");
-			Writer.AddString("id", "minecraft:" + cMonster::MobTypeToVanillaNBT(MonsterType));
-			Writer.EndCompound();
-		}
-	}
-
-	Writer.Finish();
-
-	const auto Result = Writer.GetResult();
-	if (Result.empty())
-	{
-		a_Pkt.WriteBEInt8(0);
-		return;
-	}
-	a_Pkt.WriteBuf(Result);
-}
-
-
-
-
-
-void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
+void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
 {
 	// Common metadata:
 	Int8 Flags = 0;
@@ -1672,6 +1477,10 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 	if (a_Entity.IsInvisible())
 	{
 		Flags |= 0x20;
+	}
+	if (a_Entity.IsElytraFlying())
+	{
+		Flags |= 0x80;
 	}
 	a_Pkt.WriteBEUInt8(0);  // Index 0
 	a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
@@ -1700,7 +1509,7 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 
 			a_Pkt.WriteBEUInt8(13);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetMainHand()));
+			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
 			break;
 		}
 		case cEntity::etPickup:
@@ -1737,7 +1546,7 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 				{
 					a_Pkt.WriteBEUInt8(8);  // Index 8: Block ID and damage
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-					int Content = MinecartContent.m_ItemType;
+					int Content = PaletteUpgrade::ToItem(MinecartContent.m_ItemType).first;
 					Content |= MinecartContent.m_ItemDamage << 8;
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
 
@@ -1867,7 +1676,216 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 
 
 
-void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
+void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
+{
+	short ItemType = PaletteUpgrade::ToItem(a_Item.m_ItemType).first;
+	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
+	if (ItemType <= 0)
+	{
+		// Fix, to make sure no invalid values are sent.
+		ItemType = -1;
+	}
+
+	if (a_Item.IsEmpty())
+	{
+		a_Pkt.WriteBEInt16(-1);
+		return;
+	}
+
+	if ((ItemType == E_ITEM_POTION) && ((a_Item.m_ItemDamage & 0x4000) != 0))
+	{
+		// Ugly special case for splash potion ids which changed in 1.9; this can be removed when the new 1.9 ids are implemented
+		a_Pkt.WriteBEInt16(438);  // minecraft:splash_potion
+	}
+	else
+	{
+		// Normal item
+		a_Pkt.WriteBEInt16(ItemType);
+	}
+	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
+	if ((ItemType == E_ITEM_POTION) || (ItemType == E_ITEM_SPAWN_EGG))
+	{
+		// These items lost their metadata; if it is sent they don't render correctly.
+		a_Pkt.WriteBEInt16(0);
+	}
+	else
+	{
+		a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
+	}
+
+	if (
+		a_Item.m_Enchantments.IsEmpty() &&
+		a_Item.IsBothNameAndLoreEmpty() &&
+		(a_Item.m_ItemType != Item::FireworkRocket) &&
+		(a_Item.m_ItemType != Item::FireworkStar) &&
+		!a_Item.m_ItemColor.IsValid() &&
+		(a_Item.m_ItemType != Item::Potion) &&
+		(cItemSpawnEggHandler::IsSpawnEgg(a_Item.m_ItemType)))
+	{
+		a_Pkt.WriteBEInt8(0);
+		return;
+	}
+
+
+	// Send the enchantments and custom names:
+	cFastNBTWriter Writer;
+	if (a_Item.m_RepairCost != 0)
+	{
+		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
+	}
+	if (!a_Item.m_Enchantments.IsEmpty())
+	{
+		const char * TagName = (a_Item.m_ItemType == Item::EnchantedBook) ? "StoredEnchantments" : "ench";
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
+	}
+	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
+	{
+		Writer.BeginCompound("display");
+		if (a_Item.m_ItemColor.IsValid())
+		{
+			Writer.AddInt("color", static_cast<Int32>(a_Item.m_ItemColor.m_Color));
+		}
+
+		if (!a_Item.IsCustomNameEmpty())
+		{
+			Writer.AddString("Name", a_Item.m_CustomName);
+		}
+		if (!a_Item.IsLoreEmpty())
+		{
+			Writer.BeginList("Lore", TAG_String);
+
+			for (const auto & Line : a_Item.m_LoreTable)
+			{
+				Writer.AddString("", Line);
+			}
+
+			Writer.EndList();
+		}
+		Writer.EndCompound();
+	}
+	if ((a_Item.m_ItemType == Item::FireworkRocket) || (a_Item.m_ItemType == Item::FireworkStar))
+	{
+		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+	}
+
+	switch (a_Item.m_ItemType)
+	{
+		case Item::Potion:
+		{
+			// 1.9 potions use a different format.  In the future (when only 1.9+ is supported) this should be its own class
+			AString PotionID = "empty";  // Fallback of "Uncraftable potion" for unhandled cases
+
+			cEntityEffect::eType Type = cEntityEffect::GetPotionEffectType(a_Item.m_ItemDamage);
+			if (Type != cEntityEffect::effNoEffect)
+			{
+				switch (Type)
+				{
+					case cEntityEffect::effRegeneration: PotionID = "regeneration"; break;
+					case cEntityEffect::effSpeed: PotionID = "swiftness"; break;
+					case cEntityEffect::effFireResistance: PotionID = "fire_resistance"; break;
+					case cEntityEffect::effPoison: PotionID = "poison"; break;
+					case cEntityEffect::effInstantHealth: PotionID = "healing"; break;
+					case cEntityEffect::effNightVision: PotionID = "night_vision"; break;
+					case cEntityEffect::effWeakness: PotionID = "weakness"; break;
+					case cEntityEffect::effStrength: PotionID = "strength"; break;
+					case cEntityEffect::effSlowness: PotionID = "slowness"; break;
+					case cEntityEffect::effJumpBoost: PotionID = "leaping"; break;
+					case cEntityEffect::effInstantDamage: PotionID = "harming"; break;
+					case cEntityEffect::effWaterBreathing: PotionID = "water_breathing"; break;
+					case cEntityEffect::effInvisibility: PotionID = "invisibility"; break;
+					default: ASSERT(!"Unknown potion effect"); break;
+				}
+				if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1)
+				{
+					PotionID = "strong_" + PotionID;
+				}
+				else if (a_Item.m_ItemDamage & 0x40)
+				{
+					// Extended potion bit
+					PotionID = "long_" + PotionID;
+				}
+			}
+			else
+			{
+				// Empty potions: Water bottles and other base ones
+				if (a_Item.m_ItemDamage == 0)
+				{
+					// No other bits set; thus it's a water bottle
+					PotionID = "water";
+				}
+				else
+				{
+					switch (a_Item.m_ItemDamage & 0x3f)
+					{
+						case 0x00: PotionID = "mundane"; break;
+						case 0x10: PotionID = "awkward"; break;
+						case 0x20: PotionID = "thick"; break;
+					}
+					// Default cases will use "empty" from before.
+				}
+			}
+
+			PotionID = "minecraft:" + PotionID;
+
+			Writer.AddString("Potion", PotionID);
+			break;
+		}
+		case Item::BatSpawnEgg:
+		case Item::BlazeSpawnEgg:
+		case Item::CaveSpiderSpawnEgg:
+		case Item::ChickenSpawnEgg:
+		case Item::CowSpawnEgg:
+		case Item::CreeperSpawnEgg:
+		case Item::EndermanSpawnEgg:
+		case Item::GhastSpawnEgg:
+		case Item::GuardianSpawnEgg:
+		case Item::HorseSpawnEgg:
+		case Item::MagmaCubeSpawnEgg:
+		case Item::MooshroomSpawnEgg:
+		case Item::OcelotSpawnEgg:
+		case Item::PigSpawnEgg:
+		case Item::RabbitSpawnEgg:
+		case Item::SheepSpawnEgg:
+		case Item::SilverfishSpawnEgg:
+		case Item::SkeletonSpawnEgg:
+		case Item::SlimeSpawnEgg:
+		case Item::SpiderSpawnEgg:
+		case Item::SquidSpawnEgg:
+		case Item::VillagerSpawnEgg:
+		case Item::WitchSpawnEgg:
+		case Item::WitherSkeletonSpawnEgg:
+		case Item::WolfSpawnEgg:
+		case Item::ZombieSpawnEgg:
+		case Item::ZombiePigmanSpawnEgg:
+		case Item::ZombieVillagerSpawnEgg:
+		{
+			// Convert entity ID to the name.
+			eMonsterType MonsterType = cItemSpawnEggHandler::ItemToMonsterType(a_Item.m_ItemType);
+			if (MonsterType != eMonsterType::mtInvalidType)
+			{
+				Writer.BeginCompound("EntityTag");
+				Writer.AddString("id", "minecraft:" + cMonster::MobTypeToVanillaNBT(MonsterType));
+				Writer.EndCompound();
+			}
+		}
+		default: break;
+	}
+	Writer.Finish();
+
+	const auto Result = Writer.GetResult();
+	if (Result.empty())
+	{
+		a_Pkt.WriteBEInt8(0);
+		return;
+	}
+	a_Pkt.WriteBuf(Result);
+}
+
+
+
+
+
+void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
 {
 	// Living entity metadata
 	if (a_Mob.HasCustomName())
@@ -2269,26 +2287,6 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 
 
 
-void cProtocol_1_9_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity)
-{
-	if (!a_Entity.IsMob())
-	{
-		// No properties for anything else than mobs
-		a_Pkt.WriteBEInt32(0);
-		return;
-	}
-
-	// const cMonster & Mob = (const cMonster &)a_Entity;
-
-	// TODO: Send properties and modifiers based on the mob type
-
-	a_Pkt.WriteBEInt32(0);  // NumProperties
-}
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_1:
 
@@ -2318,16 +2316,13 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 		cPacketizer Pkt(*this, pktDifficulty);
 		Pkt.WriteBEInt8(1);
 	}
-
-	// Send player abilities:
-	SendPlayerAbilities();
 }
 
 
 
 
 
-cProtocol::Version cProtocol_1_9_1::GetProtocolVersion()
+cProtocol::Version cProtocol_1_9_1::GetProtocolVersion() const
 {
 	return Version::v1_9_1;
 }
@@ -2339,7 +2334,7 @@ cProtocol::Version cProtocol_1_9_1::GetProtocolVersion()
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_2:
 
-cProtocol::Version cProtocol_1_9_2::GetProtocolVersion()
+cProtocol::Version cProtocol_1_9_2::GetProtocolVersion() const
 {
 	return Version::v1_9_2;
 }
@@ -2387,26 +2382,25 @@ void cProtocol_1_9_4::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-cProtocol::Version cProtocol_1_9_4::GetProtocolVersion()
-{
-	return Version::v1_9_4;
-}
-
-
-
-
-
-UInt32 cProtocol_1_9_4::GetPacketID(cProtocol::ePacketType a_Packet)
+UInt32 cProtocol_1_9_4::GetPacketID(cProtocol::ePacketType a_Packet) const
 {
 	switch (a_Packet)
 	{
 		case pktCollectEntity:          return 0x48;
 		case pktEntityEffect:           return 0x4b;
 		case pktEntityProperties:       return 0x4a;
-		case pktPlayerMaxSpeed:         return 0x4a;
 		case pktPlayerListHeaderFooter: return 0x47;
 		case pktTeleportEntity:         return 0x49;
 
 		default: return Super::GetPacketID(a_Packet);
 	}
+}
+
+
+
+
+
+cProtocol::Version cProtocol_1_9_4::GetProtocolVersion() const
+{
+	return Version::v1_9_4;
 }

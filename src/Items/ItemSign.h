@@ -26,7 +26,7 @@ private:
 
 		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
 		{
-			switch (PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage))
+			switch (a_HeldItem.m_ItemType)
 			{
 				case Item::AcaciaSign:  BlockToPlace = Block::AcaciaSign::AcaciaSign(RotationToFineFace(a_Player.GetYaw())); break;
 				case Item::BirchSign:   BlockToPlace = Block::BirchSign::BirchSign(RotationToFineFace(a_Player.GetYaw())); break;
@@ -41,7 +41,7 @@ private:
 		}
 		else
 		{
-			switch (PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage))
+			switch (a_HeldItem.m_ItemType)
 			{
 				case Item::AcaciaSign:  BlockToPlace = Block::AcaciaWallSign::AcaciaWallSign(); break;
 				case Item::BirchSign:   BlockToPlace = Block::BirchWallSign::BirchWallSign(); break;

@@ -410,3 +410,4 @@ constexpr std::string_view methodName(std::string_view a_PrettyFunction)
 #include "Vector3.h"
 #include "BlockState.h"
 #include "Registries/BlockStates.h"
+#include "Registries/Items.h"

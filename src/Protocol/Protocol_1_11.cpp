@@ -776,7 +776,7 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 				{
 					a_Pkt.WriteBEUInt8(MINECART_BLOCK_ID_META);
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-					int Content = MinecartContent.m_ItemType;
+					int Content = PaletteUpgrade::ToItem(MinecartContent.m_ItemType).first;
 					Content |= MinecartContent.m_ItemDamage << 8;
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
 

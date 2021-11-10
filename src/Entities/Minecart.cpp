@@ -1434,7 +1434,7 @@ void cMinecartWithFurnace::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cMinecartWithFurnace::OnRightClicked(cPlayer & a_Player)
 {
-	if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_COAL)
+	if (a_Player.GetEquippedItem().m_ItemType == Item::Coal)
 	{
 		if (!a_Player.IsGameModeCreative())
 		{

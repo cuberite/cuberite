@@ -8,14 +8,17 @@
 
 
 
-class cItemBoatHandler final:
+class cItemBoatHandler:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	using Super::Super;
+	cItemBoatHandler(Item a_ItemType):
+		Super(a_ItemType)
+	{
+	}
 
 
 
@@ -28,7 +31,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) const override
+	) override
 	{
 		// Only allow placing blocks on top of blocks, or when not in range of dest block:
 		if ((a_ClickedBlockFace != BLOCK_FACE_YM) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
@@ -70,7 +73,7 @@ public:
 
 		// Block above must be air to spawn a boat (prevents spawning a boat underwater)
 		auto PosAbove = Callbacks.m_Pos.Floor().addedY(1);
-		if (!cChunkDef::IsValidHeight(PosAbove))
+		if (!cChunkDef::IsValidHeight(PosAbove.y))
 		{
 			return false;
 		}

@@ -75,7 +75,7 @@ void cZombieVillager::OnRightClicked(cPlayer & a_Player)
 	Super::OnRightClicked(a_Player);
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
-	if ((EquippedItem.m_ItemType == E_ITEM_GOLDEN_APPLE) && GetEntityEffect(cEntityEffect::effWeakness) != nullptr)
+	if ((EquippedItem.m_ItemType == Item::GoldenApple) && GetEntityEffect(cEntityEffect::effWeakness) != nullptr)
 	{
 		if (!a_Player.IsGameModeCreative())
 		{

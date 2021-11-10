@@ -238,8 +238,6 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOGD("Stopping plugin manager...");
 	delete m_PluginManager; m_PluginManager = nullptr;
 
-	cItemHandler::Deinit();
-
 	LOG("Cleaning up...");
 	delete m_Server; m_Server = nullptr;
 

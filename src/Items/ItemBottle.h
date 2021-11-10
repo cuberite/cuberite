@@ -10,14 +10,17 @@
 
 
 
-class cItemBottleHandler final:
+class cItemBottleHandler:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	using Super::Super;
+	cItemBottleHandler():
+		Super(Item::GlassBottle)
+	{
+	}
 
 
 
@@ -26,7 +29,7 @@ public:
 	/** Searches for a water source block in the line of sight.
 	Returns true and sets a_BlockPos if a water source block is found within line-of-sight.
 	Returns false if not. */
-	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos) const
+	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos)
 	{
 		class cCallbacks:
 			public cBlockTracer::cCallbacks
@@ -79,7 +82,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) const override
+	) override
 	{
 		if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{

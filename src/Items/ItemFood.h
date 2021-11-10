@@ -14,25 +14,25 @@ class cItemFoodHandler:
 
 public:
 
-	constexpr cItemFoodHandler(int a_ItemType, FoodInfo a_FoodInfo):
+	cItemFoodHandler(Item a_ItemType, FoodInfo a_FoodInfo):
 		Super(a_ItemType),
 		m_FoodInfo(a_FoodInfo)
 	{
 	}
 
 
-	virtual bool IsFood(void) const override
+	virtual bool IsFood(void) override
 	{
 		return true;
 	}
 
-	virtual FoodInfo GetFoodInfo(const cItem * a_Item) const override
+	virtual FoodInfo GetFoodInfo(const cItem * a_Item) override
 	{
 		UNUSED(a_Item);
 		return m_FoodInfo;
 	}
 
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
 	{
 		if (!Super::EatItem(a_Player, a_Item))
 		{
@@ -50,11 +50,8 @@ public:
 protected:
 	FoodInfo m_FoodInfo;
 
-	~cItemFoodHandler() = default;
 };
 
-class cItemSimpleFoodHandler final:
-	public cItemFoodHandler
-{
-	using cItemFoodHandler::cItemFoodHandler;
-};
+
+
+

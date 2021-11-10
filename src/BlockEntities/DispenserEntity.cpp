@@ -54,7 +54,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 	}
 	switch (SlotItem.m_ItemType)
 	{
-		case E_ITEM_BUCKET:
+		case Item::Bucket:
 		{
 			FLOGD("Dispensing empty bucket in slot {}}; DispBlock is \"{}\".", a_SlotNum, DispBlock);
 			switch (DispBlock.Type())
@@ -82,9 +82,9 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 				}
 			}
 			break;
-		}  // E_ITEM_BUCKET
+		}
 
-		case E_ITEM_WATER_BUCKET:
+		case Item::WaterBucket:
 		{
 			FLOGD("Dispensing water bucket in slot {}; DispBlock is \"{}\".", a_SlotNum, DispBlock);
 			if (EmptyLiquidBucket(DispBlock, a_SlotNum))
@@ -98,7 +98,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 
-		case E_ITEM_LAVA_BUCKET:
+		case Item::LavaBucket:
 		{
 			FLOGD("Dispensing lava bucket in slot {}; DispBlock is \"{}\".", a_SlotNum, DispBlock);
 			if (EmptyLiquidBucket(DispBlock, a_SlotNum))
@@ -112,11 +112,38 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 
-		case E_ITEM_SPAWN_EGG:
+		case Item::BatSpawnEgg:
+		case Item::BlazeSpawnEgg:
+		case Item::CaveSpiderSpawnEgg:
+		case Item::ChickenSpawnEgg:
+		case Item::CowSpawnEgg:
+		case Item::CreeperSpawnEgg:
+		case Item::EndermanSpawnEgg:
+		case Item::GhastSpawnEgg:
+		case Item::GuardianSpawnEgg:
+		case Item::HorseSpawnEgg:
+		case Item::MagmaCubeSpawnEgg:
+		case Item::MooshroomSpawnEgg:
+		case Item::OcelotSpawnEgg:
+		case Item::PigSpawnEgg:
+		case Item::RabbitSpawnEgg:
+		case Item::SheepSpawnEgg:
+		case Item::SilverfishSpawnEgg:
+		case Item::SkeletonSpawnEgg:
+		case Item::SlimeSpawnEgg:
+		case Item::SpiderSpawnEgg:
+		case Item::SquidSpawnEgg:
+		case Item::VillagerSpawnEgg:
+		case Item::WitchSpawnEgg:
+		case Item::WitherSkeletonSpawnEgg:
+		case Item::WolfSpawnEgg:
+		case Item::ZombieSpawnEgg:
+		case Item::ZombiePigmanSpawnEgg:
+		case Item::ZombieVillagerSpawnEgg:
 		{
 			double MobX = 0.5 + DispAbsCoord.x;
 			double MobZ = 0.5 + DispAbsCoord.z;
-			auto MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(m_Contents.GetSlot(a_SlotNum).m_ItemDamage);
+			auto MonsterType = cItemSpawnEggHandler::ItemToMonsterType(m_Contents.GetSlot(a_SlotNum));
 			if (m_World->SpawnMob(MobX, DispAbsCoord.y, MobZ, MonsterType, false) != cEntity::INVALID_ID)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
@@ -135,7 +162,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 
-		case E_ITEM_FLINT_AND_STEEL:
+		case Item::FlintAndSteel:
 		{
 			// Spawn fire if the block in front is air.
 			if (cBlockAirHandler::IsBlockAir(DispBlock))
@@ -152,7 +179,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 
-		case E_ITEM_FIRE_CHARGE:
+		case Item::FireCharge:
 		{
 			if (SpawnProjectileFromDispenser(DispAbsCoord, cProjectileEntity::pkFireCharge, GetShootVector(Self) * 20) != cEntity::INVALID_ID)
 			{
@@ -161,7 +188,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 
-		case E_ITEM_ARROW:
+		case Item::Arrow:
 		{
 			if (SpawnProjectileFromDispenser(DispAbsCoord, cProjectileEntity::pkArrow, GetShootVector(Self) * 30 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
 			{
@@ -170,7 +197,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 
-		case E_ITEM_SNOWBALL:
+		case Item::Snowball:
 		{
 			if (SpawnProjectileFromDispenser(DispAbsCoord, cProjectileEntity::pkSnowball, GetShootVector(Self) * 20 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
 			{
@@ -179,7 +206,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 
-		case E_ITEM_EGG:
+		case Item::Egg:
 		{
 			if (SpawnProjectileFromDispenser(DispAbsCoord, cProjectileEntity::pkEgg, GetShootVector(Self) * 20 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
 			{
@@ -188,7 +215,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 
-		case E_ITEM_BOTTLE_O_ENCHANTING:
+		case Item::ExperienceBottle:
 		{
 			if (SpawnProjectileFromDispenser(DispAbsCoord, cProjectileEntity::pkExpBottle, GetShootVector(Self) * 20 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
 			{
@@ -197,7 +224,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 
-		case E_ITEM_POTION:
+		case Item::Potion:
 		{
 			if (SpawnProjectileFromDispenser(DispAbsCoord, cProjectileEntity::pkSplashPotion, GetShootVector(Self) * 20 + Vector3d(0, 1, 0), &SlotItem) != cEntity::INVALID_ID)
 			{
@@ -206,14 +233,8 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 
-		case E_ITEM_DYE:
+		case Item::BoneMeal:
 		{
-			if (SlotItem.m_ItemDamage != E_META_DYE_WHITE)
-			{
-				DropFromSlot(a_Chunk, a_SlotNum);
-				break;
-			}
-
 			// Simulate a right-click with bonemeal:
 			if (cItemDyeHandler::FertilizePlant(*m_World, DispAbsCoord))
 			{
@@ -222,12 +243,12 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 
-		case E_ITEM_BOAT:
-		case E_ITEM_SPRUCE_BOAT:
-		case E_ITEM_BIRCH_BOAT:
-		case E_ITEM_JUNGLE_BOAT:
-		case E_ITEM_ACACIA_BOAT:
-		case E_ITEM_DARK_OAK_BOAT:
+		case Item::OakBoat:
+		case Item::SpruceBoat:
+		case Item::BirchBoat:
+		case Item::JungleBoat:
+		case Item::AcaciaBoat:
+		case Item::DarkOakBoat:
 		{
 			Vector3d spawnPos = DispAbsCoord;
 			if (DispBlock.Type() == BlockType::Water)
@@ -257,7 +278,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 
-		case E_ITEM_FIREWORK_ROCKET:
+		case Item::FireworkRocket:
 		{
 			if (SpawnProjectileFromDispenser(DispAbsCoord, cProjectileEntity::pkFirework, GetShootVector(Self) * 20 + Vector3d(0, 1, 0), &SlotItem) != cEntity::INVALID_ID)
 			{

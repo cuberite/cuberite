@@ -48,7 +48,7 @@ public:  // tolua_export
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 
-	static bool IsFlower(short m_ItemType, short m_ItemData);
+	static bool IsFlower(Item m_ItemType);
 
 private:
 

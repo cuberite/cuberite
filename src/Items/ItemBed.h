@@ -16,7 +16,7 @@ class cItemBedHandler:
 
 public:
 
-	cItemBedHandler(int a_ItemType):
+	cItemBedHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

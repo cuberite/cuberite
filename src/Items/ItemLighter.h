@@ -17,7 +17,7 @@ class cItemLighterHandler:
 
 public:
 
-	cItemLighterHandler(int a_ItemType):
+	cItemLighterHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}
@@ -42,7 +42,7 @@ public:
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			if (m_ItemType == E_ITEM_FLINT_AND_STEEL)
+			if (m_ItemType == Item::FlintAndSteel)
 			{
 				a_Player->UseEquippedItem();
 			}
@@ -72,7 +72,7 @@ public:
 			a_World->PlaceBlock(FirePos, Block::Fire::Fire());
 
 			// The client plays flint and steel sounds, only need to handle fire charges:
-			if (m_ItemType == E_ITEM_FIRE_CHARGE)
+			if (m_ItemType == Item::FireCharge)
 			{
 				a_World->BroadcastSoundEffect("item.firecharge.use", FirePos, 1.0f, 1.04f);
 			}

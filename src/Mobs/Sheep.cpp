@@ -6,6 +6,7 @@
 #include "../World.h"
 #include "../EffectID.h"
 #include "../FastRandom.h"
+#include "Items/ItemDye.h"
 
 
 cSheep::cSheep(int a_Color) :
@@ -60,7 +61,7 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 	Super::OnRightClicked(a_Player);
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
-	if ((EquippedItem.m_ItemType == E_ITEM_SHEARS) && !IsSheared() && !IsBaby())
+	if ((EquippedItem.m_ItemType == Item::Shears) && !IsSheared() && !IsBaby())
 	{
 		m_IsSheared = true;
 		m_World->BroadcastEntityMetadata(*this);
@@ -72,7 +73,7 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 		m_World->BroadcastSoundEffect("entity.sheep.shear", GetPosition(), 1.0f, 1.0f);
 	}
-	else if ((EquippedItem.m_ItemType == E_ITEM_DYE) && (m_WoolColor != 15 - EquippedItem.m_ItemDamage))
+	else if (cItemDyeHandler::IsDye(EquippedItem) && (m_WoolColor != 15 - EquippedItem.m_ItemDamage))
 	{
 		m_WoolColor = 15 - EquippedItem.m_ItemDamage;
 		if (!a_Player.IsGameModeCreative())

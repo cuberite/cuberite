@@ -16,7 +16,7 @@ class cItemThrowableHandler:
 
 public:
 
-	cItemThrowableHandler(int a_ItemType, cProjectileEntity::eKind a_ProjectileKind, double a_SpeedCoeff):
+	cItemThrowableHandler(Item a_ItemType, cProjectileEntity::eKind a_ProjectileKind, double a_SpeedCoeff):
 		Super(a_ItemType),
 		m_ProjectileKind(a_ProjectileKind),
 		m_SpeedCoeff(a_SpeedCoeff)
@@ -78,7 +78,7 @@ class cItemEggHandler:
 public:
 
 	cItemEggHandler():
-		Super(E_ITEM_EGG, cProjectileEntity::pkEgg, 30)
+		Super(Item::Egg, cProjectileEntity::pkEgg, 30)
 	{
 	}
 } ;
@@ -94,7 +94,7 @@ class cItemSnowballHandler:
 public:
 
 	cItemSnowballHandler():
-		Super(E_ITEM_SNOWBALL, cProjectileEntity::pkSnowball, 30)
+		Super(Item::Snowball, cProjectileEntity::pkSnowball, 30)
 	{
 	}
 } ;
@@ -111,7 +111,7 @@ class cItemEnderPearlHandler:
 public:
 
 	cItemEnderPearlHandler():
-		Super(E_ITEM_ENDER_PEARL, cProjectileEntity::pkEnderPearl, 30)
+		Super(Item::EnderPearl, cProjectileEntity::pkEnderPearl, 30)
 	{
 	}
 } ;
@@ -128,7 +128,7 @@ class cItemBottleOEnchantingHandler:
 public:
 
 	cItemBottleOEnchantingHandler():
-		Super(E_ITEM_BOTTLE_O_ENCHANTING, cProjectileEntity::pkExpBottle, 14)
+		Super(Item::ExperienceBottle, cProjectileEntity::pkExpBottle, 14)
 	{
 	}
 };
@@ -145,7 +145,7 @@ class cItemFireworkHandler:
 public:
 
 	cItemFireworkHandler():
-		Super(E_ITEM_FIREWORK_ROCKET, cProjectileEntity::pkFirework, 0)
+		Super(Item::FireworkRocket, cProjectileEntity::pkFirework, 0)
 	{
 	}
 

@@ -9,14 +9,14 @@
 
 
 
-class cItemEndCrystalHandler final :
+class cItemEndCrystalHandler :
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	constexpr cItemEndCrystalHandler(int a_ItemType) :
+	cItemEndCrystalHandler(Item a_ItemType) :
 		Super(a_ItemType)
 	{
 	}
@@ -26,7 +26,7 @@ public:
 		cWorld * a_World, cPlayer * a_Player,
 		cBlockPluginInterface & a_PluginInterface, const cItem & a_HeldItem,
 		const Vector3i a_BlockPos,
-		eBlockFace a_ClickedBlockFace) const override
+		eBlockFace a_ClickedBlockFace) override
 	{
 		// Must click a valid block:
 		if (a_ClickedBlockFace < 0)

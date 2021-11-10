@@ -623,15 +623,15 @@ void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBlockFace
 
 
 
-bool ItemCategory::IsPickaxe(short a_ItemType)
+bool ItemCategory::IsPickaxe(Item a_ItemType)
 {
 	switch (a_ItemType)
 	{
-		case E_ITEM_WOODEN_PICKAXE:
-		case E_ITEM_STONE_PICKAXE:
-		case E_ITEM_IRON_PICKAXE:
-		case E_ITEM_GOLD_PICKAXE:
-		case E_ITEM_DIAMOND_PICKAXE:
+		case Item::WoodenPickaxe:
+		case Item::StonePickaxe:
+		case Item::IronPickaxe:
+		case Item::GoldenPickaxe:
+		case Item::DiamondPickaxe:
 		{
 			return true;
 		}
@@ -646,22 +646,17 @@ bool ItemCategory::IsPickaxe(short a_ItemType)
 
 
 
-bool ItemCategory::IsAxe(short a_ItemType)
+bool ItemCategory::IsAxe(Item a_ItemType)
 {
 	switch (a_ItemType)
 	{
-		case E_ITEM_WOODEN_AXE:
-		case E_ITEM_STONE_AXE:
-		case E_ITEM_IRON_AXE:
-		case E_ITEM_GOLD_AXE:
-		case E_ITEM_DIAMOND_AXE:
-		{
+		case Item::WoodenAxe:
+		case Item::StoneAxe:
+		case Item::IronAxe:
+		case Item::GoldenAxe:
+		case Item::DiamondAxe:
 			return true;
-		}
-		default:
-		{
-			return false;
-		}
+		default: return false;
 	}
 }
 
@@ -669,46 +664,61 @@ bool ItemCategory::IsAxe(short a_ItemType)
 
 
 
-bool ItemCategory::IsSword(short a_ItemID)
+bool ItemCategory::IsSword(Item a_ItemID)
 {
-	return (a_ItemID == E_ITEM_WOODEN_SWORD)
-		|| (a_ItemID == E_ITEM_STONE_SWORD)
-		|| (a_ItemID == E_ITEM_IRON_SWORD)
-		|| (a_ItemID == E_ITEM_GOLD_SWORD)
-		|| (a_ItemID == E_ITEM_DIAMOND_SWORD);
+	switch (a_ItemID)
+	{
+		case Item::WoodenSword:
+		case Item::StoneSword:
+		case Item::IronSword:
+		case Item::GoldenSword:
+		case Item::DiamondSword:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsHoe(short a_ItemID)
+bool ItemCategory::IsHoe(Item a_ItemID)
 {
-	return (a_ItemID == E_ITEM_WOODEN_HOE)
-		|| (a_ItemID == E_ITEM_STONE_HOE)
-		|| (a_ItemID == E_ITEM_IRON_HOE)
-		|| (a_ItemID == E_ITEM_GOLD_HOE)
-		|| (a_ItemID == E_ITEM_DIAMOND_HOE);
+	switch (a_ItemID)
+	{
+		case Item::WoodenHoe:
+		case Item::StoneHoe:
+		case Item::IronHoe:
+		case Item::GoldenHoe:
+		case Item::DiamondHoe:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsShovel(short a_ItemID)
+bool ItemCategory::IsShovel(Item a_ItemID)
 {
-	return (a_ItemID == E_ITEM_WOODEN_SHOVEL)
-		|| (a_ItemID == E_ITEM_STONE_SHOVEL)
-		|| (a_ItemID == E_ITEM_IRON_SHOVEL)
-		|| (a_ItemID == E_ITEM_GOLD_SHOVEL)
-		|| (a_ItemID == E_ITEM_DIAMOND_SHOVEL);
+	switch (a_ItemID)
+	{
+		case Item::WoodenShovel:
+		case Item::StoneShovel:
+		case Item::IronShovel:
+		case Item::GoldenShovel:
+		case Item::DiamondShovel:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsTool(short a_ItemID)
+bool ItemCategory::IsTool(Item a_ItemID)
 {
 	return IsPickaxe( a_ItemID)
 		|| IsAxe    ( a_ItemID)
@@ -721,83 +731,98 @@ bool ItemCategory::IsTool(short a_ItemID)
 
 
 
-bool ItemCategory::IsHelmet(short a_ItemType)
+bool ItemCategory::IsHelmet(Item a_ItemType)
 {
-	return (
-		(a_ItemType == E_ITEM_LEATHER_CAP) ||
-		(a_ItemType == E_ITEM_GOLD_HELMET) ||
-		(a_ItemType == E_ITEM_CHAIN_HELMET) ||
-		(a_ItemType == E_ITEM_IRON_HELMET) ||
-		(a_ItemType == E_ITEM_DIAMOND_HELMET)
-	);
+	switch (a_ItemType)
+	{
+		case Item::LeatherHelmet:
+		case Item::GoldenHelmet:
+		case Item::ChainmailHelmet:
+		case Item::IronHelmet:
+		case Item::DiamondHelmet:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsChestPlate(short a_ItemType)
+bool ItemCategory::IsChestPlate(Item a_ItemType)
 {
-	return (
-		(a_ItemType == E_ITEM_ELYTRA) ||
-		(a_ItemType == E_ITEM_LEATHER_TUNIC) ||
-		(a_ItemType == E_ITEM_GOLD_CHESTPLATE) ||
-		(a_ItemType == E_ITEM_CHAIN_CHESTPLATE) ||
-		(a_ItemType == E_ITEM_IRON_CHESTPLATE) ||
-		(a_ItemType == E_ITEM_DIAMOND_CHESTPLATE)
-	);
+	switch (a_ItemType)
+	{
+		case Item::Elytra:
+		case Item::LeatherChestplate:
+		case Item::GoldenChestplate:
+		case Item::ChainmailChestplate:
+		case Item::IronChestplate:
+		case Item::DiamondChestplate:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsLeggings(short a_ItemType)
+bool ItemCategory::IsLeggings(Item a_ItemType)
 {
-	return (
-		(a_ItemType == E_ITEM_LEATHER_PANTS) ||
-		(a_ItemType == E_ITEM_GOLD_LEGGINGS) ||
-		(a_ItemType == E_ITEM_CHAIN_LEGGINGS) ||
-		(a_ItemType == E_ITEM_IRON_LEGGINGS) ||
-		(a_ItemType == E_ITEM_DIAMOND_LEGGINGS)
-	);
+	switch (a_ItemType)
+	{
+		case Item::LeatherLeggings:
+		case Item::GoldenLeggings:
+		case Item::ChainmailLeggings:
+		case Item::IronLeggings:
+		case Item::DiamondLeggings:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsBoots(short a_ItemType)
+bool ItemCategory::IsBoots(Item a_ItemType)
 {
-	return (
-		(a_ItemType == E_ITEM_LEATHER_BOOTS) ||
-		(a_ItemType == E_ITEM_GOLD_BOOTS) ||
-		(a_ItemType == E_ITEM_CHAIN_BOOTS) ||
-		(a_ItemType == E_ITEM_IRON_BOOTS) ||
-		(a_ItemType == E_ITEM_DIAMOND_BOOTS)
-	);
+	switch (a_ItemType)
+	{
+		case Item::LeatherBoots:
+		case Item::GoldenBoots:
+		case Item::ChainmailBoots:
+		case Item::IronBoots:
+		case Item::DiamondBoots:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsMinecart(short a_ItemType)
+bool ItemCategory::IsMinecart(Item a_ItemType)
 {
-	return (
-		(a_ItemType == E_ITEM_MINECART) ||
-		(a_ItemType == E_ITEM_CHEST_MINECART) ||
-		(a_ItemType == E_ITEM_FURNACE_MINECART) ||
-		(a_ItemType == E_ITEM_MINECART_WITH_TNT) ||
-		(a_ItemType == E_ITEM_MINECART_WITH_HOPPER)
-	);
+	switch (a_ItemType)
+	{
+		case Item::Minecart:
+		case Item::ChestMinecart:
+		case Item::FurnaceMinecart:
+		case Item::TNTMinecart:
+		case Item::HopperMinecart:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsArmor(short a_ItemType)
+bool ItemCategory::IsArmor(Item a_ItemType)
 {
 	return (
 		IsHelmet(a_ItemType) ||
@@ -811,19 +836,14 @@ bool ItemCategory::IsArmor(short a_ItemType)
 
 
 
-bool ItemCategory::IsHorseArmor(short a_ItemType)
+bool ItemCategory::IsHorseArmor(Item a_ItemType)
 {
 	switch (a_ItemType)
 	{
-		case E_ITEM_IRON_HORSE_ARMOR:
-		case E_ITEM_GOLD_HORSE_ARMOR:
-		case E_ITEM_DIAMOND_HORSE_ARMOR:
-		{
+		case Item::IronHorseArmor:
+		case Item::GoldenHorseArmor:
+		case Item::DiamondHorseArmor:
 			return true;
-		}
-		default:
-		{
-			return false;
-		}
+		default: return false;
 	}
 }

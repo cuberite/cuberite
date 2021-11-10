@@ -15,7 +15,7 @@ class cItemLeavesHandler:
 
 public:
 
-	cItemLeavesHandler(int a_ItemType):
+	cItemLeavesHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}
@@ -26,7 +26,7 @@ public:
 
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
-		switch (BlockItemConverter::FromItem(PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage)))
+		switch (BlockItemConverter::FromItem(a_HeldItem.m_ItemType))
 		{
 			case BlockType::AcaciaLeaves:  return a_Player.PlaceBlock(a_PlacePosition, Block::AcaciaLeaves::AcaciaLeaves(LEAVES_CHECK_DISTANCE, true));
 			case BlockType::BirchLeaves:   return a_Player.PlaceBlock(a_PlacePosition, Block::BirchLeaves::BirchLeaves(LEAVES_CHECK_DISTANCE, true));

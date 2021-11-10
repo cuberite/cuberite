@@ -328,7 +328,7 @@ public:
 		// Write the tag compound (for enchantment, firework, custom name and repair cost):
 		if (
 			(!a_Item.m_Enchantments.IsEmpty()) ||
-			((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR)) ||
+			((a_Item.m_ItemType == Item::FireworkRocket) || (a_Item.m_ItemType == Item::FireworkStar)) ||
 			(a_Item.m_RepairCost > 0) ||
 			(a_Item.m_CustomName != "") ||
 			(!a_Item.m_LoreTable.empty())
@@ -361,14 +361,14 @@ public:
 					mWriter.EndCompound();
 				}
 
-				if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
+				if ((a_Item.m_ItemType == Item::FireworkRocket) || (a_Item.m_ItemType == Item::FireworkStar))
 				{
 					cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, mWriter, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
 				}
 
 				if (!a_Item.m_Enchantments.IsEmpty())
 				{
-					const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
+					const char * TagName = (a_Item.m_ItemType == Item::Book) ? "StoredEnchantments" : "ench";
 					EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, mWriter, TagName);
 				}
 			mWriter.EndCompound();
@@ -570,7 +570,7 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_Jukebox, "RecordPlayer");
-			mWriter.AddInt("Record", a_Jukebox->GetRecord());
+			mWriter.AddInt("Record", PaletteUpgrade::ToItem(a_Jukebox->GetRecord()).first);
 		mWriter.EndCompound();
 	}
 

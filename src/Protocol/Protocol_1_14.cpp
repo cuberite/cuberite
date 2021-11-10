@@ -48,6 +48,22 @@ void cProtocol_1_14::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+void cProtocol_1_14::SendEntityAnimation(const cEntity & a_Entity, EntityAnimation a_Animation)
+{
+	if (a_Animation == EntityAnimation::PlayerEntersBed)
+	{
+		// Use Bed packet removed, through metadata instead:
+		SendEntityMetadata(a_Entity);
+		return;
+	}
+
+	Super::SendEntityAnimation(a_Entity, a_Animation);
+}
+
+
+
+
+
 void cProtocol_1_14::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	// Send the Join Game packet:
@@ -115,15 +131,7 @@ void cProtocol_1_14::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, co
 
 
 
-void cProtocol_1_14::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-}
-
-
-
-
-
-UInt32 cProtocol_1_14::GetPacketID(ePacketType a_PacketType)
+UInt32 cProtocol_1_14::GetPacketID(ePacketType a_PacketType) const
 {
 	switch (a_PacketType)
 	{
@@ -176,25 +184,16 @@ UInt32 cProtocol_1_14::GetPacketID(ePacketType a_PacketType)
 
 
 
-cProtocol::Version cProtocol_1_14::GetProtocolVersion()
+Item cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolID) const
 {
-	return Version::v1_14;
+	return Palette_1_14::ToItem(a_ProtocolID);
 }
 
 
 
 
 
-std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolID)
-{
-	return PaletteUpgrade::ToItem(Palette_1_14::ToItem(a_ProtocolID));
-}
-
-
-
-
-
-UInt32 cProtocol_1_14::GetProtocolBlockType(BlockState a_Block)
+UInt32 cProtocol_1_14::GetProtocolBlockType(BlockState a_Block) const
 {
 	return Palette_1_14::From(a_Block);
 }
@@ -203,18 +202,54 @@ UInt32 cProtocol_1_14::GetProtocolBlockType(BlockState a_Block)
 
 
 
-UInt32 cProtocol_1_14::GetProtocolItemType(short a_ItemID, short a_ItemDamage)
+signed char cProtocol_1_14::GetProtocolEntityStatus(EntityAnimation a_Animation) const
 {
-	return Palette_1_14::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+	switch (a_Animation)
+	{
+		case EntityAnimation::FoxChews: return 45;
+		case EntityAnimation::OcelotTrusts: return 40;
+		case EntityAnimation::OcelotDistrusts: return 41;
+		case EntityAnimation::PawnBerryBushPricks: return 44;
+		case EntityAnimation::PawnChestEquipmentBreaks: return 50;
+		case EntityAnimation::PawnFeetEquipmentBreaks: return 52;
+		case EntityAnimation::PawnHeadEquipmentBreaks: return 49;
+		case EntityAnimation::PawnLegsEquipmentBreaks: return 51;
+		case EntityAnimation::PawnMainHandEquipmentBreaks: return 47;
+		case EntityAnimation::PawnOffHandEquipmentBreaks: return 48;
+		case EntityAnimation::PawnTeleports: return 46;
+		case EntityAnimation::PlayerBadOmenActivates: return 43;
+		case EntityAnimation::RavagerAttacks: return 4;
+		case EntityAnimation::RavagerBecomesStunned: return 39;
+		case EntityAnimation::VillagerSweats: return 42;
+		default: return Super::GetProtocolEntityStatus(a_Animation);
+	}
 }
 
 
 
 
 
-UInt32 cProtocol_1_14::GetProtocolStatisticType(Statistic a_Statistic)
+UInt32 cProtocol_1_14::GetProtocolItemType(Item a_ItemID) const
+{
+	return Palette_1_14::From(a_ItemID);
+}
+
+
+
+
+
+UInt32 cProtocol_1_14::GetProtocolStatisticType(const CustomStatistic a_Statistic) const
 {
 	return Palette_1_14::From(a_Statistic);
+}
+
+
+
+
+
+cProtocol::Version cProtocol_1_14::GetProtocolVersion() const
+{
+	return Version::v1_14;
 }
 
 

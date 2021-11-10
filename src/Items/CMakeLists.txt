@@ -16,7 +16,7 @@ target_sources(
 	ItemButton.h
 	ItemChest.h
 	ItemChorusFruit.h
-	ItemCloth.h
+        ItemWool.h
 	ItemComparator.h
 	ItemCookedFish.h
 	ItemDefaultItem.h
@@ -63,7 +63,7 @@ target_sources(
 	ItemRawChicken.h
 	ItemRawFish.h
 	ItemRedstoneDust.h
-	ItemRedstoneRepeater.h
+        ItemRepeater.h
 	ItemRottenFlesh.h
 	ItemSeeds.h
 	ItemShears.h

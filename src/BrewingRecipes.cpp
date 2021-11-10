@@ -140,16 +140,16 @@ const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_
 	}
 
 	// Check for gunpowder
-	if (a_Ingredient.m_ItemType == E_ITEM_GUNPOWDER)
+	if (a_Ingredient.m_ItemType == Item::Gunpowder)
 	{
-		if (a_Input.m_ItemDamage & 0x2000)
+		if (a_Input.m_ItemType == Item::Potion)
 		{
 			// Create new recipe and add it to list
 			auto Recipe = std::make_unique<cRecipe>();
 
-			Recipe->Input.m_ItemType = a_Input.m_ItemDamage;
+			Recipe->Input.m_ItemType = Item::Potion;
 			Recipe->Output.m_ItemDamage = a_Input.m_ItemDamage + 8192;
-			Recipe->Ingredient.m_ItemType = E_ITEM_GUNPOWDER;
+			Recipe->Ingredient.m_ItemType = Item::Gunpowder;
 
 			auto RecipePtr = Recipe.get();
 			m_Recipes.push_back(std::move(Recipe));
@@ -198,7 +198,7 @@ const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_
 bool cBrewingRecipes::IsIngredient(const cItem & a_Ingredient) const
 {
 	// Check for gunpowder
-	if (a_Ingredient.m_ItemType == E_ITEM_GUNPOWDER)
+	if (a_Ingredient.m_ItemType == Item::Gunpowder)
 	{
 		return true;
 	}
@@ -219,7 +219,7 @@ bool cBrewingRecipes::IsIngredient(const cItem & a_Ingredient) const
 
 bool cBrewingRecipes::IsBottle(const cItem & a_Item) const
 {
-	return (a_Item.m_ItemType == E_ITEM_POTION);
+	return (a_Item.m_ItemType == Item::Potion);
 }
 
 
@@ -228,7 +228,7 @@ bool cBrewingRecipes::IsBottle(const cItem & a_Item) const
 
 bool cBrewingRecipes::IsFuel(const cItem & a_Item) const
 {
-	return (a_Item.m_ItemType == E_ITEM_BLAZE_POWDER);
+	return (a_Item.m_ItemType == Item::BlazePowder);
 }
 
 
