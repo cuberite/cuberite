@@ -1,6 +1,6 @@
 
 #pragma once
-
+#include "Registries/Items.h"
 
 
 
@@ -662,31 +662,31 @@ inline double NormalizeAngleDegrees(const double a_Degrees)
 
 namespace ItemCategory
 {
-	bool IsPickaxe(short a_ItemType);
+	bool IsPickaxe(Item a_ItemType);
 
-	bool IsAxe(short a_ItemType);
+	bool IsAxe(Item a_ItemType);
 
-	bool IsSword(short a_ItemType);
+	bool IsSword(Item a_ItemType);
 
-	bool IsHoe(short a_ItemType);
+	bool IsHoe(Item a_ItemType);
 
-	bool IsShovel(short a_ItemType);
+	bool IsShovel(Item a_ItemType);
 
-	bool IsTool(short a_ItemType);
+	bool IsTool(Item a_ItemType);
 
-	bool IsHelmet(short a_ItemType);
+	bool IsHelmet(Item a_ItemType);
 
-	bool IsChestPlate(short a_ItemType);
+	bool IsChestPlate(Item a_ItemType);
 
-	bool IsLeggings(short a_ItemType);
+	bool IsLeggings(Item a_ItemType);
 
-	bool IsBoots(short a_ItemType);
+	bool IsBoots(Item a_ItemType);
 
-	bool IsMinecart(short a_ItemType);
+	bool IsMinecart(Item a_ItemType);
 
-	bool IsArmor(short a_ItemType);
+	bool IsArmor(Item a_ItemType);
 
-	bool IsHorseArmor(short a_ItemType);
+	bool IsHorseArmor(Item a_ItemType);
 }
 
 // tolua_end

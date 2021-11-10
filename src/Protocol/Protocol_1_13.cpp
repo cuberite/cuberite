@@ -463,9 +463,9 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadataType a_FieldType) const
 
 
 
-std::pair<short, short> cProtocol_1_13::GetItemFromProtocolID(UInt32 a_ProtocolID) const
+Item cProtocol_1_13::GetItemFromProtocolID(UInt32 a_ProtocolID) const
 {
-	return PaletteUpgrade::ToItem(Palette_1_13::ToItem(a_ProtocolID));
+	return Palette_1_13::ToItem(a_ProtocolID);
 }
 
 
@@ -560,9 +560,9 @@ signed char cProtocol_1_13::GetProtocolEntityStatus(const EntityAnimation a_Anim
 
 
 
-UInt32 cProtocol_1_13::GetProtocolItemType(short a_ItemID, short a_ItemDamage) const
+UInt32 cProtocol_1_13::GetProtocolItemType(Item a_ItemID) const
 {
-	return Palette_1_13::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+	return Palette_1_13::From(a_ItemID);
 }
 
 
@@ -760,9 +760,7 @@ bool cProtocol_1_13::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t
 		return true;
 	}
 
-	const auto Translated = GetItemFromProtocolID(ToUnsigned(ItemID));
-	a_Item.m_ItemType = Translated.first;
-	a_Item.m_ItemDamage = Translated.second;
+	a_Item.m_ItemType = GetItemFromProtocolID(ToUnsigned(ItemID));
 
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8, Int8, ItemCount);
 	a_Item.m_ItemCount = ItemCount;
@@ -875,7 +873,7 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 				if (!MinecartContent.IsEmpty())
 				{
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockIDMeta, EntityMetadataType::VarInt);
-					int Content = MinecartContent.m_ItemType;
+					int Content = PaletteUpgrade::ToItem(MinecartContent.m_ItemType).first;
 					Content |= MinecartContent.m_ItemDamage << 8;
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
 
@@ -989,14 +987,6 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 
 void cProtocol_1_13::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 {
-	short ItemType = a_Item.m_ItemType;
-	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
-	if (ItemType <= 0)
-	{
-		// Fix, to make sure no invalid values are sent.
-		ItemType = -1;
-	}
-
 	if (a_Item.IsEmpty())
 	{
 		a_Pkt.WriteBEInt16(-1);
@@ -1004,7 +994,7 @@ void cProtocol_1_13::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	}
 
 	// Normal item
-	a_Pkt.WriteBEInt16(static_cast<Int16>(GetProtocolItemType(a_Item.m_ItemType, a_Item.m_ItemDamage)));
+	a_Pkt.WriteBEInt16(static_cast<Int16>(GetProtocolItemType(a_Item.m_ItemType)));
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 
 	// TODO: NBT
@@ -1507,9 +1497,9 @@ void cProtocol_1_13_1::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSk
 
 
 
-std::pair<short, short> cProtocol_1_13_1::GetItemFromProtocolID(UInt32 a_ProtocolID) const
+Item cProtocol_1_13_1::GetItemFromProtocolID(UInt32 a_ProtocolID) const
 {
-	return PaletteUpgrade::ToItem(Palette_1_13_1::ToItem(a_ProtocolID));
+	return Palette_1_13_1::ToItem(a_ProtocolID);
 }
 
 
@@ -1525,9 +1515,9 @@ UInt32 cProtocol_1_13_1::GetProtocolBlockType(BlockState a_Block) const
 
 
 
-UInt32 cProtocol_1_13_1::GetProtocolItemType(short a_ItemID, short a_ItemDamage) const
+UInt32 cProtocol_1_13_1::GetProtocolItemType(Item a_ItemID) const
 {
-	return Palette_1_13_1::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+	return Palette_1_13_1::From(a_ItemID);
 }
 
 
@@ -1575,9 +1565,7 @@ bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size
 	}
 
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, ItemID);
-	const auto Translated = GetItemFromProtocolID(ItemID);
-	a_Item.m_ItemType = Translated.first;
-	a_Item.m_ItemDamage = Translated.second;
+	a_Item.m_ItemType = GetItemFromProtocolID(ItemID);
 
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8, Int8, ItemCount);
 	a_Item.m_ItemCount = ItemCount;
@@ -1603,13 +1591,6 @@ bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size
 
 void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 {
-	short ItemType = a_Item.m_ItemType;
-	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
-	if (ItemType <= 0)
-	{
-		// Fix, to make sure no invalid values are sent.
-		ItemType = -1;
-	}
 
 	if (a_Item.IsEmpty())
 	{
@@ -1621,7 +1602,7 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 	a_Pkt.WriteBool(true);
 
 	// Normal item
-	a_Pkt.WriteVarInt32(GetProtocolItemType(a_Item.m_ItemType, a_Item.m_ItemDamage));
+	a_Pkt.WriteVarInt32(GetProtocolItemType(a_Item.m_ItemType));
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 
 	// TODO: NBT

@@ -184,9 +184,9 @@ UInt32 cProtocol_1_14::GetPacketID(ePacketType a_PacketType) const
 
 
 
-std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolID) const
+Item cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolID) const
 {
-	return PaletteUpgrade::ToItem(Palette_1_14::ToItem(a_ProtocolID));
+	return Palette_1_14::ToItem(a_ProtocolID);
 }
 
 
@@ -229,9 +229,9 @@ signed char cProtocol_1_14::GetProtocolEntityStatus(EntityAnimation a_Animation)
 
 
 
-UInt32 cProtocol_1_14::GetProtocolItemType(short a_ItemID, short a_ItemDamage) const
+UInt32 cProtocol_1_14::GetProtocolItemType(Item a_ItemID) const
 {
-	return Palette_1_14::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+	return Palette_1_14::From(a_ItemID);
 }
 
 

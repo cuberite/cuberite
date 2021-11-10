@@ -17,7 +17,7 @@ class cItemPaintingHandler:
 
 public:
 
-	cItemPaintingHandler(int a_ItemType):
+	cItemPaintingHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

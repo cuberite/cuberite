@@ -7,11 +7,11 @@
 
 
 
-class cItemClothHandler :
+class cItemWoolHandler :
 	public cItemHandler
 {
 public:
-	cItemClothHandler(int a_ItemType)
+	cItemWoolHandler(Item a_ItemType)
 		: cItemHandler(a_ItemType)
 	{
 

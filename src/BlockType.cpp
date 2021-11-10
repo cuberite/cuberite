@@ -228,12 +228,7 @@ int BlockStringToType(const AString & a_BlockTypeString)
 bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item)
 {
 	AString ItemName = TrimString(a_ItemTypeString);
-	if (ItemName.substr(0, 10) == "minecraft:")
-	{
-		ItemName = ItemName.substr(10);
-	}
-
-	return GetBlockIDMap().ResolveItem(ItemName, a_Item);
+	return cItem(NamespaceSerializer::ToItem(NamespaceSerializer::SplitNamespacedID(ItemName).second))
 }
 
 

@@ -240,7 +240,7 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		if (GetSlot(i).IsEmpty())
 		{
 			m_CurrentBrewingRecipes[i] = nullptr;
-			m_Results[i].Clear();
+			m_Results[i].Empty();
 			continue;
 		}
 

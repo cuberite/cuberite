@@ -15,7 +15,7 @@ class cItemPoisonousPotatoHandler:
 public:
 
 	cItemPoisonousPotatoHandler():
-		Super(E_ITEM_POISONOUS_POTATO, FoodInfo(2, 1.2))
+		Super(Item::PoisonousPotato, FoodInfo(2, 1.2))
 	{
 	}
 

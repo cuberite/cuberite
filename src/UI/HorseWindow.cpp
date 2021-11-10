@@ -39,7 +39,7 @@ void cHorseWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_
 	else
 	{
 		// Inventory or Hotbar
-		if (ItemCategory::IsHorseArmor(a_ItemStack.m_ItemType) || (a_ItemStack.m_ItemType == E_ITEM_SADDLE))
+		if (ItemCategory::IsHorseArmor(a_ItemStack.m_ItemType) || (a_ItemStack.m_ItemType == Item::Saddle))
 		{
 			AreasInOrder.push_back(m_SlotAreas[0]);  /* Horse */
 			Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);

@@ -15,7 +15,7 @@ class cItemNetherWartHandler:
 
 public:
 
-	cItemNetherWartHandler(int a_ItemType):
+	cItemNetherWartHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

@@ -13,7 +13,7 @@ class cItemMilkHandler:
 public:
 
 	cItemMilkHandler():
-		Super(E_ITEM_MILK)
+		Super(Item::MilkBucket)
 	{
 	}
 

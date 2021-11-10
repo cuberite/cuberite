@@ -694,7 +694,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 	Super::OnRightClicked(a_Player);
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
-	if ((EquippedItem.m_ItemType == E_ITEM_NAME_TAG) && !EquippedItem.m_CustomName.empty())
+	if ((EquippedItem.m_ItemType == Item::NameTag) && !EquippedItem.m_CustomName.empty())
 	{
 		SetCustomName(EquippedItem.m_CustomName);
 		if (!a_Player.IsGameModeCreative())
@@ -714,7 +714,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 		// Mob is already leashed but client anticipates the server action and draws a leash link, so we need to send current leash to cancel it
 		m_World->BroadcastLeashEntity(*this, *this->GetLeashedTo());
 	}
-	else if (CanBeLeashed() && (EquippedItem.m_ItemType == E_ITEM_LEASH))
+	else if (CanBeLeashed() && (EquippedItem.m_ItemType == Item::Lead))
 	{
 		if (!a_Player.IsGameModeCreative())
 		{
@@ -1475,9 +1475,9 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 		}
 	}
 	// If a player holding my spawn egg right-clicked me, spawn a new baby
-	if (EquippedItem.m_ItemType == E_ITEM_SPAWN_EGG)
+	if (cItemSpawnEggHandler::IsSpawnEgg(EquippedItem))
 	{
-		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(EquippedItem.m_ItemDamage);
+		eMonsterType MonsterType = cItemSpawnEggHandler::ItemToMonsterType(EquippedItem);
 		if (
 			(MonsterType == m_MobType) &&
 			(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID)  // Spawning succeeded
@@ -1500,9 +1500,8 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 
 void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, Item a_Item)
 {
-	auto NumericItem = PaletteUpgrade::ToItem(a_Item);
 	auto Count = GetRandomProvider().RandInt<unsigned int>(a_Min, a_Max);
-	auto MaxStackSize = static_cast<unsigned char>(ItemHandler(NumericItem.first)->GetMaxStackSize());
+	auto MaxStackSize = static_cast<unsigned char>(ItemHandler(a_Item)->GetMaxStackSize());
 	while (Count > MaxStackSize)
 	{
 		a_Drops.emplace_back(a_Item, MaxStackSize);

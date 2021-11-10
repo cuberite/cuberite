@@ -32,7 +32,8 @@ public:
 		dlaBreakBlockInstant,
 	};
 
-	cItemHandler(int a_ItemType);
+	cItemHandler(Item a_ItemType);
+	cItemHandler() : m_ItemType(Item::Air) {}
 
 	/** Force virtual destructor */
 	virtual ~cItemHandler() {}
@@ -124,7 +125,7 @@ public:
 	virtual bool IsPlaceable(void);
 
 	/** Can the anvil repair this item, when a_Item is the second input? */
-	virtual bool CanRepairWithRawMaterial(short a_ItemType);
+	virtual bool CanRepairWithRawMaterial(const cItem & a_Item);
 
 	/** Returns whether this tool / item can harvest a specific block (e.g. iron pickaxe can harvest diamond ore, but wooden one can't).
 	Defaults to false unless overridden. */
@@ -134,15 +135,13 @@ public:
 	Defaults to 1 unless overriden. */
 	virtual float GetBlockBreakingStrength(BlockState a_Block);
 
-	static cItemHandler * GetItemHandler(int a_ItemType);
+	static cItemHandler * GetItemHandler(Item a_ItemType);
 	static cItemHandler * GetItemHandler(const cItem & a_Item) { return GetItemHandler(a_Item.m_ItemType); }
-
-	static void Deinit();
 
 protected:
 
-	int m_ItemType;
-	static cItemHandler * CreateItemHandler(int m_ItemType);
+	Item m_ItemType;
+	static cItemHandler CreateItemHandler(Item m_ItemType);
 
 	/** Performs the actual placement of this placeable item.
 	The descendant handler should call a_Player.PlaceBlock(s) supplying correct values for the newly placed block.
@@ -150,9 +149,8 @@ protected:
 	Handlers return what a_Player.PlaceBlock(s) returns, indicating whether the placement was successful. */
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, Vector3i a_PlacePosition, eBlockFace a_ClickedBlockFace, Vector3i a_CursorPosition);
 
-	static cItemHandler * m_ItemHandler[E_ITEM_LAST + 1];
-	static bool m_HandlerInitialized;  // used to detect if the itemhandlers are initialized
+	static std::map<Item, cItemHandler> m_ItemHandlers;
 };
 
 // Short function
-inline cItemHandler *ItemHandler(int a_ItemType) { return cItemHandler::GetItemHandler(a_ItemType); }
+inline cItemHandler *ItemHandler(Item a_ItemType) { return cItemHandler::GetItemHandler(a_ItemType); }

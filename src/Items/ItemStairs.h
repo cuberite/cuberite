@@ -47,7 +47,7 @@ private:
 			case BLOCK_FACE_NONE: return false;
 		}
 
-		switch (BlockItemConverter::FromItem(PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage)))
+		switch (BlockItemConverter::FromItem(a_HeldItem.m_ItemType))
 		{
 			case BlockType::AcaciaStairs:                  BlockToPlace = AcaciaStairs::AcaciaStairs(                                   BlockFace, Inverse ? AcaciaStairs::Half::Top                  : AcaciaStairs::Half::Bottom,                  AcaciaStairs::Shape::Straight); break;
 			case BlockType::AndesiteStairs:                BlockToPlace = AndesiteStairs::AndesiteStairs(                               BlockFace, Inverse ? AndesiteStairs::Half::Top                : AndesiteStairs::Half::Bottom,                AndesiteStairs::Shape::Straight); break;

@@ -41,10 +41,10 @@ protected:
 	virtual void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
-	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
+	virtual Item GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
 	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const override;
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
-	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) const override;
+	virtual UInt32 GetProtocolItemType(Item a_ItemID) const override;
 	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const override;
 	virtual Version GetProtocolVersion() const override;
 

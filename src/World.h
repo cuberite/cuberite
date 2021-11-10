@@ -443,12 +443,12 @@ public:
 
 	/** Spawns an minecart at the given coordinates.
 	Returns the UniqueID of the spawned minecart, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnMinecart(Vector3d a_Pos, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1);
+	UInt32 SpawnMinecart(Vector3d a_Pos, Item a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1);
 
 	/** OBSOLETE, use the Vector3d-based overload instead.
 	Spawns an minecart at the given coordinates.
 	Returns the UniqueID of the spawned minecart, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1)
+	UInt32 SpawnMinecart(double a_X, double a_Y, double a_Z, Item a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1)
 	{
 		return SpawnMinecart({a_X, a_Y, a_Z}, a_MinecartType, a_Content, a_BlockHeight);
 	}

@@ -16,7 +16,7 @@ class cItemLilypadHandler:
 
 public:
 
-	cItemLilypadHandler(int a_ItemType):
+	cItemLilypadHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 

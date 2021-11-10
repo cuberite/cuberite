@@ -17,7 +17,7 @@ class cItemMapHandler:
 public:
 
 	cItemMapHandler():
-		Super(E_ITEM_MAP)
+		Super(Item::FilledMap)
 	{
 	}
 

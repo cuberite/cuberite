@@ -21,7 +21,6 @@
 #include "ItemButton.h"
 #include "ItemChest.h"
 #include "ItemChorusFruit.h"
-#include "ItemCloth.h"
 #include "ItemComparator.h"
 #include "ItemCookedFish.h"
 #include "ItemDoor.h"
@@ -30,8 +29,8 @@
 #include "ItemEmptyMap.h"
 #include "ItemEnchantingTable.h"
 #include "ItemEndCrystal.h"
-#include "ItemEnderchest.h"
 #include "ItemEndPortalFrame.h"
+#include "ItemEnderchest.h"
 #include "ItemEyeOfEnder.h"
 #include "ItemFenceGate.h"
 #include "ItemFishingRod.h"
@@ -40,6 +39,7 @@
 #include "ItemFurnace.h"
 #include "ItemGlazedTerracotta.h"
 #include "ItemGoldenApple.h"
+#include "ItemHayBale.h"
 #include "ItemHoe.h"
 #include "ItemHopper.h"
 #include "ItemItemFrame.h"
@@ -49,6 +49,7 @@
 #include "ItemLever.h"
 #include "ItemLighter.h"
 #include "ItemLilypad.h"
+#include "ItemLog.h"
 #include "ItemMap.h"
 #include "ItemMilk.h"
 #include "ItemMinecart.h"
@@ -66,7 +67,7 @@
 #include "ItemRawChicken.h"
 #include "ItemRawFish.h"
 #include "ItemRedstoneDust.h"
-#include "ItemRedstoneRepeater.h"
+#include "ItemRepeater.h"
 #include "ItemRottenFlesh.h"
 #include "ItemSeeds.h"
 #include "ItemShears.h"
@@ -84,6 +85,8 @@
 #include "ItemTrapdoor.h"
 #include "ItemTripwireHook.h"
 #include "ItemVine.h"
+#include "ItemWool.h"
+
 
 #include "../Blocks/BlockHandler.h"
 #include "SimplePlaceableItemHandler.h"
@@ -93,330 +96,1003 @@
 
 
 
-bool cItemHandler::m_HandlerInitialized = false;
-cItemHandler * cItemHandler::m_ItemHandler[E_ITEM_LAST + 1];
+std::map<Item, cItemHandler> cItemHandler::m_ItemHandlers = std::map<Item, cItemHandler>();
 
 
 
 
-
-cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
+cItemHandler * cItemHandler::GetItemHandler(Item a_ItemType)
 {
-	if ((a_ItemType < 0) || (static_cast<size_t>(a_ItemType) >= ARRAYCOUNT(m_ItemHandler)))
+	if (m_ItemHandlers.count(a_ItemType) == 0)
 	{
-		// Either nothing (-1), or bad value, both cases should return the air handler
-		if (a_ItemType < -1)
-		{
-			ASSERT(!"Bad item type");
-		}
-		a_ItemType = 0;
+		m_ItemHandlers.insert(std::make_pair(a_ItemType, CreateItemHandler(a_ItemType)));
 	}
-
-	if (!m_HandlerInitialized)
-	{
-		// We need to initialize
-		memset(m_ItemHandler, 0, sizeof(m_ItemHandler));
-		m_HandlerInitialized = true;
-	}
-	if (m_ItemHandler[a_ItemType] == nullptr)
-	{
-		m_ItemHandler[a_ItemType] = CreateItemHandler(a_ItemType);
-	}
-	return m_ItemHandler[a_ItemType];
+	return & m_ItemHandlers[a_ItemType];
 }
 
 
 
 
 
-cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
+cItemHandler cItemHandler::CreateItemHandler(Item a_ItemType)
 {
 	switch (a_ItemType)
 	{
-		default:                       return new cItemHandler(a_ItemType);
-
-		// Single item per handler, alphabetically sorted:
-		case E_ITEM_BANNER:              return new cItemBannerHandler(a_ItemType);
-		case E_BLOCK_BIG_FLOWER:          return new cItemBigFlowerHandler;
-		case E_BLOCK_CHEST:               return new cItemChestHandler(a_ItemType);
-		case E_BLOCK_LEAVES:              return new cItemLeavesHandler(a_ItemType);
-		case E_BLOCK_LILY_PAD:            return new cItemLilypadHandler(a_ItemType);
-		case E_BLOCK_NEW_LEAVES:          return new cItemLeavesHandler(a_ItemType);
-		case E_BLOCK_PURPUR_SLAB:         return new cItemSlabHandler(a_ItemType);
-		case E_BLOCK_RED_SANDSTONE_SLAB:  return new cItemSlabHandler(a_ItemType);
-		case E_BLOCK_SAPLING:             return new cSimplePlaceableItemHandler(a_ItemType, BlockType::OakSapling);
-		case E_BLOCK_STONE_SLAB:          return new cItemSlabHandler(a_ItemType);
-		case E_BLOCK_TRAPPED_CHEST:       return new cItemChestHandler(a_ItemType);
-		case E_BLOCK_WOODEN_SLAB:         return new cItemSlabHandler(a_ItemType);
-		case E_BLOCK_WOOL:                return new cItemClothHandler(a_ItemType);
-		case E_ITEM_BED:                 return new cItemBedHandler(a_ItemType);
-		case E_ITEM_BOTTLE_O_ENCHANTING: return new cItemBottleOEnchantingHandler();
-		case E_ITEM_BOW:                 return new cItemBowHandler();
-		case E_ITEM_BREWING_STAND:       return new cSimplePlaceableItemHandler(a_ItemType, BlockType::BrewingStand);
-		case E_ITEM_CAKE:                return new cSimplePlaceableItemHandler(a_ItemType, BlockType::Cake);
-		case E_ITEM_CAULDRON:            return new cSimplePlaceableItemHandler(a_ItemType, BlockType::Cauldron);
-		case E_ITEM_COMPARATOR:          return new cItemComparatorHandler(a_ItemType);
-		case E_ITEM_DYE:                 return new cItemDyeHandler(a_ItemType);
-		case E_ITEM_EGG:                 return new cItemEggHandler();
-		case E_ITEM_EMPTY_MAP:           return new cItemEmptyMapHandler();
-		case E_ITEM_ENDER_PEARL:         return new cItemEnderPearlHandler();
-		case E_ITEM_END_CRYSTAL:         return new cItemEndCrystalHandler(a_ItemType);
-		case E_ITEM_EYE_OF_ENDER:        return new cItemEyeOfEnderHandler();
-		case E_ITEM_FIRE_CHARGE:         return new cItemLighterHandler(a_ItemType);
-		case E_ITEM_FIREWORK_ROCKET:     return new cItemFireworkHandler();
-		case E_ITEM_FISHING_ROD:         return new cItemFishingRodHandler(a_ItemType);
-		case E_ITEM_FLINT_AND_STEEL:     return new cItemLighterHandler(a_ItemType);
-		case E_ITEM_FLOWER_POT:          return new cSimplePlaceableItemHandler(a_ItemType, BlockType::FlowerPot);
-		case E_ITEM_GLASS_BOTTLE:        return new cItemBottleHandler();
-		case E_ITEM_MAP:                 return new cItemMapHandler();
-		case E_ITEM_MILK:                return new cItemMilkHandler();
-		case E_ITEM_ITEM_FRAME:          return new cItemItemFrameHandler(a_ItemType);
-		case E_ITEM_NETHER_WART:         return new cItemNetherWartHandler(a_ItemType);
-		case E_ITEM_PAINTING:            return new cItemPaintingHandler(a_ItemType);
-		case E_ITEM_POTIONS:             return new cItemPotionHandler();
-		case E_ITEM_REDSTONE_DUST:       return new cItemRedstoneDustHandler(a_ItemType);
-		case E_ITEM_REDSTONE_REPEATER:   return new cItemRedstoneRepeaterHandler(a_ItemType);
-		case E_ITEM_SHEARS:              return new cItemShearsHandler(a_ItemType);
-		case E_ITEM_SIGN:                return new cItemSignHandler(a_ItemType);
-		case E_ITEM_HEAD:                return new cItemMobHeadHandler(a_ItemType);
-		case E_ITEM_SNOWBALL:            return new cItemSnowballHandler();
-		case E_ITEM_SPAWN_EGG:           return new cItemSpawnEggHandler(a_ItemType);
-		case E_ITEM_STRING:              return new cSimplePlaceableItemHandler(a_ItemType, BlockType::Tripwire);
-		case E_ITEM_SUGARCANE:           return new cSimplePlaceableItemHandler(a_ItemType, BlockType::SugarCane);
-		case E_BLOCK_ACTIVATOR_RAIL:       return new cItemRailHandler(a_ItemType);
-		case E_BLOCK_ANVIL:                return new cItemAnvilHandler(a_ItemType);
-		case E_BLOCK_DETECTOR_RAIL:        return new cItemRailHandler(a_ItemType);
-		case E_BLOCK_DISPENSER:            return new cItemDropSpenserHandler(a_ItemType);
-		case E_BLOCK_DROPPER:              return new cItemDropSpenserHandler(a_ItemType);
-		case E_BLOCK_ENCHANTMENT_TABLE:    return new cItemEnchantingTableHandler(a_ItemType);
-		case E_BLOCK_ENDER_CHEST:          return new cItemEnderchestHandler(a_ItemType);
-		case E_BLOCK_END_PORTAL_FRAME:     return new cItemEndPortalFrameHandler(a_ItemType);
-		case E_BLOCK_FURNACE:              return new cItemFurnaceHandler(a_ItemType);
-		// case E_ITEM_HAY_BALE:             return new cItemSidewaysHandler(a_ItemType);  // TODO(12xx12)
-		case E_BLOCK_HOPPER:               return new cItemHopperHandler(a_ItemType);
-		case E_BLOCK_IRON_TRAPDOOR:        return new cItemTrapdoorHandler(a_ItemType);
-		case E_BLOCK_JACK_O_LANTERN:       return new cItemJackOLanternHandler(a_ItemType);
-		case E_BLOCK_LADDER:               return new cItemLadderHandler(a_ItemType);
-		case E_BLOCK_LEVER:                return new cItemLeverHandler(a_ItemType);
-		// case E_ITEM_LOG:                  return new cItemSidewaysHandler(a_ItemType);  // TODO(12xx12)
-		// case E_ITEM_NEW_LOG:              return new cItemSidewaysHandler(a_ItemType);  // TODO(12xx12)
-		case E_BLOCK_OBSERVER:             return new cItemObserverHandler(a_ItemType);
-		case E_BLOCK_PISTON:               return new cItemPistonHandler(a_ItemType);
-		// case E_ITEM_PLANKS:               return new cItemPlanksHandler(a_ItemType);  // TODO(12xx12)
-		case E_BLOCK_POWERED_RAIL:         return new cItemRailHandler(a_ItemType);
-		case E_BLOCK_PUMPKIN:              return new cItemPumpkinHandler(a_ItemType);
-		case E_BLOCK_QUARTZ_BLOCK:         return new cItemQuartzHandler(a_ItemType);
-		case E_BLOCK_RAIL:                 return new cItemRailHandler(a_ItemType);
-		case E_BLOCK_REDSTONE_TORCH_ON:    return new cItemTorchHandler(a_ItemType);
-		case E_BLOCK_SNOW:                 return new cItemSnowHandler(a_ItemType);
-		case E_BLOCK_STICKY_PISTON:        return new cItemPistonHandler(a_ItemType);
-		case E_BLOCK_STONE_BUTTON:         return new cItemButtonHandler(a_ItemType);
-		case E_BLOCK_TORCH:                return new cItemTorchHandler(a_ItemType);
-		case E_BLOCK_TRAPDOOR:             return new cItemTrapdoorHandler(a_ItemType);
-		case E_BLOCK_TRIPWIRE_HOOK:        return new cItemTripwireHookHandler(a_ItemType);
-		case E_BLOCK_VINES:                return new cItemVineHandler(a_ItemType);
-		case E_BLOCK_WOODEN_BUTTON:        return new cItemButtonHandler(a_ItemType);
-
-		case E_ITEM_WOODEN_HOE:
-		case E_ITEM_STONE_HOE:
-		case E_ITEM_IRON_HOE:
-		case E_ITEM_GOLD_HOE:
-		case E_ITEM_DIAMOND_HOE:
-		{
-			return new cItemHoeHandler(a_ItemType);
-		}
-
-		case E_ITEM_WOODEN_PICKAXE:
-		case E_ITEM_STONE_PICKAXE:
-		case E_ITEM_IRON_PICKAXE:
-		case E_ITEM_GOLD_PICKAXE:
-		case E_ITEM_DIAMOND_PICKAXE:
-		{
-			return new cItemPickaxeHandler(a_ItemType);
-		}
-
-		case E_ITEM_WOODEN_SHOVEL:
-		case E_ITEM_STONE_SHOVEL:
-		case E_ITEM_IRON_SHOVEL:
-		case E_ITEM_GOLD_SHOVEL:
-		case E_ITEM_DIAMOND_SHOVEL:
-		{
-			return new cItemShovelHandler(a_ItemType);
-		}
-
-		case E_ITEM_WOODEN_AXE:
-		case E_ITEM_STONE_AXE:
-		case E_ITEM_IRON_AXE:
-		case E_ITEM_GOLD_AXE:
-		case E_ITEM_DIAMOND_AXE:
-		{
-			return new cItemAxeHandler(a_ItemType);
-		}
-
-		case E_ITEM_WOODEN_SWORD:
-		case E_ITEM_STONE_SWORD:
-		case E_ITEM_IRON_SWORD:
-		case E_ITEM_GOLD_SWORD:
-		case E_ITEM_DIAMOND_SWORD:
-		{
-			return new cItemSwordHandler(a_ItemType);
-		}
-
-		case E_ITEM_BUCKET:
-		case E_ITEM_WATER_BUCKET:
-		case E_ITEM_LAVA_BUCKET:
-		{
-			return new cItemBucketHandler(a_ItemType);
-		}
-
-		case E_ITEM_BEETROOT_SEEDS:
-		case E_ITEM_MELON_SEEDS:
-		case E_ITEM_PUMPKIN_SEEDS:
-		case E_ITEM_SEEDS:
-		{
-			return new cItemSeedsHandler(a_ItemType);
-		}
-
-		case E_ITEM_POTATO: return new cItemFoodSeedsHandler(a_ItemType, FoodInfo(1, 0.6));
-		case E_ITEM_CARROT: return new cItemFoodSeedsHandler(a_ItemType, FoodInfo(3, 6.6));
-
-		case E_ITEM_ACACIA_DOOR:
-		case E_ITEM_BIRCH_DOOR:
-		case E_ITEM_DARK_OAK_DOOR:
-		case E_ITEM_JUNGLE_DOOR:
-		case E_ITEM_SPRUCE_DOOR:
-		case E_ITEM_IRON_DOOR:
-		case E_ITEM_WOODEN_DOOR:
-		{
-			return new cItemDoorHandler(a_ItemType);
-		}
-
-		case E_ITEM_MINECART:
-		case E_ITEM_CHEST_MINECART:
-		case E_ITEM_FURNACE_MINECART:
-		case E_ITEM_MINECART_WITH_TNT:
-		case E_ITEM_MINECART_WITH_HOPPER:
-		{
-			return new cItemMinecartHandler(a_ItemType);
-		}
-
-		case E_BLOCK_ACACIA_FENCE_GATE:
-		case E_BLOCK_BIRCH_FENCE_GATE:
-		case E_BLOCK_DARK_OAK_FENCE_GATE:
-		case E_BLOCK_JUNGLE_FENCE_GATE:
-		case E_BLOCK_OAK_FENCE_GATE:
-		case E_BLOCK_SPRUCE_FENCE_GATE:
-		{
-			return new cItemFenceGateHandler(a_ItemType);
-		}
-
-		case E_BLOCK_ACACIA_WOOD_STAIRS:
-		case E_BLOCK_BIRCH_WOOD_STAIRS:
-		case E_BLOCK_BRICK_STAIRS:
-		case E_BLOCK_COBBLESTONE_STAIRS:
-		case E_BLOCK_DARK_OAK_WOOD_STAIRS:
-		case E_BLOCK_JUNGLE_WOOD_STAIRS:
-		case E_BLOCK_NETHER_BRICK_STAIRS:
-		case E_BLOCK_OAK_WOOD_STAIRS:
-		case E_BLOCK_PURPUR_STAIRS:
-		case E_BLOCK_QUARTZ_STAIRS:
-		case E_BLOCK_RED_SANDSTONE_STAIRS:
-		case E_BLOCK_SANDSTONE_STAIRS:
-		case E_BLOCK_SPRUCE_WOOD_STAIRS:
-		case E_BLOCK_STONE_BRICK_STAIRS:
-		{
-			return new cItemStairsHandler(a_ItemType);
-		}
-
-		case E_BLOCK_WHITE_GLAZED_TERRACOTTA:
-		case E_BLOCK_ORANGE_GLAZED_TERRACOTTA:
-		case E_BLOCK_MAGENTA_GLAZED_TERRACOTTA:
-		case E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA:
-		case E_BLOCK_YELLOW_GLAZED_TERRACOTTA:
-		case E_BLOCK_LIME_GLAZED_TERRACOTTA:
-		case E_BLOCK_PINK_GLAZED_TERRACOTTA:
-		case E_BLOCK_GRAY_GLAZED_TERRACOTTA:
-		case E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA:
-		case E_BLOCK_CYAN_GLAZED_TERRACOTTA:
-		case E_BLOCK_PURPLE_GLAZED_TERRACOTTA:
-		case E_BLOCK_BLUE_GLAZED_TERRACOTTA:
-		case E_BLOCK_BROWN_GLAZED_TERRACOTTA:
-		case E_BLOCK_GREEN_GLAZED_TERRACOTTA:
-		case E_BLOCK_RED_GLAZED_TERRACOTTA:
-		case E_BLOCK_BLACK_GLAZED_TERRACOTTA:
-		{
-			return new cItemGlazedTerracottaHandler(a_ItemType);
-		}
-
-		// Food (please keep alpha-sorted):
-		case E_ITEM_BAKED_POTATO:     return new cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
-		case E_ITEM_BEETROOT:         return new cItemFoodHandler(a_ItemType, FoodInfo(1, 1.2));
-		case E_ITEM_BREAD:            return new cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
-		case E_ITEM_COOKED_CHICKEN:   return new cItemFoodHandler(a_ItemType, FoodInfo(6, 7.2));
-		case E_ITEM_COOKED_MUTTON:    return new cItemFoodHandler(a_ItemType, FoodInfo(6, 9.6));
-		case E_ITEM_COOKED_PORKCHOP:  return new cItemFoodHandler(a_ItemType, FoodInfo(8, 12.8));
-		case E_ITEM_COOKED_RABBIT:    return new cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
-		case E_ITEM_COOKIE:           return new cItemFoodHandler(a_ItemType, FoodInfo(2, 0.5));
-		case E_ITEM_GOLDEN_CARROT:    return new cItemFoodHandler(a_ItemType, FoodInfo(6, 14.4));
-		case E_ITEM_MELON_SLICE:      return new cItemFoodHandler(a_ItemType, FoodInfo(2, 1.2));
-		case E_ITEM_PUMPKIN_PIE:      return new cItemFoodHandler(a_ItemType, FoodInfo(8, 4.8));
-		case E_ITEM_RED_APPLE:        return new cItemFoodHandler(a_ItemType, FoodInfo(4, 2.4));
-		case E_ITEM_RAW_BEEF:         return new cItemFoodHandler(a_ItemType, FoodInfo(3, 1.8));
-		case E_ITEM_RAW_MUTTON:       return new cItemFoodHandler(a_ItemType, FoodInfo(2, 1.2));
-		case E_ITEM_RAW_PORKCHOP:     return new cItemFoodHandler(a_ItemType, FoodInfo(3, 1.8));
-		case E_ITEM_RAW_RABBIT:       return new cItemFoodHandler(a_ItemType, FoodInfo(3, 1.8));
-		case E_ITEM_STEAK:            return new cItemFoodHandler(a_ItemType, FoodInfo(8, 12.8));
-
-		// Special-case food with their own handler
-		case E_ITEM_CHORUS_FRUIT:     return new cItemChorusFruitHandler();
-		case E_ITEM_COOKED_FISH: return new cItemCookedFishHandler();
-		case E_ITEM_GOLDEN_APPLE:        return new cItemGoldenAppleHandler();
-		case E_ITEM_POISONOUS_POTATO: return new cItemPoisonousPotatoHandler();
-		case E_ITEM_RAW_CHICKEN: return new cItemRawChickenHandler();
-		case E_ITEM_RAW_FISH: return new cItemRawFishHandler();
-		case E_ITEM_ROTTEN_FLESH: return new cItemRottenFleshHandler();
-		case E_ITEM_SPIDER_EYE: return new cItemSpiderEyeHandler();
-
-		// Soup:
-		case E_ITEM_BEETROOT_SOUP: return new cItemSoupHandler(a_ItemType, FoodInfo(6, 7.2));
-		case E_ITEM_MUSHROOM_SOUP: return new cItemSoupHandler(a_ItemType, FoodInfo(6, 7.2));
-		case E_ITEM_RABBIT_STEW: return new cItemSoupHandler(a_ItemType, FoodInfo(10, 12));
-
-		// Armor:
-		case E_ITEM_ELYTRA:
-		case E_ITEM_LEATHER_CAP:
-		case E_ITEM_GOLD_HELMET:
-		case E_ITEM_CHAIN_HELMET:
-		case E_ITEM_IRON_HELMET:
-		case E_ITEM_DIAMOND_HELMET:
-		case E_ITEM_LEATHER_TUNIC:
-		case E_ITEM_GOLD_CHESTPLATE:
-		case E_ITEM_CHAIN_CHESTPLATE:
-		case E_ITEM_IRON_CHESTPLATE:
-		case E_ITEM_DIAMOND_CHESTPLATE:
-		case E_ITEM_LEATHER_PANTS:
-		case E_ITEM_GOLD_LEGGINGS:
-		case E_ITEM_CHAIN_LEGGINGS:
-		case E_ITEM_IRON_LEGGINGS:
-		case E_ITEM_DIAMOND_LEGGINGS:
-		case E_ITEM_LEATHER_BOOTS:
-		case E_ITEM_GOLD_BOOTS:
-		case E_ITEM_CHAIN_BOOTS:
-		case E_ITEM_IRON_BOOTS:
-		case E_ITEM_DIAMOND_BOOTS:
-		{
-			return new cItemArmorHandler(a_ItemType);
-		}
-
-		case E_ITEM_ACACIA_BOAT:
-		case E_ITEM_BIRCH_BOAT:
-		case E_ITEM_BOAT:
-		case E_ITEM_DARK_OAK_BOAT:
-		case E_ITEM_JUNGLE_BOAT:
-		case E_ITEM_SPRUCE_BOAT:
-		{
-			return new cItemBoatHandler(a_ItemType);
-		}
+		case Item::AcaciaBoat:                       return cItemBoatHandler(a_ItemType);
+		case Item::AcaciaButton:                     return cItemButtonHandler(a_ItemType);
+		case Item::AcaciaDoor:                       return cItemDoorHandler(a_ItemType);
+		case Item::AcaciaFence:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::AcaciaFenceGate:                  return cItemFenceGateHandler(a_ItemType);
+		case Item::AcaciaLeaves:                     return cItemLeavesHandler(a_ItemType);
+		case Item::AcaciaLog:                        return cItemLogHandler(a_ItemType);
+		case Item::AcaciaPlanks:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::AcaciaPressurePlate:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::AcaciaSapling:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::AcaciaSign:                       return cItemSignHandler(a_ItemType);
+		case Item::AcaciaSlab:                       return cItemSlabHandler(a_ItemType);
+		case Item::AcaciaStairs:                     return cItemStairsHandler(a_ItemType);
+		case Item::AcaciaTrapdoor:                   return cItemTrapdoorHandler(a_ItemType);
+		case Item::AcaciaWood:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::ActivatorRail:                    return cItemRailHandler(a_ItemType);
+		case Item::Air:                              return cItemHandler(a_ItemType);
+		case Item::Allium:                           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::AncientDebris:                    return cItemHandler(a_ItemType);
+		case Item::Andesite:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::AndesiteSlab:                     return cItemSlabHandler(a_ItemType);
+		case Item::AndesiteStairs:                   return cItemStairsHandler(a_ItemType);
+		case Item::AndesiteWall:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Anvil:                            return cItemAnvilHandler(a_ItemType);
+		case Item::Apple:                            return cItemFoodHandler(a_ItemType, FoodInfo(4, 2.4));
+		case Item::ArmorStand:                       return cItemHandler(a_ItemType);
+		case Item::Arrow:                            return cItemHandler(a_ItemType);
+		case Item::AzureBluet:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BakedPotato:                      return cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
+		case Item::Bamboo:                           return cItemHandler(a_ItemType);
+		case Item::Barrel:                           return cItemHandler(a_ItemType);
+		case Item::Barrier:                          return cItemHandler(a_ItemType);
+		case Item::Basalt:                           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BatSpawnEgg:                      return cItemSpawnEggHandler(a_ItemType);
+		case Item::Beacon:                           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Bedrock:                          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BeeNest:                          return cItemHandler(a_ItemType);
+		case Item::BeeSpawnEgg:                      return cItemSpawnEggHandler(a_ItemType);
+		case Item::Beef:                             return cItemFoodHandler(a_ItemType, FoodInfo(3, 1.8));
+		case Item::Beehive:                          return cItemHandler(a_ItemType);
+		case Item::Beetroot:                         return cItemFoodHandler(a_ItemType, FoodInfo(1, 1.2));
+		case Item::BeetrootSeeds:                    return cItemSeedsHandler(a_ItemType);
+		case Item::BeetrootSoup:                     return cItemSoupHandler(a_ItemType, FoodInfo(6, 7.2));
+		case Item::Bell:                             return cItemHandler(a_ItemType);
+		case Item::BirchBoat:                        return cItemBoatHandler(a_ItemType);
+		case Item::BirchButton:                      return cItemButtonHandler(a_ItemType);
+		case Item::BirchDoor:                        return cItemDoorHandler(a_ItemType);
+		case Item::BirchFence:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BirchFenceGate:                   return cItemFenceGateHandler(a_ItemType);
+		case Item::BirchLeaves:                      return cItemLeavesHandler(a_ItemType);
+		case Item::BirchLog:                         return cItemLogHandler(a_ItemType);
+		case Item::BirchPlanks:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BirchPressurePlate:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BirchSapling:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BirchSign:                        return cItemSignHandler(a_ItemType);
+		case Item::BirchSlab:                        return cItemSlabHandler(a_ItemType);
+		case Item::BirchStairs:                      return cItemStairsHandler(a_ItemType);
+		case Item::BirchTrapdoor:                    return cItemTrapdoorHandler(a_ItemType);
+		case Item::BirchWood:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlackBanner:                      return cItemBannerHandler(a_ItemType);
+		case Item::BlackBed:                         return cItemBedHandler(a_ItemType);
+		case Item::BlackCarpet:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlackConcrete:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlackConcretePowder:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlackDye:                         return cItemDyeHandler(a_ItemType);
+		case Item::BlackGlazedTerracotta:            return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::BlackShulkerBox:                  return cItemHandler(a_ItemType);
+		case Item::BlackStainedGlass:                return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlackStainedGlassPane:            return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlackTerracotta:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlackWool:                        return cItemWoolHandler(a_ItemType);
+		case Item::Blackstone:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlackstoneSlab:                   return cItemSlabHandler(a_ItemType);
+		case Item::BlackstoneStairs:                 return cItemStairsHandler(a_ItemType);
+		case Item::BlackstoneWall:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlastFurnace:                     return cItemFurnaceHandler(a_ItemType);
+		case Item::BlazePowder:                      return cItemHandler(a_ItemType);
+		case Item::BlazeRod:                         return cItemHandler(a_ItemType);
+		case Item::BlazeSpawnEgg:                    return cItemSpawnEggHandler(a_ItemType);
+		case Item::BlueBanner:                       return cItemBannerHandler(a_ItemType);
+		case Item::BlueBed:                          return cItemBedHandler(a_ItemType);
+		case Item::BlueCarpet:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlueConcrete:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlueConcretePowder:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlueDye:                          return cItemDyeHandler(a_ItemType);
+		case Item::BlueGlazedTerracotta:             return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::BlueIce:                          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlueOrchid:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlueShulkerBox:                   return cItemHandler(a_ItemType);
+		case Item::BlueStainedGlass:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlueStainedGlassPane:             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlueTerracotta:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BlueWool:                         return cItemWoolHandler(a_ItemType);
+		case Item::Bone:                             return cItemHandler(a_ItemType);
+		case Item::BoneBlock:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BoneMeal:                         return cItemDyeHandler(a_ItemType);
+		case Item::Book:                             return cItemHandler(a_ItemType);
+		case Item::Bookshelf:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Bow:                              return cItemBowHandler();
+		case Item::Bowl:                             return cItemHandler(a_ItemType);
+		case Item::BrainCoral:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BrainCoralBlock:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BrainCoralFan:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Bread:                            return cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
+		case Item::BrewingStand:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Brick:                            return cItemHandler(a_ItemType);
+		case Item::BrickSlab:                        return cItemSlabHandler(a_ItemType);
+		case Item::BrickStairs:                      return cItemStairsHandler(a_ItemType);
+		case Item::BrickWall:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Bricks:                           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BrownBanner:                      return cItemBannerHandler(a_ItemType);
+		case Item::BrownBed:                         return cItemBedHandler(a_ItemType);
+		case Item::BrownCarpet:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BrownConcrete:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BrownConcretePowder:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BrownDye:                         return cItemDyeHandler(a_ItemType);
+		case Item::BrownGlazedTerracotta:            return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::BrownMushroom:                    return cItemHandler(a_ItemType);
+		case Item::BrownMushroomBlock:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BrownShulkerBox:                  return cItemHandler(a_ItemType);
+		case Item::BrownStainedGlass:                return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BrownStainedGlassPane:            return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BrownTerracotta:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BrownWool:                        return cItemWoolHandler(a_ItemType);
+		case Item::BubbleCoral:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BubbleCoralBlock:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::BubbleCoralFan:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Bucket:                           return cItemBucketHandler(a_ItemType);
+		case Item::Cactus:                           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Cake:                             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Campfire:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Carrot:                           return cItemFoodSeedsHandler(a_ItemType, FoodInfo(3, 6.6));
+		case Item::CarrotOnAStick:                   return cItemHandler(a_ItemType);
+		case Item::CartographyTable:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CarvedPumpkin:                    return cItemPumpkinHandler(a_ItemType);
+		case Item::CatSpawnEgg:                      return cItemSpawnEggHandler(a_ItemType);
+		case Item::Cauldron:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CaveSpiderSpawnEgg:               return cItemSpawnEggHandler(a_ItemType);
+		case Item::Chain:                            return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::ChainCommandBlock:                return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::ChainmailBoots:                   return cItemArmorHandler(a_ItemType);
+		case Item::ChainmailChestplate:              return cItemArmorHandler(a_ItemType);
+		case Item::ChainmailHelmet:                  return cItemArmorHandler(a_ItemType);
+		case Item::ChainmailLeggings:                return cItemArmorHandler(a_ItemType);
+		case Item::Charcoal:                         return cItemHandler(a_ItemType);
+		case Item::Chest:                            return cItemChestHandler(a_ItemType);
+		case Item::ChestMinecart:                    return cItemMinecartHandler(a_ItemType);
+		case Item::Chicken:                          return cItemRawChickenHandler();
+		case Item::ChickenSpawnEgg:                  return cItemSpawnEggHandler(a_ItemType);
+		case Item::ChippedAnvil:                     return cItemAnvilHandler(a_ItemType);
+		case Item::ChiseledNetherBricks:             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::ChiseledPolishedBlackstone:       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::ChiseledQuartzBlock:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::ChiseledRedSandstone:             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::ChiseledSandstone:                return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::ChiseledStoneBricks:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::ChorusFlower:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::ChorusFruit:                      return cItemChorusFruitHandler();
+		case Item::ChorusPlant:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Clay:                             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::ClayBall:                         return cItemHandler(a_ItemType);
+		case Item::Clock:                            return cItemHandler(a_ItemType);
+		case Item::Coal:                             return cItemHandler(a_ItemType);
+		case Item::CoalBlock:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CoalOre:                          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CoarseDirt:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Cobblestone:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CobblestoneSlab:                  return cItemSlabHandler(a_ItemType);
+		case Item::CobblestoneStairs:                return cItemStairsHandler(a_ItemType);
+		case Item::CobblestoneWall:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Cobweb:                           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CocoaBeans:                       return cItemHandler(a_ItemType);
+		case Item::Cod:                              return cItemRawFishHandler();
+		case Item::CodBucket:                        return cItemHandler(a_ItemType);
+		case Item::CodSpawnEgg:                      return cItemSpawnEggHandler(a_ItemType);
+		case Item::CommandBlock:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CommandBlockMinecart:             return cItemMinecartHandler(a_ItemType);
+		case Item::Comparator:                       return cItemComparatorHandler(a_ItemType);
+		case Item::Compass:                          return cItemHandler(a_ItemType);
+		case Item::Composter:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Conduit:                          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CookedBeef:                       return cItemFoodHandler(a_ItemType, FoodInfo(8, 12.8));
+		case Item::CookedChicken:                    return cItemFoodHandler(a_ItemType, FoodInfo(6, 7.2));
+		case Item::CookedCod:                        return cItemCookedFishHandler();
+		case Item::CookedMutton:                     return cItemFoodHandler(a_ItemType, FoodInfo(6, 9.6));
+		case Item::CookedPorkchop:                   return cItemFoodHandler(a_ItemType, FoodInfo(8, 12.8));
+		case Item::CookedRabbit:                     return cItemFoodHandler(a_ItemType, FoodInfo(5, 6));
+		case Item::CookedSalmon:                     return cItemFoodHandler(a_ItemType, FoodInfo(6, 9.6));
+		case Item::Cookie:                           return cItemFoodHandler(a_ItemType, FoodInfo(2, 0.5));
+		case Item::Cornflower:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CowSpawnEgg:                      return cItemSpawnEggHandler(a_ItemType);
+		case Item::CrackedNetherBricks:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CrackedPolishedBlackstoneBricks:  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CrackedStoneBricks:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CraftingTable:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CreeperBannerPattern:             return cItemBannerHandler(a_ItemType);
+		case Item::CreeperHead:                      return cItemMobHeadHandler(a_ItemType);
+		case Item::CreeperSpawnEgg:                  return cItemSpawnEggHandler(a_ItemType);
+		case Item::CrimsonButton:                    return cItemButtonHandler(a_ItemType);
+		case Item::CrimsonDoor:                      return cItemDoorHandler(a_ItemType);
+		case Item::CrimsonFence:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CrimsonFenceGate:                 return cItemFenceGateHandler(a_ItemType);
+		case Item::CrimsonFungus:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CrimsonHyphae:                    return cItemLogHandler(a_ItemType);
+		case Item::CrimsonNylium:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CrimsonPlanks:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CrimsonPressurePlate:             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CrimsonRoots:                     return cItemHandler(a_ItemType);
+		case Item::CrimsonSign:                      return cItemSignHandler(a_ItemType);
+		case Item::CrimsonSlab:                      return cItemSlabHandler(a_ItemType);
+		case Item::CrimsonStairs:                    return cItemStairsHandler(a_ItemType);
+		case Item::CrimsonStem:                      return cItemLogHandler(a_ItemType);
+		case Item::CrimsonTrapdoor:                  return cItemTrapdoorHandler(a_ItemType);
+		case Item::Crossbow:                         return cItemHandler(a_ItemType);
+		case Item::CryingObsidian:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CutRedSandstone:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CutRedSandstoneSlab:              return cItemSlabHandler(a_ItemType);
+		case Item::CutSandstone:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CutSandstoneSlab:                 return cItemSlabHandler(a_ItemType);
+		case Item::CyanBanner:                       return cItemBannerHandler(a_ItemType);
+		case Item::CyanBed:                          return cItemBedHandler(a_ItemType);
+		case Item::CyanCarpet:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CyanConcrete:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CyanConcretePowder:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CyanDye:                          return cItemDyeHandler(a_ItemType);
+		case Item::CyanGlazedTerracotta:             return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::CyanShulkerBox:                   return cItemHandler(a_ItemType);
+		case Item::CyanStainedGlass:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CyanStainedGlassPane:             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CyanTerracotta:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::CyanWool:                         return cItemWoolHandler(a_ItemType);
+		case Item::DamagedAnvil:                     return cItemAnvilHandler(a_ItemType);
+		case Item::Dandelion:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DarkOakBoat:                      return cItemBoatHandler(a_ItemType);
+		case Item::DarkOakButton:                    return cItemButtonHandler(a_ItemType);
+		case Item::DarkOakDoor:                      return cItemDoorHandler(a_ItemType);
+		case Item::DarkOakFence:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DarkOakFenceGate:                 return cItemFenceGateHandler(a_ItemType);
+		case Item::DarkOakLeaves:                    return cItemLeavesHandler(a_ItemType);
+		case Item::DarkOakLog:                       return cItemLogHandler(a_ItemType);
+		case Item::DarkOakPlanks:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DarkOakPressurePlate:             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DarkOakSapling:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DarkOakSign:                      return cItemSignHandler(a_ItemType);
+		case Item::DarkOakSlab:                      return cItemSlabHandler(a_ItemType);
+		case Item::DarkOakStairs:                    return cItemStairsHandler(a_ItemType);
+		case Item::DarkOakTrapdoor:                  return cItemTrapdoorHandler(a_ItemType);
+		case Item::DarkOakWood:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DarkPrismarine:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DarkPrismarineSlab:               return cItemSlabHandler(a_ItemType);
+		case Item::DarkPrismarineStairs:             return cItemStairsHandler(a_ItemType);
+		case Item::DaylightDetector:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadBrainCoral:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadBrainCoralBlock:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadBrainCoralFan:                return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadBubbleCoral:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadBubbleCoralBlock:             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadBubbleCoralFan:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadBush:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadFireCoral:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadFireCoralBlock:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadFireCoralFan:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadHornCoral:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadHornCoralBlock:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadHornCoralFan:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadTubeCoral:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadTubeCoralBlock:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DeadTubeCoralFan:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DebugStick:                       return cItemHandler(a_ItemType);
+		case Item::DetectorRail:                     return cItemRailHandler(a_ItemType);
+		case Item::Diamond:                          return cItemHandler(a_ItemType);
+		case Item::DiamondAxe:                       return cItemAxeHandler(a_ItemType);
+		case Item::DiamondBlock:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DiamondBoots:                     return cItemArmorHandler(a_ItemType);
+		case Item::DiamondChestplate:                return cItemArmorHandler(a_ItemType);
+		case Item::DiamondHelmet:                    return cItemArmorHandler(a_ItemType);
+		case Item::DiamondHoe:                       return cItemHoeHandler(a_ItemType);
+		case Item::DiamondHorseArmor:                return cItemHandler(a_ItemType);
+		case Item::DiamondLeggings:                  return cItemArmorHandler(a_ItemType);
+		case Item::DiamondOre:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DiamondPickaxe:                   return cItemPickaxeHandler(a_ItemType);
+		case Item::DiamondShovel:                    return cItemShovelHandler(a_ItemType);
+		case Item::DiamondSword:                     return cItemSwordHandler(a_ItemType);
+		case Item::Diorite:                          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::DioriteSlab:                      return cItemSlabHandler(a_ItemType);
+		case Item::DioriteStairs:                    return cItemStairsHandler(a_ItemType);
+		case Item::DioriteWall:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Dirt:                             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Dispenser:                        return cItemDropSpenserHandler(a_ItemType);
+		case Item::DolphinSpawnEgg:                  return cItemSpawnEggHandler(a_ItemType);
+		case Item::DonkeySpawnEgg:                   return cItemSpawnEggHandler(a_ItemType);
+		case Item::DragonBreath:                     return cItemHandler(a_ItemType);
+		case Item::DragonEgg:                        return cItemHandler(a_ItemType);
+		case Item::DragonHead:                       return cItemMobHeadHandler(a_ItemType);
+		case Item::DriedKelp:                        return cItemHandler(a_ItemType);
+		case Item::DriedKelpBlock:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Dropper:                          return cItemDropSpenserHandler(a_ItemType);
+		case Item::DrownedSpawnEgg:                  return cItemSpawnEggHandler(a_ItemType);
+		case Item::Egg:                              return cItemEggHandler();
+		case Item::ElderGuardianSpawnEgg:            return cItemSpawnEggHandler(a_ItemType);
+		case Item::Elytra:                           return cItemArmorHandler(a_ItemType);
+		case Item::Emerald:                          return cItemHandler(a_ItemType);
+		case Item::EmeraldBlock:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::EmeraldOre:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::EnchantedBook:                    return cItemHandler(a_ItemType);
+		case Item::EnchantedGoldenApple:             return cItemHandler(a_ItemType);
+		case Item::EnchantingTable:                  return cItemEnchantingTableHandler(a_ItemType);
+		case Item::EndCrystal:                       return cItemEndCrystalHandler(a_ItemType);
+		case Item::EndPortalFrame:                   return cItemEndPortalFrameHandler(a_ItemType);
+		case Item::EndRod:                           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::EndStone:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::EndStoneBrickSlab:                return cItemSlabHandler(a_ItemType);
+		case Item::EndStoneBrickStairs:              return cItemStairsHandler(a_ItemType);
+		case Item::EndStoneBrickWall:                return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::EndStoneBricks:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::EnderChest:                       return cItemEnderchestHandler(a_ItemType);
+		case Item::EnderEye:                         return cItemEyeOfEnderHandler();
+		case Item::EnderPearl:                       return cItemEnderPearlHandler();
+		case Item::EndermanSpawnEgg:                 return cItemSpawnEggHandler(a_ItemType);
+		case Item::EndermiteSpawnEgg:                return cItemSpawnEggHandler(a_ItemType);
+		case Item::EvokerSpawnEgg:                   return cItemSpawnEggHandler(a_ItemType);
+		case Item::ExperienceBottle:                 return cItemBottleOEnchantingHandler();
+		case Item::Farmland:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Feather:                          return cItemHandler(a_ItemType);
+		case Item::FermentedSpiderEye:               return cItemHandler(a_ItemType);
+		case Item::Fern:                             return cItemBigFlowerHandler(a_ItemType);
+		case Item::FilledMap:                        return cItemMilkHandler();
+		case Item::FireCharge:                       return cItemLighterHandler(a_ItemType);
+		case Item::FireCoral:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::FireCoralBlock:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::FireCoralFan:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::FireworkRocket:                   return cItemFireworkHandler();
+		case Item::FireworkStar:                     return cItemFireworkHandler();
+		case Item::FishingRod:                       return cItemFishingRodHandler(a_ItemType);
+		case Item::FletchingTable:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Flint:                            return cItemHandler(a_ItemType);
+		case Item::FlintAndSteel:                    return cItemLighterHandler(a_ItemType);
+		case Item::FlowerBannerPattern:              return cItemHandler(a_ItemType);
+		case Item::FlowerPot:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::FoxSpawnEgg:                      return cItemSpawnEggHandler(a_ItemType);
+		case Item::Furnace:                          return cItemFurnaceHandler(a_ItemType);
+		case Item::FurnaceMinecart:                  return cItemMinecartHandler(a_ItemType);
+		case Item::GhastSpawnEgg:                    return cItemSpawnEggHandler(a_ItemType);
+		case Item::GhastTear:                        return cItemHandler(a_ItemType);
+		case Item::GildedBlackstone:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Glass:                            return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GlassBottle:                      return cItemBottleHandler();
+		case Item::GlassPane:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GlisteringMelonSlice:             return cItemHandler(a_ItemType);
+		case Item::GlobeBannerPattern:               return cItemHandler(a_ItemType);
+		case Item::Glowstone:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GlowstoneDust:                    return cItemHandler(a_ItemType);
+		case Item::GoldBlock:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GoldIngot:                        return cItemHandler(a_ItemType);
+		case Item::GoldNugget:                       return cItemHandler(a_ItemType);
+		case Item::GoldOre:                          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GoldenApple:                      return cItemGoldenAppleHandler();
+		case Item::GoldenAxe:                        return cItemAxeHandler(a_ItemType);
+		case Item::GoldenBoots:                      return cItemArmorHandler(a_ItemType);
+		case Item::GoldenCarrot:                     return cItemFoodHandler(a_ItemType, FoodInfo(6, 14.4));
+		case Item::GoldenChestplate:                 return cItemArmorHandler(a_ItemType);
+		case Item::GoldenHelmet:                     return cItemArmorHandler(a_ItemType);
+		case Item::GoldenHoe:                        return cItemHoeHandler(a_ItemType);
+		case Item::GoldenHorseArmor:                 return cItemHandler(a_ItemType);
+		case Item::GoldenLeggings:                   return cItemArmorHandler(a_ItemType);
+		case Item::GoldenPickaxe:                    return cItemPickaxeHandler(a_ItemType);
+		case Item::GoldenShovel:                     return cItemShovelHandler(a_ItemType);
+		case Item::GoldenSword:                      return cItemSwordHandler(a_ItemType);
+		case Item::Granite:                          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GraniteSlab:                      return cItemSlabHandler(a_ItemType);
+		case Item::GraniteStairs:                    return cItemStairsHandler(a_ItemType);
+		case Item::GraniteWall:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Grass:                            return cItemHandler(a_ItemType);
+		case Item::GrassBlock:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GrassPath:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Gravel:                           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GrayBanner:                       return cItemBannerHandler(a_ItemType);
+		case Item::GrayBed:                          return cItemBedHandler(a_ItemType);
+		case Item::GrayCarpet:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GrayConcrete:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GrayConcretePowder:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GrayDye:                          return cItemDyeHandler(a_ItemType);
+		case Item::GrayGlazedTerracotta:             return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::GrayShulkerBox:                   return cItemHandler(a_ItemType);
+		case Item::GrayStainedGlass:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GrayStainedGlassPane:             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GrayTerracotta:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GrayWool:                         return cItemWoolHandler(a_ItemType);
+		case Item::GreenBanner:                      return cItemBannerHandler(a_ItemType);
+		case Item::GreenBed:                         return cItemBedHandler(a_ItemType);
+		case Item::GreenCarpet:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GreenConcrete:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GreenConcretePowder:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GreenDye:                         return cItemDyeHandler(a_ItemType);
+		case Item::GreenGlazedTerracotta:            return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::GreenShulkerBox:                  return cItemHandler(a_ItemType);
+		case Item::GreenStainedGlass:                return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GreenStainedGlassPane:            return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GreenTerracotta:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GreenWool:                        return cItemWoolHandler(a_ItemType);
+		case Item::Grindstone:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::GuardianSpawnEgg:                 return cItemSpawnEggHandler(a_ItemType);
+		case Item::Gunpowder:                        return cItemHandler(a_ItemType);
+		case Item::HayBale:                          return cItemHayBaleHandler();
+		case Item::HeartOfTheSea:                    return cItemHandler(a_ItemType);
+		case Item::HeavyWeightedPressurePlate:       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::HoglinSpawnEgg:                   return cItemSpawnEggHandler(a_ItemType);
+		case Item::HoneyBlock:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::HoneyBottle:                      return cItemHandler(a_ItemType);
+		case Item::Honeycomb:                        return cItemHandler(a_ItemType);
+		case Item::HoneycombBlock:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Hopper:                           return cItemHopperHandler(a_ItemType);
+		case Item::HopperMinecart:                   return cItemMinecartHandler(a_ItemType);
+		case Item::HornCoral:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::HornCoralBlock:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::HornCoralFan:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::HorseSpawnEgg:                    return cItemSpawnEggHandler(a_ItemType);
+		case Item::HuskSpawnEgg:                     return cItemSpawnEggHandler(a_ItemType);
+		case Item::Ice:                              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::InfestedChiseledStoneBricks:      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::InfestedCobblestone:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::InfestedCrackedStoneBricks:       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::InfestedMossyStoneBricks:         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::InfestedStone:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::InfestedStoneBricks:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::InkSac:                           return cItemHandler(a_ItemType);
+		case Item::IronAxe:                          return cItemAxeHandler(a_ItemType);
+		case Item::IronBars:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::IronBlock:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::IronBoots:                        return cItemArmorHandler(a_ItemType);
+		case Item::IronChestplate:                   return cItemArmorHandler(a_ItemType);
+		case Item::IronDoor:                         return cItemDoorHandler(a_ItemType);
+		case Item::IronHelmet:                       return cItemArmorHandler(a_ItemType);
+		case Item::IronHoe:                          return cItemHoeHandler(a_ItemType);
+		case Item::IronHorseArmor:                   return cItemHandler(a_ItemType);
+		case Item::IronIngot:                        return cItemHandler(a_ItemType);
+		case Item::IronLeggings:                     return cItemArmorHandler(a_ItemType);
+		case Item::IronNugget:                       return cItemHandler(a_ItemType);
+		case Item::IronOre:                          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::IronPickaxe:                      return cItemPickaxeHandler(a_ItemType);
+		case Item::IronShovel:                       return cItemShovelHandler(a_ItemType);
+		case Item::IronSword:                        return cItemSwordHandler(a_ItemType);
+		case Item::IronTrapdoor:                     return cItemTrapdoorHandler(a_ItemType);
+		case Item::ItemFrame:                        return cItemItemFrameHandler(a_ItemType);
+		case Item::JackOLantern:                     return cItemJackOLanternHandler(a_ItemType);
+		case Item::Jigsaw:                           return cItemHandler(a_ItemType);
+		case Item::Jukebox:                          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::JungleBoat:                       return cItemBoatHandler(a_ItemType);
+		case Item::JungleButton:                     return cItemButtonHandler(a_ItemType);
+		case Item::JungleDoor:                       return cItemDoorHandler(a_ItemType);
+		case Item::JungleFence:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::JungleFenceGate:                  return cItemFenceGateHandler(a_ItemType);
+		case Item::JungleLeaves:                     return cItemLeavesHandler(a_ItemType);
+		case Item::JungleLog:                        return cItemLogHandler(a_ItemType);
+		case Item::JunglePlanks:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::JunglePressurePlate:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::JungleSapling:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::JungleSign:                       return cItemSignHandler(a_ItemType);
+		case Item::JungleSlab:                       return cItemSlabHandler(a_ItemType);
+		case Item::JungleStairs:                     return cItemStairsHandler(a_ItemType);
+		case Item::JungleTrapdoor:                   return cItemTrapdoorHandler(a_ItemType);
+		case Item::JungleWood:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Kelp:                             return cItemHandler(a_ItemType);
+		case Item::KnowledgeBook:                    return cItemHandler(a_ItemType);
+		case Item::Ladder:                           return cItemLadderHandler(a_ItemType);
+		case Item::Lantern:                          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LapisBlock:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LapisLazuli:                      return cItemHandler(a_ItemType);
+		case Item::LapisOre:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LargeFern:                        return cItemBigFlowerHandler(a_ItemType);
+		case Item::LavaBucket:                       return cItemBucketHandler(a_ItemType);
+		case Item::Lead:                             return cItemHandler(a_ItemType);
+		case Item::Leather:                          return cItemHandler(a_ItemType);
+		case Item::LeatherBoots:                     return cItemArmorHandler(a_ItemType);
+		case Item::LeatherChestplate:                return cItemArmorHandler(a_ItemType);
+		case Item::LeatherHelmet:                    return cItemArmorHandler(a_ItemType);
+		case Item::LeatherHorseArmor:                return cItemHandler(a_ItemType);
+		case Item::LeatherLeggings:                  return cItemArmorHandler(a_ItemType);
+		case Item::Lectern:                          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Lever:                            return cItemLeverHandler(a_ItemType);
+		case Item::LightBlueBanner:                  return cItemBannerHandler(a_ItemType);
+		case Item::LightBlueBed:                     return cItemBedHandler(a_ItemType);
+		case Item::LightBlueCarpet:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LightBlueConcrete:                return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LightBlueConcretePowder:          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LightBlueDye:                     return cItemDyeHandler(a_ItemType);
+		case Item::LightBlueGlazedTerracotta:        return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::LightBlueShulkerBox:              return cItemHandler(a_ItemType);
+		case Item::LightBlueStainedGlass:            return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LightBlueStainedGlassPane:        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LightBlueTerracotta:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LightBlueWool:                    return cItemWoolHandler(a_ItemType);
+		case Item::LightGrayBanner:                  return cItemBannerHandler(a_ItemType);
+		case Item::LightGrayBed:                     return cItemBedHandler(a_ItemType);
+		case Item::LightGrayCarpet:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LightGrayConcrete:                return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LightGrayConcretePowder:          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LightGrayDye:                     return cItemDyeHandler(a_ItemType);
+		case Item::LightGrayGlazedTerracotta:        return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::LightGrayShulkerBox:              return cItemHandler(a_ItemType);
+		case Item::LightGrayStainedGlass:            return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LightGrayStainedGlassPane:        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LightGrayTerracotta:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LightGrayWool:                    return cItemWoolHandler(a_ItemType);
+		case Item::LightWeightedPressurePlate:       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Lilac:                            return cItemBigFlowerHandler(a_ItemType);
+		case Item::LilyOfTheValley:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LilyPad:                          return cItemLilypadHandler(a_ItemType);
+		case Item::LimeBanner:                       return cItemBannerHandler(a_ItemType);
+		case Item::LimeBed:                          return cItemBedHandler(a_ItemType);
+		case Item::LimeCarpet:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LimeConcrete:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LimeConcretePowder:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LimeDye:                          return cItemDyeHandler(a_ItemType);
+		case Item::LimeGlazedTerracotta:             return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::LimeShulkerBox:                   return cItemHandler(a_ItemType);
+		case Item::LimeStainedGlass:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LimeStainedGlassPane:             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LimeTerracotta:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::LimeWool:                         return cItemWoolHandler(a_ItemType);
+		case Item::LingeringPotion:                  return cItemPotionHandler();
+		case Item::LlamaSpawnEgg:                    return cItemSpawnEggHandler(a_ItemType);
+		case Item::Lodestone:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Loom:                             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::MagentaBanner:                    return cItemBannerHandler(a_ItemType);
+		case Item::MagentaBed:                       return cItemBedHandler(a_ItemType);
+		case Item::MagentaCarpet:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::MagentaConcrete:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::MagentaConcretePowder:            return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::MagentaDye:                       return cItemDyeHandler(a_ItemType);
+		case Item::MagentaGlazedTerracotta:          return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::MagentaShulkerBox:                return cItemHandler(a_ItemType);
+		case Item::MagentaStainedGlass:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::MagentaStainedGlassPane:          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::MagentaTerracotta:                return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::MagentaWool:                      return cItemWoolHandler(a_ItemType);
+		case Item::MagmaBlock:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::MagmaCream:                       return cItemHandler(a_ItemType);
+		case Item::MagmaCubeSpawnEgg:                return cItemSpawnEggHandler(a_ItemType);
+		case Item::Map:                              return cItemEmptyMapHandler();
+		case Item::Melon:                            return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::MelonSeeds:                       return cItemSeedsHandler(a_ItemType);
+		case Item::MelonSlice:                       return cItemFoodHandler(a_ItemType, FoodInfo(2, 1.2));
+		case Item::MilkBucket:                       return cItemMilkHandler();
+		case Item::Minecart:                         return cItemMinecartHandler(a_ItemType);
+		case Item::MojangBannerPattern:              return cItemHandler(a_ItemType);
+		case Item::MooshroomSpawnEgg:                return cItemSpawnEggHandler(a_ItemType);
+		case Item::MossyCobblestone:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::MossyCobblestoneSlab:             return cItemSlabHandler(a_ItemType);
+		case Item::MossyCobblestoneStairs:           return cItemStairsHandler(a_ItemType);
+		case Item::MossyCobblestoneWall:             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::MossyStoneBrickSlab:              return cItemSlabHandler(a_ItemType);
+		case Item::MossyStoneBrickStairs:            return cItemStairsHandler(a_ItemType);
+		case Item::MossyStoneBrickWall:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::MossyStoneBricks:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::MuleSpawnEgg:                     return cItemSpawnEggHandler(a_ItemType);
+		case Item::MushroomStem:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::MushroomStew:                     return cItemSoupHandler(a_ItemType, FoodInfo(6, 7.2));
+		case Item::MusicDiscBlocks:                  return cItemHandler(a_ItemType);
+		case Item::MusicDiscCat:                     return cItemHandler(a_ItemType);
+		case Item::MusicDiscChirp:                   return cItemHandler(a_ItemType);
+		case Item::MusicDiscFar:                     return cItemHandler(a_ItemType);
+		case Item::MusicDiscMall:                    return cItemHandler(a_ItemType);
+		case Item::MusicDiscMellohi:                 return cItemHandler(a_ItemType);
+		case Item::MusicDiscPigstep:                 return cItemHandler(a_ItemType);
+		case Item::MusicDiscStal:                    return cItemHandler(a_ItemType);
+		case Item::MusicDiscStrad:                   return cItemHandler(a_ItemType);
+		case Item::MusicDiscWait:                    return cItemHandler(a_ItemType);
+		case Item::MusicDiscWard:                    return cItemHandler(a_ItemType);
+		case Item::MusicDisc11:                      return cItemHandler(a_ItemType);
+		case Item::MusicDisc13:                      return cItemHandler(a_ItemType);
+		case Item::Mutton:                           return cItemFoodHandler(a_ItemType, FoodInfo(2, 1.2));
+		case Item::Mycelium:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::NameTag:                          return cItemHandler(a_ItemType);
+		case Item::NautilusShell:                    return cItemHandler(a_ItemType);
+		case Item::NetherBrick:                      return cItemHandler(a_ItemType);
+		case Item::NetherBrickFence:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::NetherBrickSlab:                  return cItemSlabHandler(a_ItemType);
+		case Item::NetherBrickStairs:                return cItemStairsHandler(a_ItemType);
+		case Item::NetherBrickWall:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::NetherBricks:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::NetherGoldOre:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::NetherQuartzOre:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::NetherSprouts:                    return cItemHandler(a_ItemType);
+		case Item::NetherStar:                       return cItemHandler(a_ItemType);
+		case Item::NetherWart:                       return cItemNetherWartHandler(a_ItemType);
+		case Item::NetherWartBlock:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::NetheriteAxe:                     return cItemAxeHandler(a_ItemType);
+		case Item::NetheriteBlock:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::NetheriteBoots:                   return cItemArmorHandler(a_ItemType);
+		case Item::NetheriteChestplate:              return cItemArmorHandler(a_ItemType);
+		case Item::NetheriteHelmet:                  return cItemArmorHandler(a_ItemType);
+		case Item::NetheriteHoe:                     return cItemHoeHandler(a_ItemType);
+		case Item::NetheriteIngot:                   return cItemHandler(a_ItemType);
+		case Item::NetheriteLeggings:                return cItemArmorHandler(a_ItemType);
+		case Item::NetheritePickaxe:                 return cItemPickaxeHandler(a_ItemType);
+		case Item::NetheriteScrap:                   return cItemHandler(a_ItemType);
+		case Item::NetheriteShovel:                  return cItemShovelHandler(a_ItemType);
+		case Item::NetheriteSword:                   return cItemSwordHandler(a_ItemType);
+		case Item::Netherrack:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::NoteBlock:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::OakBoat:                          return cItemBoatHandler(a_ItemType);
+		case Item::OakButton:                        return cItemButtonHandler(a_ItemType);
+		case Item::OakDoor:                          return cItemDoorHandler(a_ItemType);
+		case Item::OakFence:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::OakFenceGate:                     return cItemFenceGateHandler(a_ItemType);
+		case Item::OakLeaves:                        return cItemLeavesHandler(a_ItemType);
+		case Item::OakLog:                           return cItemLogHandler(a_ItemType);
+		case Item::OakPlanks:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::OakPressurePlate:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::OakSapling:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::OakSign:                          return cItemSignHandler(a_ItemType);
+		case Item::OakSlab:                          return cItemSlabHandler(a_ItemType);
+		case Item::OakStairs:                        return cItemStairsHandler(a_ItemType);
+		case Item::OakTrapdoor:                      return cItemTrapdoorHandler(a_ItemType);
+		case Item::OakWood:                          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Observer:                         return cItemObserverHandler(a_ItemType);
+		case Item::Obsidian:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::OcelotSpawnEgg:                   return cItemSpawnEggHandler(a_ItemType);
+		case Item::OrangeBanner:                     return cItemBannerHandler(a_ItemType);
+		case Item::OrangeBed:                        return cItemBedHandler(a_ItemType);
+		case Item::OrangeCarpet:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::OrangeConcrete:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::OrangeConcretePowder:             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::OrangeDye:                        return cItemDyeHandler(a_ItemType);
+		case Item::OrangeGlazedTerracotta:           return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::OrangeShulkerBox:                 return cItemHandler(a_ItemType);
+		case Item::OrangeStainedGlass:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::OrangeStainedGlassPane:           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::OrangeTerracotta:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::OrangeTulip:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::OrangeWool:                       return cItemWoolHandler(a_ItemType);
+		case Item::OxeyeDaisy:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PackedIce:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Painting:                         return cItemPaintingHandler(a_ItemType);
+		case Item::PandaSpawnEgg:                    return cItemSpawnEggHandler(a_ItemType);
+		case Item::Paper:                            return cItemHandler(a_ItemType);
+		case Item::ParrotSpawnEgg:                   return cItemSpawnEggHandler(a_ItemType);
+		case Item::Peony:                            return cItemBigFlowerHandler(a_ItemType);
+		case Item::PetrifiedOakSlab:                 return cItemSlabHandler(a_ItemType);
+		case Item::PhantomMembrane:                  return cItemHandler(a_ItemType);
+		case Item::PhantomSpawnEgg:                  return cItemSpawnEggHandler(a_ItemType);
+		case Item::PigSpawnEgg:                      return cItemSpawnEggHandler(a_ItemType);
+		case Item::PiglinBannerPattern:              return cItemHandler(a_ItemType);
+		case Item::PiglinSpawnEgg:                   return cItemSpawnEggHandler(a_ItemType);
+		case Item::PillagerSpawnEgg:                 return cItemSpawnEggHandler(a_ItemType);
+		case Item::PinkBanner:                       return cItemBannerHandler(a_ItemType);
+		case Item::PinkBed:                          return cItemBedHandler(a_ItemType);
+		case Item::PinkCarpet:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PinkConcrete:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PinkConcretePowder:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PinkDye:                          return cItemDyeHandler(a_ItemType);
+		case Item::PinkGlazedTerracotta:             return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::PinkShulkerBox:                   return cItemHandler(a_ItemType);
+		case Item::PinkStainedGlass:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PinkStainedGlassPane:             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PinkTerracotta:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PinkTulip:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PinkWool:                         return cItemWoolHandler(a_ItemType);
+		case Item::Piston:                           return cItemPistonHandler(a_ItemType);
+		case Item::PlayerHead:                       return cItemMobHeadHandler(a_ItemType);
+		case Item::Podzol:                           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PoisonousPotato:                  return cItemPoisonousPotatoHandler();
+		case Item::PolarBearSpawnEgg:                return cItemSpawnEggHandler(a_ItemType);
+		case Item::PolishedAndesite:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PolishedAndesiteSlab:             return cItemSlabHandler(a_ItemType);
+		case Item::PolishedAndesiteStairs:           return cItemStairsHandler(a_ItemType);
+		case Item::PolishedBasalt:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PolishedBlackstone:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PolishedBlackstoneBrickSlab:      return cItemSlabHandler(a_ItemType);
+		case Item::PolishedBlackstoneBrickStairs:    return cItemStairsHandler(a_ItemType);
+		case Item::PolishedBlackstoneBrickWall:      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PolishedBlackstoneBricks:         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PolishedBlackstoneButton:         return cItemButtonHandler(a_ItemType);
+		case Item::PolishedBlackstonePressurePlate:  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PolishedBlackstoneSlab:           return cItemSlabHandler(a_ItemType);
+		case Item::PolishedBlackstoneStairs:         return cItemStairsHandler(a_ItemType);
+		case Item::PolishedBlackstoneWall:           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PolishedDiorite:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PolishedDioriteSlab:              return cItemSlabHandler(a_ItemType);
+		case Item::PolishedDioriteStairs:            return cItemStairsHandler(a_ItemType);
+		case Item::PolishedGranite:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PolishedGraniteSlab:              return cItemSlabHandler(a_ItemType);
+		case Item::PolishedGraniteStairs:            return cItemStairsHandler(a_ItemType);
+		case Item::PoppedChorusFruit:                return cItemHandler(a_ItemType);
+		case Item::Poppy:                            return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Porkchop:                         return cItemFoodHandler(a_ItemType, FoodInfo(3, 1.8));
+		case Item::Potato:                           return cItemFoodSeedsHandler(a_ItemType, FoodInfo(1, 0.6));
+		case Item::Potion:                           return cItemPotionHandler();
+		case Item::PoweredRail:                      return cItemRailHandler(a_ItemType);
+		case Item::Prismarine:                       return cItemHandler(a_ItemType);
+		case Item::PrismarineBrickSlab:              return cItemSlabHandler(a_ItemType);
+		case Item::PrismarineBrickStairs:            return cItemStairsHandler(a_ItemType);
+		case Item::PrismarineBricks:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PrismarineCrystals:               return cItemHandler(a_ItemType);
+		case Item::PrismarineShard:                  return cItemHandler(a_ItemType);
+		case Item::PrismarineSlab:                   return cItemSlabHandler(a_ItemType);
+		case Item::PrismarineStairs:                 return cItemStairsHandler(a_ItemType);
+		case Item::PrismarineWall:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Pufferfish:                       return cItemHandler(a_ItemType);
+		case Item::PufferfishBucket:                 return cItemHandler(a_ItemType);
+		case Item::PufferfishSpawnEgg:               return cItemSpawnEggHandler(a_ItemType);
+		case Item::Pumpkin:                          return cItemPumpkinHandler(a_ItemType);
+		case Item::PumpkinPie:                       return cItemFoodHandler(a_ItemType, FoodInfo(8, 4.8));
+		case Item::PumpkinSeeds:                     return cItemSeedsHandler(a_ItemType);
+		case Item::PurpleBanner:                     return cItemBannerHandler(a_ItemType);
+		case Item::PurpleBed:                        return cItemBedHandler(a_ItemType);
+		case Item::PurpleCarpet:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PurpleConcrete:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PurpleConcretePowder:             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PurpleDye:                        return cItemDyeHandler(a_ItemType);
+		case Item::PurpleGlazedTerracotta:           return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::PurpleShulkerBox:                 return cItemHandler(a_ItemType);
+		case Item::PurpleStainedGlass:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PurpleStainedGlassPane:           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PurpleTerracotta:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PurpleWool:                       return cItemWoolHandler(a_ItemType);
+		case Item::PurpurBlock:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PurpurPillar:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::PurpurSlab:                       return cItemSlabHandler(a_ItemType);
+		case Item::PurpurStairs:                     return cItemStairsHandler(a_ItemType);
+		case Item::Quartz:                           return cItemQuartzHandler(a_ItemType);
+		case Item::QuartzBlock:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::QuartzBricks:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::QuartzPillar:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::QuartzSlab:                       return cItemSlabHandler(a_ItemType);
+		case Item::QuartzStairs:                     return cItemStairsHandler(a_ItemType);
+		case Item::Rabbit:                           return cItemFoodHandler(a_ItemType, FoodInfo(3, 1.8));
+		case Item::RabbitFoot:                       return cItemHandler(a_ItemType);
+		case Item::RabbitHide:                       return cItemHandler(a_ItemType);
+		case Item::RabbitSpawnEgg:                   return cItemSpawnEggHandler(a_ItemType);
+		case Item::RabbitStew:                       return cItemSoupHandler(a_ItemType, FoodInfo(10, 12));
+		case Item::Rail:                             return cItemRailHandler(a_ItemType);
+		case Item::RavagerSpawnEgg:                  return cItemSpawnEggHandler(a_ItemType);
+		case Item::RedBanner:                        return cItemBannerHandler(a_ItemType);
+		case Item::RedBed:                           return cItemBedHandler(a_ItemType);
+		case Item::RedCarpet:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedConcrete:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedConcretePowder:                return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedDye:                           return cItemDyeHandler(a_ItemType);
+		case Item::RedGlazedTerracotta:              return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::RedMushroom:                      return cItemHandler(a_ItemType);
+		case Item::RedMushroomBlock:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedNetherBrickSlab:               return cItemSlabHandler(a_ItemType);
+		case Item::RedNetherBrickStairs:             return cItemStairsHandler(a_ItemType);
+		case Item::RedNetherBrickWall:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedNetherBricks:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedSand:                          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedSandstone:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedSandstoneSlab:                 return cItemSlabHandler(a_ItemType);
+		case Item::RedSandstoneStairs:               return cItemStairsHandler(a_ItemType);
+		case Item::RedSandstoneWall:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedShulkerBox:                    return cItemHandler(a_ItemType);
+		case Item::RedStainedGlass:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedStainedGlassPane:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedTerracotta:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedTulip:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedWool:                          return cItemWoolHandler(a_ItemType);
+		case Item::Redstone:                         return cItemRedstoneDustHandler(a_ItemType);
+		case Item::RedstoneBlock:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedstoneLamp:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedstoneOre:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RedstoneTorch:                    return cItemTorchHandler(a_ItemType);
+		case Item::Repeater:                         return cItemRepeaterHandler(a_ItemType);
+		case Item::RepeatingCommandBlock:            return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::RespawnAnchor:                    return cItemHandler(a_ItemType);
+		case Item::RoseBush:                         return cItemBigFlowerHandler(a_ItemType);
+		case Item::RottenFlesh:                      return cItemRottenFleshHandler();
+		case Item::Saddle:                           return cItemHandler(a_ItemType);
+		case Item::Salmon:                           return cItemFoodHandler(a_ItemType, FoodInfo(2, 0.2));
+		case Item::SalmonBucket:                     return cItemHandler(a_ItemType);
+		case Item::SalmonSpawnEgg:                   return cItemSpawnEggHandler(a_ItemType);
+		case Item::Sand:                             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Sandstone:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SandstoneSlab:                    return cItemSlabHandler(a_ItemType);
+		case Item::SandstoneStairs:                  return cItemStairsHandler(a_ItemType);
+		case Item::SandstoneWall:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Scaffolding:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Scute:                            return cItemHandler(a_ItemType);
+		case Item::SeaLantern:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SeaPickle:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Seagrass:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Shears:                           return cItemShearsHandler(a_ItemType);
+		case Item::SheepSpawnEgg:                    return cItemSpawnEggHandler(a_ItemType);
+		case Item::Shield:                           return cItemHandler(a_ItemType);
+		case Item::Shroomlight:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::ShulkerBox:                       return cItemHandler(a_ItemType);
+		case Item::ShulkerShell:                     return cItemHandler(a_ItemType);
+		case Item::ShulkerSpawnEgg:                  return cItemSpawnEggHandler(a_ItemType);
+		case Item::SilverfishSpawnEgg:               return cItemSpawnEggHandler(a_ItemType);
+		case Item::SkeletonHorseSpawnEgg:            return cItemSpawnEggHandler(a_ItemType);
+		case Item::SkeletonSkull:                    return cItemMobHeadHandler(a_ItemType);
+		case Item::SkeletonSpawnEgg:                 return cItemSpawnEggHandler(a_ItemType);
+		case Item::SkullBannerPattern:               return cItemHandler(a_ItemType);
+		case Item::SlimeBall:                        return cItemHandler(a_ItemType);
+		case Item::SlimeBlock:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SlimeSpawnEgg:                    return cItemSpawnEggHandler(a_ItemType);
+		case Item::SmithingTable:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Smoker:                           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SmoothQuartz:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SmoothQuartzSlab:                 return cItemSlabHandler(a_ItemType);
+		case Item::SmoothQuartzStairs:               return cItemStairsHandler(a_ItemType);
+		case Item::SmoothRedSandstone:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SmoothRedSandstoneSlab:           return cItemSlabHandler(a_ItemType);
+		case Item::SmoothRedSandstoneStairs:         return cItemStairsHandler(a_ItemType);
+		case Item::SmoothSandstone:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SmoothSandstoneSlab:              return cItemSlabHandler(a_ItemType);
+		case Item::SmoothSandstoneStairs:            return cItemStairsHandler(a_ItemType);
+		case Item::SmoothStone:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SmoothStoneSlab:                  return cItemSlabHandler(a_ItemType);
+		case Item::Snow:                             return cItemSnowHandler(a_ItemType);
+		case Item::SnowBlock:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Snowball:                         return cItemSnowballHandler();
+		case Item::SoulCampfire:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SoulLantern:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SoulSand:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SoulSoil:                         return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SoulTorch:                        return cItemTorchHandler(a_ItemType);
+		case Item::Spawner:                          return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SpectralArrow:                    return cItemHandler(a_ItemType);
+		case Item::SpiderEye:                        return cItemSpiderEyeHandler();
+		case Item::SpiderSpawnEgg:                   return cItemSpawnEggHandler(a_ItemType);
+		case Item::SplashPotion:                     return cItemPotionHandler();
+		case Item::Sponge:                           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SpruceBoat:                       return cItemBoatHandler(a_ItemType);
+		case Item::SpruceButton:                     return cItemButtonHandler(a_ItemType);
+		case Item::SpruceDoor:                       return cItemDoorHandler(a_ItemType);
+		case Item::SpruceFence:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SpruceFenceGate:                  return cItemFenceGateHandler(a_ItemType);
+		case Item::SpruceLeaves:                     return cItemLeavesHandler(a_ItemType);
+		case Item::SpruceLog:                        return cItemLogHandler(a_ItemType);
+		case Item::SprucePlanks:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SprucePressurePlate:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SpruceSapling:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SpruceSign:                       return cItemSignHandler(a_ItemType);
+		case Item::SpruceSlab:                       return cItemSlabHandler(a_ItemType);
+		case Item::SpruceStairs:                     return cItemStairsHandler(a_ItemType);
+		case Item::SpruceTrapdoor:                   return cItemTrapdoorHandler(a_ItemType);
+		case Item::SpruceWood:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::SquidSpawnEgg:                    return cItemSpawnEggHandler(a_ItemType);
+		case Item::Stick:                            return cItemHandler(a_ItemType);
+		case Item::StickyPiston:                     return cItemPistonHandler(a_ItemType);
+		case Item::Stone:                            return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StoneAxe:                         return cItemAxeHandler(a_ItemType);
+		case Item::StoneBrickSlab:                   return cItemSlabHandler(a_ItemType);
+		case Item::StoneBrickStairs:                 return cItemStairsHandler(a_ItemType);
+		case Item::StoneBrickWall:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StoneBricks:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StoneButton:                      return cItemButtonHandler(a_ItemType);
+		case Item::StoneHoe:                         return cItemHoeHandler(a_ItemType);
+		case Item::StonePickaxe:                     return cItemPickaxeHandler(a_ItemType);
+		case Item::StonePressurePlate:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StoneShovel:                      return cItemShovelHandler(a_ItemType);
+		case Item::StoneSlab:                        return cItemSlabHandler(a_ItemType);
+		case Item::StoneStairs:                      return cItemStairsHandler(a_ItemType);
+		case Item::StoneSword:                       return cItemSwordHandler(a_ItemType);
+		case Item::Stonecutter:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StraySpawnEgg:                    return cItemSpawnEggHandler(a_ItemType);
+		case Item::StriderSpawnEgg:                  return cItemSpawnEggHandler(a_ItemType);
+		case Item::String:                           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StrippedAcaciaLog:                return cItemLogHandler(a_ItemType);
+		case Item::StrippedAcaciaWood:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StrippedBirchLog:                 return cItemLogHandler(a_ItemType);
+		case Item::StrippedBirchWood:                return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StrippedCrimsonHyphae:            return cItemLogHandler(a_ItemType);
+		case Item::StrippedCrimsonStem:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StrippedDarkOakLog:               return cItemLogHandler(a_ItemType);
+		case Item::StrippedDarkOakWood:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StrippedJungleLog:                return cItemLogHandler(a_ItemType);
+		case Item::StrippedJungleWood:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StrippedOakLog:                   return cItemLogHandler(a_ItemType);
+		case Item::StrippedOakWood:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StrippedSpruceLog:                return cItemLogHandler(a_ItemType);
+		case Item::StrippedSpruceWood:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StrippedWarpedHyphae:             return cItemLogHandler(a_ItemType);
+		case Item::StrippedWarpedStem:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StructureBlock:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::StructureVoid:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Sugar:                            return cItemHandler(a_ItemType);
+		case Item::SugarCane:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Sunflower:                        return cItemBigFlowerHandler(a_ItemType);
+		case Item::SuspiciousStew:                   return cItemHandler(a_ItemType);
+		case Item::SweetBerries:                     return cItemHandler(a_ItemType);
+		case Item::TallGrass:                        return cItemBigFlowerHandler(a_ItemType);
+		case Item::Target:                           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Terracotta:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::TippedArrow:                      return cItemHandler(a_ItemType);
+		case Item::TNT:                              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::TNTMinecart:                      return cItemMinecartHandler(a_ItemType);
+		case Item::Torch:                            return cItemTorchHandler(a_ItemType);
+		case Item::TotemOfUndying:                   return cItemHandler(a_ItemType);
+		case Item::TraderLlamaSpawnEgg:              return cItemSpawnEggHandler(a_ItemType);
+		case Item::TrappedChest:                     return cItemChestHandler(a_ItemType);
+		case Item::Trident:                          return cItemHandler(a_ItemType);
+		case Item::TripwireHook:                     return cItemTripwireHookHandler(a_ItemType);
+		case Item::TropicalFish:                     return cItemHandler(a_ItemType);
+		case Item::TropicalFishBucket:               return cItemHandler(a_ItemType);
+		case Item::TropicalFishSpawnEgg:             return cItemSpawnEggHandler(a_ItemType);
+		case Item::TubeCoral:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::TubeCoralBlock:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::TubeCoralFan:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::TurtleEgg:                        return cItemHandler(a_ItemType);
+		case Item::TurtleHelmet:                     return cItemHandler(a_ItemType);
+		case Item::TurtleSpawnEgg:                   return cItemSpawnEggHandler(a_ItemType);
+		case Item::TwistingVines:                    return cItemHandler(a_ItemType);
+		case Item::VexSpawnEgg:                      return cItemSpawnEggHandler(a_ItemType);
+		case Item::VillagerSpawnEgg:                 return cItemSpawnEggHandler(a_ItemType);
+		case Item::VindicatorSpawnEgg:               return cItemSpawnEggHandler(a_ItemType);
+		case Item::Vine:                             return cItemVineHandler(a_ItemType);
+		case Item::WanderingTraderSpawnEgg:          return cItemSpawnEggHandler(a_ItemType);
+		case Item::WarpedButton:                     return cItemButtonHandler(a_ItemType);
+		case Item::WarpedDoor:                       return cItemDoorHandler(a_ItemType);
+		case Item::WarpedFence:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::WarpedFenceGate:                  return cItemFenceGateHandler(a_ItemType);
+		case Item::WarpedFungus:                     return cItemHandler(a_ItemType);
+		case Item::WarpedFungusOnA_stick:            return cItemHandler(a_ItemType);
+		case Item::WarpedHyphae:                     return cItemHandler(a_ItemType);
+		case Item::WarpedNylium:                     return cItemHandler(a_ItemType);
+		case Item::WarpedPlanks:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::WarpedPressurePlate:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::WarpedRoots:                      return cItemHandler(a_ItemType);
+		case Item::WarpedSign:                       return cItemSignHandler(a_ItemType);
+		case Item::WarpedSlab:                       return cItemSlabHandler(a_ItemType);
+		case Item::WarpedStairs:                     return cItemStairsHandler(a_ItemType);
+		case Item::WarpedStem:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::WarpedTrapdoor:                   return cItemTrapdoorHandler(a_ItemType);
+		case Item::WarpedWartBlock:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::WaterBucket:                      return cItemBucketHandler(a_ItemType);
+		case Item::WeepingVines:                     return cItemHandler(a_ItemType);
+		case Item::WetSponge:                        return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::Wheat:                            return cItemHandler(a_ItemType);
+		case Item::WheatSeeds:                       return cItemSeedsHandler(a_ItemType);
+		case Item::WhiteBanner:                      return cItemBannerHandler(a_ItemType);
+		case Item::WhiteBed:                         return cItemBedHandler(a_ItemType);
+		case Item::WhiteCarpet:                      return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::WhiteConcrete:                    return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::WhiteConcretePowder:              return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::WhiteDye:                         return cItemDyeHandler(a_ItemType);
+		case Item::WhiteGlazedTerracotta:            return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::WhiteShulkerBox:                  return cItemHandler(a_ItemType);
+		case Item::WhiteStainedGlass:                return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::WhiteStainedGlassPane:            return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::WhiteTerracotta:                  return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::WhiteTulip:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::WhiteWool:                        return cItemWoolHandler(a_ItemType);
+		case Item::WitchSpawnEgg:                    return cItemSpawnEggHandler(a_ItemType);
+		case Item::WitherRose:                       return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::WitherSkeletonSkull:              return cItemMobHeadHandler(a_ItemType);
+		case Item::WitherSkeletonSpawnEgg:           return cItemSpawnEggHandler(a_ItemType);
+		case Item::WolfSpawnEgg:                     return cItemSpawnEggHandler(a_ItemType);
+		case Item::WoodenAxe:                        return cItemAxeHandler(a_ItemType);
+		case Item::WoodenHoe:                        return cItemHoeHandler(a_ItemType);
+		case Item::WoodenPickaxe:                    return cItemPickaxeHandler(a_ItemType);
+		case Item::WoodenShovel:                     return cItemShovelHandler(a_ItemType);
+		case Item::WoodenSword:                      return cItemSwordHandler(a_ItemType);
+		case Item::WritableBook:                     return cItemHandler(a_ItemType);
+		case Item::WrittenBook:                      return cItemHandler(a_ItemType);
+		case Item::YellowBanner:                     return cItemBannerHandler(a_ItemType);
+		case Item::YellowBed:                        return cItemBedHandler(a_ItemType);
+		case Item::YellowCarpet:                     return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::YellowConcrete:                   return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::YellowConcretePowder:             return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::YellowDye:                        return cItemDyeHandler(a_ItemType);
+		case Item::YellowGlazedTerracotta:           return cItemGlazedTerracottaHandler(a_ItemType);
+		case Item::YellowShulkerBox:                 return cItemHandler(a_ItemType);
+		case Item::YellowStainedGlass:               return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::YellowStainedGlassPane:           return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::YellowTerracotta:                 return cSimplePlaceableItemHandler(a_ItemType);
+		case Item::YellowWool:                       return cItemWoolHandler(a_ItemType);
+		case Item::ZoglinSpawnEgg:                   return cItemSpawnEggHandler(a_ItemType);
+		case Item::ZombieHead:                       return cItemMobHeadHandler(a_ItemType);
+		case Item::ZombieHorseSpawnEgg:              return cItemSpawnEggHandler(a_ItemType);
+		case Item::ZombieSpawnEgg:                   return cItemSpawnEggHandler(a_ItemType);
+		case Item::ZombieVillagerSpawnEgg:           return cItemSpawnEggHandler(a_ItemType);
+		case Item::ZombiePigmanSpawnEgg:             return cItemSpawnEggHandler(a_ItemType);
 	}
 }
 
@@ -424,24 +1100,8 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 
 
 
-void cItemHandler::Deinit()
+cItemHandler::cItemHandler(Item a_ItemType) : m_ItemType(a_ItemType)
 {
-	for (size_t i = 0; i < ARRAYCOUNT(m_ItemHandler); i++)
-	{
-		delete m_ItemHandler[i];
-		m_ItemHandler[i] = nullptr;
-	}
-	memset(m_ItemHandler, 0, sizeof(m_ItemHandler));  // Don't leave any dangling pointers around, just in case
-	m_HandlerInitialized = false;
-}
-
-
-
-
-
-cItemHandler::cItemHandler(int a_ItemType)
-{
-	m_ItemType = a_ItemType;
 }
 
 
@@ -458,7 +1118,7 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 
 	if (!cChunkDef::IsValidHeight(a_ClickedBlockPosition.y))
 	{
-		// The clicked block is outside the world, ignore this call altogether (GH #128):
+		// The clicked block is outside the world, ignore this call altogether (GH #128): return cItemHandler(a_ItemType);
 		return;
 	}
 
@@ -591,7 +1251,7 @@ short cItemHandler::GetDurabilityLossByAction(eDurabilityLostAction a_Action)
 
 char cItemHandler::GetMaxStackSize(void)
 {
-	if (m_ItemType < 256)
+	if (IsPlaceable())
 	{
 		// All blocks can stack up to 64
 		return 64;
@@ -599,117 +1259,189 @@ char cItemHandler::GetMaxStackSize(void)
 
 	switch (m_ItemType)
 	{
-		case E_ITEM_ACACIA_DOOR:          return 64;
-		case E_ITEM_ARMOR_STAND:          return 16;
-		case E_ITEM_ARROW:                return 64;
-		case E_ITEM_BAKED_POTATO:         return 64;
-		case E_ITEM_BANNER:               return 16;
-		case E_ITEM_BEETROOT:             return 64;
-		case E_ITEM_BEETROOT_SEEDS:       return 64;
-		case E_ITEM_BIRCH_DOOR:           return 64;
-		case E_ITEM_BLAZE_POWDER:         return 64;
-		case E_ITEM_BLAZE_ROD:            return 64;
-		case E_ITEM_BONE:                 return 64;
-		case E_ITEM_BOOK:                 return 64;
-		case E_ITEM_BOTTLE_O_ENCHANTING:  return 64;
-		case E_ITEM_BOWL:                 return 64;
-		case E_ITEM_BREAD:                return 64;
-		case E_ITEM_BREWING_STAND:        return 64;
-		case E_ITEM_BUCKET:               return 16;
-		case E_ITEM_CARROT:               return 64;
-		case E_ITEM_CAULDRON:             return 64;
-		case E_ITEM_CHORUS_FRUIT:         return 64;
-		case E_ITEM_CLAY:                 return 64;
-		case E_ITEM_CLAY_BRICK:           return 64;
-		case E_ITEM_CLOCK:                return 64;
-		case E_ITEM_COAL:                 return 64;
-		case E_ITEM_COMPARATOR:           return 64;
-		case E_ITEM_COMPASS:              return 64;
-		case E_ITEM_COOKED_CHICKEN:       return 64;
-		case E_ITEM_COOKED_FISH:          return 64;
-		case E_ITEM_COOKED_MUTTON:        return 64;
-		case E_ITEM_COOKED_PORKCHOP:      return 64;
-		case E_ITEM_COOKED_RABBIT:        return 64;
-		case E_ITEM_COOKIE:               return 64;
-		case E_ITEM_DARK_OAK_DOOR:        return 64;
-		case E_ITEM_DIAMOND:              return 64;
-		case E_ITEM_DRAGON_BREATH:        return 64;
-		case E_ITEM_DYE:                  return 64;
-		case E_ITEM_EGG:                  return 16;
-		case E_ITEM_EMERALD:              return 64;
-		case E_ITEM_EMPTY_MAP:            return 64;
-		case E_ITEM_ENDER_PEARL:          return 16;
-		case E_ITEM_EYE_OF_ENDER:         return 64;
-		case E_ITEM_FEATHER:              return 64;
-		case E_ITEM_FERMENTED_SPIDER_EYE: return 64;
-		case E_ITEM_FIRE_CHARGE:          return 64;
-		case E_ITEM_FIREWORK_ROCKET:      return 64;
-		case E_ITEM_FIREWORK_STAR:        return 64;
-		case E_ITEM_FLINT:                return 64;
-		case E_ITEM_FLOWER_POT:           return 64;
-		case E_ITEM_GHAST_TEAR:           return 64;
-		case E_ITEM_GLASS_BOTTLE:         return 64;
-		case E_ITEM_GLISTERING_MELON:     return 64;
-		case E_ITEM_GLOWSTONE_DUST:       return 64;
-		case E_ITEM_GOLD:                 return 64;
-		case E_ITEM_GOLDEN_APPLE:         return 64;
-		case E_ITEM_GOLDEN_CARROT:        return 64;
-		case E_ITEM_GOLD_NUGGET:          return 64;
-		case E_ITEM_GUNPOWDER:            return 64;
-		case E_ITEM_HEAD:                 return 64;
-		case E_ITEM_JUNGLE_DOOR:          return 64;
-		case E_ITEM_IRON:                 return 64;
-		case E_ITEM_IRON_DOOR:            return 64;
-		case E_ITEM_IRON_NUGGET:          return 64;
-		case E_ITEM_ITEM_FRAME:           return 64;
-		case E_ITEM_LEAD:                 return 64;
-		case E_ITEM_LEATHER:              return 64;
-		case E_ITEM_MAGMA_CREAM:          return 64;
-		case E_ITEM_MAP:                  return 64;
-		case E_ITEM_MELON_SEEDS:          return 64;
-		case E_ITEM_MELON_SLICE:          return 64;
-		case E_ITEM_NETHER_BRICK:         return 64;
-		case E_ITEM_NETHER_QUARTZ:        return 64;
-		case E_ITEM_NETHER_WART:          return 64;
-		case E_ITEM_PAINTING:             return 64;
-		case E_ITEM_PAPER:                return 64;
-		case E_ITEM_POISONOUS_POTATO:     return 64;
-		case E_ITEM_POPPED_CHORUS_FRUIT:  return 64;
-		case E_ITEM_POTATO:               return 64;
-		case E_ITEM_PRISMARINE_CRYSTALS:  return 64;
-		case E_ITEM_PRISMARINE_SHARD:     return 64;
-		case E_ITEM_PUMPKIN_PIE:          return 64;
-		case E_ITEM_PUMPKIN_SEEDS:        return 64;
-		case E_ITEM_RABBITS_FOOT:         return 64;
-		case E_ITEM_RABBIT_HIDE:          return 64;
-		case E_ITEM_RAW_BEEF:             return 64;
-		case E_ITEM_RAW_CHICKEN:          return 64;
-		case E_ITEM_RAW_FISH:             return 64;
-		case E_ITEM_RAW_MUTTON:           return 64;
-		case E_ITEM_RAW_PORKCHOP:         return 64;
-		case E_ITEM_RAW_RABBIT:           return 64;
-		case E_ITEM_RED_APPLE:            return 64;
-		case E_ITEM_REDSTONE_DUST:        return 64;
-		case E_ITEM_REDSTONE_REPEATER:    return 64;
-		case E_ITEM_ROTTEN_FLESH:         return 64;
-		case E_ITEM_SEEDS:                return 64;
-		case E_ITEM_SIGN:                 return 16;
-		case E_ITEM_SLIMEBALL:            return 64;
-		case E_ITEM_SNOWBALL:             return 16;
-		case E_ITEM_SPAWN_EGG:            return 64;
-		case E_ITEM_SPECTRAL_ARROW:       return 64;
-		case E_ITEM_SPIDER_EYE:           return 64;
-		case E_ITEM_SPRUCE_DOOR:          return 64;
-		case E_ITEM_STEAK:                return 64;
-		case E_ITEM_STICK:                return 64;
-		case E_ITEM_STRING:               return 64;
-		case E_ITEM_SUGAR:                return 64;
-		case E_ITEM_SUGAR_CANE:           return 64;
-		case E_ITEM_TIPPED_ARROW:         return 64;
-		case E_ITEM_WHEAT:                return 64;
-		case E_ITEM_WOODEN_DOOR:          return 64;
+		case Item::AcaciaDoor:              return 64;
+		case Item::AcaciaSign:              return 16;
+		case Item::Apple:                   return 64;
+		case Item::ArmorStand:              return 16;
+		case Item::Arrow:                   return 64;
+		case Item::BakedPotato:             return 64;
+		case Item::BatSpawnEgg:             return 64;
+		case Item::Beef:                    return 64;
+		case Item::Beetroot:                return 64;
+		case Item::BeetrootSeeds:           return 64;
+		case Item::BirchDoor:               return 64;
+		case Item::BirchSign:               return 16;
+		case Item::BlackBanner:             return 16;
+		case Item::BlackDye:                return 64;
+		case Item::BlazePowder:             return 64;
+		case Item::BlazeRod:                return 64;
+		case Item::BlazeSpawnEgg:           return 64;
+		case Item::BlueBanner:              return 16;
+		case Item::BlueDye:                 return 64;
+		case Item::Bone:                    return 64;
+		case Item::BoneMeal:                return 64;
+		case Item::Book:                    return 64;
+		case Item::Bowl:                    return 64;
+		case Item::Bread:                   return 64;
+		case Item::BrewingStand:            return 64;
+		case Item::Brick:                   return 64;
+		case Item::BrownBanner:             return 16;
+		case Item::BrownDye:                return 64;
+		case Item::Bucket:                  return 16;
+		case Item::Carrot:                  return 64;
+		case Item::Cauldron:                return 64;
+		case Item::CaveSpiderSpawnEgg:      return 64;
+		case Item::Chicken:                 return 64;
+		case Item::ChickenSpawnEgg:         return 64;
+		case Item::ChorusFruit:             return 64;
+		case Item::ClayBall:                return 64;
+		case Item::Clock:                   return 64;
+		case Item::Coal:                    return 64;
+		case Item::Cod:                     return 64;
+		case Item::Comparator:              return 64;
+		case Item::Compass:                 return 64;
+		case Item::CookedBeef:              return 64;
+		case Item::CookedChicken:           return 64;
+		case Item::CookedCod:               return 64;
+		case Item::CookedMutton:            return 64;
+		case Item::CookedPorkchop:          return 64;
+		case Item::CookedRabbit:            return 64;
+		case Item::Cookie:                  return 64;
+		case Item::CowSpawnEgg:             return 64;
+		case Item::CreeperHead:             return 64;
+		case Item::CreeperSpawnEgg:         return 64;
+		case Item::CrimsonDoor:             return 64;
+		case Item::CrimsonSign:             return 16;
+		case Item::CyanBanner:              return 16;
+		case Item::CyanDye:                 return 64;
+		case Item::DarkOakDoor:             return 64;
+		case Item::DarkOakSign:             return 16;
+		case Item::Diamond:                 return 64;
+		case Item::DragonBreath:            return 64;
+		case Item::DragonHead:              return 64;
+		case Item::Egg:                     return 16;
+		case Item::Emerald:                 return 64;
+		case Item::EnderEye:                return 64;
+		case Item::EnderPearl:              return 16;
+		case Item::EndermanSpawnEgg:        return 64;
+		case Item::ExperienceBottle:        return 64;
+		case Item::Feather:                 return 64;
+		case Item::FermentedSpiderEye:      return 64;
+		case Item::FilledMap:               return 64;
+		case Item::FireCharge:              return 64;
+		case Item::FireworkRocket:          return 64;
+		case Item::FireworkStar:            return 64;
+		case Item::Flint:                   return 64;
+		case Item::FlowerPot:               return 64;
+		case Item::GhastSpawnEgg:           return 64;
+		case Item::GhastTear:               return 64;
+		case Item::GlassBottle:             return 64;
+		case Item::GlisteringMelonSlice:    return 64;
+		case Item::GlowstoneDust:           return 64;
+		case Item::GoldIngot:               return 64;
+		case Item::GoldNugget:              return 64;
+		case Item::GoldenApple:             return 64;
+		case Item::GoldenCarrot:            return 64;
+		case Item::GrayBanner:              return 16;
+		case Item::GrayDye:                 return 64;
+		case Item::GreenBanner:             return 16;
+		case Item::GreenDye:                return 64;
+		case Item::GuardianSpawnEgg:        return 64;
+		case Item::Gunpowder:               return 64;
+		case Item::HorseSpawnEgg:           return 64;
+		case Item::IronDoor:                return 64;
+		case Item::IronIngot:               return 64;
+		case Item::IronNugget:              return 64;
+		case Item::ItemFrame:               return 64;
+		case Item::JungleDoor:              return 64;
+		case Item::JungleSign:              return 16;
+		case Item::Lead:                    return 64;
+		case Item::Leather:                 return 64;
+		case Item::LightBlueBanner:         return 16;
+		case Item::LightBlueDye:            return 64;
+		case Item::LightGrayBanner:         return 16;
+		case Item::LightGrayDye:            return 64;
+		case Item::LimeBanner:              return 16;
+		case Item::LimeDye:                 return 64;
+		case Item::MagentaBanner:           return 16;
+		case Item::MagentaDye:              return 64;
+		case Item::MagmaCream:              return 64;
+		case Item::MagmaCubeSpawnEgg:       return 64;
+		case Item::Map:                     return 64;
+		case Item::MelonSeeds:              return 64;
+		case Item::MelonSlice:              return 64;
+		case Item::MooshroomSpawnEgg:       return 64;
+		case Item::Mutton:                  return 64;
+		case Item::NetherBrick:             return 64;
+		case Item::NetherWart:              return 64;
+		case Item::OakDoor:                 return 64;
+		case Item::OakSign:                 return 16;
+		case Item::OcelotSpawnEgg:          return 64;
+		case Item::OrangeBanner:            return 16;
+		case Item::OrangeDye:               return 64;
+		case Item::Painting:                return 64;
+		case Item::Paper:                   return 64;
+		case Item::PigSpawnEgg:             return 64;
+		case Item::PinkBanner:              return 16;
+		case Item::PinkDye:                 return 64;
+		case Item::PlayerHead:              return 64;
+		case Item::PoisonousPotato:         return 64;
+		case Item::PoppedChorusFruit:       return 64;
+		case Item::Porkchop:                return 64;
+		case Item::Potato:                  return 64;
+		case Item::PrismarineCrystals:      return 64;
+		case Item::PrismarineShard:         return 64;
+		case Item::PumpkinPie:              return 64;
+		case Item::PumpkinSeeds:            return 64;
+		case Item::PurpleBanner:            return 16;
+		case Item::PurpleDye:               return 64;
+		case Item::Quartz:                  return 64;
+		case Item::Rabbit:                  return 64;
+		case Item::RabbitFoot:              return 64;
+		case Item::RabbitHide:              return 64;
+		case Item::RabbitSpawnEgg:          return 64;
+		case Item::RedBanner:               return 16;
+		case Item::RedDye:                  return 64;
+		case Item::Redstone:                return 64;
+		case Item::Repeater:                return 64;
+		case Item::RottenFlesh:             return 64;
+		case Item::SheepSpawnEgg:           return 64;
+		case Item::SilverfishSpawnEgg:      return 64;
+		case Item::SkeletonSkull:           return 64;
+		case Item::SkeletonSpawnEgg:        return 64;
+		case Item::SlimeBall:               return 64;
+		case Item::SlimeSpawnEgg:           return 64;
+		case Item::Snowball:                return 16;
+		case Item::SpectralArrow:           return 64;
+		case Item::SpiderEye:               return 64;
+		case Item::SpiderSpawnEgg:          return 64;
+		case Item::SpruceDoor:              return 64;
+		case Item::SpruceSign:              return 16;
+		case Item::SquidSpawnEgg:           return 64;
+		case Item::Stick:                   return 64;
+		case Item::String:                  return 64;
+		case Item::Sugar:                   return 64;
+		case Item::SugarCane:               return 64;
+		case Item::TippedArrow:             return 64;
+		case Item::VillagerSpawnEgg:        return 64;
+		case Item::WarpedDoor:              return 64;
+		case Item::WarpedSign:              return 16;
+		case Item::Wheat:                   return 64;
+		case Item::WheatSeeds:              return 64;
+		case Item::WhiteBanner:             return 16;
+		case Item::WhiteDye:                return 64;
+		case Item::WitchSpawnEgg:           return 64;
+		case Item::WitherSkeletonSkull:     return 64;
+		case Item::WitherSkeletonSpawnEgg:  return 64;
+		case Item::WolfSpawnEgg:            return 64;
+		case Item::YellowBanner:            return 16;
+		case Item::YellowDye:               return 64;
+		case Item::ZombieHead:              return 64;
+		case Item::ZombiePigmanSpawnEgg:    return 64;
+		case Item::ZombieSpawnEgg:          return 64;
+		case Item::ZombieVillagerSpawnEgg:  return 64;
 		// By default items don't stack:
-		default:                          return 1;
+		default: return 1;
 	}
 }
 
@@ -719,15 +1451,31 @@ char cItemHandler::GetMaxStackSize(void)
 
 bool cItemHandler::IsTool()
 {
-	// TODO: Rewrite this to list all tools specifically
-	return
-		((m_ItemType >= 256) && (m_ItemType <= 259)) ||
-		(m_ItemType == 261) ||
-		((m_ItemType >= 267) && (m_ItemType <= 279)) ||
-		((m_ItemType >= 283) && (m_ItemType <= 286)) ||
-		((m_ItemType >= 290) && (m_ItemType <= 294)) ||
-		(m_ItemType == 325) ||
-		(m_ItemType == 346);
+	switch (m_ItemType)
+	{
+		case Item::DiamondAxe:
+		case Item::DiamondHoe:
+		case Item::DiamondPickaxe:
+		case Item::DiamondShovel:
+		case Item::GoldenAxe:
+		case Item::GoldenHoe:
+		case Item::GoldenPickaxe:
+		case Item::GoldenShovel:
+		case Item::IronAxe:
+		case Item::IronHoe:
+		case Item::IronPickaxe:
+		case Item::IronShovel:
+		case Item::NetheriteAxe:
+		case Item::NetheriteHoe:
+		case Item::NetheritePickaxe:
+		case Item::NetheriteShovel:
+		case Item::WoodenAxe:
+		case Item::WoodenHoe:
+		case Item::WoodenPickaxe:
+		case Item::WoodenShovel:
+			return true;
+		default: return false;
+	}
 }
 
 
@@ -756,17 +1504,16 @@ bool cItemHandler::IsDrinkable(short a_ItemDamage)
 
 bool cItemHandler::IsPlaceable(void)
 {
-	// We can place any block that has a corresponding E_ITEM_TYPE:
-	return (m_ItemType >= 1) && (m_ItemType <= 256);  // E_BLOCK_MAX_TYPE_ID);  TODO(12xx12)
+	return false;
 }
 
 
 
 
 
-bool cItemHandler::CanRepairWithRawMaterial(short a_ItemType)
+bool cItemHandler::CanRepairWithRawMaterial(const cItem & a_Item)
 {
-	UNUSED(a_ItemType);
+	UNUSED(a_Item);
 	return false;
 }
 
@@ -920,11 +1667,5 @@ float cItemHandler::GetBlockBreakingStrength(BlockState a_Block)
 
 bool cItemHandler::CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition)
 {
-	ASSERT(m_ItemType < 256);  // Items with IDs above 255 should all be handled by specific handlers.
-
-	// By default, all blocks can be placed and the meta is copied over from the item's damage value:
-	return a_Player.PlaceBlock(
-		a_PlacePosition,
-		BlockItemConverter::FromItem(PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage))
-	);
+	return false;
 }

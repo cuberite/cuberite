@@ -21,7 +21,7 @@ private:
 
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
 	{
-		switch (BlockItemConverter::FromItem(PaletteUpgrade::FromItem(a_HeldItem.m_ItemType, a_HeldItem.m_ItemDamage)))
+		switch (BlockItemConverter::FromItem(a_HeldItem.m_ItemType))
 		{
 			case BlockType::Piston:       return a_Player.PlaceBlock(a_PlacePosition, Block::Piston::Piston(false, DisplacementYawToFacing(a_PlacePosition, a_Player.GetEyePosition(), a_Player.GetYaw())));
 			case BlockType::StickyPiston: return a_Player.PlaceBlock(a_PlacePosition, Block::StickyPiston::StickyPiston(false, DisplacementYawToFacing(a_PlacePosition, a_Player.GetEyePosition(), a_Player.GetYaw())));

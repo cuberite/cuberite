@@ -1,6 +1,6 @@
 #pragma once
 
-enum class Item
+enum class Item : uint_least16_t
 {
 	AcaciaBoat,
 	AcaciaButton,
@@ -18,7 +18,7 @@ enum class Item
 	AcaciaTrapdoor,
 	AcaciaWood,
 	ActivatorRail,
-	Air,
+	Air,  // used for empty item
 	Allium,
 	AncientDebris,
 	Andesite,

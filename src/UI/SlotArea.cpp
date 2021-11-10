@@ -125,7 +125,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 	{
 		case caRightClick:
 		{
-			if (DraggingItem.m_ItemType <= 0)  // Empty-handed?
+			if (DraggingItem.m_ItemType == Item::Air)  // Empty-handed?
 			{
 				DraggingItem = Slot.CopyOne();  // Obtain copy of slot to preserve lore, enchantments, etc.
 
@@ -137,7 +137,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 					Slot.Empty();
 				}
 			}
-			else if ((Slot.m_ItemType <= 0) || DraggingItem.IsEqual(Slot))
+			else if ((Slot.m_ItemType == Item::Air) || DraggingItem.IsEqual(Slot))
 			{
 				// Drop one item in slot
 				cItemHandler * Handler = ItemHandler(Slot.m_ItemType);
@@ -775,11 +775,11 @@ void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Play
 		case E_BLOCK_CAKE:              a_Player.AwardAchievement(CustomStatistic::AchBakeCake);            break;
 		case E_BLOCK_ENCHANTMENT_TABLE: a_Player.AwardAchievement(CustomStatistic::AchEnchantments);        break;
 		case E_BLOCK_BOOKCASE:          a_Player.AwardAchievement(CustomStatistic::AchBookcase);            break;
-		case E_ITEM_WOODEN_PICKAXE:     a_Player.AwardAchievement(CustomStatistic::AchBuildPickaxe);        break;
-		case E_ITEM_WOODEN_SWORD:       a_Player.AwardAchievement(CustomStatistic::AchBuildSword);          break;
-		case E_ITEM_STONE_PICKAXE:      a_Player.AwardAchievement(CustomStatistic::AchBuildBetterPickaxe);  break;
-		case E_ITEM_WOODEN_HOE:         a_Player.AwardAchievement(CustomStatistic::AchBuildHoe);            break;
-		case E_ITEM_BREAD:              a_Player.AwardAchievement(CustomStatistic::AchMakeBread);           break;
+		case Item::WOODEN_PICKAXE:     a_Player.AwardAchievement(CustomStatistic::AchBuildPickaxe);        break;
+		case Item::WOODEN_SWORD:       a_Player.AwardAchievement(CustomStatistic::AchBuildSword);          break;
+		case Item::STONE_PICKAXE:      a_Player.AwardAchievement(CustomStatistic::AchBuildBetterPickaxe);  break;
+		case Item::WOODEN_HOE:         a_Player.AwardAchievement(CustomStatistic::AchBuildHoe);            break;
+		case Item::BREAD:              a_Player.AwardAchievement(CustomStatistic::AchMakeBread);           break;
 		default: break;
 	}
 	*/
@@ -1194,7 +1194,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		}
 		else  // Combining tools / armour
 		{
-			const bool IsEnchantBook = (Sacrifice.m_ItemType == E_ITEM_ENCHANTED_BOOK);
+			const bool IsEnchantBook = (Sacrifice.m_ItemType == Item::EnchantedBook);
 
 			// No result if we can't combine the items
 			if (!IsEnchantBook && (!Target.IsSameType(Sacrifice) || !Target.IsDamageable()))
@@ -1208,7 +1208,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			}
 
 			// Can we repair with sacrifice tool / armour?
-			if (Target.IsDamageable() && !IsEnchantBook && (Target.m_ItemDamage!=0))
+			if (Target.IsDamageable() && !IsEnchantBook && (Target.m_ItemDamage != 0))
 			{
 				// Durability = MaxDamage - m_ItemDamage = how far from broken
 				const short TargetDurability = Target.GetMaxDamage() - Target.m_ItemDamage;
@@ -1325,21 +1325,16 @@ cSlotAreaBeacon::~cSlotAreaBeacon()
 
 
 
-bool cSlotAreaBeacon::IsPlaceableItem(short a_ItemType)
+bool cSlotAreaBeacon::IsPlaceableItem(Item a_ItemType)
 {
 	switch (a_ItemType)
 	{
-		case E_ITEM_EMERALD:
-		case E_ITEM_DIAMOND:
-		case E_ITEM_GOLD:
-		case E_ITEM_IRON:
-		{
+		case Item::Emerald:
+		case Item::Diamond:
+		case Item::GoldIngot:
+		case Item::IronIngot:
 			return true;
-		}
-		default:
-		{
-			return false;
-		}
+		default: return false;
 	}
 }
 
@@ -1427,7 +1422,7 @@ void cSlotAreaBeacon::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_
 	}
 	else if (DraggingItem.m_ItemCount == 1)
 	{
-		if (!IsPlaceableItem(DraggingItem.m_ItemCount))
+		if (!IsPlaceableItem(DraggingItem.m_ItemType))
 		{
 			return;
 		}
@@ -1580,7 +1575,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 	if (a_SlotNum == 1)
 	{
 		// Lapis slot can have a full stack handle it normally, also check for empty hand
-		if ((DraggingItem.IsEmpty()) || ((DraggingItem.m_ItemType == E_ITEM_DYE) && (DraggingItem.m_ItemDamage == E_META_DYE_BLUE)))
+		if ((DraggingItem.IsEmpty()) || (DraggingItem.m_ItemType == Item::LapisLazuli))
 		{
 			return cSlotArea::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 		}
@@ -1630,7 +1625,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 
 void cSlotAreaEnchanting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots, bool a_BackFill)
 {
-	if ((a_ItemStack.m_ItemType == E_ITEM_DYE) && (a_ItemStack.m_ItemDamage == E_META_DYE_BLUE))
+	if (a_ItemStack.m_ItemType == Item::LapisLazuli)
 	{
 		// It's lapis, put it in the lapis spot.
 		const cItem * Slot = GetSlot(1, a_Player);
@@ -2119,8 +2114,8 @@ void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Playe
 	/** TODO 2014-05-12 xdot: Figure out when to call this method. */
 	switch (a_Result.m_ItemType)
 	{
-		case E_ITEM_IRON:        a_Player.AwardAchievement(CustomStatistic::AchAcquireIron); break;
-		case E_ITEM_COOKED_FISH: a_Player.AwardAchievement(CustomStatistic::AchCookFish);    break;
+		case Item::IronIngot:    a_Player.AwardAchievement(CustomStatistic::AchAcquireIron); break;
+		case Item::CookedSalmon: a_Player.AwardAchievement(CustomStatistic::AchCookFish);    break;
 		default: break;
 	}
 }
@@ -2592,7 +2587,7 @@ bool cSlotAreaArmor::CanPlaceArmorInSlot(int a_SlotNum, const cItem & a_Item)
 {
 	switch (a_SlotNum)
 	{
-		case 0:  return (ItemCategory::IsHelmet(a_Item.m_ItemType) || (a_Item.m_ItemType == 86));  // E_BLOCK_PUMPKIN));  // TODO(12xx12)
+		case 0:  return (ItemCategory::IsHelmet(a_Item.m_ItemType) || (a_Item.m_ItemType == Item::CarvedPumpkin));
 		case 1:  return ItemCategory::IsChestPlate(a_Item.m_ItemType);
 		case 2:  return ItemCategory::IsLeggings(a_Item.m_ItemType);
 		case 3:  return ItemCategory::IsBoots(a_Item.m_ItemType);
@@ -2813,7 +2808,7 @@ void cSlotAreaHorse::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 			{
 				case SaddleSlot:
 				{
-					if (DraggingItem.m_ItemType != E_ITEM_SADDLE)
+					if (DraggingItem.m_ItemType != Item::Saddle)
 					{
 						return;
 					}
@@ -2886,7 +2881,7 @@ void cSlotAreaHorse::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bo
 		}
 		--a_ItemStack.m_ItemCount;
 	}
-	else if ((a_ItemStack.m_ItemType == E_ITEM_SADDLE) && !m_Horse.IsSaddled())
+	else if ((a_ItemStack.m_ItemType == Item::Saddle) && !m_Horse.IsSaddled())
 	{
 		if (a_ShouldApply)
 		{

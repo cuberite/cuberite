@@ -18,7 +18,7 @@ class cItemBottleHandler:
 public:
 
 	cItemBottleHandler():
-		Super(E_ITEM_GLASS_BOTTLE)
+		Super(Item::GlassBottle)
 	{
 	}
 

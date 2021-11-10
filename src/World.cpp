@@ -1798,7 +1798,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a
 	a_FlyAwaySpeed /= 100;  // Pre-divide, so that we don't have to divide each time inside the loop
 	for (const auto & Pickup : a_Pickups)
 	{
-		if (!IsValidItem(Pickup.m_ItemType) || (Pickup.m_ItemType == E_BLOCK_AIR))
+		if (Pickup.m_ItemType == Item::Air)
 		{
 			// Don't spawn pickup if item isn't even valid; should prevent client crashing too
 			continue;
@@ -1822,7 +1822,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d
 {
 	for (const auto & Pickup : a_Pickups)
 	{
-		if (!IsValidItem(Pickup.m_ItemType) || (Pickup.m_ItemType == E_BLOCK_AIR))
+		if (Pickup.m_ItemType == Item::Air)
 		{
 			continue;
 		}
@@ -1932,16 +1932,16 @@ std::vector<UInt32> cWorld::SpawnSplitExperienceOrbs(Vector3d a_Pos, int a_Rewar
 
 
 
-UInt32 cWorld::SpawnMinecart(Vector3d a_Pos, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
+UInt32 cWorld::SpawnMinecart(Vector3d a_Pos, Item a_MinecartType, const cItem & a_Content, int a_BlockHeight)
 {
 	std::unique_ptr<cMinecart> Minecart;
 	switch (a_MinecartType)
 	{
-		case E_ITEM_MINECART:             Minecart = std::make_unique<cRideableMinecart>   (a_Pos, a_Content, a_BlockHeight); break;
-		case E_ITEM_CHEST_MINECART:       Minecart = std::make_unique<cMinecartWithChest>  (a_Pos); break;
-		case E_ITEM_FURNACE_MINECART:     Minecart = std::make_unique<cMinecartWithFurnace>(a_Pos); break;
-		case E_ITEM_MINECART_WITH_TNT:    Minecart = std::make_unique<cMinecartWithTNT>    (a_Pos); break;
-		case E_ITEM_MINECART_WITH_HOPPER: Minecart = std::make_unique<cMinecartWithHopper> (a_Pos); break;
+		case Item::Minecart:        Minecart = std::make_unique<cRideableMinecart>   (a_Pos, a_Content, a_BlockHeight); break;
+		case Item::ChestMinecart:   Minecart = std::make_unique<cMinecartWithChest>  (a_Pos); break;
+		case Item::FurnaceMinecart: Minecart = std::make_unique<cMinecartWithFurnace>(a_Pos); break;
+		case Item::TNTMinecart:     Minecart = std::make_unique<cMinecartWithTNT>    (a_Pos); break;
+		case Item::HopperMinecart:  Minecart = std::make_unique<cMinecartWithHopper> (a_Pos); break;
 		default:
 		{
 			return cEntity::INVALID_ID;

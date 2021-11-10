@@ -1071,7 +1071,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 					return;
 				}
 				// When bow is in off-hand / shield slot
-				if (m_Player->GetInventory().GetShieldSlot().m_ItemType == E_ITEM_BOW)
+				if (m_Player->GetInventory().GetShieldSlot().m_ItemType == Item::Bow)
 				{
 					ItemHandler = cItemHandler::GetItemHandler(m_Player->GetInventory().GetShieldSlot());
 				}
@@ -1750,8 +1750,8 @@ void cClientHandle::HandleUseItem(bool a_UsedMainHand)
 		if (
 			ItemHandler->IsFood() &&
 			(m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&  // Only non-creative or hungry players can eat
-			(HeldItem.m_ItemType != E_ITEM_GOLDEN_APPLE) &&  // Golden apple is a special case, it is used instead of eaten
-			(HeldItem.m_ItemType != E_ITEM_CHORUS_FRUIT)     // Chorus fruit is a special case, it is used instead of eaten
+			(HeldItem.m_ItemType != Item::GoldenApple) &&  // Golden apple is a special case, it is used instead of eaten
+			(HeldItem.m_ItemType != Item::ChorusFruit)     // Chorus fruit is a special case, it is used instead of eaten
 		)
 		{
 			// The player is satiated or in creative, and trying to eat

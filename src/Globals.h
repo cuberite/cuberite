@@ -394,3 +394,4 @@ auto ToUnsigned(T a_Val)
 #include "Vector3.h"
 #include "BlockState.h"
 #include "Registries/BlockStates.h"
+#include "Registries/Items.h"

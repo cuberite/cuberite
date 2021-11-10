@@ -32,7 +32,7 @@ private:
 	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// If using shears, drop self:
-		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == E_ITEM_SHEARS))
+		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == Item::Shears))
 		{
 			return cItem(BlockItemConverter::FromBlock(m_BlockType));
 		}

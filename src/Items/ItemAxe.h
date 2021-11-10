@@ -15,7 +15,7 @@ class cItemAxeHandler:
 
 public:
 
-	cItemAxeHandler(int a_ItemType):
+	cItemAxeHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

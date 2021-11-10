@@ -1378,18 +1378,19 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 					{
 						a_Item.m_ItemDamage |= 0x40;
 					}
-
+					/* TODO(12xx12)
 					// Ugly special case with the changed splash potion ID in 1.9
 					if ((a_Item.m_ItemType == 438) || (a_Item.m_ItemType == 441))
 					{
 						// Splash or lingering potions - change the ID to the normal one and mark as splash potions
-						a_Item.m_ItemType = E_ITEM_POTION;
+						a_Item.m_ItemType = Item::Potion;
 						a_Item.m_ItemDamage |= 0x4000;  // Is splash potion
 					}
 					else
 					{
 						a_Item.m_ItemDamage |= 0x2000;  // Is drinkable
 					}
+					*/
 				}
 				break;
 			}
@@ -1545,7 +1546,7 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 				{
 					a_Pkt.WriteBEUInt8(8);  // Index 8: Block ID and damage
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-					int Content = MinecartContent.m_ItemType;
+					int Content = PaletteUpgrade::ToItem(MinecartContent.m_ItemType).first;
 					Content |= MinecartContent.m_ItemDamage << 8;
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
 
@@ -1677,7 +1678,7 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 
 void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 {
-	short ItemType = a_Item.m_ItemType;
+	short ItemType = PaletteUpgrade::ToItem(a_Item.m_ItemType).first;
 	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
 	if (ItemType <= 0)
 	{
@@ -1712,7 +1713,14 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
 	}
 
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (ItemType != E_ITEM_FIREWORK_ROCKET) && (ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid() && (ItemType != E_ITEM_POTION) && (ItemType != E_ITEM_SPAWN_EGG))
+	if (
+		a_Item.m_Enchantments.IsEmpty() &&
+		a_Item.IsBothNameAndLoreEmpty() &&
+		(a_Item.m_ItemType != Item::FireworkRocket) &&
+		(a_Item.m_ItemType != Item::FireworkStar) &&
+		!a_Item.m_ItemColor.IsValid() &&
+		(a_Item.m_ItemType != Item::Potion) &&
+		(cItemSpawnEggHandler::IsSpawnEgg(a_Item.m_ItemType)))
 	{
 		a_Pkt.WriteBEInt8(0);
 		return;
@@ -1727,7 +1735,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	}
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
-		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
+		const char * TagName = (a_Item.m_ItemType == Item::EnchantedBook) ? "StoredEnchantments" : "ench";
 		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
 	}
 	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
@@ -1755,81 +1763,113 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		}
 		Writer.EndCompound();
 	}
-	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
+	if ((a_Item.m_ItemType == Item::FireworkRocket) || (a_Item.m_ItemType == Item::FireworkStar))
 	{
 		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
 	}
-	if (a_Item.m_ItemType == E_ITEM_POTION)
-	{
-		// 1.9 potions use a different format.  In the future (when only 1.9+ is supported) this should be its own class
-		AString PotionID = "empty";  // Fallback of "Uncraftable potion" for unhandled cases
 
-		cEntityEffect::eType Type = cEntityEffect::GetPotionEffectType(a_Item.m_ItemDamage);
-		if (Type != cEntityEffect::effNoEffect)
+	switch (a_Item.m_ItemType)
+	{
+		case Item::Potion:
 		{
-			switch (Type)
+			// 1.9 potions use a different format.  In the future (when only 1.9+ is supported) this should be its own class
+			AString PotionID = "empty";  // Fallback of "Uncraftable potion" for unhandled cases
+
+			cEntityEffect::eType Type = cEntityEffect::GetPotionEffectType(a_Item.m_ItemDamage);
+			if (Type != cEntityEffect::effNoEffect)
 			{
-				case cEntityEffect::effRegeneration: PotionID = "regeneration"; break;
-				case cEntityEffect::effSpeed: PotionID = "swiftness"; break;
-				case cEntityEffect::effFireResistance: PotionID = "fire_resistance"; break;
-				case cEntityEffect::effPoison: PotionID = "poison"; break;
-				case cEntityEffect::effInstantHealth: PotionID = "healing"; break;
-				case cEntityEffect::effNightVision: PotionID = "night_vision"; break;
-				case cEntityEffect::effWeakness: PotionID = "weakness"; break;
-				case cEntityEffect::effStrength: PotionID = "strength"; break;
-				case cEntityEffect::effSlowness: PotionID = "slowness"; break;
-				case cEntityEffect::effJumpBoost: PotionID = "leaping"; break;
-				case cEntityEffect::effInstantDamage: PotionID = "harming"; break;
-				case cEntityEffect::effWaterBreathing: PotionID = "water_breathing"; break;
-				case cEntityEffect::effInvisibility: PotionID = "invisibility"; break;
-				default: ASSERT(!"Unknown potion effect"); break;
-			}
-			if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1)
-			{
-				PotionID = "strong_" + PotionID;
-			}
-			else if (a_Item.m_ItemDamage & 0x40)
-			{
-				// Extended potion bit
-				PotionID = "long_" + PotionID;
-			}
-		}
-		else
-		{
-			// Empty potions: Water bottles and other base ones
-			if (a_Item.m_ItemDamage == 0)
-			{
-				// No other bits set; thus it's a water bottle
-				PotionID = "water";
+				switch (Type)
+				{
+					case cEntityEffect::effRegeneration: PotionID = "regeneration"; break;
+					case cEntityEffect::effSpeed: PotionID = "swiftness"; break;
+					case cEntityEffect::effFireResistance: PotionID = "fire_resistance"; break;
+					case cEntityEffect::effPoison: PotionID = "poison"; break;
+					case cEntityEffect::effInstantHealth: PotionID = "healing"; break;
+					case cEntityEffect::effNightVision: PotionID = "night_vision"; break;
+					case cEntityEffect::effWeakness: PotionID = "weakness"; break;
+					case cEntityEffect::effStrength: PotionID = "strength"; break;
+					case cEntityEffect::effSlowness: PotionID = "slowness"; break;
+					case cEntityEffect::effJumpBoost: PotionID = "leaping"; break;
+					case cEntityEffect::effInstantDamage: PotionID = "harming"; break;
+					case cEntityEffect::effWaterBreathing: PotionID = "water_breathing"; break;
+					case cEntityEffect::effInvisibility: PotionID = "invisibility"; break;
+					default: ASSERT(!"Unknown potion effect"); break;
+				}
+				if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1)
+				{
+					PotionID = "strong_" + PotionID;
+				}
+				else if (a_Item.m_ItemDamage & 0x40)
+				{
+					// Extended potion bit
+					PotionID = "long_" + PotionID;
+				}
 			}
 			else
 			{
-				switch (a_Item.m_ItemDamage & 0x3f)
+				// Empty potions: Water bottles and other base ones
+				if (a_Item.m_ItemDamage == 0)
 				{
-					case 0x00: PotionID = "mundane"; break;
-					case 0x10: PotionID = "awkward"; break;
-					case 0x20: PotionID = "thick"; break;
+					// No other bits set; thus it's a water bottle
+					PotionID = "water";
 				}
-				// Default cases will use "empty" from before.
+				else
+				{
+					switch (a_Item.m_ItemDamage & 0x3f)
+					{
+						case 0x00: PotionID = "mundane"; break;
+						case 0x10: PotionID = "awkward"; break;
+						case 0x20: PotionID = "thick"; break;
+					}
+					// Default cases will use "empty" from before.
+				}
+			}
+
+			PotionID = "minecraft:" + PotionID;
+
+			Writer.AddString("Potion", PotionID);
+			break;
+		}
+		case Item::BatSpawnEgg:
+		case Item::BlazeSpawnEgg:
+		case Item::CaveSpiderSpawnEgg:
+		case Item::ChickenSpawnEgg:
+		case Item::CowSpawnEgg:
+		case Item::CreeperSpawnEgg:
+		case Item::EndermanSpawnEgg:
+		case Item::GhastSpawnEgg:
+		case Item::GuardianSpawnEgg:
+		case Item::HorseSpawnEgg:
+		case Item::MagmaCubeSpawnEgg:
+		case Item::MooshroomSpawnEgg:
+		case Item::OcelotSpawnEgg:
+		case Item::PigSpawnEgg:
+		case Item::RabbitSpawnEgg:
+		case Item::SheepSpawnEgg:
+		case Item::SilverfishSpawnEgg:
+		case Item::SkeletonSpawnEgg:
+		case Item::SlimeSpawnEgg:
+		case Item::SpiderSpawnEgg:
+		case Item::SquidSpawnEgg:
+		case Item::VillagerSpawnEgg:
+		case Item::WitchSpawnEgg:
+		case Item::WitherSkeletonSpawnEgg:
+		case Item::WolfSpawnEgg:
+		case Item::ZombieSpawnEgg:
+		case Item::ZombiePigmanSpawnEgg:
+		case Item::ZombieVillagerSpawnEgg:
+		{
+			// Convert entity ID to the name.
+			eMonsterType MonsterType = cItemSpawnEggHandler::ItemToMonsterType(a_Item.m_ItemType);
+			if (MonsterType != eMonsterType::mtInvalidType)
+			{
+				Writer.BeginCompound("EntityTag");
+				Writer.AddString("id", "minecraft:" + cMonster::MobTypeToVanillaNBT(MonsterType));
+				Writer.EndCompound();
 			}
 		}
-
-		PotionID = "minecraft:" + PotionID;
-
-		Writer.AddString("Potion", PotionID);
+		default: break;
 	}
-	if (a_Item.m_ItemType == E_ITEM_SPAWN_EGG)
-	{
-		// Convert entity ID to the name.
-		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(a_Item.m_ItemDamage);
-		if (MonsterType != eMonsterType::mtInvalidType)
-		{
-			Writer.BeginCompound("EntityTag");
-			Writer.AddString("id", "minecraft:" + cMonster::MobTypeToVanillaNBT(MonsterType));
-			Writer.EndCompound();
-		}
-	}
-
 	Writer.Finish();
 
 	const auto Result = Writer.GetResult();

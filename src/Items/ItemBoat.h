@@ -15,7 +15,7 @@ class cItemBoatHandler:
 
 public:
 
-	cItemBoatHandler(int a_ItemType):
+	cItemBoatHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

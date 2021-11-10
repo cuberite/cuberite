@@ -16,7 +16,7 @@ class cItemBowHandler:
 public:
 
 	cItemBowHandler(void):
-		Super(E_ITEM_BOW)
+		Super(Item::Bow)
 	{
 	}
 

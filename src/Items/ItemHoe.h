@@ -16,7 +16,7 @@ class cItemHoeHandler:
 
 public:
 
-	cItemHoeHandler(int a_ItemType):
+	cItemHoeHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

@@ -12,7 +12,7 @@ class cItemMinecartHandler:
 
 public:
 
-	cItemMinecartHandler(int a_ItemType):
+	cItemMinecartHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

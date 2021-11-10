@@ -16,7 +16,7 @@ class cItemItemFrameHandler:
 
 public:
 
-	cItemItemFrameHandler(int a_ItemType):
+	cItemItemFrameHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

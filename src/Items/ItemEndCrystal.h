@@ -16,7 +16,7 @@ class cItemEndCrystalHandler :
 
 public:
 
-	cItemEndCrystalHandler(int a_ItemType) :
+	cItemEndCrystalHandler(Item a_ItemType) :
 		Super(a_ItemType)
 	{
 	}

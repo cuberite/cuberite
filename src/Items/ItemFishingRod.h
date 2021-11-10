@@ -56,7 +56,7 @@ class cItemFishingRodHandler:
 
 public:
 
-	cItemFishingRodHandler(int a_ItemType):
+	cItemFishingRodHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

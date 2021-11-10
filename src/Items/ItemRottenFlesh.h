@@ -15,7 +15,7 @@ class cItemRottenFleshHandler:
 public:
 
 	cItemRottenFleshHandler():
-		Super(E_ITEM_ROTTEN_FLESH, FoodInfo(4, 0.8))
+		Super(Item::RottenFlesh, FoodInfo(4, 0.8))
 	{
 	}
 

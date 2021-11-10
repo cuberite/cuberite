@@ -8,14 +8,14 @@
 
 
 
-class cItemRedstoneRepeaterHandler:
+class cItemRepeaterHandler:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemRedstoneRepeaterHandler(int a_ItemType):
+	cItemRepeaterHandler(Item a_ItemType):
 		Super(a_ItemType)
 	{
 	}

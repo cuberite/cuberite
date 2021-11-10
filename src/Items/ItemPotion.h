@@ -12,7 +12,7 @@ class cItemPotionHandler:
 public:
 
 	cItemPotionHandler():
-		Super(E_ITEM_POTION)
+		Super(Item::Potion)
 	{
 	}
 

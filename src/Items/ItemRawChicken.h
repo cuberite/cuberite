@@ -15,7 +15,7 @@ class cItemRawChickenHandler:
 public:
 
 	cItemRawChickenHandler():
-		Super(E_ITEM_RAW_CHICKEN, FoodInfo(2, 1.2))
+		Super(Item::Chicken, FoodInfo(2, 1.2))
 	{
 	}
 

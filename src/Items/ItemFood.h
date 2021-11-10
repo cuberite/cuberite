@@ -14,7 +14,7 @@ class cItemFoodHandler:
 
 public:
 
-	cItemFoodHandler(int a_ItemType, FoodInfo a_FoodInfo):
+	cItemFoodHandler(Item a_ItemType, FoodInfo a_FoodInfo):
 		Super(a_ItemType),
 		m_FoodInfo(a_FoodInfo)
 	{

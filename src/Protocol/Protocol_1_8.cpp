@@ -374,7 +374,7 @@ void cProtocol_1_8_0::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type
 	// Send the json string to the client:
 	cPacketizer Pkt(*this, pktChatRaw);
 	Pkt.WriteString(a_MessageRaw);
-	Pkt.WriteBEInt8(a_Type);
+	Pkt.WriteBEInt8(static_cast<Int8>(a_Type));
 }
 
 
@@ -1192,7 +1192,7 @@ void cProtocol_1_8_0::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteFPInt(LastSentPos.z);
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
-	Pkt.WriteBEInt16(a_Player.GetEquippedItem().IsEmpty() ? 0 : a_Player.GetEquippedItem().m_ItemType);
+	Pkt.WriteBEInt16(a_Player.GetEquippedItem().IsEmpty() ? 0 : PaletteUpgrade::ToItem(a_Player.GetEquippedItem().m_ItemType).first);
 	WriteEntityMetadata(Pkt, a_Player);
 	Pkt.WriteBEUInt8(0x7f);  // Metadata: end
 }
@@ -3047,7 +3047,6 @@ bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_
 		a_Item.Empty();
 		return true;
 	}
-	a_Item.m_ItemType = ItemType;
 
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8,  Int8,  ItemCount);
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemDamage);
@@ -3057,6 +3056,12 @@ bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_
 	if (ItemCount <= 0)
 	{
 		a_Item.Empty();
+	}
+
+	a_Item.m_ItemType = PaletteUpgrade::FromItem(ItemType, ItemDamage);
+	if (a_Item.GetHandler()->IsTool())
+	{
+		a_Item.m_ItemDamage += ItemDamage;
 	}
 
 	ContiguousByteBuffer Metadata;
@@ -3426,7 +3431,7 @@ void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 				if (!MinecartContent.IsEmpty())
 				{
 					a_Pkt.WriteBEUInt8(0x54);
-					int Content = MinecartContent.m_ItemType;
+					auto Content = PaletteUpgrade::ToItem(MinecartContent.m_ItemType).first;
 					Content |= MinecartContent.m_ItemDamage << 8;
 					a_Pkt.WriteBEInt32(Content);
 					a_Pkt.WriteBEUInt8(0x55);
@@ -3537,7 +3542,7 @@ void cProtocol_1_8_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity &
 
 void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 {
-	short ItemType = a_Item.m_ItemType;
+	short ItemType = PaletteUpgrade::ToItem(a_Item.m_ItemType).first;
 	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
 	if (ItemType <= 0)
 	{
@@ -3555,7 +3560,7 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 	a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
 
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid())
+	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != Item::FireworkRocket) && (a_Item.m_ItemType != Item::FireworkStar) && !a_Item.m_ItemColor.IsValid())
 	{
 		a_Pkt.WriteBEInt8(0);
 		return;
@@ -3570,7 +3575,7 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	}
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
-		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
+		const char * TagName = (a_Item.m_ItemType == Item::EnchantedBook) ? "StoredEnchantments" : "ench";
 		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
 	}
 	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
@@ -3598,7 +3603,7 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		}
 		Writer.EndCompound();
 	}
-	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
+	if ((a_Item.m_ItemType == Item::FireworkRocket) || (a_Item.m_ItemType == Item::FireworkStar))
 	{
 		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
 	}

@@ -100,7 +100,7 @@ void cItemFrame::SpawnOn(cClientHandle & a_ClientHandle)
 	a_ClientHandle.SendSpawnEntity(*this);
 	a_ClientHandle.SendEntityMetadata(*this);
 
-	if (m_Item.m_ItemType == E_ITEM_MAP)
+	if (m_Item.m_ItemType == Item::FilledMap)
 	{
 		cMap * Map = GetWorld()->GetMapManager().GetMapData(static_cast<unsigned>(m_Item.m_ItemDamage));
 		if (Map != nullptr)

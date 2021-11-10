@@ -15,7 +15,7 @@ class cItemSpiderEyeHandler:
 public:
 
 	cItemSpiderEyeHandler():
-		Super(E_ITEM_SPIDER_EYE, FoodInfo(2, 3.2))
+		Super(Item::SpiderEye, FoodInfo(2, 3.2))
 	{
 	}
 

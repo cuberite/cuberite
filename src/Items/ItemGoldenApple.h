@@ -15,7 +15,7 @@ class cItemGoldenAppleHandler:
 public:
 
 	cItemGoldenAppleHandler():
-		Super(E_ITEM_GOLDEN_APPLE, FoodInfo(4, 9.6))
+		Super(Item::GoldenApple, FoodInfo(4, 9.6))
 	{
 	}
 

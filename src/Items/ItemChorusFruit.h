@@ -16,7 +16,7 @@ class cItemChorusFruitHandler:
 public:
 
 	cItemChorusFruitHandler():
-		Super(E_ITEM_CHORUS_FRUIT, FoodInfo(4, 2.4))
+		Super(Item::ChorusFruit, FoodInfo(4, 2.4))
 	{
 	}
 

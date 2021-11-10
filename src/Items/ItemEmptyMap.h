@@ -17,7 +17,7 @@ class cItemEmptyMapHandler:
 public:
 
 	cItemEmptyMapHandler():
-		Super(E_ITEM_EMPTY_MAP)
+		Super(Item::Map)
 	{
 	}
 
