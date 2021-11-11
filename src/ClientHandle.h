@@ -105,6 +105,10 @@ public:  // tolua_export
 	void ProxyInit(const AString & a_IPString, const cUUID & a_UUID);
 	void ProxyInit(const AString & a_IPString, const cUUID & a_UUID, const Json::Value & a_Properties);
 
+	/** Processes the data in the network input buffer.
+	Called by both cWorld::Tick() and ServerTick(). */
+	void ProcessProtocolIn(void);
+
 	/** Flushes all buffered outgoing data to the network. */
 	void ProcessProtocolOut();
 
@@ -133,7 +137,7 @@ public:  // tolua_export
 	inline bool IsLoggedIn(void) const { return (m_State >= csAuthenticating); }
 
 	/** Called while the client is being ticked from the world via its cPlayer object */
-	void Tick(float a_Dt);
+	void Tick(std::chrono::milliseconds a_Dt);
 
 	/** Called while the client is being ticked from the cServer object */
 	void ServerTick(float a_Dt);
@@ -208,7 +212,7 @@ public:  // tolua_export
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
 	void SendResourcePack               (const AString & a_ResourcePackUrl);
 	void SendResetTitle                 (void);  // tolua_export
-	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks);
+	void SendRespawn                    (eDimension a_Dimension, bool a_IsRespawningFromDeath);
 	void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
 	void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void SendSetSubTitle                (const cCompositeChat & a_SubTitle);  // tolua_export
@@ -464,8 +468,9 @@ private:
 
 	/** A pointer to a World-owned player object, created in FinishAuthenticate when authentication succeeds.
 	The player should only be accessed from the tick thread of the World that owns him.
-	After the player object is handed off to the World, lifetime is managed automatically, guaranteed to outlast this client handle.
-	The player self-destructs some time after the client handle enters the Destroyed state. */
+	After the player object is handed off to the World, its lifetime is managed automatically, and strongly owns this client handle.
+	The player self-destructs some time after the client handle enters the Destroyed state.
+	We are therefore guaranteed that while m_State < Destroyed, that is when when we need to access m_Player, m_Player is valid. */
 	cPlayer * m_Player;
 
 	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know
@@ -483,11 +488,11 @@ private:
 	int m_LastStreamedChunkX;
 	int m_LastStreamedChunkZ;
 
-	/** The last time UnloadOutOfRangeChunks was called. */
-	cTickTimeLong m_LastUnloadCheck;
-
 	/** Number of ticks since the last network packet was received (increased in Tick(), reset in OnReceivedData()) */
 	std::atomic<int> m_TicksSinceLastPacket;
+
+	/** The time since UnloadOutOfRangeChunks was last called. */
+	std::chrono::milliseconds m_TimeSinceLastUnloadCheck;
 
 	/** Duration of the last completed client ping. */
 	std::chrono::steady_clock::duration m_Ping;
@@ -603,10 +608,6 @@ private:
 	/** Called to update m_State.
 	Only succeeds if a_NewState > m_State, otherwise returns false. */
 	bool SetState(eState a_NewState);
-
-	/** Processes the data in the network input buffer.
-	Called by both Tick() and ServerTick(). */
-	void ProcessProtocolIn(void);
 
 	// cTCPLink::cCallbacks overrides:
 	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override;

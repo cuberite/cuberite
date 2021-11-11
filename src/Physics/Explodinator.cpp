@@ -241,7 +241,6 @@ namespace Explodinator
 	Currently missing conduits from 1.13 */
 	static bool BlockAlwaysDrops(const BLOCKTYPE a_Block)
 	{
-		// If it's a Shulker box
 		if (IsBlockShulkerBox(a_Block))
 		{
 			return true;

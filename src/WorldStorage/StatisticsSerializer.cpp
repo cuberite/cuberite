@@ -55,26 +55,15 @@ static void LoadCustomStatFromJSON(StatisticsManager & Manager, const Json::Valu
 	for (auto it = a_In.begin(); it != a_In.end(); ++it)
 	{
 		const auto & Key = it.key().asString();
-		const auto StatInfo = NamespaceSerializer::SplitNamespacedID(Key);
-		if (StatInfo.first == NamespaceSerializer::Namespace::Unknown)
+		const auto & [Namespace, Name] = NamespaceSerializer::SplitNamespacedID(Key);
+
+		if (Namespace == NamespaceSerializer::Namespace::Unknown)
 		{
 			// Ignore non-Vanilla, non-Cuberite namespaces for now:
 			continue;
 		}
 
-		const auto & StatName = StatInfo.second;
-		try
-		{
-			Manager.Custom[NamespaceSerializer::ToCustomStatistic(StatName)] = it->asUInt();
-		}
-		catch (const std::out_of_range &)
-		{
-			FLOGWARNING("Invalid statistic type \"{}\"", StatName);
-		}
-		catch (const Json::LogicError &)
-		{
-			FLOGWARNING("Invalid statistic value for type \"{}\"", StatName);
-		}
+		Manager.Custom[NamespaceSerializer::ToCustomStatistic(Name)] = it->asUInt();
 	}
 }
 

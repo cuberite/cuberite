@@ -66,6 +66,9 @@ const int cPlayer::MAX_FOOD_LEVEL = 20;
 // 6000 ticks or 5 minutes
 #define PLAYER_INVENTORY_SAVE_INTERVAL 6000
 
+// Food saturation for newly-joined or just-respawned players.
+#define RESPAWN_FOOD_SATURATION 5
+
 #define XP_TO_LEVEL15 255
 #define XP_PER_LEVEL_TO15 17
 #define XP_TO_LEVEL30 825
@@ -114,29 +117,19 @@ cPlayer::BodyStanceGliding::BodyStanceGliding(cPlayer & a_Player) :
 cPlayer::cPlayer(const std::shared_ptr<cClientHandle> & a_Client) :
 	Super(etPlayer, 0.6f, 1.8f),
 	m_BodyStance(BodyStanceStanding(*this)),
-	m_FoodLevel(MAX_FOOD_LEVEL),
-	m_FoodSaturationLevel(5.0),
-	m_FoodTickTimer(0),
-	m_FoodExhaustionLevel(0.0),
 	m_Inventory(*this),
 	m_EnderChestContents(9, 3),
 	m_DefaultWorldPath(cRoot::Get()->GetDefaultWorld()->GetDataPath()),
-	m_GameMode(eGameMode_NotSet),
 	m_ClientHandle(a_Client),
 	m_NormalMaxSpeed(1.0),
 	m_SprintingMaxSpeed(1.3),
 	m_FlyingMaxSpeed(1.0),
 	m_IsChargingBow(false),
 	m_IsFishing(false),
-	m_IsFlightCapable(false),
-	m_IsFlying(false),
 	m_IsFrozen(false),
 	m_IsLeftHanded(false),
 	m_IsTeleporting(false),
-	m_IsVisible(true),
 	m_EatingFinishTick(-1),
-	m_LifetimeTotalXp(0),
-	m_CurrentXp(0),
 	m_BowCharge(0),
 	m_FloaterID(cEntity::INVALID_ID),
 	m_Team(nullptr),
@@ -150,13 +143,9 @@ cPlayer::cPlayer(const std::shared_ptr<cClientHandle> & a_Client) :
 	m_CurrentWindow = m_InventoryWindow;
 	m_InventoryWindow->OpenedByPlayer(*this);
 
-	SetMaxHealth(MAX_HEALTH);
-	m_Health = MAX_HEALTH;
-
 	LoadFromDisk();
-	UpdateCapabilities();
-
-	m_LastGroundHeight = static_cast<float>(GetPosY());
+	SetMaxHealth(MAX_HEALTH);
+	UpdateCapabilities();  // Only required for plugins listening to HOOK_SPAWNING_ENTITY to not read uninitialised variables.
 }
 
 
@@ -382,7 +371,6 @@ void cPlayer::SetFoodLevel(int a_FoodLevel)
 
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerFoodLevelChange(*this, FoodLevel))
 	{
-		m_FoodSaturationLevel = 5.0;
 		return;
 	}
 
@@ -943,8 +931,8 @@ void cPlayer::Respawn(void)
 
 	// Reset food level:
 	m_FoodLevel = MAX_FOOD_LEVEL;
-	m_FoodSaturationLevel = 5.0;
-	m_FoodExhaustionLevel = 0.0;
+	m_FoodSaturationLevel = RESPAWN_FOOD_SATURATION;
+	m_FoodExhaustionLevel = 0;
 
 	// Reset Experience
 	m_CurrentXp = 0;
@@ -1341,24 +1329,23 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 
 void cPlayer::UpdateCapabilities()
 {
-	// Fly ability:
-	if (IsGameModeCreative() || IsGameModeSpectator())
+	if (IsGameModeCreative())
 	{
 		m_IsFlightCapable = true;
+		m_IsVisible = true;
+	}
+	else if (IsGameModeSpectator())
+	{
+		m_DraggingItem.Empty();  // Clear the current dragging item of spectators.
+		m_IsFlightCapable = true;
+		m_IsFlying = true;  // Spectators are always in flight mode.
+		m_IsVisible = false;  // Spectators are invisible.
 	}
 	else
 	{
-		m_IsFlying = false;
 		m_IsFlightCapable = false;
-	}
-
-	// Visible:
-	m_IsVisible = !IsGameModeSpectator();
-
-	// Clear the current dragging item of spectators:
-	if (IsGameModeSpectator())
-	{
-		m_DraggingItem.Empty();
+		m_IsFlying = false;
+		m_IsVisible = true;
 	}
 }
 
@@ -1801,79 +1788,54 @@ void cPlayer::LoadFromDisk()
 {
 	LoadRank();
 
-	const auto & UUID = GetUUID();
-
-	// Load from the UUID file:
-	if (LoadFromFile(GetUUIDFileName(UUID)))
-	{
-		return;
-	}
-
-	// Player not found:
-	m_World = cRoot::Get()->GetDefaultWorld();
-	LOG("Player \"%s\" (%s) data not found, resetting to defaults", GetName().c_str(), UUID.ToShortString().c_str());
-
-	const Vector3i WorldSpawn(static_cast<int>(m_World->GetSpawnX()), static_cast<int>(m_World->GetSpawnY()), static_cast<int>(m_World->GetSpawnZ()));
-	SetPosition(WorldSpawn);
-	SetRespawnPosition(WorldSpawn, *m_World);
-
-	m_Inventory.Clear();
-	m_EnchantmentSeed = GetRandomProvider().RandInt<unsigned int>();  // Use a random number to seed the enchantment generator
-
-	FLOGD("Player \"{0}\" is connecting for the first time, spawning at default world spawn {1:.2f}", GetName(), GetPosition());
-}
-
-
-
-
-
-bool cPlayer::LoadFromFile(const AString & a_FileName)
-{
 	Json::Value Root;
+	const auto & UUID = GetUUID();
+	const auto & FileName = GetUUIDFileName(UUID);
 
 	try
 	{
-		// Load the data from the file and parse:
-		InputFileStream(a_FileName) >> Root;
-	}
-	catch (const Json::Exception & Oops)
-	{
-		// Parse failure:
-		throw std::runtime_error(Oops.what());
+		// Load the data from the save file and parse:
+		InputFileStream(FileName) >> Root;
+
+		// Load the player stats.
+		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
+		StatisticsSerializer::Load(m_Stats, m_DefaultWorldPath, UUID.ToLongString());
 	}
 	catch (const InputFileStream::failure &)
 	{
-		if (errno == ENOENT)
+		if (errno != ENOENT)
 		{
-			// This is a new player whom we haven't seen yet, bail out, let them have the defaults:
-			return false;
+			// Save file exists but unreadable:
+			throw;
 		}
 
-		throw;
+		// This is a new player whom we haven't seen yet with no save file, let them have the defaults:
+		LOG("Player \"%s\" (%s) save or statistics file not found, resetting to defaults", GetName().c_str(), UUID.ToShortString().c_str());
 	}
 
-	// Load the player data:
-	Json::Value & JSON_PlayerPosition = Root["position"];
-	if (JSON_PlayerPosition.size() == 3)
+	m_CurrentWorldName = Root.get("world", cRoot::Get()->GetDefaultWorld()->GetName()).asString();
+	m_World = cRoot::Get()->GetWorld(m_CurrentWorldName);
+
+	if (const auto & PlayerPosition = Root["position"]; PlayerPosition.size() == 3)
 	{
-		SetPosX(JSON_PlayerPosition[0].asDouble());
-		SetPosY(JSON_PlayerPosition[1].asDouble());
-		SetPosZ(JSON_PlayerPosition[2].asDouble());
-		m_LastPosition = GetPosition();
+		SetPosition(PlayerPosition[0].asDouble(), PlayerPosition[1].asDouble(), PlayerPosition[2].asDouble());
 	}
-
-	Json::Value & JSON_PlayerRotation = Root["rotation"];
-	if (JSON_PlayerRotation.size() == 3)
+	else
 	{
-		SetYaw      (static_cast<float>(JSON_PlayerRotation[0].asDouble()));
-		SetPitch    (static_cast<float>(JSON_PlayerRotation[1].asDouble()));
-		SetRoll     (static_cast<float>(JSON_PlayerRotation[2].asDouble()));
+		SetPosition(Vector3d(0.5, 0.5, 0.5) + Vector3i(m_World->GetSpawnX(), m_World->GetSpawnY(), m_World->GetSpawnZ()));
 	}
 
-	m_Health              = Root.get("health",         0).asFloat();
+	if (const auto & PlayerRotation = Root["rotation"]; PlayerRotation.size() == 3)
+	{
+		SetYaw  (PlayerRotation[0].asDouble());
+		SetPitch(PlayerRotation[1].asDouble());
+		SetRoll (PlayerRotation[2].asDouble());
+	}
+
+	m_Health              = Root.get("health",         MAX_HEALTH).asFloat();
 	m_AirLevel            = Root.get("air",            MAX_AIR_LEVEL).asInt();
 	m_FoodLevel           = Root.get("food",           MAX_FOOD_LEVEL).asInt();
-	m_FoodSaturationLevel = Root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
+	m_FoodSaturationLevel = Root.get("foodSaturation", RESPAWN_FOOD_SATURATION).asDouble();
 	m_FoodTickTimer       = Root.get("foodTickTimer",  0).asInt();
 	m_FoodExhaustionLevel = Root.get("foodExhaustion", 0).asDouble();
 	m_LifetimeTotalXp     = Root.get("xpTotal",        0).asInt();
@@ -1903,47 +1865,20 @@ bool cPlayer::LoadFromFile(const AString & a_FileName)
 
 	m_GameMode = static_cast<eGameMode>(Root.get("gamemode", eGameMode_NotSet).asInt());
 
-	if (m_GameMode == eGameMode_Creative)
-	{
-		m_IsFlightCapable = true;
-	}
-
 	m_Inventory.LoadFromJson(Root["inventory"]);
-
-	int equippedSlotNum = Root.get("equippedItemSlot", 0).asInt();
-	m_Inventory.SetEquippedSlotNum(equippedSlotNum);
+	m_Inventory.SetEquippedSlotNum(Root.get("equippedItemSlot", 0).asInt());
 
 	cEnderChestEntity::LoadFromJson(Root["enderchestinventory"], m_EnderChestContents);
-
-	m_CurrentWorldName = Root.get("world", "world").asString();
-	m_World = cRoot::Get()->GetWorld(m_CurrentWorldName);
-	if (m_World == nullptr)
-	{
-		m_World = cRoot::Get()->GetDefaultWorld();
-	}
 
 	m_RespawnPosition.x = Root.get("SpawnX", m_World->GetSpawnX()).asInt();
 	m_RespawnPosition.y = Root.get("SpawnY", m_World->GetSpawnY()).asInt();
 	m_RespawnPosition.z = Root.get("SpawnZ", m_World->GetSpawnZ()).asInt();
 	m_IsRespawnPointForced = Root.get("SpawnForced", true).asBool();
-	m_SpawnWorldName = Root.get("SpawnWorld", cRoot::Get()->GetDefaultWorld()->GetName()).asString();
+	m_SpawnWorldName = Root.get("SpawnWorld", m_World->GetName()).asString();
 
-	try
-	{
-		// Load the player stats.
-		// We use the default world name (like bukkit) because stats are shared between dimensions / worlds.
-		StatisticsSerializer::Load(m_Stats, m_DefaultWorldPath, GetUUID().ToLongString());
-	}
-	catch (...)
-	{
-		LOGWARNING("Failed loading player statistics");
-	}
-
-	FLOGD("Player {0} was read from file \"{1}\", spawning at {2:.2f} in world \"{3}\"",
-		GetName(), a_FileName, GetPosition(), m_World->GetName()
+	FLOGD("Player \"{0}\" with save file \"{1}\" is spawning at {2:.2f} in world \"{3}\"",
+		GetName(), FileName, GetPosition(), m_World->GetName()
 	);
-
-	return true;
 }
 
 
@@ -3181,7 +3116,7 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 
 void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	m_ClientHandle->Tick(a_Dt.count());
+	m_ClientHandle->Tick(a_Dt);
 
 	if (m_ClientHandle->IsDestroyed())
 	{
