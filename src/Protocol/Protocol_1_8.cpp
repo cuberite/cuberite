@@ -2880,7 +2880,7 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 
 	// Read the payload and send it through to the clienthandle:
 	ContiguousByteBuffer Message;
-	VERIFY(a_ByteBuffer.ReadSome(Message, a_ByteBuffer.GetReadableSpace() - 1));
+	VERIFY(a_ByteBuffer.ReadSome(Message, a_ByteBuffer.GetReadableSpace()));
 	m_Client->HandlePluginMessage(a_Channel, Message);
 }
 
