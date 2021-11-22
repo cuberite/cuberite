@@ -57,7 +57,7 @@ pipeline {
 				branch 'master'
 			}
             steps {
-                archiveArtifacts artifacts: 'Server/.luacheckrc'
+                archiveArtifacts artifacts: 'gcc_Release/Server/.luacheckrc'
             }
         }
     }
