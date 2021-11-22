@@ -1542,6 +1542,33 @@ end
 					},
 					Notes = "Kicks the user with the specified reason",
 				},
+				SendBlockBreakAnim =
+				{
+					Params =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+						{
+							Name = "Stage",
+							Type = "number",
+						},
+					},
+					Notes = "Sends a BlockBreakAnim packet to the client. Only one block can be broken at a time with the same UUID (the other will be reset). You can counter this using random values. The breaking stage ranges between 0 (first stage) and 9 (almost destroyed). Use -1 to reset the destruction.",
+				},
 				SendBlockChange =
 				{
 					Params =
@@ -1691,6 +1718,62 @@ end
 					},
 					Notes = "Updates the health displayed by the boss bar with the given ID.",
 				},
+				SendCollectEntity =
+				{
+					Params =
+					{
+						{
+							Name = "Entity",
+							Type = "cEntity",
+						},
+						{
+							Name = "Collector",
+							Type = "cEntity",
+						},
+					},
+					Notes = "Sends the CollectEntity packet to the client. This fakes item collecting.",
+				},
+				SendDestroyEntity =
+				{
+					Params =
+					{
+						{
+							Name = "Entity",
+							Type = "cEntity",
+						},
+					},
+					Notes = "Sends the DestroyEntity packet to the client. This tells the client to remove the entity from the world.",
+				},
+				SendDetachEntity =
+				{
+					Params =
+					{
+						{
+							Name = "Entity",
+							Type = "cEntity",
+						},
+					},
+					Notes = "Sends the DetachEntity packet to the client. This drop entities riding another one (boat, minecarts, pigs, horses...).",
+				},
+				SendEditSign =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Notes = "Sends the EditSign packet to the client. This opens the sign editor GUI.",
+				},
 				SendEntityAnimation =
 				{
 					Params =
@@ -1725,6 +1808,21 @@ end
 				{
 					Notes = "Hides the title. This makes the title and subtitle disappear, but if you call SendTitleTimes() the same title and subtitle will appear again."
 				},
+				SendLeashEntity =
+				{
+					Params =
+					{
+						{
+							Name = "Entity",
+							Type = "cEntity",
+						},
+						{
+							Name = "EntityLeashedTo",
+							Type = "cEntity",
+						},
+					},
+					Notes = "Sends the LeashEntity packet to the client. Leashes entities together. Leashing to the player, the leash will appear on the player's hand",
+				},
 				SendPluginMessage =
 				{
 					Params =
@@ -1743,6 +1841,17 @@ end
 				SendResetTitle =
 				{
 					Notes = "Resets and hides the title but not the subtitle."
+				},
+				SendResourcePack =
+				{
+					Params =
+					{
+						{
+							Name = "ResourcePackURL",
+							Type = "string",
+						},
+					},
+					Notes = "Sends the ResourcePack packet to the client. The client will request the resource pack from the given URL. If the url is blank, the resource pack will be reset.",
 				},
 				SendSetSubTitle =
 				{
@@ -1842,6 +1951,25 @@ end
 					},
 					Notes = "Sends a sound effect request to the client. The sound is played at the specified coords, with the specified volume (a float, 1.0 is full volume, can be more) and pitch (0-255, 63 is 100%) (DEPRECATED, use vector-parametered version instead)",
 				},
+				SendThunderbolt =
+				{
+					Params =
+					{
+						{
+							Name = "BlockX",
+							Type = "number",
+						},
+						{
+							Name = "BlockY",
+							Type = "number",
+						},
+						{
+							Name = "BlockZ",
+							Type = "number",
+						},
+					},
+					Notes = "Sends the thunderbolt at the specified coords to the client. The client will display the effect without any sound.",
+				},
 				SendTitleTimes =
 				{
 					Params =
@@ -1879,6 +2007,17 @@ end
 						},
 					},
 					Notes = "Sends the specified time update to the client. WorldAge is the total age of the world, in ticks. WorldDate is the current date, in ticks, and is used by the client to calculate the days elapsed (F3 debug overlay's day count) and the time of day (rendered sun position). DoDaylightCycle is a bool that specifies whether the client should automatically move the sun (true) or keep it in the same place (false).",
+				},
+				SendUnleashEntity =
+				{
+					Params =
+					{
+						{
+							Name = "EntityID",
+							Type = "number",
+						},
+					},
+					Notes = "Sends the UnleashEntity packet to the client. The client will remove any leashes related to the entity.",
 				},
 				SetClientBrand =
 				{
