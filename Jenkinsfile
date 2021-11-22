@@ -52,6 +52,14 @@ pipeline {
                 }
             }
         }
+		stage("Artifacts") {
+			when {
+				branch 'master'
+			}
+            steps {
+                archiveArtifacts artifacts: 'Server/.luacheckrc'
+            }
+        }
     }
     post {
         always {
