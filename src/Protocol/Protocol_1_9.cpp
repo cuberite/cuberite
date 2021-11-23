@@ -1197,6 +1197,58 @@ void cProtocol_1_9_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 
 
 
+void cProtocol_1_9_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std::string_view a_Channel)
+{
+	if (a_Channel == "AutoCmd")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockX);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockY);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockZ);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, TrackOutput);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Mode);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, Conditional);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, Automatic);
+
+		m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
+	}
+	else if (a_Channel == "PickItem")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, InventorySlotIndex);
+	}
+	else if (a_Channel == "Struct")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockX);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockY);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockZ);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Action);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Mode);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Name);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, OffsetX);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, OffsetY);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, OffsetZ);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, SizeX);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, SizeY);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, SizeZ);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Mirror);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Rotation);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Metadata);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, IgnoreEntities);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, ShowAir);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, ShowBoundingBox);
+		HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Integrity);
+		HANDLE_READ(a_ByteBuffer, ReadVarInt64, UInt64, Seed);
+	}
+	else
+	{
+		Super::HandleVanillaPluginMessage(a_ByteBuffer, a_Channel);
+	}
+}
+
+
+
+
+
 void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBufferView a_Metadata) const
 {
 	// Parse into NBT:
