@@ -11,22 +11,6 @@
 #include "../StringCompression.h"
 
 
-
-
-
-// Conditionally log a warning
-#define CONDWARNING(ShouldLog, ...) \
-	do { \
-		if (ShouldLog) \
-		{ \
-			LOGWARNING(__VA_ARGS__); \
-		} \
-	} while (false)
-
-
-
-
-
 /** Returns the map of string => eMergeStrategy used when translating cubeset file merge strategies. */
 static std::map<AString, cBlockArea::eMergeStrategy> & GetMergeStrategyMap(void)
 {

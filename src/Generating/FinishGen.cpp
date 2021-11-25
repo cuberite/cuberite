@@ -1822,7 +1822,7 @@ cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_Or
 			);
 			continue;
 		}
-		auto oreType = BlockStringToType(parts[0]);
+		auto oreType = static_cast<BLOCKTYPE>(BlockStringToType(parts[0]));
 		if (oreType < 0)
 		{
 			LOGWARNING("Cannot parse ore information from string, invalid OreType: \"%s\".", parts[0].c_str());

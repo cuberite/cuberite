@@ -374,7 +374,7 @@ void cProtocol_1_8_0::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type
 	// Send the json string to the client:
 	cPacketizer Pkt(*this, pktChatRaw);
 	Pkt.WriteString(a_MessageRaw);
-	Pkt.WriteBEInt8(a_Type);
+	Pkt.WriteBEInt8(static_cast<signed char>(a_Type));
 }
 
 

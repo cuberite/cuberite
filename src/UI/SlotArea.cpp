@@ -399,7 +399,7 @@ bool cSlotArea::CollectItemsToHand(cItem & a_Dragging, cPlayer & a_Player, bool 
 		{
 			continue;
 		}
-		int ToMove = a_Dragging.GetMaxStackSize() - a_Dragging.m_ItemCount;
+		char ToMove = a_Dragging.GetMaxStackSize() - a_Dragging.m_ItemCount;
 		if (ToMove > SlotItem.m_ItemCount)
 		{
 			ToMove = SlotItem.m_ItemCount;
@@ -1167,7 +1167,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			// Repair until out of materials, or fully repaired:
 			while ((DamageDiff > 0) && (NumItemsConsumed < Sacrifice.m_ItemCount))
 			{
-				Output.m_ItemDamage -= DamageDiff;
+				Output.m_ItemDamage -= static_cast<char>(DamageDiff);
 				NeedExp += std::max(1, DamageDiff / 100) + static_cast<int>(Target.m_Enchantments.Count());
 				DamageDiff = std::min(static_cast<int>(Output.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
 

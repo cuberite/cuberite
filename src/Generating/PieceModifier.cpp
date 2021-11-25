@@ -16,21 +16,6 @@ static const int SEED_OFFSET = 135 * 13;
 
 
 
-
-
-// Emit a warning if the first param is true
-#define CONDWARNING(ShouldLog, Fmt, ...) \
-	do { \
-		if (ShouldLog) \
-		{ \
-			LOGWARNING(Fmt, __VA_ARGS__); \
-		} \
-	} while (false)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 /** A modifier which is pseudo-randomly replacing blocks to other types and metas. */
 class cPieceModifierRandomizeBlocks:
@@ -252,7 +237,7 @@ public:
 		{
 			if (m_BlocksToReplace.count(BlockTypes[i]))
 			{
-				float BlockRnd = PieceNoise.IntNoise2DInRange(a_PieceRot, static_cast<int>(i), 0, m_AllWeights);
+				float BlockRnd = PieceNoise.IntNoise2DInRange(a_PieceRot, static_cast<int>(i), 0.0F, static_cast<float>(m_AllWeights));
 
 				int weightDelta = 0;
 				for (auto & blockToRnd : m_BlocksToRandomize)
@@ -265,7 +250,7 @@ public:
 						// Per block meta params
 						if (blockToRnd.m_MinMeta < blockToRnd.m_MaxMeta)
 						{
-							int BlockMetaRnd = std::clamp(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot*2, static_cast<int>(i), blockToRnd.m_MinNoiseMeta, blockToRnd.m_MaxNoiseMeta)), blockToRnd.m_MinMeta, blockToRnd.m_MaxMeta);
+							char BlockMetaRnd = static_cast<char>(std::clamp<int>(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot*2, static_cast<int>(i), static_cast<float>(blockToRnd.m_MinNoiseMeta), static_cast<float>(blockToRnd.m_MaxNoiseMeta))), blockToRnd.m_MinMeta, blockToRnd.m_MaxMeta));
 							BlockMetas[i] = static_cast<NIBBLETYPE>(BlockMetaRnd);
 						}
 						else if ((blockToRnd.m_MaxMeta > -1) && (blockToRnd.m_MaxMeta == blockToRnd.m_MinMeta))
@@ -280,7 +265,7 @@ public:
 				// All blocks meta params
 				if (m_MaxMeta > m_MinMeta)
 				{
-					int BlockMetaRnd = std::clamp(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot*2, static_cast<int>(i), m_MinNoiseMeta, m_MaxNoiseMeta)), m_MinMeta, m_MaxMeta);
+					char BlockMetaRnd = static_cast<char>(std::clamp<int>(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot * 2, static_cast<int>(i), static_cast<float>(m_MinNoiseMeta), static_cast<float>(m_MaxNoiseMeta))), m_MinMeta, m_MaxMeta));
 					BlockMetas[i] = static_cast<NIBBLETYPE>(BlockMetaRnd);
 				}
 				else if ((m_MaxMeta > -1) && (m_MaxMeta == m_MinMeta))

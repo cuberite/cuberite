@@ -1140,7 +1140,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 	}
 
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-	if (m_Player->IsFrozen() || PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, static_cast<char>(a_Status)))
+	if (m_Player->IsFrozen() || PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, static_cast<char>(a_BlockFace), static_cast<char>(a_Status)))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, *m_Player);
@@ -1371,7 +1371,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	cWorld * World = m_Player->GetWorld();
 
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, DugBlock, DugMeta))
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, static_cast<char>(a_BlockFace), DugBlock, DugMeta))
 	{
 		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, *m_Player);
@@ -1403,7 +1403,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 
 	World->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, absPos, DugBlock, this);
-	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, DugBlock, DugMeta);
+	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, static_cast<char>(a_BlockFace), DugBlock, DugMeta);
 }
 
 
@@ -1480,7 +1480,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
 	if (
-		!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ) &&
+		!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, static_cast<char>(a_BlockFace), a_CursorX, a_CursorY, a_CursorZ) &&
 		IsWithinReach && !m_Player->IsFrozen()
 	)
 	{
@@ -1500,12 +1500,12 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		if (BlockUsable && !(m_Player->IsCrouched() && !HeldItem.IsEmpty()))
 		{
 			cChunkInterface ChunkInterface(World->GetChunkMap());
-			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, static_cast<char>(a_BlockFace), a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 			{
 				// Use a block:
 				if (BlockHandler.OnUse(ChunkInterface, *World, *m_Player, ClickedPosition, a_BlockFace, CursorPosition))
 				{
-					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
+					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, static_cast<char>(a_BlockFace), a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 					return;  // Block use was successful, we're done.
 				}
 
@@ -1533,14 +1533,14 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			ItemHandler.OnPlayerPlace(*m_Player, HeldItem, ClickedPosition, BlockType, BlockMeta, a_BlockFace, CursorPosition);
 			return;
 		}
-		else if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		else if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, static_cast<char>(a_BlockFace), a_CursorX, a_CursorY, a_CursorZ))
 		{
 			// All plugins agree with using the item.
 			// Use an item in hand with a target block.
 
 			cBlockInServerPluginInterface PluginInterface(*World);
 			ItemHandler.OnItemUse(World, m_Player, PluginInterface, HeldItem, ClickedPosition, a_BlockFace);
-			PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, static_cast<char>(a_BlockFace), a_CursorX, a_CursorY, a_CursorZ);
 			return;
 		}
 	}

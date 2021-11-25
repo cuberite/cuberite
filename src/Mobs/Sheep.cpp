@@ -42,7 +42,7 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 	if (!m_IsSheared)
 	{
-		a_Drops.emplace_back(E_BLOCK_WOOL, 1, static_cast<short>(m_WoolColor));
+		a_Drops.emplace_back(E_BLOCK_WOOL, char(1), static_cast<short>(m_WoolColor));
 	}
 
 	unsigned int LootingLevel = 0;
