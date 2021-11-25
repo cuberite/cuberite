@@ -254,7 +254,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk)
 				{
 					m_bFoundPickupsAbove = true;
 
-					int PreviousCount = m_Contents.GetSlot(i).m_ItemCount;
+					char PreviousCount = m_Contents.GetSlot(i).m_ItemCount;
 
 					Item.m_ItemCount -= m_Contents.ChangeSlotCount(i, Item.m_ItemCount) - PreviousCount;  // Set count to however many items were added
 

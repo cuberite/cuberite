@@ -40,7 +40,7 @@ void cChicken::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		cItems Drops;
 		m_EggDropTimer = 0;
-		Drops.emplace_back(E_ITEM_EGG, 1);
+		Drops.emplace_back(E_ITEM_EGG, char(1));
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 	}
 	else
