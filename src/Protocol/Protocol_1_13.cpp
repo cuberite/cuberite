@@ -30,6 +30,7 @@ Implements the 1.13 protocol classes:
 #include "../World.h"
 #include "../JsonUtils.h"
 #include "../WorldStorage/FastNBT.h"
+#include "WorldStorage/NamespaceSerializer.h"
 
 #include "../Bindings/PluginManager.h"
 
@@ -715,24 +716,22 @@ bool cProtocol_1_13::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 
 void cProtocol_1_13::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, NamespacedChannel);
+
+	const auto & [Namespace, Channel] = NamespaceSerializer::SplitNamespacedID(NamespacedChannel);
 
 	// If the plugin channel is recognized vanilla, handle it directly:
-	if (Channel.substr(0, 15) == "minecraft:brand")
+	if (Namespace == NamespaceSerializer::Namespace::Minecraft)
 	{
-		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
-		m_Client->SetClientBrand(Brand);
-
-		// Send back our brand, including the length:
-		m_Client->SendPluginMessage("minecraft:brand", "\x08""Cuberite");
+		HandleVanillaPluginMessage(a_ByteBuffer, Channel);
 		return;
 	}
 
 	ContiguousByteBuffer Data;
 
 	// Read the plugin message and relay to clienthandle:
-	VERIFY(a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace()));  // Always succeeds
-	m_Client->HandlePluginMessage(Channel, Data);
+	a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace());
+	m_Client->HandlePluginMessage(NamespacedChannel, Data);
 }
 
 
@@ -744,6 +743,21 @@ void cProtocol_1_13::HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Effect1);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Effect2);
 	m_Client->HandleBeaconSelection(Effect1, Effect2);
+}
+
+
+
+
+
+void cProtocol_1_13::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const std::string_view a_Channel)
+{
+	if (a_Channel == "brand")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
+
+		m_Client->SetClientBrand(Brand);
+		m_Client->SendPluginMessage("brand", "\x08""Cuberite");  // Send back our brand, including the length.
+	}
 }
 
 

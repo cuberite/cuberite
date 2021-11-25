@@ -90,6 +90,7 @@ protected:
 	virtual void HandlePacketUseItem                (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketVehicleMove            (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer) override;
+	virtual void HandleVanillaPluginMessage         (cByteBuffer & a_ByteBuffer, std::string_view a_Channel) override;
 
 	virtual void ParseItemMetadata(cItem & a_Item, ContiguousByteBufferView a_Metadata) const override;
 	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData) override;

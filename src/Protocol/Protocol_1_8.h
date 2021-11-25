@@ -201,8 +201,8 @@ protected:
 	virtual void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
 
 	/** Parses Vanilla plugin messages into specific ClientHandle calls.
-	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel */
-	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel);
+	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel. */
+	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std::string_view a_Channel);
 
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
 	virtual void ParseItemMetadata(cItem & a_Item, ContiguousByteBufferView a_Metadata) const;

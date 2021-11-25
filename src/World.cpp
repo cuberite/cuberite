@@ -1037,6 +1037,12 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		BroadcastPlayerListUpdatePing();
 	}
 
+	// Process all clients' buffered actions:
+	for (const auto Player : m_Players)
+	{
+		Player->GetClientHandle()->ProcessProtocolIn();
+	}
+
 	TickQueuedChunkDataSets();
 	TickQueuedBlocks();
 	m_ChunkMap.Tick(a_Dt);
@@ -1243,7 +1249,7 @@ void cWorld::TickQueuedEntityAdditions(void)
 	decltype(m_EntitiesToAdd) EntitiesToAdd;
 	{
 		cCSLock Lock(m_CSEntitiesToAdd);
-		EntitiesToAdd = std::move(m_EntitiesToAdd);
+		std::swap(EntitiesToAdd, m_EntitiesToAdd);
 	}
 
 	// Ensures m_Players manipulation happens under the chunkmap lock.

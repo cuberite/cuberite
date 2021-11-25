@@ -419,14 +419,9 @@ public:
 	/** Saves all player data, such as inventory, to JSON. */
 	void SaveToDisk(void);
 
-	/** Loads the player data from the disk file.
+	/** Loads the player data from the save file.
 	Sets m_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile(). */
 	void LoadFromDisk();
-
-	/** Loads the player data from the specified file.
-	Sets m_World to the world where the player will spawn, based on the stored world name or the default world.
-	Returns true on success, false if the player wasn't found, and excepts with base std::runtime_error if the data couldn't be read or parsed. */
-	bool LoadFromFile(const AString & a_FileName);
 
 	const AString & GetLoadedWorldName() const { return m_CurrentWorldName; }
 

@@ -5,7 +5,6 @@
 
 #include "Globals.h"
 #include "BioGen.h"
-#include <iostream>
 #include "IntGen.h"
 #include "ProtIntGen.h"
 #include "../IniFile.h"
@@ -1197,6 +1196,8 @@ std::unique_ptr<cBiomeGen> cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a
 
 // Change to 1 to enable the perf test:
 #if 0
+
+#include <iostream>
 
 class cBioGenPerfTest
 {

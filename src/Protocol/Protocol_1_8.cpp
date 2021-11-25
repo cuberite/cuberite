@@ -938,13 +938,12 @@ void cProtocol_1_8_0::SendPlayerAbilities(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktPlayerAbilities);
 	Byte Flags = 0;
-	cPlayer * Player = m_Client->GetPlayer();
-	if (Player->IsGameModeCreative())
+	const cPlayer * Player = m_Client->GetPlayer();
+
+	if (Player->IsGameModeCreative() || Player->IsGameModeSpectator())
 	{
-		Flags |= 0x01;
-		Flags |= 0x08;  // Godmode, used for creative
+		Flags |= 0x01;  // Invulnerability.
 	}
 	if (Player->IsFlying())
 	{
@@ -954,6 +953,12 @@ void cProtocol_1_8_0::SendPlayerAbilities(void)
 	{
 		Flags |= 0x04;
 	}
+	if (Player->IsGameModeCreative())
+	{
+		Flags |= 0x08;  // Godmode: creative instant break.
+	}
+
+	cPacketizer Pkt(*this, pktPlayerAbilities);
 	Pkt.WriteBEUInt8(Flags);
 	Pkt.WriteBEFloat(static_cast<float>(0.05 * Player->GetFlyingMaxSpeed()));
 	Pkt.WriteBEFloat(static_cast<float>(0.1 * Player->GetNormalMaxSpeed()));
@@ -2639,28 +2644,23 @@ void cProtocol_1_8_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_8_0::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
+	// https://wiki.vg/index.php?title=Plugin_channels&oldid=14089#MC.7CAdvCmd
+
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
 
+	const std::string_view ChannelView = Channel;
+
 	// If the plugin channel is recognized vanilla, handle it directly:
-	if (Channel.substr(0, 3) == "MC|")
+	if (ChannelView.substr(0, 3) == "MC|")
 	{
-		HandleVanillaPluginMessage(a_ByteBuffer, Channel);
-
-		// Skip any unread data (vanilla sometimes sends garbage at the end of a packet; #1692):
-		if (a_ByteBuffer.GetReadableSpace() > 0)
-		{
-			LOGD("Protocol 1.8: Skipping garbage data at the end of a vanilla PluginMessage packet, %u bytes",
-				static_cast<unsigned>(a_ByteBuffer.GetReadableSpace())
-			);
-			a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace());
-		}
-
+		HandleVanillaPluginMessage(a_ByteBuffer, ChannelView.substr(3));
 		return;
 	}
 
-	// Read the plugin message and relay to clienthandle:
 	ContiguousByteBuffer Data;
-	VERIFY(a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace()));  // Always succeeds
+
+	// Read the plugin message and relay to clienthandle:
+	a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace());
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 
@@ -2892,81 +2892,83 @@ void cProtocol_1_8_0::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel)
+void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const std::string_view a_Channel)
 {
-	if ((a_Channel == "MC|AdvCdm") || (a_Channel == "MC|AdvCmd"))  // Spelling was fixed in 15w34
+	if ((a_Channel == "AdvCdm") || (a_Channel == "AdvCmd"))  // Spelling was fixed in 15w34.
 	{
-		// https://wiki.vg/index.php?title=Plugin_channels&oldid=14089#MC.7CAdvCmd
-		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Dest);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Type);
 
-		switch (Dest)
+		switch (Type)
 		{
 			case 0x00:
 			{
-				// Editing a command-block
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockX);
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockY);
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockZ);
 				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+				HANDLE_READ(a_ByteBuffer, ReadBool, bool, TrackOutput);
+
+				// Editing a command-block:
 				m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
-				break;
-			}
-
-			case 0x01:
-			{
-				// Editing a command-block-minecart
-				HANDLE_READ(a_ByteBuffer, ReadBEUInt32,      UInt32,  EntityID);
-				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
-				m_Client->HandleCommandBlockEntityChange(EntityID, Command);
-				break;
-			}
-
-			default:
-			{
-				m_Client->SendChat(Printf("Failure setting command block command; unhandled destination %u (0x%02x)", Dest, Dest), mtFailure);
-				LOG("Unhandled MC|AdvCmd packet destination.");
 				return;
 			}
-		}  // switch (Mode)
-		return;
-	}
-	else if (a_Channel == "MC|Brand")
-	{
-		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
+			case 0x01:
+			{
+				HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, EntityID);
+				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+				HANDLE_READ(a_ByteBuffer, ReadBool, bool, TrackOutput);
 
-		m_Client->SetClientBrand(Brand);
-		// Send back our brand, including the length:
-		m_Client->SendPluginMessage("MC|Brand", "\x08""Cuberite");
-		return;
+				// Editing a command-block-minecart:
+				m_Client->HandleCommandBlockEntityChange(EntityID, Command);
+				return;
+			}
+			default:
+			{
+				m_Client->Kick("Unknown command block edit type - hacked client?");
+				return;
+			}
+		}
 	}
-	else if (a_Channel == "MC|Beacon")
+	else if (a_Channel == "Beacon")
 	{
 		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, Effect1);
 		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, Effect2);
 
 		m_Client->HandleBeaconSelection(Effect1, Effect2);
-		return;
 	}
-	else if (a_Channel == "MC|ItemName")
+	else if (a_Channel == "BEdit")
+	{
+		if (cItem UnsignedBook; ReadItem(a_ByteBuffer, UnsignedBook))
+		{
+			// TODO: m_Client->HandleBookEdit
+		}
+	}
+	else if (a_Channel == "BSign")
+	{
+		if (cItem WrittenBook; ReadItem(a_ByteBuffer, WrittenBook))
+		{
+			// TODO: m_Client->HandleBookSign
+		}
+	}
+	else if (a_Channel == "Brand")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
+
+		m_Client->SetClientBrand(Brand);
+		m_Client->SendPluginMessage("MC|Brand", "\x08""Cuberite");  // Send back our brand, including the length.
+	}
+	else if (a_Channel == "ItemName")
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, ItemName);
 
 		m_Client->HandleAnvilItemName(ItemName);
-		return;
 	}
-	else if (a_Channel == "MC|TrSel")
+	else if (a_Channel == "TrSel")
 	{
 		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, SlotNum);
 
 		m_Client->HandleNPCTrade(SlotNum);
-		return;
 	}
-	LOG("Unhandled vanilla plugin channel: \"%s\".", a_Channel.c_str());
-
-	// Read the payload and send it through to the clienthandle:
-	ContiguousByteBuffer Message;
-	VERIFY(a_ByteBuffer.ReadSome(Message, a_ByteBuffer.GetReadableSpace() - 1));
-	m_Client->HandlePluginMessage(a_Channel, Message);
 }
 
 

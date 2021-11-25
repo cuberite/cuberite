@@ -50,6 +50,7 @@ touch apiCheckFailed.flag
 if [ "$CI_CUBERITE_BUILD_TYPE" != "COVERAGE" ]; then
 	./Cuberite <<- EOF
 		load APIDump
+		api
 		apicheck
 		restart
 		stop

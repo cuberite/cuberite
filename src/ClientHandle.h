@@ -105,6 +105,10 @@ public:  // tolua_export
 	void ProxyInit(const AString & a_IPString, const cUUID & a_UUID);
 	void ProxyInit(const AString & a_IPString, const cUUID & a_UUID, const Json::Value & a_Properties);
 
+	/** Processes the data in the network input buffer.
+	Called by both cWorld::Tick() and ServerTick(). */
+	void ProcessProtocolIn(void);
+
 	/** Flushes all buffered outgoing data to the network. */
 	void ProcessProtocolOut();
 
@@ -133,7 +137,7 @@ public:  // tolua_export
 	inline bool IsLoggedIn(void) const { return (m_State >= csAuthenticating); }
 
 	/** Called while the client is being ticked from the world via its cPlayer object */
-	void Tick(float a_Dt);
+	void Tick(std::chrono::milliseconds a_Dt);
 
 	/** Called while the client is being ticked from the cServer object */
 	void ServerTick(float a_Dt);
@@ -146,8 +150,9 @@ public:  // tolua_export
 	// The following functions send the various packets:
 	// (Please keep these alpha-sorted)
 	void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle);
+
 	void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BlockState a_Block);
-	void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
+	void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);  // tolua_export
 	void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BlockState a_Block);  // tolua_export
 	void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
 	void SendBossBarAdd                 (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog);  // tolua_export
@@ -165,12 +170,12 @@ public:  // tolua_export
 	void SendChatSystem                 (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChatSystem                 (const cCompositeChat & a_Message);
 	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, ContiguousByteBufferView a_ChunkData);
-	void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count);
-	void SendDestroyEntity              (const cEntity & a_Entity);
-	void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle);
+	void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count);   // tolua_export
+	void SendDestroyEntity              (const cEntity & a_Entity);   // tolua_export
+	void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle);   // tolua_export
 	void SendDisconnect                 (const AString & a_Reason);
 	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
-	void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ);
+	void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation);  // tolua_export
 	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration);
 	void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
@@ -188,14 +193,14 @@ public:  // tolua_export
 	void SendHeldItemChange             (int a_ItemIndex);
 	void SendHideTitle                  (void);   // tolua_export
 	void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item);
-	void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo);
+	void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo);  // tolua_export
 	void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY);
 	void SendPaintingSpawn              (const cPainting & a_Painting);
 	void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount);
 	void SendParticleEffect             (const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data);
 	void SendPlayerAbilities            (void);
 	void SendPlayerListAddPlayer        (const cPlayer & a_Player);
-	void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer);   // tolua_export
+	void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer);  // tolua_export
 	void SendPlayerListRemovePlayer     (const cPlayer & a_Player);
 	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
 	void SendPlayerListUpdateGameMode   (const cPlayer & a_Player);
@@ -206,9 +211,9 @@ public:  // tolua_export
 	void SendPluginMessage              (const AString & a_Channel, std::string_view a_Message);  // Exported in ManualBindings.cpp
 	void SendPluginMessage              (const AString & a_Channel, ContiguousByteBufferView a_Message);
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
-	void SendResourcePack               (const AString & a_ResourcePackUrl);
+	void SendResourcePack               (const AString & a_ResourcePackUrl);  // tolua_export
 	void SendResetTitle                 (void);  // tolua_export
-	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks);
+	void SendRespawn                    (eDimension a_Dimension, bool a_IsRespawningFromDeath);
 	void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
 	void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void SendSetSubTitle                (const cCompositeChat & a_SubTitle);  // tolua_export
@@ -222,10 +227,10 @@ public:  // tolua_export
 	void SendSpawnMob                   (const cMonster & a_Mob);
 	void SendStatistics                 (const StatisticsManager & a_Manager);
 	void SendTabCompletionResults       (const AStringVector & a_Results);
-	void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ);
+	void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks);  // tolua_export
 	void SendTimeUpdate                 (cTickTimeLong a_WorldAge, cTickTimeLong a_WorldDate, bool a_DoDaylightCycle);
-	void SendUnleashEntity              (const cEntity & a_Entity);
+	void SendUnleashEntity              (const cEntity & a_Entity);  // tolua_export
 	void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ);
 	void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity);
 	void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
@@ -464,8 +469,9 @@ private:
 
 	/** A pointer to a World-owned player object, created in FinishAuthenticate when authentication succeeds.
 	The player should only be accessed from the tick thread of the World that owns him.
-	After the player object is handed off to the World, lifetime is managed automatically, guaranteed to outlast this client handle.
-	The player self-destructs some time after the client handle enters the Destroyed state. */
+	After the player object is handed off to the World, its lifetime is managed automatically, and strongly owns this client handle.
+	The player self-destructs some time after the client handle enters the Destroyed state.
+	We are therefore guaranteed that while m_State < Destroyed, that is when when we need to access m_Player, m_Player is valid. */
 	cPlayer * m_Player;
 
 	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know
@@ -483,11 +489,11 @@ private:
 	int m_LastStreamedChunkX;
 	int m_LastStreamedChunkZ;
 
-	/** The last time UnloadOutOfRangeChunks was called. */
-	cTickTimeLong m_LastUnloadCheck;
-
 	/** Number of ticks since the last network packet was received (increased in Tick(), reset in OnReceivedData()) */
 	std::atomic<int> m_TicksSinceLastPacket;
+
+	/** The time since UnloadOutOfRangeChunks was last called. */
+	std::chrono::milliseconds m_TimeSinceLastUnloadCheck;
 
 	/** Duration of the last completed client ping. */
 	std::chrono::steady_clock::duration m_Ping;
@@ -603,10 +609,6 @@ private:
 	/** Called to update m_State.
 	Only succeeds if a_NewState > m_State, otherwise returns false. */
 	bool SetState(eState a_NewState);
-
-	/** Processes the data in the network input buffer.
-	Called by both Tick() and ServerTick(). */
-	void ProcessProtocolIn(void);
 
 	// cTCPLink::cCallbacks overrides:
 	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override;
