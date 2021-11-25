@@ -2179,7 +2179,7 @@ void cClientHandle::Tick(std::chrono::milliseconds a_Dt)
 	// anticheat fastbreak
 	if (m_HasStartedDigging)
 	{
-		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock({ m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ });
+		auto Block = m_Player->GetWorld()->GetBlock({ m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ });
 		m_BreakProgress += m_Player->GetMiningProgressPerTick(Block);
 	}
 
