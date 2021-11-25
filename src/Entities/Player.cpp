@@ -2518,11 +2518,10 @@ const cUUID & cPlayer::GetUUID(void) const
 
 
 
-bool cPlayer::PlaceBlock(const Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPlayer::PlaceBlock(const Vector3i a_Position, BlockState a_Block)
 {
 	return PlaceBlocks({ { a_Position, a_Block } });
 }
-
 
 
 

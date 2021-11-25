@@ -29,4 +29,9 @@ namespace NamespaceSerializer
 	eMonsterType ToMonsterType(std::string_view a_ID);
 
 	std::pair<Namespace, std::string_view> SplitNamespacedID(std::string_view ID);
+
+	// change string from ThisIsAString to this_is_a_string
+	AString DePrettify(std::string_view a_ID);
+	// Checks is the string is ThisIsAString
+	bool IsPretty(std::string_view a_ID);
 }

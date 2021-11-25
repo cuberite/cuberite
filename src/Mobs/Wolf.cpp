@@ -337,8 +337,8 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			{
 				eMonsterType MonsterType = cItemSpawnEggHandler::ItemToMonsterType(EquippedItem.m_ItemType);
 				if (
-						(MonsterType == m_MobType) &&
-						(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID))  // Spawning succeeded
+					(MonsterType == m_MobType) &&
+					(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID))  // Spawning succeeded
 				{
 					if (!a_Player.IsGameModeCreative())
 					{

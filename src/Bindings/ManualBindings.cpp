@@ -1634,9 +1634,8 @@ static int tolua_cPlayer_PlaceBlock(lua_State * tolua_S)
 	// Get the params:
 	cPlayer * Self;
 	Vector3i Position;
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	L.GetStackValues(1, Self, Position, BlockType, BlockMeta);
+	BlockState Block;
+	L.GetStackValues(1, Self, Position, Block);
 
 	if (!cChunkDef::IsValidHeight(Position.y))
 	{
@@ -1644,7 +1643,7 @@ static int tolua_cPlayer_PlaceBlock(lua_State * tolua_S)
 	}
 
 	// Return the result of placement:
-	L.Push(Self->PlaceBlock(Position, BlockType, BlockMeta));
+	L.Push(Self->PlaceBlock(Position, Block));
 	return 1;
 }
 

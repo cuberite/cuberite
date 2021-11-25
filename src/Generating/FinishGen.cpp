@@ -377,7 +377,7 @@ void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClum
 		for (const auto & BlockName : Blocks)
 		{
 			cItem Block;
-			if (!StringToItem(BlockName, Block) || (Block.m_ItemType != Item::Air))
+			if (!StringToItem(BlockName, Block) || (Block.m_ItemType == Item::Air))
 			{
 				LOGWARNING("Block \"%s\" is invalid", BlockName.c_str());
 				continue;
@@ -1910,7 +1910,7 @@ AString cFinishGenOres::OreInfosToString(const cFinishGenOres::OreInfos & a_OreI
 		auto NumericBlock = PaletteUpgrade::ToBlock(Ore.m_OreBlock);
 
 		AppendPrintf(res, "%s:%d:%d:%d:%d",
-			ItemTypeToString(NumericBlock.first).c_str(), NumericBlock.second,
+			NamespaceSerializer::From(Ore.m_OreBlock), NumericBlock.second,
 			Ore.m_MaxHeight, Ore.m_NumNests, Ore.m_NestSize
 		);
 	}  // for ore - a_OreInfos[]

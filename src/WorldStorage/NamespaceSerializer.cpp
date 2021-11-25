@@ -1,5 +1,7 @@
 #include "Globals.h"
 
+#include <regex>
+
 #include "NamespaceSerializer.h"
 
 
@@ -2803,6 +2805,26 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "yellow_wool",                         BlockType::YellowWool },
 		{ "zombie_head",                         BlockType::ZombieHead },
 		{ "zombie_wall_head",                    BlockType::ZombieWallHead },
+
+		// Old names
+		{ "yellowflower",                        BlockType::Dandelion },
+		{ "redflower",                           BlockType::Poppy },
+		{ "lilac",                               BlockType::Lilac },
+		{ "rosebush",                            BlockType::RoseBush },
+		{ "azurebluet",                          BlockType::AzureBluet },
+		{ "redtulip",                            BlockType::RedTulip },
+		{ "orangetulip",                         BlockType::OrangeTulip },
+		{ "whitetulip",                          BlockType::WhiteTulip },
+		{ "pinktulip",                           BlockType::PinkTulip },
+		{ "oxeyedaisy",                          BlockType::OxeyeDaisy },
+		{ "sunflower",                           BlockType::Sunflower },
+		{ "allium",                              BlockType::Allium },
+		{ "brownmushroom",                       BlockType::BrownMushroom },
+		{ "redmushroom",                         BlockType::RedMushroom },
+		{ "blueorchid",                          BlockType::BlueOrchid },
+		{ "peony",                               BlockType::Peony },
+		{ "grass",                               BlockType::Grass },
+		{ "deadbush",                            BlockType::DeadBush },
 	};
 
 	try
@@ -3932,14 +3954,202 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "zombie_spawn_egg",                    Item::ZombieSpawnEgg },
 		{ "zombie_villager_spawn_egg",           Item::ZombieVillagerSpawnEgg },
 		{ "zombie_pigman_spawn_egg",             Item::ZombiePigmanSpawnEgg },
+
+		// Old item names
+		{ "workbench",                           Item::CraftingTable },
+		{ "planks",                              Item::OakPlanks },
+		{ "eye_of_ender",                        Item::EnderEye },
+		{ "trip_wire_hook",                      Item::TripwireHook },
+		{ "book_shelf",                          Item::Bookshelf },
+		{ "brick_block",                         Item::Bricks },
+		{ "chiseled_stone_brick",                Item::ChiseledStoneBricks },
+		{ "clay_block",                          Item::Clay },
+		{ "coarsed_dirt",                        Item::CoarseDirt },
+		{ "inksac",                              Item::InkSac },
+		{ "nether_quartz",                       Item::Quartz },
+		{ "endstone_brick",                      Item::EndStoneBricks },
+		{ "endstone",                            Item::EndStone },
+		{ "deadbush",                            Item::DeadBush },
+		{ "rosebush",                            Item::RoseBush },
+		{ "redmushroom",                         Item::RedMushroom },
+		{ "brownmushroom",                       Item::BrownMushroom },
+		{ "blueorchid",                          Item::BlueOrchid },
+		{ "oxeyedaisy",                          Item::OxeyeDaisy },
+		{ "pinktulip",                           Item::PinkTulip },
+		{ "whitetulip",                          Item::WhiteTulip },
+		{ "orangetulip",                         Item::OrangeTulip },
+		{ "redtulip",                            Item::RedTulip },
+		{ "redflower",                           Item::Poppy },
+		{ "yellowflower",                        Item::Dandelion },
+		{ "azurebluet",                          Item::AzureBluet },
+		{ "fermentedspidereye",                  Item::FermentedSpiderEye },
+		{ "redstonedust",                        Item::Redstone },
+		{ "glowstonedust",                       Item::GlowstoneDust },
+		{ "rabbitsfoot",                         Item::RabbitFoot },
+		{ "goldencarrot",                        Item::GoldenCarrot },
+		{ "blazepowder",                         Item::BlazePowder },
+		{ "ghasttear",                           Item::GhastTear },
+		{ "spidereye",                           Item::SpiderEye },
+		{ "magmacream",                          Item::MagmaCream },
+		{ "glisteringmelon",                     Item::GlisteringMelonSlice },
+		{ "netherwart",                          Item::NetherWart },
+		{ "wool",                                Item::WhiteWool },
+		{ "wooden_slab",                         Item::OakSlab },
+		{ "wooden_pressure_plate",               Item::OakPressurePlate },
+		{ "wooden_door",                         Item::OakDoor },
+		{ "wooden_button",                       Item::OakButton },
+		{ "trapdoor",                            Item::OakTrapdoor },
+		{ "sign",                                Item::OakSign },
+		{ "sapling",                             Item::OakSapling },
+		{ "log",                                 Item::OakLog },
+		{ "log2",                                Item::AcaciaLog },
+		{ "lavabucket",                          Item::LavaBucket },
+		{ "fence_gate",                          Item::OakFenceGate },
+		{ "fence",                               Item::OakFence },
+		{ "daylight_sensor",                     Item::DaylightDetector },
+		{ "char_coal",                           Item::Charcoal },
+		{ "dye",                                 Item::InkSac },
+		{ "leather_pants",                       Item::LeatherLeggings },
+		{ "JackOLantern",                        Item::JackOLantern },
+		{ "vines",                               Item::Vine },
+		{ "mossy_stone_brick",                   Item::MossyStoneBricks },
+		{ "stonebrick",                          Item::StoneBricks },
+		{ "nether_brick_block",                  Item::NetherBricks },
+		{ "ornament_sandstone",                  Item::ChiseledSandstone },
+		{ "pillar_quartz_block",                 Item::QuartzPillar },
+		{ "red_nether_brick",                    Item::RedNetherBricks },
+		{ "redstone_dust",                       Item::Redstone },
+		{ "slimeball",                           Item::SlimeBall },
+		{ "snow_ball",                           Item::Snowball },
+		{ "stone_brick",                         Item::StoneBricks },
+		{ "TNT",                                 Item::TNT },
+		{ "acacia_wood_slab",                    Item::AcaciaSlab },
+		{ "birch_wood_slab",                     Item::BirchSlab },
+		{ "dark_oak_wood_slab",                  Item::DarkOakSlab },
+		{ "jungle_wood_slab",                    Item::JungleSlab },
+		{ "nether_brick_block",                  Item::NetherBricks },
+		{ "bed",                                 Item::RedBed },
+		{ "glowdust",                            Item::GlowstoneDust },
+		{ "skeleton_head",                       Item::SkeletonSkull },
+		{ "goldnugget",                          Item::GoldNugget },
+		{ "firecharge",                          Item::FireCharge },
+		{ "glistering_melon",                    Item::GlisteringMelonSlice },
+		{ "enchantment_table",                   Item::EnchantingTable },
+		{ "hardened_clay",                       Item::Terracotta },
+		{ "yellow_stained_clay",                 Item::YellowTerracotta },
+		{ "white_stained_clay",                  Item::WhiteTerracotta },
+		{ "violet_dye",                          Item::PurpleDye },
+		{ "violet_stained_clay",                 Item::PurpleTerracotta },
+		{ "red_stained_clay",                    Item::RedTerracotta },
+		{ "pink_stained_clay",                   Item::PinkTerracotta },
+		{ "orange_stained_clay",                 Item::OrangeTerracotta },
+		{ "magenta_stained_clay",                Item::MagentaTerracotta },
+		{ "lime_stained_clay",                   Item::LimeTerracotta },
+		{ "light_gray_stained_clay",             Item::LightGrayTerracotta },
+		{ "light_blue_stained_clay",             Item::LightBlueTerracotta },
+		{ "green_stained_clay",                  Item::GreenTerracotta },
+		{ "gray_stained_clay",                   Item::GrayTerracotta },
+		{ "cyan_stained_clay",                   Item::CyanTerracotta },
+		{ "brown_stained_clay",                  Item::BrownTerracotta },
+		{ "blue_stained_clay",                   Item::BlueTerracotta },
+		{ "black_stained_clay",                  Item::BlackTerracotta },
+		{ "violet_stained_glass_pane",           Item::PurpleStainedGlassPane },
+		{ "violet_stained_glass",                Item::PurpleStainedGlass },
+		{ "oak_wood_slab",                       Item::OakSlab },
+		{ "quartzslab",                          Item::QuartzSlab },
+		{ "snow_layer",                          Item::Snow },
+		{ "spruce_wood_slab",                    Item::SpruceSlab },
+		{ "stonebrick_slab",                     Item::StoneBrickSlab },
+		{ "acacia_wood_stairs",                  Item::AcaciaStairs },
+		{ "birch_wood_stairs",                   Item::BirchStairs },
+		{ "cobblestoneStairs",                   Item::CobblestoneStairs },
+		{ "dark_oak_wood_stairs",                Item::DarkOakStairs },
+		{ "jungle_wood_stairs",                  Item::JungleStairs },
+		{ "spruce_wood_stairs",                  Item::SpruceStairs },
+		{ "wood_stairs",                         Item::OakStairs },
+		{ "empty_map",                           Item::Map },
+		{ "lighter",                             Item::FlintAndSteel },
+		{ "watch",                               Item::Clock },
+		{ "redstone_torchon",                    Item::RedstoneTorch },
+		{ "CarrotOnAStick",                      Item::CarrotOnAStick },
+		{ "stone_plate",                         Item::StonePressurePlate },
+		{ "hopperminecart",                      Item::HopperMinecart},
+		{ "powered_minecart",                    Item::FurnaceMinecart },
+		{ "rails",                               Item::Rail },
+		{ "storage_minecart",                    Item::ChestMinecart },
+		{ "redstone_torch_on",                   Item::RedstoneTorch },
+		{ "heavyweightedpressureplate",          Item::HeavyWeightedPressurePlate },
+		{ "iron_trap_door",                      Item::IronTrapdoor },
+		{ "trap_door",                           Item::OakTrapdoor },
+		{ "wood_plate",                          Item::OakPressurePlate },
+		{ "red_apple",                           Item::Apple },
+		{ "melon_block",                         Item::Melon },
+		{ "sugarcane",                           Item::SugarCane },
+		{ "haybale",                             Item::HayBale },
+		{ "bookandquill",                        Item::WritableBook },
+		{ "cobblestonewall",                     Item::CobblestoneWall },
+		{ "mossycobblestonewall",                Item::MossyCobblestoneWall },
+		{ "rose",                                Item::Poppy },
+		{ "lt_blue_dye",                         Item::LightBlueDye },
+		{ "lt_gray_dye",                         Item::LightGrayDye },
+		{ "TNTMinecart",                         Item::TNTMinecart },
+		{ "lightweightedpressureplate",          Item::LightWeightedPressurePlate },
+		{ "mossycobblestone",                    Item::MossyCobblestone },
+		{ "White_Concrete_Powder",               Item::WhiteConcretePowder },
+		{ "Orange_Concrete_Powder",              Item::OrangeConcretePowder },
+		{ "Magenta_Concrete_Powder",             Item::MagentaConcretePowder },
+		{ "Light_Blue_Concrete_Powder",          Item::LightBlueConcretePowder },
+		{ "Yellow_Concrete_Powder",              Item::YellowConcretePowder },
+		{ "Lime_Concrete_Powder",                Item::LimeConcretePowder },
+		{ "Pink_Concrete_Powder",                Item::PinkConcretePowder },
+		{ "Gray_Concrete_Powder",                Item::GrayConcretePowder },
+		{ "Light_Gray_Concrete_Powder",          Item::LightGrayConcretePowder },
+		{ "Cyan_Concrete_Powder",                Item::CyanConcretePowder },
+		{ "Purple_Concrete_Powder",              Item::PurpleConcretePowder },
+		{ "Blue_Concrete_Powder",                Item::BlueConcretePowder },
+		{ "Brown_Concrete_Powder",               Item::BrownConcretePowder },
+		{ "Green_Concrete_Powder",               Item::GreenConcretePowder },
+		{ "Red_Concrete_Powder",                 Item::RedConcretePowder },
+		{ "Black_Concrete_Powder",               Item::BlackConcretePowder },
+		{ "steak",                               Item::Beef },
+		{ "cactus_green",                        Item::GreenDye },
+		{ "fish",                                Item::Salmon },
+		{ "cooked_fish",                         Item::CookedSalmon },
+		{ "gold_axe",                            Item::GoldenAxe },
+		{ "gold_boots",                          Item::GoldenBoots },
+		{ "gold_chestplate",                     Item::GoldenChestplate },
+		{ "gold_horse_armor",                    Item::GoldenHorseArmor },
+		{ "gold_helmet",                         Item::GoldenHelmet },
+		{ "gold_hoe",                            Item::GoldenHoe },
+		{ "gold_pants",                          Item::GoldenLeggings },
+		{ "gold_pickaxe",                        Item::GoldenPickaxe },
+		{ "gold_shovel",                         Item::GoldenShovel },
+		{ "gold_sword",                          Item::GoldenSword },
+		{ "banner",                              Item::WhiteBanner },
+		{ "boat",                                Item::OakBoat },
+		{ "carpet",                              Item::WhiteCarpet },
 	};
 
 	try
 	{
+		if (a_ID.size() == 0)
+		{
+			FLOGWARNING("Tried to read empty, returning Air!", a_ID);
+			return Item::Air;
+		}
+
 		return ItemNames.at(a_ID);
 	}
 	catch (...)
 	{
+		if (IsPretty(a_ID))
+		{
+			auto Res = ToItem(DePrettify(a_ID));
+			if (Res != Item::Air)
+			{
+				return Res;
+			}
+		}
 		FLOGWARNING("Tried to read unknown item {}, returning Air!", a_ID);
 		return Item::Air;
 	}
@@ -4101,4 +4311,38 @@ std::pair<NamespaceSerializer::Namespace, std::string_view> NamespaceSerializer:
 	}
 
 	return { Namespace::Unknown, ID };
+}
+
+
+
+
+
+AString NamespaceSerializer::DePrettify(std::string_view a_ID)
+{
+	if (a_ID.size() == 0)
+	{
+		return "";
+	}
+	AString Result;
+
+	// Convert CamelCase to snake_case:
+	for (size_t i = 0; i < a_ID.size(); ++i)
+	{
+		if (i > 0 && isupper(a_ID[i]))
+		{
+			Result.push_back('_');
+		}
+		Result.push_back(tolower(a_ID[i]));
+	}
+	return std::move(Result);
+}
+
+
+
+
+
+bool NamespaceSerializer::IsPretty(std::string_view a_ID)
+{
+	// Check if a_ID is in CamelCase with regex
+	return std::regex_match(a_ID.begin(), a_ID.end(), std::regex("([A-Z][a-z1-9]+)+"));
 }
