@@ -67,7 +67,6 @@ float cClientHandle::FASTBREAK_PERCENTAGE;
 // cClientHandle:
 
 cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
-	m_ForgeHandshake(this),
 	m_CurrentViewDistance(a_ViewDistance),
 	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_IPString),
@@ -77,6 +76,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_LastStreamedChunkX(std::numeric_limits<decltype(m_LastStreamedChunkX)>::max()),  // bogus chunk coords to force streaming upon login
 	m_LastStreamedChunkZ(std::numeric_limits<decltype(m_LastStreamedChunkZ)>::max()),
 	m_TicksSinceLastPacket(0),
+	m_TimeSinceLastUnloadCheck(0),
 	m_Ping(1000),
 	m_PingID(1),
 	m_BlockDigAnimStage(-1),
@@ -133,6 +133,7 @@ void cClientHandle::Destroy(void)
 
 	{
 		cCSLock Lock(m_CSOutgoingData);
+		m_Protocol.HandleOutgoingData(m_OutgoingData);  // Finalise any encryption.
 		m_Link->Send(m_OutgoingData.data(), m_OutgoingData.size());  // Flush remaining data.
 		m_Link->Shutdown();  // Cleanly close the connection.
 		m_Link.reset();  // Release the strong reference cTCPLink holds to ourself.
@@ -221,6 +222,58 @@ bool cClientHandle::IsUUIDOnline(const cUUID & a_UUID)
 
 
 
+void cClientHandle::ProxyInit(const AString & a_IPString, const cUUID & a_UUID)
+{
+	this->SetIPString(a_IPString);
+	this->SetUUID(a_UUID);
+
+	this->m_ProxyConnection = true;
+}
+
+
+
+
+
+void cClientHandle::ProxyInit(const AString & a_IPString, const cUUID & a_UUID, const Json::Value & a_Properties)
+{
+	this->SetProperties(a_Properties);
+	this->ProxyInit(a_IPString, a_UUID);
+}
+
+
+
+
+
+void cClientHandle::ProcessProtocolIn(void)
+{
+	// Process received network data:
+	decltype(m_IncomingData) IncomingData;
+	{
+		cCSLock Lock(m_CSIncomingData);
+
+		// Bail out when nothing was received:
+		if (m_IncomingData.empty())
+		{
+			return;
+		}
+
+		std::swap(IncomingData, m_IncomingData);
+	}
+
+	try
+	{
+		m_Protocol.HandleIncomingData(*this, IncomingData);
+	}
+	catch (const std::exception & Oops)
+	{
+		Kick(Oops.what());
+	}
+}
+
+
+
+
+
 void cClientHandle::ProcessProtocolOut()
 {
 	decltype(m_OutgoingData) OutgoingData;
@@ -263,46 +316,97 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 
 
-void cClientHandle::Authenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
+bool cClientHandle::BungeeAuthenticate()
 {
+	if (!m_ProxyConnection && cRoot::Get()->GetServer()->OnlyAllowBungeeCord())
 	{
-		cCSLock lock(m_CSState);
-		/*
-		LOGD("Processing authentication for client %s @ %s (%p), state = %d",
-			m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this), m_State.load()
-		);
-		//*/
+		Kick("You can only connect to this server using a Proxy.");
 
-		if (m_State != csAuthenticating)
+		return false;
+	}
+
+	cServer * Server = cRoot::Get()->GetServer();
+
+	// Proxy Shared Secret Check (BungeeGuard)
+	const AString & ForwardSecret = Server->GetProxySharedSecret();
+	const bool AllowBungee = Server->ShouldAllowBungeeCord();
+	const bool RequireForwardSecret = AllowBungee && !ForwardSecret.empty();
+
+	if (RequireForwardSecret)
+	{
+		for (auto & Node : GetProperties())
 		{
-			return;
+			if (Node.get("name", "").asString() == "bungeeguard-token")
+			{
+				AString SentToken = Node.get("value", "").asString();
+
+				if (ForwardSecret.compare(SentToken) == 0)
+				{
+					return true;
+				}
+
+				break;
+			}
 		}
 
-		ASSERT(m_Player == nullptr);
+		Kick("Unable to authenticate.");
+		return false;
+	}
+	else if (m_ProxyConnection)
+	{
+		LOG("A player connected through a proxy without requiring a forwarding secret. If open to the internet, this is very insecure!");
+	}
 
-		m_Username = a_Name;
+	return true;
+}
 
-		// Only assign UUID and properties if not already pre-assigned (BungeeCord sends those in the Handshake packet):
-		if (m_UUID.IsNil())
-		{
-			m_UUID = a_UUID;
-		}
-		if (m_Properties.empty())
-		{
-			m_Properties = a_Properties;
-		}
 
-		// Send login success (if the protocol supports it):
-		m_Protocol->SendLoginSuccess();
 
-		if (m_ForgeHandshake.m_IsForgeClient)
-		{
-			m_ForgeHandshake.BeginForgeHandshake(a_Name, a_UUID, a_Properties);
-		}
-		else
-		{
-			FinishAuthenticate(a_Name, a_UUID, a_Properties);
-		}
+
+
+void cClientHandle::Authenticate(AString && a_Name, const cUUID & a_UUID, Json::Value && a_Properties)
+{
+	cCSLock Lock(m_CSState);
+	/*
+	LOGD("Processing authentication for client %s @ %s (%p), state = %d",
+		m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this), m_State.load()
+	);
+	//*/
+
+	if (m_State != csAuthenticating)
+	{
+		return;
+	}
+
+	ASSERT(m_Player == nullptr);
+
+	if (!BungeeAuthenticate())
+	{
+		return;
+	}
+
+	m_Username = std::move(a_Name);
+
+	// Only assign UUID and properties if not already pre-assigned (BungeeCord sends those in the Handshake packet):
+	if (m_UUID.IsNil())
+	{
+		m_UUID = a_UUID;
+	}
+	if (m_Properties.empty())
+	{
+		m_Properties = std::move(a_Properties);
+	}
+
+	// Send login success (if the protocol supports it):
+	m_Protocol->SendLoginSuccess();
+
+	if (m_ForgeHandshake.IsForgeClient)
+	{
+		m_ForgeHandshake.BeginForgeHandshake(*this);
+	}
+	else
+	{
+		FinishAuthenticate();
 	}
 }
 
@@ -310,7 +414,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const cUUID & a_UUID, c
 
 
 
-void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
+void cClientHandle::FinishAuthenticate()
 {
 	// Serverside spawned player (so data are loaded).
 	std::unique_ptr<cPlayer> Player;
@@ -321,7 +425,7 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 	}
 	catch (const std::exception & Oops)
 	{
-		LOGWARNING("Error reading player \"%s\": %s", GetUsername().c_str(), Oops.what());
+		LOGWARNING("Player \"%s\" save or statistics file loading failed: %s", GetUsername().c_str(), Oops.what());
 		Kick("Contact an operator.\n\nYour player's save files could not be parsed.\nTo avoid data loss you are prevented from joining.");
 		return;
 	}
@@ -346,8 +450,8 @@ void cClientHandle::FinishAuthenticate(const AString & a_Name, const cUUID & a_U
 
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
 	{
-		cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", a_Name.c_str()));
-		LOGINFO("Player %s has joined the game", a_Name.c_str());
+		cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", m_Username.c_str()));
+		LOGINFO("Player %s has joined the game", m_Username.c_str());
 	}
 
 	// TODO: this accesses the world spawn from the authenticator thread
@@ -559,8 +663,6 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 		m_Player->GetWorld()->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
 		SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}
-
-	m_LastUnloadCheck = m_Player->GetWorld()->GetWorldAge();
 }
 
 
@@ -670,8 +772,8 @@ bool cClientHandle::HandleLogin()
 		m_State = csAuthenticating;
 	}  // lock(m_CSState)
 
-	// Schedule for authentication; until then, let the player wait (but do not block)
-	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), GetUsername(), m_Protocol->GetAuthServerID());
+	// Schedule for authentication; until then, let the player wait (but do not block):
+	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), m_Username, m_Protocol->GetAuthServerID());
 	return true;
 }
 
@@ -742,8 +844,8 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		// Only allow enchantment if the player has sufficient levels and lapis to enchant:
 		if ((m_Player->GetCurrentXp() >= XpRequired) && (LapisStack.m_ItemCount >= LapisRequired))
 		{
-			/** We need to reduce the player's level by the number of lapis required.
-			However we need to keep the resulting percentage filled the same. */
+			// We need to reduce the player's level by the number of lapis required.
+			// However we need to keep the resulting percentage filled the same.
 
 			const auto TargetLevel = m_Player->GetXpLevel() - LapisRequired;
 			const auto CurrentFillPercent = m_Player->GetXpPercentage();
@@ -769,7 +871,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		}
 	}
 
-	// Retrieve the enchanted item corresponding to our chosen option (top, middle, bottom)
+	// The enchanted item corresponding to our chosen option (top, middle, bottom).
 	cItem EnchantedItem = Window->m_SlotArea->SelectEnchantedOption(a_Enchantment);
 
 	// Set the item slot to our new enchanted item:
@@ -811,7 +913,7 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const Contigu
 	}
 	else if (a_Channel == "FML|HS")
 	{
-		m_ForgeHandshake.DataReceived(this, a_Message);
+		m_ForgeHandshake.DataReceived(*this, a_Message);
 	}
 	else if (!HasPluginChannel(a_Channel))
 	{
@@ -938,6 +1040,11 @@ void cClientHandle::HandleCommandBlockBlockChange(int a_BlockX, int a_BlockY, in
 	if (a_NewCommand.empty())
 	{
 		Kick("Command block string unexpectedly empty - hacked client?");
+		return;
+	}
+	if ((m_Player == nullptr) || !m_Player->HasPermission("comandblock.set"))
+	{
+		SendChat("You cannot edit command blocks on this server", mtFailure);
 		return;
 	}
 
@@ -1137,6 +1244,12 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 {
+	if (m_Player->IsGameModeAdventure())
+	{
+		// Players in adventure mode can't destroy blocks
+		return;
+	}
+
 	if (
 		m_HasStartedDigging &&
 		(a_BlockX == m_LastDigBlockX) &&
@@ -1457,7 +1570,14 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	Msg.AddTextPart(m_Player->GetName(), Color);
 	Msg.ParseText(m_Player->GetSuffix());
 	Msg.AddTextPart("> ");
-	Msg.ParseText(Message);
+	if (m_Player->HasPermission("chat.format"))
+	{
+		Msg.ParseText(Message);
+	}
+	else
+	{
+		Msg.AddTextPart(Message);
+	}
 	Msg.UnderlineUrls();
 	cRoot::Get()->BroadcastChat(Msg);
 }
@@ -1480,12 +1600,6 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 
 void cClientHandle::HandlePlayerMove(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround)
 {
-	if (m_Player->IsFrozen())
-	{
-		// Ignore client-side updates if the player is frozen:
-		return;
-	}
-
 	const Vector3d NewPosition(a_PosX, a_PosY, a_PosZ);
 	const Vector3d OldPosition = GetPlayer()->GetPosition();
 	const auto PreviousIsOnGround = GetPlayer()->IsOnGround();
@@ -1507,6 +1621,13 @@ void cClientHandle::HandlePlayerMove(double a_PosX, double a_PosY, double a_PosZ
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
+
+	if (m_Player->IsFrozen() || (m_Player->GetHealth() <= 0))
+	{
+		// "Repair" if the client tries to move while frozen or dead:
+		SendPlayerMoveLook();
+		return;
+	}
 
 	// If the player has moved too far, "repair" them:
 	if ((OldPosition - NewPosition).SqrLength() > 100 * 100)
@@ -1656,7 +1777,7 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 	{
 		m_Player->GetWorld()->DoWithEntityByID(a_TargetEntityID, [=](cEntity & a_Entity)
 		{
-			m_Player->AttachTo(&a_Entity);
+			m_Player->SpectateEntity(&a_Entity);
 			return true;
 		});
 		return;
@@ -1973,18 +2094,9 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 
 
 
-void cClientHandle::Tick(float a_Dt)
+void cClientHandle::Tick(std::chrono::milliseconds a_Dt)
 {
 	using namespace std::chrono_literals;
-
-	// anticheat fastbreak
-	if (m_HasStartedDigging)
-	{
-		auto Block = m_Player->GetWorld()->GetBlock({ m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ });
-		m_BreakProgress += m_Player->GetMiningProgressPerTick(Block);
-	}
-
-	ProcessProtocolIn();
 
 	if (IsDestroyed())
 	{
@@ -2058,16 +2170,24 @@ void cClientHandle::Tick(float a_Dt)
 	StreamNextChunks();
 
 	// Unload all chunks that are out of the view distance (every 5 seconds):
-	if ((m_Player->GetWorld()->GetWorldAge() - m_LastUnloadCheck) > 5s)
+	if ((m_TimeSinceLastUnloadCheck += a_Dt) > 5s)
 	{
 		UnloadOutOfRangeChunks();
+		m_TimeSinceLastUnloadCheck = 0s;
+	}
+
+	// anticheat fastbreak
+	if (m_HasStartedDigging)
+	{
+		auto Block = m_Player->GetWorld()->GetBlock({ m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ });
+		m_BreakProgress += m_Player->GetMiningProgressPerTick(Block);
 	}
 
 	// Handle block break animation:
 	if (m_BlockDigAnimStage > -1)
 	{
 		int lastAnimVal = m_BlockDigAnimStage;
-		m_BlockDigAnimStage += static_cast<int>(m_BlockDigAnimSpeed * a_Dt);
+		m_BlockDigAnimStage += static_cast<int>(m_BlockDigAnimSpeed * a_Dt.count());
 		if (m_BlockDigAnimStage > 9000)
 		{
 			m_BlockDigAnimStage = 9000;
@@ -2805,17 +2925,17 @@ void cClientHandle::SendResetTitle()
 
 
 
-void cClientHandle::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
+void cClientHandle::SendRespawn(const eDimension a_Dimension, const bool a_IsRespawningFromDeath)
 {
-	if (!a_ShouldIgnoreDimensionChecks && (a_Dimension == m_Player->GetWorld()->GetDimension()))
+	if (!a_IsRespawningFromDeath && (a_Dimension == m_Player->GetWorld()->GetDimension()))
 	{
 		// The client goes crazy if we send a respawn packet with the dimension of the current world
 		// So we send a temporary one first.
-		// This is not needed when the player dies, hence the a_ShouldIgnoreDimensionChecks flag.
-		// a_ShouldIgnoreDimensionChecks is true only at cPlayer::Respawn, which is called after
-		// the player dies.
-		eDimension TemporaryDimension = (a_Dimension == dimOverworld) ? dimNether : dimOverworld;
-		m_Protocol->SendRespawn(TemporaryDimension);
+		// This is not needed when the player dies, hence the a_IsRespawningFromDeath flag.
+		// a_IsRespawningFromDeath is true only at cPlayer::Respawn, which is called after the player dies.
+
+		// First send a temporary dimension to placate the client:
+		m_Protocol->SendRespawn((a_Dimension == dimOverworld) ? dimNether : dimOverworld);
 	}
 
 	m_Protocol->SendRespawn(a_Dimension);
@@ -3279,36 +3399,6 @@ bool cClientHandle::SetState(eState a_NewState)
 	}
 	m_State = a_NewState;
 	return true;
-}
-
-
-
-
-
-void cClientHandle::ProcessProtocolIn(void)
-{
-	// Process received network data:
-	decltype(m_IncomingData) IncomingData;
-	{
-		cCSLock Lock(m_CSIncomingData);
-
-		// Bail out when nothing was received:
-		if (m_IncomingData.empty())
-		{
-			return;
-		}
-
-		std::swap(IncomingData, m_IncomingData);
-	}
-
-	try
-	{
-		m_Protocol.HandleIncomingData(*this, IncomingData);
-	}
-	catch (const std::exception & Oops)
-	{
-		Kick(Oops.what());
-	}
 }
 
 
