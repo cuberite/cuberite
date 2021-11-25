@@ -666,6 +666,7 @@ public:
 	bool GetStackValue(int a_StackPos, float & a_ReturnedVal);
 	bool GetStackValue(int a_StackPos, cUUID & a_Value);
 	bool GetStackValue(int a_StackPos, std::string_view & a_Value);
+	bool GetStackValue(int a_StackPos, BlockState & a_Value);
 
 	// template to catch all of the various c++ integral types without overload conflicts
 	template <class T, typename = std::enable_if_t<std::is_integral_v<T>>>

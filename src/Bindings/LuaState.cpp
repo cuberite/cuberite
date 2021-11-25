@@ -1513,6 +1513,20 @@ bool cLuaState::GetStackValue(int a_StackPos, std::string_view & a_Value)
 
 
 
+bool cLuaState::GetStackValue(int a_StackPos, BlockState & a_Value)
+{
+	if (lua_isnumber(m_LuaState, a_StackPos))
+	{
+		a_Value = static_cast<float>(tolua_tonumber(m_LuaState, a_StackPos, a_Value.ID));
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
 template <typename T>
 bool cLuaState::GetStackValue(int a_StackPos, Vector3<T> & a_ReturnedVal)
 {
