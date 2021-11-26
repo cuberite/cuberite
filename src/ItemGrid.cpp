@@ -246,7 +246,7 @@ void cItemGrid::Clear(void)
 int cItemGrid::HowManyCanFit(const cItem & a_ItemStack, bool a_AllowNewStacks)
 {
 	int NumLeft = a_ItemStack.m_ItemCount;
-	int MaxStack = ItemHandler(a_ItemStack.m_ItemType)->GetMaxStackSize();
+	int MaxStack = cItemHandler::For(a_ItemStack.m_ItemType).GetMaxStackSize();
 
 	if (!m_Slots.IsStorageAllocated())
 	{
@@ -491,10 +491,10 @@ int cItemGrid::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
 
 	m_Slots[a_SlotNum].m_ItemCount += a_AddToCount;
 
-	cItemHandler * Handler = cItemHandler::GetItemHandler(m_Slots[a_SlotNum].m_ItemType);
-	if (m_Slots[a_SlotNum].m_ItemCount > Handler->GetMaxStackSize())
+	auto & Handler = cItemHandler::For(m_Slots[a_SlotNum].m_ItemType);
+	if (m_Slots[a_SlotNum].m_ItemCount > Handler.GetMaxStackSize())
 	{
-		m_Slots[a_SlotNum].m_ItemCount = Handler->GetMaxStackSize();
+		m_Slots[a_SlotNum].m_ItemCount = Handler.GetMaxStackSize();
 	}
 
 	TriggerListeners(a_SlotNum);

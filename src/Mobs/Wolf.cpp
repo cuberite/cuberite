@@ -218,7 +218,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			{
 				if (m_Health < m_MaxHealth)
 				{
-					Heal(ItemHandler(EquippedItemType)->GetFoodInfo(&EquippedItem).FoodLevel);
+					Heal(cItemHandler::For(EquippedItemType).GetFoodInfo(&EquippedItem).FoodLevel);
 					if (!a_Player.IsGameModeCreative())
 					{
 						a_Player.GetInventory().RemoveOneEquippedItem();

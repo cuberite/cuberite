@@ -71,8 +71,8 @@ private:
 		}
 
 		const auto Player = static_cast<const cPlayer *>(a_Digger);
-		auto Handler = Player->GetEquippedItem().GetHandler();
-		if (!Player->IsGameModeSurvival() || !Handler->CanHarvestBlock(E_BLOCK_MOB_SPAWNER))
+		auto & Handler = Player->GetEquippedItem().GetHandler();
+		if (!Player->IsGameModeSurvival() || !Handler.CanHarvestBlock(E_BLOCK_MOB_SPAWNER))
 		{
 			return;
 		}

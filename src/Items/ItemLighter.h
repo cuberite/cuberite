@@ -9,14 +9,14 @@
 
 
 
-class cItemLighterHandler:
+class cItemLighterHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemLighterHandler(int a_ItemType):
+	constexpr cItemLighterHandler(int a_ItemType):
 		Super(a_ItemType)
 	{
 	}
@@ -32,7 +32,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		if (a_ClickedBlockFace < 0)
 		{

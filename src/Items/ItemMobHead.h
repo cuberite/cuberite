@@ -9,14 +9,14 @@
 
 
 
-class cItemMobHeadHandler:
+class cItemMobHeadHandler final :
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemMobHeadHandler(int a_ItemType):
+	constexpr cItemMobHeadHandler(int a_ItemType):
 		Super(a_ItemType)
 	{
 	}
@@ -25,7 +25,7 @@ public:
 
 
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		// Cannot place a head at "no face" and from the bottom:
 		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_BOTTOM))
@@ -58,7 +58,7 @@ public:
 
 	/** Called after placing a regular head block with no mob spawning.
 	Adjusts the mob head entity based on the equipped item's data. */
-	void RegularHeadPlaced(const cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace)
+	void RegularHeadPlaced(const cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace) const
 	{
 		const auto HeadType = static_cast<eMobHeadType>(a_HeldItem.m_ItemDamage);
 		const auto BlockMeta = static_cast<NIBBLETYPE>(a_ClickedBlockFace);
@@ -88,7 +88,7 @@ public:
 
 	/** Spawns a wither if the wither skull placed at the specified coords completes wither's spawning formula.
 	Returns true if the wither was created. */
-	bool TrySpawnWitherAround(cPlayer & a_Player, const Vector3i a_BlockPos)
+	bool TrySpawnWitherAround(cPlayer & a_Player, const Vector3i a_BlockPos) const
 	{
 		// No wither can be created at Y < 2 - not enough space for the formula:
 		if (a_BlockPos.y < 2)
@@ -131,7 +131,7 @@ public:
 		cWorld & a_World, cPlayer & a_Player,
 		Vector3i a_PlacedHeadPos,
 		int a_OffsetX, int a_OffsetZ
-	)
+	) const
 	{
 		// Image for the wither at the X axis:
 		static const sSetBlock ImageWitherX[] =
@@ -189,7 +189,7 @@ public:
 		cWorld & a_World, cPlayer & a_Player, const sSetBlock (& a_Image)[9],
 		Vector3i a_PlacedHeadPos,
 		int a_OffsetX, int a_OffsetZ
-	)
+	) const
 	{
 		std::array<Vector3i, 9> PositionsToClear;
 
@@ -280,7 +280,7 @@ public:
 
 
 	/** Awards the achievement to all players close to the specified point. */
-	void AwardSpawnWitherAchievement(cWorld & a_World, Vector3i a_BlockPos)
+	void AwardSpawnWitherAchievement(cWorld & a_World, Vector3i a_BlockPos) const
 	{
 		Vector3f Pos(a_BlockPos);
 		a_World.ForEachPlayer([=](cPlayer & a_Player)
@@ -323,7 +323,7 @@ public:
 
 
 
-	virtual bool IsPlaceable(void) override
+	virtual bool IsPlaceable(void) const override
 	{
 		return true;
 	}

@@ -8,15 +8,15 @@
 
 
 
-class cItemBowHandler:
+class cItemBowHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemBowHandler(void):
-		Super(E_ITEM_BOW)
+	constexpr cItemBowHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 	}
 
@@ -31,7 +31,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		ASSERT(a_Player != nullptr);
 
@@ -47,7 +47,7 @@ public:
 
 
 
-	virtual void OnItemShoot(cPlayer * a_Player, const Vector3i a_BlockPos, eBlockFace a_BlockFace) override
+	virtual void OnItemShoot(cPlayer * a_Player, const Vector3i a_BlockPos, eBlockFace a_BlockFace) const override
 	{
 		// Actual shot - produce the arrow with speed based on the number of ticks that the bow was charged
 		UNUSED(a_BlockPos);

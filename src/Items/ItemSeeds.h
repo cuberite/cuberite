@@ -15,7 +15,7 @@ class cItemSeedsHandler:
 
 public:
 
-	cItemSeedsHandler(int a_ItemType):
+	constexpr cItemSeedsHandler(int a_ItemType):
 		Super(a_ItemType)
 	{
 
@@ -25,7 +25,7 @@ public:
 
 
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		// Only allow planting seeds from the top side of the block:
 		if (a_ClickedBlockFace != BLOCK_FACE_TOP)
@@ -54,12 +54,17 @@ public:
 
 
 
-	virtual bool IsPlaceable(void) override
+	virtual bool IsPlaceable(void) const override
 	{
 		return true;
 	}
 } ;
 
+class cSimpleSeedsHandler final:
+	public cItemSeedsHandler
+{
+	using Super = cItemSeedsHandler;
+};
 
 
 

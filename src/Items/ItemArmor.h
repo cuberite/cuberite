@@ -8,14 +8,14 @@
 
 
 
-class cItemArmorHandler:
+class cItemArmorHandler final :
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemArmorHandler(int a_ItemType):
+	constexpr cItemArmorHandler(int a_ItemType):
 		Super(a_ItemType)
 	{
 	}
@@ -32,7 +32,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		int SlotNum;
 		if (ItemCategory::IsHelmet(a_HeldItem.m_ItemType))
@@ -71,7 +71,7 @@ public:
 
 
 
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
+	virtual bool CanRepairWithRawMaterial(short a_ItemType) const override
 	{
 		switch (m_ItemType)
 		{

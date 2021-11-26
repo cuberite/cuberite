@@ -146,7 +146,7 @@ private:
 			}
 		}
 
-		if (!ItemHandler(EquippedItem.m_ItemType)->IsPlaceable())
+		if (!cItemHandler::For(EquippedItem.m_ItemType).IsPlaceable())
 		{
 			// Item not placeable in the first place, our work is done:
 			return true;

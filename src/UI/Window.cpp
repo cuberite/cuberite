@@ -696,7 +696,7 @@ void cWindow::OnMiddlePaintEnd(cPlayer & a_Player)
 
 	// Fill available slots with full stacks of the dragging item
 	const auto & DraggingItem = a_Player.GetDraggingItem();
-	auto StackSize = ItemHandler(DraggingItem.m_ItemType)->GetMaxStackSize();
+	auto StackSize = cItemHandler::For(DraggingItem.m_ItemType).GetMaxStackSize();
 	if (0 < DistributeItemToSlots(a_Player, DraggingItem, StackSize, a_Player.GetInventoryPaintSlots(), false))
 	{
 		// If any items were distibuted, set dragging item empty

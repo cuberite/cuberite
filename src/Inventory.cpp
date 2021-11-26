@@ -78,7 +78,7 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int
 	}
 
 	char NumLeft = a_ItemStack.m_ItemCount;
-	int MaxStack = ItemHandler(a_ItemStack.m_ItemType)->GetMaxStackSize();
+	int MaxStack = cItemHandler::For(a_ItemStack.m_ItemType).GetMaxStackSize();
 	for (int i = a_BeginSlotNum; i <= a_EndSlotNum; i++)
 	{
 		const cItem & Slot = GetSlot(i);
@@ -689,7 +689,7 @@ void cInventory::UpdateItems(void)
 	const cItem & Slot = GetEquippedItem();
 	if (!Slot.IsEmpty())
 	{
-		ItemHandler(Slot.m_ItemType)->OnUpdate(m_Owner.GetWorld(), &m_Owner, Slot);
+		cItemHandler::For(Slot.m_ItemType).OnUpdate(m_Owner.GetWorld(), &m_Owner, Slot);
 	}
 }
 

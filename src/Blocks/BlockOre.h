@@ -94,7 +94,7 @@ private:
 			return;
 		}
 
-		if (!ItemHandler(Player->GetEquippedItem().m_ItemType)->CanHarvestBlock(m_BlockType))
+		if (!cItemHandler::For(Player->GetEquippedItem().m_ItemType).CanHarvestBlock(m_BlockType))
 		{
 			return;
 		}
