@@ -151,7 +151,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 
-		case E_BLOCK_TNT:
+		case Item::TNT:
 		{
 			// Spawn a primed TNT entity, if space allows:
 			if (!cBlockInfo::IsSolid(DispBlock))
