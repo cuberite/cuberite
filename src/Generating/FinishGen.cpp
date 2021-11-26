@@ -1822,7 +1822,7 @@ cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_Or
 			);
 			continue;
 		}
-		auto oreType = static_cast<BLOCKTYPE>(BlockStringToType(parts[0]));
+		auto oreType = BlockStringToType(parts[0]);
 		if (oreType < 0)
 		{
 			LOGWARNING("Cannot parse ore information from string, invalid OreType: \"%s\".", parts[0].c_str());
@@ -1840,7 +1840,7 @@ cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_Or
 			LOGWARNING("Cannot parse ore information from string, invalid number in OreInfo \"%s\".", ore.c_str());
 			continue;
 		}
-		res.emplace_back(oreType, oreMeta, maxHeight, numNests, nestSize);
+		res.emplace_back(static_cast<BLOCKTYPE>(oreType), oreMeta, maxHeight, numNests, nestSize);
 	}  // for i - split[]
 	return res;
 }
