@@ -260,8 +260,7 @@ int cInventory::ReplaceOneEquippedItem(const cItem & a_Item, bool a_TryOtherSlot
 	cItem ItemsToAdd = a_Item;
 	if (EquippedItem.IsEqual(ItemsToAdd))
 	{
-		cItemHandler Handler(ItemsToAdd.m_ItemType);
-		auto AmountToAdd = std::min(static_cast<char>(Handler.GetMaxStackSize() - EquippedItem.m_ItemCount), ItemsToAdd.m_ItemCount);
+		auto AmountToAdd = std::min(static_cast<char>(cItemHandler::For(ItemsToAdd.m_ItemType).GetMaxStackSize() - EquippedItem.m_ItemCount), ItemsToAdd.m_ItemCount);
 
 		EquippedItem.m_ItemCount += AmountToAdd;
 		SetEquippedItem(EquippedItem);
