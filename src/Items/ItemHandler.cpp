@@ -125,7 +125,6 @@ namespace
 	constexpr cItemSoupHandler              ItemBeetrootSoupHandler                    (E_ITEM_BEETROOT_SOUP, cItemHandler::FoodInfo(6, 7.2));
 	constexpr cDefaultItemHandler           ItemBeetrootsBlockHandler                  (E_BLOCK_BEETROOTS);
 	constexpr cItemBigFlowerHandler         ItemBigFlowerHandler                       (E_BLOCK_BIG_FLOWER);
-	constexpr cDefaultItemHandler           ItemBigFlowerBlockHandler                  (E_BLOCK_BIG_FLOWER);
 	constexpr cItemBoatHandler              ItemBirchBoatHandler                       (E_ITEM_BIRCH_BOAT);
 	constexpr cItemDoorHandler              ItemBirchDoorHandler                       (E_ITEM_BIRCH_DOOR);
 	constexpr cItemFenceGateHandler         ItemBirchFenceGateHandler                  (E_BLOCK_BIRCH_FENCE_GATE);
@@ -156,7 +155,6 @@ namespace
 	constexpr cDefaultItemHandler           ItemBrownMushroomBlockHandler              (E_BLOCK_BROWN_MUSHROOM);
 	constexpr cDefaultItemHandler           ItemBrownShulkerBoxHandler                 (E_BLOCK_BROWN_SHULKER_BOX);
 	constexpr cItemBucketHandler            ItemBucketHandler                          (E_ITEM_BUCKET);
-	constexpr cDefaultItemHandler           ItemBurningFurnaceHandler                  (E_BLOCK_BURNING_FURNACE);
 	constexpr cDefaultItemHandler           ItemCactusHandler                          (E_BLOCK_CACTUS);
 	constexpr cDefaultItemHandler           ItemCakeBlockHandler                       (E_BLOCK_CAKE);
 	constexpr cSimplePlaceableItemHandler   ItemCakeHandler                            (E_ITEM_CAKE, E_BLOCK_CAKE);
@@ -228,7 +226,7 @@ namespace
 	constexpr cItemSwordHandler             ItemDiamondSwordHandler                    (E_ITEM_DIAMOND_SWORD);
 	constexpr cDefaultItemHandler           ItemDirtHandler                            (E_BLOCK_DIRT);
 	constexpr cItemDropSpenserHandler       ItemDispenserHandler                       (E_BLOCK_DISPENSER);
-	constexpr cDefaultItemHandler           ItemDoorBirchBlockHandler                  (E_BLOCK_BIRCH_DOOR);
+	constexpr cDefaultItemHandler           ItemBirchDoorBlockHandler                  (E_BLOCK_BIRCH_DOOR);
 	constexpr cDefaultItemHandler           ItemDoubleOakSlabHandler                   (E_BLOCK_DOUBLE_WOODEN_SLAB);
 	constexpr cDefaultItemHandler           ItemDoubleRedSandstoneSlabHandler          (E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB);
 	constexpr cDefaultItemHandler           ItemDoubleStoneSlabHandler                 (E_BLOCK_DOUBLE_STONE_SLAB);
@@ -572,7 +570,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 {
 	switch (a_ItemType)
 	{
-		case E_BLOCK_ACACIA_DOOR:                    return ItemAcaciaDoorHandler;
+		case E_BLOCK_ACACIA_DOOR:                    return ItemAcaciaDoorBlockHandler;
 		case E_BLOCK_ACACIA_FENCE:                   return ItemAcaciaFenceHandler;
 		case E_BLOCK_ACACIA_FENCE_GATE:              return ItemAcaciaFenceGateHandler;
 		case E_BLOCK_ACACIA_WOOD_STAIRS:             return ItemAcaciaStairsHandler;
@@ -582,11 +580,11 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_ANVIL:                          return ItemAnvilHandler;
 		case E_BLOCK_BARRIER:                        return ItemBarrierHandler;
 		case E_BLOCK_BEACON:                         return ItemBeaconHandler;
-		case E_BLOCK_BED:                            return ItemBedHandler;
+		case E_BLOCK_BED:                            return ItemBedBlockHandler;
 		case E_BLOCK_BEDROCK:                        return ItemBedrockHandler;
 		case E_BLOCK_BEETROOTS:                      return ItemBeetrootsBlockHandler;
-		case E_BLOCK_BIG_FLOWER:                     return ItemBigFlowerBlockHandler;
-		case E_BLOCK_BIRCH_DOOR:                     return ItemBirchDoorHandler;
+		case E_BLOCK_BIG_FLOWER:                     return ItemBigFlowerHandler;
+		case E_BLOCK_BIRCH_DOOR:                     return ItemBirchDoorBlockHandler;
 		case E_BLOCK_BIRCH_FENCE:                    return ItemBirchFenceHandler;
 		case E_BLOCK_BIRCH_FENCE_GATE:               return ItemBirchFenceGateHandler;
 		case E_BLOCK_BIRCH_WOOD_STAIRS:              return ItemBirchStairsHandler;
@@ -604,17 +602,16 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_BROWN_GLAZED_TERRACOTTA:        return ItemBrownGlazedTerracottaHandler;
 		case E_BLOCK_BROWN_MUSHROOM:                 return ItemBrownMushroomBlockHandler;
 		case E_BLOCK_BROWN_SHULKER_BOX:              return ItemBrownShulkerBoxHandler;
-		case E_BLOCK_BURNING_FURNACE:                return ItemBurningFurnaceHandler;
 		case E_BLOCK_CACTUS:                         return ItemCactusHandler;
-		case E_BLOCK_CAKE:                           return ItemCakeHandler;
+		case E_BLOCK_CAKE:                           return ItemCakeBlockHandler;
 		case E_BLOCK_CARPET:                         return ItemCarpetHandler;
-		case E_BLOCK_CARROTS:                        return ItemCarrotHandler;
-		case E_BLOCK_CAULDRON:                       return ItemCauldronHandler;
+		case E_BLOCK_CARROTS:                        return ItemCarrotsBlockHandler;
+		case E_BLOCK_CAULDRON:                       return ItemCauldronBlockHandler;
 		case E_BLOCK_CHAIN_COMMAND_BLOCK:            return ItemChainCommandBlockHandler;
 		case E_BLOCK_CHEST:                          return ItemChestBlockHandler;
 		case E_BLOCK_CHORUS_FLOWER:                  return ItemChorusFlowerHandler;
 		case E_BLOCK_CHORUS_PLANT:                   return ItemChorusPlantHandler;
-		case E_BLOCK_CLAY:                           return ItemClayHandler;
+		case E_BLOCK_CLAY:                           return ItemClayBlockHandler;
 		case E_BLOCK_COAL_ORE:                       return ItemCoalOreHandler;
 		case E_BLOCK_COBBLESTONE:                    return ItemCobblestoneHandler;
 		case E_BLOCK_COBBLESTONE_STAIRS:             return ItemCobblestoneStairsHandler;
@@ -628,7 +625,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_CYAN_GLAZED_TERRACOTTA:         return ItemCyanGlazedTerracottaHandler;
 		case E_BLOCK_CYAN_SHULKER_BOX:               return ItemCyanShulkerBoxHandler;
 		case E_BLOCK_DANDELION:                      return ItemDandelionHandler;
-		case E_BLOCK_DARK_OAK_DOOR:                  return ItemDarkOakDoorHandler;
+		case E_BLOCK_DARK_OAK_DOOR:                  return ItemDarkOakDoorBlockHandler;
 		case E_BLOCK_DARK_OAK_FENCE:                 return ItemDarkOakFenceHandler;
 		case E_BLOCK_DARK_OAK_FENCE_GATE:            return ItemDarkOakFenceGateHandler;
 		case E_BLOCK_DARK_OAK_WOOD_STAIRS:           return ItemDarkOakStairsHandler;
@@ -658,7 +655,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_FENCE:                          return ItemOakFenceHandler;
 		case E_BLOCK_FIRE:                           return ItemFireBlockHandler;
 		case E_BLOCK_FLOWER:                         return ItemPoppyHandler;
-		case E_BLOCK_FLOWER_POT:                     return ItemFlowerPotHandler;
+		case E_BLOCK_FLOWER_POT:                     return ItemFlowerPotBlockHandler;
 		case E_BLOCK_FROSTED_ICE:                    return ItemFrostedIceHandler;
 		case E_BLOCK_FURNACE:                        return ItemFurnaceHandler;
 		case E_BLOCK_GLASS:                          return ItemGlassHandler;
@@ -675,7 +672,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_GREEN_SHULKER_BOX:              return ItemGreenShulkerBoxHandler;
 		case E_BLOCK_HARDENED_CLAY:                  return ItemHardenedClayHandler;
 		case E_BLOCK_HAY_BALE:                       return ItemHayBaleHandler;
-		case E_BLOCK_HEAD:                           return ItemHeadHandler;
+		case E_BLOCK_HEAD:                           return ItemHeadBlockHandler;
 		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:  return ItemHeavyWeightedPressurePlateBlockHandler;
 		case E_BLOCK_HOPPER:                         return ItemHopperHandler;
 		case E_BLOCK_HUGE_BROWN_MUSHROOM:            return ItemHugeBrownMushroomBlockHandler;
@@ -685,12 +682,12 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:       return ItemInvertedDaylightSensorHandler;
 		case E_BLOCK_IRON_BARS:                      return ItemIronBarsBlockHandler;
 		case E_BLOCK_IRON_BLOCK:                     return ItemIronBlockHandler;
-		case E_BLOCK_IRON_DOOR:                      return ItemIronDoorHandler;
+		case E_BLOCK_IRON_DOOR:                      return ItemIronDoorBlockHandler;
 		case E_BLOCK_IRON_ORE:                       return ItemIronOreHandler;
 		case E_BLOCK_IRON_TRAPDOOR:                  return ItemIronTrapdoorHandler;
 		case E_BLOCK_JACK_O_LANTERN:                 return ItemJackOLanternHandler;
 		case E_BLOCK_JUKEBOX:                        return ItemJukeboxHandler;
-		case E_BLOCK_JUNGLE_DOOR:                    return ItemJungleDoorHandler;
+		case E_BLOCK_JUNGLE_DOOR:                    return ItemJungleDoorBlockHandler;
 		case E_BLOCK_JUNGLE_FENCE:                   return ItemJungleFenceHandler;
 		case E_BLOCK_JUNGLE_FENCE_GATE:              return ItemJungleFenceGateHandler;
 		case E_BLOCK_JUNGLE_WOOD_STAIRS:             return ItemJungleStairsHandler;
@@ -708,6 +705,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_LILY_PAD:                       return ItemLilypadHandler;
 		case E_BLOCK_LIME_GLAZED_TERRACOTTA:         return ItemLimeGlazedTerracottaHandler;
 		case E_BLOCK_LIME_SHULKER_BOX:               return ItemLimeShulkerBoxHandler;
+		case E_BLOCK_LIT_FURNACE:                    return ItemLitFurnaceHandler;
 		case E_BLOCK_LOG:                            return ItemLogHandler;
 		case E_BLOCK_MAGENTA_GLAZED_TERRACOTTA:      return ItemMagentaGlazedTerracottaHandler;
 		case E_BLOCK_MAGENTA_SHULKER_BOX:            return ItemMagentaShulkerBoxHandler;
@@ -718,17 +716,17 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_MOSSY_COBBLESTONE:              return ItemMossyCobblestoneHandler;
 		case E_BLOCK_MYCELIUM:                       return ItemMyceliumHandler;
 		case E_BLOCK_NETHERRACK:                     return ItemNetherrackHandler;
-		case E_BLOCK_NETHER_BRICK:                   return ItemNetherBrickHandler;
+		case E_BLOCK_NETHER_BRICK:                   return ItemNetherBrickBlockHandler;
 		case E_BLOCK_NETHER_BRICK_FENCE:             return ItemNetherBrickFenceBlockHandler;
 		case E_BLOCK_NETHER_BRICK_STAIRS:            return ItemNetherBrickStairsHandler;
 		case E_BLOCK_NETHER_PORTAL:                  return ItemNetherPortalBlockHandler;
 		case E_BLOCK_NETHER_QUARTZ_ORE:              return ItemNetherQuartzOreHandler;
 		case E_BLOCK_NETHER_WART:                    return ItemNetherWartBlockHandler;
-		case E_BLOCK_NETHER_WART_BLOCK:              return ItemNetherWartBlockHandler;
+		case E_BLOCK_NETHER_WART_BLOCK:              return ItemNetherWartBlockBlockHandler;
 		case E_BLOCK_NEW_LEAVES:                     return ItemNewLeavesHandler;
 		case E_BLOCK_NEW_LOG:                        return ItemNewLogHandler;
 		case E_BLOCK_NOTE_BLOCK:                     return ItemNoteBlockHandler;
-		case E_BLOCK_OAK_DOOR:                       return ItemOakDoorHandler;
+		case E_BLOCK_OAK_DOOR:                       return ItemOakDoorBlockHandler;
 		case E_BLOCK_OAK_FENCE_GATE:                 return ItemOakFenceGateHandler;
 		case E_BLOCK_OAK_WOOD_STAIRS:                return ItemOakStairsHandler;
 		case E_BLOCK_OBSERVER:                       return ItemObserverHandler;
@@ -786,7 +784,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_SNOW_BLOCK:                     return ItemSnowBlockHandler;
 		case E_BLOCK_SOULSAND:                       return ItemSoulsandHandler;
 		case E_BLOCK_SPONGE:                         return ItemSpongeHandler;
-		case E_BLOCK_SPRUCE_DOOR:                    return ItemSpruceDoorHandler;
+		case E_BLOCK_SPRUCE_DOOR:                    return ItemSpruceDoorBlockHandler;
 		case E_BLOCK_SPRUCE_FENCE:                   return ItemSpruceFenceHandler;
 		case E_BLOCK_SPRUCE_FENCE_GATE:              return ItemSpruceFenceGateHandler;
 		case E_BLOCK_SPRUCE_WOOD_STAIRS:             return ItemSpruceStairsHandler;
@@ -817,7 +815,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_WALLSIGN:                       return ItemWallsignHandler;
 		case E_BLOCK_WALL_BANNER:                    return ItemWallBannerHandler;
 		case E_BLOCK_WATER:                          return ItemWaterHandler;
-		case E_BLOCK_WHEAT:                          return ItemWheatHandler;
+		case E_BLOCK_WHEAT:                          return ItemWheatBlockHandler;
 		case E_BLOCK_WHITE_GLAZED_TERRACOTTA:        return ItemWhiteGlazedTerracottaHandler;
 		case E_BLOCK_WHITE_SHULKER_BOX:              return ItemWhiteShulkerBoxHandler;
 		case E_BLOCK_WOODEN_BUTTON:                  return ItemOakButtonHandler;
