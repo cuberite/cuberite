@@ -7,7 +7,7 @@
 
 
 
-class cItemButtonHandler :
+class cItemButtonHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;

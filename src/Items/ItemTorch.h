@@ -8,7 +8,7 @@
 
 
 
-class cItemTorchHandler :
+class cItemTorchHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;

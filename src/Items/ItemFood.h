@@ -50,8 +50,11 @@ public:
 protected:
 	FoodInfo m_FoodInfo;
 
+	~cItemFoodHandler() = default;
 };
 
-
-
-
+class cItemSimpleFoodHandler final:
+	public cItemFoodHandler
+{
+	using cItemFoodHandler::cItemFoodHandler;
+};

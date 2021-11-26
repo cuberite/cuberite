@@ -8,7 +8,7 @@
 
 
 
-class cItemFurnaceHandler :
+class cItemFurnaceHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;

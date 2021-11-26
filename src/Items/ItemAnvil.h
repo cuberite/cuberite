@@ -8,7 +8,7 @@
 
 
 
-class cItemAnvilHandler :
+class cItemAnvilHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;

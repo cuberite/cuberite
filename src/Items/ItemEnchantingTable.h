@@ -9,7 +9,7 @@
 
 
 
-class cItemEnchantingTableHandler:
+class cItemEnchantingTableHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;

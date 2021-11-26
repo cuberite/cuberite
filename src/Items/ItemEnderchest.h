@@ -8,7 +8,7 @@
 
 
 
-class cItemEnderchestHandler :
+class cItemEnderchestHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;

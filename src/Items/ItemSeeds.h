@@ -58,12 +58,15 @@ public:
 	{
 		return true;
 	}
+
+protected:
+	~cItemSeedsHandler() = default;
 } ;
 
-class cSimpleSeedsHandler final:
+class cItemSimpleSeedsHandler final:
 	public cItemSeedsHandler
 {
-	using Super = cItemSeedsHandler;
+	using cItemSeedsHandler::cItemSeedsHandler;
 };
 
 

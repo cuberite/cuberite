@@ -62,6 +62,8 @@ protected:
 
 	/** The speed multiplier (to the player's normalized look vector) to set for the new projectile. */
 	double m_SpeedCoeff;
+
+	~cItemThrowableHandler() = default;
 } ;
 
 
@@ -177,5 +179,4 @@ public:
 
 		return true;
 	}
-
 };

@@ -8,7 +8,7 @@
 
 
 
-class cItemPumpkinHandler:
+class cItemPumpkinHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;

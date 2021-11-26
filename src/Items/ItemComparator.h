@@ -8,7 +8,7 @@
 
 
 
-class cItemComparatorHandler:
+class cItemComparatorHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;

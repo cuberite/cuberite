@@ -8,7 +8,7 @@
 
 
 
-class cItemObserverHandler :
+class cItemObserverHandler final :
 	public cItemHandler
 {
 	using Super = cItemHandler;

@@ -8,7 +8,7 @@
 
 
 
-class cItemDropSpenserHandler :
+class cItemDropSpenserHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;

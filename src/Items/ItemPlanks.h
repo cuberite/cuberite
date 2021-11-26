@@ -7,7 +7,7 @@
 
 
 
-class cItemPlanksHandler :
+class cItemPlanksHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;

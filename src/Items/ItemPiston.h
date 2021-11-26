@@ -8,7 +8,7 @@
 
 
 
-class cItemPistonHandler :
+class cItemPistonHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;

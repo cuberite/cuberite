@@ -7,7 +7,7 @@
 
 
 
-class cItemVineHandler :
+class cItemVineHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;

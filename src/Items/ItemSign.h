@@ -9,7 +9,7 @@
 
 
 
-class cItemSignHandler:
+class cItemSignHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;

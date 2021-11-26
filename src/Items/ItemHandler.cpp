@@ -110,18 +110,18 @@ namespace
 	constexpr cDefaultItemHandler           ItemActiveComparatorHandler                (E_BLOCK_ACTIVE_COMPARATOR);
 	constexpr cDefaultItemHandler           ItemAirHandler                             (E_BLOCK_AIR);
 	constexpr cItemAnvilHandler             ItemAnvilHandler                           (E_BLOCK_ANVIL);
-	constexpr cItemFoodHandler              ItemAppleHandler                           (E_ITEM_RED_APPLE, cItemHandler::FoodInfo(4, 2.4));
+	constexpr cItemSimpleFoodHandler        ItemAppleHandler                           (E_ITEM_RED_APPLE, cItemHandler::FoodInfo(4, 2.4));
 	constexpr cDefaultItemHandler           ItemArmorStandHandler                      (E_ITEM_ARMOR_STAND);
 	constexpr cDefaultItemHandler           ItemArrowHandler                           (E_ITEM_ARROW);
-	constexpr cItemFoodHandler              ItemBakedPotatoHandler                     (E_ITEM_BAKED_POTATO, cItemHandler::FoodInfo(5, 6));
+	constexpr cItemSimpleFoodHandler        ItemBakedPotatoHandler                     (E_ITEM_BAKED_POTATO, cItemHandler::FoodInfo(5, 6));
 	constexpr cItemBannerHandler            ItemBannerHandler                          (E_ITEM_BANNER);
 	constexpr cDefaultItemHandler           ItemBarrierHandler                         (E_BLOCK_BARRIER);
 	constexpr cDefaultItemHandler           ItemBeaconHandler                          (E_BLOCK_BEACON);
 	constexpr cItemBedHandler               ItemBedBlockHandler                        (E_BLOCK_BED);
 	constexpr cItemBedHandler               ItemBedHandler                             (E_ITEM_BED);
 	constexpr cDefaultItemHandler           ItemBedrockHandler                         (E_BLOCK_BEDROCK);
-	constexpr cItemFoodHandler              ItemBeetrootHandler                        (E_ITEM_BEETROOT, cItemHandler::FoodInfo(1, 1.2));
-	constexpr cItemSeedsHandler             ItemBeetrootSeedsHandler                   (E_ITEM_BEETROOT_SEEDS);
+	constexpr cItemSimpleFoodHandler        ItemBeetrootHandler                        (E_ITEM_BEETROOT, cItemHandler::FoodInfo(1, 1.2));
+	constexpr cItemSimpleSeedsHandler       ItemBeetrootSeedsHandler                   (E_ITEM_BEETROOT_SEEDS);
 	constexpr cItemSoupHandler              ItemBeetrootSoupHandler                    (E_ITEM_BEETROOT_SOUP, cItemHandler::FoodInfo(6, 7.2));
 	constexpr cDefaultItemHandler           ItemBeetrootsBlockHandler                  (E_BLOCK_BEETROOTS);
 	constexpr cItemBigFlowerHandler         ItemBigFlowerHandler                       (E_BLOCK_BIG_FLOWER);
@@ -146,7 +146,7 @@ namespace
 	constexpr cItemBottleOEnchantingHandler ItemBottleOEnchantingHandler               (E_ITEM_BOTTLE_O_ENCHANTING);
 	constexpr cItemBowHandler               ItemBowHandler                             (E_ITEM_BOW);
 	constexpr cDefaultItemHandler           ItemBowlHandler                            (E_ITEM_BOWL);
-	constexpr cItemFoodHandler              ItemBreadHandler                           (E_ITEM_BREAD, cItemHandler::FoodInfo(5, 6));
+	constexpr cItemSimpleFoodHandler        ItemBreadHandler                           (E_ITEM_BREAD, cItemHandler::FoodInfo(5, 6));
 	constexpr cDefaultItemHandler           ItemBrewingStandBlockHandler               (E_BLOCK_BREWING_STAND);
 	constexpr cSimplePlaceableItemHandler   ItemBrewingStandHandler                    (E_ITEM_BREWING_STAND, E_BLOCK_BREWING_STAND);
 	constexpr cDefaultItemHandler           ItemBrickHandler                           (E_ITEM_CLAY_BRICK);
@@ -194,13 +194,13 @@ namespace
 	constexpr cDefaultItemHandler           ItemCompassHandler                         (E_ITEM_COMPASS);
 	constexpr cDefaultItemHandler           ItemConcreteBlockHandler                   (E_BLOCK_CONCRETE);
 	constexpr cDefaultItemHandler           ItemConcretePowderHandler                  (E_BLOCK_CONCRETE_POWDER);
-	constexpr cItemFoodHandler              ItemCookedBeefHandler                      (E_ITEM_STEAK, cItemHandler::FoodInfo(8, 12.8));
-	constexpr cItemFoodHandler              ItemCookedChickenHandler                   (E_ITEM_COOKED_CHICKEN, cItemHandler::FoodInfo(6, 7.2));
+	constexpr cItemSimpleFoodHandler        ItemCookedBeefHandler                      (E_ITEM_STEAK, cItemHandler::FoodInfo(8, 12.8));
+	constexpr cItemSimpleFoodHandler        ItemCookedChickenHandler                   (E_ITEM_COOKED_CHICKEN, cItemHandler::FoodInfo(6, 7.2));
 	constexpr cItemCookedFishHandler        ItemCookedFishHandler                      (E_ITEM_COOKED_FISH);
-	constexpr cItemFoodHandler              ItemCookedMuttonHandler                    (E_ITEM_COOKED_MUTTON, cItemHandler::FoodInfo(6, 9.6));
-	constexpr cItemFoodHandler              ItemCookedPorkchopHandler                  (E_ITEM_COOKED_PORKCHOP, cItemHandler::FoodInfo(8, 12.8));
-	constexpr cItemFoodHandler              ItemCookedRabbitHandler                    (E_ITEM_COOKED_RABBIT, cItemHandler::FoodInfo(5, 6));
-	constexpr cItemFoodHandler              ItemCookieHandler                          (E_ITEM_COOKIE, cItemHandler::FoodInfo(2, 0.5));
+	constexpr cItemSimpleFoodHandler        ItemCookedMuttonHandler                    (E_ITEM_COOKED_MUTTON, cItemHandler::FoodInfo(6, 9.6));
+	constexpr cItemSimpleFoodHandler        ItemCookedPorkchopHandler                  (E_ITEM_COOKED_PORKCHOP, cItemHandler::FoodInfo(8, 12.8));
+	constexpr cItemSimpleFoodHandler        ItemCookedRabbitHandler                    (E_ITEM_COOKED_RABBIT, cItemHandler::FoodInfo(5, 6));
+	constexpr cItemSimpleFoodHandler        ItemCookieHandler                          (E_ITEM_COOKIE, cItemHandler::FoodInfo(2, 0.5));
 	constexpr cItemGlazedTerracottaHandler  ItemCyanGlazedTerracottaHandler            (E_BLOCK_CYAN_GLAZED_TERRACOTTA);
 	constexpr cDefaultItemHandler           ItemCyanShulkerBoxHandler                  (E_BLOCK_CYAN_SHULKER_BOX);
 	constexpr cDefaultItemHandler           ItemDandelionHandler                       (E_BLOCK_DANDELION);
@@ -285,7 +285,7 @@ namespace
 	constexpr cItemGoldenAppleHandler       ItemGoldenAppleHandler                     (E_ITEM_GOLDEN_APPLE);
 	constexpr cItemAxeHandler               ItemGoldenAxeHandler                       (E_ITEM_GOLD_AXE);
 	constexpr cItemArmorHandler             ItemGoldenBootsHandler                     (E_ITEM_GOLD_BOOTS);
-	constexpr cItemFoodHandler              ItemGoldenCarrotHandler                    (E_ITEM_GOLDEN_CARROT, cItemHandler::FoodInfo(6, 14.4));
+	constexpr cItemSimpleFoodHandler        ItemGoldenCarrotHandler                    (E_ITEM_GOLDEN_CARROT, cItemHandler::FoodInfo(6, 14.4));
 	constexpr cItemArmorHandler             ItemGoldenChestplateHandler                (E_ITEM_GOLD_CHESTPLATE);
 	constexpr cItemArmorHandler             ItemGoldenHelmetHandler                    (E_ITEM_GOLD_HELMET);
 	constexpr cItemHoeHandler               ItemGoldenHoeHandler                       (E_ITEM_GOLD_HOE);
@@ -372,8 +372,8 @@ namespace
 	constexpr cItemMapHandler               ItemMapHandler                             (E_ITEM_MAP);
 	constexpr cDefaultItemHandler           ItemMellohiDiscHandler                     (E_ITEM_MELLOHI_DISC);
 	constexpr cDefaultItemHandler           ItemMelonBlockHandler                      (E_BLOCK_MELON);
-	constexpr cItemSeedsHandler             ItemMelonSeedsHandler                      (E_ITEM_MELON_SEEDS);
-	constexpr cItemFoodHandler              ItemMelonSliceHandler                      (E_ITEM_MELON_SLICE, cItemHandler::FoodInfo(2, 1.2));
+	constexpr cItemSimpleSeedsHandler       ItemMelonSeedsHandler                      (E_ITEM_MELON_SEEDS);
+	constexpr cItemSimpleFoodHandler        ItemMelonSliceHandler                      (E_ITEM_MELON_SLICE, cItemHandler::FoodInfo(2, 1.2));
 	constexpr cDefaultItemHandler           ItemMelonStemHandler                       (E_BLOCK_MELON_STEM);
 	constexpr cItemMilkHandler              ItemMilkHandler                            (E_ITEM_MILK);
 	constexpr cItemMinecartHandler          ItemMinecartHandler                        (E_ITEM_MINECART);
@@ -432,8 +432,8 @@ namespace
 	constexpr cDefaultItemHandler           ItemPrismarineCrystalsHandler              (E_ITEM_PRISMARINE_CRYSTALS);
 	constexpr cDefaultItemHandler           ItemPrismarineShardHandler                 (E_ITEM_PRISMARINE_SHARD);
 	constexpr cItemPumpkinHandler           ItemPumpkinHandler                         (E_BLOCK_PUMPKIN);
-	constexpr cItemFoodHandler              ItemPumpkinPieHandler                      (E_ITEM_PUMPKIN_PIE, cItemHandler::FoodInfo(8, 4.8));
-	constexpr cItemSeedsHandler             ItemPumpkinSeedsHandler                    (E_ITEM_PUMPKIN_SEEDS);
+	constexpr cItemSimpleFoodHandler        ItemPumpkinPieHandler                      (E_ITEM_PUMPKIN_PIE, cItemHandler::FoodInfo(8, 4.8));
+	constexpr cItemSimpleSeedsHandler       ItemPumpkinSeedsHandler                    (E_ITEM_PUMPKIN_SEEDS);
 	constexpr cDefaultItemHandler           ItemPumpkinStemHandler                     (E_BLOCK_PUMPKIN_STEM);
 	constexpr cItemStairsHandler            ItemPurpurStairsHandler                    (E_BLOCK_PURPUR_STAIRS);
 	constexpr cItemGlazedTerracottaHandler  ItemPurpleGlazedTerracottaHandler          (E_BLOCK_PURPLE_GLAZED_TERRACOTTA);
@@ -448,12 +448,12 @@ namespace
 	constexpr cItemSoupHandler              ItemRabbitStewHandler                      (E_ITEM_RABBIT_STEW, cItemHandler::FoodInfo(10, 12));
 	constexpr cDefaultItemHandler           ItemRabbitsFootHandler                     (E_ITEM_RABBITS_FOOT);
 	constexpr cItemRailHandler              ItemRailHandler                            (E_BLOCK_RAIL);
-	constexpr cItemFoodHandler              ItemRawBeefHandler                         (E_ITEM_RAW_BEEF, cItemHandler::FoodInfo(3, 1.8));
+	constexpr cItemSimpleFoodHandler        ItemRawBeefHandler                         (E_ITEM_RAW_BEEF, cItemHandler::FoodInfo(3, 1.8));
 	constexpr cItemRawChickenHandler        ItemRawChickenHandler                      (E_ITEM_RAW_CHICKEN);
 	constexpr cItemRawFishHandler           ItemRawFishHandler                         (E_ITEM_RAW_FISH);
-	constexpr cItemFoodHandler              ItemRawMuttonHandler                       (E_ITEM_RAW_MUTTON, cItemHandler::FoodInfo(2, 1.2));
-	constexpr cItemFoodHandler              ItemRawPorkchopHandler                     (E_ITEM_RAW_PORKCHOP, cItemHandler::FoodInfo(3, 1.8));
-	constexpr cItemFoodHandler              ItemRawRabbitHandler                       (E_ITEM_RAW_RABBIT, cItemHandler::FoodInfo(3, 1.8));
+	constexpr cItemSimpleFoodHandler        ItemRawMuttonHandler                       (E_ITEM_RAW_MUTTON, cItemHandler::FoodInfo(2, 1.2));
+	constexpr cItemSimpleFoodHandler        ItemRawPorkchopHandler                     (E_ITEM_RAW_PORKCHOP, cItemHandler::FoodInfo(3, 1.8));
+	constexpr cItemSimpleFoodHandler        ItemRawRabbitHandler                       (E_ITEM_RAW_RABBIT, cItemHandler::FoodInfo(3, 1.8));
 	constexpr cItemGlazedTerracottaHandler  ItemRedGlazedTerracottaHandler             (E_BLOCK_RED_GLAZED_TERRACOTTA);
 	constexpr cDefaultItemHandler           ItemRedMushroomBlockHandler                (E_BLOCK_RED_MUSHROOM);
 	constexpr cDefaultItemHandler           ItemRedNetherBricksHandler                 (E_BLOCK_RED_NETHER_BRICK);
@@ -481,7 +481,7 @@ namespace
 	constexpr cItemStairsHandler            ItemSandstoneStairsHandler                 (E_BLOCK_SANDSTONE_STAIRS);
 	constexpr cItemSaplingHandler           ItemSaplingHandler                         (E_BLOCK_SAPLING);
 	constexpr cDefaultItemHandler           ItemSeaLanternHandler                      (E_BLOCK_SEA_LANTERN);
-	constexpr cItemSeedsHandler             ItemSeedsHandler                           (E_ITEM_SEEDS);
+	constexpr cItemSimpleSeedsHandler       ItemSeedsHandler                           (E_ITEM_SEEDS);
 	constexpr cItemShearsHandler            ItemShearsHandler                          (E_ITEM_SHEARS);
 	constexpr cDefaultItemHandler           ItemShieldHandler                          (E_ITEM_SHIELD);
 	constexpr cDefaultItemHandler           ItemShulkerShellHandler                    (E_ITEM_SHULKER_SHELL);
@@ -1036,6 +1036,8 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_ITEM_WRITTEN_BOOK:                    return ItemWrittenBookHandler;
 
 	}
+	ASSERT("Unknown item type!");
+	return ItemAirHandler;
 }
 
 

@@ -8,7 +8,7 @@
 
 
 
-class cItemFenceGateHandler :
+class cItemFenceGateHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;

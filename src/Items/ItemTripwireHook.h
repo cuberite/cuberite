@@ -7,7 +7,7 @@
 
 
 
-class cItemTripwireHookHandler :
+class cItemTripwireHookHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;

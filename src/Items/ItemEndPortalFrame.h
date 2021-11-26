@@ -8,7 +8,7 @@
 
 
 
-class cItemEndPortalFrameHandler :
+class cItemEndPortalFrameHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;

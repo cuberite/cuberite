@@ -8,7 +8,7 @@
 
 
 
-class cItemGlazedTerracottaHandler :
+class cItemGlazedTerracottaHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;

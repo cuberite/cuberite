@@ -8,7 +8,7 @@
 
 
 
-class cItemJackOLanternHandler :
+class cItemJackOLanternHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;
