@@ -118,8 +118,8 @@ public:
 
 	void KickUser(int a_ClientID, const AString & a_Reason);
 
-	/** Authenticates the specified user, called by cAuthenticator */
-	void AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
+	/** Authenticates the specified user, called by cAuthenticator supplying player details from Mojang. */
+	void AuthenticateUser(int a_ClientID, AString && a_Username, const cUUID & a_UUID, Json::Value && a_Properties);
 
 	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
 
@@ -148,6 +148,10 @@ public:
 	Read from settings, admins should set this to true only when they chain to BungeeCord,
 	it makes the server vulnerable to identity theft through direct connections. */
 	bool ShouldAllowBungeeCord(void) const { return m_ShouldAllowBungeeCord; }
+
+	bool OnlyAllowBungeeCord(void) const { return m_OnlyAllowBungeeCord; }
+
+	const AString & GetProxySharedSecret(void) const { return m_ProxySharedSecret; }
 
 	/** Returns true if usernames should be completed across worlds. This is read
 	from the settings. */
@@ -239,6 +243,12 @@ private:
 
 	/** True if BungeeCord handshake packets (with player UUID) should be accepted. */
 	bool m_ShouldAllowBungeeCord;
+
+	/** True if BungeeCord handshake packets should be the only ones accepted. */
+	bool m_OnlyAllowBungeeCord;
+
+	/** Security string that the proxy server should send, compatible with BungeeGuard */
+	AString m_ProxySharedSecret;
 
 	/** True if usernames should be completed across worlds. */
 	bool m_ShouldAllowMultiWorldTabCompletion;

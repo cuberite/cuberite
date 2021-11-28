@@ -77,7 +77,7 @@ private:
 
 		a_Rotation = (a_Rotation / 360) * 16;
 
-		return static_cast<char>(a_Rotation) % 16;
+		return static_cast<NIBBLETYPE>(a_Rotation) % 16;
 	}
 } ;
 

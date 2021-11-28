@@ -82,7 +82,7 @@ void cProtocol_1_14::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	// Send the spawn position:
 	{
 		cPacketizer Pkt(*this, pktSpawnPosition);
-		Pkt.WriteXZYPosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
+		Pkt.WriteXZYPosition64(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ());
 	}
 
 	// Send the server difficulty:
@@ -90,9 +90,6 @@ void cProtocol_1_14::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		// cPacketizer Pkt(*this, pktDifficulty);
 		// Pkt.WriteBEInt8(1);
 	}
-
-	// Send player abilities:
-	SendPlayerAbilities();
 }
 
 

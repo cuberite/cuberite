@@ -15,6 +15,7 @@ target_sources(
 	ItemBucket.h
 	ItemButton.h
 	ItemChest.h
+	ItemChorusFruit.h
 	ItemCloth.h
 	ItemComparator.h
 	ItemCookedFish.h

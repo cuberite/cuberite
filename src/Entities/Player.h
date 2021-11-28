@@ -184,7 +184,7 @@ public:
 	void SendRotation(double a_YawDegrees, double a_PitchDegrees);
 
 	/** Spectates the target entity. If a_Target is nullptr or a pointer to self, end spectation. */
-	void SpectateEntity(cEntity * a_Target);
+	void SpectateEntity(const cEntity * a_Target);
 
 	/** Returns the position where projectiles thrown by this player should start, player eye position + adjustment */
 	Vector3d GetThrowStartPos(void) const;
@@ -410,7 +410,7 @@ public:
 
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
-	virtual void Killed(cEntity * a_Victim) override;
+	virtual void Killed(const cEntity & a_Victim, eDamageType a_DamageType) override;
 
 	void Respawn(void);  // tolua_export
 
@@ -419,14 +419,9 @@ public:
 	/** Saves all player data, such as inventory, to JSON. */
 	void SaveToDisk(void);
 
-	/** Loads the player data from the disk file.
+	/** Loads the player data from the save file.
 	Sets m_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile(). */
 	void LoadFromDisk();
-
-	/** Loads the player data from the specified file.
-	Sets m_World to the world where the player will spawn, based on the stored world name or the default world.
-	Returns true on success, false if the player wasn't found, and excepts with base std::runtime_error if the data couldn't be read or parsed. */
-	bool LoadFromFile(const AString & a_FileName);
 
 	const AString & GetLoadedWorldName() const { return m_CurrentWorldName; }
 
@@ -513,22 +508,28 @@ public:
 	The custom name will be used in the tab-list, in the player nametag and in the tab-completion. */
 	void SetCustomName(const AString & a_CustomName);
 
-	/** Gets the last position that the player slept in
-	This is initialised to the world spawn point if the player has not slept in a bed as of yet
-	*/
-	Vector3i GetLastBedPos(void) const { return m_LastBedPos; }
+	/** Gets the player's potential respawn position (named LastBedPos for compatibility reasons). */
+	Vector3i GetLastBedPos(void) const { return m_RespawnPosition; }
 
-	/** Sets the player's bed (home / respawn) position to the specified position.
-	Sets the respawn world to the player's world. */
-	void SetBedPos(const Vector3i & a_Pos);
+	/** Returns if the respawn point is unconditionally used. */
+	bool IsRespawnPointForced(void) const { return m_IsRespawnPointForced; }
 
-	/** Sets the player's bed (home / respawn) position and respawn world to the specified parameters. */
-	void SetBedPos(const Vector3i & a_Pos, cWorld * a_World);
+	/** Sets the player's bed position to the specified position.
+	Sets the respawn world to the player's world and unforces the respawn point.
+	The given position will be used subject to bed checks when respawning. */
+	void SetBedPos(Vector3i a_Position);
+
+	/** Sets the player's bed position to the specified position.
+	The spawn point is unforced. The given position will be used subject to bed checks when respawning. */
+	void SetBedPos(Vector3i a_Position, const cWorld & a_World);
+
+	/** Sets the player's forced respawn position and world. */
+	void SetRespawnPosition(Vector3i a_Position, const cWorld & a_World);
 
 	// tolua_end
 
-	// TODO lua export GetBedPos and GetBedWorld
-	cWorld * GetBedWorld();
+	// TODO lua export GetRespawnWorld
+	cWorld * GetRespawnWorld();
 
 	/** Update movement-related statistics. */
 	void UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIsOnGround);
@@ -548,12 +549,6 @@ public:
 	Loads the m_Rank, m_Permissions, m_MsgPrefix, m_MsgSuffix and m_MsgNameColorCode members. */
 	void LoadRank(void);
 
-	/** Calls the block-placement hook and places the block in the world, unless refused by the hook.
-	If the hook prevents the placement, sends the current block at the specified coords back to the client.
-	Assumes that the block is in a currently loaded chunk.
-	Returns true if the block is successfully placed. */
-	bool PlaceBlock(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-
 	/** Sends the block in the specified range around the specified coord to the client
 	as a block change packet.
 	The blocks in range (a_BlockX - a_Range, a_BlockX + a_Range) are sent (NY-metric). */
@@ -565,12 +560,13 @@ public:
 
 	// tolua_end
 
+	/** Attempts to place the block in the world with a call to PlaceBlocks. */
+	bool PlaceBlock(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+
 	/** Calls the block placement hooks and places the blocks in the world.
-	First the "placing" hooks for all the blocks are called, then the blocks are placed, and finally
-	the "placed" hooks are called.
+	First the "placing" hooks for all the blocks are called, then the blocks are placed, and finally the "placed" hooks are called.
 	If the any of the "placing" hooks aborts, none of the blocks are placed and the function returns false.
-	Returns true if all the blocks are placed.
-	Assumes that all the blocks are in currently loaded chunks. */
+	Returns true if all the blocks are placed. */
 	bool PlaceBlocks(std::initializer_list<sSetBlock> a_Blocks);
 
 	/** Notify nearby wolves that the player or one of the player's wolves took damage or did damage to an entity
@@ -596,8 +592,6 @@ public:
 	void AddKnownItem(const cItem & a_Item);
 
 	// cEntity overrides:
-	virtual void AttachTo(cEntity * a_AttachTo) override;
-	virtual void Detach(void) override;
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
 	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
 	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
@@ -605,7 +599,6 @@ public:
 	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
 	virtual cItem GetOffHandEquipedItem(void) const override { return m_Inventory.GetShieldSlot(); }
 	virtual bool IsCrouched(void) const override;
-	virtual bool IsElytraFlying(void) const override;
 	virtual bool IsOnGround(void) const override { return m_bTouchGround; }
 	virtual bool IsSprinting(void) const override;
 
@@ -660,8 +653,9 @@ private:
 	cWindow * m_CurrentWindow;
 	cWindow * m_InventoryWindow;
 
-	/** The player's last saved bed position */
-	Vector3i m_LastBedPos;
+	/** The player's potential respawn position, initialised to world spawn by default.
+	During player respawn from death, if m_IsRespawnPointForced is false and no bed exists here, it will be reset to world spawn. */
+	Vector3i m_RespawnPosition;
 
 	/** The name of the world which the player respawns in upon death.
 	This is stored as a string to enable SaveToDisk to not touch cRoot, and thus can be safely called in the player's destructor. */
@@ -715,6 +709,9 @@ private:
 	/** Was the player frozen manually by a plugin or automatically by the server? */
 	bool m_IsManuallyFrozen;
 
+	/** Whether we unconditionally respawn to m_RespawnPosition, or check if a bed is unobstructed and available first. */
+	bool m_IsRespawnPointForced;
+
 	/** Flag used by food handling system to determine whether a teleport has just happened.
 	Will not apply food penalties if found to be true; will set to false after processing. */
 	bool m_IsTeleporting;
@@ -734,6 +731,9 @@ private:
 	UInt32 m_FloaterID;
 
 	cTeam * m_Team;
+
+	/** The entity that this player is spectating, nullptr if none. */
+	const cEntity * m_Spectating;
 
 	StatisticsManager m_Stats;
 
@@ -793,9 +793,11 @@ private:
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual float GetEnchantmentBlastKnockbackReduction() override;
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
+	virtual bool IsElytraFlying(void) const override;
 	virtual bool IsInvisible() const override;
 	virtual bool IsRclking(void) const override { return IsEating() || IsChargingBow(); }
 	virtual void OnAddToWorld(cWorld & a_World) override;
+	virtual void OnDetach() override;
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;

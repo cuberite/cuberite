@@ -241,7 +241,6 @@ namespace Explodinator
 	Currently missing conduits from 1.13 */
 	static bool BlockAlwaysDrops(const BLOCKTYPE a_Block)
 	{
-		// If it's a Shulker box
 		if (IsBlockShulkerBox(a_Block))
 		{
 			return true;
@@ -297,7 +296,7 @@ namespace Explodinator
 			// Activate the TNT, with initial velocity and no fuse sound:
 			World.SpawnPrimedTNT(Vector3d(0.5, 0, 0.5) + Absolute, FuseTime, 1, false);
 		}
-		else if (a_ExplodingEntity->IsTNT() || BlockAlwaysDrops(DestroyedBlock) || Random.RandBool(1.f / a_Power))  // For TNT explosions, destroying a block that always drops, or if RandBool, drop pickups
+		else if ((a_ExplodingEntity != nullptr) && (a_ExplodingEntity->IsTNT() || BlockAlwaysDrops(DestroyedBlock) || Random.RandBool(1.f / a_Power)))  // For TNT explosions, destroying a block that always drops, or if RandBool, drop pickups
 		{
 			const auto DestroyedMeta = a_Chunk.GetMeta(a_Position);
 			a_Chunk.GetWorld()->SpawnItemPickups(cBlockHandler::For(DestroyedBlock).ConvertToPickups(DestroyedMeta), Absolute);

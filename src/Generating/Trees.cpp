@@ -672,7 +672,7 @@ NIBBLETYPE GetLogMetaFromDirection(NIBBLETYPE a_BlockMeta, Vector3d a_Direction)
 
 void GetBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
-	HEIGHTTYPE Height = 5 + (a_Noise.IntNoise3DInt(a_BlockPos.addedX(64 * a_Seq)) % 3);
+	HEIGHTTYPE Height = 5 + static_cast<HEIGHTTYPE>(a_Noise.IntNoise3DInt(a_BlockPos.addedX(64 * a_Seq)) % 3);
 
 	// Prealloc, so that we don't realloc too often later:
 	a_LogBlocks.reserve(static_cast<size_t>(Height));
@@ -839,7 +839,7 @@ void GetDarkoakTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetB
 
 void GetTallBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
-	HEIGHTTYPE Height = 9 + (a_Noise.IntNoise3DInt(a_BlockPos.addedX(64 * a_Seq)) % 3);
+	HEIGHTTYPE Height = 9 + static_cast<HEIGHTTYPE>(a_Noise.IntNoise3DInt(a_BlockPos.addedX(64 * a_Seq)) % 3);
 
 	// Prealloc, so that we don't realloc too often later:
 	a_LogBlocks.reserve(static_cast<size_t>(Height));
@@ -1078,7 +1078,7 @@ void GetLargeSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 
 	for (int i = 0; i < LeavesRingCount; i++)
 	{
-		unsigned int Val = (a_Noise.IntNoise3DInt(a_BlockPos.addedXZ(32 * a_Seq, 32 * i)) / 23) % 8;
+		unsigned int Val = static_cast<unsigned int>(a_Noise.IntNoise3DInt(a_BlockPos.addedXZ(32 * a_Seq, 32 * i)) / 23) % 8;
 		if ((Val < 4) && RingRadius < 3)
 		{
 			RingRadius++;

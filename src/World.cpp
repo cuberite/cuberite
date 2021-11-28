@@ -270,9 +270,9 @@ cWorld::cWorld(
 	if (m_IsSpawnExplicitlySet)
 	{
 		LOGD("Spawnpoint explicitly set!");
-		m_SpawnX = IniFile.GetValueF("SpawnPosition", "X", m_SpawnX);
-		m_SpawnY = IniFile.GetValueF("SpawnPosition", "Y", m_SpawnY);
-		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ);
+		m_SpawnX = IniFile.GetValueI("SpawnPosition", "X", m_SpawnX);
+		m_SpawnY = IniFile.GetValueI("SpawnPosition", "Y", m_SpawnY);
+		m_SpawnZ = IniFile.GetValueI("SpawnPosition", "Z", m_SpawnZ);
 	}
 
 	m_StorageSchema               = IniFile.GetValueSet ("Storage",       "Schema",                      m_StorageSchema);
@@ -626,27 +626,27 @@ void cWorld::SetNextBlockToTick(const Vector3i a_BlockPos)
 
 
 
-bool cWorld::SetSpawn(double a_X, double a_Y, double a_Z)
+bool cWorld::SetSpawn(int a_X, int a_Y, int a_Z)
 {
-		cIniFile IniFile;
+	cIniFile IniFile;
 
-		IniFile.ReadFile(m_IniFileName);
-		IniFile.SetValueF("SpawnPosition", "X", a_X);
-		IniFile.SetValueF("SpawnPosition", "Y", a_Y);
-		IniFile.SetValueF("SpawnPosition", "Z", a_Z);
-		if (IniFile.WriteFile(m_IniFileName))
-		{
-			m_SpawnX = a_X;
-			m_SpawnY = a_Y;
-			m_SpawnZ = a_Z;
-			FLOGD("Spawn set at {0}", Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
-			return true;
-		}
-		else
-		{
-			LOGWARNING("Couldn't write new spawn settings to \"%s\".", m_IniFileName.c_str());
-		}
-		return false;
+	IniFile.ReadFile(m_IniFileName);
+	IniFile.SetValueI("SpawnPosition", "X", a_X);
+	IniFile.SetValueI("SpawnPosition", "Y", a_Y);
+	IniFile.SetValueI("SpawnPosition", "Z", a_Z);
+	if (IniFile.WriteFile(m_IniFileName))
+	{
+		m_SpawnX = a_X;
+		m_SpawnY = a_Y;
+		m_SpawnZ = a_Z;
+		FLOGD("Spawn set at {}", Vector3i{m_SpawnX, m_SpawnY, m_SpawnZ});
+		return true;
+	}
+	else
+	{
+		LOGWARNING("Couldn't write new spawn settings to \"%s\".", m_IniFileName.c_str());
+	}
+	return false;
 }
 
 
@@ -674,7 +674,7 @@ void cWorld::InitializeSpawn(void)
 	IniFile.WriteFile(m_IniFileName);
 
 	int ChunkX = 0, ChunkZ = 0;
-	cChunkDef::BlockToChunk(FloorC(m_SpawnX), FloorC(m_SpawnZ), ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(m_SpawnX, m_SpawnZ, ChunkX, ChunkZ);
 	cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, ViewDist);
 }
 
@@ -724,17 +724,17 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 	}
 
 	// Check 0, 0 first.
-	double SpawnY = 0.0;
+	int SpawnY = 0;
 	if (CanSpawnAt(BiomeOffset.x, SpawnY, BiomeOffset.z))
 	{
-		SetSpawn(BiomeOffset.x + 0.5, SpawnY, BiomeOffset.z + 0.5);
+		SetSpawn(BiomeOffset.x, SpawnY, BiomeOffset.z);
 
-		FLOGINFO("World \"{0}\": Generated spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
+		FLOGINFO("World \"{}\": Generated spawnpoint position at {}", m_WorldName, Vector3i{m_SpawnX, m_SpawnY, m_SpawnZ});
 		return;
 	}
 
 	// A search grid (searches clockwise around the origin)
-	static const int HalfChunk = static_cast<int>(cChunkDef::Width / 2.0f);
+	static const int HalfChunk = cChunkDef::Width / 2;
 	static const Vector3i ChunkOffset[] =
 	{
 		Vector3i(0, 0, HalfChunk),
@@ -757,27 +757,27 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 
 			if (CanSpawnAt(PotentialSpawn.x, SpawnY, PotentialSpawn.z))
 			{
-				SetSpawn(PotentialSpawn.x + 0.5, SpawnY, PotentialSpawn.z + 0.5);
+				SetSpawn(PotentialSpawn.x, SpawnY, PotentialSpawn.z);
 
 				int ChunkX, ChunkZ;
-				cChunkDef::BlockToChunk(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ), ChunkX, ChunkZ);
+				cChunkDef::BlockToChunk(m_SpawnX, m_SpawnZ, ChunkX, ChunkZ);
 				cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, a_MaxSpawnRadius);
 
-				FLOGINFO("World \"{0}\":Generated spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
+				FLOGINFO("World \"{}\":Generated spawnpoint position at {}", m_WorldName, Vector3i{m_SpawnX, m_SpawnY, m_SpawnZ});
 				return;
 			}
 		}
 	}
 
-	m_SpawnY = GetHeight(static_cast<int>(m_SpawnX), static_cast<int>(m_SpawnZ));
-	FLOGWARNING("World \"{0}\": Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {1:.2f}", m_WorldName, Vector3d{m_SpawnX, m_SpawnY, m_SpawnZ});
+	m_SpawnY = GetHeight(m_SpawnX, m_SpawnZ);
+	FLOGWARNING("World \"{}\": Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {}", m_WorldName, Vector3i{m_SpawnX, m_SpawnY, m_SpawnZ});
 }
 
 
 
 
 
-bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
+bool cWorld::CanSpawnAt(int a_X, int & a_Y, int a_Z)
 {
 	// All this blocks can only be found above ground.
 	// Apart from netherrack (as the Nether is technically a massive cave)
@@ -793,12 +793,12 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 	static const int ValidSpawnBlocksCount = ARRAYCOUNT(ValidSpawnBlocks);
 
 	// Increase this by two, because we need two more blocks for body and head
-	static const int HighestSpawnPoint = GetHeight(static_cast<int>(a_X), static_cast<int>(a_Z)) + 2;
-	static const int LowestSpawnPoint = static_cast<int>(HighestSpawnPoint / 2.0f);
+	static const int HighestSpawnPoint = GetHeight(a_X, a_Z) + 2;
+	static const int LowestSpawnPoint = HighestSpawnPoint / 2;
 
 	for (int PotentialY = HighestSpawnPoint; PotentialY > LowestSpawnPoint; --PotentialY)
 	{
-		BLOCKTYPE HeadBlock = GetBlock({ static_cast<int>(a_X), PotentialY, static_cast<int>(a_Z) });
+		BLOCKTYPE HeadBlock = GetBlock({ a_X, PotentialY, a_Z });
 
 		// Is this block safe for spawning
 		if (HeadBlock != E_BLOCK_AIR)
@@ -806,7 +806,7 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 			continue;
 		}
 
-		BLOCKTYPE BodyBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 1, static_cast<int>(a_Z) });
+		BLOCKTYPE BodyBlock = GetBlock({ a_X, PotentialY - 1, a_Z });
 
 		// Is this block safe for spawning
 		if (BodyBlock != E_BLOCK_AIR)
@@ -814,7 +814,7 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 			continue;
 		}
 
-		BLOCKTYPE FloorBlock = GetBlock({ static_cast<int>(a_X), PotentialY - 2, static_cast<int>(a_Z) });
+		BLOCKTYPE FloorBlock = GetBlock({ a_X, PotentialY - 2, a_Z });
 
 		// Early out - Is the floor block air
 		if (FloorBlock == E_BLOCK_AIR)
@@ -834,12 +834,12 @@ bool cWorld::CanSpawnAt(double a_X, double & a_Y, double a_Z)
 			continue;
 		}
 
-		if (!CheckPlayerSpawnPoint(static_cast<int>(a_X), PotentialY - 1, static_cast<int>(a_Z)))
+		if (!CheckPlayerSpawnPoint(a_X, PotentialY - 1, a_Z))
 		{
 			continue;
 		}
 
-		a_Y = PotentialY - 1.0;
+		a_Y = PotentialY - 1;
 		return true;
 	}
 
@@ -1028,6 +1028,12 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		BroadcastPlayerListUpdatePing();
 	}
 
+	// Process all clients' buffered actions:
+	for (const auto Player : m_Players)
+	{
+		Player->GetClientHandle()->ProcessProtocolIn();
+	}
+
 	TickQueuedChunkDataSets();
 	TickQueuedBlocks();
 	m_ChunkMap.Tick(a_Dt);
@@ -1038,6 +1044,12 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 	TickWeather(static_cast<float>(a_Dt.count()));
 
 	GetSimulatorManager()->Simulate(static_cast<float>(a_Dt.count()));
+
+	// Flush out all clients' buffered data:
+	for (const auto Player : m_Players)
+	{
+		Player->GetClientHandle()->ProcessProtocolOut();
+	}
 
 	if (m_WorldAge - m_LastChunkCheck > std::chrono::seconds(10))
 	{
@@ -1228,7 +1240,7 @@ void cWorld::TickQueuedEntityAdditions(void)
 	decltype(m_EntitiesToAdd) EntitiesToAdd;
 	{
 		cCSLock Lock(m_CSEntitiesToAdd);
-		EntitiesToAdd = std::move(m_EntitiesToAdd);
+		std::swap(EntitiesToAdd, m_EntitiesToAdd);
 	}
 
 	// Ensures m_Players manipulation happens under the chunkmap lock.
@@ -2282,16 +2294,16 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 	size_t NameLength = a_PlayerNameHint.length();
 
 	cLock Lock(*this);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	for (const auto Player : m_Players)
 	{
-		if (!(*itr)->IsTicking())
+		if (!Player->IsTicking())
 		{
 			continue;
 		}
-		size_t Rating = RateCompareString (a_PlayerNameHint, (*itr)->GetName());
+		size_t Rating = RateCompareString (a_PlayerNameHint, Player->GetName());
 		if (Rating >= BestRating)
 		{
-			BestMatch = *itr;
+			BestMatch = Player;
 			BestRating = Rating;
 		}
 		if (Rating == NameLength)  // Perfect match
@@ -2334,19 +2346,19 @@ bool cWorld::DoWithNearestPlayer(Vector3d a_Pos, double a_RangeLimit, cPlayerLis
 	cPlayer * ClosestPlayer = nullptr;
 
 	cLock Lock(*this);
-	for (cPlayerList::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	for (const auto Player : m_Players)
 	{
-		if (!(*itr)->IsTicking())
+		if (!Player->IsTicking())
 		{
 			continue;
 		}
 
-		if (a_IgnoreSpectator && (*itr)->IsGameModeSpectator())
+		if (a_IgnoreSpectator && Player->IsGameModeSpectator())
 		{
 			continue;
 		}
 
-		Vector3f Pos = (*itr)->GetPosition();
+		Vector3f Pos = Player->GetPosition();
 		double Distance = (Pos - a_Pos).Length();
 
 		// If the player is too far, skip them:
@@ -2365,7 +2377,7 @@ bool cWorld::DoWithNearestPlayer(Vector3d a_Pos, double a_RangeLimit, cPlayerLis
 		}
 
 		ClosestDistance = Distance;
-		ClosestPlayer = *itr;
+		ClosestPlayer = Player;
 	}
 
 	if (ClosestPlayer)
@@ -2749,7 +2761,7 @@ OwnedEntity cWorld::RemoveEntity(cEntity & a_Entity)
 		cLock Lock(*this);
 		const auto Player = static_cast<cPlayer *>(&a_Entity);
 		LOGD("Removing player %s from world \"%s\"", Player->GetName().c_str(), m_WorldName.c_str());
-		m_Players.remove(Player);
+		m_Players.erase(std::remove(m_Players.begin(), m_Players.end(), Player), m_Players.end());
 	}
 
 	// Check if the entity is in the chunkmap:
@@ -2973,13 +2985,9 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 	std::vector<pair_t> UsernamesByWeight;
 
 	cLock Lock(*this);
-	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
+	for (const auto Player : m_Players)
 	{
-		AString PlayerName ((*itr)->GetName());
-		if ((*itr)->HasCustomName())
-		{
-			PlayerName = (*itr)->GetCustomName();
-		}
+		AString PlayerName = Player->HasCustomName() ? Player->GetCustomName() : Player->GetName();
 
 		AString::size_type Found = StrToLower(PlayerName).find(StrToLower(LastWord));  // Try to find last word in playername
 		if (Found == AString::npos)

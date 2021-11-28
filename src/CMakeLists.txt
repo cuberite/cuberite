@@ -192,7 +192,12 @@ SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES
 
 
 
-
+MACRO(TO_NATIVE_PATH PATH OUT)
+	FILE(TO_NATIVE_PATH "${PATH}" "${OUT}")
+	IF(MINGW)
+		STRING(REPLACE "/" "\\" "${OUT}" "${${OUT}}")
+	ENDIF(MINGW)
+ENDMACRO(TO_NATIVE_PATH)
 
 # Create a symbolic link from ${orig} to ${link}
 # If the orig and link point to the same thing, does nothing (-> in-source build)
@@ -211,8 +216,8 @@ function(make_symlink orig link)
 	if (CMAKE_HOST_UNIX)
 		set(command ln -s ${orig} ${link})
 	else()
-		file(TO_NATIVE_PATH "${orig}" orig)
-		file(TO_NATIVE_PATH "${link}" link)
+		TO_NATIVE_PATH("${orig}" orig)
+		TO_NATIVE_PATH("${link}" link)
 		if (IS_DIRECTORY ${orig})
 			set(command cmd.exe /c mklink /j ${link} ${orig})
 		else()

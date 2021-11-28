@@ -70,6 +70,21 @@ public:
 	/** Returns the entity effect, if it is currently applied or nullptr if not. */
 	cEntityEffect * GetEntityEffect(cEntityEffect::eType a_EffectType) const;
 
+	// tolua_begin
+
+	static bool FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const Vector3i a_MinBoxCorner, const Vector3i a_MaxBoxCorner);
+
+	static bool FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const cBoundingBox a_BoundingBox);
+
+	/** Used by enderman and chorus fruit.
+	Checks for valid destinations in a cube of length 2 * a_HalfCubeWidth centred at a_Centre.
+	Returns true and places destination in a_Destination if successful.
+	Returns false if destination could be found after a_NumTries attempts.
+	Details at: https://minecraft.fandom.com/wiki/Enderman#Teleportation. */
+	static bool FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, Vector3i a_Centre, const int a_HalfCubeWidth);
+
+	// tolua_end
+
 protected:
 
 	typedef std::map<cEntityEffect::eType, std::unique_ptr<cEntityEffect>> tEffectMap;

@@ -423,20 +423,27 @@ void cPawn::HandleFalling(void)
 				Damage = static_cast<int>(static_cast<float>(Damage) * 0.33);
 			}
 
-			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
-
 			// Fall particles:
 			if (const auto Below = POS_TOINT.addedY(-1); Below.y >= 0)
 			{
+				const auto BlockBelow = GetWorld()->GetBlock(Below);
+
+				if (BlockBelow == E_BLOCK_HAY_BALE)
+				{
+					Damage = std::clamp(static_cast<int>(static_cast<float>(Damage) * 0.2), 1, 20);
+				}
+
 				GetWorld()->BroadcastParticleEffect(
 					"blockdust",
 					GetPosition(),
 					{ 0, 0, 0 },
 					(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
 					static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
-					{ { GetWorld()->GetBlock(Below), 0 } }
+					{ { BlockBelow, 0 } }
 				);
 			}
+
+			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
 		}
 
 		m_bTouchGround = true;
@@ -546,4 +553,82 @@ bool cPawn::DeductTotem(const eDamageType a_DamageType)
 		return true;
 	}
 	return false;
+}
+
+
+
+
+
+bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const Vector3i a_MinBoxCorner, const Vector3i a_MaxBoxCorner)
+{
+	/*
+	Algorithm:
+	Choose random destination.
+	Seek downwards, regardless of distance until the block is made of movement-blocking material: https://minecraft.fandom.com/wiki/Materials
+	Succeeds if no liquid or solid blocks prevents from standing at destination.
+	*/
+	auto & Random = GetRandomProvider();
+
+	for (unsigned int i = 0; i < a_NumTries; i++)
+	{
+		const int DestX = Random.RandInt(a_MinBoxCorner.x, a_MaxBoxCorner.x);
+		int DestY = Random.RandInt(a_MinBoxCorner.y, a_MaxBoxCorner.y);
+		const int DestZ = Random.RandInt(a_MinBoxCorner.z, a_MaxBoxCorner.z);
+
+		// Seek downwards from initial destination until we find a solid block or go into the void
+		BLOCKTYPE DestBlock = a_World.GetBlock({DestX, DestY, DestZ});
+		while ((DestY >= 0) && !cBlockInfo::IsSolid(DestBlock))
+		{
+			DestBlock = a_World.GetBlock({DestX, DestY, DestZ});
+			DestY--;
+		}
+
+		// Couldn't find a solid block so move to next attempt
+		if (DestY < 0)
+		{
+			continue;
+		}
+
+		// Succeed if blocks above destination are empty
+		bool Success = true;
+		for (int j = 1; j <= a_HeightRequired; j++)
+		{
+			BLOCKTYPE TestBlock = a_World.GetBlock({DestX, DestY + j, DestZ});
+			if (cBlockInfo::IsSolid(TestBlock) || IsBlockLiquid(TestBlock))
+			{
+				Success = false;
+				break;
+			}
+		}
+
+		if (!Success)
+		{
+			continue;
+		}
+
+		// Offsets for entity to be centred and standing on solid block
+		a_Destination = Vector3d(DestX + 0.5, DestY + 1, DestZ + 0.5);
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const cBoundingBox a_BoundingBox)
+{
+	return FindTeleportDestination(a_World, a_HeightRequired, a_NumTries, a_Destination, a_BoundingBox.GetMin(), a_BoundingBox.GetMax());
+}
+
+
+
+
+
+bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, Vector3i a_Centre, const int a_HalfCubeWidth)
+{
+	Vector3i MinCorner(a_Centre.x - a_HalfCubeWidth, a_Centre.y - a_HalfCubeWidth, a_Centre.z - a_HalfCubeWidth);
+	Vector3i MaxCorner(a_Centre.x + a_HalfCubeWidth, a_Centre.y + a_HalfCubeWidth, a_Centre.z + a_HalfCubeWidth);
+	return FindTeleportDestination(a_World, a_HeightRequired, a_NumTries, a_Destination, MinCorner, MaxCorner);
 }

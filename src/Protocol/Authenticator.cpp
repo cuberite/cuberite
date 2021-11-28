@@ -57,17 +57,23 @@ void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 
 
 
-void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, const AString & a_ServerHash)
+void cAuthenticator::Authenticate(int a_ClientID, const std::string_view a_Username, const std::string_view a_ServerHash)
 {
 	if (!m_ShouldAuthenticate)
 	{
-		Json::Value Value;
-		cRoot::Get()->AuthenticateUser(a_ClientID, a_UserName, cClientHandle::GenerateOfflineUUID(a_UserName), Value);
+		// An "authenticated" username, which is just what the client sent since auth is off.
+		std::string OfflineUsername(a_Username);
+
+		// A specially constructed UUID based wholly on the username.
+		const auto OfflineUUID = cClientHandle::GenerateOfflineUUID(OfflineUsername);
+
+		// "Authenticate" the user based on what little information we have:
+		cRoot::Get()->GetServer()->AuthenticateUser(a_ClientID, std::move(OfflineUsername), OfflineUUID, Json::Value());
 		return;
 	}
 
-	cCSLock LOCK(m_CS);
-	m_Queue.emplace_back(a_ClientID, a_UserName, a_ServerHash);
+	cCSLock Lock(m_CS);
+	m_Queue.emplace_back(a_ClientID, a_Username, a_ServerHash);
 	m_QueueNonempty.Set();
 }
 
@@ -112,20 +118,19 @@ void cAuthenticator::Execute(void)
 		}
 		ASSERT(!m_Queue.empty());
 
-		cAuthenticator::cUser & User = m_Queue.front();
-		int ClientID = User.m_ClientID;
-		AString UserName = User.m_Name;
-		AString ServerID = User.m_ServerID;
+		cAuthenticator::cUser User = std::move(m_Queue.front());
+		int & ClientID = User.m_ClientID;
+		AString & Username = User.m_Name;
+		AString & ServerID = User.m_ServerID;
 		m_Queue.pop_front();
 		Lock.Unlock();
 
-		AString NewUserName = UserName;
 		cUUID UUID;
 		Json::Value Properties;
-		if (AuthWithYggdrasil(NewUserName, ServerID, UUID, Properties))
+		if (AuthWithYggdrasil(Username, ServerID, UUID, Properties))
 		{
-			LOGINFO("User %s authenticated with UUID %s", NewUserName.c_str(), UUID.ToShortString().c_str());
-			cRoot::Get()->AuthenticateUser(ClientID, NewUserName, UUID, Properties);
+			LOGINFO("User %s authenticated with UUID %s", Username.c_str(), UUID.ToShortString().c_str());
+			cRoot::Get()->GetServer()->AuthenticateUser(ClientID, std::move(Username), UUID, std::move(Properties));
 		}
 		else
 		{
@@ -144,8 +149,8 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 
 	// Create the GET request:
 	AString ActualAddress = m_Address;
-	ReplaceString(ActualAddress, "%USERNAME%", a_UserName);
-	ReplaceString(ActualAddress, "%SERVERID%", a_ServerId);
+	ReplaceURL(ActualAddress, "%USERNAME%", a_UserName);
+	ReplaceURL(ActualAddress, "%SERVERID%", a_ServerId);
 
 	AString Request;
 	Request += "GET " + ActualAddress + " HTTP/1.0\r\n";

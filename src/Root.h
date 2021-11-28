@@ -130,9 +130,6 @@ public:
 	/** Kicks the user, no matter in what world they are. Used from cAuthenticator */
 	void KickUser(int a_ClientID, const AString & a_Reason);
 
-	/** Called by cAuthenticator to auth the specified user */
-	void AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
-
 	/** Returns the number of chunks loaded */
 	size_t GetTotalChunkCount(void);  // tolua_export
 

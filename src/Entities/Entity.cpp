@@ -390,6 +390,18 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
+	if (IsPainting())
+	{
+		KilledBy(a_TDI);
+
+		if (a_TDI.Attacker != nullptr)
+		{
+			a_TDI.Attacker->Killed(*this, a_TDI.DamageType);
+		}
+
+		return true;
+	}
+
 	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPlayer()))
 	{
 		cPlayer * Player = static_cast<cPlayer *>(a_TDI.Attacker);
@@ -558,7 +570,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		if (a_TDI.Attacker != nullptr)
 		{
-			a_TDI.Attacker->Killed(this);
+			a_TDI.Attacker->Killed(*this, a_TDI.DamageType);
 		}
 	}
 	return true;
@@ -1488,7 +1500,7 @@ bool cEntity::DetectPortal()
 					if (IsPlayer())
 					{
 						cPlayer * Player = static_cast<cPlayer *>(this);
-						if (Player->GetBedWorld() == TargetWorld)
+						if (Player->GetRespawnWorld() == TargetWorld)
 						{
 							return MoveToWorld(*TargetWorld, Player->GetLastBedPos());
 						}
@@ -1633,7 +1645,7 @@ bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPo
 
 bool cEntity::MoveToWorld(cWorld & a_World, bool a_ShouldSendRespawn)
 {
-	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3d(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ()));
+	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3i(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ()));
 }
 
 
@@ -1649,7 +1661,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 		return false;
 	}
 
-	return MoveToWorld(*World, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()), false, a_ShouldSendRespawn);
+	return MoveToWorld(*World, Vector3i(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()), false, a_ShouldSendRespawn);
 }
 
 
@@ -1687,9 +1699,11 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 				BLOCKTYPE Block;
 				if (!a_Chunk.UnboundedRelGetBlockType(x, y, z, Block))
 				{
+					/*
 					LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
 						x, y, z, GetPosX(), GetPosZ()
 					);
+					*/
 					continue;
 				}
 
@@ -1716,9 +1730,11 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	BLOCKTYPE BlockIn;
 	if (!a_Chunk.UnboundedRelGetBlockType(RelX, HeadHeight, RelZ, BlockIn))
 	{
+		/*
 		LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
 			RelX, HeadHeight, RelZ, GetPosX(), GetPosZ()
 		);
+		*/
 		return;
 	}
 	m_IsHeadInWater = IsBlockWater(BlockIn);
@@ -1978,26 +1994,25 @@ cEntity * cEntity::GetAttached()
 
 
 
-void cEntity::AttachTo(cEntity * a_AttachTo)
+void cEntity::AttachTo(cEntity & a_AttachTo)
 {
-	if (m_AttachedTo == a_AttachTo)
+	if (m_AttachedTo == &a_AttachTo)
 	{
-		// Already attached to that entity, nothing to do here
+		// Already attached to that entity, nothing to do here:
 		return;
 	}
+
 	if (m_AttachedTo != nullptr)
 	{
 		// Detach from any previous entity:
 		Detach();
 	}
 
-	// Update state information
-	m_AttachedTo = a_AttachTo;
-	a_AttachTo->m_Attachee = this;
-	if (a_AttachTo != nullptr)
-	{
-		m_World->BroadcastAttachEntity(*this, *a_AttachTo);
-	}
+	// Update state information:
+	m_AttachedTo = &a_AttachTo;
+	a_AttachTo.m_Attachee = this;
+
+	m_World->BroadcastAttachEntity(*this, a_AttachTo);
 }
 
 
@@ -2008,13 +2023,16 @@ void cEntity::Detach(void)
 {
 	if (m_AttachedTo == nullptr)
 	{
-		// Already not attached to any entity, our work is done
+		// Already not attached to any entity, our work is done:
 		return;
 	}
+
 	m_World->BroadcastDetachEntity(*this, *m_AttachedTo);
 
 	m_AttachedTo->m_Attachee = nullptr;
 	m_AttachedTo = nullptr;
+
+	OnDetach();
 }
 
 
@@ -2282,6 +2300,114 @@ void cEntity::BroadcastLeashedMobs()
 		for (auto LeashedMob : m_LeashedMobs)
 		{
 			m_World->BroadcastLeashEntity(*LeashedMob, *this);
+		}
+	}
+}
+
+
+
+
+
+void cEntity::OnDetach()
+{
+}
+
+
+
+
+
+void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
+{
+	cPluginManager * PluginManager = cRoot::Get()->GetPluginManager();
+
+	AString Name;
+	if (IsPlayer())
+	{
+		cPlayer * Player = static_cast<cPlayer *>(this);
+		Name = Player->GetName();
+	}
+	else if (IsMob())
+	{
+		cMonster * Monster = static_cast<cMonster *>(this);
+		if (Monster->HasCustomName())
+		{
+			Name = Monster->GetCustomName();
+		}
+		else
+		{
+			// Tamed ocelots are really cats in vanilla.
+			if (Monster->IsTame() && (Monster->GetClass() == AString("cOcelot")))
+			{
+				Name = "Cat";
+			}
+			else
+			{
+				Name = Monster->GetClass();
+				Name.erase(Name.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
+			}
+		}
+	}
+	else
+	{
+		// If the entity is neither a player nor a mob, we should quit.
+		return;
+	}
+
+	if (a_TDI.Attacker == nullptr)
+	{
+		const AString DamageText = [&]
+			{
+				switch (a_TDI.DamageType)
+				{
+					case dtRangedAttack:    return "was shot";
+					case dtLightning:       return "was plasmified by lightining";
+					case dtFalling:         return GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard";
+					case dtDrowning:        return "drowned";
+					case dtSuffocating:     return GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block";
+					case dtStarving:        return "forgot the importance of food";
+					case dtCactusContact:   return "was impaled on a cactus";
+					case dtMagmaContact:    return "discovered the floor was lava";
+					case dtLavaContact:     return "was melted by lava";
+					case dtPoisoning:       return "died from septicaemia";
+					case dtWithering:       return "is a husk of their former selves";
+					case dtOnFire:          return "forgot to stop, drop, and roll";
+					case dtFireContact:     return "burnt themselves to death";
+					case dtInVoid:          return "somehow fell out of the world";
+					case dtPotionOfHarming: return "was magicked to death";
+					case dtEnderPearl:      return "misused an ender pearl";
+					case dtAdmin:           return "was administrator'd";
+					case dtExplosion:       return "blew up";
+					case dtAttack:          return "was attacked by thin air";
+					case dtEnvironment:     return "played too much dress up";  // This is not vanilla - added a own pun
+				}
+				UNREACHABLE("Unsupported damage type");
+			}();
+		AString DeathMessage = Printf("%s %s", Name.c_str(), DamageText.c_str());
+		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
+		if (DeathMessage != AString(""))
+		{
+			GetWorld()->BroadcastChatDeath(DeathMessage);
+		}
+	}
+	else if (a_TDI.Attacker->IsPlayer())
+	{
+		cPlayer * Killer = static_cast<cPlayer *>(a_TDI.Attacker);
+		AString DeathMessage = Printf("%s was killed by %s", Name.c_str(), Killer->GetName().c_str());
+		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
+		if (DeathMessage != AString(""))
+		{
+			GetWorld()->BroadcastChatDeath(DeathMessage);
+		}
+	}
+	else
+	{
+		AString KillerClass = a_TDI.Attacker->GetClass();
+		KillerClass.erase(KillerClass.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
+		AString DeathMessage = Printf("%s was killed by a %s", Name.c_str(), KillerClass.c_str());
+		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
+		if (DeathMessage != AString(""))
+		{
+			GetWorld()->BroadcastChatDeath(DeathMessage);
 		}
 	}
 }

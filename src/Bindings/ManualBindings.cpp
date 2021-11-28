@@ -347,22 +347,37 @@ static int tolua_StringSplitAndTrim(lua_State * tolua_S)
 
 
 
-/** Retrieves the log message from the first param on the Lua stack.
-Can take either a string or a cCompositeChat.
-*/
-static void LogFromLuaStack(lua_State * tolua_S, eLogLevel a_LogLevel)
+/** Prints the message to the console, optionally formatting it with a plugin name prefix if the second param on the Lua stack is true. */
+static void LogFromLuaStack(lua_State * tolua_S, const std::string_view a_Message, const eLogLevel a_LogLevel)
 {
-	tolua_Error err;
-	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
+	if (lua_isboolean(tolua_S, 2) && (lua_toboolean(tolua_S, 2) == 1))
 	{
-		auto Msg = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->ExtractText();
-		Logger::LogSimple(Msg, a_LogLevel);
+		Logger::LogSimple(a_Message, a_LogLevel);
+	}
+	else
+	{
+		Logger::LogSimple(fmt::format("[{}] {}", cManualBindings::GetLuaPlugin(tolua_S)->GetName(), a_Message), a_LogLevel);
+	}
+}
+
+
+
+
+
+/** Retrieves a string log message from the first param on the Lua stack, optionally prefixes it with plugin name, and prints it to the console. */
+static void LogFromLuaStack(lua_State * tolua_S, const eLogLevel a_LogLevel)
+{
+	cLuaState L(tolua_S);
+
+	// If there's no param, spit out an error message instead of crashing:
+	if (!L.CheckParamString(1))
+	{
 		return;
 	}
 
-	size_t len = 0;
-	const char * str = lua_tolstring(tolua_S, 1, &len);
-	Logger::LogSimple(std::string_view(str, len), a_LogLevel);
+	std::string_view Message;
+	L.GetStackValue(1, Message);
+	LogFromLuaStack(tolua_S, Message, a_LogLevel);
 }
 
 
@@ -371,26 +386,20 @@ static void LogFromLuaStack(lua_State * tolua_S, eLogLevel a_LogLevel)
 
 static int tolua_LOG(lua_State * tolua_S)
 {
-	// If there's no param, spit out an error message instead of crashing:
-	if (lua_isnil(tolua_S, 1))
-	{
-		LOGWARNING("Attempting to LOG a nil value!");
-		cLuaState::LogStackTrace(tolua_S);
-		return 0;
-	}
-
-	// If the param is a cCompositeChat, read the log level from it:
-	eLogLevel LogLevel = eLogLevel::Regular;
+	// If the param is a cCompositeChat, read the data from it:
 	tolua_Error err;
 	if (tolua_isusertype(tolua_S, 1, "cCompositeChat", false, &err))
 	{
-		LogLevel = cCompositeChat::MessageTypeToLogLevel(
-			static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr))->GetMessageType()
-		);
+		const auto CompositeChat = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+		if (CompositeChat != nullptr)  // isusertype returns true for nil values
+		{
+			LogFromLuaStack(tolua_S, CompositeChat->ExtractText(), cCompositeChat::MessageTypeToLogLevel(CompositeChat->GetMessageType()));
+			return 0;
+		}
 	}
 
 	// Log the message:
-	LogFromLuaStack(tolua_S, LogLevel);
+	LogFromLuaStack(tolua_S, eLogLevel::Regular);
 	return 0;
 }
 
@@ -400,14 +409,6 @@ static int tolua_LOG(lua_State * tolua_S)
 
 static int tolua_LOGINFO(lua_State * tolua_S)
 {
-	// If there's no param, spit out an error message instead of crashing:
-	if (lua_isnil(tolua_S, 1))
-	{
-		LOGWARNING("Attempting to LOGINFO a nil value!");
-		cLuaState::LogStackTrace(tolua_S);
-		return 0;
-	}
-
 	LogFromLuaStack(tolua_S, eLogLevel::Info);
 	return 0;
 }
@@ -418,14 +419,6 @@ static int tolua_LOGINFO(lua_State * tolua_S)
 
 static int tolua_LOGWARN(lua_State * tolua_S)
 {
-	// If there's no param, spit out an error message instead of crashing:
-	if (lua_isnil(tolua_S, 1))
-	{
-		LOGWARNING("Attempting to LOGWARN a nil value!");
-		cLuaState::LogStackTrace(tolua_S);
-		return 0;
-	}
-
 	LogFromLuaStack(tolua_S, eLogLevel::Warning);
 	return 0;
 }
@@ -436,14 +429,6 @@ static int tolua_LOGWARN(lua_State * tolua_S)
 
 static int tolua_LOGERROR(lua_State * tolua_S)
 {
-	// If there's no param, spit out an error message instead of crashing:
-	if (lua_isnil(tolua_S, 1))
-	{
-		LOGWARNING("Attempting to LOGERROR a nil value!");
-		cLuaState::LogStackTrace(tolua_S);
-		return 0;
-	}
-
 	LogFromLuaStack(tolua_S, eLogLevel::Error);
 	return 0;
 }
@@ -1610,6 +1595,63 @@ static int tolua_cPlayer_GetRestrictions(lua_State * tolua_S)
 
 
 
+static int tolua_cPlayer_GetUUID(lua_State * tolua_S)
+{
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cPlayer"))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cPlayer * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	// Return the UUID as a string
+	L.Push(Self->GetUUID().ToShortString());
+	return 1;
+}
+
+
+
+
+
+static int tolua_cPlayer_PlaceBlock(lua_State * tolua_S)
+{
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cPlayer") ||
+		!L.CheckParamUserType(2, "Vector3<int>") ||
+		!L.CheckParamNumber(3, 4) ||
+		!L.CheckParamEnd(5)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cPlayer * Self;
+	Vector3i Position;
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	L.GetStackValues(1, Self, Position, BlockType, BlockMeta);
+
+	if (!cChunkDef::IsValidHeight(Position.y))
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
+	}
+
+	// Return the result of placement:
+	L.Push(Self->PlaceBlock(Position, BlockType, BlockMeta));
+	return 1;
+}
+
+
+
+
+
 static int tolua_cPlayer_PermissionMatches(lua_State * tolua_S)
 {
 	// Function signature: cPlayer:PermissionMatches(PermissionStr, TemplateStr) -> bool
@@ -1631,28 +1673,6 @@ static int tolua_cPlayer_PermissionMatches(lua_State * tolua_S)
 
 	// Push the result of the match:
 	L.Push(cPlayer::PermissionMatches(StringSplit(Permission, "."), StringSplit(Template, ".")));
-	return 1;
-}
-
-
-
-
-
-static int tolua_cPlayer_GetUUID(lua_State * tolua_S)
-{
-	// Check the params:
-	cLuaState L(tolua_S);
-	if (!L.CheckParamSelf("cPlayer"))
-	{
-		return 0;
-	}
-
-	// Get the params:
-	cPlayer * Self = nullptr;
-	L.GetStackValue(1, Self);
-
-	// Return the UUID as a string
-	L.Push(Self->GetUUID().ToShortString());
 	return 1;
 }
 
@@ -4616,8 +4636,9 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cPlayer");
 			tolua_function(tolua_S, "GetPermissions",    tolua_cPlayer_GetPermissions);
 			tolua_function(tolua_S, "GetRestrictions",   tolua_cPlayer_GetRestrictions);
-			tolua_function(tolua_S, "PermissionMatches", tolua_cPlayer_PermissionMatches);
 			tolua_function(tolua_S, "GetUUID",           tolua_cPlayer_GetUUID);
+			tolua_function(tolua_S, "PermissionMatches", tolua_cPlayer_PermissionMatches);
+			tolua_function(tolua_S, "PlaceBlock",        tolua_cPlayer_PlaceBlock);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cPlugin");
