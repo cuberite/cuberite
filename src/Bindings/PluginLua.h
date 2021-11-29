@@ -97,7 +97,7 @@ public:
 	virtual bool OnPlayerDestroyed          (cPlayer & a_Player) override;
 	virtual bool OnPlayerEating             (cPlayer & a_Player) override;
 	virtual bool OnPlayerFished             (cPlayer & a_Player, const cItems & a_Reward, const int ExperienceAmount) override;
-	virtual bool OnPlayerFishing            (cPlayer & a_Player, cItems & a_Reward, const int ExperienceAmount) override;
+	virtual bool OnPlayerFishing            (cPlayer & a_Player, cItems & a_Reward, int & ExperienceAmount) override;
 	virtual bool OnPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel) override;
 	virtual bool OnPlayerJoined             (cPlayer & a_Player) override;
 	virtual bool OnPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status) override;

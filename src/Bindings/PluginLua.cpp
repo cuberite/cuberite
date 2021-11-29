@@ -642,9 +642,9 @@ bool cPluginLua::OnPlayerFished(cPlayer & a_Player, const cItems & a_Reward, con
 
 
 
-bool cPluginLua::OnPlayerFishing(cPlayer & a_Player, cItems & a_Reward, int ExperienceAmount)
+bool cPluginLua::OnPlayerFishing(cPlayer & a_Player, cItems & a_Reward, int & ExperienceAmount)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_FISHING, &a_Player, &a_Reward, ExperienceAmount);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_FISHING, &a_Player, &a_Reward, &ExperienceAmount);
 }
 
 

@@ -788,7 +788,7 @@ bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems & a_R
 
 
 
-bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems a_Reward, int ExperienceAmount)
+bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems & a_Reward, int & ExperienceAmount)
 {
 	return GenericCallHook(HOOK_PLAYER_FISHING, [&](cPlugin * a_Plugin)
 		{

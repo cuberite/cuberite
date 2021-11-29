@@ -269,8 +269,8 @@ public:
 	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerDestroyed          (cPlayer & a_Player);
 	bool CallHookPlayerEating             (cPlayer & a_Player);
-	bool CallHookPlayerFished             (cPlayer & a_Player, const cItems & a_Reward, int ExperienceAmount);
-	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems a_Reward, const int ExperienceAmount);
+	bool CallHookPlayerFished             (cPlayer & a_Player, const cItems & a_Reward, const int ExperienceAmount);
+	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems & a_Reward, int & ExperienceAmount);
 	bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel);
 	bool CallHookPlayerJoined             (cPlayer & a_Player);
 	bool CallHookPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
