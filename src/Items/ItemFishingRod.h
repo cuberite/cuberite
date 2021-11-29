@@ -287,8 +287,10 @@ public:
 			a_Player.GetStatistics().Custom[CustomStatistic::FishCaught]++;
 		}
 
+		auto Experience = Random.RandInt(1, 6);
+
 		// Check with plugins if this loot is acceptable:
-		if (cRoot::Get()->GetPluginManager()->CallHookPlayerFishing(a_Player, Drops))
+		if (cRoot::Get()->GetPluginManager()->CallHookPlayerFishing(a_Player, Drops, Experience))
 		{
 			return;
 		}
@@ -298,10 +300,10 @@ public:
 		const float FISH_SPEED_MULT = 2.25f;
 		Vector3d FlyDirection = (a_Player.GetEyePosition() - FloaterPos).addedY(1.0f) * FISH_SPEED_MULT;
 		a_World.SpawnItemPickups(Drops, FloaterPos, FlyDirection);
-		a_World.SpawnExperienceOrb(a_Player.GetPosition(), Random.RandInt(1, 6));
+		a_World.SpawnExperienceOrb(a_Player.GetPosition(), Experience);
 		a_Player.UseEquippedItem(1);
 
 		// Notify plugins
-		cRoot::Get()->GetPluginManager()->CallHookPlayerFished(a_Player, Drops);
+		cRoot::Get()->GetPluginManager()->CallHookPlayerFished(a_Player, Drops, Experience);
 	}
 } ;
