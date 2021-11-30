@@ -15,10 +15,7 @@ class cItemNetherWartHandler final:
 
 public:
 
-	constexpr cItemNetherWartHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

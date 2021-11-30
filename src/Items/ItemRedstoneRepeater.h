@@ -15,10 +15,7 @@ class cItemRedstoneRepeaterHandler final :
 
 public:
 
-	constexpr cItemRedstoneRepeaterHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

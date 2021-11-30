@@ -14,10 +14,7 @@ class cItemLeavesHandler final :
 
 public:
 
-	constexpr cItemLeavesHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

@@ -17,10 +17,7 @@ class cItemPaintingHandler final:
 
 public:
 
-	constexpr cItemPaintingHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

@@ -19,10 +19,7 @@ class cItemBannerHandler final:
 
 public:
 
-	constexpr cItemBannerHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 private:
 

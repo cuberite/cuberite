@@ -18,10 +18,7 @@ public:
 
 	using Super::Super;
 
-	constexpr cItemSpawnEggHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

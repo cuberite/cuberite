@@ -16,10 +16,7 @@ class cItemEmptyMapHandler final:
 
 public:
 
-	constexpr cItemEmptyMapHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

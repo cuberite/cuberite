@@ -197,7 +197,7 @@ bool cItem::DamageItem(short a_Amount)
 
 bool cItem::IsFullStack(void) const
 {
-	return (m_ItemCount >= cItemHandler::For(m_ItemType).GetMaxStackSize());
+	return (m_ItemCount >= GetMaxStackSize());
 }
 
 

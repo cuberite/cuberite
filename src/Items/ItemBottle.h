@@ -16,10 +16,7 @@ class cItemBottleHandler final:
 
 public:
 
-	constexpr cItemBottleHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

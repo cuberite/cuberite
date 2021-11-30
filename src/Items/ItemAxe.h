@@ -15,10 +15,7 @@ class cItemAxeHandler final :
 
 public:
 
-	constexpr cItemAxeHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

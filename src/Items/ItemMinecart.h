@@ -12,10 +12,7 @@ class cItemMinecartHandler final:
 
 public:
 
-	constexpr cItemMinecartHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

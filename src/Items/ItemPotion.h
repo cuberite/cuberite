@@ -11,10 +11,7 @@ class cItemPotionHandler final:
 
 public:
 
-	constexpr cItemPotionHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

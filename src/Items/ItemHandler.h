@@ -22,6 +22,8 @@ class cItemHandler
 {
 public:
 
+	friend class cItem;
+
 	/** Actions that may cause durability of an item may be lost, where the
 	magnitude of the loss depends on the specific item used to perform the
 	action */
@@ -131,11 +133,10 @@ public:
 	Defaults to 1 unless overriden. */
 	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) const;
 
-	static const cItemHandler & For(int a_ItemType);
-	static const cItemHandler & For(const cItem & a_Item) { return For(a_Item.m_ItemType); }
-
 
 protected:
+
+	static const cItemHandler & For(int a_ItemType);
 
 	~cItemHandler() = default;
 

@@ -16,10 +16,7 @@ class cItemLighterHandler final:
 
 public:
 
-	constexpr cItemLighterHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

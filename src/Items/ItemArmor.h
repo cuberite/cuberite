@@ -15,10 +15,7 @@ class cItemArmorHandler final :
 
 public:
 
-	constexpr cItemArmorHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

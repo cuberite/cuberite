@@ -1164,7 +1164,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 		case DIG_STATUS_SHOOT_EAT:
 		{
-			auto & ItemHandler = cItemHandler::For(m_Player->GetEquippedItem());
+			auto & ItemHandler = m_Player->GetEquippedItem().GetHandler();
 			if (ItemHandler.IsFood() || ItemHandler.IsDrinkable(m_Player->GetEquippedItem().m_ItemDamage))
 			{
 				m_Player->AbortEating();
@@ -1180,7 +1180,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 				// When bow is in off-hand / shield slot
 				if (m_Player->GetInventory().GetShieldSlot().m_ItemType == E_ITEM_BOW)
 				{
-					cItemHandler::For(m_Player->GetInventory().GetShieldSlot()).OnItemShoot(m_Player, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
+					m_Player->GetInventory().GetShieldSlot().GetHandler().OnItemShoot(m_Player, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
 				}
 				else
 				{
@@ -1322,7 +1322,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	cBlockHandler::For(DiggingBlock).OnDigging(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ});
 
-	cItemHandler::For(m_Player->GetEquippedItem()).OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
+	m_Player->GetEquippedItem().GetHandler().OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
 }
 
 
@@ -1454,7 +1454,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
 	a_UsedMainHand = true;
 	const cItem & HeldItem = a_UsedMainHand ? m_Player->GetEquippedItem() : m_Player->GetInventory().GetShieldSlot();
-	auto & ItemHandler = cItemHandler::For(HeldItem.m_ItemType);
+	auto & ItemHandler = HeldItem.GetHandler();
 
 	// TODO: This distance should be calculated from the point that the cursor pointing at, instead of the center of the block
 	// Distance from the block's center to the player's eye height
@@ -1856,7 +1856,7 @@ void cClientHandle::HandleUseItem(bool a_UsedMainHand)
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
 	a_UsedMainHand = true;
 	const cItem & HeldItem = a_UsedMainHand ? m_Player->GetEquippedItem() : m_Player->GetInventory().GetShieldSlot();
-	auto & ItemHandler = cItemHandler::For(HeldItem.m_ItemType);
+	auto & ItemHandler = HeldItem.GetHandler();
 	cWorld * World = m_Player->GetWorld();
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 

@@ -16,10 +16,7 @@ class cItemItemFrameHandler final:
 
 public:
 
-	constexpr cItemItemFrameHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

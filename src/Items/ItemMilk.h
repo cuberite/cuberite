@@ -12,10 +12,7 @@ class cItemMilkHandler final:
 
 public:
 
-	constexpr cItemMilkHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 	virtual bool IsDrinkable(short a_ItemDamage) const override
 	{

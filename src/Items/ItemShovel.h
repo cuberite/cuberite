@@ -19,10 +19,7 @@ class cItemShovelHandler final:
 
 public:
 
-	constexpr cItemShovelHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

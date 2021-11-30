@@ -14,10 +14,7 @@ class cItemRedstoneDustHandler final:
 
 public:
 
-	constexpr cItemRedstoneDustHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

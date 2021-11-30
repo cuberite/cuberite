@@ -16,10 +16,7 @@ class cItemDyeHandler final :
 	using Super = cItemHandler;
 
 public:
-	constexpr cItemDyeHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

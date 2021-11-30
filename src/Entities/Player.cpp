@@ -525,7 +525,7 @@ void cPlayer::FinishEating(void)
 	// consume the item:
 	cItem Item(GetEquippedItem());
 	Item.m_ItemCount = 1;
-	auto & ItemHandler = cItemHandler::For(Item.m_ItemType);
+	auto & ItemHandler = Item.GetHandler();
 	if (!ItemHandler.EatItem(this, &Item))
 	{
 		return;
@@ -2035,7 +2035,7 @@ void cPlayer::UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action)
 	cItem Item = GetEquippedItem();
 
 	// Get base damage for action type:
-	short Dmg = cItemHandler::For(Item).GetDurabilityLossByAction(a_Action);
+	short Dmg = Item.GetHandler().GetDurabilityLossByAction(a_Action);
 
 	UseEquippedItem(Dmg);
 }

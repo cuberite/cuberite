@@ -15,10 +15,7 @@ class cItemBoatHandler final:
 
 public:
 
-	constexpr cItemBoatHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 

@@ -15,11 +15,7 @@ class cItemSwordHandler final :
 
 public:
 
-	constexpr cItemSwordHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
-
+	using Super::Super;
 
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) const override
 	{
