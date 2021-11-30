@@ -18,12 +18,6 @@ public:
 
 	using Super::Super;
 
-	using Super::Super;
-
-
-
-
-
 	virtual bool OnItemUse(
 		cWorld * a_World,
 		cPlayer * a_Player,
