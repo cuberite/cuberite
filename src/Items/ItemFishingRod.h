@@ -49,17 +49,14 @@ protected:
 
 
 
-class cItemFishingRodHandler:
+class cItemFishingRodHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemFishingRodHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 
@@ -72,7 +69,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
@@ -108,7 +105,7 @@ public:
 
 
 	/** Reels back the fishing line, reeling any attached mob, or creating fished loot, or just breaking the fishing rod. */
-	void ReelIn(cWorld & a_World, cPlayer & a_Player)
+	void ReelIn(cWorld & a_World, cPlayer & a_Player) const
 	{
 		cFloaterCallback FloaterInfo;
 		a_World.DoWithEntityByID(a_Player.GetFloaterID(), FloaterInfo);
@@ -140,7 +137,7 @@ public:
 
 
 	/** Reels back the entity, specified by the ID, and damages the fishing rod accordingly. */
-	void ReelInEntity(cWorld & a_World, cPlayer & a_Player, UInt32 a_EntityID)
+	void ReelInEntity(cWorld & a_World, cPlayer & a_Player, UInt32 a_EntityID) const
 	{
 		auto PlayerPos = a_Player.GetPosition();
 		a_World.DoWithEntityByID(a_EntityID, [=](cEntity & a_Entity)
@@ -157,7 +154,7 @@ public:
 
 
 
-	void ReelInLoot(cWorld & a_World, cPlayer & a_Player, const Vector3d a_FloaterBitePos)
+	void ReelInLoot(cWorld & a_World, cPlayer & a_Player, const Vector3d a_FloaterBitePos) const
 	{
 		auto LotSLevel = std::min(a_Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLuckOfTheSea), 3u);
 

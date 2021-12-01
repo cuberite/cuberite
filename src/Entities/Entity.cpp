@@ -406,7 +406,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		cPlayer * Player = static_cast<cPlayer *>(a_TDI.Attacker);
 
-		Player->GetEquippedItem().GetHandler()->OnEntityAttack(Player, this);
+		Player->GetEquippedItem().GetHandler().OnEntityAttack(Player, this);
 
 		// Whether an enchantment boosted this attack's damage.
 		bool MagicalCriticalHit = false;

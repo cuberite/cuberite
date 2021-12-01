@@ -7,19 +7,19 @@
 
 
 
-class cItemGoldenAppleHandler:
+class cItemGoldenAppleHandler final:
 	public cItemFoodHandler
 {
 	using Super = cItemFoodHandler;
 
 public:
 
-	cItemGoldenAppleHandler():
-		Super(E_ITEM_GOLDEN_APPLE, FoodInfo(4, 9.6))
+	constexpr cItemGoldenAppleHandler(int a_ItemType):
+		Super(a_ItemType, FoodInfo(4, 9.6))
 	{
 	}
 
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
 	{
 		cItemHandler::EatItem(a_Player, a_Item);
 

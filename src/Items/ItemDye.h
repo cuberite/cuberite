@@ -10,16 +10,13 @@
 
 
 
-class cItemDyeHandler :
+class cItemDyeHandler final :
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
-	cItemDyeHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 
@@ -32,7 +29,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		if ((a_HeldItem.m_ItemDamage == E_META_DYE_WHITE) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
 		{

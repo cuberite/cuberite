@@ -11,7 +11,7 @@
 /** Handler for blocks that have 3 orientations (hay bale, log), specified by the upper 2 bits in meta.
 Handles setting the correct orientation on placement.
 Additionally supports the metadata specifying block sub-type in its lower 2 bits. */
-class cItemSidewaysHandler :
+class cItemSidewaysHandler final :
 	public cItemHandler
 {
 	using Super = cItemHandler;
@@ -46,7 +46,7 @@ private:
 	}
 
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		return a_Player.PlaceBlock(a_PlacePosition, static_cast<BLOCKTYPE>(a_HeldItem.m_ItemType), BlockFaceToMetaData(a_ClickedBlockFace, static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage)));
 	}

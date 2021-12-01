@@ -8,15 +8,15 @@
 
 
 
-class cItemEyeOfEnderHandler:
+class cItemEyeOfEnderHandler final:
 	public cItemThrowableHandler
 {
 	using Super = cItemThrowableHandler;
 
 public:
 
-	cItemEyeOfEnderHandler():
-		Super(E_ITEM_EYE_OF_ENDER, cProjectileEntity::pkSnowball, 30)
+	constexpr cItemEyeOfEnderHandler(int a_ItemType):
+		Super(a_ItemType, cProjectileEntity::pkSnowball, 30)
 	{
 	}
 
@@ -28,7 +28,7 @@ public:
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		// Try to fill an End Portal Frame block:
 		if (a_ClickedBlockFace != BLOCK_FACE_NONE)
