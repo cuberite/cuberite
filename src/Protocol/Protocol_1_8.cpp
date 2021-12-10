@@ -366,7 +366,7 @@ void cProtocol_1_8_0::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type
 	ASSERT(m_State == 3);  // In game mode?
 
 	// Prevent chat messages that might trigger CVE-2021-44228
-	if (a_MessageRaw.find("${jndi") != std::string::npos)
+	if (a_MessageRaw.find("${") != std::string::npos)
 	{
 		return;
 	}
