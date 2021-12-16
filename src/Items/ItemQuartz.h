@@ -7,7 +7,7 @@
 
 
 
-class cItemQuartzHandler :
+class cItemQuartzHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;

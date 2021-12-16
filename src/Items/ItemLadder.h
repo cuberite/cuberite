@@ -8,7 +8,7 @@
 
 
 
-class cItemLadderHandler :
+class cItemLadderHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;

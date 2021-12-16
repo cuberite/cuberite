@@ -632,19 +632,19 @@ bool cPluginLua::OnPlayerFoodLevelChange(cPlayer & a_Player, int a_NewFoodLevel)
 
 
 
-bool cPluginLua::OnPlayerFished(cPlayer & a_Player, const cItems & a_Reward)
+bool cPluginLua::OnPlayerFished(cPlayer & a_Player, const cItems & a_Reward, const int ExperienceAmount)
 {
 	cItems reward(a_Reward);
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_FISHED, &a_Player, &reward);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_FISHED, &a_Player, &reward, ExperienceAmount);
 }
 
 
 
 
 
-bool cPluginLua::OnPlayerFishing(cPlayer & a_Player, cItems & a_Reward)
+bool cPluginLua::OnPlayerFishing(cPlayer & a_Player, cItems & a_Reward, int & ExperienceAmount)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_FISHING, &a_Player, &a_Reward);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_FISHING, &a_Player, &a_Reward, &ExperienceAmount);
 }
 
 

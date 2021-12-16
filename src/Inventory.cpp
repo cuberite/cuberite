@@ -78,7 +78,7 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int
 	}
 
 	char NumLeft = a_ItemStack.m_ItemCount;
-	int MaxStack = ItemHandler(a_ItemStack.m_ItemType)->GetMaxStackSize();
+	int MaxStack = a_ItemStack.GetMaxStackSize();
 	for (int i = a_BeginSlotNum; i <= a_EndSlotNum; i++)
 	{
 		const cItem & Slot = GetSlot(i);
@@ -260,8 +260,7 @@ int cInventory::ReplaceOneEquippedItem(const cItem & a_Item, bool a_TryOtherSlot
 	cItem ItemsToAdd = a_Item;
 	if (EquippedItem.IsEqual(ItemsToAdd))
 	{
-		cItemHandler Handler(ItemsToAdd.m_ItemType);
-		auto AmountToAdd = std::min(static_cast<char>(Handler.GetMaxStackSize() - EquippedItem.m_ItemCount), ItemsToAdd.m_ItemCount);
+		auto AmountToAdd = std::min(static_cast<char>(ItemsToAdd.GetMaxStackSize() - EquippedItem.m_ItemCount), ItemsToAdd.m_ItemCount);
 
 		EquippedItem.m_ItemCount += AmountToAdd;
 		SetEquippedItem(EquippedItem);
@@ -689,7 +688,7 @@ void cInventory::UpdateItems(void)
 	const cItem & Slot = GetEquippedItem();
 	if (!Slot.IsEmpty())
 	{
-		ItemHandler(Slot.m_ItemType)->OnUpdate(m_Owner.GetWorld(), &m_Owner, Slot);
+		Slot.GetHandler().OnUpdate(m_Owner.GetWorld(), &m_Owner, Slot);
 	}
 }
 

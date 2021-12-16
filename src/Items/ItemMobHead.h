@@ -9,23 +9,20 @@
 
 
 
-class cItemMobHeadHandler:
+class cItemMobHeadHandler final :
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemMobHeadHandler(Item a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 
 
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		using namespace Block;
 
@@ -171,7 +168,7 @@ public:
 
 	/** Called after placing a regular head block with no mob spawning.
 	Adjusts the mob head entity based on the equipped item's data. */
-	void RegularHeadPlaced(const cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace)
+	void RegularHeadPlaced(const cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace) const
 	{
 		const auto HeadType = static_cast<eMobHeadType>(a_HeldItem.m_ItemDamage);
 
@@ -216,7 +213,7 @@ public:
 
 	/** Spawns a wither if the wither skull placed at the specified coords completes wither's spawning formula.
 	Returns true if the wither was created. */
-	bool TrySpawnWitherAround(cPlayer & a_Player, const Vector3i a_BlockPos)
+	bool TrySpawnWitherAround(cPlayer & a_Player, const Vector3i a_BlockPos) const
 	{
 		// No wither can be created at Y < 2 - not enough space for the formula:
 		if (a_BlockPos.y < 2)
@@ -368,7 +365,7 @@ public:
 
 
 	/** Awards the achievement to all players close to the specified point. */
-	void AwardSpawnWitherAchievement(cWorld * a_World, Vector3i a_BlockPos)
+	void AwardSpawnWitherAchievement(cWorld & a_World, Vector3i a_BlockPos) const
 	{
 		Vector3f Pos(a_BlockPos);
 		a_World->ForEachPlayer([=](cPlayer & a_Player)

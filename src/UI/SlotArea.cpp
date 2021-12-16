@@ -140,8 +140,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 			else if ((Slot.m_ItemType == Item::Air) || DraggingItem.IsEqual(Slot))
 			{
 				// Drop one item in slot
-				cItemHandler * Handler = ItemHandler(Slot.m_ItemType);
-				if ((DraggingItem.m_ItemCount > 0) && (Slot.m_ItemCount < Handler->GetMaxStackSize()))
+				if ((DraggingItem.m_ItemCount > 0) && (Slot.m_ItemCount < Slot.GetMaxStackSize()))
 				{
 					char OldSlotCount = Slot.m_ItemCount;
 
@@ -179,8 +178,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 			else
 			{
 				// Same type, add items:
-				cItemHandler * Handler = ItemHandler(DraggingItem.m_ItemType);
-				int FreeSlots = Handler->GetMaxStackSize() - Slot.m_ItemCount;
+				int FreeSlots = DraggingItem.GetMaxStackSize() - Slot.m_ItemCount;
 				if (FreeSlots < 0)
 				{
 					ASSERT(!"Bad item stack size - where did we get more items in a slot than allowed?");
@@ -367,7 +365,7 @@ void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_
 			// Different items
 			continue;
 		}
-		char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+		char NumFit = Slot->GetMaxStackSize() - Slot->m_ItemCount;
 		if (NumFit <= 0)
 		{
 			// Full stack already
@@ -638,8 +636,7 @@ void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 	}
 	else if (DraggingItem.IsEqual(Result))
 	{
-		cItemHandler * Handler = ItemHandler(Result.m_ItemType);
-		if (DraggingItem.m_ItemCount + Result.m_ItemCount <= Handler->GetMaxStackSize())
+		if (DraggingItem.m_ItemCount + Result.m_ItemCount <= Result.GetMaxStackSize())
 		{
 			DraggingItem.m_ItemCount += Result.m_ItemCount;
 			Recipe.ConsumeIngredients(Grid);
@@ -933,7 +930,7 @@ void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 	}
 	if (!DraggingItem.IsEmpty())
 	{
-		if (!(DraggingItem.IsEqual(Slot) && ((DraggingItem.m_ItemCount + Slot.m_ItemCount) <= cItemHandler::GetItemHandler(Slot)->GetMaxStackSize())))
+		if (!(DraggingItem.IsEqual(Slot) && ((DraggingItem.m_ItemCount + Slot.m_ItemCount) <= Slot.GetMaxStackSize())))
 		{
 			return;
 		}
@@ -1009,7 +1006,7 @@ void cSlotAreaAnvil::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bo
 			// Different items
 			continue;
 		}
-		char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+		char NumFit = Slot->GetMaxStackSize() - Slot->m_ItemCount;
 		if (NumFit <= 0)
 		{
 			// Full stack already
@@ -1165,7 +1162,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		RepairCost += Sacrifice.m_RepairCost;
 
 		// Can we repair with sacrifce material?
-		if (Target.IsDamageable() && cItemHandler::GetItemHandler(Target)->CanRepairWithRawMaterial(Sacrifice.m_ItemType))
+		if (Target.IsDamageable() && Target.GetHandler().CanRepairWithRawMaterial(Sacrifice.m_ItemType))
 		{
 			// Tool and armor repair with special item (iron / gold / diamond / ...)
 			char DamageDiff = static_cast<char>(std::min(static_cast<int>(Target.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4));
@@ -1629,7 +1626,7 @@ void cSlotAreaEnchanting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Playe
 	{
 		// It's lapis, put it in the lapis spot.
 		const cItem * Slot = GetSlot(1, a_Player);
-		char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+		char NumFit = Slot->GetMaxStackSize() - Slot->m_ItemCount;
 		if (NumFit <= 0)
 		{
 			// Full stack already
@@ -2045,7 +2042,7 @@ void cSlotAreaFurnace::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, 
 		return;
 	}
 
-	char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+	char NumFit = Slot->GetMaxStackSize() - Slot->m_ItemCount;
 	if (NumFit <= 0)
 	{
 		// Full stack already
@@ -2309,7 +2306,7 @@ void cSlotAreaBrewingstand::DistributeStack(cItem & a_ItemStack, cPlayer & a_Pla
 		return;
 	}
 
-	char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+	char NumFit = Slot->GetMaxStackSize() - Slot->m_ItemCount;
 	if (NumFit <= 0)
 	{
 		// Full stack already

@@ -10,17 +10,14 @@
 
 
 
-class cItemPaintingHandler:
+class cItemPaintingHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemPaintingHandler(Item a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 
@@ -33,7 +30,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		// Paintings can't be flatly placed:
 		if (

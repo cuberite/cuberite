@@ -8,15 +8,15 @@
 
 
 
-class cItemEyeOfEnderHandler:
+class cItemEyeOfEnderHandler final:
 	public cItemThrowableHandler
 {
 	using Super = cItemThrowableHandler;
 
 public:
 
-	cItemEyeOfEnderHandler():
-		Super(Item::EnderEye, cProjectileEntity::pkSnowball, 30)
+	constexpr cItemEyeOfEnderHandler(Item a_ItemType):
+		Super(a_ItemType, cProjectileEntity::pkSnowball, 30)
 	{
 	}
 
@@ -28,7 +28,7 @@ public:
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		using namespace Block;
 

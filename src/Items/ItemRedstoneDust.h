@@ -7,23 +7,20 @@
 
 
 
-class cItemRedstoneDustHandler:
+class cItemRedstoneDustHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemRedstoneDustHandler(Item a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 
 
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		return a_Player.PlaceBlock(a_PlacePosition, Block::RedstoneWire::RedstoneWire());
 	}
@@ -32,7 +29,7 @@ public:
 
 
 
-	virtual bool IsPlaceable(void) override
+	virtual bool IsPlaceable(void) const override
 	{
 		return true;
 	}

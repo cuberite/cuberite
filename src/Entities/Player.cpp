@@ -529,12 +529,12 @@ void cPlayer::FinishEating(void)
 	// consume the item:
 	cItem Item(GetEquippedItem());
 	Item.m_ItemCount = 1;
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Item.m_ItemType);
-	if (!ItemHandler->EatItem(this, &Item))
+	auto & ItemHandler = Item.GetHandler();
+	if (!ItemHandler.EatItem(this, &Item))
 	{
 		return;
 	}
-	ItemHandler->OnFoodEaten(m_World, this, &Item);
+	ItemHandler.OnFoodEaten(m_World, this, &Item);
 }
 
 
@@ -2039,7 +2039,7 @@ void cPlayer::UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action)
 	cItem Item = GetEquippedItem();
 
 	// Get base damage for action type:
-	short Dmg = cItemHandler::GetItemHandler(Item)->GetDurabilityLossByAction(a_Action);
+	short Dmg = Item.GetHandler().GetDurabilityLossByAction(a_Action);
 
 	UseEquippedItem(Dmg);
 }
@@ -2615,10 +2615,10 @@ float cPlayer::GetDigSpeed(BlockState a_Block)
 	// Based on: https://minecraft.gamepedia.com/Breaking#Speed
 
 	// Get the base speed multiplier of the equipped tool for the mined block
-	float MiningSpeed = GetEquippedItem().GetHandler()->GetBlockBreakingStrength(a_Block);
+	float MiningSpeed = GetEquippedItem().GetHandler().GetBlockBreakingStrength(a_Block);
 
 	// If we can harvest the block then we can apply material and enchantment bonuses
-	if (GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block))
+	if (GetEquippedItem().GetHandler().CanHarvestBlock(a_Block))
 	{
 		if (MiningSpeed > 1.0f)  // If the base multiplier for this block is greater than 1, now we can check enchantments
 		{
@@ -2685,7 +2685,7 @@ float cPlayer::GetMiningProgressPerTick(BlockState a_Block)
 		return 1;
 	}
 
-	const bool CanHarvest = GetEquippedItem().GetHandler()->CanHarvestBlock(a_Block);
+	const bool CanHarvest = GetEquippedItem().GetHandler().CanHarvestBlock(a_Block);
 	const float BlockHardness = cBlockInfo::GetHardness(a_Block) * (CanHarvest ? 1.5f : 5.0f);
 	ASSERT(BlockHardness > 0);  // Can't divide by 0 or less, IsOneHitDig should have returned true
 

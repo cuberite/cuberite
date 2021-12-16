@@ -775,11 +775,11 @@ bool cPluginManager::CallHookPlayerFoodLevelChange(cPlayer & a_Player, int a_New
 
 
 
-bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems & a_Reward)
+bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems & a_Reward, const int ExperienceAmount)
 {
 	return GenericCallHook(HOOK_PLAYER_FISHED, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerFished(a_Player, a_Reward);
+			return a_Plugin->OnPlayerFished(a_Player, a_Reward, ExperienceAmount);
 		}
 	);
 }
@@ -788,11 +788,11 @@ bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems & a_R
 
 
 
-bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems a_Reward)
+bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems & a_Reward, int & ExperienceAmount)
 {
 	return GenericCallHook(HOOK_PLAYER_FISHING, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerFishing(a_Player, a_Reward);
+			return a_Plugin->OnPlayerFishing(a_Player, a_Reward, ExperienceAmount);
 		}
 	);
 }

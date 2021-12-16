@@ -988,7 +988,7 @@ cItems cChunk::PickupsFromBlock(Vector3i a_RelPos, const cEntity * a_Digger, con
 	cItems Pickups;
 	const auto BlockEntity = GetBlockEntityRel(a_RelPos);
 
-	if ((a_Tool == nullptr) || a_Tool->GetHandler()->CanHarvestBlock(BlockToDestroy.Type()))
+	if ((a_Tool == nullptr) || a_Tool->GetHandler().CanHarvestBlock(BlockToDestroy.Type()))
 	{
 		Pickups = cBlockHandler::For(BlockToDestroy.Type()).ConvertToPickups(BlockToDestroy, a_Tool);
 
