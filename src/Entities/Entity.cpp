@@ -551,29 +551,34 @@ int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 	// Ref: https://minecraft.gamepedia.com/Damage#Dealing_damage as of 2012_12_20
 	switch (this->GetEquippedWeapon().m_ItemType)
 	{
-		case E_ITEM_WOODEN_SWORD:    return 4;
-		case E_ITEM_GOLD_SWORD:      return 4;
-		case E_ITEM_STONE_SWORD:     return 5;
-		case E_ITEM_IRON_SWORD:      return 6;
-		case E_ITEM_DIAMOND_SWORD:   return 7;
+		case Item::WoodenSword:    return 4;
+		case Item::GoldenSword:    return 4;
+		case Item::StoneSword:     return 5;
+		case Item::IronSword:      return 6;
+		case Item::DiamondSword:   return 7;
 
-		case E_ITEM_WOODEN_AXE:      return 3;
-		case E_ITEM_GOLD_AXE:        return 3;
-		case E_ITEM_STONE_AXE:       return 4;
-		case E_ITEM_IRON_AXE:        return 5;
-		case E_ITEM_DIAMOND_AXE:     return 6;
+		case Item::WoodenAxe:      return 3;
+		case Item::GoldenAxe:      return 3;
+		case Item::StoneAxe:       return 4;
+		case Item::IronAxe:        return 5;
+		case Item::DiamondAxe:     return 6;
 
-		case E_ITEM_WOODEN_PICKAXE:  return 2;
-		case E_ITEM_GOLD_PICKAXE:    return 2;
-		case E_ITEM_STONE_PICKAXE:   return 3;
-		case E_ITEM_IRON_PICKAXE:    return 4;
-		case E_ITEM_DIAMOND_PICKAXE: return 5;
+		case Item::WoodenPickaxe:  return 2;
+		case Item::GoldenPickaxe:  return 2;
+		case Item::StonePickaxe:   return 3;
+		case Item::IronPickaxe:    return 4;
+		case Item::DiamondPickaxe: return 5;
 
-		case E_ITEM_WOODEN_SHOVEL:   return 1;
-		case E_ITEM_GOLD_SHOVEL:     return 1;
-		case E_ITEM_STONE_SHOVEL:    return 2;
-		case E_ITEM_IRON_SHOVEL:     return 3;
-		case E_ITEM_DIAMOND_SHOVEL:  return 4;
+		case Item::WoodenShovel:   return 1;
+		case Item::GoldenShovel:   return 1;
+		case Item::StoneShovel:    return 2;
+		case Item::IronShovel:     return 3;
+		case Item::DiamondShovel:  return 4;
+		default:
+		{
+			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, GetEquippedWeapon().m_ItemType);
+			return 1;
+		}
 	}
 	// All other equipped items give a damage of 1:
 	return 1;
@@ -716,35 +721,55 @@ float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Da
 	int Toughness = 0;
 	switch (GetEquippedHelmet().m_ItemType)
 	{
-		case E_ITEM_LEATHER_CAP:    ArmorValue += 1; break;
-		case E_ITEM_GOLD_HELMET:    ArmorValue += 2; break;
-		case E_ITEM_CHAIN_HELMET:   ArmorValue += 2; break;
-		case E_ITEM_IRON_HELMET:    ArmorValue += 2; break;
-		case E_ITEM_DIAMOND_HELMET: ArmorValue += 3; Toughness += 2; break;
+		case Item::LeatherHelmet:   ArmorValue += 1; break;
+		case Item::GoldenHelmet:    ArmorValue += 2; break;
+		case Item::ChainmailHelmet: ArmorValue += 2; break;
+		case Item::IronHelmet:      ArmorValue += 2; break;
+		case Item::DiamondHelmet:   ArmorValue += 3; Toughness += 2; break;
+		default:
+		{
+			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, GetEquippedHelmet().m_ItemType);
+			break;
+		}
 	}
 	switch (GetEquippedChestplate().m_ItemType)
 	{
-		case E_ITEM_LEATHER_TUNIC:      ArmorValue += 3; break;
-		case E_ITEM_GOLD_CHESTPLATE:    ArmorValue += 5; break;
-		case E_ITEM_CHAIN_CHESTPLATE:   ArmorValue += 5; break;
-		case E_ITEM_IRON_CHESTPLATE:    ArmorValue += 6; break;
-		case E_ITEM_DIAMOND_CHESTPLATE: ArmorValue += 8; Toughness += 2; break;
+		case Item::LeatherChestplate:   ArmorValue += 3; break;
+		case Item::GoldenChestplate:    ArmorValue += 5; break;
+		case Item::ChainmailChestplate: ArmorValue += 5; break;
+		case Item::IronChestplate:      ArmorValue += 6; break;
+		case Item::DiamondChestplate:   ArmorValue += 8; Toughness += 2; break;
+		default:
+		{
+			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, GetEquippedChestplate().m_ItemType);
+			break;
+		}
 	}
 	switch (GetEquippedLeggings().m_ItemType)
 	{
-		case E_ITEM_LEATHER_PANTS:    ArmorValue += 2; break;
-		case E_ITEM_GOLD_LEGGINGS:    ArmorValue += 3; break;
-		case E_ITEM_CHAIN_LEGGINGS:   ArmorValue += 4; break;
-		case E_ITEM_IRON_LEGGINGS:    ArmorValue += 5; break;
-		case E_ITEM_DIAMOND_LEGGINGS: ArmorValue += 6; Toughness += 2; break;
+		case Item::LeatherLeggings:   ArmorValue += 2; break;
+		case Item::GoldenLeggings:    ArmorValue += 3; break;
+		case Item::ChainmailLeggings: ArmorValue += 4; break;
+		case Item::IronLeggings:      ArmorValue += 5; break;
+		case Item::DiamondLeggings:   ArmorValue += 6; Toughness += 2; break;
+		default:
+		{
+			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, GetEquippedLeggings().m_ItemType);
+			break;
+		}
 	}
 	switch (GetEquippedBoots().m_ItemType)
 	{
-		case E_ITEM_LEATHER_BOOTS: ArmorValue += 1; break;
-		case E_ITEM_GOLD_BOOTS:    ArmorValue += 1; break;
-		case E_ITEM_CHAIN_BOOTS:   ArmorValue += 1; break;
-		case E_ITEM_IRON_BOOTS:    ArmorValue += 2; break;
-		case E_ITEM_DIAMOND_BOOTS: ArmorValue += 3; Toughness += 2; break;
+		case Item::LeatherBoots:   ArmorValue += 1; break;
+		case Item::GoldenBoots:    ArmorValue += 1; break;
+		case Item::ChainmailBoots: ArmorValue += 1; break;
+		case Item::IronBoots:      ArmorValue += 2; break;
+		case Item::DiamondBoots:   ArmorValue += 3; Toughness += 2; break;
+		default:
+		{
+			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, GetEquippedBoots().m_ItemType);
+			break;
+		}
 	}
 
 	// TODO: Special armor cases, such as wool, saddles, dog's collar

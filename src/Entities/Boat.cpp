@@ -254,15 +254,16 @@ cBoat::eMaterial cBoat::ItemToMaterial(const cItem & a_Item)
 {
 	switch (a_Item.m_ItemType)
 	{
-		case E_ITEM_BOAT:          return bmOak;
-		case E_ITEM_SPRUCE_BOAT:   return bmSpruce;
-		case E_ITEM_BIRCH_BOAT:    return bmBirch;
-		case E_ITEM_JUNGLE_BOAT:   return bmJungle;
-		case E_ITEM_ACACIA_BOAT:   return bmAcacia;
-		case E_ITEM_DARK_OAK_BOAT: return bmDarkOak;
+
+		case Item::AcaciaBoat:  return bmAcacia;
+		case Item::BirchBoat:   return bmBirch;
+		case Item::DarkOakBoat: return bmDarkOak;
+		case Item::JungleBoat:  return bmJungle;
+		case Item::OakBoat:     return bmOak;
+		case Item::SpruceBoat:  return bmSpruce;
 		default:
 		{
-			LOGWARNING("%s: Item type not handled %d.", __FUNCTION__, a_Item.m_ItemType);
+			LOGWARNING("{}: Item type not handled {}.", __FUNCTION__, a_Item.m_ItemType);
 			return cBoat::bmOak;
 		}
 	}
