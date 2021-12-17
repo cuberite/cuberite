@@ -36,7 +36,7 @@ private:
 	break;\
 }
 
-	BlockState GetBlockFromPlacement(BlockType a_Type, eBlockFace a_ClickedBlockFace)
+	BlockState GetBlockFromPlacement(BlockType a_Type, eBlockFace a_ClickedBlockFace) const
 	{
 		using namespace Block;
 

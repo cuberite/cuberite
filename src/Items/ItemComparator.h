@@ -15,14 +15,7 @@ class cItemComparatorHandler final:
 
 public:
 
-	cItemComparatorHandler(Item a_ItemType):
-		cItemHandler(a_ItemType)
-	{
-	}
-
-
-
-
+	using Super::Super;
 
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{

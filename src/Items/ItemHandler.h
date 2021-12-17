@@ -127,7 +127,7 @@ public:
 
 	/** Returns whether this tool / item can harvest a specific block (e.g. iron pickaxe can harvest diamond ore, but wooden one can't).
 	Defaults to false unless overridden. */
-	virtual bool CanHarvestBlock(BlockState a_Block);
+	virtual bool CanHarvestBlock(BlockState a_Block) const;
 
 	/** Returns the strength to break a specific block.
 	Defaults to 1 unless overriden. */
@@ -136,7 +136,7 @@ public:
 
 protected:
 
-	static const cItemHandler & For(int a_ItemType);
+	static const cItemHandler & For(Item a_ItemType);
 
 	~cItemHandler() = default;
 

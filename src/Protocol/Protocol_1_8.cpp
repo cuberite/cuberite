@@ -3076,7 +3076,7 @@ bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_
 	}
 
 	a_Item.m_ItemType = PaletteUpgrade::FromItem(ItemType, ItemDamage);
-	if (a_Item.GetHandler()->IsTool())
+	if (ItemCategory::IsTool(a_Item.m_ItemType))
 	{
 		a_Item.m_ItemDamage += ItemDamage;
 	}

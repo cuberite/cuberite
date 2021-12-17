@@ -16,7 +16,6 @@ target_sources(
 	ItemButton.h
 	ItemChest.h
 	ItemChorusFruit.h
-        ItemWool.h
 	ItemComparator.h
 	ItemCookedFish.h
 	ItemDefaultItem.h
@@ -29,6 +28,7 @@ target_sources(
 	ItemEndPortalFrame.h
 	ItemEnderchest.h
 	ItemEyeOfEnder.h
+	ItemFence.h
 	ItemFenceGate.h
 	ItemFishingRod.h
 	ItemFood.h
@@ -60,10 +60,10 @@ target_sources(
 	ItemPumpkin.h
 	ItemQuartz.h
 	ItemRail.h
-	ItemRawChicken.h
+        ItemChicken.h
 	ItemRawFish.h
 	ItemRedstoneDust.h
-        ItemRepeater.h
+	ItemRepeater.h
 	ItemRottenFlesh.h
 	ItemSeeds.h
 	ItemShears.h
@@ -81,5 +81,7 @@ target_sources(
 	ItemTrapdoor.h
 	ItemTripwireHook.h
 	ItemVine.h
+	ItemWool.h
 	SimplePlaceableItemHandler.h
+	ItemWood.h
 )

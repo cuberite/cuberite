@@ -365,7 +365,7 @@ public:
 
 
 	/** Awards the achievement to all players close to the specified point. */
-	void AwardSpawnWitherAchievement(cWorld & a_World, Vector3i a_BlockPos) const
+	void AwardSpawnWitherAchievement(cWorld * a_World, Vector3i a_BlockPos) const
 	{
 		Vector3f Pos(a_BlockPos);
 		a_World->ForEachPlayer([=](cPlayer & a_Player)
@@ -379,15 +379,6 @@ public:
 				return false;
 			}
 		);
-	}
-
-
-
-
-
-	virtual bool IsPlaceable(void) override
-	{
-		return true;
 	}
 } ;
 
