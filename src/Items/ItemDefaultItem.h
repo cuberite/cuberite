@@ -23,17 +23,20 @@ public:
 		eBlockFace a_ClickedBlockFace
 	) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 		return false;
 	}
 
 	virtual void OnItemShoot(cPlayer *, const Vector3i a_BlockPos, eBlockFace a_BlockFace) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 	}
 
 	virtual void OnUpdate(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 	}
 
@@ -43,77 +46,82 @@ public:
 			eBlockFace a_ClickedBlockFace
 	) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 		return false;
 	}
 
 	virtual void OnEntityAttack(cPlayer * a_Attacker, cEntity * a_AttackedEntity) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 	}
 
 	virtual void OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 	}
 
 	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 		return 0;
 	}
 
 	virtual FoodInfo GetFoodInfo(const cItem * a_Item) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 		return FoodInfo(0, 0);
 	}
 
-	/** Lets the player eat a selected item. Returns true if the player ate the item */
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 		return false;
 	}
 
-	/** Indicates if this item is food */
 	virtual bool IsFood(void) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 		return false;
 	}
 
-	/** Indicates if this item is drinkable */
 	virtual bool IsDrinkable(short a_ItemDamage) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 		return false;
 	}
 
-	/** Blocks simply get placed */
 	virtual bool IsPlaceable(void) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 		return false;
 	}
 
-	/** Can the anvil repair this item, when a_Item is the second input? */
 	virtual bool CanRepairWithRawMaterial(const cItem & a_Item) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 		return false;
 	}
 
-	/** Returns whether this tool / item can harvest a specific block (e.g. iron pickaxe can harvest diamond ore, but wooden one can't).
-	Defaults to false unless overridden. */
 	virtual bool CanHarvestBlock(BlockState a_Block) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 		return false;
 	}
 
 	virtual float GetBlockBreakingStrength(BlockState a_Block) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 		return 1.0f;
 	}
@@ -121,6 +129,7 @@ public:
 protected:
 	bool CommitPlacement(cPlayer & aPlayer, const cItem & aHeldItem, const Vector3i aPlacePosition, const eBlockFace aClickedBlockFace, const Vector3i aCursorPosition) const override
 	{
+		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		ASSERT(!"Unimplemented item handler called!");
 		return false;
 	}

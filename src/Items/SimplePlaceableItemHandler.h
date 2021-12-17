@@ -13,11 +13,7 @@ class cSimplePlaceableItemHandler final:
 
 public:
 
-	constexpr cSimplePlaceableItemHandler(Item a_ItemType) :
-		Super(a_ItemType)
-	{
-	}
-
+	using Super::Super;
 
 	virtual bool IsPlaceable(void) const override
 	{

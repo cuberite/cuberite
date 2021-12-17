@@ -38,7 +38,7 @@ public:
 			case Item::WaterBucket: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace, Block::Water::Water());
 			default:
 			{
-				LOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);
+				FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);
 				return 1.0f;
 			}
 		}
