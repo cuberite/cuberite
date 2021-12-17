@@ -783,7 +783,7 @@ namespace
 	constexpr cItemSlabHandler              ItemPolishedGraniteSlabHandler             (Item::PolishedGraniteSlab);
 	constexpr cItemStairsHandler            ItemPolishedGraniteStairsHandler           (Item::PolishedGraniteStairs);
 	constexpr cUnimplementedItemHandler     ItemPoppedChorusFruitHandler               (Item::PoppedChorusFruit);
-	constexpr cUnimplementedItemHandler     ItemPoppyHandler                           (Item::Poppy);
+	constexpr cSimplePlaceableItemHandler   ItemPoppyHandler                           (Item::Poppy);
 	constexpr cItemSimpleFoodHandler        ItemPorkchopHandler                        (Item::Porkchop, cItemHandler::FoodInfo(3, 1.8));
 	constexpr cItemFoodSeedsHandler         ItemPotatoHandler                          (Item::Potato, cItemHandler::FoodInfo(1, 0.6));
 	constexpr cItemPotionHandler            ItemPotionHandler                          (Item::Potion);
