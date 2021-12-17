@@ -761,6 +761,7 @@ float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Da
 		case Item::ChainmailHelmet: ArmorValue += 2; break;
 		case Item::IronHelmet:      ArmorValue += 2; break;
 		case Item::DiamondHelmet:   ArmorValue += 3; Toughness += 2; break;
+		case Item::Air:             break;
 		default:
 		{
 			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, GetEquippedHelmet().m_ItemType);
@@ -774,6 +775,7 @@ float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Da
 		case Item::ChainmailChestplate: ArmorValue += 5; break;
 		case Item::IronChestplate:      ArmorValue += 6; break;
 		case Item::DiamondChestplate:   ArmorValue += 8; Toughness += 2; break;
+		case Item::Air:                 break;
 		default:
 		{
 			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, GetEquippedChestplate().m_ItemType);
@@ -787,6 +789,7 @@ float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Da
 		case Item::ChainmailLeggings: ArmorValue += 4; break;
 		case Item::IronLeggings:      ArmorValue += 5; break;
 		case Item::DiamondLeggings:   ArmorValue += 6; Toughness += 2; break;
+		case Item::Air:               break;
 		default:
 		{
 			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, GetEquippedLeggings().m_ItemType);
@@ -800,6 +803,7 @@ float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Da
 		case Item::ChainmailBoots: ArmorValue += 1; break;
 		case Item::IronBoots:      ArmorValue += 2; break;
 		case Item::DiamondBoots:   ArmorValue += 3; Toughness += 2; break;
+		case Item::Air:            break;
 		default:
 		{
 			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, GetEquippedBoots().m_ItemType);
