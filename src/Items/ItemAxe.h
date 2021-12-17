@@ -52,7 +52,7 @@ public:
 				case Item::DiamondAxe: return 8.0f;
 				default:
 				{
-					LOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);
+					FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);
 					return 1.0f;
 				}
 			}

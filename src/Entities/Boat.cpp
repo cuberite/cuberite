@@ -263,7 +263,7 @@ cBoat::eMaterial cBoat::ItemToMaterial(const cItem & a_Item)
 		case Item::SpruceBoat:  return bmSpruce;
 		default:
 		{
-			LOGWARNING("{}: Item type not handled {}.", __FUNCTION__, a_Item.m_ItemType);
+			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, a_Item.m_ItemType);
 			return cBoat::bmOak;
 		}
 	}
