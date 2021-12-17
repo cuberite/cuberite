@@ -815,7 +815,7 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	}
 
 	a_Item.m_ItemType = PaletteUpgrade::FromItem(ItemType, ItemDamage);
-	if (a_Item.GetHandler()->IsTool())  // Can sustain damage
+	if (ItemCategory::IsTool(a_Item.m_ItemType))  // Can sustain damage
 	{
 		a_Item.m_ItemDamage = ItemDamage;
 	}
