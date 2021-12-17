@@ -1,7 +1,6 @@
-
 #pragma once
 
-class cItemLogHandler final :
+class cItemFenceHandler final :
 	public cItemHandler
 {
 	using Super = cItemHandler;

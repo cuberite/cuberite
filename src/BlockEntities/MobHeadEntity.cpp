@@ -99,7 +99,17 @@ void cMobHeadEntity::SetOwner(const cUUID & a_OwnerUUID, const AString & a_Owner
 
 cItems cMobHeadEntity::ConvertToPickups() const
 {
-	return cItem(PaletteUpgrade::FromItem(E_ITEM_HEAD, static_cast<short>(m_Type)));
+	switch (m_Type)
+	{
+		case SKULL_TYPE_SKELETON: return cItems(Item::SkeletonSkull);
+		case SKULL_TYPE_WITHER:   return cItems(Item::WitherSkeletonSkull);
+		case SKULL_TYPE_ZOMBIE:   return cItems(Item::ZombieHead);
+		case SKULL_TYPE_PLAYER:   return cItems(Item::PlayerHead);  // TODO(12xx12): Proper handling of transferring the skin to the item
+		case SKULL_TYPE_CREEPER:  return cItems(Item::CreeperHead);
+		case SKULL_TYPE_DRAGON:   return cItems(Item::DragonHead);
+	}
+	UNREACHABLE("Unhandled mob head type");
+	return cItems();
 }
 
 

@@ -45,11 +45,16 @@ public:
 		{
 			switch (m_ItemType)
 			{
-				case E_ITEM_WOODEN_AXE: return 2.0f;
-				case E_ITEM_STONE_AXE:  return 4.0f;
-				case E_ITEM_IRON_AXE:   return 6.0f;
-				case E_ITEM_GOLD_AXE:   return 12.0f;
-				case E_ITEM_DIAMOND_AXE: return 8.0f;
+				case Item::WoodenAxe:  return 2.0f;
+				case Item::StoneAxe:   return 4.0f;
+				case Item::IronAxe:    return 6.0f;
+				case Item::GoldenAxe:  return 12.0f;
+				case Item::DiamondAxe: return 8.0f;
+				default:
+				{
+					LOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);
+					return 1.0f;
+				}
 			}
 		}
 		ASSERT(!"Something is wrong here... Maybe they are axes out of a new material?");

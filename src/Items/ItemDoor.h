@@ -37,14 +37,19 @@ public:
 		BlockType BlockType;
 		switch (m_ItemType)
 		{
-			case E_ITEM_WOODEN_DOOR:   BlockType = BlockType::OakDoor;     break;
-			case E_ITEM_IRON_DOOR:     BlockType = BlockType::IronDoor;    break;
-			case E_ITEM_SPRUCE_DOOR:   BlockType = BlockType::SpruceDoor;  break;
-			case E_ITEM_BIRCH_DOOR:    BlockType = BlockType::BirchDoor;   break;
-			case E_ITEM_JUNGLE_DOOR:   BlockType = BlockType::JungleDoor;  break;
-			case E_ITEM_DARK_OAK_DOOR: BlockType = BlockType::DarkOakDoor; break;
-			case E_ITEM_ACACIA_DOOR:   BlockType = BlockType::AcaciaDoor;  break;
-			default: UNREACHABLE("Unhandled door type");
+			case Item::OakDoor:      BlockType = BlockType::OakDoor;     break;
+			case Item::IronDoor:     BlockType = BlockType::IronDoor;    break;
+			case Item::SpruceDoor:   BlockType = BlockType::SpruceDoor;  break;
+			case Item::BirchDoor:    BlockType = BlockType::BirchDoor;   break;
+			case Item::JungleDoor:   BlockType = BlockType::JungleDoor;  break;
+			case Item::DarkOakDoor:  BlockType = BlockType::DarkOakDoor; break;
+			case Item::AcaciaDoor:   BlockType = BlockType::AcaciaDoor;  break;
+			default:
+			{
+				UNREACHABLE("Unhandled door type");
+				BlockType = BlockType::Air;
+				break;
+			}
 		}
 
 		const auto & World = *a_Player.GetWorld();

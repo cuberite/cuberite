@@ -563,12 +563,6 @@ unsigned char RotationToFineFace(double a_Rotation);
 
 eBlockFace DisplacementYawToFacing(Vector3d a_Rotation, Vector3d a_EyePos, double a_Yaw);
 
-/** Returns true if the specified block type is valid (known). */
-bool IsValidBlock(int a_BlockType);
-
-/** Returns true if the specified item type is valid (known). */
-bool IsValidItem(int a_ItemType);
-
 /** Translates a dimension string to dimension enum. Takes either a number or a dimension alias (built-in). Returns dimOverworld on failure */
 extern eDimension StringToDimension(const AString & a_DimensionString);
 
