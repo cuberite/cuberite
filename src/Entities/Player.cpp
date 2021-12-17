@@ -952,7 +952,7 @@ void cPlayer::Respawn(void)
 	if (!m_IsRespawnPointForced)
 	{
 		// Check if the bed is still present:
-		if (GetRespawnWorld()->GetBlock(m_RespawnPosition) != E_BLOCK_BED)
+		if (!cBlockBedHandler::IsBlockBed(GetRespawnWorld()->GetBlock(m_RespawnPosition)))
 		{
 			const auto & DefaultWorld = *cRoot::Get()->GetDefaultWorld();
 

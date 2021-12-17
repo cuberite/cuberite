@@ -32,13 +32,13 @@ public:
 		// Get the produce block based on the seed item:
 		switch (m_ItemType)
 		{
-			case E_ITEM_BEETROOT_SEEDS: Block = Beetroots::Beetroots();     break;
-			case E_ITEM_CARROT:         Block = Carrots::Carrots();         break;
-			case E_ITEM_MELON_SEEDS:    Block = MelonStem::MelonStem();     break;
-			case E_ITEM_POTATO:         Block = Potatoes::Potatoes();       break;
-			case E_ITEM_PUMPKIN_SEEDS:  Block = PumpkinStem::PumpkinStem(); break;
-			case E_ITEM_SEEDS:          Block = Wheat::Wheat();             break;
-			default:                    UNREACHABLE("Unsupported seed type");
+			case Item::BeetrootSeeds: Block = Beetroots::Beetroots();     break;
+			case Item::Carrot:        Block = Carrots::Carrots();         break;
+			case Item::MelonSeeds:    Block = MelonStem::MelonStem();     break;
+			case Item::Potato:        Block = Potatoes::Potatoes();       break;
+			case Item::PumpkinSeeds:  Block = PumpkinStem::PumpkinStem(); break;
+			case Item::WheatSeeds:    Block = Wheat::Wheat(1);            break;
+			default:                  UNREACHABLE("Unsupported seed type");
 		}
 
 		return a_Player.PlaceBlock(a_PlacePosition, Block);

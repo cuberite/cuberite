@@ -428,7 +428,7 @@ void cPawn::HandleFalling(void)
 			{
 				const auto BlockBelow = GetWorld()->GetBlock(Below);
 
-				if (BlockBelow == E_BLOCK_HAY_BALE)
+				if (BlockBelow == BlockType::HayBale)
 				{
 					Damage = std::clamp(static_cast<int>(static_cast<float>(Damage) * 0.2), 1, 20);
 				}

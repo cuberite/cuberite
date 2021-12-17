@@ -398,7 +398,7 @@ public:
 
 				if ((a_Item.m_ItemType == Item::FireworkRocket) || (a_Item.m_ItemType == Item::FireworkStar))
 				{
-					cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, mWriter, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+					cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, mWriter, a_Item.m_ItemType);
 				}
 
 				if (!a_Item.m_Enchantments.IsEmpty())

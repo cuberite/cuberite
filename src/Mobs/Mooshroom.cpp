@@ -41,7 +41,7 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 {
 	switch (a_Player.GetEquippedItem().m_ItemType)
 	{
-		case E_ITEM_BUCKET:
+		case Item::Bucket:
 		{
 			// Milk the cow.
 			if (!a_Player.IsGameModeCreative())
@@ -49,7 +49,7 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 				a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::MilkBucket));
 			}
 		} break;
-		case E_ITEM_BOWL:
+		case Item::Bowl:
 		{
 			// Soup the cow.
 			if (!a_Player.IsGameModeCreative())
@@ -57,7 +57,7 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 				a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::MushroomStem));
 			}
 		} break;
-		case E_ITEM_SHEARS:
+		case Item::Shears:
 		{
 			if (!a_Player.IsGameModeCreative())
 			{
@@ -70,5 +70,9 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 			m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtCow, false);
 			Destroy();
 		} break;
+		default:
+		{
+			LOGWARNING("{}: Item type not handled {}.", __FUNCTION__, a_Player.GetEquippedItem().m_ItemType);
+		}
 	}
 }
