@@ -71,6 +71,7 @@ void cSlime::KilledBy(TakeDamageInfo & a_TDI)
 
 	if (m_Size != 1)
 	{
+		// Queue slimes to be spawned after death animation delay:
 		auto & Random = GetRandomProvider();
 		int SpawnAmount = Random.RandInt(2, 4);
 
@@ -79,10 +80,18 @@ void cSlime::KilledBy(TakeDamageInfo & a_TDI)
 			double AddX = (i % 2 - 0.5) * m_Size / 4.0;
 			double AddZ = (i / 2 - 0.5) * m_Size / 4.0;
 
-			auto NewSlime = std::make_unique<cSlime>(m_Size / 2);
-			NewSlime->SetPosition(GetPosX() + AddX, GetPosY() + 0.5, GetPosZ() + AddZ);
-			NewSlime->SetYaw(Random.RandReal(360.0f));
-			m_World->SpawnMobFinalize(std::move(NewSlime));
+			Vector3d SpawnPos(GetPosX() + AddX, GetPosY() + 0.5, GetPosZ() + AddZ);
+			double Yaw = Random.RandReal(360.0f);
+			int Size = m_Size/2;
+			auto lambda = [SpawnPos, Yaw, Size](cWorld &a_World)
+			{
+				auto NewSlime = std::make_unique<cSlime>(Size);
+				NewSlime->SetPosition(SpawnPos);
+				NewSlime->SetYaw(Yaw);
+				a_World.SpawnMobFinalize(std::move(NewSlime));
+			};
+			cTickTime DelayTime(20);
+			m_World->ScheduleTask(DelayTime, lambda);
 		}
 	}
 	Super::KilledBy(a_TDI);
