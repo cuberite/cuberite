@@ -47,6 +47,15 @@ public:
 		}
 	}
 
+
+
+
+
+	bool FullyOccupiesVoxel(const BlockState a_Block) const override
+	{
+		return false;
+	}
+
 private:
 
 	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
@@ -109,7 +118,7 @@ private:
 		switch (m_BlockType)
 		{
 			case BlockType::PumpkinStem: a_Chunk.SetBlock(a_Position, Block::PumpkinStem::PumpkinStem(NewAge)); break;
-			case BlockType::MelonStem:   a_Chunk.SetBlock(a_Position, Block::MelonStem::Age(NewAge)); break;
+			case BlockType::MelonStem:   a_Chunk.SetBlock(a_Position, Block::MelonStem::MelonStem(NewAge)); break;
 			default: return 0;
 		}
 		return NewAge - OldAge;
@@ -238,7 +247,5 @@ private:
 	};
 } ;
 
-using cBlockMelonStemHandler   = cBlockStemsHandler<BlockType::MelonStem,                 Item::MelonSeeds>;
-using cBlockAttachedMelonStemHandler   = cBlockStemsHandler<BlockType::AttachedMelonStem, Item::MelonSeeds>;
-using cBlockPumpkinStemHandler = cBlockStemsHandler<BlockType::PumpkinStem,         Item::PumpkinSeeds>;
-using cBlockAttachedPumpkinStemHandler = cBlockStemsHandler<BlockType::AttachedPumpkinStem, Item::PumpkinSeeds>;
+using cBlockMelonStemHandler           = cBlockStemsHandler<BlockType::Melon,   Item::MelonSeeds>;
+using cBlockPumpkinStemHandler         = cBlockStemsHandler<BlockType::Pumpkin, Item::PumpkinSeeds>;

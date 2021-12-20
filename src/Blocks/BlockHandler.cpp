@@ -220,8 +220,8 @@ namespace
 	constexpr cBlockStairsHandler                          BlockAndesiteStairsHandler(BlockType::AndesiteStairs);
 	constexpr cDefaultBlockHandler                         BlockAndesiteWallHandler(BlockType::AndesiteWall);
 	constexpr cBlockAnvilHandler                           BlockAnvilHandler(BlockType::Anvil);
-	constexpr cBlockAttachedMelonStemHandler               BlockAttachedMelonStemHandler(BlockType::AttachedMelonStem);
-	constexpr cBlockAttachedPumpkinStemHandler             BlockAttachedPumpkinStemHandler(BlockType::AttachedPumpkinStem);
+	constexpr cBlockMelonStemHandler                       BlockAttachedMelonStemHandler(BlockType::AttachedMelonStem);
+	constexpr cBlockPumpkinStemHandler                     BlockAttachedPumpkinStemHandler(BlockType::AttachedPumpkinStem);
 	constexpr cBlockFlowerHandler                          BlockAzureBluetHandler(BlockType::AzureBluet);
 	constexpr cDefaultBlockHandler                         BlockBambooHandler(BlockType::Bamboo);
 	constexpr cDefaultBlockHandler                         BlockBambooSaplingHandler(BlockType::BambooSapling);
