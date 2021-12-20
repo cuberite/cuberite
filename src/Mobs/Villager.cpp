@@ -16,6 +16,7 @@ cVillager::cVillager(eVillagerType VillagerType) :
 	m_ActionCountDown(-1),
 	m_Type(VillagerType),
 	m_VillagerAction(false),
+	m_Harvesting(false),
 	m_Inventory(8, 1)
 {
 }
@@ -61,6 +62,13 @@ void cVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
+	if (m_Harvesting)
+	{
+		// Forcing the villager to go to farm spots while harvesting
+
+		MoveToPosition(Vector3d(m_CropsPos.x + 0.5, m_CropsPos.y + 0.0, m_CropsPos.z + 0.5));
+	}
+
 	if (m_ActionCountDown > -1)
 	{
 		m_ActionCountDown--;
@@ -83,11 +91,15 @@ void cVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			case vtFarmer:
 			{
-				HandleFarmerTryHarvestCrops();
+				m_VillagerAction = HandleFarmerTryHarvestCrops();
 			}
 		}
-		m_VillagerAction = false;
 		return;
+	}
+	else
+	{
+		// Returning to idle state.
+		m_Harvesting = false;
 	}
 
 	// Don't always try to do a special action. Each tick has 1% to do a special action.
@@ -140,24 +152,24 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 
 	cBlockArea Surrounding;
 
-	// Read a 11x7x11 area:
+	// Read a 31x3x31 area:
 	Surrounding.Read(
 		*m_World,
-		FloorC(GetPosX()) - 5,
-		FloorC(GetPosX()) + 6,
-		FloorC(GetPosY()) - 3,
-		FloorC(GetPosY()) + 4,
-		FloorC(GetPosZ()) - 5,
-		FloorC(GetPosZ()) + 6
+		FloorC(GetPosX()) - 15,
+		FloorC(GetPosX()) + 15,
+		FloorC(GetPosY()) - 1,
+		FloorC(GetPosY()) + 1,
+		FloorC(GetPosZ()) - 15,
+		FloorC(GetPosZ()) + 15
 	);
 
 	for (int I = 0; I < 5; I++)
 	{
-		for (int Y = 0; Y < 6; Y++)
+		for (int Y = 0; Y < 3; Y++)
 		{
 			// Pick random coordinates and check for crops.
-			int X = m_World->GetTickRandomNumber(11);
-			int Z = m_World->GetTickRandomNumber(11);
+			int X = m_World->GetTickRandomNumber(31 - 1);
+			int Z = m_World->GetTickRandomNumber(31 - 1);
 
 			// A villager can't farm this.
 			if (!IsBlockFarmable(Surrounding.GetRelBlockType(X, Y, Z)))
@@ -169,8 +181,10 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 				continue;
 			}
 
+
+			m_Harvesting = true;
 			m_VillagerAction = true;
-			m_CropsPos = Vector3i(static_cast<int>(GetPosX()) + X - 5, static_cast<int>(GetPosY()) + Y - 3, static_cast<int>(GetPosZ()) + Z - 5);
+			m_CropsPos = Vector3i(static_cast<int>(GetPosX()) + X - 15, static_cast<int>(GetPosY()) + Y - 1, static_cast<int>(GetPosZ()) + Z - 15);
 			MoveToPosition(Vector3d(m_CropsPos.x + 0.5, m_CropsPos.y + 0.0, m_CropsPos.z + 0.5));
 			return;
 		}  // for Y loop.
@@ -181,10 +195,10 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 
 
 
-void cVillager::HandleFarmerTryHarvestCrops()
+bool cVillager::HandleFarmerTryHarvestCrops()
 {
-	// Harvest the crops if the villager isn't moving and if the crops are closer then 2 blocks.
-	if (!m_PathfinderActivated && (GetPosition() - m_CropsPos).Length() < 2)
+	// Harvest the crops if it is closer than 1 block.
+	if ((GetPosition() - m_CropsPos).Length() < 1)
 	{
 		// Check if the blocks didn't change while the villager was walking to the coordinates.
 		BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos);
@@ -192,7 +206,60 @@ void cVillager::HandleFarmerTryHarvestCrops()
 		{
 			m_World->DropBlockAsPickups(m_CropsPos, this, nullptr);
 			m_ActionCountDown = 20;
+			return false;  // The block no longer exist since he broke it.
 		}
+		return false;  // The block is no longer farmable.
+	}
+	return true;  // Keep walking.
+}
+
+
+
+
+
+void cVillager::CheckForNearbyCrops()
+{
+
+	// Search for adjacent crops
+
+	Vector3i North = {0, 0, -1};
+	Vector3i South = {0, 0, 1};
+	Vector3i East = {1, 0, 0};
+	Vector3i West = {-1, 0, 0};
+
+	bool CropFound = false;
+
+	if (IsBlockFarmable(m_World->GetBlock(m_CropsPos + North)) && m_World->GetBlockMeta(m_CropsPos + North) == 0x7)
+	{
+		m_CropsPos += North;
+		CropFound = true;
+	}
+	else if (IsBlockFarmable(m_World->GetBlock(m_CropsPos + South)) && m_World->GetBlockMeta(m_CropsPos + South) == 0x7)
+	{
+		m_CropsPos += South;
+		CropFound = true;
+	}
+	else if (IsBlockFarmable(m_World->GetBlock(m_CropsPos + East)) && m_World->GetBlockMeta(m_CropsPos + East) == 0x7)
+	{
+		m_CropsPos += East;
+		CropFound = true;
+	}
+	else if (IsBlockFarmable(m_World->GetBlock(m_CropsPos + West)) && m_World->GetBlockMeta(m_CropsPos + West) == 0x7)
+	{
+		m_CropsPos += West;
+		CropFound = true;
+	}
+
+	if (CropFound)
+	{
+		m_VillagerAction = true;
+		MoveToPosition(Vector3d(m_CropsPos.x + 0.5, m_CropsPos.y + 0.0, m_CropsPos.z + 0.5));
+	}
+	else
+	{
+		// No more crops to harvest. Returning to idle state.
+
+		m_Harvesting = false;
 	}
 }
 
@@ -202,11 +269,80 @@ void cVillager::HandleFarmerTryHarvestCrops()
 
 void cVillager::HandleFarmerPlaceCrops()
 {
+	// Can't place crops if he does not have one (potato, carrot, seed) in his inventory.
+	if (!CanPlantCrops())
+	{
+		return;
+	}
+
 	// Check if there is still farmland at the spot where the crops were.
 	if (m_World->GetBlock(m_CropsPos.addedY(-1)) == E_BLOCK_FARMLAND)
 	{
-		m_World->SetBlock(m_CropsPos, E_BLOCK_CROPS, 0);
+		// Finding the item to use to plant a crop
+		int TargetSlot = -1;
+		BLOCKTYPE CropBlockType;
+
+		for (int I = 0; I < m_Inventory.GetWidth() && TargetSlot < 0; I++)
+		{
+			const cItem & Slot = m_Inventory.GetSlot(I);
+			switch (Slot.m_ItemType)
+			{
+				case E_ITEM_SEEDS:
+				{
+					TargetSlot = I;
+					CropBlockType = E_BLOCK_CROPS;
+					break;
+				}
+
+				case E_ITEM_BEETROOT_SEEDS:
+				{
+					TargetSlot = I;
+					CropBlockType = E_BLOCK_BEETROOTS;
+					break;
+				}
+
+				case E_ITEM_POTATO:
+				{
+					TargetSlot = I;
+					CropBlockType = E_BLOCK_POTATOES;
+					break;
+				}
+
+				case E_ITEM_CARROT:
+				{
+					TargetSlot = I;
+					CropBlockType = E_BLOCK_CARROTS;
+					break;
+				}
+
+				default:
+				{
+					break;
+				}
+			}
+		}
+
+		// Removing item from villager inventory
+		m_Inventory.RemoveOneItem(TargetSlot);
+
+		// Placing crop block
+		m_World->SetBlock(m_CropsPos, CropBlockType, 0);
+
+		// Try to do the same with adjacent crops.
+		CheckForNearbyCrops();
 	}
+}
+
+
+
+
+
+bool cVillager::CanPlantCrops()
+{
+	return m_Inventory.HasItems(cItem(E_ITEM_SEEDS)) ||
+		m_Inventory.HasItems(cItem(E_ITEM_BEETROOT_SEEDS)) ||
+		m_Inventory.HasItems(cItem(E_ITEM_POTATO)) ||
+		m_Inventory.HasItems(cItem(E_ITEM_CARROT));
 }
 
 

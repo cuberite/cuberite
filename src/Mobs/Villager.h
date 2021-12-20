@@ -49,11 +49,18 @@ public:
 	/** Searches in a 11x7x11 area for crops. If it found some it will navigate to them. */
 	void HandleFarmerPrepareFarmCrops();
 
-	/** Looks if the farmer has reached it's destination, and if it's still crops and the destination is closer then 2 blocks it will harvest them. */
-	void HandleFarmerTryHarvestCrops();
+	/** Looks if the farmer has reached it's destination, and if it's still crops and the destination is closer then 2 blocks it will harvest them.
+	Returns true if the villager must keep walking to the crop. */
+	bool HandleFarmerTryHarvestCrops();
 
 	/** Replaces the crops he harvested. */
 	void HandleFarmerPlaceCrops();
+
+	/** Harvesting nearby crops */
+	void CheckForNearbyCrops();
+
+	/** Returns whether the farmer has crops in his inventory to plant. */
+	bool CanPlantCrops();
 
 	// Get and set functions.
 	int      GetVilType(void)              const { return m_Type; }
@@ -65,6 +72,7 @@ private:
 	int m_ActionCountDown;
 	int m_Type;
 	bool m_VillagerAction;
+	bool m_Harvesting;
 	Vector3i m_CropsPos;
 	cItemGrid m_Inventory;
 
