@@ -8,6 +8,8 @@
 
 struct BlockState
 {
+	using DataType = uint_least16_t;
+
 	constexpr BlockState() : ID(0) {}
 
 	constexpr BlockState(uint_least16_t StateID) :

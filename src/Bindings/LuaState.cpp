@@ -1517,7 +1517,7 @@ bool cLuaState::GetStackValue(int a_StackPos, BlockState & a_Value)
 {
 	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
-		a_Value = static_cast<float>(tolua_tonumber(m_LuaState, a_StackPos, a_Value.ID));
+		a_Value = static_cast<BlockState::DataType>(tolua_tonumber(m_LuaState, a_StackPos, a_Value.ID));
 		return true;
 	}
 	return false;
