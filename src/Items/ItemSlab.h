@@ -82,7 +82,7 @@ protected:
 		}
 
 		BlockState BlockToPlace;
-		
+
 		using namespace Block;
 
 		switch (m_ItemType)

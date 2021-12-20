@@ -1139,6 +1139,11 @@ void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCrafting
 						++DyeCount;
 						break;
 					}
+					default:
+					{
+						LOGWARNING("{}: Item type not handled {}.", __FUNCTION__, a_CraftingGrid[GridIdx].m_ItemType);
+						break;
+					}
 				}
 			}
 		}
