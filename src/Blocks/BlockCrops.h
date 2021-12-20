@@ -49,6 +49,8 @@ public:
 		}
 	}
 
+	bool FullyOccupiesVoxel(const BlockState a_Block) const override { return false; }
+
 private:
 
 	/** Calculate the number of seeds to drop when the crop is broken. */

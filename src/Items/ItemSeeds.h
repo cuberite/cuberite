@@ -37,7 +37,7 @@ public:
 			case Item::MelonSeeds:    Block = MelonStem::MelonStem();     break;
 			case Item::Potato:        Block = Potatoes::Potatoes();       break;
 			case Item::PumpkinSeeds:  Block = PumpkinStem::PumpkinStem(); break;
-			case Item::WheatSeeds:    Block = Wheat::Wheat(1);            break;
+			case Item::WheatSeeds:    Block = Wheat::Wheat();             break;
 			default:                  UNREACHABLE("Unsupported seed type");
 		}
 

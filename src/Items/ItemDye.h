@@ -55,7 +55,7 @@ public:
 		eBlockFace a_ClickedBlockFace
 	) const override
 	{
-		if ((a_HeldItem.m_ItemDamage == E_META_DYE_WHITE) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
+		if ((a_HeldItem.m_ItemType == Item::BoneMeal) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
 		{
 			// Bonemeal (white dye) is used to fertilize plants:
 			if (FertilizePlant(*a_World, a_ClickedBlockPos))
@@ -67,7 +67,7 @@ public:
 				}
 			}
 		}
-		else if ((a_HeldItem.m_ItemDamage == E_META_DYE_BROWN) && (a_ClickedBlockFace >= BLOCK_FACE_ZM) && (a_ClickedBlockFace <= BLOCK_FACE_XP))
+		else if ((a_HeldItem.m_ItemType == Item::CocoaBeans) && (a_ClickedBlockFace >= BLOCK_FACE_ZM) && (a_ClickedBlockFace <= BLOCK_FACE_XP))
 		{
 			// Players can't place blocks while in adventure mode.
 			if (a_Player->IsGameModeAdventure())
