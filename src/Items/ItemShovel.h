@@ -86,6 +86,11 @@ public:
 			case Item::IronShovel:    return (a_Item.m_ItemType == Item::IronIngot);
 			case Item::GoldenShovel:  return (a_Item.m_ItemType == Item::GoldIngot);
 			case Item::DiamondShovel: return (a_Item.m_ItemType == Item::Diamond);
+			default:
+			{
+				LOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);
+				return false;
+			}
 		}
 		return false;
 	}

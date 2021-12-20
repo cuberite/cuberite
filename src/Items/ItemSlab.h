@@ -42,7 +42,6 @@ protected:
 			return true;
 		}
 
-		auto Facing = DisplacementYawToFacing(a_PlacePosition, a_Player.GetEyePosition(), a_Player.GetYaw());
 		bool IsTop = false;
 
 		// Set the correct metadata based on player equipped item (i.e. a_BlockMeta not initialised yet)
@@ -82,7 +81,7 @@ protected:
 		}
 
 		BlockState BlockToPlace;
-		
+
 		using namespace Block;
 
 		switch (m_ItemType)
