@@ -3,7 +3,7 @@
 
 #include "Registries/BlockStates.h"
 
-class cItemHayBaleHandler : public cItemHandler
+class cItemHayBaleHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 

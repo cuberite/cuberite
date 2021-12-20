@@ -4332,9 +4332,9 @@ AString NamespaceSerializer::DePrettify(std::string_view a_ID)
 		{
 			Result.push_back('_');
 		}
-		Result.push_back(tolower(a_ID[i]));
+		Result.push_back(static_cast<char>(tolower(static_cast<int>(a_ID[i]))));  // Todo(12xx12): WHYYYYYYYY
 	}
-	return std::move(Result);
+	return Result;
 }
 
 

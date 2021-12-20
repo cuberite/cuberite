@@ -108,6 +108,11 @@ public:
 			{
 				return (a_Item.m_ItemType == Item::Leather);
 			}
+			default:
+			{
+				LOGWARNING("{}: Item type not handled {}.", __FUNCTION__, a_Item.m_ItemType);
+				return false;
+			}
 		}
 		return false;
 	}

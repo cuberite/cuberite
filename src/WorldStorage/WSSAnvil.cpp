@@ -1449,7 +1449,7 @@ OwnedBlockEntity cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_T
 	int Record = a_NBT.FindChildByName(a_TagIdx, "Record");
 	if (Record >= 0)
 	{
-		Jukebox->SetRecord(PaletteUpgrade::FromItem(a_NBT.GetInt(Record), 0));
+		Jukebox->SetRecord(PaletteUpgrade::FromItem(a_NBT.GetShort(Record), 0));
 	}
 	return Jukebox;
 }
