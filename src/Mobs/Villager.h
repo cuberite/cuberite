@@ -3,6 +3,7 @@
 
 #include "PassiveMonster.h"
 #include "../Blocks/ChunkInterface.h"
+#include "../Inventory.h"
 
 
 
@@ -38,6 +39,9 @@ public:
 	virtual void KilledBy    (TakeDamageInfo & a_TDI) override;
 
 	// cVillager functions
+	/** Returns the villager hidden inventory (8 slots). */
+	cItemGrid & GetInventory(void) { return m_Inventory; };
+
 	/** return true if the given blocktype are: crops, potatoes or carrots. */
 	bool IsBlockFarmable(BLOCKTYPE a_BlockType);
 
@@ -62,6 +66,7 @@ private:
 	int m_Type;
 	bool m_VillagerAction;
 	Vector3i m_CropsPos;
+	cItemGrid m_Inventory;
 
 } ;
 
