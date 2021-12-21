@@ -223,12 +223,7 @@ void cVillager::CheckForNearbyCrops()
 
 	// Search for adjacent crops
 
-	Vector3i North = {0, 0, -1};
-	Vector3i South = {0, 0, 1};
-	Vector3i East = {1, 0, 0};
-	Vector3i West = {-1, 0, 0};
-
-	std::vector<Vector3i> Directions = {North, South, East, West};
+	constexpr std::array<Vector3i, 4> Directions = { Vector3i{0, 0, -1}, {0, 0, 1}, {1, 0, 0}, {-1, 0, 0} };
 
 	bool CropFound = false;
 
