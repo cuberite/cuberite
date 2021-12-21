@@ -18877,6 +18877,24 @@ end
 					},
 					Notes = "Returns true if the specified item type is any kind of a tool (axe, hoe, pickaxe, shovel or FIXME: sword)",
 				},
+				IsVillagerFood =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of a pickable food by a villager (potato, carrot, wheat, bread and any kind of seeds).",
+				}
 			},
 			AdditionalInfo =
 			{
