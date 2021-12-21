@@ -236,7 +236,7 @@ bool cPickup::CollectedBy(cEntity & a_Dest)
 	if (!a_Dest.IsPlayer() && a_Dest.IsMob())
 	{
 
-		cMonster & Mob = static_cast<cMonster &>(a_Dest);
+		auto & Mob = static_cast<cMonster &>(a_Dest);
 		if (Mob.GetMobType() == mtVillager)
 		{
 			// Villagers only pickup food
@@ -245,7 +245,7 @@ bool cPickup::CollectedBy(cEntity & a_Dest)
 				return false;
 			}
 
-			cVillager & Villager = static_cast<cVillager &>(Mob);
+			auto & Villager = static_cast<cVillager &>(Mob);
 			int NumAdded = Villager.GetInventory().AddItem(m_Item);
 			if (NumAdded > 0)
 			{
@@ -270,30 +270,30 @@ bool cPickup::CollectedBy(cEntity & a_Dest)
 	else if (a_Dest.IsPlayer())
 	{
 
-		cPlayer & playerCollector = static_cast<cPlayer &>(a_Dest);
+		auto & Player = static_cast<cPlayer &>(a_Dest);
 
 		// If the player is a spectator, he cannot collect anything
-		if (playerCollector.IsGameModeSpectator())
+		if (Player.IsGameModeSpectator())
 		{
 			return false;
 		}
 
-		if (cRoot::Get()->GetPluginManager()->CallHookCollectingPickup(playerCollector, *this))
+		if (cRoot::Get()->GetPluginManager()->CallHookCollectingPickup(Player, *this))
 		{
 			// LOG("Pickup %d cannot be collected by \"%s\", because a plugin has said no.", m_UniqueID, a_Dest->GetName().c_str());
 			return false;
 		}
 
-		int NumAdded = playerCollector.GetInventory().AddItem(m_Item);
+		int NumAdded = Player.GetInventory().AddItem(m_Item);
 		if (NumAdded > 0)
 		{
 			// Check achievements
 			switch (m_Item.m_ItemType)
 			{
-				case E_BLOCK_LOG:      playerCollector.AwardAchievement(CustomStatistic::AchMineWood); break;
-				case E_ITEM_LEATHER:   playerCollector.AwardAchievement(CustomStatistic::AchKillCow);  break;
-				case E_ITEM_DIAMOND:   playerCollector.AwardAchievement(CustomStatistic::AchDiamonds); break;
-				case E_ITEM_BLAZE_ROD: playerCollector.AwardAchievement(CustomStatistic::AchBlazeRod); break;
+				case E_BLOCK_LOG:      Player.AwardAchievement(CustomStatistic::AchMineWood); break;
+				case E_ITEM_LEATHER:   Player.AwardAchievement(CustomStatistic::AchKillCow);  break;
+				case E_ITEM_DIAMOND:   Player.AwardAchievement(CustomStatistic::AchDiamonds); break;
+				case E_ITEM_BLAZE_ROD: Player.AwardAchievement(CustomStatistic::AchBlazeRod); break;
 				default: break;
 			}
 
