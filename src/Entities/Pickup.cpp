@@ -45,11 +45,8 @@ public:
 		cItem & Item = OtherPickup.GetItem();
 		if ((Distance < 1.2) && Item.IsEqual(m_Pickup->GetItem()) && OtherPickup.CanCombine())
 		{
-			char CombineCount = Item.m_ItemCount;
-			if ((CombineCount + m_Pickup->GetItem().m_ItemCount) > Item.GetMaxStackSize())
-			{
-				CombineCount = Item.GetMaxStackSize() - m_Pickup->GetItem().m_ItemCount;
-			}
+			short CombineCount = static_cast<short>(Item.m_ItemCount);
+			if ((CombineCount + static_cast<short>(m_Pickup->GetItem().m_ItemCount)) > static_cast<short>(Item.GetMaxStackSize()))
 
 			if (CombineCount <= 0)
 			{
