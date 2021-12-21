@@ -204,6 +204,7 @@ bool cVillager::HandleFarmerTryHarvestCrops()
 		BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos);
 		if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos) == 0x7)
 		{
+			m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, m_CropsPos, m_World->GetBlock(m_CropsPos));
 			m_World->DropBlockAsPickups(m_CropsPos, this, nullptr);
 			m_ActionCountDown = 20;
 			return false;  // The block no longer exist since he broke it.
