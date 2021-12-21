@@ -150,45 +150,45 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 		return;
 	}
 
-	cBlockArea Surrounding;
+	auto Pos = GetPosition().Floor();
+	auto MinPos = Pos - FARMER_SCAN_CROPS_DIST;
+	auto MaxPos = Pos + FARMER_SCAN_CROPS_DIST;
 
-	// Read a 31x3x31 area:
+	// Read area to be checked for crops.
+	cBlockArea Surrounding;
 	Surrounding.Read(
 		*m_World,
-		FloorC(GetPosX()) - FARMER_SCAN_CROPS_AREA.x / 2,
-		FloorC(GetPosX()) + FARMER_SCAN_CROPS_AREA.x / 2,
-		FloorC(GetPosY()) - FARMER_SCAN_CROPS_AREA.y / 2,
-		FloorC(GetPosY()) + FARMER_SCAN_CROPS_AREA.y / 2,
-		FloorC(GetPosZ()) - FARMER_SCAN_CROPS_AREA.z / 2,
-		FloorC(GetPosZ()) + FARMER_SCAN_CROPS_AREA.z / 2
+		MinPos, MaxPos
 	);
 
 	for (int I = 0; I < FARMER_RANDOM_TICK_SPEED; I++)
 	{
-		for (int Y = 0; Y < 3; Y++)
+		for (int Y = MinPos.y; Y <= MaxPos.y; Y++)
 		{
 			// Pick random coordinates and check for crops.
-			int X = m_World->GetTickRandomNumber(FARMER_SCAN_CROPS_AREA.x - 1);
-			int Z = m_World->GetTickRandomNumber(FARMER_SCAN_CROPS_AREA.z - 1);
+			Vector3i CandidatePos(MinPos.x + m_World->GetTickRandomNumber(MaxPos.x - MinPos.x - 1), Y, MinPos.z + m_World->GetTickRandomNumber(MaxPos.z - MinPos.z - 1));
+
+			BLOCKTYPE CandidateBlockType;
+			NIBBLETYPE CandidateMeta;
+			Surrounding.GetBlockTypeMeta(CandidatePos.x, CandidatePos.y, CandidatePos.z, CandidateBlockType, CandidateMeta);
 
 			// A villager can't farm this.
-			if (!IsBlockFarmable(Surrounding.GetRelBlockType(X, Y, Z)))
+			if (!IsBlockFarmable(CandidateBlockType))
 			{
 				continue;
 			}
-			if (Surrounding.GetRelBlockMeta(X, Y, Z) != 0x7)
+			if (CandidateMeta != 0x7)
 			{
 				continue;
 			}
-
 
 			m_Harvesting = true;
 			m_VillagerAction = true;
-			m_CropsPos = Vector3i(static_cast<int>(GetPosX()) + X - FARMER_SCAN_CROPS_AREA.x / 2, static_cast<int>(GetPosY()) + Y - FARMER_SCAN_CROPS_AREA.y / 2, static_cast<int>(GetPosZ()) + Z - FARMER_SCAN_CROPS_AREA.z / 2);
-			MoveToPosition(Vector3d(m_CropsPos.x + 0.5, m_CropsPos.y + 0.0, m_CropsPos.z + 0.5));
+			m_CropsPos = CandidatePos;
+			MoveToPosition(static_cast<Vector3d>(m_CropsPos) + Vector3d(0.5, 0, 0.5));
 			return;
-		}  // for Y loop.
-	}  // Repeat the procces 5 times.
+		}  // for Y
+	}  // Repeat the proccess according to the random tick speed.
 }
 
 

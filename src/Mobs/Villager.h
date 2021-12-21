@@ -48,8 +48,8 @@ public:
 	// Farmer functions
 	static const int FARMER_RANDOM_TICK_SPEED = 5;
 	static constexpr double FARMER_SPECIAL_ACTION_CHANCE = 0.01;
-	/** This makes a 31x3x31 area. */
-	static constexpr Vector3i FARMER_SCAN_CROPS_AREA {31, 3, 31};
+	/** This distance from the Villager makes for a 31x3x31 area. */
+	static constexpr Vector3i FARMER_SCAN_CROPS_DIST {15, 1, 15};
 
 	/** Searches in a 31x3x31 area for crops. If it found some it will navigate to them. */
 	void HandleFarmerPrepareFarmCrops();
