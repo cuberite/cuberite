@@ -46,7 +46,7 @@ public:
 	bool IsBlockFarmable(BLOCKTYPE a_BlockType);
 
 	// Farmer functions
-	/** Searches in a 11x7x11 area for crops. If it found some it will navigate to them. */
+	/** Searches in a 31x3x31 area for crops. If it found some it will navigate to them. */
 	void HandleFarmerPrepareFarmCrops();
 
 	/** Looks if the farmer has reached it's destination, and if it's still crops and the destination is closer then 2 blocks it will harvest them.
