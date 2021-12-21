@@ -47,6 +47,9 @@ public:
 		{
 			short CombineCount = static_cast<short>(Item.m_ItemCount);
 			if ((CombineCount + static_cast<short>(m_Pickup->GetItem().m_ItemCount)) > static_cast<short>(Item.GetMaxStackSize()))
+			{
+				CombineCount = Item.GetMaxStackSize() - m_Pickup->GetItem().m_ItemCount;
+			}
 
 			if (CombineCount <= 0)
 			{
