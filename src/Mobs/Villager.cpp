@@ -227,27 +227,18 @@ void cVillager::CheckForNearbyCrops()
 	Vector3i East = {1, 0, 0};
 	Vector3i West = {-1, 0, 0};
 
+	std::vector<Vector3i> Directions = {North, South, East, West};
+
 	bool CropFound = false;
 
-	if (IsBlockFarmable(m_World->GetBlock(m_CropsPos + North)) && m_World->GetBlockMeta(m_CropsPos + North) == 0x7)
+	for (Vector3i Direction : Directions)
 	{
-		m_CropsPos += North;
-		CropFound = true;
-	}
-	else if (IsBlockFarmable(m_World->GetBlock(m_CropsPos + South)) && m_World->GetBlockMeta(m_CropsPos + South) == 0x7)
-	{
-		m_CropsPos += South;
-		CropFound = true;
-	}
-	else if (IsBlockFarmable(m_World->GetBlock(m_CropsPos + East)) && m_World->GetBlockMeta(m_CropsPos + East) == 0x7)
-	{
-		m_CropsPos += East;
-		CropFound = true;
-	}
-	else if (IsBlockFarmable(m_World->GetBlock(m_CropsPos + West)) && m_World->GetBlockMeta(m_CropsPos + West) == 0x7)
-	{
-		m_CropsPos += West;
-		CropFound = true;
+		if (IsBlockFarmable(m_World->GetBlock(m_CropsPos + Direction)) && m_World->GetBlockMeta(m_CropsPos + Direction) == 0x7)
+		{
+			m_CropsPos += Direction;
+			CropFound = true;
+			break;
+		}
 	}
 
 	if (CropFound)
