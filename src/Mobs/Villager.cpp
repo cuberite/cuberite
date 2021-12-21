@@ -272,7 +272,7 @@ void cVillager::HandleFarmerPlaceCrops()
 	{
 		// Finding the item to use to plant a crop
 		int TargetSlot = -1;
-		BLOCKTYPE CropBlockType;
+		BLOCKTYPE CropBlockType = E_BLOCK_AIR;
 
 		for (int I = 0; I < m_Inventory.GetWidth() && TargetSlot < 0; I++)
 		{
