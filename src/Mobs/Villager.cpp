@@ -103,7 +103,7 @@ void cVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	// Don't always try to do a special action. Each tick has 1% to do a special action.
-	if (GetRandomProvider().RandBool(0.99))
+	if (GetRandomProvider().RandBool(1 - FARMER_SPECIAL_ACTION_CHANCE))
 	{
 		return;
 	}
@@ -155,21 +155,21 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 	// Read a 31x3x31 area:
 	Surrounding.Read(
 		*m_World,
-		FloorC(GetPosX()) - 15,
-		FloorC(GetPosX()) + 15,
-		FloorC(GetPosY()) - 1,
-		FloorC(GetPosY()) + 1,
-		FloorC(GetPosZ()) - 15,
-		FloorC(GetPosZ()) + 15
+		FloorC(GetPosX()) - FARMER_SCAN_CROPS_AREA_RELATIVE.x,
+		FloorC(GetPosX()) + FARMER_SCAN_CROPS_AREA_RELATIVE.x,
+		FloorC(GetPosY()) - FARMER_SCAN_CROPS_AREA_RELATIVE.y,
+		FloorC(GetPosY()) + FARMER_SCAN_CROPS_AREA_RELATIVE.y,
+		FloorC(GetPosZ()) - FARMER_SCAN_CROPS_AREA_RELATIVE.z,
+		FloorC(GetPosZ()) + FARMER_SCAN_CROPS_AREA_RELATIVE.z
 	);
 
-	for (int I = 0; I < 5; I++)
+	for (int I = 0; I < FARMER_RANDOM_TICK_SPEED; I++)
 	{
 		for (int Y = 0; Y < 3; Y++)
 		{
 			// Pick random coordinates and check for crops.
-			int X = m_World->GetTickRandomNumber(31 - 1);
-			int Z = m_World->GetTickRandomNumber(31 - 1);
+			int X = m_World->GetTickRandomNumber(FARMER_SCAN_CROPS_AREA_RELATIVE.x * 2);
+			int Z = m_World->GetTickRandomNumber(FARMER_SCAN_CROPS_AREA_RELATIVE.z * 2);
 
 			// A villager can't farm this.
 			if (!IsBlockFarmable(Surrounding.GetRelBlockType(X, Y, Z)))
@@ -184,7 +184,7 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 
 			m_Harvesting = true;
 			m_VillagerAction = true;
-			m_CropsPos = Vector3i(static_cast<int>(GetPosX()) + X - 15, static_cast<int>(GetPosY()) + Y - 1, static_cast<int>(GetPosZ()) + Z - 15);
+			m_CropsPos = Vector3i(static_cast<int>(GetPosX()) + X - FARMER_SCAN_CROPS_AREA_RELATIVE.x, static_cast<int>(GetPosY()) + Y - FARMER_SCAN_CROPS_AREA_RELATIVE.y, static_cast<int>(GetPosZ()) + Z - FARMER_SCAN_CROPS_AREA_RELATIVE.z);
 			MoveToPosition(Vector3d(m_CropsPos.x + 0.5, m_CropsPos.y + 0.0, m_CropsPos.z + 0.5));
 			return;
 		}  // for Y loop.
