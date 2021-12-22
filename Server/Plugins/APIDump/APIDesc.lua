@@ -10194,7 +10194,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Tries to make the player collect the pickup. Returns true if the pickup was collected, at least partially.",
+					Notes = "Tries to make the entity collect the pickup. Returns true if the pickup was collected, at least partially.",
 				},
 				GetAge =
 				{
