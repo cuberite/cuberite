@@ -15,8 +15,7 @@ cVillager::cVillager(eVillagerType VillagerType) :
 	Super("Villager", mtVillager, "entity.villager.hurt", "entity.villager.death", "entity.villager.ambient", 0.6f, 1.95f),
 	m_ActionCountDown(-1),
 	m_Type(VillagerType),
-	m_VillagerAction(false),
-	m_Harvesting(false),
+	m_FarmerAction(faIdling),
 	m_Inventory(8, 1)
 {
 }
@@ -62,57 +61,12 @@ void cVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (m_Harvesting)
-	{
-		// Forcing the villager to go to farm spots while harvesting
-
-		MoveToPosition(Vector3d(m_CropsPos.x + 0.5, m_CropsPos.y + 0.0, m_CropsPos.z + 0.5));
-	}
-
-	if (m_ActionCountDown > -1)
-	{
-		m_ActionCountDown--;
-		if (m_ActionCountDown == 0)
-		{
-			switch (m_Type)
-			{
-				case vtFarmer:
-				{
-					HandleFarmerPlaceCrops();
-				}
-			}
-		}
-		return;
-	}
-
-	if (m_VillagerAction)
-	{
-		switch (m_Type)
-		{
-			case vtFarmer:
-			{
-				m_VillagerAction = HandleFarmerTryHarvestCrops();
-			}
-		}
-		return;
-	}
-	else
-	{
-		// Returning to idle state.
-		m_Harvesting = false;
-	}
-
-	// Don't always try to do a special action. Each tick has 1% to do a special action.
-	if (GetRandomProvider().RandBool(1 - FARMER_SPECIAL_ACTION_CHANCE))
-	{
-		return;
-	}
-
 	switch (m_Type)
 	{
 		case vtFarmer:
 		{
-			HandleFarmerPrepareFarmCrops();
+			TickFarmer();
+			break;
 		}
 	}
 }
@@ -143,12 +97,68 @@ void cVillager::KilledBy(TakeDamageInfo & a_TDI)
 ////////////////////////////////////////////////////////////////////////////////
 // Farmer functions:
 
-void cVillager::HandleFarmerPrepareFarmCrops()
+void cVillager::TickFarmer()
 {
+
+	// Don't harvest crops if you must not
 	if (!m_World->VillagersShouldHarvestCrops())
 	{
 		return;
 	}
+
+	// This is to prevent undefined behaviors
+	if (m_FinalDestination.y <= 0)
+	{
+		return;
+	}
+
+	if (!IsIdling())
+	{
+		// Forcing the farmer to go to work spots.
+		MoveToPosition(static_cast<Vector3d>(m_CropsPos) + Vector3d(0.5, 0, 0.5));
+	}
+
+	// Updating the timer
+	if (m_ActionCountDown > -1)
+	{
+		m_ActionCountDown--;
+	}
+
+	// Searching for work in blocks where the farmer goes.
+	if (isHarvestable(m_FinalDestination.Floor()))
+	{
+		m_CropsPos = m_FinalDestination.Floor();
+		m_FarmerAction = faHarvesting;
+		HandleFarmerTryHarvestCrops();
+		return;
+	}
+	else if (IsPlantable(m_FinalDestination.Floor()) && CanPlantCrops())
+	{
+		m_CropsPos = m_FinalDestination.Floor();
+		m_FarmerAction = faPlanting;
+		HandleFarmerTryPlaceCrops();
+		return;
+	}
+	else
+	{
+		m_FarmerAction = faIdling;  // Returning to idling.
+	}
+
+
+	// Don't always try to do a special action. Each tick has 10% to do a special action.
+	if (GetRandomProvider().RandBool(FARMER_SPECIAL_ACTION_CHANCE))
+	{
+		ScanAreaForWork();
+	}
+
+}
+
+
+
+
+
+void cVillager::ScanAreaForWork()
+{
 
 	auto Pos = GetPosition().Floor();
 	auto MinPos = Pos - FARMER_SCAN_CROPS_DIST;
@@ -168,25 +178,23 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 			// Pick random coordinates and check for crops.
 			Vector3i CandidatePos(MinPos.x + m_World->GetTickRandomNumber(MaxPos.x - MinPos.x - 1), Y, MinPos.z + m_World->GetTickRandomNumber(MaxPos.z - MinPos.z - 1));
 
-			BLOCKTYPE CandidateBlockType;
-			NIBBLETYPE CandidateMeta;
-			Surrounding.GetBlockTypeMeta(CandidatePos.x, CandidatePos.y, CandidatePos.z, CandidateBlockType, CandidateMeta);
-
-			// A villager can't farm this.
-			if (!IsBlockFarmable(CandidateBlockType))
+			// A villager can harvest this.
+			if (isHarvestable(CandidatePos))
 			{
-				continue;
+				m_CropsPos = CandidatePos;
+				m_FarmerAction = faHarvesting;
+				MoveToPosition(static_cast<Vector3d>(m_CropsPos) + Vector3d(0.5, 0, 0.5));
+				return;
 			}
-			if (CandidateMeta != 0x7)
+			// A villager can plant this.
+			else if (IsPlantable(CandidatePos) && CanPlantCrops())
 			{
-				continue;
+				m_CropsPos = CandidatePos;
+				m_FarmerAction = faHarvesting;
+				MoveToPosition(static_cast<Vector3d>(m_CropsPos) + Vector3d(0.5, 0, 0.5));
+				return;
 			}
 
-			m_Harvesting = true;
-			m_VillagerAction = true;
-			m_CropsPos = CandidatePos;
-			MoveToPosition(static_cast<Vector3d>(m_CropsPos) + Vector3d(0.5, 0, 0.5));
-			return;
 		}  // for Y
 	}  // Repeat the proccess according to the random tick speed.
 }
@@ -195,23 +203,26 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 
 
 
-bool cVillager::HandleFarmerTryHarvestCrops()
+void cVillager::HandleFarmerTryHarvestCrops()
 {
+	if (m_ActionCountDown > 0)
+	{
+		// The farmer is still on cooldown
+		return;
+	}
+
 	// Harvest the crops if it is closer than 1 block.
 	if ((GetPosition() - m_CropsPos).Length() < 1)
 	{
 		// Check if the blocks didn't change while the villager was walking to the coordinates.
-		BLOCKTYPE CropBlock = m_World->GetBlock(m_CropsPos);
-		if (IsBlockFarmable(CropBlock) && m_World->GetBlockMeta(m_CropsPos) == 0x7)
+		if (isHarvestable(m_CropsPos))
 		{
 			m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, m_CropsPos, m_World->GetBlock(m_CropsPos));
 			m_World->DropBlockAsPickups(m_CropsPos, this, nullptr);
-			m_ActionCountDown = 20;
-			return false;  // The block no longer exist since he broke it.
+			// Applying 0.5 second cooldown.
+			m_ActionCountDown = 10;
 		}
-		return false;  // The block is no longer farmable.
 	}
-	return true;  // Keep walking.
 }
 
 
@@ -225,45 +236,50 @@ void cVillager::CheckForNearbyCrops()
 
 	constexpr std::array<Vector3i, 4> Directions = { Vector3i{0, 0, -1}, {0, 0, 1}, {1, 0, 0}, {-1, 0, 0} };
 
-	bool CropFound = false;
-
 	for (Vector3i Direction : Directions)
 	{
-		if (IsBlockFarmable(m_World->GetBlock(m_CropsPos + Direction)) && m_World->GetBlockMeta(m_CropsPos + Direction) == 0x7)
+		if (isHarvestable(m_CropsPos + Direction))
 		{
 			m_CropsPos += Direction;
-			CropFound = true;
-			break;
+			m_FarmerAction = faHarvesting;
+			MoveToPosition(static_cast<Vector3d>(m_CropsPos) + Vector3d(0.5, 0, 0.5));
+			return;
 		}
+		else if (IsPlantable(m_CropsPos + Direction) && CanPlantCrops())
+		{
+			m_CropsPos += Direction;
+			m_FarmerAction = faPlanting;
+			MoveToPosition(static_cast<Vector3d>(m_CropsPos) + Vector3d(0.5, 0, 0.5));
+			return;
+		}
+
 	}
 
-	if (CropFound)
-	{
-		m_VillagerAction = true;
-		MoveToPosition(Vector3d(m_CropsPos.x + 0.5, m_CropsPos.y + 0.0, m_CropsPos.z + 0.5));
-	}
-	else
-	{
-		// No more crops to harvest. Returning to idle state.
-
-		m_Harvesting = false;
-	}
+	// There is no more work to do around the previous crops.
+	m_FarmerAction = faIdling;
 }
 
 
 
 
 
-void cVillager::HandleFarmerPlaceCrops()
+void cVillager::HandleFarmerTryPlaceCrops()
 {
-	// Can't place crops if he does not have one (potato, carrot, seed) in his inventory.
-	if (!CanPlantCrops())
+
+	if ((GetPosition() - m_CropsPos).Length() > 1)
 	{
+		// The farmer is still to far from the final destination
+		return;
+	}
+
+	if (m_ActionCountDown > 0)
+	{
+		// The farmer is still on cooldown
 		return;
 	}
 
 	// Check if there is still farmland at the spot where the crops were.
-	if (m_World->GetBlock(m_CropsPos.addedY(-1)) == E_BLOCK_FARMLAND)
+	if (IsPlantable(m_CropsPos))
 	{
 		// Finding the item to use to plant a crop
 		int TargetSlot = -1;
@@ -315,6 +331,9 @@ void cVillager::HandleFarmerPlaceCrops()
 		// Placing crop block
 		m_World->SetBlock(m_CropsPos, CropBlockType, 0);
 
+		// Applying 1 second cooldown
+		m_ActionCountDown = 20;
+
 		// Try to do the same with adjacent crops.
 		CheckForNearbyCrops();
 	}
@@ -336,7 +355,7 @@ bool cVillager::CanPlantCrops()
 
 
 
-bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType)
+bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	switch (a_BlockType)
 	{
@@ -345,10 +364,29 @@ bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType)
 		case E_BLOCK_POTATOES:
 		case E_BLOCK_CARROTS:
 		{
-			return true;
+			// The crop must have fully grown up.
+			return a_BlockMeta == 0x07;
 		}
 		default: return false;
 	}
+}
+
+
+
+
+
+bool cVillager::isHarvestable(Vector3i a_CropsPos)
+{
+	return IsBlockFarmable(m_World->GetBlock(a_CropsPos), m_World->GetBlockMeta(a_CropsPos));
+}
+
+
+
+
+
+bool cVillager::IsPlantable(Vector3i a_CropsPos)
+{
+	return (m_World->GetBlock(a_CropsPos.addedY(-1)) == E_BLOCK_FARMLAND) && (m_World->GetBlock(a_CropsPos) == E_BLOCK_AIR);
 }
 
 
