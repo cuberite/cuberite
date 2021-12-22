@@ -56,7 +56,7 @@ public:
 				return false;
 			}
 
-			m_Pickup->GetItem().AddCount(static_cast<short>(CombineCount));
+			m_Pickup->GetItem().AddCount(static_cast<char>(CombineCount));
 			Item.m_ItemCount -= CombineCount;
 
 			if (Item.m_ItemCount <= 0)
