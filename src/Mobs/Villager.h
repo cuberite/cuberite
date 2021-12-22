@@ -46,7 +46,7 @@ public:
 	bool IsBlockFarmable(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	/** Returns true if the block at the given location is a fully grown up crop. */
-	bool isHarvestable(Vector3i a_CropsPos);
+	bool IsHarvestable(Vector3i a_CropsPos);
 
 	/** Returns true if seeds can be planted at a given location. */
 	bool IsPlantable(Vector3i a_CropsPos);

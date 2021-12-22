@@ -125,7 +125,7 @@ void cVillager::TickFarmer()
 	}
 
 	// Searching for work in blocks where the farmer goes.
-	if (isHarvestable(m_FinalDestination.Floor()))
+	if (IsHarvestable(m_FinalDestination.Floor()))
 	{
 		m_CropsPos = m_FinalDestination.Floor();
 		m_FarmerAction = faHarvesting;
@@ -179,7 +179,7 @@ void cVillager::ScanAreaForWork()
 			Vector3i CandidatePos(MinPos.x + m_World->GetTickRandomNumber(MaxPos.x - MinPos.x - 1), Y, MinPos.z + m_World->GetTickRandomNumber(MaxPos.z - MinPos.z - 1));
 
 			// A villager can harvest this.
-			if (isHarvestable(CandidatePos))
+			if (IsHarvestable(CandidatePos))
 			{
 				m_CropsPos = CandidatePos;
 				m_FarmerAction = faHarvesting;
@@ -215,7 +215,7 @@ void cVillager::HandleFarmerTryHarvestCrops()
 	if ((GetPosition() - m_CropsPos).Length() < 1)
 	{
 		// Check if the blocks didn't change while the villager was walking to the coordinates.
-		if (isHarvestable(m_CropsPos))
+		if (IsHarvestable(m_CropsPos))
 		{
 			m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, m_CropsPos, m_World->GetBlock(m_CropsPos));
 			m_World->DropBlockAsPickups(m_CropsPos, this, nullptr);
@@ -238,7 +238,7 @@ void cVillager::CheckForNearbyCrops()
 
 	for (Vector3i Direction : Directions)
 	{
-		if (isHarvestable(m_CropsPos + Direction))
+		if (IsHarvestable(m_CropsPos + Direction))
 		{
 			m_CropsPos += Direction;
 			m_FarmerAction = faHarvesting;
@@ -375,7 +375,7 @@ bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 
 
 
-bool cVillager::isHarvestable(Vector3i a_CropsPos)
+bool cVillager::IsHarvestable(Vector3i a_CropsPos)
 {
 	return IsBlockFarmable(m_World->GetBlock(a_CropsPos), m_World->GetBlockMeta(a_CropsPos));
 }
