@@ -10183,8 +10183,8 @@ a_Player:OpenWindow(Window);
 					Params =
 					{
 						{
-							Name = "Player",
-							Type = "cPlayer",
+							Name = "Entity",
+							Type = "cEntity",
 						},
 					},
 					Returns =
