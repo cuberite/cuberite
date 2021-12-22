@@ -41,6 +41,7 @@ public:
 	// cVillager functions
 	/** Returns the villager hidden inventory (8 slots). */
 	cItemGrid & GetInventory(void) { return m_Inventory; }
+	const cItemGrid & GetInventory(void) const { return m_Inventory; }
 
 	/** Returns true if the given blocktype are: crops, potatoes or carrots and they have full grown up. */
 	bool IsBlockFarmable(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);

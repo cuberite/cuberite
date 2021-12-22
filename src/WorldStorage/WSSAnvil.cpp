@@ -3270,6 +3270,12 @@ void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		Monster->SetAge(Age);
 	}
 
+	int InventoryIdx = a_NBT.FindChildByName(a_TagIdx, "Inventory");
+	if (InventoryIdx > 0)
+	{
+		LoadItemGridFromNBT(Monster->GetInventory(), a_NBT, InventoryIdx);
+	}
+
 
 	a_Entities.emplace_back(std::move(Monster));
 }
