@@ -116,6 +116,11 @@ void cVillager::TickFarmer()
 	{
 		// Forcing the farmer to go to work spots.
 		MoveToPosition(static_cast<Vector3d>(m_CropsPos) + Vector3d(0.5, 0, 0.5));
+
+		// Forcing the farmer to look at the work spots.
+		Vector3d Direction = (m_FinalDestination - (GetPosition() + Vector3d(0, 1.6, 0)));  // We get the direction from the eyes of the farmer to the work spot.
+		Direction.Normalize();
+		SetPitch(std::asin(-Direction.y) / M_PI * 180);
 	}
 
 	// Updating the timer
