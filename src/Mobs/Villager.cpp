@@ -365,6 +365,10 @@ bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	switch (a_BlockType)
 	{
 		case E_BLOCK_BEETROOTS:
+		{
+			// The crop must have fully grown up.
+			return a_BlockMeta == 0x03;
+		}
 		case E_BLOCK_CROPS:
 		case E_BLOCK_POTATOES:
 		case E_BLOCK_CARROTS:
