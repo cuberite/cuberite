@@ -194,6 +194,10 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			m_IsInGround = false;  // Yes, begin simulating physics again
 		}
 	}
+	else if (IsInWater())  // Arrow in water?
+	{
+		ApplyFriction(m_Speed, ARROW_WATER_FRICTION, static_cast<float>(a_Dt.count()));  // Yes, slow down arrow
+	}
 }
 
 

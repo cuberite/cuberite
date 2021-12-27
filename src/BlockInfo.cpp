@@ -1526,6 +1526,7 @@ bool cBlockInfo::IsSolid(BlockState a_Block)
 		case BlockType::Allium:
 		case BlockType::AttachedMelonStem:
 		case BlockType::AzureBluet:
+		case BlockType::Beetroots:
 		case BlockType::BirchButton:
 		case BlockType::BirchPressurePlate:
 		case BlockType::BirchSapling:
@@ -1698,6 +1699,7 @@ bool cBlockInfo::IsTransparent(BlockState a_Block)
 		case BlockType::AzureBluet:
 		case BlockType::Barrier:
 		case BlockType::Beacon:
+		case BlockType::Beetroot:
 		case BlockType::BirchDoor:
 		case BlockType::BirchFence:
 		case BlockType::BirchFenceGate:
@@ -1738,6 +1740,8 @@ bool cBlockInfo::IsTransparent(BlockState a_Block)
 		case BlockType::Cauldron:
 		case BlockType::CaveAir:
 		case BlockType::Chest:
+		case BlockType::ChorusFlower:
+		case BlockType::ChorusPlant:
 		case BlockType::ChippedAnvil:
 		case BlockType::CobblestoneStairs:
 		case BlockType::CobblestoneWall:
@@ -1775,11 +1779,13 @@ bool cBlockInfo::IsTransparent(BlockState a_Block)
 		case BlockType::DragonHead:
 		case BlockType::DragonWallHead:
 		case BlockType::EnchantingTable:
+		case BlockType::EndGateWay:
 		case BlockType::EndPortal:
 		case BlockType::EndPortalFrame:
 		case BlockType::EndRod:
 		case BlockType::EnderChest:
 		case BlockType::Farmland:
+		case BlockType::FrostedIce:
 		case BlockType::Fire:
 		case BlockType::Glass:
 		case BlockType::GlassPane:
@@ -1792,6 +1798,7 @@ bool cBlockInfo::IsTransparent(BlockState a_Block)
 		case BlockType::GrayStainedGlassPane:
 		case BlockType::GrayWallBanner:
 		case BlockType::Grass:
+		case BlockType::GrassPath:
 		case BlockType::GreenBanner:
 		case BlockType::GreenBed:
 		case BlockType::GreenCarpet:
@@ -1869,6 +1876,7 @@ bool cBlockInfo::IsTransparent(BlockState a_Block)
 		case BlockType::OakStairs:
 		case BlockType::OakTrapdoor:
 		case BlockType::OakWallSign:
+		case BlockType::Observer:
 		case BlockType::OrangeBanner:
 		case BlockType::OrangeBed:
 		case BlockType::OrangeCarpet:
@@ -1976,6 +1984,7 @@ bool cBlockInfo::IsTransparent(BlockState a_Block)
 		case BlockType::SugarCane:
 		case BlockType::Sunflower:
 		case BlockType::TallGrass:
+		case BlockType::Tnt:
 		case BlockType::Torch:
 		case BlockType::TrappedChest:
 		case BlockType::Tripwire:
