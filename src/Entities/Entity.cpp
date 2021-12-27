@@ -615,8 +615,6 @@ int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 			return 1;
 		}
 	}
-	// All other equipped items give a damage of 1:
-	return 1;
 }
 
 
