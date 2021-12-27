@@ -895,6 +895,7 @@ bool cBlockInfo::IsSolid(const BLOCKTYPE Block)
 		case E_BLOCK_ACTIVATOR_RAIL:
 		case E_BLOCK_ACTIVE_COMPARATOR:
 		case E_BLOCK_AIR:
+		case E_BLOCK_BEETROOTS:
 		case E_BLOCK_BIG_FLOWER:
 		case E_BLOCK_BROWN_MUSHROOM:
 		case E_BLOCK_CARPET:
@@ -928,7 +929,6 @@ bool cBlockInfo::IsSolid(const BLOCKTYPE Block)
 		case E_BLOCK_REDSTONE_TORCH_OFF:
 		case E_BLOCK_REDSTONE_TORCH_ON:
 		case E_BLOCK_REDSTONE_WIRE:
-		case E_BLOCK_REEDS:
 		case E_BLOCK_SAPLING:
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_SNOW:
@@ -937,6 +937,7 @@ bool cBlockInfo::IsSolid(const BLOCKTYPE Block)
 		case E_BLOCK_STATIONARY_WATER:
 		case E_BLOCK_STONE_BUTTON:
 		case E_BLOCK_STONE_PRESSURE_PLATE:
+		case E_BLOCK_SUGARCANE:
 		case E_BLOCK_TALL_GRASS:
 		case E_BLOCK_TORCH:
 		case E_BLOCK_TRIPWIRE:
@@ -971,6 +972,7 @@ bool cBlockInfo::IsTransparent(const BLOCKTYPE Block)
 		case E_BLOCK_BARRIER:
 		case E_BLOCK_BEACON:
 		case E_BLOCK_BED:
+		case E_BLOCK_BEETROOTS:
 		case E_BLOCK_BIG_FLOWER:
 		case E_BLOCK_BIRCH_DOOR:
 		case E_BLOCK_BIRCH_FENCE:
@@ -989,6 +991,8 @@ bool cBlockInfo::IsTransparent(const BLOCKTYPE Block)
 		case E_BLOCK_CARROTS:
 		case E_BLOCK_CAULDRON:
 		case E_BLOCK_CHEST:
+		case E_BLOCK_CHORUS_FLOWER:
+		case E_BLOCK_CHORUS_PLANT:
 		case E_BLOCK_COBBLESTONE_STAIRS:
 		case E_BLOCK_COBBLESTONE_WALL:
 		case E_BLOCK_COBWEB:
@@ -1005,6 +1009,7 @@ bool cBlockInfo::IsTransparent(const BLOCKTYPE Block)
 		case E_BLOCK_DETECTOR_RAIL:
 		case E_BLOCK_DRAGON_EGG:
 		case E_BLOCK_ENCHANTMENT_TABLE:
+		case E_BLOCK_END_GATEWAY:
 		case E_BLOCK_END_PORTAL:
 		case E_BLOCK_END_PORTAL_FRAME:
 		case E_BLOCK_END_ROD:
@@ -1014,9 +1019,11 @@ bool cBlockInfo::IsTransparent(const BLOCKTYPE Block)
 		case E_BLOCK_FIRE:
 		case E_BLOCK_FLOWER:
 		case E_BLOCK_FLOWER_POT:
+		case E_BLOCK_FROSTED_ICE:
 		case E_BLOCK_GLASS:
 		case E_BLOCK_GLASS_PANE:
 		case E_BLOCK_GLOWSTONE:
+		case E_BLOCK_GRASS_PATH:
 		case E_BLOCK_GRAY_SHULKER_BOX:
 		case E_BLOCK_GREEN_SHULKER_BOX:
 		case E_BLOCK_HEAD:
@@ -1054,6 +1061,7 @@ bool cBlockInfo::IsTransparent(const BLOCKTYPE Block)
 		case E_BLOCK_OAK_DOOR:
 		case E_BLOCK_OAK_FENCE_GATE:
 		case E_BLOCK_OAK_WOOD_STAIRS:
+		case E_BLOCK_OBSERVER:
 		case E_BLOCK_ORANGE_SHULKER_BOX:
 		case E_BLOCK_PINK_SHULKER_BOX:
 		case E_BLOCK_PISTON:
@@ -1098,6 +1106,7 @@ bool cBlockInfo::IsTransparent(const BLOCKTYPE Block)
 		case E_BLOCK_STONE_SLAB:
 		case E_BLOCK_SUGARCANE:
 		case E_BLOCK_TALL_GRASS:
+		case E_BLOCK_TNT:
 		case E_BLOCK_TORCH:
 		case E_BLOCK_TRAPDOOR:
 		case E_BLOCK_TRAPPED_CHEST:
