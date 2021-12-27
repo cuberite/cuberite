@@ -1699,7 +1699,7 @@ bool cBlockInfo::IsTransparent(BlockState a_Block)
 		case BlockType::AzureBluet:
 		case BlockType::Barrier:
 		case BlockType::Beacon:
-		case BlockType::Beetroot:
+		case BlockType::Beetroots:
 		case BlockType::BirchDoor:
 		case BlockType::BirchFence:
 		case BlockType::BirchFenceGate:
@@ -1779,7 +1779,7 @@ bool cBlockInfo::IsTransparent(BlockState a_Block)
 		case BlockType::DragonHead:
 		case BlockType::DragonWallHead:
 		case BlockType::EnchantingTable:
-		case BlockType::EndGateWay:
+		case BlockType::EndGateway:
 		case BlockType::EndPortal:
 		case BlockType::EndPortalFrame:
 		case BlockType::EndRod:
@@ -1984,7 +1984,7 @@ bool cBlockInfo::IsTransparent(BlockState a_Block)
 		case BlockType::SugarCane:
 		case BlockType::Sunflower:
 		case BlockType::TallGrass:
-		case BlockType::Tnt:
+		case BlockType::TNT:
 		case BlockType::Torch:
 		case BlockType::TrappedChest:
 		case BlockType::Tripwire:
