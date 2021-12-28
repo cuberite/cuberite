@@ -78,6 +78,7 @@ target_sources(
 	BlockPlanks.h
 	BlockPlant.h
 	BlockPluginInterface.h
+	BlockPodzol.h
 	BlockPortal.h
 	BlockPressurePlate.h
 	BlockPumpkin.h
