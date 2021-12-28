@@ -1193,7 +1193,7 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractSkeletonArmsSwinging, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Skeleton.IsChargingBow());
 			break;
-		} // case mtSkeleton
+		}  // case mtSkeleton
 
 		case mtSlime:
 		{

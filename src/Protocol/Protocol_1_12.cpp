@@ -799,7 +799,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
 			a_Pkt.WriteBool(Skeleton.IsChargingBow());
 			break;
-		} // case mtSkeleton
+		}  // case mtSkeleton
 
 		case mtSlime:
 		{

@@ -47,13 +47,15 @@ void cSkeleton::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (m_ChargingBow && m_EMState == IDLE)
+	if (m_ChargingBow && (m_EMState == IDLE))
 	{
 		// releasing bow if no more target is found
 		m_ChargingBow = false;
 		m_World->BroadcastEntityMetadata(*this);
 	}
 }
+
+
 
 
 
