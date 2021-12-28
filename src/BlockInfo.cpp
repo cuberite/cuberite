@@ -2884,4 +2884,5 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::ZombieHead:                       return 1.0f;
 		case BlockType::ZombieWallHead:                   return 1.0f;
 	}
+	UNREACHABLE("Unhandled block type");
 }

@@ -72,6 +72,7 @@
 #include "BlockPackedIce.h"
 #include "BlockPiston.h"
 #include "BlockPlanks.h"
+#include "BlockPodzol.h"
 #include "BlockPortal.h"
 #include "BlockPressurePlate.h"
 #include "BlockPumpkin.h"
@@ -678,14 +679,14 @@ namespace
 	constexpr cBlockGlassHandler                           BlockPinkStainedGlassHandler(BlockType::PinkStainedGlass);
 	constexpr cBlockGlassHandler                           BlockPinkStainedGlassPaneHandler(BlockType::PinkStainedGlassPane);
 	constexpr cDefaultBlockHandler                         BlockPinkTerracottaHandler(BlockType::PinkTerracotta);
-	constexpr cBlockFlowerHandler                           BlockPinkTulipHandler(BlockType::PinkTulip);
+	constexpr cBlockFlowerHandler                          BlockPinkTulipHandler(BlockType::PinkTulip);
 	constexpr cDefaultBlockHandler                         BlockPinkWallBannerHandler(BlockType::PinkWallBanner);
 	constexpr cBlockWoolHandler                            BlockPinkWoolHandler(BlockType::PinkWool);
 	constexpr cBlockPistonHandler                          BlockPistonHandler(BlockType::Piston);
 	constexpr cBlockPistonHeadHandler                      BlockPistonHeadHandler;
 	constexpr cBlockMobHeadHandler                         BlockPlayerHeadHandler(BlockType::PlayerHead);
 	constexpr cBlockMobHeadHandler                         BlockPlayerWallHeadHandler(BlockType::PlayerWallHead);
-	constexpr cDefaultBlockHandler                         BlockPodzolHandler(BlockType::Podzol);
+	constexpr cBlockPodzolHandler                          BlockPodzolHandler(BlockType::Podzol);
 	constexpr cDefaultBlockHandler                         BlockPolishedAndesiteHandler(BlockType::PolishedAndesite);
 	constexpr cBlockSlabHandler                            BlockPolishedAndesiteSlabHandler(BlockType::PolishedAndesiteSlab);
 	constexpr cBlockStairsHandler                          BlockPolishedAndesiteStairsHandler(BlockType::PolishedAndesiteStairs);

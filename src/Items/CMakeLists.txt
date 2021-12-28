@@ -60,7 +60,7 @@ target_sources(
 	ItemPumpkin.h
 	ItemQuartz.h
 	ItemRail.h
-        ItemChicken.h
+	ItemChicken.h
 	ItemRawFish.h
 	ItemRedstoneDust.h
 	ItemRepeater.h
