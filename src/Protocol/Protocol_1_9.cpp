@@ -2110,9 +2110,20 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 
 		case mtSkeleton:
 		{
+			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
 			a_Pkt.WriteBEUInt8(11);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			a_Pkt.WriteVarInt32(0);
+
+			// Index 5 and 12 used for charging bow client animation.
+			a_Pkt.WriteBEUInt8(5);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEInt8(0x02 | (Skeleton.IsChargingBow() ? 0x01 : 0x00));
+
+			a_Pkt.WriteBEUInt8(12);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBool(Skeleton.IsChargingBow());
+			break;
 		}
 
 		case mtSlime:
