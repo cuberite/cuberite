@@ -411,73 +411,76 @@ bool IsBlockMaterialRock(BlockState a_Block)
 {
 	switch (a_Block.Type())
 	{
-		case BlockType::Stone:
-		case BlockType::Cobblestone:
+		case BlockType::Andesite:
 		case BlockType::Bedrock:
-		case BlockType::GoldOre:
-		case BlockType::IronOre:
-		case BlockType::CoalOre:
-		case BlockType::LapisOre:
-		case BlockType::Dispenser:
-		case BlockType::Sandstone:
-		case BlockType::StoneSlab:
-		case BlockType::Bricks:
-		case BlockType::MossyCobblestone:
-		case BlockType::Obsidian:
-		case BlockType::Spawner:
-		case BlockType::DiamondOre:
-		case BlockType::Furnace:
-		case BlockType::CobblestoneStairs:
-		case BlockType::StonePressurePlate:
-		case BlockType::RedstoneOre:
-		case BlockType::Netherrack:
-		case BlockType::StoneBricks:
+		case BlockType::BlackTerracotta:
+		case BlockType::BlueTerracotta:
+		case BlockType::BoneBlock:
 		case BlockType::BrickStairs:
-		case BlockType::StoneBrickStairs:
-		case BlockType::NetherBricks:
-		case BlockType::NetherBrickFence:
-		case BlockType::NetherBrickStairs:
+		case BlockType::Bricks:
+		case BlockType::BrownTerracotta:
+		case BlockType::CoalBlock:
+		case BlockType::CoalOre:
+		case BlockType::Cobblestone:
+		case BlockType::CobblestoneStairs:
+		case BlockType::CobblestoneWall:
+		case BlockType::CyanTerracotta:
+		case BlockType::DiamondOre:
+		case BlockType::Diorite:
+		case BlockType::Dispenser:
+		case BlockType::Dropper:
+		case BlockType::EmeraldOre:
 		case BlockType::EnchantingTable:
 		case BlockType::EndPortalFrame:
 		case BlockType::EndStone:
-		case BlockType::SandstoneStairs:
-		case BlockType::EmeraldOre:
+		case BlockType::EndStoneBricks:
 		case BlockType::EnderChest:
-		case BlockType::CobblestoneWall:
-		case BlockType::NetherQuartzOre:
-		case BlockType::QuartzBlock:
-		case BlockType::QuartzStairs:
-		case BlockType::Dropper:
-		case BlockType::Prismarine:
-		case BlockType::Terracotta:
-		case BlockType::BlackTerracotta:
-		case BlockType::BlueTerracotta:
-		case BlockType::BrownTerracotta:
-		case BlockType::CyanTerracotta:
+		case BlockType::Furnace:
+		case BlockType::GoldOre:
+		case BlockType::Granite:
 		case BlockType::GrayTerracotta:
 		case BlockType::GreenTerracotta:
-		case BlockType::LimeTerracotta:
+		case BlockType::IronOre:
+		case BlockType::LapisOre:
 		case BlockType::LightBlueTerracotta:
+		case BlockType::LimeTerracotta:
 		case BlockType::MagentaTerracotta:
-		case BlockType::PinkTerracotta:
-		case BlockType::PurpleTerracotta:
-		case BlockType::RedTerracotta:
+		case BlockType::MagmaBlock:
+		case BlockType::MossyCobblestone:
+		case BlockType::NetherBrickFence:
+		case BlockType::NetherBrickStairs:
+		case BlockType::NetherBricks:
+		case BlockType::NetherQuartzOre:
+		case BlockType::Netherrack:
+		case BlockType::Observer:
+		case BlockType::Obsidian:
 		case BlockType::OrangeTerracotta:
-		case BlockType::YellowTerracotta:
-		case BlockType::WhiteTerracotta:
-		case BlockType::CoalBlock:
-		case BlockType::RedSandstone:
-		case BlockType::RedSandstoneStairs:
-		case BlockType::RedSandstoneSlab:
+		case BlockType::PinkTerracotta:
+		case BlockType::Prismarine:
+		case BlockType::PurpleTerracotta:
 		case BlockType::PurpurBlock:
 		case BlockType::PurpurPillar:
-		case BlockType::PurpurStairs:
 		case BlockType::PurpurSlab:
-		case BlockType::EndStoneBricks:
-		case BlockType::MagmaBlock:
+		case BlockType::PurpurStairs:
+		case BlockType::QuartzBlock:
+		case BlockType::QuartzStairs:
 		case BlockType::RedNetherBricks:
-		case BlockType::BoneBlock:
-		case BlockType::Observer:
+		case BlockType::RedSandstone:
+		case BlockType::RedSandstoneSlab:
+		case BlockType::RedSandstoneStairs:
+		case BlockType::RedTerracotta:
+		case BlockType::RedstoneOre:
+		case BlockType::Sandstone:
+		case BlockType::SandstoneStairs:
+		case BlockType::Spawner:
+		case BlockType::Stone:
+		case BlockType::StoneBrickStairs:
+		case BlockType::StoneBricks:
+		case BlockType::StonePressurePlate:
+		case BlockType::StoneSlab:
+		case BlockType::Terracotta:
+		case BlockType::WhiteTerracotta:
+		case BlockType::YellowTerracotta:
 		{
 			return true;
 		}
@@ -2113,477 +2116,772 @@ float cBlockInfo::GetBlockHeight(BlockState a_Block)
 
 float cBlockInfo::GetHardness(BlockState a_Block)
 {
+	// source: https://minecraft.fandom.com/wiki/Module:Hardness_values
 	// Block hardness:
 	switch (a_Block.Type())
 	{
-		case BlockType::AcaciaDoor:                 return 3.0f;
-		case BlockType::AcaciaFence:                return 2.0f;
-		case BlockType::AcaciaFenceGate:            return 2.0f;
-		case BlockType::AcaciaLeaves:               return 0.2f;
-		case BlockType::AcaciaLog:                  return 2.0f;
-		case BlockType::AcaciaSapling:              return 0.0f;
-		case BlockType::AcaciaSign:                 return 1.0f;
-		case BlockType::AcaciaStairs:               return 2.0f;
-		case BlockType::AcaciaWallSign:             return 1.0f;
-		case BlockType::ActivatorRail:              return 0.7f;
-		case BlockType::Air:                        return 0.0f;
-		case BlockType::Allium:                     return 0.0f;
-		case BlockType::Anvil:                      return 5.0f;
-		case BlockType::AttachedMelonStem:          return 0.0f;
-		case BlockType::AttachedPumpkinStem:        return 0.0f;
-		case BlockType::AzureBluet:                 return 0.0f;
-		case BlockType::Barrier:                    return INFINITY;
-		case BlockType::Beacon:                     return 3.0f;
-		case BlockType::Bedrock:                    return INFINITY;
-		case BlockType::Beetroots:                  return 0.0f;
-		case BlockType::BirchDoor:                  return 3.0f;
-		case BlockType::BirchFence:                 return 2.0f;
-		case BlockType::BirchFenceGate:             return 2.0f;
-		case BlockType::BirchLog:                   return 2.0f;
-		case BlockType::BirchSapling:               return 0.0f;
-		case BlockType::BirchSign:                  return 1.0f;
-		case BlockType::BirchStairs:                return 2.0f;
-		case BlockType::BirchWallSign:              return 1.0f;
-		case BlockType::BlackBanner:                return 1.0f;
-		case BlockType::BlackBed:                   return 0.2f;
-		case BlockType::BlackCarpet:                return 0.1f;
-		case BlockType::BlackConcrete:              return 1.8f;
-		case BlockType::BlackConcretePowder:        return 0.5f;
-		case BlockType::BlackGlazedTerracotta:      return 1.4f;
-		case BlockType::BlackShulkerBox:            return 2.0f;
-		case BlockType::BlackStainedGlass:          return 0.3f;
-		case BlockType::BlackTerracotta:            return 1.25f;
-		case BlockType::BlackWallBanner:            return 1.0f;
-		case BlockType::BlackWool:                  return 0.8f;
-		case BlockType::BlueBanner:                 return 1.0f;
-		case BlockType::BlueBed:                    return 0.2f;
-		case BlockType::BlueCarpet:                 return 0.1f;
-		case BlockType::BlueConcrete:               return 1.8f;
-		case BlockType::BlueConcretePowder:         return 0.5f;
-		case BlockType::BlueGlazedTerracotta:       return 1.4f;
-		case BlockType::BlueOrchid:                 return 0.0f;
-		case BlockType::BlueShulkerBox:             return 2.0f;
-		case BlockType::BlueStainedGlass:           return 0.3f;
-		case BlockType::BlueTerracotta:             return 1.25f;
-		case BlockType::BlueWallBanner:             return 1.0f;
-		case BlockType::BlueWool:                   return 0.8f;
-		case BlockType::BoneBlock:                  return 2.0f;
-		case BlockType::Bookshelf:                  return 1.5f;
-		case BlockType::BrewingStand:               return 0.5f;
-		case BlockType::BrickStairs:                return 2.0f;
-		case BlockType::Bricks:                     return 2.0f;
-		case BlockType::BrownBanner:                return 1.0f;
-		case BlockType::BrownBed:                   return 0.2f;
-		case BlockType::BrownCarpet:                return 0.1f;
-		case BlockType::BrownConcrete:              return 1.8f;
-		case BlockType::BrownConcretePowder:        return 0.5f;
-		case BlockType::BrownGlazedTerracotta:      return 1.4f;
-		case BlockType::BrownMushroom:              return 0.0f;
-		case BlockType::BrownMushroomBlock:         return 0.2f;
-		case BlockType::BrownShulkerBox:            return 2.0f;
-		case BlockType::BrownStainedGlass:          return 0.3f;
-		case BlockType::BrownTerracotta:            return 1.25f;
-		case BlockType::BrownWallBanner:            return 1.0f;
-		case BlockType::BrownWool:                  return 0.8f;
-		case BlockType::Cactus:                     return 0.4f;
-		case BlockType::Cake:                       return 0.5f;
-		case BlockType::Carrots:                    return 0.0f;
-		case BlockType::Cauldron:                   return 2.0f;
-		case BlockType::CaveAir:                    return 0.0f;
-		case BlockType::ChainCommandBlock:          return INFINITY;
-		case BlockType::Chest:                      return 2.5f;
-		case BlockType::ChippedAnvil:               return 5.0f;
-		case BlockType::ChorusFlower:               return 0.4f;
-		case BlockType::ChorusPlant:                return 0.4f;
-		case BlockType::Clay:                       return 0.6f;
-		case BlockType::CoalBlock:                  return 5.0f;
-		case BlockType::CoalOre:                    return 3.0f;
-		case BlockType::Cobblestone:                return 2.0f;
-		case BlockType::CobblestoneStairs:          return 2.0f;
-		case BlockType::CobblestoneWall:            return 2.0f;
-		case BlockType::Cobweb:                     return 4.0f;
-		case BlockType::Cocoa:                      return 0.2f;
-		case BlockType::CommandBlock:               return INFINITY;
-		case BlockType::Comparator:                 return 0.0f;
-		case BlockType::Cornflower:                 return 0.0f;
-		case BlockType::CraftingTable:              return 2.5f;
-		case BlockType::CreeperHead:                return 1.0f;
-		case BlockType::CreeperWallHead:            return 1.0f;
-		case BlockType::CrimsonSign:                return 1.0f;
-		case BlockType::CrimsonWallSign:            return 1.0f;
-		case BlockType::CyanBanner:                 return 1.0f;
-		case BlockType::CyanBed:                    return 0.2f;
-		case BlockType::CyanCarpet:                 return 0.1f;
-		case BlockType::CyanConcrete:               return 1.8f;
-		case BlockType::CyanConcretePowder:         return 0.5f;
-		case BlockType::CyanGlazedTerracotta:       return 1.4f;
-		case BlockType::CyanShulkerBox:             return 2.0f;
-		case BlockType::CyanStainedGlass:           return 0.3f;
-		case BlockType::CyanTerracotta:             return 1.25f;
-		case BlockType::CyanWallBanner:             return 1.0f;
-		case BlockType::CyanWool:                   return 0.8f;
-		case BlockType::DamagedAnvil:               return 5.0f;
-		case BlockType::Dandelion:                  return 0.0f;
-		case BlockType::DarkOakDoor:                return 3.0f;
-		case BlockType::DarkOakFence:               return 2.0f;
-		case BlockType::DarkOakFenceGate:           return 2.0f;
-		case BlockType::DarkOakLeaves:              return 0.2f;
-		case BlockType::DarkOakLog:                 return 2.0f;
-		case BlockType::DarkOakSapling:             return 0.0f;
-		case BlockType::DarkOakSign:                return 1.0f;
-		case BlockType::DarkOakStairs:              return 2.0f;
-		case BlockType::DarkOakWallSign:            return 1.0f;
-		case BlockType::DaylightDetector:           return 0.2f;
-		case BlockType::DeadBush:                   return 0.0f;
-		case BlockType::DetectorRail:               return 0.7f;
-		case BlockType::DiamondBlock:               return 5.0f;
-		case BlockType::DiamondOre:                 return 3.0f;
-		case BlockType::Dirt:                       return 0.5f;
-		case BlockType::Dispenser:                  return 3.5f;
-		case BlockType::DragonEgg:                  return 3.0f;
-		case BlockType::DragonHead:                 return 1.0f;
-		case BlockType::DragonWallHead:             return 1.0f;
-		case BlockType::Dropper:                    return 3.5f;
-		case BlockType::EmeraldBlock:               return 5.0f;
-		case BlockType::EmeraldOre:                 return 3.0f;
-		case BlockType::EnchantingTable:            return 5.0f;
-		case BlockType::EndGateway:                 return INFINITY;
-		case BlockType::EndPortal:                  return INFINITY;
-		case BlockType::EndPortalFrame:             return INFINITY;
-		case BlockType::EndRod:                     return 0.0f;
-		case BlockType::EndStone:                   return 3.0f;
-		case BlockType::EndStoneBricks:             return 0.8f;
-		case BlockType::EnderChest:                 return 22.5f;
-		case BlockType::Farmland:                   return 0.6f;
-		case BlockType::Fire:                       return 0.0f;
-		case BlockType::FrostedIce:                 return 0.5f;
-		case BlockType::Furnace:                    return 3.5f;
-		case BlockType::Glass:                      return 0.3f;
-		case BlockType::GlassPane:                  return 0.3f;
-		case BlockType::Glowstone:                  return 0.3f;
-		case BlockType::GoldBlock:                  return 3.0f;
-		case BlockType::GoldOre:                    return 3.0f;
-		case BlockType::GrassBlock:                 return 0.6f;
-		case BlockType::GrassPath:                  return 0.6f;
-		case BlockType::Gravel:                     return 0.6f;
-		case BlockType::GrayBanner:                 return 1.0f;
-		case BlockType::GrayBed:                    return 0.2f;
-		case BlockType::GrayCarpet:                 return 0.1f;
-		case BlockType::GrayConcrete:               return 1.8f;
-		case BlockType::GrayConcretePowder:         return 0.5f;
-		case BlockType::GrayGlazedTerracotta:       return 1.4f;
-		case BlockType::GrayShulkerBox:             return 2.0f;
-		case BlockType::GrayStainedGlass:           return 0.3f;
-		case BlockType::GrayTerracotta:             return 1.25f;
-		case BlockType::GrayWallBanner:             return 1.0f;
-		case BlockType::GrayWool:                   return 0.8f;
-		case BlockType::GreenBanner:                return 1.0f;
-		case BlockType::GreenBed:                   return 0.2f;
-		case BlockType::GreenCarpet:                return 0.1f;
-		case BlockType::GreenConcrete:              return 1.8f;
-		case BlockType::GreenConcretePowder:        return 0.5f;
-		case BlockType::GreenGlazedTerracotta:      return 1.4f;
-		case BlockType::GreenShulkerBox:            return 2.0f;
-		case BlockType::GreenStainedGlass:          return 0.3f;
-		case BlockType::GreenTerracotta:            return 1.25f;
-		case BlockType::GreenWallBanner:            return 1.0f;
-		case BlockType::GreenWool:                  return 0.8f;
-		case BlockType::HayBale:                    return 0.5f;
-		case BlockType::HeavyWeightedPressurePlate: return 0.5f;
-		case BlockType::Hopper:                     return 3.0f;
-		case BlockType::Ice:                        return 0.5f;
-		case BlockType::InfestedChiseledStoneBricks: return 0.75;
-		case BlockType::InfestedCobblestone:         return 0.75;
-		case BlockType::InfestedCrackedStoneBricks:  return 0.75;
-		case BlockType::InfestedMossyStoneBricks:    return 0.75;
-		case BlockType::InfestedStone:               return 0.75;
-		case BlockType::IronBars:                   return 5.0f;
-		case BlockType::IronBlock:                  return 5.0f;
-		case BlockType::IronDoor:                   return 5.0f;
-		case BlockType::IronOre:                    return 3.0f;
-		case BlockType::IronTrapdoor:               return 5.0f;
-		case BlockType::JackOLantern:               return 1.0f;
-		case BlockType::Jukebox:                    return 2.0f;
-		case BlockType::JungleDoor:                 return 3.0f;
-		case BlockType::JungleFence:                return 2.0f;
-		case BlockType::JungleFenceGate:            return 2.0f;
-		case BlockType::JungleLeaves:               return 0.2f;
-		case BlockType::JungleLog:                  return 2.0f;
-		case BlockType::JungleSapling:              return 0.0f;
-		case BlockType::JungleSign:                 return 1.0f;
-		case BlockType::JungleStairs:               return 2.0f;
-		case BlockType::JungleWallSign:             return 1.0f;
-		case BlockType::Ladder:                     return 0.4f;
-		case BlockType::LapisBlock:                 return 3.0f;
-		case BlockType::LapisOre:                   return 3.0f;
-		case BlockType::LargeFern:                  return 0.0f;
-		case BlockType::Lava:                       return 100.0f;
-		case BlockType::Lever:                      return 0.5f;
-		case BlockType::LightBlueBanner:            return 1.0f;
-		case BlockType::LightBlueBed:               return 0.2f;
-		case BlockType::LightBlueCarpet:            return 0.1f;
-		case BlockType::LightBlueConcrete:          return 1.8f;
-		case BlockType::LightBlueConcretePowder:    return 0.5f;
-		case BlockType::LightBlueGlazedTerracotta:  return 1.4f;
-		case BlockType::LightBlueShulkerBox:        return 2.0f;
-		case BlockType::LightBlueStainedGlass:      return 0.3f;
-		case BlockType::LightBlueTerracotta:        return 1.25f;
-		case BlockType::LightBlueWallBanner:        return 1.0f;
-		case BlockType::LightBlueWool:              return 0.8f;
-		case BlockType::LightGrayBanner:            return 1.0f;
-		case BlockType::LightGrayBed:               return 0.2f;
-		case BlockType::LightGrayCarpet:            return 0.1f;
-		case BlockType::LightGrayConcrete:          return 1.8f;
-		case BlockType::LightGrayConcretePowder:    return 0.5f;
-		case BlockType::LightGrayGlazedTerracotta:  return 1.4f;
-		case BlockType::LightGrayShulkerBox:        return 2.0f;
-		case BlockType::LightGrayStainedGlass:      return 0.3f;
-		case BlockType::LightGrayWallBanner:        return 1.0f;
-		case BlockType::LightGrayWool:              return 0.8f;
-		case BlockType::LightWeightedPressurePlate: return 0.5f;
-		case BlockType::Lilac:                      return 0.0f;
-		case BlockType::LilyOfTheValley:            return 0.0f;
-		case BlockType::LilyPad:                    return 0.0f;
-		case BlockType::LimeBanner:                 return 1.0f;
-		case BlockType::LimeBed:                    return 0.2f;
-		case BlockType::LimeCarpet:                 return 0.1f;
-		case BlockType::LimeConcrete:               return 1.8f;
-		case BlockType::LimeConcretePowder:         return 0.5f;
-		case BlockType::LimeGlazedTerracotta:       return 1.4f;
-		case BlockType::LimeShulkerBox:             return 2.0f;
-		case BlockType::LimeStainedGlass:           return 0.3f;
-		case BlockType::LimeTerracotta:             return 1.25f;
-		case BlockType::LimeWallBanner:             return 1.0f;
-		case BlockType::LimeWool:                   return 0.8f;
-		case BlockType::MagentaBanner:              return 1.0f;
-		case BlockType::MagentaBed:                 return 0.2f;
-		case BlockType::MagentaCarpet:              return 0.1f;
-		case BlockType::MagentaConcrete:            return 1.8f;
-		case BlockType::MagentaConcretePowder:      return 0.5f;
-		case BlockType::MagentaGlazedTerracotta:    return 1.4f;
-		case BlockType::MagentaShulkerBox:          return 2.0f;
-		case BlockType::MagentaStainedGlass:        return 0.3f;
-		case BlockType::MagentaTerracotta:          return 1.25f;
-		case BlockType::MagentaWallBanner:          return 1.0f;
-		case BlockType::MagentaWool:                return 0.8f;
-		case BlockType::MagmaBlock:                 return 0.5f;
-		case BlockType::Melon:                      return 1.0f;
-		case BlockType::MelonStem:                  return 0.0f;
-		case BlockType::MossyCobblestone:           return 2.0f;
-		case BlockType::MovingPiston:               return INFINITY;
-		case BlockType::Mycelium:                   return 0.6f;
-		case BlockType::NetherBrickFence:           return 2.0f;
-		case BlockType::NetherBrickStairs:          return 2.0f;
-		case BlockType::NetherBricks:               return 2.0f;
-		case BlockType::NetherGoldOre:              return 3.0f;
-		case BlockType::NetherPortal:               return INFINITY;
-		case BlockType::NetherQuartzOre:            return 3.0f;
-		case BlockType::NetherWart:                 return 0.0f;
-		case BlockType::NetherWartBlock:            return 1.0f;
-		case BlockType::Netherrack:                 return 0.4f;
-		case BlockType::NoteBlock:                  return 0.8f;
-		case BlockType::OakButton:                  return 0.5f;
-		case BlockType::OakDoor:                    return 3.0f;
-		case BlockType::OakFence:                   return 2.0f;
-		case BlockType::OakFenceGate:               return 2.0f;
-		case BlockType::OakLeaves:                  return 0.2f;
-		case BlockType::OakLog:                     return 2.0f;
-		case BlockType::OakPlanks:                  return 2.0f;
-		case BlockType::OakPressurePlate:           return 0.5f;
-		case BlockType::OakSapling:                 return 0.0f;
-		case BlockType::OakSign:                    return 1.0f;
-		case BlockType::OakSlab:                    return 2.0f;
-		case BlockType::OakStairs:                  return 2.0f;
-		case BlockType::OakTrapdoor:                return 3.0f;
-		case BlockType::OakWallSign:                return 1.0f;
-		case BlockType::Observer:                   return 3.5f;
-		case BlockType::Obsidian:                   return 50.0f;
-		case BlockType::OrangeBanner:               return 1.0f;
-		case BlockType::OrangeBed:                  return 0.2f;
-		case BlockType::OrangeCarpet:               return 0.1f;
-		case BlockType::OrangeConcrete:             return 1.8f;
-		case BlockType::OrangeConcretePowder:       return 0.5f;
-		case BlockType::OrangeGlazedTerracotta:     return 1.4f;
-		case BlockType::OrangeShulkerBox:           return 2.0f;
-		case BlockType::OrangeStainedGlass:         return 0.3f;
-		case BlockType::OrangeTerracotta:           return 1.25f;
-		case BlockType::OrangeTulip:                return 0.0f;
-		case BlockType::OrangeWallBanner:           return 1.0f;
-		case BlockType::OrangeWool:                 return 0.8f;
-		case BlockType::OxeyeDaisy:                 return 0.0f;
-		case BlockType::PackedIce:                  return 0.5f;
-		case BlockType::Peony:                      return 0.0f;
-		case BlockType::PinkBanner:                 return 1.0f;
-		case BlockType::PinkBed:                    return 0.2f;
-		case BlockType::PinkCarpet:                 return 0.1f;
-		case BlockType::PinkConcrete:               return 1.8f;
-		case BlockType::PinkConcretePowder:         return 0.5f;
-		case BlockType::PinkGlazedTerracotta:       return 1.4f;
-		case BlockType::PinkShulkerBox:             return 2.0f;
-		case BlockType::PinkStainedGlass:           return 0.3f;
-		case BlockType::PinkTerracotta:             return 1.25f;
-		case BlockType::PinkTulip:                  return 0.0f;
-		case BlockType::PinkWallBanner:             return 1.0f;
-		case BlockType::PinkWool:                   return 0.8f;
-		case BlockType::Piston:                     return 0.5f;
-		case BlockType::PistonHead:                 return 0.5f;
-		case BlockType::PlayerHead:                 return 1.0f;
-		case BlockType::PlayerWallHead:             return 1.0f;
-		case BlockType::Poppy:                      return 0.0f;
-		case BlockType::Potatoes:                   return 0.0f;
-		case BlockType::PottedAcaciaSapling:        return 0.0f;
-		case BlockType::PottedAllium:               return 0.0f;
-		case BlockType::PottedAzureBluet:           return 0.0f;
-		case BlockType::PottedBamboo:               return 0.0f;
-		case BlockType::PottedBirchSapling:         return 0.0f;
-		case BlockType::PottedBlueOrchid:           return 0.0f;
-		case BlockType::PottedBrownMushroom:        return 0.0f;
-		case BlockType::PottedCactus:               return 0.0f;
-		case BlockType::PottedCornflower:           return 0.0f;
-		case BlockType::PottedCrimsonFungus:        return 0.0f;
-		case BlockType::PottedCrimsonRoots:         return 0.0f;
-		case BlockType::PottedDandelion:            return 0.0f;
-		case BlockType::PottedDarkOakSapling:       return 0.0f;
-		case BlockType::PottedDeadBush:             return 0.0f;
-		case BlockType::PottedFern:                 return 0.0f;
-		case BlockType::PottedJungleSapling:        return 0.0f;
-		case BlockType::PottedLilyOfTheValley:      return 0.0f;
-		case BlockType::PottedOakSapling:           return 0.0f;
-		case BlockType::PottedOrangeTulip:          return 0.0f;
-		case BlockType::PottedOxeyeDaisy:           return 0.0f;
-		case BlockType::PottedPinkTulip:            return 0.0f;
-		case BlockType::PottedPoppy:                return 0.0f;
-		case BlockType::PottedRedMushroom:          return 0.0f;
-		case BlockType::PottedRedTulip:             return 0.0f;
-		case BlockType::PottedSpruceSapling:        return 0.0f;
-		case BlockType::PottedWarpedFungus:         return 0.0f;
-		case BlockType::PottedWarpedRoots:          return 0.0f;
-		case BlockType::PottedWhiteTulip:           return 0.0f;
-		case BlockType::PottedWitherRose:           return 0.0f;
-		case BlockType::PoweredRail:                return 0.7f;
-		case BlockType::Prismarine:                 return 1.5f;
-		case BlockType::Pumpkin:                    return 1.0f;
-		case BlockType::PumpkinStem:                return 0.0f;
-		case BlockType::PurpleBanner:               return 1.0f;
-		case BlockType::PurpleBed:                  return 0.2f;
-		case BlockType::PurpleCarpet:               return 0.1f;
-		case BlockType::PurpleConcrete:             return 1.8f;
-		case BlockType::PurpleConcretePowder:       return 0.5f;
-		case BlockType::PurpleGlazedTerracotta:     return 1.4f;
-		case BlockType::PurpleShulkerBox:           return 2.0f;
-		case BlockType::PurpleStainedGlass:         return 0.3f;
-		case BlockType::PurpleTerracotta:           return 1.25f;
-		case BlockType::PurpleWallBanner:           return 1.0f;
-		case BlockType::PurpleWool:                 return 0.8f;
-		case BlockType::PurpurBlock:                return 1.5f;
-		case BlockType::PurpurPillar:               return 1.5f;
-		case BlockType::PurpurSlab:                 return 2.0f;
-		case BlockType::PurpurStairs:               return 1.5f;
-		case BlockType::QuartzBlock:                return 0.8f;
-		case BlockType::QuartzStairs:               return 0.8f;
-		case BlockType::Rail:                       return 0.7f;
-		case BlockType::RedBanner:                  return 1.0f;
-		case BlockType::RedBed:                     return 0.2f;
-		case BlockType::RedCarpet:                  return 0.1f;
-		case BlockType::RedConcrete:                return 1.8f;
-		case BlockType::RedConcretePowder:          return 0.5f;
-		case BlockType::RedGlazedTerracotta:        return 1.4f;
-		case BlockType::RedMushroom:                return 0.0f;
-		case BlockType::RedMushroomBlock:           return 0.2f;
-		case BlockType::RedNetherBricks:            return 2.0f;
-		case BlockType::RedSandstone:               return 0.8f;
-		case BlockType::RedSandstoneSlab:           return 2.0f;
-		case BlockType::RedSandstoneStairs:         return 0.8f;
-		case BlockType::RedShulkerBox:              return 2.0f;
-		case BlockType::RedStainedGlass:            return 0.3f;
-		case BlockType::RedTerracotta:              return 1.25f;
-		case BlockType::RedTulip:                   return 0.0f;
-		case BlockType::RedWallBanner:              return 1.0f;
-		case BlockType::RedWool:                    return 0.8f;
-		case BlockType::RedstoneBlock:              return 5.0f;
-		case BlockType::RedstoneLamp:               return 0.3f;
-		case BlockType::RedstoneOre:
-		{
-			return Block::RedstoneOre::Lit(a_Block) ? 0.625f : 3.0f;
-		}
-		case BlockType::RedstoneTorch:              return 0.0f;
-		case BlockType::RedstoneWallTorch:          return 0.0f;
-		case BlockType::RedstoneWire:               return 0.0f;
-		case BlockType::Repeater:                   return 0.0f;
-		case BlockType::RepeatingCommandBlock:      return INFINITY;
-		case BlockType::RoseBush:                   return 0.0f;
-		case BlockType::Sand:                       return 0.5f;
-		case BlockType::Sandstone:                  return 0.8f;
-		case BlockType::SandstoneStairs:            return 0.8f;
-		case BlockType::SeaLantern:                 return 0.3f;
-		case BlockType::SkeletonSkull:              return 1.0f;
-		case BlockType::SkeletonWallSkull:          return 1.0f;
-		case BlockType::SlimeBlock:                 return 0.0f;
-		case BlockType::Snow:                       return 0.1f;
-		case BlockType::SnowBlock:                  return 0.2f;
-		case BlockType::SoulSand:                   return 0.5f;
-		case BlockType::Spawner:                    return 5.0f;
-		case BlockType::Sponge:                     return 0.6f;
-		case BlockType::SpruceDoor:                 return 3.0f;
-		case BlockType::SpruceFence:                return 2.0f;
-		case BlockType::SpruceFenceGate:            return 2.0f;
-		case BlockType::SpruceSapling:              return 0.0f;
-		case BlockType::SpruceSign:                 return 1.0f;
-		case BlockType::SpruceStairs:               return 2.0f;
-		case BlockType::SpruceWallSign:             return 1.0f;
-		case BlockType::StickyPiston:               return 0.5f;
-		case BlockType::Stone:                      return 1.5f;
-		case BlockType::StoneBrickStairs:           return 1.5f;
-		case BlockType::StoneBricks:                return 1.5f;
-		case BlockType::StoneButton:                return 0.5f;
-		case BlockType::StonePressurePlate:         return 0.5f;
-		case BlockType::StoneSlab:                  return 2.0f;
-		case BlockType::StructureBlock:             return INFINITY;
-		case BlockType::StructureVoid:              return 0.0f;
-		case BlockType::SugarCane:                  return 0.0f;
-		case BlockType::Sunflower:                  return 0.0f;
-		case BlockType::TNT:                        return 0.0f;
-		case BlockType::TallGrass:                  return 0.0f;
-		case BlockType::Terracotta:                 return 1.25f;
-		case BlockType::Torch:                      return 0.0f;
-		case BlockType::TrappedChest:               return 2.5f;
-		case BlockType::Tripwire:                   return 0.0f;
-		case BlockType::TripwireHook:               return 0.0f;
-		case BlockType::Vine:                       return 0.2f;
-		case BlockType::VoidAir:                    return 0.0f;
-		case BlockType::WallTorch:                  return 0.0f;
-		case BlockType::WarpedSign:                 return 1.0f;
-		case BlockType::WarpedWallSign:             return 1.0f;
-		case BlockType::Water:                      return 100.0f;
-		case BlockType::WetSponge:                  return 0.6f;
-		case BlockType::Wheat:                      return 0.0f;
-		case BlockType::WhiteBanner:                return 1.0f;
-		case BlockType::WhiteBed:                   return 0.2f;
-		case BlockType::WhiteCarpet:                return 0.1f;
-		case BlockType::WhiteConcrete:              return 1.8f;
-		case BlockType::WhiteConcretePowder:        return 0.5f;
-		case BlockType::WhiteGlazedTerracotta:      return 1.4f;
-		case BlockType::WhiteShulkerBox:            return 2.0f;
-		case BlockType::WhiteStainedGlass:          return 0.3f;
-		case BlockType::WhiteTerracotta:            return 1.25f;
-		case BlockType::WhiteTulip:                 return 0.0f;
-		case BlockType::WhiteWallBanner:            return 1.0f;
-		case BlockType::WhiteWool:                  return 0.8f;
-		case BlockType::WitherSkeletonSkull:        return 1.0f;
-		case BlockType::WitherSkeletonWallSkull:    return 1.0f;
-		case BlockType::YellowBanner:               return 1.0f;
-		case BlockType::YellowBed:                  return 0.2f;
-		case BlockType::YellowCarpet:               return 0.1f;
-		case BlockType::YellowConcrete:             return 1.8f;
-		case BlockType::YellowConcretePowder:       return 0.5f;
-		case BlockType::YellowGlazedTerracotta:     return 1.4f;
-		case BlockType::YellowShulkerBox:           return 2.0f;
-		case BlockType::YellowStainedGlass:         return 0.3f;
-		case BlockType::YellowTerracotta:           return 1.25f;
-		case BlockType::YellowWallBanner:           return 1.0f;
-		case BlockType::YellowWool:                 return 0.8f;
-		case BlockType::ZombieHead:                 return 1.0f;
-		case BlockType::ZombieWallHead:             return 1.0f;
-		default:                                    return 0;
+		case BlockType::AcaciaButton:                     return 0.5f;
+		case BlockType::AcaciaDoor:                       return 3.0f;
+		case BlockType::AcaciaFence:                      return 2.0f;
+		case BlockType::AcaciaFenceGate:                  return 2.0f;
+		case BlockType::AcaciaLeaves:                     return 0.2f;
+		case BlockType::AcaciaLog:                        return 2.0f;
+		case BlockType::AcaciaPlanks:                     return 2.0f;
+		case BlockType::AcaciaPressurePlate:              return 0.5f;
+		case BlockType::AcaciaSapling:                    return 0.0f;
+		case BlockType::AcaciaSign:                       return 1.0f;
+		case BlockType::AcaciaSlab:                       return 2.0f;
+		case BlockType::AcaciaStairs:                     return 2.0f;
+		case BlockType::AcaciaTrapdoor:                   return 3.0f;
+		case BlockType::AcaciaWallSign:                   return 1.0f;
+		case BlockType::AcaciaWood:                       return 2.0f;
+		case BlockType::ActivatorRail:                    return 0.7f;
+		case BlockType::Air:                              return 0.0f;
+		case BlockType::Allium:                           return 0.0f;
+		case BlockType::AncientDebris:                    return 30.0f;
+		case BlockType::Andesite:                         return 1.5f;
+		case BlockType::AndesiteSlab:                     return 1.5f;
+		case BlockType::AndesiteStairs:                   return 1.5f;
+		case BlockType::AndesiteWall:                     return 1.5f;
+		case BlockType::Anvil:                            return 5.0f;
+		case BlockType::AttachedMelonStem:                return 0.0f;
+		case BlockType::AttachedPumpkinStem:              return 0.0f;
+		case BlockType::AzureBluet:                       return 0.0f;
+		case BlockType::Bamboo:                           return 1.0f;
+		case BlockType::BambooSapling:                    return 1.0f;
+		case BlockType::Barrel:                           return 2.5f;
+		case BlockType::Barrier:                          return INFINITY;
+		case BlockType::Basalt:                           return 1.25f;
+		case BlockType::Beacon:                           return 3.0f;
+		case BlockType::Bedrock:                          return INFINITY;
+		case BlockType::BeeNest:                          return 0.3f;
+		case BlockType::Beehive:                          return 0.6f;
+		case BlockType::Beetroots:                        return 0.0f;
+		case BlockType::Bell:                             return 5.0f;
+		case BlockType::BirchButton:                      return 0.5f;
+		case BlockType::BirchDoor:                        return 3.0f;
+		case BlockType::BirchFence:                       return 2.0f;
+		case BlockType::BirchFenceGate:                   return 2.0f;
+		case BlockType::BirchLeaves:                      return 0.2f;
+		case BlockType::BirchLog:                         return 2.0f;
+		case BlockType::BirchPlanks:                      return 2.0f;
+		case BlockType::BirchPressurePlate:               return 0.5f;
+		case BlockType::BirchSapling:                     return 0.0f;
+		case BlockType::BirchSign:                        return 1.0f;
+		case BlockType::BirchSlab:                        return 2.0f;
+		case BlockType::BirchStairs:                      return 2.0f;
+		case BlockType::BirchTrapdoor:                    return 3.0f;
+		case BlockType::BirchWallSign:                    return 1.0f;
+		case BlockType::BirchWood:                        return 2.0f;
+		case BlockType::BlackBanner:                      return 1.0f;
+		case BlockType::BlackBed:                         return 0.2f;
+		case BlockType::BlackCarpet:                      return 0.1f;
+		case BlockType::BlackConcrete:                    return 1.8f;
+		case BlockType::BlackConcretePowder:              return 0.5f;
+		case BlockType::BlackGlazedTerracotta:            return 1.4f;
+		case BlockType::BlackShulkerBox:                  return 2.0f;
+		case BlockType::BlackStainedGlass:                return 0.3f;
+		case BlockType::BlackStainedGlassPane:            return 0.3f;
+		case BlockType::BlackTerracotta:                  return 1.25f;
+		case BlockType::BlackWallBanner:                  return 1.0f;
+		case BlockType::BlackWool:                        return 0.8f;
+		case BlockType::Blackstone:                       return 1.5f;
+		case BlockType::BlackstoneSlab:                   return 2.0f;
+		case BlockType::BlackstoneStairs:                 return 1.5f;
+		case BlockType::BlackstoneWall:                   return 1.5f;
+		case BlockType::BlastFurnace:                     return 3.5f;
+		case BlockType::BlueBanner:                       return 1.0f;
+		case BlockType::BlueBed:                          return 0.2f;
+		case BlockType::BlueCarpet:                       return 0.1f;
+		case BlockType::BlueConcrete:                     return 1.8f;
+		case BlockType::BlueConcretePowder:               return 0.5f;
+		case BlockType::BlueGlazedTerracotta:             return 1.4f;
+		case BlockType::BlueIce:                          return 2.8f;
+		case BlockType::BlueOrchid:                       return 0.0f;
+		case BlockType::BlueShulkerBox:                   return 2.0f;
+		case BlockType::BlueStainedGlass:                 return 0.3f;
+		case BlockType::BlueStainedGlassPane:             return 0.3f;
+		case BlockType::BlueTerracotta:                   return 1.25f;
+		case BlockType::BlueWallBanner:                   return 1.0f;
+		case BlockType::BlueWool:                         return 0.8f;
+		case BlockType::BoneBlock:                        return 2.0f;
+		case BlockType::Bookshelf:                        return 1.5f;
+		case BlockType::BrainCoral:                       return 0.0f;
+		case BlockType::BrainCoralBlock:                  return 1.5f;
+		case BlockType::BrainCoralFan:                    return 0.0f;
+		case BlockType::BrainCoralWallFan:                return 0.0f;
+		case BlockType::BrewingStand:                     return 0.5f;
+		case BlockType::BrickSlab:                        return 2.0f;
+		case BlockType::BrickStairs:                      return 2.0f;
+		case BlockType::BrickWall:                        return 2.0f;
+		case BlockType::Bricks:                           return 2.0f;
+		case BlockType::BrownBanner:                      return 1.0f;
+		case BlockType::BrownBed:                         return 0.2f;
+		case BlockType::BrownCarpet:                      return 0.1f;
+		case BlockType::BrownConcrete:                    return 1.8f;
+		case BlockType::BrownConcretePowder:              return 0.5f;
+		case BlockType::BrownGlazedTerracotta:            return 1.4f;
+		case BlockType::BrownMushroom:                    return 0.0f;
+		case BlockType::BrownMushroomBlock:               return 0.2f;
+		case BlockType::BrownShulkerBox:                  return 2.0f;
+		case BlockType::BrownStainedGlass:                return 0.3f;
+		case BlockType::BrownStainedGlassPane:            return 0.3f;
+		case BlockType::BrownTerracotta:                  return 1.25f;
+		case BlockType::BrownWallBanner:                  return 1.0f;
+		case BlockType::BrownWool:                        return 0.8f;
+		case BlockType::BubbleColumn:                     return 0.0f;
+		case BlockType::BubbleCoral:                      return 0.0f;
+		case BlockType::BubbleCoralBlock:                 return 1.5f;
+		case BlockType::BubbleCoralFan:                   return 0.0f;
+		case BlockType::BubbleCoralWallFan:               return 0.0f;
+		case BlockType::Cactus:                           return 0.4f;
+		case BlockType::Cake:                             return 0.5f;
+		case BlockType::Campfire:                         return 2.0f;
+		case BlockType::Carrots:                          return 0.0f;
+		case BlockType::CartographyTable:                 return 2.5f;
+		case BlockType::CarvedPumpkin:                    return 1.0f;
+		case BlockType::Cauldron:                         return 2.0f;
+		case BlockType::CaveAir:                          return 0.0f;
+		case BlockType::Chain:                            return 5.0f;
+		case BlockType::ChainCommandBlock:                return INFINITY;
+		case BlockType::Chest:                            return 2.5f;
+		case BlockType::ChippedAnvil:                     return 5.0f;
+		case BlockType::ChiseledNetherBricks:             return 2.0f;
+		case BlockType::ChiseledPolishedBlackstone:       return 1.5f;
+		case BlockType::ChiseledQuartzBlock:              return 0.8f;
+		case BlockType::ChiseledRedSandstone:             return 0.8f;
+		case BlockType::ChiseledSandstone:                return 0.8f;
+		case BlockType::ChiseledStoneBricks:              return 1.5f;
+		case BlockType::ChorusFlower:                     return 0.4f;
+		case BlockType::ChorusPlant:                      return 0.4f;
+		case BlockType::Clay:                             return 0.6f;
+		case BlockType::CoalBlock:                        return 5.0f;
+		case BlockType::CoalOre:                          return 3.0f;
+		case BlockType::CoarseDirt:                       return 0.5f;
+		case BlockType::Cobblestone:                      return 2.0f;
+		case BlockType::CobblestoneSlab:                  return 2.0f;
+		case BlockType::CobblestoneStairs:                return 2.0f;
+		case BlockType::CobblestoneWall:                  return 2.0f;
+		case BlockType::Cobweb:                           return 4.0f;
+		case BlockType::Cocoa:                            return 0.2f;
+		case BlockType::CommandBlock:                     return INFINITY;
+		case BlockType::Comparator:                       return 0.0f;
+		case BlockType::Composter:                        return 0.6f;
+		case BlockType::Conduit:                          return 3.0f;
+		case BlockType::Cornflower:                       return 0.0f;
+		case BlockType::CrackedNetherBricks:              return 2.0f;
+		case BlockType::CrackedPolishedBlackstoneBricks:  return 1.5f;
+		case BlockType::CrackedStoneBricks:               return 1.5f;
+		case BlockType::CraftingTable:                    return 2.5f;
+		case BlockType::CreeperHead:                      return 1.0f;
+		case BlockType::CreeperWallHead:                  return 1.0f;
+		case BlockType::CrimsonButton:                    return 0.5f;
+		case BlockType::CrimsonDoor:                      return 3.0f;
+		case BlockType::CrimsonFence:                     return 2.0f;
+		case BlockType::CrimsonFenceGate:                 return 2.0f;
+		case BlockType::CrimsonFungus:                    return 0.0f;
+		case BlockType::CrimsonHyphae:                    return 2.0f;
+		case BlockType::CrimsonNylium:                    return 0.4f;
+		case BlockType::CrimsonPlanks:                    return 2.0f;
+		case BlockType::CrimsonPressurePlate:             return 0.5f;
+		case BlockType::CrimsonRoots:                     return 0.0f;
+		case BlockType::CrimsonSign:                      return 1.0f;
+		case BlockType::CrimsonSlab:                      return 2.0f;
+		case BlockType::CrimsonStairs:                    return 2.0f;
+		case BlockType::CrimsonStem:                      return 2.0f;
+		case BlockType::CrimsonTrapdoor:                  return 3.0f;
+		case BlockType::CrimsonWallSign:                  return 1.0f;
+		case BlockType::CryingObsidian:                   return 50.0f;
+		case BlockType::CutRedSandstone:                  return 0.8f;
+		case BlockType::CutRedSandstoneSlab:              return 2.0f;
+		case BlockType::CutSandstone:                     return 0.8f;
+		case BlockType::CutSandstoneSlab:                 return 2.0f;
+		case BlockType::CyanBanner:                       return 1.0f;
+		case BlockType::CyanBed:                          return 0.2f;
+		case BlockType::CyanCarpet:                       return 0.1f;
+		case BlockType::CyanConcrete:                     return 1.8f;
+		case BlockType::CyanConcretePowder:               return 0.5f;
+		case BlockType::CyanGlazedTerracotta:             return 1.4f;
+		case BlockType::CyanShulkerBox:                   return 2.0f;
+		case BlockType::CyanStainedGlass:                 return 0.3f;
+		case BlockType::CyanStainedGlassPane:             return 0.3f;
+		case BlockType::CyanTerracotta:                   return 1.25f;
+		case BlockType::CyanWallBanner:                   return 1.0f;
+		case BlockType::CyanWool:                         return 0.8f;
+		case BlockType::DamagedAnvil:                     return 5.0f;
+		case BlockType::Dandelion:                        return 0.0f;
+		case BlockType::DarkOakButton:                    return 0.5f;
+		case BlockType::DarkOakDoor:                      return 3.0f;
+		case BlockType::DarkOakFence:                     return 2.0f;
+		case BlockType::DarkOakFenceGate:                 return 2.0f;
+		case BlockType::DarkOakLeaves:                    return 0.2f;
+		case BlockType::DarkOakLog:                       return 2.0f;
+		case BlockType::DarkOakPlanks:                    return 2.0f;
+		case BlockType::DarkOakPressurePlate:             return 0.5f;
+		case BlockType::DarkOakSapling:                   return 0.0f;
+		case BlockType::DarkOakSign:                      return 1.0f;
+		case BlockType::DarkOakSlab:                      return 2.0f;
+		case BlockType::DarkOakStairs:                    return 2.0f;
+		case BlockType::DarkOakTrapdoor:                  return 3.0f;
+		case BlockType::DarkOakWallSign:                  return 1.0f;
+		case BlockType::DarkOakWood:                      return 2.0f;
+		case BlockType::DarkPrismarine:                   return 1.5f;
+		case BlockType::DarkPrismarineSlab:               return 1.5f;
+		case BlockType::DarkPrismarineStairs:             return 1.5f;
+		case BlockType::DaylightDetector:                 return 0.2f;
+		case BlockType::DeadBrainCoral:                   return 0.0f;
+		case BlockType::DeadBrainCoralBlock:              return 1.5f;
+		case BlockType::DeadBrainCoralFan:                return 0.0f;
+		case BlockType::DeadBrainCoralWallFan:            return 0.0f;
+		case BlockType::DeadBubbleCoral:                  return 0.0f;
+		case BlockType::DeadBubbleCoralBlock:             return 1.5f;
+		case BlockType::DeadBubbleCoralFan:               return 0.0f;
+		case BlockType::DeadBubbleCoralWallFan:           return 0.0f;
+		case BlockType::DeadBush:                         return 0.0f;
+		case BlockType::DeadFireCoral:                    return 0.0f;
+		case BlockType::DeadFireCoralBlock:               return 1.5f;
+		case BlockType::DeadFireCoralFan:                 return 0.0f;
+		case BlockType::DeadFireCoralWallFan:             return 0.0f;
+		case BlockType::DeadHornCoral:                    return 0.0f;
+		case BlockType::DeadHornCoralBlock:               return 1.5f;
+		case BlockType::DeadHornCoralFan:                 return 0.0f;
+		case BlockType::DeadHornCoralWallFan:             return 0.0f;
+		case BlockType::DeadTubeCoral:                    return 0.0f;
+		case BlockType::DeadTubeCoralBlock:               return 1.5f;
+		case BlockType::DeadTubeCoralFan:                 return 0.0f;
+		case BlockType::DeadTubeCoralWallFan:             return 0.0f;
+		case BlockType::DetectorRail:                     return 0.7f;
+		case BlockType::DiamondBlock:                     return 5.0f;
+		case BlockType::DiamondOre:                       return 3.0f;
+		case BlockType::Diorite:                          return 1.5f;
+		case BlockType::DioriteSlab:                      return 1.5f;
+		case BlockType::DioriteStairs:                    return 1.5f;
+		case BlockType::DioriteWall:                      return 1.5f;
+		case BlockType::Dirt:                             return 0.5f;
+		case BlockType::Dispenser:                        return 3.5f;
+		case BlockType::DragonEgg:                        return 3.0f;
+		case BlockType::DragonHead:                       return 1.0f;
+		case BlockType::DragonWallHead:                   return 1.0f;
+		case BlockType::DriedKelpBlock:                   return 0.5f;
+		case BlockType::Dropper:                          return 3.5f;
+		case BlockType::EmeraldBlock:                     return 5.0f;
+		case BlockType::EmeraldOre:                       return 3.0f;
+		case BlockType::EnchantingTable:                  return 5.0f;
+		case BlockType::EndGateway:                       return INFINITY;
+		case BlockType::EndPortal:                        return INFINITY;
+		case BlockType::EndPortalFrame:                   return INFINITY;
+		case BlockType::EndRod:                           return 0.0f;
+		case BlockType::EndStone:                         return 3.0f;
+		case BlockType::EndStoneBrickSlab:                return 3.0f;
+		case BlockType::EndStoneBrickStairs:              return 3.0f;
+		case BlockType::EndStoneBrickWall:                return 3.0f;
+		case BlockType::EndStoneBricks:                   return 3.0f;
+		case BlockType::EnderChest:                       return 22.5f;
+		case BlockType::Farmland:                         return 0.6f;
+		case BlockType::Fern:                             return 0.0f;
+		case BlockType::Fire:                             return 0.0f;
+		case BlockType::FireCoral:                        return 0.0f;
+		case BlockType::FireCoralBlock:                   return 1.5f;
+		case BlockType::FireCoralFan:                     return 0.0f;
+		case BlockType::FireCoralWallFan:                 return 0.0f;
+		case BlockType::FletchingTable:                   return 2.5f;
+		case BlockType::FlowerPot:                        return 0.0f;
+		case BlockType::FrostedIce:                       return 0.5f;
+		case BlockType::Furnace:                          return 3.5f;
+		case BlockType::GildedBlackstone:                 return 1.5f;
+		case BlockType::Glass:                            return 0.3f;
+		case BlockType::GlassPane:                        return 0.3f;
+		case BlockType::Glowstone:                        return 0.3f;
+		case BlockType::GoldBlock:                        return 3.0f;
+		case BlockType::GoldOre:                          return 3.0f;
+		case BlockType::Granite:                          return 1.5f;
+		case BlockType::GraniteSlab:                      return 1.5f;
+		case BlockType::GraniteStairs:                    return 1.5f;
+		case BlockType::GraniteWall:                      return 1.5f;
+		case BlockType::Grass:                            return 0.0f;
+		case BlockType::GrassBlock:                       return 0.6f;
+		case BlockType::GrassPath:                        return 0.f;
+		case BlockType::Gravel:                           return 0.6f;
+		case BlockType::GrayBanner:                       return 1.0f;
+		case BlockType::GrayBed:                          return 0.2f;
+		case BlockType::GrayCarpet:                       return 0.1f;
+		case BlockType::GrayConcrete:                     return 1.8f;
+		case BlockType::GrayConcretePowder:               return 0.5f;
+		case BlockType::GrayGlazedTerracotta:             return 1.4f;
+		case BlockType::GrayShulkerBox:                   return 2.0f;
+		case BlockType::GrayStainedGlass:                 return 0.3f;
+		case BlockType::GrayStainedGlassPane:             return 0.3f;
+		case BlockType::GrayTerracotta:                   return 1.25f;
+		case BlockType::GrayWallBanner:                   return 1.0f;
+		case BlockType::GrayWool:                         return 0.8f;
+		case BlockType::GreenBanner:                      return 1.0f;
+		case BlockType::GreenBed:                         return 0.2f;
+		case BlockType::GreenCarpet:                      return 0.1f;
+		case BlockType::GreenConcrete:                    return 1.8f;
+		case BlockType::GreenConcretePowder:              return 0.5f;
+		case BlockType::GreenGlazedTerracotta:            return 1.4f;
+		case BlockType::GreenShulkerBox:                  return 2.0f;
+		case BlockType::GreenStainedGlass:                return 0.3f;
+		case BlockType::GreenStainedGlassPane:            return 0.3f;
+		case BlockType::GreenTerracotta:                  return 1.25f;
+		case BlockType::GreenWallBanner:                  return 1.0f;
+		case BlockType::GreenWool:                        return 0.8f;
+		case BlockType::Grindstone:                       return 2.0f;
+		case BlockType::HayBale:                          return 0.5f;
+		case BlockType::HeavyWeightedPressurePlate:       return 0.5f;
+		case BlockType::HoneyBlock:                       return 0.0f;
+		case BlockType::HoneycombBlock:                   return 0.6f;
+		case BlockType::Hopper:                           return 3.0f;
+		case BlockType::HornCoral:                        return 0.0f;
+		case BlockType::HornCoralBlock:                   return 1.5f;
+		case BlockType::HornCoralFan:                     return 0.0f;
+		case BlockType::HornCoralWallFan:                 return 0.0f;
+		case BlockType::Ice:                              return 0.5f;
+		case BlockType::InfestedChiseledStoneBricks:      return 0.75f;
+		case BlockType::InfestedCobblestone:              return 1.0f;
+		case BlockType::InfestedCrackedStoneBricks:       return 0.75f;
+		case BlockType::InfestedMossyStoneBricks:         return 0.75f;
+		case BlockType::InfestedStone:                    return 0.75f;
+		case BlockType::InfestedStoneBricks:              return 0.75f;
+		case BlockType::IronBars:                         return 5.0f;
+		case BlockType::IronBlock:                        return 5.0f;
+		case BlockType::IronDoor:                         return 5.0f;
+		case BlockType::IronOre:                          return 3.0f;
+		case BlockType::IronTrapdoor:                     return 5.0f;
+		case BlockType::JackOLantern:                     return 1.0f;
+		case BlockType::Jigsaw:                           return INFINITY;
+		case BlockType::Jukebox:                          return 2.0f;
+		case BlockType::JungleButton:                     return 0.5f;
+		case BlockType::JungleDoor:                       return 3.0f;
+		case BlockType::JungleFence:                      return 2.0f;
+		case BlockType::JungleFenceGate:                  return 2.0f;
+		case BlockType::JungleLeaves:                     return 0.2f;
+		case BlockType::JungleLog:                        return 2.0f;
+		case BlockType::JunglePlanks:                     return 2.0f;
+		case BlockType::JunglePressurePlate:              return 0.5f;
+		case BlockType::JungleSapling:                    return 0.0f;
+		case BlockType::JungleSign:                       return 1.0f;
+		case BlockType::JungleSlab:                       return 2.0f;
+		case BlockType::JungleStairs:                     return 2.0f;
+		case BlockType::JungleTrapdoor:                   return 3.0f;
+		case BlockType::JungleWallSign:                   return 1.0f;
+		case BlockType::JungleWood:                       return 2.0f;
+		case BlockType::Kelp:                             return 0.0f;
+		case BlockType::KelpPlant:                        return 0.0f;
+		case BlockType::Ladder:                           return 0.4f;
+		case BlockType::Lantern:                          return 3.5f;
+		case BlockType::LapisBlock:                       return 3.0f;
+		case BlockType::LapisOre:                         return 3.0f;
+		case BlockType::LargeFern:                        return 0.0f;
+		case BlockType::Lava:                             return 100.0f;
+		case BlockType::Lectern:                          return 2.5f;
+		case BlockType::Lever:                            return 0.5f;
+		case BlockType::LightBlueBanner:                  return 1.0f;
+		case BlockType::LightBlueBed:                     return 0.2f;
+		case BlockType::LightBlueCarpet:                  return 0.1f;
+		case BlockType::LightBlueConcrete:                return 1.8f;
+		case BlockType::LightBlueConcretePowder:          return 0.5f;
+		case BlockType::LightBlueGlazedTerracotta:        return 1.4f;
+		case BlockType::LightBlueShulkerBox:              return 2.0f;
+		case BlockType::LightBlueStainedGlass:            return 0.3f;
+		case BlockType::LightBlueStainedGlassPane:        return 0.3f;
+		case BlockType::LightBlueTerracotta:              return 1.25f;
+		case BlockType::LightBlueWallBanner:              return 1.0f;
+		case BlockType::LightBlueWool:                    return 0.8f;
+		case BlockType::LightGrayBanner:                  return 1.0f;
+		case BlockType::LightGrayBed:                     return 0.2f;
+		case BlockType::LightGrayCarpet:                  return 0.1f;
+		case BlockType::LightGrayConcrete:                return 1.8f;
+		case BlockType::LightGrayConcretePowder:          return 0.5f;
+		case BlockType::LightGrayGlazedTerracotta:        return 1.4f;
+		case BlockType::LightGrayShulkerBox:              return 2.0f;
+		case BlockType::LightGrayStainedGlass:            return 0.3f;
+		case BlockType::LightGrayStainedGlassPane:        return 0.3f;
+		case BlockType::LightGrayTerracotta:              return 1.25f;
+		case BlockType::LightGrayWallBanner:              return 1.0f;
+		case BlockType::LightGrayWool:                    return 0.8f;
+		case BlockType::LightWeightedPressurePlate:       return 0.5f;
+		case BlockType::Lilac:                            return 0.0f;
+		case BlockType::LilyOfTheValley:                  return 0.0f;
+		case BlockType::LilyPad:                          return 0.0f;
+		case BlockType::LimeBanner:                       return 1.0f;
+		case BlockType::LimeBed:                          return 0.2f;
+		case BlockType::LimeCarpet:                       return 0.1f;
+		case BlockType::LimeConcrete:                     return 1.8f;
+		case BlockType::LimeConcretePowder:               return 0.5f;
+		case BlockType::LimeGlazedTerracotta:             return 1.4f;
+		case BlockType::LimeShulkerBox:                   return 2.0f;
+		case BlockType::LimeStainedGlass:                 return 0.3f;
+		case BlockType::LimeStainedGlassPane:             return 0.3f;
+		case BlockType::LimeTerracotta:                   return 1.25f;
+		case BlockType::LimeWallBanner:                   return 1.0f;
+		case BlockType::LimeWool:                         return 0.8f;
+		case BlockType::Lodestone:                        return 3.5f;
+		case BlockType::Loom:                             return 2.5f;
+		case BlockType::MagentaBanner:                    return 1.0f;
+		case BlockType::MagentaBed:                       return 0.2f;
+		case BlockType::MagentaCarpet:                    return 0.1f;
+		case BlockType::MagentaConcrete:                  return 1.8f;
+		case BlockType::MagentaConcretePowder:            return 0.5f;
+		case BlockType::MagentaGlazedTerracotta:          return 1.4f;
+		case BlockType::MagentaShulkerBox:                return 2.0f;
+		case BlockType::MagentaStainedGlass:              return 0.3f;
+		case BlockType::MagentaStainedGlassPane:          return 0.3f;
+		case BlockType::MagentaTerracotta:                return 1.25f;
+		case BlockType::MagentaWallBanner:                return 1.0f;
+		case BlockType::MagentaWool:                      return 0.8f;
+		case BlockType::MagmaBlock:                       return 0.5f;
+		case BlockType::Melon:                            return 1.0f;
+		case BlockType::MelonStem:                        return 0.0f;
+		case BlockType::MossyCobblestone:                 return 2.0f;
+		case BlockType::MossyCobblestoneSlab:             return 2.0f;
+		case BlockType::MossyCobblestoneStairs:           return 2.0f;
+		case BlockType::MossyCobblestoneWall:             return 2.0f;
+		case BlockType::MossyStoneBrickSlab:              return 1.5f;
+		case BlockType::MossyStoneBrickStairs:            return 1.5f;
+		case BlockType::MossyStoneBrickWall:              return 1.5f;
+		case BlockType::MossyStoneBricks:                 return 1.5f;
+		case BlockType::MovingPiston:                     return INFINITY;
+		case BlockType::MushroomStem:                     return 0.2f;
+		case BlockType::Mycelium:                         return 0.6f;
+		case BlockType::NetherBrickFence:                 return 2.0f;
+		case BlockType::NetherBrickSlab:                  return 2.0f;
+		case BlockType::NetherBrickStairs:                return 2.0f;
+		case BlockType::NetherBrickWall:                  return 2.0f;
+		case BlockType::NetherBricks:                     return 2.0f;
+		case BlockType::NetherGoldOre:                    return 3.0f;
+		case BlockType::NetherPortal:                     return INFINITY;
+		case BlockType::NetherQuartzOre:                  return 3.0f;
+		case BlockType::NetherSprouts:                    return 0.0f;
+		case BlockType::NetherWart:                       return 0.0f;
+		case BlockType::NetherWartBlock:                  return 1.0f;
+		case BlockType::NetheriteBlock:                   return 50.0f;
+		case BlockType::Netherrack:                       return 0.4f;
+		case BlockType::NoteBlock:                        return 0.8f;
+		case BlockType::OakButton:                        return 0.5f;
+		case BlockType::OakDoor:                          return 3.0f;
+		case BlockType::OakFence:                         return 2.0f;
+		case BlockType::OakFenceGate:                     return 2.0f;
+		case BlockType::OakLeaves:                        return 0.2f;
+		case BlockType::OakLog:                           return 2.0f;
+		case BlockType::OakPlanks:                        return 2.0f;
+		case BlockType::OakPressurePlate:                 return 0.5f;
+		case BlockType::OakSapling:                       return 0.0f;
+		case BlockType::OakSign:                          return 1.0f;
+		case BlockType::OakSlab:                          return 2.0f;
+		case BlockType::OakStairs:                        return 2.0f;
+		case BlockType::OakTrapdoor:                      return 3.0f;
+		case BlockType::OakWallSign:                      return 1.0f;
+		case BlockType::OakWood:                          return 2.0f;
+		case BlockType::Observer:                         return 3.5f;
+		case BlockType::Obsidian:                         return 50.0f;
+		case BlockType::OrangeBanner:                     return 1.0f;
+		case BlockType::OrangeBed:                        return 0.2f;
+		case BlockType::OrangeCarpet:                     return 0.1f;
+		case BlockType::OrangeConcrete:                   return 1.8f;
+		case BlockType::OrangeConcretePowder:             return 0.5f;
+		case BlockType::OrangeGlazedTerracotta:           return 1.4f;
+		case BlockType::OrangeShulkerBox:                 return 2.0f;
+		case BlockType::OrangeStainedGlass:               return 0.3f;
+		case BlockType::OrangeStainedGlassPane:           return 0.3f;
+		case BlockType::OrangeTerracotta:                 return 1.25f;
+		case BlockType::OrangeTulip:                      return 0.0f;
+		case BlockType::OrangeWallBanner:                 return 1.0f;
+		case BlockType::OrangeWool:                       return 0.8f;
+		case BlockType::OxeyeDaisy:                       return 0.0f;
+		case BlockType::PackedIce:                        return 0.5f;
+		case BlockType::Peony:                            return 0.0f;
+		case BlockType::PetrifiedOakSlab:                 return 2.0f;
+		case BlockType::PinkBanner:                       return 1.0f;
+		case BlockType::PinkBed:                          return 0.2f;
+		case BlockType::PinkCarpet:                       return 0.1f;
+		case BlockType::PinkConcrete:                     return 1.8f;
+		case BlockType::PinkConcretePowder:               return 0.5f;
+		case BlockType::PinkGlazedTerracotta:             return 1.4f;
+		case BlockType::PinkShulkerBox:                   return 2.0f;
+		case BlockType::PinkStainedGlass:                 return 0.3f;
+		case BlockType::PinkStainedGlassPane:             return 0.3f;
+		case BlockType::PinkTerracotta:                   return 1.25f;
+		case BlockType::PinkTulip:                        return 0.0f;
+		case BlockType::PinkWallBanner:                   return 1.0f;
+		case BlockType::PinkWool:                         return 0.8f;
+		case BlockType::Piston:                           return 1.5f;
+		case BlockType::PistonHead:                       return 1.5f;
+		case BlockType::PlayerHead:                       return 1.0f;
+		case BlockType::PlayerWallHead:                   return 1.0f;
+		case BlockType::Podzol:                           return 0.5f;
+		case BlockType::PolishedAndesite:                 return 1.5f;
+		case BlockType::PolishedAndesiteSlab:             return 1.5f;
+		case BlockType::PolishedAndesiteStairs:           return 1.5f;
+		case BlockType::PolishedBasalt:                   return 1.25f;
+		case BlockType::PolishedBlackstone:               return 2.0f;
+		case BlockType::PolishedBlackstoneBrickSlab:      return 2.0f;
+		case BlockType::PolishedBlackstoneBrickStairs:    return 1.5f;
+		case BlockType::PolishedBlackstoneBrickWall:      return 1.5f;
+		case BlockType::PolishedBlackstoneBricks:         return 1.5f;
+		case BlockType::PolishedBlackstoneButton:         return 0.5f;
+		case BlockType::PolishedBlackstonePressurePlate:  return 0.5f;
+		case BlockType::PolishedBlackstoneSlab:           return 2.0f;
+		case BlockType::PolishedBlackstoneStairs:         return 2.0f;
+		case BlockType::PolishedBlackstoneWall:           return 2.0f;
+		case BlockType::PolishedDiorite:                  return 1.5f;
+		case BlockType::PolishedDioriteSlab:              return 1.5f;
+		case BlockType::PolishedDioriteStairs:            return 1.5f;
+		case BlockType::PolishedGranite:                  return 1.5f;
+		case BlockType::PolishedGraniteSlab:              return 1.5f;
+		case BlockType::PolishedGraniteStairs:            return 1.5f;
+		case BlockType::Poppy:                            return 0.0f;
+		case BlockType::Potatoes:                         return 0.0f;
+		case BlockType::PottedAcaciaSapling:              return 0.0f;
+		case BlockType::PottedAllium:                     return 0.0f;
+		case BlockType::PottedAzureBluet:                 return 0.0f;
+		case BlockType::PottedBamboo:                     return 0.0f;
+		case BlockType::PottedBirchSapling:               return 0.0f;
+		case BlockType::PottedBlueOrchid:                 return 0.0f;
+		case BlockType::PottedBrownMushroom:              return 0.0f;
+		case BlockType::PottedCactus:                     return 0.0f;
+		case BlockType::PottedCornflower:                 return 0.0f;
+		case BlockType::PottedCrimsonFungus:              return 0.0f;
+		case BlockType::PottedCrimsonRoots:               return 0.0f;
+		case BlockType::PottedDandelion:                  return 0.0f;
+		case BlockType::PottedDarkOakSapling:             return 0.0f;
+		case BlockType::PottedDeadBush:                   return 0.0f;
+		case BlockType::PottedFern:                       return 0.0f;
+		case BlockType::PottedJungleSapling:              return 0.0f;
+		case BlockType::PottedLilyOfTheValley:            return 0.0f;
+		case BlockType::PottedOakSapling:                 return 0.0f;
+		case BlockType::PottedOrangeTulip:                return 0.0f;
+		case BlockType::PottedOxeyeDaisy:                 return 0.0f;
+		case BlockType::PottedPinkTulip:                  return 0.0f;
+		case BlockType::PottedPoppy:                      return 0.0f;
+		case BlockType::PottedRedMushroom:                return 0.0f;
+		case BlockType::PottedRedTulip:                   return 0.0f;
+		case BlockType::PottedSpruceSapling:              return 0.0f;
+		case BlockType::PottedWarpedFungus:               return 0.0f;
+		case BlockType::PottedWarpedRoots:                return 0.0f;
+		case BlockType::PottedWhiteTulip:                 return 0.0f;
+		case BlockType::PottedWitherRose:                 return 0.0f;
+		case BlockType::PoweredRail:                      return 0.7f;
+		case BlockType::Prismarine:                       return 1.5f;
+		case BlockType::PrismarineBrickSlab:              return 1.5f;
+		case BlockType::PrismarineBrickStairs:            return 1.5f;
+		case BlockType::PrismarineBricks:                 return 1.5f;
+		case BlockType::PrismarineSlab:                   return 1.5f;
+		case BlockType::PrismarineStairs:                 return 1.5f;
+		case BlockType::PrismarineWall:                   return 1.5f;
+		case BlockType::Pumpkin:                          return 1.0f;
+		case BlockType::PumpkinStem:                      return 0.0f;
+		case BlockType::PurpleBanner:                     return 1.0f;
+		case BlockType::PurpleBed:                        return 0.2f;
+		case BlockType::PurpleCarpet:                     return 0.1f;
+		case BlockType::PurpleConcrete:                   return 1.8f;
+		case BlockType::PurpleConcretePowder:             return 0.5f;
+		case BlockType::PurpleGlazedTerracotta:           return 1.4f;
+		case BlockType::PurpleShulkerBox:                 return 2.0f;
+		case BlockType::PurpleStainedGlass:               return 0.3f;
+		case BlockType::PurpleStainedGlassPane:           return 0.3f;
+		case BlockType::PurpleTerracotta:                 return 1.25f;
+		case BlockType::PurpleWallBanner:                 return 1.0f;
+		case BlockType::PurpleWool:                       return 0.8f;
+		case BlockType::PurpurBlock:                      return 1.5f;
+		case BlockType::PurpurPillar:                     return 1.5f;
+		case BlockType::PurpurSlab:                       return 2.0f;
+		case BlockType::PurpurStairs:                     return 1.5f;
+		case BlockType::QuartzBlock:                      return 0.8f;
+		case BlockType::QuartzBricks:                     return 0.8f;
+		case BlockType::QuartzPillar:                     return 0.8f;
+		case BlockType::QuartzSlab:                       return 2.0f;
+		case BlockType::QuartzStairs:                     return 0.8f;
+		case BlockType::Rail:                             return 0.7f;
+		case BlockType::RedBanner:                        return 1.0f;
+		case BlockType::RedBed:                           return 0.2f;
+		case BlockType::RedCarpet:                        return 0.1f;
+		case BlockType::RedConcrete:                      return 1.8f;
+		case BlockType::RedConcretePowder:                return 0.5f;
+		case BlockType::RedGlazedTerracotta:              return 1.4f;
+		case BlockType::RedMushroom:                      return 0.0f;
+		case BlockType::RedMushroomBlock:                 return 0.2f;
+		case BlockType::RedNetherBrickSlab:               return 2.0f;
+		case BlockType::RedNetherBrickStairs:             return 2.0f;
+		case BlockType::RedNetherBrickWall:               return 2.0f;
+		case BlockType::RedNetherBricks:                  return 2.0f;
+		case BlockType::RedSand:                          return 0.5f;
+		case BlockType::RedSandstone:                     return 0.8f;
+		case BlockType::RedSandstoneSlab:                 return 2.0f;
+		case BlockType::RedSandstoneStairs:               return 0.8f;
+		case BlockType::RedSandstoneWall:                 return 0.8f;
+		case BlockType::RedShulkerBox:                    return 2.0f;
+		case BlockType::RedStainedGlass:                  return 0.3f;
+		case BlockType::RedStainedGlassPane:              return 0.3f;
+		case BlockType::RedTerracotta:                    return 1.25f;
+		case BlockType::RedTulip:                         return 0.0f;
+		case BlockType::RedWallBanner:                    return 1.0f;
+		case BlockType::RedWool:                          return 0.8f;
+		case BlockType::RedstoneBlock:                    return 5.0f;
+		case BlockType::RedstoneLamp:                     return 0.3f;
+		case BlockType::RedstoneOre:                      return 3.0f;
+		case BlockType::RedstoneTorch:                    return 0.0f;
+		case BlockType::RedstoneWallTorch:                return 0.0f;
+		case BlockType::RedstoneWire:                     return 0.0f;
+		case BlockType::Repeater:                         return 0.0f;
+		case BlockType::RepeatingCommandBlock:            return INFINITY;
+		case BlockType::RespawnAnchor:                    return 50.0f;
+		case BlockType::RoseBush:                         return 0.0f;
+		case BlockType::Sand:                             return 0.5f;
+		case BlockType::Sandstone:                        return 0.8f;
+		case BlockType::SandstoneSlab:                    return 2.0f;
+		case BlockType::SandstoneStairs:                  return 0.8f;
+		case BlockType::SandstoneWall:                    return 0.8f;
+		case BlockType::Scaffolding:                      return 0.0f;
+		case BlockType::SeaLantern:                       return 0.3f;
+		case BlockType::SeaPickle:                        return 0.0f;
+		case BlockType::Seagrass:                         return 0.0f;
+		case BlockType::Shroomlight:                      return 1.0f;
+		case BlockType::ShulkerBox:                       return 2.0f;
+		case BlockType::SkeletonSkull:                    return 1.0f;
+		case BlockType::SkeletonWallSkull:                return 1.0f;
+		case BlockType::SlimeBlock:                       return 0.0f;
+		case BlockType::SmithingTable:                    return 2.5f;
+		case BlockType::Smoker:                           return 3.5f;
+		case BlockType::SmoothQuartz:                     return 2.0f;
+		case BlockType::SmoothQuartzSlab:                 return 2.0f;
+		case BlockType::SmoothQuartzStairs:               return 2.0f;
+		case BlockType::SmoothRedSandstone:               return 2.0f;
+		case BlockType::SmoothRedSandstoneSlab:           return 2.0f;
+		case BlockType::SmoothRedSandstoneStairs:         return 2.0f;
+		case BlockType::SmoothSandstone:                  return 2.0f;
+		case BlockType::SmoothSandstoneSlab:              return 2.0f;
+		case BlockType::SmoothSandstoneStairs:            return 2.0f;
+		case BlockType::SmoothStone:                      return 2.0f;
+		case BlockType::SmoothStoneSlab:                  return 2.0f;
+		case BlockType::Snow:                             return 0.1f;
+		case BlockType::SnowBlock:                        return 0.2f;
+		case BlockType::SoulCampfire:                     return 2.0f;
+		case BlockType::SoulFire:                         return 0.0f;
+		case BlockType::SoulLantern:                      return 3.5f;
+		case BlockType::SoulSand:                         return 0.5f;
+		case BlockType::SoulSoil:                         return 0.5f;
+		case BlockType::SoulTorch:                        return 0.0f;
+		case BlockType::SoulWallTorch:                    return 0.0f;
+		case BlockType::Spawner:                          return 5.0f;
+		case BlockType::Sponge:                           return 0.6f;
+		case BlockType::SpruceButton:                     return 0.5f;
+		case BlockType::SpruceDoor:                       return 3.0f;
+		case BlockType::SpruceFence:                      return 2.0f;
+		case BlockType::SpruceFenceGate:                  return 2.0f;
+		case BlockType::SpruceLeaves:                     return 0.2f;
+		case BlockType::SpruceLog:                        return 2.0f;
+		case BlockType::SprucePlanks:                     return 2.0f;
+		case BlockType::SprucePressurePlate:              return 0.5f;
+		case BlockType::SpruceSapling:                    return 0.0f;
+		case BlockType::SpruceSign:                       return 1.0f;
+		case BlockType::SpruceSlab:                       return 2.0f;
+		case BlockType::SpruceStairs:                     return 2.0f;
+		case BlockType::SpruceTrapdoor:                   return 3.0f;
+		case BlockType::SpruceWallSign:                   return 1.0f;
+		case BlockType::SpruceWood:                       return 2.0f;
+		case BlockType::StickyPiston:                     return 1.5f;
+		case BlockType::Stone:                            return 1.5f;
+		case BlockType::StoneBrickSlab:                   return 2.0f;
+		case BlockType::StoneBrickStairs:                 return 1.5f;
+		case BlockType::StoneBrickWall:                   return 1.5f;
+		case BlockType::StoneBricks:                      return 1.5f;
+		case BlockType::StoneButton:                      return 0.5f;
+		case BlockType::StonePressurePlate:               return 0.5f;
+		case BlockType::StoneSlab:                        return 2.0f;
+		case BlockType::StoneStairs:                      return 1.5f;
+		case BlockType::Stonecutter:                      return 3.5f;
+		case BlockType::StrippedAcaciaLog:                return 2.0;
+		case BlockType::StrippedAcaciaWood:               return 2.0;
+		case BlockType::StrippedBirchLog:                 return 2.0;
+		case BlockType::StrippedBirchWood:                return 2.0;
+		case BlockType::StrippedCrimsonHyphae:            return 2.0;
+		case BlockType::StrippedCrimsonStem:              return 2.0;
+		case BlockType::StrippedDarkOakLog:               return 2.0;
+		case BlockType::StrippedDarkOakWood:              return 2.0;
+		case BlockType::StrippedJungleLog:                return 2.0;
+		case BlockType::StrippedJungleWood:               return 2.0;
+		case BlockType::StrippedOakLog:                   return 2.0;
+		case BlockType::StrippedOakWood:                  return 2.0;
+		case BlockType::StrippedSpruceLog:                return 2.0;
+		case BlockType::StrippedSpruceWood:               return 2.0;
+		case BlockType::StrippedWarpedHyphae:             return 2.0;
+		case BlockType::StrippedWarpedStem:               return 2.0;
+		case BlockType::StructureBlock:                   return INFINITY;
+		case BlockType::StructureVoid:                    return 0.0f;
+		case BlockType::SugarCane:                        return 0.0f;
+		case BlockType::Sunflower:                        return 0.0f;
+		case BlockType::SweetBerryBush:                   return 0.0f;
+		case BlockType::TNT:                              return 0.0f;
+		case BlockType::TallGrass:                        return 0.0f;
+		case BlockType::TallSeagrass:                     return 0.0f;
+		case BlockType::Target:                           return 0.5f;
+		case BlockType::Terracotta:                       return 1.25f;
+		case BlockType::Torch:                            return 0.0f;
+		case BlockType::TrappedChest:                     return 2.5f;
+		case BlockType::Tripwire:                         return 0.0f;
+		case BlockType::TripwireHook:                     return 0.0f;
+		case BlockType::TubeCoral:                        return 0.0f;
+		case BlockType::TubeCoralBlock:                   return 1.5f;
+		case BlockType::TubeCoralFan:                     return 0.0f;
+		case BlockType::TubeCoralWallFan:                 return 0.0f;
+		case BlockType::TurtleEgg:                        return 0.5f;
+		case BlockType::TwistingVines:                    return 0.2f;
+		case BlockType::TwistingVinesPlant:               return 0.2f;
+		case BlockType::Vine:                             return 0.2f;
+		case BlockType::VoidAir:                          return 0.0f;
+		case BlockType::WallTorch:                        return 0.0f;
+		case BlockType::WarpedButton:                     return 0.5f;
+		case BlockType::WarpedDoor:                       return 3.0f;
+		case BlockType::WarpedFence:                      return 2.0f;
+		case BlockType::WarpedFenceGate:                  return 2.0f;
+		case BlockType::WarpedFungus:                     return 0.0f;
+		case BlockType::WarpedHyphae:                     return 2.0f;
+		case BlockType::WarpedNylium:                     return 0.4f;
+		case BlockType::WarpedPlanks:                     return 2.0f;
+		case BlockType::WarpedPressurePlate:              return 0.5f;
+		case BlockType::WarpedRoots:                      return 0.0f;
+		case BlockType::WarpedSign:                       return 1.0f;
+		case BlockType::WarpedSlab:                       return 2.0f;
+		case BlockType::WarpedStairs:                     return 2.0f;
+		case BlockType::WarpedStem:                       return 2.0f;
+		case BlockType::WarpedTrapdoor:                   return 3.0f;
+		case BlockType::WarpedWallSign:                   return 1.0f;
+		case BlockType::WarpedWartBlock:                  return 1.0f;
+		case BlockType::Water:                            return 100.0f;
+		case BlockType::WeepingVines:                     return 0.2f;
+		case BlockType::WeepingVinesPlant:                return 0.2f;
+		case BlockType::WetSponge:                        return 0.6f;
+		case BlockType::Wheat:                            return 0.0f;
+		case BlockType::WhiteBanner:                      return 1.0f;
+		case BlockType::WhiteBed:                         return 0.2f;
+		case BlockType::WhiteCarpet:                      return 0.1f;
+		case BlockType::WhiteConcrete:                    return 1.8f;
+		case BlockType::WhiteConcretePowder:              return 0.5f;
+		case BlockType::WhiteGlazedTerracotta:            return 1.4f;
+		case BlockType::WhiteShulkerBox:                  return 2.0f;
+		case BlockType::WhiteStainedGlass:                return 0.3f;
+		case BlockType::WhiteStainedGlassPane:            return 0.3f;
+		case BlockType::WhiteTerracotta:                  return 1.25f;
+		case BlockType::WhiteTulip:                       return 0.0f;
+		case BlockType::WhiteWallBanner:                  return 1.0f;
+		case BlockType::WhiteWool:                        return 0.8f;
+		case BlockType::WitherRose:                       return 0.0f;
+		case BlockType::WitherSkeletonSkull:              return 1.0f;
+		case BlockType::WitherSkeletonWallSkull:          return 1.0f;
+		case BlockType::YellowBanner:                     return 1.0f;
+		case BlockType::YellowBed:                        return 0.2f;
+		case BlockType::YellowCarpet:                     return 0.1f;
+		case BlockType::YellowConcrete:                   return 1.8f;
+		case BlockType::YellowConcretePowder:             return 0.5f;
+		case BlockType::YellowGlazedTerracotta:           return 1.4f;
+		case BlockType::YellowShulkerBox:                 return 2.0f;
+		case BlockType::YellowStainedGlass:               return 0.3f;
+		case BlockType::YellowStainedGlassPane:           return 0.3f;
+		case BlockType::YellowTerracotta:                 return 1.25f;
+		case BlockType::YellowWallBanner:                 return 1.0f;
+		case BlockType::YellowWool:                       return 0.8f;
+		case BlockType::ZombieHead:                       return 1.0f;
+		case BlockType::ZombieWallHead:                   return 1.0f;
 	}
 }
