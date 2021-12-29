@@ -102,6 +102,23 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 	HandleFalling();
+
+	// Handle item pickup
+	if (m_Health > 0)
+	{
+		if (IsPlayer())
+		{
+			m_World->CollectPickupsByEntity(*this);
+		}
+		else if (IsMob())
+		{
+			cMonster & Mob = static_cast<cMonster &>(*this);
+			if (Mob.CanPickUpLoot())
+			{
+				m_World->CollectPickupsByEntity(*this);
+			}
+		}
+	}
 }
 
 

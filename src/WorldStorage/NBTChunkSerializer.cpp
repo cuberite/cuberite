@@ -893,6 +893,9 @@ public:
 					const cVillager *Villager = static_cast<const cVillager *>(a_Monster);
 					mWriter.AddInt("Profession", Villager->GetVilType());
 					mWriter.AddInt("Age",        Villager->GetAge());
+					mWriter.BeginList("Inventory", TAG_Compound);
+						AddItemGrid(Villager->GetInventory());
+					mWriter.EndList();
 					break;
 				}
 				case mtWither:
