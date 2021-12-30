@@ -408,6 +408,7 @@ public:
 	virtual void SendPlayerListUpdatePing       () = 0;
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) = 0;
 	virtual void SendPlayerMoveLook             (void) = 0;
+	virtual void SendPlayerPermissionLevel      (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerPosition             (void) = 0;
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) = 0;
 	virtual void SendPluginMessage              (const AString & a_Channel, ContiguousByteBufferView a_Message) = 0;

@@ -1175,6 +1175,19 @@ void cProtocol_1_8_0::SendPlayerMoveLook(void)
 
 
 
+void cProtocol_1_8_0::SendPlayerPermissionLevel(const cPlayer & a_Player)
+{
+	cPlayer * Player = m_Client->GetPlayer();
+
+	cPacketizer Pkt(*this, pktEntityStatus);
+	Pkt.WriteBEUInt32(Player->GetUniqueID());
+	Pkt.WriteBEUInt8(Player->GetPermissionLevel() + 24);
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendPlayerPosition(void)
 {
 	// There is no dedicated packet for this, send the whole thing:

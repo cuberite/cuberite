@@ -1842,6 +1842,7 @@ void cPlayer::LoadFromDisk()
 	m_CurrentXp           = Root.get("xpCurrent",      0).asInt();
 	m_IsFlying            = Root.get("isflying",       0).asBool();
 	m_EnchantmentSeed     = Root.get("enchantmentSeed", GetRandomProvider().RandInt<unsigned int>()).asUInt();
+	m_PermissionLevel     = Root.get("permissionLevel", 0).asInt();
 
 	Json::Value & JSON_KnownItems = Root["knownItems"];
 	for (UInt32 i = 0; i < JSON_KnownItems.size(); i++)
@@ -1977,6 +1978,7 @@ void cPlayer::SaveToDisk()
 	root["enchantmentSeed"]     = m_EnchantmentSeed;
 	root["world"]               = m_CurrentWorldName;
 	root["gamemode"]            = static_cast<int>(m_GameMode);
+	root["permissionLevel"]     = m_PermissionLevel;
 
 	auto JsonData = JsonUtils::WriteStyledString(root);
 	AString SourceFile = GetUUIDFileName(UUID);
@@ -2328,6 +2330,16 @@ void cPlayer::LoadRank(void)
 	{
 		m_SplitRestrictions.push_back(StringSplit(Restriction, "."));
 	}  // for itr - m_Restrictions[]
+}
+
+
+
+
+
+void cPlayer::SetPermissionLevel(int a_PermissionLevel)
+{
+	m_PermissionLevel = a_PermissionLevel;
+	m_ClientHandle->SendPlayerPermissionLevel(*this);
 }
 
 

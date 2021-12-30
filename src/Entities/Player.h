@@ -549,6 +549,11 @@ public:
 	Loads the m_Rank, m_Permissions, m_MsgPrefix, m_MsgSuffix and m_MsgNameColorCode members. */
 	void LoadRank(void);
 
+	/** Returns the permission level of the player. */
+	int GetPermissionLevel(void) const { return m_PermissionLevel; }
+	/** Update the permission level of the player. */
+	void SetPermissionLevel(int a_PermissionLevel);
+
 	/** Sends the block in the specified range around the specified coord to the client
 	as a block change packet.
 	The blocks in range (a_BlockX - a_Range, a_BlockX + a_Range) are sent (NY-metric). */
@@ -626,6 +631,9 @@ private:
 	This is used mainly by the HasPermission() function to optimize the lookup. */
 	AStringVectorVector m_SplitRestrictions;
 
+	/** The permission level of the player.
+	See https://minecraft.fandom.com/wiki/Permission_level for more informations. */
+	int m_PermissionLevel;
 
 	// Message visuals:
 	AString m_MsgPrefix, m_MsgSuffix;

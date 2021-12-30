@@ -489,6 +489,9 @@ void cClientHandle::FinishAuthenticate()
 	SetState(csDownloadingWorld);
 	m_Player->Initialize(std::move(Player), *World);
 
+	// Send player permission level
+	SendPlayerPermissionLevel(*m_Player);
+
 	// LOGD("Client %s @ %s (%p) has been fully authenticated", m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this));
 }
 
@@ -2863,6 +2866,15 @@ void cClientHandle::SendPlayerMoveLook(void)
 	);
 	*/
 	m_Protocol->SendPlayerMoveLook();
+}
+
+
+
+
+
+void cClientHandle::SendPlayerPermissionLevel(const cPlayer & a_Player)
+{
+	m_Protocol->SendPlayerPermissionLevel(a_Player);
 }
 
 
