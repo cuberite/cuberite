@@ -90,6 +90,11 @@ void ForEachSourceCallback::CheckIndirectPower()
 
 bool ForEachSourceCallback::ShouldQueryLinkedPosition(const BLOCKTYPE Block)
 {
+	// transparent blocks should not conduct restone power
+	if (cBlockInfo::IsTransparent(Block))
+	{
+		return false;
+	}
 	switch (Block)
 	{
 		// Normally we don't ask solid blocks for power because they don't have any (stone, dirt, etc.)
