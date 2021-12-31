@@ -631,10 +631,6 @@ private:
 	This is used mainly by the HasPermission() function to optimize the lookup. */
 	AStringVectorVector m_SplitRestrictions;
 
-	/** The permission level of the player.
-	See https://minecraft.fandom.com/wiki/Permission_level for more informations. */
-	int m_PermissionLevel;
-
 	// Message visuals:
 	AString m_MsgPrefix, m_MsgSuffix;
 	AString m_MsgNameColorCode;
