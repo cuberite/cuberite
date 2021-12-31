@@ -1978,7 +1978,6 @@ void cPlayer::SaveToDisk()
 	root["enchantmentSeed"]     = m_EnchantmentSeed;
 	root["world"]               = m_CurrentWorldName;
 	root["gamemode"]            = static_cast<int>(m_GameMode);
-	root["permissionLevel"]     = m_PermissionLevel;
 
 	auto JsonData = JsonUtils::WriteStyledString(root);
 	AString SourceFile = GetUUIDFileName(UUID);
@@ -2336,9 +2335,42 @@ void cPlayer::LoadRank(void)
 
 
 
-void cPlayer::SetPermissionLevel(int a_PermissionLevel)
+int cPlayer::GetPermissionLevel()
 {
-	m_PermissionLevel = a_PermissionLevel;
+	if (!HasPermission("core.spawnprotect.bypass"))
+	{
+		return 0;  // The player has no permissions.
+	}
+
+	if (!HasPermission("comandblock.set") || !HasPermission("core.clear") ||
+		!HasPermission("core.difficulty") || !HasPermission("core.effect") ||
+		!HasPermission("core.gamemode") || !HasPermission("core.tp") ||
+		!HasPermission("core.give"))
+	{
+		return 1;
+	}
+
+	if (!HasPermission("core.ban") || !HasPermission("core.deop") ||
+		!HasPermission("core.kick") || !HasPermission("core.op"))
+	{
+		return 2;
+	}
+
+	if (!HasPermission("core.stop") || !HasPermission("core.reload") ||
+		!HasPermission("core.save-all"))
+	{
+		return 3;
+	}
+
+	return 4;  // The player has all permissions.
+}
+
+
+
+
+
+void cPlayer::UpdatePermissionLevel()
+{
 	m_ClientHandle->SendPlayerPermissionLevel(*this);
 }
 

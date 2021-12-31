@@ -550,9 +550,9 @@ public:
 	void LoadRank(void);
 
 	/** Returns the permission level of the player. */
-	int GetPermissionLevel(void) const { return m_PermissionLevel; }
-	/** Update the permission level of the player. */
-	void SetPermissionLevel(int a_PermissionLevel);
+	int GetPermissionLevel(void);
+	/** Send the permission level to the client. */
+	void UpdatePermissionLevel(void);
 
 	/** Sends the block in the specified range around the specified coord to the client
 	as a block change packet.
