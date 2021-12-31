@@ -1842,7 +1842,6 @@ void cPlayer::LoadFromDisk()
 	m_CurrentXp           = Root.get("xpCurrent",      0).asInt();
 	m_IsFlying            = Root.get("isflying",       0).asBool();
 	m_EnchantmentSeed     = Root.get("enchantmentSeed", GetRandomProvider().RandInt<unsigned int>()).asUInt();
-	m_PermissionLevel     = Root.get("permissionLevel", 0).asInt();
 
 	Json::Value & JSON_KnownItems = Root["knownItems"];
 	for (UInt32 i = 0; i < JSON_KnownItems.size(); i++)
