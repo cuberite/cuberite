@@ -1437,38 +1437,44 @@ void cClientHandle::FinishDigAnimation()
 
 void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, bool a_UsedMainHand)
 {
-	// This function handles three actions:
-	// (1) Place a block;
-	// (2) "Use" a block: Interactive with the block, like opening a chest/crafting table/furnace;
-	// (3) Use the held item targeting a block. E.g. farming.
-	//
-	// Sneaking player will not use the block if hand is not empty.
-	// Frozen player can do nothing.
-	// In Game Mode Spectator, player cannot use item or place block, but can interactive with some block depending on cBlockInfo::IsUseableBySpectator(BlockType)
-	//
-	// If the action failed, we need to send an update of the placed block or inventory to the client.
-	//
-	// Actions rejected by plugin will not lead to other attempts.
-	// E.g., when opening a chest with a dirt in hand, if the plugin rejects opening the chest, the dirt will not be placed.
+	/* This function handles three actions:
+	(1) Place a block;
+	(2) "Use" a block: Interactive with the block, like opening a chest/crafting table/furnace;
+	(3) Use the held item targeting a block. E.g. farming.
+
+	Sneaking player will not use the block if hand is not empty.
+	Frozen player can do nothing.
+	In Game Mode Spectator, player cannot use item or place block, but can interactive with some block depending on cBlockInfo::IsUseableBySpectator(BlockType)
+
+	If the action failed, we need to send an update of the placed block or inventory to the client.
+
+	Actions rejected by plugin will not lead to other attempts.
+	E.g., when opening a chest with a dirt in hand, if the plugin rejects opening the chest, the dirt will not be placed. */
+
+	if ((a_BlockFace == BLOCK_FACE_NONE) || !cChunkDef::IsValidHeight(a_BlockY))
+	{
+		throw std::runtime_error("Invalid click - hacked client?");
+	}
 
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
 	a_UsedMainHand = true;
-	const cItem & HeldItem = a_UsedMainHand ? m_Player->GetEquippedItem() : m_Player->GetInventory().GetShieldSlot();
-	auto & ItemHandler = HeldItem.GetHandler();
 
-	// TODO: This distance should be calculated from the point that the cursor pointing at, instead of the center of the block
-	// Distance from the block's center to the player's eye height
-	auto ClickedBlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
-	auto CursorPos = Vector3i(a_CursorX, a_CursorY, a_CursorZ);
-	double Dist = (Vector3d(ClickedBlockPos) + Vector3d(0.5, 0.5, 0.5) - m_Player->GetEyePosition()).Length();
-	FLOGD("HandleRightClick: {0}, face {1}, Cursor {2}, Hand: {3}, HeldItem: {4}; Dist: {5:.02f}",
-		ClickedBlockPos, a_BlockFace, CursorPos, a_UsedMainHand, ItemToFullString(HeldItem), Dist
-	);
+	const Vector3i ClickedPosition(a_BlockX, a_BlockY, a_BlockZ);
+	const Vector3i CursorPosition(a_CursorX, a_CursorY, a_CursorZ);
+	const cItem & HeldItem = a_UsedMainHand ? m_Player->GetEquippedItem() : m_Player->GetInventory().GetShieldSlot();
+
+	// Distance from the block's center to the player's eye height.
+	const double Dist = (Vector3d(0.5, 0.5, 0.5) + ClickedPosition - m_Player->GetEyePosition()).SqrLength();
 
 	// Check the reach distance:
 	// _X 2014-11-25: I've maxed at 5.26 with a Survival client and 5.78 with a Creative client in my tests
-	double MaxDist = m_Player->IsGameModeCreative() ? 5.78 : 5.26;
+	double MaxDist = m_Player->IsGameModeCreative() ? 33.4084 : 27.6676;
 	bool IsWithinReach = (Dist <= MaxDist);
+
+	FLOGD("HandleRightClick: {0}, face {1}, Cursor {2}, Hand: {3}, HeldItem: {4}; Dist: {5:.02f}",
+		ClickedPosition, a_BlockFace, CursorPosition, a_UsedMainHand, ItemToFullString(HeldItem), Dist
+	);
+
 	cWorld * World = m_Player->GetWorld();
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
@@ -1479,11 +1485,16 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
-		World->GetBlockTypeMeta(ClickedBlockPos, BlockType, BlockMeta);
-		const auto & BlockHandler = cBlockHandler::For(BlockType);
 
-		bool Placeable = ItemHandler.IsPlaceable() && !m_Player->IsGameModeAdventure() && !m_Player->IsGameModeSpectator();
-		bool BlockUsable = BlockHandler.IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
+		if (!World->GetBlockTypeMeta(ClickedPosition, BlockType, BlockMeta))
+		{
+			return;
+		}
+
+		const auto & ItemHandler = HeldItem.GetHandler();
+		const auto & BlockHandler = cBlockHandler::For(BlockType);
+		const bool Placeable = ItemHandler.IsPlaceable() && !m_Player->IsGameModeAdventure() && !m_Player->IsGameModeSpectator();
+		const bool BlockUsable = BlockHandler.IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
 
 		if (BlockUsable && !(m_Player->IsCrouched() && !HeldItem.IsEmpty()))
 		{
@@ -1491,7 +1502,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 			{
 				// Use a block:
-				if (BlockHandler.OnUse(ChunkInterface, *World, *m_Player, ClickedBlockPos, a_BlockFace, CursorPos))
+				if (BlockHandler.OnUse(ChunkInterface, *World, *m_Player, ClickedPosition, a_BlockFace, CursorPosition))
 				{
 					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 					return;  // Block use was successful, we're done.
@@ -1501,7 +1512,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				if (Placeable)
 				{
 					// Place a block:
-					ItemHandler.OnPlayerPlace(*m_Player, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, {a_CursorX, a_CursorY, a_CursorZ});
+					ItemHandler.OnPlayerPlace(*m_Player, HeldItem, ClickedPosition, BlockType, BlockMeta, a_BlockFace, CursorPosition);
 				}
 
 				return;
@@ -1518,7 +1529,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			}
 
 			// Place a block:
-			ItemHandler.OnPlayerPlace(*m_Player, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, {a_CursorX, a_CursorY, a_CursorZ});
+			ItemHandler.OnPlayerPlace(*m_Player, HeldItem, ClickedPosition, BlockType, BlockMeta, a_BlockFace, CursorPosition);
 			return;
 		}
 		else if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
@@ -1527,7 +1538,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			// Use an item in hand with a target block.
 
 			cBlockInServerPluginInterface PluginInterface(*World);
-			ItemHandler.OnItemUse(World, m_Player, PluginInterface, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
+			ItemHandler.OnItemUse(World, m_Player, PluginInterface, HeldItem, ClickedPosition, a_BlockFace);
 			PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 			return;
 		}

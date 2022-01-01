@@ -1042,30 +1042,15 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 
 
 
-void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_ClickedBlockPosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const
+void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_ClickedPosition, const BLOCKTYPE a_ClickedBlockType, const NIBBLETYPE a_ClickedBlockMeta, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const
 {
-	if (a_ClickedBlockFace == BLOCK_FACE_NONE)
-	{
-		// Clicked in the air, no placement possible
-		return;
-	}
-
-	if (!cChunkDef::IsValidHeight(a_ClickedBlockPosition.y))
-	{
-		// The clicked block is outside the world, ignore this call altogether (GH #128):
-		return;
-	}
-
 	const auto & World = *a_Player.GetWorld();
-	BLOCKTYPE ClickedBlockType;
-	NIBBLETYPE ClickedBlockMeta;
-	World.GetBlockTypeMeta(a_ClickedBlockPosition, ClickedBlockType, ClickedBlockMeta);
 
 	// Check if the block ignores build collision (water, grass etc.):
-	if (cBlockHandler::For(ClickedBlockType).DoesIgnoreBuildCollision(World, a_HeldItem, a_ClickedBlockPosition, ClickedBlockMeta, a_ClickedBlockFace, true))
+	if (cBlockHandler::For(a_ClickedBlockType).DoesIgnoreBuildCollision(World, a_HeldItem, a_ClickedPosition, a_ClickedBlockMeta, a_ClickedBlockFace, true))
 	{
 		// Try to place the block at the clicked position:
-		if (!CommitPlacement(a_Player, a_HeldItem, a_ClickedBlockPosition, a_ClickedBlockFace, a_CursorPosition))
+		if (!CommitPlacement(a_Player, a_HeldItem, a_ClickedPosition, a_ClickedBlockFace, a_CursorPosition))
 		{
 			// The placement failed, the blocks have already been re-sent, re-send inventory:
 			a_Player.GetInventory().SendEquippedSlot();
@@ -1074,21 +1059,19 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 	}
 	else
 	{
-		const auto PlacedPosition = AddFaceDirection(a_ClickedBlockPosition, a_ClickedBlockFace);
+		BLOCKTYPE PlaceBlock;
+		NIBBLETYPE PlaceMeta;
+		const auto PlacePosition = AddFaceDirection(a_ClickedPosition, a_ClickedBlockFace);
 
-		if (!cChunkDef::IsValidHeight(PlacedPosition.y))
+		if (!cChunkDef::IsValidHeight(PlacePosition.y) || !World.GetBlockTypeMeta(PlacePosition, PlaceBlock, PlaceMeta))
 		{
 			// The block is being placed outside the world, ignore this packet altogether (GH #128):
 			return;
 		}
 
-		NIBBLETYPE PlaceMeta;
-		BLOCKTYPE PlaceBlock;
-		World.GetBlockTypeMeta(PlacedPosition, PlaceBlock, PlaceMeta);
-
 		// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
 		// No need to do combinability (dblslab) checks, client will do that here.
-		if (!cBlockHandler::For(PlaceBlock).DoesIgnoreBuildCollision(World, a_HeldItem, PlacedPosition, PlaceMeta, a_ClickedBlockFace, false))
+		if (!cBlockHandler::For(PlaceBlock).DoesIgnoreBuildCollision(World, a_HeldItem, PlacePosition, PlaceMeta, a_ClickedBlockFace, false))
 		{
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it
@@ -1096,7 +1079,7 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 		}
 
 		// Try to place the block:
-		if (!CommitPlacement(a_Player, a_HeldItem, PlacedPosition, a_ClickedBlockFace, a_CursorPosition))
+		if (!CommitPlacement(a_Player, a_HeldItem, PlacePosition, a_ClickedBlockFace, a_CursorPosition))
 		{
 			// The placement failed, the blocks have already been re-sent, re-send inventory:
 			a_Player.GetInventory().SendEquippedSlot();
