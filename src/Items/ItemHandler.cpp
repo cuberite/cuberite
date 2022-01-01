@@ -31,7 +31,7 @@
 #include "ItemEmptyMap.h"
 #include "ItemEnchantingTable.h"
 #include "ItemEndCrystal.h"
-#include "ItemEnderchest.h"
+#include "ItemEnderChest.h"
 #include "ItemEndPortalFrame.h"
 #include "ItemEyeOfEnder.h"
 #include "ItemFenceGate.h"
@@ -87,7 +87,7 @@
 #include "ItemTorch.h"
 #include "ItemTrapdoor.h"
 #include "ItemTripwireHook.h"
-#include "ItemVine.h"
+#include "ItemVines.h"
 
 #include "../Blocks/BlockHandler.h"
 #include "SimplePlaceableItemHandler.h"
@@ -117,7 +117,7 @@ namespace
 	constexpr cItemBannerHandler            ItemBannerHandler                          (E_ITEM_BANNER);
 	constexpr cDefaultItemHandler           ItemBarrierHandler                         (E_BLOCK_BARRIER);
 	constexpr cDefaultItemHandler           ItemBeaconHandler                          (E_BLOCK_BEACON);
-	constexpr cItemBedHandler               ItemBedBlockHandler                        (E_BLOCK_BED);
+	constexpr cDefaultItemHandler           ItemBedBlockHandler                        (E_BLOCK_BED);
 	constexpr cItemBedHandler               ItemBedHandler                             (E_ITEM_BED);
 	constexpr cDefaultItemHandler           ItemBedrockHandler                         (E_BLOCK_BEDROCK);
 	constexpr cItemSimpleFoodHandler        ItemBeetrootHandler                        (E_ITEM_BEETROOT, cItemHandler::FoodInfo(1, 1.2));
@@ -170,7 +170,7 @@ namespace
 	constexpr cDefaultItemHandler           ItemChainCommandBlockHandler               (E_BLOCK_CHAIN_COMMAND_BLOCK);
 	constexpr cItemArmorHandler             ItemChainHelmetHandler                     (E_ITEM_CHAIN_HELMET);
 	constexpr cItemArmorHandler             ItemChainLeggingsHandler                   (E_ITEM_CHAIN_LEGGINGS);
-	constexpr cDefaultItemHandler           ItemChestBlockHandler                      (E_BLOCK_CHEST);
+	constexpr cItemChestHandler             ItemChestHandler                           (E_BLOCK_CHEST);
 	constexpr cItemMinecartHandler          ItemChestMinecartHandler                   (E_ITEM_CHEST_MINECART);
 	constexpr cDefaultItemHandler           ItemChirpDiscHandler                       (E_ITEM_CHIRP_DISC);
 	constexpr cDefaultItemHandler           ItemChorusFlowerHandler                    (E_BLOCK_CHORUS_FLOWER);
@@ -188,7 +188,7 @@ namespace
 	constexpr cDefaultItemHandler           ItemCobwebHandler                          (E_BLOCK_COBWEB);
 	constexpr cDefaultItemHandler           ItemCocoaPodHandler                        (E_BLOCK_COCOA_POD);
 	constexpr cDefaultItemHandler           ItemCommandBlockHandler                    (E_BLOCK_COMMAND_BLOCK);
-	constexpr cDefaultItemHandler           ItemComparatorHandler                      (E_ITEM_COMPARATOR);
+	constexpr cItemComparatorHandler        ItemComparatorHandler                      (E_ITEM_COMPARATOR);
 	constexpr cDefaultItemHandler           ItemCompassHandler                         (E_ITEM_COMPASS);
 	constexpr cDefaultItemHandler           ItemConcreteBlockHandler                   (E_BLOCK_CONCRETE);
 	constexpr cDefaultItemHandler           ItemConcretePowderHandler                  (E_BLOCK_CONCRETE_POWDER);
@@ -250,7 +250,7 @@ namespace
 	constexpr cDefaultItemHandler           ItemEndRodHandler                          (E_BLOCK_END_ROD);
 	constexpr cDefaultItemHandler           ItemEndStoneBlockHandler                   (E_BLOCK_END_STONE);
 	constexpr cItemEnderPearlHandler        ItemEnderPearlHandler                      (E_ITEM_ENDER_PEARL);
-	constexpr cItemEnderchestHandler        ItemEnderchestHandler                      (E_BLOCK_ENDER_CHEST);
+	constexpr cItemEnderChestHandler        ItemEnderChestHandler                      (E_BLOCK_ENDER_CHEST);
 	constexpr cItemEyeOfEnderHandler        ItemEyeOfEnderHandler                      (E_ITEM_EYE_OF_ENDER);
 	constexpr cDefaultItemHandler           ItemFarDiscHandler                         (E_ITEM_FAR_DISC);
 	constexpr cDefaultItemHandler           ItemFarmlandHandler                        (E_BLOCK_FARMLAND);
@@ -272,7 +272,7 @@ namespace
 	constexpr cDefaultItemHandler           ItemGhastTearHandler                       (E_ITEM_GHAST_TEAR);
 	constexpr cItemBottleHandler            ItemGlassBottleHandler                     (E_ITEM_GLASS_BOTTLE);
 	constexpr cDefaultItemHandler           ItemGlassHandler                           (E_BLOCK_GLASS);
-	constexpr cDefaultItemHandler           ItemGlassPaneBlockHandler                  (E_BLOCK_GLASS_PANE);
+	constexpr cDefaultItemHandler           ItemGlassPaneHandler                       (E_BLOCK_GLASS_PANE);
 	constexpr cDefaultItemHandler           ItemGlisteringMelonHandler                 (E_ITEM_GLISTERING_MELON);
 	constexpr cDefaultItemHandler           ItemGlowstoneBlockHandler                  (E_BLOCK_GLOWSTONE);
 	constexpr cDefaultItemHandler           ItemGlowstoneDustHandler                   (E_ITEM_GLOWSTONE_DUST);
@@ -302,9 +302,9 @@ namespace
 	constexpr cDefaultItemHandler           ItemGunpowderHandler                       (E_ITEM_GUNPOWDER);
 	constexpr cDefaultItemHandler           ItemHardenedClayHandler                    (E_BLOCK_HARDENED_CLAY);
 	constexpr cItemSidewaysHandler          ItemHayBaleHandler                         (E_BLOCK_HAY_BALE);
-	constexpr cItemMobHeadHandler           ItemHeadBlockHandler                       (E_BLOCK_HEAD);
+	constexpr cDefaultItemHandler           ItemHeadBlockHandler                       (E_BLOCK_HEAD);
 	constexpr cItemMobHeadHandler           ItemHeadHandler                            (E_ITEM_HEAD);
-	constexpr cDefaultItemHandler           ItemHeavyWeightedPressurePlateBlockHandler (E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE);
+	constexpr cDefaultItemHandler           ItemHeavyWeightedPressurePlateHandler      (E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE);
 	constexpr cItemHopperHandler            ItemHopperHandler                          (E_BLOCK_HOPPER);
 	constexpr cDefaultItemHandler           ItemHugeBrownMushroomBlockHandler          (E_BLOCK_HUGE_BROWN_MUSHROOM);
 	constexpr cDefaultItemHandler           ItemHugeRedMushroomBlockHandler            (E_BLOCK_HUGE_RED_MUSHROOM);
@@ -355,7 +355,7 @@ namespace
 	constexpr cDefaultItemHandler           ItemLightBlueShulkerBoxHandler             (E_BLOCK_LIGHT_BLUE_SHULKER_BOX);
 	constexpr cItemGlazedTerracottaHandler  ItemLightGrayGlazedTerracottaHandler       (E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA);
 	constexpr cDefaultItemHandler           ItemLightGrayShulkerBoxHandler             (E_BLOCK_LIGHT_GRAY_SHULKER_BOX);
-	constexpr cDefaultItemHandler           ItemLightWeightedPressurePlateBlockHandler (E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE);
+	constexpr cDefaultItemHandler           ItemLightWeightedPressurePlateHandler      (E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE);
 	constexpr cItemLilypadHandler           ItemLilypadHandler                         (E_BLOCK_LILY_PAD);
 	constexpr cItemGlazedTerracottaHandler  ItemLimeGlazedTerracottaHandler            (E_BLOCK_LIME_GLAZED_TERRACOTTA);
 	constexpr cDefaultItemHandler           ItemLimeShulkerBoxHandler                  (E_BLOCK_LIME_SHULKER_BOX);
@@ -383,16 +383,16 @@ namespace
 	constexpr cItemSoupHandler              ItemMushroomSoupHandler                    (E_ITEM_MUSHROOM_SOUP, cItemHandler::FoodInfo(6, 7.2));
 	constexpr cDefaultItemHandler           ItemMyceliumHandler                        (E_BLOCK_MYCELIUM);
 	constexpr cDefaultItemHandler           ItemNameTagHandler                         (E_ITEM_NAME_TAG);
-	constexpr cDefaultItemHandler           ItemNetherBrickBlockHandler                (E_BLOCK_NETHER_BRICK);
-	constexpr cDefaultItemHandler           ItemNetherBrickFenceBlockHandler           (E_BLOCK_NETHER_BRICK_FENCE);
+	constexpr cDefaultItemHandler           ItemNetherBricksHandler                    (E_BLOCK_NETHER_BRICK);
+	constexpr cDefaultItemHandler           ItemNetherBrickFenceHandler                (E_BLOCK_NETHER_BRICK_FENCE);
 	constexpr cDefaultItemHandler           ItemNetherBrickHandler                     (E_ITEM_NETHER_BRICK);
 	constexpr cItemStairsHandler            ItemNetherBrickStairsHandler               (E_BLOCK_NETHER_BRICK_STAIRS);
 	constexpr cDefaultItemHandler           ItemNetherPortalBlockHandler               (E_BLOCK_NETHER_PORTAL);
 	constexpr cDefaultItemHandler           ItemNetherQuartzHandler                    (E_ITEM_NETHER_QUARTZ);
 	constexpr cDefaultItemHandler           ItemNetherQuartzOreHandler                 (E_BLOCK_NETHER_QUARTZ_ORE);
 	constexpr cDefaultItemHandler           ItemNetherStarHandler                      (E_ITEM_NETHER_STAR);
-	constexpr cDefaultItemHandler           ItemNetherWartBlockBlockHandler            (E_BLOCK_NETHER_WART_BLOCK);
-	constexpr cDefaultItemHandler           ItemNetherWartBlockHandler                 (E_BLOCK_NETHER_WART);
+	constexpr cDefaultItemHandler           ItemNetherWartBlockHandler                 (E_BLOCK_NETHER_WART_BLOCK);
+	constexpr cDefaultItemHandler           ItemNetherWartTechnicalBlockHandler        (E_BLOCK_NETHER_WART);
 	constexpr cItemNetherWartHandler        ItemNetherWartHandler                      (E_ITEM_NETHER_WART);
 	constexpr cDefaultItemHandler           ItemNetherrackHandler                      (E_BLOCK_NETHERRACK);
 	constexpr cItemLeavesHandler            ItemNewLeavesHandler                       (E_BLOCK_NEW_LEAVES);
@@ -519,26 +519,26 @@ namespace
 	constexpr cDefaultItemHandler           ItemStoneHandler                           (E_BLOCK_STONE);
 	constexpr cItemHoeHandler               ItemStoneHoeHandler                        (E_ITEM_STONE_HOE);
 	constexpr cItemPickaxeHandler           ItemStonePickaxeHandler                    (E_ITEM_STONE_PICKAXE);
-	constexpr cDefaultItemHandler           ItemStonePressurePlateBlockHandler         (E_BLOCK_STONE_PRESSURE_PLATE);
+	constexpr cDefaultItemHandler           ItemStonePressurePlateHandler              (E_BLOCK_STONE_PRESSURE_PLATE);
 	constexpr cItemShovelHandler            ItemStoneShovelHandler                     (E_ITEM_STONE_SHOVEL);
 	constexpr cItemSlabHandler              ItemStoneSlabHandler                       (E_BLOCK_STONE_SLAB);
 	constexpr cItemSwordHandler             ItemStoneSwordHandler                      (E_ITEM_STONE_SWORD);
 	constexpr cDefaultItemHandler           ItemStradDiscHandler                       (E_ITEM_STRAD_DISC);
 	constexpr cDefaultItemHandler           ItemStructureBlockHandler                  (E_BLOCK_STRUCTURE_BLOCK);
 	constexpr cDefaultItemHandler           ItemStructureVoidHandler                   (E_BLOCK_STRUCTURE_VOID);
-	constexpr cSimplePlaceableItemHandler   ItemSugarCaneHandler                       (E_BLOCK_SUGARCANE, E_BLOCK_SUGARCANE);
+	constexpr cDefaultItemHandler           ItemSugarCaneBlockHandler                  (E_BLOCK_SUGARCANE);
+	constexpr cSimplePlaceableItemHandler   ItemSugarCaneHandler                       (E_ITEM_SUGARCANE, E_BLOCK_SUGARCANE);
 	constexpr cDefaultItemHandler           ItemSugarHandler                           (E_ITEM_SUGAR);
-	constexpr cSimplePlaceableItemHandler   ItemSugarcaneHandler                       (E_ITEM_SUGARCANE, E_BLOCK_SUGARCANE);
-	constexpr cDefaultItemHandler           ItemTNTBlockHandler                        (E_BLOCK_TNT);
+	constexpr cDefaultItemHandler           ItemTNTHandler                             (E_BLOCK_TNT);
 	constexpr cDefaultItemHandler           ItemTallGrassHandler                       (E_BLOCK_TALL_GRASS);
 	constexpr cDefaultItemHandler           ItemTerracottaHandler                      (E_BLOCK_TERRACOTTA);
 	constexpr cDefaultItemHandler           ItemTippedArrowHandler                     (E_ITEM_TIPPED_ARROW);
-	constexpr cItemTorchHandler             ItemTorchBlockHandler                      (E_BLOCK_TORCH);
+	constexpr cDefaultItemHandler           ItemTorchBlockHandler                      (E_BLOCK_TORCH);
 	constexpr cDefaultItemHandler           ItemTotemOfUndyingHandler                  (E_ITEM_TOTEM_OF_UNDYING);
 	constexpr cItemChestHandler             ItemTrappedChestHandler                    (E_BLOCK_TRAPPED_CHEST);
 	constexpr cDefaultItemHandler           ItemTripwireHandler                        (E_BLOCK_TRIPWIRE);
 	constexpr cItemTripwireHookHandler      ItemTripwireHookHandler                    (E_BLOCK_TRIPWIRE_HOOK);
-	constexpr cItemVineHandler              ItemVineHandler                            (E_BLOCK_VINES);
+	constexpr cItemVinesHandler             ItemVinesHandler                           (E_BLOCK_VINES);
 	constexpr cDefaultItemHandler           ItemWaitDiscHandler                        (E_ITEM_WAIT_DISC);
 	constexpr cDefaultItemHandler           ItemWallBannerHandler                      (E_BLOCK_WALL_BANNER);
 	constexpr cDefaultItemHandler           ItemWallsignHandler                        (E_BLOCK_WALLSIGN);
@@ -552,7 +552,7 @@ namespace
 	constexpr cItemAxeHandler               ItemWoodenAxeHandler                       (E_ITEM_WOODEN_AXE);
 	constexpr cItemHoeHandler               ItemWoodenHoeHandler                       (E_ITEM_WOODEN_HOE);
 	constexpr cItemPickaxeHandler           ItemWoodenPickaxeHandler                   (E_ITEM_WOODEN_PICKAXE);
-	constexpr cDefaultItemHandler           ItemWoodenPressurePlateBlockHandler        (E_BLOCK_WOODEN_PRESSURE_PLATE);
+	constexpr cDefaultItemHandler           ItemWoodenPressurePlateHandler             (E_BLOCK_WOODEN_PRESSURE_PLATE);
 	constexpr cItemShovelHandler            ItemWoodenShovelHandler                    (E_ITEM_WOODEN_SHOVEL);
 	constexpr cItemSwordHandler             ItemWoodenSwordHandler                     (E_ITEM_WOODEN_SWORD);
 	constexpr cItemClothHandler             ItemWoolHandler                            (E_BLOCK_WOOL);
@@ -608,7 +608,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_CARROTS:                        return ItemCarrotsBlockHandler;
 		case E_BLOCK_CAULDRON:                       return ItemCauldronBlockHandler;
 		case E_BLOCK_CHAIN_COMMAND_BLOCK:            return ItemChainCommandBlockHandler;
-		case E_BLOCK_CHEST:                          return ItemChestBlockHandler;
+		case E_BLOCK_CHEST:                          return ItemChestHandler;
 		case E_BLOCK_CHORUS_FLOWER:                  return ItemChorusFlowerHandler;
 		case E_BLOCK_CHORUS_PLANT:                   return ItemChorusPlantHandler;
 		case E_BLOCK_CLAY:                           return ItemClayBlockHandler;
@@ -644,7 +644,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_EMERALD_BLOCK:                  return ItemEmeraldBlockHandler;
 		case E_BLOCK_EMERALD_ORE:                    return ItemEmeraldOreHandler;
 		case E_BLOCK_ENCHANTMENT_TABLE:              return ItemEnchantingTableHandler;
-		case E_BLOCK_ENDER_CHEST:                    return ItemEnderchestHandler;
+		case E_BLOCK_ENDER_CHEST:                    return ItemEnderChestHandler;
 		case E_BLOCK_END_BRICKS:                     return ItemEndBricksHandler;
 		case E_BLOCK_END_GATEWAY:                    return ItemEndGatewayHandler;
 		case E_BLOCK_END_PORTAL:                     return ItemEndPortalBlockHandler;
@@ -659,7 +659,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_FROSTED_ICE:                    return ItemFrostedIceHandler;
 		case E_BLOCK_FURNACE:                        return ItemFurnaceHandler;
 		case E_BLOCK_GLASS:                          return ItemGlassHandler;
-		case E_BLOCK_GLASS_PANE:                     return ItemGlassPaneBlockHandler;
+		case E_BLOCK_GLASS_PANE:                     return ItemGlassPaneHandler;
 		case E_BLOCK_GLOWSTONE:                      return ItemGlowstoneBlockHandler;
 		case E_BLOCK_GOLD_BLOCK:                     return ItemGoldBlockHandler;
 		case E_BLOCK_GOLD_ORE:                       return ItemGoldOreHandler;
@@ -673,7 +673,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_HARDENED_CLAY:                  return ItemHardenedClayHandler;
 		case E_BLOCK_HAY_BALE:                       return ItemHayBaleHandler;
 		case E_BLOCK_HEAD:                           return ItemHeadBlockHandler;
-		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:  return ItemHeavyWeightedPressurePlateBlockHandler;
+		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:  return ItemHeavyWeightedPressurePlateHandler;
 		case E_BLOCK_HOPPER:                         return ItemHopperHandler;
 		case E_BLOCK_HUGE_BROWN_MUSHROOM:            return ItemHugeBrownMushroomBlockHandler;
 		case E_BLOCK_HUGE_RED_MUSHROOM:              return ItemHugeRedMushroomBlockHandler;
@@ -701,7 +701,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:         return ItemLightBlueShulkerBoxHandler;
 		case E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA:   return ItemLightGrayGlazedTerracottaHandler;
 		case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:         return ItemLightGrayShulkerBoxHandler;
-		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:  return ItemLightWeightedPressurePlateBlockHandler;
+		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:  return ItemLightWeightedPressurePlateHandler;
 		case E_BLOCK_LILY_PAD:                       return ItemLilypadHandler;
 		case E_BLOCK_LIME_GLAZED_TERRACOTTA:         return ItemLimeGlazedTerracottaHandler;
 		case E_BLOCK_LIME_SHULKER_BOX:               return ItemLimeShulkerBoxHandler;
@@ -716,13 +716,13 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_MOSSY_COBBLESTONE:              return ItemMossyCobblestoneHandler;
 		case E_BLOCK_MYCELIUM:                       return ItemMyceliumHandler;
 		case E_BLOCK_NETHERRACK:                     return ItemNetherrackHandler;
-		case E_BLOCK_NETHER_BRICK:                   return ItemNetherBrickBlockHandler;
-		case E_BLOCK_NETHER_BRICK_FENCE:             return ItemNetherBrickFenceBlockHandler;
+		case E_BLOCK_NETHER_BRICK:                   return ItemNetherBricksHandler;
+		case E_BLOCK_NETHER_BRICK_FENCE:             return ItemNetherBrickFenceHandler;
 		case E_BLOCK_NETHER_BRICK_STAIRS:            return ItemNetherBrickStairsHandler;
 		case E_BLOCK_NETHER_PORTAL:                  return ItemNetherPortalBlockHandler;
 		case E_BLOCK_NETHER_QUARTZ_ORE:              return ItemNetherQuartzOreHandler;
-		case E_BLOCK_NETHER_WART:                    return ItemNetherWartBlockHandler;
-		case E_BLOCK_NETHER_WART_BLOCK:              return ItemNetherWartBlockBlockHandler;
+		case E_BLOCK_NETHER_WART:                    return ItemNetherWartTechnicalBlockHandler;
+		case E_BLOCK_NETHER_WART_BLOCK:              return ItemNetherWartBlockHandler;
 		case E_BLOCK_NEW_LEAVES:                     return ItemNewLeavesHandler;
 		case E_BLOCK_NEW_LOG:                        return ItemNewLogHandler;
 		case E_BLOCK_NOTE_BLOCK:                     return ItemNoteBlockHandler;
@@ -798,20 +798,20 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_STONE_BRICKS:                   return ItemStoneBricksHandler;
 		case E_BLOCK_STONE_BRICK_STAIRS:             return ItemStoneBrickStairsHandler;
 		case E_BLOCK_STONE_BUTTON:                   return ItemStoneButtonHandler;
-		case E_BLOCK_STONE_PRESSURE_PLATE:           return ItemStonePressurePlateBlockHandler;
+		case E_BLOCK_STONE_PRESSURE_PLATE:           return ItemStonePressurePlateHandler;
 		case E_BLOCK_STONE_SLAB:                     return ItemStoneSlabHandler;
 		case E_BLOCK_STRUCTURE_BLOCK:                return ItemStructureBlockHandler;
 		case E_BLOCK_STRUCTURE_VOID:                 return ItemStructureVoidHandler;
-		case E_BLOCK_SUGARCANE:                      return ItemSugarcaneHandler;
+		case E_BLOCK_SUGARCANE:                      return ItemSugarCaneBlockHandler;
 		case E_BLOCK_TALL_GRASS:                     return ItemTallGrassHandler;
 		case E_BLOCK_TERRACOTTA:                     return ItemTerracottaHandler;
-		case E_BLOCK_TNT:                            return ItemTNTBlockHandler;
+		case E_BLOCK_TNT:                            return ItemTNTHandler;
 		case E_BLOCK_TORCH:                          return ItemTorchBlockHandler;
 		case E_BLOCK_TRAPDOOR:                       return ItemOakTrapdoorHandler;
 		case E_BLOCK_TRAPPED_CHEST:                  return ItemTrappedChestHandler;
 		case E_BLOCK_TRIPWIRE:                       return ItemTripwireHandler;
 		case E_BLOCK_TRIPWIRE_HOOK:                  return ItemTripwireHookHandler;
-		case E_BLOCK_VINES:                          return ItemVineHandler;
+		case E_BLOCK_VINES:                          return ItemVinesHandler;
 		case E_BLOCK_WALLSIGN:                       return ItemWallsignHandler;
 		case E_BLOCK_WALL_BANNER:                    return ItemWallBannerHandler;
 		case E_BLOCK_WATER:                          return ItemWaterHandler;
@@ -819,7 +819,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_WHITE_GLAZED_TERRACOTTA:        return ItemWhiteGlazedTerracottaHandler;
 		case E_BLOCK_WHITE_SHULKER_BOX:              return ItemWhiteShulkerBoxHandler;
 		case E_BLOCK_WOODEN_BUTTON:                  return ItemOakButtonHandler;
-		case E_BLOCK_WOODEN_PRESSURE_PLATE:          return ItemWoodenPressurePlateBlockHandler;
+		case E_BLOCK_WOODEN_PRESSURE_PLATE:          return ItemWoodenPressurePlateHandler;
 		case E_BLOCK_WOODEN_SLAB:                    return ItemOakSlabHandler;
 		case E_BLOCK_WOOL:                           return ItemWoolHandler;
 		case E_BLOCK_YELLOW_GLAZED_TERRACOTTA:       return ItemYellowGlazedTerracottaHandler;
@@ -1091,7 +1091,9 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 		if (!cBlockHandler::For(PlaceBlock).DoesIgnoreBuildCollision(World, a_HeldItem, PlacedPosition, PlaceMeta, a_ClickedBlockFace, false))
 		{
 			// Tried to place a block into another?
-			// Happens when you place a block aiming at side of block with a torch on it or stem beside it
+			// Happens when you place a block aiming at side of block with a torch on it or stem beside it.
+			a_Player.SendBlocksAround(PlacedPosition.x, PlacedPosition.y, PlacedPosition.z, 2);
+			a_Player.GetInventory().SendEquippedSlot();
 			return;
 		}
 
