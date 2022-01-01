@@ -3,9 +3,6 @@
 #include "Protocol.h"
 
 
-
-
-
 // Adjust these if a new protocol is added or an old one is removed:
 #define MCS_CLIENT_VERSIONS "1.8.x-1.12.x"
 #define MCS_PROTOCOL_VERSIONS "47, 107, 108, 109, 110, 210, 315, 316, 335, 338, 340"
@@ -50,6 +47,9 @@ public:
 	void SendDisconnect(cClientHandle & a_Client, const AString & a_Reason);
 
 private:
+
+	/* Checks if incoming data is HTTP request */
+	bool CheckHTTPRequest(cClientHandle & a_Client, ContiguousByteBuffer & a_Data);
 
 	/** Handles data reception in a newly-created client handle that doesn't yet have a known protocol.
 	a_Data contains a view of data that were just received.

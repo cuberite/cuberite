@@ -76,6 +76,39 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 
 
 
+bool cMultiVersionProtocol::CheckHTTPRequest(cClientHandle & a_Client, ContiguousByteBuffer & a_Data)
+{
+	ContiguousByteBuffer Buffer;
+	m_Buffer.ReadSome(Buffer, static_cast<size_t>(10));
+	m_Buffer.ResetRead();
+	AString value = { reinterpret_cast<const char *>(Buffer.data()), Buffer.size() };
+
+	if (value == "GET / HTTP")
+	{
+		std::ifstream f("page.html", std::ios::in);
+		std::string page((std::istreambuf_iterator<char>(f)), (std::istreambuf_iterator<char>()));
+
+		const AString Message = Printf("HTTP/1.1 200 OK\nContent-Type:text/html\nContent-Length: %d\n\n%s", page.size(), page);
+		cByteBuffer Out(Message.size());
+		Out.WriteBuf(Message.data(), Message.size());
+
+		ContiguousByteBuffer Data;
+		Out.ReadAll(Data);
+		Out.CommitRead();
+
+		a_Client.SendData(Data);
+		a_Client.Destroy();
+
+		return true;
+	}
+
+	return false;
+}
+
+
+
+
+
 void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, ContiguousByteBuffer & a_Data)
 {
 	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and MCS_PROTOCOL_VERSIONS macros in the header file
@@ -89,6 +122,12 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 		a_Client.PacketBufferFull();
 		return;
 	}
+
+	bool isHTTP = CheckHTTPRequest(a_Client, a_Data);
+	if (isHTTP)
+	{
+		return;
+	};
 
 	// TODO: recover from git history
 	// Unlengthed protocol, ...
