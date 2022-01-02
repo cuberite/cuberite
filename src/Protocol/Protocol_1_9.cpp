@@ -938,7 +938,7 @@ void cProtocol_1_9_0::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 
 	if (PlayerID != m_Client->GetPlayer()->GetUniqueID())
 	{
-		m_Client->Kick("Mind your own business! Hacked client?");
+		LOGD("Player \"%s\" attempted to action another entity - hacked client?", m_Client->GetUsername().c_str());
 		return;
 	}
 

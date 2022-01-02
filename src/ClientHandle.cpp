@@ -815,8 +815,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 {
 	if (a_Enchantment > 2)
 	{
-		LOGWARNING("%s attempt to crash the server with invalid enchanting selection (%u)!", GetUsername().c_str(), a_Enchantment);
-		Kick("Selected invalid enchantment - hacked client?");
+		LOGD("Player \"%s\" tried to select an invalid enchantment - hacked client?", m_Username.c_str());
 		return;
 	}
 
@@ -827,7 +826,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		(m_Player->GetWindow()->GetWindowType() != cWindow::wtEnchantment)
 	)
 	{
-		Kick("Enchantment with invalid window - hacked client?");
+		LOGD("Player \"%s\" tried to enchant without a valid window - hacked client?", m_Username.c_str());
 		return;
 	}
 
@@ -866,7 +865,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		else
 		{
 			// Not creative and can't afford enchantment, so exit:
-			Kick("Selected unavailable enchantment - hacked client?");
+			LOGD("Player \"%s\" selected unavailable enchantment - hacked client?", m_Username.c_str());
 			return;
 		}
 	}
@@ -1039,9 +1038,10 @@ void cClientHandle::HandleCommandBlockBlockChange(int a_BlockX, int a_BlockY, in
 {
 	if (a_NewCommand.empty())
 	{
-		Kick("Command block string unexpectedly empty - hacked client?");
+		LOGD("Player \"%s\" send an empty command block string - hacked client?", m_Username.c_str());
 		return;
 	}
+
 	if ((m_Player == nullptr) || !m_Player->HasPermission("comandblock.set"))
 	{
 		SendChat("You cannot edit command blocks on this server", mtFailure);
@@ -1562,10 +1562,9 @@ void cClientHandle::HandleChat(const AString & a_Message)
 {
 	if ((a_Message.size()) > MAX_CHAT_MSG_LENGTH)
 	{
-		Kick("Please don't exceed the maximum message length of " + std::to_string(MAX_CHAT_MSG_LENGTH));
+		LOGD("Player \"%s\" sent a chat message exceeding the maximum length - hacked client?", m_Username.c_str());
 		return;
 	}
-	// We no longer need to postpone message processing, because the messages already arrive in the Tick thread
 
 	// If a command, perform it:
 	AString Message(a_Message);
@@ -1699,7 +1698,7 @@ void cClientHandle::HandleSpectate(const cUUID & a_PlayerUUID)
 {
 	if (!m_Player->IsGameModeSpectator())
 	{
-		Kick("Tried to use spectator mode when not in game mode spectator.");
+		LOGD("Player \"%s\" tried to spectate when not in spectator mode - hacked client?", m_Username.c_str());
 		return;
 	}
 
@@ -1924,7 +1923,7 @@ void cClientHandle::HandleRespawn(void)
 {
 	if (m_Player->GetHealth() > 0)
 	{
-		Kick("What is not dead may not live again. Hacked client?");
+		LOGD("Player \"%s\" tried to respawn while alive - hacked client?", m_Username.c_str());
 		return;
 	}
 
