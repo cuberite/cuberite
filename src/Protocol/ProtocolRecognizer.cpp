@@ -132,8 +132,7 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 		return;
 	}
 
-	bool isHTTP = TryHandleHTTPRequest(a_Client, a_Data);
-	if (isHTTP)
+	if (TryHandleHTTPRequest(a_Client, a_Data))
 	{
 		return;
 	};
