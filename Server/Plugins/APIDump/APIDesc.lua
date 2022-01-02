@@ -10659,9 +10659,9 @@ a_Player:OpenWindow(Window);
 						{
 							Type = "number"
 						},
-						Note = "Returns the permission level of the player. For more informations, see https://minecraft.fandom.com/wiki/Permission_level"
-					}
-				}
+						Note = "Returns the permission level of the player. For more informations, see https://minecraft.fandom.com/wiki/Permission_level",
+					},
+				},
 				GetPermissions =
 				{
 					Returns =
