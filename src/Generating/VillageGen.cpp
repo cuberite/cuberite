@@ -93,7 +93,7 @@ public:
 
 
 	// cPrefabPiecePool overrides:
-	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) override
+	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) const override
 	{
 		// Roads cannot branch T-wise (appending -2 connector to a +2 connector on a 1-high piece):
 		if ((a_ExistingConnector.m_Type == 2) && (a_PlacedPiece.GetDepth() > 0) && (a_PlacedPiece.GetPiece().GetSize().y == 1))
@@ -176,14 +176,14 @@ protected:
 
 
 	// cGridStructGen::cStructure overrides:
-	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) override
+	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) const override
 	{
 		// Iterate over all items
 		// Each intersecting prefab is placed on ground, then drawn
 		// Each intersecting road is drawn by replacing top soil blocks with gravel / sandstone blocks
 		cChunkDef::HeightMap HeightMap;  // Heightmap for this chunk, used by roads
 		m_HeightGen.GenHeightMap(a_Chunk.GetChunkCoords(), HeightMap);
-		for (cPlacedPieces::iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
+		for (cPlacedPieces::const_iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
 		{
 			const cPrefab & Prefab = static_cast<const cPrefab &>((*itr)->GetPiece());
 			if ((*itr)->GetPiece().GetSize().y == 1)
@@ -203,7 +203,7 @@ protected:
 
 	/**  Adjusts the Y coord of the given piece so that the piece is on the ground.
 	Ground level is assumed to be represented by the first connector in the piece. */
-	void PlacePieceOnGround(cPlacedPiece & a_Piece)
+	void PlacePieceOnGround(cPlacedPiece & a_Piece) const
 	{
 		cPiece::cConnector FirstConnector = a_Piece.GetRotatedConnector(0);
 		int ChunkX, ChunkZ;
@@ -221,7 +221,7 @@ protected:
 	/** Draws the road into the chunk.
 	The heightmap is not queried from the heightgen, but is given via parameter, so that it may be queried just
 	once for all roads in a chunk. */
-	void DrawRoad(cChunkDesc & a_Chunk, cPlacedPiece & a_Road, cChunkDef::HeightMap & a_HeightMap)
+	void DrawRoad(cChunkDesc & a_Chunk, cPlacedPiece & a_Road, cChunkDef::HeightMap & a_HeightMap) const
 	{
 		cCuboid RoadCoords = a_Road.GetHitBox();
 		RoadCoords.Sort();
@@ -252,13 +252,13 @@ protected:
 
 
 	// cPiecePool overrides:
-	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override
+	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) const override
 	{
 		return m_Prefabs.GetPiecesWithConnector(a_ConnectorType);
 	}
 
 
-	virtual cPieces GetStartingPieces(void) override
+	virtual cPieces GetStartingPieces(void) const override
 	{
 		return m_Prefabs.GetStartingPieces();
 	}
@@ -268,7 +268,7 @@ protected:
 		const cPlacedPiece & a_PlacedPiece,
 		const cPiece::cConnector & a_ExistingConnector,
 		const cPiece & a_NewPiece
-	) override
+	) const override
 	{
 		// Check against the density:
 		if (a_ExistingConnector.m_Type == 1)
@@ -286,7 +286,7 @@ protected:
 	}
 
 
-	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) override
+	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) const override
 	{
 		return m_Prefabs.GetStartingPieceWeight(a_NewPiece);
 	}

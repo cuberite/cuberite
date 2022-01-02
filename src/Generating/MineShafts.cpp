@@ -271,7 +271,7 @@ public:
 	bool CanAppend(const cCuboid & a_BoundingBox);
 
 	// cGridStructGen::cStructure overrides:
-	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) override;
+	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) const override;
 } ;
 
 
@@ -331,7 +331,7 @@ cStructGenMineShafts::cMineShaftSystem::~cMineShaftSystem()
 
 
 
-void cStructGenMineShafts::cMineShaftSystem::DrawIntoChunk(cChunkDesc & a_Chunk)
+void cStructGenMineShafts::cMineShaftSystem::DrawIntoChunk(cChunkDesc & a_Chunk) const
 {
 	for (cMineShafts::const_iterator itr = m_MineShafts.begin(), end = m_MineShafts.end(); itr != end; ++itr)
 	{

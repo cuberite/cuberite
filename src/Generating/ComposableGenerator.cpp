@@ -143,7 +143,7 @@ void cComposableGenerator::Initialize(cIniFile & a_IniFile)
 
 
 
-void cComposableGenerator::GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
+void cComposableGenerator::GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) const
 {
 	if (m_BiomeGen != nullptr)  // Quick fix for generator deinitializing before the world storage finishes loading
 	{
@@ -155,7 +155,7 @@ void cComposableGenerator::GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef:
 
 
 
-void cComposableGenerator::Generate(cChunkDesc & a_ChunkDesc)
+void cComposableGenerator::Generate(cChunkDesc & a_ChunkDesc) const
 {
 	if (a_ChunkDesc.IsUsingDefaultBiomes())
 	{

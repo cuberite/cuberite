@@ -55,6 +55,9 @@ protected:
 
 	friend class cBioGenMulticache;
 
+	/** Generator cache protection mutex. */
+	mutable cCriticalSection m_CS;
+
 	cBiomeGen & m_BioGenToCache;
 
 	struct sCacheData
@@ -214,7 +217,7 @@ protected:
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 
 	/** Distorts the coords using a Perlin-like noise */
-	void Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ);
+	void Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ) const;
 } ;
 
 
@@ -255,27 +258,27 @@ protected:
 
 	/** Step 1: Decides between ocean, land and mushroom, using a DistVoronoi with special conditions and post-processing for mushroom islands
 	Sets biomes to biOcean, -1 (i.e. land), biMushroomIsland or biMushroomShore. */
-	void DecideOceanLandMushroom(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap);
+	void DecideOceanLandMushroom(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) const;
 
 	/** Step 2: Add rivers to the land
 	Flips some "-1" biomes into biRiver. */
-	void AddRivers(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap);
+	void AddRivers(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) const;
 
 	/** Step 3: Decide land biomes using a temperature / humidity map; freeze ocean / river in low temperatures.
 	Flips all remaining "-1" biomes into land biomes. Also flips some biOcean and biRiver into biFrozenOcean, biFrozenRiver, based on temp map. */
-	void ApplyTemperatureHumidity(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap);
+	void ApplyTemperatureHumidity(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) const;
 
 	/** Distorts the coords using a Perlin-like noise, with a specified cell-size */
-	void Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ, int a_CellSize);
+	void Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ, int a_CellSize) const;
 
 	/** Builds two Perlin-noise maps, one for temperature, the other for humidity. Trims both into [0..255] range */
-	void BuildTemperatureHumidityMaps(cChunkCoords a_ChunkCoords, IntMap & a_TemperatureMap, IntMap & a_HumidityMap);
+	void BuildTemperatureHumidityMaps(cChunkCoords a_ChunkCoords, IntMap & a_TemperatureMap, IntMap & a_HumidityMap) const;
 
 	/** Flips all remaining "-1" biomes into land biomes using the two maps */
-	void DecideLandBiomes(cChunkDef::BiomeMap & a_BiomeMap, const IntMap & a_TemperatureMap, const IntMap & a_HumidityMap);
+	static void DecideLandBiomes(cChunkDef::BiomeMap & a_BiomeMap, const IntMap & a_TemperatureMap, const IntMap & a_HumidityMap);
 
 	/** Flips biOcean and biRiver into biFrozenOcean and biFrozenRiver if the temperature is too low */
-	void FreezeWaterBiomes(cChunkDef::BiomeMap & a_BiomeMap, const IntMap & a_TemperatureMap);
+	static void FreezeWaterBiomes(cChunkDef::BiomeMap & a_BiomeMap, const IntMap & a_TemperatureMap);
 } ;
 
 
@@ -322,5 +325,5 @@ protected:
 	/** Selects biome from the specified biome group, based on the specified index.
 	Note that both params may overflow
 	a_DistLevel is either 0 or 1; zero when it is at the edge of the small Voronoi cell, 1 near the center */
-	EMCSBiome SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int a_DistLevel);
+	static EMCSBiome SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int a_DistLevel);
 } ;

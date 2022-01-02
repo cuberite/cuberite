@@ -3172,7 +3172,7 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 
 
 
-bool cWorld::cChunkGeneratorCallbacks::IsChunkValid(cChunkCoords a_Coords)
+bool cWorld::cChunkGeneratorCallbacks::IsChunkValid(cChunkCoords a_Coords) const
 {
 	return m_World->IsChunkValid(a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
 }
@@ -3181,7 +3181,7 @@ bool cWorld::cChunkGeneratorCallbacks::IsChunkValid(cChunkCoords a_Coords)
 
 
 
-bool cWorld::cChunkGeneratorCallbacks::IsChunkQueued(cChunkCoords a_Coords)
+bool cWorld::cChunkGeneratorCallbacks::IsChunkQueued(cChunkCoords a_Coords) const
 {
 	return m_World->IsChunkQueued(a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
 }
@@ -3190,7 +3190,7 @@ bool cWorld::cChunkGeneratorCallbacks::IsChunkQueued(cChunkCoords a_Coords)
 
 
 
-bool cWorld::cChunkGeneratorCallbacks::HasChunkAnyClients(cChunkCoords a_Coords)
+bool cWorld::cChunkGeneratorCallbacks::HasChunkAnyClients(cChunkCoords a_Coords) const
 {
 	return m_World->HasChunkAnyClients(a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
 }
@@ -3199,7 +3199,7 @@ bool cWorld::cChunkGeneratorCallbacks::HasChunkAnyClients(cChunkCoords a_Coords)
 
 
 
-void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerating(cChunkDesc & a_ChunkDesc)
+void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) const
 {
 	cPluginManager::Get()->CallHookChunkGenerating(
 		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
@@ -3210,7 +3210,7 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerating(cChunkDesc & a_Ch
 
 
 
-void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_ChunkDesc)
+void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_ChunkDesc) const
 {
 	cPluginManager::Get()->CallHookChunkGenerated(
 		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc

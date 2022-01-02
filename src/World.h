@@ -914,13 +914,13 @@ private:
 
 		// cChunkSink overrides:
 		virtual void OnChunkGenerated  (cChunkDesc & a_ChunkDesc) override;
-		virtual bool IsChunkValid      (cChunkCoords a_Coords) override;
-		virtual bool HasChunkAnyClients(cChunkCoords a_Coords) override;
-		virtual bool IsChunkQueued     (cChunkCoords a_Coords) override;
+		virtual bool IsChunkValid      (cChunkCoords a_Coords) const override;
+		virtual bool HasChunkAnyClients(cChunkCoords a_Coords) const override;
+		virtual bool IsChunkQueued     (cChunkCoords a_Coords) const override;
 
 		// cPluginInterface overrides:
-		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) override;
-		virtual void CallHookChunkGenerated (cChunkDesc & a_ChunkDesc) override;
+		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) const override;
+		virtual void CallHookChunkGenerated (cChunkDesc & a_ChunkDesc) const override;
 
 	public:
 		cChunkGeneratorCallbacks(cWorld & a_World);
@@ -1089,7 +1089,7 @@ private:
 	cCriticalSection m_CSEntitiesToAdd;
 
 	/** List of entities that are scheduled for adding, waiting for the Tick thread to add them. */
-	std::vector<std::pair<OwnedEntity, cWorld *>> m_EntitiesToAdd;
+	std::vector<std::pair<OwnedEntity, cWorld*>> m_EntitiesToAdd;
 
 	/** CS protecting m_SetChunkDataQueue. */
 	cCriticalSection m_CSSetChunkDataQueue;

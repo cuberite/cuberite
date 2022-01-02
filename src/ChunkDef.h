@@ -58,6 +58,8 @@ public:
 	int m_ChunkX;
 	int m_ChunkZ;
 
+	cChunkCoords() = default;
+
 	cChunkCoords(int a_ChunkX, int a_ChunkZ) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ) {}
 
 

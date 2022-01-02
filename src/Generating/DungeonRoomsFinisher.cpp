@@ -128,7 +128,7 @@ protected:
 
 	/** Fills the specified area of blocks in the chunk with the specified blocktype if they are one of the overwritten block types.
 	The coords are absolute, start coords are inclusive, end coords are exclusive. */
-	void ReplaceCuboid(cChunkDesc & a_ChunkDesc, int a_StartX, int a_StartY, int a_StartZ, int a_EndX, int a_EndY, int a_EndZ, BLOCKTYPE a_DstBlockType)
+	static void ReplaceCuboid(cChunkDesc & a_ChunkDesc, int a_StartX, int a_StartY, int a_StartZ, int a_EndX, int a_EndY, int a_EndZ, BLOCKTYPE a_DstBlockType)
 	{
 		int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 		int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
@@ -155,7 +155,7 @@ protected:
 
 	/** Fills the specified area of blocks in the chunk with a random pattern of the specified blocktypes, if they are one of the overwritten block types.
 	The coords are absolute, start coords are inclusive, end coords are exclusive. The first blocktype uses 75% chance, the second 25% chance. */
-	void ReplaceCuboidRandom(cChunkDesc & a_ChunkDesc, int a_StartX, int a_StartY, int a_StartZ, int a_EndX, int a_EndY, int a_EndZ, BLOCKTYPE a_DstBlockType1, BLOCKTYPE a_DstBlockType2)
+	static void ReplaceCuboidRandom(cChunkDesc & a_ChunkDesc, int a_StartX, int a_StartY, int a_StartZ, int a_EndX, int a_EndY, int a_EndZ, BLOCKTYPE a_DstBlockType1, BLOCKTYPE a_DstBlockType2)
 	{
 		int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 		int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
@@ -184,7 +184,7 @@ protected:
 
 	/** Tries to place a chest at the specified (absolute) coords.
 	Does nothing if the coords are outside the chunk. */
-	void TryPlaceChest(cChunkDesc & a_ChunkDesc, const Vector3i & a_Chest)
+	void TryPlaceChest(cChunkDesc & a_ChunkDesc, const Vector3i & a_Chest) const
 	{
 		int RelX = a_Chest.x - a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 		int RelZ = a_Chest.z - a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
@@ -236,7 +236,7 @@ protected:
 
 
 	// cGridStructGen::cStructure override:
-	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override
+	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) const override
 	{
 		if (
 			(m_EndX   <  a_ChunkDesc.GetChunkX() * cChunkDef::Width) ||

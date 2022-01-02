@@ -127,51 +127,61 @@ cHeiGenCache::cHeiGenCache(cTerrainHeightGen & a_HeiGenToCache, size_t a_CacheSi
 
 void cHeiGenCache::GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap)
 {
-	/*
-	if (((m_NumHits + m_NumMisses) % 1024) == 10)
 	{
-		LOGD("HeiGenCache: %d hits, %d misses, saved %.2f %%", m_NumHits, m_NumMisses, 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
-		LOGD("HeiGenCache: Avg cache chain length: %.2f", static_cast<double>(m_TotalChain) / m_NumHits);
+		cCSLock Lock{ m_CS };
+
+		/*
+		if (((m_NumHits + m_NumMisses) % 1024) == 10)
+		{
+			LOGD("HeiGenCache: %d hits, %d misses, saved %.2f %%", m_NumHits, m_NumMisses, 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
+			LOGD("HeiGenCache: Avg cache chain length: %.2f", static_cast<double>(m_TotalChain) / m_NumHits);
+		}
+		//*/
+
+		for (size_t i = 0; i < m_CacheSize; i++)
+		{
+			if (m_CacheData[m_CacheOrder[i]].m_Coords != a_ChunkCoords)
+			{
+				continue;
+			}
+			// Found it in the cache
+			auto Idx = m_CacheOrder[i];
+
+			// Move to front:
+			for (size_t j = i; j > 0; j--)
+			{
+				m_CacheOrder[j] = m_CacheOrder[j - 1];
+			}
+			m_CacheOrder[0] = Idx;
+
+			// Use the cached data:
+			memcpy(a_HeightMap, m_CacheData[Idx].m_HeightMap, sizeof(a_HeightMap));
+
+			m_NumHits++;
+			m_TotalChain += i;
+			return;
+		}  // for i - cache
+
+		// Not in the cache:
+		m_NumMisses++;
 	}
-	//*/
 
-	for (size_t i = 0; i < m_CacheSize; i++)
-	{
-		if (m_CacheData[m_CacheOrder[i]].m_Coords != a_ChunkCoords)
-		{
-			continue;
-		}
-		// Found it in the cache
-		auto Idx = m_CacheOrder[i];
-
-		// Move to front:
-		for (size_t j = i; j > 0; j--)
-		{
-			m_CacheOrder[j] = m_CacheOrder[j - 1];
-		}
-		m_CacheOrder[0] = Idx;
-
-		// Use the cached data:
-		memcpy(a_HeightMap, m_CacheData[Idx].m_HeightMap, sizeof(a_HeightMap));
-
-		m_NumHits++;
-		m_TotalChain += i;
-		return;
-	}  // for i - cache
-
-	// Not in the cache:
-	m_NumMisses++;
+	// This is multi-threaded
 	m_HeiGenToCache.GenHeightMap(a_ChunkCoords, a_HeightMap);
 
-	// Insert it as the first item in the MRU order:
-	auto Idx = m_CacheOrder[m_CacheSize - 1];
-	for (auto i = m_CacheSize - 1; i > 0; i--)
 	{
-		m_CacheOrder[i] = m_CacheOrder[i - 1];
-	}  // for i - m_CacheOrder[]
-	m_CacheOrder[0] = Idx;
-	memcpy(m_CacheData[Idx].m_HeightMap, a_HeightMap, sizeof(a_HeightMap));
-	m_CacheData[Idx].m_Coords = a_ChunkCoords;
+		cCSLock Lock{ m_CS };
+
+		// Insert it as the first item in the MRU order:
+		auto Idx = m_CacheOrder[m_CacheSize - 1];
+		for (auto i = m_CacheSize - 1; i > 0; i--)
+		{
+			m_CacheOrder[i] = m_CacheOrder[i - 1];
+		}  // for i - m_CacheOrder[]
+		m_CacheOrder[0] = Idx;
+		memcpy(m_CacheData[Idx].m_HeightMap, a_HeightMap, sizeof(a_HeightMap));
+		m_CacheData[Idx].m_Coords = a_ChunkCoords;
+	}
 }
 
 
@@ -201,6 +211,8 @@ HEIGHTTYPE cHeiGenCache::GetHeightAt(int a_BlockX, int a_BlockZ)
 
 bool cHeiGenCache::GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, HEIGHTTYPE & a_Height)
 {
+	cCSLock Lock{ m_CS };
+
 	for (size_t i = 0; i < m_CacheSize; i++)
 	{
 		if ((m_CacheData[i].m_Coords.m_ChunkX == a_ChunkX) && (m_CacheData[i].m_Coords.m_ChunkZ == a_ChunkZ))
@@ -301,7 +313,7 @@ cHeiGenClassic::cHeiGenClassic(int a_Seed) :
 
 
 
-float cHeiGenClassic::GetNoise(float x, float y)
+float cHeiGenClassic::GetNoise(float x, float y) const
 {
 	float oct1 = m_Noise.CubicNoise2D(x * m_HeightFreq1, y * m_HeightFreq1) * m_HeightAmp1;
 	float oct2 = m_Noise.CubicNoise2D(x * m_HeightFreq2, y * m_HeightFreq2) * m_HeightAmp2;
@@ -559,7 +571,7 @@ void cHeiGenBiomal::InitializeHeightGen(cIniFile & a_IniFile)
 
 
 
-NOISE_DATATYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const cHeiGenBiomal::BiomeNeighbors & a_BiomeNeighbors)
+NOISE_DATATYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const cHeiGenBiomal::BiomeNeighbors & a_BiomeNeighbors) const
 {
 	// Sum up how many biomes of each type there are in the neighborhood:
 	int BiomeCounts[256];
@@ -746,7 +758,7 @@ protected:
 
 
 	/** Returns the minimum and maximum heights for the given biome. */
-	void getBiomeMinMax(EMCSBiome a_Biome, double & a_Min, double & a_Max)
+	static void getBiomeMinMax(EMCSBiome a_Biome, double & a_Min, double & a_Max)
 	{
 		switch (a_Biome)
 		{

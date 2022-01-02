@@ -282,11 +282,11 @@ public:
 
 	/** Returns a list of pieces that contain the specified connector type.
 	The cPiece pointers returned are managed by the pool and the caller doesn't free them. */
-	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) = 0;
+	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) const = 0;
 
 	/** Returns the pieces that should be used as the starting point.
 	Multiple starting points are supported, one of the returned piece will be chosen. */
-	virtual cPieces GetStartingPieces(void) = 0;
+	virtual cPieces GetStartingPieces(void) const = 0;
 
 	/** Returns the relative weight with which the a_NewPiece is to be selected for placing under a_PlacedPiece through a_ExistingConnector.
 	a_ExistingConnector is the original connector, before any movement or rotation is applied to it.
@@ -296,7 +296,7 @@ public:
 		const cPlacedPiece & a_PlacedPiece,
 		const cPiece::cConnector & a_ExistingConnector,
 		const cPiece & a_NewPiece
-	)
+	) const
 	{
 		return 1;
 	}
@@ -305,7 +305,7 @@ public:
 	This allows the pool to tweak the piece's chances.
 	The higher the number returned, the higher the chance the piece will be chosen. 0 means the piece will not be chosen.
 	If all pieces return 0, a random piece is chosen, with all equal chances. */
-	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece)
+	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) const
 	{
 		return 1;
 	}

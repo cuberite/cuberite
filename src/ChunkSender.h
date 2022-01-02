@@ -25,9 +25,12 @@ Note that it may be called by world's BroadcastToChunk() if the client is still 
 
 #pragma once
 
+#include <shared_mutex>
+
 #include "OSSupport/IsThread.h"
 #include "ChunkDataCallback.h"
 #include "Protocol/ChunkDataSerializer.h"
+#include "TBBWrapper.h"
 
 
 
@@ -104,14 +107,16 @@ protected:
 		}
 	};
 
+	using ChunkInfoMap = tbb::concurrent_unordered_map<cChunkCoords, sSendChunk, cChunkCoordsHash>;
+
 	cWorld & m_World;
 
 	/** An instance of a chunk serializer, held to maintain its internal cache. */
 	cChunkDataSerializer m_Serializer;
 
-	cCriticalSection  m_CS;
-	std::priority_queue<sChunkQueue> m_SendChunks;
-	std::unordered_map<cChunkCoords, sSendChunk, cChunkCoordsHash> m_ChunkInfo;
+	mutable std::shared_mutex m_ChunkInfoSharedMutex;
+	tbb::concurrent_priority_queue<sChunkQueue> m_SendChunks;
+	ChunkInfoMap m_ChunkInfo;
 	cEvent m_evtQueue;  // Set when anything is added to m_ChunksReady
 
 	// Data about the chunk that is being sent:

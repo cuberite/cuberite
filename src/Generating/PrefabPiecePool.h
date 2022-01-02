@@ -111,10 +111,10 @@ public:
 	void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel);
 
 	// cPiecePool overrides:
-	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override;
-	virtual cPieces GetStartingPieces(void) override;
-	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) override;
-	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) override;
+	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) const override;
+	virtual cPieces GetStartingPieces(void) const override;
+	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) const override;
+	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) const override;
 	virtual void PiecePlaced(const cPiece & a_Piece) override;
 	virtual void Reset(void) override;
 

@@ -161,7 +161,7 @@ add_library(GeneratorTestingSupport STATIC
 	${GENERATING_HDRS}
 	${STUBS}
 )
-target_link_libraries(GeneratorTestingSupport fmt::fmt jsoncpp_static libdeflate lsqlite luaexpat tolualib)
+target_link_libraries(GeneratorTestingSupport fmt::fmt jsoncpp_static libdeflate lsqlite luaexpat tolualib TBB::tbb)
 source_group("Stubs" FILES ${STUBS})
 source_group("Generating" FILES ${GENERATING_HDRS} ${GENERATING_SRCS})
 

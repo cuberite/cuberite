@@ -39,9 +39,9 @@ protected:
 
 
 	// cGridStructGen::cStructure overrides:
-	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) override;
+	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) const override;
 
 	/**  Adjusts the Y coord of the given piece so that the piece is on the ground.
 	Ground level is assumed to be represented by the first connector in the piece. */
-	void PlacePieceOnGround(cPlacedPiece & a_Piece);
+	void PlacePieceOnGround(cPlacedPiece & a_Piece) const;
 };

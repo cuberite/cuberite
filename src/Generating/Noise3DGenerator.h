@@ -31,8 +31,8 @@ public:
 	virtual ~cNoise3DGenerator() override;
 
 	virtual void Initialize(cIniFile & a_IniFile) override;
-	virtual void GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) override;
-	virtual void Generate(cChunkDesc & a_ChunkDesc) override;
+	virtual void GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) const override;
+	virtual void Generate(cChunkDesc & a_ChunkDesc) const override;
 
 protected:
 	// Linear interpolation step sizes, must be divisors of cChunkDef::Width and cChunkDef::Height, respectively:
@@ -60,10 +60,10 @@ protected:
 	NOISE_DATATYPE m_AirThreshold;
 
 	/** Generates the 3D noise array used for terrain generation into a_Noise; a_Noise is of ChunkData-size */
-	void GenerateNoiseArray(cChunkCoords a_ChunkCoords, NOISE_DATATYPE * a_Noise);
+	void GenerateNoiseArray(cChunkCoords a_ChunkCoords, NOISE_DATATYPE * a_Noise) const;
 
 	/** Composes terrain - adds dirt, grass and sand */
-	void ComposeTerrain(cChunkDesc & a_ChunkDesc);
+	static void ComposeTerrain(cChunkDesc & a_ChunkDesc);
 } ;
 
 
@@ -115,13 +115,14 @@ protected:
 	// Threshold for when the values are considered air:
 	NOISE_DATATYPE m_AirThreshold;
 
+	// TODO: Removed, not thread safe
 	// Cache for the last calculated chunk (reused between heightmap and composition queries):
-	cChunkCoords m_LastChunkCoords;
-	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // x + 17 * z + 17 * 17 * y
+	// cChunkCoords m_LastChunkCoords;
+	// NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // x + 17 * z + 17 * 17 * y
 
 
 	/** Generates the 3D noise array used for terrain generation (m_NoiseArray), unless the LastChunk coords are equal to coords given */
-	void GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCoords);
+	void GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCoords, NOISE_DATATYPE a_NoiseArray[17 * 17 * 257]) const;
 
 	// cTerrainHeightGen overrides:
 	virtual void GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape) override;
@@ -183,9 +184,9 @@ protected:
 	// Threshold for when the values are considered air:
 	NOISE_DATATYPE m_AirThreshold;
 
+	// TODO: Removed, not thread safe
 	// Cache for the last calculated chunk (reused between heightmap and composition queries):
-	cChunkCoords m_LastChunkCoords;
-	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // 257 * x + y + 257 * 17 * z
+	// cChunkCoords m_LastChunkCoords;
 
 	/** Weights for summing up neighboring biomes. */
 	NOISE_DATATYPE m_Weight[AVERAGING_SIZE * 2 + 1][AVERAGING_SIZE * 2 + 1];
@@ -195,7 +196,7 @@ protected:
 
 
 	/** Generates the 3D noise array used for terrain generation (m_NoiseArray), unless the LastChunk coords are equal to coords given */
-	void GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCoords);
+	void GenerateNoiseArrayIfNeeded(cChunkCoords a_ChunkCoords, NOISE_DATATYPE a_Noise[17 * 17 * 257]);
 
 	/** Calculates the biome-related parameters for the chunk. */
 	void CalcBiomeParamArrays(cChunkCoords a_ChunkCoords, ChunkParam & a_HeightAmp, ChunkParam & a_MidPoint);

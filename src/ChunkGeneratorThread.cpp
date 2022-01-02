@@ -7,9 +7,6 @@
 
 
 
-/** If the generation queue size exceeds this number, a warning will be output */
-const size_t QUEUE_WARNING_LIMIT = 1000;
-
 /** If the generation queue size exceeds this number, chunks with no clients will be skipped */
 const size_t QUEUE_SKIP_LIMIT = 500;
 
@@ -38,7 +35,7 @@ cChunkGeneratorThread::~cChunkGeneratorThread()
 
 
 
-bool cChunkGeneratorThread::Initialize(cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile)
+bool cChunkGeneratorThread::Initialize(const cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile)
 {
 	m_PluginInterface = &a_PluginInterface;
 	m_ChunkSink = &a_ChunkSink;
@@ -60,7 +57,6 @@ void cChunkGeneratorThread::Stop(void)
 {
 	m_ShouldTerminate = true;
 	m_Event.Set();
-	m_evtRemoved.Set();  // Wake up anybody waiting for empty queue
 	Super::Stop();
 	m_Generator.reset();
 }
@@ -78,14 +74,8 @@ void cChunkGeneratorThread::QueueGenerateChunk(
 	ASSERT(m_ChunkSink->IsChunkQueued(a_Coords));
 
 	{
-		cCSLock Lock(m_CS);
-
-		// Add to queue, issue a warning if too many:
-		if (m_Queue.size() >= QUEUE_WARNING_LIMIT)
-		{
-			LOGWARN("WARNING: Adding chunk %s to generation queue; Queue is too big! (%zu)", a_Coords.ToString().c_str(), m_Queue.size());
-		}
-		m_Queue.emplace_back(a_Coords, a_ForceRegeneration, a_Callback);
+		std::shared_lock<std::shared_mutex> SharedLock{m_SharedMutex};	 // This operation is thread safe unless someone calls GetQueueLength()
+		m_Queue.emplace(a_Coords, a_ForceRegeneration, a_Callback);
 	}
 
 	m_Event.Set();
@@ -95,7 +85,7 @@ void cChunkGeneratorThread::QueueGenerateChunk(
 
 
 
-void cChunkGeneratorThread::GenerateBiomes(cChunkCoords a_Coords, cChunkDef::BiomeMap & a_BiomeMap)
+void cChunkGeneratorThread::GenerateBiomes(cChunkCoords a_Coords, cChunkDef::BiomeMap & a_BiomeMap) const
 {
 	if (m_Generator != nullptr)
 	{
@@ -107,24 +97,10 @@ void cChunkGeneratorThread::GenerateBiomes(cChunkCoords a_Coords, cChunkDef::Bio
 
 
 
-void cChunkGeneratorThread::WaitForQueueEmpty(void)
-{
-	cCSLock Lock(m_CS);
-	while (!m_ShouldTerminate && !m_Queue.empty())
-	{
-		cCSUnlock Unlock(Lock);
-		m_evtRemoved.Wait();
-	}
-}
-
-
-
-
-
 size_t cChunkGeneratorThread::GetQueueLength(void) const
 {
-	cCSLock Lock(m_CS);
-	return m_Queue.size();
+	std::unique_lock<std::shared_mutex> UniqueLock{m_SharedMutex};	 // This operation is not thread safe, meaning we must lock the queue
+	return m_Queue.unsafe_size();
 }
 
 
@@ -140,7 +116,7 @@ int cChunkGeneratorThread::GetSeed() const
 
 
 
-EMCSBiome cChunkGeneratorThread::GetBiomeAt(int a_BlockX, int a_BlockZ)
+EMCSBiome cChunkGeneratorThread::GetBiomeAt(int a_BlockX, int a_BlockZ) const
 {
 	ASSERT(m_Generator != nullptr);
 	return m_Generator->GetBiomeAt(a_BlockX, a_BlockZ);
@@ -154,93 +130,104 @@ void cChunkGeneratorThread::Execute(void)
 {
 	// To be able to display performance information, the generator counts the chunks generated.
 	// When the queue gets empty, the count is reset, so that waiting for the queue is not counted into the total time.
-	int NumChunksGenerated = 0;  // Number of chunks generated since the queue was last empty
-	clock_t GenerationStart = clock();  // Clock tick when the queue started to fill
-	clock_t LastReportTick = clock();  // Clock tick of the last report made (so that performance isn't reported too often)
+	std::atomic_size_t NumChunksGenerated = 0;  // Number of chunks generated since the queue was last empty
+	std::atomic<clock_t> GenerationStart = clock();      // Clock tick when the queue started to fill
+	std::atomic<clock_t> LastReportTick = clock();       // Clock tick of the last report made (so that performance isn't reported too often)
+	tbb::task_group Pool;                       // TBB task group for this generation thread
 
 	while (!m_ShouldTerminate)
 	{
-		cCSLock Lock(m_CS);
-		while (m_Queue.empty())
+		while (GetQueueLength() == 0)
 		{
-			if ((NumChunksGenerated > 16) && (clock() - LastReportTick > CLOCKS_PER_SEC))
+			// Wait for tasks to complete
+			if (auto Status = Pool.wait(); Status != tbb::complete)
 			{
-				/* LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
-					static_cast<double>(NumChunksGenerated) * CLOCKS_PER_SEC/ (clock() - GenerationStart),
-					NumChunksGenerated
-				); */
+				LOGD("Generator task group result status: %d", Status);
 			}
-			cCSUnlock Unlock(Lock);
+
 			m_Event.Wait();
+
 			if (m_ShouldTerminate)
 			{
 				return;
 			}
+
+			// Reset perf counters
 			NumChunksGenerated = 0;
 			GenerationStart = clock();
 			LastReportTick = clock();
 		}
 
-		if (m_Queue.empty())
-		{
-			// Sometimes the queue remains empty
-			// If so, we can't do any front() operations on it!
-			continue;
-		}
+		const auto SkipEnabled = GetQueueLength() > QUEUE_SKIP_LIMIT;
 
-		auto item = m_Queue.front();  // Get next chunk from the queue
-		bool SkipEnabled = (m_Queue.size() > QUEUE_SKIP_LIMIT);
-		m_Queue.erase(m_Queue.begin());  // Remove the item from the queue
-		Lock.Unlock();  // Unlock ASAP
-		m_evtRemoved.Set();
-
-		// Display perf info once in a while:
-		if ((NumChunksGenerated > 512) && (clock() - LastReportTick > 2 * CLOCKS_PER_SEC))
 		{
-			LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
-				static_cast<double>(NumChunksGenerated) * CLOCKS_PER_SEC / (clock() - GenerationStart),
-				NumChunksGenerated
-			);
-			LastReportTick = clock();
-		}
+			std::shared_lock<std::shared_mutex> SharedLock{m_SharedMutex};	 // This operation is concurrent unless someone calls
 
-		// Skip the chunk if it's already generated and regeneration is not forced. Report as success:
-		if (!item.m_ForceRegeneration && m_ChunkSink->IsChunkValid(item.m_Coords))
-		{
-			LOGD("Chunk %s already generated, skipping generation", item.m_Coords.ToString().c_str());
-			if (item.m_Callback != nullptr)
+			QueueItem Item{};
+			while (m_Queue.try_pop(Item))
 			{
-				item.m_Callback->Call(item.m_Coords, true);
-			}
-			continue;
-		}
+				// Take Item and SkipEnabled by copy
+				Pool.run([&, Item, SkipEnabled]()
+				{
+					Generate(Item, SkipEnabled);
 
-		// Skip the chunk if the generator is overloaded:
-		if (SkipEnabled && !m_ChunkSink->HasChunkAnyClients(item.m_Coords))
-		{
-			LOGWARNING("Chunk generator overloaded, skipping chunk %s", item.m_Coords.ToString().c_str());
-			if (item.m_Callback != nullptr)
-			{
-				item.m_Callback->Call(item.m_Coords, false);
-			}
-			continue;
-		}
+					++NumChunksGenerated;
 
-		// Generate the chunk:
-		DoGenerate(item.m_Coords);
-		if (item.m_Callback != nullptr)
-		{
-			item.m_Callback->Call(item.m_Coords, true);
+					// Display perf info once in a while:
+					if ((NumChunksGenerated > 512U) && (clock() - LastReportTick > 2 * CLOCKS_PER_SEC))
+					{
+						LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
+							static_cast<double>(NumChunksGenerated) * CLOCKS_PER_SEC / (clock() - GenerationStart), NumChunksGenerated);
+						LastReportTick = clock();
+					}
+				});
+			}
 		}
-		NumChunksGenerated++;
-	}  // while (!bStop)
+	}
 }
 
 
 
 
 
-void cChunkGeneratorThread::DoGenerate(cChunkCoords a_Coords)
+void cChunkGeneratorThread::Generate(const QueueItem & a_Item, const bool a_SkipEnable) const
+{
+	// Skip the chunk if it's already generated and regeneration is not forced.
+	// Report as success:
+	if (!a_Item.m_ForceRegeneration && m_ChunkSink->IsChunkValid(a_Item.m_Coords))
+	{
+		LOGD("Chunk %s already generated, skipping generation", a_Item.m_Coords.ToString().c_str());
+		if (a_Item.m_Callback != nullptr)
+		{
+			a_Item.m_Callback->Call(a_Item.m_Coords, true);
+		}
+		return;
+	}
+
+	// Skip the chunk if the generator is overloaded:
+	if (a_SkipEnable && !m_ChunkSink->HasChunkAnyClients(a_Item.m_Coords))
+	{
+		LOGWARNING("Chunk generator overloaded, skipping chunk %s", a_Item.m_Coords.ToString().c_str());
+		if (a_Item.m_Callback != nullptr)
+		{
+			a_Item.m_Callback->Call(a_Item.m_Coords, false);
+		}
+		return;
+	}
+
+	// Generate the chunk:
+	DoGenerate(a_Item.m_Coords);
+	if (a_Item.m_Callback != nullptr)
+	{
+		a_Item.m_Callback->Call(a_Item.m_Coords, true);
+	}
+}
+
+
+
+
+
+void cChunkGeneratorThread::DoGenerate(cChunkCoords a_Coords) const
 {
 	ASSERT(m_PluginInterface != nullptr);
 	ASSERT(m_ChunkSink != nullptr);

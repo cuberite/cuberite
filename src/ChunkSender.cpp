@@ -92,29 +92,7 @@ void cChunkSender::Stop(void)
 void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cClientHandle * a_Client)
 {
 	ASSERT(a_Client != nullptr);
-	{
-		cChunkCoords Chunk{a_ChunkX, a_ChunkZ};
-		cCSLock Lock(m_CS);
-		auto iter = m_ChunkInfo.find(Chunk);
-		if (iter != m_ChunkInfo.end())
-		{
-			auto & info = iter->second;
-			if (info.m_Priority < a_Priority)  // Was the chunk's priority boosted?
-			{
-				m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
-				info.m_Priority = a_Priority;
-			}
-			info.m_Clients.insert(a_Client->shared_from_this());
-		}
-		else
-		{
-			m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
-			auto info = sSendChunk{Chunk, a_Priority};
-			info.m_Clients.insert(a_Client->shared_from_this());
-			m_ChunkInfo.emplace(Chunk, info);
-		}
-	}
-	m_evtQueue.Set();
+	QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, std::vector{a_Client});
 }
 
 
@@ -123,16 +101,21 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Prior
 
 void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, const std::vector<cClientHandle *> & a_Clients)
 {
+	cChunkCoords Chunk{a_ChunkX, a_ChunkZ};
+	// cCSLock Lock(m_CS);
+
+	bool found{};
 	{
-		cChunkCoords Chunk{a_ChunkX, a_ChunkZ};
-		cCSLock Lock(m_CS);
+		std::shared_lock<std::shared_mutex> Lock{m_ChunkInfoSharedMutex};
 		auto iter = m_ChunkInfo.find(Chunk);
-		if (iter != m_ChunkInfo.end())
+		found = iter != m_ChunkInfo.end();
+
+		if (found)
 		{
 			auto & info = iter->second;
 			if (info.m_Priority < a_Priority)  // Was the chunk's priority boosted?
 			{
-				m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
+				m_SendChunks.emplace(sChunkQueue{a_Priority, Chunk});
 				info.m_Priority = a_Priority;
 			}
 			for (const auto & Client : a_Clients)
@@ -140,16 +123,17 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Prior
 				info.m_Clients.insert(Client->shared_from_this());
 			}
 		}
-		else
+	}
+
+	if (!found)
+	{
+		m_SendChunks.emplace(sChunkQueue{a_Priority, Chunk});
+		auto info = sSendChunk{Chunk, a_Priority};
+		for (const auto & Client : a_Clients)
 		{
-			m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
-			auto info = sSendChunk{Chunk, a_Priority};
-			for (const auto & Client : a_Clients)
-			{
-				info.m_Clients.insert(Client->shared_from_this());
-			}
-			m_ChunkInfo.emplace(Chunk, info);
+			info.m_Clients.insert(Client->shared_from_this());
 		}
+		m_ChunkInfo.emplace(Chunk, info);
 	}
 	m_evtQueue.Set();
 }
@@ -164,25 +148,34 @@ void cChunkSender::Execute(void)
 	{
 		m_evtQueue.Wait();
 
+		if (m_ShouldTerminate)
 		{
-			cCSLock Lock(m_CS);
-			while (!m_SendChunks.empty())
+			return;
+		}
+
+		sChunkQueue ChunkQueue{};
+		while (m_SendChunks.try_pop(ChunkQueue))  // Take one from the queue
+		{
+			const auto & Chunk = ChunkQueue.m_Chunk;
+
+			ChunkInfoMap::iterator itr;
 			{
-				// Take one from the queue:
-				auto Chunk = m_SendChunks.top().m_Chunk;
-				m_SendChunks.pop();
-				auto itr = m_ChunkInfo.find(Chunk);
+				std::shared_lock<std::shared_mutex> Lock{m_ChunkInfoSharedMutex};
+				itr = m_ChunkInfo.find(Chunk);
 				if (itr == m_ChunkInfo.end())
 				{
 					continue;
 				}
-
-				auto clients = std::move(itr->second.m_Clients);
-				m_ChunkInfo.erase(itr);
-
-				cCSUnlock Unlock(Lock);
-				SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, clients);
 			}
+
+			cChunkSender::WeakClients clients;
+			{
+				std::unique_lock<std::shared_mutex> Lock{m_ChunkInfoSharedMutex};
+				clients = std::move(itr->second.m_Clients);
+				m_ChunkInfo.unsafe_erase(itr);
+			}
+
+			SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, clients);
 		}
 	}  // while (!m_ShouldTerminate)
 }

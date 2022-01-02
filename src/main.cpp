@@ -6,6 +6,7 @@
 #include "Logger.h"
 #include "MemorySettingsRepository.h"
 #include "Root.h"
+#include "ThreadPool.h"
 #include "tclap/CmdLine.h"
 
 #include "OSSupport/ConsoleSignalHandler.h"
@@ -136,6 +137,9 @@ static int UniversalMain(int argc, char * argv[], const bool a_RunningAsService)
 			SleepResolutionBooster::Unregister();
 		}
 	} SleepResolutionBooster;
+
+	// Initialize thread pool
+	[[maybe_unused]] cThreadPool ThreadPool;
 
 	// Register signal handlers, enabling graceful shutdown from the terminal:
 	ConsoleSignalHandler::Register();

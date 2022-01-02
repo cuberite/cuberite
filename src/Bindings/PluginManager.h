@@ -242,8 +242,8 @@ public:
 	bool CallHookBrewingCompleted         (cWorld & a_World, cBrewingstandEntity & a_Brewingstand);
 	bool CallHookChat                     (cPlayer & a_Player, AString & a_Message);
 	bool CallHookChunkAvailable           (cWorld & a_World, int a_ChunkX, int a_ChunkZ);
-	bool CallHookChunkGenerated           (cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);
-	bool CallHookChunkGenerating          (cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);
+	bool CallHookChunkGenerated           (cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc) const;
+	bool CallHookChunkGenerating          (cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc) const;
 	bool CallHookChunkUnloaded            (cWorld & a_World, int a_ChunkX, int a_ChunkZ);
 	bool CallHookChunkUnloading           (cWorld & a_World, int a_ChunkX, int a_ChunkZ);
 	bool CallHookCollectingPickup         (cPlayer & a_Player, cPickup & a_Pickup);
@@ -467,7 +467,7 @@ private:
 	Returns false if the action is to continue or true if the plugin wants to abort.
 	Accessible only from within PluginManager.cpp */
 	template <typename HookFunction>
-	bool GenericCallHook(PluginHook a_HookName, HookFunction a_HookFunction);
+	bool GenericCallHook(PluginHook a_HookName, HookFunction a_HookFunction) const;
 } ;  // tolua_export
 
 

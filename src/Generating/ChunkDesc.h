@@ -231,7 +231,7 @@ public:
 
 	#ifndef NDEBUG
 	/** Verifies that the heightmap corresponds to blocktype contents; if not, asserts on that column */
-	void VerifyHeightmap(void);
+	void VerifyHeightmap(void) const;
 	#endif  // !NDEBUG
 
 private:

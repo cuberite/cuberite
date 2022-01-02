@@ -15,6 +15,7 @@
 
 
 // Conditionally log a warning
+#ifndef CONDWARNING
 #define CONDWARNING(ShouldLog, ...) \
 	do { \
 		if (ShouldLog) \
@@ -22,6 +23,7 @@
 			LOGWARNING(__VA_ARGS__); \
 		} \
 	} while (false)
+#endif
 
 
 
@@ -765,16 +767,16 @@ void cPrefabPiecePool::AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHe
 
 
 
-cPieces cPrefabPiecePool::GetPiecesWithConnector(int a_ConnectorType)
+cPieces cPrefabPiecePool::GetPiecesWithConnector(int a_ConnectorType) const
 {
-	return m_PiecesByConnector[a_ConnectorType];
+	return m_PiecesByConnector.at(a_ConnectorType);
 }
 
 
 
 
 
-cPieces cPrefabPiecePool::GetStartingPieces(void)
+cPieces cPrefabPiecePool::GetStartingPieces(void) const
 {
 	if (m_StartingPieces.empty())
 	{
@@ -790,18 +792,18 @@ cPieces cPrefabPiecePool::GetStartingPieces(void)
 
 
 
-int cPrefabPiecePool::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece)
+int cPrefabPiecePool::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) const
 {
-	return (static_cast<const cPrefab &>(a_NewPiece)).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
+	return static_cast<const cPrefab &>(a_NewPiece).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
 }
 
 
 
 
 
-int cPrefabPiecePool::GetStartingPieceWeight(const cPiece & a_NewPiece)
+int cPrefabPiecePool::GetStartingPieceWeight(const cPiece & a_NewPiece) const
 {
-	return (static_cast<const cPrefab &>(a_NewPiece)).GetDefaultWeight();
+	return static_cast<const cPrefab &>(a_NewPiece).GetDefaultWeight();
 }
 
 

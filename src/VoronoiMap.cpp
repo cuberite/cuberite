@@ -85,6 +85,8 @@ int cVoronoiMap::GetValueAt(
 	int & a_MinDist2  // Distance to the second closest cell
 )
 {
+	cCSLock Lock{ m_CS };
+
 	int CellX = a_X / m_CellSize;
 	int CellY = a_Y / m_CellSize;
 

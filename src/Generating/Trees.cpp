@@ -270,7 +270,7 @@ inline void PushCoordBlocks(int a_BlockX, int a_Height, int a_BlockZ, sSetBlockV
 
 
 
-inline void PushCornerBlocks(int a_BlockX, int a_Height, int a_BlockZ, int a_Seq, cNoise & a_Noise, int a_Chance, sSetBlockVector & a_Blocks, int a_CornersDist, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+inline void PushCornerBlocks(int a_BlockX, int a_Height, int a_BlockZ, int a_Seq, const cNoise & a_Noise, int a_Chance, sSetBlockVector & a_Blocks, int a_CornersDist, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
 {
 	for (size_t i = 0; i < ARRAYCOUNT(Corners); i++)
 	{
@@ -287,7 +287,7 @@ inline void PushCornerBlocks(int a_BlockX, int a_Height, int a_BlockZ, int a_Seq
 
 
 
-inline void PushSomeColumns(int a_BlockX, int a_Height, int a_BlockZ, int a_ColumnHeight, int a_Seq, cNoise & a_Noise, int a_Chance, sSetBlockVector & a_Blocks, const sMetaCoords * a_Coords, size_t a_NumCoords, BLOCKTYPE a_BlockType)
+inline void PushSomeColumns(int a_BlockX, int a_Height, int a_BlockZ, int a_ColumnHeight, int a_Seq, const cNoise & a_Noise, int a_Chance, sSetBlockVector & a_Blocks, const sMetaCoords * a_Coords, size_t a_NumCoords, BLOCKTYPE a_BlockType)
 {
 	for (size_t i = 0; i < a_NumCoords; i++)
 	{
@@ -307,7 +307,7 @@ inline void PushSomeColumns(int a_BlockX, int a_Height, int a_BlockZ, int a_Colu
 
 
 
-void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSBiome a_Biome, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetTreeImageByBiome(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, EMCSBiome a_Biome, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	switch (a_Biome)
 	{
@@ -519,7 +519,7 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 
 
 
-void GetAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetAppleTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	if (a_Noise.IntNoise3DInt(a_BlockPos.addedX(32 * a_Seq).addedY(32 * a_Seq)) < 0x60000000)
 	{
@@ -535,7 +535,7 @@ void GetAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlo
 
 
 
-void GetSmallAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetSmallAppleTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	/* Small apple tree has:
 	- a top plus (no log)
@@ -587,7 +587,7 @@ void GetSmallAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sS
 
 
 
-void GetLargeAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetLargeAppleTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	int Height = 7 + a_Noise.IntNoise3DInt(a_BlockPos) % 4;
 
@@ -670,7 +670,7 @@ NIBBLETYPE GetLogMetaFromDirection(NIBBLETYPE a_BlockMeta, Vector3d a_Direction)
 
 
 
-void GetBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetBirchTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	HEIGHTTYPE Height = 5 + static_cast<HEIGHTTYPE>(a_Noise.IntNoise3DInt(a_BlockPos.addedX(64 * a_Seq)) % 3);
 
@@ -708,7 +708,7 @@ void GetBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlo
 
 
 
-void GetAcaciaTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetAcaciaTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	// Calculate a base height
 	int Height = 2 + (a_Noise.IntNoise3DInt(a_BlockPos) / 11 % 3);
@@ -766,7 +766,7 @@ void GetAcaciaTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBl
 
 
 
-void GetDarkoakTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetDarkoakTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	// Pick a height
 	int Height = 5 + (a_Noise.IntNoise3DInt(a_BlockPos.addedX(32 * a_Seq).addedZ(32 * a_Seq)) / 11) % 4;
@@ -837,7 +837,7 @@ void GetDarkoakTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetB
 
 
 
-void GetTallBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetTallBirchTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	HEIGHTTYPE Height = 9 + static_cast<HEIGHTTYPE>(a_Noise.IntNoise3DInt(a_BlockPos.addedX(64 * a_Seq)) % 3);
 
@@ -875,7 +875,7 @@ void GetTallBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSe
 
 
 
-void GetConiferTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large)
+void GetConiferTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large)
 {
 	// Half chance for a spruce, half for a pine and for the large ones 3 chances for a pine and one for spruce:
 	if (a_Noise.IntNoise3DInt(a_BlockPos.addedX(64 * a_Seq).addedZ(32 * a_Seq)) < (a_Large ? 0x20000000 : 0x40000000))
@@ -892,7 +892,7 @@ void GetConiferTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetB
 
 
 
-void GetSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large)
+void GetSpruceTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large)
 {
 	if (a_Large)
 	{
@@ -909,7 +909,7 @@ void GetSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBl
 
 
 
-void GetPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large)
+void GetPineTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large)
 {
 	if (a_Large)
 	{
@@ -926,7 +926,7 @@ void GetPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBloc
 
 
 
-void GetSmallSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetSmallSpruceTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	// Spruces have a top section with layer sizes of (0, 1, 0) or only (1, 0),
 	// then 1 - 3 sections of ascending sizes (1, 2) [most often], (1, 3) or (1, 2, 3)
@@ -1037,7 +1037,7 @@ static void LargeSpruceAddRing(Vector3i a_BlockPos, int & a_Height, const sCoord
 
 const int MIN_LARGE_SPRUCE_TREE_RINGS = 3;
 const int MAX_LARGE_SPRUCE_TREE_RINGS = 11;
-void GetLargeSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetLargeSpruceTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	int Height = 20 + (a_Noise.IntNoise3DInt(a_BlockPos.addedXZ(32 * a_Seq, 32 * a_Seq)) / 11) % 12;
 	int LeavesRingCount =
@@ -1128,7 +1128,7 @@ void GetLargeSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 
 
 
-void GetSmallPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetSmallPineTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	// Tall, little leaves on top. The top leaves are arranged in a shape of two cones joined by their bases.
 	// There can be one or two layers representing the cone bases (SameSizeMax)
@@ -1181,7 +1181,7 @@ void GetSmallPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSe
 
 
 
-void GetLargePineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetLargePineTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	int Height = 20 + (a_Noise.IntNoise3DInt(a_BlockPos.addedXZ(32 * a_Seq, 32 * a_Seq)) / 11) % 12;
 
@@ -1217,7 +1217,7 @@ void GetLargePineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSe
 
 
 
-void GetSwampTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetSwampTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	// Vines are around the BigO3, but not in the corners; need proper meta for direction
 	static const sMetaCoords Vines[] =
@@ -1264,7 +1264,7 @@ void GetSwampTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlo
 
 
 
-void GetAppleBushImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetAppleBushImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	a_OtherBlocks.reserve(3 + ARRAYCOUNT(BigO2) + ARRAYCOUNT(BigO1));
 
@@ -1284,7 +1284,7 @@ void GetAppleBushImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlo
 
 
 
-void GetJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large)
+void GetJungleTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large)
 {
 	if (!a_Large)
 	{
@@ -1300,7 +1300,7 @@ void GetJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBl
 
 
 
-void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetLargeJungleTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	static const sMetaCoords VinesTrunk[] =
 	{
@@ -1385,7 +1385,7 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 
 
 
-void GetSmallJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetSmallJungleTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	// Vines are around the BigO3, but not in the corners; need proper meta for direction
 	static const sMetaCoords Vines[] =
@@ -1442,7 +1442,7 @@ void GetSmallJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 
 
 
-void GetRedMushroomTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetRedMushroomTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	static constexpr int Height = 4;
 
@@ -1489,7 +1489,7 @@ void GetRedMushroomTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 
 
 
-void GetBrownMushroomTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
+void GetBrownMushroomTreeImage(Vector3i a_BlockPos, const cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
 	static constexpr int Height = 4;
 	static constexpr int Radius = 2;

@@ -65,7 +65,7 @@ std::unique_ptr<cChunkGenerator> cChunkGenerator::CreateFromIniFile(cIniFile & a
 
 
 
-EMCSBiome cChunkGenerator::GetBiomeAt(int a_BlockX, int a_BlockZ)
+EMCSBiome cChunkGenerator::GetBiomeAt(int a_BlockX, int a_BlockZ) const
 {
 	cChunkDef::BiomeMap Biomes;
 	int Y = 0;

@@ -124,6 +124,9 @@ public:
 
 protected:
 
+	/** Generator cache protection mutex. */
+	mutable cCriticalSection m_CS;
+
 	std::unique_ptr<cTerrainCompositionGen> m_Underlying;
 
 	struct sCacheData

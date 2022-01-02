@@ -1,7 +1,11 @@
 #pragma once
 
+#include <shared_mutex>
+
 #include "OSSupport/IsThread.h"
 #include "ChunkDef.h"
+#include "TBBWrapper.h"
+
 
 
 
@@ -37,11 +41,11 @@ public:
 
 		/** Called when the chunk is about to be generated.
 		The generator may be partly or fully overriden by the implementation. */
-		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) = 0;
+		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) const = 0;
 
 		/** Called after the chunk is generated, before it is handed to the chunk sink.
 		a_ChunkDesc contains the generated chunk data. Implementation may modify this data. */
-		virtual void CallHookChunkGenerated(cChunkDesc & a_ChunkDesc) = 0;
+		virtual void CallHookChunkGenerated(cChunkDesc & a_ChunkDesc) const = 0;
 	} ;
 
 
@@ -61,15 +65,15 @@ public:
 		/** Called just before the chunk generation is started,
 		to verify that it hasn't been generated in the meantime.
 		If this callback returns true, the chunk is not generated. */
-		virtual bool IsChunkValid(cChunkCoords a_Coords) = 0;
+		virtual bool IsChunkValid(cChunkCoords a_Coords) const = 0;
 
 		/** Called when the generator is overloaded to skip chunks that are no longer needed.
 		If this callback returns false, the chunk is not generated. */
-		virtual bool HasChunkAnyClients(cChunkCoords a_Coords) = 0;
+		virtual bool HasChunkAnyClients(cChunkCoords a_Coords) const = 0;
 
 		/** Called to check whether the specified chunk is in the queued state.
 		Currently used only in Debug-mode asserts. */
-		virtual bool IsChunkQueued(cChunkCoords a_Coords) = 0;
+		virtual bool IsChunkQueued(cChunkCoords a_Coords) const = 0;
 	} ;
 
 
@@ -77,7 +81,7 @@ public:
 	virtual ~cChunkGeneratorThread() override;
 
 	/** Read settings from the ini file and initialize in preperation for being started. */
-	bool Initialize(cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile);
+	bool Initialize(const cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile);
 
 	void Stop(void);
 
@@ -89,16 +93,15 @@ public:
 	void QueueGenerateChunk(cChunkCoords a_Coords, bool a_ForceRegeneration, cChunkCoordCallback * a_Callback = nullptr);
 
 	/** Generates the biomes for the specified chunk (directly, not in a separate thread). Used by the world loader if biomes failed loading. */
-	void GenerateBiomes(cChunkCoords a_Coords, cChunkDef::BiomeMap & a_BiomeMap);
+	void GenerateBiomes(cChunkCoords a_Coords, cChunkDef::BiomeMap & a_BiomeMap) const;
 
-	void WaitForQueueEmpty();
-
+	/** Get number of items in the queue, this call is blocking. */
 	size_t GetQueueLength() const;
 
 	int GetSeed() const;
 
 	/** Returns the biome at the specified coords. Used by ChunkMap if an invalid chunk is queried for biome */
-	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ);
+	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ) const;
 
 
 private:
@@ -114,6 +117,8 @@ private:
 		/** Callback to call after generating. */
 		cChunkCoordCallback * m_Callback;
 
+		QueueItem() = default;
+
 		QueueItem(cChunkCoords a_Coords, bool a_ForceRegeneration, cChunkCoordCallback * a_Callback):
 			m_Coords(a_Coords),
 			m_ForceRegeneration(a_ForceRegeneration),
@@ -122,11 +127,11 @@ private:
 		}
 	};
 
-	using Queue = std::list<QueueItem>;
+	using Queue = tbb::concurrent_queue<QueueItem>;
 
 
-	/** CS protecting access to the queue. */
-	mutable cCriticalSection m_CS;
+	/** Shared Mutex protecting access to the queue. */
+	mutable std::shared_mutex m_SharedMutex;
 
 	/** Queue of the chunks to be generated. Protected against multithreaded access by m_CS. */
 	Queue m_Queue;
@@ -134,14 +139,11 @@ private:
 	/** Set when an item is added to the queue or the thread should terminate. */
 	cEvent m_Event;
 
-	/** Set when an item is removed from the queue. */
-	cEvent m_evtRemoved;
-
 	/** The actual chunk generator engine used. */
-	std::unique_ptr<cChunkGenerator> m_Generator;
+	std::unique_ptr<const cChunkGenerator> m_Generator;
 
 	/** The plugin interface that may modify the generated chunks */
-	cPluginInterface * m_PluginInterface;
+	const cPluginInterface * m_PluginInterface;
 
 	/** The destination where the generated chunks are sent */
 	cChunkSink * m_ChunkSink;
@@ -150,8 +152,11 @@ private:
 	// cIsThread override:
 	virtual void Execute(void) override;
 
+	/** Generates the specified chunk. */
+	void Generate(const QueueItem & a_Item, bool a_SkipEnable) const;
+
 	/** Generates the specified chunk and sets it into the chunksink. */
-	void DoGenerate(cChunkCoords a_Coords);
+	void DoGenerate(cChunkCoords a_Coords) const;
 };
 
 

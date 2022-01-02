@@ -48,10 +48,10 @@ protected:
 		cChunkDesc & a_ChunkDesc,
 		sSetBlockVector & a_OutsideLogs,
 		sSetBlockVector & a_OutsideOther
-	) ;
+	) const;
 
 	/** Applies an image into chunk blockdata; all blocks outside the chunk will be appended to a_Overflow. */
-	void ApplyTreeImage(
+	static void ApplyTreeImage(
 		int a_ChunkX, int a_ChunkZ,
 		cChunkDesc & a_ChunkDesc,
 		const sSetBlockVector & a_Image,
@@ -61,7 +61,7 @@ protected:
 	/** Get the the number of trees to generate in a_Chunk
 	If the value is between 0 and 1, it should be interpreted as the probability that a tree should be generated.
 	*/
-	double GetNumTrees(
+	static double GetNumTrees(
 		int a_ChunkX, int a_ChunkZ,
 		const cChunkDef::BiomeMap & a_Biomes
 	);
@@ -101,7 +101,7 @@ protected:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	/** Creates a lake image for the specified chunk into a_Lake. */
-	void CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeHeight, cBlockArea & a_Lake);
+	void CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeHeight, cBlockArea & a_Lake) const;
 } ;
 
 
@@ -121,7 +121,7 @@ protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-	bool HasWantedBiome(cChunkDesc & a_ChunkDesc) const;
+	static bool HasWantedBiome(cChunkDesc & a_ChunkDesc);
 } ;
 
 

@@ -89,7 +89,7 @@ void cFinishGenNetherClumpFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block)
+void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block) const
 {
 	bool IsFireBlock = a_Block == E_BLOCK_FIRE;
 
@@ -239,7 +239,7 @@ void cFinishGenClumpTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-void cFinishGenClumpTopBlock::TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int a_CenterX, int a_CenterZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_IsDoubleTall)
+void cFinishGenClumpTopBlock::TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int a_CenterX, int a_CenterZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_IsDoubleTall) const
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
@@ -454,7 +454,7 @@ void cFinishGenGlowStone::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-void cFinishGenGlowStone::TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, int a_Size, int a_NumStrings)
+void cFinishGenGlowStone::TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, int a_Size, int a_NumStrings) const
 {
 	// The starting point of every glowstone string
 	Vector3i StartPoint = Vector3i(a_RelX, a_RelY, a_RelZ);
@@ -833,7 +833,7 @@ void cFinishGenVines::GenFinish(cChunkDesc & a_ChunkDesc)
 ////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSprinkleFoliage:
 
-bool cFinishGenSprinkleFoliage::TryAddCactus(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ)
+bool cFinishGenSprinkleFoliage::TryAddCactus(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ) const
 {
 	if (!IsDesertVariant(a_ChunkDesc.GetBiome(a_RelX, a_RelZ)))
 	{
@@ -882,7 +882,7 @@ bool cFinishGenSprinkleFoliage::TryAddCactus(cChunkDesc & a_ChunkDesc, int a_Rel
 ////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSprinkleFoliage:
 
-bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ)
+bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ) const
 {
 	int SugarcaneHeight = 1 + (m_Noise.IntNoise2DInt(a_RelX, a_RelZ) % m_MaxSugarcaneHeight);
 
@@ -1155,7 +1155,7 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 ////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSingleTopBlock:
 
-int cFinishGenSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap)
+int cFinishGenSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap) const
 {
 	int res = 0;
 	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
@@ -1345,7 +1345,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 	cChunkDef::HeightMap & a_HeightMap,      // Height map to read
 	BLOCKTYPE a_Fluid,
 	BLOCKTYPE a_StationaryFluid
-)
+) const
 {
 	// Turn fluid in the middle to stationary, unless it has air or washable block next to it:
 	for (int z = 1; z < cChunkDef::Width - 1; z++)
@@ -1516,7 +1516,7 @@ void cFinishGenFluidSprings::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z)
+bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z) const
 {
 	// In order to place a spring, it needs exactly one of the XZ neighbors or a below neighbor to be air
 	// Also, its neighbor on top of it must be non-air
@@ -1645,7 +1645,7 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, eMonsterType AnimalToSpawn)
+bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, eMonsterType AnimalToSpawn) const
 {
 	if ((a_RelY >= cChunkDef::Height - 1) || (a_RelY <= 0))
 	{
@@ -1699,7 +1699,7 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 
 
 
-eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
+eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc) const
 {
 	std::vector<eMonsterType> ListOfSpawnables;
 	int chunkX = a_ChunkDesc.GetChunkX();
@@ -1887,7 +1887,7 @@ void cFinishGenOreNests::GenerateOre(
 	BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
 	int a_MaxHeight, int a_NumNests, int a_NestSize,
 	int a_Seq
-)
+) const
 {
 	// This function generates several "nests" of ore, each nest consisting of number of ore blocks relatively adjacent to each other.
 	// It does so by making a random XYZ walk and adding ore along the way in cuboids of different (random) sizes
@@ -2068,7 +2068,7 @@ void cFinishGenOrePockets::GenerateOre(
 	BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
 	int a_MaxHeight, int a_NumNests, int a_NestSize,
 	int a_Seq
-)
+) const
 {
 	// This function generates several "pockets" of the specified ore
 	// Each chunk can contain only pockets that are generated for that chunk, or for its XM / ZM neighbors.
@@ -2092,7 +2092,7 @@ void cFinishGenOrePockets::imprintChunkOrePockets(
 	BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
 	int a_MaxHeight, int a_NumNests, int a_NestSize,
 	int a_Seq
-)
+) const
 {
 	// Pick a starting coord for each nest:
 	int baseBlockX = a_ChunkX * cChunkDef::Width;
@@ -2124,7 +2124,7 @@ void cFinishGenOrePockets::imprintPocket(
 	int a_MinPocketX, int a_PocketY, int a_MinPocketZ,
 	int a_NestSize, int a_Seq,
 	BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta
-)
+) const
 {
 	// A line segment in a random direction is chosen. Then, several spheres are formed along this line segment,
 	// with their diameters diminishing towards the line ends (one half of a sinusoid)
@@ -2165,7 +2165,7 @@ void cFinishGenOrePockets::imprintSphere(
 	cChunkDesc & a_ChunkDesc,
 	double a_SphereX, double a_SphereY, double a_SphereZ, double a_Radius,
 	BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta
-)
+) const
 {
 	// Get the sphere's bounding box, unioned with the chunk's bounding box (possibly empty):
 	int baseX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;

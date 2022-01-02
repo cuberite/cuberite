@@ -25,7 +25,7 @@ public:
 
 	/** Generates a placement for pieces at the specified coords.
 	The Y coord is generated automatically based on the starting piece that is chosen. */
-	void PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDepth, cPlacedPieces & a_OutPieces);
+	void PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDepth, cPlacedPieces & a_OutPieces) const;
 
 
 protected:
@@ -66,7 +66,7 @@ protected:
 
 	/** Selects a starting piece and places it, including its height and rotation.
 	Also puts the piece's connectors in a_OutConnectors. */
-	cPlacedPiecePtr PlaceStartingPiece(int a_BlockX, int a_BlockZ, cFreeConnectors & a_OutConnectors);
+	cPlacedPiecePtr PlaceStartingPiece(int a_BlockX, int a_BlockZ, cFreeConnectors & a_OutConnectors) const;
 
 	/** Tries to place a new piece at the specified (placed) connector. Returns true if successful. */
 	bool TryPlacePieceAtConnector(
@@ -74,7 +74,7 @@ protected:
 		const cPiece::cConnector & a_Connector,  // The existing connector (world-coords) to which a new piece should be placed
 		cPlacedPieces & a_OutPieces,             // Already placed pieces, to be checked for intersections
 		cFreeConnectors & a_OutConnectors        // List of free connectors to which the new connectors will be placed
-	);
+	) const;
 
 	/** Checks if the specified piece would fit with the already-placed pieces, using the specified connector
 	and number of CCW rotations.
@@ -82,7 +82,7 @@ protected:
 	a_ToPos is the world-coords position on which the new connector should be placed (1 block away from a_ExistingConnector, in its Direction)
 	a_NewConnector is in the original (non-rotated) coords.
 	Returns true if the piece fits, false if not. */
-	bool CheckConnection(
+	static bool CheckConnection(
 		const cPiece::cConnector & a_ExistingConnector,  // The existing connector
 		const Vector3i & a_ToPos,                        // The position on which the new connector should be placed
 		const cPiece & a_Piece,                          // The new piece
