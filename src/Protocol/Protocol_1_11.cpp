@@ -609,10 +609,6 @@ void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
-	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
-	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
-	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
-
 	switch (a_BlockEntity.GetBlockType())
 	{
 		case E_BLOCK_BED:
@@ -621,7 +617,6 @@ void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockE
 			a_Writer.AddInt("color", BedEntity.GetColor());  // New: multicoloured beds
 			break;
 		}
-
 		case E_BLOCK_MOB_SPAWNER:
 		{
 			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
@@ -631,9 +626,12 @@ void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockE
 			a_Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
 			break;
 		}
-
-		default: Super::WriteBlockEntity(a_Writer, a_BlockEntity);
+		default: return Super::WriteBlockEntity(a_Writer, a_BlockEntity);
 	}
+
+	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
 }
 
 

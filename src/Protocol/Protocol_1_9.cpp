@@ -1482,13 +1482,12 @@ void cProtocol_1_9_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Ob
 
 void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
-	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
-	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
-	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
-
 	if (a_BlockEntity.GetBlockType() == E_BLOCK_MOB_SPAWNER)
 	{
 		auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
+		a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+		a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+		a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
 		a_Writer.BeginCompound("SpawnData");  // New: SpawnData compound
 			a_Writer.AddString("id", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
 		a_Writer.EndCompound();
