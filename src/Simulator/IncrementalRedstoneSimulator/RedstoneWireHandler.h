@@ -301,24 +301,15 @@ namespace RedstoneWireHandler
 			{
 				using FrontState = std::remove_reference_t<decltype(Front)>;
 
-				if (Front == FrontState::None)
+				if (Front == FrontState::Up)
 				{
-					return;
+					Callback(Relative + OffsetYP);
 				}
-
-				BLOCKTYPE LateralBlock;
-				a_Chunk.UnboundedRelGetBlockType(Relative, LateralBlock);
-
-				if (!cBlockInfo::IsTransparent(LateralBlock))  // Only check YP diagonal when on an opaque block
+				else if (Front == FrontState::Side)
 				{
-					if (Front == FrontState::Up)
-					{
-						Callback(Relative + OffsetYP);
-					}
-				}
-				else
-				{
+					// Alas, no way to distinguish side lateral and side diagonal
 					// Have to do a manual check to only accept power from YM diagonal if there's a wire there
+
 					const auto YMDiagonalPosition = Relative + OffsetYM;
 					if (
 						BLOCKTYPE QueryBlock;
