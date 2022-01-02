@@ -306,31 +306,29 @@ namespace RedstoneWireHandler
 					return;
 				}
 
-				if (Front == FrontState::Up)
-				{
-					Callback(Relative + OffsetYP);
-				}
-
 				BLOCKTYPE LateralBlock;
 				a_Chunk.UnboundedRelGetBlockType(Relative, LateralBlock);
 
-				// Don't check YM side diagonal when blocked by a non-transparent block
-				if (!cBlockInfo::IsTransparent(LateralBlock))
+				if (!cBlockInfo::IsTransparent(LateralBlock))  // Only check YP diagonal when on an opaque block
 				{
-					return;
+					if (Front == FrontState::Up)
+					{
+						Callback(Relative + OffsetYP);
+					}
 				}
-
-				// Have to do a manual check to only accept power from YM diagonal if there's a wire there
-
-				const auto YMDiagonalPosition = Relative + OffsetYM;
-				if (
-					BLOCKTYPE QueryBlock;
-					cChunkDef::IsValidHeight(YMDiagonalPosition.y) &&
-					a_Chunk.UnboundedRelGetBlockType(YMDiagonalPosition, QueryBlock) &&
-					(QueryBlock == E_BLOCK_REDSTONE_WIRE)
-				)
+				else
 				{
-					Callback(YMDiagonalPosition);
+					// Have to do a manual check to only accept power from YM diagonal if there's a wire there
+					const auto YMDiagonalPosition = Relative + OffsetYM;
+					if (
+						BLOCKTYPE QueryBlock;
+						cChunkDef::IsValidHeight(YMDiagonalPosition.y) &&
+						a_Chunk.UnboundedRelGetBlockType(YMDiagonalPosition, QueryBlock) &&
+						(QueryBlock == E_BLOCK_REDSTONE_WIRE)
+					)
+					{
+						Callback(YMDiagonalPosition);
+					}
 				}
 			});
 		}
