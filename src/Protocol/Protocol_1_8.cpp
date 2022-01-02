@@ -2455,7 +2455,7 @@ void cProtocol_1_8_0::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 
 	if (PlayerID != m_Client->GetPlayer()->GetUniqueID())
 	{
-		m_Client->Kick("Mind your own business! Hacked client?");
+		LOGD("Player \"%s\" attempted to action another entity - hacked client?", m_Client->GetUsername().c_str());
 		return;
 	}
 
@@ -2840,7 +2840,7 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 			}
 			default:
 			{
-				m_Client->Kick("Unknown command block edit type - hacked client?");
+				LOGD("Player \"%s\" sent an invalid command block edit type - hacked client?", m_Client->GetUsername().c_str());
 				return;
 			}
 		}
