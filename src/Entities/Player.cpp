@@ -2336,32 +2336,35 @@ void cPlayer::LoadRank(void)
 
 int cPlayer::GetPermissionLevel()
 {
-	if (!HasPermission("core.spawnprotect.bypass"))
+	// Refreshing permissions
+	LoadRank();
+
+	if (HasPermission("core.stop") || HasPermission("core.reload") ||
+		HasPermission("core.save-all"))
 	{
-		return 0;  // The player has no permissions.
+		return 4;
 	}
 
-	if (!HasPermission("comandblock.set") || !HasPermission("core.clear") ||
-		!HasPermission("core.difficulty") || !HasPermission("core.effect") ||
-		!HasPermission("core.gamemode") || !HasPermission("core.tp") ||
-		!HasPermission("core.give"))
-	{
-		return 1;
-	}
-
-	if (!HasPermission("core.ban") || !HasPermission("core.deop") ||
-		!HasPermission("core.kick") || !HasPermission("core.op"))
-	{
-		return 2;
-	}
-
-	if (!HasPermission("core.stop") || !HasPermission("core.reload") ||
-		!HasPermission("core.save-all"))
+	if (HasPermission("core.ban") || HasPermission("core.deop") ||
+		HasPermission("core.kick") || HasPermission("core.op"))
 	{
 		return 3;
 	}
 
-	return 4;  // The player has all permissions.
+	if (HasPermission("comandblock.set") || HasPermission("core.clear") ||
+		HasPermission("core.difficulty") || HasPermission("core.effect") ||
+		HasPermission("core.gamemode") || HasPermission("core.tp") ||
+		HasPermission("core.give"))
+	{
+		return 2;
+	}
+
+	if (HasPermission("core.spawnprotect.bypass"))
+	{
+		return 1;
+	}
+
+	return 0;  // The player has no permissions.
 }
 
 
