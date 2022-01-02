@@ -117,8 +117,8 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 	size_t CurFreeSpace = GetFreeSpace();
 	#ifndef NDEBUG
 		size_t CurReadableSpace = GetReadableSpace();
+		size_t WrittenBytes = 0;
 	#endif
-	size_t WrittenBytes = 0;
 
 	if (CurFreeSpace < a_Count)
 	{
@@ -135,7 +135,9 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 			memcpy(m_Buffer + m_WritePos, Bytes, TillEnd);
 			Bytes += TillEnd;
 			a_Count -= TillEnd;
-			WrittenBytes = TillEnd;
+			#ifndef NDEBUG
+				WrittenBytes = TillEnd;
+			#endif
 		}
 		m_WritePos = 0;
 	}
@@ -145,7 +147,9 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 	{
 		memcpy(m_Buffer + m_WritePos, Bytes, a_Count);
 		m_WritePos += a_Count;
-		WrittenBytes += a_Count;
+		#ifndef NDEBUG
+			WrittenBytes += a_Count;
+		#endif
 	}
 
 	ASSERT(GetFreeSpace() == CurFreeSpace - WrittenBytes);

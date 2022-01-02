@@ -158,7 +158,7 @@ function(set_exe_flags TARGET)
 			# TODO: actually fix the warnings instead of disabling them
 			# or at least disable on a file-level basis:
 			-Wno-missing-noreturn -Wno-padded -Wno-implicit-fallthrough
-			-Wno-double-promotion
+			-Wno-double-promotion -Wno-reserved-identifier
 
 			# This is a pretty useless warning, we've already got -Wswitch which is what we need:
 			-Wno-switch-enum
@@ -169,7 +169,7 @@ function(set_exe_flags TARGET)
 			-Wno-documentation-unknown-command -Wno-reserved-id-macro -Wno-error=unused-command-line-argument
 		)
 
-		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7)
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13)
 			target_compile_options(
 				${TARGET} PRIVATE
 
