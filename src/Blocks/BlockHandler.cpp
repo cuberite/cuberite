@@ -215,8 +215,6 @@ namespace
 	constexpr cBlockStairsHandler             BlockBirchWoodStairsHandler       (E_BLOCK_BIRCH_WOOD_STAIRS);
 	constexpr cBlockGlazedTerracottaHandler   BlockBlackGlazedTerracottaHandler (E_BLOCK_BLACK_GLAZED_TERRACOTTA);
 	constexpr cDefaultBlockHandler            BlockBlackShulkerBoxHandler       (E_BLOCK_BLACK_SHULKER_BOX);
-	constexpr cDefaultBlockHandler            BlockCoalBlockHandler             (E_BLOCK_BLOCK_OF_COAL);
-	constexpr cDefaultBlockHandler            BlockRedstoneBlockHandler         (E_BLOCK_BLOCK_OF_REDSTONE);
 	constexpr cBlockGlazedTerracottaHandler   BlockBlueGlazedTerracottaHandler  (E_BLOCK_BLUE_GLAZED_TERRACOTTA);
 	constexpr cDefaultBlockHandler            BlockBlueShulkerBoxHandler        (E_BLOCK_BLUE_SHULKER_BOX);
 	constexpr cDefaultBlockHandler            BlockBoneBlockHandler             (E_BLOCK_BONE_BLOCK);
@@ -237,6 +235,7 @@ namespace
 	constexpr cDefaultBlockHandler            BlockChorusFlowerHandler          (E_BLOCK_CHORUS_FLOWER);
 	constexpr cDefaultBlockHandler            BlockChorusPlantHandler           (E_BLOCK_CHORUS_PLANT);
 	constexpr cDefaultOreHandler              BlockClayHandler                  (E_BLOCK_CLAY);
+	constexpr cDefaultBlockHandler            BlockCoalBlockHandler             (E_BLOCK_BLOCK_OF_COAL);
 	constexpr cDefaultOreHandler              BlockCoalOreHandler               (E_BLOCK_COAL_ORE);
 	constexpr cDefaultBlockHandler            BlockCobblestoneHandler           (E_BLOCK_COBBLESTONE);
 	constexpr cBlockStairsHandler             BlockCobblestoneStairsHandler     (E_BLOCK_COBBLESTONE_STAIRS);
@@ -269,12 +268,12 @@ namespace
 	constexpr cDefaultOreHandler              BlockEmeraldOreHandler            (E_BLOCK_EMERALD_ORE);
 	constexpr cBlockEnchantingTableHandler    BlockEnchantingTableHandler       (E_BLOCK_ENCHANTMENT_TABLE);
 	constexpr cDefaultBlockHandler            BlockEndBricksHandler             (E_BLOCK_END_BRICKS);
+	constexpr cBlockEnderChestHandler         BlockEnderChestHandler            (E_BLOCK_ENDER_CHEST);
 	constexpr cDefaultBlockHandler            BlockEndGatewayHandler            (E_BLOCK_END_GATEWAY);
 	constexpr cBlockEndPortalFrameHandler     BlockEndPortalFrameHandler        (E_BLOCK_END_PORTAL_FRAME);
 	constexpr cDefaultBlockHandler            BlockEndPortalHandler             (E_BLOCK_END_PORTAL);
 	constexpr cDefaultBlockHandler            BlockEndRodHandler                (E_BLOCK_END_ROD);
 	constexpr cDefaultBlockHandler            BlockEndStoneHandler              (E_BLOCK_END_STONE);
-	constexpr cBlockEnderChestHandler         BlockEnderChestHandler            (E_BLOCK_ENDER_CHEST);
 	constexpr cBlockFarmlandHandler           BlockFarmlandHandler              (E_BLOCK_FARMLAND);
 	constexpr cBlockFenceHandler              BlockFenceHandler                 (E_BLOCK_FENCE);
 	constexpr cBlockFireHandler               BlockFireHandler                  (E_BLOCK_FIRE);
@@ -343,12 +342,12 @@ namespace
 	constexpr cBlockStairsHandler             BlockNetherBrickStairsHandler     (E_BLOCK_NETHER_BRICK_STAIRS);
 	constexpr cBlockPortalHandler             BlockNetherPortalHandler          (E_BLOCK_NETHER_PORTAL);
 	constexpr cDefaultOreHandler              BlockNetherQuartzOreHandler       (E_BLOCK_NETHER_QUARTZ_ORE);
+	constexpr cBlockNetherrack                BlockNetherrackHandler            (E_BLOCK_NETHERRACK);
 	constexpr cDefaultBlockHandler            BlockNetherWartBlockHandler       (E_BLOCK_NETHER_WART_BLOCK);
 	constexpr cBlockNetherWartHandler         BlockNetherWartHandler            (E_BLOCK_NETHER_WART);
-	constexpr cBlockNetherrack                BlockNetherrackHandler            (E_BLOCK_NETHERRACK);
 	constexpr cBlockLeavesHandler             BlockNewLeavesHandler             (E_BLOCK_NEW_LEAVES);
 	constexpr cBlockSidewaysHandler           BlockNewLogHandler                (E_BLOCK_NEW_LOG);
-	constexpr cBlockNoteBlockHandler      	  BlockNoteBlockHandler             (E_BLOCK_NOTE_BLOCK);
+	constexpr cBlockNoteBlockHandler          BlockNoteBlockHandler             (E_BLOCK_NOTE_BLOCK);
 	constexpr cBlockDoorHandler               BlockOakDoorHandler               (E_BLOCK_OAK_DOOR);
 	constexpr cBlockFenceGateHandler          BlockOakFenceGateHandler          (E_BLOCK_OAK_FENCE_GATE);
 	constexpr cBlockStairsHandler             BlockOakWoodStairsHandler         (E_BLOCK_OAK_WOOD_STAIRS);
@@ -386,6 +385,7 @@ namespace
 	constexpr cBlockSlabHandler               BlockRedSandstoneSlabHandler      (E_BLOCK_RED_SANDSTONE_SLAB);
 	constexpr cBlockStairsHandler             BlockRedSandstoneStairsHandler    (E_BLOCK_RED_SANDSTONE_STAIRS);
 	constexpr cDefaultBlockHandler            BlockRedShulkerBoxHandler         (E_BLOCK_RED_SHULKER_BOX);
+	constexpr cDefaultBlockHandler            BlockRedstoneBlockHandler         (E_BLOCK_BLOCK_OF_REDSTONE);
 	constexpr cBlockRedstoneLampHandler       BlockRedstoneLampHandler          (E_BLOCK_REDSTONE_LAMP_ON);
 	constexpr cBlockGlowingRedstoneOreHandler BlockRedstoneOreGlowingHandler    (E_BLOCK_REDSTONE_ORE_GLOWING);
 	constexpr cBlockRedstoneOreHandler        BlockRedstoneOreHandler           (E_BLOCK_REDSTONE_ORE);
@@ -417,8 +417,8 @@ namespace
 	constexpr cBlockLavaHandler               BlockStationaryLavaHandler        (E_BLOCK_STATIONARY_LAVA);
 	constexpr cBlockWaterHandler              BlockStationaryWaterHandler       (E_BLOCK_STATIONARY_WATER);
 	constexpr cBlockPistonHandler             BlockStickyPistonHandler          (E_BLOCK_STICKY_PISTON);
-	constexpr cBlockStairsHandler             BlockStoneBrickStairsHandler      (E_BLOCK_STONE_BRICK_STAIRS);
 	constexpr cDefaultBlockHandler            BlockStoneBricksHandler           (E_BLOCK_STONE_BRICKS);
+	constexpr cBlockStairsHandler             BlockStoneBrickStairsHandler      (E_BLOCK_STONE_BRICK_STAIRS);
 	constexpr cBlockButtonHandler             BlockStoneButtonHandler           (E_BLOCK_STONE_BUTTON);
 	constexpr cBlockStoneHandler              BlockStoneHandler                 (E_BLOCK_STONE);
 	constexpr cBlockPressurePlateHandler      BlockStonePressurePlateHandler    (E_BLOCK_STONE_PRESSURE_PLATE);
