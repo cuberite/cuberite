@@ -294,6 +294,12 @@ protected:
 	/** If the specified table doesn't contain the specified column, it is added to the table.
 	The column type is used only when creating the column, it is not used when checking for existence. */
 	void CreateColumnIfNotExists(const char * a_TableName, const char * a_ColumnName, const char * a_ColumnType = "");
+
+	/** Update the permission level of the players who are online. */
+	void UpdatePlayersPermissionLevel();
+
+	/** Update the permission level of the player who is online. */
+	void UpdatePlayerPermissionLevel(const cUUID & a_PlayerUUID);
 } ;
 
 

@@ -7,7 +7,8 @@
 #include "RankManager.h"
 #include "Protocol/MojangAPI.h"
 #include "ClientHandle.h"
-
+#include "Root.h"
+#include "Entities/Player.h"
 
 
 
@@ -726,6 +727,9 @@ bool cRankManager::AddGroupToRank(const AString & a_GroupName, const AString & a
 			}
 		}
 
+		// Updating the permission level for the players if they are online.
+		UpdatePlayersPermissionLevel();
+
 		// Adding succeeded:
 		return true;
 	}
@@ -790,6 +794,9 @@ bool cRankManager::AddPermissionToGroup(const AString & a_Permission, const AStr
 				return false;
 			}
 		}
+
+		// Updating the permission level for the players if they are online.
+		UpdatePlayersPermissionLevel();
 
 		// Adding succeeded:
 		return true;
@@ -857,6 +864,9 @@ bool cRankManager::AddRestrictionToGroup(const AString & a_Restriction, const AS
 				return false;
 			}
 		}
+
+		// Updating the permission level for the players if they are online.
+		UpdatePlayersPermissionLevel();
 
 		// Adding succeeded:
 		return true;
@@ -928,6 +938,9 @@ bool cRankManager::AddPermissionsToGroup(const AStringVector & a_Permissions, co
 			}
 		}  // for itr - a_Permissions[]
 
+		// Updating the permission level for the players if they are online.
+		UpdatePlayersPermissionLevel();
+
 		// Adding succeeded:
 		return true;
 	}
@@ -997,6 +1010,9 @@ bool cRankManager::AddRestrictionsToGroup(const AStringVector & a_Restrictions, 
 				}
 			}
 		}  // for itr - a_Restrictions[]
+
+		// Updating the permission level for the players if they are online.
+		UpdatePlayersPermissionLevel();
 
 		// Adding succeeded:
 		return true;
@@ -1089,6 +1105,9 @@ void cRankManager::RemoveRank(const AString & a_RankName, const AString & a_Repl
 		{
 			m_DefaultRank = a_RankName;
 		}
+
+		// Updating the permission level for the players if they are online.
+		UpdatePlayersPermissionLevel();
 	}
 	catch (const SQLite::Exception & ex)
 	{
@@ -1140,6 +1159,9 @@ void cRankManager::RemoveGroup(const AString & a_GroupName)
 			stmt.bind(1, GroupID);
 			stmt.exec();
 		}
+
+		// Updating the permission level for the players if they are online.
+		UpdatePlayersPermissionLevel();
 	}
 	catch (const SQLite::Exception & ex)
 	{
@@ -1192,6 +1214,9 @@ void cRankManager::RemoveGroupFromRank(const AString & a_GroupName, const AStrin
 			stmt.bind(1, RankID);
 			stmt.exec();
 		}
+
+		// Updating the permission level for the players if they are online.
+		UpdatePlayersPermissionLevel();
 	}
 	catch (const SQLite::Exception & ex)
 	{
@@ -1230,6 +1255,9 @@ void cRankManager::RemovePermissionFromGroup(const AString & a_Permission, const
 			stmt.bind(2, a_Permission);
 			stmt.exec();
 		}
+
+		// Updating the permission level for the players if they are online.
+		UpdatePlayersPermissionLevel();
 	}
 	catch (const SQLite::Exception & ex)
 	{
@@ -1270,6 +1298,9 @@ void cRankManager::RemoveRestrictionFromGroup(const AString & a_Restriction, con
 			stmt.bind(2, a_Restriction);
 			stmt.exec();
 		}
+
+		// Updating the permission level for the players if they are online.
+		UpdatePlayersPermissionLevel();
 	}
 	catch (const SQLite::Exception & ex)
 	{
@@ -1404,6 +1435,9 @@ void cRankManager::SetPlayerRank(const cUUID & a_PlayerUUID, const AString & a_P
 			stmt.bind(3, StrUUID);
 			if (stmt.exec() > 0)
 			{
+				// Updating the permission level for the player if he is online.
+				UpdatePlayerPermissionLevel(a_PlayerUUID);
+
 				// Successfully updated the player's rank
 				return;
 			}
@@ -1416,6 +1450,9 @@ void cRankManager::SetPlayerRank(const cUUID & a_PlayerUUID, const AString & a_P
 		stmt.bind(3, a_PlayerName);
 		if (stmt.exec() > 0)
 		{
+			// Updating the permission level for the player if he is online.
+			UpdatePlayerPermissionLevel(a_PlayerUUID);
+
 			// Successfully added the player
 			return;
 		}
@@ -1448,6 +1485,10 @@ void cRankManager::RemovePlayerRank(const cUUID & a_PlayerUUID)
 		SQLite::Statement stmt(m_DB, "DELETE FROM PlayerRank WHERE PlayerUUID = ?");
 		stmt.bind(1, StrUUID);
 		stmt.exec();
+
+		// Updating the permission level for the player if he is online.
+		UpdatePlayerPermissionLevel(a_PlayerUUID);
+
 	}
 	catch (const SQLite::Exception & ex)
 	{
@@ -1784,6 +1825,9 @@ void cRankManager::ClearPlayerRanks(void)
 	{
 		SQLite::Statement stmt(m_DB, "DELETE FROM PlayerRank");
 		stmt.exec();
+
+		// Updating the permission level for the players if they are online.
+		UpdatePlayersPermissionLevel();
 	}
 	catch (SQLite::Exception & ex)
 	{
@@ -1952,3 +1996,29 @@ void cRankManager::CreateColumnIfNotExists(const char * a_TableName, const char 
 
 
 
+
+void cRankManager::UpdatePlayersPermissionLevel()
+{
+	cRoot::Get()->ForEachPlayer(
+	[](cPlayer & a_Player)
+	{
+		a_Player.UpdatePermissionLevel();
+		return true;
+	}
+	);
+}
+
+
+
+
+
+void cRankManager::UpdatePlayerPermissionLevel(const cUUID & a_PlayerUUID)
+{
+	cRoot::Get()->DoWithPlayerByUUID(a_PlayerUUID,
+	[](cPlayer & a_Player)
+	{
+		a_Player.UpdatePermissionLevel();
+		return true;
+	}
+	);
+}
