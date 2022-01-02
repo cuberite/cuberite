@@ -1453,7 +1453,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 	if ((a_BlockFace == BLOCK_FACE_NONE) || !cChunkDef::IsValidHeight(a_BlockY))
 	{
-		throw std::runtime_error("Invalid click - hacked client?");
+		LOGD("Player \"%s\" sent an invalid click - hacked client?", m_Username.c_str());
+		return;
 	}
 
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
