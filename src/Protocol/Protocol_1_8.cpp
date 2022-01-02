@@ -1175,7 +1175,7 @@ void cProtocol_1_8_0::SendPlayerMoveLook(void)
 
 
 
-void cProtocol_1_8_0::SendPlayerPermissionLevel(const cPlayer & a_Player)
+void cProtocol_1_8_0::SendPlayerPermissionLevel()
 {
 	cPlayer * Player = m_Client->GetPlayer();
 

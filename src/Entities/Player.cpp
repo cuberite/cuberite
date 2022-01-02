@@ -2370,7 +2370,7 @@ int cPlayer::GetPermissionLevel()
 
 void cPlayer::UpdatePermissionLevel()
 {
-	m_ClientHandle->SendPlayerPermissionLevel(*this);
+	m_ClientHandle->SendPlayerPermissionLevel();
 }
 
 
