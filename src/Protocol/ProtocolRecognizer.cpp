@@ -76,29 +76,38 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 
 
 
-bool cMultiVersionProtocol::CheckHTTPRequest(cClientHandle & a_Client, ContiguousByteBuffer & a_Data)
+void cMultiVersionProtocol::HandleHTTPRequest(cClientHandle & a_Client)
+{
+	std::ifstream f("page.html", std::ios::in);
+	std::string page((std::istreambuf_iterator<char>(f)), (std::istreambuf_iterator<char>()));
+
+	const AString Message = Printf("HTTP/1.1 200 OK\nContent-Type:text/html\nContent-Length: %d\n\n%s", page.size(), page);
+	cByteBuffer Out(Message.size());
+	Out.WriteBuf(Message.data(), Message.size());
+
+	ContiguousByteBuffer Data;
+	Out.ReadAll(Data);
+	Out.CommitRead();
+
+	a_Client.SendData(Data);
+	a_Client.Destroy();
+}
+
+
+
+
+
+bool cMultiVersionProtocol::TryHandleHTTPRequest(cClientHandle & a_Client, ContiguousByteBuffer & a_Data)
 {
 	ContiguousByteBuffer Buffer;
 	m_Buffer.ReadSome(Buffer, static_cast<size_t>(10));
 	m_Buffer.ResetRead();
+
 	AString value = { reinterpret_cast<const char *>(Buffer.data()), Buffer.size() };
 
 	if (value == "GET / HTTP")
 	{
-		std::ifstream f("page.html", std::ios::in);
-		std::string page((std::istreambuf_iterator<char>(f)), (std::istreambuf_iterator<char>()));
-
-		const AString Message = Printf("HTTP/1.1 200 OK\nContent-Type:text/html\nContent-Length: %d\n\n%s", page.size(), page);
-		cByteBuffer Out(Message.size());
-		Out.WriteBuf(Message.data(), Message.size());
-
-		ContiguousByteBuffer Data;
-		Out.ReadAll(Data);
-		Out.CommitRead();
-
-		a_Client.SendData(Data);
-		a_Client.Destroy();
-
+		HandleHTTPRequest(a_Client);
 		return true;
 	}
 
@@ -123,7 +132,7 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 		return;
 	}
 
-	bool isHTTP = CheckHTTPRequest(a_Client, a_Data);
+	bool isHTTP = TryHandleHTTPRequest(a_Client, a_Data);
 	if (isHTTP)
 	{
 		return;

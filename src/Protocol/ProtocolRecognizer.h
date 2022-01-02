@@ -48,8 +48,11 @@ public:
 
 private:
 
-	/* Checks if incoming data is HTTP request */
-	bool CheckHTTPRequest(cClientHandle & a_Client, ContiguousByteBuffer & a_Data);
+	/* Handles HTTP request */
+	void HandleHTTPRequest(cClientHandle & a_Client);
+
+	/* Checks if incoming data is HTTP request and handles it if it is */
+	bool TryHandleHTTPRequest(cClientHandle & a_Client, ContiguousByteBuffer & a_Data);
 
 	/** Handles data reception in a newly-created client handle that doesn't yet have a known protocol.
 	a_Data contains a view of data that were just received.
