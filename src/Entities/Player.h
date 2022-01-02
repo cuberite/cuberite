@@ -540,6 +540,9 @@ public:
 	/** Returns the UUID that has been read from the client, or nil if not available. */
 	const cUUID & GetUUID(void) const;  // Exported in ManualBindings.cpp
 
+	/** Send the permission level to the client. */
+	void UpdatePermissionLevel(void);
+
 	// tolua_begin
 
 	/** Returns wheter the player can fly or not. */
@@ -551,8 +554,6 @@ public:
 
 	/** Returns the permission level of the player. */
 	int GetPermissionLevel(void);
-	/** Send the permission level to the client. */
-	void UpdatePermissionLevel(void);
 
 	/** Sends the block in the specified range around the specified coord to the client
 	as a block change packet.

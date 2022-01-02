@@ -10652,6 +10652,16 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the player's maximum walking speed, relative to the game default speed. Defaults to 1, but plugins may modify it for faster or slower walking.",
 				},
+				GetPermissionLevel =
+				{
+					Returns =
+					{
+						{
+							Type = "number"
+						},
+						Note = "Returns the permission level of the player. For more informations, see https://minecraft.fandom.com/wiki/Permission_level"
+					}
+				}
 				GetPermissions =
 				{
 					Returns =
