@@ -553,7 +553,7 @@ public:
 	void LoadRank(void);
 
 	/** Returns the permission level of the player. */
-	int GetPermissionLevel(void);
+	unsigned int GetPermissionLevel(void);
 
 	/** Sends the block in the specified range around the specified coord to the client
 	as a block change packet.

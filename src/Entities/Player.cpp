@@ -2334,7 +2334,7 @@ void cPlayer::LoadRank(void)
 
 
 
-int cPlayer::GetPermissionLevel()
+unsigned int cPlayer::GetPermissionLevel()
 {
 	// Refreshing permissions
 	LoadRank();
