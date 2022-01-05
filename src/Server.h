@@ -224,6 +224,7 @@ private:
 	size_t m_MaxPlayers;
 	bool m_bIsHardcore;
 	AString m_ResourcePackUrl;
+	AString m_CustomRedirectUrl;
 
 	/** Map of protocol version to Forge mods (map of ModName -> ModVersionString) */
 	std::map<UInt32, AStringMap> m_ForgeModsByVersion;
