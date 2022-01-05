@@ -158,6 +158,7 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	m_bIsHardcore = a_Settings.GetValueSetB("Server", "HardcoreEnabled", false);
 	m_bAllowMultiLogin = a_Settings.GetValueSetB("Server", "AllowMultiLogin", false);
 	m_ResourcePackUrl = a_Settings.GetValueSet("Server", "ResourcePackUrl", "");
+	m_CustomRedirectUrl = a_Settings.GetValueSet("Server", "CustomRedirectUrl", "")
 
 	m_FaviconData = Base64Encode(cFile::ReadWholeFile(AString("favicon.png")));  // Will return empty string if file nonexistant; client doesn't mind
 

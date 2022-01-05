@@ -96,6 +96,8 @@ public:
 
 	const AString & GetResourcePackUrl(void) { return m_ResourcePackUrl; }
 
+	const AString & GetCustomRedirectUrl(void) { return m_CustomRedirectUrl; }
+
 	bool Start(void);
 
 	bool Command(cClientHandle & a_Client, AString & a_Cmd);

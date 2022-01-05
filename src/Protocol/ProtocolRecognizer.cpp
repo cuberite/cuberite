@@ -78,18 +78,8 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 
 void cMultiVersionProtocol::HandleHTTPRequest(cClientHandle & a_Client)
 {
-	std::ifstream f("page.html", std::ios::in);
-	std::string page((std::istreambuf_iterator<char>(f)), (std::istreambuf_iterator<char>()));
-
-	const AString Message = Printf("HTTP/1.1 200 OK\nContent-Type:text/html\nContent-Length: %d\n\n%s", page.size(), page);
-	cByteBuffer Out(Message.size());
-	Out.WriteBuf(Message.data(), Message.size());
-
-	ContiguousByteBuffer Data;
-	Out.ReadAll(Data);
-	Out.CommitRead();
-
-	a_Client.SendData(Data);
+	const std::string_view Response("HTTP/1.1 303 See Other\r\nLocation: " + cRoot::Get()->GetServer()->GetCustomRedirectUrl() + "\r\n\r\n");
+	a_Client.SendData({ reinterpret_cast<const std::byte *>(Response.data()), Response.size() });
 	a_Client.Destroy();
 }
 
@@ -99,6 +89,12 @@ void cMultiVersionProtocol::HandleHTTPRequest(cClientHandle & a_Client)
 
 bool cMultiVersionProtocol::TryHandleHTTPRequest(cClientHandle & a_Client, ContiguousByteBuffer & a_Data)
 {
+	AString redirectUrl = cRoot::Get()->GetServer()->GetCustomRedirectUrl();
+	if (redirectUrl == "") 
+	{ 
+		return false;
+	}
+
 	ContiguousByteBuffer Buffer;
 	m_Buffer.ReadSome(Buffer, static_cast<size_t>(10));
 	m_Buffer.ResetRead();
