@@ -78,7 +78,7 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 
 void cMultiVersionProtocol::HandleHTTPRequest(cClientHandle & a_Client)
 {
-	const std::string_view Response("HTTP/1.1 303 See Other\r\nLocation: " + cRoot::Get()->GetServer()->GetCustomRedirectUrl() + "\r\n\r\n");
+	const AString Response = Printf("HTTP/1.1 303 See Other\r\nLocation: %s\r\n\r\n", cRoot::Get()->GetServer()->GetCustomRedirectUrl());
 	a_Client.SendData({ reinterpret_cast<const std::byte *>(Response.data()), Response.size() });
 	a_Client.Destroy();
 }
