@@ -136,6 +136,8 @@ private:
 	static void PushBlocks(const Vector3iSet & a_BlocksToPush,
 		cWorld & a_World, const Vector3i & a_PushDir
 	);
+
+	inline static cTickTimeLong ExtensionWorldTickTime = 0_tick;
 } ;
 
 
