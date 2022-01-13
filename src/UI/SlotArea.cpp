@@ -1891,130 +1891,125 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 		return;
 	}
 
-	switch (a_SlotNum)
+	if (a_SlotNum == 1)
 	{
-		case 1:  // Fuel slot clicked
-		{
-			cItem & DraggingItem = a_Player.GetDraggingItem();
-			cFurnaceRecipe * FurnaceRecipes = cRoot::Get()->GetFurnaceRecipe();
+		cItem & DraggingItem = a_Player.GetDraggingItem();
+		cFurnaceRecipe * FurnaceRecipes = cRoot::Get()->GetFurnaceRecipe();
 
-			// Do not allow non-fuels to be placed in the fuel slot:
-			if (!DraggingItem.IsEmpty() && !FurnaceRecipes->IsFuel(DraggingItem) && (a_ClickAction != caShiftLeftClick) && (a_ClickAction != caShiftRightClick))
-			{
-				LOGD("Rejecting non fuel item being placed in fuel slot.");
-				return;
-			}
-			break;
+		// Do not allow non-fuels to be placed in the fuel slot:
+		if (!DraggingItem.IsEmpty() && !FurnaceRecipes->IsFuel(DraggingItem) && (a_ClickAction != caShiftLeftClick) && (a_ClickAction != caShiftRightClick))
+		{
+			return;
 		}
-		case 2:  // Result slot clicked
+	}
+	else if (a_SlotNum == 2)
+	{
+		bool bAsync = false;
+		if (GetSlot(a_SlotNum, a_Player) == nullptr)
 		{
-			bool bAsync = false;
-			if (GetSlot(a_SlotNum, a_Player) == nullptr)
+			LOGWARNING("GetSlot(%d) returned nullptr! Ignoring click", a_SlotNum);
+			return;
+		}
+
+		cItem Slot(*GetSlot(a_SlotNum, a_Player));
+		if (!Slot.IsSameType(a_ClickedItem))
+		{
+			LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
+			LOGWARNING("My item:    %s", ItemToFullString(Slot).c_str());
+			LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
+			bAsync = true;
+		}
+
+		switch (a_ClickAction)
+		{
+			case caShiftLeftClick:
+			case caShiftRightClick:
 			{
-				LOGWARNING("GetSlot(%d) returned nullptr! Ignoring click", a_SlotNum);
+				HandleSmeltItem(Slot, a_Player);
+				ShiftClicked(a_Player, a_SlotNum, Slot);
+				return;
+			}
+			case caMiddleClick:
+			{
+				MiddleClicked(a_Player, a_SlotNum);
+				return;
+			}
+			case caDropKey:
+			case caCtrlDropKey:
+			{
+				DropClicked(a_Player, a_SlotNum, (a_SlotNum == caCtrlDropKey));
+				Slot.m_ItemCount = Slot.m_ItemCount - GetSlot(a_SlotNum, a_Player)->m_ItemCount;
+				HandleSmeltItem(Slot, a_Player);
+				return;
+			}
+			default:
+			{
+				break;
+			}
+		}
+
+		cItem & DraggingItem = a_Player.GetDraggingItem();
+		if (!DraggingItem.IsEmpty())
+		{
+			if (a_ClickAction == caDblClick)
+			{
+				return;
+			}
+			if (!DraggingItem.IsEqual(Slot))
+			{
+				return;
+			}
+			if ((DraggingItem.m_ItemCount + Slot.m_ItemCount) > Slot.GetMaxStackSize())
+			{
 				return;
 			}
 
-			cItem Slot(*GetSlot(a_SlotNum, a_Player));
-			if (!Slot.IsSameType(a_ClickedItem))
-			{
-				LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
-				LOGWARNING("My item:    %s", ItemToFullString(Slot).c_str());
-				LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
-				bAsync = true;
-			}
-
+			DraggingItem.m_ItemCount += Slot.m_ItemCount;
+			HandleSmeltItem(Slot, a_Player);
+			Slot.Empty();
+		}
+		else
+		{
 			switch (a_ClickAction)
 			{
-				case caShiftLeftClick:
-				case caShiftRightClick:
+				case caDblClick:
 				{
-					HandleSmeltItem(Slot, a_Player);
-					ShiftClicked(a_Player, a_SlotNum, Slot);
+					DblClicked(a_Player, a_SlotNum);
 					return;
 				}
-				case caMiddleClick:
+				case caLeftClick:
 				{
-					MiddleClicked(a_Player, a_SlotNum);
-					return;
-				}
-				case caDropKey:
-				case caCtrlDropKey:
-				{
-					DropClicked(a_Player, a_SlotNum, (a_SlotNum == caCtrlDropKey));
-					Slot.m_ItemCount = Slot.m_ItemCount - GetSlot(a_SlotNum, a_Player)->m_ItemCount;
+					DraggingItem = Slot;
 					HandleSmeltItem(Slot, a_Player);
-					return;
+					Slot.Empty();
+					break;
+				}
+				case caRightClick:
+				{
+					DraggingItem = Slot.CopyOne();
+					DraggingItem.m_ItemCount = static_cast<char>(static_cast<float>(Slot.m_ItemCount) / 2.f + 0.5f);
+					Slot.m_ItemCount -= DraggingItem.m_ItemCount;
+
+					if (Slot.m_ItemCount <= 0)
+					{
+						Slot.Empty();
+					}
+					HandleSmeltItem(DraggingItem, a_Player);
+					break;
 				}
 				default:
 				{
-					break;
+					ASSERT(!"Unhandled click type!");
 				}
 			}
-
-			cItem & DraggingItem = a_Player.GetDraggingItem();
-			if (!DraggingItem.IsEmpty())
-			{
-				if (a_ClickAction == caDblClick)
-				{
-					return;
-				}
-				if (!DraggingItem.IsEqual(Slot))
-				{
-					return;
-				}
-				if ((DraggingItem.m_ItemCount + Slot.m_ItemCount) > Slot.GetMaxStackSize())
-				{
-					return;
-				}
-
-				DraggingItem.m_ItemCount += Slot.m_ItemCount;
-				HandleSmeltItem(Slot, a_Player);
-				Slot.Empty();
-			}
-			else
-			{
-				switch (a_ClickAction)
-				{
-					case caDblClick:
-					{
-						DblClicked(a_Player, a_SlotNum);
-						return;
-					}
-					case caLeftClick:
-					{
-						DraggingItem = Slot;
-						HandleSmeltItem(Slot, a_Player);
-						Slot.Empty();
-						break;
-					}
-					case caRightClick:
-					{
-						DraggingItem = Slot.CopyOne();
-						DraggingItem.m_ItemCount = static_cast<char>(static_cast<float>(Slot.m_ItemCount) / 2.f + 0.5f);
-						Slot.m_ItemCount -= DraggingItem.m_ItemCount;
-
-						if (Slot.m_ItemCount <= 0)
-						{
-							Slot.Empty();
-						}
-						HandleSmeltItem(DraggingItem, a_Player);
-						break;
-					}
-					default:
-					{
-						ASSERT(!"Unhandled click type!");
-					}
-				}
-			}
-
-			SetSlot(a_SlotNum, a_Player, Slot);
-			if (bAsync)
-			{
-				m_ParentWindow.BroadcastWholeWindow();
-			}
-			return;
 		}
+
+		SetSlot(a_SlotNum, a_Player, Slot);
+		if (bAsync)
+		{
+			m_ParentWindow.BroadcastWholeWindow();
+		}
+		return;
 	}
 
 	Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
