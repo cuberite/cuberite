@@ -788,7 +788,7 @@ bool cByteBuffer::WriteXZYPosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_Blo
 	CheckValid();
 	return WriteBEInt64(
 		(static_cast<Int64>(a_BlockX & 0x3FFFFFF) << 38) |
-		(static_cast<Int64>(a_BlockZ & 0x3FFFFFF) << 26) |
+		(static_cast<Int64>(a_BlockZ & 0x3FFFFFF) << 12) |
 		(static_cast<Int64>(a_BlockY & 0xFFF))
 	);
 }
