@@ -1891,7 +1891,18 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 		return;
 	}
 
-	if (a_SlotNum == 2)
+	if (a_SlotNum == 1)
+	{
+		cItem & DraggingItem = a_Player.GetDraggingItem();
+		cFurnaceRecipe * FurnaceRecipes = cRoot::Get()->GetFurnaceRecipe();
+
+		// Do not allow non-fuels to be placed in the fuel slot:
+		if (!DraggingItem.IsEmpty() && !FurnaceRecipes->IsFuel(DraggingItem) && (a_ClickAction != caShiftLeftClick) && (a_ClickAction != caShiftRightClick))
+		{
+			return;
+		}
+	}
+	else if (a_SlotNum == 2)
 	{
 		bool bAsync = false;
 		if (GetSlot(a_SlotNum, a_Player) == nullptr)
