@@ -29,12 +29,12 @@ public:
 
 	virtual bool CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
-		return cPluginManager::Get()->CallHookPlayerBreakingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, static_cast<char>(a_BlockFace), a_BlockType, a_BlockMeta);
+		return cPluginManager::Get()->CallHookPlayerBreakingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta);
 	}
 
 	virtual bool CallHookPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
-		return cPluginManager::Get()->CallHookPlayerBrokenBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, static_cast<char>(a_BlockFace), a_BlockType, a_BlockMeta);
+		return cPluginManager::Get()->CallHookPlayerBrokenBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta);
 	}
 
 private:

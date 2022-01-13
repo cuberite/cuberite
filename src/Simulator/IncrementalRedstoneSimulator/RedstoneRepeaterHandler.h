@@ -23,7 +23,7 @@ namespace RedstoneRepeaterHandler
 
 		if (!Chunk.UnboundedRelGetBlock(a_Position, Type, Meta))
 		{
-			return std::make_pair(false, static_cast<NIBBLETYPE>(0));
+			return std::make_pair(false, NIBBLETYPE(0));
 		}
 
 		return std::make_pair(IsOn(Type), Meta);

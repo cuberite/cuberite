@@ -334,7 +334,7 @@ bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 				return false;
 			}
 		}
-		else if (m_Callbacks->OnNextBlockNoData(m_Current, static_cast<char>(m_CurrentFace)))
+		else if (m_Callbacks->OnNextBlockNoData(m_Current, m_CurrentFace))
 		{
 			// The callback terminated the trace
 			return false;

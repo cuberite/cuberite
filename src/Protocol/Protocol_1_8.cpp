@@ -374,7 +374,16 @@ void cProtocol_1_8_0::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type
 	// Send the json string to the client:
 	cPacketizer Pkt(*this, pktChatRaw);
 	Pkt.WriteString(a_MessageRaw);
-	Pkt.WriteBEInt8(static_cast<signed char>(a_Type));
+	Pkt.WriteBEInt8([a_Type]() -> signed char
+	{
+		switch (a_Type)
+		{
+			case eChatType::ctChatBox: return 0;
+			case eChatType::ctSystem: return 1;
+			case eChatType::ctAboveActionBar: return 2;
+		}
+		UNREACHABLE("Unsupported chat type");
+	}());
 }
 
 
@@ -504,7 +513,7 @@ void cProtocol_1_8_0::SendEntityAnimation(const cEntity & a_Entity, const Entity
 		return;
 	}
 
-	if (const auto AnimationID = GetProtocolEntityAnimation(a_Animation); AnimationID != static_cast<unsigned char>(-1))
+	if (const auto AnimationID = GetProtocolEntityAnimation(a_Animation); AnimationID != unsigned char(-1))
 	{
 		cPacketizer Pkt(*this, pktEntityAnimation);
 		Pkt.WriteVarInt32(a_Entity.GetUniqueID());
@@ -1969,7 +1978,7 @@ unsigned char cProtocol_1_8_0::GetProtocolEntityAnimation(const EntityAnimation 
 		case EntityAnimation::PlayerLeavesBed: return 2;
 		case EntityAnimation::PlayerMainHandSwings: return 0;
 		case EntityAnimation::PlayerOffHandSwings: return 0;
-		default: return static_cast<unsigned char>(-1);
+		default: return unsigned char(-1);
 	}
 }
 

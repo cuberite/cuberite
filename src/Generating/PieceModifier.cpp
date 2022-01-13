@@ -250,7 +250,7 @@ public:
 						// Per block meta params
 						if (blockToRnd.m_MinMeta < blockToRnd.m_MaxMeta)
 						{
-							char BlockMetaRnd = static_cast<char>(std::clamp<int>(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot*2, static_cast<int>(i), static_cast<float>(blockToRnd.m_MinNoiseMeta), static_cast<float>(blockToRnd.m_MaxNoiseMeta))), blockToRnd.m_MinMeta, blockToRnd.m_MaxMeta));
+							int BlockMetaRnd = std::clamp(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot*2, static_cast<int>(i), static_cast<float>(blockToRnd.m_MinNoiseMeta), static_cast<float>(blockToRnd.m_MaxNoiseMeta))), blockToRnd.m_MinMeta, blockToRnd.m_MaxMeta);
 							BlockMetas[i] = static_cast<NIBBLETYPE>(BlockMetaRnd);
 						}
 						else if ((blockToRnd.m_MaxMeta > -1) && (blockToRnd.m_MaxMeta == blockToRnd.m_MinMeta))
@@ -265,7 +265,7 @@ public:
 				// All blocks meta params
 				if (m_MaxMeta > m_MinMeta)
 				{
-					char BlockMetaRnd = static_cast<char>(std::clamp<int>(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot * 2, static_cast<int>(i), static_cast<float>(m_MinNoiseMeta), static_cast<float>(m_MaxNoiseMeta))), m_MinMeta, m_MaxMeta));
+					int BlockMetaRnd = std::clamp(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot * 2, static_cast<int>(i), static_cast<float>(m_MinNoiseMeta), static_cast<float>(m_MaxNoiseMeta))), m_MinMeta, m_MaxMeta);
 					BlockMetas[i] = static_cast<NIBBLETYPE>(BlockMetaRnd);
 				}
 				else if ((m_MaxMeta > -1) && (m_MaxMeta == m_MinMeta))

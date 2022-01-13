@@ -57,7 +57,7 @@ public:
 			}
 
 			m_Pickup->GetItem().AddCount(static_cast<char>(CombineCount));
-			Item.m_ItemCount -= CombineCount;
+			Item.m_ItemCount -= static_cast<char>(CombineCount);
 
 			if (Item.m_ItemCount <= 0)
 			{
@@ -246,7 +246,7 @@ bool cPickup::CollectedBy(cEntity & a_Dest)
 			}
 
 			auto & Villager = static_cast<cVillager &>(Mob);
-			int NumAdded = Villager.GetInventory().AddItem(m_Item);
+			char NumAdded = Villager.GetInventory().AddItem(m_Item);
 			if (NumAdded > 0)
 			{
 				m_Item.m_ItemCount -= NumAdded;
