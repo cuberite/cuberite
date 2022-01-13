@@ -1041,7 +1041,7 @@ public:
 					mWriter.AddShort("xTile", static_cast<Int16>(Arrow->GetBlockHit().x));
 					mWriter.AddShort("yTile", static_cast<Int16>(Arrow->GetBlockHit().y));
 					mWriter.AddShort("zTile", static_cast<Int16>(Arrow->GetBlockHit().z));
-					mWriter.AddByte("pickup",   static_cast<unsigned char>(Arrow->GetPickupState()));
+					mWriter.AddByte("pickup", static_cast<unsigned char>(Arrow->GetPickupState()));
 					mWriter.AddDouble("damage", Arrow->GetDamageCoeff());
 					break;
 				}
