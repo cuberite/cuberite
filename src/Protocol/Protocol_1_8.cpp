@@ -513,7 +513,7 @@ void cProtocol_1_8_0::SendEntityAnimation(const cEntity & a_Entity, const Entity
 		return;
 	}
 
-	if (const auto AnimationID = GetProtocolEntityAnimation(a_Animation); AnimationID != unsigned char(-1))
+	if (const auto AnimationID = GetProtocolEntityAnimation(a_Animation); AnimationID != static_cast<unsigned char>(-1))
 	{
 		cPacketizer Pkt(*this, pktEntityAnimation);
 		Pkt.WriteVarInt32(a_Entity.GetUniqueID());
@@ -1978,7 +1978,7 @@ unsigned char cProtocol_1_8_0::GetProtocolEntityAnimation(const EntityAnimation 
 		case EntityAnimation::PlayerLeavesBed: return 2;
 		case EntityAnimation::PlayerMainHandSwings: return 0;
 		case EntityAnimation::PlayerOffHandSwings: return 0;
-		default: return unsigned char(-1);
+		default: return static_cast<unsigned char>(-1);
 	}
 }
 
