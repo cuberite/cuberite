@@ -114,7 +114,7 @@ void cIsThread::SetThreadName() const
 #pragma pack(pop)
 
 	const DWORD NAME_EXCEPTION = 0x406D1388;
-	const THREADNAME_INFO Name = { 0x1000, m_ThreadName.c_str(), DWORD(-1), 0 };
+	const THREADNAME_INFO Name = { 0x1000, m_ThreadName.c_str(), static_cast<DWORD>(-1), 0 };
 
 	__try
 	{
