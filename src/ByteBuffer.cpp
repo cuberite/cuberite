@@ -487,8 +487,8 @@ bool cByteBuffer::ReadLEInt(int & a_Value)
 bool cByteBuffer::ReadXYZPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 {
 	CHECK_THREAD
-	Int64 Value;
-	if (!ReadBEInt64(Value))
+	UInt64 Value;
+	if (!ReadBEUInt64(Value))
 	{
 		return false;
 	}
@@ -512,8 +512,8 @@ bool cByteBuffer::ReadXYZPosition64(int & a_BlockX, int & a_BlockY, int & a_Bloc
 bool cByteBuffer::ReadXZYPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 {
 	CHECK_THREAD
-	Int64 Value;
-	if (!ReadBEInt64(Value))
+	UInt64 Value;
+	if (!ReadBEUInt64(Value))
 	{
 		return false;
 	}
@@ -771,10 +771,10 @@ bool cByteBuffer::WriteXYZPosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_Blo
 {
 	CHECK_THREAD
 	CheckValid();
-	return WriteBEInt64(
-		(static_cast<Int64>(a_BlockX & 0x3FFFFFF) << 38) |
-		(static_cast<Int64>(a_BlockY & 0xFFF) << 26) |
-		(static_cast<Int64>(a_BlockZ & 0x3FFFFFF))
+	return WriteBEUInt64(
+		((static_cast<UInt64>(a_BlockX) & 0x3FFFFFF) << 38) |
+		((static_cast<UInt64>(a_BlockY) & 0xFFF) << 26) |
+		(static_cast<UInt64>(a_BlockZ) & 0x3FFFFFF)
 	);
 }
 
@@ -786,10 +786,10 @@ bool cByteBuffer::WriteXZYPosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_Blo
 {
 	CHECK_THREAD
 	CheckValid();
-	return WriteBEInt64(
-		(static_cast<Int64>(a_BlockX & 0x3FFFFFF) << 38) |
-		(static_cast<Int64>(a_BlockZ & 0x3FFFFFF) << 12) |
-		(static_cast<Int64>(a_BlockY & 0xFFF))
+	return WriteBEUInt64(
+		((static_cast<UInt64>(a_BlockX) & 0x3FFFFFF) << 38) |
+		((static_cast<UInt64>(a_BlockZ) & 0x3FFFFFF) << 12) |
+		(static_cast<UInt64>(a_BlockY) & 0xFFF)
 	);
 }
 
