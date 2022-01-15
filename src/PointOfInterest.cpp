@@ -81,6 +81,18 @@ ePointOfInterestType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockT
 		{
 			return poiWeaponsmith;
 		}
+		*/
+
+		case E_BLOCK_BED:
+		{
+			return poiHome;
+		}
+
+		/*
+		case E_BLOCK_BELL:
+		{
+			return poiMeeting;
+		}
 
 		case E_BLOCK_BEEHIVE:
 		{
