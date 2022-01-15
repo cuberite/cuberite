@@ -62,7 +62,6 @@ target_sources(
 	StringCompression.cpp
 	StringUtils.cpp
 	UUID.cpp
-	Village.cpp
 	VoronoiMap.cpp
 	WebAdmin.cpp
 	World.cpp
@@ -144,7 +143,6 @@ target_sources(
 	StringUtils.h
 	UUID.h
 	Vector3.h
-	Village.h
 	VoronoiMap.h
 	WebAdmin.h
 	World.h
