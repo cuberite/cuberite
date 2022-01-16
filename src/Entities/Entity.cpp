@@ -2365,7 +2365,7 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 		}
 		else
 		{
-			Name = NamespaceSerializer::Prettify(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
+			Name = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
 		}
 	}
 	else
@@ -2431,7 +2431,7 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 		}
 		else
 		{
-			AString KillerName = NamespaceSerializer::Prettify(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
+			AString KillerName = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
 			DeathMessage = Printf("%s was killed by a %s", Name.c_str(), KillerName.c_str());
 		}
 
