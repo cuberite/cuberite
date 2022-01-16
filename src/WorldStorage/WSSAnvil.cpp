@@ -409,7 +409,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				unsigned char Meta = 0;
 				if (MetaData != nullptr)
 				{
-					Meta = static_cast<unsigned char>(cChunkDef::ExpandLightType(MetaData, I));
+					Meta = static_cast<unsigned char>(MetaData[I]);
 				}
 
 				Blocks[I] = PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockData[I]), Meta);

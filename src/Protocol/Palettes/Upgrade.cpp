@@ -4152,7 +4152,17 @@ namespace PaletteUpgrade
 			case StructureBlock::StructureBlock(StructureBlock::Mode::Load).ID: return { 255, 1 };
 			case StructureBlock::StructureBlock(StructureBlock::Mode::Corner).ID: return { 255, 2 };
 			case StructureBlock::StructureBlock(StructureBlock::Mode::Data).ID: return { 255, 3 };
-			default: return { 0, 0 };
+
+			// renamed or added blocks that have an old replacement
+			case CaveAir::CaveAir().ID: return { 0, 0 };
+			case Pumpkin::Pumpkin().ID: return { 86, 0 };
+
+			default:
+			{
+				FLOGWARNING("Unknown block ID: {} - {}", Block, Block.ID);
+				ASSERT(!"Unknown block ID:");
+				return { 0, 0 };
+			}
 		}
 	}
 
