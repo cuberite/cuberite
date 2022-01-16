@@ -86,6 +86,7 @@ public:
 		pktExplosion,
 		pktGameMode,
 		pktHeldItemChange,
+		pktHorseWindowOpen,
 		pktInventorySlot,
 		pktJoinGame,
 		pktKeepAlive,

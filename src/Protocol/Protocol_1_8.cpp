@@ -3901,7 +3901,7 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousBy
 
 
 
-UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity)
+UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity) const
 {
 	using Type = cEntity::eEntityType;
 
