@@ -813,3 +813,29 @@ bool ItemCategory::IsHorseArmor(Item a_ItemType)
 		default: return false;
 	}
 }
+
+
+
+
+
+bool ItemCategory::IsVillagerFood(Item a_ItemType)
+{
+	switch (a_ItemType)
+	{
+		case Item::Carrot:
+		case Item::Potato:
+		case Item::Bread:
+		case Item::Beetroot:
+		case Item::WheatSeeds:
+		case Item::BeetrootSeeds:
+		case Item::Wheat:
+		{
+			return true;
+		}
+
+		default:
+		{
+			return false;
+		}
+	}
+}

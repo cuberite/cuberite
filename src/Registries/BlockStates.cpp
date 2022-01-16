@@ -1,4 +1,10 @@
 #include "BlockStates.h"
+#include "Protocol/Palettes/Upgrade.h"
+
+std::pair<unsigned char, unsigned char> BlockState::GetLegacyValues()
+{
+	return PaletteUpgrade::ToBlock(*this);
+}
 
 namespace Block
 {

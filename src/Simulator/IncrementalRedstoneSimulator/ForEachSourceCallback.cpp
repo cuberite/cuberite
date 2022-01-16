@@ -2,6 +2,7 @@
 #include "Globals.h"
 
 #include "ForEachSourceCallback.h"
+#include "BlockType.h"
 #include "../../BlockInfo.h"
 #include "../../Chunk.h"
 #include "IncrementalRedstoneSimulator.h"
@@ -39,7 +40,7 @@ void ForEachSourceCallback::operator()(Vector3i a_Location)
 	const auto PotentialSourceBlock = NeighbourChunk->GetBlock(a_Location);
 	const auto NeighbourRelativeQueryPosition = cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(m_Chunk, *NeighbourChunk, m_Position);
 
-	if (ShouldQueryLinkedPosition(PotentialSourceBlock))
+	if (!cBlockInfo::IsTransparent(PotentialSourceBlock))
 	{
 		Power = std::max(Power, QueryLinkedPower(*NeighbourChunk, NeighbourRelativeQueryPosition, m_CurrentBlock, a_Location));
 	}
@@ -81,31 +82,6 @@ void ForEachSourceCallback::CheckIndirectPower()
 
 	// Get the results:
 	Power = std::max(Power, QuasiQueryCallback.Power);
-}
-
-
-
-
-
-bool ForEachSourceCallback::ShouldQueryLinkedPosition(const BlockState a_Block)
-{
-	switch (a_Block.Type())
-	{
-		// Normally we don't ask solid blocks for power because they don't have any (stone, dirt, etc.)
-		// However, these are mechanisms that are IsSolid, but still give power. Don't ignore them:
-		case BlockType::RedstoneBlock:
-		case BlockType::DaylightDetector:
-		case BlockType::Observer:
-		case BlockType::TrappedChest: return false;
-
-		// Pistons are solid but don't participate in link powering:
-		case BlockType::Piston:
-		case BlockType::MovingPiston:
-		case BlockType::StickyPiston: return false;
-
-		// If a mechanism asks for power from a block, redirect the query to linked positions if:
-		default: return cBlockInfo::IsSolid(a_Block);
-	}
 }
 
 

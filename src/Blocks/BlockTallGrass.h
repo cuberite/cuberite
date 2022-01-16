@@ -60,7 +60,7 @@ private:
 		}
 
 		auto BelowBlock = a_Chunk.GetBlock(a_Position.addedY(-1));
-		return IsBlockStateOfDirt(BelowBlock);
+		return IsBlockMaterialDirt(BelowBlock);
 	}
 
 
