@@ -87,8 +87,9 @@ void cProtocol_1_14::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 
 	// Send the server difficulty:
 	{
-		// cPacketizer Pkt(*this, pktDifficulty);
-		// Pkt.WriteBEInt8(1);
+		cPacketizer Pkt(*this, pktDifficulty);
+		Pkt.WriteBEInt8(1);
+		Pkt.WriteBool(false);  // Difficulty locked? 
 	}
 }
 
@@ -170,6 +171,7 @@ UInt32 cProtocol_1_14::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktUpdateHealth:         return 0x48;
 		case cProtocol::pktUpdateScore:          return 0x4C;
 		case cProtocol::pktUpdateSign:           return 0x2F;
+		case cProtocol::pktWeather:              return 0x1E;
 		case cProtocol::pktWindowItems:          return 0x14;
 		case cProtocol::pktWindowOpen:           return 0x2E;
 		case cProtocol::pktWindowProperty:       return 0x15;
