@@ -6,7 +6,7 @@
 #include "Chunk.h"
 #include "BlockState.h"
 #include "Simulator/RedstoneSimulator.h"
-
+#include "Defines.h"
 
 
 
@@ -93,6 +93,7 @@ public:
 	/** Structure storing position of mechanism + it's delay ticks (countdown) & if to power on. */
 	std::unordered_map<Vector3i, std::pair<int, bool>, VectorHasher<int>> m_MechanismDelays;
 
+	std::unordered_map<Vector3i, cTickTimeLong> PistonExtensionWorldTickTime;
 private:
 
 	std::stack<Vector3i, std::vector<Vector3i>> m_ActiveBlocks;

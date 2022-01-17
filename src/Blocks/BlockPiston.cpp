@@ -93,14 +93,13 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 			World.BroadcastSoundEffect("block.piston.extend", a_BlockPos, 0.5f, 0.7f);
 		}
 	);
-	ExtensionWorldTickTime = a_World.GetWorldTickAge();
 }
 
 
 
 
 
-void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
+void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World, bool should_pull_block)
 {
 	{
 		BLOCKTYPE pistonBlock;
@@ -109,7 +108,7 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 		a_World.BroadcastBlockAction(a_BlockPos, PistonRetractAction, pistonMeta, pistonBlock);
 	}
 
-	a_World.ScheduleTask(1_tick, [a_BlockPos](cWorld & World)
+	a_World.ScheduleTask(1_tick, [a_BlockPos, &should_pull_block](cWorld & World)
 		{
 			BLOCKTYPE pistonBlock;
 			NIBBLETYPE pistonMeta;
@@ -151,11 +150,11 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 				return;
 			}
 
-	if (ExtensionWorldTickTime - World.GetWorldTickAge() <= 2_tick)
-            {
-                // Piston has been activated for less or equal to 2 ticks, bail out
-                return;
-            }
+	if (!should_pull_block)
+	{
+		// Piston has been activated for less or equal to 2 ticks, bail out
+		// return;
+	}
 
 			// Get the block to pull
 			Vector3i AdjustedPosition = a_BlockPos + pushDir * 2;
