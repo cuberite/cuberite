@@ -1840,7 +1840,7 @@ cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_Or
 			LOGWARNING("Cannot parse ore information from string, invalid number in OreInfo \"%s\".", ore.c_str());
 			continue;
 		}
-		res.emplace_back(oreType, oreMeta, maxHeight, numNests, nestSize);
+		res.emplace_back(static_cast<BLOCKTYPE>(oreType), oreMeta, maxHeight, numNests, nestSize);
 	}  // for i - split[]
 	return res;
 }

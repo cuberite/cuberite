@@ -636,9 +636,9 @@ void cWindow::OnLeftPaintEnd(cPlayer & a_Player)
 
 	const cSlotNums & SlotNums = a_Player.GetInventoryPaintSlots();
 	cItem ToDistribute(a_Player.GetDraggingItem());
-	int ToEachSlot = static_cast<int>(ToDistribute.m_ItemCount) / static_cast<int>(SlotNums.size());
+	char ToEachSlot = ToDistribute.m_ItemCount / static_cast<char>(SlotNums.size());
 
-	int NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, ToEachSlot, SlotNums);
+	char NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, ToEachSlot, SlotNums);
 
 	// Remove the items distributed from the dragging item:
 	a_Player.GetDraggingItem().m_ItemCount -= NumDistributed;
@@ -666,7 +666,7 @@ void cWindow::OnRightPaintEnd(cPlayer & a_Player)
 	const cSlotNums & SlotNums = a_Player.GetInventoryPaintSlots();
 	cItem ToDistribute(a_Player.GetDraggingItem());
 
-	int NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, 1, SlotNums);
+	char NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, 1, SlotNums);
 
 	// Remove the items distributed from the dragging item:
 	a_Player.GetDraggingItem().m_ItemCount -= NumDistributed;
@@ -710,7 +710,7 @@ void cWindow::OnMiddlePaintEnd(cPlayer & a_Player)
 
 
 
-int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums, bool a_LimitItems)
+char cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, char a_NumToEachSlot, const cSlotNums & a_SlotNums, bool a_LimitItems)
 {
 	if (a_LimitItems && (static_cast<size_t>(a_Item.m_ItemCount) < a_SlotNums.size()))
 	{
@@ -720,7 +720,7 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 	}
 
 	// Distribute to individual slots, keep track of how many items were actually distributed (full stacks etc.)
-	int NumDistributed = 0;
+	char NumDistributed = 0;
 	for (cSlotNums::const_iterator itr = a_SlotNums.begin(), end = a_SlotNums.end(); itr != end; ++itr)
 	{
 		int LocalSlotNum = 0;
@@ -733,19 +733,19 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 
 		// Modify the item at the slot
 		cItem AtSlot(*Area->GetSlot(LocalSlotNum, a_Player));
-		int MaxStack = AtSlot.GetMaxStackSize();
+		char MaxStack = AtSlot.GetMaxStackSize();
 		if (AtSlot.IsEmpty())
 		{
 			// Empty, just move all of it there:
 			cItem ToStore(a_Item);
-			ToStore.m_ItemCount = static_cast<char>(std::min(a_NumToEachSlot, static_cast<int>(MaxStack)));
+			ToStore.m_ItemCount = std::min<char>(a_NumToEachSlot, MaxStack);
 			Area->SetSlot(LocalSlotNum, a_Player, ToStore);
 			NumDistributed += ToStore.m_ItemCount;
 		}
 		else if (AtSlot.IsEqual(a_Item))
 		{
 			// Occupied, add and cap at MaxStack:
-			int CanStore = std::min(a_NumToEachSlot, static_cast<int>(MaxStack) - AtSlot.m_ItemCount);
+			char CanStore = std::min<char>(a_NumToEachSlot, MaxStack - AtSlot.m_ItemCount);
 			AtSlot.m_ItemCount += CanStore;
 			Area->SetSlot(LocalSlotNum, a_Player, AtSlot);
 			NumDistributed += CanStore;
