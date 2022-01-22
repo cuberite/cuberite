@@ -2328,6 +2328,13 @@ void cPlayer::LoadRank(void)
 	{
 		m_SplitRestrictions.push_back(StringSplit(Restriction, "."));
 	}  // for itr - m_Restrictions[]
+
+	// Checks if the player is already initialized
+	if (GetMaxHealth() > 1.0f)
+	{
+		// Send permission level to the player
+		UpdatePermissionLevel();
+	}
 }
 
 
@@ -2336,9 +2343,6 @@ void cPlayer::LoadRank(void)
 
 unsigned int cPlayer::GetPermissionLevel()
 {
-	// Refreshing permissions
-	LoadRank();
-
 	if (HasPermission("core.stop") || HasPermission("core.reload") ||
 		HasPermission("core.save-all"))
 	{
