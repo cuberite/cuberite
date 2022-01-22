@@ -202,8 +202,66 @@ bool cIniFile::WriteFile(const AString & a_FileName) const
 	size_t NumComments = m_Comments.size();
 	for (size_t commentID = 0; commentID < NumComments; ++commentID)
 	{
-		f << ';' << m_Comments[commentID] << iniEOL;
+
+		/** This code goes through and check for newline characters when
+		 * writing. If it finds a new line character, it will remove it and will
+		 * write what is before it on one line and what is after on the next. */
+
+		// Removes newline from header comments.
+		bool NewlineCharacter = false;
+		vector<int> NumberNewlineCharacter;
+		for (int i = 0; i < m_Comments[commentID].length() - 1; i++)
+		{
+			if (m_Comments[commentID].at(i) == '\n')
+			{
+				NewlineCharacter = true;
+				NumberNewlineCharacter.push_back(i);
+			}
+		}
+
+		if (NewlineCharacter == true)
+		{
+			int IndexAt = 0;
+			bool NewlineFound = false;
+			int FoundCounter = 0;
+			string LineAfterNewline = "";
+			string LineBeforeNewline = "";
+			for (int j = 0; j < m_Comments[commentID].length(); j++)
+			{
+				if (j == NumberNewlineCharacter.at(IndexAt))
+				{
+					NewlineFound = true;
+				}
+
+				if (NewlineFound == true)
+				{
+					if (FoundCounter > 0)
+					{
+						LineAfterNewline =
+							LineAfterNewline + m_Comments[commentID].at(j);
+					}
+					FoundCounter++;
+				}
+
+				else
+				{
+					LineBeforeNewline =
+						LineBeforeNewline + m_Comments[commentID].at(j);
+				}
+			}
+
+			f << ";" << LineBeforeNewline << iniEOL;
+			f << "; " << LineAfterNewline << iniEOL;
+
+		}
+		else
+		{
+			f << ';' << m_Comments[commentID] << iniEOL;
+		}
+
+		// f << ';' << m_Comments[commentID] << iniEOL;
 	}
+
 	if (NumComments > 0)
 	{
 		f << iniEOL;
