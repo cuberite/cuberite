@@ -459,6 +459,10 @@ void cClientHandle::FinishAuthenticate()
 	// Return a server login packet:
 	m_Protocol->SendLogin(*m_Player, *World);
 
+	// Send the player's permission level.
+	// The key effect is to allow 1.9+ clients to open the command block UI.
+	SendPlayerPermissionLevel();
+
 	if (m_Player->GetKnownRecipes().empty())
 	{
 		SendInitRecipes(0);
@@ -1042,7 +1046,7 @@ void cClientHandle::HandleCommandBlockBlockChange(int a_BlockX, int a_BlockY, in
 		return;
 	}
 
-	if ((m_Player == nullptr) || !m_Player->HasPermission("comandblock.set"))
+	if ((m_Player == nullptr) || !m_Player->HasPermission("cuberite.commandblock.set"))
 	{
 		SendChat("You cannot edit command blocks on this server", mtFailure);
 		return;
@@ -1589,7 +1593,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	Msg.AddTextPart(m_Player->GetName(), Color);
 	Msg.ParseText(m_Player->GetSuffix());
 	Msg.AddTextPart("> ");
-	if (m_Player->HasPermission("chat.format"))
+	if (m_Player->HasPermission("cuberite.chat.format"))
 	{
 		Msg.ParseText(Message);
 	}
@@ -2874,6 +2878,15 @@ void cClientHandle::SendPlayerMoveLook(void)
 	);
 	*/
 	m_Protocol->SendPlayerMoveLook();
+}
+
+
+
+
+
+void cClientHandle::SendPlayerPermissionLevel()
+{
+	m_Protocol->SendPlayerPermissionLevel();
 }
 
 

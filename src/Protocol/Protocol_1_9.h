@@ -35,29 +35,30 @@ public:
 
 	cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State);
 
-	virtual void SendAttachEntity       (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
-	virtual void SendBossBarAdd         (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
-	virtual void SendBossBarRemove      (UInt32 a_UniqueID) override;
-	virtual void SendBossBarUpdateFlags (UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
-	virtual void SendBossBarUpdateHealth(UInt32 a_UniqueID, float a_FractionFilled) override;
-	virtual void SendBossBarUpdateStyle (UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType) override;
-	virtual void SendBossBarUpdateTitle (UInt32 a_UniqueID, const cCompositeChat & a_Title) override;
-	virtual void SendDetachEntity       (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
-	virtual void SendEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
-	virtual void SendEntityMetadata     (const cEntity & a_Entity) override;
-	virtual void SendEntityPosition     (const cEntity & a_Entity) override;
-	virtual void SendExperienceOrb      (const cExpOrb & a_ExpOrb) override;
-	virtual void SendKeepAlive          (UInt32 a_PingID) override;
-	virtual void SendLeashEntity        (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
-	virtual void SendMapData            (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
-	virtual void SendPaintingSpawn      (const cPainting & a_Painting) override;
-	virtual void SendPlayerMoveLook     (void) override;
-	virtual void SendPlayerSpawn        (const cPlayer & a_Player) override;
-	virtual void SendSoundEffect        (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
-	virtual void SendSpawnMob           (const cMonster & a_Mob) override;
-	virtual void SendThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ) override;
-	virtual void SendUnleashEntity      (const cEntity & a_Entity) override;
-	virtual void SendUnloadChunk        (int a_ChunkX, int a_ChunkZ) override;
+	virtual void SendAttachEntity         (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
+	virtual void SendBossBarAdd           (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
+	virtual void SendBossBarRemove        (UInt32 a_UniqueID) override;
+	virtual void SendBossBarUpdateFlags   (UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
+	virtual void SendBossBarUpdateHealth  (UInt32 a_UniqueID, float a_FractionFilled) override;
+	virtual void SendBossBarUpdateStyle   (UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType) override;
+	virtual void SendBossBarUpdateTitle   (UInt32 a_UniqueID, const cCompositeChat & a_Title) override;
+	virtual void SendDetachEntity         (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
+	virtual void SendEntityEquipment      (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
+	virtual void SendEntityMetadata       (const cEntity & a_Entity) override;
+	virtual void SendEntityPosition       (const cEntity & a_Entity) override;
+	virtual void SendExperienceOrb        (const cExpOrb & a_ExpOrb) override;
+	virtual void SendKeepAlive            (UInt32 a_PingID) override;
+	virtual void SendLeashEntity          (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
+	virtual void SendMapData              (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
+	virtual void SendPaintingSpawn        (const cPainting & a_Painting) override;
+	virtual void SendPlayerMoveLook       (void) override;
+	virtual void SendPlayerPermissionLevel() override;
+	virtual void SendPlayerSpawn          (const cPlayer & a_Player) override;
+	virtual void SendSoundEffect          (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
+	virtual void SendSpawnMob             (const cMonster & a_Mob) override;
+	virtual void SendThunderbolt          (int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void SendUnleashEntity        (const cEntity & a_Entity) override;
+	virtual void SendUnloadChunk          (int a_ChunkX, int a_ChunkZ) override;
 
 protected:
 

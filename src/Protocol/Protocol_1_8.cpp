@@ -1184,6 +1184,15 @@ void cProtocol_1_8_0::SendPlayerMoveLook(void)
 
 
 
+void cProtocol_1_8_0::SendPlayerPermissionLevel()
+{
+	// 1.8 has no concept of a permission level.
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendPlayerPosition(void)
 {
 	// There is no dedicated packet for this, send the whole thing:
