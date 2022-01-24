@@ -949,7 +949,7 @@ void GetSmallSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 	{
 		a_LogBlocks.emplace_back(a_BlockPos.addedY(i), E_BLOCK_LOG, E_META_LOG_CONIFER);
 	}
-	Height += a_BlockPos.y;
+	Height += static_cast<HEIGHTTYPE>(a_BlockPos.y);
 
 	// Optional size-1 bottom leaves layer:
 	if ((MyRandom & 1) == 0)

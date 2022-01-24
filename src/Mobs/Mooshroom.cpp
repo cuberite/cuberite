@@ -65,7 +65,7 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 			}
 
 			cItems Drops;
-			Drops.emplace_back(E_BLOCK_RED_MUSHROOM, 5, 0);
+			Drops.emplace_back(E_BLOCK_RED_MUSHROOM, static_cast<char>(5), static_cast<char>(0));
 			m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 			m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtCow, false);
 			Destroy();

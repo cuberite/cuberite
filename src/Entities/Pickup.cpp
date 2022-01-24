@@ -45,8 +45,8 @@ public:
 		cItem & Item = OtherPickup.GetItem();
 		if ((Distance < 1.2) && Item.IsEqual(m_Pickup->GetItem()) && OtherPickup.CanCombine())
 		{
-			short CombineCount = Item.m_ItemCount;
-			if ((CombineCount + m_Pickup->GetItem().m_ItemCount) > Item.GetMaxStackSize())
+			short CombineCount = static_cast<short>(Item.m_ItemCount);
+			if ((CombineCount + static_cast<short>(m_Pickup->GetItem().m_ItemCount)) > static_cast<short>(Item.GetMaxStackSize()))
 			{
 				CombineCount = Item.GetMaxStackSize() - m_Pickup->GetItem().m_ItemCount;
 			}
@@ -57,7 +57,7 @@ public:
 			}
 
 			m_Pickup->GetItem().AddCount(static_cast<char>(CombineCount));
-			Item.m_ItemCount -= CombineCount;
+			Item.m_ItemCount -= static_cast<char>(CombineCount);
 
 			if (Item.m_ItemCount <= 0)
 			{
@@ -246,7 +246,7 @@ bool cPickup::CollectedBy(cEntity & a_Dest)
 			}
 
 			auto & Villager = static_cast<cVillager &>(Mob);
-			int NumAdded = Villager.GetInventory().AddItem(m_Item);
+			char NumAdded = Villager.GetInventory().AddItem(m_Item);
 			if (NumAdded > 0)
 			{
 				m_Item.m_ItemCount -= NumAdded;
@@ -265,11 +265,9 @@ bool cPickup::CollectedBy(cEntity & a_Dest)
 			// Pickup cannot be collected because the entity has not enough space
 			return false;
 		}
-
 	}
 	else if (a_Dest.IsPlayer())
 	{
-
 		auto & Player = static_cast<cPlayer &>(a_Dest);
 
 		// If the player is a spectator, he cannot collect anything
@@ -284,7 +282,7 @@ bool cPickup::CollectedBy(cEntity & a_Dest)
 			return false;
 		}
 
-		int NumAdded = Player.GetInventory().AddItem(m_Item);
+		char NumAdded = Player.GetInventory().AddItem(m_Item);
 		if (NumAdded > 0)
 		{
 			// Check achievements

@@ -374,7 +374,16 @@ void cProtocol_1_8_0::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type
 	// Send the json string to the client:
 	cPacketizer Pkt(*this, pktChatRaw);
 	Pkt.WriteString(a_MessageRaw);
-	Pkt.WriteBEInt8(a_Type);
+	Pkt.WriteBEInt8([a_Type]() -> signed char
+	{
+		switch (a_Type)
+		{
+			case eChatType::ctChatBox: return 0;
+			case eChatType::ctSystem: return 1;
+			case eChatType::ctAboveActionBar: return 2;
+		}
+		UNREACHABLE("Unsupported chat type");
+	}());
 }
 
 
@@ -2464,7 +2473,7 @@ void cProtocol_1_8_0::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 
 	if (PlayerID != m_Client->GetPlayer()->GetUniqueID())
 	{
-		m_Client->Kick("Mind your own business! Hacked client?");
+		LOGD("Player \"%s\" attempted to action another entity - hacked client?", m_Client->GetUsername().c_str());
 		return;
 	}
 
@@ -2849,7 +2858,7 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 			}
 			default:
 			{
-				m_Client->Kick("Unknown command block edit type - hacked client?");
+				LOGD("Player \"%s\" sent an invalid command block edit type - hacked client?", m_Client->GetUsername().c_str());
 				return;
 			}
 		}
@@ -3098,10 +3107,6 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 
 void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
-	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
-	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
-	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
-
 	switch (a_BlockEntity.GetBlockType())
 	{
 		case E_BLOCK_WALL_BANNER:
@@ -3111,16 +3116,12 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			a_Writer.AddInt("Base", static_cast<Int32>(BannerEntity.GetBaseColor()));
 			break;
 		}
-
 		case E_BLOCK_BEACON:
+		case E_BLOCK_CHEST:
 		{
-			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);
-			a_Writer.AddInt("Primary",   BeaconEntity.GetPrimaryEffect());
-			a_Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
-			a_Writer.AddInt("Levels",    BeaconEntity.GetBeaconLevel());
+			// Nothing!
 			break;
 		}
-
 		case E_BLOCK_COMMAND_BLOCK:
 		{
 			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
@@ -3137,23 +3138,12 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			}
 			break;
 		}
-
 		case E_BLOCK_ENCHANTMENT_TABLE:
-		{
-			auto & EnchantingTableEntity = static_cast<const cEnchantingTableEntity &>(a_BlockEntity);
-			if (!EnchantingTableEntity.GetCustomName().empty())
-			{
-				a_Writer.AddString("CustomName", EnchantingTableEntity.GetCustomName());
-			}
-			break;
-		}
-
 		case E_BLOCK_END_PORTAL:
 		{
 			// Nothing!
 			break;
 		}
-
 		case E_BLOCK_HEAD:
 		{
 			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
@@ -3175,7 +3165,6 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			a_Writer.EndCompound();
 			break;
 		}
-
 		case E_BLOCK_FLOWER_POT:
 		{
 			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
@@ -3183,7 +3172,6 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			a_Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
 			break;
 		}
-
 		case E_BLOCK_MOB_SPAWNER:
 		{
 			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
@@ -3191,12 +3179,15 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			a_Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
 			break;
 		}
-
 		default:
 		{
-			break;
+			return;
 		}
 	}
+
+	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
 }
 
 
