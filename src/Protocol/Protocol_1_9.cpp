@@ -519,10 +519,7 @@ void cProtocol_1_9_0::SendPlayerPermissionLevel()
 			return 27;
 		}
 
-		if (
-			Player.HasPermission("cuberite.comandblock.set") || Player.HasPermission("core.clear") || Player.HasPermission("core.difficulty") ||
-			Player.HasPermission("core.effect") || Player.HasPermission("core.gamemode") || Player.HasPermission("core.tp") || Player.HasPermission("core.give")
-		)
+		if (Player.HasPermission("cuberite.comandblock.set") || Player.HasPermission("core.clear") || Player.HasPermission("core.difficulty") || Player.HasPermission("core.effect") || Player.HasPermission("core.gamemode") || Player.HasPermission("core.tp") || Player.HasPermission("core.give"))
 		{
 			return 26;
 		}
