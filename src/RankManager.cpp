@@ -7,8 +7,7 @@
 #include "RankManager.h"
 #include "Protocol/MojangAPI.h"
 #include "ClientHandle.h"
-#include "Root.h"
-#include "Entities/Player.h"
+
 
 
 
@@ -1449,7 +1448,6 @@ void cRankManager::RemovePlayerRank(const cUUID & a_PlayerUUID)
 		SQLite::Statement stmt(m_DB, "DELETE FROM PlayerRank WHERE PlayerUUID = ?");
 		stmt.bind(1, StrUUID);
 		stmt.exec();
-
 	}
 	catch (const SQLite::Exception & ex)
 	{
@@ -1950,3 +1948,7 @@ void cRankManager::CreateColumnIfNotExists(const char * a_TableName, const char 
 		LOGWARNING("%s: Failed to query DB: %s", __FUNCTION__, exc.what());
 	}
 }
+
+
+
+
