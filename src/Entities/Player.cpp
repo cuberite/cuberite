@@ -1567,7 +1567,7 @@ void cPlayer::PermuteEnchantmentSeed()
 
 
 
-bool cPlayer::HasPermission(const AString & a_Permission)
+bool cPlayer::HasPermission(const AString & a_Permission) const
 {
 	if (a_Permission.empty())
 	{
@@ -1786,7 +1786,7 @@ void cPlayer::TossPickup(const cItem & a_Item)
 
 void cPlayer::LoadFromDisk()
 {
-	LoadRank();
+	RefreshRank();
 
 	Json::Value Root;
 	const auto & UUID = GetUUID();
@@ -2295,88 +2295,10 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 
 void cPlayer::LoadRank(void)
 {
-	const auto & UUID = GetUUID();
-	cRankManager * RankMgr = cRoot::Get()->GetRankManager();
+	// Update our permissions:
+	RefreshRank();
 
-	// Load the values from cRankManager:
-	m_Rank = RankMgr->GetPlayerRankName(UUID);
-	if (m_Rank.empty())
-	{
-		m_Rank = RankMgr->GetDefaultRank();
-	}
-	else
-	{
-		// Update the name:
-		RankMgr->UpdatePlayerName(UUID, GetName());
-	}
-	m_Permissions = RankMgr->GetPlayerPermissions(UUID);
-	m_Restrictions = RankMgr->GetPlayerRestrictions(UUID);
-	RankMgr->GetRankVisuals(m_Rank, m_MsgPrefix, m_MsgSuffix, m_MsgNameColorCode);
-
-	// Break up the individual permissions on each dot, into m_SplitPermissions:
-	m_SplitPermissions.clear();
-	m_SplitPermissions.reserve(m_Permissions.size());
-	for (auto & Permission: m_Permissions)
-	{
-		m_SplitPermissions.push_back(StringSplit(Permission, "."));
-	}  // for Permission - m_Permissions[]
-
-	// Break up the individual restrictions on each dot, into m_SplitRestrictions:
-	m_SplitRestrictions.clear();
-	m_SplitRestrictions.reserve(m_Restrictions.size());
-	for (auto & Restriction: m_Restrictions)
-	{
-		m_SplitRestrictions.push_back(StringSplit(Restriction, "."));
-	}  // for itr - m_Restrictions[]
-
-	// Checks if the player is already initialized
-	if (GetMaxHealth() > 1.0f)
-	{
-		// Send permission level to the player
-		UpdatePermissionLevel();
-	}
-}
-
-
-
-
-
-unsigned int cPlayer::GetPermissionLevel()
-{
-	if (HasPermission("core.stop") || HasPermission("core.reload") ||
-		HasPermission("core.save-all"))
-	{
-		return 4;
-	}
-
-	if (HasPermission("core.ban") || HasPermission("core.deop") ||
-		HasPermission("core.kick") || HasPermission("core.op"))
-	{
-		return 3;
-	}
-
-	if (HasPermission("comandblock.set") || HasPermission("core.clear") ||
-		HasPermission("core.difficulty") || HasPermission("core.effect") ||
-		HasPermission("core.gamemode") || HasPermission("core.tp") ||
-		HasPermission("core.give"))
-	{
-		return 2;
-	}
-
-	if (HasPermission("core.spawnprotect.bypass"))
-	{
-		return 1;
-	}
-
-	return 0;  // The player has no permissions.
-}
-
-
-
-
-
-void cPlayer::UpdatePermissionLevel()
-{
+	// Send a permission level update:
 	m_ClientHandle->SendPlayerPermissionLevel();
 }
 
@@ -2851,6 +2773,47 @@ void cPlayer::TickFreezeCode()
 		{
 			FreezeInternal(GetPosition(), false);
 		}
+	}
+}
+
+
+
+
+
+void cPlayer::RefreshRank()
+{
+	const auto & UUID = GetUUID();
+	cRankManager * RankMgr = cRoot::Get()->GetRankManager();
+
+	// Load the values from cRankManager:
+	m_Rank = RankMgr->GetPlayerRankName(UUID);
+	if (m_Rank.empty())
+	{
+		m_Rank = RankMgr->GetDefaultRank();
+	}
+	else
+	{
+		// Update the name:
+		RankMgr->UpdatePlayerName(UUID, GetName());
+	}
+	m_Permissions = RankMgr->GetPlayerPermissions(UUID);
+	m_Restrictions = RankMgr->GetPlayerRestrictions(UUID);
+	RankMgr->GetRankVisuals(m_Rank, m_MsgPrefix, m_MsgSuffix, m_MsgNameColorCode);
+
+	// Break up the individual permissions on each dot, into m_SplitPermissions:
+	m_SplitPermissions.clear();
+	m_SplitPermissions.reserve(m_Permissions.size());
+	for (auto & Permission : m_Permissions)
+	{
+		m_SplitPermissions.push_back(StringSplit(Permission, "."));
+	}
+
+	// Break up the individual restrictions on each dot, into m_SplitRestrictions:
+	m_SplitRestrictions.clear();
+	m_SplitRestrictions.reserve(m_Restrictions.size());
+	for (auto & Restriction : m_Restrictions)
+	{
+		m_SplitRestrictions.push_back(StringSplit(Restriction, "."));
 	}
 }
 

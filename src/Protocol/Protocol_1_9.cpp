@@ -501,6 +501,45 @@ void cProtocol_1_9_0::SendPlayerMoveLook(void)
 
 
 
+void cProtocol_1_9_0::SendPlayerPermissionLevel()
+{
+	const cPlayer & Player = *m_Client->GetPlayer();
+
+	cPacketizer Pkt(*this, pktEntityStatus);
+	Pkt.WriteBEUInt32(Player.GetUniqueID());
+	Pkt.WriteBEInt8([&Player]() -> signed char
+	{
+		if (Player.HasPermission("core.stop") || Player.HasPermission("core.reload") || Player.HasPermission("core.save-all"))
+		{
+			return 28;
+		}
+
+		if (Player.HasPermission("core.ban") || Player.HasPermission("core.deop") || Player.HasPermission("core.kick") || Player.HasPermission("core.op"))
+		{
+			return 27;
+		}
+
+		if (
+			Player.HasPermission("cuberite.comandblock.set") || Player.HasPermission("core.clear") || Player.HasPermission("core.difficulty") ||
+			Player.HasPermission("core.effect") || Player.HasPermission("core.gamemode") || Player.HasPermission("core.tp") || Player.HasPermission("core.give")
+		)
+		{
+			return 26;
+		}
+
+		if (Player.HasPermission("core.spawnprotect.bypass"))
+		{
+			return 25;
+		}
+
+		return 24;
+	}());
+}
+
+
+
+
+
 void cProtocol_1_9_0::SendPlayerSpawn(const cPlayer & a_Player)
 {
 	// Called to spawn another player for the client

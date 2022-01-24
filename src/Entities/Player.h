@@ -301,7 +301,7 @@ public:
 
 	// tolua_end
 
-	bool HasPermission(const AString & a_Permission);  // tolua_export
+	bool HasPermission(const AString & a_Permission) const;  // tolua_export
 
 	/** Returns true iff a_Permission matches the a_Template.
 	A match is defined by either being exactly the same, or each sub-item matches until there's a wildcard in a_Template.
@@ -540,20 +540,13 @@ public:
 	/** Returns the UUID that has been read from the client, or nil if not available. */
 	const cUUID & GetUUID(void) const;  // Exported in ManualBindings.cpp
 
-	/** Send the permission level to the client. */
-	void UpdatePermissionLevel(void);
-
 	// tolua_begin
 
 	/** Returns wheter the player can fly or not. */
 	virtual bool CanFly(void) const { return m_IsFlightCapable; }
 
-	/** (Re)loads the rank and permissions from the cRankManager.
-	Loads the m_Rank, m_Permissions, m_MsgPrefix, m_MsgSuffix and m_MsgNameColorCode members. */
+	/** (Re)loads the rank and permissions from the cRankManager and sends a permission level update to the client. */
 	void LoadRank(void);
-
-	/** Returns the permission level of the player. */
-	unsigned int GetPermissionLevel(void);
 
 	/** Sends the block in the specified range around the specified coord to the client
 	as a block change packet.
@@ -791,6 +784,10 @@ private:
 	void AddKnownRecipe(UInt32 RecipeId);
 
 	void TickFreezeCode();
+
+	/** (Re)loads the rank and permissions from the cRankManager.
+	Loads the m_Rank, m_Permissions, m_MsgPrefix, m_MsgSuffix and m_MsgNameColorCode members. */
+	void RefreshRank();
 
 	// cEntity overrides:
 	virtual void ApplyArmorDamage(int DamageBlocked) override;
