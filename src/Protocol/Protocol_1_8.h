@@ -94,6 +94,7 @@ public:
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdatePing       () override;
 	virtual void SendPlayerMoveLook             (void) override;
+	virtual void SendPlayerPermissionLevel      (void) override;
 	virtual void SendPlayerPosition             (void) override;
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) override;
 	virtual void SendPluginMessage              (const AString & a_Channel, ContiguousByteBufferView a_Message) override;

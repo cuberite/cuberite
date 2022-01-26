@@ -169,7 +169,7 @@ function(set_exe_flags TARGET)
 			-Wno-documentation-unknown-command -Wno-reserved-id-macro -Wno-error=unused-command-line-argument
 		)
 
-		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7)
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13)
 			target_compile_options(
 				${TARGET} PRIVATE
 
@@ -184,6 +184,15 @@ function(set_exe_flags TARGET)
 
 				# int to float conversions happen a lot, not worth fixing all warnings:
 				-Wno-implicit-int-float-conversion
+			)
+		endif()
+
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13)
+			target_compile_options(
+				${TARGET} PRIVATE
+
+				# TODO: fix
+				-Wno-reserved-identifier
 			)
 		endif()
 	endif()

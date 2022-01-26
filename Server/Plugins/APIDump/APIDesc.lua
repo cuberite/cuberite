@@ -9774,7 +9774,7 @@ a_Player:OpenWindow(Window);
 								Type = "Vector3i",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: https://minecraft.fandom.com/wiki/Enderman#Teleportation.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
 					},
 					{
 						Params =
@@ -9800,7 +9800,7 @@ a_Player:OpenWindow(Window);
 								Type = "cBoundingBox",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: https://minecraft.fandom.com/wiki/Enderman#Teleportation.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
 					},
 					{
 						Params =
@@ -9826,7 +9826,7 @@ a_Player:OpenWindow(Window);
 								Type = "number",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: https://minecraft.fandom.com/wiki/Enderman#Teleportation.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
 					},
 				},
 				HasEntityEffect =

@@ -324,7 +324,6 @@ void cPawn::HandleFalling(void)
 
 	/* We initialize these with what the foot is really IN, because for sampling we will move down with the epsilon above */
 	bool IsFootInWater = IsBlockWater(BlockAtFoot);
-	bool IsFootInLiquid = IsFootInWater || IsBlockLava(BlockAtFoot) || (BlockAtFoot == E_BLOCK_COBWEB);  // okay so cobweb is not _technically_ a liquid...
 	bool IsFootOnSlimeBlock = false;
 
 	/* The "cross" we sample around to account for the player width/girth */
@@ -377,7 +376,6 @@ void cPawn::HandleFalling(void)
 			if (j == 0)
 			{
 				IsFootInWater |= IsBlockWater(BlockType);
-				IsFootInLiquid |= IsFootInWater || IsBlockLava(BlockType) || (BlockType == E_BLOCK_COBWEB);  // okay so cobweb is not _technically_ a liquid...
 				IsFootOnSlimeBlock |= (BlockType == E_BLOCK_SLIME_BLOCK);
 			}
 

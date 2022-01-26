@@ -501,6 +501,42 @@ void cProtocol_1_9_0::SendPlayerMoveLook(void)
 
 
 
+void cProtocol_1_9_0::SendPlayerPermissionLevel()
+{
+	const cPlayer & Player = *m_Client->GetPlayer();
+
+	cPacketizer Pkt(*this, pktEntityStatus);
+	Pkt.WriteBEUInt32(Player.GetUniqueID());
+	Pkt.WriteBEInt8([&Player]() -> signed char
+	{
+		if (Player.HasPermission("core.stop") || Player.HasPermission("core.reload") || Player.HasPermission("core.save-all"))
+		{
+			return 28;
+		}
+
+		if (Player.HasPermission("core.ban") || Player.HasPermission("core.deop") || Player.HasPermission("core.kick") || Player.HasPermission("core.op"))
+		{
+			return 27;
+		}
+
+		if (Player.HasPermission("cuberite.comandblock.set") || Player.HasPermission("core.clear") || Player.HasPermission("core.difficulty") || Player.HasPermission("core.effect") || Player.HasPermission("core.gamemode") || Player.HasPermission("core.tp") || Player.HasPermission("core.give"))
+		{
+			return 26;
+		}
+
+		if (Player.HasPermission("core.spawnprotect.bypass"))
+		{
+			return 25;
+		}
+
+		return 24;
+	}());
+}
+
+
+
+
+
 void cProtocol_1_9_0::SendPlayerSpawn(const cPlayer & a_Player)
 {
 	// Called to spawn another player for the client
@@ -938,7 +974,7 @@ void cProtocol_1_9_0::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 
 	if (PlayerID != m_Client->GetPlayer()->GetUniqueID())
 	{
-		m_Client->Kick("Mind your own business! Hacked client?");
+		LOGD("Player \"%s\" attempted to action another entity - hacked client?", m_Client->GetUsername().c_str());
 		return;
 	}
 
@@ -1482,13 +1518,12 @@ void cProtocol_1_9_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Ob
 
 void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
-	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
-	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
-	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
-
 	if (a_BlockEntity.GetBlockType() == E_BLOCK_MOB_SPAWNER)
 	{
 		auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
+		a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+		a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+		a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
 		a_Writer.BeginCompound("SpawnData");  // New: SpawnData compound
 			a_Writer.AddString("id", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
 		a_Writer.EndCompound();

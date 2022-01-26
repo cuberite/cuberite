@@ -70,8 +70,40 @@ static void TestWrap(void)
 
 
 
+static void TestXYZPositionRoundtrip(void)
+{
+	cByteBuffer buf(50);
+	buf.WriteXYZPosition64(-33554432, -2048, -33554432); // Testing the minimun values
+	int x, y, z;
+	TEST_TRUE(buf.ReadXYZPosition64(x, y, z));
+	TEST_EQUAL(x, -33554432);
+	TEST_EQUAL(y, -2048);
+	TEST_EQUAL(z, -33554432);
+}
+
+
+
+
+
+static void TestXZYPositionRoundtrip(void)
+{
+	cByteBuffer buf(50);
+	buf.WriteXZYPosition64(-33554432, -2048, -33554432); // Testing the minimun values
+	int x, y, z;
+	TEST_TRUE(buf.ReadXZYPosition64(x, y, z));
+	TEST_EQUAL(x, -33554432);
+	TEST_EQUAL(y, -2048);
+	TEST_EQUAL(z, -33554432);
+}
+
+
+
+
+
 IMPLEMENT_TEST_MAIN("ByteBuffer",
 	TestRead();
 	TestWrite();
 	TestWrap();
+	TestXYZPositionRoundtrip();
+	TestXZYPositionRoundtrip();
 )
