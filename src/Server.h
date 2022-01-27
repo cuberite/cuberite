@@ -96,7 +96,7 @@ public:
 
 	const AString & GetResourcePackUrl(void) { return m_ResourcePackUrl; }
 
-	const AString & GetCustomRedirectUrl(void) { return m_CustomRedirectUrl; }
+	std::string_view GetCustomRedirectUrl(void) { return m_CustomRedirectUrl; }
 
 	bool Start(void);
 

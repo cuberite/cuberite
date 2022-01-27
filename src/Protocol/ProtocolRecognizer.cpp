@@ -76,44 +76,6 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 
 
 
-void cMultiVersionProtocol::HandleHTTPRequest(cClientHandle & a_Client)
-{
-	const AString Response = Printf("HTTP/1.1 303 See Other\r\nLocation: %s\r\n\r\n", cRoot::Get()->GetServer()->GetCustomRedirectUrl());
-	a_Client.SendData({ reinterpret_cast<const std::byte *>(Response.data()), Response.size() });
-	a_Client.Destroy();
-}
-
-
-
-
-
-bool cMultiVersionProtocol::TryHandleHTTPRequest(cClientHandle & a_Client, ContiguousByteBuffer & a_Data)
-{
-	AString redirectUrl = cRoot::Get()->GetServer()->GetCustomRedirectUrl();
-	if (redirectUrl == "") 
-	{ 
-		return false;
-	}
-
-	ContiguousByteBuffer Buffer;
-	m_Buffer.ReadSome(Buffer, static_cast<size_t>(10));
-	m_Buffer.ResetRead();
-
-	AString value = { reinterpret_cast<const char *>(Buffer.data()), Buffer.size() };
-
-	if (value == "GET / HTTP")
-	{
-		HandleHTTPRequest(a_Client);
-		return true;
-	}
-
-	return false;
-}
-
-
-
-
-
 void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, ContiguousByteBuffer & a_Data)
 {
 	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and MCS_PROTOCOL_VERSIONS macros in the header file
@@ -131,7 +93,7 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 	if (TryHandleHTTPRequest(a_Client, a_Data))
 	{
 		return;
-	};
+	}
 
 	// TODO: recover from git history
 	// Unlengthed protocol, ...
@@ -275,6 +237,37 @@ void cMultiVersionProtocol::SendDisconnect(cClientHandle & a_Client, const AStri
 	VERIFY(Out.WriteVarInt32(PacketID));
 	VERIFY(Out.WriteVarUTF8String(Message));
 	SendPacket(a_Client, Out);
+}
+
+
+
+
+
+bool cMultiVersionProtocol::TryHandleHTTPRequest(cClientHandle & a_Client, ContiguousByteBuffer & a_Data)
+{
+	const auto RedirectUrl = cRoot::Get()->GetServer()->GetCustomRedirectUrl();
+
+	if (RedirectUrl.empty())
+	{
+		return false;
+	}
+
+	ContiguousByteBuffer Buffer;
+	m_Buffer.ReadSome(Buffer, 10U);
+	m_Buffer.ResetRead();
+
+	// The request line, hastily decoded with the hope that it's encoded in US-ASCII.
+	const std::string_view Value(reinterpret_cast<const char *>(Buffer.data()), Buffer.size());
+
+	if (Value == u8"GET / HTTP")
+	{
+		const auto Response = fmt::format(u8"HTTP/1.0 303 See Other\r\nLocation: {}\r\n\r\n", cRoot::Get()->GetServer()->GetCustomRedirectUrl());
+		a_Client.SendData({ reinterpret_cast<const std::byte *>(Response.data()), Response.size() });
+		a_Client.Destroy();
+		return true;
+	}
+
+	return false;
 }
 
 
