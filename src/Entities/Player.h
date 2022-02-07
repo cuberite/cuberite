@@ -93,6 +93,9 @@ public:
 	cPlayer(const std::shared_ptr<cClientHandle> & a_Client);
 	virtual ~cPlayer() override;
 
+	/** Called when spectation stops, because the player crouched or when the entity we're spectating gets removed from the world. */
+	void OnLoseSpectated();
+
 	// tolua_begin
 
 	/** Sets the experience total
@@ -184,7 +187,7 @@ public:
 	void SendRotation(double a_YawDegrees, double a_PitchDegrees);
 
 	/** Spectates the target entity. If a_Target is nullptr or a pointer to self, end spectation. */
-	void SpectateEntity(const cEntity * a_Target);
+	void SpectateEntity(cEntity * a_Target);
 
 	/** Returns the position where projectiles thrown by this player should start, player eye position + adjustment */
 	Vector3d GetThrowStartPos(void) const;
@@ -731,7 +734,7 @@ private:
 	cTeam * m_Team;
 
 	/** The entity that this player is spectating, nullptr if none. */
-	const cEntity * m_Spectating;
+	cEntity * m_Spectating;
 
 	StatisticsManager m_Stats;
 

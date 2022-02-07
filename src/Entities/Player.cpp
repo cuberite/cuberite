@@ -170,6 +170,17 @@ cPlayer::~cPlayer(void)
 
 
 
+void cPlayer::OnLoseSpectated()
+{
+	m_ClientHandle->SendCameraSetTo(*this);
+	m_ClientHandle->SendPlayerMoveLook();
+	m_Spectating = nullptr;
+}
+
+
+
+
+
 int cPlayer::CalcLevelFromXp(int a_XpTotal)
 {
 	// level 0 to 15
@@ -1304,18 +1315,23 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 
 	if (m_GameMode == a_GameMode)
 	{
-		// Gamemode already set
+		// New gamemode unchanged, we're done:
 		return;
-	}
-
-	// Detach, if the player is switching from or to the spectator mode
-	if ((m_GameMode == gmSpectator) || (a_GameMode == gmSpectator))
-	{
-		Detach();
 	}
 
 	m_GameMode = a_GameMode;
 	UpdateCapabilities();
+
+	if (IsGameModeSpectator())
+	{
+		// Spectators cannot ride entities:
+		Detach();
+	}
+	else
+	{
+		// Non-spectators may not spectate:
+		SpectateEntity(nullptr);
+	}
 
 	m_ClientHandle->SendGameMode(a_GameMode);
 	m_ClientHandle->SendInventorySlot(-1, -1, m_DraggingItem);
@@ -1452,7 +1468,7 @@ void cPlayer::SendRotation(double a_YawDegrees, double a_PitchDegrees)
 
 
 
-void cPlayer::SpectateEntity(const cEntity * a_Target)
+void cPlayer::SpectateEntity(cEntity * a_Target)
 {
 	if (a_Target == this)
 	{
@@ -1468,13 +1484,13 @@ void cPlayer::SpectateEntity(const cEntity * a_Target)
 
 	if (a_Target == nullptr)
 	{
-		m_ClientHandle->SendCameraSetTo(*this);
-		m_ClientHandle->SendPlayerMoveLook();
-		m_Spectating = nullptr;
+		m_Spectating->OnLoseSpectator(*this);
+		OnLoseSpectated();
 		return;
 	}
 
 	m_Spectating = a_Target;
+	a_Target->OnAcquireSpectator(*this);
 	m_ClientHandle->SendCameraSetTo(*a_Target);
 }
 
@@ -3054,6 +3070,9 @@ void cPlayer::OnRemoveFromWorld(cWorld & a_World)
 
 	// Remove any references to this player pointer by windows in the old world:
 	CloseWindow(false);
+
+	// Stop spectation and remove our reference from the spectated:
+	SpectateEntity(nullptr);
 
 	// Remove the client handle from the world:
 	m_World->RemoveClientFromChunks(m_ClientHandle.get());

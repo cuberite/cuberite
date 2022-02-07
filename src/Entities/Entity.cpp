@@ -134,12 +134,34 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 
 
 
+void cEntity::OnAcquireSpectator(cPlayer & a_Player)
+{
+	m_Spectators.push_back(&a_Player);
+}
+
+
+
+
+
 void cEntity::OnAddToWorld(cWorld & a_World)
 {
 	// Spawn the entity on the clients:
 	m_LastSentPosition = GetPosition();
 	a_World.BroadcastSpawnEntity(*this);
 	BroadcastLeashedMobs();
+}
+
+
+
+
+
+void cEntity::OnLoseSpectator(cPlayer & a_Player)
+{
+	const auto Spectator = std::find(m_Spectators.begin(), m_Spectators.end(), &a_Player);
+
+	ASSERT(Spectator != m_Spectators.end());
+	std::swap(*Spectator, m_Spectators.back());
+	m_Spectators.pop_back();
 }
 
 
@@ -153,6 +175,13 @@ void cEntity::OnRemoveFromWorld(cWorld & a_World)
 	{
 		m_LeashedMobs.front()->Unleash(false, true);
 	}
+
+	for (const auto Player : m_Spectators)
+	{
+		Player->OnLoseSpectated();
+	}
+
+	m_Spectators.clear();
 
 	if (m_AttachedTo != nullptr)
 	{
