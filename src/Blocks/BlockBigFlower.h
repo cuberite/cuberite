@@ -49,10 +49,6 @@ private:
 
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
-		if (IsMetaTopPart(a_BlockMeta))
-		{
-			return {};  // No drops from the top part
-		}
 
 		// With shears, drop self (even tall grass and fern):
 		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == E_ITEM_SHEARS))
@@ -125,7 +121,7 @@ private:
 			auto lowerPartPos = a_BlockPos - Vector3i(0, 1, 0);
 			if (a_ChunkInterface.GetBlock(lowerPartPos) == a_OldBlockType)
 			{
-				a_ChunkInterface.DropBlockAsPickups(lowerPartPos);
+				a_ChunkInterface.SetBlock(lowerPartPos, E_BLOCK_AIR, 0);
 			}
 		}
 		else
@@ -134,7 +130,7 @@ private:
 			auto upperPartPos = a_BlockPos + Vector3i(0, 1, 0);
 			if (a_ChunkInterface.GetBlock(upperPartPos) == a_OldBlockType)
 			{
-				a_ChunkInterface.DropBlockAsPickups(upperPartPos);
+				a_ChunkInterface.SetBlock(upperPartPos, E_BLOCK_AIR, 0);
 			}
 		}
 	}
