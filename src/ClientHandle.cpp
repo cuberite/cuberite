@@ -1498,10 +1498,11 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 		const auto & ItemHandler = HeldItem.GetHandler();
 		const auto & BlockHandler = cBlockHandler::For(BlockType);
+		const bool BlockUsable = BlockHandler.IsUseable() && (m_Player->IsGameModeSpectator() ? cBlockInfo::IsUseableBySpectator(BlockType) : !(m_Player->IsCrouched() && !HeldItem.IsEmpty()));
 		const bool Placeable = ItemHandler.IsPlaceable() && !m_Player->IsGameModeAdventure() && !m_Player->IsGameModeSpectator();
-		const bool BlockUsable = BlockHandler.IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(BlockType));
+		const bool Useable = !m_Player->IsGameModeSpectator();
 
-		if (BlockUsable && !(m_Player->IsCrouched() && !HeldItem.IsEmpty()))
+		if (BlockUsable)
 		{
 			cChunkInterface ChunkInterface(World->GetChunkMap());
 			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
@@ -1537,14 +1538,22 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			ItemHandler.OnPlayerPlace(*m_Player, HeldItem, ClickedPosition, BlockType, BlockMeta, a_BlockFace, CursorPosition);
 			return;
 		}
-		else if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		else if (Useable)
 		{
-			// All plugins agree with using the item.
-			// Use an item in hand with a target block.
+			if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+			{
+				// All plugins agree with using the item.
+				// Use an item in hand with a target block.
 
-			cBlockInServerPluginInterface PluginInterface(*World);
-			ItemHandler.OnItemUse(World, m_Player, PluginInterface, HeldItem, ClickedPosition, a_BlockFace);
-			PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+				cBlockInServerPluginInterface PluginInterface(*World);
+				ItemHandler.OnItemUse(World, m_Player, PluginInterface, HeldItem, ClickedPosition, a_BlockFace);
+				PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+				return;
+			}
+		}
+		else
+		{
+			// (x) None of the above.
 			return;
 		}
 	}
