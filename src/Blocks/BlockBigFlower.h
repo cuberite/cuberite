@@ -125,9 +125,12 @@ private:
 			auto lowerPartPos = a_BlockPos - Vector3i(0, 1, 0);
 			if (a_ChunkInterface.GetBlock(lowerPartPos) == a_OldBlockType)
 			{
-				if (a_Digger->IsPlayer() && (static_cast<const cPlayer *>(a_Digger))->IsGameModeCreative()) {
+				if (a_Digger->IsPlayer() && (static_cast<const cPlayer *>(a_Digger))->IsGameModeCreative())
+				{
 					a_ChunkInterface.SetBlock(lowerPartPos, E_BLOCK_AIR, 0);
-				} else {
+				}
+				else
+				{
 					a_ChunkInterface.DropBlockAsPickups(lowerPartPos);
 				}
 			}
