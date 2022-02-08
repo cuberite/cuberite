@@ -118,30 +118,29 @@ private:
 		const cEntity * a_Digger
 	) const override
 	{
-		UNUSED(a_Digger);
-		if ((a_OldBlockMeta & 0x8) != 0)
+		if (IsMetaTopPart(a_OldBlockMeta))
 		{
-			// Was upper part of flower
-			auto lowerPartPos = a_BlockPos - Vector3i(0, 1, 0);
-			if (a_ChunkInterface.GetBlock(lowerPartPos) == a_OldBlockType)
+			const auto LowerPart = a_BlockPos.addedY(-1);
+			if (a_ChunkInterface.GetBlock(LowerPart) == a_OldBlockType)
 			{
-				if (a_Digger->IsPlayer() && (static_cast<const cPlayer *>(a_Digger))->IsGameModeCreative())
+				// Prevent creative punches from dropping pickups.
+				// TODO: Simplify to SetBlock and remove the IsMetaTopPart check in DropBlockAsPickups when 1.13 blockstates arrive.
+				if (a_Digger->IsPlayer() && static_cast<const cPlayer *>(a_Digger)->IsGameModeCreative())
 				{
-					a_ChunkInterface.SetBlock(lowerPartPos, E_BLOCK_AIR, 0);
+					a_ChunkInterface.SetBlock(LowerPart, E_BLOCK_AIR, 0);
 				}
 				else
 				{
-					a_ChunkInterface.DropBlockAsPickups(lowerPartPos);
+					a_ChunkInterface.DropBlockAsPickups(LowerPart);
 				}
 			}
 		}
 		else
 		{
-			// Was lower part
-			auto upperPartPos = a_BlockPos + Vector3i(0, 1, 0);
-			if (a_ChunkInterface.GetBlock(upperPartPos) == a_OldBlockType)
+			const auto UpperPart = a_BlockPos.addedY(1);
+			if (a_ChunkInterface.GetBlock(UpperPart) == a_OldBlockType)
 			{
-				a_ChunkInterface.SetBlock(upperPartPos, E_BLOCK_AIR, 0);
+				a_ChunkInterface.SetBlock(UpperPart, E_BLOCK_AIR, 0);
 			}
 		}
 	}
