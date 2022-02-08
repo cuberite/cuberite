@@ -1499,8 +1499,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		const auto & ItemHandler = HeldItem.GetHandler();
 		const auto & BlockHandler = cBlockHandler::For(BlockType);
 		const bool BlockUsable = BlockHandler.IsUseable() && (m_Player->IsGameModeSpectator() ? cBlockInfo::IsUseableBySpectator(BlockType) : !(m_Player->IsCrouched() && !HeldItem.IsEmpty()));
-		const bool Placeable = ItemHandler.IsPlaceable() && !m_Player->IsGameModeAdventure() && !m_Player->IsGameModeSpectator();
-		const bool Useable = !m_Player->IsGameModeSpectator();
+		const bool ItemPlaceable = ItemHandler.IsPlaceable() && !m_Player->IsGameModeAdventure() && !m_Player->IsGameModeSpectator();
+		const bool ItemUseable = !m_Player->IsGameModeSpectator();
 
 		if (BlockUsable)
 		{
@@ -1514,8 +1514,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 					return;  // Block use was successful, we're done.
 				}
 
-				// Check if the item is place able, for example a torch on a fence:
-				if (Placeable)
+				// If block use failed, fall back to placement:
+				if (ItemPlaceable)
 				{
 					// Place a block:
 					ItemHandler.OnPlayerPlace(*m_Player, HeldItem, ClickedPosition, BlockType, BlockMeta, a_BlockFace, CursorPosition);
@@ -1524,7 +1524,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				return;
 			}
 		}
-		else if (Placeable)
+		else if (ItemPlaceable)
 		{
 			// TODO: Double check that we don't need this for using item and for packet out of range
 			m_NumBlockChangeInteractionsThisTick++;
@@ -1538,7 +1538,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			ItemHandler.OnPlayerPlace(*m_Player, HeldItem, ClickedPosition, BlockType, BlockMeta, a_BlockFace, CursorPosition);
 			return;
 		}
-		else if (Useable)
+		else if (ItemUseable)
 		{
 			if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 			{
