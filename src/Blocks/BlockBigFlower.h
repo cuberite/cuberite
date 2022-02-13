@@ -125,7 +125,7 @@ private:
 			{
 				// Prevent creative punches from dropping pickups.
 				// TODO: Simplify to SetBlock and remove the IsMetaTopPart check in DropBlockAsPickups when 1.13 blockstates arrive.
-				if (a_Digger->IsPlayer() && static_cast<const cPlayer *>(a_Digger)->IsGameModeCreative())
+				if ((a_Digger != nullptr) && a_Digger->IsPlayer() && static_cast<const cPlayer *>(a_Digger)->IsGameModeCreative())
 				{
 					a_ChunkInterface.SetBlock(LowerPart, E_BLOCK_AIR, 0);
 				}
