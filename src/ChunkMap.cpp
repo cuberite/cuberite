@@ -1016,8 +1016,8 @@ bool cChunkMap::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a
 	// Calculate the chunk range for the box:
 	int MinChunkX = FloorC(a_Box.GetMinX() / cChunkDef::Width);
 	int MinChunkZ = FloorC(a_Box.GetMinZ() / cChunkDef::Width);
-	int MaxChunkX = FloorC((a_Box.GetMaxX() + cChunkDef::Width) / cChunkDef::Width);
-	int MaxChunkZ = FloorC((a_Box.GetMaxZ() + cChunkDef::Width) / cChunkDef::Width);
+	int MaxChunkX = FloorC(a_Box.GetMaxX() / cChunkDef::Width);
+	int MaxChunkZ = FloorC(a_Box.GetMaxZ() / cChunkDef::Width);
 
 	// Iterate over each chunk in the range:
 	cCSLock Lock(m_CSChunks);
