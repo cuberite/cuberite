@@ -229,6 +229,43 @@ void ChunkLightData::SetSection(const SectionType & a_BlockLightSource, const Se
 
 
 
+void ChunkPoiData::Assign(const ChunkPoiData & a_Other)
+{
+	m_Poies = std::move(a_Other.m_Poies);
+}
+
+
+
+
+
+void ChunkPoiData::AddPoi(const cPointOfInterest & a_Poi)
+{
+	m_Poies.at(a_Poi.GetBlockPosition().y % 16).push_back(a_Poi);
+}
+
+
+
+
+
+void ChunkPoiData::RemovePoi(Vector3i a_Position)
+{
+	PoiArray & SectionPoies = m_Poies.at(a_Position.y % 16);
+	auto It = std::find_if(SectionPoies.begin(), SectionPoies.end(), [&a_Position](const cPointOfInterest & a_Poi)
+	{
+		return a_Position == a_Poi.GetBlockPosition();
+	});
+
+	if (It != SectionPoies.end())
+	{
+		SectionPoies.erase(It);
+	}
+
+}
+
+
+
+
+
 template struct ChunkDataStore<BLOCKTYPE, ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue>;
 template struct ChunkDataStore<NIBBLETYPE, ChunkBlockData::SectionMetaCount, ChunkLightData::DefaultBlockLightValue>;
 template struct ChunkDataStore<NIBBLETYPE, ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue>;

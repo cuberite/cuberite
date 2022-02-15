@@ -52,8 +52,8 @@ class cPointOfInterest
 {
 public:
 
-	cPointOfInterest(Vector3i a_BlockPosition, BLOCKTYPE a_BlockType) :
-		m_BlockPosition(a_BlockPosition), m_Type(GetPointOnInterestType(a_BlockType)),
+	cPointOfInterest(Vector3i a_BlockPosition, ePointOfInterestType a_PoiType) :
+		m_BlockPosition(a_BlockPosition), m_Type(a_PoiType),
 		m_FreeTickets(GetMaxFreeTickets(m_Type)) {}
 
 	static ePointOfInterestType GetPointOnInterestType(BLOCKTYPE a_BlockType);
