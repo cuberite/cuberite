@@ -13,6 +13,7 @@ Implements the 1.14 protocol classes:
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
+#include "../UI/HorseWindow.h"
 
 #include "Palettes/Upgrade.h"
 #include "Palettes/Palette_1_14.h"
@@ -257,7 +258,7 @@ void cProtocol_1_14::SendWindowOpen(const cWindow & a_Window)
 	{
 		cPacketizer Pkt(*this, pktHorseWindowOpen);
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
-		Pkt.WriteVarInt32(a_Window.GetNumSlots());
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Window.GetNumSlots()));
 
 		UInt32 HorseID = static_cast<const cHorseWindow &>(a_Window).GetHorseID();
 		Pkt.WriteBEInt32(static_cast<Int32>(HorseID));
