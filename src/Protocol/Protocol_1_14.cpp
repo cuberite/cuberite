@@ -270,6 +270,33 @@ void cProtocol_1_14::SendWindowOpen(const cWindow & a_Window)
 
 		switch (a_Window.GetWindowType())
 		{
+			case cWindow::wtChest:
+			{
+				// Chests can have multiple size
+				Pkt.WriteVarInt32(static_cast<UInt32>(a_Window.GetNumNonInventorySlots() / 9 - 1));
+				break;
+			}
+			case cWindow::wtDropper:
+			case cWindow::wtDropSpenser:
+			{
+				Pkt.WriteVarInt32(6);
+				break;
+			}
+			case cWindow::wtAnvil:
+			{
+				Pkt.WriteVarInt32(7);
+				break;
+			}
+			case cWindow::wtBeacon:
+			{
+				Pkt.WriteVarInt32(8);
+				break;
+			}
+			case cWindow::wtBrewery:
+			{
+				Pkt.WriteVarInt32(10);
+				break;
+			}
 			case cWindow::wtWorkbench:
 			{
 				Pkt.WriteVarInt32(11);
@@ -280,12 +307,62 @@ void cProtocol_1_14::SendWindowOpen(const cWindow & a_Window)
 				Pkt.WriteVarInt32(12);
 				break;
 			}
-			case cWindow::wtAnvil:
+			case cWindow::wtFurnace:
 			{
-				Pkt.WriteVarInt32(7);
-				Pkt.WriteBEUInt8(0);
+				Pkt.WriteVarInt32(13);
 				break;
 			}
+			/*
+			case cWindow::wtGrindstone:
+			{
+				Pkt.WriteVarInt32(14);
+				break;
+			}
+			*/
+			case cWindow::wtHopper:
+			{
+				Pkt.WriteVarInt32(15);
+				break;
+			}
+			/*
+			case cWindow::wtLectern:
+			{
+				Pkt.WriteVarInt32(16);
+				break;
+			}
+			case cWindow::wtLoom:
+			{
+				Pkt.WriteVarInt32(17);
+				break;
+			}
+			*/
+			case cWindow::wtNPCTrade:
+			{
+				Pkt.WriteVarInt32(18);
+				break;
+			}
+			/*
+			case cWindow::wtShulker:
+			{
+				Pkt.WriteVarInt32(19);
+				break;
+			}
+			case cWindow::wtSmoker:
+			{
+				Pkt.WriteVarInt32(20);
+				break;
+			}
+			case cWindow::wtCartography:
+			{
+				Pkt.WriteVarInt32(21);
+				break;
+			}
+			case cWindow::wtStonecutter:
+			{
+				Pkt.WriteVarInt32(22);
+				break;
+			}
+			*/
 			default:
 			{
 				Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetNumNonInventorySlots()));
