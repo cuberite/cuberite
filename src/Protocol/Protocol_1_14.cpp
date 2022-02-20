@@ -173,6 +173,7 @@ void cProtocol_1_14::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
+
 void cProtocol_1_14::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
 	ASSERT(m_State == 3);  // In game mode?
