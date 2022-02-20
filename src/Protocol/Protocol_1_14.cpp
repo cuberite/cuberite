@@ -173,6 +173,59 @@ void cProtocol_1_14::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
+void cProtocol_1_14::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktParticleEffect);
+	Pkt.WriteBEInt32(GetProtocolParticleID(a_ParticleName));
+	Pkt.WriteBool(false);
+	Pkt.WriteBEFloat(a_SrcX);
+	Pkt.WriteBEFloat(a_SrcY);
+	Pkt.WriteBEFloat(a_SrcZ);
+	Pkt.WriteBEFloat(a_OffsetX);
+	Pkt.WriteBEFloat(a_OffsetY);
+	Pkt.WriteBEFloat(a_OffsetZ);
+	Pkt.WriteBEFloat(a_ParticleData);
+	Pkt.WriteBEInt32(a_ParticleAmount);
+}
+
+
+
+
+
+void cProtocol_1_14::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	const auto ParticleID = GetProtocolParticleID(a_ParticleName);
+
+	cPacketizer Pkt(*this, pktParticleEffect);
+	Pkt.WriteBEInt32(ParticleID);
+	Pkt.WriteBool(false);
+	Pkt.WriteBEFloat(a_Src.x);
+	Pkt.WriteBEFloat(a_Src.y);
+	Pkt.WriteBEFloat(a_Src.z);
+	Pkt.WriteBEFloat(a_Offset.x);
+	Pkt.WriteBEFloat(a_Offset.y);
+	Pkt.WriteBEFloat(a_Offset.z);
+	Pkt.WriteBEFloat(a_ParticleData);
+	Pkt.WriteBEInt32(a_ParticleAmount);
+
+	switch (ParticleID)
+	{
+		// blockdust
+		case 3:
+		{
+			Pkt.WriteVarInt32(static_cast<UInt32>(a_Data[0]));
+			break;
+		}
+	}
+}
+
+
+
+
 
 void cProtocol_1_14::SendRespawn(eDimension a_Dimension)
 {
@@ -189,6 +242,15 @@ void cProtocol_1_14::SendRespawn(eDimension a_Dimension)
 
 void cProtocol_1_14::SendSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
 {
+	ASSERT(m_State == 3);  // In game mode?
+
+	// Note: Particles from block break missing
+
+	cPacketizer Pkt(*this, pktSoundParticleEffect);
+	Pkt.WriteBEInt32(static_cast<int>(a_EffectID));
+	Pkt.WriteXYZPosition64(a_SrcX, a_SrcY, a_SrcZ);
+	Pkt.WriteBEInt32(a_Data);
+	Pkt.WriteBool(false);
 }
 
 
@@ -760,6 +822,88 @@ UInt32 cProtocol_1_14::GetProtocolMobType(eMonsterType a_MobType) const
 
 		default:                      return 0;
 	}
+}
+
+
+
+
+
+int cProtocol_1_14::GetProtocolParticleID(const AString & a_ParticleName) const
+{
+	static const std::unordered_map<AString, int> ParticleMap
+	{
+		// Initialize the ParticleMap:
+		{ "ambiantentity",           0 },
+		{ "angryvillager",           1 },
+		{ "barrier",                 2 },
+		{ "blockdust",               3 },
+		{ "bubble",                  4 },
+		{ "cloud",                   5 },
+		{ "crit",                    6 },
+		{ "damageindicator",         7 },
+		{ "dragonbreath",            8 },
+		{ "driplava",                9 },
+		{ "fallinglava",            10 },
+		{ "landinglava",            11 },
+		{ "dripwater",              12 },
+		{ "fallingwater",           13 },
+		{ "dust",                   14 },
+		{ "effect",                 15 },
+		{ "elderguardian",          16 },
+		{ "enchantedhit",           17 },
+		{ "enchant",                18 },
+		{ "endrod",                 19 },
+		{ "entityeffect",           20 },
+		{ "explosionemitter",       21 },
+		{ "explode",                22 },
+		{ "fallingdust",            23 },
+		{ "firework",               24 },
+		{ "fishing",                25 },
+		{ "flame",                  26 },
+		{ "flash",                  27 },
+		{ "happyvillager",          28 },
+		{ "composter",              29 },
+		{ "heart",                  30 },
+		{ "instanteffect",          31 },
+		{ "item",                   32 },
+		{ "slime",                  33 },
+		{ "snowball",               34 },
+		{ "largesmoke",             35 },
+		{ "lava",                   36 },
+		{ "mycelium",               37 },
+		{ "note",                   38 },
+		{ "poof",                   39 },
+		{ "portal",                 40 },
+		{ "rain",                   41 },
+		{ "smoke",                  42 },
+		{ "sneeze",                 43 },
+		{ "spit",                   44 },
+		{ "squidink",               45 },
+		{ "sweepattack",            46 },
+		{ "totem",                  47 },
+		{ "underwater",             48 },
+		{ "splash",                 49 },
+		{ "witch",                  50 },
+		{ "bubblepop",              51 },
+		{ "currentdown",            52 },
+		{ "bubblecolumnup",         53 },
+		{ "nautilus",               54 },
+		{ "dolphin",                55 },
+		{ "campfirecosysmoke",      56 },
+		{ "campfiresignalsmoke",    57 },
+	};
+
+
+	const auto ParticleName = StrToLower(a_ParticleName);
+	const auto FindResult = ParticleMap.find(ParticleName);
+	if (FindResult == ParticleMap.end())
+	{
+		LOGWARNING("Unknown particle: %s", a_ParticleName.c_str());
+		ASSERT(!"Unknown particle");
+		return 0;
+	}
+
+	return FindResult->second;
 }
 
 

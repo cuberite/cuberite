@@ -3950,7 +3950,7 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity) const
 
 
 
-int cProtocol_1_8_0::GetProtocolParticleID(const AString & a_ParticleName)
+int cProtocol_1_8_0::GetProtocolParticleID(const AString & a_ParticleName) const
 {
 	static const std::unordered_map<AString, int> ParticleMap
 	{

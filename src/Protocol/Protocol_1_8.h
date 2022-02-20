@@ -162,6 +162,9 @@ protected:
 	/** Converts eMonsterType to protocol-specific mob types */
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const;
 
+	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
+	virtual int GetProtocolParticleID(const AString & a_ParticleName) const;
+
 	/** Returns the protocol version. */
 	virtual Version GetProtocolVersion() const override;
 
@@ -256,9 +259,6 @@ private:
 
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
 	void AddReceivedData(cByteBuffer & a_Buffer, ContiguousByteBufferView a_Data);
-
-	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
-	static int GetProtocolParticleID(const AString & a_ParticleName);
 
 	/** Converts a statistic to a protocol-specific string.
 	Protocols <= 1.12 use strings, hence this is a static as the string-mapping was append-only for the versions that used it.

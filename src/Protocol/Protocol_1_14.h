@@ -39,6 +39,8 @@ protected:
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
+	virtual void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) override;
+	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
 	virtual void SendRespawn                    (eDimension a_Dimension) override;
 	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
@@ -53,6 +55,7 @@ protected:
 	virtual UInt8 GetProtocolEntityType(const cEntity & a_Entity) const override;
 	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) const override;
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
+	virtual int GetProtocolParticleID(const AString & a_ParticleName) const override;
 	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const override;
 	virtual Version GetProtocolVersion() const override;
 
