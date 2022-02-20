@@ -45,6 +45,7 @@ protected:
 	virtual void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) override;
 
+	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata) const override;
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
 	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override;
@@ -60,6 +61,7 @@ protected:
 	virtual void HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer) override;
 
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override {}
-	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const override {}
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, EntityMetadata a_Metadata, EntityMetadataType a_FieldType) const override;
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
+	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const override;
 };
