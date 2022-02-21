@@ -13,19 +13,51 @@ Implements the 1.14 protocol classes:
 #include "../Server.h"
 #include "../World.h"
 #include "../UI/HorseWindow.h"
+#include "../ClientHandle.h"
+#include "../WorldStorage/FastNBT.h"
+#include "../BlockEntities/BlockEntity.h"
 
-#include "../Entities/Boat.h"
-#include "../Entities/EnderCrystal.h"
-#include "../Entities/Minecart.h"
-#include "../Entities/Pickup.h"
-#include "../Entities/Player.h"
-#include "../Entities/ItemFrame.h"
 #include "../Entities/ArrowEntity.h"
-#include "../Entities/FireworkEntity.h"
-#include "../Entities/SplashPotionEntity.h"
+#include "../Mobs/Bat.h"
+#include "../Entities/Boat.h"
+#include "../Mobs/Chicken.h"
+#include "../Mobs/Cow.h"
+#include "../Mobs/Creeper.h"
+#include "../Entities/EnderCrystal.h"
+#include "../Mobs/Enderman.h"
+#include "../Mobs/Ghast.h"
+#include "../Mobs/Horse.h"
+#include "../Mobs/MagmaCube.h"
+#include "../Entities/Minecart.h"
+#include "../Mobs/Ocelot.h"
+#include "../Entities/Pickup.h"
+#include "../Mobs/Pig.h"
+#include "../Entities/Player.h"
+#include "../Mobs/Rabbit.h"
+#include "../Mobs/Sheep.h"
+#include "../Mobs/Skeleton.h"
+#include "../Mobs/Slime.h"
+#include "../Mobs/Villager.h"
+#include "../Mobs/Wolf.h"
+#include "../Mobs/Wither.h"
+#include "../Mobs/Zombie.h"
+#include "../Mobs/ZombiePigman.h"
 
 #include "Palettes/Upgrade.h"
 #include "Palettes/Palette_1_14.h"
+
+
+
+
+
+#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
+	Type Var; \
+	do { \
+		if (!ByteBuf.Proc(Var))\
+		{\
+			return;\
+		} \
+	} while (false)
 
 
 
