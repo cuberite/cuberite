@@ -2579,9 +2579,9 @@ bool cPlayer::IsInsideWater()
 {
 	const auto EyePos = GetEyePosition().Floor();
 
-	// Not in water if in void.
 	if (!cChunkDef::IsValidHeight(EyePos.y))
 	{
+		// Not in water if in void.
 		return false;
 	}
 
