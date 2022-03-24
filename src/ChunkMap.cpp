@@ -474,6 +474,11 @@ void cChunkMap::CollectPickupsByEntity(cEntity & a_Entity)
 
 BLOCKTYPE cChunkMap::GetBlock(Vector3i a_BlockPos) const
 {
+	if (!cChunkDef::IsValidHeight(a_BlockPos.y))
+	{
+		return 0;
+	}
+
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 
@@ -493,6 +498,11 @@ BLOCKTYPE cChunkMap::GetBlock(Vector3i a_BlockPos) const
 
 NIBBLETYPE cChunkMap::GetBlockMeta(Vector3i a_BlockPos) const
 {
+	if (!cChunkDef::IsValidHeight(a_BlockPos.y))
+	{
+		return 0;
+	}
+
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 
