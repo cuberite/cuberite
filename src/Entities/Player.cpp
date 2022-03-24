@@ -2579,9 +2579,11 @@ bool cPlayer::IsInsideWater()
 {
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
-	m_World->GetBlockTypeMeta(GetEyePosition().Floor(), Block, Meta);
 
-	if ((Block != E_BLOCK_WATER) && (Block != E_BLOCK_STATIONARY_WATER))
+	if (
+		!m_World->GetBlockTypeMeta(GetEyePosition().Floor(), Block, Meta) ||
+		((Block != E_BLOCK_WATER) && (Block != E_BLOCK_STATIONARY_WATER))
+	)
 	{
 		return false;
 	}

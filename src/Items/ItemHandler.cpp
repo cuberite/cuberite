@@ -1063,7 +1063,7 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 		NIBBLETYPE PlaceMeta;
 		const auto PlacePosition = AddFaceDirection(a_ClickedPosition, a_ClickedBlockFace);
 
-		if (!cChunkDef::IsValidHeight(PlacePosition.y) || !World.GetBlockTypeMeta(PlacePosition, PlaceBlock, PlaceMeta))
+		if (!World.GetBlockTypeMeta(PlacePosition, PlaceBlock, PlaceMeta))
 		{
 			// The block is being placed outside the world, ignore this packet altogether (GH #128):
 			return;
