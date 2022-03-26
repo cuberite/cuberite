@@ -320,7 +320,7 @@ void cPawn::HandleFalling(void)
 	With this in mind, we first check the block at the player's feet, then the one below that (because fences),
 	and decide which behaviour we want to go with.
 	*/
-	BLOCKTYPE BlockAtFoot = (cChunkDef::IsValidHeight(POSY_TOINT)) ? GetWorld()->GetBlock(POS_TOINT) : E_BLOCK_AIR;
+	BLOCKTYPE BlockAtFoot = (cChunkDef::IsValidHeight(POSY_TOINT)) ? GetWorld()->GetBlock(POS_TOINT) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
 
 	/* We initialize these with what the foot is really IN, because for sampling we will move down with the epsilon above */
 	bool IsFootInWater = IsBlockWater(BlockAtFoot);

@@ -2377,8 +2377,8 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const std::initializer_list<sSetB
 		cBoundingBox BlockBox = cBlockHandler::For(blk.m_BlockType).GetPlacementCollisionBox(
 			m_World->GetBlock({ x - 1, y, z }),
 			m_World->GetBlock({ x + 1, y, z }),
-			(y == 0) ? E_BLOCK_AIR : m_World->GetBlock({ x, y - 1, z }),
-			(y == cChunkDef::Height - 1) ? E_BLOCK_AIR : m_World->GetBlock({ x, y + 1, z }),
+			(y == 0) ? static_cast<BLOCKTYPE>(E_BLOCK_AIR) : m_World->GetBlock({ x, y - 1, z }),
+			(y == cChunkDef::Height - 1) ? static_cast<BLOCKTYPE>(E_BLOCK_AIR) : m_World->GetBlock({ x, y + 1, z }),
 			m_World->GetBlock({ x, y, z - 1 }),
 			m_World->GetBlock({ x, y, z + 1 })
 		);

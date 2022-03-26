@@ -538,7 +538,7 @@ bool cByteBuffer::ReadUUID(cUUID & a_Value)
 {
 	CHECK_THREAD
 
-	std::array<Byte, 16> UUIDBuf;
+	std::array<Byte, 16> UUIDBuf = {0};
 	if (!ReadBuf(UUIDBuf.data(), UUIDBuf.size()))
 	{
 		return false;
