@@ -73,7 +73,7 @@ void cFurnaceRecipe::ReloadRecipes(void)
 		size_t FirstCommentSymbol = ParsingLine.find('#');
 		if ((FirstCommentSymbol != AString::npos) && (FirstCommentSymbol != 0))
 		{
-			ParsingLine.erase(ParsingLine.begin() + static_cast<const long>(FirstCommentSymbol), ParsingLine.end());
+			ParsingLine.erase(ParsingLine.begin() + static_cast<long>(FirstCommentSymbol), ParsingLine.end());
 		}
 
 		if (IsOnlyWhitespace(ParsingLine))

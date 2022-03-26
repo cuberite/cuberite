@@ -2972,6 +2972,7 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 				{
 					a_Item.m_RepairCost = NBT.GetInt(tag);
 				}
+				break;
 			}
 			default: LOGD("Unimplemented NBT data when parsing!"); break;
 		}
@@ -3940,6 +3941,8 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity)
 				case PType::pkFirework: return 76;
 				case PType::pkWitherSkull: return 66;
 			}
+
+			break;
 		}
 		case Type::etFloater: return 90;
 		case Type::etItemFrame: return 71;

@@ -321,7 +321,7 @@ cTCPLink::cCallbacksPtr cServer::OnConnectionAccepted(const AString & a_RemoteIP
 	cClientHandlePtr NewHandle = std::make_shared<cClientHandle>(a_RemoteIPAddress, m_ClientViewDistance);
 	cCSLock Lock(m_CSClients);
 	m_Clients.push_back(NewHandle);
-	return std::move(NewHandle);
+	return NewHandle;
 }
 
 
