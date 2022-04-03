@@ -478,6 +478,14 @@ void cPawn::HandleFalling(void)
 
 
 
+void cPawn::HandleFarmlandTrampling(void) {
+
+}
+
+
+
+
+
 void cPawn::OnRemoveFromWorld(cWorld & a_World)
 {
 	StopEveryoneFromTargetingMe();
