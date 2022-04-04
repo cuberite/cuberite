@@ -34,18 +34,16 @@ public:
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 
 	/** Handles farmland trampling when hitting the ground.
-	
 	Mobs smaller than 0.512 blocks will never trample (Java Edition's behavior).
-	Other mobs with custom trampling behavior (always/never trampling) should override this function.
 
 	Default algorithm:
-	fall height <= 0.75 blocks: no trampling
-	fall height > 0.75 and <= 1.125: 25% chance of trampling
-	fall height > 1.125 and <= 1.625: 66% chance of trampling
-	fall height > 1.625: always trample
+	fall height <= 0.625 blocks: no trampling
+	fall height > 0.625 and <= 1.0: 25% chance of trampling
+	fall height > 1.0 and <= 1.5: 66% chance of trampling
+	fall height > 1.5: always trample
 	The values may differ from vanilla, they were determined experimentally.
 	*/
-	virtual void HandleFarmlandTrampling(void);
+	void HandleFarmlandTrampling(void);
 
 	/** Tells all pawns which are targeting us to stop targeting us. */
 	void StopEveryoneFromTargetingMe();

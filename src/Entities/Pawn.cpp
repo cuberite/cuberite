@@ -478,7 +478,8 @@ void cPawn::HandleFalling(void)
 
 
 
-void cPawn::HandleFarmlandTrampling(void) {
+void cPawn::HandleFarmlandTrampling(void)
+{
 
 }
 
