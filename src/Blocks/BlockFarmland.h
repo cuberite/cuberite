@@ -25,6 +25,11 @@ public:
 
 	using Super::Super;
 
+	void TurnToDirt(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos) const
+	{
+		a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_DIRT, 0);
+	}
+
 private:
 
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
@@ -76,7 +81,7 @@ private:
 			}
 			default:
 			{
-				a_Chunk.SetBlock(a_RelPos, E_BLOCK_DIRT, 0);
+				TurnToDirt(a_ChunkInterface, a_RelPos);
 				break;
 			}
 		}
@@ -104,7 +109,7 @@ private:
 		auto upperBlock = a_ChunkInterface.GetBlock(a_BlockPos.addedY(1));
 		if (cBlockInfo::FullyOccupiesVoxel(upperBlock))
 		{
-			a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_DIRT, 0);
+			TurnToDirt(a_ChunkInterface, a_BlockPos);
 		}
 	}
 

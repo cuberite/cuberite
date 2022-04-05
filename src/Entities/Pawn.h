@@ -37,10 +37,10 @@ public:
 	Mobs smaller than 0.512 blocks will never trample (Java Edition's behavior).
 
 	Default algorithm:
-	fall height <= 0.625 blocks: no trampling
-	fall height > 0.625 and <= 1.0: 25% chance of trampling
-	fall height > 1.0 and <= 1.5: 66% chance of trampling
-	fall height > 1.5: always trample
+	fall height <= 0.6875 blocks: no trampling
+	fall height > 0.6875 and <= 1.0625: 25% chance of trampling
+	fall height > 1.0625 and <= 1.5625: 66% chance of trampling
+	fall height > 1.5625: always trample
 	The values may differ from vanilla, they were determined experimentally.
 	*/
 	void HandleFarmlandTrampling(void);
