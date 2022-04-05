@@ -1308,7 +1308,7 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 	}
 
 	// Adding POI if the block placed is a POI:
-	ePointOfInterestType PoiType = cPointOfInterest::GetPointOnInterestType(a_BlockType);
+	ePointOfInterestType PoiType = cPointOfInterest::GetPointOnInterestType(a_BlockType, a_BlockMeta);
 
 	if (PoiType != poiNone)
 	{

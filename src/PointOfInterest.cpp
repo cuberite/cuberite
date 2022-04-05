@@ -8,7 +8,7 @@
 
 
 
-ePointOfInterestType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockType)
+ePointOfInterestType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	switch (a_BlockType)
 	{
@@ -83,9 +83,17 @@ ePointOfInterestType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockT
 		}
 		*/
 
+		// The bed is a special case: only the head is a poi
 		case E_BLOCK_BED:
 		{
-			return poiHome;
+			if ((a_BlockMeta >> 3 & 1) == 1)
+			{
+				return poiHome;
+			}
+			else
+			{
+				return poiNone;
+			}
 		}
 
 		/*

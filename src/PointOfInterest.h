@@ -56,7 +56,7 @@ public:
 		m_BlockPosition(a_BlockPosition), m_Type(a_PoiType),
 		m_FreeTickets(GetMaxFreeTickets(m_Type)) {}
 
-	static ePointOfInterestType GetPointOnInterestType(BLOCKTYPE a_BlockType);
+	static ePointOfInterestType GetPointOnInterestType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	static int GetMaxFreeTickets(ePointOfInterestType a_Type);
 
 	// Getters
