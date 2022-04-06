@@ -59,6 +59,9 @@ public:
 	static ePointOfInterestType GetPointOnInterestType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	static int GetMaxFreeTickets(ePointOfInterestType a_Type);
 
+	static std::string GetPoiTypeName(ePointOfInterestType a_Type);
+	static ePointOfInterestType GetPoiFromString(const std::string & a_PoiName);
+
 	// Getters
 	const Vector3i & GetBlockPosition() const { return m_BlockPosition; }
 	ePointOfInterestType GetPoiType() const { return m_Type; }

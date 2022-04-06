@@ -174,3 +174,76 @@ int cPointOfInterest::GetMaxFreeTickets(ePointOfInterestType a_Type)
 		}
 	}
 }
+
+
+
+
+
+std::string cPointOfInterest::GetPoiTypeName(ePointOfInterestType a_Type)
+{
+	switch (a_Type)
+	{
+		case poiArmorer:        return "minecraft:armorer";
+		case poiBeehive:        return "minecraft:beehive";
+		case poiBeeNest:        return "minecraft:beenest";
+		case poiButcher:        return "minecraft:butcher";
+		case poiCartographer:   return "minecraft:cartographer";
+		case poiCleric:         return "minecraft:cleric";
+		case poiFarmer:         return "minecraft:farmer";
+		case poiFisherman:      return "minecraft:fisherman";
+		case poiFletcher:       return "minecraft:fletcher";
+		case poiHome:           return "minecraft:home";
+		case poiLetherworker:   return "minecraft:letherworker";
+		case poiLibrairian:     return "minecraft:librairian";
+		case poiLightningRod:   return "minecraft:lightning_rod";
+		case poiLodestone:      return "minecraft:lodestone";
+		case poiMason:          return "minecraft:mason";
+		case poiMeeting:        return "minecraft:meeting";
+		case poiNetherPortal:   return "minecraft:nether_portal";
+		case poiShepherd:       return "minecraft:shepherd";
+		case poiToolsmith:      return "minecraft:toolsmith";
+		case poiWeaponsmith:    return "minecraft:weaponsmith";
+
+		case poiNone:    return "none";
+	}
+}
+
+
+
+
+
+ePointOfInterestType cPointOfInterest::GetPoiFromString(const std::string & a_PoiName)
+{
+	static const std::map<std::string, ePointOfInterestType> StringToPoi
+	{
+		{ "minecraft:armorer",          poiArmorer },
+		{ "minecraft:beehive",          poiBeehive },
+		{ "minecraft:beenest",          poiBeeNest },
+		{ "minecraft:butcher",          poiButcher },
+		{ "minecraft:cartographer",     poiCartographer },
+		{ "minecraft:cleric",           poiCleric },
+		{ "minecraft:farmer",           poiFarmer },
+		{ "minecraft:fisherman",        poiFisherman },
+		{ "minecraft:fletcher",         poiFletcher },
+		{ "minecraft:home",             poiHome },
+		{ "minecraft:letherworker",     poiLetherworker },
+		{ "minecraft:librairian",       poiLibrairian },
+		{ "minecraft:lightning_rod",    poiLightningRod },
+		{ "minecraft:lodestone",        poiLodestone },
+		{ "minecraft:mason",            poiMason },
+		{ "minecraft:meeting",          poiMeeting },
+		{ "minecraft:nether_portal",    poiNetherPortal },
+		{ "minecraft:shepherd",         poiShepherd },
+		{ "minecraft:toolsmith",        poiToolsmith },
+		{ "minecraft:weaponsmith",      poiWeaponsmith },
+	};
+
+	const auto It = StringToPoi.find(a_PoiName);
+
+	if (It != StringToPoi.end())
+	{
+		return It->second;
+	}
+
+	return poiNone;
+}
