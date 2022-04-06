@@ -430,7 +430,7 @@ void cPawn::HandleFalling(void)
 
 	if (OnGround)
 	{
-		if (m_World->IsFarmlandTramplingEnabled() && BlockAtFoot == E_BLOCK_FARMLAND)
+		if (m_World->IsFarmlandTramplingEnabled() && (BlockAtFoot == E_BLOCK_FARMLAND))
 		{
 			HandleFarmlandTrampling();
 		}
@@ -492,7 +492,7 @@ void cPawn::HandleFarmlandTrampling(void)
 	}
 	if (FallHeight > 1.5625)
 	{
-		
+		// Trample
 	}
 	auto Chance = GetRandomProvider().RandReal();
 
