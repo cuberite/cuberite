@@ -430,6 +430,11 @@ void cPawn::HandleFalling(void)
 
 	if (OnGround)
 	{
+		if (m_World->IsFarmlandTramplingEnabled() && BlockAtFoot == E_BLOCK_FARMLAND)
+		{
+			HandleFarmlandTrampling();
+		}
+
 		auto Damage = static_cast<int>(m_LastGroundHeight - GetPosY() - 3.0);
 		if ((Damage > 0) && !FallDamageAbsorbed)
 		{
@@ -480,6 +485,16 @@ void cPawn::HandleFalling(void)
 
 void cPawn::HandleFarmlandTrampling(void)
 {
+	auto FallHeight = m_LastGroundHeight - GetPosY();
+	if (FallHeight <= 0.6875)
+	{
+		return;
+	}
+	if (FallHeight > 1.5625)
+	{
+		
+	}
+	auto Chance = GetRandomProvider().RandReal();
 
 }
 
