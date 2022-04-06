@@ -34,7 +34,7 @@ public:
 
 
 
-	/** Turns farmland into dirt. 
+	/** Turns farmland into dirt.
 	Will first check for any colliding entities and teleport them to a higher position.
 	*/
 	void TurnToDirt(cChunk & a_Chunk, Vector3i a_RelPos, Vector3i a_AbsPos) const
