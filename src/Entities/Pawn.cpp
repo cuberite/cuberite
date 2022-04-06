@@ -430,12 +430,9 @@ void cPawn::HandleFalling(void)
 
 	if (OnGround)
 	{
-		if (m_World->IsFarmlandTramplingEnabled() && (BlockAtFoot == E_BLOCK_FARMLAND))
-		{
-			HandleFarmlandTrampling();
-		}
+		auto FallHeight = m_LastGroundHeight - GetPosY();
+		auto Damage = static_cast<int>(FallHeight - 3.0);
 
-		auto Damage = static_cast<int>(m_LastGroundHeight - GetPosY() - 3.0);
 		if ((Damage > 0) && !FallDamageAbsorbed)
 		{
 			if (IsElytraFlying())
@@ -443,7 +440,6 @@ void cPawn::HandleFalling(void)
 				Damage = static_cast<int>(static_cast<float>(Damage) * 0.33);
 			}
 
-			// Fall particles:
 			if (const auto Below = POS_TOINT.addedY(-1); Below.y >= 0)
 			{
 				const auto BlockBelow = GetWorld()->GetBlock(Below);
@@ -453,6 +449,7 @@ void cPawn::HandleFalling(void)
 					Damage = std::clamp(static_cast<int>(static_cast<float>(Damage) * 0.2), 1, 20);
 				}
 
+				// Fall particles
 				GetWorld()->BroadcastParticleEffect(
 					"blockdust",
 					GetPosition(),
@@ -461,6 +458,12 @@ void cPawn::HandleFalling(void)
 					static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
 					{ { BlockBelow, 0 } }
 				);
+
+				// Farmland trampling
+				if (BlockBelow == E_BLOCK_FARMLAND)
+				{
+					HandleFarmlandTrampling(FallHeight);
+				}
 			}
 
 			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
@@ -483,19 +486,23 @@ void cPawn::HandleFalling(void)
 
 
 
-void cPawn::HandleFarmlandTrampling(void)
+void cPawn::HandleFarmlandTrampling(double a_FallHeight)
 {
-	auto FallHeight = m_LastGroundHeight - GetPosY();
-	if (FallHeight <= 0.6875)
+	if (a_FallHeight <= 0.6875)
 	{
 		return;
 	}
-	if (FallHeight > 1.5625)
+	// For height below <= 1.5625 we must get a random number
+	else if ((a_FallHeight <= 1.0625) && (GetRandomProvider().RandReal() <= 0.25))
 	{
-		// Trample
+		return;
 	}
-	auto Chance = GetRandomProvider().RandReal();
+	else if ((a_FallHeight <= 1.5625) && (GetRandomProvider().RandReal() <= 0.66))
+	{
+		return;
+	}
 
+	// Height > 1.5625 or random number high enough - trample
 }
 
 

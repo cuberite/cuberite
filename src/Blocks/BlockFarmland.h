@@ -25,19 +25,10 @@ public:
 
 	using Super::Super;
 
-	void TurnToDirt(cChunk & a_Chunk, Vector3i a_RelPos) const
-	{
-		TurnToDirt(a_Chunk, a_RelPos, a_Chunk.RelativeToAbsolute(a_RelPos));
-	}
-
-
-
-
-
 	/** Turns farmland into dirt.
 	Will first check for any colliding entities and teleport them to a higher position.
 	*/
-	void TurnToDirt(cChunk & a_Chunk, Vector3i a_RelPos, Vector3i a_AbsPos) const
+	static void TurnToDirt(cChunk & a_Chunk, Vector3i a_RelPos, Vector3i a_AbsPos)
 	{
 		static const auto FarmlandHeight = cBlockInfo::GetBlockHeight(E_BLOCK_FARMLAND);
 		static const auto FullHeightDelta = 1 - FarmlandHeight;
@@ -108,7 +99,8 @@ private:
 			}
 			default:
 			{
-				TurnToDirt(a_Chunk, a_RelPos);
+				auto AbsPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+				TurnToDirt(a_Chunk, a_RelPos, AbsPos);
 				break;
 			}
 		}

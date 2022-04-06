@@ -43,7 +43,7 @@ public:
 	fall height > 1.5625: always trample
 	The values may differ from vanilla, they were determined experimentally.
 	*/
-	void HandleFarmlandTrampling(void);
+	void HandleFarmlandTrampling(double a_FallHeight);
 
 	/** Tells all pawns which are targeting us to stop targeting us. */
 	void StopEveryoneFromTargetingMe();
