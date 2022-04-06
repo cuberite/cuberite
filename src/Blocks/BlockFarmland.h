@@ -25,10 +25,37 @@ public:
 
 	using Super::Super;
 
-	void TurnToDirt(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos) const
+	void TurnToDirt(cChunk & a_Chunk, Vector3i a_RelPos) const
 	{
-		a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_DIRT, 0);
+		TurnToDirt(a_Chunk, a_RelPos, a_Chunk.RelativeToAbsolute(a_RelPos));
 	}
+
+
+
+
+
+	/** Turns farmland into dirt. 
+	Will first check for any colliding entities and teleport them to a higher position.
+	*/
+	void TurnToDirt(cChunk & a_Chunk, Vector3i a_RelPos, Vector3i a_AbsPos) const
+	{
+		static const auto FarmlandHeight = cBlockInfo::GetBlockHeight(E_BLOCK_FARMLAND);
+		static const auto FullHeightDelta = 1 - FarmlandHeight;
+
+		a_Chunk.ForEachEntityInBox(
+			cBoundingBox(Vector3d(0.5, FarmlandHeight, 0.5) + a_AbsPos, 0.5, FullHeightDelta),
+			[&](cEntity & Entity)
+			{
+				Entity.TeleportToCoords(Entity.GetPosX(), Entity.GetPosY() + FullHeightDelta, Entity.GetPosZ());
+				return false;
+			});
+
+		a_Chunk.SetBlock(a_RelPos, E_BLOCK_DIRT, 0);
+	}
+
+
+
+
 
 private:
 
@@ -81,7 +108,7 @@ private:
 			}
 			default:
 			{
-				TurnToDirt(a_ChunkInterface, a_RelPos);
+				TurnToDirt(a_Chunk, a_RelPos);
 				break;
 			}
 		}
@@ -106,10 +133,12 @@ private:
 		}
 
 		// Check whether we should revert to dirt:
+		// TODO: fix for signs and slabs (possibly more blocks) - they should destroy farmland
 		auto upperBlock = a_ChunkInterface.GetBlock(a_BlockPos.addedY(1));
 		if (cBlockInfo::FullyOccupiesVoxel(upperBlock))
 		{
-			TurnToDirt(a_ChunkInterface, a_BlockPos);
+			// TODO: somehow use TurnToDirt
+			a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_DIRT, 0);
 		}
 	}
 
