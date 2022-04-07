@@ -122,7 +122,7 @@ public:
 	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }
 
 	/** Returns true if farmland trampling is enabled */
-	// bool IsFarmlandTramplingEnabled(void) const { return m_bFarmlandTramplingEnabled; }
+	bool IsFarmlandTramplingEnabled(void) const { return m_bFarmlandTramplingEnabled; }
 
 	bool IsDeepSnowEnabled(void) const { return m_IsDeepSnowEnabled; }
 
