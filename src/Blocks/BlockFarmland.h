@@ -10,6 +10,7 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "ChunkInterface.h"
 #include "../BlockArea.h"
 
 
@@ -28,12 +29,12 @@ public:
 	/** Turns farmland into dirt.
 	Will first check for any colliding entities and teleport them to a higher position.
 	*/
-	static void TurnToDirt(cChunk & a_Chunk, Vector3i a_RelPos, Vector3i a_AbsPos)
+	static void TurnToDirt(cWorld & a_World, Vector3i a_AbsPos)
 	{
 		static const auto FarmlandHeight = cBlockInfo::GetBlockHeight(E_BLOCK_FARMLAND);
 		static const auto FullHeightDelta = 1 - FarmlandHeight;
 
-		a_Chunk.ForEachEntityInBox(
+		a_World.ForEachEntityInBox(
 			cBoundingBox(Vector3d(0.5, FarmlandHeight, 0.5) + a_AbsPos, 0.5, FullHeightDelta),
 			[&](cEntity & Entity)
 			{
@@ -41,7 +42,7 @@ public:
 				return false;
 			});
 
-		a_Chunk.SetBlock(a_RelPos, E_BLOCK_DIRT, 0);
+		a_World.SetBlock(a_AbsPos, E_BLOCK_DIRT, 0);
 	}
 
 
@@ -99,8 +100,9 @@ private:
 			}
 			default:
 			{
+				auto World = a_Chunk.GetWorld();
 				auto AbsPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-				TurnToDirt(a_Chunk, a_RelPos, AbsPos);
+				TurnToDirt(*World, AbsPos);
 				break;
 			}
 		}

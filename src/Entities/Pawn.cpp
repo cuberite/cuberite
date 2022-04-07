@@ -8,6 +8,7 @@
 #include "../Bindings/PluginManager.h"
 #include "../BoundingBox.h"
 #include "../Blocks/BlockHandler.h"
+#include "../Blocks/BlockFarmland.h"
 #include "../EffectID.h"
 #include "../Mobs/Monster.h"
 
@@ -459,8 +460,8 @@ void cPawn::HandleFalling(void)
 					{ { BlockBelow, 0 } }
 				);
 
-				// Farmland trampling
-				if (BlockBelow == E_BLOCK_FARMLAND)
+				// Farmland trampling. Mobs smaller than 0.512 cubic blocks won't trample (Java Edition's behavior)
+				if ((BlockAtFoot == E_BLOCK_FARMLAND) && (VOLUME >= 0.512))
 				{
 					HandleFarmlandTrampling(FallHeight);
 				}
@@ -488,21 +489,23 @@ void cPawn::HandleFalling(void)
 
 void cPawn::HandleFarmlandTrampling(double a_FallHeight)
 {
+	// Return if FallHeight <= 0.6875
 	if (a_FallHeight <= 0.6875)
 	{
 		return;
 	}
-	// For height below <= 1.5625 we must get a random number
-	else if ((a_FallHeight <= 1.0625) && (GetRandomProvider().RandReal() <= 0.25))
+	// For FallHeight <= 1.5625 we get a random number to decide whether we should return
+	else if ((a_FallHeight <= 1.0625) && (GetRandomProvider().RandReal() > 0.25))
 	{
 		return;
 	}
-	else if ((a_FallHeight <= 1.5625) && (GetRandomProvider().RandReal() <= 0.66))
+	else if ((a_FallHeight <= 1.5625) && (GetRandomProvider().RandReal() > 0.66))
 	{
 		return;
 	}
+	// For FallHeight > 1.5625 we always trample
 
-	// Height > 1.5625 or random number high enough - trample
+	cBlockFarmlandHandler::TurnToDirt(*GetWorld(), POS_TOINT);
 }
 
 

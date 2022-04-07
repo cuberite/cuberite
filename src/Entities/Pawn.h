@@ -34,9 +34,7 @@ public:
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 
 	/** Handles farmland trampling when hitting the ground.
-	Mobs smaller than 0.512 blocks will never trample (Java Edition's behavior).
-
-	Default algorithm:
+	Algorithm:
 	fall height <= 0.6875 blocks: no trampling
 	fall height > 0.6875 and <= 1.0625: 25% chance of trampling
 	fall height > 1.0625 and <= 1.5625: 66% chance of trampling
