@@ -432,8 +432,15 @@ void cPawn::HandleFalling(void)
 	if (OnGround)
 	{
 		auto FallHeight = m_LastGroundHeight - GetPosY();
-		auto Damage = static_cast<int>(FallHeight - 3.0);
 
+		// Farmland trampling. Mobs smaller than 0.512 cubic blocks won't trample (Java Edition's behavior)
+		if (GetWorld()->IsFarmlandTramplingEnabled() &&
+			(BlockAtFoot == E_BLOCK_FARMLAND) && (VOLUME >= 0.512))
+		{
+			HandleFarmlandTrampling(FallHeight);
+		}
+
+		auto Damage = static_cast<int>(FallHeight - 3.0);
 		if ((Damage > 0) && !FallDamageAbsorbed)
 		{
 			if (IsElytraFlying())
@@ -459,12 +466,6 @@ void cPawn::HandleFalling(void)
 					static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
 					{ { BlockBelow, 0 } }
 				);
-
-				// Farmland trampling. Mobs smaller than 0.512 cubic blocks won't trample (Java Edition's behavior)
-				if ((BlockAtFoot == E_BLOCK_FARMLAND) && (VOLUME >= 0.512))
-				{
-					HandleFarmlandTrampling(FallHeight);
-				}
 			}
 
 			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
