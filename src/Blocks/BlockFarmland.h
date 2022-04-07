@@ -12,6 +12,7 @@
 #include "BlockHandler.h"
 #include "ChunkInterface.h"
 #include "../BlockArea.h"
+#include "../Chunk.h"
 
 
 
