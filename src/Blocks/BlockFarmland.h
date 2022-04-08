@@ -13,6 +13,7 @@
 #include "ChunkInterface.h"
 #include "../BlockArea.h"
 #include "../Chunk.h"
+#include "../ClientHandle.h"
 
 
 
@@ -27,23 +28,52 @@ public:
 
 	using Super::Super;
 
+	static void TurnToDirt(cChunk & a_Chunk, Vector3i a_AbsPos)
+	{
+		auto RelPos = cChunkDef::AbsoluteToRelative(a_AbsPos);
+		TurnToDirt(a_Chunk, a_AbsPos, RelPos);
+	}
+
+
+
+
+
 	/** Turns farmland into dirt.
 	Will first check for any colliding entities and teleport them to a higher position.
 	*/
-	static void TurnToDirt(cWorld & a_World, Vector3i a_AbsPos)
+	static void TurnToDirt(cChunk & a_Chunk, Vector3i a_AbsPos, Vector3i a_RelPos)
 	{
 		static const auto FarmlandHeight = cBlockInfo::GetBlockHeight(E_BLOCK_FARMLAND);
 		static const auto FullHeightDelta = 1 - FarmlandHeight;
 
-		a_World.ForEachEntityInBox(
+		a_Chunk.ForEachEntityInBox(
 			cBoundingBox(Vector3d(0.5, FarmlandHeight, 0.5) + a_AbsPos, 0.5, FullHeightDelta),
 			[&](cEntity & Entity)
 			{
-				Entity.TeleportToCoords(Entity.GetPosX(), Entity.GetPosY() + FullHeightDelta, Entity.GetPosZ());
+				if (!Entity.IsOnGround())
+				{
+					return false;
+				}
+
+				// The solution which will make the player fall through the ground:
+				// Entity.SetPosition(Entity.GetPosition().addedY(FullHeightDelta));
+
+				// The sketchy solution. It will almost always completely stop the player:
+				// Entity.TeleportToCoords(Entity.GetPosX(), Entity.GetPosY() + FullHeightDelta, Entity.GetPosZ());
+
+				// Another sketchy solution. It will rarely completely stop the player.
+				// It often causes weird pitch / yaw changes
+				Entity.AddPosY(FullHeightDelta);
+				if (Entity.IsPlayer())
+				{
+					auto Player = static_cast<cPlayer *>(&Entity);
+					Player->GetClientHandle()->SendPlayerMoveLook();
+				}
+
 				return false;
 			});
 
-		a_World.SetBlock(a_AbsPos, E_BLOCK_DIRT, 0);
+		a_Chunk.SetBlock(a_RelPos, E_BLOCK_DIRT, 0);
 	}
 
 
@@ -101,9 +131,8 @@ private:
 			}
 			default:
 			{
-				auto World = a_Chunk.GetWorld();
 				auto AbsPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-				TurnToDirt(*World, AbsPos);
+				TurnToDirt(a_Chunk, AbsPos, a_RelPos);
 				break;
 			}
 		}
@@ -132,8 +161,14 @@ private:
 		auto upperBlock = a_ChunkInterface.GetBlock(a_BlockPos.addedY(1));
 		if (cBlockInfo::FullyOccupiesVoxel(upperBlock))
 		{
-			// TODO: somehow use TurnToDirt
-			a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_DIRT, 0);
+			// At the moment, that single line will also do:
+			// a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_DIRT, 0);
+			// Testing :)
+			a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & Chunk)
+			{
+				TurnToDirt(Chunk, a_BlockPos);
+				return true;
+			});
 		}
 	}
 

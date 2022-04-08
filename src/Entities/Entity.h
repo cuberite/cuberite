@@ -42,7 +42,6 @@
 		} \
 	} while (false)
 
-#define VOLUME GetWidth() * GetHeight()
 
 
 

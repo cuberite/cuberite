@@ -432,15 +432,8 @@ void cPawn::HandleFalling(void)
 	if (OnGround)
 	{
 		auto FallHeight = m_LastGroundHeight - GetPosY();
-
-		// Farmland trampling. Mobs smaller than 0.512 cubic blocks won't trample (Java Edition's behavior)
-		if (GetWorld()->IsFarmlandTramplingEnabled() &&
-			(BlockAtFoot == E_BLOCK_FARMLAND) && (VOLUME >= 0.512))
-		{
-			HandleFarmlandTrampling(FallHeight);
-		}
-
 		auto Damage = static_cast<int>(FallHeight - 3.0);
+
 		if ((Damage > 0) && !FallDamageAbsorbed)
 		{
 			if (IsElytraFlying())
@@ -473,6 +466,14 @@ void cPawn::HandleFalling(void)
 
 		m_bTouchGround = true;
 		m_LastGroundHeight = GetPosY();
+
+		// Farmland trampling. Mobs smaller than 0.512 cubic blocks won't trample (Java Edition's behavior)
+		if (GetWorld()->IsFarmlandTramplingEnabled() &&
+			(BlockAtFoot == E_BLOCK_FARMLAND) &&
+			(GetWidth() * GetHeight() >= 0.512))
+		{
+			HandleFarmlandTrampling(FallHeight);
+		}
 	}
 	else
 	{
@@ -490,23 +491,34 @@ void cPawn::HandleFalling(void)
 
 void cPawn::HandleFarmlandTrampling(double a_FallHeight)
 {
-	// Return if FallHeight <= 0.6875
+	bool ShouldTrample = true;
+	auto & Random = GetRandomProvider();
+
+	// No trampling if FallHeight <= 0.6875
 	if (a_FallHeight <= 0.6875)
 	{
-		return;
+		ShouldTrample = false;
 	}
-	// For FallHeight <= 1.5625 we get a random number to decide whether we should return
-	else if ((a_FallHeight <= 1.0625) && (GetRandomProvider().RandReal() > 0.25))
+	// For FallHeight <= 1.5625 we need to get a random bool
+	else if (a_FallHeight <= 1.0625)
 	{
-		return;
+		ShouldTrample = Random.RandBool(0.25);
 	}
-	else if ((a_FallHeight <= 1.5625) && (GetRandomProvider().RandReal() > 0.66))
+	else if (a_FallHeight <= 1.5625)
 	{
-		return;
+		ShouldTrample = Random.RandBool(0.66);
 	}
-	// For FallHeight > 1.5625 we always trample
+	// For FallHeight > 1.5625 we always trample - ShouldTrample remains true
 
-	cBlockFarmlandHandler::TurnToDirt(*GetWorld(), POS_TOINT);
+	if (ShouldTrample)
+	{
+		auto AbsPos = GetPosition().Floor();
+		GetWorld()->DoWithChunkAt(AbsPos, [&](cChunk & Chunk)
+		{
+			cBlockFarmlandHandler::TurnToDirt(Chunk, AbsPos);
+			return true;
+		});
+	}
 }
 
 
