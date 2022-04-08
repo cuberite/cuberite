@@ -468,9 +468,10 @@ void cPawn::HandleFalling(void)
 		m_LastGroundHeight = GetPosY();
 
 		// Farmland trampling. Mobs smaller than 0.512 cubic blocks won't trample (Java Edition's behavior)
+		// We only have width and height, so we have to calculate Width^2
 		if (GetWorld()->IsFarmlandTramplingEnabled() &&
 			(BlockAtFoot == E_BLOCK_FARMLAND) &&
-			(GetWidth() * GetHeight() >= 0.512))
+			(std::pow(GetWidth(), 2) * GetHeight() >= 0.512))
 		{
 			HandleFarmlandTrampling(FallHeight);
 		}

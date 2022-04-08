@@ -28,6 +28,9 @@ public:
 
 	using Super::Super;
 
+	/** Turns farmland into dirt.
+	Will first check for any colliding entities and teleport them to a higher position.
+	*/
 	static void TurnToDirt(cChunk & a_Chunk, Vector3i a_AbsPos)
 	{
 		auto RelPos = cChunkDef::AbsoluteToRelative(a_AbsPos);
@@ -61,8 +64,8 @@ public:
 				// The sketchy solution. It will almost always completely stop the player:
 				// Entity.TeleportToCoords(Entity.GetPosX(), Entity.GetPosY() + FullHeightDelta, Entity.GetPosZ());
 
-				// Another sketchy solution. It will rarely completely stop the player.
-				// It often causes weird pitch / yaw changes
+				// Another sketchy solution. It sometimes stops the player completely.
+				// It sometimes causes weird stutter
 				Entity.AddPosY(FullHeightDelta);
 				if (Entity.IsPlayer())
 				{
