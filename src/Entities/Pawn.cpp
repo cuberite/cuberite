@@ -471,7 +471,7 @@ void cPawn::HandleFalling(void)
 		// We only have width and height, so we have to calculate Width^2
 		if (GetWorld()->IsFarmlandTramplingEnabled() &&
 			(BlockAtFoot == E_BLOCK_FARMLAND) &&
-			(std::pow(GetWidth(), 2) * GetHeight() >= 0.512))
+			(GetWidth() * GetWidth() * GetHeight() >= 0.512))
 		{
 			HandleFarmlandTrampling(FallHeight);
 		}
