@@ -2,7 +2,7 @@
 
 #include "NamespaceSerializer.h"
 
-
+#include <cctype>
 
 
 
