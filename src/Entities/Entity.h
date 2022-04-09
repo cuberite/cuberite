@@ -135,10 +135,16 @@ public:
 	Adds the entity to the world. */
 	bool Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld);
 
+	/** Called when a player begins spectating this entity. */
+	void OnAcquireSpectator(cPlayer & a_Player);
+
 	/** Called when the entity is added to a world.
 	e.g after first spawning or after successfuly moving between worlds.
 	\param a_World The world being added to. */
 	virtual void OnAddToWorld(cWorld & a_World);
+
+	/** Called when a player stops spectating this entity. */
+	void OnLoseSpectator(cPlayer & a_Player);
 
 	/** Called when the entity is removed from a world.
 	e.g. When the entity is destroyed or moved to a different world.
@@ -351,8 +357,8 @@ public:
 
 	// tolua_begin
 
-	/** Called when the entity kills another entity */
-	virtual void Killed(cEntity * a_Victim) {}
+	/** Called when the entity kills another entity. */
+	virtual void Killed(const cEntity & a_Victim, eDamageType a_DamageType) {}
 
 	/** Heals the specified amount of HPs */
 	virtual void Heal(int a_HitPoints);
@@ -452,11 +458,11 @@ public:
 	/** Gets entity (vehicle) attached to this entity */
 	cEntity * GetAttached();
 
-	/** Attaches to the specified entity; detaches from any previous one first */
-	virtual void AttachTo(cEntity * a_AttachTo);
+	/** Attaches to the specified entity; detaches from any previous one first. */
+	void AttachTo(cEntity & a_AttachTo);
 
-	/** Detaches from the currently attached entity, if any */
-	virtual void Detach(void);
+	/** Detaches from the currently attached entity, if any. */
+	void Detach(void);
 
 	/** Returns true if this entity is attached to the specified entity */
 	bool IsAttachedTo(const cEntity * a_Entity) const;
@@ -578,10 +584,10 @@ protected:
 	float m_Health;
 	float m_MaxHealth;
 
-	/** The entity to which this entity is attached (vehicle), nullptr if none */
+	/** The entity to which this entity is attached (vehicle), nullptr if none. */
 	cEntity * m_AttachedTo;
 
-	/** The entity which is attached to this entity (rider), nullptr if none */
+	/** The entity which is attached to this entity (rider), nullptr if none. */
 	cEntity * m_Attachee;
 
 	/** Stores whether head yaw has been set manually */
@@ -683,6 +689,9 @@ protected:
 	/** If has any mobs are leashed, broadcasts every leashed entity to this. */
 	void BroadcastLeashedMobs();
 
+	/** Called when this entity dismounts from m_AttachedTo. */
+	virtual void OnDetach();
+
 private:
 
 	/** Whether the entity is ticking or not. If not, it is scheduled for removal or world-teleportation. */
@@ -720,4 +729,7 @@ private:
 
 	/** List of leashed mobs to this entity */
 	cMonsterList m_LeashedMobs;
+
+	/** List of players who are spectating this entity. */
+	std::vector<cPlayer *> m_Spectators;
 } ;  // tolua_export

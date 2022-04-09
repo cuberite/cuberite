@@ -21,19 +21,6 @@ cBlaze::cBlaze(void) :
 
 
 
-void cBlaze::GetDrops(cItems & a_Drops, cEntity * a_Killer)
-{
-	if ((a_Killer != nullptr) && (a_Killer->IsPlayer() || a_Killer->IsA("cWolf")))
-	{
-		unsigned int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
-		AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_BLAZE_ROD);
-	}
-}
-
-
-
-
-
 bool cBlaze::Attack(std::chrono::milliseconds a_Dt)
 {
 	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0) && (!m_IsCharging))
@@ -42,6 +29,19 @@ bool cBlaze::Attack(std::chrono::milliseconds a_Dt)
 		return true;
 	}
 	return false;
+}
+
+
+
+
+
+void cBlaze::GetDrops(cItems & a_Drops, cEntity * a_Killer)
+{
+	if ((a_Killer != nullptr) && (a_Killer->IsPlayer() || a_Killer->IsA("cWolf")))
+	{
+		unsigned int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+		AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_BLAZE_ROD);
+	}
 }
 
 
@@ -73,7 +73,7 @@ void cBlaze::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			auto FireChargePtr = FireCharge.get();
 			FireChargePtr->Initialize(std::move(FireCharge), *m_World);
 
-			m_World->BroadcastSoundEffect("entity.ghast.shoot", GetPosition(), 4.0f, 1.0f);
+			m_World->BroadcastSoundEffect("entity.blaze.shoot", GetPosition(), 4.0f, 1.0f);
 		}
 	}
 
@@ -84,6 +84,3 @@ void cBlaze::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		ResetAttackCooldown();
 	}
 }
-
-
-

@@ -613,7 +613,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			}
 			else
 			{
-				NIBBLETYPE meta = (m_Noise.IntNoise2DInt(xx * 50, zz * 50) / 7 % 2) + 1;
+				NIBBLETYPE meta = static_cast<NIBBLETYPE>((m_Noise.IntNoise2DInt(xx * 50, zz * 50) / 7 % 2) + 1);
 				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, meta);
 				a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(y));
 			}
@@ -1840,7 +1840,7 @@ cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_Or
 			LOGWARNING("Cannot parse ore information from string, invalid number in OreInfo \"%s\".", ore.c_str());
 			continue;
 		}
-		res.emplace_back(oreType, oreMeta, maxHeight, numNests, nestSize);
+		res.emplace_back(static_cast<BLOCKTYPE>(oreType), oreMeta, maxHeight, numNests, nestSize);
 	}  // for i - split[]
 	return res;
 }

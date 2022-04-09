@@ -88,6 +88,11 @@ function(set_global_flags)
 
 		# Make build use Unicode:
 		add_compile_definitions(UNICODE _UNICODE)
+
+		# Turn off CRT warnings:
+		add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+
+		return ()
 	endif()
 
 	# Allow for a forced 32-bit build under 64-bit OS:
@@ -99,7 +104,7 @@ function(set_global_flags)
 	# https://en.wikipedia.org/wiki/Uname
 	# https://gcc.gnu.org/onlinedocs/gcc/index.html
 	# Have the compiler generate code specifically targeted at the current machine on Linux:
-	if(UNIX AND NOT NO_NATIVE_OPTIMIZATION AND NOT CMAKE_CROSSCOMPILING)
+	if(NOT NO_NATIVE_OPTIMIZATION AND NOT CMAKE_CROSSCOMPILING)
 		string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} SYSTEM_PROCESSOR)
 		if (SYSTEM_PROCESSOR MATCHES "^(i386|i686|x86|amd64|mips)")
 			message(STATUS "Optimising for this machine (march=native)")
@@ -159,12 +164,12 @@ function(set_exe_flags TARGET)
 			-Wno-switch-enum
 
 			# Weverything with Clang exceptions:
-			-Weverything -Wno-exit-time-destructors -Wno-error=disabled-macro-expansion
-			-Wno-weak-vtables -Wno-string-conversion -Wno-c++98-compat-pedantic -Wno-documentation
+			-Weverything -Wno-exit-time-destructors -Wno-error=disabled-macro-expansion -Wno-weak-vtables
+			-Wno-string-conversion -Wno-c++98-compat-pedantic -Wno-c++2a-compat-pedantic -Wno-documentation
 			-Wno-documentation-unknown-command -Wno-reserved-id-macro -Wno-error=unused-command-line-argument
 		)
 
-		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7)
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13)
 			target_compile_options(
 				${TARGET} PRIVATE
 
@@ -179,6 +184,15 @@ function(set_exe_flags TARGET)
 
 				# int to float conversions happen a lot, not worth fixing all warnings:
 				-Wno-implicit-int-float-conversion
+			)
+		endif()
+
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13)
+			target_compile_options(
+				${TARGET} PRIVATE
+
+				# TODO: fix
+				-Wno-reserved-identifier
 			)
 		endif()
 	endif()

@@ -24,7 +24,7 @@ private:
 	{
 		// TODO: only display animation if the difficulty allows mob spawns - Add when difficulty is implemented
 
-		const auto Position = Vector3f(a_BlockPos.x + 0.5f, a_BlockPos.y, a_BlockPos.z + 0.5f);
+		const auto Position = Vector3f(a_BlockPos.x + 0.5f, static_cast<float>(a_BlockPos.y), a_BlockPos.z + 0.5f);
 		a_WorldInterface.SpawnMob(Position.x, Position.y, Position.z, mtSilverfish, false);
 		a_WorldInterface.GetBroadcastManager().BroadcastParticleEffect("explode", Position, Vector3f(), 0.1f, 50);
 	}

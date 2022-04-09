@@ -501,6 +501,42 @@ void cProtocol_1_9_0::SendPlayerMoveLook(void)
 
 
 
+void cProtocol_1_9_0::SendPlayerPermissionLevel()
+{
+	const cPlayer & Player = *m_Client->GetPlayer();
+
+	cPacketizer Pkt(*this, pktEntityStatus);
+	Pkt.WriteBEUInt32(Player.GetUniqueID());
+	Pkt.WriteBEInt8([&Player]() -> signed char
+	{
+		if (Player.HasPermission("core.stop") || Player.HasPermission("core.reload") || Player.HasPermission("core.save-all"))
+		{
+			return 28;
+		}
+
+		if (Player.HasPermission("core.ban") || Player.HasPermission("core.deop") || Player.HasPermission("core.kick") || Player.HasPermission("core.op"))
+		{
+			return 27;
+		}
+
+		if (Player.HasPermission("cuberite.comandblock.set") || Player.HasPermission("core.clear") || Player.HasPermission("core.difficulty") || Player.HasPermission("core.effect") || Player.HasPermission("core.gamemode") || Player.HasPermission("core.tp") || Player.HasPermission("core.give"))
+		{
+			return 26;
+		}
+
+		if (Player.HasPermission("core.spawnprotect.bypass"))
+		{
+			return 25;
+		}
+
+		return 24;
+	}());
+}
+
+
+
+
+
 void cProtocol_1_9_0::SendPlayerSpawn(const cPlayer & a_Player)
 {
 	// Called to spawn another player for the client
@@ -938,7 +974,7 @@ void cProtocol_1_9_0::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 
 	if (PlayerID != m_Client->GetPlayer()->GetUniqueID())
 	{
-		m_Client->Kick("Mind your own business! Hacked client?");
+		LOGD("Player \"%s\" attempted to action another entity - hacked client?", m_Client->GetUsername().c_str());
 		return;
 	}
 
@@ -1197,6 +1233,58 @@ void cProtocol_1_9_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 
 
 
+void cProtocol_1_9_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std::string_view a_Channel)
+{
+	if (a_Channel == "AutoCmd")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockX);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockY);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockZ);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, TrackOutput);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Mode);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, Conditional);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, Automatic);
+
+		m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
+	}
+	else if (a_Channel == "PickItem")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, InventorySlotIndex);
+	}
+	else if (a_Channel == "Struct")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockX);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockY);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockZ);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Action);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Mode);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Name);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, OffsetX);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, OffsetY);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, OffsetZ);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, SizeX);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, SizeY);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, SizeZ);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Mirror);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Rotation);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Metadata);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, IgnoreEntities);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, ShowAir);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, ShowBoundingBox);
+		HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Integrity);
+		HANDLE_READ(a_ByteBuffer, ReadVarInt64, UInt64, Seed);
+	}
+	else
+	{
+		Super::HandleVanillaPluginMessage(a_ByteBuffer, a_Channel);
+	}
+}
+
+
+
+
+
 void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBufferView a_Metadata) const
 {
 	// Parse into NBT:
@@ -1430,13 +1518,12 @@ void cProtocol_1_9_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Ob
 
 void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
-	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
-	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
-	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
-
 	if (a_BlockEntity.GetBlockType() == E_BLOCK_MOB_SPAWNER)
 	{
 		auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
+		a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+		a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+		a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
 		a_Writer.BeginCompound("SpawnData");  // New: SpawnData compound
 			a_Writer.AddString("id", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
 		a_Writer.EndCompound();
@@ -2058,9 +2145,20 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 
 		case mtSkeleton:
 		{
+			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
 			a_Pkt.WriteBEUInt8(11);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
 			a_Pkt.WriteVarInt32(0);
+
+			// Index 5 and 12 used for charging bow client animation.
+			a_Pkt.WriteBEUInt8(5);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEInt8(0x02 | (Skeleton.IsChargingBow() ? 0x01 : 0x00));
+
+			a_Pkt.WriteBEUInt8(12);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBool(Skeleton.IsChargingBow());
+			break;
 		}
 
 		case mtSlime:
@@ -2265,7 +2363,7 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 	// Send the spawn position:
 	{
 		cPacketizer Pkt(*this, pktSpawnPosition);
-		Pkt.WriteXYZPosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
+		Pkt.WriteXYZPosition64(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ());
 	}
 
 	// Send the server difficulty:

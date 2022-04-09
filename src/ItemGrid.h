@@ -86,7 +86,7 @@ public:
 	If a_PrioritySlot is set to -1, regular order applies.
 	Returns the number of items that fit.
 	*/
-	int AddItem(cItem & a_ItemStack, bool a_AllowNewStacks = true, int a_PrioritySlot = -1);
+	char AddItem(cItem & a_ItemStack, bool a_AllowNewStacks = true, int a_PrioritySlot = -1);
 
 	/** Same as AddItem, but works on an entire list of item stacks.
 	The a_ItemStackList is modified to reflect the leftover items.
@@ -96,11 +96,11 @@ public:
 	If a_PrioritySlot is set to -1, regular order applies.
 	Returns the total number of items that fit.
 	*/
-	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks = true, int a_PrioritySlot = -1);
+	char AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks = true, int a_PrioritySlot = -1);
 
 	/** Removes the specified item from the grid, as many as possible, up to a_ItemStack.m_ItemCount.
 	Returns the number of items that were removed. */
-	int RemoveItem(const cItem & a_ItemStack);
+	char RemoveItem(const cItem & a_ItemStack);
 
 	/** Finds an item based on ItemType and ItemDamage (<- defines the itemType, too) */
 	cItem * FindItem(const cItem & a_RecipeItem);
@@ -109,13 +109,13 @@ public:
 	If the slot is empty, ignores the call.
 	Returns the new count.
 	*/
-	int ChangeSlotCount(int a_SlotNum, int a_AddToCount);
+	char ChangeSlotCount(int a_SlotNum, char a_AddToCount);
 
 	/** Adds (or subtracts, if a_AddToCount is negative) to the count of items in the specified slot.
 	If the slot is empty, ignores the call.
 	Returns the new count.
 	*/
-	int ChangeSlotCount(int a_X, int a_Y, int a_AddToCount);
+	char ChangeSlotCount(int a_X, int a_Y, char a_AddToCount);
 
 	/** Removes one item from the stack in the specified slot, and returns it.
 	If the slot was empty, returns an empty item
@@ -198,6 +198,6 @@ protected:
 	/** Adds up to a_Num items out of a_ItemStack, as many as can fit, in specified slot
 	Returns the number of items that did fit.
 	*/
-	int AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, int a_MaxStack);
+	char AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, int a_MaxStack);
 } ;
 // tolua_end

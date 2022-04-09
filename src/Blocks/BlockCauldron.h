@@ -146,7 +146,7 @@ private:
 			}
 		}
 
-		if (!ItemHandler(EquippedItem.m_ItemType)->IsPlaceable())
+		if (!EquippedItem.GetHandler().IsPlaceable())
 		{
 			// Item not placeable in the first place, our work is done:
 			return true;

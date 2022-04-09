@@ -30,6 +30,7 @@ Implements the 1.13 protocol classes:
 #include "../World.h"
 #include "../JsonUtils.h"
 #include "../WorldStorage/FastNBT.h"
+#include "WorldStorage/NamespaceSerializer.h"
 
 #include "../Bindings/PluginManager.h"
 
@@ -92,12 +93,13 @@ void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 	Pkt.WriteBEInt32(a_ChunkX);
 	Pkt.WriteBEInt32(a_ChunkZ);
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
+
 	for (const auto & Change : a_Changes)
 	{
 		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
 		Pkt.WriteBEInt16(Coords);
 		Pkt.WriteVarInt32(GetProtocolBlockType(Change.m_BlockType, Change.m_BlockMeta));
-	}  // for itr - a_Changes[]
+	}
 }
 
 
@@ -335,6 +337,7 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadata a_Metadata) const
 		case EntityMetadata::IllagerFlags:                          return Insentient;
 		case EntityMetadata::SpeIlagerSpell:                        return Insentient + 1;
 		case EntityMetadata::VexFlags:                              return Insentient;
+		case EntityMetadata::AbstractSkeletonArmsSwinging:          return Insentient;
 		case EntityMetadata::SpiderClimbing:                        return Insentient;
 		case EntityMetadata::WitchAggresive:                        return Insentient;
 		case EntityMetadata::WitherFirstHeadTarget:                 return Insentient;
@@ -364,7 +367,6 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadata a_Metadata) const
 		case EntityMetadata::EntityPose:
 		case EntityMetadata::AreaEffectCloudParticleParameter1:
 		case EntityMetadata::AreaEffectCloudParticleParameter2:
-		case EntityMetadata::AbstractSkeletonArmsSwinging:
 		case EntityMetadata::ZombieUnusedWasType: break;
 	}
 	UNREACHABLE("Retrieved invalid metadata for protocol");
@@ -636,6 +638,7 @@ bool cProtocol_1_13::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x19: HandlePacketEntityAction(a_ByteBuffer); return true;
 		case 0x1a: HandlePacketSteerVehicle(a_ByteBuffer); return true;
 		case 0x1b: HandlePacketCraftingBookData(a_ByteBuffer); return true;
+		case 0x1c: HandlePacketNameItem(a_ByteBuffer); return true;
 		case 0x1d: break;  // Resource pack status - not yet implemented
 		case 0x1e: HandlePacketAdvancementTab(a_ByteBuffer); return true;
 		case 0x20: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
@@ -655,26 +658,35 @@ bool cProtocol_1_13::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 
 
 
+void cProtocol_1_13::HandlePacketNameItem(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, NewItemName);
+
+	LOGD("New item name : %s", NewItemName);
+}
+
+
+
+
+
 void cProtocol_1_13::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, NamespacedChannel);
+
+	const auto & [Namespace, Channel] = NamespaceSerializer::SplitNamespacedID(NamespacedChannel);
 
 	// If the plugin channel is recognized vanilla, handle it directly:
-	if (Channel.substr(0, 15) == "minecraft:brand")
+	if (Namespace == NamespaceSerializer::Namespace::Minecraft)
 	{
-		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
-		m_Client->SetClientBrand(Brand);
-
-		// Send back our brand, including the length:
-		m_Client->SendPluginMessage("minecraft:brand", "\x08""Cuberite");
+		HandleVanillaPluginMessage(a_ByteBuffer, Channel);
 		return;
 	}
 
 	ContiguousByteBuffer Data;
 
 	// Read the plugin message and relay to clienthandle:
-	VERIFY(a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace()));  // Always succeeds
-	m_Client->HandlePluginMessage(Channel, Data);
+	a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace());
+	m_Client->HandlePluginMessage(NamespacedChannel, Data);
 }
 
 
@@ -686,6 +698,21 @@ void cProtocol_1_13::HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Effect1);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Effect2);
 	m_Client->HandleBeaconSelection(Effect1, Effect2);
+}
+
+
+
+
+
+void cProtocol_1_13::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const std::string_view a_Channel)
+{
+	if (a_Channel == "brand")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
+
+		m_Client->SetClientBrand(Brand);
+		m_Client->SendPluginMessage("brand", "\x08""Cuberite");  // Send back our brand, including the length.
+	}
 }
 
 
@@ -1169,6 +1196,17 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtSheep
 
+		case mtSkeleton:
+		{
+			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingActiveHand, EntityMetadataType::Byte);
+			a_Pkt.WriteBEUInt8(Skeleton.IsChargingBow() ? 0x01 : 0x00);
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractSkeletonArmsSwinging, EntityMetadataType::Boolean);
+			a_Pkt.WriteBool(Skeleton.IsChargingBow());
+			break;
+		}  // case mtSkeleton
+
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -1339,7 +1377,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtGiant:
 		case mtSilverfish:
-		case mtSkeleton:
 		case mtSquid:
 		case mtWitherSkeleton:
 		{

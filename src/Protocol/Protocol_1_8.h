@@ -36,11 +36,10 @@ public:
 
 	cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State);
 
-	/** Called to process them, when client sends some data.
-	The protocol uses the provided buffers for storage and processing, and must have exclusive access to them. */
-	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer && a_Data) override;
+	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer & a_Data) override;
+	virtual void DataPrepared(ContiguousByteBuffer & a_Data) override;
 
-	/** Sending stuff to clients (alphabetically sorted): */
+	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
 	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
 	virtual void SendBlockBreakAnim	            (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
@@ -95,6 +94,7 @@ public:
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdatePing       () override;
 	virtual void SendPlayerMoveLook             (void) override;
+	virtual void SendPlayerPermissionLevel      (void) override;
 	virtual void SendPlayerPosition             (void) override;
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) override;
 	virtual void SendPluginMessage              (const AString & a_Channel, ContiguousByteBufferView a_Message) override;
@@ -202,8 +202,8 @@ protected:
 	virtual void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
 
 	/** Parses Vanilla plugin messages into specific ClientHandle calls.
-	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel */
-	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel);
+	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel. */
+	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std::string_view a_Channel);
 
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
 	virtual void ParseItemMetadata(cItem & a_Item, ContiguousByteBufferView a_Metadata) const;
@@ -215,9 +215,6 @@ protected:
 
 	/** Sends the entity type and entity-dependent data required for the entity to initially spawn. */
 	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData);
-
-	/** Sends the data to the client, encrypting them if needed. */
-	virtual void SendData(ContiguousByteBufferView a_Size) override;
 
 	/** Sends the packet to the client. Called by the cPacketizer's destructor. */
 	virtual void SendPacket(cPacketizer & a_Packet) override;

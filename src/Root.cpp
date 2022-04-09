@@ -243,8 +243,6 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOGD("Stopping plugin manager...");
 	delete m_PluginManager; m_PluginManager = nullptr;
 
-	cItemHandler::Deinit();
-
 	LOG("Cleaning up...");
 	delete m_Server; m_Server = nullptr;
 
@@ -552,15 +550,6 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd)
 void cRoot::KickUser(int a_ClientID, const AString & a_Reason)
 {
 	m_Server->KickUser(a_ClientID, a_Reason);
-}
-
-
-
-
-
-void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
-{
-	m_Server->AuthenticateUser(a_ClientID, a_Name, a_UUID, a_Properties);
 }
 
 

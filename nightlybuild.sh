@@ -64,7 +64,7 @@ fi
 
 # Build
 CXX=$CXXCOMP CC=$CCOMP cmake . -DNO_NATIVE_OPTIMIZATION=1 ${CACHE_ARGS} ${TOOLCHAINFILE} ${COMPILEMODE} ${FORCE32}
-make -j 2
+make -j 4
 
 
 # Package Server

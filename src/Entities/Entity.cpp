@@ -135,12 +135,34 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 
 
 
+void cEntity::OnAcquireSpectator(cPlayer & a_Player)
+{
+	m_Spectators.push_back(&a_Player);
+}
+
+
+
+
+
 void cEntity::OnAddToWorld(cWorld & a_World)
 {
 	// Spawn the entity on the clients:
 	m_LastSentPosition = GetPosition();
 	a_World.BroadcastSpawnEntity(*this);
 	BroadcastLeashedMobs();
+}
+
+
+
+
+
+void cEntity::OnLoseSpectator(cPlayer & a_Player)
+{
+	const auto Spectator = std::find(m_Spectators.begin(), m_Spectators.end(), &a_Player);
+
+	ASSERT(Spectator != m_Spectators.end());
+	std::swap(*Spectator, m_Spectators.back());
+	m_Spectators.pop_back();
 }
 
 
@@ -154,6 +176,13 @@ void cEntity::OnRemoveFromWorld(cWorld & a_World)
 	{
 		m_LeashedMobs.front()->Unleash(false, true);
 	}
+
+	for (const auto Player : m_Spectators)
+	{
+		Player->OnLoseSpectated();
+	}
+
+	m_Spectators.clear();
 
 	if (m_AttachedTo != nullptr)
 	{
@@ -391,11 +420,23 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
+	if (IsPainting())
+	{
+		KilledBy(a_TDI);
+
+		if (a_TDI.Attacker != nullptr)
+		{
+			a_TDI.Attacker->Killed(*this, a_TDI.DamageType);
+		}
+
+		return true;
+	}
+
 	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPlayer()))
 	{
 		cPlayer * Player = static_cast<cPlayer *>(a_TDI.Attacker);
 
-		Player->GetEquippedItem().GetHandler()->OnEntityAttack(Player, this);
+		Player->GetEquippedItem().GetHandler().OnEntityAttack(Player, this);
 
 		// Whether an enchantment boosted this attack's damage.
 		bool MagicalCriticalHit = false;
@@ -559,7 +600,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		if (a_TDI.Attacker != nullptr)
 		{
-			a_TDI.Attacker->Killed(this);
+			a_TDI.Attacker->Killed(*this, a_TDI.DamageType);
 		}
 	}
 	return true;
@@ -1489,7 +1530,7 @@ bool cEntity::DetectPortal()
 					if (IsPlayer())
 					{
 						cPlayer * Player = static_cast<cPlayer *>(this);
-						if (Player->GetBedWorld() == TargetWorld)
+						if (Player->GetRespawnWorld() == TargetWorld)
 						{
 							return MoveToWorld(*TargetWorld, Player->GetLastBedPos());
 						}
@@ -1634,7 +1675,7 @@ bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPo
 
 bool cEntity::MoveToWorld(cWorld & a_World, bool a_ShouldSendRespawn)
 {
-	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3d(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ()));
+	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3i(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ()));
 }
 
 
@@ -1650,7 +1691,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 		return false;
 	}
 
-	return MoveToWorld(*World, Vector3d(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()), false, a_ShouldSendRespawn);
+	return MoveToWorld(*World, Vector3i(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()), false, a_ShouldSendRespawn);
 }
 
 
@@ -1688,9 +1729,11 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 				BLOCKTYPE Block;
 				if (!a_Chunk.UnboundedRelGetBlockType(x, y, z, Block))
 				{
+					/*
 					LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
 						x, y, z, GetPosX(), GetPosZ()
 					);
+					*/
 					continue;
 				}
 
@@ -1717,9 +1760,11 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	BLOCKTYPE BlockIn;
 	if (!a_Chunk.UnboundedRelGetBlockType(RelX, HeadHeight, RelZ, BlockIn))
 	{
+		/*
 		LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
 			RelX, HeadHeight, RelZ, GetPosX(), GetPosZ()
 		);
+		*/
 		return;
 	}
 	m_IsHeadInWater = IsBlockWater(BlockIn);
@@ -1979,26 +2024,25 @@ cEntity * cEntity::GetAttached()
 
 
 
-void cEntity::AttachTo(cEntity * a_AttachTo)
+void cEntity::AttachTo(cEntity & a_AttachTo)
 {
-	if (m_AttachedTo == a_AttachTo)
+	if (m_AttachedTo == &a_AttachTo)
 	{
-		// Already attached to that entity, nothing to do here
+		// Already attached to that entity, nothing to do here:
 		return;
 	}
+
 	if (m_AttachedTo != nullptr)
 	{
 		// Detach from any previous entity:
 		Detach();
 	}
 
-	// Update state information
-	m_AttachedTo = a_AttachTo;
-	a_AttachTo->m_Attachee = this;
-	if (a_AttachTo != nullptr)
-	{
-		m_World->BroadcastAttachEntity(*this, *a_AttachTo);
-	}
+	// Update state information:
+	m_AttachedTo = &a_AttachTo;
+	a_AttachTo.m_Attachee = this;
+
+	m_World->BroadcastAttachEntity(*this, a_AttachTo);
 }
 
 
@@ -2009,13 +2053,16 @@ void cEntity::Detach(void)
 {
 	if (m_AttachedTo == nullptr)
 	{
-		// Already not attached to any entity, our work is done
+		// Already not attached to any entity, our work is done:
 		return;
 	}
+
 	m_World->BroadcastDetachEntity(*this, *m_AttachedTo);
 
 	m_AttachedTo->m_Attachee = nullptr;
 	m_AttachedTo = nullptr;
+
+	OnDetach();
 }
 
 
@@ -2285,6 +2332,14 @@ void cEntity::BroadcastLeashedMobs()
 			m_World->BroadcastLeashEntity(*LeashedMob, *this);
 		}
 	}
+}
+
+
+
+
+
+void cEntity::OnDetach()
+{
 }
 
 

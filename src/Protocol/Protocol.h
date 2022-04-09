@@ -346,9 +346,14 @@ public:
 		Game = 3,
 	};
 
-	/** Called to process them, when client sends some data.
+	/** Called by cClientHandle to process data, when the client sends some.
 	The protocol uses the provided buffers for storage and processing, and must have exclusive access to them. */
-	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer && a_Data) = 0;
+	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer & a_Data) = 0;
+
+	/** Called by cClientHandle to finalise a buffer of prepared data before they are sent to the client.
+	Descendants may for example, encrypt the data if needed.
+	The protocol modifies the provided buffer in-place. */
+	virtual void DataPrepared(ContiguousByteBuffer & a_Data) = 0;
 
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;
@@ -403,6 +408,7 @@ public:
 	virtual void SendPlayerListUpdatePing       () = 0;
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) = 0;
 	virtual void SendPlayerMoveLook             (void) = 0;
+	virtual void SendPlayerPermissionLevel      (void) = 0;
 	virtual void SendPlayerPosition             (void) = 0;
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) = 0;
 	virtual void SendPluginMessage              (const AString & a_Channel, ContiguousByteBufferView a_Message) = 0;
@@ -465,9 +471,6 @@ protected:
 
 	/** Returns the current protocol's version, for handling status requests. */
 	virtual Version GetProtocolVersion() const = 0;
-
-	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
-	virtual void SendData(ContiguousByteBufferView a_Data) = 0;
 
 	/** Sends a single packet contained within the cPacketizer class.
 	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */

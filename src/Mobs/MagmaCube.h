@@ -18,19 +18,17 @@ public:
 
 	CLASS_PROTODEF(cMagmaCube)
 
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	int GetSize(void) const { return m_Size; }
 
 	/** Returns the text describing the slime's size, as used by the client's resource subsystem for sounds.
 	Returns either "big" or "small". */
 	static AString GetSizeName(int a_Size);
 
-protected:
+private:
+
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+	virtual bool IsNetherNative(void) override { return true; }
 
 	/** Size of the MagmaCube, with 1 being the smallest */
 	int m_Size;
 } ;
-
-
-
-

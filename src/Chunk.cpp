@@ -152,12 +152,6 @@ void cChunk::BroadcastPendingChanges(void)
 		}
 	}
 
-	// Flush out all buffered data:
-	for (const auto ClientHandle : m_LoadedByClient)
-	{
-		ClientHandle->ProcessProtocolOut();
-	}
-
 	m_PendingSendBlocks.clear();
 	m_PendingSendBlockEntities.clear();
 }
@@ -991,7 +985,7 @@ cItems cChunk::PickupsFromBlock(Vector3i a_RelPos, const cEntity * a_Digger, con
 	cItems Pickups;
 	const auto BlockEntity = GetBlockEntityRel(a_RelPos);
 
-	if ((a_Tool == nullptr) || a_Tool->GetHandler()->CanHarvestBlock(BlockType))
+	if ((a_Tool == nullptr) || a_Tool->GetHandler().CanHarvestBlock(BlockType))
 	{
 		Pickups = cBlockHandler::For(BlockType).ConvertToPickups(BlockMeta, a_Tool);
 

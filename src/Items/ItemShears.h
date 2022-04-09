@@ -9,26 +9,14 @@
 
 
 
-class cItemShearsHandler:
+class cItemShearsHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemShearsHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
-
-
-
-
-
-	virtual bool IsTool(void) override
-	{
-		return true;
-	}
+	using Super::Super;
 
 
 
@@ -40,7 +28,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		BLOCKTYPE Block;
 		NIBBLETYPE BlockMeta;
@@ -59,7 +47,7 @@ public:
 
 
 
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) const override
 	{
 		switch (a_BlockType)
 		{
@@ -77,7 +65,7 @@ public:
 
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) const override
 	{
 		switch (a_Action)
 		{
@@ -92,7 +80,7 @@ public:
 
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) override
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) const override
 	{
 		if ((a_Block == E_BLOCK_COBWEB) || IsBlockMaterialLeaves(a_Block))
 		{

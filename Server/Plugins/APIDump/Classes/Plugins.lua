@@ -847,11 +847,11 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			},
 			HOOK_PLAYER_FISHED =
 			{
-				Notes = "Called when the player reels the fishing rod back in, after the server decides the player's fishing reward.",
+				Notes = "Called when the player reels the fishing rod back in, after the server decides the player's fishing reward and the experience to grant.",
 			},
 			HOOK_PLAYER_FISHING =
 			{
-				Notes = "Called when the player reels the fishing rod back in, plugins may alter the fishing reward.",
+				Notes = "Called when the player reels the fishing rod back in, plugins may alter the fishing reward and the experience granted to the player.",
 			},
 			HOOK_PLAYER_FOOD_LEVEL_CHANGE =
 			{

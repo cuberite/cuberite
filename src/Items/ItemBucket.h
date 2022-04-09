@@ -13,14 +13,14 @@
 
 
 
-class cItemBucketHandler :
+class cItemBucketHandler final :
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemBucketHandler(int a_ItemType):
+	constexpr cItemBucketHandler(int a_ItemType):
 		Super(a_ItemType)
 	{
 
@@ -37,7 +37,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		switch (m_ItemType)
 		{
@@ -56,7 +56,7 @@ public:
 
 
 
-	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, const Vector3i a_ClickedBlockPos, eBlockFace a_ClickedBlockFace)
+	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, const Vector3i a_ClickedBlockPos, eBlockFace a_ClickedBlockFace) const
 	{
 		// Players can't pick up fluid while in adventure mode.
 		if (a_Player->IsGameModeAdventure())
@@ -127,7 +127,7 @@ public:
 	bool PlaceFluid(
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
 		const Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock
-	)
+	) const
 	{
 		// Players can't place fluid while in adventure mode.
 		if (a_Player->IsGameModeAdventure())
@@ -182,7 +182,7 @@ public:
 
 
 
-	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos)
+	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos) const
 	{
 		class cCallbacks :
 			public cBlockTracer::cCallbacks
@@ -233,7 +233,7 @@ public:
 
 
 
-	bool GetPlacementCoordsFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta, eBlockFace & a_BlockFace)
+	bool GetPlacementCoordsFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta, eBlockFace & a_BlockFace) const
 	{
 		class cCallbacks :
 			public cBlockTracer::cCallbacks

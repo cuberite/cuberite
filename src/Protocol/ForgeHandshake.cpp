@@ -44,10 +44,9 @@ namespace ServerPhase
 
 
 
-cForgeHandshake::cForgeHandshake(cClientHandle *a_Client) :
-	m_IsForgeClient(false),
-	m_Errored(false),
-	m_Client(a_Client)
+cForgeHandshake::cForgeHandshake() :
+	IsForgeClient(false),
+	m_Errored(false)
 {
 }
 
@@ -65,9 +64,9 @@ void cForgeHandshake::SetError(const AString & message)
 
 
 
-void cForgeHandshake::AugmentServerListPing(Json::Value & a_ResponseValue)
+void cForgeHandshake::AugmentServerListPing(cClientHandle & a_Client, Json::Value & a_ResponseValue)
 {
-	auto ProtocolVersion = m_Client->GetProtocolVersion();
+	auto ProtocolVersion = a_Client.GetProtocolVersion();
 	auto & Mods = cRoot::Get()->GetServer()->GetRegisteredForgeMods(ProtocolVersion);
 
 	if (Mods.empty())
@@ -97,13 +96,9 @@ void cForgeHandshake::AugmentServerListPing(Json::Value & a_ResponseValue)
 
 
 
-void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
+void cForgeHandshake::BeginForgeHandshake(cClientHandle & a_Client)
 {
-	ASSERT(m_IsForgeClient);
-
-	m_Name = a_Name;
-	m_UUID = a_UUID;
-	m_Properties = a_Properties;
+	ASSERT(IsForgeClient);
 
 	static const std::array<std::string_view, 5> Channels{{ "FML|HS", "FML", "FML|MP", "FML", "FORGE" }};
 	ContiguousByteBuffer ChannelsString;
@@ -113,15 +108,15 @@ void cForgeHandshake::BeginForgeHandshake(const AString & a_Name, const cUUID & 
 		ChannelsString.push_back(std::byte(0));
 	}
 
-	m_Client->SendPluginMessage("REGISTER", ChannelsString);
-	SendServerHello();
+	a_Client.SendPluginMessage("REGISTER", ChannelsString);
+	SendServerHello(a_Client);
 }
 
 
 
 
 
-void cForgeHandshake::SendServerHello()
+void cForgeHandshake::SendServerHello(cClientHandle & a_Client)
 {
 	cByteBuffer Buf(6);
 	// Discriminator | Byte | Always 0 for ServerHello
@@ -134,7 +129,7 @@ void cForgeHandshake::SendServerHello()
 	ContiguousByteBuffer Message;
 	Buf.ReadAll(Message);
 
-	m_Client->SendPluginMessage("FML|HS", Message);
+	a_Client.SendPluginMessage("FML|HS", Message);
 }
 
 
@@ -183,7 +178,7 @@ AStringMap cForgeHandshake::ParseModList(const ContiguousByteBufferView a_Data)
 
 
 
-void cForgeHandshake::HandleClientHello(cClientHandle * a_Client, const ContiguousByteBufferView a_Data)
+void cForgeHandshake::HandleClientHello(cClientHandle & a_Client, const ContiguousByteBufferView a_Data)
 {
 	if (a_Data.size() == 2)
 	{
@@ -204,7 +199,7 @@ void cForgeHandshake::HandleClientHello(cClientHandle * a_Client, const Contiguo
 
 
 
-void cForgeHandshake::HandleModList(cClientHandle * a_Client, const ContiguousByteBufferView a_Data)
+void cForgeHandshake::HandleModList(cClientHandle & a_Client, const ContiguousByteBufferView a_Data)
 {
 	LOGD("Received ModList");
 
@@ -217,10 +212,10 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const ContiguousBy
 
 	LOG("Client connected with %zu mods: %s", ClientMods.size(), ClientModsString.c_str());
 
-	m_Client->m_ForgeMods = ClientMods;
+	a_Client.m_ForgeMods = ClientMods;
 
 	// Let the plugins know about this event, they may refuse the player:
-	if (cRoot::Get()->GetPluginManager()->CallHookLoginForge(*a_Client, ClientMods))
+	if (cRoot::Get()->GetPluginManager()->CallHookLoginForge(a_Client, ClientMods))
 	{
 		SetError("Modded client refused by plugin");
 		return;
@@ -229,7 +224,7 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const ContiguousBy
 	// Send server ModList
 
 	// Send server-side Forge mods registered by plugins
-	const auto & ServerMods = m_Client->GetForgeMods();
+	const auto & ServerMods = a_Client.GetForgeMods();
 
 	const auto ModCount = ServerMods.size();
 
@@ -246,14 +241,14 @@ void cForgeHandshake::HandleModList(cClientHandle * a_Client, const ContiguousBy
 	ContiguousByteBuffer ServerModList;
 	Buf.ReadAll(ServerModList);
 
-	m_Client->SendPluginMessage("FML|HS", ServerModList);
+	a_Client.SendPluginMessage("FML|HS", ServerModList);
 }
 
 
 
 
 
-void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const ContiguousByteBufferView a_Data)
+void cForgeHandshake::HandleHandshakeAck(cClientHandle & a_Client, const ContiguousByteBufferView a_Data)
 {
 	if (a_Data.size() != 2)
 	{
@@ -286,7 +281,7 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const Contigu
 
 			ContiguousByteBuffer RegistryData;
 			Buf.ReadAll(RegistryData);
-			m_Client->SendPluginMessage("FML|HS", RegistryData);
+			a_Client.SendPluginMessage("FML|HS", RegistryData);
 			break;
 		}
 
@@ -297,7 +292,7 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const Contigu
 			ContiguousByteBuffer Ack;
 			Ack.push_back(std::byte(Discriminator::HandshakeAck));
 			Ack.push_back(ServerPhase::WAITINGCACK);
-			m_Client->SendPluginMessage("FML|HS", Ack);
+			a_Client.SendPluginMessage("FML|HS", Ack);
 			break;
 		}
 
@@ -308,15 +303,15 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const Contigu
 			ContiguousByteBuffer Ack;
 			Ack.push_back(std::byte(Discriminator::HandshakeAck));
 			Ack.push_back(ServerPhase::COMPLETE);
-			m_Client->SendPluginMessage("FML|HS", Ack);
+			a_Client.SendPluginMessage("FML|HS", Ack);
 
 			break;
 		}
 
 		case ClientPhase::COMPLETE:
 		{
-			// Now finish logging in
-			m_Client->FinishAuthenticate(m_Name, m_UUID, m_Properties);
+			// Now finish logging in:
+			a_Client.FinishAuthenticate();
 			break;
 		}
 
@@ -332,9 +327,9 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle * a_Client, const Contigu
 
 
 
-void cForgeHandshake::DataReceived(cClientHandle * a_Client, const ContiguousByteBufferView a_Data)
+void cForgeHandshake::DataReceived(cClientHandle & a_Client, const ContiguousByteBufferView a_Data)
 {
-	if (!m_IsForgeClient)
+	if (!IsForgeClient)
 	{
 		SetError(Printf("Received unexpected Forge data from non-Forge client (%zu bytes)", a_Data.size()));
 		return;

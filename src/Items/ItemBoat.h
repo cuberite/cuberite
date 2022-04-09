@@ -8,17 +8,14 @@
 
 
 
-class cItemBoatHandler:
+class cItemBoatHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemBoatHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 
@@ -31,7 +28,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		// Only allow placing blocks on top of blocks, or when not in range of dest block:
 		if ((a_ClickedBlockFace != BLOCK_FACE_YM) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
