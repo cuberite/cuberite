@@ -269,7 +269,7 @@ namespace RedstoneWireHandler
 		a_Chunk.SetMeta(a_Position, Power);
 
 		// Notify all positions, sans YP, to update:
-		for (const auto & Offset : RelativeLaterals) 
+		for (const auto & Offset : RelativeLaterals)
 		{
 			if (Offset == OffsetYP)
 			{
