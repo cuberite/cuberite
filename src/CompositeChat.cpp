@@ -107,7 +107,7 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 	{
 		switch (a_ParseText[i])
 		{
-			case '@':
+			case '$':
 			{
 				// Color code
 				i++;
@@ -116,9 +116,9 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 					// Not enough following text
 					break;
 				}
-				if (a_ParseText[i] == '@')
+				if (a_ParseText[i] == '$')
 				{
-					// "@@" escape, just put a "@" into the current text and keep parsing as text
+					// "$$" escape, just put a "$" into the current text and keep parsing as text
 					if (i > first + 1)
 					{
 						CurrentText.append(a_ParseText.c_str() + first, i - first - 1);
@@ -282,9 +282,9 @@ void cCompositeChat::AddStyle(AString & a_Style, const AString & a_AddStyle)
 	{
 		return;
 	}
-	if (a_AddStyle[0] == '@')
+	if (a_AddStyle[0] == '$')
 	{
-		size_t idx = a_Style.find('@');
+		size_t idx = a_Style.find('$');
 		if ((idx != AString::npos) && (idx != a_Style.length()))
 		{
 			a_Style.erase(idx, 2);
@@ -439,7 +439,7 @@ void cCompositeChat::AddChatPartStyle(Json::Value & a_Value, const AString & a_P
 				break;
 			}
 
-			case '@':
+			case '$':
 			{
 				// Color, specified by the next char:
 				i++;
@@ -467,7 +467,7 @@ void cCompositeChat::AddChatPartStyle(Json::Value & a_Value, const AString & a_P
 					case 'e': a_Value["color"] = Json::Value("yellow");       break;
 					case 'f': a_Value["color"] = Json::Value("white");        break;
 				}  // switch (color)
-			}  // case '@'
+			}  // case '$'
 		}  // switch (Style[i])
 	}  // for i - a_PartStyle[]
 }
