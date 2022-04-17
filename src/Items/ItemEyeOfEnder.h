@@ -35,8 +35,8 @@ public:
 		{
 			BLOCKTYPE FacingBlock;
 			NIBBLETYPE FacingMeta;
-			a_World->GetBlockTypeMeta(a_ClickedBlockPos, FacingBlock, FacingMeta);
-			if (FacingBlock == E_BLOCK_END_PORTAL_FRAME)
+
+			if (a_World->GetBlockTypeMeta(a_ClickedBlockPos, FacingBlock, FacingMeta) && (FacingBlock == E_BLOCK_END_PORTAL_FRAME))
 			{
 				// Fill the portal frame. E_META_END_PORTAL_EYE is the bit for holding the eye of ender.
 				if ((FacingMeta & E_META_END_PORTAL_FRAME_EYE) != E_META_END_PORTAL_FRAME_EYE)

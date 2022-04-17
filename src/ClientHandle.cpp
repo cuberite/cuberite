@@ -1270,7 +1270,10 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	BLOCKTYPE DiggingBlock;
 	NIBBLETYPE DiggingMeta;
-	m_Player->GetWorld()->GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, DiggingBlock, DiggingMeta);
+	if (!m_Player->GetWorld()->GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, DiggingBlock, DiggingMeta))
+	{
+		return;
+	}
 
 	if (
 		m_Player->IsGameModeCreative() &&
@@ -1354,7 +1357,10 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	BLOCKTYPE DugBlock;
 	NIBBLETYPE DugMeta;
-	m_Player->GetWorld()->GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, DugBlock, DugMeta);
+	if (!m_Player->GetWorld()->GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, DugBlock, DugMeta))
+	{
+		return;
+	}
 
 	if (!m_Player->IsGameModeCreative())
 	{

@@ -32,7 +32,10 @@ public:
 	{
 		BLOCKTYPE Block;
 		NIBBLETYPE BlockMeta;
-		a_World->GetBlockTypeMeta(a_ClickedBlockPos, Block, BlockMeta);
+		if (!a_World->GetBlockTypeMeta(a_ClickedBlockPos, Block, BlockMeta))
+		{
+			return false;
+		}
 
 		if ((Block == E_BLOCK_LEAVES) || (Block == E_BLOCK_NEW_LEAVES))
 		{

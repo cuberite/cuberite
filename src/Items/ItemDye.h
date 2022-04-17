@@ -54,10 +54,12 @@ public:
 			// Cocoa (brown dye) can be planted on jungle logs:
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
-			a_World->GetBlockTypeMeta(a_ClickedBlockPos, BlockType, BlockMeta);
 
 			// Check if the block that the player clicked is a jungle log.
-			if ((BlockType != E_BLOCK_LOG) || ((BlockMeta & 0x03) != E_META_LOG_JUNGLE))
+			if (
+				!a_World->GetBlockTypeMeta(a_ClickedBlockPos, BlockType, BlockMeta) ||
+				((BlockType != E_BLOCK_LOG) || ((BlockMeta & 0x03) != E_META_LOG_JUNGLE))
+			)
 			{
 				return false;
 			}

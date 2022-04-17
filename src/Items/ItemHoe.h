@@ -46,7 +46,10 @@ public:
 		// Can only transform dirt or grass blocks:
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
-		a_World->GetBlockTypeMeta(a_ClickedBlockPos, BlockType, BlockMeta);
+		if (!a_World->GetBlockTypeMeta(a_ClickedBlockPos, BlockType, BlockMeta))
+		{
+			return false;
+		}
 		if ((BlockType != E_BLOCK_DIRT) && (BlockType != E_BLOCK_GRASS))
 		{
 			return false;
