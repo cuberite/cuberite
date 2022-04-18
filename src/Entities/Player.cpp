@@ -2577,9 +2577,17 @@ float cPlayer::GetLiquidHeightPercent(NIBBLETYPE a_Meta)
 
 bool cPlayer::IsInsideWater()
 {
+	const auto EyePos = GetEyePosition().Floor();
+
+	if (!cChunkDef::IsValidHeight(EyePos.y))
+	{
+		// Not in water if in void.
+		return false;
+	}
+
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
-	m_World->GetBlockTypeMeta(GetEyePosition().Floor(), Block, Meta);
+	m_World->GetBlockTypeMeta(EyePos, Block, Meta);
 
 	if ((Block != E_BLOCK_WATER) && (Block != E_BLOCK_STATIONARY_WATER))
 	{
