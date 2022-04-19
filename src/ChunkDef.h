@@ -170,6 +170,11 @@ public:
 		return ((a_Height >= 0) && (a_Height < Height));
 	}
 
+	inline static bool IsValidHeight(Vector3i a_BlockPosition)
+	{
+		return IsValidHeight(a_BlockPosition.y);
+	}
+
 
 	/** Validates a width-coordinate. Returns false if width-coordiante is out of width bounds */
 	inline static bool IsValidWidth(int a_Width)

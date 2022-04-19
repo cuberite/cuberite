@@ -73,7 +73,7 @@ void cBannerEntity::CopyFrom(const cBlockEntity & a_Src)
 
 void cBannerEntity::SendTo(cClientHandle & a_Client)
 {
-	a_Client.SendBlockChange(m_Pos.x, m_Pos.y, m_Pos.z, m_BlockType, m_BlockMeta);
+	a_Client.SendBlockChange(m_Pos, m_BlockType, m_BlockMeta);
 	a_Client.SendUpdateBlockEntity(*this);
 }
 

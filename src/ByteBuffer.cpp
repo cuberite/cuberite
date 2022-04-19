@@ -509,6 +509,15 @@ bool cByteBuffer::ReadXYZPosition64(int & a_BlockX, int & a_BlockY, int & a_Bloc
 
 
 
+bool cByteBuffer::ReadXYZPosition64(Vector3i & a_Position)
+{
+	return ReadXYZPosition64(a_Position.x, a_Position.y, a_Position.z);
+}
+
+
+
+
+
 bool cByteBuffer::ReadXZYPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 {
 	CHECK_THREAD
@@ -528,6 +537,15 @@ bool cByteBuffer::ReadXZYPosition64(int & a_BlockX, int & a_BlockY, int & a_Bloc
 	a_BlockY = ((BlockYRaw & 0x0800)     == 0) ? static_cast<int>(BlockYRaw) : (static_cast<int>(BlockYRaw) - 0x01000);
 	a_BlockZ = ((BlockZRaw & 0x02000000) == 0) ? static_cast<int>(BlockZRaw) : (static_cast<int>(BlockZRaw) - 0x04000000);
 	return true;
+}
+
+
+
+
+
+bool cByteBuffer::ReadXZYPosition64(Vector3i & a_Position)
+{
+	return ReadXZYPosition64(a_Position.x, a_Position.y, a_Position.z);
 }
 
 

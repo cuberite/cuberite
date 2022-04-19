@@ -236,7 +236,7 @@ public:
 	size_t GetNumLoadedPlugins(void) const;  // tolua_export
 
 	// Calls for individual hooks. Each returns false if the action is to continue or true if the plugin wants to abort
-	bool CallHookBlockSpread              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source);
+	bool CallHookBlockSpread              (cWorld & a_World, Vector3i a_BlockPos, eSpreadSource a_Source);
 	bool CallHookBlockToPickups           (cWorld & a_World, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool, cItems & a_Pickups);
 	bool CallHookBrewingCompleting        (cWorld & a_World, cBrewingstandEntity & a_Brewingstand);
 	bool CallHookBrewingCompleted         (cWorld & a_World, cBrewingstandEntity & a_Brewingstand);
@@ -265,34 +265,34 @@ public:
 	bool CallHookLogin                    (cClientHandle & a_Client, UInt32 a_ProtocolVersion, const AString & a_Username);
 	bool CallHookLoginForge               (cClientHandle & a_Client, AStringMap & a_Mods);
 	bool CallHookPlayerAnimation          (cPlayer & a_Player, int a_Animation);
-	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerDestroyed          (cPlayer & a_Player);
 	bool CallHookPlayerEating             (cPlayer & a_Player);
 	bool CallHookPlayerFished             (cPlayer & a_Player, const cItems & a_Reward, const int ExperienceAmount);
 	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems & a_Reward, int & ExperienceAmount);
 	bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel);
 	bool CallHookPlayerJoined             (cPlayer & a_Player);
-	bool CallHookPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Status);
+	bool CallHookPlayerLeftClick          (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, char a_Status);
 	bool CallHookPlayerMoving             (cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition, bool a_PreviousIsOnGround);
 	bool CallHookPlayerOpeningWindow      (cPlayer & a_Player, cWindow & a_Window);
 	bool CallHookPlayerPlacedBlock        (cPlayer & a_Player, const sSetBlock & a_BlockChange);
 	bool CallHookPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange);
 	bool CallHookPlayerCrouched           (cPlayer & a_Player);
-	bool CallHookPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
+	bool CallHookPlayerRightClick         (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos);
 	bool CallHookPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity);
 	bool CallHookPlayerShooting           (cPlayer & a_Player);
 	bool CallHookPlayerSpawned            (cPlayer & a_Player);
 	bool CallHookPlayerTossingItem        (cPlayer & a_Player);
-	bool CallHookPlayerUsedBlock          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool CallHookPlayerUsedItem           (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
-	bool CallHookPlayerUsingBlock         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool CallHookPlayerUsingItem          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
+	bool CallHookPlayerUsedBlock          (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool CallHookPlayerUsedItem           (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos);
+	bool CallHookPlayerUsingBlock         (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool CallHookPlayerUsingItem          (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos);
 	bool CallHookPluginMessage            (cClientHandle & a_Client, const AString & a_Channel, ContiguousByteBufferView a_Message);
 	bool CallHookPluginsLoaded            (void);
 	bool CallHookPostCrafting             (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe);
 	bool CallHookPreCrafting              (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe);
-	bool CallHookProjectileHitBlock       (cProjectileEntity & a_Projectile, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Face, const Vector3d & a_BlockHitPos);
+	bool CallHookProjectileHitBlock       (cProjectileEntity & a_Projectile, Vector3i a_BlockPos, eBlockFace a_Face, const Vector3d & a_BlockHitPos);
 	bool CallHookProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity);
 	bool CallHookServerPing               (cClientHandle & a_ClientHandle, AString & a_ServerDescription, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon);
 	bool CallHookSpawnedEntity            (cWorld & a_World, cEntity & a_Entity);
@@ -300,8 +300,8 @@ public:
 	bool CallHookSpawningEntity           (cWorld & a_World, cEntity & a_Entity);
 	bool CallHookSpawningMonster          (cWorld & a_World, cMonster & a_Monster);
 	bool CallHookTakeDamage               (cEntity & a_Receiver, TakeDamageInfo & a_TDI);
-	bool CallHookUpdatedSign              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player);
-	bool CallHookUpdatingSign             (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player);
+	bool CallHookUpdatedSign              (cWorld & a_World, Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player);
+	bool CallHookUpdatingSign             (cWorld & a_World, Vector3i a_BlockPos,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player);
 	bool CallHookWeatherChanged           (cWorld & a_World);
 	bool CallHookWeatherChanging          (cWorld & a_World, eWeather & a_NewWeather);
 	bool CallHookWorldStarted             (cWorld & a_World);

@@ -72,7 +72,9 @@ public:
 	bool ReadVarUTF8String  (AString & a_Value);  // string length as VarInt, then string as UTF-8
 	bool ReadLEInt          (int & a_Value);
 	bool ReadXYZPosition64  (int & a_BlockX, int & a_BlockY, int & a_BlockZ);
+	bool ReadXYZPosition64  (Vector3i & a_Position);
 	bool ReadXZYPosition64  (int & a_BlockX, int & a_BlockY, int & a_BlockZ);
+	bool ReadXZYPosition64  (Vector3i & a_Position);
 	bool ReadUUID           (cUUID & a_Value);
 
 	/** Reads VarInt, assigns it to anything that can be assigned from an UInt64 (unsigned short, char, Byte, double, ...) */

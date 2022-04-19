@@ -1075,7 +1075,7 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 		{
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it.
-			a_Player.SendBlocksAround(PlacePosition.x, PlacePosition.y, PlacePosition.z, 2);
+			a_Player.SendBlocksAround(PlacePosition, 2);
 			a_Player.GetInventory().SendEquippedSlot();
 			return;
 		}

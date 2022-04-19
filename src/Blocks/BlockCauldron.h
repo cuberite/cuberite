@@ -156,8 +156,9 @@ private:
 		// Using cauldrons with blocks was added in 1.13 as part of shulker cleaning.
 		const auto ResendPosition = AddFaceDirection(a_BlockPos, a_BlockFace);
 		a_Player.GetClientHandle()->SendBlockChange(
-			ResendPosition.x, ResendPosition.y, ResendPosition.z,
-			a_ChunkInterface.GetBlock(ResendPosition), a_ChunkInterface.GetBlockMeta(ResendPosition)
+			ResendPosition,
+			a_ChunkInterface.GetBlock(ResendPosition),
+			a_ChunkInterface.GetBlockMeta(ResendPosition)
 		);
 
 		return true;

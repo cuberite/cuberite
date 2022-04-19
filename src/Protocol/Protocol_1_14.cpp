@@ -24,7 +24,7 @@ Implements the 1.14 protocol classes:
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_14:
 
-void cProtocol_1_14::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
+void cProtocol_1_14::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
 {
 }
 
@@ -32,7 +32,7 @@ void cProtocol_1_14::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-void cProtocol_1_14::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
+void cProtocol_1_14::SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage)
 {
 }
 
@@ -40,7 +40,7 @@ void cProtocol_1_14::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_B
 
 
 
-void cProtocol_1_14::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cProtocol_1_14::SendEditSign(Vector3i a_BlockPos)
 {
 }
 
@@ -104,7 +104,7 @@ void cProtocol_1_14::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocol_1_14::SendSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
+void cProtocol_1_14::SendSoundParticleEffect(const EffectID a_EffectID, Vector3i a_Origin, int a_Data)
 {
 }
 
@@ -120,7 +120,7 @@ void cProtocol_1_14::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 
 
 
-void cProtocol_1_14::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+void cProtocol_1_14::SendUpdateSign(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 }
 

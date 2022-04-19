@@ -161,7 +161,7 @@ private:
 		)
 		{
 			const auto AbsPos = Chunk->RelativeToAbsolute(a_RelPos);
-			if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*Chunk->GetWorld(), AbsPos.x, AbsPos.y, AbsPos.z, ssGrassSpread))
+			if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*Chunk->GetWorld(), AbsPos, ssGrassSpread))
 			{
 				Chunk->FastSetBlock(a_RelPos, E_BLOCK_GRASS, 0);
 			}
