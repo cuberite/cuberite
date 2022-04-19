@@ -34,7 +34,7 @@ public:
 		std::vector<cCoordWithData<size_t>> m_Blocks[16];
 	} ;
 
-	cDelayedFluidSimulatorChunkData(int a_TickDelay);
+	cDelayedFluidSimulatorChunkData(size_t a_TickDelay);
 	virtual ~cDelayedFluidSimulatorChunkData() override;
 
 	/** Slots, one for each delay tick, each containing the blocks to simulate */
