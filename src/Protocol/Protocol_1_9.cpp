@@ -901,7 +901,7 @@ void cProtocol_1_9_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
 
-	m_Client->HandleRightClick(Position, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, Hand == MAIN_HAND);
+	m_Client->HandleRightClick(Position, FaceIntToBlockFace(Face), {CursorX, CursorY, CursorZ}, Hand == MAIN_HAND);
 }
 
 
@@ -1003,7 +1003,7 @@ void cProtocol_1_9_0::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 
 	if (m_IsTeleportIdConfirmed)
 	{
-		m_Client->HandlePlayerMove(PosX, PosY, PosZ, IsOnGround);
+		m_Client->HandlePlayerMove({PosX, PosY, PosZ}, IsOnGround);
 	}
 }
 
@@ -1022,7 +1022,7 @@ void cProtocol_1_9_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 
 	if (m_IsTeleportIdConfirmed)
 	{
-		m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, Yaw, Pitch, IsOnGround);
+		m_Client->HandlePlayerMoveLook({PosX, PosY, PosZ}, Yaw, Pitch, IsOnGround);
 	}
 }
 

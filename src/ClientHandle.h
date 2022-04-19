@@ -370,14 +370,14 @@ public:  // tolua_export
 	/** Verifies and sets player position, performing relevant checks.
 	Calls relevant methods to process movement related statistics.
 	Requires state of previous position and on-ground status, so must be called when these are still intact. */
-	void HandlePlayerMove(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround);
+	void HandlePlayerMove(Vector3d a_Pos, bool a_IsOnGround);
 
-	void HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, float a_Rotation, float a_Pitch, bool a_IsOnGround);
+	void HandlePlayerMoveLook(Vector3d a_Pos, float a_Rotation, float a_Pitch, bool a_IsOnGround);
 
 
 	void HandlePluginMessage    (const AString & a_Channel, ContiguousByteBufferView a_Message);
 	void HandleRespawn          (void);
-	void HandleRightClick       (Vector3i a_BlockPos, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, bool a_UsedMainHand);
+	void HandleRightClick       (Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_Cursor, bool a_UsedMainHand);
 	void HandleSlotSelected     (Int16 a_SlotNum);
 	void HandleSpectate         (const cUUID & a_PlayerUUID);
 
@@ -539,6 +539,8 @@ private:
 	int m_NumBlockChangeInteractionsThisTick;
 
 	static int s_ClientCount;
+
+	static Vector3i s_IllegalPosition;
 
 	/** ID used for identification during authenticating. Assigned sequentially for each new instance. */
 	int m_UniqueID;

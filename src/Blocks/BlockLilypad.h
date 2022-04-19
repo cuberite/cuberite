@@ -31,7 +31,7 @@ private:
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
 		auto UnderPos = a_Position.addedY(-1);
-		if (!cChunkDef::IsValidHeight(UnderPos.y))
+		if (!cChunkDef::IsValidHeight(UnderPos))
 		{
 			return false;
 		}

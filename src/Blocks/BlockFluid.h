@@ -88,7 +88,7 @@ private:
 		// Check if it's fuel:
 		BLOCKTYPE BlockType;
 		if (
-			!cChunkDef::IsValidHeight(Pos.y) ||
+			!cChunkDef::IsValidHeight(Pos) ||
 			!a_Chunk.UnboundedRelGetBlockType(Pos, BlockType) ||
 			!cFireSimulator::IsFuel(BlockType)
 		)
@@ -110,7 +110,7 @@ private:
 		{
 			auto NeighborPos = Pos + CrossCoords[i];
 			if (
-				cChunkDef::IsValidHeight(NeighborPos.y) &&
+				cChunkDef::IsValidHeight(NeighborPos) &&
 				a_Chunk.UnboundedRelGetBlockType(NeighborPos, BlockType) &&
 				(BlockType == E_BLOCK_AIR)
 			)

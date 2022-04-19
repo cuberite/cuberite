@@ -748,7 +748,7 @@ bool cChunkMap::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 			res = false;
 			continue;
 		}
-		if (!cChunkDef::IsValidHeight(itr->m_RelY))
+		if (!cChunkDef::IsValidHeight(itr->GetRelativePos()))
 		{
 			continue;
 		}

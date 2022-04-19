@@ -127,7 +127,7 @@ private:
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
 		auto SupportRelPos = AddFaceDirection(a_Position, BlockMetaDataToBlockFace(a_Meta), true);
-		if (!cChunkDef::IsValidHeight(SupportRelPos.y))
+		if (!cChunkDef::IsValidHeight(SupportRelPos))
 		{
 			return false;
 		}

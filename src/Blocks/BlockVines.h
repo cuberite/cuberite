@@ -199,7 +199,7 @@ private:
 
 		// Vine cannot grow down if at the bottom:
 		auto GrowPos = a_RelPos.addedY(-1);
-		if (!cChunkDef::IsValidHeight(GrowPos.y))
+		if (!cChunkDef::IsValidHeight(GrowPos))
 		{
 			return;
 		}

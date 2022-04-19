@@ -61,7 +61,7 @@ private:
 		}
 
 		// Farmland too dry. If nothing is growing on top, turn back to dirt:
-		auto UpperBlock = cChunkDef::IsValidHeight(a_RelPos.y + 1) ? a_Chunk.GetBlock(a_RelPos.addedY(1)) : E_BLOCK_AIR;
+		auto UpperBlock = cChunkDef::IsValidHeight(a_RelPos.addedY(1)) ? a_Chunk.GetBlock(a_RelPos.addedY(1)) : E_BLOCK_AIR;
 		switch (UpperBlock)
 		{
 			case E_BLOCK_BEETROOTS:

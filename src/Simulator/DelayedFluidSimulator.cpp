@@ -145,7 +145,7 @@ void cDelayedFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLO
 
 void cDelayedFluidSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
-	if (!cChunkDef::IsValidHeight(a_Position.y))
+	if (!cChunkDef::IsValidHeight(a_Position))
 	{
 		// Not inside the world (may happen when rclk with a full bucket - the client sends Y = -1)
 		return;

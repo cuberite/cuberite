@@ -1131,7 +1131,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	// Get water direction
-	Vector3f WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
+	Vector3f WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection({BlockX, BlockY, BlockZ});
 
 	m_WaterSpeed *= 0.9;  // Reduce speed each tick
 
@@ -1433,7 +1433,7 @@ bool cEntity::DetectPortal()
 		return false;
 	}
 
-	if (const auto Position = m_Position.Floor(); cChunkDef::IsValidHeight(Position.y))
+	if (const auto Position = m_Position.Floor(); cChunkDef::IsValidHeight(Position))
 	{
 		switch (GetWorld()->GetBlock(Position))
 		{

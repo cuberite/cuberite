@@ -70,7 +70,7 @@ public:
 
 		// Block above must be air to spawn a boat (prevents spawning a boat underwater)
 		auto PosAbove = Callbacks.m_Pos.Floor().addedY(1);
-		if (!cChunkDef::IsValidHeight(PosAbove.y))
+		if (!cChunkDef::IsValidHeight(PosAbove))
 		{
 			return false;
 		}

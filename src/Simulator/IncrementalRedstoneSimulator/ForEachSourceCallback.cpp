@@ -26,7 +26,7 @@ ForEachSourceCallback::ForEachSourceCallback(const cChunk & Chunk, const Vector3
 
 void ForEachSourceCallback::operator()(Vector3i Location)
 {
-	if (!cChunkDef::IsValidHeight(Location.y))
+	if (!cChunkDef::IsValidHeight(Location))
 	{
 		return;
 	}
@@ -96,7 +96,7 @@ PowerLevel ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const V
 	for (const auto & Offset : cSimulator::GetLinkedOffsets(SolidBlockPosition - QueryPosition))
 	{
 		auto SourcePosition = QueryPosition + Offset;
-		if (!cChunkDef::IsValidHeight(SourcePosition.y))
+		if (!cChunkDef::IsValidHeight(SourcePosition))
 		{
 			continue;
 		}
