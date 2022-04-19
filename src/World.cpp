@@ -2544,7 +2544,7 @@ void cWorld::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ)
 
 
 
-bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
+bool cWorld::SetSignLines(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
 {
 	// TODO: rvalue these strings
 
@@ -2553,13 +2553,13 @@ bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AStrin
 	AString Line3(a_Line3);
 	AString Line4(a_Line4);
 
-	if (cRoot::Get()->GetPluginManager()->CallHookUpdatingSign(*this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player))
+	if (cRoot::Get()->GetPluginManager()->CallHookUpdatingSign(*this, a_BlockPos, Line1, Line2, Line3, Line4, a_Player))
 	{
 		return false;
 	}
 
 	if (
-		DoWithBlockEntityAt({ a_BlockX, a_BlockY, a_BlockZ }, [&Line1, &Line2, &Line3, &Line4](cBlockEntity & a_BlockEntity)
+		DoWithBlockEntityAt(a_BlockPos, [&Line1, &Line2, &Line3, &Line4](cBlockEntity & a_BlockEntity)
 		{
 			if ((a_BlockEntity.GetBlockType() != E_BLOCK_WALLSIGN) && (a_BlockEntity.GetBlockType() != E_BLOCK_SIGN_POST))
 			{
@@ -2571,7 +2571,7 @@ bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AStrin
 		})
 	)
 	{
-		cRoot::Get()->GetPluginManager()->CallHookUpdatedSign(*this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player);
+		cRoot::Get()->GetPluginManager()->CallHookUpdatedSign(*this, a_BlockPos, Line1, Line2, Line3, Line4, a_Player);
 		return true;
 	}
 

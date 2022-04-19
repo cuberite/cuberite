@@ -368,7 +368,7 @@ void cProtocol_1_11_0::SendEntityAnimation(const cEntity & a_Entity, const Entit
 			const auto Position = a_Entity.GetPosition();
 
 			// 1.11 dropped the automatic particle effect + sound on item break. Emulate at least some of it:
-			SendSoundEffect("entity.item.break", Position.x, Position.y, Position.z, 1, 0.75f + ((a_Entity.GetUniqueID() * 23) % 32) / 64.f);
+			SendSoundEffect("entity.item.break", Position, 1, 0.75f + ((a_Entity.GetUniqueID() * 23) % 32) / 64.f);
 			break;
 		}
 		default: break;
@@ -588,8 +588,8 @@ cProtocol::Version cProtocol_1_11_0::GetProtocolVersion() const
 
 void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
+	Vector3i Position;
+	if (!a_ByteBuffer.ReadXYZPosition64(Position))
 	{
 		return;
 	}
@@ -600,7 +600,7 @@ void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorZ);
 
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16), Hand == 0);
+	m_Client->HandleRightClick(Position, FaceIntToBlockFace(Face), FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16), Hand == 0);
 }
 
 

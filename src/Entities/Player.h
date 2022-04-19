@@ -554,7 +554,7 @@ public:
 	/** Sends the block in the specified range around the specified coord to the client
 	as a block change packet.
 	The blocks in range (a_BlockX - a_Range, a_BlockX + a_Range) are sent (NY-metric). */
-	void SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Range = 1);
+	void SendBlocksAround(Vector3i a_BlockPos, int a_Range = 1);
 
 	bool HasSkinPart(eSkinPart a_Part) const { return (m_SkinParts & a_Part) != 0; }
 	int GetSkinParts(void) const { return m_SkinParts; }

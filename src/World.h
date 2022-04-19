@@ -311,10 +311,19 @@ public:
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
 
 	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be nullptr. Returns true if sign text changed. */
-	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = nullptr);  // Exported in ManualBindings.cpp
+	bool SetSignLines(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = nullptr);
+	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = nullptr)  // Exported in ManualBindings.cpp
+	{
+		return SetSignLines({a_BlockX, a_BlockY, a_BlockZ}, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
+	}
+
 
 	/** Sets the command block command. Returns true if command changed. */
 	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);  // tolua_export
+	bool SetCommandBlockCommand(Vector3i a_BlockPos, const AString & a_Command)
+	{
+		return SetCommandBlockCommand(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Command);
+	}
 
 	/** Is the trapdoor open? Returns false if there is no trapdoor at the specified coords. */
 	bool IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ);                                      // tolua_export

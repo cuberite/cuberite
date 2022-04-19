@@ -2322,15 +2322,15 @@ void cPlayer::LoadRank(void)
 
 
 
-void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Range)
+void cPlayer::SendBlocksAround(Vector3i a_BlockPos, int a_Range)
 {
 	// Collect the coords of all the blocks to send:
 	sSetBlockVector blks;
-	for (int y = a_BlockY - a_Range + 1; y < a_BlockY + a_Range; y++)
+	for (int y = a_BlockPos.y - a_Range + 1; y < a_BlockPos.y + a_Range; y++)
 	{
-		for (int z = a_BlockZ - a_Range + 1; z < a_BlockZ + a_Range; z++)
+		for (int z = a_BlockPos.z - a_Range + 1; z < a_BlockPos.z + a_Range; z++)
 		{
-			for (int x = a_BlockX - a_Range + 1; x < a_BlockX + a_Range; x++)
+			for (int x = a_BlockPos.x - a_Range + 1; x < a_BlockPos.x + a_Range; x++)
 			{
 				blks.emplace_back(x, y, z, E_BLOCK_AIR, static_cast<NIBBLETYPE>(0));  // Use fake blocktype, it will get set later on.
 			}

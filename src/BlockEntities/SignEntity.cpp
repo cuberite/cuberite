@@ -89,5 +89,5 @@ AString cSignEntity::GetLine(int a_Index) const
 
 void cSignEntity::SendTo(cClientHandle & a_Client)
 {
-	a_Client.SendUpdateSign(m_Pos.x, m_Pos.y, m_Pos.z, m_Line[0], m_Line[1], m_Line[2], m_Line[3]);
+	a_Client.SendUpdateSign(m_Pos, m_Line[0], m_Line[1], m_Line[2], m_Line[3]);
 }
