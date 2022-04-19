@@ -31,7 +31,7 @@
 #include "ItemEnchantingTable.h"
 #include "ItemEndCrystal.h"
 #include "ItemEndPortalFrame.h"
-#include "ItemEnderchest.h"
+#include "ItemEnderChest.h"
 #include "ItemEyeOfEnder.h"
 #include "ItemFenceGate.h"
 #include "ItemFishingRod.h"

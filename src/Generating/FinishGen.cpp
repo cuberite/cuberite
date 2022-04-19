@@ -1423,8 +1423,8 @@ void cFinishGenPreSimulator::StationarizeFluid(
 						// There is an air / washable neighbor, simulate this block
 						switch (Block.Type())
 						{
-							case BlockType::Water: BlockToSet = Block::Water::Water(1); break;
-							case BlockType::Lava:  BlockToSet = Block::Lava::Lava(1); break;
+							case BlockType::Water: BlockToSet = Block::Water::Water(0); break;
+							case BlockType::Lava:  BlockToSet = Block::Lava::Lava(0); break;
 							default: continue;
 						}
 						break;
