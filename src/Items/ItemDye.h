@@ -10,16 +10,13 @@
 
 
 
-class cItemDyeHandler :
+class cItemDyeHandler final :
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
-	cItemDyeHandler(Item a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 	static inline bool IsDye(const cItem & a_Item)
@@ -56,7 +53,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		if ((a_HeldItem.m_ItemType == Item::BoneMeal) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
 		{
@@ -113,7 +110,7 @@ public:
 
 
 	/** Attempts to use the bonemeal on the plant at the specified (absolute) position.
-	The effect of fertilization depends on the plant: https://minecraft.gamepedia.com/Bone_Meal#Fertilizer
+	The effect of fertilization depends on the plant: https://minecraft.wiki/w/Bone_Meal#Fertilizer
 		- grow a few stages
 		- grow 1 stage with a chance
 		- drop pickups without destroying the plant
@@ -151,21 +148,18 @@ public:
 
 			case BlockType::Beetroots:
 			{
+				// Fix GH #4805.
+				// Bonemeal should only advance growth, not spawn produce, and should not be consumed if plant at maturity:
 				if (a_World.GrowPlantAt(a_BlockPos, 1) <= 0)
 				{
-					// Fix GH #4805 (bonemeal should only advance growth, not spawn produce):
 					return false;
 				}
-
 				a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockPos, 0);
-
-				// 75% chance of 1-stage growth:
-				if (!GetRandomProvider().RandBool(0.75))
+				if (GetRandomProvider().RandBool(0.25))
 				{
-					// Hit the 25%, rollback:
+					// 75% chance of 1-stage growth, but we hit the 25%, rollback:
 					a_World.GrowPlantAt(a_BlockPos, -1);
 				}
-
 				return true;
 			}  // case beetroots
 
@@ -218,7 +212,7 @@ public:
 				return true;
 			}  // case red or brown mushroom
 
-			case BlockType::Grass:
+			case BlockType::ShortGrass:
 			{
 				GrowPlantsAround(a_World, a_BlockPos);
 				return true;
@@ -294,7 +288,7 @@ public:
 		a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_Position, 0);
 	}
 
-	/** Grows a biome-dependent flower according to https://minecraft.gamepedia.com/Flower#Flower_biomes */
+	/** Grows a biome-dependent flower according to https://minecraft.wiki/w/Flower#Flower_biomes */
 	static void GrowFlower(cWorld & a_World, const Vector3i a_Position)
 	{
 		using namespace Block;
@@ -389,8 +383,8 @@ public:
 		)
 		{
 			if (
-				!cChunkDef::IsValidHeight(Position.y) ||
-				(a_World.GetBlock(Position).Type() != BlockType::Grass)  // Are we looking at grass?
+				!cChunkDef::IsValidHeight(Position) ||
+				(a_World.GetBlock(Position).Type() != BlockType::ShortGrass)  // Are we looking at grass?
 			)
 			{
 				// Not grass or invalid height, restart random walk and bail:

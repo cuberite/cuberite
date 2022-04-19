@@ -2,6 +2,9 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "BlockSlab.h"
+#include "../Chunk.h"
+#include "BlockStairs.h"
 
 
 
@@ -69,10 +72,23 @@ private:
 		}
 
 		auto Block = a_Chunk.GetBlock(a_Position.addedY(-1));
+
+		// upside down slabs
 		if (cBlockSlabHandler::IsAnySlabType(Block))
 		{
 			return cBlockSlabHandler::IsSlabTop(Block) || cBlockSlabHandler::IsSlabFull(Block);
 		}
+
+		// upside down stairs
+		if (cBlockStairsHandler::IsAnyStairType(Block))
+		{
+			return cBlockStairsHandler::IsStairsTopHalf(Block);
+		}
+
+		//switch (Block)
+		//{
+		//	return cBlockSlabHandler::IsSlabTop(Block) || cBlockSlabHandler::IsSlabFull(Block);
+		//}
 		switch (Block.Type())
 		{
 			case BlockType::AcaciaFence:

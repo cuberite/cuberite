@@ -35,8 +35,8 @@ public:
 	/** Called once to export block data. */
 	virtual void ChunkData(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData) { UNUSED(a_BlockData); UNUSED(a_LightData); }
 
-	/** Called once to export block data. */
-	virtual void ChunkData2(const ChunkBlockDataNew & a_BlockData, const ChunkLightData & a_LightData) { UNUSED(a_BlockData); UNUSED(a_LightData); }
+	///** Called once to export block data. */
+	//virtual void ChunkData2(const ChunkBlockDataNew & a_BlockData, const ChunkLightData & a_LightData) { UNUSED(a_BlockData); UNUSED(a_LightData); }
 
 	/** Called once to provide heightmap data. */
 	virtual void HeightMap(const cChunkDef::HeightMap & a_HeightMap) { UNUSED(a_HeightMap); }
@@ -61,7 +61,7 @@ class cChunkDataCopyCollector :
 public:
 
 	ChunkBlockData m_BlockData;
-	ChunkBlockDataNew m_BlockData2;
+	//ChunkBlockDataNew m_BlockData2;
 	ChunkLightData m_LightData;
 
 private:
@@ -72,9 +72,9 @@ private:
 		m_LightData.Assign(a_LightData);
 	}
 
-	virtual void ChunkData2(const ChunkBlockDataNew & a_BlockData, const ChunkLightData & a_LightData) override
-	{
-		m_BlockData2.Assign(a_BlockData);
-		//m_LightData.Assign(a_LightData);
-	}
+	//virtual void ChunkData2(const ChunkBlockDataNew & a_BlockData, const ChunkLightData & a_LightData) override
+	//{
+	//	m_BlockData2.Assign(a_BlockData);
+	//	//m_LightData.Assign(a_LightData);
+	//}
 };

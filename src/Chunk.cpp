@@ -157,12 +157,6 @@ void cChunk::BroadcastPendingChanges(void)
 		}
 	}
 
-	// Flush out all buffered data:
-	for (const auto ClientHandle : m_LoadedByClient)
-	{
-		ClientHandle->ProcessProtocolOut();
-	}
-
 	m_PendingSendBlocks.clear();
 	m_PendingSendBlockEntities.clear();
 }
@@ -321,6 +315,7 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback) const
 
 	a_Callback.LightIsValid(m_IsLightValid);
 	a_Callback.ChunkData(m_BlockData, m_LightData);
+	//a_Callback.ChunkData2(m_BlockData2, m_LightData);
 	a_Callback.HeightMap(m_HeightMap);
 	a_Callback.BiomeMap(m_BiomeMap);
 
@@ -345,6 +340,7 @@ void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 	std::copy_n(a_SetChunkData.BiomeMap.data(), a_SetChunkData.BiomeMap.size(), m_BiomeMap.data());
 
 	m_BlockData = std::move(a_SetChunkData.BlockData);
+	//m_BlockData2 = std::move(a_SetChunkData.BlockData2);
 	m_LightData = std::move(a_SetChunkData.LightData);
 	m_IsLightValid = a_SetChunkData.IsLightValid;
 
@@ -403,7 +399,7 @@ void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 	}
 
 	// Wake up all simulators for their respective blocks:
-	WakeUpSimulators();
+	//WakeUpSimulators();
 }
 
 
@@ -692,21 +688,6 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 
 void cChunk::Tick(std::chrono::milliseconds a_Dt)
 {
-	const auto ShouldTick = ShouldBeTicked();
-
-	// If we are not valid, tick players and bailout
-	if (!ShouldTick)
-	{
-		for (const auto & Entity : m_Entities)
-		{
-			if (Entity->IsPlayer())
-			{
-				Entity->Tick(a_Dt, *this);
-			}
-		}
-		return;
-	}
-
 	TickBlocks();
 
 	// Tick all block entities in this Chunk:
@@ -868,7 +849,7 @@ void cChunk::TickBlocks(void)
 	m_BlockToTick = cChunkDef::IndexToCoordinate(Random.RandInt<size_t>(cChunkDef::NumBlocks - 1));
 
 	// Choose a number of blocks for each section to randomly tick.
-	// http://minecraft.fandom.com/wiki/Tick#Random_tick
+	// http://minecraft.wiki/w/Tick#Random_tick
 	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 	{
 		const auto Section = m_BlockData.GetSection(Y);
@@ -918,7 +899,7 @@ void cChunk::ApplyWeatherToTop()
 	if (GetBlockLight(X, Height, Z) > 10)
 	{
 		// Snow only generates on blocks with a block light level of 10 or less.
-		// Ref: https://minecraft.gamepedia.com/Snow_(layer)#Snowfall
+		// Ref: https://minecraft.wiki/w/Snow_(layer)#Snowfall
 		return;
 	}
 
@@ -994,7 +975,7 @@ cItems cChunk::PickupsFromBlock(Vector3i a_RelPos, const cEntity * a_Digger, con
 	cItems Pickups;
 	const auto BlockEntity = GetBlockEntityRel(a_RelPos);
 
-	if ((a_Tool == nullptr) || a_Tool->GetHandler()->CanHarvestBlock(BlockToDestroy.Type()))
+	if ((a_Tool == nullptr) || a_Tool->GetHandler().CanHarvestBlock(BlockToDestroy.Type()))
 	{
 		Pickups = cBlockHandler::For(BlockToDestroy.Type()).ConvertToPickups(BlockToDestroy, a_Tool);
 
@@ -1031,7 +1012,7 @@ int cChunk::GrowPlantAt(Vector3i a_RelPos, char a_NumStages)
 
 bool cChunk::UnboundedRelGetBlock(Vector3i a_RelPos, BlockState & a_Block) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1052,7 +1033,7 @@ bool cChunk::UnboundedRelGetBlock(Vector3i a_RelPos, BlockState & a_Block) const
 
 bool cChunk::UnboundedRelGetBlockBlockLight(Vector3i a_RelPos, LIGHTTYPE & a_BlockBlockLight) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1073,7 +1054,7 @@ bool cChunk::UnboundedRelGetBlockBlockLight(Vector3i a_RelPos, LIGHTTYPE & a_Blo
 
 bool cChunk::UnboundedRelGetBlockSkyLight(Vector3i a_RelPos, LIGHTTYPE & a_BlockSkyLight) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1094,7 +1075,7 @@ bool cChunk::UnboundedRelGetBlockSkyLight(Vector3i a_RelPos, LIGHTTYPE & a_Block
 
 bool cChunk::UnboundedRelGetBlockLights(Vector3i a_RelPos, LIGHTTYPE & a_BlockLight, LIGHTTYPE & a_SkyLight) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1116,7 +1097,7 @@ bool cChunk::UnboundedRelGetBlockLights(Vector3i a_RelPos, LIGHTTYPE & a_BlockLi
 
 bool cChunk::UnboundedRelSetBlock(Vector3i a_RelPos, BlockState a_Block)
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1137,7 +1118,7 @@ bool cChunk::UnboundedRelSetBlock(Vector3i a_RelPos, BlockState a_Block)
 
 bool cChunk::UnboundedRelFastSetBlock(Vector3i a_RelPos, BlockState a_Block)
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1343,6 +1324,90 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block
 
 
 
+//void cChunk::NewFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, NEWBLOCKTYPE a_block)
+//{
+//	ASSERT(cChunkDef::IsValidRelPos({ a_RelX, a_RelY, a_RelZ }));
+//	ASSERT(IsValid());
+//
+//	/*
+//	const BLOCKTYPE OldBlockType = GetBlock(a_RelX, a_RelY, a_RelZ);
+//	const BLOCKTYPE OldBlockMeta = m_BlockData.GetMeta({ a_RelX, a_RelY, a_RelZ });
+//	if ((OldBlockType == a_BlockType) && (OldBlockMeta == a_BlockMeta))
+//	{
+//		return;
+//	}
+//
+//	bool ReplacingLiquids = (
+//		((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
+//		((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
+//		((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary lava with lava
+//		((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing lava with stationary lava
+//	);
+//
+//	if (!ReplacingLiquids)
+//	{
+//		MarkDirty();
+//	}*/
+//
+//	m_BlockData2.SetBlock({ a_RelX, a_RelY, a_RelZ }, a_block);
+//
+//	m_PendingSendBlocks.emplace_back(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_block);
+//
+//	MarkDirty();
+//
+//	// TODO: port the rest of the code 
+//	/*
+//	// Queue block to be sent only if ...
+//	if (
+//		!(                                // ... the old and new blocktypes AREN'T leaves (because the client doesn't need meta updates)
+//			((OldBlockType == E_BLOCK_LEAVES) && (a_BlockType == E_BLOCK_LEAVES)) ||
+//			((OldBlockType == E_BLOCK_NEW_LEAVES) && (a_BlockType == E_BLOCK_NEW_LEAVES))
+//		) &&                              // ... AND ...
+//		(
+//			(OldBlockMeta != a_BlockMeta) || (!ReplacingLiquids)
+//		)
+//	)
+//	{
+//		
+//	}
+//
+//	m_BlockData.SetMeta({ a_RelX, a_RelY, a_RelZ }, a_BlockMeta);
+//
+//	// ONLY recalculate lighting if it's necessary!
+//	if (
+//		(cBlockInfo::GetLightValue        (OldBlockType) != cBlockInfo::GetLightValue        (a_BlockType)) ||
+//		(cBlockInfo::GetSpreadLightFalloff(OldBlockType) != cBlockInfo::GetSpreadLightFalloff(a_BlockType)) ||
+//		(cBlockInfo::IsTransparent        (OldBlockType) != cBlockInfo::IsTransparent        (a_BlockType))
+//	)
+//	{
+//		m_IsLightValid = false;
+//	}
+//
+//	// Update heightmap, if needed:
+//	if (a_RelY >= m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width])
+//	{
+//		if (a_BlockType != E_BLOCK_AIR)
+//		{
+//			m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width] = static_cast<HEIGHTTYPE>(a_RelY);
+//		}
+//		else
+//		{
+//			for (int y = a_RelY - 1; y > 0; --y)
+//			{
+//				if (GetBlock(a_RelX, y, a_RelZ) != E_BLOCK_AIR)
+//				{
+//					m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width] = static_cast<HEIGHTTYPE>(y);
+//					break;
+//				}
+//			}  // for y - column in m_BlockData
+//		}
+//	}*/
+//}
+
+
+
+
+
 void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client)
 {
 	const auto BlockEntity = GetBlockEntityRel({ a_RelX, a_RelY, a_RelZ });
@@ -1359,7 +1424,7 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 	}
 
 	const auto Position = PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
-	a_Client->SendBlockChange(Position.x, Position.y, Position.z, GetBlock(a_RelX, a_RelY, a_RelZ));
+	a_Client->SendBlockChange(Position, GetBlock(a_RelX, a_RelY, a_RelZ));
 
 	// FS #268 - if a BlockEntity digging is cancelled by a plugin, the entire block entity must be re-sent to the client:
 	if (BlockEntity != nullptr)
@@ -1941,4 +2006,13 @@ LIGHTTYPE cChunk::GetTimeAlteredLight(LIGHTTYPE a_Skylight) const
 	a_Skylight -= m_World->GetSkyDarkness();
 	// Because NIBBLETYPE is unsigned, we clamp it to 0 .. 15 by checking for values above 15
 	return (a_Skylight < 16)? a_Skylight : 0;
+}
+
+
+
+
+
+bool cChunk::IsSlimeChunk() const
+{
+	return m_World->IsSlimeChunk(m_PosX, m_PosZ);
 }

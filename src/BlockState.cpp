@@ -286,9 +286,9 @@ BlockState::BlockState(BlockType a_Type) : ID([&]
 		case BlockType::GraniteSlab:                     return GraniteSlab::GraniteSlab().ID;
 		case BlockType::GraniteStairs:                   return GraniteStairs::GraniteStairs().ID;
 		case BlockType::GraniteWall:                     return GraniteWall::GraniteWall().ID;
-		case BlockType::Grass:                           return Grass::Grass().ID;
+		case BlockType::ShortGrass:                      return Grass::Grass().ID;
 		case BlockType::GrassBlock:                      return GrassBlock::GrassBlock().ID;
-		case BlockType::GrassPath:                       return GrassPath::GrassPath().ID;
+		case BlockType::DirtPath:                        return GrassPath::GrassPath().ID;
 		case BlockType::Gravel:                          return Gravel::Gravel().ID;
 		case BlockType::GrayBanner:                      return GrayBanner::GrayBanner().ID;
 		case BlockType::GrayBed:                         return GrayBed::GrayBed().ID;
@@ -315,7 +315,7 @@ BlockState::BlockState(BlockType a_Type) : ID([&]
 		case BlockType::GreenWallBanner:                 return GreenWallBanner::GreenWallBanner().ID;
 		case BlockType::GreenWool:                       return GreenWool::GreenWool().ID;
 		case BlockType::Grindstone:                      return Grindstone::Grindstone().ID;
-		case BlockType::HayBale:                         return HayBale::HayBale().ID;
+		case BlockType::HayBlock:                         return HayBale::HayBale().ID;
 		case BlockType::HeavyWeightedPressurePlate:      return HeavyWeightedPressurePlate::HeavyWeightedPressurePlate().ID;
 		case BlockType::HoneyBlock:                      return HoneyBlock::HoneyBlock().ID;
 		case BlockType::HoneycombBlock:                  return HoneycombBlock::HoneycombBlock().ID;
@@ -700,7 +700,7 @@ BlockState::BlockState(BlockType a_Type) : ID([&]
 		case BlockType::SugarCane:                       return SugarCane::SugarCane().ID;
 		case BlockType::Sunflower:                       return Sunflower::Sunflower().ID;
 		case BlockType::SweetBerryBush:                  return SweetBerryBush::SweetBerryBush().ID;
-		case BlockType::TNT:                             return TNT::TNT().ID;
+		case BlockType::Tnt:                             return TNT::TNT().ID;
 		case BlockType::TallGrass:                       return TallGrass::TallGrass().ID;
 		case BlockType::TallSeagrass:                    return TallSeagrass::TallSeagrass().ID;
 		case BlockType::Target:                          return Target::Target().ID;

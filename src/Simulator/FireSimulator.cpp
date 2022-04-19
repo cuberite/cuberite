@@ -164,9 +164,9 @@ bool cFireSimulator::IsFuel(BlockState a_Block)
 	switch (a_Block.Type())
 	{
 		case BlockType::Bookshelf:
-		case BlockType::TNT:
+		case BlockType::Tnt:
 		case BlockType::Vine:
-		case BlockType::HayBale:
+		case BlockType::HayBlock:
 			// Carpets
 		case BlockType::BlackCarpet:
 		case BlockType::BlueCarpet:
@@ -418,7 +418,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, Vector3i a_RelPos)
 				if (CanStartFireInBlock(a_Chunk, dstRelPos))
 				{
 					auto dstAbsPos = a_Chunk->RelativeToAbsolute(dstRelPos);
-					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, dstAbsPos.x, dstAbsPos.y, dstAbsPos.z, ssFireSpread))
+					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, dstAbsPos, ssFireSpread))
 					{
 						return;
 					}
@@ -442,7 +442,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 		BlockState Self = 0;
 		auto RelPos = a_RelPos + Coord;
 		auto NeighborChunk = a_Chunk->GetRelNeighborChunkAdjustCoords(RelPos);
-		if (NeighborChunk == nullptr)
+		if ((NeighborChunk == nullptr) || !NeighborChunk->IsValid())
 		{
 			continue;
 		}
@@ -454,7 +454,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 		}
 
 		auto AbsPos = NeighborChunk->RelativeToAbsolute(RelPos);
-		if (Self.Type() == BlockType::TNT)
+		if (Self.Type() == BlockType::Tnt)
 		{
 			NeighborChunk->SetBlock(RelPos, Block::Air::Air());
 			m_World.SpawnPrimedTNT(Vector3d(AbsPos) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
@@ -462,7 +462,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 		}
 
 		bool ShouldReplaceFuel = (GetRandomProvider().RandBool(m_ReplaceFuelChance * (1.0 / MAX_CHANCE_REPLACE_FUEL)));
-		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, AbsPos.x, AbsPos.y, AbsPos.z, ssFireSpread))
+		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, AbsPos, ssFireSpread))
 		{
 			NeighborChunk->SetBlock(RelPos, Block::Fire::Fire());
 		}

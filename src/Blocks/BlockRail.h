@@ -1,9 +1,14 @@
-
-#include "BlockHandler.h"
-#include "../Entities/Player.h"
-
 #pragma once
 
+#include "BlockHandler.h"
+#include "BlockSlab.h"
+#include "BlockStairs.h"
+#include "BlockType.h"
+#include "Blocks/Mixins.h"
+#include "../BlockInfo.h"
+#include "../Chunk.h"
+#include "ChunkDef.h"
+#include "../Entities/Player.h"
 
 
 
@@ -401,6 +406,19 @@ public:
 
 private:
 
+	static bool CanBeSupportedBy(BlockState a_Block)
+	{
+		if (cBlockSlabHandler::IsAnySlabType(a_Block))
+		{
+			return cBlockSlabHandler::IsSlabUpsideDown(a_Block);
+		}
+		else if (cBlockStairsHandler::IsAnyStairType(a_Block))
+		{
+			return cBlockStairsHandler::IsStairsUpsideDown(a_Block);
+		}
+		return cBlockInfo::FullyOccupiesVoxel(a_Block);
+	}
+
 	virtual void OnPlaced(
 			cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 			Vector3i a_BlockPos,
@@ -461,7 +479,9 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		if ((a_Position.y <= 0) || !cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_Position.addedY(-1))))
+		BlockState BelowBlock = a_Chunk.GetBlock(a_Position.addedY(-1));
+
+		if ((a_Position.y <= 0) || !CanBeSupportedBy(BelowBlock))
 		{
 			return false;
 		}
@@ -492,8 +512,8 @@ private:
 				}
 				return cBlockInfo::FullyOccupiesVoxel(Block);
 			}
-			default: return true;
 		}
+		return true;
 	}
 
 	static bool CanThisRailCurve(BlockState a_Block)

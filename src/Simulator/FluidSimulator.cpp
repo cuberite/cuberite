@@ -55,7 +55,7 @@ bool cFluidSimulator::CanWashAway(BlockState a_Block)
 		case BlockType::Cornflower:
 		case BlockType::DeadBush:
 		case BlockType::DetectorRail:
-		case BlockType::Grass:
+		case BlockType::ShortGrass:
 		case BlockType::LargeFern:
 		case BlockType::Lilac:
 		case BlockType::LilyOfTheValley:
@@ -158,14 +158,14 @@ bool cFluidSimulator::IsHigherMeta(unsigned char a_Falloff1, unsigned char a_Fal
 
 Vector3f cFluidSimulator::GetFlowingDirection(Vector3i a_Pos)
 {
-	if (!cChunkDef::IsValidHeight(a_Pos.y))
+	if (!cChunkDef::IsValidHeight(a_Pos))
 	{
 		return {};
 	}
 
 	auto Self = m_World.GetBlock(a_Pos);
 
-	if (!IsAllowedBlock(Self))  // No Fluid -> No Flowing direction :D
+	if (!IsAllowedBlock(m_World.GetBlock(a_Pos)))  // No Fluid -> No Flowing direction :D
 	{
 		return {};
 	}
@@ -181,19 +181,21 @@ Vector3f cFluidSimulator::GetFlowingDirection(Vector3i a_Pos)
 	std::array<unsigned char, 4> LevelPoint;
 
 	// blocks around the checking pos
-	std::array<Vector3i, 4> Points
+	std::array<Vector3i, 4> Offsets
 	{
-		a_Pos.addedX(1),
-		a_Pos.addedZ(1),
-		a_Pos.addedX(-1),
-		a_Pos.addedZ(-1)
+		{
+			{ 1, 0, 0 },
+			{ 0, 0, 1 },
+			{ 1, 0, 0 },
+			{ 0, 0, 1 }
+		}
 	};
 
-	for (size_t i = 0; i < Points.size(); i++)
+	for (size_t i = 0; i < Offsets.size(); i++)
 	{
-		if (IsAllowedBlock(m_World.GetBlock(Points[i])))
+		if (IsAllowedBlock(m_World.GetBlock(a_Pos + Offsets[i])))
 		{
-			LevelPoint[i] = HeightFromMeta(m_World.GetBlock(Points[i]));
+			LevelPoint[i] = HeightFromMeta(m_World.GetBlock(Offsets[i]));
 		}
 		else
 		{

@@ -81,7 +81,7 @@ bool IsBlockMaterialDirt(BlockState a_Block)
 		case BlockType::Dirt:
 		case BlockType::Farmland:
 		case BlockType::GrassBlock:
-		case BlockType::GrassPath:
+		case BlockType::DirtPath:
 			return true;
 		default: return false;
 	}
@@ -713,7 +713,7 @@ LIGHTTYPE cBlockInfo::GetSpreadLightFalloff(BlockState a_Block)
 		case BlockType::GrayStainedGlass:
 		case BlockType::GrayStainedGlassPane:
 		case BlockType::GrayWallBanner:
-		case BlockType::Grass:
+		case BlockType::ShortGrass:
 		case BlockType::GreenBanner:
 		case BlockType::GreenBed:
 		case BlockType::GreenCarpet:
@@ -1800,8 +1800,8 @@ bool cBlockInfo::IsTransparent(BlockState a_Block)
 		case BlockType::GrayStainedGlass:
 		case BlockType::GrayStainedGlassPane:
 		case BlockType::GrayWallBanner:
-		case BlockType::Grass:
-		case BlockType::GrassPath:
+		case BlockType::ShortGrass:
+		case BlockType::DirtPath:
 		case BlockType::GreenBanner:
 		case BlockType::GreenBed:
 		case BlockType::GreenCarpet:
@@ -1987,7 +1987,7 @@ bool cBlockInfo::IsTransparent(BlockState a_Block)
 		case BlockType::SugarCane:
 		case BlockType::Sunflower:
 		case BlockType::TallGrass:
-		case BlockType::TNT:
+		case BlockType::Tnt:
 		case BlockType::Torch:
 		case BlockType::TrappedChest:
 		case BlockType::Tripwire:
@@ -2398,9 +2398,9 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::GraniteSlab:                      return 1.5f;
 		case BlockType::GraniteStairs:                    return 1.5f;
 		case BlockType::GraniteWall:                      return 1.5f;
-		case BlockType::Grass:                            return 0.0f;
+		case BlockType::ShortGrass:                       return 0.0f;
 		case BlockType::GrassBlock:                       return 0.6f;
-		case BlockType::GrassPath:                        return 0.f;
+		case BlockType::DirtPath:                         return 0.f;
 		case BlockType::Gravel:                           return 0.6f;
 		case BlockType::GrayBanner:                       return 1.0f;
 		case BlockType::GrayBed:                          return 0.2f;
@@ -2427,7 +2427,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::GreenWallBanner:                  return 1.0f;
 		case BlockType::GreenWool:                        return 0.8f;
 		case BlockType::Grindstone:                       return 2.0f;
-		case BlockType::HayBale:                          return 0.5f;
+		case BlockType::HayBlock:                         return 0.5f;
 		case BlockType::HeavyWeightedPressurePlate:       return 0.5f;
 		case BlockType::HoneyBlock:                       return 0.0f;
 		case BlockType::HoneycombBlock:                   return 0.6f;
@@ -2812,7 +2812,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::SugarCane:                        return 0.0f;
 		case BlockType::Sunflower:                        return 0.0f;
 		case BlockType::SweetBerryBush:                   return 0.0f;
-		case BlockType::TNT:                              return 0.0f;
+		case BlockType::Tnt:                              return 0.0f;
 		case BlockType::TallGrass:                        return 0.0f;
 		case BlockType::TallSeagrass:                     return 0.0f;
 		case BlockType::Target:                           return 0.5f;

@@ -937,7 +937,7 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_
 	switch (a_ChunkDesc.GetBlock({a_RelX, a_RelY, a_RelZ}).Type())
 	{
 		case BlockType::Dirt:
-		case BlockType::Grass:
+		case BlockType::ShortGrass:
 		case BlockType::Sand:
 		case BlockType::SugarCane:
 		{
@@ -1909,10 +1909,10 @@ AString cFinishGenOres::OreInfosToString(const cFinishGenOres::OreInfos & a_OreI
 
 		auto NumericBlock = PaletteUpgrade::ToBlock(Ore.m_OreBlock);
 
-		AppendPrintf(res, "%s:%d:%d:%d:%d",
+		/*AppendPrintf(res, "%s:%d:%d:%d:%d",
 			NamespaceSerializer::From(Ore.m_OreBlock), NumericBlock.second,
 			Ore.m_MaxHeight, Ore.m_NumNests, Ore.m_NestSize
-		);
+		);*/
 	}  // for ore - a_OreInfos[]
 	return res;
 }

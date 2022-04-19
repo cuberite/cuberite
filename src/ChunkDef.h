@@ -174,6 +174,14 @@ public:
 	}
 
 
+	/** Validates a height-coordinate. Returns false if height-coordinate is out of height bounds */
+	inline static bool IsValidHeight(int a_BlockPosition)
+	{
+		return ((a_BlockPosition >= 0) && (a_BlockPosition < Height));
+	}
+
+
+
 	/** Validates a width-coordinate. Returns false if width-coordiante is out of width bounds */
 	inline static bool IsValidWidth(int a_Width)
 	{

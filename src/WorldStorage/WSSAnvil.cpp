@@ -1,8 +1,3 @@
-
-// WSSAnvil.cpp
-
-// Implements the cWSSAnvil class representing the Anvil world storage scheme
-
 #include "Globals.h"
 #include "WSSAnvil.h"
 #include "NBTChunkSerializer.h"
@@ -67,7 +62,7 @@
 #include "../Server.h"
 #include "../BoundingBox.h"
 
-
+#include "../Protocol/Palettes/BlockMap.h"
 
 
 
@@ -88,13 +83,12 @@ Since only the header is actually in the memory, this number can be high, but st
 ////////////////////////////////////////////////////////////////////////////////
 // cWSSAnvil:
 
-cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
+cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor):
 	Super(a_World),
 	m_Compressor(a_CompressionFactor)
 {
 	// Create a level.dat file for mapping tools, if it doesn't already exist:
-	AString fnam;
-	Printf(fnam, "%s%clevel.dat", a_World->GetDataPath().c_str(), cFile::PathSeparator());
+	auto fnam = fmt::format(FMT_STRING("{}{}level.dat"), a_World->GetDataPath(), cFile::PathSeparator());
 	if (!cFile::Exists(fnam))
 	{
 		cFastNBTWriter Writer;
@@ -108,12 +102,12 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 		Writer.AddByte("thundering", a_World->IsWeatherStorm() ? 1 : 0);
 		Writer.AddInt("GameType", static_cast<int>(a_World->GetGameMode()));
 		Writer.AddInt("generatorVersion", 1);
-		Writer.AddInt("SpawnX", FloorC(a_World->GetSpawnX()));
-		Writer.AddInt("SpawnY", FloorC(a_World->GetSpawnY()));
-		Writer.AddInt("SpawnZ", FloorC(a_World->GetSpawnZ()));
+		Writer.AddInt("SpawnX", a_World->GetSpawnX());
+		Writer.AddInt("SpawnY", a_World->GetSpawnY());
+		Writer.AddInt("SpawnZ", a_World->GetSpawnZ());
 		Writer.AddInt("version", 19133);
-		Writer.AddLong("DayTime", a_World->GetTimeOfDay());
-		Writer.AddLong("Time", a_World->GetWorldAge());
+		Writer.AddLong("DayTime", a_World->GetWorldDate().count());
+		Writer.AddLong("Time", a_World->GetWorldAge().count());
 		Writer.AddLong("SizeOnDisk", 0);
 		Writer.AddString("generatorName", "default");
 		Writer.AddString("generatorOptions", "");
@@ -132,10 +126,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 cWSSAnvil::~cWSSAnvil()
 {
 	cCSLock Lock(m_CS);
-	for (cMCAFiles::iterator itr = m_Files.begin(); itr != m_Files.end(); ++itr)
-	{
-		delete *itr;
-	}  // for itr - m_Files[]
+	m_Files.clear();
 }
 
 
@@ -182,11 +173,10 @@ bool cWSSAnvil::SaveChunk(const cChunkCoords & a_Chunk)
 
 
 
-void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Reason, const ContiguousByteBufferView a_ChunkDataToSave)
+void cWSSAnvil::ChunkLoadFailed(const cChunkCoords a_ChunkCoords, const AString & a_Reason, const ContiguousByteBufferView a_ChunkDataToSave)
 {
 	// Construct the filename for offloading:
-	AString OffloadFileName;
-	Printf(OffloadFileName, "%s%cregion%cbadchunks", m_World->GetDataPath().c_str(), cFile::PathSeparator(), cFile::PathSeparator());
+	auto OffloadFileName = fmt::format(FMT_STRING("{0}{1}region{1}badchunks"), m_World->GetDataPath(), cFile::PathSeparator());
 	cFile::CreateFolder(OffloadFileName);
 	auto t = time(nullptr);
 	struct tm stm;
@@ -195,24 +185,26 @@ void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Re
 	#else
 		localtime_r(&t, &stm);
 	#endif
-	AppendPrintf(OffloadFileName, "%cch.%d.%d.%d-%02d-%02d-%02d-%02d-%02d.dat",
-		cFile::PathSeparator(), a_ChunkX, a_ChunkZ,
+	OffloadFileName.append(fmt::format(
+		FMT_STRING("{}ch.{}.{}.{}-{:02d}-{:02d}-{:02d}-{:02d}-{:02d}.dat"),
+		cFile::PathSeparator(), a_ChunkCoords.m_ChunkX, a_ChunkCoords.m_ChunkZ,
 		stm.tm_year + 1900, stm.tm_mon + 1, stm.tm_mday, stm.tm_hour, stm.tm_min, stm.tm_sec
-	);
+	));
 
 	// Log the warning to console:
-	const int RegionX = FAST_FLOOR_DIV(a_ChunkX, 32);
-	const int RegionZ = FAST_FLOOR_DIV(a_ChunkZ, 32);
-	AString Info = Printf("Loading chunk [%d, %d] for world %s from file r.%d.%d.mca failed: %s Offloading old chunk data to file %s and regenerating chunk.",
-		a_ChunkX, a_ChunkZ, m_World->GetName().c_str(), RegionX, RegionZ, a_Reason.c_str(), OffloadFileName.c_str()
+	const int RegionX = FAST_FLOOR_DIV(a_ChunkCoords.m_ChunkX, 32);
+	const int RegionZ = FAST_FLOOR_DIV(a_ChunkCoords.m_ChunkZ, 32);
+	auto Info = fmt::format(
+		FMT_STRING("Loading chunk {} for world {} from file r.{}.{}.mca failed: {} Offloading old chunk data to file {} and regenerating chunk."),
+		a_ChunkCoords, m_World->GetName(), RegionX, RegionZ, a_Reason, OffloadFileName
 	);
-	LOGWARNING("%s", Info.c_str());
+	LOGWARNING("%s", Info);
 
 	// Write the data:
 	cFile f;
 	if (!f.Open(OffloadFileName, cFile::fmWrite))
 	{
-		LOGWARNING("Cannot open file %s for writing! Old chunk data is lost.", OffloadFileName.c_str());
+		LOGWARNING("Cannot open file %s for writing! Old chunk data is lost.", OffloadFileName);
 		return;
 	}
 	f.Write(a_ChunkDataToSave.data(), a_ChunkDataToSave.size());
@@ -221,7 +213,7 @@ void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Re
 	// Write a description file:
 	if (!f.Open(OffloadFileName + ".info", cFile::fmWrite))
 	{
-		LOGWARNING("Cannot open file %s.info for writing! The information about the failed chunk will not be written.", OffloadFileName.c_str());
+		LOGWARNING("Cannot open file %s.info for writing! The information about the failed chunk will not be written.", OffloadFileName);
 		return;
 	}
 	f.Write(Info.c_str(), Info.size());
@@ -235,7 +227,7 @@ void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Re
 bool cWSSAnvil::GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data)
 {
 	cCSLock Lock(m_CS);
-	cMCAFile * File = LoadMCAFile(a_Chunk);
+	auto File = LoadMCAFile(a_Chunk);
 	if (File == nullptr)
 	{
 		return false;
@@ -250,7 +242,7 @@ bool cWSSAnvil::GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer 
 bool cWSSAnvil::SetChunkData(const cChunkCoords & a_Chunk, const ContiguousByteBufferView a_Data)
 {
 	cCSLock Lock(m_CS);
-	cMCAFile * File = LoadMCAFile(a_Chunk);
+	auto File = LoadMCAFile(a_Chunk);
 	if (File == nullptr)
 	{
 		return false;
@@ -262,7 +254,7 @@ bool cWSSAnvil::SetChunkData(const cChunkCoords & a_Chunk, const ContiguousByteB
 
 
 
-cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
+std::shared_ptr<cWSSAnvil::cMCAFile> cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 {
 	// ASSUME m_CS is locked
 	ASSERT(m_CS.IsLocked());
@@ -275,12 +267,12 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	ASSERT(a_Chunk.m_ChunkZ - RegionZ * 32 < 32);
 
 	// Is it already cached?
-	for (cMCAFiles::iterator itr = m_Files.begin(); itr != m_Files.end(); ++itr)
+	for (auto itr = m_Files.begin(); itr != m_Files.end(); ++itr)
 	{
 		if (((*itr) != nullptr) && ((*itr)->GetRegionX() == RegionX) && ((*itr)->GetRegionZ() == RegionZ))
 		{
 			// Move the file to front and return it:
-			cMCAFile * f = *itr;
+			auto f = *itr;
 			if (itr != m_Files.begin())
 			{
 				m_Files.erase(itr);
@@ -291,11 +283,10 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	}
 
 	// Load it anew:
-	AString FileName;
-	Printf(FileName, "%s%cregion", m_World->GetDataPath().c_str(), cFile::PathSeparator());
+	auto FileName = fmt::format(FMT_STRING("{}{}region"), m_World->GetDataPath(), cFile::PathSeparator());
 	cFile::CreateFolder(FileName);
-	AppendPrintf(FileName, "/r.%d.%d.mca", RegionX, RegionZ);
-	cMCAFile * f = new cMCAFile(*this, FileName, RegionX, RegionZ);
+	FileName.append(fmt::format(FMT_STRING("/r.{}.{}.mca"), RegionX, RegionZ));
+	auto f = std::make_shared<cMCAFile>(*this, FileName, RegionX, RegionZ);
 	if (f == nullptr)
 	{
 		return nullptr;
@@ -305,7 +296,6 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	// If there are too many MCA files cached, delete the last one used:
 	if (m_Files.size() > MAX_MCA_FILES)
 	{
-		delete m_Files.back();
 		m_Files.pop_back();
 	}
 	return f;
@@ -333,7 +323,7 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const Contiguous
 	}
 	catch (const std::exception & Oops)
 	{
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Oops.what(), a_Data);
+		ChunkLoadFailed(a_Chunk, Oops.what(), a_Data);
 		return false;
 	}
 }
@@ -358,26 +348,327 @@ Compression::Result cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk)
 bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, const ContiguousByteBufferView a_RawChunkData)
 {
 	struct SetChunkData Data(a_Chunk);
+	
+	if (newFormat)
+	{
+		// LOGD("LOADING chunk X %d Z %d", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		int Level = a_NBT.FindChildByName(0, "Level");
+		if (Level < 0)
+		{
+			ChunkLoadFailed(a_Chunk, "Missing NBT tag: Level", a_RawChunkData);
+			return false;
+		}
+		int DataVersionTag = a_NBT.FindChildByName(0, "DataVersion");
+		if (DataVersionTag < 0)
+		{
+			ChunkLoadFailed(a_Chunk, "Missing NBT tag: DataVersion", a_RawChunkData);
+			return false;
+		}
+		int DataVersion = a_NBT.GetInt(DataVersionTag);
+		int Sections = a_NBT.FindChildByName(Level, "Sections");
+		if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
+		{
+			ChunkLoadFailed(a_Chunk, "Missing NBT tag: Sections", a_RawChunkData);
+			return false;
+		}
+		eTagType SectionsType = a_NBT.GetChildrenType(Sections);
+		if ((SectionsType != TAG_Compound) && (SectionsType != TAG_End))
+		{
+			ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Sections", a_RawChunkData);
+			return false;
+		}
+
+		for (int Child = a_NBT.GetFirstChild(Sections); Child >= 0; Child = a_NBT.GetNextSibling(Child))
+		{
+			const int SectionYTag = a_NBT.FindChildByName(Child, "Y");
+			if ((SectionYTag < 0) || (a_NBT.GetType(SectionYTag) != TAG_Byte))
+			{
+				ChunkLoadFailed(a_Chunk, "NBT tag missing or has wrong: Y", a_RawChunkData);
+				return false;
+			}
+			// Y level can go negative in 1.13+ worlds
+			// in 1.18 it goes to -4
+			// Section num can go higher in newer versions
+			const int Y = (signed char)a_NBT.GetByte(SectionYTag);
+			if ((Y < -1) || (Y > static_cast<int>(cChunkDef::NumSections - 1)))
+			{
+				ChunkLoadFailed(a_Chunk, "NBT tag exceeds chunk bounds: Y", a_RawChunkData);
+				return false;
+			}
+
+			int PaletteList = a_NBT.FindChildByName(Child, "Palette");
+			if (PaletteList < 0)
+			{
+				// The palette does not have to exists but that also means that the section is empty and should be ignored
+				continue;
+			}
+			if (a_NBT.GetType(PaletteList) != TAG_List)
+			{
+				ChunkLoadFailed(a_Chunk, "Missing NBT tag: Palette", a_RawChunkData);
+				return false;
+			}
+
+			eTagType PaletteListType = a_NBT.GetChildrenType(PaletteList);
+			if ((PaletteListType != TAG_Compound) && (PaletteListType != TAG_End))
+			{
+				ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Palette", a_RawChunkData);
+				return false;
+			}
+
+			AStringList Palette;
+
+			std::vector<BlockState> Paletteids;
+			for (int Child1 = a_NBT.GetFirstChild(PaletteList); Child1 >= 0; Child1 = a_NBT.GetNextSibling(Child1))
+			{
+				const int NameTagId = a_NBT.FindChildByName(Child1, "Name");
+				if ((NameTagId < 0) || (a_NBT.GetType(NameTagId) != TAG_String))
+				{
+					ChunkLoadFailed(a_Chunk, "NBT tag missing or has wrong type: Name", a_RawChunkData);
+					return false;
+				}
+				AString blockid = a_NBT.GetString(NameTagId);
+				if (!blockid._Starts_with("minecraft:"))
+				{
+					ChunkLoadFailed(a_Chunk, "Invalid namespace: " + blockid + " Mods arent supported", a_RawChunkData);
+					return false;
+				}
+				const int BlockStatesId = a_NBT.FindChildByName(Child1, "Properties");
+
+				AString bls = "";
+				std::vector<AString> strs;
+				if (BlockStatesId > 0 && false)
+				{
+					if (a_NBT.GetType(BlockStatesId) != TAG_Compound)
+					{
+						ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Properties", a_RawChunkData);
+						return false;
+					}
+					for (int ProChild = a_NBT.GetFirstChild(BlockStatesId); ProChild >= 0; ProChild = a_NBT.GetNextSibling(ProChild))
+					{
+						AString name = a_NBT.GetName(ProChild);
+						AString value = a_NBT.GetString(ProChild);
+						bls = name + ": " + value + ", ";
+						strs.push_back(bls);
+					}
+				}
+				std::sort(strs.begin(),strs.end());
+
+				AString tosearch = blockid.substr(10,std::string::npos);  // substr to remove the "minecraft:"
+				if (strs.size() != 0)
+				{
+					tosearch += " ";
+				}
+				for each (auto itm in strs)
+				{
+					tosearch += itm;
+				}
+				if (strs.size() != 0)
+				{
+					tosearch = tosearch.substr(0, tosearch.size() - 2);
+				}
+				// LOGD("%d hash tbl size", (*BlockMap::BlMap::GetMap()).size());
+				//Check if 
+				BlockState cnt = NamespaceSerializer::ToBlockType(tosearch);	 //(*BlockMap::BlMap::GetMap()).count(tosearch);
+
+				if (cnt == BlockType::Air)
+				{
+					//UNREACHABLE("could find given block while loading chunk X: " + a_Chunk.m_ChunkX + " Z: " a_Chunk.m_ChunkZ + " Y Section: " + Y);
+				}
+				//NEWBLOCKTYPE protocolblockid = (*BlockMap::BlMap::GetMap()).at(tosearch);
+				Paletteids.push_back(cnt);
+
+				Palette.emplace_back(blockid.substr(strlen("minecraft:"), std::string::npos));
+			}
+			int IndexBitSize = std::max(4, static_cast<int>(std::ceil(std::log2(Paletteids.size()))));  // How many bits is one index in length. Min is 4 bits, maximum 12 bits
+			ASSERT((12 >= IndexBitSize) && (IndexBitSize >= 4));
+
+			int SectionBlockLongCount = IndexBitSize*4096/8/8;
+
+			const auto BlockStateData = GetSectionDataLong(a_NBT, Child, "BlockStates", SectionBlockLongCount /*ChunkBlockData::SectionBlockCount*/);
+				// MetaData = GetSectionData(a_NBT, Child, "Data", ChunkBlockData::SectionMetaCount), no longer exists
+			const auto BlockLightData = GetSectionData(a_NBT, Child, "BlockLight",ChunkLightData::SectionLightCount);	 // Still exists but does not have to be present for a valid section
+			const auto SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount); // Still exists but does not have to be present for a valid section
+
+			UInt64 * LEstates = new UInt64[SectionBlockLongCount];
+
+			for (size_t i = 0; i < SectionBlockLongCount; i++)
+			{
+				LEstates[i] = ntohll(reinterpret_cast<const UInt64*>(BlockStateData)[i]);
+			}
+
+			// Byte bitsleftover = 0;
+			// int valuesread = 0;
+			// int currentbyte = 0;
+			// needs better bounds checking
+			// u_short numblockdata[4096] = { 0 };
+			BlockState resolveddata[4096] = { BlockType::Air };
+			int numblockdataindex = 0;
+			int pl = Paletteids.size();
+
+			bool usepadding = DataVersion >= 2566;  // Enable padding for worlds generated in 1.16+
+
+			int BitIndex = 0;
+			int arrindex = 0;
+			while (numblockdataindex < 4096)
+			{
+				Int64 finalv = 0;
+				if (BitIndex + IndexBitSize <= 64)
+				{
+					finalv = (LEstates[arrindex] >> BitIndex) & ((1 << IndexBitSize)-1);
+					BitIndex += IndexBitSize;
+					if (BitIndex == 64)
+					{
+						BitIndex = 0;
+						arrindex++;
+					}
+				}
+				else  // BitIndex + IndexBitSize > 64
+				{
+					if (usepadding)
+					{
+						BitIndex = 0;
+						arrindex++;
+						continue;
+					}
+					UInt64 lowerpart = LEstates[arrindex] >> BitIndex;
+					arrindex++;
+					int BitsRead = (64 - BitIndex);
+					BitIndex = IndexBitSize - BitsRead;
+					UInt64 upperpart = (LEstates[arrindex] & ((static_cast<UInt64>(1) << BitIndex) - 1)) << BitsRead;
+					finalv = lowerpart | upperpart;
+				}
+				resolveddata[numblockdataindex] = Paletteids[finalv];
+				numblockdataindex++;
+			}
+
+			/* while (numblockdataindex < 4095)
+			{
+				numblockdataindex++;
+				int finalvalue = 0;
+				int reversebitmask = (0xFF ^ ((1 << (8 - bitsleftover))-1));
+				int bitsread = 0;
+				if (bitsleftover == 0)
+				{
+					finalvalue = static_cast<Byte>(LEstates[currentbyte]) & ((1 << IndexBitSize)-1);
+					bitsread = Clamp(IndexBitSize,0,8);
+					bitsleftover = 8 - IndexBitSize;
+				}
+				else
+				{
+					finalvalue = (static_cast<Byte>(LEstates[currentbyte]) & reversebitmask) >> (8 - bitsleftover);
+					bitsread = bitsleftover;
+					bitsleftover = std::clamp(8 - (bitsleftover + IndexBitSize),0,12);
+				}
+				int bitslefttoread = IndexBitSize - bitsread;
+				if (bitslefttoread <= 0)
+				{
+					numblockdata[numblockdataindex] = finalvalue;
+					if (bitsleftover == 0)
+					{
+						currentbyte++;
+					}
+					ASSERT(finalvalue < pl);
+					continue;
+				}
+				int Mask = (1 << bitslefttoread)-1;
+				if (currentbyte + 1 < 4096)
+				{
+					UNREACHABLE("Out of bounds reading block ids + 1");
+				}
+				finalvalue |= (static_cast<Byte>(LEstates[currentbyte+1]) & Mask) >> bitsread;
+				bitslefttoread -= 8;
+				if (bitslefttoread <= 0)
+				{
+					bitsleftover = (-bitslefttoread);
+					numblockdata[numblockdataindex] = finalvalue;
+					if (bitsleftover != 0)
+					{
+						currentbyte += 1;
+					}
+					else
+					{
+						currentbyte += 2;
+					}
+					ASSERT(finalvalue < pl);
+					continue;
+				}
+				Mask = (1 << bitslefttoread)-1;
+				if (currentbyte + 2 < 4096)
+				{
+					UNREACHABLE("Out of bounds reading block ids + 2");
+				}
+				finalvalue |= (static_cast<Byte>(LEstates[currentbyte+2]) & Mask) >> (8+bitsread);
+				if (finalvalue >= 1 << (IndexBitSize))
+				{
+					UNREACHABLE("block palette index too large");
+				}
+				numblockdata[numblockdataindex] = finalvalue;
+				if (bitsleftover != 0)
+				{
+					currentbyte += 2;
+				}
+				else
+				{
+					currentbyte += 3;
+				}
+				bitsleftover = (-bitslefttoread);
+				ASSERT(finalvalue < pl);
+			} */
+
+			Data.BlockData.SetSection(resolveddata,Y);
+
+			if (BlockLightData != nullptr && SkyLightData != nullptr)
+			{
+				Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
+			}
+			char hm[256] = {0};
+			memset(&Data.HeightMap,0,256); // temp
+			memset(&Data.BiomeMap,0,1024); // temp
+			Data.IsLightValid = true;
+			delete[] LEstates;
+			// Data.BlockData.SetSection(*reinterpret_cast<const ChunkBlockData::SectionType *>(BlockData), *reinterpret_cast<const ChunkBlockData::SectionMetaType *>(MetaData), static_cast<size_t>(Y));
+			// Set the data
+			/*
+			if ((BlockData != nullptr) && (MetaData != nullptr) &&
+				(SkyLightData != nullptr) && (BlockLightData != nullptr))
+				{
+					Data.BlockData.SetSection(*reinterpret_cast<const ChunkBlockData::SectionType *>(BlockData), *reinterpret_cast<const ChunkBlockData::SectionMetaType *>(MetaData), static_cast<size_t>(Y));
+					Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
+				}
+				else
+				{
+					ChunkLoadFailed(a_Chunk, "Missing chunk block/light data", a_RawChunkData);
+					return false;
+				}*/
+
+		}  // for itr - LevelSections[]
+
+		// Load the entities from NBT:
+		LoadEntitiesFromNBT(Data.Entities,      a_NBT, a_NBT.FindChildByName(Level, "Entities"));
+	}
+
+	m_World->QueueSetChunkData(std::move(Data));
+	return true;
 
 	// Load the blockdata, blocklight and skylight:
 	int Level = a_NBT.FindChildByName(0, "Level");
 	if (Level < 0)
 	{
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing NBT tag: Level", a_RawChunkData);
+		ChunkLoadFailed(a_Chunk, "Missing NBT tag: Level", a_RawChunkData);
 		return false;
 	}
 
 	int Sections = a_NBT.FindChildByName(Level, "Sections");
 	if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
 	{
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing NBT tag: Sections", a_RawChunkData);
+		ChunkLoadFailed(a_Chunk, "Missing NBT tag: Sections", a_RawChunkData);
 		return false;
 	}
 
 	eTagType SectionsType = a_NBT.GetChildrenType(Sections);
 	if ((SectionsType != TAG_Compound) && (SectionsType != TAG_End))
 	{
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT tag has wrong type: Sections", a_RawChunkData);
+		ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Sections", a_RawChunkData);
 		return false;
 	}
 	for (int Child = a_NBT.GetFirstChild(Sections); Child >= 0; Child = a_NBT.GetNextSibling(Child))
@@ -385,14 +676,14 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		const int SectionYTag = a_NBT.FindChildByName(Child, "Y");
 		if ((SectionYTag < 0) || (a_NBT.GetType(SectionYTag) != TAG_Byte))
 		{
-			ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT tag missing or has wrong: Y", a_RawChunkData);
+			ChunkLoadFailed(a_Chunk, "NBT tag missing or has wrong: Y", a_RawChunkData);
 			return false;
 		}
 
 		const int Y = a_NBT.GetByte(SectionYTag);
 		if ((Y < 0) || (Y > static_cast<int>(cChunkDef::NumSections - 1)))
 		{
-			ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT tag exceeds chunk bounds: Y", a_RawChunkData);
+			ChunkLoadFailed(a_Chunk, "NBT tag exceeds chunk bounds: Y", a_RawChunkData);
 			return false;
 		}
 
@@ -420,7 +711,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		}
 		else
 		{
-			ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing chunk block/light data", a_RawChunkData);
+			ChunkLoadFailed(a_Chunk, "Missing chunk block/light data", a_RawChunkData);
 			return false;
 		}
 	}  // for itr - LevelSections[]
@@ -428,15 +719,14 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	// Load the biomes from NBT, if present and valid:
 	if (!LoadBiomeMapFromNBT(Data.BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "Biomes")))
 	{
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing chunk biome data", a_RawChunkData);
+		ChunkLoadFailed(a_Chunk, "Missing chunk biome data", a_RawChunkData);
 		return false;
 	}
 
-	// Height map too:
+	// Load the Height map, if it fails, recalculate it:
 	if (!LoadHeightMapFromNBT(Data.HeightMap, a_NBT, a_NBT.FindChildByName(Level, "HeightMap")))
 	{
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing chunk height data", a_RawChunkData);
-		return false;
+		Data.UpdateHeightMap();
 	}
 
 	// Load the entities from NBT:
@@ -454,7 +744,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	{
 		for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
 		{
-			int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
+			const auto Index = cChunkDef::MakeIndex(x, y, z);
 			if (ShouldInvert[x + cChunkDef::Width * z])
 			{
 				BlockTypes[Index] = (BlockTypes[Index] == E_BLOCK_AIR) ? E_BLOCK_STONE : E_BLOCK_AIR;
@@ -632,10 +922,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 		}
 
 		// Index computed before Entity moved.
-		const auto Idx = cChunkDef::MakeIndexNoCheck(Entity->GetRelPos());
+		const auto Index = cChunkDef::MakeIndex(Entity->GetRelPos());
 
 		// Add the BlockEntity to the loaded data:
-		a_BlockEntities.emplace(Idx, std::move(Entity));
+		a_BlockEntities.emplace(Index, std::move(Entity));
 	}  // for Child - tag children
 }
 
@@ -1003,6 +1293,9 @@ OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_Ta
 		return nullptr;
 	}
 
+	unsigned char Color = 15;
+	AString CustomName;
+
 	// Reads base color from NBT
 	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Base");
 	if (CurrentLine >= 0)
@@ -1011,7 +1304,15 @@ OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_Ta
 		return std::make_unique<cBannerEntity>(a_Block, a_Pos, m_World, Color);
 	}
 
-	return nullptr;
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "CustomName");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_String))
+	{
+		CustomName = a_NBT.GetString(CurrentLine);
+	}
+
+	auto banner = std::make_unique<cBannerEntity>(a_Block, a_Pos, m_World, Color);
+	banner->SetCustomName(CustomName);
+	return banner;
 }
 
 
@@ -1772,29 +2073,29 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		case mtHoglin:          return LoadHoglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtHusk:            return LoadHuskFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtIllusioner:      return LoadIllusionerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtIronGolem:       return LoadVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtLlama:           return LoadIronGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtMagmaCube:       return LoadLlamaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtMooshroom:       return LoadMagmaCubeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtMule:            return LoadMooshroomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtOcelot:          return LoadMuleFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPanda:           return LoadOcelotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtParrot:          return LoadPandaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPhantom:         return LoadParrotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPig:             return LoadPhantomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPiglin:          return LoadPigFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPiglinBrute:     return LoadPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPillager:        return LoadPiglinBruteFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPolarBear:       return LoadPillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPufferfish:      return LoadPolarBearFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtRabbit:          return LoadPufferfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtRavager:         return LoadRabbitFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSalmon:          return LoadRavagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSheep:           return LoadSalmonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtShulker:         return LoadSheepFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSilverfish:      return LoadShulkerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSkeleton:        return LoadSilverfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSkeletonHorse:   return LoadSkeletonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtIronGolem:       return LoadIronGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtLlama:           return LoadLlamaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtMagmaCube:       return LoadMagmaCubeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtMooshroom:       return LoadMooshroomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtMule:            return LoadMuleFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtOcelot:          return LoadOcelotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPanda:           return LoadPandaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtParrot:          return LoadParrotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPhantom:         return LoadPhantomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPig:             return LoadPigFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPiglin:          return LoadPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPiglinBrute:     return LoadPiglinBruteFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPillager:        return LoadPillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPolarBear:       return LoadPolarBearFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPufferfish:      return LoadPufferfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtRabbit:          return LoadRabbitFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtRavager:         return LoadRavagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSalmon:          return LoadSalmonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSheep:           return LoadSheepFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtShulker:         return LoadShulkerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSilverfish:      return LoadSilverfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSkeleton:        return LoadSkeletonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSkeletonHorse:   return LoadSkeletonHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtSlime:           return LoadSlimeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtSnowGolem:       return LoadSnowGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtSpider:          return LoadSpiderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
@@ -1817,6 +2118,7 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		case mtZombieHorse:     return LoadZombieHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtZombifiedPiglin: return LoadZombifiedPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtZombieVillager:  return LoadZombieVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtBee:             break;  // TODO: implement bee nbt
 		case mtInvalidType:     break;
 	}
 }
@@ -2214,7 +2516,7 @@ void cWSSAnvil::LoadPaintingFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		return;
 	}
 
-	auto Painting = std::make_unique<cPainting>(a_NBT.GetString(MotiveTag), BLOCK_FACE_NONE, Vector3d());
+	auto Painting = std::make_unique<cPainting>(a_NBT.GetString(MotiveTag), BLOCK_FACE_NONE, Vector3d(), 0);
 	if (!LoadEntityBaseFromNBT(*Painting.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -3379,6 +3681,12 @@ void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		Monster->SetAge(Age);
 	}
 
+	int InventoryIdx = a_NBT.FindChildByName(a_TagIdx, "Inventory");
+	if (InventoryIdx > 0)
+	{
+		LoadItemGridFromNBT(Monster->GetInventory(), a_NBT, InventoryIdx);
+	}
+
 
 	a_Entities.emplace_back(std::move(Monster));
 }
@@ -3754,7 +4062,7 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 		Rotation[1] = 0;
 	}
 	a_Entity.SetYaw(Rotation[0]);
-	a_Entity.SetRoll(Rotation[1]);
+	a_Entity.SetPitch(Rotation[1]);
 
 	// Depending on the Minecraft version, the entity's health is
 	// stored either as a float Health tag (HealF prior to 1.9) or
@@ -4085,21 +4393,21 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, ContiguousB
 	UInt32 ChunkSize = 0;
 	if (m_File.Read(&ChunkSize, 4) != 4)
 	{
-		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk size", {});
+		m_ParentSchema.ChunkLoadFailed(a_Chunk, "Cannot read chunk size", {});
 		return false;
 	}
 	ChunkSize = ntohl(ChunkSize);
 	if (ChunkSize < 1)
 	{
 		// Chunk size too small
-		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Chunk size too small", {});
+		m_ParentSchema.ChunkLoadFailed(a_Chunk, "Chunk size too small", {});
 		return false;
 	}
 
 	char CompressionType = 0;
 	if (m_File.Read(&CompressionType, 1) != 1)
 	{
-		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk compression", {});
+		m_ParentSchema.ChunkLoadFailed(a_Chunk, "Cannot read chunk compression", {});
 		return false;
 	}
 	ChunkSize--;
@@ -4107,14 +4415,14 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, ContiguousB
 	a_Data = m_File.Read(ChunkSize);
 	if (a_Data.size() != ChunkSize)
 	{
-		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read entire chunk data", a_Data);
+		m_ParentSchema.ChunkLoadFailed(a_Chunk, "Cannot read entire chunk data", a_Data);
 		return false;
 	}
 
 	if (CompressionType != 2)
 	{
 		// Chunk is in an unknown compression
-		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Printf("Unknown chunk compression: %d", CompressionType), a_Data);
+		m_ParentSchema.ChunkLoadFailed(a_Chunk, fmt::format(FMT_STRING("Unknown chunk compression: {}"), CompressionType), a_Data);
 		return false;
 	}
 	return true;
@@ -4133,6 +4441,22 @@ const std::byte * cWSSAnvil::GetSectionData(const cParsedNBT & a_NBT, int a_Tag,
 	}
 	return nullptr;
 }
+
+
+
+
+
+
+const std::byte * cWSSAnvil::GetSectionDataLong(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, size_t a_Length)
+{
+	int Child = a_NBT.FindChildByName(a_Tag, a_ChildName);
+	if ((Child >= 0) && (a_NBT.GetType(Child) == TAG_LongArray) && (a_NBT.GetDataLength(Child) == a_Length * 8))
+	{
+		return a_NBT.GetData(Child);
+	}
+	return nullptr;
+}
+
 
 
 

@@ -26,7 +26,7 @@ namespace
 		return
 		{
 			static_cast<size_t>(a_RelPos.y / cChunkDef::SectionHeight),
-			static_cast<size_t>(cChunkDef::MakeIndexNoCheck(a_RelPos.x, a_RelPos.y % cChunkDef::SectionHeight, a_RelPos.z))
+			cChunkDef::MakeIndex(a_RelPos.x, a_RelPos.y % cChunkDef::SectionHeight, a_RelPos.z)
 		};
 	}
 
@@ -192,6 +192,35 @@ void ChunkBlockData::SetSection(const SectionType & a_BlockSource, const size_t 
 	m_Blocks.SetSection(a_BlockSource, a_Y);
 }
 
+
+
+
+
+//void ChunkBlockDataNew::Assign(const ChunkBlockDataNew & a_Other)
+//{
+//	m_Blocks.Assign(a_Other.m_Blocks);
+//	//m_Metas.Assign(a_Other.m_Metas);
+//}
+//
+//
+//
+//
+//
+//void ChunkBlockDataNew::SetAll(const cChunkDef::BlockTypes2 & a_BlockSource)
+//{
+//	m_Blocks.SetAll(a_BlockSource);
+//	//m_Metas.SetAll(a_MetaSource);
+//}
+//
+//
+//
+//
+//
+//void ChunkBlockDataNew::SetSection(const SectionType & a_BlockSource, size_t a_Y)
+//{
+//	m_Blocks.SetSection(a_BlockSource, a_Y);
+//	//m_Metas.SetSection(a_MetaSource, a_Y);
+//}
 
 
 

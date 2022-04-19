@@ -53,7 +53,7 @@ public:
 		}
 
 		// Activate TNT if we clicked on it while not crouched:
-		if ((a_World->GetBlock(a_ClickedBlockPos).Type() == BlockType::TNT) && !a_Player->IsCrouched())
+		if ((a_World->GetBlock(a_ClickedBlockPos).Type() == BlockType::Tnt) && !a_Player->IsCrouched())
 		{
 			a_World->DigBlock(a_ClickedBlockPos, a_Player);
 			a_World->SpawnPrimedTNT(Vector3d(a_ClickedBlockPos) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
