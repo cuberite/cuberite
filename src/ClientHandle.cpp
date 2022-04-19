@@ -1482,11 +1482,11 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		IsWithinReach && !m_Player->IsFrozen()
 	)
 	{
-		auto ClickedBlock = World->GetBlock(ClickedBlockPos);
+		auto ClickedBlock = World->GetBlock(ClickedPosition);
 		const auto & BlockHandler = cBlockHandler::For(ClickedBlock.Type());
 
 		const auto & ItemHandler = HeldItem.GetHandler();
-		const bool BlockUsable = BlockHandler.IsUseable() && (m_Player->IsGameModeSpectator() ? cBlockInfo::IsUseableBySpectator(BlockType) : !(m_Player->IsCrouched() && !HeldItem.IsEmpty()));
+		const bool BlockUsable = BlockHandler.IsUseable() && (m_Player->IsGameModeSpectator() ? cBlockInfo::IsUseableBySpectator(ClickedBlock) : !(m_Player->IsCrouched() && !HeldItem.IsEmpty()));
 		const bool ItemPlaceable = ItemHandler.IsPlaceable() && !m_Player->IsGameModeAdventure() && !m_Player->IsGameModeSpectator();
 		const bool ItemUseable = !m_Player->IsGameModeSpectator();
 
@@ -1506,7 +1506,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 				if (ItemPlaceable)
 				{
 					// Place a block:
-					ItemHandler.OnPlayerPlace(*m_Player, HeldItem, ClickedPosition, BlockType, BlockMeta, a_BlockFace, CursorPosition);
+					ItemHandler.OnPlayerPlace(*m_Player, HeldItem, ClickedPosition, ClickedBlock, a_BlockFace, CursorPosition);
 				}
 
 				return;
@@ -1523,7 +1523,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			}
 
 			// Place a block:
-			ItemHandler.OnPlayerPlace(*m_Player, HeldItem, ClickedPosition, BlockType, BlockMeta, a_BlockFace, CursorPosition);
+			ItemHandler.OnPlayerPlace(*m_Player, HeldItem, ClickedPosition, ClickedBlock, a_BlockFace, CursorPosition);
 			return;
 		}
 		else if (ItemUseable)

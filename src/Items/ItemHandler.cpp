@@ -413,7 +413,7 @@ namespace
 	constexpr cUnimplementedItemHandler     ItemEndStoneBrickWallHandler               (Item::EndStoneBrickWall);
 	constexpr cUnimplementedItemHandler     ItemEndStoneBricksHandler                  (Item::EndStoneBricks);
 	constexpr cSimplePlaceableItemHandler   ItemEndStoneHandler                        (Item::EndStone);
-	constexpr cItemEnderchestHandler        ItemEnderChestHandler                      (Item::EnderChest);
+	constexpr cItemEnderChestHandler        ItemEnderChestHandler                      (Item::EnderChest);
 	constexpr cItemEyeOfEnderHandler        ItemEnderEyeHandler                        (Item::EnderEye);
 	constexpr cItemEnderPearlHandler        ItemEnderPearlHandler                      (Item::EnderPearl);
 	constexpr cItemSpawnEggHandler          ItemEndermanSpawnEggHandler                (Item::EndermanSpawnEgg);
@@ -1006,7 +1006,7 @@ namespace
 	constexpr cItemSpawnEggHandler          ItemVexSpawnEggHandler                     (Item::VexSpawnEgg);
 	constexpr cItemSpawnEggHandler          ItemVillagerSpawnEggHandler                (Item::VillagerSpawnEgg);
 	constexpr cItemSpawnEggHandler          ItemVindicatorSpawnEggHandler              (Item::VindicatorSpawnEgg);
-	constexpr cItemVineHandler              ItemVineHandler                            (Item::Vine);
+	constexpr cItemVinesHandler             ItemVineHandler                            (Item::Vine);
 	constexpr cItemSpawnEggHandler          ItemWanderingTraderSpawnEggHandler         (Item::WanderingTraderSpawnEgg);
 	constexpr cItemButtonHandler            ItemWarpedButtonHandler                    (Item::WarpedButton);
 	constexpr cItemDoorHandler              ItemWarpedDoorHandler                      (Item::WarpedDoor);
@@ -2067,12 +2067,12 @@ const cItemHandler & cItemHandler::For(Item a_ItemType)
 
 
 
-void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_ClickedPosition, const BLOCKTYPE a_ClickedBlockType, const NIBBLETYPE a_ClickedBlockMeta, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const
+void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_ClickedPosition, const BlockState a_ClickedBlock, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const
 {
 	const auto & World = *a_Player.GetWorld();
 
 	// Check if the block ignores build collision (water, grass etc.):
-	if (cBlockHandler::For(ClickedBlock.Type()).DoesIgnoreBuildCollision(World, a_HeldItem, a_ClickedBlockPosition, ClickedBlock, a_ClickedBlockFace, true))
+	if (cBlockHandler::For(a_ClickedBlock.Type()).DoesIgnoreBuildCollision(World, a_HeldItem, a_ClickedPosition, a_ClickedBlock, a_ClickedBlockFace, true))
 	{
 		// Try to place the block at the clicked position:
 		if (!CommitPlacement(a_Player, a_HeldItem, a_ClickedPosition, a_ClickedBlockFace, a_CursorPosition))
@@ -2084,21 +2084,20 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 	}
 	else
 	{
-		BLOCKTYPE PlaceBlock;
-		NIBBLETYPE PlaceMeta;
+		BlockState PlaceBlock;
 		const auto PlacePosition = AddFaceDirection(a_ClickedPosition, a_ClickedBlockFace);
 
-		if (!cChunkDef::IsValidHeight(PlacePosition.y) || !World.GetBlockTypeMeta(PlacePosition, PlaceBlock, PlaceMeta))
+		if (!cChunkDef::IsValidHeight(PlacePosition.y) || !World.GetBlock(PlacePosition, PlaceBlock))
 		{
 			// The block is being placed outside the world, ignore this packet altogether (GH #128):
 			return;
 		}
 
-		auto PlacedBlock = World.GetBlock(PlacedPosition);
+		auto PlacedBlock = World.GetBlock(PlacePosition);
 
 		// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
 		// No need to do combinability (dblslab) checks, client will do that here.
-		if (!cBlockHandler::For(PlacedBlock.Type()).DoesIgnoreBuildCollision(World, a_HeldItem, PlacedPosition, PlacedBlock, a_ClickedBlockFace, false))
+		if (!cBlockHandler::For(PlacedBlock.Type()).DoesIgnoreBuildCollision(World, a_HeldItem, PlacePosition, PlacedBlock, a_ClickedBlockFace, false))
 		{
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it.

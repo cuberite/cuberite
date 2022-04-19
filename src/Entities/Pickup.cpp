@@ -294,7 +294,7 @@ bool cPickup::CollectedBy(cEntity & a_Dest)
 			case Item::JungleLog:
 			case Item::OakLog:
 			case Item::SpruceLog:
-				a_Dest.AwardAchievement(CustomStatistic::AchMineWood); break;
+				Player.AwardAchievement(CustomStatistic::AchMineWood); break;
 			case Item::Leather:  Player.AwardAchievement(CustomStatistic::AchKillCow);  break;
 			case Item::Diamond:  Player.AwardAchievement(CustomStatistic::AchDiamonds); break;
 			case Item::BlazeRod: Player.AwardAchievement(CustomStatistic::AchBlazeRod); break;

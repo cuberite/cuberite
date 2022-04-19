@@ -677,7 +677,7 @@ namespace ItemCategory
 
 	bool IsHorseArmor(Item a_ItemType);
 
-	bool IsVillagerFood(short a_ItemType);
+	bool IsVillagerFood(Item a_ItemType);
 }
 
 // tolua_end

@@ -818,17 +818,17 @@ bool ItemCategory::IsHorseArmor(Item a_ItemType)
 
 
 
-bool ItemCategory::IsVillagerFood(short a_ItemType)
+bool ItemCategory::IsVillagerFood(Item a_ItemType)
 {
 	switch (a_ItemType)
 	{
-		case E_ITEM_CARROT:
-		case E_ITEM_POTATO:
-		case E_ITEM_BREAD:
-		case E_ITEM_BEETROOT:
-		case E_ITEM_SEEDS:
-		case E_ITEM_BEETROOT_SEEDS:
-		case E_ITEM_WHEAT:
+		case Item::Carrot:
+		case Item::Potato:
+		case Item::Bread:
+		case Item::Beetroot:
+		case Item::WheatSeeds:
+		case Item::BeetrootSeeds:
+		case Item::Wheat:
 		{
 			return true;
 		}

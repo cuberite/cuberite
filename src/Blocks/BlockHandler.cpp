@@ -453,7 +453,7 @@ namespace
 	constexpr cBlockStairsHandler                          BlockEndStoneBrickStairsHandler(BlockType::EndStoneBrickStairs);
 	constexpr cDefaultBlockHandler                         BlockEndStoneBrickWallHandler(BlockType::EndStoneBrickWall);
 	constexpr cDefaultBlockHandler                         BlockEndStoneBricksHandler(BlockType::EndStoneBricks);
-	constexpr cBlockEnderchestHandler                      BlockEnderChestHandler(BlockType::EnderChest);
+	constexpr cBlockEnderChestHandler                      BlockEnderChestHandler(BlockType::EnderChest);
 	constexpr cBlockFarmlandHandler                        BlockFarmlandHandler(BlockType::Farmland);
 	constexpr cBlockTallGrassHandler                       BlockFernHandler(BlockType::Fern);
 	constexpr cBlockFireHandler                            BlockFireHandler(BlockType::Fire);
@@ -799,7 +799,7 @@ namespace
 	constexpr cBlockRedstoneOreHandler                     BlockRedstoneOreHandler(BlockType::RedstoneOre);
 	constexpr cBlockTorchHandler                           BlockRedstoneTorchHandler(BlockType::RedstoneTorch);
 	constexpr cBlockTorchHandler                           BlockRedstoneWallTorchHandler(BlockType::RedstoneWallTorch);
-	constexpr cBlockRedstoneHandler                        BlockRedstoneWireHandler(BlockType::RedstoneWire);
+	constexpr cBlockRedstoneWireHandler                    BlockRedstoneWireHandler(BlockType::RedstoneWire);
 	constexpr cBlockRedstoneRepeaterHandler                BlockRepeaterHandler(BlockType::Repeater);
 	constexpr cBlockCommandBlockHandler                    BlockRepeatingCommandBlockHandler(BlockType::RepeatingCommandBlock);
 	constexpr cDefaultBlockHandler                         BlockRespawnAnchorHandler(BlockType::RespawnAnchor);
@@ -886,7 +886,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockStrippedWarpedStemHandler(BlockType::StrippedWarpedStem);
 	constexpr cDefaultBlockHandler                         BlockStructureBlockHandler(BlockType::StructureBlock);
 	constexpr cDefaultBlockHandler                         BlockStructureVoidHandler(BlockType::StructureVoid);
-	constexpr cBlockSugarcaneHandler                       BlockSugarCaneHandler(BlockType::SugarCane);
+	constexpr cBlockSugarCaneHandler                       BlockSugarCaneHandler(BlockType::SugarCane);
 	constexpr cBlockBigFlowerHandler                       BlockSunflowerHandler(BlockType::Sunflower);
 	constexpr cDefaultBlockHandler                         BlockSweetBerryBushHandler(BlockType::SweetBerryBush);
 	constexpr cBlockTNTHandler                             BlockTNTHandler(BlockType::TNT);
@@ -905,7 +905,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockTurtleEggHandler(BlockType::TurtleEgg);
 	constexpr cDefaultBlockHandler                         BlockTwistingVinesHandler(BlockType::TwistingVines);
 	constexpr cDefaultBlockHandler                         BlockTwistingVinesPlantHandler(BlockType::TwistingVinesPlant);
-	constexpr cBlockVineHandler                            BlockVineHandler(BlockType::Vine);
+	constexpr cBlockVinesHandler                           BlockVineHandler(BlockType::Vine);
 	constexpr cBlockAirHandler                             BlockVoidAirHandler(BlockType::VoidAir);
 	constexpr cBlockTorchHandler                           BlockWallTorchHandler(BlockType::WallTorch);
 	constexpr cBlockButtonHandler                          BlockWarpedButtonHandler(BlockType::WarpedButton);

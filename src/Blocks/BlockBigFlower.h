@@ -134,7 +134,7 @@ private:
 		// Both parts can only that they're rooted in grass.
 
 		const auto RootPosition = a_Position.addedY(IsTopPart(a_Self) ? -2 : -1);
-		return (RootPosition.y >= 0) && IsBlockStateOfDirt(a_Chunk.GetBlock(RootPosition));
+		return (RootPosition.y >= 0) && IsBlockMaterialDirt(a_Chunk.GetBlock(RootPosition));
 	}
 
 
@@ -157,7 +157,7 @@ private:
 				// TODO: Simplify to SetBlock and remove the IsMetaTopPart check in DropBlockAsPickups when 1.13 blockstates arrive.
 				if ((a_Digger != nullptr) && a_Digger->IsPlayer() && static_cast<const cPlayer *>(a_Digger)->IsGameModeCreative())
 				{
-					a_ChunkInterface.SetBlock(LowerPart, E_BLOCK_AIR, 0);
+					a_ChunkInterface.SetBlock(LowerPartPos, Block::Air::Air());
 				}
 				else
 				{

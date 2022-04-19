@@ -88,7 +88,7 @@ void ForEachSourceCallback::CheckIndirectPower()
 
 
 
-PowerLevel ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const Vector3i QueryPosition, const BLOCKTYPE QueryBlock, const Vector3i SolidBlockPosition)
+PowerLevel ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const Vector3i QueryPosition, const BlockState QueryBlock, const Vector3i SolidBlockPosition)
 {
 	PowerLevel Power = 0;
 
