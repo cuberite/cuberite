@@ -61,6 +61,8 @@ int cClientHandle::s_ClientCount = 0;
 
 float cClientHandle::FASTBREAK_PERCENTAGE;
 
+Vector3i cClientHandle::s_IllegalPosition = {0, cChunkDef::Height + 1, 0};
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -81,16 +83,16 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_PingID(1),
 	m_BlockDigAnimStage(-1),
 	m_BlockDigAnimSpeed(0),
-	m_BlockDigAnimPos(),
+	m_BlockDigAnimPos(s_IllegalPosition),
 	m_HasStartedDigging(false),
-	m_LastDigBlockPos(),
+	m_LastDigBlockPos(s_IllegalPosition),
 	m_State(csConnected),
 	m_NumExplosionsThisTick(0),
 	m_NumBlockChangeInteractionsThisTick(0),
 	m_UniqueID(0),
 	m_HasSentPlayerChunk(false),
 	m_Locale("en_GB"),
-	m_LastPlacedSign(0, -1, 0),
+	m_LastPlacedSign(s_IllegalPosition),
 	m_ProtocolVersion(0)
 {
 	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
@@ -1119,16 +1121,13 @@ void cClientHandle::HandleLeftClick(Vector3i a_BlockPos, eBlockFace a_BlockFace,
 		Vector3i BlockPos = a_BlockPos;
 		AddFaceDirection(BlockPos, a_BlockFace);
 
-		if (cChunkDef::IsValidHeight(BlockPos.y) && cBlockInfo::IsClickedThrough(m_Player->GetWorld()->GetBlock(BlockPos)))
+		if (cChunkDef::IsValidHeight(BlockPos) && cBlockInfo::IsClickedThrough(m_Player->GetWorld()->GetBlock(BlockPos)))
 		{
 			a_BlockPos = BlockPos;
 		}
 
-		if (
-			(Diff(m_Player->GetPosX(), static_cast<double>(a_BlockPos.x)) > 6) ||
-			(Diff(m_Player->GetPosY(), static_cast<double>(a_BlockPos.y)) > 6) ||
-			(Diff(m_Player->GetPosZ(), static_cast<double>(a_BlockPos.z)) > 6)
-		)
+		constexpr double MaxBlockDistance = 6.0;
+		if (!cBoundingBox(m_Player->GetPosition(), MaxBlockDistance).IsInside(a_BlockPos))
 		{
 			m_Player->SendBlocksAround(a_BlockPos, 2);
 			return;
@@ -1176,11 +1175,11 @@ void cClientHandle::HandleLeftClick(Vector3i a_BlockPos, eBlockFace a_BlockFace,
 				// When bow is in off-hand / shield slot
 				if (m_Player->GetInventory().GetShieldSlot().m_ItemType == E_ITEM_BOW)
 				{
-					m_Player->GetInventory().GetShieldSlot().GetHandler().OnItemShoot(m_Player, {a_BlockPos}, a_BlockFace);
+					m_Player->GetInventory().GetShieldSlot().GetHandler().OnItemShoot(m_Player, a_BlockPos, a_BlockFace);
 				}
 				else
 				{
-					ItemHandler.OnItemShoot(m_Player, {a_BlockPos}, a_BlockFace);
+					ItemHandler.OnItemShoot(m_Player, a_BlockPos, a_BlockFace);
 				}
 			}
 			return;
@@ -1271,11 +1270,8 @@ void cClientHandle::HandleBlockDigStarted(Vector3i a_BlockPos, eBlockFace a_Bloc
 		return;
 	}
 
-	if (
-		(Diff(m_Player->GetPosX(), static_cast<double>(a_BlockPos.x)) > 6) ||
-		(Diff(m_Player->GetPosY(), static_cast<double>(a_BlockPos.y)) > 6) ||
-		(Diff(m_Player->GetPosZ(), static_cast<double>(a_BlockPos.z)) > 6)
-	)
+	constexpr double MaxBlockDistance = 6.0;
+	if (!cBoundingBox(m_Player->GetPosition(), MaxBlockDistance).IsInside(a_BlockPos))
 	{
 		m_Player->SendBlocksAround(a_BlockPos, 2);
 		return;
@@ -1309,9 +1305,9 @@ void cClientHandle::HandleBlockDigStarted(Vector3i a_BlockPos, eBlockFace a_Bloc
 
 	cWorld * World = m_Player->GetWorld();
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	cBlockHandler::For(DiggingBlock).OnDigging(ChunkInterface, *World, *m_Player, {a_BlockPos});
+	cBlockHandler::For(DiggingBlock).OnDigging(ChunkInterface, *World, *m_Player, a_BlockPos);
 
-	m_Player->GetEquippedItem().GetHandler().OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), {a_BlockPos}, a_BlockFace);
+	m_Player->GetEquippedItem().GetHandler().OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), a_BlockPos, a_BlockFace);
 }
 
 
@@ -1337,7 +1333,7 @@ void cClientHandle::HandleBlockDigFinished(Vector3i a_BlockPos, eBlockFace a_Blo
 
 	BLOCKTYPE DugBlock;
 	NIBBLETYPE DugMeta;
-	m_Player->GetWorld()->GetBlockTypeMeta({ a_BlockPos }, DugBlock, DugMeta);
+	m_Player->GetWorld()->GetBlockTypeMeta(a_BlockPos, DugBlock, DugMeta);
 
 	if (!m_Player->IsGameModeCreative())
 	{
@@ -1411,14 +1407,14 @@ void cClientHandle::FinishDigAnimation()
 		m_Player->GetWorld()->BroadcastBlockBreakAnimation(static_cast<UInt32>(m_UniqueID), m_LastDigBlockPos, 10, this);
 	}
 
-	m_LastDigBlockPos = {-1, -1, -1};
+	m_LastDigBlockPos = s_IllegalPosition;
 }
 
 
 
 
 
-void cClientHandle::HandleRightClick(Vector3i a_BlockPos, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, bool a_UsedMainHand)
+void cClientHandle::HandleRightClick(Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, bool a_UsedMainHand)
 {
 	/* This function handles three actions:
 	(1) Place a block;
@@ -1443,12 +1439,10 @@ void cClientHandle::HandleRightClick(Vector3i a_BlockPos, eBlockFace a_BlockFace
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
 	a_UsedMainHand = true;
 
-	const Vector3i ClickedPosition(a_BlockPos);
-	const Vector3i CursorPosition(a_CursorX, a_CursorY, a_CursorZ);
 	const cItem & HeldItem = a_UsedMainHand ? m_Player->GetEquippedItem() : m_Player->GetInventory().GetShieldSlot();
 
 	// Distance from the block's center to the player's eye height.
-	const double Dist = (Vector3d(0.5, 0.5, 0.5) + ClickedPosition - m_Player->GetEyePosition()).SqrLength();
+	const double Dist = (Vector3d(0.5, 0.5, 0.5) + a_BlockPos - m_Player->GetEyePosition()).SqrLength();
 
 	// Check the reach distance:
 	// _X 2014-11-25: I've maxed at 5.26 with a Survival client and 5.78 with a Creative client in my tests
@@ -1456,21 +1450,21 @@ void cClientHandle::HandleRightClick(Vector3i a_BlockPos, eBlockFace a_BlockFace
 	bool IsWithinReach = (Dist <= MaxDist);
 
 	FLOGD("HandleRightClick: {0}, face {1}, Cursor {2}, Hand: {3}, HeldItem: {4}; Dist: {5:.02f}",
-		ClickedPosition, a_BlockFace, CursorPosition, a_UsedMainHand, ItemToFullString(HeldItem), Dist
+		a_BlockPos, a_BlockFace, a_CursorPos, a_UsedMainHand, ItemToFullString(HeldItem), Dist
 	);
 
 	cWorld * World = m_Player->GetWorld();
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
 	if (
-		!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockPos, a_BlockFace, CursorPosition) &&
+		!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockPos, a_BlockFace, a_CursorPos) &&
 		IsWithinReach && !m_Player->IsFrozen()
 	)
 	{
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
 
-		if (!World->GetBlockTypeMeta(ClickedPosition, BlockType, BlockMeta))
+		if (!World->GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta))
 		{
 			return;
 		}
@@ -1484,12 +1478,12 @@ void cClientHandle::HandleRightClick(Vector3i a_BlockPos, eBlockFace a_BlockFace
 		if (BlockUsable)
 		{
 			cChunkInterface ChunkInterface(World->GetChunkMap());
-			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockPos, a_BlockFace, CursorPosition, BlockType, BlockMeta))
+			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockPos, a_BlockFace, a_CursorPos, BlockType, BlockMeta))
 			{
 				// Use a block:
-				if (BlockHandler.OnUse(ChunkInterface, *World, *m_Player, ClickedPosition, a_BlockFace, CursorPosition))
+				if (BlockHandler.OnUse(ChunkInterface, *World, *m_Player, a_BlockPos, a_BlockFace, a_CursorPos))
 				{
-					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockPos, a_BlockFace, CursorPosition, BlockType, BlockMeta);
+					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockPos, a_BlockFace, a_CursorPos, BlockType, BlockMeta);
 					return;  // Block use was successful, we're done.
 				}
 
@@ -1497,7 +1491,7 @@ void cClientHandle::HandleRightClick(Vector3i a_BlockPos, eBlockFace a_BlockFace
 				if (ItemPlaceable)
 				{
 					// Place a block:
-					ItemHandler.OnPlayerPlace(*m_Player, HeldItem, ClickedPosition, BlockType, BlockMeta, a_BlockFace, CursorPosition);
+					ItemHandler.OnPlayerPlace(*m_Player, HeldItem, a_BlockPos, BlockType, BlockMeta, a_BlockFace, a_CursorPos);
 				}
 
 				return;
@@ -1514,19 +1508,19 @@ void cClientHandle::HandleRightClick(Vector3i a_BlockPos, eBlockFace a_BlockFace
 			}
 
 			// Place a block:
-			ItemHandler.OnPlayerPlace(*m_Player, HeldItem, ClickedPosition, BlockType, BlockMeta, a_BlockFace, CursorPosition);
+			ItemHandler.OnPlayerPlace(*m_Player, HeldItem, a_BlockPos, BlockType, BlockMeta, a_BlockFace, a_CursorPos);
 			return;
 		}
 		else if (ItemUseable)
 		{
-			if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockPos, a_BlockFace, CursorPosition))
+			if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockPos, a_BlockFace, a_CursorPos))
 			{
 				// All plugins agree with using the item.
 				// Use an item in hand with a target block.
 
 				cBlockInServerPluginInterface PluginInterface(*World);
-				ItemHandler.OnItemUse(World, m_Player, PluginInterface, HeldItem, ClickedPosition, a_BlockFace);
-				PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockPos, a_BlockFace, CursorPosition);
+				ItemHandler.OnItemUse(World, m_Player, PluginInterface, HeldItem, a_BlockPos, a_BlockFace);
+				PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockPos, a_BlockFace, a_CursorPos);
 				return;
 			}
 		}
@@ -1609,9 +1603,8 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 
 
 
-void cClientHandle::HandlePlayerMove(double a_PosX, double a_PosY, double a_PosZ, bool a_IsOnGround)
+void cClientHandle::HandlePlayerMove(Vector3d a_Pos, bool a_IsOnGround)
 {
-	const Vector3d NewPosition(a_PosX, a_PosY, a_PosZ);
 	const Vector3d OldPosition = GetPlayer()->GetPosition();
 	const auto PreviousIsOnGround = GetPlayer()->IsOnGround();
 
@@ -1621,7 +1614,7 @@ void cClientHandle::HandlePlayerMove(double a_PosX, double a_PosY, double a_PosZ
 #endif
 
 	if (
-		(OldPosition == NewPosition) &&
+		(OldPosition == a_Pos) &&
 		(PreviousIsOnGround == a_IsOnGround)
 	)
 	{
@@ -1641,14 +1634,14 @@ void cClientHandle::HandlePlayerMove(double a_PosX, double a_PosY, double a_PosZ
 	}
 
 	// If the player has moved too far, "repair" them:
-	if ((OldPosition - NewPosition).SqrLength() > 100 * 100)
+	if ((OldPosition - a_Pos).SqrLength() > 100 * 100)
 	{
-		LOGD("Too far away (%0.2f), \"repairing\" the client", (OldPosition - NewPosition).Length());
+		LOGD("Too far away (%0.2f), \"repairing\" the client", (OldPosition - a_Pos).Length());
 		SendPlayerMoveLook();
 		return;
 	}
 
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*m_Player, OldPosition, NewPosition, PreviousIsOnGround))
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*m_Player, OldPosition, a_Pos, PreviousIsOnGround))
 	{
 		SendPlayerMoveLook();
 		return;
@@ -1657,18 +1650,18 @@ void cClientHandle::HandlePlayerMove(double a_PosX, double a_PosY, double a_PosZ
 	// TODO: should do some checks to see if player is not moving through terrain
 	// TODO: Official server refuses position packets too far away from each other, kicking "hacked" clients; we should, too
 
-	m_Player->SetPosition(NewPosition);
+	m_Player->SetPosition(a_Pos);
 	m_Player->SetTouchGround(a_IsOnGround);
-	m_Player->UpdateMovementStats(NewPosition - OldPosition, PreviousIsOnGround);
+	m_Player->UpdateMovementStats(a_Pos - OldPosition, PreviousIsOnGround);
 }
 
 
 
 
 
-void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, float a_Rotation, float a_Pitch, bool a_IsOnGround)
+void cClientHandle::HandlePlayerMoveLook(Vector3d a_Pos, float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
-	HandlePlayerMove(a_PosX, a_PosY, a_PosZ, a_IsOnGround);
+	HandlePlayerMove(a_Pos, a_IsOnGround);
 	HandlePlayerLook(a_Rotation, a_Pitch, a_IsOnGround);
 }
 
@@ -1768,7 +1761,7 @@ void cClientHandle::HandleUpdateSign(
 	const AString & a_Line3, const AString & a_Line4
 )
 {
-	if (m_LastPlacedSign.Equals(Vector3i(a_BlockPos)))
+	if (m_LastPlacedSign.Equals(a_BlockPos))
 	{
 		m_LastPlacedSign.Set(0, -1, 0);
 		m_Player->GetWorld()->SetSignLines(a_BlockPos, a_Line1, a_Line2, a_Line3, a_Line4, m_Player);
@@ -1865,7 +1858,10 @@ void cClientHandle::HandleUseItem(bool a_UsedMainHand)
 
 	LOGD("HandleUseItem: Hand: %d; HeldItem: %s", a_UsedMainHand, ItemToFullString(HeldItem).c_str());
 
-	if (PlgMgr->CallHookPlayerRightClick(*m_Player, {-1, 255, -1}, BLOCK_FACE_NONE, {0, 0, 0}))
+	constexpr Vector3i DefaultBlockPos(-1, 255, -1);
+	constexpr Vector3i DefaultCursorPos(0, 0, 0);
+
+	if (PlgMgr->CallHookPlayerRightClick(*m_Player, DefaultBlockPos, BLOCK_FACE_NONE, DefaultCursorPos))
 	{
 		return;  // Plugin denied click action
 	}
@@ -1897,12 +1893,12 @@ void cClientHandle::HandleUseItem(bool a_UsedMainHand)
 	else
 	{
 		// Use an item in hand without a target block
-		if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, {-1, 255, -1}, BLOCK_FACE_NONE, {0, 0, 0}))
+		if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, DefaultBlockPos, BLOCK_FACE_NONE, DefaultCursorPos))
 		{
 			// All plugins agree with using the item
 			cBlockInServerPluginInterface PluginInterface(*World);
-			ItemHandler.OnItemUse(World, m_Player, PluginInterface, HeldItem, {-1, 255, -1}, BLOCK_FACE_NONE);
-			PlgMgr->CallHookPlayerUsedItem(*m_Player, {-1, 255, -1}, BLOCK_FACE_NONE, {0, 0, 0});
+			ItemHandler.OnItemUse(World, m_Player, PluginInterface, HeldItem, DefaultBlockPos, BLOCK_FACE_NONE);
+			PlgMgr->CallHookPlayerUsedItem(*m_Player, DefaultBlockPos, BLOCK_FACE_NONE, DefaultCursorPos);
 		}
 	}
 }
@@ -2687,13 +2683,13 @@ void cClientHandle::SendExplosion(const Vector3f a_Position, const float a_Power
 	auto ParticleCount = std::min(static_cast<int>(ParticleFormula * 125), 600);
 
 	// Dark smoke particles:
-	SendParticleEffect("largesmoke", a_Position, Vector3f(), Spread, static_cast<int>(ParticleCount));
+	SendParticleEffect("largesmoke", a_Position, {0.f, 0.f, 0.f,}, Spread, static_cast<int>(ParticleCount));
 
 	Spread = ParticleFormula * 0.35f;
 	ParticleCount = std::min(static_cast<int>(ParticleFormula * 550), 1800);
 
 	// Light smoke particles:
-	SendParticleEffect("explode", a_Position, Vector3f(), Spread, static_cast<int>(ParticleCount));
+	SendParticleEffect("explode", a_Position, {0.f, 0.f, 0.f,}, Spread, static_cast<int>(ParticleCount));
 
 	// Shockwave effect:
 	m_Protocol->SendExplosion(a_Position, a_Power);

@@ -130,14 +130,14 @@ bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2)
 
 
 
-Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
+Vector3f cFluidSimulator::GetFlowingDirection(Vector3i a_Pos)
 {
-	if (!cChunkDef::IsValidHeight(a_Y))
+	if (!cChunkDef::IsValidHeight(a_Pos))
 	{
 		return {};
 	}
 
-	if (!IsAllowedBlock(m_World.GetBlock({ a_X, a_Y, a_Z })))  // No Fluid -> No Flowing direction :D
+	if (!IsAllowedBlock(m_World.GetBlock(a_Pos)))  // No Fluid -> No Flowing direction :D
 	{
 		return {};
 	}
@@ -148,24 +148,24 @@ Vector3f cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z)
 			return ((a_BlockMeta & 0x08) != 0) ? 0 : a_BlockMeta;
 		};
 
-	auto BlockMeta = m_World.GetBlockMeta({ a_X, a_Y, a_Z });
+	auto BlockMeta = m_World.GetBlockMeta(a_Pos);
 	NIBBLETYPE CentralPoint = HeightFromMeta(BlockMeta);
 	NIBBLETYPE LevelPoint[4];
 
 	// blocks around the checking pos
-	Vector3i Points[]
+	std::array<Vector3i, 4> Offsets {
 	{
-		{ a_X + 1, a_Y, a_Z },
-		{ a_X, a_Y, a_Z + 1 },
-		{ a_X - 1, a_Y, a_Z },
-		{ a_X, a_Y, a_Z - 1 }
-	};
+		{ 1, 0, 0 },
+		{ 0, 0, 1 },
+		{ 1, 0, 0 },
+		{ 0, 0, 1 }
+	}};
 
-	for (size_t i = 0; i < ARRAYCOUNT(LevelPoint); i++)
+	for (size_t i = 0; i < Offsets.size(); i++)
 	{
-		if (IsAllowedBlock(m_World.GetBlock(Points[i])))
+		if (IsAllowedBlock(m_World.GetBlock(a_Pos + Offsets[i])))
 		{
-			LevelPoint[i] = HeightFromMeta(m_World.GetBlockMeta(Points[i]));
+			LevelPoint[i] = HeightFromMeta(m_World.GetBlockMeta(Offsets[i]));
 		}
 		else
 		{

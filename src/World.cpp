@@ -850,42 +850,37 @@ bool cWorld::CanSpawnAt(int a_X, int & a_Y, int a_Z)
 
 
 
-bool cWorld::CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
+bool cWorld::CheckPlayerSpawnPoint(Vector3i a_Pos)
 {
 	// Check height bounds
-	if (!cChunkDef::IsValidHeight(a_PosY))
+	if (!cChunkDef::IsValidHeight(a_Pos))
 	{
 		return false;
 	}
 
 	// Check that surrounding blocks are neither solid or liquid
-	static const Vector3i SurroundingCoords[] =
+	constexpr std::array<Vector3i, 8> SurroundingCoords =
+	{{
+		{0,  0,  1},
+		{1,  0,  1},
+		{1,  0,  0},
+		{1,  0, -1},
+		{0,  0, -1},
+		{-1, 0, -1},
+		{-1, 0,  0},
+		{-1, 0,  1},
+	}};
+
+	for (const auto & Offset : SurroundingCoords)
 	{
-		Vector3i(0,  0,  1),
-		Vector3i(1,  0,  1),
-		Vector3i(1,  0,  0),
-		Vector3i(1,  0, -1),
-		Vector3i(0,  0, -1),
-		Vector3i(-1, 0, -1),
-		Vector3i(-1, 0,  0),
-		Vector3i(-1, 0,  1),
-	};
-
-	static const int SurroundingCoordsCount = ARRAYCOUNT(SurroundingCoords);
-
-	for (int CoordIndex = 0; CoordIndex < SurroundingCoordsCount; ++CoordIndex)
-	{
-		const int XPos = a_PosX + SurroundingCoords[CoordIndex].x;
-		const int ZPos = a_PosZ + SurroundingCoords[CoordIndex].z;
-
-		const BLOCKTYPE BlockType = GetBlock({ XPos, a_PosY, ZPos });
+		const BLOCKTYPE BlockType = GetBlock(a_Pos + Offset);
 		if (cBlockInfo::IsSolid(BlockType) || IsBlockLiquid(BlockType))
 		{
-			return false;
+			return true;
 		}
 	}
 
-	return true;
+	return false;
 }
 
 

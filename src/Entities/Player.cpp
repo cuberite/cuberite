@@ -2192,7 +2192,7 @@ bool cPlayer::IsClimbing(void) const
 {
 	const auto Position = GetPosition().Floor();
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		return false;
 	}
@@ -2579,7 +2579,7 @@ bool cPlayer::IsInsideWater()
 {
 	const auto EyePos = GetEyePosition().Floor();
 
-	if (!cChunkDef::IsValidHeight(EyePos.y))
+	if (!cChunkDef::IsValidHeight(EyePos))
 	{
 		// Not in water if in void.
 		return false;

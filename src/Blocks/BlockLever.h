@@ -94,7 +94,7 @@ private:
 		// Find the type of block the lever is attached to:
 		auto NeighborFace = BlockMetaDataToBlockFace(a_Meta);
 		auto NeighborPos = AddFaceDirection(a_Position, NeighborFace, true);
-		if (!cChunkDef::IsValidHeight(NeighborPos.y))
+		if (!cChunkDef::IsValidHeight(NeighborPos))
 		{
 			return false;
 		}
