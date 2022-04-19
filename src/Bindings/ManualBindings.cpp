@@ -2897,7 +2897,7 @@ public:
 		return false;
 	}
 
-	virtual bool OnNextBlockNoData(Vector3i a_BlockPos, char a_EntryFace) override
+	virtual bool OnNextBlockNoData(Vector3i a_BlockPos, eBlockFace a_EntryFace) override
 	{
 		bool res = false;
 		if (m_Callbacks->CallTableFn(
@@ -2989,7 +2989,7 @@ public:
 		return false;
 	}
 
-	virtual bool OnNextBlockNoData(Vector3i a_BlockPos, char a_EntryFace) override
+	virtual bool OnNextBlockNoData(Vector3i a_BlockPos, eBlockFace a_EntryFace) override
 	{
 		bool res = false;
 		if (m_Callbacks->CallTableFn(

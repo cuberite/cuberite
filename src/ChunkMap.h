@@ -102,8 +102,8 @@ public:
 	If the chunk is invalid, the operation is ignored silently. */
 	void FastSetBlock(Vector3i a_BlockPos, BlockState a_Block);
 
-	/** Makes the specified player collect all the pickups around them. */
-	void CollectPickupsByPlayer(cPlayer & a_Player);
+	/** Makes the specified entity collect all the pickups around them. */
+	void CollectPickupsByEntity(cEntity & a_Entity);
 
 	BlockState GetBlock          (Vector3i a_BlockPos) const;
 	bool       GetBlock          (Vector3i a_BlockPos, BlockState & a_Block) const;

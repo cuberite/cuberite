@@ -34,7 +34,7 @@ target_sources(
 	BlockDoor.h
 	BlockDropSpenser.h
 	BlockEnchantingTable.h
-	BlockEnderchest.h
+	BlockEnderChest.h
 	BlockEndPortalFrame.h
 	BlockEntity.h
 	BlockFarmland.h
@@ -84,7 +84,7 @@ target_sources(
 	BlockPumpkin.h
 	BlockQuartz.h
 	BlockRail.h
-	BlockRedstone.h
+	BlockRedstoneWire.h
 	BlockRedstoneLamp.h
 	BlockRedstoneOre.h
 	BlockRedstoneRepeater.h
@@ -99,14 +99,14 @@ target_sources(
 	BlockStairs.h
 	BlockStems.h
 	BlockStone.h
-	BlockSugarcane.h
+	BlockSugarCane.h
 	BlockTNT.h
 	BlockTallGrass.h
 	BlockTorch.h
 	BlockTrapdoor.h
 	BlockTripwire.h
 	BlockTripwireHook.h
-	BlockVine.h
+	BlockVines.h
 	BlockWallSign.h
 	BlockWool.h
 	BroadcastInterface.h

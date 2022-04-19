@@ -23,15 +23,8 @@ public:
 	}
 
 
-
-
-
 	virtual bool IsPlaceable(void) const override
 	{
 		return true;
 	}
 } ;
-
-
-
-

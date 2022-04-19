@@ -24,9 +24,6 @@ public:
 
 private:
 
-	/** Returns whether a potential source position that's occupied by Block should be treated as linked. */
-	static bool ShouldQueryLinkedPosition(BlockState Block);
-
 	/** Asks redstone handlers adjacent to a solid block how much power they will deliver to the querying position, via the solid block.
 	Both QueryPosition and SolidBlockPosition are relative to Chunk. */
 	static PowerLevel QueryLinkedPower(const cChunk & Chunk, Vector3i QueryPosition, BlockState QueryBlock, Vector3i SolidBlockPosition);

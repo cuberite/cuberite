@@ -280,7 +280,7 @@ int cItemGrid::HowManyCanFit(const cItem & a_ItemStack, bool a_AllowNewStacks)
 
 
 
-int cItemGrid::AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, int a_MaxStack)
+char cItemGrid::AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, int a_MaxStack)
 {
 	if (!IsValidSlotNum(a_Slot))
 	{
@@ -290,7 +290,7 @@ int cItemGrid::AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, i
 		return 0;
 	}
 
-	int PrevCount = 0;
+	char PrevCount = 0;
 	if (m_Slots[a_Slot].IsEmpty())
 	{
 		m_Slots[a_Slot] = a_ItemStack;
@@ -301,7 +301,7 @@ int cItemGrid::AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, i
 		PrevCount = m_Slots[a_Slot].m_ItemCount;
 	}
 	m_Slots[a_Slot].m_ItemCount = static_cast<char>(std::min(a_MaxStack, PrevCount + a_Num));
-	int toReturn = m_Slots[a_Slot].m_ItemCount - PrevCount;
+	char toReturn = m_Slots[a_Slot].m_ItemCount - PrevCount;
 	TriggerListeners(a_Slot);
 	return toReturn;
 }
@@ -310,10 +310,10 @@ int cItemGrid::AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, i
 
 
 
-int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_PrioritySlot)
+char cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_PrioritySlot)
 {
-	int NumLeft = a_ItemStack.m_ItemCount;
-	int MaxStack = a_ItemStack.GetMaxStackSize();
+	char NumLeft = a_ItemStack.m_ItemCount;
+	char MaxStack = a_ItemStack.GetMaxStackSize();
 
 	if ((a_PrioritySlot != -1) && !IsValidSlotNum(a_PrioritySlot))
 	{
@@ -378,12 +378,12 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 
 
 
-int cItemGrid::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, int a_PrioritySlot)
+char cItemGrid::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, int a_PrioritySlot)
 {
-	int TotalAdded = 0;
+	char TotalAdded = 0;
 	for (cItems::iterator itr = a_ItemStackList.begin(); itr != a_ItemStackList.end();)
 	{
-		int NumAdded = AddItem(*itr, a_AllowNewStacks, a_PrioritySlot);
+		char NumAdded = AddItem(*itr, a_AllowNewStacks, a_PrioritySlot);
 		if (itr->m_ItemCount == NumAdded)
 		{
 			itr = a_ItemStackList.erase(itr);
@@ -402,9 +402,9 @@ int cItemGrid::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, int a_P
 
 
 
-int cItemGrid::RemoveItem(const cItem & a_ItemStack)
+char cItemGrid::RemoveItem(const cItem & a_ItemStack)
 {
-	int NumLeft = a_ItemStack.m_ItemCount;
+	char NumLeft = a_ItemStack.m_ItemCount;
 
 	if (!m_Slots.IsStorageAllocated())
 	{
@@ -420,7 +420,7 @@ int cItemGrid::RemoveItem(const cItem & a_ItemStack)
 
 		if (m_Slots[i].IsEqual(a_ItemStack))
 		{
-			int NumToRemove = std::min(NumLeft, static_cast<int>(m_Slots[i].m_ItemCount));
+			char NumToRemove = std::min<char>(NumLeft, m_Slots[i].m_ItemCount);
 			NumLeft -= NumToRemove;
 			m_Slots[i].m_ItemCount -= NumToRemove;
 
@@ -465,7 +465,7 @@ cItem * cItemGrid::FindItem(const cItem & a_RecipeItem)
 
 
 
-int cItemGrid::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
+char cItemGrid::ChangeSlotCount(int a_SlotNum, char a_AddToCount)
 {
 	if (!IsValidSlotNum(a_SlotNum))
 	{
@@ -504,7 +504,7 @@ int cItemGrid::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
 
 
 
-int cItemGrid::ChangeSlotCount(int a_X, int a_Y, int a_AddToCount)
+char cItemGrid::ChangeSlotCount(int a_X, int a_Y, char a_AddToCount)
 {
 	return ChangeSlotCount(GetSlotNum(a_X, a_Y), a_AddToCount);
 }

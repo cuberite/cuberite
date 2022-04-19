@@ -9797,7 +9797,7 @@ a_Player:OpenWindow(Window);
 								Type = "Vector3i",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: https://minecraft.fandom.com/wiki/Enderman#Teleportation.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
 					},
 					{
 						Params =
@@ -9823,7 +9823,7 @@ a_Player:OpenWindow(Window);
 								Type = "cBoundingBox",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: https://minecraft.fandom.com/wiki/Enderman#Teleportation.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
 					},
 					{
 						Params =
@@ -9849,7 +9849,7 @@ a_Player:OpenWindow(Window);
 								Type = "number",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: https://minecraft.fandom.com/wiki/Enderman#Teleportation.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
 					},
 				},
 				HasEntityEffect =
@@ -10217,8 +10217,8 @@ a_Player:OpenWindow(Window);
 					Params =
 					{
 						{
-							Name = "Player",
-							Type = "cPlayer",
+							Name = "Entity",
+							Type = "cEntity",
 						},
 					},
 					Returns =
@@ -10228,7 +10228,7 @@ a_Player:OpenWindow(Window);
 							Type = "boolean",
 						},
 					},
-					Notes = "Tries to make the player collect the pickup. Returns true if the pickup was collected, at least partially.",
+					Notes = "Tries to make the entity collect the pickup. Returns true if the pickup was collected, at least partially.",
 				},
 				GetAge =
 				{
@@ -19013,6 +19013,24 @@ end
 					},
 					Notes = "Returns true if the specified item type is any kind of a tool (axe, hoe, pickaxe, shovel or FIXME: sword)",
 				},
+				IsVillagerFood =
+				{
+					IsStatic = true,
+					Params =
+					{
+						{
+							Name = "ItemType",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns true if the specified item type is any kind of a pickable food by a villager (potato, carrot, wheat, bread and any kind of seeds).",
+				}
 			},
 			AdditionalInfo =
 			{

@@ -57,6 +57,7 @@ protected:
 	virtual Version GetProtocolVersion() const override;
 
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
+	virtual void HandlePacketNameItem(cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer);
 	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std::string_view a_Channel) override;

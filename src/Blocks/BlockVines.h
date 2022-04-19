@@ -3,7 +3,7 @@
 #include "BlockHandler.h"
 
 
-class cBlockVineHandler final :
+class cBlockVinesHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;

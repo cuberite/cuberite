@@ -796,7 +796,7 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		EMCSBiome OuterBiome;
 	} ;
 
-	static BiomeLevels bgOcean[] =
+	static BiomeLevels bgOceanBlocks[] =
 	{
 		{ biOcean, biOcean, },
 		{ biOcean, biOcean, },
@@ -810,7 +810,7 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		{ biDeepOcean, biDeepOcean, },
 		{ biMushroomIsland, biMushroomShore, }
 	} ;
-	static BiomeLevels bgFrozen[] =
+	static BiomeLevels bgFrozenBlocks[] =
 	{
 		{ biIcePlains,         biIcePlains, },
 		{ biIceMountains,      biIceMountains, },
@@ -823,7 +823,7 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		{ biExtremeHillsPlus,  biExtremeHillsEdge, },
 		{ biExtremeHillsPlusM, biExtremeHillsPlusM, },
 	} ;
-	static BiomeLevels bgTemperate[] =
+	static BiomeLevels bgTemperateBlocks[] =
 	{
 		{ biBirchForestHills,  biBirchForest, },
 		{ biBirchForest,       biBirchForest, },
@@ -839,7 +839,7 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		{ biSwampland,         biSwampland, },
 		{ biSwamplandM,        biSwamplandM, },
 	} ;
-	static BiomeLevels bgWarm[] =
+	static BiomeLevels bgWarmBlocks[] =
 	{
 		{ biDesertHills,    biDesert, },
 		{ biDesert,         biDesert, },
@@ -848,7 +848,7 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		{ biSavanna,        biSavanna, },
 		{ biSavannaM,       biSavannaM, },
 	} ;
-	static BiomeLevels bgMesa[] =
+	static BiomeLevels bgMesaBlocks[] =
 	{
 		{ biMesaPlateau,    biMesa, },
 		{ biMesaPlateauF,   biMesa, },
@@ -858,7 +858,7 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		{ biSavanna,        biSavanna, },
 		{ biSavannaPlateau, biSavanna, },
 	} ;
-	static BiomeLevels bgConifers[] =
+	static BiomeLevels bgConifersBlocks[] =
 	{
 		{ biTaiga,                biTaiga, },
 		{ biTaigaM,               biTaigaM, },
@@ -866,7 +866,7 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		{ biMegaSpruceTaiga,      biMegaSpruceTaiga, },
 		{ biMegaSpruceTaigaHills, biMegaSpruceTaiga, }
 	} ;
-	static BiomeLevels bgDenseTrees[] =
+	static BiomeLevels bgDenseTreesBlocks[] =
 	{
 		{ biJungleHills, biJungle, },
 		{ biJungle, biJungleEdge, },
@@ -878,18 +878,18 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int 
 		size_t        Count;
 	} BiomeGroups[] =
 	{
-		{ bgOcean,      ARRAYCOUNT(bgOcean), },
-		{ bgOcean,      ARRAYCOUNT(bgOcean), },
-		{ bgFrozen,     ARRAYCOUNT(bgFrozen), },
-		{ bgFrozen,     ARRAYCOUNT(bgFrozen), },
-		{ bgTemperate,  ARRAYCOUNT(bgTemperate), },
-		{ bgTemperate,  ARRAYCOUNT(bgTemperate), },
-		{ bgConifers,   ARRAYCOUNT(bgConifers), },
-		{ bgConifers,   ARRAYCOUNT(bgConifers), },
-		{ bgWarm,       ARRAYCOUNT(bgWarm), },
-		{ bgWarm,       ARRAYCOUNT(bgWarm), },
-		{ bgMesa,       ARRAYCOUNT(bgMesa), },
-		{ bgDenseTrees, ARRAYCOUNT(bgDenseTrees), },
+		{ bgOceanBlocks,      ARRAYCOUNT(bgOceanBlocks), },
+		{ bgOceanBlocks,      ARRAYCOUNT(bgOceanBlocks), },
+		{ bgFrozenBlocks,     ARRAYCOUNT(bgFrozenBlocks), },
+		{ bgFrozenBlocks,     ARRAYCOUNT(bgFrozenBlocks), },
+		{ bgTemperateBlocks,  ARRAYCOUNT(bgTemperateBlocks), },
+		{ bgTemperateBlocks,  ARRAYCOUNT(bgTemperateBlocks), },
+		{ bgConifersBlocks,   ARRAYCOUNT(bgConifersBlocks), },
+		{ bgConifersBlocks,   ARRAYCOUNT(bgConifersBlocks), },
+		{ bgWarmBlocks,       ARRAYCOUNT(bgWarmBlocks), },
+		{ bgWarmBlocks,       ARRAYCOUNT(bgWarmBlocks), },
+		{ bgMesaBlocks,       ARRAYCOUNT(bgMesaBlocks), },
+		{ bgDenseTreesBlocks, ARRAYCOUNT(bgDenseTreesBlocks), },
 	} ;
 	size_t Group = static_cast<size_t>(a_BiomeGroup) % ARRAYCOUNT(BiomeGroups);
 	size_t Index = a_BiomeIdx % BiomeGroups[Group].Count;

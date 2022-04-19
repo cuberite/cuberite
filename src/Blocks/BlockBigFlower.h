@@ -81,7 +81,7 @@ private:
 	{
 		if (IsTopPart(a_Block))
 		{
-			return {};  // No drops from the top part
+			return {};
 		}
 
 		// With shears, drop self (even tall grass and fern):
@@ -148,20 +148,26 @@ private:
 		const cEntity * a_Digger
 	) const override
 	{
-		UNUSED(a_Digger);
 		if (IsTopPart(a_OldBlock))
 		{
-			// Was upper part of flower
-			auto LowerPartPos = a_BlockPos.addedY(-1);
+			const auto LowerPartPos = a_BlockPos.addedY(-1);
 			if (a_ChunkInterface.GetBlock(LowerPartPos).Type() == a_OldBlock.Type())
 			{
-				a_ChunkInterface.DropBlockAsPickups(LowerPartPos);
+				// Prevent creative punches from dropping pickups.
+				// TODO: Simplify to SetBlock and remove the IsMetaTopPart check in DropBlockAsPickups when 1.13 blockstates arrive.
+				if ((a_Digger != nullptr) && a_Digger->IsPlayer() && static_cast<const cPlayer *>(a_Digger)->IsGameModeCreative())
+				{
+					a_ChunkInterface.SetBlock(LowerPart, E_BLOCK_AIR, 0);
+				}
+				else
+				{
+					a_ChunkInterface.DropBlockAsPickups(LowerPartPos);
+				}
 			}
 		}
 		else
 		{
-			// Was lower part
-			auto UpperPartPos = a_BlockPos.addedY(1);
+			const auto UpperPartPos = a_BlockPos.addedY(1);
 			if (a_ChunkInterface.GetBlock(UpperPartPos).Type() == a_OldBlock.Type())
 			{
 				a_ChunkInterface.DropBlockAsPickups(UpperPartPos);

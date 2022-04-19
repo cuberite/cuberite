@@ -503,11 +503,6 @@ enum class EntityAnimation
 	PlayerMainHandSwings,
 	// PlayerReducedDebugScreenDisables,
 	// PlayerReducedDebugScreenEnables,
-	// PlayerSetsOperatorLevelFour,
-	// PlayerSetsOperatorLevelOne,
-	// PlayerSetsOperatorLevelThree,
-	// PlayerSetsOperatorLevelTwo,
-	// PlayerSetsOperatorLevelZero,
 	PlayerOffHandSwings,
 	RabbitJumps,
 	RavagerAttacks,
@@ -681,6 +676,8 @@ namespace ItemCategory
 	bool IsArmor(Item a_ItemType);
 
 	bool IsHorseArmor(Item a_ItemType);
+
+	bool IsVillagerFood(short a_ItemType);
 }
 
 // tolua_end

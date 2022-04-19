@@ -234,7 +234,7 @@ public:
 	/** Queues a task to unload unused chunks onto the tick thread. The prefferred way of unloading. */
 	void QueueUnloadUnusedChunks(void);  // tolua_export
 
-	void CollectPickupsByPlayer(cPlayer & a_Player);
+	void CollectPickupsByEntity(cEntity & a_Entity);
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cPlayerListCallback a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<

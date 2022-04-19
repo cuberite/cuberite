@@ -106,7 +106,7 @@ bool cBeaconEntity::SetPrimaryEffect(cEntityEffect::eType a_Effect)
 	// Send window update:
 	if (GetWindow() != nullptr)
 	{
-		GetWindow()->SetProperty(1, m_PrimaryEffect);
+		GetWindow()->SetProperty(1, static_cast<short>(m_PrimaryEffect));
 	}
 	return true;
 }
@@ -128,7 +128,7 @@ bool cBeaconEntity::SetSecondaryEffect(cEntityEffect::eType a_Effect)
 	// Send window update:
 	if (GetWindow() != nullptr)
 	{
-		GetWindow()->SetProperty(2, m_SecondaryEffect);
+		GetWindow()->SetProperty(2, static_cast<short>(m_SecondaryEffect));
 	}
 	return true;
 }

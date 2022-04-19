@@ -6,7 +6,7 @@
 
 
 
-class cBlockEnderchestHandler final :
+class cBlockEnderChestHandler final :
 	public cBlockEntityHandler
 {
 	using Super = cBlockEntityHandler;
@@ -38,7 +38,3 @@ private:
 	}
 
 };
-
-
-
-

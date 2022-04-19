@@ -394,6 +394,7 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadata a_Metadata) const
 		case EntityMetadata::IllagerFlags:                          return Insentient;
 		case EntityMetadata::SpeIlagerSpell:                        return Insentient + 1;
 		case EntityMetadata::VexFlags:                              return Insentient;
+		case EntityMetadata::AbstractSkeletonArmsSwinging:          return Insentient;
 		case EntityMetadata::SpiderClimbing:                        return Insentient;
 		case EntityMetadata::WitchAggresive:                        return Insentient;
 		case EntityMetadata::WitherFirstHeadTarget:                 return Insentient;
@@ -423,7 +424,6 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadata a_Metadata) const
 		case EntityMetadata::EntityPose:
 		case EntityMetadata::AreaEffectCloudParticleParameter1:
 		case EntityMetadata::AreaEffectCloudParticleParameter2:
-		case EntityMetadata::AbstractSkeletonArmsSwinging:
 		case EntityMetadata::ZombieUnusedWasType: break;
 	}
 	UNREACHABLE("Retrieved invalid metadata for protocol");
@@ -695,6 +695,7 @@ bool cProtocol_1_13::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x19: HandlePacketEntityAction(a_ByteBuffer); return true;
 		case 0x1a: HandlePacketSteerVehicle(a_ByteBuffer); return true;
 		case 0x1b: HandlePacketCraftingBookData(a_ByteBuffer); return true;
+		case 0x1c: HandlePacketNameItem(a_ByteBuffer); return true;
 		case 0x1d: break;  // Resource pack status - not yet implemented
 		case 0x1e: HandlePacketAdvancementTab(a_ByteBuffer); return true;
 		case 0x20: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
@@ -708,6 +709,17 @@ bool cProtocol_1_13::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 	}
 
 	return Super::HandlePacket(a_ByteBuffer, a_PacketType);
+}
+
+
+
+
+
+void cProtocol_1_13::HandlePacketNameItem(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, NewItemName);
+
+	LOGD("New item name : %s", NewItemName);
 }
 
 
@@ -1232,6 +1244,17 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtSheep
 
+		case mtSkeleton:
+		{
+			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingActiveHand, EntityMetadataType::Byte);
+			a_Pkt.WriteBEUInt8(Skeleton.IsChargingBow() ? 0x01 : 0x00);
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractSkeletonArmsSwinging, EntityMetadataType::Boolean);
+			a_Pkt.WriteBool(Skeleton.IsChargingBow());
+			break;
+		}  // case mtSkeleton
+
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -1402,7 +1425,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtGiant:
 		case mtSilverfish:
-		case mtSkeleton:
 		case mtSquid:
 		case mtWitherSkeleton:
 		{

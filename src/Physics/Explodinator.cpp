@@ -545,9 +545,9 @@ namespace Explodinator
 
 		// Trace rays from the explosion centre to all points in a square of area TraceCubeSideLength * TraceCubeSideLength
 		// for the top and bottom sides:
-		for (int OffsetX = -HalfSide; OffsetX < HalfSide; OffsetX++)
+		for (float OffsetX = -HalfSide; OffsetX < HalfSide; OffsetX++)
 		{
-			for (int OffsetZ = -HalfSide; OffsetZ < HalfSide; OffsetZ++)
+			for (float OffsetZ = -HalfSide; OffsetZ < HalfSide; OffsetZ++)
 			{
 				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, +HalfSide, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
 				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, -HalfSide, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
@@ -555,9 +555,9 @@ namespace Explodinator
 		}
 
 		// Left and right sides, avoid duplicates at top and bottom edges:
-		for (int OffsetX = -HalfSide; OffsetX < HalfSide; OffsetX++)
+		for (float OffsetX = -HalfSide; OffsetX < HalfSide; OffsetX++)
 		{
-			for (int OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
+			for (float OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
 			{
 				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, +HalfSide), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
 				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, -HalfSide), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
@@ -565,9 +565,9 @@ namespace Explodinator
 		}
 
 		// Front and back sides, avoid all edges:
-		for (int OffsetZ = -HalfSide + 1; OffsetZ < HalfSide - 1; OffsetZ++)
+		for (float OffsetZ = -HalfSide + 1; OffsetZ < HalfSide - 1; OffsetZ++)
 		{
-			for (int OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
+			for (float OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
 			{
 				DestructionTrace(&a_Chunk, a_Position, Vector3f(+HalfSide, OffsetY, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
 				DestructionTrace(&a_Chunk, a_Position, Vector3f(-HalfSide, OffsetY, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
@@ -580,7 +580,7 @@ namespace Explodinator
 	{
 		for (const auto Client : a_Chunk.GetAllClients())
 		{
-			Client->SendExplosion(a_Position, a_Power);
+			Client->SendExplosion(a_Position, static_cast<float>(a_Power));
 		}
 	}
 

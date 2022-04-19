@@ -206,6 +206,7 @@ public:  // tolua_export
 	void SendPlayerListUpdateGameMode   (const cPlayer & a_Player);
 	void SendPlayerListUpdatePing       ();
 	void SendPlayerMoveLook             (void);
+	void SendPlayerPermissionLevel      (void);
 	void SendPlayerPosition             (void);
 	void SendPlayerSpawn                (const cPlayer & a_Player);
 	void SendPluginMessage              (const AString & a_Channel, std::string_view a_Message);  // Exported in ManualBindings.cpp

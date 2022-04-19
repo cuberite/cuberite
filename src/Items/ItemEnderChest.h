@@ -2,13 +2,13 @@
 #pragma once
 
 #include "ItemHandler.h"
-#include "Blocks/BlockEnderchest.h"
+#include "Blocks/BlockEnderChest.h"
 
 
 
 
 
-class cItemEnderchestHandler final  :
+class cItemEnderChestHandler final  :
 	public cItemHandler
 {
 	using Super = cItemHandler;

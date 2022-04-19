@@ -2232,9 +2232,9 @@ void cWorld::QueueUnloadUnusedChunks(void)
 
 
 
-void cWorld::CollectPickupsByPlayer(cPlayer & a_Player)
+void cWorld::CollectPickupsByEntity(cEntity & a_Entity)
 {
-	m_ChunkMap.CollectPickupsByPlayer(a_Player);
+	m_ChunkMap.CollectPickupsByEntity(a_Entity);
 }
 
 

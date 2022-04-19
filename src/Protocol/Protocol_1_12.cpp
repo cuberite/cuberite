@@ -789,6 +789,19 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtSheep
 
+		case mtSkeleton:
+		{
+			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
+			a_Pkt.WriteBEUInt8(LIVING_ACTIVE_HAND);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEUInt8(Skeleton.IsChargingBow() ? 0x01 : 0x00);
+
+			a_Pkt.WriteBEUInt8(ABSTRACT_SKELETON_ARMS_SWINGING);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Skeleton.IsChargingBow());
+			break;
+		}  // case mtSkeleton
+
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -968,7 +981,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtGiant:
 		case mtSilverfish:
-		case mtSkeleton:
 		case mtSquid:
 		{
 			// Mobs with no extra fields

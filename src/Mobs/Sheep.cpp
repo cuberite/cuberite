@@ -40,7 +40,6 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 	if (!m_IsSheared)
 	{
-
 		a_Drops.emplace_back(GetItemFromColor(m_WoolColor));
 	}
 

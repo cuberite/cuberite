@@ -275,6 +275,12 @@ bool cBlockPistonHandler::CanPushBlock(
 	Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
 )
 {
+	if (!cChunkDef::IsValidHeight(a_BlockPos.y))
+	{
+		// Can't push a void block.
+		return false;
+	}
+
 	const static std::array<Vector3i, 6> pushingDirs =
 	{
 			Vector3i(-1,  0,  0),
@@ -286,11 +292,6 @@ bool cBlockPistonHandler::CanPushBlock(
 	};
 
 	auto BlockToCheck = a_World.GetBlock(a_BlockPos);
-
-	if (!cChunkDef::IsValidHeight(a_BlockPos.y))
-	{
-		return !a_RequirePushable;
-	}
 
 	if (cBlockAirHandler::IsBlockAir(BlockToCheck))
 	{

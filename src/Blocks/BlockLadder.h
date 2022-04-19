@@ -31,7 +31,7 @@ public:
 			return false;
 		}
 
-		return cBlockInfo::IsSolid(a_Block);
+		return cBlockInfo::FullyOccupiesVoxel(a_Block);
 	}
 
 

@@ -4,7 +4,7 @@
 
 #include "NamespaceSerializer.h"
 
-
+#include <cctype>
 
 
 
@@ -4345,4 +4345,43 @@ bool NamespaceSerializer::IsPretty(std::string_view a_ID)
 {
 	// Check if a_ID is in CamelCase with regex
 	return std::regex_match(a_ID.begin(), a_ID.end(), std::regex("([A-Z][a-z1-9]+)+"));
+}
+
+
+
+
+
+AString NamespaceSerializer::Prettify(AString a_ID)
+{
+
+	bool NextLetterCapitalized = true;
+	std::for_each(a_ID.begin(), a_ID.end(), [&](char & a_Letter)
+	{
+		if (NextLetterCapitalized)
+		{
+			a_Letter = static_cast<char>(std::toupper(a_Letter));
+			NextLetterCapitalized = false;
+		}
+		else if (a_Letter == '_')
+		{
+			a_Letter = ' ';
+			NextLetterCapitalized = true;
+		}
+	});
+	return a_ID;
+}
+
+
+
+
+
+AString NamespaceSerializer::PrettifyEntityName(const AString & a_ID, const bool a_IsTamed)
+{
+	// In older vanilla Minecraft version (before 1.14) ocelots and cats were the same mob.
+	// So after killing a tamed ocelot without a custom name the message will say "Cat was slain by [PlayerName]".
+	if ((a_ID == "ocelot") && a_IsTamed)
+	{
+		return "Cat";
+	}
+	return Prettify(a_ID);
 }

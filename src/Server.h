@@ -96,6 +96,8 @@ public:
 
 	const AString & GetResourcePackUrl(void) { return m_ResourcePackUrl; }
 
+	std::string_view GetCustomRedirectUrl(void) { return m_CustomRedirectUrl; }
+
 	bool Start(void);
 
 	bool Command(cClientHandle & a_Client, AString & a_Cmd);
@@ -222,6 +224,7 @@ private:
 	size_t m_MaxPlayers;
 	bool m_bIsHardcore;
 	AString m_ResourcePackUrl;
+	AString m_CustomRedirectUrl;
 
 	/** Map of protocol version to Forge mods (map of ModName -> ModVersionString) */
 	std::map<UInt32, AStringMap> m_ForgeModsByVersion;

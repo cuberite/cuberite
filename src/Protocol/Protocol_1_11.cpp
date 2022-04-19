@@ -688,10 +688,6 @@ void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
-	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
-	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
-	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
-
 	switch (a_BlockEntity.GetBlockType())
 	{
 		case BlockType::BlackBed:
@@ -715,7 +711,6 @@ void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockE
 			a_Writer.AddInt("color", BedEntity.GetColor());  // New: multicoloured beds
 			break;
 		}
-
 		case BlockType::Spawner:
 		{
 			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
@@ -725,9 +720,12 @@ void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockE
 			a_Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
 			break;
 		}
-
-		default: Super::WriteBlockEntity(a_Writer, a_BlockEntity);
+		default: return Super::WriteBlockEntity(a_Writer, a_BlockEntity);
 	}
+
+	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
 }
 
 
@@ -1197,6 +1195,19 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtSheep
 
+		case mtSkeleton:
+		{
+			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
+			a_Pkt.WriteBEUInt8(LIVING_ACTIVE_HAND);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEUInt8(Skeleton.IsChargingBow() ? 0x01 : 0x00);
+
+			a_Pkt.WriteBEUInt8(ABSTRACT_SKELETON_ARMS_SWINGING);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Skeleton.IsChargingBow());
+			break;
+		}  // case mtSkeleton
+
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -1355,7 +1366,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 		case mtIronGolem:
 		case mtMooshroom:
 		case mtSilverfish:
-		case mtSkeleton:
 		case mtStray:
 		case mtSpider:
 		case mtSquid:

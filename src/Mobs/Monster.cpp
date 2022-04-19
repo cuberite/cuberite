@@ -1509,8 +1509,8 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 
 void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, Item a_Item)
 {
-	auto Count = GetRandomProvider().RandInt<unsigned int>(a_Min, a_Max);
-	auto MaxStackSize = static_cast<unsigned char>(cItem(a_Item).GetMaxStackSize());
+	auto Count = GetRandomProvider().RandInt(a_Min, a_Max);
+	auto MaxStackSize = static_cast<unsigned int>(cItem(a_Item).GetMaxStackSize());
 	while (Count > MaxStackSize)
 	{
 		a_Drops.emplace_back(a_Item, MaxStackSize);

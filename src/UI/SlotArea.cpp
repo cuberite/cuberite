@@ -1181,7 +1181,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			// Repair until out of materials, or fully repaired:
 			while ((DamageDiff > 0) && (NumItemsConsumed < Sacrifice.m_ItemCount))
 			{
-				Output.m_ItemDamage -= DamageDiff;
+				Output.m_ItemDamage -= static_cast<char>(DamageDiff);
 				NeedExp += std::max(1, DamageDiff / 100) + static_cast<int>(Target.m_Enchantments.Count());
 				DamageDiff = static_cast<char>(std::min(static_cast<int>(Output.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4));
 
@@ -1900,7 +1900,18 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 		return;
 	}
 
-	if (a_SlotNum == 2)
+	if (a_SlotNum == 1)
+	{
+		cItem & DraggingItem = a_Player.GetDraggingItem();
+		cFurnaceRecipe * FurnaceRecipes = cRoot::Get()->GetFurnaceRecipe();
+
+		// Do not allow non-fuels to be placed in the fuel slot:
+		if (!DraggingItem.IsEmpty() && !FurnaceRecipes->IsFuel(DraggingItem) && (a_ClickAction != caShiftLeftClick) && (a_ClickAction != caShiftRightClick))
+		{
+			return;
+		}
+	}
+	else if (a_SlotNum == 2)
 	{
 		bool bAsync = false;
 		if (GetSlot(a_SlotNum, a_Player) == nullptr)

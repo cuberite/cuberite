@@ -1772,29 +1772,29 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		case mtHoglin:          return LoadHoglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtHusk:            return LoadHuskFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtIllusioner:      return LoadIllusionerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtIronGolem:       return LoadVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtLlama:           return LoadIronGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtMagmaCube:       return LoadLlamaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtMooshroom:       return LoadMagmaCubeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtMule:            return LoadMooshroomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtOcelot:          return LoadMuleFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPanda:           return LoadOcelotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtParrot:          return LoadPandaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPhantom:         return LoadParrotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPig:             return LoadPhantomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPiglin:          return LoadPigFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPiglinBrute:     return LoadPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPillager:        return LoadPiglinBruteFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPolarBear:       return LoadPillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPufferfish:      return LoadPolarBearFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtRabbit:          return LoadPufferfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtRavager:         return LoadRabbitFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSalmon:          return LoadRavagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSheep:           return LoadSalmonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtShulker:         return LoadSheepFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSilverfish:      return LoadShulkerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSkeleton:        return LoadSilverfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSkeletonHorse:   return LoadSkeletonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtIronGolem:       return LoadIronGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtLlama:           return LoadLlamaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtMagmaCube:       return LoadMagmaCubeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtMooshroom:       return LoadMooshroomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtMule:            return LoadMuleFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtOcelot:          return LoadOcelotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPanda:           return LoadPandaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtParrot:          return LoadParrotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPhantom:         return LoadPhantomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPig:             return LoadPigFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPiglin:          return LoadPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPiglinBrute:     return LoadPiglinBruteFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPillager:        return LoadPillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPolarBear:       return LoadPolarBearFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtPufferfish:      return LoadPufferfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtRabbit:          return LoadRabbitFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtRavager:         return LoadRavagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSalmon:          return LoadSalmonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSheep:           return LoadSheepFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtShulker:         return LoadShulkerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSilverfish:      return LoadSilverfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSkeleton:        return LoadSkeletonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtSkeletonHorse:   return LoadSkeletonHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtSlime:           return LoadSlimeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtSnowGolem:       return LoadSnowGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtSpider:          return LoadSpiderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
@@ -3377,6 +3377,12 @@ void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT &
 			default: Age = 0; break;
 		}
 		Monster->SetAge(Age);
+	}
+
+	int InventoryIdx = a_NBT.FindChildByName(a_TagIdx, "Inventory");
+	if (InventoryIdx > 0)
+	{
+		LoadItemGridFromNBT(Monster->GetInventory(), a_NBT, InventoryIdx);
 	}
 
 
