@@ -2,12 +2,13 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Villager.h"
-#include "../World.h"
-#include "../Chunk.h"
-#include "../BlockArea.h"
-#include "../Blocks/BlockHandler.h"
-#include "../Blocks/BlockCrops.h"
-#include "../BlockInServerPluginInterface.h"
+#include "World.h"
+#include "Chunk.h"
+#include "BlockArea.h"
+#include "Blocks/BlockHandler.h"
+#include "Blocks/BlockCrops.h"
+#include "BlockInServerPluginInterface.h"
+#include "BlockInfo.h"
 
 
 
