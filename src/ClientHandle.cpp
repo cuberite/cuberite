@@ -459,6 +459,10 @@ void cClientHandle::FinishAuthenticate()
 	// Return a server login packet:
 	m_Protocol->SendLogin(*m_Player, *World);
 
+	// Send the player's permission level.
+	// The key effect is to allow 1.9+ clients to open the command block UI.
+	SendPlayerPermissionLevel();
+
 	if (m_Player->GetKnownRecipes().empty())
 	{
 		SendInitRecipes(0);
@@ -815,8 +819,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 {
 	if (a_Enchantment > 2)
 	{
-		LOGWARNING("%s attempt to crash the server with invalid enchanting selection (%u)!", GetUsername().c_str(), a_Enchantment);
-		Kick("Selected invalid enchantment - hacked client?");
+		LOGD("Player \"%s\" tried to select an invalid enchantment - hacked client?", m_Username.c_str());
 		return;
 	}
 
@@ -827,7 +830,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		(m_Player->GetWindow()->GetWindowType() != cWindow::wtEnchantment)
 	)
 	{
-		Kick("Enchantment with invalid window - hacked client?");
+		LOGD("Player \"%s\" tried to enchant without a valid window - hacked client?", m_Username.c_str());
 		return;
 	}
 
@@ -866,7 +869,7 @@ void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 		else
 		{
 			// Not creative and can't afford enchantment, so exit:
-			Kick("Selected unavailable enchantment - hacked client?");
+			LOGD("Player \"%s\" selected unavailable enchantment - hacked client?", m_Username.c_str());
 			return;
 		}
 	}
@@ -1039,10 +1042,11 @@ void cClientHandle::HandleCommandBlockBlockChange(int a_BlockX, int a_BlockY, in
 {
 	if (a_NewCommand.empty())
 	{
-		Kick("Command block string unexpectedly empty - hacked client?");
+		LOGD("Player \"%s\" send an empty command block string - hacked client?", m_Username.c_str());
 		return;
 	}
-	if ((m_Player == nullptr) || !m_Player->HasPermission("comandblock.set"))
+
+	if ((m_Player == nullptr) || !m_Player->HasPermission("cuberite.commandblock.set"))
 	{
 		SendChat("You cannot edit command blocks on this server", mtFailure);
 		return;
@@ -1129,12 +1133,12 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		}
 
 		if (
-			((Diff(m_Player->GetPosX(), static_cast<double>(a_BlockX)) > 6) ||
+			(Diff(m_Player->GetPosX(), static_cast<double>(a_BlockX)) > 6) ||
 			(Diff(m_Player->GetPosY(), static_cast<double>(a_BlockY)) > 6) ||
-			(Diff(m_Player->GetPosZ(), static_cast<double>(a_BlockZ)) > 6))
+			(Diff(m_Player->GetPosZ(), static_cast<double>(a_BlockZ)) > 6)
 		)
 		{
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, *m_Player);
+			m_Player->SendBlocksAround(a_BlockX, a_BlockY, a_BlockZ, 2);
 			return;
 		}
 	}
@@ -1143,7 +1147,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 	if (m_Player->IsFrozen() || PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, static_cast<char>(a_Status)))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, *m_Player);
+		m_Player->SendBlocksAround(a_BlockX, a_BlockY, a_BlockZ, 2);
 		SendPlayerPosition();  // Prevents the player from falling through the block that was temporarily broken client side.
 		return;
 	}
@@ -1164,8 +1168,8 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 		case DIG_STATUS_SHOOT_EAT:
 		{
-			cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
-			if (ItemHandler->IsFood() || ItemHandler->IsDrinkable(m_Player->GetEquippedItem().m_ItemDamage))
+			auto & ItemHandler = m_Player->GetEquippedItem().GetHandler();
+			if (ItemHandler.IsFood() || ItemHandler.IsDrinkable(m_Player->GetEquippedItem().m_ItemDamage))
 			{
 				m_Player->AbortEating();
 				return;
@@ -1180,9 +1184,12 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 				// When bow is in off-hand / shield slot
 				if (m_Player->GetInventory().GetShieldSlot().m_ItemType == Item::Bow)
 				{
-					ItemHandler = cItemHandler::GetItemHandler(m_Player->GetInventory().GetShieldSlot());
+					m_Player->GetInventory().GetShieldSlot().GetHandler().OnItemShoot(m_Player, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
 				}
-				ItemHandler->OnItemShoot(m_Player, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
+				else
+				{
+					ItemHandler.OnItemShoot(m_Player, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
+				}
 			}
 			return;
 		}
@@ -1279,7 +1286,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		(Diff(m_Player->GetPosZ(), static_cast<double>(a_BlockZ)) > 6)
 	)
 	{
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, *m_Player);
+		m_Player->SendBlocksAround(a_BlockX, a_BlockY, a_BlockZ, 2);
 		return;
 	}
 
@@ -1317,8 +1324,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	cBlockHandler::For(DiggingBlock.Type()).OnDigging(ChunkInterface, *World, *m_Player, {a_BlockX, a_BlockY, a_BlockZ});
 
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
-	ItemHandler->OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
+	m_Player->GetEquippedItem().GetHandler().OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
 }
 
 
@@ -1355,8 +1361,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		{
 			LOGD("Break progress of player %s was less than expected: %f < %f\n", m_Player->GetName().c_str(), m_BreakProgress * 100, FASTBREAK_PERCENTAGE * 100);
 			// AntiFastBreak doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, *m_Player);
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, *m_Player);  // Strange bug with doors
+			m_Player->SendBlocksAround(a_BlockX, a_BlockY, a_BlockZ, 2);
 			SendPlayerPosition();  // Prevents the player from falling through the block that was temporarily broken client side.
 			m_Player->SendMessage("FastBreak?");  // TODO Anticheat hook
 			return;
@@ -1368,8 +1373,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, DugBlock))
 	{
 		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, *m_Player);
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, *m_Player);  // Strange bug with doors
+		m_Player->SendBlocksAround(a_BlockX, a_BlockY, a_BlockZ, 2);
 		SendPlayerPosition();  // Prevents the player from falling through the block that was temporarily broken client side.
 		return;
 	}
@@ -1431,38 +1435,45 @@ void cClientHandle::FinishDigAnimation()
 
 void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, bool a_UsedMainHand)
 {
-	// This function handles three actions:
-	// (1) Place a block;
-	// (2) "Use" a block: Interactive with the block, like opening a chest/crafting table/furnace;
-	// (3) Use the held item targeting a block. E.g. farming.
-	//
-	// Sneaking player will not use the block if hand is not empty.
-	// Frozen player can do nothing.
-	// In Game Mode Spectator, player cannot use item or place block, but can interactive with some block depending on cBlockInfo::IsUseableBySpectator(BlockType)
-	//
-	// If the action failed, we need to send an update of the placed block or inventory to the client.
-	//
-	// Actions rejected by plugin will not lead to other attempts.
-	// E.g., when opening a chest with a dirt in hand, if the plugin rejects opening the chest, the dirt will not be placed.
+	/* This function handles three actions:
+	(1) Place a block;
+	(2) "Use" a block: Interactive with the block, like opening a chest/crafting table/furnace;
+	(3) Use the held item targeting a block. E.g. farming.
+
+	Sneaking player will not use the block if hand is not empty.
+	Frozen player can do nothing.
+	In Game Mode Spectator, player cannot use item or place block, but can interactive with some block depending on cBlockInfo::IsUseableBySpectator(BlockType)
+
+	If the action failed, we need to send an update of the placed block or inventory to the client.
+
+	Actions rejected by plugin will not lead to other attempts.
+	E.g., when opening a chest with a dirt in hand, if the plugin rejects opening the chest, the dirt will not be placed. */
+
+	if ((a_BlockFace == BLOCK_FACE_NONE) || !cChunkDef::IsValidHeight(a_BlockY))
+	{
+		LOGD("Player \"%s\" sent an invalid click - hacked client?", m_Username.c_str());
+		return;
+	}
 
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
 	a_UsedMainHand = true;
-	const cItem & HeldItem = a_UsedMainHand ? m_Player->GetEquippedItem() : m_Player->GetInventory().GetShieldSlot();
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(HeldItem.m_ItemType);
 
-	// TODO: This distance should be calculated from the point that the cursor pointing at, instead of the center of the block
-	// Distance from the block's center to the player's eye height
-	auto ClickedBlockPos = Vector3i(a_BlockX, a_BlockY, a_BlockZ);
-	auto CursorPos = Vector3i(a_CursorX, a_CursorY, a_CursorZ);
-	double Dist = (Vector3d(ClickedBlockPos) + Vector3d(0.5, 0.5, 0.5) - m_Player->GetEyePosition()).Length();
-	FLOGD("HandleRightClick: {0}, face {1}, Cursor {2}, Hand: {3}, HeldItem: {4}; Dist: {5:.02f}",
-		ClickedBlockPos, a_BlockFace, CursorPos, a_UsedMainHand, ItemToFullString(HeldItem), Dist
-	);
+	const Vector3i ClickedPosition(a_BlockX, a_BlockY, a_BlockZ);
+	const Vector3i CursorPosition(a_CursorX, a_CursorY, a_CursorZ);
+	const cItem & HeldItem = a_UsedMainHand ? m_Player->GetEquippedItem() : m_Player->GetInventory().GetShieldSlot();
+
+	// Distance from the block's center to the player's eye height.
+	const double Dist = (Vector3d(0.5, 0.5, 0.5) + ClickedPosition - m_Player->GetEyePosition()).SqrLength();
 
 	// Check the reach distance:
 	// _X 2014-11-25: I've maxed at 5.26 with a Survival client and 5.78 with a Creative client in my tests
-	double MaxDist = m_Player->IsGameModeCreative() ? 5.78 : 5.26;
+	double MaxDist = m_Player->IsGameModeCreative() ? 33.4084 : 27.6676;
 	bool IsWithinReach = (Dist <= MaxDist);
+
+	FLOGD("HandleRightClick: {0}, face {1}, Cursor {2}, Hand: {3}, HeldItem: {4}; Dist: {5:.02f}",
+		ClickedPosition, a_BlockFace, CursorPosition, a_UsedMainHand, ItemToFullString(HeldItem), Dist
+	);
+
 	cWorld * World = m_Player->GetWorld();
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
@@ -1471,35 +1482,37 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		IsWithinReach && !m_Player->IsFrozen()
 	)
 	{
-		auto ClickedBlock = World->GetBlock(ClickedBlockPos);
+		auto ClickedBlock = World->GetBlock(ClickedPosition);
 		const auto & BlockHandler = cBlockHandler::For(ClickedBlock.Type());
 
-		bool Placeable = ItemHandler->IsPlaceable() && !m_Player->IsGameModeAdventure() && !m_Player->IsGameModeSpectator();
-		bool BlockUsable = BlockHandler.IsUseable() && (!m_Player->IsGameModeSpectator() || cBlockInfo::IsUseableBySpectator(ClickedBlock));
+		const auto & ItemHandler = HeldItem.GetHandler();
+		const bool BlockUsable = BlockHandler.IsUseable() && (m_Player->IsGameModeSpectator() ? cBlockInfo::IsUseableBySpectator(ClickedBlock) : !(m_Player->IsCrouched() && !HeldItem.IsEmpty()));
+		const bool ItemPlaceable = ItemHandler.IsPlaceable() && !m_Player->IsGameModeAdventure() && !m_Player->IsGameModeSpectator();
+		const bool ItemUseable = !m_Player->IsGameModeSpectator();
 
-		if (BlockUsable && !(m_Player->IsCrouched() && !HeldItem.IsEmpty()))
+		if (BlockUsable)
 		{
 			cChunkInterface ChunkInterface(World->GetChunkMap());
 			if (!PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, ClickedBlock))
 			{
 				// Use a block:
-				if (BlockHandler.OnUse(ChunkInterface, *World, *m_Player, ClickedBlockPos, a_BlockFace, CursorPos))
+				if (BlockHandler.OnUse(ChunkInterface, *World, *m_Player, ClickedPosition, a_BlockFace, CursorPosition))
 				{
 					PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, ClickedBlock);
 					return;  // Block use was successful, we're done.
 				}
 
-				// Check if the item is place able, for example a torch on a fence:
-				if (Placeable)
+				// If block use failed, fall back to placement:
+				if (ItemPlaceable)
 				{
 					// Place a block:
-					ItemHandler->OnPlayerPlace(*m_Player, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, {a_CursorX, a_CursorY, a_CursorZ});
+					ItemHandler.OnPlayerPlace(*m_Player, HeldItem, ClickedPosition, ClickedBlock, a_BlockFace, CursorPosition);
 				}
 
 				return;
 			}
 		}
-		else if (Placeable)
+		else if (ItemPlaceable)
 		{
 			// TODO: Double check that we don't need this for using item and for packet out of range
 			m_NumBlockChangeInteractionsThisTick++;
@@ -1510,17 +1523,25 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			}
 
 			// Place a block:
-			ItemHandler->OnPlayerPlace(*m_Player, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, {a_CursorX, a_CursorY, a_CursorZ});
+			ItemHandler.OnPlayerPlace(*m_Player, HeldItem, ClickedPosition, ClickedBlock, a_BlockFace, CursorPosition);
 			return;
 		}
-		else if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		else if (ItemUseable)
 		{
-			// All plugins agree with using the item.
-			// Use an item in hand with a target block.
+			if (!PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+			{
+				// All plugins agree with using the item.
+				// Use an item in hand with a target block.
 
-			cBlockInServerPluginInterface PluginInterface(*World);
-			ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, {a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace);
-			PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+				cBlockInServerPluginInterface PluginInterface(*World);
+				ItemHandler.OnItemUse(World, m_Player, PluginInterface, HeldItem, ClickedPosition, a_BlockFace);
+				PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+				return;
+			}
+		}
+		else
+		{
+			// (x) None of the above.
 			return;
 		}
 	}
@@ -1542,10 +1563,9 @@ void cClientHandle::HandleChat(const AString & a_Message)
 {
 	if ((a_Message.size()) > MAX_CHAT_MSG_LENGTH)
 	{
-		Kick("Please don't exceed the maximum message length of " + std::to_string(MAX_CHAT_MSG_LENGTH));
+		LOGD("Player \"%s\" sent a chat message exceeding the maximum length - hacked client?", m_Username.c_str());
 		return;
 	}
-	// We no longer need to postpone message processing, because the messages already arrive in the Tick thread
 
 	// If a command, perform it:
 	AString Message(a_Message);
@@ -1570,7 +1590,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 	Msg.AddTextPart(m_Player->GetName(), Color);
 	Msg.ParseText(m_Player->GetSuffix());
 	Msg.AddTextPart("> ");
-	if (m_Player->HasPermission("chat.format"))
+	if (m_Player->HasPermission("cuberite.chat.format"))
 	{
 		Msg.ParseText(Message);
 	}
@@ -1679,7 +1699,7 @@ void cClientHandle::HandleSpectate(const cUUID & a_PlayerUUID)
 {
 	if (!m_Player->IsGameModeSpectator())
 	{
-		Kick("Tried to use spectator mode when not in game mode spectator.");
+		LOGD("Player \"%s\" tried to spectate when not in spectator mode - hacked client?", m_Username.c_str());
 		return;
 	}
 
@@ -1848,7 +1868,7 @@ void cClientHandle::HandleUseItem(bool a_UsedMainHand)
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
 	a_UsedMainHand = true;
 	const cItem & HeldItem = a_UsedMainHand ? m_Player->GetEquippedItem() : m_Player->GetInventory().GetShieldSlot();
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(HeldItem.m_ItemType);
+	auto & ItemHandler = HeldItem.GetHandler();
 	cWorld * World = m_Player->GetWorld();
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 
@@ -1866,10 +1886,10 @@ void cClientHandle::HandleUseItem(bool a_UsedMainHand)
 		return;
 	}
 
-	if (ItemHandler->IsFood() || ItemHandler->IsDrinkable(HeldItem.m_ItemDamage))
+	if (ItemHandler.IsFood() || ItemHandler.IsDrinkable(HeldItem.m_ItemDamage))
 	{
 		if (
-			ItemHandler->IsFood() &&
+			ItemHandler.IsFood() &&
 			(m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&  // Only non-creative or hungry players can eat
 			(HeldItem.m_ItemType != Item::GoldenApple) &&  // Golden apple is a special case, it is used instead of eaten
 			(HeldItem.m_ItemType != Item::ChorusFruit)     // Chorus fruit is a special case, it is used instead of eaten
@@ -1890,7 +1910,7 @@ void cClientHandle::HandleUseItem(bool a_UsedMainHand)
 		{
 			// All plugins agree with using the item
 			cBlockInServerPluginInterface PluginInterface(*World);
-			ItemHandler->OnItemUse(World, m_Player, PluginInterface, HeldItem, {-1, 255, -1}, BLOCK_FACE_NONE);
+			ItemHandler.OnItemUse(World, m_Player, PluginInterface, HeldItem, {-1, 255, -1}, BLOCK_FACE_NONE);
 			PlgMgr->CallHookPlayerUsedItem(*m_Player, -1, 255, -1, BLOCK_FACE_NONE, 0, 0, 0);
 		}
 	}
@@ -1904,7 +1924,7 @@ void cClientHandle::HandleRespawn(void)
 {
 	if (m_Player->GetHealth() > 0)
 	{
-		Kick("What is not dead may not live again. Hacked client?");
+		LOGD("Player \"%s\" tried to respawn while alive - hacked client?", m_Username.c_str());
 		return;
 	}
 
@@ -2855,6 +2875,15 @@ void cClientHandle::SendPlayerMoveLook(void)
 	);
 	*/
 	m_Protocol->SendPlayerMoveLook();
+}
+
+
+
+
+
+void cClientHandle::SendPlayerPermissionLevel()
+{
+	m_Protocol->SendPlayerPermissionLevel();
 }
 
 

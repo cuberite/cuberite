@@ -67,7 +67,7 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Self) const override
 	{
-		return (a_Position.y > 0) && IsBlockStateOfDirt(a_Self);
+		return (a_Position.y > 0) && IsBlockMaterialDirt(a_Self);
 	}
 
 

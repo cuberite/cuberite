@@ -26,6 +26,27 @@ bool IsBlockAir(BlockState a_Block)
 
 
 
+bool IsBlockAnvil(BlockState a_Block)
+{
+	switch (a_Block.Type())
+	{
+		case BlockType::Anvil:
+		case BlockType::ChippedAnvil:
+		case BlockType::DamagedAnvil:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
 bool IsBlockIce(BlockState a_Block)
 {
 	switch (a_Block.Type())
@@ -43,15 +64,6 @@ bool IsBlockIce(BlockState a_Block)
 
 
 
-bool IsBlockWaterOrIce(BlockState a_Block)
-{
-	return ((a_Block.Type() == BlockType::Water) || IsBlockIce(a_Block));
-}
-
-
-
-
-
 bool IsBlockLiquid(BlockState a_Block)
 {
 	return ((a_Block.Type() == BlockType::Water) || (a_Block.Type() == BlockType::Lava));
@@ -61,7 +73,7 @@ bool IsBlockLiquid(BlockState a_Block)
 
 
 
-bool IsBlockStateOfDirt(BlockState a_Block)
+bool IsBlockMaterialDirt(BlockState a_Block)
 {
 	switch (a_Block.Type())
 	{
@@ -79,29 +91,231 @@ bool IsBlockStateOfDirt(BlockState a_Block)
 
 
 
-bool IsBlockShulkerBox(BlockState a_Block)
+bool IsBlockMaterialGourd(BlockState a_Block)
 {
 	switch (a_Block.Type())
 	{
-		case BlockType::ShulkerBox:
-		case BlockType::BlackShulkerBox:
-		case BlockType::BlueShulkerBox:
-		case BlockType::BrownShulkerBox:
-		case BlockType::CyanShulkerBox:
-		case BlockType::GrayShulkerBox:
-		case BlockType::GreenShulkerBox:
-		case BlockType::LightBlueShulkerBox:
-		case BlockType::LightGrayShulkerBox:
-		case BlockType::LimeShulkerBox:
-		case BlockType::MagentaShulkerBox:
-		case BlockType::OrangeShulkerBox:
-		case BlockType::PinkShulkerBox:
-		case BlockType::PurpleShulkerBox:
-		case BlockType::RedShulkerBox:
-		case BlockType::WhiteShulkerBox:
-		case BlockType::YellowShulkerBox:
+		case BlockType::Pumpkin:
+		case BlockType::JackOLantern:
+		case BlockType::Melon:
+		{
 			return true;
-		default: return false;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+bool IsBlockMaterialIron(BlockState a_Block)
+{
+	switch (a_Block.Type())
+	{
+		case BlockType::LapisBlock:
+		case BlockType::GoldBlock:
+		case BlockType::IronBlock:
+		case BlockType::DiamondBlock:
+		case BlockType::IronDoor:
+		case BlockType::IronBars:
+		case BlockType::BrewingStand:
+		case BlockType::Cauldron:
+		case BlockType::EmeraldBlock:
+		case BlockType::CommandBlock:
+		case BlockType::LightWeightedPressurePlate:
+		case BlockType::HeavyWeightedPressurePlate:
+		case BlockType::RedstoneBlock:
+		case BlockType::Hopper:
+		case BlockType::IronTrapdoor:
+		case BlockType::RepeatingCommandBlock:
+		case BlockType::ChainCommandBlock:
+		case BlockType::StructureBlock:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+bool IsBlockMaterialPlants(BlockState a_Block)
+{
+	switch (a_Block.Type())
+	{
+		case BlockType::Dandelion:
+		case BlockType::BrownMushroom:
+		case BlockType::RedMushroom:
+		case BlockType::Wheat:
+		case BlockType::PumpkinStem:
+		case BlockType::AttachedPumpkinStem:
+		case BlockType::MelonStem:
+		case BlockType::AttachedMelonStem:
+		case BlockType::LilyPad:
+		case BlockType::NetherWart:
+		case BlockType::Cocoa:
+		case BlockType::Carrots:
+		case BlockType::Potatoes:
+		case BlockType::ChorusPlant:
+		case BlockType::ChorusFlower:
+		case BlockType::Beetroots:
+			// Flower
+		case BlockType::Allium:
+		case BlockType::AzureBluet:
+		case BlockType::BlueOrchid:
+		case BlockType::Cornflower:
+		case BlockType::LilyOfTheValley:
+		case BlockType::OrangeTulip:
+		case BlockType::OxeyeDaisy:
+		case BlockType::PinkTulip:
+		case BlockType::Poppy:
+		case BlockType::RedTulip:
+		case BlockType::WhiteTulip:
+			// Big Flower
+		case BlockType::TallGrass:
+		case BlockType::LargeFern:
+		case BlockType::Lilac:
+		case BlockType::Peony:
+		case BlockType::RoseBush:
+		case BlockType::Sunflower:
+			// Sapling
+		case BlockType::AcaciaSapling:
+		case BlockType::BirchSapling:
+		case BlockType::JungleSapling:
+		case BlockType::DarkOakSapling:
+		case BlockType::OakSapling:
+		case BlockType::SpruceSapling:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+bool IsBlockMaterialRock(BlockState a_Block)
+{
+	switch (a_Block.Type())
+	{
+		case BlockType::Andesite:
+		case BlockType::Bedrock:
+		case BlockType::BlackTerracotta:
+		case BlockType::BlueTerracotta:
+		case BlockType::BoneBlock:
+		case BlockType::BrickStairs:
+		case BlockType::Bricks:
+		case BlockType::BrownTerracotta:
+		case BlockType::CoalBlock:
+		case BlockType::CoalOre:
+		case BlockType::Cobblestone:
+		case BlockType::CobblestoneStairs:
+		case BlockType::CobblestoneWall:
+		case BlockType::CyanTerracotta:
+		case BlockType::DiamondOre:
+		case BlockType::Diorite:
+		case BlockType::Dispenser:
+		case BlockType::Dropper:
+		case BlockType::EmeraldOre:
+		case BlockType::EnchantingTable:
+		case BlockType::EndPortalFrame:
+		case BlockType::EndStone:
+		case BlockType::EndStoneBricks:
+		case BlockType::EnderChest:
+		case BlockType::Furnace:
+		case BlockType::GoldOre:
+		case BlockType::Granite:
+		case BlockType::GrayTerracotta:
+		case BlockType::GreenTerracotta:
+		case BlockType::IronOre:
+		case BlockType::LapisOre:
+		case BlockType::LightBlueTerracotta:
+		case BlockType::LimeTerracotta:
+		case BlockType::MagentaTerracotta:
+		case BlockType::MagmaBlock:
+		case BlockType::MossyCobblestone:
+		case BlockType::NetherBrickFence:
+		case BlockType::NetherBrickStairs:
+		case BlockType::NetherBricks:
+		case BlockType::NetherQuartzOre:
+		case BlockType::Netherrack:
+		case BlockType::Observer:
+		case BlockType::Obsidian:
+		case BlockType::OrangeTerracotta:
+		case BlockType::PinkTerracotta:
+		case BlockType::Prismarine:
+		case BlockType::PurpleTerracotta:
+		case BlockType::PurpurBlock:
+		case BlockType::PurpurPillar:
+		case BlockType::PurpurSlab:
+		case BlockType::PurpurStairs:
+		case BlockType::QuartzBlock:
+		case BlockType::QuartzStairs:
+		case BlockType::RedNetherBricks:
+		case BlockType::RedSandstone:
+		case BlockType::RedSandstoneSlab:
+		case BlockType::RedSandstoneStairs:
+		case BlockType::RedTerracotta:
+		case BlockType::RedstoneOre:
+		case BlockType::Sandstone:
+		case BlockType::SandstoneStairs:
+		case BlockType::Spawner:
+		case BlockType::Stone:
+		case BlockType::StoneBrickStairs:
+		case BlockType::StoneBricks:
+		case BlockType::StonePressurePlate:
+		case BlockType::StoneSlab:
+		case BlockType::Terracotta:
+		case BlockType::WhiteTerracotta:
+		case BlockType::YellowTerracotta:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+bool IsBlockMaterialVine(BlockState a_Block)
+{
+	switch (a_Block.Type())
+	{
+		case BlockType::DeadBush:
+		case BlockType::Vine:
+			// Big Flower
+		case BlockType::TallGrass:
+		case BlockType::LargeFern:
+		case BlockType::Lilac:
+		case BlockType::Peony:
+		case BlockType::RoseBush:
+		case BlockType::Sunflower:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
 	}
 }
 
@@ -263,231 +477,29 @@ bool IsBlockMaterialWood(BlockState a_Block)
 
 
 
-bool IsBlockMaterialPlants(BlockState a_Block)
+bool IsBlockShulkerBox(BlockState a_Block)
 {
 	switch (a_Block.Type())
 	{
-		case BlockType::Dandelion:
-		case BlockType::BrownMushroom:
-		case BlockType::RedMushroom:
-		case BlockType::Wheat:
-		case BlockType::PumpkinStem:
-		case BlockType::AttachedPumpkinStem:
-		case BlockType::MelonStem:
-		case BlockType::AttachedMelonStem:
-		case BlockType::LilyPad:
-		case BlockType::NetherWart:
-		case BlockType::Cocoa:
-		case BlockType::Carrots:
-		case BlockType::Potatoes:
-		case BlockType::ChorusPlant:
-		case BlockType::ChorusFlower:
-		case BlockType::Beetroots:
-			// Flower
-		case BlockType::Allium:
-		case BlockType::AzureBluet:
-		case BlockType::BlueOrchid:
-		case BlockType::Cornflower:
-		case BlockType::LilyOfTheValley:
-		case BlockType::OrangeTulip:
-		case BlockType::OxeyeDaisy:
-		case BlockType::PinkTulip:
-		case BlockType::Poppy:
-		case BlockType::RedTulip:
-		case BlockType::WhiteTulip:
-			// Big Flower
-		case BlockType::TallGrass:
-		case BlockType::LargeFern:
-		case BlockType::Lilac:
-		case BlockType::Peony:
-		case BlockType::RoseBush:
-		case BlockType::Sunflower:
-			// Sapling
-		case BlockType::AcaciaSapling:
-		case BlockType::BirchSapling:
-		case BlockType::JungleSapling:
-		case BlockType::DarkOakSapling:
-		case BlockType::OakSapling:
-		case BlockType::SpruceSapling:
-		{
+		case BlockType::ShulkerBox:
+		case BlockType::BlackShulkerBox:
+		case BlockType::BlueShulkerBox:
+		case BlockType::BrownShulkerBox:
+		case BlockType::CyanShulkerBox:
+		case BlockType::GrayShulkerBox:
+		case BlockType::GreenShulkerBox:
+		case BlockType::LightBlueShulkerBox:
+		case BlockType::LightGrayShulkerBox:
+		case BlockType::LimeShulkerBox:
+		case BlockType::MagentaShulkerBox:
+		case BlockType::OrangeShulkerBox:
+		case BlockType::PinkShulkerBox:
+		case BlockType::PurpleShulkerBox:
+		case BlockType::RedShulkerBox:
+		case BlockType::WhiteShulkerBox:
+		case BlockType::YellowShulkerBox:
 			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
-bool IsBlockMaterialVine(BlockState a_Block)
-{
-	switch (a_Block.Type())
-	{
-		case BlockType::DeadBush:
-		case BlockType::Vine:
-			// Big Flower
-		case BlockType::TallGrass:
-		case BlockType::LargeFern:
-		case BlockType::Lilac:
-		case BlockType::Peony:
-		case BlockType::RoseBush:
-		case BlockType::Sunflower:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
-bool IsBlockMaterialIron(BlockState a_Block)
-{
-	switch (a_Block.Type())
-	{
-		case BlockType::LapisBlock:
-		case BlockType::GoldBlock:
-		case BlockType::IronBlock:
-		case BlockType::DiamondBlock:
-		case BlockType::IronDoor:
-		case BlockType::IronBars:
-		case BlockType::BrewingStand:
-		case BlockType::Cauldron:
-		case BlockType::EmeraldBlock:
-		case BlockType::CommandBlock:
-		case BlockType::LightWeightedPressurePlate:
-		case BlockType::HeavyWeightedPressurePlate:
-		case BlockType::RedstoneBlock:
-		case BlockType::Hopper:
-		case BlockType::IronTrapdoor:
-		case BlockType::RepeatingCommandBlock:
-		case BlockType::ChainCommandBlock:
-		case BlockType::StructureBlock:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
-bool IsBlockMaterialGourd(BlockState a_Block)
-{
-	switch (a_Block.Type())
-	{
-		case BlockType::Pumpkin:
-		case BlockType::JackOLantern:
-		case BlockType::Melon:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
-bool IsBlockMaterialRock(BlockState a_Block)
-{
-	switch (a_Block.Type())
-	{
-		case BlockType::Andesite:
-		case BlockType::Bedrock:
-		case BlockType::BlackTerracotta:
-		case BlockType::BlueTerracotta:
-		case BlockType::BoneBlock:
-		case BlockType::BrickStairs:
-		case BlockType::Bricks:
-		case BlockType::BrownTerracotta:
-		case BlockType::CoalBlock:
-		case BlockType::CoalOre:
-		case BlockType::Cobblestone:
-		case BlockType::CobblestoneStairs:
-		case BlockType::CobblestoneWall:
-		case BlockType::CyanTerracotta:
-		case BlockType::DiamondOre:
-		case BlockType::Diorite:
-		case BlockType::Dispenser:
-		case BlockType::Dropper:
-		case BlockType::EmeraldOre:
-		case BlockType::EnchantingTable:
-		case BlockType::EndPortalFrame:
-		case BlockType::EndStone:
-		case BlockType::EndStoneBricks:
-		case BlockType::EnderChest:
-		case BlockType::Furnace:
-		case BlockType::GoldOre:
-		case BlockType::Granite:
-		case BlockType::GrayTerracotta:
-		case BlockType::GreenTerracotta:
-		case BlockType::IronOre:
-		case BlockType::LapisOre:
-		case BlockType::LightBlueTerracotta:
-		case BlockType::LimeTerracotta:
-		case BlockType::MagentaTerracotta:
-		case BlockType::MagmaBlock:
-		case BlockType::MossyCobblestone:
-		case BlockType::NetherBrickFence:
-		case BlockType::NetherBrickStairs:
-		case BlockType::NetherBricks:
-		case BlockType::NetherQuartzOre:
-		case BlockType::Netherrack:
-		case BlockType::Observer:
-		case BlockType::Obsidian:
-		case BlockType::OrangeTerracotta:
-		case BlockType::PinkTerracotta:
-		case BlockType::Prismarine:
-		case BlockType::PurpleTerracotta:
-		case BlockType::PurpurBlock:
-		case BlockType::PurpurPillar:
-		case BlockType::PurpurSlab:
-		case BlockType::PurpurStairs:
-		case BlockType::QuartzBlock:
-		case BlockType::QuartzStairs:
-		case BlockType::RedNetherBricks:
-		case BlockType::RedSandstone:
-		case BlockType::RedSandstoneSlab:
-		case BlockType::RedSandstoneStairs:
-		case BlockType::RedTerracotta:
-		case BlockType::RedstoneOre:
-		case BlockType::Sandstone:
-		case BlockType::SandstoneStairs:
-		case BlockType::Spawner:
-		case BlockType::Stone:
-		case BlockType::StoneBrickStairs:
-		case BlockType::StoneBricks:
-		case BlockType::StonePressurePlate:
-		case BlockType::StoneSlab:
-		case BlockType::Terracotta:
-		case BlockType::WhiteTerracotta:
-		case BlockType::YellowTerracotta:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
+		default: return false;
 	}
 }
 
@@ -525,21 +537,9 @@ bool IsBlockMobHead(BlockState a_Block)
 
 
 
-bool IsBlockAnvil(BlockState a_Block)
+bool IsBlockWaterOrIce(BlockState a_Block)
 {
-	switch (a_Block.Type())
-	{
-		case BlockType::Anvil:
-		case BlockType::ChippedAnvil:
-		case BlockType::DamagedAnvil:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
+	return ((a_Block.Type() == BlockType::Water) || IsBlockIce(a_Block));
 }
 
 

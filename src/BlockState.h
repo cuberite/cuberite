@@ -34,6 +34,8 @@ struct BlockState
 
 	/** The state ID of the block state. */
 	uint_least16_t ID;
+
+	std::pair<unsigned char, unsigned char> GetLegacyValues();
 };
 
 

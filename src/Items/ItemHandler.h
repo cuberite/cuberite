@@ -40,13 +40,11 @@ public:
 
 
 	/** Called when the player tries to place the item (right mouse button, IsPlaceable() == true).
-	a_ClickedBlockPos is the (neighbor) block that has been clicked to place this item.
-	a_ClickedBlockFace is the face of the neighbor that has been clicked to place this item.
-	a_CursorPos is the position of the player's cursor within a_ClickedBlockFace.
-	The default handler uses GetBlocksToPlace() and places the returned blocks.
-	Override if the item needs advanced processing, such as spawning a mob based on the blocks being placed.
+	a_ClickedPosition is the block that has been clicked to place this item.
+	a_ClickedBlockFace is the face has been clicked to place this item.
+	a_CursorPosition is the position of the player's cursor within a_ClickedBlockFace.
 	If the block placement is refused inside this call, it will automatically revert the client-side changes. */
-	void OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, Vector3i a_ClickedBlockPosition, eBlockFace a_ClickedBlockFace, Vector3i a_CursorPosition) const;
+	void OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, Vector3i a_ClickedPosition, BlockState a_ClickedBlock, eBlockFace a_ClickedBlockFace, Vector3i a_CursorPosition) const;
 
 	/** Called when the player tries to use the item (right mouse button).
 	Descendants can return false to abort the usage (default behavior). */

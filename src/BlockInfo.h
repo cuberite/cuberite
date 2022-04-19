@@ -68,24 +68,24 @@ bool IsBlockAnvil(BlockState a_Block);
 
 bool IsBlockIce(BlockState a_Block);
 
-bool IsBlockWaterOrIce(BlockState a_Block);
-
 bool IsBlockLiquid(BlockState a_Block);
 
-bool IsBlockStateOfDirt(BlockState a_Block);
-
-bool IsBlockShulkerBox(BlockState a_Block);
-
-bool IsBlockMaterialWood(BlockState a_Block);
-
-bool IsBlockMaterialPlants(BlockState a_Block);
-
-bool IsBlockMaterialVine(BlockState a_Block);
-
-bool IsBlockMaterialIron(BlockState a_Block);
+bool IsBlockMaterialDirt(BlockState a_Block);
 
 bool IsBlockMaterialGourd(BlockState a_Block);
 
+bool IsBlockMaterialIron(BlockState a_Block);
+
+bool IsBlockMaterialPlants(BlockState a_Block);
+
 bool IsBlockMaterialRock(BlockState a_Block);
 
+bool IsBlockMaterialVine(BlockState a_Block);
+
+bool IsBlockMaterialWood(BlockState a_Block);
+
 bool IsBlockMobHead(BlockState a_Block);
+
+bool IsBlockShulkerBox(BlockState a_Block);
+
+bool IsBlockWaterOrIce(BlockState a_Block);

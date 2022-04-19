@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Blocks/BlockVine.h"
+#include "Blocks/BlockVines.h"
 #include "Items/ItemHandler.h"
 
 
@@ -26,7 +26,7 @@ private:
 		auto BlockToReplace = a_Player.GetWorld()->GetBlock(a_PlacePosition);
 		if (BlockToReplace.Type() == BlockType::Vine)
 		{
-			if (cBlockVineHandler::IsAttachedTo(BlockToReplace, a_ClickedBlockFace))
+			if (cBlockVinesHandler::IsAttachedTo(BlockToReplace, a_ClickedBlockFace))
 			{
 				// There is already a vine at that rotation
 				return false;
