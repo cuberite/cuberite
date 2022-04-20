@@ -860,16 +860,18 @@ bool cWorld::CheckPlayerSpawnPoint(Vector3i a_Pos)
 
 	// Check that surrounding blocks are neither solid or liquid
 	constexpr std::array<Vector3i, 8> SurroundingCoords =
-	{{
-		{0,  0,  1},
-		{1,  0,  1},
-		{1,  0,  0},
-		{1,  0, -1},
-		{0,  0, -1},
-		{-1, 0, -1},
-		{-1, 0,  0},
-		{-1, 0,  1},
-	}};
+	{
+		{
+			{0,  0,  1},
+			{1,  0,  1},
+			{1,  0,  0},
+			{1,  0, -1},
+			{0,  0, -1},
+			{-1, 0, -1},
+			{-1, 0,  0},
+			{-1, 0,  1},
+		}
+	};
 
 	for (const auto & Offset : SurroundingCoords)
 	{
