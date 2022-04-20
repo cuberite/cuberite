@@ -1002,7 +1002,7 @@ void cProtocol_1_14::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 	}
 
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Face);
-	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), Status);
+	m_Client->HandleLeftClick({BlockX, BlockY, BlockZ}, FaceIntToBlockFace(Face), Status);
 }
 
 
@@ -1025,7 +1025,7 @@ void cProtocol_1_14::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorZ);
 	HANDLE_READ(a_ByteBuffer, ReadBool, bool, InsideBlock);
 
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16), Hand == 0);
+	m_Client->HandleRightClick({BlockX, BlockY, BlockZ}, FaceIntToBlockFace(Face), {FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16)}, Hand == 0);
 }
 
 
