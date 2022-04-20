@@ -165,13 +165,13 @@ public:
 		// Wash away anything that was there prior to placing:
 		if (cFluidSimulator::CanWashAway(CurrentBlockType))
 		{
-			if (a_PluginInterface.CallHookPlayerBreakingBlock(*a_Player, BlockPos.x, BlockPos.y, BlockPos.z, EntryFace, CurrentBlockType, CurrentBlockMeta))
+			if (a_PluginInterface.CallHookPlayerBreakingBlock(*a_Player, BlockPos, EntryFace, CurrentBlockType, CurrentBlockMeta))
 			{
 				// Plugin disagrees with the washing-away
 				return false;
 			}
 			a_World->DropBlockAsPickups(BlockPos, a_Player, nullptr);
-			a_PluginInterface.CallHookPlayerBrokenBlock(*a_Player, BlockPos.x, BlockPos.y, BlockPos.z, EntryFace, CurrentBlockType, CurrentBlockMeta);
+			a_PluginInterface.CallHookPlayerBrokenBlock(*a_Player, BlockPos, EntryFace, CurrentBlockType, CurrentBlockMeta);
 		}
 
 		// Place the actual fluid block:

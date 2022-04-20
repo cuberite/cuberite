@@ -135,10 +135,16 @@ public:
 	Adds the entity to the world. */
 	bool Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld);
 
+	/** Called when a player begins spectating this entity. */
+	void OnAcquireSpectator(cPlayer & a_Player);
+
 	/** Called when the entity is added to a world.
 	e.g after first spawning or after successfuly moving between worlds.
 	\param a_World The world being added to. */
 	virtual void OnAddToWorld(cWorld & a_World);
+
+	/** Called when a player stops spectating this entity. */
+	void OnLoseSpectator(cPlayer & a_Player);
 
 	/** Called when the entity is removed from a world.
 	e.g. When the entity is destroyed or moved to a different world.
@@ -723,4 +729,7 @@ private:
 
 	/** List of leashed mobs to this entity */
 	cMonsterList m_LeashedMobs;
+
+	/** List of players who are spectating this entity. */
+	std::vector<cPlayer *> m_Spectators;
 } ;  // tolua_export

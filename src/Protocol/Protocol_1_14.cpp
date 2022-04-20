@@ -66,12 +66,12 @@ Implements the 1.14 protocol classes:
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_14:
 
-void cProtocol_1_14::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
+void cProtocol_1_14::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktBlockAction);
-	Pkt.WriteXZYPosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXZYPosition64(a_BlockPos);
 	Pkt.WriteBEInt8(a_Byte1);
 	Pkt.WriteBEInt8(a_Byte2);
 	Pkt.WriteVarInt32(a_BlockType);
@@ -81,13 +81,13 @@ void cProtocol_1_14::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-void cProtocol_1_14::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
+void cProtocol_1_14::SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktBlockBreakAnim);
 	Pkt.WriteVarInt32(a_EntityID);
-	Pkt.WriteXZYPosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXZYPosition64(a_BlockPos);
 	Pkt.WriteBEInt8(a_Stage);
 }
 
@@ -95,10 +95,10 @@ void cProtocol_1_14::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_B
 
 
 
-void cProtocol_1_14::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cProtocol_1_14::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cPacketizer Pkt(*this, pktBlockChange);
-	Pkt.WriteXZYPosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXZYPosition64(a_BlockPos);
 	Pkt.WriteVarInt32(GetProtocolBlockType(a_BlockType, a_BlockMeta));
 }
 
@@ -106,7 +106,7 @@ void cProtocol_1_14::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, B
 
 
 
-void cProtocol_1_14::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cProtocol_1_14::SendEditSign(Vector3i a_BlockPos)
 {
 }
 
@@ -206,27 +206,6 @@ void cProtocol_1_14::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocol_1_14::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktParticleEffect);
-	Pkt.WriteBEInt32(GetProtocolParticleID(a_ParticleName));
-	Pkt.WriteBool(false);
-	Pkt.WriteBEFloat(a_SrcX);
-	Pkt.WriteBEFloat(a_SrcY);
-	Pkt.WriteBEFloat(a_SrcZ);
-	Pkt.WriteBEFloat(a_OffsetX);
-	Pkt.WriteBEFloat(a_OffsetY);
-	Pkt.WriteBEFloat(a_OffsetZ);
-	Pkt.WriteBEFloat(a_ParticleData);
-	Pkt.WriteBEInt32(a_ParticleAmount);
-}
-
-
-
-
-
 void cProtocol_1_14::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -273,7 +252,7 @@ void cProtocol_1_14::SendRespawn(eDimension a_Dimension)
 
 
 
-void cProtocol_1_14::SendSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
+void cProtocol_1_14::SendSoundParticleEffect(const EffectID a_EffectID, Vector3i a_Origin, int a_Data)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -281,7 +260,7 @@ void cProtocol_1_14::SendSoundParticleEffect(const EffectID a_EffectID, int a_Sr
 
 	cPacketizer Pkt(*this, pktSoundParticleEffect);
 	Pkt.WriteBEInt32(static_cast<int>(a_EffectID));
-	Pkt.WriteXYZPosition64(a_SrcX, a_SrcY, a_SrcZ);
+	Pkt.WriteXYZPosition64(a_Origin);
 	Pkt.WriteBEInt32(a_Data);
 	Pkt.WriteBool(false);
 }
@@ -340,7 +319,7 @@ void cProtocol_1_14::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 
 
 
-void cProtocol_1_14::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+void cProtocol_1_14::SendUpdateSign(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 }
 

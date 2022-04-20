@@ -99,7 +99,7 @@ private:
 	static Survivability DetermineSurvivability(cChunk & a_Chunk, const Vector3i a_RelPos)
 	{
 		const auto AbovePos = a_RelPos.addedY(1);
-		if (!cChunkDef::IsValidHeight(AbovePos.y))
+		if (!cChunkDef::IsValidHeight(AbovePos))
 		{
 			return Survivability::CanSpread;
 		}
@@ -126,7 +126,7 @@ private:
 	/** Attempt to spread grass to a block at the given position. */
 	static void TrySpreadTo(cChunk & a_Chunk, Vector3i a_RelPos)
 	{
-		if (!cChunkDef::IsValidHeight(a_RelPos.y))
+		if (!cChunkDef::IsValidHeight(a_RelPos))
 		{
 			// Y Coord out of range
 			return;
@@ -161,7 +161,7 @@ private:
 		)
 		{
 			const auto AbsPos = Chunk->RelativeToAbsolute(a_RelPos);
-			if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*Chunk->GetWorld(), AbsPos.x, AbsPos.y, AbsPos.z, ssGrassSpread))
+			if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*Chunk->GetWorld(), AbsPos, ssGrassSpread))
 			{
 				Chunk->FastSetBlock(a_RelPos, E_BLOCK_GRASS, 0);
 			}

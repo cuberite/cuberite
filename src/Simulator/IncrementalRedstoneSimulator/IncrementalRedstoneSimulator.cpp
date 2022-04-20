@@ -217,7 +217,7 @@ void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position
 	for (const auto & Offset : cSimulator::GetLinkedOffsets(a_Offset))
 	{
 		auto Relative = a_Position - a_Offset + Offset;
-		if (!cChunkDef::IsValidHeight(Relative.y))
+		if (!cChunkDef::IsValidHeight(Relative))
 		{
 			continue;
 		}

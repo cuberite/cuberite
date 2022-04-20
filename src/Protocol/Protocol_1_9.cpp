@@ -501,6 +501,42 @@ void cProtocol_1_9_0::SendPlayerMoveLook(void)
 
 
 
+void cProtocol_1_9_0::SendPlayerPermissionLevel()
+{
+	const cPlayer & Player = *m_Client->GetPlayer();
+
+	cPacketizer Pkt(*this, pktEntityStatus);
+	Pkt.WriteBEUInt32(Player.GetUniqueID());
+	Pkt.WriteBEInt8([&Player]() -> signed char
+	{
+		if (Player.HasPermission("core.stop") || Player.HasPermission("core.reload") || Player.HasPermission("core.save-all"))
+		{
+			return 28;
+		}
+
+		if (Player.HasPermission("core.ban") || Player.HasPermission("core.deop") || Player.HasPermission("core.kick") || Player.HasPermission("core.op"))
+		{
+			return 27;
+		}
+
+		if (Player.HasPermission("cuberite.comandblock.set") || Player.HasPermission("core.clear") || Player.HasPermission("core.difficulty") || Player.HasPermission("core.effect") || Player.HasPermission("core.gamemode") || Player.HasPermission("core.tp") || Player.HasPermission("core.give"))
+		{
+			return 26;
+		}
+
+		if (Player.HasPermission("core.spawnprotect.bypass"))
+		{
+			return 25;
+		}
+
+		return 24;
+	}());
+}
+
+
+
+
+
 void cProtocol_1_9_0::SendPlayerSpawn(const cPlayer & a_Player)
 {
 	// Called to spawn another player for the client
@@ -521,16 +557,16 @@ void cProtocol_1_9_0::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
-void cProtocol_1_9_0::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
+void cProtocol_1_9_0::SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSoundEffect);
 	Pkt.WriteString(a_SoundName);
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
-	Pkt.WriteBEInt32(static_cast<Int32>(a_X * 8.0));
-	Pkt.WriteBEInt32(static_cast<Int32>(a_Y * 8.0));
-	Pkt.WriteBEInt32(static_cast<Int32>(a_Z * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.x * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.y * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.z * 8.0));
 	Pkt.WriteBEFloat(a_Volume);
 	Pkt.WriteBEUInt8(static_cast<Byte>(a_Pitch * 63));
 }
@@ -575,16 +611,16 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocol_1_9_0::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cProtocol_1_9_0::SendThunderbolt(Vector3i a_Origin)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSpawnGlobalEntity);
 	Pkt.WriteVarInt32(0);  // EntityID = 0, always
 	Pkt.WriteBEUInt8(1);  // Type = Thunderbolt
-	Pkt.WriteBEDouble(a_BlockX);
-	Pkt.WriteBEDouble(a_BlockY);
-	Pkt.WriteBEDouble(a_BlockZ);
+	Pkt.WriteBEDouble(a_Origin.x);
+	Pkt.WriteBEDouble(a_Origin.y);
+	Pkt.WriteBEDouble(a_Origin.z);
 }
 
 
@@ -840,14 +876,14 @@ void cProtocol_1_9_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
 
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
+	Vector3i Position;
+	if (!a_ByteBuffer.ReadXYZPosition64(Position))
 	{
 		return;
 	}
 
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Face);
-	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), Status);
+	m_Client->HandleLeftClick(Position, FaceIntToBlockFace(Face), Status);
 }
 
 
@@ -856,8 +892,8 @@ void cProtocol_1_9_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_9_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
+	Vector3i Position;
+	if (!a_ByteBuffer.ReadXYZPosition64(Position))
 	{
 		return;
 	}
@@ -868,7 +904,7 @@ void cProtocol_1_9_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
 
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, Hand == MAIN_HAND);
+	m_Client->HandleRightClick(Position, FaceIntToBlockFace(Face), {CursorX, CursorY, CursorZ}, Hand == MAIN_HAND);
 }
 
 
@@ -970,7 +1006,7 @@ void cProtocol_1_9_0::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 
 	if (m_IsTeleportIdConfirmed)
 	{
-		m_Client->HandlePlayerMove(PosX, PosY, PosZ, IsOnGround);
+		m_Client->HandlePlayerMove({PosX, PosY, PosZ}, IsOnGround);
 	}
 }
 
@@ -989,7 +1025,7 @@ void cProtocol_1_9_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 
 	if (m_IsTeleportIdConfirmed)
 	{
-		m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, Yaw, Pitch, IsOnGround);
+		m_Client->HandlePlayerMoveLook({PosX, PosY, PosZ}, Yaw, Pitch, IsOnGround);
 	}
 }
 
@@ -1041,8 +1077,8 @@ void cProtocol_1_9_0::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_9_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 {
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
+	Vector3i Position;
+	if (!a_ByteBuffer.ReadXYZPosition64(Position))
 	{
 		return;
 	}
@@ -1054,7 +1090,7 @@ void cProtocol_1_9_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 		Lines[i] = Line;
 	}
 
-	m_Client->HandleUpdateSign(BlockX, BlockY, BlockZ, Lines[0], Lines[1], Lines[2], Lines[3]);
+	m_Client->HandleUpdateSign(Position, Lines[0], Lines[1], Lines[2], Lines[3]);
 }
 
 
@@ -1213,7 +1249,7 @@ void cProtocol_1_9_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std
 		HANDLE_READ(a_ByteBuffer, ReadBool, bool, Conditional);
 		HANDLE_READ(a_ByteBuffer, ReadBool, bool, Automatic);
 
-		m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
+		m_Client->HandleCommandBlockBlockChange({BlockX, BlockY, BlockZ}, Command);
 	}
 	else if (a_Channel == "PickItem")
 	{
@@ -2368,19 +2404,19 @@ cProtocol::Version cProtocol_1_9_2::GetProtocolVersion() const
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_4:
 
-void cProtocol_1_9_4::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+void cProtocol_1_9_4::SendUpdateSign(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	// 1.9.4 removed the update sign packet and now uses Update Block Entity
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
-	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockPos);
 	Pkt.WriteBEUInt8(9);  // Action 9 - update sign
 
 	cFastNBTWriter Writer;
-	Writer.AddInt("x",        a_BlockX);
-	Writer.AddInt("y",        a_BlockY);
-	Writer.AddInt("z",        a_BlockZ);
+	Writer.AddInt("x",        a_BlockPos.x);
+	Writer.AddInt("y",        a_BlockPos.y);
+	Writer.AddInt("z",        a_BlockPos.z);
 	Writer.AddString("id", "Sign");
 
 	Json::Value Line1;

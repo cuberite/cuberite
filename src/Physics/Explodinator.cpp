@@ -342,7 +342,7 @@ namespace Explodinator
 		while (a_Intensity > 0)
 		{
 			auto Position = Checkpoint.Floor();
-			if (!cChunkDef::IsValidHeight(Position.y))
+			if (!cChunkDef::IsValidHeight(Position))
 			{
 				break;
 			}

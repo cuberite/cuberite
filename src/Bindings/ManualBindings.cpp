@@ -1638,7 +1638,7 @@ static int tolua_cPlayer_PlaceBlock(lua_State * tolua_S)
 	NIBBLETYPE BlockMeta;
 	L.GetStackValues(1, Self, Position, BlockType, BlockMeta);
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}

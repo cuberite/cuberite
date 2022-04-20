@@ -199,7 +199,7 @@ private:
 
 		// Vine cannot grow down if at the bottom:
 		auto GrowPos = a_RelPos.addedY(-1);
-		if (!cChunkDef::IsValidHeight(GrowPos.y))
+		if (!cChunkDef::IsValidHeight(GrowPos))
 		{
 			return;
 		}
@@ -210,7 +210,7 @@ private:
 		if (Block == E_BLOCK_AIR)
 		{
 			auto WorldPos = a_Chunk.RelativeToAbsolute(GrowPos);
-			if (!a_PluginInterface.CallHookBlockSpread(WorldPos.x, WorldPos.y, WorldPos.z, ssVineSpread))
+			if (!a_PluginInterface.CallHookBlockSpread(WorldPos, ssVineSpread))
 			{
 				a_Chunk.UnboundedRelSetBlock(GrowPos, E_BLOCK_VINES, a_Chunk.GetMeta(a_RelPos));
 			}

@@ -311,10 +311,14 @@ public:
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
 
 	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be nullptr. Returns true if sign text changed. */
-	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = nullptr);  // Exported in ManualBindings.cpp
+	bool SetSignLines(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = nullptr);  // Exported in ManualBindings.cpp
 
 	/** Sets the command block command. Returns true if command changed. */
 	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);  // tolua_export
+	bool SetCommandBlockCommand(Vector3i a_BlockPos, const AString & a_Command)
+	{
+		return SetCommandBlockCommand(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Command);
+	}
 
 	/** Is the trapdoor open? Returns false if there is no trapdoor at the specified coords. */
 	bool IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ);                                      // tolua_export
@@ -1128,7 +1132,11 @@ private:
 	bool CanSpawnAt(int a_X, int & a_Y, int a_Z);
 
 	/** Check if player starting point is acceptable */
-	bool CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ);
+	bool CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
+	{
+		return CheckPlayerSpawnPoint({a_PosX, a_PosY, a_PosZ});
+	}
+	bool CheckPlayerSpawnPoint(Vector3i a_Pos);
 
 	/** Chooses a reasonable transition from the current weather to a new weather */
 	eWeather ChooseNewWeather(void);

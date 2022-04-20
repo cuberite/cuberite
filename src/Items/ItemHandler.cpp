@@ -1063,7 +1063,7 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 		NIBBLETYPE PlaceMeta;
 		const auto PlacePosition = AddFaceDirection(a_ClickedPosition, a_ClickedBlockFace);
 
-		if (!cChunkDef::IsValidHeight(PlacePosition.y) || !World.GetBlockTypeMeta(PlacePosition, PlaceBlock, PlaceMeta))
+		if (!cChunkDef::IsValidHeight(PlacePosition) || !World.GetBlockTypeMeta(PlacePosition, PlaceBlock, PlaceMeta))
 		{
 			// The block is being placed outside the world, ignore this packet altogether (GH #128):
 			return;
@@ -1075,7 +1075,7 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 		{
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it.
-			a_Player.SendBlocksAround(PlacePosition.x, PlacePosition.y, PlacePosition.z, 2);
+			a_Player.SendBlocksAround(PlacePosition, 2);
 			a_Player.GetInventory().SendEquippedSlot();
 			return;
 		}

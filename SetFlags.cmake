@@ -164,8 +164,8 @@ function(set_exe_flags TARGET)
 			-Wno-switch-enum
 
 			# Weverything with Clang exceptions:
-			-Weverything -Wno-exit-time-destructors -Wno-error=disabled-macro-expansion
-			-Wno-weak-vtables -Wno-string-conversion -Wno-c++98-compat-pedantic -Wno-documentation
+			-Weverything -Wno-exit-time-destructors -Wno-error=disabled-macro-expansion -Wno-weak-vtables
+			-Wno-string-conversion -Wno-c++98-compat-pedantic -Wno-c++2a-compat-pedantic -Wno-documentation
 			-Wno-documentation-unknown-command -Wno-reserved-id-macro -Wno-error=unused-command-line-argument
 		)
 
