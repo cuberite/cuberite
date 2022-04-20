@@ -2683,13 +2683,13 @@ void cClientHandle::SendExplosion(const Vector3f a_Position, const float a_Power
 	auto ParticleCount = std::min(static_cast<int>(ParticleFormula * 125), 600);
 
 	// Dark smoke particles:
-	SendParticleEffect("largesmoke", a_Position, {0.f, 0.f, 0.f,}, Spread, static_cast<int>(ParticleCount));
+	SendParticleEffect("largesmoke", a_Position, {0.f, 0.f, 0.f}, Spread, static_cast<int>(ParticleCount));
 
 	Spread = ParticleFormula * 0.35f;
 	ParticleCount = std::min(static_cast<int>(ParticleFormula * 550), 1800);
 
 	// Light smoke particles:
-	SendParticleEffect("explode", a_Position, {0.f, 0.f, 0.f,}, Spread, static_cast<int>(ParticleCount));
+	SendParticleEffect("explode", a_Position, {0.f, 0.f, 0.f}, Spread, static_cast<int>(ParticleCount));
 
 	// Shockwave effect:
 	m_Protocol->SendExplosion(a_Position, a_Power);

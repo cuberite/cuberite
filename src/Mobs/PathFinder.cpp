@@ -236,7 +236,7 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 		// Go down to the lowest air block.
 		if (InTheAir)
 		{
-			while (cChunkDef::IsValidHeight(a_Vector.addedY(-1)))
+			while (cChunkDef::IsValidHeight(BelowRel.addedY(-1)))
 			{
 				Chunk->GetBlockTypeMeta(BelowRel.addedY(-1), BlockType, BlockMeta);
 				if (IsWaterOrSolid(BlockType))

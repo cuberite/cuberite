@@ -153,13 +153,15 @@ Vector3f cFluidSimulator::GetFlowingDirection(Vector3i a_Pos)
 	NIBBLETYPE LevelPoint[4];
 
 	// blocks around the checking pos
-	std::array<Vector3i, 4> Offsets {
+	std::array<Vector3i, 4> Offsets
 	{
-		{ 1, 0, 0 },
-		{ 0, 0, 1 },
-		{ 1, 0, 0 },
-		{ 0, 0, 1 }
-	}};
+		{
+			{ 1, 0, 0 },
+			{ 0, 0, 1 },
+			{ 1, 0, 0 },
+			{ 0, 0, 1 }
+		}
+	};
 
 	for (size_t i = 0; i < Offsets.size(); i++)
 	{
