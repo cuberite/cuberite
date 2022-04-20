@@ -86,6 +86,7 @@ public:
 		pktExplosion,
 		pktGameMode,
 		pktHeldItemChange,
+		pktHorseWindowOpen,
 		pktInventorySlot,
 		pktJoinGame,
 		pktKeepAlive,
@@ -156,6 +157,7 @@ public:
 
 		ArrowFlags,
 		TippedArrowColor,
+		PiercingLevel,
 
 		BoatLastHitTime,
 		BoatForwardDirection,
@@ -172,6 +174,7 @@ public:
 
 		FireworkInfo,
 		FireworkBoostedEntityId,
+		FireworkFromCrossbow,
 
 		ItemFrameItem,
 		ItemFrameRotation,
@@ -227,6 +230,10 @@ public:
 		TameableAnimalFlags,
 		TameableAnimalOwner,
 
+		ThrowableItem,
+
+		TridentLoyaltyLevel,
+
 		OcelotType,
 
 		WolfDamageTaken,
@@ -260,6 +267,7 @@ public:
 		SpiderClimbing,
 
 		WitchAggresive,
+		WitchDrinking,
 
 		WitherFirstHeadTarget,
 		WitherSecondHeadTarget,
@@ -293,6 +301,8 @@ public:
 		MinecartCommandBlockLastOutput,
 
 		MinecartFurnacePowered,
+
+		MooshroomType,
 
 		TNTPrimedFuseTime
 	};

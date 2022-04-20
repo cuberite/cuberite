@@ -368,6 +368,9 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadata a_Metadata) const
 		case EntityMetadata::AreaEffectCloudParticleParameter1:
 		case EntityMetadata::AreaEffectCloudParticleParameter2:
 		case EntityMetadata::ZombieUnusedWasType: break;
+
+		default:
+			break;
 	}
 	UNREACHABLE("Retrieved invalid metadata for protocol");
 }

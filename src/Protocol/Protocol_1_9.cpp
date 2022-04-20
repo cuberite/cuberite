@@ -725,6 +725,9 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet) const
 		{
 			break;
 		}
+
+		default:
+			break;
 	}
 	UNREACHABLE("Unsupported outgoing packet type");
 }
