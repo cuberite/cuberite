@@ -121,6 +121,9 @@ public:
 
 	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }
 
+	/** Returns true if farmland trampling is enabled */
+	bool IsFarmlandTramplingEnabled(void) const { return m_bFarmlandTramplingEnabled; }
+
 	bool IsDeepSnowEnabled(void) const { return m_IsDeepSnowEnabled; }
 
 	bool ShouldLavaSpawnFire(void) const { return m_ShouldLavaSpawnFire; }
@@ -997,6 +1000,7 @@ private:
 
 	eGameMode m_GameMode;
 	bool m_bEnabledPVP;
+	bool m_bFarmlandTramplingEnabled;
 	bool m_IsDeepSnowEnabled;
 	bool m_ShouldLavaSpawnFire;
 	bool m_VillagersShouldHarvestCrops;

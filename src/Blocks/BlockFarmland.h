@@ -10,7 +10,10 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "ChunkInterface.h"
 #include "../BlockArea.h"
+#include "../Chunk.h"
+#include "../ClientHandle.h"
 
 
 
@@ -24,6 +27,58 @@ class cBlockFarmlandHandler final :
 public:
 
 	using Super::Super;
+
+	/** Turns farmland into dirt.
+	Will first check for any colliding entities and teleport them to a higher position.
+	*/
+	static void TurnToDirt(cChunk & a_Chunk, Vector3i a_AbsPos)
+	{
+		auto RelPos = cChunkDef::AbsoluteToRelative(a_AbsPos);
+		TurnToDirt(a_Chunk, a_AbsPos, RelPos);
+	}
+
+
+
+
+
+	/** Turns farmland into dirt.
+	Will first check for any colliding entities and teleport them to a higher position.
+	*/
+	static void TurnToDirt(cChunk & a_Chunk, Vector3i a_AbsPos, Vector3i a_RelPos)
+	{
+		static const auto FarmlandHeight = cBlockInfo::GetBlockHeight(E_BLOCK_FARMLAND);
+		static const auto FullHeightDelta = 1 - FarmlandHeight;
+
+		a_Chunk.ForEachEntityInBox(
+			cBoundingBox(Vector3d(0.5, FarmlandHeight, 0.5) + a_AbsPos, 0.5, FullHeightDelta),
+			[&](cEntity & Entity)
+			{
+				if (!Entity.IsOnGround())
+				{
+					return false;
+				}
+				Entity.AddPosY(FullHeightDelta);
+
+				// Players need a packet that will update their position
+				if (Entity.IsPlayer())
+				{
+					auto Player = static_cast<cPlayer *>(&Entity);
+					// This works, but it's much worse than Vanilla.
+					// This can be easily improved by implementing relative
+					// "Player Position And Look" packets! See
+					// https://wiki.vg/Protocol#Player_Position_And_Look_.28clientbound.29
+					Player->GetClientHandle()->SendPlayerMoveLook();
+				}
+
+				return false;
+			});
+
+		a_Chunk.SetBlock(a_RelPos, E_BLOCK_DIRT, 0);
+	}
+
+
+
+
 
 private:
 
@@ -76,7 +131,8 @@ private:
 			}
 			default:
 			{
-				a_Chunk.SetBlock(a_RelPos, E_BLOCK_DIRT, 0);
+				auto AbsPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+				TurnToDirt(a_Chunk, AbsPos, a_RelPos);
 				break;
 			}
 		}
@@ -101,10 +157,17 @@ private:
 		}
 
 		// Check whether we should revert to dirt:
+		// TODO: fix for signs and slabs (possibly more blocks) - they should destroy farmland
 		auto upperBlock = a_ChunkInterface.GetBlock(a_BlockPos.addedY(1));
 		if (cBlockInfo::FullyOccupiesVoxel(upperBlock))
 		{
-			a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_DIRT, 0);
+			// Until the fix above is done, this line should also suffice:
+			// a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_DIRT, 0);
+			a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & Chunk)
+			{
+				TurnToDirt(Chunk, a_BlockPos);
+				return true;
+			});
 		}
 	}
 
