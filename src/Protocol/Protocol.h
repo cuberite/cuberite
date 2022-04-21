@@ -330,6 +330,7 @@ public:
 		Pose
 	};
 
+	// TODO: these constants should be in WebServer
 	enum class Version
 	{
 		v1_8_0  = 47,
@@ -345,7 +346,7 @@ public:
 		v1_12_2 = 340,
 		v1_13   = 393,
 		v1_13_1 = 401,
-		v1_13_2 = 404,  // TODO: this constant should be in WebServer
+		v1_13_2 = 404,
 		v1_14   = 477,
 		v1_14_1 = 480,
 		v1_14_2 = 485,
