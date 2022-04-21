@@ -50,19 +50,6 @@ Implements the 1.14 protocol classes:
 
 
 
-#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!ByteBuf.Proc(Var))\
-		{\
-			return;\
-		} \
-	} while (false)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_14:
 
@@ -733,6 +720,7 @@ UInt8 cProtocol_1_14::GetProtocolEntityType(const cEntity & a_Entity) const
 				case PType::pkFirework: return 26;
 				case PType::pkWitherSkull: return 92;
 			}
+			break;
 		}
 		case Type::etFloater: return 101;
 		case Type::etItemFrame: return 35;

@@ -24,6 +24,37 @@ class cUUID;
 
 
 
+/** Macros used to read packets more easily */
+#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
+	Type Var; \
+	do { \
+		if (!ByteBuf.Proc(Var))\
+		{\
+			return;\
+		} \
+	} while (false)
+
+
+
+
+
+#define HANDLE_PACKET_READ(ByteBuf, Proc, Type, Var) \
+	Type Var; \
+	do { \
+		{ \
+			if (!ByteBuf.Proc(Var)) \
+			{ \
+				ByteBuf.CheckValid(); \
+				return false; \
+			} \
+			ByteBuf.CheckValid(); \
+		} \
+	} while (false)
+
+
+
+
+
 /** Composes an individual packet in the protocol's m_OutPacketBuffer; sends it just before being destructed. */
 class cPacketizer
 {

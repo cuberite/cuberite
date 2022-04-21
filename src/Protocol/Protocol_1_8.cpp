@@ -55,36 +55,6 @@ Implements the 1.8 protocol classes:
 
 
 
-#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!ByteBuf.Proc(Var))\
-		{\
-			return;\
-		} \
-	} while (false)
-
-
-
-
-
-#define HANDLE_PACKET_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		{ \
-			if (!ByteBuf.Proc(Var)) \
-			{ \
-				ByteBuf.CheckValid(); \
-				return false; \
-			} \
-			ByteBuf.CheckValid(); \
-		} \
-	} while (false)
-
-
-
-
-
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
 static const UInt32 CompressionThreshold = 256;  // After how large a packet should we compress it.
 
