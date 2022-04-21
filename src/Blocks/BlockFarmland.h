@@ -161,7 +161,7 @@ private:
 		auto upperBlock = a_ChunkInterface.GetBlock(a_BlockPos.addedY(1));
 		if (cBlockInfo::FullyOccupiesVoxel(upperBlock))
 		{
-			// Until the fix above is done, this line *should* also suffice:
+			// Until the fix above is done, this line should also suffice:
 			// a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_DIRT, 0);
 			a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & Chunk)
 			{
