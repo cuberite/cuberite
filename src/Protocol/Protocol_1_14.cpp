@@ -1662,3 +1662,51 @@ void cProtocol_1_14::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		default: UNREACHABLE("cProtocol_1_14::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_14_1:
+
+cProtocol::Version cProtocol_1_14_1::GetProtocolVersion() const
+{
+	return Version::v1_14_1;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_14_2:
+
+cProtocol::Version cProtocol_1_14_2::GetProtocolVersion() const
+{
+	return Version::v1_14_2;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_14_3:
+
+cProtocol::Version cProtocol_1_14_3::GetProtocolVersion() const
+{
+	return Version::v1_14_3;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_14_4:
+
+cProtocol::Version cProtocol_1_14_4::GetProtocolVersion() const
+{
+	return Version::v1_14_4;
+}
