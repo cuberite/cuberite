@@ -67,3 +67,75 @@ protected:
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const override;
 };
+
+
+
+
+
+class cProtocol_1_14_1:
+	public cProtocol_1_14
+{
+	using Super = cProtocol_1_14;
+
+public:
+
+	using Super::Super;
+
+protected:
+
+	virtual Version GetProtocolVersion() const override;
+};
+
+
+
+
+
+class cProtocol_1_14_2:
+	public cProtocol_1_14_1
+{
+	using Super = cProtocol_1_14_1;
+
+public:
+
+	using Super::Super;
+
+protected:
+
+	virtual Version GetProtocolVersion() const override;
+};
+
+
+
+
+
+class cProtocol_1_14_3:
+	public cProtocol_1_14_2
+{
+	using Super = cProtocol_1_14_2;
+
+public:
+
+	using Super::Super;
+
+protected:
+
+	virtual Version GetProtocolVersion() const override;
+};
+
+
+
+
+
+class cProtocol_1_14_4:
+	public cProtocol_1_14_3
+{
+	using Super = cProtocol_1_14_3;
+
+public:
+
+	using Super::Super;
+
+protected:
+
+	virtual Version GetProtocolVersion() const override;
+};

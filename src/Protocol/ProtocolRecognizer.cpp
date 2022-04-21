@@ -66,6 +66,10 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 		case cProtocol::Version::v1_13_1:  return "1.13.1";
 		case cProtocol::Version::v1_13_2:  return "1.13.2";
 		case cProtocol::Version::v1_14:    return "1.14";
+		case cProtocol::Version::v1_14_1:  return "1.14.1";
+		case cProtocol::Version::v1_14_2:  return "1.14.2";
+		case cProtocol::Version::v1_14_3:  return "1.14.3";
+		case cProtocol::Version::v1_14_4:  return "1.14.4";
 	}
 
 	ASSERT(!"Unknown protocol version");
@@ -338,6 +342,11 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		case static_cast<UInt32>(cProtocol::Version::v1_13_1): return std::make_unique<cProtocol_1_13_1>(&a_Client, ServerAddress, NextState);
 		case static_cast<UInt32>(cProtocol::Version::v1_13_2): return std::make_unique<cProtocol_1_13_2>(&a_Client, ServerAddress, NextState);
 		case static_cast<UInt32>(cProtocol::Version::v1_14):   return std::make_unique<cProtocol_1_14>  (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_1): return std::make_unique<cProtocol_1_14_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_2): return std::make_unique<cProtocol_1_14_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_3): return std::make_unique<cProtocol_1_14_3>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_4): return std::make_unique<cProtocol_1_14_4>(&a_Client, ServerAddress, NextState);
+
 		default:
 		{
 			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",

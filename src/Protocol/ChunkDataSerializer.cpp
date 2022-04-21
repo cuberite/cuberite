@@ -109,6 +109,10 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 				continue;
 			}
 			case cProtocol::Version::v1_14:
+			case cProtocol::Version::v1_14_1:
+			case cProtocol::Version::v1_14_2:
+			case cProtocol::Version::v1_14_3:
+			case cProtocol::Version::v1_14_4:
 			{
 				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v477);
 				continue;
