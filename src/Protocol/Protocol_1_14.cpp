@@ -719,7 +719,9 @@ UInt8 cProtocol_1_14::GetProtocolEntityType(const cEntity & a_Entity) const
 				case PType::pkSplashPotion: return 81;
 				case PType::pkFirework: return 26;
 				case PType::pkWitherSkull: return 92;
+				default: break;
 			}
+			break;
 		}
 		case Type::etFloater: return 101;
 		case Type::etItemFrame: return 35;
