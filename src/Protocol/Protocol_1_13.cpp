@@ -41,36 +41,6 @@ Implements the 1.13 protocol classes:
 
 
 
-#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!ByteBuf.Proc(Var))\
-		{\
-			return;\
-		} \
-	} while (false)
-
-
-
-
-
-#define HANDLE_PACKET_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		{ \
-			if (!ByteBuf.Proc(Var)) \
-			{ \
-				ByteBuf.CheckValid(); \
-				return false; \
-			} \
-			ByteBuf.CheckValid(); \
-		} \
-	} while (false)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_13:
 
