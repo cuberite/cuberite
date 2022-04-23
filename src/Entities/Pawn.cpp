@@ -507,7 +507,7 @@ void cPawn::HandleFarmlandTrampling(const double a_FallHeight, const BLOCKTYPE a
 	if (a_BlockAtFoot != E_BLOCK_FARMLAND)
 	{
 		// Check whether the block above is solid.
-		// The player can e.g. fall on a slab!
+		// The player can e.g. fall on a head!
 		if (cBlockInfo::IsSolid(a_BlockAtFoot))
 		{
 			return;
