@@ -466,7 +466,7 @@ void cProtocol_1_9_0::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Da
 
 
 
-void cProtocol_1_9_0::SendPlayerMoveLook (Vector3d a_Pos, float a_Yaw, float a_Pitch, bool a_IsRelative)
+void cProtocol_1_9_0::SendPlayerMoveLook (const Vector3d a_Pos, const float a_Yaw, const float a_Pitch, const bool a_IsRelative)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
