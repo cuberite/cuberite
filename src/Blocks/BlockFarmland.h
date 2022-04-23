@@ -63,7 +63,7 @@ public:
 				if (Entity.IsPlayer())
 				{
 					auto Player = static_cast<cPlayer *>(&Entity);
-					Player->GetClientHandle()->SendPlayerMoveLook(Vector3d(0, FullHeightDelta, 0), 0.0f, 0.0f, true);
+					Player->GetClientHandle()->SendPlayerMoveLook(Vector3d(0.0, FullHeightDelta, 0.0), 0.0f, 0.0f, true);
 				}
 
 				return false;
