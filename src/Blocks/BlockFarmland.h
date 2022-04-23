@@ -53,17 +53,17 @@ public:
 			cBoundingBox(Vector3d(0.5, FarmlandHeight, 0.5) + a_AbsPos, 0.5, FullHeightDelta),
 			[&](cEntity & Entity)
 			{
+				auto GroundHeight = a_AbsPos.y + 1;
+
 				// A simple IsOnGround isn't enough. It will return true when
 				// e.g. a piston pushes a farmland block into an entity's head.
 				// Maybe it's also possible than an entity is falling, it's
 				// still not on the ground, but it's less than 0.0625 blocks
 				// higher than the farmland block
-				if (Entity.GetPosY() < a_AbsPos.y + FarmlandHeight)
+				if ((Entity.GetPosY() < a_AbsPos.y + FarmlandHeight) || (Entity.GetPosY() >= GroundHeight))
 				{
 					return false;
 				}
-
-				auto GroundHeight = a_AbsPos.y + 1;
 
 				// Players need a packet that will update their position
 				if (Entity.IsPlayer())
