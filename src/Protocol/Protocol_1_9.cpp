@@ -466,22 +466,42 @@ void cProtocol_1_9_0::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Da
 
 
 
-void cProtocol_1_9_0::SendPlayerMoveLook(void)
+void cProtocol_1_9_0::SendPlayerMoveLook (Vector3d a_Pos, float a_Yaw, float a_Pitch, bool a_IsRelative)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktPlayerMoveLook);
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteBEDouble(Player->GetPosX());
-	Pkt.WriteBEDouble(Player->GetPosY());
-	Pkt.WriteBEDouble(Player->GetPosZ());
-	Pkt.WriteBEFloat(static_cast<float>(Player->GetYaw()));
-	Pkt.WriteBEFloat(static_cast<float>(Player->GetPitch()));
-	Pkt.WriteBEUInt8(0);
+	Pkt.WriteBEDouble(a_Pos.x);
+	Pkt.WriteBEDouble(a_Pos.y);
+	Pkt.WriteBEDouble(a_Pos.z);
+	Pkt.WriteBEFloat(a_Yaw);
+	Pkt.WriteBEFloat(a_Pitch);
+
+	if (a_IsRelative)
+	{
+		// Set all bits to 1 - makes everything relative
+		Pkt.WriteBEUInt8(-1);
+	}
+	else
+	{
+		// Set all bits to 0 - make everything absolute
+		Pkt.WriteBEUInt8(0);
+	}
+
 	Pkt.WriteVarInt32(++m_OutstandingTeleportId);
 
 	// This teleport ID hasn't been confirmed yet
 	m_IsTeleportIdConfirmed = false;
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendPlayerMoveLook(void)
+{
+	cPlayer * Player = m_Client->GetPlayer();
+	SendPlayerMoveLook(Player->GetPosition(), static_cast<float>(Player->GetYaw()), static_cast<float>(Player->GetPitch()), false);
 }
 
 

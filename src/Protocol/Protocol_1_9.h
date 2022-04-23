@@ -51,6 +51,7 @@ public:
 	virtual void SendLeashEntity          (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
 	virtual void SendMapData              (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn        (const cPainting & a_Painting) override;
+	virtual void SendPlayerMoveLook       (Vector3d a_Pos, float a_Yaw, float a_Pitch, bool a_IsRelative) override;
 	virtual void SendPlayerMoveLook       (void) override;
 	virtual void SendPlayerPermissionLevel() override;
 	virtual void SendPlayerSpawn          (const cPlayer & a_Player) override;

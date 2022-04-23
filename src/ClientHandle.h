@@ -204,6 +204,7 @@ public:  // tolua_export
 	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
 	void SendPlayerListUpdateGameMode   (const cPlayer & a_Player);
 	void SendPlayerListUpdatePing       ();
+	void SendPlayerMoveLook             (Vector3d a_Pos, float a_Yaw, float a_Pitch, bool a_IsRelative);
 	void SendPlayerMoveLook             (void);
 	void SendPlayerPermissionLevel      (void);
 	void SendPlayerPosition             (void);

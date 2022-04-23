@@ -93,6 +93,7 @@ public:
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) override;
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdatePing       () override;
+	virtual void SendPlayerMoveLook             (Vector3d a_Pos, float a_Yaw, float a_Pitch, bool a_IsRelative) override;
 	virtual void SendPlayerMoveLook             (void) override;
 	virtual void SendPlayerPermissionLevel      (void) override;
 	virtual void SendPlayerPosition             (void) override;
