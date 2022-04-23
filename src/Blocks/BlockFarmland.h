@@ -63,11 +63,7 @@ public:
 				if (Entity.IsPlayer())
 				{
 					auto Player = static_cast<cPlayer *>(&Entity);
-					// This works, but it's much worse than Vanilla.
-					// This can be easily improved by implementing relative
-					// "Player Position And Look" packets! See
-					// https://wiki.vg/Protocol#Player_Position_And_Look_.28clientbound.29
-					Player->GetClientHandle()->SendPlayerMoveLook();
+					Player->GetClientHandle()->SendPlayerMoveLook(Vector3d(0, FullHeightDelta, 0), 0, 0, true);
 				}
 
 				return false;
