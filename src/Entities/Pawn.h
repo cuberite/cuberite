@@ -43,7 +43,7 @@ public:
 	Additionaly, mobs smaller than 0.512 cubic blocks won't trample.
 	*/
 	void HandleFarmlandTrampling(double a_FallHeight, BLOCKTYPE a_BlockAtFoot, BLOCKTYPE a_BlockBelow);
-	
+
 	/** Tells all pawns which are targeting us to stop targeting us. */
 	void StopEveryoneFromTargetingMe();
 
