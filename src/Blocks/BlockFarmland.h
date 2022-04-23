@@ -69,7 +69,7 @@ public:
 				if (Entity.IsPlayer())
 				{
 					const auto HeightIncrease = GroundHeight - Entity.GetPosY();
-					const auto Player = static_cast<cPlayer *>(&Entity);
+					const auto Player = static_cast<const cPlayer *>(&Entity);
 
 					Player->GetClientHandle()->SendPlayerMoveLook(Vector3d(0.0, HeightIncrease, 0.0), 0.0f, 0.0f, true);
 				}
