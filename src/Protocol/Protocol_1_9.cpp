@@ -480,7 +480,7 @@ void cProtocol_1_9_0::SendPlayerMoveLook (Vector3d a_Pos, float a_Yaw, float a_P
 	if (a_IsRelative)
 	{
 		// Set all bits to 1 - makes everything relative
-		Pkt.WriteBEUInt8(-1);
+		Pkt.WriteBEUInt8(static_cast<UInt8>(-1));
 	}
 	else
 	{
