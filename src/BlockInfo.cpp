@@ -1164,7 +1164,7 @@ float cBlockInfo::GetBlockHeight(const BLOCKTYPE Block)
 		case E_BLOCK_DARK_OAK_FENCE:      return 1.5;
 		case E_BLOCK_DARK_OAK_FENCE_GATE: return 1.5;
 		case E_BLOCK_ENCHANTMENT_TABLE:   return 0.75;    // 12 pixels
-		case E_BLOCK_FARMLAND:            return 0.9375;  // 15 pixels
+		// case E_BLOCK_FARMLAND:         return 0.9375;  // prevents trampling for mobs (#2015) and older clients (MC-85162)
 		case E_BLOCK_FENCE:               return 1.5;
 		case E_BLOCK_JUNGLE_FENCE:        return 1.5;
 		case E_BLOCK_JUNGLE_FENCE_GATE:   return 1.5;
