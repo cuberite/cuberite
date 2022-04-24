@@ -506,9 +506,11 @@ void cPawn::HandleFarmlandTrampling(const double a_FallHeight, const BLOCKTYPE a
 	// If it isn't, check if the block below is a farmland - for mobs and older clients
 	if (a_BlockAtFoot != E_BLOCK_FARMLAND)
 	{
-		// Check whether the block above is solid.
-		// The player can e.g. fall on a head!
-		if (cBlockInfo::IsSolid(a_BlockAtFoot))
+		// These are probably the only blocks which:
+		// - can be placed on a farmland and shouldn't destroy it
+		// - will stop the player from falling down further
+		// - are less than 1 block high
+		if ((a_BlockAtFoot == E_BLOCK_HEAD) || (a_BlockAtFoot == E_BLOCK_FLOWER_POT))
 		{
 			return;
 		}
