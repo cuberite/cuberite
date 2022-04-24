@@ -4,6 +4,7 @@
 #include "Chunk.h"
 #include "SnowGolem.h"
 #include "../BlockInfo.h"
+#include "../Entities/ThrownSnowballEntity.h"
 #include "../World.h"
 
 
@@ -55,4 +56,32 @@ void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			Chunk->SetBlock(Rel, E_BLOCK_SNOW, 0);
 		}
 	}
+}
+
+
+
+
+
+bool cSnowGolem::Attack(std::chrono::milliseconds a_Dt)
+{
+	StopMovingToPosition();  // Todo handle this in a better way, the snowman does some uneeded recalcs due to inStateChasing
+	auto & Random = GetRandomProvider();
+
+	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0))
+	{
+		Vector3d Inaccuracy = Vector3d(Random.RandReal<double>(-0.25, 0.25), Random.RandReal<double>(-0.25, 0.25), Random.RandReal<double>(-0.25, 0.25));
+		Vector3d Speed = (GetTarget()->GetPosition() + Inaccuracy - GetPosition()) * 5;
+		Speed.y += Random.RandInt(-1, 1);
+
+		auto Snowball = std::make_unique<cThrownSnowballEntity>(this, GetPosition().addedY(1.5), Speed);
+		auto SnowballPtr = Snowball.get();
+		if (!SnowballPtr->Initialize(std::move(Snowball), *m_World))
+		{
+			return false;
+		}
+		
+		ResetAttackCooldown();
+		return true;
+	}
+	return false;
 }
