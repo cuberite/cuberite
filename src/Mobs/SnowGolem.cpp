@@ -20,6 +20,28 @@ cSnowGolem::cSnowGolem(void) :
 
 
 
+// Make sure that snow golems will never target players
+bool cSnowGolem::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	auto OldTarget = GetTarget();
+
+	if (!Super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
+
+	if ((GetTarget() != nullptr) && (GetTarget()->IsPlayer()))
+	{
+		SetTarget(OldTarget);
+	}
+
+	return true;
+}
+
+
+
+
+
 void cSnowGolem::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	UNUSED(a_Killer);
