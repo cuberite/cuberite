@@ -64,6 +64,8 @@ void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cSnowGolem::Attack(std::chrono::milliseconds a_Dt)
 {
+	UNUSED(a_Dt);
+
 	StopMovingToPosition();  // Todo handle this in a better way, the snowman does some uneeded recalcs due to inStateChasing
 	auto & Random = GetRandomProvider();
 
@@ -79,7 +81,7 @@ bool cSnowGolem::Attack(std::chrono::milliseconds a_Dt)
 		{
 			return false;
 		}
-		
+
 		ResetAttackCooldown();
 		return true;
 	}
