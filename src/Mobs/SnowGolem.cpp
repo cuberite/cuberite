@@ -210,7 +210,7 @@ void cSnowGolem::CheckEventLoseHostile(const std::chrono::milliseconds a_Dt)
 
 	if (Target == nullptr)
 	{
-		EventLoseHostile();
+		m_EMState = IDLE;
 		return;
 	}
 
@@ -261,7 +261,14 @@ void cSnowGolem::EventSeeHostile(cPawn * a_SeenHostile)
 
 void cSnowGolem::EventLoseHostile(void)
 {
-	SetTarget(nullptr);
+	if (GetTarget()->IsTicking())
+	{
+		SetTarget(nullptr);
+	}
+	else
+	{
+		UnsafeUnsetTarget();
+	}
 
 	m_EMState = IDLE;
 	m_LoseSightAbandonTargetTimer = std::chrono::seconds::zero();
