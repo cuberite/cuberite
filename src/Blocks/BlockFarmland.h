@@ -44,7 +44,7 @@ public:
 	/** Turns farmland into dirt.
 	Will first check for any colliding entities and teleport them to a higher position.
 	*/
-	static void TurnToDirt(cChunk & a_Chunk, Vector3i a_AbsPos, Vector3i a_RelPos)
+	static void TurnToDirt(cChunk & a_Chunk, const Vector3i a_AbsPos, const Vector3i a_RelPos)
 	{
 		static const auto FarmlandHeight = cBlockInfo::GetBlockHeight(E_BLOCK_FARMLAND);
 		static const auto FullHeightDelta = 1 - FarmlandHeight;
@@ -53,22 +53,28 @@ public:
 			cBoundingBox(Vector3d(0.5, FarmlandHeight, 0.5) + a_AbsPos, 0.5, FullHeightDelta),
 			[&](cEntity & Entity)
 			{
-				if (!Entity.IsOnGround())
+				const auto GroundHeight = a_AbsPos.y + 1;
+
+				// A simple IsOnGround isn't enough. It will return true when
+				// e.g. a piston pushes a farmland block into an entity's head.
+				// Maybe it's also possible than an entity is falling, it's
+				// still not on the ground, but it's less than 0.0625 blocks
+				// higher than the farmland block
+				if ((Entity.GetPosY() < a_AbsPos.y + FarmlandHeight) || (Entity.GetPosY() >= GroundHeight))
 				{
 					return false;
 				}
-				Entity.AddPosY(FullHeightDelta);
 
 				// Players need a packet that will update their position
 				if (Entity.IsPlayer())
 				{
-					auto Player = static_cast<cPlayer *>(&Entity);
-					// This works, but it's much worse than Vanilla.
-					// This can be easily improved by implementing relative
-					// "Player Position And Look" packets! See
-					// https://wiki.vg/Protocol#Player_Position_And_Look_.28clientbound.29
-					Player->GetClientHandle()->SendPlayerMoveLook();
+					const auto HeightIncrease = GroundHeight - Entity.GetPosY();
+					const auto Player = static_cast<const cPlayer *>(&Entity);
+
+					Player->GetClientHandle()->SendPlayerMoveLook(Vector3d(0.0, HeightIncrease, 0.0), 0.0f, 0.0f, true);
 				}
+
+				Entity.SetPosY(GroundHeight);
 
 				return false;
 			});

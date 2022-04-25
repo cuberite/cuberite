@@ -422,6 +422,7 @@ public:
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerListUpdatePing       () = 0;
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) = 0;
+	virtual void SendPlayerMoveLook             (Vector3d a_Pos, float a_Yaw, float a_Pitch, bool a_IsRelative) = 0;
 	virtual void SendPlayerMoveLook             (void) = 0;
 	virtual void SendPlayerPermissionLevel      (void) = 0;
 	virtual void SendPlayerPosition             (void) = 0;

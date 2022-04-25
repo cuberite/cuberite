@@ -2852,6 +2852,15 @@ void cClientHandle::SendPlayerListUpdatePing()
 
 
 
+void cClientHandle::SendPlayerMoveLook (const Vector3d a_Pos, const float a_Yaw, const float a_Pitch, const bool a_IsRelative)
+{
+	m_Protocol->SendPlayerMoveLook(a_Pos, a_Yaw, a_Pitch, a_IsRelative);
+}
+
+
+
+
+
 void cClientHandle::SendPlayerMoveLook(void)
 {
 	/*
