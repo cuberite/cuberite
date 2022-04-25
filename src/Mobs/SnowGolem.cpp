@@ -21,21 +21,20 @@ cSnowGolem::cSnowGolem(void) :
 
 
 
-// Make sure that snow golems will never target players
 bool cSnowGolem::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
+	// Make sure that snow golems will never target players and... themselves
 	auto OldTarget = GetTarget();
+	auto OldState = m_EMState;
 
 	if (!Super::DoTakeDamage(a_TDI))
 	{
 		return false;
 	}
 
-	// Quick and dirty fix: if Super::DoTakeDamage set the target as player, revert it
-	if ((GetTarget() != nullptr) && (GetTarget()->IsPlayer()))
-	{
-		SetTarget(OldTarget);
-	}
+	// Quick and dirty fix: just revert any changes made by Super::DoTakeDamage
+	SetTarget(OldTarget);
+	m_EMState = OldState;
 
 	return true;
 }
@@ -79,6 +78,16 @@ void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			Chunk->SetBlock(Rel, E_BLOCK_SNOW, 0);
 		}
+	}
+
+	// Set or clear m_Target:
+	if (m_EMState == CHASING)
+	{
+		CheckEventLoseHostile(a_Dt);
+	}
+	else
+	{
+		CheckEventSeeHostile();
 	}
 }
 
@@ -147,6 +156,12 @@ void cSnowGolem::CheckEventSeeHostile(void)
 			return false;
 		}
 
+		// Snow golems will never attack ghasts
+		if (Monster->GetMobType() == mtGhast)
+		{
+			return false;
+		}
+
 		const auto TargetHeadPosition = Monster->GetPosition().addedY(Monster->GetHeight());
 		const auto TargetDistance = (TargetHeadPosition - MyHeadPosition).SqrLength();
 
@@ -180,6 +195,7 @@ void cSnowGolem::CheckEventLoseHostile(const std::chrono::milliseconds a_Dt)
 
 	if (Target == nullptr)
 	{
+		EventLoseHostile();
 		return;
 	}
 
