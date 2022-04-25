@@ -31,7 +31,7 @@ public:
 	/** Should be called when the snowman sees a hostile mob */
 	void EventSeeHostile(cPawn * a_SeenHostile);
 	/** Should be called when the snowman stops targeting a hostile mob */
-	void EventLoseHostile(void);
+	void EventLoseHostile();
 } ;
 
 

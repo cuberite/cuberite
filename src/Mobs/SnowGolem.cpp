@@ -214,13 +214,6 @@ void cSnowGolem::CheckEventLoseHostile(const std::chrono::milliseconds a_Dt)
 		return;
 	}
 
-	// Check if the monster died:
-	if (!Target->IsTicking())
-	{
-		EventLoseHostile();
-		return;
-	}
-
 	// Check if the target is too far away:
 	if (!Target->GetBoundingBox().DoesIntersect({ GetPosition(), m_SightDistance * 2.0 }))
 	{
@@ -261,14 +254,7 @@ void cSnowGolem::EventSeeHostile(cPawn * a_SeenHostile)
 
 void cSnowGolem::EventLoseHostile(void)
 {
-	if (GetTarget()->IsTicking())
-	{
-		SetTarget(nullptr);
-	}
-	else
-	{
-		UnsafeUnsetTarget();
-	}
+	SetTarget(nullptr);
 
 	m_EMState = IDLE;
 	m_LoseSightAbandonTargetTimer = std::chrono::seconds::zero();
