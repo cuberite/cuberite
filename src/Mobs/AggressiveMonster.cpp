@@ -36,9 +36,9 @@ void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt, cChunk &
 
 
 
-void cAggressiveMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
+void cAggressiveMonster::EventSeePlayer(cPawn * a_Pawn, cChunk & a_Chunk)
 {
-	Super::EventSeePlayer(a_Player, a_Chunk);
+	Super::EventSeePlayer(a_Pawn, a_Chunk);
 	m_EMState = CHASING;
 }
 

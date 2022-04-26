@@ -781,6 +781,8 @@ void cMonster::CheckEventLostPlayer(const std::chrono::milliseconds a_Dt)
 
 	if (Target == nullptr)
 	{
+		// Make sure that the monster returns to idle
+		m_EMState = IDLE;
 		return;
 	}
 
@@ -820,16 +822,17 @@ void cMonster::CheckEventLostPlayer(const std::chrono::milliseconds a_Dt)
 
 // What to do if player is seen
 // default to change state to chasing
-void cMonster::EventSeePlayer(cPlayer * a_SeenPlayer, cChunk & a_Chunk)
+void cMonster::EventSeePlayer(cPawn * a_Pawn, cChunk & a_Chunk)
 {
 	UNUSED(a_Chunk);
-	SetTarget(a_SeenPlayer);
+	SetTarget(a_Pawn);
 }
 
 
 
 
 
+// TODO: refactor, so that the name makes more sense (it's used by UtilityMonster)
 void cMonster::EventLosePlayer(void)
 {
 	SetTarget(nullptr);

@@ -72,7 +72,8 @@ public:
 	// tolua_end
 
 	virtual void CheckEventSeePlayer(cChunk & a_Chunk);
-	virtual void EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk);
+	// TODO: refactor EventSeePlayer, so the name makes more sense (it also works for mobs)
+	virtual void EventSeePlayer(cPawn * a_Pawn, cChunk & a_Chunk);
 
 	// tolua_begin
 
@@ -115,7 +116,9 @@ public:
 	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
 	virtual bool IsUndead(void);
 
+	// TODO: refactor EventLosePlayer, so the name makes more sense (it also works for mobs)
 	virtual void EventLosePlayer(void);
+	// TODO: refactor CheckEventLostPlayer, so the name makes more sense (it also works for mobs)
 	virtual void CheckEventLostPlayer(std::chrono::milliseconds a_Dt);
 
 	virtual void InStateIdle    (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
