@@ -600,15 +600,7 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 bool cMonster::CanBeTarget(const cPawn * const a_Pawn)
 {
-	if (
-		(!a_Pawn->IsPlayer()) ||
-		(static_cast<const cPlayer *>(a_Pawn)->CanMobsTarget())
-	)
-	{
-		return true;
-	}
-
-	return false;
+	return (!a_Pawn->IsPlayer()) || (static_cast<const cPlayer *>(a_Pawn)->CanMobsTarget());
 }
 
 
@@ -756,9 +748,10 @@ void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 	cPlayer * TargetPlayer = nullptr;
 	double ClosestDistance = m_SightDistance * m_SightDistance;
 	const auto MyHeadPosition = GetPosition().addedY(GetHeight());
+	const auto Tracer = IsNetherNative() ? cLineBlockTracer::losAirWaterLava : cLineBlockTracer::losAirWater;
 
 	// Enumerate all players within sight:
-	m_World->ForEachPlayer([this, &TargetPlayer, &ClosestDistance, MyHeadPosition](cPlayer & a_Player)
+	m_World->ForEachPlayer([this, &TargetPlayer, &ClosestDistance, MyHeadPosition, Tracer](cPlayer & a_Player)
 	{
 		if (!a_Player.CanMobsTarget())
 		{
@@ -767,7 +760,6 @@ void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 
 		const auto TargetHeadPosition = a_Player.GetPosition().addedY(a_Player.GetHeight());
 		const auto TargetDistance = (TargetHeadPosition - MyHeadPosition).SqrLength();
-		const auto Tracer = IsNetherNative() ? cLineBlockTracer::losAirWaterLava : cLineBlockTracer::losAirWater;
 
 		if (
 			(TargetDistance < ClosestDistance) &&

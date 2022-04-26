@@ -22,6 +22,8 @@ public:
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
+
+	virtual bool CanBeTarget(const cPawn * const a_Pawn) override;
 } ;
 
 

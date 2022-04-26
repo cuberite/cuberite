@@ -129,3 +129,25 @@ bool cSnowGolem::Attack(std::chrono::milliseconds a_Dt)
 
 
 
+
+bool cSnowGolem::CanBeTarget(const cPawn * const a_Pawn)
+{
+	if (!a_Pawn->IsMob())
+	{
+		return false;
+	}
+
+	const auto Monster = static_cast<const cMonster *>(a_Pawn);
+
+	if (Monster->GetMobFamily() != mfHostile)
+	{
+		return false;
+	}
+
+	if (Monster->GetMobType() == mtGhast)
+	{
+		return false;
+	}
+
+	return true;
+}

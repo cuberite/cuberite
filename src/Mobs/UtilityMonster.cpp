@@ -31,11 +31,11 @@ void cUtilityMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Set or clear m_Target:
 	if (m_EMState == CHASING)
 	{
-		CheckEventSeeMob(a_Chunk);
+		CheckEventLostMob(a_Dt);
 	}
 	else
 	{
-		CheckEventLostMob(a_Dt);
+		CheckEventSeeMob(a_Chunk);
 	}
 }
 

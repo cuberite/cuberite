@@ -137,6 +137,7 @@ void cAggressiveMonster::CheckEventSeeMob(cChunk & a_Chunk)
 	cMonster * TargetMonster = nullptr;
 	double ClosestDistance = m_SightDistance * m_SightDistance;  // Squared
 	const auto MyHeadPosition = GetPosition().addedY(GetHeight());
+	const auto Tracer = IsNetherNative() ? cLineBlockTracer::losAirWaterLava : cLineBlockTracer::losAirWater;
 
 	// Enumerate all monsters within sight:
 	m_World->ForEachEntityInBox(
@@ -157,7 +158,6 @@ void cAggressiveMonster::CheckEventSeeMob(cChunk & a_Chunk)
 
 		const auto TargetHeadPosition = Monster->GetPosition().addedY(Monster->GetHeight());
 		const auto TargetDistance = (TargetHeadPosition - MyHeadPosition).SqrLength();
-		const auto Tracer = IsNetherNative() ? cLineBlockTracer::losAirWaterLava : cLineBlockTracer::losAirWater;
 
 		if (
 			(TargetDistance < ClosestDistance) &&
