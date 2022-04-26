@@ -121,6 +121,7 @@ public:
 	/** Checks if the targeted player is out of sight */
 	virtual void CheckEventLostPlayer(std::chrono::milliseconds a_Dt);
 	virtual void EventLosePlayer(void);
+
 	virtual void InStateIdle    (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual void InStateChasing (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual void InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);

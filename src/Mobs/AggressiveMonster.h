@@ -36,13 +36,13 @@ public:
 	virtual bool Attack(std::chrono::milliseconds a_Dt);
 
 	/** Checks if this mob sees a suitable monster - can be used e.g. to make hostile mobs attack an iron golem.
-	Suitability will be determined by calling CanAttackThat */
-	virtual void CheckEventSeeMob(cChunk & a_Chunk);
-	virtual void EventSeeMob(cMonster * a_Monster, cChunk & a_Chunk) { EventSeeTarget(a_Monster, a_Chunk); }
+	Suitability will be determined by calling CanBeTarget */
+	void CheckEventSeeMob(cChunk & a_Chunk);
+	void EventSeeMob(cMonster * a_Monster, cChunk & a_Chunk) { EventSeeTarget(a_Monster, a_Chunk); }
 
 	/** Checks if the targeted mob is out of sight */
-	virtual void CheckEventLostMob(std::chrono::milliseconds a_Dt) { CheckEventLostPlayer(a_Dt); }
-	virtual void EventLoseMob(void) { EventLosePlayer(); }
+	void CheckEventLostMob(std::chrono::milliseconds a_Dt) { CheckEventLostPlayer(a_Dt); }
+	void EventLoseMob(void) { EventLosePlayer(); }
 } ;
 
 

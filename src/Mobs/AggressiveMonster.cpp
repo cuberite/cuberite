@@ -45,7 +45,7 @@ bool cAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if (GetTarget() != nullptr)
 	{
-		// The suitability of the target should already be checked every tick
+		// The suitability of the target should already be checked
 		m_EMState = CHASING;
 	}
 
@@ -142,7 +142,7 @@ void cAggressiveMonster::CheckEventSeeMob(cChunk & a_Chunk)
 	// Enumerate all monsters within sight:
 	m_World->ForEachEntityInBox(
 		cBoundingBox(MyHeadPosition, m_SightDistance * 2),
-		[&](cEntity & a_Entity)
+		[this, &TargetMonster, &ClosestDistance, MyHeadPosition, Tracer](cEntity & a_Entity)
 	{
 		if (!a_Entity.IsMob())
 		{
