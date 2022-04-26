@@ -36,6 +36,26 @@ void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt, cChunk &
 
 
 
+bool cAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	if (!Super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
+
+	if (GetTarget() != nullptr)
+	{
+		// The suitability of the target should already be checked every tick
+		m_EMState = CHASING;
+	}
+
+	return true;
+}
+
+
+
+
+
 void cAggressiveMonster::EventSeePlayer(cPawn * a_Pawn, cChunk & a_Chunk)
 {
 	Super::EventSeePlayer(a_Pawn, a_Chunk);
@@ -100,4 +120,60 @@ bool cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 	GetTarget()->TakeDamage(dtMobAttack, this, m_AttackDamage, KnockbackAmount);
 
 	return true;
+}
+
+
+
+
+
+// Checks to see if EventSeeMob should be fired
+void cAggressiveMonster::CheckEventSeeMob(cChunk & a_Chunk)
+{
+	if (GetTarget() != nullptr)
+	{
+		return;
+	}
+
+	cMonster * TargetMonster = nullptr;
+	double ClosestDistance = m_SightDistance * m_SightDistance;  // Squared
+	const auto MyHeadPosition = GetPosition().addedY(GetHeight());
+
+	// Enumerate all monsters within sight:
+	m_World->ForEachEntityInBox(
+		cBoundingBox(MyHeadPosition, m_SightDistance * 2),
+		[&](cEntity & a_Entity)
+	{
+		if (!a_Entity.IsMob())
+		{
+			return false;
+		}
+
+		auto Monster = static_cast<cMonster *>(&a_Entity);
+
+		if (!CanBeTarget(Monster))
+		{
+			return false;
+		}
+
+		const auto TargetHeadPosition = Monster->GetPosition().addedY(Monster->GetHeight());
+		const auto TargetDistance = (TargetHeadPosition - MyHeadPosition).SqrLength();
+		const auto Tracer = IsNetherNative() ? cLineBlockTracer::losAirWaterLava : cLineBlockTracer::losAirWater;
+
+		if (
+			(TargetDistance < ClosestDistance) &&
+			cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, Tracer)
+		)
+		{
+			TargetMonster = Monster;
+			ClosestDistance = TargetDistance;
+		}
+
+		return false;
+	});
+
+	// Target it if suitable monster found:
+	if (TargetMonster != nullptr)
+	{
+		EventSeeMob(TargetMonster, a_Chunk);
+	}
 }

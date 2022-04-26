@@ -71,8 +71,8 @@ public:
 	eFamily GetMobFamily(void) const;
 	// tolua_end
 
+	/** Checks if the mob sees a suitable player */
 	virtual void CheckEventSeePlayer(cChunk & a_Chunk);
-	// TODO: refactor EventSeePlayer, so the name makes more sense (it also works for mobs)
 	virtual void EventSeePlayer(cPawn * a_Pawn, cChunk & a_Chunk);
 
 	// tolua_begin
@@ -116,11 +116,9 @@ public:
 	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
 	virtual bool IsUndead(void);
 
-	// TODO: refactor EventLosePlayer, so the name makes more sense (it also works for mobs)
-	virtual void EventLosePlayer(void);
-	// TODO: refactor CheckEventLostPlayer, so the name makes more sense (it also works for mobs)
+	/** Checks if the targeted player is out of sight */
 	virtual void CheckEventLostPlayer(std::chrono::milliseconds a_Dt);
-
+	virtual void EventLosePlayer(void);
 	virtual void InStateIdle    (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual void InStateChasing (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual void InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
@@ -200,6 +198,9 @@ public:
 
 	/**  Translates the MobType enum to the vanilla nbt name */
 	static AString MobTypeToVanillaNBT(eMonsterType a_MobType);
+
+	/** Can that pawn be set as target? Checks for null */
+	virtual bool CanBeTarget(const cPawn * const a_Pawn);
 
 	/** Sets the target that this mob will chase. Pass a nullptr to unset. */
 	void SetTarget (cPawn * a_NewTarget);

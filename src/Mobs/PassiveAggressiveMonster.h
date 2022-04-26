@@ -24,7 +24,6 @@ public:
 		float a_Height
 	);
 
-	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void CheckEventSeePlayer(cChunk & a_Chunk) override;
 } ;
 

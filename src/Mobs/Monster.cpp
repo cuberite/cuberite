@@ -580,18 +580,35 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		m_World->BroadcastSoundEffect(m_SoundHurt, GetPosition(), 1.0f, 0.8f);
 	}
 
-	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
+	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPawn()))
 	{
-		if (
-			(!a_TDI.Attacker->IsPlayer()) ||
-			(static_cast<cPlayer *>(a_TDI.Attacker)->CanMobsTarget())
-		)
+		const auto Pawn = static_cast<cPawn *>(a_TDI.Attacker);
+
+		if (CanBeTarget(Pawn))
 		{
-			SetTarget(static_cast<cPawn*>(a_TDI.Attacker));
+			SetTarget(Pawn);
 		}
+
 		m_TicksSinceLastDamaged = 0;
 	}
 	return true;
+}
+
+
+
+
+
+bool cMonster::CanBeTarget(const cPawn * const a_Pawn)
+{
+	if (
+		(!a_Pawn->IsPlayer()) ||
+		(static_cast<const cPlayer *>(a_Pawn)->CanMobsTarget())
+	)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -750,11 +767,11 @@ void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 
 		const auto TargetHeadPosition = a_Player.GetPosition().addedY(a_Player.GetHeight());
 		const auto TargetDistance = (TargetHeadPosition - MyHeadPosition).SqrLength();
+		const auto Tracer = IsNetherNative() ? cLineBlockTracer::losAirWaterLava : cLineBlockTracer::losAirWater;
 
-		// TODO: Currently all mobs see through lava, but only Nether-native mobs should be able to.
 		if (
 			(TargetDistance < ClosestDistance) &&
-			cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, cLineBlockTracer::losAirWaterLava)
+			cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, Tracer)
 		)
 		{
 			TargetPlayer = &a_Player;
@@ -832,7 +849,6 @@ void cMonster::EventSeePlayer(cPawn * a_Pawn, cChunk & a_Chunk)
 
 
 
-// TODO: refactor, so that the name makes more sense (it's used by UtilityMonster)
 void cMonster::EventLosePlayer(void)
 {
 	SetTarget(nullptr);
