@@ -35,7 +35,7 @@ void cSpider::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cSpider::EventSeePlayer(cPawn * a_Pawn, cChunk & a_Chunk)
+void cSpider::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 {
 	if (!GetWorld()->IsChunkLighted(GetChunkX(), GetChunkZ()))
 	{
@@ -50,7 +50,7 @@ void cSpider::EventSeePlayer(cPawn * a_Pawn, cChunk & a_Chunk)
 
 	if ((Chunk->GetSkyLightAltered(Rel.x, Rel.y, Rel.z) <= 11) && (Chunk->GetBlockLight(Rel.x, Rel.y, Rel.z) <= 11))
 	{
-		Super::EventSeePlayer(a_Pawn, a_Chunk);
+		Super::EventSeePlayer(a_Player, a_Chunk);
 	}
 }
 

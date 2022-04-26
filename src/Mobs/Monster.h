@@ -73,7 +73,9 @@ public:
 
 	/** Checks if the mob sees a suitable player */
 	virtual void CheckEventSeePlayer(cChunk & a_Chunk);
-	virtual void EventSeePlayer(cPawn * a_Pawn, cChunk & a_Chunk);
+
+	virtual void EventSeeTarget(cPawn * a_Pawn, cChunk & a_Chunk);
+	virtual void EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk);
 
 	// tolua_begin
 

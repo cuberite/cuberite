@@ -120,7 +120,7 @@ void cEnderman::CheckEventSeePlayer(cChunk & a_Chunk)
 	ASSERT(Callback.GetPlayer() != nullptr);
 
 	// Target the player:
-	cAggressiveMonster::EventSeePlayer(Callback.GetPlayer(), a_Chunk);
+	EventSeePlayer(Callback.GetPlayer(), a_Chunk);
 	m_bIsScreaming = true;
 	GetWorld()->BroadcastEntityMetadata(*this);
 }

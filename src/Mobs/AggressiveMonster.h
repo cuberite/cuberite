@@ -28,7 +28,7 @@ public:
 	virtual void InStateChasing(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
-	virtual void EventSeePlayer(cPawn * a_Pawn, cChunk & a_Chunk) override;
+	virtual void EventSeeTarget(cPawn * a_Pawn, cChunk & a_Chunk) override;
 
 	/** Try to perform attack
 	returns true if attack was deemed successful (hit player, fired projectile, creeper exploded, etc.) even if it didn't actually do damage
@@ -38,7 +38,7 @@ public:
 	/** Checks if this mob sees a suitable monster - can be used e.g. to make hostile mobs attack an iron golem.
 	Suitability will be determined by calling CanAttackThat */
 	virtual void CheckEventSeeMob(cChunk & a_Chunk);
-	virtual void EventSeeMob(cPawn * a_Pawn, cChunk & a_Chunk) { EventSeePlayer(a_Pawn, a_Chunk); }
+	virtual void EventSeeMob(cMonster * a_Monster, cChunk & a_Chunk) { EventSeeTarget(a_Monster, a_Chunk); }
 
 	/** Checks if the targeted mob is out of sight */
 	virtual void CheckEventLostMob(std::chrono::milliseconds a_Dt) { CheckEventLostPlayer(a_Dt); }

@@ -56,9 +56,9 @@ bool cAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cAggressiveMonster::EventSeePlayer(cPawn * a_Pawn, cChunk & a_Chunk)
+void cAggressiveMonster::EventSeeTarget(cPawn * a_Pawn, cChunk & a_Chunk)
 {
-	Super::EventSeePlayer(a_Pawn, a_Chunk);
+	Super::EventSeeTarget(a_Pawn, a_Chunk);
 	m_EMState = CHASING;
 }
 

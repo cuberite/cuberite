@@ -784,6 +784,15 @@ void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 
 
 
+void cMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
+{
+	EventSeeTarget(static_cast<cPawn *>(a_Player), a_Chunk);
+}
+
+
+
+
+
 void cMonster::CheckEventLostPlayer(const std::chrono::milliseconds a_Dt)
 {
 	const auto Target = GetTarget();
@@ -831,7 +840,7 @@ void cMonster::CheckEventLostPlayer(const std::chrono::milliseconds a_Dt)
 
 // What to do if player is seen
 // default to change state to chasing
-void cMonster::EventSeePlayer(cPawn * a_Pawn, cChunk & a_Chunk)
+void cMonster::EventSeeTarget(cPawn * a_Pawn, cChunk & a_Chunk)
 {
 	UNUSED(a_Chunk);
 	SetTarget(a_Pawn);
