@@ -32,6 +32,7 @@ target_sources(
 	SnowGolem.cpp
 	Spider.cpp
 	Squid.cpp
+	UtilityMonster.cpp
 	Villager.cpp
 	Witch.cpp
 	Wither.cpp
@@ -74,6 +75,7 @@ target_sources(
 	SnowGolem.h
 	Spider.h
 	Squid.h
+	UtilityMonster.h
 	Villager.h
 	Witch.h
 	Wither.h
