@@ -36,19 +36,19 @@ bool cSnowGolem::DoTakeDamage(TakeDamageInfo & a_TDI)
 	// unless the new target is a hostile and it isn't a ghast
 	if (OldTarget != GetTarget())
 	{
-	if (
-		(GetTarget() != nullptr) && (GetTarget()->IsMob()) &&
-		(static_cast<cMonster *>(GetTarget())->GetMobFamily() == mfHostile) &&
-		(static_cast<cMonster *>(GetTarget())->GetMobType() != mtGhast)
-	)
-	{
-		EventSeeHostile(GetTarget());
-	}
-	else
-	{
-		SetTarget(OldTarget);
-		m_EMState = OldState;
-	}
+		if (
+			(GetTarget() != nullptr) && (GetTarget()->IsMob()) &&
+			(static_cast<cMonster *>(GetTarget())->GetMobFamily() == mfHostile) &&
+			(static_cast<cMonster *>(GetTarget())->GetMobType() != mtGhast)
+		)
+		{
+			EventSeeHostile(GetTarget());
+		}
+		else
+		{
+			SetTarget(OldTarget);
+			m_EMState = OldState;
+		}
 	}
 
 	return true;
@@ -151,12 +151,12 @@ void cSnowGolem::CheckEventSeeHostile(void)
 	}
 
 	cMonster * TargetMonster = nullptr;
-	double ClosestDistance = m_SightDistance * m_SightDistance;  // CubeLength
+	double ClosestDistance = m_SightDistance * m_SightDistance;  // Squared
 	const auto MyHeadPosition = GetPosition().addedY(GetHeight());
 
 	// Enumerate all monsters within sight:
 	m_World->ForEachEntityInBox(
-		cBoundingBox(MyHeadPosition, ClosestDistance),
+		cBoundingBox(MyHeadPosition, m_SightDistance * 2),
 		[&](cEntity & a_Entity)
 	{
 		if (!a_Entity.IsMob())
@@ -208,7 +208,7 @@ void cSnowGolem::CheckEventLoseHostile(const std::chrono::milliseconds a_Dt)
 {
 	const auto Target = GetTarget();
 
-	if (Target == nullptr)
+	if ((Target == nullptr) || (!Target->IsTicking()))
 	{
 		m_EMState = IDLE;
 		return;
@@ -223,7 +223,7 @@ void cSnowGolem::CheckEventLoseHostile(const std::chrono::milliseconds a_Dt)
 
 	const auto MyHeadPosition = GetPosition().addedY(GetHeight());
 	const auto TargetHeadPosition = Target->GetPosition().addedY(Target->GetHeight());
-	if (!cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, cLineBlockTracer::losAirWaterLava))
+	if (!cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, cLineBlockTracer::losAirWater))
 	{
 		if ((m_LoseSightAbandonTargetTimer += a_Dt) > std::chrono::seconds(4))
 		{
