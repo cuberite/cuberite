@@ -144,10 +144,16 @@ bool cSnowGolem::CanBeTarget(const cPawn * const a_Pawn)
 		return false;
 	}
 
-	if (Monster->GetMobType() == mtGhast)
+	switch (Monster->GetMobType())
 	{
-		return false;
+		case mtGhast:
+		case mtSnowGolem:
+		{
+			return false;
+		}
+		default:
+		{
+			return true;
+		}
 	}
-
-	return true;
 }
