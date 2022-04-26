@@ -142,7 +142,7 @@ bool cSnowGolem::Attack(std::chrono::milliseconds a_Dt)
 
 
 // Checks to see if there are hostile mobs nearby
-// Basically cMonster::CheckEventLostPlayer copied and adjusted
+// Basically cMonster::CheckEventSeePlayer copied and adjusted
 void cSnowGolem::CheckEventSeeHostile(void)
 {
 	if (GetTarget() != nullptr)
