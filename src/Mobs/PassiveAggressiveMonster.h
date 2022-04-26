@@ -25,6 +25,7 @@ public:
 	);
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
+	virtual void CheckEventSeePlayer(cChunk & a_Chunk) override;
 	virtual void EventSeePlayer(cPlayer *, cChunk & a_Chunk) override;
 } ;
 

@@ -40,6 +40,15 @@ bool cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
+void cPassiveAggressiveMonster::CheckEventSeePlayer(cChunk & a_Chunk)
+{
+	// don't do anything, neutral mobs don't react to just seeing the player
+}
+
+
+
+
+
 void cPassiveAggressiveMonster::EventSeePlayer(cPlayer *, cChunk & a_Chunk)
 {
 	// don't do anything, neutral mobs don't react to just seeing the player
