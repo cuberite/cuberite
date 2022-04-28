@@ -96,50 +96,32 @@ void cCompositeChat::AddShowAchievementPart(const AString & a_PlayerName, const 
 
 
 
-
+/**
+ * Parse the input message to add colors or link then add it to the object.
+ *
+ * It detect every & of the message and the next character for it to colorize.
+ * It detect : in the text to detect link structures.
+ *
+ * @param a_ParseText The input text to parse
+ */
 void cCompositeChat::ParseText(const AString & a_ParseText)
 {
 	size_t len = a_ParseText.length();
-	size_t first = 0;  // First character of the currently parsed block
+	size_t cursor = 0;  //< First character of the currently parsed block
 	AString CurrentStyle;
 	AString CurrentText;
 	for (size_t i = 0; i < len; i++)
 	{
 		switch (a_ParseText[i])
 		{
-			case '@':
+			case '&': //< Color code
 			{
-				// Color code
-				i++;
-				if (i >= len)
-				{
-					// Not enough following text
+				if(i == len){
 					break;
 				}
-				if (a_ParseText[i] == '@')
+				if(a_ParseText[i-1] == '\\')
 				{
-					// "@@" escape, just put a "@" into the current text and keep parsing as text
-					if (i > first + 1)
-					{
-						CurrentText.append(a_ParseText.c_str() + first, i - first - 1);
-					}
-					first = i + 1;
-					continue;
-				}
-				else
-				{
-					// True color code. Create a part for the CurrentText and start parsing anew:
-					if (i >= first)
-					{
-						CurrentText.append(a_ParseText.c_str() + first, i - first - 1);
-						first = i + 1;
-					}
-					if (!CurrentText.empty())
-					{
-						AddTextPart(CurrentText, CurrentStyle);
-						CurrentText.clear();
-					}
-					AddStyle(CurrentStyle, a_ParseText.substr(i - 1, 2));
+					continue;	
 				}
 				break;
 			}
@@ -190,9 +172,9 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 			}  // case ':'
 		}  // switch (a_ParseText[i])
 	}  // for i - a_ParseText[]
-	if (first < len)
+	if (cursor < len)
 	{
-		AddTextPart(a_ParseText.substr(first, len - first), CurrentStyle);
+		AddTextPart(a_ParseText.substr(cursor, len - cursor), CurrentStyle);
 	}
 }
 
