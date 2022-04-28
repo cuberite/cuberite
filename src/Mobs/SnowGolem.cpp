@@ -71,7 +71,7 @@ bool cSnowGolem::Attack(std::chrono::milliseconds a_Dt)
 	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0))
 	{
 		Vector3d Inaccuracy = Vector3d(Random.RandReal<double>(-0.25, 0.25), Random.RandReal<double>(-0.25, 0.25), Random.RandReal<double>(-0.25, 0.25));
-		Vector3d Speed = (GetTarget()->GetPosition() + Inaccuracy - GetPosition()) * 5;
+		Vector3d Speed = (GetTarget()->GetPosition() + Inaccuracy - GetPosition()) * 4;
 		Speed.y += Random.RandInt(-1, 1);
 
 		auto Snowball = std::make_unique<cThrownSnowballEntity>(this, GetPosition().addedY(1.5), Speed);
