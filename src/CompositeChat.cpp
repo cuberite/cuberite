@@ -95,6 +95,7 @@ void cCompositeChat::AddShowAchievementPart(const AString & a_PlayerName, const 
 
 
 
+//TODO tonitch
 
 /**
  * Parse the input message to add colors or link then add it to the object.
@@ -139,15 +140,15 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 				{
 					size_t PrefixLen = Prefix.size();
 					if (
-						(i >= first + PrefixLen) &&  // There is enough space in front of the colon for the prefix
+						(i >= cursor + PrefixLen) &&  // There is enough space in front of the colon for the prefix
 						(std::string_view(a_ParseText).substr(i - PrefixLen, PrefixLen) == Prefix)  // the prefix matches
 					)
 					{
 						// Add everything before this as a text part:
-						if (i > first + PrefixLen)
+						if (i > cursor+ PrefixLen)
 						{
-							CurrentText.append(a_ParseText.c_str() + first, i - first - PrefixLen);
-							first = i - PrefixLen;
+							CurrentText.append(a_ParseText.c_str() + cursor, i - cursor - PrefixLen);
+							cursor= i - PrefixLen;
 						}
 						if (!CurrentText.empty())
 						{
@@ -163,8 +164,8 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 								break;
 							}
 						}
-						AddUrlPart(a_ParseText.substr(first, i - first), a_ParseText.substr(first, i - first), CurrentStyle);
-						first = i;
+						AddUrlPart(a_ParseText.substr(cursor, i - cursor), a_ParseText.substr(cursor, i - cursor), CurrentStyle);
+						cursor = i;
 						break;
 					}
 				}  // for Prefix - LinkPrefix[]
@@ -200,7 +201,7 @@ void cCompositeChat::UnderlineUrls(void)
 		{
 			[](TextPart &             a_Part) {  },
 			[](ClientTranslatedPart & a_Part) {  },
-			[](UrlPart &              a_Part) { a_Part.Style += 'u'; },
+			[](UrlPart &              a_Part) { a_Part.Style += 'n'; },
 			[](RunCommandPart &       a_Part) {  },
 			[](SuggestCommandPart &   a_Part) {  },
 			[](ShowAchievementPart &  a_Part) {  },
@@ -257,6 +258,8 @@ eLogLevel cCompositeChat::MessageTypeToLogLevel(eMessageType a_MessageType)
 
 
 
+
+// TODO tonitch
 
 void cCompositeChat::AddStyle(AString & a_Style, const AString & a_AddStyle)
 {
@@ -386,70 +389,28 @@ void cCompositeChat::AddChatPartStyle(Json::Value & a_Value, const AString & a_P
 	{
 		switch (a_PartStyle[i])
 		{
-			case 'b':
-			{
-				// bold
-				a_Value["bold"] = Json::Value(true);
-				break;
-			}
+			case 'k': a_Value["obfuscated"] = Json::Value(true);		break;
+			case 'l': a_Value["bold"] = Json::Value(true);			break;
+			case 'm': a_Value["strikethrough"] = Json::Value(true); 	break;
+			case 'n': a_Value["underlined"] = Json::Value(true);		break;
+			case 'o': a_Value["italic"] = Json::Value(true);		break;
+			case '0': a_Value["color"] = Json::Value("black");		break;
+			case '1': a_Value["color"] = Json::Value("dark_blue");		break;
+			case '2': a_Value["color"] = Json::Value("dark_green");		break;
+			case '3': a_Value["color"] = Json::Value("dark_aqua");		break;
+			case '4': a_Value["color"] = Json::Value("dark_red");		break;
+			case '5': a_Value["color"] = Json::Value("dark_purple");	break;
+			case '6': a_Value["color"] = Json::Value("gold");		break;
+			case '7': a_Value["color"] = Json::Value("gray");		break;
+			case '8': a_Value["color"] = Json::Value("dark_gray");		break;
+			case '9': a_Value["color"] = Json::Value("blue");		break;
+			case 'a': a_Value["color"] = Json::Value("green");		break;
+			case 'b': a_Value["color"] = Json::Value("aqua");		break;
+			case 'c': a_Value["color"] = Json::Value("red");		break;
+			case 'd': a_Value["color"] = Json::Value("light_purple");	break;
+			case 'e': a_Value["color"] = Json::Value("yellow");		break;
+			case 'f': a_Value["color"] = Json::Value("white");		break;
 
-			case 'i':
-			{
-				// italic
-				a_Value["italic"] = Json::Value(true);
-				break;
-			}
-
-			case 'u':
-			{
-				// Underlined
-				a_Value["underlined"] = Json::Value(true);
-				break;
-			}
-
-			case 's':
-			{
-				// strikethrough
-				a_Value["strikethrough"] = Json::Value(true);
-				break;
-			}
-
-			case 'o':
-			{
-				// obfuscated
-				a_Value["obfuscated"] = Json::Value(true);
-				break;
-			}
-
-			case '@':
-			{
-				// Color, specified by the next char:
-				i++;
-				if (i >= len)
-				{
-					// String too short, didn't contain a color
-					break;
-				}
-				switch (a_PartStyle[i])
-				{
-					case '0': a_Value["color"] = Json::Value("black");        break;
-					case '1': a_Value["color"] = Json::Value("dark_blue");    break;
-					case '2': a_Value["color"] = Json::Value("dark_green");   break;
-					case '3': a_Value["color"] = Json::Value("dark_aqua");    break;
-					case '4': a_Value["color"] = Json::Value("dark_red");     break;
-					case '5': a_Value["color"] = Json::Value("dark_purple");  break;
-					case '6': a_Value["color"] = Json::Value("gold");         break;
-					case '7': a_Value["color"] = Json::Value("gray");         break;
-					case '8': a_Value["color"] = Json::Value("dark_gray");    break;
-					case '9': a_Value["color"] = Json::Value("blue");         break;
-					case 'a': a_Value["color"] = Json::Value("green");        break;
-					case 'b': a_Value["color"] = Json::Value("aqua");         break;
-					case 'c': a_Value["color"] = Json::Value("red");          break;
-					case 'd': a_Value["color"] = Json::Value("light_purple"); break;
-					case 'e': a_Value["color"] = Json::Value("yellow");       break;
-					case 'f': a_Value["color"] = Json::Value("white");        break;
-				}  // switch (color)
-			}  // case '@'
 		}  // switch (Style[i])
 	}  // for i - a_PartStyle[]
 }

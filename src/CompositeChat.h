@@ -21,12 +21,13 @@ Each part corresponds roughly to the behavior supported by the client messaging:
 	- clickable commands (suggest)
 Each part has a text assigned to it that can be styled. The style is specified using a string,
 each character / character combination in the string specifies the style to use:
-	- b = bold
-	- i = italic
-	- u = underlined
-	- s = strikethrough
-	- o = obfuscated
-	- @X = color X (X is 0 - 9 or a - f, same as dye meta
+	- (char from 0 - 9 or a - f) = color X 
+	- k = obfuscated
+	- l = bold
+	- m = strikethrough
+	- n = underlined
+	- o = italic
+	- r = reset
 If the protocol version doesn't support all the features, it degrades gracefully.
 */
 class cCompositeChat
@@ -102,7 +103,7 @@ public:
 	cCompositeChat(void);
 
 	/** Creates a new chat message and parses the text into parts.
-	Recognizes "http:" and "https:" links and @color-codes.
+	Recognizes "http:" and "https:" links and &format-character.
 	Uses ParseText() for the actual parsing.
 	Exported manually due to ToLua++ generating extra output parameter. */
 	cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType = mtCustom);
