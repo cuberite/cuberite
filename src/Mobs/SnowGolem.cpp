@@ -83,7 +83,7 @@ bool cSnowGolem::Attack(std::chrono::milliseconds a_Dt)
 
 		auto Snowball = std::make_unique<cThrownSnowballEntity>(this, HeadPos, Speed);
 		auto SnowballPtr = Snowball.get();
-		if (!SnowballPtr->Initialize(std::move(Snowball), *m_World))
+		if (!SnowballPtr->Initialize(std::move(Snowball), *GetWorld()))
 		{
 			return false;
 		}
