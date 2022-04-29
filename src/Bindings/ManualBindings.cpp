@@ -3889,6 +3889,44 @@ static int tolua_cCompositeChat_new_local(lua_State * a_LuaState)
 
 
 
+static int tolua_cCompositeChat_AddShowAchievementPart(lua_State * tolua_S)
+{
+	// function cCompositeChat:AddShowAchievementPart(PlayerName, Achievement, [Style])
+	// Exported manually to support call-chaining (return *this)
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cCompositeChat") ||
+		!L.CheckParamString(2, 3)
+	)
+	{
+		return 0;
+	}
+
+	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (self == nullptr)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function call cCompositeChat::AddShowAchievementPart(string, string, string) const.", nullptr);
+		return 0;
+	}
+
+	// Add the part:
+	AString PlayerName, Achievement, Style;
+	L.GetStackValues(2, PlayerName);
+	L.GetStackValues(3, Achievement);
+	L.GetStackValues(4, Style);
+	self->AddShowAchievementPart(PlayerName, Achievement, Style);
+
+	// Cut away everything from the stack except for the cCompositeChat instance; return that:
+	lua_settop(tolua_S, 1);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cCompositeChat_AddRunCommandPart(lua_State * tolua_S)
 {
 	// function cCompositeChat:AddRunCommandPart(Message, Command, [Style])
@@ -4529,17 +4567,18 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cCompositeChat");
-			tolua_function(tolua_S, "new",                   tolua_cCompositeChat_new);
-			tolua_function(tolua_S, "new_local",             tolua_cCompositeChat_new_local);
-			tolua_function(tolua_S, ".call",                 tolua_cCompositeChat_new_local);
-			tolua_function(tolua_S, "AddRunCommandPart",     tolua_cCompositeChat_AddRunCommandPart);
-			tolua_function(tolua_S, "AddSuggestCommandPart", tolua_cCompositeChat_AddSuggestCommandPart);
-			tolua_function(tolua_S, "AddTextPart",           tolua_cCompositeChat_AddTextPart);
-			tolua_function(tolua_S, "AddUrlPart",            tolua_cCompositeChat_AddUrlPart);
-			tolua_function(tolua_S, "Clear",                 tolua_cCompositeChat_Clear);
-			tolua_function(tolua_S, "ParseText",             tolua_cCompositeChat_ParseText);
-			tolua_function(tolua_S, "SetMessageType",        tolua_cCompositeChat_SetMessageType);
-			tolua_function(tolua_S, "UnderlineUrls",         tolua_cCompositeChat_UnderlineUrls);
+			tolua_function(tolua_S, "new",                    tolua_cCompositeChat_new);
+			tolua_function(tolua_S, "new_local",              tolua_cCompositeChat_new_local);
+			tolua_function(tolua_S, ".call",                  tolua_cCompositeChat_new_local);
+			tolua_function(tolua_S, "AddShowAchievementPart", tolua_cCompositeChat_AddShowAchievementPart);
+			tolua_function(tolua_S, "AddRunCommandPart",      tolua_cCompositeChat_AddRunCommandPart);
+			tolua_function(tolua_S, "AddSuggestCommandPart",  tolua_cCompositeChat_AddSuggestCommandPart);
+			tolua_function(tolua_S, "AddTextPart",            tolua_cCompositeChat_AddTextPart);
+			tolua_function(tolua_S, "AddUrlPart",             tolua_cCompositeChat_AddUrlPart);
+			tolua_function(tolua_S, "Clear",                  tolua_cCompositeChat_Clear);
+			tolua_function(tolua_S, "ParseText",              tolua_cCompositeChat_ParseText);
+			tolua_function(tolua_S, "SetMessageType",         tolua_cCompositeChat_SetMessageType);
+			tolua_function(tolua_S, "UnderlineUrls",          tolua_cCompositeChat_UnderlineUrls);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cCryptoHash");

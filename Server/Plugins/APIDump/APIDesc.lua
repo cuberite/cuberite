@@ -908,16 +908,6 @@ return
 					},
 					Notes = "Returns true if the chunk is set to use default height generator",
 				},
-				IsUsingDefaultStructures =
-				{
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the chunk is set to use default structures",
-				},
 				RandomFillRelCuboid =
 				{
 					{
@@ -1257,17 +1247,6 @@ return
 						},
 					},
 					Notes = "Sets the chunk to use default height generator or not",
-				},
-				SetUseDefaultStructures =
-				{
-					Params =
-					{
-						{
-							Name = "ShouldUseDefaultStructures",
-							Type = "boolean",
-						},
-					},
-					Notes = "Sets the chunk to use default structures or not",
 				},
 				UpdateHeightmap =
 				{
@@ -8707,10 +8686,6 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				EraseData =
-				{
-					Notes = "Erases all pixel data.",
-				},
 				GetCenterX =
 				{
 					Returns =
@@ -8998,16 +8973,6 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "If a map with the specified ID exists, calls the CallbackFunction for that map. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cMap|Map}})</pre> Returns true if the map was found and the callback called, false if map not found.",
-				},
-				GetNumMaps =
-				{
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the number of registered maps.",
 				},
 			},
 		},
@@ -11442,17 +11407,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the dominant hand of the player.",
 				},
-				SetName =
-				{
-					Params =
-					{
-						{
-							Name = "Name",
-							Type = "string",
-						},
-					},
-					Notes = "Sets the player name. This rename will NOT be visible to any players already in the server who are close enough to see this player.",
-				},
 				SetNormalMaxSpeed =
 				{
 					Params =
@@ -13225,14 +13179,6 @@ end
 					},
 					Notes = "Generates a version 3, variant 1 UUID based on the md5 hash of Name."
 				},
-			},
-		},
-		cWebPlugin =
-		{
-			Desc = "",
-			Functions =
-			{
-
 			},
 		},
 		cWindow =
