@@ -186,8 +186,4 @@ protected:
 	/** Additional data pertaining to message type, for example, the name of a mtPrivateMsg sender */
 	AString m_AdditionalMessageTypeData;
 
-
-	/** Adds a_AddStyle to a_Style; overwrites the existing style if appropriate.
-	If the style already contains something that a_AddStyle overrides, it is erased first. */
-	void AddStyle(AString & a_Style, const AString & a_AddStyle);
 } ;  // tolua_export

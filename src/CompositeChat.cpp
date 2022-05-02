@@ -108,21 +108,38 @@ void cCompositeChat::AddShowAchievementPart(const AString & a_PlayerName, const 
 void cCompositeChat::ParseText(const AString & a_ParseText)
 {
 	size_t len = a_ParseText.length();
-	size_t cursor = 0;  //< First character of the currently parsed block
+	size_t cursor = 0;
 	AString CurrentStyle;
 	AString CurrentText;
+
 	for (size_t i = 0; i < len; i++)
 	{
 		switch (a_ParseText[i])
 		{
 			case '&': //< Color code
 			{
-				if(i == len){
-					break;
-				}
 				if(a_ParseText[i-1] == '\\')
 				{
-					continue;	
+					CurrentText.append(a_ParseText, cursor, i-1-cursor).append("&");
+					AddTextPart(CurrentText, CurrentStyle);
+					CurrentText.clear();
+					cursor = ++i;
+					continue;
+				}
+
+				CurrentText.append(a_ParseText, cursor, i-cursor);
+				AddTextPart(CurrentText, CurrentStyle);
+				CurrentText.clear();
+				i++;
+				cursor = i + 1;
+
+				if(a_ParseText[i] == 'r')
+				{
+					CurrentStyle = "";
+				}
+				else
+				{
+					CurrentStyle.push_back(a_ParseText[i]);
 				}
 				break;
 			}
@@ -175,7 +192,9 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 	}  // for i - a_ParseText[]
 	if (cursor < len)
 	{
-		AddTextPart(a_ParseText.substr(cursor, len - cursor), CurrentStyle);
+		CurrentText.clear();
+		CurrentText.append(a_ParseText, cursor, len - cursor);
+		AddTextPart(CurrentText, CurrentStyle);
 	}
 }
 
@@ -253,31 +272,6 @@ eLogLevel cCompositeChat::MessageTypeToLogLevel(eMessageType a_MessageType)
 	}
 	ASSERT(!"Unhandled MessageType");
 	return eLogLevel::Error;
-}
-
-
-
-
-
-// TODO tonitch
-
-void cCompositeChat::AddStyle(AString & a_Style, const AString & a_AddStyle)
-{
-	if (a_AddStyle.empty())
-	{
-		return;
-	}
-	if (a_AddStyle[0] == '@')
-	{
-		size_t idx = a_Style.find('@');
-		if ((idx != AString::npos) && (idx != a_Style.length()))
-		{
-			a_Style.erase(idx, 2);
-		}
-		a_Style.append(a_AddStyle);
-		return;
-	}
-	a_Style.append(a_AddStyle);
 }
 
 
