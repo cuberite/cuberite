@@ -122,15 +122,15 @@ public:
 
 	/** Adds a part that opens an URL when clicked.
 	The default style is underlined light blue text. */
-	void AddUrlPart(const AString & a_Text, const AString & a_Url, const AString & a_Style = "u@c");
+	void AddUrlPart(const AString & a_Text, const AString & a_Url, const AString & a_Style = "nc");
 
 	/** Adds a part that runs a command when clicked.
 	The default style is underlined light green text. */
-	void AddRunCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "u@a");
+	void AddRunCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "na");
 
 	/** Adds a part that suggests a command (enters it into the chat message area, but doesn't send) when clicked.
 	The default style is underlined yellow text. */
-	void AddSuggestCommandPart(const AString & a_Text, const AString & a_SuggestedCommand, const AString & a_Style = "u@b");
+	void AddSuggestCommandPart(const AString & a_Text, const AString & a_SuggestedCommand, const AString & a_Style = "nb");
 
 	/** Adds a part that fully formats a specified achievement using client translatable strings
 	Takes achievement name and player awarded to. Displays as {player} has earned the achievement {achievement_name}.
@@ -138,7 +138,7 @@ public:
 	void AddShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style = "");
 
 	/** Parses text into various parts, adds those.
-	Recognizes "http:" and "https:" URLs and @color-codes. */
+	Recognizes "http:" and "https:" URLs and &color-codes. */
 	void ParseText(const AString & a_ParseText);
 
 	/** Adds the "underline" style to each part that is an URL. */
