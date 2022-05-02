@@ -95,7 +95,6 @@ void cCompositeChat::AddShowAchievementPart(const AString & a_PlayerName, const 
 
 
 
-//TODO tonitch
 
 /**
  * Parse the input message to add colors or link then add it to the object.
@@ -118,7 +117,7 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 		{
 			case '&': //< Color code
 			{
-				if(a_ParseText[i-1] == '\\')
+				if(i != 0 && a_ParseText[i-1] == '\\')
 				{
 					CurrentText.append(a_ParseText, cursor, i-1-cursor).append("&");
 					AddTextPart(CurrentText, CurrentStyle);
