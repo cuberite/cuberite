@@ -97,13 +97,13 @@ void cCompositeChat::AddShowAchievementPart(const AString & a_PlayerName, const 
 
 
 /**
- * Parse the input message to add colors or link then add it to the object.
- *
- * It detect every & of the message and the next character for it to colorize.
- * It detect : in the text to detect link structures.
- *
- * @param a_ParseText The input text to parse
- */
+* Parse the input message to add colors or link then add it to the object.
+*
+* It detect every & of the message and the next character for it to colorize.
+* It detect : in the text to detect link structures.
+*
+* @param a_ParseText The input text to parse
+*/
 void cCompositeChat::ParseText(const AString & a_ParseText)
 {
 	size_t len = a_ParseText.length();
@@ -115,9 +115,9 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 	{
 		switch (a_ParseText[i])
 		{
-			case '&': //< Color code
+			case '&':  //< Color code
 			{
-				if(i != 0 && a_ParseText[i-1] == '\\')
+				if ((i != 0) && (a_ParseText[i-1] == '\\'))
 				{
 					CurrentText.append(a_ParseText, cursor, i-1-cursor).append("&");
 					AddTextPart(CurrentText, CurrentStyle);
@@ -132,7 +132,7 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 				i++;
 				cursor = i + 1;
 
-				if(a_ParseText[i] == 'r')
+				if (a_ParseText[i] == 'r')
 				{
 					CurrentStyle = "";
 				}
@@ -382,27 +382,27 @@ void cCompositeChat::AddChatPartStyle(Json::Value & a_Value, const AString & a_P
 	{
 		switch (a_PartStyle[i])
 		{
-			case 'k': a_Value["obfuscated"] = Json::Value(true);		break;
-			case 'l': a_Value["bold"] = Json::Value(true);			break;
-			case 'm': a_Value["strikethrough"] = Json::Value(true); 	break;
-			case 'n': a_Value["underlined"] = Json::Value(true);		break;
-			case 'o': a_Value["italic"] = Json::Value(true);		break;
-			case '0': a_Value["color"] = Json::Value("black");		break;
-			case '1': a_Value["color"] = Json::Value("dark_blue");		break;
-			case '2': a_Value["color"] = Json::Value("dark_green");		break;
-			case '3': a_Value["color"] = Json::Value("dark_aqua");		break;
-			case '4': a_Value["color"] = Json::Value("dark_red");		break;
-			case '5': a_Value["color"] = Json::Value("dark_purple");	break;
-			case '6': a_Value["color"] = Json::Value("gold");		break;
-			case '7': a_Value["color"] = Json::Value("gray");		break;
-			case '8': a_Value["color"] = Json::Value("dark_gray");		break;
-			case '9': a_Value["color"] = Json::Value("blue");		break;
-			case 'a': a_Value["color"] = Json::Value("green");		break;
-			case 'b': a_Value["color"] = Json::Value("aqua");		break;
-			case 'c': a_Value["color"] = Json::Value("red");		break;
-			case 'd': a_Value["color"] = Json::Value("light_purple");	break;
-			case 'e': a_Value["color"] = Json::Value("yellow");		break;
-			case 'f': a_Value["color"] = Json::Value("white");		break;
+			case 'k': a_Value["obfuscated"] = Json::Value(true); break;
+			case 'l': a_Value["bold"] = Json::Value(true); break;
+			case 'm': a_Value["strikethrough"] = Json::Value(true); break;
+			case 'n': a_Value["underlined"] = Json::Value(true); break;
+			case 'o': a_Value["italic"] = Json::Value(true); break;
+			case '0': a_Value["color"] = Json::Value("black"); break;
+			case '1': a_Value["color"] = Json::Value("dark_blue"); break;
+			case '2': a_Value["color"] = Json::Value("dark_green"); break;
+			case '3': a_Value["color"] = Json::Value("dark_aqua"); break;
+			case '4': a_Value["color"] = Json::Value("dark_red"); break;
+			case '5': a_Value["color"] = Json::Value("dark_purple"); break;
+			case '6': a_Value["color"] = Json::Value("gold"); break;
+			case '7': a_Value["color"] = Json::Value("gray"); break;
+			case '8': a_Value["color"] = Json::Value("dark_gray"); break;
+			case '9': a_Value["color"] = Json::Value("blue"); break;
+			case 'a': a_Value["color"] = Json::Value("green"); break;
+			case 'b': a_Value["color"] = Json::Value("aqua"); break;
+			case 'c': a_Value["color"] = Json::Value("red"); break;
+			case 'd': a_Value["color"] = Json::Value("light_purple"); break;
+			case 'e': a_Value["color"] = Json::Value("yellow"); break;
+			case 'f': a_Value["color"] = Json::Value("white"); break;
 
 		}  // switch (Style[i])
 	}  // for i - a_PartStyle[]

@@ -21,7 +21,7 @@ Each part corresponds roughly to the behavior supported by the client messaging:
 	- clickable commands (suggest)
 Each part has a text assigned to it that can be styled. The style is specified using a string,
 each character / character combination in the string specifies the style to use:
-	- (char from 0 - 9 or a - f) = color X 
+	- (char from 0 - 9 or a - f) = color X
 	- k = obfuscated
 	- l = bold
 	- m = strikethrough
