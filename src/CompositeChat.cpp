@@ -126,9 +126,12 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 					continue;
 				}
 
-				CurrentText.append(a_ParseText, cursor, i-cursor);
-				AddTextPart(CurrentText, CurrentStyle);
-				CurrentText.clear();
+				if (cursor < i)
+				{
+					CurrentText.append(a_ParseText, cursor, i-cursor);
+					AddTextPart(CurrentText, CurrentStyle);
+					CurrentText.clear();
+				}
 				i++;
 				cursor = i + 1;
 
