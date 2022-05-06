@@ -1064,6 +1064,7 @@ public:
 				case cProjectileEntity::pkFireCharge:
 				case cProjectileEntity::pkWitherSkull:
 				case cProjectileEntity::pkEnderPearl:
+				case cProjectileEntity::pkSnowball:
 				{
 					break;
 				}
