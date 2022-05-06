@@ -215,16 +215,6 @@ return
 		Desc = "Base class for all projectiles, such as arrows and fireballs.",
 		Functions =
 		{
-			GetCreator =
-			{
-				Returns =
-				{
-					{
-						Type = "cEntity",
-					},
-				},
-				Notes = "Returns the entity who created this projectile. May return nil.",
-			},
 			GetCreatorName =
 			{
 				Returns =
