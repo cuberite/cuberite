@@ -119,7 +119,7 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 			{
 				if ((i != 0) && (a_ParseText[i-1] == '\\'))
 				{
-					CurrentText.append(a_ParseText, cursor, i-1-cursor).append("&");
+					CurrentText.append(a_ParseText, cursor, i - cursor - 1).append("&");
 					AddTextPart(CurrentText, CurrentStyle);
 					CurrentText.clear();
 					cursor = ++i;
@@ -128,7 +128,7 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 
 				if (cursor < i)
 				{
-					CurrentText.append(a_ParseText, cursor, i-cursor);
+					CurrentText.append(a_ParseText, cursor, i - cursor);
 					AddTextPart(CurrentText, CurrentStyle);
 					CurrentText.clear();
 				}
