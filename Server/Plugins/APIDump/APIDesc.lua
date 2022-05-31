@@ -2249,18 +2249,20 @@ end
 				Chaining example below for details.</p>
 				<p>
 				Each part of the composite chat message takes a "Style" parameter, this is a string that describes
-				the formatting. It uses the following strings, concatenated together:
+				the formatting. It uses the "standard" minecraft format code without the '&' symbole, concatenated
+				together:
 				<table>
 				<tr><th>String</th><th>Style</th></tr>
-				<tr><td>b</td><td>Bold text</td></tr>
-				<tr><td>i</td><td>Italic text</td></tr>
-				<tr><td>u</td><td>Underlined text</td></tr>
-				<tr><td>s</td><td>Strikethrough text</td></tr>
-				<tr><td>o</td><td>Obfuscated text</td></tr>
-				<tr><td>@X</td><td>color [0–9a–f], same as dye meta</td></tr>
+				<tr><td>l</td><td>Bold text</td></tr>
+				<tr><td>o</td><td>Italic text</td></tr>
+				<tr><td>n</td><td>Underlined text</td></tr>
+				<tr><td>m</td><td>Strikethrough text</td></tr>
+				<tr><td>k</td><td>Obfuscated text</td></tr>
+				<tr><td>r</td><td>Reset Style</td></tr>
+				<tr><td>[0-9a-f]</td><td>colors</td></tr>
 				</table>
 				The following picture, taken from the Minecraft Wiki, illustrates the color codes:</p>
-				<img src="http://images.wikia.com/minecraft_gamepedia/images/archive/4/4c/20200824112326!Colors.png" />
+				<img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/7e/Minecraft_Formatting.gif/revision/latest/scale-to-width-down/292?cb=20200828001454" />
 			]],
 			Functions =
 			{
