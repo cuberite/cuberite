@@ -7,23 +7,39 @@ inline auto & DataForChunk(const cChunk & a_Chunk)
 	return *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk.GetRedstoneSimulatorData());
 }
 
-template <typename... ArrayTypes>
-inline void UpdateAdjustedRelative(const cChunk & From, const cChunk & To, const Vector3i Position, const Vector3i Offset)
+inline void UpdateAdjustedRelative(const cChunk & a_Chunk, const cChunk & a_TickingChunk, const Vector3i a_Position, const Vector3i a_Offset)
 {
-	DataForChunk(To).WakeUp(cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(From, To, Position + Offset));
+	const auto PositionToWake = a_Position + a_Offset;
 
-	for (const auto & LinkedOffset : cSimulator::GetLinkedOffsets(Offset))
+	if (!cChunkDef::IsValidHeight(PositionToWake))
 	{
-		DataForChunk(To).WakeUp(cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(From, To, Position + LinkedOffset));
+		// If an offset position is not a valid height, its linked offset positions won't be either.
+		return;
+	}
+
+	auto & ChunkData = DataForChunk(a_TickingChunk);
+
+	// Schedule the block in the requested direction to update:
+	ChunkData.WakeUp(cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(a_Chunk, a_TickingChunk, PositionToWake));
+
+	// To follow Vanilla behaviour, update all linked positions:
+	for (const auto & LinkedOffset : cSimulator::GetLinkedOffsets(a_Offset))
+	{
+		const auto LinkedPositionToWake = a_Position + LinkedOffset;
+
+		if (cChunkDef::IsValidHeight(LinkedPositionToWake))
+		{
+			ChunkData.WakeUp(cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(a_Chunk, a_TickingChunk, LinkedPositionToWake));
+		}
 	}
 }
 
 template <typename ArrayType>
-inline void UpdateAdjustedRelatives(const cChunk & From, const cChunk & To, const Vector3i Position, const ArrayType & Relative)
+inline void UpdateAdjustedRelatives(const cChunk & a_Chunk, const cChunk & a_TickingChunk, const Vector3i a_Position, const ArrayType & a_Relative)
 {
-	for (const auto & Offset : Relative)
+	for (const auto & Offset : a_Relative)
 	{
-		UpdateAdjustedRelative(From, To, Position, Offset);
+		UpdateAdjustedRelative(a_Chunk, a_TickingChunk, a_Position, Offset);
 	}
 }
 

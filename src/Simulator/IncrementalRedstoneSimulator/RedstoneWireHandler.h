@@ -269,15 +269,8 @@ namespace RedstoneWireHandler
 		a_Chunk.SetMeta(a_Position, Power);
 
 		// Notify all positions, sans YP, to update:
-		for (const auto & Offset : RelativeLaterals)
-		{
-			if (Offset == OffsetYP)
-			{
-				continue;
-			}
-
-			UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, Offset);
-		}
+		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, OffsetYM);
+		UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeLaterals);
 	}
 
 	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)

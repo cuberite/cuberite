@@ -19,7 +19,14 @@ public:
 	{
 	}
 
-	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
+	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override
+	{
+		UNUSED(a_Dt);
+		UNUSED(a_ChunkX);
+		UNUSED(a_ChunkZ);
+		UNUSED(a_Chunk);
+	}
+
 	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override
 	{
 		UNUSED(a_Block);
@@ -30,5 +37,4 @@ public:
 	{
 		return nullptr;
 	}
-
 } ;
