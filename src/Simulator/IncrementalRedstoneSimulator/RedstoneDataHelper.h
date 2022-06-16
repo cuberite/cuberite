@@ -25,9 +25,7 @@ inline void UpdateAdjustedRelative(const cChunk & a_Chunk, const cChunk & a_Tick
 	// To follow Vanilla behaviour, update all linked positions:
 	for (const auto & LinkedOffset : cSimulator::GetLinkedOffsets(a_Offset))
 	{
-		const auto LinkedPositionToWake = a_Position + LinkedOffset;
-
-		if (cChunkDef::IsValidHeight(LinkedPositionToWake))
+		if (const auto LinkedPositionToWake = a_Position + LinkedOffset; cChunkDef::IsValidHeight(LinkedPositionToWake))
 		{
 			ChunkData.WakeUp(cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(a_Chunk, a_TickingChunk, LinkedPositionToWake));
 		}

@@ -223,7 +223,8 @@ void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position
 			continue;
 		}
 
-		auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Relative);
+		const auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Relative);
+
 		if ((Chunk == nullptr) || !Chunk->IsValid())
 		{
 			continue;
