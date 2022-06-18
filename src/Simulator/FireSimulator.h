@@ -27,7 +27,6 @@ public:
 
 private:
 
-	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
 
 	static bool IsAllowedBlock(BLOCKTYPE a_BlockType);
@@ -68,7 +67,3 @@ private:
 
 /** Stores individual fire blocks in the chunk; the int data is used as the time [msec] the fire takes to step to another stage (blockmeta++) */
 typedef cCoordWithIntList cFireSimulatorChunkData;
-
-
-
-

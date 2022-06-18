@@ -590,40 +590,13 @@ static int tolua_cBlockArea_Read(lua_State * a_LuaState)
 		return L.ApiParamError("Invalid baDataTypes combination (%d)", dataTypes);
 	}
 
-	// Check the coords, shift if needed:
+	// Check the coords:
+	if (!cChunkDef::IsValidHeight(bounds.p1) || !cChunkDef::IsValidHeight(bounds.p2))
+	{
+		return L.FApiParamError("Coordinates {0} - {1} exceed world bounds", bounds.p1, bounds.p2);
+	}
+
 	bounds.Sort();
-	if (bounds.p1.y < 0)
-	{
-		FLOGWARNING("cBlockArea:Read(): MinBlockY less than zero, adjusting to zero. Coords: {0} - {1}",
-			bounds.p1, bounds.p2
-		);
-		L.LogStackTrace();
-		bounds.p1.y = 0;
-	}
-	else if (bounds.p1.y >= cChunkDef::Height)
-	{
-		FLOGWARNING("cBlockArea:Read(): MinBlockY more than chunk height, adjusting to chunk height. Coords: {0} - {1}",
-			bounds.p1, bounds.p2
-		);
-		L.LogStackTrace();
-		bounds.p1.y = cChunkDef::Height - 1;
-	}
-	if (bounds.p2.y < 0)
-	{
-		FLOGWARNING("cBlockArea:Read(): MaxBlockY less than zero, adjusting to zero. Coords: {0} - {1}",
-			bounds.p1, bounds.p2
-		);
-		L.LogStackTrace();
-		bounds.p2.y = 0;
-	}
-	else if (bounds.p2.y > cChunkDef::Height)
-	{
-		FLOGWARNING("cBlockArea:Read(): MaxBlockY more than chunk height, adjusting to chunk height. Coords: {0} - {1}",
-			bounds.p1, bounds.p2
-		);
-		L.LogStackTrace();
-		bounds.p2.y = cChunkDef::Height;
-	}
 
 	// Do the actual read:
 	L.Push(self->Read(*world, bounds, dataTypes));

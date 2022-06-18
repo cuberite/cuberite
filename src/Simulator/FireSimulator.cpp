@@ -363,14 +363,21 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 {
 	for (auto & coord : gNeighborCoords)
 	{
-		BLOCKTYPE  BlockType;
 		auto relPos = a_RelPos + coord;
-		auto neighbor = a_Chunk->GetRelNeighborChunkAdjustCoords(relPos);
-		if (neighbor == nullptr)
+
+		if (!cChunkDef::IsValidHeight(relPos))
 		{
 			continue;
 		}
-		BlockType = neighbor->GetBlock(relPos);
+
+		const auto neighbor = a_Chunk->GetRelNeighborChunkAdjustCoords(relPos);
+
+		if ((neighbor == nullptr) || !neighbor->IsValid())
+		{
+			continue;
+		}
+
+		BLOCKTYPE BlockType = neighbor->GetBlock(relPos);
 
 		if (!IsFuel(BlockType))
 		{
