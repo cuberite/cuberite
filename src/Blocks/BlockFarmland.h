@@ -46,8 +46,10 @@ public:
 	*/
 	static void TurnToDirt(cChunk & a_Chunk, const Vector3i a_AbsPos, const Vector3i a_RelPos)
 	{
-		static const auto FarmlandHeight = cBlockInfo::GetBlockHeight(E_BLOCK_FARMLAND);
-		static const auto FullHeightDelta = 1 - FarmlandHeight;
+		// Use cBlockInfo::GetBlockHeight when it doesn't break trampling for
+		// mobs and older clients anymore
+		static const auto FarmlandHeight = 0.9375;
+		static const auto FullHeightDelta = 0.0625;
 
 		a_Chunk.ForEachEntityInBox(
 			cBoundingBox(Vector3d(0.5, FarmlandHeight, 0.5) + a_AbsPos, 0.5, FullHeightDelta),

@@ -40,8 +40,9 @@ public:
 	fall height > 1.0625 and <= 1.5625: 66% chance of trampling
 	fall height > 1.5625: always trample
 	The values may differ from vanilla, they were determined experimentally.
+	Additionaly, mobs smaller than 0.512 cubic blocks won't trample.
 	*/
-	void HandleFarmlandTrampling(double a_FallHeight);
+	void HandleFarmlandTrampling(double a_FallHeight, BLOCKTYPE a_BlockAtFoot, BLOCKTYPE a_BlockBelow);
 
 	/** Tells all pawns which are targeting us to stop targeting us. */
 	void StopEveryoneFromTargetingMe();

@@ -321,7 +321,7 @@ void cPawn::HandleFalling(void)
 	With this in mind, we first check the block at the player's feet, then the one below that (because fences),
 	and decide which behaviour we want to go with.
 	*/
-	BLOCKTYPE BlockAtFoot = (cChunkDef::IsValidHeight(POS_TOINT)) ? GetWorld()->GetBlock(POS_TOINT) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
+	const auto BlockAtFoot = (cChunkDef::IsValidHeight(POS_TOINT)) ? GetWorld()->GetBlock(POS_TOINT) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
 
 	/* We initialize these with what the foot is really IN, because for sampling we will move down with the epsilon above */
 	bool IsFootInWater = IsBlockWater(BlockAtFoot);
@@ -431,8 +431,11 @@ void cPawn::HandleFalling(void)
 
 	if (OnGround)
 	{
-		auto FallHeight = m_LastGroundHeight - GetPosY();
+		const auto FallHeight = m_LastGroundHeight - GetPosY();
 		auto Damage = static_cast<int>(FallHeight - 3.0);
+
+		const auto Below = POS_TOINT.addedY(-1);
+		const auto BlockBelow = (cChunkDef::IsValidHeight(Below)) ? GetWorld()->GetBlock(Below) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
 
 		if ((Damage > 0) && !FallDamageAbsorbed)
 		{
@@ -441,25 +444,21 @@ void cPawn::HandleFalling(void)
 				Damage = static_cast<int>(static_cast<float>(Damage) * 0.33);
 			}
 
-			if (const auto Below = POS_TOINT.addedY(-1); Below.y >= 0)
+			if (BlockBelow == E_BLOCK_HAY_BALE)
 			{
-				const auto BlockBelow = GetWorld()->GetBlock(Below);
-
-				if (BlockBelow == E_BLOCK_HAY_BALE)
-				{
-					Damage = std::clamp(static_cast<int>(static_cast<float>(Damage) * 0.2), 1, 20);
-				}
-
-				// Fall particles
-				GetWorld()->BroadcastParticleEffect(
-					"blockdust",
-					GetPosition(),
-					{ 0, 0, 0 },
-					(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
-					static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
-					{ { BlockBelow, 0 } }
-				);
+				Damage = std::clamp(static_cast<int>(static_cast<float>(Damage) * 0.2), 1, 20);
 			}
+
+			// Fall particles
+			// TODO: falling on a partial (e.g. slab) block shouldn't broadcast particles of the block below
+			GetWorld()->BroadcastParticleEffect(
+				"blockdust",
+				GetPosition(),
+				{ 0, 0, 0 },
+				(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
+				static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
+				{ { BlockBelow, 0 } }
+			);
 
 			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
 		}
@@ -469,11 +468,9 @@ void cPawn::HandleFalling(void)
 
 		// Farmland trampling. Mobs smaller than 0.512 cubic blocks won't trample (Java Edition's behavior)
 		// We only have width and height, so we have to calculate Width^2
-		if (GetWorld()->IsFarmlandTramplingEnabled() &&
-			(BlockAtFoot == E_BLOCK_FARMLAND) &&
-			(GetWidth() * GetWidth() * GetHeight() >= 0.512))
+		if (GetWorld()->IsFarmlandTramplingEnabled())
 		{
-			HandleFarmlandTrampling(FallHeight);
+			HandleFarmlandTrampling(FallHeight, BlockAtFoot, BlockBelow);
 		}
 	}
 	else
@@ -490,18 +487,49 @@ void cPawn::HandleFalling(void)
 
 
 
-void cPawn::HandleFarmlandTrampling(double a_FallHeight)
+void cPawn::HandleFarmlandTrampling(const double a_FallHeight, const BLOCKTYPE a_BlockAtFoot, const BLOCKTYPE a_BlockBelow)
 {
-	bool ShouldTrample = true;
-	auto & Random = GetRandomProvider();
-
 	// No trampling if FallHeight <= 0.6875
 	if (a_FallHeight <= 0.6875)
 	{
-		ShouldTrample = false;
+		return;
 	}
+	// No trampling for mobs smaller than 0.512 cubic blocks
+	if (GetWidth() * GetWidth() * GetHeight() < 0.512)
+	{
+		return;
+	}
+
+	auto AbsPos = POS_TOINT;
+
+	// Check if the foot is "inside" a farmland - for 1.10.1 and newer clients
+	// If it isn't, check if the block below is a farmland - for mobs and older clients
+	if (a_BlockAtFoot != E_BLOCK_FARMLAND)
+	{
+		// These are probably the only blocks which:
+		// - can be placed on a farmland and shouldn't destroy it
+		// - will stop the player from falling down further
+		// - are less than 1 block high
+		if ((a_BlockAtFoot == E_BLOCK_HEAD) || (a_BlockAtFoot == E_BLOCK_FLOWER_POT))
+		{
+			return;
+		}
+
+		// Finally, check whether the block below is farmland
+		if (a_BlockBelow != E_BLOCK_FARMLAND)
+		{
+			return;
+		}
+
+		// If we haven't returned, decrease the height
+		AbsPos.y -= 1;
+	}
+
+	bool ShouldTrample = true;
+	auto & Random = GetRandomProvider();
+
 	// For FallHeight <= 1.5625 we need to get a random bool
-	else if (a_FallHeight <= 1.0625)
+	if (a_FallHeight <= 1.0625)
 	{
 		ShouldTrample = Random.RandBool(0.25);
 	}
@@ -513,7 +541,6 @@ void cPawn::HandleFarmlandTrampling(double a_FallHeight)
 
 	if (ShouldTrample)
 	{
-		auto AbsPos = GetPosition().Floor();
 		GetWorld()->DoWithChunkAt(AbsPos, [&](cChunk & Chunk)
 		{
 			cBlockFarmlandHandler::TurnToDirt(Chunk, AbsPos);
