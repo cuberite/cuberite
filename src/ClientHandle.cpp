@@ -1117,17 +1117,15 @@ void cClientHandle::HandleLeftClick(Vector3i a_BlockPos, eBlockFace a_BlockFace,
 		/* Check for clickthrough-blocks:
 		When the user breaks a fire block, the client send the wrong block location.
 		We must find the right block with the face direction. */
-
-		Vector3i BlockPos = a_BlockPos;
-		AddFaceDirection(BlockPos, a_BlockFace);
-
-		if (cChunkDef::IsValidHeight(BlockPos) && cBlockInfo::IsClickedThrough(m_Player->GetWorld()->GetBlock(BlockPos)))
+		if (
+			const auto InterferingPosition = AddFaceDirection(a_BlockPos, a_BlockFace);
+			cChunkDef::IsValidHeight(InterferingPosition) && cBlockInfo::IsClickedThrough(m_Player->GetWorld()->GetBlock(InterferingPosition))
+		)
 		{
-			a_BlockPos = BlockPos;
+			a_BlockPos = InterferingPosition;
 		}
 
-		constexpr double MaxBlockDistance = 6.0;
-		if (!cBoundingBox(m_Player->GetPosition(), MaxBlockDistance).IsInside(a_BlockPos))
+		if (!IsWithinReach(a_BlockPos))
 		{
 			m_Player->SendBlocksAround(a_BlockPos, 2);
 			return;
@@ -1267,13 +1265,6 @@ void cClientHandle::HandleBlockDigStarted(Vector3i a_BlockPos, eBlockFace a_Bloc
 	)
 	{
 		// Players can't destroy blocks with a sword in the hand.
-		return;
-	}
-
-	constexpr double MaxBlockDistance = 6.0;
-	if (!cBoundingBox(m_Player->GetPosition(), MaxBlockDistance).IsInside(a_BlockPos))
-	{
-		m_Player->SendBlocksAround(a_BlockPos, 2);
 		return;
 	}
 
@@ -1439,27 +1430,13 @@ void cClientHandle::HandleRightClick(Vector3i a_BlockPos, eBlockFace a_BlockFace
 	// TODO: We are still consuming the items in main hand. Remove this override when the off-hand consumption is handled correctly.
 	a_UsedMainHand = true;
 
-	const cItem & HeldItem = a_UsedMainHand ? m_Player->GetEquippedItem() : m_Player->GetInventory().GetShieldSlot();
-
-	// Distance from the block's center to the player's eye height.
-	const double Dist = (Vector3d(0.5, 0.5, 0.5) + a_BlockPos - m_Player->GetEyePosition()).SqrLength();
-
-	// Check the reach distance:
-	// _X 2014-11-25: I've maxed at 5.26 with a Survival client and 5.78 with a Creative client in my tests
-	double MaxDist = m_Player->IsGameModeCreative() ? 33.4084 : 27.6676;
-	bool IsWithinReach = (Dist <= MaxDist);
-
-	FLOGD("HandleRightClick: {0}, face {1}, Cursor {2}, Hand: {3}, HeldItem: {4}; Dist: {5:.02f}",
-		a_BlockPos, a_BlockFace, a_CursorPos, a_UsedMainHand, ItemToFullString(HeldItem), Dist
-	);
-
 	cWorld * World = m_Player->GetWorld();
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
+	const cItem & HeldItem = a_UsedMainHand ? m_Player->GetEquippedItem() : m_Player->GetInventory().GetShieldSlot();
 
-	if (
-		!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockPos, a_BlockFace, a_CursorPos) &&
-		IsWithinReach && !m_Player->IsFrozen()
-	)
+	FLOGD("HandleRightClick: {0}, face {1}, Cursor {2}, Hand: {3}, HeldItem: {4}", a_BlockPos, a_BlockFace, a_CursorPos, a_UsedMainHand, ItemToFullString(HeldItem));
+
+	if (!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockPos, a_BlockFace, a_CursorPos) && IsWithinReach(a_BlockPos) && !m_Player->IsFrozen())
 	{
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
@@ -2095,6 +2072,19 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 	}
 
 	return (m_NumBlockChangeInteractionsThisTick <= MAX_BLOCK_CHANGE_INTERACTIONS);
+}
+
+
+
+
+
+bool cClientHandle::IsWithinReach(const Vector3i a_Position) const
+{
+	// Distance from the block's center to the player's eye height.
+	const double Distance = (Vector3d(0.5, 0.5, 0.5) + a_Position - m_Player->GetEyePosition()).SqrLength();
+
+	// _X 2014 - 11 - 25: I've maxed at 5.26 with a Survival client and 5.78 with a Creative client in my tests.
+	return Distance <= (m_Player->IsGameModeCreative() ? 33.4084 : 27.6676);
 }
 
 

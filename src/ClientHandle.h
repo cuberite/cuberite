@@ -581,6 +581,9 @@ private:
 	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
 	bool CheckBlockInteractionsRate(void);
 
+	/** Returns whether the player could in fact reach the position they're attempting to interact with. */
+	bool IsWithinReach(Vector3i a_Position) const;
+
 	/** Adds a single chunk to be streamed to the client; used by StreamChunks() */
 	void StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority);
 
