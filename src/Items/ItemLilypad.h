@@ -3,7 +3,7 @@
 
 #include "ItemHandler.h"
 #include "../Entities/Player.h"
-#include "../LineBlockTracer.h"
+#include "../Physics/Tracers/LineBlockTracer.h"
 
 
 
@@ -89,7 +89,7 @@ public:
 		}
 
 		class cCallbacks:
-			public cBlockTracer::cCallbacks
+			public BlockTracerCallbacks
 		{
 		public:
 
@@ -118,7 +118,7 @@ public:
 
 		const auto EyePosition = a_Player->GetEyePosition();
 		const auto End = EyePosition + a_Player->GetLookVector() * 5;
-		if (cLineBlockTracer::Trace(*a_Player->GetWorld(), Callbacks, EyePosition, End))
+		if (LineBlockTracer::Trace(*a_Player->GetWorld(), Callbacks, EyePosition, End))
 		{
 			// The line traced to completion; no suitable water was found:
 			return false;

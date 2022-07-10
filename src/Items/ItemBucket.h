@@ -6,7 +6,7 @@
 #include "../World.h"
 #include "../Simulator/FluidSimulator.h"
 #include "../Blocks/BlockHandler.h"
-#include "../LineBlockTracer.h"
+#include "../Physics/Tracers/LineBlockTracer.h"
 #include "../Blocks/ChunkInterface.h"
 
 
@@ -185,7 +185,7 @@ public:
 	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos) const
 	{
 		class cCallbacks :
-			public cBlockTracer::cCallbacks
+			public BlockTracerCallbacks
 		{
 		public:
 			Vector3i m_Pos;
@@ -213,11 +213,10 @@ public:
 			}
 		} Callbacks;
 
-		cLineBlockTracer Tracer(*a_World, Callbacks);
 		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
 		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
 
-		Tracer.Trace(Start, End);
+		LineBlockTracer::Trace(*a_World, Callbacks, Start, End);
 
 		if (!Callbacks.m_HasHitFluid)
 		{
@@ -236,7 +235,7 @@ public:
 	bool GetPlacementCoordsFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta, eBlockFace & a_BlockFace) const
 	{
 		class cCallbacks :
-			public cBlockTracer::cCallbacks
+			public BlockTracerCallbacks
 		{
 		public:
 			Vector3i   m_Pos;
@@ -262,14 +261,13 @@ public:
 			}
 		} Callbacks;
 
-		cLineBlockTracer Tracer(*a_World, Callbacks);
 		Vector3d Start(a_Player->GetEyePosition());
 		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
 
-		// cLineBlockTracer::Trace() returns true when whole line was traversed. By returning true from the callback when we hit something,
+		// LineBlockTracer::Trace() returns true when whole line was traversed. By returning true from the callback when we hit something,
 		// we ensure that this never happens if liquid could be placed
 		// Use this to judge whether the position is valid
-		if (!Tracer.Trace(Start, End))
+		if (!LineBlockTracer::Trace(*a_World, Callbacks, Start, End))
 		{
 			a_BlockPos = Callbacks.m_Pos;
 			a_BlockType = Callbacks.m_ReplacedBlockType;

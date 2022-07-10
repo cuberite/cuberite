@@ -5,7 +5,7 @@
 
 #include "../World.h"
 #include "../Entities/Player.h"
-#include "../LineBlockTracer.h"
+#include "../Physics/Tracers/LineBlockTracer.h"
 
 
 
@@ -68,11 +68,11 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (
 		(GetTarget() != nullptr) &&
 		TargetIsInRange() &&
-		cLineBlockTracer::LineOfSightTrace(
+		LineBlockTracer::LineOfSightTrace(
 			*GetWorld(),
 			GetPosition().addedY(GetHeight()),
 			GetTarget()->GetPosition().addedY(GetTarget()->GetHeight()),
-			(IsNetherNative() ? cLineBlockTracer::losAirWaterLava : cLineBlockTracer::losAirWater)
+			(IsNetherNative() ? LineBlockTracer::LineOfSight::AirWaterLava : LineBlockTracer::LineOfSight::AirWater)
 		) &&
 		(GetHealth() > 0.0)
 	)

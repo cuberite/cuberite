@@ -3,7 +3,6 @@
 
 #include "Zombie.h"
 #include "../World.h"
-#include "../LineBlockTracer.h"
 
 
 

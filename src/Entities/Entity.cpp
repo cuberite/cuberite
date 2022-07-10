@@ -11,7 +11,7 @@
 #include "../Chunk.h"
 #include "../Simulator/FluidSimulator.h"
 #include "../Bindings/PluginManager.h"
-#include "../LineBlockTracer.h"
+#include "../Physics/Tracers/LineBlockTracer.h"
 #include "../Items/ItemHandler.h"
 #include "../FastRandom.h"
 #include "../NetherPortalScanner.h"
@@ -1157,7 +1157,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Vector3i HitBlockCoords;
 		eBlockFace HitBlockFace;
 		Vector3d wantNextPos = NextPos + NextSpeed * DtSec.count();
-		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, wantNextPos, HitCoords, HitBlockCoords, HitBlockFace);
+		auto isHit = LineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, wantNextPos, HitCoords, HitBlockCoords, HitBlockFace);
 		if (isHit)
 		{
 			// Set our position to where the block was hit:

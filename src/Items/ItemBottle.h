@@ -28,7 +28,7 @@ public:
 	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos) const
 	{
 		class cCallbacks:
-			public cBlockTracer::cCallbacks
+			public BlockTracerCallbacks
 		{
 		public:
 			Vector3i m_Pos;
@@ -57,7 +57,7 @@ public:
 		} Callbacks;
 		auto Start = a_Player->GetEyePosition() + a_Player->GetLookVector();
 		auto End = a_Player->GetEyePosition() + a_Player->GetLookVector() * 5;
-		cLineBlockTracer::Trace(*a_World, Callbacks, Start, End);
+		LineBlockTracer::Trace(*a_World, Callbacks, Start, End);
 		if (!Callbacks.m_HasHitFluid)
 		{
 			return false;
