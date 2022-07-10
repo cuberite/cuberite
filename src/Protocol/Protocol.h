@@ -387,7 +387,7 @@ public:
 	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) = 0;
 	virtual void SendChatRaw                    (const AString & a_MessageRaw, eChatType a_Type) = 0;
 	virtual void SendChunkData                  (ContiguousByteBufferView a_ChunkData) = 0;
-	virtual void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) = 0;
+	virtual void SendCollectEntity              (const cEntity & a_Collected, const cPawn & a_Collector, unsigned a_Count) = 0;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) = 0;
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) = 0;
 	virtual void SendDisconnect                 (const AString & a_Reason) = 0;

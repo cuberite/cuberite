@@ -2535,7 +2535,7 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, const ContiguousBy
 
 
 
-void cClientHandle::SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count)
+void cClientHandle::SendCollectEntity(const cEntity & a_Collected, const cPawn & a_Collector, unsigned a_Count)
 {
 	m_Protocol->SendCollectEntity(a_Collected, a_Collector, a_Count);
 }

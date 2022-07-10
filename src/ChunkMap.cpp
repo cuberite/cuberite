@@ -916,14 +916,15 @@ void cChunkMap::AddEntity(OwnedEntity a_Entity)
 	}
 
 	const auto EntityPtr = a_Entity.get();
-	ASSERT(EntityPtr->GetWorld() == m_World);
 
 	auto & Chunk = ConstructChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
 	Chunk.AddEntity(std::move(a_Entity));
 
-	EntityPtr->OnAddToWorld(*m_World);
 	ASSERT(!EntityPtr->IsTicking());
+	ASSERT(EntityPtr->GetWorld() == m_World);
+
 	EntityPtr->SetIsTicking(true);
+	EntityPtr->OnAddToWorld(*m_World);
 
 	cPluginManager::Get()->CallHookSpawnedEntity(*m_World, *EntityPtr);
 }

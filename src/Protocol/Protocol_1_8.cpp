@@ -372,7 +372,7 @@ void cProtocol_1_8_0::SendChunkData(const ContiguousByteBufferView a_ChunkData)
 
 
 
-void cProtocol_1_8_0::SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count)
+void cProtocol_1_8_0::SendCollectEntity(const cEntity & a_Collected, const cPawn & a_Collector, unsigned a_Count)
 {
 	UNUSED(a_Count);
 	ASSERT(m_State == 3);  // In game mode?
