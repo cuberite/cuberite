@@ -2083,7 +2083,7 @@ bool cClientHandle::IsWithinReach(const Vector3i a_Position) const
 	// Distance from the block's center to the player's eye height.
 	const double Distance = (Vector3d(0.5, 0.5, 0.5) + a_Position - m_Player->GetEyePosition()).SqrLength();
 
-	// _X 2014 - 11 - 25: I've maxed at 5.26 with a Survival client and 5.78 with a Creative client in my tests.
+	// _X 2014-11-25: I've maxed at 5.26 with a Survival client and 5.78 with a Creative client in my tests.
 	return Distance <= (m_Player->IsGameModeCreative() ? 33.4084 : 27.6676);
 }
 

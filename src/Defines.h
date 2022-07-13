@@ -570,12 +570,8 @@ If a_Inverse is true, the opposite direction is used instead. */
 void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBlockFace a_BlockFace, bool a_bInverse = false);
 
 /** Returns the coords of a block that is neighboring the specified position through its specified face.
-If a_IsInverse is true, the opposite direction is used instead. */
-inline Vector3i AddFaceDirection(Vector3i a_Pos, eBlockFace a_BlockFace, bool a_bInverse = false)
-{
-	AddFaceDirection(a_Pos.x, a_Pos.y, a_Pos.z, a_BlockFace, a_bInverse);
-	return a_Pos;
-}
+If a_InvertDirection is true, the opposite direction is used instead. */
+Vector3i AddFaceDirection(Vector3i a_Pos, eBlockFace a_BlockFace, bool a_InvertDirection = false);
 
 // tolua_end
 

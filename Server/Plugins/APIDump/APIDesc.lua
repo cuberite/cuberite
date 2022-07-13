@@ -14299,13 +14299,13 @@ end
 								Type = "number",
 							},
 						},
-						Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}",
+						Notes = "<b>OBSOLETE</b>, use the vector version instead.",
 					},
 					{
 						Params =
 						{
 							{
-								Name = "BlockPos",
+								Name = "Position",
 								Type = "Vector3i",
 							},
 							{
@@ -14313,7 +14313,7 @@ end
 								Type = "eBlockFace",
 							},
 							{
-								Name = "IsInverse",
+								Name = "InvertDirection",
 								Type = "boolean",
 								IsOptional = true,
 							},
@@ -14321,11 +14321,10 @@ end
 						Returns =
 						{
 							{
-								Name = "BlockPos",
 								Type = "Vector3i",
 							},
 						},
-						Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}",
+						Notes = "By default, returns the coordinates adjacent to the specified block through the specified face. If inverted, returns the coordinates adjacent to the opposite face.",
 					},
 				},
 				Base64Decode =
