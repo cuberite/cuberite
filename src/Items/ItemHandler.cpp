@@ -533,7 +533,7 @@ namespace
 	constexpr cDefaultItemHandler           ItemTerracottaHandler                      (E_BLOCK_TERRACOTTA);
 	constexpr cDefaultItemHandler           ItemTippedArrowHandler                     (E_ITEM_TIPPED_ARROW);
 	constexpr cDefaultItemHandler           ItemTNTHandler                             (E_BLOCK_TNT);
-	constexpr cDefaultItemHandler           ItemTorchBlockHandler                      (E_BLOCK_TORCH);
+	constexpr cItemTorchHandler             ItemTorchHandler                           (E_BLOCK_TORCH);
 	constexpr cDefaultItemHandler           ItemTotemOfUndyingHandler                  (E_ITEM_TOTEM_OF_UNDYING);
 	constexpr cItemChestHandler             ItemTrappedChestHandler                    (E_BLOCK_TRAPPED_CHEST);
 	constexpr cDefaultItemHandler           ItemTripwireHandler                        (E_BLOCK_TRIPWIRE);
@@ -806,7 +806,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_TALL_GRASS:                     return ItemTallGrassHandler;
 		case E_BLOCK_TERRACOTTA:                     return ItemTerracottaHandler;
 		case E_BLOCK_TNT:                            return ItemTNTHandler;
-		case E_BLOCK_TORCH:                          return ItemTorchBlockHandler;
+		case E_BLOCK_TORCH:                          return ItemTorchHandler;
 		case E_BLOCK_TRAPDOOR:                       return ItemOakTrapdoorHandler;
 		case E_BLOCK_TRAPPED_CHEST:                  return ItemTrappedChestHandler;
 		case E_BLOCK_TRIPWIRE:                       return ItemTripwireHandler;
