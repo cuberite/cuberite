@@ -116,12 +116,13 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 // cPickup:
 
-cPickup::cPickup(Vector3d a_Position, cItem && a_Item, Vector3d a_Speed, cTickTime a_CollectionDelay, cTickTime a_Lifetime) :
+cPickup::cPickup(Vector3d a_Position, cItem && a_Item, Vector3d a_Speed, cTickTime a_CollectionDelay, cTickTime a_Lifetime, bool a_CanCombine) :
 	Super(etPickup, a_Position, 0.25f, 0.25f),
 	m_Item(std::move(a_Item)),
 	m_RemainingCollectionDelay(a_CollectionDelay),
 	m_RemainingLifetime(a_Lifetime),
-	m_IsCollected(false)
+	m_IsCollected(false),
+	m_IsCombinable(a_CanCombine)
 {
 	SetGravity(-16.0f);
 	SetAirDrag(0.02f);

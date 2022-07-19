@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "IncludeAllMonsters.h"
-#include "LineBlockTracer.h"
+#include "Physics/Tracers/LineBlockTracer.h"
 #include "../BlockInfo.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -754,7 +754,7 @@ void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 		// TODO: Currently all mobs see through lava, but only Nether-native mobs should be able to.
 		if (
 			(TargetDistance < ClosestDistance) &&
-			cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, cLineBlockTracer::losAirWaterLava)
+			LineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, LineBlockTracer::LineOfSight::AirWaterLava)
 		)
 		{
 			TargetPlayer = &a_Player;
@@ -800,7 +800,7 @@ void cMonster::CheckEventLostPlayer(const std::chrono::milliseconds a_Dt)
 
 	const auto MyHeadPosition = GetPosition().addedY(GetHeight());
 	const auto TargetHeadPosition = Target->GetPosition().addedY(Target->GetHeight());
-	if (!cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, cLineBlockTracer::losAirWaterLava))
+	if (!LineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, LineBlockTracer::LineOfSight::AirWaterLava))
 	{
 		if ((m_LoseSightAbandonTargetTimer += a_Dt) > std::chrono::seconds(4))
 		{

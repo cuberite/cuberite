@@ -37,7 +37,6 @@ target_sources(
 	ItemGrid.cpp
 	JsonUtils.cpp
 	LightingThread.cpp
-	LineBlockTracer.cpp
 	LinearInterpolation.cpp
 	LoggerListeners.cpp
 	Logger.cpp
@@ -72,7 +71,6 @@ target_sources(
 	BlockInServerPluginInterface.h
 	BlockInfo.h
 	BlockState.h
-	BlockTracer.h
 	BlockType.h
 	BrewingRecipes.h
 	BoundingBox.h
@@ -111,7 +109,6 @@ target_sources(
 	LazyArray.h
 	JsonUtils.h
 	LightingThread.h
-	LineBlockTracer.h
 	LinearInterpolation.h
 	LinearUpscale.h
 	Logger.h
@@ -153,8 +150,8 @@ target_sources(
 set(FOLDERS
 	Bindings BlockEntities Blocks Entities
 	Generating HTTP Items mbedTLS++ Mobs Noise
-	OSSupport Physics Protocol Registries Simulator
-	Simulator/IncrementalRedstoneSimulator UI WorldStorage
+	OSSupport Physics Physics/Tracers Protocol Registries
+	Simulator Simulator/IncrementalRedstoneSimulator UI WorldStorage
 )
 
 # Add all child source directories:

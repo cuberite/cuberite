@@ -9,7 +9,7 @@
 #include "ProjectileEntity.h"
 #include "../BlockInfo.h"
 #include "../ClientHandle.h"
-#include "../LineBlockTracer.h"
+#include "../Physics/Tracers/LineBlockTracer.h"
 #include "../BoundingBox.h"
 #include "../ChunkMap.h"
 #include "../Chunk.h"
@@ -34,7 +34,7 @@
 // cProjectileTracerCallback:
 
 class cProjectileTracerCallback :
-	public cBlockTracer::cCallbacks
+	public BlockTracerCallbacks
 {
 public:
 	cProjectileTracerCallback(cProjectileEntity * a_Projectile) :
@@ -411,7 +411,7 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 
 	// Trace the tick's worth of movement as a line:
 	cProjectileTracerCallback TracerCallback(this);
-	if (!cLineBlockTracer::Trace(*m_World, TracerCallback, Pos, NextPos))
+	if (!LineBlockTracer::Trace(*m_World, TracerCallback, Pos, NextPos))
 	{
 		// Something has been hit, abort all other processing
 		return;

@@ -785,7 +785,7 @@ void cChunk::MoveEntityToNewChunk(OwnedEntity a_Entity)
 	cChunk * Neighbor = GetNeighborChunk(a_Entity->GetChunkX() * cChunkDef::Width, a_Entity->GetChunkZ() * cChunkDef::Width);
 	if (Neighbor == nullptr)
 	{
-		LOGWARNING("%s: Entity at %p (%s, ID %d) moving to a non-existent chunk.",
+		LOGD("%s: Entity at %p (%s, ID %d) moving to a non-existent chunk",
 			__FUNCTION__, static_cast<void *>(a_Entity.get()), a_Entity->GetClass(), a_Entity->GetUniqueID()
 		);
 

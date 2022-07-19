@@ -45,7 +45,11 @@ void cEnderCrystal::SetShowBottom(bool a_ShowBottom)
 void cEnderCrystal::SetBeamTarget(Vector3i a_BeamTarget)
 {
 	m_BeamTarget = a_BeamTarget;
-	m_World->BroadcastEntityMetadata(*this);
+
+	if (m_DisplayBeam)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
 }
 
 

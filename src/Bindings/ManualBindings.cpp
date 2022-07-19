@@ -32,7 +32,7 @@
 #include "../Generating/ChunkDesc.h"
 #include "../HTTP/UrlParser.h"
 #include "../Item.h"
-#include "../LineBlockTracer.h"
+#include "../Physics/Tracers/LineBlockTracer.h"
 #include "../Server.h"
 #include "../Root.h"
 #include "../StringCompression.h"
@@ -2871,9 +2871,9 @@ tolua_lerror:
 
 
 
-/** Provides interface between a Lua table of callbacks and the cBlockTracer::cCallbacks */
+/** Provides interface between a Lua table of callbacks and the BlockTracerCallbacks */
 class cLuaBlockTracerCallbacks :
-	public cBlockTracer::cCallbacks
+	public BlockTracerCallbacks
 {
 public:
 	cLuaBlockTracerCallbacks(cLuaState::cTableRefPtr && a_Callbacks):
@@ -2962,7 +2962,7 @@ protected:
 
 
 
-/** Provides interface between a Lua table of callbacks and the cBlockTracer::cCallbacks
+/** Provides interface between a Lua table of callbacks and the BlockTracerCallbacks
 This is the deprecated version of cLuaBlockTracerCallback, used when the plugin calls
 the Trace function with number-based coords. */
 class cLuaBlockTracerCallbacksOld :
@@ -3093,7 +3093,7 @@ static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
 		Vector3d hitCoords;
 		Vector3i hitBlockCoords;
 		eBlockFace hitBlockFace;
-		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*world, Vector3d(startX, startY, startZ), Vector3d(endX, endY, endZ), hitCoords, hitBlockCoords, hitBlockFace);
+		auto isHit = LineBlockTracer::FirstSolidHitTrace(*world, Vector3d(startX, startY, startZ), Vector3d(endX, endY, endZ), hitCoords, hitBlockCoords, hitBlockFace);
 		L.Push(isHit);
 		if (!isHit)
 		{
@@ -3129,7 +3129,7 @@ static int tolua_cLineBlockTracer_FirstSolidHitTrace(lua_State * tolua_S)
 		Vector3d hitCoords;
 		Vector3i hitBlockCoords;
 		eBlockFace hitBlockFace;
-		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*world, start, end, hitCoords, hitBlockCoords, hitBlockFace);
+		auto isHit = LineBlockTracer::FirstSolidHitTrace(*world, start, end, hitCoords, hitBlockCoords, hitBlockFace);
 		L.Push(isHit);
 		if (!isHit)
 		{
@@ -3197,9 +3197,9 @@ static int tolua_cLineBlockTracer_LineOfSightTrace(lua_State * tolua_S)
 			L.LogStackValues("Values on the stack");
 			return 0;
 		}
-		int lineOfSight = cLineBlockTracer::losAir | cLineBlockTracer::losWater;
+		int lineOfSight = LineBlockTracer::LineOfSight::AirWater;
 		L.GetStackValue(idx + 7, lineOfSight);
-		L.Push(cLineBlockTracer::LineOfSightTrace(*world, Vector3d(startX, startY, startZ), Vector3d(endX, endY, endZ), lineOfSight));
+		L.Push(LineBlockTracer::LineOfSightTrace(*world, Vector3d(startX, startY, startZ), Vector3d(endX, endY, endZ), static_cast<LineBlockTracer::LineOfSight>(lineOfSight)));
 		return 1;
 	}
 
@@ -3225,9 +3225,9 @@ static int tolua_cLineBlockTracer_LineOfSightTrace(lua_State * tolua_S)
 			L.LogStackValues("Values on the stack");
 			return 0;
 		}
-		int lineOfSight = cLineBlockTracer::losAirWater;
+		int lineOfSight = LineBlockTracer::LineOfSight::AirWater;
 		L.GetStackValue(idx + 7, lineOfSight);
-		L.Push(cLineBlockTracer::LineOfSightTrace(*world, start, end, lineOfSight));
+		L.Push(LineBlockTracer::LineOfSightTrace(*world, start, end, static_cast<LineBlockTracer::LineOfSight>(lineOfSight)));
 		return 1;
 	}
 
@@ -3292,7 +3292,7 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 		L.LogStackTrace();
 		// Trace:
 		cLuaBlockTracerCallbacksOld tracerCallbacks(std::move(callbacks));
-		bool res = cLineBlockTracer::Trace(*world, tracerCallbacks, start, end);
+		bool res = LineBlockTracer::Trace(*world, tracerCallbacks, start, end);
 		tolua_pushboolean(L, res ? 1 : 0);
 		return 1;
 	}
@@ -3311,7 +3311,7 @@ static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
 		}
 		// Trace:
 		cLuaBlockTracerCallbacks tracerCallbacks(std::move(callbacks));
-		bool res = cLineBlockTracer::Trace(*world, tracerCallbacks, start, end);
+		bool res = LineBlockTracer::Trace(*world, tracerCallbacks, start, end);
 		tolua_pushboolean(L, res ? 1 : 0);
 		return 1;
 	}
@@ -4640,9 +4640,9 @@ void cManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "LineOfSightTrace",   tolua_cLineBlockTracer_LineOfSightTrace);
 			tolua_function(tolua_S, "Trace",              tolua_cLineBlockTracer_Trace);
 
-			tolua_constant(tolua_S, "losAir",   cLineBlockTracer::losAir);
-			tolua_constant(tolua_S, "losWater", cLineBlockTracer::losWater);
-			tolua_constant(tolua_S, "losLava",  cLineBlockTracer::losLava);
+			tolua_constant(tolua_S, "losAir",   LineBlockTracer::LineOfSight::Air);
+			tolua_constant(tolua_S, "losWater", LineBlockTracer::LineOfSight::Water);
+			tolua_constant(tolua_S, "losLava",  LineBlockTracer::LineOfSight::Lava);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cLuaWindow");

@@ -2,7 +2,7 @@
 #pragma once
 
 #include "../Entities/Boat.h"
-#include "../LineBlockTracer.h"
+#include "../Physics/Tracers/LineBlockTracer.h"
 
 
 
@@ -38,7 +38,7 @@ public:
 
 		// Find the actual placement position by tracing line of sight until non-air block:
 		class cCallbacks:
-			public cBlockTracer::cCallbacks
+			public BlockTracerCallbacks
 		{
 		public:
 			Vector3d m_Pos;
@@ -62,7 +62,7 @@ public:
 		} Callbacks;
 		auto Start = a_Player->GetEyePosition() + a_Player->GetLookVector();
 		auto End = a_Player->GetEyePosition() + a_Player->GetLookVector() * 5;
-		cLineBlockTracer::Trace(*a_World, Callbacks, Start, End);
+		LineBlockTracer::Trace(*a_World, Callbacks, Start, End);
 		if (!Callbacks.m_HasFound)
 		{
 			return false;

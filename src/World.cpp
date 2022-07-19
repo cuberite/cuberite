@@ -12,7 +12,7 @@
 #include "Generating/ComposableGenerator.h"
 #include "SetChunkData.h"
 #include "DeadlockDetect.h"
-#include "LineBlockTracer.h"
+#include "Physics/Tracers/LineBlockTracer.h"
 #include "UUID.h"
 #include "BlockInServerPluginInterface.h"
 
@@ -1844,7 +1844,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d
 
 UInt32 cWorld::SpawnItemPickup(Vector3d a_Position, cItem && a_Item, Vector3d a_Speed, cTickTime a_CollectionDelay, cTickTime a_Lifetime, bool a_CanCombine)
 {
-	auto Pickup = std::make_unique<cPickup>(a_Position, std::move(a_Item), a_Speed, a_CollectionDelay, a_Lifetime);
+	auto Pickup = std::make_unique<cPickup>(a_Position, std::move(a_Item), a_Speed, a_CollectionDelay, a_Lifetime, a_CanCombine);
 	auto PickupPtr = Pickup.get();
 
 	if (!PickupPtr->Initialize(std::move(Pickup), *this))
@@ -2413,7 +2413,7 @@ bool cWorld::DoWithNearestPlayer(Vector3d a_Pos, double a_RangeLimit, cPlayerLis
 		// Check LineOfSight, if requested:
 		if (
 			a_CheckLineOfSight &&
-			!cLineBlockTracer::LineOfSightTrace(*this, a_Pos, Pos, cLineBlockTracer::losAirWater)
+			!LineBlockTracer::LineOfSightTrace(*this, a_Pos, Pos, LineBlockTracer::LineOfSight::AirWater)
 		)
 		{
 			continue;

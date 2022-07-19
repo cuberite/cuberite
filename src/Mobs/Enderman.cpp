@@ -4,7 +4,7 @@
 #include "Chunk.h"
 #include "Enderman.h"
 #include "../Entities/Player.h"
-#include "../LineBlockTracer.h"
+#include "../Physics/Tracers/LineBlockTracer.h"
 
 
 
@@ -55,7 +55,7 @@ public:
 		}
 
 		// TODO: Check if endermen are angered through water in Vanilla
-		if (!cLineBlockTracer::LineOfSightTrace(*a_Player.GetWorld(), m_EndermanHeadPosition, PlayerHeadPosition, cLineBlockTracer::losAirWater))
+		if (!LineBlockTracer::LineOfSightTrace(*a_Player.GetWorld(), m_EndermanHeadPosition, PlayerHeadPosition, LineBlockTracer::LineOfSight::AirWater))
 		{
 			// No direct line of sight
 			return false;

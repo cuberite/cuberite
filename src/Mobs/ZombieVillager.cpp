@@ -3,7 +3,6 @@
 
 #include "ZombieVillager.h"
 #include "../World.h"
-#include "../LineBlockTracer.h"
 #include "../Entities/Player.h"
 
 
