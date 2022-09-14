@@ -1884,6 +1884,17 @@ void cClientHandle::HandleUseItem(bool a_UsedMainHand)
 
 
 
+void cClientHandle::HandleResourcePack(UInt8 a_Status)
+{
+	// Kick player if client declined the resource pack
+	if (a_Status == 1)
+		Kick("You must accept the resource pack");
+}
+
+
+
+
+
 void cClientHandle::HandleRespawn(void)
 {
 	if (m_Player->GetHealth() > 0)
