@@ -27,6 +27,7 @@ public:
 
 	enum eFamily
 	{
+		mfUnknown  = -1, // Unknown mobs from new versions
 		mfHostile  = 0,  // Spider, Zombies ...
 		mfPassive  = 1,  // Cows, Pigs
 		mfAmbient  = 2,  // Bats

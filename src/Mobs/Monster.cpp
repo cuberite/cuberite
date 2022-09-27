@@ -1168,7 +1168,7 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtZombieHorse:     return mfPassive;
 		case mtZombiePigman:    return mfHostile;
 		case mtZombieVillager:  return mfHostile;
-		case mtInvalidType:     break;
+		case mtInvalidType:     return mfUnknown;
 	}
 	UNREACHABLE("Unhandled mob type");
 }
@@ -1186,6 +1186,7 @@ cTickTime cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 		case mfAmbient:   return 40_tick;
 		case mfWater:     return 400_tick;
 		case mfNoSpawn:   return -1_tick;
+		case mfUnknown:   return -1_tick;
 	}
 	UNREACHABLE("Unhandled mob family");
 }
