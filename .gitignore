@@ -122,3 +122,5 @@ build-cuberite
 # clang-tidy
 tidy-build
 run-clang-tidy.py
+
+tags
