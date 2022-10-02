@@ -624,12 +624,14 @@ public:
 	void Push(const cEntity * a_Entity);
 	void Push(cLuaServerHandle * a_ServerHandle);
 	void Push(cLuaTCPLink * a_TCPLink);
+	void Push(std::thread * a_Thread);
 	void Push(cLuaUDPEndpoint * a_UDPEndpoint);
 	void Push(double a_Value);
 	void Push(int a_Value);
 	void Push(long a_Value);
 	void Push(const UInt32 a_Value);
 	void Push(std::chrono::milliseconds a_time);
+	void Push(std::mutex * a_Mutex);
 
 	/** Pops the specified number of values off the top of the Lua stack. */
 	void Pop(int a_NumValuesToPop = 1);

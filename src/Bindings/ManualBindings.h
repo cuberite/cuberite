@@ -46,6 +46,9 @@ protected:
 	Implemented in ManualBindings_BlockArea.cpp. */
 	static void BindBlockArea(lua_State * tolua_S);
 
+	/** Binds the manually implemented threading API */
+	static void BindThreading(lua_State * tolua_S);
+
 
 public:
 	// Helper functions:

@@ -1033,6 +1033,16 @@ void cLuaState::Push(cLuaTCPLink * a_TCPLink)
 
 
 
+void cLuaState::Push(std::thread* a_Thread) {
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_Thread, "std::thread *");
+}
+
+
+
+
+
 void cLuaState::Push(cLuaUDPEndpoint * a_UDPEndpoint)
 {
 	ASSERT(IsValid());
@@ -1093,6 +1103,17 @@ void cLuaState::Push(std::chrono::milliseconds a_Value)
 	ASSERT(IsValid());
 
 	tolua_pushnumber(m_LuaState, static_cast<lua_Number>(a_Value.count()));
+}
+
+
+
+
+
+
+void cLuaState::Push(std::mutex * a_Mutex) {
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_Mutex, "std::mutex *");
 }
 
 

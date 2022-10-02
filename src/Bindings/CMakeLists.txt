@@ -17,6 +17,7 @@ target_sources(
 	ManualBindings_Network.cpp
 	ManualBindings_RankManager.cpp
 	ManualBindings_World.cpp
+	ManualBindings_Threading.cpp
 	Plugin.cpp
 	PluginLua.cpp
 	PluginManager.cpp

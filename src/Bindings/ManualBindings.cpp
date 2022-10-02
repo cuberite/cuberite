@@ -1447,12 +1447,12 @@ static int tolua_cPluginManager_CallPlugin(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	if (ThisPlugin->GetName() == PluginName)
+	/*if (ThisPlugin->GetName() == PluginName)
 	{
 		LOGWARNING("cPluginManager::CallPlugin(): Calling self is not implemented (why would it?)");
 		L.LogStackTrace();
 		return 0;
-	}
+	}*/
 
 	// Call the destination plugin using a plugin callback:
 	int NumReturns = 0;
@@ -4768,6 +4768,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		BindRankManager(tolua_S);
 		BindWorld(tolua_S);
 		BindBlockArea(tolua_S);
+		BindThreading(tolua_S);
 
 	tolua_endmodule(tolua_S);
 }
