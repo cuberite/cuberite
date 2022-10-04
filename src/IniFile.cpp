@@ -19,6 +19,7 @@
 
 // C++ Includes
 #include <fstream>
+#include <regex>
 
 // C Includes
 #include <ctype.h>
@@ -56,9 +57,10 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 	// a few bugs with ifstream. So ... fstream used.
 	fstream f;
 	AString   line;
-	AString   keyname, valuename, value;
+	AString   keyname, rawvalue, valuename, value;
 	AString::size_type pLeft, pRight;
 	bool IsFromExampleRedirect = false;
+	regex newlineregex(R"(\\n)");
 
 
 	f.open((a_FileName).c_str(), ios::in);
@@ -146,7 +148,8 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 			case '=':
 			{
 				valuename = line.substr(0, pLeft);
-				value = TrimString(line.substr(pLeft + 1));
+				rawvalue = TrimString(line.substr(pLeft + 1));
+				value = regex_replace(rawvalue, newlineregex, "\n");
 				AddValue(keyname, valuename, value);
 				break;
 			}
@@ -191,6 +194,8 @@ bool cIniFile::WriteFile(const AString & a_FileName) const
 	// Normally you would use ofstream, but the SGI CC compiler has
 	// a few bugs with ofstream. So ... fstream used.
 	fstream f;
+	AString runvalue, writevalue;
+	regex newlineregex(R"(\n)");
 
 	f.open((a_FileName).c_str(), ios::out);
 	if (f.fail())
@@ -223,7 +228,9 @@ bool cIniFile::WriteFile(const AString & a_FileName) const
 		// Values.
 		for (size_t valueID = 0; valueID < m_Keys[keyID].m_Names.size(); ++valueID)
 		{
-			f << m_Keys[keyID].m_Names[valueID] << '=' << m_Keys[keyID].m_Values[valueID] << iniEOL;
+			runvalue = m_Keys[keyID].m_Values[valueID];
+			writevalue = regex_replace(runvalue, newlineregex, "\\n");
+			f << m_Keys[keyID].m_Names[valueID] << '=' << writevalue << iniEOL;
 		}
 		f << iniEOL;
 	}
