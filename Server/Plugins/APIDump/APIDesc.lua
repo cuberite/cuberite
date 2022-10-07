@@ -9436,6 +9436,10 @@ a_Player:OpenWindow(Window);
 				{
 					Notes = "Family: ambient (bat)",
 				},
+				mfUnknown =
+				{
+					Notes = "Family: unknown, you should report as an issue",
+				},
 				mfHostile =
 				{
 					Notes = "Family: hostile (blaze, cavespider, creeper, enderdragon, enderman, ghast, giant, magmacube, silverfish, skeleton, slime, spider, witch, wither, zombie, zombiepigman)",
