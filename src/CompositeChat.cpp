@@ -99,7 +99,7 @@ void cCompositeChat::AddShowAchievementPart(const AString & a_PlayerName, const 
 /**
 * Parse the input message to add colors or link then add it to the object.
 *
-* It detect every & of the message and the next character for it to colorize.
+* It detects every & of the message and the next character for it to colorize.
 * It detect : in the text to detect link structures.
 *
 * @param a_ParseText The input text to parse
