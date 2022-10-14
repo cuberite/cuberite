@@ -2261,6 +2261,7 @@ end
 				<tr><td>r</td><td>Reset Style</td></tr>
 				<tr><td>[0-9a-f]</td><td>colors</td></tr>
 				</table>
+				You can escape the '&' character with an antislash in front of it. as follow: `I love Choco\&chips`
 				The following picture, taken from the Minecraft Wiki, illustrates the color codes:</p>
 				<img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/7e/Minecraft_Formatting.gif/revision/latest/scale-to-width-down/292?cb=20200828001454" />
 			]],
