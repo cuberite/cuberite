@@ -8,7 +8,7 @@
 
 
 
-ePointOfInterestType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+ePoiType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	switch (a_BlockType)
 	{
@@ -31,7 +31,7 @@ ePointOfInterestType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockT
 
 		case E_BLOCK_BREWING_STAND:
 		{
-			return poiCleric;
+			return ePoiType::poiCleric;
 		}
 
 		/*
@@ -53,7 +53,7 @@ ePointOfInterestType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockT
 
 		case E_BLOCK_CAULDRON:
 		{
-			return poiLetherworker;
+			return ePoiType::poiLetherworker;
 		}
 
 		/*
@@ -88,11 +88,11 @@ ePointOfInterestType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockT
 		{
 			if (a_BlockMeta & E_BLOCK_BED_BED_HEAD)
 			{
-				return poiHome;
+				return ePoiType::poiHome;
 			}
 			else
 			{
-				return poiNone;
+				return ePoiType::poiNone;
 			}
 		}
 
@@ -115,7 +115,7 @@ ePointOfInterestType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockT
 
 		case E_BLOCK_NETHER_PORTAL:
 		{
-			return poiNetherPortal;
+			return ePoiType::poiNetherPortal;
 		}
 
 		/*
@@ -132,7 +132,7 @@ ePointOfInterestType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockT
 
 		default:
 		{
-			return poiNone;
+			return ePoiType::poiNone;
 		}
 	}
 }
@@ -141,41 +141,41 @@ ePointOfInterestType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockT
 
 
 
-unsigned char cPointOfInterest::GetMaxFreeTickets(ePointOfInterestType a_Type)
+unsigned char cPointOfInterest::GetMaxFreeTickets(ePoiType a_Type)
 {
 	// those values can be found at https://minecraft.fandom.com/wiki/Java_Edition_level_format#poi_format
 
 	switch (a_Type)
 	{
-		case poiArmorer:
-		case poiButcher:
-		case poiCartographer:
-		case poiCleric:
-		case poiFarmer:
-		case poiFisherman:
-		case poiFletcher:
-		case poiLetherworker:
-		case poiLibrairian:
-		case poiMason:
-		case poiShepherd:
-		case poiToolsmith:
-		case poiWeaponsmith:
-		case poiHome:
+		case ePoiType::poiArmorer:
+		case ePoiType::poiButcher:
+		case ePoiType::poiCartographer:
+		case ePoiType::poiCleric:
+		case ePoiType::poiFarmer:
+		case ePoiType::poiFisherman:
+		case ePoiType::poiFletcher:
+		case ePoiType::poiLetherworker:
+		case ePoiType::poiLibrairian:
+		case ePoiType::poiMason:
+		case ePoiType::poiShepherd:
+		case ePoiType::poiToolsmith:
+		case ePoiType::poiWeaponsmith:
+		case ePoiType::poiHome:
 		{
 			return 1;
 		}
 
-		case poiMeeting:
+		case ePoiType::poiMeeting:
 		{
 			return 32;
 		}
 
-		case poiBeehive:
-		case poiBeeNest:
-		case poiNetherPortal:
-		case poiLodestone:
-		case poiLightningRod:
-		case poiNone:
+		case ePoiType::poiBeehive:
+		case ePoiType::poiBeeNest:
+		case ePoiType::poiNetherPortal:
+		case ePoiType::poiLodestone:
+		case ePoiType::poiLightningRod:
+		case ePoiType::poiNone:
 		{
 			return 0;
 		}
