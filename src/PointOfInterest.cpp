@@ -86,7 +86,7 @@ ePointOfInterestType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockT
 		// The bed is a special case: only the head is a poi
 		case E_BLOCK_BED:
 		{
-			if ((a_BlockMeta >> 3 & 1) == 1)
+			if (a_BlockMeta & E_BLOCK_BED_BED_HEAD)
 			{
 				return poiHome;
 			}
