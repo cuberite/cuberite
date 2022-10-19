@@ -168,7 +168,12 @@ unsigned char cPointOfInterest::GetMaxFreeTickets(ePointOfInterestType a_Type)
 			return 32;
 		}
 
-	default:
+		case poiBeehive:
+		case poiBeeNest:
+		case poiNetherPortal:
+		case poiLodestone:
+		case poiLightningRod:
+		case poiNone:
 		{
 			return 0;
 		}
