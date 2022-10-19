@@ -143,6 +143,8 @@ ePointOfInterestType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockT
 
 unsigned char cPointOfInterest::GetMaxFreeTickets(ePointOfInterestType a_Type)
 {
+	// those values can be found at https://minecraft.fandom.com/wiki/Java_Edition_level_format#poi_format
+
 	switch (a_Type)
 	{
 		case poiArmorer:
