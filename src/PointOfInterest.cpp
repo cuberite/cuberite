@@ -141,7 +141,7 @@ ePointOfInterestType cPointOfInterest::GetPointOnInterestType(BLOCKTYPE a_BlockT
 
 
 
-int cPointOfInterest::GetMaxFreeTickets(ePointOfInterestType a_Type)
+unsigned char cPointOfInterest::GetMaxFreeTickets(ePointOfInterestType a_Type)
 {
 	switch (a_Type)
 	{

@@ -57,7 +57,7 @@ public:
 		m_FreeTickets(GetMaxFreeTickets(m_Type)) {}
 
 	static ePointOfInterestType GetPointOnInterestType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	static int GetMaxFreeTickets(ePointOfInterestType a_Type);
+	static unsigned char GetMaxFreeTickets(ePointOfInterestType a_Type);
 
 	static std::string GetPoiTypeName(ePointOfInterestType a_Type);
 	static ePointOfInterestType GetPoiFromString(const std::string & a_PoiName);
@@ -65,15 +65,15 @@ public:
 	// Getters
 	const Vector3i & GetBlockPosition() const { return m_BlockPosition; }
 	ePointOfInterestType GetPoiType() const { return m_Type; }
-	int GetTicketsRemaining() const { return m_FreeTickets; }
+	unsigned char GetTicketsRemaining() const { return m_FreeTickets; }
 
 	void RemoveTicket() { m_FreeTickets = std::max(0, m_FreeTickets - 1); }
-	void AddTicket() { m_FreeTickets = std::min(GetMaxFreeTickets(m_Type), m_FreeTickets + 1); }
+	void AddTicket() { m_FreeTickets = std::min<unsigned char>(GetMaxFreeTickets(m_Type), m_FreeTickets + 1); }
 
 private:
 
 	Vector3i m_BlockPosition;
 	ePointOfInterestType m_Type;
-	int m_FreeTickets;
+	unsigned char m_FreeTickets;
 
 };
