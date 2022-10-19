@@ -406,7 +406,7 @@ public:
 		return UnboundedRelFastSetBlock({a_RelX, a_RelY, a_RelZ}, a_BlockType, a_BlockMeta);
 	}
 
-	const ChunkPoiData::PoiArray & GetPoies(size_t a_Y) { return m_PoiData.GetPoies(a_Y); }
+	const cChunkPoiData::PoiArray & GetPoies(size_t a_Y) { return m_PoiData.GetPoies(a_Y); }
 	void AddPoi(const cPointOfInterest & a_Poi) { m_PoiData.AddPoi(a_Poi); }
 	void RemovePoi(Vector3i a_Position) { m_PoiData.RemovePoi(a_Position); }
 
@@ -512,7 +512,7 @@ private:
 
 	ChunkBlockData m_BlockData;
 	ChunkLightData m_LightData;
-	ChunkPoiData m_PoiData;
+	cChunkPoiData m_PoiData;
 
 	cChunkDef::HeightMap m_HeightMap;
 	cChunkDef::BiomeMap  m_BiomeMap;

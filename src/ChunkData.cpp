@@ -229,7 +229,7 @@ void ChunkLightData::SetSection(const SectionType & a_BlockLightSource, const Se
 
 
 
-void ChunkPoiData::Assign(const ChunkPoiData & a_Other)
+void cChunkPoiData::Assign(const cChunkPoiData & a_Other)
 {
 	m_Poies = std::move(a_Other.m_Poies);
 }
@@ -238,7 +238,7 @@ void ChunkPoiData::Assign(const ChunkPoiData & a_Other)
 
 
 
-void ChunkPoiData::AddPoi(const cPointOfInterest & a_Poi)
+void cChunkPoiData::AddPoi(const cPointOfInterest & a_Poi)
 {
 	m_Poies.at(a_Poi.GetBlockPosition().y % 16).push_back(a_Poi);
 }
@@ -247,7 +247,7 @@ void ChunkPoiData::AddPoi(const cPointOfInterest & a_Poi)
 
 
 
-void ChunkPoiData::RemovePoi(Vector3i a_Position)
+void cChunkPoiData::RemovePoi(Vector3i a_Position)
 {
 	PoiArray & SectionPoies = m_Poies.at(a_Position.y % 16);
 	auto It = std::find_if(SectionPoies.begin(), SectionPoies.end(), [&a_Position](const cPointOfInterest & a_Poi)

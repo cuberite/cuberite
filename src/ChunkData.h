@@ -131,7 +131,7 @@ public:
 
 
 
-class ChunkPoiData
+class cChunkPoiData
 {
 private:
 
@@ -141,7 +141,7 @@ public:
 
 	using PoiArray = decltype(m_Poies)::value_type;
 
-	void Assign(const ChunkPoiData & a_Other);
+	void Assign(const cChunkPoiData & a_Other);
 
 	void AddPoi(const cPointOfInterest & a_Poi);
 	// Only removes POI if it exists
