@@ -274,7 +274,7 @@ std::string_view NamespaceSerializer::From(const BannerPattern a_Pattern)
 
 
 
-std::string_view From(ePoiType a_ID)
+std::string_view NamespaceSerializer::From(ePoiType a_ID)
 {
 	switch (a_ID)
 	{
@@ -585,7 +585,7 @@ eMonsterType NamespaceSerializer::ToMonsterType(const std::string_view a_ID)
 
 
 
-ePoiType ToPoiType(std::string_view a_ID)
+ePoiType NamespaceSerializer::ToPoiType(std::string_view a_ID)
 {
 	static const std::unordered_map<std::string_view, ePoiType> PoiTypes
 	{
