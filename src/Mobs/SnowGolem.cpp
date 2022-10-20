@@ -5,6 +5,7 @@
 #include "SnowGolem.h"
 #include "../BlockInfo.h"
 #include "../World.h"
+#include "../Entities/ThrownSnowballEntity.h"
 
 
 
@@ -55,4 +56,40 @@ void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			Chunk->SetBlock(Rel, E_BLOCK_SNOW, 0);
 		}
 	}
+}
+
+
+
+
+
+bool cSnowGolem::Attack(std::chrono::milliseconds a_Dt)
+{
+	UNUSED(a_Dt);
+
+	// Comment inherited from skeletons
+	StopMovingToPosition();  // Todo handle this in a better way, the snowman does some uneeded recalcs due to inStateChasing
+
+	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0))
+	{
+		auto & Random = GetRandomProvider();
+		Vector3d Inaccuracy = Vector3d(Random.RandReal<double>(-0.75, 0.75), Random.RandReal<double>(-0.75, 0.75), Random.RandReal<double>(-0.75, 0.75));
+
+		// The projectile is launched from the head
+		const auto HeadPos = GetPosition().addedY(1.5);
+		// It aims around the head / chest
+		const auto TargetPos = GetTarget()->GetPosition().addedY(GetTarget()->GetHeight() * 0.75);
+		// With this data, we can calculate the speed
+		const auto Speed = (TargetPos + Inaccuracy - HeadPos) * 5;
+
+		auto Snowball = std::make_unique<cThrownSnowballEntity>(this, HeadPos, Speed);
+		auto SnowballPtr = Snowball.get();
+		if (!SnowballPtr->Initialize(std::move(Snowball), *GetWorld()))
+		{
+			return false;
+		}
+
+		ResetAttackCooldown();
+		return true;
+	}
+	return false;
 }

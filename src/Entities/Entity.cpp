@@ -16,6 +16,7 @@
 #include "../FastRandom.h"
 #include "../NetherPortalScanner.h"
 #include "../BoundingBox.h"
+#include "../WorldStorage/NamespaceSerializer.h"
 
 
 
@@ -134,12 +135,34 @@ bool cEntity::Initialize(OwnedEntity a_Self, cWorld & a_EntityWorld)
 
 
 
+void cEntity::OnAcquireSpectator(cPlayer & a_Player)
+{
+	m_Spectators.push_back(&a_Player);
+}
+
+
+
+
+
 void cEntity::OnAddToWorld(cWorld & a_World)
 {
 	// Spawn the entity on the clients:
 	m_LastSentPosition = GetPosition();
 	a_World.BroadcastSpawnEntity(*this);
 	BroadcastLeashedMobs();
+}
+
+
+
+
+
+void cEntity::OnLoseSpectator(cPlayer & a_Player)
+{
+	const auto Spectator = std::find(m_Spectators.begin(), m_Spectators.end(), &a_Player);
+
+	ASSERT(Spectator != m_Spectators.end());
+	std::swap(*Spectator, m_Spectators.back());
+	m_Spectators.pop_back();
 }
 
 
@@ -153,6 +176,13 @@ void cEntity::OnRemoveFromWorld(cWorld & a_World)
 	{
 		m_LeashedMobs.front()->Unleash(false, true);
 	}
+
+	for (const auto Player : m_Spectators)
+	{
+		Player->OnLoseSpectated();
+	}
+
+	m_Spectators.clear();
 
 	if (m_AttachedTo != nullptr)
 	{
@@ -1101,7 +1131,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	// Get water direction
-	Vector3f WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
+	Vector3f WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection({BlockX, BlockY, BlockZ});
 
 	m_WaterSpeed *= 0.9;  // Reduce speed each tick
 
@@ -1403,7 +1433,7 @@ bool cEntity::DetectPortal()
 		return false;
 	}
 
-	if (const auto Position = m_Position.Floor(); cChunkDef::IsValidHeight(Position.y))
+	if (const auto Position = m_Position.Floor(); cChunkDef::IsValidHeight(Position))
 	{
 		switch (GetWorld()->GetBlock(Position))
 		{
@@ -2335,16 +2365,7 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 		}
 		else
 		{
-			// Tamed ocelots are really cats in vanilla.
-			if (Monster->IsTame() && (Monster->GetClass() == AString("cOcelot")))
-			{
-				Name = "Cat";
-			}
-			else
-			{
-				Name = Monster->GetClass();
-				Name.erase(Name.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
-			}
+			Name = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
 		}
 	}
 	else
@@ -2398,12 +2419,22 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 		{
 			GetWorld()->BroadcastChatDeath(DeathMessage);
 		}
-	}
-	else
+	}  // This will trigger if a player / tamed pet has been killed by another mob / tamed pet.
+	else if (a_TDI.Attacker->IsMob())
 	{
-		AString KillerClass = a_TDI.Attacker->GetClass();
-		KillerClass.erase(KillerClass.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
-		AString DeathMessage = Printf("%s was killed by a %s", Name.c_str(), KillerClass.c_str());
+		cMonster * Monster = static_cast<cMonster *>(a_TDI.Attacker);
+
+		AString DeathMessage;
+		if (Monster->HasCustomName())
+		{
+			DeathMessage = Printf("%s was killed by %s", Name.c_str(), Monster->GetCustomName().c_str());
+		}
+		else
+		{
+			AString KillerName = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
+			DeathMessage = Printf("%s was killed by a %s", Name.c_str(), KillerName.c_str());
+		}
+
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
 		if (DeathMessage != AString(""))
 		{

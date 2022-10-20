@@ -747,7 +747,7 @@ static int tolua_cWorld_FastSetBlock(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
@@ -903,7 +903,7 @@ static int tolua_cWorld_GetBlock(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		L.Push(E_BLOCK_AIR);
 		return 1;
@@ -959,7 +959,7 @@ static int tolua_cWorld_GetBlockBlockLight(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
@@ -1016,7 +1016,7 @@ static int tolua_cWorld_GetBlockInfo(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
@@ -1083,7 +1083,7 @@ static int tolua_cWorld_GetBlockMeta(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		L.Push(0);
 		return 1;
@@ -1139,7 +1139,7 @@ static int tolua_cWorld_GetBlockSkyLight(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
@@ -1196,7 +1196,7 @@ static int tolua_cWorld_GetBlockTypeMeta(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		L.Push(E_BLOCK_AIR, 0);
 		return 2;
@@ -1470,7 +1470,7 @@ static int tolua_cWorld_SetBlock(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
@@ -1528,7 +1528,7 @@ static int tolua_cWorld_SetBlockMeta(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
@@ -1570,7 +1570,7 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 	}
 
 	// Call the function:
-	bool res = Self->SetSignLines(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4);
+	bool res = Self->SetSignLines({BlockX, BlockY, BlockZ}, Line1, Line2, Line3, Line4);
 
 	// Push the returned values:
 	L.Push(res);

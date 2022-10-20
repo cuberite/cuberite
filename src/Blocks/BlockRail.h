@@ -326,8 +326,10 @@ private:
 
 	static bool IsNotConnected(cChunkInterface  & a_ChunkInterface, Vector3i a_Pos, eBlockFace a_BlockFace, char a_Pure = 0)
 	{
-		AddFaceDirection(a_Pos.x, a_Pos.y, a_Pos.z, a_BlockFace, false);
+		a_Pos = AddFaceDirection(a_Pos, a_BlockFace, false);
+
 		NIBBLETYPE Meta;
+
 		if (!IsBlockRail(a_ChunkInterface.GetBlock(a_Pos)))
 		{
 			if (!IsBlockRail(a_ChunkInterface.GetBlock(a_Pos + Vector3i(0, 1, 0))) || (a_Pure != E_PURE_UPDOWN))

@@ -66,6 +66,10 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 		case cProtocol::Version::v1_13_1:  return "1.13.1";
 		case cProtocol::Version::v1_13_2:  return "1.13.2";
 		case cProtocol::Version::v1_14:    return "1.14";
+		case cProtocol::Version::v1_14_1:  return "1.14.1";
+		case cProtocol::Version::v1_14_2:  return "1.14.2";
+		case cProtocol::Version::v1_14_3:  return "1.14.3";
+		case cProtocol::Version::v1_14_4:  return "1.14.4";
 	}
 
 	ASSERT(!"Unknown protocol version");
@@ -87,6 +91,11 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 	if (!m_Buffer.Write(a_Data.data(), a_Data.size()))
 	{
 		a_Client.PacketBufferFull();
+		return;
+	}
+
+	if (TryHandleHTTPRequest(a_Client, a_Data))
+	{
 		return;
 	}
 
@@ -238,6 +247,37 @@ void cMultiVersionProtocol::SendDisconnect(cClientHandle & a_Client, const AStri
 
 
 
+bool cMultiVersionProtocol::TryHandleHTTPRequest(cClientHandle & a_Client, ContiguousByteBuffer & a_Data)
+{
+	const auto RedirectUrl = cRoot::Get()->GetServer()->GetCustomRedirectUrl();
+
+	if (RedirectUrl.empty())
+	{
+		return false;
+	}
+
+	ContiguousByteBuffer Buffer;
+	m_Buffer.ReadSome(Buffer, 10U);
+	m_Buffer.ResetRead();
+
+	// The request line, hastily decoded with the hope that it's encoded in US-ASCII.
+	const std::string_view Value(reinterpret_cast<const char *>(Buffer.data()), Buffer.size());
+
+	if (Value == u8"GET / HTTP")
+	{
+		const auto Response = fmt::format(u8"HTTP/1.0 303 See Other\r\nLocation: {}\r\n\r\n", cRoot::Get()->GetServer()->GetCustomRedirectUrl());
+		a_Client.SendData({ reinterpret_cast<const std::byte *>(Response.data()), Response.size() });
+		a_Client.Destroy();
+		return true;
+	}
+
+	return false;
+}
+
+
+
+
+
 std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(cClientHandle & a_Client)
 {
 	UInt32 PacketType;
@@ -302,6 +342,11 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		case static_cast<UInt32>(cProtocol::Version::v1_13_1): return std::make_unique<cProtocol_1_13_1>(&a_Client, ServerAddress, NextState);
 		case static_cast<UInt32>(cProtocol::Version::v1_13_2): return std::make_unique<cProtocol_1_13_2>(&a_Client, ServerAddress, NextState);
 		case static_cast<UInt32>(cProtocol::Version::v1_14):   return std::make_unique<cProtocol_1_14>  (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_1): return std::make_unique<cProtocol_1_14_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_2): return std::make_unique<cProtocol_1_14_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_3): return std::make_unique<cProtocol_1_14_3>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_4): return std::make_unique<cProtocol_1_14_4>(&a_Client, ServerAddress, NextState);
+
 		default:
 		{
 			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",

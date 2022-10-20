@@ -88,6 +88,7 @@ AString cPacketizer::PacketTypeToStr(cProtocol::ePacketType a_PacketType)
 		case cProtocol::pktExplosion:              return "pktExplosion";
 		case cProtocol::pktGameMode:               return "pktGameMode";
 		case cProtocol::pktHeldItemChange:         return "pktHeldItemChange";
+		case cProtocol::pktHorseWindowOpen:        return "pktHorseWindowOpen";
 		case cProtocol::pktInventorySlot:          return "pktInventorySlot";
 		case cProtocol::pktJoinGame:               return "pktJoinGame";
 		case cProtocol::pktKeepAlive:              return "pktKeepAlive";

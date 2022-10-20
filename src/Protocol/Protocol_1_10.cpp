@@ -48,19 +48,6 @@ Implements the 1.10 protocol classes:
 
 
 
-#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!ByteBuf.Proc(Var))\
-		{\
-			return;\
-		} \
-	} while (false)
-
-
-
-
-
 // The disabled error is intended, since the Metadata have overlapping indexes
 // based on the type of the Entity.
 //
@@ -311,16 +298,16 @@ namespace Metadata
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_10_0:
 
-void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
+void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSoundEffect);
 	Pkt.WriteString(a_SoundName);
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
-	Pkt.WriteBEInt32(FloorC(a_X * 8.0));
-	Pkt.WriteBEInt32(FloorC(a_Y * 8.0));
-	Pkt.WriteBEInt32(FloorC(a_Z * 8.0));
+	Pkt.WriteBEInt32(FloorC(a_Origin.x * 8.0));
+	Pkt.WriteBEInt32(FloorC(a_Origin.y * 8.0));
+	Pkt.WriteBEInt32(FloorC(a_Origin.z * 8.0));
 	Pkt.WriteBEFloat(a_Volume);
 	Pkt.WriteBEFloat(a_Pitch);
 }
@@ -795,6 +782,19 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtSheep
 
+		case mtSkeleton:
+		{
+			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
+			a_Pkt.WriteBEUInt8(LIVING_ACTIVE_HAND);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEUInt8(Skeleton.IsChargingBow() ? 0x01 : 0x00);
+
+			a_Pkt.WriteBEUInt8(SKELETON_ARMS_SWINGING);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Skeleton.IsChargingBow());
+			break;
+		}  // case mtSkeleton
+
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -958,7 +958,6 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 		case mtIronGolem:
 		case mtMooshroom:
 		case mtSilverfish:
-		case mtSkeleton:
 		case mtSnowGolem:
 		case mtStray:
 		case mtSpider:

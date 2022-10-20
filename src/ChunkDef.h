@@ -164,10 +164,10 @@ public:
 	}
 
 
-	/** Validates a height-coordinate. Returns false if height-coordiante is out of height bounds */
-	inline static bool IsValidHeight(int a_Height)
+	/** Validates a height-coordinate. Returns false if height-coordinate is out of height bounds */
+	inline static bool IsValidHeight(Vector3i a_BlockPosition)
 	{
-		return ((a_Height >= 0) && (a_Height < Height));
+		return ((a_BlockPosition.y >= 0) && (a_BlockPosition.y < Height));
 	}
 
 
@@ -183,7 +183,7 @@ public:
 	{
 		return (
 			IsValidWidth(a_RelPos.x) &&
-			IsValidHeight(a_RelPos.y) &&
+			IsValidHeight(a_RelPos) &&
 			IsValidWidth(a_RelPos.z)
 		);
 	}

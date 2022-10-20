@@ -26,7 +26,7 @@ ForEachSourceCallback::ForEachSourceCallback(const cChunk & Chunk, const Vector3
 
 void ForEachSourceCallback::operator()(Vector3i Location)
 {
-	if (!cChunkDef::IsValidHeight(Location.y))
+	if (!cChunkDef::IsValidHeight(Location))
 	{
 		return;
 	}
@@ -40,7 +40,7 @@ void ForEachSourceCallback::operator()(Vector3i Location)
 	const auto PotentialSourceBlock = NeighbourChunk->GetBlock(Location);
 	const auto NeighbourRelativeQueryPosition = cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(m_Chunk, *NeighbourChunk, m_Position);
 
-	if (ShouldQueryLinkedPosition(PotentialSourceBlock))
+	if (!cBlockInfo::IsTransparent(PotentialSourceBlock))
 	{
 		Power = std::max(Power, QueryLinkedPower(*NeighbourChunk, NeighbourRelativeQueryPosition, m_CurrentBlock, Location));
 	}
@@ -88,32 +88,6 @@ void ForEachSourceCallback::CheckIndirectPower()
 
 
 
-bool ForEachSourceCallback::ShouldQueryLinkedPosition(const BLOCKTYPE Block)
-{
-	switch (Block)
-	{
-		// Normally we don't ask solid blocks for power because they don't have any (stone, dirt, etc.)
-		// However, these are mechanisms that are IsSolid, but still give power. Don't ignore them:
-		case E_BLOCK_BLOCK_OF_REDSTONE:
-		case E_BLOCK_DAYLIGHT_SENSOR:
-		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
-		case E_BLOCK_OBSERVER:
-		case E_BLOCK_TRAPPED_CHEST: return false;
-
-		// Pistons are solid but don't participate in link powering:
-		case E_BLOCK_PISTON:
-		case E_BLOCK_PISTON_EXTENSION:
-		case E_BLOCK_STICKY_PISTON: return false;
-
-		// If a mechanism asks for power from a block, redirect the query to linked positions if:
-		default: return cBlockInfo::IsSolid(Block);
-	}
-}
-
-
-
-
-
 PowerLevel ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const Vector3i QueryPosition, const BLOCKTYPE QueryBlock, const Vector3i SolidBlockPosition)
 {
 	PowerLevel Power = 0;
@@ -122,7 +96,7 @@ PowerLevel ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const V
 	for (const auto & Offset : cSimulator::GetLinkedOffsets(SolidBlockPosition - QueryPosition))
 	{
 		auto SourcePosition = QueryPosition + Offset;
-		if (!cChunkDef::IsValidHeight(SourcePosition.y))
+		if (!cChunkDef::IsValidHeight(SourcePosition))
 		{
 			continue;
 		}

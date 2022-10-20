@@ -173,6 +173,17 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
+	if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
+	{
+		// Check if the rail is still there
+		if (m_World->GetBlock(m_DetectorRailPosition) == E_BLOCK_DETECTOR_RAIL)
+		{
+			m_World->SetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
+		}
+
+		m_bIsOnDetectorRail = false;
+	}
+
 	BLOCKTYPE InsideType;
 	NIBBLETYPE InsideMeta;
 	chunk->GetBlockTypeMeta(relPos, InsideType, InsideMeta);
@@ -198,7 +209,6 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	bool WasDetectorRail = false;
 	if (IsBlockRail(InsideType))
 	{
 		if (InsideType == E_BLOCK_RAIL)
@@ -217,8 +227,9 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			case E_BLOCK_POWERED_RAIL: HandlePoweredRailPhysics(InsideMeta); break;
 			case E_BLOCK_DETECTOR_RAIL:
 			{
+				m_DetectorRailPosition = Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
+				m_bIsOnDetectorRail = true;
 				HandleDetectorRailPhysics(InsideMeta, a_Dt);
-				WasDetectorRail = true;
 				break;
 			}
 			default: VERIFY(!"Unhandled rail type despite checking if block was rail!"); break;
@@ -231,17 +242,6 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Not on rail, default physics
 		SetPosY(floor(GetPosY()) + 0.35);  // HandlePhysics overrides this if minecart can fall, else, it is to stop ground clipping minecart bottom when off-rail
 		Super::HandlePhysics(a_Dt, *chunk);
-	}
-
-	if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
-	{
-		m_World->SetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
-		m_bIsOnDetectorRail = false;
-	}
-	else if (WasDetectorRail)
-	{
-		m_bIsOnDetectorRail = true;
-		m_DetectorRailPosition = Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
 	}
 
 	// Enforce speed limit:

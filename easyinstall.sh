@@ -22,7 +22,7 @@ if [ "$KERNEL" = "Linux" ]; then
 		# Assume that all arm devices are a raspi for now.
 		arm*) DOWNLOADURL="https://download.cuberite.org/linux-armhf-raspbian/Cuberite.tar.gz" ;;
 		# Allow install on Raspberry Pi 4 Ubuntu x64 (AArch64) using the ARM builds.
-		"aarch64") DOWNLOADURL="https://download.cuberite.org/linux-armhf-raspbian/Cuberite.tar.gz"
+		"aarch64") DOWNLOADURL="https://download.cuberite.org/linux-aarch64/Cuberite.tar.gz"
 	esac
 elif [ "$KERNEL" = "Darwin" ]; then
 	# All Darwins we care about are x86_64

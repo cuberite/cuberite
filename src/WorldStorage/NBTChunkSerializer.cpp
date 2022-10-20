@@ -893,6 +893,9 @@ public:
 					const cVillager *Villager = static_cast<const cVillager *>(a_Monster);
 					mWriter.AddInt("Profession", Villager->GetVilType());
 					mWriter.AddInt("Age",        Villager->GetAge());
+					mWriter.BeginList("Inventory", TAG_Compound);
+						AddItemGrid(Villager->GetInventory());
+					mWriter.EndList();
 					break;
 				}
 				case mtWither:
@@ -1038,7 +1041,7 @@ public:
 					mWriter.AddShort("xTile", static_cast<Int16>(Arrow->GetBlockHit().x));
 					mWriter.AddShort("yTile", static_cast<Int16>(Arrow->GetBlockHit().y));
 					mWriter.AddShort("zTile", static_cast<Int16>(Arrow->GetBlockHit().z));
-					mWriter.AddByte("pickup",   Arrow->GetPickupState());
+					mWriter.AddByte("pickup", static_cast<unsigned char>(Arrow->GetPickupState()));
 					mWriter.AddDouble("damage", Arrow->GetDamageCoeff());
 					break;
 				}
@@ -1061,6 +1064,7 @@ public:
 				case cProjectileEntity::pkFireCharge:
 				case cProjectileEntity::pkWitherSkull:
 				case cProjectileEntity::pkEnderPearl:
+				case cProjectileEntity::pkSnowball:
 				{
 					break;
 				}

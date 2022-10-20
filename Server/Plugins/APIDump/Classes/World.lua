@@ -2245,6 +2245,16 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Returns whether the configuration has DeepSnow enabled.",
 			},
+			IsFarmlandTramplingEnabled =
+			{
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns true if farmland trampling is enabled.",
+			},
 			IsGameModeAdventure =
 			{
 				Returns =
