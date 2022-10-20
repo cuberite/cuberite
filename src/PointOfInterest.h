@@ -30,7 +30,7 @@ public:
 	ePoiType GetPoiType() const { return m_Type; }
 	unsigned char GetTicketsRemaining() const { return m_FreeTickets; }
 
-	void RemoveTicket() { m_FreeTickets = std::max(0, m_FreeTickets - 1); }
+	void RemoveTicket() { m_FreeTickets = std::max<unsigned char>(0, m_FreeTickets - 1); }
 	void AddTicket() { m_FreeTickets = std::min<unsigned char>(GetMaxFreeTickets(m_Type), m_FreeTickets + 1); }
 
 private:
