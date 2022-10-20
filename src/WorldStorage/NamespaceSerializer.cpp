@@ -612,7 +612,7 @@ ePoiType ToPoiType(std::string_view a_ID)
 	};
 
 	return PoiTypes.at(a_ID);
-}  
+}
 
 
 
