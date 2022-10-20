@@ -240,7 +240,7 @@ void cChunkPoiData::Assign(const cChunkPoiData & a_Other)
 
 void cChunkPoiData::AddPoi(const cPointOfInterest & a_Poi)
 {
-	m_Poies.at(a_Poi.GetBlockPosition().y / cChunkDef::SectionHeight).push_back(a_Poi);
+	m_Poies.at(static_cast<std::size_t>(a_Poi.GetBlockPosition().y / cChunkDef::SectionHeight)).push_back(a_Poi);
 }
 
 
@@ -249,7 +249,7 @@ void cChunkPoiData::AddPoi(const cPointOfInterest & a_Poi)
 
 void cChunkPoiData::RemovePoi(Vector3i a_Position)
 {
-	PoiArray & SectionPoies = m_Poies.at(a_Position.y / cChunkDef::SectionHeight);
+	PoiArray & SectionPoies = m_Poies.at(static_cast<std::size_t>(a_Position.y / cChunkDef::SectionHeight));
 	auto It = std::find_if(SectionPoies.begin(), SectionPoies.end(), [&a_Position](const cPointOfInterest & a_Poi)
 	{
 		return a_Position == a_Poi.GetBlockPosition();
