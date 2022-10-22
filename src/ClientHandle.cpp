@@ -1887,8 +1887,10 @@ void cClientHandle::HandleUseItem(bool a_UsedMainHand)
 void cClientHandle::HandleResourcePack(UInt8 a_Status)
 {
 	// Kick player if client declined the resource pack
-	if (a_Status == 1)
+	if ((a_Status == 1) && cRoot::Get()->GetServer()->ShouldRequireResourcePack())
+	{
 		Kick("You must accept the resource pack");
+	}
 }
 
 
