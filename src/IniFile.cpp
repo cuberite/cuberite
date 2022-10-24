@@ -19,7 +19,6 @@
 
 // C++ Includes
 #include <fstream>
-#include <regex>
 
 // C Includes
 #include <ctype.h>
@@ -60,7 +59,6 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 	AString   keyname, rawvalue, valuename, value;
 	AString::size_type pLeft, pRight;
 	bool IsFromExampleRedirect = false;
-	regex newlineregex(R"(\\n)");
 
 
 	f.open((a_FileName).c_str(), ios::in);
@@ -149,7 +147,8 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 			{
 				valuename = line.substr(0, pLeft);
 				rawvalue = TrimString(line.substr(pLeft + 1));
-				value = regex_replace(rawvalue, newlineregex, "\n");
+				value = rawvalue;
+				ReplaceString(value, "\\n", "\n");
 				AddValue(keyname, valuename, value);
 				break;
 			}
@@ -195,7 +194,6 @@ bool cIniFile::WriteFile(const AString & a_FileName) const
 	// a few bugs with ofstream. So ... fstream used.
 	fstream f;
 	AString runvalue, writevalue;
-	regex newlineregex(R"(\n)");
 
 	f.open((a_FileName).c_str(), ios::out);
 	if (f.fail())
@@ -229,7 +227,8 @@ bool cIniFile::WriteFile(const AString & a_FileName) const
 		for (size_t valueID = 0; valueID < m_Keys[keyID].m_Names.size(); ++valueID)
 		{
 			runvalue = m_Keys[keyID].m_Values[valueID];
-			writevalue = regex_replace(runvalue, newlineregex, "\\n");
+			writevalue = runvalue;
+			ReplaceString(writevalue, "\n", "\\n");
 			f << m_Keys[keyID].m_Names[valueID] << '=' << writevalue << iniEOL;
 		}
 		f << iniEOL;
