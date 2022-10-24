@@ -391,7 +391,7 @@ void cCompositeChat::AddChatPartStyle(Json::Value & a_Value, const AString & a_P
 				LOGERROR("Value s in AddChatPartStyle() is deprecated");
 			case 'm': a_Value["strikethrough"] = Json::Value(true); break;
 			case 'u':  // Deprecated
-				LOG("Value u in AddChatPartStyle() is deprecated");
+				LOGERROR("Value u in AddChatPartStyle() is deprecated");
 			case 'n': a_Value["underlined"] = Json::Value(true); break;
 			case 'i':  // Deprecated
 				LOG("Value i in AddChatPartStyle() is deprecated");
