@@ -1,4 +1,5 @@
 build/
+build*/
 nbproject/
 ipch/
 Win32/
@@ -122,3 +123,6 @@ build-cuberite
 # clang-tidy
 tidy-build
 run-clang-tidy.py
+
+# ctags output
+tags
