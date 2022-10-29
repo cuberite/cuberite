@@ -71,17 +71,35 @@ public:
 		return ((m_ItemType <= 0) || (m_ItemCount <= 0));
 	}
 
-	/* Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.)
+	/* Returns true if this item stack can stack with the specified stack (types match, enchantments etc.)
 	ItemCounts are ignored. */
 	bool IsEqual(const cItem & a_Item) const
 	{
+		cEnchantments enchantmentLhs, enchantmentRhs;
+		if (get<cEnchantments>(enchantmentLhs) != a_Item.get<cEnchantments>(enchantmentRhs))
+		{
+			return false;
+		}
+
+		cDisplayProperties displayLhs, displayRhs;
+		if (get<cDisplayProperties>(displayLhs)!= a_Item.get<cDisplayProperties>(displayRhs))
+		{
+			return false;
+		}
+
+		cFireworkItem fireworkLhs, fireworkRhs;
+		if (get<cFireworkItem>(fireworkLhs)!= a_Item.get<cFireworkItem>(fireworkRhs))
+		{
+			return false;
+		}
+
 		return (
 			IsSameType(a_Item) &&
 			(m_ItemDamage == a_Item.m_ItemDamage) &&
-			(m_Enchantments == a_Item.m_Enchantments) &&
-			(m_CustomName == a_Item.m_CustomName) &&
-			(m_LoreTable == a_Item.m_LoreTable) &&
-			m_FireworkItem.IsEqualTo(a_Item.m_FireworkItem)
+			(enchantmentLhs == enchantmentRhs) &&
+			(displayLhs.m_CustomName == displayRhs.m_CustomName) &&
+			(displayLhs.m_LoreTable == displayRhs.m_LoreTable) &&
+			fireworkLhs.IsEqualTo(fireworkRhs)
 		);
 	}
 
@@ -94,12 +112,34 @@ public:
 
 	bool IsBothNameAndLoreEmpty(void) const
 	{
-		return (m_CustomName.empty() && m_LoreTable.empty());
+		cDisplayProperties displayProperties;
+		if (!get<cDisplayProperties>(displayProperties))
+		{
+			return false;
+		}
+		return (displayProperties.m_CustomName.empty() && displayProperties.m_LoreTable.empty());
 	}
 
 
-	bool IsCustomNameEmpty(void) const { return (m_CustomName.empty()); }
-	bool IsLoreEmpty(void) const { return (m_LoreTable.empty()); }
+	bool IsCustomNameEmpty(void) const
+	{
+		cDisplayProperties displayProperties;
+		if (!get<cDisplayProperties>(displayProperties))
+		{
+			return false;
+		}
+		return displayProperties.m_CustomName.empty();
+	}
+
+	bool IsLoreEmpty(void) const
+	{
+		cDisplayProperties displayProperties;
+		if (!get<cDisplayProperties>(displayProperties))
+		{
+			return false;
+		}
+		return (displayProperties.m_LoreTable.empty());
+	}
 
 	/** Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items */
 	cItem CopyOne(void) const;
@@ -159,16 +199,52 @@ public:
 	bool CanHaveEnchantment(int a_EnchantmentID);
 
 	// tolua_begin
-
 	short          m_ItemType;
 	char           m_ItemCount;
 	short          m_ItemDamage;
-	cEnchantments  m_Enchantments;
-	AString        m_CustomName;
-
+	int            m_RepairCost;
 	// tolua_end
 
-	AStringVector  m_LoreTable;  // Exported in ManualBindings.cpp
+
+	// https://minecraft.fandom.com/wiki/Tutorials/Command_NBT_tags#Items
+	struct cDisplayProperties
+	{
+		AString m_CustomName;
+		AStringVector  m_LoreTable;  // Exported in ManualBindings.cpp
+		cColor m_Color;
+	};
+
+	struct cAdditionalBlockProperties
+	{
+		std::vector<std::pair<ENUM_BLOCK_TYPE, unsigned char>> m_CanPlaceOn;
+
+	};
+
+	std::vector<std::variant<
+		cEnchantments,
+		// cEntityTag,
+		cDisplayProperties,
+		// cAttributes,
+		// bool, // unbreakable
+		// AString, // SkullOwner
+		// cHideFlags,
+		// std::unique_ptr<cBlockEntity>,
+		cFireworkItem
+	>> m_Properties;
+
+	template <class type>
+	bool get(type & a_Value) const
+	{
+		for (auto & property : m_Properties)
+		{
+			if (std::holds_alternative<type>(property))
+			{
+				a_Value = std::get<type>(property);
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	Compares two items for the same type or category. Type of item is defined
@@ -189,17 +265,11 @@ public:
 			}
 			if ((a_Lhs.m_ItemDamage == -1) || (a_Rhs.m_ItemDamage == -1))
 			{
-				return false;  // -1 is a wildcard, damage of -1 alway compares equal
+				return false;  // -1 is a wildcard, damage of -1 always compares equal
 			}
 			return (a_Lhs.m_ItemDamage < a_Rhs.m_ItemDamage);
 		}
 	};
-
-	// tolua_begin
-
-	int            m_RepairCost;
-	cFireworkItem  m_FireworkItem;
-	cColor         m_ItemColor;
 };
 // tolua_end
 
