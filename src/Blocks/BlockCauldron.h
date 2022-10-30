@@ -102,12 +102,19 @@ private:
 			case E_ITEM_LEATHER_PANTS:
 			case E_ITEM_LEATHER_TUNIC:
 			{
+				auto DisplayProperties = EquippedItem.get<cItem::cDisplayProperties>();
+				if (!DisplayProperties.has_value())
+				{
+					break;
+				}
 				// Resets any color to default:
-				if ((Meta > 0) && ((EquippedItem.m_ItemColor.GetRed() != 255) || (EquippedItem.m_ItemColor.GetBlue() != 255) || (EquippedItem.m_ItemColor.GetGreen() != 255)))
+				if ((Meta > 0) && ((DisplayProperties.value().m_Color.GetRed() != 255) || (DisplayProperties.value().m_Color.GetBlue() != 255) || (DisplayProperties.value().m_Color.GetGreen() != 255)))
 				{
 					a_ChunkInterface.SetBlockMeta(a_BlockPos, --Meta);
 					auto NewItem = cItem(EquippedItem);
-					NewItem.m_ItemColor.Clear();
+					auto newDisplayProperties = NewItem.get<cItem::cDisplayProperties>().value_or(cItem::cDisplayProperties());
+					DisplayProperties->m_Color.Clear();
+					NewItem.set<cItem::cDisplayProperties>(newDisplayProperties);
 					a_Player.ReplaceOneEquippedItemTossRest(NewItem);
 				}
 				break;

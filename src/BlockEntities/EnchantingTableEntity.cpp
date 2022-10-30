@@ -22,7 +22,9 @@ cEnchantingTableEntity::cEnchantingTableEntity(BLOCKTYPE a_BlockType, NIBBLETYPE
 cItems cEnchantingTableEntity::ConvertToPickups() const
 {
 	cItem Item(E_BLOCK_ENCHANTMENT_TABLE);
-	Item.m_CustomName = m_CustomName;
+	cItem::cDisplayProperties DisplayProperties;
+	DisplayProperties.m_CustomName = std::move(m_CustomName);
+	Item.set<cItem::cDisplayProperties>(DisplayProperties);
 	return Item;
 }
 

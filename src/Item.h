@@ -59,10 +59,6 @@ public:
 	#endif
 
 	/** Empties the item and frees up any dynamic storage used by the internals. */
-	void Empty(void);
-
-	/** Empties the item and frees up any dynamic storage used by the internals.
-	TODO: What is the usage difference? Merge with Empty()? */
 	void Clear(void);
 
 	/** Returns true if the item represents an empty stack - either the type is invalid, or count is zero. */
@@ -75,31 +71,27 @@ public:
 	ItemCounts are ignored. */
 	bool IsEqual(const cItem & a_Item) const
 	{
-		cEnchantments enchantmentLhs, enchantmentRhs;
-		if (get<cEnchantments>(enchantmentLhs) != a_Item.get<cEnchantments>(enchantmentRhs))
-		{
-			return false;
-		}
-
-		cDisplayProperties displayLhs, displayRhs;
-		if (get<cDisplayProperties>(displayLhs)!= a_Item.get<cDisplayProperties>(displayRhs))
-		{
-			return false;
-		}
-
-		cFireworkItem fireworkLhs, fireworkRhs;
-		if (get<cFireworkItem>(fireworkLhs)!= a_Item.get<cFireworkItem>(fireworkRhs))
-		{
-			return false;
-		}
+		auto displayLhs = get<cDisplayProperties>();
+		auto displayRhs = a_Item.get<cDisplayProperties>();
 
 		return (
 			IsSameType(a_Item) &&
 			(m_ItemDamage == a_Item.m_ItemDamage) &&
-			(enchantmentLhs == enchantmentRhs) &&
-			(displayLhs.m_CustomName == displayRhs.m_CustomName) &&
-			(displayLhs.m_LoreTable == displayRhs.m_LoreTable) &&
-			fireworkLhs.IsEqualTo(fireworkRhs)
+			(get<cEnchantments>().value_or(cEnchantments()) == a_Item.get<cEnchantments>().value_or(cEnchantments())) &&
+			(get<cFireworkItem>().value_or(cFireworkItem()).IsEqualTo(a_Item.get<cFireworkItem>().value_or(cFireworkItem()))) &&
+			(
+				(
+					displayLhs.has_value() &&
+					displayRhs.has_value() &&
+					(displayLhs.value().m_CustomName == displayRhs.value().m_CustomName) &&
+					(displayLhs.value().m_LoreTable == displayRhs.value().m_LoreTable)
+				)
+				||
+				(
+					!displayLhs.has_value() &&
+					!displayRhs.has_value()
+				)
+			)
 		);
 	}
 
@@ -112,33 +104,33 @@ public:
 
 	bool IsBothNameAndLoreEmpty(void) const
 	{
-		cDisplayProperties displayProperties;
-		if (!get<cDisplayProperties>(displayProperties))
+		auto DisplayProperties = get<cDisplayProperties>();
+		if (!DisplayProperties.has_value())
 		{
 			return false;
 		}
-		return (displayProperties.m_CustomName.empty() && displayProperties.m_LoreTable.empty());
+		return (DisplayProperties.value().m_CustomName.empty() && DisplayProperties.value().m_LoreTable.empty());
 	}
 
 
 	bool IsCustomNameEmpty(void) const
 	{
-		cDisplayProperties displayProperties;
-		if (!get<cDisplayProperties>(displayProperties))
+		auto DisplayProperties = get<cDisplayProperties>();
+		if (!DisplayProperties.has_value())
 		{
 			return false;
 		}
-		return displayProperties.m_CustomName.empty();
+		return DisplayProperties.value().m_CustomName.empty();
 	}
 
 	bool IsLoreEmpty(void) const
 	{
-		cDisplayProperties displayProperties;
-		if (!get<cDisplayProperties>(displayProperties))
+		auto DisplayProperties = get<cDisplayProperties>();
+		if (!DisplayProperties.has_value())
 		{
 			return false;
 		}
-		return (displayProperties.m_LoreTable.empty());
+		return (DisplayProperties.value().m_LoreTable.empty());
 	}
 
 	/** Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items */
@@ -225,25 +217,54 @@ public:
 		// cEntityTag,
 		cDisplayProperties,
 		// cAttributes,
-		// bool, // unbreakable
-		// AString, // SkullOwner
+		// bool,  // unbreakable
+		// AString,  // SkullOwner
 		// cHideFlags,
 		// std::unique_ptr<cBlockEntity>,
 		cFireworkItem
 	>> m_Properties;
 
+	/** Returns the requested property, if there is none present, the optional will handle this */
 	template <class type>
-	bool get(type & a_Value) const
+	std::optional<type> get() const
 	{
 		for (auto & property : m_Properties)
 		{
 			if (std::holds_alternative<type>(property))
 			{
-				a_Value = std::get<type>(property);
-				return true;
+				return std::get<type>(property);
 			}
 		}
-		return false;
+		return {};
+	}
+
+	/** replaces the property if present, if not saves it */
+	template <class type>
+	void set(const type & a_Value)
+	{
+		for (auto & property : m_Properties)
+		{
+			if (std::holds_alternative<type>(property))
+			{
+				property = a_Value;
+				return;
+			}
+		}
+		m_Properties.template emplace_back(a_Value);
+	}
+
+	/** Only Sets a value if there is none present */
+	template <class type>
+	void SafeSet(const type & a_Value)
+	{
+		for (auto & property : m_Properties)
+	{
+			if (std::holds_alternative<type>(property))
+			{
+				return;
+			}
+		}
+		m_Properties.emplace_back(a_Value);
 	}
 
 	/**
@@ -270,8 +291,7 @@ public:
 			return (a_Lhs.m_ItemDamage < a_Rhs.m_ItemDamage);
 		}
 	};
-};
-// tolua_end
+};  // tolua_export
 
 
 

@@ -132,7 +132,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 
 				if (Slot.m_ItemCount <= 0)
 				{
-					Slot.Empty();
+					Slot.Clear();
 				}
 			}
 			else if ((Slot.m_ItemType <= 0) || DraggingItem.IsEqual(Slot))
@@ -150,7 +150,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 				}
 				if (DraggingItem.m_ItemCount <= 0)
 				{
-					DraggingItem.Empty();
+					DraggingItem.Clear();
 				}
 			}
 			else if (!DraggingItem.IsEqual(Slot))
@@ -188,7 +188,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 				DraggingItem.m_ItemCount -= Filling;
 				if (DraggingItem.m_ItemCount <= 0)
 				{
-					DraggingItem.Empty();
+					DraggingItem.Clear();
 				}
 			}
 			break;
@@ -220,7 +220,7 @@ void cSlotArea::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_
 	if (Slot.IsEmpty())
 	{
 		// Empty the slot completely, the client doesn't like left-over ItemType with zero count
-		Slot.Empty();
+		Slot.Clear();
 	}
 	SetSlot(a_SlotNum, a_Player, Slot);
 
@@ -297,7 +297,7 @@ void cSlotArea::DropClicked(cPlayer & a_Player, int a_SlotNum, bool a_DropStack)
 	Slot.m_ItemCount -= ItemToDrop.m_ItemCount;
 	if (Slot.m_ItemCount <= 0)
 	{
-		Slot.Empty();
+		Slot.Clear();
 	}
 	SetSlot(a_SlotNum, a_Player, Slot);
 
@@ -939,8 +939,8 @@ void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 	cItem NewItem = cItem(Slot);
 	NewItem.m_ItemCount += DraggingItem.m_ItemCount;
 
-	Slot.Empty();
-	DraggingItem.Empty();
+	Slot.Clear();
+	DraggingItem.Clear();
 	SetSlot(a_SlotNum, a_Player, Slot);
 
 	DraggingItem = NewItem;
@@ -976,7 +976,7 @@ void cSlotAreaAnvil::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem
 	m_ParentWindow.DistributeStack(Slot, a_SlotNum, a_Player, this, true);
 	if (Slot.IsEmpty())
 	{
-		Slot.Empty();
+		Slot.Clear();
 		OnTakeResult(a_Player);
 	}
 	SetSlot(a_SlotNum, a_Player, Slot);
@@ -1132,7 +1132,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 	if (Target.IsEmpty())
 	{
-		Output.Empty();
+		Output.Clear();
 		SetSlot(2, a_Player, Output);
 		m_ParentWindow.SetProperty(0, 0);
 		m_MaximumCost = 0;
@@ -1142,7 +1142,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	m_MaximumCost = 0;
 	m_StackSizeToBeUsedInRepair = 0;
 	int RepairCost = Target.m_RepairCost;
-	int NeedExp = 0;
+	unsigned int NeedExp = 0;
 	if (!Sacrifice.IsEmpty())
 	{
 		RepairCost += Sacrifice.m_RepairCost;
@@ -1155,7 +1155,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			if (DamageDiff <= 0)
 			{
 				// No enchantment
-				Output.Empty();
+				Output.Clear();
 				SetSlot(2, a_Player, Output);
 				m_ParentWindow.SetProperty(0, 0);
 				m_MaximumCost = 0;
@@ -1168,7 +1168,13 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			while ((DamageDiff > 0) && (NumItemsConsumed < Sacrifice.m_ItemCount))
 			{
 				Output.m_ItemDamage -= static_cast<char>(DamageDiff);
-				NeedExp += std::max(1, DamageDiff / 100) + static_cast<int>(Target.m_Enchantments.Count());
+				auto Enchantments = Target.get<cEnchantments>();
+				if (Enchantments.has_value())
+				{
+					NeedExp += Enchantments.value().Count();
+				}
+
+				NeedExp += std::max(1, DamageDiff / 100);
 				DamageDiff = std::min(static_cast<int>(Output.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
 
 				++NumItemsConsumed;
@@ -1183,7 +1189,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			if (!IsEnchantBook && (!Target.IsSameType(Sacrifice) || !Target.IsDamageable()))
 			{
 				// No enchantment
-				Output.Empty();
+				Output.Clear();
 				SetSlot(2, a_Player, Output);
 				m_ParentWindow.SetProperty(0, 0);
 				m_MaximumCost = 0;
@@ -1216,38 +1222,36 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		}
 	}
 
-	int NameChangeExp = 0;
+	unsigned int NameChangeExp = 0;
 	const AString & RepairedItemName = static_cast<cAnvilWindow*>(&m_ParentWindow)->GetRepairedItemName();
+	auto TargetDisplayProperties = Target.get<cItem::cDisplayProperties>().value_or(cItem::cDisplayProperties());
+	auto OutputDisplayProperties = Output.get<cItem::cDisplayProperties>().value_or(cItem::cDisplayProperties());
 	if (RepairedItemName.empty())
 	{
 		// Remove custom name
-		if (!Target.m_CustomName.empty())
+		if (!TargetDisplayProperties.m_CustomName.empty())
 		{
 			NameChangeExp = (Target.IsDamageable()) ? 7 : (Target.m_ItemCount * 5);
 			NeedExp += NameChangeExp;
-			Output.m_CustomName = "";
+			OutputDisplayProperties.m_CustomName = "";
 		}
 	}
-	else if (RepairedItemName != Target.m_CustomName)
+	else if (RepairedItemName != TargetDisplayProperties.m_CustomName)
 	{
 		// Change custom name
 		NameChangeExp = (Target.IsDamageable()) ? 7 : (Target.m_ItemCount * 5);
 		NeedExp += NameChangeExp;
 
-		if (!Target.m_CustomName.empty())
+		if (!TargetDisplayProperties.m_CustomName.empty())
 		{
 			RepairCost += NameChangeExp / 2;
 		}
 
-		Output.m_CustomName = RepairedItemName;
+		OutputDisplayProperties.m_CustomName = RepairedItemName;
 	}
+	Output.set<cItem::cDisplayProperties>(OutputDisplayProperties);
 
 	m_MaximumCost = RepairCost + NeedExp;
-
-	if (NeedExp < 0)
-	{
-		Output.Empty();
-	}
 
 	if ((NameChangeExp == NeedExp) && (NameChangeExp > 0) && (m_MaximumCost >= 40))
 	{
@@ -1255,13 +1259,13 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	}
 	if ((m_MaximumCost >= 40) && !a_Player.IsGameModeCreative())
 	{
-		Output.Empty();
+		Output.Clear();
 	}
 
 	if (!Output.IsEmpty())
 	{
 		RepairCost = std::max(Target.m_RepairCost, Sacrifice.m_RepairCost);
-		if (!Output.m_CustomName.empty())
+		if (!OutputDisplayProperties.m_CustomName.empty())
 		{
 			RepairCost -= 9;
 		}
@@ -1273,7 +1277,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	// If after everything, output will be the same then no point enchanting:
 	if (Target.IsEqual(Output))
 	{
-		Output.Empty();
+		Output.Clear();
 		m_MaximumCost = 0;
 	}
 
@@ -1392,7 +1396,7 @@ void cSlotAreaBeacon::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_
 	if (DraggingItem.IsEmpty())
 	{
 		DraggingItem = Slot;
-		Slot.Empty();
+		Slot.Clear();
 	}
 	else if (Slot.IsEmpty())
 	{
@@ -1405,7 +1409,7 @@ void cSlotAreaBeacon::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_
 		DraggingItem.m_ItemCount -= 1;
 		if (DraggingItem.m_ItemCount <= 0)
 		{
-			DraggingItem.Empty();
+			DraggingItem.Clear();
 		}
 	}
 	else if (DraggingItem.m_ItemCount == 1)
@@ -1444,7 +1448,7 @@ void cSlotAreaBeacon::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, b
 	{
 		SetSlot(0, a_Player, a_ItemStack.CopyOne());
 	}
-	a_ItemStack.Empty();
+	a_ItemStack.Clear();
 }
 
 
@@ -1591,7 +1595,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 
 		if (DraggingItem.m_ItemCount <= 0)
 		{
-			DraggingItem.Empty();
+			DraggingItem.Clear();
 		}
 	}
 	else if ((DraggingItem.m_ItemCount == 1) && !DraggingItem.IsEqual(Slot))
@@ -1648,7 +1652,7 @@ void cSlotAreaEnchanting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Playe
 	a_ItemStack.m_ItemCount -= 1;
 	if (a_ItemStack.m_ItemCount <= 0)
 	{
-		a_ItemStack.Empty();
+		a_ItemStack.Clear();
 	}
 }
 
@@ -1692,10 +1696,12 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 {
 	cItem Item = *GetSlot(0, a_Player);
 
-	if (!cItem::IsEnchantable(Item.m_ItemType) || !Item.m_Enchantments.IsEmpty())
+	auto EnchantmentsOptional = Item.get<cEnchantments>();
+	if (!cItem::IsEnchantable(Item.m_ItemType) || !EnchantmentsOptional.has_value())
 	{
 		return;
 	}
+	auto Enchantments = EnchantmentsOptional.value();
 
 	// Pseudocode found at: https://minecraft.gamepedia.com/Enchanting_mechanics
 	const auto Bookshelves = std::min(GetBookshelvesCount(*a_Player.GetWorld()), 15U);
@@ -1725,23 +1731,25 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 		// Enchant based on the number of levels:
 		EnchantedItem.EnchantByXPLevels(OptionLevels[i], Random);
 
-		LOGD("Generated enchanted item %d with enchantments: %s", i, EnchantedItem.m_Enchantments.ToString());
+		LOGD("Generated enchanted item %d with enchantments: %s", i, Enchantments.ToString());
 
 		// Send the level requirement for the enchantment option:
 		m_ParentWindow.SetProperty(i, static_cast<short>(OptionLevels[i]));
 
 		// Get the first enchantment ID, which must exist:
-		ASSERT(EnchantedItem.m_Enchantments.begin() != EnchantedItem.m_Enchantments.end());
-		const auto EnchantmentID = static_cast<short>(EnchantedItem.m_Enchantments.begin()->first);
+		ASSERT(Enchantments.begin() != Enchantments.end());
+		const auto EnchantmentID = static_cast<short>(Enchantments.begin()->first);
 
 		// Send the enchantment ID of the first enchantment on our item:
 		m_ParentWindow.SetProperty(4 + i, EnchantmentID);
 
-		const auto EnchantmentLevel = static_cast<short>(EnchantedItem.m_Enchantments.GetLevel(EnchantmentID));
+		const auto EnchantmentLevel = static_cast<short>(Enchantments.GetLevel(EnchantmentID));
 		ASSERT(EnchantmentLevel > 0);
 
 		// Send the level for the first enchantment on our item:
 		m_ParentWindow.SetProperty(7 + i, EnchantmentLevel);
+
+		EnchantedItem.set<cEnchantments>(Enchantments);
 
 		// Store the item we've enchanted as an option to be retrieved later:
 		m_EnchantedItemOptions[i] = std::move(EnchantedItem);
@@ -1966,7 +1974,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 
 			DraggingItem.m_ItemCount += Slot.m_ItemCount;
 			HandleSmeltItem(Slot, a_Player);
-			Slot.Empty();
+			Slot.Clear();
 		}
 		else
 		{
@@ -1981,7 +1989,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 				{
 					DraggingItem = Slot;
 					HandleSmeltItem(Slot, a_Player);
-					Slot.Empty();
+					Slot.Clear();
 					break;
 				}
 				case caRightClick:
@@ -1992,7 +2000,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 
 					if (Slot.m_ItemCount <= 0)
 					{
-						Slot.Empty();
+						Slot.Clear();
 					}
 					HandleSmeltItem(DraggingItem, a_Player);
 					break;
@@ -2750,7 +2758,7 @@ void cSlotAreaTemporary::TossItems(cPlayer & a_Player, int a_Begin, int a_End)
 		{
 			Drops.push_back(Item);
 		}
-		Item.Empty();
+		Item.Clear();
 	}  // for i - itr->second[]
 
 	a_Player.TossItems(Drops);

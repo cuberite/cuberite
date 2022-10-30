@@ -225,7 +225,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d
 	m_CreatorData(
 		((a_Creator != nullptr) ? a_Creator->GetUniqueID() : cEntity::INVALID_ID),
 		((a_Creator != nullptr) ? (a_Creator->IsPlayer() ? static_cast<cPlayer *>(a_Creator)->GetName() : "") : ""),
-		((a_Creator != nullptr) ? a_Creator->GetEquippedWeapon().m_Enchantments : cEnchantments())
+		((a_Creator != nullptr) ? a_Creator->GetEquippedWeapon().get<cEnchantments>().value_or(cEnchantments()) : cEnchantments())
 	),
 	m_IsInGround(false)
 {
@@ -277,7 +277,8 @@ std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(
 		case pkFirework:
 		{
 			ASSERT(a_Item != nullptr);
-			if (a_Item->m_FireworkItem.m_Colours.empty())
+			auto fireworkItem = a_Item->get<cFireworkItem>();
+			if (!fireworkItem.has_value() || fireworkItem.value().m_Colours.empty())
 			{
 				return nullptr;
 			}

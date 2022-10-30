@@ -275,7 +275,7 @@ cItem GetIniItemSet(cIniFile & a_IniFile, const char * a_Section, const char * a
 	cItem res;
 	if (!StringToItem(ItemStr, res))
 	{
-		res.Empty();
+		res.Clear();
 	}
 	return res;
 }

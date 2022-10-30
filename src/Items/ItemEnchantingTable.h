@@ -36,7 +36,13 @@ private:
 		{
 			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_ENCHANTMENT_TABLE);
 
-			static_cast<cEnchantingTableEntity &>(a_BlockEntity).SetCustomName(a_HeldItem.m_CustomName);
+			if (
+				auto DisplayProperties = a_HeldItem.get<cItem::cDisplayProperties>();
+				DisplayProperties.has_value()
+			)
+			{
+				static_cast<cEnchantingTableEntity &>(a_BlockEntity).SetCustomName(DisplayProperties.value().m_CustomName);
+			}
 			return false;
 		});
 

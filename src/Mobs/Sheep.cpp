@@ -48,7 +48,11 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	unsigned int LootingLevel = 0;
 	if (a_Killer != nullptr)
 	{
-		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+		auto Enchantments = a_Killer->GetEquippedWeapon().get<cEnchantments>();
+		if (Enchantments.has_value())
+		{
+			LootingLevel = Enchantments.value().GetLevel(cEnchantments::enchLooting);
+		}
 	}
 	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? E_ITEM_COOKED_MUTTON : E_ITEM_RAW_MUTTON);
 }

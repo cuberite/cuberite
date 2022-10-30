@@ -283,7 +283,7 @@ public:
 		}
 
 		// Write the tag compound (for enchantment, firework, custom name and repair cost):
-		if (!a_Item.m_Properties.empty())
+		if (!a_Item.m_Properties.empty() || a_Item.m_RepairCost > 0)
 		{
 			mWriter.BeginCompound("tag");
 				if (a_Item.m_RepairCost > 0)
@@ -295,7 +295,7 @@ public:
 				{
 					std::visit(OverloadedVariantAccess
 					{
-						[&](cItem::cDisplayProperties &a_Property)
+						[&](const cItem::cDisplayProperties &a_Property)
 						{
 							if ((a_Property.m_CustomName != "") || (!a_Property.m_LoreTable.empty()))
 							{
@@ -318,21 +318,21 @@ public:
 								mWriter.EndCompound();
 							}
 						},
-						[&](cFireworkItem & a_Property)
+						[&](const cFireworkItem & a_Property)
 						{
 							if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
 							{
 								cFireworkItem::WriteToNBTCompound(a_Property, mWriter, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
 							}
 						},
-						[&](cEnchantments & a_Property)
+						[&](const cEnchantments & a_Property)
 						{
 							if (!a_Property.IsEmpty())
 							{
 								const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
 								EnchantmentSerializer::WriteToNBTCompound(a_Property, mWriter, TagName);
 							}
-						},
+						}
 					}, property);
 				}
 			mWriter.EndCompound();

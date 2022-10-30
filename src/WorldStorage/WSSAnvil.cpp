@@ -708,7 +708,7 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 
 	if (a_Item.m_ItemType < 0)
 	{
-		a_Item.Empty();
+		a_Item.Clear();
 		return true;
 	}
 
@@ -743,26 +743,28 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	int DisplayTag = a_NBT.FindChildByName(TagTag, "display");
 	if (DisplayTag > 0)
 	{
+		cItem::cDisplayProperties DisplayProperties;
 		int DisplayName = a_NBT.FindChildByName(DisplayTag, "Name");
 		if ((DisplayName > 0) && (a_NBT.GetType(DisplayName) == TAG_String))
 		{
-			a_Item.m_CustomName = a_NBT.GetString(DisplayName);
+			DisplayProperties.m_CustomName = a_NBT.GetString(DisplayName);
 		}
 		int Lore = a_NBT.FindChildByName(DisplayTag, "Lore");
 		if ((Lore > 0) && (a_NBT.GetType(Lore) == TAG_String))
 		{
 			// Legacy string lore
-			a_Item.m_LoreTable = StringSplit(a_NBT.GetString(Lore), "`");
+			DisplayProperties.m_LoreTable = StringSplit(a_NBT.GetString(Lore), "`");
 		}
 		else if ((Lore > 0) && (a_NBT.GetType(Lore) == TAG_List))
 		{
 			// Lore table
-			a_Item.m_LoreTable.clear();
+			DisplayProperties.m_LoreTable.clear();
 			for (int loretag = a_NBT.GetFirstChild(Lore); loretag >= 0; loretag = a_NBT.GetNextSibling(loretag))  // Loop through array of strings
 			{
-				a_Item.m_LoreTable.push_back(a_NBT.GetString(loretag));
+				DisplayProperties.m_LoreTable.push_back(a_NBT.GetString(loretag));
 			}
 		}
+		a_Item.set<cItem::cDisplayProperties>(DisplayProperties);
 	}
 
 	// Load enchantments:
@@ -770,14 +772,18 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	int EnchTag = a_NBT.FindChildByName(TagTag, EnchName);
 	if (EnchTag > 0)
 	{
-		EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, a_NBT, EnchTag);
+		cEnchantments Enchantments;
+		EnchantmentSerializer::ParseFromNBT(Enchantments, a_NBT, EnchTag);
+		a_Item.set<cEnchantments>(Enchantments);
 	}
 
 	// Load firework data:
 	int FireworksTag = a_NBT.FindChildByName(TagTag, ((a_Item.m_ItemType == E_ITEM_FIREWORK_STAR) ? "Explosion" : "Fireworks"));
 	if (FireworksTag > 0)
 	{
-		cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, a_NBT, FireworksTag, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+		cFireworkItem fireworkItem;
+		cFireworkItem::ParseFromNBT(fireworkItem, a_NBT, FireworksTag, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+		a_Item.set<cFireworkItem>(fireworkItem);
 	}
 
 	return true;

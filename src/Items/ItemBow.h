@@ -79,9 +79,21 @@ public:
 			0.5,
 			static_cast<float>(Force)
 		);
+
+		auto Enchantments = a_Player->GetEquippedWeapon().get<cEnchantments>();
+		if (!Enchantments.has_value())
+		{
+			if (!a_Player->IsGameModeCreative())
+			{
+				a_Player->GetInventory().RemoveItem(cItem(E_ITEM_ARROW));
+				a_Player->UseEquippedItem();
+			}
+			return;
+		}
+
 		if (!a_Player->IsGameModeCreative())
 		{
-			if (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchInfinity) == 0)
+			if (Enchantments.value().GetLevel(cEnchantments::enchInfinity) == 0)
 			{
 				a_Player->GetInventory().RemoveItem(cItem(E_ITEM_ARROW));
 			}
@@ -92,7 +104,7 @@ public:
 
 			a_Player->UseEquippedItem();
 		}
-		if (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchFlame) > 0)
+		if (Enchantments.value().GetLevel(cEnchantments::enchFlame) > 0)
 		{
 			ArrowPtr->StartBurning(100);
 		}

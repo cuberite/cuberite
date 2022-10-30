@@ -1317,39 +1317,44 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 		{
 			case TAG_List:
 			{
+				cEnchantments Enchantments;
 				if ((TagName == "ench") || (TagName == "StoredEnchantments"))  // Enchantments tags
 				{
-					EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
+					EnchantmentSerializer::ParseFromNBT(Enchantments, NBT, tag);
 				}
+				a_Item.set<cEnchantments>(Enchantments);
 				break;
 			}
 			case TAG_Compound:
 			{
 				if (TagName == "display")  // Custom name and lore tag
 				{
+					cItem::cDisplayProperties DisplayProperties;
 					for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0; displaytag = NBT.GetNextSibling(displaytag))
 					{
-						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name"))  // Custon name tag
+						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name"))  // Custom name tag
 						{
-							a_Item.m_CustomName = NBT.GetString(displaytag);
+							DisplayProperties.m_CustomName = NBT.GetString(displaytag);
 						}
 						else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore"))  // Lore tag
 						{
-							a_Item.m_LoreTable.clear();
 							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag))  // Loop through array of strings
 							{
-								a_Item.m_LoreTable.push_back(NBT.GetString(loretag));
+								DisplayProperties.m_LoreTable.push_back(NBT.GetString(loretag));
 							}
 						}
 						else if ((NBT.GetType(displaytag) == TAG_Int) && (NBT.GetName(displaytag) == "color"))
 						{
-							a_Item.m_ItemColor.m_Color = static_cast<unsigned int>(NBT.GetInt(displaytag));
+							DisplayProperties.m_Color.m_Color = (static_cast<unsigned int>(NBT.GetInt(displaytag)));
 						}
 					}
+					a_Item.set<cItem::cDisplayProperties>(DisplayProperties);
 				}
 				else if ((TagName == "Fireworks") || (TagName == "Explosion"))
 				{
-					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+					cFireworkItem fireworkItem;
+					cFireworkItem::ParseFromNBT(fireworkItem, NBT, tag, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+					a_Item.set<cFireworkItem>(fireworkItem);
 				}
 				else if (TagName == "EntityTag")
 				{
@@ -1808,7 +1813,15 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
 	}
 
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (ItemType != E_ITEM_FIREWORK_ROCKET) && (ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid() && (ItemType != E_ITEM_POTION) && (ItemType != E_ITEM_SPAWN_EGG))
+	if (
+		!a_Item.get<cEnchantments>().has_value() &&
+		a_Item.IsBothNameAndLoreEmpty() &&
+		(ItemType != E_ITEM_FIREWORK_ROCKET) &&
+		(ItemType != E_ITEM_FIREWORK_STAR) &&
+		(ItemType != E_ITEM_POTION) &&
+		(ItemType != E_ITEM_SPAWN_EGG) &&
+		!a_Item.get<cItem::cDisplayProperties>().value_or(cItem::cDisplayProperties()).m_Color.IsValid()
+		)
 	{
 		a_Pkt.WriteBEInt8(0);
 		return;
@@ -1821,28 +1834,34 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	{
 		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
 	}
-	if (!a_Item.m_Enchantments.IsEmpty())
+	if (
+		auto Enchantments = a_Item.get<cEnchantments>();
+		Enchantments.has_value() || !Enchantments.value().IsEmpty()
+		)
 	{
 		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
+		EnchantmentSerializer::WriteToNBTCompound(Enchantments.value(), Writer, TagName);
 	}
-	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
+	if (
+		auto DisplayProperties = a_Item.get<cItem::cDisplayProperties>();
+			!a_Item.IsBothNameAndLoreEmpty() || (DisplayProperties.has_value() && DisplayProperties.value().m_Color.IsValid())
+			)
 	{
 		Writer.BeginCompound("display");
-		if (a_Item.m_ItemColor.IsValid())
+		if (DisplayProperties.value().m_Color.IsValid())
 		{
-			Writer.AddInt("color", static_cast<Int32>(a_Item.m_ItemColor.m_Color));
+			Writer.AddInt("color", static_cast<Int32>(DisplayProperties.value().m_Color.m_Color));
 		}
 
 		if (!a_Item.IsCustomNameEmpty())
 		{
-			Writer.AddString("Name", a_Item.m_CustomName);
+			Writer.AddString("Name", DisplayProperties.value().m_CustomName);
 		}
 		if (!a_Item.IsLoreEmpty())
 		{
 			Writer.BeginList("Lore", TAG_String);
 
-			for (const auto & Line : a_Item.m_LoreTable)
+			for (const auto & Line : DisplayProperties.value().m_LoreTable)
 			{
 				Writer.AddString("", Line);
 			}
@@ -1851,9 +1870,13 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		}
 		Writer.EndCompound();
 	}
-	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
+	if (
+		auto fireworkItem = a_Item.get<cFireworkItem>();
+			((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR)) &&
+			fireworkItem.has_value()
+			)
 	{
-		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+		cFireworkItem::WriteToNBTCompound(fireworkItem.value(), Writer, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
 	}
 	if (a_Item.m_ItemType == E_ITEM_POTION)
 	{

@@ -693,9 +693,12 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 	Super::OnRightClicked(a_Player);
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
-	if ((EquippedItem.m_ItemType == E_ITEM_NAME_TAG) && !EquippedItem.m_CustomName.empty())
+	if (
+		auto DisplayProperties = EquippedItem.get<cItem::cDisplayProperties>();
+		(EquippedItem.m_ItemType == E_ITEM_NAME_TAG) && !DisplayProperties.value_or(cItem::cDisplayProperties()).m_CustomName.empty()
+	)
 	{
-		SetCustomName(EquippedItem.m_CustomName);
+		SetCustomName(DisplayProperties.value().m_CustomName);
 		if (!a_Player.IsGameModeCreative())
 		{
 			a_Player.GetInventory().RemoveOneEquippedItem();

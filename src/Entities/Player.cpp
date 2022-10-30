@@ -1352,7 +1352,7 @@ void cPlayer::UpdateCapabilities()
 	}
 	else if (IsGameModeSpectator())
 	{
-		m_DraggingItem.Empty();  // Clear the current dragging item of spectators.
+		m_DraggingItem.Clear();  // Clear the current dragging item of spectators.
 		m_IsFlightCapable = true;
 		m_IsFlying = true;  // Spectators are always in flight mode.
 		m_IsVisible = false;  // Spectators are invisible.
@@ -1777,7 +1777,7 @@ void cPlayer::TossHeldItem(char a_Amount)
 		}
 		else
 		{
-			Item.Empty();
+			Item.Clear();
 		}
 	}
 
@@ -2070,7 +2070,13 @@ void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
 	}
 
 	// Ref: https://minecraft.gamepedia.com/Enchanting#Unbreaking
-	unsigned int UnbreakingLevel = Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking);
+	unsigned int UnbreakingLevel = 0;
+	auto Enchantments = Item.get<cEnchantments>();
+	if (Enchantments.has_value())
+	{
+		UnbreakingLevel = Enchantments.value().GetLevel(cEnchantments::enchUnbreaking);
+	}
+
 	double chance = ItemCategory::IsArmor(Item.m_ItemType)
 		? (0.6 + (0.4 / (UnbreakingLevel + 1))) : (1.0 / (UnbreakingLevel + 1));
 
@@ -2616,7 +2622,12 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 	{
 		if (MiningSpeed > 1.0f)  // If the base multiplier for this block is greater than 1, now we can check enchantments
 		{
-			unsigned int EfficiencyModifier = GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchEfficiency);
+			unsigned int EfficiencyModifier = 0;
+			auto Enchantments = GetEquippedItem().get<cEnchantments>();
+			if (Enchantments.has_value())
+			{
+				EfficiencyModifier = Enchantments.value().GetLevel(cEnchantments::eEnchantment::enchEfficiency);
+			}
 			if (EfficiencyModifier > 0)  // If an efficiency enchantment is present, apply formula as on wiki
 			{
 				MiningSpeed += (EfficiencyModifier * EfficiencyModifier) + 1;
@@ -2652,7 +2663,10 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 	}
 
 	// 5x speed loss for being in water
-	if (IsInsideWater() && !(GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) > 0))
+	if (
+		auto Enchantments = GetEquippedItem().get<cEnchantments>();
+		IsInsideWater() && (Enchantments.has_value() && (Enchantments.value().GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) > 0))
+	)
 	{
 		MiningSpeed /= 5.0f;
 	}

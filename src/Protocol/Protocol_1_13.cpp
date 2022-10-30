@@ -698,7 +698,7 @@ bool cProtocol_1_13::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t
 	if (ItemID == -1)
 	{
 		// The item is empty, no more data follows
-		a_Item.Empty();
+		a_Item.Clear();
 		return true;
 	}
 
@@ -710,7 +710,7 @@ bool cProtocol_1_13::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t
 	a_Item.m_ItemCount = ItemCount;
 	if (ItemCount <= 0)
 	{
-		a_Item.Empty();
+		a_Item.Clear();
 	}
 
 	ContiguousByteBuffer Metadata;
@@ -1521,7 +1521,7 @@ bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size
 	if (!Present)
 	{
 		// The item is empty, no more data follows
-		a_Item.Empty();
+		a_Item.Clear();
 		return true;
 	}
 
@@ -1534,7 +1534,7 @@ bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size
 	a_Item.m_ItemCount = ItemCount;
 	if (ItemCount <= 0)
 	{
-		a_Item.Empty();
+		a_Item.Clear();
 	}
 
 	ContiguousByteBuffer Metadata;

@@ -41,7 +41,11 @@ void cRabbit::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	unsigned int LootingLevel = 0;
 	if (a_Killer != nullptr)
 	{
-		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+		auto Enchantments = a_Killer->GetEquippedWeapon().get<cEnchantments>();
+		if (Enchantments.has_value())
+		{
+			LootingLevel = Enchantments.value().GetLevel(cEnchantments::enchLooting);
+		}
 	}
 	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, IsOnFire() ? E_ITEM_COOKED_RABBIT : E_ITEM_RAW_RABBIT);
 	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_RABBIT_HIDE);

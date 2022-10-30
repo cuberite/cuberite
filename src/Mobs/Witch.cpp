@@ -22,7 +22,11 @@ void cWitch::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	unsigned int LootingLevel = 0;
 	if (a_Killer != nullptr)
 	{
-		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+		auto Enchantments = a_Killer->GetEquippedWeapon().get<cEnchantments>();
+		if (Enchantments.has_value())
+		{
+			LootingLevel = Enchantments.value().GetLevel(cEnchantments::enchLooting);
+		}
 	}
 	auto & r1 = GetRandomProvider();
 	int DropTypeCount = r1.RandInt(1, 3);

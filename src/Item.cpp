@@ -17,10 +17,8 @@ cItem::cItem():
 	m_ItemType(E_ITEM_EMPTY),
 	m_ItemCount(0),
 	m_ItemDamage(0),
-	m_CustomName(),
 	m_RepairCost(0),
-	m_FireworkItem(),
-	m_ItemColor()
+	m_Properties()
 {
 }
 
@@ -39,12 +37,7 @@ cItem::cItem(
 	m_ItemType    (a_ItemType),
 	m_ItemCount   (a_ItemCount),
 	m_ItemDamage  (a_ItemDamage),
-	m_Enchantments(a_Enchantments),
-	m_CustomName  (a_CustomName),
-	m_LoreTable   (a_LoreTable),
-	m_RepairCost  (0),
-	m_FireworkItem(),
-	m_ItemColor()
+	m_RepairCost  (0)
 {
 	if (!IsValidItem(m_ItemType))
 	{
@@ -52,25 +45,14 @@ cItem::cItem(
 		{
 			LOGWARNING("%s: creating an invalid item type (%d), resetting to empty.", __FUNCTION__, a_ItemType);
 		}
-		Empty();
+		Clear();
+		return;
 	}
-}
-
-
-
-
-
-void cItem::Empty()
-{
-	m_ItemType = E_ITEM_EMPTY;
-	m_ItemCount = 0;
-	m_ItemDamage = 0;
-	m_Enchantments.Clear();
-	m_CustomName = "";
-	m_LoreTable.clear();
-	m_RepairCost = 0;
-	m_FireworkItem.EmptyData();
-	m_ItemColor.Clear();
+	cDisplayProperties DisplayProperties;
+	DisplayProperties.m_CustomName = a_CustomName;
+	DisplayProperties.m_LoreTable = a_LoreTable;
+	set<cDisplayProperties>(DisplayProperties);
+	set<cEnchantments>(a_Enchantments);
 }
 
 
@@ -83,7 +65,7 @@ void cItem::Clear()
 	m_ItemCount = 0;
 	m_ItemDamage = 0;
 	m_RepairCost = 0;
-	m_ItemColor.Clear();
+	m_Properties.clear();
 }
 
 
@@ -106,7 +88,7 @@ cItem & cItem::AddCount(char a_AmountToAdd)
 	m_ItemCount += a_AmountToAdd;
 	if (m_ItemCount <= 0)
 	{
-		Empty();
+		Clear();
 	}
 	return *this;
 }
@@ -229,40 +211,46 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 	{
 		a_OutValue["Count"] = m_ItemCount;
 		a_OutValue["Health"] = m_ItemDamage;
-		AString Enchantments(m_Enchantments.ToString());
-		if (!Enchantments.empty())
+		auto Enchantments = get<cEnchantments>();
+		if (Enchantments.has_value())
 		{
-			a_OutValue["ench"] = Enchantments;
+			a_OutValue["ench"] = Enchantments.value().ToString();
 		}
-		if (!IsCustomNameEmpty())
+		auto DisplayProperties = get<cDisplayProperties>();
+		if (DisplayProperties.has_value())
 		{
-			a_OutValue["Name"] = m_CustomName;
-		}
-		if (!IsLoreEmpty())
-		{
-			auto & LoreArray = (a_OutValue["Lore"] = Json::Value(Json::arrayValue));
-
-			for (const auto & Line : m_LoreTable)
+			if (!DisplayProperties.value().m_CustomName.empty())
 			{
-				LoreArray.append(Line);
+				a_OutValue["Name"] = DisplayProperties.value().m_CustomName;
+			}
+
+			if (!DisplayProperties.value().m_LoreTable.empty())
+			{
+				auto & LoreArray = (a_OutValue["Lore"] = Json::Value(Json::arrayValue));
+
+				for (const auto & Line : DisplayProperties.value().m_LoreTable)
+				{
+					LoreArray.append(Line);
+				}
+			}
+
+			if (DisplayProperties.value().m_Color.IsValid())
+			{
+				a_OutValue["Color_Red"] = DisplayProperties.value().m_Color.GetRed();
+				a_OutValue["Color_Green"] = DisplayProperties.value().m_Color.GetGreen();
+				a_OutValue["Color_Blue"] = DisplayProperties.value().m_Color.GetBlue();
 			}
 		}
 
-		if (m_ItemColor.IsValid())
+		auto fireworkItem = get<cFireworkItem>();
+		if (((m_ItemType == E_ITEM_FIREWORK_ROCKET) || (m_ItemType == E_ITEM_FIREWORK_STAR)) && fireworkItem.has_value())
 		{
-			a_OutValue["Color_Red"] = m_ItemColor.GetRed();
-			a_OutValue["Color_Green"] = m_ItemColor.GetGreen();
-			a_OutValue["Color_Blue"] = m_ItemColor.GetBlue();
-		}
-
-		if ((m_ItemType == E_ITEM_FIREWORK_ROCKET) || (m_ItemType == E_ITEM_FIREWORK_STAR))
-		{
-			a_OutValue["Flicker"] = m_FireworkItem.m_HasFlicker;
-			a_OutValue["Trail"] = m_FireworkItem.m_HasTrail;
-			a_OutValue["Type"] = m_FireworkItem.m_Type;
-			a_OutValue["FlightTimeInTicks"] = m_FireworkItem.m_FlightTimeInTicks;
-			a_OutValue["Colours"] = m_FireworkItem.ColoursToString(m_FireworkItem);
-			a_OutValue["FadeColours"] = m_FireworkItem.FadeColoursToString(m_FireworkItem);
+			a_OutValue["Flicker"] = fireworkItem.value().m_HasFlicker;
+			a_OutValue["Trail"] = fireworkItem.value().m_HasTrail;
+			a_OutValue["Type"] = fireworkItem.value().m_Type;
+			a_OutValue["FlightTimeInTicks"] = fireworkItem.value().m_FlightTimeInTicks;
+			a_OutValue["Colours"] = cFireworkItem::ColoursToString(fireworkItem.value());
+			a_OutValue["FadeColours"] = cFireworkItem::FadeColoursToString(fireworkItem.value());
 		}
 
 		a_OutValue["RepairCost"] = m_RepairCost;
@@ -280,13 +268,16 @@ void cItem::FromJson(const Json::Value & a_Value)
 	{
 		m_ItemCount = static_cast<char>(a_Value.get("Count", -1).asInt());
 		m_ItemDamage = static_cast<short>(a_Value.get("Health", -1).asInt());
-		m_Enchantments.Clear();
-		m_Enchantments.AddFromString(a_Value.get("ench", "").asString());
-		m_CustomName = a_Value.get("Name", "").asString();
+
+		cEnchantments Enchantments;
+		Enchantments.AddFromString(a_Value.get("ench", "").asString());
+
+		cDisplayProperties DisplayProperties;
+		DisplayProperties.m_CustomName = a_Value.get("Name", "").asString();
 		auto Lore = a_Value.get("Lore", Json::arrayValue);
 		for (auto & Line : Lore)
 		{
-			m_LoreTable.push_back(Line.asString());
+			DisplayProperties.m_LoreTable.push_back(Line.asString());
 		}
 
 		int red = a_Value.get("Color_Red", -1).asInt();
@@ -294,21 +285,24 @@ void cItem::FromJson(const Json::Value & a_Value)
 		int blue = a_Value.get("Color_Blue", -1).asInt();
 		if ((red > -1) && (red < static_cast<int>(cColor::COLOR_LIMIT)) && (green > -1) && (green < static_cast<int>(cColor::COLOR_LIMIT)) && (blue > -1) && (blue < static_cast<int>(cColor::COLOR_LIMIT)))
 		{
-			m_ItemColor.SetColor(static_cast<unsigned char>(red), static_cast<unsigned char>(green), static_cast<unsigned char>(blue));
+			DisplayProperties.m_Color.SetColor(static_cast<unsigned char>(red), static_cast<unsigned char>(green), static_cast<unsigned char>(blue));
 		}
 		else if ((red != -1) || (blue != -1) || (green != -1))
 		{
 			LOGWARNING("Item with invalid red, green, and blue values read in from json file.");
 		}
+		set<cDisplayProperties>(DisplayProperties);
 
 		if ((m_ItemType == E_ITEM_FIREWORK_ROCKET) || (m_ItemType == E_ITEM_FIREWORK_STAR))
 		{
-			m_FireworkItem.m_HasFlicker = a_Value.get("Flicker", false).asBool();
-			m_FireworkItem.m_HasTrail = a_Value.get("Trail", false).asBool();
-			m_FireworkItem.m_Type = static_cast<NIBBLETYPE>(a_Value.get("Type", 0).asInt());
-			m_FireworkItem.m_FlightTimeInTicks = static_cast<short>(a_Value.get("FlightTimeInTicks", 0).asInt());
-			m_FireworkItem.ColoursFromString(a_Value.get("Colours", "").asString(), m_FireworkItem);
-			m_FireworkItem.FadeColoursFromString(a_Value.get("FadeColours", "").asString(), m_FireworkItem);
+			cFireworkItem fireworkItem;
+			fireworkItem.m_HasFlicker = a_Value.get("Flicker", false).asBool();
+			fireworkItem.m_HasTrail = a_Value.get("Trail", false).asBool();
+			fireworkItem.m_Type = static_cast<NIBBLETYPE>(a_Value.get("Type", 0).asInt());
+			fireworkItem.m_FlightTimeInTicks = static_cast<short>(a_Value.get("FlightTimeInTicks", 0).asInt());
+			cFireworkItem::ColoursFromString(a_Value.get("Colours", "").asString(), fireworkItem);
+			cFireworkItem::FadeColoursFromString(a_Value.get("FadeColours", "").asString(), fireworkItem);
+			set<cFireworkItem>(fireworkItem);
 		}
 
 		m_RepairCost = a_Value.get("RepairCost", 0).asInt();
@@ -454,7 +448,7 @@ bool cItem::EnchantByXPLevels(unsigned a_NumXPLevels, MTRand & a_Random)
 	}
 
 	cEnchantments Enchantment1 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Random);
-	m_Enchantments.AddFromString(Enchantment1.ToString());
+
 	cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment1);
 
 	// Checking for conflicting enchantments
@@ -469,7 +463,7 @@ bool cItem::EnchantByXPLevels(unsigned a_NumXPLevels, MTRand & a_Random)
 	}
 
 	cEnchantments Enchantment2 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Random);
-	m_Enchantments.AddFromString(Enchantment2.ToString());
+	get<cEnchantments>().value_or(cEnchantments()).AddFromString(Enchantment2.ToString());  // Todo: Come on, who did this in the first place?
 	cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment2);
 
 	// Checking for conflicting enchantments
@@ -484,7 +478,7 @@ bool cItem::EnchantByXPLevels(unsigned a_NumXPLevels, MTRand & a_Random)
 	}
 
 	cEnchantments Enchantment3 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Random);
-	m_Enchantments.AddFromString(Enchantment3.ToString());
+	get<cEnchantments>().value_or(cEnchantments()).AddFromString(Enchantment3.ToString());  // Todo: Come on, who did this in the first place?
 	cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment3);
 
 	// Checking for conflicting enchantments
@@ -498,7 +492,7 @@ bool cItem::EnchantByXPLevels(unsigned a_NumXPLevels, MTRand & a_Random)
 		return true;
 	}
 	cEnchantments Enchantment4 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Random);
-	m_Enchantments.AddFromString(Enchantment4.ToString());
+	get<cEnchantments>().value_or(cEnchantments()).AddFromString(Enchantment4.ToString());  // Todo: Come on, who did this in the first place?
 
 	return true;
 }
@@ -509,7 +503,8 @@ bool cItem::EnchantByXPLevels(unsigned a_NumXPLevels, MTRand & a_Random)
 
 int cItem::AddEnchantment(int a_EnchantmentID, unsigned int a_Level, bool a_FromBook)
 {
-	unsigned int OurLevel = m_Enchantments.GetLevel(a_EnchantmentID);
+	auto Enchantments = get<cEnchantments>().value_or(cEnchantments());
+	unsigned int OurLevel = Enchantments.GetLevel(a_EnchantmentID);
 	int Multiplier = cEnchantments::GetXPCostMultiplier(a_EnchantmentID, a_FromBook);
 	unsigned int NewLevel = 0;
 	if (OurLevel > a_Level)
@@ -533,7 +528,8 @@ int cItem::AddEnchantment(int a_EnchantmentID, unsigned int a_Level, bool a_From
 		NewLevel = LevelCap;
 	}
 
-	m_Enchantments.SetLevel(a_EnchantmentID, NewLevel);
+	Enchantments.SetLevel(a_EnchantmentID, NewLevel);
+	set<cEnchantments>(Enchantments);
 	return static_cast<int>(NewLevel) * Multiplier;
 }
 
@@ -678,11 +674,12 @@ int cItem::AddEnchantmentsFromItem(const cItem & a_Other)
 
 	// Consider each enchantment seperately
 	int EnchantingCost = 0;
-	for (auto & Enchantment : a_Other.m_Enchantments)
+	auto Enchantments = a_Other.get<cEnchantments>().value_or(cEnchantments());
+	for (auto & Enchantment : Enchantments)
 	{
 		if (CanHaveEnchantment(Enchantment.first))
 		{
-			if (!m_Enchantments.CanAddEnchantment(Enchantment.first))
+			if (get<cEnchantments>().value_or(cEnchantments()).CanAddEnchantment(Enchantment.first))
 			{
 				// Cost of incompatible enchantments
 				EnchantingCost += 1;

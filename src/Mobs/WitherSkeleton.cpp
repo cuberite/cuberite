@@ -37,7 +37,11 @@ void cWitherSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	unsigned int LootingLevel = 0;
 	if (a_Killer != nullptr)
 	{
-		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+		auto Enchantments = a_Killer->GetEquippedWeapon().get<cEnchantments>();
+		if (Enchantments.has_value())
+		{
+			LootingLevel = Enchantments.value().GetLevel(cEnchantments::enchLooting);
+		}
 	}
 	AddRandomUncommonDropItem(a_Drops, 33.0f, E_ITEM_COAL);
 	AddRandomUncommonDropItem(a_Drops, 8.5f, E_ITEM_STONE_SWORD, GetRandomProvider().RandInt<short>(50));

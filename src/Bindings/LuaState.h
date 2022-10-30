@@ -32,11 +32,12 @@ stays valid but doesn't call into Lua code anymore, returning false for "failure
 
 #include "lua/src/lauxlib.h"
 
-#include "../Defines.h"
-#include "../FunctionRef.h"
-#include "../Registries/CustomStatistics.h"
-#include "PluginManager.h"
-#include "LuaState_Typedefs.inc"
+#include "Defines.h"
+#include "FunctionRef.h"
+#include "Registries/CustomStatistics.h"
+#include "WorldStorage/FireworksSerializer.h"
+#include "Bindings/PluginManager.h"
+#include "Bindings/LuaState_Typedefs.inc"
 
 // fwd:
 class cLuaServerHandle;
@@ -644,6 +645,9 @@ public:
 	bool GetStackValue(int a_StackPos, cCallback & a_Callback);
 	bool GetStackValue(int a_StackPos, cCallbackPtr & a_Callback);
 	bool GetStackValue(int a_StackPos, cCallbackSharedPtr & a_Callback);
+	bool GetStackValue(int a_StackPos, cColor & a_Value);
+	bool GetStackValue(int a_StackPos, cEnchantments & a_Value);
+	bool GetStackValue(int a_StackPos, cFireworkItem & a_Value);
 	bool GetStackValue(int a_StackPos, cOptionalCallback & a_Callback);
 	bool GetStackValue(int a_StackPos, cOptionalCallbackPtr & a_Callback);
 	bool GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result);

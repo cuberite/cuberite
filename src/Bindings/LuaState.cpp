@@ -1255,6 +1255,52 @@ bool cLuaState::GetStackValue(int a_StackPos, cCallbackSharedPtr & a_Callback)
 
 
 
+bool cLuaState::GetStackValue(int a_StackPos, cColor & a_Value)
+{
+	if (!lua_istable(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+	auto ColorPointer = (cColor*)  tolua_tousertype(m_LuaState, 1, nullptr);
+	a_Value = *ColorPointer;
+	return true;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cEnchantments & a_Value)
+{
+	if (!lua_istable(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+	auto EnchantmentsPointer = (cEnchantments*) tolua_tousertype(m_LuaState, 1, nullptr);
+	a_Value = *EnchantmentsPointer;
+	return true;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cFireworkItem & a_Value)
+{
+	if (!lua_istable(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+
+	auto FireworkItemPointer = (cFireworkItem*) tolua_tousertype(m_LuaState, 1, nullptr);
+	a_Value = *FireworkItemPointer;
+	return true;
+}
+
+
+
+
+
 bool cLuaState::GetStackValue(int a_StackPos, cPluginManager::CommandResult & a_Result)
 {
 	if (lua_isnumber(m_LuaState, a_StackPos))

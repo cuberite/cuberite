@@ -43,7 +43,7 @@ bool cItemFrame::DoTakeDamage(TakeDamageInfo & a_TDI)
 	}
 
 	// In any case we have a held item and were hit by a player, so clear it:
-	m_Item.Empty();
+	m_Item.Clear();
 	m_ItemRotation = 0;
 	a_TDI.FinalDamage = 0;
 	SetInvulnerableTicks(0);

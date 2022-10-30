@@ -10,11 +10,13 @@
 
 cFireworkEntity::cFireworkEntity(cEntity * a_Creator, Vector3d a_Pos, const cItem & a_Item) :
 	Super(pkFirework, a_Creator, a_Pos, 0.25f, 0.25f),
-	m_TicksToExplosion(a_Item.m_FireworkItem.m_FlightTimeInTicks),
 	m_FireworkItem(a_Item)
 {
 	SetGravity(0);
 	SetAirDrag(0);
+
+	auto fireworkItem = a_Item.get<cFireworkItem>();
+	m_TicksToExplosion = fireworkItem.value().m_FlightTimeInTicks;
 }
 
 

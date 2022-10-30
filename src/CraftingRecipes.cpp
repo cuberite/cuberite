@@ -119,7 +119,7 @@ void cCraftingGrid::Clear(void)
 {
 	for (int y = 0; y < m_Height; y++) for (int x = 0; x < m_Width; x++)
 	{
-		m_Items[x + m_Width * y].Empty();
+		m_Items[x + m_Width * y].Clear();
 	}
 }
 
@@ -885,6 +885,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 {
 	// TODO: add support for more than one dye in the recipe
 	// A manual and temporary solution (listing everything) is in crafting.txt for fade colours, but a programmatic solutions needs to be done for everything else
+	auto ResultFireworkItem = a_Recipe->m_Result.get<cFireworkItem>().value_or(cFireworkItem());
 
 	if (a_Recipe->m_Result.m_ItemType == E_ITEM_FIREWORK_ROCKET)
 	{
@@ -896,13 +897,17 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 				{
 					// Result was a rocket, found a star - copy star data to rocket data
 					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
-					a_Recipe->m_Result.m_FireworkItem.CopyFrom(a_CraftingGrid[GridID].m_FireworkItem);
+					auto IngredientFireworkItem = a_CraftingGrid[GridID].get<cFireworkItem>().value_or(cFireworkItem());
+					ResultFireworkItem.CopyFrom(IngredientFireworkItem);
+					a_Recipe->m_Result.set<cFireworkItem>(ResultFireworkItem);
 					break;
 				}
 				case E_ITEM_GUNPOWDER:
 				{
 					// Gunpowder - increase flight time
-					a_Recipe->m_Result.m_FireworkItem.m_FlightTimeInTicks += 20;
+					auto FireworkItem = a_Recipe->m_Result.get<cFireworkItem>().value_or(cFireworkItem());
+					FireworkItem.m_FlightTimeInTicks += 20;
+					a_Recipe->m_Result.set<cFireworkItem>(FireworkItem);
 					break;
 				}
 				case E_ITEM_PAPER: break;
@@ -917,6 +922,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 
 		for (cRecipeSlots::const_iterator itr = a_Recipe->m_Ingredients.begin(); itr != a_Recipe->m_Ingredients.end(); ++itr)
 		{
+
 			switch (itr->m_Item.m_ItemType)
 			{
 				case E_ITEM_FIREWORK_STAR:
@@ -924,7 +930,8 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 					// Result was star, found another star - probably adding fade colours, but copy data over anyhow
 					FoundStar = true;
 					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
-					a_Recipe->m_Result.m_FireworkItem.CopyFrom(a_CraftingGrid[GridID].m_FireworkItem);
+					auto IngredientFireworkItem = a_CraftingGrid[GridID].get<cFireworkItem>().value_or(cFireworkItem());
+					ResultFireworkItem.CopyFrom(IngredientFireworkItem);
 					break;
 				}
 				case E_ITEM_DYE:
@@ -934,13 +941,13 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 					break;
 				}
 				case E_ITEM_GUNPOWDER: break;
-				case E_ITEM_DIAMOND: a_Recipe->m_Result.m_FireworkItem.m_HasTrail = true; break;
-				case E_ITEM_GLOWSTONE_DUST: a_Recipe->m_Result.m_FireworkItem.m_HasFlicker = true; break;
+				case E_ITEM_DIAMOND: ResultFireworkItem.m_HasTrail = true; break;
+				case E_ITEM_GLOWSTONE_DUST: ResultFireworkItem.m_HasFlicker = true; break;
 
-				case E_ITEM_FIRE_CHARGE: a_Recipe->m_Result.m_FireworkItem.m_Type = 1; break;
-				case E_ITEM_GOLD_NUGGET: a_Recipe->m_Result.m_FireworkItem.m_Type = 2; break;
-				case E_ITEM_FEATHER: a_Recipe->m_Result.m_FireworkItem.m_Type = 4; break;
-				case E_ITEM_HEAD: a_Recipe->m_Result.m_FireworkItem.m_Type = 3; break;
+				case E_ITEM_FIRE_CHARGE: ResultFireworkItem.m_Type = 1; break;
+				case E_ITEM_GOLD_NUGGET: ResultFireworkItem.m_Type = 2; break;
+				case E_ITEM_FEATHER: ResultFireworkItem.m_Type = 4; break;
+				case E_ITEM_HEAD: ResultFireworkItem.m_Type = 3; break;
 				default: LOG("Unexpected item in firework star recipe, was the crafting file's fireworks section changed?"); break;  // ermahgerd BARD ardmins
 			}
 		}
@@ -948,14 +955,15 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 		if (FoundStar && (!DyeColours.empty()))
 		{
 			// Found a star and a dye? Fade colours.
-			a_Recipe->m_Result.m_FireworkItem.m_FadeColours = DyeColours;
+			ResultFireworkItem.m_FadeColours = DyeColours;
 		}
 		else if (!DyeColours.empty())
 		{
 			// Only dye? Normal colours.
-			a_Recipe->m_Result.m_FireworkItem.m_Colours = DyeColours;
+			ResultFireworkItem.m_Colours = DyeColours;
 		}
 	}
+	a_Recipe->m_Result.set<cFireworkItem>(ResultFireworkItem);
 }
 
 
@@ -984,12 +992,13 @@ void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCrafting
 				{
 					found = true;
 					temp = a_CraftingGrid[GridIdx].CopyOne();
+					auto DisplayProperties = temp.get<cItem::cDisplayProperties>().value_or(cItem::cDisplayProperties());
 					// The original color of the item affects the result
-					if (temp.m_ItemColor.IsValid())
+					if (DisplayProperties.m_Color.IsValid())
 					{
-						red += temp.m_ItemColor.GetRed();
-						green += temp.m_ItemColor.GetGreen();
-						blue += temp.m_ItemColor.GetBlue();
+						red += DisplayProperties.m_Color.GetRed();
+						green += DisplayProperties.m_Color.GetGreen();
+						blue += DisplayProperties.m_Color.GetBlue();
 						++dye_count;
 					}
 				}
@@ -1143,6 +1152,8 @@ void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCrafting
 
 		// Set the results values
 		a_Recipe->m_Result = temp;
-		a_Recipe->m_Result.m_ItemColor.SetColor(result_red, result_green, result_blue);
+		auto DisplayProperties = a_Recipe->m_Result.get<cItem::cDisplayProperties>().value_or(cItem::cDisplayProperties());
+		DisplayProperties.m_Color.SetColor(result_red, result_green, result_blue);
+		a_Recipe->m_Result.set<cItem::cDisplayProperties>(DisplayProperties);
 	}
 }

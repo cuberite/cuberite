@@ -452,11 +452,19 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			}
 		}
 
-		const cEnchantments & Enchantments = Player->GetEquippedItem().m_Enchantments;
+		unsigned int SharpnessLevel = 0;
+		unsigned int SmiteLevel = 0;
+		unsigned int BaneOfArthropodsLevel = 0;
+		unsigned int FireAspectLevel = 0;
 
-		int SharpnessLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchSharpness));
-		int SmiteLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchSmite));
-		int BaneOfArthropodsLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchBaneOfArthropods));
+		auto Enchantments = Player->GetEquippedItem().get<cEnchantments>();
+		if (!Enchantments.has_value())
+		{
+			SharpnessLevel = static_cast<int>(Enchantments.value().GetLevel(cEnchantments::enchSharpness));
+			SmiteLevel = static_cast<int>(Enchantments.value().GetLevel(cEnchantments::enchSmite));
+			BaneOfArthropodsLevel = static_cast<int>(Enchantments.value().GetLevel(cEnchantments::enchBaneOfArthropods));
+			FireAspectLevel = static_cast<int>(Enchantments.value().GetLevel(cEnchantments::enchFireAspect));
+		}
 
 		if (SharpnessLevel > 0)
 		{
@@ -511,7 +519,6 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			}
 		}
 
-		int FireAspectLevel = static_cast<int>(Enchantments.GetLevel(cEnchantments::enchFireAspect));
 		if (FireAspectLevel > 0)
 		{
 			int BurnTicks = 3;
@@ -555,7 +562,11 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
 		{
 			const cItem & Item = ArmorItems[i];
-			ThornsLevel = std::max(ThornsLevel, Item.m_Enchantments.GetLevel(cEnchantments::enchThorns));
+			Enchantments = Item.get<cEnchantments>();
+			if (Enchantments.has_value())
+			{
+				ThornsLevel = std::max(ThornsLevel, Enchantments.value().GetLevel(cEnchantments::enchThorns));
+			}
 		}
 
 		if (ThornsLevel > 0)
@@ -699,40 +710,45 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 
 float cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
 {
-	int TotalEPF = 0;
+	unsigned int TotalEPF = 0;
 
 	const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
 	for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
 	{
 		const cItem & Item = ArmorItems[i];
+		auto Enchantments = Item.get<cEnchantments>();
+		if (!Enchantments.has_value())
+		{
+			continue;
+		}
 
 		if ((a_DamageType != dtInVoid) && (a_DamageType != dtAdmin) && (a_DamageType != dtStarving))
 		{
-			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchProtection)) * 1;
+			TotalEPF += Enchantments.value().GetLevel(cEnchantments::enchProtection) * 1;
 		}
 
 		if ((a_DamageType == dtBurning) || (a_DamageType == dtFireContact) || (a_DamageType == dtLavaContact) || (a_DamageType == dtMagmaContact))
 		{
-			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection)) * 2;
+			TotalEPF += Enchantments.value().GetLevel(cEnchantments::enchFireProtection) * 2;
 		}
 
 		if ((a_DamageType == dtFalling) || (a_DamageType == dtEnderPearl))
 		{
-			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchFeatherFalling)) * 3;
+			TotalEPF += Enchantments.value().GetLevel(cEnchantments::enchFeatherFalling) * 3;
 		}
 
 		if (a_DamageType == dtExplosion)
 		{
-			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection)) * 2;
+			TotalEPF += Enchantments.value().GetLevel(cEnchantments::enchBlastProtection) * 2;
 		}
 
 		// Note: Also blocks against fire charges, etc.
 		if (a_DamageType == dtProjectile)
 		{
-			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchProjectileProtection)) * 2;
+			TotalEPF += Enchantments.value().GetLevel(cEnchantments::enchProjectileProtection) * 2;
 		}
 	}
-	int CappedEPF = std::min(20, TotalEPF);
+	int CappedEPF = std::min<unsigned int>(20, TotalEPF);
 	return (a_Damage * CappedEPF / 25.0f);
 }
 
@@ -748,7 +764,12 @@ float cEntity::GetEnchantmentBlastKnockbackReduction()
 
 	for (auto & Item : ArmorItems)
 	{
-		UInt32 Level = Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection);
+		auto Enchantments = Item.get<cEnchantments>();
+		if (!Enchantments.has_value())
+		{
+			continue;
+		}
+		auto Level = Enchantments.value().GetLevel(cEnchantments::enchBlastProtection);
 		if (Level > MaxLevel)
 		{
 			// Get max blast protection
@@ -834,8 +855,13 @@ double cEntity::GetKnockbackAmountAgainst(const cEntity & a_Receiver)
 		Knockback = 15;
 	}
 
-	// Check for knockback enchantments (punch only applies to shot arrows)
-	unsigned int KnockbackLevel = GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);
+	// Check for knockback Enchantments (punch only applies to shot arrows)
+	auto Enchantments = GetEquippedWeapon().get<cEnchantments>();
+	unsigned int KnockbackLevel = 0;
+	if (Enchantments.has_value())
+	{
+		KnockbackLevel = Enchantments.value().GetLevel(cEnchantments::enchKnockback);
+	}
 	unsigned int KnockbackLevelMultiplier = 8;
 
 	Knockback += KnockbackLevelMultiplier * KnockbackLevel;
@@ -1800,7 +1826,12 @@ void cEntity::HandleAir(void)
 	// See if the entity is /submerged/ water (head is in water)
 	// Get the type of block the entity is standing in:
 
-	int RespirationLevel = static_cast<int>(GetEquippedHelmet().m_Enchantments.GetLevel(cEnchantments::enchRespiration));
+	unsigned int RespirationLevel = 0;
+	auto Enchantments = GetEquippedHelmet().get<cEnchantments>();
+	if (Enchantments.has_value())
+	{
+		RespirationLevel = Enchantments.value().GetLevel(cEnchantments::enchRespiration);
+	}
 
 	if (IsHeadInWater())
 	{

@@ -325,7 +325,12 @@ static int tolua_get_cItem_m_Lore(lua_State * tolua_S)
 	const cItem * Self = nullptr;
 	L.GetStackValue(1, Self);
 
-	AString LoreString = StringJoin(Self->m_LoreTable, "`");
+	AString LoreString;
+	auto DisplayProperties = Self->get<cItem::cDisplayProperties>();
+	if (DisplayProperties.has_value())
+	{
+		LoreString = StringJoin(DisplayProperties.value().m_LoreTable, "`");
+	}
 
 	L.Push(LoreString);
 
@@ -354,7 +359,9 @@ static int tolua_set_cItem_m_Lore(lua_State * tolua_S)
 	AString LoreString;
 	L.GetStackValues(1, Self, LoreString);
 
-	Self->m_LoreTable = StringSplit(LoreString, "`");
+	auto DisplayProperties = Self->get<cItem::cDisplayProperties>().value_or(cItem::cDisplayProperties());
+	DisplayProperties.m_LoreTable = StringSplit(LoreString, "`");
+	Self->set<cItem::cDisplayProperties>(DisplayProperties);
 
 	LOGWARNING("cItem.m_Lore is deprecated, use cItem.m_LoreTable instead");
 	L.LogStackTrace(0);
