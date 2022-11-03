@@ -307,12 +307,14 @@ void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const auto Delta = (a_Entity.GetPosition() - a_Entity.GetLastSentPosition()) * 32 * 128;
+	const auto Delta = (a_Entity.GetPosition() * 32 * 128).Floor() - (a_Entity.GetLastSentPosition() * 32 * 128).Floor();
 
-	// Limitations of a short
-	static const auto Max = std::numeric_limits<Int16>::max();
-
-	if ((std::abs(Delta.x) <= Max) && (std::abs(Delta.y) <= Max) && (std::abs(Delta.z) <= Max))
+	// Ensure that the delta is within range of a BEInt16:
+	if (
+		(-32768 <= Delta.x) && (Delta.x <= 32767) &&
+		(-32768 <= Delta.y) && (Delta.y <= 32767) &&
+		(-32768 <= Delta.z) && (Delta.z <= 32767)
+	)
 	{
 		const auto Move = static_cast<Vector3<Int16>>(Delta);
 

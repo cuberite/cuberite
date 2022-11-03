@@ -579,12 +579,14 @@ void cProtocol_1_8_0::SendEntityPosition(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const auto Delta = (a_Entity.GetPosition() - a_Entity.GetLastSentPosition()) * 32;
+	const auto Delta = (a_Entity.GetPosition() * 32).Floor() - (a_Entity.GetLastSentPosition() * 32).Floor();
 
-	// Limitations of a byte
-	static const auto Max = std::numeric_limits<Int8>::max();
-
-	if ((std::abs(Delta.x) <= Max) && (std::abs(Delta.y) <= Max) && (std::abs(Delta.z) <= Max))
+	// Ensure that the delta is within range of a BEInt8:
+	if (
+		(-128 <= Delta.x) && (Delta.x <= 127) &&
+		(-128 <= Delta.y) && (Delta.y <= 127) &&
+		(-128 <= Delta.z) && (Delta.z <= 127)
+	)
 	{
 		const auto Move = static_cast<Vector3<Int8>>(Delta);
 
