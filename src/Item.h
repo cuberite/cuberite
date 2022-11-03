@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include "Defines.h"
 #include "Enchantments.h"
 #include "WorldStorage/FireworksSerializer.h"
