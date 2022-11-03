@@ -1347,7 +1347,10 @@ void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
 	// Do the magic of updating the world:
 	for (auto & Chunk : m_Chunks)
 	{
-		Chunk.second.Tick(a_Dt);
+		if (Chunk.second.ShouldBeTicked())
+		{
+			Chunk.second.Tick(a_Dt);
+		}
 	}
 
 	// Finally, only after all chunks are ticked, tell the client about all aggregated changes:
