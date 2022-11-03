@@ -65,7 +65,7 @@ void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 
 
 
-void cArrowEntity::Tick(std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000l> >, cChunk&)
+void cArrowEntity::Tick(std::chrono::milliseconds, cChunk&)
 {
 }
 
@@ -442,7 +442,7 @@ void cEntity::HandleAir()
 
 
 
-void cEntity::HandlePhysics(std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000l> >, cChunk&)
+void cEntity::HandlePhysics(std::chrono::milliseconds, cChunk&)
 {
 }
 
@@ -572,7 +572,7 @@ void cEntity::TeleportToEntity(cEntity&)
 
 
 
-void cEntity::Tick(std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000l> >, cChunk&)
+void cEntity::Tick(std::chrono::milliseconds, cChunk&)
 {
 }
 
@@ -682,7 +682,7 @@ void cFloater::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cFloater::Tick(std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000l> >, cChunk&)
+void cFloater::Tick(std::chrono::milliseconds, cChunk&)
 {
 }
 
@@ -732,7 +732,7 @@ void cHangingEntity::SpawnOn(cClientHandle&)
 
 
 
-void cHangingEntity::Tick(std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000l> >, cChunk&)
+void cHangingEntity::Tick(std::chrono::milliseconds, cChunk&)
 {
 }
 
@@ -1156,7 +1156,7 @@ void cProjectileEntity::CollectedBy(cPlayer&)
 
 
 
-void cProjectileEntity::HandlePhysics(std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000l> >, cChunk&)
+void cProjectileEntity::HandlePhysics(std::chrono::milliseconds, cChunk&)
 {
 }
 
@@ -1188,7 +1188,7 @@ void cProjectileEntity::SpawnOn(cClientHandle&)
 
 
 
-void cProjectileEntity::Tick(std::__1::chrono::duration<long long, std::__1::ratio<1l, 1000l> >, cChunk&)
+void cProjectileEntity::Tick(std::chrono::milliseconds, cChunk&)
 {
 }
 

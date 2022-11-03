@@ -2952,8 +2952,16 @@ static int tolua_get_cItem_m_FireworkItem(lua_State * tolua_S)
 	L.GetStackValue(1, Self);
 
 	// Push the result:
-	auto FireworkItem = Self->get<cFireworkItem>().value_or(cFireworkItem());
-	L.Push(&FireworkItem);
+	auto FireworkItem = Self->get<cFireworkItem>();
+	if (FireworkItem.has_value())
+	{
+		L.Push(&FireworkItem);
+	}
+	else
+	{
+		lua_pushnil(L);
+	}
+
 	return 1;
 }
 
