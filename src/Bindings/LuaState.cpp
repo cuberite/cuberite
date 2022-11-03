@@ -1261,7 +1261,7 @@ bool cLuaState::GetStackValue(int a_StackPos, cColor & a_Value)
 	{
 		return false;
 	}
-	auto ColorPointer = (cColor*)  tolua_tousertype(m_LuaState, 1, nullptr);
+	auto ColorPointer = static_cast<cColor *>(tolua_tousertype(m_LuaState, 1, nullptr));
 	a_Value = *ColorPointer;
 	return true;
 }
@@ -1276,7 +1276,7 @@ bool cLuaState::GetStackValue(int a_StackPos, cEnchantments & a_Value)
 	{
 		return false;
 	}
-	auto EnchantmentsPointer = (cEnchantments*) tolua_tousertype(m_LuaState, 1, nullptr);
+	auto EnchantmentsPointer = static_cast<cEnchantments*>(tolua_tousertype(m_LuaState, 1, nullptr));
 	a_Value = *EnchantmentsPointer;
 	return true;
 }
@@ -1292,7 +1292,7 @@ bool cLuaState::GetStackValue(int a_StackPos, cFireworkItem & a_Value)
 		return false;
 	}
 
-	auto FireworkItemPointer = (cFireworkItem*) tolua_tousertype(m_LuaState, 1, nullptr);
+	auto FireworkItemPointer = static_cast<cFireworkItem*>(tolua_tousertype(m_LuaState, 1, nullptr));
 	a_Value = *FireworkItemPointer;
 	return true;
 }
