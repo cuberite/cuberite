@@ -48,11 +48,17 @@ cItem::cItem(
 		Clear();
 		return;
 	}
-	cDisplayProperties DisplayProperties;
-	DisplayProperties.m_CustomName = a_CustomName;
-	DisplayProperties.m_LoreTable = a_LoreTable;
-	set<cDisplayProperties>(DisplayProperties);
-	set<cEnchantments>(a_Enchantments);
+	if (!a_CustomName.empty() || !a_LoreTable.empty())
+	{
+		cDisplayProperties DisplayProperties;
+		DisplayProperties.m_CustomName = a_CustomName;
+		DisplayProperties.m_LoreTable = a_LoreTable;
+		set<cDisplayProperties>(std::move(DisplayProperties));
+	}
+	if (!a_Enchantments.empty())
+	{
+		set<cEnchantments>(std::move(a_Enchantments));
+	}
 }
 
 

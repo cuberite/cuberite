@@ -107,7 +107,7 @@ public:
 		auto DisplayProperties = get<cDisplayProperties>();
 		if (!DisplayProperties.has_value())
 		{
-			return false;
+			return true;
 		}
 		return (DisplayProperties.value().m_CustomName.empty() && DisplayProperties.value().m_LoreTable.empty());
 	}
