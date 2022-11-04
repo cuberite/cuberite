@@ -2955,7 +2955,7 @@ static int tolua_get_cItem_m_FireworkItem(lua_State * tolua_S)
 	auto FireworkItem = Self->get<cFireworkItem>();
 	if (FireworkItem.has_value())
 	{
-		L.Push(&FireworkItem);
+		L.Push(&FireworkItem.value());
 	}
 	else
 	{

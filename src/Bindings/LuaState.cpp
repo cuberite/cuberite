@@ -957,6 +957,23 @@ void cLuaState::Push(const cEntity * a_Entity)
 
 
 
+void cLuaState::Push(cFireworkItem * a_FireworkItem)
+{
+	ASSERT(IsValid());
+	if (a_FireworkItem == nullptr)
+	{
+		lua_pushnil(m_LuaState);
+	}
+	else
+	{
+		tolua_pushusertype(m_LuaState, a_FireworkItem, cFireworkItem);
+	}
+}
+
+
+
+
+
 void cLuaState::Push(cEntity * a_Entity)
 {
 	ASSERT(IsValid());
