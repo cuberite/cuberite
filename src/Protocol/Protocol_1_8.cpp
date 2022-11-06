@@ -581,11 +581,12 @@ void cProtocol_1_8_0::SendEntityPosition(const cEntity & a_Entity)
 
 	const auto Delta = (a_Entity.GetPosition() * 32).Floor() - (a_Entity.GetLastSentPosition() * 32).Floor();
 
-	// Ensure that the delta is within range of a BEInt8:
+	// Ensure that the delta has enough precision and is within range of a BEInt8:
 	if (
-		(-128 <= Delta.x) && (Delta.x <= 127) &&
-		(-128 <= Delta.y) && (Delta.y <= 127) &&
-		(-128 <= Delta.z) && (Delta.z <= 127)
+		Delta.HasNonZeroLength() &&
+		cByteBuffer::CanBEInt8Represent(Delta.x) &&
+		cByteBuffer::CanBEInt8Represent(Delta.y) &&
+		cByteBuffer::CanBEInt8Represent(Delta.z)
 	)
 	{
 		const auto Move = static_cast<Vector3<Int8>>(Delta);
@@ -615,8 +616,16 @@ void cProtocol_1_8_0::SendEntityPosition(const cEntity & a_Entity)
 		return;
 	}
 
-	// Too big a movement, do a teleport
-	SendEntityTeleport(a_Entity);
+	// Too big or small a movement, do a teleport.
+
+	cPacketizer Pkt(*this, pktTeleportEntity);
+	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	Pkt.WriteFPInt(a_Entity.GetPosX());
+	Pkt.WriteFPInt(a_Entity.GetPosY());
+	Pkt.WriteFPInt(a_Entity.GetPosZ());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteByteAngle(a_Entity.GetPitch());
+	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
 
@@ -4198,22 +4207,6 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 		ASSERT(!"Read wrong number of bytes!");
 		m_Client->PacketError(PacketType);
 	}
-}
-
-
-
-
-
-void cProtocol_1_8_0::SendEntityTeleport(const cEntity & a_Entity)
-{
-	cPacketizer Pkt(*this, pktTeleportEntity);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteFPInt(a_Entity.GetPosX());
-	Pkt.WriteFPInt(a_Entity.GetPosY());
-	Pkt.WriteFPInt(a_Entity.GetPosZ());
-	Pkt.WriteByteAngle(a_Entity.GetYaw());
-	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
 

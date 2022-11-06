@@ -270,10 +270,5 @@ private:
 	/** Handle a complete packet stored in the given buffer. */
 	void HandlePacket(cByteBuffer & a_Buffer);
 
-	/** Sends an entity teleport packet.
-	Mitigates a 1.8 bug where the position in the entity spawn packet is ignored,
-	and so entities don't show up until a teleport is sent. */
-	void SendEntityTeleport(const cEntity & a_Entity);
-
 	void StartEncryption(const Byte * a_Key);
 } ;

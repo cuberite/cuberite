@@ -31,6 +31,7 @@ their own synchronization.
 class cByteBuffer
 {
 public:
+
 	cByteBuffer(size_t a_BufferSize);
 	~cByteBuffer();
 
@@ -47,7 +48,13 @@ public:
 	size_t GetReadableSpace(void) const;
 
 	/** Returns the current data start index. For debugging purposes. */
-	size_t  GetDataStart(void) const { return m_DataStart; }
+	size_t GetDataStart(void) const { return m_DataStart; }
+
+	/** Returns if the given value can fit in a protocol big-endian 8 bit integer. */
+	static bool CanBEInt8Represent(int a_Value);
+
+	/** Returns if the given value can fit in a protocol big-endian 16 bit integer. */
+	static bool CanBEInt16Represent(int a_Value);
 
 	/** Returns true if the specified amount of bytes are available for reading */
 	bool CanReadBytes(size_t a_Count) const;

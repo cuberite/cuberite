@@ -309,11 +309,12 @@ void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 
 	const auto Delta = (a_Entity.GetPosition() * 32 * 128).Floor() - (a_Entity.GetLastSentPosition() * 32 * 128).Floor();
 
-	// Ensure that the delta is within range of a BEInt16:
+	// Ensure that the delta has enough precision and is within range of a BEInt16:
 	if (
-		(-32768 <= Delta.x) && (Delta.x <= 32767) &&
-		(-32768 <= Delta.y) && (Delta.y <= 32767) &&
-		(-32768 <= Delta.z) && (Delta.z <= 32767)
+		Delta.HasNonZeroLength() &&
+		cByteBuffer::CanBEInt16Represent(Delta.x) &&
+		cByteBuffer::CanBEInt16Represent(Delta.y) &&
+		cByteBuffer::CanBEInt16Represent(Delta.z)
 	)
 	{
 		const auto Move = static_cast<Vector3<Int16>>(Delta);
@@ -343,7 +344,8 @@ void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 		return;
 	}
 
-	// Too big a movement, do a teleport
+	// Too big or small a movement, do a teleport.
+
 	cPacketizer Pkt(*this, pktTeleportEntity);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEDouble(a_Entity.GetPosX());
