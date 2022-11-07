@@ -1,6 +1,9 @@
 
 #include "RandomPosition.h"
 
+#include "FastRandom.h"
+#include "Mobs/Monster.h"
+
 namespace BehaviorTree
 {
 cRandomPosition::cRandomPosition(cLuaState & a_LuaState)

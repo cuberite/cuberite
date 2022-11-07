@@ -1,6 +1,8 @@
 
 #include "MoveToPosition.h"
 
+#include "Mobs/Monster.h"
+
 namespace BehaviorTree
 {
 

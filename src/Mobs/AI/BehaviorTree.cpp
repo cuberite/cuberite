@@ -114,7 +114,7 @@ cTasks CreateChildBehaviours(cLuaState & a_LuaState)
 
 
 
-
+/** Newly created cTasks need to be added here */
 std::unique_ptr<cTask> CreateBehaviour(const AString & a_BehaviourName, cLuaState & a_LuaState)
 {
 	if (!lua_istable(a_LuaState, -1))
@@ -123,7 +123,11 @@ std::unique_ptr<cTask> CreateBehaviour(const AString & a_BehaviourName, cLuaStat
 		return nullptr;
 	}
 
-	if (NoCaseCompare(a_BehaviourName, "DynamicGuardSelector") == 0)
+	if (NoCaseCompare(a_BehaviourName, "BreedingItemGuard") == 0)
+	{
+		return std::make_unique<cBreedingItemGuard>(a_LuaState);
+	}
+	else if (NoCaseCompare(a_BehaviourName, "DynamicGuardSelector") == 0)
 	{
 		return std::make_unique<cDynamicGuardSelector>(a_LuaState);
 	}

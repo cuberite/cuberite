@@ -12,7 +12,7 @@ namespace BehaviorTree
 		}
 		if (!a_LuaState.GetNamedValue("Min", m_MinHealth))
 		{
-			LOGWARNING("cHealthRange is missing parameter Max. Setting to 0!");
+			LOGWARNING("cHealthRange is missing parameter Max. Setting to 0.0f!");
 			m_MinHealth = 0;
 		}
 	}
