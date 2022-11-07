@@ -7,6 +7,8 @@
 
 #include "../MonsterTypes.h"
 
+// Check for logging at the bottom of the file
+
 namespace BehaviorTree
 {
 
@@ -92,243 +94,23 @@ std::vector<ValueType> MakeVector(Args && ... a_Behaviors)
 	return Result;
 }
 
+}  // namespace BehaviorTree
+
+// If this header is included, also include the behaviors
+#include "Mobs/AI/Behaviours/IncludeAllBehaviours.h"
 
 
+// This logging is far too noisy to always be on
+#ifdef ABC
 
-
-template <eStatus ContinueStatus>
-class cBasicComposite:
-	public cTask
-{
-public:
-
-	cBasicComposite(cLuaState & a_LuaState)
+template <typename... Args>
+	static void BehaviorLog(cBlackboard & a_Blackboard, const char * a_FormatString, Args && ... a_Args)
 	{
-		m_Children = CreateChildBehaviours(a_LuaState);
-		m_CurrentTask = m_Children.begin();
+		auto Msg = fmt::format(a_FormatString, std::forward<Args>(a_Args)...);
+		FLOG("{0}: {1}", a_Blackboard.Self().GetUniqueID(), Msg);
 	}
 
-	cBasicComposite(cTasks a_Children) :
-		m_Children(std::move(a_Children)),
-		m_CurrentTask(m_Children.begin())
-	{
-	}
-
-private:
-	cTasks m_Children;
-	cTasks::iterator m_CurrentTask;
-
-	virtual void DoEntry(cBlackboard & a_Blackboard) override
-	{
-		m_CurrentTask = m_Children.begin();
-	}
-
-	virtual eStatus DoTick(cBlackboard & a_Blackboard) override
-	{
-		auto Status = ContinueStatus;
-		for (; (m_CurrentTask != m_Children.end()); ++m_CurrentTask)
-		{
-			Status = (*m_CurrentTask)->Tick(a_Blackboard);
-
-			if (Status != ContinueStatus)
-			{
-				break;
-			}
-		}
-		return Status;
-	}
-
-	virtual void DoCancel(cBlackboard & a_Blackboard) override
-	{
-		if ((*m_CurrentTask)->GetStatus() == eStatus::bsRunning)
-		{
-			(*m_CurrentTask)->Cancel(a_Blackboard);
-		}
-	}
-};
-
-/** Executes children while they succeed, returns success if all children succeed */
-using cSequence = cBasicComposite<eStatus::bsSuccess>;
-
-/** Executes children while they fail, returns success if any child succeeds */
-using cSelector = cBasicComposite<eStatus::bsFailure>;
-
-
-
-
-
-/** A task that should only tick when its guard task allows it */
-class cGuardedTask :
-	public cTask
-{
-public:
-	cGuardedTask(cLuaState & a_LuaState);
-
-	cGuardedTask(std::unique_ptr<cTask> a_Guard, std::unique_ptr<cTask> a_Child) :
-		m_Guard(std::move(a_Guard)),
-		m_Child(std::move(a_Child))
-	{
-		ASSERT(m_Child != nullptr);
-	}
-
-private:
-	std::unique_ptr<cTask> m_Guard, m_Child;
-
-	bool EvaluateGuard(cBlackboard & a_Blackboard);
-	virtual eStatus DoTick(cBlackboard & a_Blackboard) override;
-
-	friend class cDynamicGuardSelector;
-};
-
-
-
-
-
-/** A selector that always runs the active task with the highest priority, cancelling running tasks as necessary */
-class cDynamicGuardSelector:
-	public cTask
-{
-	using cGuardedTasks = std::vector<std::unique_ptr<cGuardedTask>>;
-public:
-	cDynamicGuardSelector(cGuardedTasks a_Children) :
-		m_Children(std::move(a_Children)),
-		m_CurrentTask(m_Children.begin())
-	{
-	}
-
-	cDynamicGuardSelector(cLuaState & a_LuaState);
-
-private:
-	cGuardedTasks m_Children;
-	cGuardedTasks::iterator m_CurrentTask;
-
-	virtual void DoEntry(cBlackboard & a_Blackboard) override;
-	virtual eStatus DoTick(cBlackboard & a_Blackboard) override;
-};
-
-
-
-
-
-/** A task decorator that turns failure into success */
-class cSucceeder:
-	public cTask
-{
-public:
-	cSucceeder(std::unique_ptr<cTask> a_Child):
-		m_Child(std::move(a_Child))
-	{
-		ASSERT(m_Child != nullptr);
-	}
-
-	cSucceeder(cLuaState & a_LuaState);
-
-private:
-	std::unique_ptr<cTask> m_Child;
-
-	virtual eStatus DoTick(cBlackboard & a_Blackboard) override
-	{
-		auto ChildStatus = m_Child->Tick(a_Blackboard);
-		return (ChildStatus == eStatus::bsRunning) ?
-			eStatus::bsRunning : eStatus::bsSuccess;
-	}
-
-};
-
-
-
-
-
-/** Writes a random position around the monster onto the blackboard */
-class cRandomPosition :
-	public cTask
-{
-public:
-	cRandomPosition(cBlackboardKey a_WriteKey, double a_MaxRange) :
-		m_Key(std::move(a_WriteKey)),
-		m_MaxRange(a_MaxRange)
-	{
-	}
-
-	cRandomPosition(cLuaState & a_LuaState);
-
-private:
-	cBlackboardKey m_Key;
-	double m_MaxRange;
-
-	virtual eStatus DoTick(cBlackboard & a_Blackboard) override;
-};
-
-
-
-
-
-/** Move to a position in the world */
-class cMoveToPosition:
-	public cTask
-{
-public:
-	cMoveToPosition(cBlackboardKey a_PositionKey) :
-		m_Key(std::move(a_PositionKey))
-	{
-	}
-
-	cMoveToPosition(cLuaState & a_LuaState);
-
-private:
-	cBlackboardKey m_Key;
-
-	virtual void DoEntry(cBlackboard & a_Blackboard) override;
-	virtual eStatus DoTick(cBlackboard & a_Blackboard) override;
-	virtual void DoExit(cBlackboard & a_Blackboard) override;
-	virtual void DoCancel(cBlackboard & a_Blackboard) override;
-};
-
-
-
-
-
-/** Wait a random amount of time */
-class cRandomWait:
-	public cTask
-{
-public:
-	cRandomWait(cLuaState & a_LuaState);
-
-	cRandomWait(cTickTime a_WaitMin, cTickTime a_WaitMax):
-		m_WaitMin(a_WaitMin),
-		m_WaitMax(a_WaitMax)
-	{
-	}
-
-private:
-	cTickTime m_WaitMin, m_WaitMax;
-	cTickTimeLong m_WaitEnd;
-
-	virtual void DoEntry(cBlackboard & a_Blackboard) override;
-	virtual eStatus DoTick(cBlackboard & a_Blackboard) override;
-};
-
-
-
-
-
-/** Succeeds if the monster's health is within some range */
-class cHealthRange:
-	public cTask
-{
-public:
-	cHealthRange(float a_MinHealth, float a_MaxHealth):
-		m_MinHealth(a_MinHealth),
-		m_MaxHealth(a_MaxHealth)
-	{
-	}
-
-	cHealthRange(cLuaState & a_LuaState);
-
-private:
-	float m_MinHealth, m_MaxHealth;
-	virtual eStatus DoTick(cBlackboard & a_Blackboard) override;
-};
-
-}  // namespace Behaviors
+	#define BT_LOG(...) BehaviorLog(a_Blackboard, __VA_ARGS__)
+#else
+#define BT_LOG(...)
+#endif

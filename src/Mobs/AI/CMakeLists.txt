@@ -6,3 +6,5 @@ target_sources(
 		BehaviorTree.h
 		Blackboard.h
 )
+
+add_subdirectory(Behaviours)
