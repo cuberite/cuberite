@@ -2,6 +2,8 @@
 #pragma once
 #include "Mobs/AI/BehaviorTree.h"
 
+#include "Item.h"
+
 /**
 Checks for a player near to the entity holding the specified item.
 Writes the position to the blackboard with the key FeederPosition.
@@ -16,7 +18,7 @@ public:
 
 	virtual eStatus DoTick(cBlackboard & a_Blackboard) override;
 private:
-	short m_Item;
+	cItems m_Items;
 	double m_Range;
 };
 }

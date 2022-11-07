@@ -5,22 +5,28 @@ namespace BehaviorTree
 {
 	cBreedingItemGuard::cBreedingItemGuard(cLuaState &a_LuaState)
 	{
-		AString ItemString;
-		if (!a_LuaState.GetNamedValue("Item", ItemString))
+		AString RawItemString;
+		if (!a_LuaState.GetNamedValue("Item", RawItemString))
 		{
 			LOGWARNING("cBreedingItemGuard is missing parameter Item. Setting to Air, no action will take place!");
-			m_Item = E_BLOCK_AIR;
 			return;
 		}
+		auto ItemStrings = StringSplit(RawItemString, ",");
+
 		cItem Storage;
-		if (!StringToItem(ItemString, Storage))
-		{
-			FLOGWARNING("cBreedingItemGuard received a invalid item string: %s. Using air instead, no action will take place!", ItemString);
-			m_Item = E_BLOCK_AIR;
-			return;
+		for (const auto& ItemString : ItemStrings)
+        {
+			if (!StringToItem(RawItemString, Storage))
+			{
+				FLOGWARNING("cBreedingItemGuard received a invalid item string: '%s'. Using air instead!", ItemString);
+			}
+			m_Items.emplace_back(Storage);
 		}
 
-		m_Item = Storage.m_ItemType;
+		if (m_Items.empty())
+		{
+			FLOGWARNING("cBreedingItemGuard received an invalid item string: '%s'! No action will take place", RawItemString);
+		}
 
 		if (!a_LuaState.GetNamedValue("Range", m_Range))
 		{
@@ -32,7 +38,7 @@ namespace BehaviorTree
 
 	eStatus cBreedingItemGuard::DoTick(cBlackboard &a_Blackboard)
 	{
-		if (m_Item == E_BLOCK_AIR)
+		if (m_Items.empty())
 		{
 			return eStatus::bsFailure;
 		}
@@ -54,7 +60,7 @@ namespace BehaviorTree
 
 			auto & Player = static_cast<cPlayer &>(a_Entity);
 
-			if (Player.GetEquippedItem().m_ItemType != m_Item)
+			if (!m_Items.ContainsType(Player.GetEquippedItem()))
 			{
 				return true;
 			}
