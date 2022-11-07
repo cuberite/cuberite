@@ -966,7 +966,7 @@ void cLuaState::Push(cFireworkItem * a_FireworkItem)
 	}
 	else
 	{
-		tolua_pushusertype(m_LuaState, a_FireworkItem, cFireworkItem);
+		tolua_pushusertype(m_LuaState, a_FireworkItem, "cFireworkItem");
 	}
 }
 
