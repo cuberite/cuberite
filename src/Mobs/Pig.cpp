@@ -34,7 +34,7 @@ void cPig::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? E_ITEM_COOKED_PORKCHOP : E_ITEM_RAW_PORKCHOP);
 	if (m_bIsSaddled)
 	{
-		a_Drops.emplace_back(E_ITEM_SADDLE, 1);
+		a_Drops.emplace_back(E_ITEM_SADDLE, static_cast<char>(1));
 	}
 }
 

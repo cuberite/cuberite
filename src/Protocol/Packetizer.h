@@ -24,6 +24,37 @@ class cUUID;
 
 
 
+/** Macros used to read packets more easily */
+#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
+	Type Var; \
+	do { \
+		if (!ByteBuf.Proc(Var))\
+		{\
+			return;\
+		} \
+	} while (false)
+
+
+
+
+
+#define HANDLE_PACKET_READ(ByteBuf, Proc, Type, Var) \
+	Type Var; \
+	do { \
+		{ \
+			if (!ByteBuf.Proc(Var)) \
+			{ \
+				ByteBuf.CheckValid(); \
+				return false; \
+			} \
+			ByteBuf.CheckValid(); \
+		} \
+	} while (false)
+
+
+
+
+
 /** Composes an individual packet in the protocol's m_OutPacketBuffer; sends it just before being destructed. */
 class cPacketizer
 {
@@ -144,6 +175,13 @@ public:
 	inline void WriteXZYPosition64(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		VERIFY(m_Out.WriteXZYPosition64(a_BlockX, a_BlockY, a_BlockZ));
+	}
+
+	/** Writes the specified block position as a single encoded 64-bit BigEndian integer.
+	The three coordinates are written in XZY order, in 1.14+. */
+	inline void WriteXZYPosition64(const Vector3i a_Position)
+	{
+		VERIFY(m_Out.WriteXZYPosition64(a_Position.x, a_Position.y, a_Position.z));
 	}
 
 	/** Writes the specified angle using a single byte. */

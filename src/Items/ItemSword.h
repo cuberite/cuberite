@@ -8,20 +8,16 @@
 
 
 
-class cItemSwordHandler:
+class cItemSwordHandler final :
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemSwordHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
-
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) const override
 	{
 		if (a_BlockType == E_BLOCK_COBWEB)
 		{
@@ -31,7 +27,7 @@ public:
 	}
 
 
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
+	virtual bool CanRepairWithRawMaterial(short a_ItemType) const override
 	{
 		switch (m_ItemType)
 		{
@@ -45,7 +41,7 @@ public:
 	}
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) const override
 	{
 		switch (a_Action)
 		{
@@ -58,7 +54,7 @@ public:
 
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) override
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) const override
 	{
 		if (a_Block == E_BLOCK_COBWEB)
 		{

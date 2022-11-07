@@ -59,6 +59,9 @@ private:
 	/** Handles and responds to unsupported clients sending pings. */
 	void HandleIncomingDataInOldPingResponseStage(cClientHandle & a_Client, ContiguousByteBufferView a_Data);
 
+	/* Checks if incoming data is an HTTP request and handles it if it is. */
+	bool TryHandleHTTPRequest(cClientHandle & a_Client, ContiguousByteBuffer & a_Data);
+
 	/** Tries to recognize a protocol in the lengthed family (1.7+), based on m_Buffer.
 	Returns a cProtocol_XXX instance if recognized. */
 	std::unique_ptr<cProtocol> TryRecognizeLengthedProtocol(cClientHandle & a_Client);

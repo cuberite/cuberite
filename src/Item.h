@@ -124,7 +124,7 @@ public:
 	// tolua_end
 
 	/** Returns the cItemHandler responsible for this item type */
-	cItemHandler * GetHandler(void) const;
+	const cItemHandler & GetHandler(void) const;
 
 	/** Saves the item data into JSON representation */
 	void GetJson(Json::Value & a_OutValue) const;

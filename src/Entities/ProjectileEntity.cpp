@@ -75,7 +75,7 @@ protected:
 			{
 				Vector3d Intersection = LineStart + m_Projectile->GetSpeed() * LineCoeff;  // Point where projectile goes into the hit block
 
-				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, Face, Intersection))
+				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, a_BlockPos, Face, Intersection))
 				{
 					return false;
 				}

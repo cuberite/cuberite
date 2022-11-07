@@ -119,7 +119,7 @@ void cMobHeadEntity::CopyFrom(const cBlockEntity & a_Src)
 void cMobHeadEntity::SendTo(cClientHandle & a_Client)
 {
 	cWorld * World = a_Client.GetPlayer()->GetWorld();
-	a_Client.SendBlockChange(m_Pos.x, m_Pos.y, m_Pos.z, m_BlockType, World->GetBlockMeta(GetPos()));
+	a_Client.SendBlockChange(m_Pos, m_BlockType, World->GetBlockMeta(GetPos()));
 	a_Client.SendUpdateBlockEntity(*this);
 }
 

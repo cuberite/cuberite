@@ -2147,7 +2147,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Grows the plant at the specified coords to its full. Returns true if the plant was grown, false if not.",
+				Notes = "Grows the plant at the specified coords to maturity. Returns true if the plant was grown, false if not.",
 			},
 			GrowTree =
 			{
@@ -2244,6 +2244,16 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					},
 				},
 				Notes = "Returns whether the configuration has DeepSnow enabled.",
+			},
+			IsFarmlandTramplingEnabled =
+			{
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns true if farmland trampling is enabled.",
 			},
 			IsGameModeAdventure =
 			{

@@ -157,7 +157,9 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	m_MaxPlayers = static_cast<size_t>(a_Settings.GetValueSetI("Server", "MaxPlayers", 100));
 	m_bIsHardcore = a_Settings.GetValueSetB("Server", "HardcoreEnabled", false);
 	m_bAllowMultiLogin = a_Settings.GetValueSetB("Server", "AllowMultiLogin", false);
+	m_RequireResourcePack = a_Settings.GetValueSetB("Server", "RequireResourcePack", false);
 	m_ResourcePackUrl = a_Settings.GetValueSet("Server", "ResourcePackUrl", "");
+	m_CustomRedirectUrl = a_Settings.GetValueSet("Server", "CustomRedirectUrl", "https://youtu.be/dQw4w9WgXcQ");
 
 	m_FaviconData = Base64Encode(cFile::ReadWholeFile(AString("favicon.png")));  // Will return empty string if file nonexistant; client doesn't mind
 
@@ -320,7 +322,7 @@ cTCPLink::cCallbacksPtr cServer::OnConnectionAccepted(const AString & a_RemoteIP
 	cClientHandlePtr NewHandle = std::make_shared<cClientHandle>(a_RemoteIPAddress, m_ClientViewDistance);
 	cCSLock Lock(m_CSClients);
 	m_Clients.push_back(NewHandle);
-	return std::move(NewHandle);
+	return NewHandle;
 }
 
 

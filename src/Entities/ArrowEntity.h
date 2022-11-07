@@ -39,6 +39,8 @@ public:
 
 	// tolua_end
 
+	static constexpr float ARROW_WATER_FRICTION = 50.0f;    ///< Value used to calculate arrow speed in water
+
 	CLASS_PROTODEF(cArrowEntity)
 
 	/** Creates a new arrow with psNoPickup state and default damage modifier coeff */

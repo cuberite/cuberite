@@ -55,36 +55,6 @@ Implements the 1.8 protocol classes:
 
 
 
-#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!ByteBuf.Proc(Var))\
-		{\
-			return;\
-		} \
-	} while (false)
-
-
-
-
-
-#define HANDLE_PACKET_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		{ \
-			if (!ByteBuf.Proc(Var)) \
-			{ \
-				ByteBuf.CheckValid(); \
-				return false; \
-			} \
-			ByteBuf.CheckValid(); \
-		} \
-	} while (false)
-
-
-
-
-
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
 static const UInt32 CompressionThreshold = 256;  // After how large a packet should we compress it.
 
@@ -212,12 +182,12 @@ void cProtocol_1_8_0::SendAttachEntity(const cEntity & a_Entity, const cEntity &
 
 
 
-void cProtocol_1_8_0::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
+void cProtocol_1_8_0::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktBlockAction);
-	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockPos);
 	Pkt.WriteBEInt8(a_Byte1);
 	Pkt.WriteBEInt8(a_Byte2);
 	Pkt.WriteVarInt32(a_BlockType);
@@ -227,13 +197,13 @@ void cProtocol_1_8_0::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, 
 
 
 
-void cProtocol_1_8_0::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
+void cProtocol_1_8_0::SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktBlockBreakAnim);
 	Pkt.WriteVarInt32(a_EntityID);
-	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockPos);
 	Pkt.WriteBEInt8(a_Stage);
 }
 
@@ -241,12 +211,12 @@ void cProtocol_1_8_0::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_
 
 
 
-void cProtocol_1_8_0::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cProtocol_1_8_0::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktBlockChange);
-	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockPos);
 	Pkt.WriteVarInt32((static_cast<UInt32>(a_BlockType) << 4) | (static_cast<UInt32>(a_BlockMeta) & 15));
 }
 
@@ -365,10 +335,25 @@ void cProtocol_1_8_0::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type
 {
 	ASSERT(m_State == 3);  // In game mode?
 
+	// Prevent chat messages that might trigger CVE-2021-44228
+	if (a_MessageRaw.find("${") != std::string::npos)
+	{
+		return;
+	}
+
 	// Send the json string to the client:
 	cPacketizer Pkt(*this, pktChatRaw);
 	Pkt.WriteString(a_MessageRaw);
-	Pkt.WriteBEInt8(a_Type);
+	Pkt.WriteBEInt8([a_Type]() -> signed char
+	{
+		switch (a_Type)
+		{
+			case eChatType::ctChatBox: return 0;
+			case eChatType::ctSystem: return 1;
+			case eChatType::ctAboveActionBar: return 2;
+		}
+		UNREACHABLE("Unsupported chat type");
+	}());
 }
 
 
@@ -471,12 +456,12 @@ void cProtocol_1_8_0::SendDisconnect(const AString & a_Reason)
 
 
 
-void cProtocol_1_8_0::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cProtocol_1_8_0::SendEditSign(Vector3i a_BlockPos)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktEditSign);
-	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockPos);
 }
 
 
@@ -934,13 +919,12 @@ void cProtocol_1_8_0::SendPlayerAbilities(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktPlayerAbilities);
 	Byte Flags = 0;
-	cPlayer * Player = m_Client->GetPlayer();
-	if (Player->IsGameModeCreative())
+	const cPlayer * Player = m_Client->GetPlayer();
+
+	if (Player->IsGameModeCreative() || Player->IsGameModeSpectator())
 	{
-		Flags |= 0x01;
-		Flags |= 0x08;  // Godmode, used for creative
+		Flags |= 0x01;  // Invulnerability.
 	}
 	if (Player->IsFlying())
 	{
@@ -950,6 +934,12 @@ void cProtocol_1_8_0::SendPlayerAbilities(void)
 	{
 		Flags |= 0x04;
 	}
+	if (Player->IsGameModeCreative())
+	{
+		Flags |= 0x08;  // Godmode: creative instant break.
+	}
+
+	cPacketizer Pkt(*this, pktPlayerAbilities);
 	Pkt.WriteBEUInt8(Flags);
 	Pkt.WriteBEFloat(static_cast<float>(0.05 * Player->GetFlyingMaxSpeed()));
 	Pkt.WriteBEFloat(static_cast<float>(0.1 * Player->GetNormalMaxSpeed()));
@@ -959,19 +949,19 @@ void cProtocol_1_8_0::SendPlayerAbilities(void)
 
 
 
-void cProtocol_1_8_0::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
+void cProtocol_1_8_0::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktParticleEffect);
 	Pkt.WriteBEInt32(GetProtocolParticleID(a_ParticleName));
 	Pkt.WriteBool(false);
-	Pkt.WriteBEFloat(a_SrcX);
-	Pkt.WriteBEFloat(a_SrcY);
-	Pkt.WriteBEFloat(a_SrcZ);
-	Pkt.WriteBEFloat(a_OffsetX);
-	Pkt.WriteBEFloat(a_OffsetY);
-	Pkt.WriteBEFloat(a_OffsetZ);
+	Pkt.WriteBEFloat(a_Src.x);
+	Pkt.WriteBEFloat(a_Src.y);
+	Pkt.WriteBEFloat(a_Src.z);
+	Pkt.WriteBEFloat(a_Offset.x);
+	Pkt.WriteBEFloat(a_Offset.y);
+	Pkt.WriteBEFloat(a_Offset.z);
 	Pkt.WriteBEFloat(a_ParticleData);
 	Pkt.WriteBEInt32(a_ParticleAmount);
 }
@@ -1146,18 +1136,46 @@ void cProtocol_1_8_0::SendPlayerListUpdatePing()
 
 
 
-void cProtocol_1_8_0::SendPlayerMoveLook(void)
+void cProtocol_1_8_0::SendPlayerMoveLook (const Vector3d a_Pos, const float a_Yaw, const float a_Pitch, const bool a_IsRelative)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktPlayerMoveLook);
+	Pkt.WriteBEDouble(a_Pos.x);
+	Pkt.WriteBEDouble(a_Pos.y);
+	Pkt.WriteBEDouble(a_Pos.z);
+	Pkt.WriteBEFloat(a_Yaw);
+	Pkt.WriteBEFloat(a_Pitch);
+
+	if (a_IsRelative)
+	{
+		// Set all bits to 1 - makes everything relative
+		Pkt.WriteBEUInt8(static_cast<UInt8>(-1));
+	}
+	else
+	{
+		// Set all bits to 0 - make everything absolute
+		Pkt.WriteBEUInt8(0);
+	}
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendPlayerMoveLook(void)
+{
 	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteBEDouble(Player->GetPosX());
-	Pkt.WriteBEDouble(Player->GetPosY());
-	Pkt.WriteBEDouble(Player->GetPosZ());
-	Pkt.WriteBEFloat(static_cast<float>(Player->GetYaw()));
-	Pkt.WriteBEFloat(static_cast<float>(Player->GetPitch()));
-	Pkt.WriteBEUInt8(0);
+	SendPlayerMoveLook(Player->GetPosition(), static_cast<float>(Player->GetYaw()), static_cast<float>(Player->GetPitch()), false);
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendPlayerPermissionLevel()
+{
+	// 1.8 has no concept of a permission level.
 }
 
 
@@ -1360,15 +1378,15 @@ void cProtocol_1_8_0::SendSetRawTitle(const AString & a_Title)
 
 
 
-void cProtocol_1_8_0::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
+void cProtocol_1_8_0::SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSoundEffect);
 	Pkt.WriteString(a_SoundName);
-	Pkt.WriteBEInt32(static_cast<Int32>(a_X * 8.0));
-	Pkt.WriteBEInt32(static_cast<Int32>(a_Y * 8.0));
-	Pkt.WriteBEInt32(static_cast<Int32>(a_Z * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.x * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.y * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.z * 8.0));
 	Pkt.WriteBEFloat(a_Volume);
 	Pkt.WriteBEUInt8(static_cast<Byte>(a_Pitch * 63));
 }
@@ -1377,13 +1395,13 @@ void cProtocol_1_8_0::SendSoundEffect(const AString & a_SoundName, double a_X, d
 
 
 
-void cProtocol_1_8_0::SendSoundParticleEffect(const EffectID a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
+void cProtocol_1_8_0::SendSoundParticleEffect(const EffectID a_EffectID, Vector3i a_Origin, int a_Data)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSoundParticleEffect);
 	Pkt.WriteBEInt32(static_cast<int>(a_EffectID));
-	Pkt.WriteXYZPosition64(a_SrcX, a_SrcY, a_SrcZ);
+	Pkt.WriteXYZPosition64(a_Origin);
 	Pkt.WriteBEInt32(a_Data);
 	Pkt.WriteBool(false);
 }
@@ -1507,16 +1525,16 @@ void cProtocol_1_8_0::SendTabCompletionResults(const AStringVector & a_Results)
 
 
 
-void cProtocol_1_8_0::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cProtocol_1_8_0::SendThunderbolt(Vector3i a_Origin)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSpawnGlobalEntity);
 	Pkt.WriteVarInt32(0);  // EntityID = 0, always
 	Pkt.WriteBEUInt8(1);  // Type = Thunderbolt
-	Pkt.WriteFPInt(a_BlockX);
-	Pkt.WriteFPInt(a_BlockY);
-	Pkt.WriteFPInt(a_BlockZ);
+	Pkt.WriteFPInt(a_Origin.x);
+	Pkt.WriteFPInt(a_Origin.y);
+	Pkt.WriteFPInt(a_Origin.z);
 }
 
 
@@ -1620,12 +1638,12 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 
 
 
-void cProtocol_1_8_0::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+void cProtocol_1_8_0::SendUpdateSign(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktUpdateSign);
-	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockPos);
 
 	AString Lines[] = { a_Line1, a_Line2, a_Line3, a_Line4 };
 	for (size_t i = 0; i < ARRAYCOUNT(Lines); i++)
@@ -2313,15 +2331,15 @@ void cProtocol_1_8_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
 
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
+	Vector3i Position;
+	if (!a_ByteBuffer.ReadXYZPosition64(Position))
 	{
 		return;
 	}
 
 	HANDLE_READ(a_ByteBuffer, ReadBEInt8, Int8, Face);
 
-	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), Status);
+	m_Client->HandleLeftClick(Position, FaceIntToBlockFace(Face), Status);
 }
 
 
@@ -2330,8 +2348,8 @@ void cProtocol_1_8_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_8_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
+	Vector3i BlockPos;
+	if (!a_ByteBuffer.ReadXYZPosition64(BlockPos))
 	{
 		return;
 	}
@@ -2352,7 +2370,7 @@ void cProtocol_1_8_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	}
 	else
 	{
-		m_Client->HandleRightClick(BlockX, BlockY, BlockZ, blockFace, CursorX, CursorY, CursorZ, true);
+		m_Client->HandleRightClick(BlockPos, blockFace, {CursorX, CursorY, CursorZ}, true);
 	}
 }
 
@@ -2444,7 +2462,7 @@ void cProtocol_1_8_0::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 
 	if (PlayerID != m_Client->GetPlayer()->GetUniqueID())
 	{
-		m_Client->Kick("Mind your own business! Hacked client?");
+		LOGD("Player \"%s\" attempted to action another entity - hacked client?", m_Client->GetUsername().c_str());
 		return;
 	}
 
@@ -2524,7 +2542,7 @@ void cProtocol_1_8_0::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
 	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
 
-	m_Client->HandlePlayerMove(PosX, PosY, PosZ, IsOnGround);
+	m_Client->HandlePlayerMove({PosX, PosY, PosZ}, IsOnGround);
 }
 
 
@@ -2540,7 +2558,7 @@ void cProtocol_1_8_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Pitch);
 	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
 
-	m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, Yaw, Pitch, IsOnGround);
+	m_Client->HandlePlayerMoveLook({PosX, PosY, PosZ}, Yaw, Pitch, IsOnGround);
 }
 
 
@@ -2549,28 +2567,23 @@ void cProtocol_1_8_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_8_0::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
+	// https://wiki.vg/index.php?title=Plugin_channels&oldid=14089#MC.7CAdvCmd
+
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
 
+	const std::string_view ChannelView = Channel;
+
 	// If the plugin channel is recognized vanilla, handle it directly:
-	if (Channel.substr(0, 3) == "MC|")
+	if (ChannelView.substr(0, 3) == "MC|")
 	{
-		HandleVanillaPluginMessage(a_ByteBuffer, Channel);
-
-		// Skip any unread data (vanilla sometimes sends garbage at the end of a packet; #1692):
-		if (a_ByteBuffer.GetReadableSpace() > 0)
-		{
-			LOGD("Protocol 1.8: Skipping garbage data at the end of a vanilla PluginMessage packet, %u bytes",
-				static_cast<unsigned>(a_ByteBuffer.GetReadableSpace())
-			);
-			a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace());
-		}
-
+		HandleVanillaPluginMessage(a_ByteBuffer, ChannelView.substr(3));
 		return;
 	}
 
-	// Read the plugin message and relay to clienthandle:
 	ContiguousByteBuffer Data;
-	VERIFY(a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace()));  // Always succeeds
+
+	// Read the plugin message and relay to clienthandle:
+	a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace());
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 
@@ -2582,6 +2595,8 @@ void cProtocol_1_8_0::HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Hash);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
+
+	m_Client->HandleResourcePack(Status);
 }
 
 
@@ -2657,8 +2672,8 @@ void cProtocol_1_8_0::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_8_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 {
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
+	Vector3i Position;
+	if (!a_ByteBuffer.ReadXYZPosition64(Position))
 	{
 		return;
 	}
@@ -2675,7 +2690,7 @@ void cProtocol_1_8_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 		}
 	}
 
-	m_Client->HandleUpdateSign(BlockX, BlockY, BlockZ, Lines[0], Lines[1], Lines[2], Lines[3]);
+	m_Client->HandleUpdateSign(Position, Lines[0], Lines[1], Lines[2], Lines[3]);
 }
 
 
@@ -2802,81 +2817,83 @@ void cProtocol_1_8_0::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel)
+void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const std::string_view a_Channel)
 {
-	if ((a_Channel == "MC|AdvCdm") || (a_Channel == "MC|AdvCmd"))  // Spelling was fixed in 15w34
+	if ((a_Channel == "AdvCdm") || (a_Channel == "AdvCmd"))  // Spelling was fixed in 15w34.
 	{
-		// https://wiki.vg/index.php?title=Plugin_channels&oldid=14089#MC.7CAdvCmd
-		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Dest);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Type);
 
-		switch (Dest)
+		switch (Type)
 		{
 			case 0x00:
 			{
-				// Editing a command-block
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockX);
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockY);
 				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockZ);
 				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
-				m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
-				break;
-			}
+				HANDLE_READ(a_ByteBuffer, ReadBool, bool, TrackOutput);
 
-			case 0x01:
-			{
-				// Editing a command-block-minecart
-				HANDLE_READ(a_ByteBuffer, ReadBEUInt32,      UInt32,  EntityID);
-				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
-				m_Client->HandleCommandBlockEntityChange(EntityID, Command);
-				break;
-			}
-
-			default:
-			{
-				m_Client->SendChat(Printf("Failure setting command block command; unhandled destination %u (0x%02x)", Dest, Dest), mtFailure);
-				LOG("Unhandled MC|AdvCmd packet destination.");
+				// Editing a command-block:
+				m_Client->HandleCommandBlockBlockChange({BlockX, BlockY, BlockZ}, Command);
 				return;
 			}
-		}  // switch (Mode)
-		return;
-	}
-	else if (a_Channel == "MC|Brand")
-	{
-		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
+			case 0x01:
+			{
+				HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, EntityID);
+				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+				HANDLE_READ(a_ByteBuffer, ReadBool, bool, TrackOutput);
 
-		m_Client->SetClientBrand(Brand);
-		// Send back our brand, including the length:
-		m_Client->SendPluginMessage("MC|Brand", "\x08""Cuberite");
-		return;
+				// Editing a command-block-minecart:
+				m_Client->HandleCommandBlockEntityChange(EntityID, Command);
+				return;
+			}
+			default:
+			{
+				LOGD("Player \"%s\" sent an invalid command block edit type - hacked client?", m_Client->GetUsername().c_str());
+				return;
+			}
+		}
 	}
-	else if (a_Channel == "MC|Beacon")
+	else if (a_Channel == "Beacon")
 	{
 		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, Effect1);
 		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, Effect2);
 
 		m_Client->HandleBeaconSelection(Effect1, Effect2);
-		return;
 	}
-	else if (a_Channel == "MC|ItemName")
+	else if (a_Channel == "BEdit")
+	{
+		if (cItem UnsignedBook; ReadItem(a_ByteBuffer, UnsignedBook))
+		{
+			// TODO: m_Client->HandleBookEdit
+		}
+	}
+	else if (a_Channel == "BSign")
+	{
+		if (cItem WrittenBook; ReadItem(a_ByteBuffer, WrittenBook))
+		{
+			// TODO: m_Client->HandleBookSign
+		}
+	}
+	else if (a_Channel == "Brand")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
+
+		m_Client->SetClientBrand(Brand);
+		m_Client->SendPluginMessage("MC|Brand", "\x08""Cuberite");  // Send back our brand, including the length.
+	}
+	else if (a_Channel == "ItemName")
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, ItemName);
 
 		m_Client->HandleAnvilItemName(ItemName);
-		return;
 	}
-	else if (a_Channel == "MC|TrSel")
+	else if (a_Channel == "TrSel")
 	{
 		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, SlotNum);
 
 		m_Client->HandleNPCTrade(SlotNum);
-		return;
 	}
-	LOG("Unhandled vanilla plugin channel: \"%s\".", a_Channel.c_str());
-
-	// Read the payload and send it through to the clienthandle:
-	ContiguousByteBuffer Message;
-	VERIFY(a_ByteBuffer.ReadSome(Message, a_ByteBuffer.GetReadableSpace() - 1));
-	m_Client->HandlePluginMessage(a_Channel, Message);
 }
 
 
@@ -2946,6 +2963,7 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 				{
 					a_Item.m_RepairCost = NBT.GetInt(tag);
 				}
+				break;
 			}
 			default: LOGD("Unimplemented NBT data when parsing!"); break;
 		}
@@ -3081,10 +3099,6 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 
 void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
-	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
-	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
-	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
-
 	switch (a_BlockEntity.GetBlockType())
 	{
 		case E_BLOCK_WALL_BANNER:
@@ -3094,16 +3108,12 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			a_Writer.AddInt("Base", static_cast<Int32>(BannerEntity.GetBaseColor()));
 			break;
 		}
-
 		case E_BLOCK_BEACON:
+		case E_BLOCK_CHEST:
 		{
-			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);
-			a_Writer.AddInt("Primary",   BeaconEntity.GetPrimaryEffect());
-			a_Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
-			a_Writer.AddInt("Levels",    BeaconEntity.GetBeaconLevel());
+			// Nothing!
 			break;
 		}
-
 		case E_BLOCK_COMMAND_BLOCK:
 		{
 			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
@@ -3120,23 +3130,12 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			}
 			break;
 		}
-
 		case E_BLOCK_ENCHANTMENT_TABLE:
-		{
-			auto & EnchantingTableEntity = static_cast<const cEnchantingTableEntity &>(a_BlockEntity);
-			if (!EnchantingTableEntity.GetCustomName().empty())
-			{
-				a_Writer.AddString("CustomName", EnchantingTableEntity.GetCustomName());
-			}
-			break;
-		}
-
 		case E_BLOCK_END_PORTAL:
 		{
 			// Nothing!
 			break;
 		}
-
 		case E_BLOCK_HEAD:
 		{
 			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
@@ -3158,7 +3157,6 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			a_Writer.EndCompound();
 			break;
 		}
-
 		case E_BLOCK_FLOWER_POT:
 		{
 			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
@@ -3166,7 +3164,6 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			a_Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
 			break;
 		}
-
 		case E_BLOCK_MOB_SPAWNER:
 		{
 			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
@@ -3174,12 +3171,15 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			a_Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
 			break;
 		}
-
 		default:
 		{
-			break;
+			return;
 		}
 	}
+
+	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
 }
 
 
@@ -3902,7 +3902,7 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousBy
 
 
 
-UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity)
+UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity) const
 {
 	using Type = cEntity::eEntityType;
 
@@ -3932,6 +3932,8 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity)
 				case PType::pkFirework: return 76;
 				case PType::pkWitherSkull: return 66;
 			}
+
+			break;
 		}
 		case Type::etFloater: return 90;
 		case Type::etItemFrame: return 71;
@@ -3951,7 +3953,7 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity)
 
 
 
-int cProtocol_1_8_0::GetProtocolParticleID(const AString & a_ParticleName)
+int cProtocol_1_8_0::GetProtocolParticleID(const AString & a_ParticleName) const
 {
 	static const std::unordered_map<AString, int> ParticleMap
 	{

@@ -33,6 +33,17 @@ public:
 	virtual void HandleFalling(void);
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 
+	/** Handles farmland trampling when hitting the ground.
+	Algorithm:
+	fall height <= 0.6875 blocks: no trampling
+	fall height > 0.6875 and <= 1.0625: 25% chance of trampling
+	fall height > 1.0625 and <= 1.5625: 66% chance of trampling
+	fall height > 1.5625: always trample
+	The values may differ from vanilla, they were determined experimentally.
+	Additionaly, mobs smaller than 0.512 cubic blocks won't trample.
+	*/
+	void HandleFarmlandTrampling(double a_FallHeight, BLOCKTYPE a_BlockAtFoot, BLOCKTYPE a_BlockBelow);
+
 	/** Tells all pawns which are targeting us to stop targeting us. */
 	void StopEveryoneFromTargetingMe();
 

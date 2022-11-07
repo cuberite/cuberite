@@ -19,6 +19,7 @@ target_sources(
 	ItemCloth.h
 	ItemComparator.h
 	ItemCookedFish.h
+	ItemDefaultItem.h
 	ItemDoor.h
 	ItemDropSpenser.h
 	ItemDye.h
@@ -26,7 +27,7 @@ target_sources(
 	ItemEnchantingTable.h
 	ItemEndCrystal.h
 	ItemEndPortalFrame.h
-	ItemEnderchest.h
+	ItemEnderChest.h
 	ItemEyeOfEnder.h
 	ItemFenceGate.h
 	ItemFishingRod.h
@@ -82,6 +83,6 @@ target_sources(
 	ItemTorch.h
 	ItemTrapdoor.h
 	ItemTripwireHook.h
-	ItemVine.h
+	ItemVines.h
 	SimplePlaceableItemHandler.h
 )

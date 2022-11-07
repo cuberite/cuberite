@@ -555,7 +555,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			)
 			{
 				y--;
-				if (!cChunkDef::IsValidHeight(y - 1))
+				if (!cChunkDef::IsValidHeight({x, y - 1, z}))
 				{
 					failed = true;
 					break;
@@ -1840,7 +1840,7 @@ cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_Or
 			LOGWARNING("Cannot parse ore information from string, invalid number in OreInfo \"%s\".", ore.c_str());
 			continue;
 		}
-		res.emplace_back(oreType, oreMeta, maxHeight, numNests, nestSize);
+		res.emplace_back(static_cast<BLOCKTYPE>(oreType), oreMeta, maxHeight, numNests, nestSize);
 	}  // for i - split[]
 	return res;
 }
@@ -1986,7 +1986,7 @@ void cFinishGenOreNests::GenerateOre(
 				for (int y = ysize; y >= 0; --y)
 				{
 					int BlockY = BaseY + y;
-					if (!cChunkDef::IsValidHeight(BlockY))
+					if (!cChunkDef::IsValidHeight({BlockX, BlockY, BaseZ}))
 					{
 						Num++;  // So that the cycle finishes even if the base coords wander away from the chunk
 						continue;

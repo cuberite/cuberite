@@ -439,14 +439,14 @@ void cChunkMap::FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLET
 
 
 
-void cChunkMap::CollectPickupsByPlayer(cPlayer & a_Player)
+void cChunkMap::CollectPickupsByEntity(cEntity & a_Entity)
 {
 	cCSLock Lock(m_CSChunks);
 
-	auto BoundingBox = a_Player.GetBoundingBox();
+	auto BoundingBox = a_Entity.GetBoundingBox();
 	BoundingBox.Expand(1, 0.5, 1);
 
-	ForEachEntityInBox(BoundingBox, [&a_Player](cEntity & Entity)
+	ForEachEntityInBox(BoundingBox, [&a_Entity](cEntity & Entity)
 	{
 		// Only pickups and projectiles can be picked up:
 		if (Entity.IsPickup())
@@ -456,11 +456,11 @@ void cChunkMap::CollectPickupsByPlayer(cPlayer & a_Player)
 				(*itr)->GetUniqueID(), a_Player->GetName().c_str(), SqrDist
 			);
 			*/
-			static_cast<cPickup &>(Entity).CollectedBy(a_Player);
+			static_cast<cPickup &>(Entity).CollectedBy(a_Entity);
 		}
-		else if (Entity.IsProjectile())
+		else if (Entity.IsProjectile() && a_Entity.IsPlayer())
 		{
-			static_cast<cProjectileEntity &>(Entity).CollectedBy(a_Player);
+			static_cast<cProjectileEntity &>(Entity).CollectedBy(static_cast<cPlayer&>(a_Entity));
 		}
 
 		// The entities will MarkDirty when they Destroy themselves
@@ -748,7 +748,7 @@ bool cChunkMap::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 			res = false;
 			continue;
 		}
-		if (!cChunkDef::IsValidHeight(itr->m_RelY))
+		if (!cChunkDef::IsValidHeight(itr->GetRelativePos()))
 		{
 			continue;
 		}
@@ -1347,7 +1347,10 @@ void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
 	// Do the magic of updating the world:
 	for (auto & Chunk : m_Chunks)
 	{
-		Chunk.second.Tick(a_Dt);
+		if (Chunk.second.ShouldBeTicked())
+		{
+			Chunk.second.Tick(a_Dt);
+		}
 	}
 
 	// Finally, only after all chunks are ticked, tell the client about all aggregated changes:

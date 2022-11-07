@@ -23,4 +23,8 @@ namespace NamespaceSerializer
 	eMonsterType ToMonsterType(std::string_view a_ID);
 
 	std::pair<Namespace, std::string_view> SplitNamespacedID(std::string_view ID);
+
+	// Examples: Input: "wolf" -> Output: "Wolf", Input: "iron_golem" -> Output: "Iron Golem"
+	AString Prettify(AString a_ID);
+	AString PrettifyEntityName(const AString & a_ID, const bool a_IsTamed = false);
 }

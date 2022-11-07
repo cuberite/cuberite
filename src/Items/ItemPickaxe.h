@@ -5,14 +5,14 @@
 
 
 
-class cItemPickaxeHandler:
+class cItemPickaxeHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemPickaxeHandler(int a_ItemType):
+	constexpr cItemPickaxeHandler(int a_ItemType):
 		Super(a_ItemType)
 	{
 
@@ -20,7 +20,7 @@ public:
 
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) const override
 	{
 		switch (a_Action)
 		{
@@ -33,7 +33,7 @@ public:
 
 
 
-	char PickaxeLevel()
+	char PickaxeLevel() const
 	{
 		switch (m_ItemType)
 		{
@@ -47,7 +47,7 @@ public:
 		}
 	}
 
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) const override
 	{
 		// NOTICE: Make sure to update cItemHandler::CanHarvestBlock() if adding new blocks here!
 		switch (a_BlockType)
@@ -155,7 +155,7 @@ public:
 		return Super::CanHarvestBlock(a_BlockType);
 	}
 
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
+	virtual bool CanRepairWithRawMaterial(short a_ItemType) const override
 	{
 		switch (m_ItemType)
 		{
@@ -169,7 +169,7 @@ public:
 	}
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) override
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) const override
 	{
 		if (!IsBlockMaterialIron(a_Block) && (a_Block != E_BLOCK_ANVIL) && !IsBlockMaterialRock(a_Block))
 		{

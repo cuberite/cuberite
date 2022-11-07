@@ -121,6 +121,9 @@ public:
 
 	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }
 
+	/** Returns true if farmland trampling is enabled */
+	bool IsFarmlandTramplingEnabled(void) const { return m_bFarmlandTramplingEnabled; }
+
 	bool IsDeepSnowEnabled(void) const { return m_IsDeepSnowEnabled; }
 
 	bool ShouldLavaSpawnFire(void) const { return m_ShouldLavaSpawnFire; }
@@ -234,7 +237,7 @@ public:
 	/** Queues a task to unload unused chunks onto the tick thread. The prefferred way of unloading. */
 	void QueueUnloadUnusedChunks(void);  // tolua_export
 
-	void CollectPickupsByPlayer(cPlayer & a_Player);
+	void CollectPickupsByEntity(cEntity & a_Entity);
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cPlayerListCallback a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<
@@ -311,10 +314,14 @@ public:
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
 
 	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be nullptr. Returns true if sign text changed. */
-	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = nullptr);  // Exported in ManualBindings.cpp
+	bool SetSignLines(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = nullptr);  // Exported in ManualBindings.cpp
 
 	/** Sets the command block command. Returns true if command changed. */
 	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);  // tolua_export
+	bool SetCommandBlockCommand(Vector3i a_BlockPos, const AString & a_Command)
+	{
+		return SetCommandBlockCommand(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Command);
+	}
 
 	/** Is the trapdoor open? Returns false if there is no trapdoor at the specified coords. */
 	bool IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ);                                      // tolua_export
@@ -993,6 +1000,7 @@ private:
 
 	eGameMode m_GameMode;
 	bool m_bEnabledPVP;
+	bool m_bFarmlandTramplingEnabled;
 	bool m_IsDeepSnowEnabled;
 	bool m_ShouldLavaSpawnFire;
 	bool m_VillagersShouldHarvestCrops;
@@ -1099,6 +1107,9 @@ private:
 
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
 
+	/** Ticks all clients that are in this world. */
+	void TickClients(std::chrono::milliseconds a_Dt);
+
 	/** Handles the weather in each tick */
 	void TickWeather(float a_Dt);
 
@@ -1128,7 +1139,11 @@ private:
 	bool CanSpawnAt(int a_X, int & a_Y, int a_Z);
 
 	/** Check if player starting point is acceptable */
-	bool CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ);
+	bool CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
+	{
+		return CheckPlayerSpawnPoint({a_PosX, a_PosY, a_PosZ});
+	}
+	bool CheckPlayerSpawnPoint(Vector3i a_Pos);
 
 	/** Chooses a reasonable transition from the current weather to a new weather */
 	eWeather ChooseNewWeather(void);
