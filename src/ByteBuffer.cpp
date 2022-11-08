@@ -214,6 +214,24 @@ size_t cByteBuffer::GetReadableSpace(void) const
 
 
 
+bool cByteBuffer::CanBEInt8Represent(int a_Value)
+{
+	return (-128 <= a_Value) && (a_Value <= 127);
+}
+
+
+
+
+
+bool cByteBuffer::CanBEInt16Represent(int a_Value)
+{
+	return (-32768 <= a_Value) && (a_Value <= 32767);
+}
+
+
+
+
+
 bool cByteBuffer::CanReadBytes(size_t a_Count) const
 {
 	CHECK_THREAD
