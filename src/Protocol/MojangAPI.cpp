@@ -69,7 +69,7 @@ static cX509CertPtr GetCACerts(void)
 		"-----END CERTIFICATE-----\n"
 
 		// Amazon Root CA 1 (api.mojang.com)
-		// Downloaded from https://certs.starfieldtech.com/repository/
+		// Downloaded from https://www.amazontrust.com/repository/
 		"-----BEGIN CERTIFICATE-----\n"
 		"MIIDQTCCAimgAwIBAgITBmyfz5m/jAo54vB4ikPmljZbyjANBgkqhkiG9w0BAQsF\n"
 		"ADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6\n"
