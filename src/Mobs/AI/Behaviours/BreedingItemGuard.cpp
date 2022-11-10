@@ -14,8 +14,8 @@ namespace BehaviorTree
 		auto ItemStrings = StringSplit(RawItemString, ",");
 
 		cItem Storage;
-		for (const auto& ItemString : ItemStrings)
-        {
+		for (const auto & ItemString : ItemStrings)
+		{
 			if (!StringToItem(RawItemString, Storage))
 			{
 				FLOGWARNING("cBreedingItemGuard received a invalid item string: '%s'. Using air instead!", ItemString);

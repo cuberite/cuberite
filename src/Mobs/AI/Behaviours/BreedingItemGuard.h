@@ -1,8 +1,8 @@
 
 #pragma once
-#include "Mobs/AI/BehaviorTree.h"
 
-#include "Item.h"
+#include "Globals.h"
+#include "Mobs/AI/BehaviorTree.h"
 
 /**
 Checks for a player near to the entity holding the specified item.
