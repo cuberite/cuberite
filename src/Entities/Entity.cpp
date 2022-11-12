@@ -494,6 +494,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtSpider:
 					case mtCaveSpider:
 					case mtSilverfish:
+					case mtEndermite:
 					{
 						MagicalCriticalHit = true;
 						a_TDI.FinalDamage += 2.5f * BaneOfArthropodsLevel;
