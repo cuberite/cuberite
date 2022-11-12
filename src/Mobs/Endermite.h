@@ -16,5 +16,5 @@ public:
 
 	cEndermite();
 
-	CLASS_PROTODEF(cSilverfish)
+	CLASS_PROTODEF(cEndermite)
 } ;
