@@ -46,6 +46,8 @@ GPUCache
 *.cbp
 ## KDevelop
 *.kdev*
+## Vim
+.cache/
 
 # world inside source
 ChunkWorx.ini
