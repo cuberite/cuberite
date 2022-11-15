@@ -117,7 +117,7 @@ Issues that should be easy to get started with are tagged as [easy][6] in GitHub
 
 Other good places to get started are:
 
- - Cleaning up some of the compiler warnings. Check [Travis CI][7] for a list of them.
+ - Cleaning up some of the compiler warnings. Check [our CI][7] for a list of them.
  - Writing some plugins: They are written in lua, with excellent API documentation available via [APIDump][8]. The [Core plugin][9] should also help quite a bit here.
 
 Special Things
@@ -131,6 +131,6 @@ Special Things
 [4]: https://github.com/cuberite/cuberite/blob/master/CONTRIBUTING.md
 [5]: https://github.com/cuberite/cuberite/blob/master/COMPILING.md
 [6]: https://github.com/cuberite/cuberite/issues?q=is%3Aopen+is%3Aissue+label%3Aeffort%2Feasy
-[7]: https://travis-ci.org/cuberite/cuberite
+[7]: https://builds.cuberite.org/job/cuberite/job/master/lastSuccessfulBuild/console
 [8]: https://api.cuberite.org/
 [9]: https://github.com/cuberite/Core
