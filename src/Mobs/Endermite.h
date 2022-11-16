@@ -13,7 +13,7 @@ class cEndermite:
 {
 	using Super = cAggressiveMonster;
 
-	//Endermite should despawn in two minutes
+	// Endermite should despawn in two minutes
 	std::chrono::milliseconds m_Lifetime;
 	std::chrono::milliseconds m_Timer;
 
