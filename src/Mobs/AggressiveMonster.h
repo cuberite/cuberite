@@ -30,6 +30,13 @@ public:
 
 	virtual void EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk) override;
 
+	/**
+	* Check if a a_mobtype is around the monster at a SightDistance
+	* return true if it found one and set a_Monster as the Found Monster
+	* return false and leave the a_Monster untouched if
+	*/
+	virtual bool CanSeeMobType(eMonsterType a_mobtype, cAggressiveMonster * a_Monster, int SightDistance=16);
+
 	/** Try to perform attack
 	returns true if attack was deemed successful (hit player, fired projectile, creeper exploded, etc.) even if it didn't actually do damage
 	return false if e.g. the mob is still in cooldown from a previous attack */

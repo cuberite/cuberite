@@ -6,6 +6,7 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "../LineBlockTracer.h"
+#include <random>
 
 
 
@@ -40,6 +41,35 @@ void cAggressiveMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 {
 	Super::EventSeePlayer(a_Player, a_Chunk);
 	m_EMState = CHASING;
+}
+
+
+
+
+
+bool cAggressiveMonster::CanSeeMobType(eMonsterType a_MobType, cAggressiveMonster * a_Monster, int a_SightDistance)
+{
+	m_World->ForEachEntity([&](cEntity & a_Entity)
+			{
+			cAggressiveMonster* AggMonster;
+			if ((AggMonster = static_cast<cAggressiveMonster*>(&a_Entity)) == nullptr)
+			{
+				return false;
+			}
+			if (AggMonster->GetMobType() != a_MobType)
+			{
+				return false;
+			}
+			Vector3d MyHeadPosition = GetPosition().addedY(GetHeight());
+			Vector3d TargetPosition = AggMonster->GetPosition().addedY(AggMonster->GetHeight());
+			double TargetDistance = (MyHeadPosition - TargetPosition).SqrLength();
+
+			if (TargetDistance < (a_SightDistance * a_SightDistance))
+			{
+				a_Monster = AggMonster;
+				return true;
+			}
+		});
 }
 
 

@@ -65,8 +65,9 @@ void cThrownEnderPearlEntity::TeleportCreator(Vector3d a_HitPos)
 
 		auto & Random = GetRandomProvider();
 
-		//5% chance to spawn an endermite
-		if(Random.RandBool(0.05)){
+		// 5% chance to spawn an endermite
+		if (Random.RandBool(0.05))
+		{
 			Vector3d PlayerPosition = a_Entity.GetPosition();
 			m_World->SpawnMob(PlayerPosition.x, PlayerPosition.y, PlayerPosition.z, mtEndermite);
 		}
