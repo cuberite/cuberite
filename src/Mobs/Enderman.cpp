@@ -151,7 +151,7 @@ void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_EMState != CHASING)
 	{
-		cAggressiveMonster* target;
+		cAggressiveMonster* target = nullptr;
 		if (CanSeeMobType(mtEndermite, target, 64))
 		{
 			SetTarget(target);

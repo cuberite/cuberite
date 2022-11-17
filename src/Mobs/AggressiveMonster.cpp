@@ -51,7 +51,7 @@ bool cAggressiveMonster::CanSeeMobType(eMonsterType a_MobType, cAggressiveMonste
 {
 	m_World->ForEachEntity([&](cEntity & a_Entity)
 			{
-			cAggressiveMonster* AggMonster;
+			cAggressiveMonster* AggMonster = nullptr;
 			if ((AggMonster = static_cast<cAggressiveMonster*>(&a_Entity)) == nullptr)
 			{
 				return false;
@@ -70,7 +70,7 @@ bool cAggressiveMonster::CanSeeMobType(eMonsterType a_MobType, cAggressiveMonste
 				return true;
 			}
 		});
-		return a_Monster != nullptr;
+		return &a_Monster != nullptr;
 }
 
 
