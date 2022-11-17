@@ -23,5 +23,5 @@ public:
 
 	CLASS_PROTODEF(cEndermite)
 
-	void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
+	void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 } ;

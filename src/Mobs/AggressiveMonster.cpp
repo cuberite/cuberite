@@ -70,6 +70,7 @@ bool cAggressiveMonster::CanSeeMobType(eMonsterType a_MobType, cAggressiveMonste
 				return true;
 			}
 		});
+		return a_Monster != nullptr;
 }
 
 
