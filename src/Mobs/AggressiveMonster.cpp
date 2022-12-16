@@ -47,30 +47,39 @@ void cAggressiveMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 
 
 
-bool cAggressiveMonster::CanSeeMobType(eMonsterType a_MobType, cAggressiveMonster * a_Monster, int a_SightDistance)
+cMonster* cAggressiveMonster::GetMonsterOfTypeInSight(eMonsterType a_MobType, unsigned int a_SightDistance)
 {
-	m_World->ForEachEntity([&](cEntity & a_Entity)
-			{
-			cAggressiveMonster* AggMonster = nullptr;
-			if ((AggMonster = static_cast<cAggressiveMonster*>(&a_Entity)) == nullptr)
-			{
-				return false;
-			}
-			if (AggMonster->GetMobType() != a_MobType)
-			{
-				return false;
-			}
-			Vector3d MyHeadPosition = GetPosition().addedY(GetHeight());
-			Vector3d TargetPosition = AggMonster->GetPosition().addedY(AggMonster->GetHeight());
-			double TargetDistance = (MyHeadPosition - TargetPosition).SqrLength();
 
-			if (TargetDistance < (a_SightDistance * a_SightDistance))
+	cMonster* FoundTarget = nullptr;
+
+	cEntityCallback Callback = [&](cEntity & a_Entity)
 			{
-				a_Monster = AggMonster;
-				return true;
-			}
-		});
-		return &a_Monster != nullptr;
+				if (!a_Entity.IsMob()){
+					return false;
+				}
+
+				cMonster& Monster = dynamic_cast<cMonster &>(a_Entity);
+				if (Monster.GetMobType() != a_MobType)
+				{
+					return false;
+				}
+
+				Vector3d MyHeadPosition = GetPosition().addedY(GetHeight());
+				Vector3d TargetPosition = Monster.GetPosition().addedY(Monster.GetHeight());
+				double TargetDistance = (MyHeadPosition - TargetPosition).SqrLength();
+
+				if (TargetDistance < (a_SightDistance * a_SightDistance))
+				{
+					FoundTarget = &Monster;
+					return true;
+				}
+				return false;
+			};
+	
+	/* cBoundingBox CheckZone(GetPosition().addedXZ(-a_SightDistance, -a_SightDistance), GetPosition().addedXZ(a_SightDistance, a_SightDistance)); */
+	/* m_World->ForEachEntityInBox(CheckZone, Callback); */
+	m_World->ForEachEntity(Callback);
+	return FoundTarget;
 }
 
 
