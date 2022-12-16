@@ -151,8 +151,9 @@ void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_EMState != CHASING)
 	{
-		cMonster* EndermiteFound = GetMonsterOfTypeInSight(mtEndermite, 64);
-		if (EndermiteFound != nullptr){
+		cMonster * EndermiteFound = GetMonsterOfTypeInSight(mtEndermite, 64);
+		if (EndermiteFound != nullptr)
+		{
 			SetTarget(EndermiteFound);
 			m_EMState = CHASING;
 			m_bIsScreaming = true;

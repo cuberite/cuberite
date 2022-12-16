@@ -47,18 +47,19 @@ void cAggressiveMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 
 
 
-cMonster* cAggressiveMonster::GetMonsterOfTypeInSight(eMonsterType a_MobType, unsigned int a_SightDistance)
+cMonster * cAggressiveMonster::GetMonsterOfTypeInSight(eMonsterType a_MobType, unsigned int a_SightDistance)
 {
 
-	cMonster* FoundTarget = nullptr;
+	cMonster * FoundTarget = nullptr;
 
 	cEntityCallback Callback = [&](cEntity & a_Entity)
 			{
-				if (!a_Entity.IsMob()){
+				if (!a_Entity.IsMob())
+				{
 					return false;
 				}
 
-				cMonster& Monster = dynamic_cast<cMonster &>(a_Entity);
+				cMonster & Monster = dynamic_cast<cMonster &>(a_Entity);
 				if (Monster.GetMobType() != a_MobType)
 				{
 					return false;
@@ -75,7 +76,7 @@ cMonster* cAggressiveMonster::GetMonsterOfTypeInSight(eMonsterType a_MobType, un
 				}
 				return false;
 			};
-	
+
 	/* cBoundingBox CheckZone(GetPosition().addedXZ(-a_SightDistance, -a_SightDistance), GetPosition().addedXZ(a_SightDistance, a_SightDistance)); */
 	/* m_World->ForEachEntityInBox(CheckZone, Callback); */
 	m_World->ForEachEntity(Callback);
