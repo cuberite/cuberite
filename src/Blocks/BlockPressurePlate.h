@@ -2,6 +2,8 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "BlockSlab.h"
+#include "../Chunk.h"
 
 
 
@@ -26,7 +28,22 @@ private:
 
 		// TODO: check if the block is upside-down slab or upside-down stairs
 
-		const auto Block = a_Chunk.GetBlock(a_Position.addedY(-1));
+		BLOCKTYPE Block;
+		NIBBLETYPE BlockMeta;
+		a_Chunk.GetBlockTypeMeta(a_Position.addedY(-1), Block, BlockMeta);
+
+		// upside down slabs
+		if (cBlockSlabHandler::IsAnySlabType(Block))
+		{
+			return ((BlockMeta & 0x08) == 0x08);
+		}
+
+		//upside down stairs
+		if (IsBlockStair(Block))
+		{
+			return ((BlockMeta & 0x04) == 0x04);
+		}
+
 		switch (Block)
 		{
 			case E_BLOCK_ACACIA_FENCE:

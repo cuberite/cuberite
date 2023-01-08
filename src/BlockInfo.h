@@ -65,6 +65,7 @@ public:
 
 
 
+bool IsBlockStair(BLOCKTYPE a_BlockType);
 
 bool IsBlockWater(BLOCKTYPE a_BlockType);
 

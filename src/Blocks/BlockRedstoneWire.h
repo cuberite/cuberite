@@ -37,10 +37,12 @@ private:
 		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
 		{
 			// Check if the slab is turned up side down
-			if ((BelowBlockMeta & 0x08) == 0x08)
-			{
-				return true;
-			}
+			return (BelowBlockMeta & 0x08) == 0x08;
+		}
+		else if (IsBlockStair(BelowBlock))
+		{
+			//Check if the stair is upside down
+			return (BelowBlockMeta & 0x04) == 0x04;
 		}
 		return false;
 	}
