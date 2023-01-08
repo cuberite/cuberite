@@ -36,7 +36,7 @@ private:
 			return ((BlockMeta & 0x08) == 0x08);
 		}
 
-		//upside down stairs
+		// upside down stairs
 		if (IsBlockStair(Block))
 		{
 			return ((BlockMeta & 0x04) == 0x04);

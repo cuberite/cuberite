@@ -41,7 +41,7 @@ private:
 		}
 		else if (IsBlockStair(BelowBlock))
 		{
-			//Check if the stair is upside down
+			// Check if the stair is upside down
 			return (BelowBlockMeta & 0x04) == 0x04;
 		}
 		return false;
