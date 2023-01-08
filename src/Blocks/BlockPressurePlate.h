@@ -26,8 +26,6 @@ private:
 			return false;
 		}
 
-		// TODO: check if the block is upside-down slab or upside-down stairs
-
 		BLOCKTYPE Block;
 		NIBBLETYPE BlockMeta;
 		a_Chunk.GetBlockTypeMeta(a_Position.addedY(-1), Block, BlockMeta);
