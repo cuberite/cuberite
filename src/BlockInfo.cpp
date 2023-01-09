@@ -1446,31 +1446,3 @@ float cBlockInfo::GetHardness(const BLOCKTYPE Block)
 		default:                                    return 0;
 	}
 }
-
-
-
-
-
-bool IsBlockStair(BLOCKTYPE a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case E_BLOCK_SANDSTONE_STAIRS:
-		case E_BLOCK_BIRCH_WOOD_STAIRS:
-		case E_BLOCK_QUARTZ_STAIRS:
-		case E_BLOCK_JUNGLE_WOOD_STAIRS:
-		case E_BLOCK_RED_SANDSTONE_STAIRS:
-		case E_BLOCK_COBBLESTONE_STAIRS:
-		case E_BLOCK_STONE_BRICK_STAIRS:
-		case E_BLOCK_OAK_WOOD_STAIRS:
-		case E_BLOCK_ACACIA_WOOD_STAIRS:
-		case E_BLOCK_PURPUR_STAIRS:
-		case E_BLOCK_DARK_OAK_WOOD_STAIRS:
-		case E_BLOCK_BRICK_STAIRS:
-		case E_BLOCK_NETHER_BRICK_STAIRS:
-		case E_BLOCK_SPRUCE_WOOD_STAIRS:
-			return true;
-		default:
-			return false;
-	}
-}
