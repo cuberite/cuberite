@@ -1,5 +1,13 @@
-
 #pragma once
+
+#include "BlockHandler.h"
+#include "BlockSlab.h"
+#include "BlockStairs.h"
+#include "BlockType.h"
+#include "Blocks/Mixins.h"
+#include "../BlockInfo.h"
+#include "../Chunk.h"
+#include "ChunkDef.h"
 
 
 
@@ -154,9 +162,26 @@ public:
 
 private:
 
+	static bool CanBeSupportedBy(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	{
+		if (cBlockSlabHandler::IsAnySlabType(a_BlockType))
+		{
+			return (a_BlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN);
+		}
+		else if (cBlockStairsHandler::IsAnyStairType(a_BlockType))
+		{
+			return (a_BlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+		}
+		return cBlockInfo::FullyOccupiesVoxel(a_BlockType);
+	}
+
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, NIBBLETYPE a_Meta) const override
 	{
-		if ((a_Position.y <= 0) || !cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_Position.addedY(-1))))
+		BLOCKTYPE BelowBlock;
+		NIBBLETYPE BelowBlockMeta;
+		a_Chunk.GetBlockTypeMeta(a_Position.addedY(-1), BelowBlock, BelowBlockMeta);
+
+		if ((a_Position.y <= 0) || !CanBeSupportedBy(BelowBlock, BelowBlockMeta))
 		{
 			return false;
 		}
@@ -187,6 +212,7 @@ private:
 				return cBlockInfo::FullyOccupiesVoxel(BlockType);
 			}
 		}
+
 		return true;
 	}
 

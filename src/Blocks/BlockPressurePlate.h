@@ -4,6 +4,7 @@
 #include "BlockHandler.h"
 #include "BlockSlab.h"
 #include "../Chunk.h"
+#include "BlockStairs.h"
 
 
 
@@ -33,13 +34,13 @@ private:
 		// upside down slabs
 		if (cBlockSlabHandler::IsAnySlabType(Block))
 		{
-			return ((BlockMeta & 0x08) == 0x08);
+			return BlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN;
 		}
 
-		//upside down stairs
-		if (IsBlockStair(Block))
+		// upside down stairs
+		if (cBlockStairsHandler::IsAnyStairType(Block))
 		{
-			return ((BlockMeta & 0x04) == 0x04);
+			return BlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN;
 		}
 
 		switch (Block)
