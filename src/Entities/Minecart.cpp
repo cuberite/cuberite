@@ -6,6 +6,8 @@
 // Indiana Jones!
 
 #include "Globals.h"
+#include "ChunkDef.h"
+#include "Defines.h"
 #include "Minecart.h"
 #include "../BlockInfo.h"
 #include "../ClientHandle.h"
@@ -223,7 +225,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		switch (InsideType)
 		{
 			case E_BLOCK_RAIL: HandleRailPhysics(InsideMeta, a_Dt); break;
-			case E_BLOCK_ACTIVATOR_RAIL: break;
+			case E_BLOCK_ACTIVATOR_RAIL: HandleActivatorRailPhysics(InsideMeta, a_Dt); break;
 			case E_BLOCK_POWERED_RAIL: HandlePoweredRailPhysics(InsideMeta); break;
 			case E_BLOCK_DETECTOR_RAIL:
 			{
@@ -678,6 +680,7 @@ void cMinecart::HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::mi
 void cMinecart::HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt)
 {
 	HandleRailPhysics(a_RailMeta & 0x07, a_Dt);
+	// TODO - shake minecart, throw entities out
 }
 
 
@@ -1516,7 +1519,21 @@ cMinecartWithTNT::cMinecartWithTNT(Vector3d a_Pos):
 {
 }
 
-// TODO: Make it activate when passing over activator rail
+
+
+
+
+void cMinecartWithTNT::HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt)
+{
+	Super::HandleActivatorRailPhysics(a_RailMeta, a_Dt);
+
+	if ((a_RailMeta & 0x08) && !m_isTNTFused)
+	{
+		m_isTNTFused = true;
+		m_TNTFuseTicksLeft = 80;
+		m_World->BroadcastSoundEffect("entity.tnt.primed", GetPosition(), 1.0f, 1.0f);
+	}
+}
 
 
 
@@ -1525,6 +1542,32 @@ cMinecartWithTNT::cMinecartWithTNT(Vector3d a_Pos):
 void cMinecartWithTNT::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	a_Drops.emplace_back(E_ITEM_MINECART_WITH_TNT);
+}
+
+
+
+
+
+void cMinecartWithTNT::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	Super::Tick(a_Dt, a_Chunk);
+	if (!IsTicking())
+	{
+		return;
+	}
+
+	if (m_isTNTFused)
+	{
+		if (m_TNTFuseTicksLeft > 0)
+		{
+			--m_TNTFuseTicksLeft;
+		}
+		else
+		{
+			Destroy();
+			m_World->DoExplosionAt(4.0, GetPosX(), GetPosY() + GetHeight() / 2, GetPosZ(), true, esTNTMinecart, this);
+		}
+	}
 }
 
 
