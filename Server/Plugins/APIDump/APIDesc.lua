@@ -17949,6 +17949,10 @@ end
 				{
 					Notes = "A TNT explosion. The SourceData param is the {{cTNTEntity|TNT entity}} object.",
 				},
+				esTNTMinecart =
+				{
+					Notes = "A TNT minecart explosion. The SourceData param is the {{cMinecartWithTNT|Minecart with TNT entity}} object.",
+				},
 				esWitherBirth =
 				{
 					Notes = "An explosion at a wither's birth. The SourceData param is the {{cMonster|wither entity}} object.",
