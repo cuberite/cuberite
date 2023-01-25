@@ -167,14 +167,19 @@ private:
 		{
 			return true;
 		}
-		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
+
+		// upside down slabs
+		if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
 		{
-			// Check if the slab is turned up side down
-			if ((BelowBlockMeta & 0x08) == 0x08)
-			{
-				return true;
-			}
+			return BelowBlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN;
 		}
+
+		// upside down stairs
+		if (cBlockStairsHandler::IsAnyStairType(BelowBlock))
+		{
+			return BelowBlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN;
+		}
+
 		return false;
 	}
 

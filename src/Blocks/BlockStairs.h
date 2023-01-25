@@ -16,6 +16,32 @@ public:
 
 	using Super::Super;
 
+	static bool IsAnyStairType(BLOCKTYPE a_Block)
+	{
+		switch (a_Block)
+		{
+			case E_BLOCK_SANDSTONE_STAIRS:
+			case E_BLOCK_BIRCH_WOOD_STAIRS:
+			case E_BLOCK_QUARTZ_STAIRS:
+			case E_BLOCK_JUNGLE_WOOD_STAIRS:
+			case E_BLOCK_RED_SANDSTONE_STAIRS:
+			case E_BLOCK_COBBLESTONE_STAIRS:
+			case E_BLOCK_STONE_BRICK_STAIRS:
+			case E_BLOCK_OAK_WOOD_STAIRS:
+			case E_BLOCK_ACACIA_WOOD_STAIRS:
+			case E_BLOCK_PURPUR_STAIRS:
+			case E_BLOCK_DARK_OAK_WOOD_STAIRS:
+			case E_BLOCK_BRICK_STAIRS:
+			case E_BLOCK_NETHER_BRICK_STAIRS:
+			case E_BLOCK_SPRUCE_WOOD_STAIRS:
+				return true;
+			default:
+			{
+				return false;
+			}
+		}
+	}
+
 private:
 
 	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) const override
@@ -23,9 +49,6 @@ private:
 		// Toggle bit 3:
 		return (a_Meta & 0x0b) | ((~a_Meta) & 0x04);
 	}
-
-
-
 
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
