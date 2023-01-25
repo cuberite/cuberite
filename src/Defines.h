@@ -314,6 +314,7 @@ enum eExplosionSource
 	esOther,
 	esPlugin,
 	esPrimedTNT,
+	esTNTMinecart,
 	esWitherBirth,
 	esWitherSkull,
 	esMax,
