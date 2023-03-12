@@ -1858,8 +1858,8 @@ local function DumpApi()
 	-- Dump all available API objects in format used by ZeroBraneStudio API descriptions:
 	DumpAPIZBS(API)
 
-	-- Dump all available API objects in format used by VSCode API descriptions:
-	DumpAPIVSCode(API);
+	-- Dump all available API objects in format used by Lua-Language-Server API descriptions:
+	DumpAPILLS(API);
 
 	-- Export the API in a format used by LuaCheck
 	DumpLuaCheck(API)

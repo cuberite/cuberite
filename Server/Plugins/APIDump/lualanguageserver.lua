@@ -1,4 +1,4 @@
--- vscode.lua
+-- lualanguageserver.lua
 
 -- Implements the code for exporting definition files which can be used by a Lua-Language-Server
 
@@ -20,7 +20,7 @@ end
 
 --- Cleans up a description so it can be used in a definition file.
 --- Uses the standard cleanup function but also removes any newlines.
-local function CleanUpDescriptionVSCode(a_Desc)
+local function CleanUpDescriptionLLS(a_Desc)
 	return CleanUpDescription(a_Desc)
 	:gsub("\n", " ")
 end
@@ -29,11 +29,11 @@ end
 
 
 
---- Writes a list of methods into the specified file in VSCode format
-local function WriteVSCodeMethods(f, a_NameSpace, a_Methods)
+--- Writes a list of methods into the specified file in LLS format
+local function WriteLLSMethods(f, a_NameSpace, a_Methods)
 	for _, func in ipairs(a_Methods or {}) do
 		f:write("\n---\n")
-		f:write("---", CleanUpDescriptionVSCode(func.Notes or ""), "\n");
+		f:write("---", CleanUpDescriptionLLS(func.Notes or ""), "\n");
 		f:write("---\n");
 		local parameterList = {}
 		if (func.Params) then
@@ -82,7 +82,7 @@ end
 --- Writes the list of constants. If the value is an enum the value is set from that enum.
 --- This is a bit of a hack because Cuberite exports allot of enums as a constant inside 
 --- a class or global but documents them as if they are in their own table.
-local function WriteVSCodeConstants(f, a_NameSpace, a_Constants, a_Enum)
+local function WriteLLSConstants(f, a_NameSpace, a_Constants, a_Enum)
 	if (not a_Constants) then
 		return;
 	end
@@ -106,8 +106,8 @@ end
 
 
 
---- Writes a list of constants into the specified file in VSCode format
-local function WriteVSCodeEnums(f, a_NameSpace, a_ConstantGroups)
+--- Writes a list of constants into the specified file in LLS format
+local function WriteLLSEnums(f, a_NameSpace, a_ConstantGroups)
 	if (not a_ConstantGroups) then
 		return;
 	end
@@ -124,7 +124,7 @@ local function WriteVSCodeEnums(f, a_NameSpace, a_ConstantGroups)
 			f:write("\t", const.Name, " = ", constValue, ",\n")
 		end
 		f:write("}\n")
-		WriteVSCodeConstants(f, a_NameSpace, group.Constants, group.Name);
+		WriteLLSConstants(f, a_NameSpace, group.Constants, group.Name);
 	end
 end
 
@@ -135,7 +135,7 @@ end
 --- Writes all the fields which a class has.
 ---@param f file*
 ---@param a_Variables table
-local function WriteVSCodeVariables(f, a_Variables)
+local function WriteLLSVariables(f, a_Variables)
 	for _, variable in ipairs(a_Variables or {}) do
 		f:write("---@field ", variable.Name)
 		if (variable.Type) then
@@ -153,11 +153,11 @@ end
 
 
 
---- Writes one Cuberite class definition into the specified file in VSCode format
-local function WriteVSCodeClass(a_Class)
+--- Writes one Cuberite class definition into the specified file in LLS format
+local function WriteLLSClass(a_Class)
 	assert(type(a_Class) == "table")
 
-	local f = io.open("vscode/cuberite/library/" .. a_Class.Name .. ".lua", "w");
+	local f = io.open("LLS/cuberite/library/" .. a_Class.Name .. ".lua", "w");
 	f:write("---@meta\n");
 	f:write("\n\n---\n---The ", a_Class.Name, " namespace\n");
 
@@ -166,7 +166,7 @@ local function WriteVSCodeClass(a_Class)
 		inherit = ": " .. a_Class.Inherits.Name 
 	end
 	f:write("---@class ", a_Class.Name, inherit, "\n");
-	WriteVSCodeVariables(f, a_Class.Variables);
+	WriteLLSVariables(f, a_Class.Variables);
 	for _, func in pairs(a_Class.Functions or {}) do
 		if (func.Name:find("constructor")) then
 			local parameters = {};
@@ -179,9 +179,9 @@ local function WriteVSCodeClass(a_Class)
 	f:write("", a_Class.Name, " = {}\n");
 
 	-- Export methods and constants:
-	WriteVSCodeEnums(f, a_Class.Name, a_Class.ConstantGroups);
-	WriteVSCodeConstants(f, a_Class.Name, a_Class.Constants);
-	WriteVSCodeMethods(f, a_Class.Name, a_Class.Functions);
+	WriteLLSEnums(f, a_Class.Name, a_Class.ConstantGroups);
+	WriteLLSConstants(f, a_Class.Name, a_Class.Constants);
+	WriteLLSMethods(f, a_Class.Name, a_Class.Functions);
 
 	f:close();
 end
@@ -190,16 +190,16 @@ end
 
 
 
---- Dumps the entire API table into a file in the VSCode format
-function DumpAPIVSCode(a_API)
-	LOG("Dumping VSCode API description...")
-	cFile:CreateFolderRecursive("vscode/cuberite/library");
+--- Dumps the entire API table into a file in the LLS format
+function DumpAPILLS(a_API)
+	LOG("Dumping LLS API description...")
+	cFile:CreateFolderRecursive("LLS/cuberite/library");
 
 	-- Export each class except Globals, store those aside:
 	local Globals
 	for _, cls in ipairs(a_API) do
 		if (cls.Name ~= "Globals") then
-			WriteVSCodeClass(cls)
+			WriteLLSClass(cls)
 		else
 			Globals = cls
 		end
@@ -207,15 +207,15 @@ function DumpAPIVSCode(a_API)
 
 	-- Export the globals:
 	if (Globals) then
-		local f = io.open("vscode/cuberite/library/Globals.lua", "w");
+		local f = io.open("LLS/cuberite/library/Globals.lua", "w");
 		f:write("---@meta\n\n");
-		WriteVSCodeMethods(f, nil, Globals.Functions)
-		WriteVSCodeEnums(f, nil, Globals.ConstantGroups)
+		WriteLLSMethods(f, nil, Globals.Functions)
+		WriteLLSEnums(f, nil, Globals.ConstantGroups)
 		f:close();
 	end
 
 	-- Finish the file:
-	LOG("VSCode API dumped...")
+	LOG("LLS API dumped...")
 end
 
 
