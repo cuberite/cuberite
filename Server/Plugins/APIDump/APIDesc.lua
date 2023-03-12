@@ -19239,6 +19239,10 @@ end
 			Title = "Setting up the ZeroBrane Studio Lua IDE",
 		},
 		{
+			FileName = "SettingUpLuaLanguageServer.html",
+			Title = "Setting up Lua-Language-Server (VSCode/Emacs)"
+		},
+		{
 			FileName = "UsingChunkStays.html",
 			Title = "Using ChunkStays",
 		},
