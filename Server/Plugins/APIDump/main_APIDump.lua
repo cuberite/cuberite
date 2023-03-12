@@ -136,7 +136,7 @@ local function CreateAPITables()
 		return res;
 	end
 
-	for i, v in pairs(_G) do
+	for i, v in pairs(getmetatable(_G).__index) do
 		if (
 			(v ~= _G) and           -- don't want the global namespace
 			(v ~= _G.packages) and  -- don't want any packages
