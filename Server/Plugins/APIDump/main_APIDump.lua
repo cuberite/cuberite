@@ -1473,7 +1473,7 @@ end
 
 
 --- Returns the string with extra tabs and CR/LFs removed
-local function CleanUpDescription(a_Desc)
+function CleanUpDescription(a_Desc)
 	-- Get rid of indent and newlines, normalize whitespace:
 	local res = a_Desc:gsub("[\n\t]", "")
 	res = a_Desc:gsub("%s%s+", " ")
@@ -1857,6 +1857,9 @@ local function DumpApi()
 
 	-- Dump all available API objects in format used by ZeroBraneStudio API descriptions:
 	DumpAPIZBS(API)
+
+	-- Dump all available API objects in format used by VSCode API descriptions:
+	DumpAPIVSCode(API);
 
 	-- Export the API in a format used by LuaCheck
 	DumpLuaCheck(API)
