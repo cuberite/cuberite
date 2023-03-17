@@ -252,7 +252,7 @@ public:
 				return;
 			}
 		}
-		m_Properties.template emplace_back(a_Value);
+		m_Properties.emplace_back(a_Value);
 	}
 
 	/** Only Sets a value if there is none present */
