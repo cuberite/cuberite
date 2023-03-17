@@ -460,10 +460,10 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		auto Enchantments = Player->GetEquippedItem().get<cEnchantments>();
 		if (!Enchantments.has_value())
 		{
-			SharpnessLevel = static_cast<int>(Enchantments.value().GetLevel(cEnchantments::enchSharpness));
-			SmiteLevel = static_cast<int>(Enchantments.value().GetLevel(cEnchantments::enchSmite));
-			BaneOfArthropodsLevel = static_cast<int>(Enchantments.value().GetLevel(cEnchantments::enchBaneOfArthropods));
-			FireAspectLevel = static_cast<int>(Enchantments.value().GetLevel(cEnchantments::enchFireAspect));
+			SharpnessLevel = Enchantments.value().GetLevel(cEnchantments::enchSharpness);
+			SmiteLevel = Enchantments.value().GetLevel(cEnchantments::enchSmite);
+			BaneOfArthropodsLevel = Enchantments.value().GetLevel(cEnchantments::enchBaneOfArthropods);
+			FireAspectLevel = Enchantments.value().GetLevel(cEnchantments::enchFireAspect);
 		}
 
 		if (SharpnessLevel > 0)
@@ -509,8 +509,8 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
 						// increasing the max duration by 0.5 seconds each level.
 						// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
-						int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks.
-						Monster->AddEntityEffect(cEntityEffect::effSlowness, Duration, 4);
+						auto Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks.
+						Monster->AddEntityEffect(cEntityEffect::effSlowness, static_cast<int>(Duration), 4);
 
 						break;
 					}
@@ -748,8 +748,8 @@ float cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageTyp
 			TotalEPF += Enchantments.value().GetLevel(cEnchantments::enchProjectileProtection) * 2;
 		}
 	}
-	int CappedEPF = std::min<unsigned int>(20, TotalEPF);
-	return (a_Damage * CappedEPF / 25.0f);
+	auto CappedEPF = std::min<unsigned int>(20, TotalEPF);
+	return (static_cast<unsigned int>(a_Damage) * CappedEPF / 25.0f);
 }
 
 

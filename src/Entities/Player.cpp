@@ -1849,7 +1849,7 @@ void cPlayer::LoadFromDisk()
 	}
 
 	m_Health              = Root.get("health",         MAX_HEALTH).asFloat();
-	m_AirLevel            = Root.get("air",            MAX_AIR_LEVEL).asInt();
+	m_AirLevel            = Root.get("air",            MAX_AIR_LEVEL).asUInt();
 	m_FoodLevel           = Root.get("food",           MAX_FOOD_LEVEL).asInt();
 	m_FoodSaturationLevel = Root.get("foodSaturation", RESPAWN_FOOD_SATURATION).asDouble();
 	m_FoodTickTimer       = Root.get("foodTickTimer",  0).asInt();

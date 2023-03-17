@@ -1142,16 +1142,16 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	m_MaximumCost = 0;
 	m_StackSizeToBeUsedInRepair = 0;
 	int RepairCost = Target.m_RepairCost;
-	unsigned int NeedExp = 0;
+	unsigned short NeedExp = 0;
 	if (!Sacrifice.IsEmpty())
 	{
 		RepairCost += Sacrifice.m_RepairCost;
 
-		// Can we repair with sacrifce material?
+		// Can we repair with sacrifice material?
 		if (Target.IsDamageable() && Target.GetHandler().CanRepairWithRawMaterial(Sacrifice.m_ItemType))
 		{
 			// Tool and armor repair with special item (iron / gold / diamond / ...)
-			int DamageDiff = std::min(static_cast<int>(Target.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
+			auto DamageDiff = std::min<short>(Target.m_ItemDamage, Target.GetMaxDamage() / 4);
 			if (DamageDiff <= 0)
 			{
 				// No enchantment
@@ -1175,7 +1175,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 				}
 
 				NeedExp += std::max(1, DamageDiff / 100);
-				DamageDiff = std::min(static_cast<int>(Output.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
+				DamageDiff = std::min<short>(Output.m_ItemDamage, Target.GetMaxDamage() / 4);
 
 				++NumItemsConsumed;
 			}
@@ -1231,7 +1231,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		// Remove custom name
 		if (!TargetDisplayProperties.m_CustomName.empty())
 		{
-			NameChangeExp = (Target.IsDamageable()) ? 7 : (Target.m_ItemCount * 5);
+			NameChangeExp = (Target.IsDamageable()) ? 7 : (static_cast<unsigned int>(Target.m_ItemCount * 5));
 			NeedExp += NameChangeExp;
 			OutputDisplayProperties.m_CustomName = "";
 		}
@@ -1239,7 +1239,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	else if (RepairedItemName != TargetDisplayProperties.m_CustomName)
 	{
 		// Change custom name
-		NameChangeExp = (Target.IsDamageable()) ? 7 : (Target.m_ItemCount * 5);
+		NameChangeExp = (Target.IsDamageable()) ? 7 : (static_cast<unsigned int>(Target.m_ItemCount * 5));
 		NeedExp += NameChangeExp;
 
 		if (!TargetDisplayProperties.m_CustomName.empty())

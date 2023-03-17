@@ -618,7 +618,7 @@ unsigned char cBlockHandler::ToolFortuneLevel(const cItem * a_Tool)
 		{
 			return 0;
 		}
-		return std::min<unsigned char>(8U, Enchantments.value().GetLevel(cEnchantments::enchFortune));
+		return std::min<unsigned char>(8U, static_cast<const unsigned char>(Enchantments.value().GetLevel(cEnchantments::enchFortune)));
 	}
 
 	// Not a tool:
