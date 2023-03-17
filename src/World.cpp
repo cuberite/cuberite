@@ -1395,6 +1395,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 			case eExplosionSource::esGhastFireball:
 			case eExplosionSource::esMonster:
 			case eExplosionSource::esPrimedTNT:
+			case eExplosionSource::esTNTMinecart:
 			case eExplosionSource::esWitherBirth:
 			case eExplosionSource::esWitherSkull:
 			{

@@ -74,10 +74,10 @@ private:
 	static UInt32 GetPacketID(cProtocol::ePacketType a_PacketType);
 
 	/* Status handler for unrecognised versions. */
-	void HandlePacketStatusRequest(cClientHandle & a_Client, cByteBuffer & a_Out);
+	void HandlePacketStatusRequest(cClientHandle & a_Client);
 
 	/* Ping handler for unrecognised versions. */
-	void HandlePacketStatusPing(cClientHandle & a_Client, cByteBuffer & a_Out);
+	void HandlePacketStatusPing(cClientHandle & a_Client);
 
 	/** Buffer for received protocol data. */
 	cByteBuffer m_Buffer;

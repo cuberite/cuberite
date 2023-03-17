@@ -330,7 +330,7 @@ public:
 		Pose
 	};
 
-	// TODO: these constants should be in WebServer
+	/** The protocol version number, received from the client in the Handshake packet. */
 	enum class Version
 	{
 		v1_8_0  = 47,

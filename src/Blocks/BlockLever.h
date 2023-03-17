@@ -2,6 +2,9 @@
 
 #include "BlockHandler.h"
 #include "../Chunk.h"
+#include "Blocks/BlockStairs.h"
+#include "ChunkDef.h"
+#include "Defines.h"
 #include "Mixins.h"
 #include "BlockSlab.h"
 
@@ -117,7 +120,28 @@ private:
 				(((NeighborMeta & 0x08) == 0)    && (NeighborFace == BLOCK_FACE_BOTTOM))
 			);
 		}
-
+		else if (cBlockStairsHandler::IsAnyStairType(NeighborBlockType))
+		{
+			switch (NeighborFace)
+			{
+				case eBlockFace::BLOCK_FACE_YM:
+					return !(NeighborMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+				case eBlockFace::BLOCK_FACE_YP:
+					return (NeighborMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+				case eBlockFace::BLOCK_FACE_XP:
+					return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_XP);
+				case eBlockFace::BLOCK_FACE_XM:
+					return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_XM);
+				case eBlockFace::BLOCK_FACE_ZP:
+					return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_ZP);
+				case eBlockFace::BLOCK_FACE_ZM:
+					return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_ZM);
+				default:
+				{
+					return false;
+				}
+			}
+		}
 		return false;
 	}
 
