@@ -1148,6 +1148,33 @@ bool cPluginManager::CallHookPlayerFishing(cPlayer&, cItems&, int&)
 
 
 
+bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer&, Vector3<int>, eBlockFace, unsigned char, unsigned char)
+{
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer&, Vector3<int>, eBlockFace, unsigned char, unsigned char)
+{
+	return false;
+}
+
+
+
+
+
+cPluginManager * cPluginManager::Get()
+{
+	return nullptr;
+}
+
+
+
+
+
 void cProjectileEntity::CollectedBy(cPlayer&)
 {
 }
