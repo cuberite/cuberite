@@ -1,6 +1,8 @@
 
 #include "HealthRange.h"
 
+#include "Mobs/Monster.h"
+
 namespace BehaviorTree
 {
 	cHealthRange::cHealthRange(cLuaState & a_LuaState)

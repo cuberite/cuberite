@@ -2,8 +2,9 @@
 #pragma once
 
 #include "Globals.h"
-#include "Mobs/AI/BehaviorTree.h"
+
 #include "Mobs/AI/Behaviours/GuardedTask.h"
+#include "Mobs/AI/BehaviorTree.h"
 
 namespace BehaviorTree
 {
