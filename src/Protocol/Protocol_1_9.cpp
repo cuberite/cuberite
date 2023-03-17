@@ -307,12 +307,15 @@ void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const auto Delta = (a_Entity.GetPosition() - a_Entity.GetLastSentPosition()) * 32 * 128;
+	const auto Delta = (a_Entity.GetPosition() * 32 * 128).Floor() - (a_Entity.GetLastSentPosition() * 32 * 128).Floor();
 
-	// Limitations of a short
-	static const auto Max = std::numeric_limits<Int16>::max();
-
-	if ((std::abs(Delta.x) <= Max) && (std::abs(Delta.y) <= Max) && (std::abs(Delta.z) <= Max))
+	// Ensure that the delta has enough precision and is within range of a BEInt16:
+	if (
+		Delta.HasNonZeroLength() &&
+		cByteBuffer::CanBEInt16Represent(Delta.x) &&
+		cByteBuffer::CanBEInt16Represent(Delta.y) &&
+		cByteBuffer::CanBEInt16Represent(Delta.z)
+	)
 	{
 		const auto Move = static_cast<Vector3<Int16>>(Delta);
 
@@ -341,7 +344,8 @@ void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 		return;
 	}
 
-	// Too big a movement, do a teleport
+	// Too big or small a movement, do a teleport.
+
 	cPacketizer Pkt(*this, pktTeleportEntity);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEDouble(a_Entity.GetPosX());

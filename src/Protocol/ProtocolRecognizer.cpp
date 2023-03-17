@@ -146,8 +146,6 @@ void cMultiVersionProtocol::HandleIncomingDataInOldPingResponseStage(cClientHand
 		return;
 	}
 
-	cByteBuffer OutPacketBuffer(6 KiB);
-
 	// Handle server list ping packets
 	for (;;)
 	{
@@ -166,11 +164,11 @@ void cMultiVersionProtocol::HandleIncomingDataInOldPingResponseStage(cClientHand
 
 		if ((PacketID == 0x00) && (PacketLen == 1))  // Request packet
 		{
-			HandlePacketStatusRequest(a_Client, OutPacketBuffer);
+			HandlePacketStatusRequest(a_Client);
 		}
 		else if ((PacketID == 0x01) && (PacketLen == 9))  // Ping packet
 		{
-			HandlePacketStatusPing(a_Client, OutPacketBuffer);
+			HandlePacketStatusPing(a_Client);
 		}
 		else
 		{
@@ -412,7 +410,7 @@ UInt32 cMultiVersionProtocol::GetPacketID(cProtocol::ePacketType a_PacketType)
 
 
 
-void cMultiVersionProtocol::HandlePacketStatusRequest(cClientHandle & a_Client, cByteBuffer & a_Out)
+void cMultiVersionProtocol::HandlePacketStatusRequest(cClientHandle & a_Client)
 {
 	cServer * Server = cRoot::Get()->GetServer();
 	AString ServerDescription = Server->GetDescription();
@@ -445,20 +443,20 @@ void cMultiVersionProtocol::HandlePacketStatusRequest(cClientHandle & a_Client, 
 	{
 		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
 	}
-
 	AString Response = JsonUtils::WriteFastString(ResponseValue);
 
-	VERIFY(a_Out.WriteVarInt32(GetPacketID(cProtocol::ePacketType::pktStatusResponse)));
-	VERIFY(a_Out.WriteVarUTF8String(Response));
-
-	SendPacket(a_Client, a_Out);
+	// Send the response in a packet:
+	cByteBuffer out(Response.size() + 12);  // String + 2x VarInt + extra space for safety
+	VERIFY(out.WriteVarInt32(GetPacketID(cProtocol::ePacketType::pktStatusResponse)));
+	VERIFY(out.WriteVarUTF8String(Response));
+	SendPacket(a_Client, out);
 }
 
 
 
 
 
-void cMultiVersionProtocol::HandlePacketStatusPing(cClientHandle & a_Client, cByteBuffer & a_Out)
+void cMultiVersionProtocol::HandlePacketStatusPing(cClientHandle & a_Client)
 {
 	Int64 Timestamp;
 	if (!m_Buffer.ReadBEInt64(Timestamp))
@@ -466,8 +464,9 @@ void cMultiVersionProtocol::HandlePacketStatusPing(cClientHandle & a_Client, cBy
 		return;
 	}
 
-	VERIFY(a_Out.WriteVarInt32(GetPacketID(cProtocol::ePacketType::pktPingResponse)));
-	VERIFY(a_Out.WriteBEInt64(Timestamp));
-
-	SendPacket(a_Client, a_Out);
+	// Send the ping response packet:
+	cByteBuffer out(16);  // VarInt + Int64 + extra space for safety
+	VERIFY(out.WriteVarInt32(GetPacketID(cProtocol::ePacketType::pktPingResponse)));
+	VERIFY(out.WriteBEInt64(Timestamp));
+	SendPacket(a_Client, out);
 }

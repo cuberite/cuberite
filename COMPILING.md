@@ -33,7 +33,13 @@ If you're using Git to get the source, use the following command to set up the l
 git clone --recursive https://github.com/cuberite/cuberite.git
 ```
 
-Now that you have the source, it's time to prepare the project files for your favorite compiler. Open a command window in the folder with the source and type in `cmake .` . This will run CMake, it will auto-detect your Visual Studio version and produce the appropriate project and solution files.
+Now that you have the source, it's time to prepare the project files for your favorite compiler. Open a command window in the folder with the source and type in:
+```
+mkdir build
+cd build
+cmake ..
+```
+This creates a `build` folder where the build will take place, then runs CMake, which will auto-detect your Visual Studio version and produce the appropriate project and solution files.
 
 Finally, open the newly created file, `Cuberite.sln`, in your Visual Studio.
 
