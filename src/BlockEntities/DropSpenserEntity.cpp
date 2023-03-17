@@ -26,20 +26,6 @@ cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_Block
 
 
 
-cDropSpenserEntity::~cDropSpenserEntity()
-{
-	// Tell window its owner is destroyed
-	cWindow * Window = GetWindow();
-	if (Window != nullptr)
-	{
-		Window->OwnerDestroyed();
-	}
-}
-
-
-
-
-
 void cDropSpenserEntity::AddDropSpenserDir(Vector3i & a_RelCoord, NIBBLETYPE a_Direction)
 {
 	switch (a_Direction & E_META_DROPSPENSER_FACING_MASK)
@@ -132,6 +118,20 @@ void cDropSpenserEntity::CopyFrom(const cBlockEntity & a_Src)
 
 
 
+void cDropSpenserEntity::OnRemoveFromWorld()
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		// Tell window its owner is destroyed:
+		Window->OwnerDestroyed();
+	}
+}
+
+
+
+
+
 bool cDropSpenserEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
@@ -163,11 +163,11 @@ bool cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 {
 	if (m_BlockType == E_BLOCK_DISPENSER)
 	{
-		a_Player->GetStatManager().AddValue(Statistic::InspectDispenser);
+		a_Player->GetStatistics().Custom[CustomStatistic::InspectDispenser]++;
 	}
 	else  // E_BLOCK_DROPPER
 	{
-		a_Player->GetStatManager().AddValue(Statistic::InspectDropper);
+		a_Player->GetStatistics().Custom[CustomStatistic::InspectDropper]++;
 	}
 
 	cWindow * Window = GetWindow();

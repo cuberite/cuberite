@@ -572,8 +572,8 @@ void cChunkDesc::RandomFillRelCuboid(
 
 cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 {
-	auto Idx = static_cast<size_t>(cChunkDef::MakeIndex(a_RelX, a_RelY, a_RelZ));
-	auto Iterator = m_BlockArea.GetBlockEntities().find(Idx);
+	const auto Idx = cChunkDef::MakeIndex(a_RelX, a_RelY, a_RelZ);
+	const auto itr = m_BlockEntities.find(Idx);
 
 	if (Iterator != m_BlockArea.GetBlockEntities().end())
 	{
@@ -647,7 +647,7 @@ void cChunkDesc::CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas)
 
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 void cChunkDesc::VerifyHeightmap(void)
 {
@@ -669,7 +669,7 @@ void cChunkDesc::VerifyHeightmap(void)
 	}  // for x
 }
 
-#endif  // _DEBUG
+#endif  // !NDEBUG
 
 
 

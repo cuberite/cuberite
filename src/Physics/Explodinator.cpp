@@ -16,11 +16,11 @@
 
 namespace Explodinator
 {
-	const auto StepUnit = 0.3f;
-	const auto KnockbackFactor = 25U;
-	const auto StepAttenuation = 0.225f;
-	const auto TraceCubeSideLength = 16U;
-	const auto BoundingBoxStepUnit = 0.5;
+	static const auto StepUnit = 0.3f;
+	static const auto KnockbackFactor = 25U;
+	static const auto StepAttenuation = 0.225f;
+	static const auto TraceCubeSideLength = 16U;
+	static const auto BoundingBoxStepUnit = 0.5;
 
 	/** Converts an absolute floating-point Position into a Chunk-relative one. */
 	static Vector3f AbsoluteToRelative(const Vector3f a_Position, const cChunkCoords a_ChunkPosition)
@@ -39,12 +39,141 @@ namespace Explodinator
 		};
 	}
 
-	/** Calculates the approximate percentage of an Entity's bounding box that is exposed to an explosion centred at Position. */
-	static float CalculateEntityExposure(cChunk & a_Chunk, const cEntity & a_Entity, const Vector3f a_Position, const float a_SquareRadius)
+	/** Returns how much of an explosion Destruction Lazor's (tm) intensity the given block attenuates.
+	Values are scaled as 0.3 * (0.3 + Wiki) since some compilers miss the constant folding optimisation.
+	Wiki values are https://minecraft.gamepedia.com/Explosion#Blast_resistance as of 2021-02-06. */
+	static float GetExplosionAbsorption(const BLOCKTYPE Block)
 	{
+		switch (Block)
+		{
+			case E_BLOCK_BEDROCK:
+			case E_BLOCK_COMMAND_BLOCK:
+			case E_BLOCK_END_GATEWAY:
+			case E_BLOCK_END_PORTAL:
+			case E_BLOCK_END_PORTAL_FRAME: return 1080000.09f;
+			case E_BLOCK_ANVIL:
+			case E_BLOCK_ENCHANTMENT_TABLE:
+			case E_BLOCK_OBSIDIAN: return 360.09f;
+			case E_BLOCK_ENDER_CHEST: return 180.09f;
+			case E_BLOCK_LAVA:
+			case E_BLOCK_STATIONARY_LAVA:
+			case E_BLOCK_WATER:
+			case E_BLOCK_STATIONARY_WATER: return 30.09f;
+			case E_BLOCK_DRAGON_EGG:
+			case E_BLOCK_END_STONE:
+			case E_BLOCK_END_BRICKS: return 2.79f;
+			case E_BLOCK_STONE:
+			case E_BLOCK_BLOCK_OF_COAL:
+			case E_BLOCK_DIAMOND_BLOCK:
+			case E_BLOCK_EMERALD_BLOCK:
+			case E_BLOCK_GOLD_BLOCK:
+			case E_BLOCK_IRON_BLOCK:
+			case E_BLOCK_BLOCK_OF_REDSTONE:
+			case E_BLOCK_BRICK:
+			case E_BLOCK_BRICK_STAIRS:
+			case E_BLOCK_COBBLESTONE:
+			case E_BLOCK_COBBLESTONE_STAIRS:
+			case E_BLOCK_IRON_BARS:
+			case E_BLOCK_JUKEBOX:
+			case E_BLOCK_MOSSY_COBBLESTONE:
+			case E_BLOCK_NETHER_BRICK:
+			case E_BLOCK_NETHER_BRICK_FENCE:
+			case E_BLOCK_NETHER_BRICK_STAIRS:
+			case E_BLOCK_PRISMARINE_BLOCK:
+			case E_BLOCK_STONE_BRICKS:
+			case E_BLOCK_STONE_BRICK_STAIRS:
+			case E_BLOCK_COBBLESTONE_WALL: return 1.89f;
+			case E_BLOCK_IRON_DOOR:
+			case E_BLOCK_IRON_TRAPDOOR:
+			case E_BLOCK_MOB_SPAWNER: return 1.59f;
+			case E_BLOCK_HOPPER: return 1.53f;
+			case E_BLOCK_TERRACOTTA: return 1.35f;
+			case E_BLOCK_COBWEB: return 1.29f;
+			case E_BLOCK_DISPENSER:
+			case E_BLOCK_DROPPER:
+			case E_BLOCK_FURNACE:
+			case E_BLOCK_OBSERVER: return 1.14f;
+			case E_BLOCK_BEACON:
+			case E_BLOCK_COAL_ORE:
+			case E_BLOCK_COCOA_POD:
+			case E_BLOCK_DIAMOND_ORE:
+			case E_BLOCK_EMERALD_ORE:
+			case E_BLOCK_GOLD_ORE:
+			case E_BLOCK_IRON_ORE:
+			case E_BLOCK_LAPIS_BLOCK:
+			case E_BLOCK_LAPIS_ORE:
+			case E_BLOCK_NETHER_QUARTZ_ORE:
+			case E_BLOCK_PLANKS:
+			case E_BLOCK_REDSTONE_ORE:
+			case E_BLOCK_FENCE:
+			case E_BLOCK_FENCE_GATE:
+			case E_BLOCK_WOODEN_DOOR:
+			case E_BLOCK_WOODEN_SLAB:
+			case E_BLOCK_WOODEN_STAIRS:
+			case E_BLOCK_TRAPDOOR: return 0.99f;
+			case E_BLOCK_CHEST:
+			case E_BLOCK_WORKBENCH:
+			case E_BLOCK_TRAPPED_CHEST: return 0.84f;
+			case E_BLOCK_BONE_BLOCK:
+			case E_BLOCK_CAULDRON:
+			case E_BLOCK_LOG: return 0.69f;  // nIcE
+			case E_BLOCK_CONCRETE: return 0.63f;
+			case E_BLOCK_BOOKCASE: return 0.54f;
+			case E_BLOCK_STANDING_BANNER:
+			case E_BLOCK_WALL_BANNER:
+			case E_BLOCK_JACK_O_LANTERN:
+			case E_BLOCK_MELON:
+			case E_BLOCK_HEAD:
+			case E_BLOCK_NETHER_WART_BLOCK:
+			case E_BLOCK_PUMPKIN:
+			case E_BLOCK_SIGN_POST:
+			case E_BLOCK_WALLSIGN: return 0.39f;
+			case E_BLOCK_QUARTZ_BLOCK:
+			case E_BLOCK_QUARTZ_STAIRS:
+			case E_BLOCK_RED_SANDSTONE:
+			case E_BLOCK_RED_SANDSTONE_STAIRS:
+			case E_BLOCK_SANDSTONE:
+			case E_BLOCK_SANDSTONE_STAIRS:
+			case E_BLOCK_WOOL: return 0.33f;
+			case E_BLOCK_SILVERFISH_EGG: return 0.315f;
+			case E_BLOCK_ACTIVATOR_RAIL:
+			case E_BLOCK_DETECTOR_RAIL:
+			case E_BLOCK_POWERED_RAIL:
+			case E_BLOCK_RAIL: return 0.3f;
+			case E_BLOCK_GRASS_PATH:
+			case E_BLOCK_CLAY:
+			case E_BLOCK_FARMLAND:
+			case E_BLOCK_GRASS:
+			case E_BLOCK_GRAVEL:
+			case E_BLOCK_SPONGE: return 0.27f;
+			case E_BLOCK_BREWING_STAND:
+			case E_BLOCK_STONE_BUTTON:
+			case E_BLOCK_WOODEN_BUTTON:
+			case E_BLOCK_CAKE:
+			case E_BLOCK_CONCRETE_POWDER:
+			case E_BLOCK_DIRT:
+			case E_BLOCK_FROSTED_ICE:
+			case E_BLOCK_HAY_BALE:
+			case E_BLOCK_ICE: return 0.24f;
+			default: return 0.09f;
+		}
+	}
+
+	/** Calculates the approximate percentage of an Entity's bounding box that is exposed to an explosion centred at Position. */
+	static float CalculateEntityExposure(const cChunk & a_Chunk, const cEntity & a_Entity, const Vector3f a_Position, const int a_SquareRadius)
+	{
+		class LineOfSightCallbacks final : public cLineBlockTracer::cCallbacks
+		{
+			virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+			{
+				return a_BlockType != E_BLOCK_AIR;
+			}
+		} Callback;
+
 		const Vector3d Position = a_Position;
 		unsigned Unobstructed = 0, Total = 0;
 		const auto Box = a_Entity.GetBoundingBox();
+		cLineBlockTracer Tracer(*a_Chunk.GetWorld(), Callback);
 
 		for (double X = Box.GetMinX(); X < Box.GetMaxX(); X += BoundingBoxStepUnit)
 		{
@@ -60,7 +189,7 @@ namespace Explodinator
 						continue;
 					}
 
-					if (cLineBlockTracer::LineOfSightTrace(*a_Chunk.GetWorld(), a_Position, Destination, cLineBlockTracer::eLineOfSight::losAir))
+					if (Tracer.Trace(a_Position, Destination))
 					{
 						Unobstructed++;
 					}
@@ -69,16 +198,16 @@ namespace Explodinator
 			}
 		}
 
-		return static_cast<float>(Unobstructed) / Total;
+		return (Total == 0) ? 0 : (static_cast<float>(Unobstructed) / Total);
 	}
 
 	/** Applies distance-based damage and knockback to all entities within the explosion's effect range. */
-	static void DamageEntities(cChunk & a_Chunk, const Vector3f a_Position, const unsigned a_Power)
+	static void DamageEntities(const cChunk & a_Chunk, const Vector3f a_Position, const int a_Power)
 	{
-		const auto Radius = a_Power * 2.f;
+		const auto Radius = a_Power * 2;
 		const auto SquareRadius = Radius * Radius;
 
-		a_Chunk.GetWorld()->ForEachEntityInBox({ a_Position, Radius * 2 }, [&a_Chunk, a_Position, a_Power, Radius, SquareRadius](cEntity & Entity)
+		a_Chunk.GetWorld()->ForEachEntityInBox({ a_Position, Radius * 2.f }, [&a_Chunk, a_Position, a_Power, Radius, SquareRadius](cEntity & Entity)
 		{
 			// Percentage of rays unobstructed.
 			const auto Exposure = CalculateEntityExposure(a_Chunk, Entity, a_Position, SquareRadius);
@@ -96,11 +225,11 @@ namespace Explodinator
 			if (Entity.IsPawn())
 			{
 				const auto ReducedImpact = Impact - Impact * Entity.GetEnchantmentBlastKnockbackReduction();
-				Entity.SetSpeed(Direction.NormalizeCopy() * KnockbackFactor * ReducedImpact);
+				Entity.AddSpeed(Direction.NormalizeCopy() * KnockbackFactor * ReducedImpact);
 			}
 			else
 			{
-				Entity.SetSpeed(Direction.NormalizeCopy() * KnockbackFactor * Impact);
+				Entity.AddSpeed(Direction.NormalizeCopy() * KnockbackFactor * Impact);
 			}
 
 			// Continue iteration:
@@ -112,7 +241,6 @@ namespace Explodinator
 	Currently missing conduits from 1.13 */
 	static bool BlockAlwaysDrops(const BLOCKTYPE a_Block)
 	{
-		// If it's a Shulker box
 		if (IsBlockShulkerBox(a_Block))
 		{
 			return true;
@@ -146,7 +274,7 @@ namespace Explodinator
 	/** Work out what should happen when an explosion destroys the given block.
 	Tasks include lighting TNT, dropping pickups, setting fire and flinging shrapnel according to Minecraft rules.
 	OK, _mostly_ Minecraft rules. */
-	static void DestroyBlock(cChunk & a_Chunk, const Vector3i a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
+	static void DestroyBlock(cChunk & a_Chunk, const Vector3i a_Position, const int a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
 		const auto DestroyedBlock = a_Chunk.GetBlock(a_Position);
 		if (DestroyedBlock == E_BLOCK_AIR)
@@ -168,12 +296,12 @@ namespace Explodinator
 			// Activate the TNT, with initial velocity and no fuse sound:
 			World.SpawnPrimedTNT(Vector3d(0.5, 0, 0.5) + Absolute, FuseTime, 1, false);
 		}
-		else if (a_ExplodingEntity->IsTNT() || BlockAlwaysDrops(DestroyedBlock) || Random.RandBool(1.f / a_Power))  // For TNT explosions, destroying a block that always drops, or if RandBool, drop pickups
+		else if ((a_ExplodingEntity != nullptr) && (a_ExplodingEntity->IsTNT() || BlockAlwaysDrops(DestroyedBlock) || Random.RandBool(1.f / a_Power)))  // For TNT explosions, destroying a block that always drops, or if RandBool, drop pickups
 		{
 			const auto DestroyedMeta = a_Chunk.GetMeta(a_Position);
 			a_Chunk.GetWorld()->SpawnItemPickups(cBlockHandler::For(DestroyedBlock).ConvertToPickups(DestroyedMeta), Absolute);
 		}
-		else if (a_Fiery && Random.RandBool(1.f / 3.f))  // 33% chance of starting fires if it can start fires
+		else if (a_Fiery && Random.RandBool(1 / 3.0))  // 33% chance of starting fires if it can start fires
 		{
 			const auto Below = a_Position.addedY(-1);
 			if ((Below.y >= 0) && cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(Below)))
@@ -202,7 +330,7 @@ namespace Explodinator
 	}
 
 	/** Traces the path taken by one Explosion Lazor (tm) with given direction and intensity, that will destroy blocks until it is exhausted. */
-	static void DestructionTrace(cChunk * a_Chunk, Vector3f a_Origin, const Vector3f a_Direction, const unsigned a_Power, const bool a_Fiery, float a_Intensity, const cEntity * const a_ExplodingEntity)
+	static void DestructionTrace(cChunk * a_Chunk, Vector3f a_Origin, const Vector3f a_Direction, const int a_Power, const bool a_Fiery, float a_Intensity, const cEntity * const a_ExplodingEntity)
 	{
 		// The current position the ray is at.
 		auto Checkpoint = a_Origin;
@@ -214,7 +342,7 @@ namespace Explodinator
 		while (a_Intensity > 0)
 		{
 			auto Position = Checkpoint.Floor();
-			if (!cChunkDef::IsValidHeight(Position.y))
+			if (!cChunkDef::IsValidHeight(Position))
 			{
 				break;
 			}
@@ -225,7 +353,7 @@ namespace Explodinator
 				break;
 			}
 
-			a_Intensity -= 0.3f * (0.3f + cBlockInfo::GetExplosionAbsorption(Neighbour->GetBlock(Position)));
+			a_Intensity -= GetExplosionAbsorption(Neighbour->GetBlock(Position));
 			if (a_Intensity <= 0)
 			{
 				// The ray is exhausted:
@@ -246,13 +374,13 @@ namespace Explodinator
 	}
 
 	/** Returns a random intensity for an Explosion Lazor (tm) as a function of the explosion's power. */
-	static float RandomIntensity(MTRand & a_Random, const unsigned a_Power)
+	static float RandomIntensity(MTRand & a_Random, const int a_Power)
 	{
 		return a_Power * (0.7f + a_Random.RandReal(0.6f));
 	}
 
 	/** Sends out Explosion Lazors (tm) originating from the given position that destroy blocks. */
-	static void DamageBlocks(cChunk & a_Chunk, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
+	static void DamageBlocks(cChunk & a_Chunk, const Vector3f a_Position, const int a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
 		// Oh boy... Better hope you have a hot cache, 'cos this little manoeuvre's gonna cost us 1352 raytraces in one tick...
 		const int HalfSide = TraceCubeSideLength / 2;
@@ -262,46 +390,46 @@ namespace Explodinator
 
 		// Trace rays from the explosion centre to all points in a square of area TraceCubeSideLength * TraceCubeSideLength
 		// for the top and bottom sides:
-		for (int OffsetX = -HalfSide; OffsetX < HalfSide; OffsetX++)
+		for (float OffsetX = -HalfSide; OffsetX < HalfSide; OffsetX++)
 		{
-			for (int OffsetZ = -HalfSide; OffsetZ < HalfSide; OffsetZ++)
+			for (float OffsetZ = -HalfSide; OffsetZ < HalfSide; OffsetZ++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, +1, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, -1, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, +HalfSide, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, -HalfSide, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
 			}
 		}
 
 		// Left and right sides, avoid duplicates at top and bottom edges:
-		for (int OffsetX = -HalfSide; OffsetX < HalfSide; OffsetX++)
+		for (float OffsetX = -HalfSide; OffsetX < HalfSide; OffsetX++)
 		{
-			for (int OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
+			for (float OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, +1), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, -1), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, +HalfSide), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(OffsetX, OffsetY, -HalfSide), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
 			}
 		}
 
 		// Front and back sides, avoid all edges:
-		for (int OffsetZ = -HalfSide + 1; OffsetZ < HalfSide - 1; OffsetZ++)
+		for (float OffsetZ = -HalfSide + 1; OffsetZ < HalfSide - 1; OffsetZ++)
 		{
-			for (int OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
+			for (float OffsetY = -HalfSide + 1; OffsetY < HalfSide - 1; OffsetY++)
 			{
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(+1, OffsetY, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
-				DestructionTrace(&a_Chunk, a_Position, Vector3f(-1, OffsetY, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(+HalfSide, OffsetY, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
+				DestructionTrace(&a_Chunk, a_Position, Vector3f(-HalfSide, OffsetY, OffsetZ), a_Power, a_Fiery, RandomIntensity(Random, a_Power), a_ExplodingEntity);
 			}
 		}
 	}
 
 	/** Sends an explosion packet to all clients in the given chunk. */
-	static void LagTheClient(cChunk & a_Chunk, const Vector3f a_Position, const unsigned a_Power)
+	static void LagTheClient(cChunk & a_Chunk, const Vector3f a_Position, const int a_Power)
 	{
 		for (const auto Client : a_Chunk.GetAllClients())
 		{
-			Client->SendExplosion(a_Position, a_Power);
+			Client->SendExplosion(a_Position, static_cast<float>(a_Power));
 		}
 	}
 
-	void Kaboom(cWorld & a_World, const Vector3f a_Position, const unsigned a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
+	void Kaboom(cWorld & a_World, const Vector3f a_Position, const int a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
 		a_World.DoWithChunkAt(a_Position.Floor(), [a_Position, a_Power, a_Fiery, a_ExplodingEntity](cChunk & a_Chunk)
 		{

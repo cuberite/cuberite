@@ -7,19 +7,19 @@
 
 
 
-class cItemSpiderEyeHandler:
+class cItemSpiderEyeHandler final:
 	public cItemFoodHandler
 {
 	using Super = cItemFoodHandler;
 
 public:
 
-	cItemSpiderEyeHandler():
-		Super(E_ITEM_SPIDER_EYE, FoodInfo(2, 3.2))
+	constexpr cItemSpiderEyeHandler(int a_ItemType):
+		Super(a_ItemType, FoodInfo(2, 3.2))
 	{
 	}
 
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
 	{
 		if (!Super::EatItem(a_Player, a_Item))
 		{

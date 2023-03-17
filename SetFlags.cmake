@@ -88,15 +88,11 @@ function(set_global_flags)
 
 		# Make build use Unicode:
 		add_compile_definitions(UNICODE _UNICODE)
-	else()
-		# TODO: is this needed? NDEBUG is standard. Also, why are we using _DEBUG?
-		# Add the preprocessor macros used for distinguishing between debug and release builds (CMake does this automatically for MSVC):
-		set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -D_DEBUG")
-		set(CMAKE_C_FLAGS_DEBUG      "${CMAKE_C_FLAGS_DEBUG}      -D_DEBUG")
-		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -D_DEBUG")
-		set(CMAKE_C_FLAGS_COVERAGE   "${CMAKE_C_FLAGS_COVERAGE}   -D_DEBUG")
-		set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -DNDEBUG")
-		set(CMAKE_C_FLAGS_RELEASE    "${CMAKE_C_FLAGS_RELEASE}    -DNDEBUG")
+
+		# Turn off CRT warnings:
+		add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+
+		return ()
 	endif()
 
 	# Allow for a forced 32-bit build under 64-bit OS:
@@ -105,23 +101,33 @@ function(set_global_flags)
 		add_link_options(-m32)
 	endif()
 
+	# https://en.wikipedia.org/wiki/Uname
+	# https://gcc.gnu.org/onlinedocs/gcc/index.html
 	# Have the compiler generate code specifically targeted at the current machine on Linux:
-	if(LINUX AND NOT NO_NATIVE_OPTIMIZATION)
-		add_compile_options(-march=native)
-	endif()
-endfunction()
-
-function (try_add_flag TARGET FLAG)
-	include(CheckCXXCompilerFlag)
-	check_cxx_compiler_flag("${FLAG}" "HAS_FLAG_${FLAG}")
-	if ("${HAS_FLAG_${FLAG}}")
-		target_compile_options(${TARGET} PRIVATE "${FLAG}")
+	if(NOT NO_NATIVE_OPTIMIZATION AND NOT CMAKE_CROSSCOMPILING)
+		string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} SYSTEM_PROCESSOR)
+		if (SYSTEM_PROCESSOR MATCHES "^(i386|i686|x86|amd64|mips)")
+			message(STATUS "Optimising for this machine (march=native)")
+			add_compile_options(-march=native)
+		elseif (SYSTEM_PROCESSOR MATCHES "^(arm|aarch|powerpc|ppc|sparc|alpha)")
+			message(STATUS "Optimising for this machine (mcpu=native)")
+			add_compile_options(-mcpu=native)
+		endif()
 	endif()
 endfunction()
 
 function(set_exe_flags TARGET)
 	if (MSVC)
-		# TODO: MSVC level 4, warnings as errors
+		# TODO: Warnings as errors
+		target_compile_options(
+			${TARGET} PRIVATE
+
+			# Warnings level 4:
+			/W4
+
+			# Excessive amount of logspam (Unreferenced formal parameter), disable for now:
+			/wd4100
+		)
 		return ()
 	endif()
 
@@ -158,15 +164,36 @@ function(set_exe_flags TARGET)
 			-Wno-switch-enum
 
 			# Weverything with Clang exceptions:
-			-Weverything -Wno-error=disabled-macro-expansion -Wno-weak-vtables
-			-Wno-exit-time-destructors -Wno-string-conversion -Wno-c++98-compat-pedantic
-			-Wno-documentation -Wno-documentation-unknown-command -Wno-reserved-id-macro
-			-Wno-error=unused-command-line-argument
+			-Weverything -Wno-exit-time-destructors -Wno-error=disabled-macro-expansion -Wno-weak-vtables
+			-Wno-string-conversion -Wno-c++98-compat-pedantic -Wno-c++2a-compat-pedantic -Wno-documentation
+			-Wno-documentation-unknown-command -Wno-reserved-id-macro -Wno-error=unused-command-line-argument
 		)
 
-		# We aren't using C++11
-		try_add_flag(${TARGET} -Wno-return-std-move-in-c++11)
-		# int to float conversions happen a lot, not worth fixing all warnings
-		try_add_flag(${TARGET} -Wno-implicit-int-float-conversion)
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13)
+			target_compile_options(
+				${TARGET} PRIVATE
+
+				# We aren't using C++11:
+				-Wno-return-std-move-in-c++11
+			)
+		endif()
+
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 10)
+			target_compile_options(
+				${TARGET} PRIVATE
+
+				# int to float conversions happen a lot, not worth fixing all warnings:
+				-Wno-implicit-int-float-conversion
+			)
+		endif()
+
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13)
+			target_compile_options(
+				${TARGET} PRIVATE
+
+				# TODO: fix
+				-Wno-reserved-identifier
+			)
+		endif()
 	endif()
 endfunction()

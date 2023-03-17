@@ -10,7 +10,7 @@
 
 
 
-cPassiveMonster::cPassiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height) :
+cPassiveMonster::cPassiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height) :
 	Super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_SoundAmbient, a_Width, a_Height)
 {
 	m_EMPersonality = PASSIVE;
@@ -37,15 +37,6 @@ bool cPassiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cPassiveMonster::Destroyed()
-{
-	Super::Destroyed();
-}
-
-
-
-
-
 void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	Super::Tick(a_Dt, a_Chunk);
@@ -57,7 +48,7 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_EMState == ESCAPING)
 	{
-		CheckEventLostPlayer();
+		CheckEventLostPlayer(a_Dt);
 	}
 
 	cMonster::LoveTick();

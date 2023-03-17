@@ -13,36 +13,11 @@
 
 cBrewingstandEntity::cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
-	m_IsDestroyed(false),
 	m_IsBrewing(false),
 	m_TimeBrewed(0),
 	m_RemainingFuel(0)
 {
 	m_Contents.AddListener(*this);
-}
-
-
-
-
-
-cBrewingstandEntity::~cBrewingstandEntity()
-{
-	// Tell window its owner is destroyed
-	cWindow * Window = GetWindow();
-	if (Window != nullptr)
-	{
-		Window->OwnerDestroyed();
-	}
-}
-
-
-
-
-
-void cBrewingstandEntity::Destroy()
-{
-	m_IsDestroyed = true;
-	Super::Destroy();
 }
 
 
@@ -64,6 +39,20 @@ void cBrewingstandEntity::CopyFrom(const cBlockEntity & a_Src)
 	}
 	m_TimeBrewed = src.m_TimeBrewed;
 	m_RemainingFuel = src.m_RemainingFuel;
+}
+
+
+
+
+
+void cBrewingstandEntity::OnRemoveFromWorld()
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		// Tell window its owner is destroyed:
+		Window->OwnerDestroyed();
+	}
 }
 
 
@@ -156,7 +145,7 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 {
-	a_Player->GetStatManager().AddValue(Statistic::InteractWithBrewingstand);
+	a_Player->GetStatistics().Custom[CustomStatistic::InteractWithBrewingstand]++;
 
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
@@ -205,11 +194,6 @@ void cBrewingstandEntity::BroadcastProgress(size_t a_ProgressbarID, short a_Valu
 void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
 	Super::OnSlotChanged(a_ItemGrid, a_SlotNum);
-
-	if (m_IsDestroyed)
-	{
-		return;
-	}
 
 	ASSERT(a_ItemGrid == &m_Contents);
 
@@ -304,8 +288,8 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 void cBrewingstandEntity::UpdateProgressBars(bool a_ForceUpdate)
 {
-	/** Sending an update every 3th tick, using a higher value lets look the progressbar ugly */
-	if (!a_ForceUpdate && (m_World->GetWorldAge() % 3 != 0))
+	// Send an update every 3rd tick, using a higher value makes the progressbar look ugly:
+	if (!a_ForceUpdate && ((m_World->GetWorldTickAge() % 3_tick) != 0_tick))
 	{
 		return;
 	}

@@ -79,18 +79,27 @@ void LOGERROR(std::string_view a_Format, const Args & ... args)
 // Macro variants
 
 // In debug builds, translate LOGD to LOG, otherwise leave it out altogether:
-#if defined(_DEBUG) || defined(TEST_GLOBALS)
+#if !defined(NDEBUG) || defined(TEST_GLOBALS)
 	#define LOGD LOG
 #else
 	#define LOGD(...)
-#endif  // _DEBUG
+#endif  // !NDEBUG
 
 #define LOGWARN LOGWARNING
 
-#if defined(_DEBUG) || defined(TEST_GLOBALS)
+#if !defined(NDEBUG) || defined(TEST_GLOBALS)
 	#define FLOGD FLOG
 #else
 	#define FLOGD(...)
-#endif  // _DEBUG
+#endif  // !NDEBUG
 
 #define FLOGWARN FLOGWARNING
+
+// Conditionally log a warning
+#define CONDWARNING(ShouldLog, ...) \
+	do { \
+		if (ShouldLog) \
+		{ \
+			LOGWARNING(__VA_ARGS__); \
+		} \
+	} while (false)

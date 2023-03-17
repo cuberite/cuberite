@@ -6,9 +6,9 @@
 
 
 class cBlockObserverHandler final :
-	public cClearMetaOnDrop<cPitchYawRotator<cBlockHandler>>
+	public cClearMetaOnDrop<cDisplacementYawRotator<cBlockHandler>>
 {
-	using Super = cClearMetaOnDrop<cPitchYawRotator<cBlockHandler>>;
+	using Super = cClearMetaOnDrop<cDisplacementYawRotator<cBlockHandler>>;
 
 public:
 

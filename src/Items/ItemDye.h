@@ -10,16 +10,13 @@
 
 
 
-class cItemDyeHandler :
+class cItemDyeHandler final :
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
-	cItemDyeHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 
@@ -32,7 +29,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		if ((a_HeldItem.m_ItemDamage == E_META_DYE_WHITE) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
 		{
@@ -74,7 +71,7 @@ public:
 			{
 				return false;
 			}
-			if (a_Player->PlaceBlock(CocoaPos.x, CocoaPos.y, CocoaPos.z, E_BLOCK_COCOA_POD, BlockMeta))
+			if (a_Player->PlaceBlock(CocoaPos, E_BLOCK_COCOA_POD, BlockMeta))
 			{
 				if (a_Player->IsGameModeSurvival())
 				{
@@ -128,21 +125,18 @@ public:
 
 			case E_BLOCK_BEETROOTS:
 			{
+				// Fix GH #4805.
+				// Bonemeal should only advance growth, not spawn produce, and should not be consumed if plant at maturity:
 				if (a_World.GrowPlantAt(a_BlockPos, 1) <= 0)
 				{
-					// Fix GH #4805 (bonemeal should only advance growth, not spawn produce):
 					return false;
 				}
-
 				a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockPos, 0);
-
-				// 75% chance of 1-stage growth:
-				if (!GetRandomProvider().RandBool(0.75))
+				if (GetRandomProvider().RandBool(0.25))
 				{
-					// Hit the 25%, rollback:
+					// 75% chance of 1-stage growth, but we hit the 25%, rollback:
 					a_World.GrowPlantAt(a_BlockPos, -1);
 				}
-
 				return true;
 			}  // case beetroots
 
@@ -371,7 +365,7 @@ public:
 		)
 		{
 			if (
-				!cChunkDef::IsValidHeight(Position.y) ||
+				!cChunkDef::IsValidHeight(Position) ||
 				(a_World.GetBlock(Position) != E_BLOCK_GRASS)  // Are we looking at grass?
 			)
 			{

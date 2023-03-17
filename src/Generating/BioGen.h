@@ -49,13 +49,13 @@ class cBioGenCache:
 
 public:
 
-	cBioGenCache(cBiomeGenPtr a_BioGenToCache, size_t a_CacheSize);
-	virtual ~cBioGenCache() override = default;
-
+	cBioGenCache(cBiomeGen & a_BioGenToCache, size_t a_CacheSize);
 
 protected:
 
-	cBiomeGenPtr m_BioGenToCache;
+	friend class cBioGenMulticache;
+
+	cBiomeGen & m_BioGenToCache;
 
 	struct sCacheData
 	{
@@ -97,17 +97,18 @@ public:
 	This allows us to use shorter cache depths with faster lookups for more covered area. (#381)
 	a_SubCacheSize defines the size of each sub-cache
 	a_NumSubCaches defines how many sub-caches are used for the multicache. */
-	cBioGenMulticache(const cBiomeGenPtr & a_BioGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
+	cBioGenMulticache(std::unique_ptr<cBiomeGen> a_BioGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
 
 protected:
-	typedef std::vector<cBiomeGenPtr> cBiomeGenPtrs;
-
 
 	/** Number of sub-caches. Pulled out of m_Caches.size() for faster access. */
 	size_t m_NumSubCaches;
 
 	/** Individual sub-caches. */
-	cBiomeGenPtrs m_Caches;
+	std::vector<std::unique_ptr<cBioGenCache>> m_Caches;
+
+	/** The underlying biome generator. */
+	std::unique_ptr<cBiomeGen> m_Underlying;
 
 
 	virtual void GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) override;
@@ -323,7 +324,3 @@ protected:
 	a_DistLevel is either 0 or 1; zero when it is at the edge of the small Voronoi cell, 1 near the center */
 	EMCSBiome SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int a_DistLevel);
 } ;
-
-
-
-

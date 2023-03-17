@@ -1,6 +1,7 @@
 target_sources(
 	${CMAKE_PROJECT_NAME} PRIVATE
 
+	BannerEntity.cpp
 	BeaconEntity.cpp
 	BedEntity.cpp
 	BlockEntity.cpp
@@ -23,6 +24,7 @@ target_sources(
 	NoteEntity.cpp
 	SignEntity.cpp
 
+	BannerEntity.h
 	BeaconEntity.h
 	BedEntity.h
 	BlockEntity.h

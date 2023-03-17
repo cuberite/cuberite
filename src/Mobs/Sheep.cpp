@@ -12,7 +12,7 @@
 
 
 cSheep::cSheep(int a_Color) :
-	Super("Sheep", mtSheep, "entity.sheep.hurt", "entity.sheep.death", "entity.sheep.ambient", 0.6, 1.3),
+	Super("Sheep", mtSheep, "entity.sheep.hurt", "entity.sheep.death", "entity.sheep.ambient", 0.9f, 1.3f),
 	m_IsSheared(false),
 	m_WoolColor(a_Color),
 	m_TimeToStopEating(-1)
@@ -42,7 +42,7 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 	if (!m_IsSheared)
 	{
-		a_Drops.push_back(cItem(E_BLOCK_WOOL, 1, static_cast<short>(m_WoolColor)));
+		a_Drops.emplace_back(E_BLOCK_WOOL, static_cast<char>(1), static_cast<short>(m_WoolColor));
 	}
 
 	unsigned int LootingLevel = 0;
@@ -113,11 +113,11 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		if (m_TimeToStopEating == 0)
 		{
-			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS)  // Make sure grass hasn't been destroyed in the meantime
+			if (m_World->GetBlock({ PosX, PosY, PosZ }) == E_BLOCK_GRASS)  // Make sure grass hasn't been destroyed in the meantime
 			{
 				// The sheep ate the grass so we change it to dirt
-				m_World->SetBlock(PosX, PosY, PosZ, E_BLOCK_DIRT, 0);
-				GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, {PosX, PosY, PosZ}, E_BLOCK_GRASS);
+				m_World->SetBlock({ PosX, PosY, PosZ }, E_BLOCK_DIRT, 0);
+				GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, { PosX, PosY, PosZ }, E_BLOCK_GRASS);
 				m_IsSheared = false;
 				m_World->BroadcastEntityMetadata(*this);
 			}
@@ -127,9 +127,9 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (GetRandomProvider().RandBool(1.0 / 600.0))
 		{
-			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS)
+			if (m_World->GetBlock({ PosX, PosY, PosZ }) == E_BLOCK_GRASS)
 			{
-				m_World->BroadcastEntityStatus(*this, esSheepEating);
+				m_World->BroadcastEntityAnimation(*this, EntityAnimation::SheepEatsGrass);
 				m_TimeToStopEating = 40;
 			}
 		}

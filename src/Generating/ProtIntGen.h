@@ -767,7 +767,7 @@ public:
 					if (IsBiomeOcean(above) || IsBiomeOcean(below) || IsBiomeOcean(left) || IsBiomeOcean(right))
 					{
 						// First convert the value to a regular biome (drop the M flag), then modulo by our biome count:
-						val = ToBeach[(val % 128) % ARRAYCOUNT(ToBeach)];
+						val = ToBeach[static_cast<size_t>(val % 128) % ARRAYCOUNT(ToBeach)];
 					}
 				}
 				a_Values[x + z * a_SizeX] = val;
@@ -847,7 +847,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int *a_Values)
+	virtual void GetInts(int a_MinX, int a_MinZ, size_t a_SizeX, size_t a_SizeZ, int * a_Values) override
 	{
 		// Generate the underlying biome groups:
 		size_t lowerSizeX = a_SizeX + 2;

@@ -11,6 +11,7 @@
 #include "../BlockEntities/BlockEntity.h"
 #include "WorldStorage.h"
 #include "FastNBT.h"
+#include "StringCompression.h"
 
 
 
@@ -23,6 +24,7 @@ class cMonster;
 class cProjectileEntity;
 class cHangingEntity;
 class cUUID;
+class ChunkBlockData;
 
 
 
@@ -62,9 +64,8 @@ protected:
 
 		cMCAFile(cWSSAnvil & a_ParentSchema, const AString & a_FileName, int a_RegionX, int a_RegionZ);
 
-		bool GetChunkData  (const cChunkCoords & a_Chunk, AString & a_Data);
-		bool SetChunkData  (const cChunkCoords & a_Chunk, const AString & a_Data);
-		bool EraseChunkData(const cChunkCoords & a_Chunk);
+		bool GetChunkData  (const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data);
+		bool SetChunkData  (const cChunkCoords & a_Chunk, ContiguousByteBufferView a_Data);
 
 		int             GetRegionX (void) const {return m_RegionX; }
 		int             GetRegionZ (void) const {return m_RegionZ; }
@@ -86,8 +87,8 @@ protected:
 		// Chunk timestamps, following the chunk headers
 		unsigned m_TimeStamps[MCA_MAX_CHUNKS];
 
-		/** Finds a free location large enough to hold a_Data. Gets a hint of the chunk coords, places the data there if it fits. Returns the sector number. */
-		unsigned FindFreeLocation(int a_LocalX, int a_LocalZ, const AString & a_Data);
+		/** Finds a free location large enough to hold a_Data. Returns the sector number. */
+		unsigned FindFreeLocation(int a_LocalX, int a_LocalZ, size_t a_DataSize);
 
 		/** Opens a MCA file either for a Read operation (fails if doesn't exist) or for a Write operation (creates new if not found) */
 		bool OpenFile(bool a_IsForReading);
@@ -97,42 +98,42 @@ protected:
 	cCriticalSection m_CS;
 	cMCAFiles        m_Files;  // a MRU cache of MCA files
 
-	int m_CompressionFactor;
-
+	Compression::Extractor m_Extractor;
+	Compression::Compressor m_Compressor;
 
 	/** Reports that the specified chunk failed to load and saves the chunk data to an external file. */
-	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Reason, const AString & a_ChunkDataToSave);
+	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Reason, ContiguousByteBufferView a_ChunkDataToSave);
 
 	/** Gets chunk data from the correct file; locks file CS as needed */
-	bool GetChunkData(const cChunkCoords & a_Chunk, AString & a_Data);
+	bool GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data);
+
+	/** Copies a_Length bytes of data from the specified NBT Tag's Child into the a_Destination buffer */
+	const std::byte * GetSectionData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, size_t a_Length);
 
 	/** Sets chunk data into the correct file; locks file CS as needed */
-	bool SetChunkData(const cChunkCoords & a_Chunk, const AString & a_Data);
+	bool SetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBufferView a_Data);
 
 	/** Loads the chunk from the data (no locking needed) */
-	bool LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & a_Data);
+	bool LoadChunkFromData(const cChunkCoords & a_Chunk, ContiguousByteBufferView a_Data);
 
 	/** Saves the chunk into datastream (no locking needed) */
-	bool SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data);
+	Compression::Result SaveChunkToData(const cChunkCoords & a_Chunk);
 
 	/** Loads the chunk from NBT data (no locking needed).
 	a_RawChunkData is the raw (compressed) chunk data, used for offloading when chunk loading fails. */
-	bool LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, const AString & a_RawChunkData);
+	bool LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, ContiguousByteBufferView a_RawChunkData);
 
-	/** Saves the chunk into NBT data using a_Writer; returns true on success */
-	bool SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_Writer);
+	/** Loads the chunk's biome map into a_BiomeMap if biomes present and valid; returns false otherwise. */
+	bool LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx);
 
-	/** Loads the chunk's biome map from vanilla-format; returns a_BiomeMap if biomes present and valid, nullptr otherwise */
-	cChunkDef::BiomeMap * LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx);
-
-	/** Loads the chunk's biome map from MCS format; returns a_BiomeMap if biomes present and valid, nullptr otherwise */
-	cChunkDef::BiomeMap * LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx);
+	/** Loads the chunk's height map into a_HeightMap if heights present and valid; returns false otherwise. */
+	bool LoadHeightMapFromNBT(cChunkDef::HeightMap & a_HeightMap, const cParsedNBT & a_NBT, int a_TagIdx);
 
 	/** Loads the chunk's entities from NBT data (a_Tag is the Level\\Entities list tag; may be -1) */
 	void LoadEntitiesFromNBT(cEntityList & a_Entitites, const cParsedNBT & a_NBT, int a_Tag);
 
 	/** Loads the chunk's BlockEntities from NBT data (a_Tag is the Level\\TileEntities list tag; may be -1) */
-	void LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntitites, const cParsedNBT & a_NBT, int a_Tag, BLOCKTYPE * a_BlockTypes, NIBBLETYPE * a_BlockMetas);
+	void LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntitites, const cParsedNBT & a_NBT, int a_Tag, const ChunkBlockData & a_BlockData);
 
 	/** Loads the data for a block entity from the specified NBT tag.
 	Returns the loaded block entity, or nullptr upon failure. */
@@ -156,6 +157,7 @@ protected:
 	The coordinates are used only for the log message. */
 	bool CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, const AStringVector & a_ExpectedTypes, Vector3i a_Pos);
 
+	OwnedBlockEntity LoadBannerFromNBT           (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
 	OwnedBlockEntity LoadBeaconFromNBT           (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
 	OwnedBlockEntity LoadBedFromNBT              (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
 	OwnedBlockEntity LoadBrewingstandFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
@@ -175,7 +177,7 @@ protected:
 	OwnedBlockEntity LoadNoteBlockFromNBT        (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
 	OwnedBlockEntity LoadSignFromNBT             (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
 
-	void LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, size_t a_IDTagLength);
+	void LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, std::string_view a_EntityName);
 
 	void LoadBoatFromNBT            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadEnderCrystalFromNBT    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
@@ -205,36 +207,72 @@ protected:
 
 	void LoadBatFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadBlazeFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadCatFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadCaveSpiderFromNBT      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadChickenFromNBT         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadCodFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadCowFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadCreeperFromNBT         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadDolphinFromNBT         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadDonkeyFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadDrownedFromNBT         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadElderGuardianFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadEnderDragonFromNBT     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadEndermanFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadEndermiteFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadEvokerFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadFoxFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadGhastFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadGiantFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadGuardianFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadHorseFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadHoglinFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadHuskFromNBT            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadIllusionerFromNBT      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadIronGolemFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadLlamaFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadMagmaCubeFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadMooshroomFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadMuleFromNBT            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadOcelotFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadPandaFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadParrotFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadPhantomFromNBT         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadPigFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadPiglinFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadPiglinBruteFromNBT     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadPillagerFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadPolarBearFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadPufferfishFromNBT      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadRabbitFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadRavagerFromNBT         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadSalmonFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSheepFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadShulkerFromNBT         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSilverfishFromNBT      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSkeletonFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadSkeletonHorseFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSlimeFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSnowGolemFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSpiderFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSquidFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadStrayFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadStriderFromNBT         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadTraderLlamaFromNBT     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadTropicalFishFromNBT    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadTurtleFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadVexFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadVillagerFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadVindicatorFromNBT      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadWanderingTraderFromNBT (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadWitchFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadWitherFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadWitherSkeletonFromNBT  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadWolfFromNBT            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadZoglinFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadZombieFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadPigZombieFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadZombieHorseFromNBT     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadZombifiedPiglinFromNBT (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadZombieVillagerFromNBT  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 
 	/** Loads the owner name and UUID from the entity at the specified NBT tag.
@@ -265,15 +303,8 @@ protected:
 	/** Gets the correct MCA file either from cache or from disk, manages the m_MCAFiles cache; assumes m_CS is locked */
 	cMCAFile * LoadMCAFile(const cChunkCoords & a_Chunk);
 
-	/** Copies a_Length bytes of data from the specified NBT Tag's Child into the a_Destination buffer */
-	void CopyNBTData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, char * a_Destination, size_t a_Length);
-
 	// cWSSchema overrides:
 	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override;
 	virtual bool SaveChunk(const cChunkCoords & a_Chunk) override;
 	virtual const AString GetName(void) const override {return "anvil"; }
 } ;
-
-
-
-

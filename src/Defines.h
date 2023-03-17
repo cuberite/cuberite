@@ -12,16 +12,9 @@ typedef std::vector<int> cSlotNums;
 
 
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-#endif
 /** Constant to calculate ticks from seconds "ticks per second" */
 constexpr inline const int TPS = 20;
 // This is not added to the lua API because it broke the build
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
 
 
 
@@ -218,26 +211,6 @@ enum eMobHeadRotation
 
 
 
-enum eHand
-{
-	hMain = 0,
-	hOff = 1,
-} ;
-
-
-
-
-
-enum eMainHand
-{
-	mhLeft = 0,
-	mhRight = 1,
-} ;
-
-
-
-
-
 enum eSkinPart
 {
 	spCape = 0x01,
@@ -278,6 +251,7 @@ enum eDamageType
 	dtSuffocating,      // Suffocating inside a block
 	dtStarving,         // Hunger
 	dtCactusContact,    // Contact with a cactus block
+	dtMagmaContact,     // Contact with a magma block
 	dtLavaContact,      // Contact with a lava block
 	dtPoisoning,        // Having the poison effect
 	dtWithering,        // Having the wither effect
@@ -306,6 +280,7 @@ enum eDamageType
 	dtCactus       = dtCactusContact,
 	dtCactuses     = dtCactusContact,
 	dtCacti        = dtCactusContact,
+	dtMagma        = dtMagmaContact,
 	dtLava         = dtLavaContact,
 	dtPoison       = dtPoisoning,
 	dtWither       = dtWithering,
@@ -339,6 +314,7 @@ enum eExplosionSource
 	esOther,
 	esPlugin,
 	esPrimedTNT,
+	esTNTMinecart,
 	esWitherBirth,
 	esWitherSkull,
 	esMax,
@@ -399,6 +375,160 @@ enum eMessageType
 
 
 
+
+enum class BannerPattern
+{
+	BottomStripe,
+	TopStripe,
+	LeftStripe,
+	RightStripe,
+	CenterStripeVertical,
+	MiddleStripeHorizontal,
+	DownRightStripe,
+	DownLeftStripe,
+	SmallVerticalStripes,
+	DiagonalCross,
+	SquareCross,
+	LeftOfDiagonal,
+	RightOfUpsideDownDiagonal,
+	LeftOfUpsideDownDiagonal,
+	RightOfDiagonal,
+	VerticalHalfLeft,
+	VerticalHalfRight,
+	HorizontalHalfTop,
+	HorizontalHalfBottom,
+	BottomLeftCorner,
+	BottomRightCorner,
+	TopLeftCorner,
+	TopRightCorner,
+	BottomTriangle,
+	TopTriangle,
+	BottomTriangleSawtooth,
+	TopTriangleSawtooth,
+	MiddleCircle,
+	MiddleRhombus,
+	Border,
+	CurlyBorder,
+	Brick,
+	Gradient,
+	GradientUpsideDown,
+	Creeper,
+	Skull,
+	Flower,
+	Mojang,
+	Globe,
+	Piglin
+};
+
+
+
+
+
+enum class BossBarColor
+{
+	Pink,
+	Blue,
+	Red,
+	Green,
+	Yellow,
+	Purple,
+	White
+};
+
+
+
+
+
+enum class BossBarDivisionType
+{
+	None,
+	SixNotches,
+	TenNotches,
+	TwelveNotches,
+	TwentyNotches
+};
+
+// tolua_end
+
+
+
+
+
+enum class EntityAnimation
+{
+	AnimalFallsInLove,
+	ArmorStandGetsHit,
+	ArrowTipSparkles,
+	DolphinShowsHappiness,
+	EggCracks,
+	EntityGetsCriticalHit,
+	EntityGetsMagicalCriticalHit,
+	EntityTrailsHoney,
+	EvokerFangsAttacks,
+	FireworkRocketExplodes,
+	// FishingHookReels,
+	FoxChews,
+	GuardianAttacks,
+	HoglinAttacks,
+	HorseTamingFails,
+	HorseTamingSucceeds,
+	IronGolemAttacks,
+	IronGolemOffersGift,
+	IronGolemStashesGift,
+	MinecartSpawnerDelayResets,
+	MinecartTNTIgnites,
+	MobSpawns,
+	OcelotTrusts,
+	OcelotDistrusts,
+	PawnBerryBushPricks,
+	PawnBurns,
+	PawnChestEquipmentBreaks,
+	PawnDies,
+	PawnDrowns,
+	PawnFeetEquipmentBreaks,
+	PawnHandItemSwaps,
+	PawnHeadEquipmentBreaks,
+	PawnHurts,
+	PawnLegsEquipmentBreaks,
+	PawnMainHandEquipmentBreaks,
+	PawnOffHandEquipmentBreaks,
+	PawnShieldBlocks,
+	PawnShieldBreaks,
+	PawnTeleports,
+	PawnThornsPricks,
+	PawnTotemActivates,
+	PlayerBadOmenActivates,
+	PlayerEntersBed,
+	PlayerFinishesEating,
+	PlayerLeavesBed,
+	PlayerMainHandSwings,
+	// PlayerReducedDebugScreenDisables,
+	// PlayerReducedDebugScreenEnables,
+	PlayerOffHandSwings,
+	RabbitJumps,
+	RavagerAttacks,
+	RavagerBecomesStunned,
+	SheepEatsGrass,
+	SnowballPoofs,
+	// SquidResetsRotation,
+	VillagerKisses,
+	VillagerShowsAnger,
+	VillagerShowsHappiness,
+	VillagerSweats,
+	WitchMagicks,
+	WolfShakesWater,
+	WolfTamingFails,
+	WolfTamingSucceeds,
+	ZoglinAttacks,
+	ZombieVillagerCureFinishes
+};
+
+
+
+
+
+// tolua_begin
+
 /** Returns a textual representation of the click action. */
 const char * ClickActionToString(int a_ClickAction);
 
@@ -441,12 +571,8 @@ If a_Inverse is true, the opposite direction is used instead. */
 void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBlockFace a_BlockFace, bool a_bInverse = false);
 
 /** Returns the coords of a block that is neighboring the specified position through its specified face.
-If a_IsInverse is true, the opposite direction is used instead. */
-inline Vector3i AddFaceDirection(Vector3i a_Pos, eBlockFace a_BlockFace, bool a_bInverse = false)
-{
-	AddFaceDirection(a_Pos.x, a_Pos.y, a_Pos.z, a_BlockFace, a_bInverse);
-	return a_Pos;
-}
+If a_InvertDirection is true, the opposite direction is used instead. */
+Vector3i AddFaceDirection(Vector3i a_Pos, eBlockFace a_BlockFace, bool a_InvertDirection = false);
 
 // tolua_end
 
@@ -487,7 +613,8 @@ inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, do
 
 
 
-template <class T> inline T Diff(T a_Val1, T a_Val2)
+template <class T>
+inline T Diff(T a_Val1, T a_Val2)
 {
 	return std::abs(a_Val1 - a_Val2);
 }
@@ -540,6 +667,8 @@ namespace ItemCategory
 	bool IsArmor(short a_ItemType);
 
 	bool IsHorseArmor(short a_ItemType);
+
+	bool IsVillagerFood(short a_ItemType);
 }
 
 // tolua_end

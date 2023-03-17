@@ -11,7 +11,7 @@
 
 
 cZombieVillager::cZombieVillager(cVillager::eVillagerType a_Profession) :
-	Super("ZombieVillager", mtZombieVillager, "entity.zombie_villager.hurt", "entity.zombie_villager.death", "entity.ambient", 0.6, 1.8),
+	Super("ZombieVillager", mtZombieVillager, "entity.zombie_villager.hurt", "entity.zombie_villager.death", "entity.ambient", 0.6f, 1.95f),
 	m_ConversionTime(-1),
 	m_Profession(a_Profession)
 {

@@ -254,11 +254,11 @@ bool cPluginManager::GenericCallHook(PluginHook a_HookName, HookFunction a_HookF
 
 
 
-bool cPluginManager::CallHookBlockSpread(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
+bool cPluginManager::CallHookBlockSpread(cWorld & a_World, Vector3i a_BlockPos, eSpreadSource a_Source)
 {
 	return GenericCallHook(HOOK_BLOCK_SPREAD, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnBlockSpread(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Source);
+			return a_Plugin->OnBlockSpread(a_World, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Source);
 		}
 	);
 }
@@ -541,7 +541,7 @@ bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVec
 		if (world != nullptr)
 		{
 			worldName = world->GetName();
-			worldAge = world->GetWorldAge();
+			worldAge = world->GetWorldAge().count();
 		}
 		else
 		{
@@ -710,11 +710,11 @@ bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation
 
 
 
-bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	return GenericCallHook(HOOK_PLAYER_BREAKING_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerBreakingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerBreakingBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_BlockType, a_BlockMeta);
 		}
 	);
 }
@@ -723,11 +723,11 @@ bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_Block
 
 
 
-bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	return GenericCallHook(HOOK_PLAYER_BROKEN_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerBrokenBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerBrokenBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_BlockType, a_BlockMeta);
 		}
 	);
 }
@@ -775,11 +775,11 @@ bool cPluginManager::CallHookPlayerFoodLevelChange(cPlayer & a_Player, int a_New
 
 
 
-bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems & a_Reward)
+bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems & a_Reward, const int ExperienceAmount)
 {
 	return GenericCallHook(HOOK_PLAYER_FISHED, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerFished(a_Player, a_Reward);
+			return a_Plugin->OnPlayerFished(a_Player, a_Reward, ExperienceAmount);
 		}
 	);
 }
@@ -788,11 +788,11 @@ bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems & a_R
 
 
 
-bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems a_Reward)
+bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems & a_Reward, int & ExperienceAmount)
 {
 	return GenericCallHook(HOOK_PLAYER_FISHING, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerFishing(a_Player, a_Reward);
+			return a_Plugin->OnPlayerFishing(a_Player, a_Reward, ExperienceAmount);
 		}
 	);
 }
@@ -814,11 +814,11 @@ bool cPluginManager::CallHookPlayerJoined(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
+bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, char a_Status)
 {
 	return GenericCallHook(HOOK_PLAYER_LEFT_CLICK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerLeftClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status);
+			return a_Plugin->OnPlayerLeftClick(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_Status);
 		}
 	);
 }
@@ -892,11 +892,11 @@ bool cPluginManager::CallHookPlayerCrouched(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginManager::CallHookPlayerRightClick(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos)
 {
 	return GenericCallHook(HOOK_PLAYER_RIGHT_CLICK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerRightClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			return a_Plugin->OnPlayerRightClick(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z);
 		}
 	);
 }
@@ -957,11 +957,11 @@ bool cPluginManager::CallHookPlayerTossingItem(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	return GenericCallHook(HOOK_PLAYER_USED_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsedBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerUsedBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z, a_BlockType, a_BlockMeta);
 		}
 	);
 }
@@ -970,11 +970,11 @@ bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos)
 {
 	return GenericCallHook(HOOK_PLAYER_USED_ITEM, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsedItem(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			return a_Plugin->OnPlayerUsedItem(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z);
 		}
 	);
 }
@@ -983,11 +983,11 @@ bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, int a_BlockX, in
 
 
 
-bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	return GenericCallHook(HOOK_PLAYER_USING_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerUsingBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z, a_BlockType, a_BlockMeta);
 		}
 	);
 }
@@ -996,11 +996,11 @@ bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, 
 
 
 
-bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos)
 {
 	return GenericCallHook(HOOK_PLAYER_USING_ITEM, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsingItem(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			return a_Plugin->OnPlayerUsingItem(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z);
 		}
 	);
 }
@@ -1009,7 +1009,7 @@ bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message)
+bool cPluginManager::CallHookPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const ContiguousByteBufferView a_Message)
 {
 	return GenericCallHook(HOOK_PLUGIN_MESSAGE, [&](cPlugin * a_Plugin)
 		{
@@ -1071,11 +1071,11 @@ bool cPluginManager::CallHookPreCrafting(cPlayer & a_Player, cCraftingGrid & a_G
 
 
 
-bool cPluginManager::CallHookProjectileHitBlock(cProjectileEntity & a_Projectile, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Face, const Vector3d & a_BlockHitPos)
+bool cPluginManager::CallHookProjectileHitBlock(cProjectileEntity & a_Projectile, Vector3i a_BlockPos, eBlockFace a_Face, const Vector3d & a_BlockHitPos)
 {
 	return GenericCallHook(HOOK_PROJECTILE_HIT_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnProjectileHitBlock(a_Projectile, a_BlockX, a_BlockY, a_BlockZ, a_Face, a_BlockHitPos);
+			return a_Plugin->OnProjectileHitBlock(a_Projectile, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Face, a_BlockHitPos);
 		}
 	);
 }
@@ -1175,11 +1175,11 @@ bool cPluginManager::CallHookTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a
 
 
 
-bool cPluginManager::CallHookUpdatingSign(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4, cPlayer * a_Player)
+bool cPluginManager::CallHookUpdatingSign(cWorld & a_World, Vector3i a_BlockPos, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4, cPlayer * a_Player)
 {
 	return GenericCallHook(HOOK_UPDATING_SIGN, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnUpdatingSign(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
+			return a_Plugin->OnUpdatingSign(a_World, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
 		}
 	);
 }
@@ -1188,11 +1188,11 @@ bool cPluginManager::CallHookUpdatingSign(cWorld & a_World, int a_BlockX, int a_
 
 
 
-bool cPluginManager::CallHookUpdatedSign(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
+bool cPluginManager::CallHookUpdatedSign(cWorld & a_World, Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
 {
 	return GenericCallHook(HOOK_UPDATED_SIGN, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnUpdatedSign(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
+			return a_Plugin->OnUpdatedSign(a_World, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
 		}
 	);
 }

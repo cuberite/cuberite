@@ -24,17 +24,6 @@
 #include <sstream>
 #include <iostream>
 
-extern "C"
-{
-	#include "zlib/zlib.h"
-}
-
-
-
-
-
-typedef std::list< cClientHandle* > ClientList;
-
 
 
 
@@ -76,7 +65,7 @@ public:
 // cServer::cTickThread:
 
 cServer::cTickThread::cTickThread(cServer & a_Server) :
-	Super("ServerTickThread"),
+	Super("Server Ticker"),
 	m_Server(a_Server)
 {
 }
@@ -123,8 +112,7 @@ cServer::cServer(void) :
 	m_bIsHardcore(false),
 	m_TickThread(*this),
 	m_ShouldAuthenticate(false),
-	m_ShouldLoadOfflinePlayerData(false),
-	m_ShouldLoadNamedPlayerData(true)
+	m_UpTime(0)
 {
 	// Initialize the LuaStateTracker singleton before the app goes multithreaded:
 	cLuaStateTracker::GetStats();
@@ -169,7 +157,9 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	m_MaxPlayers = static_cast<size_t>(a_Settings.GetValueSetI("Server", "MaxPlayers", 100));
 	m_bIsHardcore = a_Settings.GetValueSetB("Server", "HardcoreEnabled", false);
 	m_bAllowMultiLogin = a_Settings.GetValueSetB("Server", "AllowMultiLogin", false);
+	m_RequireResourcePack = a_Settings.GetValueSetB("Server", "RequireResourcePack", false);
 	m_ResourcePackUrl = a_Settings.GetValueSet("Server", "ResourcePackUrl", "");
+	m_CustomRedirectUrl = a_Settings.GetValueSet("Server", "CustomRedirectUrl", "https://youtu.be/dQw4w9WgXcQ");
 
 	m_FaviconData = Base64Encode(cFile::ReadWholeFile(AString("favicon.png")));  // Will return empty string if file nonexistant; client doesn't mind
 
@@ -204,26 +194,36 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 
 	// Check if both BungeeCord and online mode are on, if so, warn the admin:
 	m_ShouldAllowBungeeCord = a_Settings.GetValueSetB("Authentication", "AllowBungeeCord", false);
+	m_OnlyAllowBungeeCord = a_Settings.GetValueSetB("Authentication", "OnlyAllowBungeeCord", false);
+	m_ProxySharedSecret = a_Settings.GetValueSet("Authentication", "ProxySharedSecret", "");
+
 	if (m_ShouldAllowBungeeCord && m_ShouldAuthenticate)
 	{
 		LOGWARNING("WARNING: BungeeCord is allowed and server set to online mode. This is unsafe and will not work properly. Disable either authentication or BungeeCord in settings.ini.");
 	}
 
+	if (m_ShouldAllowBungeeCord && m_ProxySharedSecret.empty())
+	{
+		LOGWARNING("WARNING: There is not a Proxy Forward Secret set up, and any proxy server can forward a player to this server unless closed from the internet.");
+	}
+
 	m_ShouldAllowMultiWorldTabCompletion = a_Settings.GetValueSetB("Server", "AllowMultiWorldTabCompletion", true);
 	m_ShouldLimitPlayerBlockChanges = a_Settings.GetValueSetB("AntiCheat", "LimitPlayerBlockChanges", true);
-	m_ShouldLoadOfflinePlayerData = a_Settings.GetValueSetB("PlayerData", "LoadOfflinePlayerData", false);
-	m_ShouldLoadNamedPlayerData   = a_Settings.GetValueSetB("PlayerData", "LoadNamedPlayerData", true);
 
-	m_ClientViewDistance = a_Settings.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
-	if (m_ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
+	const auto ClientViewDistance = a_Settings.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
+	if (ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
 	{
 		m_ClientViewDistance = cClientHandle::MIN_VIEW_DISTANCE;
-		LOGINFO("Setting default viewdistance to the minimum of %d", m_ClientViewDistance);
+		LOGINFO("Setting default view distance to the minimum of %d", m_ClientViewDistance);
 	}
-	if (m_ClientViewDistance > cClientHandle::MAX_VIEW_DISTANCE)
+	else if (ClientViewDistance > cClientHandle::MAX_VIEW_DISTANCE)
 	{
 		m_ClientViewDistance = cClientHandle::MAX_VIEW_DISTANCE;
-		LOGINFO("Setting default viewdistance to the maximum of %d", m_ClientViewDistance);
+		LOGINFO("Setting default view distance to the maximum of %d", m_ClientViewDistance);
+	}
+	else
+	{
+		m_ClientViewDistance = ClientViewDistance;
 	}
 
 	PrepareKeys();
@@ -320,10 +320,9 @@ cTCPLink::cCallbacksPtr cServer::OnConnectionAccepted(const AString & a_RemoteIP
 {
 	LOGD("Client \"%s\" connected!", a_RemoteIPAddress.c_str());
 	cClientHandlePtr NewHandle = std::make_shared<cClientHandle>(a_RemoteIPAddress, m_ClientViewDistance);
-	NewHandle->SetSelf(NewHandle);
 	cCSLock Lock(m_CSClients);
 	m_Clients.push_back(NewHandle);
-	return std::move(NewHandle);
+	return NewHandle;
 }
 
 
@@ -332,6 +331,9 @@ cTCPLink::cCallbacksPtr cServer::OnConnectionAccepted(const AString & a_RemoteIP
 
 void cServer::Tick(float a_Dt)
 {
+	// Update server uptime
+	m_UpTime++;
+
 	// Send the tick to the plugins, as well as let the plugin manager reload, if asked to (issue #102):
 	cPluginManager::Get()->Tick(a_Dt);
 
@@ -340,6 +342,9 @@ void cServer::Tick(float a_Dt)
 
 	// Tick all clients not yet assigned to a world:
 	TickClients(a_Dt);
+
+	// Process all queued tasks
+	TickQueuedTasks();
 }
 
 
@@ -369,14 +374,17 @@ void cServer::TickClients(float a_Dt)
 		// Tick the remaining clients, take out those that have been destroyed into RemoveClients
 		for (auto itr = m_Clients.begin(); itr != m_Clients.end();)
 		{
-			if ((*itr)->IsDestroyed())
+			auto & Client = *itr;
+
+			Client->ServerTick(a_Dt);
+			if (Client->IsDestroyed())
 			{
 				// Delete the client later, when CS is not held, to avoid deadlock: https://forum.cuberite.org/thread-374.html
-				RemoveClients.push_back(*itr);
+				RemoveClients.push_back(std::move(Client));
 				itr = m_Clients.erase(itr);
 				continue;
 			}
-			(*itr)->ServerTick(a_Dt);
+
 			++itr;
 		}  // for itr - m_Clients[]
 	}
@@ -410,7 +418,8 @@ bool cServer::Start(void)
 		LOGERROR("Couldn't open any ports. Aborting the server");
 		return false;
 	}
-	return m_TickThread.Start();
+	m_TickThread.Start();
+	return true;
 }
 
 
@@ -438,6 +447,20 @@ void cServer::QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCa
 	// Put the command into a queue (Alleviates FS #363):
 	cCSLock Lock(m_CSPendingCommands);
 	m_PendingCommands.emplace_back(a_Cmd, &a_Output);
+}
+
+
+
+
+
+void cServer::ScheduleTask(cTickTime a_DelayTicks, std::function<void(cServer &)> a_Task)
+{
+	const auto TargetTick = a_DelayTicks + m_UpTime;
+	// Insert the task into the list of scheduled tasks
+	{
+		cCSLock Lock(m_CSTasks);
+		m_Tasks.emplace_back(TargetTick, std::move(a_Task));
+	}
 }
 
 
@@ -688,7 +711,7 @@ void cServer::KickUser(int a_ClientID, const AString & a_Reason)
 
 
 
-void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
+void cServer::AuthenticateUser(int a_ClientID, AString && a_Username, const cUUID & a_UUID, Json::Value && a_Properties)
 {
 	cCSLock Lock(m_CSClients);
 
@@ -699,14 +722,14 @@ void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const cUU
 		return;
 	}
 
-	for (auto itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
+	for (const auto & Client : m_Clients)
 	{
-		if ((*itr)->GetUniqueID() == a_ClientID)
+		if (Client->GetUniqueID() == a_ClientID)
 		{
-			(*itr)->Authenticate(a_Name, a_UUID, a_Properties);
+			Client->Authenticate(std::move(a_Username), a_UUID, std::move(a_Properties));
 			return;
 		}
-	}  // for itr - m_Clients[]
+	}
 }
 
 
@@ -726,4 +749,43 @@ void cServer::TickCommands(void)
 	{
 		ExecuteConsoleCommand(Command.first, *Command.second);
 	}
+}
+
+
+
+
+
+void cServer::TickQueuedTasks(void)
+{
+	// Move the tasks to be executed to a seperate vector to avoid deadlocks on
+	// accessing m_Tasks
+	decltype(m_Tasks) Tasks;
+	{
+		cCSLock Lock(m_CSTasks);
+		if (m_Tasks.empty())
+		{
+			return;
+		}
+
+		// Partition everything to be executed by returning false to move to end
+		// of list if time reached
+		auto MoveBeginIterator = std::partition(
+			m_Tasks.begin(), m_Tasks.end(),
+			[this](const decltype(m_Tasks)::value_type & a_Task)
+			{
+				return a_Task.first >= m_UpTime;
+			});
+
+		// Cut all the due tasks from m_Tasks into Tasks:
+		Tasks.insert(
+			Tasks.end(), std::make_move_iterator(MoveBeginIterator),
+			std::make_move_iterator(m_Tasks.end()));
+		m_Tasks.erase(MoveBeginIterator, m_Tasks.end());
+	}
+
+	// Execute each task:
+	for (const auto & Task : Tasks)
+	{
+		Task.second(*this);
+	}  // for itr - m_Tasks[]
 }

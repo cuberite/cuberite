@@ -1192,10 +1192,6 @@ end
 			{
 				Notes = "Updates each coord to its absolute value.",
 			},
-			abs =
-			{
-				Notes = "<b>OBSOLETE</b>, use Abs() instead.",
-			},
 			addedX =
 			{
 				Params =
@@ -1292,21 +1288,6 @@ end
 					},
 				},
 				Notes = "Clamps each coord into the specified range.",
-			},
-			clamp =
-			{
-				Params =
-				{
-					{
-						Name = "min",
-						Type = "number",
-					},
-					{
-						Name = "max",
-						Type = "number",
-					},
-				},
-				Notes = "<b>OBSOLETE</b>, use Clamp() instead.",
 			},
 			constructor =
 			{
@@ -1772,10 +1753,6 @@ end
 			{
 				Notes = "Updates each coord to its absolute value.",
 			},
-			abs =
-			{
-				Notes = "<b>OBSOLETE</b>, use Abs() instead.",
-			},
 			addedX =
 			{
 				Params =
@@ -1872,21 +1849,6 @@ end
 					},
 				},
 				Notes = "Clamps each coord into the specified range.",
-			},
-			clamp =
-			{
-				Params =
-				{
-					{
-						Name = "min",
-						Type = "number",
-					},
-					{
-						Name = "max",
-						Type = "number",
-					},
-				},
-				Notes = "<b>OBSOLETE</b>, use Clamp() instead.",
 			},
 			constructor =
 			{
@@ -2384,10 +2346,6 @@ end
 			{
 				Notes = "Updates each coord to its absolute value.",
 			},
-			abs =
-			{
-				Notes = "<b>OBSOLETE</b>, use Abs() instead.",
-			},
 			addedX =
 			{
 				Params =
@@ -2484,21 +2442,6 @@ end
 					},
 				},
 				Notes = "Clamps each coord into the specified range.",
-			},
-			clamp =
-			{
-				Params =
-				{
-					{
-						Name = "min",
-						Type = "number",
-					},
-					{
-						Name = "max",
-						Type = "number",
-					},
-				},
-				Notes = "<b>OBSOLETE</b>, use Clamp() instead.",
 			},
 			constructor =
 			{

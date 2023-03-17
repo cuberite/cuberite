@@ -28,8 +28,7 @@ public:
 			case BLOCK_FACE_YM:
 			case BLOCK_FACE_YP:
 			{
-				ASSERT(!"Unknown face");
-				return 0;
+				break;
 			}
 		}
 		UNREACHABLE("Unsupported block face");
@@ -37,11 +36,11 @@ public:
 
 private:
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
 		// Check that we're attached to a jungle log block:
-		eBlockFace BlockFace = MetaToBlockFace(a_Chunk.GetMeta(a_RelPos));
-		auto LogPos = AddFaceDirection(a_RelPos, BlockFace, true);
+		eBlockFace BlockFace = MetaToBlockFace(a_Meta);
+		auto LogPos = AddFaceDirection(a_Position, BlockFace, true);
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
 		a_Chunk.UnboundedRelGetBlock(LogPos, BlockType, BlockMeta);
@@ -70,7 +69,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// If fully grown, give 3 items, otherwise just one:
 		auto growState = a_BlockMeta >> 2;

@@ -20,14 +20,14 @@ public:
 
 private:
 
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
 	{
 		if (IsMetaTopPart(a_Meta))
 		{
 			BLOCKTYPE BottomType;
 			if (
-				(a_Pos.y < 1) ||
-				!a_ChunkInterface.GetBlockTypeMeta(a_Pos - Vector3i(0, 1, 0), BottomType, a_Meta) ||
+				(a_Position.y < 1) ||
+				!a_World.GetBlockTypeMeta(a_Position - Vector3i(0, 1, 0), BottomType, a_Meta) ||
 				(BottomType != E_BLOCK_BIG_FLOWER)
 			)
 			{
@@ -47,11 +47,11 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		if (IsMetaTopPart(a_BlockMeta))
 		{
-			return {};  // No drops from the top part
+			return {};
 		}
 
 		// With shears, drop self (even tall grass and fern):
@@ -98,17 +98,13 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_RelPos.y <= 0)
-		{
-			return false;
-		}
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_RelPos.addedY(-1), BlockType, BlockMeta);
+		// CanBeAt is also called on placement, so the top part can't check for the bottom part.
+		// Both parts can only that they're rooted in grass.
 
-		return IsBlockTypeOfDirt(BlockType) || ((BlockType == E_BLOCK_BIG_FLOWER) && !IsMetaTopPart(BlockMeta));
+		const auto RootPosition = a_Position.addedY(IsMetaTopPart(a_Meta) ? -2 : -1);
+		return (RootPosition.y >= 0) && IsBlockTypeOfDirt(a_Chunk.GetBlock(RootPosition));
 	}
 
 
@@ -122,23 +118,29 @@ private:
 		const cEntity * a_Digger
 	) const override
 	{
-		UNUSED(a_Digger);
-		if ((a_OldBlockMeta & 0x8) != 0)
+		if (IsMetaTopPart(a_OldBlockMeta))
 		{
-			// Was upper part of flower
-			auto lowerPartPos = a_BlockPos - Vector3i(0, 1, 0);
-			if (a_ChunkInterface.GetBlock(lowerPartPos) == a_OldBlockType)
+			const auto LowerPart = a_BlockPos.addedY(-1);
+			if (a_ChunkInterface.GetBlock(LowerPart) == a_OldBlockType)
 			{
-				a_ChunkInterface.DropBlockAsPickups(lowerPartPos);
+				// Prevent creative punches from dropping pickups.
+				// TODO: Simplify to SetBlock and remove the IsMetaTopPart check in DropBlockAsPickups when 1.13 blockstates arrive.
+				if ((a_Digger != nullptr) && a_Digger->IsPlayer() && static_cast<const cPlayer *>(a_Digger)->IsGameModeCreative())
+				{
+					a_ChunkInterface.SetBlock(LowerPart, E_BLOCK_AIR, 0);
+				}
+				else
+				{
+					a_ChunkInterface.DropBlockAsPickups(LowerPart);
+				}
 			}
 		}
 		else
 		{
-			// Was lower part
-			auto upperPartPos = a_BlockPos + Vector3i(0, 1, 0);
-			if (a_ChunkInterface.GetBlock(upperPartPos) == a_OldBlockType)
+			const auto UpperPart = a_BlockPos.addedY(1);
+			if (a_ChunkInterface.GetBlock(UpperPart) == a_OldBlockType)
 			{
-				a_ChunkInterface.DropBlockAsPickups(upperPartPos);
+				a_ChunkInterface.SetBlock(UpperPart, E_BLOCK_AIR, 0);
 			}
 		}
 	}

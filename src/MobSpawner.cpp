@@ -74,16 +74,12 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType a_MobType, EMCSBiome a_Biome, bool a_DisableSolidBelowCheck)
 {
-	if (a_Chunk == nullptr)
-	{
-		return false;
-	}
 	if ((a_RelPos.y >= cChunkDef::Height - 1) || (a_RelPos.y <= 0))
 	{
 		return false;
 	}
 
-	if (cChunkDef::IsValidHeight(a_RelPos.y - 1) && (a_Chunk->GetBlock(a_RelPos.addedY(-1)) == E_BLOCK_BEDROCK))
+	if (cChunkDef::IsValidHeight(a_RelPos.addedY(-1)) && (a_Chunk->GetBlock(a_RelPos.addedY(-1)) == E_BLOCK_BEDROCK))
 	{
 		return false;   // Make sure mobs do not spawn on bedrock.
 	}
@@ -212,12 +208,29 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		case mtMagmaCube:
 		case mtSlime:
 		{
+			const int AMOUNT_MOON_PHASES = 8;
+			auto maxLight = Random.RandInt(0, 7);
+			auto moonPhaseNumber = static_cast<int>(std::floor(a_Chunk->GetWorld()->GetWorldAge().count() / 24000)) % AMOUNT_MOON_PHASES;
+			auto moonThreshold = static_cast<float>(std::abs(moonPhaseNumber - (AMOUNT_MOON_PHASES / 2)) / (AMOUNT_MOON_PHASES / 2));
 			return
 			(
 				(TargetBlock == E_BLOCK_AIR) &&
 				(BlockAbove == E_BLOCK_AIR) &&
-				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
-				((a_RelPos.y <= 40) || (a_Biome == biSwampland))
+				(
+					(!cBlockInfo::IsTransparent(BlockBelow)) ||
+					(a_DisableSolidBelowCheck)) &&
+				(
+					(a_RelPos.y <= 40) ||
+					(
+						(a_Biome == biSwampland) &&
+						(a_RelPos.y >= 50) &&
+						(a_RelPos.y <= 70) &&
+						(SkyLight <= maxLight) &&
+						(BlockLight <= maxLight) &&
+						(Random.RandBool(moonThreshold)) &&
+						(Random.RandBool(0.5))
+					)
+				)
 			);
 		}
 
@@ -501,9 +514,6 @@ cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, EMCS
 		}
 		m_NewPack = false;
 	}
-
-	// Make sure we are looking at the right chunk to spawn in
-	a_Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(a_RelPos);
 
 	if ((m_AllowedTypes.find(m_MobType) != m_AllowedTypes.end()) && CanSpawnHere(a_Chunk, a_RelPos, m_MobType, a_Biome))
 	{

@@ -12,7 +12,7 @@
 
 
 cWolf::cWolf(void) :
-	Super("Wolf", mtWolf, "entity.wolf.hurt", "entity.wolf.death", "entity.wolf.ambient", 0.6, 0.8),
+	Super("Wolf", mtWolf, "entity.wolf.hurt", "entity.wolf.death", "entity.wolf.ambient", 0.6f, 0.85f),
 	m_IsSitting(false),
 	m_IsTame(false),
 	m_IsBegging(false),
@@ -166,6 +166,7 @@ void cWolf::ReceiveNearbyFightInfo(const cUUID & a_PlayerID, cPawn * a_Opponent,
 
 void cWolf::OnRightClicked(cPlayer & a_Player)
 {
+	cMonster::OnRightClicked(a_Player);
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
 	const int EquippedItemType = EquippedItem.m_ItemType;
 
@@ -185,14 +186,12 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				SetMaxHealth(20);
 				SetIsTame(true);
 				SetOwner(a_Player.GetName(), a_Player.GetUUID());
-				m_World->BroadcastEntityStatus(*this, esWolfTamed);
-				m_World->BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+				m_World->BroadcastEntityAnimation(*this, EntityAnimation::WolfTamingSucceeds);
 			}
 			else
 			{
 				// Taming failed
-				m_World->BroadcastEntityStatus(*this, esWolfTaming);
-				m_World->BroadcastParticleEffect("smoke", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+				m_World->BroadcastEntityAnimation(*this, EntityAnimation::WolfTamingFails);
 			}
 		}
 	}
@@ -219,7 +218,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			{
 				if (m_Health < m_MaxHealth)
 				{
-					Heal(ItemHandler(EquippedItemType)->GetFoodInfo(&EquippedItem).FoodLevel);
+					Heal(EquippedItem.GetHandler().GetFoodInfo(&EquippedItem).FoodLevel);
 					if (!a_Player.IsGameModeCreative())
 					{
 						a_Player.GetInventory().RemoveOneEquippedItem();

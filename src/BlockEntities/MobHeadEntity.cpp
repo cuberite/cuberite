@@ -25,41 +25,6 @@ cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Ve
 
 
 
-cItems cMobHeadEntity::ConvertToPickups() const
-{
-	return cItem(E_ITEM_HEAD, 1, static_cast<short>(m_Type));
-}
-
-
-
-
-
-void cMobHeadEntity::CopyFrom(const cBlockEntity & a_Src)
-{
-	Super::CopyFrom(a_Src);
-	auto & src = static_cast<const cMobHeadEntity &>(a_Src);
-	m_OwnerName = src.m_OwnerName;
-	m_OwnerTexture = src.m_OwnerTexture;
-	m_OwnerTextureSignature = src.m_OwnerTextureSignature;
-	m_OwnerUUID = src.m_OwnerUUID;
-	m_Rotation = src.m_Rotation;
-	m_Type = src.m_Type;
-}
-
-
-
-
-
-bool cMobHeadEntity::UsedBy(cPlayer * a_Player)
-{
-	UNUSED(a_Player);
-	return true;
-}
-
-
-
-
-
 void cMobHeadEntity::SetType(const eMobHeadType & a_Type)
 {
 	if ((!m_OwnerName.empty()) && (a_Type != SKULL_TYPE_PLAYER))
@@ -68,7 +33,6 @@ void cMobHeadEntity::SetType(const eMobHeadType & a_Type)
 		m_OwnerUUID = cUUID{};
 	}
 	m_Type = a_Type;
-	m_World->BroadcastBlockEntity(GetPos());
 }
 
 
@@ -78,7 +42,6 @@ void cMobHeadEntity::SetType(const eMobHeadType & a_Type)
 void cMobHeadEntity::SetRotation(eMobHeadRotation a_Rotation)
 {
 	m_Rotation = a_Rotation;
-	m_World->BroadcastBlockEntity(GetPos());
 }
 
 
@@ -105,8 +68,6 @@ void cMobHeadEntity::SetOwner(const cPlayer & a_Owner)
 			break;
 		}
 	}
-
-	m_World->BroadcastBlockEntity(GetPos());
 }
 
 
@@ -124,7 +85,31 @@ void cMobHeadEntity::SetOwner(const cUUID & a_OwnerUUID, const AString & a_Owner
 	m_OwnerName = a_OwnerName;
 	m_OwnerTexture = a_OwnerTexture;
 	m_OwnerTextureSignature = a_OwnerTextureSignature;
-	m_World->BroadcastBlockEntity(GetPos());
+}
+
+
+
+
+
+cItems cMobHeadEntity::ConvertToPickups() const
+{
+	return cItem(E_ITEM_HEAD, 1, static_cast<short>(m_Type));
+}
+
+
+
+
+
+void cMobHeadEntity::CopyFrom(const cBlockEntity & a_Src)
+{
+	Super::CopyFrom(a_Src);
+	auto & src = static_cast<const cMobHeadEntity &>(a_Src);
+	m_OwnerName = src.m_OwnerName;
+	m_OwnerTexture = src.m_OwnerTexture;
+	m_OwnerTextureSignature = src.m_OwnerTextureSignature;
+	m_OwnerUUID = src.m_OwnerUUID;
+	m_Rotation = src.m_Rotation;
+	m_Type = src.m_Type;
 }
 
 
@@ -134,10 +119,16 @@ void cMobHeadEntity::SetOwner(const cUUID & a_OwnerUUID, const AString & a_Owner
 void cMobHeadEntity::SendTo(cClientHandle & a_Client)
 {
 	cWorld * World = a_Client.GetPlayer()->GetWorld();
-	a_Client.SendBlockChange(m_Pos.x, m_Pos.y, m_Pos.z, m_BlockType, World->GetBlockMeta(GetPos()));
+	a_Client.SendBlockChange(m_Pos, m_BlockType, World->GetBlockMeta(GetPos()));
 	a_Client.SendUpdateBlockEntity(*this);
 }
 
 
 
 
+
+bool cMobHeadEntity::UsedBy(cPlayer * a_Player)
+{
+	UNUSED(a_Player);
+	return false;
+}

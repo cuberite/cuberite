@@ -17,7 +17,7 @@ cItem::cItem():
 	m_ItemType(E_ITEM_EMPTY),
 	m_ItemCount(0),
 	m_ItemDamage(0),
-	m_CustomName(""),
+	m_CustomName(),
 	m_RepairCost(0),
 	m_FireworkItem(),
 	m_ItemColor()
@@ -133,6 +133,7 @@ short cItem::GetMaxDamage(void) const
 		case E_ITEM_DIAMOND_PICKAXE: return 1561;
 		case E_ITEM_DIAMOND_SHOVEL:  return 1561;
 		case E_ITEM_DIAMOND_SWORD:   return 1561;
+		case E_ITEM_ELYTRA:          return 432;
 		case E_ITEM_FLINT_AND_STEEL: return 64;
 		case E_ITEM_FISHING_ROD:     return 65;
 		case E_ITEM_GOLD_AXE:        return 32;
@@ -196,7 +197,7 @@ bool cItem::DamageItem(short a_Amount)
 
 bool cItem::IsFullStack(void) const
 {
-	return (m_ItemCount >= ItemHandler(m_ItemType)->GetMaxStackSize());
+	return (m_ItemCount >= GetMaxStackSize());
 }
 
 
@@ -205,16 +206,16 @@ bool cItem::IsFullStack(void) const
 
 char cItem::GetMaxStackSize(void) const
 {
-	return ItemHandler(m_ItemType)->GetMaxStackSize();
+	return cItemHandler::For(m_ItemType).GetMaxStackSize();
 }
 
 
 
 
 
-cItemHandler * cItem::GetHandler(void) const
+const cItemHandler & cItem::GetHandler(void) const
 {
-	return ItemHandler(m_ItemType);
+	return cItemHandler::For(m_ItemType);
 }
 
 
@@ -356,95 +357,93 @@ bool cItem::IsEnchantable(short a_ItemType, bool a_FromBook)
 
 
 
-int cItem::GetEnchantability()
+unsigned cItem::GetEnchantability()
 {
-	int Enchantability = 0;
-
 	switch (m_ItemType)
 	{
-		case E_ITEM_WOODEN_SWORD: Enchantability = 15; break;
-		case E_ITEM_WOODEN_PICKAXE: Enchantability = 15; break;
-		case E_ITEM_WOODEN_SHOVEL: Enchantability = 15; break;
-		case E_ITEM_WOODEN_AXE: Enchantability = 15; break;
-		case E_ITEM_WOODEN_HOE: Enchantability = 15; break;
+		case E_ITEM_WOODEN_SWORD:
+		case E_ITEM_WOODEN_PICKAXE:
+		case E_ITEM_WOODEN_SHOVEL:
+		case E_ITEM_WOODEN_AXE:
+		case E_ITEM_WOODEN_HOE: return 15;
 
-		case E_ITEM_LEATHER_CAP: Enchantability = 15; break;
-		case E_ITEM_LEATHER_TUNIC: Enchantability = 15; break;
-		case E_ITEM_LEATHER_PANTS: Enchantability = 15; break;
-		case E_ITEM_LEATHER_BOOTS: Enchantability = 15; break;
+		case E_ITEM_LEATHER_CAP:
+		case E_ITEM_LEATHER_TUNIC:
+		case E_ITEM_LEATHER_PANTS:
+		case E_ITEM_LEATHER_BOOTS: return 15;
 
-		case E_ITEM_STONE_SWORD: Enchantability = 5; break;
-		case E_ITEM_STONE_PICKAXE: Enchantability = 5; break;
-		case E_ITEM_STONE_SHOVEL: Enchantability = 5; break;
-		case E_ITEM_STONE_AXE: Enchantability = 5; break;
-		case E_ITEM_STONE_HOE: Enchantability = 5; break;
+		case E_ITEM_STONE_SWORD:
+		case E_ITEM_STONE_PICKAXE:
+		case E_ITEM_STONE_SHOVEL:
+		case E_ITEM_STONE_AXE:
+		case E_ITEM_STONE_HOE: return 5;
 
-		case E_ITEM_IRON_HELMET: Enchantability = 9; break;
-		case E_ITEM_IRON_CHESTPLATE: Enchantability = 9; break;
-		case E_ITEM_IRON_LEGGINGS: Enchantability = 9; break;
-		case E_ITEM_IRON_BOOTS: Enchantability = 9; break;
+		case E_ITEM_IRON_HELMET:
+		case E_ITEM_IRON_CHESTPLATE:
+		case E_ITEM_IRON_LEGGINGS:
+		case E_ITEM_IRON_BOOTS: return 9;
 
-		case E_ITEM_IRON_SWORD: Enchantability = 14; break;
-		case E_ITEM_IRON_PICKAXE: Enchantability = 14; break;
-		case E_ITEM_IRON_SHOVEL: Enchantability = 14; break;
-		case E_ITEM_IRON_AXE: Enchantability = 14; break;
-		case E_ITEM_IRON_HOE: Enchantability = 14; break;
+		case E_ITEM_IRON_SWORD:
+		case E_ITEM_IRON_PICKAXE:
+		case E_ITEM_IRON_SHOVEL:
+		case E_ITEM_IRON_AXE:
+		case E_ITEM_IRON_HOE: return 14;
 
-		case E_ITEM_CHAIN_HELMET: Enchantability = 12; break;
-		case E_ITEM_CHAIN_CHESTPLATE: Enchantability = 12; break;
-		case E_ITEM_CHAIN_LEGGINGS: Enchantability = 12; break;
-		case E_ITEM_CHAIN_BOOTS: Enchantability = 12; break;
+		case E_ITEM_CHAIN_HELMET:
+		case E_ITEM_CHAIN_CHESTPLATE:
+		case E_ITEM_CHAIN_LEGGINGS:
+		case E_ITEM_CHAIN_BOOTS: return 12;
 
-		case E_ITEM_DIAMOND_HELMET: Enchantability = 10; break;
-		case E_ITEM_DIAMOND_CHESTPLATE: Enchantability = 10; break;
-		case E_ITEM_DIAMOND_LEGGINGS: Enchantability = 10; break;
-		case E_ITEM_DIAMOND_BOOTS: Enchantability = 10; break;
+		case E_ITEM_DIAMOND_HELMET:
+		case E_ITEM_DIAMOND_CHESTPLATE:
+		case E_ITEM_DIAMOND_LEGGINGS:
+		case E_ITEM_DIAMOND_BOOTS: return 10;
 
-		case E_ITEM_DIAMOND_SWORD: Enchantability = 10; break;
-		case E_ITEM_DIAMOND_PICKAXE: Enchantability = 10; break;
-		case E_ITEM_DIAMOND_SHOVEL: Enchantability = 10; break;
-		case E_ITEM_DIAMOND_AXE: Enchantability = 10; break;
-		case E_ITEM_DIAMOND_HOE: Enchantability = 10; break;
+		case E_ITEM_DIAMOND_SWORD:
+		case E_ITEM_DIAMOND_PICKAXE:
+		case E_ITEM_DIAMOND_SHOVEL:
+		case E_ITEM_DIAMOND_AXE:
+		case E_ITEM_DIAMOND_HOE: return 10;
 
-		case E_ITEM_GOLD_HELMET: Enchantability = 25; break;
-		case E_ITEM_GOLD_CHESTPLATE: Enchantability = 25; break;
-		case E_ITEM_GOLD_LEGGINGS: Enchantability = 25; break;
-		case E_ITEM_GOLD_BOOTS: Enchantability = 25; break;
+		case E_ITEM_GOLD_HELMET:
+		case E_ITEM_GOLD_CHESTPLATE:
+		case E_ITEM_GOLD_LEGGINGS:
+		case E_ITEM_GOLD_BOOTS: return 25;
 
-		case E_ITEM_GOLD_SWORD: Enchantability = 22; break;
-		case E_ITEM_GOLD_PICKAXE: Enchantability = 22; break;
-		case E_ITEM_GOLD_SHOVEL: Enchantability = 22; break;
-		case E_ITEM_GOLD_AXE: Enchantability = 22; break;
-		case E_ITEM_GOLD_HOE: Enchantability = 22; break;
+		case E_ITEM_GOLD_SWORD:
+		case E_ITEM_GOLD_PICKAXE:
+		case E_ITEM_GOLD_SHOVEL:
+		case E_ITEM_GOLD_AXE:
+		case E_ITEM_GOLD_HOE: return 22;
 
-		case E_ITEM_FISHING_ROD: Enchantability = 1; break;
-		case E_ITEM_BOW: Enchantability = 1; break;
-		case E_ITEM_BOOK: Enchantability = 1; break;
+		case E_ITEM_FISHING_ROD:
+		case E_ITEM_BOW:
+		case E_ITEM_BOOK: return 1;
 	}
 
-	return Enchantability;
+	return 0;
 }
 
 
 
 
 
-bool cItem::EnchantByXPLevels(int a_NumXPLevels, MTRand & a_Random)
+bool cItem::EnchantByXPLevels(unsigned a_NumXPLevels, MTRand & a_Random)
 {
 	if (!cItem::IsEnchantable(m_ItemType))
 	{
 		return false;
 	}
 
-	int Enchantability = GetEnchantability();
+	const auto Enchantability = GetEnchantability();
 	if (Enchantability == 0)
 	{
 		return false;
 	}
 
-	int ModifiedEnchantmentLevel = a_NumXPLevels + a_Random.RandInt(Enchantability / 4) + a_Random.RandInt(Enchantability / 4) + 1;
-	float RandomBonus = 1.0F + (a_Random.RandReal() + a_Random.RandReal() - 1.0F) * 0.15F;
-	int FinalEnchantmentLevel = static_cast<int>(ModifiedEnchantmentLevel * RandomBonus + 0.5F);
+	const auto ModifiedEnchantmentLevel = a_NumXPLevels + a_Random.RandInt(Enchantability / 4) + a_Random.RandInt(Enchantability / 4) + 1;
+	const auto RandomBonus = 1.0F + (a_Random.RandReal() + a_Random.RandReal() - 1.0F) * 0.15F;
+	const auto FinalEnchantmentLevel = static_cast<unsigned>(ModifiedEnchantmentLevel * RandomBonus + 0.5F);
 
 	cWeightedEnchantments Enchantments;
 	cEnchantments::AddItemEnchantmentWeights(Enchantments, m_ItemType, FinalEnchantmentLevel);

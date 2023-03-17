@@ -4,24 +4,21 @@
 #include "../Entities/EntityEffect.h"
 
 
-class cItemPotionHandler:
+class cItemPotionHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemPotionHandler():
-		Super(E_ITEM_POTION)
-	{
-	}
+	using Super::Super;
 
 
 
 
 
 	// cItemHandler overrides:
-	virtual bool IsDrinkable(short a_ItemDamage) override
+	virtual bool IsDrinkable(short a_ItemDamage) const override
 	{
 		// Drinkable potion if 13th lowest bit is set
 		// Ref.: https://minecraft.gamepedia.com/Potions#Data_value_table
@@ -39,7 +36,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		short PotionDamage = a_HeldItem.m_ItemDamage;
 
@@ -72,7 +69,7 @@ public:
 
 
 
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
 	{
 		short PotionDamage = a_Item->m_ItemDamage;
 

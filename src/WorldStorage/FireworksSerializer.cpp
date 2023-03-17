@@ -105,7 +105,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 							continue;
 						}
 
-						const char * ColourData = (a_NBT.GetData(explosiontag));
+						const auto * ColourData = (a_NBT.GetData(explosiontag));
 						for (size_t i = 0; i < DataLength; i += 4)
 						{
 							a_FireworkItem.m_Colours.push_back(GetBEInt(ColourData + i));
@@ -121,7 +121,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 							continue;
 						}
 
-						const char * FadeColourData = (a_NBT.GetData(explosiontag));
+						const auto * FadeColourData = (a_NBT.GetData(explosiontag));
 						for (size_t i = 0; i < DataLength; i += 4)
 						{
 							a_FireworkItem.m_FadeColours.push_back(GetBEInt(FadeColourData + i));

@@ -327,6 +327,21 @@ return
 				},
 				Notes = "Spawns the specified particles to all players in the world exept the optional ExeptClient. A list of available particles by thinkofdeath can be found {{https://gist.github.com/thinkofdeath/5110835|Here}}",
 			},
+			BroadcastPlayerListHeaderFooter =
+			{
+				Params =
+				{
+					{
+						Type = "cCompositeChat",
+						Name = "Header",
+					},
+					{
+						Type = "cCompositeChat",
+						Name = "Footer",
+					},
+				},
+				Desc = "Broadcasts the header and footer of the player list to all players in the world.",
+			},
 			BroadcastSoundEffect =
 			{
 				Params =
@@ -1183,7 +1198,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "number",
 						},
 					},
-					Notes = "Sets the block at the specified coords, without waking up the simulators or replacing the block entities for the previous block type. Do not use if the block being replaced has a block entity tied to it!",
+					Notes = "Sets the block at the specified coords, without waking up the simulators or replacing the block entities for the previous block type. Do not use if the block being replaced has a block entity tied to it! <b>OBSOLETE</b>, use the vector-based overload instead.",
 				},
 				{
 					Params =
@@ -1484,7 +1499,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "number",
 						},
 					},
-					Notes = "Returns the block type of the block at the specified coords, or 0 if the appropriate chunk is not loaded.",
+					Notes = "Returns the block type of the block at the specified coords, or 0 if the appropriate chunk is not loaded. <b>OBSOLETE</b>, use the vector-based overload instead.",
 				},
 				{
 					Params =
@@ -1528,7 +1543,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "number",
 						},
 					},
-					Notes = "Returns the amount of block light at the specified coords, or 0 if the appropriate chunk is not loaded.",
+					Notes = "Returns the amount of block light at the specified coords, or 0 if the appropriate chunk is not loaded. <b>OBSOLETE</b>, use the vector-based overload instead.",
 				},
 				{
 					Params =
@@ -1613,7 +1628,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 							Type = "number",
 						},
 					},
-					Notes = "Returns the block metadata of the block at the specified coords, or 0 if the appropriate chunk is not loaded.",
+					Notes = "Returns the block metadata of the block at the specified coords, or 0 if the appropriate chunk is not loaded. <b>OBSOLETE</b>, use the vector-based overload instead.",
 				},
 				{
 					Params =
@@ -2132,7 +2147,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 						Type = "boolean",
 					},
 				},
-				Notes = "Grows the plant at the specified coords to its full. Returns true if the plant was grown, false if not.",
+				Notes = "Grows the plant at the specified coords to maturity. Returns true if the plant was grown, false if not.",
 			},
 			GrowTree =
 			{
@@ -2229,6 +2244,16 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					},
 				},
 				Notes = "Returns whether the configuration has DeepSnow enabled.",
+			},
+			IsFarmlandTramplingEnabled =
+			{
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns true if farmland trampling is enabled.",
 			},
 			IsGameModeAdventure =
 			{
@@ -3728,77 +3753,25 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 			},
 			WakeUpSimulators =
 			{
+				Params =
 				{
-					Params =
 					{
-						{
-							Name = "Block",
-							Type = "Vector3i",
-						},
+						Name = "Block",
+						Type = "Vector3i",
 					},
-					Notes = "Wakes up the simulators for the specified block.",
 				},
-				{
-					Params =
-					{
-						{
-							Name = "BlockX",
-							Type = "number",
-						},
-						{
-							Name = "BlockY",
-							Type = "number",
-						},
-						{
-							Name = "BlockZ",
-							Type = "number",
-						},
-					},
-					Notes = "Wakes up the simulators for the specified block. (DEPRECATED, use vector-parametered version)",
-				},
+				Notes = "Wakes up the simulators for the specified block.",
 			},
 			WakeUpSimulatorsInArea =
 			{
+				Params =
 				{
-					Params =
 					{
-						{
-							Name = "Area",
-							Type = "cCuboid",
-						},
+						Name = "Area",
+						Type = "cCuboid",
 					},
-					Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive).",
 				},
-				{
-					Params =
-					{
-						{
-							Name = "MinBlockX",
-							Type = "number",
-						},
-						{
-							Name = "MaxBlockX",
-							Type = "number",
-						},
-						{
-							Name = "MinBlockY",
-							Type = "number",
-						},
-						{
-							Name = "MaxBlockY",
-							Type = "number",
-						},
-						{
-							Name = "MinBlockZ",
-							Type = "number",
-						},
-						{
-							Name = "MaxBlockZ",
-							Type = "number",
-						},
-					},
-					Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive). (DEPRECATED, use vector-parametered version)",
-				},
+				Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive).",
 			},
 		},
 		AdditionalInfo =

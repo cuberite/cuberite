@@ -2,6 +2,9 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "BlockSlab.h"
+#include "../Chunk.h"
+#include "BlockStairs.h"
 
 
 
@@ -17,15 +20,29 @@ public:
 
 private:
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_RelPos.y <= 1)
+		if (a_Position.y <= 0)
 		{
 			return false;
 		}
 
-		// TODO: check if the block is upside-down slab or upside-down stairs
-		auto Block = a_Chunk.GetBlock(a_RelPos.addedY(-1));
+		BLOCKTYPE Block;
+		NIBBLETYPE BlockMeta;
+		a_Chunk.GetBlockTypeMeta(a_Position.addedY(-1), Block, BlockMeta);
+
+		// upside down slabs
+		if (cBlockSlabHandler::IsAnySlabType(Block))
+		{
+			return BlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN;
+		}
+
+		// upside down stairs
+		if (cBlockStairsHandler::IsAnyStairType(Block))
+		{
+			return BlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN;
+		}
+
 		switch (Block)
 		{
 			case E_BLOCK_ACACIA_FENCE:
@@ -41,7 +58,7 @@ private:
 			}
 			default:
 			{
-				return (!cBlockInfo::IsTransparent(Block));
+				return !cBlockInfo::IsTransparent(Block);
 			}
 		}
 	}

@@ -21,12 +21,13 @@ Each part corresponds roughly to the behavior supported by the client messaging:
 	- clickable commands (suggest)
 Each part has a text assigned to it that can be styled. The style is specified using a string,
 each character / character combination in the string specifies the style to use:
-	- b = bold
-	- i = italic
-	- u = underlined
-	- s = strikethrough
-	- o = obfuscated
-	- @X = color X (X is 0 - 9 or a - f, same as dye meta
+	- (char from 0 - 9 or a - f) = color X
+	- k = obfuscated
+	- l = bold
+	- m = strikethrough
+	- n = underlined
+	- o = italic
+	- r = reset
 If the protocol version doesn't support all the features, it degrades gracefully.
 */
 class cCompositeChat
@@ -34,144 +35,78 @@ class cCompositeChat
 public:
 	// tolua_end
 
-	enum ePartType
+
+	struct BasePart
 	{
-		ptText,
-		ptClientTranslated,
-		ptUrl,
-		ptRunCommand,
-		ptSuggestCommand,
-		ptShowAchievement,
+		AString Text;
+		AString Style;
+		AString AdditionalStyleData;
 	} ;
 
 
 
-	class cBasePart
+	struct TextPart:
+		public BasePart
 	{
-	public:
-		ePartType m_PartType;
-		AString m_Text;
-		AString m_Style;
-		AString m_AdditionalStyleData;
-
-		cBasePart(ePartType a_PartType, const AString & a_Text, const AString & a_Style = "");
-
-		// Force a virtual destructor in descendants
-		virtual ~cBasePart() {}
 	} ;
 
 
 
-	class cTextPart:
-		public cBasePart
+	struct ClientTranslatedPart:
+		public BasePart
 	{
-		using Super = cBasePart;
-
-	public:
-
-		cTextPart(const AString & a_Text, const AString & a_Style = "");
+		AStringVector Parameters;
 	} ;
 
 
 
-	class cClientTranslatedPart:
-		public cBasePart
+	struct UrlPart:
+		public BasePart
 	{
-		using Super = cBasePart;
-
-	public:
-
-		AStringVector m_Parameters;
-
-		cClientTranslatedPart(const AString & a_TranslationID, const AStringVector & a_Parameters, const AString & a_Style = "");
+		AString Url;
 	} ;
 
 
 
-	class cUrlPart:
-		public cBasePart
+	struct CommandPart:
+		public BasePart
 	{
-		using Super = cBasePart;
-
-	public:
-
-		AString m_Url;
-
-		cUrlPart(const AString & a_Text, const AString & a_Url, const AString & a_Style = "");
+		AString Command;
 	} ;
 
 
 
-	class cCommandPart:
-		public cBasePart
+	struct RunCommandPart:
+		public CommandPart
 	{
-		using Super = cBasePart;
-
-	public:
-
-		AString m_Command;
-
-		cCommandPart(ePartType a_PartType, const AString & a_Text, const AString & a_Command, const AString & a_Style = "");
 	} ;
 
 
 
-	class cRunCommandPart:
-		public cCommandPart
+	struct SuggestCommandPart:
+		public CommandPart
 	{
-		using Super = cCommandPart;
-
-	public:
-
-		cRunCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "");
 	} ;
 
 
 
-	class cSuggestCommandPart:
-		public cCommandPart
+	struct ShowAchievementPart:
+		public BasePart
 	{
-		using Super = cCommandPart;
-
-	public:
-
-		cSuggestCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "");
+		AString PlayerName;
 	} ;
 
 
-
-	class cShowAchievementPart:
-		public cBasePart
-	{
-		using Super = cBasePart;
-
-	public:
-
-		AString m_PlayerName;
-		cShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style = "");
-	} ;
-
-
-	/** the parts have to be allocated with new else the part specific parts are not saved (only the cBasePart members). */
-	using cParts = std::vector<std::unique_ptr<cBasePart>>;
 
 	/** Creates a new empty chat message.
 	Exported manually due to the other overload needing a manual export. */
 	cCompositeChat(void);
 
 	/** Creates a new chat message and parses the text into parts.
-	Recognizes "http:" and "https:" links and @color-codes.
+	Recognizes "http:" and "https:" links and &format-character.
 	Uses ParseText() for the actual parsing.
 	Exported manually due to ToLua++ generating extra output parameter. */
 	cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType = mtCustom);
-
-	cCompositeChat(cCompositeChat && a_Other) = default;
-
-	/** Copy constructor is explicitly deleted because m_Parts is not copyable. */
-	cCompositeChat(cCompositeChat & a_Other) = delete;
-	cCompositeChat(const cCompositeChat & a_Other) = delete;
-
-	~cCompositeChat();  // tolua_export
 
 	// The following are exported in ManualBindings in order to support chaining - they return "self" in Lua (#755)
 
@@ -187,15 +122,15 @@ public:
 
 	/** Adds a part that opens an URL when clicked.
 	The default style is underlined light blue text. */
-	void AddUrlPart(const AString & a_Text, const AString & a_Url, const AString & a_Style = "u@c");
+	void AddUrlPart(const AString & a_Text, const AString & a_Url, const AString & a_Style = "nc");
 
 	/** Adds a part that runs a command when clicked.
 	The default style is underlined light green text. */
-	void AddRunCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "u@a");
+	void AddRunCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "na");
 
 	/** Adds a part that suggests a command (enters it into the chat message area, but doesn't send) when clicked.
 	The default style is underlined yellow text. */
-	void AddSuggestCommandPart(const AString & a_Text, const AString & a_SuggestedCommand, const AString & a_Style = "u@b");
+	void AddSuggestCommandPart(const AString & a_Text, const AString & a_SuggestedCommand, const AString & a_Style = "nb");
 
 	/** Adds a part that fully formats a specified achievement using client translatable strings
 	Takes achievement name and player awarded to. Displays as {player} has earned the achievement {achievement_name}.
@@ -203,7 +138,7 @@ public:
 	void AddShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style = "");
 
 	/** Parses text into various parts, adds those.
-	Recognizes "http:" and "https:" URLs and @color-codes. */
+	Recognizes "http:" and "https:" URLs and &color-codes. */
 	void ParseText(const AString & a_ParseText);
 
 	/** Adds the "underline" style to each part that is an URL. */
@@ -231,7 +166,7 @@ public:
 
 	// tolua_end
 
-	const cParts & GetParts(void) const { return m_Parts; }
+	const auto & GetParts(void) const { return m_Parts; }
 
 	/** Converts the MessageType to a LogLevel value.
 	Used by the logging bindings when logging a cCompositeChat object. */
@@ -241,8 +176,9 @@ public:
 	void AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle) const;
 
 protected:
+
 	/** All the parts that */
-	cParts m_Parts;
+	std::vector<std::variant<TextPart, ClientTranslatedPart, UrlPart, RunCommandPart, SuggestCommandPart, ShowAchievementPart>> m_Parts;
 
 	/** The message type, as indicated by prefixes. */
 	eMessageType m_MessageType;
@@ -250,12 +186,4 @@ protected:
 	/** Additional data pertaining to message type, for example, the name of a mtPrivateMsg sender */
 	AString m_AdditionalMessageTypeData;
 
-
-	/** Adds a_AddStyle to a_Style; overwrites the existing style if appropriate.
-	If the style already contains something that a_AddStyle overrides, it is erased first. */
-	void AddStyle(AString & a_Style, const AString & a_AddStyle);
 } ;  // tolua_export
-
-
-
-

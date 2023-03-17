@@ -1,27 +1,83 @@
 
 // StringCompression.h
 
-// Interfaces to the wrapping functions for compression and decompression using AString as their data
+// Interfaces to the wrapping functions for compression and decompression
 
-#include "zlib/zlib.h"  // Needed for the Z_XXX return values
-
-
+#pragma once
 
 
 
-/** Compresses a_Data into a_Compressed using ZLIB; returns Z_XXX error constants same as zlib's compress2() */
-extern int CompressString(const char * a_Data, size_t a_Length, AString & a_Compressed, int a_Factor);
-
-/** Uncompresses a_Data into a_Uncompressed; returns Z_XXX error constants same as zlib's decompress() */
-extern int UncompressString(const char * a_Data, size_t a_Length, AString & a_Uncompressed, size_t a_UncompressedSize);
-
-/** Compresses a_Data into a_Compressed using GZIP; returns Z_OK for success or Z_XXX error constants same as zlib */
-extern int CompressStringGZIP(const char * a_Data, size_t a_Length, AString & a_Compressed);
-
-/** Uncompresses a_Data into a_Uncompressed using GZIP; returns Z_OK for success or Z_XXX error constants same as zlib */
-extern int UncompressStringGZIP(const char * a_Data, size_t a_Length, AString & a_Uncompressed);
-
-/** Uncompresses a_Data into a_Uncompressed using Inflate; returns Z_OK for success or Z_XXX error constants same as zlib */
-extern int InflateString(const char * a_Data, size_t a_Length, AString & a_Uncompressed);
 
 
+struct libdeflate_compressor;
+struct libdeflate_decompressor;
+
+
+
+
+
+namespace Compression
+{
+	/** Contains the result of a compression or extraction operation. */
+	struct Result
+	{
+		using Static = std::array<std::byte, 128 KiB>;
+		using Dynamic = std::unique_ptr<std::byte[]>;
+
+		static constexpr size_t StaticCapacity = sizeof(Compression::Result::Static) / sizeof(Compression::Result::Static::value_type);
+
+		/** Returns a view (of type char) of the internal store. */
+		std::string_view GetStringView() const;
+
+		/** Returns a view (of type std::byte) of the internal store. */
+		ContiguousByteBufferView GetView() const;
+
+		/** A store allocated on either the stack or heap. */
+		std::variant<Static, Dynamic> Storage;
+
+		/** The length of valid data in the store. */
+		size_t Size;
+	};
+
+	/** Contains routines for data compression. */
+	class Compressor
+	{
+	public:
+
+		/** Creates a new compressor instance with a compression factor [0-12]. */
+		Compressor(int CompressionFactor = 6);
+		~Compressor();
+
+		Result CompressGZip(ContiguousByteBufferView Input);
+		Result CompressZLib(ContiguousByteBufferView Input);
+		Result CompressZLib(const void * Input, size_t Size);
+
+	private:
+
+		template <auto Algorithm>
+		Result Compress(const void * Input, size_t Size);
+
+		libdeflate_compressor * m_Handle;
+	};
+
+	/** Contains routines for data extraction. */
+	class Extractor
+	{
+	public:
+
+		/** Creates a new extractor instance. */
+		Extractor();
+		~Extractor();
+
+		Result ExtractGZip(ContiguousByteBufferView Input);
+		Result ExtractZLib(ContiguousByteBufferView Input);
+		Result ExtractZLib(ContiguousByteBufferView Input, size_t UncompressedSize);
+
+	private:
+
+		template <auto Algorithm> Result Extract(ContiguousByteBufferView Input);
+		template <auto Algorithm> Result Extract(ContiguousByteBufferView Input, size_t UncompressedSize);
+
+		libdeflate_decompressor * m_Handle;
+	};
+}

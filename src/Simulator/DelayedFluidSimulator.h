@@ -29,13 +29,13 @@ public:
 		bool Add(int a_RelX, int a_RelY, int a_RelZ);
 
 		/** Array of block containers, each item stores blocks for one Z coord
-		Int param is the block index (for faster duplicate comparison in Add())
+		size_t param is the block index (for faster duplicate comparison in Add())
 		*/
-		cCoordWithIntVector m_Blocks[16];
+		std::vector<cCoordWithData<size_t>> m_Blocks[16];
 	} ;
 
 	cDelayedFluidSimulatorChunkData(int a_TickDelay);
-	virtual ~cDelayedFluidSimulatorChunkData();
+	virtual ~cDelayedFluidSimulatorChunkData() override;
 
 	/** Slots, one for each delay tick, each containing the blocks to simulate */
 	cSlot * m_Slots;
@@ -59,7 +59,6 @@ protected:
 	virtual void Simulate(float a_Dt) override;
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
 	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
-	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
 	virtual cFluidSimulatorData * CreateChunkData(void) override { return new cDelayedFluidSimulatorChunkData(m_TickDelay); }
 
 	int m_TickDelay;   // Count of the m_Slots array in each ChunkData

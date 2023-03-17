@@ -22,7 +22,7 @@ protected:
 
 private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// No pickups
 		return {};
@@ -32,7 +32,7 @@ private:
 
 
 
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) const override
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
 	{
 		return true;
 	}
@@ -88,7 +88,7 @@ private:
 		// Check if it's fuel:
 		BLOCKTYPE BlockType;
 		if (
-			!cChunkDef::IsValidHeight(Pos.y) ||
+			!cChunkDef::IsValidHeight(Pos) ||
 			!a_Chunk.UnboundedRelGetBlockType(Pos, BlockType) ||
 			!cFireSimulator::IsFuel(BlockType)
 		)
@@ -110,7 +110,7 @@ private:
 		{
 			auto NeighborPos = Pos + CrossCoords[i];
 			if (
-				cChunkDef::IsValidHeight(NeighborPos.y) &&
+				cChunkDef::IsValidHeight(NeighborPos) &&
 				a_Chunk.UnboundedRelGetBlockType(NeighborPos, BlockType) &&
 				(BlockType == E_BLOCK_AIR)
 			)

@@ -8,13 +8,14 @@
 #include "../Bindings/PluginManager.h"
 #include "../BoundingBox.h"
 #include "../Blocks/BlockHandler.h"
+#include "../Blocks/BlockFarmland.h"
 #include "../EffectID.h"
 #include "../Mobs/Monster.h"
 
 
 
 
-cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
+cPawn::cPawn(eEntityType a_EntityType, float a_Width, float a_Height) :
 	Super(a_EntityType, Vector3d(), a_Width, a_Height),
 	m_EntityEffects(tEffectMap()),
 	m_LastGroundHeight(0),
@@ -22,25 +23,6 @@ cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
 {
 	SetGravity(-32.0f);
 	SetAirDrag(0.02f);
-}
-
-
-
-
-
-cPawn::~cPawn()
-{
-	ASSERT(m_TargetingMe.size() == 0);
-}
-
-
-
-
-
-void cPawn::Destroyed()
-{
-	StopEveryoneFromTargetingMe();
-	Super::Destroyed();
 }
 
 
@@ -121,6 +103,23 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 	HandleFalling();
+
+	// Handle item pickup
+	if (m_Health > 0)
+	{
+		if (IsPlayer())
+		{
+			m_World->CollectPickupsByEntity(*this);
+		}
+		else if (IsMob())
+		{
+			cMonster & Mob = static_cast<cMonster &>(*this);
+			if (Mob.CanPickUpLoot())
+			{
+				m_World->CollectPickupsByEntity(*this);
+			}
+		}
+	}
 }
 
 
@@ -130,6 +129,20 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cPawn::KilledBy(TakeDamageInfo & a_TDI)
 {
 	ClearEntityEffects();
+
+	// Is death eligible for totem reanimation?
+	if (DeductTotem(a_TDI.DamageType))
+	{
+		m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnTotemActivates);
+
+		AddEntityEffect(cEntityEffect::effAbsorption, 100, 1);
+		AddEntityEffect(cEntityEffect::effRegeneration, 900, 1);
+		AddEntityEffect(cEntityEffect::effFireResistance, 800, 0);
+
+		m_Health = 1;
+		return;
+	}
+
 	Super::KilledBy(a_TDI);
 }
 
@@ -308,11 +321,10 @@ void cPawn::HandleFalling(void)
 	With this in mind, we first check the block at the player's feet, then the one below that (because fences),
 	and decide which behaviour we want to go with.
 	*/
-	BLOCKTYPE BlockAtFoot = (cChunkDef::IsValidHeight(POSY_TOINT)) ? GetWorld()->GetBlock(POS_TOINT) : E_BLOCK_AIR;
+	const auto BlockAtFoot = (cChunkDef::IsValidHeight(POS_TOINT)) ? GetWorld()->GetBlock(POS_TOINT) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
 
 	/* We initialize these with what the foot is really IN, because for sampling we will move down with the epsilon above */
 	bool IsFootInWater = IsBlockWater(BlockAtFoot);
-	bool IsFootInLiquid = IsFootInWater || IsBlockLava(BlockAtFoot) || (BlockAtFoot == E_BLOCK_COBWEB);  // okay so cobweb is not _technically_ a liquid...
 	bool IsFootOnSlimeBlock = false;
 
 	/* The "cross" we sample around to account for the player width/girth */
@@ -353,7 +365,7 @@ void cPawn::HandleFalling(void)
 		{
 			Vector3i BlockTestPosition = CrossTestPosition.Floor() + BlockSampleOffsets[j];
 
-			if (!cChunkDef::IsValidHeight(BlockTestPosition.y))
+			if (!cChunkDef::IsValidHeight(BlockTestPosition))
 			{
 				continue;
 			}
@@ -365,7 +377,6 @@ void cPawn::HandleFalling(void)
 			if (j == 0)
 			{
 				IsFootInWater |= IsBlockWater(BlockType);
-				IsFootInLiquid |= IsFootInWater || IsBlockLava(BlockType) || (BlockType == E_BLOCK_COBWEB);  // okay so cobweb is not _technically_ a liquid...
 				IsFootOnSlimeBlock |= (BlockType == E_BLOCK_SLIME_BLOCK);
 			}
 
@@ -420,24 +431,47 @@ void cPawn::HandleFalling(void)
 
 	if (OnGround)
 	{
-		auto Damage = static_cast<int>(m_LastGroundHeight - GetPosY() - 3.0);
+		const auto FallHeight = m_LastGroundHeight - GetPosY();
+		auto Damage = static_cast<int>(FallHeight - 3.0);
+
+		const auto Below = POS_TOINT.addedY(-1);
+		const auto BlockBelow = (cChunkDef::IsValidHeight(Below)) ? GetWorld()->GetBlock(Below) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
+
 		if ((Damage > 0) && !FallDamageAbsorbed)
 		{
-			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
+			if (IsElytraFlying())
+			{
+				Damage = static_cast<int>(static_cast<float>(Damage) * 0.33);
+			}
+
+			if (BlockBelow == E_BLOCK_HAY_BALE)
+			{
+				Damage = std::clamp(static_cast<int>(static_cast<float>(Damage) * 0.2), 1, 20);
+			}
 
 			// Fall particles
+			// TODO: falling on a partial (e.g. slab) block shouldn't broadcast particles of the block below
 			GetWorld()->BroadcastParticleEffect(
 				"blockdust",
 				GetPosition(),
 				{ 0, 0, 0 },
 				(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
 				static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
-				{ { GetWorld()->GetBlock(POS_TOINT - Vector3i(0, 1, 0)), 0 } }
+				{ { BlockBelow, 0 } }
 			);
+
+			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
 		}
 
 		m_bTouchGround = true;
 		m_LastGroundHeight = GetPosY();
+
+		// Farmland trampling. Mobs smaller than 0.512 cubic blocks won't trample (Java Edition's behavior)
+		// We only have width and height, so we have to calculate Width^2
+		if (GetWorld()->IsFarmlandTramplingEnabled())
+		{
+			HandleFarmlandTrampling(FallHeight, BlockAtFoot, BlockBelow);
+		}
 	}
 	else
 	{
@@ -447,6 +481,82 @@ void cPawn::HandleFalling(void)
 	/* Note: it is currently possible to fall through lava and still die from fall damage
 	because of the client skipping an update about the lava block. This can only be resolved by
 	somehow integrating these above checks into the tracer in HandlePhysics. */
+}
+
+
+
+
+
+void cPawn::HandleFarmlandTrampling(const double a_FallHeight, const BLOCKTYPE a_BlockAtFoot, const BLOCKTYPE a_BlockBelow)
+{
+	// No trampling if FallHeight <= 0.6875
+	if (a_FallHeight <= 0.6875)
+	{
+		return;
+	}
+	// No trampling for mobs smaller than 0.512 cubic blocks
+	if (GetWidth() * GetWidth() * GetHeight() < 0.512)
+	{
+		return;
+	}
+
+	auto AbsPos = POS_TOINT;
+
+	// Check if the foot is "inside" a farmland - for 1.10.1 and newer clients
+	// If it isn't, check if the block below is a farmland - for mobs and older clients
+	if (a_BlockAtFoot != E_BLOCK_FARMLAND)
+	{
+		// These are probably the only blocks which:
+		// - can be placed on a farmland and shouldn't destroy it
+		// - will stop the player from falling down further
+		// - are less than 1 block high
+		if ((a_BlockAtFoot == E_BLOCK_HEAD) || (a_BlockAtFoot == E_BLOCK_FLOWER_POT))
+		{
+			return;
+		}
+
+		// Finally, check whether the block below is farmland
+		if (a_BlockBelow != E_BLOCK_FARMLAND)
+		{
+			return;
+		}
+
+		// If we haven't returned, decrease the height
+		AbsPos.y -= 1;
+	}
+
+	bool ShouldTrample = true;
+	auto & Random = GetRandomProvider();
+
+	// For FallHeight <= 1.5625 we need to get a random bool
+	if (a_FallHeight <= 1.0625)
+	{
+		ShouldTrample = Random.RandBool(0.25);
+	}
+	else if (a_FallHeight <= 1.5625)
+	{
+		ShouldTrample = Random.RandBool(0.66);
+	}
+	// For FallHeight > 1.5625 we always trample - ShouldTrample remains true
+
+	if (ShouldTrample)
+	{
+		GetWorld()->DoWithChunkAt(AbsPos, [&](cChunk & Chunk)
+		{
+			cBlockFarmlandHandler::TurnToDirt(Chunk, AbsPos);
+			return true;
+		});
+	}
+}
+
+
+
+
+
+void cPawn::OnRemoveFromWorld(cWorld & a_World)
+{
+	StopEveryoneFromTargetingMe();
+	Super::OnRemoveFromWorld(a_World);
 }
 
 
@@ -498,4 +608,117 @@ void cPawn::ResetPosition(Vector3d a_NewPosition)
 {
 	Super::ResetPosition(a_NewPosition);
 	m_LastGroundHeight = GetPosY();
+}
+
+
+
+
+
+bool cPawn::DeductTotem(const eDamageType a_DamageType)
+{
+	if ((a_DamageType == dtAdmin) || (a_DamageType == dtInVoid))
+	{
+		// Beyond saving:
+		return false;
+	}
+
+	if (!IsPlayer())
+	{
+		// TODO: implement when mobs will be able to pick up items based on CanPickUpLoot attribute:
+		return false;
+	}
+
+	// If the player is holding a totem of undying in their off-hand or
+	// main-hand slot and receives otherwise fatal damage, the totem saves the player from death.
+
+	auto & inv = static_cast<cPlayer *>(this)->GetInventory();
+	if (inv.GetEquippedItem().m_ItemType == E_ITEM_TOTEM_OF_UNDYING)
+	{
+		inv.SetEquippedItem({});
+		return true;
+	}
+	if (inv.GetShieldSlot().m_ItemType == E_ITEM_TOTEM_OF_UNDYING)
+	{
+		inv.SetShieldSlot({});
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const Vector3i a_MinBoxCorner, const Vector3i a_MaxBoxCorner)
+{
+	/*
+	Algorithm:
+	Choose random destination.
+	Seek downwards, regardless of distance until the block is made of movement-blocking material: https://minecraft.fandom.com/wiki/Materials
+	Succeeds if no liquid or solid blocks prevents from standing at destination.
+	*/
+	auto & Random = GetRandomProvider();
+
+	for (unsigned int i = 0; i < a_NumTries; i++)
+	{
+		const int DestX = Random.RandInt(a_MinBoxCorner.x, a_MaxBoxCorner.x);
+		int DestY = Random.RandInt(a_MinBoxCorner.y, a_MaxBoxCorner.y);
+		const int DestZ = Random.RandInt(a_MinBoxCorner.z, a_MaxBoxCorner.z);
+
+		// Seek downwards from initial destination until we find a solid block or go into the void
+		BLOCKTYPE DestBlock = a_World.GetBlock({DestX, DestY, DestZ});
+		while ((DestY >= 0) && !cBlockInfo::IsSolid(DestBlock))
+		{
+			DestBlock = a_World.GetBlock({DestX, DestY, DestZ});
+			DestY--;
+		}
+
+		// Couldn't find a solid block so move to next attempt
+		if (DestY < 0)
+		{
+			continue;
+		}
+
+		// Succeed if blocks above destination are empty
+		bool Success = true;
+		for (int j = 1; j <= a_HeightRequired; j++)
+		{
+			BLOCKTYPE TestBlock = a_World.GetBlock({DestX, DestY + j, DestZ});
+			if (cBlockInfo::IsSolid(TestBlock) || IsBlockLiquid(TestBlock))
+			{
+				Success = false;
+				break;
+			}
+		}
+
+		if (!Success)
+		{
+			continue;
+		}
+
+		// Offsets for entity to be centred and standing on solid block
+		a_Destination = Vector3d(DestX + 0.5, DestY + 1, DestZ + 0.5);
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const cBoundingBox a_BoundingBox)
+{
+	return FindTeleportDestination(a_World, a_HeightRequired, a_NumTries, a_Destination, a_BoundingBox.GetMin(), a_BoundingBox.GetMax());
+}
+
+
+
+
+
+bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, Vector3i a_Centre, const int a_HalfCubeWidth)
+{
+	Vector3i MinCorner(a_Centre.x - a_HalfCubeWidth, a_Centre.y - a_HalfCubeWidth, a_Centre.z - a_HalfCubeWidth);
+	Vector3i MaxCorner(a_Centre.x + a_HalfCubeWidth, a_Centre.y + a_HalfCubeWidth, a_Centre.z + a_HalfCubeWidth);
+	return FindTeleportDestination(a_World, a_HeightRequired, a_NumTries, a_Destination, MinCorner, MaxCorner);
 }
