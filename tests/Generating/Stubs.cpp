@@ -379,6 +379,14 @@ cItem::cItem(
 
 
 
+void cItem::Clear()
+{
+}
+
+
+
+
+
 cEnderCrystal::cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom):
 	Super(etEnderCrystal, a_Pos, 1.0, 1.0)
 {
