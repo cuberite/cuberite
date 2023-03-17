@@ -1,5 +1,6 @@
 
 #include "BreedingItemGuard.h"
+#include "Entities/Player.h"
 
 namespace BehaviorTree
 {
@@ -58,7 +59,7 @@ namespace BehaviorTree
 				return true;
 			}
 
-			auto & Player = static_cast<cPlayer &>(a_Entity);
+			const auto & Player = static_cast<const cPlayer &>(a_Entity);
 
 			if (!m_Items.ContainsType(Player.GetEquippedItem()))
 			{

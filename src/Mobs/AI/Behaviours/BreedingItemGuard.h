@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Globals.h"
+#include "Item.h"
 #include "Mobs/AI/BehaviorTree.h"
 
 /**
