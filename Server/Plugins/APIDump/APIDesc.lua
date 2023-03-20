@@ -17845,6 +17845,10 @@ end
 				{
 					Notes = "A mask that indicates the bits of the metadata that specify the facing of redstone repeaters.",
 				},
+				E_META_SPAWN_EGG_ENDERMITE =
+				{
+					Notes = "",
+				},
 				E_META_SPAWN_EGG_WITHER_SKELETON =
 				{
 					Notes = ""
