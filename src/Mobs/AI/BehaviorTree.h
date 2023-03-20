@@ -96,9 +96,6 @@ std::vector<ValueType> MakeVector(Args && ... a_Behaviors)
 
 }  // namespace BehaviorTree
 
-// If this header is included, also include the behaviors
-#include "Mobs/AI/Behaviours/IncludeAllBehaviours.h"
-
 
 // This logging is far too noisy to always be on
 #ifdef ABC
