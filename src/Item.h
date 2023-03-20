@@ -206,6 +206,8 @@ public:
 		AString m_CustomName;
 		AStringVector  m_LoreTable;  // Exported in ManualBindings.cpp
 		cColor m_Color;
+
+		cDisplayProperties() : m_CustomName(), m_LoreTable(), m_Color() {}
 	};
 
 	struct cAdditionalBlockProperties
@@ -244,15 +246,15 @@ public:
 	template <class type>
 	void set(const type & a_Value)
 	{
-		for (auto & property : m_Properties)
+		for (auto & Property : m_Properties)
 		{
-			if (std::holds_alternative<type>(property))
+			if (std::holds_alternative<type>(Property))
 			{
-				property = a_Value;
+				Property = std::move(a_Value);
 				return;
 			}
 		}
-		m_Properties.emplace_back(a_Value);
+		m_Properties.push_back(std::move(a_Value));
 	}
 
 	/** Only Sets a value if there is none present */
@@ -260,13 +262,13 @@ public:
 	void SafeSet(const type & a_Value)
 	{
 		for (auto & property : m_Properties)
-	{
+		{
 			if (std::holds_alternative<type>(property))
 			{
 				return;
 			}
 		}
-		m_Properties.emplace_back(a_Value);
+		m_Properties.push_back(std::move(a_Value));
 	}
 
 	/**

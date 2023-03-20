@@ -278,6 +278,11 @@ void cItem::FromJson(const Json::Value & a_Value)
 		cEnchantments Enchantments;
 		Enchantments.AddFromString(a_Value.get("ench", "").asString());
 
+		if (!Enchantments.IsEmpty())
+		{
+			set(Enchantments);
+		}
+
 		cDisplayProperties DisplayProperties;
 		DisplayProperties.m_CustomName = a_Value.get("Name", "").asString();
 		auto Lore = a_Value.get("Lore", Json::arrayValue);
@@ -297,7 +302,11 @@ void cItem::FromJson(const Json::Value & a_Value)
 		{
 			LOGWARNING("Item with invalid red, green, and blue values read in from json file.");
 		}
-		set<cDisplayProperties>(DisplayProperties);
+
+		if (!DisplayProperties.m_CustomName.empty() || !DisplayProperties.m_LoreTable.empty() || DisplayProperties.m_Color.IsValid())
+		{
+			set(DisplayProperties);
+		}
 
 		if ((m_ItemType == E_ITEM_FIREWORK_ROCKET) || (m_ItemType == E_ITEM_FIREWORK_STAR))
 		{
@@ -308,7 +317,7 @@ void cItem::FromJson(const Json::Value & a_Value)
 			fireworkItem.m_FlightTimeInTicks = static_cast<short>(a_Value.get("FlightTimeInTicks", 0).asInt());
 			cFireworkItem::ColoursFromString(a_Value.get("Colours", "").asString(), fireworkItem);
 			cFireworkItem::FadeColoursFromString(a_Value.get("FadeColours", "").asString(), fireworkItem);
-			set<cFireworkItem>(fireworkItem);
+			set(fireworkItem);
 		}
 
 		m_RepairCost = a_Value.get("RepairCost", 0).asInt();

@@ -1839,17 +1839,23 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
 	}
 	if (
-		auto Enchantments = a_Item.get<cEnchantments>();
-		Enchantments.has_value() || !Enchantments.value().IsEmpty()
+		const auto Enchantments = a_Item.get<cEnchantments>();
+		Enchantments.has_value() && !Enchantments.value().IsEmpty()
 		)
 	{
 		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
 		EnchantmentSerializer::WriteToNBTCompound(Enchantments.value(), Writer, TagName);
 	}
 	if (
-		auto DisplayProperties = a_Item.get<cItem::cDisplayProperties>();
-			!a_Item.IsBothNameAndLoreEmpty() || (DisplayProperties.has_value() && DisplayProperties.value().m_Color.IsValid())
+		const auto DisplayProperties = a_Item.get<cItem::cDisplayProperties>();
+		(
+			DisplayProperties.has_value() &&
+			(
+				!DisplayProperties.value().m_CustomName.empty() ||
+				!DisplayProperties.value().m_LoreTable.empty() ||
+				DisplayProperties.value().m_Color.IsValid())
 			)
+		)
 	{
 		Writer.BeginCompound("display");
 		if (DisplayProperties.value().m_Color.IsValid())
