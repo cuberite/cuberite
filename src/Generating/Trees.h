@@ -117,3 +117,9 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 
 /** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a small jungle tree (1x1 trunk) */
 void GetSmallJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+
+/** Fills a_LogBlocks and a_OtherBlocks with the blocks required to form the red mushroom */
+void GetRedMushroomTreeImage(Vector3i vector3, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+
+/** Fills a_LogBlocks and a_OtherBlocks with the blocks required to form the brown mushroom */
+void GetBrownMushroomTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);

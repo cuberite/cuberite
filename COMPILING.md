@@ -33,7 +33,13 @@ If you're using Git to get the source, use the following command to set up the l
 git clone --recursive https://github.com/cuberite/cuberite.git
 ```
 
-Now that you have the source, it's time to prepare the project files for your favorite compiler. Open a command window in the folder with the source and type in `cmake .` . This will run CMake, it will auto-detect your Visual Studio version and produce the appropriate project and solution files.
+Now that you have the source, it's time to prepare the project files for your favorite compiler. Open a command window in the folder with the source and type in:
+```
+mkdir build
+cd build
+cmake ..
+```
+This creates a `build` folder where the build will take place, then runs CMake, which will auto-detect your Visual Studio version and produce the appropriate project and solution files.
 
 Finally, open the newly created file, `Cuberite.sln`, in your Visual Studio.
 
@@ -178,7 +184,7 @@ When running the compile script, make sure to have the necessary build tools ins
 NDK="path/to/ndk/root" CMAKE="path/to/cmake/executable" android/compile.sh <abi|all|clean>
 ```
 
-The NDK variable must be set to the path to the NDK root, CMAKE to a call of the cmake binary used for compiling. If the cmake binary is in the PATH, a simple `CMAKE=cmake` is enough. As last parameter you either have to enter a correct ABI (see https://cmake.org/cmake/help/latest/variable/CMAKE_ANDROID_ARCH_ABI.html) or either all or clean. Clean will cause the script to remove the android-build directory, all will compile and zip all Cuberite for all 7 ABIs and create a zip archive of the android/Server direcory for use in the official Android app. If you are unsure which ABI is required for your phone, open the official Android app and navigate to "Settings" and "Install". It will show you the required ABI. Additional parameters may be given through enviroment variables, namely TYPE="" as Release or Debug (defaults to Release) and THREADS="4" as the number of threads used for compilation (defaults to 4).
+The NDK variable must be set to the path to the NDK root, CMAKE to a call of the cmake binary used for compiling. If the cmake binary is in the PATH, a simple `CMAKE=cmake` is enough. As last parameter you either have to enter a correct ABI (see https://cmake.org/cmake/help/latest/variable/CMAKE_ANDROID_ARCH_ABI.html) or either all or clean. Clean will cause the script to remove the android-build directory, all will compile and zip all Cuberite for all 7 ABIs and create a zip archive of the android/Server direcory for use in the official Android app. If you are unsure which ABI is required for your phone, open the official Android app and navigate to "Settings" and "Install". It will show you the required ABI. Additional parameters may be given through environment variables, namely TYPE="" as Release or Debug (defaults to Release) and THREADS="4" as the number of threads used for compilation (defaults to 4).
 
 ### Running the Executables on a Device
 

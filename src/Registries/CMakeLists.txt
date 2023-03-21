@@ -1,9 +1,10 @@
 target_sources(
 	${CMAKE_PROJECT_NAME} PRIVATE
 
-	Blocks.cpp
+	BlockStates.cpp
 
-	Blocks.h
+	BlockStates.h
+	BlockTypes.h
+	CustomStatistics.h
 	Items.h
-	Statistics.h
 )

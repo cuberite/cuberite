@@ -445,8 +445,8 @@ bool cBlockArea::IsValidCoords(const Vector3i & a_Coords) const
 bool cBlockArea::Read(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes)
 {
 	ASSERT(IsValidDataTypeCombination(a_DataTypes));
-	ASSERT(cChunkDef::IsValidHeight(a_MinBlockY));
-	ASSERT(cChunkDef::IsValidHeight(a_MaxBlockY));
+	ASSERT(cChunkDef::IsValidHeight({a_MinBlockX, a_MinBlockY, a_MinBlockZ}));
+	ASSERT(cChunkDef::IsValidHeight({a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ}));
 	ASSERT(a_MinBlockX <= a_MaxBlockX);
 	ASSERT(a_MinBlockY <= a_MaxBlockY);
 	ASSERT(a_MinBlockZ <= a_MaxBlockZ);
@@ -518,8 +518,8 @@ bool cBlockArea::Read(cForEachChunkProvider & a_ForEachChunkProvider, const Vect
 bool cBlockArea::Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
 {
 	ASSERT((a_DataTypes & GetDataTypes()) == a_DataTypes);  // Are you requesting only the data that I have?
-	ASSERT(cChunkDef::IsValidHeight(a_MinBlockY));
-	ASSERT(cChunkDef::IsValidHeight(a_MinBlockY + m_Size.y - 1));
+	ASSERT(cChunkDef::IsValidHeight({a_MinBlockX, a_MinBlockY, a_MinBlockZ}));
+	ASSERT(cChunkDef::IsValidHeight({a_MinBlockX, a_MinBlockY + m_Size.y - 1, a_MinBlockZ}));
 
 	return a_ForEachChunkProvider.WriteBlockArea(*this, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
 }
@@ -2789,7 +2789,7 @@ bool cBlockArea::cChunkReader::Coords(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
+void cBlockArea::cChunkReader::ChunkData(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData)
 {
 	int SizeY = m_Area.m_Size.y;
 	int MinY = m_Origin.y;
@@ -2848,7 +2848,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlock({ InChunkX, InChunkY, InChunkZ });
+					m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockData.GetBlock({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2869,7 +2869,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockMetas[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetMeta({ InChunkX, InChunkY, InChunkZ });
+					m_Area.m_BlockMetas[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockData.GetMeta({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2890,7 +2890,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlockLight({ InChunkX, InChunkY, InChunkZ });
+					m_Area.m_BlockLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_LightData.GetBlockLight({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2911,7 +2911,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockSkyLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetSkyLight({ InChunkX, InChunkY, InChunkZ });
+					m_Area.m_BlockSkyLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_LightData.GetSkyLight({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y

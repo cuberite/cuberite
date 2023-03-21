@@ -449,7 +449,7 @@ protected:
 
 		// cChunkDataCallback overrides:
 		virtual bool Coords(int a_ChunkX, int a_ChunkZ) override;
-		virtual void ChunkData(const cChunkData &  a_BlockTypes) override;
+		virtual void ChunkData(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData) override;
 		virtual void BlockEntity(cBlockEntity * a_BlockEntity) override;
 	} ;
 

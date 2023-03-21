@@ -181,13 +181,13 @@ protected:
 			float DifZ = BlockStartZ - itr->m_Z;  // substitution for faster calc
 			for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
 			{
-				#ifdef _DEBUG
+				#ifndef NDEBUG
 				// DEBUG: Make the roughravine shapepoints visible on a single layer (so that we can see with Minutor what's going on)
 				if ((FloorC(DifX + x) == 0) && (FloorC(DifZ + z) == 0))
 				{
 					a_ChunkDesc.SetBlockType(x, 4, z, E_BLOCK_LAPIS_ORE);
 				}
-				#endif  // _DEBUG
+				#endif  // !NDEBUG
 
 				// If the column is outside the enlarged radius, bail out completely
 				float DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);

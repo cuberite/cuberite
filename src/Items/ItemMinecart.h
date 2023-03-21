@@ -5,17 +5,14 @@
 
 
 
-class cItemMinecartHandler:
+class cItemMinecartHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemMinecartHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 
@@ -28,7 +25,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		// Must be used on a block
 		if (a_ClickedBlockFace < 0)

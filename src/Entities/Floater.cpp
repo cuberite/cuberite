@@ -75,7 +75,7 @@ protected:
 
 
 cFloater::cFloater(Vector3d a_Pos, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime) :
-	Super(etFloater, a_Pos, 0.2, 0.2),
+	Super(etFloater, a_Pos, 0.25f, 0.25f),
 	m_BitePos(a_Pos),
 	m_CanPickupItem(false),
 	m_PickupCountDown(0),
@@ -101,11 +101,16 @@ void cFloater::SpawnOn(cClientHandle & a_Client)
 
 void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	auto & Random = GetRandomProvider();
-
 	HandlePhysics(a_Dt, a_Chunk);
-	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT))
-		&& (m_World->GetBlockMeta(POSX_TOINT, POSY_TOINT, POSZ_TOINT) == 0))
+
+	PREPARE_REL_AND_CHUNK(GetPosition().Floor(), a_Chunk);
+	if (!RelSuccess)
+	{
+		return;
+	}
+
+	auto & Random = GetRandomProvider();
+	if (IsBlockWater(Chunk->GetBlock(Rel)) && (Chunk->GetMeta(Rel) == 0))
 	{
 		if (!m_CanPickupItem && (m_AttachedMobID == cEntity::INVALID_ID))  // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
 		{
@@ -113,7 +118,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			{
 				m_BitePos = GetPosition();
 				m_World->BroadcastSoundEffect("entity.bobber.splash", GetPosition(), 1, 1);
-				SetPosY(GetPosY() - 1);
+				AddSpeedY(-10);
 				m_CanPickupItem = true;
 				m_PickupCountDown = 20;
 				m_CountDownTime = Random.RandInt(100, 900);
@@ -132,9 +137,9 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 
 			m_CountDownTime--;
-			if (m_World->GetHeight(POSX_TOINT, POSZ_TOINT) == POSY_TOINT)
+			if (Chunk->IsWeatherWetAt(Rel))
 			{
-				if (m_World->IsWeatherWet() && Random.RandBool(0.25))  // 25% chance of an extra countdown when being rained on.
+				if (Random.RandBool(0.25))  // 25% chance of an extra countdown when being rained on.
 				{
 					m_CountDownTime--;
 				}
@@ -150,7 +155,10 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	// Check water at the top of floater otherwise it floats into the air above the water
-	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, FloorC(GetPosY() + GetHeight()), POSZ_TOINT)))
+	if (
+		const auto Above = Rel.addedY(FloorC(GetPosY() + GetHeight()));
+		(Above.y < cChunkDef::Height) && IsBlockWater(m_World->GetBlock(Above))
+	)
 	{
 		SetSpeedY(0.7);
 	}
@@ -172,7 +180,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		a_Chunk.ForEachEntity(Callback);
 		if (Callback.HasHit())
 		{
-			AttachTo(Callback.GetHitEntity());
+			AttachTo(*Callback.GetHitEntity());
 			Callback.GetHitEntity()->TakeDamage(*this);  // TODO: the player attacked the mob not the floater.
 			m_AttachedMobID = Callback.GetHitEntity()->GetUniqueID();
 		}

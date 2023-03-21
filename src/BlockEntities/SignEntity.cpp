@@ -16,7 +16,7 @@ cSignEntity::cSignEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i
 	Super(a_BlockType, a_BlockMeta, a_Pos, a_World)
 {
 	ASSERT((a_BlockType ==  E_BLOCK_WALLSIGN) || (a_BlockType == E_BLOCK_SIGN_POST));
-	ASSERT(cChunkDef::IsValidHeight(a_Pos.y));
+	ASSERT(cChunkDef::IsValidHeight(a_Pos));
 }
 
 
@@ -88,5 +88,5 @@ AString cSignEntity::GetLine(size_t a_Index) const
 
 void cSignEntity::SendTo(cClientHandle & a_Client)
 {
-	a_Client.SendUpdateSign(m_Pos.x, m_Pos.y, m_Pos.z, m_Line[0], m_Line[1], m_Line[2], m_Line[3]);
+	a_Client.SendUpdateSign(m_Pos, m_Line[0], m_Line[1], m_Line[2], m_Line[3]);
 }

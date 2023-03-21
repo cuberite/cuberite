@@ -75,7 +75,7 @@ public:
 	int Read(void * a_Buffer, size_t a_NumBytes);
 
 	/** Reads up to a_NumBytes bytes, returns the bytes actually read, or empty string on failure; asserts if not open */
-	AString Read(size_t a_NumBytes);
+	std::basic_string<std::byte> Read(size_t a_NumBytes);
 
 	/** Writes up to a_NumBytes bytes from a_Buffer, returns the number of bytes actually written, or -1 on failure; asserts if not open */
 	int Write(const void * a_Buffer, size_t a_NumBytes);
@@ -192,17 +192,8 @@ class FileStream final : public StreamType
 {
 public:
 
-	FileStream(const std::string & Path)
-	{
-		// Except on failbit, which is what open sets on failure:
-		FileStream::exceptions(FileStream::failbit | FileStream::badbit);
-
-		// Open the file:
-		FileStream::open(Path);
-
-		// Only subsequently except on serious errors, and not on conditions like EOF or malformed input:
-		FileStream::exceptions(FileStream::badbit);
-	}
+	FileStream(const std::string & Path);
+	FileStream(const std::string & Path, const typename FileStream::openmode Mode);
 };
 
 
@@ -211,3 +202,15 @@ public:
 
 using InputFileStream = FileStream<std::ifstream>;
 using OutputFileStream = FileStream<std::ofstream>;
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-template-vtables"  // http://bugs.llvm.org/show_bug.cgi?id=18733
+#endif
+
+extern template class FileStream<std::ifstream>;
+extern template class FileStream<std::ofstream>;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

@@ -46,6 +46,7 @@ function(enable_bindings_generation)
 		Entities/ArrowEntity.h
 		Entities/Entity.h
 		Entities/ExpOrb.h
+		Entities/EnderCrystal.h
 		Entities/EntityEffect.h
 		Entities/ExpBottleEntity.h
 		Entities/FallingBlock.h
@@ -78,10 +79,11 @@ function(enable_bindings_generation)
 		Mobs/MonsterTypes.h
 		OSSupport/File.h
 		Protocol/MojangAPI.h
+		Registries/CustomStatistics.h
 		Root.h
 		Scoreboard.h
 		Server.h
-		Statistics.h
+		StatisticsManager.h
 		StringUtils.h
 		UI/Window.h
 		UUID.h

@@ -1,13 +1,12 @@
 function(build_dependencies)
-	# Set options for SQLiteCpp, disable all their tests and lints:
-	set(SQLITECPP_BUILD_EXAMPLES       OFF CACHE BOOL "Build examples.")
-	set(SQLITECPP_BUILD_TESTS          OFF CACHE BOOL "Build and run tests.")
-	set(SQLITECPP_INTERNAL_SQLITE      ON  CACHE BOOL "Add the internal SQLite3 source to the project.")
+	# Set options for SQLiteCpp, disable all their lints and other features we don't need:
+	set(SQLITE_ENABLE_COLUMN_METADATA  OFF CACHE BOOL "Enable Column::getColumnOriginName(). Require support from sqlite3 library.")
+	set(SQLITE_ENABLE_JSON1            OFF CACHE BOOL "Enable JSON1 extension when building internal sqlite3 library.")
+	set(SQLITECPP_INCLUDE_SCRIPT       OFF CACHE BOOL "Include config & script files.")
 	set(SQLITECPP_RUN_CPPCHECK         OFF CACHE BOOL "Run cppcheck C++ static analysis tool.")
 	set(SQLITECPP_RUN_CPPLINT          OFF CACHE BOOL "Run cpplint.py tool for Google C++ StyleGuide.")
-	set(SQLITECPP_RUN_DOXYGEN          OFF CACHE BOOL "Run Doxygen C++ documentation tool.")
 	set(SQLITECPP_USE_STACK_PROTECTION OFF CACHE BOOL "USE Stack Protection hardening.")
-	set(SQLITE_ENABLE_COLUMN_METADATA  OFF CACHE BOOL "Enable Column::getColumnOriginName(). Require support from sqlite3 library.")
+	set(SQLITECPP_USE_STATIC_RUNTIME   OFF CACHE BOOL "Use MSVC static runtime (default for internal googletest).")
 
 	# Set options for LibEvent, disable all their tests and benchmarks:
 	set(EVENT__DISABLE_OPENSSL   YES CACHE BOOL   "Disable OpenSSL in LibEvent")
@@ -21,6 +20,9 @@ function(build_dependencies)
 	set(JSONCPP_WITH_TESTS OFF CACHE BOOL "Compile and (for jsoncpp_check) run JsonCpp test executables")
 	set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "Automatically run unit-tests as a post build step")
 	set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE BOOL "Generate and install .pc files")
+	set(JSONCPP_WITH_CMAKE_PACKAGE OFF CACHE BOOL "Generate and install cmake package files")
+	set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build jsoncpp_lib as a shared library.")
+	set(BUILD_OBJECT_LIBS OFF CACHE BOOL "Build jsoncpp_lib as a object library.")
 
 	# Set options for mbedtls:
 	set(ENABLE_PROGRAMS OFF CACHE BOOL "Build mbed TLS programs.")
@@ -28,7 +30,7 @@ function(build_dependencies)
 
 	# Enumerate all submodule libraries
 	# SQLiteCpp needs to be included before sqlite so the lsqlite target is available:
-	set(DEPENDENCIES expat fmt jsoncpp libevent lua luaexpat mbedtls SQLiteCpp sqlite tolua++ zlib)
+	set(DEPENDENCIES expat fmt jsoncpp libdeflate libevent lua luaexpat mbedtls SQLiteCpp sqlite tolua++)
 	foreach(DEPENDENCY ${DEPENDENCIES})
 		# Check that the libraries are present:
 		if (NOT EXISTS "${PROJECT_SOURCE_DIR}/lib/${DEPENDENCY}/CMakeLists.txt")
@@ -61,19 +63,19 @@ function(link_dependencies TARGET)
 		event_core
 		event_extra
 		fmt::fmt
-		jsoncpp_lib
+		jsoncpp_static
+		libdeflate
 		lsqlite
 		lualib
 		luaexpat
 		mbedtls
 		SQLiteCpp
 		tolualib
-		zlib
 	)
 
-	# Link process information library:
+	# Link process information, multimedia (for sleep resolution) libraries:
 	if (WIN32)
-		target_link_libraries(${TARGET} PRIVATE Psapi.lib)
+		target_link_libraries(${TARGET} PRIVATE Psapi.lib Winmm.lib)
 	endif()
 
 	# Special case handling for libevent pthreads:
@@ -81,6 +83,9 @@ function(link_dependencies TARGET)
 		target_link_libraries(${TARGET} PRIVATE event_pthreads)
 	endif()
 
-	# Prettify jsoncpp_lib name in VS solution explorer:
-	set_property(TARGET jsoncpp_lib PROPERTY PROJECT_LABEL "jsoncpp")
+	# Prettify jsoncpp_static name in VS solution explorer:
+	set_property(TARGET jsoncpp_static PROPERTY PROJECT_LABEL "jsoncpp")
+	if(${CMAKE_SYSTEM_NAME} MATCHES FreeBSD)
+		target_link_libraries(${TARGET} PRIVATE kvm)
+	endif()
 endfunction()

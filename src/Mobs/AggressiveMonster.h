@@ -20,8 +20,8 @@ public:
 		const AString & a_SoundHurt,
 		const AString & a_SoundDeath,
 		const AString & a_SoundAmbient,
-		double a_Width,
-		double a_Height
+		float a_Width,
+		float a_Height
 	);
 
 	virtual void Tick          (std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;

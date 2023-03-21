@@ -8,41 +8,30 @@
 
 
 
-class cItemRedstoneRepeaterHandler:
+class cItemRedstoneRepeaterHandler final :
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemRedstoneRepeaterHandler(int a_ItemType):
-		Super(a_ItemType)
+	using Super::Super;
+
+
+
+
+
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
+		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_REDSTONE_REPEATER_OFF, cBlockRedstoneRepeaterHandler::YawToMetaData(a_Player.GetYaw()));
 	}
 
 
 
 
 
-	virtual bool IsPlaceable() override
+	virtual bool IsPlaceable() const override
 	{
-		return true;
-	}
-
-
-
-
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		a_BlockType = E_BLOCK_REDSTONE_REPEATER_OFF;
-		a_BlockMeta = cBlockRedstoneRepeaterHandler::YawToMetaData(a_Player->GetYaw());
 		return true;
 	}
 } ;

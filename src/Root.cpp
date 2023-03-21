@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Root.h"
+#include "main.h"
 
 // STD lib hreaders:
 #include <iostream>
@@ -19,6 +20,11 @@
 		#endif
 	#elif defined(__APPLE__)
 		#include <mach/mach.h>
+	#elif defined(__FreeBSD__)
+		#include <kvm.h>
+		#include <fcntl.h>
+		#include <sys/sysctl.h>
+		#include <sys/user.h>
 	#endif
 #endif
 
@@ -49,8 +55,18 @@
 
 
 
-extern bool g_RunAsService;
-cRoot * cRoot::s_Root = nullptr;
+#ifdef __clang__
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wglobal-constructors"
+#endif
+
+decltype(cRoot::s_Root)      cRoot::s_Root;
+decltype(cRoot::s_NextState) cRoot::s_NextState;
+decltype(cRoot::s_StopEvent) cRoot::s_StopEvent;
+
+#ifdef __clang__
+	#pragma clang diagnostic pop
+#endif
 
 
 
@@ -196,7 +212,7 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 		m_StartTime = std::chrono::steady_clock::now();
 
 		HandleInput();
-		m_StopEvent.Wait();
+		s_StopEvent.Wait();
 
 		// Stop the server:
 		m_WebAdmin->Stop();
@@ -227,15 +243,13 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOGD("Stopping plugin manager...");
 	delete m_PluginManager; m_PluginManager = nullptr;
 
-	cItemHandler::Deinit();
-
 	LOG("Cleaning up...");
 	delete m_Server; m_Server = nullptr;
 
 	LOG("Shutdown successful!");
 	LOG("--- Stopped Log ---");
 
-	return m_NextState == NextState::Restart;
+	return s_NextState == NextState::Restart;
 }
 
 
@@ -489,7 +503,7 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCall
 		cRoot::Get()->ForEachPlayer(
 			[&](cPlayer & a_Player)
 			{
-				a_Player.GetClientHandlePtr()->Kick(m_Server->GetShutdownMessage());
+				a_Player.GetClientHandle()->Kick(m_Server->GetShutdownMessage());
 				SentDisconnect = true;
 				return false;
 			}
@@ -536,15 +550,6 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd)
 void cRoot::KickUser(int a_ClientID, const AString & a_Reason)
 {
 	m_Server->KickUser(a_ClientID, a_Reason);
-}
-
-
-
-
-
-void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
-{
-	m_Server->AuthenticateUser(a_ClientID, a_Name, a_UUID, a_Properties);
 }
 
 
@@ -630,6 +635,18 @@ void cRoot::BroadcastPlayerListsRemovePlayer(const cPlayer & a_Player, const cCl
 	for (auto & Entry : m_WorldsByName)
 	{
 		Entry.second.BroadcastPlayerListRemovePlayer(a_Player);
+	}
+}
+
+
+
+
+
+void cRoot::BroadcastPlayerListsHeaderFooter(const cCompositeChat & a_Header, const cCompositeChat & a_Footer)
+{
+	for (auto & Entry : m_WorldsByName)
+	{
+		Entry.second.BroadcastPlayerListHeaderFooter(a_Header, a_Footer);
 	}
 }
 
@@ -862,6 +879,37 @@ int cRoot::GetPhysicalRAMUsage(void)
 			return static_cast<int>(t_info.resident_size / 1024);
 		}
 		return -1;
+	#elif defined (__FreeBSD__)
+		/*
+		struct rusage self_usage;
+		int status = getrusage(RUSAGE_SELF, &self_usage);
+		if (!status)
+		{
+			return static_cast<int>(self_usage.ru_maxrss);
+		}
+		return -1;
+		*/
+		// Good to watch: https://www.youtube.com/watch?v=Os5cK0H8EOA - getrusage.
+		// Unfortunately, it only gives peak memory usage a.k.a max resident set size
+		// So it is better to use FreeBSD kvm function to get the size of resident pages.
+
+		static kvm_t* kd = NULL;
+
+		if (kd == NULL)
+		{
+			kd = kvm_open(NULL, "/dev/null", NULL, O_RDONLY, "kvm_open");  // returns a descriptor used to access kernel virtual memory
+		}
+		if (kd != NULL)
+		{
+			int pc = 0;  // number of processes found
+			struct kinfo_proc* kp;
+			kp = kvm_getprocs(kd, KERN_PROC_PID, getpid(), &pc);
+			if ((kp != NULL) && (pc >= 1))
+			{
+				return static_cast<int>(kp->ki_rssize * getpagesize() / 1024);
+			}
+		}
+		return -1;
 	#else
 		LOGINFO("%s: Unknown platform, cannot query memory usage", __FUNCTION__);
 		return -1;
@@ -959,7 +1007,7 @@ void cRoot::HandleInput()
 	cLogCommandOutputCallback Output;
 	AString Command;
 
-	while (m_NextState == NextState::Run)
+	while (s_NextState == NextState::Run)
 	{
 #ifndef _WIN32
 		timeval Timeout{ 0, 0 };
@@ -982,7 +1030,7 @@ void cRoot::HandleInput()
 			return;
 		}
 
-		if (m_NextState != NextState::Run)
+		if (s_NextState != NextState::Run)
 		{
 			// Already shutting down, can't execute commands
 			break;
@@ -1003,7 +1051,7 @@ void cRoot::HandleInput()
 void cRoot::TransitionNextState(NextState a_NextState)
 {
 	{
-		auto Current = m_NextState.load();
+		auto Current = s_NextState.load();
 		do
 		{
 			// Stopping is final, so stops override restarts:
@@ -1012,18 +1060,17 @@ void cRoot::TransitionNextState(NextState a_NextState)
 				return;
 			}
 		}
-		while (!m_NextState.compare_exchange_strong(Current, a_NextState));
+		while (!s_NextState.compare_exchange_strong(Current, a_NextState));
 	}
 
-	if (m_NextState == NextState::Run)
+	if (s_NextState == NextState::Run)
 	{
 		return;
 	}
 
-	m_StopEvent.Set();
+	s_StopEvent.Set();
 
 #ifdef WIN32
-
 	DWORD Length;
 	INPUT_RECORD Record
 	{

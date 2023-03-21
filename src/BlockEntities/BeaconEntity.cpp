@@ -106,7 +106,7 @@ bool cBeaconEntity::SetPrimaryEffect(cEntityEffect::eType a_Effect)
 	// Send window update:
 	if (GetWindow() != nullptr)
 	{
-		GetWindow()->SetProperty(1, m_PrimaryEffect);
+		GetWindow()->SetProperty(1, static_cast<short>(m_PrimaryEffect));
 	}
 	return true;
 }
@@ -128,7 +128,7 @@ bool cBeaconEntity::SetSecondaryEffect(cEntityEffect::eType a_Effect)
 	// Send window update:
 	if (GetWindow() != nullptr)
 	{
-		GetWindow()->SetProperty(2, m_SecondaryEffect);
+		GetWindow()->SetProperty(2, static_cast<short>(m_SecondaryEffect));
 	}
 	return true;
 }
@@ -206,7 +206,7 @@ void cBeaconEntity::UpdateBeacon(void)
 					(std::abs(Distance.z) <= 20)
 				)
 				{
-					a_Player.AwardAchievement(Statistic::AchFullBeacon);
+					a_Player.AwardAchievement(CustomStatistic::AchFullBeacon);
 				}
 				return false;
 			}
@@ -271,6 +271,20 @@ void cBeaconEntity::CopyFrom(const cBlockEntity & a_Src)
 
 
 
+void cBeaconEntity::OnRemoveFromWorld()
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		// Tell window its owner is destroyed:
+		Window->OwnerDestroyed();
+	}
+}
+
+
+
+
+
 void cBeaconEntity::SendTo(cClientHandle & a_Client)
 {
 	a_Client.SendUpdateBlockEntity(*this);
@@ -282,8 +296,10 @@ void cBeaconEntity::SendTo(cClientHandle & a_Client)
 
 bool cBeaconEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	// Update the beacon every 4 seconds
-	if ((GetWorld()->GetWorldAge() % 80) == 0)
+	using namespace std::chrono_literals;
+
+	// Update the beacon every 4 seconds:
+	if ((GetWorld()->GetWorldTickAge() % 4s) == 0s)
 	{
 		UpdateBeacon();
 		GiveEffects();
@@ -297,7 +313,7 @@ bool cBeaconEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 {
-	a_Player->GetStatManager().AddValue(Statistic::InteractWithBeacon);
+	a_Player->GetStatistics().Custom[CustomStatistic::InteractWithBeacon]++;
 
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
@@ -316,6 +332,3 @@ bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 	}
 	return true;
 }
-
-
-

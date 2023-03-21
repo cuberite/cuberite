@@ -70,6 +70,7 @@ bool cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
 		{
 			a_Player->GetInventory().RemoveOneEquippedItem();
 		}
+		m_World->BroadcastBlockEntity(GetPos());
 		FLOGD("Changed monster spawner at {0} to type {1}.", GetPos(), cMonster::MobTypeToString(MonsterType));
 		return true;
 	}
@@ -91,8 +92,10 @@ void cMobSpawnerEntity::UpdateActiveState(void)
 
 bool cMobSpawnerEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	// Update the active flag every 5 seconds
-	if ((m_World->GetWorldAge() % 100) == 0)
+	using namespace std::chrono_literals;
+
+	// Update the active flag every 5 seconds:
+	if ((m_World->GetWorldTickAge() % 5s) == 0s)
 	{
 		UpdateActiveState();
 	}
@@ -105,6 +108,7 @@ bool cMobSpawnerEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (m_SpawnDelay <= 0)
 	{
 		SpawnEntity();
+		m_World->BroadcastBlockEntity(GetPos());
 		return true;
 	}
 	else
@@ -121,7 +125,6 @@ bool cMobSpawnerEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 void cMobSpawnerEntity::ResetTimer(void)
 {
 	m_SpawnDelay = GetRandomProvider().RandInt<short>(m_MinSpawnDelay, m_MaxSpawnDelay);
-	m_World->BroadcastBlockEntity(GetPos());
 }
 
 
@@ -137,14 +140,15 @@ void cMobSpawnerEntity::SpawnEntity(void)
 		return;
 	}
 
-	bool EntitiesSpawned = m_World->DoWithChunk(GetChunkX(), GetChunkZ(), [&](cChunk & a_Chunk)
+	bool EntitiesSpawned = m_World->DoWithChunk(GetChunkX(), GetChunkZ(), [this, NearbyEntities](cChunk & a_Chunk)
 		{
 			auto & Random = GetRandomProvider();
+			auto EntitySpawnTally = NearbyEntities;
 
 			bool HaveSpawnedEntity = false;
 			for (short I = 0; I < m_SpawnCount; I++)
 			{
-				if (NearbyEntities >= m_MaxNearbyEntities)
+				if (EntitySpawnTally >= m_MaxNearbyEntities)
 				{
 					break;
 				}
@@ -177,7 +181,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					{
 						HaveSpawnedEntity = true;
 						m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_MOBSPAWN, AbsPos, 0);
-						NearbyEntities++;
+						EntitySpawnTally++;
 					}
 				}
 			}
@@ -199,7 +203,7 @@ int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 {
 	int NumPlayers = 0;
 
-	auto Callback = [&] (cEntity & a_Entity)
+	auto Callback = [this, &NumPlayers](cEntity & a_Entity)
 	{
 		if (!a_Entity.IsPlayer())
 		{
@@ -212,8 +216,7 @@ int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 		return false;
 	};
 
-	auto PlayerBoundingBox = cBoundingBox(Vector3d(m_Pos.x, m_Pos.y - m_RequiredPlayerRange, m_Pos.z), m_RequiredPlayerRange, m_RequiredPlayerRange * 2);
-
+	const cBoundingBox PlayerBoundingBox(Vector3d(m_Pos.x, m_Pos.y - m_RequiredPlayerRange, m_Pos.z), m_RequiredPlayerRange, m_RequiredPlayerRange * 2);
 	m_World->ForEachEntityInBox(PlayerBoundingBox, Callback);
 
 	return NumPlayers;
@@ -227,7 +230,7 @@ int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 {
 	int NumEntities = 0;
 
-	auto Callback = [&] (cEntity & a_Entity)
+	auto Callback = [this, &NumEntities](cEntity & a_Entity)
 	{
 		if (!a_Entity.IsMob())
 		{
@@ -242,13 +245,8 @@ int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 		return false;
 	};
 
-	auto EntityBoundingBox = cBoundingBox(Vector3d(m_Pos.x, m_Pos.y - 4, m_Pos.z), m_SpawnRange, 8);
-
+	const cBoundingBox EntityBoundingBox(Vector3d(m_Pos.x, m_Pos.y - 4, m_Pos.z), m_SpawnRange, 8);
 	m_World->ForEachEntityInBox(EntityBoundingBox, Callback);
 
 	return NumEntities;
 }
-
-
-
-

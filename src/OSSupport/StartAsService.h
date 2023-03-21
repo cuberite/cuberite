@@ -1,5 +1,9 @@
 
-#pragma once
+// StartAsService.h
+
+// Handles startup as a Windows Service or UNIX daemon.
+
+// This file MUST NOT be included from anywhere other than main.cpp.
 
 
 
@@ -7,13 +11,7 @@
 
 #ifdef _WIN32
 
-#include <csignal>
-
-
-
-
-
-class cStartAsService
+class StartAsService
 {
 public:
 
@@ -79,7 +77,7 @@ private:
 			return;
 		}
 
-		const auto LastComponent = wcsrchr(applicationFilename, L'\\');
+		const auto LastComponent = std::wcsrchr(applicationFilename, L'\\');
 		if (LastComponent == nullptr)
 		{
 			serviceSetState(0, SERVICE_STOPPED, E_UNEXPECTED);
@@ -89,7 +87,7 @@ private:
 		const auto LengthToLastComponent = LastComponent - applicationFilename;
 
 		// Strip off the filename, keep only the path:
-		wcsncpy(applicationDirectory, applicationFilename, LengthToLastComponent);
+		std::wcsncpy(applicationDirectory, applicationFilename, LengthToLastComponent);
 		applicationDirectory[LengthToLastComponent] = L'\0';  // Make sure new path is null terminated
 
 		// Services are run by the SCM, and inherit its working directory - usually System32.
@@ -115,7 +113,7 @@ private:
 		char * MultibyteArgV[] = { MultibyteArgV0 };
 
 		const auto OutputSize = std::size(MultibyteArgV0);
-		const auto TranslateResult = wcstombs(MultibyteArgV0, argv[0], OutputSize);
+		const auto TranslateResult = std::wcstombs(MultibyteArgV0, argv[0], OutputSize);
 
 		if (TranslateResult == static_cast<size_t>(-1))
 		{
@@ -141,7 +139,7 @@ private:
 
 #else
 
-struct cStartAsService
+struct StartAsService
 {
 	/** Make a UNIX daemon. */
 	template <auto>

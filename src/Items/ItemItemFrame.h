@@ -9,17 +9,14 @@
 
 
 
-class cItemItemFrameHandler:
+class cItemItemFrameHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemItemFrameHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 
@@ -32,10 +29,16 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		// Can only place on a side face:
 		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_YP) || (a_ClickedBlockFace == BLOCK_FACE_YM))
+		{
+			return false;
+		}
+
+		// Make sure the support block is a valid block to place an item frame on:
+		if (!cHangingEntity::IsValidSupportBlock(a_World->GetBlock(a_ClickedBlockPos)))
 		{
 			return false;
 		}
@@ -48,8 +51,8 @@ public:
 			return false;
 		}
 
-		// Place the item frame:
-		auto ItemFrame = std::make_unique<cItemFrame>(a_ClickedBlockFace, PlacePos);
+		// An item frame, centred so pickups spawn nicely.
+		auto ItemFrame = std::make_unique<cItemFrame>(a_ClickedBlockFace, Vector3d(0.5, 0.5, 0.5) + PlacePos);
 		auto ItemFramePtr = ItemFrame.get();
 		if (!ItemFramePtr->Initialize(std::move(ItemFrame), *a_World))
 		{

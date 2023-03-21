@@ -152,29 +152,34 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_RelPos.y <= 0)
+		if (a_Position.y <= 0)
 		{
 			return false;
 		}
 
 		BLOCKTYPE BelowBlock;
 		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_RelPos.addedY(-1), BelowBlock, BelowBlockMeta);
+		a_Chunk.GetBlockTypeMeta(a_Position.addedY(-1), BelowBlock, BelowBlockMeta);
 
 		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
 		{
 			return true;
 		}
-		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
+
+		// upside down slabs
+		if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
 		{
-			// Check if the slab is turned up side down
-			if ((BelowBlockMeta & 0x08) == 0x08)
-			{
-				return true;
-			}
+			return BelowBlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN;
 		}
+
+		// upside down stairs
+		if (cBlockStairsHandler::IsAnyStairType(BelowBlock))
+		{
+			return BelowBlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN;
+		}
+
 		return false;
 	}
 
@@ -182,7 +187,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		return cItem(E_ITEM_COMPARATOR, 1, 0);
 	}

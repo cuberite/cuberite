@@ -41,10 +41,11 @@ local g_ShouldProcessExt =
 --- The list of files not to be processed:
 local g_IgnoredFiles =
 {
-	"Bindings/Bindings.h",
 	"Bindings/Bindings.cpp",
+	"Bindings/Bindings.h",
 	"Bindings/LuaState_Implementation.cpp",
-	"Registries/Blocks.h"
+	"Registries/BlockStates.cpp",
+	"Registries/BlockStates.h"
 }
 
 --- The list of files not to be processed, as a dictionary (filename => true), built from g_IgnoredFiles

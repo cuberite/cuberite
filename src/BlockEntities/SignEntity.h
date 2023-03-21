@@ -25,8 +25,6 @@ class cSignEntity :
 
 public:  // tolua_export
 
-	BLOCKENTITY_PROTODEF(cSignEntity)
-
 	/** Creates a new empty sign entity at the specified block coords and block type (wall or standing). a_World may be nullptr */
 	cSignEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
@@ -52,7 +50,3 @@ private:
 
 	std::array<AString, 4> m_Line;
 } ;  // tolua_export
-
-
-
-

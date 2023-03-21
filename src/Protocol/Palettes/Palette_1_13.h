@@ -1,12 +1,13 @@
 #pragma once
 
-#include "../../Registries/Items.h"
-#include "../../Registries/Statistics.h"
+#include "BlockState.h"
+#include "Registries/Items.h"
+#include "Registries/CustomStatistics.h"
 
 namespace Palette_1_13
 {
-	UInt32 FromBlock(short ID);
-	UInt32 FromItem(Item ID);
-	UInt32 From(Statistic ID);
+	UInt32 From(BlockState Block);
+	UInt32 From(Item ID);
+	UInt32 From(CustomStatistic ID);
 	Item ToItem(UInt32 ID);
 }

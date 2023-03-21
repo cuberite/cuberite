@@ -9,7 +9,7 @@
 
 namespace HopperHandler
 {
-	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
@@ -20,24 +20,37 @@ namespace HopperHandler
 		return 0;
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
+	static void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating holey the hopper (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
-		const auto Previous = DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, Power);
-		if (Previous == Power)
+		const bool ShouldBeLocked = Power != 0;
+		const bool PreviouslyLocked = (a_Meta & 0x8) == 0x8;
+
+		if (ShouldBeLocked == PreviouslyLocked)
 		{
 			return;
 		}
 
-		a_Chunk.DoWithHopperAt(a_Position, [Power](cHopperEntity & a_Hopper)
+		if (ShouldBeLocked)
 		{
-			a_Hopper.SetLocked(Power != 0);
+			a_Chunk.SetMeta(a_Position, a_Meta | 0x8);
+		}
+		else
+		{
+			a_Chunk.SetMeta(a_Position, a_Meta & ~0x8);
+		}
+
+		a_Chunk.DoWithBlockEntityAt(a_Position, [ShouldBeLocked](cBlockEntity & a_BlockEntity)
+		{
+			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_HOPPER);
+
+			static_cast<cHopperEntity &>(a_BlockEntity).SetLocked(ShouldBeLocked);
 			return false;
 		});
 	}
 
-	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
+	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);

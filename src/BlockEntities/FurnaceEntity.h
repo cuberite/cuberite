@@ -38,16 +38,12 @@ public:
 
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cFurnaceEntity)
-
 	/** Constructor used for normal operation */
 	cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
-	virtual ~cFurnaceEntity() override;
-
 	// cBlockEntity overrides:
-	virtual void Destroy() override;
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
+	virtual void OnRemoveFromWorld() override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
@@ -120,9 +116,6 @@ protected:
 	/** The item that is being smelted */
 	cItem m_LastInput;
 
-	/** Set to true when the furnace entity has been destroyed to prevent the block being set again */
-	bool m_IsDestroyed;
-
 	/** Set to true if the furnace is cooking an item */
 	bool m_IsCooking;
 
@@ -175,7 +168,3 @@ protected:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 
 } ;  // tolua_export
-
-
-
-

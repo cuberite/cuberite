@@ -1076,10 +1076,6 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			{
 				Notes = "Width (X) of the internal {{cItemGrid}} representing the hopper contents.",
 			},
-			TICKS_PER_TRANSFER =
-			{
-				Notes = "Number of ticks between when the hopper transfers items.",
-			},
 		},
 		Inherits = "cBlockEntityWithItems",
 	},

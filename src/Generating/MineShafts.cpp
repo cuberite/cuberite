@@ -256,7 +256,7 @@ public:
 		int a_ProbLevelCorridor, int a_ProbLevelCrossing, int a_ProbLevelStaircase
 	);
 
-	~cMineShaftSystem();
+	virtual ~cMineShaftSystem() override;
 
 	/** Creates new cMineShaft descendant connected at the specified point, heading the specified direction,
 	if it fits, appends it to the list and calls its AppendBranches()
@@ -271,7 +271,7 @@ public:
 	bool CanAppend(const cCuboid & a_BoundingBox);
 
 	// cGridStructGen::cStructure overrides:
-	virtual void DrawIntoChunk(cChunkDesc & a_Chunk);
+	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) override;
 } ;
 
 

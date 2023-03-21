@@ -78,7 +78,7 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int
 	}
 
 	char NumLeft = a_ItemStack.m_ItemCount;
-	int MaxStack = ItemHandler(a_ItemStack.m_ItemType)->GetMaxStackSize();
+	char MaxStack = a_ItemStack.GetMaxStackSize();
 	for (int i = a_BeginSlotNum; i <= a_EndSlotNum; i++)
 	{
 		const cItem & Slot = GetSlot(i);
@@ -103,12 +103,12 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int
 
 
 
-int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
+char cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
 {
 	m_Owner.AddKnownItem(a_Item);
 
 	cItem ToAdd(a_Item);
-	int res = 0;
+	char res = 0;
 
 	// When the item is a armor, try to set it directly to the armor slot.
 	if (ItemCategory::IsArmor(a_Item.m_ItemType))
@@ -162,12 +162,12 @@ int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
 
 
 
-int cInventory::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks)
+char cInventory::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks)
 {
-	int TotalAdded = 0;
+	char TotalAdded = 0;
 	for (cItems::iterator itr = a_ItemStackList.begin(); itr != a_ItemStackList.end();)
 	{
-		int NumAdded = AddItem(*itr, a_AllowNewStacks);
+		char NumAdded = AddItem(*itr, a_AllowNewStacks);
 		if (itr->m_ItemCount == NumAdded)
 		{
 			itr = a_ItemStackList.erase(itr);
@@ -188,7 +188,7 @@ int cInventory::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks)
 
 int cInventory::RemoveItem(const cItem & a_ItemStack)
 {
-	int RemovedItems = m_ShieldSlots.RemoveItem(a_ItemStack);
+	char RemovedItems = m_ShieldSlots.RemoveItem(a_ItemStack);
 
 	if (RemovedItems < a_ItemStack.m_ItemCount)
 	{
@@ -260,8 +260,7 @@ int cInventory::ReplaceOneEquippedItem(const cItem & a_Item, bool a_TryOtherSlot
 	cItem ItemsToAdd = a_Item;
 	if (EquippedItem.IsEqual(ItemsToAdd))
 	{
-		cItemHandler Handler(ItemsToAdd.m_ItemType);
-		auto AmountToAdd = std::min(static_cast<char>(Handler.GetMaxStackSize() - EquippedItem.m_ItemCount), ItemsToAdd.m_ItemCount);
+		auto AmountToAdd = std::min(static_cast<char>(ItemsToAdd.GetMaxStackSize() - EquippedItem.m_ItemCount), ItemsToAdd.m_ItemCount);
 
 		EquippedItem.m_ItemCount += AmountToAdd;
 		SetEquippedItem(EquippedItem);
@@ -496,7 +495,7 @@ bool cInventory::DamageEquippedItem(short a_Amount)
 
 
 
-int cInventory::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
+char cInventory::ChangeSlotCount(int a_SlotNum, char a_AddToCount)
 {
 	int GridSlotNum = 0;
 	cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
@@ -689,7 +688,7 @@ void cInventory::UpdateItems(void)
 	const cItem & Slot = GetEquippedItem();
 	if (!Slot.IsEmpty())
 	{
-		ItemHandler(Slot.m_ItemType)->OnUpdate(m_Owner.GetWorld(), &m_Owner, Slot);
+		Slot.GetHandler().OnUpdate(m_Owner.GetWorld(), &m_Owner, Slot);
 	}
 }
 

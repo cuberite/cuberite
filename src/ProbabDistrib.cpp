@@ -31,7 +31,7 @@ void cProbabDistrib::SetPoints(const cProbabDistrib::cPoints & a_Points)
 	int LastValue = -1;
 	if (a_Points[0].m_Value != 0)
 	{
-		m_Cumulative.push_back(cPoint(0, 0));  // Always push in the [0, 0] point for easier search algorithm bounds
+		m_Cumulative.emplace_back(0, 0);  // Always push in the [0, 0] point for easier search algorithm bounds
 		LastValue = 0;
 	}
 	for (cPoints::const_iterator itr = a_Points.begin(), end = a_Points.end(); itr != end; ++itr)
@@ -45,11 +45,11 @@ void cProbabDistrib::SetPoints(const cProbabDistrib::cPoints & a_Points)
 		ProbSum += (LastProb + itr->m_Probability) * (itr->m_Value - LastValue) / 2;
 		LastProb = itr->m_Probability;
 		LastValue = itr->m_Value;
-		m_Cumulative.push_back(cPoint(itr->m_Value, ProbSum));
+		m_Cumulative.emplace_back(itr->m_Value, ProbSum);
 	}  // for itr - a_Points[]
 	if (LastValue != m_MaxValue)
 	{
-		m_Cumulative.push_back(cPoint(m_MaxValue, 0));  // Always push in the last point for easier search algorithm bounds
+		m_Cumulative.emplace_back(m_MaxValue, 0);  // Always push in the last point for easier search algorithm bounds
 	}
 	m_Sum = ProbSum;
 }
@@ -84,7 +84,7 @@ bool cProbabDistrib::SetDefString(const AString & a_DefString)
 			// Number parse error
 			return false;
 		}
-		Pts.push_back(cPoint(Value, Prob));
+		Pts.emplace_back(Value, Prob);
 	}  // for itr - Points[]
 
 	SetPoints(Pts);

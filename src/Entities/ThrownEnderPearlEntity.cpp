@@ -9,22 +9,8 @@
 
 
 cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	Super(pkEnderPearl, a_Creator, a_Pos, 0.25, 0.25),
-	m_DestroyTimer(-1)
+	Super(pkEnderPearl, a_Creator, a_Pos, a_Speed, 0.25f, 0.25f)
 {
-	SetSpeed(a_Speed);
-}
-
-
-
-
-
-void cThrownEnderPearlEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
-{
-	// TODO: Tweak a_HitPos based on block face.
-	TeleportCreator(a_HitPos);
-
-	m_DestroyTimer = 2;
 }
 
 
@@ -33,34 +19,30 @@ void cThrownEnderPearlEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_Hi
 
 void cThrownEnderPearlEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
-	int TotalDamage = 0;
-	// TODO: If entity is Ender Crystal, destroy it
+	Super::OnHitEntity(a_EntityHit, a_HitPos);
 
+	int Damage = 0;
+	if (a_EntityHit.IsEnderCrystal())
+	{
+		// Endercrystals are destroyed:
+		Damage = CeilC(a_EntityHit.GetHealth());
+	}
+
+	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, 1);
 	TeleportCreator(a_HitPos);
-	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
-
-	m_DestroyTimer = 5;
+	Destroy();
 }
 
 
 
 
 
-void cThrownEnderPearlEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cThrownEnderPearlEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
-	if (m_DestroyTimer > 0)
-	{
-		m_DestroyTimer--;
-		if (m_DestroyTimer == 0)
-		{
-			Destroy();
-			return;
-		}
-	}
-	else
-	{
-		Super::Tick(a_Dt, a_Chunk);
-	}
+	Super::OnHitSolidBlock(a_HitPos, a_HitFace);
+
+	TeleportCreator(a_HitPos);
+	Destroy();
 }
 
 
@@ -75,11 +57,10 @@ void cThrownEnderPearlEntity::TeleportCreator(Vector3d a_HitPos)
 	}
 
 	GetWorld()->FindAndDoWithPlayer(m_CreatorData.m_Name, [=](cPlayer & a_Entity)
-		{
-			// Teleport the creator here, make them take 5 damage:
-			a_Entity.TeleportToCoords(a_HitPos.x, a_HitPos.y + 0.2, a_HitPos.z);
-			a_Entity.TakeDamage(dtEnderPearl, this, 5, 0);
-			return true;
-		}
-	);
+	{
+		// Teleport the creator here, make them take 5 damage:
+		a_Entity.TeleportToCoords(a_HitPos.x, a_HitPos.y + 0.2, a_HitPos.z);
+		a_Entity.TakeDamage(dtEnderPearl, this, 5, 0);
+		return false;
+	});
 }

@@ -14,7 +14,7 @@ Please use the issue tracker search feature and make sure your issue has not bee
 Obtaining Debug Builds
 ----------------------
 
-When testing Cuberite, debug builds are preferred because they output detailed info about the problem that had occured at the server console.
+When testing Cuberite, debug builds are preferred because they output detailed info about the problem that had occurred at the server console.
 Currently, we do not provide debug builds. You will have to compile Cuberite yourself to obtain them. See the compilation instructions.
 You can also test with regular builds.
 

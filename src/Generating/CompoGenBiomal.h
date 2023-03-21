@@ -14,8 +14,4 @@
 
 
 /** Returns a new instance of the Biomal composition generator. */
-cTerrainCompositionGenPtr CreateCompoGenBiomal(int a_Seed);
-
-
-
-
+std::unique_ptr<cTerrainCompositionGen> CreateCompoGenBiomal(int a_Seed);

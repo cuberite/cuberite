@@ -32,8 +32,7 @@ public:
 		mfAmbient  = 2,  // Bats
 		mfWater    = 3,  // Squid, Guardian
 
-		mfNoSpawn,
-		mfUnhandled,  // Nothing. Be sure this is the last and the others are in order
+		mfNoSpawn
 	} ;
 
 	// tolua_end
@@ -46,15 +45,11 @@ public:
 	a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs 2012_12_22))
 	a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
 	*/
-	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height);
-
-	virtual ~cMonster() override;
-
-	virtual void OnRemoveFromWorld(cWorld & a_World) override;
-
-	virtual void Destroyed() override;
+	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height);
 
 	CLASS_PROTODEF(cMonster)
+
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
@@ -113,11 +108,15 @@ public:
 	/** Reads the monster configuration for the specified monster name and assigns it to this object. */
 	void GetMonsterConfig(const AString & a_Name);
 
+	/** Returns whether this mob spawns in the Nether in Vanilla.
+	This is a fixed value and is not affected by custom mob spawning settings. */
+	virtual bool IsNetherNative(void);
+
 	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
 	virtual bool IsUndead(void);
 
 	virtual void EventLosePlayer(void);
-	virtual void CheckEventLostPlayer(void);
+	virtual void CheckEventLostPlayer(std::chrono::milliseconds a_Dt);
 
 	virtual void InStateIdle    (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual void InStateChasing (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
@@ -191,10 +190,10 @@ public:
 	/** Returns the mob family based on the type */
 	static eFamily FamilyFromType(eMonsterType a_MobType);
 
-	/** Returns the spawn delay (number of game ticks between spawn attempts) for the given mob family */
-	static int GetSpawnDelay(cMonster::eFamily a_MobFamily);
-
 	// tolua_end
+
+	/** Returns the spawn delay (number of game ticks between spawn attempts) for the given mob family */
+	static cTickTime GetSpawnDelay(cMonster::eFamily a_MobFamily);
 
 	/**  Translates the MobType enum to the vanilla nbt name */
 	static AString MobTypeToVanillaNBT(eMonsterType a_MobType);
@@ -313,6 +312,7 @@ protected:
 	double m_AttackRange;
 	int m_AttackCoolDownTicksLeft;
 	int m_SightDistance;
+	std::chrono::milliseconds m_LoseSightAbandonTargetTimer;
 
 	float m_DropChanceWeapon;
 	float m_DropChanceHelmet;
@@ -360,8 +360,6 @@ protected:
 
 	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
-
-	virtual void DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo) override;
 
 	/* The breeding processing */
 
