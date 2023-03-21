@@ -2,7 +2,7 @@
 #pragma once
 
 #include "RedstoneHandler.h"
-#include "../../Registries/Blocks.h"
+#include "Registries/BlockStates.h"
 
 
 
@@ -20,7 +20,7 @@ namespace RedstoneWireHandler
 	/** Invokes Callback with the wire's left, front, and right direction state corresponding to Offset.
 	Returns a new block constructed from the directions that the callback may have modified. */
 	template <class OffsetCallback>
-	inline short DoWithDirectionState(const Vector3i Offset, short Block, OffsetCallback Callback)
+	static BlockState DoWithDirectionState(const Vector3i Offset, BlockState Block, OffsetCallback Callback)
 	{
 		auto North = Block::RedstoneWire::North(Block);
 		auto South = Block::RedstoneWire::South(Block);
@@ -49,7 +49,7 @@ namespace RedstoneWireHandler
 	}
 
 	/** Adjusts a given wire block so that the direction represented by Offset has state Direction. */
-	inline void SetDirectionState(const Vector3i Offset, short & Block, TemporaryDirection Direction)
+	static void SetDirectionState(const Vector3i Offset, BlockState & Block, TemporaryDirection Direction)
 	{
 		Block = DoWithDirectionState(Offset, Block, [Direction](auto, auto & Front, auto)
 		{
@@ -70,7 +70,7 @@ namespace RedstoneWireHandler
 		});
 	}
 
-	inline bool IsDirectlyConnectingMechanism(BLOCKTYPE a_Block, NIBBLETYPE a_BlockMeta, const Vector3i a_Offset)
+	static bool IsDirectlyConnectingMechanism(BLOCKTYPE a_Block, NIBBLETYPE a_BlockMeta, const Vector3i a_Offset)
 	{
 		switch (a_Block)
 		{
@@ -100,19 +100,32 @@ namespace RedstoneWireHandler
 		}
 	}
 
+	static bool IsYPTerracingBlocked(const cChunk & a_Chunk, const Vector3i a_Position)
+	{
+		const auto Position = a_Position + OffsetYP;
+
+		if (!cChunkDef::IsValidHeight(Position))
+		{
+			// Certainly cannot terrace at the top of the world:
+			return true;
+		}
+
+		const auto YPTerraceBlock = a_Chunk.GetBlock(Position);
+		return cBlockInfo::IsSolid(YPTerraceBlock) && !cBlockInfo::IsTransparent(YPTerraceBlock);
+	}
+
 	/** Temporary. Discovers a wire's connection state, including terracing, storing the block inside redstone chunk data.
 	TODO: once the server supports block states this should go in the block handler, with data saved in the world. */
-	inline void SetWireState(const cChunk & Chunk, const Vector3i Position)
+	static void SetWireState(const cChunk & a_Chunk, const Vector3i a_Position)
 	{
 		auto Block = Block::RedstoneWire::RedstoneWire();
-		const auto YPTerraceBlock = Chunk.GetBlock(Position + OffsetYP);
-		const bool IsYPTerracingBlocked = cBlockInfo::IsSolid(YPTerraceBlock) && !cBlockInfo::IsTransparent(YPTerraceBlock);
+		const bool IsYPTerracingBlocked = RedstoneWireHandler::IsYPTerracingBlocked(a_Chunk, a_Position);
 
 		// Loop through laterals, discovering terracing connections:
 		for (const auto & Offset : RelativeLaterals)
 		{
-			auto Adjacent = Position + Offset;
-			auto NeighbourChunk = Chunk.GetRelNeighborChunkAdjustCoords(Adjacent);
+			auto Adjacent = a_Position + Offset;
+			auto NeighbourChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Adjacent);
 
 			if ((NeighbourChunk == nullptr) || !NeighbourChunk->IsValid())
 			{
@@ -131,7 +144,7 @@ namespace RedstoneWireHandler
 				// Temporary: this case will eventually be handled when wires are placed, with the state saved as blocks
 				// When a neighbour wire was loaded into its chunk, its neighbour chunks may not have loaded yet
 				// This function is called during chunk load (through AddBlock). Attempt to tell it its new state:
-				if ((NeighbourChunk != &Chunk) && (LateralBlock == E_BLOCK_REDSTONE_WIRE))
+				if ((NeighbourChunk != &a_Chunk) && (LateralBlock == E_BLOCK_REDSTONE_WIRE))
 				{
 					auto & NeighbourBlock = DataForChunk(*NeighbourChunk).WireStates.find(Adjacent)->second;
 					SetDirectionState(-Offset, NeighbourBlock, TemporaryDirection::Side);
@@ -146,9 +159,9 @@ namespace RedstoneWireHandler
 				(NeighbourChunk->GetBlock(Adjacent + OffsetYP) == E_BLOCK_REDSTONE_WIRE)  // Only terrace YP with another wire
 			)
 			{
-				SetDirectionState(Offset, Block, TemporaryDirection::Up);
+				SetDirectionState(Offset, Block, cBlockInfo::IsTransparent(LateralBlock) ? TemporaryDirection::Side : TemporaryDirection::Up);
 
-				if (NeighbourChunk != &Chunk)
+				if (NeighbourChunk != &a_Chunk)
 				{
 					auto & NeighbourBlock = DataForChunk(*NeighbourChunk).WireStates.find(Adjacent + OffsetYP)->second;
 					SetDirectionState(-Offset, NeighbourBlock, TemporaryDirection::Side);
@@ -160,12 +173,13 @@ namespace RedstoneWireHandler
 			if (
 				// IsYMTerracingBlocked (i.e. check block above lower terracing position, a.k.a. just the plain adjacent)
 				(!cBlockInfo::IsSolid(LateralBlock) || cBlockInfo::IsTransparent(LateralBlock)) &&
+				(Adjacent.y > 0) &&
 				(NeighbourChunk->GetBlock(Adjacent + OffsetYM) == E_BLOCK_REDSTONE_WIRE)  // Only terrace YM with another wire
 			)
 			{
 				SetDirectionState(Offset, Block, TemporaryDirection::Side);
 
-				if (NeighbourChunk != &Chunk)
+				if (NeighbourChunk != &a_Chunk)
 				{
 					auto & NeighbourBlock = DataForChunk(*NeighbourChunk).WireStates.find(Adjacent + OffsetYM)->second;
 					SetDirectionState(-Offset, NeighbourBlock, TemporaryDirection::Up);
@@ -173,8 +187,8 @@ namespace RedstoneWireHandler
 			}
 		}
 
-		auto & States = DataForChunk(Chunk).WireStates;
-		const auto FindResult = States.find(Position);
+		auto & States = DataForChunk(a_Chunk).WireStates;
+		const auto FindResult = States.find(a_Position);
 		if (FindResult != States.end())
 		{
 			if (Block != FindResult->second)
@@ -183,16 +197,16 @@ namespace RedstoneWireHandler
 
 				// TODO: when state is stored as the block, the block handler updating via SetBlock will do this automatically
 				// When a wire changes connection state, it needs to update its neighbours:
-				Chunk.GetWorld()->WakeUpSimulators(cChunkDef::RelativeToAbsolute(Position, Chunk.GetPos()));
+				a_Chunk.GetWorld()->WakeUpSimulators(cChunkDef::RelativeToAbsolute(a_Position, a_Chunk.GetPos()));
 			}
 
 			return;
 		}
 
-		DataForChunk(Chunk).WireStates[Position] = Block;
+		DataForChunk(a_Chunk).WireStates.emplace(a_Position, Block);
 	}
 
-	inline PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
 		// Starts off as the wire's meta value, modified appropriately and returned
 		auto Power = a_Chunk.GetMeta(a_Position);
@@ -256,7 +270,7 @@ namespace RedstoneWireHandler
 		return Power;
 	}
 
-	inline void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
+	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
 		// LOGD("Evaluating dusty the wire (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, Power);
 
@@ -268,18 +282,11 @@ namespace RedstoneWireHandler
 		a_Chunk.SetMeta(a_Position, Power);
 
 		// Notify all positions, sans YP, to update:
-		for (const auto & Offset : RelativeAdjacents)
-		{
-			if (Offset == OffsetYP)
-			{
-				continue;
-			}
-
-			UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, Offset);
-		}
+		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, OffsetYM);
+		UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeLaterals);
 	}
 
-	inline void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
+	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
@@ -312,7 +319,7 @@ namespace RedstoneWireHandler
 					const auto YMDiagonalPosition = Relative + OffsetYM;
 					if (
 						BLOCKTYPE QueryBlock;
-						cChunkDef::IsValidHeight(YMDiagonalPosition.y) &&
+						cChunkDef::IsValidHeight(YMDiagonalPosition) &&
 						a_Chunk.UnboundedRelGetBlockType(YMDiagonalPosition, QueryBlock) &&
 						(QueryBlock == E_BLOCK_REDSTONE_WIRE)
 					)

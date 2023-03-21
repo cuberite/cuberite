@@ -11,7 +11,6 @@
 #include "Generating/Trees.h"  // used in cChunkMap::ReplaceTreeBlocks() for tree block discrimination
 #include "BlockArea.h"
 #include "Bindings/PluginManager.h"
-#include "Entities/TNTEntity.h"
 #include "Blocks/BlockHandler.h"
 #include "MobCensus.h"
 #include "MobSpawner.h"
@@ -20,10 +19,6 @@
 #include "Blocks/ChunkInterface.h"
 #include "Entities/Pickup.h"
 #include "DeadlockDetect.h"
-#include "BlockEntities/BlockEntity.h"
-
-#include "zlib/zlib.h"
-#include "json/json.h"
 
 
 
@@ -33,26 +28,8 @@
 // cChunkMap:
 
 cChunkMap::cChunkMap(cWorld * a_World) :
-	m_World(a_World),
-	m_Pool(
-		std::make_unique<cListAllocationPool<cChunkData::sChunkSection>>(
-			std::make_unique<cStarvationCallbacks>(), 1600u, 5000u
-		)
-	)
+	m_World(a_World)
 {
-}
-
-
-
-
-
-cChunkMap::~cChunkMap()
-{
-	// Explicitly destroy all chunks, so that they're guaranteed to be
-	// destroyed before other internals. This fixes crashes on stopping the server.
-	// because the chunk destructor deletes entities and those may access the chunkmap.
-	// Also, the cChunkData destructor accesses the chunkMap's allocator.
-	m_Chunks.clear();
 }
 
 
@@ -63,8 +40,8 @@ cChunk & cChunkMap::ConstructChunk(int a_ChunkX, int a_ChunkZ)
 {
 	// If not exists insert. Then, return the chunk at these coordinates:
 	return m_Chunks.try_emplace(
-		ChunkCoordinate{ a_ChunkX, a_ChunkZ },
-		a_ChunkX, a_ChunkZ, this, m_World, *m_Pool
+		{ a_ChunkX, a_ChunkZ },
+		a_ChunkX, a_ChunkZ, this, m_World
 	).first->second;
 }
 
@@ -93,7 +70,19 @@ cChunk * cChunkMap::FindChunk(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_CSChunks.IsLockedByCurrentThread());
 
-	auto Chunk = m_Chunks.find({ a_ChunkX, a_ChunkZ });
+	const auto Chunk = m_Chunks.find({ a_ChunkX, a_ChunkZ });
+	return (Chunk == m_Chunks.end()) ? nullptr : &Chunk->second;
+}
+
+
+
+
+
+const cChunk * cChunkMap::FindChunk(int a_ChunkX, int a_ChunkZ) const
+{
+	ASSERT(m_CSChunks.IsLockedByCurrentThread());
+
+	const auto Chunk = m_Chunks.find({ a_ChunkX, a_ChunkZ });
 	return (Chunk == m_Chunks.end()) ? nullptr : &Chunk->second;
 }
 
@@ -153,9 +142,8 @@ bool cChunkMap::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback a_Callbac
 
 bool cChunkMap::DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callback)
 {
-	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_BlockPos.x, a_BlockPos.z, ChunkX, ChunkZ);
-	return DoWithChunk(ChunkX, ChunkZ, a_Callback);
+	const auto Position = cChunkDef::BlockToChunk(a_BlockPos);
+	return DoWithChunk(Position.m_ChunkX, Position.m_ChunkZ, a_Callback);
 }
 
 
@@ -224,20 +212,15 @@ void cChunkMap::MarkChunkSaved (int a_ChunkX, int a_ChunkZ)
 
 
 
-void cChunkMap::SetChunkData(cSetChunkData & a_SetChunkData)
+void cChunkMap::SetChunkData(struct SetChunkData && a_SetChunkData)
 {
-	int ChunkX = a_SetChunkData.GetChunkX();
-	int ChunkZ = a_SetChunkData.GetChunkZ();
+	const int ChunkX = a_SetChunkData.Chunk.m_ChunkX;
+	const int ChunkZ = a_SetChunkData.Chunk.m_ChunkZ;
 	{
 		cCSLock Lock(m_CSChunks);
 		const auto Chunk = FindChunk(ChunkX, ChunkZ);
 		ASSERT(Chunk != nullptr);  // Chunk cannot have unloaded since it is marked as queued
-		Chunk->SetAllData(a_SetChunkData);
-
-		if (a_SetChunkData.ShouldMarkDirty())
-		{
-			Chunk->MarkDirty();
-		}
+		Chunk->SetAllData(std::move(a_SetChunkData));
 
 		// Notify relevant ChunkStays:
 		cChunkStays ToBeDisabled;
@@ -279,14 +262,13 @@ void cChunkMap::ChunkLighted(
 		return;
 	}
 	Chunk->SetLight(a_BlockLight, a_SkyLight);
-	Chunk->MarkDirty();
 }
 
 
 
 
 
-bool cChunkMap::GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback)
+bool cChunkMap::GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback) const
 {
 	if (!a_Callback.Coords(a_Coords.m_ChunkX, a_Coords.m_ChunkZ))
 	{
@@ -308,23 +290,7 @@ bool cChunkMap::GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callb
 
 
 
-bool cChunkMap::GetChunkBlockTypes(int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_BlockTypes)
-{
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	Chunk->GetBlockTypes(a_BlockTypes);
-	return true;
-}
-
-
-
-
-
-bool cChunkMap::IsChunkQueued(int a_ChunkX, int a_ChunkZ)
+bool cChunkMap::IsChunkQueued(int a_ChunkX, int a_ChunkZ) const
 {
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
@@ -335,7 +301,64 @@ bool cChunkMap::IsChunkQueued(int a_ChunkX, int a_ChunkZ)
 
 
 
-bool cChunkMap::IsChunkValid(int a_ChunkX, int a_ChunkZ)
+bool cChunkMap::IsWeatherSunnyAt(int a_BlockX, int a_BlockZ) const
+{
+	int ChunkX, ChunkZ, BlockY = 0;
+	cChunkDef::AbsoluteToRelative(a_BlockX, BlockY, a_BlockZ, ChunkX, ChunkZ);
+
+	cCSLock Lock(m_CSChunks);
+	const auto Chunk = FindChunk(ChunkX, ChunkZ);
+	if ((Chunk == nullptr) || !Chunk->IsValid())
+	{
+		return m_World->IsWeatherSunny();
+	}
+
+	return Chunk->IsWeatherSunnyAt(a_BlockX, a_BlockZ);
+}
+
+
+
+
+
+bool cChunkMap::IsWeatherWetAt(int a_BlockX, int a_BlockZ) const
+{
+	int ChunkX, ChunkZ, BlockY = 0;
+	cChunkDef::AbsoluteToRelative(a_BlockX, BlockY, a_BlockZ, ChunkX, ChunkZ);
+
+	cCSLock Lock(m_CSChunks);
+	const auto Chunk = FindChunk(ChunkX, ChunkZ);
+	if ((Chunk == nullptr) || !Chunk->IsValid())
+	{
+		return m_World->IsWeatherWet();
+	}
+
+	return Chunk->IsWeatherWetAt(a_BlockX, a_BlockZ);
+}
+
+
+
+
+
+bool cChunkMap::IsWeatherWetAt(const Vector3i a_Position) const
+{
+	const auto ChunkPosition = cChunkDef::BlockToChunk(a_Position);
+	const auto Position = cChunkDef::AbsoluteToRelative(a_Position, ChunkPosition);
+
+	cCSLock Lock(m_CSChunks);
+	const auto Chunk = FindChunk(ChunkPosition.m_ChunkX, ChunkPosition.m_ChunkZ);
+	if ((Chunk == nullptr) || !Chunk->IsValid())
+	{
+		return m_World->IsWeatherWet();
+	}
+
+	return Chunk->IsWeatherWetAt(Position);
+}
+
+
+
+
+
+bool cChunkMap::IsChunkValid(int a_ChunkX, int a_ChunkZ) const
 {
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
@@ -346,7 +369,7 @@ bool cChunkMap::IsChunkValid(int a_ChunkX, int a_ChunkZ)
 
 
 
-bool cChunkMap::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ)
+bool cChunkMap::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const
 {
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
@@ -416,14 +439,14 @@ void cChunkMap::FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLET
 
 
 
-void cChunkMap::CollectPickupsByPlayer(cPlayer & a_Player)
+void cChunkMap::CollectPickupsByEntity(cEntity & a_Entity)
 {
 	cCSLock Lock(m_CSChunks);
 
-	auto BoundingBox = a_Player.GetBoundingBox();
+	auto BoundingBox = a_Entity.GetBoundingBox();
 	BoundingBox.Expand(1, 0.5, 1);
 
-	ForEachEntityInBox(BoundingBox, [&a_Player](cEntity & Entity)
+	ForEachEntityInBox(BoundingBox, [&a_Entity](cEntity & Entity)
 	{
 		// Only pickups and projectiles can be picked up:
 		if (Entity.IsPickup())
@@ -433,11 +456,11 @@ void cChunkMap::CollectPickupsByPlayer(cPlayer & a_Player)
 				(*itr)->GetUniqueID(), a_Player->GetName().c_str(), SqrDist
 			);
 			*/
-			static_cast<cPickup &>(Entity).CollectedBy(a_Player);
+			static_cast<cPickup &>(Entity).CollectedBy(a_Entity);
 		}
-		else if (Entity.IsProjectile())
+		else if (Entity.IsProjectile() && a_Entity.IsPlayer())
 		{
-			static_cast<cProjectileEntity &>(Entity).CollectedBy(a_Player);
+			static_cast<cProjectileEntity &>(Entity).CollectedBy(static_cast<cPlayer&>(a_Entity));
 		}
 
 		// The entities will MarkDirty when they Destroy themselves
@@ -449,7 +472,7 @@ void cChunkMap::CollectPickupsByPlayer(cPlayer & a_Player)
 
 
 
-BLOCKTYPE cChunkMap::GetBlock(Vector3i a_BlockPos)
+BLOCKTYPE cChunkMap::GetBlock(Vector3i a_BlockPos) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
@@ -468,7 +491,7 @@ BLOCKTYPE cChunkMap::GetBlock(Vector3i a_BlockPos)
 
 
 
-NIBBLETYPE cChunkMap::GetBlockMeta(Vector3i a_BlockPos)
+NIBBLETYPE cChunkMap::GetBlockMeta(Vector3i a_BlockPos) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
@@ -487,7 +510,7 @@ NIBBLETYPE cChunkMap::GetBlockMeta(Vector3i a_BlockPos)
 
 
 
-NIBBLETYPE cChunkMap::GetBlockSkyLight(Vector3i a_BlockPos)
+NIBBLETYPE cChunkMap::GetBlockSkyLight(Vector3i a_BlockPos) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
@@ -506,7 +529,7 @@ NIBBLETYPE cChunkMap::GetBlockSkyLight(Vector3i a_BlockPos)
 
 
 
-NIBBLETYPE cChunkMap::GetBlockBlockLight(Vector3i a_BlockPos)
+NIBBLETYPE cChunkMap::GetBlockBlockLight(Vector3i a_BlockPos) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
@@ -560,7 +583,7 @@ void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE 
 
 
 
-bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
 	auto chunkCoord = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkCoord);
@@ -579,7 +602,7 @@ bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, N
 
 
 
-bool cChunkMap::GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
+bool cChunkMap::GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
@@ -634,7 +657,7 @@ void cChunkMap::ReplaceTreeBlocks(const sSetBlockVector & a_Blocks)
 
 
 
-EMCSBiome cChunkMap::GetBiomeAt (int a_BlockX, int a_BlockZ)
+EMCSBiome cChunkMap::GetBiomeAt(int a_BlockX, int a_BlockZ) const
 {
 	int ChunkX, ChunkZ, X = a_BlockX, Y = 0, Z = a_BlockZ;
 	cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);
@@ -645,10 +668,7 @@ EMCSBiome cChunkMap::GetBiomeAt (int a_BlockX, int a_BlockZ)
 	{
 		return Chunk->GetBiomeAt(X, Z);
 	}
-	else
-	{
-		return m_World->GetGenerator().GetBiomeAt(a_BlockX, a_BlockZ);
-	}
+	return EMCSBiome::biInvalidBiome;
 }
 
 
@@ -728,6 +748,10 @@ bool cChunkMap::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 			res = false;
 			continue;
 		}
+		if (!cChunkDef::IsValidHeight(itr->GetRelativePos()))
+		{
+			continue;
+		}
 		itr->m_BlockType = Chunk->GetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ);
 		itr->m_BlockMeta = Chunk->GetMeta(itr->m_RelX, itr->m_RelY, itr->m_RelZ);
 	}
@@ -778,7 +802,7 @@ cItems cChunkMap::PickupsFromBlock(Vector3i a_BlockPos, const cEntity * a_Digger
 
 
 
-void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player)
+void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, const cPlayer & a_Player)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_X, a_Y, a_Z, ChunkX, ChunkZ);
@@ -818,8 +842,8 @@ void cChunkMap::CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2,
 
 void cChunkMap::CompareChunkClients(cChunk * a_Chunk1, cChunk * a_Chunk2, cClientDiffCallback & a_Callback)
 {
-	auto Clients1 = a_Chunk1->GetAllClients();
-	auto Clients2 = a_Chunk2->GetAllClients();
+	const auto & Clients1 = a_Chunk1->GetAllClients();
+	const auto & Clients2 = a_Chunk2->GetAllClients();
 
 	// Find "removed" clients:
 	for (auto * Client : Clients1)
@@ -884,19 +908,18 @@ void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client)
 void cChunkMap::AddEntity(OwnedEntity a_Entity)
 {
 	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
-	if (Chunk == nullptr)
+	if (FindChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ()) == nullptr)
 	{
-		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
-			static_cast<void *>(a_Entity.get()), a_Entity->GetClass(), a_Entity->GetUniqueID()
+		LOGWARNING("%s: Entity at %p (%s, ID %d) spawning in a non-existent chunk.",
+			__FUNCTION__, static_cast<void *>(a_Entity.get()), a_Entity->GetClass(), a_Entity->GetUniqueID()
 		);
-		return;
 	}
 
 	const auto EntityPtr = a_Entity.get();
 	ASSERT(EntityPtr->GetWorld() == m_World);
 
-	Chunk->AddEntity(std::move(a_Entity));
+	auto & Chunk = ConstructChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
+	Chunk.AddEntity(std::move(a_Entity));
 
 	EntityPtr->OnAddToWorld(*m_World);
 	ASSERT(!EntityPtr->IsTicking());
@@ -1053,360 +1076,17 @@ bool cChunkMap::ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEnti
 
 
 
-bool cChunkMap::ForEachBrewingstandInChunk(int a_ChunkX, int a_ChunkZ, cBrewingstandCallback a_Callback)
+bool cChunkMap::DoWithBlockEntityAt(const Vector3i a_Position, cBlockEntityCallback a_Callback)
 {
+	const auto ChunkPosition = cChunkDef::BlockToChunk(a_Position);
+	const auto Relative = cChunkDef::AbsoluteToRelative(a_Position, ChunkPosition);
 	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
+	const auto Chunk = FindChunk(ChunkPosition.m_ChunkX, ChunkPosition.m_ChunkZ);
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		return false;
 	}
-	return Chunk->ForEachBrewingstand(a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback a_Callback)
-{
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->ForEachChest(a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, cDispenserCallback a_Callback)
-{
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->ForEachDispenser(a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, cDropperCallback a_Callback)
-{
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->ForEachDropper(a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, cDropSpenserCallback a_Callback)
-{
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->ForEachDropSpenser(a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback a_Callback)
-{
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->ForEachFurnace(a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->DoWithBlockEntityAt({ BlockX, BlockY, BlockZ }, a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback a_Callback)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->DoWithBeaconAt({ BlockX, BlockY, BlockZ }, a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback a_Callback)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->DoWithBedAt({ BlockX, BlockY, BlockZ }, a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback a_Callback)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->DoWithBrewingstandAt({ BlockX, BlockY, BlockZ }, a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback a_Callback)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->DoWithChestAt({ BlockX, BlockY, BlockZ }, a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback a_Callback)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->DoWithDispenserAt({ BlockX, BlockY, BlockZ }, a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback a_Callback)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->DoWithDropperAt({ BlockX, BlockY, BlockZ }, a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback a_Callback)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->DoWithDropSpenserAt({ BlockX, BlockY, BlockZ }, a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->DoWithFurnaceAt({ BlockX, BlockY, BlockZ }, a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::DoWithHopperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperCallback a_Callback)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->DoWithHopperAt({ BlockX, BlockY, BlockZ }, a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->DoWithNoteBlockAt({ BlockX, BlockY, BlockZ }, a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback a_Callback)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->DoWithCommandBlockAt({ BlockX, BlockY, BlockZ }, a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback a_Callback)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->DoWithMobHeadAt({ BlockX, BlockY, BlockZ }, a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->DoWithFlowerPotAt({ BlockX, BlockY, BlockZ }, a_Callback);
-}
-
-
-
-
-
-bool cChunkMap::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
-{
-	int ChunkX, ChunkZ;
-	int BlockX = a_BlockX, BlockY = a_BlockY, BlockZ = a_BlockZ;
-	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
-	cCSLock Lock(m_CSChunks);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->GetSignLines({ BlockX, BlockY, BlockZ }, a_Line1, a_Line2, a_Line3, a_Line4);
+	return Chunk->DoWithBlockEntityAt(Relative, a_Callback);
 }
 
 
@@ -1452,23 +1132,6 @@ void cChunkMap::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ)
 	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
 	ASSERT(Chunk != nullptr);  // Chunk cannot have unloaded since it is marked as queued
 	Chunk->MarkLoadFailed();
-}
-
-
-
-
-
-bool cChunkMap::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
-{
-	cCSLock Lock(m_CSChunks);
-	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
-	const auto Chunk = FindChunk(ChunkX, ChunkZ);
-	if ((Chunk == nullptr) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	return Chunk->SetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4);
 }
 
 
@@ -1537,7 +1200,7 @@ bool cChunkMap::ForEachLoadedChunk(cFunctionRef<bool(int, int)> a_Callback) cons
 	{
 		if (Chunk.second.IsValid())
 		{
-			if (a_Callback(Chunk.first.ChunkX, Chunk.first.ChunkZ))
+			if (a_Callback(Chunk.first.m_ChunkX, Chunk.first.m_ChunkZ))
 			{
 				return false;
 			}
@@ -1680,13 +1343,20 @@ void cChunkMap::SpawnMobs(cMobSpawner & a_MobSpawner)
 void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
 {
 	cCSLock Lock(m_CSChunks);
+
+	// Do the magic of updating the world:
 	for (auto & Chunk : m_Chunks)
 	{
-		// Only tick chunks that are valid and should be ticked:
-		if (Chunk.second.IsValid() && Chunk.second.ShouldBeTicked())
+		if (Chunk.second.ShouldBeTicked())
 		{
 			Chunk.second.Tick(a_Dt);
 		}
+	}
+
+	// Finally, only after all chunks are ticked, tell the client about all aggregated changes:
+	for (auto & Chunk : m_Chunks)
+	{
+		Chunk.second.BroadcastPendingChanges();
 	}
 }
 
@@ -1718,11 +1388,11 @@ void cChunkMap::UnloadUnusedChunks(void)
 	{
 		if (
 			itr->second.CanUnload() &&  // Can unload
-			!cPluginManager::Get()->CallHookChunkUnloading(*GetWorld(), itr->first.ChunkX, itr->first.ChunkZ)  // Plugins agree
+			!cPluginManager::Get()->CallHookChunkUnloading(*GetWorld(), itr->first.m_ChunkX, itr->first.m_ChunkZ)  // Plugins agree
 		)
 		{
 			// First notify plugins:
-			cPluginManager::Get()->CallHookChunkUnloaded(*m_World, itr->first.ChunkX, itr->first.ChunkZ);
+			cPluginManager::Get()->CallHookChunkUnloaded(*m_World, itr->first.m_ChunkX, itr->first.m_ChunkZ);
 
 			// Notify entities within the chunk, while everything's still valid:
 			itr->second.OnUnload();
@@ -1748,7 +1418,7 @@ void cChunkMap::SaveAllChunks(void) const
 	{
 		if (Chunk.second.IsValid() && Chunk.second.IsDirty())
 		{
-			GetWorld()->GetStorage().QueueSaveChunk(Chunk.first.ChunkX, Chunk.first.ChunkZ);
+			GetWorld()->GetStorage().QueueSaveChunk(Chunk.first.m_ChunkX, Chunk.first.m_ChunkZ);
 		}
 	}
 }

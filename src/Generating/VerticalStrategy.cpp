@@ -16,21 +16,6 @@ static const int SEED_OFFSET = 135;
 
 
 
-
-
-// Emit a warning if the first param is true
-#define CONDWARNING(ShouldLog, Fmt, ...) \
-	do { \
-		if (ShouldLog) \
-		{ \
-			LOGWARNING(Fmt, __VA_ARGS__); \
-		} \
-	} while (false)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Globals:
 
@@ -162,7 +147,7 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
 	{
 		m_Seed = a_Seed + SEED_OFFSET;
 	}
@@ -209,10 +194,10 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_HeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel) override
 	{
 		m_Seed = a_Seed + SEED_OFFSET;
-		m_HeightGen = a_HeightGen;
+		m_HeightGen = &a_HeightGen;
 	}
 
 protected:
@@ -220,7 +205,7 @@ protected:
 	int m_Seed;
 
 	/** Height generator from which the top of the terrain is read. */
-	cTerrainHeightGenPtr m_HeightGen;
+	cTerrainHeightGen * m_HeightGen;
 
 	/** Minimum relative height at which the prefab is placed. */
 	int m_MinRelHeight;
@@ -265,10 +250,10 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_HeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel) override
 	{
 		m_Seed = a_Seed + SEED_OFFSET;
-		m_HeightGen = a_HeightGen;
+		m_HeightGen = &a_HeightGen;
 		m_SeaLevel = a_SeaLevel;
 	}
 
@@ -277,7 +262,7 @@ protected:
 	int m_Seed;
 
 	/** Height generator from which the top of the terrain is read. */
-	cTerrainHeightGenPtr m_HeightGen;
+	cTerrainHeightGen * m_HeightGen;
 
 	/** The sea level used by the world. */
 	int m_SeaLevel;
@@ -342,7 +327,3 @@ cPiece::cVerticalStrategyPtr CreateVerticalStrategyFromString(const AString & a_
 
 	return Strategy;
 }
-
-
-
-

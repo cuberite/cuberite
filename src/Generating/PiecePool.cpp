@@ -8,6 +8,7 @@
 #include "PiecePool.h"
 #include "VerticalStrategy.h"
 #include "VerticalLimit.h"
+#include "PieceModifier.h"
 
 
 
@@ -39,6 +40,29 @@ bool cPiece::SetVerticalLimitFromString(const AString & a_LimitDesc, bool a_LogW
 		return false;
 	}
 	m_VerticalLimit = limit;
+	return true;
+}
+
+
+
+
+
+bool cPiece::SetPieceModifiersFromString(const AString & a_Definition, bool a_LogWarnings)
+{
+	auto modifiers = std::make_shared<cPieceModifiers>();
+	if (!CreatePieceModifierFromString(a_Definition, modifiers, a_LogWarnings))
+	{
+		return false;
+	}
+
+	cPieceModifiers Modifiers;
+	for (size_t i = 0; i < modifiers->size(); i++)
+	{
+		Modifiers.push_back(std::move(modifiers->at(i)));
+	}
+
+	m_Modifiers = Modifiers;
+
 	return true;
 }
 

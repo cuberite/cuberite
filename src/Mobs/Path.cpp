@@ -2,6 +2,7 @@
 #include "Globals.h"
 
 #include "Path.h"
+#include "BlockType.h"
 #include "../BlockInfo.h"
 #include "../Chunk.h"
 
@@ -479,7 +480,7 @@ void cPath::FillCellAttributes(cPathCell & a_Cell)
 
 	ASSERT(m_Chunk != nullptr);
 
-	if (!cChunkDef::IsValidHeight(Location.y))
+	if (!cChunkDef::IsValidHeight(Location))
 	{
 		// Players can't build outside the game height, so it must be air
 		a_Cell.m_IsSolid = false;

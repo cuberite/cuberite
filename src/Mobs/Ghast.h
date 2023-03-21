@@ -18,14 +18,16 @@ public:
 
 	CLASS_PROTODEF(cGhast)
 
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
-	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
-
 	bool IsCharging(void) const { return m_IsCharging; }
 
 private:
+
+	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+	virtual bool IsNetherNative(void) override { return true; }
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+
 	/** Specifies whether or not the ghast has started shooting a fireball. */
 	bool m_IsCharging;
 
@@ -36,7 +38,3 @@ private:
 	Only used while m_IsCharging is true. */
 	int m_TicksUntilShot;
 } ;
-
-
-
-

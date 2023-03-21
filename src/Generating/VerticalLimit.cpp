@@ -5,22 +5,6 @@
 #include "VerticalLimit.h"
 
 
-
-
-
-// Emit a warning if the first param is true
-#define CONDWARNING(ShouldLog, Fmt, ...) \
-	do { \
-		if (ShouldLog) \
-		{ \
-			LOGWARNING(Fmt, __VA_ARGS__); \
-		} \
-	} while (false)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Globals:
 
@@ -133,6 +117,7 @@ class cVerticalLimitAboveTerrain:
 public:
 	virtual bool CanBeAtHeight(int a_BlockX, int a_BlockZ, int a_Height) override
 	{
+		ASSERT(m_TerrainHeightGen != nullptr);
 		auto terrainHeight = m_TerrainHeightGen->GetHeightAt(a_BlockX, a_BlockZ);
 		int compareHeight = a_Height - terrainHeight;
 		return (
@@ -151,14 +136,14 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
 	{
-		m_TerrainHeightGen = a_TerrainHeightGen;
+		m_TerrainHeightGen = &a_TerrainHeightGen;
 	}
 
 protected:
 	/** The underlying height generator. */
-	cTerrainHeightGenPtr m_TerrainHeightGen;
+	cTerrainHeightGen * m_TerrainHeightGen;
 
 	/** How many blocks above the terrain level do we accept on minimum. */
 	int m_MinBlocksAbove;
@@ -198,15 +183,15 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
 	{
-		m_TerrainHeightGen = a_TerrainHeightGen;
+		m_TerrainHeightGen = &a_TerrainHeightGen;
 		m_SeaLevel = a_SeaLevel;
 	}
 
 protected:
 	/** The underlying height generator. */
-	cTerrainHeightGenPtr m_TerrainHeightGen;
+	cTerrainHeightGen * m_TerrainHeightGen;
 
 	/** The sealevel for the current world. */
 	int m_SeaLevel;
@@ -282,14 +267,14 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
 	{
-		m_TerrainHeightGen = a_TerrainHeightGen;
+		m_TerrainHeightGen = &a_TerrainHeightGen;
 	}
 
 protected:
 	/** The underlying height generator. */
-	cTerrainHeightGenPtr m_TerrainHeightGen;
+	cTerrainHeightGen * m_TerrainHeightGen;
 
 	/** How many blocks below the terrain level do we accept on minimum. */
 	int m_MinBlocksBelow;
@@ -328,15 +313,15 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
 	{
-		m_TerrainHeightGen = a_TerrainHeightGen;
+		m_TerrainHeightGen = &a_TerrainHeightGen;
 		m_SeaLevel = a_SeaLevel;
 	}
 
 protected:
 	/** The underlying height generator. */
-	cTerrainHeightGenPtr m_TerrainHeightGen;
+	cTerrainHeightGen * m_TerrainHeightGen;
 
 	/** The sealevel for the current world. */
 	int m_SeaLevel;
@@ -413,7 +398,3 @@ cPiece::cVerticalLimitPtr CreateVerticalLimitFromString(const AString & a_LimitD
 
 	return Limit;
 }
-
-
-
-

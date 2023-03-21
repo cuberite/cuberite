@@ -44,7 +44,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// No pickups
 		return {};
@@ -71,8 +71,8 @@ private:
 		}
 
 		const auto Player = static_cast<const cPlayer *>(a_Digger);
-		auto Handler = Player->GetEquippedItem().GetHandler();
-		if (!Player->IsGameModeSurvival() || !Handler->CanHarvestBlock(E_BLOCK_MOB_SPAWNER))
+		auto & Handler = Player->GetEquippedItem().GetHandler();
+		if (!Player->IsGameModeSurvival() || !Handler.CanHarvestBlock(E_BLOCK_MOB_SPAWNER))
 		{
 			return;
 		}

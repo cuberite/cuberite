@@ -1,11 +1,11 @@
 #include "Globals.h"
 
 #include "Upgrade.h"
-#include "../../Registries/Blocks.h"
+#include "Registries/BlockStates.h"
 
 namespace PaletteUpgrade
 {
-	short FromBlock(BLOCKTYPE Block, NIBBLETYPE Meta)
+	BlockState FromBlock(const BLOCKTYPE Block, const NIBBLETYPE Meta)
 	{
 		using namespace Block;
 
@@ -1705,7 +1705,7 @@ namespace PaletteUpgrade
 		}
 	}
 
-	Item FromItem(short Item, short Damage)
+	Item FromItem(const short Item, const short Damage)
 	{
 		switch ((Item << 16) | Damage)
 		{
@@ -2516,7 +2516,7 @@ namespace PaletteUpgrade
 		}
 	}
 
-	std::pair<short, short> ToItem(Item ID)
+	std::pair<short, short> ToItem(const Item ID)
 	{
 		switch (ID)
 		{

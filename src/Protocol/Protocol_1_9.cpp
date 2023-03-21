@@ -28,6 +28,7 @@ Implements the 1.9 protocol classes:
 
 #include "../WorldStorage/FastNBT.h"
 
+#include "../Entities/EnderCrystal.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
@@ -44,33 +45,17 @@ Implements the 1.9 protocol classes:
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/HorseWindow.h"
 
-#include "../BlockEntities/BeaconEntity.h"
-#include "../BlockEntities/CommandBlockEntity.h"
-#include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"
-#include "../BlockEntities/FlowerPotEntity.h"
-#include "../Bindings/PluginManager.h"
 
 
 
 
 
-/** Value for main hand in Hand parameter for Protocol 1.9. */
-static const UInt32 MAIN_HAND = 0;
-static const UInt32 OFF_HAND = 1;
+// Value for main hand in Hand parameter for Protocol 1.9.
+#define MAIN_HAND 0
 
-
-
-
-
-#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!ByteBuf.Proc(Var))\
-		{\
-			return;\
-		} \
-	} while (false)
+// Value for left hand in MainHand parameter for Protocol 1.9.
+#define LEFT_HAND 0
 
 
 
@@ -97,6 +82,176 @@ void cProtocol_1_9_0::SendAttachEntity(const cEntity & a_Entity, const cEntity &
 	Pkt.WriteVarInt32(a_Vehicle.GetUniqueID());
 	Pkt.WriteVarInt32(1);  // 1 passenger
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(0);  // Add
+	Pkt.WriteString(a_Title.CreateJsonString());
+	Pkt.WriteBEFloat(a_FractionFilled);
+	Pkt.WriteVarInt32([a_Color]
+	{
+		switch (a_Color)
+		{
+			case BossBarColor::Pink: return 0U;
+			case BossBarColor::Blue: return 1U;
+			case BossBarColor::Red: return 2U;
+			case BossBarColor::Green: return 3U;
+			case BossBarColor::Yellow: return 4U;
+			case BossBarColor::Purple: return 5U;
+			case BossBarColor::White: return 6U;
+		}
+		UNREACHABLE("Unsupported boss bar property");
+	}());
+	Pkt.WriteVarInt32([a_DivisionType]
+	{
+		switch (a_DivisionType)
+		{
+			case BossBarDivisionType::None: return 0U;
+			case BossBarDivisionType::SixNotches: return 1U;
+			case BossBarDivisionType::TenNotches: return 2U;
+			case BossBarDivisionType::TwelveNotches: return 3U;
+			case BossBarDivisionType::TwentyNotches: return 4U;
+		}
+		UNREACHABLE("Unsupported boss bar property");
+	}());
+	{
+		UInt8 Flags = 0x00;
+		if (a_DarkenSky)
+		{
+			Flags |= 0x01;
+		}
+		if (a_PlayEndMusic || a_CreateFog)
+		{
+			Flags |= 0x02;
+		}
+		Pkt.WriteBEUInt8(Flags);
+	}
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarRemove(UInt32 a_UniqueID)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(1);  // Remove
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(5);  // Update Flags
+	{
+		UInt8 Flags = 0x00;
+		if (a_DarkenSky)
+		{
+			Flags |= 0x01;
+		}
+		if (a_PlayEndMusic || a_CreateFog)
+		{
+			Flags |= 0x02;
+		}
+		Pkt.WriteBEUInt8(Flags);
+	}
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarUpdateHealth(UInt32 a_UniqueID, float a_FractionFilled)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(2);  // Update health
+	Pkt.WriteBEFloat(a_FractionFilled);
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(4);  // Update health
+	Pkt.WriteVarInt32([a_Color]
+	{
+		switch (a_Color)
+		{
+			case BossBarColor::Pink: return 0U;
+			case BossBarColor::Blue: return 1U;
+			case BossBarColor::Red: return 2U;
+			case BossBarColor::Green: return 3U;
+			case BossBarColor::Yellow: return 4U;
+			case BossBarColor::Purple: return 5U;
+			case BossBarColor::White: return 6U;
+		}
+		UNREACHABLE("Unsupported boss bar property");
+	}());
+	Pkt.WriteVarInt32([a_DivisionType]
+	{
+		switch (a_DivisionType)
+		{
+			case BossBarDivisionType::None: return 0U;
+			case BossBarDivisionType::SixNotches: return 1U;
+			case BossBarDivisionType::TenNotches: return 2U;
+			case BossBarDivisionType::TwelveNotches: return 3U;
+			case BossBarDivisionType::TwentyNotches: return 4U;
+		}
+		UNREACHABLE("Unsupported boss bar property");
+	}());
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendBossBarUpdateTitle(UInt32 a_UniqueID, const cCompositeChat & a_Title)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBossBar);
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_UniqueID);
+	Pkt.WriteVarInt32(3);  // Update title
+	Pkt.WriteString(a_Title.CreateJsonString());
 }
 
 
@@ -152,12 +307,15 @@ void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const auto Delta = (a_Entity.GetPosition() - a_Entity.GetLastSentPosition()) * 32 * 128;
+	const auto Delta = (a_Entity.GetPosition() * 32 * 128).Floor() - (a_Entity.GetLastSentPosition() * 32 * 128).Floor();
 
-	// Limitations of a short
-	static const auto Max = std::numeric_limits<Int16>::max();
-
-	if ((std::abs(Delta.x) <= Max) && (std::abs(Delta.y) <= Max) && (std::abs(Delta.z) <= Max))
+	// Ensure that the delta has enough precision and is within range of a BEInt16:
+	if (
+		Delta.HasNonZeroLength() &&
+		cByteBuffer::CanBEInt16Represent(Delta.x) &&
+		cByteBuffer::CanBEInt16Represent(Delta.y) &&
+		cByteBuffer::CanBEInt16Represent(Delta.z)
+	)
 	{
 		const auto Move = static_cast<Vector3<Int16>>(Delta);
 
@@ -186,7 +344,8 @@ void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 		return;
 	}
 
-	// Too big a movement, do a teleport
+	// Too big or small a movement, do a teleport.
+
 	cPacketizer Pkt(*this, pktTeleportEntity);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEDouble(a_Entity.GetPosX());
@@ -195,19 +354,6 @@ void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
 	Pkt.WriteBool(a_Entity.IsOnGround());
-}
-
-
-
-
-
-void cProtocol_1_9_0::SendEntityStatus(const cEntity & a_Entity, char a_Status)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktEntityStatus);
-	Pkt.WriteBEUInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEInt8(a_Status);
 }
 
 
@@ -324,29 +470,32 @@ void cProtocol_1_9_0::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Da
 
 
 
-void cProtocol_1_9_0::SendPlayerMaxSpeed(void)
+void cProtocol_1_9_0::SendPlayerMoveLook (const Vector3d a_Pos, const float a_Yaw, const float a_Pitch, const bool a_IsRelative)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktPlayerMaxSpeed);
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteVarInt32(Player->GetUniqueID());
-	Pkt.WriteBEInt32(1);  // Count
-	Pkt.WriteString("generic.movementSpeed");
-	// The default game speed is 0.1, multiply that value by the relative speed:
-	Pkt.WriteBEDouble(0.1 * Player->GetNormalMaxSpeed());
-	if (Player->IsSprinting())
+	cPacketizer Pkt(*this, pktPlayerMoveLook);
+	Pkt.WriteBEDouble(a_Pos.x);
+	Pkt.WriteBEDouble(a_Pos.y);
+	Pkt.WriteBEDouble(a_Pos.z);
+	Pkt.WriteBEFloat(a_Yaw);
+	Pkt.WriteBEFloat(a_Pitch);
+
+	if (a_IsRelative)
 	{
-		Pkt.WriteVarInt32(1);  // Modifier count
-		Pkt.WriteBEUInt64(0x662a6b8dda3e4c1c);
-		Pkt.WriteBEUInt64(0x881396ea6097278d);  // UUID of the modifier
-		Pkt.WriteBEDouble(Player->GetSprintingMaxSpeed() - Player->GetNormalMaxSpeed());
-		Pkt.WriteBEUInt8(2);
+		// Set all bits to 1 - makes everything relative
+		Pkt.WriteBEUInt8(static_cast<UInt8>(-1));
 	}
 	else
 	{
-		Pkt.WriteVarInt32(0);  // Modifier count
+		// Set all bits to 0 - make everything absolute
+		Pkt.WriteBEUInt8(0);
 	}
+
+	Pkt.WriteVarInt32(++m_OutstandingTeleportId);
+
+	// This teleport ID hasn't been confirmed yet
+	m_IsTeleportIdConfirmed = false;
 }
 
 
@@ -355,20 +504,44 @@ void cProtocol_1_9_0::SendPlayerMaxSpeed(void)
 
 void cProtocol_1_9_0::SendPlayerMoveLook(void)
 {
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktPlayerMoveLook);
 	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteBEDouble(Player->GetPosX());
-	Pkt.WriteBEDouble(Player->GetPosY());
-	Pkt.WriteBEDouble(Player->GetPosZ());
-	Pkt.WriteBEFloat(static_cast<float>(Player->GetYaw()));
-	Pkt.WriteBEFloat(static_cast<float>(Player->GetPitch()));
-	Pkt.WriteBEUInt8(0);
-	Pkt.WriteVarInt32(++m_OutstandingTeleportId);
+	SendPlayerMoveLook(Player->GetPosition(), static_cast<float>(Player->GetYaw()), static_cast<float>(Player->GetPitch()), false);
+}
 
-	// This teleport ID hasn't been confirmed yet
-	m_IsTeleportIdConfirmed = false;
+
+
+
+
+void cProtocol_1_9_0::SendPlayerPermissionLevel()
+{
+	const cPlayer & Player = *m_Client->GetPlayer();
+
+	cPacketizer Pkt(*this, pktEntityStatus);
+	Pkt.WriteBEUInt32(Player.GetUniqueID());
+	Pkt.WriteBEInt8([&Player]() -> signed char
+	{
+		if (Player.HasPermission("core.stop") || Player.HasPermission("core.reload") || Player.HasPermission("core.save-all"))
+		{
+			return 28;
+		}
+
+		if (Player.HasPermission("core.ban") || Player.HasPermission("core.deop") || Player.HasPermission("core.kick") || Player.HasPermission("core.op"))
+		{
+			return 27;
+		}
+
+		if (Player.HasPermission("cuberite.comandblock.set") || Player.HasPermission("core.clear") || Player.HasPermission("core.difficulty") || Player.HasPermission("core.effect") || Player.HasPermission("core.gamemode") || Player.HasPermission("core.tp") || Player.HasPermission("core.give"))
+		{
+			return 26;
+		}
+
+		if (Player.HasPermission("core.spawnprotect.bypass"))
+		{
+			return 25;
+		}
+
+		return 24;
+	}());
 }
 
 
@@ -395,16 +568,16 @@ void cProtocol_1_9_0::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
-void cProtocol_1_9_0::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
+void cProtocol_1_9_0::SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSoundEffect);
 	Pkt.WriteString(a_SoundName);
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
-	Pkt.WriteBEInt32(static_cast<Int32>(a_X * 8.0));
-	Pkt.WriteBEInt32(static_cast<Int32>(a_Y * 8.0));
-	Pkt.WriteBEInt32(static_cast<Int32>(a_Z * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.x * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.y * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.z * 8.0));
 	Pkt.WriteBEFloat(a_Volume);
 	Pkt.WriteBEUInt8(static_cast<Byte>(a_Pitch * 63));
 }
@@ -417,12 +590,20 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
+	const auto MobType = GetProtocolMobType(a_Mob.GetMobType());
+
+	// If the type is not valid in this protocol bail out:
+	if (MobType == 0)
+	{
+		return;
+	}
+
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
-	Pkt.WriteBEUInt8(static_cast<Byte>(GetProtocolMobType(a_Mob.GetMobType())));
+	Pkt.WriteBEUInt8(static_cast<Byte>(MobType));
 	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
@@ -441,16 +622,16 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocol_1_9_0::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cProtocol_1_9_0::SendThunderbolt(Vector3i a_Origin)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSpawnGlobalEntity);
 	Pkt.WriteVarInt32(0);  // EntityID = 0, always
 	Pkt.WriteBEUInt8(1);  // Type = Thunderbolt
-	Pkt.WriteBEDouble(a_BlockX);
-	Pkt.WriteBEDouble(a_BlockY);
-	Pkt.WriteBEDouble(a_BlockZ);
+	Pkt.WriteBEDouble(a_Origin.x);
+	Pkt.WriteBEDouble(a_Origin.y);
+	Pkt.WriteBEDouble(a_Origin.z);
 }
 
 
@@ -470,90 +651,94 @@ void cProtocol_1_9_0::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
+UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet) const
 {
 	switch (a_Packet)
 	{
-		case pktAttachEntity:          return 0x40;
-		case pktBlockAction:           return 0x0a;
-		case pktBlockBreakAnim:        return 0x08;
-		case pktBlockChange:           return 0x0b;
-		case pktBlockChanges:          return 0x10;
-		case pktCameraSetTo:           return 0x36;
-		case pktChatRaw:               return 0x0f;
-		case pktCollectEntity:         return 0x49;
-		case pktDestroyEntity:         return 0x30;
-		case pktDifficulty:            return 0x0d;
-		case pktDisconnectDuringGame:  return 0x1a;
-		case pktDisconnectDuringLogin: return 0x0;
-		case pktDisplayObjective:      return 0x38;
-		case pktEditSign:              return 0x2a;
-		case pktEncryptionRequest:     return 0x01;
-		case pktEntityAnimation:       return 0x06;
-		case pktEntityEffect:          return 0x4c;
-		case pktEntityEquipment:       return 0x3c;
-		case pktEntityHeadLook:        return 0x34;
-		case pktEntityLook:            return 0x27;
-		case pktEntityMeta:            return 0x39;
-		case pktEntityProperties:      return 0x4b;
-		case pktEntityRelMove:         return 0x25;
-		case pktEntityRelMoveLook:     return 0x26;
-		case pktEntityStatus:          return 0x1b;
-		case pktEntityVelocity:        return 0x3b;
-		case pktExperience:            return 0x3d;
-		case pktExplosion:             return 0x1c;
-		case pktGameMode:              return 0x1e;
-		case pktHeldItemChange:        return 0x37;
-		case pktInventorySlot:         return 0x16;
-		case pktJoinGame:              return 0x23;
-		case pktKeepAlive:             return 0x1f;
-		case pktLeashEntity:           return 0x3a;
-		case pktLoginSuccess:          return 0x02;
-		case pktMapData:               return 0x24;
-		case pktParticleEffect:        return 0x22;
-		case pktPingResponse:          return 0x01;
-		case pktPlayerAbilities:       return 0x2b;
-		case pktPlayerList:            return 0x2d;
-		case pktPlayerMaxSpeed:        return 0x4b;
-		case pktPlayerMoveLook:        return 0x2e;
-		case pktPluginMessage:         return 0x18;
-		case pktRemoveEntityEffect:    return 0x31;
-		case pktResourcePack:          return 0x32;
-		case pktRespawn:               return 0x33;
-		case pktScoreboardObjective:   return 0x3f;
-		case pktSpawnExperienceOrb:    return 0x01;
-		case pktSpawnGlobalEntity:     return 0x02;
-		case pktSpawnObject:           return 0x00;
-		case pktSpawnOtherPlayer:      return 0x05;
-		case pktSpawnPainting:         return 0x04;
-		case pktSpawnPosition:         return 0x43;
-		case pktSoundEffect:           return 0x19;
-		case pktSoundParticleEffect:   return 0x21;
-		case pktSpawnMob:              return 0x03;
-		case pktStartCompression:      return 0x03;
-		case pktStatistics:            return 0x07;
-		case pktStatusResponse:        return 0x00;
-		case pktTabCompletionResults:  return 0x0e;
-		case pktTeleportEntity:        return 0x4a;
-		case pktTimeUpdate:            return 0x44;
-		case pktTitle:                 return 0x45;
-		case pktUnloadChunk:           return 0x1d;
-		case pktUpdateBlockEntity:     return 0x09;
-		case pktUpdateHealth:          return 0x3e;
-		case pktUpdateScore:           return 0x42;
-		case pktUpdateSign:            return 0x46;
-		case pktUseBed:                return 0x2f;
-		case pktWeather:               return 0x1e;
-		case pktWindowClose:           return 0x12;
-		case pktWindowItems:           return 0x14;
-		case pktWindowOpen:            return 0x13;
-		case pktWindowProperty:        return 0x15;
+		case pktAttachEntity:           return 0x40;
+		case pktBlockAction:            return 0x0a;
+		case pktBlockBreakAnim:         return 0x08;
+		case pktBlockChange:            return 0x0b;
+		case pktBlockChanges:           return 0x10;
+		case pktBossBar:                return 0x0c;
+		case pktCameraSetTo:            return 0x36;
+		case pktChatRaw:                return 0x0f;
+		case pktCollectEntity:          return 0x49;
+		case pktDestroyEntity:          return 0x30;
+		case pktDifficulty:             return 0x0d;
+		case pktDisconnectDuringGame:   return 0x1a;
+		case pktDisconnectDuringLogin:  return 0x0;
+		case pktDisplayObjective:       return 0x38;
+		case pktEditSign:               return 0x2a;
+		case pktEncryptionRequest:      return 0x01;
+		case pktEntityAnimation:        return 0x06;
+		case pktEntityEffect:           return 0x4c;
+		case pktEntityEquipment:        return 0x3c;
+		case pktEntityHeadLook:         return 0x34;
+		case pktEntityLook:             return 0x27;
+		case pktEntityMeta:             return 0x39;
+		case pktEntityProperties:       return 0x4b;
+		case pktEntityRelMove:          return 0x25;
+		case pktEntityRelMoveLook:      return 0x26;
+		case pktEntityStatus:           return 0x1b;
+		case pktEntityVelocity:         return 0x3b;
+		case pktExperience:             return 0x3d;
+		case pktExplosion:              return 0x1c;
+		case pktGameMode:               return 0x1e;
+		case pktHeldItemChange:         return 0x37;
+		case pktInventorySlot:          return 0x16;
+		case pktJoinGame:               return 0x23;
+		case pktKeepAlive:              return 0x1f;
+		case pktLeashEntity:            return 0x3a;
+		case pktLoginSuccess:           return 0x02;
+		case pktMapData:                return 0x24;
+		case pktParticleEffect:         return 0x22;
+		case pktPingResponse:           return 0x01;
+		case pktPlayerAbilities:        return 0x2b;
+		case pktPlayerList:             return 0x2d;
+		case pktPlayerListHeaderFooter: return 0x48;
+		case pktPlayerMoveLook:         return 0x2e;
+		case pktPluginMessage:          return 0x18;
+		case pktRemoveEntityEffect:     return 0x31;
+		case pktResourcePack:           return 0x32;
+		case pktRespawn:                return 0x33;
+		case pktScoreboardObjective:    return 0x3f;
+		case pktSpawnExperienceOrb:     return 0x01;
+		case pktSpawnGlobalEntity:      return 0x02;
+		case pktSpawnObject:            return 0x00;
+		case pktSpawnOtherPlayer:       return 0x05;
+		case pktSpawnPainting:          return 0x04;
+		case pktSpawnPosition:          return 0x43;
+		case pktSoundEffect:            return 0x19;
+		case pktSoundParticleEffect:    return 0x21;
+		case pktSpawnMob:               return 0x03;
+		case pktStartCompression:       return 0x03;
+		case pktStatistics:             return 0x07;
+		case pktStatusResponse:         return 0x00;
+		case pktTabCompletionResults:   return 0x0e;
+		case pktTeleportEntity:         return 0x4a;
+		case pktTimeUpdate:             return 0x44;
+		case pktTitle:                  return 0x45;
+		case pktUnloadChunk:            return 0x1d;
+		case pktUpdateBlockEntity:      return 0x09;
+		case pktUpdateHealth:           return 0x3e;
+		case pktUpdateScore:            return 0x42;
+		case pktUpdateSign:             return 0x46;
+		case pktUseBed:                 return 0x2f;
+		case pktWeather:                return 0x1e;
+		case pktWindowClose:            return 0x12;
+		case pktWindowItems:            return 0x14;
+		case pktWindowOpen:             return 0x13;
+		case pktWindowProperty:         return 0x15;
 
 		// Unsupported packets
 		case pktUnlockRecipe:
 		{
 			break;
 		}
+
+		default:
+			break;
 	}
 	UNREACHABLE("Unsupported outgoing packet type");
 }
@@ -562,7 +747,51 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet)
 
 
 
-cProtocol::Version cProtocol_1_9_0::GetProtocolVersion()
+unsigned char cProtocol_1_9_0::GetProtocolEntityAnimation(const EntityAnimation a_Animation) const
+{
+	if (a_Animation == EntityAnimation::PlayerOffHandSwings)
+	{
+		return 3;
+	}
+
+	return Super::GetProtocolEntityAnimation(a_Animation);
+}
+
+
+
+
+
+signed char cProtocol_1_9_0::GetProtocolEntityStatus(const EntityAnimation a_Animation) const
+{
+	switch (a_Animation)
+	{
+		case EntityAnimation::ArmorStandGetsHit: return 32;
+		case EntityAnimation::ArrowTipSparkles: return 0;
+		case EntityAnimation::PawnShieldBlocks: return 29;
+		case EntityAnimation::PawnShieldBreaks: return 30;
+		case EntityAnimation::PawnThornsPricks: return 33;
+		default: return Super::GetProtocolEntityStatus(a_Animation);
+	}
+}
+
+
+
+
+
+UInt32 cProtocol_1_9_0::GetProtocolMobType(const eMonsterType a_MobType) const
+{
+	switch (a_MobType)
+	{
+		case mtShulker: return 69;
+		default:        return Super::GetProtocolMobType(a_MobType);
+	}
+}
+
+
+
+
+
+cProtocol::Version cProtocol_1_9_0::GetProtocolVersion() const
 {
 	return Version::v1_9_0;
 }
@@ -647,7 +876,7 @@ void cProtocol_1_9_0::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
 
-	m_Client->HandleAnimation(0);  // Packet exists solely for arm-swing notification
+	m_Client->HandleAnimation(Hand == MAIN_HAND);  // Packet exists solely for arm-swing notification (main and off-hand).
 }
 
 
@@ -658,14 +887,14 @@ void cProtocol_1_9_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
 
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
+	Vector3i Position;
+	if (!a_ByteBuffer.ReadXYZPosition64(Position))
 	{
 		return;
 	}
 
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Face);
-	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), Status);
+	m_Client->HandleLeftClick(Position, FaceIntToBlockFace(Face), Status);
 }
 
 
@@ -674,8 +903,8 @@ void cProtocol_1_9_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_9_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
+	Vector3i Position;
+	if (!a_ByteBuffer.ReadXYZPosition64(Position))
 	{
 		return;
 	}
@@ -685,7 +914,8 @@ void cProtocol_1_9_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, HandIntToEnum(Hand));
+
+	m_Client->HandleRightClick(Position, FaceIntToBlockFace(Face), {CursorX, CursorY, CursorZ}, Hand == MAIN_HAND);
 }
 
 
@@ -722,12 +952,12 @@ void cProtocol_1_9_0::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   ChatFlags);
 	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    ChatColors);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   SkinParts);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt,        UInt32,   MainHand);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt,        UInt32,  MainHand);
 
 	m_Client->SetLocale(Locale);
 	m_Client->SetViewDistance(ViewDistance);
 	m_Client->GetPlayer()->SetSkinParts(SkinParts);
-	m_Client->GetPlayer()->SetMainHand(static_cast<eMainHand>(MainHand));
+	m_Client->GetPlayer()->SetLeftHanded(MainHand == LEFT_HAND);
 	// TODO: Handle chat flags and chat colors
 }
 
@@ -756,14 +986,21 @@ void cProtocol_1_9_0::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8,  Action);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt,  UInt32, JumpBoost);
 
+	if (PlayerID != m_Client->GetPlayer()->GetUniqueID())
+	{
+		LOGD("Player \"%s\" attempted to action another entity - hacked client?", m_Client->GetUsername().c_str());
+		return;
+	}
+
 	switch (Action)
 	{
-		case 0: m_Client->HandleEntityCrouch(PlayerID, true);     break;  // Crouch
-		case 1: m_Client->HandleEntityCrouch(PlayerID, false);    break;  // Uncrouch
-		case 2: m_Client->HandleEntityLeaveBed(PlayerID);         break;  // Leave Bed
-		case 3: m_Client->HandleEntitySprinting(PlayerID, true);  break;  // Start sprinting
-		case 4: m_Client->HandleEntitySprinting(PlayerID, false); break;  // Stop sprinting
-		case 7: m_Client->HandleOpenHorseInventory(PlayerID);     break;  // Open horse inventory
+		case 0: return m_Client->HandleCrouch(true);
+		case 1: return m_Client->HandleCrouch(false);
+		case 2: return m_Client->HandleLeaveBed();
+		case 3: return m_Client->HandleSprint(true);
+		case 4: return m_Client->HandleSprint(false);
+		case 7: return m_Client->HandleOpenHorseInventory();
+		case 8: return m_Client->HandleStartElytraFlight();
 	}
 }
 
@@ -780,7 +1017,7 @@ void cProtocol_1_9_0::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 
 	if (m_IsTeleportIdConfirmed)
 	{
-		m_Client->HandlePlayerPos(PosX, PosY, PosZ, PosY + (m_Client->GetPlayer()->IsCrouched() ? 1.54 : 1.62), IsOnGround);
+		m_Client->HandlePlayerMove({PosX, PosY, PosZ}, IsOnGround);
 	}
 }
 
@@ -799,7 +1036,7 @@ void cProtocol_1_9_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 
 	if (m_IsTeleportIdConfirmed)
 	{
-		m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, PosY + 1.62, Yaw, Pitch, IsOnGround);
+		m_Client->HandlePlayerMoveLook({PosX, PosY, PosZ}, Yaw, Pitch, IsOnGround);
 	}
 }
 
@@ -851,8 +1088,8 @@ void cProtocol_1_9_0::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_9_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 {
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
+	Vector3i Position;
+	if (!a_ByteBuffer.ReadXYZPosition64(Position))
 	{
 		return;
 	}
@@ -864,7 +1101,7 @@ void cProtocol_1_9_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 		Lines[i] = Line;
 	}
 
-	m_Client->HandleUpdateSign(BlockX, BlockY, BlockZ, Lines[0], Lines[1], Lines[2], Lines[3]);
+	m_Client->HandleUpdateSign(Position, Lines[0], Lines[1], Lines[2], Lines[3]);
 }
 
 
@@ -881,6 +1118,7 @@ void cProtocol_1_9_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 		case 0:
 		{
 			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand);
+
 			if (Hand == MAIN_HAND)  // TODO: implement handling of off-hand actions; ignore them for now to avoid processing actions twice
 			{
 				m_Client->HandleUseEntity(EntityID, false);
@@ -918,7 +1156,7 @@ void cProtocol_1_9_0::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
 
-	m_Client->HandleUseItem(HandIntToEnum(Hand));
+	m_Client->HandleUseItem(Hand == MAIN_HAND);
 }
 
 
@@ -1009,10 +1247,62 @@ void cProtocol_1_9_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
+void cProtocol_1_9_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std::string_view a_Channel)
+{
+	if (a_Channel == "AutoCmd")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockX);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockY);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockZ);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, TrackOutput);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Mode);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, Conditional);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, Automatic);
+
+		m_Client->HandleCommandBlockBlockChange({BlockX, BlockY, BlockZ}, Command);
+	}
+	else if (a_Channel == "PickItem")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, InventorySlotIndex);
+	}
+	else if (a_Channel == "Struct")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockX);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockY);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockZ);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Action);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Mode);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Name);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, OffsetX);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, OffsetY);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, OffsetZ);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, SizeX);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, SizeY);
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt32, UInt32, SizeZ);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Mirror);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Rotation);
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Metadata);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, IgnoreEntities);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, ShowAir);
+		HANDLE_READ(a_ByteBuffer, ReadBool, bool, ShowBoundingBox);
+		HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Integrity);
+		HANDLE_READ(a_ByteBuffer, ReadVarInt64, UInt64, Seed);
+	}
+	else
+	{
+		Super::HandleVanillaPluginMessage(a_ByteBuffer, a_Channel);
+	}
+}
+
+
+
+
+
+void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBufferView a_Metadata) const
 {
 	// Parse into NBT:
-	cParsedNBT NBT(a_Metadata.data(), a_Metadata.size());
+	cParsedNBT NBT(a_Metadata);
 	if (!NBT.IsValid())
 	{
 		AString HexDump;
@@ -1213,25 +1503,6 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const AString & a_Metada
 
 
 
-eHand cProtocol_1_9_0::HandIntToEnum(Int32 a_Hand)
-{
-	// Convert hand parameter into eHand enum
-	switch (a_Hand)
-	{
-		case MAIN_HAND: return eHand::hMain;
-		case OFF_HAND: return eHand::hOff;
-		default:
-		{
-			ASSERT(!"Unknown hand value");
-			return eHand::hMain;
-		}
-	}
-}
-
-
-
-
-
 void cProtocol_1_9_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1259,7 +1530,252 @@ void cProtocol_1_9_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Ob
 
 
 
-void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
+void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
+{
+	if (a_BlockEntity.GetBlockType() == E_BLOCK_MOB_SPAWNER)
+	{
+		auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
+		a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+		a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+		a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
+		a_Writer.BeginCompound("SpawnData");  // New: SpawnData compound
+			a_Writer.AddString("id", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
+		a_Writer.EndCompound();
+		a_Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
+	}
+	else
+	{
+		Super::WriteBlockEntity(a_Writer, a_BlockEntity);
+	}
+}
+
+
+
+
+
+void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+{
+	// Common metadata:
+	Int8 Flags = 0;
+	if (a_Entity.IsOnFire())
+	{
+		Flags |= 0x01;
+	}
+	if (a_Entity.IsCrouched())
+	{
+		Flags |= 0x02;
+	}
+	if (a_Entity.IsSprinting())
+	{
+		Flags |= 0x08;
+	}
+	if (a_Entity.IsRclking())
+	{
+		Flags |= 0x10;
+	}
+	if (a_Entity.IsInvisible())
+	{
+		Flags |= 0x20;
+	}
+	if (a_Entity.IsElytraFlying())
+	{
+		Flags |= 0x80;
+	}
+	a_Pkt.WriteBEUInt8(0);  // Index 0
+	a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
+	a_Pkt.WriteBEInt8(Flags);
+
+	switch (a_Entity.GetEntityType())
+	{
+		case cEntity::etPlayer:
+		{
+			auto & Player = static_cast<const cPlayer &>(a_Entity);
+
+			// TODO Set player custom name to their name.
+			// Then it's possible to move the custom name of mobs to the entities
+			// and to remove the "special" player custom name.
+			a_Pkt.WriteBEUInt8(2);  // Index 2: Custom name
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
+			a_Pkt.WriteString(Player.GetName());
+
+			a_Pkt.WriteBEUInt8(6);  // Index 6: Health
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
+			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
+
+			a_Pkt.WriteBEUInt8(12);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
+
+			a_Pkt.WriteBEUInt8(13);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
+			break;
+		}
+		case cEntity::etPickup:
+		{
+			a_Pkt.WriteBEUInt8(5);  // Index 5: Item
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
+			WriteItem(a_Pkt, static_cast<const cPickup &>(a_Entity).GetItem());
+			break;
+		}
+		case cEntity::etMinecart:
+		{
+			a_Pkt.WriteBEUInt8(5);  // Index 5: Shaking power
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+
+			// The following expression makes Minecarts shake more with less health or higher damage taken
+			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
+			auto maxHealth = a_Entity.GetMaxHealth();
+			auto curHealth = a_Entity.GetHealth();
+			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
+
+			a_Pkt.WriteBEUInt8(6);  // Index 6: Shaking direction (doesn't seem to effect anything)
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(1);
+
+			a_Pkt.WriteBEUInt8(7);  // Index 7: Shake multiplier / damage taken
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
+			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));
+
+			if (Minecart.GetPayload() == cMinecart::mpNone)
+			{
+				auto & RideableMinecart = static_cast<const cRideableMinecart &>(Minecart);
+				const cItem & MinecartContent = RideableMinecart.GetContent();
+				if (!MinecartContent.IsEmpty())
+				{
+					a_Pkt.WriteBEUInt8(8);  // Index 8: Block ID and damage
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+					int Content = MinecartContent.m_ItemType;
+					Content |= MinecartContent.m_ItemDamage << 8;
+					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
+
+					a_Pkt.WriteBEUInt8(9);  // Index 9: Block ID and damage
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
+
+					a_Pkt.WriteBEUInt8(10);  // Index 10: Show block
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+					a_Pkt.WriteBool(true);
+				}
+			}
+			else if (Minecart.GetPayload() == cMinecart::mpFurnace)
+			{
+				a_Pkt.WriteBEUInt8(11);  // Index 11: Is powered
+				a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+				a_Pkt.WriteBool(static_cast<const cMinecartWithFurnace &>(Minecart).IsFueled());
+			}
+			break;
+		}  // case etMinecart
+
+		case cEntity::etProjectile:
+		{
+			auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
+			switch (Projectile.GetProjectileKind())
+			{
+				case cProjectileEntity::pkArrow:
+				{
+					a_Pkt.WriteBEUInt8(5);  // Index 5: Is critical
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+					a_Pkt.WriteBEInt8(static_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
+					break;
+				}
+				case cProjectileEntity::pkFirework:
+				{
+					a_Pkt.WriteBEUInt8(5);  // Index 5: Firework item used for this firework
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
+					WriteItem(a_Pkt, static_cast<const cFireworkEntity &>(Projectile).GetItem());
+					break;
+				}
+				case cProjectileEntity::pkSplashPotion:
+				{
+					a_Pkt.WriteBEUInt8(5);  // Index 5: Potion item which was thrown
+					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
+					WriteItem(a_Pkt, static_cast<const cSplashPotionEntity &>(Projectile).GetItem());
+				}
+				default:
+				{
+					break;
+				}
+			}
+			break;
+		}  // case etProjectile
+
+		case cEntity::etMonster:
+		{
+			WriteMobMetadata(a_Pkt, static_cast<const cMonster &>(a_Entity));
+			break;
+		}
+
+		case cEntity::etBoat:
+		{
+			auto & Boat = static_cast<const cBoat &>(a_Entity);
+
+			a_Pkt.WriteBEInt8(5);  // Index 6: Time since last hit
+			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetLastDamage()));
+
+			a_Pkt.WriteBEInt8(6);  // Index 7: Forward direction
+			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetForwardDirection()));
+
+			a_Pkt.WriteBEInt8(7);  // Index 8: Damage taken
+			a_Pkt.WriteBEInt8(METADATA_TYPE_FLOAT);
+			a_Pkt.WriteBEFloat(Boat.GetDamageTaken());
+
+			a_Pkt.WriteBEInt8(8);  // Index 9: Type
+			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
+
+			a_Pkt.WriteBEInt8(9);  // Index 10: Right paddle turning
+			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Boat.IsRightPaddleUsed());
+
+			a_Pkt.WriteBEInt8(10);  // Index 11: Left paddle turning
+			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Boat.IsLeftPaddleUsed());
+
+			break;
+		}  // case etBoat
+
+		case cEntity::etItemFrame:
+		{
+			auto & Frame = static_cast<const cItemFrame &>(a_Entity);
+			a_Pkt.WriteBEUInt8(5);  // Index 5: Item
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
+			WriteItem(a_Pkt, Frame.GetItem());
+			a_Pkt.WriteBEUInt8(6);  // Index 6: Rotation
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(Frame.GetItemRotation());
+			break;
+		}  // case etItemFrame
+
+		case cEntity::etEnderCrystal:
+		{
+			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
+			a_Pkt.WriteBEUInt8(5);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_OPTIONAL_POSITION);
+			a_Pkt.WriteBool(EnderCrystal.DisplaysBeam());
+			if (EnderCrystal.DisplaysBeam())
+			{
+				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
+			}
+			a_Pkt.WriteBEUInt8(6);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
+			break;
+		}  // case etEnderCrystal
+		default:
+		{
+			break;
+		}
+	}
+}
+
+
+
+
+
+void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 {
 	short ItemType = a_Item.m_ItemType;
 	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
@@ -1416,331 +1932,22 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item)
 
 	Writer.Finish();
 
-	AString Result = Writer.GetResult();
-	if (Result.size() == 0)
+	const auto Result = Writer.GetResult();
+	if (Result.empty())
 	{
 		a_Pkt.WriteBEInt8(0);
 		return;
 	}
-	a_Pkt.WriteBuf(Result.data(), Result.size());
+	a_Pkt.WriteBuf(Result);
 }
 
 
 
 
 
-void cProtocol_1_9_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity)
+void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
 {
-	cFastNBTWriter Writer;
-
-	switch (a_BlockEntity.GetBlockType())
-	{
-		case E_BLOCK_BEACON:
-		{
-			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);
-			Writer.AddInt("x",         BeaconEntity.GetPosX());
-			Writer.AddInt("y",         BeaconEntity.GetPosY());
-			Writer.AddInt("z",         BeaconEntity.GetPosZ());
-			Writer.AddInt("Primary",   BeaconEntity.GetPrimaryEffect());
-			Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
-			Writer.AddInt("Levels",    BeaconEntity.GetBeaconLevel());
-			Writer.AddString("id", "Beacon");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
-
-		case E_BLOCK_COMMAND_BLOCK:
-		{
-			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
-			Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
-			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
-			Writer.AddInt("x", CommandBlockEntity.GetPosX());
-			Writer.AddInt("y", CommandBlockEntity.GetPosY());
-			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
-			Writer.AddString("Command", CommandBlockEntity.GetCommand());
-			// You can set custom names for windows in Vanilla
-			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
-			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
-			Writer.AddString("CustomName", "@");
-			Writer.AddString("id", "Control");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			if (!CommandBlockEntity.GetLastOutput().empty())
-			{
-				Writer.AddString("LastOutput", Printf("{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str()));
-			}
-			break;
-		}
-
-		case E_BLOCK_HEAD:
-		{
-			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
-			Writer.AddInt("x", MobHeadEntity.GetPosX());
-			Writer.AddInt("y", MobHeadEntity.GetPosY());
-			Writer.AddInt("z", MobHeadEntity.GetPosZ());
-			Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
-			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
-			Writer.AddString("id", "Skull");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-
-			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
-			Writer.BeginCompound("Owner");
-				Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
-				Writer.AddString("Name", MobHeadEntity.GetOwnerName());
-				Writer.BeginCompound("Properties");
-					Writer.BeginList("textures", TAG_Compound);
-						Writer.BeginCompound("");
-							Writer.AddString("Signature", MobHeadEntity.GetOwnerTextureSignature());
-							Writer.AddString("Value", MobHeadEntity.GetOwnerTexture());
-						Writer.EndCompound();
-					Writer.EndList();
-				Writer.EndCompound();
-			Writer.EndCompound();
-			break;
-		}
-
-		case E_BLOCK_FLOWER_POT:
-		{
-			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
-			Writer.AddInt("x", FlowerPotEntity.GetPosX());
-			Writer.AddInt("y", FlowerPotEntity.GetPosY());
-			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
-			Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
-			Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
-			Writer.AddString("id", "FlowerPot");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
-
-		case E_BLOCK_MOB_SPAWNER:
-		{
-			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
-			Writer.AddInt("x", MobSpawnerEntity.GetPosX());
-			Writer.AddInt("y", MobSpawnerEntity.GetPosY());
-			Writer.AddInt("z", MobSpawnerEntity.GetPosZ());
-			Writer.BeginCompound("SpawnData");
-				Writer.AddString("id", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
-			Writer.EndCompound();
-			Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
-			Writer.AddString("id", "MobSpawner");
-			break;
-		}
-
-		default:
-		{
-			break;
-		}
-	}
-
-	Writer.Finish();
-	a_Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
-}
-
-
-
-
-
-void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
-{
-	// Common metadata:
-	Int8 Flags = 0;
-	if (a_Entity.IsOnFire())
-	{
-		Flags |= 0x01;
-	}
-	if (a_Entity.IsCrouched())
-	{
-		Flags |= 0x02;
-	}
-	if (a_Entity.IsSprinting())
-	{
-		Flags |= 0x08;
-	}
-	if (a_Entity.IsRclking())
-	{
-		Flags |= 0x10;
-	}
-	if (a_Entity.IsInvisible())
-	{
-		Flags |= 0x20;
-	}
-	a_Pkt.WriteBEUInt8(0);  // Index 0
-	a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
-	a_Pkt.WriteBEInt8(Flags);
-
-	switch (a_Entity.GetEntityType())
-	{
-		case cEntity::etPlayer:
-		{
-			auto & Player = static_cast<const cPlayer &>(a_Entity);
-
-			// TODO Set player custom name to their name.
-			// Then it's possible to move the custom name of mobs to the entities
-			// and to remove the "special" player custom name.
-			a_Pkt.WriteBEUInt8(2);  // Index 2: Custom name
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
-			a_Pkt.WriteString(Player.GetName());
-
-			a_Pkt.WriteBEUInt8(6);  // Index 6: Health
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
-			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
-
-			a_Pkt.WriteBEUInt8(12);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
-
-			a_Pkt.WriteBEUInt8(13);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetMainHand()));
-			break;
-		}
-		case cEntity::etPickup:
-		{
-			a_Pkt.WriteBEUInt8(5);  // Index 5: Item
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
-			WriteItem(a_Pkt, static_cast<const cPickup &>(a_Entity).GetItem());
-			break;
-		}
-		case cEntity::etMinecart:
-		{
-			a_Pkt.WriteBEUInt8(5);  // Index 5: Shaking power
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-
-			// The following expression makes Minecarts shake more with less health or higher damage taken
-			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
-			auto maxHealth = a_Entity.GetMaxHealth();
-			auto curHealth = a_Entity.GetHealth();
-			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
-
-			a_Pkt.WriteBEUInt8(6);  // Index 6: Shaking direction (doesn't seem to effect anything)
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(1);
-
-			a_Pkt.WriteBEUInt8(7);  // Index 7: Shake multiplier / damage taken
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
-			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));
-
-			if (Minecart.GetPayload() == cMinecart::mpNone)
-			{
-				auto & RideableMinecart = static_cast<const cRideableMinecart &>(Minecart);
-				const cItem & MinecartContent = RideableMinecart.GetContent();
-				if (!MinecartContent.IsEmpty())
-				{
-					a_Pkt.WriteBEUInt8(8);  // Index 8: Block ID and damage
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-					int Content = MinecartContent.m_ItemType;
-					Content |= MinecartContent.m_ItemDamage << 8;
-					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
-
-					a_Pkt.WriteBEUInt8(9);  // Index 9: Block ID and damage
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
-
-					a_Pkt.WriteBEUInt8(10);  // Index 10: Show block
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-					a_Pkt.WriteBool(true);
-				}
-			}
-			else if (Minecart.GetPayload() == cMinecart::mpFurnace)
-			{
-				a_Pkt.WriteBEUInt8(11);  // Index 11: Is powered
-				a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-				a_Pkt.WriteBool(static_cast<const cMinecartWithFurnace &>(Minecart).IsFueled());
-			}
-			break;
-		}  // case etMinecart
-
-		case cEntity::etProjectile:
-		{
-			auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
-			switch (Projectile.GetProjectileKind())
-			{
-				case cProjectileEntity::pkArrow:
-				{
-					a_Pkt.WriteBEUInt8(5);  // Index 5: Is critical
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-					a_Pkt.WriteBEInt8(static_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
-					break;
-				}
-				case cProjectileEntity::pkFirework:
-				{
-					a_Pkt.WriteBEUInt8(5);  // Index 5: Firework item used for this firework
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
-					WriteItem(a_Pkt, static_cast<const cFireworkEntity &>(Projectile).GetItem());
-					break;
-				}
-				case cProjectileEntity::pkSplashPotion:
-				{
-					a_Pkt.WriteBEUInt8(5);  // Index 5: Potion item which was thrown
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
-					WriteItem(a_Pkt, static_cast<const cSplashPotionEntity &>(Projectile).GetItem());
-				}
-				default:
-				{
-					break;
-				}
-			}
-			break;
-		}  // case etProjectile
-
-		case cEntity::etMonster:
-		{
-			WriteMobMetadata(a_Pkt, static_cast<const cMonster &>(a_Entity));
-			break;
-		}
-
-		case cEntity::etBoat:
-		{
-			auto & Boat = static_cast<const cBoat &>(a_Entity);
-
-			a_Pkt.WriteBEInt8(5);  // Index 6: Time since last hit
-			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetLastDamage()));
-
-			a_Pkt.WriteBEInt8(6);  // Index 7: Forward direction
-			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetForwardDirection()));
-
-			a_Pkt.WriteBEInt8(7);  // Index 8: Damage taken
-			a_Pkt.WriteBEInt8(METADATA_TYPE_FLOAT);
-			a_Pkt.WriteBEFloat(Boat.GetDamageTaken());
-
-			a_Pkt.WriteBEInt8(8);  // Index 9: Type
-			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
-
-			a_Pkt.WriteBEInt8(9);  // Index 10: Right paddle turning
-			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Boat.IsRightPaddleUsed());
-
-			a_Pkt.WriteBEInt8(10);  // Index 11: Left paddle turning
-			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Boat.IsLeftPaddleUsed());
-
-			break;
-		}  // case etBoat
-
-		case cEntity::etItemFrame:
-		{
-			auto & Frame = static_cast<const cItemFrame &>(a_Entity);
-			a_Pkt.WriteBEUInt8(5);  // Index 5: Item
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
-			WriteItem(a_Pkt, Frame.GetItem());
-			a_Pkt.WriteBEUInt8(6);  // Index 6: Rotation
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Frame.GetItemRotation());
-			break;
-		}  // case etItemFrame
-
-		default:
-		{
-			break;
-		}
-	}
-}
-
-
-
-
-
-void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
-{
-	// Living Enitiy Metadata
+	// Living entity metadata
 	if (a_Mob.HasCustomName())
 	{
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
@@ -1950,6 +2157,24 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtSheep
 
+		case mtSkeleton:
+		{
+			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
+			a_Pkt.WriteBEUInt8(11);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(0);
+
+			// Index 5 and 12 used for charging bow client animation.
+			a_Pkt.WriteBEUInt8(5);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEInt8(0x02 | (Skeleton.IsChargingBow() ? 0x01 : 0x00));
+
+			a_Pkt.WriteBEUInt8(12);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBool(Skeleton.IsChargingBow());
+			break;
+		}
+
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -2081,28 +2306,50 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 			break;
 		}  // case mtZombieVillager
 
-		default: break;
+		case mtBlaze:
+		case mtElderGuardian:
+		case mtGuardian:
+		{
+			// TODO: Mobs with extra fields that aren't implemented
+			break;
+		}
+
+		case mtCat:
+
+		case mtDonkey:
+
+		case mtEndermite:
+
+		case mtMule:
+
+		case mtStray:
+
+		case mtSkeletonHorse:
+		case mtZombieHorse:
+
+		case mtShulker:
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			ASSERT(!"cProtocol_1_9::WriteMobMetadata: received unimplemented type");
+			break;
+		}
+
+		case mtCaveSpider:
+		case mtEnderDragon:
+		case mtGiant:
+		case mtIronGolem:
+		case mtMooshroom:
+		case mtSilverfish:
+		case mtSnowGolem:
+		case mtSpider:
+		case mtSquid:
+		{
+			// Entities without additional metadata
+			break;
+		}
+
+		default: UNREACHABLE("cProtocol_1_9::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
-}
-
-
-
-
-
-void cProtocol_1_9_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity)
-{
-	if (!a_Entity.IsMob())
-	{
-		// No properties for anything else than mobs
-		a_Pkt.WriteBEInt32(0);
-		return;
-	}
-
-	// const cMonster & Mob = (const cMonster &)a_Entity;
-
-	// TODO: Send properties and modifiers based on the mob type
-
-	a_Pkt.WriteBEInt32(0);  // NumProperties
 }
 
 
@@ -2130,7 +2377,7 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 	// Send the spawn position:
 	{
 		cPacketizer Pkt(*this, pktSpawnPosition);
-		Pkt.WriteXYZPosition64(FloorC(a_World.GetSpawnX()), FloorC(a_World.GetSpawnY()), FloorC(a_World.GetSpawnZ()));
+		Pkt.WriteXYZPosition64(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ());
 	}
 
 	// Send the server difficulty:
@@ -2138,16 +2385,13 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 		cPacketizer Pkt(*this, pktDifficulty);
 		Pkt.WriteBEInt8(1);
 	}
-
-	// Send player abilities:
-	SendPlayerAbilities();
 }
 
 
 
 
 
-cProtocol::Version cProtocol_1_9_1::GetProtocolVersion()
+cProtocol::Version cProtocol_1_9_1::GetProtocolVersion() const
 {
 	return Version::v1_9_1;
 }
@@ -2159,7 +2403,7 @@ cProtocol::Version cProtocol_1_9_1::GetProtocolVersion()
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_2:
 
-cProtocol::Version cProtocol_1_9_2::GetProtocolVersion()
+cProtocol::Version cProtocol_1_9_2::GetProtocolVersion() const
 {
 	return Version::v1_9_2;
 }
@@ -2171,19 +2415,19 @@ cProtocol::Version cProtocol_1_9_2::GetProtocolVersion()
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_4:
 
-void cProtocol_1_9_4::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+void cProtocol_1_9_4::SendUpdateSign(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	// 1.9.4 removed the update sign packet and now uses Update Block Entity
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
-	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockPos);
 	Pkt.WriteBEUInt8(9);  // Action 9 - update sign
 
 	cFastNBTWriter Writer;
-	Writer.AddInt("x",        a_BlockX);
-	Writer.AddInt("y",        a_BlockY);
-	Writer.AddInt("z",        a_BlockZ);
+	Writer.AddInt("x",        a_BlockPos.x);
+	Writer.AddInt("y",        a_BlockPos.y);
+	Writer.AddInt("z",        a_BlockPos.z);
 	Writer.AddString("id", "Sign");
 
 	Json::Value Line1;
@@ -2200,32 +2444,32 @@ void cProtocol_1_9_4::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	Writer.AddString("Text4", JsonUtils::WriteFastString(Line4));
 
 	Writer.Finish();
-	Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
+	Pkt.WriteBuf(Writer.GetResult());
 }
 
 
 
 
 
-cProtocol::Version cProtocol_1_9_4::GetProtocolVersion()
-{
-	return Version::v1_9_4;
-}
-
-
-
-
-
-UInt32 cProtocol_1_9_4::GetPacketID(cProtocol::ePacketType a_Packet)
+UInt32 cProtocol_1_9_4::GetPacketID(cProtocol::ePacketType a_Packet) const
 {
 	switch (a_Packet)
 	{
-		case pktCollectEntity:    return 0x48;
-		case pktEntityEffect:     return 0x4b;
-		case pktEntityProperties: return 0x4a;
-		case pktPlayerMaxSpeed:   return 0x4a;
-		case pktTeleportEntity:   return 0x49;
+		case pktCollectEntity:          return 0x48;
+		case pktEntityEffect:           return 0x4b;
+		case pktEntityProperties:       return 0x4a;
+		case pktPlayerListHeaderFooter: return 0x47;
+		case pktTeleportEntity:         return 0x49;
 
 		default: return Super::GetPacketID(a_Packet);
 	}
+}
+
+
+
+
+
+cProtocol::Version cProtocol_1_9_4::GetProtocolVersion() const
+{
+	return Version::v1_9_4;
 }

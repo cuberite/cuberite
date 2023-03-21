@@ -10,7 +10,7 @@
 
 
 cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	Super(pkArrow, a_Creator, a_Pos, a_Speed, 0.5, 0.5),
+	Super(pkArrow, a_Creator, a_Pos, a_Speed, 0.5f, 0.5f),
 	m_PickupState(psNoPickup),
 	m_DamageCoeff(2),
 	m_IsCritical(false),
@@ -193,6 +193,10 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			m_IsInGround = false;  // Yes, begin simulating physics again
 		}
+	}
+	else if (IsInWater())  // Arrow in water?
+	{
+		ApplyFriction(m_Speed, ARROW_WATER_FRICTION, static_cast<float>(a_Dt.count()));  // Yes, slow down arrow
 	}
 }
 

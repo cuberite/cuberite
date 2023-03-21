@@ -1,10 +1,15 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "BlockSlab.h"
+#include "BlockStairs.h"
 #include "../BlockInfo.h"
 #include "../Chunk.h"
+#include "Defines.h"
+#include "Entities/Player.h"
 #include "Mixins.h"
 #include "ChunkInterface.h"
+#include "World.h"
 
 
 
@@ -101,48 +106,6 @@ private:
 
 
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) const override
-	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
-		return true;
-	}
-
-
-
-
-
-	/** Converts the block face of the neighbor to which the button is attached, to the block meta for this button. */
-	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
-	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_YP: return 0x5;
-			case BLOCK_FACE_ZM: return 0x4;
-			case BLOCK_FACE_ZP: return 0x3;
-			case BLOCK_FACE_XM: return 0x2;
-			case BLOCK_FACE_XP: return 0x1;
-			case BLOCK_FACE_YM: return 0x0;
-			case BLOCK_FACE_NONE:
-			{
-				ASSERT(!"Unhandled block face!");
-				return 0x0;
-			}
-		}
-		UNREACHABLE("Unsupported block face");
-	}
-
-
-
-
-
 	/** Converts the block meta of this button into a block face of the neighbor to which the button is attached. */
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
@@ -166,16 +129,45 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		auto Meta = a_Chunk.GetMeta(a_RelPos);
-		auto SupportRelPos = AddFaceDirection(a_RelPos, BlockMetaDataToBlockFace(Meta), true);
-		if (!cChunkDef::IsValidHeight(SupportRelPos.y))
+		auto SupportRelPos = AddFaceDirection(a_Position, BlockMetaDataToBlockFace(a_Meta), true);
+		if (!cChunkDef::IsValidHeight(SupportRelPos))
 		{
 			return false;
 		}
 		BLOCKTYPE SupportBlockType;
-		a_Chunk.UnboundedRelGetBlockType(SupportRelPos, SupportBlockType);
+		NIBBLETYPE SupportBlockMeta;
+		a_Chunk.UnboundedRelGetBlock(SupportRelPos, SupportBlockType, SupportBlockMeta);
+		eBlockFace Face = BlockMetaDataToBlockFace(a_Meta);
+
+		// upside down slabs
+		if (cBlockSlabHandler::IsAnySlabType(SupportBlockType))
+		{
+			return (Face == BLOCK_FACE_YP) && (SupportBlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN);
+		}
+
+		// stairs (top and sides)
+		if (cBlockStairsHandler::IsAnyStairType(SupportBlockType))
+		{
+			switch (Face)
+			{
+				case eBlockFace::BLOCK_FACE_YP:
+					return (SupportBlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+				case eBlockFace::BLOCK_FACE_XP:
+					return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_XP);
+				case eBlockFace::BLOCK_FACE_XM:
+					return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_XM);
+				case eBlockFace::BLOCK_FACE_ZP:
+					return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_ZP);
+				case eBlockFace::BLOCK_FACE_ZM:
+					return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_ZM);
+				default:
+				{
+					return false;
+				}
+			}
+		}
 
 		return cBlockInfo::FullyOccupiesVoxel(SupportBlockType);
 	}
@@ -194,7 +186,7 @@ private:
 	The given block type is checked when the task is executed to ensure the position still contains a button. */
 	static void QueueButtonRelease(cWorld & a_ButtonWorld, const Vector3i a_Position, const BLOCKTYPE a_BlockType)
 	{
-		const auto TickDelay = (a_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
+		const auto TickDelay = (a_BlockType == E_BLOCK_STONE_BUTTON) ? 20_tick : 30_tick;
 		a_ButtonWorld.ScheduleTask(
 			TickDelay,
 			[a_Position, a_BlockType](cWorld & a_World)
@@ -265,10 +257,9 @@ private:
 			case BLOCK_FACE_YP: return { 0.5, 0, 0.5 };
 			case BLOCK_FACE_NONE:
 			{
-				ASSERT(!"Unhandled block face!");
-				return { 0, 0, 0 };
+				break;
 			}
 		}
-		UNREACHABLE(!"Unhandled block face!");
+		UNREACHABLE("Unhandled block face!");
 	}
 } ;

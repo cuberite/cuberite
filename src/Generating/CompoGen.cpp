@@ -329,7 +329,7 @@ void cCompoGenNether::InitializeCompoGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cCompoGenCache:
 
-cCompoGenCache::cCompoGenCache(cTerrainCompositionGenPtr a_Underlying, int a_CacheSize) :
+cCompoGenCache::cCompoGenCache(std::unique_ptr<cTerrainCompositionGen> a_Underlying, int a_CacheSize) :
 	m_Underlying(std::move(a_Underlying)),
 	m_CacheSize(a_CacheSize),
 	m_CacheOrder(new int[ToUnsigned(a_CacheSize)]),
@@ -364,13 +364,13 @@ cCompoGenCache::~cCompoGenCache()
 
 void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 	if (((m_NumHits + m_NumMisses) % 1024) == 10)
 	{
 		// LOGD("CompoGenCache: %d hits, %d misses, saved %.2f %%", m_NumHits, m_NumMisses, 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
 		// LOGD("CompoGenCache: Avg cache chain length: %.2f", static_cast<float>(m_TotalChain) / m_NumHits);
 	}
-	#endif  // _DEBUG
+	#endif  // !NDEBUG
 
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
@@ -430,7 +430,3 @@ void cCompoGenCache::InitializeCompoGen(cIniFile & a_IniFile)
 {
 	m_Underlying->InitializeCompoGen(a_IniFile);
 }
-
-
-
-

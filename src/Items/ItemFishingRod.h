@@ -49,17 +49,14 @@ protected:
 
 
 
-class cItemFishingRodHandler:
+class cItemFishingRodHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemFishingRodHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 
@@ -72,7 +69,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
@@ -108,7 +105,7 @@ public:
 
 
 	/** Reels back the fishing line, reeling any attached mob, or creating fished loot, or just breaking the fishing rod. */
-	void ReelIn(cWorld & a_World, cPlayer & a_Player)
+	void ReelIn(cWorld & a_World, cPlayer & a_Player) const
 	{
 		cFloaterCallback FloaterInfo;
 		a_World.DoWithEntityByID(a_Player.GetFloaterID(), FloaterInfo);
@@ -140,7 +137,7 @@ public:
 
 
 	/** Reels back the entity, specified by the ID, and damages the fishing rod accordingly. */
-	void ReelInEntity(cWorld & a_World, cPlayer & a_Player, UInt32 a_EntityID)
+	void ReelInEntity(cWorld & a_World, cPlayer & a_Player, UInt32 a_EntityID) const
 	{
 		auto PlayerPos = a_Player.GetPosition();
 		a_World.DoWithEntityByID(a_EntityID, [=](cEntity & a_Entity)
@@ -157,7 +154,7 @@ public:
 
 
 
-	void ReelInLoot(cWorld & a_World, cPlayer & a_Player, const Vector3d a_FloaterBitePos)
+	void ReelInLoot(cWorld & a_World, cPlayer & a_Player, const Vector3d a_FloaterBitePos) const
 	{
 		auto LotSLevel = std::min(a_Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLuckOfTheSea), 3u);
 
@@ -175,7 +172,7 @@ public:
 				case 0:
 				{
 					cItem Bow(E_ITEM_BOW, 1, Random.RandInt<short>(50));
-					Bow.EnchantByXPLevels(Random.RandInt(22, 30), GetRandomProvider());
+					Bow.EnchantByXPLevels(Random.RandInt(22U, 30U), GetRandomProvider());
 					Drops.Add(Bow);
 					break;
 				}
@@ -189,7 +186,7 @@ public:
 				case 2:
 				{
 					cItem Rod(E_ITEM_FISHING_ROD, 1, Random.RandInt<short>(50));
-					Rod.EnchantByXPLevels(Random.RandInt(22, 30), GetRandomProvider());
+					Rod.EnchantByXPLevels(Random.RandInt(22U, 30U), GetRandomProvider());
 					Drops.Add(Rod);
 					break;
 				}
@@ -210,7 +207,7 @@ public:
 				}
 			}
 
-			a_Player.GetStatManager().AddValue(Statistic::TreasureFished, 1);
+			a_Player.GetStatistics().Custom[CustomStatistic::TreasureFished]++;
 		}
 		else if (ItemCategory < JunkChances[LotSLevel])
 		{
@@ -262,7 +259,7 @@ public:
 				Drops.Add(cItem(E_BLOCK_TRIPWIRE_HOOK));
 			}
 
-			a_Player.GetStatManager().AddValue(Statistic::JunkFished, 1);
+			a_Player.GetStatistics().Custom[CustomStatistic::JunkFished]++;
 		}
 		else
 		{
@@ -284,11 +281,13 @@ public:
 				Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_FISH));
 			}
 
-			a_Player.GetStatManager().AddValue(Statistic::FishCaught, 1);
+			a_Player.GetStatistics().Custom[CustomStatistic::FishCaught]++;
 		}
 
+		auto Experience = Random.RandInt(1, 6);
+
 		// Check with plugins if this loot is acceptable:
-		if (cRoot::Get()->GetPluginManager()->CallHookPlayerFishing(a_Player, Drops))
+		if (cRoot::Get()->GetPluginManager()->CallHookPlayerFishing(a_Player, Drops, Experience))
 		{
 			return;
 		}
@@ -298,10 +297,10 @@ public:
 		const float FISH_SPEED_MULT = 2.25f;
 		Vector3d FlyDirection = (a_Player.GetEyePosition() - FloaterPos).addedY(1.0f) * FISH_SPEED_MULT;
 		a_World.SpawnItemPickups(Drops, FloaterPos, FlyDirection);
-		a_World.SpawnExperienceOrb(a_Player.GetPosition(), Random.RandInt(1, 6));
+		a_World.SpawnExperienceOrb(a_Player.GetPosition(), Experience);
 		a_Player.UseEquippedItem(1);
 
 		// Notify plugins
-		cRoot::Get()->GetPluginManager()->CallHookPlayerFished(a_Player, Drops);
+		cRoot::Get()->GetPluginManager()->CallHookPlayerFished(a_Player, Drops, Experience);
 	}
 } ;

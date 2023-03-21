@@ -33,7 +33,7 @@ private:
 			return false;
 		}
 
-		a_Player.GetStatManager().AddValue(Statistic::EatCakeSlice);
+		a_Player.GetStatistics().Custom[CustomStatistic::EatCakeSlice]++;
 		if (Meta >= 5)
 		{
 			a_ChunkInterface.DigBlock(a_WorldInterface, a_BlockPos, &a_Player);
@@ -49,7 +49,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Give nothing
 		return {};

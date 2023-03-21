@@ -48,7 +48,7 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 
 		BLOCKTYPE pistonBlock;
 		NIBBLETYPE pistonMeta;
-		a_World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta);
+		a_World.GetBlockTypeMeta(a_BlockPos, pistonBlock, pistonMeta);
 		a_World.BroadcastBlockAction(a_BlockPos, PistonExtendAction, pistonMeta, pistonBlock);
 	}
 
@@ -56,11 +56,11 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 	// However, we don't confuse animation with the underlying state of the world, so emulate by delaying 1 tick
 	// (Probably why vanilla has so many dupe glitches with sand and pistons lolol)
 
-	a_World.ScheduleTask(1, [a_BlockPos](cWorld & World)
+	a_World.ScheduleTask(1_tick, [a_BlockPos](cWorld & World)
 		{
 			BLOCKTYPE pistonBlock;
 			NIBBLETYPE pistonMeta;
-			World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta);
+			World.GetBlockTypeMeta(a_BlockPos, pistonBlock, pistonMeta);
 
 			if ((pistonBlock != E_BLOCK_PISTON) && !IsSticky(pistonBlock))
 			{
@@ -86,11 +86,8 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 
 			// Set the extension and the piston base correctly
 			Vector3i extensionPos = a_BlockPos + pushDir;
-			World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta | 0x8);
-			World.SetBlock(
-				extensionPos.x, extensionPos.y, extensionPos.z,
-				E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0)
-			);
+			World.SetBlock(a_BlockPos, pistonBlock, pistonMeta | 0x8);
+			World.SetBlock(extensionPos, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0));
 
 			// Play sound effect only if extended successfully
 			World.BroadcastSoundEffect("block.piston.extend", a_BlockPos, 0.5f, 0.7f);
@@ -107,15 +104,15 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 	{
 		BLOCKTYPE pistonBlock;
 		NIBBLETYPE pistonMeta;
-		a_World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta);
+		a_World.GetBlockTypeMeta(a_BlockPos, pistonBlock, pistonMeta);
 		a_World.BroadcastBlockAction(a_BlockPos, PistonRetractAction, pistonMeta, pistonBlock);
 	}
 
-	a_World.ScheduleTask(1, [a_BlockPos](cWorld & World)
+	a_World.ScheduleTask(1_tick, [a_BlockPos](cWorld & World)
 		{
 			BLOCKTYPE pistonBlock;
 			NIBBLETYPE pistonMeta;
-			World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, pistonBlock, pistonMeta);
+			World.GetBlockTypeMeta(a_BlockPos, pistonBlock, pistonMeta);
 
 			if ((pistonBlock != E_BLOCK_PISTON) && !IsSticky(pistonBlock))
 			{
@@ -192,7 +189,7 @@ void cBlockPistonHandler::PushBlocks(
 	NIBBLETYPE moveMeta;
 	for (auto & moveBlockPos : sortedBlocks)
 	{
-		a_World.GetBlockTypeMeta(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, moveBlock, moveMeta);
+		a_World.GetBlockTypeMeta(moveBlockPos, moveBlock, moveMeta);
 
 		if (cBlockInfo::IsPistonBreakable(moveBlock))
 		{
@@ -202,9 +199,9 @@ void cBlockPistonHandler::PushBlocks(
 		else
 		{
 			// Not breakable, just move it
-			a_World.SetBlock(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, E_BLOCK_AIR, 0);
+			a_World.SetBlock(moveBlockPos, E_BLOCK_AIR, 0);
 			moveBlockPos += a_PushDir;
-			a_World.SetBlock(moveBlockPos.x, moveBlockPos.y, moveBlockPos.z, moveBlock, moveMeta);
+			a_World.SetBlock(moveBlockPos, moveBlock, moveMeta);
 		}
 	}
 }
@@ -218,6 +215,12 @@ bool cBlockPistonHandler::CanPushBlock(
 	Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
 )
 {
+	if (!cChunkDef::IsValidHeight(a_BlockPos))
+	{
+		// Can't push a void block.
+		return false;
+	}
+
 	const static std::array<Vector3i, 6> pushingDirs =
 	{
 		{
@@ -229,12 +232,7 @@ bool cBlockPistonHandler::CanPushBlock(
 
 	BLOCKTYPE currBlock;
 	NIBBLETYPE currMeta;
-	a_World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, currBlock, currMeta);
-
-	if (!cChunkDef::IsValidHeight(a_BlockPos.y))
-	{
-		return !a_RequirePushable;
-	}
+	a_World.GetBlockTypeMeta(a_BlockPos, currBlock, currMeta);
 
 	if (currBlock == E_BLOCK_AIR)
 	{
@@ -301,7 +299,7 @@ void cBlockPistonHandler::OnBroken(
 
 	const auto Extension = a_BlockPos + MetadataToOffset(a_OldBlockMeta);
 	if (
-		cChunkDef::IsValidHeight(Extension.y) &&
+		cChunkDef::IsValidHeight(Extension) &&
 		(a_ChunkInterface.GetBlock(Extension) == E_BLOCK_PISTON_EXTENSION)
 	)
 	{
@@ -326,7 +324,7 @@ void cBlockPistonHeadHandler::OnBroken(
 {
 	UNUSED(a_Digger);
 	const auto Base = a_BlockPos - cBlockPistonHandler::MetadataToOffset(a_OldBlockMeta);
-	if (!cChunkDef::IsValidHeight(Base.y))
+	if (!cChunkDef::IsValidHeight(Base))
 	{
 		return;
 	}
@@ -343,7 +341,7 @@ void cBlockPistonHeadHandler::OnBroken(
 
 
 
-cItems cBlockPistonHeadHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, const cEntity * a_Digger, const cItem * a_Tool) const
+cItems cBlockPistonHeadHandler::ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const
 {
 	// Give a normal\sticky piston base, not piston extension
 	// With 1.7, the item forms of these technical blocks have been removed, so giving someone this will crash their client...

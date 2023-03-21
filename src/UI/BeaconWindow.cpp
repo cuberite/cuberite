@@ -67,8 +67,8 @@ void cBeaconWindow::OpenedByPlayer(cPlayer & a_Player)
 	Super::OpenedByPlayer(a_Player);
 
 	a_Player.GetClientHandle()->SendWindowProperty(*this, 0, m_Beacon->GetBeaconLevel());
-	a_Player.GetClientHandle()->SendWindowProperty(*this, 1, m_Beacon->GetPrimaryEffect());
-	a_Player.GetClientHandle()->SendWindowProperty(*this, 2, m_Beacon->GetSecondaryEffect());
+	a_Player.GetClientHandle()->SendWindowProperty(*this, 1, static_cast<short>(m_Beacon->GetPrimaryEffect()));
+	a_Player.GetClientHandle()->SendWindowProperty(*this, 2, static_cast<short>(m_Beacon->GetSecondaryEffect()));
 }
 
 

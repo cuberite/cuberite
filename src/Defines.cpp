@@ -41,7 +41,6 @@ const char * ClickActionToString(int a_ClickAction)
 		case caRightPaintEnd:                return "caRightPaintEnd";
 		case caMiddlePaintEnd:               return "caMiddlePaintEnd";
 		case caDblClick:                     return "caDblClick";
-
 		case caUnknown:                      return "caUnknown";
 	}
 	UNREACHABLE("Unknown click action");
@@ -273,6 +272,7 @@ AString DamageTypeToString(eDamageType a_DamageType)
 		case dtAdmin:           return "dtAdmin";
 		case dtAttack:          return "dtAttack";
 		case dtCactusContact:   return "dtCactusContact";
+		case dtMagmaContact:    return "dtMagmaContact";
 		case dtDrowning:        return "dtDrowning";
 		case dtEnderPearl:      return "dtEnderPearl";
 		case dtEnvironment:     return "dtEnvironment";
@@ -323,6 +323,7 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 		{ dtSuffocating,     "dtSuffocation"},
 		{ dtStarving,        "dtStarving"},
 		{ dtCactusContact,   "dtCactusContact"},
+		{ dtMagmaContact,    "dtMagmaContact"},
 		{ dtLavaContact,     "dtLavaContact"},
 		{ dtPoisoning,       "dtPoisoning"},
 		{ dtWithering,       "dtWithering"},
@@ -350,6 +351,7 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 		{ dtCactusContact, "dtCactus"},
 		{ dtCactusContact, "dtCactuses"},
 		{ dtCactusContact, "dtCacti"},
+		{ dtMagmaContact,  "dtMagma"},
 		{ dtLavaContact,   "dtLava"},
 		{ dtPoisoning,     "dtPoison"},
 		{ dtWithering,     "dtWither"},
@@ -375,42 +377,34 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 
 void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBlockFace a_BlockFace, bool a_bInverse)
 {
-	if (!a_bInverse)
+	LOGWARNING("AddFaceDirection with X/Y/Z parameters is deprecated, use the vector version");
+
+	const auto Offset = AddFaceDirection({ a_BlockX, a_BlockY, a_BlockZ }, a_BlockFace, a_bInverse);
+	a_BlockX = Offset.x;
+	a_BlockY = Offset.y;
+	a_BlockZ = Offset.z;
+}
+
+
+
+
+
+Vector3i AddFaceDirection(const Vector3i a_Position, const eBlockFace a_BlockFace, const bool a_InvertDirection)
+{
+	const int Offset = a_InvertDirection ? -1 : 1;
+
+	switch (a_BlockFace)
 	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_YP: a_BlockY++; break;
-			case BLOCK_FACE_YM: a_BlockY--; break;
-			case BLOCK_FACE_ZM: a_BlockZ--; break;
-			case BLOCK_FACE_ZP: a_BlockZ++; break;
-			case BLOCK_FACE_XP: a_BlockX++; break;
-			case BLOCK_FACE_XM: a_BlockX--; break;
-			case BLOCK_FACE_NONE:
-			{
-				LOGWARNING("%s: Unknown face: %d", __FUNCTION__, a_BlockFace);
-				ASSERT(!"AddFaceDirection(): Unknown face");
-				break;
-			}
-		}
+		case BLOCK_FACE_YP: return a_Position.addedY(+Offset);
+		case BLOCK_FACE_YM: return a_Position.addedY(-Offset);
+		case BLOCK_FACE_ZM: return a_Position.addedZ(-Offset);
+		case BLOCK_FACE_ZP: return a_Position.addedZ(+Offset);
+		case BLOCK_FACE_XP: return a_Position.addedX(+Offset);
+		case BLOCK_FACE_XM: return a_Position.addedX(-Offset);
+		case BLOCK_FACE_NONE: break;
 	}
-	else
-	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_YP: a_BlockY--; break;
-			case BLOCK_FACE_YM: a_BlockY++; break;
-			case BLOCK_FACE_ZM: a_BlockZ++; break;
-			case BLOCK_FACE_ZP: a_BlockZ--; break;
-			case BLOCK_FACE_XP: a_BlockX--; break;
-			case BLOCK_FACE_XM: a_BlockX++; break;
-			case BLOCK_FACE_NONE:
-			{
-				LOGWARNING("%s: Unknown inv face: %d", __FUNCTION__, a_BlockFace);
-				ASSERT(!"AddFaceDirection(): Unknown face");
-				break;
-			}
-		}
-	}
+
+	UNREACHABLE("Unsupported block face");
 }
 
 
@@ -533,6 +527,7 @@ bool ItemCategory::IsHelmet(short a_ItemType)
 bool ItemCategory::IsChestPlate(short a_ItemType)
 {
 	return (
+		(a_ItemType == E_ITEM_ELYTRA) ||
 		(a_ItemType == E_ITEM_LEATHER_TUNIC) ||
 		(a_ItemType == E_ITEM_GOLD_CHESTPLATE) ||
 		(a_ItemType == E_ITEM_CHAIN_CHESTPLATE) ||
@@ -614,6 +609,32 @@ bool ItemCategory::IsHorseArmor(short a_ItemType)
 		{
 			return true;
 		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+bool ItemCategory::IsVillagerFood(short a_ItemType)
+{
+	switch (a_ItemType)
+	{
+		case E_ITEM_CARROT:
+		case E_ITEM_POTATO:
+		case E_ITEM_BREAD:
+		case E_ITEM_BEETROOT:
+		case E_ITEM_SEEDS:
+		case E_ITEM_BEETROOT_SEEDS:
+		case E_ITEM_WHEAT:
+		{
+			return true;
+		}
+
 		default:
 		{
 			return false;

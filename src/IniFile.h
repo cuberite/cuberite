@@ -77,7 +77,6 @@ public:
 	cIniFile(void);
 
 	// tolua_end
-	virtual ~cIniFile() override = default;
 
 	virtual std::vector<std::pair<AString, AString>> GetValues(AString a_keyName) override;
 

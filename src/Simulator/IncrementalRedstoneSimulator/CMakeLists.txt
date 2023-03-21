@@ -6,6 +6,7 @@ target_sources(
 	RedstoneHandler.cpp
 
 	CommandBlockHandler.h
+	DaylightSensorHandler.h
 	DoorHandler.h
 	DropSpenserHandler.h
 	ForEachSourceCallback.h

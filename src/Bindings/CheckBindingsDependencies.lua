@@ -99,7 +99,7 @@ local cmakeFiles = getCMakeListsFiles()
 local numMissingFiles = 0
 for _, fnam in ipairs(pkgFiles) do
 	if not(cmakeFiles[fnam]) then
-		io.stderr:write("Bindings dependency file ", fnam, " is not listed in src/Bindings/CMakeLists.txt\n")
+		io.stderr:write("Bindings dependency file ", fnam, " is not listed in CMake/GenerateBindings.cmake\n")
 		numMissingFiles = numMissingFiles + 1
 	end
 end

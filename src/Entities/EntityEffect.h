@@ -73,7 +73,7 @@ public:
 	@param a_OtherEffect      The other effect to copy */
 	cEntityEffect & operator =(cEntityEffect a_OtherEffect);
 
-	virtual ~cEntityEffect(void) {}
+	virtual ~cEntityEffect(void) = default;
 
 	/** Creates a pointer to the proper entity effect from the effect type
 	@warning This function creates raw pointers that must be manually managed.

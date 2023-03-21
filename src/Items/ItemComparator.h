@@ -8,45 +8,24 @@
 
 
 
-class cItemComparatorHandler:
+class cItemComparatorHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemComparatorHandler(int a_ItemType):
-		cItemHandler(a_ItemType)
+	using Super::Super;
+
+
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
+		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_INACTIVE_COMPARATOR, cBlockComparatorHandler::YawToMetaData(a_Player.GetYaw()));
 	}
 
 
-
-
-
-	virtual bool IsPlaceable(void) override
+	virtual bool IsPlaceable(void) const override
 	{
-		return true;
-	}
-
-
-
-
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		a_BlockType = E_BLOCK_INACTIVE_COMPARATOR;
-		a_BlockMeta = cBlockComparatorHandler::YawToMetaData(a_Player->GetYaw());
 		return true;
 	}
 } ;
-
-
-
-

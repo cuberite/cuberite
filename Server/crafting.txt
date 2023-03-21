@@ -824,6 +824,23 @@ purple_stained_glass_pane: VioletStainedGlassPane, 16    = VioletStainedGlass, 1
 white_stained_glass_pane: WhiteStainedGlassPane, 16     = WhiteStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
 yellow_stained_glass_pane: YellowStainedGlassPane, 16    = YellowStainedGlass, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
 
+black_stained_glass_pane: BlackStainedGlassPane , 8    = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | BlackDye, 2:2
+blue_stained_glass_pane: BlueStainedGlassPane, 8      = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | BlueDye, 2:2
+brown_stained_glass_pane: BrownStainedGlassPane, 8     = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | BrownDye, 2:2
+cyan_stained_glass_pane: CyanStainedGlassPane, 8      = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | CyanDye, 2:2
+gray_stained_glass_pane: GrayStainedGlassPane, 8      = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | GrayDye, 2:2
+green_stained_glass_pane: GreenStainedGlassPane, 8     = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | GreenDye, 2:2
+light_blue_stained_glass_pane: LightBlueStainedGlassPane, 8 = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | LightBlueDye, 2:2
+light_gray_stained_glass_pane: LightGrayStainedGlassPane, 8 = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | LightGrayDye, 2:2
+lime_stained_glass_pane: LimeStainedGlassPane, 8      = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | LimeDye, 2:2
+magenta_stained_glass_pane: MagentaStainedGlassPane, 8   = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | MagentaDye, 2:2
+orange_stained_glass_pane: OrangeStainedGlassPane, 8    = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | OrangeDye, 2:2
+pink_stained_glass_pane: PinkStainedGlassPane, 8      = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | PinkDye, 2:2
+red_stained_glass_pane: RedStainedGlassPane, 8       = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | RedDye, 2:2
+purple_stained_glass_pane: VioletStainedGlassPane, 8    = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | VioletDye, 2:2
+white_stained_glass_pane: WhiteStainedGlassPane, 8     = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | BoneMeal, 2:2
+yellow_stained_glass_pane: YellowStainedGlassPane, 8    = GlassPane, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | YellowDye, 2:2
+
 #******************************************************#
 # Stained Clay:
 #
@@ -955,18 +972,34 @@ FireworkStar     = FireworkStar, * | Dye ^-1, * | Dye ^-1, * | Dye ^-1, * | Dye 
 #******************************************************#
 # Bed different colors
 Bed^0                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^0, 1:1, 2:1, 3:1
+Bed^0                    = Bed^0, * | WhiteDye, *
 Bed^1                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^1, 1:1, 2:1, 3:1
+Bed^1                    = Bed^0, * | OrangeDye, *
 Bed^2                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^2, 1:1, 2:1, 3:1
+Bed^2                    = Bed^0, * | MagentaDye, *
 Bed^3                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^3, 1:1, 2:1, 3:1
+Bed^3                    = Bed^0, * | LightBlueDye, *
 Bed^4                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^4, 1:1, 2:1, 3:1
+Bed^4                    = Bed^0, * | YellowDye, *
 Bed^5                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^5, 1:1, 2:1, 3:1
+Bed^5                    = Bed^0, * | LimeDye, *
 Bed^6                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^6, 1:1, 2:1, 3:1
+Bed^6                    = Bed^0, * | PinkDye, *
 Bed^7                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^7, 1:1, 2:1, 3:1
+Bed^7                    = Bed^0, * | GrayDye, *
 Bed^8                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^8, 1:1, 2:1, 3:1
+Bed^8                    = Bed^0, * | LightGrayDye, *
 Bed^9                    = Planks^-1, 1:2, 2:2, 3:2 | Wool^9, 1:1, 2:1, 3:1
+Bed^9                    = Bed^0, * | CyanDye, *
 Bed^10                   = Planks^-1, 1:2, 2:2, 3:2 | Wool^10, 1:1, 2:1, 3:1
+Bed^10                   = Bed^0, * | PurpleDye, *
 Bed^11                   = Planks^-1, 1:2, 2:2, 3:2 | Wool^11, 1:1, 2:1, 3:1
+Bed^11                   = Bed^0, * | BlueDye, *
 Bed^12                   = Planks^-1, 1:2, 2:2, 3:2 | Wool^12, 1:1, 2:1, 3:1
+Bed^12                   = Bed^0, * | BrownDye, *
 Bed^13                   = Planks^-1, 1:2, 2:2, 3:2 | Wool^13, 1:1, 2:1, 3:1
+Bed^13                   = Bed^0, * | GreenDye, *
 Bed^14                   = Planks^-1, 1:2, 2:2, 3:2 | Wool^14, 1:1, 2:1, 3:1
+Bed^14                   = Bed^0, * | RedDye, *
 Bed^15                   = Planks^-1, 1:2, 2:2, 3:2 | Wool^15, 1:1, 2:1, 3:1
+Bed^15                   = Bed^0, * | BlackDye, *

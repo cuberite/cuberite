@@ -8,53 +8,103 @@
 #include "../Blocks/BlockHandler.h"
 #include "../Blocks/BlockInfested.h"
 
+
+
+
+
+cSilverfish::cSilverfish() :
+	Super("Silverfish", mtSilverfish, "entity.silverfish.hurt", "entity.silverfish.death", "entity.silverfish.ambient", 0.4f, 0.3f)
+{
+}
+
+
+
+
+
 bool cSilverfish::DoTakeDamage(TakeDamageInfo &a_TDI)
 {
-	bool SuperResult = Super::DoTakeDamage(a_TDI);
-	// Todo: stop this if /gamerule mobGriefing is set to false
+	// Call on our brethren to attack!
+	// TODO: stop this if /gamerule mobGriefing is set to false
 
-	// If the entity didn't take andy damage
-	if (!SuperResult)
+	// If the entity didn't take any damage, bail:
+	if (!Super::DoTakeDamage(a_TDI))
 	{
-		return SuperResult;
+		return false;
 	}
 
-	// Entity does receive lethal damage or Attacker doesn't exist
-	if ((m_Health < a_TDI.FinalDamage) ||
-		((a_TDI.Attacker == nullptr) && (a_TDI.DamageType != dtPoison) && (a_TDI.DamageType != dtPotionOfHarming)))
+	// Or, conversely took lethal damage, bail:
+	if (m_Health <= 0)
 	{
-		return SuperResult;
+		return true;
 	}
 
-	// If attacker is player or splash potion
-	bool ShouldSpawn = (
-		(a_TDI.DamageType == dtPoison) || (a_TDI.DamageType == dtPotionOfHarming) ||
-		a_TDI.Attacker->IsPlayer()
-	);
-
-	if (!ShouldSpawn)
+	if (a_TDI.Attacker == nullptr)
 	{
-		return SuperResult;
-	}
-	auto Blocks = sSetBlockVector();
-	for (int X = static_cast<int>(GetPosX() - 10); X <= static_cast<int>(GetPosX() + 10); X++)
-	{
-		for (int Y = static_cast<int>(GetPosY() - 5); Y <= static_cast<int>(GetPosY() + 5); Y++)
+		if ((a_TDI.DamageType != dtPoison) && (a_TDI.DamageType != dtPotionOfHarming))
 		{
-			for (int Z = static_cast<int>(GetPosZ() - 10); Z <= static_cast<int>(GetPosZ() + 10); Z++)
+			// Bail if attacker doesn't exist and it wasn't a splash potion:
+			return true;
+		}
+	}
+	else if (!a_TDI.Attacker->IsPlayer())
+	{
+		// Bail if it wasn't a player attack:
+		return true;
+	}
+
+	auto & Random = GetRandomProvider();
+
+	// Tries to spawn another Silverfish, returning if the search should continue.
+	auto CheckInfested = [this, &Random, Position = GetPosition().Floor()](const Vector3i Offset) mutable
+	{
+		const auto Block = Position + Offset;
+		if (m_World->GetBlock(Block) == E_BLOCK_SILVERFISH_EGG)
+		{
+			m_World->DigBlock(Block);
+			return Random.RandBool();
+		}
+		return false;
+	};
+
+	// Search the faces of an increasingly large cube (so the positions closest get looked at first)
+	// of min 3, max 10, for infested blocks and spawn additional reinforcements:
+	for (int CubeSideLength = 3; CubeSideLength <= 10; CubeSideLength += 2)
+	{
+		const int HalfSide = CubeSideLength / 2;
+
+		for (int OffsetX = -HalfSide; OffsetX <= HalfSide; OffsetX++)
+		{
+			for (int OffsetZ = -HalfSide; OffsetZ <= HalfSide; OffsetZ++)
 			{
-				Blocks.emplace_back(sSetBlock({X, Y, Z}, 0, 0));
+				if (CheckInfested({ OffsetX, +HalfSide, OffsetZ }) || CheckInfested({ OffsetX, -HalfSide, OffsetZ }))
+				{
+					return true;
+				}
+			}
+		}
+
+		for (int OffsetX = -HalfSide; OffsetX <= HalfSide; OffsetX++)
+		{
+			for (int OffsetY = -HalfSide + 1; OffsetY <= HalfSide - 1; OffsetY++)
+			{
+				if (CheckInfested({ OffsetX, OffsetY, +HalfSide }) || CheckInfested({ OffsetX, OffsetY, -HalfSide }))
+				{
+					return true;
+				}
+			}
+		}
+
+		for (int OffsetZ = -HalfSide + 1; OffsetZ <= HalfSide - 1; OffsetZ++)
+		{
+			for (int OffsetY = -HalfSide + 1; OffsetY <= HalfSide - 1; OffsetY++)
+			{
+				if (CheckInfested({ +HalfSide, OffsetY, OffsetZ }) || CheckInfested({ -HalfSide, OffsetY, OffsetZ }))
+				{
+					return true;
+				}
 			}
 		}
 	}
-	m_World->GetBlocks(Blocks, true);
-	for (const auto & BlockInfo : Blocks)
-	{
-		if (BlockInfo.m_BlockType == E_BLOCK_SILVERFISH_EGG)
-		{
-			m_World->DigBlock(BlockInfo.GetAbsolutePos(), nullptr);
-		}
-	}
 
-	return SuperResult;
+	return true;
 }

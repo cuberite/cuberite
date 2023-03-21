@@ -15,6 +15,66 @@
 
 
 
+/** Template for the bindings for the DoWithXYZAt(X, Y, Z) functions that need to check their coords. */
+template <
+	class SELF,
+	class ITEM,
+	bool (SELF::*DoWithFn)(int, int, int, cFunctionRef<bool(ITEM &)>),
+	bool (SELF::*CoordCheckFn)(int, int, int) const
+>
+static int DoWithXYZ(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamNumber(2, 4) ||
+		!L.CheckParamFunction(5) ||
+		!L.CheckParamEnd(6)
+	)
+	{
+		return 0;
+	}
+
+	// Get parameters:
+	SELF * Self = nullptr;
+	int BlockX = 0;
+	int BlockY = 0;
+	int BlockZ = 0;
+	cLuaState::cRef FnRef;
+	L.GetStackValues(1, Self, BlockX, BlockY, BlockZ, FnRef);
+	if (Self == nullptr)
+	{
+		return L.ApiParamError("Invalid 'self'");
+	}
+	if (!FnRef.IsValid())
+	{
+		return L.ApiParamError("Expected a valid callback function for parameter #5");
+	}
+	if (!(Self->*CoordCheckFn)(BlockX, BlockY, BlockZ))
+	{
+		return L.FApiParamError("The provided coordinates ({0}) are not valid",
+			Vector3i{BlockX, BlockY, BlockZ}
+		);
+	}
+
+	// Call the DoWith function:
+	bool res = (Self->*DoWithFn)(BlockX, BlockY, BlockZ, [&](ITEM & a_Item)
+		{
+			bool ret = false;
+			L.Call(FnRef, &a_Item, cLuaState::Return, ret);
+			return ret;
+		}
+	);
+
+	// Push the result as the return value:
+	L.Push(res);
+	return 1;
+}
+
+
+
+
+
 /** Reads params that together form a Cuboid.
 These can be:
 	- 6 numbers (MinX, MaxX, MinY, MaxY, MinZ, MaxZ)
@@ -435,7 +495,17 @@ static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * a_LuaState)
 		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
-	L.Push(cSchematicFileSerializer::LoadFromSchematicFile(*self, fileName));
+	try
+	{
+		cSchematicFileSerializer::LoadFromSchematicFile(*self, fileName);
+		L.Push(true);
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING(Oops.what());
+		L.LogStackTrace();
+		L.Push(false);
+	}
 	return 1;
 }
 
@@ -457,7 +527,7 @@ static int tolua_cBlockArea_LoadFromSchematicString(lua_State * a_LuaState)
 		return 0;
 	}
 	cBlockArea * self;
-	AString data;
+	ContiguousByteBuffer data;
 	if (!L.GetStackValues(1, self, data))
 	{
 		return L.ApiParamError("Cannot read the parameters");
@@ -467,7 +537,17 @@ static int tolua_cBlockArea_LoadFromSchematicString(lua_State * a_LuaState)
 		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
-	L.Push(cSchematicFileSerializer::LoadFromSchematicString(*self, data));
+	try
+	{
+		cSchematicFileSerializer::LoadFromSchematicString(*self, data);
+		L.Push(true);
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING(Oops.what());
+		L.LogStackTrace();
+		L.Push(false);
+	}
 	return 1;
 }
 
@@ -510,40 +590,13 @@ static int tolua_cBlockArea_Read(lua_State * a_LuaState)
 		return L.ApiParamError("Invalid baDataTypes combination (%d)", dataTypes);
 	}
 
-	// Check the coords, shift if needed:
+	// Check the coords:
+	if (!cChunkDef::IsValidHeight(bounds.p1) || !cChunkDef::IsValidHeight(bounds.p2))
+	{
+		return L.FApiParamError("Coordinates {0} - {1} exceed world bounds", bounds.p1, bounds.p2);
+	}
+
 	bounds.Sort();
-	if (bounds.p1.y < 0)
-	{
-		FLOGWARNING("cBlockArea:Read(): MinBlockY less than zero, adjusting to zero. Coords: {0} - {1}",
-			bounds.p1, bounds.p2
-		);
-		L.LogStackTrace();
-		bounds.p1.y = 0;
-	}
-	else if (bounds.p1.y >= cChunkDef::Height)
-	{
-		FLOGWARNING("cBlockArea:Read(): MinBlockY more than chunk height, adjusting to chunk height. Coords: {0} - {1}",
-			bounds.p1, bounds.p2
-		);
-		L.LogStackTrace();
-		bounds.p1.y = cChunkDef::Height - 1;
-	}
-	if (bounds.p2.y < 0)
-	{
-		FLOGWARNING("cBlockArea:Read(): MaxBlockY less than zero, adjusting to zero. Coords: {0} - {1}",
-			bounds.p1, bounds.p2
-		);
-		L.LogStackTrace();
-		bounds.p2.y = 0;
-	}
-	else if (bounds.p2.y > cChunkDef::Height)
-	{
-		FLOGWARNING("cBlockArea:Read(): MaxBlockY more than chunk height, adjusting to chunk height. Coords: {0} - {1}",
-			bounds.p1, bounds.p2
-		);
-		L.LogStackTrace();
-		bounds.p2.y = cChunkDef::Height;
-	}
 
 	// Do the actual read:
 	L.Push(self->Read(*world, bounds, dataTypes));
@@ -625,7 +678,17 @@ static int tolua_cBlockArea_SaveToSchematicFile(lua_State * a_LuaState)
 		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
-	L.Push(cSchematicFileSerializer::SaveToSchematicFile(*self, fileName));
+	try
+	{
+		cSchematicFileSerializer::SaveToSchematicFile(*self, fileName);
+		L.Push(true);
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING(Oops.what());
+		L.LogStackTrace();
+		L.Push(false);
+	}
 	return 1;
 }
 
@@ -655,13 +718,17 @@ static int tolua_cBlockArea_SaveToSchematicString(lua_State * a_LuaState)
 		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
-	AString data;
-	if (cSchematicFileSerializer::SaveToSchematicString(*self, data))
+	try
 	{
-		L.Push(data);
+		L.Push(cSchematicFileSerializer::SaveToSchematicString(*self).GetView());
 		return 1;
 	}
-	return 0;
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING(Oops.what());
+		L.LogStackTrace();
+		return 0;
+	}
 }
 
 

@@ -36,7 +36,7 @@ local function LoadAPIFiles(a_Folder, a_DstTable)
 				if (a_DstTable[k]) then
 					-- The class is documented in two files, warn and store into a file (so that CIs can mark build as failure):
 					LOGWARNING(string.format(
-						"APIDump warning: class %s is documented at two places, the documentation in file %s will overwrite the previously loaded one!",
+						"Warning: class %s is documented at two places, the documentation in file %s will overwrite the previously loaded one!",
 						k, FileName
 					))
 					local f = io.open("DuplicateDocs.txt", "a")
@@ -48,7 +48,6 @@ local function LoadAPIFiles(a_Folder, a_DstTable)
 		end  -- if (is lua file)
 	end  -- for fnam - Folder[]
 end
-
 
 
 
@@ -121,14 +120,15 @@ local function CreateAPITables()
 		end
 
 		-- Member variables:
+		local GetField = a_ClassObj[".get"];
 		local SetField = a_ClassObj[".set"] or {};
-		if ((a_ClassObj[".get"] ~= nil) and (type(a_ClassObj[".get"]) == "table")) then
-			for k in pairs(a_ClassObj[".get"]) do
-				if (SetField[k] == nil) then
-					-- It is a read-only variable, add it as a constant:
+		if ((GetField ~= nil) and (type(GetField) == "table")) then
+			for k, v in pairs(GetField) do
+				if ((SetField[k] == nil) and ((type(v) ~= "table") or (v["__newindex"] == nil))) then
+					-- It is a read-only variable or array, add it as a constant:
 					table.insert(res.Constants, {Name = k, Value = ""});
 				else
-					-- It is a read-write variable, add it as a variable:
+					-- It is a read-write variable or array, add it as a variable:
 					table.insert(res.Variables, { Name = k });
 				end
 			end
@@ -2041,6 +2041,56 @@ end
 
 
 
+--- Checks if any functions that are documented are present in the API
+-- Returns an array-table of strings representing the unexported symbol names
+-- If no unexported are found, returns no value.
+-- If an error occurs, returns true and error message.
+local function CheckUnexportedFunctions()
+	local res = {}
+
+	local API, Globals, Desc = PrepareApi()
+	for clsname, cls in pairs(Desc.Classes) do
+		if not(cls.IsExported) then
+			-- The whole class is not exported
+			table.insert(res, "class\t" .. clsname .. "\n");
+		else
+			if (cls.Functions ~= nil) then
+				for fnname, fnapi in pairs(cls.Functions) do
+					if not(fnapi.IsExported) then
+						table.insert(res, "func\t" .. clsname .. "." .. fnname);
+					end
+				end  -- for j, fn - cls.Functions[]
+			end
+			if (cls.Constants ~= nil) then
+				for cnname, cnapi in pairs(cls.Constants) do
+					if not(cnapi.IsExported) then
+						table.insert(res, "const\t" .. clsname .. "." .. cnname);
+					end
+				end  -- for j, fn - cls.Functions[]
+			end
+		end
+	end  -- for i, cls - a_APIDesc.Classes[]
+
+	table.sort(res)
+
+	-- Bail out if no items found:
+	if not(res[1]) then
+		return
+	end
+
+	-- Save any found items to a file:
+	local f = io.open("Unexported.lua", "w")
+	f:write(table.concat(res, "\n"))
+	f:write("\n")
+	f:close()
+
+	return res
+end
+
+
+
+
+
 
 local function HandleWebAdminDump(a_Request)
 	if (a_Request.PostParams["Dump"] ~= nil) then
@@ -2101,6 +2151,18 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 		end
 	end
 
+	LOG("Checking for unexported Objects...")
+	local unexported, msg = CheckUnexportedFunctions()
+	if (unexported) then
+		if (unexported == true) then
+			LOGERROR("Cannot check for unexported symbols: " .. (msg or "<no message>"))
+			return true
+		else
+			LOGERROR("Found unexported symbols:\n" .. table.concat(unexported, "\n"))
+			return true
+		end
+	end
+
 	-- The check completed successfully, remove the "test failed" flag from the filesystem:
 	cFile:DeleteFile("apiCheckFailed.flag")
 
@@ -2115,7 +2177,7 @@ function Initialize(Plugin)
 	g_Plugin = Plugin;
 	g_PluginFolder = Plugin:GetLocalFolder();
 
-	LOG("Initialising " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
+	LOG("Initialising v." .. Plugin:GetVersion())
 
 	-- Bind a console command to dump the API:
 	cPluginManager:BindConsoleCommand("api",      HandleCmdApi,      "Dumps the Lua API docs into the API/ subfolder")

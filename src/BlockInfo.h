@@ -12,14 +12,6 @@ class cBlockInfo
 {
 public:
 
-	// tolua_end
-
-	/** Returns how much of an explosion Destruction Lazor's (tm) intensity the given block attenuates.
-	See Physics\Explodinator.cpp for details of explosion block destruction. */
-	static float GetExplosionAbsorption(BLOCKTYPE Block);
-
-	// tolua_begin
-
 	/** How much light do the blocks emit on their own? */
 	static NIBBLETYPE GetLightValue(BLOCKTYPE Block);
 
@@ -31,6 +23,10 @@ public:
 
 	/** Does this block fully occupy its voxel - is it a 'full' block? */
 	static bool FullyOccupiesVoxel(BLOCKTYPE Block);
+
+	/** Does the client pretend the block doesn't exist when clicking?
+	For example, digging a fire will hit the block below the fire, so fire is "clicked through". */
+	static bool IsClickedThrough(BLOCKTYPE a_Block);
 
 	/** Is a block destroyed after a single hit?
 	Warning: IsOneHitDig does not take into account enchantments / status effects / swim state / floating state
@@ -69,7 +65,6 @@ public:
 
 
 
-
 bool IsBlockWater(BLOCKTYPE a_BlockType);
 
 bool IsBlockIce(BLOCKTYPE a_BlockType);
@@ -85,6 +80,8 @@ bool IsBlockRail(BLOCKTYPE a_BlockType);
 bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType);
 
 bool IsBlockFence(BLOCKTYPE a_BlockType);
+
+bool IsBlockShulkerBox(BLOCKTYPE a_BlockType);
 
 bool IsBlockMaterialWood(BLOCKTYPE a_BlockType);
 

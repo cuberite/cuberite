@@ -17,10 +17,6 @@ function(flatten_files arg1)
 endfunction()
 
 
-# Include the libraries:
-
-add_subdirectory(../../lib/zlib ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/lib/zlib)
-
 # Include the shared files:
 set(SHARED_SRC
 	../../src/StringCompression.cpp
@@ -66,11 +62,9 @@ source_group("Shared\\OSSupport" FILES ${SHARED_OSS_SRC} ${SHARED_OSS_HDR})
 # Include the main source files:
 set(SOURCES
 	MCADefrag.cpp
-	Globals.cpp
 )
 set(HEADERS
 	MCADefrag.h
-	Globals.h
 )
 
 source_group("" FILES ${SOURCES} ${HEADERS})
@@ -84,7 +78,7 @@ add_executable(MCADefrag
 	${SHARED_OSS_HDR}
 )
 
-target_link_libraries(MCADefrag zlib fmt::fmt Threads::Threads)
+target_link_libraries(MCADefrag fmt::fmt libdeflate Threads::Threads)
 
 include(../../SetFlags.cmake)
 set_exe_flags(MCADefrag)

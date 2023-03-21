@@ -16,7 +16,7 @@ public:
 	@param a_MobWidth The mob width.
 	@param a_MobHeight The mob height.
 	*/
-	cPathFinder(double a_MobWidth, double a_MobHeight);
+	cPathFinder(float a_MobWidth, float a_MobHeight);
 
 	/** Updates the PathFinder's internal state and returns a waypoint.
 	A waypoint is a coordinate which the mob can safely move to from its current position in a straight line.
@@ -41,10 +41,10 @@ public:
 private:
 
 	/** The width of the Mob which owns this PathFinder. */
-	double m_Width;
+	float m_Width;
 
 	/** The height of the Mob which owns this PathFinder. */
-	double m_Height;
+	float m_Height;
 
 	/** The current cPath instance we have. This is discarded and recreated when a path recalculation is needed. */
 	std::unique_ptr<cPath> m_Path;

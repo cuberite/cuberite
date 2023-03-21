@@ -22,17 +22,17 @@ bool cDelayedFluidSimulatorChunkData::cSlot::Add(int a_RelX, int a_RelY, int a_R
 	ASSERT(a_RelZ >= 0);
 	ASSERT(a_RelZ < static_cast<int>(ARRAYCOUNT(m_Blocks)));
 
-	cCoordWithIntVector & Blocks = m_Blocks[a_RelZ];
-	int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
-	for (cCoordWithIntVector::const_iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
+	auto & Blocks = m_Blocks[a_RelZ];
+	const auto Index = cChunkDef::MakeIndex(a_RelX, a_RelY, a_RelZ);
+	for (const auto & Block : Blocks)
 	{
-		if (itr->Data == Index)
+		if (Block.Data == Index)
 		{
 			// Already present
 			return false;
 		}
 	}  // for itr - Blocks[]
-	Blocks.push_back(cCoordWithInt(a_RelX, a_RelY, a_RelZ, Index));
+	Blocks.emplace_back(a_RelX, a_RelY, a_RelZ, Index);
 	return true;
 }
 
@@ -101,14 +101,14 @@ void cDelayedFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a
 	// Simulate all the blocks in the scheduled slot:
 	for (size_t i = 0; i < ARRAYCOUNT(Slot.m_Blocks); i++)
 	{
-		cCoordWithIntVector & Blocks = Slot.m_Blocks[i];
+		auto & Blocks = Slot.m_Blocks[i];
 		if (Blocks.empty())
 		{
 			continue;
 		}
-		for (cCoordWithIntVector::iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
+		for (const auto & Block : Blocks)
 		{
-			SimulateBlock(a_Chunk, itr->x, itr->y, itr->z);
+			SimulateBlock(a_Chunk, Block.x, Block.y, Block.z);
 		}
 		m_TotalBlocks -= static_cast<int>(Blocks.size());
 		Blocks.clear();
@@ -137,19 +137,4 @@ void cDelayedFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLO
 	}
 
 	++m_TotalBlocks;
-}
-
-
-
-
-
-void cDelayedFluidSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
-{
-	if (!cChunkDef::IsValidHeight(a_Position.y))
-	{
-		// Not inside the world (may happen when rclk with a full bucket - the client sends Y = -1)
-		return;
-	}
-
-	AddBlock(a_Chunk, a_Position, a_Block);
 }

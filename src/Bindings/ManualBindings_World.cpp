@@ -12,6 +12,23 @@
 #include "PluginLua.h"
 #include "LuaChunkStay.h"
 
+#include "BlockEntities/BeaconEntity.h"
+#include "BlockEntities/BedEntity.h"
+#include "BlockEntities/BrewingstandEntity.h"
+#include "BlockEntities/ChestEntity.h"
+#include "BlockEntities/CommandBlockEntity.h"
+#include "BlockEntities/DispenserEntity.h"
+#include "BlockEntities/DropSpenserEntity.h"
+#include "BlockEntities/DropperEntity.h"
+#include "BlockEntities/FlowerPotEntity.h"
+#include "BlockEntities/FurnaceEntity.h"
+#include "BlockEntities/HopperEntity.h"
+#include "BlockEntities/MobHeadEntity.h"
+#include "BlockEntities/NoteEntity.h"
+
+
+
+
 
 /** Check that a Lua parameter is either a vector or 3 numbers in sequence
 \param L The Lua state
@@ -44,6 +61,183 @@ static bool GetStackVectorOr3Numbers(cLuaState & L, int a_Index, Vector3<T> & a_
 		return true;
 	}
 	return L.GetStackValues(a_Index, a_Return.x, a_Return.y, a_Return.z);
+}
+
+
+
+
+
+/** Template for the bindings for the DoWithXYZAt(X, Y, Z) functions that don't need to check their coords. */
+template <class BlockEntityType, BLOCKTYPE... BlockTypes>
+static int DoWithBlockEntityAt(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	int OffsetIndex;
+
+	// Check params:
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!CheckParamVectorOr3Numbers(L, "Vector3<int>", 2, OffsetIndex) ||
+		!L.CheckParamFunction(OffsetIndex) ||
+		!L.CheckParamEnd(OffsetIndex + 1)
+	)
+	{
+		return 0;
+	}
+
+	cWorld * Self = nullptr;
+	Vector3i Position;
+	cLuaState::cRef FnRef;
+
+	// Get parameters:
+	if (
+		!L.GetStackValues(1, Self) ||
+		!GetStackVectorOr3Numbers(L, 2, Position) ||
+		!L.GetStackValues(OffsetIndex, FnRef)
+	)
+	{
+		return 0;
+	}
+
+	if (Self == nullptr)
+	{
+		return L.ApiParamError("Invalid 'self'");
+	}
+	if (!FnRef.IsValid())
+	{
+		return L.ApiParamError("Expected a valid callback function for parameter %i", OffsetIndex);
+	}
+
+	// Call the DoWith function:
+	bool res = Self->DoWithBlockEntityAt(Position, [&L, &FnRef](cBlockEntity & a_BlockEntity)
+	{
+		if constexpr (sizeof...(BlockTypes) != 0)
+		{
+			if (((a_BlockEntity.GetBlockType() != BlockTypes) && ...))
+			{
+				return false;
+			}
+		}
+
+		bool ret = false;
+		L.Call(FnRef, static_cast<BlockEntityType *>(&a_BlockEntity), cLuaState::Return, ret);
+		return ret;
+	});
+
+	// Push the result as the return value:
+	L.Push(res);
+	return 1;
+}
+
+
+
+
+
+template <
+	class Ty1,
+	class Ty2,
+	bool (Ty1::*ForEachFn)(const cBoundingBox &, cFunctionRef<bool(Ty2 &)>)
+>
+static int ForEachInBox(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cWorld") ||
+		!L.CheckParamUserType(2, "cBoundingBox") ||
+		!L.CheckParamFunction(3) ||
+		!L.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	Ty1 * Self = nullptr;
+	cBoundingBox * Box = nullptr;
+	cLuaState::cRef FnRef;
+	L.GetStackValues(1, Self, Box, FnRef);
+	if ((Self == nullptr) || (Box == nullptr))
+	{
+		return L.ApiParamError("Invalid world (%p) or boundingbox (%p)", static_cast<void *>(Self), static_cast<void *>(Box));
+	}
+	if (!FnRef.IsValid())
+	{
+		return L.ApiParamError("Expected a valid callback function for parameter #2");
+	}
+
+	bool res = (Self->*ForEachFn)(*Box, [&](Ty2 & a_Item)
+		{
+			bool ret = false;
+			if (!L.Call(FnRef, &a_Item, cLuaState::Return, ret))
+			{
+				LOGWARNING("Failed to call Lua callback");
+				L.LogStackTrace();
+				return true;  // Abort enumeration
+			}
+
+			return ret;
+		}
+	);
+
+	// Push the result as the return value:
+	L.Push(res);
+	return 1;
+}
+
+
+
+
+
+template <class BlockEntityType, BLOCKTYPE... BlockTypes>
+static int ForEachBlockEntityInChunk(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamNumber(2, 3) ||
+		!L.CheckParamFunction(4) ||
+		!L.CheckParamEnd(5)
+	)
+	{
+		return 0;
+	}
+
+	// Get parameters:
+	cWorld * Self = nullptr;
+	int ChunkX = 0;
+	int ChunkZ = 0;
+	cLuaState::cRef FnRef;
+	L.GetStackValues(1, Self, ChunkX, ChunkZ, FnRef);
+	if (Self == nullptr)
+	{
+		return L.ApiParamError("Error in function call '#funcname#': Invalid 'self'");
+	}
+	if (!FnRef.IsValid())
+	{
+		return L.ApiParamError("Expected a valid callback function for parameter #4");
+	}
+
+	// Call the ForEach function:
+	bool res = Self->ForEachBlockEntityInChunk(ChunkX, ChunkZ, [&L, &FnRef](cBlockEntity & a_BlockEntity)
+	{
+		if constexpr (sizeof...(BlockTypes) != 0)
+		{
+			if (((a_BlockEntity.GetBlockType() != BlockTypes) && ...))
+			{
+				return false;
+			}
+		}
+
+		bool ret = false;
+		L.Call(FnRef, static_cast<BlockEntityType *>(&a_BlockEntity), cLuaState::Return, ret);
+		return ret;
+	});
+
+	// Push the result as the return value:
+	L.Push(res);
+	return 1;
 }
 
 
@@ -472,7 +666,7 @@ static int tolua_cWorld_DoWithNearestPlayer(lua_State * tolua_S)
 		!L.CheckParamFunction(4) ||
 		// Params 5 and 6 are optional bools, no check for those
 		!L.CheckParamEnd(7)
-		)
+	)
 	{
 		return 0;
 	}
@@ -507,6 +701,112 @@ static int tolua_cWorld_DoWithNearestPlayer(lua_State * tolua_S)
 
 
 
+static int tolua_cWorld_FastSetBlock(lua_State * tolua_S)
+{
+	/* Function signature:
+	World:FastSetBlock(BlockX, BlockY, BlockZ)
+	--or--
+	World:FastSetBlock(Position)
+	*/
+
+	cLuaState L(tolua_S);
+	int OffsetIndex;
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!CheckParamVectorOr3Numbers(L, "Vector3<int>", 2, OffsetIndex) ||
+		!L.CheckParamNumber(OffsetIndex, OffsetIndex + 1) ||
+		!L.CheckParamEnd(OffsetIndex + 2)
+	)
+	{
+		return 0;
+	}
+
+	if (OffsetIndex != 3)  // Not the vector overload
+	{
+		L.LogStackTrace();
+		LOGWARN("FastSetBlock with 3 position arguments is deprecated, use vector-parametered version instead.");
+	}
+
+	cWorld * World;
+	Vector3i Position;
+	BLOCKTYPE Type;
+	NIBBLETYPE Meta;
+
+	// Read the params:
+	if (
+		!L.GetStackValues(1, World) ||
+		!GetStackVectorOr3Numbers(L, 2, Position) ||
+		!L.GetStackValues(OffsetIndex, Type, Meta)
+	)
+	{
+		return 0;
+	}
+
+	if (World == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+	}
+
+	if (!cChunkDef::IsValidHeight(Position))
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
+	}
+
+	World->FastSetBlock(Position, Type, Meta);
+	return 0;
+}
+
+
+
+
+
+static int tolua_cWorld_ForEachEntityInChunk(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cWorld") ||
+		!L.CheckParamNumber(2, 3) ||
+		!L.CheckParamFunction(4) ||
+		!L.CheckParamEnd(5)
+	)
+	{
+		return 0;
+	}
+
+	// Get parameters:
+	cWorld * Self = nullptr;
+	int ChunkX = 0;
+	int ChunkZ = 0;
+	cLuaState::cRef FnRef;
+	L.GetStackValues(1, Self, ChunkX, ChunkZ, FnRef);
+	if (Self == nullptr)
+	{
+		return L.ApiParamError("Invalid 'self'");
+	}
+	if (!FnRef.IsValid())
+	{
+		return L.ApiParamError("Expected a valid callback function for parameter #4");
+	}
+
+	// Call the DoWith function:
+	bool res = Self->ForEachEntityInChunk(ChunkX, ChunkZ, [&](cEntity & a_Item)
+		{
+			bool ret = false;
+			L.Call(FnRef, &a_Item, cLuaState::Return, ret);
+			return ret;
+		}
+	);
+
+	// Push the result as the return value:
+	L.Push(res);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cWorld_ForEachLoadedChunk(lua_State * tolua_S)
 {
 	// Exported manually, because tolua doesn't support converting functions to functor types.
@@ -516,7 +816,7 @@ static int tolua_cWorld_ForEachLoadedChunk(lua_State * tolua_S)
 	if (
 		!L.CheckParamUserType(1, "cWorld") ||
 		!L.CheckParamFunction(2)
-		)
+	)
 	{
 		return 0;
 	}
@@ -561,37 +861,171 @@ static int tolua_cWorld_ForEachLoadedChunk(lua_State * tolua_S)
 
 
 
-static int tolua_cWorld_GetBlockInfo(lua_State * tolua_S)
+static int tolua_cWorld_GetBlock(lua_State * tolua_S)
 {
-	// Exported manually, because tolua would generate useless additional parameters (a_BlockType .. a_BlockSkyLight)
-	// Function signature: GetBlockInfo(BlockX, BlockY, BlockZ) -> BlockValid, [BlockType, BlockMeta, BlockSkyLight, BlockBlockLight]
+	/* Function signature:
+	World:GetBlock(BlockX, BlockY, BlockZ) -> BlockType
+	--or--
+	World:GetBlock(Position) -> BlockType
+	*/
 
-	// Check params:
 	cLuaState L(tolua_S);
+	int OffsetIndex;
 	if (
-		!L.CheckParamUserType(1, "cWorld") ||
-		!L.CheckParamNumber(2, 4) ||
-		!L.CheckParamEnd(5)
+		!L.CheckParamSelf("cWorld") ||
+		!CheckParamVectorOr3Numbers(L, "Vector3<int>", 2, OffsetIndex) ||
+		!L.CheckParamEnd(OffsetIndex)
 	)
 	{
 		return 0;
 	}
 
-	// Get params:
-	cWorld * Self = nullptr;
-	int BlockX = 0;
-	int BlockY = 0;
-	int BlockZ = 0;
-	L.GetStackValues(1, Self, BlockX, BlockY, BlockZ);
-	if (Self == nullptr)
+	if (OffsetIndex != 3)  // Not the vector overload
+	{
+		L.LogStackTrace();
+		LOGWARN("GetBlock with 3 position arguments is deprecated, use vector-parametered version instead.");
+	}
+
+	cWorld * World;
+	Vector3i Position;
+
+	// Read the params:
+	if (
+		!L.GetStackValues(1, World) ||
+		!GetStackVectorOr3Numbers(L, 2, Position)
+	)
+	{
+		return 0;
+	}
+
+	if (World == nullptr)
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	// Call the function:
+	if (!cChunkDef::IsValidHeight(Position))
+	{
+		L.Push(E_BLOCK_AIR);
+		return 1;
+	}
+
+	L.Push(World->GetBlock(Position));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cWorld_GetBlockBlockLight(lua_State * tolua_S)
+{
+	/* Function signature:
+	World:GetBlockBlockLight(BlockX, BlockY, BlockZ) -> BlockLight
+	--or--
+	World:GetBlockBlockLight(Position) -> BlockLight
+	*/
+
+	cLuaState L(tolua_S);
+	int OffsetIndex;
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!CheckParamVectorOr3Numbers(L, "Vector3<int>", 2, OffsetIndex) ||
+		!L.CheckParamEnd(OffsetIndex)
+	)
+	{
+		return 0;
+	}
+
+	if (OffsetIndex != 3)  // Not the vector overload
+	{
+		L.LogStackTrace();
+		LOGWARN("GetBlockBlockLight with 3 position arguments is deprecated, use vector-parametered version instead.");
+	}
+
+	cWorld * World;
+	Vector3i Position;
+
+	// Read the params:
+	if (
+		!L.GetStackValues(1, World) ||
+		!GetStackVectorOr3Numbers(L, 2, Position)
+	)
+	{
+		return 0;
+	}
+
+	if (World == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+	}
+
+	if (!cChunkDef::IsValidHeight(Position))
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
+	}
+
+	L.Push(World->GetBlockBlockLight(Position));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cWorld_GetBlockInfo(lua_State * tolua_S)
+{
+	/* Exported manually, because tolua would generate useless additional parameters (a_BlockType .. a_BlockSkyLight)
+	Function signature:
+	GetBlockInfo(BlockX, BlockY, BlockZ) -> BlockValid, [BlockType, BlockMeta, BlockSkyLight, BlockBlockLight]
+	--or--
+	GetBlockInfo(Position) -> BlockValid, [BlockType, BlockMeta, BlockSkyLight, BlockBlockLight]
+	*/
+
+	// Check params:
+	cLuaState L(tolua_S);
+	int OffsetIndex;
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!CheckParamVectorOr3Numbers(L, "Vector3<int>", 2, OffsetIndex) ||
+		!L.CheckParamEnd(OffsetIndex)
+	)
+	{
+		return 0;
+	}
+
+	if (OffsetIndex != 3)  // Not the vector overload
+	{
+		L.LogStackTrace();
+		LOGWARN("GetBlockInfo with 3 position arguments is deprecated, use vector-parametered version instead.");
+	}
+
+	cWorld * World;
+	Vector3i Position;
+
+	// Read the params:
+	if (
+		!L.GetStackValues(1, World) ||
+		!GetStackVectorOr3Numbers(L, 2, Position)
+	)
+	{
+		return 0;
+	}
+
+	if (World == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+	}
+
+	if (!cChunkDef::IsValidHeight(Position))
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
+	}
+
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta, BlockSkyLight, BlockBlockLight;
-	bool res = Self->GetBlockInfo(BlockX, BlockY, BlockZ, BlockType, BlockMeta, BlockSkyLight, BlockBlockLight);
+
+	// Call the function:
+	bool res = World->GetBlockInfo(Position, BlockType, BlockMeta, BlockSkyLight, BlockBlockLight);
 
 	// Push the returned values:
 	L.Push(res);
@@ -607,37 +1041,172 @@ static int tolua_cWorld_GetBlockInfo(lua_State * tolua_S)
 
 
 
-static int tolua_cWorld_GetBlockTypeMeta(lua_State * tolua_S)
+static int tolua_cWorld_GetBlockMeta(lua_State * tolua_S)
 {
-	// Exported manually, because tolua would generate useless additional parameters (a_BlockType, a_BlockMeta)
-	// Function signature: GetBlockTypeMeta(BlockX, BlockY, BlockZ) -> BlockValid, [BlockType, BlockMeta]
+	/* Function signature:
+	World:GetBlockMeta(BlockX, BlockY, BlockZ) -> BlockMeta
+	--or--
+	World:GetBlockMeta(Position) -> BlockMeta
+	*/
 
-	// Check params:
 	cLuaState L(tolua_S);
+	int OffsetIndex;
 	if (
-		!L.CheckParamUserType(1, "cWorld") ||
-		!L.CheckParamNumber(2, 4) ||
-		!L.CheckParamEnd(5)
+		!L.CheckParamSelf("cWorld") ||
+		!CheckParamVectorOr3Numbers(L, "Vector3<int>", 2, OffsetIndex) ||
+		!L.CheckParamEnd(OffsetIndex)
 	)
 	{
 		return 0;
 	}
 
-	// Get params:
-	cWorld * Self = nullptr;
-	int BlockX = 0;
-	int BlockY = 0;
-	int BlockZ = 0;
-	L.GetStackValues(1, Self, BlockX, BlockY, BlockZ);
-	if (Self == nullptr)
+	if (OffsetIndex != 3)  // Not the vector overload
+	{
+		L.LogStackTrace();
+		LOGWARN("GetBlockMeta with 3 position arguments is deprecated, use vector-parametered version instead.");
+	}
+
+	cWorld * World;
+	Vector3i Position;
+
+	// Read the params:
+	if (
+		!L.GetStackValues(1, World) ||
+		!GetStackVectorOr3Numbers(L, 2, Position)
+	)
+	{
+		return 0;
+	}
+
+	if (World == nullptr)
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	// Call the function:
+	if (!cChunkDef::IsValidHeight(Position))
+	{
+		L.Push(0);
+		return 1;
+	}
+
+	L.Push(World->GetBlockMeta(Position));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cWorld_GetBlockSkyLight(lua_State * tolua_S)
+{
+	/* Function signature:
+	World:GetBlockSkyLight(BlockX, BlockY, BlockZ) -> BlockLight
+	--or--
+	World:GetBlockSkyLight(Position) -> BlockLight
+	*/
+
+	cLuaState L(tolua_S);
+	int OffsetIndex;
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!CheckParamVectorOr3Numbers(L, "Vector3<int>", 2, OffsetIndex) ||
+		!L.CheckParamEnd(OffsetIndex)
+	)
+	{
+		return 0;
+	}
+
+	if (OffsetIndex != 3)  // Not the vector overload
+	{
+		L.LogStackTrace();
+		LOGWARN("GetBlockSkyLight with 3 position arguments is deprecated, use vector-parametered version instead.");
+	}
+
+	cWorld * World;
+	Vector3i Position;
+
+	// Read the params:
+	if (
+		!L.GetStackValues(1, World) ||
+		!GetStackVectorOr3Numbers(L, 2, Position)
+	)
+	{
+		return 0;
+	}
+
+	if (World == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+	}
+
+	if (!cChunkDef::IsValidHeight(Position))
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
+	}
+
+	L.Push(World->GetBlockSkyLight(Position));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cWorld_GetBlockTypeMeta(lua_State * tolua_S)
+{
+	/* Exported manually, because tolua would generate useless additional parameters (a_BlockType, a_BlockMeta)
+	Function signature:
+	GetBlockTypeMeta(BlockX, BlockY, BlockZ) -> BlockValid, [BlockType, BlockMeta]
+	--or--
+	GetBlockTypeMeta(Position) -> BlockValid, [BlockType, BlockMeta]
+	*/
+
+	// Check params:
+	cLuaState L(tolua_S);
+	int OffsetIndex;
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!CheckParamVectorOr3Numbers(L, "Vector3<int>", 2, OffsetIndex) ||
+		!L.CheckParamEnd(OffsetIndex)
+	)
+	{
+		return 0;
+	}
+
+	if (OffsetIndex != 3)  // Not the vector overload
+	{
+		L.LogStackTrace();
+		LOGWARN("GetBlockTypeMeta with 3 position arguments is deprecated, use vector-parametered version instead.");
+	}
+
+	cWorld * World;
+	Vector3i Position;
+
+	// Read the params:
+	if (
+		!L.GetStackValues(1, World) ||
+		!GetStackVectorOr3Numbers(L, 2, Position)
+	)
+	{
+		return 0;
+	}
+
+	if (World == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+	}
+
+	if (!cChunkDef::IsValidHeight(Position))
+	{
+		L.Push(E_BLOCK_AIR, 0);
+		return 2;
+	}
+
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
-	bool res = Self->GetBlockTypeMeta(BlockX, BlockY, BlockZ, BlockType, BlockMeta);
+
+	// Call the function:
+	bool res = World->GetBlockTypeMeta(Position, BlockType, BlockMeta);
 
 	// Push the returned values:
 	L.Push(res);
@@ -690,6 +1259,70 @@ static int tolua_cWorld_GetSignLines(lua_State * tolua_S)
 		L.Push(Line1, Line2, Line3, Line4);
 		return 5;
 	}
+	return 1;
+}
+
+
+
+
+
+static int tolua_cWorld_GetTimeOfDay(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get params:
+	cWorld * Self = nullptr;
+	L.GetStackValues(1, Self);
+	if (Self == nullptr)
+	{
+		return L.ApiParamError("Invalid 'self'");
+	}
+
+	// Call the function:
+	const auto Time = Self->GetTimeOfDay();
+
+	// Push the returned value:
+	L.Push(Time.count());
+	return 1;
+}
+
+
+
+
+
+static int tolua_cWorld_GetWorldAge(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get params:
+	cWorld * Self = nullptr;
+	L.GetStackValues(1, Self);
+	if (Self == nullptr)
+	{
+		return L.ApiParamError("Invalid 'self'");
+	}
+
+	// Call the function:
+	const auto Time = Self->GetWorldAge();
+
+	// Push the returned value:
+	L.Push(static_cast<lua_Number>(Time.count()));
 	return 1;
 }
 
@@ -791,6 +1424,123 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 
 
 
+static int tolua_cWorld_SetBlock(lua_State * tolua_S)
+{
+	/* Function signature:
+	World:SetBlock(BlockX, BlockY, BlockZ, BlockType, BlockMeta)
+	--or--
+	World:SetBlock(Position, BlockType, BlockMeta)
+	*/
+
+	cLuaState L(tolua_S);
+	int OffsetIndex;
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!CheckParamVectorOr3Numbers(L, "Vector3<int>", 2, OffsetIndex) ||
+		!L.CheckParamNumber(OffsetIndex, OffsetIndex + 1) ||
+		!L.CheckParamEnd(OffsetIndex + 2)
+	)
+	{
+		return 0;
+	}
+
+	if (OffsetIndex != 3)  // Not the vector overload
+	{
+		L.LogStackTrace();
+		LOGWARN("SetBlock with 3 position arguments is deprecated, use vector-parametered version instead.");
+	}
+
+	cWorld * World;
+	Vector3i Position;
+	BLOCKTYPE Type;
+	NIBBLETYPE Meta;
+
+	// Read the params:
+	if (
+		!L.GetStackValues(1, World) ||
+		!GetStackVectorOr3Numbers(L, 2, Position) ||
+		!L.GetStackValues(OffsetIndex, Type, Meta)
+	)
+	{
+		return 0;
+	}
+
+	if (World == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+	}
+
+	if (!cChunkDef::IsValidHeight(Position))
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
+	}
+
+	World->SetBlock(Position, Type, Meta);
+	return 0;
+}
+
+
+
+
+
+static int tolua_cWorld_SetBlockMeta(lua_State * tolua_S)
+{
+	/* Function signature:
+	World:SetBlockMeta(BlockX, BlockY, BlockZ, BlockMeta)
+	--or--
+	World:SetBlockMeta(Position, BlockMeta)
+	*/
+
+	cLuaState L(tolua_S);
+	int OffsetIndex;
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!CheckParamVectorOr3Numbers(L, "Vector3<int>", 2, OffsetIndex) ||
+		!L.CheckParamNumber(OffsetIndex) ||
+		!L.CheckParamEnd(OffsetIndex + 1)
+	)
+	{
+		return 0;
+	}
+
+	if (OffsetIndex != 3)  // Not the vector overload
+	{
+		L.LogStackTrace();
+		LOGWARN("SetBlockMeta with 3 position arguments is deprecated, use vector-parametered version instead.");
+	}
+
+	cWorld * World;
+	Vector3i Position;
+	NIBBLETYPE Meta;
+
+	// Read the params:
+	if (
+		!L.GetStackValue(1, World) ||
+		!GetStackVectorOr3Numbers(L, 2, Position) ||
+		!L.GetStackValue(OffsetIndex, Meta)
+	)
+	{
+		return 0;
+	}
+
+	if (World == nullptr)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
+	}
+
+	if (!cChunkDef::IsValidHeight(Position))
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
+	}
+
+	World->SetBlockMeta(Position, Meta);
+	return 0;
+}
+
+
+
+
+
 static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 {
 	// Exported manually, because tolua would generate useless additional return values (a_Line1 .. a_Line4)
@@ -820,11 +1570,42 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 	}
 
 	// Call the function:
-	bool res = Self->SetSignLines(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4);
+	bool res = Self->SetSignLines({BlockX, BlockY, BlockZ}, Line1, Line2, Line3, Line4);
 
 	// Push the returned values:
 	L.Push(res);
 	return 1;
+}
+
+
+
+
+
+static int tolua_cWorld_SetTimeOfDay(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamNumber(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Get params:
+	cWorld * Self = nullptr;
+	cTickTime::rep Time;
+	L.GetStackValues(1, Self, Time);
+	if (Self == nullptr)
+	{
+		return L.ApiParamError("Invalid 'self'");
+	}
+
+	// Call the function:
+	Self->SetTimeOfDay(cTickTime(Time));
+	return 0;
 }
 
 
@@ -862,7 +1643,7 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Could not store the callback parameter");
 	}
 
-	World->ScheduleTask(NumTicks, [Task](cWorld & a_World)
+	World->ScheduleTask(cTickTime(NumTicks), [Task](cWorld & a_World)
 		{
 			Task->Call(&a_World);
 		}
@@ -960,47 +1741,53 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "BroadcastParticleEffect",      tolua_cWorld_BroadcastParticleEffect);
 			tolua_function(tolua_S, "ChunkStay",                    tolua_cWorld_ChunkStay);
 			tolua_function(tolua_S, "DoExplosionAt",                tolua_cWorld_DoExplosionAt);
-			tolua_function(tolua_S, "DoWithBeaconAt",               DoWithXYZ<cWorld, cBeaconEntity,       &cWorld::DoWithBeaconAt>);
-			tolua_function(tolua_S, "DoWithBedAt",                  DoWithXYZ<cWorld, cBedEntity,          &cWorld::DoWithBedAt>);
-			tolua_function(tolua_S, "DoWithBlockEntityAt",          DoWithXYZ<cWorld, cBlockEntity,        &cWorld::DoWithBlockEntityAt>);
-			tolua_function(tolua_S, "DoWithBrewingstandAt",         DoWithXYZ<cWorld, cBrewingstandEntity, &cWorld::DoWithBrewingstandAt>);
-			tolua_function(tolua_S, "DoWithChestAt",                DoWithXYZ<cWorld, cChestEntity,        &cWorld::DoWithChestAt>);
-			tolua_function(tolua_S, "DoWithCommandBlockAt",         DoWithXYZ<cWorld, cCommandBlockEntity, &cWorld::DoWithCommandBlockAt>);
-			tolua_function(tolua_S, "DoWithDispenserAt",            DoWithXYZ<cWorld, cDispenserEntity,    &cWorld::DoWithDispenserAt>);
-			tolua_function(tolua_S, "DoWithDropSpenserAt",          DoWithXYZ<cWorld, cDropSpenserEntity,  &cWorld::DoWithDropSpenserAt>);
-			tolua_function(tolua_S, "DoWithDropperAt",              DoWithXYZ<cWorld, cDropperEntity,      &cWorld::DoWithDropperAt>);
-			tolua_function(tolua_S, "DoWithEntityByID",             DoWithID< cWorld, cEntity,             &cWorld::DoWithEntityByID>);
-			tolua_function(tolua_S, "DoWithFlowerPotAt",            DoWithXYZ<cWorld, cFlowerPotEntity,    &cWorld::DoWithFlowerPotAt>);
-			tolua_function(tolua_S, "DoWithFurnaceAt",              DoWithXYZ<cWorld, cFurnaceEntity,      &cWorld::DoWithFurnaceAt>);
-			tolua_function(tolua_S, "DoWithHopperAt",               DoWithXYZ<cWorld, cHopperEntity,       &cWorld::DoWithHopperAt>);
-			tolua_function(tolua_S, "DoWithMobHeadAt",              DoWithXYZ<cWorld, cMobHeadEntity,      &cWorld::DoWithMobHeadAt>);
+			tolua_function(tolua_S, "DoWithBeaconAt",               DoWithBlockEntityAt<cBeaconEntity, E_BLOCK_BEACON>);
+			tolua_function(tolua_S, "DoWithBedAt",                  DoWithBlockEntityAt<cBedEntity, E_BLOCK_BED>);
+			tolua_function(tolua_S, "DoWithBlockEntityAt",          DoWithBlockEntityAt<cBlockEntity>);
+			tolua_function(tolua_S, "DoWithBrewingstandAt",         DoWithBlockEntityAt<cBrewingstandEntity, E_BLOCK_BREWING_STAND>);
+			tolua_function(tolua_S, "DoWithChestAt",                DoWithBlockEntityAt<cChestEntity, E_BLOCK_CHEST, E_BLOCK_TRAPPED_CHEST>);
+			tolua_function(tolua_S, "DoWithCommandBlockAt",         DoWithBlockEntityAt<cCommandBlockEntity, E_BLOCK_COMMAND_BLOCK>);
+			tolua_function(tolua_S, "DoWithDispenserAt",            DoWithBlockEntityAt<cDispenserEntity, E_BLOCK_DISPENSER>);
+			tolua_function(tolua_S, "DoWithDropSpenserAt",          DoWithBlockEntityAt<cDropSpenserEntity, E_BLOCK_DISPENSER, E_BLOCK_DROPPER>);
+			tolua_function(tolua_S, "DoWithDropperAt",              DoWithBlockEntityAt<cDropperEntity, E_BLOCK_DROPPER>);
+			tolua_function(tolua_S, "DoWithEntityByID",             DoWithID<cWorld, cEntity, &cWorld::DoWithEntityByID>);
+			tolua_function(tolua_S, "DoWithFlowerPotAt",            DoWithBlockEntityAt<cFlowerPotEntity, E_BLOCK_FLOWER_POT>);
+			tolua_function(tolua_S, "DoWithFurnaceAt",              DoWithBlockEntityAt<cFurnaceEntity, E_BLOCK_FURNACE, E_BLOCK_LIT_FURNACE>);
+			tolua_function(tolua_S, "DoWithHopperAt",               DoWithBlockEntityAt<cHopperEntity, E_BLOCK_HOPPER>);
+			tolua_function(tolua_S, "DoWithMobHeadAt",              DoWithBlockEntityAt<cMobHeadEntity, E_BLOCK_HEAD>);
 			tolua_function(tolua_S, "DoWithNearestPlayer",          tolua_cWorld_DoWithNearestPlayer);
-			tolua_function(tolua_S, "DoWithNoteBlockAt",            DoWithXYZ<cWorld, cNoteEntity,         &cWorld::DoWithNoteBlockAt>);
-			tolua_function(tolua_S, "DoWithPlayer",                 DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayer>);
+			tolua_function(tolua_S, "DoWithNoteBlockAt",            DoWithBlockEntityAt<cNoteEntity, E_BLOCK_NOTE_BLOCK>);
+			tolua_function(tolua_S, "DoWithPlayer",                 DoWith<cWorld, cPlayer, &cWorld::DoWithPlayer>);
 			tolua_function(tolua_S, "DoWithPlayerByUUID",           tolua_cWorld_DoWithPlayerByUUID);
-			tolua_function(tolua_S, "FindAndDoWithPlayer",          DoWith<   cWorld, cPlayer,             &cWorld::FindAndDoWithPlayer>);
-			tolua_function(tolua_S, "ForEachBlockEntityInChunk",    ForEachInChunk<cWorld, cBlockEntity,   &cWorld::ForEachBlockEntityInChunk>);
-			tolua_function(tolua_S, "ForEachBrewingstandInChunk",   ForEachInChunk<cWorld, cBrewingstandEntity, &cWorld::ForEachBrewingstandInChunk>);
-			tolua_function(tolua_S, "ForEachChestInChunk",          ForEachInChunk<cWorld, cChestEntity,   &cWorld::ForEachChestInChunk>);
-			tolua_function(tolua_S, "ForEachEntity",                ForEach<       cWorld, cEntity,        &cWorld::ForEachEntity>);
-			tolua_function(tolua_S, "ForEachEntityInBox",           ForEachInBox<  cWorld, cEntity,        &cWorld::ForEachEntityInBox>);
-			tolua_function(tolua_S, "ForEachEntityInChunk",         ForEachInChunk<cWorld, cEntity,        &cWorld::ForEachEntityInChunk>);
-			tolua_function(tolua_S, "ForEachFurnaceInChunk",        ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
+			tolua_function(tolua_S, "FastSetBlock",                 tolua_cWorld_FastSetBlock);
+			tolua_function(tolua_S, "FindAndDoWithPlayer",          DoWith<cWorld, cPlayer, &cWorld::FindAndDoWithPlayer>);
+			tolua_function(tolua_S, "ForEachBlockEntityInChunk",    ForEachBlockEntityInChunk<cBlockEntity>);
+			tolua_function(tolua_S, "ForEachBrewingstandInChunk",   ForEachBlockEntityInChunk<cBrewingstandEntity, E_BLOCK_BREWING_STAND>);
+			tolua_function(tolua_S, "ForEachChestInChunk",          ForEachBlockEntityInChunk<cChestEntity, E_BLOCK_CHEST, E_BLOCK_TRAPPED_CHEST>);
+			tolua_function(tolua_S, "ForEachEntity",                ForEach<cWorld, cEntity, &cWorld::ForEachEntity>);
+			tolua_function(tolua_S, "ForEachEntityInBox",           ForEachInBox<cWorld, cEntity, &cWorld::ForEachEntityInBox>);
+			tolua_function(tolua_S, "ForEachEntityInChunk",         tolua_cWorld_ForEachEntityInChunk);
+			tolua_function(tolua_S, "ForEachFurnaceInChunk",        ForEachBlockEntityInChunk<cFurnaceEntity, E_BLOCK_FURNACE, E_BLOCK_LIT_FURNACE>);
 			tolua_function(tolua_S, "ForEachLoadedChunk",           tolua_cWorld_ForEachLoadedChunk);
-			tolua_function(tolua_S, "ForEachPlayer",                ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
+			tolua_function(tolua_S, "ForEachPlayer",                ForEach<cWorld, cPlayer, &cWorld::ForEachPlayer>);
+			tolua_function(tolua_S, "GetBlock",                     tolua_cWorld_GetBlock);
+			tolua_function(tolua_S, "GetBlockBlockLight",           tolua_cWorld_GetBlockBlockLight);
 			tolua_function(tolua_S, "GetBlockInfo",                 tolua_cWorld_GetBlockInfo);
+			tolua_function(tolua_S, "GetBlockMeta",                 tolua_cWorld_GetBlockMeta);
+			tolua_function(tolua_S, "GetBlockSkyLight",             tolua_cWorld_GetBlockSkyLight);
 			tolua_function(tolua_S, "GetBlockTypeMeta",             tolua_cWorld_GetBlockTypeMeta);
 			tolua_function(tolua_S, "GetSignLines",                 tolua_cWorld_GetSignLines);
+			tolua_function(tolua_S, "GetTimeOfDay",                 tolua_cWorld_GetTimeOfDay);
+			tolua_function(tolua_S, "GetWorldAge",                  tolua_cWorld_GetWorldAge);
 			tolua_function(tolua_S, "PrepareChunk",                 tolua_cWorld_PrepareChunk);
 			tolua_function(tolua_S, "QueueTask",                    tolua_cWorld_QueueTask);
 			tolua_function(tolua_S, "ScheduleTask",                 tolua_cWorld_ScheduleTask);
+			tolua_function(tolua_S, "SetBlock",                     tolua_cWorld_SetBlock);
+			tolua_function(tolua_S, "SetBlockMeta",                 tolua_cWorld_SetBlockMeta);
 			tolua_function(tolua_S, "SetSignLines",                 tolua_cWorld_SetSignLines);
+			tolua_function(tolua_S, "SetTimeOfDay",                 tolua_cWorld_SetTimeOfDay);
 			tolua_function(tolua_S, "SpawnSplitExperienceOrbs",     tolua_cWorld_SpawnSplitExperienceOrbs);
 			tolua_function(tolua_S, "TryGetHeight",                 tolua_cWorld_TryGetHeight);
 		tolua_endmodule(tolua_S);
 	tolua_endmodule(tolua_S);
 }
-
-
-
-

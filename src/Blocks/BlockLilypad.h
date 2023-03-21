@@ -28,10 +28,10 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		auto UnderPos = a_RelPos.addedY(-1);
-		if (!cChunkDef::IsValidHeight(UnderPos.y))
+		auto UnderPos = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(UnderPos))
 		{
 			return false;
 		}
