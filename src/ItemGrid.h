@@ -58,9 +58,10 @@ public:
 	// Retrieve slots by coords or slot number; Logs warning and returns the first slot on invalid coords / slotnum
 	const cItem & GetSlot(int a_X, int a_Y) const;
 	const cItem & GetSlot(size_t a_SlotNum) const { return GetSlot(static_cast<int>(a_SlotNum)); }
-	/** \deprecated Slot numbers should be unsigned, as the STL containers require unsigned indexes (in contrast to C-Arrays).
-	                Consistent unsigned slot indexes eliminate a bunch of static_cast/ToUnsigned.
-	                Signed slot indexes should indicate, that there may be some special values (like -1, when no slot is found)
+	/** \deprecated
+	* Slot numbers should be unsigned, as the STL containers require unsigned indexes (in contrast to C-Arrays).
+	* Consistent unsigned slot indexes eliminate a bunch of static_cast/ToUnsigned.
+	* Signed slot indexes should indicate, that there may be some special values (like -1, when no slot is found)
 	*/
 	const cItem & GetSlot(int a_SlotNum) const;
 
@@ -69,7 +70,7 @@ public:
 	void SetSlot(int a_X, int a_Y, short a_ItemType, char a_ItemCount, short a_ItemDamage);
 	void SetSlot(size_t a_SlotNum, const cItem & a_Item) { SetSlot(static_cast<int>(a_SlotNum), a_Item); }
 	void SetSlot(int a_SlotNum, short a_ItemType, char a_ItemCount, short a_ItemDamage);
-	//! \deprecated See GetSlot
+	/** \deprecated See GetSlot */
 	void SetSlot(int a_SlotNum, const cItem & a_Item);
 
 	// Empty the specified slot; Logs warning and doesn't set on invalid coords / slotnum
@@ -78,7 +79,7 @@ public:
 
 	/** Returns true if the specified slot is empty or the slot doesn't exist */
 	bool IsSlotEmpty(size_t a_SlotNum) const { return IsSlotEmpty(static_cast<int>(a_SlotNum)); }
-	///! \deprecated See GetSlot
+	/** \deprecated See GetSlot */
 	bool IsSlotEmpty(int a_SlotNum) const;
 
 	/** Returns true if the specified slot is empty or the slot doesn't exist */
@@ -120,9 +121,9 @@ public:
 	If the slot is empty, ignores the call.
 	Returns the new count.
 	*/
-	int ChangeSlotCount(size_t a_SlotNum, char a_AddToCount) { return ChangeSlotCount(static_cast<int>(a_SlotNum), a_AddToCount); }
-	///! \deprecated See GetSlot
-	int ChangeSlotCount(int a_SlotNum, char a_AddToCount);
+	char ChangeSlotCount(std::size_t a_SlotNum, char a_AddToCount) { return ChangeSlotCount(static_cast<int>(a_SlotNum), a_AddToCount); }
+	// ! \deprecated See GetSlot
+	char ChangeSlotCount(int a_SlotNum, char a_AddToCount);
 
 	/** Adds (or subtracts, if a_AddToCount is negative) to the count of items in the specified slot.
 	If the slot is empty, ignores the call.

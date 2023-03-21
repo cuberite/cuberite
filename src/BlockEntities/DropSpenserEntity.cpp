@@ -65,8 +65,8 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 		return;
 	}
 
-	const int RandomSlot = m_World->GetTickRandomNumber(SlotsCnt - 1);
-	const int SpenseSlot = OccupiedSlots[RandomSlot];
+	const auto RandomSlot = m_World->GetTickRandomNumber(SlotsCnt - 1);
+	const auto SpenseSlot = OccupiedSlots[RandomSlot];
 
 	if (cPluginManager::Get()->CallHookDropSpense(*m_World, *this, SpenseSlot))
 	{

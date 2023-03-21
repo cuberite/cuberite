@@ -1099,6 +1099,17 @@ void cLuaState::Push(std::chrono::milliseconds a_Value)
 
 
 
+void cLuaState::Push(std::size_t a_Value)
+{
+	ASSERT(IsValid());
+
+	tolua_pushnumber(m_LuaState, static_cast<lua_Number>(a_Value));
+}
+
+
+
+
+
 void cLuaState::Pop(int a_NumValuesToPop)
 {
 	ASSERT(IsValid());
