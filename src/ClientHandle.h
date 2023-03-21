@@ -189,9 +189,9 @@ public:  // tolua_export
 	void SendExplosion                  (Vector3f a_Position, float a_Power);
 	void SendGameMode                   (eGameMode a_GameMode);
 	void SendHealth                     (void);
-	void SendHeldItemChange             (int a_ItemIndex);
+	void SendHeldItemChange             (std::size_t a_ItemIndex);
 	void SendHideTitle                  (void);   // tolua_export
-	void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item);
+	void SendInventorySlot              (char a_WindowID, std::size_t a_SlotNum, const cItem & a_Item);
 	void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo);  // tolua_export
 	void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY);
 	void SendPaintingSpawn              (const cPainting & a_Painting);
@@ -333,7 +333,7 @@ public:  // tolua_export
 
 	/** Called when the client clicks the creative inventory window.
 	a_ClickAction specifies whether the click was inside the window or not (caLeftClick or caLeftClickOutside). */
-	void HandleCreativeInventory(Int16 a_SlotNum, const cItem & a_HeldItem, eClickAction a_ClickAction);
+	void HandleCreativeInventory(std::size_t a_SlotNum, const cItem & a_HeldItem, eClickAction a_ClickAction);
 
 	/** Handles a player sneaking or unsneaking. */
 	void HandleCrouch(bool a_IsCrouching);
@@ -359,7 +359,7 @@ public:  // tolua_export
 
 	/** Called when the protocol receives a MC|TrSel packet, indicating that the player used a trade in
 	the NPC UI. */
-	void HandleNPCTrade(int a_SlotNum);
+	void HandleNPCTrade(std::size_t a_SlotNum);
 
 	/** Handles a player opening his inventory while riding a horse. */
 	void HandleOpenHorseInventory();
@@ -399,7 +399,7 @@ public:  // tolua_export
 	void HandleUnmount          (void);
 	void HandleUseEntity        (UInt32 a_TargetEntityID, bool a_IsLeftClick);
 	void HandleUseItem          (bool a_UsedMainHand);
-	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
+	void HandleWindowClick      (UInt8 a_WindowID, std::size_t a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
 	void HandleWindowClose      (UInt8 a_WindowID);
 
 	/** Called when a recipe from the recipe book is selected */

@@ -21,23 +21,23 @@ class cCraftingGrid  // tolua_export
 {  // tolua_export
 public:
 	cCraftingGrid(const cCraftingGrid & a_Original);
-	cCraftingGrid(int a_Width, int a_Height);  // tolua_export
-	cCraftingGrid(const cItem * a_Items, int a_Width, int a_Height);
+	cCraftingGrid(std::size_t a_Width, std::size_t a_Height);  // tolua_export
+	cCraftingGrid(const cItem * a_Items, std::size_t a_Width, std::size_t a_Height);
 	~cCraftingGrid();
 
 	// tolua_begin
-	int     GetWidth (void) const {return m_Width; }
-	int     GetHeight(void) const {return m_Height; }
-	cItem & GetItem  (int x, int y) const;
-	void    SetItem  (int x, int y, ENUM_ITEM_TYPE a_ItemType, char a_ItemCount, short a_ItemHealth);
-	void    SetItem  (int x, int y, const cItem & a_Item);
+	std::size_t     GetWidth (void) const { return m_Width; }
+	std::size_t     GetHeight(void) const { return m_Height; }
+	cItem & GetItem  (std::size_t x, std::size_t y) const;
+	void    SetItem  (std::size_t x, std::size_t y, ENUM_ITEM_TYPE a_ItemType, char a_ItemCount, short a_ItemHealth);
+	void    SetItem  (std::size_t x, std::size_t y, const cItem & a_Item);
 	void    Clear    (void);
 
 	/** Removes items in a_Grid from m_Items[] (used by cCraftingRecipe::ConsumeIngredients()) */
 	void ConsumeGrid(const cCraftingGrid & a_Grid);
 
 	/** Dumps the entire crafting grid using LOGD() */
-	void Dump(void);
+	void Dump(void) const;
 
 	// tolua_end
 
@@ -48,8 +48,8 @@ public:
 
 protected:
 
-	int     m_Width;
-	int     m_Height;
+	std::size_t     m_Width;
+	std::size_t     m_Height;
 	cItem * m_Items;
 } ;  // tolua_export
 
@@ -64,9 +64,9 @@ public:
 
 	// tolua_begin
 	void          Clear               (void);
-	int           GetIngredientsWidth (void) const {return m_Ingredients.GetWidth(); }
-	int           GetIngredientsHeight(void) const {return m_Ingredients.GetHeight(); }
-	cItem &       GetIngredient       (int x, int y) const {return m_Ingredients.GetItem(x, y); }
+	std::size_t   GetIngredientsWidth (void) const {return m_Ingredients.GetWidth(); }
+	std::size_t   GetIngredientsHeight(void) const {return m_Ingredients.GetHeight(); }
+	cItem &       GetIngredient       (std::size_t x, std::size_t y) const {return m_Ingredients.GetItem(x, y); }
 	const cItem & GetResult           (void) const {return m_Result; }
 	void          SetResult           (ENUM_ITEM_TYPE a_ItemType, char a_ItemCount, short a_ItemHealth);
 	void          SetResult           (const cItem & a_Item)
@@ -74,12 +74,12 @@ public:
 		m_Result = a_Item;
 	}
 
-	void          SetIngredient       (int x, int y, ENUM_ITEM_TYPE a_ItemType, char a_ItemCount, short a_ItemHealth)
+	void          SetIngredient       (std::size_t x, std::size_t y, ENUM_ITEM_TYPE a_ItemType, char a_ItemCount, short a_ItemHealth)
 	{
 		m_Ingredients.SetItem(x, y, a_ItemType, a_ItemCount, a_ItemHealth);
 	}
 
-	void          SetIngredient       (int x, int y, const cItem & a_Item)
+	void          SetIngredient       (std::size_t x, std::size_t y, const cItem & a_Item)
 	{
 		m_Ingredients.SetItem(x, y, a_Item);
 	}
@@ -132,9 +132,9 @@ public:
 	struct cRecipeSlot
 	{
 		cItem m_Item;
-		int x, y;  // 1..3, or -1 for "any"
+		std::size_t x, y;  // 1..3, or ILLEGAL_SLOT_NUMBER for "any"
 	} ;
-	typedef std::vector<cRecipeSlot> cRecipeSlots;
+	using cRecipeSlots = std::vector<cRecipeSlot>;
 
 	/** A single recipe, stored. Each recipe is normalized right after parsing (NormalizeIngredients())
 	A normalized recipe starts at (0, 0) */
@@ -145,8 +145,8 @@ public:
 		AString      m_RecipeName;
 
 		// Size of the regular items in the recipe; "anywhere" items are excluded:
-		int m_Width;
-		int m_Height;
+		std::size_t m_Width;
+		std::size_t m_Height;
 	} ;
 
 	/** Returns the recipe by id */
@@ -177,19 +177,19 @@ protected:
 	void NormalizeIngredients(cRecipe * a_Recipe);
 
 	/** Finds a recipe matching the crafting grid. Returns a newly allocated recipe (with all its coords set) or nullptr if not found. Caller must delete return value! */
-	cRecipe * FindRecipe(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight);
+	cRecipe * FindRecipe(const cItem * a_CraftingGrid, std::size_t a_GridWidth, std::size_t a_GridHeight);
 
 	/** Same as FindRecipe, but the grid is guaranteed to be of minimal dimensions needed */
-	cRecipe * FindRecipeCropped(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight, int a_GridStride);
+	cRecipe * FindRecipeCropped(const cItem * a_CraftingGrid, std::size_t a_GridWidth, std::size_t a_GridHeight, std::size_t a_GridStride);
 
 	/** Checks if the grid matches the specified recipe, offset by the specified offsets. Returns a matched cRecipe * if so, or nullptr if not matching. Caller must delete the return value! */
-	cRecipe * MatchRecipe(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight, int a_GridStride, const cRecipe * a_Recipe, int a_OffsetX, int a_OffsetY);
+	cRecipe * MatchRecipe(const cItem * a_CraftingGrid, std::size_t a_GridWidth, std::size_t a_GridHeight, std::size_t a_GridStride, const cRecipe * a_Recipe, std::size_t a_OffsetX, std::size_t a_OffsetY);
 
 	/** Searches for anything firework related, and does the data setting if appropriate */
-	void HandleFireworks(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, int a_GridStride, int a_OffsetX, int a_OffsetY);
+	void HandleFireworks(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, std::size_t a_GridStride, std::size_t a_OffsetX, std::size_t a_OffsetY);
 
 	/** Searches for anything dye related for leather, calculates the appropriate color value, and sets the resulting value. */
-	void HandleDyedLeather(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, int a_GridStride, int a_GridWidth, int a_GridHeight);
+	void HandleDyedLeather(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, std::size_t a_GridStride, std::size_t a_GridWidth, std::size_t a_GridHeight);
 
 private:
 	/** Mapping the minecraft recipe names to the internal cuberite recipe Ids */

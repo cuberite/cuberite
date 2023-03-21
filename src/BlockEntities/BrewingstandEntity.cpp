@@ -191,7 +191,7 @@ void cBrewingstandEntity::BroadcastProgress(size_t a_ProgressbarID, short a_Valu
 
 
 
-void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
+void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, std::size_t a_SlotNum)
 {
 	Super::OnSlotChanged(a_ItemGrid, a_SlotNum);
 

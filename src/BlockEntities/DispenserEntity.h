@@ -54,12 +54,12 @@ public:  // tolua_export
 private:
 
 	// cDropSpenser overrides:
-	virtual void DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum) override;
+	virtual void DropSpenseFromSlot(cChunk & a_Chunk, std::size_t a_SlotNum) override;
 
 	/** If such a bucket can fit, adds it to m_Contents and returns true */
-	bool ScoopUpLiquid(int a_SlotNum, short a_ResultingBucketItemType);
+	bool ScoopUpLiquid(std::size_t a_SlotNum, short a_ResultingBucketItemType);
 
 	/** If the a_BlockInFront can be washed away by liquid and the empty bucket can fit,
 	does the m_Contents processing and returns true. Returns false otherwise. */
-	bool EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, int a_SlotNum);
+	bool EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, std::size_t a_SlotNum);
 } ;  // tolua_export

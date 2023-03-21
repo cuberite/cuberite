@@ -287,10 +287,10 @@ void cVillager::HandleFarmerTryPlaceCrops()
 	if (IsPlantable(m_CropsPos))
 	{
 		// Finding the item to use to plant a crop
-		int TargetSlot = -1;
+		auto TargetSlot = ILLEGAL_SLOT_NUMBER;
 		BLOCKTYPE CropBlockType = E_BLOCK_AIR;
 
-		for (int I = 0; I < m_Inventory.GetWidth() && TargetSlot < 0; I++)
+		for (std::size_t I = 0; I < m_Inventory.GetWidth() && (TargetSlot == ILLEGAL_SLOT_NUMBER); I++)
 		{
 			const cItem & Slot = m_Inventory.GetSlot(I);
 			switch (Slot.m_ItemType)

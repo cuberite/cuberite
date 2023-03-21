@@ -31,7 +31,7 @@ public:
 		eBlockFace a_ClickedBlockFace
 	) const override
 	{
-		int SlotNum;
+		std::size_t SlotNum;
 		if (ItemCategory::IsHelmet(a_HeldItem.m_ItemType))
 		{
 			SlotNum = 0;

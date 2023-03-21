@@ -165,6 +165,6 @@ protected:
 	void SetIsCooking(bool a_IsCooking);
 
 	// cItemGrid::cListener overrides:
-	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
+	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, std::size_t a_SlotNum) override;
 
 } ;  // tolua_export

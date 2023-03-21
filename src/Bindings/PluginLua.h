@@ -26,7 +26,7 @@ class cPluginLua:
 
 	using Super = cPlugin;
 
-public:
+  public:
 
 	/** A RAII-style mutex lock for accessing the internal LuaState.
 	This will be the only way to retrieve the plugin's LuaState;
@@ -37,7 +37,7 @@ public:
 	*/
 	class cOperation
 	{
-	public:
+	  public:
 		cOperation(cPluginLua & a_Plugin) :
 			m_Plugin(a_Plugin),
 			m_Lock(a_Plugin.m_LuaState)
@@ -46,7 +46,7 @@ public:
 
 		cLuaState & operator ()(void) { return m_Plugin.m_LuaState; }
 
-	protected:
+	  protected:
 		cPluginLua & m_Plugin;
 
 		/** RAII lock for the Lua state. */
@@ -84,9 +84,9 @@ public:
 	virtual bool OnExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) override;
 	virtual bool OnExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) override;
 	virtual bool OnHandshake                (cClientHandle & a_Client, const AString & a_Username) override;
-	virtual bool OnHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, size_t a_SrcSlotNum) override;
-	virtual bool OnHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum) override;
-	virtual bool OnDropSpense               (cWorld & a_World, cDropSpenserEntity & a_DropSpenser, int a_SlotNum) override;
+	virtual bool OnHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, std::size_t a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, std::size_t a_SrcSlotNum) override;
+	virtual bool OnHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, std::size_t a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, std::size_t a_DstSlotNum) override;
+	virtual bool OnDropSpense               (cWorld & a_World, cDropSpenserEntity & a_DropSpenser, std::size_t a_SlotNum) override;
 	virtual bool OnKilled                   (cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage) override;
 	virtual bool OnKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI) override;
 	virtual bool OnLogin                    (cClientHandle & a_Client, UInt32 a_ProtocolVersion, const AString & a_Username) override;
@@ -162,7 +162,7 @@ public:
 		return cOperation(*this)().Call(a_Fn, a_Args...);
 	}
 
-protected:
+  protected:
 	/** Provides an array of Lua function references */
 	typedef std::vector<cLuaState::cCallbackPtr> cLuaCallbacks;
 

@@ -98,7 +98,7 @@ void cEnderChestEntity::OpenNewWindow()
 
 void cEnderChestEntity::LoadFromJson(const Json::Value & a_Value, cItemGrid & a_Grid)
 {
-	int SlotIdx = 0;
+	std::size_t SlotIdx = 0;
 	for (auto & Node : a_Value)
 	{
 		cItem Item;

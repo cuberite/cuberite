@@ -31,5 +31,5 @@ public:  // tolua_export
 protected:
 
 	// cDropSpenserEntity overrides:
-	virtual void DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum) override;
+	virtual void DropSpenseFromSlot(cChunk & a_Chunk, std::size_t a_SlotNum) override;
 } ;  // tolua_export

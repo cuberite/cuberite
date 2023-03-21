@@ -77,5 +77,5 @@ private:
 	virtual bool UsedBy(cPlayer * a_Player) override;
 
 	/** cItemGrid::cListener overrides: */
-	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override;
+	virtual void OnSlotChanged(cItemGrid * a_Grid, std::size_t a_SlotNum) override;
 } ;  // tolua_export
