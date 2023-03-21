@@ -3949,7 +3949,7 @@ static int tolua_cCompositeChat_AddRunCommandPart(lua_State * tolua_S)
 	}
 
 	// Add the part:
-	AString Text, Command, Style = "u@a";
+	AString Text, Command, Style = "na";
 	L.GetStackValue(2, Text);
 	L.GetStackValue(3, Command);
 	L.GetStackValue(4, Style);

@@ -1107,6 +1107,9 @@ private:
 
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
 
+	/** Ticks all clients that are in this world. */
+	void TickClients(std::chrono::milliseconds a_Dt);
+
 	/** Handles the weather in each tick */
 	void TickWeather(float a_Dt);
 

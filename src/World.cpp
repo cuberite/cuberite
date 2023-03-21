@@ -1033,6 +1033,7 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		Player->GetClientHandle()->ProcessProtocolIn();
 	}
 
+	TickClients(a_Dt);
 	TickQueuedChunkDataSets();
 	TickQueuedBlocks();
 	m_ChunkMap.Tick(a_Dt);
@@ -1065,6 +1066,18 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 			// Save if we have too many dirty unused chunks
 			SaveAllChunks();
 		}
+	}
+}
+
+
+
+
+
+void cWorld::TickClients(const std::chrono::milliseconds a_Dt)
+{
+	for (const auto Player : m_Players)
+	{
+		Player->GetClientHandle()->Tick(a_Dt);
 	}
 }
 
@@ -1382,6 +1395,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 			case eExplosionSource::esGhastFireball:
 			case eExplosionSource::esMonster:
 			case eExplosionSource::esPrimedTNT:
+			case eExplosionSource::esTNTMinecart:
 			case eExplosionSource::esWitherBirth:
 			case eExplosionSource::esWitherSkull:
 			{

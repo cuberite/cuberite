@@ -684,21 +684,6 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 
 void cChunk::Tick(std::chrono::milliseconds a_Dt)
 {
-	const auto ShouldTick = ShouldBeTicked();
-
-	// If we are not valid, tick players and bailout
-	if (!ShouldTick)
-	{
-		for (const auto & Entity : m_Entities)
-		{
-			if (Entity->IsPlayer())
-			{
-				Entity->Tick(a_Dt, *this);
-			}
-		}
-		return;
-	}
-
 	TickBlocks();
 
 	// Tick all block entities in this chunk:

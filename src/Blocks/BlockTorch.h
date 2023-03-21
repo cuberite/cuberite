@@ -1,8 +1,12 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "BlockSlab.h"
+#include "BlockStairs.h"
 #include "../Chunk.h"
+#include "BlockType.h"
 #include "ChunkInterface.h"
+#include "Defines.h"
 #include "Mixins.h"
 
 
@@ -22,6 +26,34 @@ public:
 	/** Returns true if the torch can be placed on the specified block's face. */
 	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_BlockFace)
 	{
+		// upside down slabs
+		if (cBlockSlabHandler::IsAnySlabType(a_BlockType))
+		{
+			return (a_BlockFace == BLOCK_FACE_YP) && (a_BlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN);
+		}
+
+		// stairs (top and sides)
+		if (cBlockStairsHandler::IsAnyStairType(a_BlockType))
+		{
+			switch (a_BlockFace)
+			{
+				case eBlockFace::BLOCK_FACE_YP:
+					return (a_BlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+				case eBlockFace::BLOCK_FACE_XP:
+					return ((a_BlockMeta & 0b11) == E_BLOCK_STAIRS_XP);
+				case eBlockFace::BLOCK_FACE_XM:
+					return ((a_BlockMeta & 0b11) == E_BLOCK_STAIRS_XM);
+				case eBlockFace::BLOCK_FACE_ZP:
+					return ((a_BlockMeta & 0b11) == E_BLOCK_STAIRS_ZP);
+				case eBlockFace::BLOCK_FACE_ZM:
+					return ((a_BlockMeta & 0b11) == E_BLOCK_STAIRS_ZM);
+				default:
+				{
+					return false;
+				}
+			}
+		}
+
 		switch (a_BlockType)
 		{
 			case E_BLOCK_END_PORTAL_FRAME:
@@ -43,28 +75,6 @@ public:
 			{
 				// Torches can only be placed on top of these blocks
 				return (a_BlockFace == BLOCK_FACE_YP);
-			}
-			case E_BLOCK_STONE_SLAB:
-			case E_BLOCK_WOODEN_SLAB:
-			{
-				// Toches can be placed only on the top of top-half-slabs
-				return ((a_BlockFace == BLOCK_FACE_YP) && ((a_BlockMeta & 0x08) == 0x08));
-			}
-			case E_BLOCK_OAK_WOOD_STAIRS:
-			case E_BLOCK_COBBLESTONE_STAIRS:
-			case E_BLOCK_BRICK_STAIRS:
-			case E_BLOCK_STONE_BRICK_STAIRS:
-			case E_BLOCK_NETHER_BRICK_STAIRS:
-			case E_BLOCK_SANDSTONE_STAIRS:
-			case E_BLOCK_SPRUCE_WOOD_STAIRS:
-			case E_BLOCK_BIRCH_WOOD_STAIRS:
-			case E_BLOCK_JUNGLE_WOOD_STAIRS:
-			case E_BLOCK_QUARTZ_STAIRS:
-			case E_BLOCK_ACACIA_WOOD_STAIRS:
-			case E_BLOCK_DARK_OAK_WOOD_STAIRS:
-			case E_BLOCK_RED_SANDSTONE_STAIRS:
-			{
-				return (a_BlockFace == BLOCK_FACE_TOP) && (a_BlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
 			}
 			default:
 			{

@@ -377,6 +377,7 @@ public:  // tolua_export
 
 
 	void HandlePluginMessage    (const AString & a_Channel, ContiguousByteBufferView a_Message);
+	void HandleResourcePack     (UInt8 a_Status);
 	void HandleRespawn          (void);
 	void HandleRightClick       (Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_Cursor, bool a_UsedMainHand);
 	void HandleSlotSelected     (Int16 a_SlotNum);

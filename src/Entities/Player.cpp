@@ -3156,8 +3156,6 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 
 void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	m_ClientHandle->Tick(a_Dt);
-
 	if (m_ClientHandle->IsDestroyed())
 	{
 		Destroy();
@@ -3180,13 +3178,6 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			m_Stats.Custom[CustomStatistic::SneakTime] += TicksElapsed;
 		}
-	}
-
-	if (!a_Chunk.IsValid())
-	{
-		// Players are ticked even if the parent chunk is invalid.
-		// We've processed as much as we can, bail:
-		return;
 	}
 
 	ASSERT((GetParentChunk() != nullptr) && (GetParentChunk()->IsValid()));
