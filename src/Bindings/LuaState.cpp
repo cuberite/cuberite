@@ -1088,17 +1088,6 @@ void cLuaState::Push(const UInt32 a_Value)
 
 
 
-void cLuaState::Push(std::size_t a_Value)
-{
-	ASSERT(IsValid());
-
-	tolua_pushnumber(m_LuaState, a_Value);
-}
-
-
-
-
-
 void cLuaState::Push(std::chrono::milliseconds a_Value)
 {
 	ASSERT(IsValid());

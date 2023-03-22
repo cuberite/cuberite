@@ -7,6 +7,7 @@
 #include "CraftingRecipes.h"
 #include "Root.h"
 #include "Bindings/PluginManager.h"
+#include "ItemGrid.h"
 
 
 
@@ -752,7 +753,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 	// Check the regular items first:
 	std::array<std::array<bool, MAX_GRID_WIDTH>, MAX_GRID_HEIGHT> HasMatched;
 	memset(HasMatched.data(), 0, HasMatched.size());
-	for (auto Ingredient : a_Recipe->m_Ingredients)
+	for (const auto & Ingredient : a_Recipe->m_Ingredients)
 	{
 		if ((Ingredient.x == ILLEGAL_SLOT_NUMBER) || (Ingredient.y == ILLEGAL_SLOT_NUMBER))
 		{
@@ -785,7 +786,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 	// The "anywhere" items are processed on a first-come-first-served basis.
 	// Do not use a recipe with one horizontal and one vertical "anywhere" ("*:1, 1:*") as it may not match properly!
 	cRecipeSlots MatchedSlots;  // Stores the slots of "anywhere" items that have matched, with the match coords
-	for (auto Ingredient : a_Recipe->m_Ingredients)
+	for (const auto & Ingredient : a_Recipe->m_Ingredients)
 	{
 		if ((Ingredient.x == ILLEGAL_SLOT_NUMBER) || (Ingredient.y == ILLEGAL_SLOT_NUMBER))
 		{
@@ -857,7 +858,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 	Recipe->m_Result = a_Recipe->m_Result;
 	Recipe->m_Width  = a_Recipe->m_Width;
 	Recipe->m_Height = a_Recipe->m_Height;
-	for (auto Ingredient : a_Recipe->m_Ingredients)
+	for (const auto & Ingredient : a_Recipe->m_Ingredients)
 	{
 	if ((Ingredient.x == ILLEGAL_SLOT_NUMBER) || (Ingredient.y == ILLEGAL_SLOT_NUMBER))
 		{

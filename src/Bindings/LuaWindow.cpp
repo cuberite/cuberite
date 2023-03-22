@@ -201,7 +201,7 @@ void cLuaWindow::OnSlotChanged(cItemGrid * a_ItemGrid, std::size_t a_SlotNum)
 	// If an OnSlotChanged callback has been registered, call it:
 	if (m_OnSlotChanged != nullptr)
 	{
-		m_OnSlotChanged->Call(this, a_SlotNum);
+		m_OnSlotChanged->Call(this, static_cast<const UInt32>(a_SlotNum));
 	}
 }
 
