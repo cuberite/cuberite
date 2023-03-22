@@ -569,7 +569,7 @@ int cItemGrid::HowManyItems(const cItem & a_Item)
 	}
 
 	int res = 0;
-	for (auto const & Slot : m_Slots)
+	for (const auto & Slot : m_Slots)
 	{
 		if (Slot.IsEqual(a_Item))
 		{

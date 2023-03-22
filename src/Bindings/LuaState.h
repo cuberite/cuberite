@@ -630,7 +630,6 @@ public:
 	void Push(long a_Value);
 	void Push(const UInt32 a_Value);
 	void Push(std::chrono::milliseconds a_time);
-	void Push(std::size_t a_Value);
 
 	/** Pops the specified number of values off the top of the Lua stack. */
 	void Pop(int a_NumValuesToPop = 1);

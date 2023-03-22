@@ -891,7 +891,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 
 	if (a_Recipe->m_Result.m_ItemType == E_ITEM_FIREWORK_ROCKET)
 	{
-		for (auto const & Ingredient : a_Recipe->m_Ingredients)
+		for (const auto & Ingredient : a_Recipe->m_Ingredients)
 		{
 			switch (Ingredient.m_Item.m_ItemType)
 			{
@@ -918,7 +918,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 		std::vector<int> DyeColours;
 		bool FoundStar = false;
 
-		for (auto const & Ingredient : a_Recipe->m_Ingredients)
+		for (const auto & Ingredient : a_Recipe->m_Ingredients)
 		{
 			switch (Ingredient.m_Item.m_ItemType)
 			{

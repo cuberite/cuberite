@@ -12,7 +12,7 @@ class cLazyArray
 	static_assert(std::is_default_constructible<T>::value,
 		"cLazyArray<T>: T must be default constructible");
 	static_assert(std::is_integral<size_type>::value,
-	    "cLazyArray<T, size_type>: size_type must be a arithmetic type");
+		"cLazyArray<T, size_type>: size_type must be a integral type");
 public:
 	using value_type = T;
 	using pointer = T *;

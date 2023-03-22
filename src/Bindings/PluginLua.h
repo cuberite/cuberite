@@ -26,7 +26,7 @@ class cPluginLua:
 
 	using Super = cPlugin;
 
-  public:
+public:
 
 	/** A RAII-style mutex lock for accessing the internal LuaState.
 	This will be the only way to retrieve the plugin's LuaState;
@@ -37,7 +37,7 @@ class cPluginLua:
 	*/
 	class cOperation
 	{
-	  public:
+	public:
 		cOperation(cPluginLua & a_Plugin) :
 			m_Plugin(a_Plugin),
 			m_Lock(a_Plugin.m_LuaState)
@@ -46,7 +46,7 @@ class cPluginLua:
 
 		cLuaState & operator ()(void) { return m_Plugin.m_LuaState; }
 
-	  protected:
+	protected:
 		cPluginLua & m_Plugin;
 
 		/** RAII lock for the Lua state. */
@@ -162,7 +162,7 @@ class cPluginLua:
 		return cOperation(*this)().Call(a_Fn, a_Args...);
 	}
 
-  protected:
+protected:
 	/** Provides an array of Lua function references */
 	typedef std::vector<cLuaState::cCallbackPtr> cLuaCallbacks;
 
