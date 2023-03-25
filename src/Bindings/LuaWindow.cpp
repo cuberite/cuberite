@@ -201,7 +201,7 @@ void cLuaWindow::OnSlotChanged(cItemGrid * a_ItemGrid, std::size_t a_SlotNum)
 	// If an OnSlotChanged callback has been registered, call it:
 	if (m_OnSlotChanged != nullptr)
 	{
-		m_OnSlotChanged->Call(this, static_cast<const UInt32>(a_SlotNum));
+		m_OnSlotChanged->Call(this, static_cast<UInt32>(a_SlotNum));
 	}
 }
 
@@ -215,7 +215,7 @@ void cLuaWindow::Clicked(cPlayer & a_Player, int a_WindowID, std::size_t a_SlotN
 	{
 		// Plugin can stop a click
 		bool res;
-		if (m_OnClicked->Call(this, &a_Player, a_SlotNum, a_ClickAction, a_ClickedItem, cLuaState::Return, res) && res)
+		if (m_OnClicked->Call(this, &a_Player, static_cast<UInt32>(a_SlotNum), a_ClickAction, a_ClickedItem, cLuaState::Return, res) && res)
 		{
 			// Tell the client the actual state of the window
 			a_Player.GetClientHandle()->SendInventorySlot(-1, ILLEGAL_SLOT_NUMBER, a_Player.GetDraggingItem());
