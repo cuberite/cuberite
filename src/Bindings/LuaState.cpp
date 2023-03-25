@@ -1077,7 +1077,7 @@ void cLuaState::Push(long a_Value)
 
 
 
-void cLuaState::Push(const UInt32 a_Value)
+void cLuaState::Push(UInt32 a_Value)
 {
 	ASSERT(IsValid());
 
