@@ -440,13 +440,13 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 	Socket.SetExpectedPeerName(a_ServerName);
 	if (!Socket.Connect(a_ServerName, 443))
 	{
-		LOGWARNING("%s: Can't connect to %s: %s", __FUNCTION__, a_ServerName.c_str(), Socket.GetLastErrorText().c_str());
+		LOGWARNING("%s: Can't connect to %s: %s", __METHOD_NAME__, a_ServerName.c_str(), Socket.GetLastErrorText().c_str());
 		return false;
 	}
 
 	if (!Socket.Send(a_Request.c_str(), a_Request.size()))
 	{
-		LOGWARNING("%s: Writing SSL data failed: %s", __FUNCTION__, Socket.GetLastErrorText().c_str());
+		LOGWARNING("%s: Writing SSL data failed: %s", __METHOD_NAME__, Socket.GetLastErrorText().c_str());
 		return false;
 	}
 
@@ -460,7 +460,7 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 		if ((ret == MBEDTLS_ERR_SSL_WANT_READ) || (ret == MBEDTLS_ERR_SSL_WANT_WRITE))
 		{
 			// This value should never be returned, it is handled internally by cBlockingSslClientSocket
-			LOGWARNING("%s: SSL reading failed internally", __FUNCTION__);
+			LOGWARNING("%s: SSL reading failed internally", __METHOD_NAME__);
 			return false;
 		}
 		if (ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)
@@ -469,7 +469,7 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 		}
 		if (ret < 0)
 		{
-			LOGWARNING("%s: SSL reading failed: -0x%x", __FUNCTION__, -ret);
+			LOGWARNING("%s: SSL reading failed: -0x%x", __METHOD_NAME__, -ret);
 			return false;
 		}
 		if (ret == 0)
@@ -673,7 +673,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		AString HexDump;
 		if (Response.compare(0, Prefix.size(), Prefix))
 		{
-			LOGINFO("%s failed: bad HTTP status line received", __FUNCTION__);
+			LOGINFO("%s failed: bad HTTP status line received", __METHOD_NAME__);
 			LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
 			continue;
 		}
@@ -682,7 +682,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		size_t idxHeadersEnd = Response.find("\r\n\r\n");
 		if (idxHeadersEnd == AString::npos)
 		{
-			LOGINFO("%s failed: bad HTTP response header received", __FUNCTION__);
+			LOGINFO("%s failed: bad HTTP response header received", __METHOD_NAME__);
 			LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
 			continue;
 		}
@@ -692,7 +692,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		AString ParseError;
 		if (!JsonUtils::ParseString(Response, root, &ParseError) || !root.isArray())
 		{
-			LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __FUNCTION__, ParseError);
+			LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __METHOD_NAME__, ParseError);
 			LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16));
 			continue;
 		}
@@ -783,7 +783,7 @@ void cMojangAPI::QueryUUIDToProfile(const cUUID & a_UUID)
 	AString HexDump;
 	if (Response.compare(0, Prefix.size(), Prefix))
 	{
-		LOGINFO("%s failed: bad HTTP status line received", __FUNCTION__);
+		LOGINFO("%s failed: bad HTTP status line received", __METHOD_NAME__);
 		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
 		return;
 	}
@@ -792,7 +792,7 @@ void cMojangAPI::QueryUUIDToProfile(const cUUID & a_UUID)
 	size_t idxHeadersEnd = Response.find("\r\n\r\n");
 	if (idxHeadersEnd == AString::npos)
 	{
-		LOGINFO("%s failed: bad HTTP response header received", __FUNCTION__);
+		LOGINFO("%s failed: bad HTTP response header received", __METHOD_NAME__);
 		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
 		return;
 	}
@@ -803,7 +803,7 @@ void cMojangAPI::QueryUUIDToProfile(const cUUID & a_UUID)
 	AString ParseError;
 	if (!JsonUtils::ParseString(Response, root, &ParseError) || !root.isObject())
 	{
-		LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __FUNCTION__, ParseError);
+		LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __METHOD_NAME__, ParseError);
 		LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
 		return;
 	}
@@ -883,7 +883,7 @@ void cMojangAPI::Update(void)
 	}
 	if (!PlayerNames.empty())
 	{
-		LOG("cMojangAPI: Updating name-to-uuid cache for %u names", static_cast<unsigned>(PlayerNames.size()));
+		LOG("%s: Updating name-to-uuid cache for %u names", __METHOD_NAME__, static_cast<unsigned>(PlayerNames.size()));
 		QueryNamesToUUIDs(PlayerNames);
 	}
 
@@ -901,7 +901,7 @@ void cMojangAPI::Update(void)
 	}
 	if (!ProfileUUIDs.empty())
 	{
-		LOG("cMojangAPI: Updating uuid-to-profile cache for %u uuids", static_cast<unsigned>(ProfileUUIDs.size()));
+		LOG("%s: Updating uuid-to-profile cache for %u uuids", __METHOD_NAME__, static_cast<unsigned>(ProfileUUIDs.size()));
 		for (const auto & UUID : ProfileUUIDs)
 		{
 			QueryUUIDToProfile(UUID);
