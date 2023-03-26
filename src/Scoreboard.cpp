@@ -361,11 +361,15 @@ cTeam * cScoreboard::RegisterTeam(
 	const AString & a_Prefix, const AString & a_Suffix
 )
 {
-	cTeam Team(a_Name, a_DisplayName, a_Prefix, a_Suffix);
+	auto [TeamIterator, TeamExists] = m_Teams.try_emplace(a_Name, a_Name, a_DisplayName, a_Prefix, a_Suffix);
 
-	std::pair<cTeamMap::iterator, bool> Status = m_Teams.insert(cNamedTeam(a_Name, Team));
+	if (!TeamExists && GetTeam(a_Name))
+	{
+		LOGWARNING("Tried to register a team that already exists: %s", a_Name.c_str());
+		return nullptr;
+	}
 
-	return Status.second ? &Status.first->second : nullptr;
+	return &TeamIterator->second;
 }
 
 
