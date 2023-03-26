@@ -371,7 +371,7 @@ public:
 				return;
 			}
 		}
-		m_ParentRequest.GetCallbacks().OnStatusLine(a_FirstLine.substr(1, idxFirstSpace), resultCode, a_FirstLine.substr(idxSecondSpace + 1));
+		m_ParentRequest.GetCallbacks().OnStatusLine(a_FirstLine.substr(0, idxFirstSpace), resultCode, a_FirstLine.substr(idxSecondSpace + 1));
 	}
 
 

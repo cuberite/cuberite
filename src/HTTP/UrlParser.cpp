@@ -3,6 +3,7 @@
 
 // Implements the cUrlParser class that parses string URL into individual parts
 
+#include <regex>
 #include "Globals.h"
 #include "UrlParser.h"
 
@@ -194,6 +195,22 @@ std::pair<bool, AString> cUrlParser::Parse(
 	return std::make_pair(true, AString());
 }
 
+
+
+
+
+bool cUrlParser::Validate(const AString & a_Url)
+{
+	// https://stackoverflow.com/questions/5620235/cpp-regular-expression-to-validate-url
+	// I didn't use the first solution deliberately because it didn't enforce the http(s) in the beginning
+
+	const std::regex UrlRegex (
+		R"(^(([^:\/?#]+):)?(//([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?)",
+		std::regex::extended
+	);
+	std::smatch UrlMatchResult;
+	return std::regex_match(a_Url, UrlMatchResult, UrlRegex);
+}
 
 
 

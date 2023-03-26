@@ -11,7 +11,8 @@
 
 #include <time.h>
 
-#include "../UUID.h"
+#include "UUID.h"
+#include "HTTP/UrlClient.h"
 
 
 
@@ -41,11 +42,6 @@ public:
 	/** Initializes the API; reads the settings from the specified ini file.
 	Loads cached results from disk. */
 	void Start(cSettingsRepositoryInterface & a_Settings, bool a_ShouldAuth);
-
-	/** Connects to the specified server using SSL, sends the given request and receives the response.
-	Checks Mojang certificates using the hard-coded Starfield root CA certificate.
-	Returns true if all was successful, false on failure. */
-	static bool SecureRequest(const AString & a_ServerName, const AString & a_Request, AString & a_Response);
 
 	/** Converts a player name into a UUID.
 	The UUID will be nil on error.
@@ -82,6 +78,34 @@ public:
 
 	/** Sets the m_RankMgr that is used for name-uuid notifications. Accepts nullptr to remove the binding. */
 	void SetRankManager(cRankManager * a_RankManager) { m_RankMgr = a_RankManager; }
+
+	class cCallbacks : public cUrlClient::cCallbacks
+	{
+	public:
+
+		explicit cCallbacks(std::shared_ptr<cEvent> a_Event, AString & a_ResponseBody) : m_Event(std::move(a_Event)), m_ResponseBody(a_ResponseBody) {}
+
+		void OnBodyFinished() override
+		{
+			m_Event->Set();
+		}
+
+		void OnError(const AString & a_ErrorMsg) override
+		{
+			LOGERROR("%s %d: HTTP Error: %s", __FILE__, __LINE__, a_ErrorMsg.c_str());
+			m_Event->Set();
+		}
+
+		void OnBodyData(const void * a_Data, size_t a_Size) override
+		{
+			m_ResponseBody.append(static_cast<const char *>(a_Data), a_Size);
+		}
+
+		std::shared_ptr<cEvent> m_Event;
+
+		/** The accumulator for the partial body data, so that OnBodyFinished() can send the entire thing at once. */
+		AString & m_ResponseBody;
+	};
 
 protected:
 	/** The thread that periodically checks for stale data and re-queries it from the server. */

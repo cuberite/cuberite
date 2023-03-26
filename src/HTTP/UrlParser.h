@@ -51,6 +51,9 @@ public:
 		AString & a_Query,
 		AString & a_Fragment
 	);
+
+	/** Checks if the supplied URL is valid */
+	static bool Validate(const AString & a_Url);
 };
 
 

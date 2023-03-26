@@ -1,18 +1,17 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "Authenticator.h"
-#include "MojangAPI.h"
-#include "../Root.h"
-#include "../Server.h"
-#include "../ClientHandle.h"
-#include "../UUID.h"
+#include "Protocol/Authenticator.h"
+#include "Protocol/MojangAPI.h"
+#include "Root.h"
+#include "Server.h"
+#include "ClientHandle.h"
+#include "UUID.h"
+#include "HTTP/UrlParser.h"
 
-#include "../IniFile.h"
-#include "../JsonUtils.h"
+#include "IniFile.h"
+#include "JsonUtils.h"
 #include "json/json.h"
-
-#include "../mbedTLS++/BlockingSslClientSocket.h"
 
 
 
@@ -51,6 +50,24 @@ void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 	m_Server             = a_Settings.GetValueSet ("Authentication", "Server", DEFAULT_AUTH_SERVER);
 	m_Address            = a_Settings.GetValueSet ("Authentication", "Address", DEFAULT_AUTH_ADDRESS);
 	m_ShouldAuthenticate = a_Settings.GetValueSetB("Authentication", "Authenticate", true);
+
+	if (!cUrlParser::Validate(m_Server))
+	{
+		LOGWARNING("%s %d: Supplied invalid URL for authentication server: \"%s\", using default!", __FUNCTION__, __LINE__, m_Server.c_str());
+		m_Server = DEFAULT_AUTH_SERVER;
+	}
+
+	if (!cUrlParser::Validate(m_Address))
+	{
+		LOGWARNING("%s %d: Supplied invalid URL for authentication address: \"%s\", using default!", __FUNCTION__, __LINE__, m_Server.c_str());
+		m_Address = DEFAULT_AUTH_ADDRESS;
+	}
+
+	// prepend https:// if missing
+	if (m_Server.rfind("http") == AString::npos)
+	{
+		m_Server = "https://" + m_Server;
+	}
 }
 
 
@@ -143,7 +160,7 @@ void cAuthenticator::Execute(void)
 
 
 
-bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, cUUID & a_UUID, Json::Value & a_Properties)
+bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, cUUID & a_UUID, Json::Value & a_Properties) const
 {
 	LOGD("Trying to authenticate user %s", a_UserName.c_str());
 
@@ -152,38 +169,20 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	ReplaceURL(ActualAddress, "%USERNAME%", a_UserName);
 	ReplaceURL(ActualAddress, "%SERVERID%", a_ServerId);
 
-	AString Request;
-	Request += "GET " + ActualAddress + " HTTP/1.0\r\n";
-	Request += "Host: " + m_Server + "\r\n";
-	Request += "User-Agent: Cuberite\r\n";
-	Request += "Connection: close\r\n";
-	Request += "\r\n";
-
+	// Create and send the HTTP request
+	auto EvtFinished = std::make_shared<cEvent>();
 	AString Response;
-	if (!cMojangAPI::SecureRequest(m_Server, Request, Response))
+	auto Callbacks = std::make_unique<cMojangAPI::cCallbacks>(EvtFinished, Response);
+	auto [Success, ErrorMessage] = cUrlClient::Get(m_Server + ActualAddress, std::move(Callbacks));
+	if (Success)
 	{
+		EvtFinished->Wait();
+	}
+	else
+	{
+		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, Response.c_str());
 		return false;
 	}
-
-	// Check the HTTP status line:
-	const AString Prefix("HTTP/1.1 200 OK");
-	AString HexDump;
-	if (Response.compare(0, Prefix.size(), Prefix))
-	{
-		LOGINFO("User %s failed to auth, bad HTTP status line received", a_UserName.c_str());
-		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
-		return false;
-	}
-
-	// Erase the HTTP headers from the response:
-	size_t idxHeadersEnd = Response.find("\r\n\r\n");
-	if (idxHeadersEnd == AString::npos)
-	{
-		LOGINFO("User %s failed to authenticate, bad HTTP response header received", a_UserName.c_str());
-		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
-		return false;
-	}
-	Response.erase(0, idxHeadersEnd + 4);
 
 	// Parse the Json response:
 	if (Response.empty())
@@ -193,14 +192,14 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	Json::Value root;
 	if (!JsonUtils::ParseString(Response, root))
 	{
-		LOGWARNING("cAuthenticator: Cannot parse received data (authentication) to JSON!");
+		LOGWARNING("%s: Cannot parse received data (authentication) to JSON!", __FUNCTION__);
 		return false;
 	}
 	a_UserName = root.get("name", "Unknown").asString();
 	a_Properties = root["properties"];
 	if (!a_UUID.FromString(root.get("id", "").asString()))
 	{
-		LOGWARNING("cAuthenticator: Recieved invalid UUID format");
+		LOGWARNING("%s: Received invalid UUID format", __FUNCTION__);
 		return false;
 	}
 
