@@ -4,11 +4,12 @@
 // Implements the cUrlClient class for high-level URL interaction
 
 #include "Globals.h"
-#include "UrlClient.h"
-#include "UrlParser.h"
-#include "HTTPMessageParser.h"
-#include "../mbedTLS++/X509Cert.h"
-#include "../mbedTLS++/CryptoKey.h"
+
+#include "HTTP/UrlClient.h"
+#include "HTTP/UrlParser.h"
+#include "HTTP/HTTPMessageParser.h"
+#include "mbedTLS++/X509Cert.h"
+#include "mbedTLS++/CryptoKey.h"
 
 
 
@@ -16,7 +17,44 @@
 
 // fwd:
 class cSchemeHandler;
-typedef std::shared_ptr<cSchemeHandler> cSchemeHandlerPtr;
+using cSchemeHandlerPtr = std::shared_ptr<cSchemeHandler>;
+
+
+/** This is a basic set of callbacks to enable quick implementation of HTTP request. */
+namespace
+{
+	class cSimpleHTTPCallbacks :
+		public cUrlClient::cCallbacks
+	{
+	public:
+
+		explicit cSimpleHTTPCallbacks(std::shared_ptr<cEvent> a_Event, AString & a_ResponseBody) :
+			m_Event(std::move(a_Event)), m_ResponseBody(a_ResponseBody)
+		{
+		}
+
+		void OnBodyFinished() override
+		{
+			m_Event->Set();
+		}
+
+		void OnError(const AString & a_ErrorMsg) override
+		{
+			LOGERROR("%s %d: HTTP Error: %s", __FILE__, __LINE__, a_ErrorMsg.c_str());
+			m_Event->Set();
+		}
+
+		void OnBodyData(const void * a_Data, size_t a_Size) override
+		{
+			m_ResponseBody.append(static_cast<const char *>(a_Data), a_Size);
+		}
+
+		std::shared_ptr<cEvent> m_Event;
+
+		/** The accumulator for the partial body data, so that OnBodyFinished() can send the entire thing at once. */
+		AString & m_ResponseBody;
+	};
+}
 
 
 
@@ -261,7 +299,7 @@ public:
 		m_Link = &a_Link;
 		if (m_IsTls)
 		{
-			m_Link->StartTLSClient(m_ParentRequest.GetOwnCert(), m_ParentRequest.GetOwnPrivKey());
+			m_Link->StartTLSClient(m_ParentRequest.GetOwnCert(), m_ParentRequest.GetOwnPrivKey(), m_ParentRequest.m_UrlHost);
 		}
 		else
 		{
@@ -371,7 +409,7 @@ public:
 				return;
 			}
 		}
-		m_ParentRequest.GetCallbacks().OnStatusLine(a_FirstLine.substr(1, idxFirstSpace), resultCode, a_FirstLine.substr(idxSecondSpace + 1));
+		m_ParentRequest.GetCallbacks().OnStatusLine(a_FirstLine.substr(0, idxFirstSpace), resultCode, a_FirstLine.substr(idxSecondSpace + 1));
 	}
 
 
@@ -613,12 +651,12 @@ std::pair<bool, AString> cUrlClient::Request(
 	const AString & a_URL,
 	cCallbacksPtr && a_Callbacks,
 	AStringMap && a_Headers,
-	AString && a_Body,
+	const AString & a_Body,
 	AStringMap && a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
 	);
 }
 
@@ -629,13 +667,13 @@ std::pair<bool, AString> cUrlClient::Request(
 std::pair<bool, AString> cUrlClient::Get(
 	const AString & a_URL,
 	cCallbacksPtr && a_Callbacks,
-	AStringMap a_Headers,
+	AStringMap && a_Headers,
 	const AString & a_Body,
-	AStringMap a_Options
+	AStringMap && a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		"GET", a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		"GET", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
 	);
 }
 
@@ -647,12 +685,12 @@ std::pair<bool, AString> cUrlClient::Post(
 	const AString & a_URL,
 	cCallbacksPtr && a_Callbacks,
 	AStringMap && a_Headers,
-	AString && a_Body,
+	const AString & a_Body,
 	AStringMap && a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		"POST", a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		"POST", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
 	);
 }
 
@@ -664,13 +702,74 @@ std::pair<bool, AString> cUrlClient::Put(
 	const AString & a_URL,
 	cCallbacksPtr && a_Callbacks,
 	AStringMap && a_Headers,
-	AString && a_Body,
+	const AString & a_Body,
 	AStringMap && a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		"PUT", a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		"PUT", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
 	);
+}
+
+
+
+
+
+std::pair<bool, AString> cUrlClient::BlockingRequest(const AString & a_Method, const AString & a_URL, AStringMap && a_Headers, const AString & a_Body, AStringMap && a_Options)
+{
+	auto EvtFinished = std::make_shared<cEvent>();
+	AString Response;
+	auto Callbacks = std::make_unique<cSimpleHTTPCallbacks>(EvtFinished, Response);
+	auto [Success, ErrorMessage] = cUrlClient::Request(a_Method, a_URL, std::move(Callbacks), std::move(a_Headers), a_Body, std::move(a_Options));
+	if (Success)
+	{
+		EvtFinished->Wait();
+	}
+	else
+	{
+		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, ErrorMessage.c_str());
+		return std::make_pair(false, AString());
+	}
+	return std::make_pair(true, Response);
+}
+
+
+
+
+
+std::pair<bool, AString> cUrlClient::BlockingGet(
+	const AString & a_URL,
+	AStringMap a_Headers,
+	const AString & a_Body,
+	AStringMap a_Options)
+{
+	return BlockingRequest("GET", a_URL, std::move(a_Headers), a_Body, std::move(a_Options));
+}
+
+
+
+
+
+std::pair<bool, AString> cUrlClient::BlockingPost(
+	const AString & a_URL,
+	AStringMap && a_Headers,
+	const AString & a_Body,
+	AStringMap && a_Options)
+{
+	return BlockingRequest("POST", a_URL, std::move(a_Headers), a_Body, std::move(a_Options));
+}
+
+
+
+
+
+std::pair<bool, AString> cUrlClient::BlockingPut(
+	const AString & a_URL,
+	AStringMap && a_Headers,
+	const AString & a_Body,
+	AStringMap && a_Options)
+{
+	return BlockingRequest("PUT", a_URL, std::move(a_Headers), a_Body, std::move(a_Options));
 }
 
 

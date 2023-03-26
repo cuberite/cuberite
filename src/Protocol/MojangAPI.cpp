@@ -5,17 +5,18 @@
 
 #include "Globals.h"
 #include "MojangAPI.h"
+
+#include "HTTP/UrlClient.h"
+#include "IniFile.h"
+#include "JsonUtils.h"
+#include "json/json.h"
+#include "mbedTLS++/BlockingSslClientSocket.h"
+#include "mbedTLS++/SslConfig.h"
+#include "OSSupport/IsThread.h"
+#include "RankManager.h"
+#include "Root.h"
 #include "SQLiteCpp/Database.h"
 #include "SQLiteCpp/Statement.h"
-#include "../IniFile.h"
-#include "../JsonUtils.h"
-#include "json/json.h"
-#include "../mbedTLS++/BlockingSslClientSocket.h"
-#include "../mbedTLS++/SslConfig.h"
-#include "../RankManager.h"
-#include "../OSSupport/IsThread.h"
-#include "../Root.h"
-
 
 
 
@@ -30,122 +31,10 @@ const int MAX_PER_QUERY = 100;
 
 
 
-#define DEFAULT_NAME_TO_UUID_SERVER     "api.mojang.com"
-#define DEFAULT_NAME_TO_UUID_ADDRESS    "/profiles/minecraft"
-#define DEFAULT_UUID_TO_PROFILE_SERVER  "sessionserver.mojang.com"
-#define DEFAULT_UUID_TO_PROFILE_ADDRESS "/session/minecraft/profile/%UUID%?unsigned=false"
-
-
-
-
-
-/** Returns the CA certificates that should be trusted for Mojang-related connections. */
-static cX509CertPtr GetCACerts(void)
-{
-	static const char CertString[] =
-		// DigiCert Global Root CA (sessionserver.mojang.com)
-		// Downloaded from https://www.digicert.com/kb/digicert-root-certificates.htm
-		"-----BEGIN CERTIFICATE-----\n"
-		"MIIDrzCCApegAwIBAgIQCDvgVpBCRrGhdWrJWZHHSjANBgkqhkiG9w0BAQUFADBh\n"
-		"MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\n"
-		"d3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBD\n"
-		"QTAeFw0wNjExMTAwMDAwMDBaFw0zMTExMTAwMDAwMDBaMGExCzAJBgNVBAYTAlVT\n"
-		"MRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5j\n"
-		"b20xIDAeBgNVBAMTF0RpZ2lDZXJ0IEdsb2JhbCBSb290IENBMIIBIjANBgkqhkiG\n"
-		"9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4jvhEXLeqKTTo1eqUKKPC3eQyaKl7hLOllsB\n"
-		"CSDMAZOnTjC3U/dDxGkAV53ijSLdhwZAAIEJzs4bg7/fzTtxRuLWZscFs3YnFo97\n"
-		"nh6Vfe63SKMI2tavegw5BmV/Sl0fvBf4q77uKNd0f3p4mVmFaG5cIzJLv07A6Fpt\n"
-		"43C/dxC//AH2hdmoRBBYMql1GNXRor5H4idq9Joz+EkIYIvUX7Q6hL+hqkpMfT7P\n"
-		"T19sdl6gSzeRntwi5m3OFBqOasv+zbMUZBfHWymeMr/y7vrTC0LUq7dBMtoM1O/4\n"
-		"gdW7jVg/tRvoSSiicNoxBN33shbyTApOB6jtSj1etX+jkMOvJwIDAQABo2MwYTAO\n"
-		"BgNVHQ8BAf8EBAMCAYYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUA95QNVbR\n"
-		"TLtm8KPiGxvDl7I90VUwHwYDVR0jBBgwFoAUA95QNVbRTLtm8KPiGxvDl7I90VUw\n"
-		"DQYJKoZIhvcNAQEFBQADggEBAMucN6pIExIK+t1EnE9SsPTfrgT1eXkIoyQY/Esr\n"
-		"hMAtudXH/vTBH1jLuG2cenTnmCmrEbXjcKChzUyImZOMkXDiqw8cvpOp/2PV5Adg\n"
-		"06O/nVsJ8dWO41P0jmP6P6fbtGbfYmbW0W5BjfIttep3Sp+dWOIrWcBAI+0tKIJF\n"
-		"PnlUkiaY4IBIqDfv8NZ5YBberOgOzW6sRBc4L0na4UU+Krk2U886UAb3LujEV0ls\n"
-		"YSEY1QSteDwsOoBrp+uvFRTp2InBuThs4pFsiv9kuXclVzDAGySj4dzp30d8tbQk\n"
-		"CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=\n"
-		"-----END CERTIFICATE-----\n"
-
-		// Amazon Root CA 1 (api.mojang.com)
-		// Downloaded from https://www.amazontrust.com/repository/
-		"-----BEGIN CERTIFICATE-----\n"
-		"MIIDQTCCAimgAwIBAgITBmyfz5m/jAo54vB4ikPmljZbyjANBgkqhkiG9w0BAQsF\n"
-		"ADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6\n"
-		"b24gUm9vdCBDQSAxMB4XDTE1MDUyNjAwMDAwMFoXDTM4MDExNzAwMDAwMFowOTEL\n"
-		"MAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEZMBcGA1UEAxMQQW1hem9uIFJv\n"
-		"b3QgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALJ4gHHKeNXj\n"
-		"ca9HgFB0fW7Y14h29Jlo91ghYPl0hAEvrAIthtOgQ3pOsqTQNroBvo3bSMgHFzZM\n"
-		"9O6II8c+6zf1tRn4SWiw3te5djgdYZ6k/oI2peVKVuRF4fn9tBb6dNqcmzU5L/qw\n"
-		"IFAGbHrQgLKm+a/sRxmPUDgH3KKHOVj4utWp+UhnMJbulHheb4mjUcAwhmahRWa6\n"
-		"VOujw5H5SNz/0egwLX0tdHA114gk957EWW67c4cX8jJGKLhD+rcdqsq08p8kDi1L\n"
-		"93FcXmn/6pUCyziKrlA4b9v7LWIbxcceVOF34GfID5yHI9Y/QCB/IIDEgEw+OyQm\n"
-		"jgSubJrIqg0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMC\n"
-		"AYYwHQYDVR0OBBYEFIQYzIU07LwMlJQuCFmcx7IQTgoIMA0GCSqGSIb3DQEBCwUA\n"
-		"A4IBAQCY8jdaQZChGsV2USggNiMOruYou6r4lK5IpDB/G/wkjUu0yKGX9rbxenDI\n"
-		"U5PMCCjjmCXPI6T53iHTfIUJrU6adTrCC2qJeHZERxhlbI1Bjjt/msv0tadQ1wUs\n"
-		"N+gDS63pYaACbvXy8MWy7Vu33PqUXHeeE6V/Uq2V8viTO96LXFvKWlJbYK8U90vv\n"
-		"o/ufQJVtMVT8QtPHRh8jrdkPSHCa2XV4cdFyQzR1bldZwgJcJmApzyMZFo6IQ6XU\n"
-		"5MsI+yMRQ+hDKXJioaldXgjUkK642M4UwtBV8ob2xJNDd2ZhwLnoQdeXeGADbkpy\n"
-		"rqXRfboQnoZsG4q5WTP468SQvvG5\n"
-		"-----END CERTIFICATE-----\n"
-
-		// AAA Certificate Services (authserver.ely.by GH#4832)
-		// Downloaded from https://www.tbs-certificates.co.uk/FAQ/en/Comodo_AAA_Certificate_Services.html
-		"-----BEGIN CERTIFICATE-----\n"
-		"MIIEMjCCAxqgAwIBAgIBATANBgkqhkiG9w0BAQUFADB7MQswCQYDVQQGEwJHQjEb\n"
-		"MBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHDAdTYWxmb3JkMRow\n"
-		"GAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEhMB8GA1UEAwwYQUFBIENlcnRpZmlj\n"
-		"YXRlIFNlcnZpY2VzMB4XDTA0MDEwMTAwMDAwMFoXDTI4MTIzMTIzNTk1OVowezEL\n"
-		"MAkGA1UEBhMCR0IxGzAZBgNVBAgMEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UE\n"
-		"BwwHU2FsZm9yZDEaMBgGA1UECgwRQ29tb2RvIENBIExpbWl0ZWQxITAfBgNVBAMM\n"
-		"GEFBQSBDZXJ0aWZpY2F0ZSBTZXJ2aWNlczCCASIwDQYJKoZIhvcNAQEBBQADggEP\n"
-		"ADCCAQoCggEBAL5AnfRu4ep2hxxNRUSOvkbIgwadwSr+GB+O5AL686tdUIoWMQua\n"
-		"BtDFcCLNSS1UY8y2bmhGC1Pqy0wkwLxyTurxFa70VJoSCsN6sjNg4tqJVfMiWPPe\n"
-		"3M/vg4aijJRPn2jymJBGhCfHdr/jzDUsi14HZGWCwEiwqJH5YZ92IFCokcdmtet4\n"
-		"YgNW8IoaE+oxox6gmf049vYnMlhvB/VruPsUK6+3qszWY19zjNoFmag4qMsXeDZR\n"
-		"rOme9Hg6jc8P2ULimAyrL58OAd7vn5lJ8S3frHRNG5i1R8XlKdH5kBjHYpy+g8cm\n"
-		"ez6KJcfA3Z3mNWgQIJ2P2N7Sw4ScDV7oL8kCAwEAAaOBwDCBvTAdBgNVHQ4EFgQU\n"
-		"oBEKIz6W8Qfs4q8p74Klf9AwpLQwDgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQF\n"
-		"MAMBAf8wewYDVR0fBHQwcjA4oDagNIYyaHR0cDovL2NybC5jb21vZG9jYS5jb20v\n"
-		"QUFBQ2VydGlmaWNhdGVTZXJ2aWNlcy5jcmwwNqA0oDKGMGh0dHA6Ly9jcmwuY29t\n"
-		"b2RvLm5ldC9BQUFDZXJ0aWZpY2F0ZVNlcnZpY2VzLmNybDANBgkqhkiG9w0BAQUF\n"
-		"AAOCAQEACFb8AvCb6P+k+tZ7xkSAzk/ExfYAWMymtrwUSWgEdujm7l3sAg9g1o1Q\n"
-		"GE8mTgHj5rCl7r+8dFRBv/38ErjHT1r0iWAFf2C3BUrz9vHCv8S5dIa2LX1rzNLz\n"
-		"Rt0vxuBqw8M0Ayx9lt1awg6nCpnBBYurDC/zXDrPbDdVCYfeU0BsWO/8tqtlbgT2\n"
-		"G9w84FoVxp7Z8VlIMCFlA2zs6SFz7JsDoeA3raAVGI/6ugLOpyypEBMs1OUIJqsi\n"
-		"l2D4kF501KKaU73yqWjgom7C12yxow+ev+to51byrvLjKzg6CYG1a4XXvi3tPxq3\n"
-		"smPi9WIsgtRqAEFQ8TmDn5XpNpaYbg==\n"
-		"-----END CERTIFICATE-----\n"
-	;
-
-	static auto X509Cert = [&]()
-	{
-		auto Cert = std::make_shared<cX509Cert>();
-		VERIFY(0 == Cert->Parse(CertString, sizeof(CertString)));
-		return Cert;
-	}();
-
-	return X509Cert;
-}
-
-
-
-
-
-/** Returns the config to be used for secure requests. */
-static std::shared_ptr<const cSslConfig> GetSslConfig()
-{
-	static const std::shared_ptr<const cSslConfig> Config = []()
-	{
-		auto Conf = cSslConfig::MakeDefaultConfig(true);
-		Conf->SetCACerts(GetCACerts());
-		Conf->SetAuthMode(eSslAuthMode::Required);
-		return Conf;
-	}();
-	return Config;
-}
+constexpr char DEFAULT_NAME_TO_UUID_SERVER[]     = "api.mojang.com";
+constexpr char DEFAULT_NAME_TO_UUID_ADDRESS[]    = "/profiles/minecraft";
+constexpr char DEFAULT_UUID_TO_PROFILE_SERVER[]  = "sessionserver.mojang.com";
+constexpr char DEFAULT_UUID_TO_PROFILE_ADDRESS[] = "/session/minecraft/profile/%UUID%?unsigned=false";
 
 
 
@@ -188,8 +77,7 @@ cMojangAPI::sProfile::sProfile(
 	for (Json::UInt i = 0; i < Size; i++)
 	{
 		const Json::Value & Prop = a_Properties[i];
-		AString PropName = Prop.get("name", "").asString();
-		if (PropName != "textures")
+		if (Prop.get("name", "").asString() != "textures")
 		{
 			continue;
 		}
@@ -432,61 +320,6 @@ void cMojangAPI::AddPlayerProfile(const AString & a_PlayerName, const cUUID & a_
 
 
 
-bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_Request, AString & a_Response)
-{
-	// Connect the socket:
-	cBlockingSslClientSocket Socket;
-	Socket.SetSslConfig(GetSslConfig());
-	Socket.SetExpectedPeerName(a_ServerName);
-	if (!Socket.Connect(a_ServerName, 443))
-	{
-		LOGWARNING("%s: Can't connect to %s: %s", __FUNCTION__, a_ServerName.c_str(), Socket.GetLastErrorText().c_str());
-		return false;
-	}
-
-	if (!Socket.Send(a_Request.c_str(), a_Request.size()))
-	{
-		LOGWARNING("%s: Writing SSL data failed: %s", __FUNCTION__, Socket.GetLastErrorText().c_str());
-		return false;
-	}
-
-	// Read the HTTP response:
-	unsigned char buf[1024];
-
-	for (;;)
-	{
-		int ret = Socket.Receive(buf, sizeof(buf));
-
-		if ((ret == MBEDTLS_ERR_SSL_WANT_READ) || (ret == MBEDTLS_ERR_SSL_WANT_WRITE))
-		{
-			// This value should never be returned, it is handled internally by cBlockingSslClientSocket
-			LOGWARNING("%s: SSL reading failed internally", __FUNCTION__);
-			return false;
-		}
-		if (ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)
-		{
-			break;
-		}
-		if (ret < 0)
-		{
-			LOGWARNING("%s: SSL reading failed: -0x%x", __FUNCTION__, -ret);
-			return false;
-		}
-		if (ret == 0)
-		{
-			break;
-		}
-
-		a_Response.append(reinterpret_cast<const char *>(buf), static_cast<size_t>(ret));
-	}
-
-	return true;
-}
-
-
-
-
-
 void cMojangAPI::LoadCachesFromDisk(void)
 {
 	try
@@ -641,7 +474,8 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		// Create the request body - a JSON containing up to MAX_PER_QUERY playernames:
 		Json::Value root;
 		int Count = 0;
-		AStringVector::iterator itr = a_NamesToQuery.begin(), end = a_NamesToQuery.end();
+		auto itr = a_NamesToQuery.begin();
+		auto end = a_NamesToQuery.end();
 		for (; (itr != end) && (Count < MAX_PER_QUERY); ++itr, ++Count)
 		{
 			Json::Value req(*itr);
@@ -650,43 +484,13 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		a_NamesToQuery.erase(a_NamesToQuery.begin(), itr);
 		auto RequestBody = JsonUtils::WriteFastString(root);
 
-		// Create the HTTP request:
-		AString Request;
-		Request += "POST " + m_NameToUUIDAddress + " HTTP/1.0\r\n";  // We need to use HTTP 1.0 because we don't handle Chunked transfer encoding
-		Request += "Host: " + m_NameToUUIDServer + "\r\n";
-		Request += "User-Agent: Cuberite\r\n";
-		Request += "Connection: close\r\n";
-		Request += "Content-Type: application/json\r\n";
-		Request += fmt::format(FMT_STRING("Content-Length: {}\r\n"), RequestBody.length());
-		Request += "\r\n";
-		Request += RequestBody;
-
-		// Get the response from the server:
-		AString Response;
-		if (!SecureRequest(m_NameToUUIDServer, Request, Response))
+		// Create and send the HTTP request
+		auto [IsSuccessfull, Response] = cUrlClient::BlockingPost(m_NameToUUIDAddress, AStringMap(), std::move(RequestBody), AStringMap());
+		if (!IsSuccessfull)
 		{
 			continue;
 		}
-
-		// Check the HTTP status line:
-		const AString Prefix("HTTP/1.1 200 OK");
 		AString HexDump;
-		if (Response.compare(0, Prefix.size(), Prefix))
-		{
-			LOGINFO("%s failed: bad HTTP status line received", __FUNCTION__);
-			LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
-			continue;
-		}
-
-		// Erase the HTTP headers from the response:
-		size_t idxHeadersEnd = Response.find("\r\n\r\n");
-		if (idxHeadersEnd == AString::npos)
-		{
-			LOGINFO("%s failed: bad HTTP response header received", __FUNCTION__);
-			LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
-			continue;
-		}
-		Response.erase(0, idxHeadersEnd + 4);
 
 		// Parse the returned string into Json:
 		AString ParseError;
@@ -762,41 +566,12 @@ void cMojangAPI::QueryUUIDToProfile(const cUUID & a_UUID)
 	AString Address = m_UUIDToProfileAddress;
 	ReplaceURL(Address, "%UUID%", a_UUID.ToShortString());
 
-	// Create the HTTP request:
-	AString Request;
-	Request += "GET " + Address + " HTTP/1.0\r\n";  // We need to use HTTP 1.0 because we don't handle Chunked transfer encoding
-	Request += "Host: " + m_UUIDToProfileServer + "\r\n";
-	Request += "User-Agent: Cuberite\r\n";
-	Request += "Connection: close\r\n";
-	Request += "Content-Length: 0\r\n";
-	Request += "\r\n";
-
-	// Get the response from the server:
-	AString Response;
-	if (!SecureRequest(m_UUIDToProfileServer, Request, Response))
+	// Create and send the HTTP request
+	auto [IsSuccessfull, Response] = cUrlClient::BlockingGet(Address);
+	if (!IsSuccessfull)
 	{
 		return;
 	}
-
-	// Check the HTTP status line:
-	const AString Prefix("HTTP/1.1 200 OK");
-	AString HexDump;
-	if (Response.compare(0, Prefix.size(), Prefix))
-	{
-		LOGINFO("%s failed: bad HTTP status line received", __FUNCTION__);
-		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
-		return;
-	}
-
-	// Erase the HTTP headers from the response:
-	size_t idxHeadersEnd = Response.find("\r\n\r\n");
-	if (idxHeadersEnd == AString::npos)
-	{
-		LOGINFO("%s failed: bad HTTP response header received", __FUNCTION__);
-		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
-		return;
-	}
-	Response.erase(0, idxHeadersEnd + 4);
 
 	// Parse the returned string into Json:
 	Json::Value root;
@@ -804,7 +579,10 @@ void cMojangAPI::QueryUUIDToProfile(const cUUID & a_UUID)
 	if (!JsonUtils::ParseString(Response, root, &ParseError) || !root.isObject())
 	{
 		LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __FUNCTION__, ParseError);
+#ifdef NDEBUG
+		AString HexDump;
 		LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
+#endif
 		return;
 	}
 
@@ -891,7 +669,7 @@ void cMojangAPI::Update(void)
 	std::vector<cUUID> ProfileUUIDs;
 	{
 		cCSLock Lock(m_CSUUIDToProfile);
-		for (auto & UUIDToProfile : m_UUIDToProfile)
+		for (const auto & UUIDToProfile : m_UUIDToProfile)
 		{
 			if (UUIDToProfile.second.m_DateTime < LimitDateTime)
 			{

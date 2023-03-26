@@ -82,10 +82,10 @@ int cSslContext::Initialize(bool a_IsClient)
 
 
 
-void cSslContext::SetExpectedPeerName(const AString & a_ExpectedPeerName)
+void cSslContext::SetExpectedPeerName(const std::string_view a_ExpectedPeerName)
 {
 	ASSERT(m_IsValid);  // Call Initialize() first
-	mbedtls_ssl_set_hostname(&m_Ssl, a_ExpectedPeerName.c_str());
+	mbedtls_ssl_set_hostname(&m_Ssl, a_ExpectedPeerName.data());
 }
 
 

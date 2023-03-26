@@ -11,7 +11,7 @@
 
 #include <time.h>
 
-#include "../UUID.h"
+#include "UUID.h"
 
 
 
@@ -41,11 +41,6 @@ public:
 	/** Initializes the API; reads the settings from the specified ini file.
 	Loads cached results from disk. */
 	void Start(cSettingsRepositoryInterface & a_Settings, bool a_ShouldAuth);
-
-	/** Connects to the specified server using SSL, sends the given request and receives the response.
-	Checks Mojang certificates using the hard-coded Starfield root CA certificate.
-	Returns true if all was successful, false on failure. */
-	static bool SecureRequest(const AString & a_ServerName, const AString & a_Request, AString & a_Response);
 
 	/** Converts a player name into a UUID.
 	The UUID will be nil on error.
@@ -131,8 +126,8 @@ protected:
 			Int64 a_DateTime
 		);
 	};
-	typedef std::map<AString, sProfile> cProfileMap;
-	typedef std::map<cUUID, sProfile> cUUIDProfileMap;
+	using cProfileMap = std::map<AString, sProfile>;
+	using cUUIDProfileMap = std::map<cUUID, sProfile>;
 
 
 	/** The server to connect to when converting player names to UUIDs. For example "api.mojang.com". */

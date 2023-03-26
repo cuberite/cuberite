@@ -4,6 +4,7 @@
 // Implements the cUrlParser class that parses string URL into individual parts
 
 #include "Globals.h"
+
 #include "UrlParser.h"
 
 
@@ -194,6 +195,16 @@ std::pair<bool, AString> cUrlParser::Parse(
 	return std::make_pair(true, AString());
 }
 
+
+
+
+
+std::pair<bool, AString> cUrlParser::Validate(const AString & a_Url)
+{
+	AString UrlScheme, UrlUsername, UrlPassword, UrlHost, UrlPath, UrlQuery, UrlFragment;
+	UInt16 Port;
+	return Parse(a_Url, UrlScheme, UrlUsername, UrlPassword, UrlHost, Port, UrlPath, UrlQuery, UrlFragment);
+}
 
 
 
