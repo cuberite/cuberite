@@ -1,11 +1,11 @@
 
 #include "Globals.h"
 
-#include "SslConfig.h"
-#include "EntropyContext.h"
-#include "CtrDrbgContext.h"
-#include "CryptoKey.h"
-#include "X509Cert.h"
+#include "mbedTLS++/SslConfig.h"
+
+#include "mbedTLS++/CryptoKey.h"
+#include "mbedTLS++/EntropyContext.h"
+#include "mbedTLS++/RootCA.h"
 
 
 // This allows us to debug SSL and certificate problems, but produce way too much output,
@@ -225,7 +225,6 @@ void cSslConfig::SetCACerts(cX509CertPtr a_CACert)
 
 std::shared_ptr<cSslConfig> cSslConfig::MakeDefaultConfig(bool a_IsClient)
 {
-	// TODO: Default CA chain and SetAuthMode(eSslAuthMode::Required)
 	auto Ret = std::make_shared<cSslConfig>();
 
 	Ret->InitDefaults(a_IsClient);
@@ -236,7 +235,8 @@ std::shared_ptr<cSslConfig> cSslConfig::MakeDefaultConfig(bool a_IsClient)
 		Ret->SetRng(std::move(CtrDrbg));
 	}
 
-	Ret->SetAuthMode(eSslAuthMode::None);  // We cannot verify because we don't have a CA chain
+	Ret->SetAuthMode(eSslAuthMode::Required);
+	Ret->SetCACerts(GetCACerts());
 
 	#ifndef NDEBUG
 		#ifdef ENABLE_SSL_DEBUG_MSG
