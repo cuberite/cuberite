@@ -202,6 +202,73 @@ int TestRequest4()
 
 
 
+int TestRequest5()
+{
+	LOG("Running test 5");
+	auto evtFinished = std::make_shared<cEvent>();
+	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
+	auto res = cUrlClient::Get("https://cuberite.org", std::move(callbacks));
+	if (res.first)
+	{
+		evtFinished->Wait();
+	}
+	else
+	{
+		LOG("Immediate error: %s", res.second.c_str());
+		return 1;
+	}
+	return 0;
+}
+
+
+
+
+
+
+int TestRequest6()
+{
+	LOG("Running test 6");
+	auto evtFinished = std::make_shared<cEvent>();
+	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
+	auto res = cUrlClient::Get("https://sessionserver.mojang.com", std::move(callbacks));
+	if (res.first)
+	{
+		evtFinished->Wait();
+	}
+	else
+	{
+		LOG("Immediate error: %s", res.second.c_str());
+		return 1;
+	}
+	return 0;
+}
+
+
+
+
+
+int TestRequest7()
+{
+	LOG("Running test 7");
+	auto evtFinished = std::make_shared<cEvent>();
+	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
+	auto res = cUrlClient::Get("https://api.mojang.com", std::move(callbacks));
+	if (res.first)
+	{
+		evtFinished->Wait();
+	}
+	else
+	{
+		LOG("Immediate error: %s", res.second.c_str());
+		return 1;
+	}
+	return 0;
+}
+
+
+
+
+
 int TestRequests()
 {
 	using func_t = int(void);
@@ -211,6 +278,9 @@ int TestRequests()
 		&TestRequest2,
 		&TestRequest3,
 		&TestRequest4,
+		&TestRequest5,
+		&TestRequest6,
+		&TestRequest7
 	};
 	for (auto test: tests)
 	{
