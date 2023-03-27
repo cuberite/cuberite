@@ -86,7 +86,7 @@ public:
 		for such a response; instead, the redirect is silently attempted. */
 		virtual void OnRedirecting(const AString & a_NewLocation) {}
 	};
-	typedef std::unique_ptr<cCallbacks> cCallbacksPtr;
+	using cCallbacksPtr = std::unique_ptr<cCallbacks>;
 
 
 	/** Used for HTTP status codes. */
@@ -115,7 +115,7 @@ public:
 		const AString & a_URL,
 		cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
-		AString && a_Body,
+		const AString & a_Body,
 		AStringMap && a_Options
 	);
 
@@ -133,7 +133,7 @@ public:
 		const AString & a_URL,
 		cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
-		AString && a_Body,
+		const AString & a_Body,
 		AStringMap && a_Options
 	);
 
@@ -142,7 +142,35 @@ public:
 		const AString & a_URL,
 		cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
-		AString && a_Body,
+		const AString & a_Body,
+		AStringMap && a_Options
+	);
+
+	/**
+	* The methods will run a thread blocking HTTP request. Any error handling
+	* is done inside the functions. Check the LOG or stdout for any occurring
+	* errors.
+	* The return value is if the request was successful and the response.
+	*/
+
+	static std::pair<bool, AString> BlockingGet(
+		const AString & a_URL,
+		AStringMap a_Headers = AStringMap(),
+		const AString & a_Body = AString(),
+		AStringMap a_Options = AStringMap()
+	);
+
+	static std::pair<bool, AString> BlockingPost(
+		const AString & a_URL,
+		AStringMap && a_Headers,
+		const AString & a_Body,
+		AStringMap && a_Options
+	);
+
+	static std::pair<bool, AString> BlockingPut(
+		const AString & a_URL,
+		AStringMap && a_Headers,
+		const AString & a_Body,
 		AStringMap && a_Options
 	);
 };
