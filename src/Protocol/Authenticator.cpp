@@ -51,22 +51,22 @@ void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 	m_Address            = a_Settings.GetValueSet ("Authentication", "Address", DEFAULT_AUTH_ADDRESS);
 	m_ShouldAuthenticate = a_Settings.GetValueSetB("Authentication", "Authenticate", true);
 
+	// prepend https:// if missing
+	if (m_Server.rfind("http") == AString::npos)
+	{
+		m_Server = "https://" + m_Server;
+	}
+
 	if (!cUrlParser::Validate(m_Server))
 	{
-		LOGWARNING("%s %d: Supplied invalid URL for authentication server: \"%s\", using default!", __FUNCTION__, __LINE__, m_Server.c_str());
+		LOGWARNING("%s %d: Supplied invalid URL for authentication server: \"%s\", using default! (Authentication, Server)", __FUNCTION__, __LINE__, m_Server.c_str());
 		m_Server = DEFAULT_AUTH_SERVER;
 	}
 
 	if (!cUrlParser::Validate(m_Address))
 	{
-		LOGWARNING("%s %d: Supplied invalid URL for authentication address: \"%s\", using default!", __FUNCTION__, __LINE__, m_Server.c_str());
+		LOGWARNING("%s %d: Supplied invalid URL for authentication address: \"%s\", using default! (Authentication, Address)", __FUNCTION__, __LINE__, m_Server.c_str());
 		m_Address = DEFAULT_AUTH_ADDRESS;
-	}
-
-	// prepend https:// if missing
-	if (m_Server.rfind("http") == AString::npos)
-	{
-		m_Server = "https://" + m_Server;
 	}
 }
 
