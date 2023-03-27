@@ -731,7 +731,7 @@ std::pair<bool, AString> cUrlClient::BlockingGet(
 	}
 	else
 	{
-		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, Response.c_str());
+		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, ErrorMessage.c_str());
 		return std::make_pair(false, AString());
 	}
 	return std::make_pair(true, Response);
@@ -757,7 +757,7 @@ std::pair<bool, AString> cUrlClient::BlockingPost(
 	}
 	else
 	{
-		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, Response.c_str());
+		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, ErrorMessage.c_str());
 		return std::make_pair(false, AString());
 	}
 	return std::make_pair(true, Response);
@@ -783,7 +783,7 @@ std::pair<bool, AString> cUrlClient::BlockingPut(
 	}
 	else
 	{
-		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, Response.c_str());
+		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, ErrorMessage.c_str());
 		return std::make_pair(false, AString());
 	}
 	return std::make_pair(true, Response);
