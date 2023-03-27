@@ -17,8 +17,8 @@
 
 
 
-#define DEFAULT_AUTH_SERVER "sessionserver.mojang.com"
-#define DEFAULT_AUTH_ADDRESS "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%"
+constexpr char DEFAULT_AUTH_SERVER[]  = "sessionserver.mojang.com";
+constexpr char DEFAULT_AUTH_ADDRESS[] = "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%";
 
 
 
@@ -52,21 +52,33 @@ void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 	m_ShouldAuthenticate = a_Settings.GetValueSetB("Authentication", "Authenticate", true);
 
 	// prepend https:// if missing
-	if (m_Server.rfind("http") == AString::npos)
+	constexpr std::string_view HttpPrefix = "http://";
+	constexpr std::string_view HttpsPrefix = "https://";
+
+	if (
+		(std::string_view(m_Server).substr(0, HttpPrefix.size()) != HttpPrefix) &&
+		(std::string_view(m_Server).substr(0, HttpsPrefix.size()) != HttpsPrefix)
+	)
 	{
 		m_Server = "https://" + m_Server;
 	}
 
-	if (!cUrlParser::Validate(m_Server))
 	{
-		LOGWARNING("%s %d: Supplied invalid URL for authentication server: \"%s\", using default! (Authentication, Server)", __FUNCTION__, __LINE__, m_Server.c_str());
-		m_Server = DEFAULT_AUTH_SERVER;
+		auto [Success, ErrorMessage] = cUrlParser::Validate(m_Server);
+		if (!Success)
+		{
+			LOGWARNING("%s %d: Supplied invalid URL for configuration value [Authentication: Server]: \"%s\", using default! Error: %s", __FUNCTION__, __LINE__, m_Server.c_str(), ErrorMessage.c_str());
+			m_Server = DEFAULT_AUTH_SERVER;
+		}
 	}
 
-	if (!cUrlParser::Validate(m_Address))
 	{
-		LOGWARNING("%s %d: Supplied invalid URL for authentication address: \"%s\", using default! (Authentication, Address)", __FUNCTION__, __LINE__, m_Server.c_str());
-		m_Address = DEFAULT_AUTH_ADDRESS;
+		auto [Success, ErrorMessage] = cUrlParser::Validate(m_Server);
+		if (!Success)
+		{
+			LOGWARNING("%s %d: Supplied invalid URL for configuration value [Authentication: Address]: \"%s\", using default! Error: %s", __FUNCTION__, __LINE__, m_Address.c_str(), ErrorMessage.c_str());
+			m_Address = DEFAULT_AUTH_ADDRESS;
+		}
 	}
 }
 
@@ -170,17 +182,9 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	ReplaceURL(ActualAddress, "%SERVERID%", a_ServerId);
 
 	// Create and send the HTTP request
-	auto EvtFinished = std::make_shared<cEvent>();
-	AString Response;
-	auto Callbacks = std::make_unique<cMojangAPI::cCallbacks>(EvtFinished, Response);
-	auto [Success, ErrorMessage] = cUrlClient::Get(m_Server + ActualAddress, std::move(Callbacks));
-	if (Success)
+	auto [Success, Response] = cUrlClient::BlockingGet(m_Server + ActualAddress);
+	if (!Success)
 	{
-		EvtFinished->Wait();
-	}
-	else
-	{
-		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, Response.c_str());
 		return false;
 	}
 

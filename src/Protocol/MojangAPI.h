@@ -11,8 +11,8 @@
 
 #include <time.h>
 
-#include "UUID.h"
 #include "HTTP/UrlClient.h"
+#include "UUID.h"
 
 
 
@@ -79,34 +79,6 @@ public:
 	/** Sets the m_RankMgr that is used for name-uuid notifications. Accepts nullptr to remove the binding. */
 	void SetRankManager(cRankManager * a_RankManager) { m_RankMgr = a_RankManager; }
 
-	class cCallbacks : public cUrlClient::cCallbacks
-	{
-	public:
-
-		explicit cCallbacks(std::shared_ptr<cEvent> a_Event, AString & a_ResponseBody) : m_Event(std::move(a_Event)), m_ResponseBody(a_ResponseBody) {}
-
-		void OnBodyFinished() override
-		{
-			m_Event->Set();
-		}
-
-		void OnError(const AString & a_ErrorMsg) override
-		{
-			LOGERROR("%s %d: HTTP Error: %s", __FILE__, __LINE__, a_ErrorMsg.c_str());
-			m_Event->Set();
-		}
-
-		void OnBodyData(const void * a_Data, size_t a_Size) override
-		{
-			m_ResponseBody.append(static_cast<const char *>(a_Data), a_Size);
-		}
-
-		std::shared_ptr<cEvent> m_Event;
-
-		/** The accumulator for the partial body data, so that OnBodyFinished() can send the entire thing at once. */
-		AString & m_ResponseBody;
-	};
-
 protected:
 	/** The thread that periodically checks for stale data and re-queries it from the server. */
 	class cUpdateThread;
@@ -155,8 +127,8 @@ protected:
 			Int64 a_DateTime
 		);
 	};
-	typedef std::map<AString, sProfile> cProfileMap;
-	typedef std::map<cUUID, sProfile> cUUIDProfileMap;
+	using cProfileMap = std::map<AString, sProfile>;
+	using cUUIDProfileMap = std::map<cUUID, sProfile>;
 
 
 	/** The server to connect to when converting player names to UUIDs. For example "api.mojang.com". */

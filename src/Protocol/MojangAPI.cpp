@@ -31,10 +31,10 @@ const int MAX_PER_QUERY = 100;
 
 
 
-#define DEFAULT_NAME_TO_UUID_SERVER     "api.mojang.com"
-#define DEFAULT_NAME_TO_UUID_ADDRESS    "/profiles/minecraft"
-#define DEFAULT_UUID_TO_PROFILE_SERVER  "sessionserver.mojang.com"
-#define DEFAULT_UUID_TO_PROFILE_ADDRESS "/session/minecraft/profile/%UUID%?unsigned=false"
+constexpr char DEFAULT_NAME_TO_UUID_SERVER[]     = "api.mojang.com";
+constexpr char DEFAULT_NAME_TO_UUID_ADDRESS[]    = "/profiles/minecraft";
+constexpr char DEFAULT_UUID_TO_PROFILE_SERVER[]  = "sessionserver.mojang.com";
+constexpr char DEFAULT_UUID_TO_PROFILE_ADDRESS[] = "/session/minecraft/profile/%UUID%?unsigned=false";
 
 
 
@@ -516,17 +516,9 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		auto RequestBody = JsonUtils::WriteFastString(root);
 
 		// Create and send the HTTP request
-		auto EvtFinished = std::make_shared<cEvent>();
-		AString Response;
-		auto Callbacks = std::make_unique<cCallbacks>(EvtFinished, Response);
-		auto [Success, ErrorMessage] = cUrlClient::Post(m_NameToUUIDAddress, std::move(Callbacks), AStringMap(), std::move(RequestBody), AStringMap());
-		if (Success)
+		auto [Success, Response] = cUrlClient::BlockingPost(m_NameToUUIDAddress, AStringMap(), std::move(RequestBody), AStringMap());
+		if (!Success)
 		{
-			EvtFinished->Wait();
-		}
-		else
-		{
-			LOG("%s: HTTP error: %s", __FUNCTION__, Response.c_str());
 			continue;
 		}
 		AString HexDump;
@@ -606,43 +598,15 @@ void cMojangAPI::QueryUUIDToProfile(const cUUID & a_UUID)
 	ReplaceURL(Address, "%UUID%", a_UUID.ToShortString());
 
 	// Create and send the HTTP request
-	auto EvtFinished = std::make_shared<cEvent>();
-	AString Response;
-	auto Callbacks = std::make_unique<cCallbacks>(EvtFinished, Response);
-	auto [Success, ErrorMessage] = cUrlClient::Get(Address, std::move(Callbacks), AStringMap(), AString(), AStringMap());
-	if (Success)
+	auto [Success, Response] = cUrlClient::BlockingGet(Address);
+	if (!Success)
 	{
-		EvtFinished->Wait();
-	}
-	else
-	{
-		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, ErrorMessage.c_str());
 		return;
 	}
-
-	// Check the HTTP status line:
-	const AString Prefix("HTTP/1.1 200 OK");
-	AString HexDump;
-	if (Response.compare(0, Prefix.size(), Prefix))
-	{
-		LOGINFO("%s failed: bad HTTP status line received", __FUNCTION__);
-		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
-		return;
-	}
-
-	// Erase the HTTP headers from the response:
-	size_t idxHeadersEnd = Response.find("\r\n\r\n");
-	if (idxHeadersEnd == AString::npos)
-	{
-		LOGINFO("%s failed: bad HTTP response header received", __FUNCTION__);
-		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
-		return;
-	}
-	Response.erase(0, idxHeadersEnd + 4);
 
 	// Parse the returned string into Json:
 	Json::Value root;
-	AString ParseError;
+	AString ParseError, HexDump;
 	if (!JsonUtils::ParseString(Response, root, &ParseError) || !root.isObject())
 	{
 		LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __FUNCTION__, ParseError);
