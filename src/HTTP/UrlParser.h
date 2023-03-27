@@ -53,7 +53,7 @@ public:
 	);
 
 	/** Checks if the supplied URL is valid */
-	static bool Validate(const AString & a_Url);
+	static std::pair<bool, AString> Validate(const AString & a_Url);
 };
 
 

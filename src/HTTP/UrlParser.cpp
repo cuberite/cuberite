@@ -199,17 +199,11 @@ std::pair<bool, AString> cUrlParser::Parse(
 
 
 
-bool cUrlParser::Validate(const AString & a_Url)
+std::pair<bool, AString> cUrlParser::Validate(const AString & a_Url)
 {
-	// https://stackoverflow.com/questions/5620235/cpp-regular-expression-to-validate-url
-	// I didn't use the first solution deliberately because it didn't enforce the http(s) in the beginning
-
-	const std::regex UrlRegex (
-		R"(^(([^:\/?#]+):)?(//([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?)",
-		std::regex::extended
-	);
-	std::smatch UrlMatchResult;
-	return std::regex_match(a_Url, UrlMatchResult, UrlRegex);
+	AString UrlScheme, UrlUsername, UrlPassword, UrlHost, UrlPath, UrlQuery, UrlFragment;
+	UInt16 Port;
+	return Parse(a_Url, UrlScheme, UrlUsername, UrlPassword, UrlHost, Port, UrlPath, UrlQuery, UrlFragment);
 }
 
 
