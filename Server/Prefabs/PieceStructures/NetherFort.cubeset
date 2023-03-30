@@ -1773,7 +1773,124 @@ Cubeset =
 			},
 		},  -- BlazePlatformOverhang
 
-
+		{
+			OriginData = 
+			{
+				ExportName = "ClosurePiece",
+			},
+			Size =
+			{
+				x = 5,
+				y = 2,
+				z = 1
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 2,
+				MaxZ = 0,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = 2,
+				}
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "none",
+				["IsClosurePiece"] = "1",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+				["VerticalStrategy"] = "Range|40|100",
+			},
+			BlockDefinitions =
+			{
+				".:112:0",
+				"a:113:0",
+			},
+			BlockData =
+			{
+				".....",
+				".aaa.",
+			}
+		}, -- End Piece Connector
+		
+		{
+			OriginData = 
+			{
+				ExportName = "ClosurePiece",
+			},
+			Size =
+			{
+				x = 5,
+				y = 6,
+				z = 1
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 4,
+				MaxZ = 0,
+			},
+			Connectors =
+			{
+				{
+					Type = 1,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = 2,
+				},
+				{
+					Type = -1,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = 2,
+				}
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "RepeatBottomTillSolid",
+				["IsClosurePiece"] = "1",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+				["VerticalStrategy"] = "Range|40|100",
+			},
+			BlockDefinitions =
+			{
+				".:112:0",
+				"a:113:0",
+			},
+			BlockData =
+			{
+				".....",
+				".aaa.",
+				".aaa.",
+				".aaa.",
+				".aaa.",
+				".....",
+			}
+		}, -- End Piece Connector
 
 		{
 			OriginData =

@@ -84,6 +84,11 @@ void cPrefabPiecePool::Clear(void)
 		delete *itr;
 	}
 	m_StartingPieces.clear();
+	for (cPieces::iterator itr = m_ClosurePieces.begin(), end = m_ClosurePieces.end(); itr != end; ++itr)
+	{
+		delete* itr;
+	}
+	m_ClosurePieces.clear();
 }
 
 
@@ -345,8 +350,18 @@ bool cPrefabPiecePool::LoadCubesetPieceVer1(const AString & a_FileName, cLuaStat
 	else
 	{
 		auto p = prefab.release();
-		m_AllPieces.push_back(p);
-		AddToPerConnectorMap(p);
+
+		int IsClosurePiece = 0;
+		a_LuaState.GetNamedValue("Metadata.IsClosurePiece", IsClosurePiece);
+		if (IsClosurePiece != 0)
+		{
+			m_ClosurePieces.push_back(p);
+		}
+		else
+		{
+			m_AllPieces.push_back(p);
+			AddToPerConnectorMap(p);
+		}
 	}
 
 	return true;
@@ -752,6 +767,28 @@ void cPrefabPiecePool::AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHe
 cPieces cPrefabPiecePool::GetPiecesWithConnector(int a_ConnectorType)
 {
 	return m_PiecesByConnector[a_ConnectorType];
+}
+
+
+
+
+
+cPieces cPrefabPiecePool::GetClosurePiecesWithConnector(int a_ConnectorType)
+{
+	cPieces pieces;
+	for (auto& piece : m_ClosurePieces)
+	{
+		auto connectors = piece->GetConnectors();
+		for (auto& connector : connectors)
+		{
+			if (connector.m_Type == a_ConnectorType)
+			{
+				pieces.push_back(piece);
+				break;
+			}
+		}
+	}
+	return pieces;
 }
 
 

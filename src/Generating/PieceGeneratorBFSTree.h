@@ -73,8 +73,12 @@ protected:
 		const cPlacedPiece & a_ParentPiece,      // The existing piece to a new piece should be placed
 		const cPiece::cConnector & a_Connector,  // The existing connector (world-coords) to which a new piece should be placed
 		cPlacedPieces & a_OutPieces,             // Already placed pieces, to be checked for intersections
-		cFreeConnectors & a_OutConnectors        // List of free connectors to which the new connectors will be placed
+		cFreeConnectors & a_OutConnectors,        // List of free connectors to which the new connectors will be placed
+		bool a_OnlyClosurePieces = false
 	);
+
+	/** Searches through the provided list for pieces that will fit the parent piece */
+	void FindPieceForConnector(cPieces & AvailablePieces, const cPlacedPiece & a_ParentPiece, const cPiece::cConnector & a_Connector, int WantedConnectorType, Vector3i & ConnPos, cPlacedPieces & a_OutPieces, cPieceGeneratorBFSTree::cConnections & Connections, int & WeightTotal);
 
 	/** Checks if the specified piece would fit with the already-placed pieces, using the specified connector
 	and number of CCW rotations.

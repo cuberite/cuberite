@@ -112,6 +112,7 @@ public:
 
 	// cPiecePool overrides:
 	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override;
+	virtual cPieces GetClosurePiecesWithConnector(int a_ConnectorType) override;
 	virtual cPieces GetStartingPieces(void) override;
 	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) override;
 	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) override;
@@ -131,6 +132,9 @@ protected:
 	/** The pieces that are used as starting pieces.
 	This list is not shared and the pieces need deallocation. */
 	cPieces m_StartingPieces;
+
+	/** The pieces that can be used when no other piece will be placed. */
+	cPieces m_ClosurePieces;
 
 	/** The map that has all pieces by their connector types
 	The pieces are copies out of m_AllPieces and shouldn't be ever delete-d. */

@@ -101,16 +101,80 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 	const cPlacedPiece & a_ParentPiece,
 	const cPiece::cConnector & a_Connector,
 	cPlacedPieces & a_OutPieces,
-	cPieceGeneratorBFSTree::cFreeConnectors & a_OutConnectors
+	cPieceGeneratorBFSTree::cFreeConnectors & a_OutConnectors,
+	bool a_OnlyClosurePieces
 )
 {
 	// Get a list of available connections:
 	cConnections Connections;
 	int WantedConnectorType = -a_Connector.m_Type;
-	cPieces AvailablePieces = m_PiecePool.GetPiecesWithConnector(WantedConnectorType);
+	cPieces AvailablePieces;
+	if (a_OnlyClosurePieces)
+	{
+		AvailablePieces = m_PiecePool.GetClosurePiecesWithConnector(WantedConnectorType);
+	}
+	else
+	{
+		AvailablePieces = m_PiecePool.GetPiecesWithConnector(WantedConnectorType);
+	}
 	Connections.reserve(AvailablePieces.size());
 	Vector3i ConnPos = cPiece::cConnector::AddDirection(a_Connector.m_Pos, a_Connector.m_Direction);  // The position at which the new connector should be placed - 1 block away from the current connector
 	int WeightTotal = 0;
+	FindPieceForConnector(AvailablePieces, a_ParentPiece, a_Connector, WantedConnectorType, ConnPos, a_OutPieces, Connections, WeightTotal);
+	if (Connections.empty())
+	{
+		// If there are no available connections try to place a closure connector.
+		AvailablePieces = m_PiecePool.GetClosurePiecesWithConnector(WantedConnectorType);
+		FindPieceForConnector(AvailablePieces, a_ParentPiece, a_Connector, WantedConnectorType, ConnPos, a_OutPieces, Connections, WeightTotal);
+		if (Connections.empty())
+		{
+			// No available connections, bail out
+			return false;
+		}
+	}
+	ASSERT(WeightTotal > 0);
+
+	// Choose a random connection from the list, based on the weights:
+	int rnd = (m_Noise.IntNoise3DInt(a_Connector.m_Pos.x, a_Connector.m_Pos.y, a_Connector.m_Pos.z) / 7) % WeightTotal;
+	size_t ChosenIndex = 0;
+	for (cConnections::const_iterator itr = Connections.begin(), end = Connections.end(); itr != end; ++itr, ++ChosenIndex)
+	{
+		rnd -= itr->m_Weight;
+		if (rnd <= 0)
+		{
+			// This is the piece to choose
+			break;
+		}
+	}
+	cConnection & Conn = Connections[ChosenIndex];
+
+	// Place the piece:
+	Vector3i NewPos = Conn.m_Piece->RotatePos(Conn.m_Connector.m_Pos, Conn.m_NumCCWRotations);
+	ConnPos -= NewPos;
+	auto PlacedPiece = std::make_unique<cPlacedPiece>(&a_ParentPiece, *(Conn.m_Piece), ConnPos, Conn.m_NumCCWRotations);
+
+	// Add the new piece's connectors to the list of free connectors:
+	cPiece::cConnectors Connectors = Conn.m_Piece->GetConnectors();
+	for (cPiece::cConnectors::const_iterator itr = Connectors.begin(), end = Connectors.end(); itr != end; ++itr)
+	{
+		if (itr->m_Pos.Equals(Conn.m_Connector.m_Pos))
+		{
+			// This is the connector through which we have been connected to the parent, don't add
+			continue;
+		}
+		a_OutConnectors.emplace_back(PlacedPiece.get(), Conn.m_Piece->RotateMoveConnector(*itr, Conn.m_NumCCWRotations, ConnPos.x, ConnPos.y, ConnPos.z));
+	}
+	a_OutPieces.push_back(std::move(PlacedPiece));
+
+	return true;
+}
+
+
+
+
+
+void cPieceGeneratorBFSTree::FindPieceForConnector(cPieces& AvailablePieces, const cPlacedPiece& a_ParentPiece, const cPiece::cConnector& a_Connector, int WantedConnectorType, Vector3i& ConnPos, cPlacedPieces& a_OutPieces, cPieceGeneratorBFSTree::cConnections& Connections, int& WeightTotal)
+{
 	for (cPieces::iterator itrP = AvailablePieces.begin(), endP = AvailablePieces.end(); itrP != endP; ++itrP)
 	{
 		// Get the relative chance of this piece being generated in this path:
@@ -153,46 +217,6 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 			WeightTotal += Weight;
 		}  // for itrC - Connectors[]
 	}  // for itrP - AvailablePieces[]
-	if (Connections.empty())
-	{
-		// No available connections, bail out
-		return false;
-	}
-	ASSERT(WeightTotal > 0);
-
-	// Choose a random connection from the list, based on the weights:
-	int rnd = (m_Noise.IntNoise3DInt(a_Connector.m_Pos.x, a_Connector.m_Pos.y, a_Connector.m_Pos.z) / 7) % WeightTotal;
-	size_t ChosenIndex = 0;
-	for (cConnections::const_iterator itr = Connections.begin(), end = Connections.end(); itr != end; ++itr, ++ChosenIndex)
-	{
-		rnd -= itr->m_Weight;
-		if (rnd <= 0)
-		{
-			// This is the piece to choose
-			break;
-		}
-	}
-	cConnection & Conn = Connections[ChosenIndex];
-
-	// Place the piece:
-	Vector3i NewPos = Conn.m_Piece->RotatePos(Conn.m_Connector.m_Pos, Conn.m_NumCCWRotations);
-	ConnPos -= NewPos;
-	auto PlacedPiece = std::make_unique<cPlacedPiece>(&a_ParentPiece, *(Conn.m_Piece), ConnPos, Conn.m_NumCCWRotations);
-
-	// Add the new piece's connectors to the list of free connectors:
-	cPiece::cConnectors Connectors = Conn.m_Piece->GetConnectors();
-	for (cPiece::cConnectors::const_iterator itr = Connectors.begin(), end = Connectors.end(); itr != end; ++itr)
-	{
-		if (itr->m_Pos.Equals(Conn.m_Connector.m_Pos))
-		{
-			// This is the connector through which we have been connected to the parent, don't add
-			continue;
-		}
-		a_OutConnectors.emplace_back(PlacedPiece.get(), Conn.m_Piece->RotateMoveConnector(*itr, Conn.m_NumCCWRotations, ConnPos.x, ConnPos.y, ConnPos.z));
-	}
-	a_OutPieces.push_back(std::move(PlacedPiece));
-
-	return true;
 }
 
 
@@ -273,6 +297,10 @@ void cPieceGeneratorBFSTree::PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDe
 				DebugConnectorPool(ConnectorPool, NumProcessed + 1);
 				//*/
 			}
+		}
+		else
+		{
+			TryPlacePieceAtConnector(*Conn.m_Piece, Conn.m_Connector, a_OutPieces, ConnectorPool, true);
 		}
 		NumProcessed++;
 		if (NumProcessed > 1000)

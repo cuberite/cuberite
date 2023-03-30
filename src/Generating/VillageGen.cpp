@@ -258,6 +258,13 @@ protected:
 	}
 
 
+	virtual cPieces GetClosurePiecesWithConnector(int a_ConnectorType) override
+	{
+		cPieces pieces;
+		return pieces;
+	}
+
+
 	virtual cPieces GetStartingPieces(void) override
 	{
 		return m_Prefabs.GetStartingPieces();
