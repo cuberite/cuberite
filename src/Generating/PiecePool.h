@@ -284,9 +284,6 @@ public:
 	The cPiece pointers returned are managed by the pool and the caller doesn't free them. */
 	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) = 0;
 
-	/** Returns a list of closure pieces that contain the specified connector type. */
-	virtual cPieces GetClosurePiecesWithConnector(int a_ConnectorType) = 0;
-
 	/** Returns the pieces that should be used as the starting point.
 	Multiple starting points are supported, one of the returned piece will be chosen. */
 	virtual cPieces GetStartingPieces(void) = 0;

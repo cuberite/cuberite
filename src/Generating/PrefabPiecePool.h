@@ -112,7 +112,6 @@ public:
 
 	// cPiecePool overrides:
 	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override;
-	virtual cPieces GetClosurePiecesWithConnector(int a_ConnectorType) override;
 	virtual cPieces GetStartingPieces(void) override;
 	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) override;
 	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) override;

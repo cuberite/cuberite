@@ -108,14 +108,33 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 	// Get a list of available connections:
 	cConnections Connections;
 	int WantedConnectorType = -a_Connector.m_Type;
-	cPieces AvailablePieces;
+	cPieces AvailablePieces = m_PiecePool.GetPiecesWithConnector(WantedConnectorType);
 	if (a_OnlyClosurePieces)
 	{
-		AvailablePieces = m_PiecePool.GetClosurePiecesWithConnector(WantedConnectorType);
-	}
-	else
-	{
-		AvailablePieces = m_PiecePool.GetPiecesWithConnector(WantedConnectorType);
+		cPieces closurePieces;
+		closurePieces.reserve(AvailablePieces.size());
+		for (auto & piece : AvailablePieces)
+		{
+			auto hitBox = piece->GetHitBox();
+			hitBox.Sort();
+			auto pieceSize = hitBox.p2 - hitBox.p1;
+			auto connectors = piece->GetConnectors();
+			Vector3i lastCoord = connectors[0].m_Pos;
+			bool hasMultipleConnectors = false;
+			for (const auto & connector : connectors)
+			{
+				if (connector.m_Pos != lastCoord)
+				{
+					hasMultipleConnectors = true;
+					break;
+				}
+			}
+			if (!hasMultipleConnectors)
+			{
+				closurePieces.push_back(piece);
+			}
+		}
+		AvailablePieces = closurePieces;
 	}
 	Connections.reserve(AvailablePieces.size());
 	Vector3i ConnPos = cPiece::cConnector::AddDirection(a_Connector.m_Pos, a_Connector.m_Direction);  // The position at which the new connector should be placed - 1 block away from the current connector
@@ -123,14 +142,8 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 	FindPieceForConnector(AvailablePieces, a_ParentPiece, a_Connector, WantedConnectorType, ConnPos, a_OutPieces, Connections, WeightTotal);
 	if (Connections.empty())
 	{
-		// If there are no available connections try to place a closure connector.
-		AvailablePieces = m_PiecePool.GetClosurePiecesWithConnector(WantedConnectorType);
-		FindPieceForConnector(AvailablePieces, a_ParentPiece, a_Connector, WantedConnectorType, ConnPos, a_OutPieces, Connections, WeightTotal);
-		if (Connections.empty())
-		{
-			// No available connections, bail out
-			return false;
-		}
+		// No available connections, bail out
+		return false;
 	}
 	ASSERT(WeightTotal > 0);
 
