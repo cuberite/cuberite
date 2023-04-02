@@ -1987,6 +1987,5 @@ NIBBLETYPE cChunk::GetTimeAlteredLight(NIBBLETYPE a_Skylight) const
 
 bool cChunk::IsSlimeChunk() const
 {
-	cNoise Noise(m_World->GetSeed());
-	return (Noise.IntNoise2DInt(m_PosX, m_PosZ) / 8) % 10 == 0;  // 10% chance
+	return m_World->IsSlimeChunk(m_PosX, m_PosZ);
 }

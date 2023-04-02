@@ -3229,3 +3229,13 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_Ch
 		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
 	);
 }
+
+
+
+
+
+bool cWorld::IsSlimeChunk(int a_ChunkX, int a_ChunkZ) const
+{
+	cNoise Noise(GetSeed());
+	return (Noise.IntNoise2DInt(a_ChunkX, a_ChunkZ) / 8) % 10 == 0;  // 10% chance
+}

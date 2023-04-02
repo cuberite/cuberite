@@ -843,7 +843,7 @@ public:
 	virtual bool IsWeatherWetAtXYZ(Vector3i a_Position) override;
 
 	/** Returns the seed of the world. */
-	int GetSeed(void) { return m_Generator.GetSeed(); }
+	int GetSeed(void) const { return m_Generator.GetSeed(); }
 
 	// tolua_end
 
@@ -892,6 +892,8 @@ public:
 	as at least one requests is active the chunk will be ticked). */
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
 
+	/** Returns true if slimes should spawn in the chunk. */
+	bool IsSlimeChunk(int a_ChunkX, int a_ChunkZ) const;  // tolua_export
 private:
 
 	class cTickThread:
