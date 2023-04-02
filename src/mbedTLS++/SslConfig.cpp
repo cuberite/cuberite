@@ -235,14 +235,8 @@ std::shared_ptr<cSslConfig> cSslConfig::MakeDefaultConfig(bool a_IsClient)
 		Ret->SetRng(std::move(CtrDrbg));
 	}
 
-	UNUSED(GetCACerts());
-	Ret->SetAuthMode(eSslAuthMode::None);
-	// TODO: Re-enable security
-	/*
 	Ret->SetAuthMode(eSslAuthMode::Required);
-
 	Ret->SetCACerts(GetCACerts());
-	*/
 
 	#ifndef NDEBUG
 		#ifdef ENABLE_SSL_DEBUG_MSG
