@@ -656,7 +656,7 @@ std::pair<bool, AString> cUrlClient::Request(
 )
 {
 	return cUrlClientRequest::Request(
-		a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
 	);
 }
 
@@ -667,13 +667,13 @@ std::pair<bool, AString> cUrlClient::Request(
 std::pair<bool, AString> cUrlClient::Get(
 	const AString & a_URL,
 	cCallbacksPtr && a_Callbacks,
-	AStringMap a_Headers,
+	AStringMap && a_Headers,
 	const AString & a_Body,
-	AStringMap a_Options
+	AStringMap && a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		"GET", a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		"GET", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
 	);
 }
 
@@ -690,7 +690,7 @@ std::pair<bool, AString> cUrlClient::Post(
 )
 {
 	return cUrlClientRequest::Request(
-		"POST", a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		"POST", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
 	);
 }
 
@@ -707,8 +707,30 @@ std::pair<bool, AString> cUrlClient::Put(
 )
 {
 	return cUrlClientRequest::Request(
-		"PUT", a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		"PUT", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
 	);
+}
+
+
+
+
+
+std::pair<bool, AString> cUrlClient::BlockingRequest(const AString & a_Method, const AString & a_URL, AStringMap && a_Headers, const AString & a_Body, AStringMap && a_Options)
+{
+	auto EvtFinished = std::make_shared<cEvent>();
+	AString Response;
+	auto Callbacks = std::make_unique<cSimpleHTTPCallbacks>(EvtFinished, Response);
+	auto [Success, ErrorMessage] = cUrlClient::Request(a_Method, a_URL, std::move(Callbacks), std::move(a_Headers), a_Body, std::move(a_Options));
+	if (Success)
+	{
+		EvtFinished->Wait();
+	}
+	else
+	{
+		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, ErrorMessage.c_str());
+		return std::make_pair(false, AString());
+	}
+	return std::make_pair(true, Response);
 }
 
 
@@ -721,20 +743,7 @@ std::pair<bool, AString> cUrlClient::BlockingGet(
 	const AString & a_Body,
 	AStringMap a_Options)
 {
-	auto EvtFinished = std::make_shared<cEvent>();
-	AString Response;
-	auto Callbacks = std::make_unique<cSimpleHTTPCallbacks>(EvtFinished, Response);
-	auto [Success, ErrorMessage] = cUrlClient::Get(a_URL, std::move(Callbacks), std::move(a_Headers), a_Body, std::move(a_Options));
-	if (Success)
-	{
-		EvtFinished->Wait();
-	}
-	else
-	{
-		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, ErrorMessage.c_str());
-		return std::make_pair(false, AString());
-	}
-	return std::make_pair(true, Response);
+	return BlockingRequest("GET", a_URL, std::move(a_Headers), a_Body, std::move(a_Options));
 }
 
 
@@ -747,20 +756,7 @@ std::pair<bool, AString> cUrlClient::BlockingPost(
 	const AString & a_Body,
 	AStringMap && a_Options)
 {
-	auto EvtFinished = std::make_shared<cEvent>();
-	AString Response;
-	auto Callbacks = std::make_unique<cSimpleHTTPCallbacks>(EvtFinished, Response);
-	auto [Success, ErrorMessage] = cUrlClient::Post(a_URL, std::move(Callbacks), std::move(a_Headers), a_Body, std::move(a_Options));
-	if (Success)
-	{
-		EvtFinished->Wait();
-	}
-	else
-	{
-		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, ErrorMessage.c_str());
-		return std::make_pair(false, AString());
-	}
-	return std::make_pair(true, Response);
+	return BlockingRequest("POST", a_URL, std::move(a_Headers), a_Body, std::move(a_Options));
 }
 
 
@@ -773,20 +769,7 @@ std::pair<bool, AString> cUrlClient::BlockingPut(
 	const AString & a_Body,
 	AStringMap && a_Options)
 {
-	auto EvtFinished = std::make_shared<cEvent>();
-	AString Response;
-	auto Callbacks = std::make_unique<cSimpleHTTPCallbacks>(EvtFinished, Response);
-	auto [Success, ErrorMessage] = cUrlClient::Put(a_URL, std::move(Callbacks), std::move(a_Headers), a_Body, std::move(a_Options));
-	if (Success)
-	{
-		EvtFinished->Wait();
-	}
-	else
-	{
-		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, ErrorMessage.c_str());
-		return std::make_pair(false, AString());
-	}
-	return std::make_pair(true, Response);
+	return BlockingRequest("PUT", a_URL, std::move(a_Headers), a_Body, std::move(a_Options));
 }
 
 

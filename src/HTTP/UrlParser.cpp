@@ -3,8 +3,8 @@
 
 // Implements the cUrlParser class that parses string URL into individual parts
 
-#include <regex>
 #include "Globals.h"
+
 #include "UrlParser.h"
 
 
