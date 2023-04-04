@@ -17,8 +17,7 @@
 
 cRankManager::cRankManager(void) :
 	m_DB("Ranks.sqlite", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE),
-	m_IsInitialized(false),
-	m_MojangAPI(nullptr)
+	m_IsInitialized(false)
 {
 }
 
@@ -28,10 +27,6 @@ cRankManager::cRankManager(void) :
 
 cRankManager::~cRankManager()
 {
-	if (m_MojangAPI != nullptr)
-	{
-		m_MojangAPI->SetRankManager(nullptr);
-	}
 }
 
 

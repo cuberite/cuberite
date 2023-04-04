@@ -273,11 +273,6 @@ protected:
 	/** Set to true once the manager is initialized. */
 	bool m_IsInitialized;
 
-	/** The MojangAPI instance that is used for keeping player names and UUIDs in sync.
-	Set in Initialize(), may be nullptr. */
-	cMojangAPI * m_MojangAPI;
-
-
 	/** Returns true if all the DB tables are empty, indicating a fresh new install. */
 	bool AreDBTablesEmpty(void);
 
