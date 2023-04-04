@@ -139,37 +139,6 @@ protected:
 
 
 
-class cCallbacks : public cUrlClient::cCallbacks
-{
-public:
-
-	explicit cCallbacks(std::shared_ptr<cEvent> a_Event, AString & a_ResponseBody) : m_Event(std::move(a_Event)), m_ResponseBody(a_ResponseBody) {}
-
-	void OnBodyFinished() override
-	{
-		m_Event->Set();
-	}
-
-	void OnError(const AString & a_ErrorMsg) override
-	{
-		LOGERROR("%s %d: HTTP Error: %s", __FILE__, __LINE__, a_ErrorMsg.c_str());
-		m_Event->Set();
-	}
-
-	void OnBodyData(const void * a_Data, size_t a_Size) override
-	{
-		m_ResponseBody.append(static_cast<const char *>(a_Data), a_Size);
-	}
-
-	std::shared_ptr<cEvent> m_Event;
-
-	/** The accumulator for the partial body data, so that OnBodyFinished() can send the entire thing at once. */
-	AString & m_ResponseBody;
-};
-
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // cMojangAPI:
