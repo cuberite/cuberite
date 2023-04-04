@@ -117,7 +117,7 @@ int TestRequest1()
 	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
 	options["MaxRedirects"] = "0";
-	auto res = cUrlClient::Get("http://github.com", std::move(callbacks), AStringMap(), AString(), options);
+	auto res = cUrlClient::Get("http://github.com", std::move(callbacks), AStringMap(), AString(), std::move(options));
 	if (res.first)
 	{
 		evtFinished->Wait();
@@ -163,7 +163,7 @@ int TestRequest3()
 	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
 	options["MaxRedirects"] = "0";
-	auto res = cUrlClient::Get("https://github.com", std::move(callbacks), AStringMap(), AString(), options);
+	auto res = cUrlClient::Get("https://github.com", std::move(callbacks), AStringMap(), AString(), std::move(options));
 	if (res.first)
 	{
 		evtFinished->Wait();
