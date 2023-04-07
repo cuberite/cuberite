@@ -68,7 +68,8 @@ public:
 	virtual void Close(void) override;
 	virtual AString StartTLSClient(
 		cX509CertPtr a_OwnCert,
-		cCryptoKeyPtr a_OwnPrivKey
+		cCryptoKeyPtr a_OwnPrivKey,
+		const std::string_view hostname
 	) override;
 	virtual AString StartTLSServer(
 		cX509CertPtr a_OwnCert,

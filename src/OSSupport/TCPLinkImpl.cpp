@@ -237,7 +237,8 @@ void cTCPLinkImpl::Close(void)
 
 AString cTCPLinkImpl::StartTLSClient(
 	cX509CertPtr a_OwnCert,
-	cCryptoKeyPtr a_OwnPrivKey
+	cCryptoKeyPtr a_OwnPrivKey,
+	const std::string_view hostname
 )
 {
 	// Check preconditions:
@@ -262,6 +263,8 @@ AString cTCPLinkImpl::StartTLSClient(
 	{
 		m_TlsContext->Initialize(true);
 	}
+
+	m_TlsContext->SetExpectedPeerName(hostname);
 
 	m_TlsContext->SetSelf(cLinkTlsContextWPtr(m_TlsContext));
 

@@ -192,7 +192,9 @@ AString cLuaTCPLink::StartTLSClient(
 				return Printf("Cannot parse client private key: -0x%x", res);
 			}
 		}
-		return link->StartTLSClient(ownCert, ownPrivKey);
+
+		// TODO : Provide a way to pass SNI from Lua too.
+		return link->StartTLSClient(ownCert, ownPrivKey, "");
 	}
 	return "";
 }
