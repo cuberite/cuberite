@@ -19,6 +19,14 @@ cByteBuffer assumes that it is not used by multiple threads at once, this macro 
 Unfortunately it is very slow, so it is disabled even for regular DEBUG builds. */
 // #define DEBUG_SINGLE_THREAD_ACCESS
 
+namespace VarInt
+{
+	constexpr UInt32 SEGMENT_BITS = 0x7F;
+	constexpr UInt32 CONTINUE_BIT = 0x80;
+	constexpr std::size_t MOVE_BITS = 7;
+	constexpr std::size_t NORMAL_BIT_COUNT = 5;
+	constexpr std::size_t LONG_BIT_COUNT = 10;
+}
 
 
 
@@ -416,15 +424,15 @@ bool cByteBuffer::ReadVarInt32(UInt32 & a_Value)
 	CHECK_THREAD
 	CheckValid();
 	UInt32 Value = 0;
-	int Shift = 0;
-	unsigned char b = 0;
+	std::size_t Shift = 0;
+	unsigned char ReadByte = 0;
 	do
 	{
 		NEEDBYTES(1);
-		ReadBuf(&b, 1);
-		Value = Value | ((static_cast<UInt32>(b & 0x7f)) << Shift);
-		Shift += 7;
-	} while ((b & 0x80) != 0);
+		ReadBuf(&ReadByte, 1);
+		Value |= ((static_cast<UInt32>(ReadByte & VarInt::SEGMENT_BITS)) << Shift);
+		Shift += VarInt::MOVE_BITS;
+	} while ((ReadByte & VarInt::CONTINUE_BIT) != 0);
 	a_Value = Value;
 	return true;
 }
@@ -444,9 +452,9 @@ bool cByteBuffer::ReadVarInt64(UInt64 & a_Value)
 	{
 		NEEDBYTES(1);
 		ReadBuf(&b, 1);
-		Value = Value | ((static_cast<UInt64>(b & 0x7f)) << Shift);
+		Value = Value | ((static_cast<UInt64>(b & VarInt::SEGMENT_BITS)) << Shift);
 		Shift += 7;
-	} while ((b & 0x80) != 0);
+	} while ((b & VarInt::CONTINUE_BIT) != 0);
 	a_Value = Value;
 	return true;
 }
@@ -748,16 +756,17 @@ bool cByteBuffer::WriteVarInt32(UInt32 a_Value)
 	CheckValid();
 
 	// A 32-bit integer can be encoded by at most 5 bytes:
-	unsigned char b[5];
-	size_t idx = 0;
+	std::array<unsigned char, VarInt::NORMAL_BIT_COUNT> Buffer = {};
+	std::size_t Pos = 0;
 	do
 	{
-		b[idx] = (a_Value & 0x7f) | ((a_Value > 0x7f) ? 0x80 : 0x00);
-		a_Value = a_Value >> 7;
-		idx++;
+		// Write to buffer either the raw 7 lsb or the 7 lsb and a bit that indicates the number continues
+		Buffer[Pos] = ((a_Value & VarInt::SEGMENT_BITS) | ((a_Value > VarInt::SEGMENT_BITS) ? VarInt::CONTINUE_BIT : 0x00));
+		a_Value >>= VarInt::MOVE_BITS;
+		Pos++;
 	} while (a_Value > 0);
 
-	return WriteBuf(b, idx);
+	return WriteBuf(Buffer.data(), Pos);
 }
 
 
@@ -770,16 +779,17 @@ bool cByteBuffer::WriteVarInt64(UInt64 a_Value)
 	CheckValid();
 
 	// A 64-bit integer can be encoded by at most 10 bytes:
-	unsigned char b[10];
-	size_t idx = 0;
+	std::array<unsigned char, VarInt::LONG_BIT_COUNT> Buffer = {};
+	std::size_t Pos = 0;
 	do
 	{
-		b[idx] = (a_Value & 0x7f) | ((a_Value > 0x7f) ? 0x80 : 0x00);
-		a_Value = a_Value >> 7;
-		idx++;
+		// Write to buffer either the raw 7 lsb or the 7 lsb and a bit that indicates the number continues
+		Buffer[Pos] = (a_Value & VarInt::SEGMENT_BITS) | ((a_Value > VarInt::SEGMENT_BITS) ? VarInt::CONTINUE_BIT : 0x00);
+		a_Value = a_Value >> VarInt::MOVE_BITS;
+		Pos++;
 	} while (a_Value > 0);
 
-	return WriteBuf(b, idx);
+	return WriteBuf(Buffer.data(), Pos);
 }
 
 
@@ -791,8 +801,7 @@ bool cByteBuffer::WriteVarUTF8String(const AString & a_Value)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(a_Value.size() + 1);  // This is a lower-bound on the bytes that will be actually written. Fail early.
-	bool res = WriteVarInt32(static_cast<UInt32>(a_Value.size()));
-	if (!res)
+	if (!WriteVarInt32(static_cast<UInt32>(a_Value.size())))
 	{
 		return false;
 	}
