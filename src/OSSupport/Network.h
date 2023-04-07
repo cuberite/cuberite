@@ -113,7 +113,8 @@ public:
 	Returns empty string on success, non-empty error description on failure. */
 	virtual AString StartTLSClient(
 		cX509CertPtr a_OwnCert,
-		cCryptoKeyPtr a_OwnPrivKey
+		cCryptoKeyPtr a_OwnPrivKey,
+		const std::string_view hostname
 	) = 0;
 
 	/** Starts a TLS handshake as a server connection.
