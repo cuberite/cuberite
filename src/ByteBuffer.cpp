@@ -19,15 +19,54 @@ cByteBuffer assumes that it is not used by multiple threads at once, this macro 
 Unfortunately it is very slow, so it is disabled even for regular DEBUG builds. */
 // #define DEBUG_SINGLE_THREAD_ACCESS
 
+
+/** Constants encoding some values to reduce the amount of magic numbers */
 namespace VarInt
 {
-	constexpr UInt32 SEGMENT_BITS = 0x7F;
-	constexpr UInt32 CONTINUE_BIT = 0x80;
-	constexpr std::size_t MOVE_BITS = 7;
-	constexpr std::size_t NORMAL_BIT_COUNT = 5;
-	constexpr std::size_t LONG_BIT_COUNT = 10;
+	constexpr unsigned char SEGMENT_BITS = 0x7F;
+	constexpr unsigned char CONTINUE_BIT = 0x80;
+	constexpr std::size_t MOVE_BITS  = 7;
+	constexpr std::size_t BYTE_COUNT = 5;        // A 32-bit integer can be encoded by at most 5 bytes
+	constexpr std::size_t BYTE_COUNT_LONG = 10;  // A 64-bit integer can be encoded by at most 10 bytes
 }
 
+
+
+
+
+namespace Position
+{
+	// If the bit indicated in the mask is 0, the the matching offset is applied.
+	constexpr int BIT_MASK_IS_NEGATIVE_XZ = 0x02000000;
+	constexpr int BIT_MASK_IS_NEGATIVE_Y  = 0x08000;
+
+	constexpr int NEGATIVE_OFFSET_XZ = 0x04000000;
+	constexpr int NEGATIVE_OFFSET_Y  = 0x01000;
+
+	// Bit masks when reading the requested bits
+	constexpr UInt32 BIT_MASK_XZ = 0x03ffffff;  // 26 bits
+	constexpr UInt32 BIT_MASK_Y  = 0x0fff;      // 12 bits
+}
+
+
+
+
+
+namespace XYZPosition
+{
+	constexpr std::size_t BIT_COUNT_X = 38;
+	constexpr std::size_t BIT_COUNT_Y = 26;
+}
+
+
+
+
+
+namespace XZYPosition
+{
+	constexpr std::size_t BIT_COUNT_X = 38;
+	constexpr std::size_t BIT_COUNT_Z = 12;
+}
 
 
 
@@ -92,10 +131,7 @@ namespace VarInt
 
 cByteBuffer::cByteBuffer(size_t a_BufferSize) :
 	m_Buffer(new std::byte[a_BufferSize + 1]),
-	m_BufferSize(a_BufferSize + 1),
-	m_DataStart(0),
-	m_WritePos(0),
-	m_ReadPos(0)
+	m_BufferSize(a_BufferSize + 1)
 {
 	// Allocating one byte more than the buffer size requested, so that we can distinguish between
 	// completely-full and completely-empty states
@@ -108,8 +144,6 @@ cByteBuffer::cByteBuffer(size_t a_BufferSize) :
 cByteBuffer::~cByteBuffer()
 {
 	CheckValid();
-	delete[] m_Buffer;
-	m_Buffer = nullptr;
 }
 
 
@@ -122,9 +156,9 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 	CheckValid();
 
 	// Store the current free space for a check after writing:
-	size_t CurFreeSpace = GetFreeSpace();
+	auto CurFreeSpace = GetFreeSpace();
 	#ifndef NDEBUG
-		size_t CurReadableSpace = GetReadableSpace();
+		auto CurReadableSpace = GetReadableSpace();
 		size_t WrittenBytes = 0;
 	#endif
 
@@ -133,14 +167,14 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 		return false;
 	}
 	ASSERT(m_BufferSize >= m_WritePos);
-	size_t TillEnd = m_BufferSize - m_WritePos;
-	const char * Bytes = static_cast<const char *>(a_Bytes);
+	auto TillEnd = m_BufferSize - m_WritePos;
+	auto Bytes = static_cast<const char *>(a_Bytes);
 	if (TillEnd <= a_Count)
 	{
 		// Need to wrap around the ringbuffer end
 		if (TillEnd > 0)
 		{
-			memcpy(m_Buffer + m_WritePos, Bytes, TillEnd);
+			memcpy(m_Buffer.get() + m_WritePos, Bytes, TillEnd);
 			Bytes += TillEnd;
 			a_Count -= TillEnd;
 			#ifndef NDEBUG
@@ -153,7 +187,7 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 	// We're guaranteed that we'll fit in a single write op
 	if (a_Count > 0)
 	{
-		memcpy(m_Buffer + m_WritePos, Bytes, a_Count);
+		memcpy(m_Buffer.get() + m_WritePos, Bytes, a_Count);
 		m_WritePos += a_Count;
 		#ifndef NDEBUG
 			WrittenBytes += a_Count;
@@ -178,12 +212,12 @@ size_t cByteBuffer::GetFreeSpace(void) const
 		// Wrap around the buffer end:
 		ASSERT(m_BufferSize >= m_WritePos);
 		ASSERT((m_BufferSize - m_WritePos + m_DataStart) >= 1);
-		return m_BufferSize - m_WritePos + m_DataStart - 1;
+		return m_BufferSize - m_WritePos + m_DataStart - 1;  // -1 Offset since the last byte is used to indicate fullness or emptiness.
 	}
 	// Single free space partition:
 	ASSERT(m_BufferSize >= m_WritePos);
 	ASSERT(m_BufferSize - m_WritePos >= 1);
-	return m_DataStart - m_WritePos - 1;
+	return m_DataStart - m_WritePos - 1;  // -1 Offset since the last byte is used to indicate fullness or emptiness.
 }
 
 
@@ -196,7 +230,7 @@ size_t cByteBuffer::GetUsedSpace(void) const
 	CheckValid();
 	ASSERT(m_BufferSize >= GetFreeSpace());
 	ASSERT((m_BufferSize - GetFreeSpace()) >= 1);
-	return m_BufferSize - GetFreeSpace() - 1;
+	return m_BufferSize - GetFreeSpace() - 1;  // -1 Offset since the last byte is used to indicate fullness or emptiness.
 }
 
 
@@ -224,7 +258,7 @@ size_t cByteBuffer::GetReadableSpace(void) const
 
 bool cByteBuffer::CanBEInt8Represent(int a_Value)
 {
-	return (-128 <= a_Value) && (a_Value <= 127);
+	return (std::numeric_limits<Int8>::min() <= a_Value) && (a_Value <= std::numeric_limits<Int8>::max());
 }
 
 
@@ -233,7 +267,7 @@ bool cByteBuffer::CanBEInt8Represent(int a_Value)
 
 bool cByteBuffer::CanBEInt16Represent(int a_Value)
 {
-	return (-32768 <= a_Value) && (a_Value <= 32767);
+	return (std::numeric_limits<Int16>::min() <= a_Value) && (a_Value <= std::numeric_limits<Int16>::max());
 }
 
 
@@ -520,14 +554,14 @@ bool cByteBuffer::ReadXYZPosition64(int & a_BlockX, int & a_BlockY, int & a_Bloc
 	}
 
 	// Convert the 64 received bits into 3 coords:
-	UInt32 BlockXRaw = (Value >> 38) & 0x03ffffff;  // Top 26 bits
-	UInt32 BlockYRaw = (Value >> 26) & 0x0fff;      // Middle 12 bits
-	UInt32 BlockZRaw = (Value & 0x03ffffff);        // Bottom 26 bits
+	UInt32 BlockXRaw = (Value >> XYZPosition::BIT_COUNT_X) & Position::BIT_MASK_XZ;
+	UInt32 BlockYRaw = (Value >> XYZPosition::BIT_COUNT_Y) & Position::BIT_MASK_Y;
+	UInt32 BlockZRaw = (Value &                              Position::BIT_MASK_XZ);
 
 	// If the highest bit in the number's range is set, convert the number into negative:
-	a_BlockX = ((BlockXRaw & 0x02000000) == 0) ? static_cast<int>(BlockXRaw) : -(0x04000000 - static_cast<int>(BlockXRaw));
-	a_BlockY = ((BlockYRaw & 0x0800) == 0)     ? static_cast<int>(BlockYRaw) : -(0x01000    - static_cast<int>(BlockYRaw));
-	a_BlockZ = ((BlockZRaw & 0x02000000) == 0) ? static_cast<int>(BlockZRaw) : -(0x04000000 - static_cast<int>(BlockZRaw));
+	a_BlockX = ((BlockXRaw & Position::BIT_MASK_IS_NEGATIVE_XZ) == 0) ? static_cast<int>(BlockXRaw) : -(Position::NEGATIVE_OFFSET_XZ - static_cast<int>(BlockXRaw));
+	a_BlockY = ((BlockYRaw & Position::BIT_MASK_IS_NEGATIVE_Y)  == 0) ? static_cast<int>(BlockYRaw) : -(Position::NEGATIVE_OFFSET_Y  - static_cast<int>(BlockYRaw));
+	a_BlockZ = ((BlockZRaw & Position::BIT_MASK_IS_NEGATIVE_XZ) == 0) ? static_cast<int>(BlockZRaw) : -(Position::NEGATIVE_OFFSET_XZ - static_cast<int>(BlockZRaw));
 	return true;
 }
 
@@ -554,14 +588,14 @@ bool cByteBuffer::ReadXZYPosition64(int & a_BlockX, int & a_BlockY, int & a_Bloc
 	}
 
 	// Convert the 64 received bits into 3 coords:
-	UInt32 BlockXRaw = (Value >> 38) & 0x03ffffff;  // Top 26 bits
-	UInt32 BlockZRaw = (Value >> 12) & 0x03ffffff;  // Middle 26 bits
-	UInt32 BlockYRaw = (Value & 0x0fff);            // Bottom 12 bits
+	UInt32 BlockXRaw = (Value >> XZYPosition::BIT_COUNT_X) & Position::BIT_MASK_XZ;
+	UInt32 BlockZRaw = (Value >> XZYPosition::BIT_COUNT_Z) & Position::BIT_MASK_XZ;
+	UInt32 BlockYRaw = (Value                              & Position::BIT_MASK_Y);
 
 	// If the highest bit in the number's range is set, convert the number into negative:
-	a_BlockX = ((BlockXRaw & 0x02000000) == 0) ? static_cast<int>(BlockXRaw) : (static_cast<int>(BlockXRaw) - 0x04000000);
-	a_BlockY = ((BlockYRaw & 0x0800)     == 0) ? static_cast<int>(BlockYRaw) : (static_cast<int>(BlockYRaw) - 0x01000);
-	a_BlockZ = ((BlockZRaw & 0x02000000) == 0) ? static_cast<int>(BlockZRaw) : (static_cast<int>(BlockZRaw) - 0x04000000);
+	a_BlockX = ((BlockXRaw & Position::BIT_MASK_IS_NEGATIVE_XZ) == 0) ? static_cast<int>(BlockXRaw) : (static_cast<int>(BlockXRaw) - Position::NEGATIVE_OFFSET_XZ);
+	a_BlockY = ((BlockYRaw & Position::BIT_MASK_IS_NEGATIVE_Y)  == 0) ? static_cast<int>(BlockYRaw) : (static_cast<int>(BlockYRaw) - Position::NEGATIVE_OFFSET_Y);
+	a_BlockZ = ((BlockZRaw & Position::BIT_MASK_IS_NEGATIVE_XZ) == 0) ? static_cast<int>(BlockZRaw) : (static_cast<int>(BlockZRaw) - Position::NEGATIVE_OFFSET_XZ);
 	return true;
 }
 
@@ -756,7 +790,7 @@ bool cByteBuffer::WriteVarInt32(UInt32 a_Value)
 	CheckValid();
 
 	// A 32-bit integer can be encoded by at most 5 bytes:
-	std::array<unsigned char, VarInt::NORMAL_BIT_COUNT> Buffer = {};
+	std::array<unsigned char, VarInt::BYTE_COUNT> Buffer = {};
 	std::size_t Pos = 0;
 	do
 	{
@@ -779,7 +813,7 @@ bool cByteBuffer::WriteVarInt64(UInt64 a_Value)
 	CheckValid();
 
 	// A 64-bit integer can be encoded by at most 10 bytes:
-	std::array<unsigned char, VarInt::LONG_BIT_COUNT> Buffer = {};
+	std::array<unsigned char, VarInt::BYTE_COUNT_LONG> Buffer = {};
 	std::size_t Pos = 0;
 	do
 	{
@@ -796,7 +830,7 @@ bool cByteBuffer::WriteVarInt64(UInt64 a_Value)
 
 
 
-bool cByteBuffer::WriteVarUTF8String(const AString & a_Value)
+bool cByteBuffer::WriteVarUTF8String(const std::string_view & a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -847,7 +881,7 @@ bool cByteBuffer::ReadBuf(void * a_Buffer, size_t a_Count)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(a_Count);
-	char * Dst = static_cast<char *>(a_Buffer);  // So that we can do byte math
+	auto Dst = static_cast<char *>(a_Buffer);  // So that we can do byte math
 	ASSERT(m_BufferSize >= m_ReadPos);
 	size_t BytesToEndOfBuffer = m_BufferSize - m_ReadPos;
 	if (BytesToEndOfBuffer <= a_Count)
@@ -855,7 +889,7 @@ bool cByteBuffer::ReadBuf(void * a_Buffer, size_t a_Count)
 		// Reading across the ringbuffer end, read the first part and adjust parameters:
 		if (BytesToEndOfBuffer > 0)
 		{
-			memcpy(Dst, m_Buffer + m_ReadPos, BytesToEndOfBuffer);
+			memcpy(Dst, m_Buffer.get() + m_ReadPos, BytesToEndOfBuffer);
 			Dst += BytesToEndOfBuffer;
 			a_Count -= BytesToEndOfBuffer;
 		}
@@ -865,7 +899,7 @@ bool cByteBuffer::ReadBuf(void * a_Buffer, size_t a_Count)
 	// Read the rest of the bytes in a single read (guaranteed to fit):
 	if (a_Count > 0)
 	{
-		memcpy(Dst, m_Buffer + m_ReadPos, a_Count);
+		memcpy(Dst, m_Buffer.get() + m_ReadPos, a_Count);
 		m_ReadPos += a_Count;
 	}
 	return true;
@@ -880,13 +914,13 @@ bool cByteBuffer::WriteBuf(const void * a_Buffer, size_t a_Count)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(a_Count);
-	const char * Src = static_cast<const char *>(a_Buffer);  // So that we can do byte math
+	auto Src = static_cast<const char *>(a_Buffer);  // So that we can do byte math
 	ASSERT(m_BufferSize >= m_ReadPos);
 	size_t BytesToEndOfBuffer = m_BufferSize - m_WritePos;
 	if (BytesToEndOfBuffer <= a_Count)
 	{
 		// Reading across the ringbuffer end, read the first part and adjust parameters:
-		memcpy(m_Buffer + m_WritePos, Src, BytesToEndOfBuffer);
+		memcpy(m_Buffer.get() + m_WritePos, Src, BytesToEndOfBuffer);
 		Src += BytesToEndOfBuffer;
 		a_Count -= BytesToEndOfBuffer;
 		m_WritePos = 0;
@@ -895,7 +929,7 @@ bool cByteBuffer::WriteBuf(const void * a_Buffer, size_t a_Count)
 	// Read the rest of the bytes in a single read (guaranteed to fit):
 	if (a_Count > 0)
 	{
-		memcpy(m_Buffer + m_WritePos, Src, a_Count);
+		memcpy(m_Buffer.get() + m_WritePos, Src, a_Count);
 		m_WritePos += a_Count;
 	}
 	return true;
@@ -915,7 +949,7 @@ bool cByteBuffer::WriteBuf(size_t a_Count, unsigned char a_Value)
 	if (BytesToEndOfBuffer <= a_Count)
 	{
 		// Reading across the ringbuffer end, read the first part and adjust parameters:
-		memset(m_Buffer + m_WritePos, a_Value, BytesToEndOfBuffer);
+		memset(m_Buffer.get() + m_WritePos, a_Value, BytesToEndOfBuffer);
 		a_Count -= BytesToEndOfBuffer;
 		m_WritePos = 0;
 	}
@@ -923,7 +957,7 @@ bool cByteBuffer::WriteBuf(size_t a_Count, unsigned char a_Value)
 	// Read the rest of the bytes in a single read (guaranteed to fit):
 	if (a_Count > 0)
 	{
-		memset(m_Buffer + m_WritePos, a_Value, a_Count);
+		memset(m_Buffer.get() + m_WritePos, a_Value, a_Count);
 		m_WritePos += a_Count;
 	}
 	return true;
@@ -947,7 +981,7 @@ bool cByteBuffer::ReadSome(ContiguousByteBuffer & a_String, size_t a_Count)
 		// Reading across the ringbuffer end, read the first part and adjust parameters:
 		if (BytesToEndOfBuffer > 0)
 		{
-			a_String.assign(m_Buffer + m_ReadPos, BytesToEndOfBuffer);
+			a_String.assign(m_Buffer.get() + m_ReadPos, BytesToEndOfBuffer);
 			ASSERT(a_Count >= BytesToEndOfBuffer);
 			a_Count -= BytesToEndOfBuffer;
 		}
@@ -957,7 +991,7 @@ bool cByteBuffer::ReadSome(ContiguousByteBuffer & a_String, size_t a_Count)
 	// Read the rest of the bytes in a single read (guaranteed to fit):
 	if (a_Count > 0)
 	{
-		a_String.append(m_Buffer + m_ReadPos, a_Count);
+		a_String.append(m_Buffer.get() + m_ReadPos, a_Count);
 		m_ReadPos += a_Count;
 	}
 	return true;
@@ -1041,7 +1075,7 @@ void cByteBuffer::ResetRead(void)
 
 
 
-void cByteBuffer::ReadAgain(ContiguousByteBuffer & a_Out)
+void cByteBuffer::ReadAgain(ContiguousByteBuffer & a_Out) const
 {
 	// Return the data between m_DataStart and m_ReadPos (the data that has been read but not committed)
 	// Used by ProtoProxy to repeat communication twice, once for parsing and the other time for the remote party
@@ -1052,11 +1086,11 @@ void cByteBuffer::ReadAgain(ContiguousByteBuffer & a_Out)
 	{
 		// Across the ringbuffer end, read the first part and adjust next part's start:
 		ASSERT(m_BufferSize >= m_DataStart);
-		a_Out.append(m_Buffer + m_DataStart, m_BufferSize - m_DataStart);
+		a_Out.append(m_Buffer.get() + m_DataStart, m_BufferSize - m_DataStart);
 		DataStart = 0;
 	}
 	ASSERT(m_ReadPos >= DataStart);
-	a_Out.append(m_Buffer + DataStart, m_ReadPos - DataStart);
+	a_Out.append(m_Buffer.get() + DataStart, m_ReadPos - DataStart);
 }
 
 
@@ -1096,7 +1130,7 @@ size_t cByteBuffer::GetVarIntSize(UInt32 a_Value)
 	{
 		// If the value cannot be expressed in 7 bits, it needs to take up another byte
 		Count++;
-		a_Value >>= 7;
+		a_Value >>= VarInt::MOVE_BITS;
 	} while (a_Value != 0);
 
 	return Count;
