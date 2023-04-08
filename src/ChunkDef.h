@@ -226,7 +226,7 @@ public:
 	{
 		return MakeIndex(a_RelPos.x, a_RelPos.y, a_RelPos.z);
 	}
-	
+
 	inline static size_t MakeIndex(int x, int z)
 	{
 		return static_cast<size_t>(x + (z * Width));

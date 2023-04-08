@@ -542,7 +542,7 @@ void cCaveTunnel::ProcessChunk(
 			(DifZ >= 0) && (DifZ < cChunkDef::Width)
 		)
 		{
-			cChunkDef::SetBlock(a_BlockTypes.data(),, DifX, itr->m_BlockY, DifZ, E_BLOCK_GLOWSTONE);
+			cChunkDef::SetBlock(a_BlockTypes.data(), DifX, itr->m_BlockY, DifZ, E_BLOCK_GLOWSTONE);
 		}
 	}  // for itr - m_Points[]
 	#endif  // !NDEBUG
