@@ -21,12 +21,8 @@ cChunkDesc::cChunkDesc(cChunkCoords a_Coords) :
 	m_bUseDefaultFinish(true)
 {
 	m_BlockArea.Create(cChunkDef::Width, cChunkDef::Height, cChunkDef::Width);
-	/*
-	memset(m_BlockTypes, 0, sizeof(cChunkDef::BlockTypes));
-	memset(m_BlockMeta,  0, sizeof(cChunkDef::BlockNibbles));
-	*/
-	memset(m_BiomeMap,   0, sizeof(cChunkDef::BiomeMap));
-	memset(m_HeightMap,  0, sizeof(cChunkDef::HeightMap));
+	m_BiomeMap.fill(biFirstBiome);
+	m_HeightMap.fill(0);
 }
 
 
@@ -394,40 +390,6 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 
 
 
-HEIGHTTYPE cChunkDesc::GetMaxHeight(void) const
-{
-	HEIGHTTYPE MaxHeight = m_HeightMap[0];
-	for (size_t i = 1; i < ARRAYCOUNT(m_HeightMap); i++)
-	{
-		if (m_HeightMap[i] > MaxHeight)
-		{
-			MaxHeight = m_HeightMap[i];
-		}
-	}
-	return MaxHeight;
-}
-
-
-
-
-
-HEIGHTTYPE cChunkDesc::GetMinHeight(void) const
-{
-	HEIGHTTYPE MinHeight = m_HeightMap[0];
-	for (size_t i = 1; i < ARRAYCOUNT(m_HeightMap); i++)
-	{
-		if (m_HeightMap[i] < MinHeight)
-		{
-			MinHeight = m_HeightMap[i];
-		}
-	}
-	return MinHeight;
-}
-
-
-
-
-
 void cChunkDesc::FillRelCuboid(
 	int a_MinX, int a_MaxX,
 	int a_MinY, int a_MaxY,
@@ -637,7 +599,7 @@ void cChunkDesc::UpdateHeightmap(void)
 void cChunkDesc::CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas)
 {
 	const NIBBLETYPE * AreaMetas = m_BlockArea.GetBlockMetas();
-	for (size_t i = 0; i < ARRAYCOUNT(a_DestMetas); i++)
+	for (size_t i = 0; i < a_DestMetas.size(); i++)
 	{
 		a_DestMetas[i] = static_cast<NIBBLETYPE>(AreaMetas[2 * i] | (AreaMetas[2 * i + 1] << 4));
 	}

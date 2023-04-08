@@ -16,7 +16,7 @@
 
 
 
-template <class ElementType, size_t ElementCount, ElementType DefaultValue>
+template <class ElementType, size_t ElementCount, auto DefaultValue>
 struct ChunkDataStore
 {
 	using Type = std::array<ElementType, ElementCount>;
@@ -38,11 +38,11 @@ struct ChunkDataStore
 
 	/** Copies the data from the specified flat section array into the internal representation.
 	Allocates a section if needed for the operation. */
-	void SetSection(const ElementType (& a_Source)[ElementCount], size_t a_Y);
+	void SetSection(const Type & a_Source, size_t a_Y);
 
 	/** Copies the data from the specified flat array into the internal representation.
 	Allocates sections that are needed for the operation. */
-	void SetAll(const ElementType (& a_Source)[cChunkDef::NumSections * ElementCount]);
+	void SetAll(const std::array<ElementType, cChunkDef::NumSections * ElementCount> & a_Source);
 
 	/** Contains all the sections this ChunkDataStore manages. */
 	std::unique_ptr<Type> Store[cChunkDef::NumSections];
@@ -62,13 +62,13 @@ public:
 	static constexpr BLOCKTYPE DefaultValue = 0x00;
 	static constexpr NIBBLETYPE DefaultMetaValue = 0x00;
 
-	using SectionType = BLOCKTYPE[SectionBlockCount];
-	using SectionMetaType = NIBBLETYPE[SectionMetaCount];
+	using SectionType     = std::array<BLOCKTYPE,  SectionBlockCount>;
+	using SectionMetaType = std::array<NIBBLETYPE, SectionMetaCount>;
 
 private:
 
-	ChunkDataStore<BLOCKTYPE, SectionBlockCount, DefaultValue> m_Blocks;
-	ChunkDataStore<NIBBLETYPE, SectionMetaCount, DefaultMetaValue> m_Metas;
+	ChunkDataStore<BLOCKTYPE,  SectionBlockCount, DefaultValue>     m_Blocks;
+	ChunkDataStore<NIBBLETYPE, SectionMetaCount,  DefaultMetaValue> m_Metas;
 
 public:
 
@@ -103,7 +103,7 @@ public:
 	static constexpr NIBBLETYPE DefaultBlockLightValue = 0x00;
 	static constexpr NIBBLETYPE DefaultSkyLightValue = 0xFF;
 
-	using SectionType = NIBBLETYPE[SectionLightCount];
+	using SectionType = std::array<NIBBLETYPE, SectionLightCount>;
 
 private:
 

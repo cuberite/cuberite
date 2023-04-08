@@ -20,7 +20,6 @@ class cChunkMap;
 class cBoundingBox;
 class cChunkDataCallback;
 class cBlockArea;
-class cBlockArea;
 class cFluidSimulatorData;
 class cMobCensus;
 class cMobSpawner;

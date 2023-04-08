@@ -198,10 +198,7 @@ void cNoise3DGenerator::Initialize(cIniFile & a_IniFile)
 void cNoise3DGenerator::GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
 	UNUSED(a_ChunkCoords);
-	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
-	{
-		a_BiomeMap[i] = biExtremeHills;
-	}
+	a_BiomeMap.fill(biExtremeHills);
 }
 
 
