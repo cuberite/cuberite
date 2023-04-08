@@ -410,8 +410,8 @@ public:
 
 	// Per-chunk simulator data:
 	cFireSimulatorChunkData & GetFireSimulatorData (void) { return m_FireSimulatorData; }
-	cFluidSimulatorData * GetWaterSimulatorData(void) const { return m_WaterSimulatorData; }
-	cFluidSimulatorData * GetLavaSimulatorData (void) const { return m_LavaSimulatorData; }
+	const std::unique_ptr<cFluidSimulatorData> & GetWaterSimulatorData(void) const { return m_WaterSimulatorData; }
+	const std::unique_ptr<cFluidSimulatorData> & GetLavaSimulatorData (void) const { return m_LavaSimulatorData; }
 	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
 	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) const { return m_RedstoneSimulatorData; }
 
@@ -526,8 +526,8 @@ private:
 
 	// Per-chunk simulator data:
 	cFireSimulatorChunkData m_FireSimulatorData;
-	cFluidSimulatorData *   m_WaterSimulatorData;
-	cFluidSimulatorData *   m_LavaSimulatorData;
+	std::unique_ptr<cFluidSimulatorData> m_WaterSimulatorData;
+	std::unique_ptr<cFluidSimulatorData> m_LavaSimulatorData;
 	cSandSimulatorChunkData m_SandSimulatorData;
 	cRedstoneSimulatorChunkData * m_RedstoneSimulatorData;
 
