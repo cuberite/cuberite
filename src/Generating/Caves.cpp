@@ -538,7 +538,7 @@ void cCaveTunnel::ProcessChunk(
 		int DifZ = itr->m_BlockZ - BlockStartZ;  // substitution for faster calc
 		if (
 			(DifX >= 0) && (DifX < cChunkDef::Width) &&
-			(itr->m_BlockY > 0) && (itr->m_BlockY < cChunkDef::Height) &&
+			(itr->m_BlockY > cChunkDef::BottomHeight) && (itr->m_BlockY < cChunkDef::Height) &&
 			(DifZ >= 0) && (DifZ < cChunkDef::Width)
 		)
 		{

@@ -542,11 +542,11 @@ void cMonster::HandleFalling()
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
 	auto Position = GetPosition().Floor();
-	Position.y = Clamp(Position.y, 0, cChunkDef::Height);
+	Position.y = Clamp(Position.y, cChunkDef::BottomHeight, cChunkDef::Height);
 
 	if (!cBlockInfo::IsSolid(m_World->GetBlock(Position)))
 	{
-		while (!cBlockInfo::IsSolid(m_World->GetBlock(Position)) && (Position.y > 0))
+		while (!cBlockInfo::IsSolid(m_World->GetBlock(Position)) && (Position.y > cChunkDef::BottomHeight))
 		{
 			Position.y--;
 		}
@@ -1619,7 +1619,7 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn)
 	}
 
 	int RelY = POSY_TOINT;
-	if ((RelY < 0) || (RelY >= cChunkDef::Height))
+	if ((RelY < cChunkDef::BottomHeight) || (RelY >= cChunkDef::Height))
 	{
 		// Outside the world
 		return;

@@ -1223,7 +1223,7 @@ void cFinishGenSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	cChunkDef::BlockTypes & BlockTypes = a_ChunkDesc.GetBlockTypes();
-	for (int y = m_Level; y > 0; y--)
+	for (int y = m_Level; y > cChunkDef::BottomHeight; y--)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{

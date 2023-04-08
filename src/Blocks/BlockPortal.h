@@ -51,7 +51,7 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if ((a_Position.y <= 0) || (a_Position.y >= cChunkDef::Height - 1))
+		if ((a_Position.y <= cChunkDef::BottomHeight) || (a_Position.y >= cChunkDef::Height - 1))
 		{
 			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1.
 		}

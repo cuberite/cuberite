@@ -199,7 +199,7 @@ void cLineBlockTracer::FixStartAboveWorld(void)
 void cLineBlockTracer::FixStartBelowWorld(void)
 {
 	CalcXZIntersection(0, m_Start.x, m_Start.z);
-	m_Start.y = 0;
+	m_Start.y = cChunkDef::BottomHeight;
 }
 
 
@@ -245,7 +245,7 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 	// If the next XZ wall hit is closer, use it instead:
 	if (std::abs(m_Diff.y) > EPS)
 	{
-		double DestY = (m_Dir.y > 0) ? (m_Current.y + 1) : m_Current.y;
+		double DestY = (m_Dir.y > cChunkDef::BottomHeight) ? (m_Current.y + 1) : m_Current.y;
 		double CoeffY = (DestY - m_Start.y) / m_Diff.y;
 		if (CoeffY <= Coeff)  // We need to include equality for the last block in the trace
 		{
@@ -269,7 +269,7 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 	switch (Direction)
 	{
 		case dirX:    m_Current.x += m_Dir.x; m_CurrentFace = (m_Dir.x > 0) ? BLOCK_FACE_XM : BLOCK_FACE_XP; break;
-		case dirY:    m_Current.y += m_Dir.y; m_CurrentFace = (m_Dir.y > 0) ? BLOCK_FACE_YM : BLOCK_FACE_YP; break;
+		case dirY:    m_Current.y += m_Dir.y; m_CurrentFace = (m_Dir.y > cChunkDef::BottomHeight) ? BLOCK_FACE_YM : BLOCK_FACE_YP; break;
 		case dirZ:    m_Current.z += m_Dir.z; m_CurrentFace = (m_Dir.z > 0) ? BLOCK_FACE_ZM : BLOCK_FACE_ZP; break;
 		case dirNONE: return false;
 	}
@@ -282,7 +282,7 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 
 bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 {
-	ASSERT((m_Current.y >= 0) && (m_Current.y < cChunkDef::Height));  // This should be provided by FixStartAboveWorld() / FixStartBelowWorld()
+	ASSERT((m_Current.y >= cChunkDef::BottomHeight) && (m_Current.y < cChunkDef::Height));  // This should be provided by FixStartAboveWorld() / FixStartBelowWorld()
 
 	// This is the actual line tracing loop.
 	for (;;)
@@ -298,7 +298,7 @@ bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 			return true;
 		}
 
-		if ((m_Current.y < 0) || (m_Current.y >= cChunkDef::Height))
+		if ((m_Current.y < cChunkDef::BottomHeight) || (m_Current.y >= cChunkDef::Height))
 		{
 			// We've gone out of the world, that's the end of this trace
 			double IntersectX, IntersectZ;

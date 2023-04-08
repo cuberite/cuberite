@@ -27,7 +27,7 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		return (a_Position.y > 0) && (a_Chunk.GetBlock(a_Position.addedY(-1)) != E_BLOCK_AIR);
+		return (a_Position.y > cChunkDef::BottomHeight) && (a_Chunk.GetBlock(a_Position.addedY(-1)) != E_BLOCK_AIR);
 	}
 
 

@@ -105,11 +105,13 @@ public:
 
 	// Chunk dimensions:
 	static const int Width = 16;
+	static constexpr int BottomHeight = 0;  // Lower Limit for chunk coordinates (for future use, when negative height is supported). MUST BE NEGATIVE OR ZERO!
 	static const int Height = 256;
-	static const int NumBlocks = Width * Height * Width;
+	static constexpr int VerticalBlockCount = Height - BottomHeight;
+	static const int NumBlocks = Width * VerticalBlockCount * Width;
 
 	static const int SectionHeight = 16;
-	static const size_t NumSections = (cChunkDef::Height / SectionHeight);
+	static const size_t NumSections = (VerticalBlockCount / SectionHeight);
 
 	/** The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column */
 	typedef HEIGHTTYPE HeightMap[Width * Width];
@@ -167,18 +169,18 @@ public:
 	/** Validates a height-coordinate. Returns false if height-coordinate is out of height bounds */
 	inline static bool IsValidHeight(Vector3i a_BlockPosition)
 	{
-		return ((a_BlockPosition.y >= 0) && (a_BlockPosition.y < Height));
+		return ((a_BlockPosition.y >= BottomHeight) && (a_BlockPosition.y < Height));
 	}
 
 
-	/** Validates a width-coordinate. Returns false if width-coordiante is out of width bounds */
+	/** Validates a width-coordinate. Returns false if width-coordinate is out of width bounds */
 	inline static bool IsValidWidth(int a_Width)
 	{
 		return ((a_Width >= 0) && (a_Width < Width));
 	}
 
 
-	/** Validates a chunk relative coordinate. Returns false if the coordiante is out of bounds for a chunk. */
+	/** Validates a chunk relative coordinate. Returns false if the coordinate is out of bounds for a chunk. */
 	inline static bool IsValidRelPos(Vector3i a_RelPos)
 	{
 		return (
@@ -247,7 +249,7 @@ public:
 	inline static void SetBlock(BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z, BLOCKTYPE a_Type)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
-		ASSERT((a_Y >= 0) && (a_Y < Height));
+		ASSERT((a_Y >= BottomHeight) && (a_Y < Height));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
 		a_BlockTypes[MakeIndex(a_X, a_Y, a_Z)] = a_Type;
 	}
@@ -255,7 +257,7 @@ public:
 
 	inline static void SetBlock(BLOCKTYPE * a_BlockTypes, int a_Index, BLOCKTYPE a_Type)
 	{
-		ASSERT((a_Index >= 0) && (a_Index <= NumBlocks));
+		ASSERT((a_Index >= BottomHeight) && (a_Index <= NumBlocks));
 		a_BlockTypes[a_Index] = a_Type;
 	}
 
@@ -270,7 +272,7 @@ public:
 	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
-		ASSERT((a_Y >= 0) && (a_Y < Height));
+		ASSERT((a_Y >= BottomHeight) && (a_Y < Height));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
 		return a_BlockTypes[MakeIndex(a_X, a_Y, a_Z)];
 	}
@@ -317,7 +319,11 @@ public:
 
 	static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, int x, int y, int z)
 	{
-		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
+		if (
+			(x < Width)  && (x >= 0) &&
+			(y < Height) && (y >= BottomHeight) &&
+			(z < Width)  && (z >= 0)
+		)
 		{
 			return ExpandNibble(a_Buffer, MakeIndex(x, y, z));
 		}

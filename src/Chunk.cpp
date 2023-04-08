@@ -636,7 +636,7 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 		TryY += CenterY;
 		TryZ += CenterZ;
 
-		ASSERT(TryY > 0);
+		ASSERT(TryY > cChunkDef::BottomHeight);
 		ASSERT(TryY < cChunkDef::Height - 1);
 
 		int WorldX, WorldY, WorldZ;
@@ -1354,7 +1354,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		}
 		else
 		{
-			for (int y = a_RelY - 1; y > 0; --y)
+			for (int y = a_RelY - 1; y > cChunkDef::BottomHeight; --y)
 			{
 				if (GetBlock(a_RelX, y, a_RelZ) != E_BLOCK_AIR)
 				{

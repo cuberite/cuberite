@@ -521,7 +521,7 @@ void cLightingThread::CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_Ch
 {
 	int InIdx = cChunkDef::Width * 49;  // Index to the first nibble of the middle chunk in the a_LightArray
 	int OutIdx = 0;
-	for (int y = 0; y < cChunkDef::Height; y++)
+	for (int y = cChunkDef::BottomHeight; y < cChunkDef::Height; y++)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{

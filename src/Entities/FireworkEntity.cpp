@@ -27,7 +27,7 @@ void cFireworkEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_C
 	int RelZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
 	int PosY = POSY_TOINT;
 
-	if ((PosY < 0) || (PosY >= cChunkDef::Height))
+	if ((PosY < cChunkDef::BottomHeight) || (PosY >= cChunkDef::Height))
 	{
 		AddSpeedY(1);
 		AddPosition(GetSpeed() * (static_cast<double>(a_Dt.count()) / 1000));

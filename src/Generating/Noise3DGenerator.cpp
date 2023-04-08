@@ -216,9 +216,9 @@ void cNoise3DGenerator::Generate(cChunkDesc & a_ChunkDesc)
 	// Output noise into chunk:
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
-		for (int y = 0; y < cChunkDef::Height; y++)
+		for (int y = cChunkDef::BottomHeight; y < cChunkDef::Height; y++)
 		{
-			int idx = z * 17 * 257 + y * 17;
+			int idx = z * (cChunkDef::Width + 1) * cChunkDef::Height + 1 + y * (cChunkDef::Width + 1);
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
 				NOISE_DATATYPE n = Noise[idx++];
@@ -302,7 +302,7 @@ void cNoise3DGenerator::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 		{
 			int LastAir = a_ChunkDesc.GetHeight(x, z) + 1;
 			bool HasHadWater = false;
-			for (int y = LastAir - 1; y > 0; y--)
+			for (int y = LastAir - 1; y > cChunkDef::BottomHeight; y--)
 			{
 				switch (a_ChunkDesc.GetBlockType(x, y, z))
 				{

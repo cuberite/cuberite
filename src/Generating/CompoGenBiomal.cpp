@@ -419,7 +419,7 @@ protected:
 			top = m_SeaLevel;
 			a_ChunkDesc.SetHeight(a_RelX, a_RelZ, top - 1);
 		}
-		for (int y = top; y > 0; y--)
+		for (int y = top; y > cChunkDef::BottomHeight; y--)
 		{
 			if (a_ShapeColumn[y] > 0)
 			{
@@ -492,7 +492,7 @@ protected:
 			{
 				a_ChunkDesc.SetBlockType(a_RelX, y, a_RelZ, E_BLOCK_HARDENED_CLAY);
 			}
-			for (int y = ClayFloor - 1; y > 0; y--)
+			for (int y = ClayFloor - 1; y > cChunkDef::BottomHeight; y--)
 			{
 				a_ChunkDesc.SetBlockType(a_RelX, y, a_RelZ, E_BLOCK_STONE);
 			}
@@ -504,7 +504,7 @@ protected:
 		int PatternIdx = cChunkDef::Height - (Top - ClayFloor);  // We want the block at index ClayFloor to be pattern's 256th block (first stone)
 		const cPattern::BlockInfo * Pattern = m_MesaPattern;
 		bool HasHadWater = false;
-		for (int y = Top; y > 0; y--)
+		for (int y = Top; y > cChunkDef::BottomHeight; y--)
 		{
 			if (a_ShapeColumn[y] > 0)
 			{

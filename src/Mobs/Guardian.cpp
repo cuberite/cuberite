@@ -43,7 +43,7 @@ void cGuardian::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	Vector3d Pos = GetPosition();
 
 	int RelY = FloorC(Pos.y);
-	if ((RelY < 0) || (RelY >= cChunkDef::Height))
+	if ((RelY < cChunkDef::BottomHeight) || (RelY >= cChunkDef::Height))
 	{
 		return;
 	}

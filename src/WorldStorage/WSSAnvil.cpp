@@ -435,7 +435,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	// DEBUG magic: Invert the underground, so that we can see the MC generator in action :)
 	bool ShouldInvert[cChunkDef::Width * cChunkDef::Width];
 	memset(ShouldInvert, 0, sizeof(ShouldInvert));
-	for (int y = cChunkDef::Height - 1; y >= 0; y--)
+	for (int y = cChunkDef::Height - 1; y >= cChunkDef::BottomHeight; y--)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
 		{
@@ -590,7 +590,7 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 
 		// Get the BlockEntity's position
 		Vector3i absPos;
-		if (!GetBlockEntityNBTPos(a_NBT, Child, absPos) || (absPos.y < 0) || (absPos.y >= cChunkDef::Height))
+		if (!GetBlockEntityNBTPos(a_NBT, Child, absPos) || (absPos.y < cChunkDef::BottomHeight) || (absPos.y >= cChunkDef::Height))
 		{
 			LOGWARNING("Bad block entity, missing the coords. Will be ignored.");
 			continue;
@@ -631,7 +631,7 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const
 
 OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a_Tag, Vector3i a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	ASSERT((a_Pos.y >= 0) && (a_Pos.y < cChunkDef::Height));
+	ASSERT((a_Pos.y >= cChunkDef::BottomHeight) && (a_Pos.y < cChunkDef::Height));
 
 	// Load the specific BlockEntity type:
 	switch (a_BlockType)

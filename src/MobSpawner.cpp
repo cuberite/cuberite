@@ -74,7 +74,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType a_MobType, EMCSBiome a_Biome, bool a_DisableSolidBelowCheck)
 {
-	if ((a_RelPos.y >= cChunkDef::Height - 1) || (a_RelPos.y <= 0))
+	if ((a_RelPos.y >= cChunkDef::Height - 1) || (a_RelPos.y <= cChunkDef::BottomHeight))
 	{
 		return false;
 	}

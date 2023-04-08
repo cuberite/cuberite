@@ -156,7 +156,7 @@ void cChunkDesc::SetHeightFromShape(const Shape & a_Shape)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			for (HEIGHTTYPE y = cChunkDef::Height - 1; y > 0; y--)
+			for (HEIGHTTYPE y = cChunkDef::Height - 1; y > cChunkDef::BottomHeight; y--)
 			{
 				if (a_Shape[y + x * 256 + z * 16 * 256] != 0)
 				{
@@ -616,7 +616,7 @@ void cChunkDesc::UpdateHeightmap(void)
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
 			HEIGHTTYPE Height = 0;
-			for (HEIGHTTYPE y = cChunkDef::Height - 1; y > 0; y--)
+			for (HEIGHTTYPE y = cChunkDef::Height - 1; y > cChunkDef::BottomHeight; y--)
 			{
 				BLOCKTYPE BlockType = GetBlockType(x, y, z);
 				if (BlockType != E_BLOCK_AIR)
@@ -655,7 +655,7 @@ void cChunkDesc::VerifyHeightmap(void)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
-			for (int y = cChunkDef::Height - 1; y > 0; y--)
+			for (int y = cChunkDef::Height - 1; y > cChunkDef::BottomHeight; y--)
 			{
 				BLOCKTYPE BlockType = GetBlockType(x, y, z);
 				if (BlockType != E_BLOCK_AIR)

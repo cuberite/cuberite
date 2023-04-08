@@ -104,7 +104,7 @@ private:
 		// Both parts can only that they're rooted in grass.
 
 		const auto RootPosition = a_Position.addedY(IsMetaTopPart(a_Meta) ? -2 : -1);
-		return (RootPosition.y >= 0) && IsBlockTypeOfDirt(a_Chunk.GetBlock(RootPosition));
+		return (RootPosition.y >= cChunkDef::BottomHeight) && IsBlockTypeOfDirt(a_Chunk.GetBlock(RootPosition));
 	}
 
 

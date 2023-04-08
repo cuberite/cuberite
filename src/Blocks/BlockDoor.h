@@ -113,7 +113,7 @@ public:
 		else
 		{
 			// The block is the top part of the door, set the meta to the corresponding top part
-			if (a_BlockPos.y > 0)
+			if (a_BlockPos.y > cChunkDef::BottomHeight)
 			{
 				a_ChunkInterface.SetBlockMeta(a_BlockPos.addedY(-1), NewMeta);
 			}
@@ -198,7 +198,7 @@ private:
 		const auto BasePosition = a_Position.addedY(((a_Meta & 0x8) == 0x8) ? -2 : -1);
 		a_Chunk.GetBlockTypeMeta(BasePosition, BlockType, BlockMeta);
 
-		return (BasePosition.y >= 0) && CanBeOn(BlockType, BlockMeta);
+		return (BasePosition.y >= cChunkDef::BottomHeight) && CanBeOn(BlockType, BlockMeta);
 	}
 
 
@@ -216,7 +216,7 @@ private:
 		if ((Meta & 0x08) != 0)
 		{
 			// The coords are pointing at the top part of the door
-			if (a_BlockPos.y > 0)
+			if (a_BlockPos.y > cChunkDef::BottomHeight)
 			{
 				NIBBLETYPE DownMeta = a_ChunkInterface.GetBlockMeta(a_BlockPos.addedY(-1));
 				return static_cast<NIBBLETYPE>((DownMeta & 0x07) | 0x08 | (Meta << 4));

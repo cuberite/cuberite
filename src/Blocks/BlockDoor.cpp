@@ -21,7 +21,7 @@ void cBlockDoorHandler::OnBroken(
 	if ((a_OldBlockMeta & 0x08) != 0)
 	{
 		const auto Lower = a_BlockPos.addedY(-1);
-		if ((Lower.y >= 0) && IsDoorBlockType(a_ChunkInterface.GetBlock(Lower)))
+		if ((Lower.y >= cChunkDef::BottomHeight) && IsDoorBlockType(a_ChunkInterface.GetBlock(Lower)))
 		{
 			// Was upper part of door, remove lower:
 			a_ChunkInterface.SetBlock(Lower, E_BLOCK_AIR, 0);

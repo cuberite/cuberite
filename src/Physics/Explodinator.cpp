@@ -304,7 +304,7 @@ namespace Explodinator
 		else if (a_Fiery && Random.RandBool(1 / 3.0))  // 33% chance of starting fires if it can start fires
 		{
 			const auto Below = a_Position.addedY(-1);
-			if ((Below.y >= 0) && cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(Below)))
+			if ((Below.y >= cChunkDef::BottomHeight) && cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(Below)))
 			{
 				// Start a fire:
 				SetBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_FIRE, a_ExplodingEntity);

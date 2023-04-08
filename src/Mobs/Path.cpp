@@ -641,7 +641,7 @@ bool cPath::SpecialIsSolidFromThisDirection(BLOCKTYPE a_Type, NIBBLETYPE a_Meta,
 	if (!cBlockInfo::IsSolid(a_Type))
 	{
 		// Only treat as solid when we're coming from below
-		return (a_Direction.y > 0);
+		return (a_Direction.y > cChunkDef::BottomHeight);
 	}
 
 	/* switch (a_Type)
