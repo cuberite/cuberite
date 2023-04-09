@@ -18,6 +18,53 @@ public:
 
 	using Super::Super;
 
+	static constexpr bool IsPressurePlate(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaPressurePlate:
+			case BlockType::BirchPressurePlate:
+			case BlockType::CrimsonPressurePlate:
+			case BlockType::DarkOakPressurePlate:
+			case BlockType::HeavyWeightedPressurePlate:
+			case BlockType::JunglePressurePlate:
+			case BlockType::LightWeightedPressurePlate:
+			case BlockType::OakPressurePlate:
+			case BlockType::PolishedBlackstonePressurePlate:
+			case BlockType::SprucePressurePlate:
+			case BlockType::StonePressurePlate:
+			case BlockType::WarpedPressurePlate:
+				return true;
+			default: return false;
+		}
+	}
+
+	// Todo: Add this, once the BlockState is implemented
+	/*
+	static constexpr void SetPressuredState(cChunkInterface & a_ChunkInterface, Vector3i a_Position, bool a_Pressed)
+	{
+		using namespace Block;
+		auto Self = a_ChunkInterface.GetBlock(a_Position);
+		switch (Self.Type())
+		{
+			case BlockType::AcaciaPressurePlate:             Self = Block::AcaciaPressurePlate::AcaciaPressurePlate(a_Pressed); break;
+			case BlockType::BirchPressurePlate:              Self = Block::BirchPressurePlate::BirchPressurePlate(a_Pressed); break;
+			case BlockType::CrimsonPressurePlate:            Self = Block::CrimsonPressurePlate::CrimsonPressurePlate(a_Pressed); break;
+			case BlockType::DarkOakPressurePlate:            Self = Block::DarkOakPressurePlate::DarkOakPressurePlate(a_Pressed); break;
+			case BlockType::HeavyWeightedPressurePlate:      Self = Block::HeavyWeightedPressurePlate::HeavyWeightedPressurePlate(a_Pressed); break;
+			case BlockType::JunglePressurePlate:             Self = Block::JunglePressurePlate::JunglePressurePlate(a_Pressed); break;
+			case BlockType::LightWeightedPressurePlate:      Self = Block::LightWeightedPressurePlate::LightWeightedPressurePlate(a_Pressed); break;
+			case BlockType::OakPressurePlate:                Self = Block::OakPressurePlate::OakPressurePlate(a_Pressed); break;
+			case BlockType::PolishedBlackstonePressurePlate: Self = Block::PolishedBlackstonePressurePlate::PolishedBlackstonePressurePlate(a_Pressed); break;
+			case BlockType::SprucePressurePlate:             Self = Block::SprucePressurePlate::SprucePressurePlate(a_Pressed); break;
+			case BlockType::StonePressurePlate:              Self = Block::StonePressurePlate::StonePressurePlate(a_Pressed); break;
+			case BlockType::WarpedPressurePlate:             Self = Block::WarpedPressurePlate::WarpedPressurePlate(a_Pressed); break;
+			default: return;
+		}
+		a_ChunkInterface.FastSetBlock(a_Position, Self);
+	}
+	*/
+
 private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override

@@ -73,6 +73,50 @@ eBlockFace MirrorBlockFaceY(eBlockFace a_BlockFace)
 
 
 
+eBlockFace MirrorBlockFaceXY(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_XM;
+		case BLOCK_FACE_XP: return BLOCK_FACE_XP;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_ZM;
+		case BLOCK_FACE_NONE:
+		case BLOCK_FACE_YM:
+		case BLOCK_FACE_YP:
+		{
+			return a_BlockFace;
+		}
+	}
+	UNREACHABLE("Unsupported block face");
+}
+
+
+
+
+
+eBlockFace MirrorBlockFaceYZ(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_XP;
+		case BLOCK_FACE_XP: return BLOCK_FACE_XM;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_ZM;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_NONE:
+		case BLOCK_FACE_YM:
+		case BLOCK_FACE_YP:
+		{
+			return a_BlockFace;
+		}
+	}
+	UNREACHABLE("Unsupported block face");
+}
+
+
+
+
+
 /** Returns a blockface rotated around the Y axis counter-clockwise. */
 eBlockFace RotateBlockFaceCCW(eBlockFace a_BlockFace)
 {
@@ -151,6 +195,53 @@ AString BlockFaceToString(eBlockFace a_BlockFace)
 		case BLOCK_FACE_NONE: return "BLOCK_FACE_NONE";
 	}
 	UNREACHABLE("Unsupported block face");
+}
+
+
+
+
+
+eBlockFace RotationToBlockFace(double a_Rotation, bool a_Inverse)
+{
+	if (a_Inverse)
+	{
+		if ((a_Rotation > 135) || (a_Rotation < -135))  // -180/180
+		{
+			return eBlockFace::BLOCK_FACE_NORTH;
+		}
+		if ((-45 > a_Rotation) && (a_Rotation >= -135))  // -90
+		{
+			return eBlockFace::BLOCK_FACE_EAST;
+		}
+		if ((45 > a_Rotation)  && (a_Rotation >= -45))  // 0
+		{
+			return eBlockFace::BLOCK_FACE_SOUTH;
+		}
+		if ((135 > a_Rotation) && (a_Rotation >= 45))  // 90
+		{
+			return eBlockFace::BLOCK_FACE_WEST;
+		}
+	}
+	else
+	{
+		if ((a_Rotation > 135) || (a_Rotation < -135))    // -180/180
+		{
+			return eBlockFace::BLOCK_FACE_SOUTH;
+		}
+		if ((-45 > a_Rotation) && (a_Rotation >= -135))   // -90
+		{
+			return eBlockFace::BLOCK_FACE_WEST;
+		}
+		if ((45 > a_Rotation)  && (a_Rotation >= -45))    // 0
+		{
+			return eBlockFace::BLOCK_FACE_NORTH;
+		}
+		if ((135 > a_Rotation) && (a_Rotation >= 45))      // 90
+		{
+			return eBlockFace::BLOCK_FACE_EAST;
+		}
+	}
+	return BLOCK_FACE_NONE;
 }
 
 

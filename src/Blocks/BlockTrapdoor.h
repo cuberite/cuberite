@@ -17,6 +17,80 @@ public:
 
 	using Super::Super;
 
+	static constexpr bool IsBlockTrapdoor(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaTrapdoor:
+			case BlockType::BirchTrapdoor:
+			case BlockType::CrimsonTrapdoor:
+			case BlockType::DarkOakTrapdoor:
+			case BlockType::IronTrapdoor:
+			case BlockType::JungleTrapdoor:
+			case BlockType::OakTrapdoor:
+			case BlockType::SpruceTrapdoor:
+			case BlockType::WarpedTrapdoor:
+				return true;
+			default: return false;
+		}
+	}
+
+
+	static constexpr BlockState ToggleTrapdoor(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaTrapdoor:  return AcaciaTrapdoor::AcaciaTrapdoor  (AcaciaTrapdoor::Facing(a_Block),  AcaciaTrapdoor::Half(a_Block),  !AcaciaTrapdoor::Open(a_Block),  AcaciaTrapdoor::Powered(a_Block));
+			case BlockType::BirchTrapdoor:   return BirchTrapdoor::BirchTrapdoor    (BirchTrapdoor::Facing(a_Block),   BirchTrapdoor::Half(a_Block),   !BirchTrapdoor::Open(a_Block),   BirchTrapdoor::Powered(a_Block));
+			case BlockType::CrimsonTrapdoor: return CrimsonTrapdoor::CrimsonTrapdoor(CrimsonTrapdoor::Facing(a_Block), CrimsonTrapdoor::Half(a_Block), !CrimsonTrapdoor::Open(a_Block), CrimsonTrapdoor::Powered(a_Block));
+			case BlockType::DarkOakTrapdoor: return DarkOakTrapdoor::DarkOakTrapdoor(DarkOakTrapdoor::Facing(a_Block), DarkOakTrapdoor::Half(a_Block), !DarkOakTrapdoor::Open(a_Block), DarkOakTrapdoor::Powered(a_Block));
+			case BlockType::IronTrapdoor:    return IronTrapdoor::IronTrapdoor      (IronTrapdoor::Facing(a_Block),    IronTrapdoor::Half(a_Block),    !IronTrapdoor::Open(a_Block),    IronTrapdoor::Powered(a_Block));
+			case BlockType::JungleTrapdoor:  return JungleTrapdoor::JungleTrapdoor  (JungleTrapdoor::Facing(a_Block),  JungleTrapdoor::Half(a_Block),  !JungleTrapdoor::Open(a_Block),  JungleTrapdoor::Powered(a_Block));
+			case BlockType::OakTrapdoor:     return OakTrapdoor::OakTrapdoor        (OakTrapdoor::Facing(a_Block),     OakTrapdoor::Half(a_Block),     !OakTrapdoor::Open(a_Block),     OakTrapdoor::Powered(a_Block));
+			case BlockType::SpruceTrapdoor:  return SpruceTrapdoor::SpruceTrapdoor  (SpruceTrapdoor::Facing(a_Block),  SpruceTrapdoor::Half(a_Block),  !SpruceTrapdoor::Open(a_Block),  SpruceTrapdoor::Powered(a_Block));
+			case BlockType::WarpedTrapdoor:  return WarpedTrapdoor::WarpedTrapdoor  (WarpedTrapdoor::Facing(a_Block),  WarpedTrapdoor::Half(a_Block),  !WarpedTrapdoor::Open(a_Block),  WarpedTrapdoor::Powered(a_Block));
+			default: return a_Block;
+		}
+	}
+
+
+	static constexpr BlockState ToggleTrapdoorPower(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaTrapdoor:  return AcaciaTrapdoor::AcaciaTrapdoor  (AcaciaTrapdoor::Facing(a_Block),  AcaciaTrapdoor::Half(a_Block),  AcaciaTrapdoor::Open(a_Block),  !AcaciaTrapdoor::Powered(a_Block));
+			case BlockType::BirchTrapdoor:   return BirchTrapdoor::BirchTrapdoor    (BirchTrapdoor::Facing(a_Block),   BirchTrapdoor::Half(a_Block),   BirchTrapdoor::Open(a_Block),   !BirchTrapdoor::Powered(a_Block));
+			case BlockType::CrimsonTrapdoor: return CrimsonTrapdoor::CrimsonTrapdoor(CrimsonTrapdoor::Facing(a_Block), CrimsonTrapdoor::Half(a_Block), CrimsonTrapdoor::Open(a_Block), !CrimsonTrapdoor::Powered(a_Block));
+			case BlockType::DarkOakTrapdoor: return DarkOakTrapdoor::DarkOakTrapdoor(DarkOakTrapdoor::Facing(a_Block), DarkOakTrapdoor::Half(a_Block), DarkOakTrapdoor::Open(a_Block), !DarkOakTrapdoor::Powered(a_Block));
+			case BlockType::IronTrapdoor:    return IronTrapdoor::IronTrapdoor      (IronTrapdoor::Facing(a_Block),    IronTrapdoor::Half(a_Block),    IronTrapdoor::Open(a_Block),    !IronTrapdoor::Powered(a_Block));
+			case BlockType::JungleTrapdoor:  return JungleTrapdoor::JungleTrapdoor  (JungleTrapdoor::Facing(a_Block),  JungleTrapdoor::Half(a_Block),  JungleTrapdoor::Open(a_Block),  !JungleTrapdoor::Powered(a_Block));
+			case BlockType::OakTrapdoor:     return OakTrapdoor::OakTrapdoor        (OakTrapdoor::Facing(a_Block),     OakTrapdoor::Half(a_Block),     OakTrapdoor::Open(a_Block),     !OakTrapdoor::Powered(a_Block));
+			case BlockType::SpruceTrapdoor:  return SpruceTrapdoor::SpruceTrapdoor  (SpruceTrapdoor::Facing(a_Block),  SpruceTrapdoor::Half(a_Block),  SpruceTrapdoor::Open(a_Block),  !SpruceTrapdoor::Powered(a_Block));
+			case BlockType::WarpedTrapdoor:  return WarpedTrapdoor::WarpedTrapdoor  (WarpedTrapdoor::Facing(a_Block),  WarpedTrapdoor::Half(a_Block),  WarpedTrapdoor::Open(a_Block),  !WarpedTrapdoor::Powered(a_Block));
+			default: return a_Block;
+		}
+	}
+
+	static constexpr bool IsTrapdoorOpen(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaTrapdoor:  return AcaciaTrapdoor::Open(a_Block);
+			case BlockType::BirchTrapdoor:   return BirchTrapdoor::Open(a_Block);
+			case BlockType::CrimsonTrapdoor: return CrimsonTrapdoor::Open(a_Block);
+			case BlockType::DarkOakTrapdoor: return DarkOakTrapdoor::Open(a_Block);
+			case BlockType::IronTrapdoor:    return IronTrapdoor::Open(a_Block);
+			case BlockType::JungleTrapdoor:  return JungleTrapdoor::Open(a_Block);
+			case BlockType::OakTrapdoor:     return OakTrapdoor::Open(a_Block);
+			case BlockType::SpruceTrapdoor:  return SpruceTrapdoor::Open(a_Block);
+			case BlockType::WarpedTrapdoor:  return WarpedTrapdoor::Open(a_Block);
+			default: return false;
+		}
+	}
+
 private:
 
 	virtual bool IsUseable(void) const override
@@ -71,7 +145,7 @@ private:
 
 
 
-	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
+	constexpr static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x3)
 		{

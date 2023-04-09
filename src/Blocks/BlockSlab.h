@@ -9,12 +9,11 @@
 
 #pragma once
 
-#include "BlockHandler.h"
-#include "ChunkInterface.h"
-#include "../BlockInfo.h"
-#include "../Entities/Player.h"
-#include "../BlockInfo.h"
-
+#include "Blocks/BlockHandler.h"
+#include "Blocks/ChunkInterface.h"
+#include "BlockInfo.h"
+#include "Entities/Player.h"
+#include "Registries/BlockItemConverter.h"
 
 
 class cBlockSlabHandler final :
@@ -36,6 +35,162 @@ public:
 			(a_BlockType == E_BLOCK_PURPUR_SLAB)
 		);
 	}
+
+	/** Returns true if the specified BlockType is one of the slabs handled by this handler */
+	static bool IsAnySlabType(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaSlab:
+			case BlockType::AndesiteSlab:
+			case BlockType::BirchSlab:
+			case BlockType::BlackstoneSlab:
+			case BlockType::BrickSlab:
+			case BlockType::CobblestoneSlab:
+			case BlockType::CrimsonSlab:
+			case BlockType::CutRedSandstoneSlab:
+			case BlockType::CutSandstoneSlab:
+			case BlockType::DarkOakSlab:
+			case BlockType::DarkPrismarineSlab:
+			case BlockType::DioriteSlab:
+			case BlockType::EndStoneBrickSlab:
+			case BlockType::GraniteSlab:
+			case BlockType::JungleSlab:
+			case BlockType::MossyCobblestoneSlab:
+			case BlockType::MossyStoneBrickSlab:
+			case BlockType::NetherBrickSlab:
+			case BlockType::OakSlab:
+			case BlockType::PetrifiedOakSlab:
+			case BlockType::PolishedAndesiteSlab:
+			case BlockType::PolishedBlackstoneBrickSlab:
+			case BlockType::PolishedBlackstoneSlab:
+			case BlockType::PolishedDioriteSlab:
+			case BlockType::PolishedGraniteSlab:
+			case BlockType::PrismarineBrickSlab:
+			case BlockType::PrismarineSlab:
+			case BlockType::PurpurSlab:
+			case BlockType::QuartzSlab:
+			case BlockType::RedNetherBrickSlab:
+			case BlockType::RedSandstoneSlab:
+			case BlockType::SandstoneSlab:
+			case BlockType::SmoothQuartzSlab:
+			case BlockType::SmoothRedSandstoneSlab:
+			case BlockType::SmoothSandstoneSlab:
+			case BlockType::SmoothStoneSlab:
+			case BlockType::SpruceSlab:
+			case BlockType::StoneBrickSlab:
+			case BlockType::StoneSlab:
+			case BlockType::WarpedSlab:
+				return true;
+			default: return false;
+		}
+	}
+
+/** Macro only for internal use. */
+#define IS_SLAB_TOP(SlabType) (SlabType::Type(a_Block) == SlabType::Type::Top);
+
+	static constexpr bool IsSlabTop(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaSlab:                   return IS_SLAB_TOP(AcaciaSlab)
+			case BlockType::AndesiteSlab:                 return IS_SLAB_TOP(AndesiteSlab)
+			case BlockType::BirchSlab:                    return IS_SLAB_TOP(BirchSlab)
+			case BlockType::BlackstoneSlab:               return IS_SLAB_TOP(BlackstoneSlab)
+			case BlockType::BrickSlab:                    return IS_SLAB_TOP(BrickSlab)
+			case BlockType::CobblestoneSlab:              return IS_SLAB_TOP(CobblestoneSlab)
+			case BlockType::CrimsonSlab:                  return IS_SLAB_TOP(CrimsonSlab)
+			case BlockType::CutRedSandstoneSlab:          return IS_SLAB_TOP(CutRedSandstoneSlab)
+			case BlockType::CutSandstoneSlab:             return IS_SLAB_TOP(CutSandstoneSlab)
+			case BlockType::DarkOakSlab:                  return IS_SLAB_TOP(DarkOakSlab)
+			case BlockType::DarkPrismarineSlab:           return IS_SLAB_TOP(DarkPrismarineSlab)
+			case BlockType::DioriteSlab:                  return IS_SLAB_TOP(DioriteSlab)
+			case BlockType::EndStoneBrickSlab:            return IS_SLAB_TOP(EndStoneBrickSlab)
+			case BlockType::GraniteSlab:                  return IS_SLAB_TOP(GraniteSlab)
+			case BlockType::JungleSlab:                   return IS_SLAB_TOP(JungleSlab)
+			case BlockType::MossyCobblestoneSlab:         return IS_SLAB_TOP(MossyCobblestoneSlab)
+			case BlockType::MossyStoneBrickSlab:          return IS_SLAB_TOP(MossyStoneBrickSlab)
+			case BlockType::NetherBrickSlab:              return IS_SLAB_TOP(NetherBrickSlab)
+			case BlockType::OakSlab:                      return IS_SLAB_TOP(OakSlab)
+			case BlockType::PetrifiedOakSlab:             return IS_SLAB_TOP(PetrifiedOakSlab)
+			case BlockType::PolishedAndesiteSlab:         return IS_SLAB_TOP(PolishedAndesiteSlab)
+			case BlockType::PolishedBlackstoneBrickSlab:  return IS_SLAB_TOP(PolishedBlackstoneBrickSlab)
+			case BlockType::PolishedBlackstoneSlab:       return IS_SLAB_TOP(PolishedBlackstoneSlab)
+			case BlockType::PolishedDioriteSlab:          return IS_SLAB_TOP(PolishedDioriteSlab)
+			case BlockType::PolishedGraniteSlab:          return IS_SLAB_TOP(PolishedGraniteSlab)
+			case BlockType::PrismarineBrickSlab:          return IS_SLAB_TOP(PrismarineBrickSlab)
+			case BlockType::PrismarineSlab:               return IS_SLAB_TOP(PrismarineSlab)
+			case BlockType::PurpurSlab:                   return IS_SLAB_TOP(PurpurSlab)
+			case BlockType::QuartzSlab:                   return IS_SLAB_TOP(QuartzSlab)
+			case BlockType::RedNetherBrickSlab:           return IS_SLAB_TOP(RedNetherBrickSlab)
+			case BlockType::RedSandstoneSlab:             return IS_SLAB_TOP(RedSandstoneSlab)
+			case BlockType::SandstoneSlab:                return IS_SLAB_TOP(SandstoneSlab)
+			case BlockType::SmoothQuartzSlab:             return IS_SLAB_TOP(SmoothQuartzSlab)
+			case BlockType::SmoothRedSandstoneSlab:       return IS_SLAB_TOP(SmoothRedSandstoneSlab)
+			case BlockType::SmoothSandstoneSlab:          return IS_SLAB_TOP(SmoothSandstoneSlab)
+			case BlockType::SmoothStoneSlab:              return IS_SLAB_TOP(SmoothStoneSlab)
+			case BlockType::SpruceSlab:                   return IS_SLAB_TOP(SpruceSlab)
+			case BlockType::StoneBrickSlab:               return IS_SLAB_TOP(StoneBrickSlab)
+			case BlockType::StoneSlab:                    return IS_SLAB_TOP(StoneSlab)
+			case BlockType::WarpedSlab:                   return IS_SLAB_TOP(WarpedSlab)
+			default: return false;
+		}
+	}
+#undef IS_SLAB_TOP
+
+/** Macro only for internal use. */
+#define IS_SLAB_FULL(SlabType) (SlabType::Type(a_Block) == SlabType::Type::Double);
+
+	static constexpr bool IsSlabFull(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaSlab:                   return IS_SLAB_FULL(AcaciaSlab)
+			case BlockType::AndesiteSlab:                 return IS_SLAB_FULL(AndesiteSlab)
+			case BlockType::BirchSlab:                    return IS_SLAB_FULL(BirchSlab)
+			case BlockType::BlackstoneSlab:               return IS_SLAB_FULL(BlackstoneSlab)
+			case BlockType::BrickSlab:                    return IS_SLAB_FULL(BrickSlab)
+			case BlockType::CobblestoneSlab:              return IS_SLAB_FULL(CobblestoneSlab)
+			case BlockType::CrimsonSlab:                  return IS_SLAB_FULL(CrimsonSlab)
+			case BlockType::CutRedSandstoneSlab:          return IS_SLAB_FULL(CutRedSandstoneSlab)
+			case BlockType::CutSandstoneSlab:             return IS_SLAB_FULL(CutSandstoneSlab)
+			case BlockType::DarkOakSlab:                  return IS_SLAB_FULL(DarkOakSlab)
+			case BlockType::DarkPrismarineSlab:           return IS_SLAB_FULL(DarkPrismarineSlab)
+			case BlockType::DioriteSlab:                  return IS_SLAB_FULL(DioriteSlab)
+			case BlockType::EndStoneBrickSlab:            return IS_SLAB_FULL(EndStoneBrickSlab)
+			case BlockType::GraniteSlab:                  return IS_SLAB_FULL(GraniteSlab)
+			case BlockType::JungleSlab:                   return IS_SLAB_FULL(JungleSlab)
+			case BlockType::MossyCobblestoneSlab:         return IS_SLAB_FULL(MossyCobblestoneSlab)
+			case BlockType::MossyStoneBrickSlab:          return IS_SLAB_FULL(MossyStoneBrickSlab)
+			case BlockType::NetherBrickSlab:              return IS_SLAB_FULL(NetherBrickSlab)
+			case BlockType::OakSlab:                      return IS_SLAB_FULL(OakSlab)
+			case BlockType::PetrifiedOakSlab:             return IS_SLAB_FULL(PetrifiedOakSlab)
+			case BlockType::PolishedAndesiteSlab:         return IS_SLAB_FULL(PolishedAndesiteSlab)
+			case BlockType::PolishedBlackstoneBrickSlab:  return IS_SLAB_FULL(PolishedBlackstoneBrickSlab)
+			case BlockType::PolishedBlackstoneSlab:       return IS_SLAB_FULL(PolishedBlackstoneSlab)
+			case BlockType::PolishedDioriteSlab:          return IS_SLAB_FULL(PolishedDioriteSlab)
+			case BlockType::PolishedGraniteSlab:          return IS_SLAB_FULL(PolishedGraniteSlab)
+			case BlockType::PrismarineBrickSlab:          return IS_SLAB_FULL(PrismarineBrickSlab)
+			case BlockType::PrismarineSlab:               return IS_SLAB_FULL(PrismarineSlab)
+			case BlockType::PurpurSlab:                   return IS_SLAB_FULL(PurpurSlab)
+			case BlockType::QuartzSlab:                   return IS_SLAB_FULL(QuartzSlab)
+			case BlockType::RedNetherBrickSlab:           return IS_SLAB_FULL(RedNetherBrickSlab)
+			case BlockType::RedSandstoneSlab:             return IS_SLAB_FULL(RedSandstoneSlab)
+			case BlockType::SandstoneSlab:                return IS_SLAB_FULL(SandstoneSlab)
+			case BlockType::SmoothQuartzSlab:             return IS_SLAB_FULL(SmoothQuartzSlab)
+			case BlockType::SmoothRedSandstoneSlab:       return IS_SLAB_FULL(SmoothRedSandstoneSlab)
+			case BlockType::SmoothSandstoneSlab:          return IS_SLAB_FULL(SmoothSandstoneSlab)
+			case BlockType::SmoothStoneSlab:              return IS_SLAB_FULL(SmoothStoneSlab)
+			case BlockType::SpruceSlab:                   return IS_SLAB_FULL(SpruceSlab)
+			case BlockType::StoneBrickSlab:               return IS_SLAB_FULL(StoneBrickSlab)
+			case BlockType::StoneSlab:                    return IS_SLAB_FULL(StoneSlab)
+			case BlockType::WarpedSlab:                   return IS_SLAB_FULL(WarpedSlab)
+			default: return false;
+		}
+	}
+#undef IS_SLAB_FULL
 
 private:
 
@@ -98,6 +253,77 @@ private:
 		return (a_Meta ^ 0x08);
 	}
 
+
+/** Internal use only */
+#define MIRROR_XZ(SlabType) \
+{ \
+	if (IsSlabTop(a_Block)) \
+	{ \
+		return SlabType::SlabType(SlabType::Type::Bottom); \
+	} \
+	else \
+	{ \
+		return SlabType::SlabType(SlabType::Type::Top); \
+	}\
+}
+
+	// Flips top and bottom
+	// TODO add override when BlockStates are used
+	BlockState MirrorXZ(BlockState a_Block) const
+	{
+		using namespace Block;
+
+		if (cBlockSlabHandler::IsSlabFull(a_Block))
+		{
+			return a_Block;
+		}
+
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaSlab:                  MIRROR_XZ(AcaciaSlab)
+			case BlockType::AndesiteSlab:                MIRROR_XZ(AndesiteSlab)
+			case BlockType::BirchSlab:                   MIRROR_XZ(BirchSlab)
+			case BlockType::BlackstoneSlab:              MIRROR_XZ(BlackstoneSlab)
+			case BlockType::BrickSlab:                   MIRROR_XZ(BrickSlab)
+			case BlockType::CobblestoneSlab:             MIRROR_XZ(CobblestoneSlab)
+			case BlockType::CrimsonSlab:                 MIRROR_XZ(CrimsonSlab)
+			case BlockType::CutRedSandstoneSlab:         MIRROR_XZ(CutRedSandstoneSlab)
+			case BlockType::CutSandstoneSlab:            MIRROR_XZ(CutSandstoneSlab)
+			case BlockType::DarkOakSlab:                 MIRROR_XZ(DarkOakSlab)
+			case BlockType::DarkPrismarineSlab:          MIRROR_XZ(DarkPrismarineSlab)
+			case BlockType::DioriteSlab:                 MIRROR_XZ(DioriteSlab)
+			case BlockType::EndStoneBrickSlab:           MIRROR_XZ(EndStoneBrickSlab)
+			case BlockType::GraniteSlab:                 MIRROR_XZ(GraniteSlab)
+			case BlockType::JungleSlab:                  MIRROR_XZ(JungleSlab)
+			case BlockType::MossyCobblestoneSlab:        MIRROR_XZ(MossyCobblestoneSlab)
+			case BlockType::MossyStoneBrickSlab:         MIRROR_XZ(MossyStoneBrickSlab)
+			case BlockType::NetherBrickSlab:             MIRROR_XZ(NetherBrickSlab)
+			case BlockType::OakSlab:                     MIRROR_XZ(OakSlab)
+			case BlockType::PetrifiedOakSlab:            MIRROR_XZ(PetrifiedOakSlab)
+			case BlockType::PolishedAndesiteSlab:        MIRROR_XZ(PolishedAndesiteSlab)
+			case BlockType::PolishedBlackstoneBrickSlab: MIRROR_XZ(PolishedBlackstoneBrickSlab)
+			case BlockType::PolishedBlackstoneSlab:      MIRROR_XZ(PolishedBlackstoneSlab)
+			case BlockType::PolishedDioriteSlab:         MIRROR_XZ(PolishedDioriteSlab)
+			case BlockType::PolishedGraniteSlab:         MIRROR_XZ(PolishedGraniteSlab)
+			case BlockType::PrismarineBrickSlab:         MIRROR_XZ(PrismarineBrickSlab)
+			case BlockType::PrismarineSlab:              MIRROR_XZ(PrismarineSlab)
+			case BlockType::PurpurSlab:                  MIRROR_XZ(PurpurSlab)
+			case BlockType::QuartzSlab:                  MIRROR_XZ(QuartzSlab)
+			case BlockType::RedNetherBrickSlab:          MIRROR_XZ(RedNetherBrickSlab)
+			case BlockType::RedSandstoneSlab:            MIRROR_XZ(RedSandstoneSlab)
+			case BlockType::SandstoneSlab:               MIRROR_XZ(SandstoneSlab)
+			case BlockType::SmoothQuartzSlab:            MIRROR_XZ(SmoothQuartzSlab)
+			case BlockType::SmoothRedSandstoneSlab:      MIRROR_XZ(SmoothRedSandstoneSlab)
+			case BlockType::SmoothSandstoneSlab:         MIRROR_XZ(SmoothSandstoneSlab)
+			case BlockType::SmoothStoneSlab:             MIRROR_XZ(SmoothStoneSlab)
+			case BlockType::SpruceSlab:                  MIRROR_XZ(SpruceSlab)
+			case BlockType::StoneBrickSlab:              MIRROR_XZ(StoneBrickSlab)
+			case BlockType::StoneSlab:                   MIRROR_XZ(StoneSlab)
+			case BlockType::WarpedSlab:                  MIRROR_XZ(WarpedSlab)
+			default: return a_Block;
+		}
+	}
+#undef MIRROR_XZ
 
 
 
@@ -163,6 +389,64 @@ private:
 
 
 
+	// Todo: This is temporary. Please override this function if block states are implemented.
+	ColourID GetMapBaseColourID() const
+	{
+		// switch (m_BlockType)
+		// Todo: replace with the correct switch statement
+		switch (BlockType::AcaciaSlab)
+		{
+			case BlockType::AcaciaSlab:                  return 15;
+			case BlockType::AndesiteSlab:                return 11;
+			case BlockType::BirchSlab:                   return 2;
+			case BlockType::BlackstoneSlab:              return 29;
+			case BlockType::BrickSlab:                   return 28;
+			case BlockType::CobblestoneSlab:             return 11;
+			case BlockType::CrimsonSlab:                 return 35;
+			case BlockType::CutRedSandstoneSlab:         return 10;
+			case BlockType::CutSandstoneSlab:            return 2;
+			case BlockType::DarkOakSlab:                 return 26;
+			case BlockType::DarkPrismarineSlab:          return 31;
+			case BlockType::DioriteSlab:                 return 14;
+			case BlockType::EndStoneBrickSlab:           return 2;
+			case BlockType::GraniteSlab:                 return 10;
+			case BlockType::JungleSlab:                  return 10;
+			case BlockType::MossyCobblestoneSlab:        return 11;
+			case BlockType::MossyStoneBrickSlab:         return 11;
+			case BlockType::NetherBrickSlab:             return 35;
+			case BlockType::OakSlab:                     return 13;
+			case BlockType::PetrifiedOakSlab:            return 13;
+			case BlockType::PolishedAndesiteSlab:        return 11;
+			case BlockType::PolishedBlackstoneBrickSlab: return 29;
+			case BlockType::PolishedBlackstoneSlab:      return 29;
+			case BlockType::PolishedDioriteSlab:         return 14;
+			case BlockType::PolishedGraniteSlab:         return 10;
+			case BlockType::PrismarineBrickSlab:         return 23;
+			case BlockType::PrismarineSlab:              return 23;
+			case BlockType::PurpurSlab:                  return 16;
+			case BlockType::QuartzSlab:                  return 8;
+			case BlockType::RedNetherBrickSlab:          return 35;
+			case BlockType::RedSandstoneSlab:            return 10;
+			case BlockType::SandstoneSlab:               return 2;
+			case BlockType::SmoothQuartzSlab:            return 8;
+			case BlockType::SmoothRedSandstoneSlab:      return 10;
+			case BlockType::SmoothSandstoneSlab:         return 2;
+			case BlockType::SmoothStoneSlab:             return 11;
+			case BlockType::SpruceSlab:                  return 34;
+			case BlockType::StoneBrickSlab:              return 11;
+			case BlockType::StoneSlab:                   return 11;
+			case BlockType::WarpedSlab:                  return 23;
+			default:
+			{
+				ASSERT(!"Unhandled blocktype in slab handler!");
+				return 0;
+			}
+		}
+	}
+
+
+
+
 
 	virtual bool IsInsideBlock(Vector3d a_Position, const NIBBLETYPE a_BlockMeta) const override
 	{
@@ -199,7 +483,7 @@ private:
 
 
 
-	inline static BLOCKTYPE GetSingleSlabType(BLOCKTYPE a_BlockType)
+	constexpr static BLOCKTYPE GetSingleSlabType(BLOCKTYPE a_BlockType)
 	{
 		switch (a_BlockType)
 		{
@@ -218,7 +502,7 @@ private:
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
-		// For doule slabs, the meta values are the same. Only the meaning of the 4th bit changes, but that's ignored in the below handler
+		// For double slabs, the meta values are the same. Only the meaning of the 4th bit changes, but that's ignored in the below handler
 		return cBlockHandler::For(GetSingleSlabType(m_BlockType)).GetMapBaseColourID(a_Meta);
 	}
 } ;

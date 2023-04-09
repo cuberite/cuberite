@@ -23,6 +23,31 @@ public:
 
 	using Super::Super;
 
+	static constexpr bool IsBlockCarpet(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::BlackCarpet:
+			case BlockType::BlueCarpet:
+			case BlockType::BrownCarpet:
+			case BlockType::CyanCarpet:
+			case BlockType::GrayCarpet:
+			case BlockType::GreenCarpet:
+			case BlockType::LightBlueCarpet:
+			case BlockType::LightGrayCarpet:
+			case BlockType::LimeCarpet:
+			case BlockType::MagentaCarpet:
+			case BlockType::OrangeCarpet:
+			case BlockType::PinkCarpet:
+			case BlockType::PurpleCarpet:
+			case BlockType::RedCarpet:
+			case BlockType::WhiteCarpet:
+			case BlockType::YellowCarpet:
+				return true;
+			default: return false;
+		}
+	}
+
 private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override

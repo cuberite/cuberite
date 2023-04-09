@@ -14,12 +14,12 @@ public:
 
 	using Super::Super;
 
-	inline static Vector3i GetObservingFaceOffset(NIBBLETYPE a_Meta)
+	constexpr static Vector3i GetObservingFaceOffset(NIBBLETYPE a_Meta)
 	{
 		return -GetSignalOutputOffset(a_Meta);
 	}
 
-	inline static Vector3i GetSignalOutputOffset(NIBBLETYPE a_Meta)
+	constexpr static Vector3i GetSignalOutputOffset(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x7)
 		{

@@ -22,12 +22,12 @@ public:
 
 	using Super::Super;
 
-	inline static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
+	constexpr static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
 	{
 		return -GetRearCoordinateOffset(a_Meta);
 	}
 
-	inline static Vector3i GetLeftCoordinateOffset(NIBBLETYPE a_Meta)
+	constexpr static Vector3i GetLeftCoordinateOffset(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
 		{
@@ -45,7 +45,7 @@ public:
 		}
 	}
 
-	inline static Vector3i GetRearCoordinateOffset(NIBBLETYPE a_Meta)
+	constexpr static Vector3i GetRearCoordinateOffset(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
 		{
@@ -60,6 +60,18 @@ public:
 				return { 0, 0, 0 };
 			}
 		}
+	}
+
+	inline static BlockState IncreaseDelay(BlockState a_Block)
+	{
+		using namespace Block;
+		return Repeater::Repeater
+		(
+			(Repeater::Delay(a_Block) + 1) % 5,
+			Repeater::Facing(a_Block),
+			Repeater::Locked(a_Block),
+			Repeater::Powered(a_Block)
+		);
 	}
 
 private:

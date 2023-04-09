@@ -18,6 +18,20 @@ public:
 
 	using Super::Super;
 
+	static constexpr bool IsBlockInfested(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::InfestedChiseledStoneBricks:
+			case BlockType::InfestedCobblestone:
+			case BlockType::InfestedCrackedStoneBricks:
+			case BlockType::InfestedMossyStoneBricks:
+			case BlockType::InfestedStone:
+				return true;
+			default: return false;
+		}
+	}
+
 private:
 
 	static void SpawnSilverfish(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos)

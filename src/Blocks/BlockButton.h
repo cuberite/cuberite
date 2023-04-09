@@ -29,6 +29,91 @@ public:
 		return (a_Meta & 0x08) == 0x08;
 	}
 
+	static bool IsButton(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaButton:
+			case BlockType::BirchButton:
+			case BlockType::CrimsonButton:
+			case BlockType::DarkOakButton:
+			case BlockType::JungleButton:
+			case BlockType::OakButton:
+			case BlockType::PolishedBlackstoneButton:
+			case BlockType::SpruceButton:
+			case BlockType::StoneButton:
+			case BlockType::WarpedButton:
+				return true;
+			default: return false;
+		}
+	}
+
+	static bool IsButtonOn(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaButton:             return AcaciaButton::Powered(a_Block);
+			case BlockType::BirchButton:              return BirchButton::Powered(a_Block);
+			case BlockType::CrimsonButton:            return CrimsonButton::Powered(a_Block);
+			case BlockType::DarkOakButton:            return DarkOakButton::Powered(a_Block);
+			case BlockType::JungleButton:             return JungleButton::Powered(a_Block);
+			case BlockType::OakButton:                return OakButton::Powered(a_Block);
+			case BlockType::PolishedBlackstoneButton: return PolishedBlackstoneButton::Powered(a_Block);
+			case BlockType::SpruceButton:             return SpruceButton::Powered(a_Block);
+			case BlockType::StoneButton:              return StoneButton::Powered(a_Block);
+			case BlockType::WarpedButton:             return WarpedButton::Powered(a_Block);
+			default: return false;
+		}
+	}
+
+// Todo: Add this, when BlockState is implemented
+/*
+#define TOGGLE_BUTTON(ButtonType) \
+	a_ChunkInterface.SetBlock(a_Position, ButtonType::ButtonType(ButtonType::Face(Self), ButtonType::Facing(Self), !ButtonType::Powered(Self))); break \
+
+	static constexpr void ToggleButton(cChunkInterface & a_ChunkInterface, Vector3i a_Position)
+	{
+		using namespace Block;
+		BlockState Self = a_ChunkInterface.GetBlock(a_Position);
+
+		switch (Self.Type())
+		{
+			case BlockType::AcaciaButton:             TOGGLE_BUTTON(PolishedBlackstoneButton);
+			case BlockType::BirchButton:              TOGGLE_BUTTON(PolishedBlackstoneButton);
+			case BlockType::CrimsonButton:            TOGGLE_BUTTON(PolishedBlackstoneButton);
+			case BlockType::DarkOakButton:            TOGGLE_BUTTON(PolishedBlackstoneButton);
+			case BlockType::JungleButton:             TOGGLE_BUTTON(PolishedBlackstoneButton);
+			case BlockType::OakButton:                TOGGLE_BUTTON(PolishedBlackstoneButton);
+			case BlockType::PolishedBlackstoneButton: TOGGLE_BUTTON(PolishedBlackstoneButton);
+			case BlockType::SpruceButton:             TOGGLE_BUTTON(PolishedBlackstoneButton);
+			case BlockType::StoneButton:              TOGGLE_BUTTON(PolishedBlackstoneButton);
+			case BlockType::WarpedButton:             TOGGLE_BUTTON(PolishedBlackstoneButton);
+			default: break;
+		}
+	}
+#undef TOGGLE_BUTTON
+*/
+
+static constexpr eBlockFace GetFacing(const BlockState a_Block)
+{
+	using namespace Block;
+	switch (a_Block.Type())
+	{
+		case BlockType::StoneButton:              return StoneButton::Facing(a_Block);
+		case BlockType::AcaciaButton:             return AcaciaButton::Facing(a_Block);
+		case BlockType::BirchButton:              return BirchButton::Facing(a_Block);
+		case BlockType::CrimsonButton:            return CrimsonButton::Facing(a_Block);
+		case BlockType::DarkOakButton:            return DarkOakButton::Facing(a_Block);
+		case BlockType::JungleButton:             return JungleButton::Facing(a_Block);
+		case BlockType::OakButton:                return OakButton::Facing(a_Block);
+		case BlockType::PolishedBlackstoneButton: return PolishedBlackstoneButton::Facing(a_Block);
+		case BlockType::SpruceButton:             return SpruceButton::Facing(a_Block);
+		case BlockType::WarpedButton:             return WarpedButton::Facing(a_Block);
+		default: return eBlockFace::BLOCK_FACE_NONE;
+	}
+}
+
 	/** Event handler for an arrow striking a block.
 	Performs appropriate handling if the arrow intersected a wooden button. */
 	static void OnArrowHit(cWorld & a_World, const Vector3i a_Position, const eBlockFace a_HitFace)
@@ -107,7 +192,7 @@ private:
 
 
 	/** Converts the block meta of this button into a block face of the neighbor to which the button is attached. */
-	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
+	constexpr static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x7)
 		{

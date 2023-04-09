@@ -1,10 +1,11 @@
 
 #pragma once
 
-#include "BlockHandler.h"
-#include "ChunkInterface.h"
-#include "../BlockInfo.h"
-#include "../Items/ItemHandler.h"
+#include "Blocks/BlockHandler.h"
+
+#include "Blocks/ChunkInterface.h"
+#include "BlockInfo.h"
+#include "Items/ItemHandler.h"
 
 
 
@@ -17,6 +18,36 @@ class cBlockBigFlowerHandler final :
 public:
 
 	using Super::Super;
+
+	static constexpr bool IsBlockBigFlower(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::TallGrass:
+			case BlockType::LargeFern:
+			case BlockType::Lilac:
+			case BlockType::Peony:
+			case BlockType::RoseBush:
+			case BlockType::Sunflower:
+				return true;
+			default: return false;
+		}
+	}
+
+	static constexpr bool IsTopPart(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::TallGrass: return TallGrass::Half(a_Block) == TallGrass::Half::Upper;
+			case BlockType::LargeFern: return LargeFern::Half(a_Block) == LargeFern::Half::Upper;
+			case BlockType::Lilac:     return Lilac::Half(a_Block)     == Lilac::Half::Upper;
+			case BlockType::Peony:     return Peony::Half(a_Block)     == Peony::Half::Upper;
+			case BlockType::RoseBush:  return RoseBush::Half(a_Block)  == RoseBush::Half::Upper;
+			case BlockType::Sunflower: return Sunflower::Half(a_Block) == Sunflower::Half::Upper;
+			default: return false;
+		}
+	}
 
 private:
 

@@ -49,7 +49,7 @@ public:
 	static void RetractPiston(Vector3i a_BlockPos, cWorld & a_World);
 
 	/** Returns true if the piston (with the specified meta) is extended */
-	static inline bool IsExtended(NIBBLETYPE a_PistonMeta) { return ((a_PistonMeta & 0x8) != 0x0); }
+	static constexpr bool IsExtended(NIBBLETYPE a_PistonMeta) { return ((a_PistonMeta & 0x8) != 0x0); }
 
 private:
 
@@ -62,10 +62,10 @@ private:
 	static const Byte PistonRetractAction = 1U;
 
 	/** Returns true if the piston (specified by blocktype) is a sticky piston */
-	static inline bool IsSticky(BLOCKTYPE a_BlockType) { return (a_BlockType == E_BLOCK_STICKY_PISTON); }
+	static constexpr bool IsSticky(BLOCKTYPE a_BlockType) { return (a_BlockType == E_BLOCK_STICKY_PISTON); }
 
 	/** Returns true if the specified block can be pushed by a piston (and left intact) */
-	static inline bool CanPush(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	static constexpr bool CanPush(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
 		switch (a_BlockType)
 		{

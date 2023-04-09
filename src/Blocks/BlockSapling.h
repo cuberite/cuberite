@@ -2,7 +2,8 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "../FastRandom.h"
+#include "Blocks/BlockLeaves.h"
+#include "FastRandom.h"
 
 
 
@@ -16,6 +17,51 @@ class cBlockSaplingHandler final :
 public:
 
 	using Super::Super;
+
+	static constexpr bool IsBlockSapling(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaSapling:
+			case BlockType::BirchSapling:
+			case BlockType::JungleSapling:
+			case BlockType::DarkOakSapling:
+			case BlockType::OakSapling:
+			case BlockType::SpruceSapling:
+				return true;
+			default: return false;
+		}
+	}
+
+	static constexpr unsigned char GetSaplingStage(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaSapling:  return AcaciaSapling::Stage(a_Block);
+			case BlockType::BirchSapling:   return BirchSapling::Stage(a_Block);
+			case BlockType::JungleSapling:  return JungleSapling::Stage(a_Block);
+			case BlockType::DarkOakSapling: return DarkOakSapling::Stage(a_Block);
+			case BlockType::OakSapling:     return OakSapling::Stage(a_Block);
+			case BlockType::SpruceSapling:  return SpruceSapling::Stage(a_Block);
+			default: return 0;
+		}
+	}
+
+	static constexpr BlockState SetSaplingState(BlockState a_Block, unsigned char a_State)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaSapling:  return AcaciaSapling::AcaciaSapling(a_State);
+			case BlockType::BirchSapling:   return BirchSapling::BirchSapling(a_State);
+			case BlockType::JungleSapling:  return JungleSapling::JungleSapling(a_State);
+			case BlockType::DarkOakSapling: return DarkOakSapling::DarkOakSapling(a_State);
+			case BlockType::OakSapling:     return OakSapling::OakSapling(a_State);
+			case BlockType::SpruceSapling:  return SpruceSapling::SpruceSapling(a_State);
+			default: return a_Block;
+		}
+	}
 
 private:
 

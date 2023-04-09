@@ -1,9 +1,14 @@
 
 #pragma once
 
-#include "../Defines.h"
-#include "../Item.h"
-#include "../BoundingBox.h"
+#include "Defines.h"
+#include "Item.h"
+#include "BoundingBox.h"
+
+// For future use. Only included because the BlockHandler are
+// containing some BlockState code - 12xx12
+#include "BlockState.h"
+#include "Registries/BlockStates.h"
 
 
 
