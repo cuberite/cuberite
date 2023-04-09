@@ -313,6 +313,7 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback) const
 	a_Callback.ChunkData(m_BlockData, m_LightData);
 	a_Callback.HeightMap(m_HeightMap);
 	a_Callback.BiomeMap(m_BiomeMap);
+	a_Callback.PoiData(m_PoiData);
 
 	for (const auto & Entity : m_Entities)
 	{

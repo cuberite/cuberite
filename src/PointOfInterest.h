@@ -22,6 +22,10 @@ public:
 		m_BlockPosition(a_BlockPosition), m_Type(a_PoiType),
 		m_FreeTickets(GetMaxFreeTickets(m_Type)) {}
 
+	cPointOfInterest(Vector3i a_BlockPosition, ePoiType a_PoiType, int a_FreeTickets) :
+		m_BlockPosition(a_BlockPosition), m_Type(a_PoiType),
+		m_FreeTickets(a_FreeTickets) {}
+
 	static ePoiType GetPointOnInterestType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	static unsigned char GetMaxFreeTickets(ePoiType a_Type);
 

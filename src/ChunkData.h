@@ -133,13 +133,14 @@ public:
 
 class cChunkPoiData
 {
-private:
+public:
+	typedef std::array<std::vector<cPointOfInterest>, cChunkDef::SectionHeight> PoiData;
+	typedef PoiData::value_type PoiArray;
 
-	std::array<std::vector<cPointOfInterest>, cChunkDef::SectionHeight> m_Poies;
+private:
+	PoiData m_Poies;
 
 public:
-
-	using PoiArray = decltype(m_Poies)::value_type;
 
 	void Assign(const cChunkPoiData & a_Other);
 
@@ -148,6 +149,8 @@ public:
 	void RemovePoi(Vector3i a_Position);
 
 	const PoiArray & GetPoies(size_t a_Y) const { return m_Poies.at(a_Y); }
+
+	PoiData & Data() { return m_Poies; }
 };
 
 
