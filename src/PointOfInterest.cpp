@@ -180,4 +180,6 @@ unsigned char cPointOfInterest::GetMaxFreeTickets(ePoiType a_Type)
 			return 0;
 		}
 	}
+
+	return 0;
 }
