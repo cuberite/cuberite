@@ -95,7 +95,7 @@ void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 	m_World->DoExplosionAt(6.0, GetPosX(), GetPosY() + GetHeight() / 2, GetPosZ(), true, esEnderCrystal, this);
 
 	const auto Position = GetPosition().Floor();
-	if (cChunkDef::IsValidHeight(Position.y))
+	if (cChunkDef::IsValidHeight(Position))
 	{
 		m_World->SetBlock(Position, Block::Fire::Fire());
 	}

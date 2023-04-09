@@ -3,7 +3,8 @@
 
 #include "BlockHandler.h"
 #include "BlockSlab.h"
-
+#include "BlockStairs.h"
+#include "../Chunk.h"
 
 
 
@@ -28,15 +29,11 @@ private:
 
 		auto BelowBlock = a_Chunk.GetBlock(a_Position.addedY(-1));
 
-		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
-		{
-			return true;
-		}
-		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock) && cBlockSlabHandler::IsSlabTop(BelowBlock))
-		{
-			return true;
-		}
-		return false;
+		return (
+			(cBlockInfo::FullyOccupiesVoxel(BelowBlock)) ||
+			(cBlockSlabHandler::IsAnySlabType(BelowBlock) && cBlockSlabHandler::IsSlabTop(BelowBlock)) ||
+			(cBlockStairsHandler::IsAnyStairType(BelowBlock) && cBlockStairsHandler::IsStairsUpsideDown)
+		)
 	}
 
 

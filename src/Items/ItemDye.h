@@ -383,7 +383,7 @@ public:
 		)
 		{
 			if (
-				!cChunkDef::IsValidHeight(Position.y) ||
+				!cChunkDef::IsValidHeight(Position) ||
 				(a_World.GetBlock(Position).Type() != BlockType::Grass)  // Are we looking at grass?
 			)
 			{

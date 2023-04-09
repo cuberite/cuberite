@@ -176,6 +176,7 @@ cWorld::cWorld(
 	m_SkyDarkness(0),
 	m_GameMode(gmSurvival),
 	m_bEnabledPVP(false),
+	m_bFarmlandTramplingEnabled(false),
 	m_IsDeepSnowEnabled(false),
 	m_ShouldLavaSpawnFire(true),
 	m_VillagersShouldHarvestCrops(true),
@@ -310,6 +311,7 @@ cWorld::cWorld(
 	int TNTShrapnelLevel          = IniFile.GetValueSetI("Physics",       "TNTShrapnelLevel",            static_cast<int>(slAll));
 	m_bCommandBlocksEnabled       = IniFile.GetValueSetB("Mechanics",     "CommandBlocksEnabled",        false);
 	m_bEnabledPVP                 = IniFile.GetValueSetB("Mechanics",     "PVPEnabled",                  true);
+	m_bFarmlandTramplingEnabled   = IniFile.GetValueSetB("Mechanics",     "FarmlandTramplingEnabled",    true);
 	m_bUseChatPrefixes            = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",             true);
 	m_MinNetherPortalWidth        = IniFile.GetValueSetI("Mechanics",     "MinNetherPortalWidth",        2);
 	m_MaxNetherPortalWidth        = IniFile.GetValueSetI("Mechanics",     "MaxNetherPortalWidth",        21);
@@ -859,42 +861,39 @@ bool cWorld::CanSpawnAt(int a_X, int & a_Y, int a_Z)
 
 
 
-bool cWorld::CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
+bool cWorld::CheckPlayerSpawnPoint(Vector3i a_Pos)
 {
 	// Check height bounds
-	if (!cChunkDef::IsValidHeight(a_PosY))
+	if (!cChunkDef::IsValidHeight(a_Pos))
 	{
 		return false;
 	}
 
 	// Check that surrounding blocks are neither solid or liquid
-	static const Vector3i SurroundingCoords[] =
+	constexpr std::array<Vector3i, 8> SurroundingCoords =
 	{
-		Vector3i(0,  0,  1),
-		Vector3i(1,  0,  1),
-		Vector3i(1,  0,  0),
-		Vector3i(1,  0, -1),
-		Vector3i(0,  0, -1),
-		Vector3i(-1, 0, -1),
-		Vector3i(-1, 0,  0),
-		Vector3i(-1, 0,  1),
+		{
+			{0,  0,  1},
+			{1,  0,  1},
+			{1,  0,  0},
+			{1,  0, -1},
+			{0,  0, -1},
+			{-1, 0, -1},
+			{-1, 0,  0},
+			{-1, 0,  1},
+		}
 	};
 
-	static const int SurroundingCoordsCount = ARRAYCOUNT(SurroundingCoords);
-
-	for (int CoordIndex = 0; CoordIndex < SurroundingCoordsCount; ++CoordIndex)
+	for (const auto & Offset : SurroundingCoords)
 	{
-		const int XPos = a_PosX + SurroundingCoords[CoordIndex].x;
-		const int ZPos = a_PosZ + SurroundingCoords[CoordIndex].z;
-
-		auto BlockType = GetBlock({ XPos, a_PosY, ZPos });
+		auto BlockType = GetBlock(a_Pos + Offset);
 		if (cBlockInfo::IsSolid(BlockType) || IsBlockLiquid(BlockType))
 		{
-			return false;
+			return true;
 		}
 	}
 
-	return true;
+	return false;
 }
 
 
@@ -1043,6 +1042,7 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 		Player->GetClientHandle()->ProcessProtocolIn();
 	}
 
+	TickClients(a_Dt);
 	TickQueuedChunkDataSets();
 	TickQueuedBlocks();
 	m_ChunkMap.Tick(a_Dt);
@@ -1075,6 +1075,18 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 			// Save if we have too many dirty unused chunks
 			SaveAllChunks();
 		}
+	}
+}
+
+
+
+
+
+void cWorld::TickClients(const std::chrono::milliseconds a_Dt)
+{
+	for (const auto Player : m_Players)
+	{
+		Player->GetClientHandle()->Tick(a_Dt);
 	}
 }
 
@@ -1392,6 +1404,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 			case eExplosionSource::esGhastFireball:
 			case eExplosionSource::esMonster:
 			case eExplosionSource::esPrimedTNT:
+			case eExplosionSource::esTNTMinecart:
 			case eExplosionSource::esWitherBirth:
 			case eExplosionSource::esWitherSkull:
 			{
@@ -2535,7 +2548,7 @@ void cWorld::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ)
 
 
 
-bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
+bool cWorld::SetSignLines(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
 {
 	// TODO: rvalue these strings
 
@@ -2544,13 +2557,13 @@ bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AStrin
 	AString Line3(a_Line3);
 	AString Line4(a_Line4);
 
-	if (cRoot::Get()->GetPluginManager()->CallHookUpdatingSign(*this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player))
+	if (cRoot::Get()->GetPluginManager()->CallHookUpdatingSign(*this, a_BlockPos, Line1, Line2, Line3, Line4, a_Player))
 	{
 		return false;
 	}
 
 	if (
-		DoWithBlockEntityAt({ a_BlockX, a_BlockY, a_BlockZ }, [&Line1, &Line2, &Line3, &Line4](cBlockEntity & a_BlockEntity)
+		DoWithBlockEntityAt(a_BlockPos, [&Line1, &Line2, &Line3, &Line4](cBlockEntity & a_BlockEntity)
 		{
 			if (!cBlockWallSignHandler::IsBlockWallSign(a_BlockEntity.GetBlock()) && !cBlockSignPostHandler::IsBlockSignPost(a_BlockEntity.GetBlock()))
 			{
@@ -2562,7 +2575,7 @@ bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AStrin
 		})
 	)
 	{
-		cRoot::Get()->GetPluginManager()->CallHookUpdatedSign(*this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player);
+		cRoot::Get()->GetPluginManager()->CallHookUpdatedSign(*this, a_BlockPos, Line1, Line2, Line3, Line4, a_Player);
 		return true;
 	}
 
@@ -3195,4 +3208,14 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_Ch
 	cPluginManager::Get()->CallHookChunkGenerated(
 		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
 	);
+}
+
+
+
+
+
+bool cWorld::IsSlimeChunk(int a_ChunkX, int a_ChunkZ) const
+{
+	cNoise Noise(GetSeed());
+	return (Noise.IntNoise2DInt(a_ChunkX, a_ChunkZ) / 8) % 10 == 0;  // 10% chance
 }

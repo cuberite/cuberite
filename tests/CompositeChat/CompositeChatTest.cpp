@@ -14,7 +14,7 @@
 static void TestParser1(void)
 {
 	cCompositeChat Msg;
-	Msg.ParseText("Testing @2color codes and http://links parser");
+	Msg.ParseText("Testing &2color codes and http://links parser");
 	const auto & Parts = Msg.GetParts();
 	TEST_EQUAL(Parts.size(), 4);
 
@@ -22,13 +22,13 @@ static void TestParser1(void)
 	TEST_EQUAL(std::get<cCompositeChat::TextPart>(Parts[0]).Style, "");
 
 	TEST_TRUE(std::holds_alternative<cCompositeChat::TextPart>(Parts[1]));
-	TEST_EQUAL(std::get<cCompositeChat::TextPart>(Parts[1]).Style, "@2");
+	TEST_EQUAL(std::get<cCompositeChat::TextPart>(Parts[1]).Style, "2");
 
 	TEST_TRUE(std::holds_alternative<cCompositeChat::UrlPart>(Parts[2]));
-	TEST_EQUAL(std::get<cCompositeChat::UrlPart>(Parts[2]).Style, "@2");
+	TEST_EQUAL(std::get<cCompositeChat::UrlPart>(Parts[2]).Style, "2");
 
 	TEST_TRUE(std::holds_alternative<cCompositeChat::TextPart>(Parts[3]));
-	TEST_EQUAL(std::get<cCompositeChat::TextPart>(Parts[3]).Style, "@2");
+	TEST_EQUAL(std::get<cCompositeChat::TextPart>(Parts[3]).Style, "2");
 }
 
 
@@ -38,21 +38,21 @@ static void TestParser1(void)
 static void TestParser2(void)
 {
 	cCompositeChat Msg;
-	Msg.ParseText("@3Advanced stuff: @5overriding color codes and http://links.with/@4color-in-them handling");
+	Msg.ParseText("&3Advanced stuff: &5overriding color codes and http://links.with/&4color-in-them handling");
 	const auto & Parts = Msg.GetParts();
 	TEST_EQUAL(Parts.size(), 4);
 
 	TEST_TRUE(std::holds_alternative<cCompositeChat::TextPart>(Parts[0]));
-	TEST_EQUAL(std::get<cCompositeChat::TextPart>(Parts[0]).Style, "@3");
+	TEST_EQUAL(std::get<cCompositeChat::TextPart>(Parts[0]).Style, "3");
 
 	TEST_TRUE(std::holds_alternative<cCompositeChat::TextPart>(Parts[1]));
-	TEST_EQUAL(std::get<cCompositeChat::TextPart>(Parts[1]).Style, "@5");
+	TEST_EQUAL(std::get<cCompositeChat::TextPart>(Parts[1]).Style, "35");
 
 	TEST_TRUE(std::holds_alternative<cCompositeChat::UrlPart>(Parts[2]));
-	TEST_EQUAL(std::get<cCompositeChat::UrlPart>(Parts[2]).Style, "@5");
+	TEST_EQUAL(std::get<cCompositeChat::UrlPart>(Parts[2]).Style, "35");
 
 	TEST_TRUE(std::holds_alternative<cCompositeChat::TextPart>(Parts[3]));
-	TEST_EQUAL(std::get<cCompositeChat::TextPart>(Parts[3]).Style, "@5");
+	TEST_EQUAL(std::get<cCompositeChat::TextPart>(Parts[3]).Style, "35");
 }
 
 

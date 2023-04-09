@@ -171,7 +171,9 @@ private:
 		{
 			return true;
 		}
-		else if (cBlockSlabHandler::IsAnySlabType(Below))
+
+		// upside down slabs
+		if (cBlockSlabHandler::IsAnySlabType(Below))
 		{
 			// Check if the slab is turned up side down or double slab
 			if (cBlockSlabHandler::IsSlabFull(Below) || cBlockSlabHandler::IsSlabTop(Below))
@@ -179,10 +181,13 @@ private:
 				return true;
 			}
 		}
+
+		// upside down stairs
 		else if (cBlockStairsHandler::IsBlockStairs(Below) && cBlockStairsHandler::IsStairsTopHalf(Below))
 		{
 			return true;
 		}
+
 		return false;
 	}
 

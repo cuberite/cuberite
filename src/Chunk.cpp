@@ -686,21 +686,6 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 
 void cChunk::Tick(std::chrono::milliseconds a_Dt)
 {
-	const auto ShouldTick = ShouldBeTicked();
-
-	// If we are not valid, tick players and bailout
-	if (!ShouldTick)
-	{
-		for (const auto & Entity : m_Entities)
-		{
-			if (Entity->IsPlayer())
-			{
-				Entity->Tick(a_Dt, *this);
-			}
-		}
-		return;
-	}
-
 	TickBlocks();
 
 	// Tick all block entities in this Chunk:
@@ -1025,7 +1010,7 @@ int cChunk::GrowPlantAt(Vector3i a_RelPos, char a_NumStages)
 
 bool cChunk::UnboundedRelGetBlock(Vector3i a_RelPos, BlockState & a_Block) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1046,7 +1031,7 @@ bool cChunk::UnboundedRelGetBlock(Vector3i a_RelPos, BlockState & a_Block) const
 
 bool cChunk::UnboundedRelGetBlockBlockLight(Vector3i a_RelPos, LIGHTTYPE & a_BlockBlockLight) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1067,7 +1052,7 @@ bool cChunk::UnboundedRelGetBlockBlockLight(Vector3i a_RelPos, LIGHTTYPE & a_Blo
 
 bool cChunk::UnboundedRelGetBlockSkyLight(Vector3i a_RelPos, LIGHTTYPE & a_BlockSkyLight) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1088,7 +1073,7 @@ bool cChunk::UnboundedRelGetBlockSkyLight(Vector3i a_RelPos, LIGHTTYPE & a_Block
 
 bool cChunk::UnboundedRelGetBlockLights(Vector3i a_RelPos, LIGHTTYPE & a_BlockLight, LIGHTTYPE & a_SkyLight) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1110,7 +1095,7 @@ bool cChunk::UnboundedRelGetBlockLights(Vector3i a_RelPos, LIGHTTYPE & a_BlockLi
 
 bool cChunk::UnboundedRelSetBlock(Vector3i a_RelPos, BlockState a_Block)
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1131,7 +1116,7 @@ bool cChunk::UnboundedRelSetBlock(Vector3i a_RelPos, BlockState a_Block)
 
 bool cChunk::UnboundedRelFastSetBlock(Vector3i a_RelPos, BlockState a_Block)
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1353,7 +1338,7 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 	}
 
 	const auto Position = PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
-	a_Client->SendBlockChange(Position.x, Position.y, Position.z, GetBlock(a_RelX, a_RelY, a_RelZ));
+	a_Client->SendBlockChange(Position, GetBlock(a_RelX, a_RelY, a_RelZ));
 
 	// FS #268 - if a BlockEntity digging is cancelled by a plugin, the entire block entity must be re-sent to the client:
 	if (BlockEntity != nullptr)
@@ -1935,4 +1920,13 @@ LIGHTTYPE cChunk::GetTimeAlteredLight(LIGHTTYPE a_Skylight) const
 	a_Skylight -= m_World->GetSkyDarkness();
 	// Because NIBBLETYPE is unsigned, we clamp it to 0 .. 15 by checking for values above 15
 	return (a_Skylight < 16)? a_Skylight : 0;
+}
+
+
+
+
+
+bool cChunk::IsSlimeChunk() const
+{
+	return m_World->IsSlimeChunk(m_PosX, m_PosZ);
 }

@@ -10,7 +10,10 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "ChunkInterface.h"
 #include "../BlockArea.h"
+#include "../Chunk.h"
+#include "../ClientHandle.h"
 
 
 
@@ -24,6 +27,66 @@ class cBlockFarmlandHandler final :
 public:
 
 	using Super::Super;
+
+	/** Turns farmland into dirt.
+	Will first check for any colliding entities and teleport them to a higher position.
+	*/
+	static void TurnToDirt(cChunk & a_Chunk, Vector3i a_AbsPos)
+	{
+		auto RelPos = cChunkDef::AbsoluteToRelative(a_AbsPos);
+		TurnToDirt(a_Chunk, a_AbsPos, RelPos);
+	}
+
+
+
+
+
+	/** Turns farmland into dirt.
+	Will first check for any colliding entities and teleport them to a higher position.
+	*/
+	static void TurnToDirt(cChunk & a_Chunk, const Vector3i a_AbsPos, const Vector3i a_RelPos)
+	{
+		// Use cBlockInfo::GetBlockHeight when it doesn't break trampling for
+		// mobs and older clients anymore
+		static const auto FarmlandHeight = 0.9375;
+		static const auto FullHeightDelta = 0.0625;
+
+		a_Chunk.ForEachEntityInBox(
+			cBoundingBox(Vector3d(0.5, FarmlandHeight, 0.5) + a_AbsPos, 0.5, FullHeightDelta),
+			[&](cEntity & Entity)
+			{
+				const auto GroundHeight = a_AbsPos.y + 1;
+
+				// A simple IsOnGround isn't enough. It will return true when
+				// e.g. a piston pushes a farmland block into an entity's head.
+				// Maybe it's also possible than an entity is falling, it's
+				// still not on the ground, but it's less than 0.0625 blocks
+				// higher than the farmland block
+				if ((Entity.GetPosY() < a_AbsPos.y + FarmlandHeight) || (Entity.GetPosY() >= GroundHeight))
+				{
+					return false;
+				}
+
+				// Players need a packet that will update their position
+				if (Entity.IsPlayer())
+				{
+					const auto HeightIncrease = GroundHeight - Entity.GetPosY();
+					const auto Player = static_cast<const cPlayer *>(&Entity);
+
+					Player->GetClientHandle()->SendPlayerMoveLook(Vector3d(0.0, HeightIncrease, 0.0), 0.0f, 0.0f, true);
+				}
+
+				Entity.SetPosY(GroundHeight);
+
+				return false;
+			});
+
+		a_Chunk.SetBlock(a_RelPos, E_BLOCK_DIRT, 0);
+	}
+
+
+
+
 
 private:
 
@@ -62,7 +125,7 @@ private:
 		}
 
 		// Farmland too dry. If nothing is growing on top, turn back to dirt:
-		auto UpperBlock = cChunkDef::IsValidHeight(a_RelPos.y + 1) ? a_Chunk.GetBlock(a_RelPos.addedY(1)) : Block::Air::Air();
+		auto UpperBlock = cChunkDef::IsValidHeight(a_RelPos.addedY(1)) ? a_Chunk.GetBlock(a_RelPos.addedY(1)) : Block::Air::Air();
 		switch (UpperBlock.Type())
 		{
 			case BlockType::Beetroots:
@@ -79,7 +142,8 @@ private:
 			}
 			default:
 			{
-				a_Chunk.SetBlock(a_RelPos, Block::Dirt::Dirt());
+				auto AbsPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+				TurnToDirt(a_Chunk, AbsPos, a_RelPos);
 				break;
 			}
 		}
@@ -104,10 +168,17 @@ private:
 		}
 
 		// Check whether we should revert to dirt:
+		// TODO: fix for signs and slabs (possibly more blocks) - they should destroy farmland
 		auto UpperBlock = a_ChunkInterface.GetBlock(a_BlockPos.addedY(1));
 		if (cBlockInfo::FullyOccupiesVoxel(UpperBlock))
 		{
-			a_ChunkInterface.SetBlock(a_BlockPos, Block::Dirt::Dirt());
+			// Until the fix above is done, this line should also suffice:
+			// a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_DIRT, 0);
+			a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & Chunk)
+			{
+				TurnToDirt(Chunk, a_BlockPos);
+				return true;
+			});
 		}
 	}
 

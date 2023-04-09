@@ -28,7 +28,7 @@ cEnderChestEntity::cEnderChestEntity(BlockState a_Block, Vector3i a_Pos, cWorld 
 void cEnderChestEntity::SendTo(cClientHandle & a_Client)
 {
 	// Send a dummy "number of players with chest open" packet to make the chest visible:
-	a_Client.SendBlockAction(m_Pos.x, m_Pos.y, m_Pos.z, 1, 0, m_Block.Type());
+	a_Client.SendBlockAction(m_Pos, 1, 0, m_Block.Type());
 }
 
 

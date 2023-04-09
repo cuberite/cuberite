@@ -57,7 +57,6 @@ public:
 
 private:
 
-	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
 
 	bool m_IsInstantFall;  // If set to true, blocks don't fall using cFallingBlock entity, but instantly instead
@@ -69,12 +68,3 @@ private:
 	/** Performs the instant fall of the block - removes it from top, Finishes it at the bottom */
 	void DoInstantFall(cChunk * a_Chunk, Vector3i a_RelPos);
 };
-
-
-
-
-
-
-
-
-

@@ -999,7 +999,7 @@ void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector
 
 void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_NeighborPos, eBlockFace a_WhichNeighbor)
 {
-	if (!cChunkDef::IsValidHeight(a_NeighborPos.y))
+	if (!cChunkDef::IsValidHeight(a_NeighborPos))
 	{
 		return;
 	}

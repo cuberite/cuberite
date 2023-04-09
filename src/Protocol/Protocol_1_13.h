@@ -36,7 +36,7 @@ public:
 
 protected:
 
-	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BlockState a_Block) override;
+	virtual void SendBlockChange                (Vector3i a_BlockPos, BlockState a_Block) override;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;

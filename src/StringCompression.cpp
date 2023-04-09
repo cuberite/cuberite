@@ -76,7 +76,7 @@ Compression::Result Compression::Compressor::Compress(const void * const Input, 
 {
 	// First see if the stack buffer has enough space:
 	{
-		Result::Static Buffer = {static_cast<std::byte>(0)};
+		Result::Static Buffer;
 		const auto BytesWrittenOut = Algorithm(m_Handle, Input, Size, Buffer.data(), Buffer.size());
 
 		if (BytesWrittenOut != 0)
@@ -189,7 +189,7 @@ Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferVi
 {
 	// First see if the stack buffer has enough space:
 	{
-		Result::Static Buffer = {static_cast<std::byte>(0)};
+		Result::Static Buffer;
 		size_t BytesWrittenOut;
 
 		switch (Algorithm(m_Handle, Input.data(), Input.size(), Buffer.data(), Buffer.size(), &BytesWrittenOut))

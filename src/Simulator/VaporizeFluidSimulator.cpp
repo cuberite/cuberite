@@ -16,6 +16,21 @@
 
 
 
+
+void cVaporizeFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
+{
+	// Nothing needed
+
+	UNUSED(a_Dt);
+	UNUSED(a_ChunkX);
+	UNUSED(a_ChunkZ);
+	UNUSED(a_Chunk);
+}
+
+
+
+
+
 void cVaporizeFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block)
 {
 	if ((a_Block.Type() == m_FluidBlock) || cBlockFluidHandler::GetFalloff(a_Block) == m_StationaryFalloffValue)
@@ -29,16 +44,3 @@ void cVaporizeFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, Bl
 		);
 	}
 }
-
-
-
-
-
-void cVaporizeFluidSimulator::Simulate(float a_Dt)
-{
-	// Nothing needed
-}
-
-
-
-

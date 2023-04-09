@@ -58,7 +58,7 @@ public:
 		}
 
 		const auto FirePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-		if (!cChunkDef::IsValidHeight(FirePos.y))
+		if (!cChunkDef::IsValidHeight(FirePos))
 		{
 			return false;
 		}

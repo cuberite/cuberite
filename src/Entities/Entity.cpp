@@ -1457,7 +1457,7 @@ bool cEntity::DetectPortal()
 		return false;
 	}
 
-	if (const auto Position = m_Position.Floor(); cChunkDef::IsValidHeight(Position.y))
+	if (const auto Position = m_Position.Floor(); cChunkDef::IsValidHeight(Position))
 	{
 		switch (GetWorld()->GetBlock(Position).Type())
 		{
@@ -1994,7 +1994,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		return;
 	}
 
-	if (GetSpeed().SqrLength() > 0.001)
+	if (m_Speed.HasNonZeroLength())
 	{
 		// Movin'
 		m_World->BroadcastEntityVelocity(*this, a_Exclude);
@@ -2010,8 +2010,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		m_bHasSentNoSpeed = true;
 	}
 
-	Vector3i Diff = (GetPosition() * 32.0).Floor() - (m_LastSentPosition * 32.0).Floor();
-	if (Diff.HasNonZeroLength())  // Have we moved?
+	if ((m_Position - m_LastSentPosition).HasNonZeroLength())  // Have we moved?
 	{
 		m_World->BroadcastEntityPosition(*this, a_Exclude);
 

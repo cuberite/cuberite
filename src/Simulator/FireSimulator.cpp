@@ -418,7 +418,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, Vector3i a_RelPos)
 				if (CanStartFireInBlock(a_Chunk, dstRelPos))
 				{
 					auto dstAbsPos = a_Chunk->RelativeToAbsolute(dstRelPos);
-					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, dstAbsPos.x, dstAbsPos.y, dstAbsPos.z, ssFireSpread))
+					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, dstAbsPos, ssFireSpread))
 					{
 						return;
 					}
@@ -442,7 +442,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 		BlockState Self = 0;
 		auto RelPos = a_RelPos + Coord;
 		auto NeighborChunk = a_Chunk->GetRelNeighborChunkAdjustCoords(RelPos);
-		if (NeighborChunk == nullptr)
+		if ((neighbor == nullptr) || !neighbor->IsValid())
 		{
 			continue;
 		}
@@ -462,7 +462,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 		}
 
 		bool ShouldReplaceFuel = (GetRandomProvider().RandBool(m_ReplaceFuelChance * (1.0 / MAX_CHANCE_REPLACE_FUEL)));
-		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, AbsPos.x, AbsPos.y, AbsPos.z, ssFireSpread))
+		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, AbsPos, ssFireSpread))
 		{
 			NeighborChunk->SetBlock(RelPos, Block::Fire::Fire());
 		}

@@ -2196,7 +2196,7 @@ bool cPlayer::IsClimbing(void) const
 {
 	const auto Position = GetPosition().Floor();
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		return false;
 	}
@@ -2326,15 +2326,15 @@ void cPlayer::LoadRank(void)
 
 
 
-void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Range)
+void cPlayer::SendBlocksAround(Vector3i a_BlockPos, int a_Range)
 {
 	// Collect the coords of all the blocks to send:
 	sSetBlockVector blks;
-	for (int y = a_BlockY - a_Range + 1; y < a_BlockY + a_Range; y++)
+	for (int y = a_BlockPos.y - a_Range + 1; y < a_BlockPos.y + a_Range; y++)
 	{
-		for (int z = a_BlockZ - a_Range + 1; z < a_BlockZ + a_Range; z++)
+		for (int z = a_BlockPos.z - a_Range + 1; z < a_BlockPos.z + a_Range; z++)
 		{
-			for (int x = a_BlockX - a_Range + 1; x < a_BlockX + a_Range; x++)
+			for (int x = a_BlockPos.x - a_Range + 1; x < a_BlockPos.x + a_Range; x++)
 			{
 				blks.emplace_back(x, y, z, Block::Air::Air());  // Use fake blocktype, it will get set later on.
 			}
@@ -2582,7 +2582,16 @@ float cPlayer::GetLiquidHeightPercent(BlockState a_Block)
 
 bool cPlayer::IsInsideWater()
 {
-	auto Block = m_World->GetBlock(GetEyePosition().Floor());
+	const auto EyePos = GetEyePosition().Floor();
+
+	if (!cChunkDef::IsValidHeight(EyePos))
+	{
+		// Not in water if in void.
+		return false;
+	}
+
+	auto Block = m_World->GetBlock(EyePos);
+
 	if (Block.Type() != BlockType::Water)
 	{
 		return false;
@@ -3145,8 +3154,6 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 
 void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	m_ClientHandle->Tick(a_Dt);
-
 	if (m_ClientHandle->IsDestroyed())
 	{
 		Destroy();
@@ -3169,13 +3176,6 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			m_Stats.Custom[CustomStatistic::SneakTime] += TicksElapsed;
 		}
-	}
-
-	if (!a_Chunk.IsValid())
-	{
-		// Players are ticked even if the parent chunk is invalid.
-		// We've processed as much as we can, bail:
-		return;
 	}
 
 	ASSERT((GetParentChunk() != nullptr) && (GetParentChunk()->IsValid()));

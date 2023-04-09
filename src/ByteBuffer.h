@@ -31,6 +31,7 @@ their own synchronization.
 class cByteBuffer
 {
 public:
+
 	cByteBuffer(size_t a_BufferSize);
 	~cByteBuffer();
 
@@ -47,7 +48,13 @@ public:
 	size_t GetReadableSpace(void) const;
 
 	/** Returns the current data start index. For debugging purposes. */
-	size_t  GetDataStart(void) const { return m_DataStart; }
+	size_t GetDataStart(void) const { return m_DataStart; }
+
+	/** Returns if the given value can fit in a protocol big-endian 8 bit integer. */
+	static bool CanBEInt8Represent(int a_Value);
+
+	/** Returns if the given value can fit in a protocol big-endian 16 bit integer. */
+	static bool CanBEInt16Represent(int a_Value);
 
 	/** Returns true if the specified amount of bytes are available for reading */
 	bool CanReadBytes(size_t a_Count) const;
@@ -72,7 +79,9 @@ public:
 	bool ReadVarUTF8String  (AString & a_Value);  // string length as VarInt, then string as UTF-8
 	bool ReadLEInt          (int & a_Value);
 	bool ReadXYZPosition64  (int & a_BlockX, int & a_BlockY, int & a_BlockZ);
+	bool ReadXYZPosition64  (Vector3i & a_Position);
 	bool ReadXZYPosition64  (int & a_BlockX, int & a_BlockY, int & a_BlockZ);
+	bool ReadXZYPosition64  (Vector3i & a_Position);
 	bool ReadUUID           (cUUID & a_Value);
 
 	/** Reads VarInt, assigns it to anything that can be assigned from an UInt64 (unsigned short, char, Byte, double, ...) */

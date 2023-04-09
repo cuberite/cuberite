@@ -1,10 +1,15 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "BlockSlab.h"
+#include "BlockStairs.h"
 #include "../BlockInfo.h"
 #include "../Chunk.h"
+#include "Defines.h"
+#include "Entities/Player.h"
 #include "Mixins.h"
 #include "ChunkInterface.h"
+#include "World.h"
 
 
 
@@ -166,6 +171,34 @@ private:
 		}
 		BlockState SupportBlock = 0;
 		a_Chunk.UnboundedRelGetBlock(SupportRelPos, SupportBlock);
+		eBlockFace Face = GetBlockFace(SupportBlock);
+		// upside down slabs
+		if (cBlockSlabHandler::IsAnySlabType(SupportBlock))
+		{
+			return ((Face == BLOCK_FACE_YP) && ISSLABTOP(SupportBlock));
+		}
+
+		// stairs (top and sides)
+		if (cBlockStairsHandler::IsAnyStairType(SupportBlock))
+		{
+			switch (Face)
+			{
+				case eBlockFace::BLOCK_FACE_YP:
+					return cBlockStairsHandler::IsStairsTopHalf(SupportBlock);
+				case eBlockFace::BLOCK_FACE_XP:
+					return (cBlockStairsHandler::GetRotation(SupportBlock) == E_BLOCK_STAIRS_XP);
+				case eBlockFace::BLOCK_FACE_XM:
+					return (cBlockStairsHandler::GetRotation(SupportBlock) == E_BLOCK_STAIRS_XM);
+				case eBlockFace::BLOCK_FACE_ZP:
+					return (cBlockStairsHandler::GetRotation(SupportBlock) == E_BLOCK_STAIRS_ZP);
+				case eBlockFace::BLOCK_FACE_ZM:
+					return (cBlockStairsHandler::GetRotation(SupportBlock) == E_BLOCK_STAIRS_ZM);
+				default:
+				{
+					return false;
+				}
+			}
+		}
 
 		return cBlockInfo::FullyOccupiesVoxel(SupportBlock);
 	}

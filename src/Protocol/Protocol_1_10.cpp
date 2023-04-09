@@ -50,19 +50,6 @@ Implements the 1.10 protocol classes:
 
 
 
-#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!ByteBuf.Proc(Var))\
-		{\
-			return;\
-		} \
-	} while (false)
-
-
-
-
-
 // The disabled error is intended, since the Metadata have overlapping indexes
 // based on the type of the Entity.
 //
@@ -313,16 +300,16 @@ namespace Metadata
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_10_0:
 
-void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
+void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSoundEffect);
 	Pkt.WriteString(a_SoundName);
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
-	Pkt.WriteBEInt32(FloorC(a_X * 8.0));
-	Pkt.WriteBEInt32(FloorC(a_Y * 8.0));
-	Pkt.WriteBEInt32(FloorC(a_Z * 8.0));
+	Pkt.WriteBEInt32(FloorC(a_Origin.x * 8.0));
+	Pkt.WriteBEInt32(FloorC(a_Origin.y * 8.0));
+	Pkt.WriteBEInt32(FloorC(a_Origin.z * 8.0));
 	Pkt.WriteBEFloat(a_Volume);
 	Pkt.WriteBEFloat(a_Pitch);
 }
@@ -356,6 +343,7 @@ cProtocol::Version cProtocol_1_10_0::GetProtocolVersion() const
 void cProtocol_1_10_0::HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
+	m_Client->HandleResourcePack(Status);
 }
 
 

@@ -118,9 +118,6 @@ private:
 	}
 	*/
 
-
-
-
 	virtual ColourID GetMapBaseColourID() const override
 	{
 		switch (m_BlockType)

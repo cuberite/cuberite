@@ -542,7 +542,7 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 		}
 		#endif
 		{
-			bool res = self->SetSignLines(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4, Player);
+			bool res = self->SetSignLines({BlockX, BlockY, BlockZ}, Line1, Line2, Line3, Line4, Player);
 			tolua_pushboolean(LuaState, res ? 1 : 0);
 		}
 	}

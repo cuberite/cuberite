@@ -51,12 +51,13 @@ public:
 	virtual void SendLeashEntity          (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
 	virtual void SendMapData              (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn        (const cPainting & a_Painting) override;
+	virtual void SendPlayerMoveLook       (Vector3d a_Pos, float a_Yaw, float a_Pitch, bool a_IsRelative) override;
 	virtual void SendPlayerMoveLook       (void) override;
 	virtual void SendPlayerPermissionLevel() override;
 	virtual void SendPlayerSpawn          (const cPlayer & a_Player) override;
-	virtual void SendSoundEffect          (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
+	virtual void SendSoundEffect          (const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
 	virtual void SendSpawnMob             (const cMonster & a_Mob) override;
-	virtual void SendThunderbolt          (int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void SendThunderbolt          (Vector3i a_Origin) override;
 	virtual void SendUnleashEntity        (const cEntity & a_Entity) override;
 	virtual void SendUnloadChunk          (int a_ChunkX, int a_ChunkZ) override;
 
@@ -175,7 +176,7 @@ public:
 
 protected:
 
-	virtual void SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
+	virtual void SendUpdateSign(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 
 	virtual UInt32 GetPacketID(ePacketType a_Packet) const override;
 	virtual Version GetProtocolVersion() const override;

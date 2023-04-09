@@ -30,14 +30,8 @@ void cBrewingstandEntity::CopyFrom(const cBlockEntity & a_Src)
 	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cBrewingstandEntity &>(a_Src);
 	m_IsBrewing = src.m_IsBrewing;
-	for (size_t i = 0; i < ARRAYCOUNT(m_CurrentBrewingRecipes); ++i)
-	{
-		m_CurrentBrewingRecipes[i] = src.m_CurrentBrewingRecipes[i];
-	}
-	for (size_t i = 0; i < ARRAYCOUNT(m_Results); ++i)
-	{
-		m_Results[i] = src.m_Results[i];
-	}
+	m_CurrentBrewingRecipes = src.m_CurrentBrewingRecipes;
+	m_Results = src.m_Results;
 	m_TimeBrewed = src.m_TimeBrewed;
 	m_RemainingFuel = src.m_RemainingFuel;
 }
@@ -118,15 +112,15 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		// Loop over all bottle slots and update available bottles
 		const cBrewingRecipes::cRecipe * Recipe = nullptr;
-		for (int i = 0; i < 3; i++)
+		for (std::size_t i = 0; i < 3; i++)
 		{
-			if (m_Contents.GetSlot(i).IsEmpty() || (m_CurrentBrewingRecipes[i] == nullptr))
+			if (m_Contents.GetSlot(static_cast<int>(i)).IsEmpty() || (m_CurrentBrewingRecipes[i] == nullptr))
 			{
 				continue;
 			}
 
 			Recipe = m_CurrentBrewingRecipes[i];
-			m_Contents.SetSlot(i, Recipe->Output.CopyOne());
+			m_Contents.SetSlot(static_cast<int>(i), Recipe->Output.CopyOne());
 		}
 
 		// Brewing process completed
@@ -235,9 +229,9 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
 	const cBrewingRecipes::cRecipe * Recipe = nullptr;
 	bool Stop = true;
-	for (int i = 0; i < 3; i++)
+	for (std::size_t i = 0; i < 3; i++)
 	{
-		if (GetSlot(i).IsEmpty())
+		if (GetSlot(static_cast<int>(i)).IsEmpty())
 		{
 			m_CurrentBrewingRecipes[i] = nullptr;
 			m_Results[i].Empty();
@@ -247,14 +241,14 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		if (m_CurrentBrewingRecipes[i] != nullptr)
 		{
 			Recipe = m_CurrentBrewingRecipes[i];
-			if (Recipe->Ingredient.IsEqual(GetSlot(bsIngredient)) && Recipe->Input.IsEqual(GetSlot(i)))
+			if (Recipe->Ingredient.IsEqual(GetSlot(bsIngredient)) && Recipe->Input.IsEqual(GetSlot(static_cast<int>(i))))
 			{
 				Stop = false;
 				continue;
 			}
 		}
 
-		Recipe = BR->GetRecipeFrom(m_Contents.GetSlot(i), m_Contents.GetSlot(bsIngredient));
+		Recipe = BR->GetRecipeFrom(m_Contents.GetSlot(static_cast<int>(i)), m_Contents.GetSlot(bsIngredient));
 		if (Recipe != nullptr)
 		{
 			// Found a brewing recipe for the items
@@ -324,13 +318,13 @@ void cBrewingstandEntity::LoadRecipes(void)
 
 	cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
 	const cBrewingRecipes::cRecipe * Recipe = nullptr;
-	for (int i = 0; i < 3; i++)
+	for (std::size_t i = 0; i < 3; i++)
 	{
-		if (GetSlot(i).IsEmpty())
+		if (GetSlot(static_cast<int>(i)).IsEmpty())
 		{
 			continue;
 		}
-		Recipe = BR->GetRecipeFrom(GetSlot(i), GetSlot(bsIngredient));
+		Recipe = BR->GetRecipeFrom(GetSlot(static_cast<int>(i)), GetSlot(bsIngredient));
 		if (Recipe != nullptr)
 		{
 			m_CurrentBrewingRecipes[i] = Recipe;

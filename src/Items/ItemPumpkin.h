@@ -25,7 +25,7 @@ private:
 		if (TrySpawnGolem(a_Player, a_PlacePosition))
 		{
 			// The client thinks that they placed the pumpkin, let them know it's been replaced:
-			a_Player.SendBlocksAround(a_PlacePosition.x, a_PlacePosition.y, a_PlacePosition.z);
+			a_Player.SendBlocksAround(a_PlacePosition);
 			return true;
 		}
 

@@ -2245,6 +2245,16 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Returns whether the configuration has DeepSnow enabled.",
 			},
+			IsFarmlandTramplingEnabled =
+			{
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns true if farmland trampling is enabled.",
+			},
 			IsGameModeAdventure =
 			{
 				Returns =
@@ -2304,6 +2314,27 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					},
 				},
 				Notes = "Returns whether or not saving chunk data is enabled. If disabled, the world will keep dirty chunks in memory forever, and will simply regenerate non-dirty chunks that are unloaded.",
+			},
+			IsSlimeChunk =
+			{
+				Params =
+				{
+					{
+						Name = "ChunkX",
+						Type = "number",
+					},
+					{
+						Name = "ChunkZ",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns whether slimes can spawn in the chunk.",
 			},
 			IsTrapdoorOpen =
 			{

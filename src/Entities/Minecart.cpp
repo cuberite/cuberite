@@ -6,6 +6,8 @@
 // Indiana Jones!
 
 #include "Globals.h"
+#include "ChunkDef.h"
+#include "Defines.h"
 #include "Minecart.h"
 #include "../BlockInfo.h"
 #include "../ClientHandle.h"
@@ -175,6 +177,20 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
+	if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
+	{
+		// Check if the rail is still there
+		if (m_World->GetBlock(m_DetectorRailPosition) == E_BLOCK_DETECTOR_RAIL)
+		{
+			m_World->SetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
+		}
+
+		m_bIsOnDetectorRail = false;
+	}
+
+	BLOCKTYPE InsideType;
+	NIBBLETYPE InsideMeta;
+	chunk->GetBlockTypeMeta(relPos, InsideType, InsideMeta);
 
 	auto ContainedBlock = Chunk->GetBlock(RelPos);
 	if (!cBlockRailHandler::IsBlockRail(ContainedBlock))
@@ -198,8 +214,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	bool WasDetectorRail = false;
-	if (cBlockRailHandler::IsBlockRail(ContainedBlock))
+	if (cBlockRailHandler::IsBlockRail(InsideType))
 	{
 		if (ContainedBlock.Type() == BlockType::Rail)
 		{
@@ -213,12 +228,13 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		switch (ContainedBlock.Type())
 		{
 			case BlockType::Rail: HandleRailPhysics(ContainedBlock, a_Dt); break;
-			case BlockType::ActivatorRail: break;
+			case BlockType::ActivatorRail: HandleActivatorRailPhysics(InsideMeta, a_Dt); break;
 			case BlockType::PoweredRail: HandlePoweredRailPhysics(ContainedBlock); break;
 			case BlockType::DetectorRail:
 			{
+				m_DetectorRailPosition = Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
+				m_bIsOnDetectorRail = true;
 				HandleDetectorRailPhysics(ContainedBlock, a_Dt);
-				WasDetectorRail = true;
 				break;
 			}
 			default: VERIFY(!"Unhandled rail type despite checking if block was rail!"); break;
@@ -231,17 +247,6 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Not on rail, default physics
 		SetPosY(floor(GetPosY()) + 0.35);  // HandlePhysics overrides this if minecart can fall, else, it is to stop ground clipping minecart bottom when off-rail
 		Super::HandlePhysics(a_Dt, *Chunk);
-	}
-
-	if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
-	{
-		m_World->SetBlock(m_DetectorRailPosition, Block::DetectorRail::DetectorRail(false, Block::DetectorRail::Shape(m_World->GetBlock(m_DetectorRailPosition))));
-		m_bIsOnDetectorRail = false;
-	}
-	else if (WasDetectorRail)
-	{
-		m_bIsOnDetectorRail = true;
-		m_DetectorRailPosition = Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
 	}
 
 	// Enforce speed limit:
@@ -686,9 +691,8 @@ void cMinecart::HandleDetectorRailPhysics(BlockState a_Rail, std::chrono::millis
 
 void cMinecart::HandleActivatorRailPhysics(BlockState a_Rail, std::chrono::milliseconds a_Dt)
 {
-	using namespace Block;
-	m_World->SetBlock(m_DetectorRailPosition, ActivatorRail::ActivatorRail(true, ActivatorRail::Shape(a_Rail)));
-	HandleRailPhysics(a_Rail, a_Dt);
+	m_World->SetBlock(m_DetectorRailPosition, Block::ActivatorRail::ActivatorRail(true, ActivatorRail::Shape(a_Rail)));
+	// TODO - shake minecart, throw entities out
 }
 
 
@@ -1527,7 +1531,22 @@ cMinecartWithTNT::cMinecartWithTNT(Vector3d a_Pos):
 {
 }
 
-// TODO: Make it activate when passing over activator rail
+
+
+
+
+void cMinecartWithTNT::HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt)
+{
+	Super::HandleActivatorRailPhysics(a_RailMeta, a_Dt);
+
+	if ((a_RailMeta & 0x08) && !m_isTNTFused)
+	{
+		m_isTNTFused = true;
+		m_TNTFuseTicksLeft = 80;
+		m_World->BroadcastSoundEffect("entity.tnt.primed", GetPosition(), 1.0f, 1.0f);
+		m_World->BroadcastEntityAnimation(*this, EntityAnimation::MinecartTNTIgnites);
+	}
+}
 
 
 
@@ -1536,6 +1555,32 @@ cMinecartWithTNT::cMinecartWithTNT(Vector3d a_Pos):
 void cMinecartWithTNT::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	a_Drops.emplace_back(Item::TNTMinecart);
+}
+
+
+
+
+
+void cMinecartWithTNT::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	Super::Tick(a_Dt, a_Chunk);
+	if (!IsTicking())
+	{
+		return;
+	}
+
+	if (m_isTNTFused)
+	{
+		if (m_TNTFuseTicksLeft > 0)
+		{
+			--m_TNTFuseTicksLeft;
+		}
+		else
+		{
+			Destroy();
+			m_World->DoExplosionAt(4.0, GetPosX(), GetPosY() + GetHeight() / 2, GetPosZ(), true, esTNTMinecart, this);
+		}
+	}
 }
 
 

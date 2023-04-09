@@ -214,6 +214,24 @@ size_t cByteBuffer::GetReadableSpace(void) const
 
 
 
+bool cByteBuffer::CanBEInt8Represent(int a_Value)
+{
+	return (-128 <= a_Value) && (a_Value <= 127);
+}
+
+
+
+
+
+bool cByteBuffer::CanBEInt16Represent(int a_Value)
+{
+	return (-32768 <= a_Value) && (a_Value <= 32767);
+}
+
+
+
+
+
 bool cByteBuffer::CanReadBytes(size_t a_Count) const
 {
 	CHECK_THREAD
@@ -509,6 +527,15 @@ bool cByteBuffer::ReadXYZPosition64(int & a_BlockX, int & a_BlockY, int & a_Bloc
 
 
 
+bool cByteBuffer::ReadXYZPosition64(Vector3i & a_Position)
+{
+	return ReadXYZPosition64(a_Position.x, a_Position.y, a_Position.z);
+}
+
+
+
+
+
 bool cByteBuffer::ReadXZYPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 {
 	CHECK_THREAD
@@ -534,11 +561,20 @@ bool cByteBuffer::ReadXZYPosition64(int & a_BlockX, int & a_BlockY, int & a_Bloc
 
 
 
+bool cByteBuffer::ReadXZYPosition64(Vector3i & a_Position)
+{
+	return ReadXZYPosition64(a_Position.x, a_Position.y, a_Position.z);
+}
+
+
+
+
+
 bool cByteBuffer::ReadUUID(cUUID & a_Value)
 {
 	CHECK_THREAD
 
-	std::array<Byte, 16> UUIDBuf = {0};
+	std::array<Byte, 16> UUIDBuf;
 	if (!ReadBuf(UUIDBuf.data(), UUIDBuf.size()))
 	{
 		return false;
