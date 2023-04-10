@@ -31,7 +31,7 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		return (a_Position.y > cChunkDef::BottomHeight) && IsBlockTypeOfDirt(a_Chunk.GetBlock(a_Position.addedY(-1)));
+		return (a_Position.y > cChunkDef::LowerLimit) && IsBlockTypeOfDirt(a_Chunk.GetBlock(a_Position.addedY(-1)));
 	}
 
 
@@ -137,7 +137,7 @@ private:
 		ASSERT(CheckHeight != 0);
 
 		// Don't grow a tree if we don't have enough space left above it in the chunk
-		if ((a_RelY + CheckHeight) > cChunkDef::Height)
+		if ((a_RelY + CheckHeight) > cChunkDef::UpperLimit)
 		{
 			return false;
 		}

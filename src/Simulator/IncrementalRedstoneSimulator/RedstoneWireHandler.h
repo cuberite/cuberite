@@ -155,7 +155,7 @@ namespace RedstoneWireHandler
 
 			if (
 				!IsYPTerracingBlocked &&  // A block above us blocks all YP terracing, so the check is static in the loop
-				(Adjacent.y < (cChunkDef::Height - 1)) &&
+				(Adjacent.y < (cChunkDef::UpperLimit - 1)) &&
 				(NeighbourChunk->GetBlock(Adjacent + OffsetYP) == E_BLOCK_REDSTONE_WIRE)  // Only terrace YP with another wire
 			)
 			{
@@ -173,7 +173,7 @@ namespace RedstoneWireHandler
 			if (
 				// IsYMTerracingBlocked (i.e. check block above lower terracing position, a.k.a. just the plain adjacent)
 				(!cBlockInfo::IsSolid(LateralBlock) || cBlockInfo::IsTransparent(LateralBlock)) &&
-				(Adjacent.y > cChunkDef::BottomHeight) &&
+				(Adjacent.y > cChunkDef::LowerLimit) &&
 				(NeighbourChunk->GetBlock(Adjacent + OffsetYM) == E_BLOCK_REDSTONE_WIRE)  // Only terrace YM with another wire
 			)
 			{

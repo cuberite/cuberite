@@ -52,7 +52,7 @@ public:
 			return false;
 		}
 
-		/** Called when the path goes out of world, either below (a_BlockPos.y < cChunkDef::BottomHeight) or above (a_BlockPos.y >= cChunkDef::Height)
+		/** Called when the path goes out of world, either below (a_BlockPos.y < cChunkDef::LowerLimit) or above (a_BlockPos.y >= cChunkDef::UpperLimit)
 		The coords specify the exact point at which the path exited the world.
 		If this callback returns true, the tracing is aborted.
 		Note that some paths can go out of the world and come back again (parabola),
@@ -64,7 +64,7 @@ public:
 			return false;
 		}
 
-		/** Called when the path goes into the world, from either below (a_BlockPos.y < cChunkDef::BottomHeight) or above (a_BlockPos.y >= cChunkDef::Height)
+		/** Called when the path goes into the world, from either below (a_BlockPos.y < cChunkDef::LowerLimit) or above (a_BlockPos.y >= cChunkDef::UpperLimit)
 		The coords specify the exact point at which the path entered the world.
 		If this callback returns true, the tracing is aborted.
 		Note that some paths can go out of the world and come back again (parabola),

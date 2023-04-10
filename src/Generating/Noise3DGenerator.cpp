@@ -216,9 +216,9 @@ void cNoise3DGenerator::Generate(cChunkDesc & a_ChunkDesc)
 	// Output noise into chunk:
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
-		for (int y = cChunkDef::BottomHeight; y < cChunkDef::Height; y++)
+		for (int y = cChunkDef::LowerLimit; y < cChunkDef::UpperLimit; y++)
 		{
-			int idx = z * (cChunkDef::Width + 1) * cChunkDef::Height + 1 + y * (cChunkDef::Width + 1);
+			int idx = z * (cChunkDef::Width + 1) * cChunkDef::UpperLimit + 1 + y * (cChunkDef::Width + 1);
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
 				NOISE_DATATYPE n = Noise[idx++];
@@ -302,7 +302,7 @@ void cNoise3DGenerator::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 		{
 			int LastAir = a_ChunkDesc.GetHeight(x, z) + 1;
 			bool HasHadWater = false;
-			for (int y = LastAir - 1; y > cChunkDef::BottomHeight; y--)
+			for (int y = LastAir - 1; y > cChunkDef::LowerLimit; y--)
 			{
 				switch (a_ChunkDesc.GetBlockType(x, y, z))
 				{
@@ -491,7 +491,7 @@ void cNoise3DComposable::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape 
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			for (int y = 0; y < cChunkDef::Height; y++)
+			for (int y = 0; y < cChunkDef::UpperLimit; y++)
 			{
 				a_Shape[y + x * 256 + z * 256 * 16] = (m_NoiseArray[y + 257 * x + 257 * 17 * z] > m_AirThreshold) ? 0 : 1;
 			}
@@ -784,7 +784,7 @@ void cBiomalNoise3DComposable::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			for (int y = 0; y < cChunkDef::Height; y++)
+			for (int y = 0; y < cChunkDef::UpperLimit; y++)
 			{
 				a_Shape[y + x * 256 + z * 256 * 16] = (m_NoiseArray[y + 257 * x + 257 * 17 * z] > m_AirThreshold) ? 0 : 1;
 			}

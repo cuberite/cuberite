@@ -535,6 +535,36 @@ return
 				},
 			},
 		},
+		cChunkDef =
+		{
+			Desc = [[
+				This class contains constants and functions that are useful for dealing with chunks. The constants
+				are mostly used for specifying chunk coordinate ranges.
+			]],
+			Constants =
+			{
+				Width =
+				{
+					Notes = "The width of a chunk, in number of blocks.",
+				},
+				LowerLimit =
+				{
+					Notes = "The lower limit of the chunk coordinate vertical range.",
+				},
+				UpperLimit =
+				{
+					Notes = "The upper limit of the chunk coordinate vertical range.",
+				},
+				VerticalBlockCount =
+				{
+					Notes = "The number of blocks in the vertical direction in a chunk.",
+				},
+				NumBlocks =
+				{
+					Notes = "The total number of blocks in a chunk.",
+				},
+			},
+		},
 		cChunkDesc =
 		{
 			Desc = [[

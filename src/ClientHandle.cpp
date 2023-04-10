@@ -61,7 +61,7 @@ int cClientHandle::s_ClientCount = 0;
 
 float cClientHandle::FASTBREAK_PERCENTAGE;
 
-Vector3i cClientHandle::s_IllegalPosition = {0, cChunkDef::Height + 1, 0};
+Vector3i cClientHandle::s_IllegalPosition = {0, cChunkDef::UpperLimit + 1, 0};
 
 
 

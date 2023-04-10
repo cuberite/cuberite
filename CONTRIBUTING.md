@@ -53,7 +53,7 @@ Here are the conventions:
    - `dimNether`, `dimOverworld` and `dimEnd` for world dimension.
    - `gmSurvival`, `gmCreative`, `gmAdventure` for game modes.
    - `wSunny`, `wRain`, `wThunderstorm` for weather.
-   - `cChunkDef::Width`, `cChunkDef::Height` for chunk dimensions (C++).
+   - `cChunkDef::Width`, `cChunkDef::UpperLimit` for chunk dimensions (C++).
    - etc.
  - Instead of checking for a specific value, use an `IsXXX` function, if available:
    - `cPlayer:IsGameModeCreative()` instead of` (cPlayer:GetGameMode() == gmCreative)` (the player can also inherit the gamemode from the world, which the value-d condition doesn't catch).

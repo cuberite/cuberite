@@ -74,7 +74,7 @@ private:
 			return 0;
 		}
 
-		for (int newY = Y + 1; newY < cChunkDef::Height; newY++)
+		for (int newY = Y + 1; newY < cChunkDef::UpperLimit; newY++)
 		{
 			BLOCKTYPE Block = a_ChunkInterface.GetBlock({X, newY, Z});
 			if ((Block == E_BLOCK_AIR) || (Block == E_BLOCK_FIRE))

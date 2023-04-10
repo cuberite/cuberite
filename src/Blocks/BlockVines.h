@@ -119,7 +119,7 @@ private:
 		}
 
 		// Check if vine above us, add its meta to MaxMeta:
-		if ((a_Position.y < cChunkDef::Height - 1) && (a_Chunk.GetBlock(a_Position.addedY(1)) == E_BLOCK_VINES))
+		if ((a_Position.y < cChunkDef::UpperLimit - 1) && (a_Chunk.GetBlock(a_Position.addedY(1)) == E_BLOCK_VINES))
 		{
 			MaxMeta |= a_Chunk.GetMeta(a_Position.addedY(1));
 		}
@@ -127,7 +127,7 @@ private:
 		NIBBLETYPE Common = a_CurrentMeta & MaxMeta;  // Neighbors that we have and are legal.
 		if (Common != a_CurrentMeta)
 		{
-			bool HasTop = (a_Position.y < (cChunkDef::Height - 1)) && IsBlockAttachable(a_Chunk.GetBlock(a_Position.addedY(1)));
+			bool HasTop = (a_Position.y < (cChunkDef::UpperLimit - 1)) && IsBlockAttachable(a_Chunk.GetBlock(a_Position.addedY(1)));
 			if ((Common == 0) && !HasTop)  // Meta equals 0 also means top. Make a last-ditch attempt to save the vine.
 			{
 				return VINE_LOST_SUPPORT;

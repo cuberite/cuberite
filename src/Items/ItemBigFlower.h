@@ -20,7 +20,7 @@ public:
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		// Needs at least two free blocks to build in:
-		if (a_PlacePosition.y >= (cChunkDef::Height - 1))
+		if (a_PlacePosition.y >= (cChunkDef::UpperLimit - 1))
 		{
 			return false;
 		}

@@ -360,7 +360,7 @@ void cStructGenRavines::cRavine::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
 			int DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
 			if (DistSq <= RadiusSq)
 			{
-				int Top = std::min(itr->m_Top, static_cast<int>(cChunkDef::Height));  // Stupid gcc needs int cast
+				int Top = std::min(itr->m_Top, static_cast<int>(cChunkDef::UpperLimit));  // Stupid gcc needs int cast
 				for (int y = std::max(itr->m_Bottom, 1); y <= Top; y++)
 				{
 					switch (a_ChunkDesc.GetBlockType(x, y, z))

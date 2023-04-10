@@ -92,7 +92,7 @@ private:
 		// Check the total height of the sugarcane blocks here:
 		int top = a_RelPos.y + 1;
 		while (
-			(top < cChunkDef::Height) &&
+			(top < cChunkDef::UpperLimit) &&
 			(a_Chunk.GetBlock({a_RelPos.x, top, a_RelPos.z}) == E_BLOCK_SUGARCANE)
 		)
 		{
@@ -127,7 +127,7 @@ private:
 	virtual PlantAction CanGrow(cChunk & a_Chunk, Vector3i a_RelPos) const override
 	{
 		// Only allow growing if there's an air block above:
-		if (((a_RelPos.y + 1) < cChunkDef::Height) && (a_Chunk.GetBlock(a_RelPos.addedY(1)) == E_BLOCK_AIR))
+		if (((a_RelPos.y + 1) < cChunkDef::UpperLimit) && (a_Chunk.GetBlock(a_RelPos.addedY(1)) == E_BLOCK_AIR))
 		{
 			return Super::CanGrow(a_Chunk, a_RelPos);
 		}

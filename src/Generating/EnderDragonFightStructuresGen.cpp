@@ -90,7 +90,7 @@ void cEnderDragonFightStructuresGen::Init(const AString & a_TowerProperties, int
 			LOGWARNING("Got unknown parameters on generating obsidian pillars: %s, Please use \"Height|Radius|HasCage\"; ...", TowerProperty);
 			continue;
 		}
-		int Height = std::min(std::stoi(TowerPropertyVector[0]), cChunkDef::Height - 2);  // The highest block placed is two blocks above the given height (the cage above some towers)
+		int Height = std::min(std::stoi(TowerPropertyVector[0]), cChunkDef::UpperLimit - 2);  // The highest block placed is two blocks above the given height (the cage above some towers)
 		int Radius = std::stoi(TowerPropertyVector[1]);
 		bool HasCage;
 		if (NoCaseCompare(TowerPropertyVector[2], "true") == 0)

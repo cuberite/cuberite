@@ -56,7 +56,7 @@ void cFinishGenNetherClumpFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 	int PosX = Val1 % 16;
 	int PosZ = Val2 % 16;
 
-	for (int y = 1; y < cChunkDef::Height; y++)
+	for (int y = 1; y < cChunkDef::UpperLimit; y++)
 	{
 		if (a_ChunkDesc.GetBlockType(PosX, y, PosZ) != E_BLOCK_AIR)
 		{
@@ -124,9 +124,9 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 	}
 
 	int MaxY = a_RelY + 2;
-	if (MaxY > cChunkDef::Height)  // Check if the coordinate is outside the chunk. If it it then adjust it.
+	if (MaxY > cChunkDef::UpperLimit)  // Check if the coordinate is outside the chunk. If it it then adjust it.
 	{
-		MaxY = cChunkDef::Height;
+		MaxY = cChunkDef::UpperLimit;
 	}
 
 	for (int x = MinX; x < MaxX; x++)
@@ -139,7 +139,7 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 			{
 				if (
 					((x < 0) || (x >= cChunkDef::Width)) ||
-					((y < 0) || (y >= cChunkDef::Height)) ||
+					((y < 0) || (y >= cChunkDef::UpperLimit)) ||
 					((z < 0) || (z >= cChunkDef::Width))
 					)
 				{
@@ -253,7 +253,7 @@ void cFinishGenClumpTopBlock::TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int
 		int Top = a_ChunkDesc.GetHeight(x, z);
 
 		// Doesn't place if the blocks can't be placed. Checked value also depends on a_IsDoubleTall
-		if (Top + 1 + (a_IsDoubleTall ? 1 : 0) >= cChunkDef::Height)
+		if (Top + 1 + (a_IsDoubleTall ? 1 : 0) >= cChunkDef::UpperLimit)
 		{
 			continue;
 		}
@@ -537,7 +537,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			// Get the top block + 1. This is the place where the grass would finaly be placed:
 			int y = a_ChunkDesc.GetHeight(x, z) + 1;
 
-			if (y >= cChunkDef::Height - 1)
+			if (y >= cChunkDef::UpperLimit - 1)
 			{
 				continue;
 			}
@@ -843,9 +843,9 @@ bool cFinishGenSprinkleFoliage::TryAddCactus(cChunkDesc & a_ChunkDesc, int a_Rel
 	int CactusHeight = 1 + (m_Noise.IntNoise2DInt(a_RelX, a_RelZ) % m_MaxCactusHeight);
 
 	// We'll be doing comparison with blocks above, so the coords should be 1 block away from chunk top
-	if (a_RelY + CactusHeight >= cChunkDef::Height - 1)
+	if (a_RelY + CactusHeight >= cChunkDef::UpperLimit - 1)
 	{
-		CactusHeight = cChunkDef::Height - a_RelY - 1;
+		CactusHeight = cChunkDef::UpperLimit - a_RelY - 1;
 	}
 
 	// We'll be doing comparison to neighbors, so require the coords to be 1 block away from the chunk edges:
@@ -903,9 +903,9 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_
 	}
 
 	// We'll be doing comparison with blocks above, so the coords should be 1 block away from chunk top
-	if (a_RelY + SugarcaneHeight >= cChunkDef::Height - 1)
+	if (a_RelY + SugarcaneHeight >= cChunkDef::UpperLimit - 1)
 	{
-		SugarcaneHeight = cChunkDef::Height - a_RelY - 1;
+		SugarcaneHeight = cChunkDef::UpperLimit - a_RelY - 1;
 	}
 
 	// We'll be doing comparison to neighbors, so require the coords to be 1 block away from the chunk edges:
@@ -1098,7 +1098,7 @@ void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
 				continue;
 			}
 
-			if (!cBlockInfo::IsSnowable(a_ChunkDesc.GetBlockType(x, Height, z)) || (Height >= cChunkDef::Height - 1))
+			if (!cBlockInfo::IsSnowable(a_ChunkDesc.GetBlockType(x, Height, z)) || (Height >= cChunkDef::UpperLimit - 1))
 			{
 				// The top block can't be snown over.
 				continue;
@@ -1191,7 +1191,7 @@ void cFinishGenSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 		}
 
 		HEIGHTTYPE Height = a_ChunkDesc.GetHeight(x, z);
-		if (Height >= cChunkDef::Height - 1)
+		if (Height >= cChunkDef::UpperLimit - 1)
 		{
 			// Too high up
 			continue;
@@ -1223,7 +1223,7 @@ void cFinishGenSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	cChunkDef::BlockTypes & BlockTypes = a_ChunkDesc.GetBlockTypes();
-	for (int y = m_Level; y > cChunkDef::BottomHeight; y--)
+	for (int y = m_Level; y > cChunkDef::LowerLimit; y--)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{
@@ -1286,7 +1286,7 @@ void cFinishGenPreSimulator::CollapseSandGravel(cChunkDesc & a_ChunkDesc)
 		{
 			int LastY = -1;
 			int HeightY = 0;
-			for (int y = 0; y < cChunkDef::Height; y++)
+			for (int y = 0; y < cChunkDef::UpperLimit; y++)
 			{
 				BLOCKTYPE Block = a_ChunkDesc.GetBlockType(x, y, z);
 				switch (Block)
@@ -1391,7 +1391,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 	}  // for z
 
 	// Turn fluid at the chunk edges into non-stationary fluid:
-	for (int y = 0; y < cChunkDef::Height; y++)
+	for (int y = 0; y < cChunkDef::UpperLimit; y++)
 	{
 		for (int i = 0; i < cChunkDef::Width; i++)  // i stands for both x and z here
 		{
@@ -1424,7 +1424,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 
 cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, eDimension a_Dimension) :
 	m_Noise(a_Seed + a_Fluid * 100),  // Need to take fluid into account, otherwise water and lava springs generate next to each other
-	m_HeightDistribution(cChunkDef::Height - 1),
+	m_HeightDistribution(cChunkDef::UpperLimit - 1),
 	m_Fluid(a_Fluid)
 {
 	bool IsWater = (a_Fluid == E_BLOCK_WATER);
@@ -1647,7 +1647,7 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 
 bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, eMonsterType AnimalToSpawn)
 {
-	if ((a_RelY >= cChunkDef::Height - 1) || (a_RelY <= 0))
+	if ((a_RelY >= cChunkDef::UpperLimit - 1) || (a_RelY <= 0))
 	{
 		return false;
 	}
@@ -2174,7 +2174,7 @@ void cFinishGenOrePockets::imprintSphere(
 	int minY = std::max(FloorC(a_SphereY - a_Radius), 0);
 	int minZ = std::max(FloorC(a_SphereZ - a_Radius), baseZ);
 	int maxX = std::min(CeilC(a_SphereX + a_Radius), baseX + cChunkDef::Width - 1);
-	int maxY = std::min(CeilC(a_SphereY + a_Radius), cChunkDef::Height - 1);
+	int maxY = std::min(CeilC(a_SphereY + a_Radius), cChunkDef::UpperLimit - 1);
 	int maxZ = std::min(CeilC(a_SphereZ + a_Radius), baseZ + cChunkDef::Width - 1);
 
 	/*
@@ -2184,7 +2184,7 @@ void cFinishGenOrePockets::imprintSphere(
 	int blockZ = FloorC(a_SphereZ);
 	if (
 		(blockX >= baseX) && (blockX < baseX + cChunkDef::Width) &&
-		(blockY >= 0) && (blockY < cChunkDef::Height) &&
+		(blockY >= 0) && (blockY < cChunkDef::UpperLimit) &&
 		(blockZ >= baseZ) && (blockZ < baseZ + cChunkDef::Width)
 	)
 	{
@@ -2255,7 +2255,7 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 		0,
 		m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % cChunkDef::Width
 		);
-	Pos.y = a_ChunkDesc.GetHeight(Pos.x, Pos.z) % cChunkDef::Height;
+	Pos.y = a_ChunkDesc.GetHeight(Pos.x, Pos.z) % cChunkDef::UpperLimit;
 
 	auto Biome = a_ChunkDesc.GetBiome(Pos.x, Pos.z);
 	if ((Biome != biMegaTaiga) && (Biome != biMegaTaigaHills))
@@ -2294,7 +2294,7 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 	Pos.y -= Radius - 1;
-	// Pos.y = Clamp(Pos.y - m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % Radius + 1, 0, cChunkDef::Height);
+	// Pos.y = Clamp(Pos.y - m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % Radius + 1, 0, cChunkDef::UpperLimit);
 
 	for (int x = -Radius; x <= Radius; x++)
 	{

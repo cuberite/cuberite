@@ -139,7 +139,7 @@ bool cBeaconEntity::SetSecondaryEffect(cEntityEffect::eType a_Effect)
 
 bool cBeaconEntity::IsBeaconBlocked(void)
 {
-	for (int Y = m_Pos.y; Y < cChunkDef::Height; ++Y)
+	for (int Y = m_Pos.y; Y < cChunkDef::UpperLimit; ++Y)
 	{
 		BLOCKTYPE Block = m_World->GetBlock({m_Pos.x, Y, m_Pos.z});
 		if (!cBlockInfo::IsTransparent(Block))
@@ -234,7 +234,7 @@ void cBeaconEntity::GiveEffects(void)
 
 	bool HasSecondaryEffect = (m_BeaconLevel >= 4) && (m_PrimaryEffect != m_SecondaryEffect) && (m_SecondaryEffect > 0);
 
-	auto Area = cBoundingBox(m_Pos, Radius, Radius + static_cast<double>(cChunkDef::Height), -Radius);
+	auto Area = cBoundingBox(m_Pos, Radius, Radius + static_cast<double>(cChunkDef::UpperLimit), -Radius);
 	GetWorld()->ForEachEntityInBox(Area, [&](cEntity & a_Entity)
 	{
 		if (!a_Entity.IsPlayer())

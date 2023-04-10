@@ -107,7 +107,7 @@ void cSimulatorManager::WakeUp(const cCuboid & a_Area)
 	cCuboid area(a_Area);
 	area.Sort();
 	area.Expand(1, 1, 1, 1, 1, 1);  // Expand the area to contain the neighbors, too.
-	area.ClampY(0, cChunkDef::Height - 1);
+	area.ClampY(0, cChunkDef::UpperLimit - 1);
 
 	cChunkCoords ChunkStart = cChunkDef::BlockToChunk(area.p1);
 	cChunkCoords ChunkEnd = cChunkDef::BlockToChunk(area.p2);

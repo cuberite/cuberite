@@ -234,7 +234,7 @@ void cSandSimulator::FinishFalling(
 	BLOCKTYPE a_FallingBlockType, NIBBLETYPE a_FallingBlockMeta
 )
 {
-	ASSERT(a_BlockY < cChunkDef::Height);
+	ASSERT(a_BlockY < cChunkDef::UpperLimit);
 
 	BLOCKTYPE CurrentBlockType = a_World->GetBlock({ a_BlockX, a_BlockY, a_BlockZ });
 	if ((a_FallingBlockType == E_BLOCK_ANVIL) || IsReplacedOnRematerialization(CurrentBlockType))

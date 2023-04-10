@@ -51,7 +51,7 @@ void cEnderChestEntity::OnRemoveFromWorld()
 bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 {
 	if (
-		(GetPosY() < cChunkDef::Height - 1) &&
+		(GetPosY() < cChunkDef::UpperLimit - 1) &&
 		(
 			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPos().addedY(1))) ||
 			!cOcelot::IsCatSittingOnBlock(GetWorld(), Vector3d(GetPos()))

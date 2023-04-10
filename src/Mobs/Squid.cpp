@@ -42,7 +42,7 @@ void cSquid::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	// TODO: Not a real behavior, but cool :D
 	int RelY = FloorC(Pos.y);
-	if ((RelY < cChunkDef::BottomHeight) || (RelY >= cChunkDef::Height))
+	if ((RelY < cChunkDef::LowerLimit) || (RelY >= cChunkDef::UpperLimit))
 	{
 		return;
 	}

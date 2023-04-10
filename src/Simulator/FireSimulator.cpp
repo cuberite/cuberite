@@ -97,7 +97,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			continue;
 		}
 
-		auto BurnsForever = ((relPos.y > cChunkDef::BottomHeight) && DoesBurnForever(a_Chunk->GetBlock(relPos.addedY(-1))));
+		auto BurnsForever = ((relPos.y > cChunkDef::LowerLimit) && DoesBurnForever(a_Chunk->GetBlock(relPos.addedY(-1))));
 		auto BlockMeta = a_Chunk->GetMeta(relPos);
 
 		auto Raining = std::any_of(std::begin(gCrossCoords), std::end(gCrossCoords), [a_Chunk, relPos](Vector3i cc)
@@ -272,7 +272,7 @@ void cFireSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a
 int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, Vector3i a_RelPos)
 {
 	bool IsBlockBelowSolid = false;
-	if (a_RelPos.y > cChunkDef::BottomHeight)
+	if (a_RelPos.y > cChunkDef::LowerLimit)
 	{
 		BLOCKTYPE BlockBelow = a_Chunk->GetBlock(a_RelPos.addedY(-1));
 		if (DoesBurnForever(BlockBelow))

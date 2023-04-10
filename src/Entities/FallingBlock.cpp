@@ -51,7 +51,7 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (BlockY >= cChunkDef::Height)
+	if (BlockY >= cChunkDef::UpperLimit)
 	{
 		// Above the world, just wait for it to fall back down
 		return;
@@ -79,7 +79,7 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		);
 		*/
 
-		if (BlockY < cChunkDef::Height - 1)
+		if (BlockY < cChunkDef::UpperLimit - 1)
 		{
 			cSandSimulator::FinishFalling(m_World, BlockX, BlockY + 1, BlockZ, m_BlockType, m_BlockMeta);
 		}

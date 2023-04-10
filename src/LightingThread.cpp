@@ -261,7 +261,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	{
 		for (int z = 0; z < cChunkDef::Width * 3; z++)
 		{
-			for (int y = cChunkDef::Height / 2; y >= 0; y--)
+			for (int y = cChunkDef::UpperLimit / 2; y >= 0; y--)
 			{
 				unsigned char Seeds     [cChunkDef::Width * 3];
 				memcpy(Seeds, m_BlockTypes + y * BlocksPerYLayer + z * cChunkDef::Width * 3, cChunkDef::Width * 3);
@@ -292,7 +292,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	{
 		for (int z = 0; z < cChunkDef::Width * 3; z++)
 		{
-			for (int y = cChunkDef::Height / 2; y >= 0; y--)
+			for (int y = cChunkDef::UpperLimit / 2; y >= 0; y--)
 			{
 				f1.Write(m_BlockTypes + y * BlocksPerYLayer + z * cChunkDef::Width * 3, cChunkDef::Width * 3);
 				unsigned char SkyLight  [cChunkDef::Width * 3];
@@ -357,7 +357,7 @@ void cLightingThread::PrepareSkyLight(void)
 	m_NumSeeds = 0;
 
 	// Fill the top of the chunk with all-light:
-	if (m_MaxHeight < cChunkDef::Height - 1)
+	if (m_MaxHeight < cChunkDef::UpperLimit - 1)
 	{
 		std::fill(m_SkyLight + (m_MaxHeight + 1) * BlocksPerYLayer, m_SkyLight + ARRAYCOUNT(m_SkyLight), static_cast<NIBBLETYPE>(15));
 	}
@@ -371,7 +371,7 @@ void cLightingThread::PrepareSkyLight(void)
 			int idx = BaseZ + x;
 			// Find the lowest block in this column that receives full sunlight (go through transparent blocks):
 			int Current = m_HeightMap[idx];
-			ASSERT(Current < cChunkDef::Height);
+			ASSERT(Current < cChunkDef::UpperLimit);
 			while (
 				(Current >= 0) &&
 				cBlockInfo::IsTransparent(m_BlockTypes[idx + Current * BlocksPerYLayer]) &&
@@ -395,7 +395,7 @@ void cLightingThread::PrepareSkyLight(void)
 			}
 
 			// Add Current as a seed:
-			if (Current < cChunkDef::Height)
+			if (Current < cChunkDef::UpperLimit)
 			{
 				int CurrentIdx = idx + Current * BlocksPerYLayer;
 				m_IsSeed1[CurrentIdx] = true;
@@ -501,7 +501,7 @@ void cLightingThread::CalcLightStep(
 		{
 			PropagateLight(a_Light, SeedIdx, SeedIdx - cChunkDef::Width * 3, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}
-		if (SeedIdx < (cChunkDef::Height - 1) * BlocksPerYLayer)
+		if (SeedIdx < (cChunkDef::UpperLimit - 1) * BlocksPerYLayer)
 		{
 			PropagateLight(a_Light, SeedIdx, SeedIdx + BlocksPerYLayer, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}
@@ -521,7 +521,7 @@ void cLightingThread::CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_Ch
 {
 	int InIdx = cChunkDef::Width * 49;  // Index to the first nibble of the middle chunk in the a_LightArray
 	int OutIdx = 0;
-	for (int y = cChunkDef::BottomHeight; y < cChunkDef::Height; y++)
+	for (int y = cChunkDef::LowerLimit; y < cChunkDef::UpperLimit; y++)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{

@@ -31,7 +31,7 @@ public:
 		eBlockFace a_ClickedBlockFace
 	) const override
 	{
-		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockPos.y >= cChunkDef::Height))
+		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockPos.y >= cChunkDef::UpperLimit))
 		{
 			return false;
 		}

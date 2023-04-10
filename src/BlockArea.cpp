@@ -343,7 +343,7 @@ void cBlockArea::Create(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 	ASSERT(IsValidDataTypeCombination(a_DataTypes));
 
 	// Warn if the height is too much, but proceed with the creation:
-	if (a_SizeY > cChunkDef::Height)
+	if (a_SizeY > cChunkDef::UpperLimit)
 	{
 		LOGWARNING("Creating a cBlockArea with height larger than world height (%d). Continuing, but the area may misbehave.", a_SizeY);
 	}

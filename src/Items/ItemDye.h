@@ -377,7 +377,7 @@ public:
 			if (Planter == GrowDoubleTallGrass)
 			{
 				const auto TwoAbove = Position.addedY(2);
-				if ((TwoAbove.y >= cChunkDef::Height) || (a_World.GetBlock(TwoAbove) != E_BLOCK_AIR))
+				if ((TwoAbove.y >= cChunkDef::UpperLimit) || (a_World.GetBlock(TwoAbove) != E_BLOCK_AIR))
 				{
 					// Insufficient space for tall grass:
 					continue;
@@ -385,7 +385,7 @@ public:
 			}
 
 			const auto PlantBase = Position.addedY(1);
-			if ((PlantBase.y >= cChunkDef::Height) || (a_World.GetBlock(PlantBase) != E_BLOCK_AIR))
+			if ((PlantBase.y >= cChunkDef::UpperLimit) || (a_World.GetBlock(PlantBase) != E_BLOCK_AIR))
 			{
 				// Insufficient space:
 				continue;

@@ -70,7 +70,7 @@ private:
 	/** Growing a tall grass produces a big flower (2-block high fern or double-tall grass). */
 	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
-		if (a_RelPos.y > (cChunkDef::Height - 2))
+		if (a_RelPos.y > (cChunkDef::UpperLimit - 2))
 		{
 			return 0;
 		}

@@ -159,7 +159,7 @@ private:
 		}
 
 		// Don't care about anything if we're at the top of the world:
-		if (a_BlockPos.y >= cChunkDef::Height)
+		if (a_BlockPos.y >= cChunkDef::UpperLimit)
 		{
 			return;
 		}

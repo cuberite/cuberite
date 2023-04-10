@@ -86,7 +86,7 @@ protected:
 	float m_Roughness;
 
 	/** Number to add to the radius based on the height. This creates the "ledges" in the ravine walls. */
-	float m_PerHeightRadius[cChunkDef::Height];
+	float m_PerHeightRadius[cChunkDef::UpperLimit];
 
 
 	/** Recursively subdivides the line between the points of the specified index.
@@ -134,16 +134,16 @@ protected:
 	void InitPerHeightRadius(int a_GridX, int a_GridZ)
 	{
 		int h = 0;
-		while (h < cChunkDef::Height)
+		while (h < cChunkDef::UpperLimit)
 		{
 			m_Noise.SetSeed(m_Seed + h);
 			int rnd = m_Noise.IntNoise2DInt(a_GridX, a_GridZ) / 13;
 			int NumBlocks = (rnd % 3) + 2;
 			rnd = rnd / 4;
 			float Val = static_cast<float>(rnd % 256) / 128.0f - 1.0f;  // Random float in range [-1, +1]
-			if (h + NumBlocks > cChunkDef::Height)
+			if (h + NumBlocks > cChunkDef::UpperLimit)
 			{
-				NumBlocks = cChunkDef::Height - h;
+				NumBlocks = cChunkDef::UpperLimit - h;
 			}
 			for (int i = 0; i < NumBlocks; i++)
 			{
@@ -196,7 +196,7 @@ protected:
 					continue;
 				}
 
-				int Top = std::min(CeilC(itr->m_Top), +cChunkDef::Height);
+				int Top = std::min(CeilC(itr->m_Top), +cChunkDef::UpperLimit);
 				for (int y = std::max(FloorC(itr->m_Bottom), 1); y <= Top; y++)
 				{
 					if ((itr->m_Radius + m_PerHeightRadius[y]) * (itr->m_Radius + m_PerHeightRadius[y]) < DistSq)

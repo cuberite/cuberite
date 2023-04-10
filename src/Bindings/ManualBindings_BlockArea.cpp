@@ -792,11 +792,11 @@ static int tolua_cBlockArea_Write(lua_State * a_LuaState)
 		L.LogStackTrace();
 		coords.y = 0;
 	}
-	else if (coords.y > cChunkDef::Height - self->GetSizeY())
+	else if (coords.y > cChunkDef::UpperLimit - self->GetSizeY())
 	{
 		LOGWARNING("cBlockArea:Write(): MinBlockY + m_SizeY more than chunk height, adjusting to chunk height");
 		L.LogStackTrace();
-		coords.y = cChunkDef::Height - self->GetSizeY();
+		coords.y = cChunkDef::UpperLimit - self->GetSizeY();
 	}
 
 	// Do the actual write:

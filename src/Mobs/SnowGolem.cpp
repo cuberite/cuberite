@@ -49,7 +49,7 @@ void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		TakeDamage(dtEnvironment, nullptr, GetRawDamageAgainst(*this), GetKnockbackAmountAgainst(*this));
 	}
-	else if (const auto Below = Rel.addedY(-1); Below.y >= cChunkDef::BottomHeight)
+	else if (const auto Below = Rel.addedY(-1); Below.y >= cChunkDef::LowerLimit)
 	{
 		if ((Chunk->GetBlock(Rel) == E_BLOCK_AIR) && cBlockInfo::IsSolid(Chunk->GetBlock(Below)))
 		{

@@ -292,7 +292,7 @@ cDungeonRoomsFinisher::cDungeonRoomsFinisher(cTerrainShapeGen & a_ShapeGen, int 
 	m_ShapeGen(a_ShapeGen),
 	m_MaxHalfSize((a_MaxSize + 1) / 2),
 	m_MinHalfSize((a_MinSize + 1) / 2),
-	m_HeightProbability(cChunkDef::Height)
+	m_HeightProbability(cChunkDef::UpperLimit)
 {
 	// Initialize the height probability distribution:
 	m_HeightProbability.SetDefString(a_HeightDistrib);
@@ -325,7 +325,7 @@ cDungeonRoomsFinisher::cStructurePtr cDungeonRoomsFinisher::CreateStructure(int 
 	m_ShapeGen.GenShape({ChunkX, ChunkZ}, shape);
 	int height = 0;
 	int idx = RelX * 256 + RelZ * 16 * 256;
-	for (int y = 6; y < cChunkDef::Height; y++)
+	for (int y = 6; y < cChunkDef::UpperLimit; y++)
 	{
 		if (shape[idx + y] != 0)
 		{

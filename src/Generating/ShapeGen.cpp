@@ -47,7 +47,7 @@ public:
 				{
 					shapeColumn[y] = 1;
 				}
-				for (int y = height; y < cChunkDef::Height; y++)
+				for (int y = height; y < cChunkDef::UpperLimit; y++)
 				{
 					shapeColumn[y] = 0;
 				}

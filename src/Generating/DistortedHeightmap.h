@@ -31,7 +31,7 @@ public:
 protected:
 	typedef cChunkDef::BiomeMap BiomeNeighbors[3][3];
 
-	// Linear upscaling step sizes, must be divisors of cChunkDef::Width and cChunkDef::Height, respectively:
+	// Linear upscaling step sizes, must be divisors of cChunkDef::Width and cChunkDef::UpperLimit, respectively:
 	static const int INTERPOL_X = 8;
 	static const int INTERPOL_Y = 4;
 	static const int INTERPOL_Z = 8;

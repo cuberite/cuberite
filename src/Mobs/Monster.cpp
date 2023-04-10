@@ -542,11 +542,11 @@ void cMonster::HandleFalling()
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
 	auto Position = GetPosition().Floor();
-	Position.y = Clamp(Position.y, cChunkDef::BottomHeight, cChunkDef::Height);
+	Position.y = Clamp(Position.y, cChunkDef::LowerLimit, cChunkDef::UpperLimit);
 
 	if (!cBlockInfo::IsSolid(m_World->GetBlock(Position)))
 	{
-		while (!cBlockInfo::IsSolid(m_World->GetBlock(Position)) && (Position.y > cChunkDef::BottomHeight))
+		while (!cBlockInfo::IsSolid(m_World->GetBlock(Position)) && (Position.y > cChunkDef::LowerLimit))
 		{
 			Position.y--;
 		}
@@ -555,7 +555,7 @@ int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 	}
 	else
 	{
-		while ((Position.y < cChunkDef::Height) && cBlockInfo::IsSolid(m_World->GetBlock(Position)))
+		while ((Position.y < cChunkDef::UpperLimit) && cBlockInfo::IsSolid(m_World->GetBlock(Position)))
 		{
 			Position.y++;
 		}
@@ -1619,7 +1619,7 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn)
 	}
 
 	int RelY = POSY_TOINT;
-	if ((RelY < cChunkDef::BottomHeight) || (RelY >= cChunkDef::Height))
+	if ((RelY < cChunkDef::LowerLimit) || (RelY >= cChunkDef::UpperLimit))
 	{
 		// Outside the world
 		return;
@@ -1645,7 +1645,7 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 {
 	// If the Y coord is out of range, return the most logical result without considering anything else:
 	int RelY = FloorC(a_Location.y);
-	if (RelY >= cChunkDef::Height)
+	if (RelY >= cChunkDef::UpperLimit)
 	{
 		// Always burn above the world
 		return true;
@@ -1670,7 +1670,7 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 	)
 	{
 		int MobHeight = CeilC(a_Location.y + GetHeight()) - 1;  // The block Y coord of the mob's head
-		if (MobHeight >= cChunkDef::Height)
+		if (MobHeight >= cChunkDef::UpperLimit)
 		{
 			return true;
 		}

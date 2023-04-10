@@ -150,7 +150,7 @@ void cHopperEntity::OpenNewWindow(void)
 
 bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, const cTickTimeLong a_CurrentTick)
 {
-	if (m_Pos.y >= cChunkDef::Height)
+	if (m_Pos.y >= cChunkDef::UpperLimit)
 	{
 		// This hopper is at the top of the world, no more blocks above
 		return false;

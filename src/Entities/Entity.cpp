@@ -1011,7 +1011,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	Vector3d NextPos = Vector3d(GetPosX(), GetPosY(), GetPosZ());
 	Vector3d NextSpeed = Vector3d(GetSpeedX(), GetSpeedY(), GetSpeedZ());
 
-	if ((BlockY >= cChunkDef::Height) || (BlockY < cChunkDef::BottomHeight))
+	if ((BlockY >= cChunkDef::UpperLimit) || (BlockY < cChunkDef::LowerLimit))
 	{
 		// Outside of the world
 		AddSpeedY(m_Gravity * DtSec.count());
@@ -1022,7 +1022,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
 	int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
 	BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ);
-	BLOCKTYPE BlockBelow = (BlockY > cChunkDef::BottomHeight) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
+	BLOCKTYPE BlockBelow = (BlockY > cChunkDef::LowerLimit) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
 	if (!cBlockInfo::IsSolid(BlockIn))  // Making sure we are not inside a solid block
 	{
 		if (m_bOnGround)  // check if it's still on the ground
@@ -1365,8 +1365,8 @@ void cEntity::DetectCacti(void)
 	int MaxX = FloorC(GetPosX() + m_Width / 2);
 	int MinZ = FloorC(GetPosZ() - m_Width / 2);
 	int MaxZ = FloorC(GetPosZ() + m_Width / 2);
-	int MinY = Clamp(POSY_TOINT, 0, cChunkDef::Height - 1);
-	int MaxY = Clamp(FloorC(GetPosY() + m_Height), 0, cChunkDef::Height - 1);
+	int MinY = Clamp(POSY_TOINT, 0, cChunkDef::UpperLimit - 1);
+	int MaxY = Clamp(FloorC(GetPosY() + m_Height), 0, cChunkDef::UpperLimit - 1);
 
 	for (int x = MinX; x <= MaxX; x++)
 	{
@@ -1394,8 +1394,8 @@ void cEntity::DetectMagma(void)
 	int MaxX = FloorC(GetPosX() + m_Width / 2);
 	int MinZ = FloorC(GetPosZ() - m_Width / 2);
 	int MaxZ = FloorC(GetPosZ() + m_Width / 2);
-	int MinY = Clamp(POSY_TOINT - 1, 0, cChunkDef::Height - 1);
-	int MaxY = Clamp(FloorC(GetPosY() + m_Height), 0, cChunkDef::Height - 1);
+	int MinY = Clamp(POSY_TOINT - 1, 0, cChunkDef::UpperLimit - 1);
+	int MaxY = Clamp(FloorC(GetPosY() + m_Height), 0, cChunkDef::UpperLimit - 1);
 
 	for (int x = MinX; x <= MaxX; x++)
 	{
@@ -1476,7 +1476,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimNether).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
-					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, cChunkDef::Height);
+					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, cChunkDef::UpperLimit);
 					return true;
 				}
 				// Nether portal in the overworld
@@ -1496,7 +1496,7 @@ bool cEntity::DetectPortal()
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
-					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, (cChunkDef::Height / 2));
+					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, (cChunkDef::UpperLimit / 2));
 					return true;
 				}
 			}
@@ -1708,7 +1708,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	int RelY = FloorC(GetPosY() + 0.1);
 	int HeadRelY = CeilC(GetPosY() + GetHeight()) - 1;
 	ASSERT(RelY <= HeadRelY);
-	if ((RelY < 0) || (HeadRelY >= cChunkDef::Height))
+	if ((RelY < 0) || (HeadRelY >= cChunkDef::UpperLimit))
 	{
 		return;
 	}
@@ -1717,8 +1717,8 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	int MaxRelX = FloorC(GetPosX() + m_Width / 2) - a_Chunk.GetPosX() * cChunkDef::Width;
 	int MinRelZ = FloorC(GetPosZ() - m_Width / 2) - a_Chunk.GetPosZ() * cChunkDef::Width;
 	int MaxRelZ = FloorC(GetPosZ() + m_Width / 2) - a_Chunk.GetPosZ() * cChunkDef::Width;
-	int MinY = Clamp(POSY_TOINT, 0, cChunkDef::Height - 1);
-	int MaxY = Clamp(FloorC(GetPosY() + m_Height), 0, cChunkDef::Height - 1);
+	int MinY = Clamp(POSY_TOINT, 0, cChunkDef::UpperLimit - 1);
+	int MaxY = Clamp(FloorC(GetPosY() + m_Height), 0, cChunkDef::UpperLimit - 1);
 
 	for (int x = MinRelX; x <= MaxRelX; x++)
 	{

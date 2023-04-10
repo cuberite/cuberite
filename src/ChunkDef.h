@@ -99,15 +99,15 @@ public:
 
 
 /** Constants used throughout the code, useful typedefs and utility functions */
-class cChunkDef
-{
-public:
+class cChunkDef  // tolua_export
+{  // tolua_export
+public:  // tolua_export
 
-	// Chunk dimensions:
+	// Chunk dimensions, exported in ManualBindings.cpp
 	static const int Width = 16;
-	static constexpr int BottomHeight = 0;  // Lower Limit for chunk coordinates (for future use, when negative height is supported). MUST BE NEGATIVE OR ZERO!
-	static const int Height = 256;
-	static constexpr int VerticalBlockCount = Height - BottomHeight;
+	static constexpr int LowerLimit = 0;  // Lower Limit for chunk coordinates (for future use, when negative height is supported). MUST BE NEGATIVE OR ZERO!
+	static const int UpperLimit = 256;
+	static constexpr int VerticalBlockCount = UpperLimit - LowerLimit;
 	static const int NumBlocks = Width * VerticalBlockCount * Width;
 
 	static const int SectionHeight = 16;
@@ -169,7 +169,7 @@ public:
 	/** Validates a height-coordinate. Returns false if height-coordinate is out of height bounds */
 	inline static bool IsValidHeight(Vector3i a_BlockPosition)
 	{
-		return ((a_BlockPosition.y >= BottomHeight) && (a_BlockPosition.y < Height));
+		return ((a_BlockPosition.y >= LowerLimit) && (a_BlockPosition.y < UpperLimit));
 	}
 
 
@@ -217,7 +217,7 @@ public:
 			// For some reason, NOT using the Horner schema is faster. Weird.
 			return static_cast<size_t>(x + (z * Width) + (y * Width * Width));   // 1.2 uses XZY
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return static_cast<size_t>(y + (z * Width) + (x * Height * Width));  // 1.1 uses YZX
+			return static_cast<size_t>(y + (z * Width) + (x * UpperLimit * Width));  // 1.1 uses YZX
 		#endif
 	}
 
@@ -238,9 +238,9 @@ public:
 			);
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
 			return Vector3i(  // 1.1
-				static_cast<int>(index / (cChunkDef::Height * cChunkDef::Width)),  // X
-				static_cast<int>(index % cChunkDef::Height),                       // Y
-				static_cast<int>((index / cChunkDef::Height) % cChunkDef::Width)   // Z
+				static_cast<int>(index / (cChunkDef::UpperLimit * cChunkDef::Width)),  // X
+				static_cast<int>(index % cChunkDef::UpperLimit),                       // Y
+				static_cast<int>((index / cChunkDef::UpperLimit) % cChunkDef::Width)   // Z
 			);
 		#endif
 	}
@@ -249,7 +249,7 @@ public:
 	inline static void SetBlock(BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z, BLOCKTYPE a_Type)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
-		ASSERT((a_Y >= BottomHeight) && (a_Y < Height));
+		ASSERT((a_Y >= LowerLimit) && (a_Y < UpperLimit));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
 		a_BlockTypes[MakeIndex(a_X, a_Y, a_Z)] = a_Type;
 	}
@@ -257,7 +257,7 @@ public:
 
 	inline static void SetBlock(BLOCKTYPE * a_BlockTypes, int a_Index, BLOCKTYPE a_Type)
 	{
-		ASSERT((a_Index >= BottomHeight) && (a_Index <= NumBlocks));
+		ASSERT((a_Index >= LowerLimit) && (a_Index <= NumBlocks));
 		a_BlockTypes[a_Index] = a_Type;
 	}
 
@@ -272,7 +272,7 @@ public:
 	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
-		ASSERT((a_Y >= BottomHeight) && (a_Y < Height));
+		ASSERT((a_Y >= LowerLimit) && (a_Y < UpperLimit));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
 		return a_BlockTypes[MakeIndex(a_X, a_Y, a_Z)];
 	}
@@ -321,7 +321,7 @@ public:
 	{
 		if (
 			(x < Width)  && (x >= 0) &&
-			(y < Height) && (y >= BottomHeight) &&
+			(y < UpperLimit) && (y >= LowerLimit) &&
 			(z < Width)  && (z >= 0)
 		)
 		{
@@ -347,7 +347,7 @@ public:
 	{
 		return (a_Buffer[a_Index / 2] >> ((a_Index & 1) * 4)) & 0x0f;
 	}
-} ;
+} ;  // tolua_export
 
 
 

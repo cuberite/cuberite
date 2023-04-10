@@ -65,7 +65,7 @@ void ForEachSourceCallback::CheckIndirectPower()
 	const Vector3i OffsetYP(0, 1, 0);
 	const auto Above = m_Position + OffsetYP;
 
-	if (Above.y == cChunkDef::Height)
+	if (Above.y >= cChunkDef::UpperLimit)
 	{
 		return;
 	}

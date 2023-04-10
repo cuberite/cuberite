@@ -33,7 +33,7 @@ public:
 
 	constexpr cPattern(std::initializer_list<BlockInfo> a_TopBlocks)
 	{
-		ASSERT(a_TopBlocks.size() <= cChunkDef::Height);
+		ASSERT(a_TopBlocks.size() <= cChunkDef::UpperLimit);
 		// Copy the pattern into the top:
 		size_t i = 0;
 		for (const auto & Block : a_TopBlocks)
@@ -48,7 +48,7 @@ public:
 	const BlockInfo * Get(void) const { return m_Pattern; }
 
 protected:
-	BlockInfo m_Pattern[cChunkDef::Height] = {};
+	BlockInfo m_Pattern[cChunkDef::UpperLimit] = {};
 } ;
 
 
@@ -174,7 +174,7 @@ protected:
 	HEIGHTTYPE m_SeaLevel;
 
 	/** The pattern used for mesa biomes. Initialized by seed on generator creation. */
-	cPattern::BlockInfo m_MesaPattern[2 * cChunkDef::Height];
+	cPattern::BlockInfo m_MesaPattern[2 * cChunkDef::UpperLimit];
 
 	/** Noise used for selecting between dirt and sand on the ocean floor. */
 	cNoise m_OceanFloorSelect;
@@ -419,7 +419,7 @@ protected:
 			top = m_SeaLevel;
 			a_ChunkDesc.SetHeight(a_RelX, a_RelZ, top - 1);
 		}
-		for (int y = top; y > cChunkDef::BottomHeight; y--)
+		for (int y = top; y > cChunkDef::LowerLimit; y--)
 		{
 			if (a_ShapeColumn[y] > 0)
 			{
@@ -492,7 +492,7 @@ protected:
 			{
 				a_ChunkDesc.SetBlockType(a_RelX, y, a_RelZ, E_BLOCK_HARDENED_CLAY);
 			}
-			for (int y = ClayFloor - 1; y > cChunkDef::BottomHeight; y--)
+			for (int y = ClayFloor - 1; y > cChunkDef::LowerLimit; y--)
 			{
 				a_ChunkDesc.SetBlockType(a_RelX, y, a_RelZ, E_BLOCK_STONE);
 			}
@@ -501,10 +501,10 @@ protected:
 		}
 
 		// Difficult case: use the mesa pattern and watch for overhangs:
-		int PatternIdx = cChunkDef::Height - (Top - ClayFloor);  // We want the block at index ClayFloor to be pattern's 256th block (first stone)
+		int PatternIdx = cChunkDef::UpperLimit - (Top - ClayFloor);  // We want the block at index ClayFloor to be pattern's 256th block (first stone)
 		const cPattern::BlockInfo * Pattern = m_MesaPattern;
 		bool HasHadWater = false;
-		for (int y = Top; y > cChunkDef::BottomHeight; y--)
+		for (int y = Top; y > cChunkDef::LowerLimit; y--)
 		{
 			if (a_ShapeColumn[y] > 0)
 			{

@@ -495,7 +495,7 @@ void cCaveTunnel::ProcessChunk(
 		int DifY = itr->m_BlockY;
 		int DifZ = itr->m_BlockZ - BlockStartZ;  // substitution for faster calc
 		int Bottom = std::max(itr->m_BlockY - 3 * itr->m_Radius / 7, 1);
-		int Top    = std::min(itr->m_BlockY + 3 * itr->m_Radius / 7, static_cast<int>(cChunkDef::Height));
+		int Top    = std::min(itr->m_BlockY + 3 * itr->m_Radius / 7, static_cast<int>(cChunkDef::UpperLimit));
 		int SqRad  = itr->m_Radius * itr->m_Radius;
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{
@@ -538,7 +538,7 @@ void cCaveTunnel::ProcessChunk(
 		int DifZ = itr->m_BlockZ - BlockStartZ;  // substitution for faster calc
 		if (
 			(DifX >= 0) && (DifX < cChunkDef::Width) &&
-			(itr->m_BlockY > cChunkDef::BottomHeight) && (itr->m_BlockY < cChunkDef::Height) &&
+			(itr->m_BlockY > cChunkDef::LowerLimit) && (itr->m_BlockY < cChunkDef::UpperLimit) &&
 			(DifZ >= 0) && (DifZ < cChunkDef::Width)
 		)
 		{

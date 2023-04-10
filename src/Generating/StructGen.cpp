@@ -129,7 +129,7 @@ void cStructGenTrees::GenerateSingleTree(
 			// Outside the chunk
 			continue;
 		}
-		if (itr->m_RelY >= cChunkDef::Height)
+		if (itr->m_RelY >= cChunkDef::UpperLimit)
 		{
 			// Above the chunk, cut off (this shouldn't happen too often, we're limiting trees to y < 230)
 			continue;
@@ -168,7 +168,7 @@ void cStructGenTrees::ApplyTreeImage(
 	// Put the generated image into a_BlockTypes, push things outside this chunk into a_Blocks
 	for (sSetBlockVector::const_iterator itr = a_Image.begin(), end = a_Image.end(); itr != end; ++itr)
 	{
-		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ) && (itr->m_RelY < cChunkDef::Height))
+		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ) && (itr->m_RelY < cChunkDef::UpperLimit))
 		{
 			// Inside this chunk, integrate into a_ChunkDesc:
 			switch (a_ChunkDesc.GetBlockType(itr->m_RelX, itr->m_RelY, itr->m_RelZ))

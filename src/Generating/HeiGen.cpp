@@ -64,7 +64,7 @@ public:
 		);
 		for (size_t i = 0; i < ARRAYCOUNT(heights); i++)
 		{
-			a_HeightMap[i] = static_cast<HEIGHTTYPE>(std::max(std::min(60 + heights[i], cChunkDef::Height - 60), 40));
+			a_HeightMap[i] = static_cast<HEIGHTTYPE>(std::max(std::min(60 + heights[i], cChunkDef::UpperLimit - 60), 40));
 		}
 	}
 

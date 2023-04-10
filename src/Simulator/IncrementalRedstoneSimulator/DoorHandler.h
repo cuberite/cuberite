@@ -45,7 +45,7 @@ namespace DoorHandler
 		}
 		else
 		{
-			if (TopPosition.y == cChunkDef::Height)
+			if (TopPosition.y >= cChunkDef::UpperLimit)
 			{
 				return;
 			}

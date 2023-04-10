@@ -116,9 +116,9 @@ protected:
 	// The blobs are XZY organized as a whole, instead of 3x3 XZY-organized subarrays ->
 	//  -> This means data has to be scatterred when reading and gathered when writing!
 	static const int BlocksPerYLayer = cChunkDef::Width * cChunkDef::Width * 3 * 3;
-	BLOCKTYPE  m_BlockTypes[BlocksPerYLayer * cChunkDef::Height];
-	NIBBLETYPE m_BlockLight[BlocksPerYLayer * cChunkDef::Height];
-	NIBBLETYPE m_SkyLight  [BlocksPerYLayer * cChunkDef::Height];
+	BLOCKTYPE  m_BlockTypes[BlocksPerYLayer * cChunkDef::VerticalBlockCount];
+	NIBBLETYPE m_BlockLight[BlocksPerYLayer * cChunkDef::VerticalBlockCount];
+	NIBBLETYPE m_SkyLight  [BlocksPerYLayer * cChunkDef::VerticalBlockCount];
 	HEIGHTTYPE m_HeightMap [BlocksPerYLayer];
 
 	// Seed management (5.7 MiB)
@@ -126,10 +126,10 @@ protected:
 	// Each seed is represented twice in this structure - both as a "list" and as a "position".
 	// "list" allows fast traversal from seed to seed
 	// "position" allows fast checking if a coord is already a seed
-	unsigned char m_IsSeed1 [BlocksPerYLayer * cChunkDef::Height];
-	unsigned int  m_SeedIdx1[BlocksPerYLayer * cChunkDef::Height];
-	unsigned char m_IsSeed2 [BlocksPerYLayer * cChunkDef::Height];
-	unsigned int  m_SeedIdx2[BlocksPerYLayer * cChunkDef::Height];
+	unsigned char m_IsSeed1 [BlocksPerYLayer * cChunkDef::VerticalBlockCount];
+	unsigned int  m_SeedIdx1[BlocksPerYLayer * cChunkDef::VerticalBlockCount];
+	unsigned char m_IsSeed2 [BlocksPerYLayer * cChunkDef::VerticalBlockCount];
+	unsigned int  m_SeedIdx2[BlocksPerYLayer * cChunkDef::VerticalBlockCount];
 	size_t m_NumSeeds;
 
 	virtual void Execute(void) override;

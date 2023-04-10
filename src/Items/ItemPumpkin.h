@@ -42,7 +42,7 @@ private:
 	bool TrySpawnGolem(cPlayer & a_Player, const Vector3i a_PumpkinPos) const
 	{
 		// A golem can't form with a pumpkin below level 2 or above level 255:
-		if ((a_PumpkinPos.y < 2) || (a_PumpkinPos.y >= cChunkDef::Height))
+		if ((a_PumpkinPos.y < 2) || (a_PumpkinPos.y >= cChunkDef::UpperLimit))
 		{
 			return false;
 		}

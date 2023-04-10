@@ -4516,6 +4516,7 @@ void cManualBindings::Bind(lua_State * tolua_S)
 	tolua_beginmodule(tolua_S, nullptr);
 
 		// Create the new classes:
+		tolua_usertype(tolua_S, "cChunkDef");
 		tolua_usertype(tolua_S, "cCryptoHash");
 		tolua_usertype(tolua_S, "cLineBlockTracer");
 		tolua_usertype(tolua_S, "cStringCompression");
@@ -4544,6 +4545,14 @@ void cManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cBoundingBox");
 			tolua_function(tolua_S, "CalcLineIntersection", tolua_cBoundingBox_CalcLineIntersection);
 			tolua_function(tolua_S, "Intersect",            tolua_cBoundingBox_Intersect);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cChunkDef");
+			tolua_constant(tolua_S, "Width",              cChunkDef::Width);
+			tolua_constant(tolua_S, "LowerLimit",         cChunkDef::LowerLimit);
+			tolua_constant(tolua_S, "UpperLimit",         cChunkDef::UpperLimit);
+			tolua_constant(tolua_S, "VerticalBlockCount", cChunkDef::VerticalBlockCount);
+			tolua_constant(tolua_S, "NumBlocks",          cChunkDef::NumBlocks);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cChunkDesc");

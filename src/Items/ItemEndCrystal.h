@@ -49,8 +49,8 @@ public:
 
 		if (
 			// Don't place if two blocks above placement block aren't air:
-			((Above.y != cChunkDef::Height) && (a_World->GetBlock(Above) != E_BLOCK_AIR)) ||
-			((Above.y < (cChunkDef::Height - 1)) && (a_World->GetBlock(Above.addedY(1)) != E_BLOCK_AIR)) ||
+			((Above.y != cChunkDef::UpperLimit) && (a_World->GetBlock(Above) != E_BLOCK_AIR)) ||
+			((Above.y < (cChunkDef::UpperLimit - 1)) && (a_World->GetBlock(Above.addedY(1)) != E_BLOCK_AIR)) ||
 
 			// Refuse placement if there are any entities in a (1 by 2 by 1) bounding box with base at the block above:
 			!a_World->ForEachEntityInBox(
