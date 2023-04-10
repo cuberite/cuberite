@@ -28,7 +28,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockBed(BlockState a_Block)
+	static inline bool IsBlockBed(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -65,7 +65,7 @@ public:
 		}
 	}
 
-	static constexpr eBlockFace GetRotation(BlockState a_Block)
+	static inline eBlockFace GetRotation(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())
@@ -91,7 +91,7 @@ public:
 	}
 
 
-	static constexpr bool IsHeadPart(BlockState a_Block)
+	static inline bool IsHeadPart(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())
@@ -116,7 +116,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsBedOccupied(BlockState a_Block)
+	static inline bool IsBedOccupied(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())

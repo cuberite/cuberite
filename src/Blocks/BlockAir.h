@@ -12,7 +12,7 @@ public:
 
 	using cBlockHandler::cBlockHandler;
 
-	static constexpr bool IsBlockAir(BlockState a_Block)
+	static inline bool IsBlockAir(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

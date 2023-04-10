@@ -26,7 +26,7 @@ public:
 		Right
 	};
 
-	static constexpr bool IsChest(BlockState a_Block)
+	static inline bool IsChest(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -41,7 +41,7 @@ public:
 	}
 
 	/** Sets the orientation of the chest. */
-	static constexpr BlockState SetChestOrientation(BlockState a_Block, eChestType a_Orientation)
+	static inline BlockState SetChestOrientation(BlockState a_Block, eChestType a_Orientation)
 	{
 		using namespace Block;
 		switch (a_Block.Type())
@@ -52,7 +52,7 @@ public:
 		}
 	}
 
-	static constexpr eChestType GetChestComposition(BlockState a_Block)
+	static inline eChestType GetChestComposition(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())

@@ -18,7 +18,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockSapling(BlockState a_Block)
+	static inline bool IsBlockSapling(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -33,7 +33,7 @@ public:
 		}
 	}
 
-	static constexpr unsigned char GetSaplingStage(BlockState a_Block)
+	static inline unsigned char GetSaplingStage(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())
@@ -48,7 +48,7 @@ public:
 		}
 	}
 
-	static constexpr BlockState SetSaplingState(BlockState a_Block, unsigned char a_State)
+	static inline BlockState SetSaplingState(BlockState a_Block, unsigned char a_State)
 	{
 		using namespace Block;
 		switch (a_Block.Type())

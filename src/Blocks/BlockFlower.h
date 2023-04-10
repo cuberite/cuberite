@@ -16,7 +16,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockFlower(BlockState a_Block)
+	static inline bool IsBlockFlower(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

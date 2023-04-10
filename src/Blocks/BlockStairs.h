@@ -42,7 +42,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsBlockStairs(BlockState a_Block)
+	static inline bool IsBlockStairs(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -87,7 +87,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsStairsTopHalf(BlockState a_Block)
+	static inline bool IsStairsTopHalf(BlockState a_Block)
 	{
 		using namespace Block;
 

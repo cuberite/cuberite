@@ -17,7 +17,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsFenceGate(BlockState a_Block)
+	static inline bool IsFenceGate(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -34,7 +34,7 @@ public:
 		}
 	}
 
-	static constexpr eBlockFace GetFacing(BlockState a_Block)
+	static inline eBlockFace GetFacing(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -50,7 +50,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsInWall(BlockState a_Block)
+	static inline bool IsInWall(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -66,7 +66,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsOpen(BlockState a_Block)
+	static inline bool IsOpen(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -82,7 +82,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsPowered(BlockState a_Block)
+	static inline bool IsPowered(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

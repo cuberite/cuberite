@@ -14,7 +14,7 @@ public:
 
 	using cBlockHandler::cBlockHandler;
 
-	static constexpr bool IsBlockGlass(BlockState a_Block)
+	static inline bool IsBlockGlass(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

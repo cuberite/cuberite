@@ -22,12 +22,12 @@ public:
 
 	using Super::Super;
 
-	constexpr static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
+	inline static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
 	{
 		return -GetRearCoordinateOffset(a_Meta);
 	}
 
-	constexpr static Vector3i GetLeftCoordinateOffset(NIBBLETYPE a_Meta)
+	inline static Vector3i GetLeftCoordinateOffset(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
 		{
@@ -45,7 +45,7 @@ public:
 		}
 	}
 
-	constexpr static Vector3i GetRearCoordinateOffset(NIBBLETYPE a_Meta)
+	inline static Vector3i GetRearCoordinateOffset(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
 		{

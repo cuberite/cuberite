@@ -17,7 +17,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockTrapdoor(BlockState a_Block)
+	static inline bool IsBlockTrapdoor(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -36,7 +36,7 @@ public:
 	}
 
 
-	static constexpr BlockState ToggleTrapdoor(BlockState a_Block)
+	static inline BlockState ToggleTrapdoor(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())
@@ -55,7 +55,7 @@ public:
 	}
 
 
-	static constexpr BlockState ToggleTrapdoorPower(BlockState a_Block)
+	static inline BlockState ToggleTrapdoorPower(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())
@@ -73,7 +73,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsTrapdoorOpen(BlockState a_Block)
+	static inline bool IsTrapdoorOpen(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())

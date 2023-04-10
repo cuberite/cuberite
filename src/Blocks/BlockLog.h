@@ -11,7 +11,7 @@ class cBlockLogHandler final:
 public:
 	using Super::Super;
 
-	static constexpr bool IsBlockLog(BlockState a_Block)
+	static inline bool IsBlockLog(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

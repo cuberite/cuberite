@@ -22,7 +22,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockTorch(BlockState a_Block)
+	static inline bool IsBlockTorch(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

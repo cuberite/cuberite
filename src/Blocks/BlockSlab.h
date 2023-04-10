@@ -89,7 +89,7 @@ public:
 /** Macro only for internal use. */
 #define IS_SLAB_TOP(SlabType) (SlabType::Type(a_Block) == SlabType::Type::Top);
 
-	static constexpr bool IsSlabTop(BlockState a_Block)
+	static inline bool IsSlabTop(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())
@@ -142,7 +142,7 @@ public:
 /** Macro only for internal use. */
 #define IS_SLAB_FULL(SlabType) (SlabType::Type(a_Block) == SlabType::Type::Double);
 
-	static constexpr bool IsSlabFull(BlockState a_Block)
+	static inline bool IsSlabFull(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())

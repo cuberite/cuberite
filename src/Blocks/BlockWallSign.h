@@ -14,7 +14,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockWallSign(BlockState a_Block)
+	static inline bool IsBlockWallSign(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -31,7 +31,7 @@ public:
 		}
 	}
 
-	static constexpr eBlockFace GetSignFacing(BlockState a_Block)
+	static inline eBlockFace GetSignFacing(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())

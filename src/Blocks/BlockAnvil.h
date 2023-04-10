@@ -19,7 +19,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr eBlockFace GetFacing(BlockState a_Block)
+	static inline eBlockFace GetFacing(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

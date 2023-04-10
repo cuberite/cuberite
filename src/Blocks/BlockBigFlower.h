@@ -19,7 +19,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockBigFlower(BlockState a_Block)
+	static inline bool IsBlockBigFlower(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -34,7 +34,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsTopPart(BlockState a_Block)
+	static inline bool IsTopPart(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())

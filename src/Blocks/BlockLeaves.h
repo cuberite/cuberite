@@ -24,7 +24,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockLeaves(BlockState a_Block)
+	static inline bool IsBlockLeaves(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -40,7 +40,7 @@ public:
 	}
 
 	/** Returns the distance to the next block. If the block is not a Leaf this function return 0. Else a value from 1 - 7. */
-	static constexpr unsigned char GetLeafDistance(BlockState a_Block)
+	static inline unsigned char GetLeafDistance(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())
@@ -56,7 +56,7 @@ public:
 	}
 
 
-	static constexpr BlockState SetLeaveDistance(BlockState a_Block, unsigned char a_Distance)
+	static inline BlockState SetLeaveDistance(BlockState a_Block, unsigned char a_Distance)
 	{
 		using namespace Block;
 		switch (a_Block.Type())
@@ -71,7 +71,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsLeafPersistent(BlockState a_Block)
+	static inline bool IsLeafPersistent(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())
@@ -86,17 +86,17 @@ public:
 		}
 	}
 
-	static constexpr BlockState setLeafPersistance(BlockState a_Block, bool a_IsPersistant)
+	static inline BlockState SetLeafPersistence(BlockState a_Block, bool a_IsPersistent)
 	{
 		using namespace Block;
 		switch (a_Block.Type())
 		{
-			case BlockType::AcaciaLeaves:  return AcaciaLeaves::AcaciaLeaves   (AcaciaLeaves::Distance(a_Block),  a_IsPersistant);
-			case BlockType::BirchLeaves:   return BirchLeaves::BirchLeaves     (BirchLeaves::Distance(a_Block),   a_IsPersistant);
-			case BlockType::DarkOakLeaves: return DarkOakLeaves::DarkOakLeaves (DarkOakLeaves::Distance(a_Block), a_IsPersistant);
-			case BlockType::JungleLeaves:  return JungleLeaves::JungleLeaves   (JungleLeaves::Distance(a_Block),  a_IsPersistant);
-			case BlockType::OakLeaves:     return OakLeaves::OakLeaves         (OakLeaves::Distance(a_Block),     a_IsPersistant);
-			case BlockType::SpruceLeaves:  return SpruceLeaves::SpruceLeaves   (SpruceLeaves::Distance(a_Block),  a_IsPersistant);
+			case BlockType::AcaciaLeaves:  return AcaciaLeaves::AcaciaLeaves   (AcaciaLeaves::Distance(a_Block),  a_IsPersistent);
+			case BlockType::BirchLeaves:   return BirchLeaves::BirchLeaves     (BirchLeaves::Distance(a_Block),   a_IsPersistent);
+			case BlockType::DarkOakLeaves: return DarkOakLeaves::DarkOakLeaves (DarkOakLeaves::Distance(a_Block), a_IsPersistent);
+			case BlockType::JungleLeaves:  return JungleLeaves::JungleLeaves   (JungleLeaves::Distance(a_Block),  a_IsPersistent);
+			case BlockType::OakLeaves:     return OakLeaves::OakLeaves         (OakLeaves::Distance(a_Block),     a_IsPersistent);
+			case BlockType::SpruceLeaves:  return SpruceLeaves::SpruceLeaves   (SpruceLeaves::Distance(a_Block),  a_IsPersistent);
 			default: return a_Block;
 		}
 	}

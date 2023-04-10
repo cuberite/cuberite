@@ -14,7 +14,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockFlowerPot(BlockState a_Block)
+	static inline bool IsBlockFlowerPot(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -52,7 +52,7 @@ public:
 		}
 	}
 
-	static constexpr BlockType GetPlantFromPot(BlockState a_Block)
+	static inline BlockType GetPlantFromPot(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

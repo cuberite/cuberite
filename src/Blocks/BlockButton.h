@@ -95,7 +95,7 @@ public:
 #undef TOGGLE_BUTTON
 */
 
-static constexpr eBlockFace GetFacing(const BlockState a_Block)
+static inline eBlockFace GetFacing(const BlockState a_Block)
 {
 	using namespace Block;
 	switch (a_Block.Type())

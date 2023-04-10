@@ -49,7 +49,7 @@ public:
 		None
 	};
 
-	static constexpr bool IsBlockRail(BlockState a_Block)
+	static inline bool IsBlockRail(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -79,7 +79,7 @@ public:
 	}
 	*/
 
-	static constexpr enum Shape GetShapeFromRail(BlockState a_Block)
+	static inline enum Shape GetShapeFromRail(BlockState a_Block)
 	{
 		using namespace Block;
 		switch (a_Block.Type())
@@ -145,7 +145,7 @@ public:
 		return Shape::None;
 	}
 
-	static constexpr BlockState GetRailFromShape(BlockState a_Block, Shape a_Shape)
+	static inline BlockState GetRailFromShape(BlockState a_Block, Shape a_Shape)
 	{
 		using namespace Block;
 

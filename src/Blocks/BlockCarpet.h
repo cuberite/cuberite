@@ -23,7 +23,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockCarpet(BlockState a_Block)
+	static inline bool IsBlockCarpet(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

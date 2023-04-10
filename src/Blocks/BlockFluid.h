@@ -18,7 +18,7 @@ public:
 
 	static constexpr unsigned char ILLEGAL_FALLOFF = std::numeric_limits<unsigned char>::max();
 
-	static constexpr bool IsBlockLiquid(BlockState a_Block)
+	static inline bool IsBlockLiquid(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -29,7 +29,7 @@ public:
 		}
 	}
 
-	static constexpr unsigned char GetFalloff(BlockState a_Block)
+	static inline unsigned char GetFalloff(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -39,7 +39,7 @@ public:
 		}
 	}
 
-	static constexpr BlockState SetFalloff(BlockState a_Block, unsigned char a_Falloff)
+	static inline BlockState SetFalloff(BlockState a_Block, unsigned char a_Falloff)
 	{
 		switch (a_Block.Type())
 		{

@@ -10,7 +10,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockGlassPane(BlockState a_Block)
+	static inline bool IsBlockGlassPane(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

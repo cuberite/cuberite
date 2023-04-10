@@ -16,7 +16,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockPlanks(BlockState a_Block)
+	static inline bool IsBlockPlanks(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

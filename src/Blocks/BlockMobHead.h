@@ -16,7 +16,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockMobHead(BlockState a_Block)
+	static inline bool IsBlockMobHead(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -37,7 +37,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsWallHead(BlockState a_Block)
+	static inline bool IsWallHead(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -53,7 +53,7 @@ public:
 	}
 
 	/** Don't use this function for wall heads. */
-	static constexpr unsigned char GetRotation(BlockState a_Block)
+	static inline unsigned char GetRotation(BlockState a_Block)
 	{
 		ASSERT(!IsWallHead(a_Block));
 		switch (a_Block.Type())
@@ -69,7 +69,7 @@ public:
 	}
 
 	/** Don't use this function for floor heads. */
-	static constexpr eBlockFace GetFacing(BlockState a_Block)
+	static inline eBlockFace GetFacing(BlockState a_Block)
 	{
 		ASSERT(IsWallHead(a_Block));
 		switch (a_Block.Type())

@@ -20,7 +20,7 @@ public:
 	using Super::Super;
 
 
-	static constexpr bool IsBlockFence(BlockState a_Block)
+	static inline bool IsBlockFence(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -37,7 +37,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsConnectedNorth(BlockState a_Block)
+	static inline bool IsConnectedNorth(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -53,7 +53,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsConnectedEast(BlockState a_Block)
+	static inline bool IsConnectedEast(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -69,7 +69,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsConnectedSouth(BlockState a_Block)
+	static inline bool IsConnectedSouth(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -85,7 +85,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsConnectedWest(BlockState a_Block)
+	static inline bool IsConnectedWest(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

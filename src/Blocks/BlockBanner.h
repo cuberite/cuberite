@@ -24,7 +24,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockBanner(BlockState a_Block)
+	static inline bool IsBlockBanner(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -66,7 +66,7 @@ public:
 		}
 	}
 
-	static constexpr bool IsBannerStanding(BlockState a_Block)
+	static inline bool IsBannerStanding(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -95,7 +95,7 @@ public:
 	}
 
 	/** Get rotation from a standing banner. Don't call this on a wall banner. */
-	static constexpr unsigned char GetRotation(BlockState a_Block)
+	static inline unsigned char GetRotation(BlockState a_Block)
 	{
 		ASSERT(IsBannerStanding(a_Block));
 		switch (a_Block.Type())
@@ -121,7 +121,7 @@ public:
 	}
 
 	/** Get Facing from a hanging banner. Don't call this on a standing banner. */
-	static constexpr eBlockFace GetFacing(BlockState a_Block)
+	static inline eBlockFace GetFacing(BlockState a_Block)
 	{
 		ASSERT(!IsBannerStanding(a_Block));
 		switch (a_Block.Type())

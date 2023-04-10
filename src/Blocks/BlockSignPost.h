@@ -22,7 +22,7 @@ public:
 	static constexpr unsigned char ROTATION_STEP = 4;
 	static constexpr unsigned char ROTATION_MIRROR = 8;
 
-	static constexpr bool IsBlockSignPost(BlockState a_Block)
+	static inline bool IsBlockSignPost(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -39,7 +39,7 @@ public:
 		}
 	}
 
-	static constexpr unsigned char GetRotation(BlockState a_Block)
+	static inline unsigned char GetRotation(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

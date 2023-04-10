@@ -16,7 +16,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockConcretePowder(BlockState a_Block)
+	static inline bool IsBlockConcretePowder(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
@@ -41,7 +41,7 @@ public:
 		}
 	}
 
-	static constexpr BlockState GetConcreteFromConcretePowder(BlockState a_Block)
+	static inline BlockState GetConcreteFromConcretePowder(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

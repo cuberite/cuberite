@@ -18,7 +18,7 @@ public:
 
 	using Super::Super;
 
-	static constexpr bool IsBlockInfested(BlockState a_Block)
+	static inline bool IsBlockInfested(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{
