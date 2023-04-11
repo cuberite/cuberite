@@ -1,6 +1,3 @@
-//
-// Created by marc_ on 10.04.2023.
-//
 
 #include "WSSAnvilHandler_1_9_0.h"
 
