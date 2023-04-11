@@ -197,6 +197,8 @@ Int32 NamespaceSerializer::From(const eDataVersion a_ID)
 		case eDataVersion::v1_19_3: return 3218;
 		case eDataVersion::v1_19_4: return 3337;
 	}
+	ASSERT(!"Unhandled data version");
+	return 0;
 }
 
 

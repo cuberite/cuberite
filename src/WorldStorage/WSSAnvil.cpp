@@ -601,7 +601,7 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, ContiguousB
 	unsigned ChunkLocation = ntohl(m_Header[HeaderIndex]);
 	unsigned ChunkOffset = ChunkLocation >> 8;
 
-	ASSERT(ChunkOffset * 4096 < m_File.GetSize());
+	ASSERT(static_cast<long>(ChunkOffset * 4096) < m_File.GetSize());
 
 	// First chunk is at offset 2, because the first two sectors are the header and timestamp
 	if (ChunkOffset < 2)
