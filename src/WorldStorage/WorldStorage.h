@@ -12,9 +12,9 @@
 
 #pragma once
 
-#include "../OSSupport/IsThread.h"
-#include "../OSSupport/Queue.h"
 #include "ChunkDef.h"
+#include "OSSupport/IsThread.h"
+#include "OSSupport/Queue.h"
 
 
 
@@ -42,7 +42,7 @@ protected:
 	cWorld * m_World;
 } ;
 
-typedef std::list<cWSSchema *> cWSSchemaList;
+using cWSSchemaList = std::list<std::shared_ptr<cWSSchema>>;
 
 
 
@@ -54,10 +54,11 @@ class cWorldStorage:
 {
 	using Super = cIsThread;
 
+	static constexpr int MAX_CHUNK_COORD = 0x08000000;
+
 public:
 
 	cWorldStorage();
-	virtual ~cWorldStorage() override;
 
 	/** Queues a chunk to be loaded, asynchronously. */
 	void QueueLoadChunk(int a_ChunkX, int a_ChunkZ);
@@ -78,7 +79,6 @@ public:
 protected:
 
 	cWorld * m_World;
-	AString  m_StorageSchemaName;
 
 	cQueue<cChunkCoords> m_LoadQueue;
 	cQueue<cChunkCoords> m_SaveQueue;
@@ -87,24 +87,23 @@ protected:
 	cWSSchemaList m_Schemas;
 
 	/** The one storage schema used for saving */
-	cWSSchema * m_SaveSchema;
+	std::shared_ptr<cWSSchema> m_SaveSchema = nullptr;
 
 	/** Set when there's any addition to the queues */
 	cEvent m_Event;
 
+	void InitSchemas(int a_StorageCompressionFactor, const AString & a_StorageSchemaName);
 
-	/** Loads the chunk specified; returns true on success, false on failure */
-	bool LoadChunk(int a_ChunkX, int a_ChunkZ);
-
-	void InitSchemas(int a_StorageCompressionFactor);
-
-	virtual void Execute(void) override;
+	void Execute(void) override;
 
 	/** Loads one chunk from the queue (if any queued); returns true if there was a chunk in the queue to load */
 	bool LoadOneChunk(void);
 
 	/** Saves one chunk from the queue (if any queued); returns true if there was a chunk in the queue to save */
 	bool SaveOneChunk(void);
+
+	/** Loads the chunk specified; returns true on success, false on failure */
+	bool LoadChunk(int a_ChunkX, int a_ChunkZ);
 } ;
 
 

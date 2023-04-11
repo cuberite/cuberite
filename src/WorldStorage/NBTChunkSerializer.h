@@ -23,4 +23,6 @@ public:
 
 	/** Serializes the chunk into the specified writer. The chunk must be present. */
 	static void Serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter);
+
+	static constexpr eDataVersion SAVE_DATA_VERSION = eDataVersion::v1_8;
 };
