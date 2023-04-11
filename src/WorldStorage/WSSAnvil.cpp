@@ -476,28 +476,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 bool cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, const int a_TagIdx, eDataVersion a_DataVersion)
 {
-	if (
-		(a_TagIdx < 0) ||
-		(a_NBT.GetType(a_TagIdx) != TAG_ByteArray) ||
-		(a_NBT.GetDataLength(a_TagIdx) != std::size(a_BiomeMap))
-	)
-	{
-		return false;
-	}
-
-	const auto * const BiomeData = a_NBT.GetData(a_TagIdx);
-	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
-	{
-		if (BiomeData[i] > std::byte(EMCSBiome::biMaxVariantBiome))
-		{
-			// Unassigned biomes:
-			return false;
-		}
-
-		a_BiomeMap[i] = static_cast<EMCSBiome>(BiomeData[i]);
-	}
-
-	return true;
+	return cWSSAnvilHandler::From(a_DataVersion).LoadBiomeMap(a_BiomeMap, a_NBT, a_TagIdx);
 }
 
 

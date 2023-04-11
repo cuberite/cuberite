@@ -149,5 +149,6 @@ protected:
 	OwnedBlockEntity LoadSign             (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const override;
 
 	bool LoadHeightMap(cChunkDef::HeightMap & a_HeightMap, const cParsedNBT & a_NBT, const int a_TagIdx) const override;
+	bool LoadBiomeMap(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, const int a_TagIdx) const override;
 
 };

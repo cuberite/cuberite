@@ -2969,3 +2969,33 @@ bool cWSSAnvilHandler_1_8::LoadHeightMap(cChunkDef::HeightMap & a_HeightMap, con
 
 	return true;
 }
+
+
+
+
+
+bool cWSSAnvilHandler_1_8::LoadBiomeMap(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, const int a_TagIdx) const
+{
+	if (
+		(a_TagIdx < 0) ||
+		(a_NBT.GetType(a_TagIdx) != TAG_ByteArray) ||
+		(a_NBT.GetDataLength(a_TagIdx) != std::size(a_BiomeMap))
+	)
+	{
+		return false;
+	}
+
+	const auto * const BiomeData = a_NBT.GetData(a_TagIdx);
+	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
+	{
+		if (BiomeData[i] > std::byte(EMCSBiome::biMaxVariantBiome))
+		{
+			// Unassigned biomes:
+			return false;
+		}
+
+		a_BiomeMap[i] = static_cast<EMCSBiome>(BiomeData[i]);
+	}
+
+	return true;
+}

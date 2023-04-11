@@ -188,6 +188,8 @@ public:
 
 	virtual bool LoadHeightMap(cChunkDef::HeightMap & a_HeightMap, const cParsedNBT & a_NBT, const int a_TagIdx) const = 0;
 
+	virtual bool LoadBiomeMap(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, const int a_TagIdx) const = 0;
+
 	static const cWSSAnvilHandler & From(eDataVersion a_DataVersion);
 
 protected:
