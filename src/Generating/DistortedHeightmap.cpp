@@ -237,7 +237,7 @@ void cDistortedHeightmap::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int idx = x + 17 * 257 * z;
-			for (int y = 0; y < cChunkDef::UpperLimit; y++)
+			for (int y = cChunkDef::LowerLimit; y < cChunkDef::UpperLimit; y++)
 			{
 				a_Shape[y + x * 256 + z * 16 * 256] = (y < m_DistortedHeightmap[idx + y * 17]) ? 1 : 0;
 			}  // for y

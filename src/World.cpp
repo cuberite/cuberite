@@ -726,7 +726,7 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 	}
 
 	// Check 0, 0 first.
-	int SpawnY = 0;
+	int SpawnY = cChunkDef::LowerLimit;
 	if (CanSpawnAt(BiomeOffset.x, SpawnY, BiomeOffset.z))
 	{
 		SetSpawn(BiomeOffset.x, SpawnY, BiomeOffset.z);

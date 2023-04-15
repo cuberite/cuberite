@@ -137,11 +137,7 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 			int zz = a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z;
 			for (int y = MinY; y < MaxY; y++)
 			{
-				if (
-					((x < 0) || (x >= cChunkDef::Width)) ||
-					((y < 0) || (y >= cChunkDef::UpperLimit)) ||
-					((z < 0) || (z >= cChunkDef::Width))
-					)
+				if (!cChunkDef::IsValidRelPos({ x, y, z }))
 				{
 					continue;
 				}
@@ -1286,7 +1282,7 @@ void cFinishGenPreSimulator::CollapseSandGravel(cChunkDesc & a_ChunkDesc)
 		{
 			int LastY = -1;
 			int HeightY = 0;
-			for (int y = 0; y < cChunkDef::UpperLimit; y++)
+			for (int y = cChunkDef::LowerLimit; y < cChunkDef::UpperLimit; y++)
 			{
 				BLOCKTYPE Block = a_ChunkDesc.GetBlockType(x, y, z);
 				switch (Block)
@@ -1391,7 +1387,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 	}  // for z
 
 	// Turn fluid at the chunk edges into non-stationary fluid:
-	for (int y = 0; y < cChunkDef::UpperLimit; y++)
+	for (int y = cChunkDef::LowerLimit; y < cChunkDef::UpperLimit; y++)
 	{
 		for (int i = 0; i < cChunkDef::Width; i++)  // i stands for both x and z here
 		{

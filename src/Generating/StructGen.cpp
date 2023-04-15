@@ -399,11 +399,11 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeH
 	// Turn air in the bottom half into liquid:
 	for (int y = 0; y < 4; y++)
 	{
-		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
+		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			if (BlockTypes[x + z * 16 + y * 16 * 16] == E_BLOCK_AIR)
+			if (BlockTypes[x + z * cChunkDef::Width + y * cChunkDef::Width * cChunkDef::Width] == E_BLOCK_AIR)
 			{
-				BlockTypes[x + z * 16 + y * 16 * 16] = m_Fluid;
+				BlockTypes[x + z * cChunkDef::Width + y * cChunkDef::Width * cChunkDef::Width] = m_Fluid;
 			}
 		}  // for z, x
 	}  // for y
@@ -456,12 +456,12 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 	int BaseY = 63;
 
 	// Interpolate the lowest floor:
-	for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
+	for (int z = 0; z <= cChunkDef::Width / INTERPOL_Z; z++) for (int x = 0; x <= cChunkDef::Width / INTERPOL_X; x++)
 	{
 		FloorLo[INTERPOL_X * x + 17 * INTERPOL_Z * z] =
 			m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, BaseY, BaseZ + INTERPOL_Z * z) *
 			m_Noise2.IntNoise3DInt(BaseX + INTERPOL_X * x, BaseY, BaseZ + INTERPOL_Z * z) /
-			256;
+			cChunkDef::VerticalBlockCount;
 	}  // for x, z - FloorLo[]
 	LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorLo);
 
@@ -469,25 +469,25 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 	for (int Segment = BaseY; Segment < MaxHeight; Segment += SEGMENT_HEIGHT)
 	{
 		// First update the high floor:
-		for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
+		for (int z = 0; z <= cChunkDef::Width / INTERPOL_Z; z++) for (int x = 0; x <= cChunkDef::Width / INTERPOL_X; x++)
 		{
 			FloorHi[INTERPOL_X * x + 17 * INTERPOL_Z * z] = (
 				m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) *
-				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) / 256
+				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) / cChunkDef::VerticalBlockCount
 			);
 		}  // for x, z - FloorLo[]
 		LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorHi);
 
 		// Interpolate between FloorLo and FloorHi:
-		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
+		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			EMCSBiome biome = a_ChunkDesc.GetBiome(x, z);
 
 			if ((biome == biExtremeHills) || (biome == biExtremeHillsEdge))
 			{
-				int Lo = FloorLo[x + 17 * z] / 256;
-				int Hi = FloorHi[x + 17 * z] / 256;
-				for (int y = 0; y < SEGMENT_HEIGHT; y++)
+				int Lo = FloorLo[x + (cChunkDef::Width + 1) * z] / cChunkDef::VerticalBlockCount;
+				int Hi = FloorHi[x + (cChunkDef::Width + 1) * z] / cChunkDef::VerticalBlockCount;
+				for (int y = cChunkDef::LowerLimit; y < SEGMENT_HEIGHT; y++)
 				{
 					int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
 					if (Val < 0)

@@ -256,17 +256,17 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 	LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorLo);
 
 	// Interpolate segments:
-	for (int Segment = 0; Segment < MaxHeight; Segment += SEGMENT_HEIGHT)
+	for (int Segment = cChunkDef::LowerLimit; Segment < MaxHeight; Segment += SEGMENT_HEIGHT)
 	{
 		// First update the high floor:
-		for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
+		for (int z = cChunkDef::LowerLimit; z <= cChunkDef::Width / INTERPOL_Z; z++) for (int x = 0; x <= cChunkDef::Width / INTERPOL_X; x++)
 		{
 			// We need to store the intermediate result in a volatile variable, otherwise gcc -O2 optimizes
 			// through the undefined behavior in cNoise and produces different data than the other platforms / build types (#4384)
 			volatile int intermediate =
 				m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) *
 				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z);
-			FloorHi[INTERPOL_X * x + 17 * INTERPOL_Z * z] = intermediate / 256;
+			FloorHi[INTERPOL_X * x + (cChunkDef::Width + 1) * INTERPOL_Z * z] = intermediate / 256;
 		}  // for x, z - FloorLo[]
 		LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorHi);
 
@@ -276,7 +276,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 			int Threshold = static_cast<int>(m_Noise1.CubicNoise2D(static_cast<float>(BaseX + x) / 75, static_cast<float>(BaseZ + z) / 75) * m_MaxThreshold);
 			int Lo = FloorLo[x + 17 * z] / 256;
 			int Hi = FloorHi[x + 17 * z] / 256;
-			for (int y = 0; y < SEGMENT_HEIGHT; y++)
+			for (int y = cChunkDef::LowerLimit; y < SEGMENT_HEIGHT; y++)
 			{
 				int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
 				if (Val < Threshold)

@@ -32,8 +32,8 @@ public:
 	/** The datatype used to represent the entire chunk worth of shape.
 	0 = air
 	1 = solid
-	Indexed as [y + 256 * x + 256 * 16 * z]. */
-	typedef Byte Shape[256 * 16 * 16];
+	Indexed as [y + cChunkDef::VerticalBlockCount * x + cChunkDef::VerticalBlockCount * cChunkDef::Width * z]. */
+	typedef Byte Shape[cChunkDef::VerticalBlockCount * cChunkDef::Width * cChunkDef::Width];
 
 	/** Uncompressed block metas, 1 meta per byte */
 	typedef NIBBLETYPE BlockNibbleBytes[cChunkDef::NumBlocks];

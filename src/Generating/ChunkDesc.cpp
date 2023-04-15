@@ -179,7 +179,7 @@ void cChunkDesc::GetShapeFromHeight(Shape & a_Shape) const
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int height = cChunkDef::GetHeight(m_HeightMap, x, z);
-			for (int y = 0; y <= height; y++)
+			for (int y = cChunkDef::LowerLimit; y <= height; y++)
 			{
 				a_Shape[y + x * 256 + z * 16 * 256] = 1;
 			}
@@ -372,7 +372,7 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 	a_Dest.m_Origin.z = m_Coords.m_ChunkZ * cChunkDef::Width + a_MinRelZ;
 	a_Dest.SetSize(SizeX, SizeY, SizeZ, cBlockArea::baTypes | cBlockArea::baMetas);
 
-	for (int y = 0; y < SizeY; y++)
+	for (int y = cChunkDef::LowerLimit; y < SizeY; y++)
 	{
 		int CDY = a_MinRelY + y;
 		for (int z = 0; z < SizeZ; z++)
