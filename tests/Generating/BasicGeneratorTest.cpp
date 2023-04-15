@@ -16,7 +16,7 @@ static void verifyChunkDescHeightmap(const cChunkDesc & a_ChunkDesc)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
-			for (int y = cChunkDef::UpperLimit - 1; y > 0; y--)
+			for (int y = cChunkDef::UpperLimit - 1; y > cChunkDef::LowerLimit; y--)
 			{
 				BLOCKTYPE BlockType = a_ChunkDesc.GetBlockType(x, y, z);
 				if (BlockType != E_BLOCK_AIR)
@@ -37,7 +37,7 @@ static void verifyChunkDescHeightmap(const cChunkDesc & a_ChunkDesc)
 static AString chunkSHA1(const cChunkDesc & a_ChunkDesc)
 {
 	cSha1Checksum cs;
-	cs.Update(a_ChunkDesc.GetBlockTypes(), cChunkDef::Width * cChunkDef::Width * cChunkDef::UpperLimit);
+	cs.Update(a_ChunkDesc.GetBlockTypes(), cChunkDef::Width * cChunkDef::Width * cChunkDef::VerticalBlockCount);
 	cSha1Checksum::Checksum digest;
 	cs.Finalize(digest);
 	AString res;
@@ -56,7 +56,7 @@ static void printChunkColumn(const cChunkDesc & a_ChunkDesc, int a_X, int a_Z)
 	int count = 1;
 	LOG("Column {%d, %d}:", a_X, a_Z);
 	LOG("Yfrom\tYto\tcnt\ttype\ttypeStr");
-	for (int y = cChunkDef::UpperLimit - 2; y >= 0; --y)
+	for (int y = cChunkDef::UpperLimit - 2; y >= cChunkDef::LowerLimit; --y)
 	{
 		auto blockType = a_ChunkDesc.GetBlockType(a_X, y, a_Z);
 		if (blockType != prevBlockType)
@@ -126,7 +126,7 @@ static void testGenerateOverworld(cChunkGenerator & aDefaultOverworldGen)
 				TEST_EQUAL_MSG(validOverworldBlockTypes.count(blockType), 1,
 					Printf("Block at {%d, %d, %d}: %d", x, y, z, blockType)
 				);
-				if (y < cChunkDef::UpperLimit - 1)
+				if (cChunkDef::IsValidHeight(y, 1))
 				{
 					TEST_EQUAL_MSG(chd.GetBlockType(x, cChunkDef::UpperLimit - 1, z), E_BLOCK_AIR,
 						Printf("Air at {%d, %d, %d}", x, cChunkDef::UpperLimit - 1, z)

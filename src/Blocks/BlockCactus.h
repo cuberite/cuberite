@@ -77,7 +77,7 @@ private:
 		// Check the total height of the cacti blocks here:
 		int top = a_RelPos.y + 1;
 		while (
-			(top < cChunkDef::UpperLimit) &&
+			(cChunkDef::IsValidHeight(top)) &&
 			(a_Chunk.GetBlock({a_RelPos.x, top, a_RelPos.z}) == E_BLOCK_CACTUS)
 		)
 		{
@@ -85,7 +85,7 @@ private:
 		}
 		int bottom = a_RelPos.y - 1;
 		while (
-			(bottom > 0) &&
+			(cChunkDef::IsValidHeight(bottom, 0, 1)) &&
 			(a_Chunk.GetBlock({a_RelPos.x, bottom, a_RelPos.z}) == E_BLOCK_CACTUS)
 		)
 		{
@@ -143,7 +143,7 @@ private:
 	virtual PlantAction CanGrow(cChunk & a_Chunk, Vector3i a_RelPos) const override
 	{
 		// Only allow growing if there's an air block above:
-		if (((a_RelPos.y + 1) < cChunkDef::UpperLimit) && (a_Chunk.GetBlock(a_RelPos.addedY(1)) == E_BLOCK_AIR))
+		if (cChunkDef::IsValidHeight(a_RelPos.addedY(1)) && (a_Chunk.GetBlock(a_RelPos.addedY(1)) == E_BLOCK_AIR))
 		{
 			return Super::CanGrow(a_Chunk, a_RelPos);
 		}

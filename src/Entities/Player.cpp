@@ -2760,11 +2760,8 @@ void cPlayer::TickFreezeCode()
 			if (RelSuccess)
 			{
 				int NewY = Rel.y;
-				if (NewY < 0)
-				{
-					NewY = 0;
-				}
-				while (NewY < cChunkDef::UpperLimit - 2)
+				NewY = std::max(0, NewY);
+				while (cChunkDef::IsValidHeight(NewY, 2))
 				{
 					// If we find a position with enough space for the player
 					if (

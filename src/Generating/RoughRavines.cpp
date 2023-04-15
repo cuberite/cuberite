@@ -86,7 +86,7 @@ protected:
 	float m_Roughness;
 
 	/** Number to add to the radius based on the height. This creates the "ledges" in the ravine walls. */
-	float m_PerHeightRadius[cChunkDef::UpperLimit];
+	float m_PerHeightRadius[cChunkDef::VerticalBlockCount];
 
 
 	/** Recursively subdivides the line between the points of the specified index.
@@ -133,7 +133,7 @@ protected:
 
 	void InitPerHeightRadius(int a_GridX, int a_GridZ)
 	{
-		int h = 0;
+		int h = cChunkDef::LowerLimit;
 		while (h < cChunkDef::UpperLimit)
 		{
 			m_Noise.SetSeed(m_Seed + h);
@@ -141,7 +141,7 @@ protected:
 			int NumBlocks = (rnd % 3) + 2;
 			rnd = rnd / 4;
 			float Val = static_cast<float>(rnd % 256) / 128.0f - 1.0f;  // Random float in range [-1, +1]
-			if (h + NumBlocks > cChunkDef::UpperLimit)
+			if (!cChunkDef::IsValidHeight(h + NumBlocks))
 			{
 				NumBlocks = cChunkDef::UpperLimit - h;
 			}

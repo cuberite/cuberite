@@ -917,7 +917,7 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	// Non-players are destroyed as soon as they fall out of the world:
-	if ((GetPosY() < 0) && (!IsPlayer()))
+	if ((GetPosY() < cChunkDef::LowerLimit) && (!IsPlayer()))
 	{
 		Destroy();
 		return;
@@ -1394,8 +1394,8 @@ void cEntity::DetectMagma(void)
 	int MaxX = FloorC(GetPosX() + m_Width / 2);
 	int MinZ = FloorC(GetPosZ() - m_Width / 2);
 	int MaxZ = FloorC(GetPosZ() + m_Width / 2);
-	int MinY = Clamp(POSY_TOINT - 1, 0, cChunkDef::UpperLimit - 1);
-	int MaxY = Clamp(FloorC(GetPosY() + m_Height), 0, cChunkDef::UpperLimit - 1);
+	int MinY = Clamp(POSY_TOINT - 1, cChunkDef::LowerLimit, cChunkDef::UpperLimit - 1);
+	int MaxY = Clamp(FloorC(GetPosY() + m_Height), cChunkDef::LowerLimit, cChunkDef::UpperLimit - 1);
 
 	for (int x = MinX; x <= MaxX; x++)
 	{
@@ -1708,7 +1708,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	int RelY = FloorC(GetPosY() + 0.1);
 	int HeadRelY = CeilC(GetPosY() + GetHeight()) - 1;
 	ASSERT(RelY <= HeadRelY);
-	if ((RelY < 0) || (HeadRelY >= cChunkDef::UpperLimit))
+	if (!cChunkDef::IsValidHeight(HeadRelY))
 	{
 		return;
 	}
@@ -1717,8 +1717,8 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	int MaxRelX = FloorC(GetPosX() + m_Width / 2) - a_Chunk.GetPosX() * cChunkDef::Width;
 	int MinRelZ = FloorC(GetPosZ() - m_Width / 2) - a_Chunk.GetPosZ() * cChunkDef::Width;
 	int MaxRelZ = FloorC(GetPosZ() + m_Width / 2) - a_Chunk.GetPosZ() * cChunkDef::Width;
-	int MinY = Clamp(POSY_TOINT, 0, cChunkDef::UpperLimit - 1);
-	int MaxY = Clamp(FloorC(GetPosY() + m_Height), 0, cChunkDef::UpperLimit - 1);
+	int MinY = Clamp(POSY_TOINT, cChunkDef::LowerLimit, cChunkDef::UpperLimit - 1);
+	int MaxY = Clamp(FloorC(GetPosY() + m_Height), cChunkDef::LowerLimit, cChunkDef::UpperLimit - 1);
 
 	for (int x = MinRelX; x <= MaxRelX; x++)
 	{

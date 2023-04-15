@@ -95,7 +95,7 @@ void cChestEntity::DestroyWindow()
 bool cChestEntity::IsBlocked()
 {
 	return (
-		(GetPosY() < cChunkDef::UpperLimit - 1) &&
+		cChunkDef::IsValidHeight(GetPosY(), 1) &&
 		(
 			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPos().addedY(1))) ||
 			!cOcelot::IsCatSittingOnBlock(GetWorld(), Vector3d(GetPos()))

@@ -140,10 +140,10 @@ void cEndGen::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape)
 				// Create a void between the main island and the other island using the formula 'x^3 - 3 * x' where x is distance from spawn.
 				double pow = std::pow((distanceFromSpawn - m_MainIslandSize) / m_MainIslandSize, 3);
 				double mult = 3 * ((distanceFromSpawn - m_MainIslandSize) / m_MainIslandSize);
-				maxHeightLimit = Clamp((pow - mult) * 100 + static_cast<double>(voidOffset) * m_VoidOffsetNoiseMultiplier, 0.0, static_cast<double>(cChunkDef::UpperLimit));
+				maxHeightLimit = Clamp((pow - mult) * 100 + static_cast<double>(voidOffset) * m_VoidOffsetNoiseMultiplier, static_cast<double>(cChunkDef::LowerLimit), static_cast<double>(cChunkDef::UpperLimit));
 			}
-			int maxHeight = static_cast<int>(Clamp(m_BaseHeight + static_cast<double>(noise) * m_TerrainTopMultiplier, 0.0, maxHeightLimit));
-			int minHeight = static_cast<int>(Clamp(m_BaseHeight - static_cast<double>(noise) * m_TerrainBottomMultiplier, 0.0, static_cast<double>(cChunkDef::UpperLimit)));
+			int maxHeight = static_cast<int>(Clamp(m_BaseHeight + static_cast<double>(noise) * m_TerrainTopMultiplier, static_cast<double>(cChunkDef::LowerLimit), maxHeightLimit));
+			int minHeight = static_cast<int>(Clamp(m_BaseHeight - static_cast<double>(noise) * m_TerrainBottomMultiplier, static_cast<double>(cChunkDef::LowerLimit), static_cast<double>(cChunkDef::UpperLimit)));
 
 			for (int y = minHeight; y < maxHeight; y++)
 			{
@@ -164,9 +164,9 @@ void cEndGen::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape &
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			for (int y = 0; y < cChunkDef::UpperLimit; y++)
+			for (int y = cChunkDef::LowerLimit; y < cChunkDef::UpperLimit; y++)
 			{
-				if (a_Shape[(x + 16 * z) * 256 + y] != 0)
+				if (a_Shape[(x + cChunkDef::Width * z) * cChunkDef::VerticalBlockCount + y] != 0)
 				{
 					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_END_STONE);
 				}

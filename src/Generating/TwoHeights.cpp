@@ -58,10 +58,10 @@ public:
 		{
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
-				int idxChoice = 257 * 17 * z + 257 * x;
+				int idxChoice = (cChunkDef::VerticalBlockCount + 1) * (cChunkDef::Width + 1) * z + (cChunkDef::VerticalBlockCount + 1) * x;
 				NOISE_DATATYPE heightA = static_cast<NOISE_DATATYPE>(cChunkDef::GetHeight(heightsA, x, z));
 				NOISE_DATATYPE heightB = static_cast<NOISE_DATATYPE>(cChunkDef::GetHeight(heightsB, x, z));
-				for (int y = 0; y < cChunkDef::UpperLimit; y++)
+				for (int y = cChunkDef::LowerLimit; y < cChunkDef::UpperLimit; y++)
 				{
 					int height = static_cast<int>(ClampedLerp(heightA, heightB, choice[idxChoice++]));
 					a_Shape[idxShape++] = (y < height) ? 1 : 0;

@@ -555,7 +555,7 @@ int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 	}
 	else
 	{
-		while ((Position.y < cChunkDef::UpperLimit) && cBlockInfo::IsSolid(m_World->GetBlock(Position)))
+		while (cChunkDef::IsValidHeight(Position, 1) && cBlockInfo::IsSolid(m_World->GetBlock(Position)))
 		{
 			Position.y++;
 		}

@@ -56,7 +56,7 @@ void cFinishGenNetherClumpFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 	int PosX = Val1 % 16;
 	int PosZ = Val2 % 16;
 
-	for (int y = 1; y < cChunkDef::UpperLimit; y++)
+	for (int y = cChunkDef::LowerLimit + 1; y < cChunkDef::UpperLimit; y++)
 	{
 		if (a_ChunkDesc.GetBlockType(PosX, y, PosZ) != E_BLOCK_AIR)
 		{
@@ -118,9 +118,9 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 	}
 
 	int MinY = a_RelY - 2;
-	if (MinY < 0)  // Check if the coordinate is outside the chunk. If it it then adjust it.
+	if (MinY < cChunkDef::LowerLimit)  // Check if the coordinate is outside the chunk. If it it then adjust it.
 	{
-		MinY = 0;
+		MinY = cChunkDef::LowerLimit;
 	}
 
 	int MaxY = a_RelY + 2;
@@ -2184,7 +2184,7 @@ void cFinishGenOrePockets::imprintSphere(
 	int blockZ = FloorC(a_SphereZ);
 	if (
 		(blockX >= baseX) && (blockX < baseX + cChunkDef::Width) &&
-		(blockY >= 0) && (blockY < cChunkDef::UpperLimit) &&
+		cChunkDef::IsValidHeight(blockY) &&
 		(blockZ >= baseZ) && (blockZ < baseZ + cChunkDef::Width)
 	)
 	{

@@ -137,7 +137,7 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 			NIBBLETYPE TargetMeta;
 
 			auto Height = a_Chunk.GetHeight(RelX, RelZ);
-			auto ChunkHeight = cChunkDef::UpperLimit;
+			auto ChunkHeight = cChunkDef::VerticalBlockCount;
 			a_Chunk.GetBlockTypeMeta(RelX, Height, RelZ, TargetBlock, TargetMeta);
 			auto ColourID = cBlockHandler::For(TargetBlock).GetMapBaseColourID(TargetMeta);
 

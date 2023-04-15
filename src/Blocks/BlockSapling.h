@@ -137,7 +137,7 @@ private:
 		ASSERT(CheckHeight != 0);
 
 		// Don't grow a tree if we don't have enough space left above it in the chunk
-		if ((a_RelY + CheckHeight) > cChunkDef::UpperLimit)
+		if (!cChunkDef::IsValidHeight(a_RelY + CheckHeight))
 		{
 			return false;
 		}

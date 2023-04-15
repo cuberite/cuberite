@@ -636,8 +636,7 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 		TryY += CenterY;
 		TryZ += CenterZ;
 
-		ASSERT(TryY > cChunkDef::LowerLimit);
-		ASSERT(TryY < cChunkDef::UpperLimit - 1);
+		ASSERT(cChunkDef::IsValidHeight(TryY, 1));
 
 		int WorldX, WorldY, WorldZ;
 		PositionToWorldPosition(TryX, TryY, TryZ, WorldX, WorldY, WorldZ);
@@ -935,7 +934,7 @@ void cChunk::ApplyWeatherToTop()
 			FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta - 1);
 		}
 	}
-	else if (cBlockInfo::IsSnowable(TopBlock) && (Height < cChunkDef::UpperLimit - 1))
+	else if (cChunkDef::IsValidHeight(TopBlock, 1) && cBlockInfo::IsSnowable(TopBlock))
 	{
 		SetBlock({X, Height + 1, Z}, E_BLOCK_SNOW, 0);
 	}

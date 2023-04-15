@@ -82,7 +82,7 @@ private:
 				}
 				return false;
 			};
-			for (int y = std::max(a_BlockPos.y - i, 0); y <= std::min(a_BlockPos.y + i, cChunkDef::UpperLimit - 1); y++)
+			for (int y = std::max(a_BlockPos.y - i, cChunkDef::LowerLimit); y <= std::min(a_BlockPos.y + i, cChunkDef::UpperLimit - 1); y++)
 			{
 				for (int z = a_BlockPos.z - i; z <= a_BlockPos.z + i; z++)
 				{

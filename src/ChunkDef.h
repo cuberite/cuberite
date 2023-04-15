@@ -166,10 +166,23 @@ public:  // tolua_export
 	}
 
 
-	/** Validates a height-coordinate. Returns false if height-coordinate is out of height bounds */
-	inline static bool IsValidHeight(Vector3i a_BlockPosition)
+	/** Validates a height-coordinate. Returns false if height-coordinate is out of height bounds.
+	Might be enclosed by a_SpaceBelow and a_SpaceAbove. [LowerLimit + a_SpaceBelow, UpperLimit - a_SpaceAbove) is valid. */
+	inline static bool IsValidHeight(Vector3i a_BlockPosition, int a_SpaceAbove = 0, int a_SpaceBelow = 0)
 	{
-		return ((a_BlockPosition.y >= LowerLimit) && (a_BlockPosition.y < UpperLimit));
+		ASSERT(a_SpaceBelow >= 0);
+		ASSERT(a_SpaceAbove >= 0);
+		return ((a_BlockPosition.y >= LowerLimit + a_SpaceBelow) && (a_BlockPosition.y < UpperLimit - a_SpaceAbove));
+	}
+
+	/** DEPRECATED!!! Validates a height-coordinate. Returns false if height-coordinate is out of height bounds.
+	Might be enclosed by a_SpaceBelow and a_SpaceAbove. [LowerLimit + a_SpaceBelow, UpperLimit - a_SpaceAbove) is valid.
+	@deprecated */
+	inline static bool IsValidHeight(int a_Height, int a_SpaceAbove = 0, int a_SpaceBelow = 0)
+	{
+		ASSERT(a_SpaceBelow >= 0);
+		ASSERT(a_SpaceAbove >= 0);
+		return ((a_Height >= LowerLimit + a_SpaceBelow) && (a_Height < UpperLimit - a_SpaceAbove));
 	}
 
 

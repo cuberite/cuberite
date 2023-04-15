@@ -261,7 +261,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	{
 		for (int z = 0; z < cChunkDef::Width * 3; z++)
 		{
-			for (int y = cChunkDef::UpperLimit / 2; y >= 0; y--)
+			for (int y = cChunkDef::UpperLimit / 2; y >= cChunkDef::LowerLimit; y--)
 			{
 				unsigned char Seeds     [cChunkDef::Width * 3];
 				memcpy(Seeds, m_BlockTypes + y * BlocksPerYLayer + z * cChunkDef::Width * 3, cChunkDef::Width * 3);
@@ -357,7 +357,7 @@ void cLightingThread::PrepareSkyLight(void)
 	m_NumSeeds = 0;
 
 	// Fill the top of the chunk with all-light:
-	if (m_MaxHeight < cChunkDef::UpperLimit - 1)
+	if (cChunkDef::IsValidHeight(m_MaxHeight, 1))
 	{
 		std::fill(m_SkyLight + (m_MaxHeight + 1) * BlocksPerYLayer, m_SkyLight + ARRAYCOUNT(m_SkyLight), static_cast<NIBBLETYPE>(15));
 	}
@@ -371,7 +371,7 @@ void cLightingThread::PrepareSkyLight(void)
 			int idx = BaseZ + x;
 			// Find the lowest block in this column that receives full sunlight (go through transparent blocks):
 			int Current = m_HeightMap[idx];
-			ASSERT(Current < cChunkDef::UpperLimit);
+			ASSERT(cChunkDef::IsValidHeight(Current));
 			while (
 				(Current >= 0) &&
 				cBlockInfo::IsTransparent(m_BlockTypes[idx + Current * BlocksPerYLayer]) &&
@@ -395,7 +395,7 @@ void cLightingThread::PrepareSkyLight(void)
 			}
 
 			// Add Current as a seed:
-			if (Current < cChunkDef::UpperLimit)
+			if (cChunkDef::IsValidHeight(Current))
 			{
 				int CurrentIdx = idx + Current * BlocksPerYLayer;
 				m_IsSeed1[CurrentIdx] = true;

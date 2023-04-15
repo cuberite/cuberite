@@ -786,11 +786,11 @@ static int tolua_cBlockArea_Write(lua_State * a_LuaState)
 	//   ... Or should we silently clone-crop-write the cBlockArea so that the API call does what would be naturally expected?
 	//   ... Or should we change the cBlockArea::Write() to allow out-of-range Y coords and do the cropping there?
 	//   ... NOTE: We already support auto-crop in cBlockArea::Merge() itself
-	if (coords.y < 0)
+	if (coords.y < cChunkDef::LowerLimit)
 	{
-		LOGWARNING("cBlockArea:Write(): MinBlockY less than zero, adjusting to zero");
+		LOGWARNING("cBlockArea:Write(): MinBlockY less than lower limit, adjusting to lower limit");
 		L.LogStackTrace();
-		coords.y = 0;
+		coords.y = cChunkDef::LowerLimit;
 	}
 	else if (coords.y > cChunkDef::UpperLimit - self->GetSizeY())
 	{

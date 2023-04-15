@@ -282,7 +282,7 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 
 bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 {
-	ASSERT((m_Current.y >= cChunkDef::LowerLimit) && (m_Current.y < cChunkDef::UpperLimit));  // This should be provided by FixStartAboveWorld() / FixStartBelowWorld()
+	ASSERT(cChunkDef::IsValidHeight(m_Current));  // This should be provided by FixStartAboveWorld() / FixStartBelowWorld()
 
 	// This is the actual line tracing loop.
 	for (;;)
@@ -298,7 +298,7 @@ bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 			return true;
 		}
 
-		if ((m_Current.y < cChunkDef::LowerLimit) || (m_Current.y >= cChunkDef::UpperLimit))
+		if (cChunkDef::IsValidHeight(m_Current))
 		{
 			// We've gone out of the world, that's the end of this trace
 			double IntersectX, IntersectZ;

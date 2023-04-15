@@ -168,7 +168,7 @@ void cStructGenTrees::ApplyTreeImage(
 	// Put the generated image into a_BlockTypes, push things outside this chunk into a_Blocks
 	for (sSetBlockVector::const_iterator itr = a_Image.begin(), end = a_Image.end(); itr != end; ++itr)
 	{
-		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ) && (itr->m_RelY < cChunkDef::UpperLimit))
+		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ) && cChunkDef::IsValidHeight(itr->m_RelY))
 		{
 			// Inside this chunk, integrate into a_ChunkDesc:
 			switch (a_ChunkDesc.GetBlockType(itr->m_RelX, itr->m_RelY, itr->m_RelZ))

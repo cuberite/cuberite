@@ -119,7 +119,7 @@ private:
 		}
 
 		// Check if vine above us, add its meta to MaxMeta:
-		if ((a_Position.y < cChunkDef::UpperLimit - 1) && (a_Chunk.GetBlock(a_Position.addedY(1)) == E_BLOCK_VINES))
+		if (cChunkDef::IsValidHeight(a_Position.y, 1) && (a_Chunk.GetBlock(a_Position.addedY(1)) == E_BLOCK_VINES))
 		{
 			MaxMeta |= a_Chunk.GetMeta(a_Position.addedY(1));
 		}

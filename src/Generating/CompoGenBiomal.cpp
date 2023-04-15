@@ -48,7 +48,7 @@ public:
 	const BlockInfo * Get(void) const { return m_Pattern; }
 
 protected:
-	BlockInfo m_Pattern[cChunkDef::UpperLimit] = {};
+	BlockInfo m_Pattern[cChunkDef::VerticalBlockCount] = {};
 } ;
 
 
@@ -174,7 +174,7 @@ protected:
 	HEIGHTTYPE m_SeaLevel;
 
 	/** The pattern used for mesa biomes. Initialized by seed on generator creation. */
-	cPattern::BlockInfo m_MesaPattern[2 * cChunkDef::UpperLimit];
+	cPattern::BlockInfo m_MesaPattern[2 * cChunkDef::VerticalBlockCount];
 
 	/** Noise used for selecting between dirt and sand on the ocean floor. */
 	cNoise m_OceanFloorSelect;

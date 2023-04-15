@@ -249,7 +249,7 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 	}
 
 	// If destination in water or solid, go up to the first air block.
-	while (BelowRel.y < cChunkDef::UpperLimit)
+	while (cChunkDef::IsValidHeight(BelowRel))
 	{
 		Chunk->GetBlockTypeMeta(BelowRel, BlockType, BlockMeta);
 		if (!IsWaterOrSolid(BlockType))

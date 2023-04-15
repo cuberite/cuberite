@@ -227,7 +227,7 @@ private:
 		else
 		{
 			// The coords are pointing at the bottom part of the door
-			if (a_BlockPos.y < cChunkDef::UpperLimit - 1)
+			if (cChunkDef::IsValidHeight(a_BlockPos.y, 1))
 			{
 				NIBBLETYPE UpMeta = a_ChunkInterface.GetBlockMeta(a_BlockPos.addedY(1));
 				return static_cast<NIBBLETYPE>(Meta | (UpMeta << 4));

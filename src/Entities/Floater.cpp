@@ -157,7 +157,7 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Check water at the top of floater otherwise it floats into the air above the water
 	if (
 		const auto Above = Rel.addedY(FloorC(GetPosY() + GetHeight()));
-		(Above.y < cChunkDef::UpperLimit) && IsBlockWater(m_World->GetBlock(Above))
+		cChunkDef::IsValidHeight(Above) && IsBlockWater(m_World->GetBlock(Above))
 	)
 	{
 		SetSpeedY(0.7);

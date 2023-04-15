@@ -320,9 +320,9 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 		a_MaxRelX = cChunkDef::Width;
 	}
 
-	if (a_MinRelY < 0)
+	if (a_MinRelY < cChunkDef::LowerLimit)
 	{
-		LOGWARNING("%s: MinRelY less than zero, adjusting to zero", __FUNCTION__);
+		LOGWARNING("%s: MinRelY less than chunk limit, adjusting to chunk limit", __FUNCTION__);
 		a_MinRelY = 0;
 	}
 	else if (a_MinRelY >= cChunkDef::UpperLimit)
