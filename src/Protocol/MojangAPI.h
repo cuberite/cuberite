@@ -11,7 +11,6 @@
 
 #include <time.h>
 
-#include "HTTP/UrlClient.h"
 #include "UUID.h"
 
 

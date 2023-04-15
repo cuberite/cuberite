@@ -485,8 +485,8 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		auto RequestBody = JsonUtils::WriteFastString(root);
 
 		// Create and send the HTTP request
-		auto [Success, Response] = cUrlClient::BlockingPost(m_NameToUUIDAddress, AStringMap(), std::move(RequestBody), AStringMap());
-		if (!Success)
+		auto [IsSuccessfull, Response] = cUrlClient::BlockingPost(m_NameToUUIDAddress, AStringMap(), std::move(RequestBody), AStringMap());
+		if (!IsSuccessfull)
 		{
 			continue;
 		}
@@ -567,19 +567,22 @@ void cMojangAPI::QueryUUIDToProfile(const cUUID & a_UUID)
 	ReplaceURL(Address, "%UUID%", a_UUID.ToShortString());
 
 	// Create and send the HTTP request
-	auto [Success, Response] = cUrlClient::BlockingGet(Address);
-	if (!Success)
+	auto [IsSuccessfull, Response] = cUrlClient::BlockingGet(Address);
+	if (!IsSuccessfull)
 	{
 		return;
 	}
 
 	// Parse the returned string into Json:
 	Json::Value root;
-	AString ParseError, HexDump;
+	AString ParseError;
 	if (!JsonUtils::ParseString(Response, root, &ParseError) || !root.isObject())
 	{
 		LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __FUNCTION__, ParseError);
+#ifdef NDEBUG
+		AString HexDump;
 		LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
+#endif
 		return;
 	}
 

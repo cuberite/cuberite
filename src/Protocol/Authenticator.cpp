@@ -2,16 +2,17 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Protocol/Authenticator.h"
-#include "Protocol/MojangAPI.h"
-#include "Root.h"
-#include "Server.h"
-#include "ClientHandle.h"
-#include "UUID.h"
-#include "HTTP/UrlParser.h"
 
+#include "ClientHandle.h"
+#include "HTTP/UrlClient.h"
+#include "HTTP/UrlParser.h"
 #include "IniFile.h"
 #include "JsonUtils.h"
 #include "json/json.h"
+#include "Protocol/MojangAPI.h"
+#include "Root.h"
+#include "Server.h"
+#include "UUID.h"
 
 
 
@@ -64,8 +65,8 @@ void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 	}
 
 	{
-		auto [Success, ErrorMessage] = cUrlParser::Validate(m_Server);
-		if (!Success)
+		auto [IsSuccessfull, ErrorMessage] = cUrlParser::Validate(m_Server);
+		if (!IsSuccessfull)
 		{
 			LOGWARNING("%s %d: Supplied invalid URL for configuration value [Authentication: Server]: \"%s\", using default! Error: %s", __FUNCTION__, __LINE__, m_Server.c_str(), ErrorMessage.c_str());
 			m_Server = DEFAULT_AUTH_SERVER;
@@ -73,8 +74,8 @@ void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 	}
 
 	{
-		auto [Success, ErrorMessage] = cUrlParser::Validate(m_Server);
-		if (!Success)
+		auto [IsSuccessfull, ErrorMessage] = cUrlParser::Validate(m_Server);
+		if (!IsSuccessfull)
 		{
 			LOGWARNING("%s %d: Supplied invalid URL for configuration value [Authentication: Address]: \"%s\", using default! Error: %s", __FUNCTION__, __LINE__, m_Address.c_str(), ErrorMessage.c_str());
 			m_Address = DEFAULT_AUTH_ADDRESS;
@@ -182,8 +183,8 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	ReplaceURL(ActualAddress, "%SERVERID%", a_ServerId);
 
 	// Create and send the HTTP request
-	auto [Success, Response] = cUrlClient::BlockingGet(m_Server + ActualAddress);
-	if (!Success)
+	auto [IsSuccessfull, Response] = cUrlClient::BlockingGet(m_Server + ActualAddress);
+	if (!IsSuccessfull)
 	{
 		return false;
 	}
@@ -215,9 +216,9 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 
 
 
+#ifdef ENABLE_PROPERTIES
 
-
-/* In case we want to export this function to the plugin API later - don't forget to add the relevant INI configuration lines for DEFAULT_PROPERTIES_ADDRESS
+/* In case we want to export this function to the plugin API later - don't forget to add the relevant INI configuration lines for DEFAULT_PROPERTIES_ADDRESS */
 
 #define DEFAULT_PROPERTIES_ADDRESS "/session/minecraft/profile/%UUID%"
 
@@ -228,42 +229,12 @@ bool cAuthenticator::GetPlayerProperties(const AString & a_UUID, Json::Value & a
 {
 	LOGD("Trying to get properties for user %s", a_UUID.c_str());
 
-	// Create the GET request:
-	AString ActualAddress = m_PropertiesAddress;
-	ReplaceString(ActualAddress, "%UUID%", a_UUID);
-
-	AString Request;
-	Request += "GET " + ActualAddress + " HTTP/1.0\r\n";
-	Request += "Host: " + m_Server + "\r\n";
-	Request += "User-Agent: Cuberite\r\n";
-	Request += "Connection: close\r\n";
-	Request += "\r\n";
-
-	AString Response;
-	if (!ConnectSecurelyToAddress(StarfieldCACert(), m_Server, Request, Response))
+	// Create and send the HTTP request
+	auto [IsSuccessfull, Response] = cUrlClient::BlockingGet(m_Server + ActualAddress);
+	if (!IsSuccessfull)
 	{
 		return false;
 	}
-
-	// Check the HTTP status line:
-	const AString Prefix("HTTP/1.1 200 OK");
-	AString HexDump;
-	if (Response.compare(0, Prefix.size(), Prefix))
-	{
-		LOGINFO("Failed to get properties for user %s, bad HTTP status line received", a_UUID.c_str());
-		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
-		return false;
-	}
-
-	// Erase the HTTP headers from the response:
-	size_t idxHeadersEnd = Response.find("\r\n\r\n");
-	if (idxHeadersEnd == AString::npos)
-	{
-		LOGINFO("Failed to get properties for user %s, bad HTTP response header received", a_UUID.c_str());
-		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
-		return false;
-	}
-	Response.erase(0, idxHeadersEnd + 4);
 
 	// Parse the Json response:
 	if (Response.empty())
@@ -282,7 +253,7 @@ bool cAuthenticator::GetPlayerProperties(const AString & a_UUID, Json::Value & a
 	a_Properties = root["properties"];
 	return true;
 }
-*/
+#endif
 
 
 
