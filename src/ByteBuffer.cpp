@@ -38,7 +38,7 @@ namespace Position
 {
 	// If the bit indicated in the mask is 0, the the matching offset is applied.
 	constexpr int BIT_MASK_IS_NEGATIVE_XZ = 0x02000000;
-	constexpr int BIT_MASK_IS_NEGATIVE_Y  = 0x08000;
+	constexpr int BIT_MASK_IS_NEGATIVE_Y  = 0x0800;
 
 	constexpr int NEGATIVE_OFFSET_XZ = 0x04000000;
 	constexpr int NEGATIVE_OFFSET_Y  = 0x01000;
@@ -556,7 +556,7 @@ bool cByteBuffer::ReadXYZPosition64(int & a_BlockX, int & a_BlockY, int & a_Bloc
 	// Convert the 64 received bits into 3 coords:
 	UInt32 BlockXRaw = (Value >> XYZPosition::BIT_COUNT_X) & Position::BIT_MASK_XZ;
 	UInt32 BlockYRaw = (Value >> XYZPosition::BIT_COUNT_Y) & Position::BIT_MASK_Y;
-	UInt32 BlockZRaw = (Value &                              Position::BIT_MASK_XZ);
+	UInt32 BlockZRaw = (Value                              & Position::BIT_MASK_XZ);
 
 	// If the highest bit in the number's range is set, convert the number into negative:
 	a_BlockX = ((BlockXRaw & Position::BIT_MASK_IS_NEGATIVE_XZ) == 0) ? static_cast<int>(BlockXRaw) : -(Position::NEGATIVE_OFFSET_XZ - static_cast<int>(BlockXRaw));
@@ -851,9 +851,9 @@ bool cByteBuffer::WriteXYZPosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_Blo
 	CHECK_THREAD
 	CheckValid();
 	return WriteBEUInt64(
-		((static_cast<UInt64>(a_BlockX) & 0x3FFFFFF) << 38) |
-		((static_cast<UInt64>(a_BlockY) & 0xFFF) << 26) |
-		(static_cast<UInt64>(a_BlockZ) & 0x3FFFFFF)
+		((static_cast<UInt64>(a_BlockX) & Position::BIT_MASK_XZ) << XYZPosition::BIT_COUNT_X) |
+		((static_cast<UInt64>(a_BlockY) & Position::BIT_MASK_Y)  << XYZPosition::BIT_COUNT_Y) |
+		(static_cast<UInt64>(a_BlockZ)  & Position::BIT_MASK_XZ)
 	);
 }
 
@@ -866,9 +866,9 @@ bool cByteBuffer::WriteXZYPosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_Blo
 	CHECK_THREAD
 	CheckValid();
 	return WriteBEUInt64(
-		((static_cast<UInt64>(a_BlockX) & 0x3FFFFFF) << 38) |
-		((static_cast<UInt64>(a_BlockZ) & 0x3FFFFFF) << 12) |
-		(static_cast<UInt64>(a_BlockY) & 0xFFF)
+		((static_cast<UInt64>(a_BlockX) & Position::BIT_MASK_XZ) << XZYPosition::BIT_COUNT_X) |
+		((static_cast<UInt64>(a_BlockZ) & Position::BIT_MASK_XZ) << XZYPosition::BIT_COUNT_Z) |
+		(static_cast<UInt64>(a_BlockY)  & Position::BIT_MASK_Y)
 	);
 }
 
