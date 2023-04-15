@@ -786,7 +786,7 @@ void cBiomalNoise3DComposable::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::
 		{
 			for (int y = cChunkDef::LowerLimit; y < cChunkDef::UpperLimit; y++)
 			{
-				a_Shape[y + x * cChunkDef::VerticalBlockCount + z * cChunkDef::VerticalBlockCount * cChunkDef::Width] = (m_NoiseArray[y + (cChunkDef::VerticalBlockCount + 1) * x + (cChunkDef::VerticalBlockCount + 1) * (cChunkDef::VerticalBlockCount + 1) * z] > m_AirThreshold) ? 0 : 1;
+				a_Shape[y + x * cChunkDef::VerticalBlockCount + z * cChunkDef::VerticalBlockCount * cChunkDef::Width] = (m_NoiseArray[y + (cChunkDef::VerticalBlockCount + 1) * x + (cChunkDef::VerticalBlockCount + 1) * (cChunkDef::Width + 1) * z] > m_AirThreshold) ? 0 : 1;
 			}
 		}  // for x
 	}  // for z
