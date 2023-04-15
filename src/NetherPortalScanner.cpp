@@ -187,7 +187,7 @@ bool cNetherPortalScanner::OnAllChunksAvailable(void)
 		int maxy = m_MaxY;
 		std::vector<Vector3i> Possibilities;
 		int x, y, z;
-		for (cCunkDef::LowerLimit = 0; y < maxy - PortalHeight; y++)
+		for (y = cChunkDef::LowerLimit; y < maxy - PortalHeight; y++)
 		{
 			for (x = minx; x < maxx - PortalLength; x++)
 			{
