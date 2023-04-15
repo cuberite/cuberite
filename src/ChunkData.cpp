@@ -95,9 +95,9 @@ ElementType ChunkDataStore<ElementType, ElementCount, DefaultValue>::Get(const V
 
 
 template<class ElementType, size_t ElementCount, auto DefaultValue>
-typename ChunkDataStore<ElementType, ElementCount, DefaultValue>::Type * ChunkDataStore<ElementType, ElementCount, DefaultValue>::GetSection(const size_t a_Y) const
+const std::unique_ptr<typename ChunkDataStore<ElementType, ElementCount, DefaultValue>::Type> & ChunkDataStore<ElementType, ElementCount, DefaultValue>::GetSection(const size_t a_Y) const
 {
-	return Store[a_Y].get();
+	return Store[a_Y];
 }
 
 
@@ -142,7 +142,7 @@ void ChunkDataStore<ElementType, ElementCount, DefaultValue>::SetSection(const T
 
 	if (Section != nullptr)
 	{
-		*Section = a_Source;
+		Section = std::make_unique<Type>(a_Source);
 	}
 	else if (std::any_of(a_Source.begin(), a_Source.end(), [](const auto Value) { return Value != DefaultValue; }))
 	{
@@ -160,7 +160,7 @@ void ChunkDataStore<ElementType, ElementCount, DefaultValue>::SetAll(const std::
 {
 	for (size_t Y = 0; Y != cChunkDef::NumSections; Y++)
 	{
-		SetSection(reinterpret_cast<const Type & >(a_Source.data()[Y * ElementCount]), Y);
+		SetSection(reinterpret_cast<const Type &>(a_Source.data()[Y * ElementCount]), Y);
 	}
 }
 

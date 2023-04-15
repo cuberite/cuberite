@@ -12,12 +12,12 @@ static void test()
 		// Test first segment (blocks)
 		ChunkBlockData buffer;
 
-		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256];
-		memset(SrcBlockBuffer, 0x00, sizeof(SrcBlockBuffer));
+		cChunkDef::BlockTypes SrcBlockBuffer;
+		SrcBlockBuffer.fill(0x00);
 		SrcBlockBuffer[7 + (4 * 16) + (5 * 16 * 16)] = 0xcd;
 
-		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
-		memset(SrcNibbleBuffer, 0x00, sizeof(SrcNibbleBuffer));
+		cChunkDef::BlockNibbles SrcNibbleBuffer;
+		SrcNibbleBuffer.fill(0x00);
 		SrcNibbleBuffer[(6 + (1 * 16) + (2 * 16 * 16)) / 2] = 0xe;
 
 		buffer.SetAll(SrcBlockBuffer, SrcNibbleBuffer);
@@ -30,8 +30,8 @@ static void test()
 		// Test first segment (lights)
 		ChunkLightData buffer;
 
-		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
-		memset(SrcNibbleBuffer, 0x00, sizeof(SrcNibbleBuffer));
+		cChunkDef::BlockNibbles SrcNibbleBuffer;
+		SrcNibbleBuffer.fill(0x00);
 		SrcNibbleBuffer[(6 + (1 * 16) + (2 * 16 * 16)) / 2] = 0xe;
 
 		buffer.SetAll(SrcNibbleBuffer, SrcNibbleBuffer);
@@ -44,12 +44,12 @@ static void test()
 		// test following segment (blocks)
 		ChunkBlockData buffer;
 
-		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256];
-		memset(SrcBlockBuffer, 0x00, sizeof(SrcBlockBuffer));
+		cChunkDef::BlockTypes SrcBlockBuffer;
+		SrcBlockBuffer.fill(0x00);
 		SrcBlockBuffer[7 + (4 * 16) + (24 * 16 * 16)] = 0xcd;
 
-		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
-		memset(SrcNibbleBuffer, 0x00, sizeof(SrcNibbleBuffer));
+		cChunkDef::BlockNibbles SrcNibbleBuffer;
+		SrcNibbleBuffer.fill(0x00);
 		SrcNibbleBuffer[(6 + (1 * 16) + (24 * 16 * 16)) / 2] = 0xe;
 
 		buffer.SetAll(SrcBlockBuffer, SrcNibbleBuffer);
@@ -62,8 +62,8 @@ static void test()
 		// test following segment (lights)
 		ChunkLightData buffer;
 
-		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
-		memset(SrcNibbleBuffer, 0x00, sizeof(SrcNibbleBuffer));
+		cChunkDef::BlockNibbles SrcNibbleBuffer;
+		SrcNibbleBuffer.fill(0x00);
 		SrcNibbleBuffer[(6 + (1 * 16) + (24 * 16 * 16)) / 2] = 0xe;
 
 		buffer.SetAll(SrcNibbleBuffer, SrcNibbleBuffer);
@@ -76,11 +76,11 @@ static void test()
 		// test zeros (blocks)
 		ChunkBlockData buffer;
 
-		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256];
-		memset(SrcBlockBuffer, 0x00, sizeof(SrcBlockBuffer));
+		cChunkDef::BlockTypes SrcBlockBuffer;
+		SrcBlockBuffer.fill(0x00);
 
-		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
-		memset(SrcNibbleBuffer, 0x00, sizeof(SrcNibbleBuffer));
+		cChunkDef::BlockNibbles SrcNibbleBuffer;
+		SrcNibbleBuffer.fill(0x00);
 
 		buffer.SetAll(SrcBlockBuffer, SrcNibbleBuffer);
 
@@ -92,11 +92,11 @@ static void test()
 		// test zeros (lights)
 		ChunkLightData buffer;
 
-		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
-		memset(SrcNibbleBuffer, 0x00, sizeof(SrcNibbleBuffer));
+		cChunkDef::BlockNibbles SrcNibbleBuffer;
+		SrcNibbleBuffer.fill(0x00);
 
-		NIBBLETYPE SrcNibbleBuffer2[16 * 16 * 256 / 2];
-		memset(SrcNibbleBuffer2, 0xff, sizeof(SrcNibbleBuffer2));
+		cChunkDef::BlockNibbles SrcNibbleBuffer2;
+		SrcNibbleBuffer2.fill(0xFF);
 
 		buffer.SetAll(SrcNibbleBuffer, SrcNibbleBuffer2);
 

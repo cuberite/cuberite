@@ -37,7 +37,7 @@ static void verifyChunkDescHeightmap(const cChunkDesc & a_ChunkDesc)
 static AString chunkSHA1(const cChunkDesc & a_ChunkDesc)
 {
 	cSha1Checksum cs;
-	cs.Update(a_ChunkDesc.GetBlockTypes(), cChunkDef::Width * cChunkDef::Width * cChunkDef::Height);
+	cs.Update(a_ChunkDesc.GetBlockTypes().data(), cChunkDef::Width * cChunkDef::Width * cChunkDef::Height);
 	cSha1Checksum::Checksum digest;
 	cs.Finalize(digest);
 	AString res;

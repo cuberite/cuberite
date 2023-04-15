@@ -848,7 +848,7 @@ void cChunk::TickBlocks(void)
 	// http://minecraft.fandom.com/wiki/Tick#Random_tick
 	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 	{
-		const auto Section = m_BlockData.GetSection(Y);
+		const auto & Section = m_BlockData.GetSection(Y);
 		if (Section == nullptr)
 		{
 			continue;
@@ -1238,7 +1238,7 @@ void cChunk::WakeUpSimulators(void)
 
 	for (size_t SectionIdx = 0; SectionIdx != cChunkDef::NumSections; ++SectionIdx)
 	{
-		const auto * Section = m_BlockData.GetSection(SectionIdx);
+		const auto & Section = m_BlockData.GetSection(SectionIdx);
 		if (Section == nullptr)
 		{
 			continue;

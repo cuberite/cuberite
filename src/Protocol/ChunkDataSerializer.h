@@ -67,10 +67,10 @@ private:
 	/** Writes all blocks in a chunk section into a series of Int64.
 	Writes start from the bit directly subsequent to the previous write's end, possibly crossing over to the next Int64. */
 	template <auto Palette>
-	inline void WriteBlockSectionSeamless(const ChunkBlockData::BlockArray * a_Blocks, const ChunkBlockData::MetaArray * a_Metas, UInt8 a_BitsPerEntry);
+	inline void WriteBlockSectionSeamless(const ChunkBlockData::BlockArrayPtr & a_Blocks, const ChunkBlockData::MetaArrayPtr & a_Metas, UInt8 a_BitsPerEntry);
 
 	/** Copies all lights in a chunk section into the packet, block light followed immediately by sky light. */
-	inline void WriteLightSectionGrouped(const ChunkLightData::LightArray * a_BlockLights, const ChunkLightData::LightArray * a_SkyLights);
+	inline void WriteLightSectionGrouped(const ChunkLightData::LightArrayPtr & a_BlockLights, const ChunkLightData::LightArrayPtr & a_SkyLights);
 
 	/** Finalises the data, compresses it if required, and stores it into cache. */
 	inline void CompressPacketInto(ChunkDataCache & a_Cache);
