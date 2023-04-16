@@ -142,12 +142,12 @@ void ChunkDataStore<ElementType, ElementCount, DefaultValue>::SetSection(const T
 
 	if (Section != nullptr)
 	{
-		Section = std::make_unique<Type>(a_Source);
+		std::copy(a_Source.begin(), a_Source.end(), Section->begin());
 	}
 	else if (std::any_of(a_Source.begin(), a_Source.end(), [](const auto Value) { return Value != DefaultValue; }))
 	{
 		Section = cpp20::make_unique_for_overwrite<Type>();
-		*Section = a_Source;
+		std::copy(a_Source.begin(), a_Source.end(), Section->begin());
 	}
 }
 
