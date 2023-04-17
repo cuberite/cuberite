@@ -364,8 +364,8 @@ void cLightingThread::PrepareSkyLight(void)
 			ASSERT(Current < cChunkDef::Height);
 			while (
 				(Current >= 0) &&
-				cBlockInfo::IsTransparent(m_BlockTypes[idx + Current * BlocksPerYLayer]) &&
-				!cBlockInfo::IsSkylightDispersant(m_BlockTypes[idx + Current * BlocksPerYLayer])
+				cBlockInfo::IsTransparent(m_BlockTypes[static_cast<size_t>(idx + Current * BlocksPerYLayer)]) &&
+				!cBlockInfo::IsSkylightDispersant(m_BlockTypes[static_cast<size_t>(idx + Current * BlocksPerYLayer)])
 			)
 			{
 				Current -= 1;  // Sunlight goes down unchanged through this block
@@ -379,7 +379,7 @@ void cLightingThread::PrepareSkyLight(void)
 			int MaxNeighbor = std::max(std::max(Neighbor1, Neighbor2), std::max(Neighbor3, Neighbor4));  // Maximum of the four neighbors
 
 			// Fill the column from m_MaxHeight to Current with all-light:
-			for (int y = m_MaxHeight, Index = idx + y * BlocksPerYLayer; y >= Current; y--, Index -= BlocksPerYLayer)
+			for (int y = m_MaxHeight, Index = static_cast<int>(idx) + y * BlocksPerYLayer; y >= Current; y--, Index -= BlocksPerYLayer)
 			{
 				m_SkyLight[static_cast<size_t>(Index)] = 15;
 			}
@@ -387,13 +387,13 @@ void cLightingThread::PrepareSkyLight(void)
 			// Add Current as a seed:
 			if (Current < cChunkDef::Height)
 			{
-				size_t CurrentIdx = idx + Current * BlocksPerYLayer;
+				size_t CurrentIdx = idx + static_cast<size_t>(Current * BlocksPerYLayer);
 				m_IsSeed1[CurrentIdx] = true;
 				m_SeedIdx1[m_NumSeeds++] = static_cast<UInt32>(CurrentIdx);
 			}
 
 			// Add seed from Current up to the highest neighbor:
-			for (size_t y = Current + 1, Index = idx + y * BlocksPerYLayer; y < static_cast<size_t>(MaxNeighbor); y++, Index += BlocksPerYLayer)
+			for (int y = Current + 1, Index = static_cast<int>(idx) + y * BlocksPerYLayer; y < static_cast<size_t>(MaxNeighbor); y++, Index += BlocksPerYLayer)
 			{
 				m_IsSeed1[Index] = true;
 				m_SeedIdx1[m_NumSeeds++] = static_cast<UInt32>(Index);
