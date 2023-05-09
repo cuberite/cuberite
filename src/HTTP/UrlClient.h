@@ -87,7 +87,7 @@ public:
 		for such a response; instead, the redirect is silently attempted. */
 		virtual void OnRedirecting(const AString & a_NewLocation) {}
 	};
-	using cCallbacksPtr = std::unique_ptr<cCallbacks>;
+	using cCallbacksPtr = std::shared_ptr<cCallbacks>;
 
 
 	/** Used for HTTP status codes. */
@@ -147,10 +147,9 @@ public:
 		const AStringMap & a_Options = {}
 	);
 
-	/** The method will run a thread blocking HTTP request. Any error handling
-	is done inside the functions. Check the LOG or stdout for any occurring
-	errors. Other parameters are the same as for the regular request method.
-	The return value is if the request was successful and the response. */
+	/** Sends a generic request and block until a response is received or an error occurs.
+	The first returned value specifies whether the response was received successfully.
+	If successful, the second value provides the actual response data. */
 	static std::pair<bool, AString> BlockingRequest(
 		const AString & a_Method,
 		const AString & a_URL,
