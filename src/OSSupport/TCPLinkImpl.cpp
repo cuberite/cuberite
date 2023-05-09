@@ -17,10 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cTCPLinkImpl:
 
-cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
+cTCPLinkImpl::cTCPLinkImpl(const std::string & a_Host, cTCPLink::cCallbacksPtr a_LinkCallbacks):
 	Super(std::move(a_LinkCallbacks)),
 	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), -1, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE | BEV_OPT_DEFER_CALLBACKS | BEV_OPT_UNLOCK_CALLBACKS)),
 	m_LocalPort(0),
+	m_RemoteHost(a_Host),
 	m_RemotePort(0),
 	m_ShouldShutdown(false)
 {
@@ -30,7 +31,13 @@ cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
 
 
 
-cTCPLinkImpl::cTCPLinkImpl(evutil_socket_t a_Socket, cTCPLink::cCallbacksPtr a_LinkCallbacks, cServerHandleImplPtr a_Server, const sockaddr * a_Address, socklen_t a_AddrLen):
+cTCPLinkImpl::cTCPLinkImpl(
+	evutil_socket_t a_Socket,
+	cTCPLink::cCallbacksPtr a_LinkCallbacks,
+	cServerHandleImplPtr a_Server,
+	const sockaddr * a_Address,
+	socklen_t a_AddrLen
+):
 	Super(std::move(a_LinkCallbacks)),
 	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), a_Socket, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE | BEV_OPT_DEFER_CALLBACKS | BEV_OPT_UNLOCK_CALLBACKS)),
 	m_Server(std::move(a_Server)),
@@ -65,7 +72,7 @@ cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTC
 	ASSERT(a_ConnectCallbacks != nullptr);
 
 	// Create a new link:
-	cTCPLinkImplPtr res{new cTCPLinkImpl(std::move(a_LinkCallbacks))};  // Cannot use std::make_shared here, constructor is not accessible
+	cTCPLinkImplPtr res{new cTCPLinkImpl(a_Host, std::move(a_LinkCallbacks))};  // Cannot use std::make_shared here, constructor is not accessible
 	res->m_ConnectCallbacks = std::move(a_ConnectCallbacks);
 	cNetworkSingleton::Get().AddLink(res);
 	res->m_Callbacks->OnLinkCreated(res);
@@ -237,8 +244,7 @@ void cTCPLinkImpl::Close(void)
 
 AString cTCPLinkImpl::StartTLSClient(
 	cX509CertPtr a_OwnCert,
-	cCryptoKeyPtr a_OwnPrivKey,
-	const std::string_view hostname
+	cCryptoKeyPtr a_OwnPrivKey
 )
 {
 	// Check preconditions:
@@ -264,7 +270,11 @@ AString cTCPLinkImpl::StartTLSClient(
 		m_TlsContext->Initialize(true);
 	}
 
-	m_TlsContext->SetExpectedPeerName(hostname);
+	// Enable SNI / peer name verification:
+	if (!m_RemoteHost.empty())
+	{
+		m_TlsContext->SetExpectedPeerName(m_RemoteHost);
+	}
 
 	m_TlsContext->SetSelf(cLinkTlsContextWPtr(m_TlsContext));
 

@@ -193,8 +193,7 @@ AString cLuaTCPLink::StartTLSClient(
 			}
 		}
 
-		// TODO : Provide a way to pass SNI from Lua too.
-		return link->StartTLSClient(ownCert, ownPrivKey, "");
+		return link->StartTLSClient(ownCert, ownPrivKey);
 	}
 	return "";
 }
