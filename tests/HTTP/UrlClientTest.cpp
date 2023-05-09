@@ -120,7 +120,11 @@ int TestRequest1()
 	auto res = cUrlClient::Get("http://github.com", std::move(callbacks), AStringMap(), AString(), std::move(options));
 	if (res.first)
 	{
-		evtFinished->Wait();
+		if (!evtFinished->Wait(10000))
+		{
+			LOG("Aborting the wait for response; failing the test.");
+			return 1;
+		}
 	}
 	else
 	{
@@ -142,7 +146,11 @@ int TestRequest2()
 	auto res = cUrlClient::Get("http://github.com", std::move(callbacks));
 	if (res.first)
 	{
-		evtFinished->Wait();
+		if (!evtFinished->Wait(10000))
+		{
+			LOG("Aborting the wait for response; failing the test.");
+			return 1;
+		}
 	}
 	else
 	{
@@ -166,7 +174,11 @@ int TestRequest3()
 	auto res = cUrlClient::Get("https://github.com", std::move(callbacks), AStringMap(), AString(), std::move(options));
 	if (res.first)
 	{
-		evtFinished->Wait();
+		if (!evtFinished->Wait(10000))
+		{
+			LOG("Aborting the wait for response; failing the test.");
+			return 1;
+		}
 	}
 	else
 	{
@@ -188,7 +200,11 @@ int TestRequest4()
 	auto res = cUrlClient::Get("https://github.com", std::move(callbacks));
 	if (res.first)
 	{
-		evtFinished->Wait();
+		if (!evtFinished->Wait(10000))
+		{
+			LOG("Aborting the wait for response; failing the test.");
+			return 1;
+		}
 	}
 	else
 	{
