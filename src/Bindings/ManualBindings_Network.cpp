@@ -546,7 +546,7 @@ static int tolua_cTCPLink_Shutdown(lua_State * L)
 static int tolua_cTCPLink_StartTLSClient(lua_State * L)
 {
 	// Function signature:
-	// LinkInstance:StartTLSClient(OwnCert, OwnPrivKey, OwnPrivKeyPassword) -> [true] or [nil, ErrMsg]
+	// LinkInstance:StartTLSClient(OwnCert, OwnPrivKey, OwnPrivKeyPassword, TrustedRootCAs) -> [true] or [nil, ErrMsg]
 
 	// Get the link:
 	cLuaState S(L);
@@ -558,11 +558,11 @@ static int tolua_cTCPLink_StartTLSClient(lua_State * L)
 	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Read the (optional) params:
-	AString OwnCert, OwnPrivKey, OwnPrivKeyPassword;
-	S.GetStackValues(2, OwnCert, OwnPrivKey, OwnPrivKeyPassword);
+	AString OwnCert, OwnPrivKey, OwnPrivKeyPassword, TrustedRootCAs;
+	S.GetStackValues(2, OwnCert, OwnPrivKey, OwnPrivKeyPassword, cLuaState::cOptionalParam<std::string>(TrustedRootCAs));
 
 	// Start the TLS handshake:
-	AString res = Link->StartTLSClient(OwnCert, OwnPrivKey, OwnPrivKeyPassword);
+	AString res = Link->StartTLSClient(OwnCert, OwnPrivKey, OwnPrivKeyPassword, TrustedRootCAs);
 	if (!res.empty())
 	{
 		S.Push(cLuaState::Nil, fmt::format(

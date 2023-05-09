@@ -65,8 +65,8 @@ void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 	}
 
 	{
-		auto [IsSuccessfull, ErrorMessage] = cUrlParser::Validate(m_Server);
-		if (!IsSuccessfull)
+		auto [IsSuccessful, ErrorMessage] = cUrlParser::Validate(m_Server);
+		if (!IsSuccessful)
 		{
 			LOGWARNING("%s %d: Supplied invalid URL for configuration value [Authentication: Server]: \"%s\", using default! Error: %s", __FUNCTION__, __LINE__, m_Server.c_str(), ErrorMessage.c_str());
 			m_Server = DEFAULT_AUTH_SERVER;
@@ -74,8 +74,8 @@ void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 	}
 
 	{
-		auto [IsSuccessfull, ErrorMessage] = cUrlParser::Validate(m_Server);
-		if (!IsSuccessfull)
+		auto [IsSuccessful, ErrorMessage] = cUrlParser::Validate(m_Server);
+		if (!IsSuccessful)
 		{
 			LOGWARNING("%s %d: Supplied invalid URL for configuration value [Authentication: Address]: \"%s\", using default! Error: %s", __FUNCTION__, __LINE__, m_Address.c_str(), ErrorMessage.c_str());
 			m_Address = DEFAULT_AUTH_ADDRESS;
@@ -183,8 +183,8 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	ReplaceURL(ActualAddress, "%SERVERID%", a_ServerId);
 
 	// Create and send the HTTP request
-	auto [IsSuccessfull, Response] = cUrlClient::BlockingGet(m_Server + ActualAddress);
-	if (!IsSuccessfull)
+	auto [IsSuccessful, Response] = cUrlClient::BlockingGet(m_Server + ActualAddress);
+	if (!IsSuccessful)
 	{
 		return false;
 	}
@@ -230,8 +230,8 @@ bool cAuthenticator::GetPlayerProperties(const AString & a_UUID, Json::Value & a
 	LOGD("Trying to get properties for user %s", a_UUID.c_str());
 
 	// Create and send the HTTP request
-	auto [IsSuccessfull, Response] = cUrlClient::BlockingGet(m_Server + ActualAddress);
-	if (!IsSuccessfull)
+	auto [IsSuccessful, Response] = cUrlClient::BlockingGet(m_Server + ActualAddress);
+	if (!IsSuccessful)
 	{
 		return false;
 	}
