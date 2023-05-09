@@ -32,7 +32,8 @@ namespace
 	public:
 
 		explicit cBlockingHTTPCallbacks(std::shared_ptr<cEvent> a_Event, AString & a_ResponseBody) :
-			m_Event(std::move(a_Event)), m_ResponseBody(a_ResponseBody)
+			m_Event(std::move(a_Event)), m_ResponseBody(a_ResponseBody),
+			m_IsError(false)
 		{
 		}
 
@@ -44,6 +45,7 @@ namespace
 		void OnError(const AString & a_ErrorMsg) override
 		{
 			LOGERROR("%s %d: HTTP Error: %s", __FILE__, __LINE__, a_ErrorMsg.c_str());
+			m_IsError = true;
 			m_Event->Set();
 		}
 
@@ -56,6 +58,9 @@ namespace
 
 		/** The accumulator for the partial body data, so that OnBodyFinished() can send the entire thing at once. */
 		AString & m_ResponseBody;
+
+		/** Indicates whether an error was encountered while processing the request. */
+		bool m_IsError;
 	};
 }
 
@@ -746,13 +751,17 @@ std::pair<bool, AString> cUrlClient::BlockingRequest(
 {
 	auto EvtFinished = std::make_shared<cEvent>();
 	AString Response;
-	auto Callbacks = std::make_unique<cBlockingHTTPCallbacks>(EvtFinished, Response);
-	auto [Success, ErrorMessage] = cUrlClient::Request(a_Method, a_URL, std::move(Callbacks), std::move(a_Headers), a_Body, a_Options);
+	auto Callbacks = std::make_shared<cBlockingHTTPCallbacks>(EvtFinished, Response);
+	auto [Success, ErrorMessage] = cUrlClient::Request(a_Method, a_URL, Callbacks, std::move(a_Headers), a_Body, a_Options);
 	if (Success)
 	{
 		if (!EvtFinished->Wait(10000))
 		{
 			return std::make_pair(false, "Timeout");
+		}
+		if (Callbacks->m_IsError)
+		{
+			return std::make_pair(false, AString());
 		}
 	}
 	else
