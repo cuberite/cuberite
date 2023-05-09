@@ -20,15 +20,18 @@ class cSchemeHandler;
 using cSchemeHandlerPtr = std::shared_ptr<cSchemeHandler>;
 
 
-/** This is a basic set of callbacks to enable quick implementation of HTTP request. */
+
+
+
 namespace
 {
-	class cSimpleHTTPCallbacks :
+	/** Callbacks implementing the blocking UrlClient behavior. */
+	class cBlockingHTTPCallbacks :
 		public cUrlClient::cCallbacks
 	{
 	public:
 
-		explicit cSimpleHTTPCallbacks(std::shared_ptr<cEvent> a_Event, AString & a_ResponseBody) :
+		explicit cBlockingHTTPCallbacks(std::shared_ptr<cEvent> a_Event, AString & a_ResponseBody) :
 			m_Event(std::move(a_Event)), m_ResponseBody(a_ResponseBody)
 		{
 		}
@@ -73,13 +76,13 @@ public:
 		cUrlClient::cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
 		const AString & a_Body,
-		AStringMap && a_Options
+		const AStringMap & a_Options
 	)
 	{
 		// Create a new instance of cUrlClientRequest, wrapped in a SharedPtr, so that it has a controlled lifetime.
 		// Cannot use std::make_shared, because the constructor is not public
 		std::shared_ptr<cUrlClientRequest> ptr (new cUrlClientRequest(
-			a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
+			a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
 		));
 		return ptr->DoRequest(ptr);
 	}
@@ -138,6 +141,24 @@ public:
 		return key;
 	}
 
+	/** Returns the parsed TrustedRootCAs from the options, or an empty pointer if the option is not set.
+	Throws a std::runtime_error if CAs are provided, but parsing them fails. */
+	cX509CertPtr GetTrustedRootCAs() const
+	{
+		auto itr = m_Options.find("TrustedRootCAs");
+		if (itr == m_Options.end())
+		{
+			return nullptr;
+		}
+		auto Cert = std::make_shared<cX509Cert>();
+		auto Res = Cert->Parse(itr->second.data(), itr->second.size());
+		if (Res != 0)
+		{
+			throw std::runtime_error(fmt::format("Failed to parse the TrustedRootCAs certificate: {}", Res));
+		}
+		return Cert;
+	}
+
 protected:
 
 	/** Method to be used for the request */
@@ -184,14 +205,14 @@ protected:
 		cUrlClient::cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
 		const AString & a_Body,
-		AStringMap && a_Options
+		const AStringMap & a_Options
 	):
 		m_Method(a_Method),
 		m_Url(a_Url),
 		m_Callbacks(std::move(a_Callbacks)),
 		m_Headers(std::move(a_Headers)),
 		m_Body(a_Body),
-		m_Options(std::move(a_Options))
+		m_Options(a_Options)
 	{
 		m_NumRemainingRedirects = GetStringMapInteger(m_Options, "MaxRedirects", 30);
 	}
@@ -299,7 +320,7 @@ public:
 		m_Link = &a_Link;
 		if (m_IsTls)
 		{
-			m_Link->StartTLSClient(m_ParentRequest.GetOwnCert(), m_ParentRequest.GetOwnPrivKey());
+			m_Link->StartTLSClient(m_ParentRequest.GetOwnCert(), m_ParentRequest.GetOwnPrivKey(), m_ParentRequest.GetTrustedRootCAs());
 		}
 		else
 		{
@@ -652,11 +673,11 @@ std::pair<bool, AString> cUrlClient::Request(
 	cCallbacksPtr && a_Callbacks,
 	AStringMap && a_Headers,
 	const AString & a_Body,
-	AStringMap && a_Options
+	const AStringMap & a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
+		a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
 	);
 }
 
@@ -669,11 +690,11 @@ std::pair<bool, AString> cUrlClient::Get(
 	cCallbacksPtr && a_Callbacks,
 	AStringMap && a_Headers,
 	const AString & a_Body,
-	AStringMap && a_Options
+	const AStringMap & a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		"GET", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
+		"GET", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
 	);
 }
 
@@ -686,11 +707,11 @@ std::pair<bool, AString> cUrlClient::Post(
 	cCallbacksPtr && a_Callbacks,
 	AStringMap && a_Headers,
 	const AString & a_Body,
-	AStringMap && a_Options
+	const AStringMap & a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		"POST", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
+		"POST", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
 	);
 }
 
@@ -703,11 +724,11 @@ std::pair<bool, AString> cUrlClient::Put(
 	cCallbacksPtr && a_Callbacks,
 	AStringMap && a_Headers,
 	const AString & a_Body,
-	AStringMap && a_Options
+	const AStringMap & a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		"PUT", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
+		"PUT", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
 	);
 }
 
@@ -715,15 +736,24 @@ std::pair<bool, AString> cUrlClient::Put(
 
 
 
-std::pair<bool, AString> cUrlClient::BlockingRequest(const AString & a_Method, const AString & a_URL, AStringMap && a_Headers, const AString & a_Body, AStringMap && a_Options)
+std::pair<bool, AString> cUrlClient::BlockingRequest(
+	const AString & a_Method,
+	const AString & a_URL,
+	AStringMap && a_Headers,
+	const AString & a_Body,
+	const AStringMap & a_Options
+)
 {
 	auto EvtFinished = std::make_shared<cEvent>();
 	AString Response;
-	auto Callbacks = std::make_unique<cSimpleHTTPCallbacks>(EvtFinished, Response);
-	auto [Success, ErrorMessage] = cUrlClient::Request(a_Method, a_URL, std::move(Callbacks), std::move(a_Headers), a_Body, std::move(a_Options));
+	auto Callbacks = std::make_unique<cBlockingHTTPCallbacks>(EvtFinished, Response);
+	auto [Success, ErrorMessage] = cUrlClient::Request(a_Method, a_URL, std::move(Callbacks), std::move(a_Headers), a_Body, a_Options);
 	if (Success)
 	{
-		EvtFinished->Wait();
+		if (!EvtFinished->Wait(10000))
+		{
+			return std::make_pair(false, "Timeout");
+		}
 	}
 	else
 	{
@@ -741,9 +771,10 @@ std::pair<bool, AString> cUrlClient::BlockingGet(
 	const AString & a_URL,
 	AStringMap a_Headers,
 	const AString & a_Body,
-	AStringMap a_Options)
+	const AStringMap & a_Options
+)
 {
-	return BlockingRequest("GET", a_URL, std::move(a_Headers), a_Body, std::move(a_Options));
+	return BlockingRequest("GET", a_URL, std::move(a_Headers), a_Body, a_Options);
 }
 
 
@@ -754,9 +785,10 @@ std::pair<bool, AString> cUrlClient::BlockingPost(
 	const AString & a_URL,
 	AStringMap && a_Headers,
 	const AString & a_Body,
-	AStringMap && a_Options)
+	const AStringMap & a_Options
+)
 {
-	return BlockingRequest("POST", a_URL, std::move(a_Headers), a_Body, std::move(a_Options));
+	return BlockingRequest("POST", a_URL, std::move(a_Headers), a_Body, a_Options);
 }
 
 
@@ -767,9 +799,10 @@ std::pair<bool, AString> cUrlClient::BlockingPut(
 	const AString & a_URL,
 	AStringMap && a_Headers,
 	const AString & a_Body,
-	AStringMap && a_Options)
+	const AStringMap & a_Options
+)
 {
-	return BlockingRequest("PUT", a_URL, std::move(a_Headers), a_Body, std::move(a_Options));
+	return BlockingRequest("PUT", a_URL, std::move(a_Headers), a_Body, a_Options);
 }
 
 

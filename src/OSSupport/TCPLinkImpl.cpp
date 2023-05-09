@@ -244,7 +244,8 @@ void cTCPLinkImpl::Close(void)
 
 AString cTCPLinkImpl::StartTLSClient(
 	cX509CertPtr a_OwnCert,
-	cCryptoKeyPtr a_OwnPrivKey
+	cCryptoKeyPtr a_OwnPrivKey,
+	cX509CertPtr a_TrustedRootCAs
 )
 {
 	// Check preconditions:
@@ -259,15 +260,25 @@ AString cTCPLinkImpl::StartTLSClient(
 
 	// Create the TLS context:
 	m_TlsContext = std::make_shared<cLinkTlsContext>(*this);
-	if (a_OwnCert != nullptr)
+	if ((a_OwnCert == nullptr) && (a_TrustedRootCAs == nullptr))
 	{
-		auto Config = cSslConfig::MakeDefaultConfig(true);
-		Config->SetOwnCert(std::move(a_OwnCert), std::move(a_OwnPrivKey));
-		m_TlsContext->Initialize(Config);
+		// Use the (shared) default TLS config
+		m_TlsContext->Initialize(true);
 	}
 	else
 	{
-		m_TlsContext->Initialize(true);
+		// Need a specialized config for the own certificate / trusted root CAs:
+		auto Config = cSslConfig::MakeDefaultConfig(true);
+		if (a_OwnCert != nullptr)
+		{
+			Config->SetOwnCert(std::move(a_OwnCert), std::move(a_OwnPrivKey));
+		}
+		if (a_TrustedRootCAs != nullptr)
+		{
+			Config->SetAuthMode(eSslAuthMode::Required);
+			Config->SetCACerts(std::move(a_TrustedRootCAs));
+		}
+		m_TlsContext->Initialize(Config);
 	}
 
 	// Enable SNI / peer name verification:

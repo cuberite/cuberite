@@ -166,7 +166,8 @@ void cLuaTCPLink::Close(void)
 AString cLuaTCPLink::StartTLSClient(
 	const AString & a_OwnCertData,
 	const AString & a_OwnPrivKeyData,
-	const AString & a_OwnPrivKeyPassword
+	const AString & a_OwnPrivKeyPassword,
+	const AString & a_TrustedRootCAs
 )
 {
 	auto link = m_Link;
@@ -193,7 +194,17 @@ AString cLuaTCPLink::StartTLSClient(
 			}
 		}
 
-		return link->StartTLSClient(ownCert, ownPrivKey);
+		cX509CertPtr trustedRootCAs;
+		if (!a_TrustedRootCAs.empty())
+		{
+			trustedRootCAs = std::make_shared<cX509Cert>();
+			auto res = trustedRootCAs->Parse(a_TrustedRootCAs.data(), a_TrustedRootCAs.size());
+			if (res != 0)
+			{
+				return fmt::format("Cannot parse trusted root CAs: {}", res);
+			}
+		}
+		return link->StartTLSClient(ownCert, ownPrivKey, trustedRootCAs);
 	}
 	return "";
 }

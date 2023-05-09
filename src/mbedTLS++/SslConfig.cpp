@@ -5,7 +5,7 @@
 
 #include "mbedTLS++/CryptoKey.h"
 #include "mbedTLS++/EntropyContext.h"
-#include "mbedTLS++/RootCA.h"
+#include "mbedTLS++/X509Cert.h"
 
 
 // This allows us to debug SSL and certificate problems, but produce way too much output,
@@ -235,8 +235,8 @@ std::shared_ptr<cSslConfig> cSslConfig::MakeDefaultConfig(bool a_IsClient)
 		Ret->SetRng(std::move(CtrDrbg));
 	}
 
-	Ret->SetAuthMode(eSslAuthMode::Required);
-	Ret->SetCACerts(GetCACerts());
+	// By default we have no root CAs, so no cert verification can be done:
+	Ret->SetAuthMode(eSslAuthMode::None);
 
 	#ifndef NDEBUG
 		#ifdef ENABLE_SSL_DEBUG_MSG

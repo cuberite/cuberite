@@ -130,19 +130,14 @@ protected:
 	using cUUIDProfileMap = std::map<cUUID, sProfile>;
 
 
-	/** The server to connect to when converting player names to UUIDs. For example "api.mojang.com". */
-	AString m_NameToUUIDServer;
+	/** The full URL to check when converting player names to UUIDs.
+	For example: "https://api.mojang.com/profiles/page/1". */
+	AString m_NameToUUIDUrl;
 
-	/** The URL to use for converting player names to UUIDs, without server part.
-	For example "/profiles/page/1". */
-	AString m_NameToUUIDAddress;
-
-	/** The server to connect to when converting UUID to profile. For example "sessionserver.mojang.com". */
-	AString m_UUIDToProfileServer;
-
-	/** The URL to use for converting UUID to profile, without the server part.
-	Will replace %UUID% with the actual UUID. For example "session/minecraft/profile/%UUID%?unsigned=false". */
-	AString m_UUIDToProfileAddress;
+	/** The full URL to use for converting UUID to profile.
+	%UUID% will get replaced with the actual UUID.
+	For example "https://sessionserver.mojang.com/session/minecraft/profile/%UUID%?unsigned=false". */
+	AString m_UUIDToProfileUrl;
 
 	/** Cache for the Name-to-UUID lookups. The map key is lowercased PlayerName. Protected by m_CSNameToUUID. */
 	cProfileMap m_NameToUUID;

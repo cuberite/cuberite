@@ -25,7 +25,6 @@ target_sources(
 	EntropyContext.h
 	ErrorCodes.h
 	RsaPrivateKey.h
-	RootCA.h
 	SslConfig.h
 	SslContext.h
 	Sha1Checksum.h

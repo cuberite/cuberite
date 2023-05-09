@@ -75,7 +75,8 @@ public:
 	virtual void Close(void) override;
 	virtual AString StartTLSClient(
 		cX509CertPtr a_OwnCert,
-		cCryptoKeyPtr a_OwnPrivKey
+		cCryptoKeyPtr a_OwnPrivKey,
+		cX509CertPtr a_TrustedRootCAs
 	) override;
 	virtual AString StartTLSServer(
 		cX509CertPtr a_OwnCert,
