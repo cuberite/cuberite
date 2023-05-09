@@ -299,7 +299,7 @@ public:
 		m_Link = &a_Link;
 		if (m_IsTls)
 		{
-			m_Link->StartTLSClient(m_ParentRequest.GetOwnCert(), m_ParentRequest.GetOwnPrivKey(), m_ParentRequest.m_UrlHost);
+			m_Link->StartTLSClient(m_ParentRequest.GetOwnCert(), m_ParentRequest.GetOwnPrivKey());
 		}
 		else
 		{
