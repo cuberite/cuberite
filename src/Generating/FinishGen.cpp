@@ -1858,10 +1858,10 @@ AString cFinishGenOres::OreInfosToString(const cFinishGenOres::OreInfos & a_OreI
 		{
 			res.append(" | ");
 		}
-		AppendPrintf(res, "%s:%d:%d:%d:%d",
-			ItemTypeToString(ore.m_BlockType).c_str(), ore.m_BlockMeta,
+		res.append(fmt::format(FMT_STRING("{}:{}:{}:{}:{}"),
+			ItemTypeToString(ore.m_BlockType), ore.m_BlockMeta,
 			ore.m_MaxHeight, ore.m_NumNests, ore.m_NestSize
-		);
+		));
 	}  // for ore - a_OreInfos[]
 	return res;
 }

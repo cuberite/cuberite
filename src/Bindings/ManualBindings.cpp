@@ -129,8 +129,8 @@ int cManualBindings::vlua_do_error(lua_State * L, const char * a_pFormat, fmt::p
 
 	// Copied from luaL_error and modified
 	luaL_where(L, 1);
-	AString FmtMsg = vPrintf(msg.c_str(), a_ArgList);
-	lua_pushlstring(L, FmtMsg.data(), FmtMsg.size());
+	auto Msg = fmt::vsprintf(msg, a_ArgList);
+	lua_pushlstring(L, Msg.data(), Msg.size());
 	lua_concat(L, 2);
 	return lua_error(L);
 }
@@ -1156,9 +1156,8 @@ static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
 		return tolua_cPluginManager_AddHook_DefFn(PlgMgr, S, ParamIdx);
 	}
 
-	AString ParamDesc;
-	Printf(ParamDesc, "%s, %s, %s", S.GetTypeText(1).c_str(), S.GetTypeText(2).c_str(), S.GetTypeText(3).c_str());
-	LOGWARNING("cPluginManager:AddHook(): bad parameters. Expected HOOK_TYPE and CallbackFunction, got %s. Hook not added.", ParamDesc.c_str());
+	auto ParamDesc = fmt::format(FMT_STRING("{}, {}, {}"), S.GetTypeText(1), S.GetTypeText(2), S.GetTypeText(3));
+	LOGWARNING("cPluginManager:AddHook(): bad parameters. Expected HOOK_TYPE and CallbackFunction, got %s. Hook not added.", ParamDesc);
 	S.LogStackTrace();
 	return 0;
 }

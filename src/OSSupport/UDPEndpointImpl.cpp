@@ -392,7 +392,9 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 		if (!UDPEndpointImplHelper::IsValidSocket(m_MainSock))
 		{
 			err = EVUTIL_SOCKET_ERROR();
-			m_Callbacks.OnError(err, Printf("Cannot create UDP socket for port %d: %s", a_Port, evutil_socket_error_to_string(err)));
+			m_Callbacks.OnError(err, fmt::format(FMT_STRING("Cannot create UDP socket for port {}: {} ({})"),
+				a_Port, err, evutil_socket_error_to_string(err))
+			);
 			return;
 		}
 
@@ -413,7 +415,9 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 		if (bind(m_MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
 		{
 			err = EVUTIL_SOCKET_ERROR();
-			m_Callbacks.OnError(err, Printf("Cannot bind UDP port %d: %s", a_Port, evutil_socket_error_to_string(err)));
+			m_Callbacks.OnError(err, fmt::format(FMT_STRING("Cannot bind UDP port {}: {} ({})"),
+				a_Port, err, evutil_socket_error_to_string(err))
+			);
 			evutil_closesocket(m_MainSock);
 			return;
 		}
@@ -448,7 +452,9 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 		if (bind(m_MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
 		{
 			err = EVUTIL_SOCKET_ERROR();
-			m_Callbacks.OnError(err, Printf("Cannot bind to UDP port %d: %s", a_Port, evutil_socket_error_to_string(err)));
+			m_Callbacks.OnError(err, fmt::format(FMT_STRING("Cannot bind to UDP port {}: {} ({})"),
+				a_Port, err, evutil_socket_error_to_string(err))
+			);
 			evutil_closesocket(m_MainSock);
 			return;
 		}
@@ -456,7 +462,9 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 	if (evutil_make_socket_nonblocking(m_MainSock) != 0)
 	{
 		err = EVUTIL_SOCKET_ERROR();
-		m_Callbacks.OnError(err, Printf("Cannot make socket on UDP port %d nonblocking: %s", a_Port, evutil_socket_error_to_string(err)));
+		m_Callbacks.OnError(err, fmt::format(FMT_STRING("Cannot make socket on UDP port {} nonblocking: {} ({})"),
+			a_Port, err, evutil_socket_error_to_string(err))
+		);
 		evutil_closesocket(m_MainSock);
 		return;
 	}

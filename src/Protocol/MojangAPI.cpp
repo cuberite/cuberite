@@ -657,7 +657,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		Request += "User-Agent: Cuberite\r\n";
 		Request += "Connection: close\r\n";
 		Request += "Content-Type: application/json\r\n";
-		Request += Printf("Content-Length: %u\r\n", static_cast<unsigned>(RequestBody.length()));
+		Request += fmt::format(FMT_STRING("Content-Length: {}\r\n"), RequestBody.length());
 		Request += "\r\n";
 		Request += RequestBody;
 

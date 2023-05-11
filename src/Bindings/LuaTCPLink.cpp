@@ -179,7 +179,7 @@ AString cLuaTCPLink::StartTLSClient(
 			auto res = ownCert->Parse(a_OwnCertData.data(), a_OwnCertData.size());
 			if (res != 0)
 			{
-				return Printf("Cannot parse client certificate: -0x%x", res);
+				return fmt::format(FMT_STRING("Cannot parse client certificate: -0x{:x}"), -res);
 			}
 		}
 		cCryptoKeyPtr ownPrivKey;
@@ -189,7 +189,7 @@ AString cLuaTCPLink::StartTLSClient(
 			auto res = ownPrivKey->ParsePrivate(a_OwnPrivKeyData.data(), a_OwnPrivKeyData.size(), a_OwnPrivKeyPassword);
 			if (res != 0)
 			{
-				return Printf("Cannot parse client private key: -0x%x", res);
+				return fmt::format(FMT_STRING("Cannot parse client private key: -0x{:x}"), -res);
 			}
 		}
 		return link->StartTLSClient(ownCert, ownPrivKey);
@@ -216,13 +216,13 @@ AString cLuaTCPLink::StartTLSServer(
 	int res = OwnCert->Parse(a_OwnCertData.data(), a_OwnCertData.size());
 	if (res != 0)
 	{
-		return Printf("Cannot parse server certificate: -0x%x", res);
+		return fmt::format(FMT_STRING("Cannot parse server certificate: -0x{:x}"), -res);
 	}
 	auto OwnPrivKey = std::make_shared<cCryptoKey>();
 	res = OwnPrivKey->ParsePrivate(a_OwnPrivKeyData.data(), a_OwnPrivKeyData.size(), a_OwnPrivKeyPassword);
 	if (res != 0)
 	{
-		return Printf("Cannot parse server private key: -0x%x", res);
+		return fmt::format(FMT_STRING("Cannot parse server private key: -0x{:x}"), -res);
 	}
 
 		return link->StartTLSServer(OwnCert, OwnPrivKey, a_StartTLSData);

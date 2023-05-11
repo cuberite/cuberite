@@ -11,20 +11,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cCommandOutputCallback:
-
-void cCommandOutputCallback::vOut(const char * a_Fmt, fmt::printf_args a_ArgList)
-{
-	AString Output = ::vPrintf(a_Fmt, a_ArgList);
-	Output.append("\n");
-	Out(Output);
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
 // cStringAccumCommandOutputCallback:
 
 void cStringAccumCommandOutputCallback::Out(const AString & a_Text)
@@ -39,7 +25,7 @@ void cStringAccumCommandOutputCallback::Out(const AString & a_Text)
 ////////////////////////////////////////////////////////////////////////////////
 // cLogCommandOutputCallback:
 
-void cLogCommandOutputCallback::Finished(void)
+void cLogCommandOutputCallback::Finished()
 {
 	// Log each line separately:
 	size_t len = m_Accum.length();
@@ -50,7 +36,7 @@ void cLogCommandOutputCallback::Finished(void)
 		{
 			case '\n':
 			{
-				LOG("%s", m_Accum.substr(last, i - last).c_str());
+				LOG("%s", m_Accum.substr(last, i - last));
 				last = i + 1;
 				break;
 			}
@@ -58,7 +44,7 @@ void cLogCommandOutputCallback::Finished(void)
 	}  // for i - m_Buffer[]
 	if (last < len)
 	{
-		LOG("%s", m_Accum.substr(last).c_str());
+		LOG("%s", m_Accum.substr(last));
 	}
 
 	// Clear the buffer for the next command output:

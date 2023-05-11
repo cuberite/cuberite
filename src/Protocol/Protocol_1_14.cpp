@@ -440,7 +440,7 @@ void cProtocol_1_14::SendWindowOpen(const cWindow & a_Window)
 			}
 		}
 
-		Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_Window.GetWindowTitle().c_str()));
+		Pkt.WriteString(fmt::format(FMT_STRING("{{\"text\":\"{}\"}}"), a_Window.GetWindowTitle()));
 	}
 }
 

@@ -189,7 +189,7 @@ void BlockTypePalette::loadFromJsonString(const AString & aJsonPalette)
 		const auto & states = (*itr)["states"];
 		if (states == Json::Value())
 		{
-			throw LoadFailedException(Printf("Missing \"states\" for block type \"%s\"", blockTypeName));
+			throw LoadFailedException(fmt::format(FMT_STRING("Missing \"states\" for block type \"{}\""), blockTypeName));
 		}
 		for (const auto & state: states)
 		{
@@ -200,7 +200,7 @@ void BlockTypePalette::loadFromJsonString(const AString & aJsonPalette)
 				const auto & properties = state["properties"];
 				if (!properties.isObject())
 				{
-					throw LoadFailedException(Printf("Member \"properties\" is not a JSON object (block type \"%s\", id %u).", blockTypeName, id));
+					throw LoadFailedException(fmt::format(FMT_STRING("Member \"properties\" is not a JSON object (block type \"{}\", id {})."), blockTypeName, id));
 				}
 				for (const auto & key: properties.getMemberNames())
 				{
@@ -249,7 +249,7 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 		auto keyEnd = findNextSeparator(aTsvPalette, idx + 1);
 		if (keyEnd == AString::npos)
 		{
-			throw LoadFailedException(Printf("Invalid header key format on line %u", line));
+			throw LoadFailedException(fmt::format(FMT_STRING("Invalid header key format on line {}"), line));
 		}
 		if (keyEnd == idx + 1)  // Empty line, end of headers
 		{
@@ -264,7 +264,7 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 		auto valueEnd = findNextSeparator(aTsvPalette, keyEnd + 1);
 		if ((valueEnd == AString::npos) || (aTsvPalette[valueEnd] == '\t'))
 		{
-			throw LoadFailedException(Printf("Invalid header value format on line %u", line));
+			throw LoadFailedException(fmt::format(FMT_STRING("Invalid header value format on line {}"), line));
 		}
 		auto key = aTsvPalette.substr(keyStart, keyEnd - keyStart);
 		if (key == "FileVersion")
@@ -277,7 +277,7 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 			}
 			else if (version != 1)
 			{
-				throw LoadFailedException(Printf("Unknown FileVersion: %u. Only version 1 is supported.", version));
+				throw LoadFailedException(fmt::format(FMT_STRING("Unknown FileVersion: {}. Only version 1 is supported."), version));
 			}
 			hasHadVersion = true;
 		}
@@ -304,12 +304,12 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 		auto idEnd = findNextSeparator(aTsvPalette, lineStart);
 		if ((idEnd == AString::npos) || (aTsvPalette[idEnd] != '\t'))
 		{
-			throw LoadFailedException(Printf("Incomplete data on line %u (id)", line));
+			throw LoadFailedException(fmt::format(FMT_STRING("Incomplete data on line {} (id)"), line));
 		}
 		UInt32 id;
 		if (!StringToInteger(aTsvPalette.substr(lineStart, idEnd - lineStart), id))
 		{
-			throw LoadFailedException(Printf("Failed to parse id on line %u", line));
+			throw LoadFailedException(fmt::format(FMT_STRING("Failed to parse id on line {}"), line));
 		}
 		size_t metaEnd = idEnd;
 		if (isUpgrade)
@@ -317,23 +317,23 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 			metaEnd = findNextSeparator(aTsvPalette, idEnd + 1);
 			if ((metaEnd == AString::npos) || (aTsvPalette[metaEnd] != '\t'))
 			{
-				throw LoadFailedException(Printf("Incomplete data on line %u (meta)", line));
+				throw LoadFailedException(fmt::format(FMT_STRING("Incomplete data on line {} (meta)"), line));
 			}
 			UInt32 meta = 0;
 			if (!StringToInteger(aTsvPalette.substr(idEnd + 1, metaEnd - idEnd - 1), meta))
 			{
-				throw LoadFailedException(Printf("Failed to parse meta on line %u", line));
+				throw LoadFailedException(fmt::format(FMT_STRING("Failed to parse meta on line {}"), line));
 			}
 			if (meta > 15)
 			{
-				throw LoadFailedException(Printf("Invalid meta value on line %u: %u", line, meta));
+				throw LoadFailedException(fmt::format(FMT_STRING("Invalid meta value on line {}: {}"), line, meta));
 			}
 			id = (id * 16) | meta;
 		}
 		auto blockTypeEnd = findNextSeparator(aTsvPalette, metaEnd + 1);
 		if (blockTypeEnd == AString::npos)
 		{
-			throw LoadFailedException(Printf("Incomplete data on line %u (blockTypeName)", line));
+			throw LoadFailedException(fmt::format(FMT_STRING("Incomplete data on line {} (blockTypeName)"), line));
 		}
 		auto blockTypeName = aTsvPalette.substr(metaEnd + 1, blockTypeEnd - metaEnd - 1);
 		auto blockStateEnd = blockTypeEnd;
@@ -343,12 +343,12 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 			auto keyEnd = findNextSeparator(aTsvPalette, blockStateEnd + 1);
 			if ((keyEnd == AString::npos) || (aTsvPalette[keyEnd] != '\t'))
 			{
-				throw LoadFailedException(Printf("Incomplete data on line %u (blockState key)", line));
+				throw LoadFailedException(fmt::format(FMT_STRING("Incomplete data on line {} (blockState key)"), line));
 			}
 			auto valueEnd = findNextSeparator(aTsvPalette, keyEnd + 1);
 			if (valueEnd == AString::npos)
 			{
-				throw LoadFailedException(Printf("Incomplete data on line %u (blockState value)", line));
+				throw LoadFailedException(fmt::format(FMT_STRING("Incomplete data on line {} (blockState value)"), line));
 			}
 			auto key = aTsvPalette.substr(blockStateEnd + 1, keyEnd - blockStateEnd - 1);
 			auto value = aTsvPalette.substr(keyEnd + 1, valueEnd - keyEnd - 1);

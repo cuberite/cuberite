@@ -90,7 +90,7 @@ public:
 	/** Returns a string that describes the chunk coords, suitable for logging. */
 	AString ToString() const
 	{
-		return Printf("[%d, %d]", m_ChunkX, m_ChunkZ);
+		return fmt::format(FMT_STRING("[{}, {}]"), m_ChunkX, m_ChunkZ);
 	}
 } ;
 
