@@ -222,7 +222,7 @@ void cDistortedHeightmap::GenerateHeightArray(void)
 		m_DistortedHeightmap, INTERPOL_X, INTERPOL_Y, INTERPOL_Z
 	);
 
-	// DEBUG: Debug3DNoise(m_DistortedHeightmap, 17, 257, 17, Printf("DistortedHeightmap_%d_%d", m_CurChunkX, m_CurChunkZ));
+	// DEBUG: Debug3DNoise(m_DistortedHeightmap, 17, 257, 17, fmt::format(FMT_STRING("DistortedHeightmap_{}_{}"), m_CurChunkX, m_CurChunkZ));
 }
 
 

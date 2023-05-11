@@ -18,6 +18,7 @@ IMPLEMENT_TEST_MAIN("TestName",
 
 
 
+
 /** The exception that is thrown if a test fails.
 It doesn't inherit from any type so that it is not possible to catch it by a mistake,
 it needs to be caught explicitly (used in the TEST_THROWS).
@@ -50,9 +51,10 @@ public:
 		{ \
 			throw TestException( \
 				__FILE__, __LINE__, __FUNCTION__, \
-				Printf("Equality test failed: %s != %s", #VAL1, #VAL2)); \
+				fmt::format(FMT_STRING("Equality test failed: {} != {}"), #VAL1, #VAL2) \
+			); \
 		} \
-	}	while (false)
+	} while (false)
 
 
 
@@ -65,7 +67,8 @@ public:
 		{ \
 			throw TestException( \
 				__FILE__, __LINE__, __FUNCTION__, \
-				Printf("Equality test failed: %s != %s (%s)", #VAL1, #VAL2, MSG)); \
+				fmt::format(FMT_STRING("Equality test failed: {} != {} ({})"), #VAL1, #VAL2, MSG) \
+			); \
 		} \
 	} while (false)
 
@@ -80,10 +83,10 @@ public:
 		{ \
 			throw TestException( \
 				__FILE__, __LINE__, __FUNCTION__, \
-				Printf("Inequality test failed: %s == %s", #VAL1, #VAL2) \
-				); \
+				fmt::format(FMT_STRING("Inequality test failed: {} == {}"), #VAL1, #VAL2) \
+			); \
 		} \
-	} while(false)
+	} while (false)
 
 
 
@@ -108,7 +111,7 @@ public:
 	do { \
 		if (Stmt < Val) \
 		{ \
-			throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("Comparison failed: %s < %s", #Stmt, #Val)); \
+			throw TestException(__FILE__, __LINE__, __FUNCTION__, fmt::format(FMT_STRING("Comparison failed: {} < {}"), #Stmt, #Val)); \
 		} \
 	} while (false)
 
@@ -121,7 +124,7 @@ public:
 	do { \
 		if (Stmt > Val) \
 		{ \
-			throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("Comparison failed: %s > %s", #Stmt, #Val)); \
+			throw TestException(__FILE__, __LINE__, __FUNCTION__, fmt::format(FMT_STRING("Comparison failed: {} > {}"), #Stmt, #Val)); \
 		} \
 	} while (false)
 
@@ -137,8 +140,8 @@ public:
 			Stmt; \
 			throw TestException( \
 				__FILE__, __LINE__, __FUNCTION__, \
-				Printf("Failed to throw an exception of type %s", #ExcClass) \
-				); \
+				fmt::format(FMT_STRING("Failed to throw an exception of type {}"), #ExcClass) \
+			); \
 		} \
 		catch (const ExcClass &) \
 		{ \
@@ -148,17 +151,18 @@ public:
 		{ \
 			throw TestException( \
 				__FILE__, __LINE__, __FUNCTION__, \
-				Printf("An unexpected std::exception descendant was thrown, was expecting type %s. Message is: %s", \
+				fmt::format( \
+					FMT_STRING("An unexpected std::exception descendant was thrown, was expecting type {}. Message is: {}"), \
 					#ExcClass, exc.what() \
-				)); \
+				) \
+			); \
 		} \
 		catch (...)\
 		{ \
 			throw TestException( \
 				__FILE__, __LINE__, __FUNCTION__, \
-				Printf("An unexpected unknown exception object was thrown, was expecting type %s", \
-							 #ExcClass \
-					)); \
+				fmt::format(FMT_STRING("An unexpected unknown exception object was thrown, was expecting type {}"), #ExcClass) \
+			); \
 		} \
 	} while (false)
 
@@ -174,7 +178,8 @@ public:
 			Stmt; \
 			throw TestException( \
 				__FILE__, __LINE__, __FUNCTION__, \
-				"Failed to throw an exception of any type"); \
+				"Failed to throw an exception of any type" \
+			); \
 		} \
 		catch (const TestException & exc) \
 		{ \

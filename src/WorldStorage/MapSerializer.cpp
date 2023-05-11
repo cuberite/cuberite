@@ -17,11 +17,8 @@
 cMapSerializer::cMapSerializer(const AString & a_WorldName, cMap * a_Map):
 	m_Map(a_Map)
 {
-	AString DataPath;
-	Printf(DataPath, "%s%cdata", a_WorldName.c_str(), cFile::PathSeparator());
-
-	Printf(m_Path, "%s%cmap_%i.dat", DataPath.c_str(), cFile::PathSeparator(), a_Map->GetID());
-
+	auto DataPath = fmt::format(FMT_STRING("{}{}data"), a_WorldName, cFile::PathSeparator());
+	m_Path = fmt::format(FMT_STRING("{}{}map_%i.dat"), DataPath, cFile::PathSeparator(), a_Map->GetID());
 	cFile::CreateFolder(DataPath);
 }
 
@@ -29,7 +26,7 @@ cMapSerializer::cMapSerializer(const AString & a_WorldName, cMap * a_Map):
 
 
 
-bool cMapSerializer::Load(void)
+bool cMapSerializer::Load()
 {
 	const auto Data = GZipFile::ReadRestOfFile(m_Path);
 	const cParsedNBT NBT(Data.GetView());
@@ -171,11 +168,8 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 
 cIDCountSerializer::cIDCountSerializer(const AString & a_WorldName) : m_MapCount(0)
 {
-	AString DataPath;
-	Printf(DataPath, "%s%cdata", a_WorldName.c_str(), cFile::PathSeparator());
-
-	Printf(m_Path, "%s%cidcounts.dat", DataPath.c_str(), cFile::PathSeparator());
-
+	auto DataPath = fmt::format(FMT_STRING("{}{}data"), a_WorldName, cFile::PathSeparator());
+	m_Path = fmt::format(FMT_STRING("{}{}idcounts.dat"), DataPath, cFile::PathSeparator());
 	cFile::CreateFolder(DataPath);
 }
 
@@ -183,7 +177,7 @@ cIDCountSerializer::cIDCountSerializer(const AString & a_WorldName) : m_MapCount
 
 
 
-bool cIDCountSerializer::Load(void)
+bool cIDCountSerializer::Load()
 {
 	AString Data = cFile::ReadWholeFile(m_Path);
 	if (Data.empty())

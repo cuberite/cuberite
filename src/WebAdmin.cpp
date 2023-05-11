@@ -378,7 +378,7 @@ void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPInc
 	// Read the file contents and guess its mime-type, based on the extension:
 	AString Content = "<h2>404 Not Found</h2>";
 	AString ContentType = "text/html";
-	AString Path = Printf("webadmin/files/%s", FileURL.c_str());
+	AString Path = "webadmin/files/" + FileURL;
 
 	// Return 404 if the file is not found, or the URL contains '../' (for security reasons)
 	if ((FileURL.find("../") == AString::npos) && cFile::IsFile(Path))
@@ -485,9 +485,9 @@ sWebAdminPage cWebAdmin::GetPage(const HTTPRequest & a_Request)
 		page.ContentType = "text/html";  // Default to HTML content type, unless overridden by a plugin
 		if (!tab->m_Callback->Call(a_Request, split[1], page.Content, page.ContentType))
 		{
-			page.Content = GetHTMLEscapedString(Printf(
-				"WebTab callback for plugin %s, page %s has failed.",
-				tab->m_PluginName.c_str(), tab->m_Title.c_str()
+			page.Content = GetHTMLEscapedString(fmt::format(
+				FMT_STRING("WebTab callback for plugin {}, page {} has failed."),
+				tab->m_PluginName, tab->m_Title
 			));
 		}
 		page.PluginName = tab->m_PluginName;

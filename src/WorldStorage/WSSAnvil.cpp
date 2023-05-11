@@ -90,8 +90,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 	m_Compressor(a_CompressionFactor)
 {
 	// Create a level.dat file for mapping tools, if it doesn't already exist:
-	AString fnam;
-	Printf(fnam, "%s%clevel.dat", a_World->GetDataPath().c_str(), cFile::PathSeparator());
+	auto fnam = fmt::format(FMT_STRING("{}{}level.dat"), a_World->GetDataPath(), cFile::PathSeparator());
 	if (!cFile::Exists(fnam))
 	{
 		cFastNBTWriter Writer;
@@ -182,8 +181,7 @@ bool cWSSAnvil::SaveChunk(const cChunkCoords & a_Chunk)
 void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Reason, const ContiguousByteBufferView a_ChunkDataToSave)
 {
 	// Construct the filename for offloading:
-	AString OffloadFileName;
-	Printf(OffloadFileName, "%s%cregion%cbadchunks", m_World->GetDataPath().c_str(), cFile::PathSeparator(), cFile::PathSeparator());
+	auto OffloadFileName = fmt::format(FMT_STRING("{0}{1}region{1}badchunks"), m_World->GetDataPath(), cFile::PathSeparator());
 	cFile::CreateFolder(OffloadFileName);
 	auto t = time(nullptr);
 	struct tm stm;
@@ -192,24 +190,26 @@ void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Re
 	#else
 		localtime_r(&t, &stm);
 	#endif
-	AppendPrintf(OffloadFileName, "%cch.%d.%d.%d-%02d-%02d-%02d-%02d-%02d.dat",
+	OffloadFileName.append(fmt::format(
+		FMT_STRING("{}ch.{}.{}.{}-{:02d}-{:02d}-{:02d}-{:02d}-{:02d}.dat"),
 		cFile::PathSeparator(), a_ChunkX, a_ChunkZ,
 		stm.tm_year + 1900, stm.tm_mon + 1, stm.tm_mday, stm.tm_hour, stm.tm_min, stm.tm_sec
-	);
+	));
 
 	// Log the warning to console:
 	const int RegionX = FAST_FLOOR_DIV(a_ChunkX, 32);
 	const int RegionZ = FAST_FLOOR_DIV(a_ChunkZ, 32);
-	AString Info = Printf("Loading chunk [%d, %d] for world %s from file r.%d.%d.mca failed: %s Offloading old chunk data to file %s and regenerating chunk.",
-		a_ChunkX, a_ChunkZ, m_World->GetName().c_str(), RegionX, RegionZ, a_Reason.c_str(), OffloadFileName.c_str()
+	auto Info = fmt::format(
+		FMT_STRING("Loading chunk [{}, {}] for world {} from file r.{}.{}.mca failed: {} Offloading old chunk data to file {} and regenerating chunk."),
+		a_ChunkX, a_ChunkZ, m_World->GetName(), RegionX, RegionZ, a_Reason, OffloadFileName
 	);
-	LOGWARNING("%s", Info.c_str());
+	LOGWARNING("%s", Info);
 
 	// Write the data:
 	cFile f;
 	if (!f.Open(OffloadFileName, cFile::fmWrite))
 	{
-		LOGWARNING("Cannot open file %s for writing! Old chunk data is lost.", OffloadFileName.c_str());
+		LOGWARNING("Cannot open file %s for writing! Old chunk data is lost.", OffloadFileName);
 		return;
 	}
 	f.Write(a_ChunkDataToSave.data(), a_ChunkDataToSave.size());
@@ -218,7 +218,7 @@ void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Re
 	// Write a description file:
 	if (!f.Open(OffloadFileName + ".info", cFile::fmWrite))
 	{
-		LOGWARNING("Cannot open file %s.info for writing! The information about the failed chunk will not be written.", OffloadFileName.c_str());
+		LOGWARNING("Cannot open file %s.info for writing! The information about the failed chunk will not be written.", OffloadFileName);
 		return;
 	}
 	f.Write(Info.c_str(), Info.size());
@@ -288,10 +288,9 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	}
 
 	// Load it anew:
-	AString FileName;
-	Printf(FileName, "%s%cregion", m_World->GetDataPath().c_str(), cFile::PathSeparator());
+	auto FileName = fmt::format(FMT_STRING("{}{}region"), m_World->GetDataPath(), cFile::PathSeparator());
 	cFile::CreateFolder(FileName);
-	AppendPrintf(FileName, "/r.%d.%d.mca", RegionX, RegionZ);
+	FileName.append(fmt::format(FMT_STRING("/r.{}.{}.mca"), RegionX, RegionZ));
 	cMCAFile * f = new cMCAFile(*this, FileName, RegionX, RegionZ);
 	if (f == nullptr)
 	{
@@ -4011,7 +4010,7 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, ContiguousB
 	if (CompressionType != 2)
 	{
 		// Chunk is in an unknown compression
-		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Printf("Unknown chunk compression: %d", CompressionType), a_Data);
+		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, fmt::format(FMT_STRING("Unknown chunk compression: {}"), CompressionType), a_Data);
 		return false;
 	}
 	return true;

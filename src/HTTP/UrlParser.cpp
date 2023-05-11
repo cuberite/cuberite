@@ -135,7 +135,7 @@ std::pair<bool, AString> cUrlParser::Parse(
 	a_Port = GetDefaultPort(a_Scheme);
 	if (a_Port == 0)
 	{
-		return std::make_pair(false, Printf("Unknown URL scheme: \"%s\"", a_Scheme.c_str()));
+		return std::make_pair(false, fmt::format(FMT_STRING("Unknown URL scheme: \"{}\""), a_Scheme));
 	}
 
 	// If the next two chars are a double-slash, skip them:

@@ -1682,7 +1682,7 @@ AString cPlayer::GetSuffix(void) const
 
 
 
-AString cPlayer::GetPlayerListName(void) const
+AString cPlayer::GetPlayerListName() const
 {
 	const AString & Color = GetColor();
 
@@ -1692,7 +1692,7 @@ AString cPlayer::GetPlayerListName(void) const
 	}
 	else if ((GetName().length() <= 14) && !Color.empty())
 	{
-		return Printf("%s%s", Color.c_str(), GetName().c_str());
+		return fmt::format(FMT_STRING("{}{}"), Color, GetName());
 	}
 	else
 	{
@@ -3092,8 +3092,8 @@ void cPlayer::OnRemoveFromWorld(cWorld & a_World)
 
 		if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
 		{
-			cRoot::Get()->BroadcastChatLeave(Printf("%s has left the game", GetName().c_str()));
-			LOGINFO("Player %s has left the game", GetName().c_str());
+			cRoot::Get()->BroadcastChatLeave(fmt::format(FMT_STRING("{} has left the game"), GetName()));
+			LOGINFO("Player %s has left the game", GetName());
 		}
 
 		// Remove ourself from everyone's lists:

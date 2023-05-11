@@ -2402,9 +2402,9 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 				}
 				UNREACHABLE("Unsupported damage type");
 			}();
-		AString DeathMessage = Printf("%s %s", Name.c_str(), DamageText.c_str());
+		auto DeathMessage = fmt::format(FMT_STRING("{} {}"), Name, DamageText);
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (DeathMessage != AString(""))
+		if (!DeathMessage.empty())
 		{
 			GetWorld()->BroadcastChatDeath(DeathMessage);
 		}
@@ -2412,9 +2412,9 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 	else if (a_TDI.Attacker->IsPlayer())
 	{
 		cPlayer * Killer = static_cast<cPlayer *>(a_TDI.Attacker);
-		AString DeathMessage = Printf("%s was killed by %s", Name.c_str(), Killer->GetName().c_str());
+		auto DeathMessage = fmt::format(FMT_STRING("{0} was killed by {1}"), Name, Killer->GetName());
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (DeathMessage != AString(""))
+		if (!DeathMessage.empty())
 		{
 			GetWorld()->BroadcastChatDeath(DeathMessage);
 		}
@@ -2426,16 +2426,16 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 		AString DeathMessage;
 		if (Monster->HasCustomName())
 		{
-			DeathMessage = Printf("%s was killed by %s", Name.c_str(), Monster->GetCustomName().c_str());
+			DeathMessage = fmt::format(FMT_STRING("{0} was killed by {1}"), Name, Monster->GetCustomName());
 		}
 		else
 		{
 			AString KillerName = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
-			DeathMessage = Printf("%s was killed by a %s", Name.c_str(), KillerName.c_str());
+			DeathMessage = fmt::format(FMT_STRING("{0} was killed by a {1}"), Name, KillerName);
 		}
 
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (DeathMessage != AString(""))
+		if (!DeathMessage.empty())
 		{
 			GetWorld()->BroadcastChatDeath(DeathMessage);
 		}

@@ -168,7 +168,7 @@ protected:
 	// cNetwork::cConnectCallbacks override: An error has occurred:
 	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
 	{
-		m_Callbacks->OnError(Printf("Network error %d (%s)", a_ErrorCode, a_ErrorMsg.c_str()));
+		m_Callbacks->OnError(fmt::format(FMT_STRING("Network error {} ({})"), a_ErrorCode, a_ErrorMsg));
 	}
 
 
@@ -285,14 +285,14 @@ public:
 			requestLine.push_back('?');
 			requestLine.append(m_ParentRequest.m_UrlQuery);
 		}
-		m_Link->Send(Printf("%s %s HTTP/1.1\r\n", m_ParentRequest.m_Method.c_str(), requestLine.c_str()));
+		m_Link->Send(fmt::format(FMT_STRING("{} {} HTTP/1.1\r\n"), m_ParentRequest.m_Method, requestLine));
 
 		// Send the headers:
-		m_Link->Send(Printf("Host: %s\r\n", m_ParentRequest.m_UrlHost.c_str()));
-		m_Link->Send(Printf("Content-Length: %u\r\n", static_cast<unsigned>(m_ParentRequest.m_Body.size())));
-		for (auto itr = m_ParentRequest.m_Headers.cbegin(), end = m_ParentRequest.m_Headers.cend(); itr != end; ++itr)
+		m_Link->Send(fmt::format(FMT_STRING("Host: {}\r\n"), m_ParentRequest.m_UrlHost));
+		m_Link->Send(fmt::format(FMT_STRING("Content-Length: {}\r\n"), m_ParentRequest.m_Body));
+		for (const auto & hdr: m_ParentRequest.m_Headers)
 		{
-			m_Link->Send(Printf("%s: %s\r\n", itr->first.c_str(), itr->second.c_str()));
+			m_Link->Send(fmt::format(FMT_STRING("{}: {}\r\n"), hdr.first, hdr.second));
 		}  // for itr - m_Headers[]
 		m_Link->Send("\r\n", 2);
 
@@ -341,20 +341,20 @@ public:
 		auto idxFirstSpace = a_FirstLine.find(' ');
 		if (idxFirstSpace == AString::npos)
 		{
-			m_ParentRequest.CallErrorCallback(Printf("Failed to parse HTTP status line \"%s\", no space delimiter.", a_FirstLine.c_str()));
+			m_ParentRequest.CallErrorCallback(fmt::format(FMT_STRING("Failed to parse HTTP status line \"{}\", no space delimiter."), a_FirstLine));
 			return;
 		}
 		auto idxSecondSpace = a_FirstLine.find(' ', idxFirstSpace + 1);
 		if (idxSecondSpace == AString::npos)
 		{
-			m_ParentRequest.CallErrorCallback(Printf("Failed to parse HTTP status line \"%s\", missing second space delimiter.", a_FirstLine.c_str()));
+			m_ParentRequest.CallErrorCallback(fmt::format(FMT_STRING("Failed to parse HTTP status line \"{}\", missing second space delimiter."), a_FirstLine));
 			return;
 		}
 		int resultCode;
 		auto resultCodeStr = a_FirstLine.substr(idxFirstSpace + 1, idxSecondSpace - idxFirstSpace - 1);
 		if (!StringToInteger(resultCodeStr, resultCode))
 		{
-			m_ParentRequest.CallErrorCallback(Printf("Failed to parse HTTP result code from response \"%s\"", resultCodeStr.c_str()));
+			m_ParentRequest.CallErrorCallback(fmt::format(FMT_STRING("Failed to parse HTTP result code from response \"{}\""), resultCodeStr));
 			return;
 		}
 
@@ -489,7 +489,7 @@ void cUrlClientRequest::RedirectTo(const AString & a_RedirectUrl)
 	m_Callbacks->OnRedirecting(a_RedirectUrl);
 	if (!ShouldAllowRedirects())
 	{
-		CallErrorCallback(Printf("Redirect to \"%s\" not allowed", a_RedirectUrl.c_str()));
+		CallErrorCallback(fmt::format(FMT_STRING("Redirect to \"{}\" not allowed"), a_RedirectUrl));
 		return;
 	}
 
@@ -507,7 +507,7 @@ void cUrlClientRequest::RedirectTo(const AString & a_RedirectUrl)
 	auto res = DoRequest(Self);
 	if (!res.first)
 	{
-		m_Callbacks->OnError(Printf("Redirection failed: %s", res.second.c_str()));
+		m_Callbacks->OnError(fmt::format(FMT_STRING("Redirection failed: {}"), res.second));
 	}
 }
 
@@ -590,7 +590,7 @@ std::pair<bool, AString> cUrlClientRequest::DoRequest(const std::shared_ptr<cUrl
 	m_SchemeHandler = cSchemeHandler::Create(m_UrlScheme, *this);
 	if (m_SchemeHandler == nullptr)
 	{
-		return std::make_pair(false, Printf("Unknown Url scheme: %s", m_UrlScheme.c_str()));
+		return std::make_pair(false, fmt::format(FMT_STRING("Unknown URL scheme: {}"), m_UrlScheme));
 	}
 
 	// Connect and transfer ownership to the link

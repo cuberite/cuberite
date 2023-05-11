@@ -12,8 +12,8 @@
 cSlime::cSlime(int a_Size) :
 	Super("Slime",
 		mtSlime,
-		Printf("entity.%sslime.hurt", GetSizeName(a_Size).c_str()),
-		Printf("entity.%sslime.death", GetSizeName(a_Size).c_str()),
+		fmt::format(FMT_STRING("entity.{}slime.hurt"),  GetSizeName(a_Size)),
+		fmt::format(FMT_STRING("entity.{}slime.death"), GetSizeName(a_Size)),
 		"",
 		0.51f * a_Size,
 		0.51f * a_Size

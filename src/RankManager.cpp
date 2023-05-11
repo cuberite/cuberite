@@ -1896,7 +1896,7 @@ bool cRankManager::DoesColumnExist(const char * a_TableName, const char * a_Colu
 {
 	try
 	{
-		SQLite::Statement stmt(m_DB, Printf("PRAGMA table_info(%s)", a_TableName));
+		SQLite::Statement stmt(m_DB, fmt::format(FMT_STRING("PRAGMA table_info({})"), a_TableName));
 		while (stmt.executeStep())  // Iterate over all table's columns
 		{
 			int NumColumns = stmt.getColumnCount();
@@ -1936,7 +1936,7 @@ void cRankManager::CreateColumnIfNotExists(const char * a_TableName, const char 
 	// Add the column:
 	try
 	{
-		m_DB.exec(Printf("ALTER TABLE %s ADD COLUMN %s %s", a_TableName, a_ColumnName, a_ColumnType));
+		m_DB.exec(fmt::format(FMT_STRING("ALTER TABLE {} ADD COLUMN {} {}"), a_TableName, a_ColumnName, a_ColumnType));
 	}
 	catch (const SQLite::Exception & exc)
 	{

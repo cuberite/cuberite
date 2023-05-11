@@ -23,29 +23,27 @@ cMap::cMap(unsigned int a_ID, cWorld * a_World):
 	m_Scale(3),
 	m_CenterX(0),
 	m_CenterZ(0),
-	m_World(a_World)
+	m_World(a_World),
+	m_Name(fmt::format(FMT_STRING("map_{}"), m_ID))
 {
 	m_Data.assign(m_Width * m_Height, E_BASE_COLOR_TRANSPARENT);
-
-	Printf(m_Name, "map_%i", m_ID);
 }
 
 
 
 
 
-cMap::cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, unsigned int a_Scale)
-	: m_ID(a_ID)
-	, m_Width(cChunkDef::Width * 8)
-	, m_Height(cChunkDef::Width * 8)
-	, m_Scale(a_Scale)
-	, m_CenterX(a_CenterX)
-	, m_CenterZ(a_CenterZ)
-	, m_World(a_World)
+cMap::cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, unsigned int a_Scale):
+	m_ID(a_ID),
+	m_Width(cChunkDef::Width * 8),
+	m_Height(cChunkDef::Width * 8),
+	m_Scale(a_Scale),
+	m_CenterX(a_CenterX),
+	m_CenterZ(a_CenterZ),
+	m_World(a_World),
+	m_Name(fmt::format(FMT_STRING("map_{}"), m_ID))
 {
 	m_Data.assign(m_Width * m_Height, E_BASE_COLOR_TRANSPARENT);
-
-	Printf(m_Name, "map_%i", m_ID);
 }
 
 

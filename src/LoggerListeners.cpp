@@ -256,15 +256,15 @@ class cFileListener
 {
 public:
 
-	cFileListener(void) {}
+	cFileListener() {}
 
 	bool Open()
 	{
 		// Assume creation succeeds, as the API does not provide a way to tell if the folder exists.
 		cFile::CreateFolder("logs");
 		bool success = m_File.Open(
-			Printf(
-				"logs/LOG_%d.txt",
+			fmt::format(
+				FMT_STRING("logs/LOG_{}.txt"),
 				std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1>>>(
 					std::chrono::system_clock::now().time_since_epoch()
 				).count()
