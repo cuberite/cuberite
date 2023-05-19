@@ -260,6 +260,9 @@ protected:
 	Returns true if webadmin is enabled, false if disabled. */
 	bool LoadIniFile(void);
 
+	/** Checks inside the webadmin.ini file if there are users configured. */
+	bool HasUsers(void);
+
 	/** Handles requests coming to the "/webadmin" or "/~webadmin" URLs */
 	void HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request);
 
