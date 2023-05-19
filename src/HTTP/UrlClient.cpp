@@ -353,7 +353,7 @@ public:
 
 		// Send the headers:
 		m_Link->Send(fmt::format(FMT_STRING("Host: {}\r\n"), m_ParentRequest.m_UrlHost));
-		m_Link->Send(fmt::format(FMT_STRING("Content-Length: {}\r\n"), m_ParentRequest.m_Body));
+		m_Link->Send(fmt::format(FMT_STRING("Content-Length: {}\r\n"), m_ParentRequest.m_Body.size()));
 		for (const auto & hdr: m_ParentRequest.m_Headers)
 		{
 			m_Link->Send(fmt::format(FMT_STRING("{}: {}\r\n"), hdr.first, hdr.second));
