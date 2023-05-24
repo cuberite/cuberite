@@ -194,7 +194,7 @@ void cWebAdmin::Reload(void)
 	{
 		LOGWARNING(
 			"The webadmin is enabled but has no users configured."
-			" To add new users see webadmin.ini"
+			" To add new users, edit webadmin.ini"
 		);
 	}
 
@@ -255,7 +255,7 @@ bool cWebAdmin::LoadIniFile(void)
 
 
 
-bool cWebAdmin::HasUsers(void)
+bool cWebAdmin::HasUsers()
 {
 	for (int i = 0; i < m_IniFile.GetNumKeys(); i++)
 	{

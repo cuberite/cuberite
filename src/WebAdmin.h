@@ -261,7 +261,7 @@ protected:
 	bool LoadIniFile(void);
 
 	/** Checks inside the webadmin.ini file if there are users configured. */
-	bool HasUsers(void);
+	bool HasUsers();
 
 	/** Handles requests coming to the "/webadmin" or "/~webadmin" URLs */
 	void HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request);
