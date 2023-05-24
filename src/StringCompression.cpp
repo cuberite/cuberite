@@ -12,7 +12,6 @@
 
 
 
-
 std::string_view Compression::Result::GetStringView() const
 {
 	const auto View = GetView();
@@ -30,16 +29,7 @@ ContiguousByteBufferView Compression::Result::GetView() const
 	{
 		std::visit([](const auto & Buffer) -> const std::byte *
 		{
-			using Variant = std::decay_t<decltype(Buffer)>;
-
-			if constexpr (std::is_same_v<Variant, Compression::Result::Static>)
-			{
-				return Buffer.data();
-			}
-			else
-			{
-				return Buffer.get();
-			}
+			return Buffer.get();
 		}, Storage), Size
 	};
 }
@@ -74,18 +64,7 @@ Compression::Compressor::~Compressor()
 template <auto Algorithm>
 Compression::Result Compression::Compressor::Compress(const void * const Input, const size_t Size)
 {
-	// First see if the stack buffer has enough space:
-	{
-		Result::Static Buffer;
-		const auto BytesWrittenOut = Algorithm(m_Handle, Input, Size, Buffer.data(), Buffer.size());
-
-		if (BytesWrittenOut != 0)
-		{
-			return { Buffer, BytesWrittenOut };
-		}
-	}
-
-	// No it doesn't. Allocate space on the heap to write the compression result, increasing in powers of 2.
+	// Allocate space on the heap to write the compression result, increasing in powers of 2.
 	// This will either succeed, or except with bad_alloc.
 
 	auto DynamicCapacity = Result::StaticCapacity * 2;
@@ -187,25 +166,12 @@ Compression::Result Compression::Extractor::ExtractZLib(ContiguousByteBufferView
 template <auto Algorithm>
 Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferView Input)
 {
-	// First see if the stack buffer has enough space:
-	{
-		Result::Static Buffer;
-		size_t BytesWrittenOut;
-
-		switch (Algorithm(m_Handle, Input.data(), Input.size(), Buffer.data(), Buffer.size(), &BytesWrittenOut))
-		{
-			case LIBDEFLATE_SUCCESS: return { Buffer, BytesWrittenOut };
-			case LIBDEFLATE_INSUFFICIENT_SPACE: break;
-			default: throw std::runtime_error("Data extraction failed.");
-		}
-	}
-
-	// No it doesn't. Allocate space on the heap to write the compression result, increasing in powers of 2.
+	// Allocate space on the heap to write the compression result, increasing in powers of 2.
 
 	auto DynamicCapacity = Result::StaticCapacity * 2;
 	while (true)
 	{
-		size_t BytesWrittenOut;
+		size_t BytesWrittenOut {};
 		auto Dynamic = cpp20::make_unique_for_overwrite<Result::Dynamic::element_type[]>(DynamicCapacity);
 
 		switch (Algorithm(m_Handle, Input.data(), Input.size(), Dynamic.get(), DynamicCapacity, &BytesWrittenOut))
@@ -228,24 +194,16 @@ Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferVi
 template <auto Algorithm>
 Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferView Input, size_t UncompressedSize)
 {
-	// Here we have the expected size after extraction, so directly use a suitable buffer size:
-	if (UncompressedSize <= Result::StaticCapacity)
-	{
-		if (
-			Result::Static Buffer;
-			Algorithm(m_Handle, Input.data(), Input.size(), Buffer.data(), UncompressedSize, nullptr) == libdeflate_result::LIBDEFLATE_SUCCESS
-		)
-		{
-			return { Buffer, UncompressedSize };
-		}
-	}
-	else if (
+	if (
 		auto Dynamic = cpp20::make_unique_for_overwrite<Result::Dynamic::element_type[]>(UncompressedSize);
 		Algorithm(m_Handle, Input.data(), Input.size(), Dynamic.get(), UncompressedSize, nullptr) == libdeflate_result::LIBDEFLATE_SUCCESS
 	)
 	{
+
 		return { std::move(Dynamic), UncompressedSize };
+
 	}
+
 
 	throw std::runtime_error("Data extraction failed.");
 }
