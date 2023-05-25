@@ -190,6 +190,13 @@ void cWebAdmin::Reload(void)
 			" This will not take effect until you restart the server."
 		);
 	}
+	else if (!HasUsers())
+	{
+		LOGWARNING(
+			"The webadmin is enabled but has no users configured."
+			" To add new users, edit webadmin.ini"
+		);
+	}
 
 	// Initialize the WebAdmin template script and reload the file:
 	if (m_TemplateScript.IsValid())
@@ -242,6 +249,23 @@ bool cWebAdmin::LoadIniFile(void)
 	}
 
 	return m_IniFile.GetValueSetB("WebAdmin", "Enabled", true);
+}
+
+
+
+
+
+bool cWebAdmin::HasUsers()
+{
+	for (int i = 0; i < m_IniFile.GetNumKeys(); i++)
+	{
+		AString key = m_IniFile.GetKeyName(i);
+		if (key.rfind("User:", 0) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
