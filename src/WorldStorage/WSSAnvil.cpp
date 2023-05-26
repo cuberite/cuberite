@@ -123,10 +123,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor):
 cWSSAnvil::~cWSSAnvil()
 {
 	cCSLock Lock(m_CS);
-	for (cMCAFiles::iterator itr = m_Files.begin(); itr != m_Files.end(); ++itr)
-	{
-		delete *itr;
-	}  // for itr - m_Files[]
+	m_Files.clear();
 }
 
 
@@ -227,7 +224,7 @@ void cWSSAnvil::ChunkLoadFailed(const cChunkCoords a_ChunkCoords, const AString 
 bool cWSSAnvil::GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data)
 {
 	cCSLock Lock(m_CS);
-	cMCAFile * File = LoadMCAFile(a_Chunk);
+	auto File = LoadMCAFile(a_Chunk);
 	if (File == nullptr)
 	{
 		return false;
@@ -242,7 +239,7 @@ bool cWSSAnvil::GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer 
 bool cWSSAnvil::SetChunkData(const cChunkCoords & a_Chunk, const ContiguousByteBufferView a_Data)
 {
 	cCSLock Lock(m_CS);
-	cMCAFile * File = LoadMCAFile(a_Chunk);
+	auto File = LoadMCAFile(a_Chunk);
 	if (File == nullptr)
 	{
 		return false;
@@ -254,7 +251,7 @@ bool cWSSAnvil::SetChunkData(const cChunkCoords & a_Chunk, const ContiguousByteB
 
 
 
-cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
+std::shared_ptr<cWSSAnvil::cMCAFile> cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 {
 	// ASSUME m_CS is locked
 	ASSERT(m_CS.IsLocked());
@@ -267,12 +264,12 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	ASSERT(a_Chunk.m_ChunkZ - RegionZ * 32 < 32);
 
 	// Is it already cached?
-	for (cMCAFiles::iterator itr = m_Files.begin(); itr != m_Files.end(); ++itr)
+	for (auto itr = m_Files.begin(); itr != m_Files.end(); ++itr)
 	{
 		if (((*itr) != nullptr) && ((*itr)->GetRegionX() == RegionX) && ((*itr)->GetRegionZ() == RegionZ))
 		{
 			// Move the file to front and return it:
-			cMCAFile * f = *itr;
+			auto f = *itr;
 			if (itr != m_Files.begin())
 			{
 				m_Files.erase(itr);
@@ -286,7 +283,7 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	auto FileName = fmt::format(FMT_STRING("{}{}region"), m_World->GetDataPath(), cFile::PathSeparator());
 	cFile::CreateFolder(FileName);
 	FileName.append(fmt::format(FMT_STRING("/r.{}.{}.mca"), RegionX, RegionZ));
-	cMCAFile * f = new cMCAFile(*this, FileName, RegionX, RegionZ);
+	auto f = std::make_shared<cMCAFile>(*this, FileName, RegionX, RegionZ);
 	if (f == nullptr)
 	{
 		return nullptr;
@@ -296,7 +293,6 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	// If there are too many MCA files cached, delete the last one used:
 	if (m_Files.size() > MAX_MCA_FILES)
 	{
-		delete m_Files.back();
 		m_Files.pop_back();
 	}
 	return f;

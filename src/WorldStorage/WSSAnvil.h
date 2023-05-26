@@ -83,10 +83,13 @@ protected:
 		/** Opens a MCA file either for a Read operation (fails if doesn't exist) or for a Write operation (creates new if not found) */
 		bool OpenFile(bool a_IsForReading);
 	} ;
-	typedef std::list<cMCAFile *> cMCAFiles;
 
+	/** Protects m_Files against multithreaded access. */
 	cCriticalSection m_CS;
-	cMCAFiles        m_Files;  // a MRU cache of MCA files
+
+	/** A MRU cache of MCA files.
+	Protected against multithreaded access by m_CS. */
+	std::list<std::shared_ptr<cMCAFile>> m_Files;
 
 	Compression::Extractor m_Extractor;
 	Compression::Compressor m_Compressor;
@@ -291,7 +294,7 @@ protected:
 	bool GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, Vector3i & a_AbsPos);
 
 	/** Gets the correct MCA file either from cache or from disk, manages the m_MCAFiles cache; assumes m_CS is locked */
-	cMCAFile * LoadMCAFile(const cChunkCoords & a_Chunk);
+	std::shared_ptr<cMCAFile> LoadMCAFile(const cChunkCoords & a_Chunk);
 
 	// cWSSchema overrides:
 	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override;
