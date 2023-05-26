@@ -1,11 +1,3 @@
-
-// WSSAnvil.h
-
-// Interfaces to the cWSSAnvil class representing the Anvil world storage scheme
-
-
-
-
 #pragma once
 
 #include "../BlockEntities/BlockEntity.h"
@@ -30,22 +22,7 @@ class ChunkBlockData;
 
 
 
-enum
-{
-	/** Maximum number of chunks in an MCA file - also the count of the header items */
-	MCA_MAX_CHUNKS = 32 * 32,
-
-	/** The MCA header is 8 KiB */
-	MCA_HEADER_SIZE = MCA_MAX_CHUNKS * 8,
-
-	/** There are 5 bytes of header in front of each chunk */
-	MCA_CHUNK_HEADER_LENGTH = 5,
-} ;
-
-
-
-
-
+/** Implements the Anvil world storage schema. */
 class cWSSAnvil:
 	public cWSSchema
 {
@@ -58,6 +35,19 @@ public:
 
 protected:
 
+	enum
+	{
+		/** Maximum number of chunks in an MCA file - also the count of the header items */
+		MCA_MAX_CHUNKS = 32 * 32,
+
+		/** The MCA header is 8 KiB */
+		MCA_HEADER_SIZE = MCA_MAX_CHUNKS * 8,
+
+		/** There are 5 bytes of header in front of each chunk */
+		MCA_CHUNK_HEADER_LENGTH = 5,
+	} ;
+
+
 	class cMCAFile
 	{
 	public:
@@ -67,9 +57,9 @@ protected:
 		bool GetChunkData  (const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data);
 		bool SetChunkData  (const cChunkCoords & a_Chunk, ContiguousByteBufferView a_Data);
 
-		int             GetRegionX (void) const {return m_RegionX; }
-		int             GetRegionZ (void) const {return m_RegionZ; }
-		const AString & GetFileName(void) const {return m_FileName; }
+		int             GetRegionX () const {return m_RegionX; }
+		int             GetRegionZ () const {return m_RegionZ; }
+		const AString & GetFileName() const {return m_FileName; }
 
 	protected:
 
@@ -102,7 +92,7 @@ protected:
 	Compression::Compressor m_Compressor;
 
 	/** Reports that the specified chunk failed to load and saves the chunk data to an external file. */
-	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Reason, ContiguousByteBufferView a_ChunkDataToSave);
+	void ChunkLoadFailed(const cChunkCoords a_ChunkCoords, const AString & a_Reason, ContiguousByteBufferView a_ChunkDataToSave);
 
 	/** Gets chunk data from the correct file; locks file CS as needed */
 	bool GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data);
@@ -306,5 +296,5 @@ protected:
 	// cWSSchema overrides:
 	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override;
 	virtual bool SaveChunk(const cChunkCoords & a_Chunk) override;
-	virtual const AString GetName(void) const override {return "anvil"; }
+	virtual const AString GetName() const override {return "anvil"; }
 } ;
