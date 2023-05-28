@@ -51,7 +51,7 @@ static int tolua_cNetwork_Connect(lua_State * L)
 	// Check validity:
 	if ((port < 0) || (port > 65535))
 	{
-		return S.ApiParamError("Port number out of range (%d, range 0 - 65535)", port);
+		return S.ApiParamError(fmt::format(FMT_STRING("Port number out of range (got {}, range 0 - 65535)"), port));
 	}
 	ASSERT(callbacks != nullptr);  // Invalid callbacks would have resulted in GetStackValues() returning false
 
@@ -97,7 +97,7 @@ static int tolua_cNetwork_CreateUDPEndpoint(lua_State * L)
 	// Check validity:
 	if ((port < 0) || (port > 65535))
 	{
-		return S.ApiParamError("Port number out of range (%d, range 0 - 65535)", port);
+		return S.ApiParamError(fmt::format(FMT_STRING("Port number out of range (got {}, range 0 - 65535)"), port));
 	}
 	ASSERT(callbacks != nullptr);  // Invalid callbacks would have resulted in GetStackValues() returning false
 
@@ -242,7 +242,7 @@ static int tolua_cNetwork_Listen(lua_State * L)
 	// Check the validity:
 	if ((port < 0) || (port > 65535))
 	{
-		return S.ApiParamError("Port number out of range (%d, range 0 - 65535)", port);
+		return S.ApiParamError(fmt::format(FMT_STRING("Port number out of range (got {}, range 0 - 65535)"), port));
 	}
 	auto port16 = static_cast<UInt16>(port);
 
@@ -546,7 +546,7 @@ static int tolua_cTCPLink_Shutdown(lua_State * L)
 static int tolua_cTCPLink_StartTLSClient(lua_State * L)
 {
 	// Function signature:
-	// LinkInstance:StartTLSClient(OwnCert, OwnPrivKey, OwnPrivKeyPassword) -> [true] or [nil, ErrMsg]
+	// LinkInstance:StartTLSClient(OwnCert, OwnPrivKey, OwnPrivKeyPassword, TrustedRootCAs) -> [true] or [nil, ErrMsg]
 
 	// Get the link:
 	cLuaState S(L);
@@ -558,14 +558,17 @@ static int tolua_cTCPLink_StartTLSClient(lua_State * L)
 	ASSERT(Link != nullptr);  // Checked by CheckParamSelf()
 
 	// Read the (optional) params:
-	AString OwnCert, OwnPrivKey, OwnPrivKeyPassword;
-	S.GetStackValues(2, OwnCert, OwnPrivKey, OwnPrivKeyPassword);
+	AString OwnCert, OwnPrivKey, OwnPrivKeyPassword, TrustedRootCAs;
+	S.GetStackValues(2, OwnCert, OwnPrivKey, OwnPrivKeyPassword, cLuaState::cOptionalParam<std::string>(TrustedRootCAs));
 
 	// Start the TLS handshake:
-	AString res = Link->StartTLSClient(OwnCert, OwnPrivKey, OwnPrivKeyPassword);
+	AString res = Link->StartTLSClient(OwnCert, OwnPrivKey, OwnPrivKeyPassword, TrustedRootCAs);
 	if (!res.empty())
 	{
-		S.Push(cLuaState::Nil, Printf("Cannot start TLS on link to %s:%d: %s", Link->GetRemoteIP().c_str(), Link->GetRemotePort(), res.c_str()));
+		S.Push(cLuaState::Nil, fmt::format(
+			FMT_STRING("Cannot start TLS on link to {}:{}: {}"),
+			Link->GetRemoteIP(), Link->GetRemotePort(), res
+		));
 		return 2;
 	}
 	return 1;
@@ -604,7 +607,10 @@ static int tolua_cTCPLink_StartTLSServer(lua_State * L)
 	AString res = Link->StartTLSServer(OwnCert, OwnPrivKey, OwnPrivKeyPassword, StartTLSData);
 	if (!res.empty())
 	{
-		S.Push(cLuaState::Nil, Printf("Cannot start TLS on link to %s:%d: %s", Link->GetRemoteIP().c_str(), Link->GetRemotePort(), res.c_str()));
+		S.Push(cLuaState::Nil, fmt::format(
+			FMT_STRING("Cannot start TLS on link to {}:{}: {}"),
+			Link->GetRemoteIP(), Link->GetRemotePort(), res
+		));
 		return 2;
 	}
 	S.Push(true);
@@ -773,7 +779,7 @@ static int tolua_cUDPEndpoint_Send(lua_State * L)
 	// Check the port:
 	if ((remotePort < 0) || (remotePort > USHRT_MAX))
 	{
-		return S.ApiParamError("Port number out of range (%d, range 0 - 65535)", remotePort);
+		return S.ApiParamError(fmt::format(FMT_STRING("Port number out of range (got {}, range 0 - 65535)"), remotePort));
 	}
 
 	// Send the data:
@@ -958,14 +964,14 @@ static int tolua_cUrlClient_Request_Common(lua_State * a_LuaState, const AString
 	cLuaState::cCallbackPtr onCompleteBodyCallback;
 	if (!L.GetStackValues(a_UrlStackIdx, url))
 	{
-		return L.ApiParamError("Cannot read URL parameter at idx %d", a_UrlStackIdx);
+		return L.ApiParamError(fmt::format(FMT_STRING("Cannot read URL parameter at idx {}"), a_UrlStackIdx));
 	}
 	cUrlClient::cCallbacksPtr urlClientCallbacks;
 	if (lua_istable(L, a_UrlStackIdx + 1))
 	{
 		if (!L.GetStackValue(a_UrlStackIdx + 1, callbacks))
 		{
-			return L.ApiParamError("Cannot read the CallbacksTable parameter at idx %d", a_UrlStackIdx + 1);
+			return L.ApiParamError(fmt::format(FMT_STRING("Cannot read the CallbacksTable parameter at idx {}"), a_UrlStackIdx + 1));
 		}
 		urlClientCallbacks = std::make_unique<cFullUrlClientCallbacks>(std::move(callbacks));
 	}
@@ -973,17 +979,23 @@ static int tolua_cUrlClient_Request_Common(lua_State * a_LuaState, const AString
 	{
 		if (!L.GetStackValue(a_UrlStackIdx + 1, onCompleteBodyCallback))
 		{
-			return L.ApiParamError("Cannot read the CallbackFn parameter at idx %d", a_UrlStackIdx + 1);
+			return L.ApiParamError(fmt::format(FMT_STRING("Cannot read the CallbackFn parameter at idx {}"), a_UrlStackIdx + 1));
 		}
 		urlClientCallbacks = std::make_unique<cSimpleUrlClientCallbacks>(std::move(onCompleteBodyCallback));
 	}
 	else
 	{
-		L.ApiParamError("Invalid Callbacks parameter at %d, expected a table or function, got %s", a_UrlStackIdx + 1, L.GetTypeText(a_UrlStackIdx + 1).c_str());
+		L.ApiParamError(fmt::format(
+			FMT_STRING("Invalid Callbacks parameter at {}, expected a table or function, got {}"),
+			a_UrlStackIdx + 1, L.GetTypeText(a_UrlStackIdx + 1)
+		));
 	}
 	if (!L.GetStackValues(a_UrlStackIdx + 2, cLuaState::cOptionalParam<AStringMap>(headers), cLuaState::cOptionalParam<AString>(requestBody), cLuaState::cOptionalParam<AStringMap>(options)))
 	{
-		L.ApiParamError("Cannot read the Header, Body or Options parameter at idx %d, %d, %d.", a_UrlStackIdx + 2, a_UrlStackIdx + 3, a_UrlStackIdx + 4);
+		L.ApiParamError(fmt::format(
+			FMT_STRING("Cannot read the Header, Body or Options parameter at idx {}, {}, {}."),
+			a_UrlStackIdx + 2, a_UrlStackIdx + 3, a_UrlStackIdx + 4
+		));
 	}
 
 	// Make the request:

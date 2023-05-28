@@ -12292,7 +12292,7 @@ end
 							Type = "cTeam",
 						},
 					},
-					Notes = "Registers a new team. Returns the {{cTeam}} instance, nil on error.",
+					Notes = "Registers a new team. Returns the {{cTeam}} instance, nil on error. For example if the team already exists.",
 				},
 				RemoveObjective =
 				{
