@@ -370,6 +370,19 @@ bool cPluginManager::CallHookChat(cPlayer & a_Player, AString & a_Message)
 	);
 }
 
+bool cPluginManager::CallPreCommandExecute(cPlayer & a_Player, AString & a_Command)
+{
+	// Check if the message is a command (starts with a slash). If it is, we know that it wasn't recognised:
+	if (!a_Command.empty() && (a_Command[0] == '/'))
+	{
+		return GenericCallHook(HOOK_PRE_EXECUTE_COMMAND, [&](cPlugin * a_Plugin)
+			{
+				return a_Plugin->OnPreExecuteCommand(a_Player, a_Command);
+			}
+		);
+	}
+}
+
 
 
 
@@ -1260,6 +1273,9 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 	{
 		return crUnknownCommand;
 	}
+
+	// MAKE THE COMMAND LOWERCASE
+	Split[0] = StrToLower(Split[0]);
 
 	CommandMap::iterator cmd = m_Commands.find(Split[0]);
 	if (cmd == m_Commands.end())

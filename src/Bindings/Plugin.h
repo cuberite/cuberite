@@ -60,6 +60,10 @@ public:
 	virtual bool OnEntityTeleport           (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition) = 0;
 	virtual bool OnEntityChangingWorld      (cEntity & a_Entity, cWorld & a_World) = 0;
 	virtual bool OnEntityChangedWorld       (cEntity & a_Entity, cWorld & a_World) = 0;
+	
+	// ADDING COMMAND PRE EXECUTE EVENT
+	virtual bool OnPreExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, cPluginManager::CommandResult & a_Result) = 0;
+	
 	virtual bool OnExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, cPluginManager::CommandResult & a_Result) = 0;
 	virtual bool OnExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) = 0;
 	virtual bool OnExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) = 0;
