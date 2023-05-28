@@ -1,3 +1,14 @@
+# Cuberite Java Support
+This version aims to support java classes as plugins in Cuberite, while mantaining good performance
+
+# Changes from original fork
+Added HOOK_PRE_EXECUTE_COMMAND hook
+Made commands NON caps sensible (/Help is the same as /help)
+
+## TODO
+Support Java Plugins
+Make Bukkit translator to support bukkit plugins
+
 # Cuberite
 
 [![Jenkins Build Status](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fbuilds.cuberite.org%2Fjob%2Fcuberite%2Fjob%2Fmaster&label=Jenkins)](https://builds.cuberite.org/job/cuberite/job/master/)
