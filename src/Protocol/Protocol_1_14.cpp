@@ -440,7 +440,8 @@ void cProtocol_1_14::SendWindowOpen(const cWindow & a_Window)
 			}
 		}
 
-		Pkt.WriteString(fmt::format(FMT_STRING("{{\"text\":\"{}\"}}"), a_Window.GetWindowTitle()));
+		Pkt.WriteString(
+			SerializeSingleValueJsonObject("text", a_Window.GetWindowTitle()));
 	}
 }
 
