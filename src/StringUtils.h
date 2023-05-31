@@ -134,7 +134,7 @@ extern bool StringToFloat(const AString & a_String, float & a_Num);
 /** Returns true if only whitespace characters are present in the string */
 bool IsOnlyWhitespace(const AString & a_String);
 
-/** Creates a Json string with a single value */
+/** Creates a Json string representing an object with the specified single value. */
 extern AString
 SerializeSingleValueJsonObject(const AString & a_Key, const AString & a_Value);
 
