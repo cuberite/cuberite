@@ -1083,15 +1083,3 @@ bool IsOnlyWhitespace(const AString & a_String)
 {
 	return std::all_of(a_String.cbegin(), a_String.cend(), isspace);
 }
-
-
-
-
-
-AString SerializeSingleValueJsonObject(
-	const AString & a_Key, const AString & a_Value)
-{
-	Json::Value root;
-	root[a_Key] = a_Value;
-	return JsonUtils::WriteFastString(root);
-}

@@ -440,8 +440,7 @@ void cProtocol_1_14::SendWindowOpen(const cWindow & a_Window)
 			}
 		}
 
-		Pkt.WriteString(
-			SerializeSingleValueJsonObject("text", a_Window.GetWindowTitle()));
+		Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", a_Window.GetWindowTitle()));
 	}
 }
 
