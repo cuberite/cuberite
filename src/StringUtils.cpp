@@ -7,7 +7,6 @@
 
 #include "fmt/printf.h"
 
-
 #ifdef _MSC_VER
 	// Under MSVC, link to WinSock2 (needed by RawBEToUTF8's byteswapping)
 	#pragma comment(lib, "ws2_32.lib")
