@@ -9,6 +9,7 @@ Implements the 1.14 protocol classes:
 #include "Globals.h"
 #include "Protocol_1_14.h"
 #include "Packetizer.h"
+#include "JsonUtils.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
