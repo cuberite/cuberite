@@ -21,7 +21,6 @@ namespace Compression
 	/** Contains the result of a compression or extraction operation. */
 	struct Result
 	{
-		/** Static is used for determining the size of StaticCapacity, which in turn is used to determine the size of Dynamic memory allocation in StringCompression.cpp. */
 		using Static = std::array<std::byte, 128 KiB>;
 		using Dynamic = std::unique_ptr<std::byte[]>;
 
@@ -33,9 +32,8 @@ namespace Compression
 		/** Returns a view (of type std::byte) of the internal store. */
 		ContiguousByteBufferView GetView() const;
 
-		/** A store allocated on the heap. */
-		/** Note that this remains a variant for now. */
-		std::variant<Dynamic> Storage;
+		/** A store allocated on either the stack or heap. */
+		std::variant<Static, Dynamic> Storage;
 
 		/** The length of valid data in the store. */
 		size_t Size;
