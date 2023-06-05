@@ -57,6 +57,7 @@ target_sources(
 	Root.cpp
 	Scoreboard.cpp
 	Server.cpp
+	SetChunkData.cpp
 	SpawnPrepare.cpp
 	StatisticsManager.cpp
 	StringCompression.cpp

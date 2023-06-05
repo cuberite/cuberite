@@ -564,7 +564,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		AString ParseError;
 		if (!JsonUtils::ParseString(Response, root, &ParseError) || !root.isArray())
 		{
-			LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __FUNCTION__, ParseError);
+			LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __METHOD_NAME__, ParseError);
 			LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16));
 			continue;
 		}
@@ -727,7 +727,7 @@ void cMojangAPI::Update(void)
 	}
 	if (!PlayerNames.empty())
 	{
-		LOG("cMojangAPI: Updating name-to-uuid cache for %u names", static_cast<unsigned>(PlayerNames.size()));
+		LOG("%s: Updating name-to-uuid cache for %u names", __METHOD_NAME__, static_cast<unsigned>(PlayerNames.size()));
 		QueryNamesToUUIDs(PlayerNames);
 	}
 
@@ -745,7 +745,7 @@ void cMojangAPI::Update(void)
 	}
 	if (!ProfileUUIDs.empty())
 	{
-		LOG("cMojangAPI: Updating uuid-to-profile cache for %u uuids", static_cast<unsigned>(ProfileUUIDs.size()));
+		LOG("%s: Updating uuid-to-profile cache for %u uuids", __METHOD_NAME__, static_cast<unsigned>(ProfileUUIDs.size()));
 		for (const auto & UUID : ProfileUUIDs)
 		{
 			QueryUUIDToProfile(UUID);
