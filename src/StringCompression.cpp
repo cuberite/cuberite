@@ -86,7 +86,7 @@ Compression::Result Compression::Compressor::Compress(const void * const Input, 
 			Also use DynamicCapacity for the Compression::Result::Size size_t attribute. */
 			return
 			{
-				std::move (std::make_unique <std::vector <std::byte> > (Dynamic.get(), (Dynamic.get() + DynamicCapacity))),
+				std::make_unique <std::vector <std::byte> > (Dynamic.get(), (Dynamic.get() + DynamicCapacity)),
 				DynamicCapacity
 			};
 		}
@@ -202,7 +202,7 @@ Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferVi
 
 				return
 				{
-					std::move (std::make_unique <std::vector <std::byte> > (Dynamic.get(), (Dynamic.get() + DynamicCapacity))),
+					std::make_unique <std::vector <std::byte> > (Dynamic.get(), (Dynamic.get() + DynamicCapacity)),
 					DynamicCapacity
 				};
 
@@ -243,7 +243,7 @@ Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferVi
 			Compression::Result::Storage is then initialized using the iterators through the array's elements.
 			Also return the size of the data, which is copied from UncompressedSize. */
 
-			std::move (std::make_unique <std::vector <std::byte> > (Dynamic.get(), (Dynamic.get() + UncompressedSize))),
+			std::make_unique <std::vector <std::byte> > (Dynamic.get(), (Dynamic.get() + UncompressedSize)),
 			UncompressedSize
 		};
 	}
