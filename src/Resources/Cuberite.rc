@@ -6,7 +6,7 @@ STRINGTABLE
 	LANGUAGE LANG_CHINESE_SIMPLIFIED, SUBLANG_CHINESE_SIMPLIFIED
 BEGIN
 	1 "Cuberite"
-	2 "ä¸€ä¸ªè½»å·§ã€å¿«é€Ÿã€å¯æ‰©å±•çš„Minecraftfæ¸¸æˆæœåŠ¡å™¨"
+	2 "Ò»¸öÇáÇÉ¡¢¿ìËÙ¡¢¿ÉÀ©Õ¹µÄMinecraftfÓÎÏ··şÎñÆ÷"
 END
 
 STRINGTABLE
@@ -70,7 +70,7 @@ BEGIN
 	BEGIN
 		BLOCK "080404B0"
 		BEGIN
-			VALUE "CompanyName", "Cuberite ä½œè€…"
+			VALUE "CompanyName", "Cuberite ×÷Õß"
 			VALUE "FileDescription", "Cuberite"
 			VALUE "FileVersion", VERSION_STRING
 			VALUE "InternalName", INTERNAL_NAME
