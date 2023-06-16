@@ -167,7 +167,9 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	auto relPos = cChunkDef::AbsoluteToRelative(GetPosition());
+	auto pos = GetPosition();
+	auto relPos = cChunkDef::AbsoluteToRelative(pos);
+
 	auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relPos);
 	if (chunk == nullptr)
 	{
@@ -270,8 +272,8 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		{
 			SetYaw(270);
 			SetPosY(floor(GetPosY()) + 0.55);
-			SetSpeedY(0);  // Don't move vertically as on ground
-			SetSpeedX(0);  // Correct diagonal movement from curved rails
+			SetSpeedY(NO_SPEED);  // Don't move vertically as on ground
+			SetSpeedX(NO_SPEED);  // Correct diagonal movement from curved rails
 
 			// Execute both the entity and block collision checks
 			auto BlckCol = TestBlockCollision(a_RailMeta);
@@ -328,7 +330,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		case E_META_RAIL_ASCEND_ZM:  // ASCEND NORTH
 		{
 			SetYaw(270);
-			SetSpeedX(0);
+			SetSpeedX(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
 			auto EntCol = TestEntityCollision(a_RailMeta);
@@ -355,7 +357,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		case E_META_RAIL_ASCEND_ZP:  // ASCEND SOUTH
 		{
 			SetYaw(270);
-			SetSpeedX(0);
+			SetSpeedX(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
 			auto EntCol = TestEntityCollision(a_RailMeta);
@@ -407,7 +409,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		case E_META_RAIL_ASCEND_XP:  // ASCEND WEST
 		{
 			SetYaw(180);
-			SetSpeedZ(0);
+			SetSpeedZ(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
 			auto EntCol = TestEntityCollision(a_RailMeta);
@@ -433,7 +435,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		{
 			SetYaw(315);  // Set correct rotation server side
 			SetPosY(floor(GetPosY()) + 0.55);  // Levitate dat cart
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
 			auto EntCol = TestEntityCollision(a_RailMeta);
@@ -450,7 +452,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		{
 			SetYaw(225);
 			SetPosY(floor(GetPosY()) + 0.55);
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
 			auto EntCol = TestEntityCollision(a_RailMeta);
@@ -465,7 +467,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		{
 			SetYaw(135);
 			SetPosY(floor(GetPosY()) + 0.55);
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
 			auto EntCol = TestEntityCollision(a_RailMeta);
@@ -480,7 +482,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		{
 			SetYaw(45);
 			SetPosY(floor(GetPosY()) + 0.55);
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
 			auto EntCol = TestEntityCollision(a_RailMeta);
@@ -1093,7 +1095,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 	cBoundingBox bbMinecart(Vector3d(MinecartPosition.x, floor(MinecartPosition.y), MinecartPosition.z), GetWidth() / 2, GetHeight());
 	m_World->ForEachEntityInBox(bbMinecart, MinecartAttachCallback);
 
-	switch (a_RailMeta)
+	switch (a_RailMeta & 0x07)
 	{
 		case E_META_RAIL_ZM_ZP:
 		{
@@ -1284,6 +1286,21 @@ void cMinecart::OnRemoveFromWorld(cWorld & a_World)
 	Super::OnRemoveFromWorld(a_World);
 }
 
+void cMinecart::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
+{
+	if (GetSpeed().Length() > 4) // limit normal minecar speed max lower than 4
+	{
+		return;
+	}
+	Vector3d LookVector = m_Attachee->GetLookVector();
+	//judge different railway, add different direct speed.
+	//minecart ignore a_Sideways
+	auto relPos = cChunkDef::AbsoluteToRelative(GetPosition());
+
+	Vector3d ToAddSpeed = LookVector * (a_Forward * 0.4) ;
+	ToAddSpeed.y = 0;
+	AddSpeed(ToAddSpeed);
+}
 
 
 

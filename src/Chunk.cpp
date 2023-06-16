@@ -514,7 +514,8 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 
 			// This block entity is inside the chunk.
 			// The code above should have removed any that were here before:
-			ASSERT(GetBlockEntityRel(cChunkDef::AbsoluteToRelative({ posX, posY, posZ })) == nullptr);
+			Vector3i pos = { posX, posY, posZ };
+			ASSERT(GetBlockEntityRel(cChunkDef::AbsoluteToRelative(pos)) == nullptr);
 
 			// Clone, and add the new one:
 			AddBlockEntity(be->Clone({posX, posY, posZ}));

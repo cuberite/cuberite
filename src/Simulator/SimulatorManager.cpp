@@ -134,7 +134,8 @@ void cSimulatorManager::WakeUp(const cCuboid & a_Area)
 						{
 							for (int x = startX; x <= endX; ++x)
 							{
-								const auto Position = cChunkDef::AbsoluteToRelative({ x, y, z });
+								Vector3i vec = { x, y, z };
+								const auto Position = cChunkDef::AbsoluteToRelative(vec);
 								Simulator->WakeUp(a_CBChunk, Position, a_CBChunk.GetBlock(Position));
 							}  // for x
 						}  // for z

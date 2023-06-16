@@ -162,6 +162,16 @@ public:
 		return AbsoluteToRelative(a_BlockPosition, chunkPos);
 	}
 
+	inline static Vector3i AbsoluteToRelative(const Vector3d& a_BlockPosition)
+	{
+		//pos need floor, then call vec3i overload func
+		//if use default double -> int, will cast -1.xx -> -1(actually need to be -2)
+		Vector3i iPosVec = {int(floor(a_BlockPosition.x)),
+							int(a_BlockPosition.y),
+							int(floor(a_BlockPosition.z))};
+		return AbsoluteToRelative(iPosVec);
+	}
+
 
 	/** Converts the absolute coords into coords relative to the specified chunk. */
 	inline static Vector3i AbsoluteToRelative(Vector3i a_BlockPosition, cChunkCoords a_ChunkPos)
