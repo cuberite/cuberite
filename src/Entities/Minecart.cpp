@@ -1286,21 +1286,27 @@ void cMinecart::OnRemoveFromWorld(cWorld & a_World)
 	Super::OnRemoveFromWorld(a_World);
 }
 
+
+
+
+
 void cMinecart::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 {
-	if (GetSpeed().Length() > 4) // limit normal minecar speed max lower than 4
+	// limit normal minecar speed max lower than 4
+	if (GetSpeed().Length() > 4)
 	{
 		return;
 	}
 	Vector3d LookVector = m_Attachee->GetLookVector();
-	//judge different railway, add different direct speed.
-	//minecart ignore a_Sideways
+	// judge different railway, add different direct speed.
+	// minecart ignore a_Sideways
 	auto relPos = cChunkDef::AbsoluteToRelative(GetPosition());
 
 	Vector3d ToAddSpeed = LookVector * (a_Forward * 0.4) ;
 	ToAddSpeed.y = 0;
 	AddSpeed(ToAddSpeed);
 }
+
 
 
 

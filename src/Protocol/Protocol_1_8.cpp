@@ -4164,7 +4164,7 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 			PacketType, a_Buffer.GetUsedSpace(), m_State, PacketDataHex
 		));
 	}
-	//LOGD("PacketType:%d", PacketType);
+
 	if (!HandlePacket(a_Buffer, PacketType))
 	{
 		// Unknown packet, already been reported, but without the length. Log the length here:
