@@ -506,8 +506,8 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 	// If the rail is powered set to speed up else slow down.
 	const bool IsRailPowered = ((a_RailMeta & 0x8) == 0x8);
 	const double Acceleration = IsRailPowered ? 1.0 : -2.0;
-
-	switch (a_RailMeta & 0x07)
+	NIBBLETYPE PoweredRailMeta = a_RailMeta & 0x7;
+	switch (PoweredRailMeta)
 	{
 		case E_META_RAIL_ZM_ZP:  // NORTHSOUTH
 		{
@@ -516,7 +516,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			SetSpeedY(0);
 			SetSpeedX(0);
 
-			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
+			bool BlckCol = TestBlockCollision(PoweredRailMeta), EntCol = TestEntityCollision(PoweredRailMeta);
 			if (EntCol || BlckCol)
 			{
 				return;
@@ -557,7 +557,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			SetSpeedY(NO_SPEED);
 			SetSpeedZ(NO_SPEED);
 
-			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
+			bool BlckCol = TestBlockCollision(PoweredRailMeta), EntCol = TestEntityCollision(PoweredRailMeta);
 			if (EntCol || BlckCol)
 			{
 				return;
@@ -1292,7 +1292,8 @@ void cMinecart::OnRemoveFromWorld(cWorld & a_World)
 
 void cMinecart::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 {
-	// limit normal minecar speed max lower than 4
+	// limit normal minecart speed max lower than 4
+	// once speed is higher than 4, no more add speed.
 	if (GetSpeed().Length() > 4)
 	{
 		return;
