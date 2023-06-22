@@ -260,7 +260,7 @@ AString ItemTypeToString(short a_ItemType)
 
 AString ItemToFullString(const cItem & a_Item)
 {
-	return fmt::format(FMT_STRING("{}:{} * {}"), ItemToString(a_Item), a_Item.m_ItemDamage, a_Item.m_ItemCount);
+	return fmt::format(FMT_STRING("{}:{} * {:d}"), ItemToString(a_Item), a_Item.m_ItemDamage, a_Item.m_ItemCount);
 }
 
 

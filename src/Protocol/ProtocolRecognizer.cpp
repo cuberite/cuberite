@@ -229,7 +229,7 @@ void cMultiVersionProtocol::SendDisconnect(cClientHandle & a_Client, const AStri
 		return;
 	}
 
-	const AString Message = fmt::format(FMT_STRING("{{\"text\":\"{}\"}}"), EscapeString(a_Reason));
+	const AString Message = JsonUtils::SerializeSingleValueJsonObject("text", a_Reason);
 	const auto PacketID = GetPacketID(cProtocol::ePacketType::pktDisconnectDuringLogin);
 	cByteBuffer Out(
 		cByteBuffer::GetVarIntSize(PacketID) +

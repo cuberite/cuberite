@@ -40,4 +40,16 @@ bool ParseString(const AString & a_JsonStr, Json::Value & a_Root, AString * a_Er
 	return Reader->parse(Doc, Doc + a_JsonStr.size(), &a_Root, a_ErrorMsg);
 }
 
+
+
+
+
+AString SerializeSingleValueJsonObject(
+	const AString & a_Key, const AString & a_Value)
+{
+	Json::Value root;
+	root[a_Key] = a_Value;
+	return JsonUtils::WriteFastString(root);
+}
+
 }  // namespace JsonUtils
