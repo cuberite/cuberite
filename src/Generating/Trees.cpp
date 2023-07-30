@@ -521,7 +521,7 @@ void GetTreeImageByBiome(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, EMCSB
 
 void GetAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
-	if (a_Noise.IntNoise3DInt(a_BlockPos.addedX(32 * a_Seq).addedY(32 * a_Seq)) < 0x60000000)
+	if (a_Noise.IntNoise3DInt(a_BlockPos.addedX(32 * a_Seq).addedY(32 * a_Seq)) < 0x73333333)
 	{
 		GetSmallAppleTreeImage(a_BlockPos, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
 	}
