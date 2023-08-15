@@ -126,3 +126,6 @@ run-clang-tidy.py
 
 # ctags output
 tags
+
+# mac things
+.DS_Store
