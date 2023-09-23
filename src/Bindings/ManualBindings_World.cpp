@@ -105,7 +105,7 @@ static int DoWithBlockEntityAt(lua_State * tolua_S)
 	}
 	if (!FnRef.IsValid())
 	{
-		return L.ApiParamError("Expected a valid callback function for parameter %i", OffsetIndex);
+		return L.ApiParamError(fmt::format(FMT_STRING("Expected a valid callback function for parameter {}"), OffsetIndex));
 	}
 
 	// Call the DoWith function:
@@ -159,7 +159,7 @@ static int ForEachInBox(lua_State * tolua_S)
 	L.GetStackValues(1, Self, Box, FnRef);
 	if ((Self == nullptr) || (Box == nullptr))
 	{
-		return L.ApiParamError("Invalid world (%p) or boundingbox (%p)", static_cast<void *>(Self), static_cast<void *>(Box));
+		return L.ApiParamError(fmt::format(FMT_STRING("Invalid world ({}) or boundingbox ({})"), fmt::ptr(Self), fmt::ptr(Box)));
 	}
 	if (!FnRef.IsValid())
 	{

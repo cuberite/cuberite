@@ -38,7 +38,6 @@ void generateExamples(int a_Seed);
 
 
 
-
 /** Color palette used for algorithm examples.
 No relevance to biomes whatsoever. */
 static const Color spectrumColors[] =
@@ -82,8 +81,7 @@ static const struct
 {
 	EMCSBiome biome;
 	Color color;
-}
-biomeColorMap[] =
+} biomeColorMap[] =
 {
 	{ biOcean,                { 0x00, 0x00, 0x70 }, },
 	{ biPlains,               { 0x8d, 0xb3, 0x60 }, },
@@ -271,7 +269,7 @@ void generateZoomLevels(int a_Seed)
 		gen->GetInts(0, 0, arrSize, arrSize, workspace);
 
 		// Output to a bitmap file:
-		AString fnam = Printf("zoomedgrown_%u.pbm", i);
+		AString fnam = fmt::format(FMT_STRING("zoomedgrown_{}.pbm"), i);
 		outputBitmapFile(fnam, 257, 257, workspace, arrSize, arrSize, spectrumColors, ARRAYCOUNT(spectrumColors));
 		log("  zoom level %u complete", i);
 	}  // for i - Image
@@ -309,7 +307,7 @@ void generateSmoothLevels(int a_Seed)
 		gen->GetInts(static_cast<int>(i), static_cast<int>(i), arrSize, arrSize, workspace);
 
 		// Output to a bitmap file:
-		AString fnam = Printf("smoothedgrown_%u.ppm", i);
+		AString fnam = fmt::format(FMT_STRING("smoothedgrown_{}.ppm"), i);
 		outputBitmapFile(fnam, 257, 257, workspace, arrSize, arrSize, spectrumColors, ARRAYCOUNT(spectrumColors));
 		log("  smooth level %u complete", i);
 	}  // for i - Image
@@ -404,7 +402,7 @@ void generateExamples(int a_Seed)
 	for (const auto & gen: gens)
 	{
 		gen.gen->GetInts(gen.offset, gen.offset, gen.size, gen.size, workspace);
-		AString fnam = Printf("grownexample_%s.ppm", gen.name);
+		AString fnam = fmt::format(FMT_STRING("grownexample_{}.ppm"), gen.name);
 		outputBitmapFile(fnam, 256, 256, workspace, gen.size, gen.size, gen.colormap.colors, gen.colormap.count);
 		log("  Created example \"%s\"", gen.name);
 	}  // for gen - gens[]

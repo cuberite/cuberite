@@ -1,11 +1,3 @@
-
-// WSSAnvil.h
-
-// Interfaces to the cWSSAnvil class representing the Anvil world storage scheme
-
-
-
-
 #pragma once
 
 #include "BlockEntities/BlockEntity.h"
@@ -30,22 +22,7 @@ class ChunkBlockData;
 
 
 
-enum
-{
-	/** Maximum number of chunks in an MCA file - also the count of the header items */
-	MCA_MAX_CHUNKS = 32 * 32,
-
-	/** The MCA header is 8 KiB */
-	MCA_HEADER_SIZE = MCA_MAX_CHUNKS * 8,
-
-	/** There are 5 bytes of header in front of each chunk */
-	MCA_CHUNK_HEADER_LENGTH = 5,
-} ;
-
-
-
-
-
+/** Implements the Anvil world storage schema. */
 class cWSSAnvil:
 	public cWSSchema
 {
@@ -57,6 +34,19 @@ public:
 
 protected:
 
+	enum
+	{
+		/** Maximum number of chunks in an MCA file - also the count of the header items */
+		MCA_MAX_CHUNKS = 32 * 32,
+
+		/** The MCA header is 8 KiB */
+		MCA_HEADER_SIZE = MCA_MAX_CHUNKS * 8,
+
+		/** There are 5 bytes of header in front of each chunk */
+		MCA_CHUNK_HEADER_LENGTH = 5,
+	} ;
+
+
 	class cMCAFile
 	{
 	public:
@@ -66,9 +56,9 @@ protected:
 		bool GetChunkData  (const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data);
 		bool SetChunkData  (const cChunkCoords & a_Chunk, ContiguousByteBufferView a_Data);
 
-		int             GetRegionX (void) const {return m_RegionX; }
-		int             GetRegionZ (void) const {return m_RegionZ; }
-		const AString & GetFileName(void) const {return m_FileName; }
+		int             GetRegionX () const {return m_RegionX; }
+		int             GetRegionZ () const {return m_RegionZ; }
+		const AString & GetFileName() const {return m_FileName; }
 
 	private:
 
@@ -92,16 +82,19 @@ protected:
 		/** Opens a MCA file either for a Read operation (fails if doesn't exist) or for a Write operation (creates new if not found) */
 		bool OpenFile(bool a_IsForReading);
 	} ;
-	using cMCAFiles = std::list<std::shared_ptr<cMCAFile>>;
 
+	/** Protects m_Files against multithreaded access. */
 	cCriticalSection m_CS;
-	cMCAFiles        m_CachedFiles;  // a MRU cache of MCA files
+
+	/** A MRU cache of MCA files.
+	Protected against multithreaded access by m_CS. */
+	std::list<std::shared_ptr<cMCAFile>> m_Files;
 
 	Compression::Extractor m_Extractor;
 	Compression::Compressor m_Compressor;
 
 	/** Reports that the specified chunk failed to load and saves the chunk data to an external file. */
-	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Reason, ContiguousByteBufferView a_ChunkDataToSave);
+	void ChunkLoadFailed(const cChunkCoords a_ChunkCoords, const AString & a_Reason, ContiguousByteBufferView a_ChunkDataToSave);
 
 	/** Gets chunk data from the correct file; locks file CS as needed */
 	bool GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data);
@@ -138,7 +131,7 @@ protected:
 	std::shared_ptr<cMCAFile> LoadMCAFile(const cChunkCoords & a_Chunk);
 
 	// cWSSchema overrides:
-	bool LoadChunk(const cChunkCoords & a_Chunk) override;
-	bool SaveChunk(const cChunkCoords & a_Chunk) override;
-	const AString GetName(void) const override { return "anvil"; }
+	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override;
+	virtual bool SaveChunk(const cChunkCoords & a_Chunk) override;
+	virtual const AString GetName() const override {return "anvil"; }
 } ;

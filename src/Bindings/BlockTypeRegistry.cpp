@@ -211,10 +211,11 @@ AString BlockTypeRegistry::AlreadyRegisteredException::message(
 	const std::shared_ptr<BlockInfo> & aNewRegistration
 )
 {
-	return Printf("Attempting to register BlockTypeName %s from plugin %s, while it is already registered in plugin %s",
-		aNewRegistration->blockTypeName().c_str(),
-		aNewRegistration->pluginName().c_str(),
-		aPreviousRegistration->pluginName().c_str()
+	return fmt::format(
+		FMT_STRING("Attempting to register BlockTypeName {} from plugin {}, while it is already registered in plugin {}"),
+		aNewRegistration->blockTypeName(),
+		aNewRegistration->pluginName(),
+		aPreviousRegistration->pluginName()
 	);
 }
 
@@ -230,11 +231,11 @@ BlockTypeRegistry::NotRegisteredException::NotRegisteredException(
 	const AString & aHintKey,
 	const AString & aHintValue
 ):
-	Super(Printf(
-		"Attempting to set a hint of nonexistent BlockTypeName.\n\tBlockTypeName = %s\n\tHintKey = %s\n\tHintValue = %s",
-		aBlockTypeName.c_str(),
-		aHintKey.c_str(),
-		aHintValue.c_str()
+	Super(fmt::format(
+		FMT_STRING("Attempting to set a hint of nonexistent BlockTypeName.\n\tBlockTypeName = {}\n\tHintKey = {}\n\tHintValue = {}"),
+		aBlockTypeName,
+		aHintKey,
+		aHintValue
 	))
 {
 }

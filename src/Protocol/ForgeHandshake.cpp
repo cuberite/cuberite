@@ -142,7 +142,7 @@ AStringMap cForgeHandshake::ParseModList(const ContiguousByteBufferView a_Data)
 
 	if (a_Data.size() < 4)
 	{
-		SetError(Printf("ParseModList invalid packet, missing length (size = %zu)", a_Data.size()));
+		SetError(fmt::format(FMT_STRING("ParseModList invalid packet, missing length (size = {})"), a_Data.size()));
 		return Mods;
 	}
 
@@ -160,12 +160,12 @@ AStringMap cForgeHandshake::ParseModList(const ContiguousByteBufferView a_Data)
 		AString Name, Version;
 		if (!Buf.ReadVarUTF8String(Name))
 		{
-			SetError(Printf("ParseModList failed to read mod name at i = %d", i));
+			SetError(fmt::format(FMT_STRING("ParseModList failed to read mod name at i = {}"), i));
 			break;
 		}
 		if (!Buf.ReadVarUTF8String(Version))
 		{
-			SetError(Printf("ParseModList failed to read mod version at i = %d", i));
+			SetError(fmt::format(FMT_STRING("ParseModList failed to read mod version at i = {}"), i));
 			break;
 		}
 		Mods.insert({Name, Version});
@@ -186,12 +186,12 @@ void cForgeHandshake::HandleClientHello(cClientHandle & a_Client, const Contiguo
 		LOGD("Received ClientHello with FML protocol version %d", FmlProtocolVersion);
 		if (FmlProtocolVersion != 2)
 		{
-			SetError(Printf("Unsupported FML client protocol version received in ClientHello: %d", FmlProtocolVersion));
+			SetError(fmt::format(FMT_STRING("Unsupported FML client protocol version received in ClientHello: {}"), FmlProtocolVersion));
 		}
 	}
 	else
 	{
-		SetError(Printf("Received unexpected length of ClientHello: %zu", a_Data.size()));
+		SetError(fmt::format(FMT_STRING("Received unexpected length of ClientHello: {}"), a_Data.size()));
 	}
 }
 
@@ -207,10 +207,10 @@ void cForgeHandshake::HandleModList(cClientHandle & a_Client, const ContiguousBy
 	AString ClientModsString;
 	for (auto & item: ClientMods)
 	{
-		AppendPrintf(ClientModsString, "%s@%s, ", item.first.c_str(), item.second.c_str());
+		ClientModsString.append(fmt::format(FMT_STRING("{}@{}, "), item.first, item.second));
 	}
 
-	LOG("Client connected with %zu mods: %s", ClientMods.size(), ClientModsString.c_str());
+	LOG("Client connected with %zu mods: %s", ClientMods.size(), ClientModsString);
 
 	a_Client.m_ForgeMods = ClientMods;
 
@@ -252,7 +252,7 @@ void cForgeHandshake::HandleHandshakeAck(cClientHandle & a_Client, const Contigu
 {
 	if (a_Data.size() != 2)
 	{
-		SetError(Printf("Unexpected HandshakeAck packet length: %zu", a_Data.size()));
+		SetError(fmt::format(FMT_STRING("Unexpected HandshakeAck packet length: {}"), a_Data.size()));
 		return;
 	}
 
@@ -331,7 +331,7 @@ void cForgeHandshake::DataReceived(cClientHandle & a_Client, const ContiguousByt
 {
 	if (!IsForgeClient)
 	{
-		SetError(Printf("Received unexpected Forge data from non-Forge client (%zu bytes)", a_Data.size()));
+		SetError(fmt::format(FMT_STRING("Received unexpected Forge data from non-Forge client ({} bytes)"), a_Data.size()));
 		return;
 	}
 	if (m_Errored)
@@ -342,7 +342,7 @@ void cForgeHandshake::DataReceived(cClientHandle & a_Client, const ContiguousByt
 
 	if (a_Data.size() <= 1)
 	{
-		SetError(Printf("Received unexpectedly short Forge data (%zu bytes)", a_Data.size()));
+		SetError(fmt::format(FMT_STRING("Received unexpectedly short Forge data ({} bytes)"), a_Data.size()));
 		return;
 	}
 
@@ -355,7 +355,7 @@ void cForgeHandshake::DataReceived(cClientHandle & a_Client, const ContiguousByt
 
 		default:
 		{
-			SetError(Printf("Unexpected Forge packet %d received", Discriminator));
+			SetError(fmt::format(FMT_STRING("Unexpected Forge packet {0} (0x{0:x}) received"), Discriminator));
 			return;
 		}
 	}
