@@ -259,16 +259,16 @@ std::shared_ptr<cWSSAnvil::cMCAFile> cWSSAnvil::LoadMCAFile(const cChunkCoords &
 	ASSERT(a_Chunk.m_ChunkZ - RegionZ * 32 < 32);
 
 	// Is it already cached?
-	for (auto itr = m_CachedFiles.begin(); itr != m_CachedFiles.end(); ++itr)
+	for (auto itr = m_Files.begin(); itr != m_Files.end(); ++itr)
 	{
 		if (((*itr) != nullptr) && ((*itr)->GetRegionX() == RegionX) && ((*itr)->GetRegionZ() == RegionZ))
 		{
 			// Move the file to front and return it:
 			auto File = *itr;
-			if (itr != m_CachedFiles.begin())
+			if (itr != m_Files.begin())
 			{
-				m_CachedFiles.erase(itr);
-				m_CachedFiles.push_front(File);
+				m_Files.erase(itr);
+				m_Files.push_front(File);
 			}
 			return File;
 		}
@@ -283,12 +283,12 @@ std::shared_ptr<cWSSAnvil::cMCAFile> cWSSAnvil::LoadMCAFile(const cChunkCoords &
 	{
 		return nullptr;
 	}
-	m_CachedFiles.push_front(File);
+	m_Files.push_front(File);
 
 	// If there are too many MCA files cached, delete the last one used:
-	if (m_CachedFiles.size() > MAX_MCA_FILES)
+	if (m_Files.size() > MAX_MCA_FILES)
 	{
-		m_CachedFiles.pop_back();
+		m_Files.pop_back();
 	}
 	return File;
 }

@@ -1,3 +1,4 @@
+#include "Globals.h"
 
 #include "WorldStorage/WSSAnvilVersions/WSSAnvilHandler.h"
 

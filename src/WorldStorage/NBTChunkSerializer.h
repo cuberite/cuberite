@@ -3,7 +3,7 @@
 #pragma once
 
 #include "ChunkDef.h"
-
+#include "Registries/DataVersion.h"
 
 
 // fwd:
