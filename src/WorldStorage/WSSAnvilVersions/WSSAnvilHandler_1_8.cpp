@@ -2193,7 +2193,7 @@ OwnedBlockEntity cWSSAnvilHandler_1_8::LoadBlockEntity(const cParsedNBT & a_NBT,
 		// Others:
 		case E_BLOCK_BEACON:             return LoadBeacon          (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_BED:                return LoadBed             (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_BREWING_STAND:      return LoadBrewingstand    (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_BREWING_STAND:      return LoadBrewingStand    (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_CHEST:              return LoadChest           (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_COMMAND_BLOCK:      return LoadCommandBlock    (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_DISPENSER:          return LoadDispenser       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos, a_World);
@@ -2326,32 +2326,7 @@ OwnedBlockEntity cWSSAnvilHandler_1_8::LoadBeacon(const cParsedNBT & a_NBT, int 
 
 
 
-OwnedBlockEntity cWSSAnvilHandler_1_8::LoadBed(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const
-{
-	// Check if the data has a proper type:
-	static const AStringVector expectedTypes({ "Bed", "minecraft:bed" });
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
-	{
-		return nullptr;
-	}
-
-	// Use color red as default
-	short Color = E_META_WOOL_RED;
-
-	int ColorIDx = a_NBT.FindChildByName(a_TagIdx, "color");
-	if (ColorIDx >= 0)
-	{
-		Color = static_cast<short>(a_NBT.GetInt(ColorIDx));
-	}
-
-	return std::make_unique<cBedEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World, Color);
-}
-
-
-
-
-
-OwnedBlockEntity cWSSAnvilHandler_1_8::LoadBrewingstand(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const
+OwnedBlockEntity cWSSAnvilHandler_1_8::LoadBrewingStand(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const
 {
 	// Check if the data has a proper type:
 	static const AStringVector expectedTypes({ "Brewingstand", "minecraft:brewing_stand" });

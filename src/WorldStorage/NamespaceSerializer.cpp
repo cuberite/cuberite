@@ -144,7 +144,9 @@ Int32 NamespaceSerializer::From(const eDataVersion a_ID)
 {
 	switch (a_ID)
 	{
-		case eDataVersion::v1_8: return 0;
+		case eDataVersion::vUnknown: return -1;
+
+		case eDataVersion::v1_8: return 47;
 		case eDataVersion::v1_9_0: return 169;
 		case eDataVersion::v1_9_1: return 175;
 		case eDataVersion::v1_9_2: return 176;

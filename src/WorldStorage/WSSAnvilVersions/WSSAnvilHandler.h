@@ -13,6 +13,8 @@ public:
 
 	using HandlerMap = std::map<eDataVersion, std::unique_ptr<cWSSAnvilHandler>>;
 
+	static const eDataVersion m_DataVersion = eDataVersion::vUnknown;
+
 	// Basic data types:
 	/** Loads an array of doubles of the specified length from the specified NBT list tag a_TagIdx; returns true if successful */
 	template <size_t NumDoubles> static constexpr bool LoadDoublesList(std::array<double, NumDoubles> & a_Doubles, const cParsedNBT & a_NBT, int a_TagIdx);
@@ -34,10 +36,12 @@ public:
 	virtual bool LoadEntityBase(cEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 
 	// Miscellaneous:
+	virtual void LoadArmorStand      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadBoat            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadEndCrystal      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadFallingBlock    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadExpOrb          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadFloater         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadHanging         (cHangingEntity & a_Hanging, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadItemFrame       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadLeashKnot       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
@@ -47,23 +51,28 @@ public:
 
 	// Minecart:
 	/** This is a pre 1.5 function. Back then the minecarts shared the same ID */
-	virtual void LoadOldMinecart     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadRideableMinecart(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadChestMinecart   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadFurnaceMinecart (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadTNTMinecart     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadHopperMinecart  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadOldMinecart          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadRideableMinecart     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadChestMinecart        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadCommandBlockMinecart (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadFurnaceMinecart      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadTNTMinecart          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadHopperMinecart       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 
 	// Projectile:
 	/** Loads projectile common data from the NBT compound; returns true if successful */
 	virtual bool LoadProjectileBase  (cProjectileEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIx) const = 0;
 	virtual void LoadArrow           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadEgg             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadEyeOfEnder      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadFireball        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadFireCharge      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadFireworkRocket  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadSnowball        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadSplashPotion    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadThrownEnderPearl(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadThrownExpBottle (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadWitherSkull     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 
 	/** Loads monster common data from the NBT compound; returns true if successful */
 	virtual bool LoadMonsterBase     (cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
@@ -169,9 +178,10 @@ public:
 	virtual OwnedBlockEntity LoadBanner           (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
 	virtual OwnedBlockEntity LoadBeacon           (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
 	virtual OwnedBlockEntity LoadBed              (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadBrewingstand     (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadBrewingStand     (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
 	virtual OwnedBlockEntity LoadChest            (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
 	virtual OwnedBlockEntity LoadCommandBlock     (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadComparator       (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
 	virtual OwnedBlockEntity LoadDispenser        (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
 	virtual OwnedBlockEntity LoadDropper          (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
 	virtual OwnedBlockEntity LoadEnchantingTable  (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
@@ -194,9 +204,14 @@ public:
 
 protected:
 
-	static void Unimplemented(std::string_view a_FnName)
+	inline void Unimplemented(std::string_view a_FnName) const
 	{
-		LOGWARNING("cWSSAnvilHandler::%s is not implemented for this data version", a_FnName);
+		LOGWARNING("cWSSAnvilHandler::%s is not jet implemented for data version %d", a_FnName, NamespaceSerializer::From(m_DataVersion));
+	}
+
+	inline void Unsupported(std::string_view a_FnName) const
+	{
+		LOGWARNING("cWSSAnvilHandler::%s is not supported by minecraft for data version", a_FnName, NamespaceSerializer::From(m_DataVersion));
 	}
 };
 

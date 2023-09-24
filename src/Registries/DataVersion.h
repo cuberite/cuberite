@@ -6,7 +6,9 @@ enum class eDataVersion
 {
 	// Data version were added in 1.9
 	// files with missing data version are assumed to be 1.8
-	v1_8 = 0,
+	vUnknown = 0,
+
+	v1_8 = 47,
 
 	v1_9_0 = 169,
 	v1_9_1 = 175,

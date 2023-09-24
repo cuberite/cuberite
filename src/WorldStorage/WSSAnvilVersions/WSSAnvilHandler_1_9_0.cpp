@@ -2,6 +2,9 @@
 
 #include "WSSAnvilHandler_1_9_0.h"
 
+#include "Entities/Boat.h"
+#include "Entities/EnderCrystal.h"
+
 void cWSSAnvilHandler_1_9_0::LoadBoat(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const
 {
 	auto Boat = std::make_unique<cBoat>(Vector3d(), cBoat::bmOak);
