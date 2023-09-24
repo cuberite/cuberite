@@ -4,6 +4,19 @@
 #include "ChunkDef.h"
 #include "WorldStorage/FastNBT.h"
 
+#include "BlockEntities/BlockEntity.h"
+#include "WorldStorage/WorldStorage.h"
+#include "StringCompression.h"
+
+// fwd:
+class cItem;
+class cItemGrid;
+class cMonster;
+class cProjectileEntity;
+class cHangingEntity;
+class cUUID;
+class ChunkBlockData;
+
 
 class cWSSAnvilHandler
 {
@@ -36,6 +49,7 @@ public:
 	virtual bool LoadEntityBase(cEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 
 	// Miscellaneous:
+	virtual void LoadAreaEffectCloud (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadArmorStand      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadBoat            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadEndCrystal      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
@@ -63,12 +77,15 @@ public:
 	/** Loads projectile common data from the NBT compound; returns true if successful */
 	virtual bool LoadProjectileBase  (cProjectileEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIx) const = 0;
 	virtual void LoadArrow           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadDragonFireball  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadEgg             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadEyeOfEnder      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadFireball        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadFireCharge      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadFireworkRocket  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadShulkerBullet   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadSnowball        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadSpectralArrow   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadSplashPotion    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadThrownEnderPearl(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadThrownExpBottle (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
@@ -175,26 +192,32 @@ public:
 	This function extracts the text from either version. */
 	virtual AString DecodeSignLine(const AString & a_Line) const = 0;
 
-	virtual OwnedBlockEntity LoadBanner           (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadBeacon           (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadBed              (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadBrewingStand     (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadChest            (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadCommandBlock     (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadComparator       (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadDispenser        (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadDropper          (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadEnchantingTable  (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadEnderChest       (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadEndPortal        (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadFlowerPot        (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadFurnace          (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadHopper           (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadJukebox          (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadMobHead          (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadMobSpawner       (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadNoteBlock        (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
-	virtual OwnedBlockEntity LoadSign             (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadBanner                (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadBeacon                (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadBed                   (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadBrewingStand          (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadChest                 (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+
+	virtual OwnedBlockEntity LoadCommandBlock          (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadRepeatingCommandBlock (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadChainCommandBlock     (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+
+	virtual OwnedBlockEntity LoadComparator            (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadDispenser             (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadDropper               (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadEnchantingTable       (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadEnderChest            (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadEndGateway            (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadEndPortal             (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadFlowerPot             (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadFurnace               (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadHopper                (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadJukebox               (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadMobHead               (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadMobSpawner            (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadNoteBlock             (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadSign                  (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
+	virtual OwnedBlockEntity LoadStructureBlock        (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) const = 0;
 
 	virtual bool LoadHeightMap(cChunkDef::HeightMap & a_HeightMap, const cParsedNBT & a_NBT, const int a_TagIdx) const = 0;
 

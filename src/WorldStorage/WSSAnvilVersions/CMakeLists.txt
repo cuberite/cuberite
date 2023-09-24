@@ -3,9 +3,13 @@ target_sources(
 
         WSSAnvilHandler.h
         WSSAnvilHandler_1_8.h
-        WSSAnvilHandler_1_9_0.h
+        WSSAnvilHandler_1_9.h
+        WSSAnvilHandler_1_10.h
+        WSSAnvilHandler_1_11.cpp
 
         WSSAnvilHandler.cpp
         WSSAnvilHandler_1_8.cpp
-        WSSAnvilHandler_1_9_0.cpp
+        WSSAnvilHandler_1_9.cpp
+        WSSAnvilHandler_1_10.cpp
+        WSSAnvilHandler_1_11.cpp
 )

@@ -1,6 +1,6 @@
 #include "Globals.h"
 
-#include "WSSAnvilHandler_1_9_0.h"
+#include "WSSAnvilHandler_1_9.h"
 
 #include "Entities/Boat.h"
 #include "Entities/EnderCrystal.h"
