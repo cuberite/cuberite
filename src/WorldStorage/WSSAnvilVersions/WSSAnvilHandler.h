@@ -151,7 +151,6 @@ public:
 	virtual void LoadEnderDragon      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadEnderman         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadEndermite        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadEvocationIllager (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadEvoker           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadFox              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadGhast            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;

@@ -83,7 +83,6 @@ protected:
 	void LoadEnderDragon      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
 	void LoadEnderman         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
 	void LoadEndermite        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadEndermite"); }
-	void LoadEvocationIllager (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadEvocationIllager"); }
 	void LoadEvoker           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadEvoker"); }
 	void LoadFox              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadFox"); }
 	void LoadGhast            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;

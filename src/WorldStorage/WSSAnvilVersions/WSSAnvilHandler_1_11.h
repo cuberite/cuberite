@@ -19,15 +19,15 @@ public:
 	using Super::Super;
 	~cWSSAnvilHandler_1_11_0() override = default;
 
-	virtual void LoadEvocationIllager (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadEvocationIllager"); }
-	virtual void LoadEvocationFangs   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadEvocationFangs"); }
-	virtual void LoadHusk             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadHusk"); }
-	virtual void LoadLlama            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadLlama"); }
-	virtual void LoadLlamaSpit        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadLlamaSpit"); }
-	virtual void LoadMule             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadMule"); }
-	virtual void LoadStray            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadStray"); }
-	virtual void LoadVex              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadVex"); }
-	virtual void LoadVindicator       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadVindicator"); }
+	virtual void LoadEvocationFangs (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadEvocationFangs"); }
+	virtual void LoadEvoker         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadEvoker"); }
+	virtual void LoadHusk           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadHusk"); }
+	virtual void LoadLlama          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadLlama"); }
+	virtual void LoadLlamaSpit      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadLlamaSpit"); }
+	virtual void LoadMule           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadMule"); }
+	virtual void LoadStray          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadStray"); }
+	virtual void LoadVex            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadVex"); }
+	virtual void LoadVindicator     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadVindicator"); }
 
 };
 
