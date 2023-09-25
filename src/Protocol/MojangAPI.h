@@ -11,7 +11,7 @@
 
 #include <time.h>
 
-#include "../UUID.h"
+#include "UUID.h"
 
 
 
@@ -41,11 +41,6 @@ public:
 	/** Initializes the API; reads the settings from the specified ini file.
 	Loads cached results from disk. */
 	void Start(cSettingsRepositoryInterface & a_Settings, bool a_ShouldAuth);
-
-	/** Connects to the specified server using SSL, sends the given request and receives the response.
-	Checks Mojang certificates using the hard-coded Starfield root CA certificate.
-	Returns true if all was successful, false on failure. */
-	static bool SecureRequest(const AString & a_ServerName, const AString & a_Request, AString & a_Response);
 
 	/** Converts a player name into a UUID.
 	The UUID will be nil on error.
@@ -131,23 +126,18 @@ protected:
 			Int64 a_DateTime
 		);
 	};
-	typedef std::map<AString, sProfile> cProfileMap;
-	typedef std::map<cUUID, sProfile> cUUIDProfileMap;
+	using cProfileMap = std::map<AString, sProfile>;
+	using cUUIDProfileMap = std::map<cUUID, sProfile>;
 
 
-	/** The server to connect to when converting player names to UUIDs. For example "api.mojang.com". */
-	AString m_NameToUUIDServer;
+	/** The full URL to check when converting player names to UUIDs.
+	For example: "https://api.mojang.com/profiles/page/1". */
+	AString m_NameToUUIDUrl;
 
-	/** The URL to use for converting player names to UUIDs, without server part.
-	For example "/profiles/page/1". */
-	AString m_NameToUUIDAddress;
-
-	/** The server to connect to when converting UUID to profile. For example "sessionserver.mojang.com". */
-	AString m_UUIDToProfileServer;
-
-	/** The URL to use for converting UUID to profile, without the server part.
-	Will replace %UUID% with the actual UUID. For example "session/minecraft/profile/%UUID%?unsigned=false". */
-	AString m_UUIDToProfileAddress;
+	/** The full URL to use for converting UUID to profile.
+	%UUID% will get replaced with the actual UUID.
+	For example "https://sessionserver.mojang.com/session/minecraft/profile/%UUID%?unsigned=false". */
+	AString m_UUIDToProfileUrl;
 
 	/** Cache for the Name-to-UUID lookups. The map key is lowercased PlayerName. Protected by m_CSNameToUUID. */
 	cProfileMap m_NameToUUID;

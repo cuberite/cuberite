@@ -112,7 +112,7 @@ void cPrefabPiecePool::AddStartingPieceDefs(
 )
 {
 	ASSERT(a_StartingPieceDefs != nullptr);
-	auto verticalStrategy = CreateVerticalStrategyFromString(Printf("Fixed|%d", a_DefaultPieceHeight), false);
+	auto verticalStrategy = CreateVerticalStrategyFromString(fmt::format(FMT_STRING("Fixed|{}"), a_DefaultPieceHeight), false);
 	for (size_t i = 0; i < a_NumStartingPieceDefs; i++)
 	{
 		cPrefab * Prefab = new cPrefab(a_StartingPieceDefs[i]);
@@ -186,7 +186,7 @@ bool cPrefabPiecePool::LoadFromString(const AString & a_Contents, const AString 
 bool cPrefabPiecePool::LoadFromCubeset(const AString & a_Contents, const AString & a_FileName, bool a_LogWarnings)
 {
 	// Load the file in the Lua interpreter:
-	cLuaState Lua(Printf("LoadablePiecePool %s", a_FileName.c_str()));
+	cLuaState Lua(fmt::format(FMT_STRING("LoadablePiecePool {}"), a_FileName));
 	Lua.Create();
 	cLuaState::cLock lock(Lua);
 	if (!Lua.LoadString(a_Contents, a_FileName, a_LogWarnings))
@@ -199,7 +199,7 @@ bool cPrefabPiecePool::LoadFromCubeset(const AString & a_Contents, const AString
 	int Version = 0;
 	if (!Lua.GetNamedGlobal("Cubeset.Metadata.CubesetFormatVersion", Version))
 	{
-		CONDWARNING(a_LogWarnings, "Cannot load cubeset %s, it doesn't contain version information.", a_FileName.c_str());
+		CONDWARNING(a_LogWarnings, "Cannot load cubeset %s, it doesn't contain version information.", a_FileName);
 		return false;
 	}
 
@@ -210,7 +210,7 @@ bool cPrefabPiecePool::LoadFromCubeset(const AString & a_Contents, const AString
 	}
 
 	// Unknown version:
-	CONDWARNING(a_LogWarnings, "Cannot load cubeset %s, version (%d) not supported.", a_FileName.c_str(), Version);
+	CONDWARNING(a_LogWarnings, "Cannot load cubeset %s, version (%d) not supported.", a_FileName, Version);
 	return false;
 }
 
@@ -280,7 +280,7 @@ bool cPrefabPiecePool::LoadCubesetPieceVer1(const AString & a_FileName, cLuaStat
 	AString PieceName;
 	if (!a_LuaState.GetNamedValue("OriginData.ExportName", PieceName))
 	{
-		Printf(PieceName, "Piece #%d", a_PieceIndex);
+		PieceName = fmt::format(FMT_STRING("Piece #{}"), a_PieceIndex);
 	}
 
 	// Read the hitbox dimensions:
@@ -294,7 +294,7 @@ bool cPrefabPiecePool::LoadCubesetPieceVer1(const AString & a_FileName, cLuaStat
 		!a_LuaState.GetNamedValue("Hitbox.MaxZ", Hitbox.p2.z)
 	)
 	{
-		CONDWARNING(a_LogWarnings, "Cannot load piece %s from file %s, it's missing hitbox information", PieceName.c_str(), a_FileName.c_str());
+		CONDWARNING(a_LogWarnings, "Cannot load piece %s from file %s, it's missing hitbox information", PieceName, a_FileName);
 		return false;
 	}
 
@@ -331,7 +331,7 @@ bool cPrefabPiecePool::LoadCubesetPieceVer1(const AString & a_FileName, cLuaStat
 		if (prefab->GetVerticalStrategy() == nullptr)
 		{
 			CONDWARNING(a_LogWarnings, "Starting prefab %s in file %s doesn't have its VerticalStrategy set. Setting to Fixed|150.",
-				PieceName.c_str(), a_FileName.c_str()
+				PieceName, a_FileName
 			);
 			VERIFY(prefab->SetVerticalStrategyFromString("Fixed|150", false));
 		}

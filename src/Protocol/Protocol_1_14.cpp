@@ -9,6 +9,7 @@ Implements the 1.14 protocol classes:
 #include "Globals.h"
 #include "Protocol_1_14.h"
 #include "Packetizer.h"
+#include "JsonUtils.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
@@ -440,7 +441,7 @@ void cProtocol_1_14::SendWindowOpen(const cWindow & a_Window)
 			}
 		}
 
-		Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_Window.GetWindowTitle().c_str()));
+		Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", a_Window.GetWindowTitle()));
 	}
 }
 

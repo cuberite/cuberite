@@ -120,7 +120,7 @@ protected:
 				}
 				default:
 				{
-					Error(Printf("Invalid character in chunk length line: 0x%x", a_Data[i]));
+					Error(fmt::format(FMT_STRING("Invalid character in chunk length line: 0x{:02x}"), a_Data[i]));
 					return AString::npos;
 				}
 			}  // switch (a_Data[i])
@@ -150,7 +150,7 @@ protected:
 					if (a_Data[i] < 32)
 					{
 						// Only printable characters are allowed in the trailer
-						Error(Printf("Invalid character in chunk length line: 0x%x", a_Data[i]));
+						Error(fmt::format(FMT_STRING("Invalid character in chunk length line: 0x{:02x}"), a_Data[i]));
 						return AString::npos;
 					}
 				}
@@ -183,7 +183,7 @@ protected:
 			}
 			return 1;
 		}
-		Error(Printf("Invalid character past chunk length's CR: 0x%x", a_Data[0]));
+		Error(fmt::format(FMT_STRING("Invalid character past chunk length's CR: 0x{:02x}"), a_Data[0]));
 		return AString::npos;
 	}
 
@@ -219,7 +219,7 @@ protected:
 			m_State = psChunkDataLF;
 			return 1;
 		}
-		Error(Printf("Invalid character past chunk data: 0x%x", a_Data[0]));
+		Error(fmt::format(FMT_STRING("Invalid character past chunk data: 0x{:02x}"), a_Data[0]));
 		return AString::npos;
 	}
 
@@ -241,7 +241,7 @@ protected:
 			m_State = psChunkLength;
 			return 1;
 		}
-		Error(Printf("Invalid character past chunk data's CR: 0x%x", a_Data[0]));
+		Error(fmt::format(FMT_STRING("Invalid character past chunk data's CR: 0x{:02x}"), a_Data[0]));
 		return AString::npos;
 	}
 
@@ -292,11 +292,11 @@ protected:
 		return a_Size;
 	}
 
-	virtual void Finish(void) override
+	virtual void Finish() override
 	{
 		if (m_State != psFinished)
 		{
-			Error(Printf("ChunkedTransferEncoding: Finish signal received before the data stream ended (state: %d)", m_State));
+			Error(fmt::format(FMT_STRING("ChunkedTransferEncoding: Finish signal received before the data stream ended (state: {})"), m_State));
 		}
 		m_State = psFinished;
 	}

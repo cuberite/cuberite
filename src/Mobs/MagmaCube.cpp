@@ -10,8 +10,8 @@ cMagmaCube::cMagmaCube(int a_Size) :
 	Super(
 		"MagmaCube",
 		mtMagmaCube,
-		Printf("entity.%smagmacube.hurt", GetSizeName(a_Size).c_str()),
-		Printf("entity.%smagmacube.death", GetSizeName(a_Size).c_str()),
+		fmt::format(FMT_STRING("entity.{}magmacube.hurt"),  GetSizeName(a_Size)),
+		fmt::format(FMT_STRING("entity.{}magmacube.death"), GetSizeName(a_Size)),
 		"",
 		0.51f * a_Size,
 		0.51f * a_Size

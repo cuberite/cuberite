@@ -5375,6 +5375,10 @@ ValueName0=SomeOtherValue
 				insert values by hand. Then you can store the object's contents to a disk file using WriteFile(), or
 				just forget everything by destroying the object. Note that the file operations are quite slow.</p>
 				<p>
+				Cuberite will write the characters '\n' in place of line breaks in the values of the cIniFile when
+				it is being stored into a file. It will also replace '\n' with line breaks when it reads an INI
+				file.
+				<p>
 				For storing high-volume low-latency data, use the {{sqlite3}} class. For storing
 				hierarchically-structured data, use the XML format, using the LuaExpat parser in the {{lxp}} class.
 			]],
@@ -12288,7 +12292,7 @@ end
 							Type = "cTeam",
 						},
 					},
-					Notes = "Registers a new team. Returns the {{cTeam}} instance, nil on error.",
+					Notes = "Registers a new team. Returns the {{cTeam}} instance, nil on error. For example if the team already exists.",
 				},
 				RemoveObjective =
 				{
@@ -17948,6 +17952,10 @@ end
 				esPrimedTNT =
 				{
 					Notes = "A TNT explosion. The SourceData param is the {{cTNTEntity|TNT entity}} object.",
+				},
+				esTNTMinecart =
+				{
+					Notes = "A TNT minecart explosion. The SourceData param is the {{cMinecartWithTNT|Minecart with TNT entity}} object.",
 				},
 				esWitherBirth =
 				{
