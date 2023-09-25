@@ -31,7 +31,7 @@ public:
 
 protected:
 	// cFloodyFluidSimulator overrides:
-	void SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta) override;
+	virtual void SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta) override;
 
 	/** Recursively calculates the minimum number of blocks needed to descend a level. */
 	int CalculateFlowCost(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, eDirection a_Dir, unsigned a_Iteration = 0);

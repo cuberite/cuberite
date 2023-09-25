@@ -150,8 +150,10 @@ void cFloodyFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, i
 bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_MyMeta) const
 {
 	// If we have a section above, check if there's fluid above this block that would feed it:
-	if ((a_RelY < cChunkDef::Height - 1) &&
-		IsAnyFluidBlock(a_Chunk->GetBlock(a_RelX, a_RelY + 1, a_RelZ)))
+	if (
+			(a_RelY < cChunkDef::Height - 1) &&
+			IsAnyFluidBlock(a_Chunk->GetBlock(a_RelX, a_RelY + 1, a_RelZ))
+		)
 	{
 		// This block is fed from above, no more processing needed
 		FLUID_FLOG("  Fed from above");
@@ -233,8 +235,10 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 	NIBBLETYPE BlockMeta;
 	a_NearChunk->GetBlockTypeMeta(RelPos, BlockType, BlockMeta);
 
-	if (IsAllowedBlock(BlockType) &&
-		((BlockMeta == a_NewMeta) || IsHigherMeta(BlockMeta, a_NewMeta)))
+	if (
+			IsAllowedBlock(BlockType) &&
+			((BlockMeta == a_NewMeta) || IsHigherMeta(BlockMeta, a_NewMeta))
+		)
 	{
 		// Don't spread there, there's already a higher or same level there
 		return;
