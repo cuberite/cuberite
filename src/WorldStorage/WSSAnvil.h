@@ -1,9 +1,13 @@
 #pragma once
 
+#include "StringCompression.h"
+
 #include "BlockEntities/BlockEntity.h"
+
+#include "Registries/DataVersion.h"
+
 #include "WorldStorage/WorldStorage.h"
 #include "WorldStorage/FastNBT.h"
-#include "StringCompression.h"
 
 
 
@@ -94,13 +98,13 @@ protected:
 	Compression::Compressor m_Compressor;
 
 	/** Reports that the specified chunk failed to load and saves the chunk data to an external file. */
-	void ChunkLoadFailed(const cChunkCoords a_ChunkCoords, const AString & a_Reason, ContiguousByteBufferView a_ChunkDataToSave);
+	void ChunkLoadFailed(const cChunkCoords a_ChunkCoords, const AString & a_Reason, ContiguousByteBufferView a_ChunkDataToSave) const;
 
 	/** Gets chunk data from the correct file; locks file CS as needed */
 	bool GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data);
 
 	/** Copies a_Length bytes of data from the specified NBT Tag's Child into the a_Destination buffer */
-	const std::byte * GetSectionData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, size_t a_Length);
+	const std::byte * GetSectionData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, size_t a_Length) const;
 
 	/** Sets chunk data into the correct file; locks file CS as needed */
 	bool SetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBufferView a_Data);
@@ -113,19 +117,19 @@ protected:
 
 	/** Loads the chunk from NBT data (no locking needed).
 	a_RawChunkData is the raw (compressed) chunk data, used for offloading when chunk loading fails. */
-	bool LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, ContiguousByteBufferView a_RawChunkData);
+	bool LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, ContiguousByteBufferView a_RawChunkData) const;
 
 	/** Loads the chunk's biome map into a_BiomeMap if biomes present and valid; returns false otherwise. */
-	bool LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx, eDataVersion a_DataVersion);
+	bool LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, const int a_TagIdx, eDataVersion a_DataVersion) const;
 
 	/** Loads the chunk's height map into a_HeightMap if heights present and valid; returns false otherwise. */
-	bool LoadHeightMapFromNBT(cChunkDef::HeightMap & a_HeightMap, const cParsedNBT & a_NBT, int a_TagIdx, eDataVersion a_DataVersion);
+	bool LoadHeightMapFromNBT(cChunkDef::HeightMap & a_HeightMap, const cParsedNBT & a_NBT, const int a_TagIdx, eDataVersion a_DataVersion) const;
 
 	/** Loads the chunk's entities from NBT data (a_Tag is the Level\\Entities list tag; may be -1) */
-	void LoadEntitiesFromNBT(cEntityList & a_Entitites, const cParsedNBT & a_NBT, int a_Tag, eDataVersion a_DataVersion);
+	void LoadEntitiesFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_Tag, eDataVersion a_DataVersion) const;
 
 	/** Loads the chunk's BlockEntities from NBT data (a_Tag is the Level\\TileEntities list tag; may be -1) */
-	void LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntitites, const cParsedNBT & a_NBT, int a_Tag, const ChunkBlockData & a_BlockData, eDataVersion a_DataVersion);
+	void LoadBlockEntitiesFromNBT(cBlockEntities & a_BlockEntities, const cParsedNBT & a_NBT, const int a_Tag, const ChunkBlockData & a_BlockData, eDataVersion a_DataVersion) const;
 
 	/** Gets the correct MCA file either from cache or from disk, manages the m_MCAFiles cache; assumes m_CS is locked */
 	std::shared_ptr<cMCAFile> LoadMCAFile(const cChunkCoords & a_Chunk);
