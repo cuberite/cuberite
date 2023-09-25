@@ -151,12 +151,25 @@ void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_EMState != CHASING)
 	{
-		cAggressiveMonster * target = nullptr;
-		if (CanSeeMobType(mtEndermite, target, 64))
+		cMonster * EndermiteFound = GetMonsterOfTypeInSight(mtEndermite, 64);
+		if (EndermiteFound != nullptr)
 		{
-			SetTarget(target);
+			SetTarget(EndermiteFound);
+			m_EMState = CHASING;
+			m_bIsScreaming = true;
 		}
-
+	}
+	else
+	{
+		const auto Target = GetTarget();
+		if (Target != nullptr)
+		{
+			if (!Target->IsTicking())
+			{
+				m_EMState = IDLE;
+				m_bIsScreaming = false;
+			}
+		}
 	}
 
 	PREPARE_REL_AND_CHUNK(GetPosition().Floor(), a_Chunk);
