@@ -12,7 +12,7 @@
 
 
 
-template <size_t NumDoubles> constexpr bool cWSSAnvilHandler::LoadDoublesList(std::array<double, NumDoubles> & a_Doubles, const cParsedNBT & a_NBT, int a_TagIdx)
+template <size_t NumDoubles> inline bool cWSSAnvilHandler::LoadDoublesList(std::array<double, NumDoubles> & a_Doubles, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_List) || (a_NBT.GetChildrenType(a_TagIdx) != TAG_Double))
 	{
@@ -30,7 +30,7 @@ template <size_t NumDoubles> constexpr bool cWSSAnvilHandler::LoadDoublesList(st
 
 
 
-template <size_t NumFloats> constexpr bool cWSSAnvilHandler::LoadFloatsList(std::array<float, NumFloats> & a_Floats, const cParsedNBT & a_NBT, int a_TagIdx)
+template <size_t NumFloats> inline bool cWSSAnvilHandler::LoadFloatsList(std::array<float, NumFloats> & a_Floats, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_List) || (a_NBT.GetChildrenType(a_TagIdx) != TAG_Double))
 	{

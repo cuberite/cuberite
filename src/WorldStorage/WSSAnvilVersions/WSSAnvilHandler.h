@@ -38,10 +38,10 @@ public:
 
 	// Basic data types:
 	/** Loads an array of doubles of the specified length from the specified NBT list tag a_TagIdx; returns true if successful */
-	template <size_t NumDoubles> static constexpr bool LoadDoublesList(std::array<double, NumDoubles> & a_Doubles, const cParsedNBT & a_NBT, int a_TagIdx);
+	template <size_t NumDoubles> static inline bool LoadDoublesList(std::array<double, NumDoubles> & a_Doubles, const cParsedNBT & a_NBT, int a_TagIdx);
 
 	/** Loads an array of floats of the specified length from the specified NBT list tag a_TagIdx; returns true if successful */
-	template <size_t NumFloats>  static constexpr bool LoadFloatsList(std::array<float, NumFloats> & a_Floats, const cParsedNBT & a_NBT, int a_TagIdx);
+	template <size_t NumFloats>  static inline bool LoadFloatsList(std::array<float, NumFloats> & a_Floats, const cParsedNBT & a_NBT, int a_TagIdx);
 
 	/** Loads a cItem contents from the specified NBT tag; returns true if successful. Doesn't load the Slot tag */
 	virtual bool LoadItem(cItem & a_Item, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
