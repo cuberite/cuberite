@@ -233,17 +233,27 @@ void cWSSAnvilHandler_1_8::LoadEntity(cEntityList & a_Entities, const cParsedNBT
 
 	switch (NamespaceSerializer::ToEntityType(Name))
 	{
-		case cEntity::etBoat:            return LoadBoat(a_Entities, a_NBT, a_EntityTagIdx);
-		case cEntity::etEnderCrystal:    return LoadEndCrystal(a_Entities, a_NBT, a_EntityTagIdx);
-		case cEntity::etFallingBlock:    return LoadFallingBlock(a_Entities, a_NBT, a_EntityTagIdx);
+		case cEntity::etBoat:         return LoadBoat(a_Entities, a_NBT, a_EntityTagIdx);
+		case cEntity::etEnderCrystal: return LoadEndCrystal(a_Entities, a_NBT, a_EntityTagIdx);
+		case cEntity::etFallingBlock: return LoadFallingBlock(a_Entities, a_NBT, a_EntityTagIdx);
 
-		case cEntity::etPickup:          return LoadPickup(a_Entities, a_NBT, a_EntityTagIdx);
-		case cEntity::etPainting:        return LoadPainting(a_Entities, a_NBT, a_EntityTagIdx);
-		case cEntity::etTNT:             return LoadTNT(a_Entities, a_NBT, a_EntityTagIdx);
-		case cEntity::etExpOrb:          return LoadExpOrb(a_Entities, a_NBT, a_EntityTagIdx);
-		case cEntity::etItemFrame:       return LoadItemFrame(a_Entities, a_NBT, a_EntityTagIdx);
-		case cEntity::etLeashKnot:       return LoadLeashKnot(a_Entities, a_NBT, a_EntityTagIdx);
-		default: break;
+		case cEntity::etPickup:       return LoadPickup(a_Entities, a_NBT, a_EntityTagIdx);
+		case cEntity::etPainting:     return LoadPainting(a_Entities, a_NBT, a_EntityTagIdx);
+		case cEntity::etTNT:          return LoadTNT(a_Entities, a_NBT, a_EntityTagIdx);
+		case cEntity::etExpOrb:       return LoadExpOrb(a_Entities, a_NBT, a_EntityTagIdx);
+		case cEntity::etItemFrame:    return LoadItemFrame(a_Entities, a_NBT, a_EntityTagIdx);
+		case cEntity::etLeashKnot:    return LoadLeashKnot(a_Entities, a_NBT, a_EntityTagIdx);
+		/**
+		Entity types that aren't loaded. This is explicitly done because
+		don't want to use the default case, as that would prevent the compiler
+		from warning us about unhandled entity types.
+		*/
+		case cEntity::etEntity:       break;
+		case cEntity::etPlayer:       break;
+		case cEntity::etMonster:      break;
+		case cEntity::etMinecart:     break;
+		case cEntity::etProjectile:   break;
+		case cEntity::etFloater:      break;
 	}
 
 	switch (NamespaceSerializer::ToProjectileType(Name))
@@ -255,9 +265,9 @@ void cWSSAnvilHandler_1_8::LoadEntity(cEntityList & a_Entities, const cParsedNBT
 		case cProjectileEntity::pkGhastFireball:   return LoadFireball(a_Entities, a_NBT, a_EntityTagIdx);
 		case cProjectileEntity::pkFireCharge:      return LoadFireCharge(a_Entities, a_NBT, a_EntityTagIdx);
 		case cProjectileEntity::pkEnderPearl:      return LoadThrownEnderPearl(a_Entities, a_NBT, a_EntityTagIdx);
-		case cProjectileEntity::pkExpBottle:       break;
-		case cProjectileEntity::pkFirework:        break;
-		case cProjectileEntity::pkWitherSkull:     break;
+		case cProjectileEntity::pkExpBottle:       return LoadThrownExpBottle(a_Entities, a_NBT, a_EntityTagIdx);
+		case cProjectileEntity::pkFirework:        return LoadFireworkRocket(a_Entities, a_NBT, a_EntityTagIdx);
+		case cProjectileEntity::pkWitherSkull:     return LoadWitherSkull(a_Entities, a_NBT, a_EntityTagIdx);
 	}
 
 	switch (NamespaceSerializer::ToMinecartType(Name))
