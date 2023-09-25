@@ -3,10 +3,9 @@
 
 #include "AggressiveMonster.h"
 
-#include "../World.h"
-#include "../Entities/Player.h"
-#include "../LineBlockTracer.h"
-#include <random>
+#include "LineBlockTracer.h"
+#include "World.h"
+#include "Entities/Player.h"
 
 
 
@@ -49,28 +48,58 @@ void cAggressiveMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 
 bool cAggressiveMonster::CanSeeMobType(eMonsterType a_MobType, cAggressiveMonster * a_Monster, int a_SightDistance)
 {
-	m_World->ForEachEntity([&](cEntity & a_Entity)
-			{
-			cAggressiveMonster* AggMonster = nullptr;
-			if ((AggMonster = static_cast<cAggressiveMonster*>(&a_Entity)) == nullptr)
-			{
-				return false;
-			}
-			if (AggMonster->GetMobType() != a_MobType)
-			{
-				return false;
-			}
-			Vector3d MyHeadPosition = GetPosition().addedY(GetHeight());
-			Vector3d TargetPosition = AggMonster->GetPosition().addedY(AggMonster->GetHeight());
-			double TargetDistance = (MyHeadPosition - TargetPosition).SqrLength();
+	a_Monster = nullptr;
+	cBoundingBox CheckZone(GetPosition().addedXZ(-a_SightDistance, -a_SightDistance), GetPosition().addedXZ(a_SightDistance, a_SightDistance));
 
-			if (TargetDistance < (a_SightDistance * a_SightDistance))
+	class cLineBlockTracerCallbacks : public cLineBlockTracer::cCallbacks
+	{
+	public:
+		cLineBlockTracerCallbacks() = default;
+
+		virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		{
+			UNUSED(a_BlockPos);
+			UNUSED(a_BlockType);
+			UNUSED(a_BlockMeta);
+			UNUSED(a_EntryFace);
+			return false;
+		}
+	};
+
+	auto Callbacks = cLineBlockTracerCallbacks();
+	auto Tracer = cLineBlockTracer(*GetWorld(), Callbacks);
+	double ClosestDistance = a_SightDistance;
+	m_World->ForEachEntityInBox(CheckZone, [&](cEntity & a_Entity)
+	{
+		cAggressiveMonster * AggMonster = nullptr;
+		if ((AggMonster = static_cast<cAggressiveMonster*>(&a_Entity)) == nullptr)
+		{
+			return false;
+		}
+		if (AggMonster->GetMobType() != a_MobType)
+		{
+			return false;
+		}
+		auto MyHeadPosition = GetPosition().addedY(GetHeight());
+		auto TargetPosition = AggMonster->GetPosition().addedY(AggMonster->GetHeight());
+
+		if (
+			auto TargetDistance = (MyHeadPosition - TargetPosition).SqrLength();
+			(TargetDistance < ClosestDistance) &&
+			(TargetDistance < (a_SightDistance * a_SightDistance))
+		)
+		{
+			if (!Tracer.Trace(MyHeadPosition, TargetPosition))
 			{
-				a_Monster = AggMonster;
-				return true;
+				return false;
 			}
-		});
-		return &a_Monster != nullptr;
+			a_Monster = AggMonster;
+			ClosestDistance = TargetDistance;
+			return false;
+		}
+		return false;
+	});
+	return a_Monster != nullptr;
 }
 
 
