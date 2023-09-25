@@ -50,35 +50,50 @@ cMonster * cAggressiveMonster::GetMonsterOfTypeInSight(eMonsterType a_MobType, u
 {
 
 	cMonster * FoundTarget = nullptr;
+	auto MinimumDistance = static_cast<double>(a_SightDistance * a_SightDistance);
+
+	class cCallback : public cBlockTracer::cCallbacks
+	{
+		public:
+		bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		{
+			return a_BlockType != E_BLOCK_AIR;
+		}
+	};
+
+	auto Callbacks = cCallback();
+	auto Tracer = cLineBlockTracer(*GetWorld(), Callbacks);
 
 	cEntityCallback Callback = [&](cEntity & a_Entity)
-			{
-				if (!a_Entity.IsMob())
-				{
-					return false;
-				}
+	{
+		if (!a_Entity.IsMob())
+		{
+			return false;
+		}
 
-				cMonster & Monster = dynamic_cast<cMonster &>(a_Entity);
-				if (Monster.GetMobType() != a_MobType)
-				{
-					return false;
-				}
+		auto & Other = dynamic_cast<cMonster &>(a_Entity);
+		if (Other.GetMobType() != a_MobType)
+		{
+			return false;
+		}
 
-				Vector3d MyHeadPosition = GetPosition().addedY(GetHeight());
-				Vector3d TargetPosition = Monster.GetPosition().addedY(Monster.GetHeight());
-				double TargetDistance = (MyHeadPosition - TargetPosition).SqrLength();
+		Vector3d MyHeadPosition = GetPosition().addedY(GetHeight());
+		Vector3d TargetPosition = Other.GetPosition().addedY(Other.GetHeight());
+		double TargetDistance = (MyHeadPosition - TargetPosition).SqrLength();
 
-				if (TargetDistance < (a_SightDistance * a_SightDistance))
-				{
-					FoundTarget = &Monster;
-					return true;
-				}
-				return false;
-			};
+		if (
+			(MinimumDistance > TargetDistance) &&
+			(TargetDistance < (a_SightDistance * a_SightDistance))
+		)
+		{
+			FoundTarget = & Other;
+			return true;
+		}
+		return false;
+	};
 
-	/* cBoundingBox CheckZone(GetPosition().addedXZ(-a_SightDistance, -a_SightDistance), GetPosition().addedXZ(a_SightDistance, a_SightDistance)); */
-	/* m_World->ForEachEntityInBox(CheckZone, Callback); */
-	m_World->ForEachEntity(Callback);
+	cBoundingBox CheckZone(GetPosition().addedXZ(-a_SightDistance, -a_SightDistance), GetPosition().addedXZ(a_SightDistance, a_SightDistance));
+	m_World->ForEachEntityInBox(CheckZone, Callback);
 	return FoundTarget;
 }
 
