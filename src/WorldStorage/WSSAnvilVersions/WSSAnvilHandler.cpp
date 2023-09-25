@@ -8,46 +8,6 @@
 #include "WorldStorage/WSSAnvilVersions/WSSAnvilHandler_1_11.h"
 #include "WSSAnvilHandler_1_12.h"
 
-
-
-
-
-template <size_t NumDoubles> inline bool cWSSAnvilHandler::LoadDoublesList(std::array<double, NumDoubles> & a_Doubles, const cParsedNBT & a_NBT, int a_TagIdx)
-{
-	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_List) || (a_NBT.GetChildrenType(a_TagIdx) != TAG_Double))
-	{
-		return false;
-	}
-	size_t idx = 0;
-	for (int Tag = a_NBT.GetFirstChild(a_TagIdx); (Tag > 0) && (idx < NumDoubles); Tag = a_NBT.GetNextSibling(Tag), ++idx)
-	{
-		a_Doubles[idx] = a_NBT.GetDouble(Tag);
-	}  // for Tag - PosTag[]
-	return (idx == NumDoubles);  // Did we read enough doubles?
-}
-
-
-
-
-
-template <size_t NumFloats> inline bool cWSSAnvilHandler::LoadFloatsList(std::array<float, NumFloats> & a_Floats, const cParsedNBT & a_NBT, int a_TagIdx)
-{
-	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_List) || (a_NBT.GetChildrenType(a_TagIdx) != TAG_Double))
-	{
-		return false;
-	}
-	size_t idx = 0;
-	for (int Tag = a_NBT.GetFirstChild(a_TagIdx); (Tag > 0) && (idx < NumFloats); Tag = a_NBT.GetNextSibling(Tag), ++idx)
-	{
-		a_Floats[idx] = a_NBT.GetFloat(Tag);
-	}  // for Tag - PosTag[]
-	return (idx == NumFloats);  // Did we read enough floats?
-}
-
-
-
-
-
 const cWSSAnvilHandler & cWSSAnvilHandler::From(eDataVersion a_DataVersion)
 {
 	const static cWSSAnvilHandler_1_8    Handler_1_8;
