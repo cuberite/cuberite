@@ -6,6 +6,7 @@
 #include "WorldStorage/WSSAnvilVersions/WSSAnvilHandler_1_9.h"
 #include "WorldStorage/WSSAnvilVersions/WSSAnvilHandler_1_10.h"
 #include "WorldStorage/WSSAnvilVersions/WSSAnvilHandler_1_11.h"
+#include "WSSAnvilHandler_1_12.h"
 
 
 
@@ -61,6 +62,9 @@ const cWSSAnvilHandler & cWSSAnvilHandler::From(eDataVersion a_DataVersion)
 	const static cWSSAnvilHandler_1_11_0 Handler_1_11_0;
 	const static cWSSAnvilHandler_1_11_1 Handler_1_11_1;
 	const static cWSSAnvilHandler_1_11_2 Handler_1_11_2;
+	const static cWSSAnvilHandler_1_12_0 Handler_1_12_0;
+	const static cWSSAnvilHandler_1_12_1 Handler_1_12_1;
+	const static cWSSAnvilHandler_1_12_2 Handler_1_12_2;
 
 	switch (a_DataVersion)
 	{
@@ -76,6 +80,9 @@ const cWSSAnvilHandler & cWSSAnvilHandler::From(eDataVersion a_DataVersion)
 		case eDataVersion::v1_11_0: return Handler_1_11_0;
 		case eDataVersion::v1_11_1: return Handler_1_11_1;
 		case eDataVersion::v1_11_2: return Handler_1_11_2;
+		case eDataVersion::v1_12_0: return Handler_1_12_0;
+		case eDataVersion::v1_12_1: return Handler_1_12_1;
+		case eDataVersion::v1_12_2: return Handler_1_12_2;
 		default:
 		{
 			ASSERT(!"Unsupported data version");

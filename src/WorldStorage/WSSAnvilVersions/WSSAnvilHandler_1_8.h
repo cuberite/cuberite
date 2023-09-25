@@ -51,10 +51,12 @@ protected:
 	void LoadArrow           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
 	void LoadDragonFireball  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadDragonFireball"); }
 	void LoadEgg             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadEvocationFangs  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadEvocationFangs"); }
 	void LoadEyeOfEnder      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadEyeOfEnder"); }
 	void LoadFireball        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
 	void LoadFireCharge      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
 	void LoadFireworkRocket  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadFireworkRocket"); }
+	void LoadLlamaSpit       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadLlamaSpit"); }
 	void LoadShulkerBullet   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadShulkerBullet"); }
 	void LoadSnowball        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
 	void LoadSpectralArrow   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadSpectralArrow"); }
@@ -63,78 +65,79 @@ protected:
 	void LoadThrownExpBottle (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadThrownExpBottle"); }
 	void LoadWitherSkull     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadWitherSkull"); }
 
-	bool LoadMonsterBase     (cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadLeashToPosition (cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	bool LoadMonsterBase      (cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadLeashToPosition  (cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx) const override;
 	std::pair<AString, cUUID> LoadEntityOwner(const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadBat             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadBlaze           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadCat             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadCat"); }
-	void LoadCaveSpider      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadChicken         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadCod             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadCod"); }
-	void LoadCow             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadCreeper         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadDolphin         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadDolphin"); }
-	void LoadDonkey          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadDonkey"); }
-	void LoadDrowned         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadDrowned"); }
-	void LoadElderGuardian   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadElderGuardian"); }
-	void LoadEnderDragon     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadEnderman        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadEndermite       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadEndermite"); }
-	void LoadEvoker          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadEvoker"); }
-	void LoadFox             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadFox"); }
-	void LoadGhast           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadGiant           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadGuardian        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadHorse           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadHoglin          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadHoglin"); }
-	void LoadHusk            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadHusk"); }
-	void LoadIllusioner      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadIllusioner"); }
-	void LoadIronGolem       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadLlama           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadLlama"); }
-	void LoadMagmaCube       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadMooshroom       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadMule            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadMule"); }
-	void LoadOcelot          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadPanda           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadPanda"); }
-	void LoadParrot          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadParrot"); }
-	void LoadPhantom         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadPhantom"); }
-	void LoadPig             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadPiglin          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadPiglin"); }
-	void LoadPiglinBrute     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadPiglinBrute"); }
-	void LoadPillager        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadPillager"); }
-	void LoadPolarBear       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadPolarBear"); }
-	void LoadPufferfish      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadPufferfish"); }
-	void LoadRabbit          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadRavager         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadRavager"); }
-	void LoadSalmon          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadSalmon"); }
-	void LoadSheep           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadShulker         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadShulker"); }
-	void LoadSilverfish      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadSkeleton        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadSkeletonHorse   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadSkeletonHorse"); }
-	void LoadSlime           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadSnowGolem       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadSpider          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadSquid           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadStray           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadStray"); }
-	void LoadStrider         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadStrider"); }
-	void LoadTraderLlama     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadTraderLlama"); }
-	void LoadTropicalFish    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadTropicalFish"); }
-	void LoadTurtle          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadTurtle"); }
-	void LoadVex             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadVex"); }
-	void LoadVillager        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadVindicator      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadVindicator"); }
-	void LoadWanderingTrader (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadWanderingTrader"); }
-	void LoadWitch           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadWither          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadWitherSkeleton  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadWolf            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadZoglin          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadZoglin"); }
-	void LoadZombie          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadZombieHorse     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadZombieHorse"); }
-	void LoadZombifiedPiglin (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
-	void LoadZombieVillager  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadBat              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadBlaze            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadCat              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadCat"); }
+	void LoadCaveSpider       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadChicken          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadCod              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadCod"); }
+	void LoadCow              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadCreeper          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadDolphin          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadDolphin"); }
+	void LoadDonkey           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadDonkey"); }
+	void LoadDrowned          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadDrowned"); }
+	void LoadElderGuardian    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadElderGuardian"); }
+	void LoadEnderDragon      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadEnderman         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadEndermite        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadEndermite"); }
+	void LoadEvocationIllager (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadEvocationIllager"); }
+	void LoadEvoker           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadEvoker"); }
+	void LoadFox              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadFox"); }
+	void LoadGhast            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadGiant            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadGuardian         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadHorse            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadHoglin           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadHoglin"); }
+	void LoadHusk             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadHusk"); }
+	void LoadIllusioner       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadIllusioner"); }
+	void LoadIronGolem        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadLlama            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadLlama"); }
+	void LoadMagmaCube        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadMooshroom        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadMule             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadMule"); }
+	void LoadOcelot           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadPanda            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadPanda"); }
+	void LoadParrot           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadParrot"); }
+	void LoadPhantom          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadPhantom"); }
+	void LoadPig              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadPiglin           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadPiglin"); }
+	void LoadPiglinBrute      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadPiglinBrute"); }
+	void LoadPillager         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadPillager"); }
+	void LoadPolarBear        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadPolarBear"); }
+	void LoadPufferfish       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadPufferfish"); }
+	void LoadRabbit           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadRavager          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadRavager"); }
+	void LoadSalmon           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadSalmon"); }
+	void LoadSheep            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadShulker          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadShulker"); }
+	void LoadSilverfish       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadSkeleton         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadSkeletonHorse    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadSkeletonHorse"); }
+	void LoadSlime            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadSnowGolem        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadSpider           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadSquid            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadStray            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadStray"); }
+	void LoadStrider          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadStrider"); }
+	void LoadTraderLlama      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadTraderLlama"); }
+	void LoadTropicalFish     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadTropicalFish"); }
+	void LoadTurtle           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadTurtle"); }
+	void LoadVex              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadVex"); }
+	void LoadVillager         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadVindicator       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadVindicator"); }
+	void LoadWanderingTrader  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadWanderingTrader"); }
+	void LoadWitch            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadWither           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadWitherSkeleton   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadWolf             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadZoglin           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadZoglin"); }
+	void LoadZombie           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadZombieHorse      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unsupported("LoadZombieHorse"); }
+	void LoadZombifiedPiglin  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
+	void LoadZombieVillager   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override;
 
 	bool GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, Vector3i & a_AbsPos) const override;
 	bool CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, const AStringVector & a_ExpectedTypes, Vector3i a_Pos) const override;

@@ -4,6 +4,55 @@
 
 #include "WorldStorage/EnchantmentSerializer.h"
 #include "WorldStorage/FireworksSerializer.h"
+#include "WorldStorage/NamespaceSerializer.h"
+
+#include "Item.h"
+#include "ItemGrid.h"
+#include "Root.h"
+#include "JsonUtils.h"
+#include "json/value.h"
+
+#include "BlockEntities/BeaconEntity.h"
+#include "BlockEntities/BedEntity.h"
+#include "BlockEntities/BrewingstandEntity.h"
+#include "BlockEntities/BannerEntity.h"
+#include "BlockEntities/ChestEntity.h"
+#include "BlockEntities/CommandBlockEntity.h"
+#include "BlockEntities/DispenserEntity.h"
+#include "BlockEntities/DropperEntity.h"
+#include "BlockEntities/EnchantingTableEntity.h"
+#include "BlockEntities/EnderChestEntity.h"
+#include "BlockEntities/EndPortalEntity.h"
+#include "BlockEntities/FlowerPotEntity.h"
+#include "BlockEntities/FurnaceEntity.h"
+#include "BlockEntities/HopperEntity.h"
+#include "BlockEntities/JukeboxEntity.h"
+#include "BlockEntities/MobHeadEntity.h"
+#include "BlockEntities/MobSpawnerEntity.h"
+#include "BlockEntities/NoteEntity.h"
+#include "BlockEntities/SignEntity.h"
+
+#include "Entities/ArrowEntity.h"
+#include "Entities/Boat.h"
+#include "Entities/EnderCrystal.h"
+#include "Entities/Entity.h"
+#include "Entities/ExpOrb.h"
+#include "Entities/FallingBlock.h"
+#include "Entities/FireChargeEntity.h"
+#include "Entities/FireworkEntity.h"
+#include "Entities/GhastFireballEntity.h"
+#include "Entities/ItemFrame.h"
+#include "Entities/LeashKnot.h"
+#include "Entities/Minecart.h"
+#include "Entities/Painting.h"
+#include "Entities/Pickup.h"
+#include "Entities/SplashPotionEntity.h"
+#include "Entities/ThrownSnowballEntity.h"
+#include "Entities/TNTEntity.h"
+#include "Entities/ThrownEnderPearlEntity.h"
+#include "Entities/ThrownEggEntity.h"
+
+#include "Mobs/IncludeAllMonsters.h"
 
 
 bool cWSSAnvilHandler_1_8::LoadItem(cItem & a_Item, const cParsedNBT & a_NBT, int a_TagIdx) const
@@ -176,13 +225,13 @@ void cWSSAnvilHandler_1_8::LoadEntities(cEntityList & a_Entities, const cParsedN
 
 void cWSSAnvilHandler_1_8::LoadEntity(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const std::string_view a_EntityName) const
 {
-	const auto NamespaceSplit = NamespaceSerializer::SplitNamespacedID(a_EntityName);
-	if (NamespaceSplit.first == NamespaceSerializer::Namespace::Unknown)
+	const auto [Namespace, Name] = NamespaceSerializer::SplitNamespacedID(a_EntityName);
+	if (Namespace == NamespaceSerializer::Namespace::Unknown)
 	{
 		return;
 	}
 
-	switch (NamespaceSerializer::ToEntityType(NamespaceSplit.second))
+	switch (NamespaceSerializer::ToEntityType(Name))
 	{
 		case cEntity::etBoat:            return LoadBoat(a_Entities, a_NBT, a_EntityTagIdx);
 		case cEntity::etEnderCrystal:    return LoadEndCrystal(a_Entities, a_NBT, a_EntityTagIdx);
@@ -197,7 +246,7 @@ void cWSSAnvilHandler_1_8::LoadEntity(cEntityList & a_Entities, const cParsedNBT
 		default: break;
 	}
 
-	switch (NamespaceSerializer::ToProjectileType(NamespaceSplit.second))
+	switch (NamespaceSerializer::ToProjectileType(Name))
 	{
 		case cProjectileEntity::pkArrow:           return LoadArrow(a_Entities, a_NBT, a_EntityTagIdx);
 		case cProjectileEntity::pkSplashPotion:    return LoadSplashPotion(a_Entities, a_NBT, a_EntityTagIdx);
@@ -211,7 +260,7 @@ void cWSSAnvilHandler_1_8::LoadEntity(cEntityList & a_Entities, const cParsedNBT
 		case cProjectileEntity::pkWitherSkull:     break;
 	}
 
-	switch (NamespaceSerializer::ToMinecartType(NamespaceSplit.second))
+	switch (NamespaceSerializer::ToMinecartType(Name))
 	{
 		case cMinecart::mpChest:   return LoadChestMinecart(a_Entities, a_NBT, a_EntityTagIdx);
 		case cMinecart::mpFurnace: return LoadFurnaceMinecart(a_Entities, a_NBT, a_EntityTagIdx);
@@ -220,7 +269,7 @@ void cWSSAnvilHandler_1_8::LoadEntity(cEntityList & a_Entities, const cParsedNBT
 		case cMinecart::mpNone:    return LoadRideableMinecart(a_Entities, a_NBT, a_EntityTagIdx);
 	}
 
-	switch (NamespaceSerializer::ToMonsterType(NamespaceSplit.second))
+	switch (NamespaceSerializer::ToMonsterType(Name))
 	{
 		case mtBat:             return LoadBat(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtBlaze:           return LoadBlaze(a_Entities, a_NBT, a_EntityTagIdx);

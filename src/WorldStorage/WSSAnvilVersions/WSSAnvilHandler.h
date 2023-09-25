@@ -1,12 +1,20 @@
 
 #pragma once
 
+/**
+* Any information about changes is taken from: https://pokechu22.github.io/BurgerWebViewer
+*/
+
 #include "ChunkDef.h"
-#include "WorldStorage/FastNBT.h"
+#include "StringCompression.h"
 
 #include "BlockEntities/BlockEntity.h"
+
+#include "Registries/DataVersion.h"
+
+#include "WorldStorage/FastNBT.h"
+#include "WorldStorage/NamespaceSerializer.h"
 #include "WorldStorage/WorldStorage.h"
-#include "StringCompression.h"
 
 // fwd:
 class cItem;
@@ -79,10 +87,12 @@ public:
 	virtual void LoadArrow           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadDragonFireball  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadEgg             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadEvocationFangs  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadEyeOfEnder      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadFireball        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadFireCharge      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadFireworkRocket  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadLlamaSpit       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadShulkerBullet   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadSnowball        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 	virtual void LoadSpectralArrow   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
@@ -102,75 +112,76 @@ public:
 	virtual std::pair<AString, cUUID> LoadEntityOwner(const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 
 	// Mobs
-	virtual void LoadBat             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadBlaze           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadCat             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadCaveSpider      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadChicken         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadCod             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadCow             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadCreeper         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadDolphin         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadDonkey          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadDrowned         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadElderGuardian   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadEnderDragon     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadEnderman        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadEndermite       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadEvoker          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadFox             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadGhast           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadGiant           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadGuardian        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadHorse           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadHoglin          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadHusk            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadIllusioner      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadIronGolem       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadLlama           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadMagmaCube       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadMooshroom       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadMule            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadOcelot          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadPanda           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadParrot          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadPhantom         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadPig             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadPiglin          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadPiglinBrute     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadPillager        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadPolarBear       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadPufferfish      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadRabbit          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadRavager         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadSalmon          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadSheep           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadShulker         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadSilverfish      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadSkeleton        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadSkeletonHorse   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadSlime           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadSnowGolem       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadSpider          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadSquid           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadStray           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadStrider         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadTraderLlama     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadTropicalFish    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadTurtle          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadVex             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadVillager        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadVindicator      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadWanderingTrader (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadWitch           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadWither          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadWitherSkeleton  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadWolf            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadZoglin          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadZombie          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadZombieHorse     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadZombifiedPiglin (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
-	virtual void LoadZombieVillager  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadBat              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadBlaze            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadCat              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadCaveSpider       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadChicken          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadCod              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadCow              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadCreeper          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadDolphin          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadDonkey           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadDrowned          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadElderGuardian    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadEnderDragon      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadEnderman         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadEndermite        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadEvocationIllager (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadEvoker           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadFox              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadGhast            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadGiant            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadGuardian         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadHorse            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadHoglin           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadHusk             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadIllusioner       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadIronGolem        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadLlama            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadMagmaCube        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadMooshroom        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadMule             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadOcelot           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadPanda            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadParrot           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadPhantom          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadPig              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadPiglin           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadPiglinBrute      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadPillager         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadPolarBear        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadPufferfish       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadRabbit           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadRavager          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadSalmon           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadSheep            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadShulker          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadSilverfish       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadSkeleton         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadSkeletonHorse    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadSlime            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadSnowGolem        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadSpider           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadSquid            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadStray            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadStrider          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadTraderLlama      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadTropicalFish     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadTurtle           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadVex              (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadVillager         (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadVindicator       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadWanderingTrader  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadWitch            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadWither           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadWitherSkeleton   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadWolf             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadZoglin           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadZombie           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadZombieHorse      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadZombifiedPiglin  (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
+	virtual void LoadZombieVillager   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const = 0;
 
 	/** Helper function for extracting the X, Y, and Z int subtags of a NBT compound; returns true if successful */
 	virtual bool GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, Vector3i & a_AbsPos) const = 0;
