@@ -12,9 +12,9 @@ public:
 	using Super::Super;
 	~cWSSAnvilHandler_1_12_0() override = default;
 
-	virtual void LoadEvocationIllager (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadEvocationIllager"); }
-	virtual void LoadIllusioner       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadIllusioner"); }
-	virtual void LoadParrot           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadParrot"); }
+	virtual void LoadEvoker     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadEvoker"); }
+	virtual void LoadIllusioner (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadIllusioner"); }
+	virtual void LoadParrot     (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx) const override { Unimplemented("LoadParrot"); }
 };
 /**
 The burger website lists a bunch of entities that should have changed, but in
