@@ -161,7 +161,7 @@ bool IsValidBlock(int a_BlockType)
 {
 	return (
 		((a_BlockType > -1) && (a_BlockType <= E_BLOCK_MAX_TYPE_ID)) ||
-		(a_BlockType == 255)  // the blocks 253-254 don't exist yet -> https://minecraft.gamepedia.com/Data_values#Block_IDs
+		(a_BlockType == 255)  // the blocks 253-254 don't exist yet -> https://minecraft.wiki/w/Data_values#Block_IDs
 	);
 }
 

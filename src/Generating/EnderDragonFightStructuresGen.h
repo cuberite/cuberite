@@ -2,9 +2,9 @@
 #pragma once
 
 /*
-https://minecraft.gamepedia.com/End_spike
-https://minecraft.gamepedia.com/End_Crystal
-https://minecraft.gamepedia.com/Ender_Dragon
+https://minecraft.wiki/w/End_spike
+https://minecraft.wiki/w/End_Crystal
+https://minecraft.wiki/w/Ender_Dragon
 */
 
 #include "FinishGen.h"

@@ -1914,7 +1914,7 @@ void cFinishGenOreNests::GenerateOre(
 	}
 
 	// Gold ores are generated more often in Mesa-Type-Biomes:
-	// https://minecraft.gamepedia.com/Gold_Ore
+	// https://minecraft.wiki/w/Gold_Ore
 	if (a_OreType == E_BLOCK_GOLD_ORE)
 	{
 		const auto BiomeSampleOne =   a_ChunkDesc.GetBiome( 4,  4);
