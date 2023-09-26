@@ -144,9 +144,13 @@ Int32 NamespaceSerializer::From(const eDataVersion a_ID)
 {
 	switch (a_ID)
 	{
-		case eDataVersion::vUnknown: return -1;
+		case eDataVersion::vUnknown:
+		{
+			ASSERT(!"Tried to save unknown data version");
+			return 0;
+		}
 
-		case eDataVersion::v1_8: return 47;
+		case eDataVersion::v1_8: return 0;
 		case eDataVersion::v1_9_0: return 169;
 		case eDataVersion::v1_9_1: return 175;
 		case eDataVersion::v1_9_2: return 176;
@@ -471,7 +475,7 @@ eDataVersion NamespaceSerializer::ToDataVersion(const Int32 ID)
 {
 	switch (ID)
 	{
-		case 47: return  eDataVersion::v1_8;
+		case 0: return  eDataVersion::v1_8;
 		case 169: return  eDataVersion::v1_9_0;
 		case 175: return  eDataVersion::v1_9_1;
 		case 176: return  eDataVersion::v1_9_2;
