@@ -592,7 +592,16 @@ ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta) const
 
 bool cBlockHandler::ToolHasSilkTouch(const cItem * a_Tool)
 {
-	return ((a_Tool != nullptr) && (a_Tool->m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0));
+	if (a_Tool == nullptr)
+	{
+		return false;
+	}
+	auto Enchantments = a_Tool->get<cEnchantments>();
+	if (!Enchantments.has_value())
+	{
+		return false;
+	}
+	return Enchantments.value().GetLevel(cEnchantments::enchSilkTouch) > 0;
 }
 
 
@@ -604,7 +613,12 @@ unsigned char cBlockHandler::ToolFortuneLevel(const cItem * a_Tool)
 	if ((a_Tool != nullptr) && ItemCategory::IsTool(a_Tool->m_ItemType))
 	{
 		// Return enchantment level, limited to avoid spawning excessive pickups (crashing the server) when modified items are used:
-		return static_cast<unsigned char>(std::min(8U, a_Tool->m_Enchantments.GetLevel(cEnchantments::enchFortune)));
+		auto Enchantments = a_Tool->get<cEnchantments>();
+		if (!Enchantments.has_value())
+		{
+			return 0;
+		}
+		return std::min<unsigned char>(8U, static_cast<const unsigned char>(Enchantments.value().GetLevel(cEnchantments::enchFortune)));
 	}
 
 	// Not a tool:

@@ -84,7 +84,13 @@ public:
 		{
 			// Cast a hook:
 			auto & Random = GetRandomProvider();
-			auto CountDownTime = Random.RandInt(100, 900) - static_cast<int>(a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100);
+			unsigned lureLevel = 0;
+			auto Enchantments = a_Player->GetEquippedItem().get<cEnchantments>();
+			if (Enchantments.has_value())
+			{
+				lureLevel = Enchantments.value().GetLevel(cEnchantments::enchLure) * 100;
+			}
+			auto CountDownTime = Random.RandInt<unsigned int>(100, 900) - lureLevel;
 			auto Floater = std::make_unique<cFloater>(
 				a_Player->GetEyePosition(), a_Player->GetLookVector() * 15,
 				a_Player->GetUniqueID(),
@@ -156,7 +162,13 @@ public:
 
 	void ReelInLoot(cWorld & a_World, cPlayer & a_Player, const Vector3d a_FloaterBitePos) const
 	{
-		auto LotSLevel = std::min(a_Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLuckOfTheSea), 3u);
+		auto LotSLevel = 3u;
+
+		auto Enchantments = a_Player.GetEquippedItem().get<cEnchantments>();
+		if (Enchantments.has_value())
+		{
+			LotSLevel = std::min(Enchantments.value().GetLevel(cEnchantments::enchLuckOfTheSea), LotSLevel);
+		}
 
 		// Chances for getting an item from the category for each level of Luck of the Sea (0 - 3)
 		const int TreasureChances[] = {50, 71, 92, 113};  // 5% | 7.1% | 9.2% | 11.3%

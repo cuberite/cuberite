@@ -2756,6 +2756,114 @@ static int tolua_cMojangAPI_MakeUUIDShort(lua_State * L)
 
 
 
+static int tolua_get_cItem_m_CustomName(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("const cItem"))
+	{
+		return 0;
+	}
+	// Get the params:
+	const cItem * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	// Push the result:
+	auto DisplayProperties = Self->get<cItem::cDisplayProperties>().value_or(cItem::cDisplayProperties());
+	L.Push(DisplayProperties.m_CustomName);
+	return 1;
+}
+
+
+
+
+
+static int tolua_set_cItem_m_CustomName(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cItem"))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cItem * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	if (!L.CheckParamString(1))
+	{
+		return 0;
+	}
+	AString CustomName;
+	L.GetStackValue(1, CustomName);
+
+	auto DisplayProperties = Self->get<cItem::cDisplayProperties>().value_or(cItem::cDisplayProperties());
+	DisplayProperties.m_CustomName = CustomName;
+	Self->set<cItem::cDisplayProperties>(DisplayProperties);
+	return 1;
+}
+
+
+
+
+
+static int tolua_get_cItem_m_ItemColor(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("const cItem"))
+	{
+		return 0;
+	}
+	// Get the params:
+	const cItem * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	// Push the result:
+	auto DisplayProperties = Self->get<cItem::cDisplayProperties>().value_or(cItem::cDisplayProperties());
+	L.Push(&DisplayProperties.m_Color);
+	return 1;
+}
+
+
+
+
+
+static int tolua_set_cItem_m_ItemColor(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+
+	if (!L.CheckParamSelf("cItem"))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cItem * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	if (!L.CheckParamUserType(1, "cColor"))
+	{
+		return 0;
+	}
+
+	cColor Color;
+	L.GetStackValue(1, Color);
+
+	// Push the result:
+	auto DisplayProperties = Self->get<cItem::cDisplayProperties>().value_or(cItem::cDisplayProperties());
+	DisplayProperties.m_Color = Color;
+	Self->set<cItem::cDisplayProperties>(DisplayProperties);
+	return 1;
+}
+
+
+
+
+
 static int tolua_get_cItem_m_LoreTable(lua_State * tolua_S)
 {
 	// Check params:
@@ -2770,7 +2878,118 @@ static int tolua_get_cItem_m_LoreTable(lua_State * tolua_S)
 	L.GetStackValue(1, Self);
 
 	// Push the result:
-	L.Push(Self->m_LoreTable);
+	auto DisplayProperties = Self->get<cItem::cDisplayProperties>().value_or(cItem::cDisplayProperties());
+	L.Push(DisplayProperties.m_LoreTable);
+	return 1;
+}
+
+
+
+
+
+static int tolua_get_cItem_m_Enchantments(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("const cItem"))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	const cItem * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	// Push the result:
+	auto Enchantments = Self->get<cEnchantments>().value_or(cEnchantments());
+	L.Push(&Enchantments);
+	return 1;
+}
+
+
+
+
+
+static int tolua_set_cItem_m_Enchantments(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cItem"))
+	{
+		return 0;
+	}
+	// Get the params:
+	cItem * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	if (!L.CheckParamUserType(1, "cEnchantments"))
+	{
+		return 0;
+	}
+
+	cEnchantments Enchantments;
+	L.GetStackValue(1, Enchantments);
+	Self->set<cEnchantments>(Enchantments);
+	return 1;
+}
+
+
+
+
+
+static int tolua_get_cItem_m_FireworkItem(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("const cItem"))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	const cItem * Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	// Push the result:
+	auto FireworkItem = Self->get<cFireworkItem>();
+	if (FireworkItem.has_value())
+	{
+		L.Push(&FireworkItem.value());
+	}
+	else
+	{
+		lua_pushnil(L);
+	}
+
+	return 1;
+}
+
+
+
+
+
+static int tolua_set_cItem_m_FireworkItem(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (!L.CheckParamSelf("cItem"))
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cItem *Self = nullptr;
+	L.GetStackValue(1, Self);
+
+	// Push the result:
+	if (!L.CheckParamUserType(1, "cFireworkItem"))
+	{
+		return 0;
+	}
+
+	cFireworkItem FireworkItem;
+	L.GetStackValue(1, FireworkItem);
+	Self->set<cFireworkItem>(FireworkItem);
 	return 1;
 }
 
@@ -2822,11 +3041,13 @@ static int tolua_set_cItem_m_LoreTable(lua_State * tolua_S)
 	L.GetStackValue(1, Self);
 
 	// Set the value:
-	Self->m_LoreTable.clear();
-	if (!L.GetStackValue(2, Self->m_LoreTable))
+	auto DisplayProperties = Self->get<cItem::cDisplayProperties>().value_or(cItem::cDisplayProperties());
+	DisplayProperties.m_LoreTable.clear();
+	if (!L.GetStackValue(2, DisplayProperties.m_LoreTable))
 	{
 		return L.ApiParamError("cItem.m_LoreTable: Could not read value as an array of strings");
 	}
+	Self->set<cItem::cDisplayProperties>(DisplayProperties);
 	return 0;
 }
 
@@ -4627,7 +4848,11 @@ void cManualBindings::Bind(lua_State * tolua_S)
 
 		tolua_beginmodule(tolua_S, "cItem");
 			tolua_function(tolua_S, "EnchantByXPLevels", tolua_cItem_EnchantByXPLevels);
-			tolua_variable(tolua_S, "m_LoreTable",       tolua_get_cItem_m_LoreTable, tolua_set_cItem_m_LoreTable);
+			tolua_variable(tolua_S, "m_CustomName",      tolua_get_cItem_m_CustomName,   tolua_set_cItem_m_CustomName);
+			tolua_variable(tolua_S, "m_ItemColor",       tolua_get_cItem_m_ItemColor,    tolua_set_cItem_m_ItemColor);
+			tolua_variable(tolua_S, "m_LoreTable",       tolua_get_cItem_m_LoreTable,    tolua_set_cItem_m_LoreTable);
+			tolua_variable(tolua_S, "m_Enchantments",    tolua_get_cItem_m_Enchantments, tolua_set_cItem_m_Enchantments);
+			tolua_variable(tolua_S, "m_FireworkItem",    tolua_get_cItem_m_FireworkItem, tolua_set_cItem_m_FireworkItem);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cItemGrid");

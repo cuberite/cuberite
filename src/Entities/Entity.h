@@ -504,7 +504,7 @@ public:
 	virtual bool IsHeadInWater(void) const { return m_IsHeadInWater; }
 
 	/** Gets remaining air of a monster */
-	int GetAirLevel(void) const { return m_AirLevel; }
+	unsigned int GetAirLevel(void) const { return m_AirLevel; }
 
 	/** Gets number of ticks this entity has been alive for */
 	long int GetTicksAlive(void) const { return m_TicksAlive; }
@@ -657,8 +657,8 @@ protected:
 	bool m_IsHeadInWater;
 
 	/** Air level of a mobile */
-	int m_AirLevel;
-	int m_AirTickTimer;
+	unsigned int m_AirLevel;
+	unsigned int m_AirTickTimer;
 
 	/** Portal delay timer and cooldown boolean data */
 	sPortalCooldownData m_PortalCooldownData;

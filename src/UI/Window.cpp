@@ -644,7 +644,7 @@ void cWindow::OnLeftPaintEnd(cPlayer & a_Player)
 	a_Player.GetDraggingItem().m_ItemCount -= NumDistributed;
 	if (a_Player.GetDraggingItem().m_ItemCount == 0)
 	{
-		a_Player.GetDraggingItem().Empty();
+		a_Player.GetDraggingItem().Clear();
 	}
 
 	SendWholeWindow(*a_Player.GetClientHandle());
@@ -672,7 +672,7 @@ void cWindow::OnRightPaintEnd(cPlayer & a_Player)
 	a_Player.GetDraggingItem().m_ItemCount -= NumDistributed;
 	if (a_Player.GetDraggingItem().m_ItemCount == 0)
 	{
-		a_Player.GetDraggingItem().Empty();
+		a_Player.GetDraggingItem().Clear();
 	}
 
 	SendWholeWindow(*a_Player.GetClientHandle());
@@ -700,7 +700,7 @@ void cWindow::OnMiddlePaintEnd(cPlayer & a_Player)
 	if (0 < DistributeItemToSlots(a_Player, DraggingItem, StackSize, a_Player.GetInventoryPaintSlots(), false))
 	{
 		// If any items were distibuted, set dragging item empty
-		a_Player.GetDraggingItem().Empty();
+		a_Player.GetDraggingItem().Clear();
 	}
 
 	SendWholeWindow(*a_Player.GetClientHandle());

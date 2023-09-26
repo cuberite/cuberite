@@ -563,7 +563,7 @@ void cInventory::SendSlot(int a_SlotNum)
 	if (Item.IsEmpty())
 	{
 		// Sanitize items that are not completely empty (ie. count == 0, but type != empty)
-		Item.Empty();
+		Item.Clear();
 	}
 	m_Owner.GetClientHandle()->SendInventorySlot(0, static_cast<short>(a_SlotNum + 5), Item);  // Slots in the client are numbered "+ 5" because of crafting grid and result
 }

@@ -957,6 +957,23 @@ void cLuaState::Push(const cEntity * a_Entity)
 
 
 
+void cLuaState::Push(cFireworkItem * a_FireworkItem)
+{
+	ASSERT(IsValid());
+	if (a_FireworkItem == nullptr)
+	{
+		lua_pushnil(m_LuaState);
+	}
+	else
+	{
+		tolua_pushusertype(m_LuaState, a_FireworkItem, "cFireworkItem");
+	}
+}
+
+
+
+
+
 void cLuaState::Push(cEntity * a_Entity)
 {
 	ASSERT(IsValid());
@@ -1249,6 +1266,52 @@ bool cLuaState::GetStackValue(int a_StackPos, cCallbackSharedPtr & a_Callback)
 		a_Callback = std::make_shared<cCallback>();
 	}
 	return a_Callback->RefStack(*this, a_StackPos);
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cColor & a_Value)
+{
+	if (!lua_istable(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+	auto ColorPointer = static_cast<cColor *>(tolua_tousertype(m_LuaState, 1, nullptr));
+	a_Value = *ColorPointer;
+	return true;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cEnchantments & a_Value)
+{
+	if (!lua_istable(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+	auto EnchantmentsPointer = static_cast<cEnchantments*>(tolua_tousertype(m_LuaState, 1, nullptr));
+	a_Value = *EnchantmentsPointer;
+	return true;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, cFireworkItem & a_Value)
+{
+	if (!lua_istable(m_LuaState, a_StackPos))
+	{
+		return false;
+	}
+
+	auto FireworkItemPointer = static_cast<cFireworkItem*>(tolua_tousertype(m_LuaState, 1, nullptr));
+	a_Value = *FireworkItemPointer;
+	return true;
 }
 
 

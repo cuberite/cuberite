@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include "Defines.h"
 #include "Enchantments.h"
 #include "WorldStorage/FireworksSerializer.h"
@@ -59,10 +61,6 @@ public:
 	#endif
 
 	/** Empties the item and frees up any dynamic storage used by the internals. */
-	void Empty(void);
-
-	/** Empties the item and frees up any dynamic storage used by the internals.
-	TODO: What is the usage difference? Merge with Empty()? */
 	void Clear(void);
 
 	/** Returns true if the item represents an empty stack - either the type is invalid, or count is zero. */
@@ -71,17 +69,31 @@ public:
 		return ((m_ItemType <= 0) || (m_ItemCount <= 0));
 	}
 
-	/* Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.)
+	/* Returns true if this item stack can stack with the specified stack (types match, enchantments etc.)
 	ItemCounts are ignored. */
 	bool IsEqual(const cItem & a_Item) const
 	{
+		auto displayLhs = get<cDisplayProperties>();
+		auto displayRhs = a_Item.get<cDisplayProperties>();
+
 		return (
 			IsSameType(a_Item) &&
 			(m_ItemDamage == a_Item.m_ItemDamage) &&
-			(m_Enchantments == a_Item.m_Enchantments) &&
-			(m_CustomName == a_Item.m_CustomName) &&
-			(m_LoreTable == a_Item.m_LoreTable) &&
-			m_FireworkItem.IsEqualTo(a_Item.m_FireworkItem)
+			(get<cEnchantments>().value_or(cEnchantments()) == a_Item.get<cEnchantments>().value_or(cEnchantments())) &&
+			(get<cFireworkItem>().value_or(cFireworkItem()).IsEqualTo(a_Item.get<cFireworkItem>().value_or(cFireworkItem()))) &&
+			(
+				(
+					displayLhs.has_value() &&
+					displayRhs.has_value() &&
+					(displayLhs.value().m_CustomName == displayRhs.value().m_CustomName) &&
+					(displayLhs.value().m_LoreTable == displayRhs.value().m_LoreTable)
+				)
+				||
+				(
+					!displayLhs.has_value() &&
+					!displayRhs.has_value()
+				)
+			)
 		);
 	}
 
@@ -94,12 +106,34 @@ public:
 
 	bool IsBothNameAndLoreEmpty(void) const
 	{
-		return (m_CustomName.empty() && m_LoreTable.empty());
+		auto DisplayProperties = get<cDisplayProperties>();
+		if (!DisplayProperties.has_value())
+		{
+			return true;
+		}
+		return (DisplayProperties.value().m_CustomName.empty() && DisplayProperties.value().m_LoreTable.empty());
 	}
 
 
-	bool IsCustomNameEmpty(void) const { return (m_CustomName.empty()); }
-	bool IsLoreEmpty(void) const { return (m_LoreTable.empty()); }
+	bool IsCustomNameEmpty(void) const
+	{
+		auto DisplayProperties = get<cDisplayProperties>();
+		if (!DisplayProperties.has_value())
+		{
+			return false;
+		}
+		return DisplayProperties.value().m_CustomName.empty();
+	}
+
+	bool IsLoreEmpty(void) const
+	{
+		auto DisplayProperties = get<cDisplayProperties>();
+		if (!DisplayProperties.has_value())
+		{
+			return false;
+		}
+		return (DisplayProperties.value().m_LoreTable.empty());
+	}
 
 	/** Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items */
 	cItem CopyOne(void) const;
@@ -159,16 +193,83 @@ public:
 	bool CanHaveEnchantment(int a_EnchantmentID);
 
 	// tolua_begin
-
 	short          m_ItemType;
 	char           m_ItemCount;
 	short          m_ItemDamage;
-	cEnchantments  m_Enchantments;
-	AString        m_CustomName;
-
+	int            m_RepairCost;
 	// tolua_end
 
-	AStringVector  m_LoreTable;  // Exported in ManualBindings.cpp
+
+	// https://minecraft.fandom.com/wiki/Tutorials/Command_NBT_tags#Items
+	struct cDisplayProperties
+	{
+		AString m_CustomName;
+		AStringVector  m_LoreTable;  // Exported in ManualBindings.cpp
+		cColor m_Color;
+
+		cDisplayProperties() : m_CustomName(), m_LoreTable(), m_Color() {}
+	};
+
+	struct cAdditionalBlockProperties
+	{
+		std::vector<std::pair<ENUM_BLOCK_TYPE, unsigned char>> m_CanPlaceOn;
+
+	};
+
+	std::vector<std::variant<
+		cEnchantments,
+		// cEntityTag,
+		cDisplayProperties,
+		// cAttributes,
+		// bool,  // unbreakable
+		// AString,  // SkullOwner
+		// cHideFlags,
+		// std::unique_ptr<cBlockEntity>,
+		cFireworkItem
+	>> m_Properties;
+
+	/** Returns the requested property, if there is none present, the optional will handle this */
+	template <class type>
+	std::optional<type> get() const
+	{
+		for (auto & property : m_Properties)
+		{
+			if (std::holds_alternative<type>(property))
+			{
+				return std::get<type>(property);
+			}
+		}
+		return {};
+	}
+
+	/** replaces the property if present, if not saves it */
+	template <class type>
+	void set(const type & a_Value)
+	{
+		for (auto & Property : m_Properties)
+		{
+			if (std::holds_alternative<type>(Property))
+			{
+				Property = std::move(a_Value);
+				return;
+			}
+		}
+		m_Properties.push_back(std::move(a_Value));
+	}
+
+	/** Only Sets a value if there is none present */
+	template <class type>
+	void SafeSet(const type & a_Value)
+	{
+		for (auto & property : m_Properties)
+		{
+			if (std::holds_alternative<type>(property))
+			{
+				return;
+			}
+		}
+		m_Properties.push_back(std::move(a_Value));
+	}
 
 	/**
 	Compares two items for the same type or category. Type of item is defined
@@ -189,19 +290,12 @@ public:
 			}
 			if ((a_Lhs.m_ItemDamage == -1) || (a_Rhs.m_ItemDamage == -1))
 			{
-				return false;  // -1 is a wildcard, damage of -1 alway compares equal
+				return false;  // -1 is a wildcard, damage of -1 always compares equal
 			}
 			return (a_Lhs.m_ItemDamage < a_Rhs.m_ItemDamage);
 		}
 	};
-
-	// tolua_begin
-
-	int            m_RepairCost;
-	cFireworkItem  m_FireworkItem;
-	cColor         m_ItemColor;
-};
-// tolua_end
+};  // tolua_export
 
 
 

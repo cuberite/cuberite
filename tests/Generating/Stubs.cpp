@@ -379,7 +379,7 @@ cItem::cItem(
 
 
 
-void cItem::Empty()
+void cItem::Clear()
 {
 }
 

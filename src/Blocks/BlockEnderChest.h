@@ -26,7 +26,10 @@ private:
 		)
 		{
 			// Only drop self when mined with a silk-touch pickaxe:
-			if (a_Tool->m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0)
+			if (
+				auto Enchantments = a_Tool->get<cEnchantments>();
+				(Enchantments.has_value() &&
+				Enchantments.value().GetLevel(cEnchantments::enchSilkTouch) > 0))
 			{
 				return cItem(E_BLOCK_ENDER_CHEST);
 			}

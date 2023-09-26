@@ -37,9 +37,20 @@ bool cBlaze::Attack(std::chrono::milliseconds a_Dt)
 
 void cBlaze::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	if ((a_Killer != nullptr) && (a_Killer->IsPlayer() || a_Killer->IsA("cWolf")))
+	if (a_Killer == nullptr)
 	{
-		unsigned int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+		return;
+	}
+
+	unsigned int LootingLevel = 0;
+	auto Enchantments = a_Killer->GetEquippedWeapon().get<cEnchantments>();
+	if (Enchantments.has_value())
+	{
+		LootingLevel = Enchantments.value().GetLevel(cEnchantments::enchLooting);
+	}
+
+	if (a_Killer->IsPlayer() || a_Killer->IsA("cWolf"))
+	{
 		AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_BLAZE_ROD);
 	}
 }

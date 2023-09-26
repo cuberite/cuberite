@@ -23,7 +23,11 @@ void cSquid::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	unsigned int LootingLevel = 0;
 	if (a_Killer != nullptr)
 	{
-		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+		auto Enchantments = a_Killer->GetEquippedWeapon().get<cEnchantments>();
+		if (Enchantments.has_value())
+		{
+			LootingLevel = Enchantments.value().GetLevel(cEnchantments::enchLooting);
+		}
 	}
 	AddRandomDropItem(a_Drops, 0, 3 + LootingLevel, E_ITEM_DYE, E_META_DYE_BLACK);
 }

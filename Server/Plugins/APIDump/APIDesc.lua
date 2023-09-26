@@ -7258,10 +7258,6 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 					},
 					Notes = "Adds the specified damage. Returns true when damage reaches max value and the item should be destroyed (but doesn't destroy the item)",
 				},
-				Empty =
-				{
-					Notes = "Resets the instance to an empty item",
-				},
 				EnchantByXPLevels =
 				{
 					Params =

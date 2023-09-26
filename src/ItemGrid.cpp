@@ -192,7 +192,7 @@ void cItemGrid::EmptySlot(int a_SlotNum)
 	}
 
 	// Empty and notify
-	m_Slots[a_SlotNum].Empty();
+	m_Slots[a_SlotNum].Clear();
 	TriggerListeners(a_SlotNum);
 }
 
@@ -234,7 +234,7 @@ void cItemGrid::Clear(void)
 
 	for (int i = 0; i < m_Slots.size(); i++)
 	{
-		m_Slots[i].Empty();
+		m_Slots[i].Clear();
 		TriggerListeners(i);
 	}
 }
@@ -426,7 +426,7 @@ char cItemGrid::RemoveItem(const cItem & a_ItemStack)
 
 			if (m_Slots[i].m_ItemCount <= 0)
 			{
-				m_Slots[i].Empty();
+				m_Slots[i].Clear();
 			}
 
 			TriggerListeners(i);
@@ -484,7 +484,7 @@ char cItemGrid::ChangeSlotCount(int a_SlotNum, char a_AddToCount)
 	if (m_Slots[a_SlotNum].m_ItemCount <= -a_AddToCount)
 	{
 		// Trying to remove more items than there already are, make the item empty
-		m_Slots[a_SlotNum].Empty();
+		m_Slots[a_SlotNum].Clear();
 		TriggerListeners(a_SlotNum);
 		return 0;
 	}
@@ -537,7 +537,7 @@ cItem cItemGrid::RemoveOneItem(int a_SlotNum)
 	// Emptying the slot correctly if appropriate
 	if (m_Slots[a_SlotNum].m_ItemCount == 0)
 	{
-		m_Slots[a_SlotNum].Empty();
+		m_Slots[a_SlotNum].Clear();
 	}
 
 	// Notify everyone of the change
@@ -775,7 +775,9 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 		for (int j = 0; j <= NumEnchantments; j++)
 		{
 			cEnchantments Enchantment = cEnchantments::SelectEnchantmentFromVector(Enchantments, Noise.IntNoise2DInt(NumEnchantments, i));
-			CurrentLoot.m_Enchantments.Add(Enchantment);
+			auto NewEnchantments = CurrentLoot.get<cEnchantments>().value_or(cEnchantments());
+			NewEnchantments.Add(Enchantment);
+			CurrentLoot.set<cEnchantments>(NewEnchantments);
 			cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment);
 			cEnchantments::CheckEnchantmentConflictsFromVector(Enchantments, Enchantment);
 		}

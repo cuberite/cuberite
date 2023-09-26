@@ -88,7 +88,8 @@ private:
 			return;
 		}
 
-		if (Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) != 0)
+		if (auto Enchantments = Player->GetEquippedItem().get<cEnchantments>();
+			Enchantments.has_value() && Enchantments.value().GetLevel(cEnchantments::enchSilkTouch) != 0)
 		{
 			// Don't drop XP when the ore is mined with the Silk Touch enchantment
 			return;
