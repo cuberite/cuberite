@@ -27,7 +27,7 @@ cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily, const std::set<eMons
 
 
 
-
+// Checks if a pack center can be placed at the given block type.
 bool cMobSpawner::CheckPackCenter(BLOCKTYPE a_BlockType)
 {
 	// Packs of non-water mobs can only be centered on an air block
@@ -45,7 +45,7 @@ bool cMobSpawner::CheckPackCenter(BLOCKTYPE a_BlockType)
 
 
 
-
+// Chooses a random, valid mob type based on the allowed types and the biome.
 eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 {
 	std::vector<eMonsterType> AllowedMobs;
@@ -71,7 +71,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 
 
-
+// Checks if a mob of the given type can spawn at the specified position in a chunk.
 bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType a_MobType, EMCSBiome a_Biome, bool a_DisableSolidBelowCheck)
 {
 	if ((a_RelPos.y >= cChunkDef::Height - 1) || (a_RelPos.y <= 0))
@@ -351,13 +351,15 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 
 
 
-
+ // Retrieves a set of allowed mob types for spawning based on the biome.
 std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 {
 	std::set<eMonsterType> ListOfSpawnables;
 	// Check biomes first to get a list of animals
 	switch (a_Biome)
 	{
+		// Rules for specific biomes and their associated allowed mob types.
+		
 		// Mooshroom only - no other mobs on mushroom islands
 		case biMushroomIsland:
 		case biMushroomShore:
