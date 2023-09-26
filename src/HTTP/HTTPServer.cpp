@@ -81,7 +81,7 @@ cHTTPServer::~cHTTPServer()
 
 
 
-
+// Initialize the HTTP server
 bool cHTTPServer::Initialize(void)
 {
 	// Read the HTTPS cert + key:
@@ -130,7 +130,7 @@ bool cHTTPServer::Initialize(void)
 
 
 
-
+// Start the HTTP server on specified ports
 bool cHTTPServer::Start(cCallbacks & a_Callbacks, const AStringVector & a_Ports)
 {
 	m_Callbacks = &a_Callbacks;
@@ -172,7 +172,7 @@ bool cHTTPServer::Start(cCallbacks & a_Callbacks, const AStringVector & a_Ports)
 
 
 
-
+// Stop the HTTP server
 void cHTTPServer::Stop(void)
 {
 	for (const auto & handle : m_ServerHandles)
@@ -185,7 +185,7 @@ void cHTTPServer::Stop(void)
 
 
 
-
+// Callback when an incoming connection is established
 cTCPLink::cCallbacksPtr cHTTPServer::OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort)
 {
 	UNUSED(a_RemoteIPAddress);
@@ -204,7 +204,7 @@ cTCPLink::cCallbacksPtr cHTTPServer::OnIncomingConnection(const AString & a_Remo
 
 
 
-
+// Callback when a new HTTP request is received
 void cHTTPServer::NewRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request)
 {
 	m_Callbacks->OnRequestBegun(a_Connection, a_Request);
@@ -213,7 +213,7 @@ void cHTTPServer::NewRequest(cHTTPServerConnection & a_Connection, cHTTPIncoming
 
 
 
-
+// Callback when the body of an HTTP request is received
 void cHTTPServer::RequestBody(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request, const void * a_Data, size_t a_Size)
 {
 	m_Callbacks->OnRequestBody(a_Connection, a_Request, static_cast<const char *>(a_Data), a_Size);
@@ -222,7 +222,7 @@ void cHTTPServer::RequestBody(cHTTPServerConnection & a_Connection, cHTTPIncomin
 
 
 
-
+// Callback when an HTTP request is finished
 void cHTTPServer::RequestFinished(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request)
 {
 	m_Callbacks->OnRequestFinished(a_Connection, a_Request);
