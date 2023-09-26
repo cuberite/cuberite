@@ -23,7 +23,7 @@ cItemGrid::cItemGrid(int a_Width, int a_Height):
 
 
 
-
+// Check if a given slot number is valid
 bool cItemGrid::IsValidSlotNum(int a_SlotNum) const
 {
 	return ((a_SlotNum >= 0) && (a_SlotNum < m_Slots.size()));
@@ -32,7 +32,7 @@ bool cItemGrid::IsValidSlotNum(int a_SlotNum) const
 
 
 
-
+// Check if given slot coordinates are valid
 bool cItemGrid::IsValidSlotCoords(int a_X, int a_Y) const
 {
 	return (
@@ -44,7 +44,7 @@ bool cItemGrid::IsValidSlotCoords(int a_X, int a_Y) const
 
 
 
-
+// Get the slot number from given coordinates
 int cItemGrid::GetSlotNum(int a_X, int a_Y) const
 {
 	if (!IsValidSlotCoords(a_X, a_Y))
@@ -60,7 +60,7 @@ int cItemGrid::GetSlotNum(int a_X, int a_Y) const
 
 
 
-
+// Get coordinates from a given slot number
 void cItemGrid::GetSlotCoords(int a_SlotNum, int & a_X, int & a_Y) const
 {
 	if (!IsValidSlotNum(a_SlotNum))
@@ -92,7 +92,7 @@ void cItemGrid::CopyFrom(const cItemGrid & a_Src)
 
 
 
-
+// Get the item in a slot at a given slot number
 const cItem & cItemGrid::GetSlot(int a_X, int a_Y) const
 {
 	return GetSlot(GetSlotNum(a_X, a_Y));
@@ -135,7 +135,7 @@ void cItemGrid::SetSlot(int a_X, int a_Y, short a_ItemType, char a_ItemCount, sh
 
 
 
-
+// Set the item in a slot at a given slot number
 void cItemGrid::SetSlot(int a_SlotNum, const cItem & a_Item)
 {
 	if (!IsValidSlotNum(a_SlotNum))
@@ -156,7 +156,7 @@ void cItemGrid::SetSlot(int a_SlotNum, const cItem & a_Item)
 
 
 
-
+// Set the item in a slot at a given slot number with individual item properties
 void cItemGrid::SetSlot(int a_SlotNum, short a_ItemType, char a_ItemCount, short a_ItemDamage)
 {
 	SetSlot(a_SlotNum, cItem(a_ItemType, a_ItemCount, a_ItemDamage));
@@ -174,7 +174,7 @@ void cItemGrid::EmptySlot(int a_X, int a_Y)
 
 
 
-
+// Empty a slot at a given slot number
 void cItemGrid::EmptySlot(int a_SlotNum)
 {
 	if (!IsValidSlotNum(a_SlotNum))
@@ -199,7 +199,7 @@ void cItemGrid::EmptySlot(int a_SlotNum)
 
 
 
-
+// Check if a slot is empty at a given slot number
 bool cItemGrid::IsSlotEmpty(int a_SlotNum) const
 {
 	if (!IsValidSlotNum(a_SlotNum))
@@ -215,7 +215,7 @@ bool cItemGrid::IsSlotEmpty(int a_SlotNum) const
 
 
 
-
+// Check if a slot is empty at given coordinates
 bool cItemGrid::IsSlotEmpty(int a_X, int a_Y) const
 {
 	return IsSlotEmpty(GetSlotNum(a_X, a_Y));
@@ -242,7 +242,7 @@ void cItemGrid::Clear(void)
 
 
 
-
+// Determine how many items can fit in a given stack
 int cItemGrid::HowManyCanFit(const cItem & a_ItemStack, bool a_AllowNewStacks)
 {
 	int NumLeft = a_ItemStack.m_ItemCount;
