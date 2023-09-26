@@ -12,7 +12,7 @@
 
 
 
-
+// Helper function to construct the statistics directory path
 static auto MakeStatisticsDirectory(const std::string & WorldPath, std::string && FileName)
 {
 	// Even though stats are shared between worlds, they are (usually) saved
@@ -30,7 +30,7 @@ static auto MakeStatisticsDirectory(const std::string & WorldPath, std::string &
 
 
 
-
+// Helper function to save custom statistics to JSON
 static void SaveStatToJSON(const StatisticsManager & Manager, Json::Value & a_Out)
 {
 	if (Manager.Custom.empty())
@@ -49,7 +49,7 @@ static void SaveStatToJSON(const StatisticsManager & Manager, Json::Value & a_Ou
 
 
 
-
+// Helper function to load custom statistics from JSON
 static void LoadCustomStatFromJSON(StatisticsManager & Manager, const Json::Value & a_In)
 {
 	for (auto it = a_In.begin(); it != a_In.end(); ++it)
@@ -70,7 +70,7 @@ static void LoadCustomStatFromJSON(StatisticsManager & Manager, const Json::Valu
 
 
 
-
+// Load statistics from a file
 void StatisticsSerializer::Load(StatisticsManager & Manager, const std::string & WorldPath, std::string && FileName)
 {
 	Json::Value Root;
@@ -82,7 +82,7 @@ void StatisticsSerializer::Load(StatisticsManager & Manager, const std::string &
 
 
 
-
+// Save statistics to a file
 void StatisticsSerializer::Save(const StatisticsManager & Manager, const std::string & WorldPath, std::string && FileName)
 {
 	Json::Value Root;
