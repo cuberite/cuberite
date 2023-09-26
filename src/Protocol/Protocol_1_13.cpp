@@ -1299,8 +1299,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtDrowned:
 
-		case mtEndermite:
-
 		case mtEvoker:
 
 		case mtIllusioner:
@@ -1348,6 +1346,7 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}
 
+		case mtEndermite:
 		case mtGiant:
 		case mtSilverfish:
 		case mtSquid:
