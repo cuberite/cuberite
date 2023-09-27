@@ -3152,7 +3152,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			a_Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
 			a_Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
 
-			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
+			// The new Block Entity format for a Mob Head. See: https://minecraft.wiki/w/Head#Block_entity
 			a_Writer.BeginCompound("Owner");
 				a_Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
 				a_Writer.AddString("Name", MobHeadEntity.GetOwnerName());

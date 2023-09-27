@@ -24,7 +24,7 @@ I'd say that the important topics are:
 Useful Resources
 ----------------
 
- - [Minecraft Wiki](https://minecraft.gamepedia.com/Minecraft_Wiki)
+ - [Minecraft Wiki](https://minecraft.wiki/w/Minecraft_Wiki)
  - [Minecraft Protocol Wiki](http://wiki.vg/Main_Page)
  - [Lua API Documentation](https://api.cuberite.org/)
  - [Visual Studio Community Edition Download](https://www.visualstudio.com/downloads/)
@@ -127,7 +127,7 @@ Special Things
 
 [1]: https://book.cuberite.org/
 [2]: https://github.com/cuberite/cuberite/blob/master/TESTING.md
-[3]: https://minecraft.gamepedia.com/Minecraft_Wiki
+[3]: https://minecraft.wiki/w/Minecraft_Wiki
 [4]: https://github.com/cuberite/cuberite/blob/master/CONTRIBUTING.md
 [5]: https://github.com/cuberite/cuberite/blob/master/COMPILING.md
 [6]: https://github.com/cuberite/cuberite/issues?q=is%3Aopen+is%3Aissue+label%3Aeffort%2Feasy
