@@ -66,11 +66,13 @@ public:
 	If a client certificate should be used for the connection, set the certificate into a_OwnCertData and
 	its corresponding private key to a_OwnPrivKeyData. If both are empty, no client cert is presented.
 	a_OwnPrivKeyPassword is the password to be used for decoding PrivKey, empty if not passworded.
+	a_TrustedRootCAs is a \n-delimited concatenation of trusted root CAs' certificates in PEM format
 	Returns empty string on success, non-empty error description on failure. */
 	AString StartTLSClient(
 		const AString & a_OwnCertData,
 		const AString & a_OwnPrivKeyData,
-		const AString & a_OwnPrivKeyPassword
+		const AString & a_OwnPrivKeyPassword,
+		const AString & a_TrustedRootCAs
 	);
 
 	/** Starts a TLS handshake as a server connection.

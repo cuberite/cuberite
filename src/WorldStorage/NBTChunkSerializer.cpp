@@ -615,7 +615,7 @@ public:
 			mWriter.AddByte  ("SkullType", a_MobHead->GetType() & 0xFF);
 			mWriter.AddByte  ("Rot",       a_MobHead->GetRotation() & 0xFF);
 
-			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
+			// The new Block Entity format for a Mob Head. See: https://minecraft.wiki/w/Head#Block_entity
 			mWriter.BeginCompound("Owner");
 				mWriter.AddString("Id", a_MobHead->GetOwnerUUID().ToShortString());
 				mWriter.AddString("Name", a_MobHead->GetOwnerName());

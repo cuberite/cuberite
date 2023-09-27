@@ -158,25 +158,18 @@ public:
 
 	/** Returns the path separator used by the current platform.
 	Note that the platform / CRT may support additional path separators (such as slashes on Windows), these don't get reported. */
-	static AString GetPathSeparator(void);
+	static AString GetPathSeparator();
 
 	/** Returns the customary executable extension used by the current platform. */
-	static AString GetExecutableExt(void);
+	static AString GetExecutableExt();
 
 	// tolua_end
 
 	/** Returns the list of all items in the specified folder (files, folders, nix pipes, whatever's there). */
 	static AStringVector GetFolderContents(const AString & a_Folder);  // Exported in ManualBindings.cpp
 
-	int vPrintf(const char * a_Format, fmt::printf_args a_ArgList);
-	template <typename... Args>
-	int Printf(const char * a_Format, const Args & ... a_Args)
-	{
-		return vPrintf(a_Format, fmt::make_printf_args(a_Args...));
-	}
-
 	/** Flushes all the bufferef output into the file (only when writing) */
-	void Flush(void);
+	void Flush();
 
 private:
 	FILE * m_File;

@@ -126,7 +126,7 @@ cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_Ser
 		cFile::CreateFolder("CommLogs");
 		AString IP(a_Client->GetIPString());
 		ReplaceString(IP, ":", "_");
-		AString FileName = Printf("CommLogs/%x_%d__%s.log",
+		auto FileName = fmt::format(FMT_STRING("CommLogs/{:x}_{}__{}.log"),
 			static_cast<unsigned>(time(nullptr)),
 			sCounter++,
 			IP.c_str()
@@ -313,7 +313,7 @@ void cProtocol_1_8_0::SendChat(const AString & a_Message, eChatType a_Type)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	SendChatRaw(Printf("{\"text\":\"%s\"}", EscapeString(a_Message).c_str()), a_Type);
+	SendChatRaw(JsonUtils::SerializeSingleValueJsonObject("text", a_Message), a_Type);
 }
 
 
@@ -433,13 +433,13 @@ void cProtocol_1_8_0::SendDisconnect(const AString & a_Reason)
 		case State::Login:
 		{
 			cPacketizer Pkt(*this, pktDisconnectDuringLogin);
-			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
+			Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", a_Reason));
 			break;
 		}
 		case State::Game:
 		{
 			cPacketizer Pkt(*this, pktDisconnectDuringGame);
-			Pkt.WriteString(Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str()));
+			Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", a_Reason));
 			break;
 		}
 		default:
@@ -1103,7 +1103,7 @@ void cProtocol_1_8_0::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, 
 	else
 	{
 		Pkt.WriteBool(true);
-		Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_CustomName.c_str()));
+		Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", a_CustomName));
 	}
 }
 
@@ -1659,9 +1659,7 @@ void cProtocol_1_8_0::SendUpdateSign(Vector3i a_BlockPos, const AString & a_Line
 	AString Lines[] = { a_Line1, a_Line2, a_Line3, a_Line4 };
 	for (size_t i = 0; i < ARRAYCOUNT(Lines); i++)
 	{
-		Json::Value RootValue;
-		RootValue["text"] = Lines[i];
-		Pkt.WriteString(JsonUtils::WriteFastString(RootValue));
+		Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", Lines[i]));
 	}
 }
 
@@ -1750,7 +1748,7 @@ void cProtocol_1_8_0::SendWindowOpen(const cWindow & a_Window)
 	cPacketizer Pkt(*this, pktWindowOpen);
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
 	Pkt.WriteString(a_Window.GetWindowTypeName());
-	Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_Window.GetWindowTitle().c_str()));
+	Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", a_Window.GetWindowTitle()));
 
 	switch (a_Window.GetWindowType())
 	{
@@ -2217,7 +2215,7 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	m_Client->ForgeAugmentServerListPing(ResponseValue);
 	if (!Favicon.empty())
 	{
-		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+		ResponseValue["favicon"] = "data:image/png;base64," + Favicon;
 	}
 
 	// Serialize the response into a packet:
@@ -3086,10 +3084,11 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 		AString Hex;
 		ASSERT(PacketData.size() > 0);
 		CreateHexDump(Hex, PacketData.data(), PacketData.size(), 16);
-		m_CommLogFile.Printf("Outgoing packet: type %s (translated to 0x%02x), length %u (0x%04x), state %d. Payload (incl. type):\n%s\n",
+		m_CommLogFile.Write(fmt::format(
+			FMT_STRING("Outgoing packet: type {} (translated to 0x{:02x}), length {} (0x{:04x}), state {}. Payload (incl. type):\n{}\n"),
 			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
 			PacketData.size(), PacketData.size(), m_State, Hex
-		);
+		));
 		/*
 		// Useful for debugging a new protocol:
 		LOGD("Outgoing packet: type %s (translated to 0x%02x), length %u (0x%04x), state %d. Payload (incl. type):\n%s\n",
@@ -3137,7 +3136,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			a_Writer.AddString("CustomName", "@");
 			if (!CommandBlockEntity.GetLastOutput().empty())
 			{
-				a_Writer.AddString("LastOutput", Printf("{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str()));
+				a_Writer.AddString("LastOutput", JsonUtils::SerializeSingleValueJsonObject("text", CommandBlockEntity.GetLastOutput()));
 			}
 			break;
 		}
@@ -3153,7 +3152,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			a_Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
 			a_Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
 
-			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
+			// The new Block Entity format for a Mob Head. See: https://minecraft.wiki/w/Head#Block_entity
 			a_Writer.BeginCompound("Owner");
 				a_Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
 				a_Writer.AddString("Name", MobHeadEntity.GetOwnerName());
@@ -3762,7 +3761,6 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 
 		case mtCat:
 
-		case mtEndermite:
 
 		case mtDonkey:
 		case mtMule:
@@ -3780,6 +3778,7 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 		case mtIronGolem:
 		case mtMooshroom:
 		case mtSilverfish:
+		case mtEndermite:
 		case mtSnowGolem:
 		case mtSpider:
 		case mtSquid:
@@ -3811,15 +3810,17 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousBy
 			ASSERT(a_Buffer.GetReadableSpace() == OldReadableSpace);
 			AString Hex;
 			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-			m_CommLogFile.Printf("Incoming data, %zu (0x%zx) unparsed bytes already present in buffer:\n%s\n",
-				AllData.size(), AllData.size(), Hex.c_str()
-			);
+			m_CommLogFile.Write(fmt::format(
+				FMT_STRING("Incoming data, {0} (0x{0:x}) unparsed bytes already present in buffer:\n{1}\n"),
+				AllData.size(), Hex
+			));
 		}
 		AString Hex;
 		CreateHexDump(Hex, a_Data.data(), a_Data.size(), 16);
-		m_CommLogFile.Printf("Incoming data: %zu (0x%zx) bytes: \n%s\n",
-			a_Data.size(), a_Data.size(), Hex.c_str()
-		);
+		m_CommLogFile.Write(fmt::format(
+			FMT_STRING("Incoming data: {0} (0x{0:x}) bytes: \n{1}\n"),
+			a_Data.size(), Hex
+		));
 		m_CommLogFile.Flush();
 	}
 
@@ -3902,9 +3903,10 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousBy
 		ASSERT(a_Buffer.GetReadableSpace() == OldReadableSpace);
 		AString Hex;
 		CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
-		m_CommLogFile.Printf("There are %zu (0x%zx) bytes of non-parse-able data left in the buffer:\n%s",
-			a_Buffer.GetReadableSpace(), a_Buffer.GetReadableSpace(), Hex.c_str()
-		);
+		m_CommLogFile.Write(fmt::format(
+			FMT_STRING("There are {0} (0x{0:x}) bytes of non-parse-able data left in the buffer:\n{1}"),
+			a_Buffer.GetReadableSpace(), Hex
+		));
 		m_CommLogFile.Flush();
 	}
 }
@@ -4157,9 +4159,10 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 		PacketData.resize(PacketData.size() - 1);
 		AString PacketDataHex;
 		CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);
-		m_CommLogFile.Printf("Next incoming packet is type %u (0x%x), length %u (0x%x) at state %d. Payload:\n%s\n",
-			PacketType, PacketType, a_Buffer.GetUsedSpace(), a_Buffer.GetUsedSpace(), m_State, PacketDataHex.c_str()
-		);
+		m_CommLogFile.Write(fmt::format(
+			FMT_STRING("Next incoming packet is type {0} (0x{0:x}), length {1} (0x{1:x}) at state {2}. Payload:\n{3}\n"),
+			PacketType, a_Buffer.GetUsedSpace(), m_State, PacketDataHex
+		));
 	}
 
 	if (!HandlePacket(a_Buffer, PacketType))
@@ -4181,7 +4184,7 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 		// Put a message in the comm log:
 		if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
 		{
-			m_CommLogFile.Printf("^^^^^^ Unhandled packet ^^^^^^\n\n\n");
+			m_CommLogFile.Write("^^^^^^ Unhandled packet ^^^^^^\n\n\n");
 		}
 
 		return;
@@ -4198,9 +4201,10 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 		// Put a message in the comm log:
 		if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
 		{
-			m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got %zu left) ^^^^^^\n\n\n",
-				1, a_Buffer.GetReadableSpace()
-			);
+			m_CommLogFile.Write(fmt::format(
+				FMT_STRING("^^^^^^ Wrong number of bytes read for this packet (exp 1 left, got {} left) ^^^^^^\n\n\n"),
+				a_Buffer.GetReadableSpace()
+			));
 			m_CommLogFile.Flush();
 		}
 

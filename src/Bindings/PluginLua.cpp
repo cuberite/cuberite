@@ -34,7 +34,7 @@
 
 cPluginLua::cPluginLua(const AString & a_PluginDirectory, cDeadlockDetect & a_DeadlockDetect) :
 	cPlugin(a_PluginDirectory),
-	m_LuaState(Printf("plugin %s", a_PluginDirectory.c_str())),
+	m_LuaState(fmt::format(FMT_STRING("plugin {}"), a_PluginDirectory)),
 	m_DeadlockDetect(a_DeadlockDetect)
 {
 	m_LuaState.TrackInDeadlockDetect(a_DeadlockDetect);
@@ -140,7 +140,7 @@ bool cPluginLua::Load(void)
 		AString Path = PluginPath + *itr;
 		if (!m_LuaState.LoadFile(Path))
 		{
-			SetLoadError(Printf("Failed to load file %s.", itr->c_str()));
+			SetLoadError(fmt::format(FMT_STRING("Failed to load file {}."), *itr));
 			Close();
 			return false;
 		}

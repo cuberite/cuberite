@@ -335,14 +335,14 @@ bool cPluginManager::CallHookChat(cPlayer & a_Player, AString & a_Message)
 		case crError:
 		{
 			// An error in the plugin has prevented the command from executing. Report the error to the player:
-			a_Player.SendMessageFailure(Printf("Something went wrong while executing command \"%s\"", a_Message.c_str()));
+			a_Player.SendMessageFailure(fmt::format(FMT_STRING("Something went wrong while executing command \"{}\""), a_Message));
 			return true;
 		}
 
 		case crNoPermission:
 		{
 			// The player is not allowed to execute this command
-			a_Player.SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", a_Message.c_str()));
+			a_Player.SendMessageFailure(fmt::format(FMT_STRING("Forbidden command; insufficient privileges: \"{}\""), a_Message));
 			return true;
 		}
 
@@ -358,8 +358,8 @@ bool cPluginManager::CallHookChat(cPlayer & a_Player, AString & a_Message)
 	{
 		AStringVector Split(StringSplit(a_Message, " "));
 		ASSERT(!Split.empty());  // This should not happen - we know there's at least one char in the message so the split needs to be at least one item long
-		a_Player.SendMessageInfo(Printf("Unknown command: \"%s\"", a_Message.c_str()));
-		LOGINFO("Player %s issued an unknown command: \"%s\"", a_Player.GetName().c_str(), a_Message.c_str());
+		a_Player.SendMessageInfo(fmt::format(FMT_STRING("Unknown command: \"{}\""), a_Message));
+		LOGINFO("Player %s issued an unknown command: \"%s\"", a_Player.GetName(), a_Message);
 		return true;  // Cancel sending
 	}
 

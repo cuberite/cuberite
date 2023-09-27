@@ -149,6 +149,29 @@ void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
+	if (m_EMState != CHASING)
+	{
+		cMonster * EndermiteFound = GetMonsterOfTypeInSight(mtEndermite, 64);
+		if (EndermiteFound != nullptr)
+		{
+			SetTarget(EndermiteFound);
+			m_EMState = CHASING;
+			m_bIsScreaming = true;
+		}
+	}
+	else
+	{
+		const auto Target = GetTarget();
+		if (Target != nullptr)
+		{
+			if (!Target->IsTicking())
+			{
+				m_EMState = IDLE;
+				m_bIsScreaming = false;
+			}
+		}
+	}
+
 	PREPARE_REL_AND_CHUNK(GetPosition().Floor(), a_Chunk);
 	if (!RelSuccess)
 	{

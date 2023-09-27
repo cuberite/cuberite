@@ -666,7 +666,7 @@ unsigned cFile::GetLastModificationTime(const AString & a_FileName)
 
 
 
-AString cFile::GetPathSeparator(void)
+AString cFile::GetPathSeparator()
 {
 	#ifdef _WIN32
 		return "\\";
@@ -679,7 +679,7 @@ AString cFile::GetPathSeparator(void)
 
 
 
-AString cFile::GetExecutableExt(void)
+AString cFile::GetExecutableExt()
 {
 	#ifdef _WIN32
 		return ".exe";
@@ -692,18 +692,7 @@ AString cFile::GetExecutableExt(void)
 
 
 
-int cFile::vPrintf(const char * a_Format, fmt::printf_args a_ArgList)
-{
-	fmt::memory_buffer Buffer;
-	fmt::vprintf(Buffer, fmt::to_string_view(a_Format), a_ArgList);
-	return Write(Buffer.data(), Buffer.size());
-}
-
-
-
-
-
-void cFile::Flush(void)
+void cFile::Flush()
 {
 	fflush(m_File);
 }

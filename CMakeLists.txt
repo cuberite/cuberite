@@ -33,13 +33,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# The need for speed (in Release):
-if(WHOLE_PROGRAM_OPTIMISATION)
-	include(CheckIPOSupported)
-	check_ipo_supported(RESULT IPO_SUPPORTED)
-	set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ${IPO_SUPPORTED})
-endif()
-
 # Static CRT:
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
@@ -97,6 +90,17 @@ if(SELF_TEST)
 	message(STATUS "Tests enabled")
 	enable_testing()
 	add_subdirectory(tests)
+endif()
+
+# The need for speed (in Release):
+if(WHOLE_PROGRAM_OPTIMISATION)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_CHECK_OUTPUT)
+    if(IPO_SUPPORTED)
+        set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    else()
+        message(WARNING "IPO is not supported: ${IPO_CHECK_OUTPUT}")
+    endif()
 endif()
 
 emit_fixups()

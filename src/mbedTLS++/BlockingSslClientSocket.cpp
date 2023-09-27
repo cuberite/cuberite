@@ -137,7 +137,7 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 
 	if (ret != 0)
 	{
-		Printf(m_LastErrorText, "SSL initialization failed: -0x%x", -ret);
+		m_LastErrorText = fmt::format(FMT_STRING("SSL initialization failed: -0x{:x}"), -ret);
 		return false;
 	}
 
@@ -150,7 +150,7 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 	ret = m_Ssl.Handshake();
 	if (ret != 0)
 	{
-		Printf(m_LastErrorText, "SSL handshake failed: -0x%x", -ret);
+		m_LastErrorText = fmt::format(FMT_STRING("SSL handshake failed: -0x{:x}"), -ret);
 		return false;
 	}
 
@@ -169,8 +169,8 @@ void cBlockingSslClientSocket::SetExpectedPeerName(AString a_ExpectedPeerName)
 	if (!m_ExpectedPeerName.empty())
 	{
 		LOGWARNING(
-			"SSL: Trying to set multiple expected peer names, only the last one will be used. Name: %s",
-			a_ExpectedPeerName.c_str()
+			"SSL: Trying to set multiple expected peer names, only the last one will be used. %s overwriting the previous %s",
+			a_ExpectedPeerName, m_ExpectedPeerName
 		);
 	}
 
@@ -216,7 +216,7 @@ bool cBlockingSslClientSocket::Send(const void * a_Data, size_t a_NumBytes)
 		{
 			ASSERT(res != MBEDTLS_ERR_SSL_WANT_READ);   // This should never happen with callback-based SSL
 			ASSERT(res != MBEDTLS_ERR_SSL_WANT_WRITE);  // This should never happen with callback-based SSL
-			Printf(m_LastErrorText, "Data cannot be written to SSL context: -0x%x", -res);
+			m_LastErrorText = fmt::format(FMT_STRING("Data cannot be written to SSL context: -0x{:x}"), -res);
 			return false;
 		}
 		else
@@ -241,7 +241,7 @@ int cBlockingSslClientSocket::Receive(void * a_Data, size_t a_MaxBytes)
 	int res = m_Ssl.ReadPlain(a_Data, a_MaxBytes);
 	if (res < 0)
 	{
-		Printf(m_LastErrorText, "Data cannot be read form SSL context: -0x%x", -res);
+		m_LastErrorText = fmt::format(FMT_STRING("Data cannot be read from SSL context: -0x{:x}"), -res);
 	}
 	return res;
 }
@@ -250,7 +250,7 @@ int cBlockingSslClientSocket::Receive(void * a_Data, size_t a_MaxBytes)
 
 
 
-void cBlockingSslClientSocket::Disconnect(void)
+void cBlockingSslClientSocket::Disconnect()
 {
 	// Ignore if not connected
 	if (!m_IsConnected)

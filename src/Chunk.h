@@ -452,6 +452,8 @@ public:
 		return cChunkDef::RelativeToAbsolute(a_RelBlockPosition, {m_PosX, m_PosZ});
 	}
 
+	/** Returns true if slimes should spawn in the chunk. */
+	bool IsSlimeChunk() const;
 
 private:
 

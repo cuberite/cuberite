@@ -166,13 +166,13 @@ bool cSinglePieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaL
 	auto Structures = StringSplitAndTrim(a_Prefabs, "|");
 	for (const auto & S: Structures)
 	{
-		auto FileName = Printf("Prefabs%cSinglePieceStructures%c%s.cubeset", cFile::PathSeparator(), cFile::PathSeparator(), S.c_str());
+		auto FileName = fmt::format(FMT_STRING("Prefabs{0}SinglePieceStructures{0}{1}.cubeset"), cFile::PathSeparator(), S);
 		if (!cFile::IsFile(FileName))
 		{
 			FileName.append(".gz");
 			if (!cFile::IsFile(FileName))
 			{
-				LOGWARNING("Cannot load SinglePieceStructure cubeset file %s", FileName.c_str());
+				LOGWARNING("Cannot load SinglePieceStructure cubeset file %s", FileName);
 				continue;
 			}
 		}
@@ -187,7 +187,7 @@ bool cSinglePieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaL
 	// Report a warning if no generators available:
 	if (m_Gens.empty())
 	{
-		LOGWARNING("The PieceStructures generator was asked to generate \"%s\", but none of the prefabs are valid.", a_Prefabs.c_str());
+		LOGWARNING("The PieceStructures generator was asked to generate \"%s\", but none of the prefabs are valid.", a_Prefabs);
 		return false;
 	}
 	return true;

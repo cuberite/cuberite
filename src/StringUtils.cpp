@@ -52,42 +52,6 @@ static unsigned char HexToDec(char a_HexChar)
 
 
 
-AString & vPrintf(AString & a_String, const char * a_Format, fmt::printf_args a_ArgList)
-{
-	ASSERT(a_Format != nullptr);
-	fmt::memory_buffer Buffer;  // Save a string allocation compared to vsprintf
-	fmt::vprintf(Buffer, fmt::to_string_view(a_Format), a_ArgList);
-	a_String.assign(Buffer.data(), Buffer.size());
-	return a_String;
-}
-
-
-
-
-
-AString vPrintf(const char * a_Format, fmt::printf_args a_ArgList)
-{
-	ASSERT(a_Format != nullptr);
-	return fmt::vsprintf(a_Format, a_ArgList);
-}
-
-
-
-
-
-AString & vAppendPrintf(AString & a_String, const char * a_Format, fmt::printf_args a_ArgList)
-{
-	ASSERT(a_Format != nullptr);
-	fmt::memory_buffer Buffer;
-	fmt::vprintf(Buffer, fmt::to_string_view(a_Format), a_ArgList);
-	a_String.append(Buffer.data(), Buffer.size());
-	return a_String;
-}
-
-
-
-
-
 AStringVector StringSplit(const AString & str, const AString & delim)
 {
 	AStringVector results;

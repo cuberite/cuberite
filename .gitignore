@@ -46,6 +46,8 @@ GPUCache
 *.cbp
 ## KDevelop
 *.kdev*
+## Vim
+.cache/
 
 # world inside source
 ChunkWorx.ini
@@ -126,3 +128,6 @@ run-clang-tidy.py
 
 # ctags output
 tags
+
+# mac things
+.DS_Store
