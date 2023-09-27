@@ -459,14 +459,14 @@ bool cByteBuffer::ReadVarInt32(UInt32 & a_Value)
 	CheckValid();
 	UInt32 Value = 0;
 	std::size_t Shift = 0;
-	unsigned char ReadByte = 0;
+	unsigned char CurrentByte = 0;
 	do
 	{
 		NEEDBYTES(1);
-		ReadBuf(&ReadByte, 1);
-		Value |= ((static_cast<UInt32>(ReadByte & VarInt::SEGMENT_BITS)) << Shift);
+		ReadBuf(&CurrentByte, 1);
+		Value |= ((static_cast<UInt32>(CurrentByte & VarInt::SEGMENT_BITS)) << Shift);
 		Shift += VarInt::MOVE_BITS;
-	} while ((ReadByte & VarInt::CONTINUE_BIT) != 0);
+	} while ((CurrentByte & VarInt::CONTINUE_BIT) != 0);
 	a_Value = Value;
 	return true;
 }
