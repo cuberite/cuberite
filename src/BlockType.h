@@ -273,7 +273,7 @@ enum ENUM_BLOCK_TYPE : BLOCKTYPE
 	E_BLOCK_STRUCTURE_BLOCK = 255,
 
 	// Keep these two as the last values. Update the last block value to the last block with an id less than 255 when adding another block
-	// IsValidBlock() depends on this (255 gets checked additionally because there is a gap. See https://minecraft.gamepedia.com/Data_values#Block_IDs
+	// IsValidBlock() depends on this (255 gets checked additionally because there is a gap. See https://minecraft.wiki/w/Data_values#Block_IDs
 	E_BLOCK_NUMBER_OF_TYPES = E_BLOCK_CONCRETE_POWDER + 1,  ///< Number of individual (different) blocktypes
 	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
 
@@ -1130,6 +1130,7 @@ enum ENUM_ITEM_META : short
 	E_META_SPAWN_EGG_WITHER           = 64,
 	E_META_SPAWN_EGG_BAT              = 65,
 	E_META_SPAWN_EGG_WITCH            = 66,
+	E_META_SPAWN_EGG_ENDERMITE        = 67,
 	E_META_SPAWN_EGG_GUARDIAN         = 68,
 	E_META_SPAWN_EGG_PIG              = 90,
 	E_META_SPAWN_EGG_SHEEP            = 91,

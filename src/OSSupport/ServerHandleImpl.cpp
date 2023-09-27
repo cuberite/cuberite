@@ -141,7 +141,9 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		if (!ServerHandleImplHelper::IsValidSocket(MainSock))
 		{
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
-			Printf(m_ErrorMsg, "Cannot create socket for port %d: %s", a_Port, evutil_socket_error_to_string(m_ErrorCode));
+			m_ErrorMsg = fmt::format(FMT_STRING("Cannot create a server socket for port {}: {} ({})"),
+				a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
+			);
 			return false;
 		}
 
@@ -149,10 +151,10 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		if (evutil_make_listen_socket_reuseable(MainSock) != 0)
 		{
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
-			Printf(m_ErrorMsg, "Port %d cannot be made reusable: %d (%s). Restarting the server might not work.",
+			m_ErrorMsg = fmt::format(FMT_STRING("Port {} cannot be made reusable: {} ({}). Restarting the server might not work."),
 				a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
 			);
-			LOG("%s", m_ErrorMsg.c_str());
+			LOG("%s", m_ErrorMsg);
 		}
 
 		// Bind to all interfaces:
@@ -163,7 +165,9 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		if (bind(MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
 		{
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
-			Printf(m_ErrorMsg, "Cannot bind IPv4 socket to port %d: %s", a_Port, evutil_socket_error_to_string(m_ErrorCode));
+			m_ErrorMsg = fmt::format(FMT_STRING("Cannot bind IPv4 socket to port {}: {} ({})"),
+				a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
+			);
 			evutil_closesocket(MainSock);
 			return false;
 		}
@@ -185,10 +189,10 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		if (evutil_make_listen_socket_reuseable(MainSock) != 0)
 		{
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
-			Printf(m_ErrorMsg, "Port %d cannot be made reusable: %d (%s). Restarting the server might not work.",
+			m_ErrorMsg = fmt::format(FMT_STRING("Port {} cannot be made reusable: {} ({}). Restarting the server might not work."),
 				a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
 			);
-			LOG("%s", m_ErrorMsg.c_str());
+			LOG("%s", m_ErrorMsg);
 		}
 
 		// Bind to all interfaces:
@@ -199,7 +203,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		if (bind(MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
 		{
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
-			Printf(m_ErrorMsg, "Cannot bind IPv6 socket to port %d: %d (%s)", a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode));
+			m_ErrorMsg = fmt::format(FMT_STRING("Cannot bind IPv6 socket to port {}: {} ({})"), a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode));
 			evutil_closesocket(MainSock);
 			return false;
 		}
@@ -207,14 +211,14 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	if (evutil_make_socket_nonblocking(MainSock) != 0)
 	{
 		m_ErrorCode = EVUTIL_SOCKET_ERROR();
-		Printf(m_ErrorMsg, "Cannot make socket on port %d non-blocking: %d (%s)", a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode));
+		m_ErrorMsg = fmt::format(FMT_STRING("Cannot make socket on port {} non-blocking: {} ({})"), a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode));
 		evutil_closesocket(MainSock);
 		return false;
 	}
 	if (listen(MainSock, SOMAXCONN) != 0)
 	{
 		m_ErrorCode = EVUTIL_SOCKET_ERROR();
-		Printf(m_ErrorMsg, "Cannot listen on port %d: %d (%s)", a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode));
+		m_ErrorMsg = fmt::format(FMT_STRING("Cannot listen on port {}: {} ({})"), a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode));
 		evutil_closesocket(MainSock);
 		return false;
 	}
@@ -241,10 +245,10 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	if (evutil_make_listen_socket_reuseable(SecondSock) != 0)
 	{
 		m_ErrorCode = EVUTIL_SOCKET_ERROR();
-		Printf(m_ErrorMsg, "Port %d cannot be made reusable (second socket): %d (%s). Restarting the server might not work.",
+		m_ErrorMsg = fmt::format(FMT_STRING("Port {} cannot be made reusable (second socket): {} ({}). Restarting the server might not work."),
 			a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
 		);
-		LOG("%s", m_ErrorMsg.c_str());
+		LOG("%s", m_ErrorMsg);
 	}
 
 	// Make the secondary socket nonblocking:

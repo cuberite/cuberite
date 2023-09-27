@@ -119,7 +119,7 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 
 	// Save in XY cuts:
 	cFile f1;
-	if (f1.Open(Printf("%s_XY (%zu).grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
+	if (f1.Open(fmt::format(FMT_STRING("{}_XY ({}).grab"), a_FileNameBase, a_SizeX), cFile::fmWrite))
 	{
 		for (size_t z = 0; z < a_SizeZ; z++)
 		{
@@ -140,7 +140,7 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 	}  // if (XY file open)
 
 	cFile f2;
-	if (f2.Open(Printf("%s_XZ (%zu).grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
+	if (f2.Open(fmt::format(FMT_STRING("{}_XZ ({}).grab"), a_FileNameBase, a_SizeX), cFile::fmWrite))
 	{
 		for (size_t y = 0; y < a_SizeY; y++)
 		{
@@ -171,7 +171,7 @@ void Debug2DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 	ASSERT(a_SizeX <= BUF_SIZE);  // Just stretch it, if needed
 
 	cFile f1;
-	if (f1.Open(Printf("%s (%zu).grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
+	if (f1.Open(fmt::format(FMT_STRING("{} ({}).grab"), a_FileNameBase, a_SizeX), cFile::fmWrite))
 	{
 		for (size_t y = 0; y < a_SizeY; y++)
 		{

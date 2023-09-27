@@ -22,7 +22,7 @@ static void verifyChunkDescHeightmap(const cChunkDesc & a_ChunkDesc)
 				if (BlockType != E_BLOCK_AIR)
 				{
 					int Height = a_ChunkDesc.GetHeight(x, z);
-					TEST_EQUAL_MSG(Height, y, Printf("Chunk height at <%d, %d>: exp %d, got %d", x, z, y, Height));
+					TEST_EQUAL_MSG(Height, y, fmt::format(FMT_STRING("Chunk height at <{}, {}>: exp {}, got {}"), x, z, y, Height));
 					break;
 				}
 			}  // for y
@@ -99,7 +99,7 @@ static void testGenerateOverworld(cChunkGenerator & aDefaultOverworldGen)
 		{
 			for (int z = 0; z < cChunkDef::Width; ++z)
 			{
-				TEST_EQUAL_MSG(chd.GetBlockType(x, 0, z), E_BLOCK_BEDROCK, Printf("Bedrock floor at {%d, 0, %d}", x, z));
+				TEST_EQUAL_MSG(chd.GetBlockType(x, 0, z), E_BLOCK_BEDROCK, fmt::format(FMT_STRING("Bedrock floor at {{{}, {}, {}}}"), x, 0, z));
 			}
 		}
 
@@ -124,12 +124,12 @@ static void testGenerateOverworld(cChunkGenerator & aDefaultOverworldGen)
 				auto y = chd.GetHeight(x, z);
 				auto blockType = chd.GetBlockType(x, y, z);
 				TEST_EQUAL_MSG(validOverworldBlockTypes.count(blockType), 1,
-					Printf("Block at {%d, %d, %d}: %d", x, y, z, blockType)
+					fmt::format(FMT_STRING("Block at {{{}, {}, {}}}: {}"), x, y, z, blockType)
 				);
 				if (y < cChunkDef::Height - 1)
 				{
 					TEST_EQUAL_MSG(chd.GetBlockType(x, cChunkDef::Height - 1, z), E_BLOCK_AIR,
-						Printf("Air at {%d, %d, %d}", x, cChunkDef::Height - 1, z)
+						fmt::format(FMT_STRING("Air at {{{}, {}, {}}}"), x, cChunkDef::Height - 1, z)
 					);
 				}
 			}
@@ -163,7 +163,7 @@ static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 		{
 			for (int z = 0; z < cChunkDef::Width; ++z)
 			{
-				TEST_EQUAL_MSG(chd.GetBiome(x, z), biNether, Printf("Nether biome at {%d, %d}", x, z));
+				TEST_EQUAL_MSG(chd.GetBiome(x, z), biNether, fmt::format(FMT_STRING("Nether biome at <{}, {}>"), x, z));
 			}
 		}
 
@@ -173,7 +173,7 @@ static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 		{
 			for (int z = 0; z < cChunkDef::Width; ++z)
 			{
-				TEST_EQUAL_MSG(chd.GetBlockType(x, 0, z), E_BLOCK_BEDROCK, Printf("Bedrock floor at {%d, 0, %d}", x, z));
+				TEST_EQUAL_MSG(chd.GetBlockType(x, 0, z), E_BLOCK_BEDROCK, fmt::format(FMT_STRING("Bedrock floor at {{{}, {}, {}}}"), x, 0, z));
 				auto y = chd.GetHeight(x, z);
 				auto topBlockType = chd.GetBlockType(x, y, z);
 				// Skip the mushrooms generated on the top bedrock layer:
@@ -184,12 +184,13 @@ static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 				{
 					y -= 1;
 				}
-				TEST_EQUAL_MSG(y, prevHeight, Printf("Failed: Same height across the entire chunk, at {%d, %d}: exp %d, got %d; top block: %d",
+				TEST_EQUAL_MSG(y, prevHeight, fmt::format(
+					FMT_STRING("Failed: Same height across the entire chunk, at <{}, {}>: exp {}, got {}; top block: {}"),
 					x, z, prevHeight, y, chd.GetBlockType(x, y, z)
 				));
 				auto blockType = chd.GetBlockType(x, y, z);
 				TEST_EQUAL_MSG(blockType, E_BLOCK_BEDROCK,
-					Printf("Bedrock ceiling at {%d, %d, %d}: %d", x, y, z, blockType)
+					fmt::format(FMT_STRING("Bedrock ceiling at {{{}, {}, {}}}: {}"), x, y, z, blockType)
 				);
 			}
 		}
@@ -218,7 +219,7 @@ static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 				if (!hasSuitableBlockType)
 				{
 					printChunkColumn(chd, x, z);
-					TEST_FAIL(Printf("!hasSuitableBlockType at column {%d, %d} of chunk [%d, 0]", x, z, chunkX));
+					TEST_FAIL(fmt::format(FMT_STRING("!hasSuitableBlockType at column <{}, {}> of chunk [{}, 0]"), x, z, chunkX));
 				}
 			}
 		}
@@ -263,7 +264,7 @@ static void checkChunkChecksums(
 		*/
 		auto checksum = chunkSHA1(chd);
 		TEST_EQUAL_MSG(checksum, coords.mChecksum,
-			Printf("%s chunk %s SHA1: expected %s, got %s", aDimension, coords.mCoords.ToString(), coords.mChecksum, checksum)
+			fmt::format(FMT_STRING("{} chunk {} SHA1: expected {}, got {}"), aDimension, coords.mCoords.ToString(), coords.mChecksum, checksum)
 		);
 	}
 }

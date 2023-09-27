@@ -845,7 +845,7 @@ void cChunk::TickBlocks(void)
 	m_BlockToTick = cChunkDef::IndexToCoordinate(Random.RandInt<size_t>(cChunkDef::NumBlocks - 1));
 
 	// Choose a number of blocks for each section to randomly tick.
-	// http://minecraft.fandom.com/wiki/Tick#Random_tick
+	// http://minecraft.wiki/w/Tick#Random_tick
 	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 	{
 		const auto & Section = m_BlockData.GetSection(Y);
@@ -895,7 +895,7 @@ void cChunk::ApplyWeatherToTop()
 	if (GetBlockLight(X, Height, Z) > 10)
 	{
 		// Snow only generates on blocks with a block light level of 10 or less.
-		// Ref: https://minecraft.gamepedia.com/Snow_(layer)#Snowfall
+		// Ref: https://minecraft.wiki/w/Snow_(layer)#Snowfall
 		return;
 	}
 
@@ -1979,4 +1979,13 @@ NIBBLETYPE cChunk::GetTimeAlteredLight(NIBBLETYPE a_Skylight) const
 	a_Skylight -= m_World->GetSkyDarkness();
 	// Because NIBBLETYPE is unsigned, we clamp it to 0 .. 15 by checking for values above 15
 	return (a_Skylight < 16)? a_Skylight : 0;
+}
+
+
+
+
+
+bool cChunk::IsSlimeChunk() const
+{
+	return m_World->IsSlimeChunk(m_PosX, m_PosZ);
 }

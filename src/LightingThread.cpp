@@ -245,7 +245,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	// DEBUG: Save chunk data with highlighted seeds for visual inspection:
 	cFile f4;
 	if (
-		f4.Open(Printf("Chunk_%d_%d_seeds.grab", a_Item.m_ChunkX, a_Item.m_ChunkZ), cFile::fmWrite)
+		f4.Open(fmt::format(FMT_STRING("Chunk_{}_{}_seeds.grab"), a_Item.m_ChunkX, a_Item.m_ChunkZ), cFile::fmWrite)
 	)
 	{
 		for (int z = 0; z < cChunkDef::Width * 3; z++)
@@ -273,9 +273,9 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	// DEBUG: Save XY slices of the chunk data and lighting for visual inspection:
 	cFile f1, f2, f3;
 	if (
-		f1.Open(Printf("Chunk_%d_%d_data.grab",  a_Item.m_ChunkX, a_Item.m_ChunkZ), cFile::fmWrite) &&
-		f2.Open(Printf("Chunk_%d_%d_sky.grab",   a_Item.m_ChunkX, a_Item.m_ChunkZ), cFile::fmWrite) &&
-		f3.Open(Printf("Chunk_%d_%d_glow.grab",  a_Item.m_ChunkX, a_Item.m_ChunkZ), cFile::fmWrite)
+		f1.Open(fmt::format(FMT_STRING("Chunk_{}_{}_data.grab"), a_Item.m_ChunkX, a_Item.m_ChunkZ), cFile::fmWrite) &&
+		f2.Open(fmt::format(FMT_STRING("Chunk_{}_{}_sky.grab"),  a_Item.m_ChunkX, a_Item.m_ChunkZ), cFile::fmWrite) &&
+		f3.Open(fmt::format(FMT_STRING("Chunk_{}_{}_glow.grab"), a_Item.m_ChunkX, a_Item.m_ChunkZ), cFile::fmWrite)
 	)
 	{
 		for (int z = 0; z < cChunkDef::Width * 3; z++)

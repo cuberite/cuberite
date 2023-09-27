@@ -220,7 +220,10 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 					(!cBlockInfo::IsTransparent(BlockBelow)) ||
 					(a_DisableSolidBelowCheck)) &&
 				(
-					(a_RelPos.y <= 40) ||
+					(
+						(a_RelPos.y <= 40) &&
+						a_Chunk->IsSlimeChunk()
+					) ||
 					(
 						(a_Biome == biSwampland) &&
 						(a_RelPos.y >= 50) &&

@@ -51,10 +51,12 @@ public:
 	/** Returns true if the object has been initialized properly. */
 	bool IsValid(void) const { return m_IsValid; }
 
-	/** Sets the SSL peer name expected for this context. Must be called after Initialize().
+	/** Sets the SSL peer name expected for this context.
+	This is used both for TLS SNI and for certificate validation.
+	Must be called after Initialize().
 	\param a_ExpectedPeerName CommonName that we expect the SSL peer to have in its cert,
 	if it is different, the verification will fail. An empty string will disable the CN check. */
-	void SetExpectedPeerName(const AString & a_ExpectedPeerName);
+	void SetExpectedPeerName(const std::string_view a_ExpectedPeerName);
 
 	/** Writes data to be encrypted and sent to the SSL peer. Will perform SSL handshake, if needed.
 	Returns the number of bytes actually written, or mbedTLS error code.

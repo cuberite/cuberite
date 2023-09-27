@@ -410,7 +410,7 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeH
 
 	// TODO: Turn sponge next to lava into stone
 
-	// a_Lake.SaveToSchematicFile(Printf("Lake_%d_%d.schematic", a_ChunkX, a_ChunkZ));
+	// a_Lake.SaveToSchematicFile(fmt::format(FMT_STRING("Lake_{}_{}.schematic"), a_ChunkX, a_ChunkZ));
 }
 
 

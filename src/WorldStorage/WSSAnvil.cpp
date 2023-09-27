@@ -1,8 +1,3 @@
-
-// WSSAnvil.cpp
-
-// Implements the cWSSAnvil class representing the Anvil world storage scheme
-
 #include "Globals.h"
 #include "WSSAnvil.h"
 #include "NBTChunkSerializer.h"
@@ -85,13 +80,12 @@ Since only the header is actually in the memory, this number can be high, but st
 ////////////////////////////////////////////////////////////////////////////////
 // cWSSAnvil:
 
-cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
+cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor):
 	Super(a_World),
 	m_Compressor(a_CompressionFactor)
 {
 	// Create a level.dat file for mapping tools, if it doesn't already exist:
-	AString fnam;
-	Printf(fnam, "%s%clevel.dat", a_World->GetDataPath().c_str(), cFile::PathSeparator());
+	auto fnam = fmt::format(FMT_STRING("{}{}level.dat"), a_World->GetDataPath(), cFile::PathSeparator());
 	if (!cFile::Exists(fnam))
 	{
 		cFastNBTWriter Writer;
@@ -129,10 +123,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 cWSSAnvil::~cWSSAnvil()
 {
 	cCSLock Lock(m_CS);
-	for (cMCAFiles::iterator itr = m_Files.begin(); itr != m_Files.end(); ++itr)
-	{
-		delete *itr;
-	}  // for itr - m_Files[]
+	m_Files.clear();
 }
 
 
@@ -179,11 +170,10 @@ bool cWSSAnvil::SaveChunk(const cChunkCoords & a_Chunk)
 
 
 
-void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Reason, const ContiguousByteBufferView a_ChunkDataToSave)
+void cWSSAnvil::ChunkLoadFailed(const cChunkCoords a_ChunkCoords, const AString & a_Reason, const ContiguousByteBufferView a_ChunkDataToSave)
 {
 	// Construct the filename for offloading:
-	AString OffloadFileName;
-	Printf(OffloadFileName, "%s%cregion%cbadchunks", m_World->GetDataPath().c_str(), cFile::PathSeparator(), cFile::PathSeparator());
+	auto OffloadFileName = fmt::format(FMT_STRING("{0}{1}region{1}badchunks"), m_World->GetDataPath(), cFile::PathSeparator());
 	cFile::CreateFolder(OffloadFileName);
 	auto t = time(nullptr);
 	struct tm stm;
@@ -192,24 +182,26 @@ void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Re
 	#else
 		localtime_r(&t, &stm);
 	#endif
-	AppendPrintf(OffloadFileName, "%cch.%d.%d.%d-%02d-%02d-%02d-%02d-%02d.dat",
-		cFile::PathSeparator(), a_ChunkX, a_ChunkZ,
+	OffloadFileName.append(fmt::format(
+		FMT_STRING("{}ch.{}.{}.{}-{:02d}-{:02d}-{:02d}-{:02d}-{:02d}.dat"),
+		cFile::PathSeparator(), a_ChunkCoords.m_ChunkX, a_ChunkCoords.m_ChunkZ,
 		stm.tm_year + 1900, stm.tm_mon + 1, stm.tm_mday, stm.tm_hour, stm.tm_min, stm.tm_sec
-	);
+	));
 
 	// Log the warning to console:
-	const int RegionX = FAST_FLOOR_DIV(a_ChunkX, 32);
-	const int RegionZ = FAST_FLOOR_DIV(a_ChunkZ, 32);
-	AString Info = Printf("Loading chunk [%d, %d] for world %s from file r.%d.%d.mca failed: %s Offloading old chunk data to file %s and regenerating chunk.",
-		a_ChunkX, a_ChunkZ, m_World->GetName().c_str(), RegionX, RegionZ, a_Reason.c_str(), OffloadFileName.c_str()
+	const int RegionX = FAST_FLOOR_DIV(a_ChunkCoords.m_ChunkX, 32);
+	const int RegionZ = FAST_FLOOR_DIV(a_ChunkCoords.m_ChunkZ, 32);
+	auto Info = fmt::format(
+		FMT_STRING("Loading chunk {} for world {} from file r.{}.{}.mca failed: {} Offloading old chunk data to file {} and regenerating chunk."),
+		a_ChunkCoords, m_World->GetName(), RegionX, RegionZ, a_Reason, OffloadFileName
 	);
-	LOGWARNING("%s", Info.c_str());
+	LOGWARNING("%s", Info);
 
 	// Write the data:
 	cFile f;
 	if (!f.Open(OffloadFileName, cFile::fmWrite))
 	{
-		LOGWARNING("Cannot open file %s for writing! Old chunk data is lost.", OffloadFileName.c_str());
+		LOGWARNING("Cannot open file %s for writing! Old chunk data is lost.", OffloadFileName);
 		return;
 	}
 	f.Write(a_ChunkDataToSave.data(), a_ChunkDataToSave.size());
@@ -218,7 +210,7 @@ void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Re
 	// Write a description file:
 	if (!f.Open(OffloadFileName + ".info", cFile::fmWrite))
 	{
-		LOGWARNING("Cannot open file %s.info for writing! The information about the failed chunk will not be written.", OffloadFileName.c_str());
+		LOGWARNING("Cannot open file %s.info for writing! The information about the failed chunk will not be written.", OffloadFileName);
 		return;
 	}
 	f.Write(Info.c_str(), Info.size());
@@ -232,7 +224,7 @@ void cWSSAnvil::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ, const AString & a_Re
 bool cWSSAnvil::GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer & a_Data)
 {
 	cCSLock Lock(m_CS);
-	cMCAFile * File = LoadMCAFile(a_Chunk);
+	auto File = LoadMCAFile(a_Chunk);
 	if (File == nullptr)
 	{
 		return false;
@@ -247,7 +239,7 @@ bool cWSSAnvil::GetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBuffer 
 bool cWSSAnvil::SetChunkData(const cChunkCoords & a_Chunk, const ContiguousByteBufferView a_Data)
 {
 	cCSLock Lock(m_CS);
-	cMCAFile * File = LoadMCAFile(a_Chunk);
+	auto File = LoadMCAFile(a_Chunk);
 	if (File == nullptr)
 	{
 		return false;
@@ -259,7 +251,7 @@ bool cWSSAnvil::SetChunkData(const cChunkCoords & a_Chunk, const ContiguousByteB
 
 
 
-cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
+std::shared_ptr<cWSSAnvil::cMCAFile> cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 {
 	// ASSUME m_CS is locked
 	ASSERT(m_CS.IsLocked());
@@ -272,12 +264,12 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	ASSERT(a_Chunk.m_ChunkZ - RegionZ * 32 < 32);
 
 	// Is it already cached?
-	for (cMCAFiles::iterator itr = m_Files.begin(); itr != m_Files.end(); ++itr)
+	for (auto itr = m_Files.begin(); itr != m_Files.end(); ++itr)
 	{
 		if (((*itr) != nullptr) && ((*itr)->GetRegionX() == RegionX) && ((*itr)->GetRegionZ() == RegionZ))
 		{
 			// Move the file to front and return it:
-			cMCAFile * f = *itr;
+			auto f = *itr;
 			if (itr != m_Files.begin())
 			{
 				m_Files.erase(itr);
@@ -288,11 +280,10 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	}
 
 	// Load it anew:
-	AString FileName;
-	Printf(FileName, "%s%cregion", m_World->GetDataPath().c_str(), cFile::PathSeparator());
+	auto FileName = fmt::format(FMT_STRING("{}{}region"), m_World->GetDataPath(), cFile::PathSeparator());
 	cFile::CreateFolder(FileName);
-	AppendPrintf(FileName, "/r.%d.%d.mca", RegionX, RegionZ);
-	cMCAFile * f = new cMCAFile(*this, FileName, RegionX, RegionZ);
+	FileName.append(fmt::format(FMT_STRING("/r.{}.{}.mca"), RegionX, RegionZ));
+	auto f = std::make_shared<cMCAFile>(*this, FileName, RegionX, RegionZ);
 	if (f == nullptr)
 	{
 		return nullptr;
@@ -302,7 +293,6 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	// If there are too many MCA files cached, delete the last one used:
 	if (m_Files.size() > MAX_MCA_FILES)
 	{
-		delete m_Files.back();
 		m_Files.pop_back();
 	}
 	return f;
@@ -330,7 +320,7 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const Contiguous
 	}
 	catch (const std::exception & Oops)
 	{
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Oops.what(), a_Data);
+		ChunkLoadFailed(a_Chunk, Oops.what(), a_Data);
 		return false;
 	}
 }
@@ -360,21 +350,21 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	int Level = a_NBT.FindChildByName(0, "Level");
 	if (Level < 0)
 	{
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing NBT tag: Level", a_RawChunkData);
+		ChunkLoadFailed(a_Chunk, "Missing NBT tag: Level", a_RawChunkData);
 		return false;
 	}
 
 	int Sections = a_NBT.FindChildByName(Level, "Sections");
 	if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
 	{
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing NBT tag: Sections", a_RawChunkData);
+		ChunkLoadFailed(a_Chunk, "Missing NBT tag: Sections", a_RawChunkData);
 		return false;
 	}
 
 	eTagType SectionsType = a_NBT.GetChildrenType(Sections);
 	if ((SectionsType != TAG_Compound) && (SectionsType != TAG_End))
 	{
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT tag has wrong type: Sections", a_RawChunkData);
+		ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Sections", a_RawChunkData);
 		return false;
 	}
 	for (int Child = a_NBT.GetFirstChild(Sections); Child >= 0; Child = a_NBT.GetNextSibling(Child))
@@ -382,14 +372,14 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		const int SectionYTag = a_NBT.FindChildByName(Child, "Y");
 		if ((SectionYTag < 0) || (a_NBT.GetType(SectionYTag) != TAG_Byte))
 		{
-			ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT tag missing or has wrong: Y", a_RawChunkData);
+			ChunkLoadFailed(a_Chunk, "NBT tag missing or has wrong: Y", a_RawChunkData);
 			return false;
 		}
 
 		const int Y = a_NBT.GetByte(SectionYTag);
 		if ((Y < 0) || (Y > static_cast<int>(cChunkDef::NumSections - 1)))
 		{
-			ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "NBT tag exceeds chunk bounds: Y", a_RawChunkData);
+			ChunkLoadFailed(a_Chunk, "NBT tag exceeds chunk bounds: Y", a_RawChunkData);
 			return false;
 		}
 
@@ -405,7 +395,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		}
 		else
 		{
-			ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing chunk block/light data", a_RawChunkData);
+			ChunkLoadFailed(a_Chunk, "Missing chunk block/light data", a_RawChunkData);
 			return false;
 		}
 	}  // for itr - LevelSections[]
@@ -413,15 +403,14 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	// Load the biomes from NBT, if present and valid:
 	if (!LoadBiomeMapFromNBT(Data.BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "Biomes")))
 	{
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing chunk biome data", a_RawChunkData);
+		ChunkLoadFailed(a_Chunk, "Missing chunk biome data", a_RawChunkData);
 		return false;
 	}
 
-	// Height map too:
+	// Load the Height map, if it fails, recalculate it:
 	if (!LoadHeightMapFromNBT(Data.HeightMap, a_NBT, a_NBT.FindChildByName(Level, "HeightMap")))
 	{
-		ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing chunk height data", a_RawChunkData);
-		return false;
+		Data.UpdateHeightMap();
 	}
 
 	// Load the entities from NBT:
@@ -3984,21 +3973,21 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, ContiguousB
 	UInt32 ChunkSize = 0;
 	if (m_File.Read(&ChunkSize, 4) != 4)
 	{
-		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk size", {});
+		m_ParentSchema.ChunkLoadFailed(a_Chunk, "Cannot read chunk size", {});
 		return false;
 	}
 	ChunkSize = ntohl(ChunkSize);
 	if (ChunkSize < 1)
 	{
 		// Chunk size too small
-		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Chunk size too small", {});
+		m_ParentSchema.ChunkLoadFailed(a_Chunk, "Chunk size too small", {});
 		return false;
 	}
 
 	char CompressionType = 0;
 	if (m_File.Read(&CompressionType, 1) != 1)
 	{
-		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read chunk compression", {});
+		m_ParentSchema.ChunkLoadFailed(a_Chunk, "Cannot read chunk compression", {});
 		return false;
 	}
 	ChunkSize--;
@@ -4006,14 +3995,14 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, ContiguousB
 	a_Data = m_File.Read(ChunkSize);
 	if (a_Data.size() != ChunkSize)
 	{
-		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Cannot read entire chunk data", a_Data);
+		m_ParentSchema.ChunkLoadFailed(a_Chunk, "Cannot read entire chunk data", a_Data);
 		return false;
 	}
 
 	if (CompressionType != 2)
 	{
 		// Chunk is in an unknown compression
-		m_ParentSchema.ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Printf("Unknown chunk compression: %d", CompressionType), a_Data);
+		m_ParentSchema.ChunkLoadFailed(a_Chunk, fmt::format(FMT_STRING("Unknown chunk compression: {}"), CompressionType), a_Data);
 		return false;
 	}
 	return true;

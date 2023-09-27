@@ -162,7 +162,7 @@ void cHTTPMessageParser::HeadersFinished(void)
 	m_TransferEncodingParser = cTransferEncodingParser::Create(*this, m_TransferEncoding, m_ContentLength);
 	if (m_TransferEncodingParser == nullptr)
 	{
-		OnError(Printf("Unknown transfer encoding: %s", m_TransferEncoding.c_str()));
+		OnError(fmt::format(FMT_STRING("Unknown transfer encoding: {}"), m_TransferEncoding));
 		return;
 	}
 }
@@ -179,7 +179,7 @@ void cHTTPMessageParser::OnHeaderLine(const AString & a_Key, const AString & a_V
 	{
 		if (!StringToInteger(a_Value, m_ContentLength))
 		{
-			OnError(Printf("Invalid content length header value: \"%s\"", a_Value.c_str()));
+			OnError(fmt::format(FMT_STRING("Invalid content length header value: \"{}\""), a_Value));
 		}
 		return;
 	}
