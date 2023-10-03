@@ -22,6 +22,7 @@ target_sources(
 	MobHeadEntity.cpp
 	MobSpawnerEntity.cpp
 	NoteEntity.cpp
+	ShulkerBoxEntity.cpp
 	SignEntity.cpp
 
 	BannerEntity.h
@@ -45,5 +46,6 @@ target_sources(
 	MobHeadEntity.h
 	MobSpawnerEntity.h
 	NoteEntity.h
+	ShulkerBoxEntity.h
 	SignEntity.h
 )

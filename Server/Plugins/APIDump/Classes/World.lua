@@ -1144,6 +1144,35 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "If there is the player with the uuid, calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found.",
 			},
+			DoWithShulkerBoxAt =
+			{
+				Params =
+				{
+					{
+						Name = "BlockX",
+						Type = "number",
+					},
+					{
+						Name = "BlockY",
+						Type = "number",
+					},
+					{
+						Name = "BlockZ",
+						Type = "number",
+					},
+					{
+						Name = "CallbackFunction",
+						Type = "function",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "If there is a shulker box at the specified coords, calls the CallbackFunction with the {{cShulkerBoxEntity}} parameter representing the shulker box. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cShulkerBoxEntity|ShulkerBoxEntity}})</pre> The function returns false if there is no shulker box, or if there is, it returns the bool value that the callback has returned.",
+			},
 			DropBlockAsPickups =
 			{
 				Params =
@@ -1436,6 +1465,31 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					},
 				},
 				Notes = "Calls the specified callback for each player in the loaded world. Returns true if all the players have been processed (including when there are zero players), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The callback should return false or no value to continue with the next player, or true to abort the enumeration.",
+			},
+			ForEachShulkerBoxInChunk =
+			{
+				Params =
+				{
+					{
+						Name = "ChunkX",
+						Type = "number",
+					},
+					{
+						Name = "ChunkZ",
+						Type = "number",
+					},
+					{
+						Name = "CallbackFunction",
+						Type = "function",
+					},
+				},
+				Returns =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Calls the specified callback for each shulker box in the chunk. Returns true if all shulker boxes in the chunk have been processed (including when there are zero shulker boxes), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cShulkerBoxEntity|ShulkerBoxEntity}})</pre> The callback should return false or no value to continue with the next shulker box, or true to abort the enumeration.",
 			},
 			GenerateChunk =
 			{

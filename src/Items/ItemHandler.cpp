@@ -73,6 +73,7 @@
 #include "ItemSapling.h"
 #include "ItemSeeds.h"
 #include "ItemShears.h"
+#include "ItemShulkerBox.h"
 #include "ItemShovel.h"
 #include "ItemSideways.h"
 #include "ItemSign.h"
