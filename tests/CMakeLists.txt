@@ -2,6 +2,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "COVERAGE")
 	setup_target_for_coverage("${PROJECT_NAME}_coverage" "ctest" coverage)
 endif()
 
+cmake_minimum_required(VERSION 3.14)
+
 include(FetchContent)
 FetchContent_Declare(
 		googletest
