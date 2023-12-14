@@ -2,6 +2,16 @@ if (CMAKE_BUILD_TYPE STREQUAL "COVERAGE")
 	setup_target_for_coverage("${PROJECT_NAME}_coverage" "ctest" coverage)
 endif()
 
+include(FetchContent)
+FetchContent_Declare(
+		googletest
+		URL https://github.com/google/googletest/archive/refs/heads/main.zip
+)
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+include(GoogleTest)
+
 add_compile_definitions(TEST_GLOBALS)
 
 add_subdirectory(BlockTypeRegistry)
