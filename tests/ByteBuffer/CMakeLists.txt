@@ -18,7 +18,7 @@ set (SRCS
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 add_executable(ByteBufferTest ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(ByteBufferTest fmt::fmt GTest::gtest_main)
+target_link_libraries(ByteBufferTest fmt::fmt gtest gmock gtest_main)
 if (WIN32)
 	target_link_libraries(ByteBufferTest ws2_32)
 endif()
