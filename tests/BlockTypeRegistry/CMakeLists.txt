@@ -65,10 +65,10 @@ file (COPY
 
 # Define individual tests:
 
-add_test(NAME BlockStateTest        COMMAND BlockStateTest)
-add_test(NAME BlockTypeRegistryTest COMMAND BlockTypeRegistryTest)
-add_test(NAME BlockTypePaletteTest  COMMAND BlockTypePaletteTest)
-add_test(NAME PalettedBlockAreaTest COMMAND PalettedBlockAreaTest)
+add_test_executable(BlockStateTest)
+add_test_executable(BlockTypeRegistryTest)
+add_test_executable(BlockTypePaletteTest)
+add_test_executable(PalettedBlockAreaTest)
 
 
 

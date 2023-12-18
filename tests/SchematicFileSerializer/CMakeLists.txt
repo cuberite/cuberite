@@ -68,15 +68,17 @@ endif()
 
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
-add_executable(SchematicFileSerializer-exe ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(SchematicFileSerializer-exe fmt::fmt libdeflate)
-add_test(NAME SchematicFileSerializer-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND SchematicFileSerializer-exe)
+add_executable(SchematicFileSerializerTest ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
+target_link_libraries(SchematicFileSerializerTest fmt::fmt libdeflate)
+
+set_property(GLOBAL APPEND PROPERTY TEST_TARGETS SchematicFileSerializerTest)
+add_test(NAME SchematicFileSerializerTest WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND SchematicFileSerializerTest)
 
 
 
 
 # Put the projects into solution folders (MSVC):
 set_target_properties(
-	SchematicFileSerializer-exe
+	SchematicFileSerializerTest
 	PROPERTIES FOLDER Tests
 )

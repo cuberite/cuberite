@@ -66,6 +66,8 @@ target_link_libraries(UrlClientTest-exe HTTP fmt::fmt)
 
 
 
+set_property(GLOBAL APPEND PROPERTY TEST_TARGETS HTTPMessageParser_file-exe)
+set_property(GLOBAL APPEND PROPERTY TEST_TARGETS UrlClientTest-exe)
 # Define individual tests:
 
 # Test parsing the response file in 2-byte chunks (should go from response line parsing through headers parsing to body parsing, each within a different step):
