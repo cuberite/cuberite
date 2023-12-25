@@ -20,7 +20,7 @@ set (SRCS
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 add_executable(BoundingBoxTest ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(BBoundingBoxTest fmt::fmt gtest gmock gtest_main)
+target_link_libraries(BoundingBoxTest fmt::fmt gtest gmock gtest_main)
 add_test_executable(BoundingBoxTest)
 
 

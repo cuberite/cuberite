@@ -4,6 +4,7 @@
 
 cmake_minimum_required (VERSION 3.13)
 cmake_policy(VERSION 3.13...3.17.2)
+set(CMAKE_CONFIGURATION_TYPES ${CMAKE_CONFIGURATION_TYPES} "; Coverage")
 project(
 	Cuberite
 	DESCRIPTION "A lightweight, fast and extensible game server for Minecraft"

@@ -343,18 +343,20 @@ public:
 	}
 
 
-	inline static void PackNibble(NIBBLETYPE * const a_Buffer, const size_t a_Index, const NIBBLETYPE a_Nibble)
+    template<typename T>
+	inline static void PackNibble(T * const a_Buffer, const size_t a_Index, const T a_Nibble)
 	{
 		ASSERT((a_Nibble & 0xF) == a_Nibble);  // Only the lower bits should be set
 
-		a_Buffer[a_Index / 2] = static_cast<NIBBLETYPE>(
+		a_Buffer[a_Index / 2] = static_cast<T>(
 			(a_Buffer[a_Index / 2] & (0xf0 >> ((a_Index & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((a_Index & 1) * 4))  // The nibble being set
 		);
 	}
 
 
-	inline static NIBBLETYPE ExpandNibble(const NIBBLETYPE * const a_Buffer, const size_t a_Index)
+    template<typename T>
+	inline static T ExpandNibble(const T * const a_Buffer, const size_t a_Index)
 	{
 		return (a_Buffer[a_Index / 2] >> ((a_Index & 1) * 4)) & 0x0f;
 	}

@@ -2,30 +2,30 @@ include_directories(${PROJECT_SOURCE_DIR}/src/)
 
 add_library(ChunkBuffer ${PROJECT_SOURCE_DIR}/src/ChunkData.cpp ${PROJECT_SOURCE_DIR}/src/StringUtils.cpp)
 
-target_link_libraries(ChunkBuffer PUBLIC fmt::fmt)
+target_link_libraries(ChunkBuffer PUBLIC fmt::fmt gtest gmock gtest_main)
 
-add_executable(creatable-test Creatable.cpp)
-target_link_libraries(creatable-test ChunkBuffer)
-add_test_executable(creatable-test)
+add_executable(TestCreatable Creatable.cpp)
+target_link_libraries(TestCreatable ChunkBuffer)
+add_test_executable(TestCreatable)
 
-add_executable(coordinates-test Coordinates.cpp)
-target_link_libraries(coordinates-test ChunkBuffer)
-add_test_executable(coordinates-test)
+add_executable(TestCoordinates Coordinates.cpp)
+target_link_libraries(TestCoordinates ChunkBuffer)
+add_test_executable(TestCoordinates)
 
-add_executable(copies-test Copies.cpp)
-target_link_libraries(copies-test ChunkBuffer)
-add_test_executable(copies-test)
+add_executable(TestCopies Copies.cpp)
+target_link_libraries(TestCopies ChunkBuffer)
+add_test_executable(TestCopies)
 
-add_executable(arraystocoords-test ArraytoCoord.cpp)
-target_link_libraries(arraystocoords-test ChunkBuffer)
-add_test_executable(arraystocoords-test)
+add_executable(TestArrayToCoord ArraytoCoord.cpp)
+target_link_libraries(TestArrayToCoord ChunkBuffer)
+add_test_executable(TestArrayToCoord)
 
 # Put all test projects into a separate folder:
 set_target_properties(
-	arraystocoords-test
-	coordinates-test
-	copies-test
-	creatable-test
+	TestArrayToCoord
+	TestCoordinates
+	TestCopies
+	TestCreatable
 	PROPERTIES FOLDER Tests/ChunkData
 )
 set_target_properties(

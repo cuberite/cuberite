@@ -19,12 +19,13 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_GetProperties(googletest)
 
 if(NOT googletest_POPULATED)
+	message(STATUS "Downloading googletest")
 	FetchContent_Populate(googletest)
-	add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 endif()
 
-find_package(GoogleTest)
-include(GoogleTest)
+add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
+find_package(googletest)
+include(googletest)
 
 add_compile_definitions(TEST_GLOBALS)
 
@@ -34,6 +35,8 @@ function(add_test_executable name)
 	set_property(GLOBAL APPEND PROPERTY TEST_TARGETS ${name})
 	add_test(NAME ${name} COMMAND ${name})
 endfunction()
+
+message(STATUS "Test Setup finished, collecting Tests")
 
 add_subdirectory(BlockTypeRegistry)
 message(STATUS "Test targets: ${TEST_TARGETS}")
@@ -54,7 +57,6 @@ get_property(TEST_TARGETS GLOBAL PROPERTY TEST_TARGETS)
 
 add_custom_target(
 	ALL_TESTS
-	COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
 	DEPENDS
 	${TEST_TARGETS}
 )
