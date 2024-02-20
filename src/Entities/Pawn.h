@@ -94,6 +94,8 @@ public:
 	Details at: https://minecraft.wiki/w/Enderman#Teleportation. */
 	static bool FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, Vector3i a_Centre, const int a_HalfCubeWidth);
 
+	void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
+
 	// tolua_end
 
 protected:

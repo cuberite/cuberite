@@ -722,3 +722,10 @@ bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired
 	Vector3i MaxCorner(a_Centre.x + a_HalfCubeWidth, a_Centre.y + a_HalfCubeWidth, a_Centre.z + a_HalfCubeWidth);
 	return FindTeleportDestination(a_World, a_HeightRequired, a_NumTries, a_Destination, MinCorner, MaxCorner);
 }
+
+
+void cPawn::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
+{
+	m_LastGroundHeight = GetPosY();
+	cEntity::TeleportToCoords(a_PosX, a_PosY, a_PosZ);
+}
