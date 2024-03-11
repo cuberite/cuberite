@@ -6,7 +6,10 @@
 #include "Globals.h"
 #include "LuaState.h"
 
-#include "lua/src/lualib.h"
+extern "C"
+{
+	#include "lua/src/lualib.h"
+}
 
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
@@ -32,7 +35,10 @@
 
 
 // fwd: "SQLite/lsqlite3.cpp"
-int luaopen_lsqlite3(lua_State * L);
+extern "C"
+{
+	int luaopen_lsqlite3(lua_State * L);
+}
 
 // fwd: "LuaExpat/lxplib.cpp":
 int luaopen_lxp(lua_State * L);
