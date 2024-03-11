@@ -2,6 +2,11 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "DeprecatedBindings.h"
+extern "C"
+{
+	#include "lua/src/lua.h"
+	#include "lua/src/lauxlib.h"
+}
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
 

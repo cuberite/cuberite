@@ -30,7 +30,10 @@ stays valid but doesn't call into Lua code anymore, returning false for "failure
 
 #pragma once
 
-#include "lua/src/lauxlib.h"
+extern "C"
+{
+	#include "lua/src/lauxlib.h"
+}
 
 #include "../Defines.h"
 #include "../FunctionRef.h"
