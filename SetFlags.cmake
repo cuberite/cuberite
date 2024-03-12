@@ -202,5 +202,11 @@ function(set_exe_flags TARGET)
 				-Wno-reserved-identifier
 			)
 		endif()
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16)
+			target_compile_options(
+				${TARGET} PRIVATE
+				-Wno-unsafe-buffer-usage
+			)
+		endif()
 	endif()
 endfunction()
