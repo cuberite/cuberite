@@ -10,6 +10,21 @@
 namespace
 {
 
+
+
+
+
+// When under debugger, set timeouts to practically "never" so that there's time to step through the code:
+#ifdef NDEBUG
+	static const UInt32 TIMEOUT = 10000;  // 10 seconds
+#else
+	static const UInt32 TIMEOUT = 0xffffffff;  // ~4.3M seconds / ~49 days
+#endif
+
+
+
+
+
 /** Track number of cCallbacks instances alive. */
 std::atomic<int> g_ActiveCallbacks{ 0 };
 
@@ -143,6 +158,25 @@ namespace TrustedCAs
 	// The root cert used by github.com
 	static const char GithubCom[] =
 		"-----BEGIN CERTIFICATE-----\n"
+		"MIICjzCCAhWgAwIBAgIQXIuZxVqUxdJxVt7NiYDMJjAKBggqhkjOPQQDAzCBiDEL\n"
+		"MAkGA1UEBhMCVVMxEzARBgNVBAgTCk5ldyBKZXJzZXkxFDASBgNVBAcTC0plcnNl\n"
+		"eSBDaXR5MR4wHAYDVQQKExVUaGUgVVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNVBAMT\n"
+		"JVVTRVJUcnVzdCBFQ0MgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMTAwMjAx\n"
+		"MDAwMDAwWhcNMzgwMTE4MjM1OTU5WjCBiDELMAkGA1UEBhMCVVMxEzARBgNVBAgT\n"
+		"Ck5ldyBKZXJzZXkxFDASBgNVBAcTC0plcnNleSBDaXR5MR4wHAYDVQQKExVUaGUg\n"
+		"VVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNVBAMTJVVTRVJUcnVzdCBFQ0MgQ2VydGlm\n"
+		"aWNhdGlvbiBBdXRob3JpdHkwdjAQBgcqhkjOPQIBBgUrgQQAIgNiAAQarFRaqflo\n"
+		"I+d61SRvU8Za2EurxtW20eZzca7dnNYMYf3boIkDuAUU7FfO7l0/4iGzzvfUinng\n"
+		"o4N+LZfQYcTxmdwlkWOrfzCjtHDix6EznPO/LlxTsV+zfTJ/ijTjeXmjQjBAMB0G\n"
+		"A1UdDgQWBBQ64QmG1M8ZwpZ2dEl23OA1xmNjmjAOBgNVHQ8BAf8EBAMCAQYwDwYD\n"
+		"VR0TAQH/BAUwAwEB/zAKBggqhkjOPQQDAwNoADBlAjA2Z6EWCNzklwBBHU6+4WMB\n"
+		"zzuqQhFkoJ2UOQIReVx7Hfpkue4WQrO/isIJxOzksU0CMQDpKmFHjFJKS04YcPbW\n"
+		"RNZu9YO6bVi9JNlWSOrvxKJGgYhqOkbRqZtNyWHa0V1Xahg=\n"
+		"-----END CERTIFICATE-----\n";
+
+	// The root cert used by github.com in the past (no longer used)
+	static const char GithubComOld[] =
+		"-----BEGIN CERTIFICATE-----\n"
 		"MIIEFzCCAv+gAwIBAgIQB/LzXIeod6967+lHmTUlvTANBgkqhkiG9w0BAQwFADBh\n"
 		"MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\n"
 		"d3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBD\n"
@@ -208,7 +242,7 @@ namespace TrustedCAs
 
 int TestRequest1()
 {
-	LOG("Running test 1");
+	LOG("Running test 1 - fetch http://github.com without redirects");
 	auto evtFinished = std::make_shared<cEvent>();
 	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
@@ -216,7 +250,7 @@ int TestRequest1()
 	auto res = cUrlClient::Get("http://github.com", std::move(callbacks), AStringMap(), AString(), std::move(options));
 	if (res.first)
 	{
-		if (!evtFinished->Wait(10000))
+		if (!evtFinished->Wait(TIMEOUT))
 		{
 			LOG("Aborting the wait for response; failing the test.");
 			return 1;
@@ -236,13 +270,13 @@ int TestRequest1()
 
 int TestRequest2()
 {
-	LOG("Running test 2");
+	LOG("Running test 2 - default fetch http://github.com");
 	auto evtFinished = std::make_shared<cEvent>();
 	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	auto res = cUrlClient::Get("http://github.com", std::move(callbacks));
 	if (res.first)
 	{
-		if (!evtFinished->Wait(10000))
+		if (!evtFinished->Wait(TIMEOUT))
 		{
 			LOG("Aborting the wait for response; failing the test.");
 			return 1;
@@ -262,7 +296,7 @@ int TestRequest2()
 
 int TestRequest3()
 {
-	LOG("Running test 3");
+	LOG("Running test 3 - fetch https://github.com without redirects");
 	auto evtFinished = std::make_shared<cEvent>();
 	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
@@ -270,7 +304,7 @@ int TestRequest3()
 	auto res = cUrlClient::Get("https://github.com", std::move(callbacks), AStringMap(), AString(), std::move(options));
 	if (res.first)
 	{
-		if (!evtFinished->Wait(10000))
+		if (!evtFinished->Wait(TIMEOUT))
 		{
 			LOG("Aborting the wait for response; failing the test.");
 			return 1;
@@ -290,7 +324,7 @@ int TestRequest3()
 
 int TestRequest4()
 {
-	LOG("Running test 4");
+	LOG("Running test 4 - fetch https://github.com with GitHub trusted root CA");
 	auto evtFinished = std::make_shared<cEvent>();
 	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
@@ -298,7 +332,7 @@ int TestRequest4()
 	auto res = cUrlClient::Get("https://github.com", std::move(callbacks), {}, {}, options);
 	if (res.first)
 	{
-		if (!evtFinished->Wait(10000))
+		if (!evtFinished->Wait(TIMEOUT))
 		{
 			LOG("Aborting the wait for response; failing the test.");
 			return 1;
@@ -318,7 +352,7 @@ int TestRequest4()
 
 int TestRequest5()
 {
-	LOG("Running test 5");
+	LOG("Running test 5 - fetch https://cuberite.org with Cuberite trusted root CA");
 	auto evtFinished = std::make_shared<cEvent>();
 	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
@@ -326,7 +360,7 @@ int TestRequest5()
 	auto res = cUrlClient::Get("https://cuberite.org", std::move(callbacks), {}, {}, options);
 	if (res.first)
 	{
-		if (!evtFinished->Wait(10000))
+		if (!evtFinished->Wait(TIMEOUT))
 		{
 			LOG("Aborting the wait for response; failing the test.");
 			return 1;
@@ -346,7 +380,7 @@ int TestRequest5()
 
 int TestRequest6()
 {
-	LOG("Running test 6");
+	LOG("Running test 6 - fetch https://sessionserver.mojang.com with Mojang trusted root CA");
 	auto evtFinished = std::make_shared<cEvent>();
 	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
@@ -354,7 +388,7 @@ int TestRequest6()
 	auto res = cUrlClient::Get("https://sessionserver.mojang.com", std::move(callbacks), {}, {}, options);
 	if (res.first)
 	{
-		if (!evtFinished->Wait(10000))
+		if (!evtFinished->Wait(TIMEOUT))
 		{
 			LOG("Aborting the wait for response; failing the test.");
 			return 1;
@@ -374,7 +408,7 @@ int TestRequest6()
 
 int TestRequest7()
 {
-	LOG("Running test 7");
+	LOG("Running test 7 - fetch https://api.mojang.com with Mojang trusted root CA");
 	auto evtFinished = std::make_shared<cEvent>();
 	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
@@ -382,7 +416,7 @@ int TestRequest7()
 	auto res = cUrlClient::Get("https://api.mojang.com", std::move(callbacks), {}, {}, options);
 	if (res.first)
 	{
-		if (!evtFinished->Wait(10000))
+		if (!evtFinished->Wait(TIMEOUT))
 		{
 			LOG("Aborting the wait for response; failing the test.");
 			return 1;
@@ -402,7 +436,7 @@ int TestRequest7()
 
 int TestRequest8()
 {
-	LOG("Running test 8");
+	LOG("Running test 8 - fetch https://api.mojang.com with GitHub trusted root CA (testing CA verification rejection)");
 	auto evtFinished = std::make_shared<cEvent>();
 	auto callbacks = std::make_unique<cCallbacks>(evtFinished);
 	AStringMap options;
