@@ -193,6 +193,13 @@ SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES
 
 
 
+# Enable "-rdynamic" on Linux, so that external Lua modules can import Lua API symbols from the main executable:
+# ( https://stackoverflow.com/questions/24015025/resolving-symbols-in-shared-object-to-executable )
+if (NOT WIN32)
+	target_link_options(${CMAKE_PROJECT_NAME} PRIVATE "-rdynamic")
+endif()
+
+
 MACRO(TO_NATIVE_PATH PATH OUT)
 	FILE(TO_NATIVE_PATH "${PATH}" "${OUT}")
 	IF(MINGW)
