@@ -14,6 +14,7 @@ target_sources(
 	FurnaceWindow.cpp
 	HopperWindow.cpp
 	HorseWindow.cpp
+	ShulkerBoxWindow.cpp
 	InventoryWindow.cpp
 
 	SlotArea.h
@@ -29,6 +30,7 @@ target_sources(
 	FurnaceWindow.h
 	HopperWindow.h
 	HorseWindow.h
+	ShulkerBoxWindow.h
 	InventoryWindow.h
 	MinecartWithChestWindow.h
 	WindowOwner.h
