@@ -25,3 +25,5 @@ target_sources(
 	WSSAnvil.h
 	WorldStorage.h
 )
+
+add_subdirectory(WSSAnvilVersions)

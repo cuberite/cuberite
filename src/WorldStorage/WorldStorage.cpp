@@ -21,13 +21,14 @@ class cWSSForgetful :
 	public cWSSchema
 {
 public:
-	cWSSForgetful(cWorld * a_World) : cWSSchema(a_World) {}
+
+	using cWSSchema::cWSSchema;
 
 protected:
 	// cWSSchema overrides:
-	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override {return false; }
-	virtual bool SaveChunk(const cChunkCoords & a_Chunk) override {return true; }
-	virtual const AString GetName(void) const override {return "forgetful"; }
+	bool LoadChunk(const cChunkCoords & a_Chunk) override { return false; }
+	bool SaveChunk(const cChunkCoords & a_Chunk) override { return true; }
+	const AString GetName(void) const override { return "forgetful"; }
 } ;
 
 
@@ -38,22 +39,8 @@ protected:
 // cWorldStorage:
 
 cWorldStorage::cWorldStorage(void) :
-	Super("World Storage Executor"),
-	m_World(nullptr),
-	m_SaveSchema(nullptr)
+	Super("World Storage Executor")
 {
-}
-
-
-
-
-
-cWorldStorage::~cWorldStorage()
-{
-	for (cWSSchemaList::iterator itr = m_Schemas.begin(); itr != m_Schemas.end(); ++itr)
-	{
-		delete *itr;
-	}  // for itr - m_Schemas[]
 }
 
 
@@ -63,8 +50,7 @@ cWorldStorage::~cWorldStorage()
 void cWorldStorage::Initialize(cWorld & a_World, const AString & a_StorageSchemaName, int a_StorageCompressionFactor)
 {
 	m_World = &a_World;
-	m_StorageSchemaName = a_StorageSchemaName;
-	InitSchemas(a_StorageCompressionFactor);
+	InitSchemas(a_StorageCompressionFactor, a_StorageSchemaName);
 }
 
 
@@ -140,8 +126,8 @@ size_t cWorldStorage::GetSaveQueueLength(void)
 
 void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkZ)
 {
-	ASSERT((a_ChunkX > -0x08000000) && (a_ChunkX < 0x08000000));
-	ASSERT((a_ChunkZ > -0x08000000) && (a_ChunkZ < 0x08000000));
+	ASSERT((a_ChunkX > -MAX_CHUNK_COORD) && (a_ChunkX < MAX_CHUNK_COORD));
+	ASSERT((a_ChunkZ > -MAX_CHUNK_COORD) && (a_ChunkZ < MAX_CHUNK_COORD));
 	ASSERT(m_World->IsChunkQueued(a_ChunkX, a_ChunkZ));
 
 	m_LoadQueue.EnqueueItem({ a_ChunkX, a_ChunkZ });
@@ -164,34 +150,35 @@ void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cWorldStorage::InitSchemas(int a_StorageCompressionFactor)
+void cWorldStorage::InitSchemas(int a_StorageCompressionFactor, const AString & a_StorageSchemaName)
 {
 	// The first schema added is considered the default
-	m_Schemas.push_back(new cWSSAnvil    (m_World, a_StorageCompressionFactor));
-	m_Schemas.push_back(new cWSSForgetful(m_World));
-	// Add new schemas here
+	m_Schemas.push_back(std::make_unique<cWSSAnvil>(m_World, a_StorageCompressionFactor));
+	m_Schemas.push_back(std::make_unique<cWSSForgetful>(m_World));
+	// Todo: Add new schemas here
 
-	if (NoCaseCompare(m_StorageSchemaName, "default") == 0)
+	if (NoCaseCompare(a_StorageSchemaName, "default") == 0)
 	{
 		m_SaveSchema = m_Schemas.front();
 		return;
 	}
-	for (cWSSchemaList::iterator itr = m_Schemas.begin(); itr != m_Schemas.end(); ++itr)
+
+	for (const auto & Schema : m_Schemas)
 	{
-		if (NoCaseCompare((*itr)->GetName(), m_StorageSchemaName) == 0)
+		if (NoCaseCompare(Schema->GetName(), a_StorageSchemaName) == 0)
 		{
-			m_SaveSchema = *itr;
+			m_SaveSchema = Schema;
 			return;
 		}
 	}  // for itr - m_Schemas[]
 
 	// Unknown schema selected, let the admin know:
 	LOGWARNING("Unknown storage schema name \"%s\". Using default (\"%s\"). Available schemas:",
-		m_StorageSchemaName.c_str(), m_SaveSchema->GetName().c_str()
+		a_StorageSchemaName.c_str(), m_SaveSchema->GetName().c_str()
 	);
-	for (cWSSchemaList::iterator itr = m_Schemas.begin(); itr != m_Schemas.end(); ++itr)
+	for (const auto & Schema : m_Schemas)
 	{
-		LOGWARNING("\t\"%s\"", (*itr)->GetName().c_str());
+		LOGWARNING("\t\"%s\"", Schema->GetName().c_str());
 	}
 	m_SaveSchema = m_Schemas.front();
 }
@@ -228,8 +215,7 @@ bool cWorldStorage::LoadOneChunk(void)
 {
 	// Dequeue an item, bail out if there's none left:
 	cChunkCoords ToLoad(0, 0);
-	bool ShouldLoad = m_LoadQueue.TryDequeueItem(ToLoad);
-	if (!ShouldLoad)
+	if (!m_LoadQueue.TryDequeueItem(ToLoad))
 	{
 		return false;
 	}
@@ -248,8 +234,7 @@ bool cWorldStorage::SaveOneChunk(void)
 {
 	// Dequeue one chunk to save:
 	cChunkCoords ToSave(0, 0);
-	bool ShouldSave = m_SaveQueue.TryDequeueItem(ToSave);
-	if (!ShouldSave)
+	if (!m_SaveQueue.TryDequeueItem(ToSave))
 	{
 		return false;
 	}
@@ -284,9 +269,9 @@ bool cWorldStorage::LoadChunk(int a_ChunkX, int a_ChunkZ)
 	}
 
 	// If it didn't have the chunk, try all the other schemas:
-	for (cWSSchemaList::iterator itr = m_Schemas.begin(); itr != m_Schemas.end(); ++itr)
+	for (const auto & Schema : m_Schemas)
 	{
-		if (((*itr) != m_SaveSchema) && (*itr)->LoadChunk(Coords))
+		if ((Schema != m_SaveSchema) && Schema->LoadChunk(Coords))
 		{
 			return true;
 		}

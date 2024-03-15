@@ -140,6 +140,77 @@ std::string_view NamespaceSerializer::From(const CustomStatistic a_ID)
 
 
 
+Int32 NamespaceSerializer::From(const eDataVersion a_ID)
+{
+	switch (a_ID)
+	{
+		case eDataVersion::vUnknown:
+		{
+			ASSERT(!"Tried to save unknown data version");
+			return 0;
+		}
+
+		case eDataVersion::v1_8: return 0;
+		case eDataVersion::v1_9_0: return 169;
+		case eDataVersion::v1_9_1: return 175;
+		case eDataVersion::v1_9_2: return 176;
+		case eDataVersion::v1_9_3: return 183;
+		case eDataVersion::v1_9_4: return 184;
+
+		case eDataVersion::v1_10_0: return 510;
+		case eDataVersion::v1_10_1: return 511;
+		case eDataVersion::v1_10_2: return 512;
+
+		case eDataVersion::v1_11_0: return 819;
+		case eDataVersion::v1_11_1: return 921;
+		case eDataVersion::v1_11_2: return 922;
+
+		case eDataVersion::v1_12_0: return 1139;
+		case eDataVersion::v1_12_1: return 1241;
+		case eDataVersion::v1_12_2: return 1343;
+
+		case eDataVersion::v1_13_0: return 1519;
+		case eDataVersion::v1_13_1: return 1628;
+		case eDataVersion::v1_13_2: return 1631;
+
+		case eDataVersion::v1_14_0: return 1952;
+		case eDataVersion::v1_14_1: return 1957;
+		case eDataVersion::v1_14_2: return 1963;
+		case eDataVersion::v1_14_3: return 1968;
+		case eDataVersion::v1_14_4: return 1976;
+
+		case eDataVersion::v1_15_0: return 2225;
+		case eDataVersion::v1_15_1: return 2227;
+		case eDataVersion::v1_15_2: return 2230;
+
+		case eDataVersion::v1_16_0: return 2566;
+		case eDataVersion::v1_16_1: return 2567;
+		case eDataVersion::v1_16_2: return 2578;
+		case eDataVersion::v1_16_3: return 2580;
+		case eDataVersion::v1_16_4: return 2584;
+		case eDataVersion::v1_16_5: return 2586;
+
+		case eDataVersion::v1_17_0: return 2724;
+		case eDataVersion::v1_17_1: return 2730;
+
+		case eDataVersion::v1_18_0: return 2860;
+		case eDataVersion::v1_18_1: return 2865;
+		case eDataVersion::v1_18_2: return 2975;
+
+		case eDataVersion::v1_19_0: return 3105;
+		case eDataVersion::v1_19_1: return 3117;
+		case eDataVersion::v1_19_2: return 3120;
+		case eDataVersion::v1_19_3: return 3218;
+		case eDataVersion::v1_19_4: return 3337;
+	}
+	ASSERT(!"Unhandled data version");
+	return 0;
+}
+
+
+
+
+
 std::string_view NamespaceSerializer::From(const eMonsterType a_ID)
 {
 	switch (a_ID)
@@ -400,6 +471,65 @@ CustomStatistic NamespaceSerializer::ToCustomStatistic(const std::string_view ID
 
 
 
+eDataVersion NamespaceSerializer::ToDataVersion(const Int32 ID)
+{
+	switch (ID)
+	{
+		case 0: return  eDataVersion::v1_8;
+		case 169: return  eDataVersion::v1_9_0;
+		case 175: return  eDataVersion::v1_9_1;
+		case 176: return  eDataVersion::v1_9_2;
+		case 183: return  eDataVersion::v1_9_3;
+		case 184: return  eDataVersion::v1_9_4;
+		case 510: return  eDataVersion::v1_10_0;
+		case 511: return  eDataVersion::v1_10_1;
+		case 512: return  eDataVersion::v1_10_2;
+		case 819: return  eDataVersion::v1_11_0;
+		case 921: return  eDataVersion::v1_11_1;
+		case 922: return  eDataVersion::v1_11_2;
+		case 1139: return  eDataVersion::v1_12_0;
+		case 1241: return  eDataVersion::v1_12_1;
+		case 1343: return  eDataVersion::v1_12_2;
+		case 1519: return  eDataVersion::v1_13_0;
+		case 1628: return  eDataVersion::v1_13_1;
+		case 1631: return  eDataVersion::v1_13_2;
+		case 1952: return  eDataVersion::v1_14_0;
+		case 1957: return  eDataVersion::v1_14_1;
+		case 1963: return  eDataVersion::v1_14_2;
+		case 1968: return  eDataVersion::v1_14_3;
+		case 1976: return  eDataVersion::v1_14_4;
+		case 2225: return  eDataVersion::v1_15_0;
+		case 2227: return  eDataVersion::v1_15_1;
+		case 2230: return  eDataVersion::v1_15_2;
+		case 2566: return  eDataVersion::v1_16_0;
+		case 2567: return  eDataVersion::v1_16_1;
+		case 2578: return  eDataVersion::v1_16_2;
+		case 2580: return  eDataVersion::v1_16_3;
+		case 2584: return  eDataVersion::v1_16_4;
+		case 2586: return  eDataVersion::v1_16_5;
+		case 2724: return  eDataVersion::v1_17_0;
+		case 2730: return  eDataVersion::v1_17_1;
+		case 2860: return  eDataVersion::v1_18_0;
+		case 2865: return  eDataVersion::v1_18_1;
+		case 2975: return  eDataVersion::v1_18_2;
+		case 3105: return  eDataVersion::v1_19_0;
+		case 3117: return  eDataVersion::v1_19_1;
+		case 3120: return  eDataVersion::v1_19_2;
+		case 3218: return  eDataVersion::v1_19_3;
+		case 3337: return  eDataVersion::v1_19_4;
+
+		default:
+		{
+			LOGWARNING("Unknown data version: %d, defaulting to 1.8", ID);
+			return eDataVersion::v1_8;
+		}
+	}
+}
+
+
+
+
+
 std::pair<NamespaceSerializer::Namespace, std::string_view> NamespaceSerializer::SplitNamespacedID(const std::string_view ID)
 {
 	const auto NamespaceIndex = ID.find(':');
@@ -424,6 +554,118 @@ std::pair<NamespaceSerializer::Namespace, std::string_view> NamespaceSerializer:
 	}
 
 	return { Namespace::Unknown, ID };
+}
+
+
+
+
+
+cEntity::eEntityType NamespaceSerializer::ToEntityType(std::string_view a_ID)
+{
+	static const std::unordered_map<std::string_view, cEntity::eEntityType> EntityTypes
+	{
+		{ "boat",                cEntity::etBoat },
+		{ "ender_crystal",       cEntity::etEnderCrystal },
+		{ "falling_block",       cEntity::etFallingBlock },
+		{ "item",                cEntity::etPickup },
+		{ "painting",            cEntity::etPainting },
+		{ "tnt",                 cEntity::etTNT },
+		{ "xp_orb",              cEntity::etExpOrb },
+		{ "item_frame",          cEntity::etItemFrame },
+		{ "leash_knot",          cEntity::etLeashKnot },
+		{ "arrow",               cEntity::etProjectile },
+		{ "potion",              cEntity::etProjectile },
+		{ "snowball",            cEntity::etProjectile },
+		{ "egg",                 cEntity::etProjectile },
+		{ "fireball",            cEntity::etProjectile },
+		{ "small_fireball",      cEntity::etProjectile },
+		{ "ender_pearl",         cEntity::etProjectile },
+
+		{ "chest_minecart",      cEntity::etMinecart },
+		{ "furnace_minecart",    cEntity::etMinecart },
+		{ "tnt_minecart",        cEntity::etMinecart },
+		{ "hopper_minecart",     cEntity::etMinecart },
+		{ "minecart",            cEntity::etMinecart },
+
+		// Legacy IDs:
+		{ "EnderCrystal",        cEntity::etEnderCrystal },
+		{ "FallingBlock",        cEntity::etFallingBlock },
+		{ "Minecart",            cEntity::etMinecart },
+		{ "MinecartChest",       cEntity::etMinecart },
+		{ "MinecartFurnace",     cEntity::etMinecart },
+		{ "MinecartTNT",         cEntity::etMinecart },
+		{ "Boat",                cEntity::etBoat },
+		{ "MinecartHopper",      cEntity::etMinecart },
+		{ "MinecartRideable",    cEntity::etMinecart },
+		{ "Item",                cEntity::etPickup },
+		{ "Painting",            cEntity::etPainting },
+		{ "PrimedTnt",           cEntity::etTNT },
+		{ "XPOrb",               cEntity::etExpOrb },
+		{ "ItemFrame",           cEntity::etItemFrame },
+		{ "LeashKnot",           cEntity::etLeashKnot },
+		{ "Arrow",               cEntity::etProjectile },
+		{ "Egg",                 cEntity::etProjectile },
+		{ "Fireball",            cEntity::etProjectile },
+		{ "SmallFireball",       cEntity::etProjectile },
+		{ "Snowball",            cEntity::etProjectile },
+		{ "SplashPotion",        cEntity::etProjectile },
+		{ "ThrownEnderpearl",    cEntity::etProjectile },
+	};
+
+	return EntityTypes.at(a_ID);
+}
+
+
+
+
+
+cMinecart::ePayload NamespaceSerializer::ToMinecartType(std::string_view a_ID)
+{
+	static const std::unordered_map<std::string_view, cMinecart::ePayload> MinecartPayloads
+	{
+		{ "chest_minecart",   cMinecart::mpChest },
+		{ "furnace_minecart", cMinecart::mpFurnace },
+		{ "tnt_minecart",     cMinecart::mpTNT },
+		{ "hopper_minecart",  cMinecart::mpHopper },
+		{ "minecart",         cMinecart::mpNone },
+
+		{ "MinecartChest",    cMinecart::mpChest },
+		{ "MinecartFurnace",  cMinecart::mpFurnace },
+		{ "MinecartTNT",      cMinecart::mpTNT },
+		{ "MinecartHopper",   cMinecart::mpHopper },
+		{ "Minecart",         cMinecart::mpNone },
+		{ "MinecartRideable", cMinecart::mpNone },
+	};
+
+	return MinecartPayloads.at(a_ID);
+}
+
+
+
+
+
+cProjectileEntity::eKind NamespaceSerializer::ToProjectileType(std::string_view a_ID)
+{
+	static const std::unordered_map<std::string_view, cProjectileEntity::eKind> ProjectileTypes
+	{
+		{ "arrow",               cProjectileEntity::pkArrow },
+		{ "potion",              cProjectileEntity::pkSplashPotion },
+		{ "snowball",            cProjectileEntity::pkSnowball },
+		{ "egg",                 cProjectileEntity::pkEgg },
+		{ "fireball",            cProjectileEntity::pkGhastFireball },
+		{ "small_fireball",      cProjectileEntity::pkFireCharge },
+		{ "ender_pearl",         cProjectileEntity::pkEnderPearl },
+
+		{ "Arrow",               cProjectileEntity::pkArrow },
+		{ "Egg",                 cProjectileEntity::pkEgg },
+		{ "Fireball",            cProjectileEntity::pkGhastFireball },
+		{ "SmallFireball",       cProjectileEntity::pkFireCharge },
+		{ "Snowball",            cProjectileEntity::pkSnowball },
+		{ "SplashPotion",        cProjectileEntity::pkSplashPotion },
+		{ "ThrownEnderpearl",    cProjectileEntity::pkEnderPearl },
+	};
+
+	return ProjectileTypes.at(a_ID);
 }
 
 

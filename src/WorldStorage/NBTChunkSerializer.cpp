@@ -1188,6 +1188,7 @@ public:
 void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter)
 {
 	SerializerCollector serializer(aWriter);
+	aWriter.AddInt("DataVersion", NamespaceSerializer::From(SAVE_DATA_VERSION));
 	aWriter.BeginCompound("Level");
 	aWriter.AddInt("xPos", aCoords.m_ChunkX);
 	aWriter.AddInt("zPos", aCoords.m_ChunkZ);

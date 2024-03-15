@@ -6,5 +6,6 @@ target_sources(
 	BlockStates.h
 	BlockTypes.h
 	CustomStatistics.h
+	DataVersion.h
 	Items.h
 )
