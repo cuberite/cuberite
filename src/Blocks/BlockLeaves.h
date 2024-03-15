@@ -3,6 +3,7 @@
 #include "../FastRandom.h"
 #include "../BlockArea.h"
 
+#include "../Registries/BlockItemConverter.h"
 
 
 
@@ -22,6 +23,85 @@ class cBlockLeavesHandler final :
 public:
 
 	using Super::Super;
+
+	static inline bool IsBlockLeaves(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaLeaves:
+			case BlockType::BirchLeaves:
+			case BlockType::DarkOakLeaves:
+			case BlockType::JungleLeaves:
+			case BlockType::OakLeaves:
+			case BlockType::SpruceLeaves:
+				return true;
+			default: return false;
+		}
+	}
+
+	/** Returns the distance to the next block. If the block is not a Leaf this function return 0. Else a value from 1 - 7. */
+	static inline unsigned char GetLeafDistance(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaLeaves:  return AcaciaLeaves::Distance(a_Block);
+			case BlockType::BirchLeaves:   return BirchLeaves::Distance(a_Block);
+			case BlockType::DarkOakLeaves: return DarkOakLeaves::Distance(a_Block);
+			case BlockType::JungleLeaves:  return JungleLeaves::Distance(a_Block);
+			case BlockType::OakLeaves:     return OakLeaves::Distance(a_Block);
+			case BlockType::SpruceLeaves:  return SpruceLeaves::Distance(a_Block);
+			default: return 0;
+		}
+	}
+
+
+	static inline BlockState SetLeaveDistance(BlockState a_Block, unsigned char a_Distance)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaLeaves:  return AcaciaLeaves::AcaciaLeaves   (a_Distance, AcaciaLeaves::Persistent(a_Block));
+			case BlockType::BirchLeaves:   return BirchLeaves::BirchLeaves     (a_Distance, BirchLeaves::Persistent(a_Block));
+			case BlockType::DarkOakLeaves: return DarkOakLeaves::DarkOakLeaves (a_Distance, DarkOakLeaves::Persistent(a_Block));
+			case BlockType::JungleLeaves:  return JungleLeaves::JungleLeaves   (a_Distance, JungleLeaves::Persistent(a_Block));
+			case BlockType::OakLeaves:     return OakLeaves::OakLeaves         (a_Distance, OakLeaves::Persistent(a_Block));
+			case BlockType::SpruceLeaves:  return SpruceLeaves::SpruceLeaves   (a_Distance, SpruceLeaves::Persistent(a_Block));
+			default: return a_Block;
+		}
+	}
+
+	static inline bool IsLeafPersistent(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaLeaves:  return AcaciaLeaves::Persistent(a_Block);
+			case BlockType::BirchLeaves:   return BirchLeaves::Persistent(a_Block);
+			case BlockType::DarkOakLeaves: return DarkOakLeaves::Persistent(a_Block);
+			case BlockType::JungleLeaves:  return JungleLeaves::Persistent(a_Block);
+			case BlockType::OakLeaves:     return OakLeaves::Persistent(a_Block);
+			case BlockType::SpruceLeaves:  return SpruceLeaves::Persistent(a_Block);
+			default: return false;
+		}
+	}
+
+	static inline BlockState SetLeafPersistence(BlockState a_Block, bool a_IsPersistent)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaLeaves:  return AcaciaLeaves::AcaciaLeaves   (AcaciaLeaves::Distance(a_Block),  a_IsPersistent);
+			case BlockType::BirchLeaves:   return BirchLeaves::BirchLeaves     (BirchLeaves::Distance(a_Block),   a_IsPersistent);
+			case BlockType::DarkOakLeaves: return DarkOakLeaves::DarkOakLeaves (DarkOakLeaves::Distance(a_Block), a_IsPersistent);
+			case BlockType::JungleLeaves:  return JungleLeaves::JungleLeaves   (JungleLeaves::Distance(a_Block),  a_IsPersistent);
+			case BlockType::OakLeaves:     return OakLeaves::OakLeaves         (OakLeaves::Distance(a_Block),     a_IsPersistent);
+			case BlockType::SpruceLeaves:  return SpruceLeaves::SpruceLeaves   (SpruceLeaves::Distance(a_Block),  a_IsPersistent);
+			default: return a_Block;
+		}
+	}
+
+
 
 private:
 

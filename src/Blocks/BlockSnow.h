@@ -18,10 +18,7 @@ public:
 
 private:
 
-	enum
-	{
-		FullBlockMeta = 7  // Meta value of a full-height snow block.
-	};
+	static constexpr unsigned char FULL_BLOCK_LAYERS = 0x07;  // Meta value of a full-height snow block.
 
 
 	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
@@ -32,7 +29,7 @@ private:
 		}
 
 		// Special case if a player is holding a (thin) snow block and its size can be increased:
-		if ((a_HeldItem.m_ItemType == E_BLOCK_SNOW) && (a_Meta < FullBlockMeta))
+		if ((a_HeldItem.m_ItemType == E_BLOCK_SNOW) && (a_Meta < FULL_BLOCK_LAYERS))
 		{
 			return !a_ClickedDirectly || (a_ClickedBlockFace == BLOCK_FACE_YP);  // If clicked an adjacent block, or clicked YP directly, we ignore collision.
 		}
@@ -59,7 +56,7 @@ private:
 		else
 		{
 			// Drop as many snowballs as there were "layers" of snow:
-			return cItem(E_ITEM_SNOWBALL, 1 + (a_BlockMeta & 0x07), 0);
+			return cItem(E_ITEM_SNOWBALL, 1 + (a_BlockMeta & FULL_BLOCK_LAYERS), 0);
 		}
 	}
 
@@ -109,7 +106,7 @@ private:
 			cBlockInfo::IsSnowable(a_BlockType) ||
 			(
 				(a_BlockType == E_BLOCK_SNOW) &&
-				(a_BlockMeta == FullBlockMeta)
+				(a_BlockMeta == FULL_BLOCK_LAYERS)
 			)
 		);
 	}

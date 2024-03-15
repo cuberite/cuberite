@@ -16,6 +16,18 @@ public:
 
 	using Super::Super;
 
+	static inline bool IsBlockCommandBlock(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::CommandBlock:
+			case BlockType::ChainCommandBlock:
+			case BlockType::RepeatingCommandBlock:
+				return true;
+			default: return false;
+		}
+	}
+
 private:
 
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override

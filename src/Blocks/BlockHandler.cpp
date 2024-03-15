@@ -1,10 +1,12 @@
 #include "Globals.h"
 
 #include "BlockHandler.h"
-#include "../Item.h"
-#include "../World.h"
-#include "../Chunk.h"
-#include "BlockPluginInterface.h"
+#include "Item.h"
+#include "World.h"
+#include "Chunk.h"
+#include "Blocks/BlockPluginInterface.h"
+
+// Block handlers, please keep in alphabetical order:
 #include "BlockAir.h"
 #include "BlockAnvil.h"
 #include "BlockBanner.h"
@@ -18,12 +20,12 @@
 #include "BlockCarpet.h"
 #include "BlockCauldron.h"
 #include "BlockChest.h"
-#include "BlockCloth.h"
 #include "BlockCobWeb.h"
 #include "BlockCocoaPod.h"
 #include "BlockCommandBlock.h"
 #include "BlockComparator.h"
 #include "BlockConcretePowder.h"
+#include "BlockCraftingTable.h"
 #include "BlockCrops.h"
 #include "BlockDaylightSensor.h"
 #include "BlockDeadBush.h"
@@ -44,22 +46,25 @@
 #include "BlockFluid.h"
 #include "BlockFurnace.h"
 #include "BlockGlass.h"
+#include "BlockGlassPane.h"
 #include "BlockGlazedTerracotta.h"
 #include "BlockGlowstone.h"
 #include "BlockGrass.h"
 #include "BlockGravel.h"
+#include "BlockHayBale.h"
 #include "BlockHopper.h"
 #include "BlockHugeMushroom.h"
 #include "BlockIce.h"
+#include "BlockInfested.h"
 #include "BlockJukebox.h"
 #include "BlockLadder.h"
 #include "BlockLeaves.h"
 #include "BlockLever.h"
 #include "BlockLilypad.h"
+#include "BlockLog.h"
 #include "BlockMelon.h"
 #include "BlockMobHead.h"
 #include "BlockMobSpawner.h"
-#include "BlockInfested.h"
 #include "BlockMushroom.h"
 #include "BlockMycelium.h"
 #include "BlockNetherWart.h"
@@ -70,15 +75,16 @@
 #include "BlockPackedIce.h"
 #include "BlockPiston.h"
 #include "BlockPlanks.h"
+#include "BlockPodzol.h"
 #include "BlockPortal.h"
 #include "BlockPressurePlate.h"
 #include "BlockPumpkin.h"
 #include "BlockQuartz.h"
 #include "BlockRail.h"
-#include "BlockRedstoneWire.h"
 #include "BlockRedstoneLamp.h"
 #include "BlockRedstoneOre.h"
 #include "BlockRedstoneRepeater.h"
+#include "BlockRedstoneWire.h"
 #include "BlockSand.h"
 #include "BlockSapling.h"
 #include "BlockSeaLantern.h"
@@ -100,7 +106,7 @@
 #include "BlockTripwireHook.h"
 #include "BlockVines.h"
 #include "BlockWallSign.h"
-#include "BlockWorkbench.h"
+#include "BlockWool.h"
 
 
 
@@ -442,8 +448,8 @@ namespace
 	constexpr cBlockButtonHandler             BlockWoodenButtonHandler          (E_BLOCK_WOODEN_BUTTON);
 	constexpr cBlockPressurePlateHandler      BlockWoodenPressurePlateHandler   (E_BLOCK_WOODEN_PRESSURE_PLATE);
 	constexpr cBlockSlabHandler               BlockWoodenSlabHandler            (E_BLOCK_WOODEN_SLAB);
-	constexpr cBlockClothHandler              BlockWoolHandler                  (E_BLOCK_WOOL);
-	constexpr cBlockWorkbenchHandler          BlockWorkbenchHandler             (E_BLOCK_WORKBENCH);
+	constexpr cBlockWoolHandler               BlockWoolHandler                  (E_BLOCK_WOOL);
+	constexpr cBlockCraftingTableHandler      BlockWorkbenchHandler             (E_BLOCK_WORKBENCH);
 	constexpr cBlockFlowerHandler             BlockYellowFlowerHandler          (E_BLOCK_YELLOW_FLOWER);
 	constexpr cBlockGlazedTerracottaHandler   BlockYellowGlazedTerracottaHandler(E_BLOCK_YELLOW_GLAZED_TERRACOTTA);
 	constexpr cDefaultBlockHandler            BlockYellowShulkerBoxHandler      (E_BLOCK_YELLOW_SHULKER_BOX);

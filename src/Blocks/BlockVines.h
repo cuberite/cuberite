@@ -3,9 +3,6 @@
 #include "BlockHandler.h"
 
 
-
-
-
 class cBlockVinesHandler final :
 	public cBlockHandler
 {
@@ -15,10 +12,46 @@ public:
 
 	using Super::Super;
 
+	enum class Directions
+	{
+		East = 0,
+		North = 1,
+		South = 2,
+		Up = 3,
+		West = 4
+	};
+
+	static constexpr bool IsAttachedTo(BlockState a_Block, eBlockFace a_Face)
+	{
+		switch (a_Face)
+		{
+			case BLOCK_FACE_XM: return Block::Vine::West(a_Block);
+			case BLOCK_FACE_XP: return Block::Vine::East(a_Block);
+			case BLOCK_FACE_YP: return Block::Vine::Up(a_Block);
+			case BLOCK_FACE_ZM: return Block::Vine::North(a_Block);
+			case BLOCK_FACE_ZP: return Block::Vine::South(a_Block);
+			default: return false;
+		}
+	}
+
+	static constexpr bool OnlyAttachedTo(BlockState a_Block, eBlockFace a_Face)
+	{
+		using namespace Block;
+		switch (a_Face)
+		{
+			case BLOCK_FACE_XM: return (Vine::West(a_Block) &&  !(Vine::East(a_Block) || Vine::Up(a_Block)     || Vine::North(a_Block) || Vine::South(a_Block)));
+			case BLOCK_FACE_XP: return (Vine::East(a_Block) &&  !(Vine::West(a_Block) || Vine::Up(a_Block)     || Vine::North(a_Block) || Vine::South(a_Block)));
+			case BLOCK_FACE_YP: return (Vine::Up(a_Block) &&    !(Vine::East(a_Block) || Vine::West(a_Block)   || Vine::North(a_Block) || Vine::South(a_Block)));
+			case BLOCK_FACE_ZM: return (Vine::North(a_Block) && !(Vine::East(a_Block) || Vine::West(a_Block)   || Vine::Up(a_Block)    || Vine::South(a_Block)));
+			case BLOCK_FACE_ZP: return (Vine::South(a_Block) && !(Vine::East(a_Block) || Vine::West(a_Block)   || Vine::Up(a_Block)    || Vine::North(a_Block)));
+			default: return false;
+		}
+	}
+
 private:
 
-	static const NIBBLETYPE VINE_LOST_SUPPORT = 16;
-	static const NIBBLETYPE VINE_UNCHANGED = 17;
+	static const unsigned char VINE_LOST_SUPPORT = 16;
+	static const unsigned char VINE_UNCHANGED = 17;
 
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
@@ -230,9 +263,29 @@ private:
 
 
 
+	BlockState RotateCCW(BlockState a_Block) const
+	{
+		using namespace Block;
+		return Vine::Vine(Vine::North(a_Block), Vine::West(a_Block), Vine::East(a_Block), Vine::Up(a_Block), Vine::South(a_Block));
+	}
+
+
+
+
+
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const override
 	{
 		return ((a_Meta << 1) | (a_Meta >> 3)) & 0x0f;  // Rotate bits to the left
+	}
+
+
+
+
+
+	BlockState RotateCW(BlockState a_Block) const
+	{
+		using namespace Block;
+		return Vine::Vine(Vine::South(a_Block), Vine::East(a_Block), Vine::West(a_Block), Vine::Up(a_Block), Vine::North(a_Block));
 	}
 
 
@@ -249,10 +302,30 @@ private:
 
 
 
+	BlockState MirrorXY(BlockState a_Block) const
+	{
+		using namespace Block;
+		return Vine::Vine(Vine::West(a_Block), Vine::North(a_Block), Vine::South(a_Block), Vine::Up(a_Block), Vine::East(a_Block));
+	}
+
+
+
+
+
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) const override
 	{
 		// Bits 1 and 3 stay, bits 2 and 4 swap
 		return static_cast<NIBBLETYPE>((a_Meta & 0x05) | ((a_Meta & 0x02) << 2) | ((a_Meta & 0x08) >> 2));
+	}
+
+
+
+
+
+	BlockState MirrorYZ(BlockState a_Block) const
+	{
+		using namespace Block;
+		return Vine::Vine(Vine::East(a_Block), Vine::South(a_Block), Vine::North(a_Block), Vine::Up(a_Block), Vine::West(a_Block));
 	}
 
 
