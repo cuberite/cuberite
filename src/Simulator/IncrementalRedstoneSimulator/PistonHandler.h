@@ -25,6 +25,7 @@ namespace PistonHandler
 		// LOGD("Evaluating pisty the piston (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 
 		const bool ShouldBeExtended = Power != 0;
+		auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk.GetRedstoneSimulatorData());
 		if (ShouldBeExtended == cBlockPistonHandler::IsExtended(a_Meta))
 		{
 			return;
@@ -35,10 +36,18 @@ namespace PistonHandler
 		if (ShouldBeExtended)
 		{
 			cBlockPistonHandler::ExtendPiston(a_Position, *a_Chunk.GetWorld());
+			ChunkData.PistonExtensionWorldTickTime.insert({a_Position, a_Chunk.GetWorld()->GetWorldTickAge()});
 		}
 		else
 		{
-			cBlockPistonHandler::RetractPiston(a_Position, *a_Chunk.GetWorld());
+			auto Result = ChunkData.PistonExtensionWorldTickTime.find(a_Position);
+			bool ShouldPullBlock = true;
+			if (Result == ChunkData.PistonExtensionWorldTickTime.end() || Result->second - a_Chunk.GetWorld()->GetWorldTickAge() > 2_tick)
+			{
+				ShouldPullBlock = false;
+			}
+			cBlockPistonHandler::RetractPiston(a_Position, *a_Chunk.GetWorld(), ShouldPullBlock);
+			ChunkData.PistonExtensionWorldTickTime.erase(a_Position);
 		}
 
 		// It is necessary to delay after a signal to prevent an infinite loop (#3168)
