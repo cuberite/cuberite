@@ -20,7 +20,7 @@ cDropperEntity::cDropperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Ve
 
 
 
-void cDropperEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
+void cDropperEntity::DropSpenseFromSlot(cChunk & a_Chunk, std::size_t a_SlotNum)
 {
 	DropFromSlot(a_Chunk, a_SlotNum);
 }

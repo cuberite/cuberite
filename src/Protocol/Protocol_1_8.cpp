@@ -739,7 +739,7 @@ void cProtocol_1_8_0::SendHealth(void)
 
 
 
-void cProtocol_1_8_0::SendHeldItemChange(int a_ItemIndex)
+void cProtocol_1_8_0::SendHeldItemChange(std::size_t a_ItemIndex)
 {
 	ASSERT((a_ItemIndex >= 0) && (a_ItemIndex <= 8));  // Valid check
 
@@ -763,13 +763,13 @@ void cProtocol_1_8_0::SendHideTitle(void)
 
 
 
-void cProtocol_1_8_0::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
+void cProtocol_1_8_0::SendInventorySlot(char a_WindowID, std::size_t a_SlotNum, const cItem & a_Item)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktInventorySlot);
 	Pkt.WriteBEInt8(a_WindowID);
-	Pkt.WriteBEInt16(a_SlotNum);
+	Pkt.WriteBEInt16((a_SlotNum == ILLEGAL_SLOT_NUMBER) ? -1 : static_cast<Int16>(a_SlotNum));
 	WriteItem(Pkt, a_Item);
 }
 
@@ -2456,7 +2456,7 @@ void cProtocol_1_8_0::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBu
 	{
 		return;
 	}
-	m_Client->HandleCreativeInventory(SlotNum, Item, (SlotNum == -1) ? caLeftClickOutside : caLeftClick);
+	m_Client->HandleCreativeInventory(static_cast<std::size_t>(SlotNum), Item, (SlotNum == -1) ? caLeftClickOutside : caLeftClick);
 }
 
 
@@ -2808,7 +2808,7 @@ void cProtocol_1_8_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 		}
 	}
 
-	m_Client->HandleWindowClick(WindowID, SlotNum, Action, Item);
+	m_Client->HandleWindowClick(WindowID, static_cast<std::size_t>(SlotNum), Action, Item);
 }
 
 
@@ -2901,7 +2901,9 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 	{
 		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, SlotNum);
 
-		m_Client->HandleNPCTrade(SlotNum);
+		ASSERT(SlotNum >= 0);
+
+		m_Client->HandleNPCTrade(static_cast<std::size_t>(SlotNum));
 	}
 }
 

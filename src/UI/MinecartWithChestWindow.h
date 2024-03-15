@@ -34,7 +34,7 @@ public:
 		a_ChestCart->GetWorld()->BroadcastSoundEffect("block.chest.open", a_ChestCart->GetPosition(), 1, 1);
 	}
 
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override
+	virtual void DistributeStack(cItem & a_ItemStack, std::size_t a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override
 	{
 		cSlotAreas AreasInOrder;
 
