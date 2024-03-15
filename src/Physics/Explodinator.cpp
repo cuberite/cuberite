@@ -2,7 +2,6 @@
 #include "Globals.h"
 #include "BlockInfo.h"
 #include "Explodinator.h"
-#include "Blocks/BlockHandler.h"
 #include "Blocks/ChunkInterface.h"
 #include "Chunk.h"
 #include "ClientHandle.h"
@@ -202,12 +201,12 @@ namespace Explodinator
 	}
 
 	/** Applies distance-based damage and knockback to all entities within the explosion's effect range. */
-	static void DamageEntities(const cChunk & a_Chunk, const Vector3f a_Position, const int a_Power)
+	static void DamageEntities(cEntity * a_ExplodingEntity, const cChunk & a_Chunk, const Vector3f a_Position, const int a_Power, const eExplosionSource a_ExplosionSource = esOther)
 	{
 		const auto Radius = a_Power * 2;
 		const auto SquareRadius = Radius * Radius;
 
-		a_Chunk.GetWorld()->ForEachEntityInBox({ a_Position, Radius * 2.f }, [&a_Chunk, a_Position, a_Power, Radius, SquareRadius](cEntity & Entity)
+		a_Chunk.GetWorld()->ForEachEntityInBox({ a_Position, Radius * 2.f }, [a_ExplodingEntity, &a_Chunk, a_Position, a_Power, a_ExplosionSource, Radius, SquareRadius](cEntity & Entity)
 		{
 			// Percentage of rays unobstructed.
 			const auto Exposure = CalculateEntityExposure(a_Chunk, Entity, a_Position, SquareRadius);
@@ -218,7 +217,7 @@ namespace Explodinator
 			if (!Entity.IsTNT() && !Entity.IsFallingBlock())
 			{
 				const auto Damage = (Impact * Impact + Impact) * 7 * a_Power + 1;
-				Entity.TakeDamage(dtExplosion, nullptr, FloorC(Damage), 0);
+				Entity.TakeDamage(dtExplosion, a_ExplodingEntity, FloorC(Damage), 0, a_ExplosionSource);
 			}
 
 			// Impact reduced by armour, expensive call so only apply to Pawns:
@@ -429,12 +428,12 @@ namespace Explodinator
 		}
 	}
 
-	void Kaboom(cWorld & a_World, const Vector3f a_Position, const int a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
+	void Kaboom(cWorld & a_World, const Vector3f a_Position, const int a_Power, const bool a_Fiery, cEntity * a_ExplodingEntity, const eExplosionSource a_ExplosionSource)
 	{
-		a_World.DoWithChunkAt(a_Position.Floor(), [a_Position, a_Power, a_Fiery, a_ExplodingEntity](cChunk & a_Chunk)
+		a_World.DoWithChunkAt(a_Position.Floor(), [a_Position, a_Power, a_Fiery, a_ExplodingEntity, a_ExplosionSource](cChunk & a_Chunk)
 		{
 			LagTheClient(a_Chunk, a_Position, a_Power);
-			DamageEntities(a_Chunk, a_Position, a_Power);
+			DamageEntities(a_ExplodingEntity, a_Chunk, a_Position, a_Power, a_ExplosionSource);
 			DamageBlocks(a_Chunk, AbsoluteToRelative(a_Position, a_Chunk.GetPos()), a_Power, a_Fiery, a_ExplodingEntity);
 
 			return false;
