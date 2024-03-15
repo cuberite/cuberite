@@ -197,30 +197,25 @@ void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 	auto Meta = a_Chunk.GetMeta(GetRelPos());
 	AddDropSpenserDir(dispCoord, Meta);
 
-	cItems Pickups;
-	Pickups.push_back(m_Contents.RemoveOneItem(a_SlotNum));
-
-	const int PickupSpeed = GetRandomProvider().RandInt(2, 6);  // At least 2, at most 6
-	int PickupSpeedX = 0, PickupSpeedY = 0, PickupSpeedZ = 0;
-	switch (Meta & E_META_DROPSPENSER_FACING_MASK)
+	const auto PickupSpeed = [Meta]() -> Vector3i
 	{
-		case E_META_DROPSPENSER_FACING_YP: PickupSpeedY =  PickupSpeed; break;
-		case E_META_DROPSPENSER_FACING_YM: PickupSpeedY = -PickupSpeed; break;
-		case E_META_DROPSPENSER_FACING_XM: PickupSpeedX = -PickupSpeed; break;
-		case E_META_DROPSPENSER_FACING_XP: PickupSpeedX =  PickupSpeed; break;
-		case E_META_DROPSPENSER_FACING_ZM: PickupSpeedZ = -PickupSpeed; break;
-		case E_META_DROPSPENSER_FACING_ZP: PickupSpeedZ =  PickupSpeed; break;
-	}
+		const int PickupSpeed = GetRandomProvider().RandInt(2, 6);  // At least 2, at most 6.
+		switch (Meta & E_META_DROPSPENSER_FACING_MASK)
+		{
+			case E_META_DROPSPENSER_FACING_YP: return { 0, PickupSpeed, 0 };
+			case E_META_DROPSPENSER_FACING_YM: return { 0, -PickupSpeed, 0 };
+			case E_META_DROPSPENSER_FACING_XM: return { -PickupSpeed, 0, 0 };
+			case E_META_DROPSPENSER_FACING_XP: return { PickupSpeed, 0, 0 };
+			case E_META_DROPSPENSER_FACING_ZM: return { 0, 0, -PickupSpeed };
+			case E_META_DROPSPENSER_FACING_ZP: return { 0, 0, PickupSpeed };
+		}
+		UNREACHABLE("Unsupported DropSpenser direction");
+	}();
 
-	double MicroX, MicroY, MicroZ;
-	MicroX = dispCoord.x + 0.5;
-	MicroY = dispCoord.y + 0.4;  // Slightly less than half, to accomodate actual texture hole on DropSpenser
-	MicroZ = dispCoord.z + 0.5;
+	// Where to spawn the pickup.
+	// Y offset is slightly less than half, to accomodate actual texture hole on DropSpenser.
+	const auto HolePosition = Vector3d(0.5, 0.4, 0.5) + dispCoord;
 
-
-	m_World->SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ, PickupSpeedX, PickupSpeedY, PickupSpeedZ);
+	auto Pickup = m_Contents.RemoveOneItem(a_SlotNum);
+	m_World->SpawnItemPickup(HolePosition, std::move(Pickup), PickupSpeed, 0_tick);  // Spawn pickup with no collection delay.
 }
-
-
-
-
