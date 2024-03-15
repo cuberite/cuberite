@@ -982,6 +982,13 @@ void cPlayer::Respawn(void)
 		TeleportToCoords(m_RespawnPosition.x, m_RespawnPosition.y, m_RespawnPosition.z);
 	}
 
+	// The Notchian client enters a weird glitched state when trying to "resurrect" dead players
+	// To prevent that, destroy the existing client-side entity, and create a new one with the same ID
+	// This does not make any difference to more modern clients
+	m_World->BroadcastDestroyEntity(*this, &*m_ClientHandle);
+	m_World->BroadcastSpawnEntity(*this, &*m_ClientHandle);
+
+
 	SetVisible(true);
 }
 
