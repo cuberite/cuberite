@@ -3,7 +3,7 @@
 -- InfoDump.lua
 
 --[[
-Loads plugins' Info.lua and dumps its g_PluginInfo into various text formats
+Loads plugins' Info.lua and dumps its g_PluginInfo (or gPluginInfo) into various text formats
 This is used for generating plugin documentation for the forum and for GitHub's INFO.md files
 
 This script can be used in two ways:
@@ -650,8 +650,8 @@ end
 
 
 
---- Tries to load the g_PluginInfo from the plugin's Info.lua file
--- Returns the g_PluginInfo table on success, or nil and error message on failure
+--- Tries to load the g_PluginInfo or gPluginInfo from the plugin's Info.lua file
+-- Returns the plugin info table on success, or nil and error message on failure
 local function LoadPluginInfo(a_FolderName)
 	-- Load and compile the Info file:
 	local cfg, err = loadfile(a_FolderName .. "/Info.lua")
@@ -668,10 +668,12 @@ local function LoadPluginInfo(a_FolderName)
 		return nil, "Cannot load Info.lua: " .. (errMsg or "<unknown error>")
 	end
 
-	if (Sandbox.g_PluginInfo == nil) then
-		return nil, "Info.lua doesn't contain the g_PluginInfo declaration"
+	if (Sandbox.g_PluginInfo) then
+		return Sandbox.g_PluginInfo
+	elseif (Sandbox.gPluginInfo) then
+		return Sandbox.gPluginInfo
 	end
-	return Sandbox.g_PluginInfo
+	return nil, "Info.lua doesn't contain the g_PluginInfo declaration"
 end
 
 
