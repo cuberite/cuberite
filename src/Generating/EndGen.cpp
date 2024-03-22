@@ -41,11 +41,11 @@ cEndGen::cEndGen(int a_Seed) :
 	m_MainIslandFrequencyX(100),
 	m_MainIslandFrequencyY(80),
 	m_MainIslandFrequencyZ(100),
-	m_MainIslandMinThreshold(0.2),
+	m_MainIslandMinThreshold(0.2f),
 	m_SmallIslandFrequencyX(50),
 	m_SmallIslandFrequencyY(80),
 	m_SmallIslandFrequencyZ(50),
-	m_SmallIslandMinThreshold(-0.5),
+	m_SmallIslandMinThreshold(-0.5f),
 	m_LastChunkCoords(0x7fffffff, 0x7fffffff)  // Use dummy coords that won't ever be used by real chunks
 {
 	m_Perlin.AddOctave(1, 1);
@@ -112,7 +112,7 @@ void cEndGen::GenerateNoiseArray(void)
 	NOISE_DATATYPE StartZ = static_cast<NOISE_DATATYPE>(m_LastChunkCoords.m_ChunkZ       * cChunkDef::Width) / frequencyZ;
 	NOISE_DATATYPE EndZ   = static_cast<NOISE_DATATYPE>((m_LastChunkCoords.m_ChunkZ + 1) * cChunkDef::Width) / frequencyZ;
 	NOISE_DATATYPE StartY = 0;
-	NOISE_DATATYPE EndY   = static_cast<NOISE_DATATYPE>(257) / frequencyY;
+	NOISE_DATATYPE EndY   = static_cast<NOISE_DATATYPE>(cChunkDef::Height) / frequencyY;
 	m_Perlin.Generate3D(NoiseData, DIM_X, DIM_Z, DIM_Y, StartX, EndX, StartZ, EndZ, StartY, EndY, Workspace);
 
 	// Add distance:
@@ -159,15 +159,15 @@ void cEndGen::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape)
 
 			for (int y = 0; y < m_IslandYOffset; y++)
 			{
-				a_Shape[y + x * 256 + z * 256 * 16] = 0;
+				cChunkDesc::SetShapeIsSolidAt(a_Shape, x, y, z, false);
 			}
 			for (int y = m_IslandYOffset; y < MaxY; y++)
 			{
-				a_Shape[y + x * 256 + z * 256 * 16] = (m_NoiseArray[(y - m_IslandYOffset) * 17 * 17 + z * 17 + x] <= threshold) ? 1 : 0;
+				cChunkDesc::SetShapeIsSolidAt(a_Shape, x, y, z, m_NoiseArray[(y - m_IslandYOffset) * 17 * 17 + z * 17 + x] <= threshold);
 			}
 			for (int y = MaxY; y < cChunkDef::Height; y++)
 			{
-				a_Shape[y + x * 256 + z * 256 * 16] = 0;
+				cChunkDesc::SetShapeIsSolidAt(a_Shape, x, y, z, false);
 			}
 		}  // for x
 	}  // for z
@@ -186,7 +186,7 @@ void cEndGen::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape &
 		{
 			for (int y = 0; y < cChunkDef::Height; y++)
 			{
-				if (a_Shape[(x + 16 * z) * 256 + y] != 0)
+				if (cChunkDesc::GetShapeIsSolidAt(a_Shape, x, y, z))
 				{
 					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_END_STONE);
 				}
