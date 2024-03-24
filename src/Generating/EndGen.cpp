@@ -60,7 +60,7 @@ cEndGen::cEndGen(int a_Seed) :
 void cEndGen::InitializeShapeGen(cIniFile & a_IniFile)
 {
 	m_MainIslandSize = a_IniFile.GetValueSetI("Generator", "EndGenMainIslandSize", m_MainIslandSize);
-	m_IslandThickness = a_IniFile.GetValueSetI("Generator", "EndGenIslandFlatness", m_IslandThickness);
+	m_IslandThickness = a_IniFile.GetValueSetI("Generator", "EndGenIslandThickness", m_IslandThickness);
 	m_IslandYOffset = a_IniFile.GetValueSetI("Generator", "EndGenIslandYOffset", m_IslandYOffset);
 
 	m_MainIslandFrequencyX   = static_cast<NOISE_DATATYPE>(a_IniFile.GetValueSetF("Generator", "EndGenMainFrequencyX", m_MainIslandFrequencyX));
@@ -101,25 +101,25 @@ void cEndGen::GenerateNoiseArray(void)
 	NOISE_DATATYPE Workspace[DIM_X * DIM_Y * DIM_Z];  // [x + DIM_X * z + DIM_X * DIM_Z * y]
 
 	// Choose the frequency to use depending on the distance from spawn.
-	double distanceFromSpawn = cChunkDef::RelativeToAbsolute({ cChunkDef::Width / 2, 0, cChunkDef::Width / 2 }, m_LastChunkCoords).Length();
-	NOISE_DATATYPE frequencyX = distanceFromSpawn > m_MainIslandSize * 2 ? m_SmallIslandFrequencyX : m_MainIslandFrequencyX;
-	NOISE_DATATYPE frequencyY = distanceFromSpawn > m_MainIslandSize * 2 ? m_SmallIslandFrequencyY : m_MainIslandFrequencyY;
-	NOISE_DATATYPE frequencyZ = distanceFromSpawn > m_MainIslandSize * 2 ? m_SmallIslandFrequencyZ : m_MainIslandFrequencyZ;
+	auto distanceFromSpawn = cChunkDef::RelativeToAbsolute({ cChunkDef::Width / 2, 0, cChunkDef::Width / 2 }, m_LastChunkCoords).Length();
+	auto frequencyX = distanceFromSpawn > m_MainIslandSize * 2 ? m_SmallIslandFrequencyX : m_MainIslandFrequencyX;
+	auto frequencyY = distanceFromSpawn > m_MainIslandSize * 2 ? m_SmallIslandFrequencyY : m_MainIslandFrequencyY;
+	auto frequencyZ = distanceFromSpawn > m_MainIslandSize * 2 ? m_SmallIslandFrequencyZ : m_MainIslandFrequencyZ;
 
 	// Generate the downscaled noise:
-	NOISE_DATATYPE StartX = static_cast<NOISE_DATATYPE>(m_LastChunkCoords.m_ChunkX       * cChunkDef::Width) / frequencyX;
-	NOISE_DATATYPE EndX   = static_cast<NOISE_DATATYPE>((m_LastChunkCoords.m_ChunkX + 1) * cChunkDef::Width) / frequencyX;
-	NOISE_DATATYPE StartZ = static_cast<NOISE_DATATYPE>(m_LastChunkCoords.m_ChunkZ       * cChunkDef::Width) / frequencyZ;
-	NOISE_DATATYPE EndZ   = static_cast<NOISE_DATATYPE>((m_LastChunkCoords.m_ChunkZ + 1) * cChunkDef::Width) / frequencyZ;
-	NOISE_DATATYPE StartY = 0;
-	NOISE_DATATYPE EndY   = static_cast<NOISE_DATATYPE>(cChunkDef::Height) / frequencyY;
+	auto StartX = static_cast<NOISE_DATATYPE>(m_LastChunkCoords.m_ChunkX       * cChunkDef::Width) / frequencyX;
+	auto EndX   = static_cast<NOISE_DATATYPE>((m_LastChunkCoords.m_ChunkX + 1) * cChunkDef::Width) / frequencyX;
+	auto StartZ = static_cast<NOISE_DATATYPE>(m_LastChunkCoords.m_ChunkZ       * cChunkDef::Width) / frequencyZ;
+	auto EndZ   = static_cast<NOISE_DATATYPE>((m_LastChunkCoords.m_ChunkZ + 1) * cChunkDef::Width) / frequencyZ;
+	auto StartY = 0.0f;
+	auto EndY   = static_cast<NOISE_DATATYPE>(cChunkDef::Height) / frequencyY;
 	m_Perlin.Generate3D(NoiseData, DIM_X, DIM_Z, DIM_Y, StartX, EndX, StartZ, EndZ, StartY, EndY, Workspace);
 
 	// Add distance:
 	for (int y = 0; y < DIM_Y; y++)
 	{
-		NOISE_DATATYPE ValY = static_cast<NOISE_DATATYPE>(2 * INTERPOL_Y * y - m_IslandThickness) / m_IslandThickness;
-		ValY = std::pow(ValY, 6);
+		auto ValY = static_cast<NOISE_DATATYPE>(2 * INTERPOL_Y * y - m_IslandThickness) / m_IslandThickness;
+		ValY = static_cast<NOISE_DATATYPE>(std::pow(ValY, 6));
 		for (int z = 0; z < DIM_Z; z++)
 		{
 			for (int x = 0; x < DIM_X; x++)
@@ -144,8 +144,8 @@ void cEndGen::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape)
 	int MaxY = std::min(static_cast<int>(1.75 * m_IslandThickness + m_IslandYOffset), cChunkDef::Height - 1);
 
 	// Choose which threshold to use depending on the distance from spawn.
-	double distanceFromSpawn = cChunkDef::RelativeToAbsolute({ cChunkDef::Width / 2, 0, cChunkDef::Width / 2 }, a_ChunkCoords).Length();
-	double minThreshold = distanceFromSpawn > m_MainIslandSize * 2 ? m_SmallIslandMinThreshold : m_MainIslandMinThreshold;
+	double chunkDistanceFromSpawn = cChunkDef::RelativeToAbsolute({ cChunkDef::Width / 2, 0, cChunkDef::Width / 2 }, a_ChunkCoords).Length();
+	double minThreshold = chunkDistanceFromSpawn > m_MainIslandSize * 2 ? m_SmallIslandMinThreshold : m_MainIslandMinThreshold;
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
