@@ -11,6 +11,7 @@ enum eMonsterType
 {
 	mtInvalidType = -1,
 
+	mtBee,							// Added in 1.15
 	mtBat,
 	mtBlaze,
 	mtCat,                          // Added in 1.14

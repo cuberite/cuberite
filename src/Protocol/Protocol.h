@@ -306,7 +306,12 @@ public:
 
 		TNTPrimedFuseTime
 	};
+	enum class Hand	 // Used by the book update packet // A better, more uniqie name should be used instead
+	{
+		MAIN_HAND,
+		OFF_HAND
 
+	};
 	enum class EntityMetadataType
 	{
 		Byte,
@@ -351,7 +356,10 @@ public:
 		v1_14_1 = 480,
 		v1_14_2 = 485,
 		v1_14_3 = 490,
-		v1_14_4 = 498
+		v1_14_4 = 498,
+		v1_15   = 573,
+		v1_15_1 = 575,
+		v1_15_2 = 578,
 	};
 
 	enum State

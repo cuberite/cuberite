@@ -9,6 +9,7 @@
 #include "Palettes/Palette_1_13.h"
 #include "Palettes/Palette_1_13_1.h"
 #include "Palettes/Palette_1_14.h"
+#include "Palettes/Palette_1_15.h"
 
 
 
@@ -49,6 +50,12 @@ namespace
 	{
 		return Palette_1_14::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
 	}
+
+	auto Palette573(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
+	{
+		return Palette_1_15::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+	}
+
 }
 
 
@@ -117,6 +124,13 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v477);
 				continue;
 			}
+			case cProtocol::Version::v1_15:
+			case cProtocol::Version::v1_15_1:
+			case cProtocol::Version::v1_15_2:
+			{
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v573);
+				continue;
+			}
 		}
 		UNREACHABLE("Unknown chunk data serialization version");
 	}
@@ -172,6 +186,10 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 		case CacheVersion::v477:
 		{
 			Serialize477(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap);
+			break;
+		}
+		case CacheVersion::v573: {
+			Serialize573(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap);
 			break;
 		}
 	}
@@ -518,6 +536,85 @@ inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_C
 	m_Packet.WriteVarInt32(0);
 }
 
+inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData,const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
+{
+	// This function returns the fully compressed packet (including packet
+	// size), not the raw packet! Below variables tagged static because of
+	// https://developercommunity.visualstudio.com/content/problem/367326
+
+	static constexpr UInt8 BitsPerEntry = 14;
+	static constexpr size_t ChunkSectionDataArraySize =
+		(ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
+
+	const auto Bitmask = GetSectionBitmask(a_BlockData, a_LightData);
+
+	// Create the packet:
+	m_Packet.WriteVarInt32(0x22);  // Packet id (Chunk Data packet)
+	m_Packet.WriteBEInt32(a_ChunkX);
+	m_Packet.WriteBEInt32(a_ChunkZ);
+	m_Packet.WriteBool(
+		true);	// "Ground-up continuous", or rather, "biome data present" flag
+	m_Packet.WriteVarInt32(Bitmask.first);
+
+	{
+		cFastNBTWriter Writer;
+		// TODO: client works fine without?
+		// std::array<Int64, 36> Longz = {};
+		// Writer.AddLongArray("MOTION_BLOCKING", Longz.data(), Longz.size());
+		Writer.Finish();
+		m_Packet.Write(Writer.GetResult().data(), Writer.GetResult().size());
+	}
+
+	
+	// BiomeArray
+	  int HORIZONTAL_SECTION_COUNT = (int)round(log(16.0) / log(2.0)) - 2; //2
+	  int VERTICAL_SECTION_COUNT = (int)round(log(256.0) / log(2.0)) - 2; //6 
+	  int DEFAULT_LENGTH = 1 << HORIZONTAL_SECTION_COUNT +  HORIZONTAL_SECTION_COUNT + VERTICAL_SECTION_COUNT; // should ebe 1024
+
+	  for (size_t i = 0; i < DEFAULT_LENGTH; i++)
+	  {
+		  m_Packet.WriteBEInt32(0);//Biome ???
+	  }
+	
+
+
+	const size_t ChunkSectionSize =
+		(2 +  // Block count, BEInt16, 2 bytes
+		 1 +  // Bits per entry, BEUInt8, 1 byte
+		 m_Packet.GetVarIntSize(static_cast<UInt32>(
+			 ChunkSectionDataArraySize)) +	// Field containing "size of whole
+											// section", VarInt32, variable size
+		 ChunkSectionDataArraySize * 8	// Actual section data, lots of bytes
+										// (multiplier 1 long = 8 bytes)
+		);
+
+	const size_t BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
+	const size_t ChunkSize =
+		(ChunkSectionSize * Bitmask.second //+
+		 //BiomeDataSize * 4	// Biome data now BE ints
+		);
+	/*
+		// Write the biome data
+	for (size_t i = 0; i != BiomeDataSize; i++)
+	{
+		m_Packet.WriteBEUInt32(a_BiomeMap[i]);
+	}*/
+	//LOG("%d - BiomeDataSize",BiomeDataSize);
+	//LOG("%d - DEFAULT_LENGTH", DEFAULT_LENGTH);
+	// Write the chunk size in bytes:
+	m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSize));
+
+	// Write each chunk section...
+	ChunkDef_ForEachSection(a_BlockData, a_LightData, {
+		m_Packet.WriteBEInt16(-1);
+		m_Packet.WriteBEUInt8(BitsPerEntry);
+		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
+		WriteBlockSectionSeamless<&Palette573>(Blocks, Metas, BitsPerEntry);
+	});
+
+	// Identify 1.9.4's tile entity list as empty
+	m_Packet.WriteVarInt32(0);
+}
 
 
 
