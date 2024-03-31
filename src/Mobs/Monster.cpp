@@ -72,7 +72,7 @@ static const struct
 	{mtZombie,         "zombie",         "Zombie",         "zombie"},
 	{mtZombiePigman,   "zombiepigman",   "PigZombie",      "zombie_pigman"},
 	{mtZombieVillager, "zombievillager", "ZombieVillager", "zombie_villager"},
-} ;
+	{mtBee,			   "bee",			 "Bee",			   "bee"}};
 
 
 
