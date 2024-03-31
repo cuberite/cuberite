@@ -188,7 +188,8 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 			Serialize477(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap);
 			break;
 		}
-		case CacheVersion::v573: {
+		case CacheVersion::v573:
+		{
 			Serialize573(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap);
 			break;
 		}
@@ -536,6 +537,10 @@ inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_C
 	m_Packet.WriteVarInt32(0);
 }
 
+
+
+
+
 inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData,const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
 {
 	// This function returns the fully compressed packet (including packet
@@ -564,34 +569,33 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 		Writer.Finish();
 		m_Packet.Write(Writer.GetResult().data(), Writer.GetResult().size());
 	}
-
 	
 	// BiomeArray
-	  int HORIZONTAL_SECTION_COUNT = (int)round(log(16.0) / log(2.0)) - 2; //2
-	  int VERTICAL_SECTION_COUNT = (int)round(log(256.0) / log(2.0)) - 2; //6 
-	  int DEFAULT_LENGTH = 1 << HORIZONTAL_SECTION_COUNT +  HORIZONTAL_SECTION_COUNT + VERTICAL_SECTION_COUNT; // should ebe 1024
+	int HORIZONTAL_SECTION_COUNT = (int)round(log(16.0) / log(2.0)) - 2; //  2
+	int VERTICAL_SECTION_COUNT = (int)round(log(256.0) / log(2.0)) - 2; //  6 
+	int DEFAULT_LENGTH = 1 << HORIZONTAL_SECTION_COUNT +  HORIZONTAL_SECTION_COUNT + VERTICAL_SECTION_COUNT; //  should be 1024
 
-	  for (size_t i = 0; i < DEFAULT_LENGTH; i++)
-	  {
-		  m_Packet.WriteBEInt32(0);//Biome ???
-	  }
+	for (size_t i = 0; i < DEFAULT_LENGTH; i++)
+	{
+		m_Packet.WriteBEInt32(0);//  Biome ???
+	}
 	
 
 
 	const size_t ChunkSectionSize =
 		(2 +  // Block count, BEInt16, 2 bytes
-		 1 +  // Bits per entry, BEUInt8, 1 byte
-		 m_Packet.GetVarIntSize(static_cast<UInt32>(
-			 ChunkSectionDataArraySize)) +	// Field containing "size of whole
+		1 +  // Bits per entry, BEUInt8, 1 byte
+		m_Packet.GetVarIntSize(static_cast<UInt32>(
+			ChunkSectionDataArraySize)) +	// Field containing "size of whole
 											// section", VarInt32, variable size
-		 ChunkSectionDataArraySize * 8	// Actual section data, lots of bytes
+			ChunkSectionDataArraySize * 8	// Actual section data, lots of bytes
 										// (multiplier 1 long = 8 bytes)
 		);
 
 	const size_t BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
 	const size_t ChunkSize =
-		(ChunkSectionSize * Bitmask.second //+
-		 //BiomeDataSize * 4	// Biome data now BE ints
+		(ChunkSectionSize * Bitmask.second //  +
+		 //  BiomeDataSize * 4	// Biome data now BE ints
 		);
 	/*
 		// Write the biome data
@@ -599,8 +603,8 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 	{
 		m_Packet.WriteBEUInt32(a_BiomeMap[i]);
 	}*/
-	//LOG("%d - BiomeDataSize",BiomeDataSize);
-	//LOG("%d - DEFAULT_LENGTH", DEFAULT_LENGTH);
+	//  LOG("%d - BiomeDataSize",BiomeDataSize);
+	//  LOG("%d - DEFAULT_LENGTH", DEFAULT_LENGTH);
 	// Write the chunk size in bytes:
 	m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSize));
 
@@ -615,6 +619,7 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 	// Identify 1.9.4's tile entity list as empty
 	m_Packet.WriteVarInt32(0);
 }
+
 
 
 

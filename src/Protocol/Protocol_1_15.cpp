@@ -108,7 +108,6 @@ void cProtocol_1_15::SendLoginSuccess()
 		cPacketizer Pkt(*this, pktLoginSuccess);
 		Pkt.WriteString(m_Client->GetUUID().ToLongString());
 		Pkt.WriteString(m_Client->GetUsername());
-		//Pkt.WriteVarInt32(1);//temp fix 
 	}
 	
 }
@@ -175,12 +174,12 @@ void cProtocol_1_15::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));
 		Pkt.WriteBEInt32(static_cast<Int32>(a_World.GetDimension()));
-		Pkt.WriteBEInt64(0);//seed
+		Pkt.WriteBEInt64(0);// Seed
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<size_t>(Server->GetMaxPlayers(), 0, 255)));
 		Pkt.WriteString("default");
 		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));
 		Pkt.WriteBool(false);
-		Pkt.WriteBool(false);//death screen
+		Pkt.WriteBool(false);// Death screen
 	}
 
 	// Send the spawn position:
@@ -212,6 +211,10 @@ void cProtocol_1_15::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Dat
 void cProtocol_1_15::SendPaintingSpawn(const cPainting & a_Painting)
 {}
 
+
+
+
+
 void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset,float a_ParticleData, int a_ParticleAmount)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -233,6 +236,8 @@ void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f
 	Pkt.WriteBEFloat(a_ParticleData);
 	Pkt.WriteBEInt32(a_ParticleAmount);
 }
+
+
 
 
 
@@ -260,21 +265,21 @@ void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f
 	switch (ParticleID)
 	{
 		case 3: // blockdust
-		case 23: //FALLING_DUST
+		case 23: // FALLING_DUST
 		{
 			Pkt.WriteVarInt32(static_cast<UInt32>(a_Data[0]));
 			break;
 		}
-		case 14: //DUST
+		case 14: // DUST
 		{
-			Pkt.WriteBEDouble(1); //red
-			Pkt.WriteBEDouble(1); //green
-			Pkt.WriteBEDouble(1); //blue
-			Pkt.WriteBEDouble(1); //scale
+			Pkt.WriteBEDouble(1); // Red
+			Pkt.WriteBEDouble(1); // Green
+			Pkt.WriteBEDouble(1); // Blue
+			Pkt.WriteBEDouble(1); // Scale
 
 			break;
 		}
-		case 32: //ITEM
+		case 32: // ITEM
 		{
 			cItem senditem;
 			senditem.Empty();
@@ -283,6 +288,10 @@ void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f
 		}
 	}
 }
+
+
+
+
 
 void cProtocol_1_15::HandlePacketBookUpdate(cByteBuffer & a_ByteBuffer)
 {
@@ -1088,13 +1097,13 @@ int cProtocol_1_15::GetProtocolParticleID(const AString & a_ParticleName) const
 		{ "underwater",             48 },
 		{ "splash",                 49 },
 		{ "witch",                  50 },
-		{ "bubblepop",              51 },
-		{ "currentdown",            52 },
-		{ "bubblecolumnup",         53 },
-		{ "nautilus",               54 },
-		{ "dolphin",                55 },
-		{ "campfirecosysmoke",      56 },
-		{ "campfiresignalsmoke",    57 },
+		{ "bubblepop",				51 },
+		{ "currentdown",			52 },
+		{ "bubblecolumnup",			53 },
+		{ "nautilus",				54 },
+		{ "dolphin",				55 },
+		{ "campfirecosysmoke",		56 },
+		{ "campfiresignalsmoke",	57 },
 		{ "dripping_honey",			58 },
 		{ "falling_honey",			59 },
 		{ "landing_honey",			60 },

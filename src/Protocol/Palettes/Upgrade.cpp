@@ -3246,23 +3246,23 @@ namespace PaletteUpgrade
 			case Item::TotemOfUndying: return { 449, 0 };
 			case Item::ShulkerShell: return { 450, 0 };
 			case Item::IronNugget: return { 452, 0 };
-			//knolegde book and debug stick missing here
-			//case Item::KnowledgeBook return {,0};
+			// knolegde book and debug stick missing here
+			// case Item::KnowledgeBook return {,0};
 			case Item::BeeNest:	return { 453, 0};
-			case Item::Trident:return {454, 0};
-			case Item::PhantomMembrane:return { 455, 0};
-			case Item::NautilusShell:return { 456, 0};
-			case Item::HeartOfTheSea:return { 457, 0};
-			case Item::Crossbow:return { 458, 0};
-			case Item::SuspiciousStew:return { 459, 0};
-			case Item::Loom:return { 460, 0};
+			case Item::Trident:	return { 454 , 0};
+			case Item::PhantomMembrane:	return { 455, 0};
+			case Item::NautilusShell:	return { 456, 0};
+			case Item::HeartOfTheSea:	return { 457, 0};
+			case Item::Crossbow:		return { 458, 0};
+			case Item::SuspiciousStew:	return { 459, 0};
+			case Item::Loom:	return { 460, 0};
 			case Item::FlowerBannerPattern:return { 461, 0};
 			case Item::CreeperBannerPattern:return { 462, 0};
 			case Item::SkullBannerPattern:return { 463, 0};
 			case Item::MojangBannerPattern:return { 464, 0};
 			case Item::GlobeBannerPattern:return { 465, 0};
-			case Item::Barrel:return { 466, 0};
-			case Item::Smoker:	return {467, 0};
+			case Item::Barrel:	return { 466, 0};
+			case Item::Smoker:	return { 467, 0};
 			case Item::BlastFurnace:return { 468, 0};
 			case Item::CartographyTable:return { 469, 0};
 			case Item::FletchingTable:return { 470, 0};
