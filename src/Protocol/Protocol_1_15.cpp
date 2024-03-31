@@ -90,10 +90,13 @@ void cProtocol_1_15::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType,
 	Pkt.WriteVarInt32(GetProtocolBlockType(a_BlockType, a_BlockMeta));
 }
 
-static const UInt32 CompressionThreshold = 256;  // After how large a packet should we compress it. //Taken from Protocol_1_8.cpp
+
+
+
 
 void cProtocol_1_15::SendLoginSuccess()
 {
+	static const UInt32 CompressionThreshold = 256;  // After how large a packet should we compress it.  // Taken from Protocol_1_8.cpp
 	ASSERT(m_State == 2);  // State: login?
 
 	// Enable compression:
@@ -111,6 +114,8 @@ void cProtocol_1_15::SendLoginSuccess()
 	}
 	
 }
+
+
 
 
 
@@ -174,12 +179,12 @@ void cProtocol_1_15::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));
 		Pkt.WriteBEInt32(static_cast<Int32>(a_World.GetDimension()));
-		Pkt.WriteBEInt64(0);// Seed
+		Pkt.WriteBEInt64(0);  // Seed
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<size_t>(Server->GetMaxPlayers(), 0, 255)));
 		Pkt.WriteString("default");
 		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));
 		Pkt.WriteBool(false);
-		Pkt.WriteBool(false);// Death screen
+		Pkt.WriteBool(false);  // Death screen
 	}
 
 	// Send the spawn position:
@@ -264,22 +269,22 @@ void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f
 
 	switch (ParticleID)
 	{
-		case 3: // blockdust
-		case 23: // FALLING_DUST
+		case 3:  // blockdust
+		case 23:  // FALLING_DUST
 		{
 			Pkt.WriteVarInt32(static_cast<UInt32>(a_Data[0]));
 			break;
 		}
-		case 14: // DUST
+		case 14:  // DUST
 		{
-			Pkt.WriteBEDouble(1); // Red
-			Pkt.WriteBEDouble(1); // Green
-			Pkt.WriteBEDouble(1); // Blue
-			Pkt.WriteBEDouble(1); // Scale
+			Pkt.WriteBEDouble(1);  // Red
+			Pkt.WriteBEDouble(1);  // Green
+			Pkt.WriteBEDouble(1);  // Blue
+			Pkt.WriteBEDouble(1);  // Scale
 
 			break;
 		}
-		case 32: // ITEM
+		case 32:  // ITEM
 		{
 			cItem senditem;
 			senditem.Empty();
@@ -317,12 +322,14 @@ void cProtocol_1_15::HandlePacketBookUpdate(cByteBuffer & a_ByteBuffer)
 
 
 
+
+
 void cProtocol_1_15::SendRespawn(eDimension a_Dimension)
 {
 	cPacketizer Pkt(*this, pktRespawn);
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Dimension));
-	Pkt.WriteBEUInt64(0);//appears to be a SHA256 od the world seed
+	Pkt.WriteBEUInt64(0);  // Appears to be a SHA256 od the world seed
 	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
 	Pkt.WriteString("default");
 }
@@ -597,11 +604,15 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktWeather:              return 0x1F;
 		case cProtocol::pktWindowItems:          return 0x15;
 		case cProtocol::pktWindowOpen:           return 0x2F;
-		case cProtocol::pktWindowClose:			 return 0x14;
-		case cProtocol::pktWindowProperty:       return 0x16;
+        case cProtocol::pktWindowClose:			 return 0x14;
+        case cProtocol::pktWindowProperty:       return 0x16;
 		default: return Super::GetPacketID(a_PacketType);
 	}
 }
+
+
+
+
 
 void cProtocol_1_15::SendSoundEffect(
 	const AString & a_SoundName, Vector3d a_Origin, float a_Volume,
@@ -620,16 +631,23 @@ void cProtocol_1_15::SendSoundEffect(
 	Pkt.WriteBEFloat(a_Pitch);
 }
 
+
+
+
+
 void cProtocol_1_15::SendEntityMetadata(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktEntityMeta);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	//TODO: implement entity metadata
 	WriteEntityMetadata(Pkt, a_Entity);
 	Pkt.WriteBEUInt8(0xFF);	 // The termination byte
 }
+
+
+
+
 
 void cProtocol_1_15::SendSpawnMob(const cMonster & a_Mob)
 {
@@ -657,9 +675,13 @@ void cProtocol_1_15::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedX() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
-	//WriteEntityMetadata(Pkt, a_Mob);
-	//Pkt.WriteBEUInt8(0xFF);	 // Metadata terminator*/
+	// WriteEntityMetadata(Pkt, a_Mob);
+	// Pkt.WriteBEUInt8(0xFF);	 // Metadata terminator
 }
+
+
+
+
 
 void cProtocol_1_15::SendEntityPosition(const cEntity & a_Entity)
 {
@@ -712,6 +734,8 @@ void cProtocol_1_15::SendEntityPosition(const cEntity & a_Entity)
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
 	Pkt.WriteBool(a_Entity.IsOnGround());
 }
+
+
 
 
 
@@ -1097,17 +1121,17 @@ int cProtocol_1_15::GetProtocolParticleID(const AString & a_ParticleName) const
 		{ "underwater",             48 },
 		{ "splash",                 49 },
 		{ "witch",                  50 },
-		{ "bubblepop",				51 },
-		{ "currentdown",			52 },
-		{ "bubblecolumnup",			53 },
-		{ "nautilus",				54 },
-		{ "dolphin",				55 },
-		{ "campfirecosysmoke",		56 },
-		{ "campfiresignalsmoke",	57 },
-		{ "dripping_honey",			58 },
-		{ "falling_honey",			59 },
-		{ "landing_honey",			60 },
-		{ "falling_nectar",			61 },
+		{ "bubblepop",              51 },
+		{ "currentdown",            52 },
+		{ "bubblecolumnup",         53 },
+		{ "nautilus",               54 },
+		{ "dolphin",                55 },
+		{ "campfirecosysmoke",      56 },
+		{ "campfiresignalsmoke",    57 },
+		{ "dripping_honey",         58 },
+		{ "falling_honey",          59 },
+		{ "landing_honey",          60 },
+		{ "falling_nectar",         61 },
 	};
 
 
