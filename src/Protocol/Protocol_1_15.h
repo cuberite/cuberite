@@ -1,10 +1,10 @@
 
-// Protocol_1_14.h
+// Protocol_1_15.h
 
 /*
-Declares the 1.14 protocol classes:
-	- cProtocol_1_14
-		- release 1.14 protocol (#477)
+Declares the 1.15 protocol classes:
+	- cProtocol_1_15
+		- release 1.15 protocol (#573)
 */
 
 

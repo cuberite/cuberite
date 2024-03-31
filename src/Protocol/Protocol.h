@@ -306,7 +306,7 @@ public:
 
 		TNTPrimedFuseTime
 	};
-	enum class Hand	 // Used by the book update packet // A better, more uniqie name should be used instead
+	enum class Hand	 //  Used by the book update packet //  A better, more uniqie name should be used instead
 	{
 		MAIN_HAND,
 		OFF_HAND

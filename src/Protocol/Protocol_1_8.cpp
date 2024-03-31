@@ -2822,11 +2822,17 @@ void cProtocol_1_8_0::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 	m_Client->HandleWindowClose(WindowID);
 }
 
+
+
+
+
 void cProtocol_1_8_0::HandlePacketBookUpdate(cByteBuffer & a_ByteBuffer)
 {
-	//Used by clients 1.15+
+	// Used by clients 1.15+
 	return;
 }
+
+
 
 
 
