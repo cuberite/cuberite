@@ -541,7 +541,7 @@ inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_C
 
 
 
-inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData,const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
+inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
 {
 	// This function returns the fully compressed packet (including packet
 	// size), not the raw packet! Below variables tagged static because of
@@ -558,7 +558,7 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 	m_Packet.WriteBEInt32(a_ChunkX);
 	m_Packet.WriteBEInt32(a_ChunkZ);
 	m_Packet.WriteBool(
-		true);	// "Ground-up continuous", or rather, "biome data present" flag
+        true);	// "Ground-up continuous", or rather, "biome data present" flag
 	m_Packet.WriteVarInt32(Bitmask.first);
 
 	{
@@ -569,15 +569,15 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 		Writer.Finish();
 		m_Packet.Write(Writer.GetResult().data(), Writer.GetResult().size());
 	}
-	
+
 	// BiomeArray
-	int HORIZONTAL_SECTION_COUNT = (int)round(log(16.0) / log(2.0)) - 2; //  2
-	int VERTICAL_SECTION_COUNT = (int)round(log(256.0) / log(2.0)) - 2; //  6 
-	int DEFAULT_LENGTH = 1 << HORIZONTAL_SECTION_COUNT +  HORIZONTAL_SECTION_COUNT + VERTICAL_SECTION_COUNT; //  should be 1024
+	int HORIZONTAL_SECTION_COUNT = (int)round(log(16.0) / log(2.0)) - 2;  // 2
+	int VERTICAL_SECTION_COUNT = (int)round(log(256.0) / log(2.0)) - 2;  // 6 
+	int DEFAULT_LENGTH = 1 << HORIZONTAL_SECTION_COUNT +  HORIZONTAL_SECTION_COUNT + VERTICAL_SECTION_COUNT;  // should be 1024
 
 	for (size_t i = 0; i < DEFAULT_LENGTH; i++)
 	{
-		m_Packet.WriteBEInt32(0);//  Biome ???
+		m_Packet.WriteBEInt32(0);  //  Biome ???
 	}
 	
 
@@ -586,9 +586,9 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 		(2 +  // Block count, BEInt16, 2 bytes
 		1 +  // Bits per entry, BEUInt8, 1 byte
 		m_Packet.GetVarIntSize(static_cast<UInt32>(
-			ChunkSectionDataArraySize)) +	// Field containing "size of whole
+            ChunkSectionDataArraySize)) +	// Field containing "size of whole
 											// section", VarInt32, variable size
-			ChunkSectionDataArraySize * 8	// Actual section data, lots of bytes
+		    ChunkSectionDataArraySize * 8	// Actual section data, lots of bytes
 										// (multiplier 1 long = 8 bytes)
 		);
 

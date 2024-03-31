@@ -208,7 +208,7 @@ protected:
 	virtual void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketBookUpdate				(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketBookUpdate             (cByteBuffer & a_ByteBuffer);
 
 	/** Parses Vanilla plugin messages into specific ClientHandle calls.
 	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel. */

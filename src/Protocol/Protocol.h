@@ -310,7 +310,6 @@ public:
 	{
 		MAIN_HAND,
 		OFF_HAND
-
 	};
 	enum class EntityMetadataType
 	{
