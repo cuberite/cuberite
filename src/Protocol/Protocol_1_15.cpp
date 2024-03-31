@@ -961,7 +961,6 @@ UInt32 cProtocol_1_15::GetProtocolMobType(eMonsterType a_MobType) const
 		case mtBat:                   return 3;
 		case mtBee:					  return 4;					
 		case mtBlaze:                 return 5;
-		case mtBoat:				  return 6;
 		case mtCat:                   return 6;
 		case mtCaveSpider:            return 7;
 		case mtChicken:               return 8;
