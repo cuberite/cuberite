@@ -2826,6 +2826,16 @@ void cProtocol_1_8_0::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 
 
 
+void cProtocol_1_8_0::HandlePacketBookUpdate(cByteBuffer & a_ByteBuffer)
+{
+	// Used by clients 1.15+
+	return;
+}
+
+
+
+
+
 void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const std::string_view a_Channel)
 {
 	if ((a_Channel == "AdvCdm") || (a_Channel == "AdvCmd"))  // Spelling was fixed in 15w34.
