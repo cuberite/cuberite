@@ -43,7 +43,7 @@ Implements the 1.14 protocol classes:
 #include "../Mobs/Wither.h"
 #include "../Mobs/Zombie.h"
 #include "../Mobs/ZombiePigman.h"
-
+#include "../Entities/Painting.h"
 #include "Palettes/Upgrade.h"
 #include "Palettes/Palette_1_15.h"
 
@@ -112,7 +112,6 @@ void cProtocol_1_15::SendLoginSuccess()
 		Pkt.WriteString(m_Client->GetUUID().ToLongString());
 		Pkt.WriteString(m_Client->GetUsername());
 	}
-	
 }
 
 
@@ -192,7 +191,6 @@ void cProtocol_1_15::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		cPacketizer Pkt(*this, pktSpawnPosition);
 		Pkt.WriteXZYPosition64(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ());
 	}
-	
 	// Send the server difficulty:
 	{
 		cPacketizer Pkt(*this, pktDifficulty);
@@ -214,13 +212,25 @@ void cProtocol_1_15::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Dat
 
 
 void cProtocol_1_15::SendPaintingSpawn(const cPainting & a_Painting)
-{}
+{
+		ASSERT(m_State == 3);  // In game mode?
+		double PosX = a_Painting.GetPosX();
+		double PosY = a_Painting.GetPosY();
+		double PosZ = a_Painting.GetPosZ();
+
+		cPacketizer Pkt(*this, pktSpawnPainting);
+		Pkt.WriteVarInt32(a_Painting.GetUniqueID());
+		Pkt.WriteUUID(cUUID::GenerateVersion3("FIXME"));  // Temp fix
+		Pkt.WriteVarInt32(a_Painting.GetPaintingId());
+		Pkt.WriteXYZPosition64(static_cast<Int32>(PosX), static_cast<Int32>(PosY), static_cast<Int32>(PosZ));
+		Pkt.WriteBEInt8(static_cast<Int8>(a_Painting.GetProtocolFacing()));
+}
 
 
 
 
 
-void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset,float a_ParticleData, int a_ParticleAmount)
+void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -255,7 +265,7 @@ void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f
 	cPacketizer Pkt(*this, pktParticleEffect);
 	Pkt.WriteBEInt32(ParticleID);
 	
-	Pkt.WriteBool(false); // Long Distance
+	Pkt.WriteBool(false);  // Long Distance
 	Pkt.WriteBEDouble(a_Src.x);
 	Pkt.WriteBEDouble(a_Src.y);
 	Pkt.WriteBEDouble(a_Src.z);
@@ -605,7 +615,7 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktWindowItems:          return 0x15;
 		case cProtocol::pktWindowOpen:           return 0x2F;
         case cProtocol::pktWindowClose:			 return 0x14;
-        case cProtocol::pktWindowProperty:       return 0x16;
+		case cProtocol::pktWindowProperty:       return 0x16;
 		default: return Super::GetPacketID(a_PacketType);
 	}
 }
