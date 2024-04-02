@@ -41,7 +41,8 @@ target_sources(
 	Zombie.cpp
 	ZombiePigman.cpp
 	ZombieVillager.cpp
-
+	Bee.cpp
+	
 	AggressiveMonster.h
 	Bat.h
 	Blaze.h
@@ -84,4 +85,5 @@ target_sources(
 	Zombie.h
 	ZombiePigman.h
 	ZombieVillager.h
+	Bee.h
 )
