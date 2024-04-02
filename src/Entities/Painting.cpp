@@ -10,9 +10,10 @@
 
 
 
-cPainting::cPainting(const AString & a_Name, eBlockFace a_Direction, Vector3d a_Pos):
+cPainting::cPainting(const AString & a_Name, eBlockFace a_Direction, Vector3d a_Pos, UInt32 a_id):
 	Super(etPainting, a_Direction, a_Pos),
-	m_Name(a_Name)
+	m_Name(a_Name),
+	m_id(a_id)
 {
 }
 

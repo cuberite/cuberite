@@ -1528,6 +1528,8 @@ bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size
 	const auto Translated = GetItemFromProtocolID(ItemID);
 	a_Item.m_ItemType = Translated.first;
 	a_Item.m_ItemDamage = Translated.second;
+	LOG("%d - %d",a_Item.m_ItemType,a_Item.m_ItemDamage);
+
 
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8, Int8, ItemCount);
 	a_Item.m_ItemCount = ItemCount;
