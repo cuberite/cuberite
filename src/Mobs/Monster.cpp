@@ -72,7 +72,8 @@ static const struct
 	{mtZombie,         "zombie",         "Zombie",         "zombie"},
 	{mtZombiePigman,   "zombiepigman",   "PigZombie",      "zombie_pigman"},
 	{mtZombieVillager, "zombievillager", "ZombieVillager", "zombie_villager"},
-	{mtBee,			   "bee",			 "Bee",			   "bee"}};
+	{mtBee,			   "bee",			 "Bee",			   "bee"},
+	{mtParrot,         "parrot",         "Parrot",         "parrot"}};
 
 
 
@@ -1174,6 +1175,7 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtZombieHorse:     return mfPassive;
 		case mtZombiePigman:    return mfHostile;
 		case mtZombieVillager:  return mfHostile;
+		case mtBee:             return mfPassive;
 		case mtInvalidType:     break;
 	}
 	UNREACHABLE("Unhandled mob type");
@@ -1314,6 +1316,7 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		case mtWolf:           return std::make_unique<cWolf>();
 		case mtZombie:         return std::make_unique<cZombie>();
 		case mtZombiePigman:   return std::make_unique<cZombiePigman>();
+		case mtBee:			   return std::make_unique<cBee>();
 		default:
 		{
 			ASSERT(!"Unhandled mob type whilst trying to spawn mob!");
