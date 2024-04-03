@@ -572,12 +572,22 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 
 	// BiomeArray
 	int HORIZONTAL_SECTION_COUNT = (int)round(log(16.0) / log(2.0)) - 2;  // 2
-	int VERTICAL_SECTION_COUNT = (int)round(log(256.0) / log(2.0)) - 2;  // 6 
+	int VERTICAL_SECTION_COUNT = (int)round(log(256.0) / log(2.0)) - 2;   // 6 
 	int DEFAULT_LENGTH = 1 << HORIZONTAL_SECTION_COUNT +  HORIZONTAL_SECTION_COUNT + VERTICAL_SECTION_COUNT;  // should be 1024
-
+	/*int HORIZONTAL_BIT_MASK = (1 << HORIZONTAL_SECTION_COUNT) - 1;
+	int VERTICAL_BIT_MASK = (1 << VERTICAL_SECTION_COUNT) - 1;
+	*/
 	for (size_t i = 0; i < DEFAULT_LENGTH; i++)
 	{
-		m_Packet.WriteBEInt32(0);  //  Biome ???
+		/* int xoffset =
+			i & HORIZONTAL_BIT_MASK;  // reminder when dividing i by 4
+		int ycord = i >> HORIZONTAL_SECTION_COUNT + HORIZONTAL_SECTION_COUNT & VERTICAL_BIT_MASK;
+		int zoffset = i >> HORIZONTAL_SECTION_COUNT & HORIZONTAL_BIT_MASK; // diving i by 4 and then taking the reminder when dividing by 4*/
+
+		int realx = i % 16;
+		int realz = (i /16) % 16;
+		//LOG("X %d - Y %d - Z %d - I %d - RX - %d - RZ - %d",xoffset,ycord,zoffset,i,realx,realz);
+		m_Packet.WriteBEInt32(a_BiomeMap[realx + realz * 16]);  //  Biome ???
 	}
 	
 
@@ -604,7 +614,7 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 		m_Packet.WriteBEUInt32(a_BiomeMap[i]);
 	}*/
 	//  LOG("%d - BiomeDataSize",BiomeDataSize);
-	//  LOG("%d - DEFAULT_LENGTH", DEFAULT_LENGTH);
+	//LOG("%d - DL - %d - VC - %d - HC", DEFAULT_LENGTH,VERTICAL_SECTION_COUNT,HORIZONTAL_SECTION_COUNT);
 	// Write the chunk size in bytes:
 	m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSize));
 
