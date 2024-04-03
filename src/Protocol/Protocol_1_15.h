@@ -42,22 +42,21 @@ protected:
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount) override;
-	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset,	float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
+	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
 	virtual void SendRespawn                    (eDimension a_Dimension) override;
 	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, Vector3i a_Origin, int a_Data) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
 	virtual void SendUpdateSign                 (Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) override;
 	virtual void SendEntityMetadata             (const cEntity & a_Entity) override;
-
-	virtual void SendSpawnMob(const cMonster & a_Mob);
-
-	virtual void SendEntityPosition(const cEntity & a_Entity);
+	virtual void SendPlayerSpawn                (const cPlayer & a_Player) override;
+	virtual void SendSoundEffect                (const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
+	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
+	virtual void SendEntityPosition             (const cEntity & a_Entity) override;
 
 	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata) const override;
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
-	virtual void SendPlayerSpawn(const cPlayer & a_Player);
-	virtual void SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch);
+
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
 	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override;
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;

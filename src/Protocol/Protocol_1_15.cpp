@@ -1,9 +1,11 @@
 
-// Protocol_1_14.cpp
+// Protocol_1_15.cpp
 
 /*
-Implements the 1.14 protocol classes:
-- release 1.14 protocol (#477)
+Implements the 1.15 protocol classes:
+		- release 1.15 protocol (#573)
+		- release 1.15.1 protocol (#574)
+		- release 1.15.2 protocol (#577)
 */
 
 #include "Globals.h"
@@ -324,7 +326,10 @@ void cProtocol_1_15::HandlePacketBookUpdate(cByteBuffer & a_ByteBuffer)
 	{
 		UNREACHABLE("Failed to parse book data from bookupdate packet -- enum index");
 	}
-	Hand handused = (Hand)enumindex;
+	Hand handused = static_cast<Hand>(enumindex);
+
+
+	LOG("Book is signed: %d - Hand used: %d", signedbook, handused);
 	LOG("PacketBookUpdate is not imlpemented fully");
 	return;
 }
@@ -613,7 +618,7 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktWeather:              return 0x1F;
 		case cProtocol::pktWindowItems:          return 0x15;
 		case cProtocol::pktWindowOpen:           return 0x2F;
-        case cProtocol::pktWindowClose:			 return 0x14;
+		case cProtocol::pktWindowClose:			 return 0x14;
 		case cProtocol::pktWindowProperty:       return 0x16;
 		default: return Super::GetPacketID(a_PacketType);
 	}
@@ -651,8 +656,7 @@ void cProtocol_1_15::SendSoundEffect(
 
 	cPacketizer Pkt(*this, pktSoundEffect);
 	Pkt.WriteString(a_SoundName);
-	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a
-						   // parameter later)
+	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.x * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.y * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.z * 8.0));
@@ -689,7 +693,7 @@ void cProtocol_1_15::SendSpawnMob(const cMonster & a_Mob)
 	{
 		return;
 	}
-	
+
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
 	Pkt.WriteUUID(cUUID::GenerateVersion3("fixxxxx"));	 // Temp fix
@@ -716,8 +720,7 @@ void cProtocol_1_15::SendEntityPosition(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const auto Delta = (a_Entity.GetPosition() * 32).Floor() -
-					   (a_Entity.GetLastSentPosition() * 32).Floor();
+	const auto Delta = (a_Entity.GetPosition() * 32).Floor() - (a_Entity.GetLastSentPosition() * 32).Floor();
 
 	// Ensure that the delta has enough precision and is within range of a
 	// BEInt8:
@@ -729,15 +732,15 @@ void cProtocol_1_15::SendEntityPosition(const cEntity & a_Entity)
 
 		// Difference within limitations, use a relative move packet
 		if (a_Entity.IsOrientationDirty())
-		{ 
-			cPacketizer Pkt(*this, pktEntityRelMoveLook); 
+		{
+			cPacketizer Pkt(*this, pktEntityRelMoveLook);
 			Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 			Pkt.WriteBEInt16(Move.x);
 			Pkt.WriteBEInt16(Move.y);
 			Pkt.WriteBEInt16(Move.z);
-			Pkt.WriteByteAngle(a_Entity.GetYaw()); 
-			Pkt.WriteByteAngle(a_Entity.GetPitch()); 
-			Pkt.WriteBool(a_Entity.IsOnGround()); 
+			Pkt.WriteByteAngle(a_Entity.GetYaw());
+			Pkt.WriteByteAngle(a_Entity.GetPitch());
+			Pkt.WriteBool(a_Entity.IsOnGround());
 		}
 		else
 		{
@@ -1021,7 +1024,7 @@ UInt32 cProtocol_1_15::GetProtocolMobType(eMonsterType a_MobType) const
 		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
 		case mtInvalidType:           return 29;
 		case mtBat:                   return 3;
-		case mtBee:					  return 4;					
+		case mtBee:					  return 4;
 		case mtBlaze:                 return 5;
 		case mtCat:                   return 7;
 		case mtCaveSpider:            return 8;
@@ -1301,8 +1304,8 @@ void cProtocol_1_15::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_15::WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const
 {
-	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_Metadata));		  // Index
-	a_Pkt.WriteVarInt32((UInt32)a_FieldType);					  // Type
+	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_Metadata));	      // Index
+	a_Pkt.WriteVarInt32(static_cast<UInt32>(a_FieldType));        // Type
 }
 
 
