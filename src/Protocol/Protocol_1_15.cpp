@@ -152,7 +152,6 @@ void cProtocol_1_15::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Obj
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Entity.GetUniqueID());
-	LOG("%d -- spawning entity",a_ObjectType);
 	Pkt.WriteVarInt32(a_ObjectType);
 	Pkt.WriteBEDouble(a_Entity.GetPosX());
 	Pkt.WriteBEDouble(a_Entity.GetPosY());
@@ -261,10 +260,10 @@ void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f
 	ASSERT(m_State == 3);  // In game mode?
 
 	const auto ParticleID = GetProtocolParticleID(a_ParticleName);
-	
+
 	cPacketizer Pkt(*this, pktParticleEffect);
 	Pkt.WriteBEInt32(ParticleID);
-	
+
 	Pkt.WriteBool(false);  // Long Distance
 	Pkt.WriteBEDouble(a_Src.x);
 	Pkt.WriteBEDouble(a_Src.y);
@@ -620,6 +619,10 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 	}
 }
 
+
+
+
+
 void cProtocol_1_15::SendPlayerSpawn(const cPlayer & a_Player)
 {
 	// Called to spawn another player for the client
@@ -632,9 +635,11 @@ void cProtocol_1_15::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteBEDouble(LastSentPos.z);
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
-	//WriteEntityMetadata(Pkt, a_Player);
-	//Pkt.WriteBEUInt8(0xff);  // Metadata: end
+	// WriteEntityMetadata(Pkt, a_Player);
+	// Pkt.WriteBEUInt8(0xff);  // Metadata: end
 }
+
+
 
 
 
@@ -643,7 +648,7 @@ void cProtocol_1_15::SendSoundEffect(
 	float a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
+
 	cPacketizer Pkt(*this, pktSoundEffect);
 	Pkt.WriteString(a_SoundName);
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a
@@ -1177,7 +1182,7 @@ int cProtocol_1_15::GetProtocolParticleID(const AString & a_ParticleName) const
 
 UInt32 cProtocol_1_15::GetProtocolStatisticType(const CustomStatistic a_Statistic) const
 {
-	return Palette_1_14::From(a_Statistic);
+	return Palette_1_15::From(a_Statistic);
 }
 
 
@@ -1186,7 +1191,7 @@ UInt32 cProtocol_1_15::GetProtocolStatisticType(const CustomStatistic a_Statisti
 
 cProtocol::Version cProtocol_1_15::GetProtocolVersion() const
 {
-	return Version::v1_14;
+	return Version::v1_15;
 }
 
 
@@ -1937,7 +1942,7 @@ void cProtocol_1_15::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 cProtocol::Version cProtocol_1_15_1::GetProtocolVersion() const
 {
-	return Version::v1_14_1;
+	return Version::v1_15_1;
 }
 
 
@@ -1949,5 +1954,5 @@ cProtocol::Version cProtocol_1_15_1::GetProtocolVersion() const
 
 cProtocol::Version cProtocol_1_15_2::GetProtocolVersion() const
 {
-	return Version::v1_14_2;
+	return Version::v1_15_2;
 }
