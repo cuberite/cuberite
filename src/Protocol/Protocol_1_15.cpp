@@ -152,7 +152,7 @@ void cProtocol_1_15::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Obj
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Entity.GetUniqueID());
-
+	LOG("%d -- spawning entity",a_ObjectType);
 	Pkt.WriteVarInt32(a_ObjectType);
 	Pkt.WriteBEDouble(a_Entity.GetPosX());
 	Pkt.WriteBEDouble(a_Entity.GetPosY());
@@ -579,7 +579,7 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktDestroyEntity:        return 0x38;
 		case cProtocol::pktDisconnectDuringGame: return 0x1B;
 		case cProtocol::pktEntityEffect:         return 0x59;
-		case cProtocol::pktEntityEquipment:      return 0x46;
+		case cProtocol::pktEntityEquipment:      return 0x47;
 		case cProtocol::pktEntityHeadLook:       return 0x3C;
 		case cProtocol::pktEntityMeta:           return 0x44;
 		case cProtocol::pktEntityProperties:     return 0x59;
@@ -620,7 +620,21 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 	}
 }
 
-
+void cProtocol_1_15::SendPlayerSpawn(const cPlayer & a_Player)
+{
+	// Called to spawn another player for the client
+	cPacketizer Pkt(*this, pktSpawnOtherPlayer);
+	Pkt.WriteVarInt32(a_Player.GetUniqueID());
+	Pkt.WriteUUID(a_Player.GetUUID());
+	Vector3d LastSentPos = a_Player.GetLastSentPosition();
+	Pkt.WriteBEDouble(LastSentPos.x);
+	Pkt.WriteBEDouble(LastSentPos.y + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
+	Pkt.WriteBEDouble(LastSentPos.z);
+	Pkt.WriteByteAngle(a_Player.GetYaw());
+	Pkt.WriteByteAngle(a_Player.GetPitch());
+	//WriteEntityMetadata(Pkt, a_Player);
+	//Pkt.WriteBEUInt8(0xff);  // Metadata: end
+}
 
 
 
@@ -942,12 +956,12 @@ UInt8 cProtocol_1_15::GetProtocolEntityType(const cEntity & a_Entity) const
 
 	switch (a_Entity.GetEntityType())
 	{
-		case Type::etEnderCrystal: return 17;
-		case Type::etPickup: return 34;
-		case Type::etFallingBlock: return 25;
-		case Type::etMinecart: return 41;
-		case Type::etBoat: return 5;
-		case Type::etTNT: return 58;
+		case Type::etEnderCrystal: return 18;
+		case Type::etPickup: return 35;
+		case Type::etFallingBlock: return 26;
+		case Type::etMinecart: return 42;
+		case Type::etBoat: return 6;
+		case Type::etTNT: return 59;
 		case Type::etProjectile:
 		{
 			using PType = cProjectileEntity::eKind;
@@ -956,21 +970,21 @@ UInt8 cProtocol_1_15::GetProtocolEntityType(const cEntity & a_Entity) const
 			switch (Projectile.GetProjectileKind())
 			{
 				case PType::pkArrow: return 2;
-				case PType::pkSnowball: return 70;
-				case PType::pkEgg: return 78;
-				case PType::pkGhastFireball: return 36;
-				case PType::pkFireCharge: return 68;
-				case PType::pkEnderPearl: return 79;
-				case PType::pkExpBottle: return 80;
-				case PType::pkSplashPotion: return 81;
-				case PType::pkFirework: return 26;
-				case PType::pkWitherSkull: return 92;
+				case PType::pkSnowball: return 71;
+				case PType::pkEgg: return 79;
+				case PType::pkGhastFireball: return 37;
+				case PType::pkFireCharge: return 69;
+				case PType::pkEnderPearl: return 80;
+				case PType::pkExpBottle: return 81;
+				case PType::pkSplashPotion: return 82;
+				case PType::pkFirework: return 28;
+				case PType::pkWitherSkull: return 93;
 			}
 			break;
 		}
-		case Type::etFloater: return 101;
-		case Type::etItemFrame: return 35;
-		case Type::etLeashKnot: return 37;
+		case Type::etFloater: return 102;
+		case Type::etItemFrame: return 36;
+		case Type::etLeashKnot: return 38;
 
 		// Non-objects must not be sent
 		case Type::etEntity:

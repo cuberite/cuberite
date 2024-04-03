@@ -54,9 +54,8 @@ protected:
 
 	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata) const override;
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
-	virtual void SendSoundEffect(
-		const AString & a_SoundName, Vector3d a_Origin, float a_Volume,
-		float a_Pitch);
+	virtual void SendPlayerSpawn(const cPlayer & a_Player);
+	virtual void SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch);
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
 	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override;
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
