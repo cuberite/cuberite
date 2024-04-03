@@ -152,7 +152,6 @@ void cProtocol_1_15::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Obj
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Entity.GetUniqueID());
-	LOG("%d -- spawning entity",a_ObjectType);
 	Pkt.WriteVarInt32(a_ObjectType);
 	Pkt.WriteBEDouble(a_Entity.GetPosX());
 	Pkt.WriteBEDouble(a_Entity.GetPosY());
@@ -1177,7 +1176,7 @@ int cProtocol_1_15::GetProtocolParticleID(const AString & a_ParticleName) const
 
 UInt32 cProtocol_1_15::GetProtocolStatisticType(const CustomStatistic a_Statistic) const
 {
-	return Palette_1_14::From(a_Statistic);
+	return Palette_1_15::From(a_Statistic);
 }
 
 
@@ -1186,7 +1185,7 @@ UInt32 cProtocol_1_15::GetProtocolStatisticType(const CustomStatistic a_Statisti
 
 cProtocol::Version cProtocol_1_15::GetProtocolVersion() const
 {
-	return Version::v1_14;
+	return Version::v1_15;
 }
 
 
@@ -1937,7 +1936,7 @@ void cProtocol_1_15::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 cProtocol::Version cProtocol_1_15_1::GetProtocolVersion() const
 {
-	return Version::v1_14_1;
+	return Version::v1_15_1;
 }
 
 
@@ -1949,5 +1948,5 @@ cProtocol::Version cProtocol_1_15_1::GetProtocolVersion() const
 
 cProtocol::Version cProtocol_1_15_2::GetProtocolVersion() const
 {
-	return Version::v1_14_2;
+	return Version::v1_15_2;
 }
