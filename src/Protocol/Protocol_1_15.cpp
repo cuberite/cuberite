@@ -1304,8 +1304,8 @@ void cProtocol_1_15::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_15::WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const
 {
-	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_Metadata));		  // Index
-	a_Pkt.WriteVarInt32((UInt32)a_FieldType);					  // Type
+	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_Metadata));	      // Index
+	a_Pkt.WriteVarInt32(static_cast<UInt32>(a_FieldType));        // Type
 }
 
 

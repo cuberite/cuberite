@@ -50,7 +50,7 @@ protected:
 	virtual void SendWindowOpen                 (const cWindow & a_Window) override;
 	virtual void SendEntityMetadata             (const cEntity & a_Entity) override;
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) override;
-	virtual void SendSoundEffect                (const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch);
+	virtual void SendSoundEffect                (const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
 	virtual void SendEntityPosition             (const cEntity & a_Entity) override;
 
