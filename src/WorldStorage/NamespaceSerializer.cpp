@@ -213,6 +213,7 @@ std::string_view NamespaceSerializer::From(const eMonsterType a_ID)
 		case mtZombieHorse:    return "zombie_horse";
 		case mtZombiePigman:   return "zombified_piglin";
 		case mtZombieVillager: return "zombie_villager";
+		case mtBee:            return "bee";
 		case mtInvalidType:    break;
 	}
 	UNREACHABLE("Tried to save unknown monster type");
@@ -436,6 +437,7 @@ eMonsterType NamespaceSerializer::ToMonsterType(const std::string_view a_ID)
 	{
 		{ "bat",              mtBat },
 		{ "blaze",            mtBlaze },
+		{ "bee",              mtBee},
 		{ "cat",              mtCat },
 		{ "cave_spider",      mtCaveSpider },
 		{ "chicken",          mtChicken },

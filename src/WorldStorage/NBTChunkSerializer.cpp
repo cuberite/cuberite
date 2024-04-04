@@ -812,6 +812,10 @@ public:
 
 			switch (a_Monster->GetMobType())
 			{
+				case mtBee:
+				{
+					// TODO: implement serialization
+				}
 				case mtBat:
 				{
 					mWriter.AddByte("BatFlags", static_cast<const cBat *>(a_Monster)->IsHanging());

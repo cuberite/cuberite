@@ -91,7 +91,7 @@ public:
 		auto PaintingTitle = gPaintingTitlesList[painting_index];
 
 		// A painting, centred so pickups spawn nicely.
-		auto Painting = std::make_unique<cPainting>(PaintingTitle, a_ClickedBlockFace, Vector3d(0.5, 0.5, 0.5) + PlacePos, (UInt32)painting_index);
+		auto Painting = std::make_unique<cPainting>(PaintingTitle, a_ClickedBlockFace, Vector3d(0.5, 0.5, 0.5) + PlacePos, static_cast<UInt32>(painting_index));
 		auto PaintingPtr = Painting.get();
 		if (!PaintingPtr->Initialize(std::move(Painting), *a_World))
 		{

@@ -23,7 +23,7 @@ public:  // tolua_export
 
 	/** Returns the protocol name of the painting */
 	const AString & GetName(void) const { return m_Name; }  // tolua_export
-	const UInt32 GetPaintingId(void) const { return m_id; }
+	UInt32 GetPaintingId(void) const { return m_id; }
 
 private:
 
