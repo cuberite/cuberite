@@ -3283,7 +3283,6 @@ namespace PaletteUpgrade
 			case Item::ShulkerShell: return { 450, 0 };
 			case Item::IronNugget: return { 452, 0 };
 			// knolegde book and debug stick missing here
-            // case Item::KnowledgeBook: return { 0, 0};
 			case Item::BeeNest: return { 453, 0};
 			case Item::Trident: return { 454, 0};
 			case Item::PhantomMembrane: return { 455, 0};

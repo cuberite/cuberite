@@ -557,7 +557,7 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 	m_Packet.WriteVarInt32(0x22);  // Packet id (Chunk Data packet)
 	m_Packet.WriteBEInt32(a_ChunkX);
 	m_Packet.WriteBEInt32(a_ChunkZ);
-	m_Packet.WriteBool(true);	// "Ground-up continuous", or rather, "biome data present" flag
+	m_Packet.WriteBool(true);   // "Ground-up continuous", or rather, "biome data present" flag
 	m_Packet.WriteVarInt32(Bitmask.first);
 
 	{
@@ -595,16 +595,16 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 		(2 +  // Block count, BEInt16, 2 bytes
 		1 +  // Bits per entry, BEUInt8, 1 byte
 		m_Packet.GetVarIntSize(static_cast<UInt32>(
-            ChunkSectionDataArraySize)) +	// Field containing "size of whole
+			ChunkSectionDataArraySize)) +   // Field containing "size of whole
 											// section", VarInt32, variable size
-		    ChunkSectionDataArraySize * 8	// Actual section data, lots of bytes
-										// (multiplier 1 long = 8 bytes)
+			ChunkSectionDataArraySize * 8   // Actual section data, lots of bytes
+											// (multiplier 1 long = 8 bytes)
 		);
 
 	const size_t BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
 	const size_t ChunkSize =
 		(ChunkSectionSize * Bitmask.second  //  +
-		 //  BiomeDataSize * 4	// Biome data now BE ints
+		//  BiomeDataSize * 4    // Biome data now BE ints
 		);
 	/*
 		// Write the biome data

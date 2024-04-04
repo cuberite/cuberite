@@ -717,8 +717,7 @@ void cProtocol_1_15::SendEntityPosition(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const auto Delta = (a_Entity.GetPosition() * 32).Floor() -
-					   (a_Entity.GetLastSentPosition() * 32).Floor();
+	const auto Delta = (a_Entity.GetPosition() * 32).Floor() - (a_Entity.GetLastSentPosition() * 32).Floor();
 
 	// Ensure that the delta has enough precision and is within range of a
 	// BEInt8:
