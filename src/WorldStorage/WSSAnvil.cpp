@@ -1697,6 +1697,7 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		case mtZombieHorse:     return LoadZombieHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtZombifiedPiglin: return LoadZombifiedPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 		case mtZombieVillager:  return LoadZombieVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case mtBee:             break;  // TODO: implement bee nbt
 		case mtInvalidType:     break;
 	}
 }
