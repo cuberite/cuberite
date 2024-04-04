@@ -573,7 +573,7 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 	int HORIZONTAL_SECTION_COUNT = static_cast<int>(round(log(16.0) / log(2.0))) - 2;  // 2
 	int VERTICAL_SECTION_COUNT = static_cast<int>(round(log(256.0) / log(2.0))) - 2;   // 6
 	int DEFAULT_LENGTH = 1 << (HORIZONTAL_SECTION_COUNT +  HORIZONTAL_SECTION_COUNT + VERTICAL_SECTION_COUNT);  // should be 1024
-	
+
 	/* int HORIZONTAL_BIT_MASK = (1 << HORIZONTAL_SECTION_COUNT) - 1;
 	int VERTICAL_BIT_MASK = (1 << VERTICAL_SECTION_COUNT) - 1;
 	*/
@@ -600,7 +600,7 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 			ChunkSectionDataArraySize * 8   // Actual section data, lots of bytes (multiplier 1 long = 8 bytes)
 		);
 
-	//const size_t BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
+	// const size_t BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
 	const size_t ChunkSize =
 		(ChunkSectionSize * Bitmask.second  //  +
 		//  BiomeDataSize * 4    // Biome data now BE ints
