@@ -327,7 +327,7 @@ void cProtocol_1_15::HandlePacketBookUpdate(cByteBuffer & a_ByteBuffer)
 		UNREACHABLE("Failed to parse book data from bookupdate packet -- enum index");
 	}
 	Hand handused = static_cast<Hand>(enumindex);
-	
+
 
 	LOG("Book is signed: %d - Hand used: %d", signedbook, handused);
 	LOG("PacketBookUpdate is not imlpemented fully");
