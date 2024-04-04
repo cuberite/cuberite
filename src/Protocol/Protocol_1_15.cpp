@@ -729,15 +729,15 @@ void cProtocol_1_15::SendEntityPosition(const cEntity & a_Entity)
 
 		// Difference within limitations, use a relative move packet
 		if (a_Entity.IsOrientationDirty())
-		{
-			cPacketizer Pkt(*this, pktEntityRelMoveLook);
+		{ 
+			cPacketizer Pkt(*this, pktEntityRelMoveLook); 
 			Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 			Pkt.WriteBEInt16(Move.x);
 			Pkt.WriteBEInt16(Move.y);
 			Pkt.WriteBEInt16(Move.z);
-			Pkt.WriteByteAngle(a_Entity.GetYaw());
-			Pkt.WriteByteAngle(a_Entity.GetPitch());
-			Pkt.WriteBool(a_Entity.IsOnGround());
+			Pkt.WriteByteAngle(a_Entity.GetYaw()); 
+			Pkt.WriteByteAngle(a_Entity.GetPitch()); 
+			Pkt.WriteBool(a_Entity.IsOnGround()); 
 		}
 		else
 		{
@@ -1021,7 +1021,7 @@ UInt32 cProtocol_1_15::GetProtocolMobType(eMonsterType a_MobType) const
 		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
 		case mtInvalidType:           return 29;
 		case mtBat:                   return 3;
-		case mtBee:					  return 4;
+		case mtBee:					  return 4;					
 		case mtBlaze:                 return 5;
 		case mtCat:                   return 7;
 		case mtCaveSpider:            return 8;
