@@ -5,6 +5,8 @@
 Declares the 1.15 protocol classes:
 	- cProtocol_1_15
 		- release 1.15 protocol (#573)
+		- release 1.15.1 protocol (#574)
+		- release 1.15.2 protocol (#577)
 */
 
 
