@@ -595,10 +595,8 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 		(2 +  // Block count, BEInt16, 2 bytes
 		1 +  // Bits per entry, BEUInt8, 1 byte
 		m_Packet.GetVarIntSize(static_cast<UInt32>(
-			ChunkSectionDataArraySize)) +   // Field containing "size of whole
-											// section", VarInt32, variable size
-			ChunkSectionDataArraySize * 8   // Actual section data, lots of bytes
-											// (multiplier 1 long = 8 bytes)
+			ChunkSectionDataArraySize)) +   // Field containing "size of whole section", VarInt32, variable size
+			ChunkSectionDataArraySize * 8   // Actual section data, lots of bytes (multiplier 1 long = 8 bytes)
 		);
 
 	const size_t BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
