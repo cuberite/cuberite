@@ -260,10 +260,10 @@ void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f
 	ASSERT(m_State == 3);  // In game mode?
 
 	const auto ParticleID = GetProtocolParticleID(a_ParticleName);
-	
+
 	cPacketizer Pkt(*this, pktParticleEffect);
 	Pkt.WriteBEInt32(ParticleID);
-	
+
 	Pkt.WriteBool(false);  // Long Distance
 	Pkt.WriteBEDouble(a_Src.x);
 	Pkt.WriteBEDouble(a_Src.y);
@@ -619,6 +619,10 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 	}
 }
 
+
+
+
+
 void cProtocol_1_15::SendPlayerSpawn(const cPlayer & a_Player)
 {
 	// Called to spawn another player for the client
@@ -631,9 +635,11 @@ void cProtocol_1_15::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteBEDouble(LastSentPos.z);
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
-	//WriteEntityMetadata(Pkt, a_Player);
-	//Pkt.WriteBEUInt8(0xff);  // Metadata: end
+	// WriteEntityMetadata(Pkt, a_Player);
+	// Pkt.WriteBEUInt8(0xff);  // Metadata: end
 }
+
+
 
 
 
@@ -642,7 +648,7 @@ void cProtocol_1_15::SendSoundEffect(
 	float a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
+
 	cPacketizer Pkt(*this, pktSoundEffect);
 	Pkt.WriteString(a_SoundName);
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a

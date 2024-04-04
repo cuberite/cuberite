@@ -2102,7 +2102,7 @@ void cWSSAnvil::LoadPaintingFromNBT(cEntityList & a_Entities, const cParsedNBT &
 		return;
 	}
 
-	auto Painting = std::make_unique<cPainting>(a_NBT.GetString(MotiveTag), BLOCK_FACE_NONE, Vector3d(),0);
+	auto Painting = std::make_unique<cPainting>(a_NBT.GetString(MotiveTag), BLOCK_FACE_NONE, Vector3d(), 0);
 	if (!LoadEntityBaseFromNBT(*Painting.get(), a_NBT, a_TagIdx))
 	{
 		return;
