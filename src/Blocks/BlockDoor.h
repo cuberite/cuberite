@@ -102,28 +102,19 @@ public:
 		{
 			return;
 		}
+
 		// Change the door
 		NIBBLETYPE NewMeta = (Meta & 0x07) ^ 0x04;  // Flip the "IsOpen" bit (0x04)
-		LOG("%d X - %d Y - %d Z - %X", a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,Meta);
 		if ((Meta & 0x08) == 0)
 		{
-			//NIBBLETYPE nb1 = a_ChunkInterface.GetBlockMeta(a_BlockPos) & 0x07 ^ 0x04;
-			//NIBBLETYPE nb2 = a_ChunkInterface.GetBlockMeta(a_BlockPos.addedY(1)) & 0x07 ^ 0x04;
-
 			// The block is the bottom part of the door
 			a_ChunkInterface.SetBlockMeta(a_BlockPos, NewMeta);
-			//a_ChunkInterface.SetBlockMeta(a_BlockPos.addedY(1), nb2);
 		}
 		else
 		{
 			// The block is the top part of the door, set the meta to the corresponding top part
 			if (a_BlockPos.y > 0)
 			{
-				NIBBLETYPE nb1 = IsOpen ? 0x7 : 0x3;		//((Meta & 0xF) & 0x3) | (a_Open << 2);
-				NIBBLETYPE nb2 = IsOpen ? 0xC : 0x8;	//((Meta & 0xF) &
-									// 0x3) | (a_Open << 2) | 0x08;
-				LOG("%X nb1 - %X nb2",nb1,nb2);
-				//a_ChunkInterface.SetBlockMeta(a_BlockPos,nb2);
 				a_ChunkInterface.SetBlockMeta(a_BlockPos.addedY(-1), NewMeta);
 			}
 		}
