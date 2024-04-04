@@ -67,12 +67,7 @@ public:
 		m_Lock(a_Protocol.m_CSPacket),
 		m_PacketType(a_PacketType)  // Used for logging purposes
 	{
-		auto id = m_Protocol.GetPacketID(a_PacketType);
-		if (id == 0x36)
-		{
-			LOG("%s - 0x%.2X", PacketTypeToStr(a_PacketType), id);
-		}
-		m_Out.WriteVarInt32(id);
+		m_Out.WriteVarInt32(m_Protocol.GetPacketID(a_PacketType));
 	}
 
 	/** Sends the packet via the contained protocol's SendPacket() function. */
