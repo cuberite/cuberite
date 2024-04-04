@@ -1,9 +1,11 @@
 
-// Protocol_1_14.cpp
+// Protocol_1_15.cpp
 
 /*
-Implements the 1.14 protocol classes:
-- release 1.14 protocol (#477)
+Implements the 1.15 protocol classes:
+		- release 1.15 protocol (#573)
+		- release 1.15.1 protocol (#574)
+		- release 1.15.2 protocol (#577)
 */
 
 #include "Globals.h"
@@ -613,7 +615,7 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktWeather:              return 0x1F;
 		case cProtocol::pktWindowItems:          return 0x15;
 		case cProtocol::pktWindowOpen:           return 0x2F;
-        case cProtocol::pktWindowClose:			 return 0x14;
+		case cProtocol::pktWindowClose:			 return 0x14;
 		case cProtocol::pktWindowProperty:       return 0x16;
 		default: return Super::GetPacketID(a_PacketType);
 	}
@@ -651,8 +653,7 @@ void cProtocol_1_15::SendSoundEffect(
 
 	cPacketizer Pkt(*this, pktSoundEffect);
 	Pkt.WriteString(a_SoundName);
-	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a
-						   // parameter later)
+	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.x * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.y * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.z * 8.0));
@@ -689,7 +690,7 @@ void cProtocol_1_15::SendSpawnMob(const cMonster & a_Mob)
 	{
 		return;
 	}
-	
+
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
 	Pkt.WriteUUID(cUUID::GenerateVersion3("fixxxxx"));	 // Temp fix
