@@ -1588,7 +1588,7 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 		AString potionname = "";
 		AString finalname = "minecraft:";
 		
-		int potion_dmg = a_Item.m_ItemDamage & 0x7F;
+		int potion_dmg = a_Item.m_ItemDamage & 0x1F;
 		switch (potion_dmg)
 		{
 			case 0: potionname = "water"; break;
@@ -1605,11 +1605,20 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 			case 12: potionname = "harming"; break;
 			case 13: potionname = "water_breathing"; break;
 			case 14: potionname = "invisibility"; break;
+			case 15: potionname = "slow_falling"; break;
 			case 16: potionname = "awkward"; break;
+			case 17: potionname = "turtle_master"; break;
 			case 32: potionname = "thick"; break;
 			case 64: potionname = "mundane"; break;
 		}
-
+		if ((a_Item.m_ItemDamage & 32) == 32 && potionname != "")
+		{
+			potionname = "thick";
+		}
+		if ((a_Item.m_ItemDamage & 64) == 64 && potionname != "")
+		{
+			potionname = "mundane";
+		}
 		if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1 && potionname != "thick")
 		{
 			strong_potion = true;
@@ -1623,7 +1632,10 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 		finalname += potionname;
 		Writer.AddString("Potion",finalname);
 	}
-	Writer.AddInt("RepairCost", a_Item.m_RepairCost);
+	if (a_Item.m_RepairCost != 0)
+	{
+		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
+	}
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
 		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "Enchantments";

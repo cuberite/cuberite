@@ -1384,6 +1384,7 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 				if (TagName == "Potion")
 				{
 					AString PotionEffect = NBT.GetString(tag);
+					LOGD("%s",PotionEffect);
 					if (PotionEffect.find("minecraft:") == AString::npos)
 					{
 						LOGD("Unknown or missing domain on potion effect name %s!", PotionEffect.c_str());
@@ -1457,6 +1458,14 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 					else if (PotionEffect.find("invisibility") != AString::npos)
 					{
 						a_Item.m_ItemDamage = 14;
+					}
+					else if (PotionEffect.find("slow_falling") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 15;
+					}
+					else if (PotionEffect.find("turtle_master") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 17;
 					}
 					else if (PotionEffect.find("water") != AString::npos)
 					{
