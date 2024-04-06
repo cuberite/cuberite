@@ -600,7 +600,7 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktPlayerList:           return 0x34;
 		case cProtocol::pktPlayerMoveLook:       return 0x36;
 		case cProtocol::pktPluginMessage:        return 0x19;
-		case cProtocol::pktRemoveEntityEffect:   return 0x38;
+		case cProtocol::pktRemoveEntityEffect:   return 0x39;
 		case cProtocol::pktResourcePack:         return 0x39;
 		case cProtocol::pktRespawn:              return 0x3B;
 		case cProtocol::pktScoreboardObjective:  return 0x49;

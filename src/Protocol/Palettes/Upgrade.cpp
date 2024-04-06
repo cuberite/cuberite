@@ -2275,6 +2275,7 @@ namespace PaletteUpgrade
 			case (438 << 16) | 0: return Item::SplashPotion;
 			case (441 << 16) | 0: return Item::LingeringPotion;
 
+			// Theres an extra unused case here idk which
 			// Potion type encoded in Item NBT:
 			case (373 << 16) | 16:
 			case (373 << 16) | 32:
@@ -2291,6 +2292,10 @@ namespace PaletteUpgrade
 			case (373 << 16) | 8204:
 			case (373 << 16) | 8205:
 			case (373 << 16) | 8206:
+			case (373 << 16) | 8207:
+			case (373 << 16) | 8208:
+			case (373 << 16) | 8209:
+			case (373 << 16) | 8224:
 			case (373 << 16) | 8225:
 			case (373 << 16) | 8226:
 			case (373 << 16) | 8228:
@@ -2298,6 +2303,9 @@ namespace PaletteUpgrade
 			case (373 << 16) | 8233:
 			case (373 << 16) | 8235:
 			case (373 << 16) | 8236:
+			case (373 << 16) | 8239:
+			case (373 << 16) | 8241:
+			case (373 << 16) | 8256:
 			case (373 << 16) | 8257:
 			case (373 << 16) | 8258:
 			case (373 << 16) | 8259:
@@ -2309,6 +2317,8 @@ namespace PaletteUpgrade
 			case (373 << 16) | 8267:
 			case (373 << 16) | 8269:
 			case (373 << 16) | 8270:
+			case (373 << 16) | 8271:
+			case (373 << 16) | 8273:
 			case (373 << 16) | 8289:
 			case (373 << 16) | 8290:
 			case (373 << 16) | 8292: 
