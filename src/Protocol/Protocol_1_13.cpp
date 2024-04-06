@@ -1576,6 +1576,89 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 	a_Pkt.WriteVarInt32(GetProtocolItemType(a_Item.m_ItemType, a_Item.m_ItemDamage));
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 
+	cFastNBTWriter Writer;
+	if (a_Item.m_ItemType == E_ITEM_POTION)
+	{
+		bool strong_potion = false;
+		bool long_potion = false;
+		AString potionname = "";
+		AString finalname = "minecraft:";
+		
+		int potion_dmg = a_Item.m_ItemDamage & 0x7F;
+		switch (potion_dmg)
+		{
+			case 0: potionname = "water"; break;
+			case 1: potionname = "regeneration"; break;
+			case 2: potionname = "swiftness"; break;
+			case 3: potionname = "fire_resistance"; break;
+			case 4: potionname = "poison"; break;
+			case 5: potionname = "healing"; break;
+			case 6: potionname = "night_vision"; break;
+			case 8: potionname = "weakness"; break;
+			case 9: potionname = "strength"; break;
+			case 10: potionname = "slowness"; break;
+			case 11: potionname = "leaping"; break;
+			case 12: potionname = "harming"; break;
+			case 13: potionname = "water_breathing"; break;
+			case 14: potionname = "invisibility"; break;
+			case 16: potionname = "awkward"; break;
+			case 32: potionname = "thick"; break;
+			case 64: potionname = "mundane"; break;
+		}
+
+		if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1 && potionname != "thick")
+		{
+			strong_potion = true;
+			finalname += "strong_";
+		}
+		if ((a_Item.m_ItemDamage & 0x40) == 0x40 && potionname != "mundane")
+		{
+			long_potion = true;
+			finalname += "long_";
+		}
+		finalname += potionname;
+		Writer.AddString("Potion",finalname);
+	}
+	Writer.AddInt("RepairCost", a_Item.m_RepairCost);
+	if (!a_Item.m_Enchantments.IsEmpty())
+	{
+		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "Enchantments";
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName, true);
+	}
+	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
+	{
+		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem,Writer,static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+	}
+
+	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
+	{
+		Writer.BeginCompound("display");
+		if (a_Item.m_ItemColor.IsValid())
+		{
+			Writer.AddInt("color", static_cast<Int32>(a_Item.m_ItemColor.m_Color));
+		}
+
+		if (!a_Item.IsCustomNameEmpty())
+		{
+			Writer.AddString("Name", a_Item.m_CustomName);
+		}
+		if (!a_Item.IsLoreEmpty())
+		{
+			Writer.BeginList("Lore", TAG_String);
+
+			for (const auto & Line : a_Item.m_LoreTable)
+			{
+				Writer.AddString("", Line);
+			}
+
+			Writer.EndList();
+		}
+		Writer.EndCompound();
+	}
+
+	Writer.Finish();
+
+	a_Pkt.WriteBuf(Writer.GetResult());
 	// TODO: NBT
-	a_Pkt.WriteBEInt8(0);
+	//a_Pkt.WriteBEInt8(0);
 }

@@ -1,20 +1,26 @@
 
 #pragma once
 
-#include "PassiveMonster.h"
+#include "PassiveAggressiveMonster.h"
 
 
 
 
 
 class cBee:
-	public cPassiveMonster
+	public cPassiveAggressiveMonster
 {
-	using Super = cPassiveMonster;
+	using Super = cPassiveAggressiveMonster;
 
 public:
 
 	cBee();
 
 	CLASS_PROTODEF(cBee)
+  private:
+	int m_angertime;
+	int m_CannotEnterHiveTicks;
+	int CropsGrownSincePollination;
+
+
 } ;
