@@ -326,7 +326,7 @@ public:
 				if (!a_Item.m_Enchantments.IsEmpty())
 				{
 					const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-					EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, mWriter, TagName);
+					EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, mWriter, TagName, false);
 				}
 			mWriter.EndCompound();
 		}
@@ -812,10 +812,6 @@ public:
 
 			switch (a_Monster->GetMobType())
 			{
-				case mtBee:
-				{
-					// TODO: implement serialization
-				}
 				case mtBat:
 				{
 					mWriter.AddByte("BatFlags", static_cast<const cBat *>(a_Monster)->IsHanging());
@@ -1003,6 +999,7 @@ public:
 				case mtWanderingTrader:
 				case mtZoglin:
 				case mtZombieHorse:
+				case mtBee:
 				{
 					// All the entities not added
 					LOGD("Saving unimplemented entity type: %d", NamespaceSerializer::From(a_Monster->GetMobType()));

@@ -582,7 +582,7 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktCollectEntity:        return 0x56;
 		case cProtocol::pktDestroyEntity:        return 0x38;
 		case cProtocol::pktDisconnectDuringGame: return 0x1B;
-		case cProtocol::pktEntityEffect:         return 0x59;
+		case cProtocol::pktEntityEffect:         return 0x5A;
 		case cProtocol::pktEntityEquipment:      return 0x47;
 		case cProtocol::pktEntityHeadLook:       return 0x3C;
 		case cProtocol::pktEntityMeta:           return 0x44;

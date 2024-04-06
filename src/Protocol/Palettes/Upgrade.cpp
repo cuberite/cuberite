@@ -2311,7 +2311,7 @@ namespace PaletteUpgrade
 			case (373 << 16) | 8270:
 			case (373 << 16) | 8289:
 			case (373 << 16) | 8290:
-			case (373 << 16) | 8292:
+			case (373 << 16) | 8292: 
 			case (373 << 16) | 8297: return Item::Potion;
 
 			// Potion type encoded in Item NBT:

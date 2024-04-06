@@ -1321,7 +1321,7 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 		{
 			case TAG_List:
 			{
-				if ((TagName == "ench") || (TagName == "StoredEnchantments"))  // Enchantments tags
+				if ((TagName == "ench") || (TagName == "StoredEnchantments") || TagName == "Enchantments")  // Enchantments tags
 				{
 					EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
 				}
@@ -1828,7 +1828,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
 		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName, false);
 	}
 	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
 	{
