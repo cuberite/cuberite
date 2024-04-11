@@ -2826,6 +2826,16 @@ void cProtocol_1_8_0::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 
 
 
+void cProtocol_1_8_0::HandlePacketBookUpdate(cByteBuffer & a_ByteBuffer)
+{
+	// Used by clients 1.15+
+	return;
+}
+
+
+
+
+
 void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const std::string_view a_Channel)
 {
 	if ((a_Channel == "AdvCdm") || (a_Channel == "AdvCmd"))  // Spelling was fixed in 15w34.
@@ -3423,7 +3433,7 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
 		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName,false);
 	}
 	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
 	{

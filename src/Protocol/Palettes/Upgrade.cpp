@@ -1701,6 +1701,30 @@ namespace PaletteUpgrade
 			case (255 << 4) | 1: return StructureBlock::StructureBlock(StructureBlock::Mode::Load);
 			case (255 << 4) | 2: return StructureBlock::StructureBlock(StructureBlock::Mode::Corner);
 			case (255 << 4) | 3: return StructureBlock::StructureBlock(StructureBlock::Mode::Data);
+			case (453 << 4) | 0: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_ZM, 0);
+			case (453 << 4) | 1: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_ZM, 1);
+			case (453 << 4) | 2: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_ZM, 2);
+			case (453 << 4) | 3: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_ZM, 3);
+			case (453 << 4) | 4: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_ZM, 4);
+			case (453 << 4) | 5: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_ZM, 5);
+			case (453 << 4) | 6: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_ZP, 0);
+			case (453 << 4) | 7: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_ZP, 1);
+			case (453 << 4) | 8: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_ZP, 2);
+			case (453 << 4) | 9: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_ZP, 3);
+			case (453 << 4) | 10: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_ZP, 4);
+			case (453 << 4) | 11: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_ZP, 5);
+			case (453 << 4) | 12: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_XM, 0);
+			case (453 << 4) | 13: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_XM, 1);
+			case (453 << 4) | 14: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_XM, 2);
+			case (453 << 4) | 15: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_XM, 3);
+			case (454 << 4) | 0: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_XM, 4);
+			case (454 << 4) | 1: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_XM, 5);
+			case (454 << 4) | 2: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_XP, 0);
+			case (454 << 4) | 3: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_XP, 1);
+			case (454 << 4) | 4: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_XP, 2);
+			case (454 << 4) | 5: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_XP, 3);
+			case (454 << 4) | 6: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_XP, 4);
+			case (454 << 4) | 7: return BeeNest::BeeNest(eBlockFace::BLOCK_FACE_XP, 5);
 			default: return Air::Air();
 		}
 	}
@@ -2251,6 +2275,7 @@ namespace PaletteUpgrade
 			case (438 << 16) | 0: return Item::SplashPotion;
 			case (441 << 16) | 0: return Item::LingeringPotion;
 
+			// Theres an extra unused case here idk which
 			// Potion type encoded in Item NBT:
 			case (373 << 16) | 16:
 			case (373 << 16) | 32:
@@ -2267,6 +2292,10 @@ namespace PaletteUpgrade
 			case (373 << 16) | 8204:
 			case (373 << 16) | 8205:
 			case (373 << 16) | 8206:
+			case (373 << 16) | 8207:
+			case (373 << 16) | 8208:
+			case (373 << 16) | 8209:
+			case (373 << 16) | 8224:
 			case (373 << 16) | 8225:
 			case (373 << 16) | 8226:
 			case (373 << 16) | 8228:
@@ -2274,6 +2303,9 @@ namespace PaletteUpgrade
 			case (373 << 16) | 8233:
 			case (373 << 16) | 8235:
 			case (373 << 16) | 8236:
+			case (373 << 16) | 8239:
+			case (373 << 16) | 8241:
+			case (373 << 16) | 8256:
 			case (373 << 16) | 8257:
 			case (373 << 16) | 8258:
 			case (373 << 16) | 8259:
@@ -2285,9 +2317,11 @@ namespace PaletteUpgrade
 			case (373 << 16) | 8267:
 			case (373 << 16) | 8269:
 			case (373 << 16) | 8270:
+			case (373 << 16) | 8271:
+			case (373 << 16) | 8273:
 			case (373 << 16) | 8289:
 			case (373 << 16) | 8290:
-			case (373 << 16) | 8292:
+			case (373 << 16) | 8292: 
 			case (373 << 16) | 8297: return Item::Potion;
 
 			// Potion type encoded in Item NBT:
@@ -2376,6 +2410,24 @@ namespace PaletteUpgrade
 			case (383 << 16) | 29: return Item::ZombieHorseSpawnEgg;
 			case (383 << 16) | 57: return Item::ZombiePigmanSpawnEgg;
 			case (383 << 16) | 27: return Item::ZombieVillagerSpawnEgg;
+			case (383 << 16) | 104: return Item::ParrotSpawnEgg;
+			case (383 << 16) | 105: return Item::BeeSpawnEgg;
+			case (383 << 16) | 106: return Item::CatSpawnEgg;
+			case (383 << 16) | 107: return Item::CodSpawnEgg;
+			case (383 << 16) | 108: return Item::DolphinSpawnEgg;
+			case (383 << 16) | 109: return Item::DrownedSpawnEgg;
+			case (383 << 16) | 110: return Item::FoxSpawnEgg;
+			case (383 << 16) | 111: return Item::PandaSpawnEgg;
+			case (383 << 16) | 112: return Item::PhantomSpawnEgg;
+			case (383 << 16) | 113: return Item::PillagerSpawnEgg;
+			case (383 << 16) | 114: return Item::PufferfishSpawnEgg;
+			case (383 << 16) | 115: return Item::RavagerSpawnEgg;
+			case (383 << 16) | 116: return Item::SalmonSpawnEgg;
+			case (383 << 16) | 60: return Item::SilverfishSpawnEgg;
+			case (383 << 16) | 118: return Item::TraderLlamaSpawnEgg;
+			case (383 << 16) | 119: return Item::TropicalFishSpawnEgg;
+			case (383 << 16) | 121: return Item::TurtleSpawnEgg;
+			case (383 << 16) | 122: return Item::WanderingTraderSpawnEgg;
 			case (384 << 16) | 0: return Item::ExperienceBottle;
 			case (385 << 16) | 0: return Item::FireCharge;
 			case (386 << 16) | 0: return Item::WritableBook;
@@ -2456,6 +2508,129 @@ namespace PaletteUpgrade
 			case (449 << 16) | 0: return Item::TotemOfUndying;
 			case (450 << 16) | 0: return Item::ShulkerShell;
 			case (452 << 16) | 0: return Item::IronNugget;
+			case (453 << 16) | 0: return Item::BeeNest;
+			case (454 << 16) | 0: return Item::Trident;
+			case (455 << 16) | 0: return Item::PhantomMembrane;
+			case (456 << 16) | 0: return Item::NautilusShell;
+			case (457 << 16) | 0: return Item::HeartOfTheSea;
+			case (458 << 16) | 0: return Item::Crossbow;
+			case (459 << 16) | 0: return Item::SuspiciousStew;
+			case (460 << 16) | 0: return Item::Loom;
+			case (461 << 16) | 0: return Item::FlowerBannerPattern;
+			case (462 << 16) | 0: return Item::CreeperBannerPattern;
+			case (463 << 16) | 0: return Item::SkullBannerPattern;
+			case (464 << 16) | 0: return Item::MojangBannerPattern;
+			case (465 << 16) | 0: return Item::GlobeBannerPattern;
+			case (466 << 16) | 0: return Item::Barrel;
+			case (467 << 16) | 0: return Item::Smoker;
+			case (468 << 16) | 0: return Item::BlastFurnace;
+			case (469 << 16) | 0: return Item::CartographyTable;
+			case (470 << 16) | 0: return Item::FletchingTable;
+			case (471 << 16) | 0: return Item::Grindstone;
+			case (472 << 16) | 0: return Item::Lectern;
+			case (473 << 16) | 0: return Item::SmithingTable;
+			case (474 << 16) | 0: return Item::Stonecutter;
+			case (475 << 16) | 0: return Item::Bell;
+			case (476 << 16) | 0: return Item::Lantern;
+			case (477 << 16) | 0: return Item::SweetBerries;
+			case (478 << 16) | 0: return Item::Campfire;
+			case (479 << 16) | 0: return Item::Honeycomb;
+			case (480 << 16) | 0: return Item::Beehive;
+			case (481 << 16) | 0: return Item::HoneyBottle;
+			case (482 << 16) | 0: return Item::HoneyBlock;
+			case (483 << 16) | 0: return Item::HoneycombBlock;
+			case (484 << 16) | 0: return Item::DeadTubeCoralBlock;
+			case (485 << 16) | 0: return Item::DeadBrainCoralBlock;
+			case (486 << 16) | 0: return Item::DeadBubbleCoralBlock;
+			case (487 << 16) | 0: return Item::DeadFireCoralBlock;
+			case (488 << 16) | 0: return Item::DeadHornCoralBlock;
+			case (489 << 16) | 0: return Item::DeadTubeCoral;
+			case (490 << 16) | 0: return Item::DeadBrainCoral;
+			case (491 << 16) | 0: return Item::DeadBubbleCoral;
+			case (492 << 16) | 0: return Item::DeadFireCoral;
+			case (493 << 16) | 0: return Item::DeadHornCoral;
+			case (494 << 16) | 0: return Item::DeadTubeCoralFan;
+			case (495 << 16) | 0: return Item::DeadBrainCoralFan;
+			case (496 << 16) | 0: return Item::DeadBubbleCoralFan;
+			case (497 << 16) | 0: return Item::DeadFireCoralFan;
+			case (498 << 16) | 0: return Item::DeadHornCoralFan;
+			case (499 << 16) | 0: return Item::TubeCoralBlock;
+			case (500 << 16) | 0: return Item::BrainCoralBlock;
+			case (501 << 16) | 0: return Item::BubbleCoralBlock;
+			case (502 << 16) | 0: return Item::FireCoralBlock;
+			case (503 << 16) | 0: return Item::HornCoralBlock;
+			case (504 << 16) | 0: return Item::TubeCoral;
+			case (505 << 16) | 0: return Item::BrainCoral;
+			case (506 << 16) | 0: return Item::BubbleCoral;
+			case (507 << 16) | 0: return Item::FireCoral;
+			case (508 << 16) | 0: return Item::HornCoral;
+			case (509 << 16) | 0: return Item::TubeCoralFan;
+			case (510 << 16) | 0: return Item::BrainCoralFan;
+			case (511 << 16) | 0: return Item::BubbleCoralFan;
+			case (512 << 16) | 0: return Item::FireCoralFan;
+			case (513 << 16) | 0: return Item::HornCoralFan;
+			case (514 << 16) | 0: return Item::BlueIce;
+			case (515 << 16) | 0: return Item::PolishedGraniteStairs;
+			case (516 << 16) | 0: return Item::PolishedGraniteSlab;
+			case (518 << 16) | 0: return Item::GraniteSlab;
+			case (519 << 16) | 0: return Item::GraniteStairs;
+			case (520 << 16) | 0: return Item::GraniteWall;
+			case (521 << 16) | 0: return Item::SmoothRedSandstoneStairs;
+			case (522 << 16) | 0: return Item::SmoothRedSandstoneSlab;
+			case (523 << 16) | 0: return Item::RedSandstoneWall;
+			case (525 << 16) | 0: return Item::MossyCobblestoneStairs;
+			case (526 << 16) | 0: return Item::MossyCobblestoneSlab;
+			case (527 << 16) | 0: return Item::PolishedAndesiteStairs;
+			case (528 << 16) | 0: return Item::PolishedAndesiteSlab;
+			case (529 << 16) | 0: return Item::EndStoneBrickStairs;
+			case (530 << 16) | 0: return Item::EndStoneBrickSlab;
+			case (531 << 16) | 0: return Item::EndStoneBrickWall;
+			case (532 << 16) | 0: return Item::StoneStairs;
+			case (533 << 16) | 0: return Item::SmoothQuartzStairs;
+			case (534 << 16) | 0: return Item::SmoothQuartzSlab;
+			case (535 << 16) | 0: return Item::RedNetherBrickStairs;
+			case (536 << 16) | 0: return Item::RedNetherBrickSlab;
+			case (537 << 16) | 0: return Item::RedNetherBrickWall;
+			case (538 << 16) | 0: return Item::PolishedDioriteStairs;
+			case (539 << 16) | 0: return Item::PolishedDioriteSlab;
+			case (540 << 16) | 0: return Item::DioriteSlab;
+			case (541 << 16) | 0: return Item::DioriteStairs;
+			case (542 << 16) | 0: return Item::DioriteWall;
+			case (543 << 16) | 0: return Item::PrismarineSlab;
+			case (544 << 16) | 0: return Item::PrismarineStairs;
+			case (545 << 16) | 0: return Item::PrismarineWall;
+			case (546 << 16) | 0: return Item::PrismarineBrickSlab;
+			case (547 << 16) | 0: return Item::PrismarineBrickStairs;
+			case (549 << 16) | 0: return Item::DarkPrismarineSlab;
+			case (550 << 16) | 0: return Item::DarkPrismarineStairs;
+			case (551 << 16) | 0: return Item::SmoothSandstone;
+			case (552 << 16) | 0: return Item::SmoothSandstoneStairs;
+			case (553 << 16) | 0: return Item::SmoothSandstoneSlab;
+			case (554 << 16) | 0: return Item::Scaffolding;
+			case (555 << 16) | 0: return Item::SpruceSign;
+			case (556 << 16) | 0: return Item::BirchSign;
+			case (557 << 16) | 0: return Item::JungleSign;
+			case (558 << 16) | 0: return Item::AcaciaSign;
+			case (559 << 16) | 0: return Item::DarkOakSign;
+			case (560 << 16) | 0: return Item::Kelp;
+			case (561 << 16) | 0: return Item::DriedKelp;
+			case (562 << 16) | 0: return Item::DriedKelpBlock;
+			case (563 << 16) | 0: return Item::TurtleEgg;
+			case (564 << 16) | 0: return Item::TurtleHelmet;
+			case (565 << 16) | 0: return Item::Scute;
+			case (566 << 16) | 0: return Item::Bamboo;
+			case (567 << 16) | 0: return Item::PufferfishBucket;
+			case (568 << 16) | 0: return Item::SalmonBucket;
+			case (569 << 16) | 0: return Item::CodBucket;
+			case (570 << 16) | 0: return Item::TropicalFishBucket;
+			case (571 << 16) | 0: return Item::Conduit;
+			case (572 << 16) | 0: return Item::BlueDye;
+			case (573 << 16) | 0: return Item::BrownDye;
+			case (574 << 16) | 0: return Item::BlackDye;
+			case (575 << 16) | 0: return Item::WhiteDye;
+
+
+
 			case (2256 << 16) | 0: return Item::MusicDisc13;
 			case (2257 << 16) | 0: return Item::MusicDiscCat;
 			case (2258 << 16) | 0: return Item::MusicDiscBlocks;
@@ -3111,6 +3286,24 @@ namespace PaletteUpgrade
 			case Item::ZombieHorseSpawnEgg: return { 383, 29 };
 			case Item::ZombiePigmanSpawnEgg: return { 383, 57 };
 			case Item::ZombieVillagerSpawnEgg: return { 383, 27 };
+			case Item::ParrotSpawnEgg: return { 383, 104};
+			case Item::BeeSpawnEgg: return { 383, 105};
+			case Item::CatSpawnEgg: return { 383, 106};
+			case Item::CodSpawnEgg: return { 383, 107};
+			case Item::DolphinSpawnEgg: return { 383, 108};
+			case Item::DrownedSpawnEgg: return { 383, 109};
+			case Item::FoxSpawnEgg: return { 383, 110};
+			case Item::PandaSpawnEgg: return { 383, 111};
+			case Item::PhantomSpawnEgg: return { 383, 112};
+			case Item::PillagerSpawnEgg: return { 383, 113};
+			case Item::PufferfishSpawnEgg: return { 383, 114};
+			case Item::RavagerSpawnEgg: return { 383, 115};
+			case Item::SalmonSpawnEgg: return { 383, 116};
+			case Item::SilverfishSpawnEgg: return { 383, 60};
+			case Item::TraderLlamaSpawnEgg: return { 383, 118};
+			case Item::TropicalFishSpawnEgg: return { 383, 119};
+			case Item::TurtleSpawnEgg: return { 383, 121};
+			case Item::WanderingTraderSpawnEgg: return { 383, 122};
 			case Item::ExperienceBottle: return { 384, 0 };
 			case Item::FireCharge: return { 385, 0 };
 			case Item::WritableBook: return { 386, 0 };
@@ -3191,6 +3384,128 @@ namespace PaletteUpgrade
 			case Item::TotemOfUndying: return { 449, 0 };
 			case Item::ShulkerShell: return { 450, 0 };
 			case Item::IronNugget: return { 452, 0 };
+			// knolegde book and debug stick missing here
+			case Item::BeeNest: return { 453, 0};
+			case Item::Trident: return { 454, 0};
+			case Item::PhantomMembrane: return { 455, 0};
+			case Item::NautilusShell: return { 456, 0};
+			case Item::HeartOfTheSea: return { 457, 0};
+			case Item::Crossbow: return { 458, 0};
+			case Item::SuspiciousStew: return { 459, 0};
+			case Item::Loom: return { 460, 0};
+			case Item::FlowerBannerPattern:return { 461, 0};
+			case Item::CreeperBannerPattern:return { 462, 0};
+			case Item::SkullBannerPattern:return { 463, 0};
+			case Item::MojangBannerPattern:return { 464, 0};
+			case Item::GlobeBannerPattern:return { 465, 0};
+			case Item::Barrel: return { 466, 0};
+			case Item::Smoker: return { 467, 0};
+			case Item::BlastFurnace: return { 468, 0};
+			case Item::CartographyTable:return { 469, 0};
+			case Item::FletchingTable:return { 470, 0};
+			case Item::Grindstone:return { 471, 0};
+			case Item::Lectern:return { 472, 0};
+			case Item::SmithingTable:return { 473, 0};
+			case Item::Stonecutter:return { 474, 0};
+			case Item::Bell:return { 475, 0};
+			case Item::Lantern: return {476, 0};
+			case Item::SweetBerries:return { 477, 0};
+			case Item::Campfire:return { 478, 0};
+			case Item::Honeycomb:return { 479, 0};
+			case Item::Beehive:return { 480, 0};
+			case Item::HoneyBottle:return { 481, 0};
+			case Item::HoneyBlock:return { 482, 0};
+			case Item::HoneycombBlock: return { 483, 0};
+			case Item::DeadTubeCoralBlock: return { 484, 0 };
+			case Item::DeadBrainCoralBlock: return { 485, 0 };
+			case Item::DeadBubbleCoralBlock: return { 486, 0 };
+			case Item::DeadFireCoralBlock: return { 487, 0 };
+			case Item::DeadHornCoralBlock: return { 488, 0 };
+			case Item::DeadTubeCoral: return { 489, 0 };
+			case Item::DeadBrainCoral: return { 490, 0 };
+			case Item::DeadBubbleCoral: return { 491, 0 };
+			case Item::DeadFireCoral: return { 492, 0 };
+			case Item::DeadHornCoral: return { 493, 0 };
+			case Item::DeadTubeCoralFan: return { 494, 0 };
+			case Item::DeadBrainCoralFan: return { 495, 0 };
+			case Item::DeadBubbleCoralFan: return { 496, 0 };
+			case Item::DeadFireCoralFan: return { 497, 0 };
+			case Item::DeadHornCoralFan: return { 498, 0 };
+			case Item::TubeCoralBlock: return { 499, 0 };
+			case Item::BrainCoralBlock: return { 500, 0 };
+			case Item::BubbleCoralBlock: return { 501, 0 };
+			case Item::FireCoralBlock: return { 502, 0 };
+			case Item::HornCoralBlock: return { 503, 0 };
+			case Item::TubeCoral: return { 504, 0 };
+			case Item::BrainCoral: return { 505, 0 };
+			case Item::BubbleCoral: return { 506, 0 };
+			case Item::FireCoral: return { 507, 0 };
+			case Item::HornCoral: return { 508, 0 };
+			case Item::TubeCoralFan: return { 509, 0 };
+			case Item::BrainCoralFan: return { 510, 0 };
+			case Item::BubbleCoralFan: return { 511, 0 };
+			case Item::FireCoralFan: return { 512, 0 };
+			case Item::HornCoralFan: return { 513, 0 };
+			case Item::BlueIce: return { 514, 0 };
+			case Item::PolishedGraniteStairs: return { 515, 0 };
+			case Item::PolishedGraniteSlab: return { 516, 0 };
+			case Item::GraniteSlab: return { 518, 0 };
+			case Item::GraniteStairs: return { 519, 0 };
+			case Item::GraniteWall: return { 520, 0 };
+			case Item::SmoothRedSandstoneStairs: return { 521, 0 };
+			case Item::SmoothRedSandstoneSlab: return { 522, 0 };
+			case Item::RedSandstoneWall: return { 523, 0 };
+			case Item::MossyCobblestoneStairs: return { 525, 0 };
+			case Item::MossyCobblestoneSlab: return { 526, 0 };
+			case Item::PolishedAndesiteStairs: return { 527, 0 };
+			case Item::PolishedAndesiteSlab: return { 528, 0 };
+			case Item::EndStoneBrickStairs: return { 529, 0 };
+			case Item::EndStoneBrickSlab: return { 530, 0 };
+			case Item::EndStoneBrickWall: return { 531, 0 };
+			case Item::StoneStairs: return { 532, 0 };
+			case Item::SmoothQuartzStairs: return { 533, 0 };
+			case Item::SmoothQuartzSlab: return { 534, 0 };
+			case Item::RedNetherBrickStairs: return { 535, 0 };
+			case Item::RedNetherBrickSlab: return { 536, 0 };
+			case Item::RedNetherBrickWall: return { 537, 0 };
+			case Item::PolishedDioriteStairs: return { 538, 0 };
+			case Item::PolishedDioriteSlab: return { 539, 0 };
+			case Item::DioriteSlab: return { 540, 0 };
+			case Item::DioriteStairs: return { 541, 0 };
+			case Item::DioriteWall: return { 542, 0 };
+			case Item::PrismarineSlab: return { 543, 0 };
+			case Item::PrismarineStairs: return { 544, 0 };
+			case Item::PrismarineWall: return { 545, 0 };
+			case Item::PrismarineBrickSlab: return { 546, 0 };
+			case Item::PrismarineBrickStairs: return { 547, 0 };
+			case Item::DarkPrismarineSlab: return { 549, 0 };
+			case Item::DarkPrismarineStairs: return { 550, 0 };
+			case Item::SmoothSandstone: return { 551, 0 };
+			case Item::SmoothSandstoneStairs: return { 552, 0 };
+			case Item::SmoothSandstoneSlab: return { 553, 0 };
+			case Item::Scaffolding: return { 554, 0 };
+			case Item::SpruceSign: return { 555, 0 };
+			case Item::BirchSign: return { 556, 0 };
+			case Item::JungleSign: return { 557, 0 };
+			case Item::AcaciaSign: return { 558, 0 };
+			case Item::DarkOakSign: return { 559, 0 };
+			case Item::Kelp: return { 560, 0 };
+			case Item::DriedKelp: return { 561, 0 };
+			case Item::DriedKelpBlock: return { 562, 0 };
+			case Item::TurtleEgg: return { 563, 0 };
+			case Item::TurtleHelmet: return { 564, 0 };
+			case Item::Scute: return { 565, 0 };
+			case Item::Bamboo: return { 566, 0 };
+			case Item::PufferfishBucket: return { 567, 0 };
+			case Item::SalmonBucket: return { 568, 0 };
+			case Item::CodBucket: return { 569, 0 };
+			case Item::TropicalFishBucket: return { 570, 0 };
+			case Item::Conduit: return { 571, 0 };
+			case Item::BlueDye: return { 572, 0 };
+			case Item::BrownDye: return { 573, 0 };
+			case Item::BlackDye: return { 574, 0 };
+			case Item::WhiteDye: return { 575, 0 };
+
 			case Item::MusicDisc13: return { 2256, 0 };
 			case Item::MusicDiscCat: return { 2257, 0 };
 			case Item::MusicDiscBlocks: return { 2258, 0 };

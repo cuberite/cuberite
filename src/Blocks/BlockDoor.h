@@ -102,7 +102,6 @@ public:
 		{
 			return;
 		}
-
 		// Change the door
 		NIBBLETYPE NewMeta = (Meta & 0x07) ^ 0x04;  // Flip the "IsOpen" bit (0x04)
 		if ((Meta & 0x08) == 0)

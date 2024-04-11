@@ -1034,7 +1034,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_ITEM_WRITTEN_BOOK:                    return ItemWrittenBookHandler;
 
 	}
-	ASSERT("Unknown item type!");
+	UNREACHABLE("Unknown item type!");
 	return ItemAirHandler;
 }
 
