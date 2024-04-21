@@ -3,6 +3,7 @@
 { # put the whole thing in a block so as not to behave weirdly if interrupted
 set -e
 
+
 # Global variables:
 # CHOICE_BUILDTYPE  - Either "Release" or "Debug".
 # CHOICE_THREADS    - A numerical value, the amount of threads to be used for the make command.
