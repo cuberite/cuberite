@@ -23,6 +23,7 @@ cMap::cMap(unsigned int a_ID, cWorld * a_World):
 	m_Scale(3),
 	m_CenterX(0),
 	m_CenterZ(0),
+	m_Dirty(false),
 	m_World(a_World),
 	m_Name(fmt::format(FMT_STRING("map_{}"), m_ID))
 {
@@ -223,7 +224,13 @@ bool cMap::SetPixel(unsigned int a_X, unsigned int a_Z, cMap::ColorID a_Data)
 {
 	if ((a_X < m_Width) && (a_Z < m_Height))
 	{
-		m_Data[a_Z * m_Width + a_X] = a_Data;
+		auto index = a_Z * m_Width + a_X;
+
+		if (m_Data[index] != a_Data)
+		{
+			m_Data[index] = a_Data;
+			m_Dirty = true;
+		}
 
 		return true;
 	}

@@ -60,8 +60,8 @@ void cMapManager::TickMaps()
 
 	if (m_TicksUntilNextSave == 0)
 	{
-		SaveMapData();
 		m_TicksUntilNextSave = MAP_DATA_SAVE_INTERVAL;
+		SaveMapData();
 	}
 	else
 	{
@@ -167,11 +167,18 @@ void cMapManager::SaveMapData(void)
 	{
 		cMap & Map = *it;
 
-		cMapSerializer Serializer(m_World->GetDataPath(), &Map);
-
-		if (!Serializer.Save())
+		if (Map.m_Dirty)
 		{
-			LOGWARN("Could not save map #%i", Map.GetID());
+			cMapSerializer Serializer(m_World->GetDataPath(), &Map);
+
+			if (Serializer.Save())
+			{
+				Map.m_Dirty = false;
+			}
+			else
+			{
+				LOGWARN("Could not save map #%i", Map.GetID());
+			}
 		}
 	}
 }
