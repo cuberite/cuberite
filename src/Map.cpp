@@ -41,6 +41,7 @@ cMap::cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, un
 	m_Scale(a_Scale),
 	m_CenterX(a_CenterX),
 	m_CenterZ(a_CenterZ),
+	m_Dirty(true),
 	m_World(a_World),
 	m_Name(fmt::format(FMT_STRING("map_{}"), m_ID))
 {
