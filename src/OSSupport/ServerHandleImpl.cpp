@@ -329,7 +329,7 @@ void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_
 	}
 
 	const int one = 1;
-	setsockopt(a_Socket, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+	setsockopt(a_Socket, IPPROTO_TCP, TCP_NODELAY, (const char *)&one, sizeof(one));
 
 	// Create a new cTCPLink for the incoming connection:
 	cTCPLinkImplPtr Link = std::make_shared<cTCPLinkImpl>(a_Socket, LinkCallbacks, Self->m_SelfPtr, a_Addr, static_cast<socklen_t>(a_Len));
