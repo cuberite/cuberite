@@ -39,7 +39,7 @@ cmake --build . --parallel 3;
 
 if [ `which ccache` ]; then
 	echo "Built with ccache, outputting cache stats..."
-	ccache --show-stats
+	ccache --show-stats --verbose
 fi
 
 echo "Testing..."
