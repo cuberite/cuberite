@@ -489,9 +489,9 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			int IndexBitSize = std::max(4, static_cast<int>(std::ceil(std::log2(Paletteids.size()))));  // How many bits is one index in length. Min is 4 bits, maximum 12 bits
 			ASSERT((12 >= IndexBitSize) && (IndexBitSize >= 4));
 
-			//Byte bitsleftover = 0;
-			//int valuesread = 0;
-			//int currentbyte = 0;
+			// Byte bitsleftover = 0;
+			// int valuesread = 0;
+			// int currentbyte = 0;
 			// needs better bounds checking
 			short numblockdata[4096] = { 0 };
 			NEWBLOCKTYPE resolveddata[4096] = { AIR };
