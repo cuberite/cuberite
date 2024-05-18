@@ -310,6 +310,7 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback) const
 
 	a_Callback.LightIsValid(m_IsLightValid);
 	a_Callback.ChunkData(m_BlockData, m_LightData);
+	a_Callback.ChunkData2(m_BlockData2, m_LightData);
 	a_Callback.HeightMap(m_HeightMap);
 	a_Callback.BiomeMap(m_BiomeMap);
 
@@ -334,6 +335,7 @@ void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 	std::copy_n(a_SetChunkData.BiomeMap, std::size(a_SetChunkData.BiomeMap), m_BiomeMap);
 
 	m_BlockData = std::move(a_SetChunkData.BlockData);
+	m_BlockData2 = std::move(a_SetChunkData.BlockData2);
 	m_LightData = std::move(a_SetChunkData.LightData);
 	m_IsLightValid = a_SetChunkData.IsLightValid;
 
@@ -377,17 +379,7 @@ void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 		cBlockEntity * Block = KeyPair.second.get();
 		BLOCKTYPE EntityBlockType = Block->GetBlockType();
 		BLOCKTYPE WorldBlockType = GetBlock(Block->GetRelX(), Block->GetPosY(), Block->GetRelZ());
-		ASSERT(WorldBlockType == EntityBlockType);
-#endif
-		// Reset Pointer
-		KeyPair.second->SetWorld(nullptr);
-
-		auto Pos = cChunkDef::RelativeToAbsolute({KeyPair.second->GetRelX(), 0, KeyPair.second->GetRelZ()}, {m_PosX, m_PosZ});
-		if ((Pos.x != KeyPair.second->GetPosX()) || (Pos.z != KeyPair.second->GetPosZ()))
-		{
-			KeyPair.second->SetPos(Pos.addedY(KeyPair.second->GetPosY()));
-		}
-		KeyPair.second->SetWorld(m_World);
+		//ASSERT(WorldBlockType == EntityBlockType);
 	}
 
 	// Set the chunk data as valid.
@@ -402,7 +394,7 @@ void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 	}
 
 	// Wake up all simulators for their respective blocks:
-	WakeUpSimulators();
+	//WakeUpSimulators();
 }
 
 
@@ -1303,6 +1295,39 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 
 
 
+void cChunk::NewSetBlock(Vector3i a_RelPos, NEWBLOCKTYPE a_block)
+{
+	NewFastSetBlock(a_RelPos, a_block);
+
+	/*// Queue a check of this block's neighbors:
+	m_BlocksToCheck.push(a_RelPos);
+
+	// Wake up the simulators for this block:
+	GetWorld()->GetSimulatorManager()->WakeUp(*this, a_RelPos);
+
+	// If there was a block entity, remove it:
+	if (const auto FindResult = m_BlockEntities.find(cChunkDef::MakeIndex(a_RelPos)); FindResult != m_BlockEntities.end())
+	{
+		auto & BlockEntity = *FindResult->second;
+
+		BlockEntity.Destroy();
+		BlockEntity.OnRemoveFromWorld();
+
+		m_BlockEntities.erase(FindResult);
+		m_PendingSendBlockEntities.erase(std::remove(m_PendingSendBlockEntities.begin(), m_PendingSendBlockEntities.end(), &BlockEntity), m_PendingSendBlockEntities.end());
+	}
+
+	// If the new block is a block entity, create the entity object:
+	if (cBlockEntity::IsBlockEntityBlockType(a_BlockType))
+	{
+		AddBlockEntity(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, RelativeToAbsolute(a_RelPos), m_World));
+	}*/
+}
+
+
+
+
+
 void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
 {
 	ASSERT(cChunkDef::IsValidRelPos({ a_RelX, a_RelY, a_RelZ }));
@@ -1380,6 +1405,90 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 
 
+void cChunk::NewFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, NEWBLOCKTYPE a_block)
+{
+	ASSERT(cChunkDef::IsValidRelPos({ a_RelX, a_RelY, a_RelZ }));
+	ASSERT(IsValid());
+
+	/*
+	const BLOCKTYPE OldBlockType = GetBlock(a_RelX, a_RelY, a_RelZ);
+	const BLOCKTYPE OldBlockMeta = m_BlockData.GetMeta({ a_RelX, a_RelY, a_RelZ });
+	if ((OldBlockType == a_BlockType) && (OldBlockMeta == a_BlockMeta))
+	{
+		return;
+	}
+
+	bool ReplacingLiquids = (
+		((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
+		((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
+		((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary lava with lava
+		((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing lava with stationary lava
+	);
+
+	if (!ReplacingLiquids)
+	{
+		MarkDirty();
+	}*/
+
+	m_BlockData2.SetBlock({ a_RelX, a_RelY, a_RelZ }, a_block);
+
+	m_PendingSendBlocks.emplace_back(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_block);
+
+	MarkDirty();
+
+	// TODO: port the rest of the code 
+	/*
+	// Queue block to be sent only if ...
+	if (
+		!(                                // ... the old and new blocktypes AREN'T leaves (because the client doesn't need meta updates)
+			((OldBlockType == E_BLOCK_LEAVES) && (a_BlockType == E_BLOCK_LEAVES)) ||
+			((OldBlockType == E_BLOCK_NEW_LEAVES) && (a_BlockType == E_BLOCK_NEW_LEAVES))
+		) &&                              // ... AND ...
+		(
+			(OldBlockMeta != a_BlockMeta) || (!ReplacingLiquids)
+		)
+	)
+	{
+		
+	}
+
+	m_BlockData.SetMeta({ a_RelX, a_RelY, a_RelZ }, a_BlockMeta);
+
+	// ONLY recalculate lighting if it's necessary!
+	if (
+		(cBlockInfo::GetLightValue        (OldBlockType) != cBlockInfo::GetLightValue        (a_BlockType)) ||
+		(cBlockInfo::GetSpreadLightFalloff(OldBlockType) != cBlockInfo::GetSpreadLightFalloff(a_BlockType)) ||
+		(cBlockInfo::IsTransparent        (OldBlockType) != cBlockInfo::IsTransparent        (a_BlockType))
+	)
+	{
+		m_IsLightValid = false;
+	}
+
+	// Update heightmap, if needed:
+	if (a_RelY >= m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width])
+	{
+		if (a_BlockType != E_BLOCK_AIR)
+		{
+			m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width] = static_cast<HEIGHTTYPE>(a_RelY);
+		}
+		else
+		{
+			for (int y = a_RelY - 1; y > 0; --y)
+			{
+				if (GetBlock(a_RelX, y, a_RelZ) != E_BLOCK_AIR)
+				{
+					m_HeightMap[a_RelX + a_RelZ * cChunkDef::Width] = static_cast<HEIGHTTYPE>(y);
+					break;
+				}
+			}  // for y - column in m_BlockData
+		}
+	}*/
+}
+
+
+
+
+
 void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client)
 {
 	const auto BlockEntity = GetBlockEntityRel({ a_RelX, a_RelY, a_RelZ });
@@ -1387,7 +1496,7 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 	if (a_Client == nullptr)
 	{
 		// Queue the block (entity) for all clients in the chunk (will be sent in BroadcastPendingBlockChanges()):
-		m_PendingSendBlocks.emplace_back(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
+		m_PendingSendBlocks.emplace_back(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock2(a_RelX, a_RelY, a_RelZ));
 		if (BlockEntity != nullptr)
 		{
 			m_PendingSendBlockEntities.push_back(BlockEntity);
@@ -1396,8 +1505,8 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 	}
 
 	const auto Position = PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
-	a_Client->SendBlockChange(Position, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
-
+	//a_Client->SendBlockChange(Position, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
+	a_Client->NewSendBlockChange(Position, GetBlock2(a_RelX, a_RelY, a_RelZ));
 	// FS #268 - if a BlockEntity digging is cancelled by a plugin, the entire block entity must be re-sent to the client:
 	if (BlockEntity != nullptr)
 	{

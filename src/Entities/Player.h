@@ -104,6 +104,9 @@ public:
 	*/
 	bool SetCurrentExperience(int a_XpTotal);
 
+	/** Resend the RenderDistanceCenter packet to the player **/
+	void ResendRenderDistanceCenter();
+
 	/* changes Xp by Xp_delta, you "shouldn't" inc more than MAX_EXPERIENCE_ORB_SIZE
 	Wont't allow xp to go negative
 	Returns the new current experience, -1 on error
@@ -567,6 +570,8 @@ public:
 
 	/** Attempts to place the block in the world with a call to PlaceBlocks. */
 	bool PlaceBlock(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+
+	bool NewPlaceBlock(const Vector3i a_Position, NEWBLOCKTYPE a_block);
 
 	/** Calls the block placement hooks and places the blocks in the world.
 	First the "placing" hooks for all the blocks are called, then the blocks are placed, and finally the "placed" hooks are called.

@@ -231,7 +231,7 @@ public:
 
 		size_t NumBlocks = a_Image.GetBlockCount();
 		BLOCKTYPE * BlockTypes = a_Image.GetBlockTypes();
-		BLOCKTYPE * BlockMetas = a_Image.GetBlockMetas();
+		NIBBLETYPE * BlockMetas = a_Image.GetBlockMetas();
 
 		for (size_t i = 0; i < NumBlocks; i++)
 		{

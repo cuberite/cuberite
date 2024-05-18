@@ -47,6 +47,7 @@ Implements the 1.15 protocol classes:
 #include "../Mobs/ZombiePigman.h"
 #include "../Entities/Painting.h"
 #include "Palettes/Upgrade.h"
+
 #include "Palettes/Palette_1_15.h"
 
 #include "Protocol.h"
@@ -70,6 +71,26 @@ void cProtocol_1_15::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_B
 
 
 
+void cProtocol_1_15::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBlockChanges);
+	Pkt.WriteBEInt32(a_ChunkX);
+	Pkt.WriteBEInt32(a_ChunkZ);
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
+
+	for (const auto & Change : a_Changes)
+	{
+		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
+		Pkt.WriteBEInt16(Coords);
+		Pkt.WriteVarInt32(Palette_1_15::ToProtocolIdBlock(Change.m_BlockIdNew)); // should use ENUM_BLOCKS
+	}
+}
+
+
+
+
 
 void cProtocol_1_15::SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage)
 {
@@ -87,6 +108,7 @@ void cProtocol_1_15::SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos, 
 
 void cProtocol_1_15::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
+	//return;
 	cPacketizer Pkt(*this, pktBlockChange);
 	Pkt.WriteXZYPosition64(a_BlockPos);
 	Pkt.WriteVarInt32(GetProtocolBlockType(a_BlockType, a_BlockMeta));
@@ -96,24 +118,21 @@ void cProtocol_1_15::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType,
 
 
 
-void cProtocol_1_15::SendLoginSuccess()
+void cProtocol_1_15::NewSendBlockChange(Vector3i a_BlockPos, NEWBLOCKTYPE block)
 {
-	static const UInt32 CompressionThreshold = 256;  // After how large a packet should we compress it.  // Taken from Protocol_1_8.cpp
-	ASSERT(m_State == 2);  // State: login?
+	cPacketizer Pkt(*this, pktBlockChange);
+	Pkt.WriteXZYPosition64(a_BlockPos);
+	Pkt.WriteVarInt32(Palette_1_15::ToProtocolIdBlock(block));
+}
 
-	// Enable compression:
-	{
-		cPacketizer Pkt(*this, pktStartCompression);
-		Pkt.WriteVarInt32(CompressionThreshold);
-	}
 
-	m_State = State::Game;
 
-	{
-		cPacketizer Pkt(*this, pktLoginSuccess);
-		Pkt.WriteString(m_Client->GetUUID().ToLongString());
-		Pkt.WriteString(m_Client->GetUsername());
-	}
+
+void cProtocol_1_15::SendRenderDistanceCenter(cChunkCoords a_chunk)
+{
+	cPacketizer Pkt(*this, pktRenderDistanceCenter);
+	Pkt.WriteVarInt32(a_chunk.m_ChunkX);
+	Pkt.WriteVarInt32(a_chunk.m_ChunkZ);
 }
 
 
@@ -198,6 +217,32 @@ void cProtocol_1_15::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteBEInt8(1);
 		Pkt.WriteBool(false);  // Difficulty locked?
 	}
+	// Send world Border // temporarily here
+	{
+		cPacketizer Pkt(*this, pktWorldBorder);
+		Pkt.WriteVarInt32(3);
+		Pkt.WriteBEDouble(0);  // X
+		Pkt.WriteBEDouble(0);  // Z
+		Pkt.WriteBEDouble(60000000);
+		Pkt.WriteBEDouble(60000000);
+		Pkt.WriteVarInt32(0);
+		Pkt.WriteVarInt32(29999984);
+		Pkt.WriteVarInt32(5);
+		Pkt.WriteVarInt32(15);
+	}
+}
+
+
+
+
+
+void cProtocol_1_15::SendPlayerActionResponse(Vector3i a_blockpos, int a_state_id, cProtocol::PlayerActionResponses a_action, bool a_IsApproved)
+{
+	cPacketizer pkt(*this, pktDifficulty);
+	pkt.WriteXYZPosition64(a_blockpos.x,a_blockpos.y,a_blockpos.z);
+	pkt.WriteVarInt32(a_state_id);
+	pkt.WriteVarInt32(static_cast<UInt32>(a_action));
+	pkt.WriteBool(a_IsApproved);
 }
 
 
@@ -567,11 +612,13 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 	{
 		case cProtocol::pktBossBar:			     return 0x0D;
 		case cProtocol::pktBlockAction:			 return 0x0B;
+		case cProtocol::pktCustomPayload:        return 0x19;
 		case cProtocol::pktEntityLook:		     return 0x2B;
 		case cProtocol::pktEntityRelMoveLook:	 return 0x2A;
 		case cProtocol::pktUpdateBlockEntity:	 return 0x0A;
 		case cProtocol::pktBlockChange:			 return 0x0C;
 		case cProtocol::pktBlockChanges:		 return 0x10;
+		case cProtocol::pktWorldBorder:          return 0x3E;
 		case cProtocol::pktEntityRelMove:		 return 0x29;
 		case cProtocol::pktEntityStatus:		 return 0x1C;
 		case cProtocol::pktJoinGame:             return 0x26;
@@ -592,29 +639,31 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktExplosion:            return 0x1D;
 		case cProtocol::pktGameMode:             return 0x1F;
 		case cProtocol::pktHeldItemChange:       return 0x40;
-		case cProtocol::pktHorseWindowOpen:      return 0x1F;
+		case cProtocol::pktHorseWindowOpen:      return 0x20;
 		case cProtocol::pktInventorySlot:        return 0x17;
 		case cProtocol::pktKeepAlive:            return 0x21;
+		case cProtocol::pktLightUpdate:          return 0x25;
 		case cProtocol::pktParticleEffect:       return 0x24;
 		case cProtocol::pktPlayerAbilities:      return 0x32;
 		case cProtocol::pktPlayerList:           return 0x34;
 		case cProtocol::pktPlayerMoveLook:       return 0x36;
 		case cProtocol::pktPluginMessage:        return 0x19;
+		case cProtocol::pktRenderDistanceCenter: return 0x41;
 		case cProtocol::pktRemoveEntityEffect:   return 0x39;
-		case cProtocol::pktResourcePack:         return 0x39;
+		case cProtocol::pktResourcePack:         return 0x3A;
 		case cProtocol::pktRespawn:              return 0x3B;
-		case cProtocol::pktScoreboardObjective:  return 0x49;
+		case cProtocol::pktScoreboardObjective:  return 0x4A;
 		case cProtocol::pktSoundEffect:          return 0x1A;
 		case cProtocol::pktSoundParticleEffect:  return 0x23;
 		case cProtocol::pktSpawnPosition:        return 0x4E;
 		case cProtocol::pktTeleportEntity:       return 0x57;
 		case cProtocol::pktTimeUpdate:           return 0x4F;
-		case cProtocol::pktTitle:                return 0x4F;
+		case cProtocol::pktTitle:                return 0x50;
 		case cProtocol::pktUnloadChunk:          return 0x1E;
-		case cProtocol::pktUnlockRecipe:         return 0x36;
+		case cProtocol::pktUnlockRecipe:         return 0x37;
 		case cProtocol::pktUpdateHealth:         return 0x49;
 		case cProtocol::pktUpdateScore:          return 0x4C;
-		case cProtocol::pktUpdateSign:           return 0x2F;
+		case cProtocol::pktUpdateSign:           return 0x30;
 		case cProtocol::pktWeather:              return 0x1F;
 		case cProtocol::pktWindowItems:          return 0x15;
 		case cProtocol::pktWindowOpen:           return 0x2F;
@@ -1203,6 +1252,8 @@ cProtocol::Version cProtocol_1_15::GetProtocolVersion() const
 
 bool cProtocol_1_15::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
+
+	LOG("Handling packet 0x%x", a_PacketType);
 	if (m_State != State::Game)
 	{
 		return Super::HandlePacket(a_ByteBuffer, a_PacketType);
@@ -1211,6 +1262,8 @@ bool cProtocol_1_15::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 	// Game
 	switch (a_PacketType)
 	{
+		case 0x01: /* query nbt packet */ return false;
+		case 0x02: /* update difficulty */ return false;
 		case 0x03: HandlePacketChatMessage(a_ByteBuffer); return true;
 		case 0x04: HandlePacketClientStatus(a_ByteBuffer); return true;
 		case 0x05: HandlePacketClientSettings(a_ByteBuffer); return true;
@@ -1220,32 +1273,42 @@ bool cProtocol_1_15::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x09: HandlePacketWindowClick(a_ByteBuffer); return true;
 		case 0x0A: HandlePacketWindowClose(a_ByteBuffer); return true;
 		case 0x0B: HandlePacketPluginMessage(a_ByteBuffer); return true;
-		case 0x0C: HandlePacketBookUpdate(a_ByteBuffer); return true;
+		case 0x0C: HandlePacketBookUpdate(a_ByteBuffer); return true;  // not fully implemented
 		case 0x0E: HandlePacketUseEntity(a_ByteBuffer); return true;
 		case 0x0F: HandlePacketKeepAlive(a_ByteBuffer); return true;
+		case 0x10: /* Update difficulty lock */ return false;  // only used in single player
 		case 0x11: HandlePacketPlayerPos(a_ByteBuffer); return true;
 		case 0x12: HandlePacketPlayerPosLook(a_ByteBuffer); return true;
 		case 0x13: HandlePacketPlayerLook(a_ByteBuffer); return true;
 		case 0x14: HandlePacketPlayer(a_ByteBuffer); return true;
 		case 0x15: HandlePacketVehicleMove(a_ByteBuffer); return true;
 		case 0x16: HandlePacketBoatSteer(a_ByteBuffer); return true;
+		case 0x17: /* pick from inventory */ return false;
 		case 0x18: HandleCraftRecipe(a_ByteBuffer); return true;
 		case 0x19: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
 		case 0x1A: HandlePacketBlockDig(a_ByteBuffer); return true;
-		case 0x1C: HandlePacketSteerVehicle(a_ByteBuffer); return true;
+		case 0x1B: /* client command packet */ return false;
+		case 0x1C: HandlePacketSteerVehicle(a_ByteBuffer); return true;  // player input packet
 		case 0x1D: HandlePacketCraftingBookData(a_ByteBuffer); return true;
 		case 0x1E: HandlePacketNameItem(a_ByteBuffer); return true;
 		case 0x1F: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
 		case 0x20: HandlePacketAdvancementTab(a_ByteBuffer); return true;
+		case 0x21: /* select villager trade */ return false;
 		case 0x22: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x23: HandlePacketSlotSelect(a_ByteBuffer); return true;
+		case 0x24: /* update command block */ return false;
+		case 0x25: /* update minecart command block*/ return false;
 		case 0x26: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+		case 0x27: /* Update jigsaw block */ return false;
+		case 0x28: /* Update structure block */ return false;
+		case 0x29: HandlePacketUpdateSign(a_ByteBuffer); return true;
+		case 0x2B: /* Spectator teleport */ return false;
+		case 0x2A: /* Update hand swing */ return false;
 		case 0x2C: HandlePacketBlockPlace(a_ByteBuffer); return true;
 		case 0x2D: HandlePacketUseItem(a_ByteBuffer); return true;
-
 		default: break;
 	}
-
+	
 	return Super::HandlePacket(a_ByteBuffer, a_PacketType);
 }
 

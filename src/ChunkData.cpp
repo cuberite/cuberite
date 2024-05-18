@@ -79,7 +79,7 @@ ElementType ChunkDataStore<ElementType, ElementCount, DefaultValue>::Get(const V
 	{
 		if (IsCompressed(ElementCount))
 		{
-			return cChunkDef::ExpandNibble(Section->data(), Indices.Index);
+			//return cChunkDef::ExpandNibble(Section->data(), Indices.Index);
 		}
 		else
 		{
@@ -123,7 +123,7 @@ void ChunkDataStore<ElementType, ElementCount, DefaultValue>::Set(const Vector3i
 
 	if (IsCompressed(ElementCount))
 	{
-		cChunkDef::PackNibble(Section->data(), Indices.Index, a_Value);
+		//cChunkDef::PackNibble(Section->data(), Indices.Index, a_Value);
 	}
 	else
 	{
@@ -195,6 +195,35 @@ void ChunkBlockData::SetSection(const SectionType & a_BlockSource, const Section
 	m_Metas.SetSection(a_MetaSource, a_Y);
 }
 
+
+
+
+
+void ChunkBlockDataNew::Assign(const ChunkBlockDataNew & a_Other)
+{
+	m_Blocks.Assign(a_Other.m_Blocks);
+	//m_Metas.Assign(a_Other.m_Metas);
+}
+
+
+
+
+
+void ChunkBlockDataNew::SetAll(const cChunkDef::BlockTypes2 & a_BlockSource)
+{
+	m_Blocks.SetAll(a_BlockSource);
+	//m_Metas.SetAll(a_MetaSource);
+}
+
+
+
+
+
+void ChunkBlockDataNew::SetSection(const SectionType & a_BlockSource, size_t a_Y)
+{
+	m_Blocks.SetSection(a_BlockSource, a_Y);
+	//m_Metas.SetSection(a_MetaSource, a_Y);
+}
 
 
 

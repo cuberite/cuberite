@@ -1,11 +1,14 @@
 #pragma once
 
 #include "Registries/BlockTypes.h"
+#include "ChunkDef.h"
+
 
 struct BlockState
 {
 	constexpr BlockState(uint_least16_t StateID) :
-		ID(StateID)
+		ID(StateID),
+		ID2(0)
 	{
 	}
 
@@ -24,4 +27,6 @@ struct BlockState
 
 	/** The state ID of the block state. */
 	uint_least16_t ID;
+
+	NEWBLOCKTYPE ID2;
 };

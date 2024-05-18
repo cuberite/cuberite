@@ -33,6 +33,8 @@ public:
 	cWSSAnvil(cWorld * a_World, int a_CompressionFactor);
 	virtual ~cWSSAnvil() override;
 
+	const static bool newFormat = true;
+
 protected:
 
 	enum
@@ -102,6 +104,9 @@ protected:
 
 	/** Copies a_Length bytes of data from the specified NBT Tag's Child into the a_Destination buffer */
 	const std::byte * GetSectionData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, size_t a_Length);
+
+	/** Same as GetSectionData but uses TAG_LongArray Instead  */
+	const std::byte * GetSectionDataLong(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, size_t a_Length);
 
 	/** Sets chunk data into the correct file; locks file CS as needed */
 	bool SetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBufferView a_Data);

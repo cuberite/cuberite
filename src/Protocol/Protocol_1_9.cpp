@@ -641,7 +641,7 @@ void cProtocol_1_9_0::SendThunderbolt(Vector3i a_Origin)
 void cProtocol_1_9_0::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_State == 3);  // In game mode?
-
+	return;
 	cPacketizer Pkt(*this, pktUnloadChunk);
 	Pkt.WriteBEInt32(a_ChunkX);
 	Pkt.WriteBEInt32(a_ChunkZ);

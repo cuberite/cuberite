@@ -9025,6 +9025,37 @@ namespace Block
 	}
 	namespace GrassBlock
 	{
+		struct GrassBlockStr : BlockState
+		{
+			GrassBlockStr()
+				: BlockState(0),
+				 snowy(false)
+			{
+				
+			}
+
+			GrassBlockStr(NEWBLOCKTYPE blockid) : BlockState(0)
+			{
+				ID = 0;
+				ID2 = blockid;
+				if (blockid == ENUM_BLOCKS::GRASS_BLOCK__SNOWY_TRUE)
+					snowy = true;
+			}
+			bool snowy;
+			constexpr NEWBLOCKTYPE GrassBlockExp2(const bool Snowy)
+			{
+				if (Snowy) return ENUM_BLOCKS::GRASS_BLOCK__SNOWY_TRUE;
+				else return ENUM_BLOCKS::GRASS_BLOCK__SNOWY_FALSE;
+			}
+
+
+			constexpr BlockState GrassBlockExp(const bool Snowy)
+			{
+				if (Snowy) return 8;
+				else return 9;
+			}
+		};
+
 		constexpr BlockState GrassBlock(const bool Snowy)
 		{
 			if (Snowy) return 8;

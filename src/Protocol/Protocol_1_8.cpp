@@ -224,6 +224,26 @@ void cProtocol_1_8_0::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType
 
 
 
+void cProtocol_1_8_0::NewSendBlockChange(Vector3i a_BlockPos, NEWBLOCKTYPE block)
+{
+	// not used in this version
+	return;
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendRenderDistanceCenter(cChunkCoords a_chunk)
+{
+	// not used in this version
+	return;
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -4244,3 +4264,13 @@ void cProtocol_1_8_0::StartEncryption(const Byte * a_Key)
 	Checksum.Finalize(Digest);
 	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
 }
+
+
+
+
+
+void cProtocol_1_8_0::SendPlayerActionResponse(Vector3i a_blockpos, int a_state_id, cProtocol::PlayerActionResponses a_action, bool a_IsApproved)
+{
+	//Used by 1.15+
+}
+

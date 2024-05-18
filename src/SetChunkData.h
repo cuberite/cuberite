@@ -20,6 +20,8 @@ struct SetChunkData
 	cChunkCoords Chunk;
 
 	ChunkBlockData BlockData;
+	ChunkBlockDataNew BlockData2;
+
 	ChunkLightData LightData;
 
 	cChunkDef::BiomeMap BiomeMap;

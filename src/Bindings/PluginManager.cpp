@@ -1261,6 +1261,8 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 		return crUnknownCommand;
 	}
 
+	a_ShouldCheckPermissions = false;
+
 	CommandMap::iterator cmd = m_Commands.find(Split[0]);
 	if (cmd == m_Commands.end())
 	{

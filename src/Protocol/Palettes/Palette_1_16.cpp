@@ -12698,7 +12698,7 @@ namespace Palette_1_16
 			case Item::WarpedFence: return 215;
 			case Item::WarpedFenceGate: return 259;
 			case Item::WarpedFungus: return 127;
-			case Item::WarpedFungusOnA_stick: return 842;
+			case Item::WarpedFungusOnAStick: return 842;
 			case Item::WarpedHyphae: return 68;
 			case Item::WarpedNylium: return 13;
 			case Item::WarpedPlanks: return 22;
@@ -13763,7 +13763,7 @@ namespace Palette_1_16
 			case 215: return Item::WarpedFence;
 			case 259: return Item::WarpedFenceGate;
 			case 127: return Item::WarpedFungus;
-			case 842: return Item::WarpedFungusOnA_stick;
+			case 842: return Item::WarpedFungusOnAStick;
 			case 68: return Item::WarpedHyphae;
 			case 13: return Item::WarpedNylium;
 			case 22: return Item::WarpedPlanks;
