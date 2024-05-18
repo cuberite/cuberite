@@ -491,7 +491,7 @@ void cClientHandle::FinishAuthenticate()
 
 	SetState(csDownloadingWorld);
 	m_Player->Initialize(std::move(Player), *World);
-
+	m_Player->ResendRenderDistanceCenter();
 	// LOGD("Client %s @ %s (%p) has been fully authenticated", m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this));
 }
 
@@ -1356,7 +1356,7 @@ void cClientHandle::HandleBlockDigFinished(Vector3i a_BlockPos, eBlockFace a_Blo
 		return;
 	}
 
-	if (DugBlock == E_BLOCK_AIR)
+	if (DugBlock == E_BLOCK_AIR && false)
 	{
 		return;
 	}
@@ -2299,6 +2299,23 @@ void cClientHandle::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, 
 
 
 
+void cClientHandle::NewSendBlockChange(Vector3i a_BlockPos, NEWBLOCKTYPE a_block)
+{
+	auto ChunkCoords = cChunkDef::BlockToChunk(a_BlockPos);
+
+	// Do not send block changes in chunks that weren't sent to the client yet:
+	cCSLock Lock(m_CSChunkLists);
+	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
+	{
+		Lock.Unlock();
+		m_Protocol->NewSendBlockChange(a_BlockPos, a_block);
+	}
+}
+
+
+
+
+
 void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
 	ASSERT(!a_Changes.empty());  // We don't want to be sending empty change packets!
@@ -2316,7 +2333,7 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 	if (a_Changes.size() == 1)
 	{
 		const auto & Change = a_Changes[0];
-		m_Protocol->SendBlockChange(Change.GetAbsolutePos(), Change.m_BlockType, Change.m_BlockMeta);
+		m_Protocol->NewSendBlockChange(Change.GetAbsolutePos(), Change.m_BlockIdNew);
 		return;
 	}
 
@@ -2949,6 +2966,15 @@ void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effec
 void cClientHandle::SendResetTitle()
 {
 	m_Protocol->SendResetTitle();
+}
+
+
+
+
+
+void cClientHandle::SendRenderDistanceCenter(cChunkCoords a_chunk)
+{
+	m_Protocol->SendRenderDistanceCenter(a_chunk);
 }
 
 

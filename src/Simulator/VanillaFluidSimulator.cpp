@@ -39,7 +39,8 @@ cVanillaFluidSimulator::cVanillaFluidSimulator(
 
 void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta)
 {
-	// Calculate the distance to the nearest "hole" in each direction:
+	return;
+	/*// Calculate the distance to the nearest "hole" in each direction:
 	int Cost[4];
 	Cost[0] = CalculateFlowCost(a_Chunk, a_RelX + 1, a_RelY, a_RelZ,     X_PLUS);
 	Cost[1] = CalculateFlowCost(a_Chunk, a_RelX - 1, a_RelY, a_RelZ,     X_MINUS);
@@ -72,7 +73,7 @@ void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, 
 	if (Cost[3] == MinCost)
 	{
 		SpreadToNeighbor(a_Chunk, a_RelX, a_RelY, a_RelZ - 1, a_NewMeta);
-	}
+	}*/
 }
 
 
@@ -81,6 +82,8 @@ void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, 
 
 int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, Direction a_Dir, unsigned a_Iteration)
 {
+	return 0;
+	/*
 	int Cost = InfiniteCost;
 
 	BLOCKTYPE BlockType;
@@ -150,7 +153,7 @@ int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, int a_RelX, int 
 		}
 	}
 
-	return Cost;
+	return Cost;*/
 }
 
 

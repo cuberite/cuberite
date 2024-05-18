@@ -6,6 +6,8 @@
 #include "../FastRandom.h"
 #include "../BlockInServerPluginInterface.h"
 #include "../Chunk.h"
+#include "../Registries/Items.h"
+#include "../Protocol/Palettes/Upgrade.h"
 
 // Handlers:
 #include "ItemAnvil.h"
@@ -560,6 +562,126 @@ namespace
 	constexpr cDefaultItemHandler           ItemWrittenBookHandler                     (E_ITEM_WRITTEN_BOOK);
 	constexpr cItemGlazedTerracottaHandler  ItemYellowGlazedTerracottaHandler          (E_BLOCK_YELLOW_GLAZED_TERRACOTTA);
 	constexpr cDefaultItemHandler           ItemYellowShulkerBoxHandler                (E_BLOCK_YELLOW_SHULKER_BOX);
+	constexpr cDefaultItemHandler           ItemBeeNest                                (E_ITEM_BEE_NEST);
+	constexpr cDefaultItemHandler           ItemTrident                                (E_ITEM_TRIDENT);
+	constexpr cDefaultItemHandler           ItemPhantomMembrane                        (E_ITEM_PHANTOM_MEMBRANE);
+	constexpr cDefaultItemHandler           ItemNautilusShell                          (E_ITEM_NAUTILUS_SHELL);
+	constexpr cDefaultItemHandler           ItemHeartOfTheSea                          (E_ITEM_HEART_OF_THE_SEA);
+	constexpr cDefaultItemHandler           ItemCrossbow                               (E_ITEM_CROSSBOW);
+	constexpr cDefaultItemHandler           ItemSuspiciousStew                         (E_ITEM_SUSPICIOUS_STEW);
+	constexpr cDefaultItemHandler           ItemLoom                                   (E_ITEM_LOOM);
+	constexpr cDefaultItemHandler           ItemFlowerBannerPattern                    (E_ITEM_FLOWER_BANNER_PATTERN);
+	constexpr cDefaultItemHandler           ItemCreeperBannerPattern                   (E_ITEM_CREEPER_BANNER_PATTERN);
+	constexpr cDefaultItemHandler           ItemSkullBannerPattern                     (E_ITEM_SKULL_BANNER_PATTERN);
+	constexpr cDefaultItemHandler           ItemMojangBannerPattern                    (E_ITEM_MOJANG_BANNER_PATTERN);
+	constexpr cDefaultItemHandler           ItemGlobeBannerPattern                     (E_ITEM_GLOBE_BANNER_PATTERN);
+	constexpr cDefaultItemHandler           ItemBarrel                                 (E_ITEM_BARREL);
+	constexpr cDefaultItemHandler           ItemSmoker                                 (E_ITEM_SMOKER);
+	constexpr cDefaultItemHandler           ItemBlastFurnace                           (E_ITEM_BLAST_FURNACE);
+	constexpr cDefaultItemHandler           ItemCartographyTable                       (E_ITEM_CARTOGRAPHY_TABLE);
+	constexpr cDefaultItemHandler           ItemFletchingTable                         (E_ITEM_FLETCHING_TABLE);
+	constexpr cDefaultItemHandler           ItemGrindstone                             (E_ITEM_GRINDSTONE);
+	constexpr cDefaultItemHandler           ItemLectern                                (E_ITEM_LECTERN);
+	constexpr cDefaultItemHandler           ItemSmithingTable                          (E_ITEM_SMITHING_TABLE);
+	constexpr cDefaultItemHandler           ItemStonecutter                            (E_ITEM_STONECUTTER);
+	constexpr cDefaultItemHandler           ItemBell                                   (E_ITEM_BELL);
+	constexpr cDefaultItemHandler           ItemLantern                                (E_ITEM_LANTERN);
+	constexpr cDefaultItemHandler           ItemSweetBerries                           (E_ITEM_SWEET_BERRIES);
+	constexpr cDefaultItemHandler           ItemCampfire                               (E_ITEM_CAMPFIRE);
+	constexpr cDefaultItemHandler           ItemHoneycomb                              (E_ITEM_HONEYCOMB);
+	constexpr cDefaultItemHandler           ItemBeehive                                (E_ITEM_BEEHIVE);
+	constexpr cDefaultItemHandler           ItemHoneyBottle                            (E_ITEM_HONEY_BOTTLE);
+	constexpr cDefaultItemHandler           ItemHoneyBlock                             (E_ITEM_HONEY_BLOCK);
+	constexpr cDefaultItemHandler           ItemHoneycombBlock                         (E_ITEM_HONEYCOMB_BLOCK);
+	constexpr cDefaultItemHandler           ItemDeadTubeCoralBlock                     (E_ITEM_DEAD_TUBE_CORAL_BLOCK);
+	constexpr cDefaultItemHandler           ItemDeadBrainCoralBlock                    (E_ITEM_DEAD_BRAIN_CORAL_BLOCK);
+	constexpr cDefaultItemHandler           ItemDeadBubbleCoralBlock                   (E_ITEM_DEAD_BUBBLE_CORAL_BLOCK);
+	constexpr cDefaultItemHandler           ItemDeadFireCoralBlock                     (E_ITEM_DEAD_FIRE_CORAL_BLOCK);
+	constexpr cDefaultItemHandler           ItemDeadHornCoralBlock                     (E_ITEM_DEAD_HORN_CORAL_BLOCK);
+	constexpr cDefaultItemHandler           ItemDeadTubeCoral                          (E_ITEM_DEAD_TUBE_CORAL);
+	constexpr cDefaultItemHandler           ItemDeadBrainCoral                         (E_ITEM_DEAD_BRAIN_CORAL);
+	constexpr cDefaultItemHandler           ItemDeadBubbleCoral                        (E_ITEM_DEAD_BUBBLE_CORAL);
+	constexpr cDefaultItemHandler           ItemDeadFireCoral                          (E_ITEM_DEAD_FIRE_CORAL);
+	constexpr cDefaultItemHandler           ItemDeadHornCoral                          (E_ITEM_DEAD_HORN_CORAL);
+	constexpr cDefaultItemHandler           ItemDeadTubeCoralFan                       (E_ITEM_DEAD_TUBE_CORAL_FAN);
+	constexpr cDefaultItemHandler           ItemDeadBrainCoralFan                      (E_ITEM_DEAD_BRAIN_CORAL_FAN);
+	constexpr cDefaultItemHandler           ItemDeadBubbleCoralFan                     (E_ITEM_DEAD_BUBBLE_CORAL_FAN);
+	constexpr cDefaultItemHandler           ItemDeadFireCoralFan                       (E_ITEM_DEAD_FIRE_CORAL_FAN);
+	constexpr cDefaultItemHandler           ItemDeadHornCoralFan                       (E_ITEM_DEAD_HORN_CORAL_FAN);
+	constexpr cDefaultItemHandler           ItemTubeCoralBlock                         (E_ITEM_TUBE_CORAL_BLOCK);
+	constexpr cDefaultItemHandler           ItemBrainCoralBlock                        (E_ITEM_BRAIN_CORAL_BLOCK);
+	constexpr cDefaultItemHandler           ItemBubbleCoralBlock                       (E_ITEM_BUBBLE_CORAL_BLOCK);
+	constexpr cDefaultItemHandler           ItemFireCoralBlock                         (E_ITEM_FIRE_CORAL_BLOCK);
+	constexpr cDefaultItemHandler           ItemHornCoralBlock                         (E_ITEM_HORN_CORAL_BLOCK);
+	constexpr cDefaultItemHandler           ItemTubeCoral                              (E_ITEM_TUBE_CORAL);
+	constexpr cDefaultItemHandler           ItemBrainCoral                             (E_ITEM_BRAIN_CORAL);
+	constexpr cDefaultItemHandler           ItemBubbleCoral                            (E_ITEM_BUBBLE_CORAL);
+	constexpr cDefaultItemHandler           ItemFireCoral                              (E_ITEM_FIRE_CORAL);
+	constexpr cDefaultItemHandler           ItemHornCoral                              (E_ITEM_HORN_CORAL);
+	constexpr cDefaultItemHandler           ItemTubeCoralFan                           (E_ITEM_TUBE_CORAL_FAN);
+	constexpr cDefaultItemHandler           ItemBrainCoralFan                          (E_ITEM_BRAIN_CORAL_FAN);
+	constexpr cDefaultItemHandler           ItemBubbleCoralFan                         (E_ITEM_BUBBLE_CORAL_FAN);
+	constexpr cDefaultItemHandler           ItemFireCoralFan                           (E_ITEM_FIRE_CORAL_FAN);
+	constexpr cDefaultItemHandler           ItemHornCoralFan                           (E_ITEM_HORN_CORAL_FAN);
+	constexpr cDefaultItemHandler           ItemBlueIce                                (E_ITEM_BLUE_ICE);
+	constexpr cDefaultItemHandler           ItemPolishedGraniteStairs                  (E_ITEM_POLISHED_GRANITE_STAIRS);
+	constexpr cDefaultItemHandler           ItemPolishedGraniteSlab                    (E_ITEM_POLISHED_GRANITE_SLAB);
+	constexpr cDefaultItemHandler           ItemGraniteSlab                            (E_ITEM_GRANITE_SLAB);
+	constexpr cDefaultItemHandler           ItemGraniteStairs                          (E_ITEM_GRANITE_STAIRS);
+	constexpr cDefaultItemHandler           ItemGraniteWall                            (E_ITEM_GRANITE_WALL);
+	constexpr cDefaultItemHandler           ItemSmoothRedSandstoneStairs               (E_ITEM_SMOOTH_RED_SANDSTONE_STAIRS);
+	constexpr cDefaultItemHandler           ItemSmoothRedSandstoneSlab                 (E_ITEM_SMOOTH_RED_SANDSTONE_SLAB);
+	constexpr cDefaultItemHandler           ItemRedSandstoneWall                       (E_ITEM_RED_SANDSTONE_WALL);
+	constexpr cDefaultItemHandler           ItemMossyCobblestoneStairs                 (E_ITEM_MOSSY_COBBLESTONE_STAIRS);
+	constexpr cDefaultItemHandler           ItemMossyCobblestoneSlab                   (E_ITEM_MOSSY_COBBLESTONE_SLAB);
+	constexpr cDefaultItemHandler           ItemPolishedAndesiteStairs                 (E_ITEM_POLISHED_ANDESITE_STAIRS);
+	constexpr cDefaultItemHandler           ItemPolishedAndesiteSlab                   (E_ITEM_POLISHED_ANDESITE_SLAB);
+	constexpr cDefaultItemHandler           ItemEndStoneBrickStairs                    (E_ITEM_END_STONE_BRICK_STAIRS);
+	constexpr cDefaultItemHandler           ItemEndStoneBrickSlab                      (E_ITEM_END_STONE_BRICK_SLAB);
+	constexpr cDefaultItemHandler           ItemEndStoneBrickWall                      (E_ITEM_END_STONE_BRICK_WALL);
+	constexpr cDefaultItemHandler           ItemStoneStairs                            (E_ITEM_STONE_STAIRS);
+	constexpr cDefaultItemHandler           ItemSmoothQuartzStairs                     (E_ITEM_SMOOTH_QUARTZ_STAIRS);
+	constexpr cDefaultItemHandler           ItemSmoothQuartzSlab                       (E_ITEM_SMOOTH_QUARTZ_SLAB);
+	constexpr cDefaultItemHandler           ItemRedNetherBrickStairs                   (E_ITEM_RED_NETHER_BRICK_STAIRS);
+	constexpr cDefaultItemHandler           ItemRedNetherBrickSlab                     (E_ITEM_RED_NETHER_BRICK_SLAB);
+	constexpr cDefaultItemHandler           ItemRedNetherBrickWall                     (E_ITEM_RED_NETHER_BRICK_WALL);
+	constexpr cDefaultItemHandler           ItemPolishedDioriteStairs                  (E_ITEM_POLISHED_DIORITE_STAIRS);
+	constexpr cDefaultItemHandler           ItemPolishedDioriteSlab                    (E_ITEM_POLISHED_DIORITE_SLAB);
+	constexpr cDefaultItemHandler           ItemDioriteSlab                            (E_ITEM_DIORITE_SLAB);
+	constexpr cDefaultItemHandler           ItemDioriteStairs                          (E_ITEM_DIORITE_STAIRS);
+	constexpr cDefaultItemHandler           ItemDioriteWall                            (E_ITEM_DIORITE_WALL);
+	constexpr cDefaultItemHandler           ItemPrismarineSlab                         (E_ITEM_PRISMARINE_SLAB);
+	constexpr cDefaultItemHandler           ItemPrismarineStairs                       (E_ITEM_PRISMARINE_STAIRS);
+	constexpr cDefaultItemHandler           ItemPrismarineWall                         (E_ITEM_PRISMARINE_WALL);
+	constexpr cDefaultItemHandler           ItemPrismarineBrickSlab                    (E_ITEM_PRISMARINE_BRICK_SLAB);
+	constexpr cDefaultItemHandler           ItemPrismarineBrickStairs                  (E_ITEM_PRISMARINE_BRICK_STAIRS);
+	constexpr cDefaultItemHandler           ItemDarkPrismarineSlab                     (E_ITEM_DARK_PRISMARINE_SLAB);
+	constexpr cDefaultItemHandler           ItemDarkPrismarineStairs                   (E_ITEM_DARK_PRISMARINE_STAIRS);
+	constexpr cDefaultItemHandler           ItemSmoothSandstone                        (E_ITEM_SMOOTH_SANDSTONE);
+	constexpr cDefaultItemHandler           ItemSmoothSandstoneStairs                  (E_ITEM_SMOOTH_SANDSTONE_STAIRS);
+	constexpr cDefaultItemHandler           ItemSmoothSandstoneSlab                    (E_ITEM_SMOOTH_SANDSTONE_SLAB);
+	constexpr cDefaultItemHandler           ItemScaffolding                            (E_ITEM_SCAFFOLDING);
+	constexpr cDefaultItemHandler           ItemSpruceSign                             (E_ITEM_SPRUCE_SIGN);
+	constexpr cDefaultItemHandler           ItemBirchSign                              (E_ITEM_BIRCH_SIGN);
+	constexpr cDefaultItemHandler           ItemJungleSign                             (E_ITEM_JUNGLE_SIGN);
+	constexpr cDefaultItemHandler           ItemAcaciaSign                             (E_ITEM_ACACIA_SIGN);
+	constexpr cDefaultItemHandler           ItemDarkOakSign                            (E_ITEM_DARK_OAK_SIGN);
+	constexpr cDefaultItemHandler           ItemKelp                                   (E_ITEM_KELP);
+	constexpr cDefaultItemHandler           ItemDriedKelp                              (E_ITEM_DRIED_KELP);
+	constexpr cDefaultItemHandler           ItemDriedKelpBlock                         (E_ITEM_DRIED_KELP_BLOCK);
+	constexpr cDefaultItemHandler           ItemTurtleEgg                              (E_ITEM_TURTLE_EGG);
+	constexpr cDefaultItemHandler           ItemTurtleHelmet                           (E_ITEM_TURTLE_HELMET);
+	constexpr cDefaultItemHandler           ItemScute                                  (E_ITEM_SCUTE);
+	constexpr cDefaultItemHandler           ItemBamboo                                 (E_ITEM_BAMBOO);
+	constexpr cDefaultItemHandler           ItemPufferfishBucket                       (E_ITEM_PUFFERFISH_BUCKET);
+	constexpr cDefaultItemHandler           ItemSalmonBucket                           (E_ITEM_SALMON_BUCKET);
+	constexpr cDefaultItemHandler           ItemCodBucket                              (E_ITEM_COD_BUCKET);
+	constexpr cDefaultItemHandler           ItemTropicalFishBucket                     (E_ITEM_TROPICAL_FISH_BUCKET);
+	constexpr cDefaultItemHandler           ItemConduit                                (E_ITEM_CONDUIT);
+	constexpr cDefaultItemHandler           ItemBlueDye                                (E_ITEM_BLUE_DYE);
+	constexpr cDefaultItemHandler           ItemBrownDye                               (E_ITEM_BROWN_DYE);
+	constexpr cDefaultItemHandler           ItemBlackDye                               (E_ITEM_BLACK_DYE);
+	constexpr cDefaultItemHandler           ItemWhiteDye                               (Item::WhiteDye);
 }
 
 
@@ -568,6 +690,13 @@ namespace
 
 const cItemHandler & cItemHandler::For(int a_ItemType)
 {
+	Item toswitch = PaletteUpgrade::FromItem(a_ItemType,0);
+	switch (toswitch)
+	{
+		default:
+			break;
+	}
+
 	switch (a_ItemType)
 	{
 		case E_BLOCK_ACACIA_DOOR:                    return ItemAcaciaDoorBlockHandler;
@@ -1032,9 +1161,8 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_ITEM_WOODEN_SHOVEL:                   return ItemWoodenShovelHandler;
 		case E_ITEM_WOODEN_SWORD:                    return ItemWoodenSwordHandler;
 		case E_ITEM_WRITTEN_BOOK:                    return ItemWrittenBookHandler;
-
 	}
-	UNREACHABLE("Unknown item type!");
+	//UNREACHABLE("Unknown item type!");
 	return ItemAirHandler;
 }
 
@@ -1047,7 +1175,8 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 	const auto & World = *a_Player.GetWorld();
 
 	// Check if the block ignores build collision (water, grass etc.):
-	if (cBlockHandler::For(a_ClickedBlockType).DoesIgnoreBuildCollision(World, a_HeldItem, a_ClickedPosition, a_ClickedBlockMeta, a_ClickedBlockFace, true))
+	// ! for temp fix
+	if (!cBlockHandler::For(a_ClickedBlockType).DoesIgnoreBuildCollision(World, a_HeldItem, a_ClickedPosition, a_ClickedBlockMeta, a_ClickedBlockFace, true))
 	{
 		// Try to place the block at the clicked position:
 		if (!CommitPlacement(a_Player, a_HeldItem, a_ClickedPosition, a_ClickedBlockFace, a_CursorPosition))
@@ -1323,7 +1452,10 @@ bool cItemHandler::IsDrinkable(short a_ItemDamage) const
 bool cItemHandler::IsPlaceable(void) const
 {
 	// We can place any block that has a corresponding E_BLOCK_TYPE:
-	return (m_ItemType >= 1) && (m_ItemType <= E_BLOCK_MAX_TYPE_ID);
+	
+	return true;  // PaletteUpgrade::BlockToItemType(PaletteUpgrade::FromItem(m_ItemType,
+				  // 0)) != BlockType::Air;	//(m_ItemType >= 1); //
+				  // &&(m_ItemType <= //E_BLOCK_MAX_TYPE_ID);
 }
 
 
@@ -1474,12 +1606,18 @@ float cItemHandler::GetBlockBreakingStrength(BLOCKTYPE a_Block) const
 
 bool cItemHandler::CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const
 {
-	ASSERT(m_ItemType < 256);  // Items with IDs above 255 should all be handled by specific handlers.
-
-	// By default, all blocks can be placed and the meta is copied over from the item's damage value:
-	return a_Player.PlaceBlock(
+	// ASSERT(m_ItemType < 256);  // Items with IDs above 255 should all be handled by specific handlers.
+	
+	Item itm = PaletteUpgrade::FromItem(a_HeldItem.m_ItemType,a_HeldItem.m_ItemDamage);
+	
+	// Temp fix
+	return a_Player.NewPlaceBlock(
 		a_PlacePosition,
-		static_cast<BLOCKTYPE>(m_ItemType),
-		static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage & 0x0f)
-	);
+		PaletteUpgrade::ToInternalId(PaletteUpgrade::BlockToItemType(itm), AllBlockStates{}));
+	// By default, all blocks can be placed and the meta is copied over from the item's damage value:
+	//return a_Player.PlaceBlock(
+	//	a_PlacePosition,
+	//	static_cast<BLOCKTYPE>(m_ItemType),
+	//	static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage & 0x0f)
+	//);
 }

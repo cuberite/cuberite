@@ -276,6 +276,16 @@ bool cPlayer::SetCurrentExperience(int a_CurrentXp)
 
 
 
+void cPlayer::ResendRenderDistanceCenter()
+{
+	auto pos = GetPosition();
+	m_ClientHandle->SendRenderDistanceCenter(cChunkDef::BlockToChunk({static_cast<int>(round(pos.x)), 0, static_cast<int>(round(pos.z))}));
+}
+
+
+
+
+
 int cPlayer::DeltaExperience(int a_Xp_delta)
 {
 	if (a_Xp_delta > (std::numeric_limits<int>().max() - m_CurrentXp))
@@ -2453,6 +2463,15 @@ bool cPlayer::PlaceBlock(const Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBL
 
 
 
+bool cPlayer::NewPlaceBlock(const Vector3i a_Position, NEWBLOCKTYPE a_Block)
+{
+	return PlaceBlocks({ { a_Position, a_Block } });
+}
+
+
+
+
+
 bool cPlayer::PlaceBlocks(const std::initializer_list<sSetBlock> a_Blocks)
 {
 	if (DoesPlacingBlocksIntersectEntity(a_Blocks))
@@ -2494,8 +2513,10 @@ bool cPlayer::PlaceBlocks(const std::initializer_list<sSetBlock> a_Blocks)
 	cChunkInterface ChunkInterface(m_World->GetChunkMap());
 	for (const auto & Block : a_Blocks)
 	{
+		m_World->NewPlaceBlock(Block.GetAbsolutePos(), Block.m_BlockIdNew);
+
 		// Set the blocks:
-		m_World->PlaceBlock(Block.GetAbsolutePos(), Block.m_BlockType, Block.m_BlockMeta);
+		// m_World->PlaceBlock(Block.GetAbsolutePos(), Block.m_BlockType, Block.m_BlockMeta);
 
 		// Call the "placed" hooks:
 		pm->CallHookPlayerPlacedBlock(*this, Block);

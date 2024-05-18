@@ -49,6 +49,7 @@
 
 #include "../Mobs/IncludeAllMonsters.h"
 
+#include "../Protocol/Palettes/Upgrade.h"
 
 
 
@@ -1193,6 +1194,157 @@ public:
 void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter)
 {
 	SerializerCollector serializer(aWriter);
+	if (true)  // new format
+	{
+		// set to 1.15
+		aWriter.AddInt("DataVersion",2225);  // to which game version does this save correspond to
+
+		aWriter.BeginCompound("Level");
+		aWriter.AddInt("xPos", aCoords.m_ChunkX);
+		aWriter.AddInt("zPos", aCoords.m_ChunkZ);
+		[[maybe_unused]] const bool Result = aWorld.GetChunkData(aCoords, serializer);  // Chunk must be present in order to save
+		ASSERT(Result);
+		serializer.Finish();  // Close NBT tags
+
+		// std::array<NEWBLOCKTYPE, 4096> templist = { 0 };
+
+		aWriter.BeginList("Sections", TAG_Compound);
+
+		for (size_t Y = 0; Y < cChunkDef::NumSections; Y++)
+		{
+			const auto Blocks = serializer.m_BlockData2.GetSection(Y); 
+			const auto BlockLights = serializer.m_LightData.GetBlockLightSection(Y); 
+			const auto SkyLights = serializer.m_LightData.GetSkyLightSection(Y); 
+			if ((Blocks != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr)) 
+			{ 
+				ChunkBlockDataNew::BlockArray temparr;
+				std::copy(Blocks->begin(),Blocks->end(),temparr.begin());
+				std::sort(temparr.begin(), temparr.end());
+				auto newlistend = std::unique(temparr.begin(),temparr.end());
+				int newsize = (newlistend - temparr.begin());
+				int bitused = Clamp(CeilC(log2(newsize)), 4, 16);
+
+				int longarrsize = CeilC((bitused * 4096)/8/8);
+				aWriter.BeginCompound("");
+				aWriter.BeginList("Palette", eTagType::TAG_Compound);
+
+				for (size_t i = 0; i < newsize; i++)
+				{
+					aWriter.BeginCompound("");
+					auto val = temparr[i];
+					auto bls = PaletteUpgrade::GetSaveStrings(val);
+					aWriter.AddString("Name", "minecraft:"+bls[0].second);  // everything is oak for now
+					if (bls[1].first != "")
+					{
+						aWriter.BeginCompound("Properties");
+						for (size_t j = 1; j < bls.size(); j++)
+						{
+							if (bls[j].first == "")
+							{
+								break;
+							}
+							aWriter.AddString(bls[j].first, bls[j].second);
+						}
+						aWriter.EndCompound();
+					}
+					aWriter.EndCompound();
+				}
+				aWriter.EndList();
+
+
+				INT64* arr = new INT64[longarrsize];
+				
+				bool usepadding = false;  // used in 1.16+ 
+
+				UINT64 tbuf = 0;
+				int BitIndex = 0;
+				int longindex = 0;
+				int toloop = Blocks->size();
+				for (size_t i = 0; i < toloop; i++)
+				{
+					auto v = Blocks->at(i);
+					auto ind = std::find(temparr.begin(),newlistend,v);
+					INT64 towrite = ind - temparr.begin();
+					tbuf |= towrite << BitIndex;
+					BitIndex += bitused;
+					if (BitIndex + bitused > 64 || i == toloop-1)  // not enough bits in current long for the next value?
+					{
+						if (usepadding)
+						{
+							BitIndex = 0;
+							arr[longindex] = tbuf;
+							tbuf = 0;
+							longindex++;
+						}
+						else
+						{
+							arr[longindex] = tbuf;
+							longindex++;
+							if (BitIndex != 64)
+							{
+								INT64 upperpart = towrite >> (64 - BitIndex);
+								tbuf |= upperpart;
+								BitIndex = bitused - (64 - BitIndex);
+							}
+							else
+							{
+								BitIndex = 0;
+								tbuf = 0;
+							}
+						}
+					}
+
+				}
+
+				if (Blocks != nullptr)
+				{
+					aWriter.AddLongArray("BlockStates", arr, longindex);
+				}
+				else
+				{
+					// aWriter.AddByteArray("BlockStates", ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue);  // BROKEN
+				}
+
+				if (BlockLights != nullptr)
+				{
+					aWriter.AddByteArray("BlockLight", reinterpret_cast<const char *>(BlockLights->data()), BlockLights->size());
+				}
+				else
+				{
+					aWriter.AddByteArray("BlockLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultBlockLightValue);
+				}
+
+				if (SkyLights != nullptr)
+				{
+					aWriter.AddByteArray("SkyLight", reinterpret_cast<const char *>(SkyLights->data()), SkyLights->size());
+				}
+				else
+				{
+					aWriter.AddByteArray("SkyLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue);
+				}
+
+				aWriter.AddByte("Y", static_cast<unsigned char>(Y));
+				aWriter.EndCompound();
+
+				delete[] arr;
+			} 
+		}
+		aWriter.EndList();  // "Sections"
+
+		aWriter.AddLong("LastUpdate", aWorld.GetWorldAge().count());
+
+		aWriter.AddLong("InhabitedTime", 0);
+
+		aWriter.AddString("Status", "full");
+
+		aWriter.AddByte("isLightOn", 1);
+
+		// height maps not implemented yet
+
+		aWriter.EndCompound();  // "Level"
+
+		return;
+	}
 	aWriter.BeginCompound("Level");
 	aWriter.AddInt("xPos", aCoords.m_ChunkX);
 	aWriter.AddInt("zPos", aCoords.m_ChunkZ);

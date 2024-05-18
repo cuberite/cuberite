@@ -7,6 +7,7 @@
 class cWorld;
 
 
+/*
 enum Direction
 {
 	X_PLUS,
@@ -16,7 +17,7 @@ enum Direction
 	Z_PLUS,
 	Z_MINUS,
 	NONE
-};
+};*/
 
 
 

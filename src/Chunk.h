@@ -135,16 +135,24 @@ public:
 	cWorld * GetWorld(void) const { return m_World; }
 
 	void SetBlock(Vector3i a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void NewSetBlock(Vector3i a_RelPos, NEWBLOCKTYPE a_block);
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
 
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
+	void NewFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, NEWBLOCKTYPE a_block);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
 	void FastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
 	{
 		FastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_BlockType, a_BlockMeta);
 	}
-
+	void NewFastSetBlock(Vector3i a_RelPos, NEWBLOCKTYPE a_block)
+	{
+		NewFastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_block);
+	}
 	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const { return m_BlockData.GetBlock({ a_RelX, a_RelY, a_RelZ }); }
 	BLOCKTYPE GetBlock(Vector3i a_RelCoords) const { return m_BlockData.GetBlock(a_RelCoords); }
+
+	UInt32 GetBlock2(int a_RelX, int a_RelY, int a_RelZ) const { return m_BlockData2.GetBlock({ a_RelX, a_RelY, a_RelZ }); } 
+	UInt32 GetBlock2(Vector3i a_RelCoords) const { return m_BlockData2.GetBlock(a_RelCoords); }
 
 	void GetBlockTypeMeta(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	void GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
@@ -292,7 +300,7 @@ public:
 	{
 		m_BlockData.SetMeta(a_RelPos, a_Meta);
 		MarkDirty();
-		m_PendingSendBlocks.emplace_back(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock(a_RelPos), a_Meta);
+		m_PendingSendBlocks.emplace_back(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock2(a_RelPos));
 	}
 
 	/** Light alterations based on time */
@@ -510,6 +518,7 @@ private:
 	cChunkMap * m_ChunkMap;
 
 	ChunkBlockData m_BlockData;
+	ChunkBlockDataNew m_BlockData2;
 	ChunkLightData m_LightData;
 
 	cChunkDef::HeightMap m_HeightMap;

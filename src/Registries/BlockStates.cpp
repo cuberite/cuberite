@@ -13161,9 +13161,9 @@ BlockType BlockState::Type() const
 		case 10838: case 10840: case 10842: return BlockType::GraniteSlab;
 		case 10390: case 10392: case 10394: case 10396: case 10398: case 10400: case 10402: case 10404: case 10406: case 10408: case 10410: case 10412: case 10414: case 10416: case 10418: case 10420: case 10422: case 10424: case 10426: case 10428: case 10430: case 10432: case 10434: case 10436: case 10438: case 10440: case 10442: case 10444: case 10446: case 10448: case 10450: case 10452: case 10454: case 10456: case 10458: case 10460: case 10462: case 10464: case 10466: case 10468: return BlockType::GraniteStairs;
 		case 12166: case 12167: case 12168: case 12172: case 12173: case 12174: case 12178: case 12179: case 12180: case 12184: case 12185: case 12186: case 12190: case 12191: case 12192: case 12196: case 12197: case 12198: case 12202: case 12203: case 12204: case 12208: case 12209: case 12210: case 12214: case 12215: case 12216: case 12220: case 12221: case 12222: case 12226: case 12227: case 12228: case 12232: case 12233: case 12234: case 12238: case 12239: case 12240: case 12244: case 12245: case 12246: case 12250: case 12251: case 12252: case 12256: case 12257: case 12258: case 12262: case 12263: case 12264: case 12268: case 12269: case 12270: case 12274: case 12275: case 12276: case 12280: case 12281: case 12282: case 12286: case 12287: case 12288: case 12292: case 12293: case 12294: case 12298: case 12299: case 12300: case 12304: case 12305: case 12306: case 12310: case 12311: case 12312: case 12316: case 12317: case 12318: case 12322: case 12323: case 12324: case 12328: case 12329: case 12330: case 12334: case 12335: case 12336: case 12340: case 12341: case 12342: case 12346: case 12347: case 12348: case 12352: case 12353: case 12354: case 12358: case 12359: case 12360: case 12364: case 12365: case 12366: case 12370: case 12371: case 12372: case 12376: case 12377: case 12378: case 12382: case 12383: case 12384: case 12388: case 12389: case 12390: case 12394: case 12395: case 12396: case 12400: case 12401: case 12402: case 12406: case 12407: case 12408: case 12412: case 12413: case 12414: case 12418: case 12419: case 12420: case 12424: case 12425: case 12426: case 12430: case 12431: case 12432: case 12436: case 12437: case 12438: case 12442: case 12443: case 12444: case 12448: case 12449: case 12450: case 12454: case 12455: case 12456: case 12460: case 12461: case 12462: case 12466: case 12467: case 12468: case 12472: case 12473: case 12474: case 12478: case 12479: case 12480: case 12484: case 12485: case 12486: return BlockType::GraniteWall;
-		case 1342: return BlockType::Grass;
+		case 1342: return BlockType::DirtPath;
 		case 8: case 9: return BlockType::GrassBlock;
-		case 9223: return BlockType::GrassPath;
+		case 9223: return BlockType::HayBlock;
 		case 68: return BlockType::Gravel;
 		case 8009: case 8010: case 8011: case 8012: case 8013: case 8014: case 8015: case 8016: case 8017: case 8018: case 8019: case 8020: case 8021: case 8022: case 8023: case 8024: return BlockType::GrayBanner;
 		case 1161: case 1162: case 1163: case 1164: case 1165: case 1166: case 1167: case 1168: case 1169: case 1170: case 1171: case 1172: case 1173: case 1174: case 1175: case 1176: return BlockType::GrayBed;
@@ -13190,7 +13190,7 @@ BlockType BlockState::Type() const
 		case 8205: case 8206: case 8207: case 8208: return BlockType::GreenWallBanner;
 		case 1397: return BlockType::GreenWool;
 		case 14821: case 14822: case 14823: case 14824: case 14825: case 14826: case 14827: case 14828: case 14829: case 14830: case 14831: case 14832: return BlockType::Grindstone;
-		case 7863: case 7864: case 7865: return BlockType::HayBale;
+		case 7863: case 7864: case 7865: return BlockType::HayBlock;
 		case 6662: case 6663: case 6664: case 6665: case 6666: case 6667: case 6668: case 6669: case 6670: case 6671: case 6672: case 6673: case 6674: case 6675: case 6676: case 6677: return BlockType::HeavyWeightedPressurePlate;
 		case 15824: return BlockType::HoneyBlock;
 		case 15825: return BlockType::HoneycombBlock;
@@ -13575,7 +13575,7 @@ BlockType BlockState::Type() const
 		case 3948: case 3949: case 3950: case 3951: case 3952: case 3953: case 3954: case 3955: case 3956: case 3957: case 3958: case 3959: case 3960: case 3961: case 3962: case 3963: return BlockType::SugarCane;
 		case 7885: case 7886: return BlockType::Sunflower;
 		case 14954: case 14955: case 14956: case 14957: return BlockType::SweetBerryBush;
-		case 1430: case 1431: return BlockType::TNT;
+		case 1430: case 1431: return BlockType::Tnt;
 		case 7893: case 7894: return BlockType::TallGrass;
 		case 1346: case 1347: return BlockType::TallSeagrass;
 		case 15760: case 15761: case 15762: case 15763: case 15764: case 15765: case 15766: case 15767: case 15768: case 15769: case 15770: case 15771: case 15772: case 15773: case 15774: case 15775: return BlockType::Target;
