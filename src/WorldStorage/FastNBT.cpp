@@ -358,6 +358,24 @@ eNBTParseError cParsedNBT::ReadTag(void)
 			return eNBTParseError::npSuccess;
 		}
 
+		case TAG_LongArray:
+		{
+			NEEDBYTES(4, eNBTParseError::npArrayMissingLength);
+			int len = GetBEInt(m_Data.data() + m_Pos);
+			m_Pos += 4;
+			if (len < 0)
+			{
+				// Invalid length
+				return eNBTParseError::npArrayInvalidLength;
+			}
+			len *= 8;
+			NEEDBYTES(len, eNBTParseError::npArrayInvalidLength);
+			Tag.m_DataLength = static_cast<size_t>(len);
+			Tag.m_DataStart = m_Pos;
+			m_Pos += static_cast<size_t>(len);
+			return eNBTParseError::npSuccess;
+		}
+
 		case TAG_Min:
 		{
 			return eNBTParseError::npUnknownTag;
@@ -454,6 +472,7 @@ size_t cParsedNBT::GetMinTagSize(eTagType a_TagType)
 		case TAG_List:      return 5;  // 1 byte list type + 4 bytes count
 		case TAG_Compound:  return 1;  // Single TAG_End byte
 		case TAG_IntArray:  return 4;  // 4 bytes for the count
+		case TAG_LongArray: return 4;
 	}
 	UNREACHABLE("Unsupported nbt tag type");
 }
@@ -663,6 +682,28 @@ void cFastNBTWriter::AddIntArray(const AString & a_Name, const Int32 * a_Value, 
 	for (size_t i = 0; i < a_NumElements; i++)
 	{
 		UInt32 Element = htonl(static_cast<UInt32>(a_Value[i]));
+		m_Result.append(reinterpret_cast<const std::byte *>(&Element), sizeof(Element));
+	}
+}
+
+
+
+
+
+void cFastNBTWriter::AddLongArray(const AString & a_Name, const Int64 * a_Value, size_t a_NumElements)
+{
+	TagCommon(a_Name, TAG_LongArray);
+	UInt32 len = htonl(static_cast<UInt32>(a_NumElements));
+	size_t cap = m_Result.capacity();
+	size_t size = m_Result.length();
+	if ((cap - size) < (8 + a_NumElements * 8))
+	{
+		m_Result.reserve(size + 8 + (a_NumElements * 8));
+	}
+	m_Result.append(reinterpret_cast<const std::byte *>(&len), sizeof(len));
+	for (size_t i = 0; i < a_NumElements; i++)
+	{
+		UInt64 Element = (static_cast<UInt64>(htonl(static_cast<UInt32>(a_Value[i]))) << 32) | (static_cast<UInt64>(htonl(static_cast<UInt32>(a_Value[i] >> 32))));
 		m_Result.append(reinterpret_cast<const std::byte *>(&Element), sizeof(Element));
 	}
 }

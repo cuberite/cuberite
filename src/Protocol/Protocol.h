@@ -56,11 +56,16 @@ public:
 	enum ePacketType
 	{
 		pktAttachEntity = 0,
+		pktCustomPayload,
+		pktLightUpdate,
+		pktPlayerActionResponse,
+		pktRenderDistanceCenter,
 		pktBlockAction,
 		pktBlockBreakAnim,
 		pktBlockChange,
 		pktBlockChanges,
 		pktBossBar,
+		pktWorldBorder,
 		pktCameraSetTo,
 		pktChatRaw,
 		pktCollectEntity,
@@ -311,6 +316,16 @@ public:
 		MAIN_HAND,
 		OFF_HAND
 	};
+	enum class PlayerActionResponses
+	{
+		START_DESTROY_BLOCK,
+        ABORT_DESTROY_BLOCK,
+        STOP_DESTROY_BLOCK,
+        DROP_ALL_ITEMS,
+        DROP_ITEM,
+        RELEASE_USE_ITEM,
+        SWAP_HELD_ITEMS
+	};
 	enum class EntityMetadataType
 	{
 		Byte,
@@ -382,6 +397,7 @@ public:
 	virtual void SendBlockAction                (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) = 0;
 	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage) = 0;
 	virtual void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
+	virtual void NewSendBlockChange             (Vector3i a_BlockPos, NEWBLOCKTYPE block) = 0;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) = 0;
 	virtual void SendBossBarAdd                 (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) = 0;
 	virtual void SendBossBarRemove              (UInt32 a_UniqueID) = 0;
@@ -423,6 +439,7 @@ public:
 	virtual void SendPlayerAbilities            (void) = 0;
 	virtual void SendParticleEffect             (const AString & a_SoundName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount) = 0;
 	virtual void SendParticleEffect             (const AString & a_SoundName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) = 0;
+	virtual void SendPlayerActionResponse       (Vector3i a_blockpos, int a_state_id, cProtocol::PlayerActionResponses a_action, bool a_IsApproved) = 0;
 	virtual void SendPlayerListAddPlayer        (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer) = 0;
 	virtual void SendPlayerListRemovePlayer     (const cPlayer & a_Player) = 0;
@@ -439,6 +456,7 @@ public:
 	virtual void SendResetTitle                 (void) = 0;
 	virtual void SendResourcePack               (const AString & a_ResourcePackUrl) = 0;
 	virtual void SendRespawn                    (eDimension a_Dimension) = 0;
+	virtual void SendRenderDistanceCenter       (cChunkCoords a_chunk) = 0;
 	virtual void SendExperience                 (void) = 0;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) = 0;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) = 0;
@@ -468,6 +486,7 @@ public:
 	virtual void SendWindowClose                (const cWindow    & a_Window) = 0;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) = 0;
 	virtual void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value) = 0;
+
 
 	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;

@@ -168,6 +168,8 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	m_WebAdmin = new cWebAdmin();
 	m_WebAdmin->Init();
 
+
+
 	LOGD("Loading settings...");
 	m_RankManager.reset(new cRankManager());
 	m_RankManager->Initialize(*m_MojangAPI);
@@ -296,8 +298,8 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 
 		const AStringVector WorldNames{ "world", "world_nether", "world_the_end" };
 		m_pDefaultWorld = &m_WorldsByName.try_emplace("world", "world", "world", a_dd, WorldNames).first->second;
-		m_WorldsByName.try_emplace("world_nether", "world_nether", "world_nether", a_dd, WorldNames, dimNether, "world");
-		m_WorldsByName.try_emplace("world_the_end", "world_the_end", "world_the_end", a_dd, WorldNames, dimEnd, "world");
+		//m_WorldsByName.try_emplace("world_nether", "world_nether", "world_nether", a_dd, WorldNames, dimNether, "world");
+		//m_WorldsByName.try_emplace("world_the_end", "world_the_end", "world_the_end", a_dd, WorldNames, dimEnd, "world");
 		return;
 	}
 

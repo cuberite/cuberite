@@ -582,6 +582,21 @@ void cChunkMap::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE 
 
 
 
+void cChunkMap::NewSetBlock(Vector3i a_BlockPos, NEWBLOCKTYPE a_block )
+{
+	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
+	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
+
+	cCSLock Lock(m_CSChunks);
+	const auto Chunk = FindChunk(chunkPos.m_ChunkX, chunkPos.m_ChunkZ);
+	if ((Chunk != nullptr) && Chunk->IsValid())
+	{
+		Chunk->NewSetBlock(relPos,a_block);
+	}
+}
+
+
+
 
 bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
@@ -775,7 +790,8 @@ bool cChunkMap::DigBlock(Vector3i a_BlockPos)
 			return false;
 		}
 
-		Chunk->SetBlock(relPos, E_BLOCK_AIR, 0);
+		//Chunk->SetBlock(relPos, E_BLOCK_AIR, 0);
+		Chunk->NewSetBlock(relPos, ENUM_BLOCKS::AIR);
 	}
 	return true;
 }

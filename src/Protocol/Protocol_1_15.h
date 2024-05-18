@@ -34,11 +34,14 @@ protected:
 
 	virtual void SendBlockAction                (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
 	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage) override;
-	virtual void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType,NIBBLETYPE a_BlockMeta) override;
+	virtual void NewSendBlockChange             (Vector3i a_BlockPos, NEWBLOCKTYPE block) override;
+	virtual void SendRenderDistanceCenter       (cChunkCoords a_chunk) override;
 	virtual void SendEditSign                   (Vector3i a_BlockPos) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation) override;
 	virtual void SendEntitySpawn                (const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData) override;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) override;
+	virtual void SendPlayerActionResponse       (Vector3i a_blockpos, int a_state_id, cProtocol::PlayerActionResponses a_action, bool a_IsApproved) override;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount) override;
@@ -53,6 +56,8 @@ protected:
 	virtual void SendSoundEffect                (const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
 	virtual void SendEntityPosition             (const cEntity & a_Entity) override;
+	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
+
 
 	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata) const override;
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
@@ -67,7 +72,7 @@ protected:
 	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const override;
 	virtual Version GetProtocolVersion() const override;
 
-	virtual void SendLoginSuccess() override;
+	//virtual void SendLoginSuccess() override;
 
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void HandlePacketBlockDig(cByteBuffer & a_ByteBuffer) override;

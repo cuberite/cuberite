@@ -677,7 +677,7 @@ void cWorld::InitializeSpawn(void)
 
 	int ChunkX = 0, ChunkZ = 0;
 	cChunkDef::BlockToChunk(m_SpawnX, m_SpawnZ, ChunkX, ChunkZ);
-	cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, ViewDist);
+	//cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, ViewDist);
 }
 
 
@@ -1749,6 +1749,15 @@ void cWorld::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_B
 
 
 
+void cWorld::NewSetBlock(Vector3i a_BlockPos, NEWBLOCKTYPE a_block)
+{
+	m_ChunkMap.NewSetBlock(a_BlockPos, a_block);
+}
+
+
+
+
+
 void cWorld::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData)
 {
 	m_ChunkMap.SetBlockMeta(a_BlockPos, a_MetaData);
@@ -2051,6 +2060,20 @@ void cWorld::PlaceBlock(const Vector3i a_Position, const BLOCKTYPE a_BlockType, 
 	cChunkInterface ChunkInterface(GetChunkMap());
 	cBlockHandler::For(BlockType).OnBroken(ChunkInterface, *this, a_Position, BlockType, BlockMeta, nullptr);
 	cBlockHandler::For(a_BlockType).OnPlaced(ChunkInterface, *this, a_Position, a_BlockType, a_BlockMeta);
+}
+
+
+
+
+
+void cWorld::NewPlaceBlock(const Vector3i a_Position, NEWBLOCKTYPE a_block)
+{
+
+	NewSetBlock(a_Position, a_block);
+	cChunkInterface ChunkInterface(GetChunkMap());
+	
+	//cBlockHandler::For(BlockType).OnBroken(ChunkInterface, *this, a_Position, BlockType, BlockMeta, nullptr);
+	//cBlockHandler::For(a_BlockType).OnPlaced(ChunkInterface, *this, a_Position, a_BlockType, a_BlockMeta);
 }
 
 
@@ -3163,9 +3186,13 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 	cChunkDef::BlockNibbles BlockMetas;
 	a_ChunkDesc.CompressBlockMetas(BlockMetas);
 
-	struct SetChunkData Data({ a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ() });
+	cChunkDef::BlockTypes2 empty = { AIR };
+	struct SetChunkData Data({ -55, -55/* a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()*/});
 	{
-		Data.BlockData.SetAll(a_ChunkDesc.GetBlockTypes(), BlockMetas);
+		//Data.BlockData.SetAll(a_ChunkDesc.GetBlockTypes(), BlockMetas);
+
+
+		//Data.BlockData2.SetAll(empty);
 
 		std::copy(a_ChunkDesc.GetBiomeMap(), a_ChunkDesc.GetBiomeMap() + std::size(a_ChunkDesc.GetBiomeMap()), Data.BiomeMap);
 		std::copy(a_ChunkDesc.GetHeightMap(), a_ChunkDesc.GetHeightMap() + std::size(a_ChunkDesc.GetHeightMap()), Data.HeightMap);
@@ -3176,7 +3203,8 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 		Data.IsLightValid = false;
 	}
 
-	m_World->QueueSetChunkData(std::move(Data));
+	LOG("Chunk gen disabled X %d Z %d", a_ChunkDesc.GetChunkX(),  a_ChunkDesc.GetChunkZ());
+	//m_World->QueueSetChunkData(std::move(Data));
 }
 
 

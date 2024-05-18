@@ -115,6 +115,7 @@ public:
 	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta);
 
 	void SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void NewSetBlock       (Vector3i a_BlockPos, NEWBLOCKTYPE a_block);
 	bool GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	bool GetBlockInfo      (Vector3i, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
 

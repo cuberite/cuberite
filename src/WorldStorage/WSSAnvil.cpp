@@ -59,7 +59,7 @@
 #include "../Server.h"
 #include "../BoundingBox.h"
 
-
+#include "../Protocol/Palettes/Palette_1_15.h"
 
 
 
@@ -345,6 +345,307 @@ Compression::Result cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk)
 bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, const ContiguousByteBufferView a_RawChunkData)
 {
 	struct SetChunkData Data(a_Chunk);
+
+	if (newFormat)
+	{
+		LOGD("LOADING chunk X %d Z %d", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		int Level = a_NBT.FindChildByName(0, "Level");
+		if (Level < 0)
+		{
+			ChunkLoadFailed(a_Chunk, "Missing NBT tag: Level", a_RawChunkData);
+			return false;
+		}
+		int Sections = a_NBT.FindChildByName(Level, "Sections");
+		if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
+		{
+			ChunkLoadFailed(a_Chunk, "Missing NBT tag: Sections", a_RawChunkData);
+			return false;
+		}
+		eTagType SectionsType = a_NBT.GetChildrenType(Sections);
+		if ((SectionsType != TAG_Compound) && (SectionsType != TAG_End))
+		{
+			ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Sections", a_RawChunkData);
+			return false;
+		}
+
+		for (int Child = a_NBT.GetFirstChild(Sections); Child >= 0; Child = a_NBT.GetNextSibling(Child))
+		{
+			const int SectionYTag = a_NBT.FindChildByName(Child, "Y");
+			if ((SectionYTag < 0) || (a_NBT.GetType(SectionYTag) != TAG_Byte))
+			{
+				ChunkLoadFailed(a_Chunk, "NBT tag missing or has wrong: Y", a_RawChunkData);
+				return false;
+			}
+			//Y level can go negative in 1.13+ worlds
+			//Section num can go higher in newer versions
+			const int Y = (signed char)a_NBT.GetByte(SectionYTag);
+			if ((Y < -1) || (Y > static_cast<int>(cChunkDef::NumSections - 1)))
+			{
+				ChunkLoadFailed(a_Chunk, "NBT tag exceeds chunk bounds: Y", a_RawChunkData);
+				return false;
+			}
+
+			// BlockStateData = reinterpret_cast<byte*>(reinterpret_cast<const Int64*>(BlockStateData))
+
+			int PaletteList = a_NBT.FindChildByName(Child, "Palette");
+			if (PaletteList < 0)
+			{
+				// The pallete does not have to exists but that also means that the section is empty and should be ignored
+				continue;
+			}
+			if (a_NBT.GetType(PaletteList) != TAG_List)
+			{
+				ChunkLoadFailed(a_Chunk, "Missing NBT tag: Palette", a_RawChunkData);
+				return false;
+			}
+
+			eTagType PaletteListType = a_NBT.GetChildrenType(PaletteList);
+			if ((PaletteListType != TAG_Compound) && (PaletteListType != TAG_End))
+			{
+				ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Palette", a_RawChunkData);
+				return false;
+			}
+
+			int SectionBlockLongCount = 256; // not properly implemented
+
+			const auto BlockStateData = GetSectionDataLong(a_NBT, Child, "BlockStates", SectionBlockLongCount /*ChunkBlockData::SectionBlockCount*/);
+				//MetaData = GetSectionData(a_NBT, Child, "Data", ChunkBlockData::SectionMetaCount), no longer exists
+			const auto BlockLightData = GetSectionData(a_NBT, Child, "BlockLight",ChunkLightData::SectionLightCount);	 // Still exists but does not have to be present for a valid section
+			const auto SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount); // Still exists but does not have to be present for a valid section
+
+			Int64 * LEstates = new Int64[SectionBlockLongCount];
+
+			for (size_t i = 0; i < SectionBlockLongCount; i++)
+			{
+				LEstates[i] = ntohll(reinterpret_cast<const Int64*>(BlockStateData)[i]);
+			}
+
+			AStringList Palette;
+
+			std::vector<NEWBLOCKTYPE> Paletteids;
+
+			for (int Child1 = a_NBT.GetFirstChild(PaletteList); Child1 >= 0; Child1 = a_NBT.GetNextSibling(Child1))
+			{
+				const int NameTagId = a_NBT.FindChildByName(Child1, "Name");
+				if ((NameTagId < 0) || (a_NBT.GetType(NameTagId) != TAG_String))
+				{
+					ChunkLoadFailed(a_Chunk, "NBT tag missing or has wrong type: Name", a_RawChunkData);
+					return false;
+				}
+				AString blockid = a_NBT.GetString(NameTagId);
+				if (!blockid._Starts_with("minecraft:"))
+				{
+					ChunkLoadFailed(a_Chunk, "Invalid namespace: " + blockid + " Mods arent supported", a_RawChunkData);
+					return false;
+				}
+				const int BlockStatesId = a_NBT.FindChildByName(Child1, "Properties");
+
+				AString bls = "";
+				std::vector<AString> strs;
+				if (BlockStatesId > 0)
+				{
+					if (a_NBT.GetType(BlockStatesId) != TAG_Compound)
+					{
+						ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Properties", a_RawChunkData);
+						return false;
+					}
+					for (int ProChild = a_NBT.GetFirstChild(BlockStatesId); ProChild >= 0; ProChild = a_NBT.GetNextSibling(ProChild))
+					{
+						AString name = a_NBT.GetName(ProChild);
+						AString value = a_NBT.GetString(ProChild);
+						// TODO: implement blockstates
+						bls = name + ": " + value + ", ";
+						strs.push_back(bls);
+					}
+					//
+				}
+				std::sort(strs.begin(),strs.end());
+
+				AString tosearch = blockid.substr(10,std::string::npos);  // substr to remove the "minecraft:"
+				if (strs.size() != 0)
+				{
+					tosearch += " ";
+				}
+				//tosearch += bls;
+				for each (auto itm in strs)
+				{
+					tosearch += itm;
+				}
+				if (strs.size() != 0)
+				{
+					tosearch = tosearch.substr(0, tosearch.size() - 2);
+				}
+				//Check if 
+				int cnt = Palette_1_15::StringNameToId.count(tosearch);
+				if (cnt == 0)
+				{
+					UNREACHABLE("could find given block while lodaing chunk X: " + a_Chunk.m_ChunkX + " Z: " a_Chunk.m_ChunkZ + " Y Section: " + Y);
+				}
+				NEWBLOCKTYPE protocolblockid = Palette_1_15::StringNameToId.at(tosearch);
+				Paletteids.push_back(protocolblockid);
+
+				Palette.emplace_back(blockid.substr(strlen("minecraft:"), std::string::npos));
+			}
+			int IndexBitSize = std::max(4, static_cast<int>(std::ceil(std::log2(Paletteids.size()))));  // How many bits is one index in length. Min is 4 bits, maximum 12 bits
+			ASSERT((12 >= IndexBitSize) && (IndexBitSize >= 4));
+
+			//Byte bitsleftover = 0;
+			//int valuesread = 0;
+			//int currentbyte = 0;
+			// needs better bounds checking
+			short numblockdata[4096] = { 0 };
+			NEWBLOCKTYPE resolveddata[4096] = { AIR };
+			int numblockdataindex = 0;
+			int pl = Paletteids.size();
+
+			bool usepadding = false;
+
+			int BitIndex = 0;
+			int arrindex = 0;
+
+			while (numblockdataindex < 4096)
+			{
+				Int64 finalv = 0;
+				if (BitIndex + IndexBitSize <= 64)
+				{
+					finalv = (LEstates[arrindex] >> BitIndex) & ((1 << IndexBitSize)-1);
+					BitIndex += IndexBitSize;
+					if (BitIndex == 64)
+					{
+						BitIndex = 0;
+						arrindex++;
+					}
+				}
+				else // BitIndex + IndexBitSize > 64
+				{
+					if (usepadding)
+					{
+						BitIndex = 0;
+						arrindex++;
+						continue;
+					}
+					Int64 lowerpart = LEstates[arrindex] >> BitIndex;
+					arrindex++;
+					int BitsRead = (64 - BitIndex);
+					BitIndex = IndexBitSize - BitsRead;
+					Int64 upperpart = LEstates[arrindex] & ((static_cast<Int64>(1) << BitIndex) - 1) << BitsRead;
+					finalv = lowerpart | upperpart;
+				}
+				numblockdata[numblockdataindex] = static_cast<short>(finalv);
+				numblockdataindex++;
+			}
+
+			/* while (numblockdataindex < 4095)
+			{
+				numblockdataindex++;
+				int finalvalue = 0;
+				int reversebitmask = (0xFF ^ ((1 << (8 - bitsleftover))-1));
+				int bitsread = 0;
+				if (bitsleftover == 0)
+				{
+					finalvalue = static_cast<Byte>(LEstates[currentbyte]) & ((1 << IndexBitSize)-1);
+					bitsread = Clamp(IndexBitSize,0,8);
+					bitsleftover = 8 - IndexBitSize;
+				}
+				else
+				{
+					finalvalue = (static_cast<Byte>(LEstates[currentbyte]) & reversebitmask) >> (8 - bitsleftover);
+					bitsread = bitsleftover;
+					bitsleftover = std::clamp(8 - (bitsleftover + IndexBitSize),0,12);
+				}
+				int bitslefttoread = IndexBitSize - bitsread;
+				if (bitslefttoread <= 0)
+				{
+					numblockdata[numblockdataindex] = finalvalue;
+					if (bitsleftover == 0)
+					{
+						currentbyte++;
+					}
+					ASSERT(finalvalue < pl);
+					continue;
+				}
+				int Mask = (1 << bitslefttoread)-1;
+				if (currentbyte + 1 < 4096)
+				{
+					UNREACHABLE("Out of bounds reading block ids + 1");
+				}
+				finalvalue |= (static_cast<Byte>(LEstates[currentbyte+1]) & Mask) >> bitsread;
+				bitslefttoread -= 8;
+				if (bitslefttoread <= 0)
+				{
+					bitsleftover = (-bitslefttoread);
+					numblockdata[numblockdataindex] = finalvalue;
+					if (bitsleftover != 0)
+					{
+						currentbyte += 1;
+					}
+					else
+					{
+						currentbyte += 2;
+					}
+					ASSERT(finalvalue < pl);
+					continue;
+				}
+				Mask = (1 << bitslefttoread)-1;
+				if (currentbyte + 2 < 4096)
+				{
+					UNREACHABLE("Out of bounds reading block ids + 2");
+				}
+				finalvalue |= (static_cast<Byte>(LEstates[currentbyte+2]) & Mask) >> (8+bitsread);
+				if (finalvalue >= 1 << (IndexBitSize))
+				{
+					UNREACHABLE("block palette index too large");
+				}
+				numblockdata[numblockdataindex] = finalvalue;
+				if (bitsleftover != 0)
+				{
+					currentbyte += 2;
+				}
+				else
+				{
+					currentbyte += 3;
+				}
+				bitsleftover = (-bitslefttoread);
+				ASSERT(finalvalue < pl);
+			}*/
+
+			//Resolve palette indexes into protocol block ids
+			for (size_t i = 0; i < 4096; i++)
+			{
+				resolveddata[i] = Paletteids[numblockdata[i]];
+			}
+
+			Data.BlockData2.SetSection(resolveddata,Y);
+
+			if (BlockLightData != NULL && SkyLightData != NULL)
+			{
+				Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
+			}
+			char hm[256] = {0};
+			memset(&Data.HeightMap,0,256); // temp
+			memset(&Data.BiomeMap,0,256); // temp
+			Data.IsLightValid = true;
+			delete[] LEstates;
+			//Data.BlockData.SetSection(*reinterpret_cast<const ChunkBlockData::SectionType *>(BlockData), *reinterpret_cast<const ChunkBlockData::SectionMetaType *>(MetaData), static_cast<size_t>(Y));
+			//Set the data
+			/*
+			if ((BlockData != nullptr) && (MetaData != nullptr) &&
+				(SkyLightData != nullptr) && (BlockLightData != nullptr))
+				{
+					Data.BlockData.SetSection(*reinterpret_cast<const ChunkBlockData::SectionType *>(BlockData), *reinterpret_cast<const ChunkBlockData::SectionMetaType *>(MetaData), static_cast<size_t>(Y));
+					Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
+				}
+				else
+				{
+					ChunkLoadFailed(a_Chunk, "Missing chunk block/light data", a_RawChunkData);
+					return false;
+				}*/
+		}  // for itr - LevelSections[]
+
+	}
+
+	m_World->QueueSetChunkData(std::move(Data));
+	return true;
 
 	// Load the blockdata, blocklight and skylight:
 	int Level = a_NBT.FindChildByName(0, "Level");
@@ -4020,6 +4321,22 @@ const std::byte * cWSSAnvil::GetSectionData(const cParsedNBT & a_NBT, int a_Tag,
 	}
 	return nullptr;
 }
+
+
+
+
+
+
+const std::byte * cWSSAnvil::GetSectionDataLong(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, size_t a_Length)
+{
+	int Child = a_NBT.FindChildByName(a_Tag, a_ChildName);
+	if ((Child >= 0) && (a_NBT.GetType(Child) == TAG_LongArray) && (a_NBT.GetDataLength(Child) == a_Length * 8))
+	{
+		return a_NBT.GetData(Child);
+	}
+	return nullptr;
+}
+
 
 
 
