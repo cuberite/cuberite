@@ -345,10 +345,10 @@ Compression::Result cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk)
 bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, const ContiguousByteBufferView a_RawChunkData)
 {
 	struct SetChunkData Data(a_Chunk);
-
+	
 	if (newFormat)
 	{
-		LOGD("LOADING chunk X %d Z %d", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		// LOGD("LOADING chunk X %d Z %d", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		int Level = a_NBT.FindChildByName(0, "Level");
 		if (Level < 0)
 		{
@@ -377,6 +377,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				return false;
 			}
 			// Y level can go negative in 1.13+ worlds
+			// in 1.18 it goes to -4
 			// Section num can go higher in newer versions
 			const int Y = (signed char)a_NBT.GetByte(SectionYTag);
 			if ((Y < -1) || (Y > static_cast<int>(cChunkDef::NumSections - 1)))
@@ -404,20 +405,6 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			{
 				ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Palette", a_RawChunkData);
 				return false;
-			}
-
-			int SectionBlockLongCount = 256; // not properly implemented
-
-			const auto BlockStateData = GetSectionDataLong(a_NBT, Child, "BlockStates", SectionBlockLongCount /*ChunkBlockData::SectionBlockCount*/);
-				//MetaData = GetSectionData(a_NBT, Child, "Data", ChunkBlockData::SectionMetaCount), no longer exists
-			const auto BlockLightData = GetSectionData(a_NBT, Child, "BlockLight",ChunkLightData::SectionLightCount);	 // Still exists but does not have to be present for a valid section
-			const auto SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount); // Still exists but does not have to be present for a valid section
-
-			Int64 * LEstates = new Int64[SectionBlockLongCount];
-
-			for (size_t i = 0; i < SectionBlockLongCount; i++)
-			{
-				LEstates[i] = ntohll(reinterpret_cast<const Int64*>(BlockStateData)[i]);
 			}
 
 			AStringList Palette;
@@ -453,11 +440,9 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 					{
 						AString name = a_NBT.GetName(ProChild);
 						AString value = a_NBT.GetString(ProChild);
-						// TODO: implement blockstates
 						bls = name + ": " + value + ", ";
 						strs.push_back(bls);
 					}
-					//
 				}
 				std::sort(strs.begin(),strs.end());
 
@@ -489,6 +474,20 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			int IndexBitSize = std::max(4, static_cast<int>(std::ceil(std::log2(Paletteids.size()))));  // How many bits is one index in length. Min is 4 bits, maximum 12 bits
 			ASSERT((12 >= IndexBitSize) && (IndexBitSize >= 4));
 
+			int SectionBlockLongCount = IndexBitSize*4096/8/8;
+
+			const auto BlockStateData = GetSectionDataLong(a_NBT, Child, "BlockStates", SectionBlockLongCount /*ChunkBlockData::SectionBlockCount*/);
+				// MetaData = GetSectionData(a_NBT, Child, "Data", ChunkBlockData::SectionMetaCount), no longer exists
+			const auto BlockLightData = GetSectionData(a_NBT, Child, "BlockLight",ChunkLightData::SectionLightCount);	 // Still exists but does not have to be present for a valid section
+			const auto SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount); // Still exists but does not have to be present for a valid section
+
+			Int64 * LEstates = new Int64[SectionBlockLongCount];
+
+			for (size_t i = 0; i < SectionBlockLongCount; i++)
+			{
+				LEstates[i] = ntohll(reinterpret_cast<const Int64*>(BlockStateData)[i]);
+			}
+
 			// Byte bitsleftover = 0;
 			// int valuesread = 0;
 			// int currentbyte = 0;
@@ -516,7 +515,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 						arrindex++;
 					}
 				}
-				else // BitIndex + IndexBitSize > 64
+				else  // BitIndex + IndexBitSize > 64
 				{
 					if (usepadding)
 					{
@@ -607,9 +606,9 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				}
 				bitsleftover = (-bitslefttoread);
 				ASSERT(finalvalue < pl);
-			}*/
+			} */
 
-			//Resolve palette indexes into protocol block ids
+			// Resolve palette indexes into protocol block ids
 			for (size_t i = 0; i < 4096; i++)
 			{
 				resolveddata[i] = Paletteids[numblockdata[i]];
@@ -626,8 +625,8 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			memset(&Data.BiomeMap,0,256); // temp
 			Data.IsLightValid = true;
 			delete[] LEstates;
-			//Data.BlockData.SetSection(*reinterpret_cast<const ChunkBlockData::SectionType *>(BlockData), *reinterpret_cast<const ChunkBlockData::SectionMetaType *>(MetaData), static_cast<size_t>(Y));
-			//Set the data
+			// Data.BlockData.SetSection(*reinterpret_cast<const ChunkBlockData::SectionType *>(BlockData), *reinterpret_cast<const ChunkBlockData::SectionMetaType *>(MetaData), static_cast<size_t>(Y));
+			// Set the data
 			/*
 			if ((BlockData != nullptr) && (MetaData != nullptr) &&
 				(SkyLightData != nullptr) && (BlockLightData != nullptr))
