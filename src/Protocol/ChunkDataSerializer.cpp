@@ -604,7 +604,7 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 
 	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
 
-	LOG("Sending chunk X %d Z %d", a_ChunkX, a_ChunkZ);
+	// LOG("Sending chunk X %d Z %d", a_ChunkX, a_ChunkZ);
 
 	// Create the packet:
 	m_Packet.WriteVarInt32(0x22);  // Packet id (Chunk Data packet)
