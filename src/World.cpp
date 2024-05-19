@@ -3233,12 +3233,12 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 	a_ChunkDesc.CompressBlockMetas(BlockMetas);
 
 	cChunkDef::BlockTypes2 empty = { AIR };
-	struct SetChunkData Data({ -55, -55/* a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()*/});
+	struct SetChunkData Data({ a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()});
 	{
 		//Data.BlockData.SetAll(a_ChunkDesc.GetBlockTypes(), BlockMetas);
 
 
-		//Data.BlockData2.SetAll(empty);
+		Data.BlockData2.SetAll(empty);
 
 		std::copy(a_ChunkDesc.GetBiomeMap(), a_ChunkDesc.GetBiomeMap() + std::size(a_ChunkDesc.GetBiomeMap()), Data.BiomeMap);
 		std::copy(a_ChunkDesc.GetHeightMap(), a_ChunkDesc.GetHeightMap() + std::size(a_ChunkDesc.GetHeightMap()), Data.HeightMap);
@@ -3249,8 +3249,8 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 		Data.IsLightValid = false;
 	}
 
-	LOG("Chunk gen disabled X %d Z %d", a_ChunkDesc.GetChunkX(),  a_ChunkDesc.GetChunkZ());
-	//m_World->QueueSetChunkData(std::move(Data));
+	// LOG("Chunk gen disabled X %d Z %d", a_ChunkDesc.GetChunkX(),  a_ChunkDesc.GetChunkZ());
+	m_World->QueueSetChunkData(std::move(Data));
 }
 
 
