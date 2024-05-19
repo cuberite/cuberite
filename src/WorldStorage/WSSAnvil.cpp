@@ -376,8 +376,8 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				ChunkLoadFailed(a_Chunk, "NBT tag missing or has wrong: Y", a_RawChunkData);
 				return false;
 			}
-			//Y level can go negative in 1.13+ worlds
-			//Section num can go higher in newer versions
+			// Y level can go negative in 1.13+ worlds
+			// Section num can go higher in newer versions
 			const int Y = (signed char)a_NBT.GetByte(SectionYTag);
 			if ((Y < -1) || (Y > static_cast<int>(cChunkDef::NumSections - 1)))
 			{
