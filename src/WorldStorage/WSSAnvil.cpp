@@ -59,7 +59,7 @@
 #include "../Server.h"
 #include "../BoundingBox.h"
 
-#include "../Protocol/Palettes/Palette_1_15.h"
+#include "../Protocol/Palettes/BlockMap.h"
 
 
 
@@ -355,6 +355,13 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			ChunkLoadFailed(a_Chunk, "Missing NBT tag: Level", a_RawChunkData);
 			return false;
 		}
+		int DataVersionTag = a_NBT.FindChildByName(0, "DataVersion");
+		if (DataVersionTag < 0)
+		{
+			ChunkLoadFailed(a_Chunk, "Missing NBT tag: DataVersion", a_RawChunkData);
+			return false;
+		}
+		int DataVersion = a_NBT.GetInt(DataVersionTag);
 		int Sections = a_NBT.FindChildByName(Level, "Sections");
 		if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
 		{
@@ -460,13 +467,14 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				{
 					tosearch = tosearch.substr(0, tosearch.size() - 2);
 				}
+				// LOGD("%d hash tbl size", (*BlockMap::BlMap::GetMap()).size());
 				//Check if 
-				int cnt = Palette_1_15::StringNameToId.count(tosearch);
+				int cnt = (*BlockMap::BlMap::GetMap()).count(tosearch);
 				if (cnt == 0)
 				{
 					UNREACHABLE("could find given block while lodaing chunk X: " + a_Chunk.m_ChunkX + " Z: " a_Chunk.m_ChunkZ + " Y Section: " + Y);
 				}
-				NEWBLOCKTYPE protocolblockid = Palette_1_15::StringNameToId.at(tosearch);
+				NEWBLOCKTYPE protocolblockid = (*BlockMap::BlMap::GetMap()).at(tosearch);
 				Paletteids.push_back(protocolblockid);
 
 				Palette.emplace_back(blockid.substr(strlen("minecraft:"), std::string::npos));
@@ -481,27 +489,26 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			const auto BlockLightData = GetSectionData(a_NBT, Child, "BlockLight",ChunkLightData::SectionLightCount);	 // Still exists but does not have to be present for a valid section
 			const auto SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount); // Still exists but does not have to be present for a valid section
 
-			Int64 * LEstates = new Int64[SectionBlockLongCount];
+			UInt64 * LEstates = new UInt64[SectionBlockLongCount];
 
 			for (size_t i = 0; i < SectionBlockLongCount; i++)
 			{
-				LEstates[i] = ntohll(reinterpret_cast<const Int64*>(BlockStateData)[i]);
+				LEstates[i] = ntohll(reinterpret_cast<const UInt64*>(BlockStateData)[i]);
 			}
 
 			// Byte bitsleftover = 0;
 			// int valuesread = 0;
 			// int currentbyte = 0;
 			// needs better bounds checking
-			short numblockdata[4096] = { 0 };
+			// u_short numblockdata[4096] = { 0 };
 			NEWBLOCKTYPE resolveddata[4096] = { AIR };
 			int numblockdataindex = 0;
 			int pl = Paletteids.size();
 
-			bool usepadding = false;
+			bool usepadding = DataVersion >= 2566;  // Enable padding for worlds generated in 1.16+
 
 			int BitIndex = 0;
 			int arrindex = 0;
-
 			while (numblockdataindex < 4096)
 			{
 				Int64 finalv = 0;
@@ -523,14 +530,14 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 						arrindex++;
 						continue;
 					}
-					Int64 lowerpart = LEstates[arrindex] >> BitIndex;
+					UInt64 lowerpart = LEstates[arrindex] >> BitIndex;
 					arrindex++;
 					int BitsRead = (64 - BitIndex);
 					BitIndex = IndexBitSize - BitsRead;
-					Int64 upperpart = LEstates[arrindex] & ((static_cast<Int64>(1) << BitIndex) - 1) << BitsRead;
+					UInt64 upperpart = (LEstates[arrindex] & ((static_cast<UInt64>(1) << BitIndex) - 1)) << BitsRead;
 					finalv = lowerpart | upperpart;
 				}
-				numblockdata[numblockdataindex] = static_cast<short>(finalv);
+				resolveddata[numblockdataindex] = Paletteids[finalv];
 				numblockdataindex++;
 			}
 
@@ -608,12 +615,6 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				ASSERT(finalvalue < pl);
 			} */
 
-			// Resolve palette indexes into protocol block ids
-			for (size_t i = 0; i < 4096; i++)
-			{
-				resolveddata[i] = Paletteids[numblockdata[i]];
-			}
-
 			Data.BlockData2.SetSection(resolveddata,Y);
 
 			if (BlockLightData != NULL && SkyLightData != NULL)
@@ -639,8 +640,8 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 					ChunkLoadFailed(a_Chunk, "Missing chunk block/light data", a_RawChunkData);
 					return false;
 				}*/
-		}  // for itr - LevelSections[]
 
+		}  // for itr - LevelSections[]
 	}
 
 	m_World->QueueSetChunkData(std::move(Data));

@@ -50,7 +50,7 @@
 #include "../Mobs/IncludeAllMonsters.h"
 
 #include "../Protocol/Palettes/Upgrade.h"
-
+#include "../Protocol/Palettes/BlockMap.h"
 
 
 
@@ -1209,6 +1209,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 		// std::array<NEWBLOCKTYPE, 4096> templist = { 0 };
 
 		aWriter.BeginList("Sections", TAG_Compound);
+		std::unordered_map<ENUM_BLOCKS, AString> savemap = *BlockMap::BlMap::GetSaveMap();
 
 		for (size_t Y = 0; Y < cChunkDef::NumSections; Y++)
 		{
@@ -1228,25 +1229,62 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				aWriter.BeginCompound("");
 				aWriter.BeginList("Palette", eTagType::TAG_Compound);
 
+				
+
 				for (size_t i = 0; i < newsize; i++)
 				{
+					bool hasblockstats = false;
 					aWriter.BeginCompound("");
 					auto val = temparr[i];
-					auto bls = PaletteUpgrade::GetSaveStrings(val);
-					aWriter.AddString("Name", "minecraft:"+bls[0].second);  // everything is oak for now
-					if (bls[1].first != "")
+					AString strval = savemap[static_cast<ENUM_BLOCKS>(val)];
+					auto splitpos = std::find(strval.begin(), strval.end(), ' ');
+					auto id_end_index = static_cast<int>(std::distance(strval.begin(), splitpos));
+					auto stringid = strval.substr(0,id_end_index);
+					AString blockstates;
+					AStringVector blockstatesstrings;
+					if (splitpos != strval.end())
+					{
+						hasblockstats = true;
+						auto blockstates = strval.substr(id_end_index+1,std::string::npos);
+						blockstatesstrings = StringSplit(blockstates, " ");
+					}
+
+					aWriter.AddString("Name", "minecraft:"+stringid);
+					if (hasblockstats)
 					{
 						aWriter.BeginCompound("Properties");
-						for (size_t j = 1; j < bls.size(); j++)
+						for (size_t j = 0; j < blockstatesstrings.size(); j+=2)
 						{
-							if (bls[j].first == "")
+							//AString str = blockstatesstrings[j];
+							//auto nameendindex = static_cast<int>(std::distance(strval.begin(),std::find(strval.begin(), strval.end(), ':')));
+							AString val;
+							if (j+2 >= blockstatesstrings.size())
 							{
-								break;
+								val = blockstatesstrings[j + 1];
 							}
-							aWriter.AddString(bls[j].first, bls[j].second);
+							else
+							{
+								val = blockstatesstrings[j + 1].substr(0, blockstatesstrings[j + 1].length() - 1);
+							}
+							aWriter.AddString(blockstatesstrings[j].substr(0,blockstatesstrings[j].length()-1), val);
 						}
 						aWriter.EndCompound();
 					}
+					//auto bls = PaletteUpgrade::GetSaveStrings(val);
+					//aWriter.AddString("Name", "minecraft:"+bls[0].second);
+					//if (bls[1].first != "")
+					//{
+					//	aWriter.BeginCompound("Properties");
+					//	for (size_t j = 1; j < bls.size(); j++)
+					//	{
+					//		if (bls[j].first == "")
+					//		{
+					//			break;
+					//		}
+					//		aWriter.AddString(bls[j].first, bls[j].second);
+					//	}
+					//	aWriter.EndCompound();
+					//}
 					aWriter.EndCompound();
 				}
 				aWriter.EndList();

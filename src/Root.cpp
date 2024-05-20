@@ -51,7 +51,9 @@
 #include "Logger.h"
 #include "ClientHandle.h"
 
-
+// temp
+#include "Protocol/Palettes/BlockMap.h"
+#include <fstream>
 
 
 
@@ -138,6 +140,27 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	{
 		m_SettingsFilename = a_OverridesRepo.GetValue("Server","ConfigFile");
 	}
+
+	auto & loadmap = *BlockMap::BlMap::GetMap();
+	auto & savemap = *BlockMap::BlMap::GetSaveMap();
+
+	loadmap.reserve(30000);
+	savemap.reserve(30000);
+	std::fstream f;
+	f.open("Protocol/Blocks.txt", std::ios::in);
+	ASSERT(!f.fail());
+	AString line;
+	while(std::getline(f, line))
+	{
+		auto pos = std::find(line.begin(), line.end(), '-');
+		size_t b = static_cast<size_t>(std::distance(line.begin(), pos))+1;
+		auto id = static_cast<ENUM_BLOCKS>(std::stoi(line,nullptr,10));
+		auto strid = line.substr(b, std::string::npos);
+		loadmap[strid] = id;
+		savemap[id] = strid;
+	}
+
+	// LOGD("%d hash tbl size", (*BlockMap::BlMap::GetMap()).size());
 
 	auto IniFile = std::make_unique<cIniFile>();
 	bool IsNewIniFile = !IniFile->ReadFile(m_SettingsFilename);

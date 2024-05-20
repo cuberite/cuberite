@@ -14,4 +14,6 @@ target_sources(
 	Palette_1_15.h
 	Palette_1_16.h
 	Upgrade.h
+
+	BlockMap.h
 )
