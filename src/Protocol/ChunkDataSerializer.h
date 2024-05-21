@@ -61,8 +61,8 @@ private:
 	inline void Serialize107(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);  // Release 1.9
 	inline void Serialize110(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);  // Release 1.9.4
 	template <auto Palette>
-	inline void Serialize393(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);  // Release 1.13 - 1.13.2
-	inline void Serialize477(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);	 // Release 1.14 - 1.14.4
+	inline void Serialize393(int a_ChunkX, int a_ChunkZ, const ChunkBlockDataNew & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);  // Release 1.13 - 1.13.2
+	inline void Serialize477(int a_ChunkX, int a_ChunkZ, const ChunkBlockDataNew & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);	 // Release 1.14 - 1.14.4
 
 	inline void Serialize573(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkBlockDataNew & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);
 

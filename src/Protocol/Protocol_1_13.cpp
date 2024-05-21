@@ -686,6 +686,12 @@ void cProtocol_1_13::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, cons
 		m_Client->SetClientBrand(Brand);
 		m_Client->SendPluginMessage("brand", "\x08""Cuberite");  // Send back our brand, including the length.
 	}
+	else if (a_Channel == "register")
+	{
+		// to prevent fabric clients from crashing the server
+		ContiguousByteBuffer Data;
+		a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace());
+	}
 }
 
 
