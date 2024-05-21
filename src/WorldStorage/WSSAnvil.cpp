@@ -623,7 +623,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			}
 			char hm[256] = {0};
 			memset(&Data.HeightMap,0,256); // temp
-			memset(&Data.BiomeMap,0,256); // temp
+			memset(&Data.BiomeMap,0,1024); // temp
 			Data.IsLightValid = true;
 			delete[] LEstates;
 			// Data.BlockData.SetSection(*reinterpret_cast<const ChunkBlockData::SectionType *>(BlockData), *reinterpret_cast<const ChunkBlockData::SectionMetaType *>(MetaData), static_cast<size_t>(Y));
