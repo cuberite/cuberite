@@ -823,7 +823,7 @@ void cProtocol_1_15::SendEntityPosition(const cEntity & a_Entity)
 UInt8 cProtocol_1_15::GetEntityMetadataID(EntityMetadata a_Metadata) const
 {
 	const UInt8 Entity = 7;
-	const UInt8 Living = Entity + 6;
+	const UInt8 Living = Entity + 7;
 	const UInt8 Insentient = Living + 1;
 	const UInt8 Ageable = Insentient + 1;
 	const UInt8 AbstractHorse = Ageable + 2;
@@ -1422,8 +1422,9 @@ void cProtocol_1_15::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			// TODO Set player custom name to their name.
 			// Then it's possible to move the custom name of mobs to the entities
 			// and to remove the "special" player custom name.
-			WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::String);
-			a_Pkt.WriteString(Player.GetName());
+			WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);
+			a_Pkt.WriteBool(true);
+			a_Pkt.WriteString("\"{" + Player.GetName() + "\"}");	 // needs to be json formatted
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
 			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
