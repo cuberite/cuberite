@@ -1289,7 +1289,6 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				}
 				aWriter.EndList();
 
-
 				INT64* arr = new INT64[longarrsize];
 				
 				bool usepadding = false;  // used in 1.16+ 
@@ -1301,7 +1300,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				for (size_t i = 0; i < toloop; i++)
 				{
 					auto v = Blocks->at(i);
-					auto ind = std::find(temparr.begin(),newlistend,v);
+					auto ind = std::find(temparr.begin(), newlistend, v);
 					INT64 towrite = ind - temparr.begin();
 					tbuf |= towrite << BitIndex;
 					BitIndex += bitused;
@@ -1310,12 +1309,14 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 						if (usepadding)
 						{
 							BitIndex = 0;
+							ASSERT(longindex < longarrsize);
 							arr[longindex] = tbuf;
 							tbuf = 0;
 							longindex++;
 						}
 						else
 						{
+							ASSERT(longindex < longarrsize);
 							arr[longindex] = tbuf;
 							longindex++;
 							if (BitIndex != 64)
@@ -1331,7 +1332,6 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 							}
 						}
 					}
-
 				}
 
 				if (Blocks != nullptr)
