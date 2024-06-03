@@ -215,7 +215,7 @@ void cWorld::BroadcastChat(const cCompositeChat & a_Message, const cClientHandle
 
 
 
-void cWorld::BroadcastCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count, const cClientHandle * a_Exclude)
+void cWorld::BroadcastCollectEntity(const cEntity & a_Collected, const cPawn & a_Collector, unsigned a_Count, const cClientHandle * a_Exclude)
 {
 	ForClientsWithEntity(a_Collected, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
