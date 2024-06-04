@@ -72,6 +72,12 @@ void ChunkDataStore<ElementType, ElementCount, DefaultValue>::Assign(const Chunk
 template<class ElementType, size_t ElementCount, ElementType DefaultValue>
 ElementType ChunkDataStore<ElementType, ElementCount, DefaultValue>::Get(const Vector3i a_Position) const
 {
+    if (!cChunkDef::IsValidRelPos(a_Position))
+    {
+        ASSERT(false);
+        UnpackDefaultValue<ElementCount>(DefaultValue);
+    }
+
 	const auto Indices = IndicesFromRelPos(a_Position);
 	const auto & Section = Store[Indices.Section];
 
@@ -97,6 +103,11 @@ ElementType ChunkDataStore<ElementType, ElementCount, DefaultValue>::Get(const V
 template<class ElementType, size_t ElementCount, ElementType DefaultValue>
 typename ChunkDataStore<ElementType, ElementCount, DefaultValue>::Type * ChunkDataStore<ElementType, ElementCount, DefaultValue>::GetSection(const size_t a_Y) const
 {
+    if (a_Y >= cChunkDef::NumSections)
+    {
+        return nullptr;
+    }
+
 	return Store[a_Y].get();
 }
 
@@ -107,6 +118,11 @@ typename ChunkDataStore<ElementType, ElementCount, DefaultValue>::Type * ChunkDa
 template<class ElementType, size_t ElementCount, ElementType DefaultValue>
 void ChunkDataStore<ElementType, ElementCount, DefaultValue>::Set(const Vector3i a_Position, const ElementType a_Value)
 {
+    if (!cChunkDef::IsValidRelPos(a_Position))
+    {
+        return;
+    }
+
 	const auto Indices = IndicesFromRelPos(a_Position);
 	auto & Section = Store[Indices.Section];
 
@@ -138,6 +154,11 @@ void ChunkDataStore<ElementType, ElementCount, DefaultValue>::Set(const Vector3i
 template<class ElementType, size_t ElementCount, ElementType DefaultValue>
 void ChunkDataStore<ElementType, ElementCount, DefaultValue>::SetSection(const ElementType (& a_Source)[ElementCount], const size_t a_Y)
 {
+    if (a_Y >= cChunkDef::NumSections)
+    {
+        return;
+    }
+
 	auto & Section = Store[a_Y];
 	const auto SourceEnd = std::end(a_Source);
 

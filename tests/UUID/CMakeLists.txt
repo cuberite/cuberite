@@ -23,7 +23,7 @@ target_include_directories(UUIDTest PRIVATE
 	${PROJECT_SOURCE_DIR}/lib/mbedtls/include
 )
 
-add_test(NAME UUID-test COMMAND UUIDTest)
+add_test_executable(UUIDTest)
 
 
 # Put the projects into solution folders (MSVC):
