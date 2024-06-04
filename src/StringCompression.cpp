@@ -15,6 +15,10 @@
 
 std::string_view Compression::Result::GetStringView() const
 {
+	/* Use the GetView method to obtain a std::basic_string_view <std::byte>.
+	Next, cast what is returned by the data() method from a pointer to std::byte, to a pointer to char.
+	Also get the size of the array returned by GetView(). */
+
 	const auto View = GetView();
 	return { reinterpret_cast<const char *>(View.data()), View.size() };
 }
@@ -25,22 +29,15 @@ std::string_view Compression::Result::GetStringView() const
 
 ContiguousByteBufferView Compression::Result::GetView() const
 {
-	// Get a generic std::byte * to what the variant is currently storing:
+	/* Compression::Result::Storage is a smart pointer to a std::vector containing std::bytes.
+	Assuming that the current Compression::Result::Storage attribute is populated, the vector's front() method gets the first element in the vector.
+	As a pointer is needed, obtain the reference to the first element of Compression::Result::Storage to get a compatible pointer.
+	Obtain the size of the array of bytes as this is necessary for std::string_view objects. */
+
 	return
 	{
-		std::visit([](const auto & Buffer) -> const std::byte *
-		{
-			using Variant = std::decay_t<decltype(Buffer)>;
-
-			if constexpr (std::is_same_v<Variant, Compression::Result::Static>)
-			{
-				return Buffer.data();
-			}
-			else
-			{
-				return Buffer.get();
-			}
-		}, Storage), Size
+		&(this->Storage.get()->front()),
+		Size
 	};
 }
 
@@ -74,31 +71,25 @@ Compression::Compressor::~Compressor()
 template <auto Algorithm>
 Compression::Result Compression::Compressor::Compress(const void * const Input, const size_t Size)
 {
-	// First see if the stack buffer has enough space:
-	{
-		Result::Static Buffer;
-		const auto BytesWrittenOut = Algorithm(m_Handle, Input, Size, Buffer.data(), Buffer.size());
-
-		if (BytesWrittenOut != 0)
-		{
-			return { Buffer, BytesWrittenOut };
-		}
-	}
-
-	// No it doesn't. Allocate space on the heap to write the compression result, increasing in powers of 2.
-	// This will either succeed, or except with bad_alloc.
+	/* Allocate space on the heap to write the compression result, increasing in powers of 2.
+	This will either succeed, or except with bad_alloc. */
 
 	auto DynamicCapacity = Result::StaticCapacity * 2;
 	while (true)
 	{
-		auto Dynamic = cpp20::make_unique_for_overwrite<Result::Dynamic::element_type[]>(DynamicCapacity);
+		// Write to a temporary buffer, Dynamic, using the variable DynamicCapacity to allocate memory.
+		auto Dynamic = cpp20::make_unique_for_overwrite<std::byte[]>(DynamicCapacity);
 		const auto BytesWrittenOut = Algorithm(m_Handle, Input, Size, Dynamic.get(), DynamicCapacity);
-
 		if (BytesWrittenOut != 0)
 		{
-			return { std::move(Dynamic), BytesWrittenOut };
+			/* Transfer the contents of Dynamic to the Compression::Result::Storage vector attribute.
+			Also use DynamicCapacity for the Compression::Result::Size size_t attribute. */
+			return
+			{
+				std::make_unique <std::vector <std::byte> > (Dynamic.get(), (Dynamic.get() + DynamicCapacity)),
+				DynamicCapacity
+			};
 		}
-
 		DynamicCapacity *= 2;
 	}
 }
@@ -106,6 +97,9 @@ Compression::Result Compression::Compressor::Compress(const void * const Input, 
 
 
 
+
+/* Compression functions, which are public and call the Compression::Compressor::Compress method, which is private.
+The relevant libdeflate function is passed through as a template argument. */
 
 Compression::Result Compression::Compressor::CompressGZip(const ContiguousByteBufferView Input)
 {
@@ -157,6 +151,9 @@ Compression::Extractor::~Extractor()
 
 
 
+/* Extract functions, which are public and call the Compression::Extractor::Extract method, which is private.
+The relevant libdeflate function is passed through as a template argument. */
+
 Compression::Result Compression::Extractor::ExtractGZip(ContiguousByteBufferView Input)
 {
 	return Extract<&libdeflate_gzip_decompress>(Input);
@@ -187,36 +184,40 @@ Compression::Result Compression::Extractor::ExtractZLib(ContiguousByteBufferView
 template <auto Algorithm>
 Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferView Input)
 {
-	// First see if the stack buffer has enough space:
-	{
-		Result::Static Buffer;
-		size_t BytesWrittenOut;
-
-		switch (Algorithm(m_Handle, Input.data(), Input.size(), Buffer.data(), Buffer.size(), &BytesWrittenOut))
-		{
-			case LIBDEFLATE_SUCCESS: return { Buffer, BytesWrittenOut };
-			case LIBDEFLATE_INSUFFICIENT_SPACE: break;
-			default: throw std::runtime_error("Data extraction failed.");
-		}
-	}
-
-	// No it doesn't. Allocate space on the heap to write the compression result, increasing in powers of 2.
-
+	// Allocate space on the heap to write the compression result, increasing in powers of 2.
 	auto DynamicCapacity = Result::StaticCapacity * 2;
 	while (true)
 	{
-		size_t BytesWrittenOut;
-		auto Dynamic = cpp20::make_unique_for_overwrite<Result::Dynamic::element_type[]>(DynamicCapacity);
+		// Initialize BytesWrittenOut to 0 - MSVC may complain otherwise.
+		size_t BytesWrittenOut = 0;
+		auto Dynamic = cpp20::make_unique_for_overwrite<std::byte[]>(DynamicCapacity);
 
 		switch (Algorithm(m_Handle, Input.data(), Input.size(), Dynamic.get(), DynamicCapacity, &BytesWrittenOut))
 		{
-			case libdeflate_result::LIBDEFLATE_SUCCESS: return { std::move(Dynamic), BytesWrittenOut };
+
+			case libdeflate_result::LIBDEFLATE_SUCCESS:
+
+				/* Transfer the contents of Dynamic to the Compression::Result::Storage vector attribute.
+				Also use DynamicCapacity for the Compression::Result::Size size_t attribute. */
+
+				return
+				{
+					std::make_unique <std::vector <std::byte> > (Dynamic.get(), (Dynamic.get() + DynamicCapacity)),
+					DynamicCapacity
+				};
+
 			case libdeflate_result::LIBDEFLATE_INSUFFICIENT_SPACE:
 			{
+				// Double the memory buffer size to allocate and iterate in the loop.
 				DynamicCapacity *= 2;
 				continue;
 			}
-			default: throw std::runtime_error("Data extraction failed.");
+
+			default:
+			{
+				throw std::runtime_error("Data extraction failed.");
+			}
+
 		}
 	}
 }
@@ -228,24 +229,25 @@ Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferVi
 template <auto Algorithm>
 Compression::Result Compression::Extractor::Extract(const ContiguousByteBufferView Input, size_t UncompressedSize)
 {
-	// Here we have the expected size after extraction, so directly use a suitable buffer size:
-	if (UncompressedSize <= Result::StaticCapacity)
-	{
-		if (
-			Result::Static Buffer;
-			Algorithm(m_Handle, Input.data(), Input.size(), Buffer.data(), UncompressedSize, nullptr) == libdeflate_result::LIBDEFLATE_SUCCESS
-		)
-		{
-			return { Buffer, UncompressedSize };
-		}
-	}
-	else if (
-		auto Dynamic = cpp20::make_unique_for_overwrite<Result::Dynamic::element_type[]>(UncompressedSize);
+	/* Initialize the variable Dynamic within the condtional statement.
+	A separate parameter, UncompressedSize, is used instead of the default DynamicCapacity variable in order to allocate the size of memory for the vector.
+	Should the libdeflate command not return LIBDEFLATE_SUCCESS, throw a runtime error. */
+
+	if (auto Dynamic = cpp20::make_unique_for_overwrite<std::byte[]>(UncompressedSize);
 		Algorithm(m_Handle, Input.data(), Input.size(), Dynamic.get(), UncompressedSize, nullptr) == libdeflate_result::LIBDEFLATE_SUCCESS
 	)
 	{
-		return { std::move(Dynamic), UncompressedSize };
+		return
+		{
+			/* Use the pointer to Dynamic and get the pointer of the index after the last element in Dynamic.
+			Compression::Result::Storage is then initialized using the iterators through the array's elements.
+			Also return the size of the data, which is copied from UncompressedSize. */
+
+			std::make_unique <std::vector <std::byte> > (Dynamic.get(), (Dynamic.get() + UncompressedSize)),
+			UncompressedSize
+		};
 	}
 
 	throw std::runtime_error("Data extraction failed.");
 }
+
