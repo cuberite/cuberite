@@ -213,3 +213,137 @@ end
 
 
 
+
+function RegisterWebController(a_Page, a_UrlPath, a_Controller)
+	cWebAdmin:AddWebTab(a_Page, a_UrlPath, function(a_Request, a_UrlPath)
+		local controller = a_Controller:new();
+		local action = a_Request.Params['action'] or 'Index';
+		return controller[a_Request.Method .. action](controller, a_Request, a_UrlPath)
+	end)
+end
+
+
+
+
+
+-- Register all the webadmin pages inside g_PluginInfo.WebAdminPages
+function RegisterPluginInfoWebAdminPages()
+	if (g_PluginInfo.WebAdminPages) then
+		for idx, page in ipairs(g_PluginInfo.WebAdminPages) do
+			RegisterWebController(page.Title, page.UrlPath, page.WebController)
+		end
+	end
+end
+
+
+
+
+
+-- Quick and dirty templating engine.
+-- Allows lua code to be executed by putting it between {={ }=}.
+-- Echoing can be done by putting something between {{ }}
+local function CompileView(a_Content)
+	content = 'return table.concat({[===[' .. a_Content .. ']===]})';
+	content = content:gsub("%{=%{(.-)%}=%}", function(logic)
+		logic = logic
+			:gsub("<>(.-)</>", "table.insert(__RESULTING_CONTENT__, [===[%1]===])")
+			:gsub("%{%{(.-)%}%}", "table.insert(__RESULTING_CONTENT__, cWebAdmin:GetHTMLEscapedString(%1))");
+			
+		return [[]===], (
+				function() 
+					local __RESULTING_CONTENT__ = {};
+				]] .. logic .. [[
+					return table.concat(__RESULTING_CONTENT__)
+				end
+			)(), [===[
+		]];
+	end)
+	
+	content = content:gsub("%{%{(.-)%}%}", 
+		function(match) 
+			return ']===], cWebAdmin:GetHTMLEscapedString(' .. match .. '), [===[' 
+		end
+	)
+	return content;
+end
+
+
+
+
+
+-- A base class for a controller. Other controllers can inherit from it to make use of it's functionality
+WebControllerBase = {}
+
+
+
+
+
+-- Base constructor for the web controller.
+function WebControllerBase:new()
+	local obj = setmetatable({}, WebControllerBase);
+	return obj
+end
+
+
+
+
+
+-- Loads the requested view into Lua bytecode to be executed.
+-- The view should be located inside the plugin's folder in an additional folder called 'webviews'.
+function WebControllerBase:compileView(a_ViewName)
+	local viewPath = cPluginManager:GetCurrentPlugin():GetLocalFolder() .. '/webviews/' .. a_ViewName .. '.html';
+	if (not cFile:IsFile(viewPath)) then
+		error("View does not exist");
+	end
+	
+	local content = cFile:ReadWholeFile(viewPath);
+	content = CompileView(content);
+	
+	local view, err = loadstring(content);
+	if (not view) then
+		error(err)
+	end
+	return view;
+end
+
+
+
+
+
+-- Serializes provided object to json and returns it together with the content type.
+function WebControllerBase:json(a_Obj, a_Options)
+	return cJson:Serialize(a_Obj, a_Options), "application/json";
+end
+
+
+
+
+
+-- Reads the provided path and returns it's content.
+function WebControllerBase:file(a_Path)
+	if (not cFile:IsFile(a_Path)) then
+		error("The requested file does not exist");
+	end
+	return cFile:ReadWholeFile(a_Path);
+end
+
+
+
+
+
+-- Compiles the requested view, executes it and returns it's content.
+function WebControllerBase:view(a_ViewName, a_Model)
+	-- ToDo: cache view so we don't have to recompile it every time.
+	local view = self:compileView(a_ViewName);
+	
+	-- Set the environment of the view to that of the model with the global environment as fallback.
+	-- This way variables inside the model can be accessed directly.
+	setfenv(view, setmetatable(a_Model or {}, {__index = _G}));
+	
+	-- Execute and return the content of the view.
+	return view();
+end
+
+
+
+
