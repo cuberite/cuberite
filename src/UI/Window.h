@@ -87,27 +87,27 @@ public:
 	void SetOwner( cWindowOwner * a_Owner) { m_Owner = a_Owner; }
 
 	/** Returns the total number of slots */
-	int GetNumSlots(void) const;
+	std::size_t GetNumSlots(void) const;
 
 	/** Returns the number of slots, excluding the player's inventory (used for network protocols) */
-	int GetNumNonInventorySlots(void) const { return GetNumSlots() - c_NumInventorySlots; }
+	std::size_t GetNumNonInventorySlots(void) const { return GetNumSlots() - c_NumInventorySlots; }
 
 	// tolua_begin
 
 	/** Returns the item at the specified slot for the specified player. Returns nullptr if invalid SlotNum requested */
-	const cItem * GetSlot(cPlayer & a_Player, int a_SlotNum) const;
+	const cItem * GetSlot(cPlayer & a_Player, std::size_t a_SlotNum) const;
 
 	/** Sets the item to the specified slot for the specified player */
-	void SetSlot(cPlayer & a_Player, int a_SlotNum, const cItem & a_Item);
+	void SetSlot(cPlayer & a_Player, std::size_t a_SlotNum, const cItem & a_Item);
 
 	/** Returns true if the specified slot is in the Player Main Inventory slotarea */
-	bool IsSlotInPlayerMainInventory(int a_SlotNum) const;
+	bool IsSlotInPlayerMainInventory(std::size_t a_SlotNum) const;
 
 	/** Returns true if the specified slot is in the Player Hotbar slotarea */
-	bool IsSlotInPlayerHotbar(int a_SlotNum) const;
+	bool IsSlotInPlayerHotbar(std::size_t a_SlotNum) const;
 
 	/** Returns true if the specified slot is in the Player Main Inventory or Hotbar slotareas. Note that returns false for Armor. */
-	bool IsSlotInPlayerInventory(int a_SlotNum) const;
+	bool IsSlotInPlayerInventory(std::size_t a_SlotNum) const;
 
 	// tolua_end
 
@@ -117,7 +117,7 @@ public:
 	/** Handles a click event from a player */
 	virtual void Clicked(
 		cPlayer & a_Player, int a_WindowID,
-		short a_SlotNum, eClickAction a_ClickAction,
+		std::size_t a_SlotNum, eClickAction a_ClickAction,
 		const cItem & a_ClickedItem
 	);
 
@@ -127,7 +127,7 @@ public:
 	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse);
 
 	/** Sends the specified slot's contents to all clients of this window; the slot is specified as local in an area */
-	void BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum);
+	void BroadcastSlot(cSlotArea * a_Area, std::size_t a_LocalSlotNum);
 
 	/** Sends the contents of the whole window to the specified client */
 	void SendWholeWindow(cClientHandle & a_Client);
@@ -157,7 +157,7 @@ public:
 	/** Called on shift-clicking to distribute the stack into other areas; Modifies a_ItemStack as it is distributed!
 	if a_ShouldApply is true, the changes are written into the slots;
 	if a_ShouldApply is false, only a_ItemStack is modified to reflect the number of fits (for fit-testing purposes) */
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) = 0;
+	virtual void DistributeStack(cItem & a_ItemStack, std::size_t a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) = 0;
 
 	/** Called from DistributeStack() to distribute the stack into a_AreasInOrder; Modifies a_ItemStack as it is distributed!
 	If a_ShouldApply is true, the changes are written into the slots;
@@ -172,7 +172,7 @@ public:
 	bool CollectItemsToHand(cItem & a_Dragging, cSlotArea & a_Area, cPlayer & a_Player, bool a_CollectFullStacks);
 
 	/** Used by cSlotAreas to send individual slots to clients, a_RelativeSlotNum is the slot number relative to a_SlotArea */
-	void SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_RelativeSlotNum);
+	void SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, std::size_t a_RelativeSlotNum);
 
 protected:
 
@@ -197,19 +197,19 @@ protected:
 	/** Returns the correct slot area for the specified window-global SlotNum
 	Also returns the area-local SlotNum corresponding to the GlobalSlotNum
 	If the global SlotNum is out of range, returns nullptr */
-	cSlotArea * GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum);
+	cSlotArea * GetSlotArea(std::size_t a_GlobalSlotNum, std::size_t & a_LocalSlotNum);
 
 	/** Returns the correct slot area for the specified window-global SlotNum
 	Also returns the area-local SlotNum corresponding to the GlobalSlotNum
 	If the global SlotNum is out of range, returns nullptr.
 	Const version. */
-	const cSlotArea * GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum) const;
+	const cSlotArea * GetSlotArea(std::size_t a_GlobalSlotNum, std::size_t & a_LocalSlotNum) const;
 
 	/** Prepares the internal structures for inventory painting from the specified player */
 	void OnPaintBegin(cPlayer & a_Player);
 
 	/** Adds the slot to the internal structures for inventory painting by the specified player */
-	void OnPaintProgress(cPlayer & a_Player, int a_SlotNum);
+	void OnPaintProgress(cPlayer & a_Player, std::size_t);
 
 	/** Processes the entire action stored in the internal structures for inventory painting; distributes as many items as possible */
 	void OnLeftPaintEnd(cPlayer & a_Player);

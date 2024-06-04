@@ -20,7 +20,7 @@ class cHorseWindow :
 public:
 	cHorseWindow(cHorse & a_Horse);
 
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
+	virtual void DistributeStack(cItem & a_ItemStack, std::size_t a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
 
 	/** Returns the horse's entity ID. */
 	UInt32 GetHorseID() const;

@@ -33,7 +33,7 @@ public:
 	/** Gets the Position from the Anvil */
 	const Vector3i & GetBlockPos() { return m_BlockPos; }
 
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
+	virtual void DistributeStack(cItem & a_ItemStack, std::size_t a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
 
 protected:
 	cSlotAreaAnvil * m_AnvilSlotArea;
