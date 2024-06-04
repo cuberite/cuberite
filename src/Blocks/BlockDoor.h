@@ -46,7 +46,7 @@ public:
 	}
 
 	/** Returns a vector pointing one block in the direction the door is facing (where the outside is). */
-	inline static Vector3i GetRelativeDirectionToOutside(NIBBLETYPE a_BlockMeta)
+	constexpr static Vector3i GetRelativeDirectionToOutside(NIBBLETYPE a_BlockMeta)
 	{
 		switch (a_BlockMeta & 0x03)
 		{
@@ -58,7 +58,7 @@ public:
 	}
 
 	/** Returns true if the specified blocktype is any kind of door */
-	inline static bool IsDoorBlockType(BLOCKTYPE a_Block)
+	constexpr static bool IsDoorBlockType(BLOCKTYPE a_Block)
 	{
 		switch (a_Block)
 		{
@@ -120,6 +120,92 @@ public:
 		}
 	}
 
+#define IS_TOP(DoorType) DoorType::Half(a_Block) == DoorType::Half::Upper
+	static bool IsTop(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaDoor:  return IS_TOP(AcaciaDoor);
+			case BlockType::BirchDoor:   return IS_TOP(BirchDoor);
+			case BlockType::CrimsonDoor: return IS_TOP(CrimsonDoor);
+			case BlockType::DarkOakDoor: return IS_TOP(DarkOakDoor);
+			case BlockType::JungleDoor:  return IS_TOP(JungleDoor);
+			case BlockType::OakDoor:     return IS_TOP(OakDoor);
+			case BlockType::SpruceDoor:  return IS_TOP(SpruceDoor);
+			case BlockType::WarpedDoor:  return IS_TOP(WarpedDoor);
+			case BlockType::IronDoor:    return IS_TOP(IronDoor);
+			default: return false;
+		}
+	}
+#undef IS_TOP
+
+// Todo: Add this, once BlockState are implemented
+/*
+#define SET_OPEN(DoorType) \
+	Block = DoorType::DoorType \
+	( \
+		DoorType::Facing(Block), \
+		DoorType::Half(Block), \
+		DoorType::Hinge(Block), \
+		a_Open, \
+		DoorType::Powered(Block)\
+	); \
+	break;                    \
+
+	static void SetOpen(cChunkInterface & a_ChunkInterface, const Vector3i a_BlockPos, bool a_Open)
+	{
+		using namespace Block;
+		auto Block = a_ChunkInterface.GetBlock(a_BlockPos);
+		switch (Block.Type())
+		{
+			case BlockType::AcaciaDoor:  SET_OPEN(AcaciaDoor);
+			case BlockType::BirchDoor:   SET_OPEN(BirchDoor);
+			case BlockType::CrimsonDoor: SET_OPEN(CrimsonDoor);
+			case BlockType::DarkOakDoor: SET_OPEN(DarkOakDoor);
+			case BlockType::JungleDoor:  SET_OPEN(JungleDoor);
+			case BlockType::OakDoor:     SET_OPEN(OakDoor);
+			case BlockType::SpruceDoor:  SET_OPEN(SpruceDoor);
+			case BlockType::WarpedDoor:  SET_OPEN(WarpedDoor);
+			case BlockType::IronDoor:    SET_OPEN(IronDoor);
+			default: return;
+		}
+		a_ChunkInterface.SetBlock(a_BlockPos, Block);
+	}
+#undef SET_OPEN
+
+
+#define SET_POWERED(DoorType) \
+	DoorType::DoorType \
+	( \
+		DoorType::Facing(DoorBlock), \
+		DoorType::Half(DoorBlock), \
+		DoorType::Hinge(DoorBlock), \
+		DoorType::Open(DoorBlock), \
+		a_Powered \
+	)
+
+	static void SetPowered(cChunkInterface & a_ChunkInterface, const Vector3i a_BlockPos, bool a_Powered)
+	{
+		using namespace Block;
+		auto DoorBlock = a_ChunkInterface.GetBlock(a_BlockPos);
+		switch (DoorBlock.Type())
+		{
+			case BlockType::AcaciaDoor:  DoorBlock = SET_POWERED(AcaciaDoor); break;
+			case BlockType::BirchDoor:   DoorBlock = SET_POWERED(BirchDoor); break;
+			case BlockType::CrimsonDoor: DoorBlock = SET_POWERED(CrimsonDoor); break;
+			case BlockType::DarkOakDoor: DoorBlock = SET_POWERED(DarkOakDoor); break;
+			case BlockType::JungleDoor:  DoorBlock = SET_POWERED(JungleDoor); break;
+			case BlockType::OakDoor:     DoorBlock = SET_POWERED(OakDoor); break;
+			case BlockType::SpruceDoor:  DoorBlock = SET_POWERED(SpruceDoor); break;
+			case BlockType::WarpedDoor:  DoorBlock = SET_POWERED(WarpedDoor); break;
+			case BlockType::IronDoor:    DoorBlock = SET_POWERED(IronDoor); break;
+			default: return;
+		}
+		a_ChunkInterface.SetBlock(a_BlockPos, DoorBlock);
+	}
+*/
+
 private:
 
 	virtual void OnBroken(
@@ -151,6 +237,12 @@ private:
 	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta)  const override;
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta)  const override;
 	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const override;
+
+	// Todo: Mark as override once BlockState are implemented
+	BlockState RotateCCW(BlockState a_Block) const;
+	BlockState RotateCW(BlockState a_Block) const;
+	BlockState MirrorXY(BlockState a_Block) const;
+	BlockState MirrorYZ(BlockState a_Block) const;
 
 
 

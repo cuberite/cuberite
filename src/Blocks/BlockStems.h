@@ -20,6 +20,33 @@ public:
 
 	using Super::Super;
 
+	static constexpr unsigned char MAX_STEM_AGE = 7;
+
+	static constexpr bool IsBlockStem(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::PumpkinStem:
+			case BlockType::AttachedPumpkinStem:
+			case BlockType::MelonStem:
+			case BlockType::AttachedMelonStem:
+				return true;
+			default: return false;
+		}
+	}
+
+	static constexpr unsigned char GetStemAge(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::PumpkinStem:         return Block::PumpkinStem::Age(a_Block);
+			case BlockType::AttachedPumpkinStem: return MAX_STEM_AGE;
+			case BlockType::MelonStem:           return Block::MelonStem::Age(a_Block);
+			case BlockType::AttachedMelonStem:   return MAX_STEM_AGE;
+			default: return 0;
+		}
+	}
+
 private:
 
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
@@ -31,7 +58,7 @@ private:
 		*/
 
 		// Age > 7 (Impossible)
-		if (a_BlockMeta > 7)
+		if (a_BlockMeta > MAX_STEM_AGE)
 		{
 			return cItem(StemPickupType);
 		}
