@@ -279,21 +279,21 @@ void cEntity::TakeDamage(cEntity & a_Attacker)
 
 
 
-void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount)
+void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount, const eExplosionSource a_ExplosionSource)
 {
 	float FinalDamage = static_cast<float>(a_RawDamage);
 	float ArmorCover = GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
 
 	ApplyArmorDamage(static_cast<int>(ArmorCover));
 
-	cEntity::TakeDamage(a_DamageType, a_Attacker, a_RawDamage, FinalDamage, a_KnockbackAmount);
+	cEntity::TakeDamage(a_DamageType, a_Attacker, a_RawDamage, FinalDamage, a_KnockbackAmount, a_ExplosionSource);
 }
 
 
 
 
 
-void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_RawDamage, double a_KnockbackAmount)
+void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_RawDamage, double a_KnockbackAmount, const eExplosionSource a_ExplosionSource)
 {
 	m_World->DoWithEntityByID(a_AttackerID, [=](cEntity & a_Attacker)
 		{
@@ -307,7 +307,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_Ra
 				Attacker = nullptr;
 			}
 
-			TakeDamage(a_DamageType, Attacker, a_RawDamage, a_KnockbackAmount);
+			TakeDamage(a_DamageType, Attacker, a_RawDamage, a_KnockbackAmount, a_ExplosionSource);
 			return true;
 		}
 	);
@@ -317,11 +317,13 @@ void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_Ra
 
 
 
-void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, float a_FinalDamage, double a_KnockbackAmount)
+void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, float a_FinalDamage, double a_KnockbackAmount, const eExplosionSource a_ExplosionSource)
 {
 	TakeDamageInfo TDI;
 	TDI.DamageType = a_DamageType;
-	if ((a_Attacker != nullptr) && a_Attacker->IsPawn())
+	TDI.ExplosionSource = a_ExplosionSource;
+
+	if (a_Attacker != nullptr)
 	{
 		TDI.Attacker = a_Attacker;
 	}
