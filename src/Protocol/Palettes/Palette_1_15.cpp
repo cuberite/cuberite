@@ -7,12 +7,13 @@ namespace Palette_1_15
 {
 	BlockState ToBlock(UInt32 id)
 	{
-		using namespace Block;
-		switch (id)
-		{
-			case 8: return GrassBlock::GrassBlockStr(false);
-			case 9: return GrassBlock::GrassBlockStr(true);
-		}
+		//using namespace Block;
+		//switch (id)
+		//{
+		//	case 8: return GrassBlock::GrassBlockStr(false);
+		//	case 9: return GrassBlock::GrassBlockStr(true);
+		//}
+		return 0;
 	}
 
 	UInt32 From(const BlockState Block)
