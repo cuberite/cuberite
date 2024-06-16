@@ -19,6 +19,9 @@ option(SELF_TEST "Enables testing code to be built" OFF)
 option(UNITY_BUILDS "Enables source aggregation for faster builds" ON)
 option(WHOLE_PROGRAM_OPTIMISATION "Enables link time optimisation for Release" ON)
 
+#add_link_options("$<$<CONFIG:Debug>:/INCREMENTAL>")
+#add_compile_options("$<$<CONFIG:Debug>:/ZI>")
+
 include("CMake/AddDependencies.cmake")
 include("CMake/Fixups.cmake")
 include("CMake/GenerateBindings.cmake")
@@ -32,6 +35,7 @@ include("CMake/StampBuild.cmake")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+#set(WHOLE_PROGRAM_OPTIMISATION OFF)
 
 # Static CRT:
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -94,6 +98,7 @@ endif()
 
 # The need for speed (in Release):
 if(WHOLE_PROGRAM_OPTIMISATION)
+	message(STATUS "WHOLE_PROGRAM_OPTIMISATION enabled")
     include(CheckIPOSupported)
     check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_CHECK_OUTPUT)
     if(IPO_SUPPORTED)

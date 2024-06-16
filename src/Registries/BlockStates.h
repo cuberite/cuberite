@@ -9025,6 +9025,8 @@ namespace Block
 	}
 	namespace GrassBlock
 	{
+		
+		/*
 		struct GrassBlockStr : BlockState
 		{
 			GrassBlockStr()
@@ -9054,7 +9056,7 @@ namespace Block
 				if (Snowy) return 8;
 				else return 9;
 			}
-		};
+		};*/
 
 		constexpr BlockState GrassBlock(const bool Snowy)
 		{

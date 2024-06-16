@@ -3109,28 +3109,28 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 	}
 
 	// Log the comm into logfile:
-	if (g_ShouldLogCommOut && m_CommLogFile.IsOpen())
+	if (false/*g_ShouldLogCommOut && m_CommLogFile.IsOpen()*/)
 	{
 		AString Hex;
 		ASSERT(PacketData.size() > 0);
 		CreateHexDump(Hex, PacketData.data(), PacketData.size(), 16);
-		m_CommLogFile.Write(fmt::format(
-			FMT_STRING("Outgoing packet: type {} (translated to 0x{:02x}), length {} (0x{:04x}), state {}. Payload (incl. type):\n{}\n"),
-			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
-			PacketData.size(), PacketData.size(), m_State, Hex
-		));
-		/*
+		//m_CommLogFile.Write(fmt::format(
+		//	FMT_STRING("Outgoing packet: type {} (translated to 0x{:02x}), length {} (0x{:04x}), state {}. Payload (incl. type):\n{}\n"),
+		//	cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
+		//	PacketData.size(), PacketData.size(), m_State, Hex
+		//));
+		
 		// Useful for debugging a new protocol:
 		LOGD("Outgoing packet: type %s (translated to 0x%02x), length %u (0x%04x), state %d. Payload (incl. type):\n%s\n",
 			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
-			PacketLen, PacketLen, m_State, Hex
+			0, 0, m_State, Hex
 		);
-		//*/
+		//
 	}
-	/*
+	
 	// Useful for debugging a new protocol:
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	*/
+	//std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	
 }
 
 
