@@ -404,3 +404,24 @@ cProtocol::Version cProtocol_1_17_1::GetProtocolVersion() const
 {
 	return Version::v1_17_1;
 }
+
+
+
+
+
+void cProtocol_1_17_1::SendWholeInventory(const cWindow & a_Window)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktWindowItems);
+	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
+	Pkt.WriteVarInt32(0);  // revision
+	Pkt.WriteVarInt32(static_cast<Int16>(a_Window.GetNumSlots()));
+	cItems Slots;
+	a_Window.GetSlots(*(m_Client->GetPlayer()), Slots);
+	for (cItems::const_iterator itr = Slots.begin(), end = Slots.end(); itr != end; ++itr)
+	{
+		WriteItem(Pkt, *itr);
+	}  // for itr - Slots[]
+	Pkt.WriteBool(false);  // cursor item, set to empty
+}
