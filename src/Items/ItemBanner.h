@@ -40,7 +40,9 @@ private:
 		{
 			ASSERT((a_BlockEntity.GetBlockType() == E_BLOCK_STANDING_BANNER) || (a_BlockEntity.GetBlockType() == E_BLOCK_WALL_BANNER));
 
-			static_cast<cBannerEntity &>(a_BlockEntity).SetBaseColor(static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage));
+			cBannerEntity & BannerEntity = static_cast<cBannerEntity &>(a_BlockEntity);
+			BannerEntity.SetBaseColor(static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage));
+			BannerEntity.SetCustomName(a_HeldItem.m_CustomName);
 			return false;
 		});
 

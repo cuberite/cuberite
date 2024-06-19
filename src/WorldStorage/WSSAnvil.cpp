@@ -890,15 +890,23 @@ OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_Ta
 		return nullptr;
 	}
 
+	unsigned char Color = 15;
+	AString CustomName;
+
 	// Reads base color from NBT
 	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Base");
 	if (CurrentLine >= 0)
 	{
-		const auto Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
-		return std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color);
+		Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
 	}
 
-	return nullptr;
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "CustomName");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_String))
+	{
+		CustomName = a_NBT.GetString(CurrentLine);
+	}
+
+	return std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color, CustomName);
 }
 
 
