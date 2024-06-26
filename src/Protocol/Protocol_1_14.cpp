@@ -19,6 +19,7 @@ Implements the 1.14 protocol classes:
 #include "../BlockEntities/BlockEntity.h"
 
 #include "../Entities/ArrowEntity.h"
+#include "../Entities/ItemFrame.h"
 #include "../Mobs/Bat.h"
 #include "../Entities/Boat.h"
 #include "../Mobs/Chicken.h"
@@ -1213,7 +1214,11 @@ void cProtocol_1_14::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 
 		case cEntity::etItemFrame:
 		{
-			// TODO
+			const auto & Frame = static_cast<const cItemFrame &>(a_Entity);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemFrameItem, EntityMetadataType::Item);
+			WriteItem(a_Pkt, Frame.GetItem());
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemFrameRotation, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(Frame.GetItemRotation());
 			break;
 		}  // case etItemFrame
 
