@@ -29,7 +29,7 @@
 
 
 
-cBlockEntity::cBlockEntity(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta, const Vector3i a_Pos, cWorld * const a_World) :
+cBlockEntity::cBlockEntity(const BLOCKTYPE a_BlockType, const BLOCKMETATYPE a_BlockMeta, const Vector3i a_Pos, cWorld * const a_World) :
 	m_Pos(a_Pos),
 	m_RelX(a_Pos.x - cChunkDef::Width * FAST_FLOOR_DIV(a_Pos.x, cChunkDef::Width)),
 	m_RelZ(a_Pos.z - cChunkDef::Width * FAST_FLOOR_DIV(a_Pos.z, cChunkDef::Width)),
@@ -74,7 +74,7 @@ void cBlockEntity::CopyFrom(const cBlockEntity & a_Src)
 
 
 
-OwnedBlockEntity cBlockEntity::CreateByBlockType(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta, const Vector3i a_Pos, cWorld * const a_World)
+OwnedBlockEntity cBlockEntity::CreateByBlockType(const BLOCKTYPE a_BlockType, const BLOCKMETATYPE a_BlockMeta, const Vector3i a_Pos, cWorld * const a_World)
 {
 	switch (a_BlockType)
 	{

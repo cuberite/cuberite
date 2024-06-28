@@ -32,7 +32,7 @@ protected:
 
 	virtual void SendBlockAction                (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
 	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage) override;
-	virtual void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta) override;
 	virtual void SendEditSign                   (Vector3i a_BlockPos) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation) override;
 	virtual void SendEntitySpawn                (const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData) override;
@@ -49,7 +49,7 @@ protected:
 	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata) const override;
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
-	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override;
+	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_Meta) const override;
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
 	virtual UInt8 GetProtocolEntityType(const cEntity & a_Entity) const override;
 	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) const override;

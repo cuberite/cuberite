@@ -13,8 +13,8 @@
 
 
 
-cBannerEntity::cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, unsigned char a_BaseColor, AString a_CustomName):
-	Super(a_BlockType, (a_BaseColor << 4) | a_BlockMeta, a_Pos, a_World),
+cBannerEntity::cBannerEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, unsigned char a_BaseColor, AString a_CustomName):
+	Super(a_BlockType, static_cast<BLOCKMETATYPE>(a_BaseColor << 4) | a_BlockMeta, a_Pos, a_World),
 	m_CustomName(std::move(a_CustomName))
 {
 	ASSERT((a_BlockType == E_BLOCK_WALL_BANNER) || (a_BlockType == E_BLOCK_STANDING_BANNER));

@@ -13,7 +13,7 @@
 
 
 
-cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_Type(SKULL_TYPE_SKELETON),
 	m_Rotation(SKULL_ROTATION_NORTH)

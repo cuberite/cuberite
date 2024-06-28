@@ -22,7 +22,7 @@ enum
 
 
 
-cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_CurrentRecipe(nullptr),
 	m_IsCooking(a_BlockType == E_BLOCK_LIT_FURNACE),

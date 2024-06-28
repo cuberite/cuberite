@@ -36,12 +36,12 @@ public:
 	// tolua_end
 
 	/** Constructor used for normal operation */
-	cHopperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cHopperEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	/** Returns the block coords of the block receiving the output items, based on the meta
 	Returns <false, undefined> if unattached.
 	Exported in ManualBindings.cpp. */
-	std::pair<bool, Vector3i> GetOutputBlockPos(NIBBLETYPE a_BlockMeta);
+	std::pair<bool, Vector3i> GetOutputBlockPos(BLOCKMETATYPE a_BlockMeta);
 
 	void SetLocked(bool a_Value);
 

@@ -5,12 +5,12 @@
 
 namespace PaletteUpgrade
 {
-	constexpr unsigned int BlockId(BLOCKTYPE Block, NIBBLETYPE Meta)
+	constexpr unsigned int BlockId(BLOCKTYPE Block, BLOCKMETATYPE Meta)
 	{
 		return static_cast<unsigned int>(Block << (sizeof(Meta) * 8)) | Meta;
 	}
 
-	BlockState FromBlock(const BLOCKTYPE Block, const NIBBLETYPE Meta)
+	BlockState FromBlock(const BLOCKTYPE Block, const BLOCKMETATYPE Meta)
 	{
 		using namespace Block;
 

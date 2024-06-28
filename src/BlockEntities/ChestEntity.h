@@ -34,7 +34,7 @@ public:
 
 	// tolua_end
 
-	cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cChestEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	/** Gets the number of players who currently have this chest open */
 	int GetNumberOfPlayers(void) const { return m_NumActivePlayers; }

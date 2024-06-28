@@ -13,7 +13,7 @@
 
 
 
-cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_Entity(mtPig),
 	m_SpawnDelay(100),
