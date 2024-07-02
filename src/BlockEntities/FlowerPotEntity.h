@@ -26,7 +26,7 @@ class cFlowerPotEntity :
 public:  // tolua_export
 
 	/** Creates a new flowerpot entity at the specified block coords. a_World may be nullptr */
-	cFlowerPotEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cFlowerPotEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 
 	// tolua_begin

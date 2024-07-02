@@ -10,7 +10,7 @@
 
 cBlockEntityWithItems::cBlockEntityWithItems(
 	BLOCKTYPE a_BlockType,
-	NIBBLETYPE a_BlockMeta,
+	BLOCKMETATYPE a_BlockMeta,
 	Vector3i a_Pos,
 	int a_ItemGridWidth, int a_ItemGridHeight,
 	cWorld * a_World
