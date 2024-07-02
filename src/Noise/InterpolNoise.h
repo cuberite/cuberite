@@ -348,13 +348,14 @@ public:
 		ASSERT(a_StartY < a_EndY);
 
 		// Calculate the integral and fractional parts of each coord:
-		int FloorX[MAX_SIZE];
-		int FloorY[MAX_SIZE];
+		int FloorX[MAX_SIZE] = {};
+		int FloorY[MAX_SIZE] = {};
 		NOISE_DATATYPE FracX[MAX_SIZE];
 		NOISE_DATATYPE FracY[MAX_SIZE];
 		int SameX[MAX_SIZE];
 		int SameY[MAX_SIZE];
 		int NumSameX, NumSameY;
+
 		CalcFloorFrac(a_SizeX, a_StartX, a_EndX, FloorX, FracX, SameX, NumSameX);
 		CalcFloorFrac(a_SizeY, a_StartY, a_EndY, FloorY, FracY, SameY, NumSameY);
 
@@ -403,9 +404,9 @@ public:
 		ASSERT(a_StartZ < a_EndZ);
 
 		// Calculate the integral and fractional parts of each coord:
-		int FloorX[MAX_SIZE];
-		int FloorY[MAX_SIZE];
-		int FloorZ[MAX_SIZE];
+		int FloorX[MAX_SIZE] = {};
+		int FloorY[MAX_SIZE] = {};
+		int FloorZ[MAX_SIZE] = {};
 		NOISE_DATATYPE FracX[MAX_SIZE];
 		NOISE_DATATYPE FracY[MAX_SIZE];
 		NOISE_DATATYPE FracZ[MAX_SIZE];
@@ -413,6 +414,7 @@ public:
 		int SameY[MAX_SIZE];
 		int SameZ[MAX_SIZE];
 		int NumSameX, NumSameY, NumSameZ;
+
 		CalcFloorFrac(a_SizeX, a_StartX, a_EndX, FloorX, FracX, SameX, NumSameX);
 		CalcFloorFrac(a_SizeY, a_StartY, a_EndY, FloorY, FracY, SameY, NumSameY);
 		CalcFloorFrac(a_SizeZ, a_StartZ, a_EndZ, FloorZ, FracZ, SameZ, NumSameZ);

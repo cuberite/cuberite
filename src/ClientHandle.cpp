@@ -74,6 +74,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_IPString(a_IPString),
 	m_Player(nullptr),
 	m_CachedSentChunk(std::numeric_limits<decltype(m_CachedSentChunk.m_ChunkX)>::max(), std::numeric_limits<decltype(m_CachedSentChunk.m_ChunkZ)>::max()),
+	m_ProxyConnection(false),
 	m_HasSentDC(false),
 	m_LastStreamedChunkX(std::numeric_limits<decltype(m_LastStreamedChunkX)>::max()),  // bogus chunk coords to force streaming upon login
 	m_LastStreamedChunkZ(std::numeric_limits<decltype(m_LastStreamedChunkZ)>::max()),
