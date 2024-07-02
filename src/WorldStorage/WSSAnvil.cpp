@@ -3648,7 +3648,7 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 		Rotation[1] = 0;
 	}
 	a_Entity.SetYaw(Rotation[0]);
-	a_Entity.SetRoll(Rotation[1]);
+	a_Entity.SetPitch(Rotation[1]);
 
 	// Depending on the Minecraft version, the entity's health is
 	// stored either as a float Health tag (HealF prior to 1.9) or
