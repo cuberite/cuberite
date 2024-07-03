@@ -1,5 +1,5 @@
 
-// BlockBanner.h
+// BlockStandingBanner.h
 
 #pragma once
 
@@ -10,7 +10,7 @@
 
 
 
-class cBlockBannerHandler final :
+class cBlockStandingBannerHandler final :
 	public cBlockEntityHandler
 {
 	using Super = cBlockEntityHandler;
