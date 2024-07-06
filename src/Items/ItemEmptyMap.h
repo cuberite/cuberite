@@ -34,6 +34,20 @@ public:
 		UNUSED(a_HeldItem);
 		UNUSED(a_ClickedBlockFace);
 
+		// The client predicted the use empty map would create a new "Map #0" and added one to
+		// its view of the inventory. But we're not doing that! The new map has its very own
+		// map number! We need to tell the client what it should have in any slot that we know
+		// is empty or contains one or more "Map #0"s.
+		cInventory & Inventory = a_Player->GetInventory();
+		for (int i = cInventory::invInventoryOffset; i < cInventory::invShieldOffset; i++)
+		{
+			cItem Item = Inventory.GetSlot(i);
+			if (Item.IsEmpty() || ((Item.m_ItemType == E_ITEM_MAP) && (Item.m_ItemDamage == 0)))
+			{
+				Inventory.SendSlot(i);
+			}
+		}
+
 		// The map center is fixed at the central point of the 8x8 block of chunks you are standing in when you right-click it.
 
 		const int RegionWidth = cChunkDef::Width * 8;
