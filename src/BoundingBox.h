@@ -23,6 +23,7 @@ the boxes are considered non-intersecting. */
 class cBoundingBox
 {
 public:
+
 	cBoundingBox(double a_MinX, double a_MaxX, double a_MinY, double a_MaxY, double a_MinZ, double a_MaxZ);
 	cBoundingBox(Vector3d a_Min, Vector3d a_Max);
 	cBoundingBox(Vector3d a_Pos, double a_Radius, double a_Height);
@@ -46,22 +47,22 @@ public:
 	void Expand(double a_ExpandX, double a_ExpandY, double a_ExpandZ);
 
 	/** Returns true if the two bounding boxes intersect */
-	bool DoesIntersect(const cBoundingBox & a_Other);
+	bool DoesIntersect(const cBoundingBox & a_Other) const;
 
 	/** Returns the union of the two bounding boxes */
-	cBoundingBox Union(const cBoundingBox & a_Other);
+	cBoundingBox Union(const cBoundingBox & a_Other) const;
 
 	/** Returns true if the point is inside the bounding box */
-	bool IsInside(Vector3d a_Point);
+	bool IsInside(Vector3d a_Point) const;
 
 	/** Returns true if the point is inside the bounding box */
-	bool IsInside(double a_X, double a_Y, double a_Z);
+	bool IsInside(double a_X, double a_Y, double a_Z) const;
 
 	/** Returns true if a_Other is inside this bounding box */
-	bool IsInside(cBoundingBox & a_Other);
+	bool IsInside(cBoundingBox & a_Other) const;
 
 	/** Returns true if a boundingbox specified by a_Min and a_Max is inside this bounding box */
-	bool IsInside(Vector3d a_Min, Vector3d a_Max);
+	bool IsInside(Vector3d a_Min, Vector3d a_Max) const;
 
 	/** Returns true if the specified point is inside the bounding box specified by its min / max corners */
 	static bool IsInside(Vector3d a_Min, Vector3d a_Max, Vector3d a_Point);
@@ -107,7 +108,3 @@ protected:
 	Vector3d m_Max;
 
 } ;  // tolua_export
-
-
-
-

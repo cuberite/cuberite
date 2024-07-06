@@ -1939,7 +1939,7 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		return;
 	}
 
-	auto Pickup = std::make_unique<cPickup>(Vector3d(), Item, false);  // Pickup delay doesn't matter, just say false
+	auto Pickup = std::make_unique<cPickup>(Vector3d(), std::move(Item), Vector3d(), 0_tick, 0_tick);  // Pickup delay loaded later
 	if (!LoadEntityBaseFromNBT(*Pickup.get(), a_NBT, a_TagIdx))
 	{
 		return;

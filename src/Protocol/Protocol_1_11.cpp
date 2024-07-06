@@ -319,7 +319,7 @@ namespace Metadata_1_11
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_11_0:
 
-void cProtocol_1_11_0::SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count)
+void cProtocol_1_11_0::SendCollectEntity(const cEntity & a_Collected, const cPawn & a_Collector, unsigned a_Count)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
