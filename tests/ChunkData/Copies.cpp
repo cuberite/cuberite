@@ -11,20 +11,23 @@
 template <class StoreType, typename GetType, typename DefaultType, typename OutType>
 static void CopyAll(const StoreType & Data, GetType Getter, DefaultType Default, OutType & Out)
 {
-	constexpr auto SectionCount = std::extent_v<OutType> / 16;
+	constexpr auto SectionBlockCount = std::tuple_size_v<OutType> / cChunkDef::NumSections;
 
-	for (size_t Y = 0; Y != 16; Y++)
+	static_assert(std::is_same_v<OutType, std::array<typename OutType::value_type, std::tuple_size<OutType>::value>>, "arg must be an std::array");
+
+	for (size_t Y = 0; Y < cChunkDef::NumSections; Y++)
 	{
-		const auto Section = (Data.*Getter)(Y);
-		static_assert(SectionCount == std::tuple_size<std::remove_pointer_t<decltype(Section)>>::value, "Output array has wrong size");
+		const auto & Section = (Data.*Getter)(Y);
+		using ElementType = typename std::remove_reference_t<decltype(Section)>::element_type;
+		static_assert(SectionBlockCount == std::tuple_size_v<ElementType>, "Output array has wrong size");
 
 		if (Section == nullptr)
 		{
-			std::fill_n(Out + Y * SectionCount, SectionCount, Default);
+			std::fill_n(std::begin(Out) + Y * SectionBlockCount, SectionBlockCount, Default);
 		}
 		else
 		{
-			std::copy(Section->begin(), Section->end(), Out + Y * SectionCount);
+			std::copy(Section->begin(), Section->end(), std::begin(Out) + Y * SectionBlockCount);
 		}
 	}
 }
@@ -49,9 +52,9 @@ static void Test()
 		TEST_EQUAL(copy.GetBlock({ 3, 1, 4 }), 0xDE);
 		TEST_EQUAL(copy.GetMeta({ 3, 1, 4 }), 0xA);
 
-		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256];
-		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2]{};
-		for (int i = 0; i < 16 * 16 * 256; i += 4)
+		cChunkDef::BlockTypes SrcBlockBuffer;
+		cChunkDef::BlockNibbles SrcNibbleBuffer;
+		for (int i = 0; i < cChunkDef::NumBlocks; i += 4)
 		{
 			SrcBlockBuffer[i + 0] = 0xde;
 			SrcBlockBuffer[i + 1] = 0xad;
@@ -60,22 +63,22 @@ static void Test()
 		}
 
 		buffer.SetAll(SrcBlockBuffer, SrcNibbleBuffer);
-		BLOCKTYPE DstBlockBuffer[16 * 16 * 256];
+		cChunkDef::BlockTypes DstBlockBuffer;
 		CopyAll(buffer, &ChunkBlockData::GetSection, ChunkBlockData::DefaultValue, DstBlockBuffer);
-		TEST_EQUAL(memcmp(SrcBlockBuffer, DstBlockBuffer, (16 * 16 * 256) - 1), 0);
+		TEST_TRUE(std::equal(SrcBlockBuffer.begin(), SrcBlockBuffer.end(), DstBlockBuffer.begin()));
 
-		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);
+		SrcBlockBuffer.fill(0x00);
 		buffer.SetAll(SrcBlockBuffer, SrcNibbleBuffer);
 		CopyAll(buffer, &ChunkBlockData::GetSection, ChunkBlockData::DefaultValue, DstBlockBuffer);
-		TEST_EQUAL(memcmp(SrcBlockBuffer, DstBlockBuffer, (16 * 16 * 256) - 1), 0);
+		TEST_TRUE(std::equal(SrcBlockBuffer.begin(), SrcBlockBuffer.end(), DstBlockBuffer.begin()));
 	}
 
 	{
 		ChunkBlockData buffer;
 
-		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256]{};
-		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
-		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
+		cChunkDef::BlockTypes SrcBlockBuffer;
+		cChunkDef::BlockNibbles SrcNibbleBuffer;
+		for (int i = 0; i < cChunkDef::NumBlocks / 2; i += 4)
 		{
 			SrcNibbleBuffer[i + 0] = 0xde;
 			SrcNibbleBuffer[i + 1] = 0xad;
@@ -84,21 +87,21 @@ static void Test()
 		}
 
 		buffer.SetAll(SrcBlockBuffer, SrcNibbleBuffer);
-		NIBBLETYPE DstNibbleBuffer[16 * 16 * 256/ 2];
+		cChunkDef::BlockNibbles DstNibbleBuffer;
 		CopyAll(buffer, &ChunkBlockData::GetMetaSection, ChunkBlockData::DefaultMetaValue, DstNibbleBuffer);
-		TEST_EQUAL(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1), 0);
+		TEST_EQUAL(memcmp(SrcNibbleBuffer.data(), DstNibbleBuffer.data(), cChunkDef::NumBlocks / 2 - 1), 0);
 
-		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 /2);
+		SrcNibbleBuffer.fill(0x00);
 		buffer.SetAll(SrcBlockBuffer, SrcNibbleBuffer);
 		CopyAll(buffer, &ChunkBlockData::GetMetaSection, ChunkBlockData::DefaultMetaValue, DstNibbleBuffer);
-		TEST_EQUAL(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1), 0);
+		TEST_EQUAL(memcmp(SrcNibbleBuffer.data(), DstNibbleBuffer.data(), cChunkDef::NumBlocks / 2 - 1), 0);
 	}
 
 	{
 		ChunkLightData buffer;
 
-		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
-		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
+		cChunkDef::BlockNibbles SrcNibbleBuffer;
+		for (int i = 0; i < cChunkDef::NumBlocks / 2; i += 4)
 		{
 			SrcNibbleBuffer[i + 0] = 0xde;
 			SrcNibbleBuffer[i + 1] = 0xad;
@@ -107,21 +110,21 @@ static void Test()
 		}
 
 		buffer.SetAll(SrcNibbleBuffer, SrcNibbleBuffer);
-		NIBBLETYPE DstNibbleBuffer[16 * 16 * 256 / 2];
+		cChunkDef::BlockNibbles DstNibbleBuffer;
 		CopyAll(buffer, &ChunkLightData::GetBlockLightSection, ChunkLightData::DefaultBlockLightValue, DstNibbleBuffer);
-		TEST_EQUAL(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 /2) - 1), 0);
+		TEST_EQUAL(memcmp(SrcNibbleBuffer.data(), DstNibbleBuffer.data(), cChunkDef::NumBlocks / 2 - 1), 0);
 
-		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 /2);
+		SrcNibbleBuffer.fill(0x00);
 		buffer.SetAll(SrcNibbleBuffer, SrcNibbleBuffer);
 		CopyAll(buffer, &ChunkLightData::GetBlockLightSection, ChunkLightData::DefaultBlockLightValue, DstNibbleBuffer);
-		TEST_EQUAL(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 /2) - 1), 0);
+		TEST_EQUAL(memcmp(SrcNibbleBuffer.data(), DstNibbleBuffer.data(), cChunkDef::NumBlocks / 2 - 1), 0);
 	}
 
 	{
 		ChunkLightData buffer;
 
-		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
-		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
+		cChunkDef::BlockNibbles SrcNibbleBuffer;
+		for (int i = 0; i < cChunkDef::NumBlocks / 2; i += 4)
 		{
 			SrcNibbleBuffer[i + 0] = 0xde;
 			SrcNibbleBuffer[i + 1] = 0xad;
@@ -130,44 +133,44 @@ static void Test()
 		}
 
 		buffer.SetAll(SrcNibbleBuffer, SrcNibbleBuffer);
-		NIBBLETYPE DstNibbleBuffer[16 * 16 * 256/ 2];
+		cChunkDef::BlockNibbles DstNibbleBuffer;
 		CopyAll(buffer, &ChunkLightData::GetSkyLightSection, ChunkLightData::DefaultSkyLightValue, DstNibbleBuffer);
-		TEST_EQUAL(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1), 0);
+		TEST_EQUAL(memcmp(SrcNibbleBuffer.data(), DstNibbleBuffer.data(), cChunkDef::NumBlocks / 2 - 1), 0);
 
-		memset(SrcNibbleBuffer, 0xFF, 16 * 16 * 256 / 2);
+		SrcNibbleBuffer.fill(0xFF);
 		buffer.SetAll(SrcNibbleBuffer, SrcNibbleBuffer);
 		CopyAll(buffer, &ChunkLightData::GetSkyLightSection, ChunkLightData::DefaultSkyLightValue, DstNibbleBuffer);
-		TEST_EQUAL(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1), 0);
+		TEST_EQUAL(memcmp(SrcNibbleBuffer.data(), DstNibbleBuffer.data(), cChunkDef::NumBlocks / 2 - 1), 0);
 	}
 
 	{
 		ChunkBlockData buffer;
 
-		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256];
-		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);
-		BLOCKTYPE DstBlockBuffer[16 * 16 * 256];
+		cChunkDef::BlockTypes SrcBlockBuffer;
+		SrcBlockBuffer.fill(0x00);
+		cChunkDef::BlockTypes DstBlockBuffer;
 		CopyAll(buffer, &ChunkBlockData::GetSection, ChunkBlockData::DefaultValue, DstBlockBuffer);
-		TEST_EQUAL(memcmp(SrcBlockBuffer, DstBlockBuffer, (16 * 16 * 256) - 1), 0);
+		TEST_EQUAL(memcmp(SrcBlockBuffer.data(), DstBlockBuffer.data(), cChunkDef::NumBlocks - 1), 0);
 
-		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
-		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 / 2);
-		NIBBLETYPE DstNibbleBuffer[16 * 16 * 256 / 2];
+		cChunkDef::BlockNibbles SrcNibbleBuffer;
+		SrcNibbleBuffer.fill(0x00);
+		cChunkDef::BlockNibbles DstNibbleBuffer;
 		CopyAll(buffer, &ChunkBlockData::GetMetaSection, ChunkBlockData::DefaultMetaValue, DstNibbleBuffer);
-		TEST_EQUAL(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1), 0);
+		TEST_EQUAL(memcmp(SrcNibbleBuffer.data(), DstNibbleBuffer.data(), cChunkDef::NumBlocks / 2 - 1), 0);
 	}
 
 	{
 		ChunkLightData buffer;
 
-		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
-		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 / 2);
-		NIBBLETYPE DstNibbleBuffer[16 * 16 * 256 / 2];
+		cChunkDef::BlockNibbles SrcNibbleBuffer;
+		SrcNibbleBuffer.fill(0x00);
+		cChunkDef::BlockNibbles DstNibbleBuffer;
 		CopyAll(buffer, &ChunkLightData::GetBlockLightSection, ChunkLightData::DefaultBlockLightValue, DstNibbleBuffer);
-		TEST_EQUAL(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1), 0);
+		TEST_EQUAL(memcmp(SrcNibbleBuffer.data(), DstNibbleBuffer.data(), cChunkDef::NumBlocks / 2 - 1), 0);
 
-		memset(SrcNibbleBuffer, 0xFF, 16 * 16 * 256 / 2);
+		SrcNibbleBuffer.fill(0xFF);
 		CopyAll(buffer, &ChunkLightData::GetSkyLightSection, ChunkLightData::DefaultSkyLightValue, DstNibbleBuffer);
-		TEST_EQUAL(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1), 0);
+		TEST_EQUAL(memcmp(SrcNibbleBuffer.data(), DstNibbleBuffer.data(), cChunkDef::NumBlocks / 2 - 1), 0);
 	}
 }
 
