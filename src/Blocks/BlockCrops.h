@@ -19,6 +19,37 @@ public:
 
 	using Super::Super;
 
+	static constexpr unsigned char BeetrootsMaxAge = 3;
+	static constexpr unsigned char CarrotsMaxAge = 7;
+	static constexpr unsigned char PotatoesMaxAge = 7;
+	static constexpr unsigned char WheatMaxAge = 7;
+
+	static constexpr bool IsBlockCrop(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Beetroots:
+			case BlockType::Carrots:
+			case BlockType::Potatoes:
+			case BlockType::Wheat:
+				return true;
+			default: return false;
+		}
+	}
+
+	static constexpr bool IsFullyGrown(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::Beetroots: return (Beetroots::Age(a_Block) == BeetrootsMaxAge);
+			case BlockType::Carrots: return (Carrots::Age(a_Block) == CarrotsMaxAge);
+			case BlockType::Potatoes: return (Potatoes::Age(a_Block) == PotatoesMaxAge);
+			case BlockType::Wheat: return (Wheat::Age(a_Block) == WheatMaxAge);
+			default: return false;
+		}
+	}
+
 private:
 
 	/** Calculate the number of seeds to drop when the crop is broken. */

@@ -18,12 +18,12 @@ public:
 
 	using Super::Super;
 
-	inline static bool IsInSubtractionMode(NIBBLETYPE a_Meta)
+	constexpr static bool IsInSubtractionMode(NIBBLETYPE a_Meta)
 	{
 		return ((a_Meta & 0x4) == 0x4);
 	}
 
-	inline static Vector3i GetFrontCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta)
+	constexpr static Vector3i GetFrontCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta)
 		{
@@ -42,7 +42,7 @@ public:
 		return a_Position;
 	}
 
-	inline static Vector3i GetSideCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta, bool a_bInverse)
+	constexpr static Vector3i GetSideCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta, bool a_bInverse)
 	{
 		if (!a_bInverse)
 		{
@@ -80,7 +80,7 @@ public:
 		return a_Position;
 	}
 
-	inline static Vector3i GetRearCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta)
+	constexpr static Vector3i GetRearCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta)
 		{

@@ -14877,6 +14877,40 @@ end
 					},
 					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the Y axis (or rotating 180 degrees around it).",
 				},
+				MirrorBlockFaceXY =
+				{
+					Params =
+					{
+						{
+							Name = "eBlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the XY plane (or rotating 180 degrees around it).",
+				},
+				MirrorBlockFaceYZ =
+				{
+					Params =
+					{
+						{
+							Name = "eBlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the YZ plane (or rotating 180 degrees around it).",
+				},
 				NoCaseCompare =
 				{
 					Params =
@@ -14991,6 +15025,23 @@ end
 						},
 					},
 					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after rotating it around the Y axis 90 degrees clockwise.",
+				},
+				RotationToBlockFace =
+				{
+					Params =
+					{
+						{
+							Name = "Rotation",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given rotation. Used for example for {{Banners|banners}}.",
 				},
 				StringSplit =
 				{
