@@ -23,9 +23,9 @@ set (SRCS
 
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
-add_executable(CompositeChat-exe ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(CompositeChat-exe jsoncpp_static fmt::fmt)
-add_test(NAME CompositeChat-test COMMAND CompositeChat-exe)
+add_executable(CompositeChatTest ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
+target_link_libraries(CompositeChatTest jsoncpp_static fmt::fmt)
+add_test_executable(CompositeChatTest)
 
 
 
@@ -33,6 +33,6 @@ add_test(NAME CompositeChat-test COMMAND CompositeChat-exe)
 
 # Put the projects into solution folders (MSVC):
 set_target_properties(
-	CompositeChat-exe
+	CompositeChatTest
 	PROPERTIES FOLDER Tests
 )

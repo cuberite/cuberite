@@ -67,9 +67,9 @@ endif()
 # Define individual tests:
 
 # Google: download the google.com frontpage using http client socket:
-add_executable(Google-exe Google.cpp)
-target_link_libraries(Google-exe Network)
-add_test(NAME Google-test COMMAND Google-exe)
+add_executable(GoogleTest Google.cpp)
+target_link_libraries(GoogleTest Network)
+add_test_executable(GoogleTest)
 
 # EchoServer: Listen on port 9876, echo everything back:
 add_executable(EchoServer EchoServer.cpp)
@@ -80,9 +80,9 @@ add_executable(NameLookup NameLookup.cpp)
 target_link_libraries(NameLookup Network)
 
 # EnumInterfaces: List all network interfaces:
-add_executable(EnumInterfaces-exe EnumInterfaces.cpp)
-target_link_libraries(EnumInterfaces-exe Network)
-add_test(NAME EnumInterfaces-test COMMAND EnumInterfaces-exe)
+add_executable(EnumInterfacesTest EnumInterfaces.cpp)
+target_link_libraries(EnumInterfacesTest Network)
+add_test_executable(EnumInterfacesTest)
 
 
 
@@ -90,9 +90,9 @@ add_test(NAME EnumInterfaces-test COMMAND EnumInterfaces-exe)
 # Put all the tests into a solution folder (MSVC):
 set_target_properties(
 	EchoServer
-	Google-exe
+	GoogleTest
 	NameLookup
-	EnumInterfaces-exe
+	EnumInterfacesTest
 	PROPERTIES FOLDER Tests/Network
 )
 set_target_properties(
