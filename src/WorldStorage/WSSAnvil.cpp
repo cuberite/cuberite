@@ -33,6 +33,7 @@
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
+#include "../BlockEntities/ShulkerBoxEntity.h"
 
 #include "../Mobs/IncludeAllMonsters.h"
 
@@ -650,6 +651,24 @@ OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int
 		case E_BLOCK_NOTE_BLOCK:         return LoadNoteBlockFromNBT       (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_SIGN_POST:          return LoadSignFromNBT            (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		case E_BLOCK_TRAPPED_CHEST:      return LoadChestFromNBT           (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+
+		case E_BLOCK_WHITE_SHULKER_BOX:
+		case E_BLOCK_ORANGE_SHULKER_BOX:
+		case E_BLOCK_MAGENTA_SHULKER_BOX:
+		case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
+		case E_BLOCK_YELLOW_SHULKER_BOX:
+		case E_BLOCK_LIME_SHULKER_BOX:
+		case E_BLOCK_PINK_SHULKER_BOX:
+		case E_BLOCK_GRAY_SHULKER_BOX:
+		case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
+		case E_BLOCK_CYAN_SHULKER_BOX:
+		case E_BLOCK_PURPLE_SHULKER_BOX:
+		case E_BLOCK_BLUE_SHULKER_BOX:
+		case E_BLOCK_BROWN_SHULKER_BOX:
+		case E_BLOCK_GREEN_SHULKER_BOX:
+		case E_BLOCK_RED_SHULKER_BOX:
+		case E_BLOCK_BLACK_SHULKER_BOX:  return LoadShulkerBoxFromNBT      (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
+
 		case E_BLOCK_WALLSIGN:           return LoadSignFromNBT            (a_NBT, a_Tag, a_BlockType, a_BlockMeta, a_Pos);
 		default:
 		{
@@ -1520,6 +1539,37 @@ OwnedBlockEntity cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a
 		NoteBlock->SetNote(a_NBT.GetByte(note));
 	}
 	return NoteBlock;
+}
+
+
+
+
+
+OwnedBlockEntity cWSSAnvil::LoadShulkerBoxFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos)
+{
+	// Check if the data has a proper type:
+	static const AStringVector expectedTypes({"ShulkerBox", "minecraft:shulker_box"});
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
+	{
+		return nullptr;
+	}
+
+	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
+	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
+	{
+		return nullptr;
+	}
+
+	auto ShulkerBox = std::make_unique<cShulkerBoxEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World);
+	LoadItemGridFromNBT(ShulkerBox->GetContents(), a_NBT, Items);
+
+	int CustomName = a_NBT.FindChildByName(a_TagIdx, "CustomName");
+	if ((CustomName > 0) || (a_NBT.GetType(CustomName) == TAG_String))
+	{
+		ShulkerBox->m_CustomName = a_NBT.GetString(CustomName);
+	}
+
+	return ShulkerBox;
 }
 
 
