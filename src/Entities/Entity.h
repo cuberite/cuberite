@@ -58,11 +58,12 @@ class cMonster;
 // tolua_begin
 struct TakeDamageInfo
 {
-	eDamageType DamageType;   // Where does the damage come from? Being hit / on fire / contact with cactus / ...
-	cEntity *   Attacker;     // The attacking entity; valid only for dtAttack
-	int         RawDamage;    // What damage would the receiver get without any armor. Usually: attacker mob type + weapons
-	float       FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
-	Vector3d    Knockback;    // The amount and direction of knockback received from the damage
+	eDamageType      DamageType;       // Where does the damage come from? Being hit / on fire / contact with cactus / ...
+	cEntity *        Attacker;         // The attacking entity; valid only for dtAttack
+	int              RawDamage;        // What damage would the receiver get without any armor. Usually: attacker mob type + weapons
+	float            FinalDamage;      // What actual damage will be received. Usually: m_RawDamage minus armor
+	Vector3d         Knockback;        // The amount and direction of knockback received from the damage
+	eExplosionSource ExplosionSource;  // The explosion source; valid only for dtExplosion
 	// TODO: Effects - list of effects that the hit is causing. Unknown representation yet
 } ;
 // tolua_end
@@ -269,13 +270,13 @@ public:
 	void TakeDamage(cEntity & a_Attacker);
 
 	/** Makes this entity take the specified damage. The final damage is calculated using current armor, then DoTakeDamage() called */
-	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount);
+	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount, const eExplosionSource a_ExplosionSource = esOther);
 
 	/** Makes this entity take the specified damage. The final damage is calculated using current armor, then DoTakeDamage() called */
-	void TakeDamage(eDamageType a_DamageType, UInt32 a_Attacker, int a_RawDamage, double a_KnockbackAmount);
+	void TakeDamage(eDamageType a_DamageType, UInt32 a_Attacker, int a_RawDamage, double a_KnockbackAmount, const eExplosionSource a_ExplosionSource = esOther);
 
 	/** Makes this entity take the specified damage. The values are packed into a TDI, knockback calculated, then sent through DoTakeDamage() */
-	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, float a_FinalDamage, double a_KnockbackAmount);
+	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, float a_FinalDamage, double a_KnockbackAmount, const eExplosionSource a_ExplosionSource = esOther);
 
 	float GetGravity(void) const { return m_Gravity; }
 
