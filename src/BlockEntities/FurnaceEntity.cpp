@@ -243,7 +243,7 @@ void cFurnaceEntity::BurnNewFuel(void)
 
 
 
-void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
+void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, std::size_t a_SlotNum)
 {
 	Super::OnSlotChanged(a_ItemGrid, a_SlotNum);
 

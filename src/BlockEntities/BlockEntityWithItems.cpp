@@ -12,7 +12,7 @@ cBlockEntityWithItems::cBlockEntityWithItems(
 	BLOCKTYPE a_BlockType,
 	NIBBLETYPE a_BlockMeta,
 	Vector3i a_Pos,
-	int a_ItemGridWidth, int a_ItemGridHeight,
+	std::size_t a_ItemGridWidth, std::size_t a_ItemGridHeight,
 	cWorld * a_World
 ):
 	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
@@ -48,7 +48,7 @@ void cBlockEntityWithItems::CopyFrom(const cBlockEntity & a_Src)
 
 
 
-void cBlockEntityWithItems::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
+void cBlockEntityWithItems::OnSlotChanged(cItemGrid * a_Grid, std::size_t a_SlotNum)
 {
 	UNUSED(a_SlotNum);
 	ASSERT(a_Grid == &m_Contents);

@@ -69,8 +69,8 @@ protected:
 	void DropSpense(cChunk & a_Chunk);
 
 	/** Override this function to provide the specific behavior for item dropspensing (drop / shoot / pour / ...) */
-	virtual void DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum) = 0;
+	virtual void DropSpenseFromSlot(cChunk & a_Chunk, std::size_t a_SlotNum) = 0;
 
 	/** Helper function, drops one item from the specified slot (like a dropper) */
-	void DropFromSlot(cChunk & a_Chunk, int a_SlotNum);
+	void DropFromSlot(cChunk & a_Chunk, std::size_t a_SlotNum);
 } ;  // tolua_export
