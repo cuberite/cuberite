@@ -2027,7 +2027,7 @@ void cClientHandle::SendData(const ContiguousByteBufferView a_Data)
 		return;
 	}
 
-	LOG("len %d", a_Data.length());
+	// LOG("len %d", a_Data.length());
 
 	cCSLock Lock(m_CSOutgoingData);
 	m_OutgoingData += a_Data;
