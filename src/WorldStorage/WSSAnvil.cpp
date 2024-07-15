@@ -642,6 +642,9 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				}*/
 
 		}  // for itr - LevelSections[]
+
+		// Load the entities from NBT:
+		LoadEntitiesFromNBT(Data.Entities,      a_NBT, a_NBT.FindChildByName(Level, "Entities"));
 	}
 
 	m_World->QueueSetChunkData(std::move(Data));
