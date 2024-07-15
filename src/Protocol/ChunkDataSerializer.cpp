@@ -11,6 +11,7 @@
 #include "Palettes/Palette_1_14.h"
 #include "Palettes/Palette_1_15.h"
 #include "Palettes/Palette_1_16.h"
+#include "Palettes/Palette_1_18.h"
 
 
 
@@ -174,6 +175,12 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v755);
 				continue;
 			}
+			case cProtocol::Version::v1_18:
+			case cProtocol::Version::v1_18_2:
+			{
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v757);
+				continue;
+			}
 		}
 		UNREACHABLE("Unknown chunk data serialization version");
 	}
@@ -249,6 +256,11 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 		case CacheVersion::v755:
 		{
 			Serialize755(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap);
+			break;
+		}
+		case CacheVersion::v757:
+		{
+			Serialize757(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap);
 			break;
 		}
 	}
@@ -942,6 +954,85 @@ inline void cChunkDataSerializer::Serialize755(const int a_ChunkX, const int a_C
 
 
 
+inline void cChunkDataSerializer::Serialize757(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockDataNew & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
+{
+	// This function returns the fully compressed packet (including packet
+	// size), not the raw packet! Below variables tagged static because of
+	// https://developercommunity.visualstudio.com/content/problem/367326
+
+	static constexpr UInt8 BitsPerEntry = 15;
+	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
+	static int Longs = CeilC<int, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);
+	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
+
+	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
+
+	// Create the packet:
+	m_Packet.WriteVarInt32(0x22);  // Packet id (Chunk Data packet)
+	m_Packet.WriteBEInt32(a_ChunkX);
+	m_Packet.WriteBEInt32(a_ChunkZ);
+
+
+	{
+		cFastNBTWriter Writer;
+		// TODO: client works fine without?
+		// std::array<Int64, 36> Longz = {};
+		// Writer.AddLongArray("MOTION_BLOCKING", Longz.data(), Longz.size());
+		Writer.Finish();
+		m_Packet.Write(Writer.GetResult().data(), Writer.GetResult().size());
+	}
+	
+
+
+	const size_t ChunkSectionSize =
+		(2 +  // Block count, BEInt16, 2 bytes
+		1 +  // Bits per entry, BEUInt8, 1 byte
+		m_Packet.GetVarIntSize(static_cast<UInt32>(ChunkSectionDataArraySize)) +   // Field containing "size of whole section", VarInt32, variable size
+			ChunkSectionDataArraySize * 8   // Actual section data, lots of bytes (multiplier 1 long = 8 bytes)
+		) + 3;	 // for biomes
+
+	const size_t ChunkSize = ChunkSectionSize * cChunkDef::NumSections;
+
+	// Write the chunk size in bytes:
+	m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSize));
+	// Write each chunk section...
+	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
+	{
+		const auto Blocks = a_BlockData2.GetSection(Y);
+		//const auto BlockLights = a_LightData.GetBlockLightSection(Y);
+		//const auto SkyLights = a_LightData.GetSkyLightSection(Y);
+		m_Packet.WriteBEInt16(4096);
+		m_Packet.WriteBEUInt8(BitsPerEntry);
+		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
+		WriteBlockSectionSeamless2<&Palette_1_18::ToProtocolIdBlock>(Blocks, BitsPerEntry, true);
+
+		//Biomes
+		m_Packet.WriteBEUInt8(0); 
+		m_Packet.WriteVarInt32(0);
+		m_Packet.WriteVarInt32(0);
+	}
+
+	
+
+	// Identify 1.9.4's tile entity list as empty
+	m_Packet.WriteVarInt32(0);
+
+	// Light Data
+	m_Packet.WriteBool(false);
+
+	m_Packet.WriteVarInt32(0);
+	m_Packet.WriteVarInt32(0);
+	m_Packet.WriteVarInt32(0);
+	m_Packet.WriteVarInt32(0);
+
+	m_Packet.WriteVarInt32(0);
+	m_Packet.WriteVarInt32(0);
+	
+}
+
+
+
+
 template <auto Palette>
 inline void cChunkDataSerializer::WriteBlockSectionSeamless2(const ChunkBlockDataNew::BlockArray * a_Blocks, const UInt8 a_BitsPerEntry, bool padding)
 {
@@ -959,8 +1050,8 @@ inline void cChunkDataSerializer::WriteBlockSectionSeamless2(const ChunkBlockDat
 	for (size_t Index = 0; Index != ChunkBlockData::SectionBlockCount; Index++)
 	{
 		//const BLOCKTYPE BlockType = BlocksExist ? (*a_Blocks)[Index] : 0;
-		//const NIBBLETYPE BlockMeta = MetasExist ? cChunkDef::ExpandNibble(a_Metas->data(), Index) : 0;
-		const auto v2 = Palette((*a_Blocks)[Index]);
+		//const NIBBLETYPE BlockMeta = MetasExist ? cChunkDef::ExpandNibble(a_Metas->data(), Index) : 0;   
+		const auto v2 = a_Blocks == nullptr ? 0 : Palette((*a_Blocks)[Index]);
 
 		const auto Value = v2;  // Palette(BlockType, BlockMeta);
 

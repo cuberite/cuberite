@@ -143,6 +143,153 @@ UInt32 cProtocol_1_17::GetPacketID(ePacketType a_PacketType) const
 
 
 
+UInt8 cProtocol_1_17::GetEntityMetadataID(EntityMetadata a_Metadata) const
+{
+	const UInt8 Entity = 8;
+	const UInt8 Living = Entity + 7;
+	const UInt8 Insentient = Living + 1;
+	const UInt8 Ageable = Insentient + 1;
+	const UInt8 AbstractHorse = Ageable + 2;
+	const UInt8 ChestedHorse = AbstractHorse + 1;
+	const UInt8 TameableAnimal = Ageable + 2;
+	const UInt8 Minecart = Entity + 6;
+	const UInt8 RaidParticipent = Insentient + 1;
+
+	switch (a_Metadata)
+	{
+		case EntityMetadata::EntityFlags:                           return 0;
+		case EntityMetadata::EntityAir:                             return 1;
+		case EntityMetadata::EntityCustomName:                      return 2;
+		case EntityMetadata::EntityCustomNameVisible:               return 3;
+		case EntityMetadata::EntitySilent:                          return 4;
+		case EntityMetadata::EntityNoGravity:                       return 5;
+		case EntityMetadata::EntityPose:                            return 6;
+		case EntityMetadata::FrozenTicks:                           return 7;
+		case EntityMetadata::ThrowableItem:                         return Entity;
+		case EntityMetadata::PotionThrown:                          return Entity;
+		case EntityMetadata::FallingBlockPosition:                  return Entity;
+		case EntityMetadata::AreaEffectCloudRadius:                 return Entity;
+		case EntityMetadata::AreaEffectCloudColor:                  return Entity + 1;
+		case EntityMetadata::AreaEffectCloudSinglePointEffect:      return Entity + 2;
+		case EntityMetadata::AreaEffectCloudParticleId:             return Entity + 3;
+		case EntityMetadata::ArrowFlags:                            return Entity;
+		case EntityMetadata::PiercingLevel:                         return Entity + 2;
+		case EntityMetadata::TippedArrowColor:                      return Entity + 3;
+		case EntityMetadata::BoatLastHitTime:                       return Entity;
+		case EntityMetadata::BoatForwardDirection:                  return Entity + 1;
+		case EntityMetadata::BoatDamageTaken:                       return Entity + 2;
+		case EntityMetadata::BoatType:                              return Entity + 3;
+		case EntityMetadata::BoatLeftPaddleTurning:                 return Entity + 4;
+		case EntityMetadata::BoatRightPaddleTurning:                return Entity + 5;
+		case EntityMetadata::BoatSplashTimer:                       return Entity + 6;
+		case EntityMetadata::EnderCrystalBeamTarget:                return Entity;
+		case EntityMetadata::EnderCrystalShowBottom:                return Entity + 1;
+		case EntityMetadata::WitherSkullInvulnerable:               return Entity;
+		case EntityMetadata::FireworkInfo:                          return Entity;
+		case EntityMetadata::FireworkBoostedEntityId:               return Entity + 1;
+		case EntityMetadata::FireworkFromCrossbow:                  return Entity + 2;
+		case EntityMetadata::ItemFrameItem:                         return Entity;
+		case EntityMetadata::ItemFrameRotation:                     return Entity + 1;
+		case EntityMetadata::ItemItem:                              return Entity;
+		case EntityMetadata::LivingActiveHand:                      return Entity;
+		case EntityMetadata::LivingHealth:                          return Entity + 1;
+		case EntityMetadata::LivingPotionEffectColor:               return Entity + 2;
+		case EntityMetadata::LivingPotionEffectAmbient:             return Entity + 3;
+		case EntityMetadata::LivingNumberOfArrows:                  return Entity + 4;
+			//  LivingStingerCount + 5
+			//  LivingSleppingPos + 6
+		case EntityMetadata::PlayerAdditionalHearts:                return Living;
+		case EntityMetadata::PlayerScore:                           return Living + 1;
+		case EntityMetadata::PlayerDisplayedSkinParts:              return Living + 2;
+		case EntityMetadata::PlayerMainHand:                        return Living + 3;
+			//  PlayerRightShoudlerEntity + 4
+			//  PlayerRightShoudlerEntity + 5
+		case EntityMetadata::ArmorStandStatus:                      return Living;
+		case EntityMetadata::ArmorStandHeadRotation:                return Living + 1;
+		case EntityMetadata::ArmorStandBodyRotation:                return Living + 2;
+		case EntityMetadata::ArmorStandLeftArmRotation:             return Living + 3;
+		case EntityMetadata::ArmorStandRightArmRotation:            return Living + 4;
+		case EntityMetadata::ArmorStandLeftLegRotation:             return Living + 5;
+		case EntityMetadata::ArmorStandRightLegRotation:            return Living + 6;
+		case EntityMetadata::InsentientFlags:                       return Living;
+		case EntityMetadata::BatHanging:                            return Insentient;
+		case EntityMetadata::AgeableIsBaby:                         return Insentient;
+		case EntityMetadata::AbstractHorseFlags:                    return Ageable;
+		case EntityMetadata::AbstractHorseOwner:                    return Ageable + 1;
+		case EntityMetadata::HorseVariant:                          return AbstractHorse;
+		case EntityMetadata::ChestedHorseChested:                   return AbstractHorse;
+		case EntityMetadata::LlamaStrength:                         return ChestedHorse;
+		case EntityMetadata::LlamaCarpetColor:                      return ChestedHorse + 1;
+		case EntityMetadata::LlamaVariant:                          return ChestedHorse + 2;
+		case EntityMetadata::PigHasSaddle:                          return Ageable;
+		case EntityMetadata::PigTotalCarrotOnAStickBoost:           return Ageable + 1;
+		case EntityMetadata::RabbitType:                            return Ageable;
+		case EntityMetadata::PolarBearStanding:                     return Ageable;
+		case EntityMetadata::SheepFlags:                            return Ageable;
+		case EntityMetadata::TameableAnimalFlags:                   return Ageable;
+		case EntityMetadata::TameableAnimalOwner:                   return Ageable + 1;
+		case EntityMetadata::OcelotType:                            return TameableAnimal;
+		case EntityMetadata::WolfDamageTaken:                       return TameableAnimal;
+		case EntityMetadata::WolfBegging:                           return TameableAnimal + 1;
+		case EntityMetadata::WolfCollarColour:                      return TameableAnimal + 2;
+		case EntityMetadata::VillagerProfession:                    return Ageable;
+		case EntityMetadata::IronGolemPlayerCreated:                return Insentient;
+		case EntityMetadata::ShulkerFacingDirection:                return Insentient;
+		case EntityMetadata::ShulkerAttachmentFallingBlockPosition: return Insentient + 1;
+		case EntityMetadata::ShulkerShieldHeight:                   return Insentient + 2;
+		case EntityMetadata::BlazeOnFire:                           return Insentient;
+		case EntityMetadata::CreeperState:                          return Insentient;
+		case EntityMetadata::CreeperPowered:                        return Insentient + 1;
+		case EntityMetadata::CreeperIgnited:                        return Insentient + 2;
+		case EntityMetadata::GuardianStatus:                        return Insentient;
+		case EntityMetadata::GuardianTarget:                        return Insentient + 1;
+		case EntityMetadata::IllagerFlags:                          return Insentient;
+		case EntityMetadata::SpeIlagerSpell:                        return Insentient + 1;
+		case EntityMetadata::VexFlags:                              return Insentient;
+		case EntityMetadata::AbstractSkeletonArmsSwinging:          return Insentient;
+		case EntityMetadata::SpiderClimbing:                        return Insentient;
+		case EntityMetadata::WitchAggresive:                        return Insentient;
+		case EntityMetadata::WitherFirstHeadTarget:                 return Insentient;
+		case EntityMetadata::WitherSecondHeadTarget:                return Insentient + 1;
+		case EntityMetadata::WitherThirdHeadTarget:                 return Insentient + 2;
+		case EntityMetadata::WitherInvulnerableTimer:               return Insentient + 3;
+		case EntityMetadata::ZombieIsBaby:                          return Insentient;
+		case EntityMetadata::ZombieHandsRisedUp:                    return Insentient + 2;
+		case EntityMetadata::ZombieVillagerConverting:              return Insentient + 4;
+		case EntityMetadata::ZombieVillagerProfession:              return Insentient + 5;
+		case EntityMetadata::EndermanCarriedBlock:                  return Insentient;
+		case EntityMetadata::EndermanScreaming:                     return Insentient + 1;
+		case EntityMetadata::EnderDragonDragonPhase:                return Insentient;
+		case EntityMetadata::GhastAttacking:                        return Insentient;
+		case EntityMetadata::SlimeSize:                             return Insentient;
+		case EntityMetadata::MinecartShakingPower:                  return Entity;
+		case EntityMetadata::MinecartShakingDirection:              return Entity + 1;
+		case EntityMetadata::MinecartShakingMultiplier:             return Entity + 2;
+		case EntityMetadata::MinecartBlockIDMeta:                   return Entity + 3;
+		case EntityMetadata::MinecartBlockY:                        return Entity + 4;
+		case EntityMetadata::MinecartShowBlock:                     return Entity + 5;
+		case EntityMetadata::MinecartCommandBlockCommand:           return Minecart;
+		case EntityMetadata::MinecartCommandBlockLastOutput:        return Minecart + 1;
+		case EntityMetadata::MinecartFurnacePowered:                return Minecart;
+		case EntityMetadata::TNTPrimedFuseTime:                     return Entity;
+		case EntityMetadata::TridentLoyaltyLevel:                   return Entity + 3;
+		case EntityMetadata::MooshroomType:                         return Ageable;
+		case EntityMetadata::WitchDrinking:                         return RaidParticipent;
+
+		case EntityMetadata::AreaEffectCloudParticleParameter1:
+		case EntityMetadata::AreaEffectCloudParticleParameter2:
+		case EntityMetadata::ZombieUnusedWasType: break;
+
+		default:
+			break;
+	}
+	UNREACHABLE("Retrieved invalid metadata for protocol");
+}
+
+
+
+
+
 bool cProtocol_1_17::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
 	LOG("Handling packet 0x%x", a_PacketType);
@@ -201,7 +348,7 @@ bool cProtocol_1_17::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x2B: HandlePacketUpdateSign(a_ByteBuffer); return true;
 		case 0x2C: /* Update hand swing */ return false;
 		case 0x2D: /* Spectator teleport */ return false;
-		// case 0x2E: HandlePacketBlockPlace(a_ByteBuffer); return true;
+		case 0x2E: HandlePacketBlockPlace(a_ByteBuffer); return true;
 		case 0x2F: HandlePacketUseItem(a_ByteBuffer); return true;
 		default: break;
 	}
@@ -390,6 +537,124 @@ void cProtocol_1_17::SendPlayerMoveLook(const Vector3d a_Pos, const float a_Yaw,
 
 	// This teleport ID hasn't been confirmed yet
 	m_IsTeleportIdConfirmed = false;
+}
+
+
+
+
+
+
+void cProtocol_1_17::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBlockChanges);
+	Pkt.WriteBEInt32(a_ChunkX);
+	Pkt.WriteBEInt32(a_ChunkZ);
+	Pkt.WriteBool(true); // no lightning updates
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
+
+	for (const auto & Change : a_Changes)
+	{
+		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
+		UInt64 packed = Coords | (Change.m_BlockIdNew << 12);
+		Pkt.WriteVarInt64(packed);
+	}
+}
+
+
+
+
+
+void cProtocol_1_17::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktInventorySlot);
+	Pkt.WriteBEInt8(a_WindowID);
+	Pkt.WriteVarInt32(0); // revision
+	Pkt.WriteBEInt16(a_SlotNum);
+	WriteItem(Pkt, a_Item);
+}
+
+
+
+
+
+void cProtocol_1_17::SendRespawn(eDimension a_Dimension)
+{
+	cPacketizer Pkt(*this, pktRespawn);
+	cPlayer* Player = m_Client->GetPlayer();
+	{
+		cFastNBTWriter Writer;
+
+		Writer.AddByte("piglin_safe", 1);
+		Writer.AddByte("natural", 1);
+		Writer.AddFloat("ambient_light", 1.0);
+		Writer.AddString("infiniburn", "infiniburn_overworld");
+		Writer.AddByte("respawn_anchor_works", 1);
+		Writer.AddByte("has_skylight", 1);
+		Writer.AddByte("bed_works", 1);
+		Writer.AddString("effects", "minecraft:overworld");
+		Writer.AddByte("has_raids", 1);
+		Writer.AddInt("logical_height", 256);
+		Writer.AddDouble("coordinate_scale", 1.0);
+		Writer.AddByte("ultrawarm", 1);
+		Writer.AddByte("has_ceiling", 1);
+		Writer.AddInt("min_y", 0);
+		Writer.AddInt("height", 256);
+
+		Writer.Finish();
+		Pkt.WriteBuf(Writer.GetResult());
+	}
+	Pkt.WriteString("overworld");
+	Pkt.WriteBEUInt64(0);  // Appears to be a SHA256 od the world seed
+	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
+	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
+	Pkt.WriteBool(false);  // debug world
+	Pkt.WriteBool(false);  // flat world
+	Pkt.WriteBool(true);   // keep player attributes
+}
+
+
+
+
+
+
+void cProtocol_1_17::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+{
+	if (a_Entity.IsPlayer())
+	{
+		const auto & Player = static_cast<const cPlayer &>(a_Entity);
+
+		a_Pkt.WriteVarInt32(1);  // Count.
+		a_Pkt.WriteString("generic.movement_speed");
+		a_Pkt.WriteBEDouble(0.1 * Player.GetNormalMaxSpeed());  // The default game speed is 0.1, multiply that value by the relative speed.
+
+		// It seems the modifiers aren't conditionally activated; their effects are applied immediately!
+		// We have to keep on re-sending this packet when the client notifies us of sprint start and end, and so on. Strange.
+
+		if (Player.IsSprinting())
+		{
+			a_Pkt.WriteVarInt32(1);  // Modifier count.
+			a_Pkt.WriteBEUInt64(0x662a6b8dda3e4c1c);
+			a_Pkt.WriteBEUInt64(0x881396ea6097278d);  // UUID of the modifier (sprinting speed boost).
+			a_Pkt.WriteBEDouble(Player.GetSprintingMaxSpeed() - Player.GetNormalMaxSpeed());
+			a_Pkt.WriteBEUInt8(2);
+		}
+		else
+		{
+			a_Pkt.WriteVarInt32(0);
+		}
+	}
+	else
+	{
+		// const cMonster & Mob = (const cMonster &)a_Entity;
+
+		// TODO: Send properties and modifiers based on the mob type
+
+		a_Pkt.WriteVarInt32(0);
+	}
 }
 
 

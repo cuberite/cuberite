@@ -146,6 +146,12 @@ public:
 	}
 
 
+	inline void WriteVarInt64(UInt64 a_Value)
+	{
+		VERIFY(m_Out.WriteVarInt64(a_Value));
+	}
+
+
 	inline void WriteString(const AString & a_Value)
 	{
 		VERIFY(m_Out.WriteVarUTF8String(a_Value));

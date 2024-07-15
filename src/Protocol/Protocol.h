@@ -180,6 +180,7 @@ public:
 		FireworkInfo,
 		FireworkBoostedEntityId,
 		FireworkFromCrossbow,
+		FrozenTicks,
 
 		ItemFrameItem,
 		ItemFrameRotation,
