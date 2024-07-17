@@ -212,7 +212,7 @@ protected:
 	virtual void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketBookUpdate             (cByteBuffer & a_ByteBuffer);
-
+	virtual void HandlePacketCommandExecution       (cByteBuffer & a_ByteBuffer);
 	/** Parses Vanilla plugin messages into specific ClientHandle calls.
 	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel. */
 	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std::string_view a_Channel);
@@ -246,6 +246,8 @@ protected:
 	/** Writes the mob-specific metadata for the specified mob */
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const;
 
+	void StartEncryption(const Byte * a_Key);
+
 private:
 
 	AString m_ServerAddress;
@@ -273,6 +275,4 @@ private:
 
 	/** Handle a complete packet stored in the given buffer. */
 	void HandlePacket(cByteBuffer & a_Buffer);
-
-	void StartEncryption(const Byte * a_Key);
 } ;

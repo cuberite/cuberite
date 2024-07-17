@@ -2418,6 +2418,15 @@ void cProtocol_1_8_0::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 
 
 
+void cProtocol_1_8_0::HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer)
+{
+	return;
+}
+
+
+
+
+
 void cProtocol_1_8_0::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Locale);
@@ -4195,10 +4204,12 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 		));
 	}
 
+	cProtocol::State oldstate = m_State;
+
 	if (!HandlePacket(a_Buffer, PacketType))
 	{
 		// Unknown packet, already been reported, but without the length. Log the length here:
-		LOGWARNING("Unhandled packet: type 0x%x, state %d, length %u", PacketType, m_State, a_Buffer.GetUsedSpace());
+		LOGWARNING("Unhandled packet: type 0x%x, state %d, length %u", PacketType, oldstate, a_Buffer.GetUsedSpace());
 
 #ifndef NDEBUG
 		// Dump the packet contents into the log:
@@ -4225,7 +4236,7 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 	{
 		// Read more or less than packet length, report as error
 		LOGWARNING("Protocol 1.8: Wrong number of bytes read for packet 0x%x, state %d. Read %zu bytes, packet contained %u bytes",
-			PacketType, m_State, a_Buffer.GetUsedSpace() - a_Buffer.GetReadableSpace(), a_Buffer.GetUsedSpace()
+			PacketType, oldstate, a_Buffer.GetUsedSpace() - a_Buffer.GetReadableSpace(), a_Buffer.GetUsedSpace()
 		);
 
 		// Put a message in the comm log:

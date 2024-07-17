@@ -18,6 +18,7 @@
 #include "Protocol_1_16.h"
 #include "Protocol_1_17.h"
 #include "Protocol_1_18.h"
+#include "Protocol_1_19.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -380,6 +381,10 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		case static_cast<UInt32>(cProtocol::Version::v1_17_1): return std::make_unique<cProtocol_1_17_1>(&a_Client, ServerAddress, NextState);
 		case static_cast<UInt32>(cProtocol::Version::v1_18):   return std::make_unique<cProtocol_1_18>  (&a_Client, ServerAddress, NextState);
 		case static_cast<UInt32>(cProtocol::Version::v1_18_2): return std::make_unique<cProtocol_1_18_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_19):   return std::make_unique<cProtocol_1_19>  (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_19_1): return std::make_unique<cProtocol_1_19_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_19_3): return std::make_unique<cProtocol_1_19_3>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_19_4): return std::make_unique<cProtocol_1_19_4>(&a_Client, ServerAddress, NextState);
 		default:
 		{
 			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
