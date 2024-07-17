@@ -12,6 +12,7 @@
 #include "Palettes/Palette_1_15.h"
 #include "Palettes/Palette_1_16.h"
 #include "Palettes/Palette_1_18.h"
+#include "Palettes/Palette_1_19.h"
 
 
 
@@ -181,6 +182,14 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v757);
 				continue;
 			}
+			case cProtocol::Version::v1_19:
+			case cProtocol::Version::v1_19_1:
+			case cProtocol::Version::v1_19_3:
+			case cProtocol::Version::v1_19_4:
+			{
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v759);
+				continue;
+			}
 		}
 		UNREACHABLE("Unknown chunk data serialization version");
 	}
@@ -260,7 +269,12 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 		}
 		case CacheVersion::v757:
 		{
-			Serialize757(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap);
+			Serialize757<&Palette_1_18::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x22);
+			break;
+		}
+		case CacheVersion::v759:
+		{
+			Serialize757<&Palette_1_19::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x1F);
 			break;
 		}
 	}
@@ -953,8 +967,8 @@ inline void cChunkDataSerializer::Serialize755(const int a_ChunkX, const int a_C
 
 
 
-
-inline void cChunkDataSerializer::Serialize757(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockDataNew & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
+template <auto Palette>
+inline void cChunkDataSerializer::Serialize757(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockDataNew & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, UInt32 a_packet_id)
 {
 	// This function returns the fully compressed packet (including packet
 	// size), not the raw packet! Below variables tagged static because of
@@ -967,8 +981,10 @@ inline void cChunkDataSerializer::Serialize757(const int a_ChunkX, const int a_C
 
 	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
 
+
+	
 	// Create the packet:
-	m_Packet.WriteVarInt32(0x22);  // Packet id (Chunk Data packet)
+	m_Packet.WriteVarInt32(a_packet_id);
 	m_Packet.WriteBEInt32(a_ChunkX);
 	m_Packet.WriteBEInt32(a_ChunkZ);
 
@@ -1004,7 +1020,7 @@ inline void cChunkDataSerializer::Serialize757(const int a_ChunkX, const int a_C
 		m_Packet.WriteBEInt16(4096);
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-		WriteBlockSectionSeamless2<&Palette_1_18::ToProtocolIdBlock>(Blocks, BitsPerEntry, true);
+		WriteBlockSectionSeamless2<Palette>(Blocks, BitsPerEntry, true);
 
 		//Biomes
 		m_Packet.WriteBEUInt8(0); 
