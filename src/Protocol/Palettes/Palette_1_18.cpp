@@ -20351,6 +20351,7 @@ namespace Palette_1_18
 			case RAW_GOLD_BLOCK: return 20339;
 			case POTTED_AZALEA_BUSH: return 20340;
 			case POTTED_FLOWERING_AZALEA_BUSH: return 20341;
+			default: 0;
 		}
 	}
 }
