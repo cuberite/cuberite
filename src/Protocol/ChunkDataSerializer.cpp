@@ -188,10 +188,14 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 				continue;
 			}
 			case cProtocol::Version::v1_19_1:
+			{
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v760);
+				continue;
+			}
 			case cProtocol::Version::v1_19_3:
 			case cProtocol::Version::v1_19_4:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v760);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v761);
 				continue;
 			}
 		}
@@ -284,6 +288,11 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 		case CacheVersion::v760:
 		{
 			Serialize757<&Palette_1_19::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x21);
+			break;
+		}
+		case CacheVersion::v761:
+		{
+			Serialize757<&Palette_1_19::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x20);
 			break;
 		}
 	}

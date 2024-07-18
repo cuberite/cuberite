@@ -1265,6 +1265,610 @@ cProtocol::Version cProtocol_1_19_3::GetProtocolVersion() const
 
 
 
+UInt32 cProtocol_1_19_3::GetPacketID(ePacketType a_PacketType) const
+{
+	switch (a_PacketType)
+	{
+		/// Status packets
+		case cProtocol::pktStatusResponse:       return 0x00;
+		case cProtocol::pktPingResponse:         return 0x01;
+
+		//  Login Packets
+		case cProtocol::pktDisconnectDuringLogin:return 0x00;
+		case cProtocol::pktEncryptionRequest:    return 0x01;
+		case cProtocol::pktLoginSuccess:         return 0x02;
+		case cProtocol::pktStartCompression:     return 0x03;
+
+		//  Game packets
+		case cProtocol::pktSpawnObject:          return 0x00;
+		case cProtocol::pktSpawnMob:             return 0x00;
+		case cProtocol::pktSpawnPainting:        return 0x00;
+		case cProtocol::pktSpawnExperienceOrb:   return 0x01;
+		case cProtocol::pktSpawnOtherPlayer:     return 0x02;
+		case cProtocol::pktEntityAnimation:      return 0x03;
+		case cProtocol::pktStatistics:           return 0x04;
+		case cProtocol::pktPlayerActionResponse: return 0x05;
+		//  case cProtocol::pktBlockbreakingprogress:   return 0x06;
+		case cProtocol::pktUpdateBlockEntity:    return 0x07;
+		case cProtocol::pktBlockAction:          return 0x08;
+		case cProtocol::pktBlockChange:          return 0x09;
+		case cProtocol::pktBossBar:              return 0x0A;
+		case cProtocol::pktDifficulty:           return 0x0B;
+			//  clear title 0x0C
+			//  command suggestions here 0x0D
+			//  command tree 0x0E
+		case cProtocol::pktWindowClose:          return 0x0F;
+		case cProtocol::pktWindowItems:          return 0x10; //  Inventory packet
+		case cProtocol::pktWindowProperty:       return 0x11; //  ScreenHandlerPropertyUpdateS2CPacket
+		case cProtocol::pktInventorySlot:        return 0x12; //  ScreenHandlerSlotUpdateS2CPacket
+			//  cooldown update 0x13
+			//  chat suggestions 0x14
+		case cProtocol::pktCustomPayload:        return 0x15; 
+		case cProtocol::pktPluginMessage:        return 0x15; 
+		//case cProtocol::pktSoundEffect:          return 0x17; --
+			// RemoveMessageS2CPacket 0x16
+		case cProtocol::pktDisconnectDuringGame: return 0x17;
+			//  ProfilelessChatMessageS2CPacket 0x18
+		case cProtocol::pktEntityStatus:         return 0x19;
+		case cProtocol::pktExplosion:            return 0x1A;
+		case cProtocol::pktUnloadChunk:          return 0x1B;
+		case cProtocol::pktGameMode:             return 0x1C;
+		case cProtocol::pktWeather:              return 0x1C;
+		case cProtocol::pktHorseWindowOpen:      return 0x1D;
+			// wolrld border initalize 0x1E
+		case cProtocol::pktKeepAlive:            return 0x1F;
+			// chunk data packet 0x20
+		case cProtocol::pktSoundParticleEffect:  return 0x21;  // world event
+		case cProtocol::pktParticleEffect:       return 0x22;
+		case cProtocol::pktLightUpdate:          return 0x23;
+		case cProtocol::pktJoinGame:             return 0x24;
+			//  map update 0x25
+			//  set trade offers 0x26 
+		case cProtocol::pktEntityRelMove:        return 0x27;
+		case cProtocol::pktEntityRelMoveLook:    return 0x28;
+		case cProtocol::pktEntityLook:           return 0x29;
+			//  vehicle move 0x2A
+			//  open written book 0x2B
+		case cProtocol::pktWindowOpen:           return 0x2C;
+		case cProtocol::pktUpdateSign:           return 0x2D;
+			//  play ping 0x2E
+			//  craft failed response 0x2F
+		case cProtocol::pktPlayerAbilities:      return 0x30;
+			//  ChatMessageS2CPacket 0x31
+			//  combat exit 0x32
+			//  comabt enter 0x33
+			//  death msg 0x34
+			//  PlayerRemoveS2CPacket 0x35
+		case cProtocol::pktPlayerList:           return 0x36;
+			//  look at 0x37
+		case cProtocol::pktPlayerMoveLook:       return 0x38;
+		case cProtocol::pktUnlockRecipe:         return 0x39;
+		case cProtocol::pktDestroyEntity:        return 0x3A;
+		case cProtocol::pktRemoveEntityEffect:   return 0x3B;
+		case cProtocol::pktResourcePack:         return 0x3C;
+		case cProtocol::pktRespawn:              return 0x3D;
+		case cProtocol::pktEntityHeadLook:       return 0x3E;
+		case cProtocol::pktBlockChanges:         return 0x3F;
+			// select advancment tab 0x40
+			// ServerMetadataS2CPacket 0x41
+			// overlay msg 0x42
+			// wb -- worldborder wb center changed 0x43
+			// wb interpolate size 0x44
+			// wb size changed 0x45
+			// wb warning time changed 0x46
+			// wb warning blocks changed 0x47
+		case cProtocol::pktCameraSetTo:          return 0x48;
+		case cProtocol::pktHeldItemChange:       return 0x49;
+		case cProtocol::pktRenderDistanceCenter: return 0x4A;
+			//  chunk load distance 0x4B
+		case cProtocol::pktSpawnPosition:        return 0x4C;
+			//  scoreboard display 0x4D
+		case cProtocol::pktEntityMeta:           return 0x4E;
+			// entity attach 0x4F
+		case cProtocol::pktEntityVelocity:       return 0x50;
+		case cProtocol::pktEntityEquipment:      return 0x51;
+		case cProtocol::pktExperience:           return 0x52;
+		case cProtocol::pktUpdateHealth:         return 0x53;
+		case cProtocol::pktScoreboardObjective:  return 0x54;
+		case cProtocol::pktAttachEntity:         return 0x55;
+			// Teams 0x56
+		case cProtocol::pktUpdateScore:          return 0x57;
+			// simulation distance 0x58
+			// subtitle 0x59
+		case cProtocol::pktTimeUpdate:           return 0x5A;
+		case cProtocol::pktTitle:                return 0x5B;
+			//  title fade 0x5C
+			//  play sound from entity 0x5D
+			//  play sound 0x5E
+			//  stop sound 0x5F
+		case cProtocol::pktChatRaw:              return 0x60;  //  Gamemessage
+			//  player list header 0x61
+			//  NbtQueryResponseS2CPacket 0x62 
+		case cProtocol::pktCollectEntity:        return 0x63;
+		case cProtocol::pktTeleportEntity:       return 0x64;
+			//  advancment update 0x65
+		case cProtocol::pktEntityProperties:     return 0x66;
+			// FeaturesS2CPacket 0x67
+		case cProtocol::pktEntityEffect:         return 0x68;
+			//  sync recepies 0x69
+			//  sync tags 0x6A
+		default: UNREACHABLE("unhandeled packet");
+	}
+}
+
+
+
+
+void cProtocol_1_19_3::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
+{
+	AString Username;
+	if (!a_ByteBuffer.ReadVarUTF8String(Username))
+	{
+		m_Client->Kick("Bad username");
+		return;
+	}
+	HANDLE_READ(a_ByteBuffer,ReadBool,bool,HasUUID);
+	if (HasUUID)
+	{
+		HANDLE_READ(a_ByteBuffer,ReadUUID,cUUID,ProfileID);
+	}
+	if (!m_Client->HandleHandshake(Username))
+	{
+		// The client is not welcome here, they have been sent a Kick packet already
+		return;
+	}
+
+	m_Client->SetUsername(std::move(Username));
+
+	// If auth is required, then send the encryption request:
+	if (const auto Server = cRoot::Get()->GetServer(); Server->ShouldAuthenticate())
+	{
+		cPacketizer Pkt(*this, pktEncryptionRequest);
+		Pkt.WriteString(Server->GetServerID());
+		const auto PubKeyDer = Server->GetPublicKeyDER();
+		Pkt.WriteVarInt32(static_cast<UInt32>(PubKeyDer.size()));
+		Pkt.WriteBuf(PubKeyDer);
+		Pkt.WriteVarInt32(4);
+		Pkt.WriteBEInt32(static_cast<int>(reinterpret_cast<intptr_t>(this)));  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
+		return;
+	}
+
+	m_Client->HandleLogin();
+}
+
+
+
+
+bool cProtocol_1_19_3::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
+{
+	if (m_State != State::Game)
+	{
+		return Super::HandlePacket(a_ByteBuffer, a_PacketType);
+	}
+
+	// Game
+	switch (a_PacketType)
+	{
+		case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
+		case 0x01: /* query nbt packet */ return false;
+		case 0x02: /* update difficulty */ return false;
+		case 0x03: /* MessageAcknowledgmentC2SPacket */ return false;
+		case 0x04: HandlePacketCommandExecution(a_ByteBuffer); return true;
+		case 0x05: HandlePacketChatMessage(a_ByteBuffer); return true;
+		case 0x06: HandlePacketClientStatus(a_ByteBuffer); return true;
+		case 0x07: HandlePacketClientSettings(a_ByteBuffer); return true;
+		case 0x08: HandlePacketTabComplete(a_ByteBuffer); return true;
+		case 0x09: /* ButtonClickC2SPacket */ return false;
+		case 0x0A: HandlePacketWindowClick(a_ByteBuffer); return true;
+		case 0x0B: HandlePacketWindowClose(a_ByteBuffer); return true;
+		case 0x0C: HandlePacketPluginMessage(a_ByteBuffer); return true;
+		case 0x0D: HandlePacketBookUpdate(a_ByteBuffer); return true;  // not fully implemented
+		case 0x0E: /* QueryEntityNbtC2SPacket */ return false;
+		case 0x0F: HandlePacketUseEntity(a_ByteBuffer); return true;
+		case 0x10: /* Jigsaw generating */ return false;
+		case 0x11: HandlePacketKeepAlive(a_ByteBuffer); return true;
+		case 0x12: /* Update difficulty lock */ return false;  // only used in single player
+		case 0x13: HandlePacketPlayerPos(a_ByteBuffer); return true;  // PositionAndOnGround
+		case 0x14: HandlePacketPlayerPosLook(a_ByteBuffer); return true; // full
+		case 0x15: HandlePacketPlayerLook(a_ByteBuffer); return true; // LookAndOnGround
+		case 0x16: HandlePacketPlayer(a_ByteBuffer); return true;
+		case 0x17: HandlePacketVehicleMove(a_ByteBuffer); return true;
+		case 0x18: HandlePacketBoatSteer(a_ByteBuffer); return true;
+		case 0x19: /* pick from inventory */ return false;
+		case 0x1A: HandleCraftRecipe(a_ByteBuffer); return true;
+		case 0x1B: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
+		case 0x1C: HandlePacketBlockDig(a_ByteBuffer); return true;
+		case 0x1D: /* client command packet */ return false;
+		case 0x1E: HandlePacketSteerVehicle(a_ByteBuffer); return true;  // player input packet
+		case 0x1F: /* PlayPongC2SPacket */ return false;
+		case 0x20: /* PlayerSessionC2SPacket */ return false;
+		case 0x21: /* Recipe Category Options */ return false;
+		case 0x22: HandlePacketCraftingBookData(a_ByteBuffer); return true;
+		case 0x23: HandlePacketNameItem(a_ByteBuffer); return true;
+		case 0x24: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
+		case 0x25: HandlePacketAdvancementTab(a_ByteBuffer); return true;
+		case 0x26: /* select villager trade */ return false;
+		case 0x27: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
+		case 0x28: HandlePacketSlotSelect(a_ByteBuffer); return true;
+		case 0x29: /* update command block */ return false;
+		case 0x2A: /* update minecart command block*/ return false;
+		case 0x2B: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+		case 0x2C: /* Update jigsaw block */ return false;
+		case 0x2D: /* Update structure block */ return false;
+		case 0x2E: HandlePacketUpdateSign(a_ByteBuffer); return true;
+		case 0x2F: /* Update hand swing */ return false;
+		case 0x30: /* Spectator teleport */ return false;
+		case 0x31: HandlePacketBlockPlace(a_ByteBuffer); return true;
+		case 0x32: HandlePacketUseItem(a_ByteBuffer); return true;
+		default: break;
+	}
+}
+
+
+
+
+void cProtocol_1_19_3::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	// Prevent chat messages that might trigger CVE-2021-44228
+	if (a_MessageRaw.find("${") != std::string::npos)
+	{
+		return;
+	}
+
+	// Send the json string to the client:
+	cPacketizer Pkt(*this, pktChatRaw);
+	Pkt.WriteString(a_MessageRaw);
+	Pkt.WriteBool(false);
+	//Pkt.WriteVarInt32([a_Type]() -> signed char
+	//{
+	//	switch (a_Type)
+	//	{
+	//		case eChatType::ctChatBox: return 0;
+	//		case eChatType::ctSystem: return 1;
+	//		case eChatType::ctAboveActionBar: return 2;
+	//	}
+	//	UNREACHABLE("Unsupported chat type");
+	//}());
+
+}
+
+
+
+
+
+void cProtocol_1_19_3::SendPlayerListAddPlayer(const cPlayer & a_Player)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktPlayerList);
+	Pkt.WriteBEInt8(0x1 | 0x4 | 0x10);
+
+	Pkt.WriteVarInt32(1);
+	Pkt.WriteUUID(a_Player.GetUUID());
+	Pkt.WriteString(a_Player.GetPlayerListName());
+
+	const Json::Value & Properties = a_Player.GetClientHandle()->GetProperties();
+	Pkt.WriteVarInt32(Properties.size());
+	for (auto & Node : Properties)
+	{
+		Pkt.WriteString(Node.get("name", "").asString());
+		Pkt.WriteString(Node.get("value", "").asString());
+		AString Signature = Node.get("signature", "").asString();
+		if (Signature.empty())
+		{
+			Pkt.WriteBool(false);
+		}
+		else
+		{
+			Pkt.WriteBool(true);
+			Pkt.WriteString(Signature);
+		}
+	}
+
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetEffectiveGameMode()));
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
+}
+
+
+
+
+void cProtocol_1_19_3::SendPlayerListUpdatePing()
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktPlayerList);
+	Pkt.WriteBEInt8(0x10);
+
+	const auto World = m_Client->GetPlayer()->GetWorld();
+	Pkt.WriteVarInt32(static_cast<UInt32>(World->GetPlayerCount()));
+	World->ForEachPlayer([&Pkt](cPlayer & a_Player)
+	{
+		Pkt.WriteUUID(a_Player.GetUUID());
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
+		return false;
+	});
+}
+
+
+
+
+
+void cProtocol_1_19_3::WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const
+{
+	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_Metadata));	      // Index
+	a_Pkt.WriteVarInt32(static_cast<UInt32>(a_FieldType));        // Type
+}
+
+
+
+
+
+void cProtocol_1_19_3::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+{
+	// Common metadata:
+	Int8 Flags = 0;
+	if (a_Entity.IsOnFire())
+	{
+		Flags |= 0x01;
+	}
+	if (a_Entity.IsCrouched())
+	{
+		Flags |= 0x02;
+	}
+	if (a_Entity.IsSprinting())
+	{
+		Flags |= 0x08;
+	}
+	if (a_Entity.IsRclking())
+	{
+		Flags |= 0x10;
+	}
+	if (a_Entity.IsInvisible())
+	{
+		Flags |= 0x20;
+	}
+	/*
+	if (a_Entity.IsGlowing())
+	{
+		Flags |= 0x40;
+	}
+	*/
+	if (a_Entity.IsElytraFlying())
+	{
+		Flags |= 0x80;
+	}
+
+	WriteEntityMetadata(a_Pkt, EntityMetadata::EntityFlags, EntityMetadataType::Byte);
+	a_Pkt.WriteBEInt8(Flags);
+
+	switch (a_Entity.GetEntityType())
+	{
+		case cEntity::etPlayer:
+		{
+			auto & Player = static_cast<const cPlayer &>(a_Entity);
+
+			// TODO Set player custom name to their name.
+			// Then it's possible to move the custom name of mobs to the entities
+			// and to remove the "special" player custom name.
+			WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);  // no longer optional ????
+			a_Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", Player.GetName()));	 // needs to be json formatted
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerDisplayedSkinParts, EntityMetadataType::Byte);
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerMainHand, EntityMetadataType::Byte);
+			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
+			break;
+		}
+		case cEntity::etPickup:
+		{
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemItem, EntityMetadataType::Item);
+			WriteItem(a_Pkt, static_cast<const cPickup &>(a_Entity).GetItem());
+			break;
+		}
+		case cEntity::etMinecart:
+		{
+			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingPower, EntityMetadataType::VarInt);
+
+			// The following expression makes Minecarts shake more with less health or higher damage taken
+			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
+			auto maxHealth = a_Entity.GetMaxHealth();
+			auto curHealth = a_Entity.GetHealth();
+			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingDirection, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(1);  // (doesn't seem to effect anything)
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingMultiplier, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));  // or damage taken
+
+			if (Minecart.GetPayload() == cMinecart::mpNone)
+			{
+				auto & RideableMinecart = static_cast<const cRideableMinecart &>(Minecart);
+				const cItem & MinecartContent = RideableMinecart.GetContent();
+				if (!MinecartContent.IsEmpty())
+				{
+					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockIDMeta, EntityMetadataType::VarInt);
+					int Content = MinecartContent.m_ItemType;
+					Content |= MinecartContent.m_ItemDamage << 8;
+					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
+
+					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockY, EntityMetadataType::VarInt);
+					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
+
+					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShowBlock, EntityMetadataType::Boolean);
+					a_Pkt.WriteBool(true);
+				}
+			}
+			else if (Minecart.GetPayload() == cMinecart::mpFurnace)
+			{
+				WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartFurnacePowered, EntityMetadataType::Boolean);
+				a_Pkt.WriteBool(static_cast<const cMinecartWithFurnace &>(Minecart).IsFueled());
+			}
+			break;
+		}  // case etMinecart
+
+		case cEntity::etProjectile:
+		{
+			auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
+			switch (Projectile.GetProjectileKind())
+			{
+				case cProjectileEntity::pkArrow:
+				{
+					WriteEntityMetadata(a_Pkt, EntityMetadata::ArrowFlags, EntityMetadataType::Byte);
+					a_Pkt.WriteBEInt8(static_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
+
+					// TODO: Piercing level
+					break;
+				}
+				case cProjectileEntity::pkFirework:
+				{
+					// TODO
+					break;
+				}
+				case cProjectileEntity::pkSplashPotion:
+				{
+					// TODO
+				}
+				default:
+				{
+					break;
+				}
+			}
+			break;
+		}  // case etProjectile
+
+		case cEntity::etMonster:
+		{
+			WriteMobMetadata(a_Pkt, static_cast<const cMonster &>(a_Entity));
+			break;
+		}
+
+		case cEntity::etBoat:
+		{
+			auto & Boat = static_cast<const cBoat &>(a_Entity);
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatLastHitTime, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetLastDamage()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatForwardDirection, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetForwardDirection()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatDamageTaken, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(Boat.GetDamageTaken());
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatType, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatRightPaddleTurning, EntityMetadataType::Boolean);
+			a_Pkt.WriteBool(Boat.IsRightPaddleUsed());
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatLeftPaddleTurning, EntityMetadataType::Boolean);
+			a_Pkt.WriteBool(static_cast<bool>(Boat.IsLeftPaddleUsed()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatSplashTimer, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(0);
+
+			break;
+		}  // case etBoat
+
+		case cEntity::etItemFrame:
+		{
+			// TODO
+			break;
+		}  // case etItemFrame
+
+		case cEntity::etEnderCrystal:
+		{
+			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
+			if (EnderCrystal.DisplaysBeam())
+			{
+				WriteEntityMetadata(a_Pkt, EntityMetadata::EnderCrystalBeamTarget, EntityMetadataType::OptPosition);
+				a_Pkt.WriteBool(true);  // Dont do a second check if it should display the beam
+				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
+			}
+			WriteEntityMetadata(a_Pkt, EntityMetadata::EnderCrystalShowBottom, EntityMetadataType::Boolean);
+			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
+			break;
+		}  // case etEnderCrystal
+
+		default:
+		{
+			break;
+		}
+	}
+}
+
+
+
+
+
+void cProtocol_1_19_3::HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer)
+{
+	ContiguousByteBuffer sigdata;
+
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt64,       Int64,   timestamp);
+
+
+	HANDLE_READ(a_ByteBuffer, ReadBEInt64,       Int64,  sig_salt);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, arg_count);
+	for (size_t i = 0; i < arg_count; i++)
+	{
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Argument);
+		//HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, Arg_sig_len);
+		ContiguousByteBuffer bfr;
+		if (!a_ByteBuffer.ReadSome(bfr, 256))
+		{
+			return;
+		}
+	}
+
+	//Acknowledgment ???
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, offset);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt32,      Int32, bitsetvalue);
+
+	ContiguousByteBuffer bfr;
+	a_ByteBuffer.ReadSome(bfr, a_ByteBuffer.GetReadableSpace());  // temp fix 
+
+	//HANDLE_READ(a_ByteBuffer, ReadBool, bool, previwed);
+
+	//HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, last_seen_sg_count);
+	//for (size_t i = 0; i < last_seen_sg_count; i++)
+	//{
+	//	HANDLE_READ(a_ByteBuffer, ReadUUID, cUUID, profileid);
+	//	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, sig_data_count);
+	//	ContiguousByteBuffer sig_data;
+	//	if (!a_ByteBuffer.ReadSome(sig_data, sig_data_count))
+	//	{
+	//		return;
+	//	}
+	//}
+	//HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasLastRecieved);
+	//if (HasLastRecieved)
+	//{
+	//	HANDLE_READ(a_ByteBuffer, ReadUUID, cUUID, profileid);
+	//	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, sig_data_count);
+	//	ContiguousByteBuffer sig_data;
+	//	if (!a_ByteBuffer.ReadSome(sig_data, sig_data_count))
+	//	{
+	//		return;
+	//	}
+	//}
+
+
+	m_Client->HandleChat("/" + Command);
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //  cProtocol_1_19_4:
 
