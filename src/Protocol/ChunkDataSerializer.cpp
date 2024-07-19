@@ -193,9 +193,13 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 				continue;
 			}
 			case cProtocol::Version::v1_19_3:
-			case cProtocol::Version::v1_19_4:
 			{
 				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v761);
+				continue;
+			}
+			case cProtocol::Version::v1_19_4:
+			{
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v762);
 				continue;
 			}
 		}
@@ -293,6 +297,11 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 		case CacheVersion::v761:
 		{
 			Serialize757<&Palette_1_19::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x20);
+			break;
+		}
+		case CacheVersion::v762:
+		{
+			Serialize757<&Palette_1_19::ToProtocolIdBlock1_19_4>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x24);
 			break;
 		}
 	}
@@ -1229,13 +1238,8 @@ inline void cChunkDataSerializer::WriteLightSectionGrouped(const ChunkLightData:
 
 inline void cChunkDataSerializer::CompressPacketInto(ChunkDataCache & a_Cache)
 {
-	int lenbfr1 = m_Packet.GetUsedSpace();
 	m_Compressor.ReadFrom(m_Packet);
 	m_Packet.CommitRead();
-
 	cProtocol_1_8_0::CompressPacket(m_Compressor, a_Cache.ToSend);
-
-	int lenbfr2 = a_Cache.ToSend.length();
-	LOG("Sending chunk data precom: %d - postcom: %d", lenbfr1, lenbfr2);
 	a_Cache.Engaged = true;
 }

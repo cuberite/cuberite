@@ -735,6 +735,47 @@ void cProtocol_1_19::HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer)
 
 
 
+void cProtocol_1_19::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
+
+	int BlockX, BlockY, BlockZ;
+	if (!a_ByteBuffer.ReadXZYPosition64(BlockX, BlockY, BlockZ))
+	{
+		return;
+	}
+
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Face);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Sequence);
+	m_Client->HandleLeftClick({BlockX, BlockY, BlockZ}, FaceIntToBlockFace(Face), Status);
+}
+
+
+
+
+void cProtocol_1_19::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
+
+	int BlockX, BlockY, BlockZ;
+	if (!a_ByteBuffer.ReadXZYPosition64(BlockX, BlockY, BlockZ))
+	{
+		return;
+	}
+
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Face);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorX);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorY);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorZ);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, InsideBlock);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Sequence);
+	m_Client->HandleRightClick({BlockX, BlockY, BlockZ}, FaceIntToBlockFace(Face), {FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16)}, Hand == 0);
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //  cProtocol_1_19_1:
 
@@ -1543,7 +1584,7 @@ void cProtocol_1_19_3::SendPlayerListAddPlayer(const cPlayer & a_Player)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktPlayerList);
-	Pkt.WriteBEInt8(0x1 | 0x4 | 0x10);
+	Pkt.WriteBEInt8(static_cast<Int8>(PlayerListAction::AddPlayer) | static_cast<Int8>(PlayerListAction::UpdateGameMode) | static_cast<Int8>(PlayerListAction::UpdateLatency)));
 
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
@@ -1579,7 +1620,7 @@ void cProtocol_1_19_3::SendPlayerListUpdatePing()
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktPlayerList);
-	Pkt.WriteBEInt8(0x10);
+	Pkt.WriteBEInt8(static_cast<UInt32>(PlayerListAction::UpdateLatency));
 
 	const auto World = m_Client->GetPlayer()->GetWorld();
 	Pkt.WriteVarInt32(static_cast<UInt32>(World->GetPlayerCount()));
@@ -1591,6 +1632,20 @@ void cProtocol_1_19_3::SendPlayerListUpdatePing()
 	});
 }
 
+
+
+
+
+void cProtocol_1_19_3::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktPlayerList);
+	Pkt.WriteBEInt8(static_cast<Int8>(PlayerListAction::UpdateGameMode));
+	Pkt.WriteVarInt32(1);
+	Pkt.WriteUUID(a_Player.GetUUID());
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetEffectiveGameMode()));
+}
 
 
 
@@ -1831,10 +1886,11 @@ void cProtocol_1_19_3::HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer)
 
 	//Acknowledgment ???
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, offset);
-	HANDLE_READ(a_ByteBuffer, ReadBEInt32,      Int32, bitsetvalue);
 
-	ContiguousByteBuffer bfr;
-	a_ByteBuffer.ReadSome(bfr, a_ByteBuffer.GetReadableSpace());  // temp fix 
+	//HANDLE_READ(a_ByteBuffer, ReadBEInt32,      Int32, bitsetvalue);
+
+	ContiguousByteBuffer bitsetvalue;
+	a_ByteBuffer.ReadSome(bitsetvalue, 3);  // temp fix 
 
 	//HANDLE_READ(a_ByteBuffer, ReadBool, bool, previwed);
 
@@ -1876,3 +1932,663 @@ cProtocol::Version cProtocol_1_19_4::GetProtocolVersion() const
 {
 	return Version::v1_19_4;
 }
+
+
+
+
+
+UInt32 cProtocol_1_19_4::GetPacketID(ePacketType a_PacketType) const
+{
+	switch (a_PacketType)
+	{
+		/// Status packets
+		case cProtocol::pktStatusResponse:       return 0x00;
+		case cProtocol::pktPingResponse:         return 0x01;
+
+		//  Login Packets
+		case cProtocol::pktDisconnectDuringLogin:return 0x00;
+		case cProtocol::pktEncryptionRequest:    return 0x01;
+		case cProtocol::pktLoginSuccess:         return 0x02;
+		case cProtocol::pktStartCompression:     return 0x03;
+
+		//  Game packets
+        case cProtocol::pktSpawnObject:          return 0x01;
+        case cProtocol::pktSpawnMob:             return 0x01;
+        case cProtocol::pktSpawnPainting:        return 0x01;
+        case cProtocol::pktSpawnExperienceOrb:   return 0x02;
+        case cProtocol::pktSpawnOtherPlayer:     return 0x03;
+        case cProtocol::pktEntityAnimation:      return 0x04;
+        case cProtocol::pktStatistics:           return 0x05;
+        case cProtocol::pktPlayerActionResponse: return 0x06;
+        //  case cProtocol::pktBlockbreakingprogress:   return 0x07;
+        case cProtocol::pktUpdateBlockEntity:    return 0x08;
+        case cProtocol::pktBlockAction:          return 0x09;
+        case cProtocol::pktBlockChange:          return 0x0A;
+        case cProtocol::pktBossBar:              return 0x0B;
+        case cProtocol::pktDifficulty:           return 0x0C;
+				//  ChunkBiomeDataS2CPacket 0x0D
+                //  clear title 0x0E
+                //  command suggestions here 0x0F
+                //  command tree 0x10
+        case cProtocol::pktWindowClose:          return 0x11;
+        case cProtocol::pktWindowItems:          return 0x12;  //  Inventory packet
+        case cProtocol::pktWindowProperty:       return 0x13;  //  ScreenHandlerPropertyUpdateS2CPacket
+        case cProtocol::pktInventorySlot:        return 0x14;  //  ScreenHandlerSlotUpdateS2CPacket
+                //  cooldown update 0x15
+                //  chat suggestions 0x16
+        case cProtocol::pktCustomPayload:        return 0x17;
+        case cProtocol::pktPluginMessage:        return 0x17;
+				// EntityDamageS2CPacket 0x18
+                // RemoveMessageS2CPacket 0x19
+        case cProtocol::pktDisconnectDuringGame: return 0x1A;
+        //case cProtocol::pktSoundEffect:          return 0x1A;
+                //  ProfilelessChatMessageS2CPacket 0x1B
+        case cProtocol::pktEntityStatus:         return 0x1C;
+        case cProtocol::pktExplosion:            return 0x1D;
+        case cProtocol::pktUnloadChunk:          return 0x1E;
+        case cProtocol::pktGameMode:             return 0x1F;
+        case cProtocol::pktWeather:              return 0x1F;
+        case cProtocol::pktHorseWindowOpen:      return 0x20;
+				// DamageTiltS2CPacket 0x21
+                // wolrld border initalize 0x22
+        case cProtocol::pktKeepAlive:            return 0x23;
+                // chunk data packet 0x24
+        case cProtocol::pktSoundParticleEffect:  return 0x25;  // world event
+        case cProtocol::pktParticleEffect:       return 0x26;
+        case cProtocol::pktLightUpdate:          return 0x27;
+        case cProtocol::pktJoinGame:             return 0x28;
+                //  map update 0x29
+                //  set trade offers 0x2A
+        case cProtocol::pktEntityRelMove:        return 0x2B;
+        case cProtocol::pktEntityRelMoveLook:    return 0x2C;
+        case cProtocol::pktEntityLook:           return 0x2D;
+                //  vehicle move 0x2E
+                //  open written book 0x2F
+        case cProtocol::pktWindowOpen:           return 0x30;
+        case cProtocol::pktUpdateSign:           return 0x31;
+                //  play ping 0x32
+                //  craft failed response 0x33
+        case cProtocol::pktPlayerAbilities:      return 0x34;
+                //  ChatMessageS2CPacket 0x35
+                //  combat exit 0x36
+                //  comabt enter 0x37
+                //  death msg 0x38
+                //  PlayerRemoveS2CPacket 0x39
+        case cProtocol::pktPlayerList:           return 0x3A;
+                //  look at 0x3B
+        case cProtocol::pktPlayerMoveLook:       return 0x3C;
+        case cProtocol::pktUnlockRecipe:         return 0x3D;
+        case cProtocol::pktDestroyEntity:        return 0x3E;
+        case cProtocol::pktRemoveEntityEffect:   return 0x3F;
+        case cProtocol::pktResourcePack:         return 0x40;
+        case cProtocol::pktRespawn:              return 0x41;
+        case cProtocol::pktEntityHeadLook:       return 0x42;
+        case cProtocol::pktBlockChanges:         return 0x43;
+                // select advancment tab 0x44
+                // ServerMetadataS2CPacket 0x45
+                // overlay msg 0x46
+                // wb -- worldborder wb center changed 0x47
+                // wb interpolate size 0x48
+                // wb size changed 0x49
+                // wb warning time changed 0x4A
+                // wb warning blocks changed 0x4B
+        case cProtocol::pktCameraSetTo:          return 0x4C;
+        case cProtocol::pktHeldItemChange:       return 0x4D;
+        case cProtocol::pktRenderDistanceCenter: return 0x4E;
+                //  chunk load distance 0x4F
+        case cProtocol::pktSpawnPosition:        return 0x50;
+                //  scoreboard display 0x51
+        case cProtocol::pktEntityMeta:           return 0x52;
+                // entity attach 0x53
+        case cProtocol::pktEntityVelocity:       return 0x54;
+        case cProtocol::pktEntityEquipment:      return 0x55;
+        case cProtocol::pktExperience:           return 0x56;
+        case cProtocol::pktUpdateHealth:         return 0x57;
+        case cProtocol::pktScoreboardObjective:  return 0x58;
+        case cProtocol::pktAttachEntity:         return 0x59;
+                // Teams 0x5A
+        case cProtocol::pktUpdateScore:          return 0x5B;
+                // simulation distance 0x5C
+                // subtitle 0x5D
+        case cProtocol::pktTimeUpdate:           return 0x5E;
+        case cProtocol::pktTitle:                return 0x5F;
+                //  title fade 0x60
+                //  play sound from entity 0x61
+                //  play sound 0x62
+                //  stop sound 0x63
+        case cProtocol::pktChatRaw:              return 0x64; //  Gamemessage
+                //  player list header 0x65
+                //  NbtQueryResponseS2CPacket 0x66
+        case cProtocol::pktCollectEntity:        return 0x67;
+        case cProtocol::pktTeleportEntity:       return 0x68;
+                //  advancment update 0x69
+        case cProtocol::pktEntityProperties:     return 0x6A;
+                // FeaturesS2CPacket 0x6B
+        case cProtocol::pktEntityEffect:         return 0x6C;
+                //  sync recepies 0x6D
+                //  sync tags 0x6E
+		default: UNREACHABLE("unhandeled packet");
+	}
+}
+
+
+
+
+bool cProtocol_1_19_4::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
+{
+	if (m_State != State::Game)
+	{
+		return Super::HandlePacket(a_ByteBuffer, a_PacketType);
+	}
+
+	// Game
+	switch (a_PacketType)
+	{
+		case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
+		case 0x01: /* query nbt packet */ return false;
+		case 0x02: /* update difficulty */ return false;
+		case 0x03: /* MessageAcknowledgmentC2SPacket */ return false;
+		case 0x04: HandlePacketCommandExecution(a_ByteBuffer); return true;
+		case 0x05: HandlePacketChatMessage(a_ByteBuffer); return true;
+		case 0x06: /* PlayerSessionC2SPacket */ return false;
+		case 0x07: HandlePacketClientStatus(a_ByteBuffer); return true;
+		case 0x08: HandlePacketClientSettings(a_ByteBuffer); return true;
+		case 0x09: HandlePacketTabComplete(a_ByteBuffer); return true;
+		case 0x0A: /* ButtonClickC2SPacket */ return false;
+		case 0x0B: HandlePacketWindowClick(a_ByteBuffer); return true;
+		case 0x0C: HandlePacketWindowClose(a_ByteBuffer); return true;
+		case 0x0D: HandlePacketPluginMessage(a_ByteBuffer); return true;
+		case 0x0E: HandlePacketBookUpdate(a_ByteBuffer); return true;  // not fully implemented
+		case 0x0F: /* QueryEntityNbtC2SPacket */ return false;
+		case 0x10: HandlePacketUseEntity(a_ByteBuffer); return true;
+		case 0x11: /* Jigsaw generating */ return false;
+		case 0x12: HandlePacketKeepAlive(a_ByteBuffer); return true;
+		case 0x13: /* Update difficulty lock */ return false;  // only used in single player
+		case 0x14: HandlePacketPlayerPos(a_ByteBuffer); return true;  // PositionAndOnGround
+		case 0x15: HandlePacketPlayerPosLook(a_ByteBuffer); return true; // full
+		case 0x16: HandlePacketPlayerLook(a_ByteBuffer); return true; // LookAndOnGround
+		case 0x17: HandlePacketPlayer(a_ByteBuffer); return true;
+		case 0x18: HandlePacketVehicleMove(a_ByteBuffer); return true;
+		case 0x19: HandlePacketBoatSteer(a_ByteBuffer); return true;
+		case 0x1A: /* pick from inventory */ return false;
+		case 0x1B: HandleCraftRecipe(a_ByteBuffer); return true;
+		case 0x1C: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
+		case 0x1D: HandlePacketBlockDig(a_ByteBuffer); return true;
+		case 0x1E: /* client command packet */ return false;
+		case 0x1F: HandlePacketSteerVehicle(a_ByteBuffer); return true;  // player input packet
+		case 0x20: /* PlayPongC2SPacket */ return false;
+		case 0x21: /* Recipe Category Options */ return false;
+		case 0x22: HandlePacketCraftingBookData(a_ByteBuffer); return true;
+		case 0x23: HandlePacketNameItem(a_ByteBuffer); return true;
+		case 0x24: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
+		case 0x25: HandlePacketAdvancementTab(a_ByteBuffer); return true;
+		case 0x26: /* select villager trade */ return false;
+		case 0x27: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
+		case 0x28: HandlePacketSlotSelect(a_ByteBuffer); return true;
+		case 0x29: /* update command block */ return false;
+		case 0x2A: /* update minecart command block*/ return false;
+		case 0x2B: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+		case 0x2C: /* Update jigsaw block */ return false;
+		case 0x2D: /* Update structure block */ return false;
+		case 0x2E: HandlePacketUpdateSign(a_ByteBuffer); return true;
+		case 0x2F: /* Update hand swing */ return false;
+		case 0x30: /* Spectator teleport */ return false;
+		case 0x31: HandlePacketBlockPlace(a_ByteBuffer); return true;
+		case 0x32: HandlePacketUseItem(a_ByteBuffer); return true;
+		default: break;
+	}
+}
+
+
+
+
+
+void cProtocol_1_19_4::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
+{
+	// Send the Join Game packet:
+	{
+		cServer * Server = cRoot::Get()->GetServer();
+		cPacketizer Pkt(*this, pktJoinGame);
+		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
+		Pkt.WriteBool(Server->IsHardcore());
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()));  // current game mode
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()));  // previous game mode
+		Pkt.WriteVarInt32(1);  // Number of dimensions
+		Pkt.WriteString("overworld");
+		//Pkt.WriteString("the_nether");
+		//Pkt.WriteString("the_end");
+		AString dmgsrc[] = {"in_fire","lightning_bolt", "on_fire","lava","hot_floor", "in_wall","cramming", "drown","starve",	"cactus", "fall","fly_into_wall","out_of_world","generic","magic","wither","dragon_breath","dry_out","sweet_berry_bush","freeze",		 "stalagmite"};
+		int dmgids[] =     {18       ,22             ,27        ,21     ,17        ,19        ,3           ,5     ,33          ,2       ,8      ,14             ,28            ,16       ,23     ,40      ,4              ,6        ,35                ,15      ,32};
+		{
+			cFastNBTWriter Writer;
+			Writer.BeginCompound("minecraft:damage_type");
+				Writer.AddString("type", "minecraft:damage_type");
+				Writer.BeginList("value", eTagType::TAG_Compound);
+				int id = 0;
+					for each (auto ds in dmgsrc)
+					{
+						Writer.BeginCompound("");
+							Writer.BeginCompound("element");
+								Writer.AddString("effects", "burning");
+								Writer.AddFloat("exhaustion", 0.1);
+								Writer.AddString("message_id", "inFire");
+								Writer.AddString("scaling", "when_caused_by_living_non_player");
+							Writer.EndCompound();
+						Writer.AddInt("id", dmgids[id]);
+						Writer.AddString("name", "minecraft:"+ds);
+						Writer.EndCompound();
+						id++;
+					}
+
+				Writer.EndList();
+			Writer.EndCompound();
+			Writer.BeginCompound("minecraft:chat_type");
+				Writer.AddString("type", "minecraft:chat_type");
+				Writer.BeginList("value", eTagType::TAG_Compound);
+					Writer.BeginCompound("");
+						Writer.BeginCompound("element");
+							Writer.BeginCompound("chat");
+									Writer.BeginList("parameters", eTagType::TAG_String);
+										Writer.AddString("", "sender");
+										Writer.AddString("", "content");
+									Writer.EndList();
+										Writer.BeginCompound("style");
+										Writer.EndCompound();
+									Writer.AddString("translation_key", "chat.type.text");
+							Writer.EndCompound();
+
+							Writer.BeginCompound("narration");
+									Writer.BeginList("parameters", eTagType::TAG_String);
+										Writer.AddString("", "sender");
+										Writer.AddString("", "content");
+									Writer.EndList();
+										Writer.BeginCompound("style");
+										Writer.EndCompound();
+									Writer.AddString("translation_key", "chat.type.narrate");
+							Writer.EndCompound();
+						Writer.EndCompound();
+					Writer.AddInt("id",0);
+					Writer.AddString("name", "minecraft:chat");
+					Writer.EndCompound();
+				Writer.EndList();
+			Writer.EndCompound();
+			Writer.BeginCompound("minecraft:dimension_type");
+				Writer.AddString("type", "minecraft:dimension_type");
+				Writer.BeginList("value", eTagType::TAG_Compound);
+					Writer.BeginCompound("");
+
+						Writer.BeginCompound("element");
+
+						Writer.AddByte("piglin_safe", 1);
+						Writer.AddByte("natural", 1);
+						Writer.AddFloat("ambient_light", 1.0);
+						Writer.AddInt("monster_spawn_block_light_limit", 0);
+						Writer.AddString("infiniburn", "#infiniburn_overworld");
+						Writer.AddByte("respawn_anchor_works", 1);
+						Writer.AddByte("has_skylight", 1);
+						Writer.AddByte("bed_works", 1);
+						Writer.AddString("effects", "minecraft:overworld");
+						Writer.AddByte("has_raids", 1);
+						Writer.AddInt("logical_height", 256);
+						Writer.AddDouble("coordinate_scale", 1.0);
+						Writer.AddByte("ultrawarm", 0);
+						Writer.AddByte("has_ceiling", 0);
+						Writer.AddInt("min_y", 0);
+						Writer.AddInt("height", 256);
+							Writer.BeginCompound("monster_spawn_light_level");
+
+							Writer.AddString("type", "minecraft:uniform");
+								Writer.BeginCompound("value");
+
+								Writer.AddInt("min_inclusive", 0);
+								Writer.AddInt("max_inclusive", 7);
+
+								Writer.EndCompound();
+
+							Writer.EndCompound();
+
+						Writer.EndCompound();
+
+						Writer.AddInt("id",0);
+						Writer.AddString("name", "minecraft:overworld");
+					Writer.EndCompound();
+				Writer.EndList();
+			Writer.EndCompound();
+			Writer.BeginCompound("minecraft:worldgen/biome");
+				Writer.AddString("type", "minecraft:worldgen/biome");
+				Writer.BeginList("value", eTagType::TAG_Compound);
+					Writer.BeginCompound("");
+					Writer.AddString("name", "minecraft:plains");
+					Writer.AddInt("id",0);
+						Writer.BeginCompound("element");
+							Writer.AddString("precipitation", "rain");
+								Writer.BeginCompound("effects");
+								Writer.AddInt("sky_color", 7907327);
+								Writer.AddInt("water_fog_color", 329011);
+								Writer.AddInt("fog_color" ,12638463);
+								Writer.AddInt("water_color", 4159204);
+									Writer.BeginCompound("mood_sound");
+									Writer.AddInt("tick_delay", 6000);
+									Writer.AddDouble("offset", 2.0);
+									Writer.AddString("sound", "minecraft:ambient.cave");
+									Writer.AddInt("block_search_extent", 8);
+									Writer.EndCompound();
+								Writer.EndCompound();
+							Writer.AddFloat("depth", -1.0f);
+							Writer.AddFloat("temperature", 0.5f);
+							Writer.AddFloat("scale", 0.1f);
+							Writer.AddFloat("downfall", 0.5f);
+							Writer.AddByte("has_precipitation",1);
+							Writer.AddString("category", "plains");
+						Writer.EndCompound();
+					Writer.AddString("name", "minecraft:plains");
+					Writer.AddInt("id",0);
+					Writer.EndCompound();
+				Writer.EndList();
+			Writer.EndCompound();
+			Writer.Finish();
+			Pkt.WriteBuf(Writer.GetResult());
+		}
+
+		////dimensional type
+		//{
+		//	cFastNBTWriter Writer;
+		//	Writer.AddByte("piglin_safe", 1);
+		//	Writer.AddByte("natural", 1);
+		//	Writer.AddFloat("ambient_light", 1.0);
+		//	Writer.AddString("infiniburn", "infiniburn_overworld");
+		//	Writer.AddByte("respawn_anchor_works", 1);
+		//	Writer.AddByte("has_skylight", 1);
+		//	Writer.AddByte("bed_works", 1);
+		//	Writer.AddString("effects", "minecraft:overworld");
+		//	Writer.AddByte("has_raids", 1);
+		//	Writer.AddInt("logical_height", 256);
+		//	Writer.AddDouble("coordinate_scale", 1.0);
+		//	Writer.AddByte("ultrawarm", 1);
+		//	Writer.AddByte("has_ceiling", 1);
+		//	Writer.AddInt("min_y", 0);
+		//	Writer.AddInt("height", 256);
+		//	Writer.Finish();
+		//	Pkt.WriteBuf(Writer.GetResult());
+		//}
+
+
+		Pkt.WriteString("minecraft:overworld"); // dimension type
+		Pkt.WriteString("minecraft:overworld"); // dimension id
+
+		Pkt.WriteBEInt64(0);  // Seed
+		Pkt.WriteVarInt32(static_cast<UInt32>(Server->GetMaxPlayers()));
+		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));  
+		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));  // simulation distance
+		Pkt.WriteBool(false);  // Reduced debug info
+		Pkt.WriteBool(true);   // Show deaths screen
+		Pkt.WriteBool(false);  // Debug world
+		Pkt.WriteBool(false);  // Flat World
+		Pkt.WriteBool(false);  // optional last death loc
+	}
+
+	// Send the spawn position:
+	{
+		cPacketizer Pkt(*this, pktSpawnPosition);
+		Pkt.WriteXZYPosition64(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ());
+		Pkt.WriteBEFloat(0);  // Angle
+	}
+	// Send the server difficulty:
+	{
+		cPacketizer Pkt(*this, pktDifficulty);
+		Pkt.WriteBEInt8(1);
+		Pkt.WriteBool(false);  // Difficulty locked?
+	}
+}
+
+
+
+
+
+void cProtocol_1_19_4::SendPlayerMoveLook(const Vector3d a_Pos, const float a_Yaw, const float a_Pitch, const bool a_IsRelative)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktPlayerMoveLook);
+	Pkt.WriteBEDouble(a_Pos.x);
+	Pkt.WriteBEDouble(a_Pos.y);
+	Pkt.WriteBEDouble(a_Pos.z);
+	Pkt.WriteBEFloat(a_Yaw);
+	Pkt.WriteBEFloat(a_Pitch);
+
+	if (a_IsRelative)
+	{
+		// Set all bits to 1 - makes everything relative
+		Pkt.WriteBEUInt8(static_cast<UInt8>(-1));
+	}
+	else
+	{
+		// Set all bits to 0 - make everything absolute
+		Pkt.WriteBEUInt8(0);
+	}
+
+	Pkt.WriteVarInt32(++m_OutstandingTeleportId);
+
+	// This teleport ID hasn't been confirmed yet
+	m_IsTeleportIdConfirmed = false;
+}
+
+
+
+
+
+
+void cProtocol_1_19_4::WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const
+{
+	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_Metadata));	      // Index
+	a_Pkt.WriteVarInt32(static_cast<UInt32>(a_FieldType));        // Type
+}
+
+
+
+
+
+void cProtocol_1_19_4::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+{
+	// Common metadata:
+	Int8 Flags = 0;
+	if (a_Entity.IsOnFire())
+	{
+		Flags |= 0x01;
+	}
+	if (a_Entity.IsCrouched())
+	{
+		Flags |= 0x02;
+	}
+	if (a_Entity.IsSprinting())
+	{
+		Flags |= 0x08;
+	}
+	if (a_Entity.IsRclking())
+	{
+		Flags |= 0x10;
+	}
+	if (a_Entity.IsInvisible())
+	{
+		Flags |= 0x20;
+	}
+	/*
+	if (a_Entity.IsGlowing())
+	{
+		Flags |= 0x40;
+	}
+	*/
+	if (a_Entity.IsElytraFlying())
+	{
+		Flags |= 0x80;
+	}
+
+	WriteEntityMetadata(a_Pkt, EntityMetadata::EntityFlags, EntityMetadataType::Byte);
+	a_Pkt.WriteBEInt8(Flags);
+
+	switch (a_Entity.GetEntityType())
+	{
+		case cEntity::etPlayer:
+		{
+			auto & Player = static_cast<const cPlayer &>(a_Entity);
+
+			// TODO Set player custom name to their name.
+			// Then it's possible to move the custom name of mobs to the entities
+			// and to remove the "special" player custom name.
+			WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);
+			//a_Pkt.WriteBool(true);
+			a_Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", Player.GetName()));	 // needs to be json formatted
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerDisplayedSkinParts, EntityMetadataType::Byte);
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerMainHand, EntityMetadataType::Byte);
+			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
+			break;
+		}
+		case cEntity::etPickup:
+		{
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemItem, EntityMetadataType::Item);
+			WriteItem(a_Pkt, static_cast<const cPickup &>(a_Entity).GetItem());
+			break;
+		}
+		case cEntity::etMinecart:
+		{
+			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingPower, EntityMetadataType::VarInt);
+
+			// The following expression makes Minecarts shake more with less health or higher damage taken
+			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
+			auto maxHealth = a_Entity.GetMaxHealth();
+			auto curHealth = a_Entity.GetHealth();
+			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingDirection, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(1);  // (doesn't seem to effect anything)
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingMultiplier, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));  // or damage taken
+
+			if (Minecart.GetPayload() == cMinecart::mpNone)
+			{
+				auto & RideableMinecart = static_cast<const cRideableMinecart &>(Minecart);
+				const cItem & MinecartContent = RideableMinecart.GetContent();
+				if (!MinecartContent.IsEmpty())
+				{
+					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockIDMeta, EntityMetadataType::VarInt);
+					int Content = MinecartContent.m_ItemType;
+					Content |= MinecartContent.m_ItemDamage << 8;
+					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
+
+					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockY, EntityMetadataType::VarInt);
+					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
+
+					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShowBlock, EntityMetadataType::Boolean);
+					a_Pkt.WriteBool(true);
+				}
+			}
+			else if (Minecart.GetPayload() == cMinecart::mpFurnace)
+			{
+				WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartFurnacePowered, EntityMetadataType::Boolean);
+				a_Pkt.WriteBool(static_cast<const cMinecartWithFurnace &>(Minecart).IsFueled());
+			}
+			break;
+		}  // case etMinecart
+
+		case cEntity::etProjectile:
+		{
+			auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
+			switch (Projectile.GetProjectileKind())
+			{
+				case cProjectileEntity::pkArrow:
+				{
+					WriteEntityMetadata(a_Pkt, EntityMetadata::ArrowFlags, EntityMetadataType::Byte);
+					a_Pkt.WriteBEInt8(static_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
+
+					// TODO: Piercing level
+					break;
+				}
+				case cProjectileEntity::pkFirework:
+				{
+					// TODO
+					break;
+				}
+				case cProjectileEntity::pkSplashPotion:
+				{
+					// TODO
+				}
+				default:
+				{
+					break;
+				}
+			}
+			break;
+		}  // case etProjectile
+
+		case cEntity::etMonster:
+		{
+			WriteMobMetadata(a_Pkt, static_cast<const cMonster &>(a_Entity));
+			break;
+		}
+
+		case cEntity::etBoat:
+		{
+			auto & Boat = static_cast<const cBoat &>(a_Entity);
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatLastHitTime, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetLastDamage()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatForwardDirection, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetForwardDirection()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatDamageTaken, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(Boat.GetDamageTaken());
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatType, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatRightPaddleTurning, EntityMetadataType::Boolean);
+			a_Pkt.WriteBool(Boat.IsRightPaddleUsed());
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatLeftPaddleTurning, EntityMetadataType::Boolean);
+			a_Pkt.WriteBool(static_cast<bool>(Boat.IsLeftPaddleUsed()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatSplashTimer, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(0);
+
+			break;
+		}  // case etBoat
+
+		case cEntity::etItemFrame:
+		{
+			// TODO
+			break;
+		}  // case etItemFrame
+
+		case cEntity::etEnderCrystal:
+		{
+			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
+			if (EnderCrystal.DisplaysBeam())
+			{
+				WriteEntityMetadata(a_Pkt, EntityMetadata::EnderCrystalBeamTarget, EntityMetadataType::OptPosition);
+				a_Pkt.WriteBool(true);  // Dont do a second check if it should display the beam
+				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
+			}
+			WriteEntityMetadata(a_Pkt, EntityMetadata::EnderCrystalShowBottom, EntityMetadataType::Boolean);
+			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
+			break;
+		}  // case etEnderCrystal
+
+		default:
+		{
+			break;
+		}
+	}
+}
+
+
+
+
+
