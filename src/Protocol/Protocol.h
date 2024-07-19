@@ -398,6 +398,8 @@ public:
 		//  v1_20_4 = 765,
 		v1_20_5 = 766,
 		//  v1_20_6 = 766,
+		v1_21 = 767,
+		v1_21_1 = 768,
 	};
 
 	enum State
@@ -405,6 +407,16 @@ public:
 		Status = 1,
 		Login = 2,
 		Game = 3,
+	};
+
+	enum class PlayerListAction
+	{
+		AddPlayer = 1,
+		InitalizeChat = 2,
+		UpdateGameMode = 4,
+		UpdateListed = 8,
+		UpdateLatency = 16,
+		UpdateDisplayName = 32,
 	};
 
 	/** Called by cClientHandle to process data, when the client sends some.
