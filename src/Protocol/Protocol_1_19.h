@@ -28,6 +28,8 @@ protected:
 	virtual void    HandlePacketLoginStart(cByteBuffer & a_ByteBuffer) override;
 	virtual void    HandlePacketChatMessage(cByteBuffer & a_ByteBuffer) override;
 	virtual void    HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer) override;
+	virtual void    HandlePacketBlockDig(cByteBuffer & a_ByteBuffer) override;
+	virtual void    HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer) override;
 
 	virtual Version GetProtocolVersion() const override;
 };
@@ -79,6 +81,7 @@ protected:
 	virtual void    SendChatRaw(const AString & a_MessageRaw, eChatType a_Type) override;
 	virtual void    SendPlayerListAddPlayer(const cPlayer & a_Player) override;
 	virtual void    SendPlayerListUpdatePing() override;
+	virtual void    SendPlayerListUpdateGameMode(const cPlayer & a_Player) override;
 
 	virtual void    HandlePacketLoginStart(cByteBuffer & a_ByteBuffer) override;
 	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
@@ -101,6 +104,15 @@ public:
 	using Super::Super;
 
 protected:
+	virtual UInt32	GetPacketID(ePacketType a_PacketType) const override;
+	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
+	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const override;
+
+
+	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
+	virtual void    SendPlayerMoveLook(const Vector3d a_Pos, const float a_Yaw, const float a_Pitch, const bool a_IsRelative) override;
+
+	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 
 	virtual Version GetProtocolVersion() const override;
 };
