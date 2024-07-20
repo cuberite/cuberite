@@ -1379,7 +1379,7 @@ UInt32 cProtocol_1_19_3::GetPacketID(ePacketType a_PacketType) const
 			//  combat exit 0x32
 			//  comabt enter 0x33
 			//  death msg 0x34
-			//  PlayerRemoveS2CPacket 0x35
+		case cProtocol::pktPlayerLstRemove:      return 0x35;
 		case cProtocol::pktPlayerList:           return 0x36;
 			//  look at 0x37
 		case cProtocol::pktPlayerMoveLook:       return 0x38;
@@ -1440,6 +1440,7 @@ UInt32 cProtocol_1_19_3::GetPacketID(ePacketType a_PacketType) const
 
 
 
+
 void cProtocol_1_19_3::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 {
 	AString Username;
@@ -1476,6 +1477,7 @@ void cProtocol_1_19_3::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 
 	m_Client->HandleLogin();
 }
+
 
 
 
@@ -1548,6 +1550,7 @@ bool cProtocol_1_19_3::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 
 
 
+
 void cProtocol_1_19_3::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1615,6 +1618,7 @@ void cProtocol_1_19_3::SendPlayerListAddPlayer(const cPlayer & a_Player)
 
 
 
+
 void cProtocol_1_19_3::SendPlayerListUpdatePing()
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1645,6 +1649,19 @@ void cProtocol_1_19_3::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetEffectiveGameMode()));
+}
+
+
+
+
+
+void cProtocol_1_19_3::SendPlayerListRemovePlayer(const cPlayer & a_Player)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktPlayerLstRemove);
+	Pkt.WriteVarInt32(1);
+	Pkt.WriteUUID(a_Player.GetUUID());
 }
 
 
@@ -2014,7 +2031,7 @@ UInt32 cProtocol_1_19_4::GetPacketID(ePacketType a_PacketType) const
                 //  combat exit 0x36
                 //  comabt enter 0x37
                 //  death msg 0x38
-                //  PlayerRemoveS2CPacket 0x39
+		case cProtocol::pktPlayerLstRemove:      return 0x39;
         case cProtocol::pktPlayerList:           return 0x3A;
                 //  look at 0x3B
         case cProtocol::pktPlayerMoveLook:       return 0x3C;

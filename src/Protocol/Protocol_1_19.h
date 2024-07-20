@@ -82,6 +82,7 @@ protected:
 	virtual void    SendPlayerListAddPlayer(const cPlayer & a_Player) override;
 	virtual void    SendPlayerListUpdatePing() override;
 	virtual void    SendPlayerListUpdateGameMode(const cPlayer & a_Player) override;
+	virtual void    SendPlayerListRemovePlayer(const cPlayer & a_Player) override;
 
 	virtual void    HandlePacketLoginStart(cByteBuffer & a_ByteBuffer) override;
 	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;

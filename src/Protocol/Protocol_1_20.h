@@ -15,6 +15,7 @@ public:
 
 protected:
 	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
+	virtual void    SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 
 	virtual Version GetProtocolVersion() const override;
 };

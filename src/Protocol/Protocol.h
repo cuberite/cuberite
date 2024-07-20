@@ -103,6 +103,7 @@ public:
 		pktPlayerAbilities,
 		pktPlayerList,
 		pktPlayerListHeaderFooter,
+		pktPlayerLstRemove,
 		pktPlayerMoveLook,
 		pktPluginMessage,
 		pktRemoveEntityEffect,
