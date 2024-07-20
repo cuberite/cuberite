@@ -13,7 +13,7 @@
 #include "Palettes/Palette_1_16.h"
 #include "Palettes/Palette_1_18.h"
 #include "Palettes/Palette_1_19.h"
-
+#include "Palettes/Palette_1_20.h"
 
 
 namespace
@@ -309,9 +309,9 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 			Serialize757<&Palette_1_19::ToProtocolIdBlock1_19_4>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x24);
 			break;
 		}
-		case CacheVersion::v763:  //TODO: update block palette
+		case CacheVersion::v763:
 		{
-			Serialize763<&Palette_1_19::ToProtocolIdBlock1_19_4>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x24);
+			Serialize763<&Palette_1_20::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x24);
 			break;
 		}
 	}
