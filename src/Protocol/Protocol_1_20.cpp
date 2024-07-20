@@ -217,6 +217,27 @@ void cProtocol_1_20::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 
 
 
+void cProtocol_1_20::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBlockChanges);
+	Pkt.WriteBEInt32(a_ChunkX);
+	Pkt.WriteBEInt32(a_ChunkZ);
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
+
+	for (const auto & Change : a_Changes)
+	{
+		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
+		UInt64 packed = Coords | (Change.m_BlockIdNew << 12);
+		Pkt.WriteVarInt64(packed);
+	}
+}
+
+
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //  cProtocol_1_20_2:
