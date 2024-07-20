@@ -202,6 +202,11 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v762);
 				continue;
 			}
+			case cProtocol::Version::v1_20:
+			{
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v763);
+				continue;
+			}
 		}
 		UNREACHABLE("Unknown chunk data serialization version");
 	}
@@ -223,7 +228,7 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 	if (Cache.Engaged)
 	{
 		// Success! We've done it already, just re-use:
-		//a_Client->SendChunkData(a_ChunkX, a_ChunkZ, Cache.ToSend);
+		a_Client->SendChunkData(a_ChunkX, a_ChunkZ, Cache.ToSend);
 		return;
 	}
 
@@ -302,6 +307,11 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 		case CacheVersion::v762:
 		{
 			Serialize757<&Palette_1_19::ToProtocolIdBlock1_19_4>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x24);
+			break;
+		}
+		case CacheVersion::v763:  //TODO: update block palette
+		{
+			Serialize763<&Palette_1_19::ToProtocolIdBlock1_19_4>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x24);
 			break;
 		}
 	}
@@ -1072,6 +1082,87 @@ inline void cChunkDataSerializer::Serialize757(const int a_ChunkX, const int a_C
 	m_Packet.WriteVarInt32(0);
 	
 }
+
+
+
+
+template <auto Palette>
+inline void cChunkDataSerializer::Serialize763(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockDataNew & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, UInt32 a_packet_id)
+{
+	// This function returns the fully compressed packet (including packet
+	// size), not the raw packet! Below variables tagged static because of
+	// https://developercommunity.visualstudio.com/content/problem/367326
+
+	static constexpr UInt8 BitsPerEntry = 15;
+	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
+	static int Longs = CeilC<int, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);
+	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
+
+	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
+
+
+	
+	// Create the packet:
+	m_Packet.WriteVarInt32(a_packet_id);
+	m_Packet.WriteBEInt32(a_ChunkX);
+	m_Packet.WriteBEInt32(a_ChunkZ);
+
+
+	{
+		cFastNBTWriter Writer;
+		// TODO: client works fine without?
+		// std::array<Int64, 36> Longz = {};
+		// Writer.AddLongArray("MOTION_BLOCKING", Longz.data(), Longz.size());
+		Writer.Finish();
+		m_Packet.Write(Writer.GetResult().data(), Writer.GetResult().size());
+	}
+	
+
+
+	const size_t ChunkSectionSize =
+		(2 +  // Block count, BEInt16, 2 bytes
+		1 +  // Bits per entry, BEUInt8, 1 byte
+		m_Packet.GetVarIntSize(static_cast<UInt32>(ChunkSectionDataArraySize)) +   // Field containing "size of whole section", VarInt32, variable size
+			ChunkSectionDataArraySize * 8   // Actual section data, lots of bytes (multiplier 1 long = 8 bytes)
+		) + 3;	 // for biomes
+
+	const size_t ChunkSize = ChunkSectionSize * cChunkDef::NumSections;
+
+	// Write the chunk size in bytes:
+	m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSize));
+	// Write each chunk section...
+	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
+	{
+		const auto Blocks = a_BlockData2.GetSection(Y);
+		//const auto BlockLights = a_LightData.GetBlockLightSection(Y);
+		//const auto SkyLights = a_LightData.GetSkyLightSection(Y);
+		m_Packet.WriteBEInt16(4096);
+		m_Packet.WriteBEUInt8(BitsPerEntry);
+		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
+		WriteBlockSectionSeamless2<Palette>(Blocks, BitsPerEntry, true);
+
+		//Biomes
+		m_Packet.WriteBEUInt8(0); 
+		m_Packet.WriteVarInt32(0);
+		m_Packet.WriteVarInt32(0);
+	}
+
+	
+
+	// Identify 1.9.4's tile entity list as empty
+	m_Packet.WriteVarInt32(0);
+
+	// Light Data
+	m_Packet.WriteVarInt32(0);
+	m_Packet.WriteVarInt32(0);
+	m_Packet.WriteVarInt32(0);
+	m_Packet.WriteVarInt32(0);
+
+	m_Packet.WriteVarInt32(0);
+	m_Packet.WriteVarInt32(0);
+	
+}
+
 
 
 

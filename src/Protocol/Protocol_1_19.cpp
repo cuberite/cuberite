@@ -1584,7 +1584,7 @@ void cProtocol_1_19_3::SendPlayerListAddPlayer(const cPlayer & a_Player)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktPlayerList);
-	Pkt.WriteBEInt8(static_cast<Int8>(PlayerListAction::AddPlayer) | static_cast<Int8>(PlayerListAction::UpdateGameMode) | static_cast<Int8>(PlayerListAction::UpdateLatency)));
+	Pkt.WriteBEInt8(static_cast<Int8>(PlayerListAction::AddPlayer) | static_cast<Int8>(PlayerListAction::UpdateGameMode) | static_cast<Int8>(PlayerListAction::UpdateLatency));
 
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
@@ -1646,6 +1646,7 @@ void cProtocol_1_19_3::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 	Pkt.WriteUUID(a_Player.GetUUID());
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetEffectiveGameMode()));
 }
+
 
 
 
@@ -2381,7 +2382,12 @@ void cProtocol_1_19_4::SendPlayerMoveLook(const Vector3d a_Pos, const float a_Ya
 void cProtocol_1_19_4::WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const
 {
 	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_Metadata));	      // Index
-	a_Pkt.WriteVarInt32(static_cast<UInt32>(a_FieldType));        // Type
+	auto v = static_cast<UInt32>(a_FieldType);
+	if (v >= 2) // temp fix 
+	{
+		v++;
+	}
+	a_Pkt.WriteVarInt32(v);        // Type
 }
 
 
@@ -2436,7 +2442,7 @@ void cProtocol_1_19_4::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 			// Then it's possible to move the custom name of mobs to the entities
 			// and to remove the "special" player custom name.
 			WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);
-			//a_Pkt.WriteBool(true);
+			a_Pkt.WriteBool(true);
 			a_Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", Player.GetName()));	 // needs to be json formatted
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
