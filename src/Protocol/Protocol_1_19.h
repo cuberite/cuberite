@@ -87,6 +87,7 @@ protected:
 	virtual void    HandlePacketLoginStart(cByteBuffer & a_ByteBuffer) override;
 	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void    HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer) override;
+	virtual void    HandlePacketChatMessage(cByteBuffer & a_ByteBuffer) override;
 
 	virtual Version GetProtocolVersion() const override;
 };
