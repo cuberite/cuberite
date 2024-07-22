@@ -69,6 +69,9 @@ public:
 		pktCameraSetTo,
 		pktChatRaw,
 		pktCollectEntity,
+		pktConfigurationReady,
+		pktConfigurationCustomPayload,
+		pktConfigurationDynamicRegistries,
 		pktDestroyEntity,
 		pktDifficulty,
 		pktDisconnectDuringLogin,
@@ -410,6 +413,7 @@ public:
 		Status = 1,
 		Login = 2,
 		Game = 3,
+		Configuration = 4,
 	};
 
 	enum class PlayerListAction
@@ -530,11 +534,15 @@ public:
 	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;
 
+	virtual State GetCurrentState(void) = 0;
+
 protected:
 
 	friend class cPacketizer;
 
 	cClientHandle * m_Client;
+
+	bool m_CompressionEnabled = false;
 
 	/** Provides synchronization for sending the entire packet at once.
 	Each SendXYZ() function must acquire this CS in order to send the whole packet at once.

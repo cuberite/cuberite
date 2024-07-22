@@ -1246,7 +1246,7 @@ void cProtocol_1_8_0::SendPlayerSpawn(const cPlayer & a_Player)
 
 void cProtocol_1_8_0::SendPluginMessage(const AString & a_Channel, const ContiguousByteBufferView a_Message)
 {
-	ASSERT(m_State == 3);  // In game mode?
+	ASSERT(m_State == 3 || m_State == 4);  // In game mode?
 
 	cPacketizer Pkt(*this, pktPluginMessage);
 	Pkt.WriteString(a_Channel);
@@ -2347,6 +2347,26 @@ void cProtocol_1_8_0::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 
 
 
+
+void cProtocol_1_8_0::HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer)
+{
+	return;
+}
+
+
+
+
+
+
+void cProtocol_1_8_0::HandlePacketReady(cByteBuffer & a_ByteBuffer)
+{
+	return;
+}
+
+
+
+
+
 void cProtocol_1_8_0::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
 	m_Client->HandleAnimation(true);  // Packet exists solely for arm-swing notification (main hand).
@@ -3094,7 +3114,7 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 
 	const auto PacketData = m_Compressor.GetView();
 
-	if (m_State == 3)
+	if (m_State == 3 || m_CompressionEnabled)
 	{
 		ContiguousByteBuffer CompressedPacket;
 
@@ -3888,7 +3908,7 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousBy
 		}
 
 		// Check packet for compression:
-		if (m_State == 3)
+		if (m_State == 3 || m_CompressionEnabled)
 		{
 			UInt32 NumBytesRead = static_cast<UInt32>(a_Buffer.GetReadableSpace());
 
