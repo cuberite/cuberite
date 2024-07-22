@@ -140,7 +140,9 @@ public:
 	a_Compressed will be set to the compressed packet includes packet length and data length. */
 	static void CompressPacket(CircularBufferCompressor & a_Packet, ContiguousByteBuffer & a_Compressed);
 
-protected:
+	virtual State GetCurrentState(void) { return m_State; };
+
+  protected:
 
 	/** State of the protocol. */
 	State m_State;
@@ -184,6 +186,10 @@ protected:
 	// Packet handlers while in the Login state (m_State == 2):
 	virtual void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer);
+
+	// Packet handlers while in the Configuration state (m_State == 4):  Only used in 1.20.2+
+	virtual void HandlePacketReady(cByteBuffer & a_ByteBuffer);
 
 	// Packet handlers while in the Game state (m_State == 3):
 	virtual void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
