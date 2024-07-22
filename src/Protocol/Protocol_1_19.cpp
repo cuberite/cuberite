@@ -1894,9 +1894,32 @@ void cProtocol_1_19_3::HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer)
 	for (size_t i = 0; i < arg_count; i++)
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Argument);
-		//HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, Arg_sig_len);
 		ContiguousByteBuffer bfr;
 		if (!a_ByteBuffer.ReadSome(bfr, 256))
+		{
+			return;
+		}
+	}
+
+
+	m_Client->HandleChat("/" + Command);
+}
+
+
+
+
+void cProtocol_1_19_3::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
+{
+	ContiguousByteBuffer sigdata;
+
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Message);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt64,       Int64,   timestamp);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt64,       Int64,  sig_salt);
+
+	HANDLE_READ(a_ByteBuffer, ReadBool,       bool,  HasMessageSigData);
+	if (HasMessageSigData)
+	{
+		if (!a_ByteBuffer.ReadSome(sigdata, 256))
 		{
 			return;
 		}
@@ -1905,38 +1928,10 @@ void cProtocol_1_19_3::HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer)
 	//Acknowledgment ???
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, offset);
 
-	//HANDLE_READ(a_ByteBuffer, ReadBEInt32,      Int32, bitsetvalue);
-
 	ContiguousByteBuffer bitsetvalue;
 	a_ByteBuffer.ReadSome(bitsetvalue, 3);  // temp fix 
 
-	//HANDLE_READ(a_ByteBuffer, ReadBool, bool, previwed);
-
-	//HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, last_seen_sg_count);
-	//for (size_t i = 0; i < last_seen_sg_count; i++)
-	//{
-	//	HANDLE_READ(a_ByteBuffer, ReadUUID, cUUID, profileid);
-	//	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, sig_data_count);
-	//	ContiguousByteBuffer sig_data;
-	//	if (!a_ByteBuffer.ReadSome(sig_data, sig_data_count))
-	//	{
-	//		return;
-	//	}
-	//}
-	//HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasLastRecieved);
-	//if (HasLastRecieved)
-	//{
-	//	HANDLE_READ(a_ByteBuffer, ReadUUID, cUUID, profileid);
-	//	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, sig_data_count);
-	//	ContiguousByteBuffer sig_data;
-	//	if (!a_ByteBuffer.ReadSome(sig_data, sig_data_count))
-	//	{
-	//		return;
-	//	}
-	//}
-
-
-	m_Client->HandleChat("/" + Command);
+	m_Client->HandleChat(Message);
 }
 
 
