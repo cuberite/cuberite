@@ -387,7 +387,7 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		case static_cast<UInt32>(cProtocol::Version::v1_19_3): return std::make_unique<cProtocol_1_19_3>(&a_Client, ServerAddress, NextState);
 		case static_cast<UInt32>(cProtocol::Version::v1_19_4): return std::make_unique<cProtocol_1_19_4>(&a_Client, ServerAddress, NextState);
 		case static_cast<UInt32>(cProtocol::Version::v1_20):   return std::make_unique<cProtocol_1_20>  (&a_Client, ServerAddress, NextState);
-		//case static_cast<UInt32>(cProtocol::Version::v1_20_2): return std::make_unique<cProtocol_1_20_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_20_2): return std::make_unique<cProtocol_1_20_2>(&a_Client, ServerAddress, NextState);
 		//case static_cast<UInt32>(cProtocol::Version::v1_20_3): return std::make_unique<cProtocol_1_20_3>(&a_Client, ServerAddress, NextState);
 		//case static_cast<UInt32>(cProtocol::Version::v1_20_5): return std::make_unique<cProtocol_1_20_5>(&a_Client, ServerAddress, NextState);
 		default:

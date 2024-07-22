@@ -421,9 +421,13 @@ public:  // tolua_export
 
 	bool IsPlayerChunkSent();
 
+	friend class cForgeHandshake;   // Needs access to FinishAuthenticate()
+
+	/** Finish logging the user in after authenticating. */
+	void FinishAuthenticate();
+
 private:
 
-	friend class cForgeHandshake;   // Needs access to FinishAuthenticate()
 
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;
@@ -573,9 +577,6 @@ private:
 	/** The fraction between 0 and 1 (or above), of how far through mining the currently mined block is.
 	0 for just started, 1 and above for broken. Used for anti-cheat. */
 	float m_BreakProgress;
-
-	/** Finish logging the user in after authenticating. */
-	void FinishAuthenticate();
 
 	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
 	bool CheckBlockInteractionsRate(void);
