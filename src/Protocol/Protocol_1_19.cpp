@@ -1901,6 +1901,11 @@ void cProtocol_1_19_3::HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer)
 		}
 	}
 
+	//Acknowledgment ???
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, offset);
+
+	ContiguousByteBuffer bitsetvalue;
+	a_ByteBuffer.ReadSome(bitsetvalue, 3);  // temp fix
 
 	m_Client->HandleChat("/" + Command);
 }
