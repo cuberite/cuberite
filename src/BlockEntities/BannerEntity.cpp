@@ -13,18 +13,10 @@
 
 
 
-cBannerEntity::cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) :
-	cBannerEntity(a_BlockType, a_BlockMeta, a_Pos, a_World, 1)
-{
-}
-
-
-
-
-
-cBannerEntity::cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, unsigned char a_BaseColor):
+cBannerEntity::cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, unsigned char a_BaseColor, AString a_CustomName):
 	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
-	m_BaseColor(a_BaseColor)
+	m_BaseColor(a_BaseColor),
+	m_CustomName(std::move(a_CustomName))
 {
 	ASSERT((a_BlockType == E_BLOCK_WALL_BANNER) || (a_BlockType == E_BLOCK_STANDING_BANNER));
 }
@@ -33,27 +25,11 @@ cBannerEntity::cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vect
 
 
 
-unsigned char cBannerEntity::GetBaseColor() const
-{
-	return m_BaseColor;
-}
-
-
-
-
-
-void cBannerEntity::SetBaseColor(const unsigned char a_Color)
-{
-	m_BaseColor = a_Color;
-}
-
-
-
-
-
 cItems cBannerEntity::ConvertToPickups() const
 {
-	return cItem(E_ITEM_BANNER, 1, static_cast<NIBBLETYPE>(GetBaseColor()));
+	cItem Item(E_ITEM_BANNER, 1, static_cast<NIBBLETYPE>(GetBaseColor()));
+	Item.m_CustomName = m_CustomName;
+	return Item;
 }
 
 
@@ -65,6 +41,7 @@ void cBannerEntity::CopyFrom(const cBlockEntity & a_Src)
 	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cBannerEntity &>(a_Src);
 	m_BaseColor = src.m_BaseColor;
+	m_CustomName = src.m_CustomName;
 }
 
 
