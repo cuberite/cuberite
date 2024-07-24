@@ -398,17 +398,15 @@ void cClientHandle::Authenticate(AString && a_Name, const cUUID & a_UUID, Json::
 	// Send login success (if the protocol supports it):
 	m_Protocol->SendLoginSuccess();
 
-	if (m_Protocol->GetCurrentState() != cProtocol::State::Login) // if is still in login state that means the version is 1.20.2+
+	if (m_ForgeHandshake.IsForgeClient)
 	{
-		if (m_ForgeHandshake.IsForgeClient)
-		{
-			m_ForgeHandshake.BeginForgeHandshake(*this);
-		}
-		else
-		{
-			FinishAuthenticate();
-		}
+		m_ForgeHandshake.BeginForgeHandshake(*this);
 	}
+	else
+	{
+		FinishAuthenticate();
+	}
+	
 }
 
 
