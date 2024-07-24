@@ -705,7 +705,7 @@ void cProtocol_1_13::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, cons
 				nextnull = Data.size();
 			}
 
-			ContiguousByteBuffer bfr2 = Data.substr(lastnull, nextnull - lastnull - 1);
+			ContiguousByteBuffer bfr2 = Data.substr(lastnull, nextnull - lastnull);
 			AString temv = { reinterpret_cast<const char *>(bfr2.data()), bfr2.size() };
 			channels.push_back(temv);
 			lastnull = nextnull + 1;
