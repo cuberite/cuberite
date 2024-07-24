@@ -688,37 +688,28 @@ void cProtocol_1_13::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, cons
 		m_Client->SetClientBrand(Brand);
 		m_Client->SendPluginMessage("brand", "\x08""Cuberite");  // Send back our brand, including the length.
 	}
-	else if (a_Channel == "register") // fabric mod loader only
+	else if (a_Channel == "register")
 	{
-		// to prevent fabric clients from crashing the server
-
 		ContiguousByteBuffer Data;
+
 		a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace());
-		AStringList channels; //  TODO: create a system, to listen on all channels parsed here
-		size_t nextnull;
-		size_t lastnull = 0;
-		while (true)
+
+		AString tempstring = std::string{a_Channel};
+		if (m_Client->HasPluginChannel(tempstring))
 		{
-			nextnull = Data.find(static_cast<std::byte>(0), lastnull);
-			if (nextnull == std::string::npos)
-			{
-				nextnull = Data.size();
-			}
-
-			ContiguousByteBuffer bfr2 = Data.substr(lastnull, nextnull - lastnull);
-			AString temv = { reinterpret_cast<const char *>(bfr2.data()), bfr2.size() };
-			channels.push_back(temv);
-			lastnull = nextnull + 1;
-
-			if (nextnull == Data.size())
-			{
-				break;
-			}
+			m_Client->SendPluginMessage("unregister", tempstring); 
+			return;  // Can't register again if already taken - kinda defeats the point of plugin messaging!
 		}
-	}
-	else if (a_Channel == "unregister") // fabric mod loader only
-	{
 
+		m_Client->RegisterPluginChannels(m_Client->BreakApartPluginChannels(Data));
+	}
+	else if (a_Channel == "unregister")
+	{
+		ContiguousByteBuffer Data;
+
+		// Read the plugin message and relay to clienthandle:
+		a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace());
+		m_Client->UnregisterPluginChannels(m_Client->BreakApartPluginChannels(Data));
 	}
 }
 

@@ -426,6 +426,15 @@ public:  // tolua_export
 	/** Finish logging the user in after authenticating. */
 	void FinishAuthenticate();
 
+	/** Converts the protocol-formatted channel list (NUL-separated) into a proper string vector. */
+	AStringVector BreakApartPluginChannels(ContiguousByteBufferView a_PluginChannels);
+
+	/** Adds all of the channels to the list of current plugin channels. Handles duplicates gracefully. */
+	void RegisterPluginChannels(const AStringVector & a_ChannelList);
+
+	/** Removes all of the channels from the list of current plugin channels. Ignores channels that are not found. */
+	void UnregisterPluginChannels(const AStringVector & a_ChannelList);
+
 private:
 
 
@@ -595,15 +604,6 @@ private:
 
 	/** The clients will receive a finished dig animation */
 	void FinishDigAnimation();
-
-	/** Converts the protocol-formatted channel list (NUL-separated) into a proper string vector. */
-	AStringVector BreakApartPluginChannels(ContiguousByteBufferView a_PluginChannels);
-
-	/** Adds all of the channels to the list of current plugin channels. Handles duplicates gracefully. */
-	void RegisterPluginChannels(const AStringVector & a_ChannelList);
-
-	/** Removes all of the channels from the list of current plugin channels. Ignores channels that are not found. */
-	void UnregisterPluginChannels(const AStringVector & a_ChannelList);
 
 	/** Called when the network socket has been closed. */
 	void SocketClosed(void);
