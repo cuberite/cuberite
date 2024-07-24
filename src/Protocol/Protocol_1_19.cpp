@@ -2188,7 +2188,7 @@ void cProtocol_1_19_4::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 						Writer.BeginCompound("");
 							Writer.BeginCompound("element");
 								Writer.AddString("effects", "burning");
-								Writer.AddFloat("exhaustion", 0.1);
+								Writer.AddFloat("exhaustion", 0.1F);
 								Writer.AddString("message_id", "inFire");
 								Writer.AddString("scaling", "when_caused_by_living_non_player");
 							Writer.EndCompound();

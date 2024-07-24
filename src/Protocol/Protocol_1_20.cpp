@@ -43,7 +43,7 @@ void cProtocol_1_20::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 						Writer.BeginCompound("");
 							Writer.BeginCompound("element");
 								Writer.AddString("effects", "burning");
-								Writer.AddFloat("exhaustion", 0.1);
+								Writer.AddFloat("exhaustion", 0.1F);
 								Writer.AddString("message_id", "inFire");
 								Writer.AddString("scaling", "when_caused_by_living_non_player");
 							Writer.EndCompound();

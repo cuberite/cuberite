@@ -648,6 +648,8 @@ void cProtocol_1_13::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 
 	const auto & [Namespace, Channel] = NamespaceSerializer::SplitNamespacedID(NamespacedChannel);
 
+	LOGD("Payload C2S: %s", NamespacedChannel);
+
 	// If the plugin channel is recognized vanilla, handle it directly:
 	if (Namespace == NamespaceSerializer::Namespace::Minecraft)
 	{
@@ -686,11 +688,37 @@ void cProtocol_1_13::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, cons
 		m_Client->SetClientBrand(Brand);
 		m_Client->SendPluginMessage("brand", "\x08""Cuberite");  // Send back our brand, including the length.
 	}
-	else if (a_Channel == "register")
+	else if (a_Channel == "register") // fabric mod loader only
 	{
 		// to prevent fabric clients from crashing the server
+
 		ContiguousByteBuffer Data;
 		a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace());
+		AStringList channels; //  TODO: create a system, to listen on all channels parsed here
+		size_t nextnull;
+		size_t lastnull = 0;
+		while (true)
+		{
+			nextnull = Data.find(static_cast<std::byte>(0), lastnull);
+			if (nextnull == std::string::npos)
+			{
+				nextnull = Data.size();
+			}
+
+			ContiguousByteBuffer bfr2 = Data.substr(lastnull, nextnull - lastnull - 1);
+			AString temv = { reinterpret_cast<const char *>(bfr2.data()), bfr2.size() };
+			channels.push_back(temv);
+			lastnull = nextnull + 1;
+
+			if (nextnull == Data.size())
+			{
+				break;
+			}
+		}
+	}
+	else if (a_Channel == "unregister") // fabric mod loader only
+	{
+
 	}
 }
 
