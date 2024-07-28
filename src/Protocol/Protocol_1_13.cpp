@@ -648,8 +648,6 @@ void cProtocol_1_13::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 
 	const auto & [Namespace, Channel] = NamespaceSerializer::SplitNamespacedID(NamespacedChannel);
 
-	LOGD("Payload C2S: %s", NamespacedChannel);
-
 	// If the plugin channel is recognized vanilla, handle it directly:
 	if (Namespace == NamespaceSerializer::Namespace::Minecraft)
 	{
