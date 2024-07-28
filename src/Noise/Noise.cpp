@@ -743,10 +743,10 @@ void cCubicNoise::Generate2D(
 		{
 			int ToX = FromX + SameX[x];
 			Cell.Generate(FromX, ToX, FromY, ToY);
-			Cell.Move(FloorX[ToX], CurFloorY);
+			Cell.Move(FloorX[(ToX < a_SizeX) ? ToX : 0], CurFloorY);
 			FromX = ToX;
 		}
-		Cell.Move(FloorX[0], FloorY[ToY]);
+		Cell.Move(FloorX[0], FloorY[(ToY < a_SizeY) ? ToY : 0]);
 		FromY = ToY;
 	}
 }
@@ -809,13 +809,13 @@ void cCubicNoise::Generate3D(
 			{
 				int ToX = FromX + SameX[x];
 				Cell.Generate(FromX, ToX, FromY, ToY, FromZ, ToZ);
-				Cell.Move(FloorX[ToX], CurFloorY, CurFloorZ);
+				Cell.Move(FloorX[(ToX < a_SizeX) ? ToX : 0], CurFloorY, CurFloorZ);
 				FromX = ToX;
 			}
-			Cell.Move(FloorX[0], FloorY[ToY], CurFloorZ);
+			Cell.Move(FloorX[0], FloorY[(ToY < a_SizeY) ? ToY : 0], CurFloorZ);
 			FromY = ToY;
 		}  // for y
-		Cell.Move(FloorX[0], FloorY[0], FloorZ[ToZ]);
+		Cell.Move(FloorX[0], FloorY[0], FloorZ[(ToZ < a_SizeZ) ? ToZ : 0]);
 		FromZ = ToZ;
 	}  // for z
 }
