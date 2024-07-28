@@ -343,6 +343,12 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		}
 	}();
 
+	// Stating with 1.16.4 Pre-Release 1 non-release versions have the 30th bit set
+	if ((ProtocolVersion & 0x4000000) > 0)
+	{
+		throw TriedToJoinWithUnsupportedProtocolException("Snapshots, experimental snapshots, pre-releases and release candidates aren't supported by cuberite. Please join with a release version");
+	}
+
 	// TODO: this should be a protocol property, not ClientHandle:
 	a_Client.SetProtocolVersion(ProtocolVersion);
 
