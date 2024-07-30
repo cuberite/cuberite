@@ -348,8 +348,8 @@ public:
 		ASSERT(a_StartY < a_EndY);
 
 		// Calculate the integral and fractional parts of each coord:
-		int FloorX[MAX_SIZE] = {};
-		int FloorY[MAX_SIZE] = {};
+		int FloorX[MAX_SIZE];
+		int FloorY[MAX_SIZE];
 		NOISE_DATATYPE FracX[MAX_SIZE];
 		NOISE_DATATYPE FracY[MAX_SIZE];
 		int SameX[MAX_SIZE];
@@ -404,9 +404,9 @@ public:
 		ASSERT(a_StartZ < a_EndZ);
 
 		// Calculate the integral and fractional parts of each coord:
-		int FloorX[MAX_SIZE] = {};
-		int FloorY[MAX_SIZE] = {};
-		int FloorZ[MAX_SIZE] = {};
+		int FloorX[MAX_SIZE];
+		int FloorY[MAX_SIZE];
+		int FloorZ[MAX_SIZE];
 		NOISE_DATATYPE FracX[MAX_SIZE];
 		NOISE_DATATYPE FracY[MAX_SIZE];
 		NOISE_DATATYPE FracZ[MAX_SIZE];
