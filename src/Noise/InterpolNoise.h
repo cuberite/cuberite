@@ -441,19 +441,19 @@ public:
 				{
 					int ToX = FromX + SameX[x];
 					Cell.Generate(FromX, ToX, FromY, ToY, FromZ, ToZ);
-					if (++x < NumSameX)
+					if (++x < NumSameX)  // Call Move() every time except for the last loop iteration
 					{
 						Cell.Move(FloorX[ToX], CurFloorY, CurFloorZ);
 						FromX = ToX;
 					}
 				}
-				if (++y < NumSameY)
+				if (++y < NumSameY)  // Call Move() every time except for the last loop iteration
 				{
 					Cell.Move(FloorX[0], FloorY[ToY], CurFloorZ);
 					FromY = ToY;
 				}
 			}  // for y
-			if (++z < NumSameZ)
+			if (++z < NumSameZ)  // Call Move() every time except for the last loop iteration
 			{
 				Cell.Move(FloorX[0], FloorY[0], FloorZ[ToZ]);
 				FromZ = ToZ;
