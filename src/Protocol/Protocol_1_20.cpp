@@ -655,6 +655,235 @@ cProtocol::Version cProtocol_1_20_3::GetProtocolVersion() const
 
 
 
+UInt32 cProtocol_1_20_3::GetPacketID(ePacketType a_PacketType) const
+{
+	switch (a_PacketType)
+	{
+		/// Status packets
+		case cProtocol::pktStatusResponse:       return 0x00;
+		case cProtocol::pktPingResponse:         return 0x01;
+
+		//  Login Packets
+		case cProtocol::pktDisconnectDuringLogin:return 0x00;
+		case cProtocol::pktEncryptionRequest:    return 0x01;
+		case cProtocol::pktLoginSuccess:         return 0x02;
+		case cProtocol::pktStartCompression:     return 0x03;
+
+		// Configuration
+		case cProtocol::pktConfigurationCustomPayload:return 0x00;
+			//  Disconnect 0x01
+		case cProtocol::pktConfigurationReady:   return 0x02;
+			//  KeepAlive 0x03
+			//  CommonPing 0x04
+		case cProtocol::pktConfigurationDynamicRegistries: return 0x05;
+			//	Resource pack remove 0x06
+			//  ResourcePackSend  0x07
+			//  Features 0x08
+			//  SynchronizeTags 0x09
+
+		//  Game packets
+	    case cProtocol::pktSpawnObject:          return 0x01;
+        case cProtocol::pktSpawnMob:             return 0x01;
+        case cProtocol::pktSpawnPainting:        return 0x01;
+        case cProtocol::pktSpawnOtherPlayer:     return 0x01;
+        case cProtocol::pktSpawnExperienceOrb:   return 0x02;
+        case cProtocol::pktEntityAnimation:      return 0x03;
+        case cProtocol::pktStatistics:           return 0x04;
+        case cProtocol::pktPlayerActionResponse: return 0x05;
+        //  case cProtocol::pktBlockbreakingprogress:   return 0x06;
+        case cProtocol::pktUpdateBlockEntity:    return 0x07;
+        case cProtocol::pktBlockAction:          return 0x08;
+        case cProtocol::pktBlockChange:          return 0x09;
+        case cProtocol::pktBossBar:              return 0x0A;
+        case cProtocol::pktDifficulty:           return 0x0B;
+                        //  ChunkSentS2CPacket 0x0C
+                        //  StartChunkSendS2CPacket 0xD
+                        //  ChunkBiomeDataS2CPacket 0x0E
+                        //  clear title 0x0F
+                        //  command suggestions here 0x10
+                        //  command tree 0x11
+        case cProtocol::pktWindowClose:          return 0x12;
+        case cProtocol::pktWindowItems:          return 0x13;  //  Inventory packet
+        case cProtocol::pktWindowProperty:       return 0x14;  //  ScreenHandlerPropertyUpdateS2CPacket
+        case cProtocol::pktInventorySlot:        return 0x15;  //  ScreenHandlerSlotUpdateS2CPacket
+                        //  cooldown update 0x16
+                        //  chat suggestions 0x17
+        case cProtocol::pktCustomPayload:        return 0x18;
+        case cProtocol::pktPluginMessage:        return 0x18;
+                        // EntityDamageS2CPacket 0x19
+                        // RemoveMessageS2CPacket 0x1A
+                        //case cProtocol::pktSoundEffect:          return 0x1B;
+        case cProtocol::pktDisconnectDuringGame: return 0x1B;
+                        //  ProfilelessChatMessageS2CPacket 0x1C
+        case cProtocol::pktEntityStatus:         return 0x1D;
+        case cProtocol::pktExplosion:            return 0x1E;
+        case cProtocol::pktUnloadChunk:          return 0x1F;
+        case cProtocol::pktGameMode:             return 0x20;
+        case cProtocol::pktWeather:              return 0x20;
+        case cProtocol::pktHorseWindowOpen:      return 0x21;
+                        // DamageTiltS2CPacket 0x22
+                        // wolrld border initalize 0x23
+        case cProtocol::pktKeepAlive:            return 0x24;
+                        // chunk data packet 0x25
+        case cProtocol::pktSoundParticleEffect:  return 0x26;  // world event
+        case cProtocol::pktParticleEffect:       return 0x27;
+        case cProtocol::pktLightUpdate:          return 0x28;
+        case cProtocol::pktJoinGame:             return 0x29;
+                        //  map update 0x2A
+                        //  set trade offers 0x2B
+        case cProtocol::pktEntityRelMove:        return 0x2C;
+        case cProtocol::pktEntityRelMoveLook:    return 0x2D;
+        case cProtocol::pktEntityLook:           return 0x2E;
+                        //  vehicle move 0x2F
+                        //  open written book 0x30
+        case cProtocol::pktWindowOpen:           return 0x31;
+        case cProtocol::pktUpdateSign:           return 0x32;
+                        //  CommonPingS2CPacket 0x33
+                        //  PingResultS2CPacket 0x34
+                        //  craft failed response 0x35
+        case cProtocol::pktPlayerAbilities:      return 0x36;
+                        //  ChatMessageS2CPacket 0x37
+                        //  combat exit 0x38
+                        //  comabt enter 0x39
+                        //  death msg 0x3A
+        case cProtocol::pktPlayerLstRemove:      return 0x3B;
+        case cProtocol::pktPlayerList:           return 0x3C;
+                        //  look at 0x3D
+        case cProtocol::pktPlayerMoveLook:       return 0x3E;
+        case cProtocol::pktUnlockRecipe:         return 0x3F;
+        case cProtocol::pktDestroyEntity:        return 0x40;
+        case cProtocol::pktRemoveEntityEffect:   return 0x41;
+			// ScoreboardScoreResetS2CPacket 0x42
+			// ResourcePackRemoveS2CPacket 0x43
+        case cProtocol::pktResourcePack:         return 0x44;
+        case cProtocol::pktRespawn:              return 0x45;
+        case cProtocol::pktEntityHeadLook:       return 0x46;
+        case cProtocol::pktBlockChanges:         return 0x47;
+                        // select advancment tab 0x48
+                        // ServerMetadataS2CPacket 0x49
+                        // overlay msg 0x4A
+                        // wb -- worldborder wb center changed 0x4B
+                        // wb interpolate size 0x4C
+                        // wb size changed 0x4D
+                        // wb warning time changed 0x4E
+                        // wb warning blocks changed 0x4F
+        case cProtocol::pktCameraSetTo:          return 0x50;
+        case cProtocol::pktHeldItemChange:       return 0x51;
+        case cProtocol::pktRenderDistanceCenter: return 0x52;
+                        //  chunk load distance 0x53
+        case cProtocol::pktSpawnPosition:        return 0x54;
+                        //  scoreboard display 0x55
+        case cProtocol::pktEntityMeta:           return 0x56;
+                        // entity attach 0x57
+        case cProtocol::pktEntityVelocity:       return 0x58;
+        case cProtocol::pktEntityEquipment:      return 0x59;
+        case cProtocol::pktExperience:           return 0x5A;
+        case cProtocol::pktUpdateHealth:         return 0x5B;
+        case cProtocol::pktScoreboardObjective:  return 0x5C;
+        case cProtocol::pktAttachEntity:         return 0x5D;
+                        // Teams 0x5E
+        case cProtocol::pktUpdateScore:          return 0x5F;
+                        // simulation distance 0x60
+                        // subtitle 0x61
+        case cProtocol::pktTimeUpdate:           return 0x62;
+        case cProtocol::pktTitle:                return 0x63;
+                        //  title fade 0x64
+                        //  play sound from entity 0x65
+                        //  play sound 0x66
+                        //  EnterReconfigurationS2CPacket 0x67
+                        //  stop sound 0x68
+        case cProtocol::pktChatRaw:              return 0x69; //  Gamemessage
+                        //  player list header 0x6A
+                        //  NbtQueryResponseS2CPacket 0x6B
+        case cProtocol::pktCollectEntity:        return 0x6C;
+			// UpdateTickRateS2CPacket 0x6D
+			// TickStepS2CPacket 0x6E
+        case cProtocol::pktTeleportEntity:       return 0x6F;
+                        //  advancment update 0x70
+        case cProtocol::pktEntityProperties:     return 0x71;
+        case cProtocol::pktEntityEffect:         return 0x72;
+                        //  sync recepies 0x73
+                        //  sync tags 0x74
+		default: UNREACHABLE("unhandeled packet");
+	}
+}
+
+
+
+
+
+bool cProtocol_1_20_3::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
+{
+	if (m_State != State::Game)
+	{
+		return Super::HandlePacket(a_ByteBuffer, a_PacketType);
+	}
+
+	
+	switch (a_PacketType)
+	{
+        case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
+        case 0x01: /* query nbt packet */ return false;
+        case 0x02: /* update difficulty */ return false;
+        case 0x03: /* MessageAcknowledgmentC2SPacket */ return false;
+        case 0x04: HandlePacketCommandExecution(a_ByteBuffer); return true;
+        case 0x05: HandlePacketChatMessage(a_ByteBuffer); return true;
+        case 0x06: /* PlayerSessionC2SPacket */ return false;
+        case 0x07: /* AcknowledgeChunksC2SPacket */ return false;
+        case 0x08: HandlePacketClientStatus(a_ByteBuffer); return true;
+        case 0x09: HandlePacketClientSettings(a_ByteBuffer); return true;
+        case 0x0A: HandlePacketTabComplete(a_ByteBuffer); return true;
+        case 0x0B: /* AcknowledgeReconfigurationC2SPacket*/ return false;
+        case 0x0C: /* ButtonClickC2SPacket */ return false;
+        case 0x0D: HandlePacketWindowClick(a_ByteBuffer); return true;
+        case 0x0E: HandlePacketWindowClose(a_ByteBuffer); return true;
+		case 0x0F: /* SlotChangedStateC2SPacket */ return false;
+        case 0x10: HandlePacketPluginMessage(a_ByteBuffer); return true;
+        case 0x11: HandlePacketBookUpdate(a_ByteBuffer); return true;  // not fully implemented
+        case 0x12: /* QueryEntityNbtC2SPacket */ return false;
+        case 0x13: HandlePacketUseEntity(a_ByteBuffer); return true;
+        case 0x14: /* Jigsaw generating */ return false;
+        case 0x15: HandlePacketKeepAlive(a_ByteBuffer); return true;
+        case 0x16: /* Update difficulty lock */ return false;  // only used in single player
+        case 0x17: HandlePacketPlayerPos(a_ByteBuffer); return true;  // PositionAndOnGround
+        case 0x18: HandlePacketPlayerPosLook(a_ByteBuffer); return true; // full
+        case 0x19: HandlePacketPlayerLook(a_ByteBuffer); return true; // LookAndOnGround
+        case 0x1A: HandlePacketPlayer(a_ByteBuffer); return true;
+        case 0x1B: HandlePacketVehicleMove(a_ByteBuffer); return true;
+        case 0x1C: HandlePacketBoatSteer(a_ByteBuffer); return true;
+        case 0x1D: /* pick from inventory */ return false;
+        case 0x1E: /*QueryPingC2SPacket*/ return false;
+        case 0x1F: HandleCraftRecipe(a_ByteBuffer); return true;
+        case 0x20: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
+        case 0x21: HandlePacketBlockDig(a_ByteBuffer); return true;
+        case 0x22: /* client command packet */ return false;
+        case 0x23: HandlePacketSteerVehicle(a_ByteBuffer); return true;  // player input packet
+        case 0x24: /* PlayPongC2SPacket */ return false;
+        case 0x25: /* Recipe Category Options */ return false;
+        case 0x26: HandlePacketCraftingBookData(a_ByteBuffer); return true;
+        case 0x27: HandlePacketNameItem(a_ByteBuffer); return true;
+        case 0x28: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
+        case 0x29: HandlePacketAdvancementTab(a_ByteBuffer); return true;
+        case 0x2A: /* select villager trade */ return false;
+        case 0x2B: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
+        case 0x2C: HandlePacketSlotSelect(a_ByteBuffer); return true;
+        case 0x2D: /* update command block */ return false;
+        case 0x2E: /* update minecart command block*/ return false;
+        case 0x2F: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+        case 0x30: /* Update jigsaw block */ return false;
+        case 0x31: /* Update structure block */ return false;
+        case 0x32: HandlePacketUpdateSign(a_ByteBuffer); return true;
+        case 0x33: /* Update hand swing */ return false;
+        case 0x34: /* Spectator teleport */ return false;
+        case 0x35: HandlePacketBlockPlace(a_ByteBuffer); return true;
+        case 0x36: HandlePacketUseItem(a_ByteBuffer); return true;
+		default: break;
+	}	
+}
+
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //  cProtocol_1_20_5:

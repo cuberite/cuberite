@@ -60,6 +60,9 @@ public:
 	using Super::Super;
 
 protected:
+	virtual UInt32	GetPacketID(ePacketType a_PacketType) const override;
+
+	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 
 	virtual Version GetProtocolVersion() const override;
 };
