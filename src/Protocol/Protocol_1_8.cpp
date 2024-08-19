@@ -2221,7 +2221,23 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	Json::Value Players;
 	Players["online"] = NumPlayers;
 	Players["max"] = MaxPlayers;
-	// TODO: Add "sample"
+	std::vector<std::pair<cUUID, AString>> playeruuids;
+	cRoot::Get()->ForEachPlayer([this, &playeruuids](cPlayer & a_Player)
+	{
+		playeruuids.push_back({a_Player.GetUUID(), a_Player.GetName()});
+		return true;
+	});
+	Json::Value sample;
+	int i = 0;
+	for each (std::pair<cUUID, AString> PlayerId in playeruuids)
+	{
+		Json::Value entry;
+		entry["name"] = PlayerId.second;
+		entry["id"] = PlayerId.first.ToLongString();
+		sample[i] = entry;
+		i++;
+	}
+	Players["sample"] = sample;
 
 	// Description:
 	Json::Value Description;
@@ -2238,6 +2254,7 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = "data:image/png;base64," + Favicon;
 	}
 
+	ResponseValue["enforcesSecureChat"] = "false";
 	// Serialize the response into a packet:
 	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(JsonUtils::WriteFastString(ResponseValue));
