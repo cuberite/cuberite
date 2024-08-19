@@ -19,6 +19,7 @@ target_sources(
 	Protocol_1_18.cpp
 	Protocol_1_19.cpp
 	Protocol_1_20.cpp
+	Protocol_1_21.cpp
 	ProtocolRecognizer.cpp
 	RecipeMapper.cpp
 
@@ -41,8 +42,9 @@ target_sources(
 	Protocol_1_18.h
 	Protocol_1_19.h
 	Protocol_1_20.h
+	Protocol_1_21.h
 	ProtocolRecognizer.h
 	RecipeMapper.h
- )
+)
 
 add_subdirectory(Palettes)

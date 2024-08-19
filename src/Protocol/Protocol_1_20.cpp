@@ -1180,4 +1180,48 @@ UInt32 cProtocol_1_20_5::GetPacketID(ePacketType a_PacketType) const
 
 
 
+void cProtocol_1_20_5::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
+{
+	// Send the Join Game packet:
+	{
+		cServer * Server = cRoot::Get()->GetServer();
+		cPacketizer Pkt(*this, pktJoinGame);
+		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
+		Pkt.WriteBool(Server->IsHardcore());
+		Pkt.WriteVarInt32(1);  // Number of dimensions
+		Pkt.WriteString("overworld");
+		Pkt.WriteVarInt32(static_cast<UInt32>(Server->GetMaxPlayers()));
+		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));  
+		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));  // simulation distance
+		Pkt.WriteBool(false);  // Reduced debug info
+		Pkt.WriteBool(true);   // Show deaths screen
+		Pkt.WriteBool(false);  // Do Limited Crafting
 
+		Pkt.WriteVarInt32(0); // Dimension id
+		Pkt.WriteString("minecraft:overworld"); // dimension name
+		Pkt.WriteBEInt64(0);  // Seed
+
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()));  // current game mode
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()));  // previous game mode
+
+		Pkt.WriteBool(false);  // Debug world
+		Pkt.WriteBool(false);  // Flat World
+
+		Pkt.WriteBool(false);  // optional last death loc
+		Pkt.WriteVarInt32(0);  // Portal Cooldown
+		Pkt.WriteBool(false);  // Enforce secure chat
+	}
+
+	// Send the spawn position:
+	{
+		cPacketizer Pkt(*this, pktSpawnPosition);
+		Pkt.WriteXZYPosition64(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ());
+		Pkt.WriteBEFloat(0);  // Angle
+	}
+	// Send the server difficulty:
+	{
+		cPacketizer Pkt(*this, pktDifficulty);
+		Pkt.WriteBEInt8(1);
+		Pkt.WriteBool(false);  // Difficulty locked?
+	}
+}
