@@ -84,5 +84,7 @@ protected:
 
 	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 
+	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
+
 	virtual Version GetProtocolVersion() const override;
 };

@@ -493,7 +493,7 @@ void cProtocol_1_19::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuf
 		{
 			return;
 		}
-		UNREACHABLE("not implemented");
+		UNREACHABLE("Signatures arent implemented");
 	}
 
 	if ((EncKeyLength > MAX_ENC_LEN) || (EncNonceLength > MAX_ENC_LEN))
@@ -1937,6 +1937,74 @@ void cProtocol_1_19_3::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 	a_ByteBuffer.ReadSome(bitsetvalue, 3);  // temp fix 
 
 	m_Client->HandleChat(Message);
+}
+
+
+
+
+void cProtocol_1_19_3::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer)
+{
+	UInt32 EncKeyLength, EncNonceLength;
+	ContiguousByteBuffer EncKey;
+	ContiguousByteBuffer EncNonce;
+
+	ContiguousByteBuffer SignatureData;
+	if (!a_ByteBuffer.ReadVarInt(EncKeyLength))
+	{
+		return;
+	}
+
+	if (!a_ByteBuffer.ReadSome(EncKey, EncKeyLength))
+	{
+		return;
+	}
+
+	if (!a_ByteBuffer.ReadVarInt(EncNonceLength))
+	{
+		return;
+	}
+		
+	if (!a_ByteBuffer.ReadSome(EncNonce, EncNonceLength))
+	{
+		return;
+	}
+
+	if ((EncKeyLength > MAX_ENC_LEN) || (EncNonceLength > MAX_ENC_LEN))
+	{
+		LOGD("Too long encryption");
+		m_Client->Kick("Hacked client");
+		return;
+	}
+
+	// Decrypt EncNonce using privkey
+	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
+	UInt32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
+	int res = rsaDecryptor.Decrypt(EncNonce, reinterpret_cast<Byte *>(DecryptedNonce), sizeof(DecryptedNonce));
+	if (res != 4)
+	{
+		LOGD("Bad nonce length: got %d, exp %d", res, 4);
+		m_Client->Kick("Hacked client");
+		return;
+	}
+	if (ntohl(DecryptedNonce[0]) != static_cast<unsigned>(reinterpret_cast<uintptr_t>(this)))
+	{
+		LOGD("Bad nonce value");
+		m_Client->Kick("Hacked client");
+		return;
+	}
+
+	// Decrypt the symmetric encryption key using privkey:
+	Byte DecryptedKey[MAX_ENC_LEN];
+	res = rsaDecryptor.Decrypt(EncKey, DecryptedKey, sizeof(DecryptedKey));
+	if (res != 16)
+	{
+		LOGD("Bad key length");
+		m_Client->Kick("Hacked client");
+		return;
+	}
+
+	StartEncryption(DecryptedKey);
+	m_Client->HandleLogin();
 }
 
 
