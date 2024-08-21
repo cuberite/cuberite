@@ -1997,7 +1997,7 @@ void cClientHandle::HandleUnmount(void)
 
 
 
-void cClientHandle::HandleTabCompletion(const AString & a_Text)
+void cClientHandle::HandleTabCompletion(const AString & a_Text, UInt32 CompletionId)
 {
 	AStringVector Results;
 	// Get player name completions.
@@ -2019,7 +2019,7 @@ void cClientHandle::HandleTabCompletion(const AString & a_Text)
 
 	// Sort and send results.
 	std::sort(Results.begin(), Results.end());
-	SendTabCompletionResults(Results);
+	SendTabCompletionResults(Results, CompletionId);
 }
 
 
@@ -3157,9 +3157,9 @@ void cClientHandle::SendStatistics(const StatisticsManager & a_Manager)
 
 
 
-void cClientHandle::SendTabCompletionResults(const AStringVector & a_Results)
+void cClientHandle::SendTabCompletionResults(const AStringVector & a_Results, UInt32 CompletionId)
 {
-	m_Protocol->SendTabCompletionResults(a_Results);
+	m_Protocol->SendTabCompletionResults(a_Results, CompletionId);
 }
 
 

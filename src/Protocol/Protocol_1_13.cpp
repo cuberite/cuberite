@@ -114,6 +114,18 @@ void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AStri
 
 
 
+void cProtocol_1_13::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32,     CompletionId);
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString,    PartialCommand);
+
+	m_Client->HandleTabCompletion(PartialCommand, CompletionId);
+}
+
+
+
+
+
 void cProtocol_1_13::SendStatistics(const StatisticsManager & a_Manager)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -156,9 +168,21 @@ void cProtocol_1_13::SendStatistics(const StatisticsManager & a_Manager)
 
 
 
-void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results)
+void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results, UInt32 CompletionId)
 {
-	// TODO
+	{
+		//  TODO: Implement Start and Length
+		cPacketizer Pkt(*this, pktTabCompletionResults);
+		Pkt.WriteVarInt32(CompletionId);
+		Pkt.WriteVarInt32(0);  //  Start
+		Pkt.WriteVarInt32(0);  //  Length
+		Pkt.WriteVarInt32(a_Results.size());
+		for each (AString Match in a_Results)
+		{
+			Pkt.WriteString(Match);
+			Pkt.WriteBool(false); // Has Tooltip
+		}
+	}
 }
 
 
