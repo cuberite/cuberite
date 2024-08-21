@@ -472,7 +472,7 @@ size_t cParsedNBT::GetMinTagSize(eTagType a_TagType)
 		case TAG_List:      return 5;  // 1 byte list type + 4 bytes count
 		case TAG_Compound:  return 1;  // Single TAG_End byte
 		case TAG_IntArray:  return 4;  // 4 bytes for the count
-		case TAG_LongArray: return 4;
+		case TAG_LongArray: return 4;  // 4 bytes for the count
 	}
 	UNREACHABLE("Unsupported nbt tag type");
 }
@@ -491,6 +491,22 @@ cFastNBTWriter::cFastNBTWriter(const AString & a_RootTagName) :
 	m_Result.reserve(100 KiB);
 	m_Result.push_back(std::byte(TAG_Compound));
 	WriteString(a_RootTagName);
+}
+
+
+
+
+
+cFastNBTWriter::cFastNBTWriter(bool Network1_21) :
+	m_CurrentStack(0)
+{
+	m_Stack[0].m_Type = TAG_Compound;
+	m_Result.reserve(100 KiB);
+	m_Result.push_back(std::byte(TAG_Compound));
+	if (!Network1_21)
+	{
+		WriteString("");
+	}
 }
 
 
