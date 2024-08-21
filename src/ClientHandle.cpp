@@ -406,7 +406,6 @@ void cClientHandle::Authenticate(AString && a_Name, const cUUID & a_UUID, Json::
 	{
 		FinishAuthenticate();
 	}
-	
 }
 
 
@@ -2713,6 +2712,15 @@ void cClientHandle::SendExplosion(const Vector3f a_Position, const float a_Power
 
 	// Shockwave effect:
 	m_Protocol->SendExplosion(a_Position, a_Power);
+}
+
+
+
+
+
+void cClientHandle::SendFinishConfiguration()
+{
+	m_Protocol->SendFinishConfiguration();
 }
 
 
