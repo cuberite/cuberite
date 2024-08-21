@@ -661,6 +661,40 @@ void cProtocol_1_17::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & 
 
 
 
+void cProtocol_1_17::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY)
+{
+	{
+		cPacketizer Pkt(*this, pktMapData);
+		Pkt.WriteVarInt32(a_Map.GetID());
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Map.GetScale()));
+		Pkt.WriteBool(false);  // Is map locked TODO: Implement map locking
+		Pkt.WriteBool(true);
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetDecorators().size()));
+		for (const auto & Decorator : a_Map.GetDecorators())
+		{
+			Pkt.WriteVarInt32(static_cast<Int32>(Decorator.GetType()));
+			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelX()));
+			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelZ()));
+			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetRot()));
+			Pkt.WriteBool(false);  // TODO: Implement display names
+		}
+		// TODO: Remove hardcoded values
+		Pkt.WriteBEUInt8(128);
+		Pkt.WriteBEUInt8(128);
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_DataStartX));
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_DataStartY));
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetData().size()));
+		for (auto itr = a_Map.GetData().cbegin(); itr != a_Map.GetData().cend(); ++itr)
+		{
+			Pkt.WriteBEUInt8(*itr);
+		}
+	}
+}
+
+
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_17_1:

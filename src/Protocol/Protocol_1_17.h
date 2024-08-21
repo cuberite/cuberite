@@ -23,6 +23,8 @@ protected:
 	virtual void      SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 	virtual void      SendRespawn(eDimension a_Dimension) override;
 	virtual void      SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
+	virtual void      SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
+
 	virtual UInt8     GetEntityMetadataID(EntityMetadata a_Metadata) const override;
 
 	virtual void      WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
