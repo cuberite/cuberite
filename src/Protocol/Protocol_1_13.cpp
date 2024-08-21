@@ -172,7 +172,7 @@ void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results, U
 {
 	{
 		//  TODO: Implement Start and Length
-		cPacketizer Pkt(*this, pktBlockChange);
+		cPacketizer Pkt(*this, pktTabCompletionResults);
 		Pkt.WriteVarInt32(CompletionId);
 		Pkt.WriteVarInt32(0);  //  Start
 		Pkt.WriteVarInt32(0);  //  Length
