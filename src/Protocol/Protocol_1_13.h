@@ -43,7 +43,7 @@ protected:
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	virtual void SendStatistics                 (const StatisticsManager & a_Manager) override;
-	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
+	virtual void SendTabCompletionResults       (const AStringVector & a_Results, UInt32 CompletionId) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
 	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata) const;
 	virtual UInt8 GetEntityMetadataID(EntityMetadataType a_FieldType) const;
@@ -61,6 +61,7 @@ protected:
 	virtual void HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer);
 	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std::string_view a_Channel) override;
+	virtual void HandlePacketTabComplete(cByteBuffer & a_ByteBuffer) override;
 
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) const override;
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, EntityMetadata a_Metadata, EntityMetadataType a_FieldType) const;

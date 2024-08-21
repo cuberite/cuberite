@@ -1078,7 +1078,7 @@ void cProtocol_1_9_0::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 		HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, Position);
 	}
 
-	m_Client->HandleTabCompletion(Text);
+	m_Client->HandleTabCompletion(Text, 0);
 }
 
 
