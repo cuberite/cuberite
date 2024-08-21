@@ -62,6 +62,7 @@ public:
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) override;
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendDisconnect                 (const AString & a_Reason) override;
+	virtual void SendDynamicRegistries          (void) override;
 	virtual void SendEditSign                   (Vector3i a_BlockPos) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation) override;
 	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration) override;
@@ -75,6 +76,7 @@ public:
 	virtual void SendExperience                 (void) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
 	virtual void SendExplosion                  (Vector3f a_Position, float a_Power) override;
+	virtual void SendFinishConfiguration        (void) override;
 	virtual void SendGameMode                   (eGameMode a_GameMode) override;
 	virtual void SendHealth                     (void) override;
 	virtual void SendHeldItemChange             (int a_ItemIndex) override;
