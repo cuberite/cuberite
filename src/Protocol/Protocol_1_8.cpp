@@ -476,6 +476,15 @@ void cProtocol_1_8_0::SendDisconnect(const AString & a_Reason)
 
 
 
+void cProtocol_1_8_0::SendDynamicRegistries()
+{
+	return;
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendEditSign(Vector3i a_BlockPos)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -725,6 +734,14 @@ void cProtocol_1_8_0::SendExplosion(const Vector3f a_Position, const float a_Pow
 	Pkt.WriteBEFloat(0);
 	Pkt.WriteBEFloat(0);
 	Pkt.WriteBEFloat(0);
+}
+
+
+
+
+void cProtocol_1_8_0::SendFinishConfiguration()
+{
+	return;
 }
 
 
