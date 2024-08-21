@@ -326,6 +326,7 @@ class cFastNBTWriter
 {
 public:
 	cFastNBTWriter(const AString & a_RootTagName = "");
+    cFastNBTWriter(bool Network1_21);
 
 	void BeginCompound(const AString & a_Name);
 	void EndCompound(void);
