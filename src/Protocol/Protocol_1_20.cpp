@@ -380,6 +380,7 @@ UInt32 cProtocol_1_20_2::GetPacketID(ePacketType a_PacketType) const
 
 
 
+
 void cProtocol_1_20_2::SendLoginSuccess(void)
 {
 	ASSERT(m_State == 2);  // State: login?
@@ -400,6 +401,7 @@ void cProtocol_1_20_2::SendLoginSuccess(void)
 		Pkt.WriteVarInt32(0);  // number of Profile Properites
 	}
 }
+
 
 
 
@@ -515,6 +517,31 @@ bool cProtocol_1_20_2::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 void cProtocol_1_20_2::HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer)
 {
 	m_State = State::Configuration;
+
+	m_Client->SendFinishConfiguration();
+}
+
+
+
+
+
+void cProtocol_1_20_2::SendFinishConfiguration()
+{
+	{
+		cPacketizer Pkt(*this, pktConfigurationReady);
+	}
+}
+
+
+
+
+
+void cProtocol_1_20_2::SendDynamicRegistries()
+{
+	{
+		cPacketizer Pkt(*this, pktConfigurationDynamicRegistries);
+		//  TODO: Implement 
+	}
 }
 
 
@@ -627,9 +654,6 @@ void cProtocol_1_20_2::SendPluginMessage(const AString & a_Channel, const Contig
 			cPacketizer Pkt(*this, pktConfigurationCustomPayload);
 			Pkt.WriteString(a_Channel);
 			Pkt.WriteBuf(a_Message);
-		}
-		{
-			cPacketizer Pkt(*this, pktConfigurationReady);
 		}
 	}
 	else

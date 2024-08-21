@@ -457,6 +457,7 @@ public:
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) = 0;
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) = 0;
 	virtual void SendDisconnect                 (const AString & a_Reason) = 0;
+	virtual void SendDynamicRegistries          (void) = 0;
 	virtual void SendEditSign                   (Vector3i a_BlockPos) = 0;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration) = 0;
 	virtual void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation) = 0;
@@ -468,6 +469,7 @@ public:
 	virtual void SendEntityProperties           (const cEntity & a_Entity) = 0;
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) = 0;
 	virtual void SendExplosion                  (Vector3f a_Position, float a_Power) = 0;
+	virtual void SendFinishConfiguration        (void) = 0;
 	virtual void SendGameMode                   (eGameMode a_GameMode) = 0;
 	virtual void SendHealth                     (void) = 0;
 	virtual void SendHeldItemChange             (int a_ItemIndex) = 0;
