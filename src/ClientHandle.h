@@ -230,7 +230,7 @@ public:  // tolua_export
 	void SendSpawnEntity                (const cEntity & a_Entity);
 	void SendSpawnMob                   (const cMonster & a_Mob);
 	void SendStatistics                 (const StatisticsManager & a_Manager);
-	void SendTabCompletionResults       (const AStringVector & a_Results);
+	void SendTabCompletionResults       (const AStringVector & a_Results, UInt32 CompletionId);
 	void SendThunderbolt                (Vector3i a_BlockPos);  // tolua_export
 	void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks);  // tolua_export
 	void SendTimeUpdate                 (cTickTimeLong a_WorldAge, cTickTimeLong a_WorldDate, bool a_DoDaylightCycle);
@@ -393,7 +393,7 @@ public:  // tolua_export
 	void HandleStartElytraFlight();
 
 	void HandleSteerVehicle     (float Forward, float Sideways);
-	void HandleTabCompletion    (const AString & a_Text);
+	void HandleTabCompletion    (const AString & a_Text, UInt32 CompletionId);
 	void HandleUpdateSign       (Vector3i a_BlockPos,const AString & a_Line1, const AString & a_Line2,const AString & a_Line3, const AString & a_Line4);
 	void HandleUnmount          (void);
 	void HandleUseEntity        (UInt32 a_TargetEntityID, bool a_IsLeftClick);

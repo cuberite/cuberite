@@ -1556,8 +1556,9 @@ void cProtocol_1_8_0::SendStatistics(const StatisticsManager & a_Manager)
 
 
 
-void cProtocol_1_8_0::SendTabCompletionResults(const AStringVector & a_Results)
+void cProtocol_1_8_0::SendTabCompletionResults(const AStringVector & a_Results, UInt32 CompletionId)
 {
+	UNUSED(CompletionId);
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktTabCompletionResults);
@@ -2755,7 +2756,7 @@ void cProtocol_1_8_0::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 		HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, Position);
 	}
 
-	m_Client->HandleTabCompletion(Text);
+	m_Client->HandleTabCompletion(Text, 0);
 }
 
 
