@@ -78,7 +78,32 @@ void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 
 void cProtocol_1_13::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY)
 {
-	// TODO
+	{
+		cPacketizer Pkt(*this, pktMapData);
+		Pkt.WriteVarInt32(a_Map.GetID());
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Map.GetScale()));
+
+		Pkt.WriteBool(true);
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetDecorators().size()));
+		for (const auto & Decorator : a_Map.GetDecorators())
+		{
+			Pkt.WriteVarInt32(static_cast<Int32>(Decorator.GetType()));
+			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelX()));
+			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelZ()));
+			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetRot()));
+			Pkt.WriteBool(false);  // TODO: Implement display names
+		}
+		// TODO: Implement proper map scaling
+		Pkt.WriteBEUInt8(128);
+		Pkt.WriteBEUInt8(128);
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_DataStartX));
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_DataStartY));
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetData().size()));
+		for (auto itr = a_Map.GetData().cbegin(); itr != a_Map.GetData().cend(); ++itr)
+		{
+			Pkt.WriteBEUInt8(*itr);
+		}
+	}
 }
 
 
