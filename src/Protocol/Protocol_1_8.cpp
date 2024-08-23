@@ -380,6 +380,16 @@ void cProtocol_1_8_0::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type
 
 
 
+void cProtocol_1_8_0::SendCommandTree()
+{
+	// no such packet here
+	return;
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendChunkData(const ContiguousByteBufferView a_ChunkData)
 {
 	ASSERT(m_State == 3);  // In game mode?
