@@ -40,7 +40,7 @@ UInt32 cProtocol_1_16::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktChatRaw:              return 0x0E;  //  Gamemessage
 		case cProtocol::pktBlockChanges:         return 0x0F;
 			//  command suggestions here 0x10
-			//  command tree 0x11
+		case cProtocol::pktCommnadTree:          return 0x11;
 			//  confirm gui action 0x12
 		case cProtocol::pktWindowClose:          return 0x13;
 		case cProtocol::pktWindowItems:          return 0x14; //  Inventory packet
@@ -458,7 +458,7 @@ UInt32 cProtocol_1_16_2::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktDifficulty:           return 0x0D;
 		case cProtocol::pktChatRaw:              return 0x0E;  //  Gamemessage
 			//  command suggestions here 0x0F
-			//  command tree 0x10
+		case cProtocol::pktCommnadTree:          return 0x10;
 			//  confirm gui action 0x11
 		case cProtocol::pktWindowClose:          return 0x12;
 		case cProtocol::pktWindowItems:          return 0x13; //  Inventory packet

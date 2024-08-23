@@ -72,8 +72,6 @@ protected:
 	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const override;
 	virtual Version GetProtocolVersion() const override;
 
-	//virtual void SendLoginSuccess() override;
-
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void HandlePacketBlockDig(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer) override;

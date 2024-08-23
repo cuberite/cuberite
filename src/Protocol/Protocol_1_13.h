@@ -38,6 +38,7 @@ protected:
 
 	virtual void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
+	virtual void SendCommandTree                (void) override;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;

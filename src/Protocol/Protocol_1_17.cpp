@@ -47,7 +47,7 @@ UInt32 cProtocol_1_17::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktChatRaw:              return 0x0F;  //  Gamemessage
 			//  clear title 0x10
 			//  command suggestions here 0x11
-			//  command tree 0x12
+		case cProtocol::pktCommnadTree:          return 0x12;
 		case cProtocol::pktWindowClose:          return 0x13;
 		case cProtocol::pktWindowItems:          return 0x14; //  Inventory packet
 		case cProtocol::pktWindowProperty:       return 0x15; //  ScreenHandlerPropertyUpdateS2CPacket
