@@ -612,6 +612,7 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 	{
 		case cProtocol::pktBossBar:			     return 0x0D;
 		case cProtocol::pktBlockAction:			 return 0x0B;
+		case cProtocol::pktCommnadTree:          return 0x12;
 		case cProtocol::pktCustomPayload:        return 0x19;
 		case cProtocol::pktEntityLook:		     return 0x2B;
 		case cProtocol::pktEntityRelMoveLook:	 return 0x2A;
