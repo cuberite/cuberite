@@ -132,7 +132,16 @@ void cProtocol_1_13::SendParticleEffect(const AString & a_ParticleName, Vector3f
 
 void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
 {
-	// TODO
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktScoreboardObjective);
+	Pkt.WriteString(a_Name);
+	Pkt.WriteBEUInt8(a_Mode);
+	if ((a_Mode == 0) || (a_Mode == 2))
+	{
+		Pkt.WriteString(a_DisplayName);
+		Pkt.WriteVarInt32(0);
+	}
 }
 
 
