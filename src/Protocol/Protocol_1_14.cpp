@@ -96,6 +96,10 @@ void cProtocol_1_14::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType,
 
 void cProtocol_1_14::SendEditSign(Vector3i a_BlockPos)
 {
+	{
+		cPacketizer Pkt(*this, pktUpdateSign);
+		Pkt.WriteXZYPosition64(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
+	}
 }
 
 
@@ -214,6 +218,7 @@ void cProtocol_1_14::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Dat
 
 void cProtocol_1_14::SendPaintingSpawn(const cPainting & a_Painting)
 {
+
 }
 
 
