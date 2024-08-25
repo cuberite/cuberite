@@ -377,6 +377,10 @@ public:
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_Entity,"Banner");
 			mWriter.AddInt("Base", static_cast<int>(a_Entity->GetBaseColor()));
+			if (!a_Entity->GetCustomName().empty())
+			{
+				mWriter.AddString("CustomName", a_Entity->GetCustomName());
+			}
 		mWriter.EndCompound();
 	}
 

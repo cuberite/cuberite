@@ -18,7 +18,7 @@ cMapSerializer::cMapSerializer(const AString & a_WorldName, cMap * a_Map):
 	m_Map(a_Map)
 {
 	auto DataPath = fmt::format(FMT_STRING("{}{}data"), a_WorldName, cFile::PathSeparator());
-	m_Path = fmt::format(FMT_STRING("{}{}map_%i.dat"), DataPath, cFile::PathSeparator(), a_Map->GetID());
+	m_Path = fmt::format(FMT_STRING("{}{}map_{}.dat"), DataPath, cFile::PathSeparator(), a_Map->GetID());
 	cFile::CreateFolder(DataPath);
 }
 

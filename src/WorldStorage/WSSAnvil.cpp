@@ -1194,15 +1194,23 @@ OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_Ta
 		return nullptr;
 	}
 
+	unsigned char Color = 15;
+	AString CustomName;
+
 	// Reads base color from NBT
 	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Base");
 	if (CurrentLine >= 0)
 	{
-		const auto Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
-		return std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color);
+		Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
 	}
 
-	return nullptr;
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "CustomName");
+	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_String))
+	{
+		CustomName = a_NBT.GetString(CurrentLine);
+	}
+
+	return std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color, CustomName);
 }
 
 
@@ -3945,7 +3953,7 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 		Rotation[1] = 0;
 	}
 	a_Entity.SetYaw(Rotation[0]);
-	a_Entity.SetRoll(Rotation[1]);
+	a_Entity.SetPitch(Rotation[1]);
 
 	// Depending on the Minecraft version, the entity's health is
 	// stored either as a float Health tag (HealF prior to 1.9) or
