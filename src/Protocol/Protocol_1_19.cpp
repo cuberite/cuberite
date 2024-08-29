@@ -459,7 +459,7 @@ void cProtocol_1_19::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Obj
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
 void cProtocol_1_19::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer)
 {
-	UInt32 EncKeyLength, EncNonceLength;
+	UInt32 EncKeyLength, EncNonceLength = 0;
 	ContiguousByteBuffer EncKey;
 	ContiguousByteBuffer EncNonce;
 
@@ -472,8 +472,8 @@ void cProtocol_1_19::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuf
 	{
 		return;
 	}
-	HANDLE_READ(a_ByteBuffer,ReadBool,bool,IsSignature);
-	if (!IsSignature)
+	HANDLE_READ(a_ByteBuffer,ReadBool,bool,HasNounce);
+	if (HasNounce)
 	{
 		if (!a_ByteBuffer.ReadVarInt(EncNonceLength))
 		{
@@ -493,7 +493,6 @@ void cProtocol_1_19::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuf
 		{
 			return;
 		}
-		UNREACHABLE("Signatures arent implemented");
 	}
 
 	if ((EncKeyLength > MAX_ENC_LEN) || (EncNonceLength > MAX_ENC_LEN))
@@ -503,21 +502,30 @@ void cProtocol_1_19::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuf
 		return;
 	}
 
-	// Decrypt EncNonce using privkey
+	
 	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
-	UInt32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
-	int res = rsaDecryptor.Decrypt(EncNonce, reinterpret_cast<Byte *>(DecryptedNonce), sizeof(DecryptedNonce));
-	if (res != 4)
+	int res = 0;
+	if (HasNounce)
 	{
-		LOGD("Bad nonce length: got %d, exp %d", res, 4);
-		m_Client->Kick("Hacked client");
-		return;
+		// Decrypt EncNonce using privkey
+		UInt32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
+		res = rsaDecryptor.Decrypt(EncNonce, reinterpret_cast<Byte *>(DecryptedNonce), sizeof(DecryptedNonce));
+		if (res != 4)
+		{
+			LOGD("Bad nonce length: got %d, exp %d", res, 4);
+			m_Client->Kick("Hacked client");
+			return;
+		}
+		if (ntohl(DecryptedNonce[0]) != static_cast<unsigned>(reinterpret_cast<uintptr_t>(this)))
+		{
+			LOGD("Bad nonce value");
+			m_Client->Kick("Hacked client");
+			return;
+		}
 	}
-	if (ntohl(DecryptedNonce[0]) != static_cast<unsigned>(reinterpret_cast<uintptr_t>(this)))
+	else
 	{
-		LOGD("Bad nonce value");
-		m_Client->Kick("Hacked client");
-		return;
+		LOGWARN("Player %s sent a signed nounce, The verification of these is not implemented. Allowing the player to join anyway.", m_Client->GetUsername());
 	}
 
 	// Decrypt the symmetric encryption key using privkey:
