@@ -969,7 +969,7 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
 		WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);
 		a_Pkt.WriteBool(true);
-		a_Pkt.WriteString(a_Mob.GetCustomName());
+		a_Pkt.WriteString("{\"text\":\"" + a_Mob.GetCustomName() + "\"}");
 
 		WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomNameVisible, EntityMetadataType::Boolean);
 		a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
