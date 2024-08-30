@@ -1595,7 +1595,7 @@ void cProtocol_1_19_3::SendPlayerListAddPlayer(const cPlayer & a_Player)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktPlayerList);
-	Pkt.WriteBEInt8(static_cast<Int8>(PlayerListAction::AddPlayer) | static_cast<Int8>(PlayerListAction::UpdateGameMode) | static_cast<Int8>(PlayerListAction::UpdateLatency));
+	Pkt.WriteBEInt8(static_cast<Int8>(PlayerListAction::AddPlayer) | static_cast<Int8>(PlayerListAction::UpdateGameMode) | static_cast<Int8>(PlayerListAction::UpdateListed) | static_cast<Int8>(PlayerListAction::UpdateLatency));
 
 	Pkt.WriteVarInt32(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
@@ -1618,8 +1618,8 @@ void cProtocol_1_19_3::SendPlayerListAddPlayer(const cPlayer & a_Player)
 			Pkt.WriteString(Signature);
 		}
 	}
-
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetEffectiveGameMode()));
+	Pkt.WriteBool(true);
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
 }
 
