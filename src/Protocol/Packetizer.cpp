@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "Packetizer.h"
 #include "../UUID.h"
+#include "../CompositeChat.h"
 
 
 
@@ -20,6 +21,11 @@ cPacketizer::~cPacketizer()
 }
 
 
+
+void cPacketizer::WriteChat(const cCompositeChat & a_Value)
+{
+	VERIFY(m_Out.WriteVarUTF8String(a_Value.CreateJsonString()));
+}
 
 
 
