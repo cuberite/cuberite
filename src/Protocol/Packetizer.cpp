@@ -22,10 +22,14 @@ cPacketizer::~cPacketizer()
 
 
 
+
+
 void cPacketizer::WriteChat(const cCompositeChat & a_Value)
 {
 	VERIFY(m_Out.WriteVarUTF8String(a_Value.CreateJsonString()));
 }
+
+
 
 
 
