@@ -770,13 +770,14 @@ void cProtocol_1_15::SendEntityPosition(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const auto Delta = (a_Entity.GetPosition() * 32).Floor() - (a_Entity.GetLastSentPosition() * 32).Floor();
+	const auto Delta = (a_Entity.GetPosition() * 32).Floor() - (a_Entity.GetLastSentPosition() * 32).Floor() * 128;
 
 	// Ensure that the delta has enough precision and is within range of a
-	// BEInt8:
-	if (Delta.HasNonZeroLength() && cByteBuffer::CanBEInt8Represent(Delta.x) &&
-		cByteBuffer::CanBEInt8Represent(Delta.y) &&
-		cByteBuffer::CanBEInt8Represent(Delta.z))
+	// BEInt16:
+	if (Delta.HasNonZeroLength() &&
+		cByteBuffer::CanBEInt16Represent(Delta.x) &&
+		cByteBuffer::CanBEInt16Represent(Delta.y) &&
+		cByteBuffer::CanBEInt16Represent(Delta.z))
 	{
 		const auto Move = static_cast<Vector3<Int16>>(Delta);
 
