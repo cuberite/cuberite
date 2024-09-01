@@ -766,7 +766,7 @@ void cProtocol_1_15::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocol_1_15::SendEntityPosition(const cEntity & a_Entity)
+void cProtocol_1_15::SendEntityPosition(const cEntity & a_Entity) // Remove
 {
 	ASSERT(m_State == 3);  // In game mode?
 
