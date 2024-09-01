@@ -2250,11 +2250,16 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	Players["online"] = NumPlayers;
 	Players["max"] = MaxPlayers;
 	std::vector<std::pair<cUUID, AString>> playeruuids;
-	cRoot::Get()->ForEachPlayer([this, &playeruuids](cPlayer & a_Player)
+	const std::pair<cUUID,AString> AnonPlayer = {cUUID::cUUID(), "Anonymous"};
+	cRoot::Get()->ForEachPlayer([this, &playeruuids, &AnonPlayer](cPlayer & a_Player)
 	{
 		if (a_Player.GetClientHandle()->GetAllowListing())
 		{
 			playeruuids.push_back({a_Player.GetUUID(), a_Player.GetName()});
+		}
+		else
+		{
+			playeruuids.push_back(AnonPlayer);
 		}
 		return true;
 	});
