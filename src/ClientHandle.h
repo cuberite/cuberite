@@ -270,6 +270,9 @@ public:  // tolua_export
 	void SetLocale(const AString & a_Locale) { m_Locale = a_Locale; }
 	AString GetLocale(void) const { return m_Locale; }
 
+	void SetAllowListing(bool a_AllowsListing) { m_Allowslisting = a_AllowsListing; }
+	bool GetAllowListing(void) { return m_Allowslisting; }
+
 	int GetUniqueID(void) const { return m_UniqueID; }
 
 	bool HasPluginChannel(const AString & a_PluginChannel);
@@ -551,6 +554,9 @@ private:
 
 	/** Number of place or break interactions this tick */
 	int m_NumBlockChangeInteractionsThisTick;
+
+	/* Should the player be displayed in player tab list or sent in server status packets. Set by ClientSettings packet */
+	bool m_Allowslisting;
 
 	static int s_ClientCount;
 
