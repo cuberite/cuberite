@@ -55,7 +55,6 @@ protected:
 	virtual void SendPlayerSpawn                (const cPlayer & a_Player) override;
 	virtual void SendSoundEffect                (const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
-	virtual void SendEntityPosition             (const cEntity & a_Entity) override;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
 
 
