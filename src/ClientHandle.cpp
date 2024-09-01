@@ -93,7 +93,8 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_HasSentPlayerChunk(false),
 	m_Locale("en_GB"),
 	m_LastPlacedSign(s_IllegalPosition),
-	m_ProtocolVersion(0)
+	m_ProtocolVersion(0),
+	m_Allowslisting(true)
 {
 	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;

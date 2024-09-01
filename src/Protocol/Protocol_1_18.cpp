@@ -162,6 +162,7 @@ void cProtocol_1_18::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	m_Client->SetViewDistance(ViewDistance);
 	m_Client->GetPlayer()->SetSkinParts(SkinParts);
 	m_Client->GetPlayer()->SetLeftHanded(MainHand == LEFT_HAND);
+	m_Client->SetAllowListing(AllowsListing);
 	// TODO: Handle chat flags and chat colors
 }
 

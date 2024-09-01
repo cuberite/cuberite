@@ -2252,7 +2252,10 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	std::vector<std::pair<cUUID, AString>> playeruuids;
 	cRoot::Get()->ForEachPlayer([this, &playeruuids](cPlayer & a_Player)
 	{
-		playeruuids.push_back({a_Player.GetUUID(), a_Player.GetName()});
+		if (a_Player.GetClientHandle()->GetAllowListing())
+		{
+			playeruuids.push_back({a_Player.GetUUID(), a_Player.GetName()});
+		}
 		return true;
 	});
 	Json::Value sample;
