@@ -455,6 +455,38 @@ void cProtocol_1_19::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Obj
 
 
 
+void cProtocol_1_19::SendSpawnMob(const cMonster & a_Mob)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	const auto MobType = GetProtocolMobType(a_Mob.GetMobType());
+
+	// If the type is not valid in this protocol bail out:
+	if (MobType == 0)
+	{
+		return;
+	}
+
+	cPacketizer Pkt(*this, pktSpawnMob);
+	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
+	Pkt.WriteUUID(cUUID::GenerateVersion3("fixxxxx"));	 // Temp fix
+	Pkt.WriteVarInt32(static_cast<Byte>(MobType));
+	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
+	Pkt.WriteBEDouble(LastSentPos.x);
+	Pkt.WriteBEDouble(LastSentPos.y);
+	Pkt.WriteBEDouble(LastSentPos.z);
+	Pkt.WriteByteAngle(a_Mob.GetPitch());
+	Pkt.WriteByteAngle(a_Mob.GetYaw());
+	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());	 // Doesn't seem to be used
+	Pkt.WriteVarInt32(0); // Entity data not used for mobs
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedX() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
+}
+
+
+
+
 
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
 void cProtocol_1_19::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer)
@@ -2048,7 +2080,7 @@ UInt32 cProtocol_1_19_4::GetPacketID(ePacketType a_PacketType) const
 		//  Game packets
         case cProtocol::pktSpawnObject:          return 0x01;
         case cProtocol::pktSpawnMob:             return 0x01;
-        case cProtocol::pktSpawnPainting:        return 0x01;
+		case cProtocol::pktSpawnPainting:        return 0x01;
         case cProtocol::pktSpawnExperienceOrb:   return 0x02;
         case cProtocol::pktSpawnOtherPlayer:     return 0x03;
         case cProtocol::pktEntityAnimation:      return 0x04;

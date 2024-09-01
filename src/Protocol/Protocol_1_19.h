@@ -22,6 +22,7 @@ protected:
 	virtual void    SendLoginSuccess(void) override;
 	virtual void    SendPlayerListAddPlayer(const cPlayer & a_Player) override;
 	virtual void    SendRespawn(eDimension a_Dimension) override;
+	virtual void    SendSpawnMob(const cMonster & a_Mob) override;
 
 	virtual void    HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer) override;
     virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
