@@ -766,62 +766,6 @@ void cProtocol_1_15::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocol_1_15::SendEntityPosition(const cEntity & a_Entity)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	const auto Delta = (a_Entity.GetPosition() * 32).Floor() - (a_Entity.GetLastSentPosition() * 32).Floor() * 128;
-
-	// Ensure that the delta has enough precision and is within range of a
-	// BEInt16:
-	if (Delta.HasNonZeroLength() &&
-		cByteBuffer::CanBEInt16Represent(Delta.x) &&
-		cByteBuffer::CanBEInt16Represent(Delta.y) &&
-		cByteBuffer::CanBEInt16Represent(Delta.z))
-	{
-		const auto Move = static_cast<Vector3<Int16>>(Delta);
-
-		// Difference within limitations, use a relative move packet
-		if (a_Entity.IsOrientationDirty())
-		{
-			cPacketizer Pkt(*this, pktEntityRelMoveLook);
-			Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-			Pkt.WriteBEInt16(Move.x);
-			Pkt.WriteBEInt16(Move.y);
-			Pkt.WriteBEInt16(Move.z);
-			Pkt.WriteByteAngle(a_Entity.GetYaw());
-			Pkt.WriteByteAngle(a_Entity.GetPitch());
-			Pkt.WriteBool(a_Entity.IsOnGround());
-		}
-		else
-		{
-			cPacketizer Pkt(*this, pktEntityRelMove);
-			Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-			Pkt.WriteBEInt16(Move.x);
-			Pkt.WriteBEInt16(Move.y);
-			Pkt.WriteBEInt16(Move.z);
-			Pkt.WriteBool(a_Entity.IsOnGround());
-		}
-
-		return;
-	}
-
-	// Too big or small a movement, do a teleport.
-
-	cPacketizer Pkt(*this, pktTeleportEntity);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEDouble(a_Entity.GetPosX());
-	Pkt.WriteBEDouble(a_Entity.GetPosY());
-	Pkt.WriteBEDouble(a_Entity.GetPosZ());
-	Pkt.WriteByteAngle(a_Entity.GetYaw());
-	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(a_Entity.IsOnGround());
-}
-
-
-
-
-
 UInt8 cProtocol_1_15::GetEntityMetadataID(EntityMetadata a_Metadata) const
 {
 	const UInt8 Entity = 7;

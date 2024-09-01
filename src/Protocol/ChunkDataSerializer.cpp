@@ -594,7 +594,7 @@ inline void cChunkDataSerializer::Serialize393(const int a_ChunkX, const int a_C
 			// m_Packet.WriteBEInt16(4096);
 			m_Packet.WriteBEUInt8(BitsPerEntry);
 			m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-			// WriteBlockSectionSeamless2<&Palette393>(Blocks, BitsPerEntry, false);
+			WriteBlockSectionSeamless2<&Palette_1_15::ToProtocolIdBlock>(Blocks, BitsPerEntry, false); //HACK remove once a proper block system is made
 			WriteLightSectionGrouped(BlockLights, SkyLights);
 		}
 	}
@@ -675,7 +675,7 @@ inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_C
 			m_Packet.WriteBEInt16(4096);
 			m_Packet.WriteBEUInt8(BitsPerEntry);
 			m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-			// WriteBlockSectionSeamless2<&Palette477>(Blocks, BitsPerEntry, false);
+			WriteBlockSectionSeamless2<&Palette_1_15::ToProtocolIdBlock>(Blocks, BitsPerEntry, false); //HACK remove once a proper block system is made
 		}
 	}
 	//ChunkDef_ForEachSection(a_BlockData, a_LightData,
