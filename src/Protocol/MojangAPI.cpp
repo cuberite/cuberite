@@ -777,18 +777,17 @@ void cMojangAPI::GetMojangKeys(void)
 
 bool cMojangAPI::VerifyUsingMojangKeys(ContiguousByteBuffer DataToVerify, ContiguousByteBuffer Signature)
 {
-	const mbedtls_md_type_t hash_type = MBEDTLS_MD_SHA256;
+	const mbedtls_md_type_t hash_type = MBEDTLS_MD_SHA1;
 	const mbedtls_md_info_t *mdinfo = mbedtls_md_info_from_type(hash_type);
 	unsigned char* Digest = new unsigned char[mdinfo->size];
+	int hash_err = mbedtls_md(mdinfo, reinterpret_cast<const unsigned char*>(DataToVerify.c_str()), DataToVerify.size(), Digest);
+	if (hash_err != 0)
+	{
+		LOGWARN("Failed to calculate hash");
+		return false;
+	}
 	for each (auto ctx in MojangPublicKeys)
 	{
-		int hash_err = mbedtls_md(mdinfo, reinterpret_cast<const unsigned char*>(DataToVerify.c_str()), DataToVerify.size(), Digest);
-		if (hash_err != 0)
-		{
-			LOGWARN("Failed to calculate hash");
-			continue;
-		}
-		// Appears to be broken??
 		int verify_error = mbedtls_pk_verify(&ctx, hash_type, Digest, mdinfo->size, reinterpret_cast<const unsigned char*>(Signature.c_str()), Signature.size());
 		if (verify_error == 0)
 		{
