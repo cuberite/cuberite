@@ -403,6 +403,7 @@ public:  // tolua_export
 	void HandleUseItem          (bool a_UsedMainHand);
 	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
 	void HandleWindowClose      (UInt8 a_WindowID);
+	void HandlePlayerSession    (cUUID a_SessionID, Int64 ExpiresAt, ContiguousByteBuffer a_PublicKey, ContiguousByteBuffer a_KeySignature);
 
 	/** Called when a recipe from the recipe book is selected */
 	void HandleCraftRecipe      (UInt32 a_RecipeId);
