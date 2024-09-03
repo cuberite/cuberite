@@ -2400,6 +2400,14 @@ void cProtocol_1_8_0::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 
 
 
+void cProtocol_1_8_0::HandlePacketPlayerSession(cByteBuffer & a_ByteBuffer)
+{
+	return;
+}
+
+
+
+
 
 void cProtocol_1_8_0::HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer)
 {

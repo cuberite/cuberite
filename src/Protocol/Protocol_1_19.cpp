@@ -170,7 +170,6 @@ bool cProtocol_1_19::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x07: HandlePacketClientSettings(a_ByteBuffer); return true;
 		case 0x08: HandlePacketTabComplete(a_ByteBuffer); return true;
 		case 0x09: /* ButtonClickC2SPacket */ return false;
-		//case 0x08: HandlePacketEnchantItem(a_ByteBuffer); return true;
 		case 0x0A: HandlePacketWindowClick(a_ByteBuffer); return true;
 		case 0x0B: HandlePacketWindowClose(a_ByteBuffer); return true;
 		case 0x0C: HandlePacketPluginMessage(a_ByteBuffer); return true;
@@ -2216,7 +2215,7 @@ bool cProtocol_1_19_4::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x03: /* MessageAcknowledgmentC2SPacket */ return false;
 		case 0x04: HandlePacketCommandExecution(a_ByteBuffer); return true;
 		case 0x05: HandlePacketChatMessage(a_ByteBuffer); return true;
-		case 0x06: /* PlayerSessionC2SPacket */ return false;
+		case 0x06: HandlePacketPlayerSession(a_ByteBuffer); return true;
 		case 0x07: HandlePacketClientStatus(a_ByteBuffer); return true;
 		case 0x08: HandlePacketClientSettings(a_ByteBuffer); return true;
 		case 0x09: HandlePacketTabComplete(a_ByteBuffer); return true;
@@ -2263,6 +2262,39 @@ bool cProtocol_1_19_4::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x32: HandlePacketUseItem(a_ByteBuffer); return true;
 		default: break;
 	}
+}
+
+
+
+
+
+void cProtocol_1_19_4::HandlePacketPlayerSession(cByteBuffer & a_ByteBuffer)
+{
+	ContiguousByteBuffer pubkey;
+	ContiguousByteBuffer KeySig;
+	HANDLE_READ(a_ByteBuffer, ReadUUID, cUUID, SessionID);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, ExpiresAtEpoch);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, PubKeyLen);
+	if (!a_ByteBuffer.ReadSome(pubkey, PubKeyLen))
+	{
+		return;
+	}
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, KeySigLen);
+	if (!a_ByteBuffer.ReadSome(KeySig, KeySigLen))
+	{
+		return;
+	}
+	if (PubKeyLen > 512)
+	{
+		m_Client->Kick("Public key too long");
+		return;
+	}
+	if (KeySigLen > 4096)
+	{
+		m_Client->Kick("Key signature too long");
+		return;
+	}
+	m_Client->HandlePlayerSession(SessionID, ExpiresAtEpoch, pubkey, KeySig);
 }
 
 
