@@ -1714,24 +1714,24 @@ void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 ExpiresAt, Cont
 {
 	// hash algorith mchnages somehre between 1.19.4 and 1.21 - maybe???
 
+	// TODO: tidy up and make more readable 
+
 	char * tempbfr = new char[a_PublicKey.size() + 16 + 8];
-	// ORDER: UUID (in binary form big endian format) + ExpiresAt in big endian + publickey
-	// TODO: fix order
-	auto uuid = GetUUID().ToRaw().data(); // TODO: find better way to append uuid
-	memcpy(tempbfr, uuid, 16);
-	*(reinterpret_cast<Int64*>(tempbfr + 16)) = ExpiresAt;
-	memcpy(tempbfr, uuid, 16);
+	// ORDER: player UUID (in binary form big endian format) + ExpiresAt in big endian + publickey
+	memcpy(tempbfr, GetUUID().ToRaw().data(), 16);
+	Int64 toadd = (static_cast<UInt64>(htonl(static_cast<UInt32>(ExpiresAt))) << 32) | (static_cast<UInt64>(htonl(static_cast<UInt32>(ExpiresAt >> 32))));
+	*(reinterpret_cast<Int64*>(tempbfr + 16)) = toadd;
 	ContiguousByteBuffer toverify;
 	toverify.append(reinterpret_cast<std::byte*>(tempbfr),24);
 	toverify.append(a_PublicKey);
 	delete[] tempbfr;
 	if (!cRoot::Get()->GetMojangAPI().VerifyUsingMojangKeys(toverify, a_KeySignature))
 	{
-		LOGWARN("Invliad public key sent by %s", GetUsername());
+		LOGWARN("Invalid public key sent by %s", GetUsername());
 	}
 	else
 	{
-		LOGWARN("good public key sent by %s", GetUsername());
+		LOGWARN("Good public key sent by %s", GetUsername());
 	}
 }
 
