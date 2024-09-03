@@ -1717,6 +1717,35 @@ void cClientHandle::HandleWindowClose(UInt8 a_WindowID)
 
 
 
+void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 ExpiresAt, ContiguousByteBuffer a_PublicKey, ContiguousByteBuffer a_KeySignature)
+{
+	// hash algorith mchnages somehre between 1.19.4 and 1.21 - maybe???
+
+	char * tempbfr = new char[a_PublicKey.size() + 16 + 8];
+	// ORDER: UUID (in binary form big endian format) + ExpiresAt in big endian + publickey
+	// TODO: fix order
+	auto uuid = GetUUID().ToRaw().data(); // TODO: find better way to append uuid
+	memcpy(tempbfr, uuid, 16);
+	*(reinterpret_cast<Int64*>(tempbfr + 16)) = ExpiresAt;
+	memcpy(tempbfr, uuid, 16);
+	ContiguousByteBuffer toverify;
+	toverify.append(reinterpret_cast<std::byte*>(tempbfr),24);
+	toverify.append(a_PublicKey);
+	delete[] tempbfr;
+	if (!cRoot::Get()->GetMojangAPI().VerifyUsingMojangKeys(toverify, a_KeySignature))
+	{
+		LOGWARN("Invliad public key sent by %s", GetUsername());
+	}
+	else
+	{
+		LOGWARN("good public key sent by %s", GetUsername());
+	}
+}
+
+
+
+
+
 void cClientHandle::HandleWindowClick(UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem)
 {
 	LOGD("WindowClick: WinID %d, SlotNum %d, action: %s, Item %s x %d",
