@@ -440,6 +440,43 @@ public:  // tolua_export
 	/** Removes all of the channels from the list of current plugin channels. Ignores channels that are not found. */
 	void UnregisterPluginChannels(const AStringVector & a_ChannelList);
 
+	/* Contains information for verifying chat messages form players only used in 1.19+ */
+	class cPlayerSessionData
+	{
+	  public:
+		cPlayerSessionData() :
+			m_IsPopulated(false),
+			m_SessionId(cUUID::cUUID()),
+			m_ExpiresAt(-1),
+			m_PublicKey(nullptr),
+			m_KeySignature(nullptr)
+		{
+
+		}
+		cPlayerSessionData(cUUID a_SessionID, Int64 a_ExpiresAt, ContiguousByteBuffer a_PublicKey, ContiguousByteBuffer a_KeySignature) :
+			m_IsPopulated(true),
+			m_SessionId(a_SessionID),
+			m_ExpiresAt(a_ExpiresAt),
+			m_PublicKey(a_PublicKey),
+			m_KeySignature(a_KeySignature)
+		{
+
+		}
+		bool IsPopulated() const { return m_IsPopulated; };
+		cUUID GetSessionUUID() const { return m_SessionId; };
+		Int64 GetExiresAtEpochMiliscond() const { return m_ExpiresAt; };
+		ContiguousByteBuffer GetPublicKey() const { return m_PublicKey; };
+		ContiguousByteBuffer GetKeySignature() const { return m_KeySignature; };
+	  private:
+		bool m_IsPopulated;
+		cUUID m_SessionId;
+		Int64 m_ExpiresAt;
+		ContiguousByteBuffer m_PublicKey;
+		ContiguousByteBuffer m_KeySignature;
+	} m_PlayerSession;
+
+	const cPlayerSessionData GetPlayerSessionData() const { return m_PlayerSession; }
+
 private:
 
 
