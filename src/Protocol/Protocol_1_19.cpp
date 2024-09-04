@@ -1657,6 +1657,27 @@ void cProtocol_1_19_3::SendPlayerListAddPlayer(const cPlayer & a_Player)
 
 
 
+void cProtocol_1_19_3::SendPlayerListInitChat(const cClientHandle::cPlayerSessionData a_Data)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktPlayerList);
+	Pkt.WriteBEInt8(static_cast<Int8>(PlayerListAction::InitalizeChat));
+	Pkt.WriteVarInt32(1);
+	Pkt.WriteBool(a_Data.IsPopulated());
+	if (a_Data.IsPopulated())
+	{
+		Pkt.WriteUUID(a_Data.GetSessionUUID()); // mighty be player UUID not sure
+		Pkt.WriteBEInt64(a_Data.GetExiresAtEpochMiliscond());
+		Pkt.WriteLengthPrefixedBuf(a_Data.GetPublicKey());
+		Pkt.WriteLengthPrefixedBuf(a_Data.GetKeySignature());
+	}
+}
+
+
+
+
+
 
 void cProtocol_1_19_3::SendPlayerListUpdatePing()
 {

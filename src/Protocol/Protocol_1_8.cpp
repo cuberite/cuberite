@@ -243,6 +243,16 @@ void cProtocol_1_8_0::SendRenderDistanceCenter(cChunkCoords a_chunk)
 
 
 
+void cProtocol_1_8_0::SendPlayerListInitChat(const cClientHandle::cPlayerSessionData a_Data)
+{
+	// not used in this version
+	return;
+}
+
+
+
+
+
 
 void cProtocol_1_8_0::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
