@@ -15,6 +15,7 @@
 #include "../ByteBuffer.h"
 #include "../EffectID.h"
 #include "../World.h"
+#include "../ClientHandle.h"
 
 
 
@@ -488,6 +489,7 @@ public:
 	virtual void SendParticleEffect             (const AString & a_SoundName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) = 0;
 	virtual void SendPlayerActionResponse       (Vector3i a_blockpos, int a_state_id, cProtocol::PlayerActionResponses a_action, bool a_IsApproved) = 0;
 	virtual void SendPlayerListAddPlayer        (const cPlayer & a_Player) = 0;
+	virtual void SendPlayerListInitChat         (const cPlayer & a_Player, const cClientHandle::cPlayerSessionData a_Data) = 0;
 	virtual void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer) = 0;
 	virtual void SendPlayerListRemovePlayer     (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) = 0;

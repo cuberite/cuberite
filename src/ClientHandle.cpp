@@ -1717,7 +1717,7 @@ void cClientHandle::HandleWindowClose(UInt8 a_WindowID)
 
 
 
-void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 ExpiresAt, ContiguousByteBuffer a_PublicKey, ContiguousByteBuffer a_KeySignature)
+void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 a_ExpiresAt, ContiguousByteBuffer a_PublicKey, ContiguousByteBuffer a_KeySignature)
 {
 	// hash algorith mchnages somehre between 1.19.4 and 1.21 - maybe???
 
@@ -1727,7 +1727,7 @@ void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 ExpiresAt, Cont
 	char * tempbfr = new char[a_PublicKey.size() + 16 + 8];
 	// ORDER: player UUID (in binary form big endian format) + ExpiresAt in big endian + publickey
 	memcpy(tempbfr, GetUUID().ToRaw().data(), 16);
-	Int64 toadd = (static_cast<UInt64>(htonl(static_cast<UInt32>(ExpiresAt))) << 32) | (static_cast<UInt64>(htonl(static_cast<UInt32>(ExpiresAt >> 32))));
+	Int64 toadd = (static_cast<UInt64>(htonl(static_cast<UInt32>(a_ExpiresAt))) << 32) | (static_cast<UInt64>(htonl(static_cast<UInt32>(a_ExpiresAt >> 32))));
 	*(reinterpret_cast<Int64*>(tempbfr + 16)) = toadd;
 	ContiguousByteBuffer toverify;
 	toverify.append(reinterpret_cast<std::byte*>(tempbfr),24);
@@ -1739,14 +1739,15 @@ void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 ExpiresAt, Cont
 		// TODO: add enforce secure profile somewehre in settings and kick player if the key is invalid
 		return;
 	}
-	LOGWARN("Good public key sent by %s", GetUsername());
+	// LOGWARN("Good public key sent by %s", GetUsername());
     Int64 milliseconds_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	if (milliseconds_since_epoch > ExpiresAt)
+	if (milliseconds_since_epoch > a_ExpiresAt)
 	{
 		LOGWARN("Expired public key sent by %s", GetUsername());
 		// TODO: add enforce secure profile somewehre in settings and kick player if the key is invalid
 		return;
 	}
+	m_PlayerSession = cClientHandle::cPlayerSessionData(a_SessionID, a_ExpiresAt, a_PublicKey, a_KeySignature);
 	//  TODO send InitChat to all players
 }
 
