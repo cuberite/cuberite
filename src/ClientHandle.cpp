@@ -399,22 +399,6 @@ void cClientHandle::Authenticate(AString && a_Name, const cUUID & a_UUID, Json::
 	// Send login success (if the protocol supports it):
 	m_Protocol->SendLoginSuccess();
 
-	if (m_ForgeHandshake.IsForgeClient)
-	{
-		m_ForgeHandshake.BeginForgeHandshake(*this);
-	}
-	else
-	{
-		FinishAuthenticate();
-	}
-}
-
-
-
-
-
-void cClientHandle::FinishAuthenticate()
-{
 	// Serverside spawned player (so data are loaded).
 	std::unique_ptr<cPlayer> Player;
 
@@ -430,6 +414,32 @@ void cClientHandle::FinishAuthenticate()
 	}
 
 	m_Player = Player.get();
+	m_temp_player = std::move(Player);
+
+	if (m_ProtocolVersion > static_cast<UInt32>(cProtocol::Version::v1_20))
+	{
+		//  do nothing I guess
+	}
+	else // <= 1.20
+	{
+		if (m_ForgeHandshake.IsForgeClient)
+		{
+			m_ForgeHandshake.BeginForgeHandshake(*this);
+		}
+		else
+		{
+			FinishAuthenticate();
+		}
+	}
+}
+
+
+
+
+
+void cClientHandle::FinishAuthenticate()
+{
+
 
 	/*
 	LOGD("Created a new cPlayer object at %p for client %s @ %s (%p)",
@@ -437,6 +447,7 @@ void cClientHandle::FinishAuthenticate()
 		m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this)
 	);
 	//*/
+	m_Player->SendPlayerInventoryJoin();
 
 	cWorld * World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
 	if (World == nullptr)
@@ -490,7 +501,7 @@ void cClientHandle::FinishAuthenticate()
 	cRoot::Get()->GetServer()->ClientMovedToWorld(this);
 
 	SetState(csDownloadingWorld);
-	m_Player->Initialize(std::move(Player), *World);
+	m_Player->Initialize(std::move(m_temp_player), *World);
 	m_Player->ResendRenderDistanceCenter();
 	m_Protocol->SendCommandTree();
 	// LOGD("Client %s @ %s (%p) has been fully authenticated", m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this));

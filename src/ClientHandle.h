@@ -448,8 +448,8 @@ public:  // tolua_export
 			m_IsPopulated(false),
 			m_SessionId(cUUID::cUUID()),
 			m_ExpiresAt(-1),
-			m_PublicKey(nullptr),
-			m_KeySignature(nullptr)
+			m_PublicKey(),
+			m_KeySignature()
 		{
 
 		}
@@ -528,6 +528,8 @@ private:
 	The player self-destructs some time after the client handle enters the Destroyed state.
 	We are therefore guaranteed that while m_State < Destroyed, that is when when we need to access m_Player, m_Player is valid. */
 	cPlayer * m_Player;
+
+	std::unique_ptr<cPlayer> m_temp_player;
 
 	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know
 	whether or not the player is standing at a sent chunk.

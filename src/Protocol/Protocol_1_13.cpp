@@ -152,43 +152,54 @@ void cProtocol_1_13::SendCommandTree()
 {
 	// TODO: rework the whole command system to support new format
 	// https://wiki.vg/Command_Data
-	AStringVector commands;
-	class cCallback :
-		public cPluginManager::cCommandEnumCallback
+
+	if (true)
 	{
-	public:
-		cCallback(void) {}
-
-		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
 		{
-		UNUSED(a_Plugin);
-		UNUSED(a_Permission);
-		UNUSED(a_HelpString);
-			m_Commands.push_back(a_Command.substr(1, std::string::npos)); // Commands are sent with out slashes
-			return false;
+			cPacketizer Pkt(*this, pktCommnadTree);
+			cRoot::Get()->GetPluginManager()->GetRootCommandNode()->WriteCommandTree(Pkt);
 		}
-
-		AStringList m_Commands;
-	} Callback;
-	cRoot::Get()->GetPluginManager()->ForEachCommand(Callback);
+	}
+	else
 	{
-		cPacketizer Pkt(*this, pktCommnadTree);
-		Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size()) + 1);  // + 1 for the root node
-		for each (AString var in Callback.m_Commands)
+		AStringVector commands;
+		class cCallback :
+			public cPluginManager::cCommandEnumCallback
 		{
-			Pkt.WriteVarInt32(1);  // Flags
-			Pkt.WriteVarInt32(0);  // Size of Array of child nodes
-			Pkt.WriteString(var);
-		}
-		// Root Node
-		Pkt.WriteVarInt32(0);  // Flags
-		Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size()));  // Size of Array of child nodes. Every Command is a child
-		for (size_t i = 0; i < Callback.m_Commands.size(); i++)
-		{
-			Pkt.WriteVarInt32(i);  // Indexes of children in the array
-		}
+		public:
+			cCallback(void) {}
 
-		Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size())); // root index
+			virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
+			{
+			UNUSED(a_Plugin);
+			UNUSED(a_Permission);
+			UNUSED(a_HelpString);
+				m_Commands.push_back(a_Command.substr(1, std::string::npos)); // Commands are sent with out slashes
+				return false;
+			}
+
+			AStringList m_Commands;
+		} Callback;
+		cRoot::Get()->GetPluginManager()->ForEachCommand(Callback);
+		{
+			cPacketizer Pkt(*this, pktCommnadTree);
+			Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size()) + 1);  // + 1 for the root node
+			for each (AString var in Callback.m_Commands)
+			{
+				Pkt.WriteVarInt32(1);  // Flags
+				Pkt.WriteVarInt32(0);  // Size of Array of child nodes
+				Pkt.WriteString(var);
+			}
+			// Root Node
+			Pkt.WriteVarInt32(0);  // Flags
+			Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size()));  // Size of Array of child nodes. Every Command is a child
+			for (size_t i = 0; i < Callback.m_Commands.size(); i++)
+			{
+				Pkt.WriteVarInt32(i);  // Indexes of children in the array
+			}
+
+			Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size())); // root index
+		}
 	}
 }
 

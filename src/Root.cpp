@@ -207,6 +207,9 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOGD("Loading plugin manager...");
 	m_PluginManager = new cPluginManager(dd);
 	m_PluginManager->ReloadPluginsNow(*settingsRepo);
+	m_PluginManager->SetupNewCommands();
+
+
 
 	LOGD("Loading MonsterConfig...");
 	m_MonsterConfig = new cMonsterConfig;
