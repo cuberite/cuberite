@@ -78,7 +78,7 @@ class cCommandFloatArgument final : public cCommandArgument
 
 	void WriteProperties(cPacketizer& a_Packet) const override
 	{
-		const Byte flags = m_Min.has_value() | (m_Max.has_value() << 1);
+		const Byte flags = static_cast<Byte>(m_Min.has_value()) | static_cast<Byte>(m_Max.has_value() << 1);
 		a_Packet.WriteBEInt8(static_cast<Int8>(flags));
 		if (m_Min.has_value())
 		{
@@ -97,13 +97,13 @@ class cCommandFloatArgument final : public cCommandArgument
 		{
 			 value = std::stof(str);
 		}
-		catch (std::invalid_argument& _)
+		catch (std::invalid_argument& ex)
 		{
-			throw cCommandParseException("Failed to parse " + str + " as float");
+			throw cCommandParseException("Failed to parse " + str + " as float. Error: "+ ex.what());
 		}
-		catch (std::out_of_range& _)
+		catch (std::out_of_range& ex)
 		{
-			throw cCommandParseException("Failed to parse " + str + " as float because its too large/small.");
+			throw cCommandParseException("Failed to parse " + str + " as float because its too large/small. Error: "+ ex.what());
 		}
 		if (m_Max.has_value() && value > m_Max.value())
 		{
