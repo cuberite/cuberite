@@ -28,6 +28,7 @@
 #include "SetChunkData.h"
 #include "BoundingBox.h"
 #include "Blocks/ChunkInterface.h"
+#include "PointOfInterest.h"
 
 #include "json/json.h"
 
@@ -312,6 +313,7 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback) const
 	a_Callback.ChunkData(m_BlockData, m_LightData);
 	a_Callback.HeightMap(m_HeightMap);
 	a_Callback.BiomeMap(m_BiomeMap);
+	a_Callback.PoiData(m_PoiData);
 
 	for (const auto & Entity : m_Entities)
 	{
@@ -1270,6 +1272,9 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 	// Wake up the simulators for this block:
 	GetWorld()->GetSimulatorManager()->WakeUp(*this, a_RelPos);
 
+	// If there was a POI, remove it:
+	m_PoiData.RemovePoi(a_RelPos);
+
 	// If there was a block entity, remove it:
 	if (const auto FindResult = m_BlockEntities.find(cChunkDef::MakeIndex(a_RelPos)); FindResult != m_BlockEntities.end())
 	{
@@ -1286,6 +1291,14 @@ void cChunk::SetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 	if (cBlockEntity::IsBlockEntityBlockType(a_BlockType))
 	{
 		AddBlockEntity(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, RelativeToAbsolute(a_RelPos), m_World));
+	}
+
+	// Adding POI if the block placed is a POI:
+	ePoiType PoiType = cPointOfInterest::GetPointOnInterestType(a_BlockType, a_BlockMeta);
+
+	if (PoiType != ePoiType::poiNone)
+	{
+		m_PoiData.AddPoi({a_RelPos, PoiType});
 	}
 }
 
