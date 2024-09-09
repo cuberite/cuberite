@@ -80,7 +80,7 @@ protected:
 	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const override;
 
 	virtual void    SendChatRaw(const AString & a_MessageRaw, eChatType a_Type) override;
-	virtual void    SendPlayerListInitChat(const cPlayer & a_Player, const cClientHandle::cPlayerSessionData a_Data) override;
+	virtual void    SendPlayerListInitChat(const cPlayer & a_Player) override;
 	virtual void    SendPlayerListAddPlayer(const cPlayer & a_Player) override;
 	virtual void    SendPlayerListUpdatePing() override;
 	virtual void    SendPlayerListUpdateGameMode(const cPlayer & a_Player) override;

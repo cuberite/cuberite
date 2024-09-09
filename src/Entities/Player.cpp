@@ -141,7 +141,6 @@ cPlayer::cPlayer(const std::shared_ptr<cClientHandle> & a_Client) :
 
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
-	m_InventoryWindow->OpenedByPlayer(*this);
 
 	LoadFromDisk();
 	SetMaxHealth(MAX_HEALTH);
@@ -175,6 +174,15 @@ void cPlayer::OnLoseSpectated()
 	m_ClientHandle->SendCameraSetTo(*this);
 	m_ClientHandle->SendPlayerMoveLook();
 	m_Spectating = nullptr;
+}
+
+
+
+
+
+void cPlayer::SendPlayerInventoryJoin()
+{
+	m_InventoryWindow->OpenedByPlayer(*this);
 }
 
 

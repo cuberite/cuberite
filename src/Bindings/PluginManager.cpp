@@ -11,9 +11,8 @@
 
 #include "../IniFile.h"
 #include "../Entities/Player.h"
-
-
-
+#include "Commands/CommandArguments.h"
+#include "Commands/CommandManager.h"
 
 
 cPluginManager * cPluginManager::Get(void)
@@ -1255,6 +1254,17 @@ bool cPluginManager::CallHookWorldTick(cWorld & a_World, std::chrono::millisecon
 
 cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
 {
+	//to true here and in send command tree
+	if (false)
+	{
+		auto r = BasicStringReader(a_Command.substr(1));
+		auto ctx = cCommandExecutionContext(&a_Player);
+		if (!GetRootCommandNode()->Parse(r,ctx))
+		{
+			return crError;
+		}
+		return crExecuted;
+	}
 	AStringVector Split(StringSplit(a_Command, " "));
 	if (Split.empty())
 	{
@@ -1720,6 +1730,27 @@ AString cPluginManager::GetPluginFolderName(const AString & a_PluginName)
 		}
 	}
 	return AString();
+}
+
+
+
+
+
+void cPluginManager::SetupNewCommands(void)
+{
+	auto node = cCommandManager::cCommandNode();
+	node.Then(
+		cCommandManager::cCommandNode::Literal("testcmd")
+			.Executable([](const cCommandExecutionContext & a_Ctx) -> bool {
+				a_Ctx.SendFeedback("test cmd success");
+				return true;
+			})
+			->Then(cCommandManager::cCommandNode::Argument("test float", std::make_shared<cCommandFloatArgument>()).Executable([](const cCommandExecutionContext& a_Ctx) -> bool {
+				 a_Ctx.SendFeedback(
+					 "test cmd success2 " + std::to_string(cCommandFloatArgument::GetFloatFromCtx(a_Ctx, "test float")));
+				  	 return true; })));
+
+	m_RootCommandNode = node;
 }
 
 

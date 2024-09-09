@@ -1657,7 +1657,7 @@ void cProtocol_1_19_3::SendPlayerListAddPlayer(const cPlayer & a_Player)
 
 
 
-void cProtocol_1_19_3::SendPlayerListInitChat(const cPlayer & a_Player, const cClientHandle::cPlayerSessionData a_Data)
+void cProtocol_1_19_3::SendPlayerListInitChat(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -1665,14 +1665,16 @@ void cProtocol_1_19_3::SendPlayerListInitChat(const cPlayer & a_Player, const cC
 	Pkt.WriteBEInt8(static_cast<Int8>(PlayerListAction::InitalizeChat));
 	Pkt.WriteUUID(a_Player.GetUUID());
 
+	auto player_session_data = a_Player.GetClientHandle()->GetPlayerSessionData();
+
 	Pkt.WriteVarInt32(1);
-	Pkt.WriteBool(a_Data.IsPopulated());
-	if (a_Data.IsPopulated())
+	Pkt.WriteBool(player_session_data.IsPopulated());
+	if (player_session_data.IsPopulated())
 	{
-		Pkt.WriteUUID(a_Data.GetSessionUUID()); // mighty be player UUID not sure
-		Pkt.WriteBEInt64(a_Data.GetExpiresAtEpochMiliscond());
-		Pkt.WriteLengthPrefixedBuf(a_Data.GetPublicKey());
-		Pkt.WriteLengthPrefixedBuf(a_Data.GetKeySignature());
+		Pkt.WriteUUID(player_session_data.GetSessionUUID());
+		Pkt.WriteBEInt64(player_session_data.GetExpiresAtEpochMiliscond());
+		Pkt.WriteLengthPrefixedBuf(player_session_data.GetPublicKey());
+		Pkt.WriteLengthPrefixedBuf(player_session_data.GetKeySignature());
 	}
 }
 

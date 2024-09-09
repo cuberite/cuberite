@@ -5,6 +5,7 @@
 #include "../BlockType.h"
 #include "../Defines.h"
 #include "../FunctionRef.h"
+#include "../Commands/CommandManager.h"
 
 
 
@@ -404,7 +405,11 @@ public:
 	The path doesn't end in a slash. */
 	static AString GetPluginsPath(void) { return "Plugins"; }  // tolua_export
 
-private:
+	void SetupNewCommands(void);
+
+	cCommandManager::cCommandNode * GetRootCommandNode() { return &m_RootCommandNode; };
+
+  private:
 	friend class cRoot;
 
 	class cCommandReg
@@ -433,6 +438,7 @@ private:
 
 	HookMap    m_Hooks;
 	CommandMap m_Commands;
+	cCommandManager::cCommandNode m_RootCommandNode;
 	CommandMap m_ConsoleCommands;
 
 	/** If set to true, all the plugins will be reloaded within the next call to Tick(). */
