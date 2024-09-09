@@ -32,6 +32,16 @@ void cCreeper::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
+	// stop walking when about to blow
+	if (m_bIsBlowing)
+	{
+		m_EMState = ATTACKING;
+	}
+	else if (m_EMState == ATTACKING)
+	{
+		m_EMState = IDLE;
+	}
+
 	if (((GetTarget() == nullptr) || !TargetIsInRange()) && !m_BurnedWithFlintAndSteel)
 	{
 		if (m_bIsBlowing)
