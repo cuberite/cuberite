@@ -468,14 +468,15 @@ bool cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cPar
 	if (
 		(a_TagIdx < 0) ||
 		(a_NBT.GetType(a_TagIdx) != TAG_ByteArray) ||
-		(a_NBT.GetDataLength(a_TagIdx) != std::size(a_BiomeMap))
+		(a_NBT.GetDataLength(a_TagIdx) != a_BiomeMap.size())
 	)
 	{
 		return false;
 	}
 
+	size_t i = 0;
 	const auto * const BiomeData = a_NBT.GetData(a_TagIdx);
-	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
+	for (auto & Biome : a_BiomeMap)
 	{
 		if (BiomeData[i] > std::byte(EMCSBiome::biMaxVariantBiome))
 		{
@@ -483,7 +484,8 @@ bool cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cPar
 			return false;
 		}
 
-		a_BiomeMap[i] = static_cast<EMCSBiome>(BiomeData[i]);
+		Biome = static_cast<EMCSBiome>(BiomeData[i]);
+		i++;
 	}
 
 	return true;
