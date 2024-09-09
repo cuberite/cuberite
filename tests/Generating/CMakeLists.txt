@@ -177,11 +177,7 @@ add_executable(BasicGeneratorTest
 )
 target_link_libraries(BasicGeneratorTest GeneratorTestingSupport mbedtls)
 file(COPY "${PROJECT_SOURCE_DIR}/Server/items.ini" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-add_test(
-	NAME BasicGeneratorTest
-	COMMAND BasicGeneratorTest
-)
-
+add_test_executable(BasicGeneratorTest)
 
 
 
@@ -194,6 +190,7 @@ add_executable(LoadablePieces
 	Test1.schematic
 )
 target_link_libraries(LoadablePieces GeneratorTestingSupport)
+set_property(GLOBAL APPEND PROPERTY TEST_TARGETS  LoadablePieces)
 add_test(
 	NAME LoadablePieces-test
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -209,6 +206,7 @@ add_executable(PieceRotation
 	PieceRotationTest.cpp
 )
 target_link_libraries(PieceRotation GeneratorTestingSupport)
+set_property(GLOBAL APPEND PROPERTY TEST_TARGETS PieceRotation)
 add_test(
 	NAME PieceRotation-test
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -224,6 +222,7 @@ add_executable(PieceGeneratorBFSTree
 	PieceGeneratorBFSTreeTest.cpp
 )
 target_link_libraries(PieceGeneratorBFSTree GeneratorTestingSupport)
+set_property(GLOBAL APPEND PROPERTY TEST_TARGETS PieceGeneratorBFSTree)
 add_test(
 	NAME PieceGeneratorBFSTree-test
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/Server/Prefabs/PieceStructures
