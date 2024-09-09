@@ -26,7 +26,7 @@ public:
 
 	cBeaconEntity * GetBeaconEntity(void) const { return m_Beacon; }
 
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
+	virtual void DistributeStack(cItem & a_ItemStack, std::size_t a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
 
 	// cWindow Overrides:
 	virtual void OpenedByPlayer(cPlayer & a_Player) override;

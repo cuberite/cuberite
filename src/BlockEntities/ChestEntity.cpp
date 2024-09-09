@@ -237,7 +237,7 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 
 
 
-void cChestEntity::OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
+void cChestEntity::OnSlotChanged(cItemGrid * a_Grid, std::size_t a_SlotNum)
 {
 	ASSERT(a_Grid == &m_Contents);
 

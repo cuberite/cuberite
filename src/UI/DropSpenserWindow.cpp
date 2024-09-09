@@ -23,7 +23,7 @@ cDropSpenserWindow::cDropSpenserWindow(cDropSpenserEntity * a_DropSpenser):
 
 
 
-void cDropSpenserWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
+void cDropSpenserWindow::DistributeStack(cItem & a_ItemStack, std::size_t a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
 {
 	cSlotAreas AreasInOrder;
 

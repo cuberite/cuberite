@@ -404,9 +404,9 @@ public:
 	virtual void SendExplosion                  (Vector3f a_Position, float a_Power) = 0;
 	virtual void SendGameMode                   (eGameMode a_GameMode) = 0;
 	virtual void SendHealth                     (void) = 0;
-	virtual void SendHeldItemChange             (int a_ItemIndex) = 0;
+	virtual void SendHeldItemChange             (std::size_t a_ItemIndex) = 0;
 	virtual void SendHideTitle                  (void) = 0;
-	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
+	virtual void SendInventorySlot              (char a_WindowID, std::size_t a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendKeepAlive                  (UInt32 a_PingID) = 0;
 	virtual void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) = 0;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) = 0;
