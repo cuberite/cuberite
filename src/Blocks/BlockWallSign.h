@@ -1,11 +1,8 @@
 
 #pragma once
 
-#include "BlockHandler.h"
-#include "../Chunk.h"
-
-
-
+#include "BlockInfo.h"
+#include "Chunk.h"
 
 
 class cBlockWallSignHandler final :
@@ -16,6 +13,40 @@ class cBlockWallSignHandler final :
 public:
 
 	using Super::Super;
+
+	static inline bool IsBlockWallSign(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaWallSign:
+			case BlockType::BirchWallSign:
+			case BlockType::CrimsonWallSign:
+			case BlockType::DarkOakWallSign:
+			case BlockType::OakWallSign:
+			case BlockType::JungleWallSign:
+			case BlockType::WarpedWallSign:
+			case BlockType::SpruceWallSign:
+				return true;
+			default: return false;
+		}
+	}
+
+	static inline eBlockFace GetSignFacing(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaWallSign:  return AcaciaWallSign::Facing(a_Block);
+			case BlockType::BirchWallSign:   return BirchWallSign::Facing(a_Block);
+			case BlockType::CrimsonWallSign: return CrimsonWallSign::Facing(a_Block);
+			case BlockType::DarkOakWallSign: return DarkOakWallSign::Facing(a_Block);
+			case BlockType::OakWallSign:     return OakWallSign::Facing(a_Block);
+			case BlockType::JungleWallSign:  return JungleWallSign::Facing(a_Block);
+			case BlockType::WarpedWallSign:  return WarpedWallSign::Facing(a_Block);
+			case BlockType::SpruceWallSign:  return SpruceWallSign::Facing(a_Block);
+			default: return eBlockFace::BLOCK_FACE_NONE;
+		}
+	}
 
 private:
 

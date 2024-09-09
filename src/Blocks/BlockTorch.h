@@ -22,6 +22,21 @@ public:
 
 	using Super::Super;
 
+	static inline bool IsBlockTorch(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Torch:
+			case BlockType::WallTorch:
+			case BlockType::RedstoneTorch:
+			case BlockType::RedstoneWallTorch:
+			case BlockType::SoulTorch:
+			case BlockType::SoulWallTorch:
+				return true;
+			default: return false;
+		}
+	}
+
 
 	/** Returns true if the torch can be placed on the specified block's face. */
 	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_BlockFace)
@@ -95,7 +110,7 @@ protected:
 private:
 
 	/** Converts the torch block's meta to the block face of the neighbor to which the torch is attached. */
-	inline static eBlockFace MetaDataToBlockFace(NIBBLETYPE a_MetaData)
+	constexpr static eBlockFace MetaDataToBlockFace(NIBBLETYPE a_MetaData)
 	{
 		switch (a_MetaData)
 		{

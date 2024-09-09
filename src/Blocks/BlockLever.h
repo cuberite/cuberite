@@ -68,7 +68,7 @@ private:
 
 
 	/** Converts the leve block's meta to the block face of the neighbor to which the lever is attached. */
-	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
+	constexpr static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x7)
 		{

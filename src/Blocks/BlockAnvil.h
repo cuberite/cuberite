@@ -1,10 +1,10 @@
 
 #pragma once
 
-#include "BlockHandler.h"
-#include "Mixins.h"
-#include "../Entities/Player.h"
-#include "../UI/AnvilWindow.h"
+#include "Blocks/BlockHandler.h"
+#include "Blocks/Mixins.h"
+#include "Entities/Player.h"
+#include "UI/AnvilWindow.h"
 
 
 
@@ -19,7 +19,44 @@ public:
 
 	using Super::Super;
 
+	static inline eBlockFace GetFacing(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Anvil:        return Block::Anvil::Facing(a_Block);
+			case BlockType::ChippedAnvil: return Block::ChippedAnvil::Facing(a_Block);
+			case BlockType::DamagedAnvil: return Block::DamagedAnvil::Facing(a_Block);
+			default: return BLOCK_FACE_NONE;
+		}
+	}
+
 private:
+
+	/** Rotates a given block counter-clockwise. */
+	BlockState RotateCCW(BlockState a_Block) const
+	{
+		auto Facing = RotateBlockFaceCCW(GetFacing(a_Block));
+		switch (a_Block.Type())
+		{
+			case BlockType::Anvil:        return Block::Anvil::Anvil(Facing);
+			case BlockType::ChippedAnvil: return Block::ChippedAnvil::ChippedAnvil(Facing);
+			case BlockType::DamagedAnvil: return Block::DamagedAnvil::DamagedAnvil(Facing);
+			default: return a_Block;
+		}
+	}
+
+	/** Rotates a given block clockwise. */
+	BlockState RotateCW(BlockState a_Block) const
+	{
+		auto Facing = RotateBlockFaceCW(GetFacing(a_Block));
+		switch (a_Block.Type())
+		{
+			case BlockType::Anvil:        return Block::Anvil::Anvil(Facing);
+			case BlockType::ChippedAnvil: return Block::ChippedAnvil::ChippedAnvil(Facing);
+			case BlockType::DamagedAnvil: return Block::DamagedAnvil::DamagedAnvil(Facing);
+			default: return a_Block;
+		}
+	}
 
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{

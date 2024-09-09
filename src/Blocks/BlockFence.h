@@ -19,6 +19,88 @@ public:
 
 	using Super::Super;
 
+
+	static inline bool IsBlockFence(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaFence:
+			case BlockType::BirchFence:
+			case BlockType::DarkOakFence:
+			case BlockType::JungleFence:
+			case BlockType::NetherBrickFence:
+			case BlockType::OakFence:
+			case BlockType::SpruceFence:
+			case BlockType::WarpedFence:
+				return true;
+			default: return false;
+		}
+	}
+
+	static inline bool IsConnectedNorth(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaFence:      return Block::AcaciaFence::North(a_Block);
+			case BlockType::BirchFence:       return Block::BirchFence::North(a_Block);
+			case BlockType::DarkOakFence:     return Block::DarkOakFence::North(a_Block);
+			case BlockType::JungleFence:      return Block::JungleFence::North(a_Block);
+			case BlockType::NetherBrickFence: return Block::NetherBrickFence::North(a_Block);
+			case BlockType::OakFence:         return Block::OakFence::North(a_Block);
+			case BlockType::SpruceFence:      return Block::SpruceFence::North(a_Block);
+			case BlockType::WarpedFence:      return Block::WarpedFence::North(a_Block);
+			default: return false;
+		}
+	}
+
+	static inline bool IsConnectedEast(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaFence:      return Block::AcaciaFence::East(a_Block);
+			case BlockType::BirchFence:       return Block::BirchFence::East(a_Block);
+			case BlockType::DarkOakFence:     return Block::DarkOakFence::East(a_Block);
+			case BlockType::JungleFence:      return Block::JungleFence::East(a_Block);
+			case BlockType::NetherBrickFence: return Block::NetherBrickFence::East(a_Block);
+			case BlockType::OakFence:         return Block::OakFence::East(a_Block);
+			case BlockType::SpruceFence:      return Block::SpruceFence::East(a_Block);
+			case BlockType::WarpedFence:      return Block::WarpedFence::East(a_Block);
+			default: return false;
+		}
+	}
+
+	static inline bool IsConnectedSouth(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaFence:      return Block::AcaciaFence::South(a_Block);
+			case BlockType::BirchFence:       return Block::BirchFence::South(a_Block);
+			case BlockType::DarkOakFence:     return Block::DarkOakFence::South(a_Block);
+			case BlockType::JungleFence:      return Block::JungleFence::South(a_Block);
+			case BlockType::NetherBrickFence: return Block::NetherBrickFence::South(a_Block);
+			case BlockType::OakFence:         return Block::OakFence::South(a_Block);
+			case BlockType::SpruceFence:      return Block::SpruceFence::South(a_Block);
+			case BlockType::WarpedFence:      return Block::WarpedFence::South(a_Block);
+			default: return false;
+		}
+	}
+
+	static inline bool IsConnectedWest(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaFence:      return Block::AcaciaFence::West(a_Block);
+			case BlockType::BirchFence:       return Block::BirchFence::West(a_Block);
+			case BlockType::DarkOakFence:     return Block::DarkOakFence::West(a_Block);
+			case BlockType::JungleFence:      return Block::JungleFence::West(a_Block);
+			case BlockType::NetherBrickFence: return Block::NetherBrickFence::West(a_Block);
+			case BlockType::OakFence:         return Block::OakFence::West(a_Block);
+			case BlockType::SpruceFence:      return Block::SpruceFence::West(a_Block);
+			case BlockType::WarpedFence:      return Block::WarpedFence::West(a_Block);
+			default: return false;
+		}
+	}
+
 private:
 
 	// These are the min and max coordinates (X and Z) for a straight fence.

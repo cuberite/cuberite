@@ -16,6 +16,39 @@ public:
 
 	using Super::Super;
 
+	static constexpr unsigned char ILLEGAL_FALLOFF = std::numeric_limits<unsigned char>::max();
+
+	static inline bool IsBlockLiquid(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Lava:
+			case BlockType::Water:
+				return true;
+			default: return false;
+		}
+	}
+
+	static inline unsigned char GetFalloff(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Lava:  return Block::Lava::Level(a_Block);
+			case BlockType::Water: return Block::Water::Level(a_Block);
+			default: return ILLEGAL_FALLOFF;
+		}
+	}
+
+	static inline BlockState SetFalloff(BlockState a_Block, unsigned char a_Falloff)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Lava:  return Block::Lava::Lava(a_Falloff);
+			case BlockType::Water: return Block::Water::Water(a_Falloff);
+			default: return a_Block;
+		}
+	}
+
 protected:
 
 	~cBlockFluidHandler() = default;

@@ -16,6 +16,26 @@ public:
 
 	using Super::Super;
 
+	static inline bool IsBlockFlower(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Allium:
+			case BlockType::AzureBluet:
+			case BlockType::BlueOrchid:
+			case BlockType::Cornflower:
+			case BlockType::LilyOfTheValley:
+			case BlockType::OrangeTulip:
+			case BlockType::OxeyeDaisy:
+			case BlockType::PinkTulip:
+			case BlockType::Poppy:
+			case BlockType::RedTulip:
+			case BlockType::WhiteTulip:
+				return true;
+			default: return false;
+		}
+	}
+
 private:
 
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override

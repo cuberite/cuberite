@@ -129,6 +129,28 @@ cBoundingBox cBlockDoorHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTY
 
 
 
+BlockState cBlockDoorHandler::RotateCCW(BlockState a_Block) const
+{
+	using namespace Block;
+	switch (a_Block.Type())
+	{
+		case BlockType::AcaciaDoor:  return AcaciaDoor ::AcaciaDoor (RotateBlockFaceCCW(AcaciaDoor:: Facing(a_Block)), AcaciaDoor:: Half(a_Block), AcaciaDoor:: Hinge(a_Block), AcaciaDoor:: Open(a_Block), AcaciaDoor:: Powered(a_Block));
+		case BlockType::BirchDoor:   return BirchDoor  ::BirchDoor  (RotateBlockFaceCCW(BirchDoor::  Facing(a_Block)), BirchDoor::  Half(a_Block), BirchDoor::  Hinge(a_Block), BirchDoor::  Open(a_Block), BirchDoor::  Powered(a_Block));
+		case BlockType::CrimsonDoor: return CrimsonDoor::CrimsonDoor(RotateBlockFaceCCW(CrimsonDoor::Facing(a_Block)), CrimsonDoor::Half(a_Block), CrimsonDoor::Hinge(a_Block), CrimsonDoor::Open(a_Block), CrimsonDoor::Powered(a_Block));
+		case BlockType::DarkOakDoor: return DarkOakDoor::DarkOakDoor(RotateBlockFaceCCW(DarkOakDoor::Facing(a_Block)), DarkOakDoor::Half(a_Block), DarkOakDoor::Hinge(a_Block), DarkOakDoor::Open(a_Block), DarkOakDoor::Powered(a_Block));
+		case BlockType::JungleDoor:  return JungleDoor::JungleDoor  (RotateBlockFaceCCW(JungleDoor:: Facing(a_Block)), JungleDoor:: Half(a_Block), JungleDoor:: Hinge(a_Block), JungleDoor:: Open(a_Block), JungleDoor:: Powered(a_Block));
+		case BlockType::OakDoor:     return OakDoor::   OakDoor     (RotateBlockFaceCCW(OakDoor::    Facing(a_Block)), OakDoor::    Half(a_Block), OakDoor::    Hinge(a_Block), OakDoor::    Open(a_Block), OakDoor::    Powered(a_Block));
+		case BlockType::SpruceDoor:  return SpruceDoor::SpruceDoor  (RotateBlockFaceCCW(SpruceDoor:: Facing(a_Block)), SpruceDoor:: Half(a_Block), SpruceDoor:: Hinge(a_Block), SpruceDoor:: Open(a_Block), SpruceDoor:: Powered(a_Block));
+		case BlockType::WarpedDoor:  return WarpedDoor::WarpedDoor  (RotateBlockFaceCCW(WarpedDoor:: Facing(a_Block)), WarpedDoor:: Half(a_Block), WarpedDoor:: Hinge(a_Block), WarpedDoor:: Open(a_Block), WarpedDoor:: Powered(a_Block));
+		case BlockType::IronDoor:    return IronDoor::  IronDoor    (RotateBlockFaceCCW(IronDoor::   Facing(a_Block)), IronDoor::   Half(a_Block), IronDoor::   Hinge(a_Block), IronDoor::   Open(a_Block), IronDoor::   Powered(a_Block));
+		default: return a_Block;
+	}
+}
+
+
+
+
+
 NIBBLETYPE cBlockDoorHandler::MetaRotateCCW(NIBBLETYPE a_Meta) const
 {
 	if (a_Meta & 0x08)
@@ -147,6 +169,28 @@ NIBBLETYPE cBlockDoorHandler::MetaRotateCCW(NIBBLETYPE a_Meta) const
 
 
 
+BlockState cBlockDoorHandler::RotateCW(BlockState a_Block) const
+{
+	using namespace Block;
+	switch (a_Block.Type())
+	{
+		case BlockType::AcaciaDoor:  return AcaciaDoor ::AcaciaDoor (RotateBlockFaceCW(AcaciaDoor:: Facing(a_Block)), AcaciaDoor:: Half(a_Block), AcaciaDoor:: Hinge(a_Block), AcaciaDoor:: Open(a_Block), AcaciaDoor:: Powered(a_Block));
+		case BlockType::BirchDoor:   return BirchDoor  ::BirchDoor  (RotateBlockFaceCW(BirchDoor::  Facing(a_Block)), BirchDoor::  Half(a_Block), BirchDoor::  Hinge(a_Block), BirchDoor::  Open(a_Block), BirchDoor::  Powered(a_Block));
+		case BlockType::CrimsonDoor: return CrimsonDoor::CrimsonDoor(RotateBlockFaceCW(CrimsonDoor::Facing(a_Block)), CrimsonDoor::Half(a_Block), CrimsonDoor::Hinge(a_Block), CrimsonDoor::Open(a_Block), CrimsonDoor::Powered(a_Block));
+		case BlockType::DarkOakDoor: return DarkOakDoor::DarkOakDoor(RotateBlockFaceCW(DarkOakDoor::Facing(a_Block)), DarkOakDoor::Half(a_Block), DarkOakDoor::Hinge(a_Block), DarkOakDoor::Open(a_Block), DarkOakDoor::Powered(a_Block));
+		case BlockType::JungleDoor:  return JungleDoor::JungleDoor  (RotateBlockFaceCW(JungleDoor:: Facing(a_Block)), JungleDoor:: Half(a_Block), JungleDoor:: Hinge(a_Block), JungleDoor:: Open(a_Block), JungleDoor:: Powered(a_Block));
+		case BlockType::OakDoor:     return OakDoor::   OakDoor     (RotateBlockFaceCW(OakDoor::    Facing(a_Block)), OakDoor::    Half(a_Block), OakDoor::    Hinge(a_Block), OakDoor::    Open(a_Block), OakDoor::    Powered(a_Block));
+		case BlockType::SpruceDoor:  return SpruceDoor::SpruceDoor  (RotateBlockFaceCW(SpruceDoor:: Facing(a_Block)), SpruceDoor:: Half(a_Block), SpruceDoor:: Hinge(a_Block), SpruceDoor:: Open(a_Block), SpruceDoor:: Powered(a_Block));
+		case BlockType::WarpedDoor:  return WarpedDoor::WarpedDoor  (RotateBlockFaceCW(WarpedDoor:: Facing(a_Block)), WarpedDoor:: Half(a_Block), WarpedDoor:: Hinge(a_Block), WarpedDoor:: Open(a_Block), WarpedDoor:: Powered(a_Block));
+		case BlockType::IronDoor:    return IronDoor::  IronDoor    (RotateBlockFaceCW(IronDoor::   Facing(a_Block)), IronDoor::   Half(a_Block), IronDoor::   Hinge(a_Block), IronDoor::   Open(a_Block), IronDoor::   Powered(a_Block));
+		default: return a_Block;
+	}
+}
+
+
+
+
+
 NIBBLETYPE cBlockDoorHandler::MetaRotateCW(NIBBLETYPE a_Meta) const
 {
 	if (a_Meta & 0x08)
@@ -158,6 +202,28 @@ NIBBLETYPE cBlockDoorHandler::MetaRotateCW(NIBBLETYPE a_Meta) const
 	{
 		// Rotate the bottom block
 		return Super::MetaRotateCW(a_Meta);
+	}
+}
+
+
+
+
+
+BlockState cBlockDoorHandler::MirrorXY(BlockState a_Block) const
+{
+	using namespace Block;
+	switch (a_Block.Type())
+	{
+		case BlockType::AcaciaDoor:  return AcaciaDoor ::AcaciaDoor (MirrorBlockFaceXY(AcaciaDoor:: Facing(a_Block)), AcaciaDoor:: Half(a_Block), AcaciaDoor:: Hinge(a_Block), AcaciaDoor:: Open(a_Block), AcaciaDoor:: Powered(a_Block));
+		case BlockType::BirchDoor:   return BirchDoor  ::BirchDoor  (MirrorBlockFaceXY(BirchDoor::  Facing(a_Block)), BirchDoor::  Half(a_Block), BirchDoor::  Hinge(a_Block), BirchDoor::  Open(a_Block), BirchDoor::  Powered(a_Block));
+		case BlockType::CrimsonDoor: return CrimsonDoor::CrimsonDoor(MirrorBlockFaceXY(CrimsonDoor::Facing(a_Block)), CrimsonDoor::Half(a_Block), CrimsonDoor::Hinge(a_Block), CrimsonDoor::Open(a_Block), CrimsonDoor::Powered(a_Block));
+		case BlockType::DarkOakDoor: return DarkOakDoor::DarkOakDoor(MirrorBlockFaceXY(DarkOakDoor::Facing(a_Block)), DarkOakDoor::Half(a_Block), DarkOakDoor::Hinge(a_Block), DarkOakDoor::Open(a_Block), DarkOakDoor::Powered(a_Block));
+		case BlockType::JungleDoor:  return JungleDoor::JungleDoor  (MirrorBlockFaceXY(JungleDoor:: Facing(a_Block)), JungleDoor:: Half(a_Block), JungleDoor:: Hinge(a_Block), JungleDoor:: Open(a_Block), JungleDoor:: Powered(a_Block));
+		case BlockType::OakDoor:     return OakDoor::   OakDoor     (MirrorBlockFaceXY(OakDoor::    Facing(a_Block)), OakDoor::    Half(a_Block), OakDoor::    Hinge(a_Block), OakDoor::    Open(a_Block), OakDoor::    Powered(a_Block));
+		case BlockType::SpruceDoor:  return SpruceDoor::SpruceDoor  (MirrorBlockFaceXY(SpruceDoor:: Facing(a_Block)), SpruceDoor:: Half(a_Block), SpruceDoor:: Hinge(a_Block), SpruceDoor:: Open(a_Block), SpruceDoor:: Powered(a_Block));
+		case BlockType::WarpedDoor:  return WarpedDoor::WarpedDoor  (MirrorBlockFaceXY(WarpedDoor:: Facing(a_Block)), WarpedDoor:: Half(a_Block), WarpedDoor:: Hinge(a_Block), WarpedDoor:: Open(a_Block), WarpedDoor:: Powered(a_Block));
+		case BlockType::IronDoor:    return IronDoor::  IronDoor    (MirrorBlockFaceXY(IronDoor::   Facing(a_Block)), IronDoor::   Half(a_Block), IronDoor::   Hinge(a_Block), IronDoor::   Open(a_Block), IronDoor::   Powered(a_Block));
+		default: return a_Block;
 	}
 }
 
@@ -193,6 +259,28 @@ NIBBLETYPE cBlockDoorHandler::MetaMirrorXY(NIBBLETYPE a_Meta) const
 
 	// Not Facing North or South; No change.
 	return a_Meta;
+}
+
+
+
+
+
+BlockState cBlockDoorHandler::MirrorYZ(BlockState a_Block) const
+{
+	using namespace Block;
+	switch (a_Block.Type())
+	{
+		case BlockType::AcaciaDoor:  return AcaciaDoor ::AcaciaDoor (MirrorBlockFaceYZ(AcaciaDoor:: Facing(a_Block)), AcaciaDoor:: Half(a_Block), AcaciaDoor:: Hinge(a_Block), AcaciaDoor:: Open(a_Block), AcaciaDoor:: Powered(a_Block));
+		case BlockType::BirchDoor:   return BirchDoor  ::BirchDoor  (MirrorBlockFaceYZ(BirchDoor::  Facing(a_Block)), BirchDoor::  Half(a_Block), BirchDoor::  Hinge(a_Block), BirchDoor::  Open(a_Block), BirchDoor::  Powered(a_Block));
+		case BlockType::CrimsonDoor: return CrimsonDoor::CrimsonDoor(MirrorBlockFaceYZ(CrimsonDoor::Facing(a_Block)), CrimsonDoor::Half(a_Block), CrimsonDoor::Hinge(a_Block), CrimsonDoor::Open(a_Block), CrimsonDoor::Powered(a_Block));
+		case BlockType::DarkOakDoor: return DarkOakDoor::DarkOakDoor(MirrorBlockFaceYZ(DarkOakDoor::Facing(a_Block)), DarkOakDoor::Half(a_Block), DarkOakDoor::Hinge(a_Block), DarkOakDoor::Open(a_Block), DarkOakDoor::Powered(a_Block));
+		case BlockType::JungleDoor:  return JungleDoor::JungleDoor  (MirrorBlockFaceYZ(JungleDoor:: Facing(a_Block)), JungleDoor:: Half(a_Block), JungleDoor:: Hinge(a_Block), JungleDoor:: Open(a_Block), JungleDoor:: Powered(a_Block));
+		case BlockType::OakDoor:     return OakDoor::   OakDoor     (MirrorBlockFaceYZ(OakDoor::    Facing(a_Block)), OakDoor::    Half(a_Block), OakDoor::    Hinge(a_Block), OakDoor::    Open(a_Block), OakDoor::    Powered(a_Block));
+		case BlockType::SpruceDoor:  return SpruceDoor::SpruceDoor  (MirrorBlockFaceYZ(SpruceDoor:: Facing(a_Block)), SpruceDoor:: Half(a_Block), SpruceDoor:: Hinge(a_Block), SpruceDoor:: Open(a_Block), SpruceDoor:: Powered(a_Block));
+		case BlockType::WarpedDoor:  return WarpedDoor::WarpedDoor  (MirrorBlockFaceYZ(WarpedDoor:: Facing(a_Block)), WarpedDoor:: Half(a_Block), WarpedDoor:: Hinge(a_Block), WarpedDoor:: Open(a_Block), WarpedDoor:: Powered(a_Block));
+		case BlockType::IronDoor:    return IronDoor::  IronDoor    (MirrorBlockFaceYZ(IronDoor::   Facing(a_Block)), IronDoor::   Half(a_Block), IronDoor::   Hinge(a_Block), IronDoor::   Open(a_Block), IronDoor::   Powered(a_Block));
+		default: return a_Block;
+	}
 }
 
 

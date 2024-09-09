@@ -16,6 +16,55 @@ public:
 
 	using Super::Super;
 
+	static inline bool IsBlockConcretePowder(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::BlackConcretePowder:
+			case BlockType::BlueConcretePowder:
+			case BlockType::BrownConcretePowder:
+			case BlockType::CyanConcretePowder:
+			case BlockType::GrayConcretePowder:
+			case BlockType::GreenConcretePowder:
+			case BlockType::LightBlueConcretePowder:
+			case BlockType::LightGrayConcretePowder:
+			case BlockType::LimeConcretePowder:
+			case BlockType::MagentaConcretePowder:
+			case BlockType::OrangeConcretePowder:
+			case BlockType::PinkConcretePowder:
+			case BlockType::PurpleConcretePowder:
+			case BlockType::RedConcretePowder:
+			case BlockType::WhiteConcretePowder:
+			case BlockType::YellowConcretePowder:
+				return true;
+			default: return false;
+		}
+	}
+
+	static inline BlockState GetConcreteFromConcretePowder(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::BlackConcretePowder:     return Block::BlackConcrete::BlackConcrete();
+			case BlockType::BlueConcretePowder:      return Block::BlueConcrete::BlueConcrete();
+			case BlockType::BrownConcretePowder:     return Block::BrownConcrete::BrownConcrete();
+			case BlockType::CyanConcretePowder:      return Block::CyanConcrete::CyanConcrete();
+			case BlockType::GrayConcretePowder:      return Block::GrayConcrete::GrayConcrete();
+			case BlockType::GreenConcretePowder:     return Block::GreenConcrete::GreenConcrete();
+			case BlockType::LightBlueConcretePowder: return Block::LightBlueConcrete::LightBlueConcrete();
+			case BlockType::LightGrayConcretePowder: return Block::LightGrayConcrete::LightGrayConcrete();
+			case BlockType::LimeConcretePowder:      return Block::LimeConcrete::LimeConcrete();
+			case BlockType::MagentaConcretePowder:   return Block::MagentaConcrete::MagentaConcrete();
+			case BlockType::OrangeConcretePowder:    return Block::OrangeConcrete::OrangeConcrete();
+			case BlockType::PinkConcretePowder:      return Block::PinkConcrete::PinkConcrete();
+			case BlockType::PurpleConcretePowder:    return Block::PurpleConcrete::PurpleConcrete();
+			case BlockType::RedConcretePowder:       return Block::RedConcrete::RedConcrete();
+			case BlockType::WhiteConcretePowder:     return Block::WhiteConcrete::WhiteConcrete();
+			case BlockType::YellowConcretePowder:    return Block::YellowConcrete::YellowConcrete();
+			default: return a_Block;
+		}
+	}
+
 private:
 
 	virtual void OnPlaced(

@@ -17,11 +17,13 @@ public:
 
 	using Super::Super;
 
+	const unsigned char RipeAge = 0x03;
+
 private:
 
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
-		if (a_BlockMeta == 0x03)
+		if (a_BlockMeta == RipeAge)
 		{
 			// Fully grown, drop the entire produce:
 			const auto DropNum = FortuneDiscreteRandom(2, 4, ToolFortuneLevel(a_Tool));
@@ -38,17 +40,17 @@ private:
 	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
 		auto oldMeta = a_Chunk.GetMeta(a_RelPos);
-		auto meta = std::min(oldMeta + a_NumStages, 3);
-		if ((oldMeta < 3) && (CanGrow(a_Chunk, a_RelPos) == paGrowth))
+		auto meta = std::min<unsigned char>(oldMeta + static_cast<unsigned char>(a_NumStages), RipeAge);
+		if ((oldMeta < RipeAge) && (CanGrow(a_Chunk, a_RelPos) == paGrowth))
 		{
 			a_Chunk.SetBlock(a_RelPos, m_BlockType, static_cast<NIBBLETYPE>(meta));
 			return meta - oldMeta;
 		}
 
 		// In older versions of cuberite, there was a bug which made wart grow too much. This check fixes previously saved buggy warts.
-		if (oldMeta > 3)
+		if (oldMeta > RipeAge)
 		{
-			a_Chunk.FastSetBlock(a_RelPos, m_BlockType, 3);
+			a_Chunk.FastSetBlock(a_RelPos, m_BlockType, RipeAge);
 		}
 		return 0;
 	}
