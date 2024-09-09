@@ -24,7 +24,7 @@
 
 
 
-cHopperEntity::cHopperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+cHopperEntity::cHopperEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_LastMoveItemsInTick(0),
 	m_LastMoveItemsOutTick(0),
@@ -46,7 +46,7 @@ void cHopperEntity::SetLocked(bool a_Value)
 
 
 
-std::pair<bool, Vector3i> cHopperEntity::GetOutputBlockPos(NIBBLETYPE a_BlockMeta)
+std::pair<bool, Vector3i> cHopperEntity::GetOutputBlockPos(BLOCKMETATYPE a_BlockMeta)
 {
 	auto pos = GetPos();
 	switch (a_BlockMeta)

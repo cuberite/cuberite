@@ -25,17 +25,15 @@ class cBannerEntity :
 
 public:
 
-	cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, unsigned char a_BaseColor = 1, AString a_CustomName = "");
+	cBannerEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, unsigned char a_BaseColor = 1, AString a_CustomName = "");
 
-	unsigned char GetBaseColor() const { return m_BaseColor; }
-	void SetBaseColor(unsigned char a_Color) { m_BaseColor = a_Color; }
+	unsigned char GetBaseColor() const { return (m_BlockMeta >> 4) & 0x0f; }
+	void SetBaseColor(unsigned char a_Color) { m_BlockMeta = (m_BlockMeta & (~0xf0)) | static_cast<BLOCKMETATYPE>(a_Color << 4); }
 
 	const AString & GetCustomName() const { return m_CustomName; }
 	void SetCustomName(const AString & a_CustomName) { m_CustomName = a_CustomName; }
 
 private:
-
-	unsigned char m_BaseColor;
 
 	AString m_CustomName;
 
