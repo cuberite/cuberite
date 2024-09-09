@@ -398,7 +398,7 @@ void cProtocol_1_20_2::SendLoginSuccess(void)
 		cPacketizer Pkt(*this, pktLoginSuccess);
 		Pkt.WriteUUID(m_Client->GetUUID());
 		Pkt.WriteString(m_Client->GetUsername());
-		Pkt.WriteVarInt32(0);  // number of Profile Properites
+		Pkt.WriteVarInt32(0);  // TODO: write profile props. number of Profile Properites
 	}
 }
 
@@ -456,7 +456,7 @@ bool cProtocol_1_20_2::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x03: /* MessageAcknowledgmentC2SPacket */ return false;
 				case 0x04: HandlePacketCommandExecution(a_ByteBuffer); return true;
 				case 0x05: HandlePacketChatMessage(a_ByteBuffer); return true;
-				case 0x06: /* PlayerSessionC2SPacket */ return false;
+				case 0x06: HandlePacketPlayerSession(a_ByteBuffer); return true;
 				case 0x07: /* AcknowledgeChunksC2SPacket */ return false;
 				case 0x08: HandlePacketClientStatus(a_ByteBuffer); return true;
 				case 0x09: HandlePacketClientSettings(a_ByteBuffer); return true;
@@ -517,7 +517,7 @@ bool cProtocol_1_20_2::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 void cProtocol_1_20_2::HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer)
 {
 	m_State = State::Configuration;
-
+	SendDynamicRegistries();
 	m_Client->SendFinishConfiguration();
 }
 
@@ -527,6 +527,7 @@ void cProtocol_1_20_2::HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer
 
 void cProtocol_1_20_2::SendFinishConfiguration()
 {
+	m_IsConfigReadySent = true;
 	{
 		cPacketizer Pkt(*this, pktConfigurationReady);
 	}
@@ -540,7 +541,139 @@ void cProtocol_1_20_2::SendDynamicRegistries()
 {
 	{
 		cPacketizer Pkt(*this, pktConfigurationDynamicRegistries);
-		//  TODO: Implement 
+		AString dmgsrc[] = {"in_fire","lightning_bolt", "on_fire","lava","hot_floor", "in_wall","cramming", "drown","starve",	"cactus", "fall","fly_into_wall","out_of_world","generic","magic","wither","dragon_breath","dry_out","sweet_berry_bush","freeze","stalagmite","outside_border","generic_kill"};
+		int dmgids[] =     {18       ,22             ,27        ,21     ,17        ,19        ,3           ,5     ,33          ,2       ,8      ,14             ,28            ,16       ,23     ,40      ,4              ,6        ,35                ,15      ,32          ,5              ,7};
+		{
+			cFastNBTWriter Writer = cFastNBTWriter(true);
+			Writer.BeginCompound("minecraft:damage_type");
+				Writer.AddString("type", "minecraft:damage_type");
+				Writer.BeginList("value", eTagType::TAG_Compound);
+				int id = 0;
+					for each (auto ds in dmgsrc)
+					{
+						Writer.BeginCompound("");
+							Writer.BeginCompound("element");
+								Writer.AddString("effects", "burning");
+								Writer.AddFloat("exhaustion", 0.1F);
+								Writer.AddString("message_id", "inFire");
+								Writer.AddString("scaling", "when_caused_by_living_non_player");
+							Writer.EndCompound();
+						Writer.AddInt("id", dmgids[id]);
+						Writer.AddString("name", "minecraft:"+ds);
+						Writer.EndCompound();
+						id++;
+					}
+
+				Writer.EndList();
+			Writer.EndCompound();
+			Writer.BeginCompound("minecraft:chat_type");
+				Writer.AddString("type", "minecraft:chat_type");
+				Writer.BeginList("value", eTagType::TAG_Compound);
+					Writer.BeginCompound("");
+						Writer.BeginCompound("element");
+							Writer.BeginCompound("chat");
+									Writer.BeginList("parameters", eTagType::TAG_String);
+										Writer.AddString("", "sender");
+										Writer.AddString("", "content");
+									Writer.EndList();
+										Writer.BeginCompound("style");
+										Writer.EndCompound();
+									Writer.AddString("translation_key", "chat.type.text");
+							Writer.EndCompound();
+
+							Writer.BeginCompound("narration");
+									Writer.BeginList("parameters", eTagType::TAG_String);
+										Writer.AddString("", "sender");
+										Writer.AddString("", "content");
+									Writer.EndList();
+										Writer.BeginCompound("style");
+										Writer.EndCompound();
+									Writer.AddString("translation_key", "chat.type.narrate");
+							Writer.EndCompound();
+						Writer.EndCompound();
+					Writer.AddInt("id",0);
+					Writer.AddString("name", "minecraft:chat");
+					Writer.EndCompound();
+				Writer.EndList();
+			Writer.EndCompound();
+			Writer.BeginCompound("minecraft:dimension_type");
+				Writer.AddString("type", "minecraft:dimension_type");
+				Writer.BeginList("value", eTagType::TAG_Compound);
+					Writer.BeginCompound("");
+
+						Writer.BeginCompound("element");
+
+						Writer.AddByte("piglin_safe", 1);
+						Writer.AddByte("natural", 1);
+						Writer.AddFloat("ambient_light", 1.0);
+						Writer.AddInt("monster_spawn_block_light_limit", 0);
+						Writer.AddString("infiniburn", "#infiniburn_overworld");
+						Writer.AddByte("respawn_anchor_works", 1);
+						Writer.AddByte("has_skylight", 1);
+						Writer.AddByte("bed_works", 1);
+						Writer.AddString("effects", "minecraft:overworld");
+						Writer.AddByte("has_raids", 1);
+						Writer.AddInt("logical_height", 256);
+						Writer.AddDouble("coordinate_scale", 1.0);
+						Writer.AddByte("ultrawarm", 0);
+						Writer.AddByte("has_ceiling", 0);
+						Writer.AddInt("min_y", 0);
+						Writer.AddInt("height", 256);
+							Writer.BeginCompound("monster_spawn_light_level");
+
+							Writer.AddString("type", "minecraft:uniform");
+								Writer.BeginCompound("value");
+
+								Writer.AddInt("min_inclusive", 0);
+								Writer.AddInt("max_inclusive", 7);
+
+								Writer.EndCompound();
+
+							Writer.EndCompound();
+
+						Writer.EndCompound();
+
+						Writer.AddInt("id",0);
+						Writer.AddString("name", "minecraft:overworld");
+					Writer.EndCompound();
+				Writer.EndList();
+			Writer.EndCompound();
+			Writer.BeginCompound("minecraft:worldgen/biome");
+				Writer.AddString("type", "minecraft:worldgen/biome");
+				Writer.BeginList("value", eTagType::TAG_Compound);
+					Writer.BeginCompound("");
+					Writer.AddString("name", "minecraft:plains");
+					Writer.AddInt("id",0);
+						Writer.BeginCompound("element");
+							Writer.AddString("precipitation", "rain");
+								Writer.BeginCompound("effects");
+								Writer.AddInt("sky_color", 7907327);
+								Writer.AddInt("water_fog_color", 329011);
+								Writer.AddInt("fog_color" ,12638463);
+								Writer.AddInt("water_color", 4159204);
+									Writer.BeginCompound("mood_sound");
+									Writer.AddInt("tick_delay", 6000);
+									Writer.AddDouble("offset", 2.0);
+									Writer.AddString("sound", "minecraft:ambient.cave");
+									Writer.AddInt("block_search_extent", 8);
+									Writer.EndCompound();
+								Writer.EndCompound();
+							Writer.AddFloat("depth", -1.0f);
+							Writer.AddFloat("temperature", 0.5f);
+							Writer.AddFloat("scale", 0.1f);
+							Writer.AddFloat("downfall", 0.5f);
+							Writer.AddByte("has_precipitation",1);
+							Writer.AddString("category", "plains");
+						Writer.EndCompound();
+					Writer.AddString("name", "minecraft:plains");
+					Writer.AddInt("id",0);
+					Writer.EndCompound();
+				Writer.EndList();
+			Writer.EndCompound();
+			Writer.Finish();
+			Pkt.WriteBuf(Writer.GetResult());
+		}
+
 	}
 }
 
@@ -636,7 +769,7 @@ void cProtocol_1_20_2::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 
 void cProtocol_1_20_2::HandlePacketReady(cByteBuffer & a_ByteBuffer)
 {
-	m_State = State::Game;
+	m_State = Game;
 	m_Client->FinishAuthenticate();
 }
 
@@ -648,7 +781,7 @@ void cProtocol_1_20_2::SendPluginMessage(const AString & a_Channel, const Contig
 {
 	ASSERT(m_State == 3 || m_State == 4);  // In game mode?
 
-	if (m_State == cProtocol::State::Configuration)
+	if (m_State == cProtocol::State::Configuration && !m_IsConfigReadySent)
 	{
 		{
 			cPacketizer Pkt(*this, pktConfigurationCustomPayload);
@@ -852,7 +985,7 @@ bool cProtocol_1_20_3::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
         case 0x03: /* MessageAcknowledgmentC2SPacket */ return false;
         case 0x04: HandlePacketCommandExecution(a_ByteBuffer); return true;
         case 0x05: HandlePacketChatMessage(a_ByteBuffer); return true;
-        case 0x06: /* PlayerSessionC2SPacket */ return false;
+        case 0x06: HandlePacketPlayerSession(a_ByteBuffer); return true;
         case 0x07: /* AcknowledgeChunksC2SPacket */ return false;
         case 0x08: HandlePacketClientStatus(a_ByteBuffer); return true;
         case 0x09: HandlePacketClientSettings(a_ByteBuffer); return true;
@@ -903,6 +1036,251 @@ bool cProtocol_1_20_3::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
         case 0x36: HandlePacketUseItem(a_ByteBuffer); return true;
 		default: break;
 	}	
+}
+
+
+
+
+void cProtocol_1_20_3::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	UNUSED(@@)
+	// Prevent chat messages that might trigger CVE-2021-44228
+	if (a_MessageRaw.find("${") != std::string::npos)
+	{
+		return;
+	}
+	cFastNBTWriter Writer(true);
+	Writer.AddString("text", a_MessageRaw);
+	Writer.Finish();
+	// Send the json string to the client:
+	cPacketizer Pkt(*this, pktChatRaw);
+	Pkt.WriteBuf(Writer.GetResult());
+	Pkt.WriteBool(a_Type == ctAboveActionBar);
+}
+
+
+
+
+
+void cProtocol_1_20_3::WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const
+{
+	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_Metadata));	      // Index
+	auto v = static_cast<UInt32>(a_FieldType);
+	if (v >= 2) // temp fix 
+	{
+		v++;
+	}
+	a_Pkt.WriteVarInt32(v);        // Type
+}
+
+
+
+
+
+void cProtocol_1_20_3::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+{
+	// Common metadata:
+	Int8 Flags = 0;
+	if (a_Entity.IsOnFire())
+	{
+		Flags |= 0x01;
+	}
+	if (a_Entity.IsCrouched())
+	{
+		Flags |= 0x02;
+	}
+	if (a_Entity.IsSprinting())
+	{
+		Flags |= 0x08;
+	}
+	if (a_Entity.IsRclking())
+	{
+		Flags |= 0x10;
+	}
+	if (a_Entity.IsInvisible())
+	{
+		Flags |= 0x20;
+	}
+	/*
+	if (a_Entity.IsGlowing())
+	{
+		Flags |= 0x40;
+	}
+	*/
+	if (a_Entity.IsElytraFlying())
+	{
+		Flags |= 0x80;
+	}
+
+	WriteEntityMetadata(a_Pkt, EntityMetadata::EntityFlags, EntityMetadataType::Byte);
+	a_Pkt.WriteBEInt8(Flags);
+
+	switch (a_Entity.GetEntityType())
+	{
+		case cEntity::etPlayer:
+		{
+			auto & Player = static_cast<const cPlayer &>(a_Entity);
+
+			// TODO Set player custom name to their name.
+			// Then it's possible to move the custom name of mobs to the entities
+			// and to remove the "special" player custom name.
+			WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);
+			a_Pkt.WriteBool(true);
+
+			cFastNBTWriter Writer(true);
+			Writer.AddString("text", Player.GetName());
+			Writer.Finish();
+			a_Pkt.WriteBuf(Writer.GetResult());
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerDisplayedSkinParts, EntityMetadataType::Byte);
+			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerMainHand, EntityMetadataType::Byte);
+			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
+			break;
+		}
+		case cEntity::etPickup:
+		{
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemItem, EntityMetadataType::Item);
+			WriteItem(a_Pkt, static_cast<const cPickup &>(a_Entity).GetItem());
+			break;
+		}
+		case cEntity::etMinecart:
+		{
+			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingPower, EntityMetadataType::VarInt);
+
+			// The following expression makes Minecarts shake more with less health or higher damage taken
+			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
+			auto maxHealth = a_Entity.GetMaxHealth();
+			auto curHealth = a_Entity.GetHealth();
+			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingDirection, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(1);  // (doesn't seem to effect anything)
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingMultiplier, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));  // or damage taken
+
+			if (Minecart.GetPayload() == cMinecart::mpNone)
+			{
+				auto & RideableMinecart = static_cast<const cRideableMinecart &>(Minecart);
+				const cItem & MinecartContent = RideableMinecart.GetContent();
+				if (!MinecartContent.IsEmpty())
+				{
+					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockIDMeta, EntityMetadataType::VarInt);
+					int Content = MinecartContent.m_ItemType;
+					Content |= MinecartContent.m_ItemDamage << 8;
+					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
+
+					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockY, EntityMetadataType::VarInt);
+					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
+
+					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShowBlock, EntityMetadataType::Boolean);
+					a_Pkt.WriteBool(true);
+				}
+			}
+			else if (Minecart.GetPayload() == cMinecart::mpFurnace)
+			{
+				WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartFurnacePowered, EntityMetadataType::Boolean);
+				a_Pkt.WriteBool(static_cast<const cMinecartWithFurnace &>(Minecart).IsFueled());
+			}
+			break;
+		}  // case etMinecart
+
+		case cEntity::etProjectile:
+		{
+			auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
+			switch (Projectile.GetProjectileKind())
+			{
+				case cProjectileEntity::pkArrow:
+				{
+					WriteEntityMetadata(a_Pkt, EntityMetadata::ArrowFlags, EntityMetadataType::Byte);
+					a_Pkt.WriteBEInt8(static_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
+
+					// TODO: Piercing level
+					break;
+				}
+				case cProjectileEntity::pkFirework:
+				{
+					// TODO
+					break;
+				}
+				case cProjectileEntity::pkSplashPotion:
+				{
+					// TODO
+				}
+				default:
+				{
+					break;
+				}
+			}
+			break;
+		}  // case etProjectile
+
+		case cEntity::etMonster:
+		{
+			WriteMobMetadata(a_Pkt, static_cast<const cMonster &>(a_Entity));
+			break;
+		}
+
+		case cEntity::etBoat:
+		{
+			auto & Boat = static_cast<const cBoat &>(a_Entity);
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatLastHitTime, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetLastDamage()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatForwardDirection, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetForwardDirection()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatDamageTaken, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(Boat.GetDamageTaken());
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatType, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatRightPaddleTurning, EntityMetadataType::Boolean);
+			a_Pkt.WriteBool(Boat.IsRightPaddleUsed());
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatLeftPaddleTurning, EntityMetadataType::Boolean);
+			a_Pkt.WriteBool(static_cast<bool>(Boat.IsLeftPaddleUsed()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatSplashTimer, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(0);
+
+			break;
+		}  // case etBoat
+
+		case cEntity::etItemFrame:
+		{
+			// TODO
+			break;
+		}  // case etItemFrame
+
+		case cEntity::etEnderCrystal:
+		{
+			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
+			if (EnderCrystal.DisplaysBeam())
+			{
+				WriteEntityMetadata(a_Pkt, EntityMetadata::EnderCrystalBeamTarget, EntityMetadataType::OptPosition);
+				a_Pkt.WriteBool(true);  // Dont do a second check if it should display the beam
+				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
+			}
+			WriteEntityMetadata(a_Pkt, EntityMetadata::EnderCrystalShowBottom, EntityMetadataType::Boolean);
+			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
+			break;
+		}  // case etEnderCrystal
+
+		default:
+		{
+			break;
+		}
+	}
 }
 
 
@@ -975,7 +1353,7 @@ bool cProtocol_1_20_5::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
                 case 0x04: HandlePacketCommandExecution(a_ByteBuffer); return true;
 				case 0x05: /* ChatCommandSignedC2SPacket */ return false;
                 case 0x06: HandlePacketChatMessage(a_ByteBuffer); return true;
-                case 0x07: /* PlayerSessionC2SPacket */ return false;
+                case 0x07: HandlePacketPlayerSession(a_ByteBuffer); return true;
                 case 0x08: /* AcknowledgeChunksC2SPacket */ return false;
                 case 0x09: HandlePacketClientStatus(a_ByteBuffer); return true;
                 case 0x0A: HandlePacketClientSettings(a_ByteBuffer); return true;
@@ -1197,6 +1575,70 @@ UInt32 cProtocol_1_20_5::GetPacketID(ePacketType a_PacketType) const
                         //  sync tags 0x78
 						//  ProjectilePower 0x79
 		default: UNREACHABLE("unhandeled packet");
+	}
+}
+
+
+
+
+
+void cProtocol_1_20_5::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
+{
+	AString Username;
+	if (!a_ByteBuffer.ReadVarUTF8String(Username))
+	{
+		m_Client->Kick("Bad username");
+		return;
+	}
+
+	HANDLE_READ(a_ByteBuffer,ReadUUID,cUUID,ProfileID);
+	if (!m_Client->HandleHandshake(Username))
+	{
+		// The client is not welcome here, they have been sent a Kick packet already
+		return;
+	}
+
+	m_Client->SetUsername(std::move(Username));
+
+	// Encryption can now be used regardless of is auth is required. Encryption is now always requested
+	{
+		const auto Server = cRoot::Get()->GetServer();
+		cPacketizer Pkt(*this, pktEncryptionRequest);
+		Pkt.WriteString(Server->GetServerID());
+		const auto PubKeyDer = Server->GetPublicKeyDER();
+		Pkt.WriteVarInt32(static_cast<UInt32>(PubKeyDer.size()));
+		Pkt.WriteBuf(PubKeyDer);
+		Pkt.WriteVarInt32(4);
+		Pkt.WriteBEInt32(static_cast<int>(reinterpret_cast<intptr_t>(this)));  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
+		Pkt.WriteBool(Server->ShouldAuthenticate());
+		return;
+	}
+
+	m_Client->HandleLogin();
+}
+
+
+
+
+
+void cProtocol_1_20_5::SendLoginSuccess(void)
+{
+	ASSERT(m_State == 2);  // State: login?
+
+	// Enable compression:
+	{
+		cPacketizer Pkt(*this, pktStartCompression);
+		Pkt.WriteVarInt32(CompressionThreshold);
+	}
+
+	m_CompressionEnabled = true;
+
+	{
+		cPacketizer Pkt(*this, pktLoginSuccess);
+		Pkt.WriteUUID(m_Client->GetUUID());
+		Pkt.WriteString(m_Client->GetUsername());
+		Pkt.WriteVarInt32(0);  // TODO: write profile props. number of Profile Properites
+		Pkt.WriteBool(true); //  strict error handling
 	}
 }
 

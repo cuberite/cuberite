@@ -550,6 +550,8 @@ protected:
 
 	bool m_CompressionEnabled = false;
 
+	bool m_IsConfigReadySent = false;  // only used in 1.20.2+ Basically used as a hack
+
 	/** Provides synchronization for sending the entire packet at once.
 	Each SendXYZ() function must acquire this CS in order to send the whole packet at once.
 	Automated via cPacketizer class. */
