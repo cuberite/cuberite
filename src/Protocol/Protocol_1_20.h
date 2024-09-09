@@ -42,8 +42,8 @@ protected:
 	virtual void    SendDynamicRegistries() override;
 
 	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
-	virtual void    HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer);
-	virtual void    HandlePacketReady(cByteBuffer & a_ByteBuffer);
+	virtual void    HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer) override;
+	virtual void    HandlePacketReady(cByteBuffer & a_ByteBuffer) override;
 	virtual void    HandlePacketLoginStart(cByteBuffer & a_ByteBuffer) override;
 
 	virtual Version GetProtocolVersion() const override;
@@ -64,7 +64,13 @@ public:
 protected:
 	virtual UInt32	GetPacketID(ePacketType a_PacketType) const override;
 
-	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
+	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
+
+	virtual void SendChatRaw(const AString & a_MessageRaw, eChatType a_Type) override;
+
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const override;
+
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
 
 	virtual Version GetProtocolVersion() const override;
 };
@@ -82,7 +88,11 @@ public:
 	using Super::Super;
 
 protected:
-	virtual UInt32	GetPacketID(ePacketType a_PacketType) const override;
+	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
+
+	virtual void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer) override;
+
+	virtual void SendLoginSuccess(void) override;
 
 	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 

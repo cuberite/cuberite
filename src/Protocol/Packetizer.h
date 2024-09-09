@@ -68,7 +68,7 @@ public:
 		m_PacketType(a_PacketType)  // Used for logging purposes
 	{
 		auto id = m_Protocol.GetPacketID(a_PacketType);
-		//LOG("%s - 0x%.2X", PacketTypeToStr(a_PacketType), id);
+		LOG("%s - 0x%.2X", PacketTypeToStr(a_PacketType), id);
 		m_Out.WriteVarInt32(id);
 	}
 
