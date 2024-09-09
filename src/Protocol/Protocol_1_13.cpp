@@ -153,7 +153,7 @@ void cProtocol_1_13::SendCommandTree()
 	// TODO: rework the whole command system to support new format
 	// https://wiki.vg/Command_Data
 
-	if (true)
+	if (false)
 	{
 		{
 			cPacketizer Pkt(*this, pktCommnadTree);
@@ -195,7 +195,7 @@ void cProtocol_1_13::SendCommandTree()
 			Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size()));  // Size of Array of child nodes. Every Command is a child
 			for (size_t i = 0; i < Callback.m_Commands.size(); i++)
 			{
-				Pkt.WriteVarInt32(i);  // Indexes of children in the array
+				Pkt.WriteVarInt32(static_cast<UInt32>(i));  // Indexes of children in the array
 			}
 
 			Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size())); // root index
@@ -269,7 +269,7 @@ void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results, U
 		Pkt.WriteVarInt32(CompletionId);
 		Pkt.WriteVarInt32(0);  //  Start
 		Pkt.WriteVarInt32(0);  //  Length
-		Pkt.WriteVarInt32(a_Results.size());
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Results.size()));
 		for each (AString Match in a_Results)
 		{
 			Pkt.WriteString(Match);

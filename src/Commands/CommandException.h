@@ -14,7 +14,7 @@ private:
 	const AString m_Msg;
 };
 
-class cCommandExecutionException : cCommandParseException
+class cCommandExecutionException : public cCommandParseException
 {
 	public:
     explicit cCommandExecutionException(const AString& a_Message)
