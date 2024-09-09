@@ -285,10 +285,9 @@ bool cByteBuffer::ReadBEInt16(Int16 & a_Value)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(2);
-	UInt16 val;
-	ReadBuf(&val, 2);
-	val = ntohs(val);
-	memcpy(&a_Value, &val, 2);
+	Bytes<Int16> bytes;
+	ReadBuf(bytes.data(), bytes.size());
+	a_Value = NetworkToHost<Int16>(bytes);
 	return true;
 }
 
@@ -301,8 +300,9 @@ bool cByteBuffer::ReadBEUInt16(UInt16 & a_Value)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(2);
-	ReadBuf(&a_Value, 2);
-	a_Value = ntohs(a_Value);
+	Bytes<UInt16> bytes;
+	ReadBuf(bytes.data(), bytes.size());
+	a_Value = NetworkToHost<UInt16>(bytes);
 	return true;
 }
 
@@ -315,10 +315,9 @@ bool cByteBuffer::ReadBEInt32(Int32 & a_Value)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(4);
-	UInt32 val;
-	ReadBuf(&val, 4);
-	val = ntohl(val);
-	memcpy(&a_Value, &val, 4);
+	Bytes<Int32> bytes;
+	ReadBuf(bytes.data(), bytes.size());
+	a_Value = NetworkToHost<Int32>(bytes);
 	return true;
 }
 
@@ -331,8 +330,9 @@ bool cByteBuffer::ReadBEUInt32(UInt32 & a_Value)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(4);
-	ReadBuf(&a_Value, 4);
-	a_Value = ntohl(a_Value);
+	Bytes<UInt32> bytes;
+	ReadBuf(bytes.data(), bytes.size());
+	a_Value = NetworkToHost<UInt32>(bytes);
 	return true;
 }
 
@@ -345,8 +345,9 @@ bool cByteBuffer::ReadBEInt64(Int64 & a_Value)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(8);
-	ReadBuf(&a_Value, 8);
-	a_Value = NetworkToHostLong8(&a_Value);
+	Bytes<Int64> bytes;
+	ReadBuf(bytes.data(), bytes.size());
+	a_Value = NetworkToHost<Int64>(bytes);
 	return true;
 }
 
@@ -359,8 +360,9 @@ bool cByteBuffer::ReadBEUInt64(UInt64 & a_Value)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(8);
-	ReadBuf(&a_Value, 8);
-	a_Value = NetworkToHostULong8(&a_Value);
+	Bytes<UInt64> bytes;
+	ReadBuf(bytes.data(), bytes.size());
+	a_Value = NetworkToHost<UInt64>(bytes);
 	return true;
 }
 
@@ -373,8 +375,9 @@ bool cByteBuffer::ReadBEFloat(float & a_Value)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(4);
-	ReadBuf(&a_Value, 4);
-	a_Value = NetworkToHostFloat4(&a_Value);
+	Bytes<float> bytes;
+	ReadBuf(bytes.data(), bytes.size());
+	a_Value = NetworkToHost<float>(bytes);
 	return true;
 }
 
@@ -387,8 +390,9 @@ bool cByteBuffer::ReadBEDouble(double & a_Value)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(8);
-	ReadBuf(&a_Value, 8);
-	a_Value = NetworkToHostDouble8(&a_Value);
+	Bytes<double> bytes;
+	ReadBuf(bytes.data(), bytes.size());
+	a_Value = NetworkToHost<double>(bytes);
 	return true;
 }
 
@@ -629,10 +633,8 @@ bool cByteBuffer::WriteBEInt16(Int16 a_Value)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(2);
-	UInt16 val;
-	memcpy(&val, &a_Value, 2);
-	val = htons(val);
-	return WriteBuf(&val, 2);
+	auto Converted = HostToNetwork(a_Value);
+	return WriteBuf(Converted.data(), Converted.size());
 }
 
 
@@ -644,8 +646,8 @@ bool cByteBuffer::WriteBEUInt16(UInt16 a_Value)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(2);
-	a_Value = htons(a_Value);
-	return WriteBuf(&a_Value, 2);
+	auto Converted = HostToNetwork(a_Value);
+	return WriteBuf(Converted.data(), Converted.size());
 }
 
 
@@ -657,8 +659,8 @@ bool cByteBuffer::WriteBEInt32(Int32 a_Value)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(4);
-	UInt32 Converted = HostToNetwork4(&a_Value);
-	return WriteBuf(&Converted, 4);
+	auto Converted = HostToNetwork(a_Value);
+	return WriteBuf(Converted.data(), Converted.size());
 }
 
 
@@ -670,8 +672,8 @@ bool cByteBuffer::WriteBEUInt32(UInt32 a_Value)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(4);
-	UInt32 Converted = HostToNetwork4(&a_Value);
-	return WriteBuf(&Converted, 4);
+	auto Converted = HostToNetwork(a_Value);
+	return WriteBuf(Converted.data(), Converted.size());
 }
 
 
@@ -683,8 +685,8 @@ bool cByteBuffer::WriteBEInt64(Int64 a_Value)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(8);
-	UInt64 Converted = HostToNetwork8(&a_Value);
-	return WriteBuf(&Converted, 8);
+	auto Converted = HostToNetwork(a_Value);
+	return WriteBuf(Converted.data(), Converted.size());
 }
 
 
@@ -696,8 +698,8 @@ bool cByteBuffer::WriteBEUInt64(UInt64 a_Value)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(8);
-	UInt64 Converted = HostToNetwork8(&a_Value);
-	return WriteBuf(&Converted, 8);
+	auto Converted = HostToNetwork(a_Value);
+	return WriteBuf(Converted.data(), Converted.size());
 }
 
 
@@ -709,8 +711,8 @@ bool cByteBuffer::WriteBEFloat(float a_Value)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(4);
-	UInt32 Converted = HostToNetwork4(&a_Value);
-	return WriteBuf(&Converted, 4);
+	auto Converted = HostToNetwork(a_Value);
+	return WriteBuf(Converted.data(), Converted.size());
 }
 
 
@@ -722,8 +724,8 @@ bool cByteBuffer::WriteBEDouble(double a_Value)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(8);
-	UInt64 Converted = HostToNetwork8(&a_Value);
-	return WriteBuf(&Converted, 8);
+	auto Converted = HostToNetwork(a_Value);
+	return WriteBuf(Converted.data(), Converted.size());
 }
 
 

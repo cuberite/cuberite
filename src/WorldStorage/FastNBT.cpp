@@ -189,7 +189,7 @@ eNBTParseError cParsedNBT::ReadString(size_t & a_StringStart, size_t & a_StringL
 {
 	NEEDBYTES(2, eNBTParseError::npStringMissingLength);
 	a_StringStart = m_Pos + 2;
-	a_StringLen = static_cast<size_t>(GetBEShort(m_Data.data() + m_Pos));
+	a_StringLen = static_cast<size_t>(NetworkBufToHost<UInt16>(m_Data.data() + m_Pos));
 	NEEDBYTES(2 + a_StringLen, eNBTParseError::npStringInvalidLength);
 	m_Pos += 2 + a_StringLen;
 	return eNBTParseError::npSuccess;
@@ -247,7 +247,7 @@ eNBTParseError cParsedNBT::ReadList(eTagType a_ChildrenType)
 
 	// Read the count:
 	NEEDBYTES(4, eNBTParseError::npListMissingLength);
-	int Count = GetBEInt(m_Data.data() + m_Pos);
+	int Count = NetworkBufToHost<int>(m_Data.data() + m_Pos);
 	m_Pos += 4;
 	auto MinChildSize = GetMinTagSize(a_ChildrenType);
 	if ((Count < 0) || (Count > static_cast<int>((m_Data.size() - m_Pos) / MinChildSize)))
@@ -311,7 +311,7 @@ eNBTParseError cParsedNBT::ReadTag(void)
 		case TAG_ByteArray:
 		{
 			NEEDBYTES(4, eNBTParseError::npArrayMissingLength);
-			int len = GetBEInt(m_Data.data() + m_Pos);
+			int len = NetworkBufToHost<int>(m_Data.data() + m_Pos);
 			m_Pos += 4;
 			if (len < 0)
 			{
@@ -343,7 +343,7 @@ eNBTParseError cParsedNBT::ReadTag(void)
 		case TAG_IntArray:
 		{
 			NEEDBYTES(4, eNBTParseError::npArrayMissingLength);
-			int len = GetBEInt(m_Data.data() + m_Pos);
+			int len = NetworkBufToHost<int>(m_Data.data() + m_Pos);
 			m_Pos += 4;
 			if (len < 0)
 			{
@@ -539,7 +539,8 @@ void cFastNBTWriter::EndList(void)
 	ASSERT(m_Stack[m_CurrentStack].m_Type == TAG_List);
 
 	// Update the list count:
-	SetBEInt(m_Result.data() + m_Stack[m_CurrentStack].m_Pos, m_Stack[m_CurrentStack].m_Count);
+	auto Value = HostToNetwork(m_Stack[m_CurrentStack].m_Count);
+	std::copy(Value.begin(), Value.end(), m_Result.data() + m_Stack[m_CurrentStack].m_Pos);
 
 	--m_CurrentStack;
 }
@@ -561,8 +562,8 @@ void cFastNBTWriter::AddByte(const AString & a_Name, unsigned char a_Value)
 void cFastNBTWriter::AddShort(const AString & a_Name, Int16 a_Value)
 {
 	TagCommon(a_Name, TAG_Short);
-	UInt16 Value = htons(static_cast<UInt16>(a_Value));
-	m_Result.append(reinterpret_cast<const std::byte *>(&Value), 2);
+	auto Value = HostToNetwork(a_Value);
+	m_Result.append(Value.begin(), Value.end());
 }
 
 
@@ -572,8 +573,8 @@ void cFastNBTWriter::AddShort(const AString & a_Name, Int16 a_Value)
 void cFastNBTWriter::AddInt(const AString & a_Name, Int32 a_Value)
 {
 	TagCommon(a_Name, TAG_Int);
-	UInt32 Value = htonl(static_cast<UInt32>(a_Value));
-	m_Result.append(reinterpret_cast<const std::byte *>(&Value), 4);
+	auto Value = HostToNetwork(a_Value);
+	m_Result.append(Value.begin(), Value.end());
 }
 
 
@@ -583,8 +584,8 @@ void cFastNBTWriter::AddInt(const AString & a_Name, Int32 a_Value)
 void cFastNBTWriter::AddLong(const AString & a_Name, Int64 a_Value)
 {
 	TagCommon(a_Name, TAG_Long);
-	UInt64 Value = HostToNetwork8(&a_Value);
-	m_Result.append(reinterpret_cast<const std::byte *>(&Value), 8);
+	auto Value = HostToNetwork(a_Value);
+	m_Result.append(Value.begin(), Value.end());
 }
 
 
@@ -594,8 +595,8 @@ void cFastNBTWriter::AddLong(const AString & a_Name, Int64 a_Value)
 void cFastNBTWriter::AddFloat(const AString & a_Name, float a_Value)
 {
 	TagCommon(a_Name, TAG_Float);
-	UInt32 Value = HostToNetwork4(&a_Value);
-	m_Result.append(reinterpret_cast<const std::byte *>(&Value), 4);
+	auto Value = HostToNetwork(a_Value);
+	m_Result.append(Value.begin(), Value.end());
 }
 
 
@@ -605,8 +606,8 @@ void cFastNBTWriter::AddFloat(const AString & a_Name, float a_Value)
 void cFastNBTWriter::AddDouble(const AString & a_Name, double a_Value)
 {
 	TagCommon(a_Name, TAG_Double);
-	UInt64 Value = HostToNetwork8(&a_Value);
-	m_Result.append(reinterpret_cast<const std::byte *>(&Value), 8);
+	auto Value = HostToNetwork(a_Value);
+	m_Result.append(Value.begin(), Value.end());
 }
 
 
@@ -616,8 +617,8 @@ void cFastNBTWriter::AddDouble(const AString & a_Name, double a_Value)
 void cFastNBTWriter::AddString(const AString & a_Name, const std::string_view a_Value)
 {
 	TagCommon(a_Name, TAG_String);
-	const UInt16 Length = htons(static_cast<UInt16>(a_Value.size()));
-	m_Result.append(reinterpret_cast<const std::byte *>(&Length), sizeof(Length));
+	auto Length = HostToNetwork(static_cast<UInt16>(a_Value.size()));
+	m_Result.append(Length.begin(), Length.end());
 	m_Result.append({ reinterpret_cast<const std::byte *>(a_Value.data()), a_Value.size() });
 }
 
@@ -628,8 +629,8 @@ void cFastNBTWriter::AddString(const AString & a_Name, const std::string_view a_
 void cFastNBTWriter::AddByteArray(const AString & a_Name, const char * a_Value, size_t a_NumElements)
 {
 	TagCommon(a_Name, TAG_ByteArray);
-	UInt32 len = htonl(static_cast<UInt32>(a_NumElements));
-	m_Result.append(reinterpret_cast<const std::byte *>(&len), 4);
+	auto Length = HostToNetwork(static_cast<UInt32>(a_NumElements));
+	m_Result.append(Length.begin(), Length.end());
 	m_Result.append(reinterpret_cast<const std::byte *>(a_Value), a_NumElements);
 }
 
@@ -640,8 +641,8 @@ void cFastNBTWriter::AddByteArray(const AString & a_Name, const char * a_Value, 
 void cFastNBTWriter::AddByteArray(const AString & a_Name, size_t a_NumElements, unsigned char a_Value)
 {
 	TagCommon(a_Name, TAG_ByteArray);
-	UInt32 len = htonl(static_cast<UInt32>(a_NumElements));
-	m_Result.append(reinterpret_cast<const std::byte *>(&len), 4);
+	auto Length = HostToNetwork(static_cast<UInt32>(a_NumElements));
+	m_Result.append(Length.begin(), Length.end());
 	m_Result.append(a_NumElements, std::byte(a_Value));
 }
 
@@ -652,18 +653,18 @@ void cFastNBTWriter::AddByteArray(const AString & a_Name, size_t a_NumElements, 
 void cFastNBTWriter::AddIntArray(const AString & a_Name, const Int32 * a_Value, size_t a_NumElements)
 {
 	TagCommon(a_Name, TAG_IntArray);
-	UInt32 len = htonl(static_cast<UInt32>(a_NumElements));
+	auto Length = HostToNetwork(static_cast<UInt32>(a_NumElements));
 	size_t cap = m_Result.capacity();
 	size_t size = m_Result.length();
 	if ((cap - size) < (4 + a_NumElements * 4))
 	{
 		m_Result.reserve(size + 4 + (a_NumElements * 4));
 	}
-	m_Result.append(reinterpret_cast<const std::byte *>(&len), sizeof(len));
+	m_Result.append(Length.begin(), Length.end());
 	for (size_t i = 0; i < a_NumElements; i++)
 	{
-		UInt32 Element = htonl(static_cast<UInt32>(a_Value[i]));
-		m_Result.append(reinterpret_cast<const std::byte *>(&Element), sizeof(Element));
+		auto Element = HostToNetwork(a_Value[i]);
+		m_Result.append(Element.begin(), Element.end());
 	}
 }
 
@@ -684,7 +685,7 @@ void cFastNBTWriter::Finish(void)
 void cFastNBTWriter::WriteString(const std::string_view a_Data)
 {
 	// TODO check size <= short max
-	UInt16 Len = htons(static_cast<unsigned short>(a_Data.size()));
-	m_Result.append(reinterpret_cast<const std::byte *>(&Len), sizeof(Len));
+	auto Length = HostToNetwork(static_cast<UInt16>(a_Data.size()));
+	m_Result.append(Length.begin(), Length.end());
 	m_Result.append(reinterpret_cast<const std::byte *>(a_Data.data()), a_Data.size());
 }
