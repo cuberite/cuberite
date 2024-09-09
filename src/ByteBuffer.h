@@ -32,8 +32,12 @@ class cByteBuffer
 {
 public:
 
-	cByteBuffer(size_t a_BufferSize);
+	explicit cByteBuffer(size_t a_BufferSize);
 	~cByteBuffer();
+
+	/** cByteBuffer should not be copied or moved. Use ReadToByteBuffer instead. */
+	cByteBuffer(const cByteBuffer & a_ByteBuffer) = delete;
+	cByteBuffer(cByteBuffer && a_ByteBuffer) = delete;
 
 	/** Writes the bytes specified to the ringbuffer. Returns true if successful, false if not */
 	bool Write(const void * a_Bytes, size_t a_Count);
@@ -111,8 +115,7 @@ public:
 	bool WriteBool           (bool   a_Value);
 	bool WriteVarInt32       (UInt32 a_Value);
 	bool WriteVarInt64       (UInt64 a_Value);
-	bool WriteVarUTF8String  (const AString & a_Value);  // string length as VarInt, then string as UTF-8
-	bool WriteLEInt32        (Int32 a_Value);
+	bool WriteVarUTF8String  (const std::string_view & a_Value);  // string length as VarInt, then string as UTF-8
 	bool WriteXYZPosition64  (Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ);
 	bool WriteXZYPosition64  (Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ);
 
@@ -134,7 +137,7 @@ public:
 	/** Reads all available data into a_Data */
 	void ReadAll(ContiguousByteBuffer & a_Data);
 
-	/** Reads the specified number of bytes and writes it into the destinatio bytebuffer. Returns true on success. */
+	/** Reads the specified number of bytes and writes it into the destination bytebuffer. Returns true on success. */
 	bool ReadToByteBuffer(cByteBuffer & a_Dst, size_t a_NumBytes);
 
 	/** Removes the bytes that have been read from the ringbuffer */
@@ -144,7 +147,7 @@ public:
 	void ResetRead(void);
 
 	/** Re-reads the data that has been read since the last commit to the current readpos. Used by ProtoProxy to duplicate communication */
-	void ReadAgain(ContiguousByteBuffer & a_Out);
+	void ReadAgain(ContiguousByteBuffer & a_Out) const;
 
 	/** Checks if the internal state is valid (read and write positions in the correct bounds) using ASSERTs */
 	void CheckValid(void) const;
@@ -154,12 +157,12 @@ public:
 
 protected:
 
-	std::byte * m_Buffer;
+	std::unique_ptr<std::byte[]> m_Buffer;
 	size_t m_BufferSize;  // Total size of the ringbuffer
 
-	size_t m_DataStart;  // Where the data starts in the ringbuffer
-	size_t m_WritePos;   // Where the data ends in the ringbuffer
-	size_t m_ReadPos;    // Where the next read will start in the ringbuffer
+	size_t m_DataStart = 0;  // Where the data starts in the ringbuffer
+	size_t m_WritePos = 0;   // Where the data ends in the ringbuffer
+	size_t m_ReadPos = 0;    // Where the next read will start in the ringbuffer
 
 	#ifndef NDEBUG
 		/** The ID of the thread currently accessing the object.
