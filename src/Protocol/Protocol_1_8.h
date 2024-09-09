@@ -94,7 +94,7 @@ public:
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
 	virtual void SendPlayerActionResponse       (Vector3i a_blockpos, int a_state_id, cProtocol::PlayerActionResponses a_action, bool a_IsApproved) override;
 	virtual void SendPlayerListAddPlayer        (const cPlayer & a_Player) override;
-	virtual void SendPlayerListInitChat         (const cPlayer & a_Player, const cClientHandle::cPlayerSessionData a_Data) override;
+	virtual void SendPlayerListInitChat         (const cPlayer & a_Player) override;
 	virtual void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer) override;
 	virtual void SendPlayerListRemovePlayer     (const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) override;
