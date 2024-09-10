@@ -1601,8 +1601,8 @@ void cProtocol_1_20_5::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 	m_Client->SetUsername(std::move(Username));
 
 	// Encryption can now be used regardless of is auth is required. Encryption is now always requested
+	const auto Server = cRoot::Get()->GetServer();
 	{
-		const auto Server = cRoot::Get()->GetServer();
 		cPacketizer Pkt(*this, pktEncryptionRequest);
 		Pkt.WriteString(Server->GetServerID());
 		const auto PubKeyDer = Server->GetPublicKeyDER();
@@ -1611,10 +1611,12 @@ void cProtocol_1_20_5::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		Pkt.WriteVarInt32(4);
 		Pkt.WriteBEInt32(static_cast<int>(reinterpret_cast<intptr_t>(this)));  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
 		Pkt.WriteBool(Server->ShouldAuthenticate());
-		return;
 	}
 
-	m_Client->HandleLogin();
+	if (!Server->ShouldAuthenticate())
+	{
+		m_Client->HandleLogin();
+	}
 }
 
 
