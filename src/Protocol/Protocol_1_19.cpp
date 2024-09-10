@@ -1977,6 +1977,7 @@ void cProtocol_1_19_3::HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer)
 
 
 
+
 void cProtocol_1_19_3::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 {
 	ContiguousByteBuffer sigdata;

@@ -419,7 +419,7 @@ public:
 		Configuration = 4,
 	};
 
-	enum class PlayerListAction
+	enum class PlayerListAction : std::uint8_t
 	{
 		AddPlayer = 1,
 		InitalizeChat = 2,
@@ -427,6 +427,24 @@ public:
 		UpdateListed = 8,
 		UpdateLatency = 16,
 		UpdateDisplayName = 32,
+	};
+
+	enum class eGameStateReason
+	{
+		NoRespawnBlock,
+		RainStarted,
+		RainStopped,
+		GamemodeChanged,
+		WinGame,
+		DemoMessageShown,
+		ProjectileHitPlayer,
+		RainGradientChanged,
+		ThunderGradientChanged,
+		PufferfishString,
+		ElderGuardianEffect,
+		ImmediateRespawn,
+		LimitedCraftingToggled,
+		InitialChunksComing
 	};
 
 	/** Called by cClientHandle to process data, when the client sends some.
@@ -532,6 +550,7 @@ public:
 	virtual void SendUpdateSign                 (Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) = 0;
 	virtual void SendUnlockRecipe               (UInt32 a_RecipeID) = 0;
 	virtual void SendInitRecipes                (UInt32 a_RecipeID) = 0;
+	virtual void SendInitialChunksComing        () = 0;
 	virtual void SendWeather                    (eWeather a_Weather) = 0;
 	virtual void SendWholeInventory             (const cWindow    & a_Window) = 0;
 	virtual void SendWindowClose                (const cWindow    & a_Window) = 0;
