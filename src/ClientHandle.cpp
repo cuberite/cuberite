@@ -503,6 +503,7 @@ void cClientHandle::FinishAuthenticate()
 	SetState(csDownloadingWorld);
 	m_Player->Initialize(std::move(m_temp_player), *World);
 	m_Player->ResendRenderDistanceCenter();
+	m_Protocol->SendInitialChunksComing();
 	m_Protocol->SendCommandTree();
 	// LOGD("Client %s @ %s (%p) has been fully authenticated", m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this));
 }

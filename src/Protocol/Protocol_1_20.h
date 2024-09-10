@@ -67,6 +67,7 @@ protected:
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 
 	virtual void SendChatRaw(const AString & a_MessageRaw, eChatType a_Type) override;
+	virtual void SendInitialChunksComing() override;
 
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const override;
 
@@ -93,11 +94,13 @@ protected:
 	virtual void SendDynamicRegistries() override;
 	virtual void SendSelectKnownPacks() override;
 	virtual void SendLoginSuccess(void) override;
+	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
 
+	virtual void HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer) override;
-	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
-	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
+
+	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
 	virtual Version GetProtocolVersion() const override;
 };
