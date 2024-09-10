@@ -90,13 +90,14 @@ public:
 protected:
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
 
-	virtual void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer) override;
-
+	virtual void SendDynamicRegistries() override;
+	virtual void SendSelectKnownPacks() override;
 	virtual void SendLoginSuccess(void) override;
 
-	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
-
-	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
-
+	virtual void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer) override;
+	virtual void HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer) override;
+	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
+	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
+	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual Version GetProtocolVersion() const override;
 };

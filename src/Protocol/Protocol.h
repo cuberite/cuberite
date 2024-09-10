@@ -117,6 +117,7 @@ public:
 		pktScoreboardObjective,
 		pktSpawnObject,
 		pktSoundEffect,
+		pktSelectKnownPacks,
 		pktSoundParticleEffect,
 		pktSpawnExperienceOrb,
 		pktSpawnGlobalEntity,
@@ -479,6 +480,7 @@ public:
 	virtual void SendHideTitle                  (void) = 0;
 	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendKeepAlive                  (UInt32 a_PingID) = 0;
+	virtual void SendSelectKnownPacks           (void) = 0;
 	virtual void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) = 0;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) = 0;
 	virtual void SendLoginSuccess               (void) = 0;

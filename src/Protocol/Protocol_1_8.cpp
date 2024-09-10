@@ -4376,3 +4376,13 @@ void cProtocol_1_8_0::SendPlayerActionResponse(Vector3i a_blockpos, int a_state_
 	//Used by 1.15+
 }
 
+
+
+
+
+void cProtocol_1_8_0::SendSelectKnownPacks()
+{
+	//used in 1.20.5+
+	return;
+}
+
