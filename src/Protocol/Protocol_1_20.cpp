@@ -1428,7 +1428,7 @@ UInt32 cProtocol_1_20_5::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktLoginSuccess:         return 0x02;
 		case cProtocol::pktStartCompression:     return 0x03;
 			//login query request 0x4
-			//cookie requst 0x5
+			//cookie request 0x5
 
 		// Configuration
 			//CookieRequestS2CPacket 0x0
@@ -1445,7 +1445,7 @@ UInt32 cProtocol_1_20_5::GetPacketID(ePacketType a_PacketType) const
 			//  ServerTransfer 0x0B
 			//  Features 0x0C
 			//  SynchronizeTags 0x0D
-			//  SelectKnownPacks 0x0E
+		case cProtocol::pktSelectKnownPacks:     return 0x0E;
 
 		//  Game packets
         case cProtocol::pktSpawnObject:          return 0x01;
@@ -1616,6 +1616,169 @@ void cProtocol_1_20_5::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 	if (!Server->ShouldAuthenticate())
 	{
 		m_Client->HandleLogin();
+	}
+}
+
+
+
+
+
+void cProtocol_1_20_5::SendDynamicRegistries()
+{
+	{
+		{
+			cPacketizer Pkt(*this, pktConfigurationDynamicRegistries);
+			Pkt.WriteString("minecraft:dimension_type");
+			Pkt.WriteVarInt32(1);
+			Pkt.WriteString("minecraft:overworld");
+			Pkt.WriteBool(true);
+			cFastNBTWriter Writer(true);
+			Writer.AddByte("piglin_safe", 1);
+			Writer.AddByte("natural", 1);
+			Writer.AddFloat("ambient_light", 1.0);
+			Writer.AddInt("monster_spawn_block_light_limit", 0);
+			Writer.AddString("infiniburn", "#infiniburn_overworld");
+			Writer.AddByte("respawn_anchor_works", 1);
+			Writer.AddByte("has_skylight", 1);
+			Writer.AddByte("bed_works", 1);
+			Writer.AddString("effects", "minecraft:overworld");
+			Writer.AddByte("has_raids", 1);
+			Writer.AddInt("logical_height", 256);
+			Writer.AddDouble("coordinate_scale", 1.0);
+			Writer.AddByte("ultrawarm", 0);
+			Writer.AddByte("has_ceiling", 0);
+			Writer.AddInt("min_y", 0);
+			Writer.AddInt("height", 256);
+			Writer.AddInt("monster_spawn_light_level",0);
+			Writer.AddInt("monster_spawn_block_light_limit",0);
+			Writer.Finish();
+			Pkt.WriteBuf(Writer.GetResult());
+		}
+		{
+			cPacketizer Pkt(*this, pktConfigurationDynamicRegistries);
+			Pkt.WriteString("minecraft:worldgen/biome");
+			Pkt.WriteVarInt32(1);
+			Pkt.WriteString("minecraft:plains");
+			Pkt.WriteBool(false);
+		}
+		{
+			cPacketizer Pkt(*this, pktConfigurationDynamicRegistries);
+			Pkt.WriteString("minecraft:damage_type");
+			Pkt.WriteVarInt32(45);
+			Pkt.WriteString("arrow"); Pkt.WriteBool(false);
+			Pkt.WriteString("bad_respawn_point"); Pkt.WriteBool(false);
+			Pkt.WriteString("cactus"); Pkt.WriteBool(false);
+			Pkt.WriteString("cramming"); Pkt.WriteBool(false);
+			Pkt.WriteString("dragon_breath"); Pkt.WriteBool(false);
+			Pkt.WriteString("drown"); Pkt.WriteBool(false);
+			Pkt.WriteString("dry_out"); Pkt.WriteBool(false);
+			Pkt.WriteString("explosion"); Pkt.WriteBool(false);
+			Pkt.WriteString("fall"); Pkt.WriteBool(false);
+			Pkt.WriteString("falling_anvil"); Pkt.WriteBool(false);
+			Pkt.WriteString("falling_block"); Pkt.WriteBool(false);
+			Pkt.WriteString("falling_stalactite"); Pkt.WriteBool(false);
+			Pkt.WriteString("fireball"); Pkt.WriteBool(false);
+			Pkt.WriteString("fireworks"); Pkt.WriteBool(false);
+			Pkt.WriteString("fly_into_wall"); Pkt.WriteBool(false);
+			Pkt.WriteString("freeze"); Pkt.WriteBool(false);
+			Pkt.WriteString("generic"); Pkt.WriteBool(false);
+			Pkt.WriteString("generic_kill"); Pkt.WriteBool(false);
+			Pkt.WriteString("hot_floor"); Pkt.WriteBool(false);
+			Pkt.WriteString("indirect_magic"); Pkt.WriteBool(false);
+			Pkt.WriteString("in_fire"); Pkt.WriteBool(false);
+			Pkt.WriteString("in_wall"); Pkt.WriteBool(false);
+			Pkt.WriteString("lava"); Pkt.WriteBool(false);
+			Pkt.WriteString("lightning_bolt"); Pkt.WriteBool(false);
+			Pkt.WriteString("magic"); Pkt.WriteBool(false);
+			Pkt.WriteString("mob_attack"); Pkt.WriteBool(false);
+			Pkt.WriteString("mob_attack_no_aggro"); Pkt.WriteBool(false);
+			Pkt.WriteString("mob_projectile"); Pkt.WriteBool(false);
+			Pkt.WriteString("on_fire"); Pkt.WriteBool(false);
+			Pkt.WriteString("outside_border"); Pkt.WriteBool(false);
+			Pkt.WriteString("out_of_world"); Pkt.WriteBool(false);
+			Pkt.WriteString("player_attack"); Pkt.WriteBool(false);
+			Pkt.WriteString("player_explosion"); Pkt.WriteBool(false);
+			Pkt.WriteString("sonic_boom"); Pkt.WriteBool(false);
+			Pkt.WriteString("spit"); Pkt.WriteBool(false);
+			Pkt.WriteString("stalagmite"); Pkt.WriteBool(false);
+			Pkt.WriteString("starve"); Pkt.WriteBool(false);
+			Pkt.WriteString("sting"); Pkt.WriteBool(false);
+			Pkt.WriteString("sweet_berry_bush"); Pkt.WriteBool(false);
+			Pkt.WriteString("thorns"); Pkt.WriteBool(false);
+			Pkt.WriteString("thrown"); Pkt.WriteBool(false);
+			Pkt.WriteString("trident"); Pkt.WriteBool(false);
+			Pkt.WriteString("unattributed_fireball"); Pkt.WriteBool(false);
+			Pkt.WriteString("wither"); Pkt.WriteBool(false);
+			Pkt.WriteString("wither_skull"); Pkt.WriteBool(false);
+		}	
+
+	}
+}
+
+
+
+
+
+void cProtocol_1_20_5::SendSelectKnownPacks()
+{
+	cPacketizer Pkt(*this, pktSelectKnownPacks);
+	{
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteString("minecraft");
+		Pkt.WriteString("core");
+		Pkt.WriteString("1.20.5");
+	}	
+}
+
+
+
+
+
+void cProtocol_1_20_5::HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer)
+{
+	m_State = State::Configuration;
+	SendDynamicRegistries();
+	SendSelectKnownPacks();
+	m_Client->SendFinishConfiguration();
+}
+
+
+
+
+
+void cProtocol_1_20_5::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+{
+	if (a_Entity.IsPlayer())
+	{
+		const auto & Player = static_cast<const cPlayer &>(a_Entity);
+
+		a_Pkt.WriteVarInt32(1);  // Count.
+		a_Pkt.WriteVarInt32(17); // generic.speed
+		a_Pkt.WriteBEDouble(0.1 * Player.GetNormalMaxSpeed());  // The default game speed is 0.1, multiply that value by the relative speed.
+
+		// It seems the modifiers aren't conditionally activated; their effects are applied immediately!
+		// We have to keep on re-sending this packet when the client notifies us of sprint start and end, and so on. Strange.
+
+		if (Player.IsSprinting())
+		{
+			a_Pkt.WriteVarInt32(1);  // Modifier count.
+			a_Pkt.WriteBEUInt64(0x662a6b8dda3e4c1c);
+			a_Pkt.WriteBEUInt64(0x881396ea6097278d);  // UUID of the modifier (sprinting speed boost).
+			a_Pkt.WriteBEDouble(Player.GetSprintingMaxSpeed() - Player.GetNormalMaxSpeed());
+			a_Pkt.WriteBEUInt8(2);
+		}
+		else
+		{
+			a_Pkt.WriteVarInt32(0);
+		}
+	}
+	else
+	{
+		// const cMonster & Mob = (const cMonster &)a_Entity;
+
+		// TODO: Send properties and modifiers based on the mob type
+
+		a_Pkt.WriteVarInt32(0);
 	}
 }
 
