@@ -82,6 +82,7 @@ void cProtocol_1_21::SendDynamicRegistries()
 			cPacketizer Pkt(*this, pktConfigurationDynamicRegistries);
 			Pkt.WriteString("minecraft:worldgen/biome");
 			Pkt.WriteVarInt32(64);
+			Pkt.WriteString("plains"); Pkt.WriteBool(false); // temporarily here
 			Pkt.WriteString("badlands"); Pkt.WriteBool(false);
 			Pkt.WriteString("bamboo_jungle"); Pkt.WriteBool(false);
 			Pkt.WriteString("basalt_deltas"); Pkt.WriteBool(false);
@@ -121,7 +122,7 @@ void cProtocol_1_21::SendDynamicRegistries()
 			Pkt.WriteString("old_growth_birch_forest"); Pkt.WriteBool(false);
 			Pkt.WriteString("old_growth_pine_taiga"); Pkt.WriteBool(false);
 			Pkt.WriteString("old_growth_spruce_taiga"); Pkt.WriteBool(false);
-			Pkt.WriteString("plains"); Pkt.WriteBool(false);
+			//Pkt.WriteString("plains"); Pkt.WriteBool(false);
 			Pkt.WriteString("river"); Pkt.WriteBool(false);
 			Pkt.WriteString("savanna"); Pkt.WriteBool(false);
 			Pkt.WriteString("savanna_plateau"); Pkt.WriteBool(false);

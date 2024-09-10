@@ -1064,6 +1064,19 @@ void cProtocol_1_20_3::SendChatRaw(const AString & a_MessageRaw, eChatType a_Typ
 
 
 
+void cProtocol_1_20_3::SendInitialChunksComing()
+{
+	{
+		cPacketizer Pkt(*this, pktWeather);
+		Pkt.WriteBEUInt8(static_cast<UInt8>(eGameStateReason::InitialChunksComing));  // End rain / begin rain
+		Pkt.WriteBEFloat(0);  // Unused
+	}
+}
+
+
+
+
+
 void cProtocol_1_20_3::WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const
 {
 	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_Metadata));	      // Index
@@ -1856,3 +1869,18 @@ void cProtocol_1_20_5::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 		Pkt.WriteBool(false);  // Difficulty locked?
 	}
 }
+
+
+
+
+
+void cProtocol_1_20_5::HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+
+	m_Client->HandleChat("/" + Command);
+}
+
+
+
+
