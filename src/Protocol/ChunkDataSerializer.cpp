@@ -222,6 +222,11 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v766);
 				continue;
 			}
+			case cProtocol::Version::v1_21:
+			{
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v767);
+				continue;
+			}
 		}
 		UNREACHABLE("Unknown chunk data serialization version");
 	}
@@ -336,6 +341,11 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 			break;
 		}
 		case CacheVersion::v766:
+		{
+			Serialize764<&Palette_1_20::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x27);
+			break;
+		}
+		case CacheVersion::v767:
 		{
 			Serialize764<&Palette_1_20::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x27);
 			break;
