@@ -20,6 +20,7 @@
 #include "Protocol_1_18.h"
 #include "Protocol_1_19.h"
 #include "Protocol_1_20.h"
+#include "Protocol_1_21.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -96,6 +97,7 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 		case cProtocol::Version::v1_20_2:  return "1.20.2";
 		case cProtocol::Version::v1_20_3:  return "1.20.3";
 		case cProtocol::Version::v1_20_5:  return "1.20.5";
+		case cProtocol::Version::v1_21:    return "1.21";
 	}
 
 	ASSERT(!"Unknown protocol version");
@@ -396,6 +398,7 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		case static_cast<UInt32>(cProtocol::Version::v1_20_2): return std::make_unique<cProtocol_1_20_2>(&a_Client, ServerAddress, NextState);
 		case static_cast<UInt32>(cProtocol::Version::v1_20_3): return std::make_unique<cProtocol_1_20_3>(&a_Client, ServerAddress, NextState);
 		case static_cast<UInt32>(cProtocol::Version::v1_20_5): return std::make_unique<cProtocol_1_20_5>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_21):   return std::make_unique<cProtocol_1_21>  (&a_Client, ServerAddress, NextState);
 		default:
 		{
 			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
