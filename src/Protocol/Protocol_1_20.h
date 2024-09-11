@@ -73,6 +73,8 @@ protected:
 
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
 
+	virtual void SendDisconnect(const AString & a_Reason) override;
+
 	virtual Version GetProtocolVersion() const override;
 };
 

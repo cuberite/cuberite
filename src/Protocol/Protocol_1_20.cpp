@@ -1068,7 +1068,7 @@ void cProtocol_1_20_3::SendInitialChunksComing()
 {
 	{
 		cPacketizer Pkt(*this, pktWeather);
-		Pkt.WriteBEUInt8(static_cast<UInt8>(eGameStateReason::InitialChunksComing));  // End rain / begin rain
+		Pkt.WriteBEUInt8(static_cast<UInt8>(eGameStateReason::InitialChunksComing));
 		Pkt.WriteBEFloat(0);  // Unused
 	}
 }
@@ -1295,6 +1295,40 @@ void cProtocol_1_20_3::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 		}
 	}
 }
+
+
+
+
+
+void cProtocol_1_20_3::SendDisconnect(const AString & a_Reason)
+{
+	switch (m_State)
+	{
+		case State::Login:
+		{
+			cPacketizer Pkt(*this, pktDisconnectDuringLogin);
+			Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", a_Reason));
+			break;
+		}
+		case State::Game:
+		{
+			cPacketizer Pkt(*this, pktDisconnectDuringGame);
+			cFastNBTWriter writer(true);
+			writer.AddString("text",a_Reason);
+			writer.Finish();
+			Pkt.WriteBuf(writer.GetResult());
+			break;
+		}
+		default:
+		{
+			FLOGERROR(
+				"Tried to send disconnect in invalid game state {0}",
+				static_cast<int>(m_State)
+			);
+		}
+	}
+}
+
 
 
 
