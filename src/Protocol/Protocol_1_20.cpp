@@ -398,7 +398,23 @@ void cProtocol_1_20_2::SendLoginSuccess(void)
 		cPacketizer Pkt(*this, pktLoginSuccess);
 		Pkt.WriteUUID(m_Client->GetUUID());
 		Pkt.WriteString(m_Client->GetUsername());
-		Pkt.WriteVarInt32(0);  // TODO: write profile props. number of Profile Properites
+		const Json::Value & Properties = m_Client->GetProperties();
+		Pkt.WriteVarInt32(Properties.size());
+		for (auto & Node : Properties)
+		{
+			Pkt.WriteString(Node.get("name", "").asString());
+			Pkt.WriteString(Node.get("value", "").asString());
+			AString Signature = Node.get("signature", "").asString();
+			if (Signature.empty())
+			{
+				Pkt.WriteBool(false);
+			}
+			else
+			{
+				Pkt.WriteBool(true);
+				Pkt.WriteString(Signature);
+			}
+		}
 	}
 }
 
@@ -1849,7 +1865,23 @@ void cProtocol_1_20_5::SendLoginSuccess(void)
 		cPacketizer Pkt(*this, pktLoginSuccess);
 		Pkt.WriteUUID(m_Client->GetUUID());
 		Pkt.WriteString(m_Client->GetUsername());
-		Pkt.WriteVarInt32(0);  // TODO: write profile props. number of Profile Properites
+		const Json::Value & Properties = m_Client->GetProperties();
+		Pkt.WriteVarInt32(Properties.size());
+		for (auto & Node : Properties)
+		{
+			Pkt.WriteString(Node.get("name", "").asString());
+			Pkt.WriteString(Node.get("value", "").asString());
+			AString Signature = Node.get("signature", "").asString();
+			if (Signature.empty())
+			{
+				Pkt.WriteBool(false);
+			}
+			else
+			{
+				Pkt.WriteBool(true);
+				Pkt.WriteString(Signature);
+			}
+		}
 		Pkt.WriteBool(true); //  strict error handling
 	}
 }
