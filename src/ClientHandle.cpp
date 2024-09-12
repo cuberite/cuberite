@@ -3051,6 +3051,7 @@ void cClientHandle::SendRespawn(const eDimension a_Dimension, const bool a_IsRes
 	}
 
 	m_Protocol->SendRespawn(a_Dimension);
+	m_Protocol->SendInitialChunksComing();
 }
 
 
