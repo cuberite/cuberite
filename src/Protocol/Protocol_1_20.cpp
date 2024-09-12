@@ -216,6 +216,26 @@ void cProtocol_1_20::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 
 
 
+void cProtocol_1_20::SendRespawn(eDimension a_Dimension)
+{
+	cPacketizer Pkt(*this, pktRespawn);
+	cPlayer* Player = m_Client->GetPlayer();
+
+	Pkt.WriteString("minecraft:overworld");  // dimension type key
+	Pkt.WriteString("minecraft:overworld");  // world key
+	Pkt.WriteBEUInt64(0);  // Appears to be a SHA256 od the world seed
+	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
+	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
+	Pkt.WriteBool(false);  // debug world
+	Pkt.WriteBool(false);  // flat world
+	Pkt.WriteBEInt8(0x3);   // keep player attributes
+	Pkt.WriteBool(false);  // optional last death pos
+	Pkt.WriteVarInt32(0);
+}
+
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //  cProtocol_1_20_2:
@@ -811,6 +831,27 @@ void cProtocol_1_20_2::SendPluginMessage(const AString & a_Channel, const Contig
 		Pkt.WriteString(a_Channel);
 		Pkt.WriteBuf(a_Message);
 	}
+}
+
+
+
+
+
+void cProtocol_1_20_2::SendRespawn(eDimension a_Dimension)
+{
+	cPacketizer Pkt(*this, pktRespawn);
+	cPlayer* Player = m_Client->GetPlayer();
+
+	Pkt.WriteString("minecraft:overworld");  // dimension type key
+	Pkt.WriteString("minecraft:overworld");  // world key
+	Pkt.WriteBEUInt64(0);  // Appears to be a SHA256 od the world seed
+	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
+	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
+	Pkt.WriteBool(false);  // debug world
+	Pkt.WriteBool(false);  // flat world
+	Pkt.WriteBool(false);  // optional last death pos
+	Pkt.WriteVarInt32(0); // portal cool down
+	Pkt.WriteBEInt8(0x3); // keep metadata and attributes 
 }
 
 
@@ -1945,6 +1986,27 @@ void cProtocol_1_20_5::HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
 
 	m_Client->HandleChat("/" + Command);
+}
+
+
+
+
+
+void cProtocol_1_20_5::SendRespawn(eDimension a_Dimension)
+{
+	cPacketizer Pkt(*this, pktRespawn);
+	cPlayer* Player = m_Client->GetPlayer();
+
+	Pkt.WriteVarInt32(0);  // dimension type key
+	Pkt.WriteString("minecraft:overworld");  // world key
+	Pkt.WriteBEUInt64(0);  // Appears to be a SHA256 od the world seed
+	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
+	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
+	Pkt.WriteBool(false);  // debug world
+	Pkt.WriteBool(false);  // flat world
+	Pkt.WriteBool(false);  // optional last death pos
+	Pkt.WriteVarInt32(0); // portal cool down
+	Pkt.WriteBEInt8(0x3); // keep metadata and attributes 
 }
 
 

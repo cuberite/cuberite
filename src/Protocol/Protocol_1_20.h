@@ -15,7 +15,10 @@ public:
 
 protected:
 	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
-	virtual void    SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
+    virtual void SendBlockChanges(
+	  int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
+
+    virtual void SendRespawn(eDimension a_Dimension) override;
 
 	virtual Version GetProtocolVersion() const override;
 };
@@ -38,6 +41,7 @@ protected:
 	virtual void    SendLoginSuccess(void) override;
 	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void    SendPluginMessage(const AString & a_Channel, const ContiguousByteBufferView a_Message) override;
+	virtual void    SendRespawn(eDimension a_Dimension) override;
 	virtual void    SendFinishConfiguration() override;
 	virtual void    SendDynamicRegistries() override;
 
@@ -97,6 +101,7 @@ protected:
 	virtual void SendSelectKnownPacks() override;
 	virtual void SendLoginSuccess(void) override;
 	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
+	virtual void SendRespawn(eDimension a_Dimension) override;
 
 	virtual void HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer) override;

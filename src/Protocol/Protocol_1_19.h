@@ -118,7 +118,9 @@ protected:
 	virtual void    SendPlayerMoveLook(const Vector3d a_Pos, const float a_Yaw, const float a_Pitch, const bool a_IsRelative) override;
 
 	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
-	virtual void    HandlePacketPlayerSession(cByteBuffer & a_ByteBuffer) override;
+	virtual void HandlePacketPlayerSession(cByteBuffer & a_ByteBuffer) override;
+
+	virtual void SendRespawn(eDimension a_Dimension) override;
 
 	virtual Version GetProtocolVersion() const override;
 };
