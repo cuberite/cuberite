@@ -2327,6 +2327,26 @@ void cProtocol_1_19_4::HandlePacketPlayerSession(cByteBuffer & a_ByteBuffer)
 
 
 
+void cProtocol_1_19_4::SendRespawn(eDimension a_Dimension)
+{
+	cPacketizer Pkt(*this, pktRespawn);
+	cPlayer* Player = m_Client->GetPlayer();
+
+	Pkt.WriteString("minecraft:overworld");  // dimension type key
+	Pkt.WriteString("minecraft:overworld");  // world key
+	Pkt.WriteBEUInt64(0);  // Appears to be a SHA256 od the world seed
+	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
+	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
+	Pkt.WriteBool(false);  // debug world
+	Pkt.WriteBool(false);  // flat world
+	Pkt.WriteBEInt8(0x3);   // keep player attributes
+	Pkt.WriteBool(false);  // optional last death pos
+}
+
+
+
+
+
 void cProtocol_1_19_4::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	// Send the Join Game packet:
