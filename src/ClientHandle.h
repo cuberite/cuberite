@@ -246,6 +246,7 @@ public:  // tolua_export
 	void SendInitRecipes                (UInt32 a_RecipeId);
 
 	void SendWeather                    (eWeather a_Weather);
+	void SendGameStateChange            (eGameStateReason a_Reason, float a_Value);
 	void SendWholeInventory             (const cWindow & a_Window);
 	void SendWindowClose                (const cWindow & a_Window);
 	void SendWindowOpen                 (const cWindow & a_Window);

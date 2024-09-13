@@ -153,7 +153,7 @@ void cProtocol_1_13::SendCommandTree()
 	// TODO: rework the whole command system to support new format
 	// https://wiki.vg/Command_Data
 
-	if (true)
+	if (false)
 	{
 		{
 			cPacketizer Pkt(*this, pktCommnadTree);

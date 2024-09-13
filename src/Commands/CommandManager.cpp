@@ -89,11 +89,11 @@ bool cCommandManager::cCommandNode::Parse(BasicStringReader& a_Command, cCommand
 			}
 			catch (cCommandParseException ex)
 			{
-				UNREACHABLE("exceptions should never be caught here");
+				a_Ctx.SendFeedback(ex.what());
 			}
 		}
 	}
-	else
+	else if (!a_Command.IsDone())
 	{
 		auto ret = this->GetNextPotentialNode(a_Command, a_Ctx);
 		if (ret != nullptr)

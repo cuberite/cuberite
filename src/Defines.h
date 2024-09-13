@@ -448,6 +448,28 @@ enum class BossBarDivisionType
 	TwentyNotches
 };
 
+
+
+
+
+enum class eGameStateReason
+{
+	NoRespawnBlock,
+	RainStarted,
+	RainStopped,
+	GamemodeChanged,
+	WinGame,
+	DemoMessageShown,
+	ProjectileHitPlayer,
+	RainGradientChanged,
+	ThunderGradientChanged,
+	PufferfishString,
+	ElderGuardianEffect,
+	ImmediateRespawn,
+	LimitedCraftingToggled,
+	InitialChunksComing
+};
+
 // tolua_end
 
 

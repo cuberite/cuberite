@@ -135,6 +135,7 @@ public:
 	virtual void SendUnlockRecipe               (UInt32 a_RecipeID) override;
 	virtual void SendInitRecipes                (UInt32 a_RecipeID) override;
 	virtual void SendWeather                    (eWeather a_Weather) override;
+	virtual void SendGameStateChange            (eGameStateReason a_Reason, float a_Value) override;
 	virtual void SendWholeInventory             (const cWindow & a_Window) override;
 	virtual void SendWindowClose                (const cWindow & a_Window) override;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) override;

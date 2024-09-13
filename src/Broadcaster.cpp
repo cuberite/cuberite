@@ -620,9 +620,21 @@ void cWorld::BroadcastUnleashEntity(const cEntity & a_Entity)
 
 void cWorld::BroadcastWeather(eWeather a_Weather, const cClientHandle * a_Exclude)
 {
+	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client) {
+		                  a_Client.SendWeather(a_Weather);
+	                  }
+	);
+}
+
+
+
+
+
+void cWorld::BroadcastGameStateChange(eGameStateReason a_Reason, float a_Value, const cClientHandle * a_Exclude)
+{
 	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendWeather(a_Weather);
+			a_Client.SendGameStateChange(a_Reason, a_Value);
 		}
 	);
 }
