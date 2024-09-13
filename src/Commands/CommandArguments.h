@@ -45,6 +45,7 @@ class cCommandArgument
 		Swizzle,
 		Team,
 		ItemSlot,
+		ItemSlots,
 		ResourceLocation,
 		Function,
 		EntityAnchor,
@@ -127,4 +128,70 @@ class cCommandFloatArgument final : public cCommandArgument
 private:
 	std::optional<float> m_Min;
 	std::optional<float> m_Max;
+};
+
+
+
+
+
+class cCommandTimeArgument final : public cCommandArgument
+{
+  public:
+	cCommandTimeArgument(int a_Min) : m_Min(a_Min){}
+	cCommandTimeArgument() = default;
+
+	void WriteProperties(cPacketizer& a_Packet) const override
+	{
+		a_Packet.WriteBEInt32(m_Min.value_or(0));
+	}
+	void Parse(BasicStringReader& a_ToParse, cCommandExecutionContext& ctx, const AString& a_Name) override
+	{
+		float value = 0;
+		auto str = a_ToParse.ReadStringUntilWhiteSpace();
+		float multiplier = 1;
+		try
+		{
+			const char unit = str.at(str.size() - 1);
+			if (unit == 'd')
+			{
+				multiplier = 24000;
+				str = str.substr(0,str.size() - 1);
+			}
+			if (unit == 's')
+			{
+				multiplier = 20;
+				str = str.substr(0,str.size() - 1);
+			}
+			if (unit == 't')
+			{
+				str = str.substr(0,str.size() - 1);
+			}
+			 value = std::stof(str);
+		}
+		catch (std::invalid_argument& ex)
+		{
+			throw cCommandParseException("Failed to parse " + str + " as float. Error: "+ ex.what());
+		}
+		catch (std::out_of_range& ex)
+		{
+			throw cCommandParseException("Failed to parse " + str + " as float because its too large/small. Error: "+ ex.what());
+		}
+		value *= multiplier;
+		if (m_Min.has_value() && value < m_Min.value())
+		{
+			throw cCommandParseException(str + " is too small. Min value is " + std::to_string(m_Min.value()));
+		}
+		ctx.AddValue(a_Name, static_cast<int>(value));
+	}
+	virtual void WriteParserID(cPacketizer& a_Packet) const override
+	{
+		a_Packet.WriteVarInt32(static_cast<UInt32>(eParserType::Time));
+	}
+	static int GetTimeTicksFromCtx(cCommandExecutionContext a_Ctx, const AString& a_Name)
+	{
+		return std::any_cast<int>(a_Ctx.GetValue(a_Name));
+	}
+
+private:
+	std::optional<int> m_Min;
 };

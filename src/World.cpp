@@ -1149,13 +1149,41 @@ void cWorld::TickWeather(float a_Dt)
 		// Change weather:
 		SetWeather(ChooseNewWeather());
 	}
+	float oldrain = m_RainGradient;
+	float oldthunder = m_ThunderGradient;
+	if (m_Weather == eWeather_Rain)
+	{
+		m_RainGradient += 0.01f;
+	}
+	else
+	{
+		m_RainGradient -= 0.01f;
+	}
+	if (m_Weather == eWeather_ThunderStorm)
+	{
+		m_ThunderGradient += 0.01f;
+	}
+	else
+	{
+		m_ThunderGradient -= 0.01f;
+	}
+	m_RainGradient = std::clamp(m_RainGradient, 0.0F, 1.0F);
+	m_ThunderGradient = std::clamp(m_ThunderGradient, 0.0F, 1.0F);
+	if (oldrain != m_RainGradient)
+	{
+		BroadcastGameStateChange(eGameStateReason::RainGradientChanged, m_RainGradient);
+	}
+	if(oldthunder != m_ThunderGradient)
+	{
+		BroadcastGameStateChange(eGameStateReason::ThunderGradientChanged, m_ThunderGradient);
+	}
 
 	if (m_Weather == eWeather_ThunderStorm)
 	{
 		// 0.5% chance per tick of thunderbolt
 		if (GetRandomProvider().RandBool(0.005))
 		{
-			CastThunderbolt({0, 0, 0});  // TODO: find random positions near players to cast thunderbolts.
+			//CastThunderbolt({0, 0, 0});  // TODO: find random positions near players to cast thunderbolts.
 		}
 	}
 }
