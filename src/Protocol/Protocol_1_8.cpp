@@ -1762,6 +1762,21 @@ void cProtocol_1_8_0::SendWeather(eWeather a_Weather)
 
 
 
+void cProtocol_1_8_0::SendGameStateChange(eGameStateReason a_Reason, float a_Value)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	{
+		cPacketizer Pkt(*this, pktWeather);
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Reason));
+		Pkt.WriteBEFloat(a_Value);
+	}
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendWholeInventory(const cWindow & a_Window)
 {
 	ASSERT(m_State == 3);  // In game mode?

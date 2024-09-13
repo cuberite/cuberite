@@ -178,6 +178,7 @@ public:
 	void         BroadcastEntityProperties           (const cEntity & a_Entity);
 	virtual void BroadcastEntityVelocity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
+	virtual void BroadcastGameStateChange            (eGameStateReason a_Reason, float a_Value = 0, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
 	virtual void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
 	virtual void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
@@ -1041,6 +1042,7 @@ private:
 	int m_MaxSunnyTicks, m_MinSunnyTicks;
 	int m_MaxRainTicks,  m_MinRainTicks;
 	int m_MaxThunderStormTicks, m_MinThunderStormTicks;
+	float m_RainGradient, m_ThunderGradient;
 
 	int  m_MaxCactusHeight;
 	int  m_MaxSugarcaneHeight;

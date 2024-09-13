@@ -2,7 +2,8 @@
 class cCommandParseException : public std::exception
 {
 public:
-	explicit cCommandParseException(const char * message) = delete;
+	explicit cCommandParseException(const char * a_Message)
+		: m_Msg(a_Message) {}
 
     explicit cCommandParseException(const AString& a_Message)
         : m_Msg(a_Message) {}

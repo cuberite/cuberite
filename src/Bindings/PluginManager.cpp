@@ -1738,6 +1738,10 @@ AString cPluginManager::GetPluginFolderName(const AString & a_PluginName)
 
 void cPluginManager::SetupNewCommands(void)
 {
+#define LITERAL(name) cCommandManager::cCommandNode::Literal(name)
+#define ARGUMENT(name, arg) cCommandManager::cCommandNode::Argument(name, std::make_shared<arg>())
+#define ARGUMENT_ARGS(name, arg,args) cCommandManager::cCommandNode::Argument(name, std::make_shared<arg>(args))
+#define EXECUTE(exe) [](const cCommandExecutionContext& a_Ctx) -> bool {exe return true;}
 	auto node = cCommandManager::cCommandNode();
 	node.Then(
 		cCommandManager::cCommandNode::Literal("testcmd")
@@ -1749,6 +1753,32 @@ void cPluginManager::SetupNewCommands(void)
 				 a_Ctx.SendFeedback(
 					 "test cmd success2 " + std::to_string(cCommandFloatArgument::GetFloatFromCtx(a_Ctx, "test float")));
 				  	 return true; })));
+	node.Then(LITERAL("weather").Then(
+		LITERAL("rain")
+			.Executable(EXECUTE(
+				cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Rain);))
+				->Then(ARGUMENT("duration", cCommandTimeArgument)
+					   .Executable(EXECUTE(
+						   cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Rain);
+						   cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)))
+			)->Then(
+		LITERAL("clear")
+			.Executable(EXECUTE(
+				cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Sunny);))
+				->Then(ARGUMENT("duration", cCommandTimeArgument)
+					   .Executable(EXECUTE(
+						   cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Sunny);
+						   cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)))
+			)->Then(
+		LITERAL("thunder")
+			.Executable(EXECUTE(
+				cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_ThunderStorm);))
+				->Then(ARGUMENT("duration", cCommandTimeArgument)
+					   .Executable(EXECUTE(
+						   cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_ThunderStorm);
+						   cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)))
+			)
+	);
 
 	m_RootCommandNode = node;
 }

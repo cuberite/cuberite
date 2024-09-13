@@ -429,24 +429,6 @@ public:
 		UpdateDisplayName = 32,
 	};
 
-	enum class eGameStateReason
-	{
-		NoRespawnBlock,
-		RainStarted,
-		RainStopped,
-		GamemodeChanged,
-		WinGame,
-		DemoMessageShown,
-		ProjectileHitPlayer,
-		RainGradientChanged,
-		ThunderGradientChanged,
-		PufferfishString,
-		ElderGuardianEffect,
-		ImmediateRespawn,
-		LimitedCraftingToggled,
-		InitialChunksComing
-	};
-
 	/** Called by cClientHandle to process data, when the client sends some.
 	The protocol uses the provided buffers for storage and processing, and must have exclusive access to them. */
 	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer & a_Data) = 0;
@@ -552,6 +534,7 @@ public:
 	virtual void SendInitRecipes                (UInt32 a_RecipeID) = 0;
 	virtual void SendInitialChunksComing        () = 0;
 	virtual void SendWeather                    (eWeather a_Weather) = 0;
+	virtual void SendGameStateChange            (eGameStateReason a_Reason, float a_Value) = 0;
 	virtual void SendWholeInventory             (const cWindow    & a_Window) = 0;
 	virtual void SendWindowClose                (const cWindow    & a_Window) = 0;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) = 0;

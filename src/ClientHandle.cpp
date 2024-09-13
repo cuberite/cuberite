@@ -3333,6 +3333,14 @@ void cClientHandle::SendWeather(eWeather a_Weather)
 
 
 
+void cClientHandle::SendGameStateChange(eGameStateReason a_Reason, float a_Value)
+{
+	m_Protocol->SendGameStateChange(a_Reason, a_Value);
+}
+
+
+
+
 
 void cClientHandle::SendWholeInventory(const cWindow & a_Window)
 {

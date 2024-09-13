@@ -44,6 +44,7 @@ public:
 	virtual void BroadcastEntityPosition             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastEntityVelocity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation, const cClientHandle * a_Exclude = nullptr) = 0;
+	virtual void BroadcastGameStateChange            (eGameStateReason a_Reason, float a_Value = 0, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) = 0;
 	virtual void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data, const cClientHandle * a_Exclude = nullptr) = 0;

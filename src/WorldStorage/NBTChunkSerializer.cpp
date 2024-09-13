@@ -1225,7 +1225,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				int newsize = (newlistend - temparr.begin());
 				int bitused = Clamp(CeilC(log2(newsize)), 4, 16);
 
-				int longarrsize = CeilC((bitused * 4096)/8/8);
+				int longarrsize = CeilC((bitused * 4096)/8/8); // TODO: account for padding in 1.16+
 				aWriter.BeginCompound("");
 				aWriter.BeginList("Palette", eTagType::TAG_Compound);
 
