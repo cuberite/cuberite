@@ -417,8 +417,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 			AStringList Palette;
 
-			std::vector<NEWBLOCKTYPE> Paletteids;
-
+			std::vector<BlockState> Paletteids;
 			for (int Child1 = a_NBT.GetFirstChild(PaletteList); Child1 >= 0; Child1 = a_NBT.GetNextSibling(Child1))
 			{
 				const int NameTagId = a_NBT.FindChildByName(Child1, "Name");
@@ -437,7 +436,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 				AString bls = "";
 				std::vector<AString> strs;
-				if (BlockStatesId > 0)
+				if (BlockStatesId > 0 && false)
 				{
 					if (a_NBT.GetType(BlockStatesId) != TAG_Compound)
 					{
@@ -459,7 +458,6 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				{
 					tosearch += " ";
 				}
-				//tosearch += bls;
 				for each (auto itm in strs)
 				{
 					tosearch += itm;
@@ -470,13 +468,14 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				}
 				// LOGD("%d hash tbl size", (*BlockMap::BlMap::GetMap()).size());
 				//Check if 
-				int cnt = (*BlockMap::BlMap::GetMap()).count(tosearch);
-				if (cnt == 0)
+				BlockState cnt = NamespaceSerializer::ToBlockType(tosearch);	 //(*BlockMap::BlMap::GetMap()).count(tosearch);
+
+				if (cnt == BlockType::Air)
 				{
-					UNREACHABLE("could find given block while loading chunk X: " + a_Chunk.m_ChunkX + " Z: " a_Chunk.m_ChunkZ + " Y Section: " + Y);
+					//UNREACHABLE("could find given block while loading chunk X: " + a_Chunk.m_ChunkX + " Z: " a_Chunk.m_ChunkZ + " Y Section: " + Y);
 				}
-				NEWBLOCKTYPE protocolblockid = (*BlockMap::BlMap::GetMap()).at(tosearch);
-				Paletteids.push_back(protocolblockid);
+				//NEWBLOCKTYPE protocolblockid = (*BlockMap::BlMap::GetMap()).at(tosearch);
+				Paletteids.push_back(cnt);
 
 				Palette.emplace_back(blockid.substr(strlen("minecraft:"), std::string::npos));
 			}
@@ -502,7 +501,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			// int currentbyte = 0;
 			// needs better bounds checking
 			// u_short numblockdata[4096] = { 0 };
-			NEWBLOCKTYPE resolveddata[4096] = { AIR };
+			BlockState resolveddata[4096] = { BlockType::Air };
 			int numblockdataindex = 0;
 			int pl = Paletteids.size();
 
@@ -616,9 +615,9 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				ASSERT(finalvalue < pl);
 			} */
 
-			Data.BlockData2.SetSection(resolveddata,Y);
+			Data.BlockData.SetSection(resolveddata,Y);
 
-			if (BlockLightData != NULL && SkyLightData != NULL)
+			if (BlockLightData != nullptr && SkyLightData != nullptr)
 			{
 				Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
 			}
