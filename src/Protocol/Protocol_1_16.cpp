@@ -3,8 +3,6 @@
 #include "Packetizer.h"
 
 
-static const UInt32 CompressionThreshold = 256;  // After how large a packet should we compress it.
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_16:
 

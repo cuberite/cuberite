@@ -42,7 +42,7 @@ class cPacketizer;
 typedef unsigned char Byte;
 
 
-
+static const int CompressionThreshold = 128; // After how large a packet should we compress it.
 
 
 class cProtocol

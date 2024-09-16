@@ -3,7 +3,7 @@
 
 #include "../Defines.h"
 #include "../Item.h"
-
+#include "../Registries/Items.h"
 
 
 
@@ -36,8 +36,8 @@ public:
 
 	constexpr cItemHandler(Item a_ItemType) : m_ItemType(a_ItemType)
 	{
-	}
 
+	}
 
 	/** Called when the player tries to place the item (right mouse button, IsPlaceable() == true).
 	a_ClickedPosition is the block that has been clicked to place this item.
@@ -139,6 +139,8 @@ protected:
 	~cItemHandler() = default;
 
 	Item m_ItemType;
+
+	// const Item m_NewItemType;
 
 	/** Performs the actual placement of this placeable item.
 	The descendant handler should call a_Player.PlaceBlock(s) supplying correct values for the newly placed block.

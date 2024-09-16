@@ -259,9 +259,9 @@ namespace BlockItemConverter
 			case Item::GraniteSlab:                     return BlockType::GraniteSlab;
 			case Item::GraniteStairs:                   return BlockType::GraniteStairs;
 			case Item::GraniteWall:                     return BlockType::GraniteWall;
-			case Item::Grass:                           return BlockType::Grass;
+			case Item::Grass:                           return BlockType::ShortGrass;
 			case Item::GrassBlock:                      return BlockType::GrassBlock;
-			case Item::GrassPath:                       return BlockType::GrassPath;
+			case Item::GrassPath:                       return BlockType::DirtPath;
 			case Item::Gravel:                          return BlockType::Gravel;
 			case Item::GrayBanner:                      return BlockType::GrayBanner;
 			case Item::GrayBed:                         return BlockType::GrayBed;
@@ -286,7 +286,7 @@ namespace BlockItemConverter
 			case Item::GreenTerracotta:                 return BlockType::GreenTerracotta;
 			case Item::GreenWool:                       return BlockType::GreenWool;
 			case Item::Grindstone:                      return BlockType::Grindstone;
-			case Item::HayBale:                         return BlockType::HayBale;
+			case Item::HayBale:                         return BlockType::HayBlock;
 			case Item::HeavyWeightedPressurePlate:      return BlockType::HeavyWeightedPressurePlate;
 			case Item::HoneyBlock:                      return BlockType::HoneyBlock;
 			case Item::HoneycombBlock:                  return BlockType::HoneycombBlock;
@@ -616,7 +616,7 @@ namespace BlockItemConverter
 			case Item::StructureVoid:                   return BlockType::StructureVoid;
 			case Item::SugarCane:                       return BlockType::SugarCane;
 			case Item::Sunflower:                       return BlockType::Sunflower;
-			case Item::TNT:                             return BlockType::TNT;
+			case Item::TNT:                             return BlockType::Tnt;
 			case Item::TallGrass:                       return BlockType::TallGrass;
 			case Item::Target:                          return BlockType::Target;
 			case Item::Terracotta:                      return BlockType::Terracotta;
@@ -963,7 +963,7 @@ namespace BlockItemConverter
 			case Item::VillagerSpawnEgg:
 			case Item::VindicatorSpawnEgg:
 			case Item::WanderingTraderSpawnEgg:
-			case Item::WarpedFungusOnA_stick:
+			case Item::WarpedFungusOnAStick:
 			case Item::WaterBucket:
 			case Item::WheatSeeds:
 			case Item::WhiteDye:
@@ -1274,9 +1274,9 @@ namespace BlockItemConverter
 			case BlockType::GraniteSlab:                     return Item::GraniteSlab;
 			case BlockType::GraniteStairs:                   return Item::GraniteStairs;
 			case BlockType::GraniteWall:                     return Item::GraniteWall;
-			case BlockType::Grass:                           return Item::Grass;
+			case BlockType::ShortGrass:                      return Item::Grass;
 			case BlockType::GrassBlock:                      return Item::GrassBlock;
-			case BlockType::GrassPath:                       return Item::GrassPath;
+			case BlockType::DirtPath:                        return Item::GrassPath;
 			case BlockType::Gravel:                          return Item::Gravel;
 			case BlockType::GrayBanner:                      return Item::GrayBanner;
 			case BlockType::GrayBed:                         return Item::GrayBed;
@@ -1303,7 +1303,7 @@ namespace BlockItemConverter
 			case BlockType::GreenWallBanner:                 return Item::GreenBanner;
 			case BlockType::GreenWool:                       return Item::GreenWool;
 			case BlockType::Grindstone:                      return Item::Grindstone;
-			case BlockType::HayBale:                         return Item::HayBale;
+			case BlockType::HayBlock:                         return Item::HayBale;
 			case BlockType::HeavyWeightedPressurePlate:      return Item::HeavyWeightedPressurePlate;
 			case BlockType::HoneyBlock:                      return Item::HoneyBlock;
 			case BlockType::HoneycombBlock:                  return Item::HoneycombBlock;
@@ -1688,7 +1688,7 @@ namespace BlockItemConverter
 			case BlockType::SugarCane:                       return Item::SugarCane;
 			case BlockType::Sunflower:                       return Item::Sunflower;
 			case BlockType::SweetBerryBush:                  return Item::Air;
-			case BlockType::TNT:                             return Item::TNT;
+			case BlockType::Tnt:                             return Item::TNT;
 			case BlockType::TallGrass:                       return Item::TallGrass;
 			case BlockType::TallSeagrass:                    return Item::Air;
 			case BlockType::Target:                          return Item::Target;

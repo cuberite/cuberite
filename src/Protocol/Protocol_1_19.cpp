@@ -1831,9 +1831,7 @@ void cProtocol_1_19_3::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 				if (!MinecartContent.IsEmpty())
 				{
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockIDMeta, EntityMetadataType::VarInt);
-					int Content = MinecartContent.m_ItemType;
-					Content |= MinecartContent.m_ItemDamage << 8;
-					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
+					a_Pkt.WriteVarInt32(Palette_1_14::From(MinecartContent.m_ItemType)); // todo use proper palette
 
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockY, EntityMetadataType::VarInt);
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
@@ -2687,9 +2685,7 @@ void cProtocol_1_19_4::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 				if (!MinecartContent.IsEmpty())
 				{
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockIDMeta, EntityMetadataType::VarInt);
-					int Content = MinecartContent.m_ItemType;
-					Content |= MinecartContent.m_ItemDamage << 8;
-					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
+					a_Pkt.WriteVarInt32(Palette_1_14::From(MinecartContent.m_ItemType)); // todo use proper palette
 
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockY, EntityMetadataType::VarInt);
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));

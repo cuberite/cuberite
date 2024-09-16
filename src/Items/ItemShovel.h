@@ -107,7 +107,7 @@ public:
 			case BlockType::Dirt:
 			case BlockType::Farmland:
 			case BlockType::GrassBlock:
-			case BlockType::GrassPath:
+			case BlockType::DirtPath:
 			case BlockType::Gravel:
 			case BlockType::Mycelium:
 			case BlockType::Sand:

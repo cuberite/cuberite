@@ -475,9 +475,9 @@ namespace
 	constexpr cBlockSlabHandler                            BlockGraniteSlabHandler(BlockType::GraniteSlab);
 	constexpr cBlockStairsHandler                          BlockGraniteStairsHandler(BlockType::GraniteStairs);
 	constexpr cDefaultBlockHandler                         BlockGraniteWallHandler(BlockType::GraniteWall);
-	constexpr cBlockTallGrassHandler                       BlockGrassHandler(BlockType::Grass);
+	constexpr cBlockTallGrassHandler                       BlockGrassHandler(BlockType::ShortGrass);
 	constexpr cBlockGrassHandler                           BlockGrassBlockHandler(BlockType::GrassBlock);
-	constexpr cDefaultBlockHandler                         BlockGrassPathHandler(BlockType::GrassPath);
+	constexpr cDefaultBlockHandler                         BlockGrassPathHandler(BlockType::DirtPath);
 	constexpr cBlockGravelHandler                          BlockGravelHandler(BlockType::Gravel);
 	constexpr cDefaultBlockHandler                         BlockGrayBannerHandler(BlockType::GrayBanner);
 	constexpr cBlockBedHandler                             BlockGrayBedHandler(BlockType::GrayBed);
@@ -504,7 +504,7 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockGreenWallBannerHandler(BlockType::GreenWallBanner);
 	constexpr cBlockWoolHandler                            BlockGreenWoolHandler(BlockType::GreenWool);
 	constexpr cDefaultBlockHandler                         BlockGrindstoneHandler(BlockType::Grindstone);
-	constexpr cBlockHayBaleHandler                         BlockHayBaleHandler(BlockType::HayBale);
+	constexpr cBlockHayBaleHandler                         BlockHayBaleHandler(BlockType::HayBlock);
 	constexpr cBlockPressurePlateHandler                   BlockHeavyWeightedPressurePlateHandler(BlockType::HeavyWeightedPressurePlate);
 	constexpr cDefaultBlockHandler                         BlockHoneyBlockHandler(BlockType::HoneyBlock);
 	constexpr cDefaultBlockHandler                         BlockHoneycombBlockHandler(BlockType::HoneycombBlock);
@@ -889,7 +889,7 @@ namespace
 	constexpr cBlockSugarCaneHandler                       BlockSugarCaneHandler(BlockType::SugarCane);
 	constexpr cBlockBigFlowerHandler                       BlockSunflowerHandler(BlockType::Sunflower);
 	constexpr cDefaultBlockHandler                         BlockSweetBerryBushHandler(BlockType::SweetBerryBush);
-	constexpr cBlockTNTHandler                             BlockTNTHandler(BlockType::TNT);
+	constexpr cBlockTNTHandler                             BlockTNTHandler(BlockType::Tnt);
 	constexpr cBlockTallGrassHandler                       BlockTallGrassHandler(BlockType::TallGrass);
 	constexpr cDefaultBlockHandler                         BlockTallSeagrassHandler(BlockType::TallSeagrass);
 	constexpr cDefaultBlockHandler                         BlockTargetHandler(BlockType::Target);
@@ -1425,9 +1425,9 @@ const cBlockHandler & cBlockHandler::For(BlockType a_BlockType)
 		case BlockType::GraniteSlab:                      return BlockGraniteSlabHandler;
 		case BlockType::GraniteStairs:                    return BlockGraniteStairsHandler;
 		case BlockType::GraniteWall:                      return BlockGraniteWallHandler;
-		case BlockType::Grass:                            return BlockGrassHandler;
+		case BlockType::ShortGrass:                       return BlockGrassHandler;
 		case BlockType::GrassBlock:                       return BlockGrassBlockHandler;
-		case BlockType::GrassPath:                        return BlockGrassPathHandler;
+		case BlockType::DirtPath:                         return BlockGrassPathHandler;
 		case BlockType::Gravel:                           return BlockGravelHandler;
 		case BlockType::GrayBanner:                       return BlockGrayBannerHandler;
 		case BlockType::GrayBed:                          return BlockGrayBedHandler;
@@ -1454,7 +1454,7 @@ const cBlockHandler & cBlockHandler::For(BlockType a_BlockType)
 		case BlockType::GreenWallBanner:                  return BlockGreenWallBannerHandler;
 		case BlockType::GreenWool:                        return BlockGreenWoolHandler;
 		case BlockType::Grindstone:                       return BlockGrindstoneHandler;
-		case BlockType::HayBale:                          return BlockHayBaleHandler;
+		case BlockType::HayBlock:                         return BlockHayBaleHandler;
 		case BlockType::HeavyWeightedPressurePlate:       return BlockHeavyWeightedPressurePlateHandler;
 		case BlockType::HoneyBlock:                       return BlockHoneyBlockHandler;
 		case BlockType::HoneycombBlock:                   return BlockHoneycombBlockHandler;
@@ -1839,7 +1839,7 @@ const cBlockHandler & cBlockHandler::For(BlockType a_BlockType)
 		case BlockType::SugarCane:                        return BlockSugarCaneHandler;
 		case BlockType::Sunflower:                        return BlockSunflowerHandler;
 		case BlockType::SweetBerryBush:                   return BlockSweetBerryBushHandler;
-		case BlockType::TNT:                              return BlockTNTHandler;
+		case BlockType::Tnt:                              return BlockTNTHandler;
 		case BlockType::TallGrass:                        return BlockTallGrassHandler;
 		case BlockType::TallSeagrass:                     return BlockTallSeagrassHandler;
 		case BlockType::Target:                           return BlockTargetHandler;

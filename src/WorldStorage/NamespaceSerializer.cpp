@@ -351,9 +351,9 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::GraniteSlab:                      return "granite_slab";
 		case BlockType::GraniteStairs:                    return "granite_stairs";
 		case BlockType::GraniteWall:                      return "granite_wall";
-		case BlockType::Grass:                            return "grass";
+		case BlockType::ShortGrass:                       return "short_grass";
 		case BlockType::GrassBlock:                       return "grass_block";
-		case BlockType::GrassPath:                        return "grass_path";
+		case BlockType::DirtPath:                         return "dirt_path";
 		case BlockType::Gravel:                           return "gravel";
 		case BlockType::GrayBanner:                       return "gray_banner";
 		case BlockType::GrayBed:                          return "gray_bed";
@@ -380,7 +380,7 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::GreenWallBanner:                  return "green_wall_banner";
 		case BlockType::GreenWool:                        return "green_wool";
 		case BlockType::Grindstone:                       return "grindstone";
-		case BlockType::HayBale:                          return "hay_bale";
+		case BlockType::HayBlock:                         return "hay_block";
 		case BlockType::HeavyWeightedPressurePlate:       return "heavy_weighted_pressure_plate";
 		case BlockType::HoneyBlock:                       return "honey_block";
 		case BlockType::HoneycombBlock:                   return "honeycomb_block";
@@ -765,7 +765,7 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::SugarCane:                        return "sugar_cane";
 		case BlockType::Sunflower:                        return "sunflower";
 		case BlockType::SweetBerryBush:                   return "sweet_berry_bush";
-		case BlockType::TNT:                              return "tnt";
+		case BlockType::Tnt:                              return "tnt";
 		case BlockType::TallGrass:                        return "tall_grass";
 		case BlockType::TallSeagrass:                     return "tall_seagrass";
 		case BlockType::Target:                           return "target";
@@ -1970,7 +1970,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::WarpedFence:                      return "warped_fence";
 		case Item::WarpedFenceGate:                  return "warped_fence_gate";
 		case Item::WarpedFungus:                     return "warped_fungus";
-		case Item::WarpedFungusOnA_stick:            return "warped_fungus_on_a_stick";
+		case Item::WarpedFungusOnAStick:             return "warped_fungus_on_a_stick";
 		case Item::WarpedHyphae:                     return "warped_hyphae";
 		case Item::WarpedNylium:                     return "warped_nylium";
 		case Item::WarpedPlanks:                     return "warped_planks";
@@ -2320,9 +2320,9 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "granite_slab",                        BlockType::GraniteSlab },
 		{ "granite_stairs",                      BlockType::GraniteStairs },
 		{ "granite_wall",                        BlockType::GraniteWall },
-		{ "grass",                               BlockType::Grass },
+		{ "short_grass",                         BlockType::ShortGrass },
 		{ "grass_block",                         BlockType::GrassBlock },
-		{ "grass_path",                          BlockType::GrassPath },
+		{ "dirt_path",                           BlockType::DirtPath },
 		{ "gravel",                              BlockType::Gravel },
 		{ "gray_banner",                         BlockType::GrayBanner },
 		{ "gray_bed",                            BlockType::GrayBed },
@@ -2349,7 +2349,7 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "green_wall_banner",                   BlockType::GreenWallBanner },
 		{ "green_wool",                          BlockType::GreenWool },
 		{ "grindstone",                          BlockType::Grindstone },
-		{ "hay_bale",                            BlockType::HayBale },
+		{ "hay_block",                           BlockType::HayBlock },
 		{ "heavy_weighted_pressure_plate",       BlockType::HeavyWeightedPressurePlate },
 		{ "honey_block",                         BlockType::HoneyBlock },
 		{ "honeycomb_block",                     BlockType::HoneycombBlock },
@@ -2734,7 +2734,7 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "sugar_cane",                          BlockType::SugarCane },
 		{ "sunflower",                           BlockType::Sunflower },
 		{ "sweet_berry_bush",                    BlockType::SweetBerryBush },
-		{ "tnt",                                 BlockType::TNT },
+		{ "tnt",                                 BlockType::Tnt },
 		{ "tall_grass",                          BlockType::TallGrass },
 		{ "tall_seagrass",                       BlockType::TallSeagrass },
 		{ "target",                              BlockType::Target },
@@ -2823,7 +2823,7 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "redmushroom",                         BlockType::RedMushroom },
 		{ "blueorchid",                          BlockType::BlueOrchid },
 		{ "peony",                               BlockType::Peony },
-		{ "grass",                               BlockType::Grass },
+		{ "grass",                               BlockType::ShortGrass },
 		{ "deadbush",                            BlockType::DeadBush },
 	};
 
@@ -3894,7 +3894,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "warped_fence",                        Item::WarpedFence },
 		{ "warped_fence_gate",                   Item::WarpedFenceGate },
 		{ "warped_fungus",                       Item::WarpedFungus },
-		{ "warped_fungus_on_a_stick",            Item::WarpedFungusOnA_stick },
+		{ "warped_fungus_on_a_stick",            Item::WarpedFungusOnAStick },
 		{ "warped_hyphae",                       Item::WarpedHyphae },
 		{ "warped_nylium",                       Item::WarpedNylium },
 		{ "warped_planks",                       Item::WarpedPlanks },

@@ -2,9 +2,16 @@
 #include "Protocol_1_20.h"
 #include "Packetizer.h"
 #include <ClientHandle.h>
-
-
-
+#include <Entities/EnderCrystal.h>
+#include <Entities/Pickup.h>
+#include "JsonUtils.h"
+#include "Root.h"
+#include "Entities/Player.h"
+#include "Server.h"
+#include "../WorldStorage/FastNBT.h"
+#include "Entities/ArrowEntity.h"
+#include "Entities/Minecart.h"
+#include "Palettes/Palette_1_16.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -207,7 +214,7 @@ void cProtocol_1_20::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 	for (const auto & Change : a_Changes)
 	{
 		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
-		UInt64 packed = Coords | (Change.m_BlockIdNew << 12);
+		UInt64 packed = Coords | (Palette_1_16::From(Change.m_Block) << 12);
 		Pkt.WriteVarInt64(packed);
 	}
 }
@@ -1243,9 +1250,7 @@ void cProtocol_1_20_3::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 				if (!MinecartContent.IsEmpty())
 				{
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockIDMeta, EntityMetadataType::VarInt);
-					int Content = MinecartContent.m_ItemType;
-					Content |= MinecartContent.m_ItemDamage << 8;
-					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
+					a_Pkt.WriteVarInt32(Palette_1_16::From(MinecartContent.m_ItemType)); // todo use proper palette
 
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockY, EntityMetadataType::VarInt);
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));

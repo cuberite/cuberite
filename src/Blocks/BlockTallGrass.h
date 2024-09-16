@@ -77,7 +77,7 @@ private:
 		auto Self = a_Chunk.GetBlock(a_RelPos);
 		switch (Self.Type())
 		{
-			case BlockType::Grass:
+			case BlockType::ShortGrass:
 			{
 				a_Chunk.SetBlock(a_RelPos,           Block::TallGrass::TallGrass(Block::TallGrass::Half::Lower));
 				a_Chunk.SetBlock(a_RelPos.addedY(1), Block::TallGrass::TallGrass(Block::TallGrass::Half::Upper));

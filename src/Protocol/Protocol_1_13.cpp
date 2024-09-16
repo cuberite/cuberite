@@ -48,7 +48,7 @@ void cProtocol_1_13::SendBlockChange(Vector3i a_BlockPos, BlockState a_Block)
 {
 	cPacketizer Pkt(*this, pktBlockChange);
 	Pkt.WriteXYZPosition64(a_BlockPos);
-	Pkt.WriteVarInt32(GetProtocolBlockType(a_Block));
+	Pkt.WriteVarInt32(Palette_1_13::From(a_Block));
 }
 
 
@@ -68,7 +68,7 @@ void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 	{
 		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
 		Pkt.WriteBEInt16(Coords);
-		Pkt.WriteVarInt32(GetProtocolBlockType(Change.m_Block));
+		Pkt.WriteVarInt32(Palette_1_13::From(Change.m_Block));
 	}
 }
 
@@ -78,7 +78,32 @@ void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 
 void cProtocol_1_13::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY)
 {
-	// TODO
+	{
+		cPacketizer Pkt(*this, pktMapData);
+		Pkt.WriteVarInt32(a_Map.GetID());
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Map.GetScale()));
+
+		Pkt.WriteBool(true);
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetDecorators().size()));
+		for (const auto & Decorator : a_Map.GetDecorators())
+		{
+			Pkt.WriteVarInt32(static_cast<Int32>(Decorator.GetType()));
+			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelX()));
+			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelZ()));
+			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetRot()));
+			Pkt.WriteBool(false);  // TODO: Implement display names
+		}
+		// TODO: Implement proper map scaling
+		Pkt.WriteBEUInt8(128);
+		Pkt.WriteBEUInt8(128);
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_DataStartX));
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_DataStartY));
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetData().size()));
+		for (auto itr = a_Map.GetData().cbegin(); itr != a_Map.GetData().cend(); ++itr)
+		{
+			Pkt.WriteBEUInt8(*itr);
+		}
+	}
 }
 
 
@@ -107,7 +132,87 @@ void cProtocol_1_13::SendParticleEffect(const AString & a_ParticleName, Vector3f
 
 void cProtocol_1_13::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
 {
-	// TODO
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktScoreboardObjective);
+	Pkt.WriteString(a_Name);
+	Pkt.WriteBEUInt8(a_Mode);
+	if ((a_Mode == 0) || (a_Mode == 2))
+	{
+		Pkt.WriteString(a_DisplayName);
+		Pkt.WriteVarInt32(0);
+	}
+}
+
+
+
+
+
+void cProtocol_1_13::SendCommandTree()
+{
+	// TODO: rework the whole command system to support new format
+	// https://wiki.vg/Command_Data
+
+	if (false)
+	{
+		{
+			cPacketizer Pkt(*this, pktCommnadTree);
+			cRoot::Get()->GetPluginManager()->GetRootCommandNode()->WriteCommandTree(Pkt);
+		}
+	}
+	else
+	{
+		AStringVector commands;
+		class cCallback :
+			public cPluginManager::cCommandEnumCallback
+		{
+		public:
+			cCallback(void) {}
+
+			virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
+			{
+			UNUSED(a_Plugin);
+			UNUSED(a_Permission);
+			UNUSED(a_HelpString);
+				m_Commands.push_back(a_Command.substr(1, std::string::npos)); // Commands are sent with out slashes
+				return false;
+			}
+
+			AStringList m_Commands;
+		} Callback;
+		cRoot::Get()->GetPluginManager()->ForEachCommand(Callback);
+		{
+			cPacketizer Pkt(*this, pktCommnadTree);
+			Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size()) + 1);  // + 1 for the root node
+			for each (AString var in Callback.m_Commands)
+			{
+				Pkt.WriteVarInt32(1);  // Flags
+				Pkt.WriteVarInt32(0);  // Size of Array of child nodes
+				Pkt.WriteString(var);
+			}
+			// Root Node
+			Pkt.WriteVarInt32(0);  // Flags
+			Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size()));  // Size of Array of child nodes. Every Command is a child
+			for (size_t i = 0; i < Callback.m_Commands.size(); i++)
+			{
+				Pkt.WriteVarInt32(static_cast<UInt32>(i));  // Indexes of children in the array
+			}
+
+			Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size())); // root index
+		}
+	}
+}
+
+
+
+
+
+void cProtocol_1_13::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32,     CompletionId);
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString,    PartialCommand);
+
+	m_Client->HandleTabCompletion(PartialCommand, CompletionId);
 }
 
 
@@ -156,9 +261,21 @@ void cProtocol_1_13::SendStatistics(const StatisticsManager & a_Manager)
 
 
 
-void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results)
+void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results, UInt32 CompletionId)
 {
-	// TODO
+	{
+		//  TODO: Implement Start and Length
+		cPacketizer Pkt(*this, pktTabCompletionResults);
+		Pkt.WriteVarInt32(CompletionId);
+		Pkt.WriteVarInt32(0);  //  Start
+		Pkt.WriteVarInt32(0);  //  Length
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Results.size()));
+		for each (AString Match in a_Results)
+		{
+			Pkt.WriteString(Match);
+			Pkt.WriteBool(false); // Has Tooltip
+		}
+	}
 }
 
 
@@ -455,6 +572,7 @@ UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType) const
 		case pktCameraSetTo:            return 0x3c;
 		case pktChatRaw:                return 0x0e;
 		case pktCollectEntity:          return 0x4f;
+		case pktCommnadTree:            return 0x11;
 		case pktDestroyEntity:          return 0x35;
 		case pktDisconnectDuringGame:   return 0x1b;
 		case pktEditSign:               return 0x2c;
@@ -747,6 +865,29 @@ void cProtocol_1_13::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, cons
 		m_Client->SetClientBrand(Brand);
 		m_Client->SendPluginMessage("brand", "\x08""Cuberite");  // Send back our brand, including the length.
 	}
+	else if (a_Channel == "register")
+	{
+		ContiguousByteBuffer Data;
+
+		a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace());
+
+		AString tempstring = std::string{a_Channel};
+		if (m_Client->HasPluginChannel(tempstring))
+		{
+			m_Client->SendPluginMessage("unregister", tempstring); 
+			return;  // Can't register again if already taken - kinda defeats the point of plugin messaging!
+		}
+
+		m_Client->RegisterPluginChannels(m_Client->BreakApartPluginChannels(Data));
+	}
+	else if (a_Channel == "unregister")
+	{
+		ContiguousByteBuffer Data;
+
+		// Read the plugin message and relay to clienthandle:
+		a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace());
+		m_Client->UnregisterPluginChannels(m_Client->BreakApartPluginChannels(Data));
+	}
 }
 
 
@@ -959,7 +1100,11 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 
 		case cEntity::etItemFrame:
 		{
-			// TODO
+			const auto & Frame = static_cast<const cItemFrame &>(a_Entity);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemFrameItem, EntityMetadataType::Item);
+			WriteItem(a_Pkt, Frame.GetItem());
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemFrameRotation, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(Frame.GetItemRotation());
 			break;
 		}  // case etItemFrame
 
@@ -1351,8 +1496,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtDrowned:
 
-		case mtEndermite:
-
 		case mtEvoker:
 
 		case mtIllusioner:
@@ -1400,6 +1543,7 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}
 
+		case mtEndermite:
 		case mtGiant:
 		case mtSilverfish:
 		case mtSquid:
@@ -1618,6 +1762,101 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 	a_Pkt.WriteVarInt32(GetProtocolItemType(a_Item.m_ItemType));
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 
+	cFastNBTWriter Writer;
+	if (a_Item.m_ItemType == Item::Potion)
+	{
+		bool strong_potion = false;
+		bool long_potion = false;
+		AString potionname = "";
+		AString finalname = "minecraft:";
+		
+		int potion_dmg = a_Item.m_ItemDamage & 0x1F;
+		switch (potion_dmg)
+		{
+			case 0: potionname = "water"; break;
+			case 1: potionname = "regeneration"; break;
+			case 2: potionname = "swiftness"; break;
+			case 3: potionname = "fire_resistance"; break;
+			case 4: potionname = "poison"; break;
+			case 5: potionname = "healing"; break;
+			case 6: potionname = "night_vision"; break;
+			case 8: potionname = "weakness"; break;
+			case 9: potionname = "strength"; break;
+			case 10: potionname = "slowness"; break;
+			case 11: potionname = "leaping"; break;
+			case 12: potionname = "harming"; break;
+			case 13: potionname = "water_breathing"; break;
+			case 14: potionname = "invisibility"; break;
+			case 15: potionname = "slow_falling"; break;
+			case 16: potionname = "awkward"; break;
+			case 17: potionname = "turtle_master"; break;
+			case 32: potionname = "thick"; break;
+			case 64: potionname = "mundane"; break;
+		}
+		if ((a_Item.m_ItemDamage & 32) == 32 && potionname != "")
+		{
+			potionname = "thick";
+		}
+		if ((a_Item.m_ItemDamage & 64) == 64 && potionname != "")
+		{
+			potionname = "mundane";
+		}
+		if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1 && potionname != "thick")
+		{
+			strong_potion = true;
+			finalname += "strong_";
+		}
+		if ((a_Item.m_ItemDamage & 0x40) == 0x40 && potionname != "mundane")
+		{
+			long_potion = true;
+			finalname += "long_";
+		}
+		finalname += potionname;
+		Writer.AddString("Potion",finalname);
+	}
+	if (a_Item.m_RepairCost != 0)
+	{
+		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
+	}
+	if (!a_Item.m_Enchantments.IsEmpty())
+	{
+		const char * TagName = (a_Item.m_ItemType == Item::EnchantedBook) ? "StoredEnchantments" : "Enchantments";
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName, true);
+	}
+	if ((a_Item.m_ItemType == Item::FireworkRocket) || (a_Item.m_ItemType == Item::FireworkStar))
+	{
+		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, a_Item.m_ItemType);
+	}
+
+	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
+	{
+		Writer.BeginCompound("display");
+		if (a_Item.m_ItemColor.IsValid())
+		{
+			Writer.AddInt("color", static_cast<Int32>(a_Item.m_ItemColor.m_Color));
+		}
+
+		if (!a_Item.IsCustomNameEmpty())
+		{
+			Writer.AddString("Name", a_Item.m_CustomName);
+		}
+		if (!a_Item.IsLoreEmpty())
+		{
+			Writer.BeginList("Lore", TAG_String);
+
+			for (const auto & Line : a_Item.m_LoreTable)
+			{
+				Writer.AddString("", Line);
+			}
+
+			Writer.EndList();
+		}
+		Writer.EndCompound();
+	}
+
+	Writer.Finish();
+
+	a_Pkt.WriteBuf(Writer.GetResult());
 	// TODO: NBT
-	a_Pkt.WriteBEInt8(0);
+	//a_Pkt.WriteBEInt8(0);
 }

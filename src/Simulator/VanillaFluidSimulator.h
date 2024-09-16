@@ -34,7 +34,7 @@ protected:
 	virtual void SpreadXZ(cChunk * a_Chunk, Vector3i a_RelPos, unsigned char a_Falloff);
 
 	/** Recursively calculates the minimum number of blocks needed to descend a level. */
-	int CalculateFlowCost(cChunk * a_Chunk, Vector3i a_RelPos, Direction a_Dir, unsigned a_Iteration = 0);
+	int CalculateFlowCost(cChunk * a_Chunk, Vector3i a_RelPos, FluidDirection a_Dir, unsigned a_Iteration = 0);
 
 } ;
 

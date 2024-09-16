@@ -154,7 +154,7 @@ static inline void MergeCombinatorLake(BlockState & a_DstBlock, BlockState a_Src
 		switch (a_DstBlock.Type())
 		{
 			case BlockType::Dirt:
-			case BlockType::Grass:
+			case BlockType::ShortGrass:
 			case BlockType::Mycelium:
 			{
 				a_DstBlock = BlockType::Stone;

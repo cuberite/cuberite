@@ -127,7 +127,7 @@
 				return NoteBlockHandler::Callback; \
 			case BlockType::RedstoneWire: \
 				return RedstoneWireHandler::Callback; \
-			case BlockType::TNT: \
+			case BlockType::Tnt: \
 				return TNTHandler::Callback; \
 			case BlockType::TrappedChest: \
 				return TrappedChestHandler::Callback; \

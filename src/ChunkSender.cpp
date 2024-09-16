@@ -238,7 +238,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, const WeakClients & a_C
 	}
 
 	// Send:
-	m_Serializer.SendToClients(a_ChunkX, a_ChunkZ, m_BlockData, m_BlockData2, m_LightData, m_BiomeMap, Clients);
+	m_Serializer.SendToClients(a_ChunkX, a_ChunkZ, m_BlockData, m_LightData, m_BiomeMap, Clients);
 
 	for (const auto & Client : Clients)
 	{

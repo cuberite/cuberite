@@ -42,10 +42,10 @@ void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, Vector3i a_RelPos, unsig
 {
 	// Calculate the distance to the nearest "hole" in each direction:
 	std::array<int, 4> Cost;
-	Cost[0] = CalculateFlowCost(a_Chunk, a_RelPos.addedX(1),  X_PLUS);
-	Cost[1] = CalculateFlowCost(a_Chunk, a_RelPos.addedX(-1), X_MINUS);
-	Cost[2] = CalculateFlowCost(a_Chunk, a_RelPos.addedZ(1),  Z_PLUS);
-	Cost[3] = CalculateFlowCost(a_Chunk, a_RelPos.addedZ(-1), Z_MINUS);
+	Cost[0] = CalculateFlowCost(a_Chunk, a_RelPos.addedX(1),  FluidDirection::X_PLUS);
+	Cost[1] = CalculateFlowCost(a_Chunk, a_RelPos.addedX(-1), FluidDirection::X_MINUS);
+	Cost[2] = CalculateFlowCost(a_Chunk, a_RelPos.addedZ(1),  FluidDirection::Z_PLUS);
+	Cost[3] = CalculateFlowCost(a_Chunk, a_RelPos.addedZ(-1), FluidDirection::Z_MINUS);
 
 	// Find the minimum distance:
 	int MinCost = InfiniteCost;
@@ -80,7 +80,7 @@ void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, Vector3i a_RelPos, unsig
 
 
 
-int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, Vector3i a_RelPos, Direction a_Dir, unsigned a_Iteration)
+int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, Vector3i a_RelPos, FluidDirection a_Dir, unsigned a_Iteration)
 {
 	int Cost = InfiniteCost;
 
