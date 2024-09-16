@@ -9769,7 +9769,7 @@ a_Player:OpenWindow(Window);
 								Type = "Vector3i",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.wiki/w/Enderman#Teleportation}}.",
 					},
 					{
 						Params =
@@ -9795,7 +9795,7 @@ a_Player:OpenWindow(Window);
 								Type = "cBoundingBox",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.wiki/w/Enderman#Teleportation}}.",
 					},
 					{
 						Params =
@@ -9821,7 +9821,7 @@ a_Player:OpenWindow(Window);
 								Type = "number",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.wiki/w/Enderman#Teleportation}}.",
 					},
 				},
 				HasEntityEffect =
@@ -17984,6 +17984,10 @@ end
 				E_META_REDSTONE_REPEATER_FACING_MASK =
 				{
 					Notes = "A mask that indicates the bits of the metadata that specify the facing of redstone repeaters.",
+				},
+				E_META_SPAWN_EGG_ENDERMITE =
+				{
+					Notes = "",
 				},
 				E_META_SPAWN_EGG_WITHER_SKELETON =
 				{

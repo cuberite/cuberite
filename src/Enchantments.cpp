@@ -85,7 +85,7 @@ void cEnchantments::AddFromString(const AString & a_StringSpec)
 
 
 
-size_t cEnchantments::Count(void) const
+size_t cEnchantments::Count() const
 {
 	return m_Enchantments.size();
 }
@@ -94,13 +94,13 @@ size_t cEnchantments::Count(void) const
 
 
 
-AString cEnchantments::ToString(void) const
+AString cEnchantments::ToString() const
 {
 	// Serialize all the enchantments into a string
 	AString res;
 	for (cEnchantments::cMap::const_iterator itr = m_Enchantments.begin(), end = m_Enchantments.end(); itr != end; ++itr)
 	{
-		AppendPrintf(res, "%d=%d;", itr->first, itr->second);
+		res.append(fmt::format(FMT_STRING("{}={};"), itr->first, itr->second));
 	}  // for itr - m_Enchantments[]
 	return res;
 }

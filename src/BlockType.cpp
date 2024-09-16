@@ -90,11 +90,11 @@ public:
 		AString res;
 		if (a_ItemDamage == -1)
 		{
-			Printf(res, "%d", a_ItemType);
+			res = fmt::format(FMT_STRING("{}"), a_ItemType);
 		}
 		else
 		{
-			Printf(res, "%d:%d", a_ItemType, a_ItemDamage);
+			res = fmt::format(FMT_STRING("{}:{}"), a_ItemType, a_ItemDamage);
 		}
 		return res;
 	}
@@ -208,9 +208,7 @@ AString ItemTypeToString(short a_ItemType)
 
 AString ItemToFullString(const cItem & a_Item)
 {
-	AString res;
-	Printf(res, "%s:%d * %d", ItemToString(a_Item).c_str(), a_Item.m_ItemDamage, a_Item.m_ItemCount);
-	return res;
+	return fmt::format(FMT_STRING("{}:{} * {:d}"), ItemToString(a_Item), a_Item.m_ItemDamage, a_Item.m_ItemCount);
 }
 
 

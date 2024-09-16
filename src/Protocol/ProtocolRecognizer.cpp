@@ -73,7 +73,7 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 	}
 
 	ASSERT(!"Unknown protocol version");
-	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
+	return fmt::format(FMT_STRING("Unknown protocol ({})"), a_ProtocolVersion);
 }
 
 
@@ -229,7 +229,7 @@ void cMultiVersionProtocol::SendDisconnect(cClientHandle & a_Client, const AStri
 		return;
 	}
 
-	const AString Message = Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str());
+	const AString Message = JsonUtils::SerializeSingleValueJsonObject("text", a_Reason);
 	const auto PacketID = GetPacketID(cProtocol::ePacketType::pktDisconnectDuringLogin);
 	cByteBuffer Out(
 		cByteBuffer::GetVarIntSize(PacketID) +
@@ -348,13 +348,14 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		default:
 		{
 			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
-				a_Client.GetIPString().c_str(), ProtocolVersion, ProtocolVersion
+				a_Client.GetIPString(), ProtocolVersion, ProtocolVersion
 			);
 
 			if (NextState != cProtocol::State::Status)
 			{
 				throw TriedToJoinWithUnsupportedProtocolException(
-					Printf("Unsupported protocol version %u.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS, ProtocolVersion)
+					fmt::format(FMT_STRING("Unsupported protocol version {}.\nTry connecting with Minecraft {}"),
+					ProtocolVersion, MCS_CLIENT_VERSIONS)
 				);
 			}
 
@@ -441,7 +442,7 @@ void cMultiVersionProtocol::HandlePacketStatusRequest(cClientHandle & a_Client)
 	ResponseValue["description"] = Description;
 	if (!Favicon.empty())
 	{
-		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+		ResponseValue["favicon"] = "data:image/png;base64," + Favicon;
 	}
 	AString Response = JsonUtils::WriteFastString(ResponseValue);
 

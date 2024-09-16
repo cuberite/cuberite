@@ -21,9 +21,12 @@
 #define NO_SPEED 0.0
 #define MAX_SPEED 8
 #define MAX_SPEED_NEGATIVE -MAX_SPEED
-
-
-
+#define DIR_NORTH_SOUTH 270
+#define DIR_EAST_WEST 180
+#define DIR_NORTH_WEST 315
+#define DIR_NORTH_EAST 225
+#define DIR_SOUTH_WEST 135
+#define DIR_SOUTH_EAST 45
 
 class cMinecartAttachCallback
 {
@@ -273,10 +276,10 @@ void cMinecart::HandleRailPhysics(BlockState a_Rail, std::chrono::milliseconds a
 	{
 		case cBlockRailHandler::Shape::NorthSouth:
 		{
-			SetYaw(270);
+			SetYaw(DIR_NORTH_SOUTH);
 			SetPosY(floor(GetPosY()) + 0.55);
-			SetSpeedY(0);  // Don't move vertically as on ground
-			SetSpeedX(0);  // Correct diagonal movement from curved rails
+			SetSpeedY(NO_SPEED);  // Don't move vertically as on ground
+			SetSpeedX(NO_SPEED);  // Correct diagonal movement from curved rails
 
 			// Execute both the entity and block collision checks
 			auto BlockCollision = TestBlockCollision(a_Rail);
@@ -304,7 +307,7 @@ void cMinecart::HandleRailPhysics(BlockState a_Rail, std::chrono::milliseconds a
 		}
 		case cBlockRailHandler::Shape::EastWest:
 		{
-			SetYaw(180);
+			SetYaw(DIR_EAST_WEST);
 			SetPosY(floor(GetPosY()) + 0.55);
 			SetSpeedY(NO_SPEED);
 			SetSpeedZ(NO_SPEED);
@@ -332,8 +335,8 @@ void cMinecart::HandleRailPhysics(BlockState a_Rail, std::chrono::milliseconds a
 		}
 		case cBlockRailHandler::Shape::AscendingNorth:
 		{
-			SetYaw(270);
-			SetSpeedX(0);
+			SetYaw(DIR_NORTH_SOUTH);
+			SetSpeedX(NO_SPEED);
 
 			auto BlockCollision = TestBlockCollision(a_Rail);
 			auto EntityCollision = TestEntityCollision(a_Rail);
@@ -359,8 +362,8 @@ void cMinecart::HandleRailPhysics(BlockState a_Rail, std::chrono::milliseconds a
 		}
 		case cBlockRailHandler::Shape::AscendingSouth:
 		{
-			SetYaw(270);
-			SetSpeedX(0);
+			SetYaw(DIR_NORTH_SOUTH);
+			SetSpeedX(NO_SPEED);
 
 			auto BlockCollision = TestBlockCollision(a_Rail);
 			auto EntityCollision = TestEntityCollision(a_Rail);
@@ -386,7 +389,7 @@ void cMinecart::HandleRailPhysics(BlockState a_Rail, std::chrono::milliseconds a
 		}
 		case cBlockRailHandler::Shape::AscendingEast:
 		{
-			SetYaw(180);
+			SetYaw(DIR_EAST_WEST);
 			SetSpeedZ(NO_SPEED);
 
 			auto BlockCollision = TestBlockCollision(a_Rail);
@@ -411,8 +414,8 @@ void cMinecart::HandleRailPhysics(BlockState a_Rail, std::chrono::milliseconds a
 		}
 		case cBlockRailHandler::Shape::AscendingWest:
 		{
-			SetYaw(180);
-			SetSpeedZ(0);
+			SetYaw(DIR_EAST_WEST);
+			SetSpeedZ(NO_SPEED);
 
 			auto BlockCollision = TestBlockCollision(a_Rail);
 			auto EntityCollision = TestEntityCollision(a_Rail);
@@ -436,9 +439,9 @@ void cMinecart::HandleRailPhysics(BlockState a_Rail, std::chrono::milliseconds a
 		}
 		case cBlockRailHandler::Shape::NorthWest:
 		{
-			SetYaw(315);  // Set correct rotation server side
+			SetYaw(DIR_NORTH_WEST);  // Set correct rotation server side
 			SetPosY(floor(GetPosY()) + 0.55);  // Levitate dat cart
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 
 			auto BlockCollision = TestBlockCollision(a_Rail);
 			auto EntityCollision = TestEntityCollision(a_Rail);
@@ -453,9 +456,9 @@ void cMinecart::HandleRailPhysics(BlockState a_Rail, std::chrono::milliseconds a
 		}
 		case cBlockRailHandler::Shape::NorthEast:
 		{
-			SetYaw(225);
+			SetYaw(DIR_NORTH_EAST);
 			SetPosY(floor(GetPosY()) + 0.55);
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 
 			auto BlockCollision = TestBlockCollision(a_Rail);
 			auto EntityCollision = TestEntityCollision(a_Rail);
@@ -468,9 +471,9 @@ void cMinecart::HandleRailPhysics(BlockState a_Rail, std::chrono::milliseconds a
 		}
 		case cBlockRailHandler::Shape::SouthWest:
 		{
-			SetYaw(135);
+			SetYaw(DIR_SOUTH_WEST);
 			SetPosY(floor(GetPosY()) + 0.55);
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 
 			auto BlockCollision = TestBlockCollision(a_Rail);
 			auto EntityCollision = TestEntityCollision(a_Rail);
@@ -483,9 +486,9 @@ void cMinecart::HandleRailPhysics(BlockState a_Rail, std::chrono::milliseconds a
 		}
 		case cBlockRailHandler::Shape::SouthEast:
 		{
-			SetYaw(45);
+			SetYaw(DIR_SOUTH_EAST);
 			SetPosY(floor(GetPosY()) + 0.55);
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 
 			auto BlockCollision = TestBlockCollision(a_Rail);
 			auto EntityCollision = TestEntityCollision(a_Rail);
@@ -522,7 +525,7 @@ void cMinecart::HandlePoweredRailPhysics(BlockState a_Rail)
 	{
 		case PoweredRail::Shape::NorthSouth:
 		{
-			SetYaw(270);
+			SetYaw(DIR_NORTH_SOUTH);
 			SetPosY(floor(GetPosY()) + 0.55);
 			SetSpeedY(0);
 			SetSpeedX(0);
@@ -563,7 +566,7 @@ void cMinecart::HandlePoweredRailPhysics(BlockState a_Rail)
 		}
 		case PoweredRail::Shape::EastWest:
 		{
-			SetYaw(180);
+			SetYaw(DIR_EAST_WEST);
 			SetPosY(floor(GetPosY()) + 0.55);
 			SetSpeedY(NO_SPEED);
 			SetSpeedZ(NO_SPEED);
@@ -604,7 +607,7 @@ void cMinecart::HandlePoweredRailPhysics(BlockState a_Rail)
 		}
 		case PoweredRail::Shape::AscendingEast:
 		{
-			SetYaw(180);
+			SetYaw(DIR_EAST_WEST);
 			SetSpeedZ(NO_SPEED);
 
 			if (GetSpeedX() >= NO_SPEED)
@@ -621,7 +624,7 @@ void cMinecart::HandlePoweredRailPhysics(BlockState a_Rail)
 		}
 		case PoweredRail::Shape::AscendingWest:
 		{
-			SetYaw(180);
+			SetYaw(DIR_EAST_WEST);
 			SetSpeedZ(NO_SPEED);
 
 			if (GetSpeedX() > NO_SPEED)
@@ -638,7 +641,7 @@ void cMinecart::HandlePoweredRailPhysics(BlockState a_Rail)
 		}
 		case PoweredRail::Shape::AscendingNorth:
 		{
-			SetYaw(270);
+			SetYaw(DIR_NORTH_SOUTH);
 			SetSpeedX(NO_SPEED);
 
 			if (GetSpeedZ() >= NO_SPEED)
@@ -655,7 +658,7 @@ void cMinecart::HandlePoweredRailPhysics(BlockState a_Rail)
 		}
 		case PoweredRail::Shape::AscendingSouth:
 		{
-			SetYaw(270);
+			SetYaw(DIR_NORTH_SOUTH);
 			SetSpeedX(NO_SPEED);
 
 			if (GetSpeedZ() > NO_SPEED)
@@ -1295,6 +1298,24 @@ void cMinecart::OnRemoveFromWorld(cWorld & a_World)
 	}
 
 	Super::OnRemoveFromWorld(a_World);
+}
+
+
+
+
+
+void cMinecart::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
+{
+	// limit normal minecart speed max lower than 4
+	// once speed is higher than 4, no more add speed.
+	if (GetSpeed().Length() > 4)
+	{
+		return;
+	}
+	Vector3d LookVector = m_Attachee->GetLookVector();
+	Vector3d ToAddSpeed = LookVector * (a_Forward * 0.4) ;
+	ToAddSpeed.y = 0;
+	AddSpeed(ToAddSpeed);
 }
 
 

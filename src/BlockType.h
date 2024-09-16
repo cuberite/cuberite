@@ -1132,6 +1132,7 @@ enum ENUM_ITEM_META : short
 	E_META_SPAWN_EGG_WITHER           = 64,
 	E_META_SPAWN_EGG_BAT              = 65,
 	E_META_SPAWN_EGG_WITCH            = 66,
+	E_META_SPAWN_EGG_ENDERMITE        = 67,
 	E_META_SPAWN_EGG_GUARDIAN         = 68,
 	E_META_SPAWN_EGG_PIG              = 90,
 	E_META_SPAWN_EGG_SHEEP            = 91,

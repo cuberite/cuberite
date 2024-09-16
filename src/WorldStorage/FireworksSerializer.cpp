@@ -165,12 +165,10 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 AString cFireworkItem::ColoursToString(const cFireworkItem & a_FireworkItem)
 {
 	AString Result;
-
-	for (std::vector<int>::const_iterator itr = a_FireworkItem.m_Colours.begin(); itr != a_FireworkItem.m_Colours.end(); ++itr)
+	for (const auto col: a_FireworkItem.m_Colours)
 	{
-		AppendPrintf(Result, "%i;", *itr);
+		Result.append(fmt::format(FMT_STRING("{};"), col));
 	}
-
 	return Result;
 }
 
@@ -200,12 +198,10 @@ void cFireworkItem::ColoursFromString(const AString & a_String, cFireworkItem & 
 AString cFireworkItem::FadeColoursToString(const cFireworkItem & a_FireworkItem)
 {
 	AString Result;
-
-	for (std::vector<int>::const_iterator itr = a_FireworkItem.m_FadeColours.begin(); itr != a_FireworkItem.m_FadeColours.end(); ++itr)
+	for (const auto col: a_FireworkItem.m_FadeColours)
 	{
-		AppendPrintf(Result, "%i;", *itr);
+		Result.append(fmt::format(FMT_STRING("{};"), col));
 	}
-
 	return Result;
 }
 

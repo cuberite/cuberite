@@ -166,7 +166,8 @@ void cLuaTCPLink::Close(void)
 AString cLuaTCPLink::StartTLSClient(
 	const AString & a_OwnCertData,
 	const AString & a_OwnPrivKeyData,
-	const AString & a_OwnPrivKeyPassword
+	const AString & a_OwnPrivKeyPassword,
+	const AString & a_TrustedRootCAs
 )
 {
 	auto link = m_Link;
@@ -179,7 +180,7 @@ AString cLuaTCPLink::StartTLSClient(
 			auto res = ownCert->Parse(a_OwnCertData.data(), a_OwnCertData.size());
 			if (res != 0)
 			{
-				return Printf("Cannot parse client certificate: -0x%x", res);
+				return fmt::format(FMT_STRING("Cannot parse client certificate: -0x{:x}"), -res);
 			}
 		}
 		cCryptoKeyPtr ownPrivKey;
@@ -189,10 +190,21 @@ AString cLuaTCPLink::StartTLSClient(
 			auto res = ownPrivKey->ParsePrivate(a_OwnPrivKeyData.data(), a_OwnPrivKeyData.size(), a_OwnPrivKeyPassword);
 			if (res != 0)
 			{
-				return Printf("Cannot parse client private key: -0x%x", res);
+				return fmt::format(FMT_STRING("Cannot parse client private key: -0x{:x}"), -res);
 			}
 		}
-		return link->StartTLSClient(ownCert, ownPrivKey);
+
+		cX509CertPtr trustedRootCAs;
+		if (!a_TrustedRootCAs.empty())
+		{
+			trustedRootCAs = std::make_shared<cX509Cert>();
+			auto res = trustedRootCAs->Parse(a_TrustedRootCAs.data(), a_TrustedRootCAs.size());
+			if (res != 0)
+			{
+				return fmt::format("Cannot parse trusted root CAs: {}", res);
+			}
+		}
+		return link->StartTLSClient(ownCert, ownPrivKey, trustedRootCAs);
 	}
 	return "";
 }
@@ -216,13 +228,13 @@ AString cLuaTCPLink::StartTLSServer(
 	int res = OwnCert->Parse(a_OwnCertData.data(), a_OwnCertData.size());
 	if (res != 0)
 	{
-		return Printf("Cannot parse server certificate: -0x%x", res);
+		return fmt::format(FMT_STRING("Cannot parse server certificate: -0x{:x}"), -res);
 	}
 	auto OwnPrivKey = std::make_shared<cCryptoKey>();
 	res = OwnPrivKey->ParsePrivate(a_OwnPrivKeyData.data(), a_OwnPrivKeyData.size(), a_OwnPrivKeyPassword);
 	if (res != 0)
 	{
-		return Printf("Cannot parse server private key: -0x%x", res);
+		return fmt::format(FMT_STRING("Cannot parse server private key: -0x{:x}"), -res);
 	}
 
 		return link->StartTLSServer(OwnCert, OwnPrivKey, a_StartTLSData);

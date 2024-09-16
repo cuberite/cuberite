@@ -23,7 +23,7 @@ function HandleDumpPluginRequest(a_Request)
 	-- Check if it already was requested to dump a plugin.
 	if (a_Request.PostParams["DumpInfo"] ~= nil) then
 		local F = loadfile("Plugins/InfoDump.lua")
-		F("Plugins/" .. a_Request.PostParams["DumpInfo"])
+		F("Plugins/" .. cPluginManager:Get():GetPluginFolderName(a_Request.PostParams["DumpInfo"]))
 	end
 	
 	Content = Content .. [[
@@ -36,7 +36,7 @@ function HandleDumpPluginRequest(a_Request)
 	cPluginManager:Get():ForEachPlugin(
 		function(a_Plugin)
 			-- Check if there is a file called 'Info.lua'
-			if (cFile:IsFile("Plugins/" .. a_Plugin:GetName() .. "/Info.lua")) then
+			if (cFile:IsFile(a_Plugin:GetLocalFolder() .. "/Info.lua")) then
 				Content = Content .. "\n<tr>\n"
 				Content = Content .. "\t<td>" .. a_Plugin:GetName() .. "</td>\n"
 				Content = Content .. "\t<td><form method='POST'> <input type='hidden' value='" .. a_Plugin:GetName() .. "' name='DumpInfo'> <input type='submit' value='DumpInfo'></form></td>\n"

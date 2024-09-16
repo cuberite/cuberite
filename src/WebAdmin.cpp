@@ -190,6 +190,13 @@ void cWebAdmin::Reload(void)
 			" This will not take effect until you restart the server."
 		);
 	}
+	else if (!HasUsers())
+	{
+		LOGWARNING(
+			"The webadmin is enabled but has no users configured."
+			" To add new users, edit webadmin.ini"
+		);
+	}
 
 	// Initialize the WebAdmin template script and reload the file:
 	if (m_TemplateScript.IsValid())
@@ -242,6 +249,23 @@ bool cWebAdmin::LoadIniFile(void)
 	}
 
 	return m_IniFile.GetValueSetB("WebAdmin", "Enabled", true);
+}
+
+
+
+
+
+bool cWebAdmin::HasUsers()
+{
+	for (int i = 0; i < m_IniFile.GetNumKeys(); i++)
+	{
+		AString key = m_IniFile.GetKeyName(i);
+		if (key.rfind("User:", 0) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -378,7 +402,7 @@ void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPInc
 	// Read the file contents and guess its mime-type, based on the extension:
 	AString Content = "<h2>404 Not Found</h2>";
 	AString ContentType = "text/html";
-	AString Path = Printf("webadmin/files/%s", FileURL.c_str());
+	AString Path = "webadmin/files/" + FileURL;
 
 	// Return 404 if the file is not found, or the URL contains '../' (for security reasons)
 	if ((FileURL.find("../") == AString::npos) && cFile::IsFile(Path))
@@ -485,9 +509,9 @@ sWebAdminPage cWebAdmin::GetPage(const HTTPRequest & a_Request)
 		page.ContentType = "text/html";  // Default to HTML content type, unless overridden by a plugin
 		if (!tab->m_Callback->Call(a_Request, split[1], page.Content, page.ContentType))
 		{
-			page.Content = GetHTMLEscapedString(Printf(
-				"WebTab callback for plugin %s, page %s has failed.",
-				tab->m_PluginName.c_str(), tab->m_Title.c_str()
+			page.Content = GetHTMLEscapedString(fmt::format(
+				FMT_STRING("WebTab callback for plugin {}, page {} has failed."),
+				tab->m_PluginName, tab->m_Title
 			));
 		}
 		page.PluginName = tab->m_PluginName;

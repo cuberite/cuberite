@@ -45,7 +45,7 @@ public:
 
 	public:
 		NoSuchIndexException(UInt32 aIndex):
-			Super(Printf("No such palette index: %u", aIndex))
+			Super(fmt::format(FMT_STRING("No such palette index: {}"), aIndex))
 		{
 		}
 	};

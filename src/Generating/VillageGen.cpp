@@ -352,13 +352,13 @@ cVillageGen::cVillageGen(
 	for (const auto & toLoad: a_PrefabsToLoad)
 	{
 		auto prefabs = std::make_shared<cVillagePiecePool>();
-		auto fileName = Printf("Prefabs%sVillages%s%s.cubeset", cFile::GetPathSeparator().c_str(), cFile::GetPathSeparator().c_str(), toLoad.c_str());
+		auto fileName = fmt::format(FMT_STRING("Prefabs{0}Villages{0}{1}.cubeset"), cFile::GetPathSeparator(), toLoad);
 		if (prefabs->LoadFromFile(fileName, true))
 		{
 			if (NoCaseCompare(prefabs->GetIntendedUse(), "village") != 0)
 			{
 				LOGWARNING("Village generator: File %s is intended for use in \"%s\", rather than villages. Loading the file, but the generator may behave unexpectedly.",
-					fileName.c_str(), prefabs->GetIntendedUse().c_str()
+					fileName, prefabs->GetIntendedUse()
 				);
 			}
 			prefabs->AssignGens(a_Seed, m_BiomeGen, m_HeightGen, a_SeaLevel);

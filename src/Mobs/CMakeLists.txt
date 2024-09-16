@@ -9,6 +9,7 @@ target_sources(
 	Cow.cpp
 	Creeper.cpp
 	EnderDragon.cpp
+	Endermite.cpp
 	Enderman.cpp
 	Ghast.cpp
 	Giant.cpp
@@ -49,6 +50,7 @@ target_sources(
 	Cow.h
 	Creeper.h
 	EnderDragon.h
+	Endermite.h
 	Enderman.h
 	Ghast.h
 	Giant.h

@@ -110,7 +110,7 @@ public:
 
 
 	/** Attempts to use the bonemeal on the plant at the specified (absolute) position.
-	The effect of fertilization depends on the plant: https://minecraft.gamepedia.com/Bone_Meal#Fertilizer
+	The effect of fertilization depends on the plant: https://minecraft.wiki/w/Bone_Meal#Fertilizer
 		- grow a few stages
 		- grow 1 stage with a chance
 		- drop pickups without destroying the plant
@@ -288,7 +288,7 @@ public:
 		a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_Position, 0);
 	}
 
-	/** Grows a biome-dependent flower according to https://minecraft.gamepedia.com/Flower#Flower_biomes */
+	/** Grows a biome-dependent flower according to https://minecraft.wiki/w/Flower#Flower_biomes */
 	static void GrowFlower(cWorld & a_World, const Vector3i a_Position)
 	{
 		using namespace Block;

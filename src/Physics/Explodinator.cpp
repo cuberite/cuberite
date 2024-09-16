@@ -541,7 +541,7 @@ namespace Explodinator
 		const int HalfSide = TraceCubeSideLength / 2;
 		auto & Random = GetRandomProvider();
 
-		// The following loops implement the tracing algorithm described in http://minecraft.gamepedia.com/Explosion
+		// The following loops implement the tracing algorithm described in http://minecraft.wiki/w/Explosion
 
 		// Trace rays from the explosion centre to all points in a square of area TraceCubeSideLength * TraceCubeSideLength
 		// for the top and bottom sides:

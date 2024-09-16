@@ -23,7 +23,7 @@ static void verifyChunkDescHeightmap(const cChunkDesc & a_ChunkDesc)
 				if (!IsBlockAir(Block))
 				{
 					int Height = a_ChunkDesc.GetHeight(x, z);
-					TEST_EQUAL_MSG(Height, y, Printf("Chunk height at <%d, %d>: exp %d, got %d", x, z, y, Height));
+					TEST_EQUAL_MSG(Height, y, fmt::format(FMT_STRING("Chunk height at <{}, {}>: exp {}, got {}"), x, z, y, Height));
 					break;
 				}
 			}  // for y
@@ -168,7 +168,7 @@ static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 		{
 			for (int z = 0; z < cChunkDef::Width; ++z)
 			{
-				TEST_EQUAL_MSG(chd.GetBiome(x, z), biNether, Printf("Nether biome at {%d, %d}", x, z));
+				TEST_EQUAL_MSG(chd.GetBiome(x, z), biNether, fmt::format(FMT_STRING("Nether biome at <{}, {}>"), x, z));
 			}
 		}
 
@@ -230,7 +230,7 @@ static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 				if (!hasSuitableBlockType)
 				{
 					printChunkColumn(chd, x, z);
-					TEST_FAIL(Printf("!hasSuitableBlockType at column {%d, %d} of chunk [%d, 0]", x, z, chunkX));
+					TEST_FAIL(fmt::format(FMT_STRING("!hasSuitableBlockType at column <{}, {}> of chunk [{}, 0]"), x, z, chunkX));
 				}
 			}
 		}
@@ -275,7 +275,7 @@ static void checkChunkChecksums(
 		*/
 		auto checksum = chunkSHA1(chd);
 		TEST_EQUAL_MSG(checksum, coords.mChecksum,
-			Printf("%s chunk %s SHA1: expected %s, got %s", aDimension, coords.mCoords.ToString(), coords.mChecksum, checksum)
+			fmt::format(FMT_STRING("{} chunk {} SHA1: expected {}, got {}"), aDimension, coords.mCoords.ToString(), coords.mChecksum, checksum)
 		);
 	}
 }

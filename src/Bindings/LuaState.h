@@ -30,7 +30,10 @@ stays valid but doesn't call into Lua code anymore, returning false for "failure
 
 #pragma once
 
-#include "lua/src/lauxlib.h"
+extern "C"
+{
+	#include "lua/src/lauxlib.h"
+}
 
 #include "../Defines.h"
 #include "../FunctionRef.h"
@@ -68,7 +71,7 @@ public:
 				if (a_ShouldLogStack)
 				{
 					// DEBUG: If an unbalanced stack is reported, uncommenting the next line can help debug the imbalance
-					// cLuaState::LogStackValues(a_LuaState, Printf("Started checking Lua stack balance, currently %d items:", m_StackPos).c_str());
+					// cLuaState::LogStackValues(a_LuaState, fmt::format(FMT_STRING("Started checking Lua stack balance, currently {} items:"), m_StackPos).c_str());
 					// Since LogStackValues() itself uses the balance check, we must not call it recursively
 				}
 			}
@@ -119,14 +122,14 @@ public:
 			if (curTop > m_Count)
 			{
 				// There are some leftover elements, adjust the stack:
-				m_LuaState.LogStackValues(Printf("Re-balancing Lua stack, expected %d values, got %d:", m_Count, curTop).c_str());
+				m_LuaState.LogStackValues(fmt::format(FMT_STRING("Re-balancing Lua stack, expected {} values, got {}:"), m_Count, curTop).c_str());
 				lua_pop(m_LuaState, curTop - m_Count);
 			}
 			else if (curTop < m_Count)
 			{
 				// This is an irrecoverable error, rather than letting the Lua engine crash undefinedly later on, abort now:
 				LOGERROR("Unable to re-balance Lua stack, there are elements missing. Expected at least %d elements, got %d.", m_Count, curTop);
-				throw std::runtime_error(Printf("Unable to re-balance Lua stack, there are elements missing. Expected at least %d elements, got %d.", m_Count, curTop));
+				throw std::runtime_error(fmt::format(FMT_STRING("Unable to re-balance Lua stack, there are elements missing. Expected at least {} elements, got {}."), m_Count, curTop));
 			}
 		}
 
@@ -839,25 +842,6 @@ public:
 	To be used for bindings when they detect bad parameters.
 	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
 	int ApiParamError(std::string_view a_Msg);
-
-	/** Formats and prints the message using printf-style format specifiers, but prefixed with the current function name, then logs the stack contents and raises a Lua error.
-	To be used for bindings when they detect bad parameters.
-	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
-	template <typename... Args>
-	int ApiParamError(const char * a_MsgFormat, const Args & ... a_Args)
-	{
-		return ApiParamError(Printf(a_MsgFormat, a_Args...));
-	}
-
-	/** Formats and prints the message using python-style format specifiers, but prefixed with the current function name, then logs the stack contents and raises a Lua error.
-	To be used for bindings when they detect bad parameters.
-	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
-	template <typename... Args>
-	int FApiParamError(const char * a_MsgFormat, const Args & ... a_Args)
-	{
-		return ApiParamError(fmt::format(a_MsgFormat, a_Args...));
-	}
-
 
 	/** Returns the type of the item on the specified position in the stack */
 	AString GetTypeText(int a_StackPos);

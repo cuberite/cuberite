@@ -123,12 +123,12 @@ public:
 	float GetXpPercentage(void) const;
 
 	/** Calculates the amount of XP needed for a given level
-	Ref: https://minecraft.gamepedia.com/XP
+	Ref: https://minecraft.wiki/w/XP
 	*/
 	static int XpForLevel(int a_Level);
 
 	/** Inverse of XpForLevel
-	Ref: https://minecraft.gamepedia.com/XP
+	Ref: https://minecraft.wiki/w/XP
 	values are as per this with pre-calculations
 	*/
 	static int CalcLevelFromXp(int a_CurrentXp);

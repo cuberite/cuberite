@@ -54,6 +54,7 @@ typedef unsigned char HEIGHTTYPE;
 
 
 
+/** Wraps the chunk coords into a single structure. */
 class cChunkCoords
 {
 public:
@@ -92,9 +93,25 @@ public:
 	/** Returns a string that describes the chunk coords, suitable for logging. */
 	AString ToString() const
 	{
-		return Printf("[%d, %d]", m_ChunkX, m_ChunkZ);
+		return fmt::format(FMT_STRING("[{}, {}]"), m_ChunkX, m_ChunkZ);
 	}
 } ;
+
+
+
+
+
+/** Implements custom fmtlib formatting for cChunkCoords. */
+namespace fmt
+{
+	template <> struct formatter<cChunkCoords>: formatter<int>
+	{
+		auto format(cChunkCoords a_Coords, format_context & a_Ctx)
+		{
+			return format_to(a_Ctx.out(), "[{}, {}]", a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
+		}
+	};
+}
 
 
 

@@ -36,24 +36,6 @@ cBannerEntity::cBannerEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_Worl
 
 
 
-unsigned char cBannerEntity::GetBaseColor() const
-{
-	return m_BaseColor;
-}
-
-
-
-
-
-void cBannerEntity::SetBaseColor(const unsigned char a_Color)
-{
-	m_BaseColor = a_Color;
-}
-
-
-
-
-
 cItems cBannerEntity::ConvertToPickups() const
 {
 	return cItem(BlockItemConverter::FromBlock(m_Block.Type()));
@@ -68,6 +50,7 @@ void cBannerEntity::CopyFrom(const cBlockEntity & a_Src)
 	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cBannerEntity &>(a_Src);
 	m_BaseColor = src.m_BaseColor;
+	m_CustomName = src.m_CustomName;
 }
 
 

@@ -656,7 +656,7 @@ bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired
 	/*
 	Algorithm:
 	Choose random destination.
-	Seek downwards, regardless of distance until the block is made of movement-blocking material: https://minecraft.fandom.com/wiki/Materials
+	Seek downwards, regardless of distance until the block is made of movement-blocking material: https://minecraft.wiki/w/Materials
 	Succeeds if no liquid or solid blocks prevents from standing at destination.
 	*/
 	auto & Random = GetRandomProvider();

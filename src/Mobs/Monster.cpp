@@ -46,6 +46,7 @@ static const struct
 	{mtCow,            "cow",            "Cow",            "cow"},
 	{mtCreeper,        "creeper",        "Creeper",        "creeper"},
 	{mtEnderman,       "enderman",       "Enderman",       "enderman"},
+	{mtEndermite,      "endermite",      "Endermite",      "endermite"},
 	{mtEnderDragon,    "enderdragon",    "EnderDragon",    "ender_dragon"},
 	{mtGhast,          "ghast",          "Ghast",          "ghast"},
 	{mtGiant,          "giant",          "Giant",          "giant"},
@@ -652,6 +653,11 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 		case mtMagmaCube:
 		{
 			Reward = GetRandomProvider().RandInt(6, 8);
+			break;
+		}
+		case mtEndermite:
+		{
+			Reward = 3;
 			break;
 		}
 		case mtBlaze:
@@ -1285,6 +1291,7 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		case mtCow:            return std::make_unique<cCow>();
 		case mtCreeper:        return std::make_unique<cCreeper>();
 		case mtEnderDragon:    return std::make_unique<cEnderDragon>();
+		case mtEndermite:      return std::make_unique<cEndermite>();
 		case mtEnderman:       return std::make_unique<cEnderman>();
 		case mtGhast:          return std::make_unique<cGhast>();
 		case mtGiant:          return std::make_unique<cGiant>();

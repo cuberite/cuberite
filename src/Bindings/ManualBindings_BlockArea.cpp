@@ -52,9 +52,9 @@ static int DoWithXYZ(lua_State * tolua_S)
 	}
 	if (!(Self->*CoordCheckFn)({ BlockX, BlockY, BlockZ }))
 	{
-		return L.FApiParamError("The provided coordinates ({0}) are not valid",
+		return L.ApiParamError(fmt::format(FMT_STRING("The provided coordinates ({0}) are not valid"),
 			Vector3i{BlockX, BlockY, BlockZ}
-		);
+		));
 	}
 
 	// Call the DoWith function:
@@ -134,7 +134,7 @@ static int readVector3iOverloadParams(cLuaState & a_LuaState, int a_StartParam, 
 		// Assume the 3-number version:
 		if (!a_LuaState.GetStackValues(a_StartParam, a_Coords.x, a_Coords.y, a_Coords.z))
 		{
-			return a_LuaState.ApiParamError("Cannot read the %s, expected 3 numbers", a_ParamName);
+			return a_LuaState.ApiParamError(fmt::format(FMT_STRING("Cannot read the {}, expected 3 numbers"), a_ParamName));
 		}
 		return a_StartParam + 3;
 	}
@@ -143,7 +143,7 @@ static int readVector3iOverloadParams(cLuaState & a_LuaState, int a_StartParam, 
 		// Assume the Vector3i version:
 		if (!a_LuaState.GetStackValues(a_StartParam, a_Coords))
 		{
-			return a_LuaState.ApiParamError("Cannot read the %s, expected a Vector3i instance", a_ParamName);
+			return a_LuaState.ApiParamError(fmt::format(FMT_STRING("Cannot read the {}, expected a Vector3i instance"), a_ParamName));
 		}
 		return a_StartParam + 1;
 	}
@@ -177,13 +177,13 @@ static int tolua_cBlockArea_Create(lua_State * a_LuaState)
 	L.GetStackValue(dataTypesIdx, dataTypes);
 	if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
 	{
-		return L.ApiParamError("Invalid combination of baDataTypes specified (%d)", dataTypes);
+		return L.ApiParamError(fmt::format(FMT_STRING("Invalid combination of baDataTypes specified (0x{:02x})"), dataTypes));
 	}
 
 	// Create the area:
 	if ((size.x <= 0) || (size.y <= 0) || (size.z <= 0))
 	{
-		return L.FApiParamError("Invalid sizes, must be greater than zero, got {0}", size);
+		return L.ApiParamError(fmt::format(FMT_STRING("Invalid sizes, must be greater than zero, got {}"), size));
 	}
 	ASSERT(self != nullptr);
 	self->Create(size, dataTypes);
@@ -221,13 +221,13 @@ static int tolua_cBlockArea_FillRelCuboid(lua_State * a_LuaState)
 	bounds.Sort();
 	if (!(self->IsValidRelCoords(bounds.p1) && self->IsValidRelCoords(bounds.p2)))
 	{
-		return L.FApiParamError(
-			"The bounds ({0} - {1}) are out of range ({2} - {3})",
+		return L.ApiParamError(fmt::format(
+			FMT_STRING("The bounds ({0} - {1}) are out of range ({2} - {3})"),
 			bounds.p1,
 			bounds.p2,
 			Vector3i(0, 0, 0),
 			(self->GetSize() - Vector3i{1, 1, 1})
-		);
+		));
 	}
 	int DataTypes = cBlockArea::baBlocks | cBlockArea::baBlockEntities;
 	unsigned char BlockType;
@@ -587,13 +587,13 @@ static int tolua_cBlockArea_Read(lua_State * a_LuaState)
 	L.GetStackValues(dataTypesIdx, dataTypes);
 	if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
 	{
-		return L.ApiParamError("Invalid baDataTypes combination (%d)", dataTypes);
+		return L.ApiParamError(fmt::format(FMT_STRING("Invalid baDataTypes combination (0x{:02x})"), dataTypes));
 	}
 
 	// Check the coords:
 	if (!cChunkDef::IsValidHeight(bounds.p1) || !cChunkDef::IsValidHeight(bounds.p2))
 	{
-		return L.FApiParamError("Coordinates {0} - {1} exceed world bounds", bounds.p1, bounds.p2);
+		return L.ApiParamError(fmt::format(FMT_STRING("Coordinates {0} - {1} exceed world bounds"), bounds.p1, bounds.p2));
 	}
 
 	bounds.Sort();
@@ -636,13 +636,14 @@ static int tolua_cBlockArea_RelLine(lua_State * a_LuaState)
 	L.GetStackValues(idx, dataTypes, BlockType, BlockMeta, BlockLight, BlockSkyLight);
 	if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
 	{
-		return L.ApiParamError("Invalid baDataTypes combination (%d)", dataTypes);
+		return L.ApiParamError(fmt::format(FMT_STRING("Invalid baDataTypes combination (0x{:02x})"), dataTypes));
 	}
 	if ((self->GetDataTypes() & dataTypes) != dataTypes)
 	{
-		return L.ApiParamError("Requested datatypes not present in the cBlockArea. Got only 0x%02x, requested 0x%02x",
+		return L.ApiParamError(fmt::format(
+			FMT_STRING("Requested datatypes not present in the cBlockArea. Got only 0x{:02x}, requested 0x{:02x}"),
 			self->GetDataTypes(), dataTypes
-		);
+		));
 	}
 
 	// Draw the line:
@@ -771,13 +772,14 @@ static int tolua_cBlockArea_Write(lua_State * a_LuaState)
 	{
 		if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
 		{
-			return L.ApiParamError("Invalid datatype combination (%d)", dataTypes);
+			return L.ApiParamError(fmt::format(FMT_STRING("Invalid datatype combination (0x{:02x})"), dataTypes));
 		}
 		if ((self->GetDataTypes() & dataTypes) != dataTypes)
 		{
-			return L.ApiParamError("Requesting datatypes not present in the cBlockArea. Got only 0x%02x, requested 0x%02x",
+			return L.ApiParamError(fmt::format(
+				FMT_STRING("Requesting datatypes not present in the cBlockArea. Got only 0x{:02x}, requested 0x{:02x}"),
 				self->GetDataTypes(), dataTypes
-			);
+			));
 		}
 	}
 
@@ -844,7 +846,7 @@ static int GetBlock(lua_State * a_LuaState)
 	// Check the datatype's presence:
 	if ((self->GetDataTypes() & DataTypeFlag) == 0)
 	{
-		return L.ApiParamError("The area doesn't contain the datatype (%d)", DataTypeFlag);
+		return L.ApiParamError(fmt::format(FMT_STRING("The area doesn't contain the datatype (0x{:02x})"), DataTypeFlag));
 	}
 
 	// Read the overloaded params:
@@ -895,7 +897,7 @@ static int GetRelBlock(lua_State * a_LuaState)
 	// Check the datatype's presence:
 	if ((self->GetDataTypes() & DataTypeFlag) == 0)
 	{
-		return L.ApiParamError("The area doesn't contain the datatype (%d)", DataTypeFlag);
+		return L.ApiParamError(fmt::format(FMT_STRING("The area doesn't contain the datatype (0x{:02x})"), DataTypeFlag));
 	}
 
 	// Read the overloaded params:

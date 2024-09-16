@@ -1446,7 +1446,7 @@ void cChunkMap::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTi
 
 void cChunkMap::TrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect, const AString & a_WorldName)
 {
-	a_DeadlockDetect.TrackCriticalSection(m_CSChunks, Printf("World %s chunkmap", a_WorldName.c_str()));
+	a_DeadlockDetect.TrackCriticalSection(m_CSChunks, fmt::format(FMT_STRING("World {} chunkmap"), a_WorldName));
 }
 
 

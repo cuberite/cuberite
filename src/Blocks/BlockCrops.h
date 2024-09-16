@@ -106,7 +106,7 @@ private:
 				Res.Add(Item::Potato, PotatoCount);
 				if (Rand.RandBool(0.02))
 				{
-					// https://minecraft.gamepedia.com/Poisonous_Potato#Obtaining
+					// https://minecraft.wiki/w/Poisonous_Potato#Obtaining
 					// With a 2% chance, drop a poisonous potato as well:
 					Res.Add(Item::PoisonousPotato);
 				}

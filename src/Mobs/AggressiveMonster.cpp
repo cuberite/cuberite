@@ -3,9 +3,9 @@
 
 #include "AggressiveMonster.h"
 
-#include "../World.h"
-#include "../Entities/Player.h"
-#include "../LineBlockTracer.h"
+#include "LineBlockTracer.h"
+#include "World.h"
+#include "Entities/Player.h"
 
 
 
@@ -40,6 +40,61 @@ void cAggressiveMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 {
 	Super::EventSeePlayer(a_Player, a_Chunk);
 	m_EMState = CHASING;
+}
+
+
+
+
+
+cMonster * cAggressiveMonster::GetMonsterOfTypeInSight(eMonsterType a_MobType, unsigned int a_SightDistance)
+{
+
+	cMonster * FoundTarget = nullptr;
+	auto MinimumDistance = static_cast<double>(a_SightDistance * a_SightDistance);
+
+	class cCallback : public cBlockTracer::cCallbacks
+	{
+		public:
+		bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		{
+			return a_BlockType != E_BLOCK_AIR;
+		}
+	};
+
+	auto Callbacks = cCallback();
+	auto Tracer = cLineBlockTracer(*GetWorld(), Callbacks);
+
+	cEntityCallback Callback = [&](cEntity & a_Entity)
+	{
+		if (!a_Entity.IsMob())
+		{
+			return false;
+		}
+
+		auto & Other = dynamic_cast<cMonster &>(a_Entity);
+		if (Other.GetMobType() != a_MobType)
+		{
+			return false;
+		}
+
+		Vector3d MyHeadPosition = GetPosition().addedY(GetHeight());
+		Vector3d TargetPosition = Other.GetPosition().addedY(Other.GetHeight());
+		double TargetDistance = (MyHeadPosition - TargetPosition).SqrLength();
+
+		if (
+			(MinimumDistance > TargetDistance) &&
+			(TargetDistance < (a_SightDistance * a_SightDistance))
+		)
+		{
+			FoundTarget = & Other;
+			return true;
+		}
+		return false;
+	};
+
+	cBoundingBox CheckZone(GetPosition().addedXZ(-a_SightDistance, -a_SightDistance), GetPosition().addedXZ(a_SightDistance, a_SightDistance));
+	m_World->ForEachEntityInBox(CheckZone, Callback);
+	return FoundTarget;
 }
 
 

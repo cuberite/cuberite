@@ -105,8 +105,8 @@ cWorld::cLock::cLock(const cWorld & a_World) :
 ////////////////////////////////////////////////////////////////////////////////
 // cWorld::cTickThread:
 
-cWorld::cTickThread::cTickThread(cWorld & a_World) :
-	Super(Printf("World Ticker (%s)", a_World.GetName().c_str())),
+cWorld::cTickThread::cTickThread(cWorld & a_World):
+	Super(fmt::format(FMT_STRING("World Ticker ({})"), a_World.GetName())),
 	m_World(a_World)
 {
 }
@@ -115,7 +115,7 @@ cWorld::cTickThread::cTickThread(cWorld & a_World) :
 
 
 
-void cWorld::cTickThread::Execute(void)
+void cWorld::cTickThread::Execute()
 {
 	auto LastTime = std::chrono::steady_clock::now();
 	auto TickTime = std::chrono::duration_cast<std::chrono::milliseconds>(1_tick);
@@ -226,7 +226,7 @@ cWorld::cWorld(
 	m_Lighting(*this),
 	m_TickThread(*this)
 {
-	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
+	LOGD("cWorld::cWorld(\"%s\")", a_WorldName);
 
 	cFile::CreateFolderRecursive(m_DataPath);
 
@@ -237,13 +237,13 @@ cWorld::cWorld(
 	Serializer.Load();
 
 	// Track the CSs used by this world in the deadlock detector:
-	a_DeadlockDetect.TrackCriticalSection(m_CSTasks, Printf("World %s tasks",   m_WorldName.c_str()));
+	a_DeadlockDetect.TrackCriticalSection(m_CSTasks, fmt::format(FMT_STRING("World {} tasks"), m_WorldName));
 
 	// Load world settings from the ini file
 	cIniFile IniFile;
 	if (!IniFile.ReadFile(m_IniFileName))
 	{
-		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName.c_str());
+		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName);
 
 		// TODO: More descriptions for each key
 		IniFile.AddHeaderComment(" This is the per-world configuration file, managing settings such as generators, simulators, and spawn points");
@@ -3060,17 +3060,15 @@ cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
 
 cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BlockType a_SimulateBlock)
 {
-	AString SimulatorNameKey;
-	Printf(SimulatorNameKey, "%sSimulator", a_FluidName);
-	AString SimulatorSectionName;
-	Printf(SimulatorSectionName, "%sSimulator", a_FluidName);
+	auto SimulatorNameKey = fmt::format(FMT_STRING("{}Simulator"), a_FluidName);
+	auto SimulatorSectionName = fmt::format(FMT_STRING("{}Simulator"), a_FluidName);
 
 	bool IsWater = (strcmp(a_FluidName, "Water") == 0);  // Used for defaults
 	AString DefaultSimulatorName = ((GetDimension() == dimNether) && IsWater) ? "Vaporise" : "Vanilla";
 	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, DefaultSimulatorName);
 	if (SimulatorName.empty())
 	{
-		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"%s\".", SimulatorNameKey.c_str(), GetIniFileName().c_str(), DefaultSimulatorName.c_str());
+		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"%s\".", SimulatorNameKey, GetIniFileName(), DefaultSimulatorName);
 		SimulatorName = DefaultSimulatorName;
 	}
 	cFluidSimulator * res = nullptr;
