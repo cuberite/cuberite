@@ -13,8 +13,7 @@ struct BlockState
 	constexpr BlockState() : ID(0) {}
 
 	constexpr BlockState(uint_least16_t StateID) :
-		ID(StateID),
-		ID2(0)
+		ID(StateID)
 	{
 	}
 

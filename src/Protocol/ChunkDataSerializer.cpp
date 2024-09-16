@@ -32,7 +32,7 @@ namespace
 		return { Mask, Present };
 	}
 
-	std::pair<UInt16, size_t> GetSectionBitmask2(const ChunkBlockDataNew & a_BlockData, const ChunkLightData & a_LightData)
+	std::pair<UInt16, size_t> GetSectionBitmask2(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData)
 	{
 		size_t Present = 0;
 		UInt16 Mask = 0;
@@ -57,11 +57,11 @@ namespace
 		return { Mask, Present };
 	}
 
-	auto PaletteLegacy(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
+	/*auto PaletteLegacy(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
 	{
 		auto NumericBlock = PaletteUpgrade::ToBlock(a_Block);
 		return (NumericBlock.first << 4) | NumericBlock.second;
-	}
+	}*/
 
 	auto Palette393(const BlockState a_Block)
 	{
@@ -78,9 +78,14 @@ namespace
 		return Palette_1_14::From(a_Block);
 	}
 
-	auto Palette573(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
+	auto Palette573(const BlockState a_Block)
 	{
-		return Palette_1_15::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+		return Palette_1_15::From(a_Block);
+	}
+
+	auto Palette754(const BlockState a_Block)
+	{
+		return Palette_1_16::From(a_Block);
 	}
 
 }
@@ -102,7 +107,7 @@ cChunkDataSerializer::cChunkDataSerializer(const eDimension a_Dimension) :
 
 
 
-void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkBlockDataNew & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const ClientHandles & a_SendTo)
+void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const ClientHandles & a_SendTo)
 {
 	for (const auto & Client : a_SendTo)
 	{
@@ -110,14 +115,14 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 		{
 			case cProtocol::Version::v1_8_0:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v47);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v47);
 				continue;
 			}
 			case cProtocol::Version::v1_9_0:
 			case cProtocol::Version::v1_9_1:
 			case cProtocol::Version::v1_9_2:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v107);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v107);
 				continue;
 			}
 			case cProtocol::Version::v1_9_4:
@@ -128,18 +133,18 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 			case cProtocol::Version::v1_12_1:
 			case cProtocol::Version::v1_12_2:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v110);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v110);
 				continue;
 			}
 			case cProtocol::Version::v1_13:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v393);  // This version didn't last very long xD
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v393);  // This version didn't last very long xD
 				continue;
 			}
 			case cProtocol::Version::v1_13_1:
 			case cProtocol::Version::v1_13_2:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v401);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v401);
 				continue;
 			}
 			case cProtocol::Version::v1_14:
@@ -148,84 +153,84 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 			case cProtocol::Version::v1_14_3:
 			case cProtocol::Version::v1_14_4:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v477);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v477);
 				continue;
 			}
 			case cProtocol::Version::v1_15:
 			case cProtocol::Version::v1_15_1:
 			case cProtocol::Version::v1_15_2:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v573);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v573);
 				continue;
 			}
 			case cProtocol::Version::v1_16:
 			case cProtocol::Version::v1_16_1:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v735);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v735);
 				continue;
 			}
 			case cProtocol::Version::v1_16_2:
 			case cProtocol::Version::v1_16_3:
 			case cProtocol::Version::v1_16_4:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v751);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v751);
 				continue;
 			}
 			case cProtocol::Version::v1_17:
 			case cProtocol::Version::v1_17_1:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v755);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v755);
 				continue;
 			}
 			case cProtocol::Version::v1_18:
 			case cProtocol::Version::v1_18_2:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v757);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v757);
 				continue;
 			}
 			case cProtocol::Version::v1_19:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v759);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v759);
 				continue;
 			}
 			case cProtocol::Version::v1_19_1:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v760);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v760);
 				continue;
 			}
 			case cProtocol::Version::v1_19_3:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v761);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v761);
 				continue;
 			}
 			case cProtocol::Version::v1_19_4:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v762);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v762);
 				continue;
 			}
 			case cProtocol::Version::v1_20:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v763);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v763);
 				continue;
 			}
 			case cProtocol::Version::v1_20_2:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v764);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v764);
 				continue;
 			}
 			case cProtocol::Version::v1_20_3:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v765);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v765);
 				continue;
 			}
 			case cProtocol::Version::v1_20_5:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v766);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v766);
 				continue;
 			}
 			case cProtocol::Version::v1_21:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap, CacheVersion::v767);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v767);
 				continue;
 			}
 		}
@@ -243,7 +248,7 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 
 
 
-inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_Client, const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkBlockDataNew & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const CacheVersion a_CacheVersion)
+inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_Client, const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const CacheVersion a_CacheVersion)
 {
 	auto & Cache = m_Cache[static_cast<size_t>(a_CacheVersion)];
 	if (Cache.Engaged)
@@ -272,83 +277,83 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 		}
 		case CacheVersion::v393:
 		{
-			Serialize393<&Palette393>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap);
+			Serialize393<&Palette393>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap);
 			break;
 		}
 		case CacheVersion::v401:
 		{
-			Serialize393<&Palette401>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap);
+			Serialize393<&Palette401>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap);
 			break;
 		}
 		case CacheVersion::v477:
 		{
-			Serialize477(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap);
+			Serialize477(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap);
 			break;
 		}
 		case CacheVersion::v573:
 		{
-			Serialize573(a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData2, a_LightData, a_BiomeMap);
+			Serialize573(a_ChunkX, a_ChunkZ, a_BlockData, a_BlockData, a_LightData, a_BiomeMap);
 			break;
 		}
 		case CacheVersion::v735:
 		{
-			Serialize735(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap);
+			Serialize735(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap);
 			break;
 		}
 		case CacheVersion::v751:
 		{
-			Serialize751(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap);
+			Serialize751(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap);
 			break;
 		}
 		case CacheVersion::v755:
 		{
-			Serialize755(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap);
+			Serialize755(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap);
 			break;
 		}
 		case CacheVersion::v757:
 		{
-			Serialize757<&Palette_1_18::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x22);
+			Serialize757<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x22);
 			break;
 		}
 		case CacheVersion::v759:
 		{
-			Serialize757<&Palette_1_19::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x1F);
+			Serialize757<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x1F);
 			break;
 		}
 		case CacheVersion::v760:
 		{
-			Serialize757<&Palette_1_19::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x21);
+			Serialize757<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x21);
 			break;
 		}
 		case CacheVersion::v761:
 		{
-			Serialize757<&Palette_1_19::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x20);
+			Serialize757<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x20);
 			break;
 		}
 		case CacheVersion::v762:
 		{
-			Serialize757<&Palette_1_19::ToProtocolIdBlock1_19_4>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x24);
+			Serialize757<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x24);
 			break;
 		}
 		case CacheVersion::v763:
 		{
-			Serialize763<&Palette_1_20::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x24);
+			Serialize763<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x24);
 			break;
 		}
 		case CacheVersion::v764:
 		case CacheVersion::v765:
 		{
-			Serialize764<&Palette_1_20::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x25);
+			Serialize764<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x25);
 			break;
 		}
 		case CacheVersion::v766:
 		{
-			Serialize764<&Palette_1_20::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x27);
+			Serialize764<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x27);
 			break;
 		}
 		case CacheVersion::v767:
 		{
-			Serialize764<&Palette_1_20::ToProtocolIdBlock>(a_ChunkX, a_ChunkZ, a_BlockData2, a_LightData, a_BiomeMap, 0x27);
+			Serialize764<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x27);
 			break;
 		}
 	}
@@ -502,7 +507,7 @@ inline void cChunkDataSerializer::Serialize107(const int a_ChunkX, const int a_C
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(0);  // Palette length is 0
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-		WriteBlockSectionSeamless<&PaletteLegacy>(Blocks, BitsPerEntry);
+		//WriteBlockSectionSeamless<&PaletteLegacy>(Blocks, BitsPerEntry);
 		WriteLightSectionGrouped(BlockLights, SkyLights);
 	});
 
@@ -560,7 +565,7 @@ inline void cChunkDataSerializer::Serialize110(const int a_ChunkX, const int a_C
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(0);  // Palette length is 0
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-		WriteBlockSectionSeamless<&PaletteLegacy>(Blocks, BitsPerEntry);
+		//WriteBlockSectionSeamless<&PaletteLegacy>(Blocks, BitsPerEntry);
 		WriteLightSectionGrouped(BlockLights, SkyLights);
 	});
 
@@ -576,7 +581,7 @@ inline void cChunkDataSerializer::Serialize110(const int a_ChunkX, const int a_C
 
 
 template <auto Palette>
-inline void cChunkDataSerializer::Serialize393(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockDataNew & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
+inline void cChunkDataSerializer::Serialize393(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
 {
 	// This function returns the fully compressed packet (including packet size), not the raw packet!
 	// Below variables tagged static because of https://developercommunity.visualstudio.com/content/problem/367326
@@ -616,7 +621,7 @@ inline void cChunkDataSerializer::Serialize393(const int a_ChunkX, const int a_C
 	m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSize));
 
 	// Write each chunk section...
-	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
+	ChunkDef_ForEachSection(a_BlockData, a_LightData,
 	{
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
@@ -638,7 +643,7 @@ inline void cChunkDataSerializer::Serialize393(const int a_ChunkX, const int a_C
 
 
 
-inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockDataNew & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
+inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
 {
 	// This function returns the fully compressed packet (including packet size), not the raw packet!
 	// Below variables tagged static because of https://developercommunity.visualstudio.com/content/problem/367326
@@ -681,7 +686,7 @@ inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_C
 	m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSize));
 
 	// Write each chunk section...
-	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
+	ChunkDef_ForEachSection(a_BlockData, a_LightData,
 	{
 		m_Packet.WriteBEInt16(4096);
 		m_Packet.WriteBEUInt8(BitsPerEntry);
@@ -703,7 +708,7 @@ inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_C
 
 
 
-inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkBlockDataNew & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
+inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkBlockData & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
 {
 	// This function returns the fully compressed packet (including packet
 	// size), not the raw packet! Below variables tagged static because of
@@ -766,7 +771,7 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 			m_Packet.WriteBEInt16(4096);
 			m_Packet.WriteBEUInt8(BitsPerEntry);
 			m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-			WriteBlockSectionSeamless2<&Palette_1_15::ToProtocolIdBlock>(Blocks, BitsPerEntry, false);
+			WriteBlockSectionSeamless2<&Palette573>(Blocks, BitsPerEntry, false);
 		}
 	}
 
@@ -778,7 +783,7 @@ inline void cChunkDataSerializer::Serialize573(const int a_ChunkX, const int a_C
 
 
 
-inline void cChunkDataSerializer::Serialize735(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockDataNew & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
+inline void cChunkDataSerializer::Serialize735(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
 {
 	// This function returns the fully compressed packet (including packet
 	// size), not the raw packet! Below variables tagged static because of
@@ -786,8 +791,8 @@ inline void cChunkDataSerializer::Serialize735(const int a_ChunkX, const int a_C
 
 	static constexpr UInt8 BitsPerEntry = 15;
 	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
-	static int Longs = CeilC<int, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);
-	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
+	static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
+	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
 
 	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
 
@@ -844,7 +849,7 @@ inline void cChunkDataSerializer::Serialize735(const int a_ChunkX, const int a_C
 			m_Packet.WriteBEInt16(4096);
 			m_Packet.WriteBEUInt8(BitsPerEntry);
 			m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-			WriteBlockSectionSeamless2<&Palette_1_16::ToProtocolIdBlock>(Blocks, BitsPerEntry, true);
+			WriteBlockSectionSeamless2<&Palette754>(Blocks, BitsPerEntry, true);
 		}
 	}
 
@@ -856,7 +861,7 @@ inline void cChunkDataSerializer::Serialize735(const int a_ChunkX, const int a_C
 
 
 
-inline void cChunkDataSerializer::Serialize751(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockDataNew & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
+inline void cChunkDataSerializer::Serialize751(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
 {
 		// This function returns the fully compressed packet (including packet
 	// size), not the raw packet! Below variables tagged static because of
@@ -864,8 +869,8 @@ inline void cChunkDataSerializer::Serialize751(const int a_ChunkX, const int a_C
 
 	static constexpr UInt8 BitsPerEntry = 15;
 	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
-	static int Longs = CeilC<int, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);
-	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
+	static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
+	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
 
 	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
 
@@ -924,7 +929,7 @@ inline void cChunkDataSerializer::Serialize751(const int a_ChunkX, const int a_C
 			m_Packet.WriteBEInt16(4096);
 			m_Packet.WriteBEUInt8(BitsPerEntry);
 			m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-			WriteBlockSectionSeamless2<&Palette_1_16::ToProtocolIdBlock16_2>(Blocks, BitsPerEntry, true);
+			WriteBlockSectionSeamless2<&Palette754>(Blocks, BitsPerEntry, true);
 		}
 	}
 
@@ -936,7 +941,7 @@ inline void cChunkDataSerializer::Serialize751(const int a_ChunkX, const int a_C
 
 
 
-inline void cChunkDataSerializer::Serialize755(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockDataNew & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
+inline void cChunkDataSerializer::Serialize755(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap)
 {
 		// This function returns the fully compressed packet (including packet
 	// size), not the raw packet! Below variables tagged static because of
@@ -944,8 +949,8 @@ inline void cChunkDataSerializer::Serialize755(const int a_ChunkX, const int a_C
 
 	static constexpr UInt8 BitsPerEntry = 15;
 	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
-	static int Longs = CeilC<int, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);
-	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
+	static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
+	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
 
 	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
 
@@ -1006,7 +1011,7 @@ inline void cChunkDataSerializer::Serialize755(const int a_ChunkX, const int a_C
 			m_Packet.WriteBEInt16(4096);
 			m_Packet.WriteBEUInt8(BitsPerEntry);
 			m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-			WriteBlockSectionSeamless2<&Palette_1_16::ToProtocolIdBlock16_2>(Blocks, BitsPerEntry, true);
+			WriteBlockSectionSeamless2<&Palette754>(Blocks, BitsPerEntry, true);
 		}
 	}
 
@@ -1018,7 +1023,7 @@ inline void cChunkDataSerializer::Serialize755(const int a_ChunkX, const int a_C
 
 
 template <auto Palette>
-inline void cChunkDataSerializer::Serialize757(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockDataNew & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, UInt32 a_packet_id)
+inline void cChunkDataSerializer::Serialize757(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, UInt32 a_packet_id)
 {
 	// This function returns the fully compressed packet (including packet
 	// size), not the raw packet! Below variables tagged static because of
@@ -1026,8 +1031,8 @@ inline void cChunkDataSerializer::Serialize757(const int a_ChunkX, const int a_C
 
 	static constexpr UInt8 BitsPerEntry = 15;
 	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
-	static int Longs = CeilC<int, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);
-	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
+	static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
+	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
 
 	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
 
@@ -1100,7 +1105,7 @@ inline void cChunkDataSerializer::Serialize757(const int a_ChunkX, const int a_C
 
 
 template <auto Palette>
-inline void cChunkDataSerializer::Serialize763(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockDataNew & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, UInt32 a_packet_id)
+inline void cChunkDataSerializer::Serialize763(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, UInt32 a_packet_id)
 {
 	// This function returns the fully compressed packet (including packet
 	// size), not the raw packet! Below variables tagged static because of
@@ -1108,8 +1113,8 @@ inline void cChunkDataSerializer::Serialize763(const int a_ChunkX, const int a_C
 
 	static constexpr UInt8 BitsPerEntry = 15;
 	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
-	static int Longs = CeilC<int, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);
-	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
+	static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
+	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
 
 	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
 
@@ -1181,7 +1186,7 @@ inline void cChunkDataSerializer::Serialize763(const int a_ChunkX, const int a_C
 
 
 template <auto Palette>
-inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockDataNew & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, UInt32 a_packet_id)
+inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, UInt32 a_packet_id)
 {
 	// This function returns the fully compressed packet (including packet
 	// size), not the raw packet! Below variables tagged static because of
@@ -1189,8 +1194,8 @@ inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_C
 
 	static constexpr UInt8 BitsPerEntry = 15;
 	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
-	static int Longs = CeilC<int, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);
-	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockDataNew::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
+	static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
+	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
 
 	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
 
@@ -1262,7 +1267,7 @@ inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_C
 
 
 template <auto Palette>
-inline void cChunkDataSerializer::WriteBlockSectionSeamless2(const ChunkBlockDataNew::BlockArray * a_Blocks, const UInt8 a_BitsPerEntry, bool padding)
+inline void cChunkDataSerializer::WriteBlockSectionSeamless2(const ChunkBlockData::BlockArray * a_Blocks, const UInt8 a_BitsPerEntry, bool padding)
 {
 	// https://wiki.vg/Chunk_Format#Data_structure
 

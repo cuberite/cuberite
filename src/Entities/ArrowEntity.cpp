@@ -87,7 +87,7 @@ void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 	// Wooden buttons will be depressed by the arrow
 	cBlockButtonHandler::OnArrowHit(*m_World, m_HitBlockPos, a_HitFace);
 
-	if ((m_World->GetBlock(m_HitBlockPos) == BlockType::TNT) && IsOnFire())
+	if ((m_World->GetBlock(m_HitBlockPos) == BlockType::Tnt) && IsOnFire())
 	{
 		m_World->SetBlock(m_HitBlockPos, Block::Air::Air());
 		m_World->SpawnPrimedTNT(m_HitBlockPos);

@@ -36,11 +36,7 @@ public:
 
 	constexpr cItemHandler(Item a_ItemType) : m_ItemType(a_ItemType)
 	{
-	}
 
-	constexpr cItemHandler(Item a_ItemType) :
-		m_ItemType(0), m_NewItemType(a_ItemType)
-	{
 	}
 
 	/** Called when the player tries to place the item (right mouse button, IsPlaceable() == true).
@@ -144,7 +140,7 @@ protected:
 
 	Item m_ItemType;
 
-	const Item m_NewItemType;
+	// const Item m_NewItemType;
 
 	/** Performs the actual placement of this placeable item.
 	The descendant handler should call a_Player.PlaceBlock(s) supplying correct values for the newly placed block.

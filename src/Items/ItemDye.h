@@ -212,7 +212,7 @@ public:
 				return true;
 			}  // case red or brown mushroom
 
-			case BlockType::Grass:
+			case BlockType::ShortGrass:
 			{
 				GrowPlantsAround(a_World, a_BlockPos);
 				return true;
@@ -384,7 +384,7 @@ public:
 		{
 			if (
 				!cChunkDef::IsValidHeight(Position) ||
-				(a_World.GetBlock(Position).Type() != BlockType::Grass)  // Are we looking at grass?
+				(a_World.GetBlock(Position).Type() != BlockType::ShortGrass)  // Are we looking at grass?
 			)
 			{
 				// Not grass or invalid height, restart random walk and bail:

@@ -7,8 +7,8 @@
 class cWorld;
 
 
-/*
-enum Direction
+
+enum class FluidDirection
 {
 	X_PLUS,
 	X_MINUS,
@@ -17,7 +17,7 @@ enum Direction
 	Z_PLUS,
 	Z_MINUS,
 	NONE
-};*/
+};
 
 
 

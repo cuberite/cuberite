@@ -557,7 +557,7 @@ void cProtocol_1_17::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 	for (const auto & Change : a_Changes)
 	{
 		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
-		UInt64 packed = Coords | (Change.m_BlockIdNew << 12);
+		UInt64 packed = Coords | (Palette_1_15::From(Change.m_Block) << 12);
 		Pkt.WriteVarInt64(packed);
 	}
 }

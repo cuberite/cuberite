@@ -950,53 +950,53 @@ int cRoot::GetPhysicalRAMUsage(void)
 
 void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 {
-	int SumNumValid = 0;
-	int SumNumDirty = 0;
-	int SumNumInLighting = 0;
-	size_t SumNumInGenerator = 0;
-	int SumMem = 0;
-	for (auto & Entry : m_WorldsByName)
-	{
-		auto & World = Entry.second;
-		const auto NumInGenerator = World.GetGeneratorQueueLength();
-		const auto NumInSaveQueue = World.GetStorageSaveQueueLength();
-		const auto NumInLoadQueue = World.GetStorageLoadQueueLength();
-		int NumValid = 0;
-		int NumDirty = 0;
-		int NumInLighting = 0;
-		World.GetChunkStats(NumValid, NumDirty, NumInLighting);
-		a_Output.OutLn(fmt::format(FMT_STRING("World {}:"), World.GetName()));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Num loaded chunks: {}"), NumValid));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Num dirty chunks: {}"), NumDirty));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in lighting queue: {}"), NumInLighting));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in generator queue: {}"), NumInGenerator));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in storage load queue: {}"), NumInLoadQueue));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in storage save queue: {}"), NumInSaveQueue));
-		int Mem = NumValid * static_cast<int>(sizeof(cChunk));
-		a_Output.Out("  Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
-		a_Output.Out("  Per-chunk memory size breakdown:");
-		a_Output.Out("    block types:    %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BlockStates), (sizeof(cChunkDef::BlockStates) + 1023) / 1024);
-		a_Output.Out("    block lighting: %6zu bytes (%3zu KiB)", 2 * sizeof(cChunkDef::LightNibbles), (2 * sizeof(cChunkDef::LightNibbles) + 1023) / 1024);
-		a_Output.Out("    heightmap:      %6zu bytes (%3zu KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
-		a_Output.Out("    biomemap:       %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
-		SumNumValid += NumValid;
-		SumNumDirty += NumDirty;
-		SumNumInLighting += NumInLighting;
-		SumNumInGenerator += NumInGenerator;
-		SumMem += Mem;
-	}
-	a_Output.OutLn("Totals:");
-	a_Output.OutLn(fmt::format(FMT_STRING("  Num loaded chunks: {}"), SumNumValid));
-	a_Output.OutLn(fmt::format(FMT_STRING("  Num dirty chunks: {}"), SumNumDirty));
-	a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in lighting queue: {}"), SumNumInLighting));
-	a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in generator queue: {}"), SumNumInGenerator));
-	a_Output.OutLn(fmt::format(FMT_STRING("  Memory used by chunks: {} KiB ({} MiB)"), (SumMem + 1023) / 1024, (SumMem + 1024 * 1024 - 1) / (1024 * 1024)));
-	a_Output.OutLn("Per-chunk memory size breakdown:");
-	a_Output.OutLn(fmt::format(FMT_STRING("  block types:    {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::BlockTypes), (sizeof(cChunkDef::BlockTypes) + 1023) / 1024));
-	a_Output.OutLn(fmt::format(FMT_STRING("  block metadata: {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::BlockNibbles), (sizeof(cChunkDef::BlockNibbles) + 1023) / 1024));
-	a_Output.OutLn(fmt::format(FMT_STRING("  block lighting: {:06} bytes ({:3} KiB)"), 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024));
-	a_Output.OutLn(fmt::format(FMT_STRING("  heightmap:      {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024));
-	a_Output.OutLn(fmt::format(FMT_STRING("  biomemap:       {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024));
+	//int SumNumValid = 0;
+	//int SumNumDirty = 0;
+	//int SumNumInLighting = 0;
+	//size_t SumNumInGenerator = 0;
+	//int SumMem = 0;
+	//for (auto & Entry : m_WorldsByName)
+	//{
+	//	auto & World = Entry.second;
+	//	const auto NumInGenerator = World.GetGeneratorQueueLength();
+	//	const auto NumInSaveQueue = World.GetStorageSaveQueueLength();
+	//	const auto NumInLoadQueue = World.GetStorageLoadQueueLength();
+	//	int NumValid = 0;
+	//	int NumDirty = 0;
+	//	int NumInLighting = 0;
+	//	World.GetChunkStats(NumValid, NumDirty, NumInLighting);
+	//	a_Output.OutLn(fmt::format(FMT_STRING("World {}:"), World.GetName()));
+	//	a_Output.OutLn(fmt::format(FMT_STRING("  Num loaded chunks: {}"), NumValid));
+	//	a_Output.OutLn(fmt::format(FMT_STRING("  Num dirty chunks: {}"), NumDirty));
+	//	a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in lighting queue: {}"), NumInLighting));
+	//	a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in generator queue: {}"), NumInGenerator));
+	//	a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in storage load queue: {}"), NumInLoadQueue));
+	//	a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in storage save queue: {}"), NumInSaveQueue));
+	//	int Mem = NumValid * static_cast<int>(sizeof(cChunk));
+	//	a_Output.Out("  Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
+	//	a_Output.Out("  Per-chunk memory size breakdown:");
+	//	a_Output.Out("    block types:    %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BlockStates), (sizeof(cChunkDef::BlockStates) + 1023) / 1024);
+	//	a_Output.Out("    block lighting: %6zu bytes (%3zu KiB)", 2 * sizeof(cChunkDef::LightNibbles), (2 * sizeof(cChunkDef::LightNibbles) + 1023) / 1024);
+	//	a_Output.Out("    heightmap:      %6zu bytes (%3zu KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
+	//	a_Output.Out("    biomemap:       %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
+	//	SumNumValid += NumValid;
+	//	SumNumDirty += NumDirty;
+	//	SumNumInLighting += NumInLighting;
+	//	SumNumInGenerator += NumInGenerator;
+	//	SumMem += Mem;
+	//}
+	//a_Output.OutLn("Totals:");
+	//a_Output.OutLn(fmt::format(FMT_STRING("  Num loaded chunks: {}"), SumNumValid));
+	//a_Output.OutLn(fmt::format(FMT_STRING("  Num dirty chunks: {}"), SumNumDirty));
+	//a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in lighting queue: {}"), SumNumInLighting));
+	//a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in generator queue: {}"), SumNumInGenerator));
+	//a_Output.OutLn(fmt::format(FMT_STRING("  Memory used by chunks: {} KiB ({} MiB)"), (SumMem + 1023) / 1024, (SumMem + 1024 * 1024 - 1) / (1024 * 1024)));
+	//a_Output.OutLn("Per-chunk memory size breakdown:");
+	//a_Output.OutLn(fmt::format(FMT_STRING("  block types:    {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::BlockTypes), (sizeof(cChunkDef::BlockTypes) + 1023) / 1024));
+	//a_Output.OutLn(fmt::format(FMT_STRING("  block metadata: {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::BlockNibbles), (sizeof(cChunkDef::BlockNibbles) + 1023) / 1024));
+	//a_Output.OutLn(fmt::format(FMT_STRING("  block lighting: {:06} bytes ({:3} KiB)"), 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024));
+	//a_Output.OutLn(fmt::format(FMT_STRING("  heightmap:      {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024));
+	//a_Output.OutLn(fmt::format(FMT_STRING("  biomemap:       {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024));
 }
 
 

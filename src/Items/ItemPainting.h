@@ -87,10 +87,11 @@ public:
 			"BurningSkull"
 		};
 
-		auto PaintingTitle = gPaintingTitlesList[static_cast<size_t>(a_World->GetTickRandomNumber(gPaintingTitlesList.size() - 1))];
+		auto paint_index = a_World->GetTickRandomNumber(gPaintingTitlesList.size() - 1);
+		auto PaintingTitle = gPaintingTitlesList[static_cast<size_t>(paint_index)];
 
 		// A painting, centred so pickups spawn nicely.
-		auto Painting = std::make_unique<cPainting>(PaintingTitle, a_ClickedBlockFace, Vector3d(0.5, 0.5, 0.5) + PlacePos, static_cast<UInt32>(painting_index));
+		auto Painting = std::make_unique<cPainting>(PaintingTitle, a_ClickedBlockFace, Vector3d(0.5, 0.5, 0.5) + PlacePos, static_cast<UInt32>(paint_index));
 		auto PaintingPtr = Painting.get();
 		if (!PaintingPtr->Initialize(std::move(Painting), *a_World))
 		{

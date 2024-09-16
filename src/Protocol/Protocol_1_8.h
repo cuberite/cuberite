@@ -43,7 +43,6 @@ public:
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
 	virtual void SendBlockAction                (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BlockState a_Block) override;
 	virtual void SendBlockBreakAnim	            (UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage) override;
-	virtual void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendRenderDistanceCenter       (cChunkCoords a_chunk) override;
 	virtual void SendBlockChange                (Vector3i a_BlockPos, BlockState a_Block) override;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;

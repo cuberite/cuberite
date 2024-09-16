@@ -55,7 +55,7 @@ bool cFluidSimulator::CanWashAway(BlockState a_Block)
 		case BlockType::Cornflower:
 		case BlockType::DeadBush:
 		case BlockType::DetectorRail:
-		case BlockType::Grass:
+		case BlockType::ShortGrass:
 		case BlockType::LargeFern:
 		case BlockType::Lilac:
 		case BlockType::LilyOfTheValley:

@@ -795,7 +795,7 @@ bool cWorld::CanSpawnAt(int a_X, int & a_Y, int a_Z)
 	// Apart from netherrack (as the Nether is technically a massive cave)
 	static constexpr std::array<BlockType, 6> ValidSpawnBlocks =
 	{
-		BlockType::Grass,
+		BlockType::ShortGrass,
 		BlockType::Sand,
 		BlockType::Snow,
 		BlockType::SnowBlock,

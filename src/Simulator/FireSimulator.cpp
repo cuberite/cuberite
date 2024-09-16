@@ -164,9 +164,9 @@ bool cFireSimulator::IsFuel(BlockState a_Block)
 	switch (a_Block.Type())
 	{
 		case BlockType::Bookshelf:
-		case BlockType::TNT:
+		case BlockType::Tnt:
 		case BlockType::Vine:
-		case BlockType::HayBale:
+		case BlockType::HayBlock:
 			// Carpets
 		case BlockType::BlackCarpet:
 		case BlockType::BlueCarpet:
@@ -454,7 +454,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 		}
 
 		auto AbsPos = NeighborChunk->RelativeToAbsolute(RelPos);
-		if (Self.Type() == BlockType::TNT)
+		if (Self.Type() == BlockType::Tnt)
 		{
 			NeighborChunk->SetBlock(RelPos, Block::Air::Air());
 			m_World.SpawnPrimedTNT(Vector3d(AbsPos) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom

@@ -35,7 +35,7 @@ class cPacketizer;
 struct StatisticsManager;
 
 
-
+static const int CompressionThreshold = 128; // After how large a packet should we compress it.
 
 
 class cProtocol

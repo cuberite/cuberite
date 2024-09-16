@@ -2468,15 +2468,6 @@ bool cPlayer::PlaceBlock(const Vector3i a_Position, BlockState a_Block)
 
 
 
-bool cPlayer::NewPlaceBlock(const Vector3i a_Position, NEWBLOCKTYPE a_Block)
-{
-	return PlaceBlocks({ { a_Position, a_Block } });
-}
-
-
-
-
-
 bool cPlayer::PlaceBlocks(const std::initializer_list<sSetBlock> a_Blocks)
 {
 	if (DoesPlacingBlocksIntersectEntity(a_Blocks))
@@ -2518,7 +2509,7 @@ bool cPlayer::PlaceBlocks(const std::initializer_list<sSetBlock> a_Blocks)
 	cChunkInterface ChunkInterface(m_World->GetChunkMap());
 	for (const auto & Block : a_Blocks)
 	{
-		m_World->NewPlaceBlock(Block.GetAbsolutePos(), Block.m_BlockIdNew);
+		//m_World->NewPlaceBlock(Block.GetAbsolutePos(), Block.m_BlockIdNew);
 
 		// Set the blocks:
 		m_World->PlaceBlock(Block.GetAbsolutePos(), Block.m_Block);

@@ -110,7 +110,7 @@ inline bool cIncrementalRedstoneSimulator::IsRedstone(BlockType a_Block)
 		case BlockType::StickyPiston:
 		case BlockType::StoneButton:
 		case BlockType::StonePressurePlate:
-		case BlockType::TNT:
+		case BlockType::Tnt:
 		case BlockType::TrappedChest:
 		case BlockType::TripwireHook:
 		case BlockType::Piston:

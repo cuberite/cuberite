@@ -48,7 +48,7 @@ void cProtocol_1_13::SendBlockChange(Vector3i a_BlockPos, BlockState a_Block)
 {
 	cPacketizer Pkt(*this, pktBlockChange);
 	Pkt.WriteXYZPosition64(a_BlockPos);
-	Pkt.WriteVarInt32(GetProtocolBlockType(a_Block));
+	Pkt.WriteVarInt32(Palette_1_13::From(a_Block));
 }
 
 
@@ -68,7 +68,7 @@ void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 	{
 		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
 		Pkt.WriteBEInt16(Coords);
-		Pkt.WriteVarInt32(GetProtocolBlockType(Change.m_Block));
+		Pkt.WriteVarInt32(Palette_1_13::From(Change.m_Block));
 	}
 }
 
@@ -1763,7 +1763,7 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 
 	cFastNBTWriter Writer;
-	if (a_Item.m_ItemType == E_ITEM_POTION)
+	if (a_Item.m_ItemType == Item::Potion)
 	{
 		bool strong_potion = false;
 		bool long_potion = false;
@@ -1820,12 +1820,12 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 	}
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
-		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "Enchantments";
+		const char * TagName = (a_Item.m_ItemType == Item::EnchantedBook) ? "StoredEnchantments" : "Enchantments";
 		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName, true);
 	}
-	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
+	if ((a_Item.m_ItemType == Item::FireworkRocket) || (a_Item.m_ItemType == Item::FireworkStar))
 	{
-		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem,Writer,static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, a_Item.m_ItemType);
 	}
 
 	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())

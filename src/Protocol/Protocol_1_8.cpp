@@ -57,7 +57,6 @@ Implements the 1.8 protocol classes:
 
 
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
-static const UInt32 CompressionThreshold = 256;  // After how large a packet should we compress it.
 
 
 
@@ -221,16 +220,6 @@ void cProtocol_1_8_0::SendBlockChange(Vector3i a_BlockPos, BlockState a_Block)
 	Pkt.WriteXYZPosition64(a_BlockPos);
 	auto NumericBlock = PaletteUpgrade::ToBlock(a_Block);
 	Pkt.WriteVarInt32((static_cast<UInt32>(NumericBlock.first) << 4) | (static_cast<UInt32>(NumericBlock.second) & 15));
-}
-
-
-
-
-
-void cProtocol_1_8_0::NewSendBlockChange(Vector3i a_BlockPos, NEWBLOCKTYPE block)
-{
-	// not used in this version
-	return;
 }
 
 
@@ -3735,7 +3724,7 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
 		const char * TagName = (a_Item.m_ItemType == Item::EnchantedBook) ? "StoredEnchantments" : "ench";
-		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName, false);
 	}
 	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
 	{

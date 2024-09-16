@@ -396,12 +396,10 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				return false;
 			}
 
-			// BlockStateData = reinterpret_cast<byte*>(reinterpret_cast<const Int64*>(BlockStateData))
-
 			int PaletteList = a_NBT.FindChildByName(Child, "Palette");
 			if (PaletteList < 0)
 			{
-				// The pallete does not have to exists but that also means that the section is empty and should be ignored
+				// The palette does not have to exists but that also means that the section is empty and should be ignored
 				continue;
 			}
 			if (a_NBT.GetType(PaletteList) != TAG_List)
@@ -475,7 +473,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				int cnt = (*BlockMap::BlMap::GetMap()).count(tosearch);
 				if (cnt == 0)
 				{
-					UNREACHABLE("could find given block while lodaing chunk X: " + a_Chunk.m_ChunkX + " Z: " a_Chunk.m_ChunkZ + " Y Section: " + Y);
+					UNREACHABLE("could find given block while loading chunk X: " + a_Chunk.m_ChunkX + " Z: " a_Chunk.m_ChunkZ + " Y Section: " + Y);
 				}
 				NEWBLOCKTYPE protocolblockid = (*BlockMap::BlMap::GetMap()).at(tosearch);
 				Paletteids.push_back(protocolblockid);
@@ -1313,7 +1311,7 @@ OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_Ta
 		CustomName = a_NBT.GetString(CurrentLine);
 	}
 
-	return std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, m_World, Color, CustomName);
+	return std::make_unique<cBannerEntity>(a_Block, a_Pos, m_World, Color, CustomName);
 }
 
 

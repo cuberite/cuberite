@@ -89,47 +89,47 @@ public:
 	void SetSection(const SectionType & a_BlockSource, size_t a_Y);
 };
 
-class ChunkBlockDataNew
-{
-public:
-
-	static constexpr size_t SectionBlockCount = cChunkDef::SectionHeight * cChunkDef::Width * cChunkDef::Width;
-	//static constexpr size_t SectionMetaCount = SectionBlockCount / 2;
-
-	static constexpr NEWBLOCKTYPE DefaultValue = ENUM_BLOCKS::AIR;
-	//static constexpr NIBBLETYPE DefaultMetaValue = 0x00;
-
-	using SectionType = NEWBLOCKTYPE[SectionBlockCount];
-	//using SectionMetaType = NIBBLETYPE[SectionMetaCount];
-
-private:
-
-	ChunkDataStore<NEWBLOCKTYPE, SectionBlockCount, DefaultValue> m_Blocks;
-	//ChunkDataStore<NIBBLETYPE, SectionMetaCount, DefaultMetaValue> m_Metas;
-
-public:
-
-	using BlockArray = decltype(m_Blocks)::Type;
-	//using MetaArray = decltype(m_Metas)::Type;
-
-	void Assign(const ChunkBlockDataNew & a_Other);
-
-	NEWBLOCKTYPE GetBlock(Vector3i a_Position) const { return m_Blocks.Get(a_Position); }
-	//NIBBLETYPE GetMeta(Vector3i a_Position) const { return m_Metas.Get(a_Position); }
-
-	BlockArray * GetSection(size_t a_Y) const
-	{
-		return m_Blocks.Store[a_Y].get(); // m_Blocks.GetSection(a_Y); // --produces a linking error 
-	}
-	//std::array<unsigned int, 4096> * GetSec(size_t a_Y) const {return m_Blocks.GetSection(a_Y); }
-	//MetaArray * GetMetaSection(size_t a_Y) const { return m_Metas.GetSection(a_Y); }
-
-	void SetBlock(Vector3i a_Position, NEWBLOCKTYPE a_Block) { m_Blocks.Set(a_Position, a_Block); }
-	//void SetMeta(Vector3i a_Position, NIBBLETYPE a_Meta) { m_Metas.Set(a_Position, a_Meta); }
-
-	void SetAll(const cChunkDef::BlockTypes2 & a_BlockSource);
-	void SetSection(const SectionType & a_BlockSource, size_t a_Y);
-};
+//class ChunkBlockDataNew
+//{
+//public:
+//
+//	static constexpr size_t SectionBlockCount = cChunkDef::SectionHeight * cChunkDef::Width * cChunkDef::Width;
+//	//static constexpr size_t SectionMetaCount = SectionBlockCount / 2;
+//
+//	static constexpr NEWBLOCKTYPE DefaultValue = ENUM_BLOCKS::AIR;
+//	//static constexpr NIBBLETYPE DefaultMetaValue = 0x00;
+//
+//	using SectionType = NEWBLOCKTYPE[SectionBlockCount];
+//	//using SectionMetaType = NIBBLETYPE[SectionMetaCount];
+//
+//private:
+//
+//	ChunkDataStore<NEWBLOCKTYPE, SectionBlockCount, DefaultValue> m_Blocks;
+//	//ChunkDataStore<NIBBLETYPE, SectionMetaCount, DefaultMetaValue> m_Metas;
+//
+//public:
+//
+//	using BlockArray = decltype(m_Blocks)::Type;
+//	//using MetaArray = decltype(m_Metas)::Type;
+//
+//	void Assign(const ChunkBlockDataNew & a_Other);
+//
+//	NEWBLOCKTYPE GetBlock(Vector3i a_Position) const { return m_Blocks.Get(a_Position); }
+//	//NIBBLETYPE GetMeta(Vector3i a_Position) const { return m_Metas.Get(a_Position); }
+//
+//	BlockArray * GetSection(size_t a_Y) const
+//	{
+//		return m_Blocks.Store[a_Y].get(); // m_Blocks.GetSection(a_Y); // --produces a linking error 
+//	}
+//	//std::array<unsigned int, 4096> * GetSec(size_t a_Y) const {return m_Blocks.GetSection(a_Y); }
+//	//MetaArray * GetMetaSection(size_t a_Y) const { return m_Metas.GetSection(a_Y); }
+//
+//	void SetBlock(Vector3i a_Position, NEWBLOCKTYPE a_Block) { m_Blocks.Set(a_Position, a_Block); }
+//	//void SetMeta(Vector3i a_Position, NIBBLETYPE a_Meta) { m_Metas.Set(a_Position, a_Meta); }
+//
+//	void SetAll(const cChunkDef::BlockTypes2 & a_BlockSource);
+//	void SetSection(const SectionType & a_BlockSource, size_t a_Y);
+//};
 
 
 

@@ -260,7 +260,7 @@ namespace Explodinator
 			case BlockType::DetectorRail:
 			case BlockType::PoweredRail:
 			case BlockType::Rail: return 0.3f;
-			case BlockType::GrassPath:
+			case BlockType::DirtPath:
 			case BlockType::Clay:
 			case BlockType::Farmland:
 			case BlockType::GrassBlock:
@@ -301,7 +301,7 @@ namespace Explodinator
 
 			case BlockType::Dirt:
 			case BlockType::FrostedIce:
-			case BlockType::HayBale:
+			case BlockType::HayBlock:
 			case BlockType::Ice: return 0.24f;
 			default: ASSERT("BLOCK MIGHT NOT HAVE RIGHT EXPLOSION ABSORPTION"); return 0.09f;
 		}
@@ -445,7 +445,7 @@ namespace Explodinator
 		auto & Random = GetRandomProvider();
 		const auto Absolute = cChunkDef::RelativeToAbsolute(a_Position, a_Chunk.GetPos());
 
-		if (DestroyedBlock == BlockType::TNT)  // If the block is TNT we should set it off
+		if (DestroyedBlock == BlockType::Tnt)  // If the block is TNT we should set it off
 		{
 			// Random fuse between 10 to 30 game ticks.
 			const int FuseTime = Random.RandInt(10, 30);

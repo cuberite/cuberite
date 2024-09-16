@@ -52,6 +52,7 @@
 #include "../Mobs/IncludeAllMonsters.h"
 
 #include "../Protocol/Palettes/Upgrade.h"
+#include <Protocol/Palettes/BlockMap.h>
 
 
 
@@ -403,7 +404,7 @@ public:
 				if (!a_Item.m_Enchantments.IsEmpty())
 				{
 					const char * TagName = (a_Item.m_ItemType == Item::Book) ? "StoredEnchantments" : "ench";
-					EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, mWriter, TagName);
+					EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, mWriter, TagName,false);
 				}
 			mWriter.EndCompound();
 		}
@@ -1296,7 +1297,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 			const auto SkyLights = serializer.m_LightData.GetSkyLightSection(Y); 
 			if ((Blocks != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr)) 
 			{ 
-				ChunkBlockDataNew::BlockArray temparr;
+				ChunkBlockData::BlockArray temparr;
 				std::copy(Blocks->begin(),Blocks->end(),temparr.begin());
 				std::sort(temparr.begin(), temparr.end());
 				auto newlistend = std::unique(temparr.begin(),temparr.end());

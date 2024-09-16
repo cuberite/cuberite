@@ -1477,7 +1477,7 @@ namespace
 	constexpr cItemFenceGateHandler         ItemWarpedFenceGateHandler                 (Item::WarpedFenceGate);
 	constexpr cItemFenceHandler             ItemWarpedFenceHandler                     (Item::WarpedFence);
 	constexpr cUnimplementedItemHandler     ItemWarpedFungusHandler                    (Item::WarpedFungus);
-	constexpr cUnimplementedItemHandler     ItemWarpedFungusOnA_stickHandler           (Item::WarpedFungusOnA_stick);
+	constexpr cUnimplementedItemHandler     ItemWarpedFungusOnA_stickHandler           (Item::WarpedFungusOnAStick);
 	constexpr cUnimplementedItemHandler     ItemWarpedHyphaeHandler                    (Item::WarpedHyphae);
 	constexpr cUnimplementedItemHandler     ItemWarpedNyliumHandler                    (Item::WarpedNylium);
 	constexpr cSimplePlaceableItemHandler   ItemWarpedPlanksHandler                    (Item::WarpedPlanks);
@@ -1545,12 +1545,12 @@ namespace
 
 const cItemHandler & cItemHandler::For(Item a_ItemType)
 {
-	Item toswitch = PaletteUpgrade::FromItem(a_ItemType,0);
-	switch (toswitch)
-	{
-		default:
-			break;
-	}
+	//Item toswitch = PaletteUpgrade::FromItem(a_ItemType,0);
+	//switch (toswitch)
+	//{
+	//	default:
+	//		break;
+	//}
 
 	switch (a_ItemType)
 	{
@@ -2469,7 +2469,7 @@ const cItemHandler & cItemHandler::For(Item a_ItemType)
 		case Item::WarpedFence:                      return ItemWarpedFenceHandler;
 		case Item::WarpedFenceGate:                  return ItemWarpedFenceGateHandler;
 		case Item::WarpedFungus:                     return ItemWarpedFungusHandler;
-		case Item::WarpedFungusOnA_stick:            return ItemWarpedFungusOnA_stickHandler;
+		case Item::WarpedFungusOnAStick:             return ItemWarpedFungusOnA_stickHandler;
 		case Item::WarpedHyphae:                     return ItemWarpedHyphaeHandler;
 		case Item::WarpedNylium:                     return ItemWarpedNyliumHandler;
 		case Item::WarpedPlanks:                     return ItemWarpedPlanksHandler;

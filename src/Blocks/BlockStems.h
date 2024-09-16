@@ -193,7 +193,7 @@ private:
 		switch (SoilBlock.Type())
 		{
 			case BlockType::Dirt:
-			case BlockType::Grass:
+			case BlockType::ShortGrass:
 			case BlockType::Farmland:
 			{
 				FLOGD("Growing melon / pumpkin at {0} (<{1}, {2}> from stem), overwriting {3}, growing on top of {4}, meta {5}",

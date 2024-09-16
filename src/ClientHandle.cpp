@@ -2336,23 +2336,6 @@ void cClientHandle::SendBlockChange(Vector3i a_BlockPos, BlockState a_Block)
 
 
 
-void cClientHandle::NewSendBlockChange(Vector3i a_BlockPos, NEWBLOCKTYPE a_block)
-{
-	auto ChunkCoords = cChunkDef::BlockToChunk(a_BlockPos);
-
-	// Do not send block changes in chunks that weren't sent to the client yet:
-	cCSLock Lock(m_CSChunkLists);
-	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
-	{
-		Lock.Unlock();
-		m_Protocol->NewSendBlockChange(a_BlockPos, a_block);
-	}
-}
-
-
-
-
-
 void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
 	ASSERT(!a_Changes.empty());  // We don't want to be sending empty change packets!
