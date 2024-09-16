@@ -106,6 +106,21 @@ public:
 			default: return false;
 		}
 	}
+	// TODO: get rid of this function
+	static inline bool IsAnyStairType(BlockState a_Block)
+	{
+		return IsBlockStairs(a_Block);
+	}
+
+	static inline ENUM_BLOCK_META GetRotation(BlockState a_Block)
+	{
+		UNREACHABLE("unimplemented");
+	}
+
+	static inline bool IsStairsUpsideDown(BlockState a_Block)
+	{
+		UNREACHABLE("unimplemented");
+	}
 
 private:
 

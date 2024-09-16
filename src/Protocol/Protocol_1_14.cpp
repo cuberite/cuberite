@@ -61,7 +61,7 @@ void cProtocol_1_14::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_B
 	Pkt.WriteXZYPosition64(a_BlockPos);
 	Pkt.WriteBEInt8(a_Byte1);
 	Pkt.WriteBEInt8(a_Byte2);
-	Pkt.WriteVarInt32(a_BlockType);
+	Pkt.WriteVarInt32(Palette_1_14::From(a_Block));
 }
 
 
@@ -82,11 +82,11 @@ void cProtocol_1_14::SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos, 
 
 
 
-void cProtocol_1_14::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cProtocol_1_14::SendBlockChange(Vector3i a_BlockPos, BlockState a_Block)
 {
 	cPacketizer Pkt(*this, pktBlockChange);
 	Pkt.WriteXZYPosition64(a_BlockPos);
-	Pkt.WriteVarInt32(GetProtocolBlockType(a_BlockType, a_BlockMeta));
+	Pkt.WriteVarInt32(Palette_1_14::From(a_Block));
 }
 
 
@@ -1127,9 +1127,7 @@ void cProtocol_1_14::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 				if (!MinecartContent.IsEmpty())
 				{
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockIDMeta, EntityMetadataType::VarInt);
-					int Content = MinecartContent.m_ItemType;
-					Content |= MinecartContent.m_ItemDamage << 8;
-					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
+					a_Pkt.WriteVarInt32(Palette_1_14::From(MinecartContent.m_ItemType));
 
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockY, EntityMetadataType::VarInt);
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
@@ -1308,10 +1306,12 @@ void cProtocol_1_14::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		{
 			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
 			WriteEntityMetadata(a_Pkt, EntityMetadata::EndermanCarriedBlock, EntityMetadataType::OptBlockID);
-			UInt32 Carried = 0;
-			Carried |= static_cast<UInt32>(Enderman.GetCarriedBlock() << 4);
-			Carried |= Enderman.GetCarriedMeta();
-			a_Pkt.WriteVarInt32(Carried);
+			auto Carried = Enderman.GetCarriedBlock();
+			a_Pkt.WriteBool(Carried != BlockType::Air);
+			if (Carried != BlockType::Air)
+			{
+				a_Pkt.WriteVarInt32(Palette_1_14::From(Carried));
+			}
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::EndermanScreaming, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Enderman.IsScreaming());

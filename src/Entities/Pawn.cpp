@@ -435,7 +435,7 @@ void cPawn::HandleFalling(void)
 		auto Damage = static_cast<int>(FallHeight - 3.0);
 
 		const auto Below = POS_TOINT.addedY(-1);
-		const auto BlockBelow = (cChunkDef::IsValidHeight(Below)) ? GetWorld()->GetBlock(Below) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
+		const auto BlockBelow = (cChunkDef::IsValidHeight(Below)) ? GetWorld()->GetBlock(Below) : Block::Air::Air();
 
 		if ((Damage > 0) && !FallDamageAbsorbed)
 		{
@@ -444,7 +444,7 @@ void cPawn::HandleFalling(void)
 				Damage = static_cast<int>(static_cast<float>(Damage) * 0.33);
 			}
 
-			if (BlockBelow == E_BLOCK_HAY_BALE)
+			if (BlockBelow == Block::HayBale::HayBale())
 			{
 				Damage = std::clamp(static_cast<int>(static_cast<float>(Damage) * 0.2), 1, 20);
 			}
@@ -489,7 +489,7 @@ void cPawn::HandleFalling(void)
 
 
 
-void cPawn::HandleFarmlandTrampling(const double a_FallHeight, const BLOCKTYPE a_BlockAtFoot, const BLOCKTYPE a_BlockBelow)
+void cPawn::HandleFarmlandTrampling(const double a_FallHeight, const BlockState a_BlockAtFoot, const BlockState a_BlockBelow)
 {
 	// No trampling if FallHeight <= 0.6875
 	if (a_FallHeight <= 0.6875)

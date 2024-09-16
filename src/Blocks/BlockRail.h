@@ -408,15 +408,15 @@ private:
 
 	static bool CanBeSupportedBy(BlockState a_Block)
 	{
-		if (cBlockSlabHandler::IsAnySlabType(a_BlockType))
+		if (cBlockSlabHandler::IsAnySlabType(a_Block))
 		{
-			return cBlockSlabHandler::IsSlabUpsideDown(a_Block)
+			return cBlockSlabHandler::IsSlabUpsideDown(a_Block);
 		}
-		else if (cBlockStairsHandler::IsAnyStairType(a_BlockType))
+		else if (cBlockStairsHandler::IsAnyStairType(a_Block))
 		{
 			return cBlockStairsHandler::IsStairsUpsideDown(a_Block);
 		}
-		return cBlockInfo::FullyOccupiesVoxel(a_BlockType);
+		return cBlockInfo::FullyOccupiesVoxel(a_Block);
 	}
 
 	virtual void OnPlaced(
@@ -479,11 +479,9 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		BLOCKTYPE BelowBlock;
-		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_Position.addedY(-1), BelowBlock, BelowBlockMeta);
+		BlockState BelowBlock = a_Chunk.GetBlock(a_Position.addedY(-1));
 
-		if ((a_Position.y <= 0) || !CanBeSupportedBy(BelowBlock, BelowBlockMeta))
+		if ((a_Position.y <= 0) || !CanBeSupportedBy(BelowBlock))
 		{
 			return false;
 		}
@@ -512,7 +510,7 @@ private:
 					// Too close to the edge, cannot simulate
 					return true;
 				}
-				return cBlockInfo::FullyOccupiesVoxel(BlockType);
+				return cBlockInfo::FullyOccupiesVoxel(Block);
 			}
 		}
 		return true;

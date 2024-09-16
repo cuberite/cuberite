@@ -228,7 +228,7 @@ private:
 	bool m_isTNTFused = false;
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	void HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt) override;
+	void HandleActivatorRailPhysics(BlockState a_Rail, std::chrono::milliseconds a_Dt) override;
 } ;
 
 

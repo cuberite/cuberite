@@ -182,15 +182,16 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Check if the rail is still there
 		if (m_World->GetBlock(m_DetectorRailPosition) == E_BLOCK_DETECTOR_RAIL)
 		{
-			m_World->SetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
+			m_World->SetBlock(m_DetectorRailPosition, m_World->GetBlock(m_DetectorRailPosition));
 		}
 
 		m_bIsOnDetectorRail = false;
 	}
 
-	BLOCKTYPE InsideType;
-	NIBBLETYPE InsideMeta;
-	chunk->GetBlockTypeMeta(relPos, InsideType, InsideMeta);
+	//BLOCKTYPE InsideType;
+	//NIBBLETYPE InsideMeta;
+	
+	BlockState InsideBlock = a_Chunk.GetBlock(RelPos);
 
 	auto ContainedBlock = Chunk->GetBlock(RelPos);
 	if (!cBlockRailHandler::IsBlockRail(ContainedBlock))
@@ -214,7 +215,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	if (cBlockRailHandler::IsBlockRail(InsideType))
+	if (cBlockRailHandler::IsBlockRail(InsideBlock))
 	{
 		if (ContainedBlock.Type() == BlockType::Rail)
 		{
@@ -228,7 +229,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		switch (ContainedBlock.Type())
 		{
 			case BlockType::Rail: HandleRailPhysics(ContainedBlock, a_Dt); break;
-			case BlockType::ActivatorRail: HandleActivatorRailPhysics(InsideMeta, a_Dt); break;
+			case BlockType::ActivatorRail: HandleActivatorRailPhysics(InsideBlock, a_Dt); break;
 			case BlockType::PoweredRail: HandlePoweredRailPhysics(ContainedBlock); break;
 			case BlockType::DetectorRail:
 			{
@@ -691,7 +692,7 @@ void cMinecart::HandleDetectorRailPhysics(BlockState a_Rail, std::chrono::millis
 
 void cMinecart::HandleActivatorRailPhysics(BlockState a_Rail, std::chrono::milliseconds a_Dt)
 {
-	m_World->SetBlock(m_DetectorRailPosition, Block::ActivatorRail::ActivatorRail(true, ActivatorRail::Shape(a_Rail)));
+	m_World->SetBlock(m_DetectorRailPosition, Block::ActivatorRail::ActivatorRail(true, Block::ActivatorRail::Shape(a_Rail)));
 	// TODO - shake minecart, throw entities out
 }
 
@@ -1535,11 +1536,11 @@ cMinecartWithTNT::cMinecartWithTNT(Vector3d a_Pos):
 
 
 
-void cMinecartWithTNT::HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt)
+void cMinecartWithTNT::HandleActivatorRailPhysics(BlockState a_Rail, std::chrono::milliseconds a_Dt)
 {
-	Super::HandleActivatorRailPhysics(a_RailMeta, a_Dt);
+	Super::HandleActivatorRailPhysics(a_Rail, a_Dt);
 
-	if ((a_RailMeta & 0x08) && !m_isTNTFused)
+	if (Block::ActivatorRail::Powered(a_Rail) && !m_isTNTFused)
 	{
 		m_isTNTFused = true;
 		m_TNTFuseTicksLeft = 80;

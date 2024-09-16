@@ -33,7 +33,7 @@ private:
 			(cBlockInfo::FullyOccupiesVoxel(BelowBlock)) ||
 			(cBlockSlabHandler::IsAnySlabType(BelowBlock) && cBlockSlabHandler::IsSlabTop(BelowBlock)) ||
 			(cBlockStairsHandler::IsAnyStairType(BelowBlock) && cBlockStairsHandler::IsStairsUpsideDown)
-		)
+		);
 	}
 
 

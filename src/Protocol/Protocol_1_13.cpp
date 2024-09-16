@@ -701,6 +701,10 @@ void cProtocol_1_13::HandlePacketNameItem(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_13::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
+	ContiguousByteBuffer Data;
+	a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace());
+
+	return;
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, NamespacedChannel);
 
 	const auto & [Namespace, Channel] = NamespaceSerializer::SplitNamespacedID(NamespacedChannel);
@@ -712,7 +716,7 @@ void cProtocol_1_13::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	ContiguousByteBuffer Data;
+	//ContiguousByteBuffer Data;
 
 	// Read the plugin message and relay to clienthandle:
 	a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace());

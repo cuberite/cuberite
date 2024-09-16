@@ -222,7 +222,7 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 			}
 			auto InspectRel = cChunkDef::AbsoluteToRelative(InspectPos);
 			BlockToCheck = Chunk->GetBlock(InspectRel);
-			if (IsWaterOrSolid((BlockType)))
+			if (IsWaterOrSolid((BlockToCheck)))
 			{
 				BelowRel = InspectRel;
 				InTheAir = false;
@@ -235,7 +235,7 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 		{
 			while (cChunkDef::IsValidHeight(BelowRel.addedY(-1)))
 			{
-				BlockToCheck = Chunk->GetBlockTypeMeta(BelowRel.addedY(-1));
+				BlockToCheck = Chunk->GetBlock(BelowRel.addedY(-1));
 				if (IsWaterOrSolid(BlockToCheck))
 				{
 					break;

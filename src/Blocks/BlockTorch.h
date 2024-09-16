@@ -57,10 +57,10 @@ public:
 				return (a_BlockFace != BLOCK_FACE_YM);
 			}
 		}
-		if (cBlockSlabHandler::IsAnyStairType(a_Block))
-		{
-			return (a_BlockFace == cBlockStairsHandler::GetRotation);
-		}
+		//if (cBlockStairsHandler::IsAnyStairType(a_Block))
+		//{
+		//	return (a_BlockFace == cBlockStairsHandler::GetRotation);
+		//}
 
 		switch (a_Block.Type())
 		{

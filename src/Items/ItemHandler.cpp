@@ -98,7 +98,7 @@
 
 namespace
 {
-	constexpr cDefaultItemHandler           Item11DiscHandler                          (E_ITEM_11_DISC);
+	/*constexpr cDefaultItemHandler           Item11DiscHandler                          (E_ITEM_11_DISC);
 	constexpr cDefaultItemHandler           Item13DiscHandler                          (E_ITEM_13_DISC);
 	constexpr cItemBoatHandler              ItemAcaciaBoatHandler                      (E_ITEM_ACACIA_BOAT);
 	constexpr cDefaultItemHandler           ItemAcaciaDoorBlockHandler                 (E_BLOCK_ACACIA_DOOR);
@@ -559,7 +559,7 @@ namespace
 	constexpr cDefaultItemHandler           ItemWorkbenchHandler                       (E_BLOCK_WORKBENCH);
 	constexpr cDefaultItemHandler           ItemWrittenBookHandler                     (E_ITEM_WRITTEN_BOOK);
 	constexpr cItemGlazedTerracottaHandler  ItemYellowGlazedTerracottaHandler          (E_BLOCK_YELLOW_GLAZED_TERRACOTTA);
-	constexpr cDefaultItemHandler           ItemYellowShulkerBoxHandler                (E_BLOCK_YELLOW_SHULKER_BOX);
+	constexpr cDefaultItemHandler           ItemYellowShulkerBoxHandler                (E_BLOCK_YELLOW_SHULKER_BOX);*/
 	constexpr cItemBoatHandler              ItemAcaciaBoatHandler                      (Item::AcaciaBoat);
 	constexpr cItemButtonHandler            ItemAcaciaButtonHandler                    (Item::AcaciaButton);
 	constexpr cItemDoorHandler              ItemAcaciaDoorHandler                      (Item::AcaciaDoor);

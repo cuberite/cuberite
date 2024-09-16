@@ -175,7 +175,7 @@ private:
 		// upside down slabs
 		if (cBlockSlabHandler::IsAnySlabType(SupportBlock))
 		{
-			return ((Face == BLOCK_FACE_YP) && ISSLABTOP(SupportBlock));
+			return ((Face == BLOCK_FACE_YP) && cBlockSlabHandler::IsSlabTop(SupportBlock));
 		}
 
 		// stairs (top and sides)

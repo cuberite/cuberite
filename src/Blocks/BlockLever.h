@@ -108,10 +108,12 @@ private:
 				case Block::Lever::Face::Ceiling: return !cBlockSlabHandler::IsSlabTop(Neighbour);
 			}
 		}
-		else if (cBlockStairsHandler::IsAnyStairType(NeighborBlockType))
+		else if (cBlockStairsHandler::IsAnyStairType(Neighbour))
 		{
-			switch (NeighborFace)
+			switch (NeighbourFace)
 			{
+				UNREACHABLE("unimplemented");
+				/*
 				case eBlockFace::BLOCK_FACE_YM:
 					return !(NeighborMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
 				case eBlockFace::BLOCK_FACE_YP:
@@ -127,7 +129,7 @@ private:
 				default:
 				{
 					return false;
-				}
+				}*/
 			}
 		}
 		return false;

@@ -81,7 +81,7 @@ public:
 				return false;
 			});
 
-		a_Chunk.SetBlock(a_RelPos, E_BLOCK_DIRT, 0);
+		a_Chunk.SetBlock(a_RelPos, BlockType::Dirt);
 	}
 
 

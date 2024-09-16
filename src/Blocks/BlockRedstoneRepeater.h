@@ -140,13 +140,13 @@ private:
 		// upside down slabs
 		if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
 		{
-			return BelowBlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN;
+			return cBlockSlabHandler::IsSlabDown(BelowBlock);
 		}
 
 		// upside down stairs
 		if (cBlockStairsHandler::IsAnyStairType(BelowBlock))
 		{
-			return cBlockSlabHandler::IsSlabTop(BelowBlock)
+			return cBlockSlabHandler::IsSlabTop(BelowBlock);
 		}
 
 		return false;
