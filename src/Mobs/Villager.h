@@ -44,7 +44,7 @@ public:
 	const cItemGrid & GetInventory(void) const { return m_Inventory; }
 
 	/** Returns true if the given blocktype are: crops, potatoes or carrots and they have full grown up. */
-	bool IsBlockFarmable(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool IsBlockFarmable(BlockState a_Block);
 
 	/** Returns true if the block at the given location is a fully grown up crop. */
 	bool IsHarvestable(Vector3i a_CropsPos);

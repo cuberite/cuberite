@@ -45,8 +45,8 @@ public:
 
 		// Make sure block that will be occupied by the item frame is free now:
 		const auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-		BLOCKTYPE Block = a_World->GetBlock(PlacePos);
-		if (Block != E_BLOCK_AIR)
+		auto Block = a_World->GetBlock(PlacePos);
+		if (Block != Block::Air::Air())
 		{
 			return false;
 		}

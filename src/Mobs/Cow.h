@@ -23,7 +23,7 @@ public:
 
 	virtual void GetFollowedItems(cItems & a_Items) override
 	{
-		a_Items.Add(E_ITEM_WHEAT);
+		a_Items.Add(Item::Wheat);
 	}
 
 } ;

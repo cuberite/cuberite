@@ -329,13 +329,13 @@ void cStructGenRavines::cRavine::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
 	int BlockStartZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 	int BlockEndX = BlockStartX + cChunkDef::Width;
 	int BlockEndZ = BlockStartZ + cChunkDef::Width;
-	for (cRavDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
+	for (const auto & Point : m_Points)
 	{
 		if (
-			(itr->m_BlockX + itr->m_Radius < BlockStartX) ||
-			(itr->m_BlockX - itr->m_Radius > BlockEndX) ||
-			(itr->m_BlockZ + itr->m_Radius < BlockStartZ) ||
-			(itr->m_BlockZ - itr->m_Radius > BlockEndZ)
+			(Point.m_BlockX + Point.m_Radius < BlockStartX) ||
+			(Point.m_BlockX - Point.m_Radius > BlockEndX) ||
+			(Point.m_BlockZ + Point.m_Radius < BlockStartZ) ||
+			(Point.m_BlockZ - Point.m_Radius > BlockEndZ)
 		)
 		{
 			// Cannot intersect, bail out early
@@ -343,44 +343,43 @@ void cStructGenRavines::cRavine::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
 		}
 
 		// Carve out a cylinder around the xz point, m_Radius in diameter, from Bottom to Top:
-		int RadiusSq = itr->m_Radius * itr->m_Radius;  // instead of doing sqrt for each distance, we do sqr of the radius
-		int DifX = BlockStartX - itr->m_BlockX;  // substitution for faster calc
-		int DifZ = BlockStartZ - itr->m_BlockZ;  // substitution for faster calc
+		int RadiusSq = Point.m_Radius * Point.m_Radius;  // instead of doing sqrt for each distance, we do sqr of the radius
+		int DifX = BlockStartX - Point.m_BlockX;  // substitution for faster calc
+		int DifZ = BlockStartZ - Point.m_BlockZ;  // substitution for faster calc
 		for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
 		{
 			#ifndef NDEBUG
 			// DEBUG: Make the ravine shapepoints visible on a single layer (so that we can see with Minutor what's going on)
 			if ((DifX + x == 0) && (DifZ + z == 0))
 			{
-				a_ChunkDesc.SetBlockType(x, 4, z, E_BLOCK_LAPIS_ORE);
+				a_ChunkDesc.SetBlock({x, 4, z}, Block::LapisOre::LapisOre());
 			}
 			#endif  // !NDEBUG
 
 			int DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
 			if (DistSq <= RadiusSq)
 			{
-				int Top = std::min(itr->m_Top, static_cast<int>(cChunkDef::Height));  // Stupid gcc needs int cast
-				for (int y = std::max(itr->m_Bottom, 1); y <= Top; y++)
+				int Top = std::min(Point.m_Top, static_cast<int>(cChunkDef::Height));  // Stupid gcc needs int cast
+				for (int y = std::max(Point.m_Bottom, 1); y <= Top; y++)
 				{
-					switch (a_ChunkDesc.GetBlockType(x, y, z))
+					switch (a_ChunkDesc.GetBlock({x, y, z}).Type())
 					{
 						// Only carve out these specific block types
-						case E_BLOCK_DIRT:
-						case E_BLOCK_GRASS:
-						case E_BLOCK_STONE:
-						case E_BLOCK_COBBLESTONE:
-						case E_BLOCK_GRAVEL:
-						case E_BLOCK_SAND:
-						case E_BLOCK_SANDSTONE:
-						case E_BLOCK_NETHERRACK:
-						case E_BLOCK_COAL_ORE:
-						case E_BLOCK_IRON_ORE:
-						case E_BLOCK_GOLD_ORE:
-						case E_BLOCK_DIAMOND_ORE:
-						case E_BLOCK_REDSTONE_ORE:
-						case E_BLOCK_REDSTONE_ORE_GLOWING:
+						case BlockType::Dirt:
+						case BlockType::GrassBlock:
+						case BlockType::Stone:
+						case BlockType::Cobblestone:
+						case BlockType::Gravel:
+						case BlockType::Sand:
+						case BlockType::Sandstone:
+						case BlockType::Netherrack:
+						case BlockType::CoalOre:
+						case BlockType::IronOre:
+						case BlockType::GoldOre:
+						case BlockType::DiamondOre:
+						case BlockType::RedstoneOre:
 						{
-							a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
+							a_ChunkDesc.SetBlock({x, y, z}, Block::Air::Air());
 							break;
 						}
 						default: break;

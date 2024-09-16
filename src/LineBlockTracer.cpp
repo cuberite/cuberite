@@ -54,15 +54,15 @@ bool cLineBlockTracer::LineOfSightTrace(cWorld & a_World, const Vector3d & a_Sta
 			m_IsLavaOpaque(a_IsLavaOpaque)
 		{}
 
-		virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		virtual bool OnNextBlock(Vector3i a_BlockPos, BlockState a_Block, eBlockFace a_EntryFace) override
 		{
-			switch (a_BlockType)
+			switch (a_Block.Type())
 			{
-				case E_BLOCK_AIR:              return m_IsAirOpaque;
-				case E_BLOCK_LAVA:             return m_IsLavaOpaque;
-				case E_BLOCK_STATIONARY_LAVA:  return m_IsLavaOpaque;
-				case E_BLOCK_STATIONARY_WATER: return m_IsWaterOpaque;
-				case E_BLOCK_WATER:            return m_IsWaterOpaque;
+				case BlockType::Air:
+				case BlockType::CaveAir:
+				case BlockType::VoidAir: return m_IsAirOpaque;
+				case BlockType::Lava:    return m_IsLavaOpaque;
+				case BlockType::Water:   return m_IsWaterOpaque;
 				default: return true;
 			}
 		}
@@ -98,9 +98,9 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 		{
 		}
 
-		virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		virtual bool OnNextBlock(Vector3i a_BlockPos, BlockState a_Block, eBlockFace a_EntryFace) override
 		{
-			if (!cBlockInfo::IsSolid(a_BlockType))
+			if (!cBlockInfo::IsSolid(a_Block))
 			{
 				return false;
 			}
@@ -323,12 +323,10 @@ bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 		// Report the current block through the callbacks:
 		if (a_Chunk->IsValid())
 		{
-			BLOCKTYPE BlockType;
-			NIBBLETYPE BlockMeta;
 			int RelX = m_Current.x - a_Chunk->GetPosX() * cChunkDef::Width;
 			int RelZ = m_Current.z - a_Chunk->GetPosZ() * cChunkDef::Width;
-			a_Chunk->GetBlockTypeMeta(RelX, m_Current.y, RelZ, BlockType, BlockMeta);
-			if (m_Callbacks->OnNextBlock(m_Current, BlockType, BlockMeta, m_CurrentFace))
+			auto BlockToCheck = a_Chunk->GetBlock({RelX, m_Current.y, RelZ});
+			if (m_Callbacks->OnNextBlock(m_Current, BlockToCheck, m_CurrentFace))
 			{
 				// The callback terminated the trace
 				return false;

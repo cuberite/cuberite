@@ -21,13 +21,17 @@
 #include "../WorldStorage/StatisticsSerializer.h"
 #include "../CompositeChat.h"
 
-#include "../Blocks/BlockHandler.h"
-#include "../Blocks/BlockSlab.h"
-#include "../Blocks/ChunkInterface.h"
+#include "Blocks/BlockHandler.h"
+#include "Blocks/BlockBed.h"
+#include "Blocks/BlockSlab.h"
+#include "Blocks/ChunkInterface.h"
 
-#include "../IniFile.h"
-#include "../JsonUtils.h"
+#include "IniFile.h"
+#include "JsonUtils.h"
 #include "json/json.h"
+
+#include "../Blocks/BlockAir.h"
+#include "../Blocks/BlockFluid.h"
 
 #include "../CraftingRecipes.h"
 
@@ -699,7 +703,7 @@ void cPlayer::SetCrouch(const bool a_ShouldCrouch)
 
 void cPlayer::SetElytraFlight(const bool a_ShouldElytraFly)
 {
-	if (a_ShouldElytraFly && IsStanding() && !IsOnGround() && !IsInWater() && !IsRiding() && (GetEquippedChestplate().m_ItemType == E_ITEM_ELYTRA))
+	if (a_ShouldElytraFly && IsStanding() && !IsOnGround() && !IsInWater() && !IsRiding() && (GetEquippedChestplate().m_ItemType == Item::Elytra))
 	{
 		m_BodyStance = BodyStanceGliding(*this);
 	}
@@ -892,7 +896,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 	if (GetName() == "Notch")
 	{
-		Pickups.Add(cItem(E_ITEM_RED_APPLE));
+		Pickups.Add(cItem(Item::Apple));
 	}
 	m_Stats.Custom[CustomStatistic::Drop] +=  static_cast<StatisticsManager::StatValue>(Pickups.Size());
 
@@ -977,7 +981,7 @@ void cPlayer::Respawn(void)
 	if (!m_IsRespawnPointForced)
 	{
 		// Check if the bed is still present:
-		if (GetRespawnWorld()->GetBlock(m_RespawnPosition) != E_BLOCK_BED)
+		if (!cBlockBedHandler::IsBlockBed(GetRespawnWorld()->GetBlock(m_RespawnPosition)))
 		{
 			const auto & DefaultWorld = *cRoot::Get()->GetDefaultWorld();
 
@@ -2100,7 +2104,7 @@ void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
 	if (m_Inventory.DamageItem(a_SlotNumber, ReducedDamage))
 	{
 		// The item broke. Broadcast the correct animation:
-		if (Item.m_ItemType == E_ITEM_SHIELD)
+		if (Item.m_ItemType == Item::Shield)
 		{
 			m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnShieldBreaks);
 		}
@@ -2120,7 +2124,7 @@ void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
 			}
 		}
 	}
-	else if (Item.m_ItemType == E_ITEM_SHIELD)
+	else if (Item.m_ItemType == Item::Shield)
 	{
 		// The item survived. Special case for shield blocking:
 		m_World->BroadcastEntityAnimation(*this, EntityAnimation::PawnShieldBlocks);
@@ -2189,7 +2193,7 @@ void cPlayer::HandleFood(void)
 
 void cPlayer::HandleFloater()
 {
-	if (GetEquippedItem().m_ItemType == E_ITEM_FISHING_ROD)
+	if (GetEquippedItem().m_ItemType == Item::FishingRod)
 	{
 		return;
 	}
@@ -2215,11 +2219,11 @@ bool cPlayer::IsClimbing(void) const
 		return false;
 	}
 
-	BLOCKTYPE Block = m_World->GetBlock(Position);
-	switch (Block)
+	auto Block = m_World->GetBlock(Position);
+	switch (Block.Type())
 	{
-		case E_BLOCK_LADDER:
-		case E_BLOCK_VINES:
+		case BlockType::Ladder:
+		case BlockType::Vine:
 		{
 			return true;
 		}
@@ -2350,7 +2354,7 @@ void cPlayer::SendBlocksAround(Vector3i a_BlockPos, int a_Range)
 		{
 			for (int x = a_BlockPos.x - a_Range + 1; x < a_BlockPos.x + a_Range; x++)
 			{
-				blks.emplace_back(x, y, z, E_BLOCK_AIR, static_cast<NIBBLETYPE>(0));  // Use fake blocktype, it will get set later on.
+				blks.emplace_back(x, y, z, Block::Air::Air());  // Use fake blocktype, it will get set later on.
 			}
 		}
 	}  // for y
@@ -2392,11 +2396,11 @@ bool cPlayer::DoesPlacingBlocksIntersectEntity(const std::initializer_list<sSetB
 		int x = blk.GetX();
 		int y = blk.GetY();
 		int z = blk.GetZ();
-		cBoundingBox BlockBox = cBlockHandler::For(blk.m_BlockType).GetPlacementCollisionBox(
+		cBoundingBox BlockBox = cBlockHandler::For(blk.m_Block.Type()).GetPlacementCollisionBox(
 			m_World->GetBlock({ x - 1, y, z }),
 			m_World->GetBlock({ x + 1, y, z }),
-			(y == 0) ? static_cast<BLOCKTYPE>(E_BLOCK_AIR) : m_World->GetBlock({ x, y - 1, z }),
-			(y == cChunkDef::Height - 1) ? static_cast<BLOCKTYPE>(E_BLOCK_AIR) : m_World->GetBlock({ x, y + 1, z }),
+			(y == 0) ? Block::Air::Air() : m_World->GetBlock({ x, y - 1, z }),
+			(y == cChunkDef::Height - 1) ? Block::Air::Air() : m_World->GetBlock({ x, y + 1, z }),
 			m_World->GetBlock({ x, y, z - 1 }),
 			m_World->GetBlock({ x, y, z + 1 })
 		);
@@ -2455,9 +2459,9 @@ const cUUID & cPlayer::GetUUID(void) const
 
 
 
-bool cPlayer::PlaceBlock(const Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPlayer::PlaceBlock(const Vector3i a_Position, BlockState a_Block)
 {
-	return PlaceBlocks({ { a_Position, a_BlockType, a_BlockMeta } });
+	return PlaceBlocks({ { a_Position, a_Block } });
 }
 
 
@@ -2493,7 +2497,7 @@ bool cPlayer::PlaceBlocks(const std::initializer_list<sSetBlock> a_Blocks)
 		if (
 			!m_World->DoWithChunkAt(Block.GetAbsolutePos(), [&Block](cChunk & a_Chunk)
 			{
-				return cBlockHandler::For(Block.m_BlockType).CanBeAt(a_Chunk, Block.GetRelativePos(), Block.m_BlockMeta);
+				return cBlockHandler::For(Block.m_Block.Type()).CanBeAt(a_Chunk, Block.GetRelativePos(), Block.m_Block);
 			})
 		)
 		{
@@ -2517,7 +2521,7 @@ bool cPlayer::PlaceBlocks(const std::initializer_list<sSetBlock> a_Blocks)
 		m_World->NewPlaceBlock(Block.GetAbsolutePos(), Block.m_BlockIdNew);
 
 		// Set the blocks:
-		// m_World->PlaceBlock(Block.GetAbsolutePos(), Block.m_BlockType, Block.m_BlockMeta);
+		m_World->PlaceBlock(Block.GetAbsolutePos(), Block.m_Block);
 
 		// Call the "placed" hooks:
 		pm->CallHookPlayerPlacedBlock(*this, Block);
@@ -2591,13 +2595,14 @@ void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
 
 
 
-float cPlayer::GetLiquidHeightPercent(NIBBLETYPE a_Meta)
+float cPlayer::GetLiquidHeightPercent(BlockState a_Block)
 {
-	if (a_Meta >= 8)
+	auto Falloff = cBlockFluidHandler::GetFalloff(a_Block);
+	if (Falloff >= 8)
 	{
-		a_Meta = 0;
+		Falloff = 0;
 	}
-	return static_cast<float>(a_Meta + 1) / 9.0f;
+	return static_cast<float>(Falloff + 1) / 9.0f;
 }
 
 
@@ -2614,17 +2619,15 @@ bool cPlayer::IsInsideWater()
 		return false;
 	}
 
-	BLOCKTYPE Block;
-	NIBBLETYPE Meta;
-	m_World->GetBlockTypeMeta(EyePos, Block, Meta);
+	auto Block = m_World->GetBlock(EyePos);
 
-	if ((Block != E_BLOCK_WATER) && (Block != E_BLOCK_STATIONARY_WATER))
+	if (Block.Type() != BlockType::Water)
 	{
 		return false;
 	}
 
 	const auto EyeHeight = GetEyeHeight();
-	float f = GetLiquidHeightPercent(Meta) - 0.11111111f;
+	float f = GetLiquidHeightPercent(Block) - 0.11111111f;
 	float f1 = static_cast<float>(EyeHeight + 1) - f;
 	return EyeHeight < f1;
 }
@@ -2633,7 +2636,7 @@ bool cPlayer::IsInsideWater()
 
 
 
-float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
+float cPlayer::GetDigSpeed(BlockState a_Block)
 {
 	// Based on: https://minecraft.wiki/w/Breaking#Speed
 
@@ -2681,7 +2684,7 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 	}
 
 	// 5x speed loss for being in water
-	if (IsInsideWater() && !(GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) > 0))
+	if (IsInsideWater() && GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::eEnchantment::enchAquaAffinity) <= 0)
 	{
 		MiningSpeed /= 5.0f;
 	}
@@ -2699,7 +2702,7 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 
 
 
-float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
+float cPlayer::GetMiningProgressPerTick(BlockState a_Block)
 {
 	// Based on https://minecraft.wiki/w/Breaking#Calculation
 	// If we know it's instantly breakable then quit here:
@@ -2722,7 +2725,7 @@ float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 
 
 
-bool cPlayer::CanInstantlyMine(BLOCKTYPE a_Block)
+bool cPlayer::CanInstantlyMine(BlockState a_Block)
 {
 	// Based on: https://minecraft.wiki/w/Breaking#Calculation
 
@@ -2736,11 +2739,6 @@ bool cPlayer::CanInstantlyMine(BLOCKTYPE a_Block)
 
 void cPlayer::AddKnownItem(const cItem & a_Item)
 {
-	if (a_Item.m_ItemType < 0)
-	{
-		return;
-	}
-
 	auto Response = m_KnownItems.insert(a_Item.CopyOne());
 	if (!Response.second)
 	{
@@ -3084,8 +3082,8 @@ void cPlayer::OnDetach()
 			for (int z = PosZ - 1; z <= (PosZ + 1); ++z)
 			{
 				if (
-					(m_World->GetBlock({ x, y, z }) == E_BLOCK_AIR) &&
-					(m_World->GetBlock({ x, y + 1, z }) == E_BLOCK_AIR) &&
+					(cBlockAirHandler::IsBlockAir(m_World->GetBlock({ x, y, z }))) &&
+					(cBlockAirHandler::IsBlockAir(m_World->GetBlock({ x, y + 1, z }))) &&
 					cBlockInfo::IsSolid(m_World->GetBlock({ x, y - 1, z }))
 				)
 				{
@@ -3255,7 +3253,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 
 		// Check if flight is still possible:
-		if (IsOnGround() || IsInWater() || IsRiding() || (GetEquippedChestplate().m_ItemType != E_ITEM_ELYTRA))
+		if (IsOnGround() || IsInWater() || IsRiding() || (GetEquippedChestplate().m_ItemType != Item::Elytra))
 		{
 			SetElytraFlight(false);
 		}
@@ -3263,7 +3261,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	else if (IsInBed())
 	{
 		// Check if sleeping is still possible:
-		if ((GetPosition().Floor() != m_RespawnPosition) || (m_World->GetBlock(m_RespawnPosition) != E_BLOCK_BED))
+		if ((GetPosition().Floor() != m_RespawnPosition) || (cBlockBedHandler::IsBlockBed(m_World->GetBlock(m_RespawnPosition))))
 		{
 			m_ClientHandle->HandleLeaveBed();
 		}

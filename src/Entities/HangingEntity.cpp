@@ -23,9 +23,9 @@ cHangingEntity::cHangingEntity(eEntityType a_EntityType, eBlockFace a_Facing, Ve
 
 
 
-bool cHangingEntity::IsValidSupportBlock(const BLOCKTYPE a_BlockType)
+bool cHangingEntity::IsValidSupportBlock(const BlockState a_Block)
 {
-	return cBlockInfo::IsSolid(a_BlockType) && (a_BlockType != E_BLOCK_REDSTONE_REPEATER_OFF) && (a_BlockType != E_BLOCK_REDSTONE_REPEATER_ON);
+	return cBlockInfo::IsSolid(a_Block.Type()) && (a_Block.Type() != BlockType::Repeater);
 }
 
 
@@ -62,9 +62,9 @@ void cHangingEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	BLOCKTYPE Block;
+	BlockState Block;
 	const auto SupportPosition = AddFaceDirection(cChunkDef::AbsoluteToRelative(GetPosition()), ProtocolFaceToBlockFace(m_Facing), true);
-	if (!a_Chunk.UnboundedRelGetBlockType(SupportPosition, Block) || IsValidSupportBlock(Block))
+	if (!a_Chunk.UnboundedRelGetBlock(SupportPosition, Block) || IsValidSupportBlock(Block))
 	{
 		return;
 	}

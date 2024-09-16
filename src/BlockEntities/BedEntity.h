@@ -20,7 +20,7 @@ class cBedEntity :
 
 public:  // tolua_export
 
-	cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, short a_Color = E_META_WOOL_RED);
+	cBedEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World, short a_Color = E_META_WOOL_RED);
 
 	// tolua_begin
 
@@ -29,9 +29,6 @@ public:  // tolua_export
 
 	/** Set the color of the bed. */
 	void SetColor(short a_Color);
-
-	/** Returns true if this is the pillow block, it has then the meta 8. */
-	bool IsPillowBlock(void) { return ((m_BlockMeta & 0x08) == 0x08); }
 
 	// tolua_end
 

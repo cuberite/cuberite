@@ -8,16 +8,17 @@
 #include "../Entities/Player.h"
 #include "../ClientHandle.h"
 #include "../Blocks/BlockBed.h"
+#include "../Registries/BlockItemConverter.h"
 
 
 
 
 
-cBedEntity::cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, short a_Color):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+cBedEntity::cBedEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World, short a_Color):
+	Super(a_Block, a_Pos, a_World),
 	m_Color(a_Color)
 {
-	ASSERT(a_BlockType == E_BLOCK_BED);
+	ASSERT(cBlockBedHandler::IsBlockBed(a_Block.Type()));
 }
 
 
@@ -26,7 +27,7 @@ cBedEntity::cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a
 
 cItems cBedEntity::ConvertToPickups() const
 {
-	return cItem(E_ITEM_BED, 1, m_Color);
+	return cItem(BlockItemConverter::FromBlock(m_Block.Type()));
 }
 
 

@@ -18,28 +18,19 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
-	{
-		return cItem(E_ITEM_SUGARCANE, 1, 0);
-	}
-
-
-
-
-
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		if (a_Position.y <= 0)
 		{
 			return false;
 		}
 
-		switch (a_Chunk.GetBlock(a_Position.addedY(-1)))
+		switch (a_Chunk.GetBlock(a_Position.addedY(-1)).Type())
 		{
-			case E_BLOCK_DIRT:
-			case E_BLOCK_GRASS:
-			case E_BLOCK_FARMLAND:
-			case E_BLOCK_SAND:
+			case BlockType::Dirt:
+			case BlockType::GrassBlock:
+			case BlockType::Farmland:
+			case BlockType::Sand:
 			{
 				static const Vector3i Coords[] =
 				{
@@ -50,14 +41,13 @@ private:
 				} ;
 				for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 				{
-					BLOCKTYPE BlockType;
-					NIBBLETYPE BlockMeta;
-					if (!a_Chunk.UnboundedRelGetBlock(a_Position + Coords[i], BlockType, BlockMeta))
+					BlockState Block;
+					if (!a_Chunk.UnboundedRelGetBlock(a_Position + Coords[i], Block))
 					{
 						// Too close to the edge, cannot simulate
 						return true;
 					}
-					if (IsBlockWater(BlockType) || (BlockType == E_BLOCK_FROSTED_ICE))
+					if ((Block.Type() == BlockType::Water) || (Block.Type() == BlockType::FrostedIce))
 					{
 						return true;
 					}
@@ -65,21 +55,20 @@ private:
 				// Not directly neighboring a water block
 				return false;
 			}
-			case E_BLOCK_SUGARCANE:
+			case BlockType::SugarCane:
 			{
 				return true;
 			}
+			default: return false;
 		}
-		return false;
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 7;
 	}
 
@@ -87,34 +76,35 @@ private:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, char a_NumStages = 1) const override
 	{
 		// Check the total height of the sugarcane blocks here:
-		int top = a_RelPos.y + 1;
+		int TopY = a_RelPos.y + 1;
 		while (
-			(top < cChunkDef::Height) &&
-			(a_Chunk.GetBlock({a_RelPos.x, top, a_RelPos.z}) == E_BLOCK_SUGARCANE)
+			(TopY < cChunkDef::Height) &&
+			(a_Chunk.GetBlock({a_RelPos.x, TopY, a_RelPos.z}).Type() == BlockType::SugarCane)
 		)
 		{
-			++top;
+			++TopY;
 		}
 		int bottom = a_RelPos.y - 1;
 		while (
 			(bottom > 0) &&
-			(a_Chunk.GetBlock({a_RelPos.x, bottom, a_RelPos.z}) == E_BLOCK_SUGARCANE)
+			(a_Chunk.GetBlock({a_RelPos.x, bottom, a_RelPos.z}).Type() == BlockType::SugarCane)
 		)
 		{
 			--bottom;
 		}
+		const auto NumStages = static_cast<unsigned char>(std::clamp<char>(a_NumStages, 0, std::numeric_limits<char>::max()));
 
 		// Grow by at most a_NumStages, but no more than max height:
-		auto toGrow = std::min(a_NumStages, a_Chunk.GetWorld()->GetMaxSugarcaneHeight() + 1 - (top - bottom));
-		Vector3i topPos(a_RelPos.x, top, a_RelPos.z);
+		auto toGrow = std::min<unsigned char>(NumStages, static_cast<unsigned char>(a_Chunk.GetWorld()->GetMaxSugarcaneHeight() + 1 - (TopY - bottom)));
+		Vector3i TopYPos(a_RelPos.x, TopY, a_RelPos.z);
 		for (int i = 0; i < toGrow; i++)
 		{
-			if (a_Chunk.GetBlock(topPos.addedY(i)) == E_BLOCK_AIR)
+			if (cBlockAirHandler::IsBlockAir(a_Chunk.GetBlock(TopYPos.addedY(i))))
 			{
-				a_Chunk.SetBlock(topPos.addedY(i), E_BLOCK_SUGARCANE, 0);
+				a_Chunk.SetBlock(TopYPos.addedY(i), Block::SugarCane::SugarCane());
 			}
 			else
 			{
@@ -127,7 +117,7 @@ private:
 	virtual PlantAction CanGrow(cChunk & a_Chunk, Vector3i a_RelPos) const override
 	{
 		// Only allow growing if there's an air block above:
-		if (((a_RelPos.y + 1) < cChunkDef::Height) && (a_Chunk.GetBlock(a_RelPos.addedY(1)) == E_BLOCK_AIR))
+		if (((a_RelPos.y + 1) < cChunkDef::Height) && (cBlockAirHandler::IsBlockAir(a_Chunk.GetBlock(a_RelPos.addedY(1)))))
 		{
 			return Super::CanGrow(a_Chunk, a_RelPos);
 		}

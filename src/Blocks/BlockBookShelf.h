@@ -10,17 +10,18 @@ class cBlockBookShelfHandler final :
 	public cBlockHandler
 {
 public:
+	using Super = cBlockHandler;
 
-	using cBlockHandler::cBlockHandler;
+	using Super::Super;
 
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		if (ToolHasSilkTouch(a_Tool))
 		{
-			return cItem(m_BlockType, 1);
+			return cItem(Item::Bookshelf, 1);
 		}
-		return cItem(E_ITEM_BOOK, 3);
+		return cItem(Item::Book, 3);
 	}
 };

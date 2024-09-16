@@ -1112,6 +1112,29 @@ return
 					},
 					Notes = "Sets the biome at the specified relative coords.",
 				},
+				SetBlock =
+				{
+					Params =
+					{
+						{
+							Name = "RelX",
+							Type = "number",
+						},
+						{
+							Name = "RelY",
+							Type = "number",
+						},
+						{
+							Name = "RelZ",
+							Type = "number",
+						},
+						{
+							Name = "Block",
+							Type = "number",
+						},
+					},
+					Notes = "Sets the block at the specified relative coords.",
+				},
 				SetBlockMeta =
 				{
 					Params =
@@ -1301,7 +1324,7 @@ function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
 	local Height = a_ChunkDesc:GetHeight(0, 0);
 
 	-- Create a sign there:
-	a_ChunkDesc:SetBlockTypeMeta(0, Height + 1, 0, E_BLOCK_SIGN_POST, 0);
+	a_ChunkDesc:SetBlockTypeMeta(0, Height + 1, 0, E_ITEM_SIGN_POST, 0);
 	local BlockEntity = a_ChunkDesc:GetBlockEntity(0, Height + 1, 0);
 	if (BlockEntity ~= nil) then
 		LOG("Setting sign lines...");
@@ -7452,7 +7475,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				m_ItemType =
 				{
 					Type = "number",
-					Notes = "The item type. One of E_ITEM_ or E_BLOCK_ constants",
+					Notes = "The item type. One of E_ITEM_ or E_ITEM_ constants",
 				},
 				m_LoreTable =
 				{
@@ -9963,6 +9986,17 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
+				GetBlock =
+				{
+					Returns =
+					{
+						{
+							Name = "Block",
+							Type = "number",
+						}
+					},
+					Notes = "Returns the block of the falling block.",
+				},
 				GetBlockType =
 				{
 					Returns =
@@ -14490,6 +14524,31 @@ end
 					},
 					Notes = "Converts an {{Globals#eDimension|eDimension}} to a string value. Returns Overworld on failure.",
 				},
+				DisplacementYawToFacing =
+				{
+					Params =
+					{
+						{
+							Name = "PlacePosition",
+							Type = "Vector3d",
+						},
+						{
+							Name = "EyePosition",
+							Type = "Vector3d",
+						},
+						{
+							Name = "Yaw",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace"
+						},
+					},
+					Notes = "Takes a position and the direction the player is looking at and returns a proper rotation",
+				},
 				EscapeString =
 				{
 					Params =
@@ -14877,6 +14936,40 @@ end
 					},
 					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the Y axis (or rotating 180 degrees around it).",
 				},
+				MirrorBlockFaceXY =
+				{
+					Params =
+					{
+						{
+							Name = "eBlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the XY plane.",
+				},
+				MirrorBlockFaceYZ =
+				{
+					Params =
+					{
+						{
+							Name = "eBlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the YZ plane.",
+				},
 				NoCaseCompare =
 				{
 					Params =
@@ -14991,6 +15084,45 @@ end
 						},
 					},
 					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after rotating it around the Y axis 90 degrees clockwise.",
+				},
+				RotationToBlockFace =
+				{
+					Params =
+					{
+						{
+							Name = "player rotation",
+							Type = "number",
+						},
+						{
+							Name = "invert",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that is calculated from the player rotation. Can be inverted.",
+				},
+				RotationToFineFace =
+				{
+					Params =
+					{
+						{
+							Name = "player rotation",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns a value [0, 15] that indicates the rotation. Is used to calculate banner, singn, ... rotation.",
 				},
 				StringSplit =
 				{
@@ -16589,6 +16721,10 @@ end
 				{
 					Notes = "The blocktype for water"
 				},
+				E_BLOCK_WHEAT =
+				{
+					Notes = "The blocktype for wheat"
+				},
 				E_BLOCK_WHITE_GLAZED_TERRACOTTA =
 				{
 					Notes = "The blocktype for white glazed terracotta"
@@ -16717,7 +16853,7 @@ end
 				{
 					Notes = "The itemtype for book"
 				},
-				E_ITEM_BOOK_AND_QUILL =
+				E_BLOCK_BOOK_AND_QUILL =
 				{
 					Notes = "The itemtype for book and quill"
 				},
@@ -18388,7 +18524,7 @@ end
 				},
 				eBlockType =
 				{
-					Include = "^E_BLOCK_.*",
+					Include = "^E_ITEM_.*",
 					TextBefore = [[
 						These constants are used for block types. They correspond directly with MineCraft's data values
 						for blocks.
@@ -19304,7 +19440,7 @@ end
 		"cLuaWindow.__cItemGrid__cListener__",
 		"Globals._CuberiteInternal_.*",
 		"Globals.esMax",
-		"Globals.E_BLOCK_*",
+		"Globals.E_ITEM_*",
 	},
 	IgnoreVariables =
 	{

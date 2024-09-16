@@ -15,7 +15,7 @@ class cItemEyeOfEnderHandler final:
 
 public:
 
-	constexpr cItemEyeOfEnderHandler(int a_ItemType):
+	constexpr cItemEyeOfEnderHandler(Item a_ItemType):
 		Super(a_ItemType, cProjectileEntity::pkSnowball, 30)
 	{
 	}
@@ -30,29 +30,30 @@ public:
 		eBlockFace a_ClickedBlockFace
 	) const override
 	{
+		using namespace Block;
+
 		// Try to fill an End Portal Frame block:
 		if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
-			BLOCKTYPE FacingBlock;
-			NIBBLETYPE FacingMeta;
-			a_World->GetBlockTypeMeta(a_ClickedBlockPos, FacingBlock, FacingMeta);
-			if (FacingBlock == E_BLOCK_END_PORTAL_FRAME)
+			auto DestBlock = a_World->GetBlock(a_ClickedBlockPos);
+			if (DestBlock.Type() == BlockType::EndPortalFrame)
 			{
-				// Fill the portal frame. E_META_END_PORTAL_EYE is the bit for holding the eye of ender.
-				if ((FacingMeta & E_META_END_PORTAL_FRAME_EYE) != E_META_END_PORTAL_FRAME_EYE)
+				if (EndPortalFrame::Eye(DestBlock))
 				{
-					a_World->SetBlock(a_ClickedBlockPos, E_BLOCK_END_PORTAL_FRAME, FacingMeta | E_META_END_PORTAL_FRAME_EYE);
-					if (!a_Player->IsGameModeCreative())
-					{
-						a_Player->GetInventory().RemoveOneEquippedItem();
-					}
-
-					cChunkInterface ChunkInterface(a_World->GetChunkMap());
-
-					// Try to spawn portal:
-					FindAndSetPortal(a_ClickedBlockPos, FacingMeta & 3, ChunkInterface, *a_World);
-					return true;
+					return false;
 				}
+
+				a_World->SetBlock(a_ClickedBlockPos, EndPortalFrame::EndPortalFrame(true, EndPortalFrame::Facing(DestBlock)));
+				if (!a_Player->IsGameModeCreative())
+				{
+					a_Player->GetInventory().RemoveOneEquippedItem();
+				}
+
+				cChunkInterface ChunkInterface(a_World->GetChunkMap());
+
+				// Try to spawn portal:
+				FindAndSetPortal(a_ClickedBlockPos, EndPortalFrame::Facing(DestBlock), ChunkInterface, *a_World);
+				return true;
 			}
 			return false;
 		}
@@ -67,10 +68,10 @@ public:
 
 
 	/** Returns false if portal cannot be made, true if portal was made. */
-	static bool FindAndSetPortal(Vector3i a_FirstFrame, NIBBLETYPE a_Direction, cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface)
+	static bool FindAndSetPortal(Vector3i a_FirstFrame, eBlockFace a_Direction, cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface)
 	{
 		/*
-		PORTAL FINDING ALGORITH
+		PORTAL FINDING ALGORITHM
 		=======================
 		- Get clicked base block
 		- Check diagonally (clockwise) for another portal block
@@ -106,7 +107,7 @@ public:
 		int EdgesComplete = -1;  // We start search _before_ finding the first edge
 		Vector3i NorthWestCorner;
 		int EdgeWidth[4] = { 1, 1, 1, 1 };
-		NIBBLETYPE CurrentDirection = a_Direction;
+		auto CurrentDirection = a_Direction;
 		Vector3i CurrentPos = a_FirstFrame;
 
 		// Scan clockwise until we have seen all 4 edges
@@ -114,10 +115,10 @@ public:
 		{
 			// Check if we are at a corner
 			Vector3i NextPos = CurrentPos + LeftForward[CurrentDirection];
-			if (IsPortalFrame(a_ChunkInterface.GetBlock(NextPos)))
+			if (a_ChunkInterface.GetBlock(NextPos).Type() == BlockType::EndPortalFrame)
 			{
 				// We have found the corner, move clockwise to next edge
-				if (CurrentDirection == E_META_END_PORTAL_FRAME_XP)
+				if (CurrentDirection == eBlockFace::BLOCK_FACE_XP)
 				{
 					// We are on the NW (XM, ZM) Corner
 					// Relative to the previous frame, the portal should appear to the right of this portal frame.
@@ -131,7 +132,7 @@ public:
 				}
 
 				// Rotate 90 degrees clockwise
-				CurrentDirection = (CurrentDirection + 1) % 4;
+				CurrentDirection = RotateBlockFaceCW(CurrentDirection);
 				EdgesComplete++;
 			}
 			else
@@ -171,7 +172,7 @@ public:
 		{
 			for (int j = 0; j < EdgeWidth[1]; j++)
 			{
-				a_ChunkInterface.SetBlock(NorthWestCorner.x + i, NorthWestCorner.y, NorthWestCorner.z + j, E_BLOCK_END_PORTAL, 0);
+				a_ChunkInterface.SetBlock(NorthWestCorner.addedXZ(i, j), Block::EndPortal::EndPortal());
 			}
 		}
 		return true;
@@ -182,25 +183,14 @@ public:
 
 
 	/** Return true if this block is a portal frame, has an eye, and is facing the correct direction. */
-	static bool IsValidFrameAtPos(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, NIBBLETYPE a_ShouldFace)
+	static bool IsValidFrameAtPos(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_ShouldFace)
 	{
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
+		auto EndPortalFrame = a_ChunkInterface.GetBlock(a_BlockPos);
 
 		return (
-			a_ChunkInterface.GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta) &&
-			(BlockType == E_BLOCK_END_PORTAL_FRAME) &&
-			(BlockMeta == (a_ShouldFace | E_META_END_PORTAL_FRAME_EYE))
+			(EndPortalFrame.Type() == BlockType::EndPortalFrame) &&
+			(Block::EndPortalFrame::Facing(EndPortalFrame) == a_ShouldFace)
 		);
-	}
-
-
-
-
-	/** Return true if this block is a portal frame. */
-	static bool IsPortalFrame(BLOCKTYPE BlockType)
-	{
-		return (BlockType == E_BLOCK_END_PORTAL_FRAME);
 	}
 } ;
 

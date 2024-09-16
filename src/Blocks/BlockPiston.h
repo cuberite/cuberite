@@ -16,44 +16,40 @@ class cWorld;
 
 
 class cBlockPistonHandler final :
-	public cClearMetaOnDrop<cDisplacementYawRotator<cBlockHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>>
+	public cBlockHandler
 {
-	using Super = cClearMetaOnDrop<cDisplacementYawRotator<cBlockHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>>;
+	using Super = cBlockHandler;
 
 public:
 
 	using Super::Super;
 
-	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)
+	static inline bool IsBlockPiston(BlockState a_Block)
 	{
-		switch (a_MetaData & 0x7)  // We only want the bottom three bits (4th controls extended-ness))
+		switch (a_Block.Type())
 		{
-			case 0x0: return BLOCK_FACE_YM;
-			case 0x1: return BLOCK_FACE_YP;
-			case 0x2: return BLOCK_FACE_ZM;
-			case 0x3: return BLOCK_FACE_ZP;
-			case 0x4: return BLOCK_FACE_XM;
-			case 0x5: return BLOCK_FACE_XP;
-			default:
-			{
-				ASSERT(!"Invalid Metadata");
-				return BLOCK_FACE_NONE;
-			}
+			case BlockType::Piston:
+			case BlockType::StickyPiston:
+				return true;
+			default: return false;
 		}
 	}
 
 	/** Converts piston block's metadata into a unit vector representing the direction in which the piston will extend. */
-	static Vector3i MetadataToOffset(NIBBLETYPE a_PistonMeta);
+	static inline Vector3i GetExtensionDirection(BlockState a_Block);
+
+	/** Returns UCHAR_MAX on error. */
+	static inline Byte GetExtensionByte(BlockState a_Block);
 
 	static void ExtendPiston(Vector3i a_BlockPos, cWorld & a_World);
 	static void RetractPiston(Vector3i a_BlockPos, cWorld & a_World);
 
 	/** Returns true if the piston (with the specified meta) is extended */
-	static inline bool IsExtended(NIBBLETYPE a_PistonMeta) { return ((a_PistonMeta & 0x8) != 0x0); }
+	static inline bool IsExtended(BlockState a_Block) { return Block::Piston::Extended(a_Block); }
 
 private:
 
-	typedef std::unordered_set<Vector3i, VectorHasher<int>> Vector3iSet;
+	using Vector3iSet = std::unordered_set<Vector3i, VectorHasher<int>>;
 
 	/** Piston extension block action */
 	static const Byte PistonExtendAction = 0U;
@@ -62,55 +58,89 @@ private:
 	static const Byte PistonRetractAction = 1U;
 
 	/** Returns true if the piston (specified by blocktype) is a sticky piston */
-	static inline bool IsSticky(BLOCKTYPE a_BlockType) { return (a_BlockType == E_BLOCK_STICKY_PISTON); }
+	static inline bool IsSticky(BlockState a_Block) { return (a_Block.Type() == BlockType::StickyPiston); }
 
 	/** Returns true if the specified block can be pushed by a piston (and left intact) */
-	static inline bool CanPush(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	static inline bool CanPush(BlockState a_Block)
 	{
-		switch (a_BlockType)
+		switch (a_Block.Type())
 		{
-			case E_BLOCK_ANVIL:
-			case E_BLOCK_BARRIER:
-			case E_BLOCK_BEACON:
-			case E_BLOCK_BEDROCK:
-			case E_BLOCK_BREWING_STAND:
-			case E_BLOCK_CHAIN_COMMAND_BLOCK:
-			case E_BLOCK_CHEST:
-			case E_BLOCK_COMMAND_BLOCK:
-			case E_BLOCK_DAYLIGHT_SENSOR:
-			case E_BLOCK_DISPENSER:
-			case E_BLOCK_DROPPER:
-			case E_BLOCK_ENCHANTMENT_TABLE:
-			case E_BLOCK_END_GATEWAY:
-			case E_BLOCK_END_PORTAL:
-			case E_BLOCK_END_PORTAL_FRAME:
-			case E_BLOCK_ENDER_CHEST:
-			case E_BLOCK_FURNACE:
-			case E_BLOCK_LIT_FURNACE:
-			case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
-			case E_BLOCK_HOPPER:
-			case E_BLOCK_JUKEBOX:
-			case E_BLOCK_MOB_SPAWNER:
-			case E_BLOCK_NETHER_PORTAL:
-			case E_BLOCK_NOTE_BLOCK:
-			case E_BLOCK_OBSIDIAN:
-			case E_BLOCK_PISTON_EXTENSION:
-			case E_BLOCK_REPEATING_COMMAND_BLOCK:
-			case E_BLOCK_STANDING_BANNER:
-			case E_BLOCK_STRUCTURE_BLOCK:
-			case E_BLOCK_TRAPPED_CHEST:
-			case E_BLOCK_WALL_BANNER:
+			case BlockType::Anvil:
+			case BlockType::ChippedAnvil:
+			case BlockType::DamagedAnvil:
+
+			case BlockType::Barrier:
+			case BlockType::Beacon:
+			case BlockType::Bedrock:
+			case BlockType::BrewingStand:
+			case BlockType::ChainCommandBlock:
+			case BlockType::Chest:
+			case BlockType::CommandBlock:
+			case BlockType::DaylightDetector:
+			case BlockType::Dispenser:
+			case BlockType::Dropper:
+			case BlockType::EnchantingTable:
+			case BlockType::EndGateway:
+			case BlockType::EndPortal:
+			case BlockType::EndPortalFrame:
+			case BlockType::EnderChest:
+			case BlockType::Furnace:
+			case BlockType::Hopper:
+			case BlockType::Jukebox:
+			case BlockType::Spawner:
+			case BlockType::NetherPortal:
+			case BlockType::NoteBlock:
+			case BlockType::Observer:
+			case BlockType::PoweredRail:
+			case BlockType::RepeatingCommandBlock:
+
+			case BlockType::BlackBanner:
+			case BlockType::BlueBanner:
+			case BlockType::BrownBanner:
+			case BlockType::CyanBanner:
+			case BlockType::GrayBanner:
+			case BlockType::GreenBanner:
+			case BlockType::LightBlueBanner:
+			case BlockType::LightGrayBanner:
+			case BlockType::LimeBanner:
+			case BlockType::MagentaBanner:
+			case BlockType::OrangeBanner:
+			case BlockType::PinkBanner:
+			case BlockType::PurpleBanner:
+			case BlockType::RedBanner:
+			case BlockType::WhiteBanner:
+			case BlockType::YellowBanner:
+
+			case BlockType::BlackWallBanner:
+			case BlockType::BlueWallBanner:
+			case BlockType::BrownWallBanner:
+			case BlockType::CyanWallBanner:
+			case BlockType::GrayWallBanner:
+			case BlockType::GreenWallBanner:
+			case BlockType::LightBlueWallBanner:
+			case BlockType::LightGrayWallBanner:
+			case BlockType::LimeWallBanner:
+			case BlockType::MagentaWallBanner:
+			case BlockType::OrangeWallBanner:
+			case BlockType::PinkWallBanner:
+			case BlockType::PurpleWallBanner:
+			case BlockType::RedWallBanner:
+			case BlockType::WhiteWallBanner:
+			case BlockType::YellowWallBanner:
+
+			case BlockType::StructureBlock:
+			case BlockType::TrappedChest:
 			{
 				return false;
 			}
-			case E_BLOCK_STICKY_PISTON:
-			case E_BLOCK_PISTON:
+			case BlockType::Piston:
+			case BlockType::StickyPiston:
 			{
 				// A piston can only be pushed if retracted:
-				return !IsExtended(a_BlockMeta);
+				return !IsExtended(a_Block);
 			}
+			default: return true;
 		}
-		return true;
 	}
 
 	/** Tries to push a block and increases the pushed blocks variable. Returns true if the block is pushable */
@@ -119,22 +149,21 @@ private:
 		Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
 	);
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 11;
 	}
 
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BlockState a_OldBlock,
 		const cEntity * a_Digger
 	) const override;
 
 	/** Moves a list of blocks in a specific direction */
-	static void PushBlocks(const Vector3iSet & a_BlocksToPush,
-		cWorld & a_World, const Vector3i & a_PushDir
+	static void PushBlocks(const Vector3iSet & aBlocksToPush,
+		cWorld & aWorld, const Vector3i & aPushDir
 	);
 } ;
 
@@ -150,16 +179,14 @@ class cBlockPistonHeadHandler final :
 public:
 
 	constexpr cBlockPistonHeadHandler(void) :
-		Super(E_BLOCK_PISTON_EXTENSION)
+		Super(BlockType::PistonHead)
 	{
 	}
 
 	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
-		const cEntity * a_Digger
+		cChunkInterface & aChunkInterface, cWorldInterface & aWorldInterface,
+		Vector3i aBlockPos,
+		BlockState a_Block,
+		const cEntity * aDigger
 	) const override;
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cItem * a_Tool) const override;
 } ;

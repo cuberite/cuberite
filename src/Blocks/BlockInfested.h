@@ -18,6 +18,20 @@ public:
 
 	using Super::Super;
 
+	static inline bool IsBlockInfested(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::InfestedChiseledStoneBricks:
+			case BlockType::InfestedCobblestone:
+			case BlockType::InfestedCrackedStoneBricks:
+			case BlockType::InfestedMossyStoneBricks:
+			case BlockType::InfestedStone:
+				return true;
+			default: return false;
+		}
+	}
+
 private:
 
 	static void SpawnSilverfish(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos)
@@ -30,36 +44,35 @@ private:
 	}
 
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
-		switch (a_BlockMeta)
+		switch (a_Block.Type())
 		{
-			case E_META_SILVERFISH_EGG_STONE:
+			case BlockType::InfestedStone:
 			{
 				if (ToolHasSilkTouch(a_Tool))
 				{
-					return { E_BLOCK_STONE };
+					return { Item::Stone };
 				}
 				else
 				{
-					return { E_BLOCK_COBBLESTONE };
+					return { Item::Cobblestone };
 				}
 			}
-			case E_META_SILVERFISH_EGG_COBBLESTONE:          return { E_BLOCK_COBBLESTONE };
-			case E_META_SILVERFISH_EGG_STONE_BRICK:          return { E_BLOCK_STONE_BRICKS };
-			case E_META_SILVERFISH_EGG_MOSSY_STONE_BRICK:    return cItem(E_BLOCK_STONE_BRICKS, 1, E_META_STONE_BRICK_MOSSY);
-			case E_META_SILVERFISH_EGG_CRACKED_STONE_BRICK:  return cItem(E_BLOCK_STONE_BRICKS, 1, E_META_STONE_BRICK_CRACKED);
-			case E_META_SILVERFISH_EGG_CHISELED_STONE_BRICK: return cItem(E_BLOCK_STONE_BRICKS, 1, E_META_STONE_BRICK_ORNAMENT);
+			case BlockType::InfestedCobblestone:          return { Item::Cobblestone };
+			case BlockType::InfestedStoneBricks:          return { Item::StoneBricks };
+			case BlockType::InfestedMossyStoneBricks:    return { Item::MossyStoneBricks };
+			case BlockType::InfestedCrackedStoneBricks:  return { Item::CrackedStoneBricks };
+			case BlockType::InfestedChiseledStoneBricks: return { Item::ChiseledStoneBricks };
+			default: return {};
 		}
-
-		return {};
 	}
 
 
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BlockState a_Block,
 		const cEntity * a_Digger
 	) const override
 	{
@@ -82,7 +95,7 @@ private:
 	}
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
 		return 11;
 	}

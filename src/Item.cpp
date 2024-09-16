@@ -14,7 +14,7 @@
 
 
 cItem::cItem():
-	m_ItemType(E_ITEM_EMPTY),
+	m_ItemType(Item::Air),
 	m_ItemCount(0),
 	m_ItemDamage(0),
 	m_CustomName(),
@@ -29,7 +29,7 @@ cItem::cItem():
 
 
 cItem::cItem(
-	short a_ItemType,
+	enum Item a_ItemType,
 	char a_ItemCount,
 	short a_ItemDamage,
 	const AString & a_Enchantments,
@@ -46,14 +46,6 @@ cItem::cItem(
 	m_FireworkItem(),
 	m_ItemColor()
 {
-	if (!IsValidItem(m_ItemType))
-	{
-		if ((m_ItemType != E_BLOCK_AIR) && (m_ItemType != E_ITEM_EMPTY))
-		{
-			LOGWARNING("%s: creating an invalid item type (%d), resetting to empty.", __FUNCTION__, a_ItemType);
-		}
-		Empty();
-	}
 }
 
 
@@ -62,7 +54,7 @@ cItem::cItem(
 
 void cItem::Empty()
 {
-	m_ItemType = E_ITEM_EMPTY;
+	m_ItemType = Item::Air;
 	m_ItemCount = 0;
 	m_ItemDamage = 0;
 	m_Enchantments.Clear();
@@ -70,19 +62,6 @@ void cItem::Empty()
 	m_LoreTable.clear();
 	m_RepairCost = 0;
 	m_FireworkItem.EmptyData();
-	m_ItemColor.Clear();
-}
-
-
-
-
-
-void cItem::Clear()
-{
-	m_ItemType = E_ITEM_EMPTY;
-	m_ItemCount = 0;
-	m_ItemDamage = 0;
-	m_RepairCost = 0;
 	m_ItemColor.Clear();
 }
 
@@ -119,57 +98,56 @@ short cItem::GetMaxDamage(void) const
 {
 	switch (m_ItemType)
 	{
-		case E_ITEM_BOW:             return 384;
-		case E_ITEM_CHAIN_BOOTS:     return 196;
-		case E_ITEM_CHAIN_CHESTPLATE:return 241;
-		case E_ITEM_CHAIN_HELMET:    return 166;
-		case E_ITEM_CHAIN_LEGGINGS:  return 226;
-		case E_ITEM_DIAMOND_AXE:     return 1561;
-		case E_ITEM_DIAMOND_BOOTS:   return 430;
-		case E_ITEM_DIAMOND_CHESTPLATE: return 529;
-		case E_ITEM_DIAMOND_HELMET:  return 364;
-		case E_ITEM_DIAMOND_HOE:     return 1561;
-		case E_ITEM_DIAMOND_LEGGINGS:return 496;
-		case E_ITEM_DIAMOND_PICKAXE: return 1561;
-		case E_ITEM_DIAMOND_SHOVEL:  return 1561;
-		case E_ITEM_DIAMOND_SWORD:   return 1561;
-		case E_ITEM_ELYTRA:          return 432;
-		case E_ITEM_FLINT_AND_STEEL: return 64;
-		case E_ITEM_FISHING_ROD:     return 65;
-		case E_ITEM_GOLD_AXE:        return 32;
-		case E_ITEM_GOLD_BOOTS:      return 92;
-		case E_ITEM_GOLD_CHESTPLATE: return 113;
-		case E_ITEM_GOLD_HELMET:     return 78;
-		case E_ITEM_GOLD_HOE:        return 32;
-		case E_ITEM_GOLD_LEGGINGS:   return 106;
-		case E_ITEM_GOLD_PICKAXE:    return 32;
-		case E_ITEM_GOLD_SHOVEL:     return 32;
-		case E_ITEM_GOLD_SWORD:      return 32;
-		case E_ITEM_IRON_AXE:        return 250;
-		case E_ITEM_IRON_BOOTS:      return 196;
-		case E_ITEM_IRON_CHESTPLATE: return 241;
-		case E_ITEM_IRON_HELMET:     return 166;
-		case E_ITEM_IRON_HOE:        return 250;
-		case E_ITEM_IRON_LEGGINGS:   return 226;
-		case E_ITEM_IRON_PICKAXE:    return 250;
-		case E_ITEM_IRON_SHOVEL:     return 250;
-		case E_ITEM_IRON_SWORD:      return 250;
-		case E_ITEM_LEATHER_BOOTS:   return 66;
-		case E_ITEM_LEATHER_CAP:     return 55;
-		case E_ITEM_LEATHER_PANTS:   return 76;
-		case E_ITEM_LEATHER_TUNIC:   return 81;
-		case E_ITEM_SHEARS:          return 250;
-		case E_ITEM_STONE_AXE:       return 131;
-		case E_ITEM_STONE_HOE:       return 131;
-		case E_ITEM_STONE_PICKAXE:   return 131;
-		case E_ITEM_STONE_SHOVEL:    return 131;
-		case E_ITEM_STONE_SWORD:     return 131;
-		case E_ITEM_WOODEN_AXE:      return 59;
-		case E_ITEM_WOODEN_HOE:      return 59;
-		case E_ITEM_WOODEN_PICKAXE:  return 59;
-		case E_ITEM_WOODEN_SHOVEL:   return 59;
-		case E_ITEM_WOODEN_SWORD:    return 59;
-
+		case Item::Bow:                  return 384;
+		case Item::ChainmailBoots:       return 196;
+		case Item::ChainmailChestplate:  return 241;
+		case Item::ChainmailHelmet:      return 166;
+		case Item::ChainmailLeggings:    return 226;
+		case Item::DiamondAxe:           return 1561;
+		case Item::DiamondBoots:         return 430;
+		case Item::DiamondChestplate:    return 529;
+		case Item::DiamondHelmet:        return 364;
+		case Item::DiamondHoe:           return 1561;
+		case Item::DiamondLeggings:      return 496;
+		case Item::DiamondPickaxe:       return 1561;
+		case Item::DiamondShovel:        return 1561;
+		case Item::DiamondSword:         return 1561;
+		case Item::Elytra:               return 432;
+		case Item::FlintAndSteel:        return 64;
+		case Item::FishingRod:           return 65;
+		case Item::GoldenAxe:            return 32;
+		case Item::GoldenBoots:          return 92;
+		case Item::GoldenChestplate:     return 113;
+		case Item::GoldenHelmet:         return 78;
+		case Item::GoldenHoe:            return 32;
+		case Item::GoldenLeggings:       return 106;
+		case Item::GoldenPickaxe:        return 32;
+		case Item::GoldenShovel:         return 32;
+		case Item::GoldenSword:          return 32;
+		case Item::IronAxe:              return 250;
+		case Item::IronBoots:            return 196;
+		case Item::IronChestplate:       return 241;
+		case Item::IronHelmet:           return 166;
+		case Item::IronHoe:              return 250;
+		case Item::IronLeggings:         return 226;
+		case Item::IronPickaxe:          return 250;
+		case Item::IronShovel:           return 250;
+		case Item::IronSword:            return 250;
+		case Item::LeatherBoots:         return 66;
+		case Item::LeatherHelmet:        return 55;
+		case Item::LeatherLeggings:      return 76;
+		case Item::LeatherChestplate:    return 81;
+		case Item::Shears:               return 250;
+		case Item::StoneAxe:             return 131;
+		case Item::StoneHoe:             return 131;
+		case Item::StonePickaxe:         return 131;
+		case Item::StoneShovel:          return 131;
+		case Item::StoneSword:           return 131;
+		case Item::WoodenAxe:            return 59;
+		case Item::WoodenHoe:            return 59;
+		case Item::WoodenPickaxe:        return 59;
+		case Item::WoodenShovel:         return 59;
+		case Item::WoodenSword:          return 59;
 		default: return 0;
 	}
 }
@@ -224,11 +202,12 @@ const cItemHandler & cItem::GetHandler(void) const
 
 void cItem::GetJson(Json::Value & a_OutValue) const
 {
-	a_OutValue["ID"] = m_ItemType;
-	if (m_ItemType > 0)
+	auto NumericItem = PaletteUpgrade::ToItem(m_ItemType);
+	a_OutValue["ID"] = NumericItem.first;
+	if (NumericItem.first > 0)
 	{
 		a_OutValue["Count"] = m_ItemCount;
-		a_OutValue["Health"] = m_ItemDamage;
+		a_OutValue["Health"] = m_ItemDamage + NumericItem.second;
 		AString Enchantments(m_Enchantments.ToString());
 		if (!Enchantments.empty())
 		{
@@ -255,7 +234,7 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 			a_OutValue["Color_Blue"] = m_ItemColor.GetBlue();
 		}
 
-		if ((m_ItemType == E_ITEM_FIREWORK_ROCKET) || (m_ItemType == E_ITEM_FIREWORK_STAR))
+		if ((m_ItemType == Item::FireworkRocket) || (m_ItemType == Item::FireworkStar))
 		{
 			a_OutValue["Flicker"] = m_FireworkItem.m_HasFlicker;
 			a_OutValue["Trail"] = m_FireworkItem.m_HasTrail;
@@ -275,11 +254,11 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 
 void cItem::FromJson(const Json::Value & a_Value)
 {
-	m_ItemType = static_cast<ENUM_ITEM_TYPE>(a_Value.get("ID", -1).asInt());
-	if (m_ItemType > 0)
+	m_ItemType = PaletteUpgrade::FromItem(static_cast<short>(a_Value.get("ID", -1).asInt()), static_cast<short>(a_Value.get("Health", -1).asInt()));
+	if (m_ItemType != Item::Air)
 	{
-		m_ItemCount = static_cast<char>(a_Value.get("Count", -1).asInt());
 		m_ItemDamage = static_cast<short>(a_Value.get("Health", -1).asInt());
+		m_ItemCount = static_cast<char>(a_Value.get("Count", -1).asInt());
 		m_Enchantments.Clear();
 		m_Enchantments.AddFromString(a_Value.get("ench", "").asString());
 		m_CustomName = a_Value.get("Name", "").asString();
@@ -301,11 +280,11 @@ void cItem::FromJson(const Json::Value & a_Value)
 			LOGWARNING("Item with invalid red, green, and blue values read in from json file.");
 		}
 
-		if ((m_ItemType == E_ITEM_FIREWORK_ROCKET) || (m_ItemType == E_ITEM_FIREWORK_STAR))
+		if ((m_ItemType == Item::FireworkRocket) || (m_ItemType == Item::FireworkStar))
 		{
 			m_FireworkItem.m_HasFlicker = a_Value.get("Flicker", false).asBool();
 			m_FireworkItem.m_HasTrail = a_Value.get("Trail", false).asBool();
-			m_FireworkItem.m_Type = static_cast<NIBBLETYPE>(a_Value.get("Type", 0).asInt());
+			m_FireworkItem.m_Type = static_cast<unsigned char>(a_Value.get("Type", 0).asInt());
 			m_FireworkItem.m_FlightTimeInTicks = static_cast<short>(a_Value.get("FlightTimeInTicks", 0).asInt());
 			m_FireworkItem.ColoursFromString(a_Value.get("Colours", "").asString(), m_FireworkItem);
 			m_FireworkItem.FadeColoursFromString(a_Value.get("FadeColours", "").asString(), m_FireworkItem);
@@ -319,7 +298,7 @@ void cItem::FromJson(const Json::Value & a_Value)
 
 
 
-bool cItem::IsEnchantable(short a_ItemType, bool a_FromBook)
+bool cItem::IsEnchantable(Item a_ItemType, bool a_FromBook)
 {
 	if (
 		ItemCategory::IsAxe(a_ItemType) ||
@@ -335,22 +314,21 @@ bool cItem::IsEnchantable(short a_ItemType, bool a_FromBook)
 
 	switch (a_ItemType)
 	{
-		case E_ITEM_BOOK:
-		case E_ITEM_BOW:
-		case E_ITEM_FISHING_ROD:
+		case Item::Book:
+		case Item::Bow:
+		case Item::FishingRod:
 		{
 			return true;
 		}
 
-		case E_ITEM_CARROT_ON_STICK:
-		case E_ITEM_SHEARS:
-		case E_ITEM_FLINT_AND_STEEL:
+		case Item::CarrotOnAStick:
+		case Item::Shears:
+		case Item::FlintAndSteel:
 		{
 			return a_FromBook;
 		}
+		default: return false;
 	}
-
-	return false;
 }
 
 
@@ -361,67 +339,66 @@ unsigned cItem::GetEnchantability()
 {
 	switch (m_ItemType)
 	{
-		case E_ITEM_WOODEN_SWORD:
-		case E_ITEM_WOODEN_PICKAXE:
-		case E_ITEM_WOODEN_SHOVEL:
-		case E_ITEM_WOODEN_AXE:
-		case E_ITEM_WOODEN_HOE: return 15;
+		case Item::WoodenSword:
+		case Item::WoodenPickaxe:
+		case Item::WoodenShovel:
+		case Item::WoodenAxe:
+		case Item::WoodenHoe: return 15;
 
-		case E_ITEM_LEATHER_CAP:
-		case E_ITEM_LEATHER_TUNIC:
-		case E_ITEM_LEATHER_PANTS:
-		case E_ITEM_LEATHER_BOOTS: return 15;
+		case Item::LeatherHelmet:
+		case Item::LeatherChestplate:
+		case Item::LeatherLeggings:
+		case Item::LeatherBoots: return 15;
 
-		case E_ITEM_STONE_SWORD:
-		case E_ITEM_STONE_PICKAXE:
-		case E_ITEM_STONE_SHOVEL:
-		case E_ITEM_STONE_AXE:
-		case E_ITEM_STONE_HOE: return 5;
+		case Item::StoneSword:
+		case Item::StonePickaxe:
+		case Item::StoneShovel:
+		case Item::StoneAxe:
+		case Item::StoneHoe: return 5;
 
-		case E_ITEM_IRON_HELMET:
-		case E_ITEM_IRON_CHESTPLATE:
-		case E_ITEM_IRON_LEGGINGS:
-		case E_ITEM_IRON_BOOTS: return 9;
+		case Item::IronHelmet:
+		case Item::IronChestplate:
+		case Item::IronLeggings:
+		case Item::IronBoots: return 9;
 
-		case E_ITEM_IRON_SWORD:
-		case E_ITEM_IRON_PICKAXE:
-		case E_ITEM_IRON_SHOVEL:
-		case E_ITEM_IRON_AXE:
-		case E_ITEM_IRON_HOE: return 14;
+		case Item::IronSword:
+		case Item::IronPickaxe:
+		case Item::IronShovel:
+		case Item::IronAxe:
+		case Item::IronHoe: return 14;
 
-		case E_ITEM_CHAIN_HELMET:
-		case E_ITEM_CHAIN_CHESTPLATE:
-		case E_ITEM_CHAIN_LEGGINGS:
-		case E_ITEM_CHAIN_BOOTS: return 12;
+		case Item::ChainmailHelmet:
+		case Item::ChainmailChestplate:
+		case Item::ChainmailLeggings:
+		case Item::ChainmailBoots: return 12;
 
-		case E_ITEM_DIAMOND_HELMET:
-		case E_ITEM_DIAMOND_CHESTPLATE:
-		case E_ITEM_DIAMOND_LEGGINGS:
-		case E_ITEM_DIAMOND_BOOTS: return 10;
+		case Item::DiamondHelmet:
+		case Item::DiamondChestplate:
+		case Item::DiamondLeggings:
+		case Item::DiamondBoots: return 10;
 
-		case E_ITEM_DIAMOND_SWORD:
-		case E_ITEM_DIAMOND_PICKAXE:
-		case E_ITEM_DIAMOND_SHOVEL:
-		case E_ITEM_DIAMOND_AXE:
-		case E_ITEM_DIAMOND_HOE: return 10;
+		case Item::DiamondSword:
+		case Item::DiamondPickaxe:
+		case Item::DiamondShovel:
+		case Item::DiamondAxe:
+		case Item::DiamondHoe: return 10;
 
-		case E_ITEM_GOLD_HELMET:
-		case E_ITEM_GOLD_CHESTPLATE:
-		case E_ITEM_GOLD_LEGGINGS:
-		case E_ITEM_GOLD_BOOTS: return 25;
+		case Item::GoldenHelmet:
+		case Item::GoldenChestplate:
+		case Item::GoldenLeggings:
+		case Item::GoldenBoots: return 25;
 
-		case E_ITEM_GOLD_SWORD:
-		case E_ITEM_GOLD_PICKAXE:
-		case E_ITEM_GOLD_SHOVEL:
-		case E_ITEM_GOLD_AXE:
-		case E_ITEM_GOLD_HOE: return 22;
+		case Item::GoldenSword:
+		case Item::GoldenPickaxe:
+		case Item::GoldenShovel:
+		case Item::GoldenAxe:
+		case Item::GoldenHoe: return 22;
 
-		case E_ITEM_FISHING_ROD:
-		case E_ITEM_BOW:
-		case E_ITEM_BOOK: return 1;
+		case Item::FishingRod:
+		case Item::Bow:
+		case Item::Book: return 1;
+		default: return 0;
 	}
-
-	return 0;
 }
 
 
@@ -448,9 +425,9 @@ bool cItem::EnchantByXPLevels(unsigned a_NumXPLevels, MTRand & a_Random)
 	cWeightedEnchantments Enchantments;
 	cEnchantments::AddItemEnchantmentWeights(Enchantments, m_ItemType, FinalEnchantmentLevel);
 
-	if (m_ItemType == E_ITEM_BOOK)
+	if (m_ItemType == Item::Book)
 	{
-		m_ItemType = E_ITEM_ENCHANTED_BOOK;
+		m_ItemType = Item::EnchantedBook;
 	}
 
 	cEnchantments Enchantment1 = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Random);
@@ -543,7 +520,7 @@ int cItem::AddEnchantment(int a_EnchantmentID, unsigned int a_Level, bool a_From
 
 bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 {
-	if (m_ItemType == E_ITEM_ENCHANTED_BOOK)
+	if (m_ItemType == Item::EnchantedBook)
 	{
 		// Enchanted books can take anything
 		return true;
@@ -615,19 +592,19 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 	{
 		return ToolEnchantments.count(a_EnchantmentID) > 0;
 	}
-	if (m_ItemType == E_ITEM_SHEARS)
+	if (m_ItemType == Item::Shears)
 	{
 		return ShearEnchantments.count(a_EnchantmentID) > 0;
 	}
-	if (m_ItemType == E_ITEM_BOW)
+	if (m_ItemType == Item::Bow)
 	{
 		return BowEnchantments.count(a_EnchantmentID) > 0;
 	}
-	if (m_ItemType == E_ITEM_FISHING_ROD)
+	if (m_ItemType == Item::FishingRod)
 	{
 		return FishingEnchantments.count(a_EnchantmentID) > 0;
 	}
-	if (ItemCategory::IsHoe(m_ItemType) || (m_ItemType == E_ITEM_FLINT_AND_STEEL) || (m_ItemType == E_ITEM_CARROT_ON_STICK) || (m_ItemType == E_ITEM_SHIELD))
+	if (ItemCategory::IsHoe(m_ItemType) || (m_ItemType == Item::FlintAndSteel) || (m_ItemType == Item::CarrotOnAStick) || (m_ItemType == Item::Shield))
 	{
 		return MiscEnchantments.count(a_EnchantmentID) > 0;
 	}
@@ -674,7 +651,7 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 
 int cItem::AddEnchantmentsFromItem(const cItem & a_Other)
 {
-	bool FromBook = (a_Other.m_ItemType == E_ITEM_ENCHANTED_BOOK);
+	bool FromBook = (a_Other.m_ItemType == Item::EnchantedBook);
 
 	// Consider each enchantment seperately
 	int EnchantingCost = 0;
@@ -754,14 +731,14 @@ void cItems::Delete(int a_Idx)
 
 
 
-void cItems::Set(int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDamage)
+void cItems::Set(int a_Idx, Item a_Item, char a_ItemCount, short a_ItemDamage)
 {
 	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
 		LOGWARNING("cItems: Attempt to set an item at an out-of-bounds index %d; there are currently %zu items. Not setting.", a_Idx, size());
 		return;
 	}
-	at(static_cast<size_t>(a_Idx)) = cItem(a_ItemType, a_ItemCount, a_ItemDamage);
+	at(static_cast<size_t>(a_Idx)) = cItem(a_Item, a_ItemCount, a_ItemDamage);
 }
 
 

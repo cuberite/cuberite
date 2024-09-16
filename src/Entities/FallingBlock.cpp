@@ -6,15 +6,16 @@
 #include "../ClientHandle.h"
 #include "../Simulator/SandSimulator.h"
 #include "../Chunk.h"
+#include "../Blocks/ChunkInterface.h"
+#include "../Blocks/BlockConcretePowder.h"
 
 
 
 
 
-cFallingBlock::cFallingBlock(Vector3d a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta):
+cFallingBlock::cFallingBlock(Vector3d a_Position, BlockState a_Block):
 	Super(etFallingBlock, a_Position, 0.98f, 0.98f),
-	m_BlockType(a_BlockType),
-	m_BlockMeta(a_BlockMeta)
+	m_Block(a_Block)
 {
 	SetGravity(-16.0f);
 	SetAirDrag(0.02f);
@@ -57,13 +58,12 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	BLOCKTYPE BlockBelow = a_Chunk.GetBlock(BlockX - a_Chunk.GetPosX() * cChunkDef::Width, BlockY, BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width);
-	NIBBLETYPE BelowMeta = a_Chunk.GetMeta(BlockX - a_Chunk.GetPosX() * cChunkDef::Width, BlockY, BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width);
-	if (cSandSimulator::DoesBreakFallingThrough(BlockBelow, BelowMeta))
+	auto BlockBelow = a_Chunk.GetBlock(cChunkDef::AbsoluteToRelative({BlockX, BlockY, BlockZ}));
+	if (cSandSimulator::DoesBreakFallingThrough(BlockBelow))
 	{
 		// Fallen onto a block that breaks this into pickups (e. g. half-slab)
 		// Must finish the fall with coords one below the block:
-		cSandSimulator::FinishFalling(m_World, BlockX, BlockY, BlockZ, m_BlockType, m_BlockMeta);
+		cSandSimulator::FinishFalling(m_World, {BlockX, BlockY, BlockZ}, m_Block);
 		Destroy();
 		return;
 	}
@@ -81,15 +81,15 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		if (BlockY < cChunkDef::Height - 1)
 		{
-			cSandSimulator::FinishFalling(m_World, BlockX, BlockY + 1, BlockZ, m_BlockType, m_BlockMeta);
+			cSandSimulator::FinishFalling(m_World, {BlockX, BlockY + 1, BlockZ}, m_Block);
 		}
 		Destroy();
 		return;
 	}
-	else if ((m_BlockType == E_BLOCK_CONCRETE_POWDER) && IsBlockWater(BlockBelow))
+	else if (cBlockConcretePowderHandler::IsBlockConcretePowder(m_Block) && BlockBelow.Type() == BlockType::Water)
 	{
 		// Concrete powder falling into water solidifies on the first water it touches
-		cSandSimulator::FinishFalling(m_World, BlockX, BlockY, BlockZ, E_BLOCK_CONCRETE, m_BlockMeta);
+		cSandSimulator::FinishFalling(m_World, {BlockX, BlockY, BlockZ}, cBlockConcretePowderHandler::GetConcreteFromConcretePowder(m_Block));
 		Destroy();
 		return;
 	}

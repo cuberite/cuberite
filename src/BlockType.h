@@ -5,7 +5,8 @@
 // tolua_begin
 
 
-enum ENUM_BLOCK_TYPE : BLOCKTYPE
+
+enum ENUM_BLOCK_TYPE  // : unsigned char
 {
 	E_BLOCK_AIR = 0,
 	E_BLOCK_STONE = 1,
@@ -273,18 +274,19 @@ enum ENUM_BLOCK_TYPE : BLOCKTYPE
 	E_BLOCK_STRUCTURE_BLOCK = 255,
 
 	// Keep these two as the last values. Update the last block value to the last block with an id less than 255 when adding another block
-	// IsValidBlock() depends on this (255 gets checked additionally because there is a gap. See https://minecraft.wiki/w/Data_values#Block_IDs
-	E_BLOCK_NUMBER_OF_TYPES = E_BLOCK_CONCRETE_POWDER + 1,  ///< Number of individual (different) blocktypes
-	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
+	// IsValidBlock() depends on this (255 gets checked additionally because there is a gap. See https://minecraft.gamepedia.com/Data_values#Block_IDs
 
 	E_BLOCK_UNFINISHED = 254,  // Special type used as a placeholder, signifying that the block lacks implementation
+
+	E_BLOCK_NUMBER_OF_TYPES = E_BLOCK_CONCRETE_POWDER + 1,  ///< Number of individual (different) blocktypes
+	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
 
 	// Synonym or ID compatibility
 	E_BLOCK_YELLOW_FLOWER = E_BLOCK_DANDELION,
 	E_BLOCK_RED_ROSE = E_BLOCK_FLOWER,
 	E_BLOCK_WOODEN_DOOR = E_BLOCK_OAK_DOOR,
 	E_BLOCK_FENCE_GATE = E_BLOCK_OAK_FENCE_GATE,
-	E_BLOCK_WOODEN_STAIRS = E_BLOCK_OAK_WOOD_STAIRS,
+	E_BLOCK_WOODEN_STAIRS = E_BLOCK_OAK_WOOD_STAIRS
 };
 
 
@@ -641,14 +643,14 @@ enum ENUM_ITEM_TYPE : short
 	E_ITEM_LAST_DISC_PLUS_ONE,  ///< Useless, really, but needs to be present for the following value
 	E_ITEM_LAST_DISC = E_ITEM_LAST_DISC_PLUS_ONE - 1,  ///< Maximum disc itemtype number used
 
-	E_ITEM_LAST = E_ITEM_LAST_DISC,  ///< Maximum valid ItemType
+	E_ITEM_LAST = E_ITEM_LAST_DISC,  ///< Maximum valid ItemType */
 };
 
 
 
 
 
-enum ENUM_BLOCK_META : NIBBLETYPE
+enum ENUM_BLOCK_META
 {
 	// Please keep this list alpha-sorted by the blocktype part
 	// then number-sorted for the same block

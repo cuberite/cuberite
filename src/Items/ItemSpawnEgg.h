@@ -39,7 +39,7 @@ public:
 			PlacementPos.y--;
 		}
 
-		auto MonsterType = ItemDamageToMonsterType(a_HeldItem.m_ItemDamage);
+		auto MonsterType = ItemToMonsterType(a_HeldItem.m_ItemType);
 		if (
 			(MonsterType != mtInvalidType) &&  // Valid monster type
 			(a_World->SpawnMob(PlacementPos.x + 0.5, PlacementPos.y, PlacementPos.z + 0.5, MonsterType, false) != cEntity::INVALID_ID))  // Spawning succeeded
@@ -61,42 +61,76 @@ public:
 
 	/** Converts the Spawn egg item damage to the monster type to spawn.
 	Returns mtInvalidType for invalid damage values. */
-	static eMonsterType ItemDamageToMonsterType(short a_ItemDamage)
+	static eMonsterType ItemToMonsterType(const cItem & a_Item)
 	{
-		switch (a_ItemDamage)
+		switch (a_Item.m_ItemType)
 		{
-			case E_META_SPAWN_EGG_BAT:             return mtBat;
-			case E_META_SPAWN_EGG_BLAZE:           return mtBlaze;
-			case E_META_SPAWN_EGG_CAVE_SPIDER:     return mtCaveSpider;
-			case E_META_SPAWN_EGG_CHICKEN:         return mtChicken;
-			case E_META_SPAWN_EGG_COW:             return mtCow;
-			case E_META_SPAWN_EGG_CREEPER:         return mtCreeper;
-			case E_META_SPAWN_EGG_ENDERMAN:        return mtEnderman;
-			case E_META_SPAWN_EGG_ENDERMITE:       return mtEndermite;
-			case E_META_SPAWN_EGG_GHAST:           return mtGhast;
-			case E_META_SPAWN_EGG_GUARDIAN:        return mtGuardian;
-			case E_META_SPAWN_EGG_HORSE:           return mtHorse;
-			case E_META_SPAWN_EGG_MAGMA_CUBE:      return mtMagmaCube;
-			case E_META_SPAWN_EGG_MOOSHROOM:       return mtMooshroom;
-			case E_META_SPAWN_EGG_OCELOT:          return mtOcelot;
-			case E_META_SPAWN_EGG_PIG:             return mtPig;
-			case E_META_SPAWN_EGG_RABBIT:          return mtRabbit;
-			case E_META_SPAWN_EGG_SHEEP:           return mtSheep;
-			case E_META_SPAWN_EGG_SILVERFISH:      return mtSilverfish;
-			case E_META_SPAWN_EGG_SKELETON:        return mtSkeleton;
-			case E_META_SPAWN_EGG_SLIME:           return mtSlime;
-			case E_META_SPAWN_EGG_SPIDER:          return mtSpider;
-			case E_META_SPAWN_EGG_SQUID:           return mtSquid;
-			case E_META_SPAWN_EGG_VILLAGER:        return mtVillager;
-			case E_META_SPAWN_EGG_WITCH:           return mtWitch;
-			case E_META_SPAWN_EGG_WITHER_SKELETON: return mtWitherSkeleton;
-			case E_META_SPAWN_EGG_WOLF:            return mtWolf;
-			case E_META_SPAWN_EGG_ZOMBIE:          return mtZombie;
-			case E_META_SPAWN_EGG_ZOMBIE_PIGMAN:   return mtZombiePigman;
-			case E_META_SPAWN_EGG_ZOMBIE_VILLAGER: return mtZombieVillager;
-			case E_META_SPAWN_EGG_BEE:			   return mtBee;
-			case E_META_SPAWN_EGG_PARROT:		   return mtParrot;
+			case Item::BatSpawnEgg:            return mtBat;
+			case Item::BlazeSpawnEgg:          return mtBlaze;
+			case Item::CaveSpiderSpawnEgg:     return mtCaveSpider;
+			case Item::ChickenSpawnEgg:        return mtChicken;
+			case Item::CowSpawnEgg:            return mtCow;
+			case Item::CreeperSpawnEgg:        return mtCreeper;
+			case Item::EndermanSpawnEgg:       return mtEnderman;
+			case Item::GhastSpawnEgg:          return mtGhast;
+			case Item::GuardianSpawnEgg:       return mtGuardian;
+			case Item::HorseSpawnEgg:          return mtHorse;
+			case Item::MagmaCubeSpawnEgg:      return mtMagmaCube;
+			case Item::MooshroomSpawnEgg:      return mtMooshroom;
+			case Item::OcelotSpawnEgg:         return mtOcelot;
+			case Item::PigSpawnEgg:            return mtPig;
+			case Item::RabbitSpawnEgg:         return mtRabbit;
+			case Item::SheepSpawnEgg:          return mtSheep;
+			case Item::SilverfishSpawnEgg:     return mtSilverfish;
+			case Item::SkeletonSpawnEgg:       return mtSkeleton;
+			case Item::SlimeSpawnEgg:          return mtSlime;
+			case Item::SpiderSpawnEgg:         return mtSpider;
+			case Item::SquidSpawnEgg:          return mtSquid;
+			case Item::VillagerSpawnEgg:       return mtVillager;
+			case Item::WitchSpawnEgg:          return mtWitch;
+			case Item::WitherSkeletonSpawnEgg: return mtWitherSkeleton;
+			case Item::WolfSpawnEgg:           return mtWolf;
+			case Item::ZombieSpawnEgg:         return mtZombie;
+			case Item::ZombiePigmanSpawnEgg:   return mtZombiePigman;
+			case Item::ZombieVillagerSpawnEgg: return mtZombieVillager;
 			default: return mtInvalidType;
+		}
+	}
+
+	static inline bool IsSpawnEgg(const cItem & a_Item)
+	{
+		switch (a_Item.m_ItemType)
+		{
+			case Item::BatSpawnEgg:
+			case Item::BlazeSpawnEgg:
+			case Item::CaveSpiderSpawnEgg:
+			case Item::ChickenSpawnEgg:
+			case Item::CowSpawnEgg:
+			case Item::CreeperSpawnEgg:
+			case Item::EndermanSpawnEgg:
+			case Item::GhastSpawnEgg:
+			case Item::GuardianSpawnEgg:
+			case Item::HorseSpawnEgg:
+			case Item::MagmaCubeSpawnEgg:
+			case Item::MooshroomSpawnEgg:
+			case Item::OcelotSpawnEgg:
+			case Item::PigSpawnEgg:
+			case Item::RabbitSpawnEgg:
+			case Item::SheepSpawnEgg:
+			case Item::SilverfishSpawnEgg:
+			case Item::SkeletonSpawnEgg:
+			case Item::SlimeSpawnEgg:
+			case Item::SpiderSpawnEgg:
+			case Item::SquidSpawnEgg:
+			case Item::VillagerSpawnEgg:
+			case Item::WitchSpawnEgg:
+			case Item::WitherSkeletonSpawnEgg:
+			case Item::WolfSpawnEgg:
+			case Item::ZombieSpawnEgg:
+			case Item::ZombiePigmanSpawnEgg:
+			case Item::ZombieVillagerSpawnEgg:
+				return true;
+			default: return false;
 		}
 	}
 } ;

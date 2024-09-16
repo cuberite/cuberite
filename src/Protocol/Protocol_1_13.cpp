@@ -44,11 +44,11 @@ Implements the 1.13 protocol classes:
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_13:
 
-void cProtocol_1_13::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cProtocol_1_13::SendBlockChange(Vector3i a_BlockPos, BlockState a_Block)
 {
 	cPacketizer Pkt(*this, pktBlockChange);
 	Pkt.WriteXYZPosition64(a_BlockPos);
-	Pkt.WriteVarInt32(GetProtocolBlockType(a_BlockType, a_BlockMeta));
+	Pkt.WriteVarInt32(GetProtocolBlockType(a_Block));
 }
 
 
@@ -68,7 +68,7 @@ void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 	{
 		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
 		Pkt.WriteBEInt16(Coords);
-		Pkt.WriteVarInt32(GetProtocolBlockType(Change.m_BlockType, Change.m_BlockMeta));
+		Pkt.WriteVarInt32(GetProtocolBlockType(Change.m_Block));
 	}
 }
 
@@ -289,29 +289,86 @@ void cProtocol_1_13::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	Byte Action;
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_CHEST:
-		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_END_PORTAL:
-		case E_BLOCK_TRAPPED_CHEST:
-		{
-			// The ones with a action of 0 is just a workaround to send the block entities to a client.
-			// Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
-			Action = 0;
-			break;
-		}
+		case BlockType::EnchantingTable:   Action = 0; break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
+		case BlockType::EndPortal:         Action = 0; break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
+		case BlockType::Spawner:           Action = 1;  break;  // Update mob spawner spinny mob thing
+		case BlockType::CommandBlock:
+		case BlockType::ChainCommandBlock:
+		case BlockType::RepeatingCommandBlock: Action = 2;  break;  // Update command block text
+		case BlockType::Beacon:            Action = 3;  break;  // Update beacon entity
+		case BlockType::CreeperHead:
+		case BlockType::CreeperWallHead:
+		case BlockType::DragonHead:
+		case BlockType::DragonWallHead:
+		case BlockType::PlayerHead:
+		case BlockType::PlayerWallHead:
+		case BlockType::SkeletonSkull:
+		case BlockType::SkeletonWallSkull:
+		case BlockType::WitherSkeletonSkull:
+		case BlockType::WitherSkeletonWallSkull:
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:    Action = 4;  break;  // Update Mobhead entity
+		// case BlockType::CONDUIT:        Action = 5;  break;  // Update Conduit entity
+		case BlockType::BlackBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BrownBanner:
+		case BlockType::CyanBanner:
+		case BlockType::GrayBanner:
+		case BlockType::GreenBanner:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LimeBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::OrangeBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::RedBanner:
+		case BlockType::WhiteBanner:
+		case BlockType::YellowBanner:
 
-		case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
-		case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
-		case E_BLOCK_BEACON:            Action = 3;  break;  // Update beacon entity
-		case E_BLOCK_HEAD:              Action = 4;  break;  // Update Mobhead entity
-		// case E_BLOCK_CONDUIT:        Action = 5;  break;  // Update Conduit entity
-		case E_BLOCK_STANDING_BANNER:
-		case E_BLOCK_WALL_BANNER:       Action = 6;  break;  // Update banner entity
-		// case Structure Block:        Action = 7;  break;  // Update Structure tile entity
-		case E_BLOCK_END_GATEWAY:       Action = 8;  break;  // Update destination for a end gateway entity
-		case E_BLOCK_SIGN_POST:         Action = 9;  break;  // Update sign entity
-		// case E_BLOCK_SHULKER_BOX:    Action = 10; break;  // sets shulker box - not used just here if anyone is confused from reading the protocol wiki
-		case E_BLOCK_BED:               Action = 11; break;  // Update bed color
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownWallBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedWallBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowWallBanner:  Action = 6;  break;  // Update banner entity
+		// case Structure Block:           Action = 7;  break;  // Update Structure tile entity
+		case BlockType::EndGateway:        Action = 8;  break;  // Update destination for a end gateway entity
+		case BlockType::AcaciaSign:
+		case BlockType::BirchSign:
+		case BlockType::CrimsonSign:
+		case BlockType::DarkOakSign:
+		case BlockType::JungleSign:
+		case BlockType::OakSign:
+		case BlockType::SpruceSign:
+		case BlockType::WarpedSign:        Action = 9;  break;  // Update sign entity
+		// case BlockType::SHULKER_BOX:    Action = 10; break;  // sets shulker box - not used just here if anyone is confused from reading the protocol wiki
+		case BlockType::BlackBed:
+		case BlockType::BlueBed:
+		case BlockType::BrownBed:
+		case BlockType::CyanBed:
+		case BlockType::GrayBed:
+		case BlockType::GreenBed:
+		case BlockType::LightBlueBed:
+		case BlockType::LightGrayBed:
+		case BlockType::LimeBed:
+		case BlockType::MagentaBed:
+		case BlockType::OrangeBed:
+		case BlockType::PinkBed:
+		case BlockType::PurpleBed:
+		case BlockType::RedBed:
+		case BlockType::WhiteBed:
+		case BlockType::YellowBed:          Action = 11; break;  // Update bed color
 
 		default: return;  // Block entities change between versions
 	}
@@ -497,9 +554,9 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadataType a_FieldType) const
 
 
 
-std::pair<short, short> cProtocol_1_13::GetItemFromProtocolID(UInt32 a_ProtocolID) const
+Item cProtocol_1_13::GetItemFromProtocolID(UInt32 a_ProtocolID) const
 {
-	return PaletteUpgrade::ToItem(Palette_1_13::ToItem(a_ProtocolID));
+	return Palette_1_13::ToItem(a_ProtocolID);
 }
 
 
@@ -573,9 +630,9 @@ UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType) const
 
 
 
-UInt32 cProtocol_1_13::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const
+UInt32 cProtocol_1_13::GetProtocolBlockType(BlockState a_Block) const
 {
-	return Palette_1_13::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+	return Palette_1_13::From(a_Block);
 }
 
 
@@ -595,9 +652,9 @@ signed char cProtocol_1_13::GetProtocolEntityStatus(const EntityAnimation a_Anim
 
 
 
-UInt32 cProtocol_1_13::GetProtocolItemType(short a_ItemID, short a_ItemDamage) const
+UInt32 cProtocol_1_13::GetProtocolItemType(Item a_ItemID) const
 {
-	return Palette_1_13::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+	return Palette_1_13::From(a_ItemID);
 }
 
 
@@ -762,6 +819,10 @@ void cProtocol_1_13::HandlePacketNameItem(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_13::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
+	ContiguousByteBuffer Data;
+	a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace());
+
+	return;
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, NamespacedChannel);
 
 	const auto & [Namespace, Channel] = NamespaceSerializer::SplitNamespacedID(NamespacedChannel);
@@ -773,7 +834,7 @@ void cProtocol_1_13::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	ContiguousByteBuffer Data;
+	//ContiguousByteBuffer Data;
 
 	// Read the plugin message and relay to clienthandle:
 	a_ByteBuffer.ReadSome(Data, a_ByteBuffer.GetReadableSpace());
@@ -843,9 +904,7 @@ bool cProtocol_1_13::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t
 		return true;
 	}
 
-	const auto Translated = GetItemFromProtocolID(ToUnsigned(ItemID));
-	a_Item.m_ItemType = Translated.first;
-	a_Item.m_ItemDamage = Translated.second;
+	a_Item.m_ItemType = GetItemFromProtocolID(ToUnsigned(ItemID));
 
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8, Int8, ItemCount);
 	a_Item.m_ItemCount = ItemCount;
@@ -958,7 +1017,7 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 				if (!MinecartContent.IsEmpty())
 				{
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockIDMeta, EntityMetadataType::VarInt);
-					int Content = MinecartContent.m_ItemType;
+					int Content = PaletteUpgrade::ToItem(MinecartContent.m_ItemType).first;
 					Content |= MinecartContent.m_ItemDamage << 8;
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
 
@@ -1076,14 +1135,6 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 
 void cProtocol_1_13::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 {
-	short ItemType = a_Item.m_ItemType;
-	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
-	if (ItemType <= 0)
-	{
-		// Fix, to make sure no invalid values are sent.
-		ItemType = -1;
-	}
-
 	if (a_Item.IsEmpty())
 	{
 		a_Pkt.WriteBEInt16(-1);
@@ -1091,7 +1142,7 @@ void cProtocol_1_13::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	}
 
 	// Normal item
-	a_Pkt.WriteBEInt16(static_cast<Int16>(GetProtocolItemType(a_Item.m_ItemType, a_Item.m_ItemDamage)));
+	a_Pkt.WriteBEInt16(static_cast<Int16>(GetProtocolItemType(a_Item.m_ItemType)));
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 
 	// TODO: NBT
@@ -1167,9 +1218,10 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		{
 			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
 			WriteEntityMetadata(a_Pkt, EntityMetadata::EndermanCarriedBlock, EntityMetadataType::OptBlockID);
+			auto NumericBlock = PaletteUpgrade::ToBlock(Enderman.GetCarriedBlock());
 			UInt32 Carried = 0;
-			Carried |= static_cast<UInt32>(Enderman.GetCarriedBlock() << 4);
-			Carried |= Enderman.GetCarriedMeta();
+			Carried |= static_cast<UInt32>(NumericBlock.first << 4);
+			Carried |= static_cast<UInt32>(NumericBlock.second);
 			a_Pkt.WriteVarInt32(Carried);
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::EndermanScreaming, EntityMetadataType::Boolean);
@@ -1602,27 +1654,27 @@ void cProtocol_1_13_1::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSk
 
 
 
-std::pair<short, short> cProtocol_1_13_1::GetItemFromProtocolID(UInt32 a_ProtocolID) const
+Item cProtocol_1_13_1::GetItemFromProtocolID(UInt32 a_ProtocolID) const
 {
-	return PaletteUpgrade::ToItem(Palette_1_13_1::ToItem(a_ProtocolID));
+	return Palette_1_13_1::ToItem(a_ProtocolID);
 }
 
 
 
 
 
-UInt32 cProtocol_1_13_1::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const
+UInt32 cProtocol_1_13_1::GetProtocolBlockType(BlockState a_Block) const
 {
-	return Palette_1_13_1::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+	return Palette_1_13_1::From(a_Block);
 }
 
 
 
 
 
-UInt32 cProtocol_1_13_1::GetProtocolItemType(short a_ItemID, short a_ItemDamage) const
+UInt32 cProtocol_1_13_1::GetProtocolItemType(Item a_ItemID) const
 {
-	return Palette_1_13_1::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+	return Palette_1_13_1::From(a_ItemID);
 }
 
 
@@ -1670,11 +1722,7 @@ bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size
 	}
 
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, ItemID);
-	const auto Translated = GetItemFromProtocolID(ItemID);
-	a_Item.m_ItemType = Translated.first;
-	a_Item.m_ItemDamage = Translated.second;
-	// LOG("%d - %d - %d", a_Item.m_ItemType, a_Item.m_ItemDamage, ItemID);
-
+	a_Item.m_ItemType = GetItemFromProtocolID(ItemID);
 
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8, Int8, ItemCount);
 	a_Item.m_ItemCount = ItemCount;
@@ -1700,13 +1748,6 @@ bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size
 
 void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 {
-	short ItemType = a_Item.m_ItemType;
-	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
-	if (ItemType <= 0)
-	{
-		// Fix, to make sure no invalid values are sent.
-		ItemType = -1;
-	}
 
 	if (a_Item.IsEmpty())
 	{
@@ -1718,7 +1759,7 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 	a_Pkt.WriteBool(true);
 
 	// Normal item
-	a_Pkt.WriteVarInt32(GetProtocolItemType(a_Item.m_ItemType, a_Item.m_ItemDamage));
+	a_Pkt.WriteVarInt32(GetProtocolItemType(a_Item.m_ItemType));
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 
 	cFastNBTWriter Writer;

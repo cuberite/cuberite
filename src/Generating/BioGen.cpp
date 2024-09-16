@@ -20,9 +20,9 @@
 void cBioGenConstant::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap)
 {
 	UNUSED(a_ChunkCoords);
-	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
+	for (auto & Biome : a_BiomeMap)
 	{
-		a_BiomeMap[i] = m_Biome;
+		Biome = m_Biome;
 	}
 }
 
@@ -100,7 +100,7 @@ void cBioGenCache::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a
 		m_CacheOrder[0] = Idx;
 
 		// Use the cached data:
-		memcpy(a_BiomeMap, m_CacheData[Idx].m_BiomeMap, sizeof(a_BiomeMap));
+		memcpy(a_BiomeMap.data(), m_CacheData[Idx].m_BiomeMap.data(), sizeof(a_BiomeMap));
 
 		m_NumHits++;
 		m_TotalChain += i;
@@ -118,7 +118,7 @@ void cBioGenCache::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a
 		m_CacheOrder[i] = m_CacheOrder[i - 1];
 	}  // for i - m_CacheOrder[]
 	m_CacheOrder[0] = Idx;
-	memcpy(m_CacheData[Idx].m_BiomeMap, a_BiomeMap, sizeof(a_BiomeMap));
+	memcpy(m_CacheData[Idx].m_BiomeMap.data(), a_BiomeMap.data(), sizeof(a_BiomeMap));
 	m_CacheData[Idx].m_Coords = a_ChunkCoords;
 }
 
@@ -269,7 +269,7 @@ void cBioGenCheckerboard::GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::Biome
 		{
 			int Add = cChunkDef::Width * a_ChunkCoords.m_ChunkX + x;
 			size_t BiomeIdx = static_cast<size_t>((((Base + Add / m_BiomeSize) % m_BiomesCount) + m_BiomesCount) % m_BiomesCount);  // Need to add and modulo twice because of negative numbers
-			a_BiomeMap[x + cChunkDef::Width * z] = m_Biomes[BiomeIdx];
+			a_BiomeMap[static_cast<size_t>(x + cChunkDef::Width * z)] = m_Biomes[BiomeIdx];
 		}
 	}
 }

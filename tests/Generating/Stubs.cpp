@@ -103,7 +103,7 @@ cBoundingBox::cBoundingBox(double, double, double, double, double, double)
 
 
 
-cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const
+cBoundingBox cBlockHandler::GetPlacementCollisionBox(BlockState a_XM, BlockState a_XP, BlockState a_YM, BlockState a_YP, BlockState a_ZM, BlockState a_ZP) const
 {
 	return cBoundingBox(0, 0, 0, 0, 0, 0);
 }
@@ -136,7 +136,7 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i
 
 
 
-cItems cBlockHandler::ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const
+cItems cBlockHandler::ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const
 {
 	return cItems();
 }
@@ -145,7 +145,7 @@ cItems cBlockHandler::ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem
 
 
 
-bool cBlockHandler::CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const
+bool cBlockHandler::CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const
 {
 	return true;
 }
@@ -163,9 +163,9 @@ bool cBlockHandler::IsUseable() const
 
 
 
-bool cBlockHandler::DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, Vector3i a_Position, NIBBLETYPE a_Meta, eBlockFace a_ClickedBlockFace, bool a_ClickedDirectly) const
+bool cBlockHandler::DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, Vector3i a_Position, BlockState a_ClickedBlock, eBlockFace a_ClickedBlockFace, bool a_ClickedDirectly) const
 {
-	return m_BlockType == E_BLOCK_AIR;
+	return m_BlockType == BlockType::Air;
 }
 
 
@@ -180,7 +180,7 @@ void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterf
 
 
 
-ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta) const
+ColourID cBlockHandler::GetMapBaseColourID() const
 {
 	return 0;
 }
@@ -189,7 +189,7 @@ ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta) const
 
 
 
-bool cBlockHandler::IsInsideBlock(Vector3d a_Position, const NIBBLETYPE a_BlockMeta) const
+bool cBlockHandler::IsInsideBlock(const Vector3d a_RelPosition, const BlockState a_Block) const
 {
 	return true;
 }
@@ -198,10 +198,10 @@ bool cBlockHandler::IsInsideBlock(Vector3d a_Position, const NIBBLETYPE a_BlockM
 
 
 
-const cBlockHandler & cBlockHandler::For(BLOCKTYPE a_BlockType)
+const cBlockHandler & cBlockHandler::For(BlockType a_BlockType)
 {
 	// Dummy handler.
-	static cBlockHandler Handler(E_BLOCK_AIR);
+	static cBlockHandler Handler(BlockType::Air);
 	return Handler;
 }
 
@@ -209,7 +209,7 @@ const cBlockHandler & cBlockHandler::For(BLOCKTYPE a_BlockType)
 
 
 
-OwnedBlockEntity cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World)
+OwnedBlockEntity cBlockEntity::CreateByBlockType(BlockState a_Block, Vector3i a_Pos, cWorld * a_World)
 {
 	return nullptr;
 }
@@ -242,7 +242,7 @@ void cBlockEntity::SetPos(Vector3i a_NewPos)
 
 
 
-bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
+bool cBlockEntity::IsBlockEntityBlockType(BlockState a_Block)
 {
 	return false;
 }
@@ -321,7 +321,7 @@ void cMonster::CheckEventLostPlayer(std::chrono::milliseconds a_Dt)
 
 
 
-bool cFluidSimulator::CanWashAway(BLOCKTYPE a_BlockType)
+bool cFluidSimulator::CanWashAway(BlockState a_BlockType)
 {
 	return false;
 }
@@ -330,7 +330,7 @@ bool cFluidSimulator::CanWashAway(BLOCKTYPE a_BlockType)
 
 
 
-bool cFireSimulator::DoesBurnForever(BLOCKTYPE a_BlockType)
+bool cFireSimulator::DoesBurnForever(BlockState a_BlockType)
 {
 	return false;
 }
@@ -365,12 +365,12 @@ cItem::cItem()
 
 
 cItem::cItem(
-	short a_ItemType,
-	char a_ItemCount,
-	short a_ItemDamage,
-	const AString & a_Enchantments,
-	const AString & a_CustomName,
-	const AStringVector & a_LoreTable
+		enum Item a_ItemType,
+		char a_ItemCount,
+		short a_ItemDamage,
+		const AString & a_Enchantments,
+		const AString & a_CustomName,
+		const AStringVector & a_LoreTable
 )
 {
 }

@@ -20,53 +20,37 @@ public:
 
 private:
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		if (a_Position.y <= 0)
 		{
 			return false;
 		}
 
-		BLOCKTYPE BelowBlock;
-		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_Position.addedY(-1), BelowBlock, BelowBlockMeta);
+		auto BelowBlock = a_Chunk.GetBlock(a_Position.addedY(-1));
 
-		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
-		{
-			return true;
-		}
-
-		// upside down slabs
-		if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
-		{
-			return BelowBlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN;
-		}
-
-		// upside down stairs
-		if (cBlockStairsHandler::IsAnyStairType(BelowBlock))
-		{
-			return BelowBlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN;
-		}
-
-		return false;
+		return (
+			(cBlockInfo::FullyOccupiesVoxel(BelowBlock)) ||
+			(cBlockSlabHandler::IsAnySlabType(BelowBlock) && cBlockSlabHandler::IsSlabTop(BelowBlock)) ||
+			(cBlockStairsHandler::IsAnyStairType(BelowBlock) && cBlockStairsHandler::IsStairsUpsideDown)
+		);
 	}
 
 
 
 
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
-		return cItem(E_ITEM_REDSTONE_DUST, 1, 0);
+		return cItem(Item::Redstone);
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 0;
 	}
 } ;

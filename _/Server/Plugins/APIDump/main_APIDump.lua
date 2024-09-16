@@ -77,7 +77,7 @@ local function CreateAPITables()
 				...
 			},
 			Constants = {
-				{Name = "baTypes", Value = 0},
+				{Name = "baBlocks", Value = 0},
 				{Name = "baMetas", Value = 1},
 				...
 			},

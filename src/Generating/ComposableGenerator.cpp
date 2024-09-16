@@ -419,11 +419,25 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 
 			// A list with all the allowed blocks that can be below the dead bush.
 			cFinishGenSingleTopBlock::BlockList AllowedBlocks;
-			AllowedBlocks.push_back(E_BLOCK_SAND);
-			AllowedBlocks.push_back(E_BLOCK_HARDENED_CLAY);
-			AllowedBlocks.push_back(E_BLOCK_STAINED_CLAY);
+			AllowedBlocks.push_back(BlockType::Sand);
+			AllowedBlocks.push_back(BlockType::Terracotta);
+			AllowedBlocks.push_back(BlockType::BlackTerracotta);
+			AllowedBlocks.push_back(BlockType::BlueTerracotta);
+			AllowedBlocks.push_back(BlockType::BrownTerracotta);
+			AllowedBlocks.push_back(BlockType::CyanTerracotta);
+			AllowedBlocks.push_back(BlockType::GrayTerracotta);
+			AllowedBlocks.push_back(BlockType::GreenTerracotta);
+			AllowedBlocks.push_back(BlockType::LimeTerracotta);
+			AllowedBlocks.push_back(BlockType::LightBlueTerracotta);
+			AllowedBlocks.push_back(BlockType::MagentaTerracotta);
+			AllowedBlocks.push_back(BlockType::OrangeTerracotta);
+			AllowedBlocks.push_back(BlockType::PinkTerracotta);
+			AllowedBlocks.push_back(BlockType::PurpleTerracotta);
+			AllowedBlocks.push_back(BlockType::RedTerracotta);
+			AllowedBlocks.push_back(BlockType::YellowTerracotta);
+			AllowedBlocks.push_back(BlockType::WhiteTerracotta);
 
-			m_FinishGens.push_back(std::make_unique<cFinishGenSingleTopBlock>(m_Seed, E_BLOCK_DEAD_BUSH, AllowedBiomes, 2, AllowedBlocks));
+			m_FinishGens.push_back(std::make_unique<cFinishGenSingleTopBlock>(m_Seed, Block::DeadBush::DeadBush(), AllowedBiomes, 2, AllowedBlocks));
 		}
 		else if (NoCaseCompare(finisher, "DirectOverhangs") == 0)
 		{
@@ -479,11 +493,11 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(finisher, "LavaLakes") == 0)
 		{
 			int Probability = a_IniFile.GetValueSetI("Generator", "LavaLakesProbability", 10);
-			m_FinishGens.push_back(std::make_unique<cStructGenLakes>(m_Seed * 5 + 16873, E_BLOCK_STATIONARY_LAVA, *m_ShapeGen, Probability));
+			m_FinishGens.push_back(std::make_unique<cStructGenLakes>(m_Seed * 5 + 16873, BlockType::Lava, *m_ShapeGen, Probability));
 		}
 		else if (NoCaseCompare(finisher, "LavaSprings") == 0)
 		{
-			m_FinishGens.push_back(std::make_unique<cFinishGenFluidSprings>(m_Seed, E_BLOCK_LAVA, a_IniFile, m_Dimension));
+			m_FinishGens.push_back(std::make_unique<cFinishGenFluidSprings>(m_Seed, BlockType::Lava, a_IniFile, m_Dimension));
 		}
 		else if (NoCaseCompare(finisher, "Lilypads") == 0)
 		{
@@ -494,10 +508,9 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 
 			// A list with all the allowed blocks that can be below the lilypad.
 			cFinishGenSingleTopBlock::BlockList AllowedBlocks;
-			AllowedBlocks.push_back(E_BLOCK_WATER);
-			AllowedBlocks.push_back(E_BLOCK_STATIONARY_WATER);
+			AllowedBlocks.push_back(BlockType::Water);
 
-			m_FinishGens.push_back(std::make_unique<cFinishGenSingleTopBlock>(m_Seed, E_BLOCK_LILY_PAD, AllowedBiomes, 4, AllowedBlocks));
+			m_FinishGens.push_back(std::make_unique<cFinishGenSingleTopBlock>(m_Seed, Block::LilyPad::LilyPad(), AllowedBiomes, 4, AllowedBlocks));
 		}
 		else if (NoCaseCompare(finisher, "MarbleCaves") == 0)
 		{
@@ -661,11 +674,11 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(finisher, "WaterLakes") == 0)
 		{
 			int Probability = a_IniFile.GetValueSetI("Generator", "WaterLakesProbability", 25);
-			m_FinishGens.push_back(std::make_unique<cStructGenLakes>(m_Seed * 3 + 652, E_BLOCK_STATIONARY_WATER, *m_ShapeGen, Probability));
+			m_FinishGens.push_back(std::make_unique<cStructGenLakes>(m_Seed * 3 + 652, BlockType::Water, *m_ShapeGen, Probability));
 		}
 		else if (NoCaseCompare(finisher, "WaterSprings") == 0)
 		{
-			m_FinishGens.push_back(std::make_unique<cFinishGenFluidSprings>(m_Seed, E_BLOCK_WATER, a_IniFile, m_Dimension));
+			m_FinishGens.push_back(std::make_unique<cFinishGenFluidSprings>(m_Seed, BlockType::Water, a_IniFile, m_Dimension));
 		}
 		else if (NoCaseCompare(finisher, "WormNestCaves") == 0)
 		{

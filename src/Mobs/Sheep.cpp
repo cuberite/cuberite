@@ -6,9 +6,7 @@
 #include "../World.h"
 #include "../EffectID.h"
 #include "../FastRandom.h"
-
-
-
+#include "Items/ItemDye.h"
 
 
 cSheep::cSheep(int a_Color) :
@@ -42,7 +40,7 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 	if (!m_IsSheared)
 	{
-		a_Drops.emplace_back(E_BLOCK_WOOL, static_cast<char>(1), static_cast<short>(m_WoolColor));
+		a_Drops.emplace_back(GetItemFromColor(m_WoolColor));
 	}
 
 	unsigned int LootingLevel = 0;
@@ -50,7 +48,7 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? E_ITEM_COOKED_MUTTON : E_ITEM_RAW_MUTTON);
+	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? Item::CookedMutton : Item::Mutton);
 }
 
 
@@ -62,7 +60,7 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 	Super::OnRightClicked(a_Player);
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
-	if ((EquippedItem.m_ItemType == E_ITEM_SHEARS) && !IsSheared() && !IsBaby())
+	if ((EquippedItem.m_ItemType == Item::Shears) && !IsSheared() && !IsBaby())
 	{
 		m_IsSheared = true;
 		m_World->BroadcastEntityMetadata(*this);
@@ -70,11 +68,11 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 
 		cItems Drops;
 		char NumDrops = GetRandomProvider().RandInt<char>(1, 3);
-		Drops.emplace_back(E_BLOCK_WOOL, NumDrops, static_cast<short>(m_WoolColor));
+		Drops.emplace_back(GetItemFromColor(m_WoolColor), NumDrops);
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 		m_World->BroadcastSoundEffect("entity.sheep.shear", GetPosition(), 1.0f, 1.0f);
 	}
-	else if ((EquippedItem.m_ItemType == E_ITEM_DYE) && (m_WoolColor != 15 - EquippedItem.m_ItemDamage))
+	else if (cItemDyeHandler::IsDye(EquippedItem) && (m_WoolColor != 15 - EquippedItem.m_ItemDamage))
 	{
 		m_WoolColor = 15 - EquippedItem.m_ItemDamage;
 		if (!a_Player.IsGameModeCreative())
@@ -97,11 +95,9 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// The base class tick destroyed us
 		return;
 	}
-	int PosX = POSX_TOINT;
-	int PosY = POSY_TOINT - 1;
-	int PosZ = POSZ_TOINT;
+	auto Pos = POS_TOINT.addedY(-1);
 
-	if ((PosY <= 0) || (PosY >= cChunkDef::Height))
+	if (!cChunkDef::IsValidHeight(Pos.y))
 	{
 		return;
 	}
@@ -113,11 +109,11 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		if (m_TimeToStopEating == 0)
 		{
-			if (m_World->GetBlock({ PosX, PosY, PosZ }) == E_BLOCK_GRASS)  // Make sure grass hasn't been destroyed in the meantime
+			if (m_World->GetBlock(Pos).Type() == BlockType::GrassBlock)  // Make sure grass hasn't been destroyed in the meantime
 			{
 				// The sheep ate the grass so we change it to dirt
-				m_World->SetBlock({ PosX, PosY, PosZ }, E_BLOCK_DIRT, 0);
-				GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, { PosX, PosY, PosZ }, E_BLOCK_GRASS);
+				m_World->SetBlock(Pos, Block::Dirt::Dirt());
+				GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, Pos, 2);  // This is a magic number corresponding to the old value of the grass block
 				m_IsSheared = false;
 				m_World->BroadcastEntityMetadata(*this);
 			}
@@ -127,7 +123,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (GetRandomProvider().RandBool(1.0 / 600.0))
 		{
-			if (m_World->GetBlock({ PosX, PosY, PosZ }) == E_BLOCK_GRASS)
+			if (m_World->GetBlock(Pos).Type() == BlockType::GrassBlock)
 			{
 				m_World->BroadcastEntityAnimation(*this, EntityAnimation::SheepEatsGrass);
 				m_TimeToStopEating = 40;
@@ -144,26 +140,26 @@ void cSheep::InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2)
 {
 	static const struct
 	{
-		short Parent1, Parent2, Child;
+		eSheepColor Parent1, Parent2, Child;
 	} ColorInheritance[] =
 	{
-		{ E_META_WOOL_BLUE,   E_META_WOOL_RED,   E_META_WOOL_PURPLE     },
-		{ E_META_WOOL_BLUE,   E_META_WOOL_GREEN, E_META_WOOL_CYAN       },
-		{ E_META_WOOL_YELLOW, E_META_WOOL_RED,   E_META_WOOL_ORANGE     },
-		{ E_META_WOOL_GREEN,  E_META_WOOL_WHITE, E_META_WOOL_LIGHTGREEN },
-		{ E_META_WOOL_RED,    E_META_WOOL_WHITE, E_META_WOOL_PINK       },
-		{ E_META_WOOL_WHITE,  E_META_WOOL_BLACK, E_META_WOOL_GRAY       },
-		{ E_META_WOOL_PURPLE, E_META_WOOL_PINK,  E_META_WOOL_MAGENTA    },
-		{ E_META_WOOL_WHITE,  E_META_WOOL_GRAY,  E_META_WOOL_LIGHTGRAY  },
-		{ E_META_WOOL_BLUE,   E_META_WOOL_WHITE, E_META_WOOL_LIGHTBLUE  },
+		{ eSheepColor::Blue,   eSheepColor::Red,   eSheepColor::Purple     },
+		{ eSheepColor::Blue,   eSheepColor::Green, eSheepColor::Cyan       },
+		{ eSheepColor::Yellow, eSheepColor::Red,   eSheepColor::Orange     },
+		{ eSheepColor::Green,  eSheepColor::White, eSheepColor::Lime       },
+		{ eSheepColor::Red,    eSheepColor::White, eSheepColor::Pink       },
+		{ eSheepColor::White,  eSheepColor::Black, eSheepColor::Gray       },
+		{ eSheepColor::Purple, eSheepColor::Pink,  eSheepColor::Magenta    },
+		{ eSheepColor::White,  eSheepColor::Gray,  eSheepColor::LightGray  },
+		{ eSheepColor::Blue,   eSheepColor::White, eSheepColor::LightBlue  },
 	};
 	cSheep * Parent1 = static_cast<cSheep *>(a_Parent1);
 	cSheep * Parent2 = static_cast<cSheep *>(a_Parent2);
 	for (size_t i = 0; i < ARRAYCOUNT(ColorInheritance); i++)
 	{
 		if (
-			((Parent1->GetFurColor() == ColorInheritance[i].Parent1) && (Parent2->GetFurColor() == ColorInheritance[i].Parent2)) ||
-			((Parent1->GetFurColor() == ColorInheritance[i].Parent2) && (Parent2->GetFurColor() == ColorInheritance[i].Parent1))
+			((Parent1->GetFurColorEnum() == ColorInheritance[i].Parent1) && (Parent2->GetFurColorEnum() == ColorInheritance[i].Parent2)) ||
+			((Parent1->GetFurColorEnum() == ColorInheritance[i].Parent2) && (Parent2->GetFurColorEnum() == ColorInheritance[i].Parent1))
 		)
 		{
 			SetFurColor(ColorInheritance[i].Child);
@@ -177,32 +173,61 @@ void cSheep::InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2)
 
 
 
-NIBBLETYPE cSheep::GenerateNaturalRandomColor(void)
+unsigned char cSheep::GenerateNaturalRandomColor(void)
 {
 	int Chance = GetRandomProvider().RandInt(100);
 
 	if (Chance <= 81)
 	{
-		return E_META_WOOL_WHITE;
+		return static_cast<unsigned char>(eSheepColor::White);
 	}
 	else if (Chance <= 86)
 	{
-		return E_META_WOOL_BLACK;
+		return static_cast<unsigned char>(eSheepColor::Black);
 	}
 	else if (Chance <= 91)
 	{
-		return E_META_WOOL_GRAY;
+		return static_cast<unsigned char>(eSheepColor::Gray);
 	}
 	else if (Chance <= 96)
 	{
-		return E_META_WOOL_LIGHTGRAY;
+		return static_cast<unsigned char>(eSheepColor::LightGray);
 	}
 	else if (Chance <= 99)
 	{
-		return E_META_WOOL_BROWN;
+		return static_cast<unsigned char>(eSheepColor::Brown);
 	}
 	else
 	{
-		return E_META_WOOL_PINK;
+		return static_cast<unsigned char>(eSheepColor::Pink);
+	}
+}
+
+
+
+
+
+Item cSheep::GetItemFromColor(int a_Color)
+{
+	// TODO(12xx12): replace number with enum constant
+	switch (a_Color)
+	{
+		case 0: return Item::WhiteWool;
+		case 1: return Item::OrangeWool;
+		case 2: return Item::MagentaWool;
+		case 3: return Item::LightBlueWool;
+		case 4: return Item::YellowWool;
+		case 5: return Item::LimeWool;
+		case 6: return Item::PinkWool;
+		case 7: return Item::GrayWool;
+		case 8: return Item::LightGrayWool;
+		case 9: return Item::CyanWool;
+		case 10: return Item::PurpleWool;
+		case 11: return Item::BlueWool;
+		case 12: return Item::BrownWool;
+		case 13: return Item::GreenWool;
+		case 14: return Item::RedWool;
+		case 15: return Item::BlackWool;
+		default: return Item::WhiteWool;
 	}
 }

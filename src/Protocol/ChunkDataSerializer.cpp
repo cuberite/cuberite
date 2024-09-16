@@ -59,22 +59,23 @@ namespace
 
 	auto PaletteLegacy(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
 	{
-		return (a_BlockType << 4) | a_Meta;
+		auto NumericBlock = PaletteUpgrade::ToBlock(a_Block);
+		return (NumericBlock.first << 4) | NumericBlock.second;
 	}
 
-	auto Palette393(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
+	auto Palette393(const BlockState a_Block)
 	{
-		return Palette_1_13::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+		return Palette_1_13::From(a_Block);
 	}
 
-	auto Palette401(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
+	auto Palette401(const BlockState a_Block)
 	{
-		return Palette_1_13_1::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+		return Palette_1_13_1::From(a_Block);
 	}
 
-	auto Palette477(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
+	auto Palette477(const BlockState a_Block)
 	{
-		return Palette_1_14::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+		return Palette_1_14::From(a_Block);
 	}
 
 	auto Palette573(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
@@ -389,19 +390,24 @@ inline void cChunkDataSerializer::Serialize47(const int a_ChunkX, const int a_Ch
 	// each array stores all present sections of the same kind packed together
 
 	// Write the block types to the packet:
-	ChunkDef_ForEachSection(a_BlockData, a_LightData,
 	{
-		const bool BlocksExist = Blocks != nullptr;
-		const bool MetasExist = Metas != nullptr;
-
-		for (size_t BlockIdx = 0; BlockIdx != ChunkBlockData::SectionBlockCount; ++BlockIdx)
+		for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 		{
-			BLOCKTYPE BlockType = BlocksExist ? (*Blocks)[BlockIdx] : 0;
-			NIBBLETYPE BlockMeta = MetasExist ? cChunkDef::ExpandNibble(Metas->data(), BlockIdx) : 0;
-			m_Packet.WriteBEUInt8(static_cast<unsigned char>(BlockType << 4) | BlockMeta);
-			m_Packet.WriteBEUInt8(static_cast<unsigned char>(BlockType >> 4));
+			const auto Blocks = a_BlockData.GetSection(Y);
+			const auto BlockLights = a_LightData.GetBlockLightSection(Y);
+			const auto SkyLights = a_LightData.GetSkyLightSection(Y);
+			if ((Blocks != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr))
+			{
+				const bool BlocksExist = Blocks != nullptr;
+				for (size_t BlockIdx = 0; BlockIdx != ChunkBlockData::SectionBlockCount; ++BlockIdx)
+				{
+					auto NumericBlock = BlocksExist ? PaletteUpgrade::ToBlock((*Blocks)[BlockIdx]) : std::make_pair<unsigned char, unsigned char>(0, 0);
+					m_Packet.WriteBEUInt8(static_cast<unsigned char>(BlocksExist ? ((NumericBlock.first << 4) | NumericBlock.second) : 0));
+					m_Packet.WriteBEUInt8(static_cast<unsigned char>(BlocksExist ? (NumericBlock.first >> 4) : 0));
+				}
+			}
 		}
-	});
+	}
 
 	// Write the block lights:
 	ChunkDef_ForEachSection(a_BlockData, a_LightData,
@@ -496,7 +502,7 @@ inline void cChunkDataSerializer::Serialize107(const int a_ChunkX, const int a_C
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(0);  // Palette length is 0
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-		WriteBlockSectionSeamless<&PaletteLegacy>(Blocks, Metas, BitsPerEntry);
+		WriteBlockSectionSeamless<&PaletteLegacy>(Blocks, BitsPerEntry);
 		WriteLightSectionGrouped(BlockLights, SkyLights);
 	});
 
@@ -554,7 +560,7 @@ inline void cChunkDataSerializer::Serialize110(const int a_ChunkX, const int a_C
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(0);  // Palette length is 0
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-		WriteBlockSectionSeamless<&PaletteLegacy>(Blocks, Metas, BitsPerEntry);
+		WriteBlockSectionSeamless<&PaletteLegacy>(Blocks, BitsPerEntry);
 		WriteLightSectionGrouped(BlockLights, SkyLights);
 	});
 
@@ -612,27 +618,11 @@ inline void cChunkDataSerializer::Serialize393(const int a_ChunkX, const int a_C
 	// Write each chunk section...
 	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 	{
-		const auto Blocks = a_BlockData.GetSection(Y);
-		const auto BlockLights = a_LightData.GetBlockLightSection(Y);
-		const auto SkyLights = a_LightData.GetSkyLightSection(Y);
-		if ( (Blocks != nullptr) ||  (BlockLights != nullptr) || (SkyLights != nullptr))
-		{
-			// m_Packet.WriteBEInt16(4096);
-			m_Packet.WriteBEUInt8(BitsPerEntry);
-			m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-			WriteBlockSectionSeamless2<&Palette_1_15::ToProtocolIdBlock>(Blocks, BitsPerEntry, false); //HACK remove once a proper block system is made
-			WriteLightSectionGrouped(BlockLights, SkyLights);
-		}
-	}
-
-	//// Write each chunk section...
-	//  ChunkDef_ForEachSection(a_BlockData, a_LightData,
-	//  {
-	//  m_Packet.WriteBEUInt8(BitsPerEntry);
-	//  m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-	//  WriteBlockSectionSeamless<Palette>(Blocks, Metas, BitsPerEntry);
-	//  WriteLightSectionGrouped(BlockLights, SkyLights);
-	//  });
+		m_Packet.WriteBEUInt8(BitsPerEntry);
+		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
+		WriteBlockSectionSeamless<Palette>(Blocks, BitsPerEntry);
+		WriteLightSectionGrouped(BlockLights, SkyLights);
+	});
 
 	// Write the biome data
 	for (size_t i = 0; i != BiomeDataSize; i++)
@@ -693,24 +683,11 @@ inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_C
 	// Write each chunk section...
 	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 	{
-		const auto Blocks = a_BlockData.GetSection(Y);
-		const auto BlockLights = a_LightData.GetBlockLightSection(Y);
-		const auto SkyLights = a_LightData.GetSkyLightSection(Y);
-		if ( (Blocks != nullptr) ||  (BlockLights != nullptr) || (SkyLights != nullptr))
-		{
-			m_Packet.WriteBEInt16(4096);
-			m_Packet.WriteBEUInt8(BitsPerEntry);
-			m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-			WriteBlockSectionSeamless2<&Palette_1_15::ToProtocolIdBlock>(Blocks, BitsPerEntry, false); //HACK remove once a proper block system is made
-		}
-	}
-	//ChunkDef_ForEachSection(a_BlockData, a_LightData,
-	//{
-	//	m_Packet.WriteBEInt16(4096);
-	//	m_Packet.WriteBEUInt8(BitsPerEntry);
-	//	m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-	//	WriteBlockSectionSeamless<&Palette477>(Blocks, Metas, BitsPerEntry);
-	//});
+		m_Packet.WriteBEInt16(4096);
+		m_Packet.WriteBEUInt8(BitsPerEntry);
+		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
+		WriteBlockSectionSeamless<&Palette477>(Blocks, BitsPerEntry);
+	});
 
 	// Write the biome data
 	for (size_t i = 0; i != BiomeDataSize; i++)
@@ -1365,7 +1342,7 @@ inline void cChunkDataSerializer::WriteBlockSectionSeamless2(const ChunkBlockDat
 
 
 template <auto Palette>
-inline void cChunkDataSerializer::WriteBlockSectionSeamless(const ChunkBlockData::BlockArray * a_Blocks, const ChunkBlockData::MetaArray * a_Metas, const UInt8 a_BitsPerEntry)
+inline void cChunkDataSerializer::WriteBlockSectionSeamless(const ChunkBlockData::BlockArray * a_Blocks, const UInt8 a_BitsPerEntry)
 {
 	// https://wiki.vg/Chunk_Format#Data_structure
 
@@ -1376,13 +1353,12 @@ inline void cChunkDataSerializer::WriteBlockSectionSeamless(const ChunkBlockData
 	unsigned char BitIndex = 0;  // The bit-position in Buffer that represents where to write next
 
 	const bool BlocksExist = a_Blocks != nullptr;
-	const bool MetasExist = a_Metas != nullptr;
 
 	for (size_t Index = 0; Index != ChunkBlockData::SectionBlockCount; Index++)
 	{
-		const BLOCKTYPE BlockType = BlocksExist ? (*a_Blocks)[Index] : 0;
-		const NIBBLETYPE BlockMeta = MetasExist ? cChunkDef::ExpandNibble(a_Metas->data(), Index) : 0;
-		const auto Value = Palette(BlockType, BlockMeta);
+		auto Block = BlocksExist ? (*a_Blocks)[Index] : 0;
+
+		const auto Value = Palette(Block);
 
 		// Write as much as possible of Value, starting from BitIndex, into Buffer:
 		Buffer |= static_cast<UInt64>(Value) << BitIndex;

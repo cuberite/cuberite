@@ -34,11 +34,12 @@ private:
 
 		auto & World = *a_Player.GetWorld();
 		int NeighborIdx = -1;
+		auto ChestType = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(static_cast<short>(m_ItemType), 0));
 
 		for (size_t i = 0; i < ARRAYCOUNT(CrossCoords); i++)
 		{
 			const auto NeighborPos = a_PlacePosition + CrossCoords[i];
-			if (World.GetBlock(NeighborPos) != m_ItemType)
+			if (World.GetBlock(NeighborPos) != ChestType)
 			{
 				continue;
 			}
@@ -52,7 +53,7 @@ private:
 			// Check that this neighbor is a single chest:
 			for (size_t j = 0; j < ARRAYCOUNT(CrossCoords); j++)
 			{
-				if (World.GetBlock(NeighborPos + CrossCoords[j]) == m_ItemType)
+				if (World.GetBlock(NeighborPos + CrossCoords[j]) == ChestType)
 				{
 					// Trying to place next to a dblchest
 					return false;
@@ -61,35 +62,98 @@ private:
 		}  // for i
 
 		// Get the meta of the placed chest; take existing neighbors into account:
-		BLOCKTYPE ChestBlockType = static_cast<BLOCKTYPE>(m_ItemType);
-		NIBBLETYPE Meta;
-		const auto yaw = a_Player.GetYaw();
+		const auto Yaw = a_Player.GetYaw();
+		BlockState BlockToPlace;
+		using namespace Block;
 		switch (NeighborIdx)
 		{
 			case 0:
 			case 2:
 			{
 				// The neighbor is in the X axis, form a X-axis-aligned dblchest:
-				Meta = ((yaw >= -90) && (yaw < 90)) ? E_META_CHEST_FACING_ZM : E_META_CHEST_FACING_ZP;
+				switch (ChestType)
+				{
+					case BlockType::Chest:
+					{
+						if ((Yaw >= -90) && (Yaw < 90))
+						{
+							BlockToPlace = Chest::Chest(BLOCK_FACE_NORTH, Chest::Type::Left);
+							break;
+						}
+						else
+						{
+							BlockToPlace = Chest::Chest(BLOCK_FACE_SOUTH, Chest::Type::Right);
+							break;
+						}
+					}
+					case BlockType::TrappedChest:
+					{
+						if ((Yaw >= -90) && (Yaw < 90))
+						{
+							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_NORTH, TrappedChest::Type::Left);
+							break;
+						}
+						else
+						{
+							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_SOUTH, TrappedChest::Type::Right);
+							break;
+						}
+					}
+					default: return false;
+				}
 				break;
 			}
 			case 1:
 			case 3:
 			{
 				// The neighbor is in the Z axis, form a Z-axis-aligned dblchest:
-				Meta = (yaw < 0) ? E_META_CHEST_FACING_XM : E_META_CHEST_FACING_XP;
+				switch (ChestType)
+				{
+					case BlockType::Chest:
+					{
+						if ((Yaw < 0))
+						{
+							BlockToPlace = Chest::Chest(BLOCK_FACE_EAST, Chest::Type::Left);
+							break;
+						}
+						else
+						{
+							BlockToPlace = Chest::Chest(BLOCK_FACE_WEST, Chest::Type::Right);
+							break;
+						}
+					}
+					case BlockType::TrappedChest:
+					{
+						if ((Yaw < 0))
+						{
+							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_EAST, TrappedChest::Type::Left);
+							break;
+						}
+						else
+						{
+							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_WEST, TrappedChest::Type::Right);
+							break;
+						}
+					}
+					default: return false;
+				}
 				break;
 			}
 			default:
 			{
 				// No neighbor, place based on yaw:
-				Meta = cBlockChestHandler::YawToMetaData(yaw);
+				switch (ChestType)
+				{
+					case BlockType::Chest:        BlockToPlace = Chest::Chest(RotationToBlockFace(a_Player.GetYaw()), Chest::Type::Single); break;
+					case BlockType::TrappedChest: BlockToPlace = TrappedChest::TrappedChest(RotationToBlockFace(a_Player.GetYaw()), TrappedChest::Type::Single); break;
+					default: return false;
+				}
 				break;
 			}
 		}  // switch (NeighborIdx)
 
 		// Place the new chest:
-		if (!a_Player.PlaceBlock(a_PlacePosition, ChestBlockType, Meta))
+		if (!a_Player.PlaceBlock(a_PlacePosition, BlockToPlace))
 		{
 			return false;
 		}
@@ -97,7 +161,83 @@ private:
 		// Adjust the existing chest, if any:
 		if (NeighborIdx != -1)
 		{
-			World.FastSetBlock(a_PlacePosition + CrossCoords[NeighborIdx], ChestBlockType, Meta);
+			BlockState Neighbour = World.GetBlock(a_PlacePosition + CrossCoords[NeighborIdx]);
+			switch (NeighborIdx)
+			{
+				case 0:
+				case 2:
+				{
+					// The neighbor is in the X axis, form a X-axis-aligned dblchest:
+					switch (ChestType)
+					{
+						case BlockType::Chest:
+						{
+							if ((Yaw >= -90) && (Yaw < 90))
+							{
+								Neighbour = Chest::Chest(BLOCK_FACE_NORTH, Chest::Type::Right);
+								break;
+							}
+							else
+							{
+								Neighbour = Chest::Chest(BLOCK_FACE_SOUTH, Chest::Type::Left);
+								break;
+							}
+						}
+						case BlockType::TrappedChest:
+						{
+							if ((Yaw >= -90) && (Yaw < 90))
+							{
+								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_NORTH, TrappedChest::Type::Right);
+								break;
+							}
+							else
+							{
+								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_SOUTH, TrappedChest::Type::Left);
+								break;
+							}
+						}
+						default: return false;
+					}
+					break;
+				}
+				case 1:
+				case 3:
+				{
+					// The neighbor is in the Z axis, form a Z-axis-aligned dblchest:
+					switch (ChestType)
+					{
+						case BlockType::Chest:
+						{
+							if ((Yaw < 0))
+							{
+								Neighbour = Chest::Chest(BLOCK_FACE_EAST, Chest::Type::Right);
+								break;
+							}
+							else
+							{
+								Neighbour = Chest::Chest(BLOCK_FACE_WEST, Chest::Type::Left);
+								break;
+							}
+						}
+						case BlockType::TrappedChest:
+						{
+							if ((Yaw < 0))
+							{
+								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_EAST, TrappedChest::Type::Right);
+								break;
+							}
+							else
+							{
+								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_WEST, TrappedChest::Type::Left);
+								break;
+							}
+						}
+						default: return false;
+					}
+					break;
+				}
+			}
+			World.FastSetBlock(a_PlacePosition + CrossCoords[NeighborIdx], Neighbour);
 		}
 
 		return true;

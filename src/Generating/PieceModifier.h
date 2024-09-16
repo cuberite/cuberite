@@ -25,7 +25,7 @@ bool CreatePieceModifierFromString(const AString & a_Definition, std::shared_ptr
 class cRandomizedBlock
 {
 public:
-	BLOCKTYPE m_Type;
+	BlockType m_Type;
 
 	int m_Weight;
 

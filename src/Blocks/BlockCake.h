@@ -26,7 +26,7 @@ private:
 		const Vector3i a_CursorPos
 	) const override
 	{
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
+		auto Self = a_ChunkInterface.GetBlock(a_BlockPos);
 
 		if (!a_Player.Feed(2, 0.4))
 		{
@@ -34,13 +34,14 @@ private:
 		}
 
 		a_Player.GetStatistics().Custom[CustomStatistic::EatCakeSlice]++;
-		if (Meta >= 5)
+		auto EatenSlices = Block::Cake::Bites(Self);
+		if (EatenSlices >= 5)
 		{
 			a_ChunkInterface.DigBlock(a_WorldInterface, a_BlockPos, &a_Player);
 		}
 		else
 		{
-			a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta + 1);
+			a_ChunkInterface.SetBlock(a_BlockPos, Block::Cake::Cake(EatenSlices + 1));
 		}
 		return true;
 	}
@@ -49,7 +50,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// Give nothing
 		return {};
@@ -64,9 +65,8 @@ private:
 		return true;
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 14;
 	}
 } ;

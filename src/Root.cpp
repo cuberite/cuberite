@@ -973,7 +973,12 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in storage load queue: {}"), NumInLoadQueue));
 		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in storage save queue: {}"), NumInSaveQueue));
 		int Mem = NumValid * static_cast<int>(sizeof(cChunk));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Memory used by chunks: {} KiB ({} MiB)"), (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024)));
+		a_Output.Out("  Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
+		a_Output.Out("  Per-chunk memory size breakdown:");
+		a_Output.Out("    block types:    %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BlockStates), (sizeof(cChunkDef::BlockStates) + 1023) / 1024);
+		a_Output.Out("    block lighting: %6zu bytes (%3zu KiB)", 2 * sizeof(cChunkDef::LightNibbles), (2 * sizeof(cChunkDef::LightNibbles) + 1023) / 1024);
+		a_Output.Out("    heightmap:      %6zu bytes (%3zu KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
+		a_Output.Out("    biomemap:       %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
 		SumNumValid += NumValid;
 		SumNumDirty += NumDirty;
 		SumNumInLighting += NumInLighting;

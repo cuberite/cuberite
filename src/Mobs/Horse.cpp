@@ -142,7 +142,7 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 		if (
 			!IsSaddled() &&
 			(
-				(EquipedItemType == E_ITEM_SADDLE) ||
+				(EquipedItemType == Item::Saddle) ||
 				ItemCategory::IsHorseArmor(EquipedItemType)
 			)
 		)
@@ -194,7 +194,7 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 
 void cHorse::SetHorseSaddle(cItem a_Saddle)
 {
-	if (a_Saddle.m_ItemType == E_ITEM_SADDLE)
+	if (a_Saddle.m_ItemType == Item::Saddle)
 	{
 		m_World->BroadcastSoundEffect("entity.horse.saddle", GetPosition(), 1.0f, 0.8f);
 	}
@@ -234,10 +234,10 @@ int cHorse::GetHorseArmour(void) const
 {
 	switch (m_Armor.m_ItemType)
 	{
-		case E_ITEM_EMPTY:               return 0;
-		case E_ITEM_IRON_HORSE_ARMOR:    return 1;
-		case E_ITEM_GOLD_HORSE_ARMOR:    return 2;
-		case E_ITEM_DIAMOND_HORSE_ARMOR: return 3;
+		case Item::Air:               return 0;
+		case Item::IronHorseArmor:    return 1;
+		case Item::GoldenHorseArmor:  return 2;
+		case Item::DiamondHorseArmor: return 3;
 
 		default:
 		{
@@ -263,7 +263,7 @@ void cHorse::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_LEATHER);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, Item::Leather);
 	if (IsSaddled())
 	{
 		a_Drops.push_back(m_Saddle);

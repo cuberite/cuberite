@@ -2,7 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
-
+#include "../Registries/BlockItemConverter.h"
 
 
 
@@ -18,12 +18,12 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// Only drop self when using silk-touch:
 		if (ToolHasSilkTouch(a_Tool))
 		{
-			return cItem(m_BlockType);
+			return cItem(BlockItemConverter::FromBlock(m_BlockType));
 		}
 
 		return {};
@@ -40,12 +40,12 @@ private:
 		// Disappears instantly in nether:
 		if (a_WorldInterface.GetDimension() == dimNether)
 		{
-			a_Chunk.SetBlock(a_RelPos, E_BLOCK_AIR, 0);
+			a_Chunk.SetBlock(a_RelPos, Block::Air::Air());
 			return;
 		}
 
-		// Artificial light on any of the surrounding block > 11 leads to melting the ice.
-		static const std::array<Vector3i, 7> Adjacents
+		// Artificial light on any of the surrounding block > 1 leads to melting the ice.
+		static const std::array<Vector3i, 6> Adjacents
 		{
 			{
 				{ 1, 0, 0 }, { -1, 0, 0 },
@@ -72,7 +72,7 @@ private:
 
 			if (Chunk->GetBlockLight(Position) > 11)
 			{
-				a_Chunk.SetBlock(a_RelPos, E_BLOCK_STATIONARY_WATER, 0);
+				a_Chunk.SetBlock(a_RelPos, Block::Water::Water());
 				return;
 			}
 		}
@@ -81,7 +81,7 @@ private:
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BlockState a_OldBlock,
 		const cEntity * a_Digger
 	) const override
 	{
@@ -95,7 +95,7 @@ private:
 		const auto Below = a_ChunkInterface.GetBlock(a_BlockPos.addedY(-1));
 		if (cBlockInfo::FullyOccupiesVoxel(Below) || IsBlockLiquid(Below))
 		{
-			a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_WATER, 0);
+			a_ChunkInterface.SetBlock(a_BlockPos, Block::Water::Water());
 		}
 	}
 
@@ -103,9 +103,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 5;
 	}
 } ;

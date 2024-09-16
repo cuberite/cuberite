@@ -15,7 +15,7 @@ class cItemChorusFruitHandler final:
 
 public:
 
-	constexpr cItemChorusFruitHandler(int a_ItemType) :
+	constexpr cItemChorusFruitHandler(Item a_ItemType) :
 		Super(a_ItemType, FoodInfo(4, 2.4))
 	{
 	}

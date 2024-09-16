@@ -21,7 +21,7 @@ public:
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
 	// (Please keep these alpha-sorted)
 	virtual void BroadcastAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;
-	virtual void BroadcastBlockAction                (Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr) = 0;
+	virtual void BroadcastBlockAction                (Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BlockState a_BlockType, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastBlockBreakAnimation        (UInt32 a_EntityID, Vector3i a_BlockPos, Int8 a_Stage, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastBlockEntity                (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastBossBarUpdateHealth        (const cEntity & a_Entity, UInt32 a_UniqueID, float a_FractionFilled) = 0;

@@ -2,10 +2,13 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Villager.h"
-#include "../World.h"
-#include "../BlockArea.h"
-#include "../Blocks/BlockHandler.h"
-#include "../BlockInServerPluginInterface.h"
+#include "World.h"
+#include "Chunk.h"
+#include "BlockArea.h"
+#include "Blocks/BlockHandler.h"
+#include "Blocks/BlockCrops.h"
+#include "BlockInServerPluginInterface.h"
+#include "BlockInfo.h"
 
 
 
@@ -222,7 +225,7 @@ void cVillager::HandleFarmerTryHarvestCrops()
 		// Check if the blocks didn't change while the villager was walking to the coordinates.
 		if (IsHarvestable(m_CropsPos))
 		{
-			m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, m_CropsPos, m_World->GetBlock(m_CropsPos));
+			m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, m_CropsPos, m_World->GetBlock(m_CropsPos).GetLegacyValues().first);
 			m_World->DropBlockAsPickups(m_CropsPos, this, nullptr);
 			// Applying 0.5 second cooldown.
 			m_ActionCountDown = 10;
@@ -288,38 +291,38 @@ void cVillager::HandleFarmerTryPlaceCrops()
 	{
 		// Finding the item to use to plant a crop
 		int TargetSlot = -1;
-		BLOCKTYPE CropBlockType = E_BLOCK_AIR;
+		BlockState CropBlockType;
 
 		for (int I = 0; I < m_Inventory.GetWidth() && TargetSlot < 0; I++)
 		{
 			const cItem & Slot = m_Inventory.GetSlot(I);
 			switch (Slot.m_ItemType)
 			{
-				case E_ITEM_SEEDS:
+				case Item::WheatSeeds:
 				{
 					TargetSlot = I;
-					CropBlockType = E_BLOCK_CROPS;
+					CropBlockType = Block::Wheat::Wheat();
 					break;
 				}
 
-				case E_ITEM_BEETROOT_SEEDS:
+				case Item::BeetrootSeeds:
 				{
 					TargetSlot = I;
-					CropBlockType = E_BLOCK_BEETROOTS;
+					CropBlockType = Block::Beetroots::Beetroots();
 					break;
 				}
 
-				case E_ITEM_POTATO:
+				case Item::Potato:
 				{
 					TargetSlot = I;
-					CropBlockType = E_BLOCK_POTATOES;
+					CropBlockType = Block::Potatoes::Potatoes();
 					break;
 				}
 
-				case E_ITEM_CARROT:
+				case Item::Carrot:
 				{
 					TargetSlot = I;
-					CropBlockType = E_BLOCK_CARROTS;
+					CropBlockType = Block::Carrots::Carrots();
 					break;
 				}
 
@@ -334,7 +337,7 @@ void cVillager::HandleFarmerTryPlaceCrops()
 		m_Inventory.RemoveOneItem(TargetSlot);
 
 		// Placing crop block
-		m_World->SetBlock(m_CropsPos, CropBlockType, 0);
+		m_World->SetBlock(m_CropsPos, CropBlockType);
 
 		// Applying 1 second cooldown
 		m_ActionCountDown = 20;
@@ -350,32 +353,29 @@ void cVillager::HandleFarmerTryPlaceCrops()
 
 bool cVillager::CanPlantCrops()
 {
-	return m_Inventory.HasItems(cItem(E_ITEM_SEEDS)) ||
-		m_Inventory.HasItems(cItem(E_ITEM_BEETROOT_SEEDS)) ||
-		m_Inventory.HasItems(cItem(E_ITEM_POTATO)) ||
-		m_Inventory.HasItems(cItem(E_ITEM_CARROT));
+	return m_Inventory.HasItems(cItem(Item::WheatSeeds)) ||
+		m_Inventory.HasItems(cItem(Item::BeetrootSeeds)) ||
+		m_Inventory.HasItems(cItem(Item::Potato)) ||
+		m_Inventory.HasItems(cItem(Item::Carrot));
 }
 
 
 
 
 
-bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cVillager::IsBlockFarmable(BlockState a_Block)
 {
-	switch (a_BlockType)
+	switch (a_Block.Type())
 	{
-		case E_BLOCK_BEETROOTS:
+		case BlockType::Beetroots:
+		case BlockType::Carrots:
 		{
 			// The crop must have fully grown up.
-			return a_BlockMeta == 0x03;
+			return cBlockCropsHandler::IsFullyGrown(a_Block);
 		}
-		case E_BLOCK_CROPS:
-		case E_BLOCK_POTATOES:
-		case E_BLOCK_CARROTS:
-		{
-			// The crop must have fully grown up.
-			return a_BlockMeta == 0x07;
-		}
+		case BlockType::Wheat:
+		case BlockType::Potatoes:
+			return true;
 		default: return false;
 	}
 }
@@ -386,7 +386,7 @@ bool cVillager::IsBlockFarmable(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 
 bool cVillager::IsHarvestable(Vector3i a_CropsPos)
 {
-	return IsBlockFarmable(m_World->GetBlock(a_CropsPos), m_World->GetBlockMeta(a_CropsPos));
+	return IsBlockFarmable(m_World->GetBlock(a_CropsPos));
 }
 
 
@@ -395,7 +395,7 @@ bool cVillager::IsHarvestable(Vector3i a_CropsPos)
 
 bool cVillager::IsPlantable(Vector3i a_CropsPos)
 {
-	return (m_World->GetBlock(a_CropsPos.addedY(-1)) == E_BLOCK_FARMLAND) && (m_World->GetBlock(a_CropsPos) == E_BLOCK_AIR);
+	return (m_World->GetBlock(a_CropsPos.addedY(-1)).Type() == BlockType::Farmland) && IsBlockAir(m_World->GetBlock(a_CropsPos));
 }
 
 

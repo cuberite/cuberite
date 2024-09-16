@@ -12,6 +12,7 @@ Implements the 1.8 protocol classes:
 #include "main.h"
 #include "../mbedTLS++/Sha1Checksum.h"
 #include "Packetizer.h"
+#include "Palettes/Upgrade.h"
 
 #include "../ClientHandle.h"
 #include "../Root.h"
@@ -182,7 +183,7 @@ void cProtocol_1_8_0::SendAttachEntity(const cEntity & a_Entity, const cEntity &
 
 
 
-void cProtocol_1_8_0::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
+void cProtocol_1_8_0::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BlockState a_Block)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -190,7 +191,8 @@ void cProtocol_1_8_0::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_
 	Pkt.WriteXYZPosition64(a_BlockPos);
 	Pkt.WriteBEInt8(a_Byte1);
 	Pkt.WriteBEInt8(a_Byte2);
-	Pkt.WriteVarInt32(a_BlockType);
+	auto NumericBlock = PaletteUpgrade::ToBlock(a_Block);
+	Pkt.WriteVarInt32(NumericBlock.first);
 }
 
 
@@ -211,13 +213,14 @@ void cProtocol_1_8_0::SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos,
 
 
 
-void cProtocol_1_8_0::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cProtocol_1_8_0::SendBlockChange(Vector3i a_BlockPos, BlockState a_Block)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktBlockChange);
 	Pkt.WriteXYZPosition64(a_BlockPos);
-	Pkt.WriteVarInt32((static_cast<UInt32>(a_BlockType) << 4) | (static_cast<UInt32>(a_BlockMeta) & 15));
+	auto NumericBlock = PaletteUpgrade::ToBlock(a_Block);
+	Pkt.WriteVarInt32((static_cast<UInt32>(NumericBlock.first) << 4) | (static_cast<UInt32>(NumericBlock.second) & 15));
 }
 
 
@@ -267,8 +270,9 @@ void cProtocol_1_8_0::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlo
 	{
 		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
 		Pkt.WriteBEInt16(Coords);
-		Pkt.WriteVarInt32(static_cast<UInt32>(Change.m_BlockType & 0xFFF) << 4 | (Change.m_BlockMeta & 0xF));
-	}
+		auto NumericBlock = PaletteUpgrade::ToBlock(Change.m_Block);
+		Pkt.WriteVarInt32(static_cast<UInt32>(NumericBlock.first & 0xFFF) << 4 | (NumericBlock.second & 0xF));
+	}  // for itr - a_Changes[]
 }
 
 
@@ -1272,7 +1276,7 @@ void cProtocol_1_8_0::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteFPInt(LastSentPos.z);
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
-	Pkt.WriteBEInt16(a_Player.GetEquippedItem().IsEmpty() ? 0 : a_Player.GetEquippedItem().m_ItemType);
+	Pkt.WriteBEInt16(a_Player.GetEquippedItem().IsEmpty() ? 0 : PaletteUpgrade::ToItem(a_Player.GetEquippedItem().m_ItemType).first);
 	WriteEntityMetadata(Pkt, a_Player);
 	Pkt.WriteBEUInt8(0x7f);  // Metadata: end
 }
@@ -1496,7 +1500,8 @@ void cProtocol_1_8_0::SendSpawnEntity(const cEntity & a_Entity)
 	else if (a_Entity.IsFallingBlock())
 	{
 		const auto & Block = static_cast<const cFallingBlock &>(a_Entity);
-		EntityData = Block.GetBlockType() | (static_cast<Int32>(Block.GetBlockMeta()) << 12);
+		auto NumericBlock = PaletteUpgrade::ToBlock(Block.GetBlock());
+		EntityData = NumericBlock.first | (static_cast<Int32>(NumericBlock.second) << 12);
 	}
 	else if (a_Entity.IsFloater())
 	{
@@ -1671,24 +1676,109 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	Byte Action;
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_CHEST:
-		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_END_PORTAL:
-		case E_BLOCK_TRAPPED_CHEST:
-		{
-			// The ones with a action of 0 is just a workaround to send the block entities to a client.
-			// Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
-			Action = 0;
-			break;
-		}
+		case BlockType::EnchantingTable: Action = 0; break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
+		case BlockType::EndPortal:       Action = 0; break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
 
-		case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
-		case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
-		case E_BLOCK_BEACON:            Action = 3;  break;  // Update beacon entity
-		case E_BLOCK_HEAD:              Action = 4;  break;  // Update mobhead entity
-		case E_BLOCK_FLOWER_POT:        Action = 5;  break;  // Update flower pot
-		case E_BLOCK_WALL_BANNER:
-		case E_BLOCK_STANDING_BANNER:   Action = 6;  break;  // Update banner
+		case BlockType::Spawner:       Action = 1; break;  // Update mob spawner spinny mob thing
+		case BlockType::CommandBlock:
+		case BlockType::ChainCommandBlock:
+		case BlockType::RepeatingCommandBlock:
+			Action = 2; break;  // Update command block text
+		case BlockType::Beacon:        Action = 3; break;  // Update beacon entity
+		case BlockType::CreeperHead:
+		case BlockType::CreeperWallHead:
+		case BlockType::DragonHead:
+		case BlockType::DragonWallHead:
+		case BlockType::PlayerHead:
+		case BlockType::PlayerWallHead:
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:
+		case BlockType::SkeletonSkull:
+		case BlockType::SkeletonWallSkull:
+		case BlockType::WitherSkeletonSkull:
+		case BlockType::WitherSkeletonWallSkull:
+			Action = 4; break;  // Update Mobhead entity
+		case BlockType::PottedAcaciaSapling:
+		case BlockType::PottedAzureBluet:
+		case BlockType::PottedBamboo:
+		case BlockType::PottedBirchSapling:
+		case BlockType::PottedBlueOrchid:
+		case BlockType::PottedBrownMushroom:
+		case BlockType::PottedCactus:
+		case BlockType::PottedCornflower:
+		case BlockType::PottedCrimsonRoots:
+		case BlockType::PottedCrimsonFungus:
+		case BlockType::PottedDandelion:
+		case BlockType::PottedDarkOakSapling:
+		case BlockType::PottedDeadBush:
+		case BlockType::PottedFern:
+		case BlockType::PottedJungleSapling:
+		case BlockType::PottedLilyOfTheValley:
+		case BlockType::PottedOakSapling:
+		case BlockType::PottedOrangeTulip:
+		case BlockType::PottedOxeyeDaisy:
+		case BlockType::PottedPinkTulip:
+		case BlockType::PottedPoppy:
+		case BlockType::PottedRedMushroom:
+		case BlockType::PottedRedTulip:
+		case BlockType::PottedSpruceSapling:
+		case BlockType::PottedWarpedFungus:
+		case BlockType::PottedWarpedRoots:
+		case BlockType::PottedWhiteTulip:
+		case BlockType::PottedWitherRose:
+		case BlockType::PottedAllium:
+			Action = 5; break;  // Update flower pot
+		case BlockType::BlackBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BrownBanner:
+		case BlockType::CyanBanner:
+		case BlockType::GrayBanner:
+		case BlockType::GreenBanner:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LimeBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::OrangeBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::RedBanner:
+		case BlockType::WhiteBanner:
+		case BlockType::YellowBanner:
+
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownWallBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedWallBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowWallBanner:
+			Action = 6; break;  // Update Banner
+		case BlockType::BlackBed:
+		case BlockType::BlueBed:
+		case BlockType::BrownBed:
+		case BlockType::CyanBed:
+		case BlockType::GrayBed:
+		case BlockType::GreenBed:
+		case BlockType::LightBlueBed:
+		case BlockType::LightGrayBed:
+		case BlockType::LimeBed:
+		case BlockType::MagentaBed:
+		case BlockType::OrangeBed:
+		case BlockType::PinkBed:
+		case BlockType::PurpleBed:
+		case BlockType::RedBed:
+		case BlockType::WhiteBed:
+		case BlockType::YellowBed:
+			Action = 11; break;  // Update bed color
 
 		default: return;  // Block entities change between versions
 	}
@@ -3107,7 +3197,7 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 				}
 				else if ((TagName == "Fireworks") || (TagName == "Explosion"))
 				{
-					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, a_Item.m_ItemType);
 				}
 				break;
 			}
@@ -3138,7 +3228,6 @@ bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_
 		a_Item.Empty();
 		return true;
 	}
-	a_Item.m_ItemType = ItemType;
 
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8,  Int8,  ItemCount);
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemDamage);
@@ -3148,6 +3237,12 @@ bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_
 	if (ItemCount <= 0)
 	{
 		a_Item.Empty();
+	}
+
+	a_Item.m_ItemType = PaletteUpgrade::FromItem(ItemType, ItemDamage);
+	if (ItemCategory::IsTool(a_Item.m_ItemType))
+	{
+		a_Item.m_ItemDamage += ItemDamage;
 	}
 
 	ContiguousByteBuffer Metadata;
@@ -3256,20 +3351,53 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 {
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_WALL_BANNER:
-		case E_BLOCK_STANDING_BANNER:
+		case BlockType::BlackBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BrownBanner:
+		case BlockType::CyanBanner:
+		case BlockType::GrayBanner:
+		case BlockType::GreenBanner:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LimeBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::OrangeBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::RedBanner:
+		case BlockType::WhiteBanner:
+		case BlockType::YellowBanner:
+
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownWallBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedWallBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowWallBanner:
 		{
 			auto & BannerEntity = static_cast<const cBannerEntity &>(a_BlockEntity);
 			a_Writer.AddInt("Base", static_cast<Int32>(BannerEntity.GetBaseColor()));
 			break;
 		}
-		case E_BLOCK_BEACON:
-		case E_BLOCK_CHEST:
+		case BlockType::Beacon:
+		case BlockType::Chest:
 		{
 			// Nothing!
 			break;
 		}
-		case E_BLOCK_COMMAND_BLOCK:
+		case BlockType::CommandBlock:
+		case BlockType::ChainCommandBlock:
+		case BlockType::RepeatingCommandBlock:
 		{
 			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
 			a_Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
@@ -3285,13 +3413,24 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			}
 			break;
 		}
-		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_END_PORTAL:
+		case BlockType::EnchantingTable:
+		case BlockType::EndPortal:
 		{
 			// Nothing!
 			break;
 		}
-		case E_BLOCK_HEAD:
+		case BlockType::CreeperHead:
+		case BlockType::CreeperWallHead:
+		case BlockType::DragonHead:
+		case BlockType::DragonWallHead:
+		case BlockType::PlayerHead:
+		case BlockType::PlayerWallHead:
+		case BlockType::SkeletonSkull:
+		case BlockType::SkeletonWallSkull:
+		case BlockType::WitherSkeletonSkull:
+		case BlockType::WitherSkeletonWallSkull:
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:
 		{
 			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
 			a_Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
@@ -3312,14 +3451,42 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			a_Writer.EndCompound();
 			break;
 		}
-		case E_BLOCK_FLOWER_POT:
+		case BlockType::PottedAcaciaSapling:
+		case BlockType::PottedAzureBluet:
+		case BlockType::PottedBamboo:
+		case BlockType::PottedBirchSapling:
+		case BlockType::PottedBlueOrchid:
+		case BlockType::PottedBrownMushroom:
+		case BlockType::PottedCactus:
+		case BlockType::PottedCornflower:
+		case BlockType::PottedCrimsonRoots:
+		case BlockType::PottedCrimsonFungus:
+		case BlockType::PottedDandelion:
+		case BlockType::PottedDarkOakSapling:
+		case BlockType::PottedDeadBush:
+		case BlockType::PottedFern:
+		case BlockType::PottedJungleSapling:
+		case BlockType::PottedLilyOfTheValley:
+		case BlockType::PottedOakSapling:
+		case BlockType::PottedOrangeTulip:
+		case BlockType::PottedOxeyeDaisy:
+		case BlockType::PottedPinkTulip:
+		case BlockType::PottedPoppy:
+		case BlockType::PottedRedMushroom:
+		case BlockType::PottedRedTulip:
+		case BlockType::PottedSpruceSapling:
+		case BlockType::PottedWarpedFungus:
+		case BlockType::PottedWarpedRoots:
+		case BlockType::PottedWhiteTulip:
+		case BlockType::PottedWitherRose:
+		case BlockType::PottedAllium:
 		{
 			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
 			a_Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
 			a_Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
 			break;
 		}
-		case E_BLOCK_MOB_SPAWNER:
+		case BlockType::Spawner:
 		{
 			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
 			a_Writer.AddString("EntityId", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
@@ -3423,7 +3590,7 @@ void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 				if (!MinecartContent.IsEmpty())
 				{
 					a_Pkt.WriteBEUInt8(0x54);
-					int Content = MinecartContent.m_ItemType;
+					auto Content = PaletteUpgrade::ToItem(MinecartContent.m_ItemType).first;
 					Content |= MinecartContent.m_ItemDamage << 8;
 					a_Pkt.WriteBEInt32(Content);
 					a_Pkt.WriteBEUInt8(0x55);
@@ -3534,7 +3701,7 @@ void cProtocol_1_8_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity &
 
 void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 {
-	short ItemType = a_Item.m_ItemType;
+	short ItemType = PaletteUpgrade::ToItem(a_Item.m_ItemType).first;
 	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
 	if (ItemType <= 0)
 	{
@@ -3552,7 +3719,7 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 	a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
 
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid())
+	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != Item::FireworkRocket) && (a_Item.m_ItemType != Item::FireworkStar) && !a_Item.m_ItemColor.IsValid())
 	{
 		a_Pkt.WriteBEInt8(0);
 		return;
@@ -3567,8 +3734,8 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	}
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
-		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName,false);
+		const char * TagName = (a_Item.m_ItemType == Item::EnchantedBook) ? "StoredEnchantments" : "ench";
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
 	}
 	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
 	{
@@ -3595,9 +3762,9 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		}
 		Writer.EndCompound();
 	}
-	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
+	if ((a_Item.m_ItemType == Item::FireworkRocket) || (a_Item.m_ItemType == Item::FireworkStar))
 	{
-		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, a_Item.m_ItemType);
 	}
 	Writer.Finish();
 
@@ -3669,9 +3836,10 @@ void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 		{
 			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
 			a_Pkt.WriteBEUInt8(0x30);
-			a_Pkt.WriteBEInt16(static_cast<Byte>(Enderman.GetCarriedBlock()));
+			auto NumericBlock = PaletteUpgrade::ToBlock(Enderman.GetCarriedBlock());
+			a_Pkt.WriteBEInt16(static_cast<Byte>(NumericBlock.first));
 			a_Pkt.WriteBEUInt8(0x11);
-			a_Pkt.WriteBEUInt8(static_cast<Byte>(Enderman.GetCarriedMeta()));
+			a_Pkt.WriteBEUInt8(static_cast<Byte>(NumericBlock.second));
 			a_Pkt.WriteBEUInt8(0x12);
 			a_Pkt.WriteBEUInt8(Enderman.IsScreaming() ? 1 : 0);
 			break;
@@ -4090,7 +4258,6 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity) const
 				case PType::pkFirework: return 76;
 				case PType::pkWitherSkull: return 66;
 			}
-
 			break;
 		}
 		case Type::etFloater: return 90;

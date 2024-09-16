@@ -50,45 +50,44 @@ public:
 
 		// Make sure block that will be occupied is free:
 		auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-		BLOCKTYPE PlaceBlockType = a_World->GetBlock(PlacePos);
-		if (PlaceBlockType != E_BLOCK_AIR)
+		auto PlaceBlock = a_World->GetBlock(PlacePos);
+		if (PlaceBlock.Type() != BlockType::Air)
 		{
 			return false;
 		}
 
 		// Define all the possible painting titles
-		static const AString gPaintingTitlesList[] =
+		static const std::array<AString, 26> gPaintingTitlesList =
 		{
-			{ "Kebab" },
-			{ "Aztec" },
-			{ "Alban" },
-			{ "Aztec2" },
-			{ "Bomb" },
-			{ "Plant" },
-			{ "Wasteland" },
-			{ "Wanderer" },
-			{ "Graham" },
-			{ "Pool" },
-			{ "Courbet" },
-			{ "Sunset" },
-			{ "Sea" },
-			{ "Creebet" },
-			{ "Match" },
-			{ "Bust" },
-			{ "Stage" },
-			{ "Void" },
-			{ "SkullAndRoses" },
-			{ "Wither" },
-			{ "Fighters" },
-			{ "Skeleton" },
-			{ "DonkeyKong" },
-			{ "Pointer" },
-			{ "Pigscene" },
-			{ "BurningSkull" }
+			"Kebab",
+			"Aztec",
+			"Alban",
+			"Aztec2",
+			"Bomb",
+			"Plant",
+			"Wasteland",
+			"Wanderer",
+			"Graham",
+			"Pool",
+			"Courbet",
+			"Sunset",
+			"Sea",
+			"Creebet",
+			"Match",
+			"Bust",
+			"Stage",
+			"Void",
+			"SkullAndRes",
+			"Wither",
+			"Fighters",
+			"Skeleton",
+			"DonkeyKong",
+			"Pointer",
+			"Pigscene",
+			"BurningSkull"
 		};
 
-		int painting_index = a_World->GetTickRandomNumber(ARRAYCOUNT(gPaintingTitlesList) - 1);
-		auto PaintingTitle = gPaintingTitlesList[painting_index];
+		auto PaintingTitle = gPaintingTitlesList[static_cast<size_t>(a_World->GetTickRandomNumber(gPaintingTitlesList.size() - 1))];
 
 		// A painting, centred so pickups spawn nicely.
 		auto Painting = std::make_unique<cPainting>(PaintingTitle, a_ClickedBlockFace, Vector3d(0.5, 0.5, 0.5) + PlacePos, static_cast<UInt32>(painting_index));

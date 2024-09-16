@@ -9,28 +9,26 @@
 
 namespace ObserverHandler
 {
-	static bool IsOn(NIBBLETYPE a_Meta)
+	static bool IsOn(BlockState a_Block)
 	{
-		return (a_Meta & 0x8) == 0x8;
+		return Block::Observer::Powered(a_Block);
 	}
 
-	static bool ShouldPowerOn(cChunk & Chunk, const Vector3i a_Position, NIBBLETYPE a_Meta, cIncrementalRedstoneSimulatorChunkData & a_Data)
+	static bool ShouldPowerOn(cChunk & Chunk, const Vector3i a_Position, BlockState a_Block, cIncrementalRedstoneSimulatorChunkData & a_Data)
 	{
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-		if (!Chunk.UnboundedRelGetBlock(a_Position + cBlockObserverHandler::GetObservingFaceOffset(a_Meta), BlockType, BlockMeta))
+		BlockState Other = 0;
+		if (!Chunk.UnboundedRelGetBlock(a_Position + cBlockObserverHandler::GetObservingFaceOffset(a_Block), Other))
 		{
 			return false;
 		}
 
 		auto & ObserverCache = a_Data.ObserverCache;
 		const auto FindResult = ObserverCache.find(a_Position);
-		const auto Observed = std::make_pair(BlockType, BlockMeta);
 
 		if (FindResult == ObserverCache.end())
 		{
 			// Cache the last seen block for this position:
-			ObserverCache.emplace(a_Position, Observed);
+			ObserverCache.emplace(a_Position, Other);
 
 			// Definitely should signal update:
 			return true;
@@ -40,28 +38,27 @@ namespace ObserverHandler
 		const auto Previous = FindResult->second;
 
 		// Update the last seen block:
-		FindResult->second = Observed;
+		FindResult->second = Other;
 
 		// Determine if to signal an update based on the block previously observed changed
-		return Previous != Observed;
+		return Previous != Other;
 	}
 
-	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, Vector3i a_QueryPosition, BlockState a_QueryBlock, bool IsLinked)
 	{
-		const auto Meta = a_Chunk.GetMeta(a_Position);
-		return (IsOn(Meta) && (a_QueryPosition == (a_Position + cBlockObserverHandler::GetSignalOutputOffset(Meta)))) ? 15 : 0;
+		return (IsOn(a_QueryBlock) && (a_QueryPosition == (a_Position + cBlockObserverHandler::GetSignalOutputOffset(a_Block)))) ? 15 : 0;
 	}
 
-	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
+	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BlockState a_Block, const PowerLevel Power)
 	{
-		// LOGD("Evaluating Lenny the observer (%i %i %i)", a_Position.x, a_Position.y, a_Position.z);
+		LOGREDSTONE("Evaluating Lenny the observer (%i %i %i)", a_Position.x, a_Position.y, a_Position.z);
 
 		auto & Data = DataForChunk(a_Chunk);
 		auto DelayInfo = Data.GetMechanismDelayInfo(a_Position);
 
 		if (DelayInfo == nullptr)
 		{
-			if (!ShouldPowerOn(a_Chunk, a_Position, a_Meta, Data))
+			if (!ShouldPowerOn(a_Chunk, a_Position, a_Block, Data))
 			{
 				return;
 			}
@@ -82,27 +79,27 @@ namespace ObserverHandler
 			return;
 		}
 
+		cChunkInterface ChunkInterface(a_Chunk.GetWorld()->GetChunkMap());
+		cBlockObserverHandler::Toggle(ChunkInterface, a_Position);
+
 		if (ShouldPowerOn)
 		{
 			// Remain on for 1 tick before resetting
 			*DelayInfo = std::make_pair(1, false);
-			a_Chunk.SetMeta(a_Position, a_Meta | 0x8);
 		}
 		else
 		{
 			// We've reset. Erase delay data in preparation for detecting further updates
 			Data.m_MechanismDelays.erase(a_Position);
-			a_Chunk.SetMeta(a_Position, a_Meta & ~0x8);
 		}
 
-		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, cBlockObserverHandler::GetSignalOutputOffset(a_Meta));
+		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, cBlockObserverHandler::GetSignalOutputOffset(a_Block));
 	}
 
-	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
+	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
-		UNUSED(a_BlockType);
-		UNUSED(a_BlockType);
+		UNUSED(a_Block);
 	}
 };

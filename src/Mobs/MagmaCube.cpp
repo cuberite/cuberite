@@ -42,6 +42,6 @@ void cMagmaCube::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	UNUSED(a_Killer);
 	if (GetSize() > 1)
 	{
-		AddRandomUncommonDropItem(a_Drops, 25.0f, E_ITEM_MAGMA_CREAM);
+		AddRandomUncommonDropItem(a_Drops, 25.0f, Item::MagmaCream);
 	}
 }

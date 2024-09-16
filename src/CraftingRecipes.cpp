@@ -79,7 +79,7 @@ cItem & cCraftingGrid::GetItem(int x, int y) const
 
 
 
-void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_TYPE a_ItemType, char a_ItemCount, short a_ItemHealth)
+void cCraftingGrid::SetItem(int x, int y, Item a_Item, char a_ItemCount, short a_ItemHealth)
 {
 	// Accessible through scripting, must verify parameters:
 	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
@@ -90,7 +90,7 @@ void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_TYPE a_ItemType, char a_Item
 		return;
 	}
 
-	m_Items[x + m_Width * y] = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
+	m_Items[x + m_Width * y] = cItem(a_Item, a_ItemCount, a_ItemHealth);
 }
 
 
@@ -164,13 +164,13 @@ void cCraftingGrid::ConsumeGrid(const cCraftingGrid & a_Grid)
 		m_Items[ThisIdx].m_ItemCount -= NumWantedItems;
 		if (m_Items[ThisIdx].m_ItemCount == 0)
 		{
-			if ((m_Items[ThisIdx].m_ItemType == E_ITEM_MILK) || (m_Items[ThisIdx].m_ItemType == E_ITEM_WATER_BUCKET) || (m_Items[ThisIdx].m_ItemType == E_ITEM_LAVA_BUCKET))
+			if ((m_Items[ThisIdx].m_ItemType == Item::MilkBucket) || (m_Items[ThisIdx].m_ItemType == Item::WaterBucket) || (m_Items[ThisIdx].m_ItemType == Item::LavaBucket))
 			{
-				m_Items[ThisIdx] = cItem(E_ITEM_BUCKET);
+				m_Items[ThisIdx] = cItem(Item::Bucket);
 			}
 			else
 			{
-				m_Items[ThisIdx].Clear();
+				m_Items[ThisIdx].Empty();
 			}
 		}
 	}  // for x, for y
@@ -222,16 +222,16 @@ cCraftingRecipe::cCraftingRecipe(const cCraftingGrid & a_CraftingGrid) :
 void cCraftingRecipe::Clear(void)
 {
 	m_Ingredients.Clear();
-	m_Result.Clear();
+	m_Result.Empty();
 }
 
 
 
 
 
-void cCraftingRecipe::SetResult(ENUM_ITEM_TYPE a_ItemType, char a_ItemCount, short a_ItemHealth)
+void cCraftingRecipe::SetResult(Item a_Item, char a_ItemCount, short a_ItemHealth)
 {
-	m_Result = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
+	m_Result = cItem(a_Item, a_ItemCount, a_ItemHealth);
 }
 
 
@@ -886,31 +886,31 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 	// TODO: add support for more than one dye in the recipe
 	// A manual and temporary solution (listing everything) is in crafting.txt for fade colours, but a programmatic solutions needs to be done for everything else
 
-	if (a_Recipe->m_Result.m_ItemType == E_ITEM_FIREWORK_ROCKET)
+	if (a_Recipe->m_Result.m_ItemType == Item::FireworkRocket)
 	{
 		for (cRecipeSlots::const_iterator itr = a_Recipe->m_Ingredients.begin(); itr != a_Recipe->m_Ingredients.end(); ++itr)
 		{
 			switch (itr->m_Item.m_ItemType)
 			{
-				case E_ITEM_FIREWORK_STAR:
+				case Item::FireworkStar:
 				{
 					// Result was a rocket, found a star - copy star data to rocket data
 					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
 					a_Recipe->m_Result.m_FireworkItem.CopyFrom(a_CraftingGrid[GridID].m_FireworkItem);
 					break;
 				}
-				case E_ITEM_GUNPOWDER:
+				case Item::Gunpowder:
 				{
 					// Gunpowder - increase flight time
 					a_Recipe->m_Result.m_FireworkItem.m_FlightTimeInTicks += 20;
 					break;
 				}
-				case E_ITEM_PAPER: break;
+				case Item::Paper: break;
 				default: LOG("Unexpected item in firework rocket recipe, was the crafting file's fireworks section changed?"); break;
 			}
 		}
 	}
-	else if (a_Recipe->m_Result.m_ItemType == E_ITEM_FIREWORK_STAR)
+	else if (a_Recipe->m_Result.m_ItemType == Item::FireworkStar)
 	{
 		std::vector<int> DyeColours;
 		bool FoundStar = false;
@@ -919,7 +919,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 		{
 			switch (itr->m_Item.m_ItemType)
 			{
-				case E_ITEM_FIREWORK_STAR:
+				case Item::FireworkStar:
 				{
 					// Result was star, found another star - probably adding fade colours, but copy data over anyhow
 					FoundStar = true;
@@ -927,20 +927,36 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 					a_Recipe->m_Result.m_FireworkItem.CopyFrom(a_CraftingGrid[GridID].m_FireworkItem);
 					break;
 				}
-				case E_ITEM_DYE:
+				case Item::BlackDye:
+				case Item::BlueDye:
+				case Item::BrownDye:
+				case Item::BoneMeal:
+				case Item::CyanDye:
+				case Item::GrayDye:
+				case Item::GreenDye:
+				case Item::LightBlueDye:
+				case Item::LightGrayDye:
+				case Item::LimeDye:
+				case Item::MagentaDye:
+				case Item::OrangeDye:
+				case Item::PinkDye:
+				case Item::PurpleDye:
+				case Item::RedDye:
+				case Item::WhiteDye:
+				case Item::YellowDye:
 				{
 					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
-					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(static_cast<NIBBLETYPE>(a_CraftingGrid[GridID].m_ItemDamage & 0x0f)));
+					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(static_cast<unsigned char>(a_CraftingGrid[GridID].m_ItemDamage & 0x0f)));
 					break;
 				}
-				case E_ITEM_GUNPOWDER: break;
-				case E_ITEM_DIAMOND: a_Recipe->m_Result.m_FireworkItem.m_HasTrail = true; break;
-				case E_ITEM_GLOWSTONE_DUST: a_Recipe->m_Result.m_FireworkItem.m_HasFlicker = true; break;
+				case Item::Gunpowder: break;
+				case Item::Diamond: a_Recipe->m_Result.m_FireworkItem.m_HasTrail = true; break;
+				case Item::GlowstoneDust: a_Recipe->m_Result.m_FireworkItem.m_HasFlicker = true; break;
 
-				case E_ITEM_FIRE_CHARGE: a_Recipe->m_Result.m_FireworkItem.m_Type = 1; break;
-				case E_ITEM_GOLD_NUGGET: a_Recipe->m_Result.m_FireworkItem.m_Type = 2; break;
-				case E_ITEM_FEATHER: a_Recipe->m_Result.m_FireworkItem.m_Type = 4; break;
-				case E_ITEM_HEAD: a_Recipe->m_Result.m_FireworkItem.m_Type = 3; break;
+				case Item::FireCharge:  a_Recipe->m_Result.m_FireworkItem.m_Type = 1; break;
+				case Item::GoldNugget:  a_Recipe->m_Result.m_FireworkItem.m_Type = 2; break;
+				case Item::Feather:     a_Recipe->m_Result.m_FireworkItem.m_Type = 4; break;
+				case Item::CreeperHead: a_Recipe->m_Result.m_FireworkItem.m_Type = 3; break;
 				default: LOG("Unexpected item in firework star recipe, was the crafting file's fireworks section changed?"); break;  // ermahgerd BARD ardmins
 			}
 		}
@@ -964,8 +980,8 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 
 void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, int a_GridStride, int a_GridWidth, int a_GridHeight)
 {
-	short result_type = a_Recipe->m_Result.m_ItemType;
-	if ((result_type == E_ITEM_LEATHER_CAP) || (result_type == E_ITEM_LEATHER_TUNIC) || (result_type == E_ITEM_LEATHER_PANTS) || (result_type == E_ITEM_LEATHER_BOOTS))
+	auto ResultType = a_Recipe->m_Result.m_ItemType;
+	if ((ResultType == Item::LeatherHelmet) || (ResultType == Item::LeatherChestplate) || (ResultType == Item::LeatherLeggings) || (ResultType == Item::LeatherBoots))
 	{
 		bool found = false;
 		cItem temp;
@@ -973,14 +989,14 @@ void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCrafting
 		float red = 0;
 		float green = 0;
 		float blue = 0;
-		float dye_count = 0;
+		float DyeCount = 0;
 
 		for (int x = 0; x < a_GridWidth; ++x)
 		{
 			for (int y = 0; y < a_GridHeight; ++y)
 			{
 				int GridIdx = x + a_GridStride * y;
-				if ((a_CraftingGrid[GridIdx].m_ItemType == result_type) && !found)
+				if ((a_CraftingGrid[GridIdx].m_ItemType == ResultType) && !found)
 				{
 					found = true;
 					temp = a_CraftingGrid[GridIdx].CopyOne();
@@ -990,131 +1006,144 @@ void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCrafting
 						red += temp.m_ItemColor.GetRed();
 						green += temp.m_ItemColor.GetGreen();
 						blue += temp.m_ItemColor.GetBlue();
-						++dye_count;
+						++DyeCount;
 					}
 				}
-				else if (a_CraftingGrid[GridIdx].m_ItemType == E_ITEM_DYE)
+				switch (a_CraftingGrid[GridIdx].m_ItemType)
 				{
-					switch (a_CraftingGrid[GridIdx].m_ItemDamage)
+					case Item::BlackDye:
 					{
-						case E_META_DYE_BLACK:
-						{
-							red += 23;
-							green += 23;
-							blue += 23;
-							break;
-						}
-						case E_META_DYE_RED:
-						{
-							red += 142;
-							green += 47;
-							blue += 47;
-							break;
-						}
-						case E_META_DYE_GREEN:
-						{
-							red += 95;
-							green += 118;
-							blue += 47;
-							break;
-						}
-						case E_META_DYE_BROWN:
-						{
-							red += 95;
-							green += 71;
-							blue += 47;
-							break;
-						}
-						case E_META_DYE_BLUE:
-						{
-							red += 47;
-							green += 71;
-							blue += 165;
-							break;
-						}
-						case E_META_DYE_PURPLE:
-						{
-							red += 118;
-							green += 59;
-							blue += 165;
-							break;
-						}
-						case E_META_DYE_CYAN:
-						{
-							red += 71;
-							green += 118;
-							blue += 142;
-							break;
-						}
-						case E_META_DYE_LIGHTGRAY:
-						{
-							red += 142;
-							green += 142;
-							blue += 142;
-							break;
-						}
-						case E_META_DYE_GRAY:
-						{
-							red += 71;
-							green += 71;
-							blue += 71;
-							break;
-						}
-						case E_META_DYE_PINK:
-						{
-							red += 225;
-							green += 118;
-							blue += 153;
-							break;
-						}
-						case E_META_DYE_LIGHTGREEN:
-						{
-							red += 118;
-							green += 190;
-							blue += 23;
-							break;
-						}
-						case E_META_DYE_YELLOW:
-						{
-							red += 213;
-							green += 213;
-							blue += 47;
-							break;
-						}
-						case E_META_DYE_LIGHTBLUE:
-						{
-							red += 95;
-							green += 142;
-							blue += 201;
-							break;
-						}
-						case E_META_DYE_MAGENTA:
-						{
-							red += 165;
-							green += 71;
-							blue += 201;
-							break;
-						}
-						case E_META_DYE_ORANGE:
-						{
-							red += 201;
-							green += 118;
-							blue += 47;
-							break;
-						}
-						case E_META_DYE_WHITE:
-						{
-							red += 237;
-							green += 237;
-							blue += 237;
-							break;
-						}
+						red += 23;
+						green += 23;
+						blue += 23;
+						++DyeCount;
+						break;
 					}
-					++dye_count;
-				}
-				else if (a_CraftingGrid[GridIdx].m_ItemType != E_ITEM_EMPTY)
-				{
-					return;
+					case Item::RedDye:
+					{
+						red += 142;
+						green += 47;
+						blue += 47;
+						++DyeCount;
+						break;
+					}
+					case Item::GreenDye:
+					{
+						red += 95;
+						green += 118;
+						blue += 47;
+						++DyeCount;
+						break;
+					}
+					case Item::BrownDye:
+					{
+						red += 95;
+						green += 71;
+						blue += 47;
+						++DyeCount;
+						break;
+					}
+					case Item::BlueDye:
+					{
+						red += 47;
+						green += 71;
+						blue += 165;
+						++DyeCount;
+						break;
+					}
+					case Item::PurpleDye:
+					{
+						red += 118;
+						green += 59;
+						blue += 165;
+						++DyeCount;
+						break;
+					}
+					case Item::CyanDye:
+					{
+						red += 71;
+						green += 118;
+						blue += 142;
+						++DyeCount;
+						break;
+					}
+					case Item::LightGrayDye:
+					{
+						red += 142;
+						green += 142;
+						blue += 142;
+						++DyeCount;
+						break;
+					}
+					case Item::GrayDye:
+					{
+						red += 71;
+						green += 71;
+						blue += 71;
+						++DyeCount;
+						break;
+					}
+					case Item::PinkDye:
+					{
+						red += 225;
+						green += 118;
+						blue += 153;
+						++DyeCount;
+						break;
+					}
+					case Item::LimeDye:
+					{
+						red += 118;
+						green += 190;
+						blue += 23;
+						++DyeCount;
+						break;
+					}
+					case Item::YellowDye:
+					{
+						red += 213;
+						green += 213;
+						blue += 47;
+						++DyeCount;
+						break;
+					}
+					case Item::LightBlueDye:
+					{
+						red += 95;
+						green += 142;
+						blue += 201;
+						++DyeCount;
+						break;
+					}
+					case Item::MagentaDye:
+					{
+						red += 165;
+						green += 71;
+						blue += 201;
+						++DyeCount;
+						break;
+					}
+					case Item::OrangeDye:
+					{
+						red += 201;
+						green += 118;
+						blue += 47;
+						++DyeCount;
+						break;
+					}
+					case Item::BoneMeal:
+					{
+						red += 237;
+						green += 237;
+						blue += 237;
+						++DyeCount;
+						break;
+					}
+					default:
+					{
+						LOGWARNING("{}: Item type not handled {}.", __FUNCTION__, a_CraftingGrid[GridIdx].m_ItemType);
+						break;
+					}
 				}
 			}
 		}
@@ -1127,10 +1156,10 @@ void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCrafting
 		// Calculate the rgb values
 		double maximum = static_cast<double>(std::max({red, green, blue}));
 
-		double average_red = red / dye_count;
-		double average_green = green / dye_count;
-		double average_blue = blue / dye_count;
-		double average_max = maximum / dye_count;
+		double average_red = red / DyeCount;
+		double average_green = green / DyeCount;
+		double average_blue = blue / DyeCount;
+		double average_max = maximum / DyeCount;
 
 		double max_average = std::max({average_red, average_green, average_blue});
 

@@ -617,32 +617,35 @@ int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 	// Ref: https://minecraft.wiki/w/Damage#Dealing_damage as of 2012_12_20
 	switch (this->GetEquippedWeapon().m_ItemType)
 	{
-		case E_ITEM_WOODEN_SWORD:    return 4;
-		case E_ITEM_GOLD_SWORD:      return 4;
-		case E_ITEM_STONE_SWORD:     return 5;
-		case E_ITEM_IRON_SWORD:      return 6;
-		case E_ITEM_DIAMOND_SWORD:   return 7;
+		case Item::WoodenSword:    return 4;
+		case Item::GoldenSword:    return 4;
+		case Item::StoneSword:     return 5;
+		case Item::IronSword:      return 6;
+		case Item::DiamondSword:   return 7;
 
-		case E_ITEM_WOODEN_AXE:      return 3;
-		case E_ITEM_GOLD_AXE:        return 3;
-		case E_ITEM_STONE_AXE:       return 4;
-		case E_ITEM_IRON_AXE:        return 5;
-		case E_ITEM_DIAMOND_AXE:     return 6;
+		case Item::WoodenAxe:      return 3;
+		case Item::GoldenAxe:      return 3;
+		case Item::StoneAxe:       return 4;
+		case Item::IronAxe:        return 5;
+		case Item::DiamondAxe:     return 6;
 
-		case E_ITEM_WOODEN_PICKAXE:  return 2;
-		case E_ITEM_GOLD_PICKAXE:    return 2;
-		case E_ITEM_STONE_PICKAXE:   return 3;
-		case E_ITEM_IRON_PICKAXE:    return 4;
-		case E_ITEM_DIAMOND_PICKAXE: return 5;
+		case Item::WoodenPickaxe:  return 2;
+		case Item::GoldenPickaxe:  return 2;
+		case Item::StonePickaxe:   return 3;
+		case Item::IronPickaxe:    return 4;
+		case Item::DiamondPickaxe: return 5;
 
-		case E_ITEM_WOODEN_SHOVEL:   return 1;
-		case E_ITEM_GOLD_SHOVEL:     return 1;
-		case E_ITEM_STONE_SHOVEL:    return 2;
-		case E_ITEM_IRON_SHOVEL:     return 3;
-		case E_ITEM_DIAMOND_SHOVEL:  return 4;
+		case Item::WoodenShovel:   return 1;
+		case Item::GoldenShovel:   return 1;
+		case Item::StoneShovel:    return 2;
+		case Item::IronShovel:     return 3;
+		case Item::DiamondShovel:  return 4;
+		default:
+		{
+			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, GetEquippedWeapon().m_ItemType);
+			return 1;
+		}
 	}
-	// All other equipped items give a damage of 1:
-	return 1;
 }
 
 
@@ -782,35 +785,59 @@ float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Da
 	int Toughness = 0;
 	switch (GetEquippedHelmet().m_ItemType)
 	{
-		case E_ITEM_LEATHER_CAP:    ArmorValue += 1; break;
-		case E_ITEM_GOLD_HELMET:    ArmorValue += 2; break;
-		case E_ITEM_CHAIN_HELMET:   ArmorValue += 2; break;
-		case E_ITEM_IRON_HELMET:    ArmorValue += 2; break;
-		case E_ITEM_DIAMOND_HELMET: ArmorValue += 3; Toughness += 2; break;
+		case Item::LeatherHelmet:   ArmorValue += 1; break;
+		case Item::GoldenHelmet:    ArmorValue += 2; break;
+		case Item::ChainmailHelmet: ArmorValue += 2; break;
+		case Item::IronHelmet:      ArmorValue += 2; break;
+		case Item::DiamondHelmet:   ArmorValue += 3; Toughness += 2; break;
+		case Item::Air:             break;
+		default:
+		{
+			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, GetEquippedHelmet().m_ItemType);
+			break;
+		}
 	}
 	switch (GetEquippedChestplate().m_ItemType)
 	{
-		case E_ITEM_LEATHER_TUNIC:      ArmorValue += 3; break;
-		case E_ITEM_GOLD_CHESTPLATE:    ArmorValue += 5; break;
-		case E_ITEM_CHAIN_CHESTPLATE:   ArmorValue += 5; break;
-		case E_ITEM_IRON_CHESTPLATE:    ArmorValue += 6; break;
-		case E_ITEM_DIAMOND_CHESTPLATE: ArmorValue += 8; Toughness += 2; break;
+		case Item::LeatherChestplate:   ArmorValue += 3; break;
+		case Item::GoldenChestplate:    ArmorValue += 5; break;
+		case Item::ChainmailChestplate: ArmorValue += 5; break;
+		case Item::IronChestplate:      ArmorValue += 6; break;
+		case Item::DiamondChestplate:   ArmorValue += 8; Toughness += 2; break;
+		case Item::Air:                 break;
+		default:
+		{
+			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, GetEquippedChestplate().m_ItemType);
+			break;
+		}
 	}
 	switch (GetEquippedLeggings().m_ItemType)
 	{
-		case E_ITEM_LEATHER_PANTS:    ArmorValue += 2; break;
-		case E_ITEM_GOLD_LEGGINGS:    ArmorValue += 3; break;
-		case E_ITEM_CHAIN_LEGGINGS:   ArmorValue += 4; break;
-		case E_ITEM_IRON_LEGGINGS:    ArmorValue += 5; break;
-		case E_ITEM_DIAMOND_LEGGINGS: ArmorValue += 6; Toughness += 2; break;
+		case Item::LeatherLeggings:   ArmorValue += 2; break;
+		case Item::GoldenLeggings:    ArmorValue += 3; break;
+		case Item::ChainmailLeggings: ArmorValue += 4; break;
+		case Item::IronLeggings:      ArmorValue += 5; break;
+		case Item::DiamondLeggings:   ArmorValue += 6; Toughness += 2; break;
+		case Item::Air:               break;
+		default:
+		{
+			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, GetEquippedLeggings().m_ItemType);
+			break;
+		}
 	}
 	switch (GetEquippedBoots().m_ItemType)
 	{
-		case E_ITEM_LEATHER_BOOTS: ArmorValue += 1; break;
-		case E_ITEM_GOLD_BOOTS:    ArmorValue += 1; break;
-		case E_ITEM_CHAIN_BOOTS:   ArmorValue += 1; break;
-		case E_ITEM_IRON_BOOTS:    ArmorValue += 2; break;
-		case E_ITEM_DIAMOND_BOOTS: ArmorValue += 3; Toughness += 2; break;
+		case Item::LeatherBoots:   ArmorValue += 1; break;
+		case Item::GoldenBoots:    ArmorValue += 1; break;
+		case Item::ChainmailBoots: ArmorValue += 1; break;
+		case Item::IronBoots:      ArmorValue += 2; break;
+		case Item::DiamondBoots:   ArmorValue += 3; Toughness += 2; break;
+		case Item::Air:            break;
+		default:
+		{
+			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, GetEquippedBoots().m_ItemType);
+			break;
+		}
 	}
 
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
@@ -1022,8 +1049,8 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
 	int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
-	BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ);
-	BLOCKTYPE BlockBelow = (BlockY > 0) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
+	auto BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ);
+	auto BlockBelow = (BlockY > 0) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : Block::Air::Air();
 	if (!cBlockInfo::IsSolid(BlockIn))  // Making sure we are not inside a solid block
 	{
 		if (m_bOnGround)  // check if it's still on the ground
@@ -1037,31 +1064,28 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	else if (!(IsMinecart() || IsTNT() || (IsPickup() && (m_TicksAlive < 15))))
 	{
 		// Push out entity.
-		BLOCKTYPE GotBlock;
+		BlockState GotBlock;
 
-		static const struct
+		static const std::array<Vector3i, 4> gCrossCoords =
 		{
-			int x, y, z;
-		} gCrossCoords[] =
-		{
-			{ 1, 0,  0},
-			{-1, 0,  0},
-			{ 0, 0,  1},
-			{ 0, 0, -1},
+			Vector3i( 1, 0,  0),
+			Vector3i(-1, 0,  0),
+			Vector3i( 0, 0,  1),
+			Vector3i( 0, 0, -1),
 		} ;
 
 		bool IsNoAirSurrounding = true;
-		for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+		for (const auto & Offset : gCrossCoords)
 		{
-			if (!NextChunk->UnboundedRelGetBlockType(RelBlockX + gCrossCoords[i].x, BlockY, RelBlockZ + gCrossCoords[i].z, GotBlock))
+			if (!NextChunk->UnboundedRelGetBlock(RelBlockX + Offset.x, BlockY, RelBlockZ + Offset.z, GotBlock))
 			{
 				// The pickup is too close to an unloaded chunk, bail out of any physics handling
 				return;
 			}
 			if (!cBlockInfo::IsSolid(GotBlock))
 			{
-				NextPos.x += gCrossCoords[i].x;
-				NextPos.z += gCrossCoords[i].z;
+				NextPos.x += Offset.x;
+				NextPos.z += Offset.z;
 				IsNoAirSurrounding = false;
 				break;
 			}
@@ -1085,32 +1109,32 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (!m_bOnGround)
 	{
-		double fallspeed;
-		if (IsBlockWater(BlockIn))
+		double FallSpeed;
+		if (BlockIn.Type() == BlockType::Water)
 		{
-			fallspeed = m_Gravity * DtSec.count() / 3;  // Fall 3x slower in water
+			FallSpeed = m_Gravity * DtSec.count() / 3;  // Fall 3x slower in water
 			ApplyFriction(NextSpeed, 0.7, static_cast<float>(DtSec.count()));
 		}
-		else if (BlockIn == E_BLOCK_COBWEB)
+		else if (BlockIn == BlockType::Cobweb)
 		{
 			NextSpeed.y *= 0.05;  // Reduce overall falling speed
-			fallspeed = 0;  // No falling
+			FallSpeed = 0;  // No falling
 		}
 		else
 		{
 			// Normal gravity
-			fallspeed = m_Gravity * DtSec.count();
+			FallSpeed = m_Gravity * DtSec.count();
 			NextSpeed -= NextSpeed * (m_AirDrag * 20.0f) * DtSec.count();
 		}
-		NextSpeed.y += static_cast<float>(fallspeed);
+		NextSpeed.y += static_cast<float>(FallSpeed);
 
 		// A real boat floats
 		if (IsBoat())
 		{
 			// Find top water block and sit there
 			int NextBlockY = BlockY;
-			BLOCKTYPE NextBlock = NextChunk->GetBlock(RelBlockX, NextBlockY, RelBlockZ);
-			while (IsBlockWater(NextBlock))
+			auto NextBlock = NextChunk->GetBlock(RelBlockX, NextBlockY, RelBlockZ);
+			while (NextBlock.Type() == BlockType::Water)
 			{
 				NextBlock = NextChunk->GetBlock(RelBlockX, ++NextBlockY, RelBlockZ);
 			}
@@ -1125,7 +1149,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	// Adjust X and Z speed for COBWEB temporary. This speed modification should be handled inside block handlers since we
 	// might have different speed modifiers according to terrain.
-	if (BlockIn == E_BLOCK_COBWEB)
+	if (BlockIn.Type() == BlockType::Cobweb)
 	{
 		NextSpeed.x *= 0.25;
 		NextSpeed.z *= 0.25;
@@ -1375,7 +1399,7 @@ void cEntity::DetectCacti(void)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				if (GetWorld()->GetBlock({ x, y, z }) == E_BLOCK_CACTUS)
+				if (GetWorld()->GetBlock({ x, y, z }).Type() == BlockType::Cactus)
 				{
 					TakeDamage(dtCactusContact, nullptr, 1, 0);
 					return;
@@ -1404,7 +1428,7 @@ void cEntity::DetectMagma(void)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				if (GetWorld()->GetBlock({ x, y, z }) == E_BLOCK_MAGMA)
+				if (GetWorld()->GetBlock({ x, y, z }) == BlockType::MagmaBlock)
 				{
 					TakeDamage(dtMagmaContact, nullptr, 1, 0);
 					return;
@@ -1436,9 +1460,9 @@ bool cEntity::DetectPortal()
 
 	if (const auto Position = m_Position.Floor(); cChunkDef::IsValidHeight(Position))
 	{
-		switch (GetWorld()->GetBlock(Position))
+		switch (GetWorld()->GetBlock(Position).Type())
 		{
-			case E_BLOCK_NETHER_PORTAL:
+			case BlockType::NetherPortal:
 			{
 				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
 				{
@@ -1501,7 +1525,7 @@ bool cEntity::DetectPortal()
 					return true;
 				}
 			}
-			case E_BLOCK_END_PORTAL:
+			case BlockType::EndPortal:
 			{
 				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
 				{
@@ -1727,8 +1751,8 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				BLOCKTYPE Block;
-				if (!a_Chunk.UnboundedRelGetBlockType(x, y, z, Block))
+				BlockState Block;
+				if (!a_Chunk.UnboundedRelGetBlock(x, y, z, Block))
 				{
 					/*
 					LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
@@ -1738,15 +1762,15 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 					continue;
 				}
 
-				if (Block == E_BLOCK_FIRE)
+				if (Block.Type() == BlockType::Fire)
 				{
 					m_IsInFire = true;
 				}
-				else if (IsBlockLava(Block))
+				else if (Block.Type() == BlockType::Lava)
 				{
 					m_IsInLava = true;
 				}
-				else if (IsBlockWater(Block))
+				else if (Block.Type() == BlockType::Water)
 				{
 					m_IsInWater = true;
 				}
@@ -1758,8 +1782,8 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 	int RelX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
 	int HeadHeight = CeilC(GetPosY() + GetHeight()) - 1;
-	BLOCKTYPE BlockIn;
-	if (!a_Chunk.UnboundedRelGetBlockType(RelX, HeadHeight, RelZ, BlockIn))
+	BlockState BlockIn;
+	if (!a_Chunk.UnboundedRelGetBlock(RelX, HeadHeight, RelZ, BlockIn))
 	{
 		/*
 		LOGD("SetSwimState failure: RelX = %d, RelY = %d, RelZ = %d, Pos = %.02f, %.02f}",
@@ -1768,7 +1792,7 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 		*/
 		return;
 	}
-	m_IsHeadInWater = IsBlockWater(BlockIn);
+	m_IsHeadInWater = BlockIn.Type() == BlockType::Water;
 }
 
 

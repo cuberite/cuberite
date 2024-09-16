@@ -128,7 +128,7 @@ protected:
 
 	/** Fills the specified area of blocks in the chunk with the specified blocktype if they are one of the overwritten block types.
 	The coords are absolute, start coords are inclusive, end coords are exclusive. */
-	void ReplaceCuboid(cChunkDesc & a_ChunkDesc, int a_StartX, int a_StartY, int a_StartZ, int a_EndX, int a_EndY, int a_EndZ, BLOCKTYPE a_DstBlockType)
+	void ReplaceCuboid(cChunkDesc & a_ChunkDesc, int a_StartX, int a_StartY, int a_StartZ, int a_EndX, int a_EndY, int a_EndZ, BlockState a_DstBlock)
 	{
 		int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 		int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
@@ -142,9 +142,9 @@ protected:
 			{
 				for (int x = RelStartX; x < RelEndX; x++)
 				{
-					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlockType(x, y, z)))
+					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlock({x, y, z})))
 					{
-						a_ChunkDesc.SetBlockType(x, y, z, a_DstBlockType);
+						a_ChunkDesc.SetBlock({x, y, z}, a_DstBlock);
 					}
 				}  // for x
 			}  // for z
@@ -155,7 +155,7 @@ protected:
 
 	/** Fills the specified area of blocks in the chunk with a random pattern of the specified blocktypes, if they are one of the overwritten block types.
 	The coords are absolute, start coords are inclusive, end coords are exclusive. The first blocktype uses 75% chance, the second 25% chance. */
-	void ReplaceCuboidRandom(cChunkDesc & a_ChunkDesc, int a_StartX, int a_StartY, int a_StartZ, int a_EndX, int a_EndY, int a_EndZ, BLOCKTYPE a_DstBlockType1, BLOCKTYPE a_DstBlockType2)
+	void ReplaceCuboidRandom(cChunkDesc & a_ChunkDesc, int a_StartX, int a_StartY, int a_StartZ, int a_EndX, int a_EndY, int a_EndZ, BlockState a_DstBlock1, BlockState a_DstBlock2)
 	{
 		int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 		int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
@@ -163,17 +163,16 @@ protected:
 		int RelStartZ = Clamp(a_StartZ - BlockZ, 0, cChunkDef::Width - 1);
 		int RelEndX   = Clamp(a_EndX - BlockX,   0, cChunkDef::Width);
 		int RelEndZ   = Clamp(a_EndZ - BlockZ,   0, cChunkDef::Width);
-		auto & rnd = GetRandomProvider();
+		auto & Rnd = GetRandomProvider();
 		for (int y = a_StartY; y < a_EndY; y++)
 		{
 			for (int z = RelStartZ; z < RelEndZ; z++)
 			{
 				for (int x = RelStartX; x < RelEndX; x++)
 				{
-					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlockType(x, y, z)))
+					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlock({x, y, z})))
 					{
-						BLOCKTYPE BlockType = rnd.RandBool(0.75) ? a_DstBlockType1 : a_DstBlockType2;
-						a_ChunkDesc.SetBlockType(x, y, z, BlockType);
+						a_ChunkDesc.SetBlock({x, y, z}, Rnd.RandBool(0.75) ? a_DstBlock1 : a_DstBlock2);
 					}
 				}  // for x
 			}  // for z
@@ -195,38 +194,38 @@ protected:
 		{
 			return;
 		}
-		a_ChunkDesc.SetBlockTypeMeta(RelX, m_FloorHeight + 1, RelZ, E_BLOCK_CHEST, static_cast<NIBBLETYPE>(a_Chest.y));
+		a_ChunkDesc.SetBlock({RelX, m_FloorHeight + 1, RelZ}, Block::Chest::Chest());
 
 		// Fill the chest with random loot
 		static const cLootProbab LootProbab[] =
 		{
 			// Item,                          MinAmount, MaxAmount, Weight
-			{ cItem(E_ITEM_GOLDEN_APPLE),        1,         1,         1 },
-			{ cItem(E_ITEM_DIAMOND_HORSE_ARMOR), 1,         1,         1 },
-			{ cItem(E_ITEM_GOLD_HORSE_ARMOR),    1,         1,         2 },
-			{ cItem(E_ITEM_GOLD),                1,         4,         2 },
-			{ cItem(E_ITEM_13_DISC),             1,         1,         4 },
-			{ cItem(E_ITEM_CAT_DISC),            1,         1,         4 },
-			{ cItem(E_ITEM_IRON_HORSE_ARMOR),    1,         1,         5 },
-			{ cItem(E_ITEM_IRON),                1,         4,        10 },
-			{ cItem(E_ITEM_WHEAT),               1,         4,        10 },
-			{ cItem(E_ITEM_GUNPOWDER),           1,         4,        10 },
-			{ cItem(E_ITEM_STRING),              1,         4,        10 },
-			{ cItem(E_ITEM_REDSTONE_DUST),       1,         4,        10 },
-			{ cItem(E_ITEM_COAL),                1,         4,        10 },
-			{ cItem(E_ITEM_BONE),                1,         4,        10 },
-			{ cItem(E_ITEM_ROTTEN_FLESH),        1,         4,        10 },
-			{ cItem(E_ITEM_SADDLE),              1,         1,        10 },
-			{ cItem(E_ITEM_BUCKET),              1,         1,        10 },
-			{ cItem(E_ITEM_BREAD),               1,         1,        10 },
-			{ cItem(E_ITEM_NAME_TAG),            1,         1,        10 },
-			{ cItem(E_ITEM_BEETROOT_SEEDS),      2,         4,        10 },
-			{ cItem(E_ITEM_MELON_SEEDS),         2,         4,        10 },
-			{ cItem(E_ITEM_PUMPKIN_SEEDS),       2,         4,        10 },
+			{ cItem(Item::GoldenApple),        1,         1,         1 },
+			{ cItem(Item::DiamondHorseArmor),  1,         1,         1 },
+			{ cItem(Item::GoldenHorseArmor),   1,         1,         2 },
+			{ cItem(Item::GoldIngot),          1,         4,         2 },
+			{ cItem(Item::MusicDisc13),        1,         1,         4 },
+			{ cItem(Item::MusicDiscCat),       1,         1,         4 },
+			{ cItem(Item::IronHorseArmor),     1,         1,         5 },
+			{ cItem(Item::IronIngot),          1,         4,        10 },
+			{ cItem(Item::Wheat),              1,         4,        10 },
+			{ cItem(Item::Gunpowder),          1,         4,        10 },
+			{ cItem(Item::String),             1,         4,        10 },
+			{ cItem(Item::Redstone),           1,         4,        10 },
+			{ cItem(Item::Coal),               1,         4,        10 },
+			{ cItem(Item::Bone),               1,         4,        10 },
+			{ cItem(Item::RottenFlesh),        1,         4,        10 },
+			{ cItem(Item::Saddle),             1,         1,        10 },
+			{ cItem(Item::Bucket),             1,         1,        10 },
+			{ cItem(Item::Bread),              1,         1,        10 },
+			{ cItem(Item::NameTag),            1,         1,        10 },
+			{ cItem(Item::BeetrootSeeds),      2,         4,        10 },
+			{ cItem(Item::MelonSeeds),         2,         4,        10 },
+			{ cItem(Item::PumpkinSeeds),       2,         4,        10 },
 		} ;
 
-		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity(RelX, m_FloorHeight + 1, RelZ));
-		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
+		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity({RelX, m_FloorHeight + 1, RelZ}));
+		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == BlockType::Chest));
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
 		int NumSlots = 3 + ((Noise.IntNoise3DInt(a_Chest.x, a_Chest.y, a_Chest.z) / 11) % 4);
 		int Seed = Noise.IntNoise2DInt(RelX, RelZ);
@@ -251,14 +250,14 @@ protected:
 
 		int b = m_FloorHeight + 1;  // Bottom
 		int t = m_FloorHeight + 1 + ROOM_HEIGHT;  // Top
-		ReplaceCuboidRandom(a_ChunkDesc, m_StartX, m_FloorHeight, m_StartZ, m_EndX + 1, b, m_EndZ + 1, E_BLOCK_MOSSY_COBBLESTONE, E_BLOCK_COBBLESTONE);  // Floor
-		ReplaceCuboid(a_ChunkDesc, m_StartX + 1, b, m_StartZ + 1, m_EndX, t, m_EndZ, E_BLOCK_AIR);  // Insides
+		ReplaceCuboidRandom(a_ChunkDesc, m_StartX, m_FloorHeight, m_StartZ, m_EndX + 1, b, m_EndZ + 1, Block::MossyCobblestone::MossyCobblestone(), Block::Cobblestone::Cobblestone());  // Floor
+		ReplaceCuboid(a_ChunkDesc, m_StartX + 1, b, m_StartZ + 1, m_EndX, t, m_EndZ, Block::CaveAir::CaveAir());  // Insides
 
 		// Walls:
-		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_StartZ, m_StartX + 1, t, m_EndZ,       E_BLOCK_COBBLESTONE);  // XM wall
-		ReplaceCuboid(a_ChunkDesc, m_EndX,   b, m_StartZ, m_EndX + 1,   t, m_EndZ,       E_BLOCK_COBBLESTONE);  // XP wall
-		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_StartZ, m_EndX + 1,   t, m_StartZ + 1, E_BLOCK_COBBLESTONE);  // ZM wall
-		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_EndZ,   m_EndX + 1,   t, m_EndZ + 1,   E_BLOCK_COBBLESTONE);  // ZP wall
+		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_StartZ, m_StartX + 1, t, m_EndZ,       Block::Cobblestone::Cobblestone());  // XM wall
+		ReplaceCuboid(a_ChunkDesc, m_EndX,   b, m_StartZ, m_EndX + 1,   t, m_EndZ,       Block::Cobblestone::Cobblestone());  // XP wall
+		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_StartZ, m_EndX + 1,   t, m_StartZ + 1, Block::Cobblestone::Cobblestone());  // ZM wall
+		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_EndZ,   m_EndX + 1,   t, m_EndZ + 1,   Block::Cobblestone::Cobblestone());  // ZP wall
 
 		// Place chests:
 		TryPlaceChest(a_ChunkDesc, m_Chest1);
@@ -272,9 +271,9 @@ protected:
 			(CenterZ >= 0) && (CenterZ < cChunkDef::Width)
 		)
 		{
-			a_ChunkDesc.SetBlockTypeMeta(CenterX, b, CenterZ, E_BLOCK_MOB_SPAWNER, 0);
-			cMobSpawnerEntity * MobSpawner = static_cast<cMobSpawnerEntity *>(a_ChunkDesc.GetBlockEntity(CenterX, b, CenterZ));
-			ASSERT((MobSpawner != nullptr) && (MobSpawner->GetBlockType() == E_BLOCK_MOB_SPAWNER));
+			a_ChunkDesc.SetBlock({CenterX, b, CenterZ}, Block::Spawner::Spawner());
+			cMobSpawnerEntity * MobSpawner = static_cast<cMobSpawnerEntity *>(a_ChunkDesc.GetBlockEntity({CenterX, b, CenterZ}));
+			ASSERT((MobSpawner != nullptr) && (MobSpawner->GetBlockType() == BlockType::Spawner));
 			MobSpawner->SetEntity(m_MonsterType);
 		}
 	}

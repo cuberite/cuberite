@@ -16,11 +16,7 @@ class cItemEndCrystalHandler final :
 
 public:
 
-	constexpr cItemEndCrystalHandler(int a_ItemType) :
-		Super(a_ItemType)
-	{
-	}
-
+	using Super::Super;
 
 	virtual bool OnItemUse(
 		cWorld * a_World, cPlayer * a_Player,
@@ -35,10 +31,10 @@ public:
 		}
 
 		if (
-			const auto BlockType = a_World->GetBlock(a_BlockPos);
+			auto BelowBlock = a_World->GetBlock(a_BlockPos);
 
 			// Don't place if placement block is not obsidian or bedrock:
-			(BlockType != E_BLOCK_OBSIDIAN) && (BlockType != E_BLOCK_BEDROCK)
+			(BelowBlock.Type() != BlockType::Obsidian) && (BelowBlock.Type() != BlockType::Bedrock)
 		)
 		{
 			return false;
@@ -49,8 +45,8 @@ public:
 
 		if (
 			// Don't place if two blocks above placement block aren't air:
-			((Above.y != cChunkDef::Height) && (a_World->GetBlock(Above) != E_BLOCK_AIR)) ||
-			((Above.y < (cChunkDef::Height - 1)) && (a_World->GetBlock(Above.addedY(1)) != E_BLOCK_AIR)) ||
+			((Above.y != cChunkDef::Height) && (a_World->GetBlock(Above) != BlockType::Air)) ||
+			((Above.y < (cChunkDef::Height - 1)) && (a_World->GetBlock(Above.addedY(1)) != BlockType::Air)) ||
 
 			// Refuse placement if there are any entities in a (1 by 2 by 1) bounding box with base at the block above:
 			!a_World->ForEachEntityInBox(

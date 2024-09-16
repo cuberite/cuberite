@@ -8,17 +8,18 @@
 #include "json/json.h"
 #include "../Entities/Player.h"
 #include "../ClientHandle.h"
+#include "../Blocks/BlockMobHead.h"
 
 
 
 
 
-cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+cMobHeadEntity::cMobHeadEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, a_World),
 	m_Type(SKULL_TYPE_SKELETON),
 	m_Rotation(SKULL_ROTATION_NORTH)
 {
-	ASSERT(a_BlockType == E_BLOCK_HEAD);
+	ASSERT(cBlockMobHeadHandler::IsBlockMobHead(a_Block));
 }
 
 
@@ -93,7 +94,17 @@ void cMobHeadEntity::SetOwner(const cUUID & a_OwnerUUID, const AString & a_Owner
 
 cItems cMobHeadEntity::ConvertToPickups() const
 {
-	return cItem(E_ITEM_HEAD, 1, static_cast<short>(m_Type));
+	switch (m_Type)
+	{
+		case SKULL_TYPE_SKELETON: return cItems(Item::SkeletonSkull);
+		case SKULL_TYPE_WITHER:   return cItems(Item::WitherSkeletonSkull);
+		case SKULL_TYPE_ZOMBIE:   return cItems(Item::ZombieHead);
+		case SKULL_TYPE_PLAYER:   return cItems(Item::PlayerHead);  // TODO(12xx12): Proper handling of transferring the skin to the item
+		case SKULL_TYPE_CREEPER:  return cItems(Item::CreeperHead);
+		case SKULL_TYPE_DRAGON:   return cItems(Item::DragonHead);
+	}
+	UNREACHABLE("Unhandled mob head type");
+	return cItems();
 }
 
 
@@ -119,7 +130,7 @@ void cMobHeadEntity::CopyFrom(const cBlockEntity & a_Src)
 void cMobHeadEntity::SendTo(cClientHandle & a_Client)
 {
 	cWorld * World = a_Client.GetPlayer()->GetWorld();
-	a_Client.SendBlockChange(m_Pos, m_BlockType, World->GetBlockMeta(GetPos()));
+	a_Client.SendBlockChange(m_Pos, World->GetBlock(GetPos()));
 	a_Client.SendUpdateBlockEntity(*this);
 }
 

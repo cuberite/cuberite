@@ -13,13 +13,13 @@
 
 
 
-cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+cMobSpawnerEntity::cMobSpawnerEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, a_World),
 	m_Entity(mtPig),
 	m_SpawnDelay(100),
 	m_IsActive(false)
 {
-	ASSERT(a_BlockType == E_BLOCK_MOB_SPAWNER);
+	ASSERT(a_Block.Type() == BlockType::Spawner);
 }
 
 
@@ -56,25 +56,55 @@ void cMobSpawnerEntity::SendTo(cClientHandle & a_Client)
 
 bool cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
 {
-	if (a_Player->GetEquippedItem().m_ItemType == E_ITEM_SPAWN_EGG)
+	switch (a_Player->GetEquippedItem().m_ItemType)
 	{
-		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(a_Player->GetEquippedItem().m_ItemDamage);
-		if (MonsterType == eMonsterType::mtInvalidType)
+		case Item::BatSpawnEgg:
+		case Item::BlazeSpawnEgg:
+		case Item::CaveSpiderSpawnEgg:
+		case Item::ChickenSpawnEgg:
+		case Item::CowSpawnEgg:
+		case Item::CreeperSpawnEgg:
+		case Item::EndermanSpawnEgg:
+		case Item::GhastSpawnEgg:
+		case Item::GuardianSpawnEgg:
+		case Item::HorseSpawnEgg:
+		case Item::MagmaCubeSpawnEgg:
+		case Item::MooshroomSpawnEgg:
+		case Item::OcelotSpawnEgg:
+		case Item::PigSpawnEgg:
+		case Item::RabbitSpawnEgg:
+		case Item::SheepSpawnEgg:
+		case Item::SilverfishSpawnEgg:
+		case Item::SkeletonSpawnEgg:
+		case Item::SlimeSpawnEgg:
+		case Item::SpiderSpawnEgg:
+		case Item::SquidSpawnEgg:
+		case Item::VillagerSpawnEgg:
+		case Item::WitchSpawnEgg:
+		case Item::WitherSkeletonSpawnEgg:
+		case Item::WolfSpawnEgg:
+		case Item::ZombieSpawnEgg:
+		case Item::ZombiePigmanSpawnEgg:
+		case Item::ZombieVillagerSpawnEgg:
 		{
-			return false;
-		}
+			eMonsterType MonsterType = cItemSpawnEggHandler::ItemToMonsterType(a_Player->GetEquippedItem());
+			if (MonsterType == eMonsterType::mtInvalidType)
+			{
+				return false;
+			}
 
-		m_Entity = MonsterType;
-		ResetTimer();
-		if (!a_Player->IsGameModeCreative())
-		{
-			a_Player->GetInventory().RemoveOneEquippedItem();
+			m_Entity = MonsterType;
+			ResetTimer();
+			if (!a_Player->IsGameModeCreative())
+			{
+				a_Player->GetInventory().RemoveOneEquippedItem();
+			}
+			m_World->BroadcastBlockEntity(GetPos());
+			FLOGD("Changed monster spawner at {0} to type {1}.", GetPos(), cMonster::MobTypeToString(MonsterType));
+			return true;
 		}
-		m_World->BroadcastBlockEntity(GetPos());
-		FLOGD("Changed monster spawner at {0} to type {1}.", GetPos(), cMonster::MobTypeToString(MonsterType));
-		return true;
+		default: return false;
 	}
-	return false;
 }
 
 

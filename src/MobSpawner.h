@@ -22,7 +22,7 @@ public :
 	cMobSpawner(cMonster::eFamily MobFamily, const std::set<eMonsterType> & a_AllowedTypes);
 
 	/** Check if specified block can be a Pack center for this spawner */
-	bool CheckPackCenter(BLOCKTYPE a_BlockType);
+	bool CheckPackCenter(BlockState a_Block);
 
 	/** Try to create a monster here
 	If this is the first of a Pack, determine the type of monster

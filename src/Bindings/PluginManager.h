@@ -238,7 +238,7 @@ public:
 
 	// Calls for individual hooks. Each returns false if the action is to continue or true if the plugin wants to abort
 	bool CallHookBlockSpread              (cWorld & a_World, Vector3i a_BlockPos, eSpreadSource a_Source);
-	bool CallHookBlockToPickups           (cWorld & a_World, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool, cItems & a_Pickups);
+	bool CallHookBlockToPickups           (cWorld & a_World, Vector3i a_BlockPos, BlockState a_Block, const cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool, cItems & a_Pickups);
 	bool CallHookBrewingCompleting        (cWorld & a_World, cBrewingstandEntity & a_Brewingstand);
 	bool CallHookBrewingCompleted         (cWorld & a_World, cBrewingstandEntity & a_Brewingstand);
 	bool CallHookChat                     (cPlayer & a_Player, AString & a_Message);
@@ -266,8 +266,8 @@ public:
 	bool CallHookLogin                    (cClientHandle & a_Client, UInt32 a_ProtocolVersion, const AString & a_Username);
 	bool CallHookLoginForge               (cClientHandle & a_Client, AStringMap & a_Mods);
 	bool CallHookPlayerAnimation          (cPlayer & a_Player, int a_Animation);
-	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BlockState a_Block);
+	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BlockState a_Block);
 	bool CallHookPlayerDestroyed          (cPlayer & a_Player);
 	bool CallHookPlayerEating             (cPlayer & a_Player);
 	bool CallHookPlayerFished             (cPlayer & a_Player, const cItems & a_Reward, const int ExperienceAmount);
@@ -285,9 +285,9 @@ public:
 	bool CallHookPlayerShooting           (cPlayer & a_Player);
 	bool CallHookPlayerSpawned            (cPlayer & a_Player);
 	bool CallHookPlayerTossingItem        (cPlayer & a_Player);
-	bool CallHookPlayerUsedBlock          (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool CallHookPlayerUsedBlock          (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BlockState a_Block);
 	bool CallHookPlayerUsedItem           (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos);
-	bool CallHookPlayerUsingBlock         (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool CallHookPlayerUsingBlock         (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BlockState a_Block);
 	bool CallHookPlayerUsingItem          (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos);
 	bool CallHookPluginMessage            (cClientHandle & a_Client, const AString & a_Channel, ContiguousByteBufferView a_Message);
 	bool CallHookPluginsLoaded            (void);

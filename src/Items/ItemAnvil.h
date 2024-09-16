@@ -3,7 +3,8 @@
 
 #include "ItemHandler.h"
 #include "Blocks/BlockAnvil.h"
-
+#include "Registries/BlockItemConverter.h"
+#include "Protocol/Palettes/Upgrade.h"
 
 
 
@@ -17,14 +18,15 @@ public:
 
 	using Super::Super;
 
-private:
-
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
-		return a_Player.PlaceBlock(
-			a_PlacePosition,
-			static_cast<BLOCKTYPE>(a_HeldItem.m_ItemType),
-			cBlockAnvilHandler::YawToMetaData(a_Player.GetYaw()) | static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage << 2)
-		);
+		return a_Player.PlaceBlock(a_PlacePosition, Block::Anvil::Anvil(RotationToBlockFace(a_Player.GetYaw())));
+
+		// TODO(12xx12) Other types
+	}
+
+	bool IsPlaceable() const override
+	{
+		return true;
 	}
 };

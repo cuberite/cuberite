@@ -14,7 +14,7 @@ class cItemPoisonousPotatoHandler final:
 
 public:
 
-	constexpr cItemPoisonousPotatoHandler(int a_ItemType):
+	constexpr cItemPoisonousPotatoHandler(Item a_ItemType):
 		Super(a_ItemType, FoodInfo(2, 1.2))
 	{
 	}

@@ -4,6 +4,7 @@
 #include "ItemHandler.h"
 #include "../BlockInfo.h"
 #include "../World.h"
+#include "../Blocks/BlockFluid.h"
 
 
 
@@ -40,11 +41,11 @@ public:
 			{
 			}
 
-			virtual bool OnNextBlock(Vector3i a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+			virtual bool OnNextBlock(Vector3i a_BlockPosition, BlockState a_Block, eBlockFace a_EntryFace) override
 			{
-				if (IsBlockWater(a_BlockType))
+				if (a_Block == Block::Air::Air())
 				{
-					if (a_BlockMeta != 0)  // we're only looking for source blocks
+					if (cBlockFluidHandler::GetFalloff(a_Block) != 0)  // we're only looking for source blocks
 					{
 						return false;
 					}
@@ -94,7 +95,7 @@ public:
 		// Give back a filled water bottle if gamemode is not creative:
 		if (!a_Player->IsGameModeCreative())
 		{
-			a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_POTION));
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(Item::Potion));
 		}
 		return true;
 	}

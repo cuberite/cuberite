@@ -29,8 +29,8 @@ void cMooshroom::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_LEATHER);
-	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? E_ITEM_STEAK : E_ITEM_RAW_BEEF);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, Item::Leather);
+	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? Item::CookedBeef : Item::Beef);
 }
 
 
@@ -41,23 +41,23 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 {
 	switch (a_Player.GetEquippedItem().m_ItemType)
 	{
-		case E_ITEM_BUCKET:
+		case Item::Bucket:
 		{
 			// Milk the cow.
 			if (!a_Player.IsGameModeCreative())
 			{
-				a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_MILK));
+				a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::MilkBucket));
 			}
 		} break;
-		case E_ITEM_BOWL:
+		case Item::Bowl:
 		{
 			// Soup the cow.
 			if (!a_Player.IsGameModeCreative())
 			{
-				a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_MUSHROOM_SOUP));
+				a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::MushroomStem));
 			}
 		} break;
-		case E_ITEM_SHEARS:
+		case Item::Shears:
 		{
 			if (!a_Player.IsGameModeCreative())
 			{
@@ -65,10 +65,14 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 			}
 
 			cItems Drops;
-			Drops.emplace_back(E_BLOCK_RED_MUSHROOM, static_cast<char>(5), static_cast<char>(0));
+			Drops.emplace_back(Item::RedMushroom, 5);
 			m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 			m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtCow, false);
 			Destroy();
 		} break;
+		default:
+		{
+			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, a_Player.GetEquippedItem().m_ItemType);
+		}
 	}
 }

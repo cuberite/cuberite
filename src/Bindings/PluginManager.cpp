@@ -269,7 +269,7 @@ bool cPluginManager::CallHookBlockSpread(cWorld & a_World, Vector3i a_BlockPos, 
 bool cPluginManager::CallHookBlockToPickups(
 	cWorld & a_World,
 	Vector3i a_BlockPos,
-	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	BlockState a_Block,
 	const cBlockEntity * a_BlockEntity,
 	const cEntity * a_Digger,
 	const cItem * a_Tool,
@@ -278,7 +278,7 @@ bool cPluginManager::CallHookBlockToPickups(
 {
 	return GenericCallHook(HOOK_BLOCK_TO_PICKUPS, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnBlockToPickups(a_World, a_BlockPos, a_BlockType, a_BlockMeta, a_BlockEntity, a_Digger, a_Tool, a_Pickups);
+			return a_Plugin->OnBlockToPickups(a_World, a_BlockPos, a_Block, a_BlockEntity, a_Digger, a_Tool, a_Pickups);
 		}
 	);
 }
@@ -709,11 +709,11 @@ bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation
 
 
 
-bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BlockState a_Block)
 {
 	return GenericCallHook(HOOK_PLAYER_BREAKING_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerBreakingBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerBreakingBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_Block);
 		}
 	);
 }
@@ -722,11 +722,11 @@ bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, Vector3i a_
 
 
 
-bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BlockState a_Block)
 {
 	return GenericCallHook(HOOK_PLAYER_BROKEN_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerBrokenBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerBrokenBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_Block);
 		}
 	);
 }
@@ -956,11 +956,11 @@ bool cPluginManager::CallHookPlayerTossingItem(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BlockState a_Block)
 {
 	return GenericCallHook(HOOK_PLAYER_USED_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsedBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerUsedBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z, a_Block);
 		}
 	);
 }
@@ -982,11 +982,11 @@ bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, Vector3i a_Block
 
 
 
-bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BlockState a_Block)
 {
 	return GenericCallHook(HOOK_PLAYER_USING_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsingBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerUsingBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z, a_Block);
 		}
 	);
 }

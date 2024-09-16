@@ -16,28 +16,10 @@
 
 
 
-cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
+cDropSpenserEntity::cDropSpenserEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_ShouldDropSpense(false)
 {
-}
-
-
-
-
-
-void cDropSpenserEntity::AddDropSpenserDir(Vector3i & a_RelCoord, NIBBLETYPE a_Direction)
-{
-	switch (a_Direction & E_META_DROPSPENSER_FACING_MASK)
-	{
-		case E_META_DROPSPENSER_FACING_YM: a_RelCoord.y--; return;
-		case E_META_DROPSPENSER_FACING_YP: a_RelCoord.y++; return;
-		case E_META_DROPSPENSER_FACING_ZM: a_RelCoord.z--; return;
-		case E_META_DROPSPENSER_FACING_ZP: a_RelCoord.z++; return;
-		case E_META_DROPSPENSER_FACING_XM: a_RelCoord.x--; return;
-		case E_META_DROPSPENSER_FACING_XP: a_RelCoord.x++; return;
-	}
-	LOGWARNING("%s: Unhandled direction: %d", __FUNCTION__, a_Direction);
 }
 
 
@@ -78,16 +60,26 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 	DropSpenseFromSlot(a_Chunk, SpenseSlot);
 
 	// Broadcast a smoke and click effects:
-	NIBBLETYPE Meta = a_Chunk.GetMeta(GetRelPos());
-	int SmokeDir = 0;
-	switch (Meta & E_META_DROPSPENSER_FACING_MASK)
+	auto Self = a_Chunk.GetBlock(GetRelPos());
+
+	eBlockFace Facing = BLOCK_FACE_NONE;
+	switch (Self.Type())
 	{
-		case E_META_DROPSPENSER_FACING_YP: SmokeDir = static_cast<int>(SmokeDirection::CENTRE); break;  // YP & YM don't have associated smoke dirs, just do 4 (centre of block)
-		case E_META_DROPSPENSER_FACING_YM: SmokeDir = static_cast<int>(SmokeDirection::CENTRE); break;
-		case E_META_DROPSPENSER_FACING_XM: SmokeDir = static_cast<int>(SmokeDirection::EAST); break;
-		case E_META_DROPSPENSER_FACING_XP: SmokeDir = static_cast<int>(SmokeDirection::WEST); break;
-		case E_META_DROPSPENSER_FACING_ZM: SmokeDir = static_cast<int>(SmokeDirection::SOUTH); break;
-		case E_META_DROPSPENSER_FACING_ZP: SmokeDir = static_cast<int>(SmokeDirection::NORTH); break;
+		case BlockType::Dropper:   Facing = Block::Dropper::Facing(Self); break;
+		case BlockType::Dispenser: Facing = Block::Dispenser::Facing(Self); break;
+		default: return;
+	}
+
+	int SmokeDir = 0;
+	switch (Facing)
+	{
+		case BLOCK_FACE_YP: SmokeDir = static_cast<int>(SmokeDirection::CENTRE); break;  // YP & YM don't have associated smoke dirs, just do 4 (centre of block)
+		case BLOCK_FACE_YM: SmokeDir = static_cast<int>(SmokeDirection::CENTRE); break;
+		case BLOCK_FACE_XM: SmokeDir = static_cast<int>(SmokeDirection::EAST); break;
+		case BLOCK_FACE_XP: SmokeDir = static_cast<int>(SmokeDirection::WEST); break;
+		case BLOCK_FACE_ZM: SmokeDir = static_cast<int>(SmokeDirection::SOUTH); break;
+		case BLOCK_FACE_ZP: SmokeDir = static_cast<int>(SmokeDirection::NORTH); break;
+		default: return;
 	}
 	m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, GetPos(), SmokeDir);
 	m_World->BroadcastSoundEffect("block.dispenser.dispense", m_Pos, 1.0f, 1.0f);
@@ -161,11 +153,11 @@ void cDropSpenserEntity::SendTo(cClientHandle & a_Client)
 
 bool cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 {
-	if (m_BlockType == E_BLOCK_DISPENSER)
+	if (m_Block.Type() == BlockType::Dispenser)
 	{
 		a_Player->GetStatistics().Custom[CustomStatistic::InspectDispenser]++;
 	}
-	else  // E_BLOCK_DROPPER
+	else  // BlockType::Dropper
 	{
 		a_Player->GetStatistics().Custom[CustomStatistic::InspectDropper]++;
 	}
@@ -193,29 +185,38 @@ bool cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 
 void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 {
-	Vector3i dispCoord(m_Pos);
-	auto Meta = a_Chunk.GetMeta(GetRelPos());
-	AddDropSpenserDir(dispCoord, Meta);
+	Vector3i DispCoord(m_Pos);
+	auto Self = a_Chunk.GetBlock(GetRelPos());
+	eBlockFace Facing = BLOCK_FACE_NONE;
+	switch (Self.Type())
+	{
+		case BlockType::Dropper:   Facing = Block::Dropper::Facing(Self); break;
+		case BlockType::Dispenser: Facing = Block::Dispenser::Facing(Self); break;
+		default: return;
+	}
+
+	DispCoord = AddFaceDirection(DispCoord, Facing);
 
 	cItems Pickups;
 	Pickups.push_back(m_Contents.RemoveOneItem(a_SlotNum));
 
 	const int PickupSpeed = GetRandomProvider().RandInt(2, 6);  // At least 2, at most 6
 	int PickupSpeedX = 0, PickupSpeedY = 0, PickupSpeedZ = 0;
-	switch (Meta & E_META_DROPSPENSER_FACING_MASK)
+	switch (Facing)
 	{
-		case E_META_DROPSPENSER_FACING_YP: PickupSpeedY =  PickupSpeed; break;
-		case E_META_DROPSPENSER_FACING_YM: PickupSpeedY = -PickupSpeed; break;
-		case E_META_DROPSPENSER_FACING_XM: PickupSpeedX = -PickupSpeed; break;
-		case E_META_DROPSPENSER_FACING_XP: PickupSpeedX =  PickupSpeed; break;
-		case E_META_DROPSPENSER_FACING_ZM: PickupSpeedZ = -PickupSpeed; break;
-		case E_META_DROPSPENSER_FACING_ZP: PickupSpeedZ =  PickupSpeed; break;
+		case BLOCK_FACE_YP: PickupSpeedY =  PickupSpeed; break;
+		case BLOCK_FACE_YM: PickupSpeedY = -PickupSpeed; break;
+		case BLOCK_FACE_XM: PickupSpeedX = -PickupSpeed; break;
+		case BLOCK_FACE_XP: PickupSpeedX =  PickupSpeed; break;
+		case BLOCK_FACE_ZM: PickupSpeedZ = -PickupSpeed; break;
+		case BLOCK_FACE_ZP: PickupSpeedZ =  PickupSpeed; break;
+		default: UNREACHABLE("Got unknown Block face");
 	}
 
 	double MicroX, MicroY, MicroZ;
-	MicroX = dispCoord.x + 0.5;
-	MicroY = dispCoord.y + 0.4;  // Slightly less than half, to accomodate actual texture hole on DropSpenser
-	MicroZ = dispCoord.z + 0.5;
+	MicroX = DispCoord.x + 0.5;
+	MicroY = DispCoord.y + 0.4;  // Slightly less than half, to accomodate actual texture hole on DropSpenser
+	MicroZ = DispCoord.z + 0.5;
 
 
 	m_World->SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ, PickupSpeedX, PickupSpeedY, PickupSpeedZ);

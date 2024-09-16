@@ -95,7 +95,7 @@ void cLeashKnot::GetDrops(cItems & a_Items, cEntity * a_Killer)
 {
 	if ((a_Killer != nullptr) && a_Killer->IsPlayer() && !static_cast<cPlayer *>(a_Killer)->IsGameModeCreative())
 	{
-		a_Items.emplace_back(E_ITEM_LEASH);
+		a_Items.emplace_back(Item::Lead);
 	}
 }
 
