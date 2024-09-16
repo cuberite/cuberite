@@ -2,9 +2,11 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "BlockType.h"
 #include "Mixins.h"
 #include "ChunkInterface.h"
 #include "BlockSlab.h"
+#include "BlockStairs.h"
 #include "../Chunk.h"
 
 
@@ -134,14 +136,19 @@ private:
 		{
 			return true;
 		}
-		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
+
+		// upside down slabs
+		if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
 		{
-			// Check if the slab is turned up side down
-			if (cBlockSlabHandler::IsSlabTop(BelowBlock))
-			{
-				return true;
-			}
+			return cBlockSlabHandler::IsSlabDown(BelowBlock);
 		}
+
+		// upside down stairs
+		if (cBlockStairsHandler::IsAnyStairType(BelowBlock))
+		{
+			return cBlockSlabHandler::IsSlabTop(BelowBlock);
+		}
+
 		return false;
 	}
 

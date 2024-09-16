@@ -6,10 +6,7 @@
 #include "Globals.h"
 #include "LuaState.h"
 
-extern "C"
-{
-	#include "lua/src/lualib.h"
-}
+#include "lua/src/lualib.h"
 
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
@@ -35,10 +32,7 @@ extern "C"
 
 
 // fwd: "SQLite/lsqlite3.cpp"
-extern "C"
-{
-	int luaopen_lsqlite3(lua_State * L);
-}
+extern "C" int luaopen_lsqlite3(lua_State * L);
 
 // fwd: "LuaExpat/lxplib.cpp":
 int luaopen_lxp(lua_State * L);
@@ -151,7 +145,7 @@ void cLuaStateTracker::Del(cLuaState & a_LuaState)
 
 
 
-AString cLuaStateTracker::GetStats()
+AString cLuaStateTracker::GetStats(void)
 {
 	auto & Instance = Get();
 	cCSLock Lock(Instance.m_CSLuaStates);
@@ -162,15 +156,15 @@ AString cLuaStateTracker::GetStats()
 		int Mem = 0;
 		if (!state->Call("collectgarbage", "count", cLuaState::Return, Mem))
 		{
-			res.append(fmt::format(FMT_STRING("Cannot query memory for state \"{}\"\n"), state->GetSubsystemName()));
+			res.append(Printf("Cannot query memory for state \"%s\"\n", state->GetSubsystemName().c_str()));
 		}
 		else
 		{
-			res.append(fmt::format(FMT_STRING("State \"{}\" is using {} KiB of memory\n"), state->GetSubsystemName(), Mem));
+			res.append(Printf("State \"%s\" is using %d KiB of memory\n", state->GetSubsystemName().c_str(), Mem));
 			Total += Mem;
 		}
 	}
-	res.append(fmt::format(FMT_STRING("Total memory used by Lua: {} KiB\n"), Total));
+	res.append(Printf("Total memory used by Lua: %d KiB\n", Total));
 	return res;
 }
 
@@ -178,7 +172,7 @@ AString cLuaStateTracker::GetStats()
 
 
 
-cLuaStateTracker & cLuaStateTracker::Get()
+cLuaStateTracker & cLuaStateTracker::Get(void)
 {
 	static cLuaStateTracker Inst;  // The singleton
 	return Inst;
@@ -809,7 +803,7 @@ bool cLuaState::PushFunction(const cRef & a_TableRef, const char * a_FnName)
 	// Pop the table off the stack:
 	lua_remove(m_LuaState, -2);
 
-	m_CurrentFunctionName = fmt::format(FMT_STRING("<table-callback {}>"), a_FnName);
+	Printf(m_CurrentFunctionName, "<table-callback %s>", a_FnName);
 	m_NumCurrentFunctionArgs = 0;
 	return true;
 }
@@ -1662,13 +1656,13 @@ bool cLuaState::CallFunction(int a_NumResults)
 	if (s != 0)
 	{
 		// The error has already been printed together with the stacktrace
-		LOGWARNING("Error in %s calling function %s()", m_SubsystemName, CurrentFunctionName);
+		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), CurrentFunctionName.c_str());
 
 		// Remove the error handler and error message from the stack:
 		auto top = lua_gettop(m_LuaState);
 		if (top < 2)
 		{
-			LogStackValues(fmt::format(FMT_STRING("The Lua stack is in an unexpected state, expected at least two values there, but got {}"), top).c_str());
+			LogStackValues(Printf("The Lua stack is in an unexpected state, expected at least two values there, but got %d", top).c_str());
 		}
 		lua_pop(m_LuaState, std::min(2, top));
 		return false;
@@ -1703,7 +1697,7 @@ bool cLuaState::CheckParamUserTable(int a_StartParam, const char * a_UserTable, 
 		lua_Debug entry;
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-		AString ErrMsg = fmt::format(FMT_STRING("#ferror in function '{}'."), (entry.name != nullptr) ? entry.name : "?");
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != nullptr) ? entry.name : "?");
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
@@ -1736,7 +1730,7 @@ bool cLuaState::CheckParamUserType(int a_StartParam, const char * a_UserType, in
 		lua_Debug entry;
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-		AString ErrMsg = fmt::format(FMT_STRING("#ferror in function '{}'."), (entry.name != nullptr) ? entry.name : "?");
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != nullptr) ? entry.name : "?");
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
@@ -1769,7 +1763,7 @@ bool cLuaState::CheckParamTable(int a_StartParam, int a_EndParam)
 		lua_Debug entry;
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-		AString ErrMsg = fmt::format(FMT_STRING("#ferror in function '{}'."), (entry.name != nullptr) ? entry.name : "?");
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != nullptr) ? entry.name : "?");
 
 		BreakIntoDebugger(m_LuaState);
 
@@ -1805,7 +1799,7 @@ bool cLuaState::CheckParamNumber(int a_StartParam, int a_EndParam)
 		lua_Debug entry;
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-		AString ErrMsg = fmt::format(FMT_STRING("#ferror in function '{}'."), (entry.name != nullptr) ? entry.name : "?");
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != nullptr) ? entry.name : "?");
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
@@ -1838,7 +1832,7 @@ bool cLuaState::CheckParamBool(int a_StartParam, int a_EndParam)
 		lua_Debug entry;
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-		AString ErrMsg = fmt::format(FMT_STRING("#ferror in function '{}'."), (entry.name != nullptr) ? entry.name : "?");
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != nullptr) ? entry.name : "?");
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
@@ -1874,7 +1868,7 @@ bool cLuaState::CheckParamString(int a_StartParam, int a_EndParam)
 		tolua_err.array = 0;
 		tolua_err.type = "string";
 		tolua_err.index = i;
-		AString ErrMsg = fmt::format(FMT_STRING("#ferror in function '{}'."), (entry.name != nullptr) ? entry.name : "?");
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != nullptr) ? entry.name : "?");
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
@@ -1969,7 +1963,7 @@ bool cLuaState::CheckParamVector3(int a_StartParam, int a_EndParam)
 			continue;
 		}
 
-		ApiParamError(fmt::format(FMT_STRING("Failed to read parameter #{}. Vector3 expected, got {}"), i, GetTypeText(i)));
+		ApiParamError("Failed to read parameter #%d. Vector3 expected, got %s", i, GetTypeText(i).c_str());
 		return false;
 	}
 	return true;
@@ -2001,7 +1995,7 @@ bool cLuaState::CheckParamUUID(int a_StartParam, int a_EndParam)
 
 		if (!tolua_iscppstring(m_LuaState, i, 0, &err))
 		{
-			ApiParamError(fmt::format(FMT_STRING("Failed to read parameter #{}. UUID expected, got {}"), i, GetTypeText(i)));
+			ApiParamError("Failed to read parameter #%d. UUID expected, got %s", i, GetTypeText(i).c_str());
 			return false;
 		}
 
@@ -2009,7 +2003,7 @@ bool cLuaState::CheckParamUUID(int a_StartParam, int a_EndParam)
 		GetStackValue(i, tempStr);
 		if (!tempUUID.FromString(tempStr))
 		{
-			ApiParamError(fmt::format(FMT_STRING("Failed to read parameter #{}. UUID expected, got non-UUID string:\n\t\"{}\""), i, tempStr));
+			ApiParamError("Failed to read parameter #%d. UUID expected, got non-UUID string:\n\t\"%s\"", i, tempStr.c_str());
 			return false;
 		}
 	}
@@ -2031,7 +2025,7 @@ bool cLuaState::CheckParamEnd(int a_Param)
 	lua_Debug entry;
 	VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 	VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-	AString ErrMsg = fmt::format(FMT_STRING("#ferror in function '{}': Too many arguments."), (entry.name != nullptr) ? entry.name : "?");
+	AString ErrMsg = Printf("#ferror in function '%s': Too many arguments.", (entry.name != nullptr) ? entry.name : "?");
 	tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 	return false;
 }
@@ -2052,9 +2046,9 @@ bool cLuaState::CheckParamSelf(const char * a_SelfClassName)
 	lua_Debug entry;
 	VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 	VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-	AString ErrMsg = fmt::format(
-		FMT_STRING("Error in function '{}'. The 'self' parameter is not of the expected type, \"instance of {}\". " \
-		"Make sure you're using the correct calling convention (obj:fn() instead of obj.fn())."),
+	AString ErrMsg = Printf(
+		"Error in function '%s'. The 'self' parameter is not of the expected type, \"instance of %s\". " \
+		"Make sure you're using the correct calling convention (obj:fn() instead of obj.fn()).",
 		(entry.name != nullptr) ? entry.name : "<unknown>", a_SelfClassName
 	);
 	tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
@@ -2077,9 +2071,9 @@ bool cLuaState::CheckParamStaticSelf(const char * a_SelfClassName)
 	lua_Debug entry;
 	VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 	VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-	AString ErrMsg = fmt::format(
-		FMT_STRING("Error in function '{}'. The 'self' parameter is not of the expected type, \"class {}\". " \
-		"Make sure you're using the correct calling convention (cClassName:fn() instead of cClassName.fn() or obj:fn())."),
+	AString ErrMsg = Printf(
+		"Error in function '%s'. The 'self' parameter is not of the expected type, \"class %s\". " \
+		"Make sure you're using the correct calling convention (cClassName:fn() instead of cClassName.fn() or obj:fn()).",
 		(entry.name != nullptr) ? entry.name : "<unknown>", a_SelfClassName
 	);
 	tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
@@ -2461,8 +2455,8 @@ void cLuaState::LogStackValues(lua_State * a_LuaState, const char * a_Header)
 		switch (Type)
 		{
 			case LUA_TBOOLEAN: Value.assign((lua_toboolean(a_LuaState, i) != 0) ? "true" : "false"); break;
-			case LUA_TLIGHTUSERDATA: Value = fmt::format(FMT_STRING("{}"), lua_touserdata(a_LuaState, i)); break;
-			case LUA_TNUMBER:        Value = fmt::format(FMT_STRING("{}"), lua_tonumber(a_LuaState, i)); break;
+			case LUA_TLIGHTUSERDATA: Printf(Value, "%p", lua_touserdata(a_LuaState, i)); break;
+			case LUA_TNUMBER:        Printf(Value, "%f", static_cast<double>(lua_tonumber(a_LuaState, i))); break;
 			case LUA_TSTRING:
 			{
 				size_t len;
@@ -2470,11 +2464,11 @@ void cLuaState::LogStackValues(lua_State * a_LuaState, const char * a_Header)
 				Value.assign(txt, std::min<size_t>(len, 50));  // Only log up to 50 characters of the string
 				break;
 			}
-			case LUA_TTABLE:         Value = fmt::format(FMT_STRING("{}"), lua_topointer(a_LuaState, i)); break;
-			case LUA_TFUNCTION:      Value = fmt::format(FMT_STRING("{}"), lua_topointer(a_LuaState, i)); break;
+			case LUA_TTABLE:         Printf(Value, "%p", lua_topointer(a_LuaState, i)); break;
+			case LUA_TFUNCTION:      Printf(Value, "%p", lua_topointer(a_LuaState, i)); break;
 			case LUA_TUSERDATA:
 			{
-				Value = fmt::format(FMT_STRING("{} ({})"), lua_touserdata(a_LuaState, i), tolua_typename(a_LuaState, i));
+				Printf(Value, "%p (%s)", lua_touserdata(a_LuaState, i), tolua_typename(a_LuaState, i));
 				// tolua_typename pushes the string onto Lua stack, pop it off again:
 				lua_pop(a_LuaState, 1);
 				break;
@@ -2511,7 +2505,7 @@ void cLuaState::LogApiCallParamFailure(const char * a_FnName, const char * a_Par
 
 void cLuaState::TrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect)
 {
-	a_DeadlockDetect.TrackCriticalSection(m_CS, fmt::format(FMT_STRING("cLuaState {}"), m_SubsystemName));
+	a_DeadlockDetect.TrackCriticalSection(m_CS, Printf("cLuaState %s", m_SubsystemName.c_str()));
 }
 
 
