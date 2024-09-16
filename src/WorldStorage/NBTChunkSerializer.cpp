@@ -1292,7 +1292,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 		for (size_t Y = 0; Y < cChunkDef::NumSections; Y++)
 		{
-			const auto Blocks = serializer.m_BlockData2.GetSection(Y); 
+			const auto Blocks = serializer.m_BlockData.GetSection(Y); 
 			const auto BlockLights = serializer.m_LightData.GetBlockLightSection(Y); 
 			const auto SkyLights = serializer.m_LightData.GetSkyLightSection(Y); 
 			if ((Blocks != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr)) 
@@ -1315,10 +1315,10 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 					bool hasblockstats = false;
 					aWriter.BeginCompound("");
 					auto val = temparr[i];
-					AString strval = savemap[static_cast<ENUM_BLOCKS>(val)];
+					auto strval = AString(NamespaceSerializer::From(val.Type()));
 					auto splitpos = std::find(strval.begin(), strval.end(), ' ');
 					auto id_end_index = static_cast<int>(std::distance(strval.begin(), splitpos));
-					auto stringid = strval.substr(0,id_end_index);
+					AString stringid = strval.substr(0,id_end_index);
 					AString blockstates;
 					AStringVector blockstatesstrings;
 					if (splitpos != strval.end())
