@@ -22,7 +22,6 @@ Implements the 1.8 protocol classes:
 #include "../StringCompression.h"
 #include "../CompositeChat.h"
 #include "../UUID.h"
-#include "../World.h"
 #include "../JsonUtils.h"
 
 #include "../WorldStorage/FastNBT.h"

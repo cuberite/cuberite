@@ -1295,7 +1295,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 			const auto Blocks = serializer.m_BlockData.GetSection(Y); 
 			const auto BlockLights = serializer.m_LightData.GetBlockLightSection(Y); 
 			const auto SkyLights = serializer.m_LightData.GetSkyLightSection(Y); 
-			if ((Blocks != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr)) 
+			if ((Blocks != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr)) // currenlty trhorews an crashes if Block is null
 			{ 
 				ChunkBlockData::BlockArray temparr;
 				std::copy(Blocks->begin(),Blocks->end(),temparr.begin());
@@ -1378,11 +1378,12 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				int toloop = Blocks->size();
 				for (size_t i = 0; i < toloop; i++)
 				{
-					auto v = Blocks->at(i);
+					auto & v = Blocks->at(i);
 					auto ind = std::find(temparr.begin(), newlistend, v);
 					INT64 towrite = ind - temparr.begin();
 					tbuf |= towrite << BitIndex;
 					BitIndex += bitused;
+					
 					if (BitIndex + bitused > 64 || i == toloop-1)  // not enough bits in current long for the next value?
 					{
 						if (usepadding)
@@ -1412,7 +1413,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 						}
 					}
 				}
-
+				
 				if (Blocks != nullptr)
 				{
 					aWriter.AddLongArray("BlockStates", arr, longindex);
@@ -1444,6 +1445,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				aWriter.EndCompound();
 
 				delete[] arr;
+				
 			} 
 		}
 		aWriter.EndList();  // "Sections"
@@ -1460,84 +1462,85 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 		aWriter.EndCompound();  // "Level"
 
+		float dd = 1.0f;
 		return;
 	}
-	aWriter.BeginCompound("Level");
-	aWriter.AddInt("xPos", aCoords.m_ChunkX);
-	aWriter.AddInt("zPos", aCoords.m_ChunkZ);
-	[[maybe_unused]] const bool Result = aWorld.GetChunkData(aCoords, serializer);  // Chunk must be present in order to save
-	ASSERT(Result);
-	serializer.Finish();  // Close NBT tags
+	//aWriter.BeginCompound("Level");
+	//aWriter.AddInt("xPos", aCoords.m_ChunkX);
+	//aWriter.AddInt("zPos", aCoords.m_ChunkZ);
+	//[[maybe_unused]] const bool Result = aWorld.GetChunkData(aCoords, serializer);  // Chunk must be present in order to save
+	//ASSERT(Result);
+	//serializer.Finish();  // Close NBT tags
 
-	// Save biomes:
-	aWriter.AddByteArray("Biomes", reinterpret_cast<const char *>(serializer.Biomes), ARRAYCOUNT(serializer.Biomes));
+	//// Save biomes:
+	//aWriter.AddByteArray("Biomes", reinterpret_cast<const char *>(serializer.Biomes), ARRAYCOUNT(serializer.Biomes));
 
-	// Save heightmap (Vanilla require this):
-	aWriter.AddIntArray("HeightMap", reinterpret_cast<const int *>(serializer.Heights), ARRAYCOUNT(serializer.Heights));
+	//// Save heightmap (Vanilla require this):
+	//aWriter.AddIntArray("HeightMap", reinterpret_cast<const int *>(serializer.Heights), ARRAYCOUNT(serializer.Heights));
 
-	// Save blockdata:
-	aWriter.BeginList("Sections", TAG_Compound);
-	ChunkDef_ForEachSection(serializer.m_BlockData, serializer.m_LightData,
-	{
-		aWriter.BeginCompound("");
+	//// Save blockdata:
+	//aWriter.BeginList("Sections", TAG_Compound);
+	//ChunkDef_ForEachSection(serializer.m_BlockData, serializer.m_LightData,
+	//{
+	//	aWriter.BeginCompound("");
 
-		if (Blocks != nullptr)
-		{
-			std::string BlockData;
-			std::string MetaData;
+	//	if (Blocks != nullptr)
+	//	{
+	//		std::string BlockData;
+	//		std::string MetaData;
 
-			for (size_t I = 0; I < Blocks->size(); I++)
-			{
-				auto NumericBlock = PaletteUpgrade::ToBlock(Blocks->at(I));
-				BlockData += static_cast<char>(NumericBlock.first);
-				MetaData += static_cast<char>(NumericBlock.second);
-			}
+	//		for (size_t I = 0; I < Blocks->size(); I++)
+	//		{
+	//			auto NumericBlock = PaletteUpgrade::ToBlock(Blocks->at(I));
+	//			BlockData += static_cast<char>(NumericBlock.first);
+	//			MetaData += static_cast<char>(NumericBlock.second);
+	//		}
 
-			aWriter.AddByteArray("Blocks", BlockData);
-			aWriter.AddByteArray("Data", MetaData);
-		}
-		else
-		{
-			AString Dummy(ChunkBlockData::SectionBlockCount, 0);
-			aWriter.AddByteArray("Blocks", Dummy);
-			aWriter.AddByteArray("Data", Dummy);
-		}
+	//		aWriter.AddByteArray("Blocks", BlockData);
+	//		aWriter.AddByteArray("Data", MetaData);
+	//	}
+	//	else
+	//	{
+	//		AString Dummy(ChunkBlockData::SectionBlockCount, 0);
+	//		aWriter.AddByteArray("Blocks", Dummy);
+	//		aWriter.AddByteArray("Data", Dummy);
+	//	}
 
-		if (BlockLights != nullptr)
-		{
-			aWriter.AddByteArray("BlockLight", reinterpret_cast<const char *>(BlockLights->data()), BlockLights->size());
-		}
-		else
-		{
-			aWriter.AddByteArray("BlockLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultBlockLightValue);
-		}
+	//	if (BlockLights != nullptr)
+	//	{
+	//		aWriter.AddByteArray("BlockLight", reinterpret_cast<const char *>(BlockLights->data()), BlockLights->size());
+	//	}
+	//	else
+	//	{
+	//		aWriter.AddByteArray("BlockLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultBlockLightValue);
+	//	}
 
-		if (SkyLights != nullptr)
-		{
-			aWriter.AddByteArray("SkyLight", reinterpret_cast<const char *>(SkyLights->data()), SkyLights->size());
-		}
-		else
-		{
-			aWriter.AddByteArray("SkyLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue);
-		}
+	//	if (SkyLights != nullptr)
+	//	{
+	//		aWriter.AddByteArray("SkyLight", reinterpret_cast<const char *>(SkyLights->data()), SkyLights->size());
+	//	}
+	//	else
+	//	{
+	//		aWriter.AddByteArray("SkyLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue);
+	//	}
 
-		aWriter.AddByte("Y", static_cast<unsigned char>(Y));
-		aWriter.EndCompound();
-	});
-	aWriter.EndList();  // "Sections"
+	//	aWriter.AddByte("Y", static_cast<unsigned char>(Y));
+	//	aWriter.EndCompound();
+	//});
+	//aWriter.EndList();  // "Sections"
 
-	// Store the information that the lighting is valid.
-	// For compatibility reason, the default is "invalid" (missing) - this means older data is re-lighted upon loading.
-	if (serializer.mIsLightValid)
-	{
-		aWriter.AddByte("MCSIsLightValid", 1);
-	}
+	//// Store the information that the lighting is valid.
+	//// For compatibility reason, the default is "invalid" (missing) - this means older data is re-lighted upon loading.
+	//if (serializer.mIsLightValid)
+	//{
+	//	aWriter.AddByte("MCSIsLightValid", 1);
+	//}
 
-	// Save the world age to the chunk data. Required by vanilla and mcedit.
-	aWriter.AddLong("LastUpdate", aWorld.GetWorldAge().count());
+	//// Save the world age to the chunk data. Required by vanilla and mcedit.
+	//aWriter.AddLong("LastUpdate", aWorld.GetWorldAge().count());
 
-	// Store the flag that the chunk has all the ores, trees, dungeons etc. Cuberite chunks are always complete.
-	aWriter.AddByte("TerrainPopulated", 1);
+	//// Store the flag that the chunk has all the ores, trees, dungeons etc. Cuberite chunks are always complete.
+	//aWriter.AddByte("TerrainPopulated", 1);
 
-	aWriter.EndCompound();  // "Level"
+	//aWriter.EndCompound();  // "Level"
 }
