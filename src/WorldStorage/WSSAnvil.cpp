@@ -1310,7 +1310,9 @@ OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_Ta
 		CustomName = a_NBT.GetString(CurrentLine);
 	}
 
-	return std::make_unique<cBannerEntity>(a_Block, a_Pos, m_World, Color, CustomName);
+	auto banner = std::make_unique<cBannerEntity>(a_Block, a_Pos, m_World, Color);
+	banner->SetCustomName(CustomName);
+	return banner;
 }
 
 

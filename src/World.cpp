@@ -2078,20 +2078,6 @@ void cWorld::PlaceBlock(const Vector3i a_Position, BlockState a_Block)
 
 
 
-void cWorld::NewPlaceBlock(const Vector3i a_Position, NEWBLOCKTYPE a_block)
-{
-
-	NewSetBlock(a_Position, a_block);
-	cChunkInterface ChunkInterface(GetChunkMap());
-	
-	//cBlockHandler::For(BlockType).OnBroken(ChunkInterface, *this, a_Position, BlockType, BlockMeta, nullptr);
-	//cBlockHandler::For(a_BlockType).OnPlaced(ChunkInterface, *this, a_Position, a_BlockType, a_BlockMeta);
-}
-
-
-
-
-
 bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 {
 	return m_ChunkMap.GetBlocks(a_Blocks, a_ContinueOnFailure);

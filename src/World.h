@@ -351,8 +351,6 @@ public:
 	Full processing, incl. updating neighbors, is performed. */
 	void SetBlock(Vector3i a_BlockPos, BlockState a_Block);
 
-	void NewSetBlock(Vector3i a_BlockPos, NEWBLOCKTYPE a_block);
-
 	/** Sets the block at the specified coords to the specified value.
 	The replacement doesn't trigger block updates, nor wake up simulators.
 	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block) */
@@ -524,8 +522,6 @@ public:
 	The OnBroken block handler is called for the replaced block. Wakes up the simulators.
 	If the chunk for any of the blocks is not loaded, the set operation is ignored silently. */
 	void PlaceBlock(const Vector3i a_Position, const BlockState a_Block);
-
-	void NewPlaceBlock(const Vector3i a_Position, NEWBLOCKTYPE a_block);
 
 	/** Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read. */
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
