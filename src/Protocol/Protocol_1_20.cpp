@@ -312,7 +312,6 @@ UInt32 cProtocol_1_20_2::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktPluginMessage:        return 0x18;
 				// EntityDamageS2CPacket 0x19
 				// RemoveMessageS2CPacket 0x1A
-				//case cProtocol::pktSoundEffect:          return 0x1B;
 		case cProtocol::pktDisconnectDuringGame: return 0x1B;
 				//  ProfilelessChatMessageS2CPacket 0x1C
 		case cProtocol::pktEntityStatus:         return 0x1D;

@@ -1294,8 +1294,9 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 		{
 			const auto Blocks = serializer.m_BlockData.GetSection(Y); 
 			const auto BlockLights = serializer.m_LightData.GetBlockLightSection(Y); 
-			const auto SkyLights = serializer.m_LightData.GetSkyLightSection(Y); 
-			if ((Blocks != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr)) // currenlty trhorews an crashes if Block is null
+			const auto SkyLights = serializer.m_LightData.GetSkyLightSection(Y);
+			aWriter.BeginCompound("");
+			if (Blocks != nullptr)
 			{ 
 				ChunkBlockData::BlockArray temparr;
 				std::copy(Blocks->begin(),Blocks->end(),temparr.begin());
@@ -1305,7 +1306,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				int bitused = Clamp(CeilC(log2(newsize)), 4, 16);
 
 				int longarrsize = CeilC((bitused * 4096)/8/8); // TODO: account for padding in 1.16+
-				aWriter.BeginCompound("");
+				
 				aWriter.BeginList("Palette", eTagType::TAG_Compound);
 
 				
@@ -1376,6 +1377,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				int BitIndex = 0;
 				int longindex = 0;
 				int toloop = Blocks->size();
+				int bitswritten = 0;
 				for (size_t i = 0; i < toloop; i++)
 				{
 					auto & v = Blocks->at(i);
@@ -1383,7 +1385,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 					INT64 towrite = ind - temparr.begin();
 					tbuf |= towrite << BitIndex;
 					BitIndex += bitused;
-					
+					bitswritten += bitused;
 					if (BitIndex + bitused > 64 || i == toloop-1)  // not enough bits in current long for the next value?
 					{
 						if (usepadding)
@@ -1404,6 +1406,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 								INT64 upperpart = towrite >> (64 - BitIndex);
 								tbuf |= upperpart;
 								BitIndex = bitused - (64 - BitIndex);
+								bitswritten += bitused - (64 - BitIndex);
 							}
 							else
 							{
@@ -1423,30 +1426,29 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 					// aWriter.AddByteArray("BlockStates", ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue);  // BROKEN
 				}
 
-				if (BlockLights != nullptr)
-				{
-					aWriter.AddByteArray("BlockLight", reinterpret_cast<const char *>(BlockLights->data()), BlockLights->size());
-				}
-				else
-				{
-					aWriter.AddByteArray("BlockLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultBlockLightValue);
-				}
-
-				if (SkyLights != nullptr)
-				{
-					aWriter.AddByteArray("SkyLight", reinterpret_cast<const char *>(SkyLights->data()), SkyLights->size());
-				}
-				else
-				{
-					aWriter.AddByteArray("SkyLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue);
-				}
-
 				aWriter.AddByte("Y", static_cast<unsigned char>(Y));
-				aWriter.EndCompound();
 
 				delete[] arr;
-				
-			} 
+			}
+
+			if (BlockLights != nullptr)
+			{
+				aWriter.AddByteArray("BlockLight", reinterpret_cast<const char *>(BlockLights->data()), BlockLights->size());
+			}
+			else
+			{
+				aWriter.AddByteArray("BlockLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultBlockLightValue);
+			}
+
+			if (SkyLights != nullptr)
+			{
+				aWriter.AddByteArray("SkyLight", reinterpret_cast<const char *>(SkyLights->data()), SkyLights->size());
+			}
+			else
+			{
+				aWriter.AddByteArray("SkyLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue);
+			}
+			aWriter.EndCompound();
 		}
 		aWriter.EndList();  // "Sections"
 
