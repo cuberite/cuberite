@@ -429,6 +429,63 @@ void cProtocol_1_19::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type)
 
 
 
+
+void cProtocol_1_19::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	const auto ParticleID = GetProtocolParticleID(a_ParticleName);
+
+	cPacketizer Pkt(*this, pktParticleEffect);
+	Pkt.WriteVarInt32(ParticleID);
+
+	Pkt.WriteBool(false);  // Long Distance
+	Pkt.WriteBEDouble(a_Src.x);
+	Pkt.WriteBEDouble(a_Src.y);
+	Pkt.WriteBEDouble(a_Src.z);
+
+	Pkt.WriteBEFloat(a_Offset.x);
+	Pkt.WriteBEFloat(a_Offset.y);
+	Pkt.WriteBEFloat(a_Offset.z);
+
+	Pkt.WriteBEFloat(a_ParticleData);
+	Pkt.WriteBEInt32(a_ParticleAmount);
+}
+
+
+
+
+
+void cProtocol_1_19::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	return;
+
+	const auto ParticleID = GetProtocolParticleID(a_ParticleName);
+
+	cPacketizer Pkt(*this, pktParticleEffect);
+	Pkt.WriteVarInt32(ParticleID);
+
+	Pkt.WriteBool(false);  // Long Distance
+	Pkt.WriteBEDouble(a_Src.x);
+	Pkt.WriteBEDouble(a_Src.y);
+	Pkt.WriteBEDouble(a_Src.z);
+
+	Pkt.WriteBEFloat(a_Offset.x);
+	Pkt.WriteBEFloat(a_Offset.y);
+	Pkt.WriteBEFloat(a_Offset.z);
+
+	Pkt.WriteBEFloat(a_ParticleData);
+	Pkt.WriteBEInt32(a_ParticleAmount);
+
+	//todo implement particle specific data
+}
+
+
+
+
+
 void cProtocol_1_19::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -446,7 +503,7 @@ void cProtocol_1_19::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Obj
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetHeadYaw());
-	Pkt.WriteBEInt32(a_ObjectData);
+	Pkt.WriteVarInt32(a_ObjectData);
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
@@ -1385,7 +1442,6 @@ UInt32 cProtocol_1_19_3::GetPacketID(ePacketType a_PacketType) const
 			//  chat suggestions 0x14
 		case cProtocol::pktCustomPayload:        return 0x15; 
 		case cProtocol::pktPluginMessage:        return 0x15; 
-		//case cProtocol::pktSoundEffect:          return 0x17; --
 			// RemoveMessageS2CPacket 0x16
 		case cProtocol::pktDisconnectDuringGame: return 0x17;
 			//  ProfilelessChatMessageS2CPacket 0x18
@@ -1459,7 +1515,7 @@ UInt32 cProtocol_1_19_3::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktTitle:                return 0x5B;
 			//  title fade 0x5C
 			//  play sound from entity 0x5D
-			//  play sound 0x5E
+		case cProtocol::pktSoundEffect:          return 0x5E;
 			//  stop sound 0x5F
 		case cProtocol::pktChatRaw:              return 0x60;  //  Gamemessage
 			//  player list header 0x61
@@ -1615,6 +1671,25 @@ void cProtocol_1_19_3::SendChatRaw(const AString & a_MessageRaw, eChatType a_Typ
 	//	UNREACHABLE("Unsupported chat type");
 	//}());
 
+}
+
+
+
+
+
+void cProtocol_1_19_3::SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume,float a_Pitch)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktSoundEffect);
+	Pkt.WriteVarInt32(1); // sound id
+	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.x * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.y * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.z * 8.0));
+	Pkt.WriteBEFloat(a_Volume);
+	Pkt.WriteBEFloat(a_Pitch);
+	Pkt.WriteBEInt64(0); // seed
 }
 
 
@@ -2203,7 +2278,7 @@ UInt32 cProtocol_1_19_4::GetPacketID(ePacketType a_PacketType) const
         case cProtocol::pktTitle:                return 0x5F;
                 //  title fade 0x60
                 //  play sound from entity 0x61
-                //  play sound 0x62
+		case cProtocol::pktSoundEffect:          return 0x62;
                 //  stop sound 0x63
         case cProtocol::pktChatRaw:              return 0x64; //  Gamemessage
                 //  player list header 0x65
