@@ -491,7 +491,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 			UInt64 * LEstates = new UInt64[SectionBlockLongCount];
 
-			for (size_t i = 0; i < SectionBlockLongCount; i++)
+			for (size_t i = 0; i < static_cast<size_t>(SectionBlockLongCount); i++)
 			{
 				LEstates[i] = ntohll(reinterpret_cast<const UInt64*>(BlockStateData)[i]);
 			}
@@ -514,7 +514,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				Int64 finalv = 0;
 				if (BitIndex + IndexBitSize <= 64)
 				{
-					finalv = (LEstates[arrindex] >> BitIndex) & ((1 << IndexBitSize)-1);
+					finalv = (LEstates[arrindex] >> BitIndex) & ((static_cast<UInt64>(1) << IndexBitSize) - 1);
 					BitIndex += IndexBitSize;
 					if (BitIndex == 64)
 					{
