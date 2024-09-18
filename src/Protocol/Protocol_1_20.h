@@ -15,8 +15,7 @@ public:
 
 protected:
 	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
-    virtual void SendBlockChanges(
-	  int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
+    virtual void    SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 
     virtual void SendRespawn(eDimension a_Dimension) override;
 
@@ -50,6 +49,7 @@ protected:
 	virtual void    HandlePacketReady(cByteBuffer & a_ByteBuffer) override;
 	virtual void    HandlePacketLoginStart(cByteBuffer & a_ByteBuffer) override;
 
+	virtual void    WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const override;
 	virtual Version GetProtocolVersion() const override;
 };
 
@@ -70,14 +70,12 @@ protected:
 
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 
+	virtual void SendDisconnect(const AString & a_Reason) override;
 	virtual void SendChatRaw(const AString & a_MessageRaw, eChatType a_Type) override;
 	virtual void SendInitialChunksComing() override;
 
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const override;
-
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
-
-	virtual void SendDisconnect(const AString & a_Reason) override;
 
 	virtual Version GetProtocolVersion() const override;
 };

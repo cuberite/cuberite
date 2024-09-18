@@ -536,6 +536,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 					BitIndex = IndexBitSize - BitsRead;
 					UInt64 upperpart = (LEstates[arrindex] & ((static_cast<UInt64>(1) << BitIndex) - 1)) << BitsRead;
 					finalv = lowerpart | upperpart;
+					ASSERT(finalv < Paletteids.size());
 				}
 				resolveddata[numblockdataindex] = Paletteids[finalv];
 				numblockdataindex++;

@@ -1377,7 +1377,8 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				int BitIndex = 0;
 				int longindex = 0;
 				int toloop = Blocks->size();
-				int bitswritten = 0;
+				//int bitswritten = 0;
+				//std::vector<int> bw = {0};
 				for (size_t i = 0; i < toloop; i++)
 				{
 					auto & v = Blocks->at(i);
@@ -1385,7 +1386,11 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 					INT64 towrite = ind - temparr.begin();
 					tbuf |= towrite << BitIndex;
 					BitIndex += bitused;
-					bitswritten += bitused;
+					//bitswritten += bitused;
+					//ASSERT(bitswritten >= bw[bw.size()-1]);
+					//bw.push_back(bitswritten);
+					//LOGD(std::to_string(bitswritten) + " - bits written");
+					//ASSERT(bitswritten == (longindex*64+BitIndex));
 					if (BitIndex + bitused > 64 || i == toloop-1)  // not enough bits in current long for the next value?
 					{
 						if (usepadding)
@@ -1399,20 +1404,29 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 						else
 						{
 							ASSERT(longindex < longarrsize);
-							arr[longindex] = tbuf;
-							longindex++;
+							INT64 upperpart = 0;
 							if (BitIndex != 64)
 							{
-								INT64 upperpart = towrite >> (64 - BitIndex);
-								tbuf |= upperpart;
+								upperpart = towrite >> (64 - BitIndex);
+								INT64 lowerpart = towrite & ((static_cast<INT64>(1) << (64 - BitIndex)) - 1);
+								tbuf |= lowerpart;
+								//bitswritten += 64 - BitIndex;
 								BitIndex = bitused - (64 - BitIndex);
-								bitswritten += bitused - (64 - BitIndex);
+								//bitswritten += BitIndex;
+								//ASSERT(bitswritten >= bw[bw.size()-1]);
+								//bw.push_back(bitswritten);
+								i++;
 							}
 							else
 							{
 								BitIndex = 0;
 								tbuf = 0;
 							}
+							arr[longindex] = tbuf;
+							longindex++;
+							tbuf = 0;
+							tbuf |= upperpart; 
+							//ASSERT(bitswritten == (longindex*64+BitIndex));
 						}
 					}
 				}
