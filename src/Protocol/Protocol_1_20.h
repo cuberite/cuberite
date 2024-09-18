@@ -107,5 +107,6 @@ protected:
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 
 	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
+	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const override;
 	virtual Version GetProtocolVersion() const override;
 };

@@ -1775,7 +1775,7 @@ UInt32 cProtocol_1_20_5::GetPacketID(ePacketType a_PacketType) const
         case cProtocol::pktTitle:                return 0x65;
                         //  title fade 0x66
                         //  play sound from entity 0x67
-                        //  play sound 0x68
+		case cProtocol::pktSoundEffect:          return 0x68;
                         //  EnterReconfigurationS2CPacket 0x69
                         //  stop sound 0x6A
 						//  StoreCookies 0x6B
@@ -1999,6 +1999,24 @@ void cProtocol_1_20_5::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity 
 
 		a_Pkt.WriteVarInt32(0);
 	}
+}
+
+
+
+
+
+void cProtocol_1_20_5::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
+{
+	if (a_Item.IsEmpty())
+	{
+		a_Pkt.WriteVarInt32(-1);
+		return;
+	}
+	a_Pkt.WriteVarInt32(a_Item.m_ItemCount);
+	a_Pkt.WriteVarInt32(Palette_1_16::From(a_Item.m_ItemType));
+	// TODO: item components
+	a_Pkt.WriteVarInt32(0);
+	a_Pkt.WriteVarInt32(0);
 }
 
 
