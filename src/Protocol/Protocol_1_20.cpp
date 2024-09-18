@@ -386,7 +386,7 @@ UInt32 cProtocol_1_20_2::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktTitle:                return 0x61;
 				//  title fade 0x62
 				//  play sound from entity 0x63
-				//  play sound 0x64
+		case cProtocol::pktSoundEffect:          return 0x64;
 				//  EnterReconfigurationS2CPacket 0x65
 				//  stop sound 0x66
 		case cProtocol::pktChatRaw:              return 0x67; //  Gamemessage
@@ -863,7 +863,118 @@ void cProtocol_1_20_2::SendRespawn(eDimension a_Dimension)
 
 
 
+void cProtocol_1_20_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
+{
 
+	if (a_Item.IsEmpty())
+	{
+		a_Pkt.WriteBool(false);
+		return;
+	}
+
+	// Item present
+	a_Pkt.WriteBool(true);
+
+	// Normal item
+	a_Pkt.WriteVarInt32(GetProtocolItemType(a_Item.m_ItemType));
+	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
+
+	cFastNBTWriter Writer(true);
+	if (a_Item.m_ItemType == Item::Potion)
+	{
+		bool strong_potion = false;
+		bool long_potion = false;
+		AString potionname = "";
+		AString finalname = "minecraft:";
+		
+		int potion_dmg = a_Item.m_ItemDamage & 0x1F;
+		switch (potion_dmg)
+		{
+			case 0: potionname = "water"; break;
+			case 1: potionname = "regeneration"; break;
+			case 2: potionname = "swiftness"; break;
+			case 3: potionname = "fire_resistance"; break;
+			case 4: potionname = "poison"; break;
+			case 5: potionname = "healing"; break;
+			case 6: potionname = "night_vision"; break;
+			case 8: potionname = "weakness"; break;
+			case 9: potionname = "strength"; break;
+			case 10: potionname = "slowness"; break;
+			case 11: potionname = "leaping"; break;
+			case 12: potionname = "harming"; break;
+			case 13: potionname = "water_breathing"; break;
+			case 14: potionname = "invisibility"; break;
+			case 15: potionname = "slow_falling"; break;
+			case 16: potionname = "awkward"; break;
+			case 17: potionname = "turtle_master"; break;
+			case 32: potionname = "thick"; break;
+			case 64: potionname = "mundane"; break;
+		}
+		if ((a_Item.m_ItemDamage & 32) == 32 && potionname != "")
+		{
+			potionname = "thick";
+		}
+		if ((a_Item.m_ItemDamage & 64) == 64 && potionname != "")
+		{
+			potionname = "mundane";
+		}
+		if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1 && potionname != "thick")
+		{
+			strong_potion = true;
+			finalname += "strong_";
+		}
+		if ((a_Item.m_ItemDamage & 0x40) == 0x40 && potionname != "mundane")
+		{
+			long_potion = true;
+			finalname += "long_";
+		}
+		finalname += potionname;
+		Writer.AddString("Potion",finalname);
+	}
+	if (a_Item.m_RepairCost != 0)
+	{
+		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
+	}
+	if (!a_Item.m_Enchantments.IsEmpty())
+	{
+		const char * TagName = (a_Item.m_ItemType == Item::EnchantedBook) ? "StoredEnchantments" : "Enchantments";
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName, true);
+	}
+	if ((a_Item.m_ItemType == Item::FireworkRocket) || (a_Item.m_ItemType == Item::FireworkStar))
+	{
+		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, a_Item.m_ItemType);
+	}
+
+	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
+	{
+		Writer.BeginCompound("display");
+		if (a_Item.m_ItemColor.IsValid())
+		{
+			Writer.AddInt("color", static_cast<Int32>(a_Item.m_ItemColor.m_Color));
+		}
+
+		if (!a_Item.IsCustomNameEmpty())
+		{
+			Writer.AddString("Name", a_Item.m_CustomName);
+		}
+		if (!a_Item.IsLoreEmpty())
+		{
+			Writer.BeginList("Lore", TAG_String);
+
+			for (const auto & Line : a_Item.m_LoreTable)
+			{
+				Writer.AddString("", Line);
+			}
+
+			Writer.EndList();
+		}
+		Writer.EndCompound();
+	}
+
+	Writer.Finish();
+
+	a_Pkt.WriteBuf(Writer.GetResult());
+}
 ////////////////////////////////////////////////////////////////////////////////
 //  cProtocol_1_20_3:
 
@@ -1672,10 +1783,10 @@ UInt32 cProtocol_1_20_5::GetPacketID(ePacketType a_PacketType) const
                         //  player list header 0x6D
                         //  NbtQueryResponseS2CPacket 0x6E
         case cProtocol::pktCollectEntity:        return 0x6F;
-                        // UpdateTickRateS2CPacket 0x70
-                        // TickStepS2CPacket 0x71
-						// ServerTransfer 0x72
-        case cProtocol::pktTeleportEntity:       return 0x73;
+        case cProtocol::pktTeleportEntity:       return 0x70;
+                        //  UpdateTickRateS2CPacket 0x71
+                        //  TickStepS2CPacket 0x72
+						//  ServerTransfer 0x73
                         //  advancment update 0x74
         case cProtocol::pktEntityProperties:     return 0x75;
         case cProtocol::pktEntityEffect:         return 0x76;

@@ -707,7 +707,7 @@ cProtocol::Version cProtocol_1_17_1::GetProtocolVersion() const
 
 
 
-
+//broken because of nbt
 void cProtocol_1_17_1::SendWholeInventory(const cWindow & a_Window)
 {
 	ASSERT(m_State == 3);  // In game mode?

@@ -2142,7 +2142,10 @@ void cProtocol_1_19_3::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteB
 	}
 
 	StartEncryption(DecryptedKey);
-	m_Client->HandleLogin();
+	if (cRoot::Get()->GetServer()->ShouldAuthenticate())
+	{
+		m_Client->HandleLogin();
+	}
 }
 
 
