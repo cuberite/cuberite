@@ -1296,6 +1296,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 			const auto BlockLights = serializer.m_LightData.GetBlockLightSection(Y); 
 			const auto SkyLights = serializer.m_LightData.GetSkyLightSection(Y);
 			aWriter.BeginCompound("");
+			aWriter.AddByte("Y", static_cast<unsigned char>(Y)); // the game interprets Y as signed
 			if (Blocks != nullptr)
 			{ 
 				ChunkBlockData::BlockArray temparr;
@@ -1439,8 +1440,6 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				{
 					// aWriter.AddByteArray("BlockStates", ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue);  // BROKEN
 				}
-
-				aWriter.AddByte("Y", static_cast<unsigned char>(Y));
 
 				delete[] arr;
 			}
