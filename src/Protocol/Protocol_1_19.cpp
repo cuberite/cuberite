@@ -963,6 +963,7 @@ UInt32 cProtocol_1_19::GetProtocolMobType(eMonsterType a_MobType) const
 
 
 
+
 int cProtocol_1_19::GetProtocolParticleID(const AString & a_ParticleName) const
 {
 	static const std::unordered_map<AString, int> ParticleMap
@@ -2035,7 +2036,6 @@ void cProtocol_1_19_3::SendPlayerListInitChat(const cPlayer & a_Player)
 
 
 
-
 void cProtocol_1_19_3::SendPlayerListUpdatePing()
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -2715,8 +2715,9 @@ void cProtocol_1_19_4::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 		Pkt.WriteString("overworld");
 		//Pkt.WriteString("the_nether");
 		//Pkt.WriteString("the_end");
-		AString dmgsrc[] = {"in_fire","lightning_bolt", "on_fire","lava","hot_floor", "in_wall","cramming", "drown","starve",	"cactus", "fall","fly_into_wall","out_of_world","generic","magic","wither","dragon_breath","dry_out","sweet_berry_bush","freeze",		 "stalagmite"};
-		int dmgids[] =     {18       ,22             ,27        ,21     ,17        ,19        ,3           ,5     ,33          ,2       ,8      ,14             ,28            ,16       ,23     ,40      ,4              ,6        ,35                ,15      ,32};
+
+		AString dmgsrc[] = {"in_fire","lightning_bolt", "on_fire","lava","hot_floor", "in_wall","cramming", "drown","starve",	"cactus", "fall","fly_into_wall","out_of_world","generic","magic","wither","dragon_breath","dry_out","sweet_berry_bush","freeze","stalagmite","player_attack"};
+		int dmgids[] =     {18          ,22                 ,27          ,21      ,17             ,19        ,3              ,5          ,33        ,2           ,8       ,14                ,28               ,16         ,23        ,40         ,4                ,6           ,35                   ,15        ,32,             34};
 		{
 			cFastNBTWriter Writer;
 			Writer.BeginCompound("minecraft:damage_type");
@@ -2935,7 +2936,6 @@ void cProtocol_1_19_4::SendPlayerMoveLook(const Vector3d a_Pos, const float a_Ya
 
 
 
-
 void cProtocol_1_19_4::WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const
 {
 	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_Metadata));	      // Index
@@ -3149,6 +3149,145 @@ void cProtocol_1_19_4::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 	}
 }
 
+
+
+
+
+UInt32 cProtocol_1_19_4::GetProtocolMobType(eMonsterType a_MobType) const
+{
+	switch (a_MobType)
+	{
+		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
+		case mtAllay: return 0;
+		case mtAxolotl: return 4;
+		case mtBat: return 5;
+		case mtBee: return 6;
+		case mtBlaze: return 7;
+		case mtCamel: return 10;
+		case mtCat: return 11;
+		case mtCaveSpider: return 12;
+		case mtChicken: return 15;
+		case mtCod: return 16;
+		case mtCow: return 18;
+		case mtCreeper: return 19;
+		case mtDolphin: return 20;
+		case mtDonkey: return 21;
+		case mtDrowned: return 23;
+		case mtElderGuardian: return 25;
+		case mtEnderDragon: return 27;
+		case mtEnderman: return 29;
+		case mtEndermite: return 30;
+		case mtEvoker: return 31;
+		case mtFox: return 38;
+		case mtFrog: return 39;
+		case mtGhast: return 41;
+		case mtGiant: return 42;
+		case mtGlowSquid: return 44;
+		case mtGoat: return 45;
+		case mtGuardian: return 46;
+		case mtHoglin: return 47;
+		case mtHorse: return 49;
+		case mtHusk: return 50;
+		case mtIllusioner: return 51;
+		case mtLlama: return 60;
+		case mtMagmaCube: return 62;
+		case mtMooshroom: return 65;
+		case mtMule: return 66;
+		case mtOcelot: return 67;
+		case mtPanda: return 69;
+		case mtParrot: return 70;
+		case mtPhantom: return 71;
+		case mtPig: return 72;
+		case mtPiglin: return 73;
+		case mtPiglinBrute: return 74;
+		case mtPillager: return 75;
+		case mtPolarBear: return 76;
+		case mtPufferfish: return 78;
+		case mtRabbit: return 79;
+		case mtRavager: return 80;
+		case mtSalmon: return 81;
+		case mtSheep: return 82;
+		case mtShulker: return 83;
+		case mtSilverfish: return 85;
+		case mtSkeleton: return 86;
+		case mtSkeletonHorse: return 87;
+		case mtSlime: return 88;
+		case mtSniffer: return 90;
+		case mtSpider: return 95;
+		case mtSquid: return 96;
+		case mtStray: return 97;
+		case mtStrider: return 98;
+		case mtTadpole: return 99;
+		case mtTraderLlama: return 103;
+		case mtTropicalFish: return 105;
+		case mtTurtle: return 106;
+		case mtVex: return 107;
+		case mtVindicator: return 109;
+		case mtWanderingTrader: return 110;
+		case mtWarden: return 111;
+		case mtWitch: return 112;
+		case mtWither: return 113;
+		case mtWitherSkeleton: return 114;
+		case mtWolf: return 116;
+		case mtZoglin: return 117;
+		case mtZombie: return 118;
+		case mtZombieHorse: return 119;
+		case mtZombieVillager: return 120;
+		case mtZombifiedPiglin: return 121;
+
+		default:                      return 0;
+	}
+}
+
+
+
+
+
+UInt8 cProtocol_1_19_4::GetProtocolEntityType(const cEntity & a_Entity) const
+{
+	using Type = cEntity::eEntityType;
+
+	switch (a_Entity.GetEntityType())
+	{
+		case Type::etEnderCrystal: return 26;
+		case Type::etPickup: return 54;
+		case Type::etFallingBlock: return 36;
+		case Type::etMinecart: return 64;
+		case Type::etBoat: return 9;
+		case Type::etTNT: return 101;
+		case Type::etProjectile:
+		{
+			using PType = cProjectileEntity::eKind;
+			const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
+
+			switch (Projectile.GetProjectileKind())
+			{
+				case PType::pkArrow: return 3;
+				case PType::pkSnowball: return 92;
+				case PType::pkEgg: return 24;
+				case PType::pkGhastFireball: return 57;
+				case PType::pkFireCharge: return 89;
+				case PType::pkEnderPearl: return 94;
+				case PType::pkExpBottle: return 33;
+				case PType::pkSplashPotion: return 77;
+				case PType::pkFirework: return 37;
+				case PType::pkWitherSkull: return 115;
+			}
+			break;
+		}
+		case Type::etFloater: return 123;
+		case Type::etItemFrame: return 56;
+		case Type::etLeashKnot: return 58;
+
+		// Non-objects must not be sent
+		case Type::etEntity:
+		case Type::etPlayer:
+		case Type::etMonster:
+		case Type::etExpOrb:
+		case Type::etPainting: break;
+	}
+	UNREACHABLE("Unhandled entity kind");
+}
 
 
 

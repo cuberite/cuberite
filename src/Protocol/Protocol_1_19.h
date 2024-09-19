@@ -122,14 +122,15 @@ protected:
 	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
 	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const override;
 
-
 	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void    SendPlayerMoveLook(const Vector3d a_Pos, const float a_Yaw, const float a_Pitch, const bool a_IsRelative) override;
+	virtual void    SendRespawn(eDimension a_Dimension) override;
 
 	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void    HandlePacketPlayerSession(cByteBuffer & a_ByteBuffer) override;
 
-	virtual void SendRespawn(eDimension a_Dimension) override;
+	virtual UInt32    GetProtocolMobType(eMonsterType a_MobType) const override;
+	virtual UInt8     GetProtocolEntityType(const cEntity & a_Entity) const override;
 
 	virtual Version GetProtocolVersion() const override;
 };

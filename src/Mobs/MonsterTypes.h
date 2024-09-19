@@ -16,6 +16,7 @@ enum eMonsterType
 	mtBee,                          // Added in 1.15
 	mtBat,
 	mtBlaze,
+	mtCamel,                        // Added in 1.20
 	mtCat,                          // Added in 1.14
 	mtCaveSpider,
 	mtChicken,
@@ -65,6 +66,7 @@ enum eMonsterType
 	mtSkeleton,
 	mtSkeletonHorse,
 	mtSlime,
+	mtSniffer,                      // Added in 1.20
 	mtSnowGolem,
 	mtSpider,
 	mtSquid,
