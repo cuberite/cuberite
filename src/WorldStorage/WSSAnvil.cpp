@@ -511,7 +511,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			int arrindex = 0;
 			while (numblockdataindex < 4096)
 			{
-				Int64 finalv = 0;
+				UInt64 finalv = 0;
 				if (BitIndex + IndexBitSize <= 64)
 				{
 					finalv = (LEstates[arrindex] >> BitIndex) & ((static_cast<UInt64>(1) << IndexBitSize) - 1);

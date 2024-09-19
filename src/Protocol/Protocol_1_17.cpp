@@ -292,7 +292,6 @@ UInt8 cProtocol_1_17::GetEntityMetadataID(EntityMetadata a_Metadata) const
 
 bool cProtocol_1_17::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
-	LOG("Handling packet 0x%x", a_PacketType);
 	if (m_State != State::Game)
 	{
 		return Super::HandlePacket(a_ByteBuffer, a_PacketType);

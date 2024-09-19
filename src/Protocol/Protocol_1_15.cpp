@@ -1187,8 +1187,6 @@ cProtocol::Version cProtocol_1_15::GetProtocolVersion() const
 
 bool cProtocol_1_15::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
-
-	LOG("Handling packet 0x%x", a_PacketType);
 	if (m_State != State::Game)
 	{
 		return Super::HandlePacket(a_ByteBuffer, a_PacketType);

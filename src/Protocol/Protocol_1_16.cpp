@@ -124,7 +124,6 @@ UInt32 cProtocol_1_16::GetPacketID(ePacketType a_PacketType) const
 
 bool cProtocol_1_16::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 {
-	LOG("Handling packet 0x%x", a_PacketType);
 	if (m_State != State::Game)
 	{
 		return Super::HandlePacket(a_ByteBuffer, a_PacketType);
@@ -359,7 +358,6 @@ void cProtocol_1_16::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
 
 
 
-
 cProtocol::Version cProtocol_1_16::GetProtocolVersion() const
 {
 	return Version::v1_16;
@@ -396,6 +394,226 @@ void cProtocol_1_16::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type)
 
 }
 
+
+
+
+
+UInt32 cProtocol_1_16::GetProtocolMobType(eMonsterType a_MobType) const
+{
+	switch (a_MobType)
+	{
+		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
+		case mtInvalidType:           return 30;
+		case mtBee: return 4;
+		case mtBlaze: return 5;
+		case mtCat: return 7;
+		case mtCaveSpider: return 8;
+		case mtChicken: return 9;
+		case mtCow: return 11;
+		case mtCreeper: return 12;
+		case mtDolphin: return 13;
+		case mtDonkey: return 14;
+		case mtDrowned: return 16;
+		case mtElderGuardian: return 17;
+		case mtEnderDragon: return 19;
+		case mtEnderman: return 20;
+		case mtEndermite: return 21;
+		case mtEvoker: return 22;
+		case mtFox: return 28;
+		case mtGhast: return 29;
+		case mtGiant: return 30;
+		case mtGuardian: return 31;
+		case mtHoglin: return 32;
+		case mtHorse: return 33;
+		case mtHusk: return 34;
+		case mtIllusioner: return 35;
+		case mtLlama: return 42;
+		case mtMagmaCube: return 44;
+		case mtMule: return 52;
+		case mtMooshroom: return 53;
+		case mtOcelot: return 54;
+		case mtPanda: return 56;
+		case mtParrot: return 57;
+		case mtPhantom: return 58;
+		case mtPig: return 59;
+		case mtPiglin: return 60;
+		case mtPillager: return 61;
+		case mtPolarBear: return 62;
+		case mtRabbit: return 65;
+		case mtRavager: return 66;
+		case mtSheep: return 68;
+		case mtShulker: return 69;
+		case mtSilverfish: return 71;
+		case mtSkeleton: return 72;
+		case mtSkeletonHorse: return 73;
+		case mtSlime: return 74;
+		case mtSpider: return 79;
+		case mtSquid: return 80;
+		case mtStray: return 81;
+		case mtStrider: return 82;
+		case mtTraderLlama: return 88;
+		case mtTurtle: return 90;
+		case mtVex: return 91;
+		case mtVindicator: return 93;
+		case mtWanderingTrader: return 94;
+		case mtWitch: return 95;
+		case mtWither: return 96;
+		case mtWitherSkeleton: return 97;
+		case mtWolf: return 99;
+		case mtZoglin: return 100;
+		case mtZombie: return 101;
+		case mtZombieHorse: return 102;
+		case mtZombieVillager: return 103;
+		case mtZombifiedPiglin: return 104;
+
+		default:                      return 0;
+	}
+}
+
+
+
+
+int cProtocol_1_16::GetProtocolParticleID(const AString & a_ParticleName) const
+{
+	static const std::unordered_map<AString, int> ParticleMap
+	{
+		// Initialize the ParticleMap:
+		{ "ambient_entity_effect",  0 },
+		{ "angry_villager",         1 },
+		{ "barrier",                2 },
+		{ "block",                  3 },
+		{ "bubble",                 4 },
+		{ "cloud",                  5 },
+		{ "crit",                   6 },
+		{ "damage_indicator",       7 },
+		{ "dragon_breath",          8 },
+		{ "dripping_lava",          9 },
+		{ "falling_lava",           10 },
+		{ "landing_lava",           11 },
+		{ "dripping_water",         12 },
+		{ "falling_water",          13 },
+		{ "dust",                   14 },
+		{ "effect",                 15 },
+		{ "elder_guardian",         16 },
+		{ "enchanted_hit",          17 },
+		{ "enchant",                18 },
+		{ "end_rod",                19 },
+		{ "entity_effect",          20 },
+		{ "explosion_emitter",      21 },
+		{ "explosion",              22 },
+		{ "falling_dust",           23 },
+		{ "firework",               24 },
+		{ "fishing",                25 },
+		{ "flame",                  26 },
+		{ "soul_fire_flame",        27 },
+		{ "soul",                   28 },
+		{ "flash",                  29 },
+		{ "happy_villager",         30 },
+		{ "composter",              31 },
+		{ "heart",                  32 },
+		{ "instant_effect",         33 },
+		{ "item",                   34 },
+		{ "item_slime",             35 },
+		{ "item_snowball",          36 },
+		{ "large_smoke",            37 },
+		{ "lava",                   38 },
+		{ "mycelium",               39 },
+		{ "note",                   40 },
+		{ "poof",                   41 },
+		{ "portal",                 42 },
+		{ "rain",                   43 },
+		{ "smoke",                  44 },
+		{ "sneeze",                 45 },
+		{ "spit",                   46 },
+		{ "squid_ink",              47 },
+		{ "sweep_attack",           48 },
+		{ "totem_of_undying",       49 },
+		{ "underwater",             50 },
+		{ "splash",                 51 },
+		{ "witch",                  52 },
+		{ "bubble_pop",             53 },
+		{ "current_down",           54 },
+		{ "bubble_column_up",       55 },
+		{ "nautilus",               56 },
+		{ "dolphin",                57 },
+		{ "campfire_cosy_smoke",    58 },
+		{ "campfire_signal_smoke",  59 },
+		{ "dripping_honey",         60 },
+		{ "falling_honey",          61 },
+		{ "landing_honey",          62 },
+		{ "falling_nectar",         63 },
+		{ "ash",                    64 },
+		{ "crimson_spore",          65 },
+		{ "warped_spore",           66 },
+		{ "dripping_obsidian_tear", 67 },
+		{ "falling_obsidian_tear",  68 },
+		{ "landing_obsidian_tear",  69 },
+		{ "reverse_portal",         70 },
+		{ "white_ash",              71 }
+	};
+
+
+	const auto ParticleName = StrToLower(a_ParticleName);
+	const auto FindResult = ParticleMap.find(ParticleName);
+	if (FindResult == ParticleMap.end())
+	{
+		LOGWARNING("Unknown particle: %s", a_ParticleName.c_str());
+		ASSERT(!"Unknown particle");
+		return 0;
+	}
+
+	return FindResult->second;
+}
+
+
+
+
+
+UInt8 cProtocol_1_16::GetProtocolEntityType(const cEntity & a_Entity) const
+{
+	using Type = cEntity::eEntityType;
+
+	switch (a_Entity.GetEntityType())
+	{
+		case Type::etEnderCrystal: return 18;
+		case Type::etPickup: return 37;
+		case Type::etFallingBlock: return 26;
+		case Type::etMinecart: return 45;
+		case Type::etBoat: return 6;
+		case Type::etTNT: return 53;
+		case Type::etProjectile:
+		{
+			using PType = cProjectileEntity::eKind;
+			const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
+
+			switch (Projectile.GetProjectileKind())
+			{
+				case PType::pkArrow: return 2;
+				case PType::pkSnowball: return 77;
+				case PType::pkEgg: return 83;
+				case PType::pkGhastFireball: return 39;
+				case PType::pkFireCharge: return 75;
+				case PType::pkEnderPearl: return 84;
+				case PType::pkExpBottle: return 85;
+				case PType::pkSplashPotion: return 86;
+				case PType::pkFirework: return 27;
+				case PType::pkWitherSkull: return 98;
+			}
+			break;
+		}
+		case Type::etFloater: return 106;
+		case Type::etItemFrame: return 38;
+		case Type::etLeashKnot: return 40;
+
+		// Non-objects must not be sent
+		case Type::etEntity:
+		case Type::etPlayer:
+		case Type::etMonster:
+		case Type::etExpOrb:
+		case Type::etPainting: break;
+	}
+	UNREACHABLE("Unhandled entity kind");
+}
 
 
 
