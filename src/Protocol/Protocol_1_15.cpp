@@ -255,7 +255,9 @@ void cProtocol_1_15::SendPaintingSpawn(const cPainting & a_Painting)
 
 		cPacketizer Pkt(*this, pktSpawnPainting);
 		Pkt.WriteVarInt32(a_Painting.GetUniqueID());
-		Pkt.WriteUUID(cUUID::GenerateVersion3("FIXME"));  // Temp fix
+		// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+		Pkt.WriteBEUInt64(0);
+		Pkt.WriteBEUInt64(a_Painting.GetUniqueID());
 		Pkt.WriteVarInt32(a_Painting.GetPaintingId());
 		Pkt.WriteXYZPosition64(static_cast<Int32>(PosX), static_cast<Int32>(PosY), static_cast<Int32>(PosZ));
 		Pkt.WriteBEInt8(static_cast<Int8>(a_Painting.GetProtocolFacing()));
@@ -735,7 +737,8 @@ void cProtocol_1_15::SendSpawnMob(const cMonster & a_Mob)
 
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
-	Pkt.WriteUUID(cUUID::GenerateVersion3("fixxxxx"));	 // Temp fix
+	Pkt.WriteBEInt64(0);
+	Pkt.WriteBEInt64(a_Mob.GetUniqueID());
 	Pkt.WriteVarInt32(static_cast<Byte>(MobType));
 	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);

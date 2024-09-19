@@ -11,6 +11,8 @@ enum eMonsterType
 {
 	mtInvalidType = -1,
 
+	mtAllay,	                    // Added in 1.18
+	mtAxolotl,	                    // Added in 1.17
 	mtBee,                          // Added in 1.15
 	mtBat,
 	mtBlaze,
@@ -29,8 +31,11 @@ enum eMonsterType
 	mtEndermite,                    // Added in 1.8
 	mtEvoker,                       // Added in 1.11
 	mtFox,                          // Added in 1.14
+	mtFrog,		                    // Added in 1.18
 	mtGhast,
 	mtGiant,
+	mtGlowSquid,	                // Added in 1.17
+	mtGoat,	                        // Added in 1.17
 	mtGuardian,
 	mtHorse,
 	mtHoglin,                       // Added in 1.16
@@ -65,6 +70,7 @@ enum eMonsterType
 	mtSquid,
 	mtStray,                        // Added in 1.10
 	mtStrider,                      // Added in 1.16
+	mtTadpole,		                // Added in 1.18
 	mtTraderLlama,                  // Added in 1.11
 	mtTropicalFish,                 // Added in 1.13
 	mtTurtle,                       // Added in 1.13
@@ -72,6 +78,7 @@ enum eMonsterType
 	mtVillager,
 	mtVindicator,                   // Added in 1.11
 	mtWanderingTrader,              // Added in 1.14
+	mtWarden,			            // Added in 1.18
 	mtWitch,
 	mtWither,
 	mtWitherSkeleton,

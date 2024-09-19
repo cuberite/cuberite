@@ -630,7 +630,48 @@ cProtocol::Version cProtocol_1_16_1::GetProtocolVersion() const
 
 
 
+void cProtocol_1_16_1::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, EntityID);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Type);
 
+	switch (Type)
+	{
+		case 0:
+		{
+			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand);
+			HANDLE_READ(a_ByteBuffer, ReadBool,     bool, IsSneaking);
+
+			if (Hand == MAIN_HAND)  // TODO: implement handling of off-hand actions; ignore them for now to avoid processing actions twice
+			{
+				m_Client->HandleUseEntity(EntityID, false);
+			}
+			break;
+		}
+		case 1:
+		{
+			HANDLE_READ(a_ByteBuffer, ReadBool,     bool, IsSneaking);
+			m_Client->HandleUseEntity(EntityID, true);
+			break;
+		}
+		case 2:
+		{
+			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetX);
+			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetY);
+			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetZ);
+			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand);
+			HANDLE_READ(a_ByteBuffer, ReadBool,     bool, IsSneaking);
+
+			// TODO: Do anything
+			break;
+		}
+		default:
+		{
+			ASSERT(!"Unhandled use entity type!");
+			return;
+		}
+	}
+}
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_16_2:
 

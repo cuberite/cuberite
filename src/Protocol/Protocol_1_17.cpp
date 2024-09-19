@@ -694,6 +694,253 @@ void cProtocol_1_17::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Dat
 
 
 
+UInt32 cProtocol_1_17::GetProtocolMobType(eMonsterType a_MobType) const
+{
+	switch (a_MobType)
+	{
+		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
+		case mtInvalidType:           return 31;
+		case mtAxolotl: return 3;
+		case mtBat: return 4;
+		case mtBee: return 5;
+		case mtBlaze: return 6;
+		case mtCat: return 8;
+		case mtCaveSpider: return 9;
+		case mtChicken: return 10;
+		case mtCod: return 11;
+		case mtCow: return 12;
+		case mtCreeper: return 13;
+		case mtDolphin: return 14;
+		case mtDonkey: return 15;
+		case mtDrowned: return 17;
+		case mtElderGuardian: return 18;
+		case mtEnderDragon: return 20;
+		case mtEnderman: return 21;
+		case mtEndermite: return 22;
+		case mtEvoker: return 23;
+		case mtFox: return 29;
+		case mtGhast: return 30;
+		case mtGiant: return 31;
+		case mtGlowSquid: return 33;
+		case mtGoat: return 34;
+		case mtGuardian: return 35;
+		case mtHoglin: return 36;
+		case mtHorse: return 37;
+		case mtHusk: return 38;
+		case mtIllusioner: return 39;
+		case mtLlama: return 46;
+		case mtMagmaCube: return 48;
+		case mtMule: return 57;
+		case mtMooshroom: return 58;
+		case mtOcelot: return 59;
+		case mtPanda: return 61;
+		case mtParrot: return 62;
+		case mtPhantom: return 63;
+		case mtPig: return 64;
+		case mtPiglin: return 65;
+		case mtPiglinBrute: return 66;
+		case mtPillager: return 67;
+		case mtPolarBear: return 68;
+		case mtPufferfish: return 70;
+		case mtRabbit: return 71;
+		case mtRavager: return 72;
+		case mtSalmon: return 73;
+		case mtSheep: return 74;
+		case mtShulker: return 75;
+		case mtSilverfish: return 77;
+		case mtSkeleton: return 78;
+		case mtSkeletonHorse: return 79;
+		case mtSlime: return 80;
+		case mtSpider: return 85;
+		case mtSquid: return 86;
+		case mtStray: return 87;
+		case mtStrider: return 88;
+		case mtTraderLlama: return 94;
+		case mtTropicalFish: return 95;
+		case mtTurtle: return 96;
+		case mtVex: return 97;
+		case mtVindicator: return 99;
+		case mtWanderingTrader: return 100;
+		case mtWitch: return 101;
+		case mtWither: return 102;
+		case mtWitherSkeleton: return 103;
+		case mtWolf: return 105;
+		case mtZoglin: return 106;
+		case mtZombie: return 107;
+		case mtZombieHorse: return 108;
+		case mtZombieVillager: return 109;
+		case mtZombifiedPiglin: return 110;
+
+		default:                      return 0;
+	}
+}
+
+
+
+
+int cProtocol_1_17::GetProtocolParticleID(const AString & a_ParticleName) const
+{
+	static const std::unordered_map<AString, int> ParticleMap
+	{
+		// Initialize the ParticleMap:
+		{ "ambient_entity_effect",    0 },
+		{ "angry_villager",           1 },
+		{ "barrier",                  2 },
+		{ "light",                    3 },
+		{ "block",                    4 },
+		{ "bubble",                   5 },
+		{ "cloud",                    6 },
+		{ "crit",                     7 },
+		{ "damage_indicator",         8 },
+		{ "dragon_breath",            9 },
+		{ "dripping_lava",            10 },
+		{ "falling_lava",             11 },
+		{ "landing_lava",             12 },
+		{ "dripping_water",           13 },
+		{ "falling_water",            14 },
+		{ "dust",                     15 },
+		{ "dust_color_transition",    16 },
+		{ "effect",                   17 },
+		{ "elder_guardian",           18 },
+		{ "enchanted_hit",            19 },
+		{ "enchant",                  20 },
+		{ "end_rod",                  21 },
+		{ "entity_effect",            22 },
+		{ "explosion_emitter",        23 },
+		{ "explosion",                24 },
+		{ "falling_dust",             25 },
+		{ "firework",                 26 },
+		{ "fishing",                  27 },
+		{ "flame",                    28 },
+		{ "soul_fire_flame",          29 },
+		{ "soul",                     30 },
+		{ "flash",                    31 },
+		{ "happy_villager",           32 },
+		{ "composter",                33 },
+		{ "heart",                    34 },
+		{ "instant_effect",           35 },
+		{ "item",                     36 },
+		{ "vibration",                37 },
+		{ "item_slime",               38 },
+		{ "item_snowball",            39 },
+		{ "large_smoke",              40 },
+		{ "lava",                     41 },
+		{ "mycelium",                 42 },
+		{ "note",                     43 },
+		{ "poof",                     44 },
+		{ "portal",                   45 },
+		{ "rain",                     46 },
+		{ "smoke",                    47 },
+		{ "sneeze",                   48 },
+		{ "spit",                     49 },
+		{ "squid_ink",                50 },
+		{ "sweep_attack",             51 },
+		{ "totem_of_undying",         52 },
+		{ "underwater",               53 },
+		{ "splash",                   54 },
+		{ "witch",                    55 },
+		{ "bubble_pop",               56 },
+		{ "current_down",             57 },
+		{ "bubble_column_up",         58 },
+		{ "nautilus",                 59 },
+		{ "dolphin",                  60 },
+		{ "campfire_cosy_smoke",      61 },
+		{ "campfire_signal_smoke",    62 },
+		{ "dripping_honey",           63 },
+		{ "falling_honey",            64 },
+		{ "landing_honey",            65 },
+		{ "falling_nectar",           66 },
+		{ "falling_spore_blossom",    67 },
+		{ "ash",                      68 },
+		{ "crimson_spore",            69 },
+		{ "warped_spore",             70 },
+		{ "spore_blossom_air",        71 },
+		{ "dripping_obsidian_tear",   72 },
+		{ "falling_obsidian_tear",    73 },
+		{ "landing_obsidian_tear",    74 },
+		{ "reverse_portal",           75 },
+		{ "white_ash",                76 },
+		{ "small_flame",              77 },
+		{ "snowflake",                78 },
+		{ "dripping_dripstone_lava",  79 },
+		{ "falling_dripstone_lava",   80 },
+		{ "dripping_dripstone_water", 81 },
+		{ "falling_dripstone_water",  82 },
+		{ "glow_squid_ink",           83 },
+		{ "glow",                     84 },
+		{ "wax_on",                   85 },
+		{ "wax_off",                  86 },
+		{ "electric_spark",           87 },
+		{ "scrape",                   88 },
+	};
+
+
+	const auto ParticleName = StrToLower(a_ParticleName);
+	const auto FindResult = ParticleMap.find(ParticleName);
+	if (FindResult == ParticleMap.end())
+	{
+		LOGWARNING("Unknown particle: %s", a_ParticleName.c_str());
+		//ASSERT(!"Unknown particle"); // some particles where renamed so they throw this error
+		return 0;
+	}
+
+	return FindResult->second;
+}
+
+
+
+
+
+UInt8 cProtocol_1_17::GetProtocolEntityType(const cEntity & a_Entity) const
+{
+	using Type = cEntity::eEntityType;
+
+	switch (a_Entity.GetEntityType())
+	{
+		case Type::etEnderCrystal: return 19;
+		case Type::etPickup: return 41;
+		case Type::etFallingBlock: return 27;
+		case Type::etMinecart: return 50;
+		case Type::etBoat: return 7;
+		case Type::etTNT: return 69;
+		case Type::etProjectile:
+		{
+			using PType = cProjectileEntity::eKind;
+			const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
+
+			switch (Projectile.GetProjectileKind())
+			{
+				case PType::pkArrow: return 2;
+				case PType::pkSnowball: return 83;
+				case PType::pkEgg: return 89;
+				case PType::pkGhastFireball: return 43;
+				case PType::pkFireCharge: return 81;
+				case PType::pkEnderPearl: return 90;
+				case PType::pkExpBottle: return 91;
+				case PType::pkSplashPotion: return 92;
+				case PType::pkFirework: return 28;
+				case PType::pkWitherSkull: return 104;
+			}
+			break;
+		}
+		case Type::etFloater: return 112;
+		case Type::etItemFrame: return 42;
+		case Type::etLeashKnot: return 44;
+
+		// Non-objects must not be sent
+		case Type::etEntity:
+		case Type::etPlayer:
+		case Type::etMonster:
+		case Type::etExpOrb:
+		case Type::etPainting: break;
+	}
+	UNREACHABLE("Unhandled entity kind");
+}
+
+
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_17_1:
