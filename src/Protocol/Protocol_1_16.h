@@ -23,6 +23,11 @@ protected:
 	virtual void HandlePacketUseItem(cByteBuffer & a_ByteBuffer) override;
 	virtual void SendChatRaw(const AString & a_MessageRaw, eChatType a_Type) override;
 
+
+	virtual int GetProtocolParticleID(const AString & a_ParticleName) const override;
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
+	virtual UInt8 GetProtocolEntityType(const cEntity & a_Entity) const override;
+
 	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
 
 	virtual Version GetProtocolVersion() const override;
