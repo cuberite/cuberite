@@ -25,6 +25,7 @@ protected:
 	virtual void    SendPlayerListAddPlayer(const cPlayer & a_Player) override;
 	virtual void    SendRespawn(eDimension a_Dimension) override;
 	virtual void    SendSpawnMob(const cMonster & a_Mob) override;
+	virtual void    SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
 
 	virtual void    HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer) override;
     virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
@@ -33,6 +34,11 @@ protected:
 	virtual void    HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer) override;
 	virtual void    HandlePacketBlockDig(cByteBuffer & a_ByteBuffer) override;
 	virtual void    HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer) override;
+
+	virtual UInt32    GetProtocolMobType(eMonsterType a_MobType) const override;
+	virtual int       GetProtocolParticleID(const AString & a_ParticleName) const override;
+	virtual UInt8     GetProtocolEntityType(const cEntity & a_Entity) const override;
+
 
 	virtual Version GetProtocolVersion() const override;
 };
