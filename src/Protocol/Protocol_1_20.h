@@ -16,9 +16,9 @@ public:
 protected:
 	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
     virtual void    SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
+    virtual void    SendRespawn(eDimension a_Dimension) override;
 
-    virtual void SendRespawn(eDimension a_Dimension) override;
-
+	virtual int     GetProtocolParticleID(const AString & a_ParticleName) const override;
 	virtual Version GetProtocolVersion() const override;
 };
 
@@ -109,4 +109,8 @@ protected:
 	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const override;
 	virtual Version GetProtocolVersion() const override;
+
+	virtual UInt32    GetProtocolMobType(eMonsterType a_MobType) const override;
+	virtual int       GetProtocolParticleID(const AString & a_ParticleName) const override;
+	virtual UInt8     GetProtocolEntityType(const cEntity & a_Entity) const override;
 };

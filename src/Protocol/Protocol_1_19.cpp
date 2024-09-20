@@ -3222,6 +3222,7 @@ UInt32 cProtocol_1_19_4::GetProtocolMobType(eMonsterType a_MobType) const
 		case mtTropicalFish: return 105;
 		case mtTurtle: return 106;
 		case mtVex: return 107;
+		case mtVillager: return 108;
 		case mtVindicator: return 109;
 		case mtWanderingTrader: return 110;
 		case mtWarden: return 111;
