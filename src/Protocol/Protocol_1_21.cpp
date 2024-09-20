@@ -280,10 +280,13 @@ void cProtocol_1_21::SendSelectKnownPacks()
 {
 	cPacketizer Pkt(*this, pktSelectKnownPacks);
 	{
-		Pkt.WriteVarInt32(1);
+		Pkt.WriteVarInt32(2);
 		Pkt.WriteString("minecraft");
 		Pkt.WriteString("core");
 		Pkt.WriteString("1.21");
+		Pkt.WriteString("minecraft");
+		Pkt.WriteString("core");
+		Pkt.WriteString("1.21.1");
 	}	
 }
 

@@ -1943,11 +1943,6 @@ void cProtocol_1_20_5::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		Pkt.WriteBEInt32(static_cast<int>(reinterpret_cast<intptr_t>(this)));  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
 		Pkt.WriteBool(Server->ShouldAuthenticate());
 	}
-
-	if (!Server->ShouldAuthenticate())
-	{
-		m_Client->HandleLogin();
-	}
 }
 
 
