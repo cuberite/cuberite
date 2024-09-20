@@ -12,10 +12,13 @@ enum eMonsterType
 	mtInvalidType = -1,
 
 	mtAllay,	                    // Added in 1.18
+	mtArmadillo,                    // Added in 1.20.5
 	mtAxolotl,	                    // Added in 1.17
 	mtBee,                          // Added in 1.15
 	mtBat,
 	mtBlaze,
+	mtBogged,                       // Added in 1.21
+	mtBreeze,                       // Added in 1.21
 	mtCamel,                        // Added in 1.20
 	mtCat,                          // Added in 1.14
 	mtCaveSpider,
