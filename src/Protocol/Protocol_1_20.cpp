@@ -244,6 +244,118 @@ void cProtocol_1_20::SendRespawn(eDimension a_Dimension)
 
 
 
+int cProtocol_1_20::GetProtocolParticleID(const AString & a_ParticleName) const
+{
+	static const std::unordered_map<AString, int> ParticleMap
+	{
+		// Initialize the ParticleMap:
+		{ "ambient_entity_effect",    0 },
+		{ "angry_villager",           1 },
+		{ "ash",                      71 },
+		{ "block",                    2 },
+		{ "block_marker",             3 },
+		{ "bubble",                   4 },
+		{ "bubble_column_up",         61 },
+		{ "bubble_pop",               59 },
+		{ "campfire_cosy_smoke",      64 },
+		{ "campfire_signal_smoke",    65 },
+		{ "cloud",                    5 },
+		{ "composter",                36 },
+		{ "crimson_spore",            72 },
+		{ "crit",                     6 },
+		{ "current_down",             60 },
+		{ "damage_indicator",         7 },
+		{ "dolphin",                  63 },
+		{ "dragon_breath",            8 },
+		{ "dripping_dripstone_lava",  82 },
+		{ "dripping_dripstone_water", 84 },
+		{ "dripping_honey",           66 },
+		{ "dripping_lava",            9 },
+		{ "dripping_obsidian_tear",   75 },
+		{ "dripping_water",           12 },
+		{ "dust",                     14 },
+		{ "dust_color_transition",    15 },
+		{ "effect",                   16 },
+		{ "elder_guardian",           17 },
+		{ "electric_spark",           90 },
+		{ "enchant",                  19 },
+		{ "enchanted_hit",            18 },
+		{ "end_rod",                  20 },
+		{ "entity_effect",            21 },
+		{ "explosion",                23 },
+		{ "explosion_emitter",        22 },
+		{ "falling_dripstone_lava",   83 },
+		{ "falling_dripstone_water",  85 },
+		{ "falling_dust",             25 },
+		{ "falling_honey",            67 },
+		{ "falling_lava",             10 },
+		{ "falling_nectar",           69 },
+		{ "falling_obsidian_tear",    76 },
+		{ "falling_spore_blossom",    70 },
+		{ "falling_water",            13 },
+		{ "firework",                 26 },
+		{ "fishing",                  27 },
+		{ "flame",                    28 },
+		{ "flash",                    34 },
+		{ "glow",                     87 },
+		{ "glow_squid_ink",           86 },
+		{ "happy_villager",           35 },
+		{ "heart",                    37 },
+		{ "instant_effect",           38 },
+		{ "item",                     39 },
+		{ "item_slime",               41 },
+		{ "item_snowball",            42 },
+		{ "landing_honey",            68 },
+		{ "landing_lava",             11 },
+		{ "landing_obsidian_tear",    77 },
+		{ "large_smoke",              43 },
+		{ "lava",                     44 },
+		{ "mycelium",                 45 },
+		{ "nautilus",                 62 },
+		{ "note",                     46 },
+		{ "poof",                     47 },
+		{ "portal",                   48 },
+		{ "rain",                     49 },
+		{ "reverse_portal",           78 },
+		{ "scrape",                   91 },
+		{ "sculk_charge",             30 },
+		{ "sculk_charge_pop",         31 },
+		{ "sculk_soul",               29 },
+		{ "shriek",                   92 },
+		{ "small_flame",              80 },
+		{ "smoke",                    50 },
+		{ "sneeze",                   51 },
+		{ "snowflake",                81 },
+		{ "sonic_boom",               24 },
+		{ "soul",                     33 },
+		{ "soul_fire_flame",          32 },
+		{ "spit",                     52 },
+		{ "splash",                   57 },
+		{ "spore_blossom_air",        74 },
+		{ "squid_ink",                53 },
+		{ "sweep_attack",             54 },
+		{ "totem_of_undying",         55 },
+		{ "underwater",               56 },
+		{ "vibration",                40 },
+		{ "warped_spore",             73 },
+		{ "wax_off",                  89 },
+		{ "wax_on",                   88 },
+		{ "white_ash",                79 },
+		{ "witch",                    58 },
+	};
+
+
+	const auto ParticleName = StrToLower(a_ParticleName);
+	const auto FindResult = ParticleMap.find(ParticleName);
+	if (FindResult == ParticleMap.end())
+	{
+		LOGWARNING("Unknown particle: %s", a_ParticleName.c_str());
+		//ASSERT(!"Unknown particle"); // some particles where renamed so they throw this error
+		return 0;
+	}
+
+	return FindResult->second;
+}
 ////////////////////////////////////////////////////////////////////////////////
 //  cProtocol_1_20_2:
 
@@ -2140,6 +2252,284 @@ void cProtocol_1_20_5::SendRespawn(eDimension a_Dimension)
 	Pkt.WriteBool(false);  // optional last death pos
 	Pkt.WriteVarInt32(0); // portal cool down
 	Pkt.WriteBEInt8(0x3); // keep metadata and attributes 
+}
+
+
+
+
+
+UInt32 cProtocol_1_20_5::GetProtocolMobType(eMonsterType a_MobType) const
+{
+	switch (a_MobType)
+	{
+		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
+		case mtInvalidType:           return 46;
+		case mtAllay: return 0;
+		case mtArmadillo: return 2;
+		case mtAxolotl: return 5;
+		case mtBat: return 6;
+		case mtBee: return 7;
+		case mtBlaze: return 8;
+		case mtBogged: return 11;
+		case mtBreeze: return 12;
+		case mtCamel: return 14;
+		case mtCat: return 15;
+		case mtCaveSpider: return 16;
+		case mtChicken: return 19;
+		case mtCod: return 20;
+		case mtCow: return 22;
+		case mtCreeper: return 23;
+		case mtDolphin: return 24;
+		case mtDonkey: return 25;
+		case mtDrowned: return 27;
+		case mtElderGuardian: return 29;
+		case mtEnderDragon: return 31;
+		case mtEnderman: return 33;
+		case mtEndermite: return 34;
+		case mtEvoker: return 35;
+		case mtFox: return 42;
+		case mtFrog: return 43;
+		case mtGhast: return 45;
+		case mtGiant: return 46;
+		case mtGlowSquid: return 48;
+		case mtGoat: return 49;
+		case mtGuardian: return 50;
+		case mtHoglin: return 51;
+		case mtHorse: return 53;
+		case mtHusk: return 54;
+		case mtIllusioner: return 55;
+		case mtLlama: return 65;
+		case mtMagmaCube: return 67;
+		case mtMooshroom: return 70;
+		case mtMule: return 71;
+		case mtOcelot: return 72;
+		case mtPanda: return 74;
+		case mtParrot: return 75;
+		case mtPhantom: return 76;
+		case mtPig: return 77;
+		case mtPiglin: return 78;
+		case mtPiglinBrute: return 79;
+		case mtPillager: return 80;
+		case mtPolarBear: return 81;
+		case mtPufferfish: return 83;
+		case mtRabbit: return 84;
+		case mtRavager: return 85;
+		case mtSalmon: return 86;
+		case mtSheep: return 87;
+		case mtShulker: return 88;
+		case mtSilverfish: return 90;
+		case mtSkeleton: return 91;
+		case mtSkeletonHorse: return 92;
+		case mtSlime: return 93;
+		case mtSniffer: return 95;
+		case mtSpider: return 100;
+		case mtSquid: return 101;
+		case mtStray: return 102;
+		case mtStrider: return 103;
+		case mtTadpole: return 104;
+		case mtTraderLlama: return 108;
+		case mtTropicalFish: return 110;
+		case mtTurtle: return 111;
+		case mtVex: return 112;
+		case mtVillager: return 113;
+		case mtVindicator: return 114;
+		case mtWanderingTrader: return 115;
+		case mtWarden: return 116;
+		case mtWitch: return 118;
+		case mtWither: return 119;
+		case mtWitherSkeleton: return 120;
+		case mtWolf: return 122;
+		case mtZoglin: return 123;
+		case mtZombie: return 124;
+		case mtZombieHorse: return 125;
+		case mtZombieVillager: return 126;
+		case mtZombifiedPiglin: return 127;
+
+		default:                      return 0;
+	}
+}
+
+
+
+
+
+int cProtocol_1_20_5::GetProtocolParticleID(const AString & a_ParticleName) const
+{
+	static const std::unordered_map<AString, int> ParticleMap
+	{
+		// Initialize the ParticleMap:
+		{ "angry_villager",                  0 },
+		{ "ash",                             78 },
+		{ "block",                           1 },
+		{ "block_marker",                    2 },
+		{ "bubble",                          3 },
+		{ "bubble_column_up",                68 },
+		{ "bubble_pop",                      66 },
+		{ "campfire_cosy_smoke",             71 },
+		{ "campfire_signal_smoke",           72 },
+		{ "cherry_leaves",                   33 },
+		{ "cloud",                           4 },
+		{ "composter",                       41 },
+		{ "crimson_spore",                   79 },
+		{ "crit",                            5 },
+		{ "current_down",                    67 },
+		{ "damage_indicator",                6 },
+		{ "dolphin",                         70 },
+		{ "dragon_breath",                   7 },
+		{ "dripping_dripstone_lava",         89 },
+		{ "dripping_dripstone_water",        91 },
+		{ "dripping_honey",                  73 },
+		{ "dripping_lava",                   8 },
+		{ "dripping_obsidian_tear",          82 },
+		{ "dripping_water",                  11 },
+		{ "dust",                            13 },
+		{ "dust_color_transition",           14 },
+		{ "dust_pillar",                     105 },
+		{ "dust_plume",                      101 },
+		{ "effect",                          15 },
+		{ "egg_crack",                       100 },
+		{ "elder_guardian",                  16 },
+		{ "electric_spark",                  97 },
+		{ "enchant",                         18 },
+		{ "enchanted_hit",                   17 },
+		{ "end_rod",                         19 },
+		{ "entity_effect",                   20 },
+		{ "explosion",                       22 },
+		{ "explosion_emitter",               21 },
+		{ "falling_dripstone_lava",          90 },
+		{ "falling_dripstone_water",         92 },
+		{ "falling_dust",                    28 },
+		{ "falling_honey",                   74 },
+		{ "falling_lava",                    9 },
+		{ "falling_nectar",                  76 },
+		{ "falling_obsidian_tear",           83 },
+		{ "falling_spore_blossom",           77 },
+		{ "falling_water",                   12 },
+		{ "firework",                        29 },
+		{ "fishing",                         30 },
+		{ "flame",                           31 },
+		{ "flash",                           39 },
+		{ "glow",                            94 },
+		{ "glow_squid_ink",                  93 },
+		{ "gust",                            23 },
+		{ "gust_emitter_large",              25 },
+		{ "gust_emitter_small",              26 },
+		{ "happy_villager",                  40 },
+		{ "heart",                           42 },
+		{ "infested",                        32 },
+		{ "instant_effect",                  43 },
+		{ "item",                            44 },
+		{ "item_cobweb",                     47 },
+		{ "item_slime",                      46 },
+		{ "item_snowball",                   48 },
+		{ "landing_honey",                   75 },
+		{ "landing_lava",                    10 },
+		{ "landing_obsidian_tear",           84 },
+		{ "large_smoke",                     49 },
+		{ "lava",                            50 },
+		{ "mycelium",                        51 },
+		{ "nautilus",                        69 },
+		{ "note",                            52 },
+		{ "ominous_spawning",                106 },
+		{ "poof",                            53 },
+		{ "portal",                          54 },
+		{ "raid_omen",                       107 },
+		{ "rain",                            55 },
+		{ "reverse_portal",                  85 },
+		{ "scrape",                          98 },
+		{ "sculk_charge",                    35 },
+		{ "sculk_charge_pop",                36 },
+		{ "sculk_soul",                      34 },
+		{ "shriek",                          99 },
+		{ "small_flame",                     87 },
+		{ "small_gust",                      24 },
+		{ "smoke",                           56 },
+		{ "sneeze",                          58 },
+		{ "snowflake",                       88 },
+		{ "sonic_boom",                      27 },
+		{ "soul",                            38 },
+		{ "soul_fire_flame",                 37 },
+		{ "spit",                            59 },
+		{ "splash",                          64 },
+		{ "spore_blossom_air",               81 },
+		{ "squid_ink",                       60 },
+		{ "sweep_attack",                    61 },
+		{ "totem_of_undying",                62 },
+		{ "trial_omen",                      108 },
+		{ "trial_spawner_detection",         102 },
+		{ "trial_spawner_detection_ominous", 103 },
+		{ "underwater",                      63 },
+		{ "vault_connection",                104 },
+		{ "vibration",                       45 },
+		{ "warped_spore",                    80 },
+		{ "wax_off",                         96 },
+		{ "wax_on",                          95 },
+		{ "white_ash",                       86 },
+		{ "white_smoke",                     57 },
+		{ "witch",                           65 },
+	};
+
+
+	const auto ParticleName = StrToLower(a_ParticleName);
+	const auto FindResult = ParticleMap.find(ParticleName);
+	if (FindResult == ParticleMap.end())
+	{
+		LOGWARNING("Unknown particle: %s", a_ParticleName.c_str());
+		//ASSERT(!"Unknown particle"); // some particles where renamed so they throw this error
+		return 0;
+	}
+
+	return FindResult->second;
+}
+
+
+
+
+
+UInt8 cProtocol_1_20_5::GetProtocolEntityType(const cEntity & a_Entity) const
+{
+	using Type = cEntity::eEntityType;
+
+	switch (a_Entity.GetEntityType())
+	{
+		case Type::etEnderCrystal: return 30;
+		case Type::etPickup: return 58;
+		case Type::etFallingBlock: return 40;
+		case Type::etMinecart: return 69;
+		case Type::etBoat: return 10;
+		case Type::etTNT: return 106;
+		case Type::etProjectile:
+		{
+			using PType = cProjectileEntity::eKind;
+			const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
+
+			switch (Projectile.GetProjectileKind())
+			{
+				case PType::pkArrow: return 4;
+				case PType::pkSnowball: return 67;
+				case PType::pkEgg: return 28;
+				case PType::pkGhastFireball: return 62;
+				case PType::pkFireCharge: return 94;
+				case PType::pkEnderPearl: return 32;
+				case PType::pkExpBottle: return 37;
+				case PType::pkSplashPotion: return 82;
+				case PType::pkFirework: return 41;
+				case PType::pkWitherSkull: return 121;
+			}
+			break;
+		}
+		case Type::etFloater: return 129;
+		case Type::etItemFrame: return 60;
+		case Type::etLeashKnot: return 63;
+
+		// Non-objects must not be sent
+		case Type::etEntity:
+		case Type::etPlayer:
+		case Type::etMonster:
+		case Type::etExpOrb:
+		case Type::etPainting: break;
+	}
+	UNREACHABLE("Unhandled entity kind");
 }
 
 
