@@ -397,7 +397,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			// in 1.18 it goes to -4
 			// Section num can go higher in newer versions
 			const int Y = a_NBT.GetType(SectionYTag) == TAG_Int ? a_NBT.GetInt(SectionYTag) : static_cast<signed char>(a_NBT.GetByte(SectionYTag));
-			if ((Y < -1) || (Y > static_cast<int>(cChunkDef::NumSections - 1)))
+			if ((Y < 0) || (Y > static_cast<int>(cChunkDef::NumSections - 1)))
 			{
 				LOGWARN("Cuberite currently does not support chunk sections below Y 0 or above 256 blocks. Ignoring");
 				continue;
@@ -407,7 +407,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			int block_states_compound = a_NBT.FindChildByName(Child, "block_states");
 			if (block_states_compound > 0)
 			{
-				PaletteList = a_NBT.FindChildByName(block_states_compound, "Palette");
+				PaletteList = a_NBT.FindChildByName(block_states_compound, "palette");
 			}
 			else
 			{
@@ -514,53 +514,58 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			const auto BlockLightData = GetSectionData(a_NBT, Child, "BlockLight",ChunkLightData::SectionLightCount);	 // Still exists but does not have to be present for a valid section
 			const auto SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount); // Still exists but does not have to be present for a valid section
 
-			UInt64 * LEstates = new UInt64[SectionBlockLongCount];
-
-			for (size_t i = 0; i < static_cast<size_t>(SectionBlockLongCount); i++)
+			if (BlockStateData != nullptr)
 			{
-				LEstates[i] = ntohll(reinterpret_cast<const UInt64*>(BlockStateData)[i]);
-			}
+				ASSERT(SectionBlockLongCount > 0);
+				UInt64 * LEstates = new UInt64[SectionBlockLongCount];
 
-			BlockState resolveddata[4096] = { BlockType::Air };
-			int numblockdataindex = 0;
-
-			const bool usepadding = DataVersion >= 2566;  // Enable padding for worlds generated in 1.16+
-
-			int BitIndex = 0;
-			int arrindex = 0;
-			while (numblockdataindex < 4096)
-			{
-				UInt64 finalv = 0;
-				if (BitIndex + IndexBitSize <= 64)
+				for (size_t i = 0; i < static_cast<size_t>(SectionBlockLongCount); i++)
 				{
-					finalv = (LEstates[arrindex] >> BitIndex) & ((static_cast<UInt64>(1) << IndexBitSize) - 1);
-					BitIndex += IndexBitSize;
-					if (BitIndex == 64)
-					{
-						BitIndex = 0;
-						arrindex++;
-					}
+					LEstates[i] = ntohll(reinterpret_cast<const UInt64*>(BlockStateData)[i]);
 				}
-				else  // BitIndex + IndexBitSize > 64
+
+				BlockState resolveddata[4096] = { BlockType::Air };
+				int numblockdataindex = 0;
+
+				const bool usepadding = DataVersion >= 2566;  // Enable padding for worlds generated in 1.16+
+
+				int BitIndex = 0;
+				int arrindex = 0;
+				while (numblockdataindex < 4096)
 				{
-					if (usepadding)
+					UInt64 finalv = 0;
+					if (BitIndex + IndexBitSize <= 64)
 					{
-						BitIndex = 0;
-						arrindex++;
-						continue;
+						finalv = (LEstates[arrindex] >> BitIndex) & ((static_cast<UInt64>(1) << IndexBitSize) - 1);
+						BitIndex += IndexBitSize;
+						if (BitIndex == 64)
+						{
+							BitIndex = 0;
+							arrindex++;
+						}
 					}
-					UInt64 lowerpart = LEstates[arrindex] >> BitIndex;
-					arrindex++;
-					int BitsRead = (64 - BitIndex);
-					BitIndex = IndexBitSize - BitsRead;
-					UInt64 upperpart = (LEstates[arrindex] & ((static_cast<UInt64>(1) << BitIndex) - 1)) << BitsRead;
-					finalv = lowerpart | upperpart;
-					ASSERT(finalv < Paletteids.size());
+					else  // BitIndex + IndexBitSize > 64
+					{
+						if (usepadding)
+						{
+							BitIndex = 0;
+							arrindex++;
+							continue;
+						}
+						UInt64 lowerpart = LEstates[arrindex] >> BitIndex;
+						arrindex++;
+						int BitsRead = (64 - BitIndex);
+						BitIndex = IndexBitSize - BitsRead;
+						UInt64 upperpart = (LEstates[arrindex] & ((static_cast<UInt64>(1) << BitIndex) - 1)) << BitsRead;
+						finalv = lowerpart | upperpart;
+						ASSERT(finalv < Paletteids.size());
+					}
+					resolveddata[numblockdataindex] = Paletteids[finalv];
+					numblockdataindex++;
 				}
-				resolveddata[numblockdataindex] = Paletteids[finalv];
-				numblockdataindex++;
+				Data.BlockData.SetSection(resolveddata, Y);
+				delete[] LEstates;
 			}
-			Data.BlockData.SetSection(resolveddata,Y);
 
 			if (BlockLightData != nullptr && SkyLightData != nullptr)
 			{
@@ -570,7 +575,6 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			memset(&Data.HeightMap,0,256); // temp
 			memset(&Data.BiomeMap,0,1024); // temp
 			Data.IsLightValid = true;
-			delete[] LEstates;
 		}  // for itr - LevelSections[]
 
 		// Load the entities from NBT:
@@ -580,6 +584,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			entities = a_NBT.FindChildByName(Level, "entities");
 		}
 		LoadEntitiesFromNBT(Data.Entities, a_NBT, entities);
+		//TODO: block entites
 	}
 
 	m_World->QueueSetChunkData(std::move(Data));
