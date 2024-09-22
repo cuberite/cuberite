@@ -1275,28 +1275,26 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 	SerializerCollector serializer(aWriter);
 	if (true)  // new format
 	{
-		// set to 1.15
-		aWriter.AddInt("DataVersion",2225);  // to which game version does this save correspond to
+		// set to 1.21.1
+		aWriter.AddInt("DataVersion", 3955);  // to which game version does this save correspond to
 
-		aWriter.BeginCompound("Level");
 		aWriter.AddInt("xPos", aCoords.m_ChunkX);
 		aWriter.AddInt("zPos", aCoords.m_ChunkZ);
 		[[maybe_unused]] const bool Result = aWorld.GetChunkData(aCoords, serializer);  // Chunk must be present in order to save
 		ASSERT(Result);
 		serializer.Finish();  // Close NBT tags
 
-		// std::array<NEWBLOCKTYPE, 4096> templist = { 0 };
-
-		aWriter.BeginList("Sections", TAG_Compound);
+		aWriter.BeginList("sections", TAG_Compound);
 		std::unordered_map<ENUM_BLOCKS, AString> savemap = *BlockMap::BlMap::GetSaveMap();
 
+		const bool use_padding = true;	// used in 1.16+
 		for (size_t Y = 0; Y < cChunkDef::NumSections; Y++)
 		{
 			const auto Blocks = serializer.m_BlockData.GetSection(Y); 
 			const auto BlockLights = serializer.m_LightData.GetBlockLightSection(Y); 
 			const auto SkyLights = serializer.m_LightData.GetSkyLightSection(Y);
 			aWriter.BeginCompound("");
-			aWriter.AddByte("Y", static_cast<unsigned char>(Y)); // the game interprets Y as signed
+			aWriter.AddInt("Y", static_cast<Int32>(Y));
 			if (Blocks != nullptr)
 			{ 
 				ChunkBlockData::BlockArray temparr;
@@ -1306,11 +1304,21 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				int newsize = (newlistend - temparr.begin());
 				int bitused = Clamp(CeilC(log2(newsize)), 4, 16);
 
-				int longarrsize = CeilC((bitused * 4096)/8/8); // TODO: account for padding in 1.16+
-				
-				aWriter.BeginList("Palette", eTagType::TAG_Compound);
+				int longarrsize = -1;
 
-				
+				if (use_padding)
+				{
+					int blocks_per_long = FloorC(64.0 / bitused);
+					int longs_needed = CeilC(4096.0 / blocks_per_long);
+					longarrsize = longs_needed;
+				}
+				else
+				{
+					longarrsize = CeilC((bitused * 4096)/8/8); 
+				}
+
+				aWriter.BeginCompound("block_states");
+				aWriter.BeginList("palette", eTagType::TAG_Compound);
 
 				for (size_t i = 0; i < newsize; i++)
 				{
@@ -1369,10 +1377,9 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 					aWriter.EndCompound();
 				}
 				aWriter.EndList();
+				
 
 				INT64* arr = new INT64[longarrsize];
-				
-				bool usepadding = false;  // used in 1.16+ 
 
 				UINT64 tbuf = 0;
 				int BitIndex = 0;
@@ -1394,7 +1401,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 					//ASSERT(bitswritten == (longindex*64+BitIndex));
 					if (BitIndex + bitused > 64 || i == toloop-1)  // not enough bits in current long for the next value?
 					{
-						if (usepadding)
+						if (use_padding)
 						{
 							BitIndex = 0;
 							ASSERT(longindex < longarrsize);
@@ -1434,13 +1441,13 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				
 				if (Blocks != nullptr)
 				{
-					aWriter.AddLongArray("BlockStates", arr, longindex);
+					aWriter.AddLongArray("data", arr, longindex);
 				}
 				else
 				{
 					// aWriter.AddByteArray("BlockStates", ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue);  // BROKEN
 				}
-
+				aWriter.EndCompound();
 				delete[] arr;
 			}
 
@@ -1469,15 +1476,11 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 		aWriter.AddLong("InhabitedTime", 0);
 
-		aWriter.AddString("Status", "full");
+		aWriter.AddString("Status", "minecraft:full");
 
 		aWriter.AddByte("isLightOn", 1);
 
 		// height maps not implemented yet
-
-		aWriter.EndCompound();  // "Level"
-
-		float dd = 1.0f;
 		return;
 	}
 	//aWriter.BeginCompound("Level");

@@ -3171,7 +3171,6 @@ cWorld::cChunkGeneratorCallbacks::cChunkGeneratorCallbacks(cWorld & a_World) :
 void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc)
 {
 
-	cChunkDef::BlockTypes2 empty = { AIR };
 	struct SetChunkData Data({ a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()});
 	{
 		Data.BlockData.SetAll(a_ChunkDesc.GetBlocks());
