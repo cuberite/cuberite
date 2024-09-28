@@ -185,7 +185,7 @@ void cBoat::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (IsBlockWater(m_World->GetBlock(POS_TOINT)))
+	if (m_World->GetBlock(POS_TOINT).Type() == BlockType::Water)
 	{
 		if (GetSpeedY() < 2)
 		{
@@ -254,15 +254,16 @@ cBoat::eMaterial cBoat::ItemToMaterial(const cItem & a_Item)
 {
 	switch (a_Item.m_ItemType)
 	{
-		case E_ITEM_BOAT:          return bmOak;
-		case E_ITEM_SPRUCE_BOAT:   return bmSpruce;
-		case E_ITEM_BIRCH_BOAT:    return bmBirch;
-		case E_ITEM_JUNGLE_BOAT:   return bmJungle;
-		case E_ITEM_ACACIA_BOAT:   return bmAcacia;
-		case E_ITEM_DARK_OAK_BOAT: return bmDarkOak;
+
+		case Item::AcaciaBoat:  return bmAcacia;
+		case Item::BirchBoat:   return bmBirch;
+		case Item::DarkOakBoat: return bmDarkOak;
+		case Item::JungleBoat:  return bmJungle;
+		case Item::OakBoat:     return bmOak;
+		case Item::SpruceBoat:  return bmSpruce;
 		default:
 		{
-			LOGWARNING("%s: Item type not handled %d.", __FUNCTION__, a_Item.m_ItemType);
+			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, a_Item.m_ItemType);
 			return cBoat::bmOak;
 		}
 	}
@@ -330,12 +331,12 @@ cItem cBoat::MaterialToItem(eMaterial a_Material)
 {
 	switch (a_Material)
 	{
-		case bmOak:     return cItem(E_ITEM_BOAT);
-		case bmSpruce:  return cItem(E_ITEM_SPRUCE_BOAT);
-		case bmBirch:   return cItem(E_ITEM_BIRCH_BOAT);
-		case bmJungle:  return cItem(E_ITEM_JUNGLE_BOAT);
-		case bmAcacia:  return cItem(E_ITEM_ACACIA_BOAT);
-		case bmDarkOak: return cItem(E_ITEM_DARK_OAK_BOAT);
+		case bmOak:     return cItem(Item::OakBoat);
+		case bmSpruce:  return cItem(Item::SpruceBoat);
+		case bmBirch:   return cItem(Item::BirchBoat);
+		case bmJungle:  return cItem(Item::JungleBoat);
+		case bmAcacia:  return cItem(Item::AcaciaBoat);
+		case bmDarkOak: return cItem(Item::DarkOakBoat);
 	}
 	UNREACHABLE("Unsupported boat material");
 }

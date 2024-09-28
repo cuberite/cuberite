@@ -29,7 +29,7 @@ public:
 			return true;
 		}
 
-		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_NETHER_WART, 0);
+		return a_Player.PlaceBlock(a_PlacePosition, Block::NetherWart::NetherWart());
 	}
 
 

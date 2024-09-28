@@ -14,7 +14,7 @@ class cItemGoldenAppleHandler final:
 
 public:
 
-	constexpr cItemGoldenAppleHandler(int a_ItemType):
+	constexpr cItemGoldenAppleHandler(Item a_ItemType):
 		Super(a_ItemType, FoodInfo(4, 9.6))
 	{
 	}

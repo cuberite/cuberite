@@ -14,7 +14,7 @@ class cItemCookedFishHandler final:
 
 public:
 
-	constexpr cItemCookedFishHandler(int a_ItemType):
+	constexpr cItemCookedFishHandler(Item a_ItemType):
 		Super(a_ItemType, FoodInfo(0, 0))
 	{
 	}
