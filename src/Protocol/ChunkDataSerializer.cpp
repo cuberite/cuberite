@@ -1252,14 +1252,53 @@ inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_C
 	m_Packet.WriteVarInt32(0);
 
 	// Light Data
-	m_Packet.WriteVarInt32(0);
-	m_Packet.WriteVarInt32(0);
-	m_Packet.WriteVarInt32(0);
-	m_Packet.WriteVarInt32(0);
+	// Each bit corresponds to one chunk section that is lit
+	// Skylight
+	m_Packet.WriteVarInt32(1);
+	Int64 SkyLight = 0;
+	Int64 BlockLight = 0;
+	int light_count = 0, block_count = 0;
+	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
+	{
+		SkyLight |= (a_LightData.GetSkyLightSection(Y) != nullptr) << Y;
+		if (a_LightData.GetSkyLightSection(Y) != nullptr)
+		{
+			light_count++;
+		}
+		BlockLight |= (a_LightData.GetBlockLightSection(Y) != nullptr) << Y;
+		if (a_LightData.GetBlockLightSection(Y) != nullptr)
+		{
+			block_count++;
+		}
+	}
+	m_Packet.WriteBEInt64(SkyLight);
+	//BlockLight
+	m_Packet.WriteVarInt32(1);
+	m_Packet.WriteBEInt64(BlockLight);
 
 	m_Packet.WriteVarInt32(0);
 	m_Packet.WriteVarInt32(0);
-	
+
+	m_Packet.WriteVarInt32(light_count);
+	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
+	{
+		auto light = a_LightData.GetSkyLightSection(Y);
+		if (light != nullptr)
+		{
+			m_Packet.WriteVarInt32(2048);
+			m_Packet.Write(light,2048);
+		}
+	}
+	m_Packet.WriteVarInt32(block_count);
+	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
+	{
+		auto light = a_LightData.GetBlockLightSection(Y);
+		if (light != nullptr)
+		{
+			m_Packet.WriteVarInt32(2048);
+			m_Packet.Write(light,2048);
+		}
+	}
 }
 
 
