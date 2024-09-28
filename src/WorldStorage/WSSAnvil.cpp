@@ -366,6 +366,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			return false;
 		}
 		int DataVersion = a_NBT.GetInt(DataVersionTag);
+		const bool usepadding = DataVersion >= 2566;  // Enable padding for worlds generated in 1.16+
 		int Sections = a_NBT.FindChildByName(Level, "Sections");
 		if (Sections < 0)
 		{
@@ -399,7 +400,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			const int Y = a_NBT.GetType(SectionYTag) == TAG_Int ? a_NBT.GetInt(SectionYTag) : static_cast<signed char>(a_NBT.GetByte(SectionYTag));
 			if ((Y < 0) || (Y > static_cast<int>(cChunkDef::NumSections - 1)))
 			{
-				LOGWARN("Cuberite currently does not support chunk sections below Y 0 or above 256 blocks. Ignoring");
+				LOGWARN("Cuberite currently does not support chunk sections below Y 0 or above 256 blocks. Ignoring X: %d Y: %d Z: %d", a_Chunk.m_ChunkX, Y, a_Chunk.m_ChunkZ);
 				continue;
 			}
 			// in 1.18+? versions the palette and data are in a separate compound tag
@@ -498,21 +499,44 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			int IndexBitSize = std::max(4, static_cast<int>(std::ceil(std::log2(Paletteids.size()))));  // How many bits is one index in length. Min is 4 bits, maximum 12 bits
 			ASSERT((12 >= IndexBitSize) && (IndexBitSize >= 4));
 
-			int SectionBlockLongCount = IndexBitSize*4096/8/8;
+			int SectionBlockLongCount = -1;
+
+			if (usepadding)
+			{
+				int blocks_per_long = FloorC(64.0 / IndexBitSize);
+				SectionBlockLongCount = CeilC(4096.0 / blocks_per_long);
+			}
+			else
+			{
+				SectionBlockLongCount = IndexBitSize*4096/8/8;
+			}
+
+			//if (a_Chunk.m_ChunkX == -1 && a_Chunk.m_ChunkZ == 0 && Y == 3)
+			//{
+			//	DebugBreak();
+			//}
 
 			const std::byte* BlockStateData = nullptr;
 
 			if (block_states_compound > 0)
 			{
 				BlockStateData = GetSectionDataLong(a_NBT, block_states_compound, "data", SectionBlockLongCount);
+				if (BlockStateData != nullptr)
+				{
+					VERIFY(static_cast<size_t>(SectionBlockLongCount) * 8 == a_NBT.GetDataLength(a_NBT.FindChildByName(block_states_compound,"data")));
+				}
 			}
 			else
 			{
 				BlockStateData = GetSectionDataLong(a_NBT, Child, "BlockStates", SectionBlockLongCount);
+				if (BlockStateData != nullptr)
+				{
+					VERIFY(static_cast<size_t>(SectionBlockLongCount) * 8 == a_NBT.GetDataLength(a_NBT.FindChildByName(Child,"BlockStates")));
+				}
 			}
 
-			const auto BlockLightData = GetSectionData(a_NBT, Child, "BlockLight",ChunkLightData::SectionLightCount);	 // Still exists but does not have to be present for a valid section
-			const auto SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount); // Still exists but does not have to be present for a valid section
+			const auto BlockLightData = GetSectionData(a_NBT, Child, "BlockLight",ChunkLightData::SectionLightCount);  // Still exists but does not have to be present for a valid section
+			const auto SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount);  // Still exists but does not have to be present for a valid section
 
 			if (BlockStateData != nullptr)
 			{
@@ -526,8 +550,6 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 				BlockState resolveddata[4096] = { BlockType::Air };
 				int numblockdataindex = 0;
-
-				const bool usepadding = DataVersion >= 2566;  // Enable padding for worlds generated in 1.16+
 
 				int BitIndex = 0;
 				int arrindex = 0;
@@ -566,15 +588,23 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				Data.BlockData.SetSection(resolveddata, Y);
 				delete[] LEstates;
 			}
-
+			else if (Paletteids.size() == 1)  // if there is only one block in the palette, we can just fill the section with it
+			{
+				std::array<BlockState, 4096> Oneblock;
+			    std::fill(Oneblock.begin(), Oneblock.end(), Paletteids[0]);
+				Data.BlockData.SetSection(reinterpret_cast<ChunkBlockData::SectionType &>(Oneblock), Y);
+			}
 			if (BlockLightData != nullptr && SkyLightData != nullptr)
 			{
 				Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
+				Data.IsLightValid = true;
 			}
-			char hm[256] = {0};
+			else
+			{
+				Data.IsLightValid = false;
+			}
 			memset(&Data.HeightMap,0,256); // temp
 			memset(&Data.BiomeMap,0,1024); // temp
-			Data.IsLightValid = true;
 		}  // for itr - LevelSections[]
 
 		// Load the entities from NBT:
