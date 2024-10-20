@@ -800,7 +800,7 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 		(z >= 0) && (z < cChunkDef::Width)
 	)
 	{
-		a_ChunkDesc.SetBlock({x, m_BoundingBox.p1.y + 1, z}, Block::Chest::Chest(Facing, Block::Chest::Type::Single));
+		a_ChunkDesc.SetBlock({x, m_BoundingBox.p1.y + 1, z}, Block::Chest::Chest(Facing, Block::Chest::Type::Single, false));
 		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity({x, m_BoundingBox.p1.y + 1, z}));
 		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == BlockType::Chest));
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
@@ -844,7 +844,7 @@ void cMineShaftCorridor::PlaceTracks(cChunkDesc & a_ChunkDesc)
 			break;
 		}
 	}  // switch (direction)
-	a_ChunkDesc.RandomFillRelCuboid(Box, Block::Rail::Rail(Shape), a_ChunkDesc.GetChunkX() + a_ChunkDesc.GetChunkZ(), 6000);
+	a_ChunkDesc.RandomFillRelCuboid(Box, Block::Rail::Rail(Shape, false), a_ChunkDesc.GetChunkX() + a_ChunkDesc.GetChunkZ(), 6000);
 }
 
 

@@ -6,5 +6,5 @@
 
 namespace Palette_1_20
 {
-	UInt32 ToProtocolIdBlock(NEWBLOCKTYPE block);
+	
 }

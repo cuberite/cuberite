@@ -45,7 +45,7 @@ void cProtocol_1_20::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 				Writer.AddString("type", "minecraft:damage_type");
 				Writer.BeginList("value", eTagType::TAG_Compound);
 				int id = 0;
-					for each (auto ds in dmgsrc)
+					for (auto ds : dmgsrc)
 					{
 						Writer.BeginCompound("");
 							Writer.BeginCompound("element");
@@ -1331,7 +1331,6 @@ void cProtocol_1_20_3::SendChatRaw(const AString & a_MessageRaw, eChatType a_Typ
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	UNUSED(@@)
 	// Prevent chat messages that might trigger CVE-2021-44228
 	if (a_MessageRaw.find("${") != std::string::npos)
 	{
@@ -2120,12 +2119,40 @@ void cProtocol_1_20_5::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 		return;
 	}
 	a_Pkt.WriteVarInt32(a_Item.m_ItemCount);
-	a_Pkt.WriteVarInt32(Palette_1_16::From(a_Item.m_ItemType));
+	a_Pkt.WriteVarInt32(GetProtocolItemType(a_Item.m_ItemType));
 	// TODO: item components
 	a_Pkt.WriteVarInt32(0);
 	a_Pkt.WriteVarInt32(0);
 }
 
+
+
+
+
+bool cProtocol_1_20_5::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) const
+{
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8, Int8, ItemCount);
+	if (ItemCount <= 0)
+	{
+		a_Item.Empty();
+		return true;
+	}
+	a_Item.m_ItemCount = ItemCount;
+
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, ItemID);
+	a_Item.m_ItemType = GetItemFromProtocolID(ItemID);
+
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, ComponentsToAdd);
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, ComponentsToRemove);
+
+	ContiguousByteBuffer Metadata;
+	if (!a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes))
+	{
+		return false;
+	}
+
+	return true;
+}
 
 
 

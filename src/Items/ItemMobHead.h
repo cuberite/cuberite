@@ -34,7 +34,7 @@ public:
 				{
 					case BLOCK_FACE_YP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, SkeletonSkull::SkeletonSkull(RotationToFineFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, SkeletonSkull::SkeletonSkull(false, RotationToFineFace(a_Player.GetYaw())));
 						break;
 					}
 					case BLOCK_FACE_XM:
@@ -42,7 +42,7 @@ public:
 					case BLOCK_FACE_ZM:
 					case BLOCK_FACE_ZP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, SkeletonWallSkull::SkeletonWallSkull(RotationToBlockFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, SkeletonWallSkull::SkeletonWallSkull(RotationToBlockFace(a_Player.GetYaw()), false));
 						break;
 					}
 					default: return false;
@@ -55,7 +55,7 @@ public:
 				{
 					case BLOCK_FACE_YP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, WitherSkeletonSkull::WitherSkeletonSkull(RotationToFineFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, WitherSkeletonSkull::WitherSkeletonSkull(false, RotationToFineFace(a_Player.GetYaw())));
 						break;
 					}
 					case BLOCK_FACE_XM:
@@ -63,7 +63,7 @@ public:
 					case BLOCK_FACE_ZM:
 					case BLOCK_FACE_ZP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, WitherSkeletonWallSkull::WitherSkeletonWallSkull(RotationToBlockFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, WitherSkeletonWallSkull::WitherSkeletonWallSkull(RotationToBlockFace(a_Player.GetYaw()), false));
 						break;
 					}
 					default: return false;
@@ -76,7 +76,7 @@ public:
 				{
 					case BLOCK_FACE_YP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, ZombieHead::ZombieHead(RotationToFineFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, ZombieHead::ZombieHead(false, RotationToFineFace(a_Player.GetYaw())));
 						break;
 					}
 					case BLOCK_FACE_XM:
@@ -84,7 +84,7 @@ public:
 					case BLOCK_FACE_ZM:
 					case BLOCK_FACE_ZP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, ZombieWallHead::ZombieWallHead(RotationToBlockFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, ZombieWallHead::ZombieWallHead(RotationToBlockFace(a_Player.GetYaw()), false));
 						break;
 					}
 					default: return false;
@@ -97,7 +97,7 @@ public:
 				{
 					case BLOCK_FACE_YP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, PlayerHead::PlayerHead(RotationToFineFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, PlayerHead::PlayerHead(false, RotationToFineFace(a_Player.GetYaw())));
 						break;
 					}
 					case BLOCK_FACE_XM:
@@ -105,7 +105,7 @@ public:
 					case BLOCK_FACE_ZM:
 					case BLOCK_FACE_ZP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, PlayerWallHead::PlayerWallHead(RotationToBlockFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, PlayerWallHead::PlayerWallHead(RotationToBlockFace(a_Player.GetYaw()), false));
 						break;
 					}
 					default: return false;
@@ -118,7 +118,7 @@ public:
 				{
 					case BLOCK_FACE_YP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, CreeperHead::CreeperHead(RotationToFineFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, CreeperHead::CreeperHead(false,RotationToFineFace(a_Player.GetYaw())));
 						break;
 					}
 					case BLOCK_FACE_XM:
@@ -126,7 +126,7 @@ public:
 					case BLOCK_FACE_ZM:
 					case BLOCK_FACE_ZP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, CreeperWallHead::CreeperWallHead(RotationToBlockFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, CreeperWallHead::CreeperWallHead(RotationToBlockFace(a_Player.GetYaw()), false));
 						break;
 					}
 					default: return false;
@@ -139,7 +139,7 @@ public:
 				{
 					case BLOCK_FACE_YP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, CreeperHead::CreeperHead(RotationToFineFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, CreeperHead::CreeperHead(false,RotationToFineFace(a_Player.GetYaw())));
 						break;
 					}
 					case BLOCK_FACE_XM:
@@ -147,7 +147,7 @@ public:
 					case BLOCK_FACE_ZM:
 					case BLOCK_FACE_ZP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, CreeperWallHead::CreeperWallHead(RotationToBlockFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, CreeperWallHead::CreeperWallHead(RotationToBlockFace(a_Player.GetYaw()), false));
 						break;
 					}
 					default: return false;

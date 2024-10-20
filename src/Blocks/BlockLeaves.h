@@ -61,12 +61,12 @@ public:
 		using namespace Block;
 		switch (a_Block.Type())
 		{
-			case BlockType::AcaciaLeaves:  return AcaciaLeaves::AcaciaLeaves   (a_Distance, AcaciaLeaves::Persistent(a_Block));
-			case BlockType::BirchLeaves:   return BirchLeaves::BirchLeaves     (a_Distance, BirchLeaves::Persistent(a_Block));
-			case BlockType::DarkOakLeaves: return DarkOakLeaves::DarkOakLeaves (a_Distance, DarkOakLeaves::Persistent(a_Block));
-			case BlockType::JungleLeaves:  return JungleLeaves::JungleLeaves   (a_Distance, JungleLeaves::Persistent(a_Block));
-			case BlockType::OakLeaves:     return OakLeaves::OakLeaves         (a_Distance, OakLeaves::Persistent(a_Block));
-			case BlockType::SpruceLeaves:  return SpruceLeaves::SpruceLeaves   (a_Distance, SpruceLeaves::Persistent(a_Block));
+			case BlockType::AcaciaLeaves:  return AcaciaLeaves::AcaciaLeaves   (a_Distance, AcaciaLeaves::Persistent(a_Block), AcaciaLeaves::Waterlogged(a_Block));
+			case BlockType::BirchLeaves:   return BirchLeaves::BirchLeaves     (a_Distance, BirchLeaves::Persistent(a_Block), BirchLeaves::Waterlogged(a_Block));
+			case BlockType::DarkOakLeaves: return DarkOakLeaves::DarkOakLeaves (a_Distance, DarkOakLeaves::Persistent(a_Block), DarkOakLeaves::Waterlogged(a_Block));
+			case BlockType::JungleLeaves:  return JungleLeaves::JungleLeaves   (a_Distance, JungleLeaves::Persistent(a_Block), JungleLeaves::Waterlogged(a_Block));
+			case BlockType::OakLeaves:     return OakLeaves::OakLeaves         (a_Distance, OakLeaves::Persistent(a_Block), OakLeaves::Waterlogged(a_Block));
+			case BlockType::SpruceLeaves:  return SpruceLeaves::SpruceLeaves   (a_Distance, SpruceLeaves::Persistent(a_Block), SpruceLeaves::Waterlogged(a_Block));
 			default: return a_Block;
 		}
 	}
@@ -91,12 +91,12 @@ public:
 		using namespace Block;
 		switch (a_Block.Type())
 		{
-			case BlockType::AcaciaLeaves:  return AcaciaLeaves::AcaciaLeaves   (AcaciaLeaves::Distance(a_Block),  a_IsPersistant);
-			case BlockType::BirchLeaves:   return BirchLeaves::BirchLeaves     (BirchLeaves::Distance(a_Block),   a_IsPersistant);
-			case BlockType::DarkOakLeaves: return DarkOakLeaves::DarkOakLeaves (DarkOakLeaves::Distance(a_Block), a_IsPersistant);
-			case BlockType::JungleLeaves:  return JungleLeaves::JungleLeaves   (JungleLeaves::Distance(a_Block),  a_IsPersistant);
-			case BlockType::OakLeaves:     return OakLeaves::OakLeaves         (OakLeaves::Distance(a_Block),     a_IsPersistant);
-			case BlockType::SpruceLeaves:  return SpruceLeaves::SpruceLeaves   (SpruceLeaves::Distance(a_Block),  a_IsPersistant);
+			case BlockType::AcaciaLeaves:  return AcaciaLeaves::AcaciaLeaves   (AcaciaLeaves::Distance(a_Block),  a_IsPersistant, AcaciaLeaves::Waterlogged(a_Block));
+			case BlockType::BirchLeaves:   return BirchLeaves::BirchLeaves     (BirchLeaves::Distance(a_Block),   a_IsPersistant, BirchLeaves::Waterlogged(a_Block));
+			case BlockType::DarkOakLeaves: return DarkOakLeaves::DarkOakLeaves (DarkOakLeaves::Distance(a_Block), a_IsPersistant, DarkOakLeaves::Waterlogged(a_Block));
+			case BlockType::JungleLeaves:  return JungleLeaves::JungleLeaves   (JungleLeaves::Distance(a_Block),  a_IsPersistant, JungleLeaves::Waterlogged(a_Block));
+			case BlockType::OakLeaves:     return OakLeaves::OakLeaves         (OakLeaves::Distance(a_Block),     a_IsPersistant, OakLeaves::Waterlogged(a_Block));
+			case BlockType::SpruceLeaves:  return SpruceLeaves::SpruceLeaves   (SpruceLeaves::Distance(a_Block),  a_IsPersistant, SpruceLeaves::Waterlogged(a_Block));
 			default: return a_Block;
 		}
 	}

@@ -14,7 +14,7 @@
 #include "Palettes/Palette_1_18.h"
 #include "Palettes/Palette_1_19.h"
 #include "Palettes/Palette_1_20.h"
-
+#include "Palettes/Palette_1_21.h"
 
 namespace
 {
@@ -86,6 +86,11 @@ namespace
 	auto Palette754(const BlockState a_Block)
 	{
 		return Palette_1_16::From(a_Block);
+	}
+
+	auto Palette767(const BlockState a_Block)
+	{
+		return Palette_1_21::From(a_Block);
 	}
 
 }
@@ -337,23 +342,23 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 		}
 		case CacheVersion::v763:
 		{
-			Serialize763<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x24);
+			Serialize763<&Palette767>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x24);
 			break;
 		}
 		case CacheVersion::v764:
 		case CacheVersion::v765:
 		{
-			Serialize764<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x25);
+			Serialize764<&Palette767>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x25);
 			break;
 		}
 		case CacheVersion::v766:
 		{
-			Serialize764<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x27);
+			Serialize764<&Palette767>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x27);
 			break;
 		}
 		case CacheVersion::v767:
 		{
-			Serialize764<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x27);
+			Serialize764<&Palette767>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x27);
 			break;
 		}
 	}

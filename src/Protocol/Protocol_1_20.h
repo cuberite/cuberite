@@ -108,6 +108,7 @@ protected:
 
 	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const override;
+	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) const override;
 	virtual Version GetProtocolVersion() const override;
 
 	virtual UInt32    GetProtocolMobType(eMonsterType a_MobType) const override;

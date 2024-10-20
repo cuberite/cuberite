@@ -1340,7 +1340,7 @@ namespace
 	constexpr cItemStairsHandler            ItemSandstoneStairsHandler                 (Item::SandstoneStairs);
 	constexpr cUnimplementedItemHandler     ItemSandstoneWallHandler                   (Item::SandstoneWall);
 	constexpr cUnimplementedItemHandler     ItemScaffoldingHandler                     (Item::Scaffolding);
-	constexpr cUnimplementedItemHandler     ItemScuteHandler                           (Item::Scute);
+	constexpr cUnimplementedItemHandler     ItemScuteHandler                           (Item::TurtleScute);
 	constexpr cUnimplementedItemHandler     ItemSeaLanternHandler                      (Item::SeaLantern);
 	constexpr cUnimplementedItemHandler     ItemSeaPickleHandler                       (Item::SeaPickle);
 	constexpr cUnimplementedItemHandler     ItemSeagrassHandler                        (Item::Seagrass);
@@ -2332,7 +2332,7 @@ const cItemHandler & cItemHandler::For(Item a_ItemType)
 		case Item::SandstoneStairs:                  return ItemSandstoneStairsHandler;
 		case Item::SandstoneWall:                    return ItemSandstoneWallHandler;
 		case Item::Scaffolding:                      return ItemScaffoldingHandler;
-		case Item::Scute:                            return ItemScuteHandler;
+		case Item::TurtleScute:                      return ItemScuteHandler;
 		case Item::SeaLantern:                       return ItemSeaLanternHandler;
 		case Item::SeaPickle:                        return ItemSeaPickleHandler;
 		case Item::Seagrass:                         return ItemSeagrassHandler;

@@ -2368,7 +2368,7 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	});
 	Json::Value sample;
 	int i = 0;
-	for each (std::pair<cUUID, AString> PlayerId in playeruuids)
+	for (std::pair<cUUID, AString> PlayerId : playeruuids)
 	{
 		Json::Value entry;
 		entry["name"] = PlayerId.second;

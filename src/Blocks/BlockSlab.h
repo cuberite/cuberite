@@ -517,11 +517,11 @@ private:
 { \
 	if (IsSlabTop(a_Block)) \
 	{ \
-		return SlabType::SlabType(SlabType::Type::Bottom); \
+		return SlabType::SlabType(SlabType::Type::Bottom, SlabType::Waterlogged(a_Block)); \
 	} \
 	else \
 	{ \
-		return SlabType::SlabType(SlabType::Type::Top); \
+		return SlabType::SlabType(SlabType::Type::Top, SlabType::Waterlogged(a_Block)); \
 	}\
 }
 	// Flips top and bottom

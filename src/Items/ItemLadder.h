@@ -36,7 +36,7 @@ private:
 			}
 		}
 
-		return a_Player.PlaceBlock(a_PlacePosition, Block::Ladder::Ladder(RotationToBlockFace(a_Player.GetYaw())));
+		return a_Player.PlaceBlock(a_PlacePosition, Block::Ladder::Ladder(RotationToBlockFace(a_Player.GetYaw()), a_Player.GetWorld()->GetBlock(a_PlacePosition).Type() == BlockType::Water));
 	}
 
 

@@ -444,14 +444,14 @@ void cPawn::HandleFalling(void)
 				Damage = static_cast<int>(static_cast<float>(Damage) * 0.33);
 			}
 
-			if (BlockBelow == Block::HayBale::HayBale())
+			if (BlockBelow.Type() == BlockType::HayBlock)
 			{
 				Damage = std::clamp(static_cast<int>(static_cast<float>(Damage) * 0.2), 1, 20);
 			}
 
 			// Fall particles
 			// TODO: falling on a partial (e.g. slab) block shouldn't broadcast particles of the block below
-			auto NumericBlock = PaletteUpgrade::ToBlock(GetWorld()->GetBlock(Below));
+			//auto NumericBlock = PaletteUpgrade::ToBlock(GetWorld()->GetBlock(Below));
 
 			GetWorld()->BroadcastParticleEffect(
 				"blockdust",
@@ -459,7 +459,7 @@ void cPawn::HandleFalling(void)
 				{ 0, 0, 0 },
 				(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
 				static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
-				{ { NumericBlock.first, NumericBlock.second } }
+				{ { 0, 0 } }
 			);
 
 			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);

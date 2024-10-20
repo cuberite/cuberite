@@ -716,9 +716,10 @@ void cMojangAPI::NotifyNameUUID(const AString & a_PlayerName, const cUUID & a_UU
 void cMojangAPI::GetMojangKeys(void)
 {
 	/* Incase this function is called multiple times there are no duplicate keys */
-	for each (auto var in MojangPublicKeys)
+
+	for (auto mojang_public_key : MojangPublicKeys)
 	{
-		mbedtls_pk_free(&var);
+		mbedtls_pk_free(&mojang_public_key);
 	}
 	MojangPublicKeys.clear();
 

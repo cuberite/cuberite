@@ -224,7 +224,7 @@ cCommandManager::cCommandNode::ComputeChildrenIds(cCommandNode & a_node)
 	CollectChildren(list, a_node);
 	childmap[&a_node] = 0;
 	int i = 1;
-	for each (cCommandNode* var in list)
+	for (cCommandNode* var : list)
 	{
 		childmap[var] = i;
 		i++;

@@ -3,6 +3,7 @@
 #include "Packetizer.h"
 #include <ClientHandle.h>
 #include "WorldStorage/FastNBT.h"
+#include "Palettes/Palette_1_21.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -290,6 +291,32 @@ void cProtocol_1_21::SendSelectKnownPacks()
 	}	
 }
 
+
+
+
+
+UInt32 cProtocol_1_21::GetProtocolBlockType(BlockState a_Block) const
+{
+	return Palette_1_21::From(a_Block);
+}
+
+
+
+
+
+UInt32 cProtocol_1_21::GetProtocolItemType(Item a_ItemID) const
+{
+	return Palette_1_21::From(a_ItemID);
+}
+
+
+
+
+
+Item cProtocol_1_21::GetItemFromProtocolID(UInt32 a_ProtocolID) const
+{
+	return Palette_1_21::ToItem(a_ProtocolID);
+}
 
 
 
