@@ -69,9 +69,9 @@ public:
 		switch (Self.Type())
 		{
 			case BlockType::Rail: break;   // Nothing to do
-			case BlockType::ActivatorRail: a_ChunkInterface.FastSetBlock(a_Position, ActivatorRail::ActivatorRail(a_Powered, ActivatorRail::Shape(Self))); break;
-			case BlockType::DetectorRail:  a_ChunkInterface.FastSetBlock(a_Position, DetectorRail::DetectorRail(a_Powered, DetectorRail::Shape(Self))); break;
-			case BlockType::PoweredRail:   a_ChunkInterface.FastSetBlock(a_Position, PoweredRail::PoweredRail(a_Powered, PoweredRail::Shape(Self))); break;
+			case BlockType::ActivatorRail: a_ChunkInterface.FastSetBlock(a_Position, ActivatorRail::ActivatorRail(a_Powered, ActivatorRail::Shape(Self),ActivatorRail::Waterlogged(Self))); break;
+			case BlockType::DetectorRail:  a_ChunkInterface.FastSetBlock(a_Position, DetectorRail::DetectorRail(a_Powered, DetectorRail::Shape(Self), DetectorRail::Waterlogged(Self))); break;
+			case BlockType::PoweredRail:   a_ChunkInterface.FastSetBlock(a_Position, PoweredRail::PoweredRail(a_Powered, PoweredRail::Shape(Self), PoweredRail::Waterlogged(Self))); break;
 			default: break;
 		}
 	}
@@ -152,16 +152,16 @@ public:
 			{
 				switch (a_Shape)
 				{
-					case Shape::NorthSouth:      return Rail::Rail(Rail::Shape::NorthSouth);
-					case Shape::EastWest:        return Rail::Rail(Rail::Shape::EastWest);
-					case Shape::AscendingEast:   return Rail::Rail(Rail::Shape::AscendingEast);
-					case Shape::AscendingWest:   return Rail::Rail(Rail::Shape::AscendingWest);
-					case Shape::AscendingNorth:  return Rail::Rail(Rail::Shape::AscendingNorth);
-					case Shape::AscendingSouth:  return Rail::Rail(Rail::Shape::AscendingSouth);
-					case Shape::SouthEast:       return Rail::Rail(Rail::Shape::SouthEast);
-					case Shape::SouthWest:       return Rail::Rail(Rail::Shape::SouthWest);
-					case Shape::NorthWest:       return Rail::Rail(Rail::Shape::NorthWest);
-					case Shape::NorthEast:       return Rail::Rail(Rail::Shape::NorthEast);
+					case Shape::NorthSouth:      return Rail::Rail(Rail::Shape::NorthSouth, Rail::Waterlogged(a_Block));
+					case Shape::EastWest:        return Rail::Rail(Rail::Shape::EastWest, Rail::Waterlogged(a_Block));
+					case Shape::AscendingEast:   return Rail::Rail(Rail::Shape::AscendingEast, Rail::Waterlogged(a_Block));
+					case Shape::AscendingWest:   return Rail::Rail(Rail::Shape::AscendingWest, Rail::Waterlogged(a_Block));
+					case Shape::AscendingNorth:  return Rail::Rail(Rail::Shape::AscendingNorth, Rail::Waterlogged(a_Block));
+					case Shape::AscendingSouth:  return Rail::Rail(Rail::Shape::AscendingSouth, Rail::Waterlogged(a_Block));
+					case Shape::SouthEast:       return Rail::Rail(Rail::Shape::SouthEast, Rail::Waterlogged(a_Block));
+					case Shape::SouthWest:       return Rail::Rail(Rail::Shape::SouthWest, Rail::Waterlogged(a_Block));
+					case Shape::NorthWest:       return Rail::Rail(Rail::Shape::NorthWest, Rail::Waterlogged(a_Block));
+					case Shape::NorthEast:       return Rail::Rail(Rail::Shape::NorthEast, Rail::Waterlogged(a_Block));
 					case Shape::None:            return a_Block;
 				}
 				break;
@@ -170,12 +170,12 @@ public:
 			{
 				switch (a_Shape)
 				{
-					case Shape::NorthSouth:      return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::NorthSouth);
-					case Shape::EastWest:        return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::EastWest);
-					case Shape::AscendingEast:   return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast);
-					case Shape::AscendingWest:   return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest);
-					case Shape::AscendingNorth:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth);
-					case Shape::AscendingSouth:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingSouth);
+					case Shape::NorthSouth:      return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::NorthSouth, ActivatorRail::Waterlogged(a_Block));
+					case Shape::EastWest:        return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::EastWest, ActivatorRail::Waterlogged(a_Block));
+					case Shape::AscendingEast:   return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast, ActivatorRail::Waterlogged(a_Block));
+					case Shape::AscendingWest:   return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest, ActivatorRail::Waterlogged(a_Block));
+					case Shape::AscendingNorth:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth, ActivatorRail::Waterlogged(a_Block));
+					case Shape::AscendingSouth:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingSouth, ActivatorRail::Waterlogged(a_Block));
 					case Shape::None:            return a_Block;
 					case Shape::SouthEast:
 					case Shape::SouthWest:
@@ -192,12 +192,12 @@ public:
 			{
 				switch (a_Shape)
 				{
-					case Shape::NorthSouth:      return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::NorthSouth);
-					case Shape::EastWest:        return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::EastWest);
-					case Shape::AscendingEast:   return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast);
-					case Shape::AscendingWest:   return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest);
-					case Shape::AscendingNorth:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth);
-					case Shape::AscendingSouth:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingSouth);
+					case Shape::NorthSouth:      return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::NorthSouth, DetectorRail::Waterlogged(a_Block));
+					case Shape::EastWest:        return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::EastWest, DetectorRail::Waterlogged(a_Block));
+					case Shape::AscendingEast:   return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast, DetectorRail::Waterlogged(a_Block));
+					case Shape::AscendingWest:   return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest, DetectorRail::Waterlogged(a_Block));
+					case Shape::AscendingNorth:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth, DetectorRail::Waterlogged(a_Block));
+					case Shape::AscendingSouth:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingSouth, DetectorRail::Waterlogged(a_Block));
 					case Shape::None:            return a_Block;
 					case Shape::SouthEast:
 					case Shape::SouthWest:
@@ -214,12 +214,12 @@ public:
 			{
 				switch (a_Shape)
 				{
-					case Shape::NorthSouth:      return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::NorthSouth);
-					case Shape::EastWest:        return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::EastWest);
-					case Shape::AscendingEast:   return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast);
-					case Shape::AscendingWest:   return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest);
-					case Shape::AscendingNorth:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth);
-					case Shape::AscendingSouth:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingSouth);
+					case Shape::NorthSouth:      return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::NorthSouth, PoweredRail::Waterlogged(a_Block));
+					case Shape::EastWest:        return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::EastWest, PoweredRail::Waterlogged(a_Block));
+					case Shape::AscendingEast:   return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast, PoweredRail::Waterlogged(a_Block));
+					case Shape::AscendingWest:   return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest, PoweredRail::Waterlogged(a_Block));
+					case Shape::AscendingNorth:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth, PoweredRail::Waterlogged(a_Block));
+					case Shape::AscendingSouth:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingSouth, PoweredRail::Waterlogged(a_Block));
 					case Shape::None:            return a_Block;
 					case Shape::SouthEast:
 					case Shape::SouthWest:
@@ -680,7 +680,8 @@ private:
 	{
 		using namespace Block;
 		auto Self = a_ChunkInterface.GetBlock(a_Pos);
-		AddFaceDirection(a_Pos.x, a_Pos.y, a_Pos.z, a_BlockFace, false);
+		//AddFaceDirection(a_Pos.x, a_Pos.y, a_Pos.z, a_BlockFace, false);
+		a_Pos = AddFaceDirection(a_Pos, a_BlockFace, false);
 		BlockState Other = 0;
 		if (!IsBlockRail(a_ChunkInterface.GetBlock(a_Pos)))
 		{
@@ -1062,16 +1063,16 @@ private:
 				switch (Rail::Shape(a_Block))
 				{
 
-					case Rail::Shape::NorthSouth:     return Rail::Rail(Rail::Shape::EastWest);
-					case Rail::Shape::EastWest:       return Rail::Rail(Rail::Shape::NorthSouth);
-					case Rail::Shape::AscendingEast:  return Rail::Rail(Rail::Shape::AscendingNorth);
-					case Rail::Shape::AscendingWest:  return Rail::Rail(Rail::Shape::AscendingSouth);
-					case Rail::Shape::AscendingNorth: return Rail::Rail(Rail::Shape::AscendingWest);
-					case Rail::Shape::AscendingSouth: return Rail::Rail(Rail::Shape::AscendingEast);
-					case Rail::Shape::SouthEast:      return Rail::Rail(Rail::Shape::NorthEast);
-					case Rail::Shape::SouthWest:      return Rail::Rail(Rail::Shape::SouthEast);
-					case Rail::Shape::NorthWest:      return Rail::Rail(Rail::Shape::SouthWest);
-					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::NorthWest);
+					case Rail::Shape::NorthSouth:     return Rail::Rail(Rail::Shape::EastWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::EastWest:       return Rail::Rail(Rail::Shape::NorthSouth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingEast:  return Rail::Rail(Rail::Shape::AscendingNorth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingWest:  return Rail::Rail(Rail::Shape::AscendingSouth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingNorth: return Rail::Rail(Rail::Shape::AscendingWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingSouth: return Rail::Rail(Rail::Shape::AscendingEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthEast:      return Rail::Rail(Rail::Shape::NorthEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthWest:      return Rail::Rail(Rail::Shape::SouthEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthWest:      return Rail::Rail(Rail::Shape::SouthWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::NorthWest, Rail::Waterlogged(a_Block));
 				}
 				break;
 			}
@@ -1079,12 +1080,12 @@ private:
 			{
 				switch (ActivatorRail::Shape(a_Block))
 				{
-					case ActivatorRail::Shape::NorthSouth:     return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::EastWest);
-					case ActivatorRail::Shape::EastWest:       return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::NorthSouth);
-					case ActivatorRail::Shape::AscendingEast:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth);
-					case ActivatorRail::Shape::AscendingWest:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingSouth);
-					case ActivatorRail::Shape::AscendingNorth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest);
-					case ActivatorRail::Shape::AscendingSouth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast);
+					case ActivatorRail::Shape::NorthSouth:     return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::EastWest, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::EastWest:       return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::NorthSouth, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingEast:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingWest:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingSouth, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingNorth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingSouth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast, ActivatorRail::Waterlogged(a_Block));
 				}
 				break;
 			}
@@ -1092,12 +1093,12 @@ private:
 			{
 				switch (DetectorRail::Shape(a_Block))
 				{
-					case DetectorRail::Shape::NorthSouth:     return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::EastWest);
-					case DetectorRail::Shape::EastWest:       return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::NorthSouth);
-					case DetectorRail::Shape::AscendingEast:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth);
-					case DetectorRail::Shape::AscendingWest:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingSouth);
-					case DetectorRail::Shape::AscendingNorth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest);
-					case DetectorRail::Shape::AscendingSouth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast);
+					case DetectorRail::Shape::NorthSouth:     return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::EastWest, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::EastWest:       return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::NorthSouth, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingEast:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingWest:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingSouth, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingNorth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingSouth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast, DetectorRail::Waterlogged(a_Block));
 				}
 				break;
 			}
@@ -1105,12 +1106,12 @@ private:
 			{
 				switch (PoweredRail::Shape(a_Block))
 				{
-					case PoweredRail::Shape::NorthSouth:     return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::EastWest);
-					case PoweredRail::Shape::EastWest:       return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::NorthSouth);
-					case PoweredRail::Shape::AscendingEast:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth);
-					case PoweredRail::Shape::AscendingWest:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingSouth);
-					case PoweredRail::Shape::AscendingNorth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest);
-					case PoweredRail::Shape::AscendingSouth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast);
+					case PoweredRail::Shape::NorthSouth:     return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::EastWest, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::EastWest:       return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::NorthSouth, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingEast:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingWest:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingSouth, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingNorth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingSouth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast, PoweredRail::Waterlogged(a_Block));
 				}
 				break;
 			}
@@ -1129,16 +1130,16 @@ private:
 			{
 				switch (Rail::Shape(a_Block))
 				{
-					case Rail::Shape::NorthSouth:     return Rail::Rail(Rail::Shape::EastWest);
-					case Rail::Shape::EastWest:       return Rail::Rail(Rail::Shape::NorthSouth);
-					case Rail::Shape::AscendingEast:  return Rail::Rail(Rail::Shape::AscendingSouth);
-					case Rail::Shape::AscendingWest:  return Rail::Rail(Rail::Shape::AscendingNorth);
-					case Rail::Shape::AscendingNorth: return Rail::Rail(Rail::Shape::AscendingEast);
-					case Rail::Shape::AscendingSouth: return Rail::Rail(Rail::Shape::AscendingWest);
-					case Rail::Shape::SouthEast:      return Rail::Rail(Rail::Shape::SouthWest);
-					case Rail::Shape::SouthWest:      return Rail::Rail(Rail::Shape::NorthWest);
-					case Rail::Shape::NorthWest:      return Rail::Rail(Rail::Shape::NorthEast);
-					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::SouthEast);
+					case Rail::Shape::NorthSouth:     return Rail::Rail(Rail::Shape::EastWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::EastWest:       return Rail::Rail(Rail::Shape::NorthSouth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingEast:  return Rail::Rail(Rail::Shape::AscendingSouth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingWest:  return Rail::Rail(Rail::Shape::AscendingNorth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingNorth: return Rail::Rail(Rail::Shape::AscendingEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingSouth: return Rail::Rail(Rail::Shape::AscendingWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthEast:      return Rail::Rail(Rail::Shape::SouthWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthWest:      return Rail::Rail(Rail::Shape::NorthWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthWest:      return Rail::Rail(Rail::Shape::NorthEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::SouthEast, Rail::Waterlogged(a_Block));
 				}
 				break;
 			}
@@ -1146,12 +1147,12 @@ private:
 			{
 				switch (ActivatorRail::Shape(a_Block))
 				{
-					case ActivatorRail::Shape::NorthSouth:     return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::EastWest);
-					case ActivatorRail::Shape::EastWest:       return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::NorthSouth);
-					case ActivatorRail::Shape::AscendingEast:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingSouth);
-					case ActivatorRail::Shape::AscendingWest:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth);
-					case ActivatorRail::Shape::AscendingNorth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast);
-					case ActivatorRail::Shape::AscendingSouth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest);
+					case ActivatorRail::Shape::NorthSouth:     return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::EastWest, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::EastWest:       return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::NorthSouth, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingEast:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingSouth, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingWest:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingNorth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingSouth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest, ActivatorRail::Waterlogged(a_Block));
 				}
 				break;
 			}
@@ -1159,12 +1160,12 @@ private:
 			{
 				switch (DetectorRail::Shape(a_Block))
 				{
-					case DetectorRail::Shape::NorthSouth:     return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::EastWest);
-					case DetectorRail::Shape::EastWest:       return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::NorthSouth);
-					case DetectorRail::Shape::AscendingEast:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingSouth);
-					case DetectorRail::Shape::AscendingWest:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth);
-					case DetectorRail::Shape::AscendingNorth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast);
-					case DetectorRail::Shape::AscendingSouth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest);
+					case DetectorRail::Shape::NorthSouth:     return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::EastWest, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::EastWest:       return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::NorthSouth, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingEast:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingSouth, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingWest:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingNorth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingSouth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest, DetectorRail::Waterlogged(a_Block));
 				}
 				break;
 			}
@@ -1172,12 +1173,12 @@ private:
 			{
 				switch (PoweredRail::Shape(a_Block))
 				{
-					case PoweredRail::Shape::NorthSouth:     return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::EastWest);
-					case PoweredRail::Shape::EastWest:       return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::NorthSouth);
-					case PoweredRail::Shape::AscendingEast:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingSouth);
-					case PoweredRail::Shape::AscendingWest:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth);
-					case PoweredRail::Shape::AscendingNorth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast);
-					case PoweredRail::Shape::AscendingSouth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest);
+					case PoweredRail::Shape::NorthSouth:     return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::EastWest, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::EastWest:       return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::NorthSouth, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingEast:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingSouth, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingWest:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingNorth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingSouth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest, PoweredRail::Waterlogged(a_Block));
 				}
 				break;
 			}
@@ -1196,12 +1197,12 @@ private:
 			{
 				switch (Rail::Shape(a_Block))
 				{
-					case Rail::Shape::AscendingNorth: return Rail::Rail(Rail::Shape::AscendingSouth);
-					case Rail::Shape::AscendingSouth: return Rail::Rail(Rail::Shape::AscendingNorth);
-					case Rail::Shape::SouthEast:      return Rail::Rail(Rail::Shape::NorthEast);
-					case Rail::Shape::SouthWest:      return Rail::Rail(Rail::Shape::NorthWest);
-					case Rail::Shape::NorthWest:      return Rail::Rail(Rail::Shape::SouthWest);
-					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::SouthEast);
+					case Rail::Shape::AscendingNorth: return Rail::Rail(Rail::Shape::AscendingSouth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingSouth: return Rail::Rail(Rail::Shape::AscendingNorth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthEast:      return Rail::Rail(Rail::Shape::NorthEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthWest:      return Rail::Rail(Rail::Shape::NorthWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthWest:      return Rail::Rail(Rail::Shape::SouthWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::SouthEast, Rail::Waterlogged(a_Block));
 					default: return a_Block;
 				}
 			}
@@ -1209,8 +1210,8 @@ private:
 			{
 				switch (ActivatorRail::Shape(a_Block))
 				{
-					case ActivatorRail::Shape::AscendingNorth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingSouth);
-					case ActivatorRail::Shape::AscendingSouth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth);
+					case ActivatorRail::Shape::AscendingNorth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingSouth, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingSouth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth, ActivatorRail::Waterlogged(a_Block));
 					default: return a_Block;
 				}
 			}
@@ -1218,8 +1219,8 @@ private:
 			{
 				switch (DetectorRail::Shape(a_Block))
 				{
-					case DetectorRail::Shape::AscendingNorth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingSouth);
-					case DetectorRail::Shape::AscendingSouth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth);
+					case DetectorRail::Shape::AscendingNorth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingSouth, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingSouth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth, DetectorRail::Waterlogged(a_Block));
 					default: return a_Block;
 				}
 			}
@@ -1227,8 +1228,8 @@ private:
 			{
 				switch (PoweredRail::Shape(a_Block))
 				{
-					case PoweredRail::Shape::AscendingNorth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingSouth);
-					case PoweredRail::Shape::AscendingSouth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth);
+					case PoweredRail::Shape::AscendingNorth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingSouth, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingSouth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth, PoweredRail::Waterlogged(a_Block));
 					default: return a_Block;
 				}
 			}
@@ -1246,12 +1247,12 @@ private:
 			{
 				switch (Rail::Shape(a_Block))
 				{
-					case Rail::Shape::AscendingEast:  return Rail::Rail(Rail::Shape::AscendingWest);
-					case Rail::Shape::AscendingWest:  return Rail::Rail(Rail::Shape::AscendingEast);
-					case Rail::Shape::SouthEast:      return Rail::Rail(Rail::Shape::SouthWest);
-					case Rail::Shape::SouthWest:      return Rail::Rail(Rail::Shape::SouthEast);
-					case Rail::Shape::NorthWest:      return Rail::Rail(Rail::Shape::NorthEast);
-					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::NorthWest);
+					case Rail::Shape::AscendingEast:  return Rail::Rail(Rail::Shape::AscendingWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingWest:  return Rail::Rail(Rail::Shape::AscendingEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthEast:      return Rail::Rail(Rail::Shape::SouthWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthWest:      return Rail::Rail(Rail::Shape::SouthEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthWest:      return Rail::Rail(Rail::Shape::NorthEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::NorthWest, Rail::Waterlogged(a_Block));
 					default: return a_Block;
 				}
 			}
@@ -1259,8 +1260,8 @@ private:
 			{
 				switch (ActivatorRail::Shape(a_Block))
 				{
-					case ActivatorRail::Shape::AscendingEast:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest);
-					case ActivatorRail::Shape::AscendingWest:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast);
+					case ActivatorRail::Shape::AscendingEast:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingWest:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast, ActivatorRail::Waterlogged(a_Block));
 					default: return a_Block;
 				}
 			}
@@ -1268,8 +1269,8 @@ private:
 			{
 				switch (DetectorRail::Shape(a_Block))
 				{
-					case DetectorRail::Shape::AscendingEast:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest);
-					case DetectorRail::Shape::AscendingWest:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast);
+					case DetectorRail::Shape::AscendingEast:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingWest:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast, DetectorRail::Waterlogged(a_Block));
 					default: return a_Block;
 				}
 			}
@@ -1277,8 +1278,8 @@ private:
 			{
 				switch (PoweredRail::Shape(a_Block))
 				{
-					case PoweredRail::Shape::AscendingEast:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest);
-					case PoweredRail::Shape::AscendingWest:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast);
+					case PoweredRail::Shape::AscendingEast:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingWest:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast, PoweredRail::Waterlogged(a_Block));
 					default: return a_Block;
 				}
 			}

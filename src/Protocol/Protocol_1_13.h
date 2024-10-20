@@ -46,6 +46,7 @@ protected:
 	virtual void SendStatistics                 (const StatisticsManager & a_Manager) override;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results, UInt32 CompletionId) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
+	virtual void SendSpawnEntity                (const cEntity & a_Entity) override;
 	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata) const;
 	virtual UInt8 GetEntityMetadataID(EntityMetadataType a_FieldType) const;
 	virtual Item GetItemFromProtocolID(UInt32 a_ProtocolID) const;

@@ -32,8 +32,8 @@ public:
 		using namespace Block;
 		switch (a_Block.Type())
 		{
-			case BlockType::Chest:        return Chest::Chest              (Chest::Facing(a_Block),        a_Orientation == ChestType::Left ? Chest::Type::Left :        a_Orientation == ChestType::Right ? Chest::Type::Right        : Chest::Type::Single);
-			case BlockType::TrappedChest: return TrappedChest::TrappedChest(TrappedChest::Facing(a_Block), a_Orientation == ChestType::Left ? TrappedChest::Type::Left : a_Orientation == ChestType::Right ? TrappedChest::Type::Right : TrappedChest::Type::Single);
+			case BlockType::Chest:        return Chest::Chest              (Chest::Facing(a_Block),        a_Orientation == ChestType::Left ? Chest::Type::Left :        a_Orientation == ChestType::Right ? Chest::Type::Right        : Chest::Type::Single, Chest::Waterlogged(a_Block));
+			case BlockType::TrappedChest: return TrappedChest::TrappedChest(TrappedChest::Facing(a_Block), a_Orientation == ChestType::Left ? TrappedChest::Type::Left : a_Orientation == ChestType::Right ? TrappedChest::Type::Right : TrappedChest::Type::Single, Chest::Waterlogged(a_Block));
 			default: return a_Block;
 		}
 	}

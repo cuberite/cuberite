@@ -604,7 +604,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			int GrassType = m_Noise.IntNoise2DInt(xx * 50, zz * 50) / 7 % 100;
 			if ((GrassType < 60) && CanGrassGrow(a_ChunkDesc.GetBiome(x, z)))
 			{
-				a_ChunkDesc.SetBlock({x, y, z}, Block::Grass::Grass());
+				a_ChunkDesc.SetBlock({x, y, z}, Block::ShortGrass::ShortGrass());
 				a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(y));
 			}
 			else if ((GrassType < 90) && CanFernGrow(a_ChunkDesc.GetBiome(x, z)))
@@ -654,7 +654,7 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			}
 			else
 			{
-				a_ChunkDesc.SetBlock({x, y, z}, Block::Grass::Grass());
+				a_ChunkDesc.SetBlock({x, y, z}, Block::ShortGrass::ShortGrass());
 				a_ChunkDesc.SetHeight(x, z, static_cast<HEIGHTTYPE>(y));
 			}
 		}

@@ -33,6 +33,8 @@ Implements the 1.13 protocol classes:
 #include "WorldStorage/NamespaceSerializer.h"
 
 #include "../Bindings/PluginManager.h"
+#include "Entities/FallingBlock.h"
+#include "Entities/Floater.h"
 
 #include "Palettes/Palette_1_13.h"
 #include "Palettes/Palette_1_13_1.h"
@@ -255,6 +257,51 @@ void cProtocol_1_13::SendStatistics(const StatisticsManager & a_Manager)
 		Pkt.WriteVarInt32(ID);
 		Pkt.WriteVarInt32(static_cast<UInt32>(Value));
 	}
+}
+
+
+
+
+
+void cProtocol_1_13::SendSpawnEntity(const cEntity & a_Entity)
+{
+	Int32 EntityData = /* Default: velocity present flag */ 1;
+	const auto EntityType = GetProtocolEntityType(a_Entity);
+
+	if (a_Entity.IsMinecart())
+	{
+		const auto & Cart = static_cast<const cMinecart &>(a_Entity);
+		EntityData = static_cast<Int32>(Cart.GetPayload());
+	}
+	else if (a_Entity.IsItemFrame())
+	{
+		const auto & Frame = static_cast<const cItemFrame &>(a_Entity);
+		EntityData = static_cast<Int32>(Frame.GetProtocolFacing());
+	}
+	else if (a_Entity.IsFallingBlock())
+	{
+		const auto & Block = static_cast<const cFallingBlock &>(a_Entity);
+		auto NumericBlock = GetProtocolBlockType(Block.GetBlock());
+		EntityData = NumericBlock;
+	}
+	else if (a_Entity.IsFloater())
+	{
+		const auto & Floater = static_cast<const cFloater &>(a_Entity);
+		EntityData = static_cast<Int32>(Floater.GetOwnerID());
+	}
+	else if (a_Entity.IsProjectile())
+	{
+		using PType = cProjectileEntity::eKind;
+		const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
+
+		if (Projectile.GetProjectileKind() == PType::pkArrow)
+		{
+			const auto & Arrow = static_cast<const cArrowEntity &>(Projectile);
+			EntityData = static_cast<Int32>(Arrow.GetCreatorUniqueID() + 1);
+		}
+	}
+
+	SendEntitySpawn(a_Entity, EntityType, EntityData);
 }
 
 
@@ -1741,6 +1788,7 @@ bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size
 	ParseItemMetadata(a_Item, Metadata);
 	return true;
 }
+
 
 
 

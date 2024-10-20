@@ -683,7 +683,7 @@ void cMinecart::HandlePoweredRailPhysics(BlockState a_Rail)
 void cMinecart::HandleDetectorRailPhysics(BlockState a_Rail, std::chrono::milliseconds a_Dt)
 {
 	using namespace Block;
-	m_World->SetBlock(m_DetectorRailPosition, DetectorRail::DetectorRail(true, DetectorRail::Shape(a_Rail)));
+	m_World->SetBlock(m_DetectorRailPosition, DetectorRail::DetectorRail(true, DetectorRail::Shape(a_Rail), DetectorRail::Waterlogged(a_Rail)));
 
 	// No special handling
 	HandleRailPhysics(a_Rail, a_Dt);
@@ -695,7 +695,7 @@ void cMinecart::HandleDetectorRailPhysics(BlockState a_Rail, std::chrono::millis
 
 void cMinecart::HandleActivatorRailPhysics(BlockState a_Rail, std::chrono::milliseconds a_Dt)
 {
-	m_World->SetBlock(m_DetectorRailPosition, Block::ActivatorRail::ActivatorRail(true, Block::ActivatorRail::Shape(a_Rail)));
+	m_World->SetBlock(m_DetectorRailPosition, Block::ActivatorRail::ActivatorRail(true, Block::ActivatorRail::Shape(a_Rail), Block::ActivatorRail::Waterlogged(a_Rail)));
 	// TODO - shake minecart, throw entities out
 }
 
@@ -1294,7 +1294,7 @@ void cMinecart::OnRemoveFromWorld(cWorld & a_World)
 {
 	if (m_bIsOnDetectorRail)
 	{
-		m_World->SetBlock(m_DetectorRailPosition, Block::DetectorRail::DetectorRail(false, Block::DetectorRail::Shape(m_World->GetBlock(m_DetectorRailPosition))));
+		m_World->SetBlock(m_DetectorRailPosition, Block::DetectorRail::DetectorRail(false, Block::DetectorRail::Shape(m_World->GetBlock(m_DetectorRailPosition)),Block::DetectorRail::Waterlogged(m_World->GetBlock(m_DetectorRailPosition))));
 	}
 
 	Super::OnRemoveFromWorld(a_World);
