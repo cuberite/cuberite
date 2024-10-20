@@ -141,7 +141,7 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 		m_SettingsFilename = a_OverridesRepo.GetValue("Server","ConfigFile");
 	}
 
-	auto & loadmap = *BlockMap::BlMap::GetMap();
+	/*auto & loadmap = *BlockMap::BlMap::GetMap();
 	auto & savemap = *BlockMap::BlMap::GetSaveMap();
 
 	loadmap.reserve(30000);
@@ -158,7 +158,7 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 		auto strid = line.substr(b, std::string::npos);
 		loadmap[strid] = id;
 		savemap[id] = strid;
-	}
+	}*/
 
 	// LOGD("%d hash tbl size", (*BlockMap::BlMap::GetMap()).size());
 

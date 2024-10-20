@@ -1285,7 +1285,6 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 		serializer.Finish();  // Close NBT tags
 
 		aWriter.BeginList("sections", TAG_Compound);
-		std::unordered_map<ENUM_BLOCKS, AString> savemap = *BlockMap::BlMap::GetSaveMap();
 
 		const bool use_padding = true;	// used in 1.16+
 		for (size_t Y = 0; Y < cChunkDef::NumSections; Y++)
