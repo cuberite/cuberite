@@ -284,7 +284,7 @@ public:
 
 	static void GrowTallGrass(cWorld & a_World, const Vector3i a_Position)
 	{
-		a_World.SetBlock(a_Position, Block::Grass::Grass());
+		a_World.SetBlock(a_Position, Block::ShortGrass::ShortGrass());
 		a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_Position, 0);
 	}
 

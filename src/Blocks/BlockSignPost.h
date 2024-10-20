@@ -65,14 +65,14 @@ private:
 		using namespace Block;
 		switch (a_Block.Type())
 		{
-			case BlockType::AcaciaSign:  return AcaciaSign::AcaciaSign(  (AcaciaSign::Rotation(a_Block)  + 4) % 16);
-			case BlockType::BirchSign:   return BirchSign::BirchSign(    (BirchSign::Rotation(a_Block)   + 4) % 16);
-			case BlockType::CrimsonSign: return CrimsonSign::CrimsonSign((CrimsonSign::Rotation(a_Block) + 4) % 16);
-			case BlockType::DarkOakSign: return DarkOakSign::DarkOakSign((DarkOakSign::Rotation(a_Block) + 4) % 16);
-			case BlockType::JungleSign:  return JungleSign::JungleSign(  (JungleSign::Rotation(a_Block)  + 4) % 16);
-			case BlockType::OakSign:     return OakSign::OakSign(        (OakSign::Rotation(a_Block)     + 4) % 16);
-			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(  (SpruceSign::Rotation(a_Block)  + 4) % 16);
-			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(  (WarpedSign::Rotation(a_Block)  + 4) % 16);
+			case BlockType::AcaciaSign:  return AcaciaSign::AcaciaSign(  (AcaciaSign::Rotation(a_Block)  + 4) % 16, AcaciaSign::Waterlogged(a_Block));
+			case BlockType::BirchSign:   return BirchSign::BirchSign(    (BirchSign::Rotation(a_Block)   + 4) % 16, BirchSign::Waterlogged(a_Block));
+			case BlockType::CrimsonSign: return CrimsonSign::CrimsonSign((CrimsonSign::Rotation(a_Block) + 4) % 16, CrimsonSign::Waterlogged(a_Block));
+			case BlockType::DarkOakSign: return DarkOakSign::DarkOakSign((DarkOakSign::Rotation(a_Block) + 4) % 16, DarkOakSign::Waterlogged(a_Block));
+			case BlockType::JungleSign:  return JungleSign::JungleSign(  (JungleSign::Rotation(a_Block)  + 4) % 16, JungleSign::Waterlogged(a_Block));
+			case BlockType::OakSign:     return OakSign::OakSign(        (OakSign::Rotation(a_Block)     + 4) % 16, OakSign::Waterlogged(a_Block));
+			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(  (SpruceSign::Rotation(a_Block)  + 4) % 16, SpruceSign::Waterlogged(a_Block));
+			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(  (WarpedSign::Rotation(a_Block)  + 4) % 16, WarpedSign::Waterlogged(a_Block));
 			default: return a_Block;
 		}
 	}
@@ -86,14 +86,14 @@ private:
 		using namespace Block;
 		switch (a_Block.Type())
 		{
-			case BlockType::AcaciaSign:  return AcaciaSign::AcaciaSign(  (AcaciaSign::Rotation(a_Block)  + 12) % 16);
-			case BlockType::BirchSign:   return BirchSign::BirchSign(    (BirchSign::Rotation(a_Block)   + 12) % 16);
-			case BlockType::CrimsonSign: return CrimsonSign::CrimsonSign((CrimsonSign::Rotation(a_Block) + 12) % 16);
-			case BlockType::DarkOakSign: return DarkOakSign::DarkOakSign((DarkOakSign::Rotation(a_Block) + 12) % 16);
-			case BlockType::JungleSign:  return JungleSign::JungleSign(   (JungleSign::Rotation(a_Block) + 12) % 16);
-			case BlockType::OakSign:     return OakSign::OakSign(         (OakSign::Rotation(a_Block)    + 12) % 16);
-			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(   (SpruceSign::Rotation(a_Block) + 12) % 16);
-			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(   (WarpedSign::Rotation(a_Block) + 12) % 16);
+			case BlockType::AcaciaSign:  return AcaciaSign::AcaciaSign(  (AcaciaSign::Rotation(a_Block)  + 12) % 16, AcaciaSign::Waterlogged(a_Block));
+			case BlockType::BirchSign:   return BirchSign::BirchSign(    (BirchSign::Rotation(a_Block)   + 12) % 16, BirchSign::Waterlogged(a_Block));
+			case BlockType::CrimsonSign: return CrimsonSign::CrimsonSign((CrimsonSign::Rotation(a_Block) + 12) % 16, CrimsonSign::Waterlogged(a_Block));
+			case BlockType::DarkOakSign: return DarkOakSign::DarkOakSign((DarkOakSign::Rotation(a_Block) + 12) % 16, DarkOakSign::Waterlogged(a_Block));
+			case BlockType::JungleSign:  return JungleSign::JungleSign(   (JungleSign::Rotation(a_Block) + 12) % 16, JungleSign::Waterlogged(a_Block));
+			case BlockType::OakSign:     return OakSign::OakSign(         (OakSign::Rotation(a_Block)    + 12) % 16, OakSign::Waterlogged(a_Block));
+			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(   (SpruceSign::Rotation(a_Block) + 12) % 16, SpruceSign::Waterlogged(a_Block));
+			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(   (WarpedSign::Rotation(a_Block) + 12) % 16, WarpedSign::Waterlogged(a_Block));
 			default: return a_Block;
 		}
 	}
@@ -108,14 +108,14 @@ private:
 		using namespace Block;
 		switch (a_Block.Type())
 		{
-			case BlockType::AcaciaSign:  return AcaciaSign::AcaciaSign(  (AcaciaSign::Rotation(a_Block)  + 8) % 16);
-			case BlockType::BirchSign:   return BirchSign::BirchSign(    (BirchSign::Rotation(a_Block)   + 8) % 16);
-			case BlockType::CrimsonSign: return CrimsonSign::CrimsonSign((CrimsonSign::Rotation(a_Block) + 8) % 16);
-			case BlockType::DarkOakSign: return DarkOakSign::DarkOakSign((DarkOakSign::Rotation(a_Block) + 8) % 16);
-			case BlockType::JungleSign:  return JungleSign::JungleSign(   (JungleSign::Rotation(a_Block) + 8) % 16);
-			case BlockType::OakSign:     return OakSign::OakSign(         (OakSign::Rotation(a_Block)    + 8) % 16);
-			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(   (SpruceSign::Rotation(a_Block) + 8) % 16);
-			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(   (WarpedSign::Rotation(a_Block) + 8) % 16);
+			case BlockType::AcaciaSign:  return AcaciaSign::AcaciaSign(  (AcaciaSign::Rotation(a_Block)  + 8) % 16, AcaciaSign::Waterlogged(a_Block));
+			case BlockType::BirchSign:   return BirchSign::BirchSign(    (BirchSign::Rotation(a_Block)   + 8) % 16, BirchSign::Waterlogged(a_Block));
+			case BlockType::CrimsonSign: return CrimsonSign::CrimsonSign((CrimsonSign::Rotation(a_Block) + 8) % 16, CrimsonSign::Waterlogged(a_Block));
+			case BlockType::DarkOakSign: return DarkOakSign::DarkOakSign((DarkOakSign::Rotation(a_Block) + 8) % 16, DarkOakSign::Waterlogged(a_Block));
+			case BlockType::JungleSign:  return JungleSign::JungleSign(   (JungleSign::Rotation(a_Block) + 8) % 16, JungleSign::Waterlogged(a_Block));
+			case BlockType::OakSign:     return OakSign::OakSign(         (OakSign::Rotation(a_Block)    + 8) % 16, OakSign::Waterlogged(a_Block));
+			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(   (SpruceSign::Rotation(a_Block) + 8) % 16, SpruceSign::Waterlogged(a_Block));
+			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(   (WarpedSign::Rotation(a_Block) + 8) % 16, WarpedSign::Waterlogged(a_Block));
 			default: return a_Block;
 		}
 	}
@@ -130,14 +130,14 @@ private:
 		using namespace Block;
 		switch (a_Block.Type())
 		{
-			case BlockType::AcaciaSign:  return AcaciaSign::AcaciaSign(  (AcaciaSign::Rotation(a_Block)  + 8) % 16);
-			case BlockType::BirchSign:   return BirchSign::BirchSign(    (BirchSign::Rotation(a_Block)   + 8) % 16);
-			case BlockType::CrimsonSign: return CrimsonSign::CrimsonSign((CrimsonSign::Rotation(a_Block) + 8) % 16);
-			case BlockType::DarkOakSign: return DarkOakSign::DarkOakSign((DarkOakSign::Rotation(a_Block) + 8) % 16);
-			case BlockType::JungleSign:  return JungleSign::JungleSign(   (JungleSign::Rotation(a_Block) + 8) % 16);
-			case BlockType::OakSign:     return OakSign::OakSign(         (OakSign::Rotation(a_Block)    + 8) % 16);
-			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(   (SpruceSign::Rotation(a_Block) + 8) % 16);
-			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(   (WarpedSign::Rotation(a_Block) + 8) % 16);
+			case BlockType::AcaciaSign:  return AcaciaSign::AcaciaSign(  (AcaciaSign::Rotation(a_Block)  + 8) % 16, AcaciaSign::Waterlogged(a_Block));
+			case BlockType::BirchSign:   return BirchSign::BirchSign(    (BirchSign::Rotation(a_Block)   + 8) % 16, BirchSign::Waterlogged(a_Block));
+			case BlockType::CrimsonSign: return CrimsonSign::CrimsonSign((CrimsonSign::Rotation(a_Block) + 8) % 16, CrimsonSign::Waterlogged(a_Block));
+			case BlockType::DarkOakSign: return DarkOakSign::DarkOakSign((DarkOakSign::Rotation(a_Block) + 8) % 16, DarkOakSign::Waterlogged(a_Block));
+			case BlockType::JungleSign:  return JungleSign::JungleSign(   (JungleSign::Rotation(a_Block) + 8) % 16, JungleSign::Waterlogged(a_Block));
+			case BlockType::OakSign:     return OakSign::OakSign(         (OakSign::Rotation(a_Block)    + 8) % 16, OakSign::Waterlogged(a_Block));
+			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(   (SpruceSign::Rotation(a_Block) + 8) % 16, SpruceSign::Waterlogged(a_Block));
+			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(   (WarpedSign::Rotation(a_Block) + 8) % 16, WarpedSign::Waterlogged(a_Block));
 			default: return a_Block;
 		}
 	}

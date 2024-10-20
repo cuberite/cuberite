@@ -59,6 +59,8 @@ private:
 
 		BlockState BlockToPlace;
 
+		bool IsPlacedInWater = a_Player.GetWorld()->GetBlock(a_PlacePosition).Type() == BlockType::Water;
+
 		using namespace Block;
 		switch (BlockItemConverter::FromItem(a_HeldItem.m_ItemType))
 		{
@@ -67,7 +69,7 @@ private:
 				BlockToPlace = AcaciaTrapdoor::AcaciaTrapdoor(
 					DestFacing,
 					IsBottom ? AcaciaTrapdoor::Half::Bottom : AcaciaTrapdoor::Half::Top,
-					false, false);
+					false, false, IsPlacedInWater);
 				break;
 			}
 			case BlockType::BirchTrapdoor:
@@ -75,7 +77,7 @@ private:
 				BlockToPlace = BirchTrapdoor::BirchTrapdoor(
 					DestFacing,
 					IsBottom ? BirchTrapdoor::Half::Bottom : BirchTrapdoor::Half::Top,
-					false, false);
+					false, false, IsPlacedInWater);
 				break;
 			}
 			case BlockType::CrimsonTrapdoor:
@@ -83,7 +85,7 @@ private:
 				BlockToPlace = CrimsonTrapdoor::CrimsonTrapdoor(
 					DestFacing,
 					IsBottom ? CrimsonTrapdoor::Half::Bottom : CrimsonTrapdoor::Half::Top,
-					false, false);
+					false, false, IsPlacedInWater);
 				break;
 			}
 			case BlockType::DarkOakTrapdoor:
@@ -91,7 +93,7 @@ private:
 				BlockToPlace = DarkOakTrapdoor::DarkOakTrapdoor(
 					DestFacing,
 					IsBottom ? DarkOakTrapdoor::Half::Bottom : DarkOakTrapdoor::Half::Top,
-					false, false);
+					false, false, IsPlacedInWater);
 				break;
 			}
 			case BlockType::IronTrapdoor:
@@ -99,7 +101,7 @@ private:
 				BlockToPlace = IronTrapdoor::IronTrapdoor(
 					DestFacing,
 					IsBottom ? IronTrapdoor::Half::Bottom : IronTrapdoor::Half::Top,
-					false, false);
+					false, false, IsPlacedInWater);
 				break;
 			}
 			case BlockType::JungleTrapdoor:
@@ -107,7 +109,7 @@ private:
 				BlockToPlace = JungleTrapdoor::JungleTrapdoor(
 					DestFacing,
 					IsBottom ? JungleTrapdoor::Half::Bottom : JungleTrapdoor::Half::Top,
-					false, false);
+					false, false, IsPlacedInWater);
 				break;
 			}
 			case BlockType::OakTrapdoor:
@@ -115,7 +117,7 @@ private:
 				BlockToPlace = OakTrapdoor::OakTrapdoor(
 					DestFacing,
 					IsBottom ? OakTrapdoor::Half::Bottom : OakTrapdoor::Half::Top,
-					false, false);
+					false, false, IsPlacedInWater);
 				break;
 			}
 			case BlockType::SpruceTrapdoor:
@@ -123,7 +125,7 @@ private:
 				BlockToPlace = SpruceTrapdoor::SpruceTrapdoor(
 					DestFacing,
 					IsBottom ? SpruceTrapdoor::Half::Bottom : SpruceTrapdoor::Half::Top,
-					false, false);
+					false, false, IsPlacedInWater);
 				break;
 			}
 			case BlockType::WarpedTrapdoor:
@@ -131,7 +133,7 @@ private:
 				BlockToPlace = WarpedTrapdoor::WarpedTrapdoor(
 					DestFacing,
 					IsBottom ? WarpedTrapdoor::Half::Bottom : WarpedTrapdoor::Half::Top,
-					false, false);
+					false, false, IsPlacedInWater);
 				break;
 			}
 			default: return false;

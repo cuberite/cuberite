@@ -66,6 +66,7 @@ private:
 
 		// Get the meta of the placed chest; take existing neighbors into account:
 		const auto Yaw = a_Player.GetYaw();
+		bool IsPlacedInWater = World.GetBlock(a_PlacePosition).Type() == BlockType::Water;
 		BlockState BlockToPlace;
 		using namespace Block;
 		switch (NeighborIdx)
@@ -80,12 +81,12 @@ private:
 					{
 						if ((Yaw >= -90) && (Yaw < 90))
 						{
-							BlockToPlace = Chest::Chest(BLOCK_FACE_NORTH, Chest::Type::Left);
+							BlockToPlace = Chest::Chest(BLOCK_FACE_NORTH, Chest::Type::Left, IsPlacedInWater);
 							break;
 						}
 						else
 						{
-							BlockToPlace = Chest::Chest(BLOCK_FACE_SOUTH, Chest::Type::Right);
+							BlockToPlace = Chest::Chest(BLOCK_FACE_SOUTH, Chest::Type::Right, IsPlacedInWater);
 							break;
 						}
 					}
@@ -93,12 +94,12 @@ private:
 					{
 						if ((Yaw >= -90) && (Yaw < 90))
 						{
-							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_NORTH, TrappedChest::Type::Left);
+							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_NORTH, TrappedChest::Type::Left, IsPlacedInWater);
 							break;
 						}
 						else
 						{
-							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_SOUTH, TrappedChest::Type::Right);
+							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_SOUTH, TrappedChest::Type::Right, IsPlacedInWater);
 							break;
 						}
 					}
@@ -116,12 +117,12 @@ private:
 					{
 						if ((Yaw < 0))
 						{
-							BlockToPlace = Chest::Chest(BLOCK_FACE_EAST, Chest::Type::Left);
+							BlockToPlace = Chest::Chest(BLOCK_FACE_EAST, Chest::Type::Left, IsPlacedInWater);
 							break;
 						}
 						else
 						{
-							BlockToPlace = Chest::Chest(BLOCK_FACE_WEST, Chest::Type::Right);
+							BlockToPlace = Chest::Chest(BLOCK_FACE_WEST, Chest::Type::Right, IsPlacedInWater);
 							break;
 						}
 					}
@@ -129,12 +130,12 @@ private:
 					{
 						if ((Yaw < 0))
 						{
-							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_EAST, TrappedChest::Type::Left);
+							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_EAST, TrappedChest::Type::Left, IsPlacedInWater);
 							break;
 						}
 						else
 						{
-							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_WEST, TrappedChest::Type::Right);
+							BlockToPlace = TrappedChest::TrappedChest(BLOCK_FACE_WEST, TrappedChest::Type::Right, IsPlacedInWater);
 							break;
 						}
 					}
@@ -147,8 +148,8 @@ private:
 				// No neighbor, place based on yaw:
 				switch (ChestType)
 				{
-					case BlockType::Chest:        BlockToPlace = Chest::Chest(RotationToBlockFace(a_Player.GetYaw()), Chest::Type::Single); break;
-					case BlockType::TrappedChest: BlockToPlace = TrappedChest::TrappedChest(RotationToBlockFace(a_Player.GetYaw()), TrappedChest::Type::Single); break;
+					case BlockType::Chest:        BlockToPlace = Chest::Chest(RotationToBlockFace(a_Player.GetYaw()), Chest::Type::Single, IsPlacedInWater); break;
+					case BlockType::TrappedChest: BlockToPlace = TrappedChest::TrappedChest(RotationToBlockFace(a_Player.GetYaw()), TrappedChest::Type::Single, IsPlacedInWater); break;
 					default: return false;
 				}
 				break;
@@ -177,12 +178,12 @@ private:
 						{
 							if ((Yaw >= -90) && (Yaw < 90))
 							{
-								Neighbour = Chest::Chest(BLOCK_FACE_NORTH, Chest::Type::Right);
+								Neighbour = Chest::Chest(BLOCK_FACE_NORTH, Chest::Type::Right, IsPlacedInWater);
 								break;
 							}
 							else
 							{
-								Neighbour = Chest::Chest(BLOCK_FACE_SOUTH, Chest::Type::Left);
+								Neighbour = Chest::Chest(BLOCK_FACE_SOUTH, Chest::Type::Left, IsPlacedInWater);
 								break;
 							}
 						}
@@ -190,12 +191,12 @@ private:
 						{
 							if ((Yaw >= -90) && (Yaw < 90))
 							{
-								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_NORTH, TrappedChest::Type::Right);
+								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_NORTH, TrappedChest::Type::Right, IsPlacedInWater);
 								break;
 							}
 							else
 							{
-								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_SOUTH, TrappedChest::Type::Left);
+								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_SOUTH, TrappedChest::Type::Left, IsPlacedInWater);
 								break;
 							}
 						}
@@ -213,12 +214,12 @@ private:
 						{
 							if ((Yaw < 0))
 							{
-								Neighbour = Chest::Chest(BLOCK_FACE_EAST, Chest::Type::Right);
+								Neighbour = Chest::Chest(BLOCK_FACE_EAST, Chest::Type::Right, IsPlacedInWater);
 								break;
 							}
 							else
 							{
-								Neighbour = Chest::Chest(BLOCK_FACE_WEST, Chest::Type::Left);
+								Neighbour = Chest::Chest(BLOCK_FACE_WEST, Chest::Type::Left, IsPlacedInWater);
 								break;
 							}
 						}
@@ -226,12 +227,12 @@ private:
 						{
 							if ((Yaw < 0))
 							{
-								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_EAST, TrappedChest::Type::Right);
+								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_EAST, TrappedChest::Type::Right, IsPlacedInWater);
 								break;
 							}
 							else
 							{
-								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_WEST, TrappedChest::Type::Left);
+								Neighbour = TrappedChest::TrappedChest(BLOCK_FACE_WEST, TrappedChest::Type::Left, IsPlacedInWater);
 								break;
 							}
 						}
